@@ -45,11 +45,8 @@ use LibreNMS\Exceptions\InvalidModuleException;
 class ModuleTestHelper
 {
     private bool $quiet = false;
-    private readonly string $variant;
     private readonly string $snmprec_file;
     private readonly string $json_file;
-    private readonly string $snmprec_dir;
-    private readonly string $json_dir;
     private readonly string $file_name;
     private array $discovery_module_output = [];
     private array $poller_module_output = [];
@@ -69,18 +66,10 @@ class ModuleTestHelper
      */
     public function __construct(private readonly ModuleList $modules, string $os, string $variant = '')
     {
-        $this->variant = strtolower($variant);
-
         // preset the file names
-        if ($variant) {
-            $variant = '_' . $this->variant;
-        }
-        $install_dir = LibrenmsConfig::get('install_dir');
-        $this->file_name = $os . $variant;
-        $this->snmprec_dir = "$install_dir/tests/snmpsim/";
-        $this->snmprec_file = $this->snmprec_dir . $this->file_name . '.snmprec';
-        $this->json_dir = "$install_dir/tests/data/";
-        $this->json_file = $this->json_dir . $this->file_name . '.json';
+        $this->file_name = self::fixtureName($os, $variant);
+        $this->snmprec_file = self::snmprecFilepath($this->file_name);
+        $this->json_file = base_path("tests/data/$this->file_name.json");
 
         // never store time series data
         LibrenmsConfig::set('rrd.enable', false);
@@ -90,6 +79,20 @@ class ModuleTestHelper
         LibrenmsConfig::set('graphite.enable', false);
         LibrenmsConfig::set('prometheus.enable', false);
         LibrenmsConfig::set('kafka.enable', false);
+    }
+
+    /**
+     * The fixture base name: <os> for the base fixture, <os>_<variant> for a variant
+     */
+    public static function fixtureName(string $os, string $variant = ''): string
+    {
+        return $variant === '' ? $os : $os . '_' . strtolower($variant);
+    }
+
+    public static function snmprecFilepath(string $fixture): string
+    {
+        // same directory Snmpsim serves
+        return base_path("tests/snmpsim/$fixture.snmprec");
     }
 
     public function setQuiet(bool $quiet = true): void
@@ -273,7 +276,7 @@ class ModuleTestHelper
             ]);
             $method = new DevicePollingMethod([
                 'method_type' => PollingMethodType::Snmp,
-                'settings' => ['transport' => 'udp', 'port' => $snmpSimPort],
+                'settings' => ['transport' => 'udp', 'port' => $snmpSimPort, 'max_repeaters' => 25],
                 'affects_availability' => true,
                 'last_check_successful' => true,
             ]);
@@ -308,7 +311,7 @@ class ModuleTestHelper
         ob_start();
         Log::setDefaultDriver('stdout');
 
-        (new DiscoverDevice($device_id, $this->modules))->handle();
+        new DiscoverDevice($device_id, $this->modules)->handle();
 
         $this->discovery_output = ob_get_contents();
         if ($this->quiet) {
@@ -340,7 +343,7 @@ class ModuleTestHelper
         ob_start();
         Log::setDefaultDriver('stdout');
 
-        (new PollDevice($device_id, $this->modules))->handle();
+        new PollDevice($device_id, $this->modules)->handle();
 
         $this->poller_output = ob_get_contents();
         if ($this->quiet) {
@@ -364,7 +367,7 @@ class ModuleTestHelper
         if (! getenv('CI') && $device['hostname'] == $snmpSimIp) {
             // we don't need the debug from this
             Debug::set(false);
-            delete_device($device_id);
+            $device->delete();
         }
 
         return $data;
@@ -496,7 +499,7 @@ class ModuleTestHelper
     public function getJsonFilepath(bool $short = false): string
     {
         if ($short) {
-            return ltrim(str_replace(LibrenmsConfig::get('install_dir'), '', $this->json_file), '/');
+            return ltrim(str_replace(base_path(), '', $this->json_file), '/');
         }
 
         return $this->json_file;

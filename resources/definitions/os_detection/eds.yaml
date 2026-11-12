@@ -1,6 +1,6 @@
 os: eds
 text: 'EDS'
-type: appliance
+type: environment
 icon: eds
 group: eds
 mib_dir: eds

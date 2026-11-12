@@ -11634,24 +11634,22 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.2636.3.1.13.1.8.9.1.0.0",
-                    "processor_index": "9.1.0.0",
-                    "processor_type": "junos",
-                    "processor_usage": 38,
-                    "processor_descr": "Routing Engine",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.2636.3.39.1.12.1.1.1.4.0",
                     "processor_index": "0",
                     "processor_type": "junos",
                     "processor_usage": 4,
                     "processor_descr": "single SPU 0/0",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.2636.3.1.13.1.8.9.1.0.0",
+                    "processor_index": "9.1.0.0",
+                    "processor_type": "junos",
+                    "processor_usage": 38,
+                    "processor_descr": "Routing Engine",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }

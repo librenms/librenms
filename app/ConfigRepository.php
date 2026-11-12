@@ -27,7 +27,6 @@
 namespace App;
 
 use App\Events\SettingChanged;
-use App\Models\Callback;
 use App\Models\GraphType;
 use Exception;
 use Illuminate\Database\QueryException;
@@ -65,7 +64,7 @@ class ConfigRepository
 
         // load config settings that can be cached
         $cache_ttl = config('librenms.config_cache_ttl');
-        $this->config = Cache::driver($cache_ttl == 0 ? 'null' : 'file')->remember('librenms-config', $cache_ttl, function () {
+        $this->config = Cache::driver($cache_ttl == 0 ? 'null' : 'file')->remember($this->cacheKey(), $cache_ttl, function () {
             $this->config = [];
             // merge all config sources together config_definitions.json & os defs > db config > config.php
             $this->loadPreUserConfigDefaults();
@@ -333,7 +332,15 @@ class ConfigRepository
      */
     public function invalidateCache(): void
     {
-        Cache::driver('file')->forget('librenms-config');
+        Cache::driver('file')->forget($this->cacheKey());
+    }
+
+    /**
+     * The config includes database settings, keep each database's apart (the test suite shares the file cache)
+     */
+    private function cacheKey(): string
+    {
+        return 'librenms-config-' . config('database.default');
     }
 
     /**
@@ -463,10 +470,6 @@ class ConfigRepository
             }
 
             $this->persistDefault('device_display_default', $display_value);
-        }
-
-        if (! $this->has('reporting.usage')) {
-            $this->persistDefault('reporting.usage', (bool) Callback::get('enabled'));
         }
 
         // populate legacy DB credentials, just in case something external uses them.  Maybe remove this later

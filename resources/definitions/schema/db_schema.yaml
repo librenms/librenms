@@ -408,6 +408,7 @@ cache:
     - { Field: expiration, Type: int, 'Null': false, Extra: '' }
   Indexes:
     cache_key_unique: { Name: cache_key_unique, Columns: [key], Unique: true, Type: BTREE }
+    cache_expiration_index: { Name: cache_expiration_index, Columns: [expiration], Unique: false, Type: BTREE }
 cache_locks:
   Columns:
     - { Field: key, Type: varchar(255), 'Null': false, Extra: '' }
@@ -415,6 +416,7 @@ cache_locks:
     - { Field: expiration, Type: int, 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [key], Unique: true, Type: BTREE }
+    cache_locks_expiration_index: { Name: cache_locks_expiration_index, Columns: [expiration], Unique: false, Type: BTREE }
 callback:
   Columns:
     - { Field: callback_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1133,6 +1135,7 @@ mempools:
     - { Field: mempool_precision, Type: int, 'Null': false, Extra: '', Default: '1' }
     - { Field: mempool_descr, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: polling_method, Type: varchar(32), 'Null': false, Extra: '', Default: snmp }
     - { Field: mempool_perc, Type: int, 'Null': false, Extra: '' }
     - { Field: mempool_perc_oid, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: mempool_used, Type: bigint, 'Null': false, Extra: '' }
@@ -1886,7 +1889,7 @@ ports_fdb:
     - { Field: ports_fdb_id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: mac_address, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: vlan_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: vlan, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: created_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: updated_at, Type: timestamp, 'Null': true, Extra: '' }
@@ -1895,7 +1898,7 @@ ports_fdb:
     ports_fdb_device_id_index: { Name: ports_fdb_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     ports_fdb_mac_address_index: { Name: ports_fdb_mac_address_index, Columns: [mac_address], Unique: false, Type: BTREE }
     ports_fdb_port_id_index: { Name: ports_fdb_port_id_index, Columns: [port_id], Unique: false, Type: BTREE }
-    ports_fdb_vlan_id_index: { Name: ports_fdb_vlan_id_index, Columns: [vlan_id], Unique: false, Type: BTREE }
+    ports_fdb_vlan_index: { Name: ports_fdb_vlan_index, Columns: [vlan], Unique: false, Type: BTREE }
 ports_nac:
   Columns:
     - { Field: ports_nac_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2094,39 +2097,19 @@ processes:
 processors:
   Columns:
     - { Field: processor_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: entPhysicalIndex, Type: int, 'Null': false, Extra: '', Default: '0' }
     - { Field: hrDeviceIndex, Type: int, 'Null': true, Extra: '' }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: processor_oid, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: processor_index, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: processor_type, Type: varchar(16), 'Null': false, Extra: '' }
-    - { Field: processor_usage, Type: int, 'Null': false, Extra: '' }
+    - { Field: processor_usage, Type: int, 'Null': true, Extra: '' }
     - { Field: processor_descr, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: processor_precision, Type: int, 'Null': false, Extra: '', Default: '1' }
     - { Field: processor_perc_warn, Type: int, 'Null': true, Extra: '', Default: '75' }
+    - { Field: processor_perc_warn_custom, Type: int, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [processor_id], Unique: true, Type: BTREE }
     processors_device_id_index: { Name: processors_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
-proxmox:
-  Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
-    - { Field: vmid, Type: int, 'Null': false, Extra: '' }
-    - { Field: cluster, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: description, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: last_seen, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    proxmox_cluster_vmid_unique: { Name: proxmox_cluster_vmid_unique, Columns: [cluster, vmid], Unique: true, Type: BTREE }
-proxmox_ports:
-  Columns:
-    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: vm_id, Type: int, 'Null': false, Extra: '' }
-    - { Field: port, Type: varchar(10), 'Null': false, Extra: '' }
-    - { Field: last_seen, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    proxmox_ports_vm_id_port_unique: { Name: proxmox_ports_vm_id_port_unique, Columns: [vm_id, port], Unique: true, Type: BTREE }
 pseudowires:
   Columns:
     - { Field: pseudowire_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2596,6 +2579,7 @@ users:
     - { Field: updated_at, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
     - { Field: remember_token, Type: varchar(100), 'Null': true, Extra: '' }
     - { Field: enabled, Type: tinyint, 'Null': false, Extra: '', Default: '1' }
+    - { Field: phone, Type: varchar(15), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [user_id], Unique: true, Type: BTREE }
     users_auth_type_username_unique: { Name: users_auth_type_username_unique, Columns: [auth_type, username], Unique: true, Type: BTREE }
@@ -2653,8 +2637,10 @@ vminfo:
     - { Field: vmwVmMemSize, Type: int, 'Null': false, Extra: '' }
     - { Field: vmwVmCpus, Type: int, 'Null': false, Extra: '' }
     - { Field: vmwVmState, Type: 'smallint unsigned', 'Null': false, Extra: '' }
+    - { Field: cluster_id, Type: varchar(64), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    vminfo_cluster_id_vm_type_vmwvmvmid_unique: { Name: vminfo_cluster_id_vm_type_vmwvmvmid_unique, Columns: [cluster_id, vm_type, vmwVmVMID], Unique: true, Type: BTREE }
     vminfo_device_id_index: { Name: vminfo_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     vminfo_vmwvmvmid_index: { Name: vminfo_vmwvmvmid_index, Columns: [vmwVmVMID], Unique: false, Type: BTREE }
 vrfs:

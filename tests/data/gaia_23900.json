@@ -14,7 +14,7 @@
                     "os": "gaia",
                     "type": "firewall",
                     "serial": "LR123456789",
-                    "icon": "checkpoint.png"
+                    "icon": "checkpoint.svg"
                 }
             ]
         },

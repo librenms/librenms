@@ -26,10 +26,13 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Facades\Rrd;
 use App\Models\Device;
 use App\Models\Vminfo;
+use App\View\Components\VminfoGraphs;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class VmInfoController implements DeviceTab
@@ -54,14 +57,47 @@ class VmInfoController implements DeviceTab
         return __('Virtual Machines');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function data(Device $device, Request $request): array
     {
-        $request->validate(Vminfo::filterValidationRules());
+        // the device page only authorizes the device
+        Gate::authorize('viewAny', Vminfo::class);
+
+        $request->validate([
+            ...Vminfo::filterValidationRules(),
+            ...VminfoGraphs::validationRules(),
+        ]);
+
+        $graph = $request->input('graph');
 
         return [
             'filterFields' => collect(Vminfo::filterFieldDefinitions())
                 ->filter(fn ($field) => $field['key'] !== 'device_id')->values()->all(),
             'filter' => $request->array('filter'),
+            'graph' => $graph,
+            'nav' => VminfoGraphs::nav($request->query(), fn (array $query): string => route('device', ['device' => $device->device_id, 'tab' => 'vm', ...$query])),
+            'vms' => $graph ? $device->vminfo()
+                ->chaperone()
+                ->recordsMetrics()
+                ->applyFilters($request->array('filter'))
+                ->orderBy('vmwVmDisplayName')
+                ->paginate($request->integer('per_page', VminfoGraphs::PER_PAGE_OPTIONS[0]))
+                ->withQueryString() : null,
         ];
+    }
+
+    public function show(Device $device, Vminfo $vminfo): View
+    {
+        abort_unless($vminfo->device()->is($device), 404);
+        Gate::authorize('view', $vminfo);
+
+        return view('device.tabs.vm.show', [
+            'device' => $device,
+            'vm' => $vminfo,
+            // not every source records metrics
+            'graphs' => array_values(array_filter(VminfoGraphs::types(), fn (array $graph): bool => Rrd::checkRrdExists(Rrd::metricName($vminfo->metricIdentity($graph['metric']))))),
+        ]);
     }
 }

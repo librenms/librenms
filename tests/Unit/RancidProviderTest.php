@@ -53,7 +53,7 @@ final class RancidProviderTest extends TestCase
     protected function tearDown(): void
     {
         if ($this->repo && is_dir($this->repo)) {
-            (new Process(['rm', '-rf', $this->repo]))->run();
+            new Process(['rm', '-rf', $this->repo])->run();
         }
         parent::tearDown();
     }
@@ -63,7 +63,7 @@ final class RancidProviderTest extends TestCase
      */
     private function git(array $args): void
     {
-        (new Process(array_merge(['git'], $args), $this->repo))->mustRun();
+        new Process(array_merge(['git'], $args), $this->repo)->mustRun();
     }
 
     /**
@@ -82,7 +82,7 @@ final class RancidProviderTest extends TestCase
     private function bareClone(string $path): void
     {
         mkdir(dirname($path), 0777, true);
-        (new Process(['git', 'clone', '-q', '--bare', $this->repo, $path]))->mustRun();
+        new Process(['git', 'clone', '-q', '--bare', $this->repo, $path])->mustRun();
         LibrenmsConfig::set('rancid_repo_type', 'git-bare');
     }
 
@@ -101,20 +101,20 @@ final class RancidProviderTest extends TestCase
 
         LibrenmsConfig::set('rancid_repo_type', 'svn');
         $url = 'file://' . $this->repo . '/SVN';
-        (new Process([dirname($svn) . '/svnadmin', 'create', $this->repo . '/SVN']))->mustRun();
-        (new Process([$svn, 'mkdir', '-q', '-m', 'init', "$url/core", "$url/core/configs"]))->mustRun();
-        (new Process([$svn, 'checkout', '-q', "$url/core", $this->repo . '/core']))->mustRun();
+        new Process([dirname($svn) . '/svnadmin', 'create', $this->repo . '/SVN'])->mustRun();
+        new Process([$svn, 'mkdir', '-q', '-m', 'init', "$url/core", "$url/core/configs"])->mustRun();
+        new Process([$svn, 'checkout', '-q', "$url/core", $this->repo . '/core'])->mustRun();
 
         $this->configs = $this->repo . '/core/configs';
         LibrenmsConfig::set('rancid_configs', [$this->configs]);
         foreach ($revisions as $index => $content) {
             file_put_contents($this->configs . '/router.example.com', $content);
             if ($index === 0) {
-                (new Process([$svn, 'add', '-q', 'router.example.com'], $this->configs))->mustRun();
+                new Process([$svn, 'add', '-q', 'router.example.com'], $this->configs)->mustRun();
             }
-            (new Process([$svn, 'commit', '-q', '-m', "v$index"], $this->configs))->mustRun();
+            new Process([$svn, 'commit', '-q', '-m', "v$index"], $this->configs)->mustRun();
         }
-        (new Process([$svn, 'update', '-q'], $this->configs))->mustRun();
+        new Process([$svn, 'update', '-q'], $this->configs)->mustRun();
     }
 
     private function makeDevice(string $hostname = 'router.example.com', int $id = 42): Device
@@ -307,7 +307,7 @@ final class RancidProviderTest extends TestCase
     {
         $this->initGitRepo();
         $bare = $this->repo . '/rancid.git';
-        (new Process(['git', 'clone', '-q', '--bare', $this->repo, $bare]))->mustRun();
+        new Process(['git', 'clone', '-q', '--bare', $this->repo, $bare])->mustRun();
         LibrenmsConfig::set('rancid_repo_type', 'git-bare');
         LibrenmsConfig::set('rancid_configs', [$bare . '/configs']);
         $provider = resolve(RancidProvider::class);
@@ -424,7 +424,7 @@ final class RancidProviderTest extends TestCase
             $stream .= "commit refs/heads/master\ncommitter Test <test@example.com> " . (1700000000 + $i) . " +0000\ndata 1\n\n"
                 . 'M 644 inline configs/router.example.com' . "\ndata " . strlen($data) . "\n$data\n";
         }
-        (new Process(['git', 'fast-import', '--quiet'], $this->repo, null, $stream))->mustRun();
+        new Process(['git', 'fast-import', '--quiet'], $this->repo, null, $stream)->mustRun();
         $this->git(['symbolic-ref', 'HEAD', 'refs/heads/master']);
         $this->git(['reset', '-q', '--hard']);
 

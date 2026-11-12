@@ -59,11 +59,15 @@ class EditProcessorsController
         }
 
         $validated = $request->validate([
-            'processor_perc_warn' => 'nullable|numeric|between:0,100',
+            'processor_perc_warn_custom' => 'nullable|numeric|between:0,100',
         ]);
 
-        $warnPercent = $validated['processor_perc_warn'] ?? null;
-        $processor->processor_perc_warn = $warnPercent === null ? null : (int) round((float) $warnPercent);
+        // empty clears the user threshold, the default threshold is used until discovery sets the discovered one
+        $custom = $validated['processor_perc_warn_custom'] ?? null;
+        $processor->processor_perc_warn_custom = $custom === null ? null : (int) round((float) $custom);
+        if ($custom === null) {
+            $processor->processor_perc_warn = null;
+        }
 
         if ($processor->save()) {
             return response()->json([

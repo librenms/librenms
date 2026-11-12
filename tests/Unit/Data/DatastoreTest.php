@@ -26,9 +26,13 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Providers\DatastoreServiceProvider;
+use LibreNMS\Data\Store\Datastore;
+use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 use LibreNMS\Tests\TestCase;
+use Mockery;
 use PHPUnit\Framework\Attributes\Group;
 use WeakReference;
 
@@ -100,5 +104,34 @@ final class DatastoreTest extends TestCase
 
         $stores = $this->app->make('Datastore')->getStores();
         $this->assertEquals([\LibreNMS\Data\Store\Graphite::class], array_map(get_class(...), $stores), 'Datastore should be rebuilt from the current config');
+    }
+
+    public function testCleanedUpMetricsAreWrittenUnderTheNamesTheyHad(): void
+    {
+        $metric = new MetricIdentity('processor', ['hostname' => 'localhost', 'type' => 'hr', 'index' => 1]);
+        $store = Mockery::mock(DatastoreContract::class);
+        $store->shouldReceive('write')->once()
+            ->with('processors', ['usage' => 5], ['processor_type' => 'hr', 'processor_index' => 1], ['rrd_def' => 'def', 'rrd_name' => ['processor', 'hr', '1']]);
+
+        new Datastore([$store])->write($metric->measurement, ['usage' => 5], $metric->tags, ['metric' => $metric, 'rrd_def' => 'def']);
+    }
+
+    public function testCanonicalMetricsAreWrittenAsIdentified(): void
+    {
+        LibrenmsConfig::set('datastore.canonical_metrics', true);
+        $metric = new MetricIdentity('processor', ['hostname' => 'localhost', 'type' => 'hr', 'index' => 1]);
+        $store = Mockery::mock(DatastoreContract::class);
+        $store->shouldReceive('write')->once()->with('processor', ['usage' => 5], $metric->tags, ['metric' => $metric]);
+
+        new Datastore([$store])->write($metric->measurement, ['usage' => 5], $metric->tags, ['metric' => $metric]);
+    }
+
+    public function testMetricsThatWereAlwaysCleanAreWrittenAsIdentified(): void
+    {
+        $metric = new MetricIdentity('vm.cpu', ['cluster' => 'proxmox-abc', 'id' => 100]);
+        $store = Mockery::mock(DatastoreContract::class);
+        $store->shouldReceive('write')->once()->with('vm.cpu', ['usage' => 5], $metric->tags, ['metric' => $metric]);
+
+        new Datastore([$store])->write($metric->measurement, ['usage' => 5], $metric->tags, ['metric' => $metric]);
     }
 }

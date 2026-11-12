@@ -17,7 +17,7 @@ final class HostProbeTest extends TestCase
 {
     use FakesNetworkTools;
 
-    private const IP = '192.0.2.1';
+    private const string IP = '192.0.2.1';
 
     /**
      * @param  array<string, bool>  $options

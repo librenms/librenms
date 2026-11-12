@@ -82,7 +82,7 @@
                                 </tr>
                             </template>
                             <tr x-show="visibleModules.length === 0" x-cloak>
-                                <td colspan="4" class="tw:px-4 tw:py-8 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('No modules match') }}</td>
+                                <td colspan="4" class="tw:px-4 tw:py-8 tw:text-center tw:text-gray-500 tw:dark:text-dark-white-400">{{ empty($modules) ? __('No modules can run with the polling methods enabled on this device.') : __('No modules match') }}</td>
                             </tr>
                             </tbody>
                         </table>
@@ -135,7 +135,7 @@
                 },
 
                 enabled(setting) {
-                    return setting.device ?? setting.os ?? setting.global;
+                    return setting.device ?? setting.method ?? setting.os ?? setting.global;
                 },
 
                 isPending(key) {

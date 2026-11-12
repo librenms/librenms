@@ -33,7 +33,7 @@ use LibreNMS\Interfaces\UI\DeviceTab;
 
 class ProcessesController implements DeviceTab
 {
-    private const COLUMNS = [
+    private const array COLUMNS = [
         'pid' => ['label' => 'PID'],
         'vsz' => ['label' => 'VSZ', 'title' => 'Virtual Memory'],
         'rss' => ['label' => 'RSS', 'title' => 'Resident Memory'],

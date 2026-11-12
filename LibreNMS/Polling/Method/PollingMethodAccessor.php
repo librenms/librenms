@@ -58,6 +58,16 @@ readonly class PollingMethodAccessor
     }
 
     /**
+     * At least one of the methods is configured and enabled for this device.
+     *
+     * @param  PollingMethodType[]  $types
+     */
+    public function anyEnabled(array $types): bool
+    {
+        return array_any($types, fn ($type) => $this->isEnabled($type));
+    }
+
+    /**
      * Enabled methods that affect availability and failed their last check.
      *
      * @return Collection<int, DevicePollingMethod>

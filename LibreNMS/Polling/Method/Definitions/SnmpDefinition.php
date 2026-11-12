@@ -58,7 +58,8 @@ final class SnmpDefinition extends PollingMethodDefinition
                     1 => 'Yes',
                     0 => 'No',
                 ])
-                ->cast('bool'),
+                ->cast('bool')
+                ->fixedIf(['version' => 'v1'], 0), // v1 has no GETBULK
 
             'context' => FieldDefinition::make('context', 'text')
                 ->rules(['nullable', 'string', 'max:255']),

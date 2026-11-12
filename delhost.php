@@ -16,11 +16,13 @@ c_echo('%RWarning: delhost.php is deprecated!%n Use %9lnms device:remove%n inste
 // Remove a host and all related data from the system
 if ($argv[1]) {
     $host = strtolower($argv[1]);
-    $id = getidbyname($host);
-    if ($id) {
-        echo delete_device($id) . "\n";
-    } else {
+    $device = DeviceCache::get($host);
+    if (! $device->exists) {
         echo "Host doesn't exist!\n";
+    } elseif ($device->delete()) {
+        echo "Removed device {$device->hostname}\n";
+    } else {
+        echo "Failed to remove device {$device->hostname}\n";
     }
 } else {
     echo "Host Removal Tool\nUsage: ./delhost.php <hostname>\n";

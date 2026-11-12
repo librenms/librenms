@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use LibreNMS\Util\SearchTerm;
 
 abstract class GroupedSearchController extends Controller
 {
@@ -28,9 +29,19 @@ abstract class GroupedSearchController extends Controller
     }
 
     /**
-     * Return a list of groups, each ['type' => ..., 'label' => ..., 'results' => Collection], or null for empty groups.
+     * Return a list of groups, each ['type' => ..., 'label' => ..., 'url' => optional page with all results, 'results' => Collection], or null for empty groups.
      *
      * @return list<mixed>
      */
     abstract protected function groups(string $search, string $like, int $limit, ?User $user): array;
+
+    /**
+     * The search page with all results of this source, it needs a longer MAC fragment than the global search does
+     */
+    protected function addressSearchUrl(string $search, string $source): ?string
+    {
+        $term = SearchTerm::parse($search);
+
+        return $term->isMac() || $term->isIp() ? route('search', ['q' => $search, 'filter' => ['source' => ['eq' => $source]]]) : null;
+    }
 }

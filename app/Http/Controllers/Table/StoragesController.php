@@ -71,7 +71,7 @@ class StoragesController extends TableController
         $descr = htmlentities((string) $model->storage_descr);
         $graph_array = [
             'type' => 'storage_usage',
-            'popup_title' => htmlentities(strip_tags($model->device?->displayName() . ': ' . $model->storage_descr)),
+            'popup_title' => htmlentities(strip_tags($model->device?->display . ': ' . $model->storage_descr)),
             'id' => $model->storage_id,
             'from' => '-1d',
             'height' => 20,
@@ -129,8 +129,10 @@ class StoragesController extends TableController
      */
     protected function formatExportRow(Model $storage): array
     {
+        $device = $storage->device;
+
         return [
-            $storage->device ? $storage->device->displayName() : '',
+            $storage->device ? $device->display : '',
             $storage->storage_descr,
             Number::formatBi($storage->storage_used),
             Number::formatBi($storage->storage_free),

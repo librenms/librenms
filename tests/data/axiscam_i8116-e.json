@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "axiscam",
-                    "type": "appliance",
+                    "type": "surveillance",
                     "serial": "b8:a4:4f:0:0:0",
                     "icon": "axis.svg"
                 }
@@ -24,7 +24,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.368.4.1.100.3.1.0",
                     "processor_index": "0",

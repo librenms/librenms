@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 
@@ -115,6 +116,19 @@ trait SyncsModels
         };
 
         return $this->syncModels($device, $relationship, $models->when($where, $filter), $device->$relationship->when($where, $filter));
+    }
+
+    /**
+     * Sync models discovered by one polling method, they replace the models of every method.
+     * Models are linked to their method by a polling_method attribute cast to PollingMethodType.
+     *
+     * @template TModel of Model&Keyable
+     *
+     * @param  Collection<int, TModel>  $models
+     */
+    protected function syncModelsFromMethod(Device $device, string $relationship, PollingMethodType $type, Collection $models): Collection
+    {
+        return $this->syncModels($device, $relationship, $models->each(fn (Model $model) => $model->setAttribute('polling_method', $type)));
     }
 
     /**

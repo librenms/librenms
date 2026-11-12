@@ -8,6 +8,7 @@ use App\Models\DevicePollingMethod;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
+use LibreNMS\Polling\Method\DataSources\UnixAgentDataSource;
 use LibreNMS\Polling\Method\Definitions\UnixAgentDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Util\Rewrite;
@@ -17,6 +18,22 @@ use LibreNMS\Util\Rewrite;
  */
 final class UnixAgentPollingMethod extends PollingMethod
 {
+    /**
+     * @param  string|null  $recordedOutput  agent output to use instead of connecting, for test fixtures (tests/unix-agent)
+     */
+    public function __construct(
+        private readonly ?string $recordedOutput = null,
+    ) {
+    }
+
+    /**
+     * Use an agent output recorded from a device, like `nc <host> 6556 > tests/unix-agent/<os>_<variant>.txt`.
+     */
+    public static function recorded(string $file): self
+    {
+        return new self((string) file_get_contents($file));
+    }
+
     public function definition(): UnixAgentDefinition
     {
         return new UnixAgentDefinition;
@@ -48,6 +65,16 @@ final class UnixAgentPollingMethod extends PollingMethod
         );
     }
 
+    public function dataSourceClass(): string
+    {
+        return UnixAgentDataSource::class;
+    }
+
+    public function dataSource(PollingMethodConfig $config, ProbeResult $result): UnixAgentDataSource
+    {
+        return new UnixAgentDataSource($result);
+    }
+
     /**
      * Connecting runs the whole agent, so the check fetches its output for the unix-agent module (output and time stats).
      */
@@ -56,6 +83,11 @@ final class UnixAgentPollingMethod extends PollingMethod
         assert($config instanceof UnixAgentConfig);
 
         $stats = ['port' => $config->port, 'timeout' => $config->timeout];
+
+        if ($this->recordedOutput !== null) {
+            return ProbeResult::success($stats + ['output' => $this->recordedOutput, 'time' => 0]);
+        }
+
         $start = microtime(true);
 
         try {

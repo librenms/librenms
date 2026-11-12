@@ -1111,10 +1111,6 @@ return [
             'description' => 'Enable Libvirt',
             'help' => 'Enables the libvirt page, which shows the virtual machines of devices.',
         ],
-        'enable_proxmox' => [
-            'description' => 'Enable Proxmox',
-            'help' => 'Enables the Proxmox page, which shows the virtual machines of devices.',
-        ],
         'enable_pseudowires' => [
             'description' => 'Enable Pseudowires',
             'help' => 'Enables the pseudowires page, which shows the pseudowires of devices.',
@@ -2115,10 +2111,6 @@ return [
             'help' => 'Ignore comments when comparing RANCID configs, used to display config diffs on device pages',
         ],
         'reporting' => [
-            'error' => [
-                'description' => 'Send Error Reports',
-                'help' => 'Sends some errors to LibreNMS for analysis and fixing',
-            ],
             'usage' => [
                 'description' => 'Send Usage Reports',
                 'help' => 'Reports usage and versions to LibreNMS. To delete anonymous stats, visit the about page. You can view stats at https://stats.librenms.org',
@@ -2126,10 +2118,6 @@ return [
             'dump_errors' => [
                 'description' => 'Dump debug errors (Will break your install)',
                 'help' => 'Dump out errors that are normally hidden so you as a developer can find and fix the possible issues.',
-            ],
-            'throttle' => [
-                'description' => 'Throttle Error Reports',
-                'help' => 'Reports will only be sent every specified amount of seconds. Without this if you have an error in common code reporting can get out of hand. Set to 0 to disable throttling.',
             ],
         ],
         'rewrite_if' => [

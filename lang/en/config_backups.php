@@ -5,6 +5,7 @@ return [
     'backups' => 'Backups',
     'latest' => 'Latest',
     'configuration' => 'Configuration',
+    'author' => 'Author',
     'diff' => 'Diff',
     'compare' => 'Compare',
     'exit_diff' => 'Exit Diff',

@@ -15,16 +15,15 @@ if ($options['h'] && $options['o'] && $options['t'] && $options['v']) {
     $vendor = $options['v'];
     Debug::set(isset($options['d']));
 
-    $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
-    $device = device_by_id_cache($device_id);
+    $device = DeviceCache::get($options['h']);
     $definition_file = resource_path("definitions/os_detection/{$options['o']}.yaml");
     $discovery_file = resource_path("definitions/os_discovery/{$options['o']}.yaml");
     $test_file = LibrenmsConfig::get('install_dir') . "/tests/snmpsim/{$options['o']}.snmprec";
     if (file_exists($definition_file)) {
         c_echo("The OS {$options['o']} appears to exist already, skipping to sensors support\n");
     } else {
-        $sysDescr = snmp_get($device, 'sysDescr.0', '-OvQ', 'SNMPv2-MIB');
-        $sysObjectID = explode('.', ltrim(snmp_get($device, 'sysObjectID.0', '-OnvQ', 'SNMPv2-MIB'), '.'));
+        $sysDescr = SnmpQuery::device($device)->get('SNMPv2-MIB::sysDescr.0')->value();
+        $sysObjectID = explode('.', ltrim(SnmpQuery::device($device)->numeric()->get('SNMPv2-MIB::sysObjectID.0')->value(), '.'));
         $end_oid = array_pop($sysObjectID);
         $sysObjectID = '.' . implode('.', $sysObjectID);
         $full_sysObjectID = "$sysObjectID.$end_oid";
@@ -35,7 +34,7 @@ sysObjectID: $full_sysObjectID
 
 ");
 
-        $os = Core::detectOS(new \App\Models\Device($device));
+        $os = Core::detectOS($device);
         $continue = 'n';
         if ($os != 'generic') {
             $continue = get_user_input("We already detect this device as OS $os type, do you want to continue to add sensors? (Y/n)");

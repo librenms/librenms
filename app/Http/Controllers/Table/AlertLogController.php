@@ -21,7 +21,7 @@ class AlertLogController extends TableController
     protected array $default_sort = ['time_logged' => 'asc'];
 
     /** Max entity rows rendered in the (collapsed) inline detail cell to bound memory. */
-    private const INLINE_DETAIL_ROW_LIMIT = 100;
+    private const int INLINE_DETAIL_ROW_LIMIT = 100;
 
     public function __construct(
         private readonly AlertLogDetailParser $parser
@@ -230,12 +230,14 @@ class AlertLogController extends TableController
 
     protected function formatExportRow($item): array
     {
+        $device = $item->device;
+
         return [
             $item->id,
             strtolower((string) $item->state->name),
             $item->time_logged->toIso8601ZuluString(),
             $item->device_id,
-            $item->device?->displayName(),
+            $device->display,
             $item->rule_id,
             $item->rule?->name,
             $item->rule?->severity,

@@ -16,7 +16,6 @@ use App\Actions\Device\AutoDiscoverDevice;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
-use App\Models\Eventlog;
 use App\Models\Port;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -86,25 +85,6 @@ function discover_sensor($unused, SensorType|string $class, $device, $oid, $inde
 
     return true;
 }
-
-function discover_juniAtmVp(&$valid, $device, $port_id, $vp_id, $vp_descr)
-{
-    Log::debug("Discover Juniper ATM VP: $port_id, $vp_id, $vp_descr\n");
-
-    if (dbFetchCell('SELECT COUNT(*) FROM `juniAtmVp` WHERE `port_id` = ? AND `vp_id` = ?', [$port_id, $vp_id]) == '0') {
-        $inserted = dbInsert(['port_id' => $port_id, 'vp_id' => $vp_id, 'vp_descr' => $vp_descr], 'juniAtmVp');
-        Log::debug("( $inserted inserted )\n");
-
-        // FIXME vv no $device!
-        Eventlog::log('Juniper ATM VP Added: port ' . $port_id . ' vp ' . $vp_id . ' descr' . $vp_descr, $device, 'juniAtmVp', 3, $inserted);
-    } else {
-        Log::info('.', ['nlb' => true]);
-    }
-
-    $valid[$port_id][$vp_id] = 1;
-}
-
-//end discover_juniAtmVp()
 
 /*
  * Check entity sensors to be excluded
@@ -373,7 +353,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                                 if (is_callable($user_function)) {
                                     ${$limit} = $user_function(${$limit});
                                 } else {
-                                    ${$limit} = (new UserFuncHelper(${$limit}))->{$user_function}();
+                                    ${$limit} = new UserFuncHelper(${$limit})->{$user_function}();
                                 }
                             }
                         }
@@ -397,7 +377,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                         if (is_callable($user_function)) {
                             $value = $user_function($value);
                         } else {
-                            $value = (new UserFuncHelper($value, $snmp_data[$data['value']], $data))->{$user_function}();
+                            $value = new UserFuncHelper($value, $snmp_data[$data['value']], $data)->{$user_function}();
                         }
                     }
 
@@ -445,72 +425,4 @@ function sensors($types, $os, $pre_cache = [])
         app('sensor-discovery')->sync(sensor_class: $sensor_class, poller_type: 'snmp');
         $progress->end();
     }
-}
-
-/**
- * Try to find a port by ifDescr, ifName, ifAlias, or MAC
- *
- * @param  string  $description  matched against ifDescr, ifName, and ifAlias
- * @param  string  $identifier  matched against ifDescr, ifName, and ifAlias
- * @param  int  $device_id  restrict search to ports on a specific device
- * @param  string  $mac_address  check against ifPhysAddress (should be in lowercase hexadecimal)
- * @return int
- */
-function find_port_id($description, $identifier = '', $device_id = 0, $mac_address = null)
-{
-    if (! ($device_id || $mac_address)) {
-        return 0;
-    }
-
-    $statements = [];
-    $params = [];
-
-    if ($device_id) {
-        if ($description) {
-            // order is important here, the standard says this is ifDescr, which some mfg confuse with ifName
-            $statements[] = 'SELECT `port_id` FROM `ports` WHERE `device_id`=? AND (`ifDescr`=? OR `ifName`=?)';
-            $params[] = $device_id;
-            $params[] = $description;
-            $params[] = $description;
-        }
-
-        if ($identifier) {
-            if (is_numeric($identifier)) {
-                $statements[] = 'SELECT `port_id` FROM `ports` WHERE `device_id`=? AND (`ifIndex`=? OR `ifAlias`=?)';
-            } else {
-                $statements[] = 'SELECT `port_id` FROM `ports` WHERE `device_id`=? AND (`ifDescr`=? OR `ifName`=?)';
-            }
-            $params[] = $device_id;
-            $params[] = $identifier;
-            $params[] = $identifier;
-        }
-
-        if ($description) {
-            // we check ifAlias last because this is a user editable field, but some bad LLDP implementations use it
-            $statements[] = 'SELECT `port_id` FROM `ports` WHERE `device_id`=? AND `ifAlias`=?';
-            $params[] = $device_id;
-            $params[] = $description;
-        }
-    }
-
-    if ($mac_address) {
-        $mac_statement = 'SELECT `port_id` FROM `ports` WHERE ';
-        if ($device_id) {
-            $mac_statement .= '`device_id`=? AND ';
-            $params[] = $device_id;
-        }
-        $mac_statement .= '`ifPhysAddress`=?';
-
-        $statements[] = $mac_statement;
-        $params[] = $mac_address;
-    }
-
-    if (empty($statements)) {
-        return 0;
-    }
-
-    $queries = implode(' UNION ', $statements);
-    $sql = "SELECT * FROM ($queries LIMIT 1) p";
-
-    return (int) dbFetchCell($sql, $params);
 }

@@ -33,18 +33,19 @@ use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\VrfPolling;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\Traits\RequiresPollingMethod;
 use SnmpQuery;
 
 class Vrf implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /** a context that answered before is walked until it fails this many discoveries in a row */
     public const CONTEXT_FAILURE_LIMIT = 3;
@@ -60,20 +61,9 @@ class Vrf implements Module
         return ['ports'];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function pollingMethods(Device $device): array
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
-    }
-
-    /**
-     * @inheritDoc
-     */
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
-    {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return [PollingMethodType::Snmp];
     }
 
     /**
@@ -283,7 +273,9 @@ class Vrf implements Module
 
     protected function checkContext(string $context): bool
     {
-        return SnmpQuery::context($context)->get('SNMPv2-MIB::sysUpTime.0')->isValid();
+        $response = SnmpQuery::numeric()->context($context)->next('.1.3.6.1');
+
+        return $response->isValid() || str_starts_with($response->getErrorMessage(), 'No more variables');
     }
 
     /**

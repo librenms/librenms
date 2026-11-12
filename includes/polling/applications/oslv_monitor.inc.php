@@ -18,7 +18,6 @@ try {
 }
 
 $stat_vars = [
-    'active_anon',
     'active_file',
     'burst-time',
     'copy-on-write-faults',
@@ -30,7 +29,6 @@ $stat_vars = [
     'elapsed-times',
     'inactive_file',
     'involuntary-context-switches',
-    'kernel_stack',
     'major-faults',
     'minor-faults',
     'nr_bursts',
@@ -48,7 +46,6 @@ $stat_vars = [
     'signals-taken',
     'sock',
     'stack-size',
-    'swapcached',
     'swaps',
     'system-time',
     'text-size',
