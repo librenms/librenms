@@ -148,12 +148,12 @@ class Vminfo extends DeviceRelatedModel implements HasMetrics, Keyable
     }
 
     /**
-     * VMs whose source records the graphed metrics, other VMs have no graphs.
+     * VMs whose source records metrics, optionally limited to a specific metric.
      *
      * @param  Builder<self>  $query
      * @return Builder<self>
      */
-    protected function scopeRecordsMetrics(Builder $query): Builder
+    protected function scopeRecordsMetrics(Builder $query, ?string $metric = null): Builder
     {
         $registry = app(PollingMethodRegistry::class);
         $types = collect($registry->providing(VminfoMetricSource::class))
@@ -163,6 +163,10 @@ class Vminfo extends DeviceRelatedModel implements HasMetrics, Keyable
 
                 return $source::vmTypes();
             })->unique()->values()->all();
+
+        if ($metric === 'vm.diskops') {
+            $types = array_diff($types, ['proxmox-lxc']);
+        }
 
         return $query->whereIn('vm_type', $types);
     }
