@@ -86,22 +86,27 @@ modules:
           num_oid: ".1.3.6.1.4.1.823.34441.1.10.5.{{ $index }}"
           index: "powerConsumption.{{ $index }}"
           descr: Power consumption
-    temperature:
-      data:
-        - oid: L-AM3440-A-Private::c1Temperature
-          num_oid: '.1.3.6.1.4.1.823.34441.1.10.11.{{ $index }}'
-          snmp_flags: '-OQUSb'
-          index: 'c1Temperature.{{ $index }}'
-          descr: Chassis 1
-          high_limit: 90
-
-        - oid: L-AM3440-A-Private::dpwmTemperature
-          num_oid: '.1.3.6.1.4.1.823.34441.1.10.16.{{ $index }}'
-          snmp_flags: '-OQUSb'
-          index: ' dpwmTemperature.{{ $index }}'
-          descr: DPWM Temperature
-          high_limit: 90
-
+#
+# The returned data will not work. In SNMPREC
+# 1.3.6.1.4.1.823.34441.1.10.11.0|4x|203631A25843
+# 1.3.6.1.4.1.823.34441.1.10.16.0|4x|34372E30303030303020A2584300
+#
+#    temperature:
+#      data:
+#        - oid: L-AM3440-A-Private::c1Temperature
+#          num_oid: '.1.3.6.1.4.1.823.34441.1.10.11.{{ $index }}'
+#          snmp_flags: '-OQUSb'
+#          index: 'c1Temperature.{{ $index }}'
+#          descr: Chassis 1
+#          high_limit: 90
+#
+#        - oid: L-AM3440-A-Private::dpwmTemperature
+#          num_oid: '.1.3.6.1.4.1.823.34441.1.10.16.{{ $index }}'
+#          snmp_flags: '-OQUSb'
+#          index: ' dpwmTemperature.{{ $index }}'
+#          descr: DPWM Temperature
+#          high_limit: 90
+#
     voltage:
       data:
         - oid: L-AM3440-A-Private::dpwmInputVoltage
