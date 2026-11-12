@@ -21,10 +21,19 @@ class PhpSnmpTest extends TestCase
         return ['transport' => 'udp', 'bulk' => true] + (new SnmpPollingMethod)->defaults();
     }
 
+    private function assertBackendUnavailable(): void
+    {
+        $config = SnmpConfig::make($this->backendDefaults(), new SnmpCommunitySecretData(community: 'public'));
+
+        $this->assertNull((new PhpSnmp)->buildSnmp('127.0.0.1', $config, new SnmpQueryOptions));
+    }
+
     public function testBuildSnmpAppliesMaxOids(): void
     {
         if (! class_exists(\SNMP::class) || ! function_exists('snmp_init_mib')) {
-            $this->markTestSkipped('The required SNMP extension is not installed.');
+            $this->assertBackendUnavailable();
+
+            return;
         }
 
         $backend = new PhpSnmp;
@@ -47,7 +56,9 @@ class PhpSnmpTest extends TestCase
     public function testBackendEligibility(): void
     {
         if (! class_exists(\SNMP::class) || ! function_exists('snmp_init_mib')) {
-            $this->markTestSkipped('The required SNMP extension is not installed.');
+            $this->assertBackendUnavailable();
+
+            return;
         }
 
         $method = new \ReflectionMethod(PhpSnmp::class, 'worksFor');
@@ -88,7 +99,9 @@ class PhpSnmpTest extends TestCase
     public function testV3SecurityLevelsAndContext(): void
     {
         if (! class_exists(\SNMP::class)) {
-            $this->markTestSkipped('The SNMP extension is not installed.');
+            $this->assertBackendUnavailable();
+
+            return;
         }
 
         $method = new \ReflectionMethod(PhpSnmp::class, 'setSecurityOptions');
@@ -128,7 +141,9 @@ class PhpSnmpTest extends TestCase
     public function testExtendedPrivacyAlgorithmsUseSupportedBackend(): void
     {
         if (! class_exists(\SNMP::class) || ! function_exists('snmp_init_mib')) {
-            $this->markTestSkipped('The required SNMP extension is not installed.');
+            $this->assertBackendUnavailable();
+
+            return;
         }
 
         $method = new \ReflectionMethod(PhpSnmp::class, 'worksFor');
@@ -170,7 +185,9 @@ class PhpSnmpTest extends TestCase
     public function testUnsupportedV3AlgorithmsFallBack(): void
     {
         if (! class_exists(\SNMP::class) || ! function_exists('snmp_init_mib')) {
-            $this->markTestSkipped('The required SNMP extension is not installed.');
+            $this->assertBackendUnavailable();
+
+            return;
         }
 
         $method = new \ReflectionMethod(PhpSnmp::class, 'worksFor');
@@ -191,7 +208,9 @@ class PhpSnmpTest extends TestCase
     public function testFailedSecuritySetupFallsBack(): void
     {
         if (! class_exists(\SNMP::class) || ! function_exists('snmp_init_mib')) {
-            $this->markTestSkipped('The required SNMP extension is not installed.');
+            $this->assertBackendUnavailable();
+
+            return;
         }
 
         $config = SnmpConfig::make($this->backendDefaults(), new SnmpV3SecretData(
