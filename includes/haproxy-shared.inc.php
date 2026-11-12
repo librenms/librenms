@@ -18,6 +18,9 @@
  * DS names are limited to 19 chars, so the longer ones are shortened.
  * DS names must be unique across all groups, as they are also used for
  * the metric names.
+ *
+ * Only the DS listed in item_metrics are saved as metrics for each item.
+ * The totals have a metric for every DS they have.
  */
 
 return [
@@ -274,5 +277,13 @@ return [
         'status', 'smax', 'slim', 'rate_max', 'rate_lim', 'conn_rate_max', 'req_rate_max',
         'qmax', 'qtime', 'ctime', 'rtime', 'ttime', 'qtime_max', 'ctime_max', 'rtime_max', 'ttime_max',
         'weight', 'uweight',
+    ],
+    // DS saved as metrics for each item, for alerting... kept short as every one
+    // of these is a row in application_metrics per item, the rest are only in the RRDs
+    // lastsess is not a DS, but is saved as a metric for backends and servers
+    'item_metrics' => [
+        'status', 'scur', 'slim', 'rate',
+        'qcur', 'act', 'bck', 'weight', 'lastsess', 'qtime', 'ctime', 'rtime', 'ttime',
+        'check_health',
     ],
 ];

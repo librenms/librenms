@@ -41,199 +41,7 @@
                     "app_type": "haproxy"
                 },
                 {
-                    "metric": "be_dotdot_bin",
-                    "value": 16090925,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_bout",
-                    "value": 33232112,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_cache_hits",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_cache_lookups",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_chkdown",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_cli_abrt",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_comp_byp",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_comp_in",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_comp_out",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_comp_rsp",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_connect",
-                    "value": 78157,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
                     "metric": "be_dotdot_ctime",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_ctime_max",
-                    "value": 19,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_downtime",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_dreq",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_dresp",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_econ",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_eint",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_eresp",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_h1_bytes_in",
-                    "value": 33310269,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_h1_bytes_out",
-                    "value": 15856454,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_h1_open_conn",
-                    "value": 16,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_h1_open_streams",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_h1_splice_bytes_in",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_h1_splice_bytes_out",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_h1_tot_conn",
-                    "value": 78157,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_h1_tot_streams",
-                    "value": 78157,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_hrsp_1xx",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_hrsp_2xx",
-                    "value": 78157,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_hrsp_3xx",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_hrsp_4xx",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_hrsp_5xx",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_hrsp_other",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "haproxy"
@@ -245,19 +53,7 @@
                     "app_type": "haproxy"
                 },
                 {
-                    "metric": "be_dotdot_lbtot",
-                    "value": 78157,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
                     "metric": "be_dotdot_qcur",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_qmax",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "haproxy"
@@ -269,44 +65,14 @@
                     "app_type": "haproxy"
                 },
                 {
-                    "metric": "be_dotdot_qtime_max",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
                     "metric": "be_dotdot_rate",
                     "value": 13,
                     "value_prev": null,
                     "app_type": "haproxy"
                 },
                 {
-                    "metric": "be_dotdot_rate_max",
-                    "value": 133,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_req_tot",
-                    "value": 78157,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_reuse",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
                     "metric": "be_dotdot_rtime",
                     "value": 1,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_rtime_max",
-                    "value": 7,
                     "value_prev": null,
                     "app_type": "haproxy"
                 },
@@ -323,44 +89,8 @@
                     "app_type": "haproxy"
                 },
                 {
-                    "metric": "be_dotdot_smax",
-                    "value": 12,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_srv_abrt",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_ssl_failed_hs",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_ssl_reused_sess",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_ssl_sess",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
                     "metric": "be_dotdot_status",
                     "value": 1,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_stot",
-                    "value": 78157,
                     "value_prev": null,
                     "app_type": "haproxy"
                 },
@@ -371,38 +101,8 @@
                     "app_type": "haproxy"
                 },
                 {
-                    "metric": "be_dotdot_ttime_max",
-                    "value": 510,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_uweight",
-                    "value": 1,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
                     "metric": "be_dotdot_weight",
                     "value": 1,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_wredis",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_wretr",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "be_dotdot_wrew",
-                    "value": 0,
                     "value_prev": null,
                     "app_type": "haproxy"
                 },
@@ -575,230 +275,8 @@
                     "app_type": "haproxy"
                 },
                 {
-                    "metric": "fe_http_in_bin",
-                    "value": 16090925,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_bout",
-                    "value": 33232112,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_cache_hits",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_cache_lookups",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_comp_byp",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_comp_in",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_comp_out",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_comp_rsp",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_conn_rate",
-                    "value": 13,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_conn_rate_max",
-                    "value": 133,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_conn_tot",
-                    "value": 78157,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_dcon",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_dreq",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_dresp",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_dses",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_eint",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_ereq",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_h1_bytes_in",
-                    "value": 157848800,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_h1_bytes_out",
-                    "value": 34795252,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_h1_open_conn",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_h1_open_streams",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_h1_splice_bytes_in",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_h1_splice_bytes_out",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_h1_tot_conn",
-                    "value": 78157,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_h1_tot_streams",
-                    "value": 78157,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_hrsp_1xx",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_hrsp_2xx",
-                    "value": 78157,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_hrsp_3xx",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_hrsp_4xx",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_hrsp_5xx",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_hrsp_other",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_intercepted",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
                     "metric": "fe_http_in_rate",
                     "value": 13,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_rate_lim",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_rate_max",
-                    "value": 133,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_req_rate",
-                    "value": 13,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_req_rate_max",
-                    "value": 133,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_req_tot",
-                    "value": 78157,
                     "value_prev": null,
                     "app_type": "haproxy"
                 },
@@ -815,272 +293,14 @@
                     "app_type": "haproxy"
                 },
                 {
-                    "metric": "fe_http_in_smax",
-                    "value": 18,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_ssl_failed_hs",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_ssl_reused_sess",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_ssl_sess",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
                     "metric": "fe_http_in_status",
                     "value": 1,
                     "value_prev": null,
                     "app_type": "haproxy"
                 },
                 {
-                    "metric": "fe_http_in_stot",
-                    "value": 78157,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_http_in_wrew",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_bin",
-                    "value": 3197,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_bout",
-                    "value": 211915,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_cache_hits",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_cache_lookups",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_comp_byp",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_comp_in",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_comp_out",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_comp_rsp",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_conn_rate",
-                    "value": 1,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_conn_rate_max",
-                    "value": 1,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_conn_tot",
-                    "value": 31,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_dcon",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_dreq",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_dresp",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_dses",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_eint",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_ereq",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_h1_bytes_in",
-                    "value": 3497,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_h1_bytes_out",
-                    "value": 212594,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_h1_open_conn",
-                    "value": 1,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_h1_open_streams",
-                    "value": 1,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_h1_splice_bytes_in",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_h1_splice_bytes_out",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_h1_tot_conn",
-                    "value": 31,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_h1_tot_streams",
-                    "value": 31,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_hrsp_1xx",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_hrsp_2xx",
-                    "value": 28,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_hrsp_3xx",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_hrsp_4xx",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_hrsp_5xx",
-                    "value": 2,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_hrsp_other",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_intercepted",
-                    "value": 29,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
                     "metric": "fe_stats_rate",
                     "value": 1,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_rate_lim",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_rate_max",
-                    "value": 1,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_req_rate",
-                    "value": 1,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_req_rate_max",
-                    "value": 1,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_req_tot",
-                    "value": 31,
                     "value_prev": null,
                     "app_type": "haproxy"
                 },
@@ -1097,44 +317,8 @@
                     "app_type": "haproxy"
                 },
                 {
-                    "metric": "fe_stats_smax",
-                    "value": 4,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_ssl_failed_hs",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_ssl_reused_sess",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_ssl_sess",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
                     "metric": "fe_stats_status",
                     "value": 1,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_stot",
-                    "value": 31,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "fe_stats_wrew",
-                    "value": 0,
                     "value_prev": null,
                     "app_type": "haproxy"
                 },
@@ -1151,50 +335,8 @@
                     "app_type": "haproxy"
                 },
                 {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_bin",
-                    "value": 16090925,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_bout",
-                    "value": 33232112,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_check_duration",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
                     "metric": "srv_dotdot_-_DMZ_Dotdot_Public_check_health",
                     "value": 4,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_chkdown",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_chkfail",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_cli_abrt",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_connect",
-                    "value": 78157,
                     "value_prev": null,
                     "app_type": "haproxy"
                 },
@@ -1205,109 +347,13 @@
                     "app_type": "haproxy"
                 },
                 {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_ctime_max",
-                    "value": 19,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_downtime",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_dresp",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_econ",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_eint",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_eresp",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_hrsp_1xx",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_hrsp_2xx",
-                    "value": 78157,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_hrsp_3xx",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_hrsp_4xx",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_hrsp_5xx",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_hrsp_other",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_idle_conn_cur",
-                    "value": 16,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
                     "metric": "srv_dotdot_-_DMZ_Dotdot_Public_lastsess",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "haproxy"
                 },
                 {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_lbtot",
-                    "value": 78157,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_need_conn_est",
-                    "value": 6,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
                     "metric": "srv_dotdot_-_DMZ_Dotdot_Public_qcur",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_qmax",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "haproxy"
@@ -1319,32 +365,8 @@
                     "app_type": "haproxy"
                 },
                 {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_qtime_max",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
                     "metric": "srv_dotdot_-_DMZ_Dotdot_Public_rate",
                     "value": 13,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_rate_max",
-                    "value": 133,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_req_tot",
-                    "value": 78157,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_reuse",
-                    "value": 0,
                     "value_prev": null,
                     "app_type": "haproxy"
                 },
@@ -1355,55 +377,7 @@
                     "app_type": "haproxy"
                 },
                 {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_rtime_max",
-                    "value": 7,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_safe_conn_cur",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
                     "metric": "srv_dotdot_-_DMZ_Dotdot_Public_scur",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_smax",
-                    "value": 12,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_srv_abrt",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_srv_icur",
-                    "value": 16,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_ssl_failed_hs",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_ssl_reused_sess",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_ssl_sess",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "haproxy"
@@ -1415,31 +389,7 @@
                     "app_type": "haproxy"
                 },
                 {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_stot",
-                    "value": 78157,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
                     "metric": "srv_dotdot_-_DMZ_Dotdot_Public_ttime",
-                    "value": 1,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_ttime_max",
-                    "value": 510,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_used_conn_cur",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_uweight",
                     "value": 1,
                     "value_prev": null,
                     "app_type": "haproxy"
@@ -1447,24 +397,6 @@
                 {
                     "metric": "srv_dotdot_-_DMZ_Dotdot_Public_weight",
                     "value": 1,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_wredis",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_wretr",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "haproxy"
-                },
-                {
-                    "metric": "srv_dotdot_-_DMZ_Dotdot_Public_wrew",
-                    "value": 0,
                     "value_prev": null,
                     "app_type": "haproxy"
                 },

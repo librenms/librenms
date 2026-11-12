@@ -17,6 +17,7 @@ try {
 $haproxy_shared = require base_path('includes/haproxy-shared.inc.php');
 $groups = $haproxy_shared['groups'];
 $no_total = $haproxy_shared['no_total'];
+$item_metrics = $haproxy_shared['item_metrics'];
 
 // numeric representation of the status string
 $status_codes = [
@@ -155,8 +156,12 @@ foreach ($data as $pxname => $services) {
             $item_fields['lastsess'] = $row['lastsess'] ?? null;
         }
 
+        // only the ones useful for alerting are saved as metrics, the rest are only in the RRDs
         // the metric column is limited to 64 chars, so skip any that would be too long
         foreach ($item_fields as $ds => $value) {
+            if (! in_array($ds, $item_metrics)) {
+                continue;
+            }
             $metric = $type . '_' . $id . '_' . $ds;
             if (! is_null($value) && strlen($metric) <= 64) {
                 $metrics[$metric] = $value;

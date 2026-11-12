@@ -117,17 +117,63 @@ The metrics are named as below.
 | Totals   | `totals_<field>`                     |
 | Counts   | `count_<type>_<state>`               |
 
+The parts in angle brackets are as below.
+
+- proxy :: The name of the frontend or backend, as in the HAProxy config.
+- backend :: The name of the backend a server belongs to.
+- server :: The name of the server, as on its `server` line.
+- frontend :: The name of the frontend a listener belongs to.
+- listener :: The name of the listener. Listeners are only reported
+  by HAProxy if `option socket-stats` is set.
+- field :: One of the fields listed further down, such as `status`
+  or `scur`.
+- type :: `fe` for frontends, `be` for backends, `srv` for servers,
+  or `li` for listeners.
+- state :: The state being counted, see below.
+
+For example, the status of the server `DMZ_Dotdot_Public` in the
+backend `dotdot` is `srv_dotdot_-_DMZ_Dotdot_Public_status`.
+
 Metric names are limited to 64 characters. Any metric whose name would
 be longer than that is skipped, which may happen with long proxy or
 server names. The counts metrics are always present and can be used
 for alerting regardless.
 
-For counts, type is one of `fe`, `be`, `srv`, or `li` and state is
-one of `total`, `up`, `down`, `maint`, `drain`, `nolb`, or `other`.
-`up` includes `UP`, `OPEN`, and `no check`.
+The counts are how many items of a type are in a given state. For
+example, `count_srv_down` is the number of servers that are down.
+The states are as below.
 
-Backends and servers also have a `lastsess` metric, the number of
-seconds since the last session, with `-1` meaning never.
+- total :: All items of that type.
+- up :: Status of `UP`, `OPEN`, or `no check`.
+- down :: Status of `DOWN`.
+- maint :: Status of `MAINT`.
+- drain :: Status of `DRAIN`.
+- nolb :: Status of `NOLB`.
+- other :: Any other status, such as `FULL`, `STOP`, `PAUSED`, or
+  `WAITING`.
+
+The totals are the values summed across all frontends, or across all
+backends for fields only backends have.
+
+The totals have a metric for every field they graph. Frontends, backends,
+servers, and listeners only have the ones below, with the rest only
+being graphed.
+
+- status :: The status code, see above.
+- scur :: Current sessions.
+- slim :: Session limit.
+- rate :: Sessions per second.
+- qcur :: Requests currently queued. Backends and servers only.
+- act :: Active servers that are up. Backends and servers only.
+- bck :: Backup servers that are up. Backends and servers only.
+- weight :: The load balancing weight. Backends and servers only.
+- lastsess :: Seconds since the last session, with `-1` meaning
+  never. Backends and servers only.
+- qtime :: Average queue time in ms. Backends and servers only.
+- ctime :: Average connect time in ms. Backends and servers only.
+- rtime :: Average response time in ms. Backends and servers only.
+- ttime :: Average total session time in ms. Backends and servers only.
+- check_health :: The health check counter. Servers only.
 
 ### Alerting Examples
 
