@@ -2,6 +2,8 @@
 
 namespace LibreNMS\Enum;
 
+use Psr\Log\LogLevel;
+
 enum Severity: int
 {
     case Unknown = 0;
@@ -41,14 +43,17 @@ enum Severity: int
         throw new \Exception("Severity $this->name is not supported for state sensors");
     }
 
+    /**
+     * Convert the severity to a PSR-3 log level.
+     */
     public function toLogLevel(): string
     {
-        return match ($this->value) {
-            1,2 => 'info',
-            3 => 'notice',
-            4 => 'warning',
-            5 => 'error',
-            default => 'debug',
+        return match ($this) {
+            self::Ok, self::Info => LogLevel::INFO,
+            self::Notice => LogLevel::NOTICE,
+            self::Warning => LogLevel::WARNING,
+            self::Error => LogLevel::ERROR,
+            self::Unknown => LogLevel::DEBUG,
         };
     }
 }

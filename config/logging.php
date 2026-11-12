@@ -60,34 +60,28 @@ return [
 
     'channels' => [
 
+        // Eventlog entries, event_db stores them in the eventlog table shown in the WebUI
         'event' => [
             'driver' => 'stack',
             'channels' => ['event_db'],
-        ],
-
-        'auth' => [
-            'driver' => 'stack',
-            'channels' => ['auth_db'],
-        ],
-
-        'auth_db' => [
-            'driver' => 'monolog',
-            'handler' => \App\Logging\AuthLogDbHandler::class,
+            'ignore_exceptions' => false,
         ],
 
         'event_db' => [
             'driver' => 'monolog',
-            'handler' => \App\Logging\EventLogDbHandler::class,
+            'handler' => App\Logging\EventLogDbHandler::class,
         ],
 
-        'stdout_debug' => [
+        // Authentication log entries, auth_db stores them in the authlog table shown in the WebUI
+        'auth' => [
+            'driver' => 'stack',
+            'channels' => ['auth_db'],
+            'ignore_exceptions' => false,
+        ],
+
+        'auth_db' => [
             'driver' => 'monolog',
-            'handler' => StreamHandler::class,
-            'formatter' => App\Logging\CliColorFormatter::class,
-            'with' => [
-                'stream' => 'php://output',
-            ],
-            'level' => 'debug',
+            'handler' => App\Logging\AuthLogDbHandler::class,
         ],
 
         'stack' => [

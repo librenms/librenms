@@ -10,10 +10,13 @@ class AuthFailedListener
 {
     public function handle(Failed $event): void
     {
-        $username = $event->credentials['username'] ?? 'Not found';
+        // when the user exists, the user provider logs the reason the credentials were rejected
+        if ($event->user !== null) {
+            return;
+        }
 
-        Log::channel('auth')->info('Failed', [
-            'user' => $username,
+        Log::channel('auth')->warning('User not found', [
+            'user' => $event->credentials['username'] ?? '',
             'address' => Request::ip(),
         ]);
     }

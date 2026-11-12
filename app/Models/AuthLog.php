@@ -35,7 +35,6 @@ class AuthLog extends Model
 
     public $timestamps = false;
     protected $table = 'authlog';
-    protected $fillable = ['user', 'address', 'result'];
 
     /**
      * @return array<string, string>

@@ -32,7 +32,6 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\DB;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Authentication\MysqlAuthorizer;
 use LibreNMS\Exceptions\AuthenticationException;
@@ -149,7 +148,10 @@ class LegacyUserProvider implements UserProvider
 
             $username = Session::get('username', $credentials['username']);
 
-            DB::table('authlog')->insert(['user' => $username, 'address' => Request::ip(), 'result' => $auth_message]);
+            Log::channel('auth')->warning($auth_message, [
+                'user' => $username,
+                'address' => Request::ip(),
+            ]);
         }
 
         return false;
