@@ -30,6 +30,7 @@ $pressure_sources = [
     [
         'rrd_prefix' => 'system',
         'metric_prefix' => 'system',
+        'cgroup' => null,
         'metric_averages' => ['avg10', 'avg60', 'avg300'],
         'pressure' => $returned['data']['system'] ?? [],
     ],
@@ -50,12 +51,18 @@ foreach ($returned['data']['cgroups'] ?? [] as $cgroup => $cgroup_pressure) {
         'rrd_prefix' => 'cgroup___' . $cgroup,
         'metric_prefix' => 'cgroup_' . $cgroup,
         // just avg300 so a pile of cgroups does not turn into a even bigger pile of metrics
+        'cgroup' => $cgroup,
         'metric_averages' => ['avg300'],
         'pressure' => $cgroup_pressure,
     ];
 }
 
 $metrics = [];
+
+// The latest averages, saved to $app->data for the overview table. Keyed by
+// "$resource_$stall_type", such as cpu_some, each holding avg10, avg60, and avg300.
+$system_pressure = [];
+$cgroup_pressure = [];
 
 // One RRD per resource and stall type as not every kernel reports all of them.
 // irq requires 6.1+ and only has full, while cpu only has full on 5.13+.
@@ -77,6 +84,17 @@ foreach ($pressure_sources as $pressure_source) {
             $rrd_name = ['app', $name, $app->app_id, $pressure_source['rrd_prefix'] . '___' . $resource . '___' . $stall_type];
             $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
             app('Datastore')->put($device, 'app', $tags, $fields);
+
+            $latest_averages = [
+                'avg10' => $fields['avg10'],
+                'avg60' => $fields['avg60'],
+                'avg300' => $fields['avg300'],
+            ];
+            if ($pressure_source['cgroup'] === null) {
+                $system_pressure[$resource . '_' . $stall_type] = $latest_averages;
+            } else {
+                $cgroup_pressure[$pressure_source['cgroup']][$resource . '_' . $stall_type] = $latest_averages;
+            }
 
             // total is left out as a raw counter is of no use for alerting
             foreach ($pressure_source['metric_averages'] as $average) {
@@ -102,6 +120,10 @@ if (count($added_cgroups) > 0 || count($removed_cgroups) > 0) {
     Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
-$app->data = ['cgroups' => $cgroups];
+$app->data = [
+    'cgroups' => $cgroups,
+    'system_pressure' => $system_pressure,
+    'cgroup_pressure' => $cgroup_pressure,
+];
 
 update_application($app, 'OK', $metrics);

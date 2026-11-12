@@ -23,7 +23,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": "{\"cgroups\":[]}",
+                    "data": "{\"cgroups\":[],\"system_pressure\":{\"cpu_some\":{\"avg10\":0.57,\"avg60\":0.62,\"avg300\":0.5},\"cpu_full\":{\"avg10\":0,\"avg60\":0,\"avg300\":0},\"io_some\":{\"avg10\":0,\"avg60\":0,\"avg300\":0.11},\"io_full\":{\"avg10\":0,\"avg60\":0,\"avg300\":0.08},\"memory_some\":{\"avg10\":0,\"avg60\":0,\"avg300\":0},\"memory_full\":{\"avg10\":0,\"avg60\":0,\"avg300\":0},\"irq_full\":{\"avg10\":0.02,\"avg60\":0.01,\"avg300\":0.01}},\"cgroup_pressure\":[]}",
                     "deleted_at": null
                 }
             ],
