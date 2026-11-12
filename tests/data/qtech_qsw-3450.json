@@ -6433,7 +6433,7 @@
                     "ipv6_address": "fe80:0000:0000:0000:021f:ceff:fe73:3b73",
                     "ipv6_compressed": "fe80::21f:ceff:fe73:3b73",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "manual",
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 11001
@@ -6442,7 +6442,7 @@
                     "ipv6_address": "fe80:0000:0000:0000:021f:ceff:fe73:3b73",
                     "ipv6_compressed": "fe80::21f:ceff:fe73:3b73",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "manual",
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 11006

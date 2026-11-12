@@ -6885,7 +6885,7 @@
                     "ipv6_address": "fe80:0000:0000:0000:faf0:82ff:fe78:6844",
                     "ipv6_compressed": "fe80::faf0:82ff:fe78:6844",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "manual",
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 11001
@@ -6894,7 +6894,7 @@
                     "ipv6_address": "fe80:0000:0000:0000:faf0:82ff:fe78:6844",
                     "ipv6_compressed": "fe80::faf0:82ff:fe78:6844",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "manual",
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 11101
@@ -6903,7 +6903,7 @@
                     "ipv6_address": "fe80:0000:0000:0000:faf0:82ff:fe78:6844",
                     "ipv6_compressed": "fe80::faf0:82ff:fe78:6844",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "manual",
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 13072
@@ -6912,7 +6912,7 @@
                     "ipv6_address": "fe80:0000:0000:0000:faf0:82ff:fe7a:727d",
                     "ipv6_compressed": "fe80::faf0:82ff:fe7a:727d",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "manual",
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 11001
@@ -6921,7 +6921,7 @@
                     "ipv6_address": "fe80:0000:0000:0000:faf0:82ff:fe7a:727d",
                     "ipv6_compressed": "fe80::faf0:82ff:fe7a:727d",
                     "ipv6_prefixlen": 64,
-                    "ipv6_origin": "other",
+                    "ipv6_origin": "manual",
                     "context_name": "",
                     "ipv6_network": null,
                     "ifIndex": 11011

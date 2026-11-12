@@ -7,6 +7,7 @@ use App\Models\Device;
 use App\Models\Port;
 use App\Models\Vrf;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LogicException;
 use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
@@ -90,6 +91,12 @@ final class Ipv6AddressesTest extends DBTestCase
         $this->assertSame(['2001:db8::3/64'], $this->addresses());
     }
 
+    public function testIpv6MibAddressTypeSetsTheOrigin(): void
+    {
+        $this->discover(['' => self::IPV6_MIB_WALKS]);
+
+        $this->assertSame(['manual'], $this->device->ipv6()->pluck('ipv6_origin')->all());
+    }
 
     public function testIpv6MibAddressesAreStoredOnceInTheDefaultContext(): void
     {
@@ -180,7 +187,12 @@ final class Ipv6AddressesTest extends DBTestCase
                 return new RawSnmpResponse('', self::TIMEOUT, 1);
             }
 
-            return new RawSnmpResponse($walks[$oid] ?? '');
+            $output = $walks[$oid] ?? '';
+            if ($output !== '' && $options->numericEnums) {
+                throw new LogicException("$oid: this test writes enum values as strings, so the walk must use enumStrings()");
+            }
+
+            return new RawSnmpResponse($output);
         });
         $this->app->instance(SnmpBackendInterface::class, $backend);
 

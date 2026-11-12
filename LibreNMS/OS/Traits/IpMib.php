@@ -132,13 +132,13 @@ trait IpMib
     {
         $device = $this->getDevice();
 
-        return SnmpQuery::walk([
+        return SnmpQuery::enumStrings()->walk([
             'IPV6-MIB::ipv6AddrPfxLength',
             'IPV6-MIB::ipv6AddrType',
         ])->throwIfConnectionError()->mapTable(function ($data, $ipv6IfIndex = 0, $ipv6AddrAddress = '') use ($device) {
             try {
                 $ip = IPv6::parse($ipv6AddrAddress);
-                $origin = match ($data['IP-MIB::ipv6AddrType'] ?? null) {
+                $origin = match ($data['IPV6-MIB::ipv6AddrType'] ?? null) {
                     'stateless' => 'linklayer',
                     'stateful' => 'manual',
                     'unknown' => 'unknown',
