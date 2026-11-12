@@ -131,7 +131,7 @@ class PhpSnmp implements SnmpBackendInterface
             // Dummy SNMP object to check security settings are supported
             $snmp = new \SNMP(\SNMP::VERSION_3, 'localhost', 'root', 1000000, 3);
             try {
-                $this->setSecurityOptions($snmp, $config, $options->context);
+                return $this->setSecurityOptions($snmp, $config, $options->context);
             } catch (\Exception|\Error) {
                 return false;
             }
@@ -140,7 +140,7 @@ class PhpSnmp implements SnmpBackendInterface
         return true;
     }
 
-    private function setSecurityOptions(\SNMP $snmp, SnmpConfig $config, ?string $context): void
+    private function setSecurityOptions(\SNMP $snmp, SnmpConfig $config, ?string $context): bool
     {
         $authlevel = strtolower((string) $config->authlevel);
         $authalgo = match (strtoupper((string) $config->authalgo)) {
@@ -157,12 +157,12 @@ class PhpSnmp implements SnmpBackendInterface
         };
 
         if ($authlevel === 'authpriv') {
-            $snmp->setSecurity('authPriv', $authalgo, $config->authpass, $cryptoalgo, $config->cryptopass, $context ?: '');
+            return (bool) $snmp->setSecurity('authPriv', $authalgo, $config->authpass, $cryptoalgo, $config->cryptopass, $context ?: '');
         } elseif ($authlevel === 'authnopriv') {
-            $snmp->setSecurity('authNoPriv', $authalgo, $config->authpass, '', '', $context ?: ''); /** @phpstan-ignore argument.type */
+            return (bool) $snmp->setSecurity('authNoPriv', $authalgo, $config->authpass, '', '', $context ?: ''); /** @phpstan-ignore argument.type */
         }
 
-        $snmp->setSecurity('noAuthNoPriv', '', '', '', '', $context ?: ''); /** @phpstan-ignore argument.type, argument.type */
+        return (bool) $snmp->setSecurity('noAuthNoPriv', '', '', '', '', $context ?: ''); /** @phpstan-ignore argument.type, argument.type */
     }
 
     /**
