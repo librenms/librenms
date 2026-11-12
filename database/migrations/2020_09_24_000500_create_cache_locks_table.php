@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cache_locks', function ($table) {
+        Schema::create('cache_locks', function ($table): void {
             $table->string('key')->primary();
             $table->string('owner');
             $table->integer('expiration');

@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users_widgets', function (Blueprint $table) {
+        Schema::table('users_widgets', function (Blueprint $table): void {
             $table->string('widget', 32)->default('')->after('user_id');
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users_widgets', function (Blueprint $table) {
+        Schema::table('users_widgets', function (Blueprint $table): void {
             $table->dropColumn('widget');
         });
     }

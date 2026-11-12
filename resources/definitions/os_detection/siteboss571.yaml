@@ -1,6 +1,6 @@
 os: siteboss571
 text: 'Asentria SiteBoss'
-type: power
+type: environment
 icon: siteboss
 group: asentria
 mib_dir: asentria

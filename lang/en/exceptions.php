@@ -22,6 +22,7 @@ return [
         'sysname_exists' => 'Already have device :hostname due to duplicate sysName: :sysname',
     ],
     'host_name_empty' => 'Hostname is empty',
+    'missing_secret' => 'Credentials are required to add a device with :method without checking it, and there are no default credentials.',
     'invalid_auth_mechanism' => [
         'title' => 'Invalid authentication mechanism',
         'message' => 'No valid authentication mechanism is configured. Please check the auth_mechanism setting.',
@@ -30,8 +31,7 @@ return [
         'unpingable' => 'Could not ping :hostname (:ip)',
         'unsnmpable' => 'Could not connect to :hostname. Check the SNMP details and SNMP reachability.',
         'unresolvable' => 'Hostname did not resolve to IP',
-        'no_reply_community' => 'SNMP :version: No reply with community :credentials',
-        'no_reply_credentials' => 'SNMP :version: No reply with credentials :credentials',
+        'no_reply_secret' => 'SNMP :version: No reply using credential ":secret"',
     ],
     'ldap_missing' => [
         'title' => 'PHP LDAP support missing',

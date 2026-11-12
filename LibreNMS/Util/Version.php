@@ -36,19 +36,19 @@ use Symfony\Component\Process\Process;
 class Version
 {
     /** @var string Update this on release */
-    public const VERSION = '26.9.1';
+    public const VERSION = '26.10.0';
 
     /** @var Git convenience instance */
     public $git;
 
-    public function __construct(private readonly ConfigRepository $config)
+    public function __construct(private readonly ConfigRepository $config, private readonly Binaries $binaries)
     {
         $this->git = Git::make();
     }
 
     public static function get(): Version
     {
-        return new static(app('librenms-config'));
+        return new static(app('librenms-config'), resolve(Binaries::class));
     }
 
     public function release(): string
@@ -63,7 +63,7 @@ class Version
 
     public function name(): string
     {
-        $regex = '/^(?<year>\d+)\.(?<month>\d+)\.(?<minor>\d+)-(?<commits>\d+)-g(?<sha>[0-9a-f]{7,})$/';
+        $regex = '/^(?<year>\d+)\.(?<month>\d+)\.(?<minor>\d+)(?:\.\d+)*-(?<commits>\d+)-g(?<sha>[0-9a-f]{7,})$/';
         if (preg_match($regex, $this->git->tag(), $matches)) {
             // guess the next version
             $year = (int) $matches['year'];
@@ -138,7 +138,7 @@ class Version
 
     public function python(): string
     {
-        $proc = new Process(['python3', '--version']);
+        $proc = new Process([$this->binaries->path('python3'), '--version']);
         $proc->run();
 
         if ($proc->getExitCode() !== 0) {
@@ -150,16 +150,25 @@ class Version
 
     public function rrdtool(): string
     {
-        $process = new Process([$this->config->get('rrdtool', 'rrdtool'), '--version']);
+        $process = new Process([$this->binaries->path('rrdtool'), '--version']);
         $process->run();
         preg_match('/^RRDtool ([\w.]+) /', $process->getOutput(), $matches);
 
         return str_replace('1.7.01.7.0', '1.7.0', $matches[1] ?? '');
     }
 
+    public function fping(): string
+    {
+        $process = new Process([$this->binaries->path('fping'), '-v']);
+        $process->run();
+        preg_match('/Version (\d+(?:\.\d+)*)/i', $process->getOutput() . $process->getErrorOutput(), $matches);
+
+        return $matches[1] ?? '';
+    }
+
     public function netSnmp(): string
     {
-        $process = new Process([$this->config->get('snmpget', 'snmpget'), '-V']);
+        $process = new Process([$this->binaries->path('snmpget'), '-V']);
 
         $process->run();
         preg_match('/[\w.]+$/', $process->getErrorOutput(), $matches);

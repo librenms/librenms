@@ -15,6 +15,7 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\SensorType;
 
 $teracom_devices = [
     // Only supported by certain models
@@ -67,7 +68,7 @@ if (Arr::exists($teracom_devices, $device['hardware'])) {
             $current = $t_data[1]['Int'];
             $temp_func = ($teracom_temp_value == 1) ? 'fahrenheit_to_celsius' : null;
 
-            discover_sensor(null, 'temperature', $device, $oid, $index, 'teracom', $t_data['description'], $divisor, '1', $low_limit, null, null, $high_limit, $current, 'snmp', null, null, $temp_func);
+            discover_sensor(null, SensorType::Temperature, $device, $oid, $index, 'teracom', $t_data['description'], $divisor, '1', $low_limit, null, null, $high_limit, $current, 'snmp', null, null, $temp_func);
         }
     }
 }

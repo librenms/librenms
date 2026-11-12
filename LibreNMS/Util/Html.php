@@ -169,13 +169,8 @@ class Html
         return implode('', $output);
     }
 
-    /**
-     * @param  int|string  $state
-     */
-    public static function powerStateLabel($state): array
+    public static function powerStateLabel(int $state): array
     {
-        $state = is_string($state) ? PowerState::STATES[$state] : $state;
-
         return match ($state) {
             PowerState::OFF => ['OFF', 'label-default'],
             PowerState::ON => ['ON', 'label-success'],

@@ -67,10 +67,10 @@ if ($vars['metric'] == 'overview') {
     }
     $row = 0;
 
-    $sensors = dbFetchRows(
-        'SELECT * FROM `wireless_sensors` WHERE `sensor_class` = ? AND `device_id` = ? ORDER BY `sensor_descr`',
-        [$vars['metric'], $device['device_id']]
-    );
+    $sensors = WirelessSensor::where('sensor_class', $vars['metric'])
+        ->where('device_id', $device['device_id'])
+        ->orderBy('sensor_descr')
+        ->get();
     foreach ($sensors as $sensor) {
         if (! is_int($row++ / 2)) {
             $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.even');
@@ -78,16 +78,16 @@ if ($vars['metric'] == 'overview') {
             $row_colour = \App\Facades\LibrenmsConfig::get('list_colour.odd');
         }
 
-        $sensor_descr = e($sensor['sensor_descr']);
+        $sensor_descr = e($sensor->sensor_descr);
 
         if (empty($unit)) {
-            $sensor_current = ((int) $sensor['sensor_current']) . $unit;
-            $sensor_limit = ((int) $sensor['sensor_limit']) . $unit;
-            $sensor_limit_low = ((int) $sensor['sensor_limit_low']) . $unit;
+            $sensor_current = ((int) $sensor->sensor_current) . $unit;
+            $sensor_limit = ((int) $sensor->sensor_limit) . $unit;
+            $sensor_limit_low = ((int) $sensor->sensor_limit_low) . $unit;
         } else {
-            $sensor_current = Number::formatSi($sensor['sensor_current'] * $factor, 3, 0, $unit);
-            $sensor_limit = Number::formatSi($sensor['sensor_limit'] * $factor, 3, 0, $unit);
-            $sensor_limit_low = Number::formatSi($sensor['sensor_limit_low'] * $factor, 3, 0, $unit);
+            $sensor_current = Number::formatSi($sensor->sensor_current * $factor, 3, 0, $unit);
+            $sensor_limit = Number::formatSi($sensor->sensor_limit * $factor, 3, 0, $unit);
+            $sensor_limit_low = Number::formatSi($sensor->sensor_limit_low * $factor, 3, 0, $unit);
         }
 
         echo "<div class='panel panel-default'>
@@ -99,8 +99,8 @@ if ($vars['metric'] == 'overview') {
             </div>";
         echo "<div class='panel-body'>";
 
-        $graph_array['id'] = $sensor['sensor_id'];
-        $graph_array['type'] = 'wireless_' . $vars['metric'];
+        $graph_array['id'] = $sensor->sensor_id;
+        $graph_array['type'] = $sensor->getGraphType();
 
         include \App\Facades\LibrenmsConfig::get('install_dir') . '/includes/html/print-graphrow.inc.php';
 

@@ -26,19 +26,15 @@
 namespace App\Observers;
 
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Log\Logger;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\Debug;
 use Psr\Log\LoggerInterface;
 
 class ModuleModelObserver
 {
-    private readonly LoggerInterface $logger;
-
     public function __construct(
-        ?Logger $logger = null,
+        private readonly LoggerInterface $logger,
     ) {
-        $this->logger = $logger ?? Log::channel('stdout');
     }
 
     /**
@@ -56,7 +52,7 @@ class ModuleModelObserver
         }
 
         if (! in_array($class, $observed_models)) {
-            $model::observe(new static());
+            $model::observe(static::class);
             $observed_models[] = $class;
         }
     }

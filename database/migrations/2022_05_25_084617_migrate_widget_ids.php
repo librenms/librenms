@@ -19,14 +19,14 @@ return new class extends Migration
     {
         $this->map = DB::table('widgets')->pluck('widget', 'widget_id');
 
-        UserWidget::query()->chunk(1000, function (Collection $widgets) {
-            $widgets->each(function (UserWidget $widget) {
+        UserWidget::query()->chunk(1000, function (Collection $widgets): void {
+            $widgets->each(function (UserWidget $widget): void {
                 $widget->widget = $this->map[$widget->getAttribute('widget_id')];
                 $widget->save();
             });
         });
 
-        Schema::table('users_widgets', function (Blueprint $table) {
+        Schema::table('users_widgets', function (Blueprint $table): void {
             $table->string('widget', 32)->default(null)->change();
         });
     }
@@ -38,7 +38,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users_widgets', function (Blueprint $table) {
+        Schema::table('users_widgets', function (Blueprint $table): void {
             $table->string('widget', 32)->default('')->change();
         });
     }

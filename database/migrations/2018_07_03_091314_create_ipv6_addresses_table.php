@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ipv6_addresses', function (Blueprint $table) {
+        Schema::create('ipv6_addresses', function (Blueprint $table): void {
             $table->increments('ipv6_address_id');
             $table->string('ipv6_address', 128);
             $table->string('ipv6_compressed', 128);

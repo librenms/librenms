@@ -17,7 +17,7 @@ return new class extends Migration
             ->whereNull('device_id')
             ->orWhereNull('ifIndex')
             ->get()
-            ->each(function ($row) {
+            ->each(function ($row): void {
                 $port = DB::table('ports')->where('port_id', $row->port_id)->first(['device_id', 'ifIndex']);
                 if ($port) {
                     DB::table('mac_accounting')
@@ -29,7 +29,7 @@ return new class extends Migration
                 }
             });
 
-        Schema::table('mac_accounting', function (Blueprint $table) {
+        Schema::table('mac_accounting', function (Blueprint $table): void {
             $table->unsignedBigInteger('device_id')->change();
             $table->unsignedInteger('ifIndex')->change();
         });
@@ -40,7 +40,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('mac_accounting', function (Blueprint $table) {
+        Schema::table('mac_accounting', function (Blueprint $table): void {
             $table->unsignedBigInteger('device_id')->nullable()->change();
             $table->unsignedInteger('ifIndex')->nullable()->change();
         });

@@ -36,12 +36,13 @@ use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use SnmpQuery;
@@ -49,6 +50,7 @@ use SnmpQuery;
 class Ospfv3 implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -58,9 +60,9 @@ class Ospfv3 implements Module
         return ['ports', 'vrf'];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function pollingMethods(Device $device): array
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return [PollingMethodType::Snmp];
     }
 
     /**
@@ -97,7 +99,7 @@ class Ospfv3 implements Module
             return;
         }
 
-        $this->syncModels($os->getDevice(), 'ospfv3Instances', $instances);
+        $this->syncVrfContextModels($os->getDevice(), 'ospfv3Instances', $instances);
         Log::info(' (Total processes: ' . $instances->count() . ')');
 
         ModuleModelObserver::observe(Ospfv3Area::class, 'Areas');
@@ -106,7 +108,7 @@ class Ospfv3 implements Module
             ->walk('OSPFV3-MIB::ospfv3AreaTable')
             ->mapTable(fn ($ospf_area, $ospfv3AreaId) => $this->createArea($ospfv3AreaId, $instance, $ospf_area)))->flatten(); // flatten one level
 
-        $ospf_areas = $this->syncModels($os->getDevice(), 'ospfv3Areas', $ospf_areas);
+        $ospf_areas = $this->syncVrfContextModels($os->getDevice(), 'ospfv3Areas', $ospf_areas);
         Log::info(' (Total areas: ' . $ospf_areas->count() . ')');
 
         ModuleModelObserver::observe(Ospfv3Port::class, 'Ports');
@@ -115,7 +117,7 @@ class Ospfv3 implements Module
             ->walk('OSPFV3-MIB::ospfv3IfTable')
             ->mapTable(fn ($ospf_port, $ospfv3IfIndex, $ospfv3IfInstId) => $this->createPort($ospfv3IfIndex, $ospfv3IfInstId, $instance, $ospf_areas, $ospf_port)))->flatten(); // flatten one level
 
-        $this->syncModels($os->getDevice(), 'ospfv3Ports', $ospf_ports);
+        $this->syncVrfContextModels($os->getDevice(), 'ospfv3Ports', $ospf_ports);
         Log::info(' (Total ports: ' . $ospf_ports->count() . ')');
 
         ModuleModelObserver::observe(Ospfv3Nbr::class, 'Neighbors');
@@ -124,13 +126,8 @@ class Ospfv3 implements Module
             ->walk('OSPFV3-MIB::ospfv3NbrTable')
             ->mapTable(fn ($ospf_nbr, $ospfv3NbrIfIndex, $ospfv3NbrIfInstId, $ospfv3NbrRtrId) => $this->createNeighbor($ospfv3NbrIfIndex, $ospfv3NbrIfInstId, $ospfv3NbrRtrId, $instance, $ospf_nbr)))->flatten(); // flatten one level
 
-        $this->syncModels($os->getDevice(), 'ospfv3Nbrs', $ospf_neighbors);
+        $this->syncVrfContextModels($os->getDevice(), 'ospfv3Nbrs', $ospf_neighbors);
         Log::info(' (Total neighbors: ' . $ospf_neighbors->count() . ')');
-    }
-
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
-    {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
@@ -139,7 +136,7 @@ class Ospfv3 implements Module
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
         $device = $os->getDevice();
-        $instances = $device->ospfv3Instances;
+        $instances = $device->ospfv3Instances->whereIn('context_name', $device->getVrfContexts());
 
         if ($instances->isEmpty()) {
             return;
@@ -170,8 +167,8 @@ class Ospfv3 implements Module
                 $this->createArea($ospfv3AreaId, $instance, $ospf_area)))->flatten();
 
         // fill data in new areas
-        Ospfv3Area::creating($this->fetchAndFillArea(...));
-        $ospf_areas = $this->syncModels($device, 'ospfv3Areas', $ospf_areas);
+        $this->fillNew($device->ospfv3Areas, $ospf_areas, $this->fetchAndFillArea(...));
+        $ospf_areas = $this->syncVrfContextModels($device, 'ospfv3Areas', $ospf_areas);
         ModuleModelObserver::done();
 
         // Ports
@@ -186,8 +183,8 @@ class Ospfv3 implements Module
                 'OSPFV3-MIB::ospfv3IfAreaId',
             ])->mapTable(fn ($ospf_port, $ospfv3IfIndex, $ospfv3IfInstId) => $this->createPort($ospfv3IfIndex, $ospfv3IfInstId, $instance, $ospf_areas, $ospf_port)))->flatten();
 
-        Ospfv3Port::creating($this->fetchAndFillPort(...));
-        $this->syncModels($device, 'ospfv3Ports', $ospf_ports);
+        $this->fillNew($device->ospfv3Ports, $ospf_ports, $this->fetchAndFillPort(...));
+        $this->syncVrfContextModels($device, 'ospfv3Ports', $ospf_ports);
         ModuleModelObserver::done();
 
         // Neighbors
@@ -199,8 +196,8 @@ class Ospfv3 implements Module
                 'OSPFV3-MIB::ospfv3NbrAddress',
             ])->mapTable(fn ($ospf_nbr, $ospfv3NbrIfIndex, $ospfv3NbrIfInstId, $ospfv3NbrRtrId) => $this->createNeighbor($ospfv3NbrIfIndex, $ospfv3NbrIfInstId, $ospfv3NbrRtrId, $instance, $ospf_nbr)))->flatten();
 
-        Ospfv3Nbr::creating($this->fetchAndFillNeighbor(...));
-        $this->syncModels($device, 'ospfv3Nbrs', $ospf_neighbors);
+        $this->fillNew($device->ospfv3Nbrs, $ospf_neighbors, $this->fetchAndFillNeighbor(...));
+        $this->syncVrfContextModels($device, 'ospfv3Nbrs', $ospf_neighbors);
         ModuleModelObserver::done();
 
         // Create device-wide statistics RRD
@@ -276,6 +273,23 @@ class Ospfv3 implements Module
         return IP::fromHexString($ip_raw, true)
             ?? IP::parse($ip_raw, true)
             ?? $ip_raw;
+    }
+
+    /**
+     * Fill full data only for models that do not exist in the database yet
+     *
+     * @template T of Keyable
+     *
+     * @param  Collection<int, T>  $existing
+     * @param  Collection<int, T>  $models
+     * @param  callable(T): void  $fill
+     */
+    private function fillNew(Collection $existing, Collection $models, callable $fill): void
+    {
+        $existing_keys = $existing->map(fn (Keyable $model) => $model->getCompositeKey())->flip();
+
+        $models->reject(fn (Keyable $model) => $existing_keys->has($model->getCompositeKey()))
+            ->each(fn ($model) => $fill($model));
     }
 
     /**

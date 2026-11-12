@@ -15,18 +15,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Vminfo::select('id', 'vmwVmState')->chunk(100, function ($vms) {
+        Vminfo::select('id', 'vmwVmState')->chunk(100, function ($vms): void {
             foreach ($vms as $vm) {
                 if (is_numeric($vm->vmwVmState)) {
                     continue;
                 }
 
-                $vm->vmwVmState = PowerState::STATES[strtolower($vm->vmwVmState)] ?? PowerState::UNKNOWN;
+                $vm->vmwVmState = PowerState::parse($vm->vmwVmState);
                 $vm->update();
             }
         });
 
-        Schema::table('vminfo', function (Blueprint $table) {
+        Schema::table('vminfo', function (Blueprint $table): void {
             $table->smallInteger('vmwVmState')->unsigned()->change();
         });
     }
@@ -38,7 +38,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('vminfo', function (Blueprint $table) {
+        Schema::table('vminfo', function (Blueprint $table): void {
             $table->string('vmwVmState', 128)->change();
         });
     }

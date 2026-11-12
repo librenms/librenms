@@ -56,7 +56,8 @@ class QosObserver
             return null;
         }
 
-        if (! $divisor) {
+        // Drops cannot exceed the total, some devices (Catalyst 3850) report no pre-policy counters
+        if (! $divisor || $dividend > $divisor) {
             return null;
         }
 

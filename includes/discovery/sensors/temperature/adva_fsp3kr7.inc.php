@@ -17,6 +17,8 @@
  * the source code distribution for details.
  **/
 
+use LibreNMS\Enum\SensorType;
+
 // *************************************************************
 // ***** Temperature Sensors for ADVA FSP3000 R7
 // *************************************************************
@@ -34,7 +36,7 @@ if (is_array($pre_cache['adva_fsp3kr7_Card'])) {
 
             discover_sensor(
                 null,
-                'temperature',
+                SensorType::Temperature,
                 $device,
                 $oid,
                 'eqptPhysInstValueTemp' . $index,

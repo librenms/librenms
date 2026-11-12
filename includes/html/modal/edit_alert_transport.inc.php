@@ -275,7 +275,7 @@ use LibreNMS\Alert\Transport;
             var transport_id = $("#delete_transport_id").val();
             $.ajax({
                 type: "DELETE",
-                url: '<?php echo route('alert.transports.destroy', ['transport' => ':transport']) ?>'.replace(':transport', transport_id),
+                url: route('alert.transports.destroy', {transport: transport_id}),
                 dataType: "json",
                 success: function(data) {
                     if (data.status == 'ok') {

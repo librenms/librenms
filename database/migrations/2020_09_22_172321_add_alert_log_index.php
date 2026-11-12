@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('alert_log', function (Blueprint $table) {
+        Schema::table('alert_log', function (Blueprint $table): void {
             $table->index(['rule_id', 'device_id']);
             $table->index(['rule_id', 'device_id', 'state']);
         });
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('alert_log', function (Blueprint $table) {
+        Schema::table('alert_log', function (Blueprint $table): void {
             $table->dropIndex(['rule_id', 'device_id']);
             $table->dropIndex(['rule_id', 'device_id', 'state']);
         });

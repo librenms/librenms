@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
@@ -27,7 +28,7 @@ try {
         $nfs['data']['BioDMisses'], $nfs['data']['DirEHits'], $nfs['data']['DirEMisses'], $nfs['data']['AccsHits'],
         $nfs['data']['AccsMisses']] = explode("\n", (string) $legacy);
 } catch (JsonAppException $e) {
-    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    Log::info($name . ':' . $e->getCode() . ':' . $e->getMessage());
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
 
     return;

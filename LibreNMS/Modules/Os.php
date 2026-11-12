@@ -31,16 +31,19 @@ use App\Models\Eventlog;
 use App\Models\Location;
 use App\Observers\DeviceObserver;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\Url;
+use SnmpQuery;
 
 class Os implements Module
 {
+    use RequiresPollingMethod;
+
     /**
      * @inheritDoc
      */
@@ -49,9 +52,9 @@ class Os implements Module
         return [];
     }
 
-    public function shouldDiscover(\LibreNMS\OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function pollingMethods(Device $device): array
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return [PollingMethodType::Snmp];
     }
 
     public function discover(\LibreNMS\OS $os): void
@@ -77,11 +80,6 @@ class Os implements Module
         }
 
         $this->handleChanges($os);
-    }
-
-    public function shouldPoll(\LibreNMS\OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
-    {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     public function poll(\LibreNMS\OS $os, DataStorageInterface $datastore): void
@@ -175,7 +173,7 @@ class Os implements Module
     private function sysContact(\LibreNMS\OS $os): void
     {
         $device = $os->getDevice();
-        $device->sysContact = snmp_get($os->getDeviceArray(), 'sysContact.0', '-Ovq', 'SNMPv2-MIB');
+        $device->sysContact = SnmpQuery::get('SNMPv2-MIB::sysContact.0')->value();
         $device->sysContact = str_replace(['', '"', '\n', 'not set'], '', $device->sysContact);
         if (empty($device->sysContact)) {
             $device->sysContact = null;

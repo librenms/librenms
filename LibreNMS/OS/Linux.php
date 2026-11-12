@@ -26,12 +26,13 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\EntPhysical;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
-use LibreNMS\OS\Traits\VminfoLibvirt;
 use LibreNMS\OS\Traits\VminfoVmware;
 use LibreNMS\OS\Traits\VminfoXcpNg;
+use LibreNMS\Polling\Method\DataSources\LibvirtDataSource;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
@@ -39,25 +40,43 @@ class Linux extends Shared\Unix implements VminfoDiscovery
 {
     // NOTE: Only Linux specific stuff should go here, most things should be in Unix
 
-    use VminfoLibvirt, VminfoVmware, VminfoXcpNg {
-        VminfoLibvirt::discoverVminfo as discoverLibvirtVminfo;
+    use VminfoVmware, VminfoXcpNg {
         VminfoVmware::discoverVmInfo as discoverVmwareVminfo;
         VminfoXcpNg::discoverVmInfo as discoverXcpNgVminfo;
     }
 
+    /**
+     * @return string[]
+     */
+    public static function vmTypes(): array
+    {
+        return ['vmware', 'xcp-ng'];
+    }
+
+    /**
+     * libvirt does not use snmp, only ssh tunnels, so it is a source of its own.
+     * It stays a source while the device has its VMs, so they are removed when libvirt is disabled.
+     */
+    public function dataSources(string $interface): array
+    {
+        $sources = parent::dataSources($interface);
+
+        if ($interface === VminfoDiscovery::class && ! $this->isXcpNg()
+            && (LibrenmsConfig::get('enable_libvirt') || $this->getDevice()->vminfo->contains('vm_type', 'libvirt'))) {
+            $sources[] = new LibvirtDataSource($this->getDevice());
+        }
+
+        return $sources;
+    }
+
     public function discoverVmInfo(): Collection
     {
-        if (preg_match('/^XCP-ng/', (string) $this->getDevice()->features)) {
-            return $this->discoverXcpNgVminfo();
-        }
+        return $this->isXcpNg() ? $this->discoverXcpNgVminfo() : $this->discoverVmwareVminfo();
+    }
 
-        $vms = $this->discoverLibvirtVminfo();
-
-        if ($vms->isNotEmpty()) {
-            return $vms;
-        }
-
-        return $this->discoverVmwareVminfo();
+    private function isXcpNg(): bool
+    {
+        return (bool) preg_match('/^XCP-ng/', (string) $this->getDevice()->features);
     }
 
     public function discoverEntityPhysical(): Collection

@@ -73,7 +73,6 @@
 @endsection
 
 @section('scripts')
-    @routes
 <script type="text/javascript">
     var network_options = {{ Js::from($map_conf) }};
     var legend = {{ Js::from($legend) }};
@@ -85,7 +84,7 @@
 
     function editMapSuccess(data) {
         $('#mapModal').modal('hide');
-        window.location.href = "{{ @route('maps.custom.edit', ['map' => '?']) }}".replace('?', data['id']);
+        window.location.href = route('maps.custom.edit', {map: data['id']});
     }
 
     function editMapCancel() {
@@ -105,7 +104,7 @@
 
     function deleteMap() {
         $.ajax({
-            url: "{{ route('maps.custom.destroy', ['map' => '?']) }}".replace('?', pendingMapToDelete.id),
+            url: route('maps.custom.destroy', {map: pendingMapToDelete.id}),
             type: 'DELETE'
         }).done(() => {
             $('#map-' + pendingMapToDelete.id).remove();

@@ -15,7 +15,7 @@ return new class extends Migration
         //Remove the old route table, as it is not used anymore.
         Schema::drop('route');
 
-        Schema::create('route', function (Blueprint $table) {
+        Schema::create('route', function (Blueprint $table): void {
             $table->increments('route_id');
             $table->timestamps();
             $table->unsignedInteger('device_id');
@@ -44,7 +44,7 @@ return new class extends Migration
     {
         Schema::drop('route');
         // Create the old route table to reverse this.
-        Schema::create('route', function (Blueprint $table) {
+        Schema::create('route', function (Blueprint $table): void {
             $table->unsignedInteger('device_id');
             $table->string('context_name', 128);
             $table->string('ipRouteDest', 39);

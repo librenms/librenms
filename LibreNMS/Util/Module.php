@@ -76,7 +76,7 @@ class Module
             return; // do not record for now as there is currently no rrd during discovery
         }
 
-        app('Datastore')->put(DeviceCache::getPrimary()->toArray(), 'poller-perf', [
+        app('Datastore')->put(DeviceCache::getPrimary(), 'poller-perf', [
             'module' => $module,
             'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
             'rrd_name' => ['poller-perf', $module],

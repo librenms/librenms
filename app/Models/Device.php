@@ -8,7 +8,6 @@ use App\Models\Traits\Filterable;
 use App\Observers\DeviceObserver;
 use App\View\SimpleTemplate;
 use Carbon\Carbon;
-use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,11 +21,13 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Cache\DeviceMaintenanceCache;
-use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InvalidIpException;
-use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Polling\Method\PollingMethodAccessor;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -42,18 +43,11 @@ use LibreNMS\Util\Url;
 #[ObservedBy([DeviceObserver::class])]
 class Device extends BaseModel
 {
-    use PivotEventTrait, HasFactory, Filterable;
+    use HasFactory, Filterable;
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
     protected $fillable = [
-        'authalgo',
-        'authlevel',
-        'authname',
-        'authpass',
-        'community',
-        'cryptoalgo',
-        'cryptopass',
         'disable_notify',
         'disabled',
         'features',
@@ -70,22 +64,14 @@ class Device extends BaseModel
         'override_sysLocation',
         'overwrite_ip',
         'poller_group',
-        'port',
-        'port_association_mode',
         'purpose',
-        'retries',
         'serial',
-        'snmp_disable',
-        'snmp_max_repeaters',
-        'snmpver',
         'status',
         'status_reason',
         'sysDescr',
         'sysName',
         'sysObjectID',
         'snmpEngineID',
-        'timeout',
-        'transport',
         'type',
         'version',
         'uptime',
@@ -109,6 +95,7 @@ class Device extends BaseModel
         'poller_group',
         'groups.id',
         'serviceTemplates.id',
+        'secrets.secret_id',
         'search',
         'state',
     ];
@@ -127,7 +114,6 @@ class Device extends BaseModel
             'ignore' => 'boolean',
             'ignore_status' => 'boolean',
             'disabled' => 'boolean',
-            'snmp_disable' => 'boolean',
             'disable_notify' => 'boolean',
             'override_sysLocation' => 'boolean',
         ];
@@ -145,16 +131,17 @@ class Device extends BaseModel
         return ($this->overwrite_ip ?: $this->hostname) ?: '';
     }
 
-    public function toSnmpConfig(): SnmpConfig
+    /**
+     * Polling method configs and status for this device.
+     */
+    public function polling(): PollingMethodAccessor
     {
-        return SnmpConfig::fromDevice($this);
+        return new PollingMethodAccessor($this, app(PollingMethodRegistry::class));
     }
 
-    public function ipFamily(): AddressFamily
-    {
-        return str_ends_with($this->transport ?? '', '6') ? AddressFamily::IPv6 : AddressFamily::IPv4;
-    }
-
+    /**
+     * Find the device with this address, preferring a device that owns it over one that has it on a port.
+     */
     public static function findByIp(?string $ip): ?Device
     {
         if ($ip === null) {
@@ -162,7 +149,8 @@ class Device extends BaseModel
         }
 
         try {
-            $device_id = static::hasIp(IP::parse($ip))->value('device_id');
+            $ip = IP::parse($ip);
+            $device_id = static::hasIp($ip)->orderByIpOwner($ip)->value('device_id');
             $device = DeviceCache::get($device_id);
 
             return $device->exists ? $device : null;
@@ -171,47 +159,76 @@ class Device extends BaseModel
         }
     }
 
-    public function hasSnmpInfo(): bool
+    public function pollingMethod(PollingMethodType $method): ?DevicePollingMethod
     {
-        if ($this->snmpver == 'v3') {
-            if ($this->authlevel == 'authNoPriv') {
-                return ! empty($this->authname) && ! empty($this->authpass);
-            }
-
-            if ($this->authlevel == 'authPriv') {
-                return ! empty($this->authname)
-                    && ! empty($this->authpass)
-                    && ! empty($this->cryptoalgo)
-                    && ! empty($this->cryptopass);
-            }
-
-            return $this->authlevel !== 'noAuthNoPriv'; // reject if not noAuthNoPriv
+        if ($method === PollingMethodType::Unknown) {
+            return null; // any number of unknown types, none of them is used
         }
 
-        if ($this->snmpver == 'v2c' || $this->snmpver == 'v1') {
-            return ! empty($this->community);
+        if (! $this->relationLoaded('pollingMethods')) {
+            if (! $this->exists) {
+                return null;
+            }
+            $this->load('pollingMethods');
         }
 
-        return false; // no known snmpver
+        return $this->pollingMethods->firstWhere('method_type', $method);
     }
 
     /**
-     * Get VRF contexts to poll.
-     * If no contexts are found, return the default context ''
+     * SNMP contexts to walk for per VRF data: the default context, plus the contexts of
+     * non-default VRFs that answered at the last discovery and were not disabled by the user.
      *
-     * @return array
+     * @return string[]
      */
     public function getVrfContexts(): array
     {
-        return $this->vrfLites->isEmpty() ? [''] : $this->vrfLites->pluck('context_name')->all();
+        return $this->vrfs
+            ->filter(fn (Vrf $vrf) => $vrf->isContextWalked())
+            ->pluck('context_name')
+            ->prepend('')
+            ->unique()
+            ->values()
+            ->all();
     }
 
     /**
-     * @deprecated use display field directly
+     * Contexts of VRFs that are not walked right now, because they stopped answering or were disabled.
+     * Modules keep the rows of these contexts until the VRF or its context is removed.
+     *
+     * @return string[]
+     */
+    public function getSkippedVrfContexts(): array
+    {
+        return $this->vrfs
+            ->filter(fn (Vrf $vrf) => $vrf->context_name !== null && ! $vrf->isDefault() && ! $vrf->isContextWalked())
+            ->pluck('context_name')
+            ->diff($this->getVrfContexts())
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Find the VRF of rows walked from an SNMP context.
+     * Some tables store the VRF name as the context, so names are matched as well.
+     */
+    public function vrfIdForContext(?string $context): ?int
+    {
+        if ($context === null || $context === '') {
+            return null; // default context
+        }
+
+        return $this->vrfs->firstWhere('context_name', $context)->vrf_id
+            ?? $this->vrfs->firstWhere('vrf_name', $context)?->vrf_id;
+    }
+
+    /**
+     * @deprecated use display field directly.
      */
     public function displayName(): string
     {
-        return $this->display ?: $this->hostname ?: '';
+        return $this->display ?: '';
     }
 
     /**
@@ -219,7 +236,7 @@ class Device extends BaseModel
      */
     public function name(): string
     {
-        $display = $this->displayName();
+        $display = $this->display;
 
         if (! Str::contains($display, $this->hostname)) {
             return (string) $this->hostname;
@@ -283,16 +300,16 @@ class Device extends BaseModel
      * @param  int  $length  length to shorten to, will not break up words so may be longer
      * @return string
      */
-    public function shortDisplayName($length = 12)
+    public function shortDisplayName(int $length = 12): string
     {
-        $name = $this->displayName();
+        $name = $this->display;
 
         // IP addresses should not be shortened
         if (IP::isValid($name)) {
             return $name;
         }
 
-        $length = \App\Facades\LibrenmsConfig::get('shorthost_target_length', $length);
+        $length = LibrenmsConfig::get('shorthost_target_length', $length);
         if ($length < strlen($name)) {
             $take = max(substr_count($name, '.', 0, $length), 1);
 
@@ -358,12 +375,13 @@ class Device extends BaseModel
     }
 
     /**
-     * Update the max_depth field based on parents
+     * Update the max_depth field based on parents, then update children if it changed
      * Performs SQL query, so make sure all parents are saved first
      *
-     * @param  int  $exclude  exclude a device_id from being considered (used for deleting)
+     * @param  int|null  $exclude  exclude a device_id from being considered as parent
+     * @param  int[]  $visited  device_ids already updated on this path, to stop on dependency loops
      */
-    public function updateMaxDepth($exclude = null)
+    public function updateMaxDepth($exclude = null, array $visited = []): void
     {
         // optimize for memory instead of time
         $query = $this->parents()->getQuery();
@@ -383,7 +401,16 @@ class Device extends BaseModel
             $this->max_depth = $parents_max_depth + 1;
         }
 
+        $changed = $this->isDirty('max_depth');
         $this->save();
+
+        if ($changed) {
+            $visited[] = $this->device_id;
+            $this->children()
+                ->whereNotIn('devices.device_id', $visited)
+                ->get()
+                ->each(fn (Device $child) => $child->updateMaxDepth(null, $visited));
+        }
     }
 
     /**
@@ -396,19 +423,24 @@ class Device extends BaseModel
     {
         if ($this->max_depth === 0 && $this->children()->count() > 0) {
             $this->max_depth = 1; // has children
-        } elseif ($this->max_depth === 1 && $this->parents()->count() === 0) {
+        } elseif ($this->max_depth === 1 && $this->parents()->count() === 0 && $this->children()->count() === 0) {
             $this->max_depth = 0; // no children or parents
         }
 
         $this->save();
     }
 
-    public function getAttrib($name, $default = null)
+    public function hasAttrib($name): bool
+    {
+        return $this->attribs->contains('attrib_type', $name);
+    }
+
+    public function getAttrib($name, $default = null): mixed
     {
         return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name, $default);
     }
 
-    public function setAttrib($name, $value)
+    public function setAttrib($name, $value): bool
     {
         $attrib = $this->attribs->first(fn ($item) => $item->attrib_type === $name);
 
@@ -424,13 +456,12 @@ class Device extends BaseModel
 
     public function forgetAttrib($name)
     {
-        $attrib_index = $this->attribs->search(fn ($attrib) => $attrib->attrib_type === $name);
+        $attrib = $this->attribs->first(fn ($attrib) => $attrib->attrib_type === $name);
 
-        if ($attrib_index !== false) {
-            $deleted = (bool) $this->attribs->get($attrib_index)->delete();
-            // only forget the attrib_index after delete, otherwise delete() will fail fatally with:
-            // Symfony\\Component\\Debug\Exception\\FatalThrowableError(code: 0):  Call to a member function delete() on null
-            $this->attribs->forget((string) $attrib_index);
+        if ($attrib !== null) {
+            $deleted = (bool) $attrib->delete();
+            // only remove the attrib from the relation after delete
+            $this->setRelation('attribs', $this->attribs->reject(fn ($item) => $item->is($attrib))->values());
 
             return $deleted;
         }
@@ -441,6 +472,21 @@ class Device extends BaseModel
     public function getAttribs()
     {
         return $this->attribs->pluck('attrib_value', 'attrib_type')->toArray();
+    }
+
+    /**
+     * Selected port polling only polls ports that are up.
+     * The device setting overrides the os setting, which overrides the global setting.
+     */
+    public function selectedPortPolling(): ModuleStatus
+    {
+        $deviceSetting = $this->getAttrib('selected_ports');
+
+        return new ModuleStatus(
+            (bool) LibrenmsConfig::get('polling.selected_ports', false),
+            LibrenmsConfig::has("os.$this->os.polling.selected_ports") ? (bool) LibrenmsConfig::get("os.$this->os.polling.selected_ports") : null,
+            $deviceSetting === null ? null : $deviceSetting === 'true',
+        );
     }
 
     /**
@@ -623,7 +669,11 @@ class Device extends BaseModel
 
     protected function scopeCanPing(Builder $query): Builder
     {
-        return $this->scopeWhereAttributeDisabled($query->where('disabled', 0), 'override_icmp_disable');
+        return $query->where('devices.disabled', 0)
+            ->whereHas('pollingMethods', function (Builder $query): void {
+                $query->where('method_type', PollingMethodType::Icmp)
+                    ->where('enabled', true);
+            });
     }
 
     public function scopeHasAccess($query, User $user)
@@ -694,6 +744,17 @@ class Device extends BaseModel
         }
 
         return $query->where('hostname', $deviceSpec);
+    }
+
+    /**
+     * Order devices that own this address, or are named $name, ahead of devices that only have it on a port.
+     */
+    protected function scopeOrderByIpOwner(Builder $query, IP $ip, ?string $name = null): Builder
+    {
+        $name ??= $ip->uncompressed();
+
+        return $query->orderByRaw('CASE WHEN hostname IN (?, ?) OR sysName = ? OR ip = ? THEN 0 ELSE 1 END', [$name, $ip->uncompressed(), $name, $ip->packed()])
+            ->orderBy('device_id');
     }
 
     protected function scopeHasIp(Builder $query, IP $ip): Builder
@@ -791,11 +852,12 @@ class Device extends BaseModel
     }
 
     /**
-     * @return BelongsToMany<Device, $this>
+     * @return BelongsToMany<Device, $this, DeviceRelationship>
      */
     public function children(): BelongsToMany
     {
-        return $this->belongsToMany(self::class, 'device_relationships', 'parent_device_id', 'child_device_id');
+        return $this->belongsToMany(self::class, 'device_relationships', 'parent_device_id', 'child_device_id')
+            ->using(DeviceRelationship::class);
     }
 
     /**
@@ -812,6 +874,15 @@ class Device extends BaseModel
     public function diskIo(): HasMany
     {
         return $this->hasMany(DiskIo::class, 'device_id');
+    }
+
+    /**
+     * @return BelongsToMany<Secret, $this>
+     */
+    public function secrets(): BelongsToMany
+    {
+        return $this->belongsToMany(Secret::class, 'device_polling_methods', 'device_id', 'secret_id')
+            ->withPivot('method_type');
     }
 
     /**
@@ -903,6 +974,14 @@ class Device extends BaseModel
     }
 
     /**
+     * @return HasManyThrough<JuniAtmVp, Port, $this>
+     */
+    public function juniAtmVps(): HasManyThrough
+    {
+        return $this->hasManyThrough(JuniAtmVp::class, Port::class, 'device_id', 'port_id');
+    }
+
+    /**
      * @return HasMany<Link, $this>
      */
     public function links(): HasMany
@@ -919,7 +998,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, \App\Models\Link>
+     * @return \Illuminate\Support\Collection<int, Link>
      */
     public function allLinks(): \Illuminate\Support\Collection
     {
@@ -936,7 +1015,7 @@ class Device extends BaseModel
 
     /**
      * @return HasMany<Ipv4Mac, $this>
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MacAccounting, $this>
+     * @return HasMany<MacAccounting, $this>
      */
     public function macAccounting(): HasMany
     {
@@ -944,7 +1023,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ipv4Mac, $this>
+     * @return HasMany<Ipv4Mac, $this>
      */
     public function macs(): HasMany
     {
@@ -1065,11 +1144,20 @@ class Device extends BaseModel
     }
 
     /**
-     * @return BelongsToMany<Device, $this>
+     * @return BelongsToMany<Device, $this, DeviceRelationship>
      */
     public function parents(): BelongsToMany
     {
-        return $this->belongsToMany(self::class, 'device_relationships', 'child_device_id', 'parent_device_id');
+        return $this->belongsToMany(self::class, 'device_relationships', 'child_device_id', 'parent_device_id')
+            ->using(DeviceRelationship::class);
+    }
+
+    /**
+     * @return HasMany<DevicePollingMethod, $this>
+     */
+    public function pollingMethods(): HasMany
+    {
+        return $this->hasMany(DevicePollingMethod::class, 'device_id');
     }
 
     /**
@@ -1410,19 +1498,21 @@ class Device extends BaseModel
     }
 
     /**
-     * @return HasMany<VrfLite, $this>
-     */
-    public function vrfLites(): HasMany
-    {
-        return $this->hasMany(VrfLite::class, 'device_id');
-    }
-
-    /**
      * @return HasMany<Vrf, $this>
      */
     public function vrfs(): HasMany
     {
         return $this->hasMany(Vrf::class, 'device_id');
+    }
+
+    /**
+     * Scoped route bindings guess the relationship of {vrf} as vrves
+     *
+     * @param  string  $childType
+     */
+    protected function childRouteBindingRelationshipName($childType): string
+    {
+        return $childType === 'vrf' ? 'vrfs' : parent::childRouteBindingRelationshipName($childType);
     }
 
     /**

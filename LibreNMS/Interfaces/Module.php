@@ -27,10 +27,10 @@
 namespace LibreNMS\Interfaces;
 
 use App\Models\Device;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 
 interface Module
 {
@@ -40,14 +40,22 @@ interface Module
     public function dependencies(): array;
 
     /**
-     * Should this module be run?
+     * The polling methods this module can get data from, in order of preference.
+     * The module is offered for devices that have one of them enabled.
+     *
+     * @return list<PollingMethodType>
      */
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool;
+    public function pollingMethods(Device $device): array;
 
     /**
-     * Should polling run for this device?
+     * Should discovery run for this device? Only called when the module is enabled.
      */
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool;
+    public function shouldDiscover(OS $os): bool;
+
+    /**
+     * Should polling run for this device? Only called when the module is enabled.
+     */
+    public function shouldPoll(OS $os): bool;
 
     /**
      * Discover this module. Heavier processes can be run here
@@ -62,10 +70,11 @@ interface Module
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
      * Run frequently (default every 5 minutes)
      *
+     * Modules may declare just the interface they use, new code should use WriteInterface.
+     *
      * @param  OS  $os
-     * @param  DataStorageInterface  $datastore
      */
-    public function poll(OS $os, DataStorageInterface $datastore): void;
+    public function poll(OS $os, DataStorageInterface&WriteInterface $datastore): void;
 
     /**
      * Check if data exists for this module

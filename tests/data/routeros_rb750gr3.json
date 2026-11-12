@@ -2901,7 +2901,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 1,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.1",
                     "processor_index": "1",
@@ -2912,7 +2911,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 2,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.2",
                     "processor_index": "2",
@@ -2923,7 +2921,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 3,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.3",
                     "processor_index": "3",
@@ -2934,7 +2931,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 4,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.4",
                     "processor_index": "4",
@@ -3299,6 +3295,7 @@
                     "sensor_type": "routeros",
                     "sensor_descr": "Total number of ipv4 connections",
                     "group": "Firewall",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 120,
@@ -3324,6 +3321,7 @@
                     "sensor_type": "routeros",
                     "sensor_descr": "Total number of ipv6 connections",
                     "group": "Firewall",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 104,
@@ -3349,6 +3347,7 @@
                     "sensor_type": "routeros",
                     "sensor_descr": "Total number of connections",
                     "group": "Firewall",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 224,
@@ -3374,6 +3373,7 @@
                     "sensor_type": "routeros",
                     "sensor_descr": "DHCP Lease Count",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 9,
@@ -3399,6 +3399,7 @@
                     "sensor_type": "routeros",
                     "sensor_descr": "temperature",
                     "group": "System",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 38,
@@ -3424,6 +3425,7 @@
                     "sensor_type": "routeros",
                     "sensor_descr": "Voltage 0",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 24.3,
@@ -3449,6 +3451,7 @@
                     "sensor_type": "routeros",
                     "sensor_descr": "voltage",
                     "group": "System",
+                    "category": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 24.3,
@@ -3637,6 +3640,34 @@
                     "hrDeviceErrors": 0,
                     "hrDeviceStatus": "running",
                     "hrProcessorLoad": 7
+                }
+            ]
+        }
+    },
+    "discovery-protocols": {
+        "discovery": {
+            "links": [
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "sw11.mzmol",
+                    "remote_port": "trunk: Up (p24)",
+                    "remote_platform": null,
+                    "remote_version": "MES2324B 28-port 1G/10G Managed Switch, Software version: 4.0.24.1",
+                    "ifAlias": "trunk: Down (eth5)",
+                    "ifDescr": "trunk: Down (eth5)",
+                    "ifName": "trunk: Down (eth5)"
+                },
+                {
+                    "active": 1,
+                    "protocol": "lldp",
+                    "remote_hostname": "r1.soada",
+                    "remote_port": "trunk: switch (br1)/trunk: MzMol (eoip1)",
+                    "remote_platform": null,
+                    "remote_version": "MikroTik RouterOS 7.19.1 (stable) 2025-05-23 14:27:17 RB5009UG+S+",
+                    "ifAlias": "trunk: SoAda (eoip1)",
+                    "ifDescr": "trunk: SoAda (eoip1)",
+                    "ifName": "trunk: SoAda (eoip1)"
                 }
             ]
         }

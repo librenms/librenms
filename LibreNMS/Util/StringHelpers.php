@@ -201,6 +201,33 @@ class StringHelpers
         return hex2bin($hex);
     }
 
+    /**
+     * Decode an SNMP text value that net-snmp output as hex (ex: "41 42 43 00") because it
+     * contained non-printable bytes. Common causes are a trailing null byte from devices that send
+     * an off by one string length or non-ASCII text (UTF-8, GBK, etc) in an OCTET STRING.
+     * Trailing null bytes are removed and the encoding is inferred.
+     *
+     * Only use for values known to be text, binary values (MACs, IPs, bitmaps) will be mangled.
+     * Values that are not hex or decode to only printable ASCII are returned unchanged,
+     * because net-snmp would not have output those as hex.
+     */
+    public static function decodeSnmpHexText(string $value): string
+    {
+        $hex = trim((string) preg_replace('/\s+/', ' ', $value));
+
+        if (! self::isHex($hex, ' ')) {
+            return $value;
+        }
+
+        $bytes = (string) hex2bin(str_replace(' ', '', $hex));
+
+        if (preg_match('/^[\x20-\x7E]*$/', $bytes)) {
+            return $value;
+        }
+
+        return (string) self::inferEncoding(rtrim($bytes, "\0"));
+    }
+
     public static function trimHexGarbage(string $string): string
     {
         $regex = '/((\.{2,}.{1,2})?\.+)?([0-9a-f]{2} )*([0-9a-f]{2})?$/';
@@ -213,7 +240,7 @@ class StringHelpers
      */
     public static function hasNumber(string $string): bool
     {
-        return (bool) preg_match('/^\s*-?\d+(\.\d+)?/', $string);
+        return (bool) preg_match('/^\s*-?(\d+(\.\d*)?|\.\d+)/', $string);
     }
 
     public static function isHex(string $string, string $delimiter = ''): bool

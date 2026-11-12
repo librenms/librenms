@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ports_nac', function (Blueprint $table) {
+        Schema::table('ports_nac', function (Blueprint $table): void {
             $table->unsignedInteger('vlan')->nullable();
             $table->string('time_elapsed', 50)->nullable();
             $table->string('time_left', 50)->nullable()->change();
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ports_nac', function (Blueprint $table) {
+        Schema::table('ports_nac', function (Blueprint $table): void {
             $table->dropColumn(['vlan', 'time_elapsed']);
             $table->string('time_left', 50)->change();
         });

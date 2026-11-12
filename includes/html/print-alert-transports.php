@@ -13,8 +13,8 @@ $no_refresh = true;
 </div>
 <?php
 
-require_once 'includes/html/modal/edit_alert_transport.inc.php';
-require_once 'includes/html/modal/edit_transport_group.inc.php';
+require 'includes/html/modal/edit_alert_transport.inc.php';
+require 'includes/html/modal/edit_transport_group.inc.php';
 
 if (Gate::allows('create', AlertTransport::class)) {
     echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#edit-alert-transport'>Create alert transport</button>";
@@ -118,7 +118,7 @@ foreach (dbFetchRows($query) as $group) {
         var transport = $this.data("transport");
         $.ajax({
             type: 'POST',
-            url: '<?php echo route('alert.transports.test', ['transport' => ':transport_id']) ?>'.replace(':transport_id', transport_id),
+            url: route('alert.transports.test', {transport: transport_id}),
             data: { type: "test-transport", transport_id: transport_id },
             dataType: "json",
             success: function(data){

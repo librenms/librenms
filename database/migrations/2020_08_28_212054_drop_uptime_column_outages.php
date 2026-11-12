@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('device_outages', function (Blueprint $table) {
+        Schema::table('device_outages', function (Blueprint $table): void {
             $table->dropColumn([
                 'uptime',
             ]);
@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('device_outages', function (Blueprint $table) {
+        Schema::table('device_outages', function (Blueprint $table): void {
             $table->bigInteger('uptime')->nullable();
         });
     }

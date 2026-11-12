@@ -27,7 +27,7 @@
 namespace LibreNMS\Util;
 
 use App\Facades\LibrenmsConfig;
-use LibreNMS\Exceptions\RrdGraphException;
+use LibreNMS\Exceptions\GraphException;
 use PHPMailer\PHPMailer\PHPMailer;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Exception\ExceptionInterface as MimeException;
@@ -108,7 +108,7 @@ class Mail
             switch (strtolower(trim(LibrenmsConfig::get('email_backend')))) {
                 case 'sendmail':
                     $mail->Mailer = 'sendmail';
-                    $mail->Sendmail = LibrenmsConfig::get('email_sendmail_path');
+                    $mail->Sendmail = resolve(Binaries::class)->path('sendmail');
                     break;
                 case 'smtp':
                     $mail->isSMTP();
@@ -164,7 +164,7 @@ class Mail
                     $cid,
                     $fileName . '.' . $image->fileExtension(),
                     PHPMailer::ENCODING_BASE64,
-                    $image->format->contentType()
+                    $image->format->mediaType()
                 );
 
                 // update image tag to link to attached image, or just the image name
@@ -173,7 +173,7 @@ class Mail
                 } else {
                     $body = str_replace($tag, "[$fileName]", $body);
                 }
-            } catch (RrdGraphException|\PHPMailer\PHPMailer\Exception $e) {
+            } catch (GraphException|\PHPMailer\PHPMailer\Exception $e) {
                 report($e);
             }
         }

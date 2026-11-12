@@ -43,11 +43,8 @@
 
 @section('javascript')
 <script>
-var sslCertUpdateUrl = "{{ route('ssl-certificates.update', ['ssl_certificate' => '__ID__']) }}".replace('__ID__', '');
-var sslCertDestroyUrl = "{{ route('ssl-certificates.destroy', ['ssl_certificate' => '__ID__']) }}".replace('__ID__', '');
-
 function sslCertPause(id) {
-    var url = sslCertUpdateUrl + id;
+    var url = route('ssl-certificates.update', {ssl_certificate: id});
     $.ajax({
         method: 'PUT',
         url: url,
@@ -62,7 +59,7 @@ function sslCertPause(id) {
 }
 
 function sslCertEnable(id) {
-    var url = sslCertUpdateUrl + id;
+    var url = route('ssl-certificates.update', {ssl_certificate: id});
     $.ajax({
         method: 'PUT',
         url: url,
@@ -80,7 +77,7 @@ function sslCertDelete(id) {
     if (!confirm("{{ __('Delete this certificate?') }}")) {
         return;
     }
-    var url = sslCertDestroyUrl + id;
+    var url = route('ssl-certificates.destroy', {ssl_certificate: id});
     $.ajax({
         method: 'DELETE',
         url: url,

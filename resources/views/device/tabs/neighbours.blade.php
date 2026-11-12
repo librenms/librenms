@@ -47,22 +47,8 @@
 @elseif($data['selection'] == 'map')
     <div id="netmap"></div>
 
-@push('styles')
-<style>
-    div.vis-tooltip {
-        padding: 0 !important;
-        background-color: transparent !important;
-        border: 0 !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-    }
-    div.vis-tooltip .panel {
-        margin-bottom: 0 !important;
-    }
-</style>
-@endpush
-
 @push('scripts')
+@include('map.partials.vis-popups')
 <script>
 var network_nodes = new vis.DataSet({queue: {delay: 100}});
 var network_edges = new vis.DataSet({queue: {delay: 100}});
@@ -72,6 +58,7 @@ $.post( '{{ route('maps.getdevicelinks') }}', {device: {{$device->device_id}}, l
         var devices = [];
         $.each(data, function( link_id, link ) {
             var this_edge = link['style'];
+            this_edge['id'] = link_id;
             this_edge['from'] = link['ldev'];
             this_edge['to'] = link['rdev'];
             this_edge['label'] = link['ifnames'];
@@ -81,13 +68,10 @@ $.post( '{{ route('maps.getdevicelinks') }}', {device: {{$device->device_id}}, l
             devices[link['rdev']] = true;
         });
 
-        $.post( '{{ route('maps.getdevices') }}', {devices: Object.keys(devices), url_type: 'links'})
+        $.post( '{{ route('maps.getdevices') }}', {devices: Object.keys(devices)})
             .done(function( data ) {
                 $.each(data, function( dev_id, dev ) {
-                    let title = document.createElement("div");
-                    title.innerHTML = dev["url"];
-
-                    var this_dev = {id: dev_id, label: dev["sname"], title: title, shape: "box"};
+                    var this_dev = {id: dev_id, label: dev["sname"], shape: "box"};
                     if (dev["style"]) {
                         // Merge the style if it has been defined
                         this_dev = Object.assign(dev["style"], this_dev);
@@ -114,6 +98,7 @@ var data = {
 };
 
 var network = new vis.Network(container, data, options);
+visPopups.attach(network, {ports: true});
 network.on('click', function (properties) {
     if (properties.nodes > 0) {
        window.location.href = "{{ @url('device') }}/device="+properties.nodes+"/tab=neighbours/selection=map/"

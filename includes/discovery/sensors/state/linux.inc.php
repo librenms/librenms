@@ -4,6 +4,9 @@
  * codec states for raspberry pi
  * requires snmp extend agent script from librenms-agent
  */
+
+use LibreNMS\Enum\SensorType;
+
 if (! empty($pre_cache['raspberry_pi_sensors'])) {
     $state_name = 'raspberry_codec';
     $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.';
@@ -36,7 +39,7 @@ if (! empty($pre_cache['raspberry_pi_sensors'])) {
             ];
             create_state_index($state_name, $states);
 
-            discover_sensor(null, 'state', $device, $oid . $codec, $codec, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp', $codec);
+            discover_sensor(null, SensorType::State, $device, $oid . $codec, $codec, $state_name, $descr, 1, 1, null, null, null, null, $value, 'snmp', $codec);
         } else {
             break;
         }

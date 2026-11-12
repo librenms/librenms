@@ -136,6 +136,11 @@ the string to the equivalent OID representation.
   With the value `transceiver`, LibreNMS shows the sensor with the port
   and not with the generic sensors. You must also set
   `entPhysicalIndex` to ifIndex
+- `category` (optional): the category of the sensor: `stack` for stack
+  and virtual chassis member sensors. On the device Overview page,
+  sensors of any class in the same category share one panel, and
+  `group` still groups them inside it. Sensors without a category show
+  in the panel of their sensor class.
 - `index` (optional): the unique index value of this sensor. Omit
   this key unless auto-generated indexes collide. LibreNMS uses the row
   index from the SNMP walk automatically. If multiple tables in the same
@@ -380,6 +385,8 @@ MIB from the vendor of the device. Other MIB tables also work.
 - $rrd_type = the default is 'GAUGE'. It changes the type of the new
   RRD file of this sensor. For more details, read the RRD
   documentation: https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
+- $category = the default is null. Give a `SensorCategory` case to set
+  the category, see `category` above.
 
 For most devices, these steps give full sensor support. The polling
 uses the data from `discover_sensor()`. For your own polling code, the
@@ -395,7 +402,7 @@ not necessary and not supported.
 
 Add code for your new sensor class to these existing files:
 
-- `LibreNMS/Enum/Sensor.php`: add accordingly, find free icon from [Font Awesome](https://fontawesome.com/icons?d=gallery&m=free)
+- `LibreNMS/Enum/SensorType.php`: add accordingly, find free icon from [Font Awesome](https://fontawesome.com/icons?d=gallery&m=free)
 - `doc/Developing/os/Health-Information.md`: documentation for every sensor class is mandatory.
 - `includes/discovery/functions.inc.php`: optional - if sensible low_limit and high_limit values
 are guessable when a SNMP-retrievable threshold is not available, add a case for the sensor class

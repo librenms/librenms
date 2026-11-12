@@ -1,6 +1,6 @@
 os: avaya-ipo
 text: 'IP Office Firmware'
-type: network
+type: voice
 icon: avaya
 mib_dir: nortel
 discovery:

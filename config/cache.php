@@ -16,4 +16,22 @@ return [
 
     'default' => env('CACHE_STORE', env('CACHE_DRIVER', 'database')),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Stores
+    |--------------------------------------------------------------------------
+    |
+    | Merged with the framework default stores.
+    | The device store holds data for the current device and is flushed at
+    | the start of each device poll/discovery.
+    |
+    */
+
+    'stores' => [
+        'device' => [
+            'driver' => 'array',
+            'serialize' => false,
+        ],
+    ],
+
 ];

@@ -123,10 +123,12 @@ class PortSecurityController extends TableController
      */
     protected function formatExportRow(Model $item): array
     {
+        $device = $item->device;
+
         return array_merge(
             request()->integer('device_id') ? [] : [
                 $item->device_id,
-                $item->device?->displayName() ?? '',
+                $device->display ?? '',
             ],
             [
                 $item->port?->getShortLabel() ?? '',

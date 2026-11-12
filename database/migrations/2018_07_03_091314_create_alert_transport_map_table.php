@@ -36,7 +36,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('alert_transport_map', function (Blueprint $table) {
+        Schema::create('alert_transport_map', function (Blueprint $table): void {
             $table->increments('id');
             $table->unsignedInteger('rule_id');
             $table->unsignedInteger('transport_or_group_id');

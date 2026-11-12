@@ -137,9 +137,6 @@ function initNotificationManager() {
         csrf: '{{ csrf_token() }}',
         storeUrl: '{{ route('notifications.store') }}',
         readAllUrl: '{{ route('notifications.read-all') }}',
-        readUrlTemplate: '{{ route('notifications.read', ['notification' => ':id']) }}',
-        stickUrlTemplate: '{{ route('notifications.stick', ['notification' => ':id']) }}',
-        unstickUrlTemplate: '{{ route('notifications.unstick', ['notification' => ':id']) }}',
 
         async submitCreate() {
             if (! this.newTitle.trim() || ! this.newBody.trim()) {
@@ -177,7 +174,7 @@ function initNotificationManager() {
             const btn = event.currentTarget;
             btn.disabled = true;
             try {
-                const res = await fetch(this.readUrlTemplate.replace(':id', id), {
+                const res = await fetch(route('notifications.read', {notification: id}), {
                     method: 'PUT',
                     headers: {
                         'X-CSRF-TOKEN': this.csrf,
@@ -234,7 +231,7 @@ function initNotificationManager() {
             const btn = event.currentTarget;
             btn.disabled = true;
             try {
-                const res = await fetch(this.stickUrlTemplate.replace(':id', id), {
+                const res = await fetch(route('notifications.stick', {notification: id}), {
                     method: 'PUT',
                     headers: {
                         'X-CSRF-TOKEN': this.csrf,
@@ -258,7 +255,7 @@ function initNotificationManager() {
             const btn = event.currentTarget;
             btn.disabled = true;
             try {
-                const res = await fetch(this.unstickUrlTemplate.replace(':id', id), {
+                const res = await fetch(route('notifications.unstick', {notification: id}), {
                     method: 'DELETE',
                     headers: {
                         'X-CSRF-TOKEN': this.csrf,

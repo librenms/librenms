@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('eventlog', function (Blueprint $table) {
+        Schema::create('eventlog', function (Blueprint $table): void {
             $table->increments('event_id');
             $table->unsignedInteger('device_id')->nullable()->index();
             $table->dateTime('datetime')->default('1970-01-02 00:00:01')->index();

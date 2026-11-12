@@ -23,14 +23,14 @@ class UserFactory extends Factory
 
     public function admin(): UserFactory
     {
-        return $this->afterCreating(function ($user) {
+        return $this->afterCreating(function ($user): void {
             $user->assignRole('admin');
         });
     }
 
     public function read(): UserFactory
     {
-        return $this->afterCreating(function ($user) {
+        return $this->afterCreating(function ($user): void {
             $user->assignRole('global-read');
         });
     }

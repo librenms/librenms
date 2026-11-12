@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('qos', function (Blueprint $table) {
+        Schema::create('qos', function (Blueprint $table): void {
             $table->id('qos_id');
             $table->timestamps();
             $table->integer('device_id')->unsigned()->index();

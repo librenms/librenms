@@ -61,8 +61,6 @@ return [
             'file' => '要更新或添加到LibreNMS的snmprec文件的基本文件名。如果没有指定文件，则不会添加或更新设备。',
         ],
         'options' => [
-            'multiple' => '使用社区名称作为主机名，而不是snmpsim',
-            'remove' => '停止后删除设备',
         ],
         'added' => '设备:hostname (:id) 已添加',
         'exit' => '按Ctrl-C停止',
@@ -244,9 +242,6 @@ return [
         ],
         'not_found' => '设备未找到',
         'value' => '值',
-    ],
-    'translation:generate' => [
-        'description' => '生成更新后的json语言文件，供Web前端使用',
     ],
     'user:add' => [
         'description' => '添加本地用户，仅当auth设置为mysql时，您才能使用此用户登录',

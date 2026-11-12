@@ -73,7 +73,7 @@ class DiskioController extends TableController
     {
         $graph_array = [
             'type' => 'diskio_bits',
-            'popup_title' => htmlentities(strip_tags($model->device?->displayName() . ': ' . $model->diskio_descr)),
+            'popup_title' => htmlentities(strip_tags($model->device?->display . ': ' . $model->diskio_descr)),
             'id' => $model->diskio_id,
             'from' => '-1d',
             'height' => 20,

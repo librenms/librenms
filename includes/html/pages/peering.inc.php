@@ -24,7 +24,7 @@
 $no_refresh = true;
 
 match ($vars['section']) {
-    'ix-list' => require_once 'includes/html/pages/peering/ix-list.inc.php',
-    'ix-peers' => require_once 'includes/html/pages/peering/ix-peers.inc.php',
-    default => require_once 'includes/html/pages/peering/as-selection.inc.php',
+    'ix-list' => require 'includes/html/pages/peering/ix-list.inc.php',
+    'ix-peers' => require 'includes/html/pages/peering/ix-peers.inc.php',
+    default => require 'includes/html/pages/peering/as-selection.inc.php',
 };

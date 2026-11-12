@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('custom_maps', function (Blueprint $table) {
+        Schema::table('custom_maps', function (Blueprint $table): void {
             $table->boolean('reverse_arrows')->default(0)->after('node_align');
             $table->smallInteger('edge_separation')->default(10)->after('reverse_arrows');
             $table->integer('legend_x')->default(-1)->after('edge_separation');
@@ -28,7 +28,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('custom_maps', function (Blueprint $table) {
+        Schema::table('custom_maps', function (Blueprint $table): void {
             $table->dropColumn(['reverse_arrows', 'edge_separation', 'legend_x', 'legend_y', 'legend_steps', 'legend_steps', 'legend_hide_invalid', 'legend_hide_overspeed']);
         });
     }

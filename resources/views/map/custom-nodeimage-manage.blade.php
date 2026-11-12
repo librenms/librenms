@@ -32,7 +32,7 @@
 '            <div class="tw:flex tw:justify-between tw:p-3 tw:items-center tw:hover:bg-gray-100 tw:dark:hover:bg-gray-600">' +
 '                <div id="imagename-' + node_image_id + '">' + name + '</div>' +
 '                <div>' +
-'                    <img id="imageview-' + node_image_id + '" src="' + '{{ route('maps.nodeimage.show', ['image' => '?' ]) }}'.replace("?", node_image_id) + '" width="25" height="25">' +
+'                    <img id="imageview-' + node_image_id + '" src="' + route('maps.nodeimage.show', {image: node_image_id}) + '" width="25" height="25">' +
 '                </div>' +
 '                <div class="tw:whitespace-nowrap">' +
 '                    <button class="btn btn-default" onclick="imageModalEdit(' + node_image_id + ');">' +

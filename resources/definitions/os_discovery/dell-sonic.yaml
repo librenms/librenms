@@ -1,0 +1,4 @@
+modules:
+    os:
+        sysDescr_regex: '/Software Version:\s+SONiC\.(?<version>[^\s]+)\s+-\s+HwSku:\s+(?<hardware>[^\s]+)/'
+        serial: ENTITY-MIB::entPhysicalSerialNum.1

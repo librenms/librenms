@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('toner', function (Blueprint $table) {
+        Schema::create('toner', function (Blueprint $table): void {
             $table->increments('toner_id');
             $table->unsignedInteger('device_id')->default(0)->index();
             $table->integer('toner_index');

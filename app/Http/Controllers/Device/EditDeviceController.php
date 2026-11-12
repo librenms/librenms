@@ -35,7 +35,9 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use LibreNMS\Enum\DeviceType;
 use LibreNMS\Enum\MaintenanceBehavior;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\HostRenameException;
 
 class EditDeviceController
@@ -46,14 +48,8 @@ class EditDeviceController
     {
         $this->authorize('update', $device);
 
-        $types = collect(LibrenmsConfig::get('device_types'))->keyBy('type');
-        if (! $types->has($device->type)) {
-            $types->put($device->type, [
-                'icon' => null,
-                'text' => ucfirst($device->type),
-                'type' => $device->type,
-            ]);
-        }
+        $types = DeviceType::icons();
+        $types[$device->type] ??= null;
 
         $alertSchedules = $device->alertSchedules()->isActive()->get();
         $isUnderMaintenance = $alertSchedules->isNotEmpty();
@@ -76,20 +72,24 @@ class EditDeviceController
             'static_groups' => $static_groups,
             'types' => $types,
             'default_type' => LibrenmsConfig::getOsSetting($device->os, 'type'),
-            'parents' => $device->parents()->select(['devices.device_id', 'hostname', 'sysName', 'ip', 'overwrite_ip', 'display'])->get()->mapWithKeys(fn ($parent) => [$parent->device_id => $parent->displayName()]),
+            'parents' => $device->parents()->select(['devices.device_id', 'hostname', 'sysName', 'ip', 'overwrite_ip', 'display'])->get()->mapWithKeys(fn ($parent) => [$parent->device_id => $parent->display]),
             'poller_groups' => PollerGroup::orderBy('group_name')->pluck('group_name', 'id'),
             'default_poller_group' => LibrenmsConfig::get('distributed_poller_group'),
             'override_sysContact_bool' => $device->getAttrib('override_sysContact_bool'),
             'override_sysContact_string' => $device->getAttrib('override_sysContact_string'),
             'maintenance' => $isUnderMaintenance,
-            'default_maintenance_behavior' => MaintenanceBehavior::from((int) LibrenmsConfig::get('alert.scheduled_maintenance_default_behavior'))->value,
+            'default_maintenance_behavior' => MaintenanceBehavior::fromConfig()->value,
             'exclusive_maintenance_id' => $exclusive_schedule_id,
+            'without_snmp' => $device->pollingMethod(PollingMethodType::Snmp) === null,
         ]);
     }
 
     public function update(UpdateDeviceRequest $request, Device $device): RedirectResponse
     {
         $device->fill($request->validated());
+        if ($request->withoutSnmp()) {
+            $device->os = $device->os ?: 'ping';
+        }
 
         $device->parents()->sync($request->input('parent_id', [])); // TODO avoid loops!
 
@@ -133,6 +133,6 @@ class EditDeviceController
             toast()->error($e->getMessage());
         }
 
-        return response()->redirectToRoute('device', ['device' => $device->device_id, 'edit']);
+        return response()->redirectToRoute('device.edit', $device->device_id);
     }
 }

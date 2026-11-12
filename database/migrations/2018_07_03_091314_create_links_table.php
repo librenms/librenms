@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('links', function (Blueprint $table) {
+        Schema::create('links', function (Blueprint $table): void {
             $table->increments('id');
             $table->unsignedInteger('local_port_id')->nullable()->index();
             $table->unsignedInteger('local_device_id');

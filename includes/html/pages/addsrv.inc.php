@@ -25,7 +25,7 @@ if (! empty($vars['addsrv'])) {
         $message_break .= '<br />';
     }
 }
-foreach (list_available_services() as $current_service) {
+foreach (\LibreNMS\Services::list() as $current_service) {
     $servicesform .= "<option value='$current_service'>$current_service</option>";
 }
 
@@ -40,7 +40,7 @@ echo "<div class='row'>
     </div>
     <div class='col-sm-6'>";
 
-include_once 'includes/html/print-service-add.inc.php';
+include 'includes/html/print-service-add.inc.php';
 
 echo '</div>
     </div>';

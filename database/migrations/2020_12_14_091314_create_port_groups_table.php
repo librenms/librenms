@@ -16,12 +16,12 @@ return new class extends Migration
         if (Schema::hasTable('port_groups')) {
             // if the table exists and the index doesn't, add the index.
             if (! Schema::hasIndex('port_groups', 'port_groups_name_unique')) {
-                Schema::table('port_groups', function (Blueprint $table) {
+                Schema::table('port_groups', function (Blueprint $table): void {
                     $table->unique('name');
                 });
             }
         } else {
-            Schema::create('port_groups', function (Blueprint $table) {
+            Schema::create('port_groups', function (Blueprint $table): void {
                 $table->increments('id');
                 $table->string('name')->unique();
                 $table->string('desc')->nullable();

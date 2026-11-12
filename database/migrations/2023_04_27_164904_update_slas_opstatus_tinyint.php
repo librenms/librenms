@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('slas', function (Blueprint $table) {
+        Schema::table('slas', function (Blueprint $table): void {
             $table->renameColumn('opstatus', 'opstatus_old');
         });
 
-        Schema::table('slas', function (Blueprint $table) {
+        Schema::table('slas', function (Blueprint $table): void {
             $table->unsignedTinyInteger('opstatus')->default(0)->after('opstatus_old');
         });
 
@@ -25,7 +25,7 @@ return new class extends Migration
             $sla->save();
         }
 
-        Schema::table('slas', function (Blueprint $table) {
+        Schema::table('slas', function (Blueprint $table): void {
             $table->dropColumn('opstatus_old');
         });
     }
@@ -35,7 +35,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('slas', function (Blueprint $table) {
+        Schema::table('slas', function (Blueprint $table): void {
             $table->boolean('opstatus')->default(0)->change();
         });
     }

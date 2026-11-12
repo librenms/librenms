@@ -168,7 +168,7 @@
         function apply_st(button) {
             var id = button.dataset.templateId;
             var name = button.dataset.templateName;
-            var url = "{{ route('services.templates.apply', ':template-id') }}".replace(':template-id', id);
+            var url = route('services.templates.apply', id);
 
             if (confirm('{{ __('Are you sure you want to create Services for ') }}' + name + '?')) {
                 $.ajax({
@@ -202,7 +202,7 @@
         function remove_st(button) {
             var id = button.dataset.templateId;
             var name = button.dataset.templateName;
-            var url = "{{ route('services.templates.remove', ':template-id') }}".replace(':template-id', id);
+            var url = route('services.templates.remove', id);
 
             if (confirm('{{ __('Are you sure you want to remove all Services created by ') }}' + name + '?')) {
                 $.ajax({
@@ -223,7 +223,7 @@
             var index = button.parentNode.parentNode.rowIndex;
             var id = button.dataset.templateId;
             var name = button.dataset.templateName;
-            var url = "{{ route('services.templates.destroy', ':template-id') }}".replace(':template-id', id);
+            var url = route('services.templates.destroy', id);
 
             if (confirm('{{ __('Are you sure you want to delete AND remove all Services created by ') }}' + name + '?')) {
                 $.ajax({

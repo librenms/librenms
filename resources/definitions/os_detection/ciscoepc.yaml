@@ -16,7 +16,6 @@ poller_modules:
     ucd-mib: false
 discovery_modules:
     bgp-peers: false
-    cisco-vrf-lite: false
     ntp: false
     ucd-diskio: false
 discovery:

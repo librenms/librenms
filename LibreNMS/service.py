@@ -459,7 +459,16 @@ class Service:
         A process from a previous invocation is trying to report its status
         """
         # Speed things up by only looking at direct zombie children
-        for p in psutil.Process().children(recursive=False):
+        try:
+            children = psutil.Process().children(recursive=False)
+        except (OSError, psutil.AccessDenied):
+            # psutil may raise AccessDenied during /proc scans on hosts with PID churn.
+            # Catch it to keep the dispatcher alive and re-arm reaping, since no
+            # further SIGCHLD may arrive to retry pending children.
+            self.reap_flag = True
+            logger.debug("Could not enumerate child processes", exc_info=True)
+            return
+        for p in children:
             try:
                 status = p.status()
 
@@ -472,8 +481,13 @@ class Service:
                         r[0],
                         r[1],
                     )
-            except (OSError, psutil.NoSuchProcess):
-                # process was already reaped
+            except psutil.NoSuchProcess:
+                # process was already reaped, nothing to retry
+                continue
+            except (OSError, psutil.AccessDenied):
+                # child was unreadable mid-reap, re-arm so a possible zombie
+                # gets another chance on the next loop iteration
+                self.reap_flag = True
                 continue
 
     def start(self):
@@ -673,31 +687,14 @@ class Service:
 
     def run_maintenance(self):
         """
-        Runs update and cleanup tasks by calling daily.sh.  Reloads the python script after the update.
-        Sets a schema-update lock so no distributed pollers will update until the schema has been updated.
+        Run update and cleanup tasks by calling daily.sh, then reload on success.
         """
-        attempt = 0
-        wait = 5
-        max_runtime = 86100
-        max_tries = int(max_runtime / wait)
-        logger.info("Waiting for schema lock")
-        while not self._lm.lock("schema-update", self.config.unique_name, max_runtime):
-            attempt += 1
-            if attempt >= max_tries:  # don't get stuck indefinitely
-                logger.warning(
-                    "Reached max wait for other pollers to update, updating now"
-                )
-                break
-            sleep(wait)
-
         logger.info("Running maintenance tasks")
         exit_code, output = LibreNMS.call_script("daily.sh")
         if exit_code == 0:
             logger.info("Maintenance tasks complete\n{}".format(output))
         else:
             logger.error("Error {} in daily.sh:\n{}".format(exit_code, output))
-
-        self._lm.unlock("schema-update", self.config.unique_name)
 
         self.reload_flag = True
 

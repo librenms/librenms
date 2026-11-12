@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('vlans', function (Blueprint $table) {
+        Schema::table('vlans', function (Blueprint $table): void {
             $table->dropColumn('vlan_mtu');
             $table->boolean('vlan_state')->default(1);
         });
@@ -22,7 +22,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('vlans', function (Blueprint $table) {
+        Schema::table('vlans', function (Blueprint $table): void {
             $table->integer('vlan_mtu')->nullable();
             $table->dropColumn('vlan_state');
         });

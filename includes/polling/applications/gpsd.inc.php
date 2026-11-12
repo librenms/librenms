@@ -53,6 +53,7 @@
 }
 */
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
@@ -111,7 +112,7 @@ if (! empty($agent_data['app'][$name])) {
     } catch (JsonAppException $e) {
         // Set Empty metrics and error message
 
-        echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+        Log::info($name . ':' . $e->getCode() . ':' . $e->getMessage());
         update_application($app, $e->getCode() . ':' . $e->getMessage(), []);
 
         return;

@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('devices', function (Blueprint $table) {
+        Schema::table('devices', function (Blueprint $table): void {
             if (LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
                 DB::statement('ALTER TABLE `devices` CHANGE `inserted` `inserted` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP;');
             } else {

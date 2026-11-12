@@ -13,6 +13,7 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
 */
 use LibreNMS\Enum\IfOperStatus;
+use LibreNMS\Enum\SensorType;
 
 echo 'Comware ';
 
@@ -37,6 +38,6 @@ foreach ($hh3cTransceiverInfoTable as $index => $entry) {
         $entPhysicalIndex_measured = 'ports';
 
         $descr = $port->getShortLabel() . ' Supply Voltage';
-        discover_sensor(null, 'voltage', $device, $oid, 'volt-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
+        discover_sensor(null, SensorType::Voltage, $device, $oid, 'volt-' . $index, 'comware', $descr, $divisor, $multiplier, $limit_low, $warn_limit_low, $warn_limit, $limit, $current, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured, group: 'transceiver');
     }
 }

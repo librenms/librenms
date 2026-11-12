@@ -53,7 +53,7 @@ class AlertData extends \Illuminate\Support\Collection
             'os' => $device->os,
             'type' => $device->type,
             'ip' => $device->ip,
-            'display' => $device->displayName(),
+            'display' => $device->display,
             'version' => $device->version,
             'hardware' => $device->hardware,
             'features' => $device->features,

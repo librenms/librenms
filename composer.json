@@ -14,57 +14,56 @@
     "homepage": "https://www.librenms.org/",
     "license": "GPL-3.0-or-later",
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "ext-curl": "*",
         "ext-gd": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
+        "ext-mysqlnd": "*",
         "ext-pcre": "*",
         "ext-pdo": "*",
+        "ext-pdo_mysql": "*",
         "ext-session": "*",
         "ext-simplexml": "*",
         "ext-sockets": "*",
         "ext-xml": "*",
         "ext-zlib": "*",
         "amenadiel/jpgraph": "^4",
-        "binaryk/laravel-restify": "^9.11",
+        "binaryk/laravel-restify": "^10.4",
         "clue/socket-raw": "^1.4",
         "dapphp/radius": "^3.0",
-        "easybook/geshi": "^1.0.8",
-        "enshrined/svg-sanitize": "^0.22.0",
-        "fico7489/laravel-pivot": "^3.0",
+        "enshrined/svg-sanitize": "^1.0.0",
         "influxdata/influxdb-client-php": "^3.8",
         "influxdb/influxdb-php": "^1.15",
         "jalle19/certificate-parser": "^4.0",
         "justinrainbow/json-schema": "^6.4",
-        "laravel-notification-channels/webpush": "^10.0",
-        "laravel/framework": "^12.10",
+        "laravel-notification-channels/webpush": "^10.5",
+        "laravel/framework": "^13.32",
+        "laravel/horizon": "^5.50",
         "laravel/sanctum": "^4.3.1",
         "laravel/tinker": "^3.0",
         "laravel/ui": "^4.6",
-        "librenms/laravel-vue-i18n-generator": "dev-master",
         "librenms/plugin-interfaces": "^1.0",
         "mews/purifier": "^3.4",
         "mikepultz/netdns2": "^1.5",
         "nesbot/carbon": "^3.8",
-        "nunomaduro/laravel-console-summary": "^1.13",
+        "nunomaduro/laravel-console-summary": "^1.14",
         "pear/console_color2": "^0.1",
         "php-amqplib/php-amqplib": "^3.1",
         "phpmailer/phpmailer": "^7.0",
         "predis/predis": "^3.0",
-        "socialiteproviders/manager": "^4.8",
-        "spatie/laravel-ignition": "^2.9",
-        "spatie/laravel-permission": "^6.16",
-        "symfony/yaml": "^7.2",
+        "socialiteproviders/manager": "^4.9",
+        "spatie/laravel-permission": "^7.3",
+        "symfony/yaml": "^7.4",
         "tightenco/ziggy": "^2.0"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "^3.5",
+        "barryvdh/laravel-ide-helper": "^3.7",
         "coding-socks/lost-in-translation": "^0.3.5",
         "composer/composer": "^2.8",
         "fakerphp/faker": "^1.23",
         "fruitcake/laravel-debugbar": "^4.1",
-        "larastan/larastan": "^3.12",
+        "larastan/larastan": "^3.13",
         "laravel/boost": "^2.0",
         "laravel/dusk": "^8.2.2",
         "laravel/pint": "^1.30",
@@ -75,16 +74,19 @@
         "phpstan/phpstan-mockery": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
         "phpunit/phpunit": "^11.5.33 || ^12.3.7",
-        "rector/rector": "^2.6"
+        "rector/rector": "^2.6",
+        "spatie/laravel-ignition": "^2.9"
     },
     "suggest": {
         "ext-gmp": "Used for browser push notifications",
         "ext-ldap": "*",
+        "ext-pcntl": "Required to run the queue worker (lnms worker)",
         "ext-memcached": "Required if you utilize wrapper based distributed polling",
         "ext-mysqlnd": "*",
-        "ext-posix": "Allows for additional validation tests"
+        "ext-posix": "Required to run the queue worker (lnms worker)"
     },
     "config": {
+        "process-timeout": 900,
         "discard-changes": true,
         "optimize-autoloader": true,
         "platform-check": true,
@@ -131,7 +133,6 @@
         "post-install-cmd": [
             "LibreNMS\\ComposerHelper::postInstall",
             "Illuminate\\Foundation\\ComposerScripts::postInstall",
-            "@php artisan vue-i18n:generate --multi-locales --format=umd",
             "@php artisan view:cache",
             "@php artisan optimize",
             "@php artisan config:clear"
@@ -150,10 +151,10 @@
         ],
         "lint": [
             "rector",
-            "pint"
+            "pint --parallel"
         ],
         "test:lint": [
-            "pint --test",
+            "pint --test --parallel",
             "rector --dry-run"
         ],
         "test:unit": "phpunit",
@@ -163,6 +164,9 @@
             "@test:unit",
             "@test:lint",
             "@test:types"
+        ],
+        "pre-package-uninstall": [
+            "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
         ]
     },
     "support": {

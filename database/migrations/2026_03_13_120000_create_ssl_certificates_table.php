@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ssl_certificates', function (Blueprint $table) {
+        Schema::create('ssl_certificates', function (Blueprint $table): void {
             $table->id();
             $table->unsignedInteger('device_id')->nullable()->index();
             $table->string('host');

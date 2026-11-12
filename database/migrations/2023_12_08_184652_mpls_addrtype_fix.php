@@ -9,12 +9,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('mpls_sdps', function ($table) {
+        Schema::table('mpls_sdps', function ($table): void {
             // drop and recreate because of SQLite not accepting any changes.
             // data is collected again next poll anyway.
             $table->dropColumn(['sdpFarEndInetAddressType']);
         });
-        Schema::table('mpls_sdps', function ($table) {
+        Schema::table('mpls_sdps', function ($table): void {
             $table->enum('sdpFarEndInetAddressType', ['unknown', 'ipv4', 'ipv6', 'ipv4z', 'ipv6z', 'dns'])->nullable();
         });
     }
@@ -24,10 +24,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('mpls_sdps', function ($table) {
+        Schema::table('mpls_sdps', function ($table): void {
             $table->dropColumn(['sdpFarEndInetAddressType']);
         });
-        Schema::table('mpls_sdps', function ($table) {
+        Schema::table('mpls_sdps', function ($table): void {
             $table->enum('sdpFarEndInetAddressType', ['ipv4', 'ipv6'])->nullable();
         });
     }

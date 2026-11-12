@@ -73,7 +73,7 @@ class AlertSchedule extends Model
     protected function casts(): array
     {
         return [
-            'behaviour' => MaintenanceBehavior::class,
+            'behavior' => MaintenanceBehavior::class,
         ];
     }
 
@@ -81,6 +81,10 @@ class AlertSchedule extends Model
 
     public function getRecurringDayAttribute()
     {
+        if (empty($this->attributes['recurring_day'])) {
+            return [];
+        }
+
         return explode(',', str_replace(array_values($this->days), array_keys($this->days), $this->attributes['recurring_day']));
     }
 

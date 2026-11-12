@@ -1,5 +1,5 @@
 <?php
 
-$class = \LibreNMS\Enum\Sensor::Humidity;
+$class = \LibreNMS\Enum\SensorType::Humidity;
 
 require 'sensors.inc.php';

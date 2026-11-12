@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('stp', function (Blueprint $table) {
+        Schema::table('stp', function (Blueprint $table): void {
             $table->unsignedInteger('rootCost')->change();
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('stp', function (Blueprint $table) {
+        Schema::table('stp', function (Blueprint $table): void {
             $table->mediumInteger('rootCost')->change();
         });
     }

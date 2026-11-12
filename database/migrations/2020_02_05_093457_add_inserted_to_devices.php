@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('devices', function (Blueprint $table) {
+        Schema::table('devices', function (Blueprint $table): void {
             // add inserted column after device id with a default of current_timestamp
             $table->timestamp('inserted')->nullable()->default(null)->after('device_id');
         });
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('devices', function (Blueprint $table) {
+        Schema::table('devices', function (Blueprint $table): void {
             // revert add inserted column after device id with a default of current_timestamp
             $table->dropColumn('inserted');
         });

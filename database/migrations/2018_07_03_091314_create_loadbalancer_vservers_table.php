@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('loadbalancer_vservers', function (Blueprint $table) {
+        Schema::create('loadbalancer_vservers', function (Blueprint $table): void {
             $table->id();
             $table->unsignedInteger('classmap_id');
             $table->string('classmap', 128);
