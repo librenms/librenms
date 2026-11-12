@@ -11,7 +11,7 @@ use LdapRecord\Models\Model;
 
 class ActiveDirectoryAccess implements Rule
 {
-    public function __construct(private ActiveDirectoryGroups $groups) {}
+    public function __construct(private readonly ActiveDirectoryGroups $groups) {}
 
     public function passes(Model $user, ?Eloquent $model = null): bool
     {

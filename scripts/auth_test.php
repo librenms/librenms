@@ -45,8 +45,8 @@ if (LibrenmsConfig::get('auth_mechanism') == 'ldap' || LibrenmsConfig::get('auth
 }
 if (LibrenmsConfig::get('auth_mechanism') === 'active_directory') {
     $username = $options['u'] ?? '';
-    $question = (new \Symfony\Component\Console\Question\Question('Password: '))->setHidden(true);
-    $password = (new \Symfony\Component\Console\Helper\QuestionHelper())->ask(
+    $question = new \Symfony\Component\Console\Question\Question('Password: ')->setHidden(true);
+    $password = new \Symfony\Component\Console\Helper\QuestionHelper()->ask(
         new \Symfony\Component\Console\Input\ArgvInput(),
         new \Symfony\Component\Console\Output\ConsoleOutput(),
         $question
