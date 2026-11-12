@@ -100,7 +100,7 @@ class Billing
 
         [$from, $to] = self::getDates($bill->bill_day);
         $currentStart = new DateTime($from);
-        $currentEnd = (new DateTime($to))->modify('+1 second');
+        $currentEnd = new DateTime($to))->modify('+1 second';
         $oldestStart = new DateTime(self::getDates($bill->bill_day, 3)[0]);
         $now = now();
         $history = $bill->history()

@@ -214,8 +214,8 @@ class BillingCdrPredictionTest extends TestCase
 
         return BillHistory::create([
             'bill_id' => $bill->bill_id,
-            'bill_datefrom' => (new \DateTime($from))->format('Y-m-d H:i:s'),
-            'bill_dateto' => (new \DateTime($to))->format('Y-m-d H:i:s'),
+            'bill_datefrom' => new \DateTime($from)->format('Y-m-d H:i:s'),
+            'bill_dateto' => new \DateTime($to)->format('Y-m-d H:i:s'),
             'bill_type' => $type,
             'bill_allowed' => 0,
             'bill_used' => $rate,
