@@ -37,6 +37,7 @@ with the default URL used by the extend, `http://127.0.0.1/stats;csv`.
 ```
 frontend stats
     bind 127.0.0.1:80
+    mode http
     stats enable
     stats uri /stats
     stats refresh 10s
