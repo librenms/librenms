@@ -2,6 +2,9 @@
 
 // Expects $pressure_lines to be set by the including graph, a list of the lines to draw.
 // Each item is an array with the keys resource, stall_type, ds, and descr.
+//
+// If $vars['cgroup'] is set, the graph is for that cgroup instead of the system wide
+// pressure. It is the RRD safe form of the cgroup name, as the real one has slashes.
 
 $name = 'linux_pressure';
 $colours = 'rainbow';
@@ -12,13 +15,15 @@ $transparency = 15;
 $scale_min = 0;
 $descr_len = 16;
 
+$rrd_prefix = isset($vars['cgroup']) ? 'cgroup___' . $vars['cgroup'] : 'system';
+
 $rrd_list = [];
 foreach ($pressure_lines as $pressure_line) {
     $rrd_filename = Rrd::name($device['hostname'], [
         'app',
         $name,
         $app->app_id,
-        'system___' . $pressure_line['resource'] . '___' . $pressure_line['stall_type'],
+        $rrd_prefix . '___' . $pressure_line['resource'] . '___' . $pressure_line['stall_type'],
     ]);
 
     // not every kernel reports every resource and stall type

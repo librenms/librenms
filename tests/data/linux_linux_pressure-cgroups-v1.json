@@ -1,0 +1,214 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "linux_pressure",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "linux_pressure",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": "{\"cgroups\":[\"system.slice\\/cron.service\",\"system.slice\\/ssh.service\",\"system.slice\\/system-getty.slice\\/getty@tty1.service\"]}",
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "cgroup_system.slice/cron.service_cpu_full_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "cgroup_system.slice/cron.service_cpu_some_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "cgroup_system.slice/cron.service_io_full_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "cgroup_system.slice/cron.service_io_some_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "cgroup_system.slice/cron.service_memory_full_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "cgroup_system.slice/cron.service_memory_some_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "cgroup_system.slice/ssh.service_cpu_full_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "cgroup_system.slice/ssh.service_cpu_some_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "cgroup_system.slice/ssh.service_io_full_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "cgroup_system.slice/ssh.service_io_some_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "cgroup_system.slice/ssh.service_memory_full_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "cgroup_system.slice/ssh.service_memory_some_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_cpu_full_avg10",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_cpu_full_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_cpu_full_avg60",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_cpu_some_avg10",
+                    "value": 0.55,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_cpu_some_avg300",
+                    "value": 0.33,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_cpu_some_avg60",
+                    "value": 0.44,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_io_full_avg10",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_io_full_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_io_full_avg60",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_io_some_avg10",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_io_some_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_io_some_avg60",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_memory_full_avg10",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_memory_full_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_memory_full_avg60",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_memory_some_avg10",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_memory_some_avg300",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                },
+                {
+                    "metric": "system_memory_some_avg60",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "linux_pressure"
+                }
+            ]
+        }
+    }
+}

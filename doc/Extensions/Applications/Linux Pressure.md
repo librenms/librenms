@@ -57,6 +57,39 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
+## Cgroups
+
+Per cgroup pressure can also be graphed. This requires cgroup v2. Add
+`-c` to the extend to report every cgroup, or `-r` with a regexp to only
+report the cgroups matching it. `-r` may be used more than once and is
+matched against the path relative to `/sys/fs/cgroup`.
+
+For only the systemd system services...
+
+```bash
+extend linux_pressure /etc/snmp/linux_pressure -b -r '^system\.slice/[^/]+\.service$'
+```
+
+Or for every service, including template instances and user services...
+
+```bash
+extend linux_pressure /etc/snmp/linux_pressure -b -r '\.service$'
+```
+
+Each cgroup gets it own set of RRDs, so `-r` is very much suggested over
+`-c`. A plain `-c` on a host with containers or lots of short lived
+scopes will leave a lot of RRDs behind.
+
+The cgroups show up as a list at the top of the application page.
+Selecting one shows the graphs for it instead of the system wide ones. A
+cgroup is dropped from the list once it is no longer reported, but its
+RRDs are kept.
+
+Anything in a cgroup name other than letters, numbers, and `,._-` becomes
+a `_` in the RRD filename. So `foo/bar` and `foo_bar` would end up
+sharing RRDs. Cgroups with a name too long to fit in a RRD filename are
+skipped.
+
 ## Metrics
 
 The averages are saved as metrics for use with alerting, named
@@ -76,6 +109,15 @@ does not report will not be present.
 With the default five minute polling, `avg300` is the one to alert on.
 The shorter averages only cover the last few seconds before each poll.
 
+For cgroups only `avg300` is saved, named
+`cgroup_$CGROUP_$RESOURCE_$STALL_TYPE_avg300`, with `$CGROUP` being the
+path relative to `/sys/fs/cgroup`. So for cron it would be
+`cgroup_system.slice/cron.service_memory_full_avg300`.
+
+Metric names are limited to 64 characters, so cgroups with a name over
+38 to 42 characters, depending on the resource, will be graphed but not
+have metrics.
+
 ## Alerting
 
 The alert rule collection has the rules below. Go to *Alerts -> Alert
@@ -90,3 +132,6 @@ normal varies a lot with workload.
 | Linux Pressure: IO full avg300 >= 20%     | critical |
 | Linux Pressure: memory some avg300 >= 20% | warning  |
 | Linux Pressure: memory full avg300 >= 10% | critical |
+
+These are all for the system wide pressure. For alerting on cgroups, use
+a regex on the metric name, such as `cgroup_.*_memory_full_avg300`.
