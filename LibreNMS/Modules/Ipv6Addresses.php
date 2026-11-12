@@ -9,6 +9,7 @@ use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
@@ -46,7 +47,13 @@ class Ipv6Addresses implements Module
      */
     public function discover(OS $os): void
     {
-        $ips = $os->discoverIpv6Addresses();
+        try {
+            $ips = $os->discoverIpv6Addresses();
+        } catch (SnmpException $e) {
+            Log::warning('Device did not answer, IPv6 addresses were not updated: ' . $e->getMessage());
+
+            return;
+        }
 
         // reject localhost and populate ipv6 networks
         $ips = $ips->reject(function (Ipv6Address $ip) {

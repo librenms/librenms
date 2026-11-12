@@ -59,48 +59,74 @@ trait IpMib
 
     public function discoverIpv6Addresses(): Collection
     {
-        $ips = $this->discoverIpMibIpv6Addresses();
+        $silentContexts = [];
+        $ips = $this->discoverIpMibIpv6Addresses($silentContexts);
 
-        return $ips->isEmpty() ? $this->discoverIpv6MibAddresses() : $ips;
+        // IPV6-MIB is walked without a context, so the silent contexts do not apply to it
+        if ($ips->isEmpty()) {
+            return $this->discoverIpv6MibAddresses();
+        }
+
+        return $ips->merge($this->getDevice()->ipv6()->whereIn('ipv6_addresses.context_name', $silentContexts)->get()
+            ->map(fn (Ipv6Address $ip) => new Ipv6Address($ip->only(['port_id', 'ipv6_address', 'ipv6_compressed', 'ipv6_prefixlen', 'ipv6_origin', 'context_name']))));
     }
 
-    private function discoverIpMibIpv6Addresses(): Collection
+    /**
+     * @param  string[]  $silentContexts  filled with the VRF contexts that did not answer
+     */
+    private function discoverIpMibIpv6Addresses(array &$silentContexts): Collection
     {
         $device = $this->getDevice();
         $ips = new Collection;
         foreach ($device->getVrfContexts() as $context_name) {
-            $prefixOrigins = null; // only walked if a row needs it
-            $ips = $ips->merge(SnmpQuery::context($context_name)
-                ->enumStrings()
-                ->walk([
-                    'IP-MIB::ipAddressTable',
-                ])->mapTable(function ($data, $ipAddressAddrType, $ipAddressAddr = '') use ($context_name, $device, &$prefixOrigins) {
-                    if (! in_array($ipAddressAddrType, ['ipv6', 'ipv6z'])) {
-                        return null;
-                    }
+            try {
+                $ips = $ips->merge($this->discoverIpMibIpv6ContextAddresses($context_name));
+            } catch (SnmpException $e) {
+                if ($context_name === '') {
+                    throw $e;
+                }
 
-                    try {
-                        Log::debug("Attempting to parse $ipAddressAddr");
-                        $ifIndex = $data['IP-MIB::ipAddressIfIndex'] ?? 0;
-                        $ip = $this->parseIpMibIpv6Address($ipAddressAddr);
-
-                        return new Ipv6Address([
-                            'port_id' => PortCache::getIdFromIfIndex($ifIndex, $device),
-                            'ipv6_address' => $ip->uncompressed(),
-                            'ipv6_compressed' => $ip->compressed(),
-                            'ipv6_prefixlen' => $this->parseIpMibIpv6PrefixLen($data, $ipAddressAddrType, $ip, $context_name, $prefixOrigins),
-                            'ipv6_origin' => $data['IP-MIB::ipAddressOrigin'] ?? 'unknown',
-                            'context_name' => $context_name,
-                        ]);
-                    } catch (InvalidIpException $e) {
-                        Log::error('Failed to parse IP: ' . $e->getMessage());
-
-                        return null;
-                    }
-                }));
+                Log::warning("SNMP context $context_name did not answer, its IPv6 addresses were not updated: " . $e->getMessage());
+                $silentContexts[] = $context_name;
+            }
         }
 
         return $ips->filter();
+    }
+
+    /**
+     * @throws SnmpException when a walk of the context did not answer
+     */
+    private function discoverIpMibIpv6ContextAddresses(string $context_name): Collection
+    {
+        $device = $this->getDevice();
+        $response = SnmpQuery::context($context_name)->enumStrings()->walk(['IP-MIB::ipAddressTable'])->throwIfConnectionError();
+        $prefixOrigins = null; // only walked if a row needs it
+
+        return $response->mapTable(function ($data, $ipAddressAddrType, $ipAddressAddr = '') use ($context_name, $device, &$prefixOrigins) {
+            if (! in_array($ipAddressAddrType, ['ipv6', 'ipv6z'])) {
+                return null;
+            }
+
+            try {
+                Log::debug("Attempting to parse $ipAddressAddr");
+                $ifIndex = $data['IP-MIB::ipAddressIfIndex'] ?? 0;
+                $ip = $this->parseIpMibIpv6Address($ipAddressAddr);
+
+                return new Ipv6Address([
+                    'port_id' => PortCache::getIdFromIfIndex($ifIndex, $device),
+                    'ipv6_address' => $ip->uncompressed(),
+                    'ipv6_compressed' => $ip->compressed(),
+                    'ipv6_prefixlen' => $this->parseIpMibIpv6PrefixLen($data, $ipAddressAddrType, $ip, $context_name, $prefixOrigins),
+                    'ipv6_origin' => $data['IP-MIB::ipAddressOrigin'] ?? 'unknown',
+                    'context_name' => $context_name,
+                ]);
+            } catch (InvalidIpException $e) {
+                Log::error('Failed to parse IP: ' . $e->getMessage());
+
+                return null;
+            }
+        });
     }
 
     private function discoverIpv6MibAddresses(): Collection
@@ -111,7 +137,7 @@ trait IpMib
             $ips = $ips->merge(SnmpQuery::walk([
                 'IPV6-MIB::ipv6AddrPfxLength',
                 'IPV6-MIB::ipv6AddrType',
-            ])->mapTable(function ($data, $ipv6IfIndex = 0, $ipv6AddrAddress = '') use ($context_name, $device) {
+            ])->throwIfConnectionError()->mapTable(function ($data, $ipv6IfIndex = 0, $ipv6AddrAddress = '') use ($context_name, $device) {
                 try {
                     $ip = IPv6::parse($ipv6AddrAddress);
                     $origin = match ($data['IP-MIB::ipv6AddrType'] ?? null) {
@@ -172,7 +198,7 @@ trait IpMib
 
         // try IP-MIB::ipAddressPrefixTable to get the prefix length
         if (isset($snmpRowData['IP-MIB::ipAddressIfIndex'])) {
-            $prefixOrigins ??= SnmpQuery::context($context_name)->cache()->walk('IP-MIB::ipAddressPrefixOrigin')->table(4); // walk this and parse from index
+            $prefixOrigins ??= SnmpQuery::context($context_name)->cache()->walk('IP-MIB::ipAddressPrefixOrigin')->throwIfConnectionError()->table(4); // walk this and parse from index
             $longestPrefixLen = 0;
             foreach ($prefixOrigins[$snmpRowData['IP-MIB::ipAddressIfIndex']][$ipAddressAddrType] ?? [] as $prefix => $prefixData) {
                 foreach (array_keys($prefixData) as $prefixLen) {
