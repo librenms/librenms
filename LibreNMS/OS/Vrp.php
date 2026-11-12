@@ -228,8 +228,10 @@ class Vrp extends OS implements
         foreach (Arr::wrap($mempools_array) as $index => $entry) {
             $size = empty($entry['hwEntityMemSizeMega']) ? ($entry['hwEntityMemSize'] ?? null) : $entry['hwEntityMemSizeMega'];
             $descr = empty($entry['entPhysicalName']) ? ($entry['hwEntityBomEnDesc'] ?? null) : $entry['entPhysicalName'];
+            // some VRP 8 platforms (e.g. NE40E-M2K) report usage but no memory size
+            $percentOnly = empty($size) && is_numeric($entry['hwEntityMemUsage'] ?? null) && $entry['hwEntityMemUsage'] > 0;
 
-            if ($size != 0 && $descr && ! Str::contains($descr, 'No') && ! Str::contains($entry['hwEntityMemUsage'], 'No')) {
+            if (($size != 0 || $percentOnly) && $descr && ! Str::contains($descr, 'No') && ! Str::contains($entry['hwEntityMemUsage'], 'No')) {
                 $mempools->push(new Mempool([
                     'mempool_index' => $index,
                     'mempool_type' => 'vrp',
@@ -238,7 +240,7 @@ class Vrp extends OS implements
                     'mempool_descr' => substr("$descr Memory", 0, 64),
                     'mempool_perc_oid' => ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7.$index",
                     'mempool_perc_warn' => 90,
-                ])->fillUsage(null, $size, null, $entry['hwEntityMemUsage']));
+                ])->fillUsage(null, $percentOnly ? null : $size, null, $entry['hwEntityMemUsage']));
             }
         }
 
