@@ -241,10 +241,23 @@ function discovery_process($os, $sensor_class, $pre_cache)
                 $snmp_value = $snmp_data[$data['value']] ?? '';
                 if (! is_numeric($snmp_value)) {
                     if ($sensor_class === 'temperature') {
-                        // For temp sensors, try and detect fahrenheit values
-                        if (is_string($snmp_value) && Str::endsWith($snmp_value, ['f', 'F'])) {
+                        if (is_string($snmp_value)) {
+                          // Handle temperature string for Celsius
+                          if (preg_match('/([0-9.-]+)\s*[cC]/', $snmp_value, $matches)) {
+                            $snmp_value = (float)$matches[1];
+                            $user_function = null; 
+                          } 
+                          // Handle temperature string for Fahrenheit
+                          elseif (preg_match('/([0-9.-]+)\s*[fF]/', $snmp_value, $matches)) {
+                            $snmp_value = (float)$matches[1];
                             $user_function = 'fahrenheit_to_celsius';
+                          }
+						  // Handle temperature string - first matched number
+						  elseif (preg_match('/([0-9.-]+)/', $snmp_value, $matches)) {
+                            $snmp_value = (float)$matches[1];
+                            $user_function = null; 
                         }
+                      }
                     }
                     if ($sensor_class === 'state' && isset($data['states'])) {
                         // For state sensors, try to look up the string value in the states table first
