@@ -170,6 +170,19 @@ final class BasicApiTest extends DBTestCase
 
         auth()->forgetGuards();
 
+        // Test with HTTP Basic auth password
+        $this->json('GET', '/api/v0/devices', [], ['Authorization' => 'Basic ' . base64_encode("X-Auth-Token:{$token->plainTextToken}")])
+            ->assertStatus(200)
+            ->assertJsonPath('status', 'ok');
+
+        auth()->forgetGuards();
+
+        // Test with invalid HTTP Basic auth password
+        $this->json('GET', '/api/v0/devices', [], ['Authorization' => 'Basic ' . base64_encode('X-Auth-Token:invalid')])
+            ->assertStatus(401);
+
+        auth()->forgetGuards();
+
         // Test with invalid ID prefix
         $mismatchedId = ((int) $id) + 999;
         $this->json('GET', '/api/v0/devices', [], ['X-Auth-Token' => "{$mismatchedId}|{$secret}"])
@@ -345,6 +358,12 @@ final class BasicApiTest extends DBTestCase
 
         // Query parameter api_token should be rejected on v1
         $this->json('GET', "/api/v1/system?api_token={$token->plainTextToken}")
+            ->assertStatus(401);
+
+        auth()->forgetGuards();
+
+        // HTTP Basic auth password should be rejected on v1
+        $this->json('GET', '/api/v1/system', [], ['Authorization' => 'Basic ' . base64_encode("X-Auth-Token:{$token->plainTextToken}")])
             ->assertStatus(401);
     }
 
