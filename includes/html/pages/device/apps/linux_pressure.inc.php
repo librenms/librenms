@@ -61,12 +61,17 @@ if (count($compare_types) === 0) {
     $compare_types = $pressure_types;
 }
 
-// Which page to show, one of system, cgroup, overview, or compare.
-$page_view = 'system';
-if (count($cgroup_labels) > 0) {
-    if (isset($vars['cgroup'], $cgroup_labels[$vars['cgroup']])) {
-        $page_view = 'cgroup';
-    } elseif (isset($vars['compare'], $compare_types[$vars['compare']])) {
+// The RRD safe name of the cgroup being looked at, or null for the system wide pressure.
+// Used by the system, cgroup, and resources pages.
+$selected_cgroup = isset($vars['cgroup'], $cgroup_labels[$vars['cgroup']]) ? $vars['cgroup'] : null;
+
+// Which page to show, one of system, cgroup, resources, overview, or compare.
+// resources compares the resources against each other, for the system or $selected_cgroup.
+$page_view = $selected_cgroup === null ? 'system' : 'cgroup';
+if (($vars['view'] ?? null) === 'resources') {
+    $page_view = 'resources';
+} elseif (count($cgroup_labels) > 0) {
+    if (isset($vars['compare'], $compare_types[$vars['compare']])) {
         $page_view = 'compare';
     } elseif (($vars['view'] ?? null) === 'overview') {
         $page_view = 'overview';
@@ -77,6 +82,13 @@ print_optionbar_start();
 
 echo $menu_link('System', [], $page_view === 'system');
 
+// From a cgroup page, go to the resources page for that cgroup. From anywhere else, the system one.
+$resources_vars = ['view' => 'resources'];
+if ($page_view === 'cgroup') {
+    $resources_vars['cgroup'] = $selected_cgroup;
+}
+echo ' | ' . $menu_link('Resources', $resources_vars, $page_view === 'resources');
+
 if (count($cgroup_labels) > 0) {
     echo ' | ' . $menu_link('Overview', ['view' => 'overview'], $page_view === 'overview');
 
@@ -86,9 +98,11 @@ if (count($cgroup_labels) > 0) {
     }
     echo "<br>\nCompare: " . implode(', ', $compare_links);
 
+    // on the resources page, picking a cgroup stays on the resources page
     $cgroup_links = [];
     foreach ($cgroup_labels as $safe_cgroup => $cgroup) {
-        $cgroup_links[] = $menu_link(htmlspecialchars($cgroup), ['cgroup' => $safe_cgroup], $page_view === 'cgroup' && $vars['cgroup'] === $safe_cgroup);
+        $cgroup_vars = $page_view === 'resources' ? ['view' => 'resources', 'cgroup' => $safe_cgroup] : ['cgroup' => $safe_cgroup];
+        $cgroup_links[] = $menu_link(htmlspecialchars($cgroup), $cgroup_vars, in_array($page_view, ['cgroup', 'resources']) && $selected_cgroup === $safe_cgroup);
     }
     echo "<br>\nCgroups: " . implode(', ', $cgroup_links);
 }
@@ -188,6 +202,20 @@ if ($page_view === 'compare') {
             ],
         ];
     }
+} elseif ($page_view === 'resources') {
+    // one graph per stall type and average, with a line per resource
+    foreach (['some', 'full'] as $stall_type) {
+        foreach (['avg10', 'avg60', 'avg300'] as $average) {
+            $graphs[] = [
+                'title' => ucfirst($stall_type) . ' ' . $average,
+                'graph_vars' => [
+                    'type' => 'application_linux_pressure_resources',
+                    'stall_type' => $stall_type,
+                    'average' => $average,
+                ],
+            ];
+        }
+    }
 } else {
     $source_graphs = [
         'linux_pressure_cpu' => 'CPU Pressure',
@@ -198,34 +226,21 @@ if ($page_view === 'compare') {
     ];
 
     // irq pressure is only reported by 6.1+ kernels with CONFIG_IRQ_TIME_ACCOUNTING
-    $rrd_prefix = $page_view === 'cgroup' ? 'cgroup___' . $vars['cgroup'] : 'system';
+    $rrd_prefix = $selected_cgroup === null ? 'system' : 'cgroup___' . $selected_cgroup;
     $irq_rrd_filename = Rrd::name($device['hostname'], ['app', 'linux_pressure', $app['app_id'], $rrd_prefix . '___irq___full']);
     if (! Rrd::checkRrdExists($irq_rrd_filename)) {
         unset($source_graphs['linux_pressure_irq']);
     }
 
-    // resources compared against each other, one graph per stall type and average
-    foreach (['some', 'full'] as $stall_type) {
-        foreach (['avg10', 'avg60', 'avg300'] as $average) {
-            $graphs[] = [
-                'title' => ucfirst($stall_type) . ' ' . $average . ', All Resources',
-                'graph_vars' => [
-                    'type' => 'application_linux_pressure_resources',
-                    'stall_type' => $stall_type,
-                    'average' => $average,
-                ],
-            ];
-        }
-    }
-
     foreach ($source_graphs as $graph_name => $graph_title) {
         $graphs[] = ['title' => $graph_title, 'graph_vars' => ['type' => 'application_' . $graph_name]];
     }
+}
 
-    if ($page_view === 'cgroup') {
-        foreach (array_keys($graphs) as $graph_index) {
-            $graphs[$graph_index]['graph_vars']['cgroup'] = $vars['cgroup'];
-        }
+// the system, cgroup, and resources pages graph a single cgroup when one is selected
+if ($page_view !== 'compare' && $selected_cgroup !== null) {
+    foreach (array_keys($graphs) as $graph_index) {
+        $graphs[$graph_index]['graph_vars']['cgroup'] = $selected_cgroup;
     }
 }
 
