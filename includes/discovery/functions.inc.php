@@ -242,18 +242,20 @@ function discovery_process($os, $sensor_class, $pre_cache)
                 if (! is_numeric($snmp_value)) {
                     if ($sensor_class === 'temperature') {
                         if (is_string($snmp_value)) {
+                          //remove all spaces
+                          $snmp_value = preg_replace('/\s+/', '', $snmp_value);
                           // Handle temperature string for Celsius
                           if (preg_match('/([0-9.-]+)\s*[cC]/', $snmp_value, $matches)) {
                             $snmp_value = (float)$matches[1];
                             $user_function = null;
-                          } 
+                          }
                           // Handle temperature string for Fahrenheit
                           elseif (preg_match('/([0-9.-]+)\s*[fF]/', $snmp_value, $matches)) {
                             $snmp_value = (float)$matches[1];
                             $user_function = 'fahrenheit_to_celsius';
                           }
                           // Handle temperature string - first matched number
-                          elseif (preg_match('/([0-9.-]+)/', $snmp_value, $matches)) {
+                          elseif (preg_match('/([0-9]+)/', $snmp_value, $matches)) {
                             $snmp_value = (float)$matches[1];
                             $user_function = null;
                         }
