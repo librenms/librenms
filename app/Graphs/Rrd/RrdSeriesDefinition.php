@@ -53,6 +53,8 @@ class RrdSeriesDefinition
     public function build(GraphParameters $params): array
     {
         $defs = [];
+        $maxFills = [];
+        $fills = [];
         $drawing = [];
         $previousValues = [];
         $stacking = false;
@@ -97,7 +99,10 @@ class RrdSeriesDefinition
             } else {
                 $drawing[] = "LINE1.25:$drawnId#$color:$label";
                 if ($style->fill) {
-                    $drawing[] = "AREA:$drawnId#" . ($style->fillColor ?? $color . '20');
+                    $fills[] = "AREA:$drawnId#" . ($style->fillColor ?? $color . '20');
+                }
+                if ($style->maxFillColor !== null) {
+                    $maxFills[] = 'AREA:' . $this->drawnValue("{$id}max", $drawScale, $style->invert, $defs) . "#$style->maxFillColor";
                 }
             }
 
@@ -113,7 +118,8 @@ class RrdSeriesDefinition
             $drawing[] = 'HRULE:0#555555';
         }
 
-        return [$this->legendHeader(), ...$defs, ...$drawing];
+        // fills go below all lines, so they do not hide lines of other series
+        return [$this->legendHeader(), ...$defs, ...$maxFills, ...$fills, ...$drawing];
     }
 
     /**
@@ -141,6 +147,7 @@ class RrdSeriesDefinition
     /**
      * Apply the draw only transformations of the style
      *
+     * @param  string  $id  the value to draw, such as ds0 or ds0max
      * @param  array<int, string>  $defs  receives the definition, if one is needed
      * @return string the id to draw
      */
