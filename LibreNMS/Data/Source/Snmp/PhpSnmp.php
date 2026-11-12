@@ -117,6 +117,16 @@ class PhpSnmp implements SnmpBackendInterface
             return false;
         }
 
+        // Do not use php-snmp if bulk operations are not allowed
+        if(!$config->bulk || !$options->allowBulk) {
+            return false;
+        }
+
+        // php-snmp does not support display hits being disabled (non-default)
+        if(!$options->applyDisplayHints) {
+            return false;
+        }
+
         if ($config->version == 'v3') {
             // Dummy SNMP object to check security settings are supported
             $snmp = new \SNMP(\SNMP::VERSION_3, 'localhost', 'root', 1000000, 3);
