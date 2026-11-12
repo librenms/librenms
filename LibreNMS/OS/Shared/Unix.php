@@ -26,14 +26,19 @@
 
 namespace LibreNMS\OS\Shared;
 
+use App\Facades\PortCache;
 use App\Models\Device;
+use App\Models\EntPhysical;
+use App\Models\Transceiver;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS\Traits\ServerHardware;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 use SnmpQuery;
 
-class Unix extends \LibreNMS\OS implements MempoolsDiscovery
+class Unix extends \LibreNMS\OS implements MempoolsDiscovery, TransceiverDiscovery
 {
     use ServerHardware;
     use YamlOSDiscovery {
@@ -124,5 +129,52 @@ class Unix extends \LibreNMS\OS implements MempoolsDiscovery
             '.1.3.6.1.4.1.2021.7890.4.101.1', // legacy UCD-SNMP-MIB exec
         ])->value();
         $device->serial = $serial ?: $device->serial;
+    }
+
+    /**
+     * Transceivers from ENTITY-MIB, as provided by the linux_entity and freebsd_entity
+     * pass_persist scripts. A transceiver is a module entity contained in a port entity
+     * that entAliasMappingIdentifier maps to a ifIndex.
+     */
+    public function discoverTransceivers(): Collection
+    {
+        // saved by the entity-physical module, which runs first, falling back to walking it if that is disabled
+        $entities = $this->getDevice()->entityPhysical()->get();
+        if ($entities->isEmpty()) {
+            $entities = $this->discoverEntityPhysical();
+        }
+        $entities = $entities->keyBy('entPhysicalIndex');
+        $children = $entities->groupBy('entPhysicalContainedIn');
+
+        return $entities->filter(function (EntPhysical $entity) use ($entities) {
+            // the port's ifIndex is copied to the module by discoverEntityPhysical()
+            return $entity->entPhysicalClass === 'module'
+                && $entity->ifIndex
+                && $entities->get($entity->entPhysicalContainedIn)?->entPhysicalClass === 'port';
+        })->map(function (EntPhysical $module) use ($children) {
+            // the scripts name per lane sensors '$interface Lane $lane ...'
+            $sensors = $children->get($module->entPhysicalIndex, new Collection)->where('entPhysicalClass', 'sensor');
+            $channels = $sensors->map(fn (EntPhysical $sensor) => preg_match('/ Lane (\d+) /', (string) $sensor->entPhysicalName, $matches) ? (int) $matches[1] : 1)->max() ?? 1;
+
+            // net-snmp shows DateAndTime as '2011-5-20,0:0:0.0', with all zeros meaning unknown
+            $date = null;
+            if (preg_match('/^(\d+)-(\d+)-(\d+)/', (string) $module->entPhysicalMfgDate, $matches) && $matches[1] > 0) {
+                $date = sprintf('%04d-%02d-%02d', $matches[1], $matches[2], $matches[3]);
+            }
+
+            return new Transceiver([
+                'port_id' => (int) PortCache::getIdFromIfIndex($module->ifIndex, $this->getDevice()),
+                'index' => $module->entPhysicalIndex,
+                'entity_physical_index' => $module->entPhysicalIndex,
+                'type' => $module->entPhysicalDescr ?: null,
+                'vendor' => $module->entPhysicalMfgName ?: null,
+                'model' => $module->entPhysicalModelName ?: null,
+                'revision' => $module->entPhysicalHardwareRev ?: null,
+                'serial' => $module->entPhysicalSerialNum ?: null,
+                'date' => $date,
+                'ddm' => $sensors->isNotEmpty(),
+                'channels' => $channels,
+            ]);
+        })->values();
     }
 }

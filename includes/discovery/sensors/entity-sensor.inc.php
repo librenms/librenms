@@ -52,6 +52,17 @@ if (! empty($entity_oids)) {
         'dBm' => 'dbm',
     ];
 
+    // Unix devices, such as ones using the linux_entity or freebsd_entity pass_persist scripts,
+    // have the sensors under a transceiver linked to it, so they show with it on the port page.
+    // entity_parents is entPhysicalIndex to entPhysicalContainedIn, and transceiver_indexes is
+    // keyed by the entPhysicalIndex of each transceiver found by the transceivers module.
+    $entity_parents = [];
+    $transceiver_indexes = [];
+    if ($device['os_group'] === 'unix') {
+        $entity_parents = \App\Models\EntPhysical::where('device_id', $device['device_id'])->pluck('entPhysicalContainedIn', 'entPhysicalIndex')->all();
+        $transceiver_indexes = \App\Models\Transceiver::where('device_id', $device['device_id'])->pluck('entity_physical_index')->flip()->all();
+    }
+
     foreach ($entity_oids as $index => $entry) {
         $low_limit = null;
         $low_warn_limit = null;
@@ -243,8 +254,21 @@ if (! empty($entity_oids)) {
                     }
                     // End grouping sensors
                 }
+                // walk up the containment to a transceiver, if any, see $entity_parents above
+                $measured_entity = $entry['entSensorMeasuredEntity'] ?? null;
+                $parent_index = $entity_parents[$index] ?? 0;
+                for ($depth = 0; $parent_index && $depth < 10; $depth++) {
+                    if (isset($transceiver_indexes[$parent_index])) {
+                        $entPhysicalIndex = $parent_index;
+                        $measured_entity = 'ports';
+                        $group = 'transceiver';
+                        break;
+                    }
+                    $parent_index = $entity_parents[$parent_index] ?? 0;
+                }
+
                 $descr = trim((string) $descr);
-                discover_sensor(null, $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'] ?? null, null, $group);
+                discover_sensor(null, $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $measured_entity, null, $group);
             }
         }//end if
     }//end foreach
