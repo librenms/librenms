@@ -56,7 +56,7 @@ class Trap
         $this->ip = $matches[1] ?? '';
 
         // parse the oid data
-        $this->oid_data = (new Collection($lines))->mapWithKeys(function ($line) {
+        $this->oid_data = new Collection($lines)->mapWithKeys(function ($line) {
             [$oid, $data] = explode(' ', $line, 2);
 
             return [$oid => trim($data, '"')];

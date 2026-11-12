@@ -9,16 +9,39 @@
 -- ****************************************************************
 
 IFOTEC-PRODUCTLIST-MIB DEFINITIONS ::= BEGIN
-		
-IMPORTS
-    MODULE-IDENTITY, OBJECT-IDENTITY FROM SNMPv2-SMI
-	ifotec FROM IFOTEC-SMI;
 
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE FROM SNMPv2-SMI
+	ifotec, ifoLogNotifSysIndex, ifoLogNotifId, ifoLogNotifTimestamp,
+	ifoLogNotifType, ifoLogNotifSequence, ifoLogNotifDesc,
+	ifoLogNotifStatus, ifoLogNotifSeverity FROM IFOTEC-SMI;
+ 
 ifotecProductList MODULE-IDENTITY
-    LAST-UPDATED    "202007290000Z"
+    LAST-UPDATED    "202610020000Z"
     ORGANIZATION    "IFOTEC"
     CONTACT-INFO    "contact@ifotec.com"
     DESCRIPTION     "Product list of IFOTEC enterprise."
+
+    REVISION      "202610020000Z"
+    DESCRIPTION
+            "Declare the LOG_EVENT notification of each product. The agent
+            builds its snmpTrapOID from its own sysObjectID, as an SNMPv1
+            enterprise-specific trap is translated (RFC 3584 section 3.1):
+            <product>.0.1. Each product therefore carries its own
+            declaration, all of the same meaning."
+    REVISION      "202609300000Z"
+    DESCRIPTION
+            "Add IFOTEC product identifier INET-4GE-2XF-FS-011."
+    REVISION      "202609160000Z"
+    DESCRIPTION
+            "Add IFOTEC product identifier INET-1GE-10XF-FS-001."
+    REVISION      "202411180000Z"
+    DESCRIPTION
+            "Add/change IFOTEC product identifier."
+    REVISION      "202007290000Z"
+    DESCRIPTION
+            "First iteration of the MIB."
+
      ::= { ifotec 100 }
 
 
@@ -34,9 +57,179 @@ ifotecEthernetProducts OBJECT IDENTIFIER        ::= { ifotecProductList 1 }
 			INET-2GP2GF-AS-101 OBJECT IDENTIFIER     ::= { ifotecINETFamilly 2 }
 			INET-4GE2GF-KS-001 OBJECT IDENTIFIER     ::= { ifotecINETFamilly 3 }
 			INET-4GP2GF-AS-001 OBJECT IDENTIFIER     ::= { ifotecINETFamilly 4 }
-			INET-4GE2GF2XF-R1-001 OBJECT IDENTIFIER  ::= { ifotecINETFamilly 5 }
+			INET-4GE2GF-2XF-R1-001 OBJECT IDENTIFIER  ::= { ifotecINETFamilly 5 }
+			INET-8GP90-2XF-FS-001 OBJECT IDENTIFIER  ::= { ifotecINETFamilly 6 }
+			INET-4GP90-2XF-AS-201 OBJECT IDENTIFIER  ::= { ifotecINETFamilly 7 }
+			INET-2GP90-2XF-AS-201 OBJECT IDENTIFIER  ::= { ifotecINETFamilly 8 }
+			INET-4GE-2XF-FS-001 OBJECT IDENTIFIER    ::= { ifotecINETFamilly 9 }
+			INET-1GE-10XF-FS-001 OBJECT IDENTIFIER   ::= { ifotecINETFamilly 10 }
+			INET-4GE-2XF-FS-011 OBJECT IDENTIFIER    ::= { ifotecINETFamilly 11 }
 			
 	-- ifotecRouters OBJECT IDENTIFIER             ::= { ifotecEthernetProducts 5 }
 
+-- *****************************************************************
+-- Notifications
+--
+-- The agent sends LOG_EVENT with snmpTrapOID = <product>.0.1: the
+-- specific-trap 1 of the product's own sysObjectID. One declaration per
+-- product, since the OID depends on it.
+-- *****************************************************************
+
+notificationsInet2GE2GFAS101 OBJECT IDENTIFIER ::= { INET-2GE2GF-AS-101 0 }
+
+logEventInet2GE2GFAS101 NOTIFICATION-TYPE
+    OBJECTS {
+        ifoLogNotifSysIndex, ifoLogNotifId, ifoLogNotifTimestamp,
+        ifoLogNotifType, ifoLogNotifSequence, ifoLogNotifDesc,
+        ifoLogNotifStatus, ifoLogNotifSeverity
+    }
+    STATUS      current
+    DESCRIPTION
+            "LOG_EVENT of the INET-2GE2GF-AS-101: an entry of the device log
+            (specific-trap 1)."
+    ::= { notificationsInet2GE2GFAS101 1 }
+
+notificationsInet2GP2GFAS101 OBJECT IDENTIFIER ::= { INET-2GP2GF-AS-101 0 }
+
+logEventInet2GP2GFAS101 NOTIFICATION-TYPE
+    OBJECTS {
+        ifoLogNotifSysIndex, ifoLogNotifId, ifoLogNotifTimestamp,
+        ifoLogNotifType, ifoLogNotifSequence, ifoLogNotifDesc,
+        ifoLogNotifStatus, ifoLogNotifSeverity
+    }
+    STATUS      current
+    DESCRIPTION
+            "LOG_EVENT of the INET-2GP2GF-AS-101: an entry of the device log
+            (specific-trap 1)."
+    ::= { notificationsInet2GP2GFAS101 1 }
+
+notificationsInet4GE2GFKS001 OBJECT IDENTIFIER ::= { INET-4GE2GF-KS-001 0 }
+
+logEventInet4GE2GFKS001 NOTIFICATION-TYPE
+    OBJECTS {
+        ifoLogNotifSysIndex, ifoLogNotifId, ifoLogNotifTimestamp,
+        ifoLogNotifType, ifoLogNotifSequence, ifoLogNotifDesc,
+        ifoLogNotifStatus, ifoLogNotifSeverity
+    }
+    STATUS      current
+    DESCRIPTION
+            "LOG_EVENT of the INET-4GE2GF-KS-001: an entry of the device log
+            (specific-trap 1)."
+    ::= { notificationsInet4GE2GFKS001 1 }
+
+notificationsInet4GP2GFAS001 OBJECT IDENTIFIER ::= { INET-4GP2GF-AS-001 0 }
+
+logEventInet4GP2GFAS001 NOTIFICATION-TYPE
+    OBJECTS {
+        ifoLogNotifSysIndex, ifoLogNotifId, ifoLogNotifTimestamp,
+        ifoLogNotifType, ifoLogNotifSequence, ifoLogNotifDesc,
+        ifoLogNotifStatus, ifoLogNotifSeverity
+    }
+    STATUS      current
+    DESCRIPTION
+            "LOG_EVENT of the INET-4GP2GF-AS-001: an entry of the device log
+            (specific-trap 1)."
+    ::= { notificationsInet4GP2GFAS001 1 }
+
+notificationsInet4GE2GF2XFR1001 OBJECT IDENTIFIER ::= { INET-4GE2GF-2XF-R1-001 0 }
+
+logEventInet4GE2GF2XFR1001 NOTIFICATION-TYPE
+    OBJECTS {
+        ifoLogNotifSysIndex, ifoLogNotifId, ifoLogNotifTimestamp,
+        ifoLogNotifType, ifoLogNotifSequence, ifoLogNotifDesc,
+        ifoLogNotifStatus, ifoLogNotifSeverity
+    }
+    STATUS      current
+    DESCRIPTION
+            "LOG_EVENT of the INET-4GE2GF-2XF-R1-001: an entry of the device log
+            (specific-trap 1)."
+    ::= { notificationsInet4GE2GF2XFR1001 1 }
+
+notificationsInet8GP902XFFS001 OBJECT IDENTIFIER ::= { INET-8GP90-2XF-FS-001 0 }
+
+logEventInet8GP902XFFS001 NOTIFICATION-TYPE
+    OBJECTS {
+        ifoLogNotifSysIndex, ifoLogNotifId, ifoLogNotifTimestamp,
+        ifoLogNotifType, ifoLogNotifSequence, ifoLogNotifDesc,
+        ifoLogNotifStatus, ifoLogNotifSeverity
+    }
+    STATUS      current
+    DESCRIPTION
+            "LOG_EVENT of the INET-8GP90-2XF-FS-001: an entry of the device log
+            (specific-trap 1)."
+    ::= { notificationsInet8GP902XFFS001 1 }
+
+notificationsInet4GP902XFAS201 OBJECT IDENTIFIER ::= { INET-4GP90-2XF-AS-201 0 }
+
+logEventInet4GP902XFAS201 NOTIFICATION-TYPE
+    OBJECTS {
+        ifoLogNotifSysIndex, ifoLogNotifId, ifoLogNotifTimestamp,
+        ifoLogNotifType, ifoLogNotifSequence, ifoLogNotifDesc,
+        ifoLogNotifStatus, ifoLogNotifSeverity
+    }
+    STATUS      current
+    DESCRIPTION
+            "LOG_EVENT of the INET-4GP90-2XF-AS-201: an entry of the device log
+            (specific-trap 1)."
+    ::= { notificationsInet4GP902XFAS201 1 }
+
+notificationsInet2GP902XFAS201 OBJECT IDENTIFIER ::= { INET-2GP90-2XF-AS-201 0 }
+
+logEventInet2GP902XFAS201 NOTIFICATION-TYPE
+    OBJECTS {
+        ifoLogNotifSysIndex, ifoLogNotifId, ifoLogNotifTimestamp,
+        ifoLogNotifType, ifoLogNotifSequence, ifoLogNotifDesc,
+        ifoLogNotifStatus, ifoLogNotifSeverity
+    }
+    STATUS      current
+    DESCRIPTION
+            "LOG_EVENT of the INET-2GP90-2XF-AS-201: an entry of the device log
+            (specific-trap 1)."
+    ::= { notificationsInet2GP902XFAS201 1 }
+
+notificationsInet4GE2XFFS001 OBJECT IDENTIFIER ::= { INET-4GE-2XF-FS-001 0 }
+
+logEventInet4GE2XFFS001 NOTIFICATION-TYPE
+    OBJECTS {
+        ifoLogNotifSysIndex, ifoLogNotifId, ifoLogNotifTimestamp,
+        ifoLogNotifType, ifoLogNotifSequence, ifoLogNotifDesc,
+        ifoLogNotifStatus, ifoLogNotifSeverity
+    }
+    STATUS      current
+    DESCRIPTION
+            "LOG_EVENT of the INET-4GE-2XF-FS-001: an entry of the device log
+            (specific-trap 1)."
+    ::= { notificationsInet4GE2XFFS001 1 }
+
+notificationsInet1GE10XFFS001 OBJECT IDENTIFIER ::= { INET-1GE-10XF-FS-001 0 }
+
+logEventInet1GE10XFFS001 NOTIFICATION-TYPE
+    OBJECTS {
+        ifoLogNotifSysIndex, ifoLogNotifId, ifoLogNotifTimestamp,
+        ifoLogNotifType, ifoLogNotifSequence, ifoLogNotifDesc,
+        ifoLogNotifStatus, ifoLogNotifSeverity
+    }
+    STATUS      current
+    DESCRIPTION
+            "LOG_EVENT of the INET-1GE-10XF-FS-001: an entry of the device log
+            (specific-trap 1)."
+    ::= { notificationsInet1GE10XFFS001 1 }
+
+notificationsInet4GE2XFFS011 OBJECT IDENTIFIER ::= { INET-4GE-2XF-FS-011 0 }
+
+logEventInet4GE2XFFS011 NOTIFICATION-TYPE
+    OBJECTS {
+        ifoLogNotifSysIndex, ifoLogNotifId, ifoLogNotifTimestamp,
+        ifoLogNotifType, ifoLogNotifSequence, ifoLogNotifDesc,
+        ifoLogNotifStatus, ifoLogNotifSeverity
+    }
+    STATUS      current
+    DESCRIPTION
+            "LOG_EVENT of the INET-4GE-2XF-FS-011: an entry of the device log
+            (specific-trap 1)."
+    ::= { notificationsInet4GE2XFFS011 1 }
+
 
 END
+
+

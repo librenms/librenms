@@ -24,9 +24,10 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\SensorType;
 
-echo 'OneFS: ';
+Log::info('OneFS: ', ['nlb' => true]);
 $oids = snmpwalk_cache_multi_oid($device, 'powerSensorTable', [], 'ISILON-MIB');
 
 foreach ($oids as $index => $entry) {

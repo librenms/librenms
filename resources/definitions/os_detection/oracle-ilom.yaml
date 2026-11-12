@@ -1,6 +1,6 @@
 os: oracle-ilom
 text: 'Oracle ILOM'
-type: appliance
+type: management
 icon: oracle
 over:
     - { graph: device_bits, text: Traffic }

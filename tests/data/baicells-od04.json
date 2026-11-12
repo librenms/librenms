@@ -3434,7 +3434,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 768,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.768",
                     "processor_index": "768",
@@ -3547,6 +3546,7 @@
                     "sensor_type": "baicells-od04",
                     "sensor_descr": "Rx Rate",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -3572,6 +3572,7 @@
                     "sensor_type": "baicells-od04",
                     "sensor_descr": "Tx Rate",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 4136,
@@ -3597,6 +3598,7 @@
                     "sensor_type": "baicells-od04",
                     "sensor_descr": "Rx Packets",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1848,
@@ -3622,6 +3624,7 @@
                     "sensor_type": "baicells-od04",
                     "sensor_descr": "Tx Packets",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 41322317,
@@ -3647,6 +3650,7 @@
                     "sensor_type": "baicells-od04",
                     "sensor_descr": "Connection time",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 682,

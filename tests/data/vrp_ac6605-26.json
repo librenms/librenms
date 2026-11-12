@@ -7301,7 +7301,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.9",
                     "processor_index": "9",
@@ -7354,6 +7353,7 @@
                     "sensor_type": "vrp",
                     "sensor_descr": "Average Power Consumption",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 43.291,
@@ -7379,6 +7379,7 @@
                     "sensor_type": "vrp",
                     "sensor_descr": "Current Power Consumption",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 43.291,
@@ -7404,6 +7405,7 @@
                     "sensor_type": "hwWlanClusterACRole",
                     "sensor_descr": "Peer Redundancy Role",
                     "group": "Redundancy",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -7429,6 +7431,7 @@
                     "sensor_type": "hwWlanClusterACStatus",
                     "sensor_descr": "Current Redundancy Status",
                     "group": "Redundancy",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -7454,6 +7457,7 @@
                     "sensor_type": "hwWlanClusterSynConfigScheduleEnable",
                     "sensor_descr": "Configuration Sync",
                     "group": "Redundancy",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -7479,6 +7483,7 @@
                     "sensor_type": "vrp",
                     "sensor_descr": "SRU Board 0",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 40,
@@ -7504,6 +7509,7 @@
                     "sensor_type": "vrp",
                     "sensor_descr": "SRU Board 0",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.003,
@@ -7707,6 +7713,56 @@
                     "vlan_name": "VLAN 419",
                     "vlan_type": null,
                     "vlan_state": 1
+                }
+            ],
+            "ports_vlans": [
+                {
+                    "vlan": 70,
+                    "baseport": 1,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 71,
+                    "baseport": 1,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 391,
+                    "baseport": 1,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 392,
+                    "baseport": 1,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 393,
+                    "baseport": 1,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 395,
+                    "baseport": 1,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
                 }
             ]
         }

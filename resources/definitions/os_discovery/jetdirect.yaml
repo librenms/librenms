@@ -8,11 +8,6 @@ modules:
             - HP-LASERJET-COMMON-MIB::fw-rom-datecode.0
         hardware:
             - HP-LASERJET-COMMON-MIB::model-name.0
-        features:
-            - HP-LASERJET-COMMON-MIB::mio1-manufacturing-info.0
-            - HP-LASERJET-COMMON-MIB::mio2-manufacturing-info.0
-            - HP-LASERJET-COMMON-MIB::mio3-manufacturing-info.0
-            - HP-LASERJET-COMMON-MIB::mio4-manufacturing-info.0
 
     sensors:
         state:

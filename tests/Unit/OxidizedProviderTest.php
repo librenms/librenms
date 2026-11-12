@@ -108,8 +108,8 @@ final class OxidizedProviderTest extends TestCase
         Http::fake([
             'oxidized:8888/node/show/*' => Http::response($this->fakeNode(), 200),
             'oxidized:8888/node/version?*' => Http::response([
-                ['oid' => 'aaaa1111', 'date' => '2026-07-14 00:24:24 +0000', 'message' => 'update'],
-                ['oid' => 'bbbb2222', 'date' => '2026-07-13 00:21:17 +0000', 'message' => 'update'],
+                ['oid' => 'aaaa1111', 'date' => '2026-07-14 00:24:24 +0000', 'message' => 'update', 'author' => ['name' => 'username', 'email' => 'user@example.com']],
+                ['oid' => 'bbbb2222', 'date' => '2026-07-13 00:21:17 +0000', 'message' => 'update', 'author' => ['name' => 'Oxidized', 'email' => 'oxidized@example.com']],
             ], 200),
         ]);
 
@@ -117,26 +117,86 @@ final class OxidizedProviderTest extends TestCase
 
         $this->assertSame('aaaa1111', $list['backups'][0]['id']);
         $this->assertSame(strtotime('2026-07-14 00:24:24 +0000'), $list['backups'][0]['date']);
+        $this->assertSame('username', $list['backups'][0]['author']);
+        $this->assertNull($list['backups'][1]['author']);
         $this->assertSame('TEXT', $list['backups'][0]['type']);
         $this->assertNull($list['backups'][0]['content']);
         $this->assertSame(2, $list['total']);
         $this->assertSame(1, $list['totalPages']);
     }
 
-    public function testLatestIncludesContent(): void
+    public function testBackupsMapsVersionsWithTimeFieldWhenDateIsMissing(): void
     {
         Http::fake([
             'oxidized:8888/node/show/*' => Http::response($this->fakeNode(), 200),
             'oxidized:8888/node/version?*' => Http::response([
-                ['oid' => 'aaaa1111', 'date' => '2026-07-14 00:24:24 +0000'],
+                ['oid' => 'aaaa1111', 'date' => null, 'time' => '2026-07-29 23:36:42 +0000', 'message' => 'update'],
+                ['oid' => 'bbbb2222', 'time' => '2026-07-28 23:36:42 +0000', 'message' => 'update'],
+                ['oid' => 'cccc3333', 'message' => 'update'],
             ], 200),
-            'oxidized:8888/node/version/view*' => Http::response('hostname router', 200),
+        ]);
+
+        $list = $this->makeProvider()->backups($this->makeDevice());
+
+        $this->assertSame(strtotime('2026-07-29 23:36:42 +0000'), $list['backups'][0]['date']);
+        $this->assertSame(strtotime('2026-07-28 23:36:42 +0000'), $list['backups'][1]['date']);
+        $this->assertNull($list['backups'][2]['date']);
+        $this->assertSame(3, $list['total']);
+    }
+
+    public function testBackupsMapsVersionsPrefersDateOverTime(): void
+    {
+        Http::fake([
+            'oxidized:8888/node/show/*' => Http::response($this->fakeNode(), 200),
+            'oxidized:8888/node/version?*' => Http::response([
+                ['oid' => 'aaaa1111', 'date' => '2026-07-14 00:24:24 +0000', 'time' => '2026-07-29 23:36:42 +0000', 'message' => 'update'],
+                ['oid' => 'bbbb2222', 'date' => 'unknown', 'time' => '2026-07-28 23:36:42 +0000', 'message' => 'update'],
+            ], 200),
+        ]);
+
+        $list = $this->makeProvider()->backups($this->makeDevice());
+
+        $this->assertSame(strtotime('2026-07-14 00:24:24 +0000'), $list['backups'][0]['date']);
+        $this->assertSame(strtotime('2026-07-28 23:36:42 +0000'), $list['backups'][1]['date']);
+    }
+
+    public function testLatestFetchesCurrentConfigWithoutVersionList(): void
+    {
+        Http::fake([
+            'oxidized:8888/node/show/*' => Http::response($this->fakeNode(['group' => 'core', 'mtime' => '2026-07-14 00:24:24 +0000']), 200),
+            'oxidized:8888/node/fetch/*' => Http::response('hostname router', 200),
         ]);
 
         $latest = $this->makeProvider()->latest($this->makeDevice());
 
-        $this->assertSame('aaaa1111', $latest['id']);
+        $this->assertSame('current', $latest['id']);
         $this->assertSame('hostname router', $latest['content']);
+        $this->assertSame(strtotime('2026-07-14 00:24:24 +0000'), $latest['date']);
+        Http::assertSent(fn ($request) => str_ends_with((string) $request->url(), '/node/fetch/core/router.example.com'));
+        Http::assertNotSent(fn ($request) => str_contains((string) $request->url(), '/node/version'));
+    }
+
+    public function testLatestIgnoresUnknownMtime(): void
+    {
+        Http::fake([
+            'oxidized:8888/node/show/*' => Http::response($this->fakeNode(['mtime' => 'unknown']), 200),
+            'oxidized:8888/node/fetch/*' => Http::response('hostname router', 200),
+        ]);
+
+        $this->assertNull($this->makeProvider()->latest($this->makeDevice())['date']);
+    }
+
+    public function testLatestFetchFailureIsAnError(): void
+    {
+        Http::fake([
+            'oxidized:8888/node/show/*' => Http::response($this->fakeNode(), 200),
+            'oxidized:8888/node/fetch/*' => Http::response('node not found', 500),
+        ]);
+
+        $provider = $this->makeProvider();
+
+        $this->assertNull($provider->latest($this->makeDevice()));
+        $this->assertSame(ConfigBackupProvider::ERROR_NO_BACKUPS, $provider->lastError());
     }
 
     public function testContentFetchesVersion(): void

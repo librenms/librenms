@@ -25,6 +25,7 @@
 namespace App\Models;
 
 use App\Casts\CompressedJson;
+use App\Models\Traits\AlertFilters;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -48,6 +49,8 @@ use LibreNMS\Enum\AlertState;
  */
 class AlertFault extends DeviceRelatedModel
 {
+    use AlertFilters;
+
     public $timestamps = false;
     protected $table = 'alert_faults';
     protected $fillable = [
@@ -76,7 +79,82 @@ class AlertFault extends DeviceRelatedModel
         'timestamp' => 'datetime',
     ];
 
+    /** @var list<string> */
+    protected array $filterable = [
+        'search',
+        'state',
+        'rule_id',
+        'rule.severity',
+        'device_id',
+        'device.location_id',
+        'device.groups.id',
+        'unreachable',
+        'note',
+    ];
+
+    /**
+     * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: array<string, string>, search?: bool}>
+     */
+    public static function filterFieldDefinitions(?int $deviceId = null): array
+    {
+        return [
+            ...self::alertFilterFields($deviceId),
+            [
+                'key' => 'unreachable',
+                'label' => __('Unreachable'),
+                'type' => 'boolean',
+            ],
+            [
+                'key' => 'note',
+                'label' => __('Notes'),
+                'type' => 'text',
+            ],
+        ];
+    }
+
+    /**
+     * @return array<string, array{int, string}>
+     */
+    protected static function filterStates(): array
+    {
+        return [
+            'alerted' => [AlertState::ACTIVE, __('Alerted')],
+            'acknowledged' => [AlertState::ACKNOWLEDGED, __('Acknowledged')],
+            'worse' => [AlertState::WORSE, __('Worse')],
+            'better' => [AlertState::BETTER, __('Better')],
+            'changed' => [AlertState::CHANGED, __('Changed')],
+        ];
+    }
+
+    public function filterUnreachable(Builder $query, mixed $value, array $config): void
+    {
+        $this->scopeUnreachable($query, (bool) $value xor ($config['not'] ?? false));
+    }
+
     // ---- Query scopes ----
+
+    /**
+     * Faults on devices whose parents are all down (the device is unreachable rather than failed).
+     *
+     * @param  Builder<AlertFault>  $query
+     * @return Builder<AlertFault>
+     */
+    public function scopeUnreachable($query, bool $unreachable = true): Builder
+    {
+        $hasParent = fn ($q) => $q
+            ->from('device_relationships')
+            ->whereColumn('device_relationships.child_device_id', 'alert_faults.device_id');
+
+        $hasUpParent = fn ($q) => $q
+            ->from('device_relationships')
+            ->join('devices as parent_devices', 'parent_devices.device_id', '=', 'device_relationships.parent_device_id')
+            ->whereColumn('device_relationships.child_device_id', 'alert_faults.device_id')
+            ->where('parent_devices.status', '!=', 0);
+
+        return $unreachable
+            ? $query->whereExists($hasParent)->whereNotExists($hasUpParent)
+            : $query->where(fn ($q) => $q->whereNotExists($hasParent)->orWhereExists($hasUpParent));
+    }
 
     /**
      * @param  Builder<AlertFault>  $query

@@ -50,19 +50,21 @@ class AlertPolicy
 
     /**
      * Determine whether the user can update the model.
+     * Without a model, only the global permission is checked.
      */
-    public function update(User $user, Alert $alert): bool
+    public function update(User $user, ?Alert $alert = null): bool
     {
         return $this->hasGlobalPermission($user, 'update')
-            && ($user->can('viewAll', \App\Models\Device::class) || Permissions::canAccessDevice($alert->device_id, $user));
+            && ($alert === null || $user->can('viewAll', \App\Models\Device::class) || Permissions::canAccessDevice($alert->device_id, $user));
     }
 
     /**
      * Determine whether the user can delete the model.
+     * Without a model, only the global permission is checked.
      */
-    public function delete(User $user, Alert $alert): bool
+    public function delete(User $user, ?Alert $alert = null): bool
     {
         return $this->hasGlobalPermission($user, 'delete')
-            && ($user->can('viewAll', \App\Models\Device::class) || Permissions::canAccessDevice($alert->device_id, $user));
+            && ($alert === null || $user->can('viewAll', \App\Models\Device::class) || Permissions::canAccessDevice($alert->device_id, $user));
     }
 }

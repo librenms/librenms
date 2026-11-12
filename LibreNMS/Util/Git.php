@@ -207,7 +207,7 @@ class Git
 
     private function run(string $command, array $options): Process
     {
-        $version_process = new Process(array_merge(['git', $command], $options), $this->install_dir);
+        $version_process = new Process(array_merge([resolve(Binaries::class)->path('git'), $command], $options), $this->install_dir);
         $version_process->run();
 
         return $version_process;

@@ -19,7 +19,7 @@ final class SyncsModelsTest extends TestCase
 {
     use DatabaseTransactions;
 
-    private const DISCOVERED_LIMITS = [
+    private const array DISCOVERED_LIMITS = [
         'sensor_limit' => 70,
         'sensor_limit_warn' => 60,
         'sensor_limit_low_warn' => 3,
@@ -190,7 +190,7 @@ final class SyncsModelsTest extends TestCase
     {
         $discovered = $existing->replicate(['sensor_custom'])->forceFill($attributes);
 
-        (new SensorDiscovery($existing->device))
+        new SensorDiscovery($existing->device)
             ->discover($discovered)
             ->sync(sensor_class: $discovered->sensor_class, poller_type: $discovered->poller_type);
     }

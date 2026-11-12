@@ -4034,7 +4034,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 6,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.6",
                     "processor_index": "6",
@@ -4045,7 +4044,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 7,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.7",
                     "processor_index": "7",
@@ -4056,7 +4054,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 8,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.8",
                     "processor_index": "8",
@@ -4067,7 +4064,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 9,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.9",
                     "processor_index": "9",

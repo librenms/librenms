@@ -28,7 +28,6 @@ discovery_modules:
     ports-stack: false
     entity-physical: false
     processors: false
-    cisco-vrf-lite: false
     ipv4-addresses: false
     ipv6-addresses: false
     hr-device: false

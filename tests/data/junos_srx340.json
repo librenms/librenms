@@ -32,6 +32,7 @@
                     "sensor_type": "junos",
                     "sensor_descr": "Node  FPC  SPU  Flow Count",
                     "group": "Sessions",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 109,

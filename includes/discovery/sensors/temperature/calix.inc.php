@@ -12,10 +12,11 @@
  * the source code distribution for details.
  */
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\SensorType;
 
 if (strstr((string) $device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3')) { // E5-1xx Series
-    echo 'Calix E5: ';
+    Log::info('Calix E5: ', ['nlb' => true]);
 
     if (str_contains((string) $device['sysObjectID'], '.1.3.6.1.4.1.6321.1.2.3.4')) { // E5-121
         $oids = snmp_walk($device, 'iesSysTempCurValue', '-Osqn', 'E5-121-IESCOMMON-MIB', 'calix');

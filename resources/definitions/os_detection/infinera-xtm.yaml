@@ -1,6 +1,6 @@
 os: infinera-xtm
 text: 'Infinera XTM'
-type: network
+type: optical
 icon: infinera
 mib_dir: infinera
 discovery:

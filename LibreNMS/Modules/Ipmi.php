@@ -32,16 +32,19 @@ use App\Models\Device;
 use App\Models\Sensor;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Source\Ipmitool;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\ProgressList;
 
 class Ipmi implements Module
 {
+    use RequiresPollingMethod;
+
     /**
      * @return string[]
      */
@@ -50,9 +53,9 @@ class Ipmi implements Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function pollingMethods(Device $device): array
     {
-        return $status->isEnabled() && $connectivity->ipmiIsAvailable();
+        return [PollingMethodType::Ipmi];
     }
 
     /**
@@ -98,15 +101,20 @@ class Ipmi implements Module
             }
         }
 
+        $progress = ProgressList::start('IPMI sensors');
         $sensorDiscovery->sync(poller_type: 'ipmi');
+        $progress->end();
     }
 
     /**
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldPoll(OS $os): bool
     {
-        return $status->isEnabled() && $connectivity->ipmiIsAvailable();
+        // without discovered sensors there is nothing to poll, don't check IPMI
+        return $os->getDevice()->polling()->isEnabled(PollingMethodType::Ipmi)
+            && $this->dataExists($os->getDevice())
+            && $this->hasAvailableMethod($os);
     }
 
     /**
@@ -118,17 +126,11 @@ class Ipmi implements Module
         $ipmiSensors = $device->sensors()->where('poller_type', 'ipmi')
             ->get()->groupBy('sensor_class')->map->keyBy('sensor_descr');
 
-        if ($ipmiSensors->isEmpty()) {
-            return;
-        }
+        // the ipmi check read the sensor data records
+        /** @var list<array{string, string, string, string, string}> $records */
+        $records = $os->getMethodResults()->result(PollingMethodType::Ipmi)?->stat('sdr', []) ?? [];
 
-        $ipmi = Ipmitool::init($device);
-        if ($ipmi === null) {
-            return;
-        }
-
-        Log::info('Fetching IPMI sensor data...');
-        foreach ($ipmi->sdr() as [$descr, $value, $unit]) {
+        foreach ($records as [$descr, $value, $unit]) {
             $descr = trim($descr, ' ');
             $ipmi_unit_type = LibrenmsConfig::get("ipmi_unit.$unit");
 

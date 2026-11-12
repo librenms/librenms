@@ -64,8 +64,6 @@ return [
             'file' => 'O nome do arquivo (apenas o nome base) do arquivo snmprec para atualizar ou adicionar ao LibreNMS. Se o arquivo não for especificado, nenhum dispositivo será adicionado ou atualizado.',
         ],
         'options' => [
-            'multiple' => 'Usar nome da comunidade para o nome do host em vez de snmpsim',
-            'remove' => 'Remover o dispositivo após parar',
         ],
         'added' => 'Dispositivo :hostname (:id) adicionado',
         'exit' => 'Ctrl-C para parar',

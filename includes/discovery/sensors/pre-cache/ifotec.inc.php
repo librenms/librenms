@@ -57,7 +57,6 @@ if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.21362.100.')) {
                 $pre_cache[$oid] = [[$oid => $value]];
             }
         }
-        var_dump($pre_cache['ifoTemperatureTable']);
     }
 }
 unset($data);

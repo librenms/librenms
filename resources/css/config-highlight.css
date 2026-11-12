@@ -5,47 +5,31 @@
 }
 
 .config-highlight > code {
+    display: block;
     color: #1f2937;
     font-family: inherit;
     white-space: inherit;
 }
 
-.config-highlight.line-numbers {
+.config-highlight .line {
+    display: block;
     position: relative;
-    counter-reset: linenumber;
+    padding-left: calc(var(--line-digits) * 1ch + 1.6em);
 }
 
-.config-highlight.line-numbers > code {
-    position: relative;
-    white-space: inherit;
-}
-
-.config-highlight .line-numbers-rows {
+.config-highlight .line::before {
+    content: attr(data-line);
     position: absolute;
-    pointer-events: none;
     top: 0;
-    font-size: 100%;
-    left: -3.8em;
-    width: 3em;
-    letter-spacing: -1px;
-    border-right: 1px solid #d1d5db;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
-
-.config-highlight .line-numbers-rows > span {
-    display: block;
-    counter-increment: linenumber;
-}
-
-.config-highlight .line-numbers-rows > span::before {
-    content: counter(linenumber);
-    color: #9ca3af;
-    display: block;
+    bottom: 0;
+    left: 0;
+    box-sizing: content-box;
+    width: calc(var(--line-digits) * 1ch);
     padding-right: 0.8em;
+    white-space: nowrap;
     text-align: right;
+    color: #9ca3af;
+    border-right: 1px solid #d1d5db;
 }
 
 .config-highlight .token.comment {
@@ -95,12 +79,8 @@
     background-color: #272b30;
 }
 
-.dark .config-highlight .line-numbers-rows {
+.dark .config-highlight .line::before {
     border-right-color: #4b5563;
-}
-
-.dark .config-highlight .line-numbers-rows > span::before {
-    color: #9ca3af;
 }
 
 .dark .config-highlight .token.comment {

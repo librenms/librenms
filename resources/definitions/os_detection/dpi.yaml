@@ -17,7 +17,6 @@ poller_modules:
     ntp: false
 discovery_modules:
     entity-physical: false
-    cisco-vrf-lite: false
     ipv6-address: false
     storage: false
     hr-device: false

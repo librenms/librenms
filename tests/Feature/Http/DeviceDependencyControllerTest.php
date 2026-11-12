@@ -196,6 +196,12 @@ final class DeviceDependencyControllerTest extends TestCase
         $this->assertSame(0, $parent->children()->count());
         $this->assertEquals([$other_parent->device_id], $child2->parents()->pluck('devices.device_id')->all());
         $this->assertEquals([$other_parent->device_id], $other_child->parents()->pluck('devices.device_id')->all());
+
+        $this->assertSame(0, $parent->fresh()->max_depth);
+        $this->assertSame(0, $child1->fresh()->max_depth);
+        $this->assertSame(1, $other_parent->fresh()->max_depth);
+        $this->assertSame(2, $child2->fresh()->max_depth);
+        $this->assertSame(2, $other_child->fresh()->max_depth);
     }
 
     public function testUserCannotDestroyDependencies(): void

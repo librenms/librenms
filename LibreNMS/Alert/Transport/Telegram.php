@@ -33,7 +33,7 @@ use LibreNMS\Util\Http;
 
 class Telegram extends Transport
 {
-    private  const BASE_URL = 'https://api.telegram.org/bot';
+    private  const string BASE_URL = 'https://api.telegram.org/bot';
 
     private $message = [];
 
@@ -113,7 +113,7 @@ class Telegram extends Transport
         $regex = '#<img class="librenms-graph" src="(.*?)"\s*/>#';
 
         $this->message['text'] = preg_replace_callback($regex, function ($match) {
-            $this->message['images'][] = Graph::getImage($match[1]);
+            $this->message['images'][] = Graph::getImage($match[1])->data;
 
             return '';
         }, (string) $this->message['text']);

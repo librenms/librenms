@@ -69,7 +69,7 @@ class ApplicationController extends SelectController
     {
         return [
             'id' => $model->app_id,
-            'text' => $model->displayName() . ' - ' . $model->device->displayName(),
+            'text' => $model->displayName() . ' - ' . $model->device->display,
         ];
     }
 }
