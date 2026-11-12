@@ -181,7 +181,11 @@ $haproxy_graphs = require 'includes/html/graphs/application/haproxy-definitions.
 // http only graphs are skipped if it is known to not be http
 // for the totals, that is if no frontends or backends are http
 if ($haproxy_type == 'totals') {
-    $is_http = array_any(array_merge($frontends, $backends), fn($info) => ($info['mode'] ?? null) == 'http');
+    // array_values as a frontend and backend may have the same name, which array_merge would collapse
+    $is_http = array_any(
+        array_merge(array_values($frontends), array_values($backends)),
+        fn ($info) => ($info['mode'] ?? null) == 'http'
+    );
 } else {
     $is_http = ! isset($haproxy_info['mode']) || $haproxy_info['mode'] == 'http';
 }
