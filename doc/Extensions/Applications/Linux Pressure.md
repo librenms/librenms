@@ -59,36 +59,87 @@ Extend` heading top of page.
 
 ## Cgroups
 
-Per cgroup pressure can also be graphed. This requires cgroup v2. Add
-`-c` to the extend to report every cgroup, or `-r` with a regexp to only
-report the cgroups matching it. `-r` may be used more than once and is
-matched against the path relative to `/sys/fs/cgroup`.
+Per cgroup pressure can also be graphed. This requires cgroup v2.
 
-For only the systemd system services...
+- -c :: Report every cgroup under `/sys/fs/cgroup`.
+
+- -r $REGEXP :: Only report the cgroups matching the Perl regexp. It
+  is matched against the path relative to `/sys/fs/cgroup`, such as
+  `system.slice/cron.service`. May be given more than once, in which
+  case a cgroup matching any of them is reported. Implies `-c`.
+
+### Why -r matters
+
+Use `-r`. A plain `-c` is only sane on a host with a small, fixed set
+of cgroups.
+
+Each reported cgroup costs up to seven RRDs, seven alerting metrics, and
+a line on every comparison graph. Worse, cgroups that go away are not
+cleaned up. Their RRDs stay on disk until removed by hand. Every
+cgroup that ever shows up costs this, and lots of cgroups are short
+lived...
+
+- session-*.scope :: A new one for every login.
+
+- run-*.scope and run-*.service :: Made by `systemd-run` and anything
+  that uses it.
+
+- user@*.service :: The user manager, which has its own tree of
+  per user services and scopes under it.
+
+- Containers :: Docker, Podman, LXC, and Kubernetes cgroups are named
+  after the container or pod ID, which changes every time the
+  container is recreated.
+
+On a host running containers or with users logging in, `-c` grows the
+RRD directory forever and fills the graphs with dead cgroups.
+
+`-c` also reports the parent cgroups, such as `system.slice` and
+`user.slice`. A parent includes the pressure of everything under it,
+so these are mostly noise next to the cgroups under them.
+
+### Picking a regexp
+
+The regexp is not anchored, so `cron` matches anything with `cron`
+anywhere in the path. Use `^` and `$`, and escape the dots.
+
+To see what cgroups exist...
+
+```bash
+find /sys/fs/cgroup -name cpu.pressure -printf '%h\n' | sed 's|^/sys/fs/cgroup/||'
+```
+
+To check what a regexp matches, run the script without `-b` and look
+at the keys...
+
+```bash
+/etc/snmp/linux_pressure -r '^system\.slice/[^/]+\.service$' | jq -r '.data.cgroups | keys[]'
+```
+
+Some starting points...
+
+- ^system\.slice/[^/]+\.service$ :: The systemd system services. A
+  good default for most hosts.
+
+- ^system\.slice/(nginx|postgresql@[^/]+)\.service$ :: Only the
+  services of interest. Template instances, such as
+  `postgresql@16-main.service`, need the `@` part matched.
+
+- ^[^/]+\.slice$ :: Only the top level slices, such as `system.slice`,
+  `user.slice`, and `machine.slice`. A cheap overview of where pressure
+  is coming from.
+
+Avoid patterns like `\.service$` or `\.scope$` without a `^system\.slice/`
+in front, as they will pick up the user and transient cgroups above.
+
+For example, the extend line for the systemd system services...
 
 ```bash
 extend linux_pressure /etc/snmp/linux_pressure -b -r '^system\.slice/[^/]+\.service$'
 ```
 
-Or for every service, including template instances and user services...
-
-```bash
-extend linux_pressure /etc/snmp/linux_pressure -b -r '\.service$'
-```
-
-Each cgroup gets it own set of RRDs, so `-r` is very much suggested over
-`-c`. A plain `-c` on a host with containers or lots of short lived
-scopes will leave a lot of RRDs behind.
-
-The cgroups show up as a list at the top of the application page.
-Selecting one shows the graphs for it instead of the system wide ones. A
-cgroup is dropped from the list once it is no longer reported, but its
-RRDs are kept.
-
-Anything in a cgroup name other than letters, numbers, and `,._-` becomes
-a `_` in the RRD filename. So `foo/bar` and `foo_bar` would end up
-sharing RRDs. Cgroups with a name too long to fit in a RRD filename are
-skipped.
+A regexp that fails to compile is reported back as the error for the
+application.
 
 ## Metrics
 
