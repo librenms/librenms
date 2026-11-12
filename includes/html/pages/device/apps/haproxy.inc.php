@@ -132,11 +132,16 @@ if (! empty($status_rows)) {
     echo '<th>Type</th><th>Name</th><th>Status</th><th>Mode</th><th>Check</th><th>Check Description</th><th>Check Health</th><th>Weight</th><th>Last Change</th><th>Last Session</th>';
     echo '</tr></thead><tbody>';
     foreach ($status_rows as [$row_type, $row_name, $info]) {
-        // only the first word matters, as status may be like "UP 1/3"
-        $status_label_class = match (preg_replace('/\s.*$/', '', (string) ($info['status'] ?? ''))) {
-            'UP', 'OPEN' => 'label-success',
-            'DOWN' => 'label-danger',
-            'MAINT', 'DRAIN', 'NOLB' => 'label-warning',
+        // the state is worked out by the poller from the status
+        // no check is counted as up, but left grey here as nothing is checking it
+        $item_state = $info['state'] ?? 'other';
+        if (($info['status'] ?? '') === 'no check') {
+            $item_state = 'other';
+        }
+        $status_label_class = match ($item_state) {
+            'up' => 'label-success',
+            'down' => 'label-danger',
+            'maint', 'drain', 'nolb' => 'label-warning',
             default => 'label-default',
         };
         echo '<tr><td>' . $row_type . '</td><td>' . $row_name . '</td>';

@@ -23,7 +23,7 @@
                     "app_state_prev": "UNKNOWN",
                     "app_status": "",
                     "app_instance": "",
-                    "data": "{\"frontends\":{\"http_in\":{\"status\":\"OPEN\",\"mode\":\"http\"},\"stats\":{\"status\":\"OPEN\",\"mode\":\"http\"}},\"backends\":{\"dotdot\":{\"status\":\"UP\",\"mode\":\"http\",\"lastchg\":3489,\"lastsess\":0,\"act\":1,\"bck\":0,\"weight\":1}},\"servers\":{\"dotdot\":{\"DMZ_Dotdot_Public\":{\"status\":\"UP\",\"mode\":\"http\",\"lastchg\":3489,\"lastsess\":0,\"act\":1,\"bck\":0,\"weight\":1,\"addr\":null,\"check_status\":\"L4OK\",\"check_desc\":\"Layer4 check passed\",\"check_code\":null,\"check_health\":4,\"check_rise\":2,\"check_fall\":3,\"agent_status\":null,\"tracked\":null}}},\"listeners\":[],\"gated\":[]}",
+                    "data": "{\"frontends\":{\"http_in\":{\"status\":\"OPEN\",\"state\":\"up\",\"mode\":\"http\"},\"stats\":{\"status\":\"OPEN\",\"state\":\"up\",\"mode\":\"http\"}},\"backends\":{\"dotdot\":{\"status\":\"UP\",\"state\":\"up\",\"mode\":\"http\",\"lastchg\":3489,\"lastsess\":0,\"act\":1,\"bck\":0,\"weight\":1}},\"servers\":{\"dotdot\":{\"DMZ_Dotdot_Public\":{\"status\":\"UP\",\"state\":\"up\",\"mode\":\"http\",\"lastchg\":3489,\"lastsess\":0,\"act\":1,\"bck\":0,\"weight\":1,\"addr\":null,\"check_status\":\"L4OK\",\"check_desc\":\"Layer4 check passed\",\"check_code\":null,\"check_health\":4,\"check_rise\":2,\"check_fall\":3,\"agent_status\":null,\"tracked\":null}}},\"listeners\":[],\"gated\":[]}",
                     "deleted_at": null
                 }
             ],

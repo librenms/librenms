@@ -98,7 +98,6 @@ foreach ($data as $pxname => $services) {
         // the status can have stuff like 'UP 1/3' or 'MAINT (via x/y)' for transitional states
         $status_string = $row['status'] ?? '';
         $status_base = $status_string === 'no check' ? 'no check' : preg_replace('/\s.*$/', '', $status_string);
-        $status_base = $status_base === 'STOPPED' ? 'STOP' : $status_base;
         $status = $status_codes[$status_base] ?? $status_code_other;
 
         $counts[$type . '_total']++;
@@ -172,6 +171,8 @@ foreach ($data as $pxname => $services) {
 
         $info = [
             'status' => $status_string,
+            // saved so the web side does not need to parse the status string
+            'state' => $state,
             'mode' => $row['mode'] ?? null,
         ];
         if ($type == 'srv' || $type == 'be') {
