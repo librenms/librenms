@@ -9,7 +9,8 @@ try {
     $data = json_app_get($device, $name)['data'];
 } catch (JsonAppException $e) {
     echo PHP_EOL . "$name:{$e->getCode()}:{$e->getMessage()}" . PHP_EOL;
-    update_application($app, "{$e->getCode()}:{$e->getMessage()}");
+    // without the ERROR prefix update_application() sets the state to OK and drops the message
+    update_application($app, "ERROR: {$e->getCode()}:{$e->getMessage()}");
 
     return;
 }

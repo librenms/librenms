@@ -136,8 +136,16 @@ backend `dotdot` is `srv_dotdot_-_DMZ_Dotdot_Public_status`.
 
 Metric names are limited to 64 characters. Any metric whose name would
 be longer than that is skipped, which may happen with long proxy or
-server names. The counts metrics are always present and can be used
-for alerting regardless.
+server names. An alert rule using a skipped metric will never match,
+and so will never fire. The counts metrics are always present and can
+be used for alerting regardless.
+
+For the status metric to fit, the names need to be within the lengths
+below. Fields with longer names than `status` leave less room.
+
+- Frontend or backend :: 54 characters.
+- Server :: 50 characters for the backend and server names combined.
+- Listener :: 51 characters for the frontend and listener names combined.
 
 The counts are how many items of a type are in a given state. For
 example, `count_srv_down` is the number of servers that are down.
@@ -194,3 +202,6 @@ A specific server being anything other than up.
 ```
 applications.app_type = "haproxy" AND application_metrics.metric = "srv_dotdot_-_DMZ_Dotdot_Public_status" AND application_metrics.value != 1
 ```
+
+This only works if the metric name fits in 64 characters, see
+Metrics above. If it does not, use `count_srv_down` instead.
