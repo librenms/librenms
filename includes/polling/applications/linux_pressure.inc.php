@@ -11,7 +11,7 @@ try {
     $returned = json_app_get($device, $name, 1);
 } catch (JsonAppException $e) {
     Log::info($name . ':' . $e->getCode() . ':' . $e->getMessage());
-    update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
+    update_application($app, 'ERROR: ' . $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
 
     return;
 }
