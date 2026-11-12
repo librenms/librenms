@@ -45,7 +45,7 @@ return [
     ],
     'status' => [
         'group' => 'core',
-        'title' => 'Status (0=DOWN 1=UP/OPEN 2=NOLB 3=MAINT 4=DRAIN 5=no check 6=FULL 7=STOP)',
+        'title' => 'Status (-1=other 0=DOWN 1=UP/OPEN 2=NOLB 3=MAINT 4=DRAIN 5=no check 6=FULL 7=STOP 8=PAUSED 9=WAITING)',
         'unit' => 'status',
         'types' => ['fe', 'be', 'srv', 'li'],
         'http' => false,

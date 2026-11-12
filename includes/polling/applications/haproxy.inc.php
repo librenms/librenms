@@ -29,7 +29,11 @@ $status_codes = [
     'no check' => 5,
     'FULL' => 6,
     'STOP' => 7,
+    'PAUSED' => 8,
+    'WAITING' => 9,
 ];
+// used for any status not in the map above, so the status metric always exists for alerting
+$status_code_other = -1;
 
 // HAProxy type => short name used for RRDs and metrics
 $types = [
@@ -46,9 +50,11 @@ foreach ($groups as $group => $group_def) {
     $rrd_defs[$group] = RrdDefinition::make();
     $total_rrd_defs[$group] = RrdDefinition::make();
     foreach ($group_def['fields'] as [$ds, $ds_type]) {
-        $rrd_defs[$group]->addDataset($ds, $ds_type, 0);
+        // a min of 0 for DERIVE keeps a counter reset from being a negative rate, gauges get no min
+        $ds_min = $ds_type == 'DERIVE' ? 0 : null;
+        $rrd_defs[$group]->addDataset($ds, $ds_type, $ds_min);
         if (! in_array($ds, $no_total)) {
-            $total_rrd_defs[$group]->addDataset($ds, $ds_type, 0);
+            $total_rrd_defs[$group]->addDataset($ds, $ds_type, $ds_min);
         }
     }
 }
@@ -92,7 +98,7 @@ foreach ($data as $pxname => $services) {
         $status_string = $row['status'] ?? '';
         $status_base = $status_string === 'no check' ? 'no check' : preg_replace('/\s.*$/', '', $status_string);
         $status_base = $status_base === 'STOPPED' ? 'STOP' : $status_base;
-        $status = $status_codes[$status_base] ?? null;
+        $status = $status_codes[$status_base] ?? $status_code_other;
 
         $counts[$type . '_total']++;
         $state = match ($status_base) {
@@ -216,7 +222,7 @@ foreach ($sums as $group => $type_sums) {
 // counts of frontends/backends/servers/listeners by state, handy for alerting
 $tags['rrd_def'] = RrdDefinition::make();
 foreach ($counts as $ds => $value) {
-    $tags['rrd_def']->addDataset($ds, 'GAUGE', 0);
+    $tags['rrd_def']->addDataset($ds, 'GAUGE');
 }
 $tags['rrd_name'] = ['app', $name, $app->app_id, 'counts'];
 app('Datastore')->put($device, 'app', $tags, $counts);

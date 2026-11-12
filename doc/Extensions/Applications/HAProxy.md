@@ -97,6 +97,12 @@ the state before the space.
 | 5    | no check |
 | 6    | FULL     |
 | 7    | STOP     |
+| 8    | PAUSED   |
+| 9    | WAITING  |
+| -1   | other    |
+
+Any status not listed is saved as -1, so the status metric is always
+present for alerting.
 
 ### Metrics
 
