@@ -109,11 +109,15 @@ class Billing
             ->where('bill_dateto', '<', min($currentStart, $now)->format('Y-m-d H:i:s'))
             ->orderByDesc('bill_dateto')
             ->orderByDesc('bill_hist_id')
-            ->get(['rate_95th']);
+            ->get(['bill_dateto', 'rate_95th']);
 
         $points = [];
-        foreach ($history as $index => $row) {
-            $points[-$index - 1] = (float) $row->rate_95th;
+        $seenCycles = [];
+        foreach ($history as $row) {
+            if (! isset($seenCycles[$row->bill_dateto])) {
+                $points[-count($points) - 1] = (float) $row->rate_95th;
+                $seenCycles[$row->bill_dateto] = true;
+            }
         }
 
         // Fall back to current use if there are no prior months to predict from
