@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Models\Traits\Filterable;
 use App\Observers\VminfoObserver;
@@ -10,14 +11,18 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PowerState;
+use LibreNMS\Interfaces\Models\HasMetrics;
 use LibreNMS\Interfaces\Models\Keyable;
+use LibreNMS\Interfaces\VminfoMetricSource;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Rewrite;
 
 #[ObservedBy([VminfoObserver::class])]
-class Vminfo extends DeviceRelatedModel implements Keyable
+class Vminfo extends DeviceRelatedModel implements HasMetrics, Keyable
 {
     use Filterable;
     use HasFactory;
@@ -32,6 +37,7 @@ class Vminfo extends DeviceRelatedModel implements Keyable
         'vmwVmMemSize',
         'vmwVmCpus',
         'vmwVmState',
+        'cluster_id',
     ];
 
     /** @var list<string> */
@@ -142,6 +148,26 @@ class Vminfo extends DeviceRelatedModel implements Keyable
     }
 
     /**
+     * VMs whose source records the graphed metrics, other VMs have no graphs.
+     *
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
+    protected function scopeRecordsMetrics(Builder $query): Builder
+    {
+        $registry = app(PollingMethodRegistry::class);
+        $types = collect($registry->providing(VminfoMetricSource::class))
+            ->flatMap(function (PollingMethodType $type) use ($registry): array {
+                /** @var class-string<VminfoMetricSource> $source */
+                $source = $registry->get($type)->dataSourceClass();
+
+                return $source::vmTypes();
+            })->unique()->values()->all();
+
+        return $query->whereIn('vm_type', $types);
+    }
+
+    /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\Device, $this>
      */
     public function parentDevice(): HasOne
@@ -151,6 +177,14 @@ class Vminfo extends DeviceRelatedModel implements Keyable
 
     public function getCompositeKey(): string
     {
-        return "$this->vm_type-$this->vmwVmVMID";
+        return "$this->cluster_id-$this->vm_type-$this->vmwVmVMID";  // cluster_id null on non-proxmox
+    }
+
+    public function metricIdentity(string $measurement): MetricIdentity
+    {
+        // a VM in a cluster keeps its metrics when it migrates to another device
+        $group = $this->cluster_id === null ? ['hostname' => (string) $this->device?->hostname] : ['cluster' => $this->cluster_id];
+
+        return new MetricIdentity($measurement, [...$group, 'type' => $this->vm_type, 'id' => $this->vmwVmVMID]);
     }
 }

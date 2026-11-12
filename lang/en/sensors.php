@@ -12,6 +12,12 @@ return [
     */
 
     'title' => 'Sensors',
+    'category' => [
+        'access-point' => 'Access Point|Access Points',
+        'cluster' => 'Cluster|Clusters',
+        'license' => 'License|Licenses',
+        'stack' => 'Stack|Stacks',
+    ],
     'airflow' => [
         'short' => 'Airflow',
         'long' => 'Airflow',

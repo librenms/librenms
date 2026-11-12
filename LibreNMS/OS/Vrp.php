@@ -30,9 +30,12 @@ namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\AccessPoint;
+use App\Models\BgpPeer;
+use App\Models\BgpPeerCbgp;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Mempool;
+use App\Models\PortsFdb;
 use App\Models\PortsNac;
 use App\Models\PortVlan;
 use App\Models\Sla;
@@ -45,13 +48,12 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
@@ -64,15 +66,17 @@ use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Bgp;
+use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Oid;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 class Vrp extends OS implements
+    BgpAddressFamilyDiscovery,
     MempoolsDiscovery,
     OSPolling,
-    ProcessorDiscovery,
     NacPolling,
     WirelessApCountDiscovery,
     WirelessClientsDiscovery,
@@ -226,7 +230,7 @@ class Vrp extends OS implements
             $descr = empty($entry['entPhysicalName']) ? ($entry['hwEntityBomEnDesc'] ?? null) : $entry['entPhysicalName'];
 
             if ($size != 0 && $descr && ! Str::contains($descr, 'No') && ! Str::contains($entry['hwEntityMemUsage'], 'No')) {
-                $mempools->push((new Mempool([
+                $mempools->push(new Mempool([
                     'mempool_index' => $index,
                     'mempool_type' => 'vrp',
                     'mempool_class' => 'system',
@@ -234,7 +238,7 @@ class Vrp extends OS implements
                     'mempool_descr' => substr("$descr Memory", 0, 64),
                     'mempool_perc_oid' => ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.7.$index",
                     'mempool_perc_warn' => 90,
-                ]))->fillUsage(null, $size, null, $entry['hwEntityMemUsage']));
+                ])->fillUsage(null, $size, null, $entry['hwEntityMemUsage']));
             }
         }
 
@@ -422,53 +426,6 @@ class Vrp extends OS implements
             ModuleModelObserver::observe(AccessPoint::class);
             $this->syncModels($this->getDevice(), 'accessPoints', $aps);
         }
-    }
-
-    /**
-     * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
-     *
-     * @return array Processors
-     */
-    public function discoverProcessors()
-    {
-        $device = $this->getDeviceArray();
-
-        $processors_data = snmpwalk_cache_multi_oid($device, 'hwEntityCpuUsage', [], 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
-
-        if (! empty($processors_data)) {
-            $processors_data = snmpwalk_cache_multi_oid($device, 'hwEntityMemSize', $processors_data, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
-            $processors_data = snmpwalk_cache_multi_oid($device, 'hwEntityBomEnDesc', $processors_data, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
-        }
-
-        d_echo($processors_data);
-
-        $processors = [];
-        foreach ($processors_data as $index => $entry) {
-            if ($entry['hwEntityMemSize'] != 0) {
-                d_echo($index . ' ' . $entry['hwEntityBomEnDesc'] . ' -> ' . $entry['hwEntityCpuUsage'] . ' -> ' . $entry['hwEntityMemSize'] . "\n");
-
-                $usage_oid = '.1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.' . $index;
-                $descr = $entry['hwEntityBomEnDesc'];
-                $usage = $entry['hwEntityCpuUsage'];
-
-                if (empty($descr) || Str::contains($descr, 'No') || Str::contains($usage, 'No')) {
-                    continue;
-                }
-
-                $processors[] = Processor::discover(
-                    $this->getName(),
-                    $this->getDeviceId(),
-                    $usage_oid,
-                    $index,
-                    $descr,
-                    1,
-                    $usage
-                );
-            }
-        }
-
-        return $processors;
     }
 
     /**
@@ -787,5 +744,137 @@ class Vrp extends OS implements
         }
 
         return $ports;
+    }
+
+    /**
+     * Sessions of every VRF are listed in the default context. The session, statistics and
+     * description tables are indexed differently, they are merged by VRF index and address.
+     *
+     * @return Collection<int, BgpPeer>
+     */
+    public function discoverBgpPeers(): Collection
+    {
+        $sessions = [];
+
+        // instance, afi, safi, address
+        foreach ($this->walkBgpTable('', 'HUAWEI-BGP-VPN-MIB', [
+            'bgpPeerRemoteAs' => 'hwBgpPeerRemoteAs',
+            'vrf_name' => 'hwBgpPeerVrfName',
+            'bgpPeerState' => 'hwBgpPeerState',
+            'bgpPeerAdminStatus' => 'hwBgpPeerAdminStatus',
+            'bgpPeerLastError' => 'hwBgpPeerLastError',
+            'bgpPeerFsmEstablishedTime' => 'hwBgpPeerFsmEstablishedTime',
+        ]) as $index => $row) {
+            $parts = explode('.', (string) $index);
+            $instance = array_shift($parts);
+            array_splice($parts, 0, 2); // afi, safi
+            $this->mergeVrpBgpSession($sessions, $instance, Bgp::shiftInetAddress($parts), $row);
+        }
+
+        // ip version, instance, address
+        foreach ($this->walkBgpTable('', 'HUAWEI-BGP-VPN-MIB', [
+            'bgpPeerInUpdates' => 'hwBgpPeerInUpdateMsgs',
+            'bgpPeerOutUpdates' => 'hwBgpPeerOutUpdateMsgs',
+            'bgpPeerInTotalMessages' => 'hwBgpPeerInTotalMsgs',
+            'bgpPeerOutTotalMessages' => 'hwBgpPeerOutTotalMsgs',
+        ]) as $index => $row) {
+            $parts = array_slice(explode('.', (string) $index), 1);
+            $instance = array_shift($parts);
+            $this->mergeVrpBgpSession($sessions, $instance, Bgp::shiftIp($parts), $row);
+        }
+
+        // instance, address
+        foreach ($this->walkBgpTable('', 'HUAWEI-BGP-VPN-MIB', [
+            'bgpPeerDescr' => 'hwBgpPeerSessionExtDescription',
+            'bgpLocalAddr' => 'hwBgpPeerSessionExtLocalAddr',
+        ]) as $index => $row) {
+            $parts = explode('.', (string) $index);
+            $instance = array_shift($parts);
+            $this->mergeVrpBgpSession($sessions, $instance, Bgp::shiftInetAddress($parts), $row);
+        }
+
+        $peers = collect($sessions)->map(function (array $session): ?BgpPeer {
+            $vrfId = $this->bgpVrfId($session['instance'], $session['row']['vrf_name'] ?? null);
+
+            return $this->makeBgpPeer($session['address'], null, '', $vrfId, Arr::except($session['row'], ['vrf_name']));
+        })->filter()->values();
+
+        return $peers->isNotEmpty() ? $peers : $this->discoverBgp4MibPeers('');
+    }
+
+    /**
+     * @return Collection<int, BgpPeerCbgp>
+     */
+    public function discoverBgpAddressFamilies(Collection $peers): Collection
+    {
+        $rows = $this->walkBgpTable('', 'HUAWEI-BGP-VPN-MIB', [
+            'AcceptedPrefixes' => 'hwBgpPeerPrefixRcvCounter',
+            'AdvertisedPrefixes' => 'hwBgpPeerPrefixAdvCounter',
+        ]);
+
+        $families = new Collection;
+        foreach ($rows as $index => $counters) {
+            // instance, afi, safi, address
+            $parts = explode('.', (string) $index);
+            array_shift($parts);
+            [$afi, $safi] = array_splice($parts, 0, 2) + [null, null];
+            if ($afi !== null && $safi !== null) {
+                $families->push($this->makeBgpAddressFamily(Bgp::shiftInetAddress($parts), null, '', $afi, $safi, $counters));
+            }
+        }
+
+        return $families->filter()->values();
+    }
+
+    /**
+     * The first table to report a column wins
+     *
+     * @param  array<string, array{instance: string, address: IP, row: array<string, string>}>  $sessions
+     * @param  array<string, string>  $row
+     */
+    private function mergeVrpBgpSession(array &$sessions, ?string $instance, ?IP $address, array $row): void
+    {
+        if ($instance === null || $address === null) {
+            return;
+        }
+
+        $key = "$instance|$address";
+        $sessions[$key] ??= ['instance' => $instance, 'address' => $address, 'row' => []];
+        $sessions[$key]['row'] += $row;
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        $ifIndexes = [];
+
+        // indexed by MAC address, VLAN number and VSI name (may be empty)
+        foreach (SnmpQuery::walk('HUAWEI-L2MAM-MIB::hwDynFdbPort')->table(1) as $mac => $data) {
+            foreach ($data['HUAWEI-L2MAM-MIB::hwDynFdbPort'] ?? [] as $vlan => $ports) {
+                $ifIndexes[$vlan][$mac] = Arr::first((array) $ports);
+            }
+        }
+
+        // Static (sticky) mac addresses are not stored in the same table.
+        foreach (SnmpQuery::walk('HUAWEI-L2MAM-MIB::hwCfgMacAddrQueryIfIndex')->table(10) as $vlan => $data) {
+            foreach ($data[0][0][0] ?? [] as $mac => $query) {
+                $ifIndex = Arr::first((array) ($query['showall'][0][0][0][0]['HUAWEI-L2MAM-MIB::hwCfgMacAddrQueryIfIndex'] ?? null));
+                if ($ifIndex) {
+                    $ifIndexes[$vlan][$mac] = $ifIndex;
+                }
+            }
+        }
+
+        $fdb = [];
+        foreach ($ifIndexes as $vlan => $macs) {
+            foreach (array_filter($macs) as $mac => $ifIndex) {
+                $fdb[] = new PortsFdb([
+                    'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0,
+                    'mac_address' => Mac::parse((string) $mac)->hex(),
+                    'vlan' => (int) $vlan ?: null,
+                ]);
+            }
+        }
+
+        return empty($fdb) ? parent::discoverFdbTable() : new Collection($fdb);
     }
 }

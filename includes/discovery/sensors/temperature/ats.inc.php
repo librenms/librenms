@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\SensorType;
 
-echo 'ATS Temperature: ';
+Log::info('ATS Temperature: ', ['nlb' => true]);
 
 $descr = 'System';
 $oids = [

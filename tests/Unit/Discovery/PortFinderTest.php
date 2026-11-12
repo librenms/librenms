@@ -44,7 +44,7 @@ final class PortFinderTest extends TestCase
     /**
      * ifName => attributes, ifDescr defaults to the ifName
      */
-    private const PORTS = [
+    private const array PORTS = [
         'Gi1/0/1' => ['ifIndex' => 10101, 'ifDescr' => 'GigabitEthernet1/0/1'],
         'Gi1/0/2' => ['ifIndex' => 10102, 'ifDescr' => 'GigabitEthernet1/0/2', 'ifAlias' => 'uplink'],
         'Gi1/0/3' => ['ifIndex' => 10103, 'ifDescr' => 'GigabitEthernet1/0/3'],

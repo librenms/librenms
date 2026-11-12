@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -33,41 +34,24 @@ use App\Polling\Measure\Measurement;
 use Carbon\Carbon;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\RrdException;
-use LibreNMS\Exceptions\RrdFileExistsException;
-use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\Exceptions\RrdStoreException;
+use LibreNMS\RRD\Backend\RrdBackendInterface;
 use LibreNMS\RRD\RrdPath;
-use LibreNMS\RRD\RrdProcess;
-use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
 use Log;
 
 class Rrd extends BaseDatastore
 {
-    private const FAILURE_THRESHOLD = 3;
-    private const BACKOFF_BASE = 30; // seconds
-    private const BACKOFF_MAX = 600; // seconds
+    private const int FAILURE_THRESHOLD = 3;
+    private const int BACKOFF_BASE = 30; // seconds
+    private const int BACKOFF_MAX = 600; // seconds
 
     private int $consecutiveErrors = 0;
     private int $trips = 0;
     private int $suspendedUntil = 0;
 
-    private ?RrdProcess $rrd = null;
-    /** @var string */
-    private $version;
-    /** @var string */
-    private $rrdcached;
-
-    private array $rra;
-    /** @var int */
-    private $step;
-
-    public function __construct()
-    {
-        parent::__construct();
-        $this->loadConfig();
-    }
+    private ?RrdBackendInterface $backend = null;
 
     public function getName(): string
     {
@@ -79,32 +63,12 @@ class Rrd extends BaseDatastore
         return LibrenmsConfig::get('rrd.enable', true);
     }
 
-    protected function loadConfig(): void
-    {
-        $this->rrdcached = LibrenmsConfig::get('rrdcached', false);
-        $this->step = LibrenmsConfig::get('rrd.step', 300);
-        $this->rra = preg_split('/\s+/', trim(LibrenmsConfig::get(
-            'rrd_rra',
-            'RRA:AVERAGE:0.5:1:2016 RRA:AVERAGE:0.5:6:1440 RRA:AVERAGE:0.5:24:1440 RRA:AVERAGE:0.5:288:1440 ' .
-            ' RRA:MIN:0.5:1:2016 RRA:MIN:0.5:6:1440     RRA:MIN:0.5:24:1440     RRA:MIN:0.5:288:1440 ' .
-            ' RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:1440     RRA:MAX:0.5:288:1440 ' .
-            ' RRA:LAST:0.5:1:2016 '
-        )));
-        $this->version = LibrenmsConfig::get('rrdtool_version', '1.4');
-    }
-
-    public function init(int $timeout = 600): void
-    {
-        $this->rrd ??= app(RrdProcess::class, ['timeout' => $timeout]);
-    }
-
     /**
-     * Close rrdtool process.
-     * This should be done before exiting
+     * Resolved on first use, so requests that only build rrd paths don't start a process or connect
      */
-    public function terminate(): void
+    private function backend(): RrdBackendInterface
     {
-        $this->rrd?->stop();
+        return $this->backend ??= resolve(RrdBackendInterface::class);
     }
 
     /**
@@ -112,51 +76,52 @@ class Rrd extends BaseDatastore
      */
     public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
+        if ($this->isSuspended()) {
+            return;
+        }
+
         $device_model = $this->getDevice($meta);
 
         $rrd_name = $meta['rrd_name'] ?? $measurement;
-        $step = $meta['rrd_step'] ?? $this->step;
         if (! empty($meta['rrd_oldname'])) {
             self::renameFile($device_model, $meta['rrd_oldname'], $rrd_name);
         }
 
-        if (isset($meta['rrd_proxmox_name'])) {
-            $pmxvars = $meta['rrd_proxmox_name'];
-            $rrd = self::proxmoxName($pmxvars['pmxcluster'], $pmxvars['vmid'], $pmxvars['vmport']);
-            self::checkDirExists(RrdPath::proxmox($pmxvars['pmxcluster']));
+        $metric = $meta['metric'] ?? null;
+        if ($metric instanceof MetricIdentity) {
+            self::checkDirExists(RrdPath::make($metric->group())); // not always a device, those are created when polling starts
+            $rrd = $this->metricName($metric);
         } else {
             $rrd = RrdPath::make($device_model->hostname, self::filenameString($rrd_name) . '.rrd');
         }
 
         if (isset($meta['rrd_def'])) {
             $rrd_def = $meta['rrd_def'];
-
-            // filter out data not in the definition
-            $fields = array_filter($fields, function ($key) use ($rrd_def) {
-                $valid = $rrd_def->isValidDataset($key);
-                if (! $valid) {
-                    Log::debug("RRD warning: unused data sent $key");
-                }
-
-                return $valid;
-            }, ARRAY_FILTER_USE_KEY);
-        }
-
-        if ($this->isSuspended()) {
-            if (! LibrenmsConfig::get('hide_rrd_disabled')) {
-                Log::debug('[%rRRD Disabled%n]', ['color' => true]);
+            if (isset($meta['rrd_step'])) {
+                $rrd_def = (clone $rrd_def)->setStep((int) $meta['rrd_step']);
             }
 
-            return;
+            foreach (array_keys($fields) as $key) {
+                if (! $rrd_def->isValidDataset($key)) {
+                    Log::debug("RRD warning: unused data sent $key");
+                }
+            }
+
+            // values must be in the same order as the data sources in the file
+            $values = $rrd_def->orderValues($fields);
+        } else {
+            $values = array_values($fields);
         }
 
         try {
             try {
-                $this->update($rrd, $fields);
+                $this->update($rrd, $values);
             } catch (RrdNotFoundException) {
                 if (isset($rrd_def)) {
-                    $this->command('create', $rrd, ['--step', $step, ...$rrd_def->getArguments(), ...$this->rra]);
-                    $this->update($rrd, $fields);
+                    $stat = Measurement::start('create');
+                    $this->backend()->create($rrd, $rrd_def);
+                    $this->recordStatistic($stat->end());
+                    $this->update($rrd, $values);
                 }
             }
             $this->recordSuccess($device_model);
@@ -168,9 +133,20 @@ class Rrd extends BaseDatastore
         }
     }
 
+    /**
+     * Writes are skipped while suspended, reads are still allowed
+     */
     private function isSuspended(): bool
     {
-        return Carbon::now()->getTimestamp() < $this->suspendedUntil;
+        if (Carbon::now()->getTimestamp() >= $this->suspendedUntil) {
+            return false;
+        }
+
+        if (! LibrenmsConfig::get('hide_rrd_disabled')) {
+            Log::debug('[%rRRD Disabled%n]', ['color' => true]);
+        }
+
+        return true;
     }
 
     private function recordSuccess(Device $device): void
@@ -198,74 +174,53 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * Updates an rrd database at $filename using $options
-     * Where $options is an array, each entry which is not a number is replaced with "U"
+     * Updates an rrd database with the given values in data source order
+     * Non-numeric values are stored as unknown
      *
-     * @param  string[]  $data
+     * @param  array<int|float|string|null>  $values
+     * @param  int|null  $timestamp  unix time of the values, defaults to now
      *
      * @throws RrdException
      *
      * @internal
      */
-    public function update(RrdPath $rrd, array $data): void
+    public function update(RrdPath $rrd, array $values, ?int $timestamp = null): void
     {
-        $data = 'N:' . implode(':', array_map(fn ($v) => is_numeric($v) ? $v : 'U', $data));
+        if ($this->isSuspended()) {
+            return;
+        }
 
-        $this->command('update', $rrd, [$data]);
+        $stat = Measurement::start('update');
+        $this->backend()->update($rrd, array_values($values), $timestamp);
+        $this->recordStatistic($stat->end());
     }
 
     /**
-     * Modify an rrd file's max value and trim the peaks as defined by rrdtool
+     * Change the minimum and/or maximum values of data sources in an existing rrd file
+     *
+     * @param  array<string, array{min?: int|float|null, max?: int|float|null}>  $limits  data source name => limits
+     * @return bool true if the file was tuned
      */
-    public function tune(string $type, RrdPath $rrd, int $max): bool
+    public function tune(RrdPath $rrd, array $limits): bool
     {
-        $fields = [];
-        if ($type === 'port') {
-            if ($max < 10000000) {
-                return false;
-            }
-            $max /= 8;
-            $fields = [
-                'INOCTETS',
-                'OUTOCTETS',
-                'INERRORS',
-                'OUTERRORS',
-                'INUCASTPKTS',
-                'OUTUCASTPKTS',
-                'INNUCASTPKTS',
-                'OUTNUCASTPKTS',
-                'INDISCARDS',
-                'OUTDISCARDS',
-                'INUNKNOWNPROTOS',
-                'INBROADCASTPKTS',
-                'OUTBROADCASTPKTS',
-                'INMULTICASTPKTS',
-                'OUTMULTICASTPKTS',
-            ];
-        }
-        if (count($fields) > 0) {
-            $options = [];
-            foreach ($fields as $field) {
-                array_push($options, '--maximum', $field . ':' . $max);
-            }
-            try {
-                $this->command('tune', $rrd->fullPath(), $options);
-            } catch (RrdException $e) {
-                if (! $e instanceof RrdNotFoundException) {
-                    Log::debug('RRD tune failed: ' . $e->getMessage());
-                }
-            }
+        if ($this->isSuspended() || empty($limits)) {
+            return false;
         }
 
-        return true;
-    }
+        $stat = Measurement::start('other');
+        try {
+            $this->backend()->tune($rrd, $limits);
 
-    /**
-     * Generates a filename for a proxmox cluster rrd
-     */
-    public function proxmoxName(string $pmxcluster, string $vmid, string $vmport): RrdPath
-    {
-        return RrdPath::proxmox($pmxcluster, $vmid . '_netif_' . $vmport . '.rrd');
+            return true;
+        } catch (RrdException $e) {
+            if (! $e instanceof RrdNotFoundException) {
+                Log::debug('RRD tune failed: ' . $e->getMessage());
+            }
+
+            return false;
+        } finally {
+            $this->recordStatistic($stat->end());
+        }
     }
 
     /**
@@ -286,8 +241,10 @@ class Rrd extends BaseDatastore
      */
     public function renameFile(Device $device, $oldname, $newname): bool
     {
-        $oldrrd = RrdPath::make($device->hostname, self::filenameString($oldname))->fullPath();
-        $newrrd = RrdPath::make($device->hostname, self::filenameString($newname))->fullPath();
+        $oldpath = $this->name($device->hostname, $oldname);
+        $newpath = $this->name($device->hostname, $newname);
+        $oldrrd = $oldpath->fullPath();
+        $newrrd = $newpath->fullPath();
         if (is_file($oldrrd) && ! is_file($newrrd)) {
             if (rename($oldrrd, $newrrd)) {
                 Eventlog::log("Renamed $oldrrd to $newrrd", $device, 'poller', Severity::Ok);
@@ -298,10 +255,15 @@ class Rrd extends BaseDatastore
 
                 return false;
             }
-        } else {
-            // we don't need to rename the file
-            return true;
         }
+
+        // a remote rrdcached server cannot rename files, notify once (before the new file is created)
+        if (LibrenmsConfig::get('rrdcached') && ! is_file($oldrrd) && ! $this->checkRrdExists($newpath) && $this->checkRrdExists($oldpath)) {
+            Eventlog::log("Unable to rename {$oldpath->relativePath()} to {$newpath->relativePath()} on remote rrdcached server, rename manually to keep history", $device, 'poller', Severity::Warning);
+        }
+
+        // we don't need to rename the file
+        return true;
     }
 
     /**
@@ -313,100 +275,63 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * Generates and pipes a command to rrdtool
-     *
-     * @internal
-     *
-     * @param  string  $command  create, update, updatev, graph, graphv, dump, restore, fetch, tune, first, last, lastupdate, info, resize, xport, flushcached
-     * @param  string  $filename  The full patth to the rrd file
-     * @param  array  $options  rrdtool command options
-     * @return string the output of the command
-     *
-     * @throws RrdException thrown when the rrdtool process(s) cannot be started
+     * The rrd file of a metric: in the directory of its group, named after the measurement and the other tag values.
      */
-    private function command(string $command, string $filename, array $options = []): string
+    public function metricName(MetricIdentity $metric): RrdPath
     {
-        $stat = Measurement::start($this->coalesceStatisticType($command));
-        $output = '';
-
-        try {
-            $cmd = self::buildCommand($command, $filename, $options);
-        } catch (RrdFileExistsException) {
-            Log::debug("RRD[%g$filename already exists%n]", ['color' => true]);
-
-            return $output;
-        }
-
-        $commandLine = implode(' ', $cmd);
-
-        // do not write rrd files, but allow read-only commands
-        $ro_commands = ['graph', 'graphv', 'dump', 'fetch', 'first', 'last', 'lastupdate', 'info', 'xport'];
-        if ($this->isSuspended() && ! in_array($command, $ro_commands)) {
-            if (! LibrenmsConfig::get('hide_rrd_disabled')) {
-                Log::debug('[%rRRD Disabled%n]', ['color' => true]);
-            }
-
-            return $output;
-        }
-
-        $this->init();
-        $output = $this->rrd->run($commandLine);
-
-        if (Debug::isVerbose() && $output) {
-            Log::debug('RRDtool Output: ' . $output);
-        }
-
-        $this->recordStatistic($stat->end());
-
-        return $output;
+        return $this->name($metric->group(), [$metric->measurement, ...array_values($metric->tagsInGroup())]);
     }
 
     /**
-     * Build a command array for rrdtool
-     * Shortens the filename as needed
-     * Determines if --daemon should be used
+     * The rrd files a metric may be kept in, the one the poller writes to first.
+     * A metric whose identity was cleaned up may still be kept in the file it had before.
      *
-     * @param  string  $command  The base rrdtool command.  Usually create, update, last.
-     * @param  string  $filename  The full path to the rrd file
-     * @param  array  $options  Options for the command possibly including the rrd definition
-     * @return array returns a full command array ready to be used by rrdtool
-     *
-     * @throws RrdFileExistsException if rrdtool <1.4.3 and the rrd file exists locally
+     * @return list<RrdPath>
      */
-    public function buildCommand(string $command, string $filename, array $options = []): array
+    public function metricNames(MetricIdentity $metric): array
     {
-        if ($command == 'create') {
-            // <1.4.3 doesn't support -O, so make sure the file doesn't exist
-            if (version_compare($this->version, '1.4.3', '<')) {
-                if (is_file($filename)) {
-                    throw new RrdFileExistsException();
-                }
-            } else {
-                $options[] = '-O';
+        if ($metric->group() === '') {
+            return [];
+        }
+
+        $names = app(MetricNames::class);
+        $paths = [$this->metricName($metric)];
+
+        if ($legacy = $names->legacyOf($metric)) {
+            $legacyPath = $this->name($metric->group(), $legacy->rrdNameOf($metric) ?? $legacy->measurement);
+
+            // some metrics kept their file name when the identity was cleaned up
+            if ($legacyPath->relativePath() !== $paths[0]->relativePath()) {
+                $paths[] = $legacyPath;
             }
         }
 
-        return [$command, $filename, ...$options];
+        return $names->isCanonical() ? $paths : array_reverse($paths);
     }
 
     /**
-     * Get array of all rrd files for a device,
-     * via rrdached or localdisk.
+     * Get array of all rrd files for a device
      *
      * @param  string|string[]  $prefix  limit returned results to files matching this prefix
-     * @return string[] array of rrd files for this host
+     * @return string[] array of rrd files for this host, relative to the rrd directory
      */
     public function getRrdFiles(string $hostname, string|array $prefix = ''): array
     {
         $prefix = self::safeName(is_array($prefix) ? implode('-', $prefix) : $prefix);
-        $rrdpath = RrdPath::make($hostname);
 
-        if ($this->rrdcached) {
-            $output = $this->command('list', '/' . $rrdpath);
-            $files = array_filter(explode("\n", trim($output)), fn ($file) => str_starts_with((string) $file, $prefix));
+        if ($this->backend()->remote()) {
+            $stat = Measurement::start('other');
+            try {
+                $paths = $this->backend()->list($hostname, $prefix);
+            } finally {
+                $this->recordStatistic($stat->end());
+            }
         } else {
-            $files = glob($rrdpath . DIRECTORY_SEPARATOR . $prefix . '*.rrd') ?: [];
+            $files = glob(RrdPath::make($hostname)->fullPath() . DIRECTORY_SEPARATOR . $prefix . '*.rrd') ?: [];
+            $paths = array_map(fn (string $file) => RrdPath::make($hostname, basename($file)), $files);
         }
+
+        $files = array_map(fn (RrdPath $path) => $path->relativePath(), $paths);
 
         sort($files);
 
@@ -452,20 +377,22 @@ class Rrd extends BaseDatastore
 
     /**
      * Checks if the rrd file exists on the server
-     * This will perform a remote check if using rrdcached and rrdtool >= 1.5
      */
     public function checkRrdExists(RrdPath $rrdpath): bool
     {
-        if ($this->rrdcached && version_compare($this->version, '1.5', '>=')) {
-            try {
-                $check_output = $this->command('last', $rrdpath);
-
-                return ! (str_contains($check_output, $rrdpath) && str_contains($check_output, 'No such file or directory'));
-            } catch (RrdNotFoundException) {
-                return false;
-            }
-        } else {
+        if (! $this->backend()->remote()) {
             return is_file($rrdpath->fullPath());
+        }
+
+        $stat = Measurement::start('other');
+        try {
+            $this->backend()->last($rrdpath);
+
+            return true;
+        } catch (RrdNotFoundException) {
+            return false;
+        } finally {
+            $this->recordStatistic($stat->end());
         }
     }
 
@@ -518,30 +445,6 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * Generates a graph file at $graph_file using $options
-     * Graphs are a single command per run, so this just runs rrdtool
-     *
-     * @param  array  $options
-     * @return string
-     *
-     * @throws RrdGraphException
-     */
-    public function graph(array $options): string
-    {
-        try {
-            $command = $this->buildCommand('graph', '-', $options);
-
-            $this->init(300);
-            $image = $this->rrd->run('"' . implode('" "', $command) . '"');
-            $this->rrd->stop();
-
-            return $image;
-        } catch (RrdException $e) {
-            throw new RrdGraphException($e->getMessage(), 'Error');
-        }
-    }
-
-    /**
      * Remove invalid characters from the rrd file name
      */
     public static function safeName(string $name): string
@@ -570,7 +473,7 @@ class Rrd extends BaseDatastore
     public static function fixedSafeDescr($descr, $length): string
     {
         $result = Rewrite::shortenIfName($descr);
-        $result = str_replace("'", '', $result);            // remove quotes
+        $result = str_replace(["'", '"', "\n", "\r"], '', $result); // remove quotes and newlines
 
         if (is_numeric($length)) {
             // preserve original $length for str_pad()
@@ -588,17 +491,6 @@ class Rrd extends BaseDatastore
         $result = str_replace(':', '\:', $result);          // escape colons
 
         return $result . ' ';
-    }
-
-    /**
-     * Only track update and create primarily, just put all others in an "other" bin
-     *
-     * @param  string  $type
-     * @return string
-     */
-    private function coalesceStatisticType($type): string
-    {
-        return ($type == 'update' || $type == 'create') ? $type : 'other';
     }
 
     /**

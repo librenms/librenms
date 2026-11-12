@@ -7,13 +7,14 @@ use App\Models\Device;
 use App\Models\Processor;
 use Closure;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\View\Component;
 
 class Processors extends Component
 {
     /**
-     * @var Collection<(int|string), array{processors: Collection<int, Processor>, usage: int, warning: float|int|null}>
+     * @var Collection<(int|string), array{processors: EloquentCollection<int, Processor>, usage: int, warning: float|int|null}>
      */
     public Collection $processorGroups;
 
@@ -28,7 +29,7 @@ class Processors extends Component
                 'processors' => $processors
                     ->map(fn (Processor $processor): Processor => $processor)
                     ->values(),
-                'usage' => (int) ceil($processors->avg('processor_usage')),
+                'usage' => (int) ceil($processors->avg('processor_usage') ?? 0),
                 'warning' => $processors->avg('processor_perc_warn'),
             ],
             );

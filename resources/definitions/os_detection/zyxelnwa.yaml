@@ -1,7 +1,7 @@
 os: zyxelnwa
 text: 'ZyXEL NWA'
 group: zyxel
-type: network
+type: wireless
 icon: zyxel
 discovery:
     -

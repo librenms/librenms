@@ -213,7 +213,7 @@ final class FileCategorizerTest extends TestCase
         $files = $input ?? array_unique(Arr::flatten(Arr::except($expected, ['os']))); // os is a virtual category
         $expected = array_merge($this->getCategorySkeleton(), $expected);
 
-        $this->assertEquals($expected, (new FileCategorizer($files))->categorize(), $message);
+        $this->assertEquals($expected, new FileCategorizer($files)->categorize(), $message);
     }
 
     private function getCategorySkeleton()

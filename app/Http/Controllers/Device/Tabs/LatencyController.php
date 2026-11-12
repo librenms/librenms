@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Device\Tabs;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Smokeping;
 
@@ -36,7 +37,7 @@ class LatencyController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return LibrenmsConfig::get('smokeping.integration') || $device->getAttrib('override_icmp_disable') !== 'true';
+        return (bool) LibrenmsConfig::get('smokeping.integration') || $device->pollingMethod(PollingMethodType::Icmp)?->enabled !== false;
     }
 
     public function slug(): string

@@ -1,6 +1,8 @@
 OGTRAPv2-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
+	sysName
+		FROM SNMPv2-MIB
 	OBJECT-TYPE
 		FROM RFC-1212
 	TRAP-TYPE
@@ -311,18 +313,17 @@ ogSerialSignalAlarmEntry OBJECT IDENTIFIER ::= {
 ogSerialSignalNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES { 
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
-		ogAlarmTriggerValue,
+		ogAlarmUser,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary,
+		sysName
 	}
 	DESCRIPTION
 		"The alert sent when a signal change occurs"
@@ -345,17 +346,19 @@ ogSerialPatternAlarmEntry OBJECT IDENTIFIER ::= {
 ogSerialPatternNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES {
-		ogAlarmEventId,
 		ogAlarmName,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
 		ogAlarmType,
-		ogAlarmSummary,
 		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmSummary,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
-		ogAlarmState
+		ogAlarmPreviousValue,
+		ogAlarmState,
+		sysName
 	}
 	DESCRIPTION
 		"The alert sent when a pre-defined pattern was
@@ -379,18 +382,18 @@ ogSerialUserAlarmEntry OBJECT IDENTIFIER ::= {
 ogSerialUserNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES { 
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmSummary,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		sysName
 	}
 	DESCRIPTION
 		"The alert sent when a user connection event occurs."
@@ -413,18 +416,17 @@ ogHostEventEntry OBJECT IDENTIFIER ::= {
 ogHostPingNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
-		ogAlarmTriggerValue,
+		ogAlarmUser,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary,
+		sysName
 	}
 	DESCRIPTION
 		"An alarm sent when a Network Host occurs stops or resumes
@@ -445,7 +447,8 @@ ogHostServiceNotification TRAP-TYPE
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmState,
+		sysName
 	}
 	DESCRIPTION
 		"An alarm sent when a service on a network host stops or starts
@@ -455,18 +458,14 @@ ogHostServiceNotification TRAP-TYPE
 ogHostUserNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES {
-		ogAlarmEventId,
-		ogAlarmName,
-		ogAlarmCheck,
-		ogAlarmInstance,
-		ogAlarmTime,
 		ogAlarmType,
-		ogAlarmSummary,
 		ogAlarmDevice,
+		ogAlarmSummary,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmState,
+		sysName
 	}
 	DESCRIPTION
 		"An alarm sent when a user connection to a Network Host occurs"
@@ -489,18 +488,18 @@ ogWebEventEntry OBJECT IDENTIFIER ::= {
 ogWebUserNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
+		ogAlarmUser,
+		ogAlarmSummary,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		sysName
 	}
 	DESCRIPTION
 		"An alarm sent when a user connection to web interface occurs"
@@ -523,18 +522,18 @@ ogEmdAlarmEntry OBJECT IDENTIFIER ::= {
 ogEmdTemperatureNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES { 
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
+		ogAlarmUser,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary,
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when a temperature event occurs"
@@ -543,18 +542,18 @@ ogEmdTemperatureNotification TRAP-TYPE
 ogEmdHumidityNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES { 
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
+		ogAlarmUser,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary,
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when a humidity event occurs"
@@ -563,18 +562,17 @@ ogEmdHumidityNotification TRAP-TYPE
 ogEmdDioNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES { 
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
-		ogAlarmTriggerValue,
+		ogAlarmUser,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary,
+		sysName
 	}
 	DESCRIPTION
 		"The alert sent when a DIO signal state changes"
@@ -597,19 +595,18 @@ ogPowerSupplyAlarmEntry OBJECT IDENTIFIER ::= {
 ogPowerSupplyInputNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES { 
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary,
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when a power supply voltage alarm occurs"
@@ -618,19 +615,18 @@ ogPowerSupplyInputNotification TRAP-TYPE
 ogPowerSupplyOutputNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES { 
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary,
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when a power supply rail current alarm occurs"
@@ -639,19 +635,18 @@ ogPowerSupplyOutputNotification TRAP-TYPE
 ogPowerSupplyTempNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES { 
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary,
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when a power supply temperature alarm occurs"
@@ -674,19 +669,16 @@ ogUpsAlarmEntry OBJECT IDENTIFIER ::= {
 ogUpsNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES { 
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
-		ogAlarmUser,
-		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary,
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when a UPS alarm occurs"
@@ -695,19 +687,18 @@ ogUpsNotification TRAP-TYPE
 ogUpsBatteryNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES { 
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary,
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when a UPS battery alarm occurs"
@@ -716,19 +707,18 @@ ogUpsBatteryNotification TRAP-TYPE
 ogUpsInputNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES { 
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary,
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when a UPS input alarm occurs"
@@ -737,19 +727,18 @@ ogUpsInputNotification TRAP-TYPE
 ogUpsOutputNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES { 
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
 		ogAlarmUser,
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary,
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when a UPS output alarm occurs"
@@ -784,7 +773,8 @@ ogRpcInputNotification TRAP-TYPE
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmState,
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when an RPC input alarm occurs"
@@ -805,7 +795,8 @@ ogRpcOutputNotification TRAP-TYPE
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmState,
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when an RPC output alarm occurs"
@@ -826,7 +817,8 @@ ogRpcOutletNotification TRAP-TYPE
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmState,
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when an RPC outlet alarm occurs"
@@ -849,18 +841,16 @@ ogNetAlarmEntry OBJECT IDENTIFIER ::= {
 ogNetInterfaceNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES {
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
-		ogAlarmTriggerValue,
+		ogAlarmUser,
 		ogAlarmCurrentValue,
-		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmSummary,
+		sysName
 	}
 	DESCRIPTION
 		"The alert sent when a network interface event occurs"
@@ -883,19 +873,16 @@ ogCellAlarmEntry OBJECT IDENTIFIER ::= {
 ogCellDataNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES { 
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
-		ogAlarmSummary,
+		ogAlarmState,
 		ogAlarmDevice,
-		ogAlarmUser,
-		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
-		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmTriggerValue,
+		ogAlarmSummary,
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when a cell data alarm occurs"
@@ -904,19 +891,16 @@ ogCellDataNotification TRAP-TYPE
 ogCellMessageNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES { 
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
+		ogAlarmState,
 		ogAlarmSummary,
 		ogAlarmDevice,
-		ogAlarmUser,
-		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when a SMS command alarm occurs"
@@ -937,7 +921,8 @@ ogCellSignalNotification TRAP-TYPE
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmState,
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when a cellular signal alarm occurs."
@@ -958,7 +943,8 @@ ogCellApnNotification TRAP-TYPE
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmState,
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when an APN change alarm occurs"
@@ -979,7 +965,8 @@ ogCellTowerNotification TRAP-TYPE
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmState,
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when a cell tower change alarm occurs"
@@ -1000,7 +987,8 @@ ogCellNetworkNotification TRAP-TYPE
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmState,
+		sysName
 	}
 	DESCRIPTION
  		"The notification sent when a cell network change alarm occurs"
@@ -1035,7 +1023,8 @@ ogWifiClientConnectNotification TRAP-TYPE
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmState,
+		sysName
 	}
 	DESCRIPTION
  		"A notification sent when a wireless client
@@ -1057,7 +1046,8 @@ ogWifiClientSignalNotification TRAP-TYPE
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmState,
+		sysName
 	}
 	DESCRIPTION
  		"A notification sent when a wireless client
@@ -1079,7 +1069,8 @@ ogWifiApAssociationNotification TRAP-TYPE
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmState,
+		sysName
 	}
 	DESCRIPTION
  		"A notification sent when a wireless client
@@ -1101,7 +1092,8 @@ ogWifiApAuthNotification TRAP-TYPE
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmState,
+		sysName
 	}
 	DESCRIPTION
  		"A notification sent when a wireless client
@@ -1137,7 +1129,8 @@ ogDialPoolHealthNotification TRAP-TYPE
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmState,
+		sysName
 	}
 	DESCRIPTION
  		"A notification sent when a dial-pool health alarm occurs."
@@ -1160,19 +1153,16 @@ ogCustomAlarmEntry OBJECT IDENTIFIER ::= {
 ogCustomNotification TRAP-TYPE
 	ENTERPRISE  opengear
 	VARIABLES { 
-		ogAlarmEventId,
-		ogAlarmName,
+		ogAlarmType,
 		ogAlarmCheck,
 		ogAlarmInstance,
 		ogAlarmTime,
-		ogAlarmType,
+		ogAlarmState,
 		ogAlarmSummary,
 		ogAlarmDevice,
-		ogAlarmUser,
-		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
-		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmTriggerValue,
+		sysName
 	}
 	DESCRIPTION
  		"A notification sent when a custom check alarm occurs."
@@ -1206,7 +1196,8 @@ ogCliUserNotification TRAP-TYPE
 		ogAlarmTriggerValue,
 		ogAlarmCurrentValue,
 		ogAlarmPreviousValue,
-		ogAlarmState
+		ogAlarmState,
+		sysName
 	}
 	DESCRIPTION
 		"An alarm sent when a user connection to CLI session occurs"

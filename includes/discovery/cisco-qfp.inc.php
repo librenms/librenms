@@ -14,6 +14,9 @@
  * @copyright  2019 LibreNMS
  * @author     Pavle Obradovic <pobradovic08@gmail.com>
  */
+
+use LibreNMS\Util\ProgressList;
+
 if ($device['os_group'] == 'cisco') {
     $module = 'cisco-qfp';
 
@@ -47,6 +50,7 @@ if ($device['os_group'] == 'cisco') {
     $components = $component->getComponents($device['device_id'], ['type' => $module]);
     $components = $components[$device['device_id']] ?? [];
 
+    $progress = ProgressList::start('QFP components');
     /*
      * Walk through CISCO-ENTITY-QFP-MIB::ceqfpSystemTable
      */
@@ -94,10 +98,10 @@ if ($device['os_group'] == 'cisco') {
                 $new_component = $component->createComponent($device['device_id'], $module);
                 $component_id = key($new_component);
                 $components[$component_id] = array_merge($new_component[$component_id], $component_data);
-                echo '+';
+                $progress->mark('+');
             } else {
                 $components[$component_id] = array_merge($components[$component_id], $component_data);
-                echo '.';
+                $progress->mark('.');
             }
         }
     }
@@ -109,7 +113,7 @@ if ($device['os_group'] == 'cisco') {
         $found = in_array($tmp_component['entPhysicalIndex'], array_keys($qfp_general_data));
         if (! $found) {
             $component->deleteComponent($tmp_component_id);
-            echo '-';
+            $progress->mark('-');
         }
     }
 
@@ -118,5 +122,5 @@ if ($device['os_group'] == 'cisco') {
      */
     $component->setComponentPrefs($device['device_id'], $components);
 
-    echo "\n";
+    $progress->end();
 }

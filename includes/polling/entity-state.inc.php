@@ -23,6 +23,9 @@
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
+
+use LibreNMS\Util\ProgressList;
+
 $entityStatesIndexes = dbFetchRows(
     'SELECT S.entity_state_id, S.entStateLastChanged, P.entPhysicalIndex FROM entityState AS S ' .
     'LEFT JOIN entPhysical AS P USING (entPhysical_id) WHERE S.device_id=?',
@@ -30,7 +33,7 @@ $entityStatesIndexes = dbFetchRows(
 );
 
 if (! empty($entityStatesIndexes)) {
-    echo "\nEntity States: ";
+    $progress = ProgressList::start('Entity States');
 
     // index by entPhysicalIndex
     $entityStatesIndexes = array_by_column($entityStatesIndexes, 'entPhysicalIndex');
@@ -90,10 +93,10 @@ if (! empty($entityStatesIndexes)) {
                 d_echo('Error: ' . $e->getMessage() . PHP_EOL);
             }
         }
-        echo '.';
+        $progress->mark('.');
     }
 
-    echo PHP_EOL;
+    $progress->end();
 }
 
 unset($entityStatesIndexes, $entLC, $lastChanged, $dbLastChanged, $new_states, $update);

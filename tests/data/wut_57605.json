@@ -242,6 +242,7 @@
                     "sensor_type": "wut",
                     "sensor_descr": "Sensorbeschreibung 1",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 19.8,

@@ -44,16 +44,6 @@ final readonly class RrdPath implements \Stringable
     }
 
     /**
-     * Legacy proxmox layout: proxmox/<cluster>/<filename>
-     *
-     * @deprecated remove when proxmox is rewritten
-     */
-    public static function proxmox(string $cluster, string $filename = ''): RrdPath
-    {
-        return self::fromParts('proxmox', $cluster, $filename);
-    }
-
-    /**
      * Sanitize each path component and join them, skipping empty components
      */
     private static function fromParts(string ...$parts): RrdPath
@@ -73,13 +63,11 @@ final readonly class RrdPath implements \Stringable
         return LibrenmsConfig::get('rrd_dir') . DIRECTORY_SEPARATOR . $this->relativePath;
     }
 
-    public function defaultPath(): string
-    {
-        return LibrenmsConfig::get('rrdcached') ? $this->relativePath() : $this->fullPath();
-    }
-
+    /**
+     * The path relative to the rrd directory, backends resolve it from there
+     */
     public function __toString(): string
     {
-        return $this->defaultPath();
+        return $this->relativePath;
     }
 }

@@ -29,12 +29,18 @@ namespace LibreNMS;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DeviceGraph;
+use App\Models\Mempool;
 use DeviceCache;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Interfaces\Discovery\BgpPeerDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
+use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
+use LibreNMS\Interfaces\Discovery\MefDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\NeighborDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -44,6 +50,10 @@ use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\StpPortDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
+use LibreNMS\Interfaces\Discovery\VrfDiscovery;
+use LibreNMS\Interfaces\Discovery\VrfPortDiscovery;
+use LibreNMS\Interfaces\Polling\MefPolling;
+use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpForwardNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpNetstatsPolling;
@@ -53,29 +63,39 @@ use LibreNMS\Interfaces\Polling\Netstats\UdpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\StpInstancePolling;
 use LibreNMS\Interfaces\Polling\StpPortPolling;
 use LibreNMS\OS\Generic;
+use LibreNMS\OS\Traits\Bgp4Mib;
 use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\LldpMib;
+use LibreNMS\OS\Traits\MefUniEvcMib;
+use LibreNMS\OS\Traits\MplsVpnMib;
 use LibreNMS\OS\Traits\NetstatsPolling;
 use LibreNMS\OS\Traits\QBridgeMib;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
+use LibreNMS\OS\Traits\YamlProcessorDiscovery;
 use LibreNMS\OS\Traits\YamlStorageDiscovery;
+use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Util\StringHelpers;
 
 class OS implements
+    BgpPeerDiscovery,
     ProcessorDiscovery,
     OSDiscovery,
     MempoolsDiscovery,
+    MempoolsPolling,
     StpInstanceDiscovery,
     StpPortDiscovery,
     EntityPhysicalDiscovery,
+    FdbTableDiscovery,
     IcmpNetstatsPolling,
     NeighborDiscovery,
     IpNetstatsPolling,
     IpForwardNetstatsPolling,
+    MefDiscovery,
+    MefPolling,
     SnmpNetstatsPolling,
     StorageDiscovery,
     StpInstancePolling,
@@ -83,7 +103,9 @@ class OS implements
     TcpNetstatsPolling,
     UdpNetstatsPolling,
     VlanDiscovery,
-    VlanPortDiscovery
+    VlanPortDiscovery,
+    VrfDiscovery,
+    VrfPortDiscovery
 {
     use HostResources {
         HostResources::discoverProcessors as discoverHrProcessors;
@@ -97,11 +119,15 @@ class OS implements
     }
     use YamlOSDiscovery;
     use YamlMempoolsDiscovery;
+    use YamlProcessorDiscovery;
     use YamlStorageDiscovery;
     use NetstatsPolling;
+    use Bgp4Mib;
     use BridgeMib;
     use EntityMib;
     use LldpMib;
+    use MefUniEvcMib;
+    use MplsVpnMib;
     use QBridgeMib;
 
     /**
@@ -112,6 +138,7 @@ class OS implements
     private $graphs; // stores device graphs
     private $cache; // data cache
     private $pre_cache; // pre-fetch data cache
+    private ?PerDeviceMethodResults $methodResults = null;
 
     protected ?string $entityVendorTypeMib = null;
 
@@ -155,6 +182,58 @@ class OS implements
     }
 
     /**
+     * The polling method results of the current poll or discovery
+     */
+    public function getMethodResults(): PerDeviceMethodResults
+    {
+        return $this->methodResults ??= new PerDeviceMethodResults($this->getDevice());
+    }
+
+    public function setMethodResults(PerDeviceMethodResults $methodResults): void
+    {
+        $this->methodResults = $methodResults;
+    }
+
+    /**
+     * The sources of a module's data for this device: the data sources of the polling methods,
+     * then this OS when it implements the interface, most of its data is read with SNMP.
+     *
+     * @template T of object
+     *
+     * @param  class-string<T>  $interface
+     * @return list<T>
+     */
+    public function dataSources(string $interface): array
+    {
+        $sources = $this->getMethodResults()->dataSources($interface);
+        $os = $this->dataSource(PollingMethodType::Snmp, $interface);
+
+        if ($os !== null) {
+            $sources[] = $os;
+        }
+
+        return $sources;
+    }
+
+    /**
+     * The source of a module's data from one polling method, for modules that prefer one method. SNMP data comes from this OS.
+     * Null when the method is not available or does not have data for the interface.
+     *
+     * @template T of object
+     *
+     * @param  class-string<T>  $interface
+     * @return T|null
+     */
+    public function dataSource(PollingMethodType $type, string $interface): ?object
+    {
+        if ($type !== PollingMethodType::Snmp) {
+            return $this->getMethodResults()->dataSource($type, $interface);
+        }
+
+        return $this instanceof $interface && $this->getMethodResults()->isAvailable($type) ? $this : null;
+    }
+
+    /**
      * Enable a graph for this device
      *
      * @param  string  $name
@@ -194,6 +273,8 @@ class OS implements
      * @param  string  $mib  mib for this oid
      * @param  string  $snmpflags  snmpflags for this oid
      * @return array|null array indexed by the snmp index with the value as the data returned by snmp
+     *
+     * @deprecated Please use SnmpQuery instead
      */
     public function getCacheByIndex($oid, $mib = null, $snmpflags = '-OQUs')
     {
@@ -220,6 +301,8 @@ class OS implements
      * @param  string  $mib  mib for this oid (optional)
      * @param  int  $depth  depth for snmpwalk_group (optional)
      * @return array|null array indexed by the snmp index with the value as the data returned by snmp
+     *
+     * @deprecated Use SnmpQuery
      */
     public function getCacheTable($oid, $mib = null, $depth = 1)
     {
@@ -239,6 +322,8 @@ class OS implements
      *
      * @param  string  $oid
      * @return bool
+     *
+     * @deprecated Only applies to getCacheByIndex(), use SnmpQuery::cache() instead
      */
     public function isCached($oid)
     {
@@ -332,19 +417,23 @@ class OS implements
 
     /**
      * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
+     * Returns a Collection of Processor models that have been discovered
      *
-     * @return array Processors
+     * @return Collection<int, \App\Models\Processor>
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): Collection
     {
-        $processors = $this->discoverHrProcessors();
-
-        if (empty($processors)) {
-            $processors = $this->discoverUcdProcessors();
+        $processors = $this->discoverYamlProcessors();
+        if ($processors->isNotEmpty()) {
+            return $processors;
         }
 
-        return $processors;
+        $processors = $this->discoverHrProcessors();
+        if ($processors->isNotEmpty()) {
+            return collect($processors);
+        }
+
+        return $this->discoverUcdProcessors();
     }
 
     public function discoverMempools()
@@ -359,6 +448,30 @@ class OS implements
         }
 
         return $this->discoverUcdMempools();
+    }
+
+    /**
+     * Read the OIDs set when the mempools were discovered.
+     */
+    public function pollMempools(EloquentCollection $mempools): EloquentCollection
+    {
+        $oids = $mempools->map->only(['mempool_perc_oid', 'mempool_used_oid', 'mempool_free_oid', 'mempool_total_oid'])
+            ->flatten()->filter()->unique()->values()->all();
+
+        if (empty($oids)) {
+            return $mempools;
+        }
+
+        $data = \SnmpQuery::numeric()->get($oids)->values();
+
+        return $mempools->each(function (Mempool $mempool) use ($data): void {
+            $mempool->fillUsage(
+                $data[(string) $mempool->mempool_used_oid] ?? null,
+                $data[(string) $mempool->mempool_total_oid] ?? null,
+                $data[(string) $mempool->mempool_free_oid] ?? null,
+                $data[(string) $mempool->mempool_perc_oid] ?? null
+            );
+        });
     }
 
     public function discoverStorage(): Collection

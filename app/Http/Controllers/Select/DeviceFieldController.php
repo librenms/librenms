@@ -31,6 +31,7 @@ use App\Models\Device;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use LibreNMS\Enum\DeviceType;
 
 /**
  * @extends SelectController<Device>
@@ -85,7 +86,7 @@ class DeviceFieldController extends SelectController
         if ($field == 'os') {
             $text = LibrenmsConfig::getOsSetting($text, 'text');
         } elseif ($field == 'type') {
-            $text = ucfirst((string) $text);
+            $text = DeviceType::labelFor((string) $text);
         }
 
         return [

@@ -37,7 +37,7 @@ print_optionbar_start();
 ?>
     <div class='row' style="margin-bottom: 10px;">
         <div class='col-md-12'>
-            <span style="font-size: 20px;">Virtual Server - <?php echo $components[$vars['vsid']]['label']?></span><br />
+            <span style="font-size: 20px;">Virtual Server - <?php echo e($components[$vars['vsid']]['label']); ?></span><br />
         </div>
     </div>
     <div class='row'>

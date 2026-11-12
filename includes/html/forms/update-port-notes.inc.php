@@ -11,18 +11,23 @@
  * the source code distribution for details.
  */
 
-use App\Facades\DeviceCache;
-
-Gate::authorize('port.update');
+use App\Models\Port;
+use Illuminate\Support\Facades\Gate;
 
 header('Content-type: application/json');
 
-$status = 'error';
-$message = 'unknown error';
+$port_id_notes = (string) ($_POST['port_id_notes'] ?? '');
+$attrib_value = $_POST['notes'] ?? null;
 
-$device = DeviceCache::get($_POST['device_id']);
-$port_id_notes = $_POST['port_id_notes'];
-$attrib_value = $_POST['notes'];
+$port = preg_match('/^port_id_notes:(\d+)$/', $port_id_notes, $matches) ? Port::with('device')->find((int) $matches[1]) : null;
+
+if ($port === null || $port->device_id != ($_POST['device_id'] ?? null)) {
+    abort(400, 'Invalid port');
+}
+
+Gate::authorize('update', $port);
+
+$device = $port->device;
 
 if (isset($attrib_value) && $device->setAttrib($port_id_notes, $attrib_value)) {
     $status = 'ok';
@@ -31,11 +36,11 @@ if (isset($attrib_value) && $device->setAttrib($port_id_notes, $attrib_value)) {
     $status = 'error';
     $message = 'ERROR: Could not update';
 }
-exit(json_encode([
+
+echo json_encode([
     'status' => $status,
     'message' => $message,
     'attrib_type' => $port_id_notes,
     'attrib_value' => $attrib_value,
     'device_id' => $device->device_id,
-
-]));
+]);

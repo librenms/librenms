@@ -21,8 +21,6 @@ discovery_modules:
     slas: true
     cisco-otv: true
     cisco-pw: true
-    vrf: true
-    cisco-vrf-lite: true
 discovery:
     -
         sysDescr:

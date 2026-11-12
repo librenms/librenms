@@ -72,8 +72,6 @@ return [
             'file' => 'LibreNMS에 추가하거나 업데이트할 snmprec 파일의 이름(기본 이름만). 파일을 지정하지 않으면 장비가 추가되거나 업데이트되지 않습니다.',
         ],
         'options' => [
-            'multiple' => 'snmpsim 대신 커뮤니티 이름을 호스트명으로 사용합니다.',
-            'remove' => '중단 후 장비를 삭제합니다.',
         ],
         'added' => '장비 :hostname (:id)이 추가되었습니다.',
         'exit' => '중단하려면 Ctrl-C를 누르세요.',
