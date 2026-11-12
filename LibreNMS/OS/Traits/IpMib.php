@@ -31,14 +31,11 @@ trait IpMib
     /**
      * Walk ipAddressTable once per context for both address modules.
      *
-     * The cached response is reused unless the agent did not answer, so a timeout in
-     * whichever module runs first cannot hide the other module's addresses.
+     * Both modules must use identical query options, otherwise they get separate cache entries.
      */
     public function walkIpAddressTable(string $context_name): SnmpResponse
     {
-        $query = fn () => SnmpQuery::context($context_name)->allowUnordered()->enumStrings();
-        $response = $query()->cache()->walk('IP-MIB::ipAddressTable');
-
-        return $response->hasConnectionError() ? $query()->walk('IP-MIB::ipAddressTable') : $response;
+        return SnmpQuery::context($context_name)->cache()->allowUnordered()->enumStrings()
+            ->walk('IP-MIB::ipAddressTable');
     }
 }
