@@ -15,6 +15,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
+use LdapRecord\Laravel\Auth\AuthenticatesWithLdap;
+use LdapRecord\Laravel\Auth\LdapAuthenticatable;
 use LibreNMS\Authentication\LegacyAuth;
 use NotificationChannels\WebPush\HasPushSubscriptions;
 use Permissions;
@@ -24,8 +26,9 @@ use Spatie\Permission\Traits\HasRoles;
  * @method static \Database\Factories\UserFactory factory(...$parameters)
  */
 #[ObservedBy([UserObserver::class])]
-class User extends Authenticatable
+class User extends Authenticatable implements LdapAuthenticatable
 {
+    use AuthenticatesWithLdap;
     use HasApiTokens;
     use HasFactory;
     use HasPushSubscriptions;
@@ -57,6 +60,16 @@ class User extends Authenticatable
             'phone' => 'string',
             'can_modify_passwd' => 'integer',
         ];
+    }
+
+    public function getLdapDomainColumn(): string
+    {
+        return 'auth_type';
+    }
+
+    public function getLdapGuidColumn(): string
+    {
+        return 'auth_id';
     }
 
     // ---- Helper Functions ----

@@ -68,7 +68,7 @@ class UserPreferencesController extends Controller implements HasMiddleware
 
         $data = [
             'user' => $user,
-            'can_change_password' => LegacyAuth::get()->canUpdatePasswords($user->username),
+            'can_change_password' => LegacyAuth::getType() !== 'active_directory' && LegacyAuth::get()->canUpdatePasswords($user->username),
             'dashboards' => Dashboard::hasAccess($user)->with('user')->get(),
             'default_dashboard' => UserPref::getPref($user, 'dashboard'),
             'note_to_device' => UserPref::getPref($user, 'add_schedule_note_to_device'),
