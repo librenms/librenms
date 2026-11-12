@@ -9,7 +9,7 @@ if (is_array($sfp_table)) {
         if (!empty($entry['informationTemperature'])) {
             $raw_temp = $entry['informationTemperature'];
             
-            // Extract the Celsius float value from string like "63.5C / 146.7F"
+            // "63.5C / 146.7F"
             if (preg_match('/([0-9.-]+)\s*C/i', $raw_temp, $matches)) {
                 $current = (float)$matches[1];
                 
@@ -26,8 +26,8 @@ if (is_array($sfp_table)) {
                     'informationTemperature.' . $index,
                     'microsens-g6',
                     $descr,
-                    1, // divisor
-                    1, // multiplier
+                    1,
+                    1,
                     null,
                     null,
                     null,
