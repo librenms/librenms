@@ -2,7 +2,9 @@
 
 namespace LibreNMS\Tests\Unit;
 
+use LibreNMS\Data\Source\Snmp\NetSnmpOptions;
 use LibreNMS\Data\Source\Snmp\PhpSnmp;
+use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData;
@@ -43,22 +45,118 @@ class PhpSnmpTest extends TestCase
         $defaults = (new SnmpPollingMethod)->defaults();
 
         foreach ([
-            ['authPriv', ['authPriv', 'SHA', 'authpass', 'AES', 'privpass', 'vrf1']],
-            ['authNoPriv', ['authNoPriv', 'SHA', 'authpass', '', '', 'vrf1']],
-            ['noAuthNoPriv', ['noAuthNoPriv', '', '', '', '', 'vrf1']],
-        ] as [$level, $expected]) {
+            ['authPriv', 'SHA', 'AES', ['authPriv', 'SHA', 'authpass', 'AES', 'privpass', 'vrf1']],
+            ['authPriv', 'SHA-256', 'DES', ['authPriv', 'SHA256', 'authpass', 'DES', 'privpass', 'vrf1']],
+            ['authPriv', 'SHA-512', 'AES', ['authPriv', 'SHA512', 'authpass', 'AES', 'privpass', 'vrf1']],
+            ['authPriv', 'SHA', 'AES-192', ['authPriv', 'SHA', 'authpass', 'AES192', 'privpass', 'vrf1']],
+            ['authPriv', 'SHA', 'AES-256', ['authPriv', 'SHA', 'authpass', 'AES256', 'privpass', 'vrf1']],
+            ['authPriv', 'SHA', 'AES-192-C', ['authPriv', 'SHA', 'authpass', 'AES192C', 'privpass', 'vrf1']],
+            ['authPriv', 'SHA', 'AES-256-C', ['authPriv', 'SHA', 'authpass', 'AES256C', 'privpass', 'vrf1']],
+            ['authPriv', 'SHA', 'aes-256-c', ['authPriv', 'SHA', 'authpass', 'AES256C', 'privpass', 'vrf1']],
+            ['authNoPriv', 'SHA-256', 'AES', ['authNoPriv', 'SHA256', 'authpass', '', '', 'vrf1']],
+            ['authNoPriv', 'SHA-512', 'AES', ['authNoPriv', 'SHA512', 'authpass', '', '', 'vrf1']],
+            ['authNoPriv', 'sha-256', 'AES', ['authNoPriv', 'SHA256', 'authpass', '', '', 'vrf1']],
+            ['authNoPriv', 'MD5', 'AES', ['authNoPriv', 'MD5', 'authpass', '', '', 'vrf1']],
+            ['noAuthNoPriv', 'SHA-224', 'AES-256', ['noAuthNoPriv', '', '', '', '', 'vrf1']],
+        ] as [$level, $authalgo, $cryptoalgo, $expected]) {
             $config = SnmpConfig::make($defaults, new SnmpV3SecretData(
                 authname: 'alice',
                 authlevel: $level,
                 authpass: 'authpass',
-                authalgo: 'SHA',
-                cryptoalgo: 'AES',
+                authalgo: $authalgo,
+                cryptoalgo: $cryptoalgo,
                 cryptopass: 'privpass',
             ));
 
             $snmp = $this->getMockBuilder(\SNMP::class)->disableOriginalConstructor()->onlyMethods(['setSecurity'])->getMock();
-            $snmp->expects($this->once())->method('setSecurity')->with(...$expected);
-            $method->invoke($backend, $snmp, $config, 'vrf1');
+            $snmp->expects($this->once())->method('setSecurity')->with(...$expected)->willReturn(true);
+            $this->assertTrue($method->invoke($backend, $snmp, $config, 'vrf1'));
         }
+    }
+
+    public function testExtendedPrivacyAlgorithmsUseSupportedBackend(): void
+    {
+        if (! class_exists(\SNMP::class) || ! function_exists('snmp_init_mib')) {
+            $this->markTestSkipped('The required SNMP extension is not installed.');
+        }
+
+        $method = new \ReflectionMethod(PhpSnmp::class, 'worksFor');
+        $backend = new PhpSnmp;
+        $defaults = (new SnmpPollingMethod)->defaults();
+
+        foreach ([
+            'AES-192' => 'AES192',
+            'AES-256' => 'AES256',
+            'AES-192-C' => 'AES192C',
+            'AES-256-C' => 'AES256C',
+        ] as $configured => $phpName) {
+            $secret = new SnmpV3SecretData(
+                authname: 'alice',
+                authlevel: 'authPriv',
+                authalgo: 'SHA',
+                authpass: 'authpass',
+                cryptoalgo: $configured,
+                cryptopass: 'privpass',
+            );
+            $config = SnmpConfig::make($defaults, $secret);
+            $snmp = new \SNMP(\SNMP::VERSION_3, 'localhost', 'alice');
+            try {
+                $supported = $snmp->setSecurity('authPriv', 'SHA', 'authpass', $phpName, 'privpass');
+            } catch (\ValueError) {
+                $supported = false;
+            }
+
+            $this->assertSame($supported, $method->invoke($backend, $config, new SnmpQueryOptions), $configured);
+            $this->assertSame(
+                ['-v3', '-l', 'authPriv', '-x', $configured, '-X', 'privpass', '-a', 'SHA', '-A', 'authpass', '-u', 'alice'],
+                (new NetSnmpOptions)->buildAuth($config),
+            );
+        }
+    }
+
+    public function testUnsupportedV3AlgorithmsFallBack(): void
+    {
+        if (! class_exists(\SNMP::class) || ! function_exists('snmp_init_mib')) {
+            $this->markTestSkipped('The required SNMP extension is not installed.');
+        }
+
+        $method = new \ReflectionMethod(PhpSnmp::class, 'worksFor');
+        $backend = new PhpSnmp;
+        $defaults = (new SnmpPollingMethod)->defaults();
+
+        foreach ([
+            new SnmpV3SecretData(authlevel: 'authNoPriv', authalgo: 'unsupported', authpass: 'authpass'),
+            new SnmpV3SecretData(authlevel: 'authPriv', authalgo: 'SHA', authpass: 'authpass', cryptoalgo: 'unsupported', cryptopass: 'privpass'),
+        ] as $secret) {
+            $this->assertFalse($method->invoke($backend, SnmpConfig::make($defaults, $secret), new SnmpQueryOptions));
+        }
+    }
+
+    public function testFailedSecuritySetupFallsBack(): void
+    {
+        if (! class_exists(\SNMP::class) || ! function_exists('snmp_init_mib')) {
+            $this->markTestSkipped('The required SNMP extension is not installed.');
+        }
+
+        $config = SnmpConfig::make((new SnmpPollingMethod)->defaults(), new SnmpV3SecretData(
+            authlevel: 'authNoPriv',
+            authalgo: 'SHA',
+            authpass: 'short',
+        ));
+        $warnings = [];
+        set_error_handler(function (int $severity, string $message) use (&$warnings): bool {
+            $warnings[] = $message;
+
+            return true;
+        }, E_WARNING);
+        try {
+            $method = new \ReflectionMethod(PhpSnmp::class, 'worksFor');
+            $result = $method->invoke(new PhpSnmp, $config, new SnmpQueryOptions);
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertFalse($result);
+        $this->assertNotEmpty($warnings);
     }
 }

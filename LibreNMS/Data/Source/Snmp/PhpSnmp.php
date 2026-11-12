@@ -121,7 +121,7 @@ class PhpSnmp implements SnmpBackendInterface
             $snmp = new \SNMP(\SNMP::VERSION_3, 'localhost', 'root', 1000000, 3);
             try {
                 $this->setSecurityOptions($snmp, $config, $options->context);
-            } catch (\Exception) {
+            } catch (\Exception|\Error) {
                 return false;
             }
         }
@@ -132,13 +132,26 @@ class PhpSnmp implements SnmpBackendInterface
     private function setSecurityOptions(\SNMP $snmp, SnmpConfig $config, ?string $context): void
     {
         $authlevel = strtolower((string) $config->authlevel);
+        $authalgo = match (strtoupper((string) $config->authalgo)) {
+            'SHA-256' => 'SHA256',
+            'SHA-512' => 'SHA512',
+            default => $config->authalgo,
+        };
+        $cryptoalgo = match (strtoupper((string) $config->cryptoalgo)) {
+            'AES-192' => 'AES192',
+            'AES-256' => 'AES256',
+            'AES-192-C' => 'AES192C',
+            'AES-256-C' => 'AES256C',
+            default => $config->cryptoalgo,
+        };
+
         if ($authlevel === 'authpriv') {
-            $snmp->setSecurity('authPriv', $config->authalgo, $config->authpass, $config->cryptoalgo, $config->cryptopass, $context ?: '');
+            $snmp->setSecurity('authPriv', $authalgo, $config->authpass, $cryptoalgo, $config->cryptopass, $context ?: '');
         } elseif ($authlevel === 'authnopriv') {
-            $snmp->setSecurity('authNoPriv', $config->authalgo, $config->authpass, '', '', $context ?: ''); /** @phpstan-ignore argument.type */
-        } else {
-            $snmp->setSecurity('noAuthNoPriv', '', '', '', '', $context ?: ''); /** @phpstan-ignore argument.type, argument.type */
+            $snmp->setSecurity('authNoPriv', $authalgo, $config->authpass, '', '', $context ?: ''); /** @phpstan-ignore argument.type */
         }
+
+        $snmp->setSecurity('noAuthNoPriv', '', '', '', '', $context ?: ''); /** @phpstan-ignore argument.type, argument.type */
     }
 
     /**
