@@ -72,15 +72,10 @@ class PhpSnmp implements SnmpBackendInterface
             return null;
         }
 
-        $community = $config->community ?: 'public';
-        if ($options->context) {
-            $community .= '@' . $options->context;
-        }
-
         $snmp = new \SNMP(
             $this->snmpver($config->version),
             Rewrite::addIpv6Brackets($target) . ':' . $config->port,
-            $community,
+            $this->communityOrUsername($config, $options->context),
             $config->timeout * 1000000,
             $config->retries,
         );
@@ -90,6 +85,17 @@ class PhpSnmp implements SnmpBackendInterface
         $this->initMibs($options);
 
         return $snmp;
+    }
+
+    private function communityOrUsername(SnmpConfig $config, string $context): string
+    {
+        if ($config->version === 'v3') {
+            return $config->authname ?: 'root';
+        }
+
+        $community = $config->community ?: 'public';
+
+        return $context ? "$community@$context" : $community;
     }
 
     /**
@@ -125,9 +131,10 @@ class PhpSnmp implements SnmpBackendInterface
 
     private function setSecurityOptions(\SNMP $snmp, SnmpConfig $config, ?string $context): void
     {
-        if ($config->authlevel === 'authpriv') {
+        $authlevel = strtolower((string) $config->authlevel);
+        if ($authlevel === 'authpriv') {
             $snmp->setSecurity('authPriv', $config->authalgo, $config->authpass, $config->cryptoalgo, $config->cryptopass, $context ?: '');
-        } elseif ($config->authlevel === 'authnopriv') {
+        } elseif ($authlevel === 'authnopriv') {
             $snmp->setSecurity('authNoPriv', $config->authalgo, $config->authpass, '', '', $context ?: ''); /** @phpstan-ignore argument.type */
         } else {
             $snmp->setSecurity('noAuthNoPriv', '', '', '', '', $context ?: ''); /** @phpstan-ignore argument.type, argument.type */
