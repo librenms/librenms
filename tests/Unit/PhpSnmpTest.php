@@ -13,6 +13,9 @@ use LibreNMS\Tests\TestCase;
 
 class PhpSnmpTest extends TestCase
 {
+    /**
+     * @return array{version: string, transport: string, port: int, timeout: int|float, retries: int, max_repeaters: int, max_oid: int, bulk: bool, context: ?string, port_association_mode: string}
+     */
     private function backendDefaults(): array
     {
         return ['transport' => 'udp', 'bulk' => true] + (new SnmpPollingMethod)->defaults();
@@ -129,6 +132,8 @@ class PhpSnmpTest extends TestCase
         }
 
         $method = new \ReflectionMethod(PhpSnmp::class, 'worksFor');
+        // Extended AES names depend on the installed SNMP extension.
+        $setSecurity = new \ReflectionMethod(\SNMP::class, 'setSecurity');
         $backend = new PhpSnmp;
         $defaults = $this->backendDefaults();
 
@@ -149,7 +154,7 @@ class PhpSnmpTest extends TestCase
             $config = SnmpConfig::make($defaults, $secret);
             $snmp = new \SNMP(\SNMP::VERSION_3, 'localhost', 'alice');
             try {
-                $supported = $snmp->setSecurity('authPriv', 'SHA', 'authpass', $phpName, 'privpass');
+                $supported = $setSecurity->invoke($snmp, 'authPriv', 'SHA', 'authpass', $phpName, 'privpass');
             } catch (\ValueError) {
                 $supported = false;
             }
