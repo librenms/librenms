@@ -11,11 +11,11 @@ class AuthLogoutListener
 {
     public function handle(Logout $event): void
     {
-        /** @var User $user */
-        $user = $event->user ?: (object) ['username' => 'Not found'];
+        /** @var User|null $user */
+        $user = $event->user;
 
         Log::channel('auth')->info('Logged Out', [
-            'user' => $user->username,
+            'user' => $user->username ?? '',
             'address' => Request::ip(),
         ]);
     }

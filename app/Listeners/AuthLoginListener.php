@@ -12,7 +12,7 @@ class AuthLoginListener
     public function handle(Login $event): void
     {
         /** @var User $user */
-        $user = $event->user ?: (object) ['username' => 'Not found'];
+        $user = $event->user;
 
         Log::channel('auth')->info('Logged In', [
             'user' => $user->username,

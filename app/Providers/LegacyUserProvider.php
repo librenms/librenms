@@ -38,7 +38,6 @@ use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Util\Debug;
 use Log;
 use Request;
-use Session;
 
 class LegacyUserProvider implements UserProvider
 {
@@ -141,17 +140,12 @@ class LegacyUserProvider implements UserProvider
             return true;
         } catch (AuthenticationException $ae) {
             $auth_message = $ae->getMessage();
+            // the auth log only records that the credentials were rejected, keep the reason for diagnosis
+            Log::warning("Auth Error: [{$credentials['username']}] $auth_message from " . Request::ip());
             if (Debug::isEnabled()) {
                 $auth_message .= '<br /> ' . $ae->getFile() . ': ' . $ae->getLine();
             }
             toast()->error($auth_message);
-
-            $username = Session::get('username', $credentials['username']);
-
-            Log::channel('auth')->warning($auth_message, [
-                'user' => $username,
-                'address' => Request::ip(),
-            ]);
         }
 
         return false;
