@@ -42,7 +42,6 @@ discovery:
 
 discovery_modules:
     entity-physical: false
-    cisco-vrf-lite: false
     sensors: false
     storage: false
     hr-device: false

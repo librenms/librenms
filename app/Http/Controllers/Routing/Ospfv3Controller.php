@@ -34,6 +34,7 @@ class Ospfv3Controller extends Controller
     public function __invoke(Request $request): View
     {
         $instances = Ospfv3Instance::hasAccess($request->user())
+            ->where('ospfv3AdminStatus', 'enabled')
             ->with('device')
             ->withCount([
                 'areas',

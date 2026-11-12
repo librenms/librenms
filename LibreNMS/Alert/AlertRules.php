@@ -152,10 +152,14 @@ readonly class AlertRules
 
         /** @var array<string, AlertFault> $existing */
         $existing = [];
+        $previousEntityCount = 0;
         foreach (AlertFault::query()->where('rule_id', $rule->id)->where('device_id', $this->device->device_id)
             ->where('open', 1)->get() as $fault) {
             /** @var AlertFault $fault */
             $existing[$fault->entity_key] = $fault;
+            if ((int) $fault->state !== AlertState::RECOVERED) {
+                $previousEntityCount++;
+            }
         }
 
         $added = 0;
@@ -206,7 +210,11 @@ readonly class AlertRules
             Log::info(PHP_EOL . 'Status: %gOK%n', ['color' => true]);
         }
 
-        if ($added > 0 || $removed > 0) {
+        // Independent acknowledgements survive changes to other entities. Keep grouped
+        // until-change behaviour when either side of the change exceeds max_entities.
+        $perEntity = AlertUtil::shouldNotifyPerEntity($rule, $previousEntityCount)
+            && AlertUtil::shouldNotifyPerEntity($rule, count($faulting));
+        if (($added > 0 || $removed > 0) && ! $perEntity) {
             $acked = AlertFault::query()
                 ->where('rule_id', $rule->id)
                 ->where('device_id', $this->device->device_id)
@@ -318,6 +326,17 @@ readonly class AlertRules
                 //    sets alerted = RECOVERED itself.
                 if ($newState !== AlertState::ACKNOWLEDGED && $newState !== AlertState::RECOVERED) {
                     $alertRow->alerted = 0;
+                } elseif ($newState === AlertState::RECOVERED && (int) $alertRow->alerted === 0) {
+                    $notified = AlertFault::query()
+                        ->where('rule_id', $rule->id)
+                        ->where('device_id', $this->device->device_id)
+                        ->where('open', 1)
+                        ->where('state', AlertState::RECOVERED)
+                        ->where('alerted', '!=', 0)
+                        ->max('alerted');
+                    if ($notified) {
+                        $alertRow->alerted = (int) $notified;
+                    }
                 }
                 $alertRow->timestamp = Carbon::now();
             }

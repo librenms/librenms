@@ -2,6 +2,9 @@
 
 namespace LibreNMS\Tests\Feature\Http;
 
+use App\Facades\LibrenmsConfig;
+use App\Models\AlertLog;
+use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -51,10 +54,19 @@ class AlertStatsTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'alert-stats']))
+            ->get(route('device.faults.stats', $device->device_id))
             ->assertOk()
-            ->assertSee('Device Alerts')
+            ->assertSee('Alert Stats')
             ->assertSee('critical');
+    }
+
+    public function testLegacyUrlRedirects(): void
+    {
+        $device = Device::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->get("/device/$device->device_id/alert-stats")
+            ->assertRedirect(route('device.faults.stats', $device->device_id));
     }
 
     public function testUserWithoutAccessGetsForbidden(): void
@@ -65,7 +77,29 @@ class AlertStatsTabTest extends TestCase
         $user->assignRole('user');
 
         $this->actingAs($user)
-            ->get(route('device', ['device' => $device, 'tab' => 'alert-stats']))
+            ->get(route('device.faults.stats', $device->device_id))
             ->assertForbidden();
+    }
+
+    public function testGlobalStatsOnlyCountAccessibleDevices(): void
+    {
+        LibrenmsConfig::set('alert_graph_date_format', '%Y-%m-%d');
+        $device = Device::factory()->create();
+        $critical = AlertRule::factory()->create(['severity' => 'critical']);
+        $warning = AlertRule::factory()->create(['severity' => 'warning']);
+        AlertLog::factory()->create(['device_id' => $device->device_id, 'rule_id' => $critical->id, 'state' => 1, 'time_logged' => '2026-10-01 12:00:00']);
+        AlertLog::factory()->create(['device_id' => $device->device_id, 'rule_id' => $critical->id, 'state' => 0, 'time_logged' => '2026-10-01 13:00:00']); // cleared, not counted
+        AlertLog::factory()->create(['rule_id' => $warning->id, 'state' => 1, 'time_logged' => '2026-10-02 12:00:00']); // another device
+
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->assignRole('user');
+        $user->devicesOwned()->attach($device->device_id);
+
+        $stats = $this->actingAs($user)->get(route('alert-stats'))->assertOk()->viewData('stats');
+        $this->assertSame(['critical'], $stats['groups']);
+        $this->assertSame([['x' => '2026-10-01', 'y' => 1, 'group' => 'critical']], $stats['items']);
+
+        $stats = $this->actingAs($this->admin())->get(route('alert-stats'))->assertOk()->viewData('stats');
+        $this->assertEqualsCanonicalizing(['critical', 'warning'], $stats['groups']);
     }
 }

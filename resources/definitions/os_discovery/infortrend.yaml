@@ -1,35 +1,425 @@
 modules:
-   os:
-        serial: 
-            - IFT-SNMP-MIB::serialNum.0
-        hardware:
-            - IFT-SNMP-MIB::privateLogoModel.0
-   sensors:
-       temperature:
-            data:
-                -
-                    oid: IFT-SNMP-MIB::luDevTable
-                    value: IFT-SNMP-MIB::luDevValue
-                    num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.9.{{ $index }}'
-                    divisor: 10
-                    index: 'temp{{ $index }}'
-                    descr: IFT-SNMP-MIB::luDevDescription
-                    skip_values:                
-                        -
-                            oid: IFT-SNMP-MIB::luDevTypeCode
-                            op: '!='
-                            value: 3
-       voltage:
-            data:
-                - 
-                    oid: IFT-SNMP-MIB::luDevTable
-                    value: IFT-SNMP-MIB::luDevValue
-                    num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.9.{{ $index }}'
-                    divisor: 1000
-                    index: 'voltage{{ $index }}'
-                    descr: IFT-SNMP-MIB::luDevDescription
-                    skip_values:                
-                        -
-                            oid: IFT-SNMP-MIB::luDevTypeCode
-                            op: '!='
-                            value: 5
+  os:
+    hardware:
+      - IFT-SNMP-MIB::privateLogoModel.0
+    serial:
+      - IFT-SNMP-MIB::serialNum.0
+      - IFT-SNMP-MIB::serialNumSec.0
+    version_template: '{{ IFT-SNMP-MIB::fwMajorVersion.0 }}.{{ IFT-SNMP-MIB::fwMinorVersion.0 }}.{{ IFT-SNMP-MIB::fwEngineerVersion.0 }}'
+
+  sensors:
+    state:
+      data:
+
+        # luDevStatus is a per-device-class BITMASK, not a plain 1-5 enum
+        -
+          oid: IFT-SNMP-MIB::luDevTable
+          value: IFT-SNMP-MIB::luDevStatus
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.13.{{ $index }}'
+          descr: IFT-SNMP-MIB::luDevDescription
+          index: 'luDevStatus.{{ $index }}'
+          state_name: luDevStatusGeneric
+          states:
+            - { value: 0,   generic: 0, descr: ok }
+            - { value: 1,   generic: 2, descr: malfunction }
+            - { value: 64,  generic: 1, descr: off }
+            - { value: 65,  generic: 2, descr: 'malfunction, off' }
+            - { value: 128, generic: 3, descr: 'not present' }
+            - { value: 129, generic: 2, descr: 'malfunction, not present' }
+            - { value: 192, generic: 3, descr: 'off, not present' }
+            - { value: 193, generic: 2, descr: 'malfunction, off, not present' }
+            - { value: 255, generic: 3, descr: unknown }
+          skip_values:
+            -
+              oid: IFT-SNMP-MIB::luDevTypeCode
+              op: 'not_in_array'
+              value: [1, 2, 4, 10, 11, 13, 14, 18, 31]
+
+       
+        -
+          oid: IFT-SNMP-MIB::luDevTable
+          value: IFT-SNMP-MIB::luDevStatus
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.13.{{ $index }}'
+          descr: IFT-SNMP-MIB::luDevDescription
+          index: 'luDevStatus.{{ $index }}'
+          state_name: luDevStatusLED
+          states:
+            - { value: 0,   generic: 0, descr: ok }
+            - { value: 1,   generic: 2, descr: malfunction }
+            - { value: 64,  generic: 1, descr: off }
+            - { value: 65,  generic: 2, descr: 'malfunction, off' }
+            - { value: 128, generic: 3, descr: 'not present' }
+            - { value: 129, generic: 2, descr: 'malfunction, not present' }
+            - { value: 192, generic: 3, descr: 'off, not present' }
+            - { value: 193, generic: 2, descr: 'malfunction, off, not present' }
+            - { value: 255, generic: 3, descr: unknown }
+          skip_values:
+            -
+              oid: IFT-SNMP-MIB::luDevDescriptor
+              op: 'not_in_array'
+              value: [33]
+
+        -
+          oid: IFT-SNMP-MIB::luDevTable
+          value: IFT-SNMP-MIB::luDevStatus
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.13.{{ $index }}'
+          descr: 'Temperature Out-of-Range Flag {{ $index }}'
+          index: 'luDevStatus.{{ $index }}'
+          state_name: luDevStatusTempFlag
+          states:
+            - { value: 0,   generic: 0, descr: ok }
+            - { value: 1,   generic: 2, descr: 'temperature out of range' }
+            - { value: 255, generic: 3, descr: unknown }
+          skip_values:
+            -
+              oid: IFT-SNMP-MIB::luDevTypeCode
+              op: '!='
+              value: 8
+
+        -
+          oid: IFT-SNMP-MIB::luDevTable
+          value: IFT-SNMP-MIB::luDevStatus
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.13.{{ $index }}'
+          descr: IFT-SNMP-MIB::luDevDescription
+          index: 'luDevStatus.{{ $index }}'
+          state_name: luDevStatusDoor
+          states:
+            - { value: 0,   generic: 0, descr: 'closed, locked' }
+            - { value: 1,   generic: 2, descr: malfunction }
+            - { value: 2,   generic: 1, descr: open }
+            - { value: 3,   generic: 2, descr: 'malfunction, open' }
+            - { value: 64,  generic: 1, descr: 'closed, unlocked' }
+            - { value: 65,  generic: 2, descr: 'malfunction, unlocked' }
+            - { value: 66,  generic: 1, descr: 'open, unlocked' }
+            - { value: 67,  generic: 2, descr: 'malfunction, open, unlocked' }
+            - { value: 128, generic: 3, descr: 'not present' }
+            - { value: 129, generic: 2, descr: 'malfunction, not present' }
+            - { value: 130, generic: 3, descr: 'not present' }
+            - { value: 131, generic: 2, descr: 'malfunction, not present' }
+            - { value: 192, generic: 3, descr: 'not present' }
+            - { value: 193, generic: 2, descr: 'malfunction, not present' }
+            - { value: 194, generic: 3, descr: 'not present' }
+            - { value: 195, generic: 2, descr: 'malfunction, not present' }
+            - { value: 255, generic: 3, descr: unknown }
+          skip_values:
+            -
+              oid: IFT-SNMP-MIB::luDevTypeCode
+              op: '!='
+              value: 9
+
+        -
+          oid: IFT-SNMP-MIB::luDevTable
+          value: IFT-SNMP-MIB::luDevStatus
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.13.{{ $index }}'
+          descr: IFT-SNMP-MIB::luDevDescription
+          index: 'luDevStatus.{{ $index }}'
+          state_name: luDevStatusSlot
+          states:
+            - { value: 0,   generic: 0, descr: ok }
+            - { value: 1,   generic: 2, descr: malfunction }
+            - { value: 2,   generic: 1, descr: 'marked for replacement' }
+            - { value: 3,   generic: 2, descr: 'malfunction, marked for replacement' }
+            - { value: 4,   generic: 2, descr: 'not activated' }
+            - { value: 5,   generic: 2, descr: 'malfunction, not activated' }
+            - { value: 6,   generic: 2, descr: 'marked for replacement, not activated' }
+            - { value: 7,   generic: 2, descr: 'malfunction, marked for replacement, not activated' }
+            - { value: 64,  generic: 1, descr: 'ready for insertion/removal' }
+            - { value: 65,  generic: 2, descr: 'malfunction, ready for insertion/removal' }
+            - { value: 66,  generic: 1, descr: 'marked for replacement, ready for removal' }
+            - { value: 67,  generic: 2, descr: 'malfunction, marked for replacement, ready for removal' }
+            - { value: 68,  generic: 1, descr: 'not activated, ready for removal' }
+            - { value: 69,  generic: 2, descr: 'malfunction, not activated, ready for removal' }
+            - { value: 70,  generic: 1, descr: 'marked for replacement, not activated, ready for removal' }
+            - { value: 71,  generic: 2, descr: 'malfunction, marked for replacement, not activated, ready for removal' }
+            - { value: 128, generic: 3, descr: empty }
+            - { value: 129, generic: 2, descr: 'malfunction, empty' }
+            - { value: 130, generic: 3, descr: empty }
+            - { value: 131, generic: 2, descr: 'malfunction, empty' }
+            - { value: 132, generic: 3, descr: empty }
+            - { value: 133, generic: 2, descr: 'malfunction, empty' }
+            - { value: 134, generic: 3, descr: empty }
+            - { value: 135, generic: 2, descr: 'malfunction, empty' }
+            - { value: 192, generic: 3, descr: 'ready for insertion, empty' }
+            - { value: 193, generic: 2, descr: 'malfunction, ready for insertion, empty' }
+            - { value: 194, generic: 3, descr: 'ready for insertion, empty' }
+            - { value: 195, generic: 2, descr: 'malfunction, ready for insertion, empty' }
+            - { value: 196, generic: 3, descr: 'ready for insertion, empty' }
+            - { value: 197, generic: 2, descr: 'malfunction, ready for insertion, empty' }
+            - { value: 198, generic: 3, descr: 'ready for insertion, empty' }
+            - { value: 199, generic: 2, descr: 'malfunction, ready for insertion, empty' }
+            - { value: 255, generic: 3, descr: unknown }
+          skip_values:
+            -
+              oid: IFT-SNMP-MIB::luDevTypeCode
+              op: '!='
+              value: 17
+
+        # Logical Drive Status.
+        -
+          oid: IFT-SNMP-MIB::ldTable
+          value: IFT-SNMP-MIB::ldStatus
+          num_oid: '.1.3.6.1.4.1.1714.1.1.2.1.6.{{ $index }}'
+          descr: 'Logical Drive {{ IFT-SNMP-MIB::ldID }}'
+          index: 'ldStatus.{{ $index }}'
+          state_name: ldStatus
+          states:
+            - { value: 0, generic: 0, descr: good }
+            - { value: 1, generic: 1, descr: rebuilding }
+            - { value: 2, generic: 1, descr: initializing }
+            - { value: 3, generic: 2, descr: degraded }
+            - { value: 4, generic: 2, descr: dead }
+            - { value: 5, generic: 2, descr: invalid }
+            - { value: 6, generic: 2, descr: incomplete }
+            - { value: 7, generic: 2, descr: drive missing }
+            - { value: 64, generic: 0, descr: 'good' }
+            - { value: 65, generic: 1, descr: 'rebuilding (flag bit 6 set)' }
+            - { value: 66, generic: 1, descr: 'initializing (flag bit 6 set)' }
+            - { value: 67, generic: 2, descr: 'degraded (flag bit 6 set)' }
+            - { value: 68, generic: 2, descr: 'dead (flag bit 6 set)' }
+            - { value: 69, generic: 2, descr: 'invalid (flag bit 6 set)' }
+            - { value: 70, generic: 2, descr: 'incomplete (flag bit 6 set)' }
+            - { value: 71, generic: 2, descr: 'drive missing (flag bit 6 set)' }
+            - { value: 128, generic: 2, descr: 'good (offline)' }
+            - { value: 129, generic: 2, descr: 'rebuilding (offline)' }
+            - { value: 130, generic: 2, descr: 'initializing (offline)' }
+            - { value: 131, generic: 2, descr: 'degraded (offline)' }
+            - { value: 132, generic: 2, descr: 'dead (offline)' }
+            - { value: 133, generic: 2, descr: 'invalid (offline)' }
+            - { value: 134, generic: 2, descr: 'incomplete (offline)' }
+            - { value: 135, generic: 2, descr: 'drive missing (offline)' }
+            - { value: 192, generic: 2, descr: 'good (offline, flag bit 6 set)' }
+            - { value: 193, generic: 2, descr: 'rebuilding (offline, flag bit 6 set)' }
+            - { value: 194, generic: 2, descr: 'initializing (offline, flag bit 6 set)' }
+            - { value: 195, generic: 2, descr: 'degraded (offline, flag bit 6 set)' }
+            - { value: 196, generic: 2, descr: 'dead (offline, flag bit 6 set)' }
+            - { value: 197, generic: 2, descr: 'invalid (offline, flag bit 6 set)' }
+            - { value: 198, generic: 2, descr: 'incomplete (offline, flag bit 6 set)' }
+            - { value: 199, generic: 2, descr: 'drive missing (offline, flag bit 6 set)' }
+
+        # Physical Hard Drive Status.
+        -
+          oid: IFT-SNMP-MIB::hddTable
+          value: IFT-SNMP-MIB::hddStatus
+          num_oid: '.1.3.6.1.4.1.1714.1.1.6.1.11.{{ $index }}'
+          descr: 'Drive Slot {{ IFT-SNMP-MIB::hddSlotNum }} {{ IFT-SNMP-MIB::hddModelStr }}'
+          index: 'hddStatus.{{ $index }}'
+          state_name: hddStatus
+          states:
+            - { value: 0, generic: 0, descr: new }
+            - { value: 1, generic: 0, descr: online }
+            - { value: 2, generic: 0, descr: used }
+            - { value: 3, generic: 0, descr: spare }
+            - { value: 4, generic: 1, descr: initialization }
+            - { value: 5, generic: 1, descr: rebuilding }
+            - { value: 6, generic: 1, descr: add-to-ld }
+            - { value: 9, generic: 0, descr: global-spare }
+            - { value: 17, generic: 1, descr: cloning }
+            - { value: 18, generic: 0, descr: clone-valid }
+            - { value: 19, generic: 1, descr: copying }
+            - { value: 63, generic: 3, descr: absent }
+            - { value: 252, generic: 2, descr: missing-global-spare }
+            - { value: 253, generic: 2, descr: missing-spare }
+            - { value: 254, generic: 2, descr: missing }
+            - { value: 255, generic: 2, descr: failed }
+          skip_values:
+            -
+              oid: IFT-SNMP-MIB::hddSlotNum
+              op: '='
+              value: 0
+
+        # Dual-controller
+        -
+          oid: IFT-SNMP-MIB::redCtlrStatus
+          value: IFT-SNMP-MIB::redCtlrStatus
+          num_oid: '.1.3.6.1.4.1.1714.1.1.1.6.4.{{ $index }}'
+          descr: 'Redundant Controller Status'
+          index: 'redCtlrStatus'
+          state_name: redCtlrStatus
+          states:
+            - { value: 0, generic: 1, descr: inactive }
+            - { value: 1, generic: 1, descr: scanning }
+            - { value: 17, generic: 0, descr: detected }
+            - { value: 18, generic: 0, descr: enabled }
+            - { value: 63, generic: 2, descr: 'controller failed' }
+            - { value: 64, generic: 1, descr: 'inactive (originally secondary)' }
+            - { value: 65, generic: 1, descr: 'scanning (originally secondary)' }
+            - { value: 81, generic: 0, descr: 'detected (originally secondary)' }
+            - { value: 82, generic: 0, descr: 'enabled (originally secondary)' }
+            - { value: 127, generic: 2, descr: 'controller failed (originally secondary)' }
+            - { value: 128, generic: 1, descr: 'inactive (secondary)' }
+            - { value: 129, generic: 1, descr: 'scanning (secondary)' }
+            - { value: 145, generic: 0, descr: 'detected (secondary)' }
+            - { value: 146, generic: 0, descr: 'enabled (secondary)' }
+            - { value: 191, generic: 2, descr: 'controller failed (secondary)' }
+            - { value: 192, generic: 1, descr: 'inactive (secondary, originally secondary)' }
+            - { value: 193, generic: 1, descr: 'scanning (secondary, originally secondary)' }
+            - { value: 209, generic: 0, descr: 'detected (secondary, originally secondary)' }
+            - { value: 210, generic: 0, descr: 'enabled (secondary, originally secondary)' }
+            - { value: 255, generic: 2, descr: 'controller failed (secondary, originally secondary)' }
+          skip_values:
+            -
+              oid: IFT-SNMP-MIB::redCtlrCfg
+              op: '='
+              value: 255
+
+    temperature:
+      data:
+        -
+          oid: IFT-SNMP-MIB::luDevTable
+          value: IFT-SNMP-MIB::luDevValue
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.9.{{ $index }}'
+          descr: IFT-SNMP-MIB::luDevDescription
+          index: 'temp{{ $index }}'
+          divisor: 10
+          skip_values:
+            -
+              oid: IFT-SNMP-MIB::luDevTypeCode
+              op: '!='
+              value: 3
+            -
+              oid: IFT-SNMP-MIB::luDevValue
+              op: '='
+              value: 0
+
+    voltage:
+      data:
+        -
+          oid: IFT-SNMP-MIB::luDevTable
+          value: IFT-SNMP-MIB::luDevValue
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.9.{{ $index }}'
+          descr: IFT-SNMP-MIB::luDevDescription
+          index: 'voltage{{ $index }}'
+          divisor: 1000
+          skip_values:
+            -
+              oid: IFT-SNMP-MIB::luDevTypeCode
+              op: '!='
+              value: 5
+            -
+              oid: IFT-SNMP-MIB::luDevValue
+              op: '='
+              value: 0
+
+    current:
+      data:
+        -
+          oid: IFT-SNMP-MIB::luDevTable
+          value: IFT-SNMP-MIB::luDevValue
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.9.{{ $index }}'
+          descr: IFT-SNMP-MIB::luDevDescription
+          index: 'current.{{ $index }}'
+          divisor: 1000
+          skip_values:
+            -
+              oid: IFT-SNMP-MIB::luDevTypeCode
+              op: '!='
+              value: 6
+            -
+              oid: IFT-SNMP-MIB::luDevValue
+              op: '='
+              value: 0
+
+    fanspeed:
+      data:
+        -
+          oid: IFT-SNMP-MIB::luDevTable
+          value: IFT-SNMP-MIB::luDevValue
+          num_oid: '.1.3.6.1.4.1.1714.1.1.9.1.9.{{ $index }}'
+          descr: IFT-SNMP-MIB::luDevDescription
+          index: 'fanspeed.{{ $index }}'
+          skip_values:
+            -
+              oid: IFT-SNMP-MIB::luDevTypeCode
+              op: '!='
+              value: 2
+            -
+              oid: IFT-SNMP-MIB::luDevValue
+              op: '='
+              value: 0
+
+    percent:
+      data:
+        -
+          oid: IFT-SNMP-MIB::hddTable
+          value: IFT-SNMP-MIB::hddWearLife
+          num_oid: '.1.3.6.1.4.1.1714.1.1.6.1.50.{{ $index }}'
+          descr: 'SSD {{ IFT-SNMP-MIB::hddSlotNum }} Wear Life'
+          index: 'hddWearLife.{{ $index }}'
+          group: SSD Wear Life
+          low_limit: 10
+          low_warn_limit: 20
+          skip_values:
+            -
+              oid: IFT-SNMP-MIB::hddWearLife
+              op: '='
+              value: -1
+
+    count:
+      data:
+
+        -
+          oid: IFT-SNMP-MIB::lvTable
+          value: IFT-SNMP-MIB::lvSize
+          num_oid: '.1.3.6.1.4.1.1714.1.1.3.1.3.{{ $index }}'
+          descr: 'LUN {{ IFT-SNMP-MIB::lvID }} (TB)'
+          index: 'lvSize.{{ $index }}'
+          multiplier: 24
+          divisor: 46881075200
+          group: LUN Capacity
+
+        -
+          oid: IFT-SNMP-MIB::hddTable
+          value: IFT-SNMP-MIB::hddSize
+          num_oid: '.1.3.6.1.4.1.1714.1.1.6.1.7.{{ $index }}'
+          descr: 'Drive Slot {{ IFT-SNMP-MIB::hddSlotNum }} {{ IFT-SNMP-MIB::hddModelStr }} (TB)'
+          index: 'hddSize.{{ $index }}'
+          multiplier: 4
+          divisor: 7813512960
+          group: Physical Drive Capacity
+          skip_values:
+            -
+              oid: IFT-SNMP-MIB::hddSlotNum
+              op: '='
+              value: 0
+
+        -
+          oid: IFT-SNMP-MIB::cacheTotal
+          value: IFT-SNMP-MIB::cacheTotal
+          num_oid: '.1.3.6.1.4.1.1714.1.1.1.2.3.{{ $index }}'
+          descr: 'Cache Total Blocks'
+          index: 'cacheTotal'
+
+        -
+          oid: IFT-SNMP-MIB::cacheDirty
+          value: IFT-SNMP-MIB::cacheDirty
+          num_oid: '.1.3.6.1.4.1.1714.1.1.1.2.4.{{ $index }}'
+          descr: 'Cache Dirty Blocks'
+          index: 'cacheDirty'
+
+        -
+          oid: IFT-SNMP-MIB::ldTable
+          value: IFT-SNMP-MIB::ldTotalDrvCnt
+          num_oid: '.1.3.6.1.4.1.1714.1.1.2.1.8.{{ $index }}'
+          descr: 'LD {{ $index }} Total Drives'
+          index: 'ldTotalDrvCnt.{{ $index }}'
+
+        -
+          oid: IFT-SNMP-MIB::ldTable
+          value: IFT-SNMP-MIB::ldOnlineDrvCnt
+          num_oid: '.1.3.6.1.4.1.1714.1.1.2.1.9.{{ $index }}'
+          descr: 'LD {{ $index }} Online Drives'
+          index: 'ldOnlineDrvCnt.{{ $index }}'
+
+        -
+          oid: IFT-SNMP-MIB::ldTable
+          value: IFT-SNMP-MIB::ldSpareDrvCnt
+          num_oid: '.1.3.6.1.4.1.1714.1.1.2.1.10.{{ $index }}'
+          descr: 'LD {{ $index }} Spare Drives'
+          index: 'ldSpareDrvCnt.{{ $index }}'
+
+        -
+          oid: IFT-SNMP-MIB::ldTable
+          value: IFT-SNMP-MIB::ldFailedDrvCnt
+          num_oid: '.1.3.6.1.4.1.1714.1.1.2.1.11.{{ $index }}'
+          descr: 'LD {{ $index }} Failed Drives'
+          index: 'ldFailedDrvCnt.{{ $index }}'

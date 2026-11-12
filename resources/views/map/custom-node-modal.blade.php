@@ -289,6 +289,7 @@
         // Update the node with the selected values on success and run the callback
         node.device_id = $("#device_id").val();
         node.linked_map_id = $("#maplink").val();
+        const labelCleared = Boolean(node.label) && ! $("#nodelabel").val();
         node.label = $("#nodelabel").val();
         node.shape = $("#nodestyle").val();
         node.font.face = $("#nodetextface").val();
@@ -323,6 +324,9 @@
             network_nodes.add(node);
         } else {
             network_nodes.update(node);
+            if (labelCleared) {
+                recreateNode(node);
+            }
         }
 
         if(node.id) {
@@ -334,7 +338,6 @@
         }
 
         $("#map-saveDataButton").show();
-        $("#map-renderButton").show();
     }
 
     function nodeEdit(nodeconf) {

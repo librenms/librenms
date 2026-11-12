@@ -32,6 +32,7 @@
                     "sensor_type": "grandstream-sw",
                     "sensor_descr": "switch-temperature-0",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 47.38,

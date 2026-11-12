@@ -43,11 +43,11 @@ class DevicesSearchTest extends TestCase
         $user = User::factory()->admin()->create(['enabled' => true]);
         $device = Device::factory()->create([
             'hostname' => 'other',
-            'location_id' => \App\Models\Location::factory()->create(['location' => 'London'])->id,
+            'location_id' => \App\Models\Location::factory()->create(['location' => 'Sweet Potato Warehouse'])->id,
         ]);
 
         $response = $this->actingAs($user)
-            ->getJson(route('ajax.search.devices', ['search' => 'London']));
+            ->getJson(route('ajax.search.devices', ['search' => 'potato']));
 
         $response->assertStatus(200)
             ->assertJsonPath('groups.0.type', 'devices')
@@ -81,7 +81,7 @@ class DevicesSearchTest extends TestCase
             'device_id' => $device->device_id,
             'port_id' => \App\Models\Port::factory()->create(['device_id' => $device->device_id])->port_id,
             'mac_address' => $mac,
-            'vlan_id' => 1,
+            'vlan' => 1,
         ]);
 
         $response = $this->actingAs($user)

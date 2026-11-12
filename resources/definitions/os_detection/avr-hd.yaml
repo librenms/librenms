@@ -1,6 +1,6 @@
 os: avr-hd
 text: 'AvediaPlayer Receivers'
-type: appliance
+type: audiovisual
 icon: exterity
 over:
     - { graph: device_bits, text: Traffic }

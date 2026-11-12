@@ -45,7 +45,7 @@ $config["rrdtool_version"] = '1.1';
 EOF
         );
 
-        (new CheckRrdVersion())->fix();
+        new CheckRrdVersion()->fix();
 
         $actual = Storage::disk('base')->get('config.php');
         $this->assertSame(<<<'EOF'

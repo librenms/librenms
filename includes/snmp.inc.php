@@ -17,14 +17,12 @@
  */
 
 use App\Events\SnmpQueryExecuted;
-use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Source\Snmp\NetSnmpOptions;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Exceptions\SnmpException;
-use LibreNMS\Polling\Method\Config\SnmpConfig;
 use LibreNMS\Util\Mib;
 use LibreNMS\Util\StringHelpers;
 
@@ -39,10 +37,10 @@ function snmp_exec(string $cmd, array|string|null $oids, array|string|null $opti
     $os = $device['os'] ?? 'generic';
     $oids = Arr::wrap($oids);
 
-    $config = SnmpConfig::fromDeviceArray($device);
+    $config = DeviceCache::get($device['device_id'] ?? 0)->polling()->snmp();
 
     $queryOptions = resolve(NetSnmpOptions::class)->parseCli($options);
-    $queryOptions->context = $device['context_name'] ?? $queryOptions->context;
+    $queryOptions->context = $device['context_name'] ?? ($config->context ?: $queryOptions->context);
     $queryOptions->mibs = Mib::parseCliInput($mibs ?? '', $queryOptions->mibs);
     $queryOptions->mibDirs = Mib::directories($os, Mib::parseCliInput($mibdir ?? '', $queryOptions->mibDirs));
     if ($cmd === 'snmpwalk') {
@@ -207,7 +205,6 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
  */
 function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
-    $snmpcmd = [LibrenmsConfig::get('snmpgetnext', 'snmpgetnext')];
     $data = trim(snmp_exec('snmpgetnext', $oid, $options, $device, $mib, $mibdir), "\" \n\r");
 
     if (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data)) {
@@ -386,40 +383,6 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibd
 
     return $array;
 }
-
-/**
- * @deprecated Please use SnmpQuery instead
- */
-function snmpwalk_cache_twopart_oid($device, $oid, $array = [], $mib = 0, $mibdir = null, $snmpflags = '-OQUs')
-{
-    $data = trim(snmp_exec('snmpwalk', $oid, $snmpflags, $device, $mib, $mibdir));
-
-    if (empty($data)) {
-        return $array;
-    }
-
-    foreach (explode("\n", $data) as $entry) {
-        if (! Str::contains($entry, ' =')) {
-            if (! empty($entry) && isset($first, $second, $oid)) {
-                $array[$first][$second][$oid] .= "\n$entry"; // multi-line value, append to previous entry
-            }
-
-            continue;
-        }
-
-        [$oid,$value] = explode('=', $entry, 2);
-        $oid = trim($oid);
-        $value = trim($value);
-        $value = str_replace('"', '', $value);
-        $parts = explode('.', $oid);
-        if (! strstr($value, 'at this OID') && count($parts) >= 3) {
-            [$oid, $first, $second] = $parts;
-            $array[$first][$second][$oid] = $value;
-        }
-    }
-
-    return $array;
-}//end snmpwalk_cache_twopart_oid()
 
 /**
  * SNMPWalk_array_num - performs a numeric SNMPWalk and returns an array containing $count indexes

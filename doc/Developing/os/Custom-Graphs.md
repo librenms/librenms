@@ -1,5 +1,10 @@
 # Custom Device Graphs
 
+To add a custom device graph, define where it appears, collect its data, and
+create a graph class. This page covers the definition and polling steps. See
+[Creating Graphs](../Graphs.md) for the class-based graph method and a complete
+`PulseUsersGraph` example that displays the data collected below.
+
 First define your graphs in
 `resources/definitions/config_definitions.json`. Your work is then
 available to everyone.
@@ -23,15 +28,18 @@ available to everyone.
         },
 ```
 
-Without a contribution, put the definitions in `config.php`.
+To customize these settings locally, use `lnms config:set`.
 
-```config.php
-// Pulse Secure Graphs
-$config['graph_types']['device']['pulse_users'] = ['section' => 'firewall', 'order' => 0, 'descr' => 'Active Users'];
-$config['graph_types']['device']['pulse_sessions'] = ['section' => 'firewall', 'order' => 0, 'descr' => 'Active Sessions'];
+```bash
+lnms config:set graph_types.device.pulse_users '{"section":"firewall","order":0,"descr":"Active Users"}'
+lnms config:set graph_types.device.pulse_sessions '{"section":"firewall","order":0,"descr":"Active Sessions"}'
 ```
 
-#### Polling OS
+These settings define the graphs' labels and sections. The poller enables each
+graph for an individual device by calling `enableGraph()` after collecting
+valid data.
+
+## Polling OS
 
 OS polling is not always the correct place for your own polling code.
 For guidance, ask a core developer on
@@ -43,9 +51,9 @@ Update the example file with more polling:
 LibreNMS/OS/Pulse.php
 ```
 
-This code declares two graphs: one for the number of users and one for
-the number of sessions. The two graphs appear in the firewall section
-of the graphs tab. The definition include file sets this position.
+The example below collects the number of users and enables `pulse_users` for
+this device. The graph settings above place it in the firewall section of the
+Graphs tab. Add equivalent polling for `pulse_sessions` to show sessions too.
 
 ```php
 <?php
@@ -78,36 +86,12 @@ class Pulse extends \LibreNMS\OS implements OSPolling
 }
 ```
 
-#### Displaying
+## Displaying
 
-LibreNMS does not show these graphs automatically. Add this PHP code:
+Create `app/Graphs/Device/PulseUsersGraph.php` using the example in
+[Creating Graphs](../Graphs.md#2-create-the-graph-class). It reads the
+`pulse_users` measurement and its `users` field, matching the poller above.
 
-**Pulse Users**
-
-```bash
-includes/html/graphs/device/pulse_users.inc.php
-```
-
-```php
-<?php
-
-$rrd_filename = Rrd::name($device['hostname'], 'pulse_users');
-
-require 'includes/html/graphs/common.inc.php';
-
-$ds = 'users';
-
-$colour_area = '9999cc';
-$colour_line = '0000cc';
-
-$colour_area_max = '9999cc';
-
-$graph_max = 1;
-
-$unit_text = 'Users';
-
-require 'includes/html/graphs/generic_simplex.inc.php';
-```
-
-The graph appears in the web interface after the first data
-collection.
+The graph appears in the firewall section of the device's Graphs tab after
+polling collects data and enables the graph. Use the same steps for
+`pulse_sessions`, with a matching poller and graph class.

@@ -76,7 +76,8 @@ class CustomMapDataController extends Controller
             ];
             if ($edge->port) {
                 $edges[$edgeid]['device_id'] = $edge->port->device_id;
-                $edges[$edgeid]['port_name'] = $edge->port->device->displayName() . ' - ' . $edge->port->getLabel();
+                $device = $edge->port->device;
+                $edges[$edgeid]['port_name'] = $device->display . ' - ' . $edge->port->getLabel();
 
                 // Get speed to and from
                 if ($edge->reverse) {

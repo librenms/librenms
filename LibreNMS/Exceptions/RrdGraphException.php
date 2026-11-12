@@ -26,35 +26,6 @@
 
 namespace LibreNMS\Exceptions;
 
-use LibreNMS\Util\Graph;
-
-class RrdGraphException extends RrdException
+class RrdGraphException extends GraphException
 {
-    /**
-     * @param  string  $error
-     * @param  string|null  $short_text
-     * @param  int|string|null  $width
-     * @param  int|string|null  $height
-     * @param  int  $exit_code
-     * @param  string  $image_output
-     */
-    public function __construct($error, private $short_text = null, private $width = null, private $height = null, $exit_code = 0, protected $image_output = '')
-    {
-        parent::__construct($error, $exit_code);
-    }
-
-    public function getImage(): string
-    {
-        return $this->image_output;
-    }
-
-    public function generateErrorImage(): string
-    {
-        return Graph::error(
-            $this->getMessage(),
-            $this->short_text,
-            empty($this->width) ? 300 : (int) $this->width,
-            empty($this->height) ? null : (int) $this->height,
-        );
-    }
 }

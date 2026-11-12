@@ -2042,6 +2042,7 @@
                     "sensor_type": "ifotecSensor",
                     "sensor_descr": "Internal Temperature 1",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 10,
                     "sensor_multiplier": 1,
                     "sensor_current": 30,

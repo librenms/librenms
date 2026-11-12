@@ -20,7 +20,7 @@ class DeviceDependenciesController extends TableController
     {
         $this->authorize('device.update');
 
-        return Device::query()
+        return Device::hasAccess($request->user())
             ->with('parents')
             ->when($request->has('sort.parents'), fn (Builder $query) => $query->withMin('parents', 'hostname'));
     }

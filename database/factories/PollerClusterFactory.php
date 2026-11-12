@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Queue\WorkerNode;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /** @extends Factory<\App\Models\PollerCluster> */
@@ -12,10 +13,15 @@ class PollerClusterFactory extends Factory
         return [
             'node_id' => $this->faker->unique()->uuid(),
             'poller_name' => $this->faker->unique()->domainWord() . '-poller',
-            'poller_version' => '24.10.0',
+            'poller_version' => 'librenms-service',
             'poller_groups' => '0',
             'last_report' => $this->faker->dateTimeThisMonth(),
             'master' => 0,
         ];
+    }
+
+    public function worker(): static
+    {
+        return $this->state(['poller_version' => WorkerNode::VERSION]);
     }
 }

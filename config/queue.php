@@ -27,9 +27,9 @@ return [
 
     ],
 
-    // framework default is sqlite
+    // framework default is sqlite, the queue pages read failed jobs from this table (App\Models\FailedJob)
     'failed' => [
-        'driver' => env('QUEUE_FAILED_DRIVER', 'database-uuids'),
+        'driver' => 'database-uuids',
         'database' => env('DB_CONNECTION', env('DBTEST') ? 'testing' : 'mysql'),
         'table' => 'failed_jobs',
     ],

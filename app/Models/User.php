@@ -33,12 +33,13 @@ class User extends Authenticatable
     use Notifiable;
 
     protected $primaryKey = 'user_id';
-    protected $fillable = ['realname', 'username', 'email', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id', 'enabled'];
+    protected $fillable = ['realname', 'username', 'email', 'phone', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id', 'enabled'];
     protected $hidden = ['password', 'remember_token', 'pivot'];
     protected $attributes = [ // default values
         'descr' => '',
         'realname' => '',
         'email' => '',
+        'phone' => '',
     ];
     protected $dispatchesEvents = [
         'created' => UserCreated::class,
@@ -53,13 +54,9 @@ class User extends Authenticatable
             'realname' => 'string',
             'descr' => 'string',
             'email' => 'string',
+            'phone' => 'string',
             'can_modify_passwd' => 'integer',
         ];
-    }
-
-    public function toFlare(): array
-    {
-        return $this->only(['auth_type', 'enabled']);
     }
 
     // ---- Helper Functions ----

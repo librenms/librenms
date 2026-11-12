@@ -1,7 +1,7 @@
 os: feos
 group: trellix
 text: 'FireEye OS'
-type: appliance
+type: security
 icon: trellix
 mib_dir: trellix
 over:

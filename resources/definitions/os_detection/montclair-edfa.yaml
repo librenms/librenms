@@ -1,6 +1,6 @@
 os: montclair-edfa
 text: Montclair EDFA
-type: network
+type: optical
 ifname: true
 empty_ifdescr: true
 mib_dir: montclair

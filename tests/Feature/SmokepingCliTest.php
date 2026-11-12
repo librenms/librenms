@@ -28,10 +28,13 @@ namespace LibreNMS\Tests\Feature;
 
 use App\Console\Commands\SmokepingGenerateCommand;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Tests\DBTestCase;
+use LibreNMS\Util\Binaries;
 
 final class SmokepingCliTest extends DBTestCase
 {
@@ -144,8 +147,29 @@ final class SmokepingCliTest extends DBTestCase
         $tests = [0, -1];
 
         foreach ($tests as $test) {
-            $this->assertEmpty($this->instance->assembleProbes($test));
+            $this->assertEmpty($this->instance->assembleProbes($test, new Binaries));
         }
+    }
+
+    public function testProbesRequireFping(): void
+    {
+        config(['librenms.binaries.fping' => '/nonexistent/fping']);
+        Device::factory()->create();
+
+        $this->assertNotEquals(0, \Artisan::call('smokeping:generate --probes'));
+        $this->assertStringContainsString(__('commands.smokeping:generate.no-fping'), \Artisan::output());
+        $this->assertEquals(0, \Artisan::call('smokeping:generate --targets --no-dns'));
+    }
+
+    public function testFping6FallsBackToFping(): void
+    {
+        $fping = base_path('lnms'); // any executable file
+        config(['librenms.binaries.fping' => $fping, 'librenms.binaries.fping6' => '/nonexistent/fping6']);
+
+        $probes = $this->instance->assembleProbes(1, new Binaries);
+
+        $this->assertContains('+ FPing6', $probes);
+        $this->assertSame(["  binary = $fping", "  binary = $fping"], array_values(array_filter($probes, fn (string $line): bool => str_starts_with($line, '  binary = '))));
     }
 
     public function testBuildProbe(): void
@@ -341,6 +365,34 @@ final class SmokepingCliTest extends DBTestCase
         $this->assertEquals(implode(PHP_EOL, $saved), implode(PHP_EOL, $output));
     }
 
+    public function testControlCharactersStripped(): void
+    {
+        $groups = [
+            "server\nslave evil" => [
+                'host.example.org' => [
+                    'transport' => 'udp',
+                    'displayname' => "Host\r\nhost = 192.0.2.1",
+                ],
+            ],
+        ];
+
+        $saved = [
+            '+ server_slave_evil',
+            '  menu = server slave evil',
+            '  title = server slave evil',
+            '',
+            '++ host_example_org',
+            '   menu = Host host = 192.0.2.1',
+            '   title = Host host = 192.0.2.1',
+            '   host = host.example.org',
+            '',
+        ];
+
+        $output = $this->instance->buildTargets($groups, 4, true);
+
+        $this->assertEquals(implode(PHP_EOL, $saved), implode(PHP_EOL, $output));
+    }
+
     public function testCompareLegacy(): void
     {
         $data = [];
@@ -360,6 +412,22 @@ final class SmokepingCliTest extends DBTestCase
         $old = $this->legacyAlgo($data);
 
         $this->assertEquals($this->canonicalise($new), $this->canonicalise($old));
+    }
+
+    public function testTargetsUseTheSnmpTransport(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'smoke.example.com', 'type' => 'server']);
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'settings' => ['transport' => 'udp6'],
+        ]);
+
+        \Artisan::call('smokeping:generate --targets --no-header --no-dns');
+        $output = \Artisan::output();
+
+        $this->assertStringContainsString("   title = $device->display", $output);
+        $this->assertStringContainsString('   probe = lnmsFPing6-', $output);
     }
 
     public function legacyAlgo($data)

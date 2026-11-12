@@ -24,7 +24,7 @@
                 <x-device.overview.memory :device="$device" />
                 <x-device.overview.storage :device="$device" />
                 <x-device.overview.printer-supplies :device="$device" />
-                <x-device.overview.sensors :device="$device" :sensor-groups="$data['sensorGroups']" />
+                <x-device.overview.sensors :device="$device" :panels="$data['sensorPanels']" />
                 <x-device.overview.eventlog :device="$device" :eventlogs="$data['eventlogs']" :ports="$data['eventPorts']" />
                 <x-device.overview.services :device="$device" />
                 <x-device.overview.syslog :device="$device" :syslogs="$data['syslogs']" />

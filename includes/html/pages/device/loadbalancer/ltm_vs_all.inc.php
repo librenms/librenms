@@ -52,11 +52,11 @@
         <tr>
             <td><?php echo $vs_id; ?></td>
             <td><?php echo $id; ?></td>
-            <td><?php echo $array['label']; ?></td>
-            <td><?php echo $string; ?></td>
-            <td><?php echo $array['pool']; ?></td>
-            <td><?php echo $status; ?></td>
-            <td><?php echo $message; ?></td>
+            <td><?php echo e($array['label']); ?></td>
+            <td><?php echo e($string); ?></td>
+            <td><?php echo e($array['pool']); ?></td>
+            <td><?php echo e($status); ?></td>
+            <td><?php echo e($message); ?></td>
         </tr>
         <?php
     }
@@ -177,7 +177,7 @@
                 2: "danger"
             },
         }).on("click.rs.jquery.bootgrid", function (e, columns, row) {
-            var link = '<?php echo \LibreNMS\Util\Url::generate($vars, ['type' => 'ltm_vs', 'subtype' => 'ltm_vs_det']); ?>vsid='+row['vsid']+'/poolid='+row['poolid'];
+            var link = <?php echo json_encode(\LibreNMS\Util\Url::generate($vars, ['type' => 'ltm_vs', 'subtype' => 'ltm_vs_det'])); ?> + 'vsid=' + row['vsid']+'/poolid='+row['poolid'];
             window.location.href = link;
         });
     </script>

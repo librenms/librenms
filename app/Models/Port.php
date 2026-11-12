@@ -33,6 +33,7 @@ class Port extends DeviceRelatedModel
     protected $guarded = [];
     protected array $filterable = [
         'device_id',
+        'port_id',
         'ifName',
         'ifDescr',
         'portName',
@@ -350,6 +351,15 @@ class Port extends DeviceRelatedModel
     public function scopeInPortGroup($query, $portGroup)
     {
         return $query->whereIn($query->qualifyColumn('port_id'), function ($query) use ($portGroup): void {
+            $query->select('port_id')
+                ->from('port_group_port')
+                ->where('port_group_id', $portGroup);
+        });
+    }
+
+    public function scopeNotInPortGroup($query, $portGroup)
+    {
+        return $query->whereNotIn($query->qualifyColumn('port_id'), function ($query) use ($portGroup): void {
             $query->select('port_id')
                 ->from('port_group_port')
                 ->where('port_group_id', $portGroup);

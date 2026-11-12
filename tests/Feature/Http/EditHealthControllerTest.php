@@ -5,6 +5,7 @@ namespace LibreNMS\Tests\Feature\Http;
 use App\Models\Device;
 use App\Models\Sensor;
 use App\Models\User;
+use App\Models\UserPref;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\TestCase;
 use Spatie\Permission\Models\Role;
@@ -71,6 +72,20 @@ final class EditHealthControllerTest extends TestCase
             ->assertSee('value="40"', false)
             ->assertSee('value="5"', false)
             ->assertSee('value="1"', false);
+    }
+
+    public function testHealthPageShowsCelsiusRegardlessOfUserPreference(): void
+    {
+        $device = Device::factory()->create();
+        $this->sensor($device);
+        $admin = $this->admin();
+        UserPref::setPref($admin, 'temp_units', 'f');
+
+        $this->actingAs($admin)
+            ->get(route('device.edit.health', $device))
+            ->assertOk()
+            ->assertSee('12 °C')
+            ->assertDontSee('°F');
     }
 
     public function testUserCannotViewHealthPage(): void

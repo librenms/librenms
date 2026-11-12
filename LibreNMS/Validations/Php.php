@@ -28,6 +28,7 @@ namespace LibreNMS\Validations;
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Config;
+use LibreNMS\Util\Binaries;
 use LibreNMS\Validator;
 
 class Php extends BaseValidation
@@ -58,7 +59,7 @@ class Php extends BaseValidation
         }
 
         $web_version = PHP_VERSION;
-        $cli_version = rtrim(shell_exec('php -r "echo PHP_VERSION;"'));
+        $cli_version = rtrim(shell_exec($this->php() . ' -r "echo PHP_VERSION;"'));
         if (version_compare($web_version, $cli_version, '!=')) {
             $validator->fail("PHP version of your webserver ($web_version) does not match the cli version ($cli_version)", 'If you updated PHP recently, restart php-fpm or apache to switch to the new version');
         }
@@ -66,7 +67,7 @@ class Php extends BaseValidation
 
     private function checkExtensions(Validator $validator)
     {
-        $required_modules = ['mysqlnd', 'mbstring', 'pcre', 'curl', 'xml', 'gd', 'sockets', 'dom'];
+        $required_modules = ['mysqlnd', 'mbstring', 'pcre', 'curl', 'xml', 'gd', 'sockets', 'dom', 'posix'];
 
         if (LibrenmsConfig::get('distributed_poller') && Config::get('cache.default') == 'memcached') {
             $required_modules[] = 'memcached';
@@ -75,15 +76,16 @@ class Php extends BaseValidation
         foreach ($required_modules as $extension) {
             if (! extension_loaded($extension)) {
                 $validator->fail("Missing PHP extension: $extension", "Please install $extension");
-            } elseif (shell_exec("php -r \"var_export(extension_loaded('$extension'));\"") == 'false') {
+            } elseif (shell_exec($this->php() . " -r \"var_export(extension_loaded('$extension'));\"") == 'false') {
                 $validator->fail("Missing CLI PHP extension: $extension", "Please install $extension");
             }
         }
 
-        $suggested_extensions = ['posix' => 'php-process'];
-        foreach ($suggested_extensions as $extension => $packages) {
-            if (! extension_loaded($extension)) {
-                $validator->warn("Missing optional PHP extension: $extension", "It is suggested you install $packages or the one that matches your php version");
+        // only available on the cli
+        $required_cli_modules = ['pcntl'];
+        foreach ($required_cli_modules as $extension) {
+            if (shell_exec($this->php() . " -r \"var_export(extension_loaded('$extension'));\"") == 'false') {
+                $validator->fail("Missing CLI PHP extension: $extension", "Please install $extension");
             }
         }
     }
@@ -122,7 +124,7 @@ class Php extends BaseValidation
         $ini_tz = ini_get('date.timezone');
         $sh_tz = rtrim(shell_exec('date +%Z'));
         $php_tz = date('T');
-        $php_cli_tz = rtrim(shell_exec('php -r "echo date(\'T\');"'));
+        $php_cli_tz = rtrim(shell_exec($this->php() . ' -r "echo date(\'T\');"'));
 
         if (empty($ini_tz)) {
             // make sure timezone is set
@@ -141,12 +143,20 @@ class Php extends BaseValidation
             // check if web and cli timezones match (this does nothing if validate.php is run on cli)
             // some distros have different php.ini for cli and the web server
             if ($sh_tz !== $php_cli_tz) {
-                $ini_file = rtrim(shell_exec('php -r "echo php_ini_loaded_file();"'));
+                $ini_file = rtrim(shell_exec($this->php() . ' -r "echo php_ini_loaded_file();"'));
                 $validator->fail(
                     "The CLI php.ini ($php_cli_tz) timezone is different than your system's timezone ($sh_tz)",
                     "Edit your CLI ini file $ini_file and set the correct timezone ($sh_tz)."
                 );
             }
         }
+    }
+
+    /**
+     * The php cli used by LibreNMS, for comparison with the web server
+     */
+    private function php(): string
+    {
+        return escapeshellarg(resolve(Binaries::class)->path('php'));
     }
 }

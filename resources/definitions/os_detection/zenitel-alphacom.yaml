@@ -1,6 +1,6 @@
 os: zenitel-alphacom
 text: 'AlphaCom'
-type: server
+type: voice
 icon: zenitel
 mib_dir: zenitel
 over:

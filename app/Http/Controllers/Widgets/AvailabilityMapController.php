@@ -208,7 +208,7 @@ class AvailabilityMapController extends WidgetController
 
     private function getDeviceTooltip(Device $device, string $state_name): string
     {
-        $tooltip = $device->displayName();
+        $tooltip = $device->display;
 
         if (! $device->status && ! $device->last_polled) {
             $time = __('Never polled');
@@ -225,7 +225,8 @@ class AvailabilityMapController extends WidgetController
 
     private function getServiceTooltip(Service $service): string
     {
-        $tooltip = $service->device->displayName() . ' [' . $service->service_type . ']';
+        $device = $service->device;
+        $tooltip = $device->display . ' [' . $service->service_type . ']';
 
         $description = $service->service_name ?: $service->service_desc;
         if ($description) {

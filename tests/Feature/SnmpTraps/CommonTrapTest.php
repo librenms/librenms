@@ -117,7 +117,7 @@ SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::authenticationFailure\n";
         // check that eventlog was logged
         $eventlog = Eventlog::latest('event_id')->first();
         $this->assertEquals($device->device_id, $eventlog->device_id, 'Trap eventlog device incorrect');
-        $this->assertEquals('SNMP Trap: Authentication Failure: ' . $device->displayName(), $eventlog->message, 'Trap eventlog message incorrect');
+        $this->assertEquals('SNMP Trap: Authentication Failure: ' . $device->display, $eventlog->message, 'Trap eventlog message incorrect');
         $this->assertEquals('auth', $eventlog->type, 'Trap eventlog type incorrect');
         $this->assertEquals(Severity::Notice, $eventlog->severity, 'Trap eventlog severity incorrect');
     }
@@ -139,7 +139,7 @@ SNMPv2-MIB::snmpTrapOID.0 BRIDGE-MIB::newRoot";
         // check that eventlog was logged
         $eventlog = Eventlog::latest('event_id')->first();
         $this->assertEquals($device->device_id, $eventlog->device_id, 'Trap eventlog device incorrect');
-        $this->assertEquals('SNMP Trap: Device ' . $device->displayName() . ' was elected as new root on one of its Spanning Tree Instances', $eventlog->message, 'Trap eventlog message incorrect');
+        $this->assertEquals('SNMP Trap: Device ' . $device->display . ' was elected as new root on one of its Spanning Tree Instances', $eventlog->message, 'Trap eventlog message incorrect');
         $this->assertEquals('stp', $eventlog->type, 'Trap eventlog type incorrect');
         $this->assertEquals(Severity::Notice, $eventlog->severity, 'Trap eventlog severity incorrect');
     }

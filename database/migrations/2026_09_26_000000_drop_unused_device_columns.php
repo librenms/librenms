@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    private const OLD_FIELD = 'devices.last_ping_timetaken';
-    private const NEW_FIELD = 'device_stats.ping_rtt_last';
-    private const NEW_SQL = '(SELECT ping_rtt_last FROM device_stats WHERE device_stats.device_id = devices.device_id)';
+    private const string OLD_FIELD = 'devices.last_ping_timetaken';
+    private const string NEW_FIELD = 'device_stats.ping_rtt_last';
+    private const string NEW_SQL = '(SELECT ping_rtt_last FROM device_stats WHERE device_stats.device_id = devices.device_id)';
 
     /**
      * Ping data is stored in device_stats, agent_uptime and last_poll_attempted are never written.

@@ -3,10 +3,12 @@
 use App\Http\Controllers\AboutController;
 use App\Http\Controllers\Ajax;
 use App\Http\Controllers\AlertController;
+use App\Http\Controllers\AlertHistoryController;
 use App\Http\Controllers\AlertOperationController;
 use App\Http\Controllers\AlertRuleController;
 use App\Http\Controllers\AlertRuleTemplateController;
 use App\Http\Controllers\AlertScheduleController;
+use App\Http\Controllers\AlertStatsController;
 use App\Http\Controllers\AlertTemplateController;
 use App\Http\Controllers\AlertTransportController;
 use App\Http\Controllers\AlertTransportGroupController;
@@ -23,6 +25,8 @@ use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\DeviceDependencyController;
 use App\Http\Controllers\DeviceGroupController;
 use App\Http\Controllers\DevicesController;
+use App\Http\Controllers\FaultsController;
+use App\Http\Controllers\FirstRunController;
 use App\Http\Controllers\GraphController;
 use App\Http\Controllers\GraphsPageController;
 use App\Http\Controllers\Install;
@@ -39,6 +43,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OuiLookupController;
 use App\Http\Controllers\OutagesController;
 use App\Http\Controllers\OverviewController;
+use App\Http\Controllers\PackagesController;
 use App\Http\Controllers\PluginLegacyController;
 use App\Http\Controllers\PluginPageController;
 use App\Http\Controllers\PluginSettingsController;
@@ -47,13 +52,18 @@ use App\Http\Controllers\PollerGroupController;
 use App\Http\Controllers\PollerSettingsController;
 use App\Http\Controllers\PortController;
 use App\Http\Controllers\PortGroupController;
+use App\Http\Controllers\PortGroupPortsController;
 use App\Http\Controllers\PortSecurityController;
 use App\Http\Controllers\PortTypeController;
 use App\Http\Controllers\PushNotificationController;
+use App\Http\Controllers\QueueController;
 use App\Http\Controllers\RealtimeDataController;
 use App\Http\Controllers\RealtimeGraphController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Routing;
+use App\Http\Controllers\Search;
+use App\Http\Controllers\SearchController;
+use App\Http\Controllers\SecretController;
 use App\Http\Controllers\Select;
 use App\Http\Controllers\SensorController;
 use App\Http\Controllers\ServiceController;
@@ -110,6 +120,13 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('devices/{view?}/{graph?}/{vars?}', [DevicesController::class, 'index'])->where('vars', '.*')
         ->middleware(['saved-filter:devices'])
         ->name('devices');
+    Route::get('alert-log/{vars?}', [AlertHistoryController::class, 'index'])->where('vars', '.*')
+        ->middleware('saved-filter:alert-log')->name('alert-log');
+    Route::get('alert-stats', AlertStatsController::class)->name('alert-stats');
+    Route::get('faults/{vars?}', [FaultsController::class, 'index'])->where('vars', '.*')
+        ->middleware('saved-filter:faults')->name('faults');
+    Route::get('alerts/{vars?}', [FaultsController::class, 'index'])->where('vars', '.*')
+        ->middleware('saved-filter:faults'); // legacy alias
     Route::resource('device-groups', DeviceGroupController::class);
     Route::get('device-dependencies', [DeviceDependencyController::class, 'index'])->name('device-dependencies.index');
     Route::post('device-groups/{device_group}/rediscover', [DeviceGroupController::class, 'rediscover'])->name('device-groups.rediscover');
@@ -117,6 +134,8 @@ Route::middleware(['auth'])->group(function (): void {
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
     Route::get('outages', [OutagesController::class, 'index'])->name('outages');
+    Route::get('packages', [PackagesController::class, 'index'])->middleware('saved-filter:packages')->name('packages.index');
+    Route::get('packages/{legacy}', [PackagesController::class, 'legacy'])->where('legacy', '.*=.*');
     Route::resource('port', PortController::class)->only('update');
     Route::get('port/{port}/popup', App\Http\Controllers\PortPopupController::class)->name('port.popup');
     Route::get('vlans', [App\Http\Controllers\VlansController::class, 'index'])->name('vlans.index');
@@ -132,6 +151,13 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('{legacy?}', Routing\RoutingController::class)->where('legacy', '.*=.*')->name('index');
     });
     Route::get('port-security', [PortSecurityController::class, 'index'])->name('port-security.index');
+    Route::prefix('search')->group(function (): void {
+        Route::get('', [SearchController::class, 'index'])->middleware('saved-filter:network-search')->name('search');
+        Route::get('results', Search\HostResultsController::class)->name('search.results');
+        Route::get('name', Search\HostNameController::class)->middleware('signed')->name('search.name');
+        Route::get('export', Search\HostExportController::class)->name('search.export');
+        Route::match(['get', 'post'], '{legacy}', [SearchController::class, 'legacy'])->where('legacy', '.*=.*');
+    });
     Route::get('porttype/{type}', [PortTypeController::class, 'graph'])->name('porttype.graph');
     Route::get('portgroup/{group}', [PortGroupController::class, 'graph'])->name('portgroup.graph')->whereNumber('group');
     Route::prefix('poller')->group(function (): void {
@@ -140,12 +166,16 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('groups', [PollerController::class, 'groupsTab'])->name('poller.groups');
         Route::get('settings', [PollerController::class, 'settingsTab'])->name('poller.settings');
         Route::get('performance', [PollerController::class, 'performanceTab'])->name('poller.performance');
+        Route::get('queues', [QueueController::class, 'index'])->name('poller.queues');
+        Route::post('queues/failed/{id}/retry', [QueueController::class, 'retry'])->name('poller.queues.retry');
+        Route::delete('queues/failed/{id}', [QueueController::class, 'forget'])->name('poller.queues.forget');
+        Route::delete('queues/locks/{device}', [QueueController::class, 'releaseLock'])->name('poller.queues.release-lock');
         Route::resource('{id}/settings', PollerSettingsController::class, ['as' => 'poller'])->only(['update', 'destroy']);
         Route::delete('{poller}', [PollerController::class, 'destroy'])->name('poller.destroy');
         Route::delete('cluster/{poller_cluster}', [PollerController::class, 'destroyCluster'])->name('poller-cluster.destroy');
     });
-    Route::delete('ports/purge', [\App\Http\Controllers\PortsController::class, 'purge'])->name('ports.purge');
-    Route::get('ports/{view?}/{graph?}', [\App\Http\Controllers\PortsController::class, 'index'])
+    Route::delete('ports/purge', [App\Http\Controllers\PortsController::class, 'purge'])->name('ports.purge');
+    Route::get('ports/{view?}/{graph?}', [App\Http\Controllers\PortsController::class, 'index'])
         ->middleware('saved-filter:ports')->name('ports');
     Route::prefix('services')->name('services.')->group(function (): void {
         Route::resource('templates', ServiceTemplateController::class);
@@ -190,6 +220,14 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('bill', [UserPermissionsController::class, 'attachBill'])->name('bill.attach');
         Route::delete('bill/{bill}', [UserPermissionsController::class, 'detachBill'])->name('bill.detach')->whereNumber('bill');
     });
+    Route::resource('secrets', SecretController::class);
+    Route::prefix('first-run')->name('first-run')->group(function (): void {
+        Route::get('/', [FirstRunController::class, 'index']);
+        Route::post('credentials', [FirstRunController::class, 'credentials'])->name('.credentials');
+        Route::post('networks', [FirstRunController::class, 'networks'])->name('.networks');
+        Route::post('scan', [FirstRunController::class, 'scan'])->name('.scan');
+        Route::post('finish', [FirstRunController::class, 'finish'])->name('.finish');
+    });
     Route::get('about', [AboutController::class, 'index'])->name('about');
     Route::delete('reporting', [AboutController::class, 'clearReportingData'])->name('reporting.clear');
     Route::get('authlog', [AuthLogController::class, 'index'])->name('auth-log');
@@ -200,6 +238,9 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('nac', [NacController::class, 'index']);
 
     // Device Tabs
+    Route::get('/device/add', [Device\AddDeviceController::class, 'index'])->name('device.add');
+    Route::post('/device/add', [Device\AddDeviceController::class, 'store'])->name('device.add.store');
+    Route::redirect('/addhost', '/device/add');
     Route::get('/device/{device}/edit', [Device\EditDeviceController::class, 'index'])->name('device.edit');
     Route::put('/device/{device}/edit', [Device\EditDeviceController::class, 'update'])->name('device.edit.update');
     Route::get('/device/{device}/edit/health', [Device\EditHealthController::class, 'index'])->name('device.edit.health');
@@ -212,6 +253,11 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('/device/{device}/edit/modules', [Device\EditModulesController::class, 'index'])->name('device.edit.modules');
     Route::put('/device/{device}/edit/modules/{module}', [Device\EditModulesController::class, 'update'])->name('device.edit.modules.update');
     Route::delete('/device/{device}/edit/modules/{module}', [Device\EditModulesController::class, 'delete'])->name('device.edit.modules.delete');
+    Route::get('/device/{device}/edit/polling', [Device\EditPollingController::class, 'index'])->name('device.edit.polling');
+    Route::post('/device/{device}/edit/polling', [Device\EditPollingController::class, 'store'])->name('device.edit.polling.store');
+    Route::put('/device/{device}/edit/polling/{methodType}', [Device\EditPollingController::class, 'update'])->name('device.edit.polling.update');
+    Route::delete('/device/{device}/edit/polling/{methodType}', [Device\EditPollingController::class, 'destroy'])->name('device.edit.polling.destroy')
+        ->where('methodType', '.+'); // stored unknown types may contain slashes
     Route::get('/device/{device}/edit/ports', [Device\EditPortsController::class, 'index'])->name('device.edit.ports')->middleware('saved-filter:device.edit-ports');
     Route::get('/device/{device}/edit/ports/list', [Device\EditPortsController::class, 'ports'])->name('device.edit.ports.list');
     Route::put('/device/{device}/edit/ports/settings', [Device\EditPortsController::class, 'settings'])->name('device.edit.ports.settings');
@@ -221,7 +267,9 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('/device/{device}/edit/processors', [Device\EditProcessorsController::class, 'index'])->name('device.edit.processors');
     Route::post('/device/{device}/edit/processors/{processor}', [Device\EditProcessorsController::class, 'update'])->name('device.edit.processors.update')->scopeBindings();
     Route::get('/device/{device}/edit/routing', [Device\EditRoutingController::class, 'index'])->name('device.edit.routing');
-    Route::put('/device/{device}/edit/routing', [Device\EditRoutingController::class, 'updateContexts'])->name('device.edit.routing.contexts');
+    Route::post('/device/{device}/edit/routing/vrf', [Device\EditRoutingController::class, 'storeVrf'])->name('device.edit.routing.vrf.store');
+    Route::patch('/device/{device}/edit/routing/vrf/{vrf}', [Device\EditRoutingController::class, 'updateVrf'])->name('device.edit.routing.vrf.update')->scopeBindings()->whereNumber('vrf');
+    Route::delete('/device/{device}/edit/routing/vrf/{vrf}', [Device\EditRoutingController::class, 'destroyVrf'])->name('device.edit.routing.vrf.destroy')->scopeBindings()->whereNumber('vrf');
     Route::post('/device/{device}/edit/routing/peer/{bgpPeer}', [Device\EditRoutingController::class, 'updatePeer'])->name('device.edit.routing.peer.update')->scopeBindings();
     Route::get('/device/{device}/edit/storage', [Device\EditStorageController::class, 'index'])->name('device.edit.storage');
     Route::post('/device/{device}/edit/storage/{storage}', [Device\EditStorageController::class, 'update'])->name('device.edit.storage.update')->whereNumber('storage');
@@ -235,6 +283,13 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('delete', [DeviceController::class, 'deleteConfirm'])->name('delete.confirm');
         Route::delete('', [DeviceController::class, 'destroy'])->name('destroy');
 
+        Route::get('faults', [Device\Tabs\FaultsController::class, 'index'])
+            ->middleware('saved-filter:device.faults')->name('faults');
+        Route::get('faults/history', [Device\Tabs\FaultsController::class, 'history'])
+            ->middleware('saved-filter:device.alert-log')->name('faults.history');
+        Route::get('faults/stats', [Device\Tabs\FaultsController::class, 'stats'])->name('faults.stats');
+        Route::get('alerts/{vars?}', [Device\Tabs\FaultsController::class, 'legacy'])->where('vars', '.*')->name('faults.legacy');
+        Route::get('alert-stats', [Device\Tabs\FaultsController::class, 'legacy']);
         Route::redirect('logs', 'logs/eventlog')->name('logs');
         Route::get('logs/eventlog', Device\Tabs\EventlogController::class)->name('eventlog');
         Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
@@ -255,11 +310,14 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('popup', App\Http\Controllers\DevicePopupController::class)->name('popup');
         Route::get('discovery-status', [DeviceController::class, 'discoveryStatus'])->name('discovery-status');
         Route::put('notes', [Device\Tabs\NotesController::class, 'update'])->name('notes.update');
+        Route::post('jobs/monitor', [Device\JobMonitorController::class, 'store'])->name('jobs.monitor');
+        Route::delete('jobs/monitor', [Device\JobMonitorController::class, 'destroy'])->name('jobs.stop-monitoring');
         Route::get('config/backups', [Device\Tabs\ConfigController::class, 'backups'])->name('config.backups');
         Route::get('config/backup', [Device\Tabs\ConfigController::class, 'backup'])->name('config.backup');
         Route::get('config/diff', [Device\Tabs\ConfigController::class, 'diff'])->name('config.diff');
         Route::post('config/refresh', [Device\Tabs\ConfigController::class, 'refresh'])->name('config.refresh');
         Route::get('accesspoints/{accessPoint}', [Device\Tabs\AccessPointsController::class, 'show'])->name('accesspoints.show')->scopeBindings();
+        Route::get('vm/{vminfo}', [Device\Tabs\VmInfoController::class, 'show'])->name('vm.show')->whereNumber('vminfo');
         Route::get('debug/process', Device\Debug\DebugPollAndDiscoveryController::class)->name('debug.process');
         Route::get('debug/snmp', Device\Debug\DebugSnmpwalkController::class)->name('debug.snmp');
         Route::get('debug/alerts', Device\Debug\DebugAlertsController::class)->name('debug.alerts');
@@ -268,6 +326,7 @@ Route::middleware(['auth'])->group(function (): void {
     // fallback device routes
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', [DeviceController::class, 'index'])
         ->middleware([
+            'saved-filter:device.packages,*/packages',
             'saved-filter:device.port-security,*/ports/portsecurity',
             'saved-filter:device.ports,*/ports|*/ports/basic|*/ports/detail',
         ])
@@ -348,6 +407,9 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('alertlog/{alertLog}/details', Ajax\AlertDetailsController::class)->name('alertlog.details');
 
     Route::resource('port-groups', PortGroupController::class);
+    Route::get('port-groups/{port_group}/ports', [PortGroupPortsController::class, 'index'])->name('port-groups.ports')->middleware('saved-filter:port-group.ports');
+    Route::get('port-groups/{port_group}/ports/list', [PortGroupPortsController::class, 'ports'])->name('port-groups.ports.list');
+    Route::post('port-groups/{port_group}/ports', [PortGroupPortsController::class, 'update'])->name('port-groups.ports.update');
     Route::get('validate', [ValidateController::class, 'index'])->name('validate');
     Route::get('validate/results/{group?}', [ValidateController::class, 'runValidation'])->name('validate.results');
     Route::post('validate/fix', [ValidateController::class, 'runFixer'])->name('validate.fix');
@@ -404,7 +466,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('set_resolution', [Ajax\SessionController::class, 'resolution']);
         Route::post('set_style', [Ajax\SessionController::class, 'style']);
         Route::post('ripe/raw', [Ajax\RipeNccApiController::class, 'raw']);
-        Route::get('snmp/capabilities', Ajax\SnmpCapabilities::class)->name('snmp.capabilities');
+        Route::post('template/preview', Ajax\TemplatePreviewController::class)->name('ajax.template.preview');
 
         // js select2 data controllers
         Route::prefix('select')->group(function (): void {
@@ -412,6 +474,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('alert-transport-group', Select\AlertTransportGroupController::class)->name('ajax.select.alert-transport-group');
             Route::get('alert-transports-groups', Select\AlertTransportsAndGroupsController::class)->name('ajax.select.alert-transports-groups');
             Route::get('alert-operation', Select\AlertOperationController::class)->name('ajax.select.alert-operation');
+            Route::get('alert-rule', Select\AlertRuleController::class)->name('ajax.select.alert-rule');
             Route::get('application', Select\ApplicationController::class)->name('ajax.select.application');
             Route::get('bill', Select\BillController::class)->name('ajax.select.bill');
             Route::get('custom-map', Select\CustomMapController::class)->name('ajax.select.custom-map');
@@ -427,6 +490,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('graph-aggregate', Select\GraphAggregateController::class)->name('ajax.select.graph-aggregate');
             Route::get('graylog-streams', Select\GraylogStreamsController::class)->name('ajax.select.graylog-streams');
             Route::get('inventory', Select\InventoryController::class)->name('ajax.select.inventory');
+            Route::get('secret', Select\SecretController::class)->name('ajax.select.secret');
             Route::get('syslog', Select\SyslogController::class)->name('ajax.select.syslog');
             Route::get('location', Select\LocationController::class)->name('ajax.select.location');
             Route::get('munin', Select\MuninPluginController::class)->name('ajax.select.munin');
@@ -443,9 +507,6 @@ Route::middleware(['auth'])->group(function (): void {
 
         // jquery bootgrid data controllers
         Route::prefix('table')->group(function (): void {
-            Route::post('address-search/ipv4', Table\Ipv4AddressSearchController::class)->name('search.ipv4');
-            Route::post('address-search/ipv6', Table\Ipv6AddressSearchController::class)->name('search.ipv6');
-            Route::post('address-search/mac', Table\MacSearchController::class)->name('search.mac');
             Route::post('alertlog', Table\AlertLogController::class)->name('table.alertlog');
             Route::get('alertlog/export', [Table\AlertLogController::class, 'export'])->name('table.alertlog.export');
             Route::post('alerts', Table\AlertsController::class)->name('table.alerts');
