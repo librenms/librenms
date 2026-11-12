@@ -82,7 +82,20 @@ foreach ($pressure_sources as $pressure_source) {
             ];
 
             $rrd_name = ['app', $name, $app->app_id, $pressure_source['rrd_prefix'] . '___' . $resource . '___' . $stall_type];
-            $tags = ['name' => $name, 'app_id' => $app->app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+            // resource, stall_type, source, and cgroup keep each RRD a separate series for the
+            // backends that build series from the tags, such as InfluxDB, instead of the RRD name
+            $tags = [
+                'name' => $name,
+                'app_id' => $app->app_id,
+                'resource' => $resource,
+                'stall_type' => $stall_type,
+                'source' => $pressure_source['cgroup'] === null ? 'system' : 'cgroup',
+                'rrd_def' => $rrd_def,
+                'rrd_name' => $rrd_name,
+            ];
+            if ($pressure_source['cgroup'] !== null) {
+                $tags['cgroup'] = $pressure_source['cgroup'];
+            }
             app('Datastore')->put($device, 'app', $tags, $fields);
 
             $latest_averages = [
