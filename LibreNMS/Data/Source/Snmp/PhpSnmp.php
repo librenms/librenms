@@ -80,6 +80,7 @@ class PhpSnmp implements SnmpBackendInterface
             $config->retries,
         );
 
+        $snmp->max_oids = max($config->maxOid, 1);
         $this->setSecurityOptions($snmp, $config, $options->context);
         $this->setOptions($snmp, $options);
         $this->initMibs($options);

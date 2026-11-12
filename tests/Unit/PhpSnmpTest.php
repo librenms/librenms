@@ -13,6 +13,30 @@ use LibreNMS\Tests\TestCase;
 
 class PhpSnmpTest extends TestCase
 {
+    public function testBuildSnmpAppliesMaxOids(): void
+    {
+        if (! class_exists(\SNMP::class) || ! function_exists('snmp_init_mib')) {
+            $this->markTestSkipped('The required SNMP extension is not installed.');
+        }
+
+        $backend = new PhpSnmp;
+        $defaults = (new SnmpPollingMethod)->defaults();
+
+        foreach ([
+            ['v1', new SnmpCommunitySecretData(community: 'public')],
+            ['v2c', new SnmpCommunitySecretData(community: 'public')],
+            ['v3', new SnmpV3SecretData(authname: 'alice')],
+        ] as [$version, $secret]) {
+            foreach ([-1 => 1, 0 => 1, 1 => 1, 4 => 4, 20 => 20] as $configured => $expected) {
+                $config = SnmpConfig::make(['version' => $version, 'max_oid' => $configured] + $defaults, $secret);
+                $snmp = $backend->buildSnmp('127.0.0.1', $config, new SnmpQueryOptions);
+
+                $this->assertNotNull($snmp);
+                $this->assertSame($expected, $snmp->max_oids, "$version max_oid=$configured");
+            }
+        }
+    }
+
     public function testCommunityAndUsername(): void
     {
         $method = new \ReflectionMethod(PhpSnmp::class, 'communityOrUsername');
