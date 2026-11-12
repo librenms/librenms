@@ -138,7 +138,7 @@ class Billing
             $numerator += ($idx - $meanIndex) * ($usage - $meanUsage);
             $denominator += ($idx - $meanIndex) ** 2;
         }
-        $slope = $denominator > 0 ? $numerator / $denominator : 0;
+        $slope = $denominator > 0.0 ? $numerator / $denominator : 0.0;
 
         // Calculate a predicted usage from the prior months
         $predicted = max(0.0, $meanUsage - $slope * $meanIndex);
