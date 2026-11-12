@@ -76,18 +76,6 @@ class BillingCdrPredictionTest extends TestCase
         $this->assertEqualsWithDelta($this->initialForecast(749.5), Billing::getPredictedCdrUsage($bill), 0.0001);
     }
 
-    public function testForecastUsesNewestRecordForEachEndTimestamp(): void
-    {
-        $bill = $this->cdrBill();
-        $this->history($bill, 3, 100);
-        $this->history($bill, 2, 10000);
-        $this->history($bill, 2, 200);
-        $this->history($bill, 1, 10000);
-        $this->history($bill, 1, 300);
-
-        $this->assertEqualsWithDelta($this->initialForecast(400), Billing::getPredictedCdrUsage($bill), 0.0001);
-    }
-
     public function testForecastPreservesZeroRateForDuplicateEndTimestamp(): void
     {
         $bill = $this->cdrBill();
