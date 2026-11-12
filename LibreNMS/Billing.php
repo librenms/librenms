@@ -118,7 +118,7 @@ class Billing
         $seenCycles = [];
         foreach ($history as $row) {
             if (! isset($seenCycles[$row->bill_dateto])) {
-                $points[-count($points) - 1] = (float) $row->rate_95th;
+                $points[] = (float) $row->rate_95th;
                 $seenCycles[$row->bill_dateto] = true;
             }
         }
@@ -130,15 +130,17 @@ class Billing
         }
 
         // Calculate the slope for the average trend
-        $meanIndex = array_sum(array_keys($points)) / $count;
+        // Historical points have trend indices -1, -2, and so on.
+        $meanIndex = -($count + 1) / 2;
         $meanUsage = array_sum($points) / $count;
         $numerator = 0.0;
         $denominator = 0.0;
         foreach ($points as $idx => $usage) {
+            $idx = -$idx - 1;
             $numerator += ($idx - $meanIndex) * ($usage - $meanUsage);
             $denominator += ($idx - $meanIndex) ** 2;
         }
-        $slope = $denominator > 0.0 ? $numerator / $denominator : 0.0;
+        $slope = $count > 1 ? $numerator / $denominator : 0.0;
 
         // Calculate a predicted usage from the prior months
         $predicted = max(0.0, $meanUsage - $slope * $meanIndex);
