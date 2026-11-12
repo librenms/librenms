@@ -11,8 +11,11 @@ interface Ipv4AddressDiscovery
      * Will be keyed by ip, port_id and context_name
      * ipv4_network_id is optional and will be filled by the module
      * ::1 will be filtered by the module as well
+     * A VRF context that did not answer keeps its saved addresses
      *
      * @return \Illuminate\Support\Collection<\App\Models\Ipv4Address>
+     *
+     * @throws \LibreNMS\Exceptions\SnmpException when the device did not answer, existing addresses are kept
      */
     public function discoverIpv4Addresses(): Collection;
 }
