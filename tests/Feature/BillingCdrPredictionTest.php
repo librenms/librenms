@@ -18,14 +18,25 @@ class BillingCdrPredictionTest extends TestCase
     {
         parent::setUp();
 
-        [$from] = Billing::getDates(1);
-        Carbon::setTestNow(Carbon::parse($from)->addHours(12));
+        Carbon::setTestNow(Carbon::parse('2024-06-02 12:00:00'));
     }
 
     protected function tearDown(): void
     {
         Carbon::setTestNow();
         parent::tearDown();
+    }
+
+    public function testReferenceDateIsInsideTheSelectedCycle(): void
+    {
+        $this->assertSame(
+            ['20240601000000', '20240630235959', '20240501000000', '20240530235959'],
+            Billing::getDates(1)
+        );
+        $this->assertSame('2024-06-02 12:00:00', now()->format('Y-m-d H:i:s'));
+
+        Carbon::setTestNow(Carbon::parse('2024-06-01 12:00:00'));
+        $this->assertSame(['20240501000000', '20240531235959'], array_slice(Billing::getDates(1), 0, 2));
     }
 
     public function testForecastUsesTheLastThreeCompleteCycles(): void
@@ -38,7 +49,7 @@ class BillingCdrPredictionTest extends TestCase
         $this->history($bill, 0, 10000);
         $this->history($this->cdrBill(), 1, 10000);
 
-        $this->assertEqualsWithDelta(326.6666667, Billing::getPredictedCdrUsage($bill), 0.0001);
+        $this->assertEqualsWithDelta($this->initialForecast(326.6666667), Billing::getPredictedCdrUsage($bill), 0.0001);
     }
 
     public function testForecastTreatsMissingCyclesAsConsecutiveAndIgnoresQuotaHistory(): void
@@ -48,7 +59,7 @@ class BillingCdrPredictionTest extends TestCase
         $this->history($bill, 2, 10000, 'Quota');
         $this->history($bill, 1, 200);
 
-        $this->assertEqualsWithDelta(300, Billing::getPredictedCdrUsage($bill), 0.0001);
+        $this->assertEqualsWithDelta($this->initialForecast(300), Billing::getPredictedCdrUsage($bill), 0.0001);
     }
 
     public function testForecastTreatsDifferentEndTimestampsAsSeparateRecords(): void
@@ -62,7 +73,7 @@ class BillingCdrPredictionTest extends TestCase
         $this->history($bill, 1, 300);
         $this->history($bill, 0, 10000);
 
-        $this->assertEqualsWithDelta(749.5, Billing::getPredictedCdrUsage($bill), 0.0001);
+        $this->assertEqualsWithDelta($this->initialForecast(749.5), Billing::getPredictedCdrUsage($bill), 0.0001);
     }
 
     public function testForecastUsesNewestRecordForEachEndTimestamp(): void
@@ -74,7 +85,7 @@ class BillingCdrPredictionTest extends TestCase
         $this->history($bill, 1, 10000);
         $this->history($bill, 1, 300);
 
-        $this->assertSame(400.0, Billing::getPredictedCdrUsage($bill));
+        $this->assertEqualsWithDelta($this->initialForecast(400), Billing::getPredictedCdrUsage($bill), 0.0001);
     }
 
     public function testForecastPreservesZeroRateForDuplicateEndTimestamp(): void
@@ -83,7 +94,7 @@ class BillingCdrPredictionTest extends TestCase
         $this->history($bill, 1, 10000);
         $this->history($bill, 1, 0);
 
-        $this->assertSame(0.0, Billing::getPredictedCdrUsage($bill));
+        $this->assertEqualsWithDelta($this->initialForecast(0), Billing::getPredictedCdrUsage($bill), 0.0001);
     }
 
     public function testForecastTreatsOldestAvailableRecordsAsConsecutive(): void
@@ -92,22 +103,20 @@ class BillingCdrPredictionTest extends TestCase
         $this->history($bill, 3, 100);
         $this->history($bill, 2, 200);
 
-        $this->assertSame(300.0, Billing::getPredictedCdrUsage($bill));
+        $this->assertEqualsWithDelta($this->initialForecast(300), Billing::getPredictedCdrUsage($bill), 0.0001);
     }
 
     public function testHistoryMustEndBeforeTheCurrentTimeWhenTheBillingStartIsInTheFuture(): void
     {
-        $bill = $this->cdrBill();
+        Carbon::setTestNow(Carbon::parse('2024-03-01 12:00:00'));
+        $bill = Bill::factory()->create(['bill_type' => 'cdr', 'bill_day' => 31, 'rate_95th' => 75]);
         $future = $this->history($bill, 1, 1000);
-        $currentStart = Carbon::parse(Billing::getDates($bill->bill_day)[0]);
-        $clock = $currentStart->copy()->subDays(2);
-        $future->bill_dateto = $clock->copy()->addDay();
+        $clock = now();
+        $future->bill_dateto = $clock->copy()->addHours(6);
         $future->save();
         $past = $this->history($bill, 2, 200);
         $past->bill_dateto = $clock->copy()->subDay();
         $past->save();
-        Carbon::setTestNow($clock);
-
         $this->assertSame(200.0, Billing::getPredictedCdrUsage($bill));
     }
 
@@ -131,11 +140,11 @@ class BillingCdrPredictionTest extends TestCase
         $bill = $this->cdrBill();
         $this->history($bill, 2, 120);
 
-        $this->assertSame(120.0, Billing::getPredictedCdrUsage($bill));
+        $this->assertEqualsWithDelta($this->initialForecast(120), Billing::getPredictedCdrUsage($bill), 0.0001);
 
         $this->history($bill, 1, 0);
 
-        $this->assertSame(0.0, Billing::getPredictedCdrUsage($bill));
+        $this->assertEqualsWithDelta($this->initialForecast(0), Billing::getPredictedCdrUsage($bill), 0.0001);
 
         [$from, $to] = Billing::getDates($bill->bill_day);
         $start = Carbon::parse($from);
@@ -150,7 +159,7 @@ class BillingCdrPredictionTest extends TestCase
         $this->history($bill, 2, 100, 'cdr');
         $this->history($bill, 1, 150);
 
-        $this->assertSame(200.0, Billing::getPredictedCdrUsage($bill));
+        $this->assertEqualsWithDelta($this->initialForecast(200), Billing::getPredictedCdrUsage($bill), 0.0001);
     }
 
     public function testForecastDoesNotGoBelowZero(): void
@@ -160,7 +169,7 @@ class BillingCdrPredictionTest extends TestCase
         $this->history($bill, 2, 150);
         $this->history($bill, 1, 0);
 
-        $this->assertSame(0.0, Billing::getPredictedCdrUsage($bill));
+        $this->assertEqualsWithDelta($this->initialForecast(0), Billing::getPredictedCdrUsage($bill), 0.0001);
     }
 
     public function testForecastWeightsCurrentRateByElapsedBillingDays(): void
@@ -172,7 +181,7 @@ class BillingCdrPredictionTest extends TestCase
         $days = (int) $start->diffInDays(Carbon::parse($to)->addSecond());
         $halfway = intdiv($days, 2);
 
-        $this->assertSame(300.0, Billing::getPredictedCdrUsage($bill));
+        $this->assertEqualsWithDelta($this->initialForecast(300), Billing::getPredictedCdrUsage($bill), 0.0001);
 
         Carbon::setTestNow($start->copy()->addDays($halfway)->addHours(12));
         $this->assertEqualsWithDelta(300 * (1 - $halfway / $days) + 75 * $halfway / $days, Billing::getPredictedCdrUsage($bill), 0.0001);
@@ -218,6 +227,11 @@ class BillingCdrPredictionTest extends TestCase
 
         $this->expectException(InvalidArgumentException::class);
         Billing::getPredictedCdrUsage($bill);
+    }
+
+    private function initialForecast(float $rate): float
+    {
+        return $rate * 29 / 30 + 75 / 30;
     }
 
     private function cdrBill(): Bill
