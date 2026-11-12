@@ -71,7 +71,7 @@ Nodes appear automatically after running for a few minutes.
     lnms config:set service_services_frequency 300
     lnms config:set service_discovery_frequency 21600
     lnms config:set service_billing_frequency 300
-    lnms config:set service_billing_calculate_frequency 60
+    lnms config:set service_billing_calculate_frequency 3600
     lnms config:set service_poller_down_retry 60
     lnms config:set service_loglevel INFO
     lnms config:set service_update_frequency 86400
