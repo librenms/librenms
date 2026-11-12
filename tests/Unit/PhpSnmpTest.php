@@ -13,6 +13,11 @@ use LibreNMS\Tests\TestCase;
 
 class PhpSnmpTest extends TestCase
 {
+    private function backendDefaults(): array
+    {
+        return ['transport' => 'udp', 'bulk' => true] + (new SnmpPollingMethod)->defaults();
+    }
+
     public function testBuildSnmpAppliesMaxOids(): void
     {
         if (! class_exists(\SNMP::class) || ! function_exists('snmp_init_mib')) {
@@ -20,10 +25,9 @@ class PhpSnmpTest extends TestCase
         }
 
         $backend = new PhpSnmp;
-        $defaults = (new SnmpPollingMethod)->defaults();
+        $defaults = $this->backendDefaults();
 
         foreach ([
-            ['v1', new SnmpCommunitySecretData(community: 'public')],
             ['v2c', new SnmpCommunitySecretData(community: 'public')],
             ['v3', new SnmpV3SecretData(authname: 'alice')],
         ] as [$version, $secret]) {
@@ -37,11 +41,31 @@ class PhpSnmpTest extends TestCase
         }
     }
 
+    public function testBackendEligibility(): void
+    {
+        if (! class_exists(\SNMP::class) || ! function_exists('snmp_init_mib')) {
+            $this->markTestSkipped('The required SNMP extension is not installed.');
+        }
+
+        $method = new \ReflectionMethod(PhpSnmp::class, 'worksFor');
+        $backend = new PhpSnmp;
+        $defaults = $this->backendDefaults();
+        $secret = new SnmpCommunitySecretData(community: 'public');
+        $config = SnmpConfig::make($defaults, $secret);
+
+        $this->assertTrue($method->invoke($backend, $config, new SnmpQueryOptions));
+        $this->assertFalse($method->invoke($backend, SnmpConfig::make(['version' => 'v1'] + $defaults, $secret), new SnmpQueryOptions));
+        $this->assertFalse($method->invoke($backend, SnmpConfig::make(['transport' => 'tcp'] + $defaults, $secret), new SnmpQueryOptions));
+        $this->assertFalse($method->invoke($backend, SnmpConfig::make(['bulk' => false] + $defaults, $secret), new SnmpQueryOptions));
+        $this->assertFalse($method->invoke($backend, $config, new SnmpQueryOptions(allowBulk: false)));
+        $this->assertFalse($method->invoke($backend, $config, new SnmpQueryOptions(applyDisplayHints: false)));
+    }
+
     public function testCommunityAndUsername(): void
     {
         $method = new \ReflectionMethod(PhpSnmp::class, 'communityOrUsername');
         $backend = new PhpSnmp;
-        $defaults = (new SnmpPollingMethod)->defaults();
+        $defaults = $this->backendDefaults();
 
         $v3 = SnmpConfig::make($defaults, new SnmpV3SecretData(authname: 'alice'));
         $v3Default = SnmpConfig::make($defaults, new SnmpV3SecretData);
@@ -66,7 +90,7 @@ class PhpSnmpTest extends TestCase
 
         $method = new \ReflectionMethod(PhpSnmp::class, 'setSecurityOptions');
         $backend = new PhpSnmp;
-        $defaults = (new SnmpPollingMethod)->defaults();
+        $defaults = $this->backendDefaults();
 
         foreach ([
             ['authPriv', 'SHA', 'AES', ['authPriv', 'SHA', 'authpass', 'AES', 'privpass', 'vrf1']],
@@ -106,7 +130,7 @@ class PhpSnmpTest extends TestCase
 
         $method = new \ReflectionMethod(PhpSnmp::class, 'worksFor');
         $backend = new PhpSnmp;
-        $defaults = (new SnmpPollingMethod)->defaults();
+        $defaults = $this->backendDefaults();
 
         foreach ([
             'AES-192' => 'AES192',
@@ -146,7 +170,10 @@ class PhpSnmpTest extends TestCase
 
         $method = new \ReflectionMethod(PhpSnmp::class, 'worksFor');
         $backend = new PhpSnmp;
-        $defaults = (new SnmpPollingMethod)->defaults();
+        $defaults = $this->backendDefaults();
+
+        $valid = SnmpConfig::make($defaults, new SnmpV3SecretData(authname: 'alice'));
+        $this->assertTrue($method->invoke($backend, $valid, new SnmpQueryOptions));
 
         foreach ([
             new SnmpV3SecretData(authlevel: 'authNoPriv', authalgo: 'unsupported', authpass: 'authpass'),
@@ -162,7 +189,7 @@ class PhpSnmpTest extends TestCase
             $this->markTestSkipped('The required SNMP extension is not installed.');
         }
 
-        $config = SnmpConfig::make((new SnmpPollingMethod)->defaults(), new SnmpV3SecretData(
+        $config = SnmpConfig::make($this->backendDefaults(), new SnmpV3SecretData(
             authlevel: 'authNoPriv',
             authalgo: 'SHA',
             authpass: 'short',
