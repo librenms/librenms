@@ -17,6 +17,8 @@ sender. The Twilio APIs are at
 
 Twilio sends your alert by calls. Requirements match Twilio SMS.
 
+At least one of Call To, Call by Roles, or Call by Users must be configured. Selected users must be enabled and have valid E.164 phone numbers, or the transport skips them and may make no calls.
+
 Required Fields:
 - Account SID: Account SID used in the API URL.
 - API SID: the SID of the API key.
