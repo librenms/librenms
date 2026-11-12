@@ -91,7 +91,24 @@ final class Ipv6AddressesTest extends DBTestCase
     }
 
 
+    public function testIpv6MibAddressesAreStoredOnceInTheDefaultContext(): void
+    {
+        $this->createVrf();
 
+        $this->discover(['' => self::IPV6_MIB_WALKS]);
+
+        $this->assertSame(['2001:db8::3/64'], $this->addresses());
+    }
+
+    public function testVrfContextThatDoesNotAnswerKeepsItsAddressesWhenIpv6MibIsWalked(): void
+    {
+        $this->createVrf();
+
+        $this->discover(['' => self::IPV6_MIB_WALKS, 'red' => self::VRF_WALKS]);
+        $this->discover(['' => self::IPV6_MIB_WALKS, 'red' => null]);
+
+        $this->assertSame(['2001:db8::3/64', '2001:db8:1::1/64 red'], $this->addresses());
+    }
 
     public function testVrfContextWhosePrefixWalkDoesNotAnswerKeepsItsAddresses(): void
     {

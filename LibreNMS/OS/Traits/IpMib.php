@@ -61,10 +61,8 @@ trait IpMib
     {
         $silentContexts = [];
         $ips = $this->discoverIpMibIpv6Addresses($silentContexts);
-
-        // IPV6-MIB is walked without a context, so the silent contexts do not apply to it
         if ($ips->isEmpty()) {
-            return $this->discoverIpv6MibAddresses();
+            $ips = $this->discoverIpv6MibAddresses();
         }
 
         return $ips->merge($this->getDevice()->ipv6()->whereIn('ipv6_addresses.context_name', $silentContexts)->get()
@@ -129,41 +127,38 @@ trait IpMib
         });
     }
 
+    // IPV6-MIB has no context, so its addresses belong to the default context
     private function discoverIpv6MibAddresses(): Collection
     {
         $device = $this->getDevice();
-        $ips = new Collection;
-        foreach ($device->getVrfContexts() as $context_name) {
-            $ips = $ips->merge(SnmpQuery::walk([
-                'IPV6-MIB::ipv6AddrPfxLength',
-                'IPV6-MIB::ipv6AddrType',
-            ])->throwIfConnectionError()->mapTable(function ($data, $ipv6IfIndex = 0, $ipv6AddrAddress = '') use ($context_name, $device) {
-                try {
-                    $ip = IPv6::parse($ipv6AddrAddress);
-                    $origin = match ($data['IP-MIB::ipv6AddrType'] ?? null) {
-                        'stateless' => 'linklayer',
-                        'stateful' => 'manual',
-                        'unknown' => 'unknown',
-                        default => 'other',
-                    };
 
-                    return new Ipv6Address([
-                        'port_id' => PortCache::getIdFromIfIndex($ipv6IfIndex, $device),
-                        'ipv6_address' => $ip->uncompressed(),
-                        'ipv6_compressed' => $ip->compressed(),
-                        'ipv6_prefixlen' => $data['IPV6-MIB::ipv6AddrPfxLength'] ?? '',
-                        'ipv6_origin' => $origin,
-                        'context_name' => $context_name,
-                    ]);
-                } catch (InvalidIpException $e) {
-                    Log::error('Failed to parse IP: ' . $e->getMessage());
+        return SnmpQuery::walk([
+            'IPV6-MIB::ipv6AddrPfxLength',
+            'IPV6-MIB::ipv6AddrType',
+        ])->throwIfConnectionError()->mapTable(function ($data, $ipv6IfIndex = 0, $ipv6AddrAddress = '') use ($device) {
+            try {
+                $ip = IPv6::parse($ipv6AddrAddress);
+                $origin = match ($data['IP-MIB::ipv6AddrType'] ?? null) {
+                    'stateless' => 'linklayer',
+                    'stateful' => 'manual',
+                    'unknown' => 'unknown',
+                    default => 'other',
+                };
 
-                    return null;
-                }
-            }));
-        }
+                return new Ipv6Address([
+                    'port_id' => PortCache::getIdFromIfIndex($ipv6IfIndex, $device),
+                    'ipv6_address' => $ip->uncompressed(),
+                    'ipv6_compressed' => $ip->compressed(),
+                    'ipv6_prefixlen' => $data['IPV6-MIB::ipv6AddrPfxLength'] ?? '',
+                    'ipv6_origin' => $origin,
+                    'context_name' => '',
+                ]);
+            } catch (InvalidIpException $e) {
+                Log::error('Failed to parse IP: ' . $e->getMessage());
 
-        return $ips->filter();
+                return null;
+            }
+        })->filter();
     }
 
     /**
