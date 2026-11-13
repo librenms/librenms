@@ -430,6 +430,10 @@ curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agen
 chmod +x /usr/bin/distro
 ```
 
+!!! note
+    For transceivers, hardware sensors, and inventory, see
+    [Linux and FreeBSD Hardware](Device-Notes/Linux-FreeBSD-Hardware.md).
+
 ### Linux (snmpd v3)
 
 #### Stop the snmpd service
@@ -516,6 +520,10 @@ firewall-cmd --reload
 ```bash
 service snmpd restart
 ```
+
+!!! note
+    For transceivers, hardware sensors, and inventory, see
+    [Linux and FreeBSD Hardware](Device-Notes/Linux-FreeBSD-Hardware.md).
 
 ### Arch Linux (snmpd v2)
 
