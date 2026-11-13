@@ -147,14 +147,6 @@ class SmokepingGenerateCommand extends LnmsCommand
         return $this->render($header, $targets);
     }
 
-    /**
-     * Transport used to pick the smokeping probe family for a device.
-     *
-     * Smokeping must probe a device with the same address family as the
-     * LibreNMS ICMP poller, otherwise a device polled over IPv4 that has no
-     * AAAA record (or a literal IPv4 hostname) lands on the FPing6 probe with
-     * 100% loss. Devices without an explicit IP version keep the SNMP transport.
-     */
     private function deviceTransport(Device $device, IcmpPollingMethod $icmp, SnmpPollingMethod $snmp): string
     {
         return match ($icmp->resolveAddressFamily($device)) {
