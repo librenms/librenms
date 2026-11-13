@@ -23,54 +23,51 @@ IMPORTS
     LldpChassisId,
     LldpChassisIdSubtype,
     LldpPortId,
-    LldpPortIdSubtype        FROM LLDP-MIB      -- [IEEE Std 802.1AB-2005]
+    LldpPortIdSubtype        FROM LLDP-MIB      -- [IEEE Std 802.1AB]
     VlanIdOrNone, VlanId     FROM Q-BRIDGE-MIB  -- [RFC4363]
     ieee802dot1mibs,
     IEEE8021VlanIndex        FROM IEEE8021-TC-MIB
    ;
 
 ieee8021CfmMib   MODULE-IDENTITY
-    LAST-UPDATED "201806280000Z" -- June 28, 2018
+    LAST-UPDATED "202211080000Z" -- November 8, 2022
     ORGANIZATION "IEEE 802.1 Working Group"
     CONTACT-INFO
-       "WG-URL:   http://www.ieee802.org/1/
-        WG-EMail: stds-802-1-L@ieee.org 
-
-        Contact:  IEEE 802.1 Working Group Chair
+        "  WG-URL: http://www.ieee802.org/1/
+         WG-EMail: stds-802-1-l@ieee.org
+          Contact: IEEE 802.1 Working Group Chair
            Postal: C/O IEEE 802.1 Working Group
                    IEEE Standards Association
                    445 Hoes Lane
-                   Piscataway
-                   NJ 08854
+                   Piscataway, NJ 08854
                    USA
-           E-mail: STDS-802-1-L@IEEE.ORG
-       "
-   DESCRIPTION 
+           E-mail: stds-802-1-chairs@ieee.org"
+   DESCRIPTION
       "Connectivity Fault Management module.
 
-       Unless otherwise indicated, the references in this MIB
-       module are to IEEE Std 802.1Q.
+         Unless otherwise indicated, the references in this MIB
+         module are to IEEE Std 802.1Q-2022.
 
-       Copyright (C) IEEE (2018).
-       This version of this MIB module is part of IEEE Syd 802.1Q;
-       see the draft itself for full legal notices."
+         Copyright (C) IEEE (2022).
+         This version of this MIB module is part of IEEE Std 802.1Q-2022;
+         see that standard for full legal notices."
 
-    REVISION "201806280000Z" -- June 28, 2018
+    REVISION "202211080000Z" -- November 8, 2022
     DESCRIPTION
-            "Published as part of IEEE Std 802.1Q-2018.
-            Cross references updated and corrected."
-            
+            "Published as part of IEEE Std 802.1Q-2022.
+            Cross references and contact information updated."
+
     REVISION "201412150000Z" -- December 15, 2014
-    
+
     DESCRIPTION
             "Published as part of IEEE Std 802.1Q 2014 revision.
             Cross references updated and corrected."
-            
+
     REVISION     "201102270000Z" -- February 27, 2011
     DESCRIPTION
          "Addition of support for ICC format and minor edits
          as part of 2011 revision of IEEE Std 802.1Q."
-          
+
    REVISION       "200811180000Z" -- November 18, 2008
    DESCRIPTION
 
@@ -81,16 +78,16 @@ ieee8021CfmMib   MODULE-IDENTITY
        needed for PBB-TE support."
 
    REVISION       "200810150000Z" -- October 15, 2008
-   DESCRIPTION 
-      "The IEEE8021-CFM-MIB Module was originally included in IEEE 
-       Std 802.1ag-2007. Some objects in this module are deprecated  
+   DESCRIPTION
+      "The IEEE8021-CFM-MIB Module was originally included in IEEE
+       Std 802.1ag-2007. Some objects in this module are deprecated
        and replaced by objects in the IEEE8021-CFM-V2-MIB module
        defined in IEEE Std 802.1ap.
 
        This revision is included in IEEE Std 802.1ap."
 
    REVISION       "200706100000Z"    -- 06/10/2007 00:00GMT
-   DESCRIPTION 
+   DESCRIPTION
       "Included in IEEE Std 802.1ag-2007."
 
     ::= { ieee802dot1mibs  8 }
@@ -121,7 +118,6 @@ Dot1agCfmMaintDomainNameType ::= TEXTUAL-CONVENTION
         of a Dot1agCfmMaintDomainName.  The value can be one of
         the following:
 
-
         ieeeReserved(0)   Reserved for definition by IEEE 802.1
                           recommend to not use zero unless
                           absolutely needed.
@@ -138,7 +134,7 @@ Dot1agCfmMaintDomainNameType ::= TEXTUAL-CONVENTION
                           used.
         ieeeReserved(xx)  Reserved for definition by IEEE 802.1
                           xx values can be [5..31] and [96..255]
-        ituReserved(xx)   Reserved for definition by  ITU-T Y.1731
+        ituReserved(xx)   Reserved for definition by  ITU-T G.8013/Y.1731
                           xx values range from [32..63]
         ietfReserved(xx)  Reserved for definition by IETF.  xx values range
                           from [64..95].
@@ -225,7 +221,7 @@ Dot1agCfmMaintAssocNameType ::= TEXTUAL-CONVENTION
         primaryVid(1)     Primary VLAN ID.
                           12 bits represented in a 2-octet integer:
                           - least significant 4 bits of the first
-                            byte contains the most significant 
+                            byte contains the most significant
                             4 bits of the 12 bits primary VID
                           - second byte contains the least
                             significant 8 bits of the primary VID
@@ -243,7 +239,7 @@ Dot1agCfmMaintAssocNameType ::= TEXTUAL-CONVENTION
         unsignedInt16 (3) 2-octet integer/big endian
         rfc2685VpnId(4)   RFC 2685 VPN ID
                           3 octet VPN authority Organizationally
-                          Unique Identifier (OUI) or Company Identifier (CID)
+                          Unique Identifier (OUI) or Company ID (CID)
                           followed by 4 octet VPN index identifying VPN
                           according to the OUI or CID:
 
@@ -266,8 +262,8 @@ Dot1agCfmMaintAssocNameType ::= TEXTUAL-CONVENTION
 
         ieeeReserved(xx)  Reserved for definition by IEEE 802.1
                           xx values can be [5..31] and [96..255]
-        iccFormat(32)     ICC-based format as specified in ITU-T Y.1731
-        ituReserved(xx)   Reserved for definition by  ITU-T Y.1731
+        iccFormat(32)     ICC-based format as specified in ITU-T G.8013/Y.1731
+        ituReserved(xx)   Reserved for definition by  ITU-T G.8013/Y.1731
                           xx values range from [33..63]
         ietfReserved(xx)  Reserved for definition by IETF
                           xx values range from [64..95]
@@ -296,7 +292,7 @@ Dot1agCfmMaintAssocNameType ::= TEXTUAL-CONVENTION
         the Dot1agCfmMaintDomainName object plus the length of the
         Dot1agCfmMaintAssocName object, added together, MUST total
         less than or equal to 44 octets.
-       " 
+       "
     REFERENCE
        "21.6.5.4, Table 21-19"
     SYNTAX      INTEGER {
@@ -311,7 +307,7 @@ Dot1agCfmMaintAssocName ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
        "Denotes a generic Maintenance Association Name. It is the
-        part of the Maintenance Association Identifier which is
+        part of the Maintenance Association Identifier that is
         unique within the Maintenance Domain Name and is appended
         to the Maintenance Domain Name to form the Maintenance
         Association Identifier (MAID).
@@ -325,7 +321,7 @@ Dot1agCfmMaintAssocName ::= TEXTUAL-CONVENTION
         before the object(s) that use the Dot1agCfmMaintAssocName
         textual convention, if they appear in the same logical row.
 
-        The value of a Dot1agCfmMaintAssocName object MUST 
+        The value of a Dot1agCfmMaintAssocName object MUST
         always be consistent with the value of the associated
         Dot1agCfmMaintAssocNameType object. Attempts to set
         an Dot1agCfmMaintAssocName object to a value inconsistent
@@ -345,7 +341,6 @@ Dot1agCfmMaintAssocName ::= TEXTUAL-CONVENTION
     REFERENCE
        "21.6.5.4, 21.6.5.5, 21.6.5.6"
     SYNTAX      OCTET STRING (SIZE(1..45))
-
 
 Dot1agCfmMDLevel ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d"
@@ -370,7 +365,7 @@ Dot1agCfmMDLevelOrNone ::= TEXTUAL-CONVENTION
        "Integer identifying the Maintenance Domain Level (MD Level).
         Higher numbers correspond to higher Maintenance Domains,
         those with the greatest physical reach, with the highest
-        values for customers' CFM packets.  Lower numbers correspond
+        values for customers' CFM frames.  Lower numbers correspond
         to lower Maintenance Domains, those with more limited
         physical reach, with the lowest values for CFM PDUs
         protecting single Bridges or physical links.
@@ -403,11 +398,11 @@ Dot1agCfmMpDirection ::= TEXTUAL-CONVENTION
 Dot1agCfmPortStatus ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-       "An enumerated value from he Port Status TLV from the last CCM
+       "An enumerated value from the Port Status TLV from the last CCM
         received from the last MEP. It indicates the ability of the
         Bridge Port on which the transmitting MEP resides to pass
         ordinary data, regardless of the status of the MAC
-        (Table 21-10).
+        (Table 21-9).
 
         psNoPortStateTLV(0) Indicates either that no CCM has been
                             received or that no port status TLV was
@@ -439,7 +434,7 @@ Dot1agCfmPortStatus ::= TEXTUAL-CONVENTION
 Dot1agCfmInterfaceStatus ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-       "An enumerated value from the Interface Status TLV from the 
+       "An enumerated value from the Interface Status TLV from the
         last CCM received from the last MEP. It indicates the status
         of the Interface within which the MEP transmitting the CCM
         is configured, or the next lower Interface in the Interface
@@ -449,21 +444,21 @@ Dot1agCfmInterfaceStatus ::= TEXTUAL-CONVENTION
                           received or that no interface status TLV
                           was present in the last CCM received.
 
-    isUp(1)               The interface is ready to pass packets.
+    isUp(1)               The interface is ready to pass frames.
 
-    isDown(2)             The interface cannot pass packets
+    isDown(2)             The interface cannot pass frames.
 
     isTesting(3)          The interface is in some test mode.
-   
+
     isUnknown(4)          The interface status cannot be determined
                           for some reason.
 
     isDormant(5)          The interface is not in a state to pass
-                          packets but is in a pending state, waiting
+                          frames but is in a pending state, waiting
                           for some external event.
-    
+
     isNotPresent(6)       Some component of the interface is missing
-    
+
     isLowerLayerDown(7)   The interface is down due to state of the
                           lower layer interfaces
 
@@ -491,7 +486,7 @@ Dot1agCfmHighestDefectPri ::= TEXTUAL-CONVENTION
        "An enumerated value, equal to the contents of the variable
         highestDefect (20.35.9 and Table 20-1), indicating the
         highest-priority defect that has been present since the MEP
-        Fault Notification Generator State Machine was last in the 
+        Fault Notification Generator State Machine was last in the
         FNG_RESET state, either:
 
         none(0)           no defects since FNG_RESET
@@ -554,7 +549,7 @@ Dot1agCfmMepId ::= TEXTUAL-CONVENTION
         identifying a specific MEP.
        "
     REFERENCE
-       "3.132, 19.2.1"
+       "3.133, 19.2.1"
     SYNTAX      Unsigned32 (1..8191)
 
 Dot1agCfmMepIdOrZero ::= TEXTUAL-CONVENTION
@@ -564,7 +559,7 @@ Dot1agCfmMepIdOrZero ::= TEXTUAL-CONVENTION
        "Maintenance association Endpoint Identifier (MEPID): A small
         integer, unique over a given Maintenance Association,
         identifying a specific MEP.
- 
+
         The special value 0 is allowed to indicate special cases, for
         example that no MEPID is configured.
 
@@ -670,7 +665,7 @@ Dot1agCfmCcmInterval ::= TEXTUAL-CONVENTION
 Dot1agCfmFngState ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-       "Indicates the diferent states of the MEP Fault Notification
+       "Indicates the different states of the MEP Fault Notification
         Generator State Machine.
 
         fngReset(1)            No defect has been present since the
@@ -679,7 +674,7 @@ Dot1agCfmFngState ::= TEXTUAL-CONVENTION
                                was last reset.
 
         fngDefect(2)           A defect is present, but not for a
-                               long enough time to be reported 
+                               long enough time to be reported
                                (dot1agCfmMepFngAlarmTime).
 
         fngReportDefect(3)     A momentary state during which the
@@ -715,7 +710,7 @@ Dot1agCfmRelayActionFieldValue ::= TEXTUAL-CONVENTION
                   rlyFdb     (2),
                   rlyMpdb    (3)
                 }
-               
+
 Dot1agCfmIngressActionFieldValue ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -840,7 +835,7 @@ Dot1agCfmMepDefects ::= TEXTUAL-CONVENTION
 Dot1agCfmConfigErrors ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-       "While making the MIP creation evaluation described in 
+       "While making the MIP creation evaluation described in
         22.2.3, the management entity can encounter errors in
         the configuration. These are possible errors that can be
         encountered:
@@ -885,7 +880,7 @@ Dot1agCfmPbbComponentIdentifier
     DESCRIPTION
        "A Provider Backbone Bridge (PBB) can comprise a number of
         components, each of which can be managed in a manner
-        essentially equivalent to an IEEE 802.1Q Bridge.  In order to 
+        essentially equivalent to an IEEE 802.1Q Bridge.  In order to
         access these components easily, an index is used in a number of
         tables.  If any two tables are indexed by
         Dot1agCfmPbbComponentIdentifier, then entries in those tables
@@ -913,7 +908,7 @@ dot1agCfmStackTable OBJECT-TYPE
        "There is one CFM Stack table per Bridge. It permits
         the retrieval of information about the Maintenance Points
         configured on any given interface.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -926,7 +921,7 @@ dot1agCfmStackEntry OBJECT-TYPE
     STATUS      deprecated
     DESCRIPTION
        "The Stack table entry
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
 "
     INDEX { dot1agCfmStackifIndex, dot1agCfmStackVlanIdOrNone,
@@ -960,7 +955,7 @@ dot1agCfmStackifIndex OBJECT-TYPE
         indexed before the system restart.  If no such entry exists,
         then the system SHALL delete all entries in the
         dot1agCfmStackTable with the interface index.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -973,7 +968,7 @@ dot1agCfmStackVlanIdOrNone OBJECT-TYPE
     STATUS      deprecated
     DESCRIPTION
        "VLAN ID to which the MP is attached, or 0, if none.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -986,7 +981,7 @@ dot1agCfmStackMdLevel OBJECT-TYPE
     STATUS      deprecated
     DESCRIPTION
        "MD Level of the Maintenance Point.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -999,7 +994,7 @@ dot1agCfmStackDirection OBJECT-TYPE
     STATUS      deprecated
     DESCRIPTION
        "Direction in which the MP faces on the Bridge Port
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1026,7 +1021,7 @@ dot1agCfmStackMaIndex OBJECT-TYPE
        "The index of the MA in the dot1agCfmMaNetTable and
         dot1agCfmMaCompTable to which the MP is associated, or 0, if
         none.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1041,7 +1036,7 @@ dot1agCfmStackMepId OBJECT-TYPE
        "If an MEP is configured, the MEPID, else 0"
     REFERENCE
        "12.14.2.1.3:d
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     ::= { dot1agCfmStackEntry 7 }
@@ -1052,7 +1047,7 @@ dot1agCfmStackMacAddress OBJECT-TYPE
     STATUS      deprecated
     DESCRIPTION
        "MAC address of the MP.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1084,7 +1079,7 @@ dot1agCfmVlanTable OBJECT-TYPE
 
         The writable objects in this table need to be persistent
         upon reboot or restart of a device.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1098,7 +1093,7 @@ dot1agCfmVlanEntry OBJECT-TYPE
     STATUS      deprecated
     DESCRIPTION
        "The VLAN table entry.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     INDEX { dot1agCfmVlanComponentId, dot1agCfmVlanVid }
@@ -1120,7 +1115,7 @@ dot1agCfmVlanComponentId OBJECT-TYPE
         in this dot1agCfmVlanEntry applies.  If the system is not a
         Bridge, or if only one component is present in the Bridge, then
         this variable (index) MUST be equal to 1.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1135,7 +1130,7 @@ dot1agCfmVlanVid OBJECT-TYPE
        "This is a VLAN ID belonging to a VLAN that is associated with
         more than one VLAN ID, and this is not the Primary VID of the
         VLAN.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     ::= { dot1agCfmVlanEntry 2 }
@@ -1148,7 +1143,7 @@ dot1agCfmVlanPrimaryVid OBJECT-TYPE
        "This is the Primary VLAN ID of the VLAN with which this
         entry's dot1agCfmVlanVid is associated.  This value MUST not
         equal the value of dot1agCfmVlanVid.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     ::= { dot1agCfmVlanEntry 3 }
@@ -1163,7 +1158,7 @@ dot1agCfmVlanRowStatus OBJECT-TYPE
         The writable columns in a row cannot be changed if the row
         is active. All columns MUST have a valid value before a row
         can be activated.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     ::= { dot1agCfmVlanEntry 4 }
@@ -1274,7 +1269,7 @@ dot1agCfmDefaultMdTable OBJECT-TYPE
         After this initialization, the writable objects in this
         table need to be persistent upon reboot or restart of a
         device.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1287,7 +1282,7 @@ dot1agCfmDefaultMdEntry OBJECT-TYPE
     STATUS      deprecated
     DESCRIPTION
        "The Default MD Level table entry.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     INDEX { dot1agCfmDefaultMdComponentId,
@@ -1312,7 +1307,7 @@ dot1agCfmDefaultMdComponentId OBJECT-TYPE
         in this dot1agCfmDefaultMdEntry applies.  If the system is not
         a Bridge, or if only one component is present in the Bridge,
         then this variable (index) MUST be equal to 1.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1326,7 +1321,7 @@ dot1agCfmDefaultMdPrimaryVid OBJECT-TYPE
     DESCRIPTION
        "The Primary VID of the VLAN to which this entry's objects
         apply.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     ::= { dot1agCfmDefaultMdEntry 2 }
@@ -1340,7 +1335,7 @@ dot1agCfmDefaultMdStatus OBJECT-TYPE
         no entry in the Maintenance Association table defining an MA
         for the same VLAN ID and MD Level as this table's entry, and
         on which MA an Up MEP is defined, else false.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1358,7 +1353,7 @@ dot1agCfmDefaultMdLevel OBJECT-TYPE
         apply.  If this object has the value -1, the MD Level for MHF
         creation for this VLAN is controlled by
         dot1agCfmDefaultMdDefLevel.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1378,7 +1373,7 @@ dot1agCfmDefaultMdMhfCreation OBJECT-TYPE
 
         The value of this variable is meaningless if the values of
         dot1agCfmDefaultMdStatus is false.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1399,7 +1394,7 @@ dot1agCfmDefaultMdIdPermission OBJECT-TYPE
 
         The value of this variable is meaningless if the values of
         dot1agCfmDefaultMdStatus is false.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1424,7 +1419,7 @@ dot1agCfmConfigErrorListTable OBJECT-TYPE
     DESCRIPTION
        "The CFM Configuration Error List table provides a list of
         Interfaces and VIDs that are incorrectly configured.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1437,7 +1432,7 @@ dot1agCfmConfigErrorListEntry OBJECT-TYPE
     STATUS      deprecated
     DESCRIPTION
        "The Config Error List Table  entry
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     INDEX { dot1agCfmConfigErrorListVid,
@@ -1451,14 +1446,13 @@ Dot1agCfmConfigErrorListEntry ::= SEQUENCE {
       dot1agCfmConfigErrorListErrorType   Dot1agCfmConfigErrors
     }
 
-
 dot1agCfmConfigErrorListVid OBJECT-TYPE
     SYNTAX      VlanId
     MAX-ACCESS  not-accessible
     STATUS      deprecated
     DESCRIPTION
        "The VLAN ID of the VLAN with interfaces in error.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1479,7 +1473,7 @@ dot1agCfmConfigErrorListIfIndex OBJECT-TYPE
         entry exists, then the system SHALL delete any entries in
         dot1agCfmConfigErrorListTable indexed by that
         InterfaceIndex value.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1498,7 +1492,7 @@ dot1agCfmConfigErrorListErrorType OBJECT-TYPE
         1) ConflictingVids;
         2) ExcessiveLevels;
         3) OverlappedLevels.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1506,7 +1500,7 @@ dot1agCfmConfigErrorListErrorType OBJECT-TYPE
     ::= { dot1agCfmConfigErrorListEntry 3 }
 
 -- ******************************************************************
--- The Maintenance Domain Managed Object.  This group contains all  
+-- The Maintenance Domain Managed Object.  This group contains all
 -- the MIB objects used to maintain Maintenance Domains.
 -- ******************************************************************
 
@@ -1532,14 +1526,14 @@ dot1agCfmMdTable OBJECT-TYPE
        "The Maintenance Domain table. Each row in the table
         represents a different Maintenance Domain.
 
-        A Maintenance Domain is described 3.135 as the
+        A Maintenance Domain is described 3.136 as the
         network or the part of the network for which faults in
         connectivity are to be managed. The boundary of a Maintenance
         Domain is defined by a set of DSAPs, each of which can become
         a point of connectivity to a service instance.
        "
     REFERENCE
-       "3.135, 18.1"
+       "3.136, 18.1"
     ::= { dot1agCfmMd 2 }
 
 dot1agCfmMdEntry OBJECT-TYPE
@@ -1600,19 +1594,19 @@ dot1agCfmMdName OBJECT-TYPE
     DESCRIPTION
        "The Maintenance Domain name. The type/format of this object
         is determined by the value of the dot1agCfmMdNameType object.
-          
+
         Each Maintenance Domain has unique name among all those
         used or available to a service provider or operator.  It
         facilitates easy identification of administrative
         responsibility for each Maintenance Domain.
 
-        3.140 defines a Maintenance Domain name as the
+        3.141 defines a Maintenance Domain name as the
         identifier, unique over the domain for which CFM is to
         protect against accidental concatenation of Service
         Instances, of a particular Maintenance Domain.
        "
     REFERENCE
-       "3.140, 12.14.5, 21.6.5.3"
+       "3.141, 12.14.5, 21.6.5.3"
     DEFVAL { "DEFAULT" }
     ::= { dot1agCfmMdEntry 3 }
 
@@ -1730,7 +1724,7 @@ dot1agCfmMaNetTable OBJECT-TYPE
         incorrect connectivity among Service Instances.  A small
         integer, the Maintenance association Endpoint Identifier
         (MEPID), identifies each MEP among those configured on a
-        single MA (3.132, 18.2).
+        single MA (3.133, 18.2).
 
         This table uses two indices, first index is the index of the
         Maintenance Domain table.  The second index is the same as the
@@ -1853,7 +1847,7 @@ dot1agCfmMaCompTable OBJECT-TYPE
         The writable objects in this table need to be persistent
         upon reboot or restart of a device.
 
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1866,7 +1860,7 @@ dot1agCfmMaCompEntry OBJECT-TYPE
     STATUS      deprecated
     DESCRIPTION
        "The MA table entry.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     INDEX {dot1agCfmMaComponentId,
@@ -1891,7 +1885,7 @@ dot1agCfmMaComponentId OBJECT-TYPE
         in this dot1agCfmMaCompEntry applies.  If the system is not a
         Bridge, or if only one component is present in the Bridge, then
         this variable (index) MUST be equal to 1.
-    **NOTE: this object is deprecated due to re-indexing of the 
+    **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1907,7 +1901,7 @@ dot1agCfmMaCompPrimaryVlanId OBJECT-TYPE
         associated, or 0 if the MA is not attached to any VID.  If
         the MA is associated with more than one VID, the
         dot1agCfmVlanTable lists them.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1921,7 +1915,7 @@ dot1agCfmMaCompMhfCreation OBJECT-TYPE
     DESCRIPTION
        "Indicates if the Management entity can create MHFs (MIP Half
         Function) for this MA.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1937,7 +1931,7 @@ dot1agCfmMaCompIdPermission OBJECT-TYPE
        "Enumerated value indicating what, if anything, is to be
         included in the Sender ID TLV (21.5.3) transmitted by MPs
         configured in this MA.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1951,7 +1945,7 @@ dot1agCfmMaCompNumberOfVids OBJECT-TYPE
     STATUS      deprecated
     DESCRIPTION
        "The number of VIDs associated with the MA.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     REFERENCE
@@ -1968,7 +1962,7 @@ dot1agCfmMaCompRowStatus OBJECT-TYPE
         The writable columns in a row cannot be changed if the row
         is active. All columns MUST have a valid value before a row
         can be activated.
-        **NOTE: this object is deprecated due to re-indexing of the 
+        **NOTE: this object is deprecated due to re-indexing of the
     table.
        "
     ::= { dot1agCfmMaCompEntry 6 }
@@ -1983,12 +1977,12 @@ dot1agCfmMaMepListTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
        "List of MEPIDs that belong to this MA.
- 
+
         12.14.6.1.3 specifies that a list of MEPIDs in all
         Bridges in that MA, but since SNMP SMI does not allow to
-        state in a MIB that an object in a table is an array, the 
+        state in a MIB that an object in a table is an array, the
         information has to be stored in another table with two
-        indices, being the first index, the index of the table that 
+        indices, being the first index, the index of the table that
         contains the list or array.
 
         For all Bridges in which the same MAID {dot1agCfmMdFormat,
@@ -2079,7 +2073,7 @@ dot1agCfmMepTable OBJECT-TYPE
         CFM PDUs and track any responses.  It is an endpoint of a
         single Maintenance Association, and is an endpoint of a
         separate Maintenance Entity for each of the other MEPs in
-        the same Maintenance Association (3.132).
+        the same Maintenance Association (3.133).
 
         This table uses three indices. The first two indices are the
         indices of the Maintenance Domain and MA tables, the reason
@@ -2230,12 +2224,12 @@ dot1agCfmMepIdentifier OBJECT-TYPE
        "Integer that is unique among all the MEPs in the same MA.
         Other definition is: a small integer, unique over a given
         Maintenance Association, identifying a specific Maintenance
-        association Endpoint (3.132).
+        association Endpoint (3.133).
 
         MEP Identifier is also known as the MEPID.
        "
     REFERENCE
-       "3.132, 19.2, 12.14.7"
+       "3.133, 19.2, 12.14.7"
     ::= { dot1agCfmMepEntry 1 }
 
 dot1agCfmMepIfIndex OBJECT-TYPE
@@ -2329,8 +2323,8 @@ dot1agCfmMepCcmLtmPriority OBJECT-TYPE
        "The priority value for CCMs and LTMs transmitted by the MEP.
         Default Value is the highest priority value allowed to pass
         through the Bridge Port for any of this MEPs VIDs.
-        The management entity can obtain the default value for this 
-        variable from the priority regeneration table by extracting the 
+        The management entity can obtain the default value for this
+        variable from the priority regeneration table by extracting the
         highest priority value in this table on this MEPs Bridge Port.
         (1 is lowest, then 2, then 0, then 3-7).
        "
@@ -2353,7 +2347,7 @@ dot1agCfmMepLowPrDef OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-       "An integer value specifying the lowest priority defect 
+       "An integer value specifying the lowest priority defect
         that is allowed to generate fault alarm.
        "
     REFERENCE
@@ -2386,7 +2380,7 @@ dot1agCfmMepFngResetTime OBJECT-TYPE
        "12.14.7.1.3:m, 20.35.4"
     DEFVAL { 1000 }
     ::= { dot1agCfmMepEntry 12 }
-   
+
 dot1agCfmMepHighestPrDefect OBJECT-TYPE
     SYNTAX   Dot1agCfmHighestDefectPri
     MAX-ACCESS  read-only
@@ -2397,7 +2391,7 @@ dot1agCfmMepHighestPrDefect OBJECT-TYPE
         the FNG_RESET state.
        "
     REFERENCE
-       "12.14.7.1.3:n, 20.35.9, Table 21-1"
+       "12.14.7.1.3:n, 20.35.9, Table 20-1"
     ::= { dot1agCfmMepEntry 13 }
 
 dot1agCfmMepDefects OBJECT-TYPE
@@ -2691,7 +2685,7 @@ dot1agCfmMepTransmitLtmStatus OBJECT-TYPE
    STATUS      current
    DESCRIPTION
       "A Boolean flag set to true by the Bridge Port to indicate
-       that another LTM may be transmitted. 
+       that another LTM may be transmitted.
        Reset to false by the MEP Linktrace Initiator State Machine."
    DEFVAL { true }
    ::= { dot1agCfmMepEntry 36 }
@@ -2825,7 +2819,7 @@ dot1agCfmMepTransmitLtmEgressIdentifier OBJECT-TYPE
     REFERENCE
        "12.14.7.4.3:b, 21.8.8"
     ::= { dot1agCfmMepEntry 44 }
-   
+
 dot1agCfmMepRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
@@ -2911,8 +2905,6 @@ dot1agCfmMepPbbTeMismatchSinceReset OBJECT-TYPE
    REFERENCE
       "12.14.7.1.3:aj"
    ::= { dot1agCfmMepEntry 51 }
-
-
 
 -- ******************************************************************
 -- The Linktrace Reply Table
@@ -3042,8 +3034,8 @@ dot1agCfmLtrLastEgressIdentifier OBJECT-TYPE
     DESCRIPTION
        "An octet field holding the Last Egress Identifier returned
         in the LTR Egress Identifier TLV of the LTR.
-        The Last Egress Identifier identifies the MEP Linktrace 
-        Initiator that originated, or the Linktrace Responder that 
+        The Last Egress Identifier identifies the MEP Linktrace
+        Initiator that originated, or the Linktrace Responder that
         forwarded, the LTM to which this LTR is the response.  This
         is the same value as the Egress Identifier TLV of that LTM.
        "
@@ -3116,7 +3108,6 @@ dot1agCfmLtrManAddressDomain OBJECT-TYPE
         in the LTR Sender ID TLV from that system.
 
         Typical values will be one of (not all inclusive) list:
-
 
            snmpUDPDomain          (from SNMPv2-TM, RFC3417)
            snmpIeee802Domain      (from SNMP-IEEE802-TM-MIB, RFC4789)
@@ -3376,7 +3367,7 @@ dot1agCfmMepDbPortStatusTlv OBJECT-TYPE
        "12.14.7.6.3:f, 20.19.3"
     DEFVAL { psNoPortStateTLV }
     ::= { dot1agCfmMepDbEntry 6}
-   
+
 dot1agCfmMepDbInterfaceStatusTlv OBJECT-TYPE
     SYNTAX      Dot1agCfmInterfaceStatus
     MAX-ACCESS  read-only
@@ -3427,7 +3418,6 @@ dot1agCfmMepDbManAddressDomain OBJECT-TYPE
         in the CCM Sender ID TLV from that system.
 
         Typical values will be one of (not all inclusive) list:
-
 
            snmpUDPDomain          (from SNMPv2-TM, RFC3417)
            snmpIeee802Domain      (from SNMP-IEEE802-TM-MIB, RFC4789)
@@ -3704,7 +3694,6 @@ dot1agCfmNotificationsGroup NOTIFICATION-GROUP
        "Objects for the Notifications group."
     ::= { dot1agCfmGroups 9 }
 
-
 ieee8021CfmMaNetGroup OBJECT-GROUP
     OBJECTS {
       dot1agCfmMaNetFormat,
@@ -3738,7 +3727,7 @@ ieee8021CfmPbbTeExtensionGroup OBJECT-GROUP
     STATUS     current
     DESCRIPTION
        "Objects needed for systems that support PBB-TE CFM functionality."
-    ::= { dot1agCfmGroups 12 } 
+    ::= { dot1agCfmGroups 12 }
 
 ieee8021CfmPbbTeTrafficBitGroup OBJECT-GROUP
     OBJECTS {
@@ -3753,7 +3742,7 @@ ieee8021CfmPbbTeTrafficBitGroup OBJECT-GROUP
     DESCRIPTION
        "Objects needed for PBB-TE supporting systems that support the
         optional traffic bit."
-    ::= { dot1agCfmGroups 13 } 
+    ::= { dot1agCfmGroups 13 }
 
 -- ******************************************************************
 -- MIB Module Compliance statements
