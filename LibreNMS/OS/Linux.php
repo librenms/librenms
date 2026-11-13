@@ -81,7 +81,8 @@ class Linux extends Shared\Unix implements VminfoDiscovery
 
     public function discoverEntityPhysical(): Collection
     {
-        return $this->discoverLsiMegaRaidInventory();
+        // ENTITY-MIB, such as from the linux_entity pass_persist, plus the LSI MegaRAID inventory
+        return parent::discoverEntityPhysical()->merge($this->discoverLsiMegaRaidInventory());
     }
 
     private function discoverLsiMegaRaidInventory(): Collection

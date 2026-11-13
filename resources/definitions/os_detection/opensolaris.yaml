@@ -6,6 +6,10 @@ processor_stacked: true
 over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
+poller_modules:
+    entity-state: true
+discovery_modules:
+    entity-state: true
 discovery:
     -
         sysObjectID: .1.3.6.1.4.1.8072.3.2.3

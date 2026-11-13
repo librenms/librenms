@@ -210,6 +210,9 @@ class InventoryController implements DeviceTab
             'backplane' => 'fa-bars',
             'stack' => 'fa-list-ol',
             'powerSupply' => 'fa-bolt',
+            'cpu' => 'fa-microchip',
+            'battery' => 'fa-battery-half',
+            'storageDrive' => 'fa-hard-drive',
             default => 'fa-cube',
         };
     }

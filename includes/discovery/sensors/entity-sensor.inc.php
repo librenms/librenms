@@ -52,6 +52,28 @@ if (! empty($entity_oids)) {
         'dBm' => 'dbm',
     ];
 
+    // Unix devices, such as ones using the linux_entity or freebsd_entity pass_persist scripts,
+    // have the sensors under a transceiver linked to it, so they show with it on the port page.
+    // entity_parents is entPhysicalIndex to entPhysicalContainedIn, and transceiver_indexes is
+    // keyed by the entPhysicalIndex of each transceiver found by the transceivers module.
+    //
+    // Those scripts can also serve the CISCO-ENTITY-SENSOR-MIB entSensorThresholdTable for the
+    // limits, as ENTITY-SENSOR-MIB has none. unix_thresholds is entPhysicalIndex, then the
+    // threshold index, to its severity, relation, and value, the value being at the same scale
+    // and precision as the entPhySensorValue.
+    $entity_parents = [];
+    $transceiver_indexes = [];
+    $unix_thresholds = [];
+    if ($device['os_group'] === 'unix') {
+        $entity_parents = \App\Models\EntPhysical::where('device_id', $device['device_id'])->pluck('entPhysicalContainedIn', 'entPhysicalIndex')->all();
+        $transceiver_indexes = \App\Models\Transceiver::where('device_id', $device['device_id'])->pluck('entity_physical_index')->flip()->all();
+        $unix_thresholds = \SnmpQuery::mibDir('cisco')->mibs(['CISCO-ENTITY-SENSOR-MIB'])->enumStrings()->walk([
+            'CISCO-ENTITY-SENSOR-MIB::entSensorThresholdSeverity',
+            'CISCO-ENTITY-SENSOR-MIB::entSensorThresholdRelation',
+            'CISCO-ENTITY-SENSOR-MIB::entSensorThresholdValue',
+        ])->table(2);
+    }
+
     foreach ($entity_oids as $index => $entry) {
         $low_limit = null;
         $low_warn_limit = null;
@@ -243,8 +265,47 @@ if (! empty($entity_oids)) {
                     }
                     // End grouping sensors
                 }
+                // limits from entSensorThresholdTable, see $unix_thresholds above. minor is the warning
+                // limit. major and critical are both the limit, as IPMI has critical and
+                // non-recoverable, so the one reached first is used.
+                foreach ($unix_thresholds[$index] ?? [] as $threshold) {
+                    if (! is_numeric($threshold['CISCO-ENTITY-SENSOR-MIB::entSensorThresholdValue'] ?? null)) {
+                        continue;
+                    }
+                    $threshold_value = $threshold['CISCO-ENTITY-SENSOR-MIB::entSensorThresholdValue'] * $multiplier / $divisor;
+                    $relation = $threshold['CISCO-ENTITY-SENSOR-MIB::entSensorThresholdRelation'] ?? '';
+                    $is_upper = in_array($relation, ['greaterThan', 'greaterOrEqual'], true);
+                    if (! $is_upper && ! in_array($relation, ['lessThan', 'lessOrEqual'], true)) {
+                        continue;
+                    }
+
+                    $severity = $threshold['CISCO-ENTITY-SENSOR-MIB::entSensorThresholdSeverity'] ?? '';
+                    if ($severity === 'minor' && $is_upper) {
+                        $warn_limit = $threshold_value;
+                    } elseif ($severity === 'minor') {
+                        $low_warn_limit = $threshold_value;
+                    } elseif (($severity === 'major' || $severity === 'critical') && $is_upper) {
+                        $high_limit = min($high_limit ?? $threshold_value, $threshold_value);
+                    } elseif ($severity === 'major' || $severity === 'critical') {
+                        $low_limit = max($low_limit ?? $threshold_value, $threshold_value);
+                    }
+                }
+
+                // walk up the containment to a transceiver, if any, see $entity_parents above
+                $measured_entity = $entry['entSensorMeasuredEntity'] ?? null;
+                $parent_index = $entity_parents[$index] ?? 0;
+                for ($depth = 0; $parent_index && $depth < 10; $depth++) {
+                    if (isset($transceiver_indexes[$parent_index])) {
+                        $entPhysicalIndex = $parent_index;
+                        $measured_entity = 'ports';
+                        $group = 'transceiver';
+                        break;
+                    }
+                    $parent_index = $entity_parents[$parent_index] ?? 0;
+                }
+
                 $descr = trim((string) $descr);
-                discover_sensor(null, $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'] ?? null, null, $group);
+                discover_sensor(null, $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $measured_entity, null, $group);
             }
         }//end if
     }//end foreach
