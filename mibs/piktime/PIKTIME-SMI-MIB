@@ -1,0 +1,22 @@
+PIKTIME-SMI-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Top-level infrastructure of the PIKTIME enterprise MIB tree
+--
+
+IMPORTS
+    MODULE-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+		
+-- 1.3.6.1.4.1.49224
+piktime MODULE-IDENTITY
+    LAST-UPDATED 	"202604290000Z"
+    ORGANIZATION 	"PikTime Systems"
+    CONTACT-INFO 	"www.piktime.com"
+    DESCRIPTION  	"Top-level infrastructure of the PIKTIME enterprise MIB tree"
+    REVISION 		"202604290000Z"
+    DESCRIPTION 	"Administrative update."
+    REVISION 		"202211070000Z"
+    DESCRIPTION 	" "
+    ::= { enterprises 49224 }
+END
