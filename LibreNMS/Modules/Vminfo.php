@@ -35,13 +35,11 @@ use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PowerState;
-use LibreNMS\Enum\ProcessType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
 use LibreNMS\Interfaces\RemovesMethodData;
-use LibreNMS\Interfaces\UsesDataSources;
 use LibreNMS\Interfaces\VminfoClusterSource;
 use LibreNMS\Interfaces\VminfoSource;
 use LibreNMS\OS;
@@ -49,7 +47,7 @@ use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\RRD\RrdDefinition;
 use Throwable;
 
-class Vminfo implements \LibreNMS\Interfaces\Module, RemovesMethodData, UsesDataSources
+class Vminfo implements \LibreNMS\Interfaces\Module, RemovesMethodData
 {
     use SyncsModels;
 
@@ -65,14 +63,6 @@ class Vminfo implements \LibreNMS\Interfaces\Module, RemovesMethodData, UsesData
     {
         // the OS is mostly a data source with snmp
         return [...app(PollingMethodRegistry::class)->providing(VminfoDiscovery::class), PollingMethodType::Snmp];
-    }
-
-    public function dataSourceInterface(ProcessType $type): string
-    {
-        return match ($type) {
-            ProcessType::Discovery => VminfoDiscovery::class,
-            ProcessType::Poller => VminfoPolling::class,
-        };
     }
 
     public function removeMethodData(Device $device, PollingMethodType $type): void
