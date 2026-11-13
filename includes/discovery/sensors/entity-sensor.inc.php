@@ -67,7 +67,7 @@ if (! empty($entity_oids)) {
     if ($device['os_group'] === 'unix') {
         $entity_parents = \App\Models\EntPhysical::where('device_id', $device['device_id'])->pluck('entPhysicalContainedIn', 'entPhysicalIndex')->all();
         $transceiver_indexes = \App\Models\Transceiver::where('device_id', $device['device_id'])->pluck('entity_physical_index')->flip()->all();
-        $unix_thresholds = \SnmpQuery::mibDir('cisco')->mibs(['CISCO-ENTITY-SENSOR-MIB'])->hideMib()->enumStrings()->walk([
+        $unix_thresholds = \SnmpQuery::mibDir('cisco')->mibs(['CISCO-ENTITY-SENSOR-MIB'])->enumStrings()->walk([
             'CISCO-ENTITY-SENSOR-MIB::entSensorThresholdSeverity',
             'CISCO-ENTITY-SENSOR-MIB::entSensorThresholdRelation',
             'CISCO-ENTITY-SENSOR-MIB::entSensorThresholdValue',
@@ -269,17 +269,17 @@ if (! empty($entity_oids)) {
                 // limit. major and critical are both the limit, as IPMI has critical and
                 // non-recoverable, so the one reached first is used.
                 foreach ($unix_thresholds[$index] ?? [] as $threshold) {
-                    if (! is_numeric($threshold['entSensorThresholdValue'] ?? null)) {
+                    if (! is_numeric($threshold['CISCO-ENTITY-SENSOR-MIB::entSensorThresholdValue'] ?? null)) {
                         continue;
                     }
-                    $threshold_value = $threshold['entSensorThresholdValue'] * $multiplier / $divisor;
-                    $relation = $threshold['entSensorThresholdRelation'] ?? '';
+                    $threshold_value = $threshold['CISCO-ENTITY-SENSOR-MIB::entSensorThresholdValue'] * $multiplier / $divisor;
+                    $relation = $threshold['CISCO-ENTITY-SENSOR-MIB::entSensorThresholdRelation'] ?? '';
                     $is_upper = in_array($relation, ['greaterThan', 'greaterOrEqual'], true);
                     if (! $is_upper && ! in_array($relation, ['lessThan', 'lessOrEqual'], true)) {
                         continue;
                     }
 
-                    $severity = $threshold['entSensorThresholdSeverity'] ?? '';
+                    $severity = $threshold['CISCO-ENTITY-SENSOR-MIB::entSensorThresholdSeverity'] ?? '';
                     if ($severity === 'minor' && $is_upper) {
                         $warn_limit = $threshold_value;
                     } elseif ($severity === 'minor') {
