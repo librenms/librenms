@@ -61,9 +61,8 @@ instructions of each application.
 | --- | --- |
 | `/etc/init.d/xinetd restart` | `systemctl enable check_mk.socket && systemctl start check_mk.socket` |
 
-8: Log in to the LibreNMS web interface and edit the monitored device.
-In the polling section, add the Unix Agent method. This enables the
-unix-agent module for the device.
+8: In LibreNMS, add the Unix Agent method under Device -> Edit -> Polling.
+This enables the unix-agent module.
 
 9: Then enable your applications under Applications.
 

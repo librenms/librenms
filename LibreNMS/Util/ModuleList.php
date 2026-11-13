@@ -135,9 +135,7 @@ class ModuleList
     }
 
     /**
-     * Enabled when the device has a non-SNMP polling method the module gets data from enabled.
-     * SNMP is left out, modules that use it are enabled by the global and OS settings.
-     * Null when the methods do not set it.
+     * True when one of the module's non-SNMP methods is enabled, otherwise null.
      */
     public function methodSetting(string $module_name, Device $device): ?bool
     {

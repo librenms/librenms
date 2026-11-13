@@ -120,6 +120,18 @@ final class EditModulesControllerTest extends TestCase
         $this->assertTrue((new ModuleList)->moduleStatus(ProcessType::Poller, 'unix-agent', $device)->isEnabled());
     }
 
+    public function testIpmiMethodEnablesTheIpmiModule(): void
+    {
+        $snmpOnly = $this->deviceWithMethods([], PollingMethodType::Snmp);
+        $ipmi = $this->deviceWithMethods([], PollingMethodType::Snmp, PollingMethodType::Ipmi);
+        $moduleList = new ModuleList;
+
+        foreach ([ProcessType::Discovery, ProcessType::Poller] as $type) {
+            $this->assertFalse($moduleList->moduleStatus($type, 'ipmi', $snmpOnly)->isEnabled(), 'ipmi is off by default');
+            $this->assertTrue($moduleList->moduleStatus($type, 'ipmi', $ipmi)->isEnabled());
+        }
+    }
+
     public function testAllModulesHaveFriendlyNames(): void
     {
         foreach (['poller_modules', 'discovery_modules'] as $configKey) {

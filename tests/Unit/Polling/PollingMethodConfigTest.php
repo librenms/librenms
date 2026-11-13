@@ -10,6 +10,7 @@ use App\Models\Secret;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
+use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
@@ -214,7 +215,9 @@ final class PollingMethodConfigTest extends TestCase
         $this->assertSame('ipv6', $device->polling()->icmp()->ipVersion);
 
         $this->assertFalse($device->polling()->isEnabled(PollingMethodType::Ipmi));
-        $this->assertSame('192.0.2.1', $device->polling()->ipmi()->hostname);
+        $ipmi = $device->polling()->get(PollingMethodType::Ipmi);
+        $this->assertInstanceOf(IpmiConfig::class, $ipmi);
+        $this->assertSame('192.0.2.1', $ipmi->hostname);
         $agent = $device->polling()->get(PollingMethodType::UnixAgent);
         $this->assertInstanceOf(UnixAgentConfig::class, $agent);
         $this->assertSame(6556, $agent->port);

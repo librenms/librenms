@@ -7,7 +7,6 @@ use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
-use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
 
@@ -34,12 +33,6 @@ readonly class PollingMethodAccessor
     {
         /** @var IcmpConfig */
         return $this->get(PollingMethodType::Icmp);
-    }
-
-    public function ipmi(): IpmiConfig
-    {
-        /** @var IpmiConfig */
-        return $this->get(PollingMethodType::Ipmi);
     }
 
     /**

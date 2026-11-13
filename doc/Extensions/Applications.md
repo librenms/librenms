@@ -178,7 +178,6 @@ LibreNMS during discovery and polling.
 ## Agent
 
 The unix-agent does not have a discovery module, only a poller
-module. That poller module is disabled by default. Adding the Unix Agent
-polling method to a device enables it for that device. It is better to
+module. Adding the Unix Agent polling method to a device enables it. It is better to
 ensure that your application is enabled for monitoring. You can check
 by following the steps under the `SNMP Extend` heading.
