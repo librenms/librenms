@@ -148,7 +148,7 @@ class Unix extends \LibreNMS\OS implements MempoolsDiscovery, TransceiverDiscove
 
         return $entities->filter(
             // the port's ifIndex is copied to the module by discoverEntityPhysical()
-            fn(EntPhysical $entity) => $entity->entPhysicalClass === 'module'
+            fn (EntPhysical $entity) => $entity->entPhysicalClass === 'module'
             && $entity->ifIndex
             && $entities->get($entity->entPhysicalContainedIn)?->entPhysicalClass === 'port')->map(function (EntPhysical $module) use ($children) {
             // the scripts name per lane sensors '$interface Lane $lane ...'
