@@ -146,12 +146,11 @@ class Unix extends \LibreNMS\OS implements MempoolsDiscovery, TransceiverDiscove
         $entities = $entities->keyBy('entPhysicalIndex');
         $children = $entities->groupBy('entPhysicalContainedIn');
 
-        return $entities->filter(function (EntPhysical $entity) use ($entities) {
+        return $entities->filter(
             // the port's ifIndex is copied to the module by discoverEntityPhysical()
-            return $entity->entPhysicalClass === 'module'
-                && $entity->ifIndex
-                && $entities->get($entity->entPhysicalContainedIn)?->entPhysicalClass === 'port';
-        })->map(function (EntPhysical $module) use ($children) {
+            fn(EntPhysical $entity) => $entity->entPhysicalClass === 'module'
+            && $entity->ifIndex
+            && $entities->get($entity->entPhysicalContainedIn)?->entPhysicalClass === 'port')->map(function (EntPhysical $module) use ($children) {
             // the scripts name per lane sensors '$interface Lane $lane ...'
             $sensors = $children->get($module->entPhysicalIndex, new Collection)->where('entPhysicalClass', 'sensor');
             $channels = $sensors->map(fn (EntPhysical $sensor) => preg_match('/ Lane (\d+) /', (string) $sensor->entPhysicalName, $matches) ? (int) $matches[1] : 1)->max() ?? 1;
