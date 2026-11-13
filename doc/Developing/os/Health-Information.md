@@ -545,20 +545,21 @@ limit, the high limit, and the high warning limit. The Adva MIB does
 not hold these values.
 
 To test the code, run the discovery manually with
-`lnms device:discover $device_id -m sensors`. The flag `-v` shows the
-calls of the discovery. The flag `-d` shows the debug output. The
-output under `#### Load disco module sensors ####` holds a list of the
+`lnms device:discover $device_id -m sensors`. The flag `-vv` shows the
+calls of the discovery. The flag `-vvv` shows the debug output. 
+
+The output under `#### Load discovery module sensors ####` holds a list of the
 sensor types. A `+` means a new sensor. A `-` means a removed sensor. A
 `.` means no change. No character means no discovery of that sensor.
 The bottom of the output holds the changes to the database and to the
 RRD files.
 
 ```
-[librenms@nms-test ~]$ lnms device:discover 2 -m sensors
+[librenms@nms-test ~]$ lnms device:discover -v 2 -m sensors
 LibreNMS Discovery
 164.113.194.250 2 adva_fsp150
 
-#### Load disco module core ####
+#### Load discovery module core ####
 
 >> Runtime for discovery module 'core': 0.0240 seconds with 66536 bytes
 >> SNMP: [2/0.06s] MySQL: [3/0.00s] RRD: [0/0.00s]
