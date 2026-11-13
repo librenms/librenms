@@ -585,6 +585,7 @@ class RunAlerts
 
             $tolerence_window = LibrenmsConfig::get('alert.tolerance_window');
             $activeState = in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED], true);
+            $dueSegments = [];
             $dueTransports = [];
 
             $hasUnacknowledgedFaults = $activeState && AlertFault::query()
@@ -637,6 +638,10 @@ class RunAlerts
                     $rextra['mute'] = true;
                 } else {
                     $dueSegments = AlertUtil::dueProblemSegments((int) $alert['rule_id'], $alert['details']);
+                    if (empty($alert['details']['op_sent']) && ! empty($alert['details']['op_missed'])) {
+                        $alert['details']['op_missed'] = AlertUtil::currentProblemSegments((int) $alert['rule_id'], $alert['details']['op_missed']);
+                        $dueSegments = array_values(array_unique([...$dueSegments, ...$alert['details']['op_missed']]));
+                    }
                     $updet = true;
                     $noacc = true;
                     if (! empty($dueSegments)) {
@@ -736,6 +741,17 @@ class RunAlerts
                     ->where('rule_id', $alert['rule_id'])
                     ->where('device_id', $alert['device_id'])
                     ->update(['info' => $info]);
+            }
+
+            if (! empty($dueTransports) && empty($alert['details']['op_sent'])) {
+                if ($maintenance_status == MaintenanceStatus::MuteAlerts || $maintenance_status == MaintenanceStatus::SkipAlerts) {
+                    if ((int) $alert['alerted'] === 0) {
+                        $alert['details']['op_missed'] = array_values(array_unique([...$alert['details']['op_missed'] ?? [], ...$dueSegments]));
+                    }
+                } elseif (! $noiss && empty($rextra['mute'])) {
+                    $alert['details']['op_sent'] = 1;
+                    unset($alert['details']['op_missed']);
+                }
             }
 
             if ($updet) {
