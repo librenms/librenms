@@ -1,8 +1,8 @@
--- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+-- Mib files packaged on  Wed Jun 19 01:31:39 EDT 2019 for Storage Array Firmware V10.0.3 (R469188)
 
 EQLDISK-MIB DEFINITIONS  ::= BEGIN   
 IMPORTS  
-    MODULE-IDENTITY, OBJECT-TYPE, Integer32,enterprises, Counter32, Counter64
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,enterprises, Counter32, Counter64, Gauge32
             FROM SNMPv2-SMI        
    TEXTUAL-CONVENTION,  DisplayString
             FROM SNMPv2-TC
@@ -14,8 +14,8 @@ IMPORTS
             FROM EQLMEMBER-MIB;      
 
 eqldiskModule MODULE-IDENTITY      
-	LAST-UPDATED "201503171528Z"
-    ORGANIZATION  "EqualLogic Inc."
+	LAST-UPDATED "201906190531Z"
+    ORGANIZATION  "Dell Inc."
     CONTACT-INFO      
         "Contact: Customer Support
          Postal:  Dell Inc
@@ -25,9 +25,9 @@ eqldiskModule MODULE-IDENTITY
          WEB:     www.equallogic.com"
 
     DESCRIPTION          
-        "Equallogic Inc Peer Storage Array disk table information 
+        "Dell Inc. Peer Storage Array disk table information 
 
-         Copyright (c) 2002-2009 by Dell, Inc.
+         Copyright (c) 2002-2013 by Dell, Inc.
 
          All rights reserved.  This software may not be copied, disclosed,
          transferred, or used except in accordance with a license granted
@@ -37,6 +37,8 @@ eqldiskModule MODULE-IDENTITY
 
 
     -- Revision history, in reverse chronological order
+    REVISION    "201309200000Z"         -- 20-Sep-2013
+    DESCRIPTION "Corrected eqlDiskStatusNumIOs from a Counter32 to a Gauge32"
     REVISION    "200209060000Z"         -- 02-Sep-06
     DESCRIPTION "Initial revision"    
     ::= { enterprises equalLogic(12740) 3 }     
@@ -300,7 +302,7 @@ EqlDiskStatusEntry ::=
         eqlDiskStatusBytesRead      Counter64,
         eqlDiskStatusBytesWritten   Counter64,
         eqlDiskStatusBusyTime       Counter64,
-        eqlDiskStatusNumIOs         Counter32,
+        eqlDiskStatusNumIOs         Gauge32,
         eqlDiskStatusFailXfers      Counter32,
         eqlDiskStatusNumResets      Counter32,
         eqlDiskStatusTotalQD        Counter64,
@@ -336,9 +338,9 @@ eqlDiskStatusBusyTime   OBJECT-TYPE
     ::=  {  eqlDiskStatusEntry 4 }
 
 eqlDiskStatusNumIOs  OBJECT-TYPE      
-    SYNTAX           Counter32
-    MAX-ACCESS      read-only      
-    STATUS          current      
+    SYNTAX           Gauge32
+    MAX-ACCESS       read-only      
+    STATUS           current      
     DESCRIPTION     "This variable specifies number of IO operations
                      currently outstanding."
     ::=  {  eqlDiskStatusEntry 5 }

@@ -1,4 +1,4 @@
--- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+-- Mib files packaged on  Wed Jun 19 01:31:39 EDT 2019 for Storage Array Firmware V10.0.3 (R469188)
 
 --FROM SNMP-FRAMEWORK-MIB; 
 -- RFC 2571  
@@ -34,7 +34,7 @@ IMPORTS
         FROM RFC1213-MIB;
 
 eqlvolbalancerModule MODULE-IDENTITY      
-	LAST-UPDATED "201503171528Z"
+	LAST-UPDATED "201906190531Z"
     ORGANIZATION  "EqualLogic Inc."
     CONTACT-INFO      
         "Contact: Customer Support
@@ -694,7 +694,8 @@ eqlVolBalPlanEntryStatus OBJECT-TYPE
 
 eqlVolBalPlanFlags OBJECT-TYPE
     SYNTAX      INTEGER {
-				mixedModeBit(1)
+                mixedModeBit(1),
+                fastModeBit(2)
     }
     MAX-ACCESS      read-create
     STATUS          current      
@@ -1581,7 +1582,9 @@ eqlPageMoveHistoryType OBJECT-TYPE
                 vacate-pool(5),
                 move-volume(6),
                 move-site(7),
-                performance-trouble(8)
+                performance-trouble(8),
+                archive(9),
+                fast(65536)
     }
     MAX-ACCESS  read-create
     STATUS      current

@@ -1,4 +1,4 @@
--- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+-- Mib files packaged on  Wed Jun 19 01:31:39 EDT 2019 for Storage Array Firmware V10.0.3 (R469188)
 
 EQLTAG-MIB DEFINITIONS  ::= BEGIN
 IMPORTS
@@ -15,7 +15,7 @@ IMPORTS
             FROM EQLVOLUME-MIB;
 
 eqltagModule MODULE-IDENTITY
-	LAST-UPDATED "201503171528Z"
+	LAST-UPDATED "201906190531Z"
     ORGANIZATION  "EqualLogic Inc."
     CONTACT-INFO
         "Contact: Customer Support
@@ -48,10 +48,10 @@ eqltagNotifications OBJECT IDENTIFIER ::= { eqltagModule 2 }
 eqltagConformance OBJECT IDENTIFIER   ::= { eqltagModule 3 }
 
 
-----------------------------------------------------------------------
-
+-------------------------------------------------------------------------------
 -- Tag table
 --
+-------------------------------------------------------------------------------
 
 eqlTagTable OBJECT-TYPE
     SYNTAX        SEQUENCE OF EqlTagEntry
@@ -85,12 +85,14 @@ EqlTagEntry ::= SEQUENCE {
    eqlTagRowStatus          RowStatus,
    eqlTagValue              UTFString,
    eqlTagAdminAccountKey    Unsigned32,
-   eqlTagValueDescription   UTFString
+   eqlTagValueDescription   UTFString,
+   eqlTagKeyValue           UTFString
 }
 
 eqlTagType OBJECT-TYPE      
     SYNTAX          INTEGER {
-                    folder(1)
+                    folder(1),
+                    application(2)
                     }
     MAX-ACCESS      not-accessible      
     STATUS          current      
@@ -145,12 +147,22 @@ eqlTagValueDescription OBJECT-TYPE
     DESCRIPTION     "This field specifies a descriptive string that provides details about this tag.
                      The description can be up to 127 characters plus NULL."  
     DEFVAL          { "" }
-    ::=  { eqlTagEntry 6 } 
-          
-----------------------------------------------------------------------
+    ::=  { eqlTagEntry 6 }
 
+eqlTagKeyValue OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..64))    
+    MAX-ACCESS      read-write      
+    STATUS          current      
+    DESCRIPTION     "EQL-SECONDARY-KEY
+                     This field specifies the iSCSI profile sysprep version
+                     of eqlTagValue. It is populated by the backend on a row-create."
+    DEFVAL          { "" }
+    ::=  { eqlTagEntry 7 } 
+
+------------------------------------------------------------------------------
 -- Tag Object table
 --
+-------------------------------------------------------------------------------
 
 eqlTagObjectTable OBJECT-TYPE
     SYNTAX        SEQUENCE OF EqlTagObjectEntry
@@ -202,8 +214,10 @@ eqlTagObjectRowStatus           OBJECT-TYPE
       "Row status used to manage this row."
     ::= { eqlTagObjectEntry  3 }
 
+-------------------------------------------------------------------------------
 -- Admin Account Tag table
 --
+-------------------------------------------------------------------------------
 
 eqlAdminAccountTagTable OBJECT-TYPE
     SYNTAX        SEQUENCE OF EqlAdminAccountTagEntry
@@ -242,10 +256,10 @@ eqlAdminAccountTagAccess OBJECT-TYPE
     DESCRIPTION     "The administrative permission to a tag."
     ::=   { eqlAdminAccountTagEntry 1 }
 
---******************************************************************
-          
+-------------------------------------------------------------------------------
 -- Volume Tag table
 --
+-------------------------------------------------------------------------------
 
 eqlVolumeTagTable OBJECT-TYPE
     SYNTAX        SEQUENCE OF EqlVolumeTagEntry
@@ -269,7 +283,8 @@ eqlVolumeTagEntry OBJECT-TYPE
 
 EqlVolumeTagEntry ::= 
    SEQUENCE {
-      eqlVolumeTagValue   UTFString
+      eqlVolumeTagValue   UTFString,
+      eqlVolumeTagName    UTFString
 }
 
 eqlVolumeTagValue OBJECT-TYPE      
@@ -281,8 +296,254 @@ eqlVolumeTagValue OBJECT-TYPE
                      The tag value can be up to 63 characters plus NULL."  
     ::=   { eqlVolumeTagEntry 1 }
 
---******************************************************************
-          
+eqlVolumeTagName OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..64))    
+    MAX-ACCESS      read-write      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the name of the tag, for instance,
+                     if this is a folder tag then the name would be 'folder'
+                     The tag name can be up to 63 characters plus NULL."   
+    ::=   { eqlVolumeTagEntry 2 }
+
+-------------------------------------------------------------------------------
+-- User Defined Tag Type Table
+--
+-------------------------------------------------------------------------------
+
+eqlUserDefinedTagTypeTable   OBJECT-TYPE
+    SYNTAX              SEQUENCE OF EqlUserDefinedTagTypeEntry
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION
+     "EqualLogic-Persistent
+      This table maintains a set of all of the user defined tag types within
+      the system."
+    ::= { eqltagObjects 5 }
+
+eqlUserDefinedTagTypeEntry  OBJECT-TYPE
+    SYNTAX                  EqlUserDefinedTagTypeEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+      "An entry in the tag object table."
+    INDEX           {eqlTagType}
+    ::= { eqlUserDefinedTagTypeTable 1 }
+
+EqlUserDefinedTagTypeEntry ::= SEQUENCE {
+   eqlUserDefinedTagTypeRowStatus       RowStatus,
+   eqlUserDefinedTagTypeName            UTFString,
+   eqlUserDefinedTagTypeKeyName         UTFString,
+   eqlUserDefinedTagTypeAdminAccountKey Unsigned32,
+   eqlUserDefinedTagTypeDescription     UTFString
+}
+
+eqlUserDefinedTagTypeRowStatus     OBJECT-TYPE
+   SYNTAX               RowStatus
+   MAX-ACCESS           read-only
+   STATUS               current
+   DESCRIPTION
+      "Row status used to manage this row."
+    ::= { eqlUserDefinedTagTypeEntry  1 }
+    
+eqlUserDefinedTagTypeName        OBJECT-TYPE
+      SYNTAX          UTFString (SIZE (0..64))
+      MAX-ACCESS      read-write
+      STATUS          current
+      DESCRIPTION     "The name of this tag type."
+    DEFVAL          { "" }
+      ::= { eqlUserDefinedTagTypeEntry  2 }
+
+eqlUserDefinedTagTypeKeyName        OBJECT-TYPE
+      SYNTAX          UTFString (SIZE (0..64))
+      MAX-ACCESS      read-write
+      STATUS          current
+    DESCRIPTION     "EQL-SECONDARY-KEY
+                     This field specifies the iSCSI profile sysprep version
+                     of eqlUserDefinedTagTypeName. It is populated by the backend on a row-create."
+    DEFVAL          { "" }
+      ::= { eqlUserDefinedTagTypeEntry  3 }
+
+eqlUserDefinedTagTypeAdminAccountKey OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the unique key for identifying a volume administrator
+                     that owns this tag.  If no account has this value as its 
+                     eqlStorageGroupAdminAccountKey, then the tag is unassigned."
+    DEFVAL          {0}
+    ::=   { eqlUserDefinedTagTypeEntry 4 }
+
+eqlUserDefinedTagTypeDescription OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..128))    
+    MAX-ACCESS      read-write      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a descriptive string that provides details about this tag.
+                     The description can be up to 127 characters plus NULL."  
+    DEFVAL          { "" }
+    ::=  { eqlUserDefinedTagTypeEntry 5 } 
+
+
+-------------------------------------------------------------------------------
+-- Tag Type Table
+--
+-------------------------------------------------------------------------------
+
+eqlTagTypeTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlTagTypeEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "EqualLogic-Dynamic
+      This table maintains a set of all of the current tag types defined
+      in the system.  This is a combination of system defined tag types, as well
+      as user defined tag types."
+    ::= { eqltagObjects 6 }
+
+eqlTagTypeEntry OBJECT-TYPE
+    SYNTAX        EqlTagTypeEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the tag object table."
+    INDEX           {eqlTagType}
+    ::= { eqlTagTypeTable 1 }
+
+EqlTagTypeEntry ::= SEQUENCE {
+   eqlTagTypeRowStatus                RowStatus,
+   eqlTagTypeName                     UTFString,
+   eqlTagTypeAdminAccountKey          Unsigned32,
+   eqlTagTypeUserDefined              TruthValue,
+   eqlTagTypeDescription              UTFString
+}
+
+eqlTagTypeRowStatus     OBJECT-TYPE
+   SYNTAX               RowStatus
+   MAX-ACCESS           read-create
+   STATUS               current
+   DESCRIPTION
+      "Row status used to manage this row."
+    ::= { eqlTagTypeEntry  1 }
+    
+eqlTagTypeName        OBJECT-TYPE
+      SYNTAX          UTFString (SIZE (0..64))  
+      MAX-ACCESS      read-write
+      STATUS          current
+      DESCRIPTION     "The name of this tag type."
+      DEFVAL          { "" }
+      ::= { eqlTagTypeEntry  2 }
+
+eqlTagTypeAdminAccountKey OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the unique key for identifying a volume administrator
+                     that owns this tag type.  If no account has this value as its 
+                     eqlStorageGroupAdminAccountKey, then the tag is unassigned."
+    DEFVAL          {0}
+    ::=   { eqlTagTypeEntry 3 }
+
+eqlTagTypeUserDefined   OBJECT-TYPE
+   SYNTAX               TruthValue
+   MAX-ACCESS           read-write
+   STATUS               current
+   DESCRIPTION          "A value that indicates if the tag type is a system tag
+                         or a user defined tag.  True indicates a system defined
+                         tag, and False indicates a user defined tag."
+   DEFVAL               {false}
+   ::=   { eqlTagTypeEntry 4 }
+
+eqlTagTypeDescription OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..128))    
+    MAX-ACCESS      read-write      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a descriptive string that provides details about this tag type.
+                     The description can be up to 127 characters plus NULL."  
+    DEFVAL          { "" }
+    ::=  { eqlTagTypeEntry 5 } 
+    
+
+-------------------------------------------------------------------------------
+-- User Defined Dynamic Tag Type Table
+--
+-------------------------------------------------------------------------------
+
+eqlUserDefinedTagLookupTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlUserDefinedTagLookupEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic
+                     This table allows for a faster lookup of the eqlTagType 
+                     for a user defined tag name, by utilizing the
+                     eqlUserDefinedTagTypeKeyName secondary key."  
+    ::=  { eqltagObjects 7 }
+
+eqlUserDefinedTagLookupEntry OBJECT-TYPE      
+    SYNTAX          EqlUserDefinedTagLookupEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry(row) which uses the eqlUserDefinedTagTypeKeyName
+                     secondary key to lookup an eqlTagType."
+    INDEX           { eqlUserDefinedTagTypeKeyName, eqlTagType }
+
+    ::=   { eqlUserDefinedTagLookupTable 1 }
+
+EqlUserDefinedTagLookupEntry ::=
+    SEQUENCE {
+        eqlUserDefinedTagLookupIndex Unsigned32
+    }
+
+eqlUserDefinedTagLookupIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field is the value of the eqlTagType of the 
+                     corresponding entry matching the 
+                     eqlUserDefinedTagTypeKeyName in the eqlUserDefinedTagTypeTable"  
+
+    ::=  { eqlUserDefinedTagLookupEntry 1 }  
+    
+    
+-------------------------------------------------------------------------------
+--  Dynamic Tag Usage Count Table
+--
+-------------------------------------------------------------------------------
+    
+eqlTagUsageCountTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlTagUsageCountEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic
+                     This table retrieves the usage count for a tag, based on
+                     the admin access level of the user and the status of
+                     the volume with the tag applied. A tag applied to a volume
+                     that is not visible is not counted, such as a volume in the 
+                     recovery bin, or a replicated volume that is not in the
+                     primary or failover state. A Tag applied to a non-active 
+                     sync-rep volume is not counted."  
+    ::=  { eqltagObjects 8 }
+
+eqlTagUsageCountEntry OBJECT-TYPE      
+    SYNTAX          EqlTagUsageCountEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry(row) which uses the eqlTagType and eqlTagIndex of
+                     the tag to lookup the usage count."
+    INDEX           { eqlTagType, eqlTagIndex }
+
+    ::=   { eqlTagUsageCountTable 1 }
+
+    EqlTagUsageCountEntry ::=
+    SEQUENCE {
+        eqlTagUsageCount Unsigned32
+    }
+    
+    eqlTagUsageCount OBJECT-TYPE      
+    SYNTAX          Unsigned32    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field is the usage count for tag."  
+
+    ::=  { eqlTagUsageCountEntry 1 }    
 
 END
 
