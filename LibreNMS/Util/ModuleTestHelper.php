@@ -276,8 +276,7 @@ class ModuleTestHelper
             ]);
             $method = new DevicePollingMethod([
                 'method_type' => PollingMethodType::Snmp,
-                // snmpsim is local, fail fast instead of the 1s timeout and 5 retries default
-                'settings' => ['transport' => 'udp', 'port' => $snmpSimPort, 'max_repeaters' => 25, 'timeout' => 0.1, 'retries' => 0],
+                'settings' => ['transport' => 'udp', 'port' => $snmpSimPort, 'max_repeaters' => 25],
                 'affects_availability' => true,
                 'last_check_successful' => true,
             ]);
