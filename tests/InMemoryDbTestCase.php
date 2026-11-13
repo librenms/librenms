@@ -27,22 +27,30 @@
 namespace LibreNMS\Tests;
 
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class InMemoryDbTestCase extends TestCase
 {
+    use DatabaseTransactions;
+
     /** @var string */
     protected $connection = 'testing_memory';
 
+    /** @var string[] */
+    protected $connectionsToTransact = ['testing_memory'];
+
     /**
      * Migrated in-memory database, shared by all tests in this process.
-     * Each test runs inside a transaction that is rolled back afterwards.
+     * DatabaseTransactions rolls each test back, so it stays clean.
      */
     private static ?\PDO $pdo = null;
 
-    protected function setUp(): void
+    /**
+     * Migrate or restore the shared database before DatabaseTransactions
+     * starts its transaction, so the transaction runs on the migrated PDO.
+     */
+    protected function setUpTraits()
     {
-        parent::setUp();
-
         $connection = $this->app->make('db')->connection($this->connection);
 
         if (self::$pdo === null) {
@@ -53,10 +61,12 @@ class InMemoryDbTestCase extends TestCase
             $connection->setPdo(self::$pdo);
         }
 
-        $connection->beginTransaction();
-        $this->beforeApplicationDestroyed(function () use ($connection): void {
-            $connection->rollBack(0);
-        });
+        return parent::setUpTraits();
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
 
         $current = config('database.default');
         config(['database.default' => $this->connection]);
