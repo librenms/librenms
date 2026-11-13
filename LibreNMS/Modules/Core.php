@@ -36,6 +36,7 @@ use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\OSIdentification;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
@@ -47,6 +48,11 @@ use SnmpQuery;
 
 class Core implements Module
 {
+    /**
+     * Os that many devices match, checked after every other os and less specific than any of them.
+     */
+    public const array GENERIC_OS = ['airos', 'freebsd', 'linux'];
+
     /**
      * @inheritDoc
      */
@@ -63,12 +69,73 @@ class Core implements Module
         return [PollingMethodType::Snmp, PollingMethodType::Icmp];
     }
 
+    /**
+     * Runs when a source can identify the os. While SNMP is enabled but down, the device keeps its os.
+     */
     public function shouldDiscover(OS $os): bool
     {
-        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
+        $snmpDown = $os->getDevice()->polling()->isEnabled(PollingMethodType::Snmp)
+            && ! $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
+
+        return ! $snmpDown && $os->dataSources(OSIdentification::class) !== [];
     }
 
+    /**
+     * Every source that can identify the os is asked, the most specific answer becomes the os of the device.
+     * With SNMP the OS is one of the sources, it matches the system data against the os definitions.
+     * It is asked last and the last of equally specific answers wins, so SNMP decides a tie.
+     */
     public function discover(OS $os): void
+    {
+        $device = $os->getDevice();
+
+        if ($os->getMethodResults()->isAvailable(PollingMethodType::Snmp)) {
+            $this->discoverSnmpSystem($os);
+        }
+
+        $detectedOs = null;
+        foreach ($os->dataSources(OSIdentification::class) as $source) {
+            $candidate = $source->identifyOS();
+            Log::debug(class_basename($source) . ' identified os: ' . ($candidate ?? 'unknown'));
+
+            if ($candidate !== null && ($detectedOs === null || $this->specificity($candidate) >= $this->specificity($detectedOs))) {
+                $detectedOs = $candidate;
+            }
+        }
+
+        if ($detectedOs === null) {
+            return; // no source identified the os, keep it
+        }
+
+        $device->os = $detectedOs;
+
+        // Set type to a predefined type for the OS if it's not user set (still could be overridden later by os discovery)
+        if (! $device->getAttrib('override_device_type')) {
+            $device->type = LibrenmsConfig::getOsSetting($device->os, 'type');
+            $os->getDeviceArray()['type'] = $device->type;
+        }
+
+        if ($device->isDirty('os')) {
+            OsChangedEvent::dispatch($device);
+        }
+    }
+
+    /**
+     * How specific an os is: generic, then os that many devices match (linux), then every other os.
+     */
+    private function specificity(string $os): int
+    {
+        if ($os === 'generic') {
+            return 0;
+        }
+
+        return in_array($os, self::GENERIC_OS, true) ? 1 : 2;
+    }
+
+    /**
+     * Update the SNMP system data of the device.
+     */
+    private function discoverSnmpSystem(OS $os): void
     {
         $snmpdata = SnmpQuery::numeric()->get([
             'SNMPv2-MIB::sysObjectID.0',
@@ -91,19 +158,6 @@ class Core implements Module
                 Log::debug(DeviceObserver::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)));
                 $os->getDeviceArray()[$attribute] = $device->$attribute; // update device array
             }
-        }
-
-        // detect OS
-        $device->os = self::detectOS($device, false);
-
-        // Set type to a predefined type for the OS if it's not user set (still could be overridden later by os discovery)
-        if (! $device->getAttrib('override_device_type')) {
-            $device->type = LibrenmsConfig::getOsSetting($device->os, 'type');
-            $os->getDeviceArray()['type'] = $device->type;
-        }
-
-        if ($device->isDirty('os')) {
-            OsChangedEvent::dispatch($device);
         }
     }
 
@@ -184,17 +238,12 @@ class Core implements Module
         $sysObjectID = (string) ($device->sysObjectID ?? '');
 
         $deferred_os = [];
-        $generic_os = [
-            'airos' => true,
-            'freebsd' => true,
-            'linux' => true,
-        ];
 
         // check yaml files
         $os_defs = LibrenmsConfig::get('os');
 
         foreach ($os_defs as $os => $def) {
-            if (isset($def['discovery']) && ! isset($generic_os[$os])) {
+            if (isset($def['discovery']) && ! in_array($os, self::GENERIC_OS, true)) {
                 if (self::discoveryIsSlow($def)) {
                     // defer all os that use snmpget or snmpwalk
                     $deferred_os[] = $os;
@@ -219,7 +268,7 @@ class Core implements Module
         }
 
         // check generic os
-        foreach (['airos', 'freebsd', 'linux'] as $os) {
+        foreach (self::GENERIC_OS as $os) {
             if (isset($os_defs[$os]['discovery'])) {
                 foreach ($os_defs[$os]['discovery'] as $item) {
                     if (self::checkDiscovery($device, $item, $os_defs[$os]['mib_dir'] ?? null, $sysDescr, $sysObjectID)) {
