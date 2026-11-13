@@ -546,7 +546,7 @@ not hold these values.
 
 To test the code, run the discovery manually with
 `lnms device:discover $device_id -m sensors`. The flag `-vv` shows the
-calls of the discovery. The flag `-vvv` shows the debug output. 
+debug output. The flag `-vvv` shows the unredacted debug output. 
 
 The output under `#### Load discovery module sensors ####` holds a list of the
 sensor types. A `+` means a new sensor. A `-` means a removed sensor. A
@@ -566,7 +566,7 @@ LibreNMS Discovery
 #### Unload disco module core ####
 
 
-#### Load disco module sensors ####
+#### Load discovery module sensors ####
 Pre-cache adva_fsp150:
  ENTITY-SENSOR: Caching OIDs: entPhysicalDescr entPhysicalName entPhySensorType entPhySensorScale entPhySensorPrecision entPhySensorValue entPhySensorOperStatus
 Airflow:
@@ -602,7 +602,7 @@ Signal_loss:
 
 >> Runtime for discovery module 'sensors': 3.9340 seconds with 190024 bytes
 >> SNMP: [16/3.89s] MySQL: [36/0.03s] RRD: [0/0.00s]
-#### Unload disco module sensors ####
+#### Unload discovery module sensors ####
 
 Discovered in 5.521 seconds
 
