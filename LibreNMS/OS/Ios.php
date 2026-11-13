@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Discovery\Neighbors\NeighborParser;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
@@ -52,6 +53,37 @@ class Ios extends Cisco implements
 {
     use CiscoCellular;
     use CiscoPortSecurity;
+
+/**
+ * Maps IE-3300 encoded LLDP port IDs to local interfaces, falling back to the
+ * standard IOS mapping when the ID or interface cannot be resolved.
+ *
+ * @param int $lldpPortNum LLDP local port number.
+ * @return int|null The matching local port ID, or null if none is found.
+ */
+    protected function lldpLocalPortId(int $lldpPortNum): ?int
+    {
+        if (str_starts_with((string) ($this->getDeviceArray()['hardware'] ?? ''), 'IE-3300')) {
+            $portId = NeighborParser::parseText($this->lldpLocPortTable()[$lldpPortNum]['lldpLocPortId'] ?? '');
+
+            if (preg_match('/^port-(\d{3})-(\d{5})$/D', $portId, $matches) === 1) {
+                $portNumber = (int) $matches[1];
+                $portGroup = (int) $matches[2];
+
+                if ($portNumber > 0 && $portGroup <= 1) {
+                    $interfaceNumber = $portGroup + 1;
+                    $port = $this->lldpLocalPorts()->byName("Gi$interfaceNumber/$portNumber")
+                        ?? $this->lldpLocalPorts()->byName("GigabitEthernet$interfaceNumber/$portNumber");
+
+                    if ($port !== null) {
+                        return $port->port_id;
+                    }
+                }
+            }
+        }
+
+        return parent::lldpLocalPortId($lldpPortNum);
+    }
 
     /**
      * @return WirelessSensor[] Sensors
