@@ -3,6 +3,7 @@
 namespace LibreNMS\Tests\Unit;
 
 use App\Models\AlertTemplate;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Template;
 use LibreNMS\Tests\TestCase;
 
@@ -32,7 +33,7 @@ class AlertTemplateSstiTest extends TestCase
         ];
 
         $tpl = new Template();
-        $renderedTitle = $tpl->getTitle($data);
+        $renderedTitle = $tpl->getTitle(new AlertData($data));
 
         $this->assertFalse($GLOBALS['__test_ssti_flag'], 'Blade expressions in device display string should not be evaluated');
         $this->assertEquals('Alert for device ' . $maliciousDisplay . ' - Test Rule', $renderedTitle);
@@ -60,7 +61,7 @@ class AlertTemplateSstiTest extends TestCase
         ];
 
         $tpl = new Template();
-        $renderedTitle = $tpl->getTitle($data);
+        $renderedTitle = $tpl->getTitle(new AlertData($data));
 
         $this->assertEquals('Custom Alert: my-switch-01 - Ping Latency', $renderedTitle);
     }
@@ -89,7 +90,7 @@ class AlertTemplateSstiTest extends TestCase
         ];
 
         $tpl = new Template();
-        $renderedTitle = $tpl->getTitle($data);
+        $renderedTitle = $tpl->getTitle(new AlertData($data));
 
         $this->assertFalse($GLOBALS['__test_ssti_flag_directive'], 'Blade directives like @php in device display string should not be evaluated');
         $this->assertEquals('Alert for device ' . $maliciousDisplay . ' - Test Rule', $renderedTitle);
@@ -116,7 +117,7 @@ class AlertTemplateSstiTest extends TestCase
         ];
 
         $tpl = new Template();
-        $renderedTitle = $tpl->getTitle($data);
+        $renderedTitle = $tpl->getTitle(new AlertData($data));
 
         $this->assertEquals('Alert for device router & switch - Test Rule', $renderedTitle);
     }

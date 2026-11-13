@@ -29,6 +29,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use Exception;
 use Illuminate\Support\Str;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\Severity;
@@ -37,7 +38,11 @@ use Spatie\Permission\Models\Role;
 
 class Mail extends Transport
 {
-    public function deliverAlert(array $alert_data): bool
+    /**
+     * @param  array<string, mixed>|AlertData  $alert_data
+     * @return bool
+     */
+    public function deliverAlert($alert_data): bool
     {
         $emails = match ($this->config['mail-contact'] ?? '') {
             'sysContact' => AlertUtil::findContactsSysContact($alert_data['faults']),

@@ -24,6 +24,7 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
@@ -32,7 +33,11 @@ class Googlechat extends Transport
 {
     protected string $name = 'Google Chat';
 
-    public function deliverAlert(array $alert_data): bool
+    /**
+     * @param  array<string, mixed>|AlertData  $alert_data
+     * @return bool
+     */
+    public function deliverAlert($alert_data): bool
     {
         $data = ['text' => $alert_data['msg']];
         $res = Http::client()->post($this->config['googlechat-webhook'], $data);

@@ -25,13 +25,18 @@
 namespace LibreNMS\Alert\Transport;
 
 use App\View\SimpleTemplate;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
 class Matrix extends Transport
 {
-    public function deliverAlert(array $alert_data): bool
+    /**
+     * @param  array<string, mixed>|AlertData  $alert_data
+     * @return bool
+     */
+    public function deliverAlert($alert_data): bool
     {
         $server = $this->config['matrix-server'];
         $room = $this->config['matrix-room'];

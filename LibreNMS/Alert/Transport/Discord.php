@@ -30,6 +30,7 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
@@ -46,10 +47,10 @@ class Discord extends Transport
      * Composes a Discord JSON message and delivers it using HTTP POST
      * https://discord.com/developers/docs/resources/message#create-message
      *
-     * @param  array  $alert_data
+     * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert(array $alert_data): bool
+    public function deliverAlert($alert_data): bool
     {
         $this->discord_message = [
             'embeds' => [
