@@ -72,7 +72,6 @@ modules:
                     low_warn_limit: FS-MIB::portTransceiverThresholdInfoTemperatureLowWarn
                     warn_limit: FS-MIB::portTransceiverThresholdInfoTemperatureHighWarn
                     high_limit: FS-MIB::portTransceiverThresholdInfoTemperatureHighAlarm
-                    divisor: 100
         voltage:
             data:
                 -
