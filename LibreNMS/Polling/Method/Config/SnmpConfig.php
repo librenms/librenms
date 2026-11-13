@@ -63,9 +63,10 @@ final readonly class SnmpConfig extends PollingMethodConfig
     {
         $community = $secret instanceof SnmpCommunitySecretData ? $secret : null;
         $v3 = $secret instanceof SnmpV3SecretData ? $secret : null;
+        $version = self::version($v3 ? SecretType::SnmpV3 : SecretType::SnmpCommunity, $settings['version'] ?? null);
 
         return new self(
-            version: self::version($v3 ? SecretType::SnmpV3 : SecretType::SnmpCommunity, $settings['version'] ?? null),
+            version: $version,
             community: $community?->community,
             authname: $v3?->authname,
             authpass: $v3?->authpass,
@@ -80,7 +81,7 @@ final readonly class SnmpConfig extends PollingMethodConfig
             retries: $settings['retries'],
             maxRepeaters: $settings['max_repeaters'],
             maxOid: $settings['max_oid'],
-            bulk: $settings['bulk'],
+            bulk: $version !== 'v1' && $settings['bulk'], // v1 has no GETBULK
             portAssociationMode: $settings['port_association_mode'],
         );
     }

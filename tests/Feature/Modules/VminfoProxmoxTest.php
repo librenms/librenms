@@ -511,7 +511,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         $metrics = [];
         $datastore = Mockery::mock(WriteInterface::class);
         $datastore->shouldReceive('write')->andReturnUsing(function (string $measurement, array $fields, array $tags, array $meta) use (&$metrics): void {
-            $metrics[$measurement] = $meta['metric']->owner;
+            $metrics[$measurement] = $meta['metric']->group();
         });
 
         (new Vminfo)->poll($this->os(), $datastore);

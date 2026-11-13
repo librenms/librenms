@@ -47,7 +47,8 @@ class PhpSnmp implements SnmpBackendInterface
 
     public function walk(string $target, string $oid, SnmpConfig $config, SnmpQueryOptions $options): SnmpResponse
     {
-        $snmp = $this->buildSnmp($target, $config, $options);
+        // php-snmp always walks v2c/v3 with GETBULK, net-snmp can walk without it
+        $snmp = $config->bulk && $options->allowBulk ? $this->buildSnmp($target, $config, $options) : null;
 
         return $snmp ? $this->runCommand('walk', $snmp, $config, [$oid], $options) : new NetSnmp()->walk($target, $oid, $config, $options);
     }
@@ -59,7 +60,7 @@ class PhpSnmp implements SnmpBackendInterface
     {
         $snmp = $this->buildSnmp($target, $config, $options);
 
-        return $snmp ? $this->runCommand('next', $snmp, $config, $oids, $options) : new NetSnmp()->next($target, $oids, $config, $options);
+        return $snmp ? $this->runCommand('getnext', $snmp, $config, $oids, $options) : new NetSnmp()->next($target, $oids, $config, $options);
     }
 
     /**
@@ -71,24 +72,31 @@ class PhpSnmp implements SnmpBackendInterface
             return null;
         }
 
-        $community = $config->community ?: 'public';
-        if ($options->context) {
-            $community .= '@' . $options->context;
-        }
-
         $snmp = new \SNMP(
             $this->snmpver($config->version),
             Rewrite::addIpv6Brackets($target) . ':' . $config->port,
-            $community,
+            $this->communityOrUsername($config, $options->context),
             $config->timeout * 1000000,
             $config->retries,
         );
 
+        $snmp->max_oids = max($config->maxOid, 1);
         $this->setSecurityOptions($snmp, $config, $options->context);
         $this->setOptions($snmp, $options);
         $this->initMibs($options);
 
         return $snmp;
+    }
+
+    private function communityOrUsername(SnmpConfig $config, string $context): string
+    {
+        if ($config->version === 'v3') {
+            return $config->authname ?: 'root';
+        }
+
+        $community = $config->community ?: 'public';
+
+        return $context ? "$community@$context" : $community;
     }
 
     /**
@@ -109,12 +117,22 @@ class PhpSnmp implements SnmpBackendInterface
             return false;
         }
 
+        // Do not use php-snmp if bulk operations are not allowed
+        if(! $config->bulk || ! $options->allowBulk) {
+            return false;
+        }
+
+        // php-snmp does not support display hits being disabled (non-default)
+        if(! $options->applyDisplayHints) {
+            return false;
+        }
+
         if ($config->version == 'v3') {
             // Dummy SNMP object to check security settings are supported
             $snmp = new \SNMP(\SNMP::VERSION_3, 'localhost', 'root', 1000000, 3);
             try {
-                $this->setSecurityOptions($snmp, $config, $options->context);
-            } catch (\Exception) {
+                return $this->setSecurityOptions($snmp, $config, $options->context);
+            } catch (\Exception|\Error) {
                 return false;
             }
         }
@@ -122,15 +140,29 @@ class PhpSnmp implements SnmpBackendInterface
         return true;
     }
 
-    private function setSecurityOptions(\SNMP $snmp, SnmpConfig $config, ?string $context): void
+    private function setSecurityOptions(\SNMP $snmp, SnmpConfig $config, ?string $context): bool
     {
-        if ($config->authlevel === 'authpriv') {
-            $snmp->setSecurity('authPriv', $config->authalgo, $config->authpass, $config->cryptoalgo, $config->cryptopass, $context ?: '');
-        } elseif ($config->authlevel === 'authnopriv') {
-            $snmp->setSecurity('authNoPriv', $config->authalgo, $config->authpass, '', '', $context ?: ''); /** @phpstan-ignore argument.type */
-        } else {
-            $snmp->setSecurity('noAuthNoPriv', '', '', '', '', $context ?: ''); /** @phpstan-ignore argument.type, argument.type */
+        $authlevel = strtolower((string) $config->authlevel);
+        $authalgo = match (strtoupper((string) $config->authalgo)) {
+            'SHA-256' => 'SHA256',
+            'SHA-512' => 'SHA512',
+            default => $config->authalgo,
+        };
+        $cryptoalgo = match (strtoupper((string) $config->cryptoalgo)) {
+            'AES-192' => 'AES192',
+            'AES-256' => 'AES256',
+            'AES-192-C' => 'AES192C',
+            'AES-256-C' => 'AES256C',
+            default => $config->cryptoalgo,
+        };
+
+        if ($authlevel === 'authpriv') {
+            return (bool) $snmp->setSecurity('authPriv', $authalgo, $config->authpass, $cryptoalgo, $config->cryptopass, $context ?: '');
+        } elseif ($authlevel === 'authnopriv') {
+            return (bool) $snmp->setSecurity('authNoPriv', $authalgo, $config->authpass, '', '', $context ?: ''); /** @phpstan-ignore argument.type */
         }
+
+        return (bool) $snmp->setSecurity('noAuthNoPriv', '', '', '', '', $context ?: ''); /** @phpstan-ignore argument.type, argument.type */
     }
 
     /**

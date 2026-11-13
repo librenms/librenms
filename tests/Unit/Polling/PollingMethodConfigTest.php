@@ -103,6 +103,35 @@ final class PollingMethodConfigTest extends TestCase
         $this->assertSame(3, $this->config(new SnmpPollingMethod, $this->deviceMethod(PollingMethodType::Snmp, device: $device))->maxRepeaters);
     }
 
+    public function testSnmpBulkSettingIsUsedExceptForV1(): void
+    {
+        $method = new SnmpPollingMethod;
+        $community = ['community' => 'shared'];
+        $v3 = ['authlevel' => 'noAuthNoPriv', 'authname' => 'user1'];
+
+        $this->assertTrue($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, [], $community))->bulk);
+        $this->assertFalse($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['bulk' => false], $community))->bulk);
+        $this->assertFalse($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['bulk' => false], $v3))->bulk);
+
+        // v1 has no GETBULK, whatever the setting or OS default
+        $this->assertFalse($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['version' => 'v1'], $community))->bulk);
+        $this->assertFalse($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['version' => 'v1', 'bulk' => true], $community))->bulk);
+
+        // the version setting only applies to a community, so v3 keeps bulk
+        $this->assertTrue($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['version' => 'v1'], $v3))->bulk);
+    }
+
+    public function testSnmpBulkDefaultFollowsOsSetting(): void
+    {
+        LibrenmsConfig::set('os.test-os.snmp_bulk', false);
+        $device = new Device(['hostname' => 'example.com', 'os' => 'test-os']);
+        $method = new SnmpPollingMethod;
+
+        $this->assertFalse($method->defaults($device)['bulk']);
+        $this->assertFalse($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, device: $device))->bulk);
+        $this->assertTrue($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['bulk' => true], device: $device))->bulk); // stored setting wins
+    }
+
     public function testSnmpTransportDefaultFollowsConfig(): void
     {
         LibrenmsConfig::set('snmp.transports.0', 'tcp6');

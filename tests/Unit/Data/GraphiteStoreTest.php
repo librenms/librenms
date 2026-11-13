@@ -102,10 +102,10 @@ final class GraphiteStoreTest extends TestCase
         $graphite = $this->mockGraphite($mockSocket);
 
         foreach ([100, 101] as $id) {
-            $identity = new MetricIdentity('proxmox-abc', 'vm.cpu', ['type' => 'proxmox', 'id' => $id]);
+            $identity = new MetricIdentity('vm.cpu', ['cluster' => 'proxmox-abc', 'type' => 'proxmox', 'id' => $id]);
             $mockSocket->shouldReceive('write')
                 ->with("proxmox-abc.vm_cpu.proxmox.$id.usage 25 $this->timestamp\n")->once();
-            $graphite->write('vm.cpu', ['usage' => 25], $identity->seriesTags(), ['device' => new Device(['hostname' => 'testhost']), 'metric' => $identity]);
+            $graphite->write('vm.cpu', ['usage' => 25], $identity->tags, ['device' => new Device(['hostname' => 'testhost']), 'metric' => $identity]);
         }
     }
 

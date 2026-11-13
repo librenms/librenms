@@ -148,12 +148,12 @@ class Vminfo extends DeviceRelatedModel implements HasMetrics, Keyable
     }
 
     /**
-     * VMs whose source records the graphed metrics, other VMs have no graphs.
+     * VMs whose source records metrics, optionally limited to a specific metric.
      *
      * @param  Builder<self>  $query
      * @return Builder<self>
      */
-    protected function scopeRecordsMetrics(Builder $query): Builder
+    protected function scopeRecordsMetrics(Builder $query, ?string $metric = null): Builder
     {
         $registry = app(PollingMethodRegistry::class);
         $types = collect($registry->providing(VminfoMetricSource::class))
@@ -163,6 +163,10 @@ class Vminfo extends DeviceRelatedModel implements HasMetrics, Keyable
 
                 return $source::vmTypes();
             })->unique()->values()->all();
+
+        if ($metric === 'vm.diskops') {
+            $types = array_diff($types, ['proxmox-lxc']);
+        }
 
         return $query->whereIn('vm_type', $types);
     }
@@ -183,10 +187,8 @@ class Vminfo extends DeviceRelatedModel implements HasMetrics, Keyable
     public function metricIdentity(string $measurement): MetricIdentity
     {
         // a VM in a cluster keeps its metrics when it migrates to another device
-        return new MetricIdentity(
-            $this->cluster_id ?? (string) $this->device?->hostname,
-            $measurement,
-            ['type' => $this->vm_type, 'id' => $this->vmwVmVMID],
-        );
+        $group = $this->cluster_id === null ? ['hostname' => (string) $this->device?->hostname] : ['cluster' => $this->cluster_id];
+
+        return new MetricIdentity($measurement, [...$group, 'type' => $this->vm_type, 'id' => $this->vmwVmVMID]);
     }
 }
