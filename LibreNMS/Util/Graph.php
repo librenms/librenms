@@ -12,6 +12,7 @@ use Illuminate\Support\Arr;
 use LibreNMS\Enum\ImageFormat;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\GraphException;
+use LibreNMS\Exceptions\NoGraphData;
 
 class Graph
 {
@@ -80,7 +81,12 @@ class Graph
      */
     public static function errorImage(GraphParameters $params, GraphException $e): GraphImage
     {
-        return new GraphImage($params->imageFormat, 'Error', self::error($e->getMessage(), $e->shortText, $params->width, $params->height, format: $params->imageFormat));
+        $style = $params->style ?: session('applied_site_style');
+        $foreground = $style === 'dark' ? [255, 255, 255] : [0, 0, 0];
+        $color = $e instanceof NoGraphData ? $foreground : [128, 0, 0];
+        $title = $params->visible('title') ? ($params->user_title ?? $e->graphTitle) : null;
+
+        return new GraphImage($params->imageFormat, $title ?? 'Error', self::error($e->getMessage(), $e->shortText, $params->width, $params->height, $color, $params->imageFormat, $title, $foreground));
     }
 
     public static function getTypes(): array
@@ -139,9 +145,11 @@ class Graph
      * @param  int|null  $height  Height of graph image (defaults to width / 3)
      * @param  int[]  $color  Color of text, defaults to dark red
      * @param  ImageFormat|null  $format  defaults to the configured graph type
+     * @param  string|null  $title  Original graph title, when enabled
+     * @param  int[]  $titleColor  Color of the graph title
      * @return string the generated image
      */
-    public static function error(string $text, ?string $short_text, int $width = 300, ?int $height = null, array $color = [128, 0, 0], ?ImageFormat $format = null): string
+    public static function error(string $text, ?string $short_text, int $width = 300, ?int $height = null, array $color = [128, 0, 0], ?ImageFormat $format = null, ?string $title = null, array $titleColor = [0, 0, 0]): string
     {
         $format ??= ImageFormat::forGraph();
         $height ??= $width / 3;
@@ -152,6 +160,9 @@ class Graph
 
         if ($format === ImageFormat::Svg) {
             $rgb = implode(', ', $color);
+            $titleRgb = implode(', ', $titleColor);
+            $text = htmlspecialchars($text, ENT_QUOTES | ENT_XML1, 'UTF-8');
+            $titleHtml = $title === null ? '' : '<xhtml:div style="position:absolute; top:5px; width:100%; color:rgb(' . $titleRgb . '); text-align:center; font-family:sans-serif; font-size:0.7em; font-weight:bold;">' . htmlspecialchars($title, ENT_QUOTES | ENT_XML1, 'UTF-8') . '</xhtml:div>';
 
             return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg"
@@ -159,7 +170,8 @@ xmlns:xhtml="http://www.w3.org/1999/xhtml"
 viewBox="0 0 $width $height"
 preserveAspectRatio="xMinYMin">
 <foreignObject x="0" y="0" width="$width" height="$height" transform="translate(0,0)">
-      <xhtml:div style="display:table; width:{$width}px; height:{$height}px; overflow:hidden;">
+      <xhtml:div style="position:relative; display:table; width:{$width}px; height:{$height}px; overflow:hidden;">
+         $titleHtml
          <xhtml:div style="display:table-cell; vertical-align:middle;">
             <xhtml:div style="color:rgb($rgb); text-align:center; font-family:sans-serif; font-size:0.6em;">$text</xhtml:div>
          </xhtml:div>
@@ -171,6 +183,11 @@ SVG;
 
         $img = imagecreate($width, $height);
         imagecolorallocatealpha($img, 255, 255, 255, 127); // transparent background
+
+        if ($title !== null) {
+            $titleX = max(0, (int) (($width - imagefontwidth(3) * strlen($title)) / 2));
+            imagestring($img, 3, $titleX, 5, $title, imagecolorallocate($img, ...$titleColor));
+        }
 
         $px = (int) ((imagesx($img) - 7.5 * strlen($text)) / 2);
         $font = $width < 200 ? 3 : 5;
