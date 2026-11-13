@@ -55,6 +55,20 @@ final class UnixAgentDataSourceTest extends TestCase
         $this->assertEquals(75, $mempool->mempool_perc);
     }
 
+    public function testIdentifiesTheOsFromTheAgentOs(): void
+    {
+        $this->assertSame('linux', $this->source((string) file_get_contents(base_path('tests/unix-agent/linux.txt')))->identifyOS());
+        $this->assertSame('freebsd', $this->source("<<<check_mk>>>\nVersion: 2.2.0\nAgentOS: freebsd\n")->identifyOS());
+    }
+
+    public function testUnknownOrMissingAgentOsIsNotIdentified(): void
+    {
+        $this->assertNull($this->source("<<<check_mk>>>\nVersion: 2.2.0\nAgentOS: windows\n")->identifyOS());
+        $this->assertNull($this->source("<<<check_mk>>>\nVersion: 2.2.0\n")->identifyOS());
+        $this->assertNull($this->source(self::OUTPUT)->identifyOS());
+        $this->assertNull($this->source('')->identifyOS());
+    }
+
     private function source(string $output): UnixAgentDataSource
     {
         return new UnixAgentDataSource(ProbeResult::success(['output' => $output]));
