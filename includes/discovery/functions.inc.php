@@ -254,12 +254,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                             $snmp_value = (float) $matches[1];
                             $user_function = 'fahrenheit_to_celsius';
                           }
-                          // Handle temperature string - first matched number
-                          elseif (preg_match('/([0-9.]+)/', $snmp_value, $matches)) {
-                            $snmp_value = (float) $matches[1];
-                            $user_function = null;
                         }
-                      }
                     }
                     if ($sensor_class === 'state' && isset($data['states'])) {
                         // For state sensors, try to look up the string value in the states table first
