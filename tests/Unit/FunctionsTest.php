@@ -211,7 +211,7 @@ public function testNtronNt24kFirmwareGuard(): void
     $this->assertFalse(is_ntron_nt24k_v223([...$device, 'sysDescr' => '']));
     $this->assertFalse(is_ntron_nt24k_v223([...$device, 'os' => 'other']));
 }
-    
+
     private function fakeDeviceWithAttribs(array $attribs): array
     {
         $device = new Device(['hostname' => 'test.example.com']);
