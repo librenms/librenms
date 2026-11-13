@@ -429,6 +429,22 @@ class ConfigRepository
         ));
     }
 
+    private function mapLegacyScheduleOptions(): void
+    {
+        foreach (['alerting', 'billing', 'discovery', 'ping', 'poller', 'services'] as $type) {
+            if ($this->get("schedule_type.$type") !== 'legacy') {
+                continue;
+            }
+
+            $enabled = $this->get("service_{$type}_enabled");
+            if ($enabled === true || $enabled === 1 || $enabled === '1') {
+                $this->set("schedule_type.$type", 'dispatcher');
+            } elseif ($enabled === false || $enabled === 0 || $enabled === '0') {
+                $this->set("schedule_type.$type", 'cron');
+            }
+        }
+    }
+
     private function loadPostUserConfigDefaults(): void
     {
         if (! $this->get('email_from')) {
