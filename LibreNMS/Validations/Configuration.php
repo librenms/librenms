@@ -41,6 +41,28 @@ class Configuration extends BaseValidation
      */
     public function validate(Validator $validator): void
     {
+        $legacyScheduleOptions = array_filter(
+            [
+                'service_alerting_enabled',
+                'service_billing_enabled',
+                'service_discovery_enabled',
+                'service_ping_enabled',
+                'service_poller_enabled',
+                'service_services_enabled',
+            ],
+            fn (string $option): bool => LibrenmsConfig::has($option)
+        );
+
+        if ($legacyScheduleOptions !== []) {
+            $validator->warn(
+                trans(
+                    'validation.validations.configuration.legacy_schedule_options',
+                    ['options' => implode(', ', $legacyScheduleOptions)]
+                ),
+                trans('validation.validations.configuration.legacy_schedule_options_fix')
+            );
+        }
+
         // Test transports
         if (LibrenmsConfig::get('alerts.email.enable') == true) {
             $validator->warn('You have the old alerting system enabled - this is to be deprecated on the 1st of June 2015: https://groups.google.com/forum/#!topic/librenms-project/1llxos4m0p4');
