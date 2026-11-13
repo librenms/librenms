@@ -30,8 +30,6 @@ use App\Models\Traits\HasThresholds;
 use LibreNMS\Enum\WirelessSensorType;
 
 /**
- * @template T
- *
  * @property int $sensor_id
  * @property int $sensor_deleted
  * @property string|WirelessSensorType $sensor_class
@@ -61,6 +59,26 @@ abstract class SensorModel extends DeviceRelatedModel
         'sensor_limit_warn',
         'sensor_limit_low_warn',
         'sensor_limit_low',
+    ];
+
+    /**
+     * Colors of the threshold lines as drawn in the sensor graphs.
+     */
+    public const LIMIT_COLORS = [
+        'sensor_limit_low' => '#00008b',
+        'sensor_limit_low_warn' => '#005bdf',
+        'sensor_limit_warn' => '#ffa420',
+        'sensor_limit' => '#ff0000',
+    ];
+
+    /**
+     * Icons for the threshold inputs in the threshold editors.
+     */
+    public const LIMIT_ICONS = [
+        'sensor_limit_low' => 'fa-angles-down',
+        'sensor_limit_low_warn' => 'fa-angle-down',
+        'sensor_limit_warn' => 'fa-angle-up',
+        'sensor_limit' => 'fa-angles-up',
     ];
 
     use HasThresholds;
