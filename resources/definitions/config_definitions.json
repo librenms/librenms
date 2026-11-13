@@ -5498,6 +5498,19 @@
                 "value": "int|nullable|between:9,65535"
             }
         },
+        "mtu_options.fragmentation": {
+            "default": "default",
+            "group": "poller",
+            "section": "mtu",
+            "order": 2,
+            "type": "select",
+            "options": {
+                "default": "System Default",
+                "pmtu": "Allow with PMTU",
+                "allow": "Allow",
+                "deny": "Not Allowed"
+            }
+        },
         "mydomain": {
             "type": "text",
             "group": "discovery",

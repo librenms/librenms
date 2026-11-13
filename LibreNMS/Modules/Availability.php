@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Modules;
 
-use App\Actions\Device\DeviceMtuTest;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use LibreNMS\Enum\PollingMethodType;
@@ -82,10 +81,6 @@ class Availability implements Module
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
-        if ($os->getMethodResults()->isAvailable(PollingMethodType::Icmp)) {
-            $os->getDevice()->mtu_status = app(DeviceMtuTest::class)->execute($os->getDevice());
-        }
-
         $os->enableGraph('availability');
 
         $valid_ids = [];

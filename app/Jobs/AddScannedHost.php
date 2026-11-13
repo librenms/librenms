@@ -29,6 +29,7 @@ namespace App\Jobs;
 use App\Actions\Device\AddFoundDevice;
 use App\Actions\Device\AddFoundDeviceResult;
 use App\Actions\Device\BuildDefaultPollingMethods;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -86,7 +87,7 @@ class AddScannedHost implements ShouldQueue
             'poller_group' => $this->pollerGroup,
         ]);
 
-        $pollingMethods = $builder->execute($device, ['methods' => $this->snmpSecretId === null
+        $methods = $this->snmpSecretId === null
             ? [PollingMethodType::Icmp->value => ['active' => true]]
             : [
                 PollingMethodType::Icmp->value => ['active' => $this->pingable],
@@ -97,9 +98,13 @@ class AddScannedHost implements ShouldQueue
                     // only v1 is a setting, the scan found it so v2c is not tried again
                     'settings' => $this->snmpVersion === 'v1' ? ['version' => 'v1'] : [],
                 ],
-            ],
-        ]);
+            ];
+        if ((LibrenmsConfig::get('mtu_options.bytes') ?? 0) > 0) {
+            $methods[PollingMethodType::Mtu->value] = ['active' => $this->pingable];
+        }
 
-        return $addFoundDevice->execute($device, $pollingMethods, $this->pingable ? [PollingMethodType::Icmp] : []);
+        $pollingMethods = $builder->execute($device, ['methods' => $methods]);
+
+        return $addFoundDevice->execute($device, $pollingMethods, $this->pingable ? [PollingMethodType::Icmp, PollingMethodType::Mtu] : [PollingMethodType::Mtu]);
     }
 }
