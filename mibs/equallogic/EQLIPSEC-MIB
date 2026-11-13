@@ -1,4 +1,4 @@
--- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+-- Mib files packaged on  Wed Jun 19 01:31:39 EDT 2019 for Storage Array Firmware V10.0.3 (R469188)
 
 EQLIPSEC-MIB DEFINITIONS ::= BEGIN
 
@@ -31,7 +31,7 @@ IMPORTS
 --
 
 eqlIpsecModule MODULE-IDENTITY
-	LAST-UPDATED "201503171528Z"
+	LAST-UPDATED "201906190531Z"
     ORGANIZATION  "EqualLogic Inc."
     CONTACT-INFO
         "Contact: Customer Support
