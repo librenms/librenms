@@ -86,7 +86,7 @@ return [
         ],
         'configuration' => [
             'legacy_schedule_options' => 'Deprecated scheduler config options are set: :options.',
-            'legacy_schedule_options_fix' => 'Remove these options from config.php and configure scheduling with schedule_type.* instead.',
+            'legacy_schedule_options_fix' => 'First configure and save the replacement schedule using schedule_type.*, then remove the deprecated options from both config.php and database-backed configuration.',
         ],
         'rrd' => [
             'CheckRrdVersion' => [
