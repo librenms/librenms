@@ -42,11 +42,11 @@ class EditModulesController
     use AuthorizesRequests;
 
     /**
-     * @var array<string, array{config: string, attrib: string, process: ProcessType}>
+     * @var array<string, array{config: string, attrib: string}>
      */
     private const array TYPES = [
-        'polling' => ['config' => 'poller_modules', 'attrib' => 'poll_', 'process' => ProcessType::Poller],
-        'discovery' => ['config' => 'discovery_modules', 'attrib' => 'discover_', 'process' => ProcessType::Discovery],
+        'polling' => ['config' => 'poller_modules', 'attrib' => 'poll_'],
+        'discovery' => ['config' => 'discovery_modules', 'attrib' => 'discover_'],
     ];
 
     public function index(Device $device): View
@@ -58,7 +58,7 @@ class EditModulesController
         $moduleList = new ModuleList;
         $modules = [];
 
-        foreach (self::TYPES as $type => ['config' => $configKey, 'attrib' => $attribPrefix, 'process' => $process]) {
+        foreach (self::TYPES as $type => ['config' => $configKey, 'attrib' => $attribPrefix]) {
             foreach (array_intersect_key($this->modules($configKey), $toggleable) as $module => $globalEnabled) {
                 $osEnabled = LibrenmsConfig::has("os.$device->os.$configKey.$module")
                     ? (bool) LibrenmsConfig::get("os.$device->os.$configKey.$module")
@@ -68,7 +68,7 @@ class EditModulesController
                 $modules[$module][$type] = [
                     'global' => (bool) $globalEnabled,
                     'os' => $osEnabled,
-                    'method' => $moduleList->methodSetting($process, $module, $device),
+                    'method' => $moduleList->methodSetting($module, $device),
                     'device' => $deviceEnabled,
                 ];
             }

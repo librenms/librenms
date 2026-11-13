@@ -12,7 +12,9 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Testing\TestResponse;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\ProcessType;
 use LibreNMS\Tests\TestCase;
+use LibreNMS\Util\ModuleList;
 use Spatie\Permission\Models\Role;
 
 final class EditModulesControllerTest extends TestCase
@@ -103,6 +105,19 @@ final class EditModulesControllerTest extends TestCase
         $this->assertTrue($modules['vminfo']['discovery']['method']);
         $this->assertTrue($modules['vminfo']['polling']['method']);
         $this->assertArrayNotHasKey('mempools', $modules, 'mempools does not use the proxmox-api method');
+    }
+
+    public function testUnixAgentMethodEnablesTheUnixAgentModule(): void
+    {
+        LibrenmsConfig::set('poller_modules.unix-agent', false);
+        $device = $this->deviceWithMethods([], PollingMethodType::Snmp, PollingMethodType::UnixAgent);
+
+        $modules = $this->modulesFrom($this->actingAs($this->admin())->get(route('device.edit.modules', $device)));
+        $this->assertTrue($modules['unix-agent']['polling']['method']);
+        $this->assertTrue($modules['mempools']['polling']['method']);
+        $this->assertNull($modules['storage']['polling']['method'], 'snmp does not enable modules');
+
+        $this->assertTrue((new ModuleList)->moduleStatus(ProcessType::Poller, 'unix-agent', $device)->isEnabled());
     }
 
     public function testAllModulesHaveFriendlyNames(): void
