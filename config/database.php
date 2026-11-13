@@ -200,6 +200,8 @@ return [
             'database' => database_path('testing.sqlite'),
             'prefix' => '',
             'foreign_key_constraints' => true,
+            // throwaway test database; skipping fsync makes migrations ~20x faster
+            'synchronous' => 'off',
         ],
 
     ],
