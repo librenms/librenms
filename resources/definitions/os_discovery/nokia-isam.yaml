@@ -23,6 +23,14 @@ modules:
                 descr: CPU {{ $index }}
 
     sensors:
+        count:
+            data:
+                -
+                    oid: ASAM-ALARM-MIB::asamNumberofAlarmEntries
+                    num_oid: '.1.3.6.1.4.1.637.61.1.3.4.{{ $index }}'
+                    index: 'asamNumberofAlarmEntries.{{ $index }}'
+                    descr: 'Alarm: Current Count'
+                    group: 'Alarms'
         temperature:
             data:
                 -
@@ -46,20 +54,6 @@ modules:
                         - { value: 1, generic: 1, descr: 'eco' }
                         - { value: 2, generic: 0, descr: 'protect' }
                         - { value: 3, generic: 0, descr: 'classic' }
-                -
-                    oid: ASAM-ALARM-MIB::asamNumberofAlarmEntries
-                    num_oid: '.1.3.6.1.4.1.637.61.1.3.4.{{ $index }}'
-                    descr: 'Alarm: Current Count'
-                    group: 'Alarms'
-                    state_name: alarmCount
-                    states:
-                        - { value: 0, generic: 0, descr: '0' }
-                        - { value: 1, generic: 1, descr: '1' }
-                        - { value: 2, generic: 1, descr: '2' }
-                        - { value: 3, generic: 2, descr: '3' }
-                        - { value: 4, generic: 2, descr: '4' }
-                        - { value: 5, generic: 2, descr: '5' }
-                        - { value: 6, generic: 2, descr: '6' }
                 -
                     oid: ASAM-ALARM-MIB::asamCurrentAlarmSeverityStatus
                     num_oid: '.1.3.6.1.4.1.637.61.1.3.5.{{ $index }}'
