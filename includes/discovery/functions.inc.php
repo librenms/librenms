@@ -239,7 +239,7 @@ function discovery_process($os, $sensor_class, $pre_cache)
                 $data['value'] ??= $data['oid'];  // fallback to oid if value is not set
 
                 $snmp_value = $snmp_data[$data['value']] ?? '';
-                if (!is_numeric($snmp_value)) {
+                if (! is_numeric($snmp_value)) {
                     if ($sensor_class === 'temperature') {
                         if (is_string($snmp_value)) {
                           //remove all spaces

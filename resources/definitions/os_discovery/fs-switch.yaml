@@ -72,6 +72,7 @@ modules:
                     low_warn_limit: FS-MIB::portTransceiverThresholdInfoTemperatureLowWarn
                     warn_limit: FS-MIB::portTransceiverThresholdInfoTemperatureHighWarn
                     high_limit: FS-MIB::portTransceiverThresholdInfoTemperatureHighAlarm
+                    user_func: \LibreNMS\OS\FsSwitch::normalizeTransceiverValues
         voltage:
             data:
                 -
