@@ -35,6 +35,7 @@ use App\Models\Sensor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use LibreNMS\Util\PortUi;
 
 class InventoryController implements DeviceTab
 {
@@ -65,7 +66,7 @@ class InventoryController implements DeviceTab
         Gate::authorize('view', $device);
         abort_if(Gate::none(['inventory.view', 'inventory.viewAll']), 403);
 
-        return match ($this->getType($device)) {
+        $data = match ($this->getType($device)) {
             'entphysical' => [
                 'type' => 'entphysical',
                 'tree' => $this->getEntPhysicalTree($device),
@@ -80,6 +81,13 @@ class InventoryController implements DeviceTab
                 'tree' => [],
             ],
         };
+
+        $portUi = PortUi::build($device);
+        if ($portUi) {
+            $data['portui'] = $portUi;
+        }
+
+        return $data;
     }
 
     /**
@@ -257,6 +265,8 @@ class InventoryController implements DeviceTab
                     $this->type = 'entphysical';
                 } elseif ($device->hostResources()->exists()) {
                     $this->type = 'hrdevice';
+                } elseif (PortUi::findTemplate($device)) {
+                    $this->type = 'portui';
                 }
             }
         }
