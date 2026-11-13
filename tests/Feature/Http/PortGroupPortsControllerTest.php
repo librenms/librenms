@@ -280,6 +280,42 @@ final class PortGroupPortsControllerTest extends TestCase
             ->assertUnprocessable();
     }
 
+    public function testDynamicGroupMembershipCannotBeEdited(): void
+    {
+        $device = Device::factory()->create();
+        $uplink = $this->port($device, ['ifAlias' => 'uplink to core']);
+        $other = $this->port($device, ['ifAlias' => 'server']);
+        $group = PortGroup::factory()->create([
+            'type' => 'dynamic',
+            'rules' => [
+                'condition' => 'AND',
+                'rules' => [['id' => 'ports.ifAlias', 'field' => 'ports.ifAlias', 'type' => 'string', 'input' => 'text', 'operator' => 'begins_with', 'value' => 'uplink']],
+                'valid' => true,
+            ],
+        ]);
+
+        // the manage page is not offered for dynamic groups, their rules are edited instead
+        $this->actingAs($this->admin())
+            ->get(route('port-groups.index'))
+            ->assertOk()
+            ->assertDontSee(route('port-groups.ports', $group->id), false);
+
+        $this->actingAs($this->admin())
+            ->get(route('port-groups.ports', $group))
+            ->assertRedirect(route('port-groups.edit', $group));
+
+        $this->actingAs($this->admin())
+            ->postJson(route('port-groups.ports.update', $group), ['action' => 'add', 'ids' => [$other->port_id]])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('action');
+
+        $this->actingAs($this->admin())
+            ->postJson(route('port-groups.ports.update', $group), ['action' => 'remove', 'all' => true])
+            ->assertUnprocessable();
+
+        $this->assertEquals([$uplink->port_id], $group->ports()->pluck('ports.port_id')->all());
+    }
+
     public function testLimitedUserOnlyManagesAccessiblePorts(): void
     {
         Permission::findOrCreate('port-group.update');

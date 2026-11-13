@@ -27,7 +27,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Port;
+use App\Models\PortGroup;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 
 class PortController extends Controller
 {
@@ -44,7 +46,14 @@ class PortController extends Controller
         $message = '';
 
         if (array_key_exists('groups', $validated)) {
-            $changes = $port->groups()->sync($validated['groups']);
+            if (PortGroup::where('type', 'dynamic')->whereIntegerInRaw('id', $validated['groups'])->exists()) {
+                // membership of dynamic groups is computed from their rules
+                throw ValidationException::withMessages(['groups' => __('port.settings.bulk.dynamic_group')]);
+            }
+
+            // sync groups without removing dynamic groups, they are managed by the rules
+            $dynamic_groups = $port->groups()->where('type', 'dynamic')->pluck('id')->toArray();
+            $changes = $port->groups()->sync(array_merge($dynamic_groups, $validated['groups']));
             $groups_updated = array_sum(array_map(count(...), $changes));
 
             if ($groups_updated > 0) {

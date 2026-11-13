@@ -8,7 +8,9 @@ use App\Models\PortGroup;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 use LibreNMS\Util\Url;
 
 class PortGroupPortsController extends Controller
@@ -28,9 +30,17 @@ class PortGroupPortsController extends Controller
 
     private const array MEMBERSHIP = ['members', 'available', 'all'];
 
-    public function index(Request $request, PortGroup $portGroup): View
+    public function index(Request $request, PortGroup $portGroup): View|RedirectResponse
     {
         $this->authorize('update', $portGroup);
+
+        if ($portGroup->type == 'dynamic') {
+            // members of dynamic groups are selected by their rules, send the user to edit them instead
+            toast()->info(__('port.settings.bulk.dynamic_group'));
+
+            return redirect()->route('port-groups.edit', $portGroup);
+        }
+
         $request->validate(Port::filterValidationRules());
 
         $members = $this->memberCount($request, $portGroup);
@@ -99,6 +109,11 @@ class PortGroupPortsController extends Controller
             'ids' => 'required_unless:all,true|array',
             'ids.*' => 'integer',
         ]);
+
+        if ($portGroup->type == 'dynamic') {
+            // membership of dynamic groups is computed from their rules
+            throw ValidationException::withMessages(['action' => __('port.settings.bulk.dynamic_group')]);
+        }
 
         // either every port matching the filter or the selected ports, always limited to ports the user can access
         $query = empty($validated['all'])

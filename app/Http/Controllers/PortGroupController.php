@@ -6,8 +6,11 @@ use App\Http\Interfaces\ToastInterface;
 use App\Models\Port;
 use App\Models\PortGroup;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
+use LibreNMS\Alerting\QueryBuilderFilter;
 
 class PortGroupController extends Controller
 {
@@ -37,6 +40,7 @@ class PortGroupController extends Controller
 
         return view('port-group.create', [
             'port_group' => new PortGroup(),
+            'filters' => json_encode(new QueryBuilderFilter('group')),
         ]);
     }
 
@@ -52,10 +56,37 @@ class PortGroupController extends Controller
 
         $this->validate($request, [
             'name' => 'required|string|unique:port_groups',
+            'type' => 'nullable|in:dynamic,static',
+            'ports' => ['array', PortGroup::portsExistRule()],
+            'ports.*' => 'integer',
+            'rules' => 'json|required_if:type,dynamic',
         ]);
 
+        // groups created inline from the device edit page only send a name
         $portGroup = new PortGroup($request->only(['name', 'desc']));
-        $portGroup->save();
+        $portGroup->type = $request->input('type', 'static');
+        if ($portGroup->type == 'dynamic') {
+            $portGroup->rules = json_decode($request->rules);
+        }
+
+        try {
+            // a rule failing to query must not leave the group behind
+            DB::transaction(function () use ($portGroup, $request): void {
+                $portGroup->save();
+
+                if ($portGroup->type == 'static') {
+                    $portGroup->ports()->sync($request->input('ports', []));
+                }
+            });
+        } catch (QueryException $e) {
+            // the database error holds the query text, log it instead of showing it
+            report($e);
+            $error = __('Rules resulted in invalid query, check the rules and try again.');
+
+            return $request->expectsJson()
+                ? response()->json(['message' => $error, 'errors' => ['rules' => [$error]]], 422)
+                : redirect()->back()->withInput()->withErrors(['rules' => $error]);
+        }
 
         if ($request->expectsJson()) {
             return response()->json([
@@ -82,6 +113,7 @@ class PortGroupController extends Controller
 
         return view('port-group.edit', [
             'port_group' => $portGroup,
+            'filters' => json_encode(new QueryBuilderFilter('group')),
         ]);
     }
 
@@ -106,16 +138,48 @@ class PortGroupController extends Controller
                 }),
             ],
             'desc' => 'string|max:255',
+            'type' => 'required|in:dynamic,static',
+            'ports' => ['array', PortGroup::portsExistRule()],
+            'ports.*' => 'integer',
+            'rules' => 'json|required_if:type,dynamic',
         ]);
 
-        $portGroup->fill($request->only(['name', 'desc']));
+        $was_dynamic = $portGroup->type == 'dynamic';
+        $portGroup->fill($request->only(['name', 'desc', 'type']));
 
-        if ($portGroup->save()) {
-            $toast->success(__('Port Group :name updated', ['name' => $portGroup->name]));
+        $ports_updated = false;
+        if ($portGroup->type == 'static') {
+            // the form does not list the members of a dynamic group, converting it keeps them
+            // and only adds the selected ports, otherwise sync port_ids from input
+            $updated = $was_dynamic
+                ? $portGroup->ports()->syncWithoutDetaching($request->input('ports', []))
+                : $portGroup->ports()->sync($request->input('ports', []));
+            // check for attached/detached/updated
+            $ports_updated = array_sum(array_map(count(...), $updated)) > 0;
         } else {
-            $toast->error(__('Failed to save'));
+            $portGroup->rules = json_decode($request->rules);
+        }
 
-            return redirect()->back()->withInput();
+        if ($portGroup->isDirty() || $ports_updated) {
+            try {
+                // membership is resynced when saving, roll the rules back if their query fails
+                if (DB::transaction(fn () => $portGroup->save()) || $ports_updated) {
+                    $toast->success(__('Port Group :name updated', ['name' => $portGroup->name]));
+                } else {
+                    $toast->error(__('Failed to save'));
+
+                    return redirect()->back()->withInput();
+                }
+            } catch (QueryException $e) {
+                // the database error holds the query text, log it instead of showing it
+                report($e);
+
+                return redirect()->back()->withInput()->withErrors([
+                    'rules' => __('Rules resulted in invalid query, check the rules and try again.'),
+                ]);
+            }
+        } else {
+            $toast->info(__('No changes made'));
         }
 
         return redirect()->route('port-groups.index');
