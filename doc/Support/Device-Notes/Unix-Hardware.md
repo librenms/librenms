@@ -13,8 +13,8 @@ This shows up in LibreNMS as...
 - Sensors :: hwmon temperatures, fans, voltages, current, and power on
   Linux, or the coretemp, amdtemp, pchtherm, and ACPI temperatures on
   FreeBSD, plus RAPL CPU power on Linux, batteries on both, BMC sensors
-  via IPMI, and disk temperatures from the smart extend. These are under
-  Health.
+  via IPMI, and disk temperatures from smartctl or the smart extend.
+  These are under Health.
 - Inventory :: the chassis, motherboard, CPUs, memory, disks, and
   transceivers, with vendor, model, and serial, on the Inventory tab.
 - State :: transceiver alarm and warning flags, loss of signal, and Tx
@@ -144,8 +144,9 @@ their interfaces for transceivers.
 
 For the likes of OpenBSD, NetBSD, and illumos, `generic_entity` provides
 the inventory from dmidecode, including power supplies, the disks and
-their temperatures from the [smart](../../Extensions/Applications/SMART.md)
-extend, and the BMC via freeipmi. It lacks transceivers and the OS
+their temperatures from smartctl or the
+[smart](../../Extensions/Applications/SMART.md) extend, and the BMC via
+freeipmi. It lacks transceivers and the OS
 specific sensors. Like the others, it needs net-snmp for `pass_persist`.
 
 1. Install Perl's JSON and File::Slurp, plus dmidecode and freeipmi.
@@ -168,9 +169,11 @@ specific sensors. Like the others, it needs net-snmp for `pass_persist`.
 
 5. Run it once so the cache exists, then restart snmpd.
 
-For `--smart`, set `useSN=0` in the smart extend's config. Disks are then
-keyed by name, so a replaced disk keeps its history. With `useSN=1` they
-are keyed by serial, so a replaced disk shows up as a new one.
+When `--smart` uses the smart extend's cache, set `useSN=0` in its config.
+Disks are then keyed by name, so a replaced disk keeps its history. With
+`useSN=1` they are keyed by serial, so a replaced disk shows up as a new
+one. With smartctl, the disks come from `smartctl --scan`, which also
+finds those behind RAID controllers it supports, such as megaraid.
 
 The entity-state module is enabled by default for OpenBSD, NetBSD,
 DragonFly, Solaris, OpenSolaris, and OpenIndiana. For other OSes it needs
@@ -192,11 +195,18 @@ script with `--help` for the details.
 - `--sensors` :: FreeBSD. Temperatures from sysctl.
 - `--power` :: Batteries and AC.
 - `--inventory` :: Motherboard, CPUs, memory, and disks.
-- `--smart [cache]` :: Merge in the disk details, health, and temperatures
-  from the [smart](../../Extensions/Applications/SMART.md) extend's cache,
-  `/var/cache/smart` by default. Also adds disks only it can see, such as
-  those behind a RAID controller. On Linux, disks `--hwmon` has a
-  temperature for keep that one. Implies `--inventory`.
+- `--smart` :: Add the disk details, health, and temperatures from SMART.
+  On Linux, disks `--hwmon` has a temperature for keep that one. Implies
+  `--inventory`.
+- `--smart-cache` :: The [smart](../../Extensions/Applications/SMART.md)
+  extend's cache, `/var/cache/smart` by default. Implies `--smart`.
+- `--smart-mode` :: Where SMART info comes from. Implies `--smart`.
+    - auto :: The smart extend's cache if it exists, else smartctl. The
+      default.
+    - extend :: The smart extend's cache. Also adds disks only it can see,
+      such as those behind a RAID controller.
+    - smartctl :: Runs smartctl on each disk, skipping ones that are
+      asleep so they are not woken up. Needs smartmontools 7.0 or newer.
 - `--state` :: ENTITY-STATE-MIB state for transceivers, power supplies,
   disks, and the BMC.
 - `--ipmi` :: BMC temperatures, voltages, current, power, and fans via
