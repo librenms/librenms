@@ -74,7 +74,7 @@ use LibreNMS\Alert\Transport;
 
         foreach ($tmp['config'] as $item) {
             if ($item['type'] !== 'hidden') {
-                echo '<div class="form-group" title="' . htmlentities($item['descr'] ?? '') . '">';
+                echo '<div class="form-group' . (! empty($item['legacy']) ? ' transport-legacy' : '') . '" title="' . htmlentities($item['descr'] ?? '') . '">';
                 echo '<label for="' . htmlentities((string) $item['name']) . '" class="col-sm-3 col-md-2 control-label">' . htmlentities((string) $item['title']) . ': </label>';
                 if ($item['type'] == 'text' || $item['type'] == 'password') {
                     echo '<div class="col-sm-9 col-md-10">';
@@ -89,7 +89,7 @@ use LibreNMS\Alert\Transport;
                     echo '<div class="col-sm-2">';
                     echo '<input type="checkbox" name="' . htmlentities((string) $item['name']) . '" id="' . htmlentities((string) $item['name']) . '">';
                     echo '</div>';
-                    $switches[$item['name']] = htmlentities((string) $item['default']);
+                    $switches[$item['name']] = (bool) $item['default'];
                 } elseif ($item['type'] == 'select') {
                     echo '<div class="col-sm-3">';
                     echo '<select name="' . htmlentities((string) $item['name']) . '" id="' . htmlentities((string) $item['name']) . '" class="form-control">';
@@ -97,6 +97,10 @@ use LibreNMS\Alert\Transport;
                         echo '<option value="' . htmlentities((string) $opt) . '">' . htmlentities((string) $descr) . '</option>';
                     }
                     echo '</select>';
+                    echo '</div>';
+                } elseif ($item['type'] === 'keyvalue') {
+                    echo '<div class="col-sm-9 col-md-10">';
+                    echo view('alert.transports.key-value', ['item' => $item])->render();
                     echo '</div>';
                 } elseif ($item['type'] === 'textarea') {
                     echo '<div class="col-sm-9 col-md-10">';
@@ -160,13 +164,26 @@ use LibreNMS\Alert\Transport;
     </div>
 <!--Modal end for deleting an alert transport -->
 
+    <script src="<?php echo asset('js/alert-key-value.js'); ?>"></script>
     <script>
+        var transportSwitchDefaults = <?php echo json_encode($switches); ?>;
+
+        function resetTransportForm(form) {
+            form[0].reset();
+            form.find('input:checkbox').each(function () {
+                $(this).bootstrapSwitch('state', transportSwitchDefaults[this.name], true);
+            });
+            form.find(".alert-key-value").each(function () { AlertKeyValue.clear(this); });
+            form.find(".transport-legacy").hide();
+        }
+
         // Scripts related to editing/updating alert transports
 
         // Display different form on selection
         $("#transport-choice").on("change", function (){
             $(".transport").hide();
-            $("#" + $(this).val()).show().find("input:text").val("");
+            var form = $("#" + $(this).val()).show();
+            resetTransportForm(form);
 
         });
 
@@ -192,7 +209,8 @@ use LibreNMS\Alert\Transport;
                 $("#name").val("");
                 $("#transport-choice").val("mail-form");
                 $(".transport").hide();
-                $("#" + $("#transport-choice").val()).show().find("input:text").val("");
+                var form = $("#" + $("#transport-choice").val()).show();
+                resetTransportForm(form);
                 $("#is_default").bootstrapSwitch('state', false);
 
                 // Turn on all switches in form
@@ -211,15 +229,19 @@ use LibreNMS\Alert\Transport;
             $("#transport-choice").val(form_id);
             $("#is_default").bootstrapSwitch('state', transport.is_default);
             $(".transport").hide();
-            transport_form.show().find("input:text").val("");
+            transport_form.show();
+            resetTransportForm(transport_form);
 
             // Populate the field values
             transport.details.forEach(function(config) {
                 var $field = transport_form.find("#" + config.name);
-                if ($field.prop('type') == 'checkbox') {
+                if ($field.hasClass('alert-key-value')) {
+                    AlertKeyValue.set($field[0], config.value);
+                } else if ($field.prop('type') == 'checkbox') {
                     $field.bootstrapSwitch('state', config.value);
                 } else {
                     $field.val(config.value);
+                    if (config.value) { $field.closest(".transport-legacy").show(); }
                 }
             });
         }
