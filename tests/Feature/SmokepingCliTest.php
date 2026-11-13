@@ -430,6 +430,36 @@ final class SmokepingCliTest extends DBTestCase
         $this->assertStringContainsString('   probe = lnmsFPing6-', $output);
     }
 
+    public function testTargetsUseTheIcmpAddressFamily(): void
+    {
+        // Polled over IPv4 by ICMP although SNMP is on udp6 (or absent): FPing, not FPing6
+        $v4 = Device::factory()->create(['hostname' => 'v4only.example.com', 'type' => 'server']);
+        DevicePollingMethod::factory()->create([
+            'device_id' => $v4->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'settings' => ['transport' => 'udp6'],
+        ]);
+        DevicePollingMethod::factory()->create([
+            'device_id' => $v4->device_id,
+            'method_type' => PollingMethodType::Icmp,
+            'settings' => ['ip_version' => 'ipv4'],
+        ]);
+
+        // Ping-only device polled over IPv6: FPing6 even if the SNMP default transport is udp
+        $v6 = Device::factory()->create(['hostname' => 'v6only.example.com', 'type' => 'server']);
+        DevicePollingMethod::factory()->create([
+            'device_id' => $v6->device_id,
+            'method_type' => PollingMethodType::Icmp,
+            'settings' => ['ip_version' => 'ipv6'],
+        ]);
+
+        \Artisan::call('smokeping:generate --targets --no-header --no-dns');
+        $output = \Artisan::output();
+
+        $this->assertMatchesRegularExpression('/\+\+ v4only_example_com\n.*\n.*\n   probe = lnmsFPing-\d+\n/', $output);
+        $this->assertMatchesRegularExpression('/\+\+ v6only_example_com\n.*\n.*\n   probe = lnmsFPing6-\d+\n/', $output);
+    }
+
     public function legacyAlgo($data)
     {
         // This is the code taken from the old gen_smokeping script, with echos and sql queries replaced
