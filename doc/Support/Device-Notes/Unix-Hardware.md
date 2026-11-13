@@ -1,4 +1,4 @@
-# Linux and FreeBSD Hardware
+# Unix Hardware
 
 The `linux_entity` and `freebsd_entity` scripts from librenms-agent, plus
 `generic_entity` for other unix systems, provide hardware info via
@@ -172,8 +172,9 @@ For `--smart`, set `useSN=0` in the smart extend's config. Disks are then
 keyed by name, so a replaced disk keeps its history. With `useSN=1` they
 are keyed by serial, so a replaced disk shows up as a new one.
 
-The entity-state module is only enabled by default for Linux and FreeBSD,
-so for others it needs turning on under Device -> Settings -> Modules.
+The entity-state module is enabled by default for OpenBSD, NetBSD,
+DragonFly, Solaris, OpenSolaris, and OpenIndiana. For other OSes it needs
+turning on under Device -> Settings -> Modules.
 
 ## Flags
 
@@ -225,15 +226,17 @@ lnms device:discover yourhost -m entity-physical,transceivers,sensors,entity-sta
 
 ## Limits
 
-- Thresholds :: ENTITY-SENSOR-MIB has nowhere to put them, so sensors get
-  the LibreNMS default limits. `--thresholds` serves the IPMI and disk
-  ones via CISCO-ENTITY-SENSOR-MIB, but LibreNMS only reads that for Cisco
-  devices, so it does not use them yet. The transceiver and hwmon ones are
-  not served.
+- Thresholds :: ENTITY-SENSOR-MIB has nowhere to put them, so without
+  `--thresholds` sensors get the LibreNMS default limits. With it, the
+  IPMI and disk ones are used as the sensor limits, critical and
+  non-recoverable as the limit and non-critical as the warning. They are
+  updated each discovery, unless custom limits were set for the sensor in
+  LibreNMS. The transceiver and hwmon ones are not served.
 - Transceiver details :: Wavelength, connector, and distance are not
   shown, as ENTITY-MIB has nowhere to put them.
 - Indexes :: The cache directory has `state.json`, which keeps the
   indexes the same between runs. Deleting it renumbers everything, which
   loses the sensor history.
-- State :: The entity-state module is enabled for Linux and FreeBSD. It
-  can be turned off per device under Device -> Settings -> Modules.
+- State :: The entity-state module is enabled for Linux, FreeBSD, and
+  the other unix OSes listed under [Other Unix](#other-unix). It can be
+  turned off per device under Device -> Settings -> Modules.

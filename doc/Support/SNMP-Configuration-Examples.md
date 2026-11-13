@@ -432,7 +432,7 @@ chmod +x /usr/bin/distro
 
 !!! note
     For transceivers, hardware sensors, and inventory, see
-    [Linux and FreeBSD Hardware](Device-Notes/Linux-FreeBSD-Hardware.md).
+    [Unix Hardware](Device-Notes/Unix-Hardware.md).
 
 ### Linux (snmpd v3)
 
@@ -523,7 +523,7 @@ service snmpd restart
 
 !!! note
     For transceivers, hardware sensors, and inventory, see
-    [Linux and FreeBSD Hardware](Device-Notes/Linux-FreeBSD-Hardware.md).
+    [Unix Hardware](Device-Notes/Unix-Hardware.md).
 
 ### Arch Linux (snmpd v2)
 

@@ -22,7 +22,7 @@ extend distro /usr/bin/distro
 #extend serial '/bin/cat /sys/firmware/devicetree/base/serial-number'
 
 #Transceivers, Hardware Sensors, and Inventory
-# (uncomment after setting up linux_entity, see doc/Support/Device-Notes/Linux-FreeBSD-Hardware.md)
+# (uncomment after setting up linux_entity, see doc/Support/Device-Notes/Unix-Hardware.md)
 #pass_persist .1.3.6.1.2.1.47 /etc/snmp/extends/linux_entity -p .1.3.6.1.2.1.47
 #pass_persist .1.3.6.1.2.1.99 /etc/snmp/extends/linux_entity -p .1.3.6.1.2.1.99
 #pass_persist .1.3.6.1.2.1.131 /etc/snmp/extends/linux_entity -p .1.3.6.1.2.1.131
