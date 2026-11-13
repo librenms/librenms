@@ -166,6 +166,52 @@ final class FunctionsTest extends TestCase
         $this->assertArrayNotHasKey('ifAlias', $port);
     }
 
+public function testIfXEntryCoverageRequiresEveryPollablePortAndCounter(): void
+{
+    $ports = [
+        1 => ['ifIndex' => 1, 'deleted' => 0, 'disabled' => 0],
+        2 => ['ifIndex' => 2, 'deleted' => 0, 'disabled' => 0],
+    ];
+    $complete = [
+        1 => ['ifHCInOctets' => 0, 'ifHCOutOctets' => '0', 'ifHighSpeed' => 100],
+        2 => ['ifHCInOctets' => 0, 'ifHCOutOctets' => 0, 'ifHighSpeed' => 0],
+    ];
+
+    $this->assertTrue(has_complete_if_x_entry($complete, $ports));
+    $this->assertFalse(has_complete_if_x_entry(array_slice($complete, 0, 1, true), $ports));
+
+    unset($complete[2]['ifHCOutOctets']);
+    $this->assertFalse(has_complete_if_x_entry($complete, $ports));
+}
+
+public function testIfXEntryCoverageIgnoresDeletedAndDisabledPorts(): void
+{
+    $ports = [
+        1 => ['ifIndex' => 1, 'deleted' => 0, 'disabled' => 0],
+        2 => ['ifIndex' => 2, 'deleted' => 1, 'disabled' => 0],
+        3 => ['ifIndex' => 3, 'deleted' => 0, 'disabled' => 1],
+    ];
+
+    $this->assertTrue(has_complete_if_x_entry([
+        1 => ['ifHCInOctets' => 0, 'ifHCOutOctets' => 0, 'ifHighSpeed' => 100],
+    ], $ports));
+    $this->assertFalse(has_complete_if_x_entry([], [
+        1 => ['ifIndex' => 1, 'deleted' => 1, 'disabled' => 0],
+    ]));
+}
+
+public function testNtronNt24kFirmwareGuard(): void
+{
+    $device = ['os' => 'ntron', 'sysDescr' => 'N-Tron NT24k-16TX, v2.2.3'];
+
+    $this->assertTrue(is_ntron_nt24k_v223($device));
+    $this->assertTrue(is_ntron_nt24k_v223([...$device, 'sysDescr' => 'N-Tron NT-24K-8TX, 2.2.3']));
+    $this->assertFalse(is_ntron_nt24k_v223([...$device, 'sysDescr' => 'N-Tron NT24k-16TX, v2.2.2']));
+    $this->assertFalse(is_ntron_nt24k_v223([...$device, 'sysDescr' => 'N-Tron 714FX6, v2.2.3']));
+    $this->assertFalse(is_ntron_nt24k_v223([...$device, 'sysDescr' => '']));
+    $this->assertFalse(is_ntron_nt24k_v223([...$device, 'os' => 'other']));
+}
+
     private function fakeDeviceWithAttribs(array $attribs): array
     {
         $device = new Device(['hostname' => 'test.example.com']);
