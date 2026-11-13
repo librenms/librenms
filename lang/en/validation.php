@@ -85,6 +85,10 @@ return [
             'user' => 'User',
             'webserver' => 'Web Server',
         ],
+        'configuration' => [
+            'legacy_schedule_options' => 'Deprecated scheduler config options are set: :options.',
+            'legacy_schedule_options_fix' => 'First configure and save the replacement schedule using schedule_type.*, then remove the deprecated options from both config.php and database-backed configuration.',
+        ],
         'rrd' => [
             'CheckRrdVersion' => [
                 'fail' => 'The rrdtool version :installed_version is too old. The minimum supported version is 1.5.5.',
