@@ -313,7 +313,7 @@ class BillController extends Controller
         return $this->page($bill, $view, [
             'period' => $period,
             'percent' => Number::calculatePercent($bill->used(), $bill->allowed()),
-            'predicted' => Billing::getPredictedUsage($bill->bill_day, $bill->used()),
+            'predicted' => $bill->isCdr() ? Billing::getPredictedCdrUsage($bill) : Billing::getPredictedUsage($bill->bill_day, $bill->used()),
             'graph' => $graph,
             'graphs' => [
                 __('Billing View') => ['from' => $period['from']->timestamp, 'to' => $period['to']->timestamp],
