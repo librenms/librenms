@@ -7,8 +7,9 @@ use LibreNMS\Util\IPv4;
 use LibreNMS\Util\ProgressList;
 
 if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco') {
-    // Pre-cache the existing state of pseudowires for this device from the database, keyed by VC ID
-    $pws_db = Pseudowire::where('device_id', $device['device_id'])->get()->keyBy('cpwVcID');
+    // Pre-cache the existing state of pseudowires for this device from the database, keyed by cpwVcIndex.
+    // cpwVcID is not unique: the same VC ID can be used towards different peers.
+    $pws_db = Pseudowire::where('device_id', $device['device_id'])->get()->keyBy('cpwOid');
     $port_ids = Port::where('device_id', $device['device_id'])->pluck('port_id', 'ifDescr');
 
     // Both tables are indexed by cpwVcIndex
@@ -19,7 +20,7 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
         'CISCO-IETF-PW-MIB::cpwVcPsnType',
         'CISCO-IETF-PW-MIB::cpwVcDescr',
         'CISCO-IETF-PW-MPLS-MIB::cpwVcMplsPeerLdpID',
-    ])->table(1);
+    ])->throwIfConnectionError()->table(1); // a timeout must not be treated as "no pseudowires" (would delete or zero rows)
 
     $progress = ProgressList::start('Pseudowires');
     $seen_ids = [];
@@ -31,14 +32,16 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
         // cpwVcMplsPeerLdpID is "ip:label-space"; store the IP as a number
         [$peer_ip] = explode(':', (string) ($pw['cpwVcMplsPeerLdpID'] ?? ''));
         $is_ip = IPv4::isValid($peer_ip);
+        $peer_ldp_id = $is_ip ? ip2long($peer_ip) : (int) $peer_ip;
+        $peer_device_id = $is_ip
+            ? Port::whereHas('ipv4', fn ($q) => $q->where('ipv4_address', $peer_ip))->value('device_id')
+            : null;
 
         $attributes = [
             'device_id' => $device['device_id'],
             'port_id' => $port_ids[$if_name] ?? 0,
-            'peer_device_id' => $is_ip
-                ? (Port::whereHas('ipv4', fn ($q) => $q->where('ipv4_address', $peer_ip))->value('device_id') ?? 0)
-                : 0,
-            'peer_ldp_id' => $is_ip ? ip2long($peer_ip) : (int) $peer_ip,
+            'peer_device_id' => $peer_device_id ?? 0,
+            'peer_ldp_id' => $peer_ldp_id,
             'cpwVcID' => $pw['cpwVcID'] ?? 0,
             'cpwOid' => $pw_oid,
             'pw_type' => $pw['cpwVcType'] ?? '',
@@ -46,8 +49,16 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
             'pw_psntype' => $pw['cpwVcPsnType'] ?? '',
         ];
 
-        $pseudowire = $pws_db->get($attributes['cpwVcID']);
+        $pseudowire = $pws_db->get($pw_oid);
         if ($pseudowire) {
+            if (! isset($pw['cpwVcMplsPeerLdpID'])) {
+                // peer column missing from the walk: keep the stored peer instead of zeroing it
+                unset($attributes['peer_ldp_id'], $attributes['peer_device_id']);
+            } elseif ($peer_device_id === null && $pseudowire->peer_ldp_id == $peer_ldp_id) {
+                // same peer, but its device is not (or no longer) known: keep the stored association
+                unset($attributes['peer_device_id']);
+            }
+
             $pseudowire->fill($attributes)->save();
             $progress->mark($pseudowire->wasChanged() ? 'U' : '.');
         } else {
@@ -67,4 +78,4 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
     $progress->end();
 }
 
-unset($pws_db, $port_ids, $pws, $pw, $pw_oid, $if_name, $peer_ip, $is_ip, $seen_ids, $pseudowire, $attributes);
+unset($pws_db, $port_ids, $pws, $pw, $pw_oid, $if_name, $peer_ip, $is_ip, $peer_ldp_id, $peer_device_id, $seen_ids, $pseudowire, $attributes);
