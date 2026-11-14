@@ -148,46 +148,7 @@ foreach ($pre_cache['nokiaIsamSlot'] as $slotId => $slot) {
     }
 }
 
-// Port mapping
-// FIXME Hardcoded Port Numbering for FANT-F NT Card.
-$portTable = [
-    '257' => 'xfp:1',
-    '258' => 'xfp:2',
-    '259' => 'xfp:3',
-    '260' => 'xfp:4',
-];
-
-// dbm pre cache
-$pre_cache['nokiaIsamSfpPort'] = SnmpQuery::enumStrings()->walk('SFP-MIB::sfpDiagAvailable')->table(2);
-foreach ($pre_cache['nokiaIsamSfpPort'] as $slotId => $slot) {
-    foreach ($slot as $portId => $port) {
-        if (isset($portTable[$portId])) {
-            $pre_cache['nokiaIsamSfpPort'][$slotId][$portId]['numBasedPort'] = $portTable[$portId];
-        } else {
-            $pre_cache['nokiaIsamSfpPort'][$slotId][$portId]['numBasedPort'] = $portId;
-        }
-        $oId = '.' . $slotId . '.' . $portId;
-        $oIds = [
-            'SFP-MIB::sfpDiagRxPower' . $oId,
-            'SFP-MIB::sfpDiagTxPower' . $oId,
-            'SFP-MIB::sfpDiagRSSIRxPowerAlmLow' . $oId,
-            'SFP-MIB::sfpDiagRSSIRxPowerAlmHigh' . $oId,
-            'SFP-MIB::sfpDiagRSSIRxPowerWarnLow' . $oId,
-            'SFP-MIB::sfpDiagRSSIRxPowerWarnHigh' . $oId,
-            'SFP-MIB::sfpDiagRSSITxPowerAlmLow' . $oId,
-            'SFP-MIB::sfpDiagRSSITxPowerAlmHigh' . $oId,
-            'SFP-MIB::sfpDiagRSSITxPowerWarnLow' . $oId,
-            'SFP-MIB::sfpDiagRSSITxPowerWarnHigh' . $oId,
-        ];
-        if ($port['SFP-MIB::sfpDiagAvailable'] == 'noError') {
-            $twopart_value = SnmpQuery::enumStrings()->get($oIds)->table(2);
-            foreach ($twopart_value[$slotId][$portId] ?? [] as $index => $value) {
-                $value = str_replace(' dBm', '', $value);
-                if (is_numeric($value)) {
-                    $pre_cache['nokiaIsamSfpPort'][$slotId][$portId][$index] = $value;
-                }
-            }
-            unset($twopart_value);
-        }
-    }
+// SFP+/XFP cages: portId is 256 + faceplate number (SFP-MIB sfpDiagSfpFaceplateNumber)
+for ($portId = 0x101; $portId <= 0x1FF; $portId++) {
+    $pre_cache['nokiaIsamXfp'][$portId] = $portId & 0xFF;
 }
