@@ -3,6 +3,7 @@
 use App\Facades\DeviceCache;
 use App\Facades\PortCache;
 use App\Models\Bill;
+use App\Models\Eventlog;
 use App\Models\JuniAtmVp;
 use App\Models\MacAccounting;
 use App\Models\PortAdsl;
@@ -68,6 +69,10 @@ echo view('device.tabs.ports.includes.port_row', [
             'errors' => [['type' => 'port_errors', 'title' => trans('Errors'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
         ],
         'tab' => $vars['tab'] ?? 'detail',
+        'ports_with_events' => Eventlog::where('device_id', $device['device_id'])
+            ->where('type', 'interface')
+            ->where('reference', $port->port_id)
+            ->exists() ? collect([(string) $port->port_id]) : collect(),
     ],
     'collapsing' => false,
 ]);
@@ -155,7 +160,12 @@ foreach ($menu_options as $option => $text) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link($text, $link_array, ['view' => $option]);
+    if ($option === 'events') {
+        echo '<a href="' . route('device.eventlog', ['device' => $device->device_id, 'eventtype' => 'interface', 'reference' => $port->port_id]) . '">' . $text . '</a>';
+    } else {
+        echo generate_link($text, $link_array, ['view' => $option]);
+    }
+
     if ($vars['view'] == $option) {
         echo '</span>';
     }

@@ -28,6 +28,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Enum\Severity;
@@ -99,5 +100,13 @@ class Eventlog extends DeviceRelatedModel
     public function related(): MorphTo
     {
         return $this->morphTo('related', 'type', 'reference');
+    }
+
+    /**
+     * @return BelongsTo<Port, $this>
+     */
+    public function port(): BelongsTo
+    {
+        return $this->belongsTo(Port::class, 'reference', 'port_id');
     }
 }

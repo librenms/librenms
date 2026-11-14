@@ -33,7 +33,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
-use LibreNMS\Enum\Severity;
+use LibreNMS\Util\Html;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
@@ -47,6 +47,7 @@ class EventlogController extends TableController
         return [
             'device' => 'nullable|int',
             'device_group' => 'nullable|int',
+            'reference' => 'nullable|int',
             'eventtype' => 'nullable|string',
             'age' => 'nullable|int',
             'message' => 'nullable|string',
@@ -58,11 +59,49 @@ class EventlogController extends TableController
         return ['message'];
     }
 
+    /**
+     * Search the eventlog by message and, for interface events, by the
+     * port label (ifName, ifAlias, ifDescr).
+     */
+    protected function search(?string $search, Builder $query, array $fields): Builder
+    {
+        if (! $search) {
+            return $query;
+        }
+
+        $query->where(function (Builder $query) use ($fields, $search): void {
+            foreach ($fields as $index => $field) {
+                if (! is_numeric($index)) {
+                    $query->orWhereHas($index, function (Builder $query) use ($field, $search): void {
+                        $query->where(function (Builder $query) use ($field, $search): void {
+                            foreach ($field as $relatedField) {
+                                $query->orWhere($relatedField, 'like', '%' . $search . '%');
+                            }
+                        });
+                    });
+                } else {
+                    $query->orWhere($field, 'like', '%' . $search . '%');
+                }
+            }
+
+            $query->orWhere(function (Builder $query) use ($search): void {
+                $query->where('type', 'interface')->whereHas('port', function (Builder $query) use ($search): void {
+                    $query->where('ifName', 'like', '%' . $search . '%')
+                        ->orWhere('ifAlias', 'like', '%' . $search . '%')
+                        ->orWhere('ifDescr', 'like', '%' . $search . '%');
+                });
+            });
+        });
+
+        return $query;
+    }
+
     protected function filterFields(Request $request): array
     {
         return [
             'device_id' => 'device',
             'type' => 'eventtype',
+            'reference' => 'reference',
         ];
     }
 
@@ -131,23 +170,7 @@ class EventlogController extends TableController
 
     private function formatDatetime(Eventlog $eventlog): string
     {
-        $output = "<span class='alert-status ";
-        $output .= $this->severityLabel($eventlog->severity);
-        $output .= " eventlog-status'></span>";
-        $output .= Time::format($eventlog->datetime, 'compact');
-
-        return $output;
-    }
-
-    private function severityLabel(Severity $eventlog_severity): string
-    {
-        return match ($eventlog_severity) {
-            Severity::Ok => 'label-success',
-            Severity::Info => 'label-info',
-            Severity::Notice => 'label-primary',
-            Severity::Warning => 'label-warning',
-            Severity::Error => 'label-danger',
-            default => 'label-default', // Unknown
-        };
+        return Html::severityToLabel($eventlog->severity, '', class: 'alert-status eventlog-status')
+            . Time::format($eventlog->datetime, 'compact');
     }
 }
