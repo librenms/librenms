@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Data\Graphing\GraphParameters;
 use App\Facades\LibrenmsConfig;
+use App\Graphs\AbstractSeriesGraph;
 use App\Graphs\GraphFactory;
 use App\Http\Requests\GraphRequest;
 use App\Models\Device;
@@ -12,7 +13,6 @@ use App\Models\UserPref;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Applications\ApplicationDefinition;
-use LibreNMS\Interfaces\Data\Graphing\SeriesGraphInterface;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Time;
@@ -30,7 +30,7 @@ class GraphsPageController extends Controller
         $port = $context->port;
         $fullType = "{$params->type}_$params->subtype";
         $showCommand = $request->input('showcommand') === 'yes';
-        $canDrawInBrowser = $request->graph() instanceof SeriesGraphInterface;
+        $canDrawInBrowser = $request->graph() instanceof AbstractSeriesGraph;
         $drawInBrowser = $canDrawInBrowser && UserPref::getPref($request->user(), self::RENDERER_PREFERENCE) === 'js';
         $showCommand = $showCommand && ! $drawInBrowser;
         $isDynamicGraph = ! $drawInBrowser && LibrenmsConfig::get('webui.dynamic_graphs', false) === true;

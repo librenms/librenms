@@ -30,7 +30,6 @@ use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\RRD\RrdExport;
 use LibreNMS\RRD\RrdPath;
 
 /**
@@ -113,10 +112,11 @@ interface RrdBackendInterface
      * Export the values a graph would draw
      *
      * @param  string[]  $options  rrdtool xport options, each XPORT needs a unique legend
+     * @return array<string, array<int, float|null>> the values by legend and unix time, null where there is no data
      *
      * @throws RrdException
      */
-    public function xport(array $options): RrdExport;
+    public function xport(array $options): array;
 
     /**
      * Whether rrdcached is on another host, so the files may not be local.

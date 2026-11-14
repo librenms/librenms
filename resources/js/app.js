@@ -22,8 +22,6 @@ import portLink from "./components/alpine/portLink.js";
 import filterBarComponent from "./components/alpine/filterBarComponent.js";
 import remoteDropdown from "./components/alpine/remoteDropdown.js";
 import dateRangePicker from "./components/alpine/dateRangePicker.js";
-import timeSeriesGraph from "./components/alpine/timeSeriesGraph.js";
-import graphsPage from "./components/alpine/graphsPage.js";
 import {librenmsSelect, librenmsSetting, settingArray, settingArrayDynamic, settingArraySubKeyed, settingGroupRoleMap, settingOxidizedMaps, settingsPage} from "./components/alpine/settings.js";
 import LibreNMSDate from "./datetime.js";
 import LibreNMSUrl from "./url.js";
@@ -46,8 +44,6 @@ Alpine.data('portLink', portLink);
 Alpine.data("filterBarComponent", filterBarComponent);
 Alpine.data("remoteDropdown", remoteDropdown);
 Alpine.data("dateRangePicker", dateRangePicker);
-Alpine.data("timeSeriesGraph", timeSeriesGraph);
-Alpine.data("graphsPage", graphsPage);
 Alpine.data("settingsPage", settingsPage);
 Alpine.data("librenmsSetting", librenmsSetting);
 Alpine.data("librenmsSelect", librenmsSelect);
@@ -58,6 +54,8 @@ Alpine.data("settingOxidizedMaps", settingOxidizedMaps);
 Alpine.data("settingArrayDynamic", settingArrayDynamic);
 
 window.Alpine = Alpine;
+
+window.LibreNMS.loadTimeSeriesChart = () => import("./timeSeriesChart.js");
 
 if (document.querySelector('[data-config-backups]')) {
     window.LibreNMS.loadConfigHighlight = () => import("./configHighlight.js");

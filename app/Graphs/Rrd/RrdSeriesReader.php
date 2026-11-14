@@ -2,21 +2,22 @@
 
 namespace App\Graphs\Rrd;
 
+use App\Data\Graphing\DataSeries;
 use App\Data\TimeSeries\SeriesData;
-use App\Data\TimeSeries\SeriesValues;
+use Illuminate\Support\Arr;
 use LibreNMS\Exceptions\RrdException;
-use LibreNMS\Interfaces\Data\SeriesReaderInterface;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
 
 /**
- * Reads series from rrd files with one rrdtool xport, which consolidates them to the same points
+ * Reads the stored values of series from rrd files, independent of how they are shown.
+ * One rrdtool xport reads all of them, which consolidates them to the same points.
  */
-class RrdSeriesReader implements SeriesReaderInterface
+class RrdSeriesReader
 {
     // rrdtool does not export fewer rows
     private const int MIN_POINTS = 10;
 
-    /** @var array<string, string> rrd consolidation function by the suffix of the exported value */
+    /** @var array<string, string> rrd consolidation function by the name of the values */
     private const array CONSOLIDATIONS = ['avg' => 'AVERAGE', 'min' => 'MIN', 'max' => 'MAX'];
 
     public function __construct(
@@ -26,6 +27,14 @@ class RrdSeriesReader implements SeriesReaderInterface
     }
 
     /**
+     * Read the values of the series over a time range.
+     * Longer ranges are consolidated so there are not many more than the requested number of points.
+     *
+     * @param  array<string, DataSeries>  $series
+     * @param  int  $from  unix time
+     * @param  int  $to  unix time
+     * @param  int  $points  how many points are wanted, for example the width of a graph in pixels
+     *
      * @throws RrdException
      */
     public function read(array $series, int $from, int $to, int $points): SeriesData
@@ -40,8 +49,8 @@ class RrdSeriesReader implements SeriesReaderInterface
             }
 
             $ids[$key] = $id = 'ds' . count($ids);
-            foreach (self::CONSOLIDATIONS as $suffix => $cf) {
-                array_push($definition, "DEF:$id$suffix=$filename:$item->field:$cf", "XPORT:$id$suffix:$id$suffix");
+            foreach (self::CONSOLIDATIONS as $name => $cf) {
+                array_push($definition, "DEF:$id$name=$filename:$item->field:$cf", "XPORT:$id$name:$id$name");
             }
         }
 
@@ -53,12 +62,12 @@ class RrdSeriesReader implements SeriesReaderInterface
 
         $values = [];
         foreach ($ids as $key => $id) {
-            $column = fn (string $suffix): array => $this->scale($export->columns[$id . $suffix] ?? [], $series[$key]->scale);
-
-            $values[$key] = new SeriesValues($column('avg'), $column('min'), $column('max'));
+            foreach (array_keys(self::CONSOLIDATIONS) as $name) {
+                $values[$key][$name] = $this->scale(array_values($export[$id . $name] ?? []), $series[$key]->scale);
+            }
         }
 
-        return new SeriesData($export->timestamps, $values);
+        return new SeriesData(array_keys(Arr::first($export) ?? []), $values);
     }
 
     /**

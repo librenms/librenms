@@ -3,20 +3,19 @@
 namespace App\Graphs;
 
 use App\Data\Graphing\DataSeries;
-use App\Data\Graphing\GraphData;
 use App\Data\Graphing\GraphImage;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\SeriesSum;
+use App\Data\TimeSeries\SeriesData;
 use App\Graphs\Rrd\RrdGraphRenderer;
+use App\Graphs\Rrd\RrdSeriesReader;
 use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Exceptions\NoGraphData;
-use LibreNMS\Interfaces\Data\Graphing\SeriesGraphInterface;
-use LibreNMS\Interfaces\Data\SeriesReaderInterface;
 
 /**
  * A graph defined by its series and options, drawn by a renderer for the datastore
  */
-abstract class AbstractSeriesGraph extends AbstractGraph implements SeriesGraphInterface
+abstract class AbstractSeriesGraph extends AbstractGraph
 {
     protected function options(): GraphOptions
     {
@@ -51,17 +50,23 @@ abstract class AbstractSeriesGraph extends AbstractGraph implements SeriesGraphI
         return $this->renderer()->render($this->getTitle(), $this->series(), $this->options());
     }
 
-    public function getData(): GraphData
+    public function getOptions(): GraphOptions
     {
-        return $this->attempt(function (): GraphData {
-            $series = $this->series();
-            $data = app(SeriesReaderInterface::class)->read($series, $this->params->from, $this->params->to, $this->params->width);
+        return $this->options();
+    }
 
-            if ($data->series === []) {
-                throw new NoGraphData('No Data files');
-            }
+    /**
+     * The values of the series that have data, for drawing in the browser or use without drawing.
+     * Validates input and authorization first.
+     *
+     * @throws GraphException
+     */
+    public function getData(): SeriesData
+    {
+        return $this->attempt(function (): SeriesData {
+            $data = app(RrdSeriesReader::class)->read($this->series(), $this->params->from, $this->params->to, $this->params->width);
 
-            return new GraphData($this->options(), array_intersect_key($series, $data->series), $data);
+            return $data->series === [] ? throw new NoGraphData('No Data files') : $data;
         });
     }
 

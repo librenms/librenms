@@ -10,7 +10,6 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use LibreNMS\Exceptions\RrdUnknownException;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
-use LibreNMS\RRD\RrdExport;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 use Spatie\Permission\Models\Role;
@@ -57,11 +56,7 @@ class GraphDataControllerTest extends TestCase
     public function testMinAndMaxAreOnlySentWhenTheyDifferFromTheAverage(): void
     {
         $device = Device::factory()->create();
-        $this->fakeRrdFiles('localhost/netstats-ip.rrd')->shouldReceive('xport')->andReturnUsing(function (array $options) {
-            $export = $this->export($options, [2.0, null]);
-
-            return new RrdExport($export->timestamps, ['ds0min' => [1.0, null], 'ds1max' => [3.0, null]] + $export->columns);
-        });
+        $this->fakeRrdFiles('localhost/netstats-ip.rrd')->shouldReceive('xport')->andReturnUsing(fn (array $options) => ['ds0min' => $this->timed([1.0, null]), 'ds1max' => $this->timed([3.0, null])] + $this->export($options, [2.0, null]));
 
         $response = $this->actingAs($this->adminUser())->getJson("/graph-data?type=device_netstat_ip&device=$device->device_id");
 
@@ -161,15 +156,25 @@ class GraphDataControllerTest extends TestCase
      *
      * @param  string[]  $options
      * @param  list<float|null>  $values
+     * @return array<string, array<int, float|null>>
      */
-    private function export(array $options, array $values): RrdExport
+    private function export(array $options, array $values): array
     {
         $columns = [];
         foreach (preg_grep('/^XPORT:/', $options) as $xport) {
-            $columns[explode(':', $xport)[2]] = $values;
+            $columns[explode(':', $xport)[2]] = $this->timed($values);
         }
 
-        return new RrdExport(array_slice([1700000300, 1700000600], 0, count($values)), $columns);
+        return $columns;
+    }
+
+    /**
+     * @param  list<float|null>  $values
+     * @return array<int, float|null> the values by the time of their row
+     */
+    private function timed(array $values): array
+    {
+        return array_combine(array_slice([1700000300, 1700000600], 0, count($values)), $values);
     }
 
     private function adminUser(): User

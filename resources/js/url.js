@@ -50,18 +50,4 @@ function updateDateRange(relativeStartSeconds, relativeEndSeconds, start, end) {
     }
 }
 
-/**
- * The given url with the date range of the current page, for links made before the range was changed on the page
- */
-function withCurrentDateRange(href) {
-    const url = new URL(href, window.location.href);
-    const current = new URL(window.location.href).searchParams;
-
-    ['from', 'to'].forEach((key) => {
-        if (current.has(key)) url.searchParams.set(key, current.get(key)); else url.searchParams.delete(key);
-    });
-
-    return url.toString();
-}
-
-export default { applyNestedParamsToUrl, updateDateRange, withCurrentDateRange };
+export default { applyNestedParamsToUrl, updateDateRange };

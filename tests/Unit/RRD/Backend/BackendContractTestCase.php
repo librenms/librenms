@@ -234,13 +234,12 @@ abstract class BackendContractTestCase extends TestCase
 
         $export = $this->backend->xport(['--start', (string) $start, '--end', (string) ($start + 900), '--maxrows', '10', "DEF:a=$rrd:a:AVERAGE", "DEF:b=$rrd:b:AVERAGE", 'XPORT:a:first', 'XPORT:b:second']);
 
-        $this->assertSame(['first', 'second'], array_keys($export->columns));
-        $this->assertCount(count($export->timestamps), $export->columns['second']);
+        $this->assertSame(['first', 'second'], array_keys($export));
+        $this->assertSame(array_keys($export['first']), array_keys($export['second']));
         // rows are at the end of the interval they cover, the values were stored for the two after the first update
-        $rows = array_combine($export->timestamps, $export->columns['first']);
-        $this->assertSame(5.0, $rows[$start + 600]);
-        $this->assertSame(5.0, $rows[$start + 900]);
-        $this->assertContains(null, $export->columns['second'], 'unknown values are null');
+        $this->assertSame(5.0, $export['first'][$start + 600]);
+        $this->assertSame(5.0, $export['first'][$start + 900]);
+        $this->assertContains(null, $export['second'], 'unknown values are null');
     }
 
     #[DataProvider('modes')]

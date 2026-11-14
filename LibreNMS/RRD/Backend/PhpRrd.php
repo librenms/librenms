@@ -41,7 +41,6 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdUnknownException;
-use LibreNMS\RRD\RrdExport;
 use LibreNMS\RRD\RrdPath;
 use Log;
 
@@ -170,10 +169,11 @@ class PhpRrd extends Rrdtool
 
     /**
      * @param  string[]  $options
+     * @return array<string, array<int, float|null>>
      *
      * @throws RrdException
      */
-    public function xport(array $options): RrdExport
+    public function xport(array $options): array
     {
         $options = [...$this->daemon(), ...$options];
         Log::debug('PHPRRD[%gxport ' . implode(' ', $options) . '%n]', ['color' => true]);
@@ -190,12 +190,9 @@ class PhpRrd extends Rrdtool
             throw RrdException::parse(rrd_error());
         }
 
-        // each column is keyed by the time of its rows
-        $columns = array_column($export['data'], 'data', 'legend');
-
-        return new RrdExport(
-            array_keys(reset($columns) ?: []),
-            array_map(fn (array $values) => array_map(fn (float $value) => is_finite($value) ? $value : null, array_values($values)), $columns),
+        return array_map(
+            fn (array $values) => array_map(fn (float $value) => is_finite($value) ? $value : null, $values),
+            array_column($export['data'], 'data', 'legend'),
         );
     }
 

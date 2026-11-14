@@ -8,7 +8,6 @@ use App\ApiClients\MapquestApi;
 use App\ApiClients\NominatimApi;
 use App\Discovery\Sensor as DiscoverySensor;
 use App\Facades\LibrenmsConfig;
-use App\Graphs\Rrd\RrdSeriesReader;
 use App\Horizon\Supervisors;
 use App\Models\Device;
 use App\Models\DeviceGroup;
@@ -44,7 +43,6 @@ use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
 use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
 use LibreNMS\Enum\SensorType;
-use LibreNMS\Interfaces\Data\SeriesReaderInterface;
 use LibreNMS\Interfaces\Geocoder;
 use LibreNMS\RRD\Backend\PhpRrd;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
@@ -108,7 +106,6 @@ class AppServiceProvider extends ServiceProvider
 
             return LibrenmsConfig::get('rrd.backend') === 'php-rrd' ? new PhpRrd($rrdcached) : new Rrdtool($rrdcached, version: (string) LibrenmsConfig::get('rrdtool_version', '1.7.0'));
         });
-        $this->app->bind(SeriesReaderInterface::class, RrdSeriesReader::class);
     }
 
     /**

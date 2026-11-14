@@ -4,6 +4,8 @@ return [
     'interactive' => 'Interactive graph',
     'image_only' => 'This graph can only be drawn as an image',
     'loading' => 'Loading',
+    'zoom_in' => 'Zoom in',
+    'zoom_out' => 'Zoom out',
     'earlier' => 'Earlier',
     'later' => 'Later',
     'reset' => 'Reset',
