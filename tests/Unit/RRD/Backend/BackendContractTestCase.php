@@ -4,6 +4,7 @@ namespace LibreNMS\Tests\Unit\RRD\Backend;
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\File;
+use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
@@ -218,6 +219,36 @@ abstract class BackendContractTestCase extends TestCase
         $this->start($mode);
         $this->expectException(RrdGraphException::class);
         $this->backend->graph(['--start', '-1h', 'DEF:a=' . RrdPath::make('host1', 'missing.rrd') . ':a:AVERAGE', 'LINE1:a#ff0000']);
+    }
+
+    #[DataProvider('modes')]
+    public function testXport(string $mode): void
+    {
+        $this->start($mode);
+        $rrd = RrdPath::make('host1', 'test.rrd');
+        $this->create($rrd);
+        $start = intdiv(time(), 300) * 300 + 300;
+        foreach ([1, 2, 3] as $row) {
+            $this->backend->update($rrd, [5, null], $start + $row * 300);
+        }
+
+        $export = $this->backend->xport(['--start', (string) $start, '--end', (string) ($start + 900), '--maxrows', '10', "DEF:a=$rrd:a:AVERAGE", "DEF:b=$rrd:b:AVERAGE", 'XPORT:a:first', 'XPORT:b:second']);
+
+        $this->assertSame(['first', 'second'], array_keys($export->columns));
+        $this->assertCount(count($export->timestamps), $export->columns['second']);
+        // rows are at the end of the interval they cover, the values were stored for the two after the first update
+        $rows = array_combine($export->timestamps, $export->columns['first']);
+        $this->assertSame(5.0, $rows[$start + 600]);
+        $this->assertSame(5.0, $rows[$start + 900]);
+        $this->assertContains(null, $export->columns['second'], 'unknown values are null');
+    }
+
+    #[DataProvider('modes')]
+    public function testXportError(string $mode): void
+    {
+        $this->start($mode);
+        $this->expectException(RrdException::class);
+        $this->backend->xport(['--start', '-1h', 'DEF:a=' . RrdPath::make('host1', 'missing.rrd') . ':a:AVERAGE', 'XPORT:a:a']);
     }
 
     protected function create(RrdPath $rrd): void
