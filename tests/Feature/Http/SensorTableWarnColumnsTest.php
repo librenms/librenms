@@ -2,9 +2,11 @@
 
 namespace LibreNMS\Tests\Feature\Http;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Sensor;
 use App\Models\User;
+use App\Models\WirelessSensor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use LibreNMS\Tests\TestCase;
 use Spatie\Permission\Models\Role;
@@ -70,6 +72,64 @@ final class SensorTableWarnColumnsTest extends TestCase
             $this->assertNotFalse($found, "Expected to find \"$needle\" after position $position");
             $position = $found + strlen($needle);
         }
+
+        $visibility = [
+            'sensor_limit_low' => false,
+            'sensor_limit_low_warn' => true,
+            'sensor_limit_warn' => true,
+            'sensor_limit' => false,
+        ];
+
+        foreach ($visibility as $column => $hidden) {
+            $tag = $this->columnTag($html, $column);
+
+            if ($hidden) {
+                $this->assertStringContainsString('data-visible="false"', $tag, "Expected \"$column\" to be hidden by default");
+            } else {
+                $this->assertStringNotContainsString('data-visible', $tag, "Expected \"$column\" to be visible by default");
+            }
+        }
+
+        WirelessSensor::forceCreate([
+            'device_id' => $device->device_id,
+            'sensor_class' => 'quality',
+            'sensor_type' => 'signal',
+            'sensor_oids' => '[{"var":"signal","type":"gauge","oid":".1.3.6.1.4.1.991.1.1.1.1.0"}]',
+        ]);
+
+        $wireless_html = $this->actingAs($this->admin())
+            ->get(route('wireless.index', ['metric' => 'quality']))
+            ->assertOk()
+            ->getContent();
+
+        foreach (['sensor_limit_low_warn', 'sensor_limit_warn'] as $column) {
+            $this->assertStringContainsString('data-visible="false"', $this->columnTag($wireless_html, $column), "Expected \"$column\" to be hidden by default on the wireless sensor table");
+        }
+    }
+
+    public function testSensorIndexPageShowsTheWarnLimitColumnsWhenEnabled(): void
+    {
+        LibrenmsConfig::set('sensors.warn_limits.enabled', true);
+
+        $device = Device::factory()->create();
+        Sensor::forceCreate($this->sensorAttributes($device));
+
+        $html = $this->actingAs($this->admin())
+            ->get(route('sensor.index'))
+            ->assertOk()
+            ->getContent();
+
+        foreach (['sensor_limit_low_warn', 'sensor_limit_warn'] as $column) {
+            $this->assertStringNotContainsString('data-visible', $this->columnTag($html, $column), "Expected \"$column\" to be visible when sensors.warn_limits.enabled is set");
+        }
+    }
+
+    private function columnTag(string $html, string $column): string
+    {
+        preg_match('/<th[^>]*data-column-id="' . $column . '"[^>]*>/', $html, $matches);
+        $this->assertNotEmpty($matches, "Expected to find the $column column header");
+
+        return $matches[0];
     }
 
     /**
