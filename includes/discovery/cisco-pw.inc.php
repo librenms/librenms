@@ -6,7 +6,7 @@ use LibreNMS\Util\ProgressList;
 if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco') {
     $pws_db = [];
     // Pre-cache the existing state of pseudowires for this device from the database
-    $pws_db_raw = dbFetchRows('SELECT * FROM `pseudowires` WHERE `device_id` = ?', [$device['device_id']]);
+    $pws_db_raw = \App\Models\Pseudowire::where('device_id', $device['device_id'])->get();
     foreach ($pws_db_raw as $pw_db) {
         $pws_db[$pw_db['cpwVcID']] = $pw_db['pseudowire_id'];
     }
@@ -38,13 +38,13 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
             $cpw_remote_id = $cpw_remote_ip;
         }
 
-        $cpw_remote_device = dbFetchCell('SELECT device_id from ipv4_addresses AS A, ports AS I WHERE A.ipv4_address=? AND A.port_id=I.port_id', [$cpw_remote_ip]);
-        $if_id = dbFetchCell('SELECT port_id from ports WHERE `ifDescr`=? AND `device_id`=?', [$pw['cpwVcName'], $device['device_id']]);
+        $cpw_remote_device = \App\Models\Port::whereHas('ipv4', fn ($q) => $q->where('ipv4_address', $cpw_remote_ip))->value('device_id');
+        $if_id = \App\Models\Port::where('ifDescr', $pw['cpwVcName'])->where('device_id', $device['device_id'])->value('port_id');
         if (! empty($pws_db[$pw['cpwVcID']])) {
             $pseudowire_id = $pws_db[$pw['cpwVcID']];
             $progress->mark('.');
         } else {
-            $pseudowire_id = dbInsert(
+            $pseudowire_id = \App\Models\Pseudowire::create(
                 [
                     'device_id' => $device['device_id'],
                     'port_id' => $if_id,
@@ -55,9 +55,8 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
                     'pw_type' => $pw['cpwVcType'],
                     'pw_descr' => $pw['cpwVcDescr'],
                     'pw_psntype' => $pw['cpwVcPsnType'],
-                ],
-                'pseudowires'
-            );
+                ]
+            )->pseudowire_id;
             $progress->mark('+');
         }
 
