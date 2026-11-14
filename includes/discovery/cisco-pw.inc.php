@@ -38,7 +38,7 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
             $cpw_remote_id = $cpw_remote_ip;
         }
 
-        $cpw_remote_device = \App\Models\Port::whereHas('ipv4', fn ($q) => $q->where('ipv4_address', $cpw_remote_ip))->value('device_id');
+        $cpw_remote_device = \App\Models\Port::whereHas('ipv4', fn ($q) => $q->where('ipv4_address', $cpw_remote_ip))->value('device_id') ?? 0;
         $if_id = \App\Models\Port::where('ifDescr', $pw['cpwVcName'])->where('device_id', $device['device_id'])->value('port_id');
         if (! empty($pws_db[$pw['cpwVcID']])) {
             $pseudowire_id = $pws_db[$pw['cpwVcID']];
