@@ -223,7 +223,7 @@
                             @class(['danger' => $isDown, 'warning' => $isWarning])
                             x-show="matchesPoller({{ Js::from($poller->poller_name) }}, {{ Js::from((string) $poller->node_id) }}, {{ Js::from($poller['row_class']) }})"
                             style="cursor: pointer;"
-                            @click="togglePoller('{{ $rowKey }}')">
+                            @click="if (!$event.target.closest('[data-toggle=modal], a')) togglePoller('{{ $rowKey }}')">
                             <td class="text-center" style="vertical-align: middle;">
                                 <button type="button"
                                         class="btn btn-default btn-xs"
@@ -286,7 +286,7 @@
                             @else
                                 <td colspan="4" style="vertical-align: middle;">
                                     @if($poller->poller_version == \App\Queue\WorkerNode::VERSION && \App\Queue\QueueStatus::showPages())
-                                        <a href="{{ route('poller.queues') }}" @click.stop>{{ __('Queue workers share the queues of their poller groups, see Queues') }}</a>
+                                        <a href="{{ route('poller.queues') }}">{{ __('Queue workers share the queues of their poller groups, see Queues') }}</a>
                                     @else
                                         <span class="text-muted">{{ __('No job statistics reported') }}</span>
                                     @endif
@@ -294,7 +294,7 @@
                             @endif
 
                             @if($anyDeletable)
-                                <td class="text-center" style="vertical-align: middle;" @click.stop>
+                                <td class="text-center" style="vertical-align: middle;">
                                     @if($poller->long_not_polled)
                                         <button type="button"
                                                 class="btn btn-danger btn-xs"
@@ -418,8 +418,11 @@
             success: function (result) {
                 if (result.status == 0) {
                     toastr.success(result.message);
-                    $("#row_" + id).remove();
-                    $("[data-poller-row='" + id + "']").remove();
+                    if (pollertype === 'delete-poller') {
+                        $("#row_" + id).remove();
+                    } else {
+                        $("[data-poller-row='" + id + "']").remove();
+                    }
                 }
                 else {
                     toastr.error(result.message);

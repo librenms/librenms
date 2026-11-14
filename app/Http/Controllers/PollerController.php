@@ -85,7 +85,7 @@ class PollerController extends Controller
         $poller->long_not_polled = $since_last_poll > ($this->rrdstep * 2);
 
         if ($poller instanceof PollerCluster && $poller->row_class === 'success') {
-            $primaryStat = $poller->stats->firstWhere('poller_type', 'poller');
+            $primaryStat = $poller->stats->firstWhere('poller_type', 'poller') ?? $poller->stats->first();
             $maxSeconds = $primaryStat ? ((int) $primaryStat->frequency * (int) $primaryStat->workers) : 0;
             if ($maxSeconds > 0 && (float) $primaryStat->worker_seconds > $maxSeconds) {
                 $poller->row_class = 'warning';
