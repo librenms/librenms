@@ -160,6 +160,11 @@ export default function timeSeriesGraph(src, range) {
 
                 createChart = module.default;
                 graph = response.data;
+                // a min and max that equal the average are left out by the server
+                graph.series.forEach((series) => {
+                    series.min ??= series.avg;
+                    series.max ??= series.avg;
+                });
                 this.caption = graph.axis.label;
                 this.error = null;
 

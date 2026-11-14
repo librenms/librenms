@@ -53,15 +53,24 @@ class RrdSeriesReader implements SeriesReaderInterface
 
         $values = [];
         foreach ($ids as $key => $id) {
-            $scale = $series[$key]->scale;
-            $column = fn (string $suffix): array => array_map(
-                fn (?float $value) => $value === null ? null : $value * $scale,
-                $export->columns[$id . $suffix] ?? [],
-            );
+            $column = fn (string $suffix): array => $this->scale($export->columns[$id . $suffix] ?? [], $series[$key]->scale);
 
             $values[$key] = new SeriesValues($column('avg'), $column('min'), $column('max'));
         }
 
         return new SeriesData($export->timestamps, $values);
+    }
+
+    /**
+     * @param  list<float|null>  $values
+     * @return list<float|null>
+     */
+    private function scale(array $values, float $scale): array
+    {
+        if ($scale == 1) {
+            return $values;
+        }
+
+        return array_map(fn (?float $value) => $value === null ? null : $value * $scale, $values);
     }
 }

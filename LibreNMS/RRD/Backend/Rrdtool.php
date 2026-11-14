@@ -192,23 +192,19 @@ class Rrdtool implements RrdBackendInterface
         }
 
         $rows = $export['data'] ?? [];
-        $columns = [];
-        foreach ($meta['legend'] ?? [] as $index => $legend) {
-            $columns[$legend] = array_map($this->exportValue(...), array_column($rows, $index));
+        $legends = $meta['legend'] ?? [];
+        $columns = array_fill_keys($legends, []);
+        foreach ($rows as $row) {
+            foreach ($legends as $index => $legend) {
+                $value = $row[$index] ?? null;
+                $columns[$legend][] = is_float($value) ? $value : (is_int($value) ? (float) $value : null);
+            }
         }
 
         return new RrdExport(
             array_map(fn (int $row) => $meta['start'] + $row * $meta['step'], array_keys($rows)),
             $columns,
         );
-    }
-
-    /**
-     * A value of an export, unknown and infinite values are null
-     */
-    protected function exportValue(mixed $value): ?float
-    {
-        return (is_int($value) || is_float($value)) && is_finite($value) ? (float) $value : null;
     }
 
     /**

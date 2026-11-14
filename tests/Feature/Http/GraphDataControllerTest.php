@@ -48,10 +48,29 @@ class GraphDataControllerTest extends TestCase
         $response->assertJsonPath('series.0.color', '#' . LibrenmsConfig::get('graph_colours.mixed.0'));
         $response->assertJsonPath('series.0.invert', false);
         $response->assertJsonPath('series.0.avg', [1.5, null]);
-        $response->assertJsonPath('series.0.min', [1.5, null]);
-        $response->assertJsonPath('series.0.max', [1.5, null]);
+        $response->assertJsonPath('series.0.min', null);
+        $response->assertJsonPath('series.0.max', null);
         $response->assertJsonPath('series.3.key', 'ipOutRequests');
         $response->assertJsonPath('series.3.invert', true);
+    }
+
+    public function testMinAndMaxAreOnlySentWhenTheyDifferFromTheAverage(): void
+    {
+        $device = Device::factory()->create();
+        $this->fakeRrdFiles('localhost/netstats-ip.rrd')->shouldReceive('xport')->andReturnUsing(function (array $options) {
+            $export = $this->export($options, [2.0, null]);
+
+            return new RrdExport($export->timestamps, ['ds0min' => [1.0, null], 'ds1max' => [3.0, null]] + $export->columns);
+        });
+
+        $response = $this->actingAs($this->adminUser())->getJson("/graph-data?type=device_netstat_ip&device=$device->device_id");
+
+        $response->assertOk();
+        $response->assertJsonPath('series.0.avg', [2, null]);
+        $response->assertJsonPath('series.0.min', [1, null]);
+        $response->assertJsonPath('series.0.max', null);
+        $response->assertJsonPath('series.1.min', null);
+        $response->assertJsonPath('series.1.max', [3, null]);
     }
 
     public function testStackedSeriesAreDrawnAsTheirShare(): void

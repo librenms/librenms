@@ -51,8 +51,8 @@ class GraphDataResource extends JsonResource
                 'invert' => $style->invert && $inverts,
                 'draw_scale' => $style->stackAverage ? $style->drawScale / $averaged : $style->drawScale,
                 'avg' => $values->average,
-                'min' => $values->min,
-                'max' => $values->max,
+                'min' => $values->min === $values->average ? null : $values->min,
+                'max' => $values->max === $values->average ? null : $values->max,
             ];
         }
 
