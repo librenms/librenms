@@ -236,7 +236,7 @@ abstract class BackendContractTestCase extends TestCase
 
         $this->assertSame(['first', 'second'], array_keys($export));
         $this->assertSame(array_keys($export['first']), array_keys($export['second']));
-        // rows are at the end of the interval they cover, the values were stored for the two after the first update
+        // rows are at the end of their interval
         $this->assertSame(5.0, $export['first'][$start + 600]);
         $this->assertSame(5.0, $export['first'][$start + 900]);
         $this->assertContains(null, $export['second'], 'unknown values are null');

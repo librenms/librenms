@@ -191,7 +191,7 @@ class Rrdtool implements RrdBackendInterface
             throw new RrdUnknownException('Unexpected rrdtool xport output');
         }
 
-        // one pass over the rows, exports can be a hundred thousand values
+        // a single pass, exports can be large
         $legends = $meta['legend'] ?? [];
         $columns = array_fill_keys($legends, []);
         foreach ($export['data'] ?? [] as $row => $values) {

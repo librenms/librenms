@@ -178,7 +178,7 @@ class PhpRrd extends Rrdtool
         $options = [...$this->daemon(), ...$options];
         Log::debug('PHPRRD[%gxport ' . implode(' ', $options) . '%n]', ['color' => true]);
 
-        // php-rrd prints a message when the export fails, keep it out of the response
+        // php-rrd prints a message on failure
         ob_start();
         try {
             $export = $this->inRrdDir(fn () => rrd_xport($options));

@@ -1,18 +1,14 @@
 @props(['src', 'range', 'height' => 300])
 
 {{--
-    A graph drawn in the browser from a graph data url.
-
-    It shows a time range: ['last' => seconds] for a period up to now, or ['from' => time, 'to' => time].
-    The page sets another range with $el.timeSeriesGraph.setRange(range), as {last} or {from, to}.
-    The user can zoom and pan away from the range and reset back to it.
-    Each change dispatches graph-range-changed with what is shown now.
+    range: ['last' => seconds] up to now, or ['from' => time, 'to' => time].
+    Set another with $el.timeSeriesGraph.setRange(range). Dispatches graph-range-changed with what is shown.
 --}}
 @php
     $button = 'tw:h-8 tw:min-w-8 tw:px-2 tw:inline-flex tw:items-center tw:justify-center tw:gap-1 tw:rounded tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:text-gray-700 tw:dark:text-gray-200 tw:hover:bg-gray-100 tw:dark:hover:bg-dark-gray-300 tw:disabled:opacity-40 tw:disabled:pointer-events-none';
     $kbd = 'tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs';
 
-    // the help by section: what can be done and the ways to do it, each way the keys to combine
+    // section => [action, ways], a way is the keys to combine
     $help = [
         __('graphs.help.time_range') => [
             [__('graphs.help.pan'), [[__('graphs.help.drag')], ['←'], ['→'], ['Shift', __('graphs.help.scroll')]]],
@@ -155,30 +151,24 @@
 <script>
     document.addEventListener('alpine:init', () => {
         const MAX_TOOLTIP_ROWS = 12;
-        // how far the tooltip stays from the cursor, and from the edges of the window
-        const TOOLTIP_GAP = 32;
-        const TOOLTIP_MARGIN = 8;
-        // a move that is still going on, like scrolling or dragging, loads data once it pauses
-        const SETTLE_DELAY = 200;
-        // data is loaded this much of the view past both ends, so a pan shows data right away
-        const MARGIN = 0.5;
-        // how much of the view a step earlier or later moves, and how much of it a step in shows
-        const PAN_STEP = 0.25;
-        const ZOOM_STEP = 0.5;
-        // the view is kept between two minutes and ten years wide
+        const TOOLTIP_GAP = 32; // from the cursor
+        const TOOLTIP_MARGIN = 8; // from the window edges
+        const SETTLE_DELAY = 200; // a move loads data once it pauses
+        const MARGIN = 0.5; // of the view, loaded past both ends
+        const PAN_STEP = 0.25; // of the view
+        const ZOOM_STEP = 0.5; // of the view
         const MIN_SPAN = 120;
         const MAX_SPAN = 10 * 365 * 86400;
-        // narrower screens get the label of the value axis above the graph, see the sm: classes above
-        const WIDE_SCREEN = '(min-width: 640px)';
+        const WIDE_SCREEN = '(min-width: 640px)'; // the sm: classes above
 
         const now = () => Math.floor(Date.now() / 1000);
 
         window.Alpine.data('timeSeriesGraph', (src, range) => {
-            // kept out of the component data, Alpine must not make these reactive
-            let draw = null; // formatValue, summarize and createChart of the chart module, once it is loaded
+            // not reactive
+            let draw = null; // the chart module
             let chart = null;
             let graph = null;
-            let view = null; // the {from, to} zoomed or panned to, null while showing the range
+            let view = null; // {from, to} zoomed or panned to
             let request = null;
             let timer = null;
 
@@ -218,7 +208,7 @@
                     }
                 },
 
-                // Move a number of steps, negative for earlier
+                // negative for earlier
                 pan(steps) {
                     const { from, to } = shown();
                     const shift = (to - from) * PAN_STEP * steps;
@@ -226,7 +216,7 @@
                     this.show({ from: from + shift, to: to + shift });
                 },
 
-                // Zoom a number of steps, negative for out
+                // negative for out
                 zoom(steps) {
                     const { from, to } = shown();
                     const middle = (from + to) / 2;
@@ -257,8 +247,7 @@
                     actions[event.key]();
                 },
 
-                // Show what is already loaded of a view right away, then tell the page and load the view in full detail.
-                // next is null to go back to the range. More moves are likely to follow one that is moving, so loading waits for them.
+                // Shows what is loaded right away, and loads the rest once moving stops. null is back to the range.
                 show(next, moving = false) {
                     if (next !== null) {
                         const span = Math.min(Math.max(next.to - next.from, MIN_SPAN), MAX_SPAN);
@@ -286,7 +275,7 @@
                     const params = {
                         from: from - margin,
                         to: until,
-                        // the same detail as loading only the view
+                        // the same detail as the view alone
                         width: Math.round(this.$refs.plot.clientWidth * (until - from + margin) / (to - from)),
                     };
 
@@ -302,7 +291,7 @@
 
                         draw = module;
                         graph = response.data;
-                        // a min and max that equal the average are left out by the server
+                        // left out by the server when equal to the average
                         graph.series.forEach((series) => {
                             series.min ??= series.avg;
                             series.max ??= series.avg;
@@ -321,7 +310,7 @@
                             return; // replaced by a newer load
                         }
                         if (! error.response) {
-                            console.error(error); // not an answer from the server, so a fault in drawing
+                            console.error(error); // a fault in drawing
                         }
                         this.error = error.response?.data?.message ?? error.message;
                     }
@@ -343,15 +332,17 @@
                     });
                 },
 
-                // The legend values are those of what is shown, not of the margins loaded around it
+                // of what is shown, not the margins
                 updateLegend() {
                     if (graph === null) {
                         return;
                     }
 
                     const { from, to } = shown();
-                    const start = graph.timestamps.findIndex((timestamp) => timestamp >= from);
-                    const end = start === -1 ? 0 : graph.timestamps.findLastIndex((timestamp) => timestamp <= to) + 1;
+                    // a point covers the interval up to its time, the last one shown may end after the view
+                    const start = graph.timestamps.findIndex((timestamp) => timestamp > from);
+                    const last = graph.timestamps.findIndex((timestamp) => timestamp >= to);
+                    const end = start === -1 ? 0 : (last === -1 ? graph.timestamps.length : last + 1);
 
                     this.legend = graph.series.map((series) => {
                         const format = (value) => draw.formatValue(value, series.unit, graph.axis.base);
@@ -369,7 +360,7 @@
                     });
                 },
 
-                // Show only one series, or all again when it is the only one. With ctrl or shift, show or hide just that one.
+                // Only this series, or all again. With ctrl or shift, show or hide this one.
                 toggle(key, event) {
                     const others = graph.series.map((series) => series.key).filter((other) => other !== key);
 
@@ -400,7 +391,7 @@
                             value: draw.formatValue(series.avg[position.index], series.unit, graph.axis.base),
                         }));
 
-                    // with many series, the busiest ones are the interesting ones
+                    // the busiest ones
                     const listed = rows.length > MAX_TOOLTIP_ROWS
                         ? [...rows].sort((a, b) => b.amount - a.amount).slice(0, MAX_TOOLTIP_ROWS)
                         : rows;
@@ -413,18 +404,15 @@
                     };
                 },
 
-                // The tooltip goes beside the cursor, far enough to leave the graph around the cursor in sight,
-                // on the side with the most room. A finger would cover it there, so for touch it goes in the corner
-                // away from the finger. It starts at the top of the graph and moves as needed to stay inside the window.
+                // Beside the cursor on the side with more room, for touch in the top corner away from the finger
                 tooltipStyle(left) {
                     const plot = this.$refs.plot.getBoundingClientRect();
                     const touch = window.matchMedia('(pointer: coarse)').matches;
                     const before = left > plot.width / 2;
                     const room = before ? left - TOOLTIP_GAP : plot.width - left - TOOLTIP_GAP;
                     const inset = touch ? '0' : `${plot.width - room}px`;
-                    // after the cursor or in the left corner it is placed from the left, else from the right
                     const fromLeft = touch ? before : ! before;
-                    // it stays between the menu bar, which sticks to the top of the window, and the bottom of the window
+                    // kept between the sticky menu bar and the bottom of the window
                     const menuBar = document.querySelector('.navbar-sticky-top')?.getBoundingClientRect().bottom ?? 0;
                     const highest = menuBar + TOOLTIP_MARGIN - plot.top;
                     const lowest = window.innerHeight - TOOLTIP_MARGIN - plot.top;
@@ -434,7 +422,7 @@
                         left: fromLeft ? inset : 'auto',
                         right: fromLeft ? 'auto' : inset,
                         maxWidth: touch ? '75%' : `${room}px`,
-                        // 100% is the height of the tooltip
+                        // 100% is the tooltip height
                         transform: `translateY(max(${highest}px, min(0px, calc(${lowest}px - 100%))))`,
                     };
                 },

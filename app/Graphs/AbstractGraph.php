@@ -100,8 +100,7 @@ abstract class AbstractGraph implements GraphInterface
     }
 
     /**
-     * Run the callback once the input is validated and the user authorized.
-     * Failures become graph exceptions that know the title of the graph.
+     * Validates and authorizes before the callback, failures become graph exceptions with the title.
      *
      * @template T
      *

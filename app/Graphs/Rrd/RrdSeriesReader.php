@@ -9,15 +9,14 @@ use LibreNMS\Exceptions\RrdException;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
 
 /**
- * Reads the stored values of series from rrd files, independent of how they are shown.
- * One rrdtool xport reads all of them, which consolidates them to the same points.
+ * One rrdtool xport reads all series, which gives them the same points.
  */
 class RrdSeriesReader
 {
     // rrdtool does not export fewer rows
     private const int MIN_POINTS = 10;
 
-    /** @var array<string, string> rrd consolidation function by the name of the values */
+    /** @var array<string, string> */
     private const array CONSOLIDATIONS = ['avg' => 'AVERAGE', 'min' => 'MIN', 'max' => 'MAX'];
 
     public function __construct(
@@ -27,13 +26,10 @@ class RrdSeriesReader
     }
 
     /**
-     * Read the values of the series over a time range.
-     * Longer ranges are consolidated so there are not many more than the requested number of points.
-     *
      * @param  array<string, DataSeries>  $series
      * @param  int  $from  unix time
      * @param  int  $to  unix time
-     * @param  int  $points  how many points are wanted, for example the width of a graph in pixels
+     * @param  int  $points  longer ranges are consolidated to about this many
      *
      * @throws RrdException
      */

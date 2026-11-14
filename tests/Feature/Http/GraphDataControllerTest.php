@@ -137,7 +137,7 @@ class GraphDataControllerTest extends TestCase
     }
 
     /**
-     * Every metric is kept in the given rrd file, or in none when null
+     * Every metric is in the given rrd file, null for none
      */
     private function fakeRrdFiles(?string $file): RrdBackendInterface&Mockery\MockInterface
     {
@@ -152,7 +152,7 @@ class GraphDataControllerTest extends TestCase
     }
 
     /**
-     * An export with the same values for everything that was asked for
+     * The same values for every XPORT
      *
      * @param  string[]  $options
      * @param  list<float|null>  $values
@@ -170,7 +170,7 @@ class GraphDataControllerTest extends TestCase
 
     /**
      * @param  list<float|null>  $values
-     * @return array<int, float|null> the values by the time of their row
+     * @return array<int, float|null>
      */
     private function timed(array $values): array
     {

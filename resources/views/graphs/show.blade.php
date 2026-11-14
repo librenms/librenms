@@ -27,7 +27,6 @@
     </x-slot:heading>
 </x-panel>
 
-{{-- A graph drawn in the browser changes its range without reloading the page, the thumbnails and date picker follow it --}}
 <div @if ($drawInBrowser) x-data="graphsPage(@js($graphRange['last'] ?? null))"
      x-on:graph-range-changed="rangeChanged($event.detail)" x-on:date-range-changed="picked($event.detail)" @endif>
 
@@ -122,7 +121,7 @@
         document.getElementById('period-thumbs')?.querySelector('[aria-current="true"]')?.scrollIntoView({ block: 'nearest', inline: 'center' });
     })();
 
-    // A link made when the page loaded, with the time range that is shown now
+    // links were made at page load, the range may have changed
     function withShownRange(href) {
         const url = new URL(href, window.location.href);
         const shown = new URL(window.location.href).searchParams;
@@ -135,14 +134,12 @@
     }
 
     @if ($drawInBrowser)
-        // Keeps the page in step with the graph that is drawn in the browser, without reloading the page:
-        // the period thumbnails and the date picker set the range of the graph, and the address,
-        // the date picker and the highlighted thumbnail follow what the graph shows.
+        // Thumbnails and date picker set the range of the graph; address, picker and highlight follow it.
         document.addEventListener('alpine:init', () => {
-            // last is the seconds up to now the graph shows, null when it shows a fixed range
+            // last: seconds up to now, null for a fixed range
             window.Alpine.data('graphsPage', (last) => ({
                 last,
-                // the date picker is being set to what the graph shows, which is not a new range to show
+                // the picker is being set to what the graph shows
                 syncing: false,
 
                 graph() {
@@ -153,12 +150,11 @@
                     return this.$root.querySelector('[x-data="dateRangePicker"]')?.dateRangePicker;
                 },
 
-                // a period is the one shown when it is within 5% of it
                 isPeriod(seconds) {
                     return this.last !== null && Math.abs(this.last - seconds) <= 0.05 * seconds;
                 },
 
-                // A period thumbnail was clicked, modified clicks still open its link
+                // modified clicks still open the link
                 showPeriod(seconds, event) {
                     if (event.ctrlKey || event.metaKey || event.shiftKey || ! this.graph()) {
                         return;
@@ -168,9 +164,15 @@
                     this.graph().setRange({ last: seconds });
                 },
 
-                // A range was picked in the date picker
                 picked({ start, end, relativeStartSeconds, relativeEndSeconds }) {
-                    if (this.syncing || ! start) {
+                    if (this.syncing) {
+                        return;
+                    }
+
+                    if (! start) {
+                        // cleared: the default period
+                        this.graph()?.setRange({ last: 86400 });
+
                         return;
                     }
 
@@ -187,7 +189,6 @@
                     this.syncing = false;
                 },
 
-                // The graph shows another range
                 rangeChanged(range) {
                     const from = 'last' in range ? LibreNMS.Date.toShortOffset(range.last) : String(range.from);
                     const to = 'last' in range ? null : String(range.to);

@@ -56,8 +56,7 @@ abstract class AbstractSeriesGraph extends AbstractGraph
     }
 
     /**
-     * The values of the series that have data, for drawing in the browser or use without drawing.
-     * Validates input and authorization first.
+     * Validates and authorizes first.
      *
      * @throws GraphException
      */

@@ -19,7 +19,7 @@ use LibreNMS\Util\Time;
 
 class GraphsPageController extends Controller
 {
-    /** The user preference for how graphs that can give their data are drawn: by the browser (js) or as an image */
+    /** js draws in the browser, anything else is an image */
     private const string RENDERER_PREFERENCE = 'graph_renderer';
 
     public function __invoke(GraphRequest $request): View

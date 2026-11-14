@@ -5,7 +5,7 @@ namespace App\Graphs;
 use App\Facades\LibrenmsConfig;
 
 /**
- * Hands out the colors of a graph_colours palette in order, starting over when they run out
+ * The colors of a graph_colours palette in order, starting over when they run out
  */
 class SeriesPalette
 {

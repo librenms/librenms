@@ -11,8 +11,7 @@ use Illuminate\Http\JsonResponse;
 use LibreNMS\Exceptions\GraphException;
 
 /**
- * A graph for the browser to draw: the values of each series and how to draw them.
- * Only for graphs that are defined by their series.
+ * The values of each series and how to draw them, for the browser.
  */
 class GraphDataController extends Controller
 {
@@ -41,7 +40,6 @@ class GraphDataController extends Controller
             $style = $item->style;
             $values = $data->series[$key];
             $color = $style->color ?? $palette->next();
-            // stacked series are solid areas, lines are only filled when the style asks for it
             $fill = $style->stacked ? $color : ($style->fill ? $style->fillColor ?? $color . '20' : null);
 
             $series[] = [
@@ -55,7 +53,7 @@ class GraphDataController extends Controller
                 'invert' => $style->invert && $inverts,
                 'draw_scale' => $style->stackAverage ? $style->drawScale / $averaged : $style->drawScale,
                 'avg' => $values['avg'],
-                // the same as the average while every point is a single stored value, the browser fills those in
+                // the browser fills these in when equal to the average
                 'min' => $values['min'] === $values['avg'] ? null : $values['min'],
                 'max' => $values['max'] === $values['avg'] ? null : $values['max'],
             ];
