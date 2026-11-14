@@ -33,8 +33,15 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->api([
             \App\Http\Middleware\EnforceJson::class,  // prevent redirect to login page
+            \App\Http\Middleware\LogApiAuthFailure::class,
             'auth:sanctum',
         ]);
+
+        // must wrap authentication to see its failures
+        $middleware->prependToPriorityList(
+            before: \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
+            prepend: \App\Http\Middleware\LogApiAuthFailure::class,
+        );
 
         $middleware->replace(\Illuminate\Http\Middleware\TrustProxies::class, \App\Http\Middleware\TrustProxies::class);
         $middleware->replace(\Illuminate\Http\Middleware\HandleCors::class, \App\Http\Middleware\HandleCors::class);

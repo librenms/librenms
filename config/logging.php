@@ -60,6 +60,42 @@ return [
 
     'channels' => [
 
+        // Eventlog entries, event_db stores them in the eventlog table shown in the WebUI
+        'event' => [
+            'driver' => 'stack',
+            'channels' => explode(',', (string) env('LOG_EVENT_CHANNELS', 'event_db')),
+            'ignore_exceptions' => false,
+        ],
+
+        'event_db' => [
+            'driver' => 'monolog',
+            'handler' => App\Logging\EventLogDbHandler::class,
+        ],
+
+        'event_file' => [
+            'driver' => 'single',
+            'path' => env('LOG_EVENT_FILE', base_path('logs/event.log')),
+            'formatter' => App\Logging\LogFileFormatter::class,
+        ],
+
+        // Authentication log entries, auth_db stores them in the authlog table shown in the WebUI
+        'auth' => [
+            'driver' => 'stack',
+            'channels' => explode(',', (string) env('LOG_AUTH_CHANNELS', 'auth_db')),
+            'ignore_exceptions' => false,
+        ],
+
+        'auth_db' => [
+            'driver' => 'monolog',
+            'handler' => App\Logging\AuthLogDbHandler::class,
+        ],
+
+        'auth_file' => [
+            'driver' => 'single',
+            'path' => env('LOG_AUTH_FILE', base_path('logs/auth.log')),
+            'formatter' => App\Logging\LogFileFormatter::class,
+        ],
+
         'stack' => [
             'driver' => 'stack',
             'channels' => ['log_file'],
