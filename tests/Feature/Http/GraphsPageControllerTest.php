@@ -9,6 +9,7 @@ use App\Models\Port;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Js;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\PreserveGlobalState;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -219,6 +220,80 @@ class GraphsPageControllerTest extends TestCase
         $response->assertSee('from={{start}}', false);
         $response->assertSee('to={{end}}', false);
         $response->assertSee('width={{width}}', false);
+    }
+
+    public function testSeriesGraphsCanBeDrawnInTheBrowser(): void
+    {
+        $device = Device::factory()->create();
+        $user = $this->adminUser();
+
+        $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip");
+
+        $response->assertOk();
+        $response->assertSee('Interactive graph');
+        $response->assertDontSee('x-data="timeSeriesGraph', false);
+        $response->assertSee('graph?device=' . $device->device_id, false);
+
+        $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_renderer', 'value' => 'js'])->assertOk();
+        $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip&from=1700000000&to=1700003600&showcommand=yes");
+
+        $response->assertOk();
+        $src = Js::from(route('graph.data', ['device' => $device->device_id, 'type' => 'device_netstat_ip', 'showcommand' => 'yes']));
+        $response->assertSee('x-data="timeSeriesGraph(' . $src . ', ' . Js::from(['from' => 1700000000, 'to' => 1700003600]) . ')"', false);
+        $response->assertSee('x-data="graphsPage(null)"', false);
+        $response->assertSee('data-reload="false"', false);
+        $response->assertSee(__('graphs.help.title'));
+        $response->assertSee(__('graphs.help.zoom_range'));
+        $response->assertDontSee('graphs.help.'); // every help text is translated
+        $response->assertDontSee('RRD Command');
+        $this->assertNoPhpWarningOutput($response->getContent());
+
+        $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_renderer', 'value' => 'default'])->assertOk();
+        $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip");
+        $response->assertDontSee('x-data="timeSeriesGraph', false);
+        $response->assertDontSee('x-data="graphsPage', false);
+        $response->assertSee('data-reload="true"', false);
+    }
+
+    public function testGraphDrawnInTheBrowserStartsWithThePeriodUpToNow(): void
+    {
+        $device = Device::factory()->create();
+        $user = $this->adminUser();
+        $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_renderer', 'value' => 'js'])->assertOk();
+
+        $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip&from=-2d");
+
+        $response->assertOk();
+        $response->assertSee(', ' . Js::from(['last' => 172800]) . ')"', false);
+        $response->assertSee('x-data="graphsPage(172800)"', false);
+        $response->assertSee('showPeriod(172800, $event)', false);
+    }
+
+    public function testPeriodThumbnailsEndNowWhateverRangeIsShown(): void
+    {
+        $device = Device::factory()->create();
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?device={$device->device_id}&type=device_poller_perf&from=1700000000&to=1700003600");
+
+        $response->assertOk();
+        $response->assertSee('to=1700003600', false); // the main graph
+        $this->assertDoesNotMatchRegularExpression('/graph\?[^"]*to=1700003600[^"]*absolute=1/', $response->getContent());
+        $this->assertDoesNotMatchRegularExpression('/graph\?[^"]*absolute=1[^"]*to=1700003600/', $response->getContent());
+    }
+
+    public function testGraphsDrawnByScriptsAreAlwaysImages(): void
+    {
+        $device = Device::factory()->create();
+        $user = $this->adminUser();
+        $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_renderer', 'value' => 'js'])->assertOk();
+
+        $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_poller_perf");
+
+        $response->assertOk();
+        $response->assertDontSee('Interactive graph');
+        $response->assertDontSee('x-data="timeSeriesGraph', false);
+        $response->assertSee('Show RRD Command');
     }
 
     public function testSensorGraphPageUsesSubtitleFromAuthFile(): void

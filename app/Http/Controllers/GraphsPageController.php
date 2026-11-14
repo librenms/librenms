@@ -8,14 +8,19 @@ use App\Graphs\GraphFactory;
 use App\Http\Requests\GraphRequest;
 use App\Models\Device;
 use App\Models\Port;
+use App\Models\UserPref;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Interfaces\Data\Graphing\SeriesGraphInterface;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Time;
 
 class GraphsPageController extends Controller
 {
+    /** The user preference for how graphs that can give their data are drawn: by the browser (js) or as an image */
+    private const string RENDERER_PREFERENCE = 'graph_renderer';
+
     public function __invoke(GraphRequest $request): View
     {
         $params = $request->graphParams();
@@ -24,7 +29,10 @@ class GraphsPageController extends Controller
         $port = $context->port;
         $fullType = "{$params->type}_$params->subtype";
         $showCommand = $request->input('showcommand') === 'yes';
-        $isDynamicGraph = LibrenmsConfig::get('webui.dynamic_graphs', false) === true;
+        $canDrawInBrowser = $request->graph() instanceof SeriesGraphInterface;
+        $drawInBrowser = $canDrawInBrowser && UserPref::getPref($request->user(), self::RENDERER_PREFERENCE) === 'js';
+        $showCommand = $showCommand && ! $drawInBrowser;
+        $isDynamicGraph = ! $drawInBrowser && LibrenmsConfig::get('webui.dynamic_graphs', false) === true;
 
         $this->handleWidescreenPreference($request);
 
@@ -45,8 +53,13 @@ class GraphsPageController extends Controller
             'subtypeOptions' => $subtypeOptions,
             'subtypeSelected' => $subtypeSelected,
             'periodThumbs' => $this->periodThumbnails($request, $thumbWidth),
-            'toggles' => $this->controlToggles($request, $fullType, $showCommand),
-            'trendHint' => $fullType === 'port_bits' || str_contains($fullType, 'sensor_'),
+            'toggles' => $drawInBrowser ? [] : $this->controlToggles($request, $fullType, $showCommand),
+            'trendHint' => ! $drawInBrowser && ($fullType === 'port_bits' || str_contains($fullType, 'sensor_')),
+            'canDrawInBrowser' => $canDrawInBrowser,
+            'drawInBrowser' => $drawInBrowser,
+            'rendererPreference' => self::RENDERER_PREFERENCE,
+            'graphDataUrl' => $drawInBrowser ? route('graph.data', $request->toVars(['width' => null, 'height' => null, 'from' => null, 'to' => null])) : null,
+            'graphRange' => $params->ends_now ? ['last' => $params->period] : ['from' => $params->from, 'to' => $params->to],
             'graphFrom' => $request->input('from') ?? '-1d',
             'graphTo' => $request->input('to'),
             'mainGraphVars' => $mainGraphVars,
@@ -112,6 +125,7 @@ class GraphsPageController extends Controller
             $periodDuration = $now - $periodFrom;
             $periodThumbs[] = [
                 'text' => __("settings.settings.graphs.row.normal.options.$period"),
+                'period' => $periodDuration,
                 'active' => $params->ends_now && $periodDuration > 0 && abs($currentDuration - $periodDuration) <= 0.05 * $periodDuration,
                 'link' => $this->graphUrl($request, ['from' => Time::toRelativeOffset($periodDuration), 'to' => null]),
                 'vars' => $request->toVars([
@@ -120,6 +134,7 @@ class GraphsPageController extends Controller
                     'legend' => 'no',
                     'absolute' => 1,
                     'from' => $periodFrom,
+                    'to' => null, // a period is up to now, whatever range is shown
                 ]),
             ];
         }

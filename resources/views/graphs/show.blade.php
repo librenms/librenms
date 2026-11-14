@@ -21,21 +21,28 @@
             @if (count($subtypeOptions) > 1)
                 <x-select name="graph_subtype" :options="$subtypeOptions" :selected="$subtypeSelected"
                           class="tw:[&_select]:px-3 tw:[&_select]:py-1.5"
-                          x-data @change="window.location = $event.target.value"></x-select>
+                          x-data @change="window.location = LibreNMS.Url.withCurrentDateRange($event.target.value)"></x-select>
             @endif
         </div>
     </x-slot:heading>
 </x-panel>
+
+{{-- A graph drawn in the browser changes its range without reloading the page, the thumbnails and date picker follow it --}}
+<div @if ($drawInBrowser) x-data="graphsPage(@js($graphRange['last'] ?? null))"
+     x-on:graph-range-changed="rangeChanged($event.detail)" x-on:date-range-changed="picked($event.detail)" @endif>
 
 <div id="period-thumbs" class="tw:overflow-x-auto tw:scroll-px-2 tw:pb-2 tw:dark:scheme-dark">
     <div class="tw:flex tw:flex-nowrap tw:gap-1">
     @foreach ($periodThumbs as $thumb)
         <a href="{{ $thumb['link'] }}"
            @if ($thumb['active']) aria-current="true" @endif
+           @if ($drawInBrowser) x-bind:aria-current="isPeriod({{ $thumb['period'] }}) ? 'true' : false" x-on:click="showPeriod({{ $thumb['period'] }}, $event)" @endif
            style="width: {{ $thumb['vars']['width'] }}px; min-width: {{ (int) ($thumb['vars']['width'] * 0.6) }}px;"
            class="tw:flex tw:flex-col tw:items-center tw:gap-0.5 tw:p-1 tw:rounded-lg tw:border tw:no-underline tw:transition-colors
                   @if ($loop->first) tw:ml-auto @elseif ($loop->last) tw:mr-auto @endif
-                  @if ($thumb['active']) tw:border-blue-500 tw:bg-blue-50 tw:dark:bg-gray-700 @else tw:border-transparent tw:hover:border-gray-300 tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700 @endif">
+                  tw:border-transparent tw:hover:border-gray-300 tw:hover:bg-gray-100 tw:dark:hover:bg-gray-700
+                  tw:aria-[current=true]:border-blue-500 tw:aria-[current=true]:bg-blue-50 tw:dark:aria-[current=true]:bg-gray-700
+                  tw:aria-[current=true]:hover:border-blue-500 tw:aria-[current=true]:hover:bg-blue-50 tw:dark:aria-[current=true]:hover:bg-gray-700">
             <span class="tw:font-medium tw:whitespace-nowrap tw:text-gray-700 tw:dark:text-gray-200 tw:overflow-hidden tw:text-ellipsis tw:w-full tw:text-center">{{ $thumb['text'] }}</span>
             <img class="graph-image tw:block tw:w-full tw:h-auto tw:object-cover tw:rounded tw:border-0"
                  src="{{ route('graph', $thumb['vars']) }}"
@@ -49,25 +56,35 @@
 </div>
 
 <div class="tw:w-[48ch] tw:max-w-full tw:mx-auto tw:mt-3 tw:mb-2">
-    <x-date-range-picker :start="$graphFrom" :end="$graphTo" :reload="true"
+    <x-date-range-picker :start="$graphFrom" :end="$graphTo" :reload="! $drawInBrowser"
                          class="tw:w-full tw:text-center tw:px-3 tw:py-2 tw:border tw:border-gray-300 tw:rounded-md tw:bg-gray-100! tw:hover:bg-gray-200! tw:dark:bg-white! tw:dark:hover:bg-gray-200!"></x-date-range-picker>
 </div>
-<div class="tw:text-center">
-    @foreach ($toggles as $toggle)
-        @if (! $loop->first) | @endif
-        <a href="{{ $toggle['link'] }}">{{ $toggle['text'] }}</a>
-    @endforeach
-    @if ($trendHint) | {{ __('To show trend, set to future date') }} @endif
+<div class="tw:flex tw:flex-wrap tw:items-center tw:justify-center tw:gap-x-4 tw:gap-y-1">
+    @if ($canDrawInBrowser)
+        <x-toggle size="sm" :label="__('graphs.interactive')" :checked="$drawInBrowser" x-data
+                  x-on:change="axios.post('{{ route('preferences.store') }}', { pref: '{{ $rendererPreference }}', value: $event.target.checked ? 'js' : 'default' }).then(() => location.reload())"></x-toggle>
+    @endif
+    <div>
+        @foreach ($toggles as $toggle)
+            @if (! $loop->first) | @endif
+            <a href="{{ $toggle['link'] }}">{{ $toggle['text'] }}</a>
+        @endforeach
+        @if ($trendHint) | {{ __('To show trend, set to future date') }} @endif
+    </div>
 </div>
 
 <div class="tw:w-full tw:mt-4">
-@if ($isDynamicGraph)
+@if ($drawInBrowser)
+    <x-time-series-graph :src="$graphDataUrl" :range="$graphRange" :height="$mainGraphVars['height']"></x-time-series-graph>
+@elseif ($isDynamicGraph)
     <img class="graph graph-image img-responsive tw:w-full tw:h-auto tw:border-0" data-src-template="{{ $dynamicGraphSrcTemplate }}" fetchpriority="high" />
 @else
     <img class="graph-image img-responsive tw:w-full tw:h-auto tw:border-0"
          src="{{ route('graph', $mainGraphVars) }}"
          fetchpriority="high" />
 @endif
+</div>
+
 </div>
 
 @isset($graphDescr)

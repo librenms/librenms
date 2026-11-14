@@ -6,6 +6,7 @@ use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
 use App\Facades\LibrenmsConfig;
+use App\Graphs\SeriesPalette;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Exceptions\NoGraphData;
 
@@ -31,7 +32,7 @@ class RrdSeriesDefinition
     // series labels start further right than the heading because of the color box
     private const int LEGEND_COLOR_BOX_WIDTH = 2;
 
-    private int $colorIndex = 0;
+    private readonly SeriesPalette $palette;
 
     /**
      * @param  array<string, DataSeries>  $series
@@ -41,6 +42,7 @@ class RrdSeriesDefinition
         private readonly GraphOptions $options,
         private readonly RrdFileResolver $rrdFiles,
     ) {
+        $this->palette = new SeriesPalette($options->palette);
     }
 
     /**
@@ -81,7 +83,7 @@ class RrdSeriesDefinition
             $id = 'ds' . $i++;
             $style = $series->style;
             $drawScale = $style->stackAverage ? $style->drawScale / $averaged : $style->drawScale;
-            $color = $style->color ?? $this->nextColor();
+            $color = $style->color ?? $this->palette->next();
             $label = Rrd::fixedSafeDescr($series->description, self::LABEL_WIDTH);
             $inverted = $inverted || $style->invert;
 
@@ -170,17 +172,6 @@ class RrdSeriesDefinition
     private function scaleRpn(float $scale): string
     {
         return $scale == 1 ? '' : ",$scale,*";
-    }
-
-    private function nextColor(): string
-    {
-        $palette = $this->options->palette;
-
-        if (! LibrenmsConfig::has("graph_colours.$palette.$this->colorIndex")) {
-            $this->colorIndex = 0;
-        }
-
-        return LibrenmsConfig::get("graph_colours.$palette." . $this->colorIndex++);
     }
 
     /**

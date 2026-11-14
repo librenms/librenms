@@ -9,6 +9,7 @@ use App\Facades\DeviceCache;
 use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Port;
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -90,18 +91,40 @@ abstract class AbstractGraph implements GraphInterface
 
     public function render(): GraphImage
     {
+        $image = $this->attempt($this->draw(...));
+
+        // the image is named after the title the user set
+        return $this->params->user_title === null
+            ? $image
+            : new GraphImage($image->format, $this->params->user_title, $image->data);
+    }
+
+    /**
+     * Run the callback once the input is validated and the user authorized.
+     * Failures become graph exceptions that know the title of the graph.
+     *
+     * @template T
+     *
+     * @param  Closure(): T  $callback
+     * @return T
+     *
+     * @throws GraphException
+     */
+    protected function attempt(Closure $callback): mixed
+    {
         $title = null;
 
         try {
             $this->checkRenderable();
             $title = $this->params->visible('title') ? ($this->params->user_title ?? $this->getTitle()) : null;
-            $image = $this->draw();
+
+            return $callback();
         } catch (GraphException $e) {
             $e->graphTitle ??= $title;
 
             throw $e;
         } catch (Throwable $e) {
-            // drawing libraries and queries fail with their own exceptions, keep the details out of the image
+            // drawing libraries and queries fail with their own exceptions, keep the details out of the response
             report($e);
 
             $error = new GraphException('Graph Error', 'Error', $e);
@@ -109,11 +132,6 @@ abstract class AbstractGraph implements GraphInterface
 
             throw $error;
         }
-
-        // the image is named after the title the user set
-        return $this->params->user_title === null
-            ? $image
-            : new GraphImage($image->format, $this->params->user_title, $image->data);
     }
 
     /**

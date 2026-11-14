@@ -31,7 +31,9 @@ use LibreNMS\Exceptions\RrdFileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\Exceptions\RrdSourceException;
+use LibreNMS\Exceptions\RrdUnknownException;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\RRD\RrdExport;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Util\Debug;
@@ -172,6 +174,37 @@ class Rrdtool implements RrdBackendInterface
         } catch (RrdException $e) {
             throw new RrdGraphException($e->getMessage(), 'Error');
         }
+    }
+
+    /**
+     * @param  string[]  $options
+     *
+     * @throws RrdException
+     */
+    public function xport(array $options): RrdExport
+    {
+        $process = app(RrdProcess::class, ['timeout' => 300]);
+        $export = json_decode($process->run('"' . implode('" "', ['xport', '--json', ...$options]) . '"'), true);
+        $meta = $export['meta'] ?? null;
+
+        if (! is_int($meta['start'] ?? null) || ! is_int($meta['step'] ?? null)) {
+            throw new RrdUnknownException('Unexpected rrdtool xport output');
+        }
+
+        $rows = $export['data'] ?? [];
+        $legends = $meta['legend'] ?? [];
+        $columns = array_fill_keys($legends, []);
+        foreach ($rows as $row) {
+            foreach ($legends as $index => $legend) {
+                $value = $row[$index] ?? null;
+                $columns[$legend][] = is_float($value) ? $value : (is_int($value) ? (float) $value : null);
+            }
+        }
+
+        return new RrdExport(
+            array_map(fn (int $row) => $meta['start'] + $row * $meta['step'], array_keys($rows)),
+            $columns,
+        );
     }
 
     /**
