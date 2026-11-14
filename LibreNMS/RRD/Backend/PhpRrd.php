@@ -195,7 +195,7 @@ class PhpRrd extends Rrdtool
 
         return new RrdExport(
             array_keys(reset($columns) ?: []),
-            array_map(fn (array $values) => array_map($this->exportValue(...), array_values($values)), $columns),
+            array_map(fn (array $values) => array_map(fn (float $value) => is_finite($value) ? $value : null, array_values($values)), $columns),
         );
     }
 
