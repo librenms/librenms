@@ -64,6 +64,11 @@ class LoginController extends Controller implements HasMiddleware
         return view('auth.login');
     }
 
+    protected function credentials(Request $request): array
+    {
+        return app(\App\Ldap\ActiveDirectoryConfig::class)->credentials($request->only('username', 'password'));
+    }
+
     protected function loggedOut(Request $request): \Illuminate\Http\RedirectResponse
     {
         return redirect(LibrenmsConfig::get('auth_logout_handler', $this->redirectTo));

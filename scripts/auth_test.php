@@ -43,6 +43,20 @@ if (LibrenmsConfig::get('auth_mechanism') == 'ldap' || LibrenmsConfig::get('auth
         }
     }
 }
+if (LibrenmsConfig::get('auth_mechanism') === 'active_directory') {
+    $username = $options['u'] ?? '';
+    $question = new \Symfony\Component\Console\Question\Question('Password: ')->setHidden(true);
+    $password = new \Symfony\Component\Console\Helper\QuestionHelper()->ask(
+        new \Symfony\Component\Console\Input\ArgvInput(),
+        new \Symfony\Component\Console\Output\ConsoleOutput(),
+        $question
+    );
+    $credentials = app(\App\Ldap\ActiveDirectoryConfig::class)->credentials(compact('username', 'password'));
+    $success = \Illuminate\Support\Facades\Auth::once($credentials);
+    echo $success ? "AUTH SUCCESS\n" : "AUTH FAILURE\n";
+    exit($success ? 0 : 1);
+}
+
 try {
     $authorizer = LegacyAuth::get();
 
@@ -51,47 +65,13 @@ try {
         $authorizer->bind([]);
     }
 
-    // AD bind tests
-    if ($authorizer instanceof \LibreNMS\Authentication\ActiveDirectoryAuthorizer) {
-        // peek inside the class
-        $lc_rp = new ReflectionProperty($authorizer, 'ldap_connection');
-        $adbind_rm = new ReflectionMethod($authorizer, 'bind');
-
-        $bind_success = false;
-        if (LibrenmsConfig::has('auth_ad_binduser') && LibrenmsConfig::has('auth_ad_bindpassword')) {
-            $bind_success = $adbind_rm->invoke($authorizer, false, true);
-            if (! $bind_success) {
-                $ldap_error = ldap_error($lc_rp->getValue($authorizer));
-                echo $ldap_error . PHP_EOL;
-                if ($ldap_error == 'Invalid credentials') {
-                    print_error('AD bind failed for user ' . LibrenmsConfig::get('auth_ad_binduser') . '@' . LibrenmsConfig::get('auth_ad_domain') .
-                        '. Check \'auth_ad_binduser\' and \'auth_ad_bindpassword\' in your config');
-                }
-            } else {
-                print_message('AD bind success');
-            }
-        } else {
-            $bind_success = $adbind_rm->invoke($authorizer, true, true);
-            if (! $bind_success) {
-                echo ldap_error($lc_rp->getValue($authorizer)) . PHP_EOL;
-                print_message('Could not anonymous bind to AD');
-            } else {
-                print_message('AD bind anonymous successful');
-            }
-        }
-
-        if (! $bind_success) {
-            print_error('Could not bind to AD, you will not be able to use the API or alert AD users');
-        }
-    }
-
     $test_username = $options['u'];
     $auth = false;
 
     echo 'Password: ';
-    `stty -echo`;
+    shell_exec('stty -echo');
     $test_password = trim(fgets(STDIN));
-    `stty echo`;
+    shell_exec('stty echo');
     echo PHP_EOL;
 
     echo "Authenticate user $test_username: \n";
