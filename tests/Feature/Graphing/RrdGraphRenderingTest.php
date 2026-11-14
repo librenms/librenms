@@ -10,6 +10,7 @@ use App\Facades\Rrd;
 use App\Graphs\Device\DeviceGraph;
 use App\Graphs\GraphFactory;
 use App\Models\Device;
+use App\Models\Port;
 use App\Models\Processor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\File;
@@ -19,6 +20,7 @@ use LibreNMS\RRD\Backend\RrdBackendInterface;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\Tests\TestCase;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
  * Draws images with rrdtool from real rrd files
@@ -76,6 +78,24 @@ class RrdGraphRenderingTest extends TestCase
         $image = $this->graph('device_ib_dns_performance', $device)->render();
 
         $this->assertStringStartsWith(self::PNG_HEADER, $image->data);
+    }
+
+    #[TestWith([false, false])]
+    #[TestWith([true, false])]
+    #[TestWith([false, true])]
+    #[TestWith([true, true])]
+    public function test_it_draws_port_traffic_with_summaries(bool $previous, bool $speedZoom): void
+    {
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create(['ifSpeed' => 1000000000]);
+        $this->createRrd($device, "port-id$port->port_id.rrd", ['INOCTETS', 'OUTOCTETS']);
+        LibrenmsConfig::set('rrdgraph_real_percentile', true);
+        $graph = (new GraphFactory)->graphFor(new GraphParameters([
+            'type' => 'port_bits', 'id' => $port->port_id, 'graph_type' => 'png',
+            'previous' => $previous ? 'yes' : 'no', 'port_speed_zoom' => $speedZoom, 'to' => time() + 3600,
+        ]));
+
+        $this->assertStringStartsWith(self::PNG_HEADER, $graph->render()->data);
     }
 
     public function test_it_draws_stacked_series_with_the_previous_period(): void
