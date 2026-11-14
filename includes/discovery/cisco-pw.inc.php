@@ -42,6 +42,20 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
         $if_id = \App\Models\Port::where('ifDescr', $pw['cpwVcName'])->where('device_id', $device['device_id'])->value('port_id');
         if (! empty($pws_db[$pw['cpwVcID']])) {
             $pseudowire_id = $pws_db[$pw['cpwVcID']];
+            \App\Models\Pseudowire::updateOrCreate(
+                [
+                    'pseudowire_id' => $pseudowire_id,
+                    'device_id' => $device['device_id'],
+                    'port_id' => $if_id,
+                    'peer_device_id' => $cpw_remote_device,
+                    'peer_ldp_id' => $cpw_remote_id,
+                    'cpwVcID' => $pw['cpwVcID'],
+                    'cpwOid' => $pw_id,
+                    'pw_type' => $pw['cpwVcType'],
+                    'pw_descr' => $pw['cpwVcDescr'],
+                    'pw_psntype' => $pw['cpwVcPsnType'],
+                ]
+            );
             $progress->mark('.');
         } else {
             $pseudowire_id = \App\Models\Pseudowire::create(
@@ -52,9 +66,11 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
                     'peer_ldp_id' => $cpw_remote_id,
                     'cpwVcID' => $pw['cpwVcID'],
                     'cpwOid' => $pw_id,
-                    'pw_type' => $pw['cpwVcType'],
-                    'pw_descr' => $pw['cpwVcDescr'],
-                    'pw_psntype' => $pw['cpwVcPsnType'],
+                    'pw_type' => $pw['cpwVcType'] ?? '',
+                    'pw_descr' => $pw['cpwVcDescr'] ?? '',
+                    'pw_psntype' => $pw['cpwVcPsnType'] ?? '',
+                    'pw_local_mtu' => 0,
+                    'pw_peer_mtu' => 0,
                 ]
             )->pseudowire_id;
             $progress->mark('+');
