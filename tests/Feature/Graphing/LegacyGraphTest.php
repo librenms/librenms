@@ -34,7 +34,7 @@ class LegacyGraphTest extends TestCase
     {
         $port = Port::factory()->for(Device::factory())->create();
 
-        $graph = (new GraphFactory)->graphFor(new GraphParameters(['type' => 'port_bits', 'id' => $port->port_id]));
+        $graph = (new GraphFactory)->graphFor(new GraphParameters(['type' => 'port_upkts', 'id' => $port->port_id]));
 
         $this->assertInstanceOf(LegacyGraph::class, $graph);
         $this->assertTrue($graph->authorize());

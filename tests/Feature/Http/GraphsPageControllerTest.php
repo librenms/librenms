@@ -3,6 +3,7 @@
 namespace LibreNMS\Tests\Feature\Http;
 
 use App\Facades\LibrenmsConfig;
+use App\Facades\Rrd;
 use App\Http\Requests\GraphRequest;
 use App\Models\Device;
 use App\Models\Port;
@@ -83,6 +84,7 @@ class GraphsPageControllerTest extends TestCase
 
     public function testShowCommandUsesGraphVars(): void
     {
+        Rrd::partialMock()->shouldReceive('checkRrdExists')->andReturn(true);
         $device = Device::factory()->create(['hostname' => 'port-device.example.com']);
         $port = Port::factory()->for($device)->create([
             'ifName' => 'GigabitEthernet0/1',
@@ -129,7 +131,7 @@ class GraphsPageControllerTest extends TestCase
 
         try {
             $response = $this->actingAs($this->adminUser())
-                ->get("/graphs?id={$port->port_id}&type=port_bits&showcommand=yes");
+                ->get("/graphs?id={$port->port_id}&type=port_upkts&showcommand=yes");
 
             $response->assertOk();
             $response->assertSee('RRDTool Command');
