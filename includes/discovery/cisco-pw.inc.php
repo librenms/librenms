@@ -1,92 +1,70 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Port;
+use App\Models\Pseudowire;
+use LibreNMS\Util\IPv4;
 use LibreNMS\Util\ProgressList;
 
 if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco') {
-    $pws_db = [];
-    // Pre-cache the existing state of pseudowires for this device from the database
-    $pws_db_raw = \App\Models\Pseudowire::where('device_id', $device['device_id'])->get();
-    foreach ($pws_db_raw as $pw_db) {
-        $pws_db[$pw_db['cpwVcID']] = $pw_db['pseudowire_id'];
-    }
+    // Pre-cache the existing state of pseudowires for this device from the database, keyed by VC ID
+    $pws_db = Pseudowire::where('device_id', $device['device_id'])->get()->keyBy('cpwVcID');
+    $port_ids = Port::where('device_id', $device['device_id'])->pluck('port_id', 'ifDescr');
 
-    $pws = snmpwalk_cache_oid($device, 'cpwVcID', [], 'CISCO-IETF-PW-MPLS-MIB');
-    $pws = snmpwalk_cache_oid($device, 'cpwVcName', $pws, 'CISCO-IETF-PW-MPLS-MIB');
-    $pws = snmpwalk_cache_oid($device, 'cpwVcType', $pws, 'CISCO-IETF-PW-MPLS-MIB');
-    $pws = snmpwalk_cache_oid($device, 'cpwVcPsnType', $pws, 'CISCO-IETF-PW-MPLS-MIB');
-    $pws = snmpwalk_cache_oid($device, 'cpwVcDescr', $pws, 'CISCO-IETF-PW-MPLS-MIB');
-
-    // For MPLS pseudowires
-    $pws = snmpwalk_cache_oid($device, 'cpwVcMplsPeerLdpID', $pws, 'CISCO-IETF-PW-MPLS-MIB');
+    // Both tables are indexed by cpwVcIndex
+    $pws = SnmpQuery::enumStrings()->hideMib()->walk([
+        'CISCO-IETF-PW-MIB::cpwVcID',
+        'CISCO-IETF-PW-MIB::cpwVcName',
+        'CISCO-IETF-PW-MIB::cpwVcType',
+        'CISCO-IETF-PW-MIB::cpwVcPsnType',
+        'CISCO-IETF-PW-MIB::cpwVcDescr',
+        'CISCO-IETF-PW-MPLS-MIB::cpwVcMplsPeerLdpID',
+    ])->table(1);
 
     $progress = ProgressList::start('Pseudowires');
-    foreach ($pws as $pw_id => $pw) {
-        // Added By Oirbsiu
-        // To correct Interface names that use escaped '/' e.g. GigabitEthernet0_4_0_12
-        // and translate the underscore back to a slash - e.g. GigabitEthernet0/4/0/12
-        // Thank you @murrant
-        $pw['cpwVcName'] = preg_replace('/(?<=\d)_(?=\d)/', '/', (string) $pw['cpwVcName']);
-        // END
+    $seen_ids = [];
 
-        [$cpw_remote_ip] = explode(':', (string) $pw['cpwVcMplsPeerLdpID']);
+    foreach ($pws as $pw_oid => $pw) {
+        // Interface names may use '_' in place of '/' (e.g. GigabitEthernet0_4_0_12 -> GigabitEthernet0/4/0/12)
+        $if_name = preg_replace('/(?<=\d)_(?=\d)/', '/', (string) ($pw['cpwVcName'] ?? ''));
 
-        if (\LibreNMS\Util\IPv4::isValid($cpw_remote_ip)) {
-            //If cpwVcMplsPeerLdpID is in the IP form, then convert it to number to store it in DB to avoid failing
-            $cpw_remote_id = ip2long($cpw_remote_ip);
+        // cpwVcMplsPeerLdpID is "ip:label-space"; store the IP as a number
+        [$peer_ip] = explode(':', (string) ($pw['cpwVcMplsPeerLdpID'] ?? ''));
+        $is_ip = IPv4::isValid($peer_ip);
+
+        $attributes = [
+            'device_id' => $device['device_id'],
+            'port_id' => $port_ids[$if_name] ?? 0,
+            'peer_device_id' => $is_ip
+                ? (Port::whereHas('ipv4', fn ($q) => $q->where('ipv4_address', $peer_ip))->value('device_id') ?? 0)
+                : 0,
+            'peer_ldp_id' => $is_ip ? ip2long($peer_ip) : (int) $peer_ip,
+            'cpwVcID' => $pw['cpwVcID'] ?? 0,
+            'cpwOid' => $pw_oid,
+            'pw_type' => $pw['cpwVcType'] ?? '',
+            'pw_descr' => $pw['cpwVcDescr'] ?? '',
+            'pw_psntype' => $pw['cpwVcPsnType'] ?? '',
+        ];
+
+        $pseudowire = $pws_db->get($attributes['cpwVcID']);
+        if ($pseudowire) {
+            $pseudowire->fill($attributes)->save();
+            $progress->mark($pseudowire->wasChanged() ? 'U' : '.');
         } else {
-            $cpw_remote_id = $cpw_remote_ip;
-        }
-
-        $cpw_remote_device = \App\Models\Port::whereHas('ipv4', fn ($q) => $q->where('ipv4_address', $cpw_remote_ip))->value('device_id') ?? 0;
-        $if_id = \App\Models\Port::where('ifDescr', $pw['cpwVcName'])->where('device_id', $device['device_id'])->value('port_id');
-        if (! empty($pws_db[$pw['cpwVcID']])) {
-            $pseudowire_id = $pws_db[$pw['cpwVcID']];
-            \App\Models\Pseudowire::updateOrCreate(
-                [
-                    'pseudowire_id' => $pseudowire_id,
-                    'device_id' => $device['device_id'],
-                    'port_id' => $if_id,
-                    'peer_device_id' => $cpw_remote_device,
-                    'peer_ldp_id' => $cpw_remote_id,
-                    'cpwVcID' => $pw['cpwVcID'],
-                    'cpwOid' => $pw_id,
-                    'pw_type' => $pw['cpwVcType'],
-                    'pw_descr' => $pw['cpwVcDescr'],
-                    'pw_psntype' => $pw['cpwVcPsnType'],
-                ]
-            );
-            $progress->mark('.');
-        } else {
-            $pseudowire_id = \App\Models\Pseudowire::create(
-                [
-                    'device_id' => $device['device_id'] ?? 0,
-                    'port_id' => $if_id ?? 0,
-                    'peer_device_id' => $cpw_remote_device ?? 0,
-                    'peer_ldp_id' => $cpw_remote_id ?? 0,
-                    'cpwVcID' => $pw['cpwVcID'] ?? 0,
-                    'cpwOid' => $pw_id ?? 0,
-                    'pw_type' => $pw['cpwVcType'] ?? '',
-                    'pw_descr' => $pw['cpwVcDescr'] ?? '',
-                    'pw_psntype' => $pw['cpwVcPsnType'] ?? '',
-                    'pw_local_mtu' => 0,
-                    'pw_peer_mtu' => 0,
-                ]
-            )->pseudowire_id;
+            $pseudowire = Pseudowire::create($attributes + ['pw_local_mtu' => 0, 'pw_peer_mtu' => 0]);
             $progress->mark('+');
         }
 
-        $device['pws'][$pw['cpwVcID']] = $pseudowire_id;
-    }//end foreach
+        $seen_ids[] = $pseudowire->pseudowire_id;
+    }
 
-    // Cycle the list of pseudowires we cached earlier and make sure we saw them again.
-    foreach ($pws_db as $pw_id => $pseudowire_id) {
-        if (empty($device['pws'][$pw_id])) {
-            \App\Models\Pseudowire::where('pseudowire_id', $pseudowire_id)->delete();
-        }
+    // Remove pseudowires that are no longer present on the device
+    $deleted = Pseudowire::where('device_id', $device['device_id'])->whereNotIn('pseudowire_id', $seen_ids)->delete();
+    if ($deleted) {
+        $progress->mark(str_repeat('-', $deleted));
     }
 
     $progress->end();
-} //end if
+}
 
-unset($pws_db, $pws_db_raw, $pw_db);
+unset($pws_db, $port_ids, $pws, $pw, $pw_oid, $if_name, $peer_ip, $is_ip, $seen_ids, $pseudowire, $attributes);
