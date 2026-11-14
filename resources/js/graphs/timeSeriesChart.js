@@ -105,7 +105,7 @@ function commonUnit(series) {
  * @param {(view: {from: number, to: number}, moving: boolean) => void} options.onView the user zoomed or panned,
  *   moving when more moves are likely to follow right away. The page answers with setView.
  * @param {() => void} options.onReset the user asked for the original view
- * @param {(position: {index: number, left: number, top: number}|null) => void} options.onHover the cursor is at a point, or left
+ * @param {(position: {index: number, left: number}|null) => void} options.onHover the cursor is at a point, or left
  */
 export default function createChart(element, graph, { view, hidden, compact, onView, onReset, onHover }) {
     const label = compact ? '' : graph.axis.label;
@@ -286,10 +286,8 @@ export default function createChart(element, graph, { view, hidden, compact, onV
                 self.setSelect({ left: 0, top: 0, width: 0, height: 0 }, false);
             }],
             setCursor: [(self) => {
-                const { idx, left, top } = self.cursor;
-                onHover(idx === null || idx === undefined || left < 0
-                    ? null
-                    : { index: idx, left: self.over.offsetLeft + left, top: self.over.offsetTop + top });
+                const { idx, left } = self.cursor;
+                onHover(idx === null || idx === undefined || left < 0 ? null : { index: idx, left: self.over.offsetLeft + left });
             }],
         },
     }, dataFor(graph), element);

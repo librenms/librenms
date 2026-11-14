@@ -63,10 +63,9 @@
         <div x-show="error" x-cloak x-text="error" role="alert"
              class="tw:absolute tw:inset-0 tw:flex tw:items-center tw:justify-center tw:text-lg tw:text-red-600 tw:dark:text-red-400"></div>
 
-        {{-- beside the cursor, or along the top where a finger would cover it --}}
         <div x-show="tooltip" x-cloak
              class="tw:absolute tw:z-10 tw:pointer-events-none tw:px-3 tw:py-2 tw:rounded tw:shadow-lg tw:text-sm tw:whitespace-nowrap tw:bg-white tw:dark:bg-dark-gray-400 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100"
-             :style="tooltipStyle">
+             :style="tooltip?.style">
             <div class="tw:font-semibold tw:mb-1" x-text="tooltip?.time"></div>
             <template x-for="row in tooltip?.rows ?? []" :key="row.key">
                 <div class="tw:flex tw:items-center tw:gap-2">
