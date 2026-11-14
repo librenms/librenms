@@ -34,6 +34,7 @@ class Pseudowire extends PortRelatedModel
 {
     use HasFactory;
     public $timestamps = false;
+    protected $guarded = [];
     protected $primaryKey = 'pseudowire_id';
 
     /**
