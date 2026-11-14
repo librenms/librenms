@@ -20,15 +20,16 @@
     "src": "html/fonts/glyphicons-halflings-regular.woff2"
   },
   "resources/js/app.js": {
-    "file": "assets/app-JvI2AlHY.js",
+    "file": "assets/app-C9iqITyt.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "dynamicImports": [
+      "resources/js/graphs/timeSeriesChart.js",
       "resources/js/configHighlight.js"
     ],
     "css": [
-      "assets/app-Dhh4t1g7.css"
+      "assets/app-DFOWq6UR.css"
     ],
     "assets": [
       "assets/glyphicons-halflings-regular-BUJKDMgK.eot",
@@ -48,6 +49,18 @@
     ],
     "assets": [
       "assets/configHighlight.worker-D3U8Hr8D.js"
+    ]
+  },
+  "resources/js/graphs/timeSeriesChart.js": {
+    "file": "assets/timeSeriesChart-BXAZya25.js",
+    "name": "timeSeriesChart",
+    "src": "resources/js/graphs/timeSeriesChart.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "resources/js/app.js"
+    ],
+    "css": [
+      "assets/timeSeriesChart-CnsZ1jie.css"
     ]
   }
 }

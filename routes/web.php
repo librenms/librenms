@@ -28,6 +28,7 @@ use App\Http\Controllers\DevicesController;
 use App\Http\Controllers\FaultsController;
 use App\Http\Controllers\FirstRunController;
 use App\Http\Controllers\GraphController;
+use App\Http\Controllers\GraphDataController;
 use App\Http\Controllers\GraphsPageController;
 use App\Http\Controllers\Install;
 use App\Http\Controllers\LegacyController;
@@ -130,6 +131,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::resource('device-groups', DeviceGroupController::class);
     Route::get('device-dependencies', [DeviceDependencyController::class, 'index'])->name('device-dependencies.index');
     Route::post('device-groups/{device_group}/rediscover', [DeviceGroupController::class, 'rediscover'])->name('device-groups.rediscover');
+    Route::get('graph-data', GraphDataController::class)->name('graph.data');
     Route::get('graphs/{path?}', GraphsPageController::class)->where('path', '.*')->name('graphs');
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');

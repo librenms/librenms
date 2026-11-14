@@ -7,7 +7,7 @@ import "./bootstrap";
 
 // Gridstack (bundled by Vite)
 import "gridstack/dist/gridstack.min.css";
-import { GridStack } from "gridstack";
+import {GridStack} from "gridstack";
 
 // // Alpine Components
 import Alpine from "alpinejs";
@@ -22,7 +22,9 @@ import portLink from "./components/alpine/portLink.js";
 import filterBarComponent from "./components/alpine/filterBarComponent.js";
 import remoteDropdown from "./components/alpine/remoteDropdown.js";
 import dateRangePicker from "./components/alpine/dateRangePicker.js";
-import { librenmsSelect, librenmsSetting, settingArray, settingArrayDynamic, settingArraySubKeyed, settingGroupRoleMap, settingOxidizedMaps, settingsPage } from "./components/alpine/settings.js";
+import timeSeriesGraph from "./components/alpine/timeSeriesGraph.js";
+import graphsPage from "./components/alpine/graphsPage.js";
+import {librenmsSelect, librenmsSetting, settingArray, settingArrayDynamic, settingArraySubKeyed, settingGroupRoleMap, settingOxidizedMaps, settingsPage} from "./components/alpine/settings.js";
 import LibreNMSDate from "./datetime.js";
 import LibreNMSUrl from "./url.js";
 import LibreNMSNumber from "./number.js";
@@ -44,6 +46,8 @@ Alpine.data('portLink', portLink);
 Alpine.data("filterBarComponent", filterBarComponent);
 Alpine.data("remoteDropdown", remoteDropdown);
 Alpine.data("dateRangePicker", dateRangePicker);
+Alpine.data("timeSeriesGraph", timeSeriesGraph);
+Alpine.data("graphsPage", graphsPage);
 Alpine.data("settingsPage", settingsPage);
 Alpine.data("librenmsSetting", librenmsSetting);
 Alpine.data("librenmsSelect", librenmsSelect);

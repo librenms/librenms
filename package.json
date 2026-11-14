@@ -25,6 +25,7 @@
         "es6-object-assign": "^1.1.0",
         "gridstack": "^12.6.0",
         "luxon": "^3.7.2",
-        "prismjs": "^1.30.0"
+        "prismjs": "^1.30.0",
+        "uplot": "^1.6.32"
     }
 }

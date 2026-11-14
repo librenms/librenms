@@ -3,16 +3,19 @@
 namespace App\Graphs;
 
 use App\Data\Graphing\DataSeries;
+use App\Data\Graphing\GraphData;
 use App\Data\Graphing\GraphImage;
 use App\Data\Graphing\GraphOptions;
 use App\Graphs\Rrd\RrdGraphRenderer;
 use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Exceptions\NoGraphData;
+use LibreNMS\Interfaces\Data\Graphing\SeriesGraphInterface;
+use LibreNMS\Interfaces\Data\SeriesReaderInterface;
 
 /**
  * A graph defined by its series and options, drawn by a renderer for the datastore
  */
-abstract class AbstractSeriesGraph extends AbstractGraph
+abstract class AbstractSeriesGraph extends AbstractGraph implements SeriesGraphInterface
 {
     protected function options(): GraphOptions
     {
@@ -44,6 +47,20 @@ abstract class AbstractSeriesGraph extends AbstractGraph
     protected function draw(): GraphImage
     {
         return $this->renderer()->render($this->getTitle(), $this->series(), $this->options());
+    }
+
+    public function getData(): GraphData
+    {
+        return $this->attempt(function (): GraphData {
+            $series = $this->series();
+            $data = app(SeriesReaderInterface::class)->read($series, $this->params->from, $this->params->to, $this->params->width);
+
+            if ($data->series === []) {
+                throw new NoGraphData('No Data files');
+            }
+
+            return new GraphData($this->options(), array_intersect_key($series, $data->series), $data);
+        });
     }
 
     /**
