@@ -29,14 +29,16 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
         $pw['cpwVcName'] = preg_replace('/(?<=\d)_(?=\d)/', '/', (string) $pw['cpwVcName']);
         // END
 
-        [$cpw_remote_id] = explode(':', (string) $pw['cpwVcMplsPeerLdpID']);
+        [$cpw_remote_ip] = explode(':', (string) $pw['cpwVcMplsPeerLdpID']);
 
-        if (\LibreNMS\Util\IPv4::isValid($cpw_remote_id)) {
+        if (\LibreNMS\Util\IPv4::isValid($cpw_remote_ip)) {
             //If cpwVcMplsPeerLdpID is in the IP form, then convert it to number to store it in DB to avoid failing
-            $cpw_remote_id = ip2long($cpw_remote_id);
+            $cpw_remote_id = ip2long($cpw_remote_ip);
+        } else {
+            $cpw_remote_id = $cpw_remote_ip;
         }
 
-        $cpw_remote_device = dbFetchCell('SELECT device_id from ipv4_addresses AS A, ports AS I WHERE A.ipv4_address=? AND A.port_id=I.port_id', [$cpw_remote_id]);
+        $cpw_remote_device = dbFetchCell('SELECT device_id from ipv4_addresses AS A, ports AS I WHERE A.ipv4_address=? AND A.port_id=I.port_id', [$cpw_remote_ip]);
         $if_id = dbFetchCell('SELECT port_id from ports WHERE `ifDescr`=? AND `device_id`=?', [$pw['cpwVcName'], $device['device_id']]);
         if (! empty($pws_db[$pw['cpwVcID']])) {
             $pseudowire_id = $pws_db[$pw['cpwVcID']];
