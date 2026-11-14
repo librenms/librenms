@@ -11,7 +11,7 @@ use LibreNMS\Util\Html;
 class Eventlog extends Component
 {
     /**
-     * @var array<int, array{entry: \App\Models\Eventlog, severityLabel: string, port: ?\App\Models\Port}>
+     * @var array<int, array{entry: \App\Models\Eventlog, severityClass: string, port: ?\App\Models\Port}>
      */
     public array $rows;
 
@@ -26,7 +26,7 @@ class Eventlog extends Component
     ) {
         $this->rows = $eventlogs->map(fn (\App\Models\Eventlog $entry): array => [
             'entry' => $entry,
-            'severityLabel' => Html::severityToLabel($entry->severity, '', class: 'alert-status'),
+            'severityClass' => Html::severityClass($entry->severity),
             'port' => $entry->type === 'interface' && $entry->reference !== null ? $ports->get((int) $entry->reference) : null,
         ])->values()->all();
     }
