@@ -2,6 +2,9 @@ import LibreNMSDate from '../../datetime.js';
 import {formatValue, summarize} from '../../graphs/seriesMath.js';
 
 const MAX_TOOLTIP_ROWS = 12;
+// how far the tooltip stays from the cursor, and from the edges of the window
+const TOOLTIP_GAP = 32;
+const TOOLTIP_MARGIN = 8;
 // a move that is still going on, like scrolling or dragging, loads data once it pauses
 const SETTLE_DELAY = 200;
 // data is loaded this much of the view past both ends, so a pan shows data right away
@@ -267,31 +270,37 @@ export default function timeSeriesGraph(src, range) {
                 time: LibreNMSDate.display(graph.timestamps[position.index], { dateStyle: 'medium', timeStyle: 'short', hourCycle: 'h23' }),
                 rows: listed,
                 more: rows.length - listed.length,
-                left: position.left,
-                top: position.top,
+                style: this.tooltipStyle(position.left),
             };
         },
 
-        // Beside the cursor, on the side with the most room. A finger covers what is beside it,
-        // so for touch the tooltip goes in the top corner away from the finger.
-        get tooltipStyle() {
-            if (this.tooltip === null) {
-                return {};
-            }
-
-            const { left, top } = this.tooltip;
-            const before = left > this.$refs.plot.clientWidth / 2;
-            const gap = 12;
-
-            if (window.matchMedia('(pointer: coarse)').matches) {
-                return { top: '0', left: before ? '0' : 'auto', right: before ? 'auto' : '0', maxWidth: '75%' };
-            }
+        /**
+         * The tooltip goes beside the cursor, far enough to leave the graph around the cursor in sight,
+         * on the side with the most room. A finger would cover it there, so for touch it goes in the corner
+         * away from the finger. It starts at the top of the graph and moves as needed to stay inside the window.
+         *
+         * @param {number} left where the cursor is in the graph
+         */
+        tooltipStyle(left) {
+            const plot = this.$refs.plot.getBoundingClientRect();
+            const touch = window.matchMedia('(pointer: coarse)').matches;
+            const before = left > plot.width / 2;
+            const room = before ? left - TOOLTIP_GAP : plot.width - left - TOOLTIP_GAP;
+            const inset = touch ? '0' : `${plot.width - room}px`;
+            // after the cursor or in the left corner it is placed from the left, else from the right
+            const fromLeft = touch ? before : ! before;
+            // it stays between the menu bar, which sticks to the top of the window, and the bottom of the window
+            const menuBar = document.querySelector('.navbar-sticky-top')?.getBoundingClientRect().bottom ?? 0;
+            const highest = menuBar + TOOLTIP_MARGIN - plot.top;
+            const lowest = window.innerHeight - TOOLTIP_MARGIN - plot.top;
 
             return {
-                top: `${top + gap}px`,
-                left: before ? 'auto' : `${left + gap}px`,
-                right: before ? `calc(100% - ${left - gap}px)` : 'auto',
-                maxWidth: before ? `${left - gap}px` : `calc(100% - ${left + gap}px)`,
+                top: '0',
+                left: fromLeft ? inset : 'auto',
+                right: fromLeft ? 'auto' : inset,
+                maxWidth: touch ? '75%' : `${room}px`,
+                // 100% is the height of the tooltip
+                transform: `translateY(max(${highest}px, min(0px, calc(${lowest}px - 100%))))`,
             };
         },
     };
