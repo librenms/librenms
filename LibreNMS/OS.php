@@ -67,6 +67,7 @@ use LibreNMS\OS\Traits\Bgp4Mib;
 use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\HostResources;
+use LibreNMS\OS\Traits\IpMib;
 use LibreNMS\OS\Traits\LldpMib;
 use LibreNMS\OS\Traits\MefUniEvcMib;
 use LibreNMS\OS\Traits\MplsVpnMib;
@@ -125,6 +126,7 @@ class OS implements
     use Bgp4Mib;
     use BridgeMib;
     use EntityMib;
+    use IpMib;
     use LldpMib;
     use MefUniEvcMib;
     use MplsVpnMib;

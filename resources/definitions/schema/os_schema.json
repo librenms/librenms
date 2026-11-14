@@ -451,6 +451,9 @@
         "ifalias": {
             "type": "boolean"
         },
+        "ipv4_always_walk_ipaddrtable": {
+            "type": "boolean"
+        },
         "mib_dir": {
             "type":  "string"
         },
