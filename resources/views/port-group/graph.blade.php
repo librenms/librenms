@@ -18,7 +18,7 @@
     </x-graph-row>
     @endif
     @foreach($ports as $port)
-        <x-graph-row type="port_bits" :port=$port columns="responsive" legend=true>
+        <x-graph-row type="port_bits" :port=$port columns="responsive" legend="yes">
             <x-slot name="title">
                 <div class="row">
                     <div class=col-md-3><x-port-link :port="$port" :basic=true><span class=list-large>{{ $port->port_descr_descr }}</span></x-port-link></div>
