@@ -579,7 +579,7 @@
                         @can('peering-db.view')
                             @if($show_peeringdb)
                                 <li role="presentation" class="divider"></li>
-                                <li><a href="{{ url('peering') }}"><i class="fa fa-hand-o-right fa-fw fa-lg"
+                                <li><a href="{{ route('peering.index') }}"><i class="fa fa-hand-o-right fa-fw fa-lg"
                                                                       aria-hidden="true"></i> {{ __('PeeringDB') }}</a>
                                 </li>
                             @endif
