@@ -27,6 +27,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Eventlog;
+use App\Models\Port;
 use App\Models\Sensor;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -47,7 +48,7 @@ class EventlogController extends TableController
         return [
             'device' => 'nullable|int',
             'device_group' => 'nullable|int',
-            'reference' => 'nullable|int',
+            'port' => 'nullable|int',
             'eventtype' => 'nullable|string',
             'age' => 'nullable|int',
             'message' => 'nullable|string',
@@ -60,8 +61,7 @@ class EventlogController extends TableController
     }
 
     /**
-     * Search the eventlog by message and, for interface events, by the
-     * port label (ifName, ifAlias, ifDescr).
+     * Also match interface events by the label (ifName, ifAlias, ifDescr) of their port.
      */
     protected function search(?string $search, Builder $query, array $fields): Builder
     {
@@ -69,31 +69,15 @@ class EventlogController extends TableController
             return $query;
         }
 
-        $query->where(function (Builder $query) use ($fields, $search): void {
-            foreach ($fields as $index => $field) {
-                if (! is_numeric($index)) {
-                    $query->orWhereHas($index, function (Builder $query) use ($field, $search): void {
-                        $query->where(function (Builder $query) use ($field, $search): void {
-                            foreach ($field as $relatedField) {
-                                $query->orWhere($relatedField, 'like', '%' . $search . '%');
-                            }
-                        });
-                    });
-                } else {
-                    $query->orWhere($field, 'like', '%' . $search . '%');
-                }
-            }
-
-            $query->orWhere(function (Builder $query) use ($search): void {
-                $query->where('type', 'interface')->whereHas('port', function (Builder $query) use ($search): void {
-                    $query->where('ifName', 'like', '%' . $search . '%')
-                        ->orWhere('ifAlias', 'like', '%' . $search . '%')
-                        ->orWhere('ifDescr', 'like', '%' . $search . '%');
-                });
-            });
-        });
-
-        return $query;
+        return $query->where(fn (Builder $query) => parent::search($search, $query, $fields)
+            ->orWhere(fn (Builder $query) => $query
+                ->where('type', 'interface')
+                ->whereIn('reference', Port::select('port_id')->where(fn (Builder $query) => $query
+                    ->where('ifName', 'like', "%$search%")
+                    ->orWhere('ifAlias', 'like', "%$search%")
+                    ->orWhere('ifDescr', 'like', "%$search%")
+                ))
+            ));
     }
 
     protected function filterFields(Request $request): array
@@ -101,7 +85,9 @@ class EventlogController extends TableController
         return [
             'device_id' => 'device',
             'type' => 'eventtype',
-            'reference' => 'reference',
+            'port' => function (Builder $query, int $port_id): void {
+                $query->where('type', 'interface')->where('reference', $port_id);
+            },
         ];
     }
 

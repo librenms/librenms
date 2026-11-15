@@ -42,7 +42,7 @@ class PortEventlogLinksTest extends TestCase
                 'vars' => 'port=' . $port->port_id . '/view=notes/graph=bits/subview=graphs',
             ]))
             ->assertOk()
-            ->assertSee(route('device.eventlog', ['device' => $device->device_id, 'eventtype' => 'interface', 'reference' => $port->port_id]), false);
+            ->assertSee(route('device.eventlog', ['device' => $device->device_id, 'port' => $port->port_id]), false);
     }
 
     public function testPortListShowsEventlogLinkOnlyForPortsWithEvents(): void
@@ -61,11 +61,26 @@ class PortEventlogLinksTest extends TestCase
         $this->actingAs($this->admin())
             ->get(route('device', ['device' => $device, 'tab' => 'ports']))
             ->assertOk()
-            ->assertSee(route('device.eventlog', ['device' => $device->device_id, 'eventtype' => 'interface', 'reference' => $portWithEvents->port_id]))
-            ->assertDontSee(route('device.eventlog', ['device' => $device->device_id, 'eventtype' => 'interface', 'reference' => $portWithoutEvents->port_id]));
+            ->assertSee(route('device.eventlog', ['device' => $device->device_id, 'port' => $portWithEvents->port_id]))
+            ->assertDontSee(route('device.eventlog', ['device' => $device->device_id, 'port' => $portWithoutEvents->port_id]));
     }
 
-    public function testEventlogTableFiltersByPortReference(): void
+    public function testOldPortEventsViewFallsBackToGraphs(): void
+    {
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create(['ifDescr' => 'GigabitEthernet0/1', 'ifOperStatus' => 'up']);
+
+        $this->actingAs($this->admin())
+            ->get(route('device', [
+                'device' => $device,
+                'tab' => 'port',
+                'vars' => 'port=' . $port->port_id . '/view=events',
+            ]))
+            ->assertOk()
+            ->assertSee(route('device.eventlog', ['device' => $device->device_id, 'port' => $port->port_id]), false);
+    }
+
+    public function testEventlogTableFiltersByPort(): void
     {
         $device = Device::factory()->create();
         $port = Port::factory()->for($device)->create(['ifDescr' => 'GigabitEthernet0/1']);
@@ -87,7 +102,7 @@ class PortEventlogLinksTest extends TestCase
             ->postJson(route('table.eventlog'), [
                 'device' => $device->device_id,
                 'eventtype' => 'interface',
-                'reference' => $port->port_id,
+                'port' => $port->port_id,
                 'rowCount' => 25,
                 'current' => 1,
             ])
@@ -96,16 +111,46 @@ class PortEventlogLinksTest extends TestCase
             ->assertJsonPath('rows.0.message', 'ifOperStatus: up -&gt; down');
     }
 
-    public function testEventlogPageShowsPortLabelAndReferencePassThrough(): void
+    public function testEventlogTablePortFilterIgnoresOtherTypesWithSameReference(): void
+    {
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create(['ifDescr' => 'GigabitEthernet0/1']);
+
+        Eventlog::factory()->create([
+            'device_id' => $device->device_id,
+            'type' => 'interface',
+            'reference' => (string) $port->port_id,
+            'message' => 'port event',
+        ]);
+        Eventlog::factory()->create([
+            'device_id' => $device->device_id,
+            'type' => 'temperature',
+            'reference' => (string) $port->port_id,
+            'message' => 'sensor event',
+        ]);
+
+        $this->actingAs($this->admin())
+            ->postJson(route('table.eventlog'), [
+                'device' => $device->device_id,
+                'port' => $port->port_id,
+                'rowCount' => 25,
+                'current' => 1,
+            ])
+            ->assertOk()
+            ->assertJsonCount(1, 'rows')
+            ->assertJsonPath('rows.0.message', 'port event');
+    }
+
+    public function testEventlogPageShowsPortLabelAndPortPassThrough(): void
     {
         $device = Device::factory()->create();
         $port = Port::factory()->for($device)->create(['ifName' => 'GigabitEthernet0/1', 'ifDescr' => 'GigabitEthernet0/1', 'ifOperStatus' => 'up']);
 
         $response = $this->actingAs($this->admin())
-            ->get(route('device.eventlog', ['device' => $device->device_id, 'eventtype' => 'interface', 'reference' => $port->port_id]));
+            ->get(route('device.eventlog', ['device' => $device->device_id, 'port' => $port->port_id]));
         $response->assertOk()
             ->assertSee('GigabitEthernet0', false)
-            ->assertSee('name="reference"', false)
+            ->assertSee('name="port"', false)
             ->assertSee('value="' . $port->port_id . '"', false);
 
         $html = $response->getContent();
@@ -120,7 +165,7 @@ class PortEventlogLinksTest extends TestCase
         $port = Port::factory()->for($device)->create(['ifName' => 'evil <b>bold</b>', 'ifDescr' => 'evil <b>bold</b>', 'ifOperStatus' => 'up']);
 
         $html = $this->actingAs($this->admin())
-            ->get(route('device.eventlog', ['device' => $device->device_id, 'eventtype' => 'interface', 'reference' => $port->port_id]))
+            ->get(route('device.eventlog', ['device' => $device->device_id, 'port' => $port->port_id]))
             ->assertOk()
             ->getContent();
 

@@ -41,14 +41,19 @@ class EventlogController extends Controller
 
         $request->validate([
             'eventtype' => 'nullable|string',
-            'reference' => 'nullable|int',
+            'port' => 'nullable|int',
         ]);
+
+        $eventtype = $request->string('eventtype')->value();
+        $port_id = $request->integer('port') ?: null;
 
         return view('device.tabs.logs.eventlog', [
             'device' => $device,
             'filter_device' => false,
-            'eventtype' => $request->input('eventtype', ''),
-            'reference' => $request->input('reference', ''),
+            'eventtype' => $eventtype,
+            'port_id' => $port_id,
+            'port' => $port_id ? $device->ports()->find($port_id) : null,
+            'clear_port_url' => route('device.eventlog', array_filter(['device' => $device->device_id, 'eventtype' => $eventtype])),
         ]);
     }
 }
