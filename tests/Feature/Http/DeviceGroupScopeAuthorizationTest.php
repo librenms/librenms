@@ -38,7 +38,7 @@ final class DeviceGroupScopeAuthorizationTest extends TestCase
 {
     use DatabaseTransactions;
 
-    private const DISCOVERED = '2026-01-01 00:00:00';
+    private const string DISCOVERED = '2026-01-01 00:00:00';
 
     private Device $accessible;
     private Device $other;
