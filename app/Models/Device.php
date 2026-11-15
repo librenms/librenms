@@ -675,8 +675,6 @@ class Device extends BaseModel
 
     public function scopeInDeviceGroup($query, $deviceGroup)
     {
-        // Arr::wrap() would nest a Collection inside an array, which breaks
-        // whereIn() when the collection is empty (see #21039)
         $deviceGroup = $deviceGroup instanceof Collection ? $deviceGroup->all() : $deviceGroup;
 
         return $query->whereIn(
@@ -690,8 +688,6 @@ class Device extends BaseModel
 
     public function scopeNotInDeviceGroup($query, $deviceGroup)
     {
-        // Arr::wrap() would nest a Collection inside an array, which breaks
-        // whereIn() when the collection is empty (see #21039)
         $deviceGroup = $deviceGroup instanceof Collection ? $deviceGroup->all() : $deviceGroup;
 
         return $query->whereNotIn(
