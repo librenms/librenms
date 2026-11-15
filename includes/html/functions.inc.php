@@ -91,35 +91,6 @@ function device_permitted($device_id)
     return Permissions::canAccessDevice($device_id, Auth::id());
 }
 
-function alert_layout($severity)
-{
-    switch ($severity) {
-        case 'critical':
-            $icon = 'exclamation';
-            $color = 'danger';
-            $background = 'danger';
-            break;
-        case 'warning':
-            $icon = 'warning';
-            $color = 'warning';
-            $background = 'warning';
-            break;
-        case 'ok':
-            $icon = 'check';
-            $color = 'success';
-            $background = 'success';
-            break;
-        default:
-            $icon = 'info';
-            $color = 'info';
-            $background = 'info';
-    }
-
-    return ['icon' => $icon,
-        'icon_color' => $color,
-        'background_color' => $background, ];
-}
-
 function generate_port_link($port, $text = null, $type = null, $overlib = 1, $single_graph = 0)
 {
     if (is_null($port)) {
@@ -313,11 +284,6 @@ function get_ports_from_type($given_types)
     $ports = dbFetchRows("SELECT * FROM `ports` as I, `devices` AS D WHERE $type_where AND I.device_id = D.device_id ORDER BY I.ifAlias", $type_param);
 
     return $ports;
-}
-
-function get_rules_from_json()
-{
-    return json_decode(file_get_contents(resource_path('definitions/alert_rules.json')), true);
 }
 
 /**

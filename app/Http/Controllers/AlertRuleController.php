@@ -6,7 +6,10 @@ use App\Http\Requests\AlertRuleRequest;
 use App\Models\Alert;
 use App\Models\AlertFault;
 use App\Models\AlertRule;
+use App\Models\Device;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
@@ -14,6 +17,80 @@ use LibreNMS\Enum\AlertState;
 
 class AlertRuleController extends Controller
 {
+    private const array PER_PAGE = [10, 50, 100, 250, 500, 1000, 5000];
+
+    public function index(Request $request): View
+    {
+        $this->authorize('viewAny', AlertRule::class);
+
+        return $this->listing($request);
+    }
+
+    /**
+     * Rules that apply to a device, on the device settings page
+     */
+    public function device(Request $request, Device $device): View
+    {
+        $this->authorize('update', $device);
+        $this->authorize('viewAny', AlertRule::class);
+
+        return $this->listing($request, $device);
+    }
+
+    /**
+     * Create the rules marked as default in the rule collection
+     */
+    public function createDefaults(): RedirectResponse
+    {
+        $this->authorize('create', AlertRule::class);
+
+        $extra = ['mute' => false, 'count' => -1, 'delay' => 300, 'invert' => false, 'interval' => 300];
+
+        foreach (resolve(AlertRuleTemplateController::class)->templatesCollection() as $rule) {
+            if (empty($rule['default'])) {
+                continue;
+            }
+
+            AlertRule::create([
+                'name' => $rule['name'],
+                'builder' => $rule['builder'],
+                'query' => QueryBuilderParser::fromJson($rule['builder'])->toSql(),
+                'severity' => 'critical',
+                'extra' => array_replace($extra, json_decode($rule['extra'] ?? '[]', true) ?: []),
+                'disabled' => 0,
+            ]);
+        }
+
+        return redirect()->back();
+    }
+
+    private function listing(Request $request, ?Device $device = null): View
+    {
+        $perPage = (int) $request->input('per_page');
+        $perPage = in_array($perPage, self::PER_PAGE) ? $perPage : 50;
+
+        $rules = AlertRule::query()
+            ->when($device, fn ($query) => $query->forDevice($device))
+            ->with(['devices', 'groups', 'locations', 'alertOperation.segments.transportSingles', 'alertOperation.segments.transportGroups'])
+            ->orderBy('name')
+            ->paginate($perPage)
+            ->withQueryString();
+
+        return view('alert-rules.index', [
+            'device' => $device,
+            'rules' => $rules,
+            'perPage' => $perPage,
+            'perPageOptions' => self::PER_PAGE,
+            // the most severe alert state of each rule
+            'states' => Alert::whereIn('rule_id', $rules->pluck('id'))
+                ->groupBy('rule_id')
+                ->selectRaw('rule_id, max(state) as state')
+                ->pluck('state', 'rule_id'),
+            'collection' => resolve(AlertRuleTemplateController::class)->templatesCollection(),
+            'offerDefaults' => ! $device && $rules->total() === 0,
+        ]);
+    }
+
     /**
      * Store a newly created resource in storage.
      */

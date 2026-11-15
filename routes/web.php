@@ -273,6 +273,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('/device/{device}/edit/components', [Device\EditComponentsController::class, 'index'])->name('device.edit.components');
     Route::put('/device/{device}/edit/components', [Device\EditComponentsController::class, 'update'])->name('device.edit.components.update');
     Route::get('/device/{device}/edit/customoids', [Device\EditCustomoidsController::class, 'index'])->name('device.edit.customoids');
+    Route::get('/device/{device}/edit/alert-rules', [AlertRuleController::class, 'device'])->name('device.edit.alert-rules');
     Route::get('/device/{device}/edit/health', [Device\EditHealthController::class, 'index'])->name('device.edit.health');
     Route::post('/device/{device}/edit/health/reset', [Device\EditHealthController::class, 'reset'])->name('device.edit.health.reset');
     Route::post('/device/{device}/edit/health/{sensor}', [Device\EditHealthController::class, 'update'])->name('device.edit.health.update')->scopeBindings()->whereNumber('sensor');
@@ -450,6 +451,11 @@ Route::middleware(['auth'])->group(function (): void {
     Route::post('alert-templates/convert', [AlertTemplateController::class, 'convert'])->name('alert-templates.convert');
     Route::resource('alert-templates', AlertTemplateController::class)->except(['show'])->where(['alert_template' => '[0-9]+']);
     Route::redirect('templates', 'alert-templates');
+    Route::delete('alert/transports/{transport}', [AlertTransportController::class, 'destroy'])->name('alert.transports.destroy');
+    Route::delete('alert/transport-groups/{alert_transport_group}', [AlertTransportGroupController::class, 'destroy'])->name('alert.transport-groups.destroy');
+    Route::delete('alert-templates/{alert_template}', [AlertTemplateController::class, 'destroy'])->name('alert-templates.destroy');
+    Route::get('alert-rules', [AlertRuleController::class, 'index'])->name('alert-rules.index');
+    Route::post('alert-rules/defaults', [AlertRuleController::class, 'createDefaults'])->name('alert-rules.defaults');
     Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);
     Route::resource('alert-operation', AlertOperationController::class)->only(['show', 'store', 'update', 'destroy']);
     Route::put('alert-rule/{alert_rule}/toggle', [AlertRuleController::class, 'toggle'])->name('alert-rule.toggle');
