@@ -32,6 +32,7 @@ use App\Http\Controllers\GraphsPageController;
 use App\Http\Controllers\Install;
 use App\Http\Controllers\LegacyController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\LogController;
 use App\Http\Controllers\Maps;
 use App\Http\Controllers\Maps\CustomMapBackgroundController;
 use App\Http\Controllers\Maps\CustomMapController;
@@ -141,6 +142,9 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('oxidized', [OxidizedController::class, 'index'])->name('oxidized');
     Route::post('oxidized/search', [OxidizedController::class, 'search'])->name('oxidized.search');
     Route::post('oxidized/reload', [OxidizedController::class, 'reload'])->name('oxidized.reload');
+    Route::get('eventlog', [LogController::class, 'eventlog'])->name('eventlog');
+    Route::get('syslog', [LogController::class, 'syslog'])->middleware('saved-filter:syslog')->name('syslog');
+    Route::get('graylog', [LogController::class, 'graylog'])->name('graylog');
     Route::get('packages', [PackagesController::class, 'index'])->middleware('saved-filter:packages')->name('packages.index');
     Route::get('packages/{legacy}', [PackagesController::class, 'legacy'])->where('legacy', '.*=.*');
     Route::prefix('peering')->name('peering.')->group(function (): void {
@@ -327,6 +331,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('stp', [Device\Tabs\StpController::class, 'index'])->name('stp')->whereNumber('device');
         Route::get('wireless', [Device\Tabs\WirelessController::class, 'index'])->name('wireless')->whereNumber('device');
         Route::get('routing', [Device\Tabs\RoutingController::class, 'index'])->name('routing')->whereNumber('device');
+        Route::get('logs/syslog', Device\Tabs\SyslogController::class)->middleware('saved-filter:device.syslog')->name('syslog');
         Route::prefix('routing')->name('routing.')->group(function (): void {
             Route::get('bgp', Device\Tabs\Routing\BgpController::class)->name('bgp');
             Route::get('cef', Device\Tabs\Routing\CefController::class)->name('cef');

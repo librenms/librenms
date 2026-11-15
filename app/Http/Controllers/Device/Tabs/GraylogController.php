@@ -26,7 +26,6 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
-use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
 use App\Models\Syslog;
@@ -38,22 +37,19 @@ class GraylogController extends Controller
     public function __invoke(Device $device, Request $request): View
     {
         $this->authorize('view', $device);
-        $this->authorize('viewAny', Syslog::class);  // Note: Graylog replaces syslog, correct permission?
+        $this->authorize('viewAny', Syslog::class); // Graylog replaces syslog
 
         $request->validate([
-            'stream' => 'nullable|string',
+            'stream' => 'nullable|alpha_num',
             'range' => 'nullable|int',
-            'loglevel' => 'nullable|int',
+            'loglevel' => 'nullable|int|min:0|max:7',
         ]);
 
         return view('device.tabs.logs.graylog', [
             'device' => $device,
-            'timezone' => LibrenmsConfig::has('graylog.timezone'),
-            'filter_device' => true,
-            'show_form' => true,
-            'stream' => $request->input('stream', ''),
-            'range' => $request->input('range', '0'),
-            'loglevel' => $request->input('loglevel', ''),
+            'stream' => $request->string('stream')->value(),
+            'range' => $request->integer('range'),
+            'loglevel' => $request->filled('loglevel') ? $request->integer('loglevel') : null,
         ]);
     }
 }

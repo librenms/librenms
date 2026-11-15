@@ -30,8 +30,10 @@ use App\Models\Syslog;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Enum\SyslogSeverity;
+use LibreNMS\Util\Time;
 
 /**
  * @extends TableController<Syslog>
@@ -45,9 +47,10 @@ class SyslogController extends TableController
             'device_group' => 'nullable|int',
             'program' => 'nullable|string',
             'priority' => 'nullable|string',
-            'to' => 'nullable|date',
-            'from' => 'nullable|date',
+            'to' => 'nullable|date_or_relative',
+            'from' => 'nullable|date_or_relative',
             'level' => 'nullable|string',
+            ...Syslog::filterValidationRules(),
         ];
     }
 
@@ -79,14 +82,15 @@ class SyslogController extends TableController
 
         return Syslog::hasAccess($request->user())
             ->with('device')
+            ->when($request->array('filter'), fn ($query, $filters) => $query->applyFilters($filters))
             ->when($request->device_group, function ($query, $group): void {
                 $query->inDeviceGroup($group);
             })
-            ->when($request->from, function ($query, $from): void {
-                $query->where('timestamp', '>=', $from);
+            ->when(Time::parseInput($request->input('from')), function ($query, int $from): void {
+                $query->where('timestamp', '>=', Carbon::createFromTimestamp($from, config('app.timezone')));
             })
-            ->when($request->to, function ($query, $to): void {
-                $query->where('timestamp', '<=', $to);
+            ->when(Time::parseInput($request->input('to')), function ($query, int $to): void {
+                $query->where('timestamp', '<=', Carbon::createFromTimestamp($to, config('app.timezone')));
             })
             ->when($request->level, function ($query, $level): void {
                 if ($level >= 7) {

@@ -5,6 +5,7 @@ namespace LibreNMS\Tests\Feature\Http;
 use App\Models\Device;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Js;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Role;
@@ -23,50 +24,77 @@ class DeviceLogTabsTest extends TestCase
     }
 
     /**
-     * @return array<string, array{string, array<int, string>}>
+     * @return array<string, array{string, bool, array<int, string>}>
      */
-    public static function logTabs(): array
+    public static function logPages(): array
     {
         return [
-            'syslog' => ['device.syslog', ['program', 'priority', 'from', 'to']],
-            'eventlog' => ['device.eventlog', ['eventtype']],
-            'graylog' => ['device.graylog', ['stream']],
+            'device syslog' => ['device.syslog', true, []],
+            'device eventlog' => ['device.eventlog', true, ['eventtype']],
+            'device graylog' => ['device.graylog', true, []],
+            'global syslog' => ['syslog', false, []],
+            'global eventlog' => ['eventlog', false, ['eventtype']],
+            'global graylog' => ['graylog', false, []],
         ];
     }
 
     /**
      * @param  array<int, string>  $params
      */
-    #[DataProvider('logTabs')]
-    public function testFilterParametersAreHtmlEscapedInsideJavascript(string $route, array $params): void
+    #[DataProvider('logPages')]
+    public function testFilterParametersAreEscaped(string $route, bool $deviceTab, array $params): void
     {
-        $admin = User::factory()->create(['enabled' => 1]);
-        $admin->assignRole('admin');
         $device = Device::factory()->create();
-
         $query = array_fill_keys($params, self::PAYLOAD);
+        $parameters = ($deviceTab ? ['device' => $device] : ['device' => $device->device_id]) + $query;
 
-        $response = $this->actingAs($admin)
-            ->get(route($route, ['device' => $device] + $query))
-            ->assertOk();
+        $response = $this->actingAs($this->admin())
+            ->get(route($route, $parameters))
+            ->assertOk()
+            ->assertDontSee(self::PAYLOAD, false);
 
-        $flags = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
-
-        // values concatenated into HTML strings must be html escaped before being JS encoded
-        $response->assertDontSee('+ ' . json_encode(self::PAYLOAD, $flags) . ' +', false);
-        $response->assertSee('+ ' . json_encode(e(self::PAYLOAD), $flags) . ' +', false);
+        if ($params) {
+            $response->assertSee((string) Js::from(self::PAYLOAD), false);
+        }
     }
 
-    public function testGlobalGraylogStreamIsEscaped(): void
+    public function testGlobalPagesPreselectTheFilteredDevice(): void
+    {
+        $device = Device::factory()->create();
+
+        foreach (['eventlog', 'graylog'] as $route) {
+            $this->actingAs($this->admin())
+                ->get(route($route, ['device' => $device->device_id]))
+                ->assertOk()
+                ->assertSee((string) Js::from(['id' => $device->device_id, 'text' => $device->display]), false);
+        }
+    }
+
+    public function testSyslogFilterBarIsEscaped(): void
+    {
+        $device = Device::factory()->create();
+
+        foreach ([route('syslog'), route('device.syslog', ['device' => $device])] as $url) {
+            $this->actingAs($this->admin())
+                ->get($url . '?' . http_build_query(['filter' => ['program' => ['eq' => self::PAYLOAD]]]))
+                ->assertOk()
+                ->assertDontSee(self::PAYLOAD, false)
+                ->assertSee('filterBarComponent', false);
+        }
+    }
+
+    public function testGraylogRejectsInvalidStream(): void
+    {
+        $this->actingAs($this->admin())
+            ->get(route('graylog', ['stream' => self::PAYLOAD]))
+            ->assertSessionHasErrors('stream');
+    }
+
+    private function admin(): User
     {
         $admin = User::factory()->create(['enabled' => 1]);
         $admin->assignRole('admin');
 
-        $response = $this->actingAs($admin)
-            ->get('/graylog?stream=' . urlencode(self::PAYLOAD))
-            ->assertOk();
-
-        $response->assertDontSee(self::PAYLOAD, false);
-        $response->assertSee('+ ' . json_encode(htmlspecialchars(self::PAYLOAD)) . ' +', false);
+        return $admin;
     }
 }

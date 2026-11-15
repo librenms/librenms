@@ -26,12 +26,10 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
-use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\Controller;
 use App\Models\Device;
 use App\Models\Syslog;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 class SyslogController extends Controller
@@ -42,21 +40,17 @@ class SyslogController extends Controller
         $this->authorize('viewAny', Syslog::class);
 
         $request->validate([
-            'program' => 'nullable|string',
-            'priority' => 'nullable|string',
-            'from' => 'nullable|string',
-            'to' => 'nullable|string',
+            'from' => 'nullable|date_or_relative',
+            'to' => 'nullable|date_or_relative',
+            ...Syslog::filterValidationRules(),
         ]);
 
         return view('device.tabs.logs.syslog', [
             'device' => $device,
-            'filter_device' => false,
-            'now' => Carbon::now()->format(LibrenmsConfig::get('dateformat.byminute', 'Y-m-d H:i')),
-            'default_date' => Carbon::now()->subDay()->format(LibrenmsConfig::get('dateformat.byminute', 'Y-m-d H:i')),
-            'program' => $request->input('program', ''),
-            'priority' => $request->input('priority', ''),
-            'from' => $request->input('from', ''),
-            'to' => $request->input('to', ''),
+            'filter' => $request->array('filter'),
+            'filterFields' => Syslog::filterFieldDefinitions(withDevice: false),
+            'from' => $request->string('from')->value(),
+            'to' => $request->string('to')->value(),
         ]);
     }
 }

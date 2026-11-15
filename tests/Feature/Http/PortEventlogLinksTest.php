@@ -157,8 +157,8 @@ class PortEventlogLinksTest extends TestCase
 
         $html = $response->getContent();
         $this->assertNotFalse(mb_strpos($html, 'Filter</button>'));
-        $this->assertNotFalse(mb_strpos($html, 'Port&nbsp;&nbsp;'));
-        $this->assertTrue(mb_strpos($html, 'Filter</button>') < mb_strpos($html, 'Port&nbsp;&nbsp;'));
+        $this->assertNotFalse(mb_strpos($html, 'Clear port filter'));
+        $this->assertTrue(mb_strpos($html, 'Filter</button>') < mb_strpos($html, 'Clear port filter'));
     }
 
     public function testEventlogPageEscapesHtmlInPortLabel(): void
@@ -172,7 +172,6 @@ class PortEventlogLinksTest extends TestCase
             ->getContent();
 
         $this->assertStringNotContainsString('<b>bold</b>', $html);
-        $this->assertStringNotContainsString('\u003Cb\u003E', $html);
-        $this->assertStringContainsString('\u0026lt;b\u0026gt;bold', $html);
+        $this->assertStringContainsString('evil &lt;b&gt;bold&lt;/b&gt;', $html);
     }
 }
