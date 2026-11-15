@@ -179,6 +179,51 @@ final class AlertOperationRunAlertsTest extends TestCase
         $this->assertEquals(AlertState::ACKNOWLEDGED, $alerted);
     }
 
+    public function testAcknowledgedAlertNotificationPopulatesFaultNotesAndIgnoresStaleAlertNote(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 0, 'dur' => 3600],
+        ]);
+
+        $objs = [];
+        /** @var RunAlerts&\Mockery\MockInterface $runAlerts */
+        $runAlerts = Mockery::mock(RunAlerts::class)->makePartial();
+        $runAlerts->shouldReceive('extTransports')->andReturnUsing(function ($obj) use (&$objs): void {
+            $objs[] = $obj;
+        });
+
+        $runAlerts->runAlerts();
+
+        // Simulate a stale note on the alerts table row from an older alert
+        DB::table('alerts')
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->update(['note' => 'Stale note from prior alert']);
+
+        AlertFault::query()
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->where('open', 1)
+            ->update([
+                'state' => AlertState::ACKNOWLEDGED,
+                'note' => 'Fault acknowledgement note',
+            ]);
+        new AlertRules($context['device']->device_id)->syncAlertState($context['rule']);
+
+        $objs = [];
+        $runAlerts->runAlerts();
+        $runAlerts->runAcks();
+
+        $this->assertContains(
+            AlertState::ACKNOWLEDGED,
+            $this->issuedStates($objs)
+        );
+        $ackObj = collect($objs)->firstWhere('state', AlertState::ACKNOWLEDGED);
+        $this->assertNotNull($ackObj);
+        $this->assertSame('Fault acknowledgement note', $ackObj['alert_notes']);
+        $this->assertStringNotContainsString('Stale note from prior alert', (string) $ackObj['alert_notes']);
+    }
+
     public function testAcknowledgedFaultsSendWhileAggregateStillActive(): void
     {
         $context = $this->makeActiveAlert([

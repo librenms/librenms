@@ -326,12 +326,24 @@ class RunAlerts
             // Acknowledgement alerts are one notification per rule/device (runAcks), not per fault.
             if ($faults->isNotEmpty()) {
                 $rows = [];
+                $ackNotes = [];
+                $ackedFaults = $faults->filter(fn (AlertFault $fault) => (int) $fault->state === AlertState::ACKNOWLEDGED);
+                $newlyAcked = $ackedFaults->filter(fn (AlertFault $fault) => (int) $fault->alerted !== AlertState::ACKNOWLEDGED);
+                $noteSources = $newlyAcked->isNotEmpty() ? $newlyAcked : $ackedFaults;
+
+                foreach ($noteSources as $fault) {
+                    if (! empty($fault->note)) {
+                        $ackNotes[] = $fault->note;
+                    }
+                }
+
                 foreach ($faults as $fault) {
                     foreach (($fault->details['rule'] ?? []) as $row) {
                         $rows[] = $row;
                     }
                 }
                 $alert['details']['rule'] = $rows;
+                $alert['note'] = $ackNotes !== [] ? implode(PHP_EOL, array_unique($ackNotes)) : '';
                 if (LibrenmsConfig::get('alert.fixed-contacts') == false) {
                     $alert['details']['contacts'] = AlertUtil::getContacts($rows);
                 }
@@ -352,6 +364,7 @@ class RunAlerts
                 $unit = $alert;
                 $unit['state'] = $faultState;
                 $unit['fault_id'] = $fault->id;
+                $unit['note'] = $fault->note ?? '';
                 $unit['details']['rule'] = $fault->details['rule'] ?? [];
                 $unit['details']['contacts'] = $fault->details['contacts'] ?? ($alert['details']['contacts'] ?? []);
                 $latestLogId = AlertLog::query()->where('fault_id', $fault->id)->max('id');
