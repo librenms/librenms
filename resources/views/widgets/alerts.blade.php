@@ -61,7 +61,8 @@
                 group: @json($device_group),
                 proc: @json($proc),
                 uncollapse_key_count: @json($uncollapse_key_count),
-                device_id: @json($device)
+                device_id: @json($device),
+                widget_id: @json($id)
             }),
             responseHandler: response => {
                 $("#widget_title_counter_{{ $id }}").text(response.total ? ` (${response.total})` : '')

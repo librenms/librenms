@@ -80,6 +80,7 @@ class AlertsController extends TableController
             'min_severity' => 'nullable|string',
             'group' => 'nullable|integer|min:1',
             'uncollapse_key_count' => 'nullable|integer',
+            'widget_id' => 'nullable|integer|min:1',
         ];
     }
 
@@ -247,12 +248,13 @@ class AlertsController extends TableController
         }
 
         $alertLogId = AlertLog::query()->where('fault_id', $model->id)->max('id');
+        $incidentId = $this->incidentId($model->id);
 
         return [
             'rule' => '<i title="' . e(json_encode($model->rule?->builder)) . '"><a href="' . Url::generate(['page' => 'alert-rules']) . '">' . $ruleName . '</a></i>',
-            'details' => '<a class="fa-solid fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $model->id . '" data-parent="#alerts"></a>',
+            'details' => '<a class="fa-solid fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#' . $incidentId . '" data-parent="#alerts"></a>',
             'verbose_details' => $this->verboseDetailsButton($alertLogId),
-            'hostname' => $this->renderHostname($model),
+            'hostname' => $this->renderHostname($model, $incidentId),
             'location' => '<a href="' . e(Url::generate(['page' => 'devices', 'location' => $location ?? ''])) . '">' . e($location ?? 'N/A') . '</a>',
             'timestamp' => $model->timestamp ? Time::format($model->timestamp, 'compact') : 'N/A',
             'severity' => $this->severityIcon($model->rule?->severity, $state),
@@ -315,15 +317,25 @@ class AlertsController extends TableController
         ])->render();
     }
 
-    private function renderHostname(AlertFault $fault): string
+    private function renderHostname(AlertFault $fault, string $incidentId): string
     {
         $faultDetail = $this->renderFaultDetail($fault);
         $collapseClass = $this->incidentCollapseClass($faultDetail);
 
         return '<div class="incident">'
             . Url::modernDeviceLink($fault->device)
-            . '<div id="incident' . $fault->id . '"' . $collapseClass . '>' . $faultDetail . '</div>'
+            . '<div id="' . $incidentId . '"' . $collapseClass . '>' . $faultDetail . '</div>'
             . '</div>';
+    }
+
+    /**
+     * Build the incident element id, namespaced by the dashboard widget instance when present.
+     */
+    private function incidentId(int $faultId): string
+    {
+        $widgetId = request()->integer('widget_id');
+
+        return $widgetId > 0 ? "incident{$widgetId}-{$faultId}" : "incident{$faultId}";
     }
 
     private function countPrintableCharacters(string $string): int
