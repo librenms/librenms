@@ -26,101 +26,55 @@
 
 use App\Models\AlertTransport;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Validator;
+use LibreNMS\Alert\KeyValueOptions;
+use LibreNMS\Alert\Transport;
 
 header('Content-type: application/json');
 
 if (Gate::none(['alert-transport.create', 'alert-transport.update'])) {
-    exit(json_encode([
-        'status' => 'error',
-        'message' => 'You need permisisson',
-    ]));
+    return print json_encode(['status' => 'error', 'message' => 'You need permission']);
 }
 
-$status = 'ok';
-$message = '';
+$name = strip_tags((string) ($vars['name'] ?? ''));
+$type = (string) ($vars['transport-type'] ?? '');
+$class = Transport::getClass($type);
+if ($name === '' || ! array_key_exists($type, Transport::list()) || ! method_exists($class, 'configTemplate')) {
+    return print json_encode(['status' => 'error', 'message' => 'A transport name and supported type are required.']);
+}
 
-$transport_id = strip_tags((string) $vars['transport_id']);
-$name = strip_tags((string) $vars['name']);
-$is_default = (int) (isset($vars['is_default']) && $vars['is_default'] == 'on');
-$transport_type = strip_tags((string) $vars['transport-type']);
-
-if (empty($name)) {
-    $status = 'error';
-    $message = 'No transport name provided';
-} elseif (empty($transport_type)) {
-    $status = 'error';
-    $message = 'Missing transport information';
-} else {
-    $details = [
-        'transport_name' => $name,
-        'is_default' => $is_default,
-    ];
-
-    if (is_numeric($transport_id) && $transport_id > 0) {
-        $transport = AlertTransport::findOrFail($transport_id);
-        Gate::authorize('update', $transport);
-        $transport->transport_name = $name;
-        $transport->is_default = $is_default;
-        $transport->save();
-        // Update the fields -- json config field will be updated later
-    } else {
-        Gate::authorize('create', AlertTransport::class);
-        // Insert the new alert transport
-        $newEntry = true;
-        $transport_id = dbInsert($details, 'alert_transports');
+$template = $class::configTemplate();
+try {
+    foreach ($template['config'] as $field) {
+        if ($field['type'] === 'keyvalue') {
+            $rows = $vars[$field['name'] . '-rows'] ?? [];
+            $vars[$field['name']] = KeyValueOptions::fromRows($rows === '' ? [] : $rows);
+        }
     }
+} catch (\InvalidArgumentException|\TypeError $e) {
+    return print json_encode(['status' => 'error', 'message' => e($e->getMessage())]);
+}
 
-    if ($transport_id) {
-        $class = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport_type);
+$validator = Validator::make($vars, $template['validation']);
+if ($validator->fails()) {
+    return print json_encode(['status' => 'error', 'message' => implode('<br>', array_map(e(...), $validator->errors()->all()))]);
+}
 
-        if (! method_exists($class, 'configTemplate')) {
-            exit(json_encode([
-                'status' => 'error',
-                'message' => 'This transport type is not yet supported',
-            ]));
-        }
+$transportId = $vars['transport_id'] ?? null;
+$transport = is_numeric($transportId) && $transportId > 0 ? AlertTransport::findOrFail($transportId) : new AlertTransport;
+Gate::authorize($transport->exists ? 'update' : 'create', $transport->exists ? $transport : AlertTransport::class);
 
-        // Build config values
-        $result = call_user_func_array($class . '::configTemplate', []);
-        $validator = Validator::make($vars, $result['validation']);
-        if ($validator->fails()) {
-            $errors = $validator->errors();
-            foreach ($errors->all() as $error) {
-                $message .= "$error<br>";
-            }
-            $status = 'error';
-        } else {
-            $transport_config = AlertTransport::where('transport_id', $transport_id)->value('transport_config');
-            $transport_config = is_array($transport_config) ? $transport_config : (array) json_decode((string) $transport_config, true);
-            foreach ($result['config'] as $tmp_config) {
-                if (isset($tmp_config['name']) && $tmp_config['type'] !== 'hidden') {
-                    $transport_config[$tmp_config['name']] = $vars[$tmp_config['name']] ?? null;
-                }
-            }
-            //Update the json config field
-            $detail = [
-                'transport_type' => $transport_type,
-                'transport_config' => json_encode($transport_config),
-            ];
-            $where = 'transport_id=?';
-
-            dbUpdate($detail, 'alert_transports', $where, [$transport_id]);
-
-            $status = 'ok';
-            $message = 'Updated alert transports';
-        }
-        if ($status == 'error' && $newEntry) {
-            //If error, we will have to delete the new entry in alert_transports tbl
-            $where = '`transport_id`=?';
-            \App\Models\AlertTransport::where('transport_id', $transport_id)->delete();
-        }
-    } else {
-        $status = 'error';
-        $message = 'Failed to update transport';
+$config = $transport->transport_config ?? [];
+foreach ($template['config'] as $field) {
+    if (isset($field['name']) && $field['type'] !== 'hidden') {
+        $config[$field['name']] = $vars[$field['name']] ?? null;
     }
 }
 
-exit(json_encode([
-    'status' => $status,
-    'message' => $message,
-]));
+$transport->transport_name = $name;
+$transport->is_default = ($vars['is_default'] ?? '') === 'on';
+$transport->transport_type = $type;
+$transport->transport_config = $config;
+$transport->save();
+
+return print json_encode(['status' => 'ok', 'message' => 'Updated alert transports']);

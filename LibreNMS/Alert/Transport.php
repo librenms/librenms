@@ -115,7 +115,13 @@ abstract class Transport implements TransportInterface
             }
 
             $val = $this->config[$item['name']] ?? '';
-            if ($item['type'] == 'password') {
+            if ($item['type'] === 'keyvalue') {
+                $val = implode(PHP_EOL, array_map(
+                    fn ($key, $value) => $key . '=' . $value,
+                    array_keys(KeyValueOptions::fromConfig($val ?: null)),
+                    array_values(KeyValueOptions::fromConfig($val ?: null))
+                ));
+            } elseif ($item['type'] == 'password') {
                 $val = '********';
             } elseif ($item['type'] == 'select') {
                 // Match value to key name for select inputs
