@@ -194,7 +194,7 @@ class DeviceGroupController extends Controller
     private function staticMembers(Request $request, ?DeviceGroup $deviceGroup = null): array
     {
         $requested = $request->collect('devices')->map(fn ($id): int => (int) $id)->unique();
-        $current = $deviceGroup === null ? collect() : $deviceGroup->devices()->pluck('devices.device_id');
+        $current = $deviceGroup?->devices()->pluck('devices.device_id') ?? collect();
 
         $accessible = Device::hasAccess($request->user())
             ->whereIntegerInRaw('device_id', $requested->merge($current))
