@@ -40,28 +40,12 @@
 @endif
 
 @if( $poller_cluster->isNotEmpty() )
-@php
-    $totalNodes = $poller_cluster->count();
-    $healthyNodes = $poller_cluster->where('row_class', 'success')->count();
-    $warningNodes = $poller_cluster->where('row_class', 'warning')->count();
-    $dangerNodes = $poller_cluster->where('row_class', 'danger')->count();
-    $unhealthyNodes = $warningNodes + $dangerNodes;
-    $anyDeletable = $poller_cluster->contains(fn ($p) => (bool) $p->long_not_polled);
-    $totalCols = $anyDeletable ? 11 : 10;
-    $clusterGroups = $cluster_groups ?? collect();
-    $allPollersMeta = $poller_cluster->map(fn ($p) => [
-        'name' => (string) $p->poller_name,
-        'nodeId' => (string) $p->node_id,
-        'rowClass' => (string) $p['row_class'],
-    ])->values();
-@endphp
-
 <div x-data="{
     statusFilter: 'all',
     search: '',
     expandAll: false,
     expanded: {},
-    allPollers: {{ Js::from($allPollersMeta) }},
+    allPollers: {{ Js::from($cluster_summary['all_pollers_meta']) }},
     togglePoller(id) {
         this.expanded[id] = !this.expanded[id];
     },
@@ -98,20 +82,20 @@
                     <button type="button" class="lnms-btn"
                             :class="statusFilter === 'all' ? 'lnms-btn-primary' : 'lnms-btn-default'"
                             @click="statusFilter = 'all'">
-                        {{ __('All Nodes') }} <span class="lnms-btn-badge">{{ $totalNodes }}</span>
+                        {{ __('All Nodes') }} <span class="lnms-btn-badge">{{ $cluster_summary['total_nodes'] }}</span>
                     </button>
                     <button type="button" class="lnms-btn"
                             :class="statusFilter === 'healthy' ? 'lnms-btn-success' : 'lnms-btn-default'"
                             @click="statusFilter = (statusFilter === 'healthy' ? 'all' : 'healthy')">
                         <i class="fa fa-check-circle" aria-hidden="true"></i> {{ __('Healthy') }}
-                        <span class="lnms-btn-badge">{{ $healthyNodes }}</span>
+                        <span class="lnms-btn-badge">{{ $cluster_summary['healthy_nodes'] }}</span>
                     </button>
-                    @if($unhealthyNodes > 0)
+                    @if($cluster_summary['unhealthy_nodes'] > 0)
                         <button type="button" class="lnms-btn"
                                 :class="statusFilter === 'unhealthy' ? 'lnms-btn-danger' : 'lnms-btn-warning'"
                                 @click="statusFilter = (statusFilter === 'unhealthy' ? 'all' : 'unhealthy')">
                             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {{ __('Attention') }}
-                            <span class="lnms-btn-badge">{{ $unhealthyNodes }}</span>
+                            <span class="lnms-btn-badge">{{ $cluster_summary['unhealthy_nodes'] }}</span>
                         </button>
                     @endif
                 </div>
@@ -143,7 +127,7 @@
                     <th class="text-center">{{ __('Devices Actioned') }}<br><small class="text-muted">{{ __('Last Interval') }}</small></th>
                     <th class="text-center">{{ __('Devices Pending') }}</th>
                     <th>{{ __('Worker Seconds') }}<br><small class="text-muted">{{ __('Consumed/Maximum') }}</small></th>
-                    @if($anyDeletable)
+                    @if($cluster_summary['any_deletable'])
                         <th class="text-center" style="width: 40px;">{{ __('Actions') }}</th>
                     @endif
                 </tr>
@@ -151,33 +135,16 @@
 
                 <tbody x-show="!hasAnyMatches()" x-cloak>
                 <tr>
-                    <td colspan="{{ $totalCols }}" class="text-center text-muted" style="padding: 16px;">
+                    <td colspan="{{ $cluster_summary['total_cols'] }}" class="text-center text-muted" style="padding: 16px;">
                         {{ __('No pollers match your search or filter.') }}
                     </td>
                 </tr>
                 </tbody>
 
-                @foreach($clusterGroups as $group)
-                    @php
-                        $grpPollers = $group['pollers'];
-                        $grpPollersMeta = $grpPollers->map(fn ($p) => [
-                            'name' => (string) $p->poller_name,
-                            'nodeId' => (string) $p->node_id,
-                            'rowClass' => (string) $p['row_class'],
-                        ])->values();
-                        $grpWorkers = $grpPollers->sum(fn ($p) => (int) ($p->stats->firstWhere('poller_type', 'poller')?->workers ?? 0));
-                        $grpConsumed = $grpPollers->sum(fn ($p) => (float) ($p->stats->firstWhere('poller_type', 'poller')?->worker_seconds ?? 0));
-                        $grpMax = $grpPollers->sum(function ($p) {
-                            $s = $p->stats->firstWhere('poller_type', 'poller');
-                            return $s ? ((int) $s->frequency * (int) $s->workers) : 0;
-                        });
-                        $grpLoadPct = $grpMax > 0 ? (int) round(($grpConsumed / $grpMax) * 100) : 0;
-                        $grpLoadLabelClass = $grpLoadPct > 100 ? 'label-warning' : 'label-default';
-                    @endphp
-
-                    <tbody x-show="groupHasMatches({{ Js::from($grpPollersMeta) }})">
+                @foreach($cluster_groups as $group)
+                    <tbody x-show="groupHasMatches({{ Js::from($group['pollers_meta']) }})">
                     <tr class="active">
-                        <td colspan="{{ $totalCols }}" style="padding: 7px 10px;">
+                        <td colspan="{{ $cluster_summary['total_cols'] }}" style="padding: 7px 10px;">
                             <div class="tw:flex tw:flex-wrap tw:justify-between tw:items-center tw:gap-2">
                                 <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
                                     <span class="label label-default">#{{ $group['id'] }}</span>
@@ -191,51 +158,36 @@
 
                                 <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
                                     <span class="label label-default" title="{{ __('Total poller workers in this group') }}">
-                                        {{ __('Workers') }}: {{ $grpWorkers }}
+                                        {{ __('Workers') }}: {{ $group['workers'] }}
                                     </span>
-                                    <span class="label {{ $grpLoadLabelClass }}"
+                                    <span class="label {{ $group['load_label_class'] }}"
                                           title="{{ __('Average poller worker load across this group') }}">
-                                        {{ __('Group Load') }}: {{ $grpLoadPct }}%
+                                        {{ __('Group Load') }}: {{ $group['load_pct'] }}%
                                     </span>
                                 </div>
                             </div>
                         </td>
                     </tr>
 
-                    @foreach($grpPollers as $poller)
-                        @php
-                            $primaryStat = $poller->stats->firstWhere('poller_type', 'poller') ?? $poller->stats->first();
-                            $otherStats = $primaryStat
-                                ? $poller->stats->filter(fn ($s) => $s->id !== $primaryStat->id)->values()
-                                : collect();
-                            $maxSeconds = $primaryStat ? ((int) $primaryStat->frequency * (int) $primaryStat->workers) : 0;
-                            $consumedSeconds = $primaryStat ? (float) $primaryStat->worker_seconds : 0;
-                            $utilPct = $maxSeconds > 0 ? (int) round(($consumedSeconds / $maxSeconds) * 100) : 0;
-                            $isDown = $poller['row_class'] === 'danger';
-                            $isWarning = ! $isDown && ($poller['row_class'] === 'warning' || $utilPct > 100);
-                            $dotClass = $isDown ? 'text-danger' : ($isWarning ? 'text-warning' : 'text-success');
-                            $barClass = $isDown ? 'progress-bar-danger' : ($isWarning ? 'progress-bar-warning' : 'progress-bar-success');
-                            $rowKey = $group['id'] . '_' . $poller->id;
-                        @endphp
-
+                    @foreach($group['pollers'] as $poller)
                         <tr id="row_{{ $poller->id }}"
                             data-poller-row="{{ $poller->id }}"
-                            @class(['danger' => $isDown, 'warning' => $isWarning])
-                            x-show="matchesPoller({{ Js::from($poller->poller_name) }}, {{ Js::from((string) $poller->node_id) }}, {{ Js::from($poller['row_class']) }})"
+                            @class(['danger' => $poller->is_down, 'warning' => $poller->is_warning])
+                            x-show="matchesPoller({{ Js::from($poller->poller_name) }}, {{ Js::from((string) $poller->node_id) }}, {{ Js::from($poller->row_class) }})"
                             style="cursor: pointer;"
-                            @click="if (!$event.target.closest('[data-toggle=modal], a')) togglePoller('{{ $rowKey }}')">
+                            @click="if (!$event.target.closest('[data-toggle=modal], a')) togglePoller('{{ $group['id'] }}_{{ $poller->id }}')">
                             <td class="text-center" style="vertical-align: middle;">
                                 <button type="button"
                                         class="btn btn-default btn-xs"
-                                        @click.stop="togglePoller('{{ $rowKey }}')"
-                                        :aria-expanded="isExpanded('{{ $rowKey }}')"
+                                        @click.stop="togglePoller('{{ $group['id'] }}_{{ $poller->id }}')"
+                                        :aria-expanded="isExpanded('{{ $group['id'] }}_{{ $poller->id }}')"
                                         title="{{ __('Toggle job breakdown') }}">
-                                    <i class="fa" :class="isExpanded('{{ $rowKey }}') ? 'fa-chevron-down' : 'fa-chevron-right'" aria-hidden="true"></i>
+                                    <i class="fa" :class="isExpanded('{{ $group['id'] }}_{{ $poller->id }}') ? 'fa-chevron-down' : 'fa-chevron-right'" aria-hidden="true"></i>
                                 </button>
                             </td>
                             <td style="vertical-align: middle;">
                                 <div class="tw:flex tw:items-center tw:gap-2">
-                                    <i class="fa fa-circle {{ $dotClass }}" aria-hidden="true"></i>
+                                    <i class="fa fa-circle {{ $poller->dot_class }}" aria-hidden="true"></i>
                                     <span class="tw:font-bold">{{ $poller->poller_name }}</span>
                                     @if($poller->master)
                                         <span class="label label-primary">master</span>
@@ -258,34 +210,34 @@
                                 @endif
                             </td>
 
-                            @if($primaryStat)
+                            @if($poller->primary_stat)
                                 <td class="text-center" style="vertical-align: middle;">
-                                    {{ $primaryStat->workers }}
+                                    {{ $poller->primary_stat->workers }}
                                 </td>
                                 <td class="text-center" style="vertical-align: middle;">
-                                    {{ $primaryStat->devices }}
+                                    {{ $poller->primary_stat->devices }}
                                 </td>
                                 <td class="text-center" style="vertical-align: middle;">
-                                    {{ $primaryStat->depth }}
+                                    {{ $poller->primary_stat->depth }}
                                 </td>
                                 <td style="vertical-align: middle;">
                                     <div class="tw:flex tw:justify-between tw:items-center tw:gap-2" style="font-size: 12px; margin-bottom: 3px;">
-                                        <span>{{ $primaryStat->worker_seconds }} / {{ $maxSeconds }}</span>
-                                        <strong @class(['text-danger' => $isDown, 'text-warning' => $isWarning])>{{ $utilPct }}%</strong>
+                                        <span>{{ $poller->primary_stat->worker_seconds }} / {{ $poller->max_seconds }}</span>
+                                        <strong @class(['text-danger' => $poller->is_down, 'text-warning' => $poller->is_warning])>{{ $poller->util_pct }}%</strong>
                                     </div>
                                     <div class="progress" style="height: 5px; margin-bottom: 0;">
-                                        <div class="progress-bar {{ $barClass }}"
+                                        <div class="progress-bar {{ $poller->bar_class }}"
                                              role="progressbar"
-                                             aria-valuenow="{{ $utilPct }}"
+                                             aria-valuenow="{{ $poller->util_pct }}"
                                              aria-valuemin="0"
                                              aria-valuemax="100"
-                                             style="width: {{ min(100, max(2, $utilPct)) }}%;">
+                                             style="width: {{ $poller->progress_width }}%;">
                                         </div>
                                     </div>
                                 </td>
                             @else
                                 <td colspan="4" style="vertical-align: middle;">
-                                    @if($poller->poller_version == \App\Queue\WorkerNode::VERSION && \App\Queue\QueueStatus::showPages())
+                                    @if($poller->show_queue_link)
                                         <a href="{{ route('poller.queues') }}">{{ __('Queue workers share the queues of their poller groups, see Queues') }}</a>
                                     @else
                                         <span class="text-muted">{{ __('No job statistics reported') }}</span>
@@ -293,7 +245,7 @@
                                 </td>
                             @endif
 
-                            @if($anyDeletable)
+                            @if($cluster_summary['any_deletable'])
                                 <td class="text-center" style="vertical-align: middle;">
                                     @if($poller->long_not_polled)
                                         <button type="button"
@@ -311,14 +263,9 @@
                             @endif
                         </tr>
 
-                        @foreach($otherStats as $stat)
-                            @php
-                                $statMax = (int) $stat->frequency * (int) $stat->workers;
-                                $statPct = $statMax > 0 ? (int) round(((float) $stat->worker_seconds / $statMax) * 100) : 0;
-                                $statBarClass = $statPct > 100 ? 'progress-bar-warning' : 'progress-bar-success';
-                            @endphp
+                        @foreach($poller->other_stats as $stat)
                             <tr data-poller-row="{{ $poller->id }}"
-                                x-show="isExpanded('{{ $rowKey }}') && matchesPoller({{ Js::from($poller->poller_name) }}, {{ Js::from((string) $poller->node_id) }}, {{ Js::from($poller['row_class']) }})"
+                                x-show="isExpanded('{{ $group['id'] }}_{{ $poller->id }}') && matchesPoller({{ Js::from($poller->poller_name) }}, {{ Js::from((string) $poller->node_id) }}, {{ Js::from($poller->row_class) }})"
                                 x-cloak>
                                 <td colspan="5"></td>
                                 <td class="text-right" style="vertical-align: middle;">
@@ -335,17 +282,17 @@
                                 </td>
                                 <td style="vertical-align: middle;">
                                     <div class="tw:flex tw:justify-between tw:items-center tw:gap-2" style="font-size: 11px; margin-bottom: 2px;">
-                                        <span>{{ $stat->worker_seconds }} / {{ $statMax }}</span>
-                                        <span @class(['text-warning tw:font-bold' => $statPct > 100])>{{ $statPct }}%</span>
+                                        <span>{{ $stat->worker_seconds }} / {{ $stat->max_seconds }}</span>
+                                        <span @class(['text-warning tw:font-bold' => $stat->util_pct > 100])>{{ $stat->util_pct }}%</span>
                                     </div>
                                     <div class="progress" style="height: 4px; margin-bottom: 0;">
-                                        <div class="progress-bar {{ $statBarClass }}"
+                                        <div class="progress-bar {{ $stat->bar_class }}"
                                              role="progressbar"
-                                             style="width: {{ min(100, max(1, $statPct)) }}%;">
+                                             style="width: {{ $stat->progress_width }}%;">
                                         </div>
                                     </div>
                                 </td>
-                                @if($anyDeletable)
+                                @if($cluster_summary['any_deletable'])
                                     <td></td>
                                 @endif
                             </tr>
