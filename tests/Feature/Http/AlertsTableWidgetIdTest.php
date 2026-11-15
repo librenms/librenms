@@ -71,6 +71,20 @@ class AlertsTableWidgetIdTest extends TestCase
         $this->assertRowHasIncidentId($rows[0], null, $log->id);
     }
 
+    public function testTablesRejectInvalidWidgetId(): void
+    {
+        $admin = $this->admin();
+
+        foreach (['table.alerts', 'table.alertlog'] as $route) {
+            foreach (['abc', '47abc', 0, -1] as $widgetId) {
+                $this->actingAs($admin)
+                    ->postJson(route($route), ['widget_id' => $widgetId])
+                    ->assertUnprocessable()
+                    ->assertJsonValidationErrors('widget_id');
+            }
+        }
+    }
+
     private function makeFault(): AlertFault
     {
         $device = Device::factory()->create();

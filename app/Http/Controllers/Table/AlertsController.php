@@ -80,6 +80,7 @@ class AlertsController extends TableController
             'min_severity' => 'nullable|string',
             'group' => 'nullable|integer|min:1',
             'uncollapse_key_count' => 'nullable|integer',
+            'widget_id' => 'nullable|integer|min:1',
         ];
     }
 
@@ -332,7 +333,7 @@ class AlertsController extends TableController
      */
     private function incidentId(int $faultId): string
     {
-        $widgetId = (int) request()->input('widget_id', 0);
+        $widgetId = request()->integer('widget_id');
 
         return $widgetId > 0 ? "incident{$widgetId}-{$faultId}" : "incident{$faultId}";
     }

@@ -39,6 +39,7 @@ class AlertLogController extends TableController
             'state' => 'integer|nullable',
             'from' => 'nullable|date_or_relative',
             'to' => 'nullable|date_or_relative',
+            'widget_id' => 'nullable|integer|min:1',
         ];
     }
 
@@ -220,7 +221,7 @@ class AlertLogController extends TableController
      */
     private function incidentId(int $logId): string
     {
-        $widgetId = (int) request()->input('widget_id', 0);
+        $widgetId = request()->integer('widget_id');
 
         return $widgetId > 0 ? "incident{$widgetId}-{$logId}" : "incident{$logId}";
     }
