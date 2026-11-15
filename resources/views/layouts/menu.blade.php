@@ -349,7 +349,7 @@
                             @if($port_groups_exist)
                                 <li role="presentation" class="divider"></li>
                                 @config('int_customers')
-                                <li><a href="{{ url('customers') }}"><i class="fa fa-users fa-fw fa-lg"
+                                <li><a href="{{ route('customers') }}"><i class="fa fa-users fa-fw fa-lg"
                                                                         aria-hidden="true"></i> {{ __('Customers') }}</a>
                                 </li>
                                 @endconfig
