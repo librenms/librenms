@@ -69,17 +69,22 @@ class Aos6 extends OS implements VlanDiscovery, VlanPortDiscovery, TransceiverDi
 
     public function discoverVlanPorts(Collection $vlans): Collection
     {
-        if (($QBridgeMibPorts = parent::discoverVlanPorts($vlans))->isNotEmpty()) {
-            return $QBridgeMibPorts;
+        $ports = parent::discoverVlanPorts($vlans);
+        $missingVlans = $vlans->pluck('vlan_vlan')->diff($ports->pluck('vlan'));
+
+        if ($missingVlans->isEmpty()) {
+            return $ports;
         }
 
-        return SnmpQuery::walk('ALCATEL-IND1-VLAN-MGR-MIB::vpaType')
+        $vendorPorts = SnmpQuery::walk('ALCATEL-IND1-VLAN-MGR-MIB::vpaType')
             ->mapTable(fn ($data, $vpaVlanNumber, $vpaIfIndex = null) => new PortVlan([
                 'vlan' => $vpaVlanNumber,
                 'baseport' => $this->bridgePortFromIfIndex($vpaIfIndex),
                 'untagged' => ($data['ALCATEL-IND1-VLAN-MGR-MIB::vpaType'] == 1 ? 1 : 0),
                 'port_id' => PortCache::getIdFromIfIndex($vpaIfIndex, $this->getDeviceId()) ?? 0,
             ]));
+
+        return $ports->concat($vendorPorts->filter(fn (PortVlan $port) => $missingVlans->contains($port->vlan)));
     }
 
     public function pollNac(): Collection
