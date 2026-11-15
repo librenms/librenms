@@ -38,6 +38,12 @@ use LibreNMS\Util\Url;
 
 class AvailabilityMapController extends WidgetController
 {
+    // Rank of each drawn tile state for order_by=status: problems first,
+    // then healthy, then ignored/disabled. Service states (down, warn, up)
+    // are a subset of the device states in the same relative order, so one
+    // list covers both.
+    private const STATE_ORDER = ['down' => 0, 'warn' => 1, 'ignored-down' => 2, 'maintenance' => 3, 'up' => 4, 'ignored-up' => 5, 'disabled' => 6];
+
     protected string $name = 'availability-map';
 
     public function __construct()
@@ -102,10 +108,14 @@ class AvailabilityMapController extends WidgetController
             // parse state and count
             [$state_name, $class] = $this->parseDeviceState($device, $uptime_warn);
             $totals[$state_name]++;
+            $sort_state = $state_name;
 
             if ($check_maintenance && $device->isUnderMaintenance()) {
                 $class = 'label-default';
                 $totals['maintenance']++;
+                // the new view draws maintenance tiles grey, so sort them as
+                // their own group; the old view draws the state class instead
+                $sort_state = $settings['type'] == 1 ? $state_name : 'maintenance';
             }
 
             if ($settings['type'] == 1) {
@@ -114,6 +124,7 @@ class AvailabilityMapController extends WidgetController
 
             $data[] = [
                 'status' => $device->status,
+                'state' => $sort_state,
                 'link' => Url::deviceUrl($device),
                 'tooltip' => $this->getDeviceTooltip($device, $state_name),
                 'label' => $this->getDeviceLabel($device, $state_name), // add another field for the selected label
@@ -160,6 +171,7 @@ class AvailabilityMapController extends WidgetController
 
             $data[] = [
                 'status' => $service->service_status,
+                'state' => $state_name,
                 'link' => Url::deviceUrl($service->device),
                 'tooltip' => $this->getServiceTooltip($service),
                 'label' => $this->getServiceLabel($service),
@@ -175,7 +187,7 @@ class AvailabilityMapController extends WidgetController
     private function sort(array &$data): void
     {
         match ($this->getSettings()['order_by']) {
-            'status' => usort($data, fn ($l, $r) => ($l['status'] <=> $r['status']) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
+            'status' => usort($data, fn ($l, $r) => (self::STATE_ORDER[$l['state']] <=> self::STATE_ORDER[$r['state']]) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
             'label' => usort($data, fn ($l, $r) => strcasecmp((string) $l['label'], (string) $r['label'])),
             // device display name (tooltip starts with the display name)
             default => usort($data, fn ($l, $r) => strcasecmp((string) $l['tooltip'], (string) $r['tooltip']) ?: strcasecmp((string) $l['label'], (string) $r['label'])),
