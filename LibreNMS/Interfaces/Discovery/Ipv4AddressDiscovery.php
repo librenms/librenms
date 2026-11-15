@@ -13,6 +13,8 @@ interface Ipv4AddressDiscovery
      * ::1 will be filtered by the module as well
      *
      * @return \Illuminate\Support\Collection<\App\Models\Ipv4Address>
+     *
+     * @throws \LibreNMS\Exceptions\SnmpException when the device did not answer, existing addresses are kept
      */
     public function discoverIpv4Addresses(): Collection;
 }
