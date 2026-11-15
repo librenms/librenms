@@ -1,6 +1,10 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use App\Models\BgpPeer;
+use App\Models\Ipv4Address;
+use App\Models\Ipv4Mac;
+use App\Models\MacAccounting;
 use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Mac;
@@ -117,22 +121,39 @@ if ($vars['subview'] == 'top10') {
 ";
     unset($query);
 } else {
-    $query = 'SELECT *, (M.bps_in + M.bps_out) as bps FROM `mac_accounting` AS M,
-                       `ports` AS I WHERE M.port_id = ? AND I.port_id = M.port_id ORDER BY bps DESC';
-    $param = [$port['port_id']];
+    $mac_rows = MacAccounting::query()
+        ->where('port_id', $port['port_id'])
+        ->orderByRaw('bps_in + bps_out DESC')
+        ->get();
 
-    foreach (dbFetchRows($query, $param) as $acc) {
+    $ipv4_by_mac = Ipv4Mac::query()
+        ->whereIn('mac_address', $mac_rows->pluck('mac'))
+        ->get(['mac_address', 'ipv4_address'])
+        ->unique('mac_address')
+        ->mapWithKeys(fn ($ipv4_mac) => [$ipv4_mac->mac_address => $ipv4_mac->ipv4_address])
+        ->all();
+
+    $arp_hosts = Ipv4Address::query()
+        ->whereHas('port')
+        ->whereHas('port.device')
+        ->with('port.device')
+        ->whereIn('ipv4_address', array_values($ipv4_by_mac))
+        ->get()
+        ->unique('ipv4_address')
+        ->keyBy('ipv4_address')
+        ->all();
+
+    foreach ($mac_rows as $acc) {
         if (! is_int($i / 2)) {
             $row_colour = LibrenmsConfig::get('list_colour.even');
         } else {
             $row_colour = LibrenmsConfig::get('list_colour.odd');
         }
-        $ipv4 = App\Models\Ipv4Mac::where('mac_address', $acc['mac'])->value('ipv4_address');
-        $arp_host = dbFetchRow('SELECT * FROM ipv4_addresses AS A, ports AS I, devices AS D WHERE A.ipv4_address = ? AND I.port_id = A.port_id AND D.device_id = I.device_id', [$ipv4]);
-        $arp_host = cleanPort($arp_host);
+        $ipv4 = $ipv4_by_mac[$acc['mac']] ?? null;
+        $arp_host = $ipv4 ? ($arp_hosts[$ipv4] ?? null) : null;
         if ($arp_host) {
-            $arp_name = generate_device_link($arp_host);
-            $arp_name .= ' ' . generate_port_link($arp_host);
+            $arp_name = Url::deviceLink($arp_host->port->device);
+            $arp_name .= ' ' . Url::portLink($arp_host->port);
         } else {
             $arp_name = '';
         }
@@ -144,8 +165,8 @@ if ($vars['subview'] == 'top10') {
 
         $astext = '';
         $asn = '';
-        if (dbFetchCell('SELECT count(*) FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $ipv4])) {
-            $peer_info = dbFetchRow('SELECT * FROM bgpPeers WHERE device_id = ? AND bgpPeerIdentifier = ?', [$acc['device_id'], $ipv4]);
+        $peer_info = BgpPeer::query()->where('device_id', $device['device_id'])->where('bgpPeerIdentifier', $ipv4)->first();
+        if ($peer_info) {
             $asn = 'AS' . $peer_info['bgpPeerRemoteAs'];
             $astext = $peer_info['astext'];
         }
