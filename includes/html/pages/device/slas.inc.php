@@ -4,7 +4,7 @@ if ($vars['id']) {
     $sla = dbFetchRow('SELECT `tag`, `sla_nr`,`rtt_type` FROM `slas` WHERE `sla_id` = ?', [$vars['id']]);
     $key = "modules.slas.types.{$sla['rtt_type']}";
     $translation = trans($key);
-    $name = 'SLA #' . $sla['sla_nr'] . ' - ' . ($translation === $key ? ucfirst((string) $sla['rtt_type']) : $translation);
+    $name = 'SLA #' . e($sla['sla_nr']) . ' - ' . e($translation === $key ? ucfirst((string) $sla['rtt_type']) : $translation);
     if ($sla['tag']) {
         $name .= ': ' . e($sla['tag']);
     }
@@ -68,7 +68,7 @@ if ($vars['id']) {
             echo "<span class='pagemenu-selected'>";
         }
 
-        echo generate_link($text, $vars, ['view' => $sla_type]);
+        echo generate_link(e($text), $vars, ['view' => $sla_type]);
         if ($vars['view'] == $sla_type) {
             echo '</span>';
         }
@@ -111,20 +111,18 @@ if ($vars['id']) {
             continue;
         }
 
-        $name = 'SLA #' . $sla['sla_nr'] . ' - ' . $sla_types[$sla['rtt_type']];
+        $name = 'SLA #' . e($sla['sla_nr']) . ' - ' . e($sla_types[$sla['rtt_type']]);
         if ($sla['tag']) {
-            $name .= ': ' . $sla['tag'];
+            $name .= ': ' . e($sla['tag']);
         }
 
         if ($sla['owner']) {
-            $name .= ' (Owner: ' . $sla['owner'] . ')';
+            $name .= ' (Owner: ' . e($sla['owner']) . ')';
         }
 
         // These Types have more graphs. Display a sub-page
         if (($sla['rtt_type'] == 'jitter') || ($sla['rtt_type'] == 'icmpjitter') || ($sla['rtt_type'] == 'IcmpEcho') || ($sla['rtt_type'] == 'IcmpTimeStamp') || ($sla['rtt_type'] == 'icmpAppl')) {
             $name = '<a href="' . \LibreNMS\Util\Url::generate($vars, ['tab' => 'slas', 'id' => $sla['sla_id']]) . '">' . $name . '</a>';
-        } else {
-            $name = htmlentities($name);
         }
 
         // If we have an error highlight the row.
