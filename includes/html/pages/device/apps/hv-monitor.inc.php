@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Port;
+use LibreNMS\Util\Url;
 
 $link_array = [
     'page' => 'device',
@@ -124,12 +125,7 @@ if (isset($vars['vmif']) and isset($vars['vm'])) {
         echo ' (' .
                generate_device_link(['device_id' => $port->device_id]) .
                ', ' .
-               generate_port_link([
-                   'label' => $port->label,
-                   'port_id' => $port->port_id,
-                   'ifName' => $port->ifName,
-                   'device_id' => $port->device_id,
-               ]) .
+               Url::portLink($port) .
             ')';
     }
     echo "<br>\n";
@@ -147,12 +143,7 @@ if (isset($vars['vmif']) and isset($vars['vm'])) {
         echo '<b>HV if:</b> ' . htmlspecialchars((string) $app->data['VMifs'][$vars['vm']][$vars['vmif']]['if']) . "\n";
     } else {
         echo '<b>HV if:</b> ' .
-            generate_port_link([
-                'label' => $port->label,
-                'port_id' => $port->port_id,
-                'ifName' => $port->ifName,
-                'device_id' => $port->device_id,
-            ]);
+            Url::portLink($port);
     }
 
     // Not likely to be known on Libvirt systems thanks to Libvirt sucking at reporting some info... and IF stuff in general
@@ -162,12 +153,7 @@ if (isset($vars['vmif']) and isset($vars['vm'])) {
             echo '<br><b>HV parent if:</b> ' . $app->data['VMifs'][$vars['vm']][$vars['vmif']]['parent'];
         } else {
             echo '<br><b>HV parent if:</b> ' .
-                generate_port_link([
-                    'label' => $port->label,
-                    'port_id' => $port->port_id,
-                    'ifName' => $port->ifName,
-                    'device_id' => $port->device_id,
-                ]);
+                Url::portLink($port);
         }
     }
 }

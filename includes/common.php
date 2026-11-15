@@ -54,15 +54,6 @@ function get_port_rrdfile_path($hostname, $port_id, $suffix = '')
     return Rrd::name($hostname, Rrd::portName($port_id, $suffix));
 }
 
-function ifclass($ifOperStatus, $ifAdminStatus)
-{
-    // fake a port model
-    return \LibreNMS\Util\Url::portLinkDisplayClass((object) [
-        'ifOperStatus' => $ifOperStatus instanceof \LibreNMS\Enum\IfOperStatus ? $ifOperStatus : \LibreNMS\Enum\IfOperStatus::tryFrom($ifOperStatus),
-        'ifAdminStatus' => $ifAdminStatus instanceof \LibreNMS\Enum\IfOperStatus ? $ifAdminStatus : \LibreNMS\Enum\IfOperStatus::tryFrom($ifAdminStatus),
-    ]);
-}
-
 /**
  * @deprecated Use DeviceCache::get() and the Device model instead
  */
