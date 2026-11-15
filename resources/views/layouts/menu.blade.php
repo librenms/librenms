@@ -68,7 +68,7 @@
                                                                aria-hidden="true"></i> {{ __('Tools') }}</a>
                             <ul class="dropdown-menu">
                                 @can('tools.ripe')
-                                <li><a href="{{ url('ripenccapi') }}"><i class="fa fa-star fa-fw fa-lg"
+                                <li><a href="{{ route('tool.ripe') }}"><i class="fa fa-star fa-fw fa-lg"
                                                                          aria-hidden="true"></i> {{ __('RIPE NCC API') }}
                                     </a></li>
                                 @endcan
