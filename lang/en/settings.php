@@ -774,6 +774,9 @@ return [
             'discovery-arp' => [
                 'description' => 'Discovery ARP',
             ],
+            'device-stack' => [
+                'description' => 'Device Stack',
+            ],
             'discovery-protocols' => [
                 'description' => 'Discovery Protocols',
             ],
@@ -1860,6 +1863,9 @@ return [
             ],
             'availability' => [
                 'description' => 'Availability',
+            ],
+            'device-stack' => [
+                'description' => 'Device Stack',
             ],
             'entity-physical' => [
                 'description' => 'Entity Physical',
