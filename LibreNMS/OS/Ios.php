@@ -63,7 +63,7 @@ class Ios extends Cisco implements
  */
     protected function lldpLocalPortId(int $lldpPortNum): ?int
     {
-        if (str_starts_with((string) ($this->getDeviceArray()['hardware'] ?? ''), 'IE-3300')) {
+        if (str_starts_with((string) ($this->getDevice()['hardware'] ?? ''), 'IE-3300')) {
             $portId = NeighborParser::parseText($this->lldpLocPortTable()[$lldpPortNum]['lldpLocPortId'] ?? '');
 
             if (preg_match('/^port-(\d{3})-(\d{5})$/D', $portId, $matches) === 1) {
