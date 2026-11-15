@@ -184,7 +184,7 @@ jobs:
         wait: database
       -
         name: Migrate Database
-        run: php artisan migrate
+        run: php artisan migrate --seed
 
       -
         name: Wait for SNMPSIM

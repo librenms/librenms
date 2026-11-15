@@ -1,41 +1,70 @@
 IEEE8021-PFC-MIB DEFINITIONS ::= BEGIN
 
 -- ******************************************************************
--- IEEE P802.1Qbb(TM) Priority-based Flow Control MIB
+-- IEEE P802.1Q(TM) Priority-based Flow Control MIB
 -- ******************************************************************
 
 IMPORTS
     MODULE-IDENTITY,
     OBJECT-TYPE,
     Counter32,
-    Unsigned32               FROM SNMPv2-SMI   -- [RFC2578]
+    Unsigned32               FROM SNMPv2-SMI    -- [RFC2578]
+    ieee802dot1mibs          FROM IEEE8021-TC-MIB
     MODULE-COMPLIANCE,
-    OBJECT-GROUP             FROM SNMPv2-CONF  -- [RFC2580]
+    OBJECT-GROUP             FROM SNMPv2-CONF   -- [RFC2580]
     ifEntry,
     ifGeneralInformationGroup
-                             FROM IF-MIB       -- [RFC2863]
-    systemGroup              FROM SNMPv2-MIB   -- [RFC3418]
+                             FROM IF-MIB        -- [RFC2863]
+    systemGroup              FROM SNMPv2-MIB    -- [RFC3418]
    ;
 
 ieee8021PFCMib MODULE-IDENTITY
-    LAST-UPDATED "201002080000Z" -- 02/08/2010 00:00GMT
-    ORGANIZATION "Netgear Inc"
-    CONTACT-INFO ""
+    LAST-UPDATED "202103050000Z" -- March 5, 2021
+    ORGANIZATION "IEEE 802.1 Working Group"
+    CONTACT-INFO
+        "  WG-URL: http://www.ieee802.org/1/
+         WG-EMail: stds-802-1-l@ieee.org
+          Contact: IEEE 802.1 Working Group Chair
+           Postal: C/O IEEE 802.1 Working Group
+                   IEEE Standards Association
+                   445 Hoes Lane
+                   Piscataway, NJ 08854
+                   USA
+           E-mail: stds-802-1-chairs@ieee.org"
+   DESCRIPTION
+     "Priority-based Flow Control module for IEEE Std 802.1Q.
+
+        Unless otherwise indicated, the references in this MIB
+        module are to IEEE Std 802.1Q-2022.
+
+        Copyright (C) IEEE (2022).
+        This version of this MIB module is part of IEEE Std 802.1Q;
+        see that standard for full legal notices."
+
+    REVISION "202103050000Z" -- March 5, 2021
     DESCRIPTION
-      "Priority-based Flow Control module for managing IEEE 802.1Qbb"
-    REVISION "201002080000Z" -- 02/08/2010 00:00GMT
+            "Published as part of IEEE Std 802.1Q-2022.
+            Cross references and contact information updated."
+
+    REVISION "201807010000Z" -- July 1, 2018
     DESCRIPTION
-       "Included in IEEE P802.1Qbb
+            "Published as part of IEEE Std 802.1Q 2018 revision.
+            Cross references updated and corrected."
 
-         Copyright (C) IEEE."
-     ::= { iso(1) org(3) ieee(111)
-          standards-association-numbers-series-standards (2)
-          lan-man-stds (802) ieee802dot1 (1) ieee802dot1mibs (1) 21 }
+    REVISION "201412150000Z" -- December 15, 2014
+    DESCRIPTION
+            "Published as part of IEEE Std 802.1Q 2014 revision.
+            Cross references updated and corrected."
 
+   REVISION       "201002080000Z"    -- 02/08/2010 00:00GMT
+   DESCRIPTION
+      "Included in IEEE P802.1Qbb
 
-ieee8021PfcMIBObjects  OBJECT IDENTIFIER ::= { ieee8021PFCMib 1 }
-ieee8021PfcConformance OBJECT IDENTIFIER ::= { ieee8021PFCMib 2 }
+        Copyright (C) IEEE."
+    ::= { ieee802dot1mibs 21 }
 
+ieee8021PfcMIBObjects      OBJECT IDENTIFIER ::= { ieee8021PFCMib 1 }
+ieee8021PfcConformance     OBJECT IDENTIFIER ::= { ieee8021PFCMib 2 }
 
 ieee8021PfcIfTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF Ieee8021PfcIfEntry
@@ -44,7 +73,7 @@ ieee8021PfcIfTable OBJECT-TYPE
     DESCRIPTION
        "A table of PFC information for all interfaces of a system."
     REFERENCE
-       "802.1Qbb clause 12.18"
+       "12.22.6"
     ::= { ieee8021PfcMIBObjects 1 }
 
 ieee8021PfcIfEntry OBJECT-TYPE
@@ -55,29 +84,29 @@ ieee8021PfcIfEntry OBJECT-TYPE
        "Each entry contains information about
         the PFC function on a single interface."
     REFERENCE
-       "802.1Qbb clause 12.18"
+       "12.22.6"
     AUGMENTS { ifEntry }
     ::= { ieee8021PfcIfTable 1 }
 
 Ieee8021PfcIfEntry ::= SEQUENCE {
-        ieee8021PfcLinkDelayAllowance  Unsigned32,
-        ieee8021PfcRequests            Counter32,
-        ieee8021PfcIndications         Counter32
+        ieee8021PfcLinkDelayAllowance       Unsigned32,
+        ieee8021PfcRequests                 Counter32,
+        ieee8021PfcIndications              Counter32
     }
 
-ieee8021PfcLinkDelayAllowance OBJECT-TYPE
+ieee8021PfcLinkDelayAllowance    OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The allowance made for round-trip propagation delay
-         of the link in bits.
+        of the link in bits.
 
-         The value of this object MUST be retained across
-         reinitializations of the management system."
+        The value of this object MUST be retained across
+        reinitializations of the management system."
     ::= { ieee8021PfcIfEntry 1 }
 
-ieee8021PfcRequests OBJECT-TYPE
+ieee8021PfcRequests    OBJECT-TYPE
     SYNTAX      Counter32
     UNITS       "Requests"
     MAX-ACCESS  read-only
@@ -91,7 +120,7 @@ ieee8021PfcRequests OBJECT-TYPE
          ifCounterDiscontinuityTime."
     ::= { ieee8021PfcIfEntry 2 }
 
-ieee8021PfcIndications OBJECT-TYPE
+ieee8021PfcIndications    OBJECT-TYPE
     SYNTAX      Counter32
     UNITS       "Indications"
     MAX-ACCESS  read-only
@@ -109,10 +138,10 @@ ieee8021PfcIndications OBJECT-TYPE
 -- IEEE 802.1Qbb MIB Module - Conformance Information
 -- ******************************************************************
 
-ieee8021PfcCompliances
-    OBJECT IDENTIFIER ::= { ieee8021PfcConformance 1 }
-ieee8021PfcGroups
-    OBJECT IDENTIFIER ::= { ieee8021PfcConformance 2 }
+   ieee8021PfcCompliances
+       OBJECT IDENTIFIER ::= { ieee8021PfcConformance 1 }
+   ieee8021PfcGroups
+       OBJECT IDENTIFIER ::= { ieee8021PfcConformance 2 }
 
 -- ******************************************************************
 -- Units of conformance

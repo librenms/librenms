@@ -3,20 +3,20 @@ IPFIX-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, mib-2, Unsigned32, Counter64,
     Gauge32
-        FROM SNMPv2-SMI                                -- RFC2578
+        FROM SNMPv2-SMI                              -- [RFC2578]
     TimeStamp, DateAndTime
-        FROM SNMPv2-TC                                 -- RFC2579
+        FROM SNMPv2-TC                               -- [RFC2579]
     MODULE-COMPLIANCE, OBJECT-GROUP
-        FROM SNMPv2-CONF                               -- RFC2580
+        FROM SNMPv2-CONF                             -- [RFC2580]
     InterfaceIndexOrZero
-        FROM IF-MIB                                    -- RFC2863
+        FROM IF-MIB                                  -- [RFC2863]
     InetAddressType, InetAddress, InetPortNumber
-        FROM INET-ADDRESS-MIB                          -- RFC4001
+        FROM INET-ADDRESS-MIB                        -- [RFC4001]
     PhysicalIndexOrZero
-        FROM ENTITY-MIB;                               -- RFC4133
+        FROM ENTITY-MIB;                             -- [RFC4133]
 
 ipfixMIB MODULE-IDENTITY
-    LAST-UPDATED "201004190000Z"         -- 19 April 2010
+    LAST-UPDATED "201206110000Z"         -- 11 June 2012
     ORGANIZATION "IETF IPFIX Working Group"
     CONTACT-INFO
         "WG charter:
@@ -34,16 +34,16 @@ ipfixMIB MODULE-IDENTITY
           NEC Laboratories Europe
           Network Research Division
           Kurfuersten-Anlage 36
-          69115 Heidelberg
+          Heidelberg  69115
           Germany
+
           Phone: +49 6221 4342-128
-          Email: Thomas.Dietz@nw.neclab.eu
+          Email: Thomas.Dietz@neclab.eu
 
           Atsushi Kobayashi
           NTT Information Sharing Platform Laboratories
           3-9-11 Midori-cho
-          Musashino-shi
-          180-8585
+          Musashino-shi, Tokyo  180-8585
           Japan
           Phone: +81-422-59-3978
           Email: akoba@nttv6.net
@@ -51,7 +51,7 @@ ipfixMIB MODULE-IDENTITY
           Benoit Claise
           Cisco Systems, Inc.
           De Kleetlaan 6a b1
-          Degem 1831
+          Diegem  1831
           Belgium
           Phone:  +32 2 704 5622
           Email: bclaise@cisco.com
@@ -61,18 +61,17 @@ ipfixMIB MODULE-IDENTITY
           Department of Informatics
           Chair for Network Architectures and Services (I8)
           Boltzmannstr. 3
-          85748 Garching
+          Garching  85748
           Germany
-          Phone: +49 89 289-18008
-          Email: muenz@net.in.tum.de
-          URI:   http://www.net.in.tum.de/~muenz"
+          Email: muenz@net.in.tum.de"
+
     DESCRIPTION
         "The IPFIX MIB defines managed objects for IP Flow
         Information eXport.  These objects provide information about
         managed nodes supporting the IPFIX protocol,
         for Exporters as well as for Collectors.
 
-        Copyright (c) 2010 IETF Trust and the persons identified as
+        Copyright (c) 2012 IETF Trust and the persons identified as
         authors of the code.  All rights reserved.
 
         Redistribution and use in source and binary forms, with or
@@ -84,15 +83,19 @@ ipfixMIB MODULE-IDENTITY
 
 --  Revision history
 
-     REVISION     "201004190000Z"         -- 19 April 2010
-     DESCRIPTION
+    REVISION     "201206110000Z"         -- 11 June 2012
+    DESCRIPTION
+
+        "Fixed errata from RFC 5815.  Published as RFC 6615."
+
+    REVISION     "201004190000Z"         -- 19 April 2010
+    DESCRIPTION
         "Initial version, published as RFC 5815."
 
     ::= { mib-2 193 }
 
-
 --******************************************************************
--- Top Level Structure of the MIB
+-- Top-Level Structure of the MIB
 --******************************************************************
 
 ipfixObjects     OBJECT IDENTIFIER ::= { ipfixMIB 1 }
@@ -102,7 +105,7 @@ ipfixMainObjects OBJECT IDENTIFIER ::= { ipfixObjects 1 }
 ipfixStatistics  OBJECT IDENTIFIER ::= { ipfixObjects 2 }
 
 --==================================================================
--- 1.1: Objects used by all IPFIX implementations
+-- 1.1: Objects Used by All IPFIX Implementations
 --==================================================================
 --------------------------------------------------------------------
 -- 1.1.1: Transport Session Table
@@ -131,6 +134,7 @@ IpfixTransportSessionEntry ::=
        ipfixTransportSessionIndex                  Unsigned32,
        ipfixTransportSessionProtocol               Unsigned32,
        ipfixTransportSessionSourceAddressType      InetAddressType,
+
        ipfixTransportSessionSourceAddress          InetAddress,
        ipfixTransportSessionDestinationAddressType InetAddressType,
        ipfixTransportSessionDestinationAddress     InetAddress,
@@ -165,25 +169,28 @@ ipfixTransportSessionProtocol OBJECT-TYPE
         "The transport protocol used for receiving or transmitting
         IPFIX Messages.  Protocol numbers are assigned by IANA.  A
         current list of all assignments is available from
-        <http://www.iana.org/>."
+        <http://www.iana.org/assignments/protocol-numbers/>."
     REFERENCE
-        "RFC 5101, Specification of the IP Flow
-        Information Export (IPFIX) Protocol for the Exchange of IP
-        Traffic Flow Information, Section 10."
+        "RFC 5101, Specification of the IP Flow Information Export
+        (IPFIX) Protocol for the Exchange of IP Traffic Flow
+        Information, Section 10."
     ::= { ipfixTransportSessionEntry 2 }
 
 ipfixTransportSessionSourceAddressType OBJECT-TYPE
-    SYNTAX      InetAddressType
+    SYNTAX      InetAddressType { unknown(0), ipv4(1), ipv6 (2) }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The type of address used for the source address,
-        as specified in RFC 4001.  This object is used with protocols
-        (specified in ipfixTransportSessionProtocol) like TCP (6)
-        and UDP (17) that have the notion of addresses.  SCTP (132)
-        should use the ipfixTransportSessionSctpAssocId instead.
-        If SCTP (132) or any other protocol without the notion of
-        addresses is used, the object MUST be set to unknown(0)."
+        as specified in RFC 4001.  The InetAddressType supported
+
+        values are ipv4(1) and ipv6(2).  This object is used with
+        protocols (specified in ipfixTransportSessionProtocol) like
+        TCP (6) and UDP (17) that have the notion of addresses.
+        SCTP (132) should use the ipfixTransportSessionSctpAssocId
+        instead.  If SCTP (132) or any other protocol without the
+        notion of addresses is used, the object MUST be set to
+        unknown(0)."
     ::= { ipfixTransportSessionEntry 3 }
 
 ipfixTransportSessionSourceAddress OBJECT-TYPE
@@ -193,7 +200,7 @@ ipfixTransportSessionSourceAddress OBJECT-TYPE
     DESCRIPTION
         "The source address of the Exporter of the IPFIX Transport
         Session.  This value is interpreted according to the value of
-        ipfixTransportSessionAddressType as specified in RFC 4001.
+        ipfixTransportSessionAddressType, as specified in RFC 4001.
         This object is used with protocols (specified in
         ipfixTransportSessionProtocol) like TCP (6) and UDP (17) that
         have the notion of addresses.  SCTP (132) should use the
@@ -203,17 +210,19 @@ ipfixTransportSessionSourceAddress OBJECT-TYPE
     ::= { ipfixTransportSessionEntry 4 }
 
 ipfixTransportSessionDestinationAddressType OBJECT-TYPE
-    SYNTAX      InetAddressType
+    SYNTAX      InetAddressType { unknown(0), ipv4(1), ipv6 (2) }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The type of address used for the destination address,
-        as specified in RFC 4001.  This object is used with protocols
-        (specified in ipfixTransportSessionProtocol) like TCP (6)
-        and UDP (17) that have the notion of addresses.  SCTP (132)
-        should use the ipfixTransportSessionSctpAssocId instead.
-        If SCTP (132) or any other protocol without the notion of
-        addresses is used, the object MUST be set to unknown(0)."
+        as specified in RFC 4001.  The InetAddressType supported
+        values are ipv4(1) and ipv6(2).  This object is used with
+        protocols (specified in ipfixTransportSessionProtocol) like
+        TCP (6) and UDP (17) that have the notion of addresses.
+        SCTP (132) should use the ipfixTransportSessionSctpAssocId
+        instead.  If SCTP (132) or any other protocol without the
+        notion of addresses is used, the object MUST be set to
+        unknown(0)."
     ::= { ipfixTransportSessionEntry 5 }
 
 ipfixTransportSessionDestinationAddress OBJECT-TYPE
@@ -223,6 +232,7 @@ ipfixTransportSessionDestinationAddress OBJECT-TYPE
     DESCRIPTION
         "The destination address of the Collector of the IPFIX
         Transport Session.  This value is interpreted according to
+
         the value of ipfixTransportSessionAddressType, as specified
         in RFC 4001.  This object is used with protocols
         (specified in ipfixTransportSessionProtocol) like TCP (6)
@@ -230,7 +240,7 @@ ipfixTransportSessionDestinationAddress OBJECT-TYPE
         should use the ipfixTransportSessionSctpAssocId instead.
         If SCTP (132) or any other protocol without the notion of
         addresses is used, the object MUST be set to a zero-length
-        string"
+        string."
     ::= { ipfixTransportSessionEntry 6 }
 
 ipfixTransportSessionSourcePort OBJECT-TYPE
@@ -268,6 +278,7 @@ ipfixTransportSessionDestinationPort OBJECT-TYPE
         by the ipfixTransportSessionSctpAssocId.
         If any other protocol without the notion of
         ports is used, the object MUST be set to zero."
+
     ::= { ipfixTransportSessionEntry 8 }
 
 ipfixTransportSessionSctpAssocId OBJECT-TYPE
@@ -275,7 +286,7 @@ ipfixTransportSessionSctpAssocId OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The association id used for the SCTP session between the
+        "The association ID used for the SCTP session between the
         Exporter and the Collector of the IPFIX Transport Session.
         It is equal to the sctpAssocId entry in the sctpAssocTable
         defined in the SCTP MIB.  This object is only valid if
@@ -299,12 +310,12 @@ ipfixTransportSessionDeviceMode OBJECT-TYPE
 
         exporting(1)
             This value MUST be used if the Transport Session is
-            used for exporting Records to other IPFIX Devices,
+            used for exporting Records to other IPFIX Devices;
             i.e., this device acts as Exporter.
 
         collecting(2)
             This value MUST be used if the Transport Session is
-            used for collecting Records from other IPFIX Devices,
+            used for collecting Records from other IPFIX Devices;
             i.e., this device acts as Collector."
     ::= { ipfixTransportSessionEntry 10 }
 
@@ -346,7 +357,7 @@ ipfixTransportSessionOptionsTemplateRefreshTimeout OBJECT-TYPE
         not received again within this lifetime.
 
         This object is only valid if ipfixTransportSessionProtocol
-        has the value 17 (UDP).  In all other cases the value MUST
+        has the value 17 (UDP).  In all other cases, the value MUST
         be zero."
     REFERENCE
         "RFC 5101, Specification of the IP Flow Information Export
@@ -369,7 +380,7 @@ ipfixTransportSessionTemplateRefreshPacket OBJECT-TYPE
         invalid when it is not received again within this lifetime.
 
         This object is only valid if ipfixTransportSessionProtocol
-        has the value 17 (UDP).  In all other cases the value MUST
+        has the value 17 (UDP).  In all other cases, the value MUST
         be zero."
     REFERENCE
         "RFC 5101, Specification of the IP Flow Information Export
@@ -393,7 +404,7 @@ ipfixTransportSessionOptionsTemplateRefreshPacket OBJECT-TYPE
         lifetime.
 
         This object is only valid if ipfixTransportSessionProtocol
-        has the value 17 (UDP).  In all other cases the value MUST
+        has the value 17 (UDP).  In all other cases, the value MUST
         be zero."
     REFERENCE
         "RFC 5101, Specification of the IP Flow Information Export
@@ -406,11 +417,11 @@ ipfixTransportSessionIpfixVersion OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "On Exporters the object contains the version number of the
+        "On Exporters, the object contains the version number of the
         IPFIX protocol that the Exporter uses to export its data in
         this Transport Session.
 
-        On Collectors the object contains the version number of the
+        On Collectors, the object contains the version number of the
         IPFIX protocol it receives for this Transport Session.
 
         If IPFIX Messages of different IPFIX protocol versions are
@@ -442,9 +453,9 @@ ipfixTransportSessionStatus OBJECT-TYPE
         inactive(1)
             This value MUST be used for Transport Sessions that
             are specified in the system but are not currently active.
-            The value can be used, e.g., for Transport Sessions that
-            are backup (secondary) sessions in a Transport Session
-            group.
+            The value can be used, for example, for Transport
+            Sessions that are backup (secondary) sessions in a
+            Transport Session group.
 
         active(2)
             This value MUST be used for Transport Sessions that are
@@ -467,7 +478,7 @@ ipfixTemplateTable  OBJECT-TYPE
         are received or used for exporting data for a given
         Transport Session group and Observation Domain.
 
-        Withdrawn or invalidated (Options) Template MUST be removed
+        Withdrawn or invalidated (Options) Templates MUST be removed
         from this table."
     ::= { ipfixMainObjects 2 }
 
@@ -497,11 +508,11 @@ ipfixTemplateObservationDomainId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The Id of the Observation Domain for which this Template
+        "The ID of the Observation Domain for which this Template
         is defined.  This value is used when sending IPFIX Messages.
 
         The special value of 0 indicates that the Data Records
-        exported with this (Option Template) cannot be applied to a
+        exported with this (Options Template) cannot be applied to a
         single Observation Domain."
     REFERENCE
         "RFC 5101, Specification of the IP Flow Information Export
@@ -514,9 +525,9 @@ ipfixTemplateId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "This number indicates the Template Id in the IPFIX
+        "This number indicates the Template ID in the IPFIX
         Message.  Values from 0 to 255 are not allowed for Template
-        Ids."
+        IDs."
     REFERENCE
         "RFC 5101, Specification of the IP Flow Information Export
         (IPFIX) Protocol for the Exchange of IP Traffic Flow
@@ -528,8 +539,8 @@ ipfixTemplateSetId OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This number indicates the Set Id of the Template.  This
-        object allows to easily retrieve the Template type.
+        "This number indicates the Set ID of the Template.  This
+        object allows the Template type to be easily retrieved.
 
         Currently, there are two values defined.  The value 2 is
         used for Sets containing Template definitions.  The value 3
@@ -553,11 +564,11 @@ ipfixTemplateAccessTime OBJECT-TYPE
         time is used to know when a retransmission of the
         (Options) Template is needed.
 
-        If it is in collecting mode, this object contains the
-        time when this (Options) Template was last received from
-        the Exporter.  In the specific case of UDP as transport
-        protocol, this time is used to know when this (Options)
-        Template times out and thus is no longer valid."
+        If the Transport Session is in collecting mode, this object
+        contains the time when this (Options) Template was last
+        received from the Exporter.  In the specific case of UDP as
+        transport protocol, this time is used to know when this
+        (Options) Template times out and thus is no longer valid."
     ::= { ipfixTemplateEntry 4 }
 
 --------------------------------------------------------------------
@@ -597,6 +608,7 @@ IpfixTemplateDefinitionEntry ::=
     SEQUENCE {
         ipfixTemplateDefinitionIndex            Unsigned32,
         ipfixTemplateDefinitionIeId             Unsigned32,
+
         ipfixTemplateDefinitionIeLength         Unsigned32,
         ipfixTemplateDefinitionEnterpriseNumber Unsigned32,
         ipfixTemplateDefinitionFlags            BITS
@@ -624,12 +636,12 @@ ipfixTemplateDefinitionIeId OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "This indicates the Information Element Id at position
+        "This indicates the Information Element ID at position
         ipfixTemplateDefinitionIndex in the (Options) Template
         ipfixTemplateId.  This implicitly specifies the data type
         of the Information Element.  The elements are registered
         at IANA.  A current list of assignments can be found at
-        <http://www.iana.org/assignments/ipfix>"
+        <http://www.iana.org/assignments/ipfix/>."
     REFERENCE
         "RFC 5101, Specification of the IP Flow Information Export
         (IPFIX) Protocol for the Exchange of IP Traffic Flow
@@ -642,8 +654,9 @@ ipfixTemplateDefinitionIeLength OBJECT-TYPE
     SYNTAX      Unsigned32 (0..65535)
     MAX-ACCESS  read-only
     STATUS      current
+
     DESCRIPTION
-        "This indicates the length of the Information Element Id at
+        "This indicates the length of the Information Element ID at
         position ipfixTemplateDefinitionIndex in the (Options)
         Template ipfixTemplateId."
     REFERENCE
@@ -668,7 +681,7 @@ ipfixTemplateDefinitionEnterpriseNumber OBJECT-TYPE
         This object must be zero(0) for all standard Information
         Elements registered with IANA.  A current list of these
         elements is available from
-        <http://www.iana.org/assignments/ipfix/ipfix.xhtml>."
+        <http://www.iana.org/assignments/ipfix/>."
     REFERENCE
         "RFC 5101, Specification of the IP Flow Information Export
         (IPFIX) Protocol for the Exchange of IP Traffic Flow
@@ -696,7 +709,7 @@ ipfixTemplateDefinitionFlags OBJECT-TYPE
 
         Thus, we get the following values for an Information Element:
 
-        If neither bit scope(0) nor bit flowKey(1) are set
+        If neither bit scope(0) nor bit flowKey(1) is set
             The Information Element is neither used for scoping nor
             as Flow Key.
         If only bit scope(0) is set
@@ -707,8 +720,8 @@ ipfixTemplateDefinitionFlags OBJECT-TYPE
         Both bit scope(0) and flowKey(1) MUST NOT be set at the same
         time.  This combination is not allowed."
     REFERENCE
-        "RFC 5101, Specification of the IP Flow Information
-        Export (IPFIX) Protocol for the Exchange of IP Traffic Flow
+        "RFC 5101, Specification of the IP Flow Information Export
+        (IPFIX) Protocol for the Exchange of IP Traffic Flow
         Information, Sections 2 and 3.4.2.1.
 
         RFC 5102, Information Model for IP Flow Information Export."
@@ -722,9 +735,10 @@ ipfixExportTable  OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "This table lists all exports of an IPFIX device.
+        "This table lists all exports of an IPFIX Device.
+
         On Exporters, this table contains all exports grouped by
-        Transport Session, Observation Domain Id, Template Id, and
+        Transport Session, Observation Domain ID, Template ID, and
         Metering Process represented by the
         ipfixMeteringProcessCacheId.  Thanks to the ipfixExportIndex,
         the exports can group one or more Transport Sessions to
@@ -734,10 +748,11 @@ ipfixExportTable  OBJECT-TYPE
         and ipfixMeteringProcessCacheId define a Transport
         Session group.  If the Exporter does not use Transport
         Session grouping, then each ipfixExportIndex contains a
-        single ipfixMeteringProcessCacheId and thus a singe
-        Transport Session, and this session MUST have the member
-        type primary(1).  Transport Sessions referenced in this
-        table MUST have the ipfixTransportSessionDeviceMode
+        single ipfixMeteringProcessCacheId, and thus a single
+        Transport Session; this session MUST have a member type
+
+        value of primary(1).  Transport Sessions referenced in this
+        table MUST have a ipfixTransportSessionDeviceMode value of
         exporting(1).
 
         On Collectors, this table is not needed."
@@ -771,8 +786,9 @@ ipfixExportIndex OBJECT-TYPE
         the ipfixExportTable.  The value is expected
         to remain constant from a re-initialization of the entity's
         network management agent to the next re-initialization.
+
         A common ipfixExportIndex between two entries from this
-        table expresses that there is a relationship between the
+        table indicates that there is a relationship between the
         Transport Sessions in ipfixTransportSessionIndex.  The type
         of relationship is expressed by the value of
         ipfixExportMemberType."
@@ -783,13 +799,14 @@ ipfixExportMemberType OBJECT-TYPE
                     unknown(0),
                     primary(1),
                     secondary(2),
+
                     parallel(3),
                     loadBalancing(4)
                 }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The type of a member Transport Session in a Transport
+        "The type of member Transport Session in a Transport
         Session group (identified by the value of ipfixExportIndex,
         ipfixObservationDomainId, and ipfixMeteringProcessCacheId).
         The following values are valid:
@@ -818,10 +835,10 @@ ipfixExportMemberType OBJECT-TYPE
 
         parallel(3)
             This value is used for a group member that is used for
-            duplicate exporting, i.e., all group members identified
+            duplicate exporting (i.e., all group members identified
             by the ipfixExportIndex are exporting the same Records
-            in parallel.  This implies that all group members MUST
-            have the same membertype parallel(3).
+            in parallel).  This implies that all group members MUST
+            have the same member type (i.e., parallel(3)).
 
         loadBalancing(4)
             This value is used for a group member that is used
@@ -829,7 +846,7 @@ ipfixExportMemberType OBJECT-TYPE
             Record is sent to one of the group members in this
             group identified by ipfixExportIndex.
             This implies that all group members MUST have the same
-            membertype loadBalancing(4)."
+            member type (i.e., loadBalancing(4))."
     ::= { ipfixExportEntry 2 }
 
 --------------------------------------------------------------------
@@ -864,7 +881,7 @@ IpfixMeteringProcessEntry ::=
         ipfixMeteringProcessCacheId              Unsigned32,
         ipfixMeteringProcessObservationPointGroupRef Unsigned32,
         ipfixMeteringProcessCacheActiveTimeout   Unsigned32,
-        ipfixMeteringProcessCacheInactiveTimeout Unsigned32
+        ipfixMeteringProcessCacheIdleTimeout Unsigned32
     }
 
 ipfixMeteringProcessCacheId OBJECT-TYPE
@@ -873,7 +890,7 @@ ipfixMeteringProcessCacheId OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Locally arbitrary, but unique identifier of an entry in the
-        ipfixMeterinProcessTable.  The value is expected to remain
+        ipfixMeteringProcessTable.  The value is expected to remain
         constant from a re-initialization of the entity's network
         management agent to the next re-initialization."
     ::= { ipfixMeteringProcessEntry 1 }
@@ -883,7 +900,7 @@ ipfixMeteringProcessObservationPointGroupRef OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The Observation Point Group Id that links this table entry
+        "The Observation Point Group ID that links this table entry
         to the ipfixObservationPointTable.  The matching
         ipfixObservationPointGroupId in that table gives the
         Observation Points used in that cache.  If the Observation
@@ -898,7 +915,7 @@ ipfixMeteringProcessCacheActiveTimeout OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "On the Exporter, this object contains the time after which a
-        Flow is expired (and a Data Record for the template is sent)
+        Flow is expired (and a Data Record for the Template is sent),
         even though packets matching this Flow are still received by
         the Metering Process.  If this value is 0, the Flow is not
         prematurely expired."
@@ -907,17 +924,17 @@ ipfixMeteringProcessCacheActiveTimeout OBJECT-TYPE
         Section 5.1.1, item 3."
     ::= { ipfixMeteringProcessEntry 3 }
 
-ipfixMeteringProcessCacheInactiveTimeout OBJECT-TYPE
+ipfixMeteringProcessCacheIdleTimeout OBJECT-TYPE
     SYNTAX      Unsigned32
     UNITS       "seconds"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "On the Exporter. this object contains the time after which a
-        Flow is expired (and a Data Record for the template is sent)
+        "On the Exporter, this object contains the time after which a
+        Flow is expired (and a Data Record for the Template is sent)
         when no packets matching this Flow are received by the
         Metering Process for the given number of seconds.  If this
-        value is zero, the Flow is expired immediately, i.e., a Data
+        value is zero, the Flow is expired immediately; i.e., a Data
         Record is sent for every packet received by the Metering
         Process."
     REFERENCE
@@ -934,11 +951,11 @@ ipfixObservationPointTable  OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "This table lists the Observation Points used within an
-        Exporter by the Metering Process. The index
+        Exporter by the Metering Process.  The index
         ipfixObservationPointGroupId groups Observation Points
         and is referenced in the Metering Process table.
 
-        On Collectors this table is not needed."
+        On Collectors, this table is not needed."
     ::= { ipfixMainObjects 6 }
 
 ipfixObservationPointEntry OBJECT-TYPE
@@ -976,11 +993,10 @@ ipfixObservationPointGroupId OBJECT-TYPE
         This index represents a group of Observation Points.
 
         The special value of 0 MUST NOT be used within this table
-        but is reserved for the usage in the
-        ipfixMeteringProcessTable.  An index of 0 for the
-        ipfixObservationPointGroupReference index in that table
-        indicates that an Observation Point is unknown or
-        unspecified for a Metering Process cache."
+        but is reserved for usage in the ipfixMeteringProcessTable.
+        An index of 0 for the ipfixObservationPointGroupReference
+        index in that table indicates that an Observation Point is
+        unknown or unspecified for a Metering Process cache."
     ::= { ipfixObservationPointEntry 1 }
 
 ipfixObservationPointIndex OBJECT-TYPE
@@ -1002,7 +1018,7 @@ ipfixObservationPointObservationDomainId OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The Id of the Observation Domain in which this
+        "The ID of the Observation Domain in which this
         Observation Point is included.
 
         The special value of 0 indicates that the Observation
@@ -1010,8 +1026,8 @@ ipfixObservationPointObservationDomainId OBJECT-TYPE
         Observation Domain."
     REFERENCE
         "RFC 5101, Specification of the IP Flow Information Export
-        (IPFIX) Protocol for the Exchange of IP
-        Traffic Flow Information, Section 3.1."
+        (IPFIX) Protocol for the Exchange of IP Traffic Flow
+        Information, Section 3.1."
     ::= { ipfixObservationPointEntry 3 }
 
 ipfixObservationPointPhysicalEntity OBJECT-TYPE
@@ -1022,6 +1038,7 @@ ipfixObservationPointPhysicalEntity OBJECT-TYPE
         "This object contains the index of a physical entity in
         the ENTITY MIB.  This physical entity is the given
         Observation Point.  If such a physical entity cannot be
+
         specified or is not known, then the object is zero."
     ::= { ipfixObservationPointEntry 4 }
 
@@ -1031,16 +1048,17 @@ ipfixObservationPointPhysicalInterface OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "This object contains the index of a physical interface in
-        the IF MIB.  This physical interface is the given
+        the Interfaces MIB.  This physical interface is the given
         Observation Point.  If such a physical interface cannot be
         specified or is not known, then the object is zero.
 
-        This object MAY be used stand alone or in addition to
+        This object MAY be used alone or in addition to
         ipfixObservationPointPhysicalEntity.  If
-        ipfixObservationPointPhysicalEntity is not zero, this object
-        MUST point to the same physical interface that is
+        ipfixObservationPointPhysicalEntity is not zero, this
+        object MUST point to the same physical interface that is
         referenced in ipfixObservationPointPhysicalEntity.
-        Otherwise, it may reference any interface in the IF MIB."
+        Otherwise, it may reference any interface in the
+        Interfaces MIB."
     ::= { ipfixObservationPointEntry 5 }
 
 ipfixObservationPointPhysicalEntityDirection OBJECT-TYPE
@@ -1057,8 +1075,8 @@ ipfixObservationPointPhysicalEntityDirection OBJECT-TYPE
         physical entity.  The following values are valid:
 
         unknown(0)
-            This value MUST be used if a direction is not
-            known for the given physical entity.
+            This value MUST be used if a direction is not known for
+            the given physical entity.
 
         ingress(1)
             This value is used for monitoring incoming Flows on the
@@ -1069,6 +1087,7 @@ ipfixObservationPointPhysicalEntityDirection OBJECT-TYPE
             given physical entity.
 
         both(3)
+
             This value is used for monitoring incoming and outgoing
             Flows on the given physical entity."
     ::= { ipfixObservationPointEntry 6 }
@@ -1087,17 +1106,18 @@ ipfixSelectionProcessTable OBJECT-TYPE
         by the ipfixSelectionProcessIndex.  The Selector Functions
         are applied within the Selection Process to the packets
         observed for the given Metering Process cache in increasing
-        order implied by the ipfixSelectionProcessSelectorIndex.
-        This means Selector Functions with lower
-        ipfixSelectionProcessSelectorIndex are applied first.  The
-        remaining packets are accounted for in Flow Records.
+        order as indicated by the ipfixSelectionProcessSelectorIndex.
+        This means Selector Functions with a lower
+        ipfixSelectionProcessSelectorIndex are applied first.
+        The remaining packets are accounted for in Flow Records.
+
         Since IPFIX does not define any Selector Function (except
         selecting every packet), this is a placeholder for future
         use and a guideline for implementing enterprise-specific
         Selector Function objects.
 
-        The following object tree should visualize how the
-        Selector Function objects should be implemented:
+        The following object tree should help the reader visualize
+        how the Selector Function objects should be implemented:
 
         ipfixSelectorFunctions
         |
@@ -1112,7 +1132,7 @@ ipfixSelectionProcessTable OBJECT-TYPE
         |  +- ipfixFuncF2Parameters (a table with parameters)
         ...
         |
-        +- ipfixFunFn...
+        +- ipfixFuncFn...
 
         If a Selector Function takes parameters, the MIB should
         contain a table with an entry for each set of parameters
@@ -1155,11 +1175,11 @@ ipfixSelectionProcessSelectorIndex OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Index specifying the order in which the referenced
-        ipfixSelctionProcessSelectorFunctions are applied to the
+        ipfixSelectionProcessSelectorFunctions are applied to the
         observed packet stream within the given Selection Process
         (identified by the ipfixSelectionProcessIndex).  The
-        Selector Functions are applied in increasing order, i.e.,
-        Selector Functions with lower index are applied first."
+        Selector Functions are applied in increasing order; i.e.,
+        Selector Functions with a lower index are applied first."
     ::= { ipfixSelectionProcessEntry 2 }
 
 ipfixSelectionProcessSelectorFunction OBJECT-TYPE
@@ -1189,7 +1209,7 @@ ipfixTransportSessionStatsTable  OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "This table lists Transport Sessions statistics between
+        "This table lists Transport Session statistics between
         Exporting Processes and Collecting Processes."
     ::= { ipfixStatistics 1 }
 
@@ -1210,6 +1230,7 @@ IpfixTransportSessionStatsEntry ::=
         ipfixTransportSessionMessages          Counter64,
         ipfixTransportSessionDiscardedMessages Counter64,
         ipfixTransportSessionRecords           Counter64,
+
         ipfixTransportSessionTemplates         Counter64,
         ipfixTransportSessionOptionsTemplates  Counter64,
         ipfixTransportSessionDiscontinuityTime TimeStamp
@@ -1224,7 +1245,7 @@ ipfixTransportSessionRate OBJECT-TYPE
         "The number of bytes per second received by the
         Collector or transmitted by the Exporter.  A
         value of zero (0) means that no packets were sent or
-        received, yet.  This object is updated every second."
+        received yet.  This object is updated every second."
     ::= { ipfixTransportSessionStatsEntry 1 }
 
 ipfixTransportSessionPackets OBJECT-TYPE
@@ -1258,6 +1279,7 @@ ipfixTransportSessionBytes OBJECT-TYPE
 ipfixTransportSessionMessages OBJECT-TYPE
     SYNTAX      Counter64
     MAX-ACCESS  read-only
+
     STATUS      current
     DESCRIPTION
         "The number of IPFIX Messages received by the
@@ -1273,13 +1295,13 @@ ipfixTransportSessionDiscardedMessages OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The number of received IPFIX Message that are malformed,
+        "The number of received IPFIX Messages that are malformed,
         cannot be decoded, are received in the wrong order, or are
         missing according to the sequence number.
 
         If used at the Exporter, the number of messages that could
-        not be sent due to, e.g., internal buffer overflows, network
-        congestion, or routing issues.
+        not be sent due to, for example, internal buffer overflows,
+        network congestion, or routing issues.
         Discontinuities in the value of this counter can occur at
         re-initialization of the management system and at other
         times as indicated by the value of
@@ -1306,6 +1328,7 @@ ipfixTransportSessionTemplates OBJECT-TYPE
     DESCRIPTION
         "The number of Templates received or transmitted.
         Discontinuities in the value of this counter can occur at
+
         re-initialization of the management system and at other
         times as indicated by the value of
         ipfixTransportSessionDiscontinuityTime."
@@ -1324,14 +1347,14 @@ ipfixTransportSessionOptionsTemplates OBJECT-TYPE
     ::= { ipfixTransportSessionStatsEntry 8 }
 
 ipfixTransportSessionDiscontinuityTime OBJECT-TYPE
-    SYNTAX       TimeStamp
-    MAX-ACCESS   read-only
-    STATUS       current
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
     DESCRIPTION
         "The value of sysUpTime at the most recent occasion at which
         one or more of the Transport Session counters suffered a
         discontinuity.
-        A value of zero indicates no such discontinuity has
+        A value of zero indicates that no such discontinuity has
         occurred since the last re-initialization of the local
         management subsystem."
     ::= { ipfixTransportSessionStatsEntry 9 }
@@ -1353,6 +1376,7 @@ ipfixTemplateStatsEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Defines an entry in the ipfixTemplateStatsTable."
+
     AUGMENTS    { ipfixTemplateEntry }
     ::= { ipfixTemplateStatsTable 1 }
 
@@ -1370,19 +1394,19 @@ ipfixTemplateDataRecords OBJECT-TYPE
         "The number of Data Records that are transmitted or received
         per Template.
         Discontinuities in the value of this counter can occur at
-        re-initialization of the management system, and at other
+        re-initialization of the management system and at other
         times as indicated by the value of
         ipfixTemplateDiscontinuityTime."
     ::= { ipfixTemplateStatsEntry 1 }
 
 ipfixTemplateDiscontinuityTime OBJECT-TYPE
-    SYNTAX       TimeStamp
-    MAX-ACCESS   read-only
-    STATUS       current
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
     DESCRIPTION
         "The value of sysUpTime at the most recent occasion at which
         the Template counter suffered a discontinuity.
-        A value of zero indicates no such discontinuity has
+        A value of zero indicates that no such discontinuity has
         occurred since the last re-initialization of the local
         management subsystem."
     ::= { ipfixTemplateStatsEntry 2 }
@@ -1395,7 +1419,7 @@ ipfixMeteringProcessStatsTable  OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "This table lists statistic objects that have data per
+        "This table lists statistics objects that have data per
         Metering Process cache.
 
         On Collectors, this table is not needed."
@@ -1443,17 +1467,18 @@ ipfixMeteringProcessCacheDataRecords OBJECT-TYPE
         Discontinuities in the value of this counter can occur at
         re-initialization of the management system and at other
         times as indicated by the value of
-        ipfixTemplateDiscontinuityTime."
+        ipfixMeteringProcessCacheDiscontinuityTime."
     ::= { ipfixMeteringProcessStatsEntry 3 }
 
 ipfixMeteringProcessCacheDiscontinuityTime OBJECT-TYPE
-    SYNTAX       TimeStamp
-    MAX-ACCESS   read-only
-    STATUS       current
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+
+    STATUS      current
     DESCRIPTION
         "The value of sysUpTime at the most recent occasion at which
         the Metering Process counter suffered a discontinuity.
-        A value of zero indicates no such discontinuity has
+        A value of zero indicates that no such discontinuity has
         occurred since the last re-initialization of the local
         management subsystem."
     ::= { ipfixMeteringProcessStatsEntry 4 }
@@ -1467,7 +1492,7 @@ ipfixSelectionProcessStatsTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "This table contains statistics for the Selector Functions
-        connected to Metering Process by the index
+        connected to a Metering Process by the index
         ipfixMeteringProcessCacheId.
 
         The indexes MUST match an entry in the
@@ -1497,6 +1522,7 @@ ipfixSelectionProcessStatsPacketsObserved OBJECT-TYPE
         "The number of packets observed at the entry point of the
         function.  The entry point may be the Observation Point or
         the exit point of another Selector Function.
+
         Discontinuities in the value of this counter can occur at
         re-initialization of the management system and at other
         times as indicated by the value of
@@ -1516,14 +1542,14 @@ ipfixSelectionProcessStatsPacketsDropped OBJECT-TYPE
     ::= { ipfixSelectionProcessStatsEntry 2 }
 
 ipfixSelectionProcessStatsDiscontinuityTime OBJECT-TYPE
-    SYNTAX       TimeStamp
-    MAX-ACCESS   read-only
-    STATUS       current
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
     DESCRIPTION
         "The value of sysUpTime at the most recent occasion at which
         one or more of the Selector counters suffered a
         discontinuity.
-        A value of zero indicates no such discontinuity has
+        A value of zero indicates that no such discontinuity has
         occurred since the last re-initialization of the local
         management subsystem."
     ::= { ipfixSelectionProcessStatsEntry 3 }
@@ -1541,17 +1567,17 @@ ipfixCollectorCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION
         "An implementation that builds an IPFIX Collector
-        that complies to this module MUST implement the objects
+        that complies with this module MUST implement the objects
         defined in the mandatory group ipfixCommonGroup.
 
         The implementation of all objects in the other groups is
         optional and depends on the corresponding functionality
         implemented in the equipment.
 
-        An implementation that is compliant to this MIB module
-        is limited to use only the values TCP (6), UDP (17), and
+        An implementation that is compliant with this MIB module
+        is limited to using only the values TCP (6), UDP (17), and
         SCTP (132) in the ipfixTransportSessionProtocol object
-        because these are the only protocol currently specified
+        because these are the only protocols currently specified
         for usage within IPFIX (see RFC 5101)."
     MODULE  -- this module
     MANDATORY-GROUPS {
@@ -1565,10 +1591,10 @@ ipfixCollectorCompliance MODULE-COMPLIANCE
     ::= { ipfixCompliances 1 }
 
 ipfixExporterCompliance MODULE-COMPLIANCE
-    STATUS  current
+    STATUS      current
     DESCRIPTION
         "An implementation that builds an IPFIX Exporter that
-        complies to this module MUST implement the objects defined
+        complies with this module MUST implement the objects defined
         in the mandatory group ipfixCommonGroup.  The implementation
         of all other objects depends on the implementation of the
         corresponding functionality in the equipment."
@@ -1585,8 +1611,8 @@ ipfixExporterCompliance MODULE-COMPLIANCE
 
     GROUP ipfixExporterStatsGroup
     DESCRIPTION
-        "These objects MUST be implemented if statistical functions
-        are implemented on the equipment."
+        "These objects MUST be implemented if statistics functions
+        are implemented in the equipment."
     ::= { ipfixCompliances 2 }
 
 --------------------------------------------------------------------
@@ -1637,6 +1663,7 @@ ipfixCommonStatsGroup OBJECT-GROUP
 
         ipfixTemplateDataRecords,
         ipfixTemplateDiscontinuityTime
+
     }
     STATUS      current
     DESCRIPTION
@@ -1649,7 +1676,7 @@ ipfixExporterGroup OBJECT-GROUP
 
         ipfixMeteringProcessObservationPointGroupRef,
         ipfixMeteringProcessCacheActiveTimeout,
-        ipfixMeteringProcessCacheInactiveTimeout,
+        ipfixMeteringProcessCacheIdleTimeout,
 
         ipfixObservationPointObservationDomainId,
         ipfixObservationPointPhysicalEntity,
@@ -1680,4 +1707,3 @@ ipfixExporterStatsGroup OBJECT-GROUP
     ::= { ipfixGroups 4 }
 
 END
-

@@ -136,6 +136,7 @@ pimBsrCandidateRPGroupPrefixLength OBJECT-TYPE
             pimBsrCandidateRPGroupAddress, identifies a group prefix
             for which the local router will advertise itself as a
             Candidate-RP.  The InetAddressType is given by the
+
             pimBsrCandidateRPAddressType object."
     ::= { pimBsrCandidateRPEntry 4 }
 
@@ -184,6 +185,7 @@ pimBsrCandidateRPAdvInterval OBJECT-TYPE
 
     REFERENCE "RFC 5059, sections 3.2 and 5"
     DEFVAL { 60 }
+
     ::= { pimBsrCandidateRPEntry 8 }
 
 pimBsrCandidateRPHoldtime OBJECT-TYPE
@@ -219,7 +221,6 @@ pimBsrCandidateRPStatus OBJECT-TYPE
 
     ::= { pimBsrCandidateRPEntry 10 }
 
-
 pimBsrCandidateRPStorageType OBJECT-TYPE
     SYNTAX     StorageType
     MAX-ACCESS read-create
@@ -232,6 +233,7 @@ pimBsrCandidateRPStorageType OBJECT-TYPE
    ::= { pimBsrCandidateRPEntry 11 }
 
 --
+
 -- The BSR Elected BSR RP-Set Table
 --
 
@@ -280,6 +282,7 @@ pimBsrElectedBSRGrpMappingAddrType OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
+
             "The Inet address type of the IP multicast group
             prefix."
     ::= { pimBsrElectedBSRRPSetEntry 2 }
@@ -328,6 +331,7 @@ pimBsrElectedBSRGrpMappingRPAddr OBJECT-TYPE
     ::= { pimBsrElectedBSRRPSetEntry 5 }
 
 pimBsrElectedBSRRPSetPriority OBJECT-TYPE
+
     SYNTAX     Unsigned32 (0..255)
     MAX-ACCESS read-only
     STATUS     current
@@ -376,6 +380,7 @@ pimBsrCandidateBSRTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF PimBsrCandidateBSREntry
     MAX-ACCESS not-accessible
     STATUS     current
+
     DESCRIPTION
             "The (conceptual) table containing Candidate-BSR
             configuration for the local router.  The table contains
@@ -424,6 +429,7 @@ pimBsrCandidateBSRZoneIndex OBJECT-TYPE
 
 pimBsrCandidateBSRAddressType OBJECT-TYPE
     SYNTAX     InetAddressType
+
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
@@ -449,7 +455,7 @@ pimBsrCandidateBSRPriority OBJECT-TYPE
             "The priority value for the local router as a
             Candidate-BSR for this zone.  Numerically higher
             values for this object indicate higher priorities."
-    DEFVAL { 64 }
+    DEFVAL { 0 }
     ::= { pimBsrCandidateBSREntry 4 }
 
 pimBsrCandidateBSRHashMaskLength OBJECT-TYPE
@@ -472,6 +478,7 @@ pimBsrCandidateBSRElectedBSR OBJECT-TYPE
     DESCRIPTION
             "Whether the local router is the elected BSR for this
             zone."
+
     ::= { pimBsrCandidateBSREntry 6 }
 
 pimBsrCandidateBSRBootstrapTimer OBJECT-TYPE
@@ -520,6 +527,7 @@ pimBsrElectedBSRTable OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
+
             "The (conceptual) table containing information about
             elected BSRs.  The table contains one row for each
             zone for which there is an elected BSR."
@@ -617,6 +625,7 @@ pimBsrElectedBSRLostElection   NOTIFICATION-TYPE
               pimBsrElectedBSRPriority }
     STATUS     current
     DESCRIPTION
+
             "A pimBsrElectedBSRLostElection notification should be
             generated when current E-BSR lost election to a new
             Candidate-BSR.  Only an E-BSR should generate this
@@ -665,6 +674,7 @@ pimBsrCompliance MODULE-COMPLIANCE
 --
 
 pimBsrObjectGroup OBJECT-GROUP
+
     OBJECTS { pimBsrCandidateRPBidir,
               pimBsrCandidateRPAdvTimer,
               pimBsrCandidateRPPriority,
