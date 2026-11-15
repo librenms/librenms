@@ -8,13 +8,12 @@ use App\Models\Poller;
 use App\Models\PollerCluster;
 use App\Models\PollerClusterStat;
 use App\Models\PollerGroup;
-use App\Queue\QueueStatus;
-use App\Queue\WorkerNode;
 use App\View\SettingPresenter;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Gate;
 
 class PollerController extends Controller
 {
@@ -85,48 +84,11 @@ class PollerController extends Controller
     {
         $since_last_poll = (int) Carbon::parse($last)->diffInSeconds(null, true);
 
-        $rowClass = $this->checkTimeSinceLastPoll($since_last_poll);
-        $poller->row_class = $rowClass;
+        $poller->row_class = $this->checkTimeSinceLastPoll($since_last_poll);
         $poller->long_not_polled = $since_last_poll > ($this->rrdstep * 2);
 
-        if ($poller instanceof PollerCluster) {
-            $primaryStat = $poller->stats->firstWhere('poller_type', 'poller') ?? $poller->stats->first();
-            $otherStats = $primaryStat
-                ? $poller->stats->filter(fn (PollerClusterStat $s): bool => $s->id !== $primaryStat->id)->values()
-                : new Collection();
-
-            $poller->stats->each(function (PollerClusterStat $stat): void {
-                $statMax = (int) $stat->frequency * (int) $stat->workers;
-                $statPct = $statMax > 0 ? (int) round(((float) $stat->worker_seconds / $statMax) * 100) : 0;
-
-                $stat->setAttribute('max_seconds', $statMax);
-                $stat->setAttribute('util_pct', $statPct);
-                $stat->setAttribute('bar_class', $statPct > 100 ? 'progress-bar-warning' : 'progress-bar-success');
-                $stat->setAttribute('progress_width', min(100, max(1, $statPct)));
-            });
-
-            $maxSeconds = $primaryStat ? ((int) $primaryStat->frequency * (int) $primaryStat->workers) : 0;
-            $consumedSeconds = $primaryStat ? (float) $primaryStat->worker_seconds : 0.0;
-            $utilPct = $maxSeconds > 0 ? (int) round(($consumedSeconds / $maxSeconds) * 100) : 0;
-
-            if ($rowClass === 'success' && $maxSeconds > 0 && $consumedSeconds > $maxSeconds) {
-                $rowClass = 'warning';
-                $poller->setAttribute('row_class', $rowClass);
-            }
-
-            $isDown = $rowClass === 'danger';
-            $isWarning = ! $isDown && ($rowClass === 'warning' || $utilPct > 100);
-
-            $poller->setAttribute('primary_stat', $primaryStat);
-            $poller->setAttribute('other_stats', $otherStats);
-            $poller->setAttribute('max_seconds', $maxSeconds);
-            $poller->setAttribute('util_pct', $utilPct);
-            $poller->setAttribute('is_down', $isDown);
-            $poller->setAttribute('is_warning', $isWarning);
-            $poller->setAttribute('dot_class', $isDown ? 'text-danger' : ($isWarning ? 'text-warning' : 'text-success'));
-            $poller->setAttribute('bar_class', $isDown ? 'progress-bar-danger' : ($isWarning ? 'progress-bar-warning' : 'progress-bar-success'));
-            $poller->setAttribute('progress_width', min(100, max(2, $utilPct)));
-            $poller->setAttribute('show_queue_link', $poller->poller_version == WorkerNode::VERSION && QueueStatus::showPages());
+        if ($poller instanceof PollerCluster && $poller->row_class === 'success' && $poller->primaryStat()?->isOverloaded()) {
+            $poller->row_class = 'warning';
         }
 
         return $poller;
@@ -147,23 +109,30 @@ class PollerController extends Controller
      */
     private function clusterSummary(Collection $pollerCluster): array
     {
+        $totalNodes = $pollerCluster->count();
         $healthyNodes = $pollerCluster->where('row_class', 'success')->count();
-        $warningNodes = $pollerCluster->where('row_class', 'warning')->count();
-        $dangerNodes = $pollerCluster->where('row_class', 'danger')->count();
-        $anyDeletable = $pollerCluster->contains(fn ($p): bool => (bool) $p->long_not_polled);
+        $anyDeletable = $pollerCluster->contains(fn ($p): bool => (bool) $p->long_not_polled && Gate::allows('delete', $p));
 
         return [
-            'total_nodes' => $pollerCluster->count(),
+            'total_nodes' => $totalNodes,
             'healthy_nodes' => $healthyNodes,
-            'unhealthy_nodes' => $warningNodes + $dangerNodes,
+            'unhealthy_nodes' => $totalNodes - $healthyNodes,
             'any_deletable' => $anyDeletable,
             'total_cols' => $anyDeletable ? 11 : 10,
-            'all_pollers_meta' => $pollerCluster->map(fn ($p): array => [
-                'name' => (string) $p->poller_name,
-                'nodeId' => (string) $p->node_id,
-                'rowClass' => (string) $p->row_class,
-            ])->values(),
+            'all_pollers_meta' => $this->pollersMeta($pollerCluster),
         ];
+    }
+
+    /**
+     * @return Collection<int, array<string, string>>
+     */
+    private function pollersMeta(Collection $pollers): Collection
+    {
+        return $pollers->map(fn ($p): array => [
+            'name' => (string) $p->poller_name,
+            'nodeId' => (string) $p->node_id,
+            'rowClass' => (string) $p->row_class,
+        ])->values();
     }
 
     private function clusterGroups(Collection $pollerCluster): Collection
@@ -198,27 +167,19 @@ class PollerController extends Controller
         foreach ($grouped as $gid => $groupPollers) {
             $groupModel = $groups->get($gid);
             $grpPollers = new Collection($groupPollers);
-            $grpWorkers = $grpPollers->sum(fn ($p): int => (int) ($p->stats->firstWhere('poller_type', 'poller')?->workers ?? 0));
-            $grpConsumed = $grpPollers->sum(fn ($p): float => (float) ($p->stats->firstWhere('poller_type', 'poller')?->worker_seconds ?? 0));
-            $grpMax = $grpPollers->sum(function ($p): int {
-                $s = $p->stats->firstWhere('poller_type', 'poller');
-
-                return $s ? ((int) $s->frequency * (int) $s->workers) : 0;
-            });
-            $grpLoadPct = $grpMax > 0 ? (int) round(($grpConsumed / $grpMax) * 100) : 0;
+            $pollerStats = $grpPollers
+                ->map(fn (PollerCluster $p): ?PollerClusterStat => $p->stats->firstWhere('poller_type', 'poller'))
+                ->filter();
+            $grpMax = $pollerStats->sum(fn (PollerClusterStat $s): int => $s->maxSeconds());
+            $grpConsumed = $pollerStats->sum(fn (PollerClusterStat $s): float => (float) $s->worker_seconds);
 
             $result->push([
                 'id' => (int) $gid,
                 'group_name' => $gid === 0 ? __('General') : ($groupModel ? $groupModel->group_name : __('Group') . ' #' . $gid),
                 'devices_count' => $gid === 0 ? $ungroupedCount : ($groupModel ? (int) $groupModel->devices_count : 0),
-                'workers' => $grpWorkers,
-                'load_pct' => $grpLoadPct,
-                'load_label_class' => $grpLoadPct > 100 ? 'label-warning' : 'label-default',
-                'pollers_meta' => $grpPollers->map(fn ($p): array => [
-                    'name' => (string) $p->poller_name,
-                    'nodeId' => (string) $p->node_id,
-                    'rowClass' => (string) $p->row_class,
-                ])->values(),
+                'workers' => $pollerStats->sum('workers'),
+                'load_pct' => $grpMax > 0 ? (int) round(($grpConsumed / $grpMax) * 100) : 0,
+                'pollers_meta' => $this->pollersMeta($grpPollers),
                 'pollers' => $grpPollers,
             ]);
         }

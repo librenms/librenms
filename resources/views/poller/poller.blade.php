@@ -160,7 +160,7 @@
                                     <span class="label label-default" title="{{ __('Total poller workers in this group') }}">
                                         {{ __('Workers') }}: {{ $group['workers'] }}
                                     </span>
-                                    <span class="label {{ $group['load_label_class'] }}"
+                                    <span @class(['label', 'label-warning' => $group['load_pct'] > 100, 'label-default' => $group['load_pct'] <= 100])
                                           title="{{ __('Average poller worker load across this group') }}">
                                         {{ __('Group Load') }}: {{ $group['load_pct'] }}%
                                     </span>
@@ -172,7 +172,7 @@
                     @foreach($group['pollers'] as $poller)
                         <tr id="row_{{ $poller->id }}"
                             data-poller-row="{{ $poller->id }}"
-                            @class(['danger' => $poller->is_down, 'warning' => $poller->is_warning])
+                            @class(['danger' => $poller->row_class === 'danger', 'warning' => $poller->row_class === 'warning'])
                             x-show="matchesPoller({{ Js::from($poller->poller_name) }}, {{ Js::from((string) $poller->node_id) }}, {{ Js::from($poller->row_class) }})"
                             style="cursor: pointer;"
                             @click="if (!$event.target.closest('[data-toggle=modal], a')) togglePoller('{{ $group['id'] }}_{{ $poller->id }}')">
@@ -187,7 +187,7 @@
                             </td>
                             <td style="vertical-align: middle;">
                                 <div class="tw:flex tw:items-center tw:gap-2">
-                                    <i class="fa fa-circle {{ $poller->dot_class }}" aria-hidden="true"></i>
+                                    <i class="fa fa-circle text-{{ $poller->row_class }}" aria-hidden="true"></i>
                                     <span class="tw:font-bold">{{ $poller->poller_name }}</span>
                                     @if($poller->master)
                                         <span class="label label-primary">master</span>
@@ -210,34 +210,34 @@
                                 @endif
                             </td>
 
-                            @if($poller->primary_stat)
+                            @if($poller->primaryStat())
                                 <td class="text-center" style="vertical-align: middle;">
-                                    {{ $poller->primary_stat->workers }}
+                                    {{ $poller->primaryStat()->workers }}
                                 </td>
                                 <td class="text-center" style="vertical-align: middle;">
-                                    {{ $poller->primary_stat->devices }}
+                                    {{ $poller->primaryStat()->devices }}
                                 </td>
                                 <td class="text-center" style="vertical-align: middle;">
-                                    {{ $poller->primary_stat->depth }}
+                                    {{ $poller->primaryStat()->depth }}
                                 </td>
                                 <td style="vertical-align: middle;">
                                     <div class="tw:flex tw:justify-between tw:items-center tw:gap-2" style="font-size: 12px; margin-bottom: 3px;">
-                                        <span>{{ $poller->primary_stat->worker_seconds }} / {{ $poller->max_seconds }}</span>
-                                        <strong @class(['text-danger' => $poller->is_down, 'text-warning' => $poller->is_warning])>{{ $poller->util_pct }}%</strong>
+                                        <span>{{ $poller->primaryStat()->worker_seconds }} / {{ $poller->primaryStat()->maxSeconds() }}</span>
+                                        <strong @class(['text-danger' => $poller->row_class === 'danger', 'text-warning' => $poller->row_class === 'warning'])>{{ $poller->primaryStat()->utilizationPercent() }}%</strong>
                                     </div>
                                     <div class="progress" style="height: 5px; margin-bottom: 0;">
-                                        <div class="progress-bar {{ $poller->bar_class }}"
+                                        <div class="progress-bar progress-bar-{{ $poller->row_class }}"
                                              role="progressbar"
-                                             aria-valuenow="{{ $poller->util_pct }}"
+                                             aria-valuenow="{{ $poller->primaryStat()->utilizationPercent() }}"
                                              aria-valuemin="0"
                                              aria-valuemax="100"
-                                             style="width: {{ $poller->progress_width }}%;">
+                                             style="width: {{ $poller->primaryStat()->progressBarWidth(2) }}%;">
                                         </div>
                                     </div>
                                 </td>
                             @else
                                 <td colspan="4" style="vertical-align: middle;">
-                                    @if($poller->show_queue_link)
+                                    @if($poller->usesSharedQueues())
                                         <a href="{{ route('poller.queues') }}">{{ __('Queue workers share the queues of their poller groups, see Queues') }}</a>
                                     @else
                                         <span class="text-muted">{{ __('No job statistics reported') }}</span>
@@ -247,23 +247,25 @@
 
                             @if($cluster_summary['any_deletable'])
                                 <td class="text-center" style="vertical-align: middle;">
-                                    @if($poller->long_not_polled)
-                                        <button type="button"
-                                                class="btn btn-danger btn-xs"
-                                                aria-label="{{ __('Delete') }}"
-                                                data-toggle="modal"
-                                                data-target="#confirm-delete"
-                                                data-id="{{ $poller->id }}"
-                                                data-pollertype="delete-cluster-poller"
-                                                name="delete-cluster-poller">
-                                            <i class="fa fa-trash" aria-hidden="true"></i>
-                                        </button>
-                                    @endif
+                                    @can('delete', $poller)
+                                        @if($poller->long_not_polled)
+                                            <button type="button"
+                                                    class="btn btn-danger btn-xs"
+                                                    aria-label="{{ __('Delete') }}"
+                                                    data-toggle="modal"
+                                                    data-target="#confirm-delete"
+                                                    data-id="{{ $poller->id }}"
+                                                    data-pollertype="delete-cluster-poller"
+                                                    name="delete-cluster-poller">
+                                                <i class="fa fa-trash" aria-hidden="true"></i>
+                                            </button>
+                                        @endif
+                                    @endcan
                                 </td>
                             @endif
                         </tr>
 
-                        @foreach($poller->other_stats as $stat)
+                        @foreach($poller->secondaryStats() as $stat)
                             <tr data-poller-row="{{ $poller->id }}"
                                 x-show="isExpanded('{{ $group['id'] }}_{{ $poller->id }}') && matchesPoller({{ Js::from($poller->poller_name) }}, {{ Js::from((string) $poller->node_id) }}, {{ Js::from($poller->row_class) }})"
                                 x-cloak>
@@ -282,13 +284,13 @@
                                 </td>
                                 <td style="vertical-align: middle;">
                                     <div class="tw:flex tw:justify-between tw:items-center tw:gap-2" style="font-size: 11px; margin-bottom: 2px;">
-                                        <span>{{ $stat->worker_seconds }} / {{ $stat->max_seconds }}</span>
-                                        <span @class(['text-warning tw:font-bold' => $stat->util_pct > 100])>{{ $stat->util_pct }}%</span>
+                                        <span>{{ $stat->worker_seconds }} / {{ $stat->maxSeconds() }}</span>
+                                        <span @class(['text-warning tw:font-bold' => $stat->isOverloaded()])>{{ $stat->utilizationPercent() }}%</span>
                                     </div>
                                     <div class="progress" style="height: 4px; margin-bottom: 0;">
-                                        <div class="progress-bar {{ $stat->bar_class }}"
+                                        <div @class(['progress-bar', 'progress-bar-warning' => $stat->isOverloaded(), 'progress-bar-success' => ! $stat->isOverloaded()])
                                              role="progressbar"
-                                             style="width: {{ $stat->progress_width }}%;">
+                                             style="width: {{ $stat->progressBarWidth() }}%;">
                                         </div>
                                     </div>
                                 </td>
@@ -369,6 +371,7 @@
                         $("#row_" + id).remove();
                     } else {
                         $("[data-poller-row='" + id + "']").remove();
+                        location.reload();
                     }
                 }
                 else {
