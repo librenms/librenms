@@ -54,31 +54,18 @@ class Ios extends Cisco implements
     use CiscoCellular;
     use CiscoPortSecurity;
 
-/**
- * Maps IE-3300 encoded LLDP port IDs to local interfaces, falling back to the
- * standard IOS mapping when the ID or interface cannot be resolved.
- *
- * @param int $lldpPortNum LLDP local port number.
- * @return int|null The matching local port ID, or null if none is found.
- */
+    /**
+     * IE-3300 sends lldpLocPortId as port-<port>-<module>, module 0 is Gi1/x
+     */
     protected function lldpLocalPortId(int $lldpPortNum): ?int
     {
-        if (str_starts_with((string) ($this->getDevice()['hardware'] ?? ''), 'IE-3300')) {
-            $portId = NeighborParser::parseText($this->lldpLocPortTable()[$lldpPortNum]['lldpLocPortId'] ?? '');
+        $portId = NeighborParser::parseText($this->lldpLocPortTable()[$lldpPortNum]['lldpLocPortId'] ?? '');
 
-            if (preg_match('/^port-(\d{3})-(\d{5})$/D', $portId, $matches) === 1) {
-                $portNumber = (int) $matches[1];
-                $portGroup = (int) $matches[2];
+        if (preg_match('/^port-(\d+)-(\d+)$/', $portId, $matches)) {
+            $port = $this->lldpLocalPorts()->byName(sprintf('Gi%d/%d', $matches[2] + 1, $matches[1]));
 
-                if ($portNumber > 0 && $portGroup <= 1) {
-                    $interfaceNumber = $portGroup + 1;
-                    $port = $this->lldpLocalPorts()->byName("Gi$interfaceNumber/$portNumber")
-                        ?? $this->lldpLocalPorts()->byName("GigabitEthernet$interfaceNumber/$portNumber");
-
-                    if ($port !== null) {
-                        return $port->port_id;
-                    }
-                }
+            if ($port) {
+                return $port->port_id;
             }
         }
 
