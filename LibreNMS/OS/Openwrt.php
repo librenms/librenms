@@ -138,7 +138,7 @@ class Openwrt extends OS implements
                         $subtype,
                         $subtype . '-' . $this->wirelessKey($row, $ifIndex) . "-$stat",
                         $this->wirelessLabel($row, $ifIndex) . " $stat",
-                        $row[$column] * 100000, // the agent reports tenths of Mbit/s, LibreNMS stores bps
+                        $row[$column] * 1000000, // discovery sees the d-1 hinted Mbit/s value, the poller raw tenths (hence multiplier 100000)
                         100000
                     );
                 }
@@ -186,7 +186,7 @@ class Openwrt extends OS implements
                     'openwrt',
                     $this->wirelessKey($row, $ifIndex),
                     $this->wirelessLabel($row, $ifIndex),
-                    $row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceChannelUtil'] / 10, // tenths of a percent
+                    $row['OPENWRT-WIRELESS-MIB::openwrtWlIfaceChannelUtil'], // discovery sees the d-1 hinted percent, the poller raw tenths (hence divisor 10)
                     1,
                     10
                 );
@@ -261,7 +261,7 @@ class Openwrt extends OS implements
                     'openwrt',
                     $this->wirelessKey($row, $ifIndex) . "-link$linkId",
                     $this->wirelessLabel($row, $ifIndex) . " link $linkId",
-                    $value / $divisor,
+                    $value,
                     1,
                     $divisor
                 );
