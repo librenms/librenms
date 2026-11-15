@@ -5,12 +5,14 @@ namespace LibreNMS\Tests\Feature\Jobs;
 use App\Actions\Device\CheckDeviceAvailability;
 use App\Events\DiscoveringModule;
 use App\Exceptions\DiscoveryFailedException;
+use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Jobs\DiscoverDevice;
 use App\Jobs\DispatchPollingWork;
 use App\Jobs\PollDevice;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
+use App\Models\Eventlog;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Queue\Jobs\FakeJob;
 use Illuminate\Support\Facades\Event;
@@ -103,6 +105,24 @@ final class DiscoverDeviceTest extends DBTestCase
             'device disables module enabled by polling method' => [0, false],
             'device explicitly enables module' => [1, true],
         ];
+    }
+
+    public function testUnixAgentAddedToAPingOnlyDeviceSetsTheOs(): void
+    {
+        $device = Device::factory()->create(['hostname' => '192.0.2.1', 'status' => 1, 'os' => 'ping']);
+        DevicePollingMethod::factory()->for($device)->create(['method_type' => PollingMethodType::Icmp]);
+        $this->fakeAvailability(true);
+        $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => $this->agentOsOutput('linux')]);
+
+        new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides(['core']))->handle();
+        $this->assertSame('ping', $device->fresh()->os, 'no method identifies the os of a ping only device');
+
+        DevicePollingMethod::factory()->for($device)->create(['method_type' => PollingMethodType::UnixAgent, 'affects_availability' => false]);
+        DeviceCache::flush(); // the next discovery is another job
+        new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides(['core']))->handle();
+
+        $this->assertSame('linux', $device->fresh()->os);
+        $this->assertTrue(Eventlog::where('device_id', $device->device_id)->where('message', 'Device OS changed: ping -> linux')->exists());
     }
 
     public function testDeletedDeviceIsSkipped(): void

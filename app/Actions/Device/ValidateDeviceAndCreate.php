@@ -99,7 +99,7 @@ readonly class ValidateDeviceAndCreate
             }
         }
 
-        // The OS is detected via SNMP, without it the device is ping only
+        // While adding, the OS is only detected via SNMP, without it the device is ping only until discovery identifies it
         $hasSnmp = $pollingMethods->contains(fn (DevicePollingMethod $m) => $m->method_type === PollingMethodType::Snmp && $m->enabled);
         if (! $hasSnmp && $device->os === 'generic') {
             $device->os = 'ping';

@@ -44,6 +44,7 @@ use LibreNMS\Interfaces\Discovery\MefDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\NeighborDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Discovery\OSIdentification;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\StorageDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
@@ -62,6 +63,7 @@ use LibreNMS\Interfaces\Polling\Netstats\TcpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\UdpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\StpInstancePolling;
 use LibreNMS\Interfaces\Polling\StpPortPolling;
+use LibreNMS\Modules\Core;
 use LibreNMS\OS\Generic;
 use LibreNMS\OS\Traits\Bgp4Mib;
 use LibreNMS\OS\Traits\BridgeMib;
@@ -84,6 +86,7 @@ class OS implements
     BgpPeerDiscovery,
     ProcessorDiscovery,
     OSDiscovery,
+    OSIdentification,
     MempoolsDiscovery,
     MempoolsPolling,
     StpInstanceDiscovery,
@@ -231,6 +234,14 @@ class OS implements
         }
 
         return $this instanceof $interface && $this->getMethodResults()->isAvailable($type) ? $this : null;
+    }
+
+    /**
+     * The os SNMP identifies, from the sysDescr and sysObjectID of the device.
+     */
+    public function identifyOS(): string
+    {
+        return Core::detectOS($this->getDevice(), false);
     }
 
     /**

@@ -9,6 +9,7 @@ use App\Data\TimeSeries\MetricCollector;
 use App\Models\Vminfo;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\Discovery\OSIdentification;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
 use LibreNMS\Interfaces\VminfoClusterSource;
@@ -19,7 +20,7 @@ use LibreNMS\Polling\Method\Config\ProxmoxApiConfig;
  * Module data of one Proxmox VE node, read with the Proxmox API. Each node reports the guests it runs.
  * A standalone host is a cluster of one.
  */
-class ProxmoxApiDataSource implements VminfoClusterSource, VminfoDiscovery, VminfoMetricSource, VminfoPolling
+class ProxmoxApiDataSource implements OSIdentification, VminfoClusterSource, VminfoDiscovery, VminfoMetricSource, VminfoPolling
 {
     private const string TYPE_VM = 'proxmox';
     private const string TYPE_CONTAINER = 'proxmox-lxc';
@@ -35,6 +36,14 @@ class ProxmoxApiDataSource implements VminfoClusterSource, VminfoDiscovery, Vmin
         private readonly string $clusterId,
     ) {
         $this->api = new ProxmoxApi($config);
+    }
+
+    /**
+     * Only Proxmox VE answers this API.
+     */
+    public function identifyOS(): string
+    {
+        return 'proxmox';
     }
 
     public function clusterId(): string

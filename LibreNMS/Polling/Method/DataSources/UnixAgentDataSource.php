@@ -6,6 +6,7 @@ use App\Models\Mempool;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
+use LibreNMS\Interfaces\Discovery\OSIdentification;
 use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\Modules\UnixAgent;
 use LibreNMS\Polling\Method\ProbeResult;
@@ -13,8 +14,16 @@ use LibreNMS\Polling\Method\ProbeResult;
 /**
  * Module data from the agent output. The check fetched the whole output, so this reads it instead of querying the device.
  */
-final readonly class UnixAgentDataSource implements MempoolsDiscovery, MempoolsPolling
+final readonly class UnixAgentDataSource implements MempoolsDiscovery, MempoolsPolling, OSIdentification
 {
+    /**
+     * The os of each AgentOS value the agent reports in its <<<check_mk>>> section.
+     */
+    private const array AGENT_OS = [
+        'freebsd' => 'freebsd',
+        'linux' => 'linux',
+    ];
+
     /**
      * The meminfo fields of each mempool, keyed by mempool_index. Laid out like the UCD-SNMP-MIB mempools.
      */
@@ -33,9 +42,20 @@ final readonly class UnixAgentDataSource implements MempoolsDiscovery, MempoolsP
      */
     private array $meminfo;
 
+    /**
+     * The os of the AgentOS value, null when the agent did not send a known one.
+     */
+    private ?string $os;
+
     public function __construct(ProbeResult $result)
     {
-        $section = UnixAgent::parse((string) $result->stat('output'))['mem'] ?? null;
+        $sections = UnixAgent::parse((string) $result->stat('output'));
+
+        $checkMk = $sections['check_mk'] ?? null;
+        $agentOs = is_string($checkMk) && preg_match('/^AgentOS:\s*(\S+)/m', $checkMk, $matches) ? strtolower($matches[1]) : '';
+        $this->os = self::AGENT_OS[$agentOs] ?? null;
+
+        $section = $sections['mem'] ?? null;
 
         $meminfo = [];
         foreach (is_string($section) ? explode("\n", $section) : [] as $line) {
@@ -45,6 +65,11 @@ final readonly class UnixAgentDataSource implements MempoolsDiscovery, MempoolsP
         }
 
         $this->meminfo = $meminfo;
+    }
+
+    public function identifyOS(): ?string
+    {
+        return $this->os;
     }
 
     /**
