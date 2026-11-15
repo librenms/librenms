@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Component;
+use LibreNMS\Util\Url;
 use LibreNMS\Enum\PollingMethodType;
 
 class PageLinks extends Component
@@ -64,11 +65,12 @@ class PageLinks extends Component
         if (Gate::allows('update', $device)) {
             // check if metric has more specific edit page
             $path = \Request::path();
-            if (preg_match('#health/metric=(\w+)#', $path, $matches)) {
-                if ($this->editTabUrl($device, $matches[1])) {
-                    $currentTab = $matches[1];
-                } elseif ($this->editTabUrl($device, $matches[1] . 's')) {
-                    $currentTab = $matches[1] . 's';
+            $metric = $currentTab === 'health' ? (string) Url::parseOptions('metric') : '';
+            if ($metric !== '') {
+                if ($this->editTabUrl($device, $metric)) {
+                    $currentTab = $metric;
+                } elseif ($this->editTabUrl($device, $metric . 's')) {
+                    $currentTab = $metric . 's';
                 }
             } elseif (preg_match('#device/\d+/ports/transceivers#', $path)) {
                 $currentTab = 'transceivers';

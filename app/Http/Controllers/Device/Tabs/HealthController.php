@@ -26,9 +26,13 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use LibreNMS\Component;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use LibreNMS\Util\Url;
 
 class HealthController implements DeviceTab
 {
@@ -54,6 +58,62 @@ class HealthController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [];
+        $qfp = $this->qfpComponents($device);
+        $metrics = $this->metrics($device, $qfp->isNotEmpty());
+        $metric = Url::parseOptions('metric', 'overview');
+        if (! isset($metrics[$metric])) {
+            $metric = 'overview';
+        }
+
+        return [
+            'metric' => $metric,
+            'metrics' => $metrics,
+            'options' => collect(['overview' => __('Overview')] + $metrics)
+                ->map(fn ($text, $option) => ['text' => $text, 'link' => route('device', ['device' => $device->device_id, 'tab' => 'health', 'metric' => $option])])
+                ->all(),
+            'items' => match ($metric) {
+                'overview' => collect(),
+                'processor' => $device->processors()->orderBy('processor_descr')->get(),
+                'mempool' => $device->mempools()->get(),
+                'storage' => $device->storage()->orderBy('storage_descr')->get(),
+                'diskio' => $device->diskIo()->orderBy('diskio_descr')->get(),
+                'qfp' => $qfp,
+                default => $device->sensors()->where('sensor_class', $metric)->orderBy('sensor_descr')->get(),
+            },
+        ];
+    }
+
+    /**
+     * The health metrics the device has, as metric => title.
+     *
+     * @return array<string, string>
+     */
+    private function metrics(Device $device, bool $hasQfp): array
+    {
+        $metrics = array_filter([
+            'processor' => $device->processors()->exists() ? __('Processor') : null,
+            'qfp' => $hasQfp ? 'QFP' : null,
+            'mempool' => $device->mempools()->exists() ? __('Memory') : null,
+            'storage' => $device->storage()->exists() ? __('Disk Usage') : null,
+            'diskio' => $device->diskIo()->exists() ? __('Disk I/O') : null,
+        ]);
+
+        foreach ($device->sensors()->distinct()->pluck('sensor_class') as $class) {
+            $metrics[$class] = __("sensors.$class.short");
+        }
+
+        return $metrics;
+    }
+
+    /**
+     * @return Collection<int, array<string, mixed>>
+     */
+    private function qfpComponents(Device $device): Collection
+    {
+        if (LibrenmsConfig::get("os.$device->os.group") !== 'cisco') {
+            return collect();
+        }
+
+        return collect((new Component)->getComponents($device->device_id, ['type' => 'cisco-qfp'])[$device->device_id] ?? []);
     }
 }
