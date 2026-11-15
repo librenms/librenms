@@ -13,13 +13,13 @@ This shows up in LibreNMS as...
 - Sensors :: hwmon temperatures, fans, voltages, current, and power on
   Linux, or the coretemp, amdtemp, pchtherm, and ACPI temperatures on
   FreeBSD, plus RAPL CPU power on Linux, batteries on both, BMC sensors
-  via IPMI, and disk temperatures from smartctl or the smart extend.
-  These are under Health.
-- Inventory :: the chassis, motherboard, CPUs, memory, disks, and
+  via IPMI, disk temperatures from smartctl or the smart extend, and GPU
+  temperature, power, and clocks. These are under Health.
+- Inventory :: the chassis, motherboard, CPUs, memory, disks, GPUs, and
   transceivers, with vendor, model, and serial, on the Inventory tab.
 - State :: transceiver alarm and warning flags, loss of signal, and Tx
-  fault, battery and AC state, disk SMART health, and whether any BMC
-  sensor is past a threshold, also on the Inventory tab.
+  fault, battery and AC state, disk SMART health, NVIDIA GPU health, and
+  whether any BMC sensor is past a threshold, also on the Inventory tab.
 
 Each script works in two parts. Ran from cron as root, it gathers
 everything and writes a cache. Ran by snmpd, it answers from the cache, so
@@ -33,36 +33,38 @@ snmpd never waits on slow tools such as `ethtool -m`.
     apt-get install ethtool libjson-perl libfile-slurp-perl
     ```
 
-    For `--ipmi`, also install `freeipmi-tools`.
+    For `--ipmi`, also install `freeipmi-tools`. For `--gpu`, also install
+    `pciutils` and `libxml-libxml-perl`, plus the NVIDIA driver for NVIDIA
+    GPUs.
 
 2. Download the script and make it executable.
 
     ```bash
-    wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/linux_entity -O /etc/snmp/extends/linux_entity
-    chmod +x /etc/snmp/extends/linux_entity
+    wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/linux_entity -O /etc/snmp/linux_entity
+    chmod +x /etc/snmp/linux_entity
     ```
 
 3. Add a cron job, picking the flags wanted from [Flags](#flags).
 
     ```bash
     # /etc/cron.d/linux_entity
-    */5 * * * * root /etc/snmp/extends/linux_entity -u --hwmon --rapl --power --inventory --state
+    */5 * * * * root /etc/snmp/linux_entity -u --hwmon --rapl --power --inventory --state
     ```
 
 4. Add these to `/etc/snmp/snmpd.conf`. The .131 one is only needed with
    `--state` and the .9.9.91 one with `--thresholds`.
 
     ```bash
-    pass_persist .1.3.6.1.2.1.47 /etc/snmp/extends/linux_entity -p .1.3.6.1.2.1.47
-    pass_persist .1.3.6.1.2.1.99 /etc/snmp/extends/linux_entity -p .1.3.6.1.2.1.99
-    pass_persist .1.3.6.1.2.1.131 /etc/snmp/extends/linux_entity -p .1.3.6.1.2.1.131
-    pass_persist .1.3.6.1.4.1.9.9.91 /etc/snmp/extends/linux_entity -p .1.3.6.1.4.1.9.9.91
+    pass_persist .1.3.6.1.2.1.47 /etc/snmp/linux_entity -p .1.3.6.1.2.1.47
+    pass_persist .1.3.6.1.2.1.99 /etc/snmp/linux_entity -p .1.3.6.1.2.1.99
+    pass_persist .1.3.6.1.2.1.131 /etc/snmp/linux_entity -p .1.3.6.1.2.1.131
+    pass_persist .1.3.6.1.4.1.9.9.91 /etc/snmp/linux_entity -p .1.3.6.1.4.1.9.9.91
     ```
 
 5. Run it once so the cache exists, then restart snmpd.
 
     ```bash
-    /etc/snmp/extends/linux_entity -u --hwmon --rapl --power --inventory --state
+    /etc/snmp/linux_entity -u --hwmon --rapl --power --inventory --state
     systemctl restart snmpd
     ```
 
@@ -103,37 +105,38 @@ does not support `pass_persist`.
     ```
 
     `--ipmi` also needs ipmi(4) loaded, which `ipmi_load="YES"` in
-    `/boot/loader.conf` does at boot.
+    `/boot/loader.conf` does at boot. For `--gpu` with NVIDIA GPUs, also
+    install `p5-XML-LibXML` and `nvidia-driver`.
 
 2. Download the script and make it executable.
 
     ```bash
-    mkdir -p /usr/local/etc/snmp/extends
-    fetch -o /usr/local/etc/snmp/extends/freebsd_entity https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/freebsd_entity
-    chmod +x /usr/local/etc/snmp/extends/freebsd_entity
+    mkdir -p /usr/local/etc/snmp
+    fetch -o /usr/local/etc/snmp/freebsd_entity https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/freebsd_entity
+    chmod +x /usr/local/etc/snmp/freebsd_entity
     ```
 
 3. Add a cron job to `/etc/crontab`, picking the flags wanted from
    [Flags](#flags).
 
     ```bash
-    */5 * * * * root /usr/local/etc/snmp/extends/freebsd_entity -u --sensors --power --inventory --state
+    */5 * * * * root /usr/local/etc/snmp/freebsd_entity -u --sensors --power --inventory --state
     ```
 
 4. Add these to `/usr/local/etc/snmp/snmpd.conf`. The .131 one is only
    needed with `--state` and the .9.9.91 one with `--thresholds`.
 
     ```bash
-    pass_persist .1.3.6.1.2.1.47 /usr/local/etc/snmp/extends/freebsd_entity -p .1.3.6.1.2.1.47
-    pass_persist .1.3.6.1.2.1.99 /usr/local/etc/snmp/extends/freebsd_entity -p .1.3.6.1.2.1.99
-    pass_persist .1.3.6.1.2.1.131 /usr/local/etc/snmp/extends/freebsd_entity -p .1.3.6.1.2.1.131
-    pass_persist .1.3.6.1.4.1.9.9.91 /usr/local/etc/snmp/extends/freebsd_entity -p .1.3.6.1.4.1.9.9.91
+    pass_persist .1.3.6.1.2.1.47 /usr/local/etc/snmp/freebsd_entity -p .1.3.6.1.2.1.47
+    pass_persist .1.3.6.1.2.1.99 /usr/local/etc/snmp/freebsd_entity -p .1.3.6.1.2.1.99
+    pass_persist .1.3.6.1.2.1.131 /usr/local/etc/snmp/freebsd_entity -p .1.3.6.1.2.1.131
+    pass_persist .1.3.6.1.4.1.9.9.91 /usr/local/etc/snmp/freebsd_entity -p .1.3.6.1.4.1.9.9.91
     ```
 
 5. Run it once so the cache exists, then restart snmpd.
 
     ```bash
-    /usr/local/etc/snmp/extends/freebsd_entity -u --sensors --power --inventory --state
+    /usr/local/etc/snmp/freebsd_entity -u --sensors --power --inventory --state
     service snmpd restart
     ```
 
@@ -145,23 +148,24 @@ their interfaces for transceivers.
 For the likes of OpenBSD, NetBSD, and illumos, `generic_entity` provides
 the inventory from dmidecode, including power supplies, the disks and
 their temperatures from smartctl or the
-[smart](../../Extensions/Applications/SMART.md) extend, and the BMC via
-freeipmi. It lacks transceivers and the OS
-specific sensors. Like the others, it needs net-snmp for `pass_persist`.
+[smart](../../Extensions/Applications/SMART.md) extend, NVIDIA GPUs via
+nvidia-smi, and the BMC via freeipmi. It lacks transceivers, other GPUs,
+and the OS specific sensors. Like the others, it needs net-snmp for `pass_persist`.
 
-1. Install Perl's JSON and File::Slurp, plus dmidecode and freeipmi.
+1. Install Perl's JSON and File::Slurp, plus dmidecode and freeipmi. For
+   `--gpu`, also install XML::LibXML and the NVIDIA driver.
 
 2. Download the script and make it executable.
 
     ```bash
-    wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/generic_entity -O /etc/snmp/extends/generic_entity
-    chmod +x /etc/snmp/extends/generic_entity
+    wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/generic_entity -O /etc/snmp/generic_entity
+    chmod +x /etc/snmp/generic_entity
     ```
 
 3. Add a cron job.
 
     ```bash
-    */5 * * * * root /etc/snmp/extends/generic_entity -u --dmi --smart --ipmi --state
+    */5 * * * * root /etc/snmp/generic_entity -u --dmi --smart --ipmi --state
     ```
 
 4. Add the same `pass_persist` lines as for Linux, with `generic_entity`
@@ -208,11 +212,22 @@ script with `--help` for the details.
     - smartctl :: Runs smartctl on each disk, skipping ones that are
       asleep so they are not woken up. Needs smartmontools 7.0 or newer.
 - `--state` :: ENTITY-STATE-MIB state for transceivers, power supplies,
-  disks, and the BMC.
+  disks, the BMC, and GPUs.
 - `--ipmi` :: BMC temperatures, voltages, current, power, and fans via
   `ipmi-sensors` from freeipmi.
-- `--thresholds` :: The `--ipmi` thresholds and `--smart` disk temperature
-  limits, as the entSensorThresholdTable from CISCO-ENTITY-SENSOR-MIB.
+- `--gpu` :: GPUs, with vendor, model, and revision, plus VBIOS version
+  and serial when the driver has them. NVIDIA GPUs get temperature, memory
+  temperature, and power from `nvidia-smi`. On Linux, AMD, Intel, and
+  nouveau GPUs get theirs from `--hwmon`, which then puts them under the
+  GPU, keeping their history. generic_entity only finds NVIDIA GPUs.
+  nvidia-smi can take a second or more per run without persistence mode,
+  and on Linux wakes a GPU that is powered down.
+- `--gpu-clock` :: GPU clocks, in MHz. Graphics and memory for NVIDIA and
+  amdgpu, and graphics only for i915 and xe on Linux. Implies `--gpu`.
+- `--thresholds` :: The `--ipmi` thresholds, `--smart` disk temperature
+  limits, NVIDIA GPU temperature limits, hwmon limits on Linux, and the
+  coretemp tjmax on FreeBSD, as the entSensorThresholdTable from
+  CISCO-ENTITY-SENSOR-MIB.
 - `-i` and `-I` :: Regexps of interfaces to check or skip for transceivers.
 - `--dmi` :: generic_entity. Chassis, motherboard, CPUs, memory, and power
   supplies from dmidecode.
@@ -238,10 +253,13 @@ lnms device:discover yourhost -m entity-physical,transceivers,sensors,entity-sta
 
 - Thresholds :: ENTITY-SENSOR-MIB has nowhere to put them, so without
   `--thresholds` sensors get the LibreNMS default limits. With it, the
-  IPMI and disk ones are used as the sensor limits, critical and
+  ones the script has are used as the sensor limits, critical and
   non-recoverable as the limit and non-critical as the warning. They are
   updated each discovery, unless custom limits were set for the sensor in
-  LibreNMS. The transceiver and hwmon ones are not served.
+  LibreNMS. The transceiver ones are not served.
+- GPU sensors :: Fan speed and utilization are skipped, as
+  ENTITY-SENSOR-MIB has no percent type. FreeBSD only has sensors for
+  NVIDIA GPUs, as drm-kmod does not provide any.
 - Transceiver details :: Wavelength, connector, and distance are not
   shown, as ENTITY-MIB has nowhere to put them.
 - Indexes :: The cache directory has `state.json`, which keeps the
