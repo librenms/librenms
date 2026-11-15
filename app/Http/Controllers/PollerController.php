@@ -91,15 +91,16 @@ class PollerController extends Controller
 
         if ($poller instanceof PollerCluster) {
             foreach ($poller->stats as $stat) {
-                $stat->max_seconds = (int) $stat->frequency * (int) $stat->workers;
-                $stat->util_pct = $stat->max_seconds > 0 ? (int) round($stat->worker_seconds / $stat->max_seconds * 100) : 0;
+                $maxSeconds = (int) $stat->frequency * (int) $stat->workers;
+                $stat->setAttribute('max_seconds', $maxSeconds);
+                $stat->setAttribute('util_pct', $maxSeconds > 0 ? (int) round($stat->worker_seconds / $maxSeconds * 100) : 0);
             }
 
             $primaryStat = $poller->stats->firstWhere('poller_type', 'poller') ?? $poller->stats->first();
-            $poller->primary_stat = $primaryStat;
-            $poller->other_stats = $poller->stats->reject(fn ($stat) => $stat === $primaryStat);
+            $poller->setAttribute('primary_stat', $primaryStat);
+            $poller->setAttribute('other_stats', $poller->stats->reject(fn ($stat) => $stat === $primaryStat));
 
-            if ($poller->row_class === 'success' && $primaryStat?->util_pct > 100) {
+            if ($poller->row_class === 'success' && $primaryStat?->getAttribute('util_pct') > 100) {
                 $poller->row_class = 'warning';
             }
         }
