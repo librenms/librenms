@@ -1,0 +1,484 @@
+-- Portions based on BEGEMOT-WIRELESS-MIB, Copyright (C) 2010, The FreeBSD Foundation
+
+ALTA-WIRELESS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Counter64, IpAddress
+    FROM SNMPv2-SMI
+    MacAddress, RowStatus, DisplayString
+    FROM SNMPv2-TC
+    InterfaceIndex, ifIndex
+    FROM IF-MIB
+    alta
+	FROM ALTA-MIB;
+
+altaWlan MODULE-IDENTITY
+    LAST-UPDATED "202405080000Z"
+    ORGANIZATION "Alta Labs"
+    CONTACT-INFO
+	    "		Alta Labs
+
+	     Postal:	Alta Labs
+			192 N Old Hwy 91, Unit 1
+			Hurricane, UT 84737
+
+	     Fax:	N/A
+
+	     E-Mail:    support@alta.inc"
+    DESCRIPTION
+	    "The Alta MIB for monitoring IEEE802.11 interfaces"
+    REVISION     "202405080000Z"
+    DESCRIPTION
+	    "Initial revision."
+    ::= { alta 1 }
+
+-- ---------------------------------------------------------- --
+-- Subtrees in the Alta Wireless MIB
+-- ---------------------------------------------------------- --
+altaWlanStatistics		OBJECT IDENTIFIER ::= { altaWlan 1 }
+
+-- ---------------------------------------------------------- --
+-- wireless interfaces' database
+-- ---------------------------------------------------------- --
+wlanRadioTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF wlanRadioEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"A table that contains information about the wireless radios in the system."
+    ::= { altaWlanStatistics 1 }
+
+wlanRadioEntry OBJECT-TYPE
+    SYNTAX	wlanRadioEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Information for the wireless radio."
+    INDEX { wlanRadioIfindex }
+    ::= { wlanRadioTable 1 }
+
+wlanRadioEntry ::= SEQUENCE {
+    wlanRadioIfindex            InterfaceIndex,
+    wlanRadioIfname             DisplayString,
+    wlanRadioBand               INTEGER,
+    wlanRadioChannel            INTEGER,
+    wlanRadioChanUtilization    INTEGER,
+    wlanRadioChanOBSS           INTEGER,
+    wlanRadioTxBytes            Counter64,
+    wlanRadioTxPackets          Counter64,
+    wlanRadioTxDrops            Counter64,
+    wlanRadioRxBytes            Counter64,
+    wlanRadioRxPackets          Counter64,
+    wlanRadioRxErrors           Counter64,
+}
+
+wlanRadioIfindex OBJECT-TYPE
+    SYNTAX	InterfaceIndex
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The ifIndex of this wireless interface for this radio."
+    ::= { wlanRadioEntry 1 }
+
+wlanRadioIfname OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE(1..32))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The name of this wireless radio interface."
+    ::= { wlanRadioEntry 2 }
+
+wlanRadioBand OBJECT-TYPE
+    SYNTAX	INTEGER {
+			"2.4 GHz"(2),
+			"5 GHz"(5),
+			"6 GHz"(6)
+		}
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+    "The frequency band of this wireless radio."
+    ::= { wlanRadioEntry 3 }
+
+wlanRadioChannel OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+    "The active channel of this wireless radio."
+    ::= { wlanRadioEntry 4 }
+
+wlanRadioChanUtilization OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+    "The channel utilization 0%-100%"
+    ::= { wlanRadioEntry 5 }
+
+wlanRadioChanOBSS OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+    "The channel OBSS"
+    ::= { wlanRadioEntry 6 }
+
+wlanRadioTxBytes OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of bytes transmitted by the wireless radio."
+    ::= { wlanRadioEntry 7 }
+
+wlanRadioTxPackets OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of packets transmitted by the wireless radio."
+    ::= { wlanRadioEntry 8 }
+
+wlanRadioTxDrops OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of packets that could not be transmitted by the wireless radio."
+    ::= { wlanRadioEntry 9 }
+
+wlanRadioRxBytes OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of bytes received by the wireless radio."
+    ::= { wlanRadioEntry 10 }
+
+wlanRadioRxPackets OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of packets received by the wireless radio."
+    ::= { wlanRadioEntry 11 }
+
+wlanRadioRxErrors OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of packets received with errors by the wireless radio."
+    ::= { wlanRadioEntry 12 }
+
+wlanVapTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF WlanVapEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"A table that contains the list of all virtual access points created on the system."
+    ::= { altaWlanStatistics 2 }
+
+wlanVapEntry OBJECT-TYPE
+    SYNTAX	wlanVapEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Information for a virtual access point."
+    INDEX { wlanVapIfindex }
+    ::= { wlanVapTable 1 }
+
+wlanVapEntry ::= SEQUENCE {
+    wlanVapIfindex              InterfaceIndex,
+    wlanVapIfname               DisplayString,
+    wlanVapBssid                MacAddress,
+    wlanVapSsid                 OCTET STRING,
+    wlanVapChannel              INTEGER,
+    wlanVapBand                 INTEGER,       
+    wlanVapStatus               RowStatus,
+    wlanVapState                INTEGER,
+    wlanVapStaCount             INTEGER,
+    wlanVapTxBytes              Counter64,
+    wlanVapTxPackets            Counter64,
+    wlanVapTxDrops              Counter64,
+    wlanVapRxBytes              Counter64,
+    wlanVapRxPackets            Counter64,
+    wlanVapRxErrors             Counter64,
+}
+
+wlanVapIfindex OBJECT-TYPE
+    SYNTAX	InterfaceIndex
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The ifIndex of this wireless interface for this VAP."
+    ::= { wlanVapEntry 1 }
+
+wlanVapIfname OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE(1..32))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The name of this wireless interface for this VAP."
+    ::= { wlanVapEntry 2 }
+
+wlanVapBssid OBJECT-TYPE
+    SYNTAX	MacAddress
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The BSSID assigned to the VAP."
+    ::= { wlanVapEntry 3 }
+
+wlanVapSsid OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE(1..32))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The SSID of this VAP."
+    ::= { wlanVapEntry 4 }
+
+wlanVapChannel OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+    "The active channel of this VAP."
+    ::= { wlanVapEntry 5 }
+
+wlanVapBand OBJECT-TYPE
+    SYNTAX	INTEGER {
+			"2.4 GHz"(2),
+			"5 GHz"(5),
+			"6 GHz"(6)
+		}
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+    "The frequency band of this VAP."
+    ::= { wlanVapEntry 6 }
+
+wlanVapStatus OBJECT-TYPE
+    SYNTAX	RowStatus
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"This column allows creation or deletion of VAP."
+    ::= { wlanVapEntry 7 }
+
+wlanVapState OBJECT-TYPE
+    SYNTAX	INTEGER {
+			up(1),
+			down(2)
+		}
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The operating state of the VAP."
+    ::= { wlanVapEntry 8 }
+
+wlanVapStaCount OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of stations connected to this VAP."
+    ::= { wlanVapEntry 9 }
+
+wlanVapTxBytes OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of bytes transmitted by the VAP."
+    ::= { wlanVapEntry 10 }
+
+wlanVapTxPackets OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of packets transmitted by the VAP."
+    ::= { wlanVapEntry 11 }
+
+wlanVapTxDrops OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of packets that could not be transmitted by the VAP."
+    ::= { wlanVapEntry 12 }
+
+wlanVapRxBytes OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of bytes received by the VAP."
+    ::= { wlanVapEntry 13 }
+
+wlanVapRxPackets OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of packets received by the VAP."
+    ::= { wlanVapEntry 14 }
+
+wlanVapRxErrors OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of packets received with errors by the VAP."
+    ::= { wlanVapEntry 15 }
+
+WlanStaTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF WlanStaEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"A table that contains information about the associated stations the virtual access points on this system."
+    ::= { altaWlanStatistics 3 }
+
+WlanStaEntry OBJECT-TYPE
+    SYNTAX	WlanStaEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"Entry contains information about the associated station."
+    INDEX { wlanStaAddress }
+    ::= { WlanStaTable 1 }
+
+WlanStaEntry ::= SEQUENCE {
+    wlanStaAddress             MacAddress,
+    wlanStaAssociationId       INTEGER,
+    wlanStaVlanTag             INTEGER,
+    wlanStaFrequency           INTEGER,
+    wlanStaCurrentTxRate       INTEGER,
+    wlanStaCurrentRxRate       INTEGER,
+    wlanStaRxSignalStrength    INTEGER,
+    wlanStaIp                  IpAddress,
+    wlanStaConnectedBssid      MacAddress,
+    wlanStaTxBytes             Counter64,
+    wlanStaTxPackets           Counter64,
+    wlanStaRxBytes             Counter64,
+    wlanStaRxPackets           Counter64,
+    wlanStaDrops               Counter64,
+}
+
+wlanStaAddress OBJECT-TYPE
+    SYNTAX	MacAddress
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The MAC address of this station."
+    ::= { WlanStaEntry 1 }
+
+wlanStaAssociationId OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The ID of the associacition with this station."
+    ::= { WlanStaEntry 2 }
+
+wlanStaVlanTag OBJECT-TYPE
+    SYNTAX	INTEGER (0..4096)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The Vlan Tag for traffic to/from this station."
+    ::= { WlanStaEntry 3 }
+
+wlanStaFrequency OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The operating frequency for the link with this station."
+    ::= { WlanStaEntry 4 }
+
+wlanStaCurrentTxRate OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The current transmit rate in mbps for this station."
+    ::= { WlanStaEntry 5 }
+
+wlanStaCurrentRxRate OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The current receive rate in mbps for this station."
+    ::= { WlanStaEntry 6 }
+
+wlanStaRxSignalStrength OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The average receive signal strength for this station."
+    ::= { WlanStaEntry 7 }
+
+wlanStaIp OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The station IP address."
+    ::= { WlanStaEntry 8 }
+
+wlanStaConnectedBssid OBJECT-TYPE
+    SYNTAX	MacAddress
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The BSSID the station is connected to."
+    ::= { WlanStaEntry 9 }
+
+wlanStaTxBytes OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of bytes transmitted by the station."
+    ::= { WlanStaEntry 10 }
+
+wlanStaTxPackets OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of packets transmitted by the station."
+    ::= { WlanStaEntry 11 }
+
+wlanStaRxBytes OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of bytes received by the station."
+    ::= { WlanStaEntry 12 }
+
+wlanStaRxPackets OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of packets received by the station."
+    ::= { WlanStaEntry 13 }
+
+wlanStaDrops OBJECT-TYPE
+    SYNTAX	Counter64
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of packets destined for the station that could not be transmitted by the VAP."
+    ::= { WlanStaEntry 14 }
+
+END
