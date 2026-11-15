@@ -72,44 +72,15 @@ class PseudowiresController extends Controller implements DeviceTab
         ]);
 
         $view = $request->string('view')->value() ?: 'detail';
+        $user = $request->user();
 
         $pseudowires = $device->pseudowires()
-            ->with(['port', 'peerDevice'])
-            ->hasAccess($request->user())
+            ->with(['port.device', 'peerDevice'])
+            ->hasAccess($user)
             ->join('ports', 'pseudowires.port_id', '=', 'ports.port_id')
             ->orderBy('ports.ifDescr')
             ->select('pseudowires.*')
             ->get();
-
-        $peerDeviceIds = $pseudowires->pluck('peer_device_id')->filter(fn ($id) => (int) $id !== 0)->unique();
-        $vcIds = $pseudowires->pluck('cpwVcID')->unique();
-
-        $peerPseudowires = Pseudowire::whereIn('device_id', $peerDeviceIds)
-            ->whereIn('cpwVcID', $vcIds)
-            ->with(['port', 'device'])
-            ->hasAccess($request->user())
-            ->get()
-            ->keyBy(fn (Pseudowire $pw) => $pw->device_id . '_' . $pw->cpwVcID);
-
-        $rows = [];
-        $linkdone = [];
-
-        foreach ($pseudowires as $pw) {
-            $key = $pw->device_id . '_' . $pw->port_id;
-            if (in_array($key, $linkdone, true)) {
-                continue;
-            }
-
-            $peerPw = $pw->peer_device_id ? $peerPseudowires->get($pw->peer_device_id . '_' . $pw->cpwVcID) : null;
-            if ($peerPw) {
-                $linkdone[] = $peerPw->device_id . '_' . $peerPw->port_id;
-            }
-
-            $rows[] = [
-                'pw' => $pw,
-                'peerPw' => $peerPw,
-            ];
-        }
 
         return view('device.tabs.pseudowires', [
             'device' => $device,
@@ -124,7 +95,7 @@ class PseudowiresController extends Controller implements DeviceTab
                     'link' => route('device.pseudowires', ['device' => $device, 'view' => 'minigraphs']),
                 ],
             ],
-            'rows' => $rows,
+            'circuits' => Pseudowire::pairEndpoints($pseudowires, $user),
         ]);
     }
 }
