@@ -18,6 +18,9 @@ use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Url;
 
 $vars['view'] = basename($vars['view'] ?? 'graphs');
+if (! is_file("includes/html/pages/device/port/{$vars['view']}.inc.php")) {
+    $vars['view'] = 'graphs'; // unknown or removed view (e.g. the old events view)
+}
 
 $port = PortCache::get($vars['port']);
 $device = DeviceCache::getPrimary();
@@ -68,6 +71,7 @@ echo view('device.tabs.ports.includes.port_row', [
             'errors' => [['type' => 'port_errors', 'title' => trans('Errors'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
         ],
         'tab' => $vars['tab'] ?? 'detail',
+        'ports_with_events' => new \App\Http\Controllers\Device\Tabs\PortsController()->portsWithEvents($device->device_id, [$port->port_id]),
     ],
     'collapsing' => false,
 ]);
@@ -110,7 +114,6 @@ if ($port->nd()->exists()) {
 if ($port->fdbEntries()->exists()) {
     $menu_options['fdb'] = 'FDB Table';
 }
-$menu_options['events'] = 'Eventlog';
 $menu_options['notes'] = ($device->getAttrib('port_id_notes:' . $port->port_id) ?? '') == '' ? 'Notes' : 'Notes*';
 
 if ($port->transceivers()->exists()) {
@@ -163,6 +166,7 @@ foreach ($menu_options as $option => $text) {
     $sep = ' | ';
 }
 
+echo $sep . '<a href="' . route('device.eventlog', ['device' => $device->device_id, 'port' => $port->port_id]) . '">' . __('Eventlog') . '</a>';
 unset($sep);
 
 if (MacAccounting::where('port_id', $port->port_id)->exists()) {
