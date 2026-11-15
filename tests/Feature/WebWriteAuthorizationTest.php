@@ -29,12 +29,10 @@ namespace LibreNMS\Tests\Feature;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\User;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\DBTestCase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 final class WebWriteAuthorizationTest extends DBTestCase
 {
@@ -144,52 +142,18 @@ final class WebWriteAuthorizationTest extends DBTestCase
     public function testPortNotesRequireAccessToThePort(): void
     {
         $user = $this->limitedUser(['port.update']);
-        $this->actingAs($user);
         $port = Port::factory()->create(['device_id' => $this->accessible->device_id]);
         $otherPort = Port::factory()->create(['device_id' => $this->other->device_id]);
 
-        $output = $this->runForm('update-port-notes', [
-            'device_id' => $this->accessible->device_id,
-            'port_id_notes' => 'port_id_notes:' . $port->port_id,
-            'notes' => 'my notes',
-        ]);
-        $this->assertSame('ok', json_decode($output, true)['status'] ?? null);
-        $this->assertSame('my notes', $this->accessible->getAttrib('port_id_notes:' . $port->port_id));
+        $this->actingAs($user)
+            ->putJson(route('port.notes.update', $port), ['notes' => 'my notes'])
+            ->assertOk();
+        $this->assertSame('my notes', $this->accessible->fresh()->getAttrib('port_id_notes:' . $port->port_id));
 
-        try {
-            $this->runForm('update-port-notes', [
-                'device_id' => $this->other->device_id,
-                'port_id_notes' => 'port_id_notes:' . $otherPort->port_id,
-                'notes' => 'bad',
-            ]);
-            $this->fail('Updating notes on an inaccessible port should be denied');
-        } catch (AuthorizationException) {
-            $this->assertNull($this->other->getAttrib('port_id_notes:' . $otherPort->port_id));
-        }
-    }
-
-    public function testPortNotesRejectMismatchedDeviceAndAttribute(): void
-    {
-        $user = $this->limitedUser(['port.update']);
-        $this->actingAs($user);
-        $port = Port::factory()->create(['device_id' => $this->accessible->device_id]);
-
-        $invalid = [
-            ['device_id' => $this->other->device_id, 'port_id_notes' => 'port_id_notes:' . $port->port_id],
-            ['device_id' => $this->accessible->device_id, 'port_id_notes' => 'override_icmp_disable'],
-        ];
-
-        foreach ($invalid as $post) {
-            try {
-                $this->runForm('update-port-notes', $post + ['notes' => 'bad']);
-                $this->fail('Invalid port notes request should be rejected');
-            } catch (HttpException $e) {
-                $this->assertSame(400, $e->getStatusCode());
-            }
-        }
-
-        $this->assertNull($this->other->getAttrib('port_id_notes:' . $port->port_id));
-        $this->assertNull($this->accessible->getAttrib('override_icmp_disable'));
+        $this->actingAs($user)
+            ->putJson(route('port.notes.update', $otherPort), ['notes' => 'bad'])
+            ->assertForbidden();
+        $this->assertNull($this->other->fresh()->getAttrib('port_id_notes:' . $otherPort->port_id));
     }
 
     public function testApplicationUpdateIsScopedToAccessibleDevices(): void
