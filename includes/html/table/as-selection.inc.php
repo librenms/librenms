@@ -8,6 +8,13 @@ $param = [];
 // 4294967295 (Reserved)
 $sql = ' FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 ';
 
+if (Gate::denies('viewAll', App\Models\Device::class)) {
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    // @phpstan-ignore function.deprecated
+    $sql .= ' AND `device_id` IN ' . dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
+}
+
 if (isset($searchPhrase) && ! empty($searchPhrase)) {
     $sql .= ' AND (`bgpLocalAs` LIKE ?)';
     $param[] = "%$searchPhrase%";
