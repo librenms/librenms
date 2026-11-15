@@ -351,22 +351,6 @@ function search_oxidized_config($search_in_conf_textbox)
     return $nodes;
 }
 
-/**
- * @param  int  $eventlog_severity
- * @return string $eventlog_severity_icon
- */
-function eventlog_severity($eventlog_severity)
-{
-    return match ($eventlog_severity) {
-        1 => 'label-success',
-        2 => 'label-info',
-        3 => 'label-primary',
-        4 => 'label-warning',
-        5 => 'label-danger',
-        default => 'label-default',
-    };
-} // end eventlog_severity
-
 function get_oxidized_nodes_list()
 {
     $context = stream_context_create([

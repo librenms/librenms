@@ -179,9 +179,12 @@ class Html
         };
     }
 
-    public static function severityToLabel(Severity $severity, string $text = '', string $title = '', string $class = 'label'): string
+    /**
+     * Return the bootstrap label class for this severity.
+     */
+    public static function severityClass(Severity $severity): string
     {
-        $state_label = match ($severity) {
+        return match ($severity) {
             Severity::Ok => 'label-success',
             Severity::Info => 'label-info',
             Severity::Notice => 'label-primary',
@@ -189,11 +192,14 @@ class Html
             Severity::Error => 'label-danger',
             default => 'label-default',
         };
+    }
 
+    public static function severityToLabel(Severity $severity, string $text = '', string $title = '', string $class = 'label'): string
+    {
         if ($title) {
             $title = " title=\"$title\"";
         }
 
-        return "<span class=\"$class $state_label\"$title>$text</span>";
+        return "<span class=\"$class " . self::severityClass($severity) . "\"$title>$text</span>";
     }
 }
