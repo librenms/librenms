@@ -15,6 +15,7 @@ use LibreNMS\Modules\Ipv6Addresses;
 use LibreNMS\OS;
 use LibreNMS\Tests\DBTestCase;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class Ipv6AddressesTest extends DBTestCase
 {
@@ -157,6 +158,44 @@ final class Ipv6AddressesTest extends DBTestCase
         $this->discover(['' => []]);
 
         $this->assertSame([], $this->addresses());
+    }
+
+    /**
+     * @param  array<string, string>  $vendorWalks
+     */
+    #[DataProvider('vendorWalkProvider')]
+    public function testAddressesAreKeptWhenTheVendorWalkDoesNotAnswer(string $os, array $vendorWalks): void
+    {
+        $this->device->update(['os' => $os]);
+
+        $this->discover(['' => $vendorWalks]);
+        $this->assertSame(['2001:db8::5/64'], $this->addresses());
+
+        $this->discover(['' => array_map(fn () => null, $vendorWalks)]);
+
+        $this->assertSame(['2001:db8::5/64'], $this->addresses());
+    }
+
+    /**
+     * @return array<string, array{string, array<string, string>}>
+     */
+    public static function vendorWalkProvider(): array
+    {
+        return [
+            'eltex-mes23xx' => ['eltex-mes23xx', [
+                'IP-MIB::ipAddressIfIndex.ipv6' => 'IP-MIB::ipAddressIfIndex[ipv6]["20:01:0d:b8:00:00:00:00:00:00:00:00:00:00:00:05"] = 3',
+                'RADLAN-IPv6::rlIpAddressTable' => 'RADLAN-IPv6::rlIpAddressPrefixLength[ipv6]["20:01:0d:b8:00:00:00:00:00:00:00:00:00:00:00:05"] = 64',
+            ]],
+            'eltex-mes24xx' => ['eltex-mes24xx', [
+                'IP-MIB::ipAddressPrefixTable' => 'IP-MIB::ipAddressPrefixOrigin[3][ipv6]["20:01:0d:b8:00:00:00:00:00:00:00:00:00:00:00:05"][64] = manual',
+            ]],
+            'jetstream' => ['jetstream', [
+                'TPLINK-IPV6ADDR-MIB::ipv6ParaConfigAddrTable' => <<<'SNMP'
+                    TPLINK-IPV6ADDR-MIB::ipv6ParaConfigAddress[3][unicast][assignedIp]["20:01:0d:b8:00:00:00:00:00:00:00:00:00:00:00:05"] = 20:01:0d:b8:00:00:00:00:00:00:00:00:00:00:00:05
+                    TPLINK-IPV6ADDR-MIB::ipv6ParaConfigPrefixLength[3][unicast][assignedIp]["20:01:0d:b8:00:00:00:00:00:00:00:00:00:00:00:05"] = 64
+                    SNMP,
+            ]],
+        ];
     }
 
     public function testVrfContextThatDoesNotAnswerKeepsItsAddresses(): void

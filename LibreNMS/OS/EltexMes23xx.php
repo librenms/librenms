@@ -98,7 +98,7 @@ class EltexMes23xx extends Radlan implements TransceiverDiscovery, Ipv6AddressDi
         $ips = $ips->merge(SnmpQuery::enumStrings()->walk([
             'IP-MIB::ipAddressIfIndex.ipv6',
             'RADLAN-IPv6::rlIpAddressTable',
-        ])->mapTable(function ($data, $addrType, $address = '') {
+        ])->throwIfConnectionError()->mapTable(function ($data, $addrType, $address = '') {
             if ($addrType == 'ipv6') {
                 try {
                     $ip = IPv6::fromHexString($address);
