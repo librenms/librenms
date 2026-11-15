@@ -168,6 +168,40 @@ class Oxidized extends BaseApi
     }
 
     /**
+     * All nodes known to Oxidized, or null if it is disabled or unreachable.
+     *
+     * @return array<int, array<string, mixed>>|null
+     */
+    public function nodes(): ?array
+    {
+        $response = $this->request('/nodes?format=json');
+
+        return $response?->successful() ? (array) $response->json() : null;
+    }
+
+    /**
+     * Nodes whose config matches the given regex, or null if Oxidized is disabled or unreachable.
+     *
+     * @return array<int, array<string, mixed>>|null
+     */
+    public function searchConfigs(string $search): ?array
+    {
+        if (! $this->enabled) {
+            return null;
+        }
+
+        try {
+            $response = $this->getClient()->asForm()->post('/nodes/conf_search?format=json', ['search_in_conf_textbox' => $search]);
+        } catch (ConnectionException $e) {
+            Log::warning('Oxidized is not reachable: ' . $e->getMessage());
+
+            return null;
+        }
+
+        return $response->successful() ? (array) $response->json() : null;
+    }
+
+    /**
      * Ask oxidized to refresh the node list for the source (likely the LibreNMS API).
      */
     public function reloadNodes(): void

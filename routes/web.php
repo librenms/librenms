@@ -42,6 +42,7 @@ use App\Http\Controllers\NacController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OuiLookupController;
 use App\Http\Controllers\OutagesController;
+use App\Http\Controllers\OxidizedController;
 use App\Http\Controllers\OverviewController;
 use App\Http\Controllers\PackagesController;
 use App\Http\Controllers\PluginLegacyController;
@@ -136,6 +137,9 @@ Route::middleware(['auth'])->group(function (): void {
     Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
     Route::get('outages', [OutagesController::class, 'index'])->name('outages');
+    Route::get('oxidized', [OxidizedController::class, 'index'])->name('oxidized');
+    Route::post('oxidized/search', [OxidizedController::class, 'search'])->name('oxidized.search');
+    Route::post('oxidized/reload', [OxidizedController::class, 'reload'])->name('oxidized.reload');
     Route::get('packages', [PackagesController::class, 'index'])->middleware('saved-filter:packages')->name('packages.index');
     Route::get('packages/{legacy}', [PackagesController::class, 'legacy'])->where('legacy', '.*=.*');
     Route::resource('port', PortController::class)->only('update');
