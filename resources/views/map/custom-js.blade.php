@@ -1,4 +1,5 @@
 @include('map.partials.vis-popups')
+@include('map.partials.custom-map-via')
 @once
 <div id="custom-map-context-menu"
      class="tw:hidden tw:fixed tw:z-50 tw:min-w-48 tw:bg-white tw:dark:bg-dark-gray-400 tw:text-slate-800 tw:dark:text-dark-white-100 tw:border tw:border-gray-200 tw:dark:border-dark-gray-100 tw:rounded-lg tw:shadow-xl tw:py-1 tw:text-sm">
@@ -333,12 +334,7 @@
         },
 
         getEdgeCfg: function (edgeid, edge, fromto, reverse_arrows) {
-            var arrows;
-            if (Boolean(reverse_arrows)) {
-                arrows = {from: {enabled: true, scaleFactor: 0.6}, to: {enabled: false}};
-            } else {
-                arrows = {to: {enabled: true, scaleFactor: 0.6}, from: {enabled: false}};
-            }
+            var arrows = customMapVia.getArrows(reverse_arrows, edge.arrow_type, edge.arrow_scale);
 
             var edge_cfg = {
                 id: edgeid + "_" + fromto,
@@ -359,7 +355,7 @@
                         maxVisible: 100000
                     }
                 },
-                smooth: {type: edge.style},
+                smooth: customMapVia.smoothForStyle(edge.style),
                 arrowStrikethrough: false,
                 physics: false
             };
@@ -575,14 +571,15 @@
                                 } else {
                                     delete self.edgePortMap[edgeid];
                                 }
-                                if (self.networkNodes.get(mid.id)) {
-                                    self.networkNodes.update(mid);
-                                    self.networkEdges.update(edge1);
-                                    self.networkEdges.update(edge2);
-                                } else {
-                                    self.networkNodes.add([mid]);
-                                    self.networkEdges.add([edge1, edge2]);
-                                }
+
+                                // VIA waypoints: reroute the canonical segments through any waypoint nodes
+                                var wps = edge.waypoints || {};
+                                var midPos = {x: edge.mid_x, y: edge.mid_y};
+                                var fromExtras = customMapVia.getEdgeExtras(edgeid, edge1, "from", wps.from, customMapVia.nodePos(data.nodes, edge.custom_map_node1_id), midPos, 0);
+                                var toExtras = customMapVia.getEdgeExtras(edgeid, edge2, "to", wps.to, customMapVia.nodePos(data.nodes, edge.custom_map_node2_id), midPos, 0);
+
+                                self.networkNodes.update([mid].concat(fromExtras.nodes, toExtras.nodes));
+                                self.networkEdges.update([edge1, edge2].concat(fromExtras.segments, toExtras.segments));
                             });
                         }
 
@@ -596,10 +593,30 @@
                                     self.networkEdges.remove(edgeid + "_from");
                                     delete self.edgePortMap[edgeid];
                                 }
+                            } else if (customMapVia.parseWaypointId(nodeid)) {
+                                // waypoint node - handled by the stale waypoint pass below
                             } else if (!nodeid.startsWith('legend_')) {
                                 if (!data.nodes || !(nodeid in data.nodes)) {
                                     self.networkNodes.remove(nodeid);
                                 }
+                            }
+                        });
+
+                        // Drop waypoint nodes/segments of deleted edges, or of edges whose waypoint count shrank
+                        var isStaleWaypoint = function (edgeid, half, index) {
+                            var edge = data.edges ? data.edges[edgeid] : null;
+                            return !(edge && edge.waypoints && edge.waypoints[half] && index < edge.waypoints[half].length);
+                        };
+                        self.networkEdges.getIds().forEach(function (eid) {
+                            var m = customMapVia.isWaypointSegmentId(eid) ? eid.match(/^(.+)_(from|to)_seg_(\d+)$/) : null;
+                            if (m && isStaleWaypoint(m[1], m[2], parseInt(m[3]))) {
+                                self.networkEdges.remove(eid);
+                            }
+                        });
+                        self.networkNodes.getIds().forEach(function (nid) {
+                            var wp = customMapVia.parseWaypointId(nid);
+                            if (wp && isStaleWaypoint(wp.edgeid, wp.half, wp.index)) {
+                                self.networkNodes.remove(nid);
                             }
                         });
 
