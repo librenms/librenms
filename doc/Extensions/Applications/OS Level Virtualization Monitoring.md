@@ -10,7 +10,7 @@
 === "Debian/Ubuntu"
 
     ```bash
-    apt-get install libjson-perl libclone-perl libmime-base64-perl libfile-slurp-perl libio-interface-perl cpanminus
+    apt-get install libjson-perl libclone-perl libmime-base64-perl libfile-slurp-perl libjson-xs-perl cpanminus
     cpanm OSLV::Monitor
     ```
 
@@ -23,7 +23,7 @@
 === "Generic"
 
     ```bash
-    cpanm JSON Clone Mime::Base64 File::Slurp IO::Interface
+    cpanm JSON JSON::XS Clone Mime::Base64 File::Slurp
     cpanm OSLV::Monitor
     ``` 
 
@@ -32,7 +32,7 @@
 1. Setup cron.
 
     ```bash
-    */5 * * * * /usr/local/bin/oslv_monitor -q > /dev/null 2> /dev/null
+    */5 * * * * /usr/local/bin/oslv_monitor -l -q > /dev/null 2> /dev/null
     ```
 
 2. Setup snmpd.
@@ -57,7 +57,7 @@ The following keys are used in the JSON config file.
 
 | Option         | Description                                                      | Default    |
 |----------------|------------------------------------------------------------------|------------|
-| `include`      | An array of regular expressions to include.                      | `["^.*$"]` |
+| `include`      | An array of regular expressions to include.                      | `["^.+$"]` |
 | `exclude`      | An array of regular expressions to exclude.                      | undef      |
 | `backend`      | Override the backend and automatically choose it.                |            |
 | `time_divider` | Override the time_divider value. see chapter under Time divider. |            |
@@ -89,7 +89,7 @@ By Defaults the backends are as below.
 
 ```json
 {
-  "include": ["^.*$"]
+  "include": ["^.+$"]
 }
 ```
 
@@ -122,13 +122,17 @@ The stats names match those produced by `ps --libxo json`.
 
 The cgroup to name mapping is done like below.
 
-| Input         | Output    |
-|---------------|-----------|
-| systemd       | `s_$name` |
-| user          | `u_$name` |
-| docker        | `d_$name` |
-| podman        | `p_$name` |
-| anything else | `$name`   |
+| Input                     | Output          |
+|---------------------------|-----------------|
+| systemd                   | `s_$name`       |
+| user                      | `u_$name`       |
+| docker                    | `d_$name`       |
+| podman                    | `p_$name`       |
+| machine.slice, non-podman | `m_$type_$name` |
+| anything else             | `$name`         |
+
+For `m_$type_$name`, `$type` is `qemu`, `lxc`, or `nspawn`. If the type is
+unknown, it and the `_` after it are left out.
 
 
 The following `ps` to stats mapping are as below.
@@ -155,16 +159,16 @@ the names kept as is.
 
 The following mappings are done though.
 
-The following mappings are done though.
-
-| cgroupv2          | stats            |
-|-------------------|------------------|
-| `pgfault`         | `minor-faults`   |
-| `pgmajfault`      | `major-faults`   |
-| `usage_usec`      | `cpu-time`       |
-| `system_usec`     | `system-time`    |
-| `user_usec`       | `user-time`      |
-| `throttled_usecs` | `throttled-time` |
+| cgroupv2                     | stats                        |
+|------------------------------|------------------------------|
+| `pgfault`                    | `minor-faults`               |
+| `pgmajfault`                 | `major-faults`               |
+| `usage_usec`                 | `cpu-time`                   |
+| `system_usec`                | `system-time`                |
+| `user_usec`                  | `user-time`                  |
+| `throttled_usec`             | `throttled-time`             |
+| `burst_usec`                 | `burst-time`                 |
+| `core_sched.force_idle_usec` | `core_sched.force_idle-time` |
 
 If the extended memory stat information pulled via C groups is not needed, it can be
 disabled as below.
