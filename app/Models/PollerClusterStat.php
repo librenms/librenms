@@ -36,28 +36,4 @@ class PollerClusterStat extends Model
     public $timestamps = false;
     protected $primaryKey = 'id';
 //    protected $fillable = ['poller_name'];
-
-    public function maxSeconds(): int
-    {
-        return (int) $this->frequency * (int) $this->workers;
-    }
-
-    public function utilizationPercent(): int
-    {
-        $max = $this->maxSeconds();
-
-        return $max > 0 ? (int) round(((float) $this->worker_seconds / $max) * 100) : 0;
-    }
-
-    public function isOverloaded(): bool
-    {
-        $max = $this->maxSeconds();
-
-        return $max > 0 && (float) $this->worker_seconds > $max;
-    }
-
-    public function progressBarWidth(int $min = 1): int
-    {
-        return min(100, max($min, $this->utilizationPercent()));
-    }
 }

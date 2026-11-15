@@ -56,8 +56,10 @@ class PollerController extends Controller
             'current_tab' => 'poller',
             'pollers' => $this->poller(),
             'poller_cluster' => $pollerCluster,
+            'poller_cluster_meta' => $this->pollersMeta($pollerCluster),
             'cluster_groups' => $this->clusterGroups($pollerCluster),
-            'cluster_summary' => $this->clusterSummary($pollerCluster),
+            'healthy_count' => $pollerCluster->where('row_class', 'success')->count(),
+            'can_delete_any' => $pollerCluster->contains(fn ($poller) => $poller->long_not_polled && Gate::allows('delete', $poller)),
         ]);
     }
 
@@ -87,8 +89,19 @@ class PollerController extends Controller
         $poller->row_class = $this->checkTimeSinceLastPoll($since_last_poll);
         $poller->long_not_polled = $since_last_poll > ($this->rrdstep * 2);
 
-        if ($poller instanceof PollerCluster && $poller->row_class === 'success' && $poller->primaryStat()?->isOverloaded()) {
-            $poller->row_class = 'warning';
+        if ($poller instanceof PollerCluster) {
+            foreach ($poller->stats as $stat) {
+                $stat->max_seconds = (int) $stat->frequency * (int) $stat->workers;
+                $stat->util_pct = $stat->max_seconds > 0 ? (int) round($stat->worker_seconds / $stat->max_seconds * 100) : 0;
+            }
+
+            $primaryStat = $poller->stats->firstWhere('poller_type', 'poller') ?? $poller->stats->first();
+            $poller->primary_stat = $primaryStat;
+            $poller->other_stats = $poller->stats->reject(fn ($stat) => $stat === $primaryStat);
+
+            if ($poller->row_class === 'success' && $primaryStat?->util_pct > 100) {
+                $poller->row_class = 'warning';
+            }
         }
 
         return $poller;
@@ -105,26 +118,9 @@ class PollerController extends Controller
     }
 
     /**
-     * @return array<string, mixed>
-     */
-    private function clusterSummary(Collection $pollerCluster): array
-    {
-        $totalNodes = $pollerCluster->count();
-        $healthyNodes = $pollerCluster->where('row_class', 'success')->count();
-        $anyDeletable = $pollerCluster->contains(fn ($p): bool => (bool) $p->long_not_polled && Gate::allows('delete', $p));
-
-        return [
-            'total_nodes' => $totalNodes,
-            'healthy_nodes' => $healthyNodes,
-            'unhealthy_nodes' => $totalNodes - $healthyNodes,
-            'any_deletable' => $anyDeletable,
-            'total_cols' => $anyDeletable ? 11 : 10,
-            'all_pollers_meta' => $this->pollersMeta($pollerCluster),
-        ];
-    }
-
-    /**
-     * @return Collection<int, array<string, string>>
+     * Name, node id and status of each poller for the search/status filter
+     *
+     * @return Collection<int, array{name: string, nodeId: string, rowClass: string}>
      */
     private function pollersMeta(Collection $pollers): Collection
     {
@@ -166,21 +162,20 @@ class PollerController extends Controller
         $result = new Collection();
         foreach ($grouped as $gid => $groupPollers) {
             $groupModel = $groups->get($gid);
-            $grpPollers = new Collection($groupPollers);
-            $pollerStats = $grpPollers
-                ->map(fn (PollerCluster $p): ?PollerClusterStat => $p->stats->firstWhere('poller_type', 'poller'))
-                ->filter();
-            $grpMax = $pollerStats->sum(fn (PollerClusterStat $s): int => $s->maxSeconds());
-            $grpConsumed = $pollerStats->sum(fn (PollerClusterStat $s): float => (float) $s->worker_seconds);
+            $pollers = new Collection($groupPollers);
+            $pollerStats = $pollers->flatMap(fn (PollerCluster $poller) => $poller->stats->where('poller_type', 'poller'));
+            $workers = (int) $pollerStats->sum('workers');
+            // busy workers = consumed seconds / frequency, so nodes with different frequencies are weighted fairly
+            $busyWorkers = $pollerStats->sum(fn (PollerClusterStat $stat) => $stat->frequency > 0 ? $stat->worker_seconds / $stat->frequency : 0);
 
             $result->push([
                 'id' => (int) $gid,
                 'group_name' => $gid === 0 ? __('General') : ($groupModel ? $groupModel->group_name : __('Group') . ' #' . $gid),
                 'devices_count' => $gid === 0 ? $ungroupedCount : ($groupModel ? (int) $groupModel->devices_count : 0),
-                'workers' => $pollerStats->sum('workers'),
-                'load_pct' => $grpMax > 0 ? (int) round(($grpConsumed / $grpMax) * 100) : 0,
-                'pollers_meta' => $this->pollersMeta($grpPollers),
-                'pollers' => $grpPollers,
+                'workers' => $workers,
+                'load_pct' => $workers > 0 ? (int) round($busyWorkers / $workers * 100) : 0,
+                'pollers_meta' => $this->pollersMeta($pollers),
+                'pollers' => $pollers,
             ]);
         }
 

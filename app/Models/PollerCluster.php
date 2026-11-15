@@ -26,13 +26,11 @@
 
 namespace App\Models;
 
-use App\Queue\QueueStatus;
 use App\Queue\WorkerNode;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Collection;
 use LibreNMS\Exceptions\InvalidNameException;
 
 class PollerCluster extends Model
@@ -93,28 +91,6 @@ class PollerCluster extends Model
     }
 
     // ---- Helpers ----
-
-    public function primaryStat(): ?PollerClusterStat
-    {
-        return $this->stats->firstWhere('poller_type', 'poller') ?? $this->stats->first();
-    }
-
-    /**
-     * @return Collection<int, PollerClusterStat>
-     */
-    public function secondaryStats(): Collection
-    {
-        $primary = $this->primaryStat();
-
-        return $primary
-            ? $this->stats->filter(fn (PollerClusterStat $s): bool => $s->id !== $primary->id)->values()
-            : new Collection();
-    }
-
-    public function usesSharedQueues(): bool
-    {
-        return $this->poller_version == WorkerNode::VERSION && QueueStatus::showPages();
-    }
 
     /**
      * Get the value of a setting (falls back to the global value if not set on this node)
