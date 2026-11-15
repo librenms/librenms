@@ -32,7 +32,6 @@ Debug::set(isset($_REQUEST['debug']));
 
 $ajax_form = match ($_POST['type'] ?? '') {
     'alert-notes' => 'includes/html/forms/alert-notes.inc.php',
-    'create-service' => 'includes/html/forms/create-service.inc.php',
     'override-config' => 'includes/html/forms/override-config.inc.php',
     default => null,
 };
