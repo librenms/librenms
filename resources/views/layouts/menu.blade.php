@@ -625,7 +625,7 @@
                         </li>
                         @endcan
                         @can('viewAny', \App\Models\AlertTransport::class)
-                        <li><a href="{{ url('alert-transports') }}"><i class="fa fa-bus fa-fw fa-lg"
+                        <li><a href="{{ route('alert-transports.index') }}"><i class="fa fa-bus fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Alert Transports') }}
                             </a></li>
                         @endcan

@@ -80,9 +80,6 @@ require 'includes/html/modal/delete_alert_rule.inc.php'; // Also dies if !Auth::
 require 'includes/html/modal/alert_rule_collection.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
 require 'includes/html/modal/alert_rule_list.inc.php'; // Also dies if !Auth::user()->hasGlobalAdmin()
 
-require 'includes/html/modal/edit_transport_group.inc.php';
-require 'includes/html/modal/edit_alert_transport.inc.php';
-
 echo '<form method="post" action="" id="result_form">';
 echo csrf_field();
 if (isset($_POST['results_amount']) && $_POST['results_amount'] > 0) {
@@ -338,7 +335,6 @@ foreach ($rule_list as $rule) {
     echo '</td>';
 
     // Transports from the rule's assigned alert operation (segments → alert_operation_transport_map)
-    $transports_popover = 'right';
     $transports = '';
 
     $opId = (int) ($rule['alert_operation_id'] ?? 0);
@@ -366,10 +362,10 @@ foreach ($rule_list as $rule) {
         foreach ($transport_maps as $transport_map) {
             if ($transport_map->target_type == 'group') {
                 $groupName = (string) ($groupNames[$transport_map->transport_or_group_id] ?? '');
-                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-transport-group' data-group_id='" . $transport_map->transport_or_group_id . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport group " . e($groupName) . "'>" . e($groupName) . '</a>';
+                $transport_edit = '<a href="' . route('alert-transports.index') . '#transport-group-' . $transport_map->transport_or_group_id . '">' . e($groupName) . '</a>';
             } elseif ($transport_map->target_type == 'single') {
                 $transportName = (string) ($singleNames[$transport_map->transport_or_group_id] ?? '');
-                $transport_edit = "<a href='' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $transport_map->transport_or_group_id . "' data-container='body' data-toggle='popover' data-placement='$transports_popover' data-content='Edit transport " . e($transportName) . "'>" . e($transportName) . '</a>';
+                $transport_edit = '<a href="' . route('alert-transports.index') . '#transport-' . $transport_map->transport_or_group_id . '">' . e($transportName) . '</a>';
             } else {
                 $transport_edit = '';
             }
