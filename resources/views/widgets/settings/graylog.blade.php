@@ -72,7 +72,7 @@
 @section('javascript')
     <script type="application/javascript">
         init_select2('#device-{{ $id }}', 'device', {limit: 100}, '{{ $device ? $device->device_id : '' }}');
-        init_select2('#stream-{{ $id }}', 'graylog-streams', {}, '{{ $stream }}');
+        init_select2('#stream-{{ $id }}', 'graylog-streams', {}, @json($stream ?: ''));
 
         $('#hidenavigation-{{ $id }}')
             .bootstrapSwitch('offColor','danger')
