@@ -9,12 +9,22 @@ use App\Models\DeviceGroup;
 use App\Models\Location;
 use App\Models\UserPref;
 use Carbon\Carbon;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Enum\MaintenanceBehavior;
 
 class AlertScheduleController extends Controller
 {
+    public function index(): View
+    {
+        $this->authorize('viewAny', AlertSchedule::class);
+
+        return view('alert-schedule.index', [
+            'defaultBehavior' => MaintenanceBehavior::fromConfig()->value,
+        ]);
+    }
+
     public function show(AlertSchedule $alertSchedule): JsonResponse
     {
         $this->authorize('view', $alertSchedule);

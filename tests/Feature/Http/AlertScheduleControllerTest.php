@@ -339,6 +339,23 @@ final class AlertScheduleControllerTest extends TestCase
         $this->assertNotNull($schedule->fresh());
     }
 
+    public function testIndexPageRendersScheduleTable(): void
+    {
+        $this->actingAs($this->admin())
+            ->get(route('alert-schedule.index'))
+            ->assertOk()
+            ->assertSee('id="alert-schedule"', false)
+            ->assertSee('data-url="' . route('table.alert-schedule') . '"', false)
+            ->assertSee(__('Schedule maintenance'));
+    }
+
+    public function testUserCannotViewIndexPage(): void
+    {
+        $this->actingAs($this->user())
+            ->get(route('alert-schedule.index'))
+            ->assertForbidden();
+    }
+
     public function testDeviceEditPageRendersMaintenanceButton(): void
     {
         $device = Device::factory()->create();

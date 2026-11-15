@@ -123,6 +123,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('alert-log/{vars?}', [AlertHistoryController::class, 'index'])->where('vars', '.*')
         ->middleware('saved-filter:alert-log')->name('alert-log');
     Route::get('alert-stats', AlertStatsController::class)->name('alert-stats');
+    Route::get('alert-schedule', [AlertScheduleController::class, 'index'])->name('alert-schedule.index');
     Route::get('faults/{vars?}', [FaultsController::class, 'index'])->where('vars', '.*')
         ->middleware('saved-filter:faults')->name('faults');
     Route::get('alerts/{vars?}', [FaultsController::class, 'index'])->where('vars', '.*')
@@ -511,7 +512,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('alertlog/export', [Table\AlertLogController::class, 'export'])->name('table.alertlog.export');
             Route::post('alerts', Table\AlertsController::class)->name('table.alerts');
             Route::post('bills', Table\BillsController::class)->name('table.bills');
-            Route::post('alert-schedule', Table\AlertScheduleController::class);
+            Route::post('alert-schedule', Table\AlertScheduleController::class)->name('table.alert-schedule');
             Route::post('access-points', Table\AccessPointController::class)->name('table.access-points');
             Route::post('customers', Table\CustomersController::class);
             Route::post('diskio', Table\DiskioController::class)->name('table.diskio');
