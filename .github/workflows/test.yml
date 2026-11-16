@@ -54,6 +54,18 @@ jobs:
       SNMPSIM_VERSION: 2.0.3
     steps:
       -
+        # pre-installed uses the runner's PHP as is, it already has composer.
+        # runs first: setup-php unpacks its build over / and briefly replaces system
+        # libraries (libpcre2-8), so programs started meanwhile by background steps can fail to load
+        name: Set up PHP
+        if: matrix.php-version != 'pre-installed'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: rrd
+          tools: none
+          coverage: none
+      -
         # mysql is the runner's own MySQL, anything else is a docker image
         name: Start database
         id: database
@@ -131,16 +143,6 @@ jobs:
           .python_venvs/snmpsim/bin/pip install -q "https://github.com/librenms/snmpsim/releases/download/v$SNMPSIM_VERSION/snmpsim-$SNMPSIM_VERSION-py3-none-any.whl"
           # returns once snmpsim answers, fails with the error otherwise
           .python_venvs/snmpsim/bin/snmpsim-command-responder-lite --daemonize --pid-file=/tmp/snmpsimd.pid --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --log-level=error --logging-method=file:/tmp/snmpsimd.log
-      -
-        # pre-installed uses the runner's PHP as is, it already has composer
-        name: Set up PHP
-        if: matrix.php-version != 'pre-installed'
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
-          extensions: rrd
-          tools: none
-          coverage: none
       -
         name: Disable Xdebug
         background: true
