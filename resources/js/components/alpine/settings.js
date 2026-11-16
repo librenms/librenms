@@ -73,6 +73,15 @@ export function settingsPage({ prefix, tab, section, setting, groups, settings, 
             return this.prefix + "/" + name;
         },
 
+        sendTestEmail(event) {
+            const button = event.target.querySelector("button");
+            button.disabled = true;
+            return axios.post(route("settings.email.test"), { email: event.target.elements.email.value })
+                .then(({ data }) => toastr.success(data.message))
+                .catch((error) => toastr.error($("<span>").text(error.response?.data?.message ?? error.message)))
+                .finally(() => (button.disabled = false));
+        },
+
         copySettingLink(name) {
             const url = this.settingLink(name);
             const copied = () => toastr.success(this.lang.copied ?? "Copied");

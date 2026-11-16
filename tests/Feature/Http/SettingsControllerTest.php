@@ -6,6 +6,10 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Testing\TestResponse;
 use LibreNMS\Tests\TestCase;
+use LibreNMS\Util\Mail;
+use Mockery;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use Spatie\Permission\Models\Role;
 
 final class SettingsControllerTest extends TestCase
@@ -71,5 +75,59 @@ final class SettingsControllerTest extends TestCase
     public function testUserCannotView(): void
     {
         $this->getSettings(['snmp.max_repeaters'], 'user')->assertForbidden();
+    }
+
+    public function testEmailOptionsIncludeTestEmailForm(): void
+    {
+        $this->getSettings(['alerting', 'email'])
+            ->assertOk()
+            ->assertSeeInOrder([
+                'x-for="name in sectionSettings(sec)"',
+                'Send test email to',
+                'id="test-email-recipient"',
+            ], false);
+    }
+
+    public function testUserCannotSendTestEmail(): void
+    {
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->assignRole('user');
+
+        $this->actingAs($user)->postJson(route('settings.email.test'), ['email' => 'recipient@example.com'])
+            ->assertForbidden();
+    }
+
+    public function testTestEmailRequiresValidRecipient(): void
+    {
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->assignRole('admin');
+
+        foreach (['', 'not-an-email', 'one@example.com,two@example.com'] as $email) {
+            $this->actingAs($user)->postJson(route('settings.email.test'), ['email' => $email])
+                ->assertUnprocessable()
+                ->assertJsonValidationErrors('email');
+        }
+    }
+
+    #[RunInSeparateProcess]
+    #[PreserveGlobalState(false)]
+    public function testSendTestEmail(): void
+    {
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->assignRole('admin');
+        $mail = Mockery::mock('alias:' . Mail::class);
+        $mail->shouldReceive('send')->once()
+            ->with('recipient@example.com', 'LibreNMS test email', 'This is a test email from LibreNMS to verify your email settings.', false, false, false)
+            ->andReturn(true);
+
+        $this->actingAs($user)->postJson(route('settings.email.test'), ['email' => 'recipient@example.com'])
+            ->assertOk()
+            ->assertJsonPath('message', 'Test email sent');
+
+        $mail->shouldReceive('send')->once()->andThrow(new \PHPMailer\PHPMailer\Exception('SMTP connection failed'));
+        $this->actingAs($user)->postJson(route('settings.email.test'), ['email' => 'recipient@example.com'])
+            ->assertStatus(500)
+            ->assertJsonPath('message', 'Unable to send test email. Check your email settings and the LibreNMS log.')
+            ->assertDontSee('SMTP connection failed');
     }
 }

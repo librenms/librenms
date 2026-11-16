@@ -76,6 +76,21 @@
                                                                 </div>
                                                             </template>
                                                         </form>
+                                                        @can('settings.update')
+                                                            <template x-if="group.name === 'alerting' && sec.name === 'email'">
+                                                                <form class="form-horizontal" @submit.prevent="sendTestEmail($event)">
+                                                                    <div class="form-group row">
+                                                                        <label for="test-email-recipient" class="col-sm-5 col-md-3 col-form-label">{{ __('Send test email to') }}</label>
+                                                                        <div class="col-sm-5">
+                                                                            <div class="input-group">
+                                                                                <input id="test-email-recipient" name="email" type="email" class="form-control" required maxlength="254" autocomplete="off">
+                                                                                <span class="input-group-btn"><button type="submit" class="btn btn-primary">{{ __('Send') }}</button></span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </form>
+                                                            </template>
+                                                        @endcan
                                                     </div>
                                                 </template>
                                             </div>

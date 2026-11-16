@@ -392,6 +392,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('settings/{tab?}/{section?}/{setting?}', [SettingsController::class, 'index'])->name('settings');
     Route::put('settings/{name}', [SettingsController::class, 'update'])->name('settings.update');
     Route::delete('settings/{name}', [SettingsController::class, 'destroy'])->name('settings.destroy');
+    Route::post('settings/email/test', [SettingsController::class, 'testEmail'])->name('settings.email.test');
 
     Route::resource('roles', RoleController::class);
 
