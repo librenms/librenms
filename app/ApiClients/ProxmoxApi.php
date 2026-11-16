@@ -83,6 +83,30 @@ readonly class ProxmoxApi
     }
 
     /**
+     * The CPU usage of the guests of the cluster, from the statistics pvestatd collects every few seconds.
+     * The guest lists of a node measure it per API worker process instead: a worker reports 0 for a guest it was not asked about before.
+     * Guests without statistics, such as those on an offline node, are left out.
+     *
+     * @return array{qemu: array<int, float>, lxc: array<int, float>} keyed by guest id
+     *
+     * @throws ConnectionException
+     * @throws RequestException
+     */
+    public function clusterGuestCpu(): array
+    {
+        $cpu = ['qemu' => [], 'lxc' => []];
+
+        foreach ($this->callApi('cluster/resources', ['type' => 'vm'])->throw()->json('data') ?? [] as $guest) {
+            $type = $guest['type'] ?? '';
+            if (isset($cpu[$type], $guest['vmid'], $guest['cpu'])) {
+                $cpu[$type][(int) $guest['vmid']] = (float) $guest['cpu'];
+            }
+        }
+
+        return $cpu;
+    }
+
+    /**
      * With the full status of running VMs, such as disk activity and whether they are paused.
      *
      * @return list<ProxmoxGuest>
