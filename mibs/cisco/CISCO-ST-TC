@@ -3,7 +3,7 @@
 --   
 -- September 2002, Vinay Gaonkar
 --   
--- Copyright (c) 2002-2008-2012 by cisco Systems Inc.
+-- Copyright (c) 2002-2008-2016, 2021 by cisco Systems Inc.
 -- All rights reserved.
 --   
 -- *******************************************************************
@@ -21,7 +21,7 @@ IMPORTS
 
 
 storageTextualConventions MODULE-IDENTITY
-    LAST-UPDATED    "201208080000Z"
+    LAST-UPDATED    "202102120000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -30,10 +30,22 @@ storageTextualConventions MODULE-IDENTITY
             San Jose, CA  95134
             USA
             Tel: +1 800 553 -NETS
-            E-mail: cs-san@cisco.com"
+            E-mail: cs-san@cisco.com"		
     DESCRIPTION
         "This module defines textual conventions used in
         Storage Area Network technology specific mibs."
+    REVISION        "202408200000Z"
+    DESCRIPTION
+        "Added enumerated values fiftyG(14),sixtyFourG(15) and
+         autoMaxSixtyFourG(16) to FcIfSpeed"			
+    REVISION        "202102120000Z"
+    DESCRIPTION
+        "Added enumerated values sixtyFourG and
+        autoMaxSixtyFourG to fcIfSpeed"
+    REVISION        "201611300000Z"
+    DESCRIPTION
+        "Added enumerated values thirtyTwoG(12) and
+        autoMaxThirtyTwoG(13) to fcIfSpeed"
     REVISION        "201208080000Z"
     DESCRIPTION
         "Added sixteenG and automaxSixteenG in fcIfSpeed"
@@ -90,7 +102,6 @@ storageTextualConventions MODULE-IDENTITY
     DESCRIPTION
         "Initial version of this MIB module."
     ::= { ciscoModules 4 }
-
 
 
 VsanIndex ::= TEXTUAL-CONVENTION
@@ -347,7 +358,16 @@ FcIfSpeed ::= TEXTUAL-CONVENTION
           sixteenG  (10) - 16GBit.
           autoMaxSixteenG (11) - Negotiate to determine the
                              speed automatically upto a
-                             maximum of 16Gbit."
+                             maximum of 16Gbit.
+          thirtyTwoG  (12) - 32GBit.
+          autoMaxThirtyTwoG (13) - Negotiate to determine the
+                             speed automatically upto a
+                             maximum of 32Gbit."
+          fiftyG      (14) - 50GBit.
+          sixtyFourG  (15) - 64GBit.
+          autoMaxSixtyFourG (16) - Negotiate to determine the
+                             speed automatically upto a
+                             maximum of 64Gbit."
     SYNTAX          INTEGER  {
                         auto(1),
                         oneG(2),
@@ -359,7 +379,12 @@ FcIfSpeed ::= TEXTUAL-CONVENTION
                         tenG(8),
                         autoMaxEightG(9),
                         sixteenG(10),
-                        autoMaxSixteenG(11)
+                        autoMaxSixteenG(11),
+                        thirtyTwoG(12),
+                        autoMaxThirtyTwoG(13),
+						fiftyG(14),
+                        sixtyFourG(15),
+                        autoMaxSixtyFourG(16)
                     }
 
 PortMemberList ::= TEXTUAL-CONVENTION

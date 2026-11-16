@@ -22,38 +22,40 @@ IMPORTS
         FROM SNMPv2-CONF;
 
 ieee8021MstpMib MODULE-IDENTITY
-    LAST-UPDATED "201806280000Z" -- June 28, 2018
+    LAST-UPDATED "202211080000Z" -- November 8, 2022
     ORGANIZATION "IEEE 802.1 Working Group"
     CONTACT-INFO
         "  WG-URL: http://www.ieee802.org/1/
-         WG-EMail: stds-802-1-L@ieee.org
-
+         WG-EMail: stds-802-1-l@ieee.org
           Contact: IEEE 802.1 Working Group Chair
            Postal: C/O IEEE 802.1 Working Group
                    IEEE Standards Association
                    445 Hoes Lane
-                   Piscataway
-                   NJ 08854
+                   Piscataway, NJ 08854
                    USA
-           E-mail: STDS-802-1-L@IEEE.ORG"
+           E-mail: stds-802-1-chairs@ieee.org"
     DESCRIPTION
         "The Bridge MIB modules for managing devices that support
          IEEE Std 802.1Q multiple spanning tree groups.
 
-         Unless otherwise indicated, the references in this MIB
-         module are to IEEE Std 802.1Q.
+        Unless otherwise indicated, the references in this MIB
+        module are to IEEE Std 802.1Q-2022.
 
-        Copyright (C) IEEE (2018).
+        Copyright (C) IEEE (2022).
         This version of this MIB module is part of IEEE Std 802.1Q;
-        see the draft itself for full legal notices."
-
-    REVISION "201806280000Z" -- June 28, 2018
+        see that standard for full legal notices."
+        
+    REVISION "202211080000Z" -- November 8, 2022
     DESCRIPTION
-            "Published as part of IEEE Std 802.1Q-2018.
+            "Published as part of IEEE Std 802.1Q-2022.
+            Cross references and contact information updated."
+
+    REVISION "201807010000Z" -- July 1, 2018
+    DESCRIPTION
+            "Published as part of IEEE Std 802.1Q 2018 revision.
             Cross references updated and corrected."
             
     REVISION "201412150000Z" -- December 15, 2014
-    
     DESCRIPTION
             "Published as part of IEEE Std 802.1Q 2014 revision.
             Cross references updated and corrected.
@@ -642,7 +644,7 @@ ieee8021MstpCistPortOperEdgePort OBJECT-TYPE
     DESCRIPTION
         "In a Bridge that supports the identification of edge ports, the
          Port's operational Edge Port parameter value, for the CIST.
-         True(1) if it is an Oper Edge Port."
+         True(1) if it is an operEdge Port."
     REFERENCE   "13.27.44"
     ::= { ieee8021MstpCistPortEntry 9 }
 
@@ -653,7 +655,7 @@ ieee8021MstpCistPortMacEnabled OBJECT-TYPE
     DESCRIPTION
         "In a Bridge that supports the MAC Enabled parameter, the current
          state of the MAC Enabled parameter.
-         True(1) indicates that adminstratively the MAC is set as if it 
+         True(1) indicates that administratively the MAC is set as if it 
          was connected to a point-to-point LAN."
     REFERENCE   "12.8.2.1.3 p)"
     ::= { ieee8021MstpCistPortEntry 10 }
@@ -1324,7 +1326,7 @@ ieee8021MstpConfigIdEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "An entry contining the MST Configuration Identifier of a Bridge."
+        "An entry containing the MST Configuration Identifier of a Bridge."
     INDEX { ieee8021MstpConfigIdComponentId }
     ::= { ieee8021MstpConfigIdTable 1 }
 
@@ -1430,7 +1432,7 @@ ieee8021MstpCistPortAutoEdgePort OBJECT-TYPE
     DESCRIPTION
         "The administrative value of the Auto Edge Port parameter.
          A value of true(1) indicates if the Bridge detection state 
-         machine (BDM, 13.31) is to detect other Bridges
+         machine (BDM, 13.33) is to detect other Bridges
          attached to the LAN, and set 
          ieee8021SpanningTreeRstpPortOperEdgePort automatically.
          The default value is true(1)

@@ -4,13 +4,16 @@ IMPORTS
     OBJECT-TYPE,
     enterprises
                     FROM SNMPv2-SMI          -- RFC 2578
+    OBJECT-GROUP,
+    MODULE-COMPLIANCE
+                    FROM SNMPv2-CONF         -- RFC 2580
     TEXTUAL-CONVENTION
                     FROM SNMPv2-TC           -- RFC 2579
     DocsX509ASN1DEREncodedCertificate
                     FROM DOCS-IETF-BPI2-MIB; -- RFC 4131
  
 cableLabs MODULE-IDENTITY
-    LAST-UPDATED "201704130000Z" -- April 13, 2017
+    LAST-UPDATED "202306010000Z" -- June 1, 2023
     ORGANIZATION "Cable Television Laboratories, Inc."
     CONTACT-INFO
            "Postal: Cable Television Laboratories
@@ -38,9 +41,15 @@ cableLabs MODULE-IDENTITY
             This MIB module defines the namespace organization for the
             CableLabs enterprise OID registry.
  
-            Copyright 1999-2017 Cable Television Laboratories, Inc.
+            Copyright 1999-2023 Cable Television Laboratories, Inc.
             All rights reserved."
 
+    REVISION "202306010000Z" -- June 1, 2023
+    DESCRIPTION
+            "Revised per ECN CLAB-DEF-MIB-N-23.0188-1."
+    REVISION "201908150000Z" -- August 15, 2019
+    DESCRIPTION
+            "Revised per ECN CLAB-DEF-MIB-N-19.0173-2."
     REVISION "201704130000Z" -- April 13, 2017
     DESCRIPTION
             "Revised per ECN CLAB-DEF-MIB-N-17.0157-1."
@@ -89,13 +98,20 @@ clabProjPacketCable     OBJECT IDENTIFIER ::= { clabProject 2 }
 clabProjOpenCable       OBJECT IDENTIFIER ::= { clabProject 3 }
 clabProjCableHome       OBJECT IDENTIFIER ::= { clabProject 4 }
 clabProjWireless        OBJECT IDENTIFIER ::= { clabProject 5 }
+clabProjCoOpt           OBJECT IDENTIFIER ::= { clabProject 6 }
 
 -- Sub-tree for Global Security Definitions
 clabSecurity            OBJECT IDENTIFIER ::= { cableLabs 3 }
 clabSecCertObject       OBJECT IDENTIFIER ::= { clabSecurity 1 } 
 clabSecOlcaObject		OBJECT IDENTIFIER ::= { clabSecurity 2 }
+
 -- Sub tree for CableLabs cross project common MIB definitions 
 clabCommonMibs          OBJECT IDENTIFIER ::= { cableLabs 4 }
+
+-- CableLabs conformance
+clabConformance         OBJECT IDENTIFIER ::= { cableLabs 5 }
+clabCompliances         OBJECT IDENTIFIER ::= { clabConformance 1 }
+clabGroups              OBJECT IDENTIFIER ::= { clabConformance 2 }
 
 --
 -- CableLabs DOCSIS Project Sub-tree Definitions
@@ -364,7 +380,7 @@ clabAniDevMib OBJECT IDENTIFIER
 -- DOCSIS Defined Textual Conventions 
 --
 
-DocsL2vpnIfList ::= TEXTUAL-CONVENTION
+CpeInterfaceMaskType ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
             "An object of this type indicates a set of CM 
@@ -387,7 +403,7 @@ DocsL2vpnIfList ::= TEXTUAL-CONVENTION
             interface. In CableHome devices, this interface is assigned
             to the embedded Portal Services (ePS) host interface, which
             provides a portal to the primary physical CPE interface. 
-            In many contexts of a DocsL2VpnIfList, a '1' in bit 
+            In many contexts of a CpeInterfaceMaskType, a '1' in bit 
             position 1 corresponds to 'any' or 'all' CPE interfaces 
             when the CM contains more than one CPE interface. 
 
@@ -403,10 +419,10 @@ DocsL2vpnIfList ::= TEXTUAL-CONVENTION
 
             ifIndex values 5 through 15 are reserved for individual
             CPE interfaces for devices that implement more than one
-            CPE interface. In such devices, DocsL2vpnIfList bit 
+            CPE interface. In such devices, CpeInterfaceMaskType bit 
             position 1 corresponds to the set of all CPE interfaces.
             A CM with more than one CPE interface MAY assign a 
-            DocsL2vpnIfList bit position within the range of 5..15 to
+            CpeInterfaceMaskType bit position within the range of 5..15 to
             refer to the single primary CPE interface.
 
             ifIndex value 16 is assigned to any embedded Multimedia 
@@ -419,6 +435,11 @@ DocsL2vpnIfList ::= TEXTUAL-CONVENTION
 
             ifIndex values 19 through 31 are
             reserved for future defined embedded Service Application."
+    REFERENCE 
+            "MAC and Upper Layer Protocols Interface Specification,
+            CM-SP-MULPIv4.0-I06-221019; CM Interface Mask (CMIM)
+            Encoding section in the Encodings for Configuration and
+            MAC-Layer Messaging Annex."
     SYNTAX      BITS {
         eCm(0),
         cmci(1),
@@ -431,5 +452,35 @@ DocsL2vpnIfList ::= TEXTUAL-CONVENTION
         eStbDsg(18)
         -- 19..31 reserved for other eSAFE interfaces
     }
+
+-- ---------------------------------------------------------------------
+-- Compliance
+-- ---------------------------------------------------------------------
+    
+clabCompliance MODULE-COMPLIANCE 
+    STATUS current 
+    DESCRIPTION 
+        "The compliance statement for the CableLabs MIB."
+
+MODULE -- cableLabs
+
+GROUP clabGroup 
+    DESCRIPTION
+        "Group of objects applicable to CableLabs"
+    
+::= { clabCompliances 1}
+
+clabGroup OBJECT-GROUP
+    OBJECTS {
+              clabSrvcPrvdrRootCACert,
+              clabCVCRootCACert,
+              clabCVCCACert,
+              clabMfgCVCCert,
+              clabMfgCACert
+             }
+    STATUS      current
+    DESCRIPTION
+        "Group of objects implemented in CableLabs."
+    ::= { clabGroups 1 } 
 END
 

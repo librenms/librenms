@@ -27,25 +27,38 @@ IMPORTS
 		FROM SNMPv2-CONF;
 
 ieee8021SpbMib MODULE-IDENTITY
-	LAST-UPDATED "201806280000Z" -- June 28, 2018
-	ORGANIZATION "IEEE 802.1 Working Group"
-	CONTACT-INFO
+    LAST-UPDATED "202211080000Z" -- November 8, 2022
+    ORGANIZATION "IEEE 802.1 Working Group"
+    CONTACT-INFO
         "  WG-URL: http://www.ieee802.org/1/
-         WG-EMail: stds-802-1-L@ieee.org
-
+         WG-EMail: stds-802-1-l@ieee.org
           Contact: IEEE 802.1 Working Group Chair
            Postal: C/O IEEE 802.1 Working Group
                    IEEE Standards Association
                    445 Hoes Lane
-                   Piscataway
-                   NJ 08854
+                   Piscataway, NJ 08854
                    USA
-           E-mail: stds-802-1-L@ieee.org"
-	DESCRIPTION  "802.1 SPB MIB"
+           E-mail: stds-802-1-chairs@ieee.org"
 
-    REVISION "201806280000Z" -- June 28, 2018
+    DESCRIPTION 
+        "The MIB module for managing the support of
+        Shortest Path Bridging (SPB) in IEEE 802.1Q Bridges.
+
+        Unless otherwise indicated, the references in this MIB
+        module are to IEEE Std 802.1Q-2022.
+
+        Copyright (C) IEEE (2022).
+        This version of this MIB module is part of IEEE Std 802.1Q;
+        see that standard for full legal notices."
+
+    REVISION "202211080000Z" -- November 8, 2022
     DESCRIPTION
-            "Published as part of IEEE Std 802.1Q-2018.
+            "Published as part of IEEE Std 802.1Q-2022.
+            Cross references and contact information updated."
+
+    REVISION "201807010000Z" -- July 1, 2018
+    DESCRIPTION
+            "Published as part of IEEE Std 802.1Q 2018 revision.
             Cross references updated and corrected.
             Contact details corrected. Syntax error in
             ieee8021SpbEctDynamicEntryIngressCheckDiscards
@@ -168,7 +181,7 @@ IEEE8021SpbMTID ::= TEXTUAL-CONVENTION
 	STATUS current
 	DESCRIPTION
 		"The IS-IS Multi Topology Identifier."
-	REFERENCE "3.157, 3.158"
+	REFERENCE "3.158, 3.159"
 	SYNTAX Unsigned32
 
 IEEE8021SpbServiceIdentifierOrAny ::= TEXTUAL-CONVENTION
@@ -179,7 +192,7 @@ IEEE8021SpbServiceIdentifierOrAny ::= TEXTUAL-CONVENTION
 		 port in SPBM to distinguish a service instance.
 		 The special value of 0xFFFFFF is used for wildcard. 
 		 This range also includes the default I-SID. "
-	REFERENCE "3.157, 3.158"
+	REFERENCE "3.158, 3.159"
 	SYNTAX Unsigned32 (255..16777215)
 
 -- ===================================================================
@@ -226,7 +239,7 @@ ieee8021SpbSysId OBJECT-TYPE
 		 defaulted to the Bridge Address initially but can 
 		 be overridden.
 		 This object is persistent."
-	REFERENCE "12.25.1.3.3, 3.238"
+	REFERENCE "12.25.1.3.3, 3.244"
 	::= { ieee8021SpbSys 2 }
 
 ieee8021SpbSysControlAddr OBJECT-TYPE
@@ -262,7 +275,7 @@ ieee8021SpbSysBridgePriority OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"This is a 16 bit quantity which ranks this SPB Bridge
+		"This is a 16-bit quantity that ranks this SPB Bridge
 		 relative to others when breaking ties. This priority
 		 is the high 16 bits of the Bridge Identifier. Its impact
 		 depends on the tie breaking algorithm. Recommend 
@@ -282,7 +295,7 @@ ieee8021SpbmSysSPSourceId OBJECT-TYPE
 		 Note that only the 20 bits not including the top 4 bits are
 		 the SPSourceID.
 		 This object is persistent."
-	REFERENCE "12.25.1.3.3, 3.244, 27.15"
+	REFERENCE "12.25.1.3.3, 3.250, 27.15"
 	::= { ieee8021SpbSys 6 }
 
 ieee8021SpbvSysMode OBJECT-TYPE
@@ -295,7 +308,7 @@ ieee8021SpbvSysMode OBJECT-TYPE
 		 auto => auto allocate SPVIDs.
 		 manual => manually assign SPVIDs.
 		 This object is persistent."
-	REFERENCE "12.25.1.3.3, 3.249"
+	REFERENCE "12.25.1.3.3, 3.255"
 	DEFVAL {auto}
 	::= { ieee8021SpbSys 7 }
 
@@ -309,7 +322,7 @@ ieee8021SpbmSysMode OBJECT-TYPE
 		 auto => enable SPBM mode and auto allocate SPsourceID.
 		 manual => enable SPBM mode and manually assign SPsourceID.
 		 This object is persistent."
-	REFERENCE "12.25.1.3.3, 3.239"
+	REFERENCE "12.25.1.3.3, 3.245"
 	DEFVAL {auto}
 	::= { ieee8021SpbSys 8 }
 
@@ -475,7 +488,7 @@ ieee8021SpbTopIxDynamicEntryMCID OBJECT-TYPE
 	STATUS current
 	DESCRIPTION
 		"The MST Identifier MCID. The MCID is a digest of the 
-		 VID to MSTID configuration table which determines the Base VIDs
+		 VID to MSTID configuration table, which determines the Base VIDs
 		 enabled for SPBV and SPBM."
 	REFERENCE "12.25.3.1.3, 13.8"
 	::= { ieee8021SpbTopIxDynamicTableEntry 3 }
@@ -546,7 +559,7 @@ ieee8021SpbEctStaticEntryBaseVid OBJECT-TYPE
 		 Traffic B-VID (SPBM) or Management VID (SPBV).
 		 A Base VID value of 4095 is a wildcard for any Base VID
 		 assigned to SPB operation."
-	REFERENCE "12.25.4.2.3, 3.20"
+	REFERENCE "12.25.4.2.3, 3.21"
 	::= { ieee8021SpbEctStaticTableEntry 2 }
 
 ieee8021SpbEctStaticEntryEctAlgorithm OBJECT-TYPE
@@ -569,7 +582,7 @@ ieee8021SpbEctStaticEntryEctAlgorithm OBJECT-TYPE
 		 The default is 00-80-c2-01, which is the LowPATHID
 		 from Table 28-1.
 		 This object is persistent."
-	REFERENCE "12.25.4.1, 12.25.4.2.3, 3.157"
+	REFERENCE "12.25.4.1, 12.25.4.2.3, 3.158"
 	DEFVAL {"00-80-c2-01"}
 	::= { ieee8021SpbEctStaticTableEntry 3 }
 
@@ -583,7 +596,7 @@ ieee8021SpbvEctStaticEntrySpvid OBJECT-TYPE
 		 but the output always returns the SPVID in use.
 		 Otherwise in SPBM this is empty, should be set = 0.
 		 This object is persistent."
-	REFERENCE "12.25.4.2.3, 3.246"
+	REFERENCE "12.25.4.2.3, 3.252"
 	::= { ieee8021SpbEctStaticTableEntry 4 }
 
 ieee8021SpbEctStaticEntryRowStatus OBJECT-TYPE
@@ -652,7 +665,7 @@ ieee8021SpbEctDynamicEntryBaseVid OBJECT-TYPE
 	DESCRIPTION
 		"The Base VID being queried. Base VID 
 		 define the mode in the VID to MSTID table. "
-	REFERENCE "12.25.5.1.2, 12.25.5.1.3, 3.20"
+	REFERENCE "12.25.5.1.2, 12.25.5.1.3, 3.21"
 	::= { ieee8021SpbEctDynamicTableEntry 2 }
 
 ieee8021SpbEctDynamicEntryMode OBJECT-TYPE
@@ -694,9 +707,9 @@ ieee8021SpbEctDynamicEntryIngressCheckDiscards OBJECT-TYPE
 	DESCRIPTION
 		"The number of ingress check failures on this ECT VID.
 		 This is referred to as the ingress check, and this
-		 counter increments whenever a packet is discarded
+		 counter increments whenever a frame is discarded
 		 for this VID because it has not come from an
-		 interface which is on the shortest path to its SA
+		 interface that is on the shortest path to its SA
 		 or because it is not upstream for the individual DA if
 		 relaxed ingress checking is applied."
 	REFERENCE "12.25.5.1.3, 8.4, 45.3.1"
@@ -754,7 +767,7 @@ ieee8021SpbAdjStaticEntryIfIndex OBJECT-TYPE
 	MAX-ACCESS not-accessible
 	STATUS current
 	DESCRIPTION
-		"The System interface/index which defines this 
+		"The System interface/index that defines this 
 		 adjacency. A value of 0 is a wildcard for any 
 		 interface on which SPB Operation is supported."
 	REFERENCE "12.25.6.1.2, 12.25.6.1.3"
@@ -859,7 +872,7 @@ ieee8021SpbAdjDynamicEntryIfIndex OBJECT-TYPE
 	MAX-ACCESS not-accessible
 	STATUS current
 	DESCRIPTION
-		"System interface/index which defines this adjacency
+		"System interface/index that defines this adjacency
 		 A value of 0 is a wildcard for any interface
 		 on which SPB Operation is enabled."
 	REFERENCE "12.25.7.1.2, 12.25.7.1.3"
@@ -872,7 +885,7 @@ ieee8021SpbAdjDynamicEntryPeerSysId OBJECT-TYPE
 	DESCRIPTION
 		"The SPB System Identifier of this peer. This is used to 
 		 identify a neighbor uniquely."
-	REFERENCE "12.25.7.1.3, 3.238"
+	REFERENCE "12.25.7.1.3, 3.244"
 	::= { ieee8021SpbAdjDynamicTableEntry 3 }
 
 ieee8021SpbAdjDynamicEntryPort OBJECT-TYPE
@@ -890,7 +903,7 @@ ieee8021SpbAdjDynamicEntryIfOperState OBJECT-TYPE
 	STATUS current
 	DESCRIPTION
 		"The operational state of this port.
-		 up, down or testing (in test)."
+		 up, down, or testing (in test)."
 	REFERENCE "12.25.7.1.3"
 	::= { ieee8021SpbAdjDynamicTableEntry 5 }
 
@@ -923,7 +936,7 @@ ieee8021SpbAdjDynamicEntryPeerMCID OBJECT-TYPE
 	STATUS current
 	DESCRIPTION
 		"The peer MST Identifier MCID. The MCID is a digest of the 
-		 VID to MSTID configuration table which determines the Base VIDs
+		 VID to MSTID configuration table, which determines the Base VIDs
 		 enabled for SPBV and SPBM."
 	REFERENCE "12.25.7.1.3, 13.8"
 	::= { ieee8021SpbAdjDynamicTableEntry 8 }
@@ -961,7 +974,7 @@ ieee8021SpbAdjDynamicEntryPortIdentifier OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION
-		"The value for this bridge which has been selected by 
+		"The value for this bridge that has been selected by 
 		 IS-IS to form this adjacency if there is more than 1 candidate link."
 	REFERENCE "12.25.7.1.3, 28.11"
 	::= { ieee8021SpbAdjDynamicTableEntry 12 }
@@ -1041,7 +1054,7 @@ ieee8021SpbTopNodeEntrySysId OBJECT-TYPE
 		"The IS-IS System ID of a bridge in the SPB 
 		 LSP database and hence the network.
 		 A value of 0 is a wildcard for all System identifiers."
-	REFERENCE "12.25.8.1.2, 12.25.8.1.3, 3.238"
+	REFERENCE "12.25.8.1.2, 12.25.8.1.3, 3.244"
 	::= { ieee8021SpbTopNodeTableEntry 2 }
 
 ieee8021SpbTopNodeEntryBridgePriority OBJECT-TYPE
@@ -1050,7 +1063,7 @@ ieee8021SpbTopNodeEntryBridgePriority OBJECT-TYPE
 	STATUS current
 	DESCRIPTION
 		"The Bridge Priority of the bridge in the LSP database.  
-		 This is a 16 bit quantity which ranks this SPB Bridge
+		 This is a 16-bit quantity that ranks this SPB Bridge
 		 relative to others when breaking ties. This priority
 		 is the high 16 bits of the Bridge Identifier. Its impact
 		 depends on the tie breaking algorithm. Recommend 
@@ -1068,7 +1081,7 @@ ieee8021SpbmTopNodeEntrySPsourceID OBJECT-TYPE
 		 It is the high order 3 bytes for Group Address DA from this
 		 bridge. Note that only the 20 bits not including the 
 		 top 4 bits are the SPSourceID."
-	REFERENCE "12.25.8.1.3, 3.247"
+	REFERENCE "12.25.8.1.3, 3.253"
 	::= { ieee8021SpbTopNodeTableEntry 4 }
 
 ieee8021SpbTopNodeEntrySysName OBJECT-TYPE
@@ -1137,9 +1150,9 @@ ieee8021SpbTopEctEntrySysId OBJECT-TYPE
 	MAX-ACCESS not-accessible
 	STATUS current
 	DESCRIPTION
-		"The system ID which is using a particular ECT.
+		"The system ID that is using a particular ECT.
 		 A value of 0 is a wildcard for all System identifiers."
-	REFERENCE "12.25.9.1.2, 12.25.9.1.3, 3.238"
+	REFERENCE "12.25.9.1.2, 12.25.9.1.3, 3.244"
 	::= { ieee8021SpbTopEctTableEntry 2 }
 
 ieee8021SpbTopEctEntryBaseVid OBJECT-TYPE
@@ -1153,7 +1166,7 @@ ieee8021SpbTopEctEntryBaseVid OBJECT-TYPE
 		 this is the Base-VID used for management.
 		 A Base VID value of 4095 is a wildcard for any Base VID
 		 assigned to SPB operation."
-	REFERENCE "12.25.9.1.2, 12.25.9.1.3, 3.20"
+	REFERENCE "12.25.9.1.2, 12.25.9.1.3, 3.21"
 	::= { ieee8021SpbTopEctTableEntry 3 }
 
 ieee8021SpbTopEctEntryEctAlgorithm OBJECT-TYPE
@@ -1169,7 +1182,7 @@ ieee8021SpbTopEctEntryEctAlgorithm OBJECT-TYPE
 		 and the lower 8 bits are an index. This creates a 
 		 world-wide unique identity for the computation that
 		 will be using the VID thus ensuring consistency."
-	REFERENCE "12.25.9.1.3, 3.157"
+	REFERENCE "12.25.9.1.3, 3.158"
 	::= { ieee8021SpbTopEctTableEntry 4 }
 
 ieee8021SpbTopEctEntryMode OBJECT-TYPE
@@ -1190,7 +1203,7 @@ ieee8021SpbvTopEctSysMode OBJECT-TYPE
 		 auto(=1)/manual(=2)
 		 auto => SPBV mode and auto allocate SPVIDs.
 		 manual => SPBV mode and manually assign SPVIDs."
-	REFERENCE "12.25.9.1.3, 3.248"
+	REFERENCE "12.25.9.1.3, 3.254"
 	::= { ieee8021SpbTopEctTableEntry 6 }
 
 ieee8021SpbvTopEctEntrySpvid OBJECT-TYPE
@@ -1201,7 +1214,7 @@ ieee8021SpbvTopEctEntrySpvid OBJECT-TYPE
 		"SPVID in V mode
 		 The VID this bridge will use to originate traffic 
 		 using this ECT-ALGORITHM when running in SPBV mode."
-	REFERENCE "12.25.9.1.3, 3.244"
+	REFERENCE "12.25.9.1.3, 3.250"
 	::= { ieee8021SpbTopEctTableEntry 7 }
 
 ieee8021SpbTopEctEntryLocalUse OBJECT-TYPE
@@ -1273,7 +1286,7 @@ ieee8021SpbTopEdgeEntrySysIdNear OBJECT-TYPE
 		"The System ID of near bridge (the bridge 
 		 reporting the adjacency).
 		 A value of 0 is a wildcard for all System identifiers."
-	REFERENCE "12.25.10.1.2, 12.25.10.1.3, 3.238"
+	REFERENCE "12.25.10.1.2, 12.25.10.1.3, 3.244"
 	::= { ieee8021SpbTopEdgeTableEntry 2 }
 
 ieee8021SpbTopEdgeEntrySysIdFar OBJECT-TYPE
@@ -1284,7 +1297,7 @@ ieee8021SpbTopEdgeEntrySysIdFar OBJECT-TYPE
 		"The System ID of far bridge (the neighbor 
 		 of the bridge reporting).
 		 A value of 0 is a wildcard for all System identifiers."
-	REFERENCE "12.25.10.1.2, 12.25.10.1.3, 3.238"
+	REFERENCE "12.25.10.1.2, 12.25.10.1.3, 3.244"
 	::= { ieee8021SpbTopEdgeTableEntry 3 }
 
 ieee8021SpbTopEdgeEntryMetricNear2Far OBJECT-TYPE
@@ -1372,7 +1385,7 @@ ieee8021SpbmTopSrvEntrySysId OBJECT-TYPE
 	DESCRIPTION
 		"The System identifier this service originates/terminates on.
 		 A value of 0 is a wildcard for all System identifiers."
-	REFERENCE "12.25.11.1.2, 12.25.11.1.3, 3.238"
+	REFERENCE "12.25.11.1.2, 12.25.11.1.3, 3.244"
 	::= { ieee8021SpbmTopSrvTableEntry 2 }
 
 ieee8021SpbmTopSrvEntryIsid OBJECT-TYPE
@@ -1482,7 +1495,7 @@ ieee8021SpbvTopSrvEntrySysId OBJECT-TYPE
 	DESCRIPTION
 		"The System identifier advertising this group address.
 		 A value of 0 is a wildcard for all System identifiers."
-	REFERENCE "12.25.12.1.2, 12.25.12.1.3, 3.238"
+	REFERENCE "12.25.12.1.2, 12.25.12.1.3, 3.244"
 	::= { ieee8021SpbvTopSrvTableEntry 2 }
 
 ieee8021SpbvTopSrvEntryMMac OBJECT-TYPE
@@ -1503,7 +1516,7 @@ ieee8021SpbvTopSrvEntryBaseVid OBJECT-TYPE
 	DESCRIPTION
 		"The Base VID associated with this service. The Base VID determines
 		 the ECT Algorithm that is associated with this service."
-	REFERENCE "12.25.12.1.3, 3.20"
+	REFERENCE "12.25.12.1.3, 3.21"
 	::= { ieee8021SpbvTopSrvTableEntry 4 }
 
 ieee8021SpbvTopSrvEntryMMacFlags OBJECT-TYPE
@@ -1732,8 +1745,8 @@ dot1agCfmMepSpbmEspIndex OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
-        "This is an identifier, of local signifigance to a particular
-         SPBM path MA which is used to index the ESPs associated
+        "This is an identifier, of local significance to a particular
+         SPBM path MA that is used to index the ESPs associated
          with that MA."
     ::= { dot1agCfmMepSpbmEspEntry 1 }
 

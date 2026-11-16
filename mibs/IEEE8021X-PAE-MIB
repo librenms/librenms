@@ -1,6 +1,6 @@
 -- *********************************************************************
 --   
--- IEEE8021X-PAE-MIB : IEEE 802.1X (802.1X-2010 + 802.1Xbx + 802.1Xck)
+-- IEEE8021X-PAE-MIB : IEEE 802.1X
 --
 -- *********************************************************************
 
@@ -34,18 +34,17 @@ IMPORTS
         FROM IEEE8021-SECY-MIB;
 
 ieee8021XPaeMIB MODULE-IDENTITY
-    LAST-UPDATED    "201710281457Z"
+    LAST-UPDATED    "202002181507Z"
     ORGANIZATION    "IEEE 802.1 Working Group"
     CONTACT-INFO
-      " WG-URL: http://grouper.ieee802.org/1
+      " WG-URL: http://www.ieee802.org/1
         WG-EMail: stds-802-1-L@ieee.org
         Contact: IEEE 802.1 Working Group Chair
         Postal: C/O IEEE 802.1 Working Group
                 IEEE Standards Association
                 445 Hoes Lane
-                P.O. Box 1331
                 Piscataway
-                NJ 08855-1331
+                NJ 08854
                 USA
                 E-mail: STDS-802-1-L@LISTSERV.IEEE.ORG"
     DESCRIPTION
@@ -234,6 +233,14 @@ ieee8021XPaeMIB MODULE-IDENTITY
             created on demand.  Virtual ports can be used to provide
             separate secure connectivity associations over the same
             LAN."
+    REVISION        "201202181507Z"
+    DESCRIPTION
+        "Published as part of IEEE Std 802.1X-2020.
+         Updated CONTACT-INFO. Corrected last REVISION DESCRIPTION." 
+    REVISION        "201904102040Z"
+    DESCRIPTION
+        "Edited ieee8021XSuppPaeHelloPeriod DESCRIPTION to refer to HeldPeriod.
+         Updated ieee8021XSuppPaeRetryMax DESCRIPTION to match." 
     REVISION        "201710281457Z"
     DESCRIPTION
         "Published as part of IEEE 802.1Xck.
@@ -1613,8 +1620,8 @@ ieee8021XSuppPaeHelloPeriod OBJECT-TYPE
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "This object indicated a waiting time period after a failed
-        authentication attempt, before another attempt is permitted."
+        "The HeldPeriod before a failed authentication attempt is retried.
+        Name HelloPeriod in previous MIB revisions retained for compatibility."
     REFERENCE       "IEEE 802.1X Clause 8.6, Figure 8-6, Figure 12-3"
     DEFVAL          { 60 } 
     ::= { ieee8021XSupplicantEntry 4 }
@@ -1627,7 +1634,7 @@ ieee8021XSuppPaeRetryMax OBJECT-TYPE
     DESCRIPTION
         "The maximum number of authentication attempts before failure is
         reported to the Logon Process, and the ieee8021XSuppPaeHelloPeriod
-        timer imposed before further attempts are permitted."
+        (HeldPeriod) imposed before further attempts are permitted."
     REFERENCE       "IEEE 802.1X Clause 8.7, Figure 8-6, Figure 12-3"
     DEFVAL          { 2 } 
     ::= { ieee8021XSupplicantEntry 5 }

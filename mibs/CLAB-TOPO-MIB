@@ -17,7 +17,7 @@ CLAB-TOPO-MIB DEFINITIONS ::= BEGIN
              FROM CLAB-DEF-MIB;
 
 clabTopoMib MODULE-IDENTITY
-     LAST-UPDATED    "201706150000Z" -- June 15, 2017
+     LAST-UPDATED    "201811080000Z" -- November 8, 2018
      ORGANIZATION    "Cable Television Laboratories, Inc."
      CONTACT-INFO
          "
@@ -47,6 +47,10 @@ clabTopoMib MODULE-IDENTITY
          management of fiber nodes in the Cable plant.
          Copyright 2006-2017 Cable Television Laboratories, Inc.
          All rights reserved."
+     REVISION    "201811080000Z" -- November 8, 2018
+     DESCRIPTION
+         "Revised Version includes ECN
+         CLAB-TOPO-MIB-N-18.0169-1."
      REVISION    "201706150000Z" -- June 15, 2017
      DESCRIPTION
          "Revised Version includes ECN
@@ -68,12 +72,13 @@ clabTopoMib MODULE-IDENTITY
 -- Textual Conventions
 
 NodeName ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "64t"
      STATUS      current
      DESCRIPTION
         "This data type is a human readable string that represents
         the name of a fiber node. Internationalization is supported
         by conforming to the SNMP textual convention SnmpAdminString.
-        The US-ASCII control characters (0x00 – 0x1F), the DEL
+        The US-ASCII control characters (0x00 - 0x1F), the DEL
         Character (0x7F), and the double-quote mark (0x22) are 
         prohibited within the syntax of this data type."
      REFERENCE
