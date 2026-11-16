@@ -132,6 +132,11 @@ return [
         'long' => 'Cell',
         'unit' => '',
     ],
+    'cqi' => [
+        'short' => 'CQI',
+        'long' => 'Channel Quality Indicator',
+        'unit' => '',
+    ],
     'channel' => [
         'short' => 'Channel',
         'long' => 'Channel',

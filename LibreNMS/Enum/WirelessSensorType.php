@@ -33,6 +33,7 @@ enum WirelessSensorType: string
     case Frequency = 'frequency';
     case Distance = 'distance';
     case Cell = 'cell';
+    case Cqi = 'cqi';
     case Channel = 'channel';
 
     public function icon(): string
@@ -61,6 +62,7 @@ enum WirelessSensorType: string
             self::Frequency => 'line-chart',
             self::Distance => 'space-shuttle',
             self::Cell => 'line-chart',
+            self::Cqi => 'signal',
             self::Channel => 'line-chart',
             self::Mcs => 'signal',
         };

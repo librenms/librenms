@@ -43,6 +43,7 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\QosDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessCqiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
@@ -73,6 +74,7 @@ class Routeros extends OS implements
     TransceiverDiscovery,
     WirelessCcqDiscovery,
     WirelessCellDiscovery,
+    WirelessCqiDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
     WirelessNoiseFloorDiscovery,
@@ -252,7 +254,7 @@ class Routeros extends OS implements
             );
         }
 
-        foreach ($this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable') as $index => $entry) {
+        foreach ($this->lteModems() as $index => $entry) {
             // the modem reports 0 when it has no RSSI (lTAP mini)
             if (! isset($entry['mtxrLTEModemSignalRSSI']) || (float) $entry['mtxrLTEModemSignalRSSI'] == 0) {
                 continue;
@@ -485,15 +487,19 @@ class Routeros extends OS implements
      */
     public function discoverWirelessCell()
     {
+        // walked numerically like the poller: by name the MIB display hint renders the HexInt as hex
+        $cellIds = [];
+        foreach (SnmpQuery::numeric()->walk('.1.3.6.1.4.1.14988.1.1.16.1.1.5')->values() as $oid => $value) {
+            $cellIds[substr((string) $oid, strrpos((string) $oid, '.') + 1)] = $value;
+        }
+
         $sensors = [];
-        foreach ($this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable') as $index => $entry) {
-            if (! isset($entry['mtxrLTEModemCellId'])) {
+        foreach ($this->lteModems() as $index => $entry) {
+            if (! is_numeric($cellIds[$index] ?? null)) {
                 continue;
             }
 
-            // MIB display hint renders the HexInt as hex, the poller fetches it numerically
-            $cellId = $entry['mtxrLTEModemCellId'];
-            $cellId = ctype_xdigit((string) $cellId) ? hexdec($cellId) : (int) $cellId;
+            $cellId = (int) $cellIds[$index];
             if ($cellId < 0 || $cellId >= 0xFFFFFFFF) {
                 continue; // -1 (or all ones): modem does not report the cell id (seen on SXT LTE)
             }
@@ -513,13 +519,40 @@ class Routeros extends OS implements
     }
 
     /**
+     * Discover the Channel Quality Indicator the LTE/5G modem reports to the cell (0-15)
+     *
+     * @return array<WirelessSensor>
+     */
+    public function discoverWirelessCqi(): array
+    {
+        $sensors = [];
+        foreach ($this->lteModems() as $index => $entry) {
+            if (! is_numeric($entry['mtxrLTEModemCQI'] ?? null)) {
+                continue;
+            }
+
+            $sensors[] = new WirelessSensor(
+                WirelessSensorType::Cqi,
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.14988.1.1.16.1.1.21.' . $index,
+                'routeros',
+                $index,
+                $this->lteName($index) . ': CQI',
+                $entry['mtxrLTEModemCQI']
+            );
+        }
+
+        return $sensors;
+    }
+
+    /**
      * @param  array<string, array{string, string, string, int}>  $columns  column => [oid leaf, index prefix, description, divisor]
      * @return array<WirelessSensor>
      */
     private function discoverLteSignal(WirelessSensorType $type, array $columns): array
     {
         $sensors = [];
-        foreach ($this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable') as $index => $entry) {
+        foreach ($this->lteModems() as $index => $entry) {
             $found = [];
             foreach ($columns as $column => [$leaf, $prefix, $descr, $divisor]) {
                 // the first available column wins when several map to the same sensor index
@@ -527,8 +560,9 @@ class Routeros extends OS implements
                     continue;
                 }
 
-                // newer columns (5G NR) are absent on older RouterOS or report 0 (NR RSRQ: '.0') on LTE-only modems
-                if (! isset($entry[$column]) || ($prefix !== '' && (float) $entry[$column] == 0)) {
+                // newer columns (5G NR) are absent on older RouterOS or report 0 (NR RSRQ: '.0') on LTE-only modems,
+                // a modem without signal may report an empty value
+                if (! is_numeric($entry[$column] ?? null) || ($prefix !== '' && (float) $entry[$column] == 0)) {
                     continue;
                 }
 
@@ -557,9 +591,19 @@ class Routeros extends OS implements
         return $sensors;
     }
 
+    /**
+     * The LTE modem table, columns without MIB prefix and enums as names
+     *
+     * @return array<int|string, array<string, mixed>>
+     */
+    private function lteModems(): array
+    {
+        return SnmpQuery::cache()->hideMib()->enumStrings()->walk('MIKROTIK-MIB::mtxrLTEModemTable')->table(1);
+    }
+
     private function lteName(int|string $index): string
     {
-        return $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName')[$index] ?? "lte$index";
+        return SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrInterfaceStatsName')->pluck()[$index] ?? "lte$index";
     }
 
     public function discoverEntityPhysical(): Collection
@@ -567,7 +611,7 @@ class Routeros extends OS implements
         $inventory = parent::discoverEntityPhysical();
         $chassis = $inventory->firstWhere('entPhysicalClass', 'chassis')->entPhysicalIndex ?? 0;
 
-        foreach ($this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable') as $index => $entry) {
+        foreach ($this->lteModems() as $index => $entry) {
             $model = trim($entry['mtxrLTEModemModel'] ?? '');
             $firmware = trim($entry['mtxrLTEModemFirmware'] ?? '');
             $iccid = trim($entry['mtxrLTEModemUICC'] ?? '');
@@ -628,7 +672,7 @@ class Routeros extends OS implements
         ];
 
         $state_indexes = [];
-        foreach ($this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable') as $index => $entry) {
+        foreach ($this->lteModems() as $index => $entry) {
             foreach ($columns as $column => [$leaf, $descr]) {
                 // the ICCID is empty without a SIM, which is the state we want to see.
                 // Other columns are empty when RouterOS does not fill them (PIN/registration status on 7.23)
@@ -721,7 +765,10 @@ class Routeros extends OS implements
         // ifPhysAddress is filled by the ports poller, fetch it for ports that were not polled yet (new device)
         $missing = $ports->whereNull('ifPhysAddress');
         if ($missing->isNotEmpty()) {
-            $macs = SnmpQuery::get($missing->map(fn ($port) => 'IF-MIB::ifPhysAddress.' . $port->ifIndex)->all())->values();
+            $macs = [];
+            foreach ($missing->chunk(30) as $chunk) {
+                $macs += SnmpQuery::get($chunk->map(fn ($port) => 'IF-MIB::ifPhysAddress.' . $port->ifIndex)->values()->all())->values();
+            }
             foreach ($missing as $port) {
                 $port->ifPhysAddress = Mac::parse($macs["IF-MIB::ifPhysAddress[$port->ifIndex]"] ?? null)->hex() ?: null;
             }
@@ -841,9 +888,9 @@ class Routeros extends OS implements
         return match ($column) {
             'mtxrLTEModemUICC' => $value === '' ? 0 : 1,
             'mtxrLTEModemRAT' => match (true) {
-                str_contains($value, 'nsa') || (str_contains($value, 'lte') && preg_match('/nr|5g/', $value)) => 5,
-                (bool) preg_match('/nr|5g/', $value) => 6,
-                (bool) preg_match('/lte|4g|e-utran/', $value) => 4,
+                str_contains($value, 'nsa') || (str_contains($value, 'lte') && preg_match('/\bnr|5g/', $value)) => 5,
+                (bool) preg_match('/\bnr|5g/', $value) => 6,
+                (bool) preg_match('/lte|4g|e-?utran/', $value) => 4,
                 (bool) preg_match('/umts|wcdma|hspa|utran|3g/', $value) => 3,
                 (bool) preg_match('/gsm|gprs|edge|2g/', $value) => 2,
                 default => 0,
