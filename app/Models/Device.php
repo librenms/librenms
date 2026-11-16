@@ -1053,6 +1053,22 @@ class Device extends BaseModel
     }
 
     /**
+     * @return HasMany<RadiusServer, $this>
+     */
+    public function radiusServers(): HasMany
+    {
+        return $this->hasMany(RadiusServer::class, 'device_id');
+    }
+
+    /**
+     * @return HasMany<SubscriberCount, $this>
+     */
+    public function subscriberCounts(): HasMany
+    {
+        return $this->hasMany(SubscriberCount::class, 'device_id');
+    }
+
+    /**
      * @return HasMany<MuninPlugin, $this>
      */
     public function muninPlugins(): HasMany

@@ -2192,6 +2192,24 @@ qos:
     qos_device_id_foreign: { name: qos_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
     qos_parent_id_foreign: { name: qos_parent_id_foreign, foreign_key: parent_id, table: qos, key: qos_id, extra: 'ON DELETE SET NULL' }
     qos_port_id_foreign: { name: qos_port_id_foreign, foreign_key: port_id, table: ports, key: port_id, extra: 'ON DELETE SET NULL' }
+radius_servers:
+  Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: address, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: port, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: state, Type: varchar(16), 'Null': true, Extra: '' }
+    - { Field: dead_count, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: requests, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: accepts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: rejects, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: timeouts, Type: 'bigint unsigned', 'Null': true, Extra: '' }
+    - { Field: round_trip_time, Type: 'int unsigned', 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    radius_servers_device_id_index: { Name: radius_servers_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+  Constraints:
+    radius_servers_device_id_foreign: { name: radius_servers_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
 roles:
   Columns:
     - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
@@ -2487,6 +2505,20 @@ stp:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [stp_id], Unique: true, Type: BTREE }
     stp_device_id_index: { Name: stp_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+subscriber_counts:
+  Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: port_id, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: session_type, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: sessions, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    subscriber_counts_device_id_port_id_index: { Name: subscriber_counts_device_id_port_id_index, Columns: [device_id, port_id], Unique: false, Type: BTREE }
+    subscriber_counts_port_id_foreign: { Name: subscriber_counts_port_id_foreign, Columns: [port_id], Unique: false, Type: BTREE }
+  Constraints:
+    subscriber_counts_device_id_foreign: { name: subscriber_counts_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
+    subscriber_counts_port_id_foreign: { name: subscriber_counts_port_id_foreign, foreign_key: port_id, table: ports, key: port_id, extra: 'ON DELETE CASCADE' }
 syslog:
   Columns:
     - { Field: device_id, Type: 'int unsigned', 'Null': true, Extra: '' }

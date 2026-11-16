@@ -43,14 +43,19 @@ use App\Models\PortsNac;
 use App\Models\PortVlan;
 use App\Models\Processor;
 use App\Models\Qos;
+use App\Models\RadiusServer;
 use App\Models\Sla;
 use App\Models\Storage;
+use App\Models\SubscriberCount;
 use App\Models\Transceiver;
 use App\Models\Vlan;
 use App\Models\Vrf;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Exceptions\SnmpException;
+use LibreNMS\Interfaces\Discovery\RadiusServerDiscovery;
+use LibreNMS\Interfaces\Discovery\SubscriberDiscovery;
 use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Discovery\MacAccountingDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
@@ -68,6 +73,7 @@ use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
+use LibreNMS\OS\Traits\RadiusAuthClientMib;
 use LibreNMS\OS\Traits\CiscoCdpMib;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
@@ -80,6 +86,8 @@ use SnmpQuery;
 
 class Cisco extends OS implements
     BgpAddressFamilyDiscovery,
+    RadiusServerDiscovery,
+    SubscriberDiscovery,
     OSDiscovery,
     SlaDiscovery,
     StpInstanceDiscovery,
@@ -96,6 +104,7 @@ class Cisco extends OS implements
     VlanDiscovery,
     VlanPortDiscovery
 {
+    use RadiusAuthClientMib;
     use CiscoCdpMib;
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
@@ -1394,5 +1403,119 @@ class Cisco extends OS implements
         }
 
         return $families;
+    }
+
+    /**
+     * CISCO-SUBSCRIBER-SESSION-MIB SubSessionType to SubscriberCount::SESSION_TYPES
+     */
+    private const array SUBSCRIBER_SESSION_TYPES = [
+        1 => 'total',
+        2 => 'other',
+        3 => 'ppp',
+        4 => 'pppoe',
+        5 => 'l2tp',
+        6 => 'other',
+        7 => 'ipoe',
+        8 => 'ipoe',
+        9 => 'ipoe',
+        10 => 'ipoe',
+        11 => 'ipoe',
+        12 => 'ipoe',
+        13 => 'ipoe',
+    ];
+
+    /**
+     * Aggregated subscriber sessions from CISCO-SUBSCRIBER-SESSION-MIB, a single walk.
+     *
+     * @return Collection<int, SubscriberCount>|null
+     */
+    public function discoverSubscribers(): ?Collection
+    {
+        try {
+            $response = SnmpQuery::numericIndex()->hideMib()->walk('CISCO-SUBSCRIBER-SESSION-MIB::csubAggStatsUpSessions')->throwIfConnectionError();
+        } catch (SnmpException) {
+            return null;
+        }
+
+        if (! $response->isValid()) {
+            return new Collection; // not a BNG
+        }
+
+        $table = $response->table(3);
+        $counts = new Collection;
+        $count = fn (?int $portId, int|string $sessionType, array $data) => $counts->push(new SubscriberCount([
+            'port_id' => $portId,
+            'session_type' => self::SUBSCRIBER_SESSION_TYPES[$sessionType] ?? 'other',
+            'sessions' => (int) $data['csubAggStatsUpSessions'],
+        ]));
+
+        // the device counts are the chassis entry, or the sum of the nodes (route processors, line cards)
+        $nodes = $table[1] ?? [];
+        $chassis = $this->getDevice()->entityPhysical()->whereIn('entPhysicalIndex', array_keys($nodes))->where('entPhysicalClass', 'chassis')->value('entPhysicalIndex');
+        foreach ($chassis ? [$chassis => $nodes[$chassis]] : $nodes as $types) {
+            foreach ($types as $sessionType => $data) {
+                $count(null, $sessionType, $data);
+            }
+        }
+
+        foreach ($table[2] ?? [] as $ifIndex => $types) {
+            $portId = PortCache::getIdFromIfIndex($ifIndex, $this->getDevice());
+            foreach ($portId === null ? [] : $types as $sessionType => $data) {
+                $count($portId, $sessionType, $data);
+            }
+        }
+
+        return $counts;
+    }
+
+    /**
+     * RADIUS servers from RADIUS-AUTH-CLIENT-MIB, with their state from CISCO-AAA-SERVER-MIB.
+     * IOS-XE only has CISCO-AAA-SERVER-MIB, which does not split responses into accepts and rejects.
+     *
+     * @return Collection<int, RadiusServer>|null
+     */
+    public function discoverRadiusServers(): ?Collection
+    {
+        $servers = $this->discoverRadiusAuthClientServers();
+        if ($servers === null) {
+            return null;
+        }
+
+        try {
+            $cisco = SnmpQuery::hideMib()->numericIndex()->walk([
+                'CISCO-AAA-SERVER-MIB::casConfigTable',
+                'CISCO-AAA-SERVER-MIB::casStatisticsTable',
+            ])->throwIfConnectionError()->table(2)[2] ?? []; // casProtocol radius(2)
+        } catch (SnmpException) {
+            return $servers;
+        }
+
+        foreach ($cisco as $row) {
+            if (empty($row['casAddress'])) {
+                continue;
+            }
+
+            $port = (int) ($row['casAuthenPort'] ?? 0);
+            $server = $servers->first(fn (RadiusServer $server) => $server->address == $row['casAddress'] && $server->port == $port);
+            if ($server === null) {
+                $server = new RadiusServer([
+                    'address' => $row['casAddress'],
+                    'port' => $port,
+                    'requests' => $row['casAuthenRequests'] ?? null,
+                    'timeouts' => $row['casAuthenRequestTimeouts'] ?? null,
+                    'round_trip_time' => isset($row['casAuthenResponseTime']) ? (int) $row['casAuthenResponseTime'] * 10 : null,
+                ]);
+                $servers->push($server);
+            }
+
+            $server->state = match ($row['casState'] ?? null) {
+                '1', 'up' => 'up',
+                '2', 'dead' => 'dead',
+                default => null,
+            };
+            $server->dead_count = $row['casDeadCount'] ?? null;
+        }
+
+        return $servers;
     }
 }

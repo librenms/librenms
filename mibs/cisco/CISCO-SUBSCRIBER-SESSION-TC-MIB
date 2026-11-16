@@ -1,0 +1,357 @@
+-- *****************************************************************
+-- CISCO-SUBSCRIBER-SESSION-TC-MIB
+-- Definitions of textual conventions describing
+-- subscriber sessions.
+--   
+-- September 2007, Patrick R. Gili
+--   
+-- Copyright (c) 2007, 2011-2012 by Cisco Systems Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+CISCO-SUBSCRIBER-SESSION-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoSubscriberSessionTcMIB MODULE-IDENTITY
+    LAST-UPDATED    "201201270000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA 95134
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-snmp@cisco.com"
+    DESCRIPTION
+        "This MIB module defines textual conventions describing
+        subscriber sessions."
+    REVISION        "200709260000Z"
+    DESCRIPTION
+        "The initial version of the MIB module."
+    ::= { ciscoMgmt 785 }
+
+
+
+SubSessionType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "An enumerated integer-value describing the type of subscriber
+        session.  This value has the intent of refining the interface
+        type assigned to a subscriber session.  The interface type
+        assigned to a subscriber session groups those types of
+        subscriber sessions with similar interface semantics.
+
+        A PPP subscriber session consists of a PPP connection
+        (RFC-1661)
+        and has an interface type of 'ppp'.  The following subscriber
+        types refine PPP subscriber sessions:
+
+            'pppSubscriber'
+                A PPP connection initiated over a circuit (e.g., an
+        ISDN
+                line or ATM VC) using the LCP (RFC-1661).
+
+            'pppoeSubscriber'
+                A PPP connection over Ethernet (RFC-2516), initiated
+                by a PADI (PPPoE Active Discovery Initiation) packet.
+
+            'l2tpSubscriber'
+                A PPP connection over an L2TP tunnel (RFC-2661),
+                initiated by an Incoming-Call-Request control message.
+
+            'l2fSubscriber'
+                A PPP connection over an L2F tunnel (RFC-2341),
+                initiated by a L2F_OPEN message with a non-zero MID.
+
+        An IP subscriber session consists of the routed traffic
+        associated with a subscriber IP address having an interface
+        type of 'ipSubscriber'.  Routed traffic describes IP traffic
+        that transits at least one router.  If a subscriber's IP
+        address
+        is not unique to the system, further distinguishing
+        characteristics, such as VRF or MAC address, form part of the
+        subscriber's identity.  The following subscriber types refine
+        IP
+        subscriber sessions:
+
+            'ipInterfaceSubscriber'
+                An IP subcriber session provisioned by the system's
+                configuration which consists of all traffic received by
+                the interface to which the provisioning applies.
+
+            'ipPktSubscriber'
+                An IP subscriber session initiated by the receipt of
+        the
+                first packet received with an unclassified source IP
+                address.
+
+            'ipDhcpv4Subscriber'
+                An IP subscriber session initiated by the receipt of a
+                DHCPv4 DISCOVER packet (RFC-2131).
+
+            'ipRadiusSubscriber'
+                An IP subscriber session initiated by the receipt of a
+                RADIUS Access-Request packet (RFC-2865).
+
+        An L2 subscriber session consists of the non-routed traffic
+        associated with a subscriber IP address having an interface
+        type of 'l2Subscriber'.  Non-routed traffic describes IP
+        traffic
+        that doesn't transit a router, meaning that the subscriber must
+        be directly connected to the system or have a connection
+        through
+        an L2 access network (e.g., bridges, switches, and tunnels).
+        The
+        following subscriber types refine L2 subscriber sessions:
+
+            'l2MacPacketSubscriber'
+                An L2 subscriber session initiated by the receipt of
+        the
+                first layer 2 packet with an unclassified source MAC
+                address.
+
+            'l2Dhcpv4Subscriber'
+                An L2 subscriber session initiated by the receipt of a
+                DHCPv4 DISCOVER packet (RFC-2131).
+
+            'l2RadiusSucriber'
+                An L2 subscriber session initiated by the receipt of a
+                RADIUS Access-Request packet (RFC-2865).
+
+        The system should assign the value 'other' to any subscriber
+        session not recognized by the implementation of a MIB module
+        using this textual convention.
+
+        The value 'all' represents a special value used to indicate all
+        subscriber session types.  For example, a scope of aggregation
+        that includes all subscriber session types uses this value to
+        indicate this fact."
+
+    REFERENCE
+        "W. Simpson, 'The Point-to-Point Protocol (PPP)',
+        RFC-1661,
+        July 1994.
+
+        R. Droms, 'Dynamic Host Configuration Protocol', RFC-2131,
+        March
+        1997.
+
+        A. Valencia, M. Littlewood, T. Kolar, 'Cisco Layer Two
+        Forwarding Protocol (L2F)', RFC-2341, May 1998.
+
+        L. Mamakos, K. Lidl, J. Evarts, D. Carrel, D. Simone, and
+        R. Wheeler, 'A Method for Transmitting PPP Over Ethernet
+        (PPPoE)', RFC-2516, February 1999.
+
+        W. Townsley, A. Valencia, A. Rubens, G. Pall, G. Zorn,
+        and
+        B. Palter, 'Layer Two Tunneling Protocol (L2TP)',
+        RFC-2661,
+        August 1999.
+
+        C. Rigney, S. Willens, A. Rubens, and W. Simpson, 'Remote
+        Authentication Dial-In User Service (RADIUS)', RFC-2865,
+        June
+        2000."
+    SYNTAX          INTEGER  {
+                        all(1),
+                        other(2),
+                        pppSubscriber(3),
+                        pppoeSubscriber(4),
+                        l2tpSubscriber(5),
+                        l2fSubscriber(6),
+                        ipInterfaceSubscriber(7),
+                        ipPktSubscriber(8),
+                        ipDhcpv4Subscriber(9),
+                        ipRadiusSubscriber(10),
+                        l2MacSubscriber(11),
+                        l2Dhcpv4Subscriber(12),
+                        l2RadiusSubscriber(13)
+                    }
+
+SubSessionTypes ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A bit string describing a set of subscriber session types:
+
+        'pppSubscriber'
+            A PPP connection initiated over a circuit (e.g., an ISDN
+            line or ATM VC) using the LCP (RFC-1661).
+
+        'pppoeSubscriber'
+            A PPP connection over Ethernet (RFC-2516), initiated
+            by a PADI (PPPoE Active Discovery Initiation) packet.
+
+        'l2tpSubscriber'
+            A PPP connection over an L2TP tunnel (RFC-2661),
+            initiated by an Incoming-Call-Request control message.
+
+        'l2fSubscriber'
+            A PPP connection over an L2F tunnel (RFC-2341),
+            initiated by a L2F_OPEN message with a non-zero MID.
+
+        'ipInterfaceSubscriber'
+            An IP subcriber session provisioned by the system's
+            configuration which consists of all traffic received by
+            the interface the provisioning applies.
+
+        'ipPktSubscriber'
+            An IP subscriber session initiated by the receipt of
+            the first packet received with an unclassified source IP
+            address.
+
+        'ipDhcpv4Subscriber'
+            An IP subscriber session initiated by the receipt of a
+            DHCPv4 DISCOVER packet (RFC-2131).
+
+        'ipRadiusSubscriber'
+            An IP subscriber session initiated by the receipt of a
+            RADIUS Access-Request packet (RFC-2865).
+
+        'l2MacSubscriber'
+            An L2 subscriber session initiated by the receipt of the
+            first layer 2 packet with an unclassified source MAC
+            address.
+
+        'l2Dhcpv4Subscriber'
+            An L2 subscriber session initiated by the receipt of a
+            DHCPv4 DISCOVER packet (RFC-2131).
+
+        'l2RadiusSubscriber'
+            An L2 subscriber session initiated by the receipt of a
+            RADIUS Access-Request packet (RFC-2865).
+
+        For more details regarding subscriber session types, see the
+        descriptive text associated with the SubSessionType textual
+        convention."
+
+    REFERENCE
+        "W. Simpson, 'The Point-to-Point Protocol (PPP)', RFC-1661,
+        July 1994.
+
+        R. Droms, 'Dynamic Host Configuration Protocol', RFC-2131, March
+        1997.
+
+        A. Valencia, M. Littlewood, T. Kolar, 'Cisco Layer Two
+        Forwarding Protocol (L2F)', RFC-2341, May 1998.
+
+        L. Mamakos, K. Lidl, J. Evarts, D. Carrel, D. Simone, and
+        R. Wheeler, 'A Method for Transmitting PPP Over Ethernet
+        (PPPoE)', RFC-2516, February 1999.
+
+        W. Townsley, A. Valencia, A. Rubens, G. Pall, G. Zorn, and
+        B. Palter, 'Layer Two Tunneling Protocol (L2TP)', RFC-2661,
+        August 1999.
+
+        C. Rigney, S. Willens, A. Rubens, and W. Simpson, 'Remote
+        Authentication Dial-In User Service (RADIUS)', RFC-2865, June
+        2000."
+    SYNTAX          BITS {
+                        pppSubscriber(0),
+                        pppoeSubscriber(1),
+                        l2tpSubscriber(2),
+                        l2fSubscriber(3),
+                        ipInterfaceSubscriber(4),
+                        ipPktSubscriber(5),
+                        ipDhcpv4Subscriber(6),
+                        ipRadiusSubscriber(7),
+                        l2MacSubscriber(8),
+                        l2Dhcpv4Subscriber(9),
+                        l2RadiusSubscriber(10)
+                    }
+
+SubSessionState ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "An enumerated integer-value describing the state of a
+        subscriber session:
+
+            'other'
+                The subscriber session is in a state not recognized by
+                the implementation of a MIB module using this textual
+                convention.
+
+            'pending'
+                The subscriber session is in the PENDING state;
+                that is, the subscriber session has been initiated and
+                the system is in the process of establishing the
+                subscriber session.
+
+            'up'
+                The subscriber session is in the UP state; that is, the
+                system has established the subscriber session."
+    SYNTAX          INTEGER  {
+                        other(1),
+                        pending(2),
+                        up(3)
+                    }
+
+SubSessionRedundancyMode ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "An enumerated integer-value describing the redundancy mode in
+        which a subscriber session is operating:
+
+            'none'
+                The subscriber session is not part of a redundant
+                configuration.
+
+            'other'
+                The subscriber session is part of a redundant
+                configuration and is in a state not recognized by this
+                MIB module.
+
+            'active'
+                The subscriber session is part of a redundant
+                configuration and is forwarding traffic from the
+                subscriber.
+
+            'standby'
+                The subscriber session is part of a redundant
+                configuration and ready to become active in the case of
+                a fail-over event (e.g., linecard failure)."
+    SYNTAX          INTEGER  {
+                        none(1),
+                        other(2),
+                        active(3),
+                        standby(4)
+                    }
+
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
