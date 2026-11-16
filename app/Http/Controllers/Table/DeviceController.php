@@ -27,6 +27,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\AlertSchedule;
 use App\Models\Device;
 use App\Models\Location;
 use Illuminate\Database\Eloquent\Builder;
@@ -92,7 +93,34 @@ class DeviceController extends TableController
             'uptime' => \DB::raw('IF(`status` = 1, `uptime`, `last_polled` - NOW())'),
             'location' => 'location',
             'device_id' => 'device_id',
+            'maintenance' => $this->maintenanceSortQuery(),
         ];
+    }
+
+    /**
+     * Correlated subquery used to sort by the maintenance column.
+     * Returns an active schedule id when the device is under maintenance (directly, through its location,
+     * or through one of its device groups), otherwise null. Same rules as DeviceMaintenanceCache.
+     */
+    private function maintenanceSortQuery(): Builder
+    {
+        return AlertSchedule::isActive()
+            ->join('alert_schedulables', 'alert_schedulables.schedule_id', 'alert_schedule.schedule_id')
+            ->where(fn (Builder $query) => $query
+                ->where(fn (Builder $query) => $query
+                    ->where('alert_schedulables.alert_schedulable_type', 'device')
+                    ->whereColumn('alert_schedulables.alert_schedulable_id', 'devices.device_id'))
+                ->orWhere(fn (Builder $query) => $query
+                    ->where('alert_schedulables.alert_schedulable_type', 'location')
+                    ->whereColumn('alert_schedulables.alert_schedulable_id', 'devices.location_id'))
+                ->orWhere(fn (Builder $query) => $query
+                    ->where('alert_schedulables.alert_schedulable_type', 'device_group')
+                    ->whereIn('alert_schedulables.alert_schedulable_id', fn ($groups) => $groups
+                        ->select('device_group_device.device_group_id')
+                        ->from('device_group_device')
+                        ->whereColumn('device_group_device.device_id', 'devices.device_id'))))
+            ->select('alert_schedule.schedule_id')
+            ->limit(1);
     }
 
     /**
