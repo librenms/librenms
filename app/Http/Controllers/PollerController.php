@@ -6,7 +6,6 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Poller;
 use App\Models\PollerCluster;
-use App\Models\PollerClusterStat;
 use App\Models\PollerGroup;
 use App\View\SettingPresenter;
 use Carbon\Carbon;
@@ -51,13 +50,14 @@ class PollerController extends Controller
         $this->authorize('viewAny', PollerCluster::class);
 
         $pollerCluster = $this->pollerCluster();
+        $clusterGroups = $this->clusterGroups($pollerCluster);
 
         return view('poller.poller', [
             'current_tab' => 'poller',
             'pollers' => $this->poller(),
             'poller_cluster' => $pollerCluster,
             'poller_cluster_meta' => $this->pollersMeta($pollerCluster),
-            'cluster_groups' => $this->clusterGroups($pollerCluster),
+            'cluster_groups' => $clusterGroups,
             'healthy_count' => $pollerCluster->where('row_class', 'success')->count(),
             'can_delete_any' => $pollerCluster->contains(fn ($poller) => $poller->long_not_polled && Gate::allows('delete', $poller)),
         ]);
@@ -119,9 +119,9 @@ class PollerController extends Controller
     }
 
     /**
-     * Name, node id and status of each poller for the search/status filter
+     * Name, node id, status and groups of each poller for the search/status/group filter
      *
-     * @return Collection<int, array{name: string, nodeId: string, rowClass: string}>
+     * @return Collection<int, array{name: string, nodeId: string, rowClass: string, groupIds: array<mixed>}>
      */
     private function pollersMeta(Collection $pollers): Collection
     {
@@ -129,6 +129,7 @@ class PollerController extends Controller
             'name' => (string) $p->poller_name,
             'nodeId' => (string) $p->node_id,
             'rowClass' => (string) $p->row_class,
+            'groupIds' => (array) ($p->getAttribute('group_ids') ?? [0]),
         ])->values();
     }
 
@@ -136,7 +137,15 @@ class PollerController extends Controller
     {
         $groups = PollerGroup::query()->withCount('devices')->orderBy('id')->get()->keyBy('id');
         $defaultGroup = (string) LibrenmsConfig::get('distributed_poller_group', '0');
-        $grouped = [];
+        $groupName = function (int $gid) use ($groups): string {
+            if ($gid === 0) {
+                return __('General');
+            }
+            $groupModel = $groups->get($gid);
+
+            return $groupModel ? $groupModel->group_name : __('Group') . ' #' . $gid;
+        };
+        $usedGroupIds = [];
 
         foreach ($pollerCluster as $poller) {
             $rawGroups = ($poller->poller_groups === null || $poller->poller_groups === '')
@@ -152,31 +161,25 @@ class PollerController extends Controller
                 $groupIds = [0];
             }
 
+            $poller->setAttribute('group_ids', $groupIds);
+            $poller->setAttribute('groups_served', implode(', ', array_map($groupName, $groupIds)));
+
             foreach ($groupIds as $gid) {
-                $grouped[$gid][] = $poller;
+                $usedGroupIds[$gid] = true;
             }
         }
 
-        ksort($grouped);
-        $ungroupedCount = isset($grouped[0]) ? Device::where('poller_group', 0)->count() : 0;
+        ksort($usedGroupIds);
+        $ungroupedCount = isset($usedGroupIds[0]) ? Device::where('poller_group', 0)->count() : 0;
 
         $result = new Collection();
-        foreach ($grouped as $gid => $groupPollers) {
+        foreach (array_keys($usedGroupIds) as $gid) {
             $groupModel = $groups->get($gid);
-            $pollers = new Collection($groupPollers);
-            $pollerStats = $pollers->flatMap(fn (PollerCluster $poller) => $poller->stats->where('poller_type', 'poller'));
-            $workers = (int) $pollerStats->sum('workers');
-            // busy workers = consumed seconds / frequency, so nodes with different frequencies are weighted fairly
-            $busyWorkers = $pollerStats->sum(fn (PollerClusterStat $stat) => $stat->frequency > 0 ? $stat->worker_seconds / $stat->frequency : 0);
 
             $result->push([
                 'id' => (int) $gid,
-                'group_name' => $gid === 0 ? __('General') : ($groupModel ? $groupModel->group_name : __('Group') . ' #' . $gid),
+                'group_name' => $groupName((int) $gid),
                 'devices_count' => $gid === 0 ? $ungroupedCount : ($groupModel ? (int) $groupModel->devices_count : 0),
-                'workers' => $workers,
-                'load_pct' => $workers > 0 ? (int) round($busyWorkers / $workers * 100) : 0,
-                'pollers_meta' => $this->pollersMeta($pollers),
-                'pollers' => $pollers,
             ]);
         }
 
