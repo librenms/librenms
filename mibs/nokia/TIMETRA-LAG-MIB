@@ -1,0 +1,1306 @@
+TIMETRA-LAG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Counter32, Unsigned32
+        FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+
+    TEXTUAL-CONVENTION, RowStatus, TruthValue,
+    TimeStamp, DisplayString, MacAddress
+        FROM SNMPv2-TC
+
+    InterfaceIndexOrZero
+        FROM IF-MIB
+
+    timetraSRMIBModules, tmnxSRObjs, tmnxSRNotifyPrefix,
+    tmnxSRConfs
+        FROM TIMETRA-GLOBAL-MIB
+    tmnxPortLagId, tmnxPortPortID
+        FROM TIMETRA-PORT-MIB
+    TmnxPortID, TNamedItemOrEmpty, TItemLongDescription
+    
+        FROM TIMETRA-TC-MIB
+    dot3adAggPortEntry
+        FROM IEEE8023-LAG-MIB
+    ;
+
+timetraLagMIBModule   MODULE-IDENTITY
+        LAST-UPDATED "201204060000Z"
+        ORGANIZATION "Alcatel-Lucent"
+        CONTACT-INFO
+            "Alcatel-Lucent SROS Support
+             Web: http://support.alcatel-lucent.com"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision 
+         the IEEE 802.3ad Link Aggregation Group operation on Alcatel-Lucent 
+         SROS systems.
+
+         Copyright 2003-2012 Alcatel-Lucent.  All rights reserved.
+         Reproduction of this document is authorized on the condition that
+         the foregoing copyright notice is included.
+
+         This SNMP MIB module (Specification) embodies Alcatel-Lucent's
+         proprietary intellectual property.  Alcatel-Lucent retains 
+         all title and ownership in the Specification, including any 
+         revisions.
+
+         Alcatel-Lucent grants all interested parties a non-exclusive 
+         license to use and distribute an unmodified copy of this 
+         Specification in connection with management of Alcatel-Lucent
+         products, and without fee, provided this copyright notice and 
+         license appear on all copies.
+
+         This Specification is supplied 'as is', and Alcatel-Lucent 
+         makes no warranty, either express or implied, as to the use, 
+         operation, condition, or performance of the Specification."
+
+--
+--  Revision History
+--
+        REVISION        "1204060000Z"
+        DESCRIPTION     "Rev 10.0               6 Apr 2012 00:00
+                         10.0 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "1102010000Z"
+        DESCRIPTION     "Rev 9.0                1 Feb 2011 00:00
+                         9.0 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "0902280000Z"
+        DESCRIPTION     "Rev 7.0                28 Feb 2009 00:00
+                         7.0 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "0807010000Z"
+        DESCRIPTION     "Rev 6.1                01 Jul 2008 00:00
+                         6.1 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "0801010000Z"
+        DESCRIPTION     "Rev 6.0                01 Jan 2008 00:00
+                         6.0 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "0701010000Z"
+        DESCRIPTION     "Rev 5.0                01 Jan 2007 00:00
+                         5.0 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "0603150000Z"   
+        DESCRIPTION     "Rev 4.0                15 Mar 2006 00:00
+                         4.0 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "0508310000Z"   
+        DESCRIPTION     "Rev 3.0                31 Aug 2005 00:00
+                         3.0 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "0501240000Z"   
+        DESCRIPTION     "Rev 2.1                24 Jan 2005 00:00
+                         2.1 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "0401150000Z"
+        DESCRIPTION     "Rev 2.0                15 Jan 2004 00:00
+                         2.0 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "0308150000Z"
+        DESCRIPTION     "Rev 1.2                15 Aug 2003 00:00
+                         1.2 release of the TIMETRA-LAG-MIB."
+
+        REVISION        "200301200000Z"
+        DESCRIPTION     "Rev 1.0                20 Jan 2003 00:00
+                        1.0 Release of the TIMETRA-LAG-MIB."
+
+        REVISION        "200102090000Z"
+        DESCRIPTION     "Rev 0.1                09 Feb 2001 00:00
+                        Initial version of the TIMETRA-LAG-MIB."
+
+        ::= { timetraSRMIBModules 15 }
+
+tLagObjects                 OBJECT IDENTIFIER ::= { tmnxSRObjs 15 }
+tLagNotifyPrefix      OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 15 }
+    tLagNotifications    OBJECT IDENTIFIER ::= { tLagNotifyPrefix 0 }
+tmnxLagConformance          OBJECT IDENTIFIER ::= { tmnxSRConfs 15 }
+
+tLagNotificationObjects     OBJECT IDENTIFIER ::= { tLagObjects 4 }
+
+--
+-- textual conventions
+--
+LAGInterfaceNumber ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "The unique number identifying a LAG interface.
+
+                  There are maximum 64 LAG interfaces, when the value of
+                  TIMETRA-CHASSIS-MIB::tmnxChassisType is '5' (ESS-1/SR-1)."
+    SYNTAX       INTEGER (1..200)
+
+LAGSubgroup ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "This type specifies a LAG subgroup.
+                  The value -2 denotes 'auto-iom', whereby the  subgroup 
+                  is defined based on the IOM (i.e. all ports
+                  of the same IOM are assigned to the same subgroup).
+                  The value -1 denotes 'auto-mda', whereby the subgroup is
+                  defined based on the MDA."
+    SYNTAX       INTEGER (-2|-1|1..8)
+
+--
+-- mib objects
+--
+
+tLagConfigTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TLagConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Configuration information about each Link Aggregation Group."
+    ::= { tLagObjects 2 }
+
+tLagConfigEntry OBJECT-TYPE
+    SYNTAX     TLagConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry (conceptual row) in the tLagConfigTable.
+        Each entry represents a Link Aggregation Group.
+        Create or destroy rows to add or remove Link Aggregation Groups (LAG).
+
+        After tLagRowStatus is set to active(1), a corresponding
+        entry is created in IEEE8023-LAG-MIB dot3adAggTable.
+
+        The corresponding entry in IEEE8023-LAG-MIB dot3adAggTable is 
+        removed when tLagRowStatus is set to destroy(6).
+        
+        Use ifAdminStatus to set interface up and down for this LAG entry.
+        
+        Use ifAlias for the interface description.
+        "
+    INDEX      { tLagIndex }
+    ::= { tLagConfigTable 1 }
+
+TLagConfigEntry ::= SEQUENCE {
+    tLagIndex                     LAGInterfaceNumber,
+    tLagRowStatus                 RowStatus,
+    tLagPortThreshold             INTEGER,
+    tLagPortThresholdAction       INTEGER,
+    tLagEnableMarkerGenerator     TruthValue,
+    tLagEnableLACP                TruthValue,
+    tLagDescription               TItemLongDescription,
+    tLagDynamicCosting            TruthValue,
+    tLagLACPMode                  INTEGER,
+    tLagLACPAdminKeyAutogen       TruthValue,
+    tLagLACPTransmitInterval      INTEGER,
+    tLagAccessAdaptQos            INTEGER,
+    tLagLACPXmitStdby             TruthValue,
+    tLagLACPSelCrit               INTEGER,
+    tLagLACPSelCritSlaveToPartner TruthValue,
+    tLagLACPNbrOfSubGroups        Unsigned32,
+    tLagholdTimeDown              Unsigned32,
+    tLagPortType                  INTEGER,
+    tLagPerFpIngQueuing           TruthValue,
+    tLagSystemId                  MacAddress,
+    tLagSystemPriority            INTEGER,
+    tLagStandbySignaling          INTEGER
+}
+
+tLagIndex OBJECT-TYPE
+    SYNTAX       LAGInterfaceNumber
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "the number of the Link Aggregation Group."
+    ::= { tLagConfigEntry 1 }
+
+tLagRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "RowStatus for this entry."
+    ::= { tLagConfigEntry 2 }
+
+tLagPortThreshold OBJECT-TYPE
+    SYNTAX       INTEGER (0..31)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "tLagPortThreshold is a threshold for tLagPortThresholdAction.
+
+        When a physical port link state changes and the number of 
+        operational physical ports is less than or equal to 
+        tLagPortThreshold, tLagPortThresholdAction is invoked:
+        either the LAG is set operationally down, or 
+        the protocols operating on the LAG interface are adjusted.
+        
+        When the number of operational physical ports becomes greater
+        than tLagPortThreshold, tLagPortThresholdAction is revoked:
+        either the LAG is set operationally up, or the protocols 
+        operating on the LAG interface are adjusted.
+        
+        The value zero means tLagPortThresholdAction is never invoked.
+        
+        To invoke dynamicCost at every physical port state change,
+        set tLagPortThreshold to the total number of physical ports
+        configured to be in the Link Aggregation Group.
+        "
+    DEFVAL { 0 }
+    ::= { tLagConfigEntry 3 }
+
+tLagPortThresholdAction OBJECT-TYPE
+    SYNTAX       INTEGER { down(1), dynamicCost(2) }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "Port Threshold Action is action to take when the number of 
+         operational (link up) physical ports is less than tLagPortThreshold.
+          
+         When a physical port ifOperStatus changes and the number of
+         operational physical ports is less than or equal to tLagPortThreshold:
+         
+         - when set to down(1), the ifOperStatus for the Link Aggregation Group
+         (tLagIfIndex) goes to down(2).
+         
+         - when set to dynamicCost(2), the ifOperStatus stays up(2), but
+         dependent protocols such as OSPF are signaled and will adjust their 
+         operation (cost) to match the number of physical ports remaining
+         in the Link Aggregation Group.  a tLagDynamicCostOn notification 
+         is generated.
+
+
+         When a physical port ifOperStatus changes and the number of
+         operational physical ports is greater than tLagPortThreshold:
+         
+         - when set to down(1), the ifOperStatus for the Link Aggregation Group
+         (tLagIfIndex) goes to up(1).
+         
+         - when set to dynamicCost(2), the ifOperStatus stays up(2), but
+         dependent protocols such as OSPF are signaled and will adjust their 
+         operation (cost) to be the value as configured.    a tLagDynamicCostOff
+         notification is generated.
+
+         
+         Regardless of the setting of this object, when the number of 
+         operational physical ports goes to zero, the Link Aggregation Group's
+         ifOperStatus goes to down.
+         "
+--    REFERENCE
+--        ""
+    DEFVAL { down }
+    ::= { tLagConfigEntry 4 }
+
+tLagEnableMarkerGenerator OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "enables (true(1)) or disables (false(2)) the Marker Generator
+        protocol."
+    REFERENCE
+        "IEEE 802.3ad 43.5"
+    DEFVAL { false }
+    ::= { tLagConfigEntry 5 }
+
+tLagEnableLACP OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "enables (true(1)) or disables (false(2)) the Link Aggregation Control
+        Protocol (LACP).
+
+        The value of tLagEnableLACP can only be set to 'true(1)'
+        when tLagStandbySignaling is set to 'lacp(1)' and
+        the value of tLagLACPSelCrit is not 'bestPort(3)'."
+    REFERENCE
+        "IEEE 802.3ad 43.4"
+    DEFVAL { false }
+    ::= { tLagConfigEntry 6 }
+
+tLagDescription OBJECT-TYPE
+    SYNTAX      TItemLongDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "discription text for the Link Aggregation Group port."
+    DEFVAL { ''H }
+    ::= { tLagConfigEntry 7 }
+
+tLagDynamicCosting OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When dynamic cost and OSPF autocost are both configured then costing
+        is applied based on the total number of links configured and the cost
+        is advertised inversely proportional to the number of links 
+        available at the time, providing the number of links that are up 
+        exceeds the configured LAG threshold value at which time the 
+        configured threshold action determines if and at what cost this
+        LAG will be advertised."
+    DEFVAL { false }
+    ::= { tLagConfigEntry 8 }
+
+tLagLACPMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    passive(1),
+                    active(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "tLagLACPMode represents the mode in which LACP will operate.
+         If the value is set to 'passive', LACP places all member ports of a 
+         lag into a passive negotiating state. When this is the case member 
+         ports of the lag respond to LACP packets they receive but do not 
+         initiate LACP packet negotiation.
+         If the value is set to 'active', LACP places all member ports of a lag
+         in to an active negotiation state. When this occurs the port will 
+         initiate LACP negotiation immediately once the port achieves link up 
+         state. At least one of the peer lag ports must be configured as 
+         active to initiate LACP.  
+         The default mode is passive."
+    DEFVAL      { passive } 
+    ::= { tLagConfigEntry 9 }
+
+tLagLACPAdminKeyAutogen OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "tLagLACPAdminKeyAutogen is set to 'true' if the lag administrative key
+         in the dot3adAggActorAdminKey object was auto generated.
+         tLagLACPAdminKeyAutogen is set to 'false', if the lag administrative 
+         key was manually configured."
+    DEFVAL { true }
+    ::= { tLagConfigEntry 10 }
+
+tLagLACPTransmitInterval OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    slow (1),
+                    fast (2) 
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "tLagLACPTransmitInterval configures the timer interval for 
+         periodic transmission of LACP packets. If set to 'slow', LACP packets
+         are transmitted every 30 seconds. If set to 'fast', LACP packets
+         are transmitted every second."
+    DEFVAL { fast }
+    ::= { tLagConfigEntry 11 }
+
+tLagAccessAdaptQos OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   link       (1),
+                   distribute (2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tLagAccessAdaptQos specifies how the LAG SAP queue and 
+         virtual scheduler buffering and rate parameters are adapted over
+         multiple active MDAs.
+         link           (1) - The LAG will create the SAP queues and virtual
+                              schedulers with the actual parameters on each MDA.
+         distribute     (2) - Each MDA will receive a fraction of the SAP and
+                              scheduler parameters."
+    DEFVAL { distribute }
+    ::= { tLagConfigEntry 12 }
+
+tLagLACPXmitStdby OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tLagLACPXmitStdby specifies whether or not LACP messages
+         are transmitted on standby-links."
+    DEFVAL { true }
+    ::= { tLagConfigEntry 13 }
+
+tLagLACPSelCrit OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   highest-count  (1),
+                   highest-weight (2),
+                   bestPort       (3)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tLagLACPSelCrit specifies which selection criteria 
+         should be used to select the active sub-group."
+    DEFVAL { highest-count }
+    ::= { tLagConfigEntry 14 }
+
+tLagLACPSelCritSlaveToPartner OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tLagLACPSelCritSlaveToPartner specifies together with
+         tLagLACPSelCrit  selection criteria  should be used to select the 
+         active sub-group.
+         The term 'eligible member' refers to a lag-member link which can
+         potentially become active. This means it is oper up, and not disabled
+         for use by the remote side. The object tLagLACPSelCritSlaveToPartner
+         can be used to control whether ornot this latter condition is taken
+         into account." 
+    DEFVAL { false }
+    ::= { tLagConfigEntry 15 }
+
+tLagLACPNbrOfSubGroups OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tLagLACPNbrOfSubGroups indicates the number of subgroups
+         configured in this LAG."
+    ::= { tLagConfigEntry 16 }
+
+tLagholdTimeDown OBJECT-TYPE
+    SYNTAX      Unsigned32(0..2000)
+    UNITS       "100s of milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tLagholdTimeDown specifies the timer in  0.1 second
+         units which controls the delay between detecting that a LAG is down 
+         (all active ports are down) and reporting it to the higher levels.
+         The default value for this timer is 0, i.e. the higher levels are
+         informed directly.
+         A non zero value may be configured e.g. when active/standby
+         signalling is used in a 1:1 fashion to avoid that the higher levels
+         are informed during the small time interval between detecting that 
+         the LAG is down and the time needed to activate the standby system."
+    DEFVAL { 0 }
+    ::= { tLagConfigEntry 17 }
+
+tLagPortType OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   standard (1),
+                   hsmda (2),
+                   hsmdaV2  (3)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tLagPortType specifies the type of ports allowed in
+         this LAG.
+
+         A value of 'standard (1)' allows all non-HSMDA type ports to be added
+         to this LAG.  A value of 'hsmda (2)' limits the LAG members to be 
+         HSMDA-v1 ports only. A value of 'hsmdaV2 (3)' limits the LAG members 
+         to be HSMDA-v2." 
+    DEFVAL { standard }
+    ::= { tLagConfigEntry 18 }
+
+tLagPerFpIngQueuing OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tLagPerFpIngQueuing specifies whether a more efficient
+         method of queue allocation for LAG SAPs should be utilized.
+
+         An 'inconsistentValue' error is returned if this object is set to
+         a different value when there are existing port members in the LAG."
+    DEFVAL { false }
+    ::= { tLagConfigEntry 19 }
+
+tLagSystemId OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tLagSystemId specifies A 6-octet MAC address
+         used as a unique identifier for the System that contains this
+         Aggregator.
+         
+         If set to zero, the dot3adAggActorSystemID will be used as 
+         identifier."
+    DEFVAL {'000000000000'H}
+    ::= { tLagConfigEntry 20 }
+
+tLagSystemPriority OBJECT-TYPE
+    SYNTAX       INTEGER (-1|0..65535)
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The value of the object tLagSystemPriority specifies
+         a 2-octet value indicating the priority
+         value associated with the Actor's System ID.
+         
+         If set to -1, the priority is taken from the object
+         dot3adAggActorSystemPriority"
+         DEFVAL {-1}
+    ::= { tLagConfigEntry 21 }
+
+tLagStandbySignaling OBJECT-TYPE
+    SYNTAX       INTEGER
+                 {
+                    lacp (1),
+                    powerOff (2)
+                 }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+        "The value of tLagStandbySignaling specifies
+         how the state of a member port is signalled to the remote side
+         when the tLagPortActiveStdby corresponding to this member port
+         has the value 'standby'.
+
+         lacp           (1) - The state of this member port is signalled
+                              to the other side through the LACP protocol.
+         powerOff       (2) - This member port is powered off.
+
+         The value of tLagStandbySignaling can only be set to 'powerOff(2)'
+         when tLagEnableLACP is set to 'false(2)' and tLagLACPSelCrit is set
+         to 'bestPort(3)'."
+    DEFVAL { lacp }
+    ::= { tLagConfigEntry 22 }
+
+--
+-- tLagOperationTable
+--
+
+tLagOperationTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TLagOperationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Operational information about each Link Aggregation Group."
+    ::= { tLagObjects 3 }
+
+tLagOperationEntry OBJECT-TYPE
+    SYNTAX     TLagOperationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry (conceptual row) in the tLagOperationTable.
+         Each entry represents an active Link Aggregation Group.
+        "
+    AUGMENTS       { tLagConfigEntry }
+    ::= { tLagOperationTable 1 }
+
+TLagOperationEntry ::= SEQUENCE {
+    tLagIfIndex                  InterfaceIndexOrZero,
+    tLagConfigLastChange         TimeStamp,
+    tLagPortThresholdFalling     Counter32,
+    tLagPortThresholdRising      Counter32,
+    tLagLACPPrimaryPort          TmnxPortID,
+    tLagPortReasonDownFlags      BITS
+}
+
+tLagIfIndex OBJECT-TYPE
+    SYNTAX       InterfaceIndexOrZero
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "ifIndex for the Link Aggregation Group.
+        This value is zero when tLagRowStatus is not active(1).
+        "
+    REFERENCE
+        ""
+    ::= { tLagOperationEntry 1 }
+
+tLagConfigLastChange OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "last change timestamp records when any object in tLagConfigTable was set."
+    ::= { tLagOperationEntry 2 }
+
+tLagPortThresholdFalling OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "counts the number of linkDown or dynamicCost events for the
+        Link Aggregation Group caused by the number of physical ports being
+        less than or equal to tLagPortThreshold value."
+    ::= { tLagOperationEntry 3 }
+
+tLagPortThresholdRising OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "counts the number of linkUp or dynamicCost events for the
+        Link Aggregation Group caused by the number of physical ports
+        being greater than tLagPortThreshold value."
+    ::= { tLagOperationEntry 4 }
+
+tLagLACPPrimaryPort OBJECT-TYPE
+    SYNTAX       TmnxPortID
+    MAX-ACCESS   read-only
+    STATUS       obsolete
+    DESCRIPTION
+        "tLagLACPPrimaryPort contains the primary port of the LACP.
+         The following two conditions have to be met for the port
+         to become eligible for becoming the primary port:
+         a) Port has to be in either link up or oper up.
+         b) The port must have received at least one LACP PDU.
+
+         Once the above two conditions have been met, port with a highest
+         priority is chosen as the primary port.
+         If there is a tie, the smallest TmnxPortID will be the primary port."
+    ::= { tLagOperationEntry 5 }
+
+tLagPortReasonDownFlags OBJECT-TYPE
+    SYNTAX      BITS {
+                   unknown     (0),
+                   linklossFwd (1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "The tLagPortReasonDownFlags indicates why a lag port may be in the
+         operationally 'down' state. The following reasons are detected
+         through this object:
+                unknown(0)     - Unspecified (or unknown)
+                linklossFwd(1) - A sap using this port has the object 
+                                 'sapEthernetLLFOperStatus' set to 'fault'"
+    ::= { tLagOperationEntry 6 }
+--
+-- tLagMemberTable
+--
+
+tLagMemberTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TLagMemberEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The tLagMemberTable has an entry for each Port that is part
+         of a LAG."
+    ::= { tLagObjects 5 }
+
+tLagMemberEntry OBJECT-TYPE
+    SYNTAX     TLagMemberEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Each row entry represents a particular port in a LAG. Entries are
+         automatically created when a Port is provisioned as part of a LAG,
+         i.e. when tmnxPortLagId from TIMETRA-PORT-MIB.mib is changed from
+         its default value of '0'."
+    INDEX { tLagIndex, tmnxPortPortID }
+    ::= { tLagMemberTable 1 }
+
+TLagMemberEntry ::= SEQUENCE {
+    tLagMemberPortName                  TNamedItemOrEmpty,
+    tLagMemberPortIsPrimary             TruthValue
+}
+
+tLagMemberPortName OBJECT-TYPE
+    SYNTAX       TNamedItemOrEmpty
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of tLagMemberPortName indicates the name of the port
+         that is a member of the LAG used to index into tLagMemberTable.
+         This is a read-only object that is the same as tmnxPortName from
+         TIMETRA-PORT-MIB.mib."
+    ::= { tLagMemberEntry 1 }
+
+tLagMemberPortIsPrimary OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tLagMemberPortIsPrimary indicates whether the port used to
+         index into tLagMemberTable is the primary port of the LAG
+         used to index into tLagMemberTable."
+    ::= { tLagMemberEntry 2 }
+
+--
+-- tLagPortTable
+--
+
+tLagPortTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TLagPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The tLagPortTable extends the IEEE8023-LAG-MIB::dot3adAggPortTable
+         with 7x50 specific features."
+    ::= { tLagObjects 6 }
+
+tLagPortEntry OBJECT-TYPE
+    SYNTAX     TLagPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of Link Aggregation Control configuration
+         parameters for each Aggregation Port on this device.
+         The tLagPortTable extends the IEEE8023-LAG-MIB::dot3adAggPortTable
+         with 7x50 specific features."
+    AUGMENTS { dot3adAggPortEntry }
+    ::= { tLagPortTable 1 }
+
+TLagPortEntry ::= SEQUENCE {
+    tLagPortSubgroup     LAGSubgroup,
+    tLagPortActiveStdby  INTEGER
+}
+
+tLagPortSubgroup OBJECT-TYPE
+    SYNTAX       LAGSubgroup
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The value of tLagPortSubgroup specifies the subgroup to which the
+         port in this LAG is assigned."
+    DEFVAL { 1 }
+    ::= { tLagPortEntry 1 }
+
+tLagPortActiveStdby OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                   active    (1),
+                   stand-by  (2)
+                }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The value of tLagPortActiveStdby indicates active standby state of this
+         port in the LAG."
+    ::= { tLagPortEntry 2 }
+
+--
+-- Notification Information
+--
+tLagNotifyPortAddFailReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown (0),
+                    adminkey-mismatch (1),
+                    sysid-mismatch (2),
+                    lacp-passive-both-ends (3),
+                    link-down (4)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+        "tLagNotifyPortAddFailReason is used by the tLagPortAddFailed
+         notification to indicate the reason why a port could not be added
+         to a lag."
+    ::= { tLagNotificationObjects 1 }
+
+tLagNotifySubGroupSelected OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tLagNotifySubGroupSelected is a printable character
+         string which contains information about the result of the selection
+         algorithm."
+    ::= { tLagNotificationObjects 2 }
+
+tLagNotifyAdditionalInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tLagNotifyAdditionalInfo is a printable character
+         string which contains information about the reason why the
+         notification was generated."
+    ::= { tLagNotificationObjects 3 }
+
+tLagNotifyStateChangedReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    partner-oper-state-changed (1),
+                    lacp-expired (2),
+                    lacp-rx-state-machine (3), -- lacp-RX state machine entered
+                                               -- current state
+                    efm-oam-state-changed (4),
+                    dot1ag-state-changed (5)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+        "The value of tLagNotifyStateChangedReason indicates
+         the reason why a the state of a lag changed."
+    ::= { tLagNotificationObjects 4 }
+
+tLagDynamicCostOn NOTIFICATION-TYPE
+    OBJECTS { tLagPortThreshold }
+    STATUS current
+    DESCRIPTION
+        "the number of phyical ports in the Link Aggregation Group
+        is less than or equal to tLagPortThreshold value.
+        "
+    REFERENCE
+        ""
+  ::= { tLagNotifications 1 }
+
+tLagDynamicCostOff NOTIFICATION-TYPE
+    OBJECTS { tLagPortThreshold }
+    STATUS current
+    DESCRIPTION
+        "the number of phyical ports in the Link Aggregation Group
+        is greater than tLagPortThreshold value.
+        "
+    REFERENCE
+        ""
+  ::= { tLagNotifications 2 }
+
+tLagPortAddFailed NOTIFICATION-TYPE
+    OBJECTS {
+            tLagRowStatus,
+            tmnxPortLagId,
+            tLagNotifyPortAddFailReason
+    }
+    STATUS current
+    DESCRIPTION
+        "tLagPortAddFailed notification is generated when a port could
+         not be added to the lag.
+         tLagNotifyPortAddFailReason contains the reason for failure."
+  ::= { tLagNotifications 3 }
+
+tLagSubGroupSelected NOTIFICATION-TYPE
+    OBJECTS { tLagNotifySubGroupSelected }
+    STATUS current
+    DESCRIPTION
+        "The tLagSubGroupSelected notification is sent when the selection
+         algorithm selects a different sub-group."
+  ::= { tLagNotifications 4 }
+
+tLagPortAddFailureCleared NOTIFICATION-TYPE
+    OBJECTS {
+            tLagRowStatus,
+            tmnxPortLagId,
+            tLagNotifyPortAddFailReason
+    }
+    STATUS current
+    DESCRIPTION
+        "tLagPortAddFailureCleared notification is generated when
+         the failure, reported by tLagPortAddFailed, has been resolved."
+  ::= { tLagNotifications 5 }
+
+tLagStateEvent NOTIFICATION-TYPE
+    OBJECTS {
+            tLagRowStatus,
+            tLagNotifyAdditionalInfo
+    }
+    STATUS current
+    DESCRIPTION
+        "tLagStateEvent notification is generated when
+         an event occurs that might influence the lag state."
+  ::= { tLagNotifications 6 }
+
+tLagMemberStateEvent NOTIFICATION-TYPE
+    OBJECTS {
+            tLagRowStatus,
+            tmnxPortLagId,
+            tLagNotifyAdditionalInfo,
+            tLagNotifyStateChangedReason
+    }
+    STATUS current
+    DESCRIPTION
+        "tLagMemberStateEvent notification is generated when
+         an event occurs on this member that might influence the lag state."
+  ::= { tLagNotifications 7 }
+
+--
+-- Conformance Information
+--
+
+tmnxLagCompliances OBJECT IDENTIFIER ::= { tmnxLagConformance 1 }
+tmnxLagGroups      OBJECT IDENTIFIER ::= { tmnxLagConformance 2 }
+
+
+-- compliance statements
+
+-- tmnxLagCompliance   MODULE-COMPLIANCE
+--    ::= { tmnxLagCompliances 1 }
+
+-- tmnxLagV3v0Compliance   MODULE-COMPLIANCE
+--    ::= { tmnxLagCompliances 2 }
+
+tmnxLagV4v0Compliance   MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for management of extended LAG
+             capabilities on Alcatel-Lucent SROS series systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxLagInstanceV4v0Group,
+            tmnxLagNotifyObjsGroup,
+            tmnxLagNotificationsGroup
+        }
+    ::= { tmnxLagCompliances 3 }
+
+tmnxLagV5v0Compliance   MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for management of extended LAG
+             capabilities on Alcatel-Lucent SROS series systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxLagInstanceV5v0Group,
+            tmnxLagV5v0NotifGroup
+        }
+    ::= { tmnxLagCompliances 4 }
+
+tmnxLagV6v0Compliance   MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for management of extended LAG
+             capabilities on Alcatel-Lucent SROS series systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxLagInstanceV6v0Group,
+            tmnxLagV6v0NotifGroup
+        }
+    ::= { tmnxLagCompliances 5 }
+
+tmnxLagV6v1Compliance   MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for management of extended LAG
+             capabilities on Alcatel-Lucent SROS series systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxLagInstanceV6v0Group,
+            tmnxLagV6v0NotifGroup,
+            tmnxLagHsmdaV6v0Group
+        }
+    ::= { tmnxLagCompliances 6 }
+
+tmnxLagV7v0Compliance   MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for management of extended LAG
+             capabilities on Alcatel-Lucent SROS series systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxLagInstanceV7v0Group,
+            tmnxLagV6v0NotifGroup,
+            tmnxLagHsmdaV6v0Group,
+            tmnxLagV7v0Group
+        }
+    ::= { tmnxLagCompliances 7 }
+
+tmnxLagV8v0Compliance   MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for management of extended LAG
+             capabilities on Alcatel-Lucent SROS series systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxLagInstanceV7v0Group,
+            tmnxLagV6v0NotifGroup,
+            tmnxLagHsmdaV6v0Group,
+            tmnxLagV8v0Group
+        }
+    ::= { tmnxLagCompliances 8 }
+
+tmnxLagV9v0Compliance   MODULE-COMPLIANCE
+    STATUS  obsolete
+    DESCRIPTION
+            "The compliance statement for management of extended LAG
+             capabilities on Alcatel-Lucent SROS series systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxLagInstanceV7v0Group,
+            tmnxLagInstanceV9v0Group,
+            tmnxLagV6v0NotifGroup,
+            tmnxLagHsmdaV6v0Group,
+            tmnxLagV8v0Group
+        }
+    ::= { tmnxLagCompliances 9 }
+
+tmnxLagV10v0Compliance   MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for management of extended LAG
+             capabilities on Alcatel-Lucent SROS series systems."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            tmnxLagInstanceV7v0Group,
+            tmnxLagInstanceV9v0Group,
+            tmnxLagV6v0NotifGroup,
+            tmnxLagV10v0NotifGroup,
+            tmnxLagHsmdaV6v0Group,
+            tmnxLagV8v0Group
+        }
+    ::= { tmnxLagCompliances 10 }
+
+-- units of conformance
+
+-- tmnxLagInstanceGroup OBJECT-GROUP
+--    ::= { tmnxLagGroups 1 }
+
+tmnxLagNotifyObjsGroup   OBJECT-GROUP
+    OBJECTS {   tLagNotifyPortAddFailReason
+            }
+    STATUS        obsolete
+    DESCRIPTION
+        "The group of objects supporting LAG notifications
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLagGroups 2 }
+
+tmnxLagNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {   tLagDynamicCostOn,
+                        tLagDynamicCostOff,
+                        tLagPortAddFailed
+                    }
+    STATUS obsolete
+    DESCRIPTION
+        "the group of notifications providing for management of Link
+        Aggregation Group operation."
+    ::= { tmnxLagGroups 3 }
+
+-- tmnxLagInstanceV3v0Group OBJECT-GROUP
+--    ::= { tmnxLagGroups 4 }
+
+tmnxLagInstanceV4v0Group OBJECT-GROUP
+    OBJECTS {   tLagRowStatus,
+                tLagPortThreshold,
+                tLagPortThresholdAction,
+                tLagEnableMarkerGenerator,
+                tLagEnableLACP,
+                tLagDescription,
+                tLagDynamicCosting,
+                tLagLACPMode,
+                tLagLACPAdminKeyAutogen,
+                tLagLACPTransmitInterval,
+                tLagAccessAdaptQos,
+                tLagLACPXmitStdby,
+                tLagLACPSelCrit,
+                tLagLACPSelCritSlaveToPartner,
+                tLagLACPNbrOfSubGroups,
+                tLagholdTimeDown,
+                tLagIfIndex,
+                tLagConfigLastChange,
+                tLagPortThresholdFalling,
+                tLagPortThresholdRising,
+                tLagMemberPortName,
+                tLagMemberPortIsPrimary,
+                tLagPortSubgroup,
+                tLagPortActiveStdby
+            }
+    STATUS    obsolete
+    DESCRIPTION
+        "The group of objects supporting management of Link Aggregation (LAG)
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLagGroups 5 }
+
+tmnxObsoletedObjectsV4v0Group OBJECT-GROUP
+    OBJECTS {   tLagLACPPrimaryPort
+            }
+    STATUS    current
+    DESCRIPTION
+        "The group of objects that have been obsoleted in release 4.0
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLagGroups 6 }
+
+tmnxLagInstanceV5v0Group OBJECT-GROUP
+    OBJECTS {   tLagRowStatus,
+                tLagPortThreshold,
+                tLagPortThresholdAction,
+                tLagEnableMarkerGenerator,
+                tLagEnableLACP,
+                tLagDescription,
+                tLagDynamicCosting,
+                tLagLACPMode,
+                tLagLACPAdminKeyAutogen,
+                tLagLACPTransmitInterval,
+                tLagAccessAdaptQos,
+                tLagLACPXmitStdby,
+                tLagLACPSelCrit,
+                tLagLACPSelCritSlaveToPartner,
+                tLagLACPNbrOfSubGroups,
+                tLagholdTimeDown,
+                tLagIfIndex,
+                tLagConfigLastChange,
+                tLagPortThresholdFalling,
+                tLagPortThresholdRising,
+                tLagMemberPortName,
+                tLagMemberPortIsPrimary,
+                tLagPortSubgroup,
+                tLagPortActiveStdby
+            }
+    STATUS   obsolete 
+    DESCRIPTION
+        "The group of objects supporting management of Link Aggregation (LAG)
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLagGroups 7 }
+
+tmnxLagV5v0NotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {   tLagDynamicCostOn,
+                        tLagDynamicCostOff,
+                        tLagPortAddFailed,
+                        tLagSubGroupSelected
+                    }
+    STATUS   obsolete
+    DESCRIPTION
+        "the group of notifications providing for management of Link
+        Aggregation Group operation in version 5.0 of the Alcatel-Lucent SROS 
+        series systems."
+    ::= { tmnxLagGroups 8 }
+
+tmnxLagNotifyObjsV5v0Group OBJECT-GROUP
+    OBJECTS {   tLagNotifyPortAddFailReason,
+                tLagNotifySubGroupSelected
+            }
+    STATUS obsolete
+    DESCRIPTION
+        "The group of objects supporting LAG notifications
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLagGroups 9 }
+
+tmnxLagHsmdaV6v0Group OBJECT-GROUP
+    OBJECTS {
+                tLagPortType
+            }
+    STATUS current
+    DESCRIPTION
+        "The group of objects supporting management of Link Aggregation (LAG)
+         with the HSMDA MDA on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLagGroups 10 }
+
+tmnxLagInstanceV6v0Group OBJECT-GROUP
+    OBJECTS {   tLagRowStatus,
+                tLagPortThreshold,
+                tLagPortThresholdAction,
+                tLagEnableMarkerGenerator,
+                tLagEnableLACP,
+                tLagDescription,
+                tLagDynamicCosting,
+                tLagLACPMode,
+                tLagLACPAdminKeyAutogen,
+                tLagLACPTransmitInterval,
+                tLagAccessAdaptQos,
+                tLagLACPXmitStdby,
+                tLagLACPSelCrit,
+                tLagLACPSelCritSlaveToPartner,
+                tLagLACPNbrOfSubGroups,
+                tLagholdTimeDown,
+                tLagIfIndex,
+                tLagConfigLastChange,
+                tLagPortThresholdFalling,
+                tLagPortThresholdRising,
+                tLagMemberPortName,
+                tLagMemberPortIsPrimary,
+                tLagPortSubgroup,
+                tLagPortActiveStdby,
+                tLagPortReasonDownFlags
+            }
+    STATUS    obsolete
+    DESCRIPTION
+        "The group of objects supporting management of Link Aggregation (LAG)
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLagGroups 11 }
+
+tmnxLagV6v0NotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                tLagDynamicCostOn,
+                tLagDynamicCostOff,
+                tLagPortAddFailed,
+                tLagSubGroupSelected,
+                tLagPortAddFailureCleared
+                    }
+    STATUS    current
+    DESCRIPTION
+        "the group of notifications providing for management of Link
+         Aggregation Group operation in version 6.0 of the Alcatel-Lucent SROS 
+         series systems."
+    ::= { tmnxLagGroups 12 }
+
+tmnxLagV7v0Group OBJECT-GROUP
+    OBJECTS {
+                tLagPerFpIngQueuing
+            }
+    STATUS obsolete
+    DESCRIPTION
+        "The group of objects supporting management of Link Aggregation (LAG)
+         on Alcatel-Lucent SROS series systems in 7.0 release."
+    ::= { tmnxLagGroups 13 }
+
+tmnxObsoletedObjectsV7v0Group OBJECT-GROUP
+    OBJECTS {   tLagPortReasonDownFlags
+            }
+    STATUS    current
+    DESCRIPTION
+        "The group of objects that have been obsoleted in release 7.0
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLagGroups 14 }
+
+tmnxLagInstanceV7v0Group OBJECT-GROUP
+    OBJECTS {   tLagRowStatus,
+                tLagPortThreshold,
+                tLagPortThresholdAction,
+                tLagEnableMarkerGenerator,
+                tLagEnableLACP,
+                tLagDescription,
+                tLagDynamicCosting,
+                tLagLACPMode,
+                tLagLACPAdminKeyAutogen,
+                tLagLACPTransmitInterval,
+                tLagAccessAdaptQos,
+                tLagLACPXmitStdby,
+                tLagLACPSelCrit,
+                tLagLACPSelCritSlaveToPartner,
+                tLagLACPNbrOfSubGroups,
+                tLagholdTimeDown,
+                tLagIfIndex,
+                tLagConfigLastChange,
+                tLagPortThresholdFalling,
+                tLagPortThresholdRising,
+                tLagMemberPortName,
+                tLagMemberPortIsPrimary,
+                tLagPortSubgroup,
+                tLagPortActiveStdby
+            }
+    STATUS    current
+    DESCRIPTION
+        "The group of objects supporting management of Link Aggregation (LAG)
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLagGroups 15 }
+    
+tmnxLagV8v0Group OBJECT-GROUP
+    OBJECTS {   tLagPerFpIngQueuing,   
+                tLagSystemId,
+                tLagSystemPriority
+            }
+    STATUS current
+    DESCRIPTION
+        "The group of objects supporting management of Link Aggregation (LAG)
+         on Alcatel-Lucent SROS series systems in 8.0 release."
+    ::= { tmnxLagGroups 16 }
+
+tmnxLagInstanceV9v0Group OBJECT-GROUP
+    OBJECTS {   tLagStandbySignaling
+            }
+    STATUS    current
+    DESCRIPTION
+        "The group of objects supporting management of Link Aggregation (LAG)
+         that were added in release 9.0 of the Alcatel-Lucent SROS series 
+         systems."
+    ::= { tmnxLagGroups 17 }
+
+tmnxLagNotifyObjsV10v0Group OBJECT-GROUP
+    OBJECTS {   tLagNotifyPortAddFailReason,
+                tLagNotifySubGroupSelected,
+                tLagNotifyAdditionalInfo,
+                tLagNotifyStateChangedReason
+            }
+    STATUS    current
+    DESCRIPTION
+        "The group of objects supporting LAG notifications
+         on Alcatel-Lucent SROS series systems."
+    ::= { tmnxLagGroups 18 }
+
+tmnxLagV10v0NotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                tLagStateEvent,
+                tLagMemberStateEvent
+                    }
+    STATUS    current
+    DESCRIPTION
+        "the group of notifications providing for management of Link
+         Aggregation Group operation since version 10.0
+         of the Alcatel-Lucent SROS series systems."
+    ::= { tmnxLagGroups 19 }
+END
+

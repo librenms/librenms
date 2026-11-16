@@ -1,0 +1,499 @@
+-- *********************************************************************
+-- CISCO-ST-TC.my: Storage TC Mib
+--   
+-- September 2002, Vinay Gaonkar
+--   
+-- Copyright (c) 2002-2008-2012 by cisco Systems Inc.
+-- All rights reserved.
+--   
+-- *******************************************************************
+
+CISCO-ST-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ciscoModules
+        FROM CISCO-SMI;
+
+
+storageTextualConventions MODULE-IDENTITY
+    LAST-UPDATED    "201208080000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+            Postal: 170 W Tasman Drive
+            San Jose, CA  95134
+            USA
+            Tel: +1 800 553 -NETS
+            E-mail: cs-san@cisco.com"
+    DESCRIPTION
+        "This module defines textual conventions used in
+        Storage Area Network technology specific mibs."
+    REVISION        "201208080000Z"
+    DESCRIPTION
+        "Added sixteenG and automaxSixteenG in fcIfSpeed"
+    REVISION        "201107260000Z"
+    DESCRIPTION
+        "-Added following enum to FcIfSpeed:
+        autoMaxEightG."
+    REVISION        "201012240000Z"
+    DESCRIPTION
+        "-Added following enums to FcIfSpeed:
+        autoMax4G, eightG and tenG."
+    REVISION        "200805160000Z"
+    DESCRIPTION
+        "-Added following enums to FcPortTypes
+        TEXTUAL CONVENTION
+        npPort, tfPort, tnpPort
+        -Added following enums to InterfaceOperMode 
+        TEXTUAL CONVENTION.
+        npPort, tfPort, tnpPort
+        -Added following enums to FcPortModuleTypes
+        TEXTUAL CONVENTION
+        sfpDwdm, qsfp, x2Dwdm
+        - Updated the description of the following objects:
+        FcPortTxTypes,
+        FcNameId."
+    REVISION        "200512170000Z"
+    DESCRIPTION
+        "- Added following TCs
+        FcIfSfpDiagLevelType 
+        FcIfServiceStateType
+        - Added following enums in FcPortModuleTypes
+        xfp, x2Short, x2Medium, x2Tall, xpakShort, 
+        xpakMedium, xpakTall and xenpak. 
+        - Added following enums in FcPortTxTypes. 
+        tenGigBaseSr, tenGigBaseLr, tenGigBaseEr, 
+        tenGigBaseLx4, tenGigBaseSw, tenGigBaseLw, 
+        tenGigBaseEw. 
+        - Added following enums in FcIfSpeed 
+        fourG and autoMaxTwoG."
+    REVISION        "200405180000Z"
+    DESCRIPTION
+        "Added new textual convention 'InterfaceOperMode'."
+    REVISION        "200309260000Z"
+    DESCRIPTION
+        "Obtained the OID for this MIB."
+    REVISION        "200308070000Z"
+    DESCRIPTION
+        "Added stPort(15) to FcPortTypes."
+    REVISION        "200210040000Z"
+    DESCRIPTION
+        "Added fvPort and portOperDown to FcPortTypes.
+        Added FcAddress and FcAddressType."
+    REVISION        "200209240000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { ciscoModules 4 }
+
+
+
+VsanIndex ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The VSAN id of a VSAN which uniquely identifies
+        a VSAN within a fabric. VSAN id is 12-bit 
+        wide; so theoretically, 4096 VSANs can be defined in 
+        a fabric and this device can be part of. However, VSAN 
+        numbers 0 , 4094 and 4095 are reserved."
+    SYNTAX          Integer32 (1..4094)
+
+DomainId ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The Domain Id of the switch. This is assigned
+        dynamically if the Domain Manager is enabled on 
+        the switch or could be configured statically by 
+        the user."
+    SYNTAX          Integer32 (1..239)
+
+DomainIdOrZero ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The Textual convention is an extension to
+        textual convetion 'DomainId'. It includes 
+        the value '0'in addition the range 1-239.
+        Value '0' indicates that Domain Id has  
+        been neither configured nor assigned."
+    SYNTAX          Integer32 (0..239)
+
+FcAddressId ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents Fibre Channel Address ID, a 24-bit
+        value unique within the address space of a Fabric."
+    SYNTAX          OCTET STRING (SIZE (3))
+
+FcNameId ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents the World Wide Name (WWN) associated with
+        a Fibre Channel (FC) entity. A WWN is a 64 bit address
+        to uniquely identify each entity within a Fibre Channel
+        fabric."
+
+    REFERENCE
+        "Fibre Channel Framing and Signaling (FC-FS) Rev 1.70
+               - Section 14 Name_Indentifier Formats."
+    SYNTAX          OCTET STRING (SIZE (8))
+
+FcNameIdOrZero ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The World Wide Name (WWN) associated with a Fibre Channel
+        (FC) entity.  WWNs were initially defined as 64-bits in
+        length.  The latest definition (for future use) is 128-bits
+        long.  The zero-length string value is used in circumstances
+        where the WWN is unassigned/unknown."
+    SYNTAX          OCTET STRING (SIZE (0 | 8 | 16))
+
+FcClassOfServices ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents the class of service capability of an
+        NxPort or FxPort."
+    SYNTAX          BITS {
+                        classF(0),
+                        class1(1),
+                        class2(2),
+                        class3(3),
+                        class4(4),
+                        class5(5),
+                        class6(6)
+                    }
+
+FcPortTypes ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents fibre channel port types:
+        auto (1)   - Mode is determined by port initialization 
+                    scheme.
+        fPort (2)  - Fibre channel fabric port. 
+        flPort (3) - Fibre channel arbitrated loop port.
+        ePort (4)  - Fabric Expansion port.
+        bPort (5)  - Bridging port.
+        fxPort (6) - This port can only be f_port or fl_port.
+        sdPort (7) - SPAN destination port. SD_ports transmit 
+                    traffic copied from one or more source ports
+                    for monitoring purposes.        
+        tlPort (8) - Translation loop port.
+        nPort (9)   - Fibre channel N port.
+        nlPort (10) - Fibre channel NL port.
+        nxPort (11) - This port can only be n_port or nl_port.
+
+          -- read only port types.
+        tePort (12) - Trunking e_port.
+                     Note: A port which is administratively set
+                     to 'ePort', will operationally have type
+                     'tePort' if fcIfOperTrunkMode has the value
+                     'trunk'.
+        fvPort (13) - Virtual Port.
+        portOperDown (14) - port operationally down
+                            If a port is operationally down, the
+                            port mode is unknown. In such cases
+                            the operational port mode is shown 
+                            as 'portOperDown'. 
+        stPort (15) - SPAN Tunnel destination port.
+        npPort (16) - N Proxy port mode applicable only to N-port
+                      Virtualizer (NPV)
+        tfPort (17) - Trunking fibre channel fabric port.
+        tnpPort (18) - Trunking N Proxy port mode applicable only
+                      to N-port Virtualizer (NPV)."
+    SYNTAX          INTEGER  {
+                        auto(1),
+                        fPort(2),
+                        flPort(3),
+                        ePort(4),
+                        bPort(5),
+                        fxPort(6),
+                        sdPort(7),
+                        tlPort(8),
+                        nPort(9),
+                        nlPort(10),
+                        nxPort(11),
+                        tePort(12),
+                        fvPort(13),
+                        portOperDown(14),
+                        stPort(15),
+                        npPort(16),
+                        tfPort(17),
+                        tnpPort(18)
+                    }
+
+FcPortTxTypes ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents port transciever technology types.
+        unknown (1) - unknown
+        longWaveLaser (2) - 1550nm laser
+        shortWaveLaser (3) - 850nm laser
+        longWaveLaserCostReduced (4) - 1310nm laser
+        electrical (5) - electrical 
+        tenGigBaseSr (6)  - 10GBASE-SR 850nm laser
+        tenGigBaseLr (7)  - 10GBASE-LR 1310nm laser
+        tenGigBaseEr (8)  - 10GBASE-ER 1550nm laser
+        tenGigBaseLx4 (9) - 10GBASE-LX4 WWDM 1300nm laser
+        tenGigBaseSw (10)  - 850nm laser
+        tenGigBaseLw (11) - 1310nm laser
+        tenGigBaseEw (12) - 1550nm laser
+        ."
+
+    REFERENCE
+        "IEEE Std 802.3-2005 carrier sense multiple access 
+        with collision detection (CSMA/CD) access method 
+        and physical layer specification."
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        longWaveLaser(2),
+                        shortWaveLaser(3),
+                        longWaveLaserCostReduced(4),
+                        electrical(5),
+                        tenGigBaseSr(6),
+                        tenGigBaseLr(7),
+                        tenGigBaseEr(8),
+                        tenGigBaseLx4(9),
+                        tenGigBaseSw(10),
+                        tenGigBaseLw(11),
+                        tenGigBaseEw(12)
+                    }
+
+FcPortModuleTypes ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents module type of the port connector. This
+        object refers to the hardware implementation of the port.
+        The enums are defined as per FC-GS-4 standard.
+        unknown             (1) - unknown
+        other               (2) - other
+        gbic                (3) - gbic (gigabit interface card)
+        embedded            (4) - gbic is part of the line card 
+                                  and is unremovable
+        glm                 (5) - if its a gigabit link module 
+                                  (GLM). A GLM has a different 
+                                  form factor than GBIC. GLM is 
+                                  not supported by our switch.
+        gbicWithSerialID    (6) - If GBIC serial id can be read
+        gbicWithoutSerialID (7) - If GBIC serial id cannot be read
+        sfpWithSerialID     (8) - If small form factor (SFP) 
+                                  pluggable GBICs serial id can 
+                                  be read
+        sfpWithoutSerialID  (9) - If small form factor (SFP) 
+                                  pluggable GBICs serial id 
+                                  cannot be read
+        The following enums are module types for 10 gigabit small 
+        form factor pluggable sfp port connectors.
+        xfp                (10) - xfp 
+        x2Short            (11) - x2 short 
+        x2Medium           (12) - x2 medium
+        x2Tall             (13) - x2 tall
+        xpakShort          (14) - xpak short
+        xpakMedium         (15) - xpak medium
+        xpakTall           (16) - xpak tall
+        xenpak             (17) - xenpak
+        sfpDwdm            (18) - DWDM SFP type
+        qsfp               (19) - Quad small form-factor (QSFP) 
+                                                          pluggable type
+        x2Dwdm             (20) - x2 DWDM
+        ."
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        other(2),
+                        gbic(3),
+                        embedded(4),
+                        glm(5),
+                        gbicWithSerialID(6),
+                        gbicWithoutSerialID(7),
+                        sfpWithSerialID(8),
+                        sfpWithoutSerialID(9),
+                        xfp(10),
+                        x2Short(11),
+                        x2Medium(12),
+                        x2Tall(13),
+                        xpakShort(14),
+                        xpakMedium(15),
+                        xpakTall(16),
+                        xenpak(17),
+                        sfpDwdm(18),
+                        qsfp(19),
+                        x2Dwdm(20)
+                    }
+
+FcIfSpeed ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents the speed of a fibre channel port.
+        Following are the meanings of the enumerated values:
+          auto      (1) - Negotiate to determine the speed 
+                          automatically.
+          oneG      (2) - 1Gbit 
+          twoG      (3) - 2Gbit
+          fourG     (4) - 4Gbit 
+          autoMaxTwoG (5)  - Negotiate to determine the 
+                             speed automatically upto a 
+                             maximum of 2Gbit.
+          eightG    (6) - 8Gbit
+          autoMaxFourG (7) - Negotiate to determine the
+                             speed automatically upto a
+                             maximum of 4Gbit.          
+          tenG      (8) - 10GBit.
+          autoMaxEightG (9) - Negotiate to determine the
+                             speed automatically upto a
+                             maximum of 8Gbit.
+          sixteenG  (10) - 16GBit.
+          autoMaxSixteenG (11) - Negotiate to determine the
+                             speed automatically upto a
+                             maximum of 16Gbit."
+    SYNTAX          INTEGER  {
+                        auto(1),
+                        oneG(2),
+                        twoG(3),
+                        fourG(4),
+                        autoMaxTwoG(5),
+                        eightG(6),
+                        autoMaxFourG(7),
+                        tenG(8),
+                        autoMaxEightG(9),
+                        sixteenG(10),
+                        autoMaxSixteenG(11)
+                    }
+
+PortMemberList ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A list of ifIndex's of the ports that are members of
+        this list.
+
+        The value of this object is a concatenation of zero or
+        more 4-octet strings, where each 4-octet string contains
+        a 32-bit ifIndex value in network byte order.
+
+        A zero length string value means this list has no
+        members."
+    SYNTAX          OCTET STRING (SIZE (0..64))
+
+FcAddress ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents either the Fibre Channel Address ID or
+        the World Wide Name associated with a Fibre
+        Channel (FC) Entity."
+    SYNTAX          OCTET STRING (SIZE (3 | 8))
+
+FcAddressType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Denotes if a Fibre Channel Address is
+        a World Wide Name (WWN) or a Fibre
+        Channel Address ID (FCID).
+        wwn(1) - address is WWN.
+        fcid(2) - address is FCID."
+    SYNTAX          INTEGER  {
+                        wwn(1),
+                        fcid(2)
+                    }
+
+InterfaceOperMode ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents the operational mode of an interface
+        auto (1) - Mode is determined by port initialization
+                   scheme.
+        fPort (2) - Fibre channel fabric port.
+        flPort (3) - Fibre channel arbitrated loop port.
+        ePort (4)  - Fabric Expansion port.
+        bPort (5)  - Bridging port.
+        fxPort (6) - This port can only be f_port or fl_port.
+        sdPort (7) - SPAN destination port. SD_ports transmit
+                     traffic copied from one or more source
+                     ports for monitoring purposes.
+        tlPort (8) - Translation loop port.
+        nPort (9)   - Fibre channel N port.
+        nlPort (10) - Fibre channel NL port.
+        nxPort (11) - This port can only be n_port or nl_port.
+
+        -- read only port types.
+        tePort (12) - Trunking e_port.
+                  Note: A port which is administratively set
+                  to 'ePort', will operationally have type
+                  'tePort' if fcIfOperTrunkMode has the value
+                  'trunk'.
+        fvPort (13) - Virtual Port.
+        portOperDown (14) - port operationally down
+                          If a port is operationally down, the
+                          port mode is unknown. In such cases
+                          the operational port mode is shown
+                          as 'portOperDown'.
+        stPort (15) - SPAN Tunnel destination port.
+        mgmtPort(16) - Mgmt Port.
+        ipsPort(17) - Ethernet Port.
+        evPort(18) - FCIP tunnels on Ethernet ports.
+        npPort (19) - N Proxy port mode applicable only 
+                      to N-port Virtualizer (NPV).
+        tfPort (20) - Trunking fibre channel fabric port.
+        tnpPort (21) - Trunking N Proxy port mode applicable only
+                              to N-port Virtualizer (NPV)."
+    SYNTAX          INTEGER  {
+                        auto(1),
+                        fPort(2),
+                        flPort(3),
+                        ePort(4),
+                        bPort(5),
+                        fxPort(6),
+                        sdPort(7),
+                        tlPort(8),
+                        nPort(9),
+                        nlPort(10),
+                        nxPort(11),
+                        tePort(12),
+                        fvPort(13),
+                        portOperDown(14),
+                        stPort(15),
+                        mgmtPort(16),
+                        ipsPort(17),
+                        evPort(18),
+                        npPort(19),
+                        tfPort(20),
+                        tnpPort(21)
+                    }
+
+FcIfServiceStateType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents the service state of a Fibre Channel
+        interface. Following are the meanings of the 
+        enumerated values:
+
+        inService    (1) - interface is in service and is
+                      allowed to become operational.
+        outOfService (2) - interface is removed from service 
+                      and is not allowed to become 
+                      operational."
+    SYNTAX          INTEGER  {
+                        inService(1),
+                        outOfService(2)
+                    }
+
+FcIfSfpDiagLevelType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Represents the severity level of the SFP
+        diagnostic information of an interface for 
+        temperature, voltage, current, optical 
+        transmit and receive power."
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        normal(2),
+                        lowWarning(3),
+                        lowAlarm(4),
+                        highWarning(5),
+                        highAlarm(6)
+                    }
+
+END
+
+

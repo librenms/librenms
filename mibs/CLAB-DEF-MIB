@@ -1,0 +1,435 @@
+CLAB-DEF-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    enterprises
+                    FROM SNMPv2-SMI          -- RFC 2578
+    TEXTUAL-CONVENTION
+                    FROM SNMPv2-TC           -- RFC 2579
+    DocsX509ASN1DEREncodedCertificate
+                    FROM DOCS-IETF-BPI2-MIB; -- RFC 4131
+ 
+cableLabs MODULE-IDENTITY
+    LAST-UPDATED "201704130000Z" -- April 13, 2017
+    ORGANIZATION "Cable Television Laboratories, Inc."
+    CONTACT-INFO
+           "Postal: Cable Television Laboratories
+                    858 Coal Creek Circle
+                    Louisville, Colorado 80027-9750
+                    U.S.A.
+            Phone:  +1 303-661-9100
+            Fax:    +1 303-661-9199
+            E-mail: mibs@cablelabs.com"
+    DESCRIPTION
+            "Licensed under the Apache License, Version 2.0 (the 'License');
+             you may not use this file except in compliance with the License.
+             You may obtain a copy of the License at:
+ 
+                 http://www.apache.org/licenses/LICENSE-2.0
+ 
+             Unless required by applicable law or agreed to in writing, software
+             distributed under the License is distributed on an 'AS IS' BASIS,
+             WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
+             implied.
+
+             See the License for the specific language governing permissions and
+             limitations under the License.
+
+            This MIB module defines the namespace organization for the
+            CableLabs enterprise OID registry.
+ 
+            Copyright 1999-2017 Cable Television Laboratories, Inc.
+            All rights reserved."
+
+    REVISION "201704130000Z" -- April 13, 2017
+    DESCRIPTION
+            "Revised per ECN CLAB-DEF-MIB-N-17.0157-1."
+    REVISION "201607280000Z" -- July 28, 2016
+    DESCRIPTION
+            "Revised Version includes ECN MIB-CLABDEF-N-16.0149-3."
+    
+    REVISION "201603160000Z" -- March 16, 2016
+    DESCRIPTION
+            "Revised Version includes ECNs MIB-CLABDEF-N-15.0138-1
+             and MIB-CLABDEF-N-16.0142-1."
+    REVISION "201208090000Z" -- August 9, 2012
+    DESCRIPTION
+            "Revised Version includes ECN MIB-CLABDEF-N-12.0113-1
+             and published as CL-SP-MIB-CLABDEF-I10-120809"
+
+    REVISION "201102100000Z" -- February 10, 2011
+    DESCRIPTION
+            "Revised Version includes ECN MIB-CLABDEF-N-10.0092-1
+             and published as CL-SP-MIB-CLABDEF-I09-110210"
+    REVISION "200908110000Z" -- August 11, 2009
+    DESCRIPTION
+            "Revised Version includes ECN MIB-CLABDEF-N-08.0039-2
+             and published as CL-SP-MIB-CLABDEF-I08-090811"
+    REVISION "200803060000Z" -- March 6, 2008
+    DESCRIPTION
+            "Revised Version includes ECN MIB-CLABDEF-N-07.0032-4 and
+            published as CL-SP-MIB-CLABDEF-I07."
+    REVISION "200701191700Z" -- January 19, 2007
+    DESCRIPTION
+            "This revision published as CL-SP-MIB-CLABDEF-I06."
+    REVISION "200504081700Z" -- April 8, 2005
+    DESCRIPTION
+            "This revision published as CL-SP-MIB-CLABDEF-I05."
+    ::= { enterprises 4491 }
+ 
+-- Sub-tree for Registrations
+clabFunction            OBJECT IDENTIFIER ::= { cableLabs 1 }
+clabFuncMib2            OBJECT IDENTIFIER ::= { clabFunction 1 }
+clabFuncProprietary     OBJECT IDENTIFIER ::= { clabFunction 2 }
+ 
+-- Sub-tree for Project Definitions
+clabProject             OBJECT IDENTIFIER ::= { cableLabs 2 }
+clabProjDocsis          OBJECT IDENTIFIER ::= { clabProject 1 }
+clabProjPacketCable     OBJECT IDENTIFIER ::= { clabProject 2 }
+clabProjOpenCable       OBJECT IDENTIFIER ::= { clabProject 3 }
+clabProjCableHome       OBJECT IDENTIFIER ::= { clabProject 4 }
+clabProjWireless        OBJECT IDENTIFIER ::= { clabProject 5 }
+
+-- Sub-tree for Global Security Definitions
+clabSecurity            OBJECT IDENTIFIER ::= { cableLabs 3 }
+clabSecCertObject       OBJECT IDENTIFIER ::= { clabSecurity 1 } 
+clabSecOlcaObject		OBJECT IDENTIFIER ::= { clabSecurity 2 }
+-- Sub tree for CableLabs cross project common MIB definitions 
+clabCommonMibs          OBJECT IDENTIFIER ::= { cableLabs 4 }
+
+--
+-- CableLabs DOCSIS Project Sub-tree Definitions
+--
+
+--
+-- CableLabs CableHome Project Sub-tree Definitions
+--
+
+--
+-- CableLabs PacketCable Project Sub-tree Definitions
+--
+ 
+pktcSecurity OBJECT IDENTIFIER
+    -- CableLabs OID reserved for security and used to specify errors
+    -- that can be returned for the Kerberos KDC - Provisioning
+    -- Server interface, or the MTA-CMS Kerberized IPsec interface, or
+    -- the MTA-Provisioning Server Kerberized SNMPv3 interface.
+    -- CableLabs PacketCable Security Specification
+    ::= { clabProjPacketCable 4 }
+ 
+pktcLawfulIntercept OBJECT IDENTIFIER
+    -- CableLabs OID reserved for the PacketCable Electronic
+    -- Surveillance Protocol (PCESP) between the Delivery Function
+    -- and Collection Function. This OID is used to define the ASN.1
+    -- PCESP messages.
+    -- CableLabs PacketCable Electronic Surveillance Protocol
+    -- Specification
+    ::= { clabProjPacketCable 5 }
+
+-- 
+-- Sub-tree for PacketCable MIB Enhancements
+--
+
+pktcEnhancements OBJECT IDENTIFIER ::= { clabProjPacketCable 6 }
+
+-- Subtree for the incorporation of new MIB Modules 
+-- (MIB enhancements) proposed to the PacketCable MIB modules.
+-- This includes new MIB objects being introduced
+-- as part of the PacketCable MIB enhancement efforts
+-- and as a place holder for future revisions.
+-- This sub-division would facilitate easier incorporation
+-- of proposed IETF Internet-Drafts and RFCs by keeping enhancements
+-- independent of RFC or Internet-Draft changes.
+-- For new MIB tables that use previously used indices, it is 
+-- recommended that the AUGMENT CLAUSE be used to aid SNMP Operations,
+-- as deemed necessary.
+
+pktcPACMMibs OBJECT IDENTIFIER
+    -- PacketCable MIB module defining the basic MIB
+    -- Objects related to Provisioning, Activation, 
+    -- Configuration and Management (PACM)
+    -- Reference:
+    -- CableLabs PacketCable PACM Specification.
+    ::= { clabProjPacketCable 7 }
+
+pktcApplicationMibs OBJECT IDENTIFIER
+    -- PacketCable MIB module defining the basic MIB
+    -- Objects related to Service specific definitions
+    -- Reference:
+    -- CableLabs PacketCable Service specifications
+    ::= { clabProjPacketCable 8 }
+
+pktcSupportMibs OBJECT IDENTIFIER
+    -- PacketCable MIB module defining the basic MIB
+    -- Objects related to service support definitions, 
+    -- (independent of PACM or service specific definitions)
+    -- Reference:
+    -- CableLabs PacketCable specifications
+    ::= { clabProjPacketCable 9 }
+
+pktcEUEMibs OBJECT IDENTIFIER
+    -- PacketCable MIB module defining the basic MIB
+    -- Objects related to PacketCable E-UE 
+    -- Provisioning.
+    -- Reference:
+    -- CableLabs PacketCable E-UE Provisioning
+    -- Framework specification
+    ::= { clabProjPacketCable 10 }
+
+pktcSMAMibs OBJECT IDENTIFIER
+    -- PacketCable MIB module defining the basic MIB
+    -- Objects related to PacketCable SMA
+    -- Provisioning.
+    -- Reference:
+    -- CableLabs PacketCable SMA Provisioning
+    -- Framework specification
+    ::= { clabProjPacketCable 11 }
+--
+-- PacketCable PACM sub-tree
+--
+
+pktcPACMTC OBJECT IDENTIFIER
+    -- PacketCable MIB module defining PacketCable
+    -- textual conventions for describing PacketCable
+    -- PACM MIB objects.
+    -- Reference
+    -- CableLabs PacketCable Provisioning, Activation,
+    -- Configuration and Management specification
+    ::= { pktcPACMMibs 1 }
+
+pktcPACMUEMib OBJECT IDENTIFIER
+    -- PacketCable MIB module defining PacketCable
+    -- PACM MIB Objects related to User Equipment.
+    -- Reference
+    -- CableLabs PacketCable Provisioning, Activation,
+    -- Configuration and Management specification
+    ::= { pktcPACMMibs 2 }
+
+pktcPACMUserMib OBJECT IDENTIFIER
+    -- PacketCable MIB module defining PacketCable
+    -- PACM MIB Objects related to Users.
+    -- Reference
+    -- CableLabs PacketCable Provisioning, Activation,
+    -- Configuration and Management specification
+    ::= { pktcPACMMibs 3 }
+
+--
+-- PacketCable Service support sub-tree
+--
+
+pktcESSupportMibs OBJECT IDENTIFIER
+    -- PacketCable MIB module defining PacketCable
+    -- Electronic Surveillance (ES) support MIB Objects.
+    -- Reference
+    -- CableLabs PacketCable Electronic Surveillance
+    -- specification
+    ::= { pktcSupportMibs 1 }
+
+--
+-- PacketCable EUE sub-tree
+--
+
+pktcEUEDeviceMibs OBJECT IDENTIFIER
+    -- PacketCable MIB module defining PacketCable
+    -- E-UE configuration MIB Objects for specific
+    -- E-UE types, such as the E-DVA.
+    -- Reference
+    -- CableLabs PacketCable E-UE Provisioning
+    -- Framework specification
+    ::= { pktcEUEMibs 1 }
+
+--
+-- CableLabs OpenCable Project Sub-tree Definitions
+--
+
+--
+-- Definition of CableLabs Security Certificate Objects
+--
+
+clabSrvcPrvdrRootCACert OBJECT-TYPE
+    SYNTAX      DocsX509ASN1DEREncodedCertificate
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The X509 DER-encoded CableLabs Service Provider Root CA
+            Certificate."
+    REFERENCE
+            "CableLabs CableHome Specification;
+            CableLabs PacketCable Security Specification."
+    ::= { clabSecCertObject 1 }
+ 
+clabCVCRootCACert OBJECT-TYPE
+    SYNTAX      DocsX509ASN1DEREncodedCertificate
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The X509 DER-encoded CableLabs CVC Root CA Certificate."
+    REFERENCE
+            "CableLabs CableHome Specification;
+            CableLabs PacketCable Security Specification."
+    ::= { clabSecCertObject 2 }
+ 
+clabCVCCACert OBJECT-TYPE
+    SYNTAX      DocsX509ASN1DEREncodedCertificate
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The X509 DER-encoded CableLabs CVC CA Certificate."
+    REFERENCE
+            "CableLabs CableHome Specification;
+            CableLabs PacketCable Security Specification."
+    ::= { clabSecCertObject 3 }
+ 
+clabMfgCVCCert OBJECT-TYPE
+    SYNTAX      DocsX509ASN1DEREncodedCertificate
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The X509 DER-encoded Manufacturer CVC Certificate."
+    REFERENCE
+            "CableLabs CableHome Specification;
+            CableLabs PacketCable Security Specification."
+    ::= { clabSecCertObject 4 }
+
+clabMfgCACert OBJECT-TYPE
+    SYNTAX      DocsX509ASN1DEREncodedCertificate
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The X509 DER-encoded Manufacturer CA Certificate."
+    REFERENCE
+            "CableLabs CableHome Specification;
+            CableLabs PacketCable Security Specification."
+    ::= { clabSecCertObject 5 }
+
+--
+-- CableLabs cross project common MIB sub-tree definitions
+--
+
+clabUpsMib OBJECT IDENTIFIER
+    -- CableLabs cross project MIB module defining the basic management
+    -- objects for the configuration and monitoring of the battery
+    -- backup and UPS functionality for CableLabs compliant devices.
+    ::= { clabCommonMibs 1 }
+
+clabTopoMib OBJECT IDENTIFIER 
+    -- This CableLabs cross project MIB module provides
+    -- management objects for the management of fiber 
+    -- nodes in the Cable plant    
+    -- Reference: 
+    -- CableLabs DOCSIS 3.0 OSSI Specification.
+    ::= { clabCommonMibs 2 }
+
+clabGREMib OBJECT IDENTIFIER 
+    -- This CableLabs cross project MIB module provides
+    -- management objects for the management of 
+    -- Generic Routing Encapsulation (GRE)
+    -- Reference: 
+    -- CableLabs DOCSIS eRouter Specification.
+    ::= { clabCommonMibs 3 }
+
+clabMAPMib OBJECT IDENTIFIER 
+    -- This CableLabs cross project MIB module was 
+    -- incorporated in the clabGWMib.
+    -- This MIB is obsolete.  
+    ::= { clabCommonMibs 4 }
+
+clabDNSMib OBJECT IDENTIFIER 
+    -- This CableLabs cross project MIB module was 
+    -- incorporated in the clbGWMib
+    -- This MIB is obsolete.
+    ::= { clabCommonMibs 5 }
+
+clabGWMib OBJECT IDENTIFIER 
+    -- This CableLabs cross project MIB module provides
+    -- management objects for the management of 
+    -- Gateway devices.
+    -- Reference: 
+    -- CableLabs DOCSIS sRouter Specification.
+    ::= { clabCommonMibs 6 }
+
+clabAniDevMib OBJECT IDENTIFIER 
+    -- This CableLabs cross project MIB module provides
+    -- management objects for the management of 
+    -- Access Network Independent devices.
+    -- Reference: 
+    -- CableLabs DOCSIS sRouter Specification.
+    ::= { clabCommonMibs 7 }
+
+--
+-- Textual Conventions 
+--
+
+--
+-- DOCSIS Defined Textual Conventions 
+--
+
+DocsL2vpnIfList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+            "An object of this type indicates a set of CM 
+            MAC bridge interfaces, encoded as a BITS syntax with a ?1?
+            Bit for each interface included in the set.
+
+            Bit position eCM(0) represents a conceptual interface to 
+            the internal 'self' host MAC of the eCM itself. All other 
+            bit positions K correspond to CM MAC bridge port interface
+            index with ifIndex value K. 
+
+            A BITS object is encoded as an OCTET STRING, which may have
+            length zero. Bit position 0 is encoded in the most
+            significant bit of the first octet, proceeding to 
+            bit position 7 in the least significant bit. Bit position 8
+            is encoded in the most significant bit of the second octet,
+            and so on.
+
+            In a CM, ifIndex value 1 corresponds to the primary CPE 
+            interface. In CableHome devices, this interface is assigned
+            to the embedded Portal Services (ePS) host interface, which
+            provides a portal to the primary physical CPE interface. 
+            In many contexts of a DocsL2VpnIfList, a '1' in bit 
+            position 1 corresponds to 'any' or 'all' CPE interfaces 
+            when the CM contains more than one CPE interface. 
+
+            ifIndex value 2 corresponds to the docsCableMacLayer 
+            RF MAC interface. 
+
+            ifIndex values 3 and 4 correspond to the 
+            docsCableDownstream and docsCableUpstream interfaces, 
+            respectively, which are not separate MAC bridge port 
+            interfaces. Bit positions 3 and 4 are unused in this type;
+            they must be saved and reported as configured, but 
+            otherwise ignored. 
+
+            ifIndex values 5 through 15 are reserved for individual
+            CPE interfaces for devices that implement more than one
+            CPE interface. In such devices, DocsL2vpnIfList bit 
+            position 1 corresponds to the set of all CPE interfaces.
+            A CM with more than one CPE interface MAY assign a 
+            DocsL2vpnIfList bit position within the range of 5..15 to
+            refer to the single primary CPE interface.
+
+            ifIndex value 16 is assigned to any embedded Multimedia 
+            Terminal Adapter (eMTA) as defined by PacketCable.
+
+            ifIndex value 17 is assigned to the IP management host 
+            interface of an embedded Set Top Box (eSTB). ifIndex value 
+            18 is reserved for the DOCSIS Set-top Gateway (DSG) traffic
+            delivered to an eSTB. 
+
+            ifIndex values 19 through 31 are
+            reserved for future defined embedded Service Application."
+    SYNTAX      BITS {
+        eCm(0),
+        cmci(1),
+        docsCableMacLayer(2),
+        docsCableDownstream(3),
+        docsCableUpstream(4),
+        -- 5..15 reserved for other CPE interfaces
+        eMta(16),
+        eStbIp(17),
+        eStbDsg(18)
+        -- 19..31 reserved for other eSAFE interfaces
+    }
+END
+

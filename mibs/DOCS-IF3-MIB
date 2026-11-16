@@ -1,0 +1,5032 @@
+DOCS-IF3-MIB DEFINITIONS ::= BEGIN
+  IMPORTS
+    NOTIFICATION-TYPE,
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    Unsigned32,
+    Counter32
+             FROM SNMPv2-SMI         -- RFC 2578
+    sysName
+             FROM SNMPv2-MIB         -- RFC 3418
+    TEXTUAL-CONVENTION,
+    RowStatus,
+    TruthValue,
+    MacAddress,
+    DateAndTime,
+    StorageType
+             FROM SNMPv2-TC          -- RFC 2579
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP,
+    MODULE-COMPLIANCE
+             FROM SNMPv2-CONF        -- RFC 2580
+    SnmpAdminString
+             FROM SNMP-FRAMEWORK-MIB -- RFC 3411
+    SnmpTagList
+             FROM SNMP-TARGET-MIB    -- RFC 3413
+    InetAddressIPv6,
+    InetAddressIPv4
+             FROM INET-ADDRESS-MIB   --  RFC 4001
+    ifIndex,
+    InterfaceIndex,
+    InterfaceIndexOrZero
+             FROM IF-MIB             --  RFC 2863
+    TenthdB,
+    TenthdBmV,
+    DocsisUpstreamType,
+    DocsEqualizerData,
+    DocsisQosVersion
+             FROM DOCS-IF-MIB        -- RFC 4546
+    NodeName
+             FROM CLAB-TOPO-MIB
+
+    docsDevEvLevel,
+    docsDevEvId,
+    docsDevEvText, 
+    docsDevEvLastTime
+             FROM DOCS-CABLE-DEVICE-MIB -- RFC 4639 
+    clabProjDocsis
+              FROM CLAB-DEF-MIB;
+
+docsIf3Mib MODULE-IDENTITY
+    LAST-UPDATED    "201706150000Z" -- June 15, 2017 
+    ORGANIZATION    "Cable Television Laboratories, Inc."
+    CONTACT-INFO
+         "Postal: Cable Television Laboratories, Inc.
+         858 Coal Creek Circle
+         Louisville, Colorado 80027-9750
+         U.S.A.
+         Phone: +1 303-661-9100
+         Fax:   +1 303-661-9199
+         E-mail: mibs@cablelabs.com"
+    DESCRIPTION
+         "Licensed under the Apache License, Version 2.0 (the 'License');
+         you may not use this file except in compliance with the License.
+         You may obtain a copy of the License at:
+ 
+             http://www.apache.org/licenses/LICENSE-2.0
+ 
+         Unless required by applicable law or agreed to in writing, software
+         distributed under the License is distributed on an 'AS IS' BASIS,
+         WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
+         implied.
+
+         See the License for the specific language governing permissions and
+         limitations under the License.
+
+         This MIB module contains the management objects for the
+         management of DOCSIS 3.0 features, primarily channel bonding,
+         interface topology and enhanced signal quality monitoring.
+		 Copyright 1999-2017 Cable Television Laboratories, Inc.
+         All rights reserved."
+    REVISION    "201706150000Z" -- June 15, 2017
+    DESCRIPTION
+        "Revised Version includes ECN
+         DOCS-IF3-MIB-N-17.1741-1 to add Apache license."
+    REVISION "201608040000Z" -- August 4, 2016
+    DESCRIPTION
+       "Revised Version includes ECN
+        DOCS-IF3-MIB-N-16.1560-1"
+    REVISION "201605050000Z" -- May 5, 2016
+    DESCRIPTION
+       "Revised Version includes ECNs
+        CCAP-OSSIv3.1-N-1509-1 and OSSIv3.0-N-15.1398-1;
+        supersedes CCAP-OSSIv3.1-N-16.1431-1"
+    REVISION    "201505200000Z" -- May 20, 2015
+    DESCRIPTION
+            "Revised Version includes ECN
+            CM-OSSIv3.1-N-15.1309-1"
+    REVISION    "201504080000Z" -- April 8, 2015
+    DESCRIPTION	 		
+            "Revised Version includes ECN
+            CM-OSSIv3.1-N-14.1222-3"
+    REVISION    "201311190000Z" -- November 20, 2013
+    DESCRIPTION
+            "Revised Version includes ECN 
+            OSSIv3.0-N-13.1119-3 and published as I22"
+    REVISION    "201304040000Z" -- April 4, 2013
+    DESCRIPTION
+            "Revised Version includes ECNs
+            OSSIv3.0-N-12.1083 and OSSIv3.0-N-13.1093
+            and published as I21"
+    REVISION    "201211130000Z" -- November 13, 2012
+    DESCRIPTION
+            "Revised Version includes ECN
+            OSSIv3.0-N-12.1079-4 and published as I20"
+    REVISION    "201208090000Z" -- August 9, 2012
+    DESCRIPTION
+            "Revised Version includes ECN
+            OSSIv3.0-N-12.1064-3 and published as I19"
+    REVISION    "201102100000Z" -- February 10, 2011
+    DESCRIPTION
+            "Revised Version includes ECNs
+            OSSIv3.0-N-10.0962-5 and OSSIv3.0-N-10.0984-1
+            and published as I14"
+    REVISION    "201006110000Z" -- June 11, 2010
+    DESCRIPTION
+            "Revised Version includes ECN
+            OSSIv3.0-N-10.0906-2
+            and published as I12"
+    REVISION    "201001150000Z" -- January 15, 2010
+    DESCRIPTION
+            "Revised Version includes ECNs
+            OSSIv3.0-N-09.0871-4
+            OSSIv3.0-N-09.0872-4
+            OSSIv3.0-N-09.0881-3
+            and published as I11"
+    REVISION    "200905290000Z" -- May 29, 2009
+    DESCRIPTION
+            "Revised Version includes ECN
+            OSSIv3.0-N-09.0775-3
+            and published as I09"
+    REVISION    "200901210000Z" -- January 21, 2009
+    DESCRIPTION
+            "Revised Version includes ECNs
+            OSSIv3.0-N-08.0651-3
+            OSSIv3.0-N-08.0700-4
+            and published as I08"
+    REVISION        "200805220000Z" -- May 22, 2008
+    DESCRIPTION
+        "Revised Version includes ECN OSSIv3.0-N-08.0645-4
+        and published as I07"
+    REVISION "200802150000Z"
+    DESCRIPTION
+            "Revised Version includes ECN OSSIv3.0-N-07.0605-1
+             and published as I06"
+    REVISION "200712060000Z"  -- December 6, 2007
+    DESCRIPTION
+            "Revised Version includes ECNs
+            OSSIv3.0-N-07.0522-6
+            OSSIv3.0-N-07.0554-4
+            and published as I05"
+    REVISION "200708030000Z"  -- August 3, 2007
+    DESCRIPTION
+            "Revised Version includes ECNs
+            OSSIv3.0-N-07.0481-2
+            OSSIv3.0-N-07.0480-3
+            and published as I04"
+    REVISION "200705180000Z"  -- May 18, 2007
+    DESCRIPTION
+            "Revised Version includes ECNs
+            OSSIv3.0-N-07.0447-2
+            OSSIv3.0-N-07.0446-4
+            OSSIv3.0-N-07.0445-3
+            OSSIv3.0-N-07.0441-4
+            OSSIv3.0-N-07.0422-5
+            OSSIv3.0-N-07.0413-3
+            OSSIv3.0-N-07.0410-4
+            OSSIv3.0-N-07.0392-1
+            OSSIv3.0-N-07.0384-1
+            OSSIv3.0-N-06.0357-1
+            and published as I03"
+    REVISION "200702230000Z" -- February 23, 2007
+    DESCRIPTION
+            "Revised Version includes ECN OSSIv3.0-N-06.0357-1
+            and published as IO2"
+     REVISION "200612071700Z" -- December 7, 2006
+     DESCRIPTION
+        "Initial version, published as part of the CableLabs
+        OSSIv3.0 specification CM-SP-OSSIv3.0-I01-061207"
+     ::= {  clabProjDocsis 20 }
+
+-- Textual Conventions
+
+CmRegState ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+         "This data type defines the CM connectivity state as reported
+         by the CM.
+         The enumerated values associated with the CmRegState are:
+         'other'
+          indicates any state not described below.
+         'notReady'
+          indicates that the CM has not started the registration process
+          yet.
+         'notSynchronized'
+          indicates that the CM has not initiated or completed the
+          synchronization of the downstream physical layer
+         'phySynchronized'
+          indicates that the CM has completed the synchronization of
+          the downstream physical layer
+         'dsTopologyResolutionInProgress'
+          indicates that the CM is attempting to determine its MD-DS-SG
+         'usParametersAcquired'
+          indicates that the CM has completed the upstream parameters
+          acquisition or have completed the downstream and upstream
+          service groups resolution, whether the CM is registering in
+          a pre-3.0 or a 3.0 CMTS.
+         'rangingInProgress'
+          indicates that the CM has initiated the ranging process. 
+         'rangingComplete'
+          indicates that the CM has completed initial ranging and
+          received a Ranging Status of success from the CMTS in the
+          RNG-RSP message.
+         'eaeInProgress'
+          indicates that the CM has sent an Auth Info message for EAE.
+         'dhcpv4InProgress'
+          indicates that the CM has sent a DHCPv4 DISCOVER to gain 
+          IP connectivity.
+         'dhcpv6InProgress'
+          indicates that the CM has sent an DHCPv6 Solicit message.
+         'dhcpv4Complete'
+          indicates that the CM has received a DHCPv4 ACK message from
+          the CMTS.
+         'dhcpv6Complete'
+          indicates that the CM has received a DHCPv6 Reply message from
+          the CMTS.
+         'todEstablished'
+          indicates that the CM has successfully acquired time of day.
+          If the ToD is acquired after the CM is operational, this
+          value should not be reported.
+         'securityEstablished'
+          indicates that the CM has successfully completed the BPI
+          initialization process.
+         'configFileDownloadComplete'
+          indicates that the CM has completed the config file download
+          process.
+         'registrationInProgress'
+          indicates that the CM has sent a Registration Request
+          (REG-REQ or REG-REQ-MP)
+         'registrationComplete'
+          indicates that the CM has successfully completed the
+          Registration process with the CMTS.
+         'accessDenied'
+          indicates that the CM has received a registration aborted
+          notification from the CMTS
+         'operational'
+          indicates that the CM has completed all necessary
+          initialization steps and is operational.
+         'bpiInit'
+          indicates that the CM has started the BPI initialization
+          process as indicated in the CM config file. If the CM already
+          performed EAE, this state is skipped by the CM.
+         'forwardingDisabled'
+          indicates that the registration process was completed, but 
+          the network access option in the received configuration file
+          prohibits forwarding.
+         'rfMuteAll'
+          indicates that the CM is instructed to mute all channels 
+          in the CM-CTRL-REQ message from CMTS."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Cable Modem -
+         CMTS Interaction section."
+     SYNTAX      INTEGER {other(1),
+                          notReady(2),
+                          notSynchronized(3),
+                          phySynchronized(4),
+                          dsTopologyResolutionInProgress(21),
+                          usParametersAcquired(5),
+                          rangingInProgress(22),
+                          rangingComplete(6),
+                          eaeInProgress(14),
+                          dhcpv4InProgress(15),
+                          dhcpv6InProgress(16),
+                          dhcpv4Complete(7),
+                          dhcpv6Complete(17),
+                          todEstablished(8),
+                          securityEstablished(9),
+                          configFileDownloadComplete(10),
+                          registrationInProgress(18),
+                          registrationComplete(11),
+                          accessDenied(13),
+                          operational(12),
+                          bpiInit (19),
+                          forwardingDisabled(20),
+                          rfMuteAll(23)
+                         }
+
+CmtsCmRegState ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+        "This data type defines the CM connectivity states as reported
+        by the CMTS.
+        The enumerated values associated with the CmtsCmRegState are:
+
+        'other'
+         indicates any state not described below.
+        'initialRanging'
+         indicates that the CMTS has received an Initial Ranging
+         Request message from the CM, and the ranging process is not yet
+         complete.
+        'rangingAutoAdjComplete'
+         indicates that the CM has completed initial ranging and the
+         CMTS sends  a Ranging Status of success in the RNG-RSP.
+        'startEae'
+         indicates that the CMTS has received an Auth Info message for
+         EAE from the CM.
+        'startDhcpv4'
+         indicates that the CMTS has received a DHCPv4 DISCOVER message
+         from the CM.
+        'startDhcpv6'
+         indicates that the CMTS has received a DHCPv6 Solicit message
+         from the CM.
+        'dhcpv4Complete'
+         indicates that the CMTS has sent a DHCPv4 ACK message to the
+         CM.
+        'dhcpv6Complete'
+         indicates that the CMTS has sent a DHCPv6 Reply message to the
+         CM.
+        'startConfigFileDownload'
+         indicates that the CM has started the config file download.
+         If the TFTP Proxy feature is not enabled, the CMTS may not
+         report this state.
+        'configFileDownloadComplete'
+         indicates that the CM has completed the config file download
+         process.  If the TFTP Proxy feature is not enabled, the CMTS
+         is not required to report this state.
+        'startRegistration'
+         indicates that the CMTS has received a Registration
+         Request (REG-REQ or REG-REQ-MP) from the CM.
+        'registrationComplete'
+         indicates that the CMTS has received a Registration Acknowledge
+         (REG-ACK) with a confirmation code of okay/success.
+        'operational'
+         indicates that the CM has completed all necessary
+         initialization steps and is operational.
+        'bpiInit'
+         indicates that the CMTS has received an Auth Info or Auth
+         Request message as part of BPI Initialization.
+        'forwardingDisabled'
+         indicates that the registration process was completed, but 
+         the network access option in the received configuration 
+         file prohibits forwarding.
+        'rfMuteAll'
+         indicates that the CM is instructed to mute all channels 
+         in the CM-CTRL-REQ message from CMTS."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Cable Modem -
+         CMTS Interaction section."
+     SYNTAX      INTEGER {other (1),
+                          initialRanging(2),
+                          rangingAutoAdjComplete(4),
+                          startEae(10),
+                          startDhcpv4 (11),
+                          startDhcpv6(12),
+                          dhcpv4Complete(5),
+                          dhcpv6Complete(13),
+                          startConfigFileDownload(14),
+                          configFileDownloadComplete(15),
+                          startRegistration(16),
+                          registrationComplete(6),
+                          operational (8),
+                          bpiInit(9),
+                          forwardingDisabled(17),
+                          rfMuteAll(18)
+                         }
+
+ScdmaSelectionString  ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+        "This data type represents the S-CDMA selection string
+         for active codes used with Selectable Active Codes Mode 2.
+         A 128-bit string indicating which codes are active.
+         The first element in the string corresponds to code 0
+         (the all-ones code), and the last element in the string
+         corresponds to code 127.  A '1' element in the string
+         indicates an active code, and a '0' indicates an unused
+         code. A zero-length string is returned for an unknown
+         or non-applicable value."
+     REFERENCE
+         "DOCSIS 3.0 Physical Layer Specification
+         CM-SP-PHYv3.0-I05-070803, Mini-slot Numbering Parameters
+         in UCD section."
+     SYNTAX      OCTET STRING (SIZE(0 | 16))
+
+AmplitudeData  ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+        "This data type represents a sequence of spectral amplitudes.
+        Each spectral amplitude value corresponds to a bin.
+        The format of the bin measurement is as follows.
+        Sequence of:
+          4 bytes: ChCenterFreq
+                   The center frequency of the upstream channel.
+          4 bytes: FreqSpan
+                   The width in Hz of the band across which the spectral
+                   amplitudes characterizing the channel are measured.
+          4 bytes: NumberOfBins
+                   The number of data points or bins that compose the
+                   spectral data. The leftmost bin corresponds to the
+                   lower band edge, the rightmost bin corresponds to the
+                   upper band edge, and the middle bin center is aligned
+                   with the center frequency of the analysis span.
+          4 bytes: BinSpacing
+                   The frequency separation between adjacent bin
+                   centers. It is derived from the frequency span and
+                   the number of bins or data points.
+                   The bin spacing is computed as:
+
+                            BinSpacing = FrequencySpan/(NumberOfBins -1)
+
+                   The larger the number of bins the finer the
+                   resolution.
+          4 bytes: ResolutionBW
+                   The resolution bandwidth or equivalent noise
+                   bandwidth of each bin. If spectral windowing is used
+                   (based on vendor implementation), the bin spacing and
+                   resolution bandwidth would not generally be the same.
+          n bytes: Amplitude (2 bytes * NumberOfBins)
+                   A sequence of two byte elements. Each element
+                   represents the spectral amplitudes in relation to the
+                   expected received signal power of a bin, in units of
+                   0.01dB. That is, a test CMTS input signal with
+                   square-root raised-cosine spectrum, bandwidth equal
+                   to the expected received signal bandwidth, and power
+                   equal to the expected received signal power, which
+                   is present for the entire spectrum sampling period,
+                   will exhibit a spectrum measurement of 0 dB average
+                   power in each bin of the signal passband.
+                   Each bin element amplitude value format is 2's
+                   complement which provides a range of -327.68 dB to
+                   327.67 dB amplitude value for the bin measurement."
+     SYNTAX      OCTET STRING (SIZE(0 | 2..4116))
+
+SpectrumAnalysisWindowFunction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "This object controls the windowing function which will be used 
+       when performing the discrete fourier transform for the analysis.  
+       Note that all window functions may not be supported by all 
+       devices.  If an attempt is made to set the object to an 
+       unsupported window function, an error of inconsistentValue will
+       be returned."
+    REFERENCE
+       "Harris, Fredric J. (Jan 1978). 'On the use of Windows for 
+       Harmonic Analysis with the Discrete Fourier Transform'. 
+       Proceedings of the IEEE, Vol 66, Issue 1, Jan 1978 
+       doi:10.1109/PROC.1978.10837"
+    SYNTAX      INTEGER {
+                         other(0),
+                         hann(1), 
+                         blackmanHarris(2),
+                         rectangular(3),
+                         hamming(4),
+                         flatTop(5),
+                         gaussian(6),
+                         chebyshev(7)
+                        }   
+
+Tlv8 ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+        "This data type represents a single TLV encoding.
+        This first octet represents the Type of the TLV.
+        The second octet represents an unsigned 8-bit Length of the
+        subsequent Value part of the TLV.  The remaining octets
+        represent the value. The Value could be an atomic value or a
+        sequence of one or more sub-TLVs."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Common Radio
+         Frequency Interface Encodings Annex."
+     SYNTAX      OCTET STRING (SIZE(0 | 2..255))
+
+ChId ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "d"
+     STATUS      current
+     DESCRIPTION
+        "This data type is an 8-bit number that represents a provisioned
+        Downstream Channel ID (DCID) or a provisioned Upstream Channel
+        ID (UCID). A Channel Id is unique per direction within a MAC
+        Domain. The value zero is reserved for use when the channel ID
+        is unknown."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Upstream Channel
+         Descriptor (UCD) section."
+     SYNTAX      Unsigned32 (0..255)
+
+ChSetId ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "d"
+     STATUS      current
+     DESCRIPTION
+        "This data type is a CMTS-derived unique number within a MAC
+        Domain used to reference a Channel Set within the CMTS.
+        Values in the range of 1 to 255 define a single-channel Channel
+        Set and correspond to either the Downstream Channel ID (DCID)
+        or an Upstream Channel ID (UCID) of that channel.
+        Values greater than 255 indicate a Channel Set consisting of two
+        or more channels in the same direction within the MAC Domain.
+        The value zero is reserved for use when the Channel Set is
+        unknown."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Channel
+         Bonding section."
+     SYNTAX      Unsigned32
+
+ChannelList ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "1d,"
+     STATUS      current
+     DESCRIPTION
+        "This data type represents a unique set of channel IDs in
+        either the upstream or the downstream direction.  Each octet
+        represents a UCID or DCID depending on the direction of the
+        channels within the list.  The CMTS must ensure that this
+        combination of channels is unique per direction within the MAC
+        Domain.
+
+        In order to facilitate Channel ID combinatorial uniqueness
+        across all channel lists, a query to retrieve the value of
+        an attribute of this type, returns the set of channels in
+        the channel list in ascending order of Channel Ids."
+     SYNTAX      OCTET STRING (SIZE (0..255))
+
+AttributeMask ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+        "This data type consists of a sequence of 32-bit positions used
+        to select the bonding group or the channel to which a service
+        flow is assigned. DOCSIS defines three types of Attribute Masks
+        for which this type applies: The Provisionied Attribute Mask
+        that is configured to a Bonding Group or a single-channel,
+        whereas the Required Attribute and the Forbidden Attribute
+        Mask are part of the Service Flow QOS Parameter Set to be
+        matched with the Provisioned Attribute Mask of CMTS-configured
+        Bonding Groups or single-channels. DOCSIS reserves the
+        assignment of the meaning of the first 8 bit positions
+        (left to right) as follows:
+            Bit 0: 'bonding'
+            Bit 1: 'lowLatency'
+            Bit 2: 'highAvailability'
+            Bit positions 3-15 are reserved.
+
+        Bit positions 16-31 are freely assigned by operators to
+        represent their own constraints on the channel(s) selection
+        for a particular service flow."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Service Flow
+         Assignment section."
+     SYNTAX      BITS {
+                       bonding(0),
+                       lowLatency(1),
+                       highAvailability(2)
+                      }
+
+AttrAggrRuleMask ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+        "This data type represents a sequence of 32-bit positions that
+        defines logical (e.g., AND, OR) operations to match against the
+        channel list Provisioned Mask and Service Flow Required Mask
+        bit positions when the CMTS is determining the service flow
+        for assignment to a bonding group not configured by the
+        management system."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Service Flow
+         Assignment section."
+     SYNTAX      OCTET STRING (SIZE (4))
+
+RcpId ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+        "This data type defines a 'Receive Channel Profile Identifier'
+        (RCP-ID). An RCP-ID consists of 5-octet length string where the
+        first 3-bytes (from left to right corresponds to the
+        Organizational Unique ID (OUI) followed by a two-byte
+        vendor-maintained identifier to represent multiple versions or
+        models of RCP-IDs."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, RCP-ID section in
+         the Common Radio Frequency Interface Encodings Annex."
+     SYNTAX      OCTET STRING (SIZE (5))
+
+Dsid ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT "d"
+     STATUS      current
+     DESCRIPTION
+        "This data type defines the 20-bit Downstream Service Identifier
+        (DSID) used by the CM for downstream resequencing, filtering,
+        and forwarding. The value zero is reserved for use when the
+        DSID is unknown or does not apply."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, DSID Definition
+         section."
+     SYNTAX      Unsigned32 (0..1048575)
+
+RangingState ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+        "This data type defines the CM ranging state as reported
+        by the CMTS.
+        The enumerated values associated with the RangingState are:
+
+        'other'
+         indicates any state not described below.
+        'aborted'
+         indicates that the CMTS has sent a ranging abort.
+        'retriesExceeded'
+         indicates that the CM ranging retry limit has exceeded. 
+        'success'
+         indicates that the CMTS has sent a ranging success in the
+         ranging response.
+        'continue'
+         indicates that the CMTS has sent a ranging continue in the
+         ranging response.
+        'timeoutT4'
+         indicates that the T4 timer expired on the CM."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Cable Modem - 
+         CMTS Interaction section."
+     SYNTAX      INTEGER {other(1),
+                          aborted(2),
+                          retriesExceeded(3), 
+                          success(4),
+                          continue(5),
+                          timeoutT4(6)
+                         }
+                        
+IfDirection ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates a direction on an RF MAC interface.
+
+       The value downstream(1) is from Cable Modem
+       Termination System to Cable Modem.
+
+       The value upstream(2) is from Cable Modem to
+       Cable Modem Termination System."
+    SYNTAX      INTEGER {
+                         downstream(1),
+                         upstream(2)
+                        }
+
+-- Object Definitions
+docsIf3Notifications  OBJECT IDENTIFIER ::= { docsIf3Mib 0 }
+docsIf3MibObjects  OBJECT IDENTIFIER ::= { docsIf3Mib 1 }
+
+
+-- Notifications
+
+-- CMTS Notifications
+docsIf3CmtsEventNotif NOTIFICATION-TYPE
+    OBJECTS {
+        docsDevEvLevel,
+        docsDevEvId,
+        docsDevEvText, 
+        docsDevEvLastTime,
+        sysName
+    }
+    STATUS current
+    DESCRIPTION
+        "A notification to report a DOCSIS event detected on the 
+         CMTS.
+
+         This notification includes the following information:
+         - docsDevEvLevel: the DOCSIS priority level associated with 
+           the event.
+         - docsDevEvId: the numeric identifier of the event.
+         - docsDevEvText: The text description of the event.
+         - docsDevEvLastTime: The local date and time when this event
+           was generated.
+         - sysName: the administratively-assigned name of the CMTS.
+           e.g., The fully-qualified domain name as indicated in RFC 3418
+           or in the absence the IP address of the CMTS administrative
+           interface in dot '.' notation for IPv4 and colon ':' notation
+           for and IPv6 Address as indicated in  RFC 3164"
+     REFERENCE
+        "DOCSIS 3.0 Operations Support System Interface
+         Specification CM-SP-OSSIv3.0-I07-080522, Format and Content
+         for Event, Syslog, and SNMP Notification Annex.
+         RFC 3418, RFC 3164"
+    ::= { docsIf3Notifications 1 }
+
+-- CM Notifications
+
+docsIf3CmEventNotif NOTIFICATION-TYPE
+    OBJECTS {
+        docsDevEvLevel,
+        docsDevEvId,
+        docsDevEvText,
+        docsDevEvLastTime
+    }
+    STATUS current
+    DESCRIPTION
+        "A notification to report a DOCSIS event detected on the  
+         CM.
+
+         This notification includes the following information:
+         - docsDevEvLevel: the priority level associated with the
+           event.
+         - docsDevEvId: the unique identifier of the event that
+           occurred.
+         - docsDevEvText: a textual description of the event.
+         - docsDevEvLastTime: The local date and time when this event
+           was generated."
+     REFERENCE
+        "DOCSIS 3.0 Operations Support System Interface
+         Specification CM-SP-OSSIv3.0-I07-080522, Format and Content
+         for Event, Syslog, and SNMP Notification Annex."
+    ::= { docsIf3Notifications 2 }
+
+docsIf3CmStatusTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3CmStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object defines attributes of the CM connectivity
+        status. This object provides CM connectivity status
+        information of the CM previously available in
+        the SNMP table docsIfCmStatusTable."
+     REFERENCE
+        "RFC 4546"
+     ::= { docsIf3MibObjects 1}
+
+docsIf3CmStatusEntry OBJECT-TYPE
+     SYNTAX      DocsIf3CmStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3CmStatusTable.
+         An instance exist for the CM MAC Domain Interface."
+     INDEX {
+             ifIndex
+           }
+     ::= { docsIf3CmStatusTable 1 }
+
+DocsIf3CmStatusEntry ::= SEQUENCE {
+     docsIf3CmStatusValue
+                  CmRegState,
+     docsIf3CmStatusCode
+                  OCTET STRING,
+     docsIf3CmStatusResets
+                  Counter32,
+     docsIf3CmStatusLostSyncs
+                  Counter32,
+     docsIf3CmStatusInvalidMaps
+                  Counter32,
+     docsIf3CmStatusInvalidUcds
+                  Counter32,
+     docsIf3CmStatusInvalidRangingRsps
+                  Counter32,
+     docsIf3CmStatusInvalidRegRsps
+                  Counter32,
+     docsIf3CmStatusT1Timeouts
+                  Counter32,
+     docsIf3CmStatusT2Timeouts
+                  Counter32,
+     docsIf3CmStatusUCCsSuccesses
+                  Counter32,
+     docsIf3CmStatusUCCFails
+                  Counter32,
+     docsIf3CmStatusEnergyMgt1x1OperStatus
+                  TruthValue
+     }
+
+docsIf3CmStatusValue OBJECT-TYPE
+     SYNTAX      CmRegState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes the current CM connectivity
+        state. For the case of IP acquisition related states,
+        this attribute reflects states for the current CM
+        provisioning mode, not the other DHCP process associated
+        with dual stack operation."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Establishing
+         IP Connectivity section."
+     ::= { docsIf3CmStatusEntry 1 }
+
+docsIf3CmStatusCode OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE( 0 | 5 | 6 | 7 ))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes the status code for CM as defined
+        in the OSSI Specification. The status code consists
+        of a single character indicating error groups,
+        followed by a two- or three-digit number indicating
+        the status condition, followed by a decimal. An example
+        of a returned value could be 'T101.0'. The zero-length
+        hex string indicates no status code yet registered."
+     REFERENCE
+        "DOCSIS 3.0 Operations Support System Interface
+         Specification CM-SP-OSSIv3.0-I09-090529, Format and Content
+         for Event, Syslog, and SNMP Notification Annex."
+     ::= { docsIf3CmStatusEntry 2 }
+
+docsIf3CmStatusResets OBJECT-TYPE
+     SYNTAX      Counter32
+     UNITS       "resets"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes the number of times the CM reset
+        or initialized this interface. Discontinuities
+        in the value of this counter can occur at re-initialization
+        of the managed system, and at other times as
+        indicated by the value of ifCounterDiscontinuityTime
+        for the CM MAC Domain interface."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmStatusEntry 3 }
+
+docsIf3CmStatusLostSyncs OBJECT-TYPE
+     SYNTAX      Counter32
+     UNITS       "messages"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes the number of times the CM lost
+        synchronization with the downstream channel. Discontinuities
+        in the value of this counter can occur
+        at re-initialization of the managed system, and at
+        other times as indicated by the value of
+        ifCounterDiscontinuityTime for the CM MAC Domain interface."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmStatusEntry 4 }
+
+docsIf3CmStatusInvalidMaps OBJECT-TYPE
+     SYNTAX      Counter32
+     UNITS       "maps"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes the number of times the CM received
+        invalid MAP messages. Discontinuities in the
+        value of this counter can occur at re-initialization
+        of the managed system, and at other times as indicated
+        by the value of ifCounterDiscontinuityTime for
+        the CM MAC Domain interface."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmStatusEntry 5 }
+
+docsIf3CmStatusInvalidUcds OBJECT-TYPE
+     SYNTAX      Counter32
+     UNITS       "messages"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes the number of times the CM received
+        invalid UCD messages. Discontinuities in the
+        value of this counter can occur at re-initialization
+        of the managed system, and at other times as indicated
+        by the value of ifCounterDiscontinuityTime for
+        the CM MAC Domain interface."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmStatusEntry 6 }
+
+docsIf3CmStatusInvalidRangingRsps OBJECT-TYPE
+     SYNTAX      Counter32
+     UNITS       "messages"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes the number of times the CM received
+        invalid ranging response messages. Discontinuities
+        in the value of this counter can occur at re-initialization
+        of the managed system, and at other
+        times as indicated by the value of ifCounterDiscontinuityTime
+        for the CM MAC Domain interface."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmStatusEntry 7 }
+
+docsIf3CmStatusInvalidRegRsps OBJECT-TYPE
+     SYNTAX      Counter32
+     UNITS       "messages"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes the number of times the CM received
+        invalid registration response messages. Discontinuities
+        in the value of this counter can occur
+        at re-initialization of the managed system, and at
+        other times as indicated by the value of
+        ifCounterDiscontinuityTime for the CM MAC Domain interface."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmStatusEntry 8 }
+
+docsIf3CmStatusT1Timeouts OBJECT-TYPE
+     SYNTAX      Counter32
+     UNITS       "timeouts"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes the number of times counter
+        T1 expired in the CM. Discontinuities in the value of
+        this counter can occur at re-initialization of the
+        managed system, and at other times as indicated by the
+        value of ifCounterDiscontinuityTime for the CM MAC
+        Domain interface."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmStatusEntry 9 }
+
+docsIf3CmStatusT2Timeouts OBJECT-TYPE
+     SYNTAX      Counter32
+     UNITS       "timeouts"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes the number of times counter
+        T2 expired in the CM. Discontinuities in the value of
+        this counter can occur at re-initialization of the
+        managed system, and at other times as indicated by the
+        value of ifCounterDiscontinuityTime for the CM MAC
+        Domain interface."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmStatusEntry 10 }
+
+docsIf3CmStatusUCCsSuccesses OBJECT-TYPE
+     SYNTAX      Counter32
+     UNITS       "attempts"
+     MAX-ACCESS  read-only
+     STATUS      obsolete
+     DESCRIPTION
+        "This attribute denotes the number of successful Upstream
+        Channel Change transactions. Discontinuities
+        in the value of this counter can occur at re-initialization
+        of the managed system, and at other times
+        as indicated by the value of ifCounterDiscontinuityTime
+         for the CM MAC Domain interface."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmStatusEntry 11 }
+
+docsIf3CmStatusUCCFails OBJECT-TYPE
+     SYNTAX      Counter32
+     UNITS       "attempts"
+     MAX-ACCESS  read-only
+     STATUS      obsolete
+     DESCRIPTION
+        "This attribute denotes the number of failed Upstream
+        Channel Change transactions. Discontinuities
+        in the value of this counter can occur at re-initialization
+        of the managed system, and at other times as indicated
+        by the value of ifCounterDiscontinuityTime
+        for the CM MAC Domain interface."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmStatusEntry 12 }
+
+docsIf3CmStatusEnergyMgt1x1OperStatus OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute indicates whether the CM is currently operating
+        in Energy Management 1x1 Mode. If this attribute returns 'true', 
+        the CM is operating in Energy Management 1x1 Mode."
+     REFERENCE
+        "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+        Specification CM-SP-MULPIv3.0-I20-121155,
+        Energy Management Mode Indicator section."
+     ::= { docsIf3CmStatusEntry 13 }
+
+docsIf3CmStatusUsTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3CmStatusUsEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object defines PHY and MAC information about
+        the CM's upstream channels operating in Multiple Transmit
+        Channel (MTC) mode or in a Pre-3.0 DOSCIS transmit
+        channel mode. This object provides per-CM Upstream
+        channel information previously available in the
+        SNMP table docsIfCmStatusTable."
+     ::= { docsIf3MibObjects 2}
+
+docsIf3CmStatusUsEntry OBJECT-TYPE
+     SYNTAX      DocsIf3CmStatusUsEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3CmStatusUsTable.
+         An instance exist for each of the CM's SC-QAM upstream channels 
+         which are configured for data transmission."
+     INDEX {
+             ifIndex
+           }
+     ::= { docsIf3CmStatusUsTable 1 }
+
+DocsIf3CmStatusUsEntry ::= SEQUENCE {
+     docsIf3CmStatusUsTxPower
+                  TenthdBmV,
+     docsIf3CmStatusUsT3Timeouts
+                  Counter32,
+     docsIf3CmStatusUsT4Timeouts
+                  Counter32,
+     docsIf3CmStatusUsRangingAborteds
+                  Counter32,
+     docsIf3CmStatusUsModulationType
+                  DocsisUpstreamType,
+     docsIf3CmStatusUsEqData
+                  DocsEqualizerData,
+     docsIf3CmStatusUsT3Exceededs
+                  Counter32,
+     docsIf3CmStatusUsIsMuted
+                  TruthValue,
+     docsIf3CmStatusUsRangingStatus
+                  RangingState
+     }
+
+docsIf3CmStatusUsTxPower OBJECT-TYPE
+     SYNTAX      TenthdBmV
+     UNITS       "TenthdBmV"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the operational CM transmit
+        power for this SC-QAM upstream channel.
+        In order for this attribute to provide consistent information 
+        under all circumstances, a 3.1 CM will report the average total 
+        power for the SC-QAM channel the same as was done for 
+        DOCSIS 3.0, regardless of whether it is operating with a 3.1 or 
+        a 3.0 CMTS. The value that is reported was referred to as Pr in 
+        the DOCSIS 3.0 PHY Spec. This attribute is not applicable for 
+        OFDMA channels."
+     ::= { docsIf3CmStatusUsEntry 1 }
+
+docsIf3CmStatusUsT3Timeouts OBJECT-TYPE
+     SYNTAX      Counter32
+     UNITS       "timeouts"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes the number of times counter
+        T3 expired in the CM for this upstream channel. Discontinuities
+        in the value of this counter can occur at
+        re-initialization of the managed system, and at other
+        times as indicated by the value of ifCounterDiscontinuityTime
+        for the associated upstream channel."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmStatusUsEntry 2 }
+
+docsIf3CmStatusUsT4Timeouts OBJECT-TYPE
+     SYNTAX      Counter32
+     UNITS       "timeouts"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes the number of times counter
+        T4 expired in the CM for this upstream channel. Discontinuities
+        in the value of this counter can occur at
+        re-initialization of the managed system, and at other
+        times as indicated by the value of ifCounterDiscontinuityTime
+        for the associated upstream channel."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmStatusUsEntry 3 }
+
+docsIf3CmStatusUsRangingAborteds OBJECT-TYPE
+     SYNTAX      Counter32
+     UNITS       "attempts"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes the number of times the ranging
+        process was aborted by the CMTS. Discontinuities
+        in the value of this counter can occur at re-initialization
+        of the managed system, and at other times as
+        indicated by the value of ifCounterDiscontinuityTime
+        ([RFC2863]) for the associated upstream channel."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmStatusUsEntry 4 }
+
+docsIf3CmStatusUsModulationType OBJECT-TYPE
+     SYNTAX      DocsisUpstreamType
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute indicates modulation type status
+        currently used by the CM for this upstream channel. Since
+        this object specifically identifies PHY Layer
+        mode, the shared upstream channel type 'tdmaAndAtdma'
+        is not permitted."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmStatusUsEntry 5 }
+
+docsIf3CmStatusUsEqData OBJECT-TYPE
+     SYNTAX      DocsEqualizerData
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute indicates the pre-equalization data
+        for the specified upstream Channel on this CM after
+        convolution with data indicated in the RNG-RSP. This
+        data is valid when docsIfUpChannelPreEqEnable
+        RFC 4546 is set to true."
+     REFERENCE
+        "RFC 2863.
+         RFC 4546."
+     ::= { docsIf3CmStatusUsEntry 6 }
+
+docsIf3CmStatusUsT3Exceededs OBJECT-TYPE
+     SYNTAX      Counter32
+     UNITS       "timeouts"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes the number of times for excessive
+        T3 timeouts. Discontinuities in the value of
+        this counter can occur at re-initialization of the managed
+        system, and at other times as indicated by the
+        value of ifCounterDiscontinuityTime for the associated
+        upstream channel."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmStatusUsEntry 7 }
+
+docsIf3CmStatusUsIsMuted OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes whether the upstream
+        channel is muted."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522 section
+         Media Access Control specification."
+     ::= { docsIf3CmStatusUsEntry 8 }
+
+docsIf3CmStatusUsRangingStatus OBJECT-TYPE
+     SYNTAX      RangingState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes the ranging state of the CM."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, section
+         Media Access Control specification."
+     ::= { docsIf3CmStatusUsEntry 9 }
+
+docsIf3CmtsCmRegStatusTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3CmtsCmRegStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object defines attributes that represent the CM's
+        registration status as tracked by the CMTS.
+        Refer to the individual attribute definitions for 
+        applicability to 3.0 and 3.1 Cable Modems."
+     ::= { docsIf3MibObjects 3}
+
+docsIf3CmtsCmRegStatusEntry OBJECT-TYPE
+     SYNTAX      DocsIf3CmtsCmRegStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3CmtsCmRegStatusTable."
+     INDEX {
+             docsIf3CmtsCmRegStatusId
+           }
+     ::= { docsIf3CmtsCmRegStatusTable 1 }
+
+DocsIf3CmtsCmRegStatusEntry ::= SEQUENCE {
+     docsIf3CmtsCmRegStatusId
+                  Unsigned32,
+     docsIf3CmtsCmRegStatusMacAddr
+                  MacAddress,
+     docsIf3CmtsCmRegStatusIPv6Addr
+                  InetAddressIPv6,
+     docsIf3CmtsCmRegStatusIPv6LinkLocal
+                  InetAddressIPv6,
+     docsIf3CmtsCmRegStatusIPv4Addr
+                  InetAddressIPv4,
+     docsIf3CmtsCmRegStatusValue
+                  CmtsCmRegState,
+     docsIf3CmtsCmRegStatusMdIfIndex
+                  InterfaceIndexOrZero,
+     docsIf3CmtsCmRegStatusMdCmSgId
+                  Unsigned32,
+     docsIf3CmtsCmRegStatusRcpId
+                  RcpId,
+     docsIf3CmtsCmRegStatusRccStatusId
+                  Unsigned32,
+     docsIf3CmtsCmRegStatusRcsId
+                  ChSetId,
+     docsIf3CmtsCmRegStatusTcsId
+                  ChSetId,
+     docsIf3CmtsCmRegStatusQosVersion
+                  DocsisQosVersion,
+     docsIf3CmtsCmRegStatusLastRegTime
+                  DateAndTime,
+     docsIf3CmtsCmRegStatusAddrResolutionReqs
+                  Counter32,
+     docsIf3CmtsCmRegStatusEnergyMgtEnabled
+                  BITS,
+     docsIf3CmtsCmRegStatusEnergyMgtOperStatus
+                  BITS
+     }
+
+docsIf3CmtsCmRegStatusId OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..4294967295)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This attribute uniquely identifies a CM.  The CMTS
+        must assign a single id value for each CM MAC address seen
+        by the CMTS.  The CMTS should ensure that the association
+        between an Id and MAC Address remains constant
+        during CMTS uptime."
+     ::= { docsIf3CmtsCmRegStatusEntry 1 }
+
+docsIf3CmtsCmRegStatusMacAddr OBJECT-TYPE
+     SYNTAX      MacAddress
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the MAC address of the CM.
+        If the CM has multiple MAC addresses, this is the MAC
+        address associated with the MAC Domain interface."
+     ::= { docsIf3CmtsCmRegStatusEntry 2 }
+
+docsIf3CmtsCmRegStatusIPv6Addr OBJECT-TYPE
+     SYNTAX      InetAddressIPv6
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the IPv6 address of the
+        CM. If the CM has no Internet address assigned, or the
+        Internet address is unknown, the value of this attribute
+        is the all zeros address."
+     ::= { docsIf3CmtsCmRegStatusEntry 3 }
+
+docsIf3CmtsCmRegStatusIPv6LinkLocal OBJECT-TYPE
+     SYNTAX      InetAddressIPv6
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the IPv6 local scope address
+        of the CM. If the CM has no link local address assigned,
+        or the Internet address is unknown, the value
+        of this attribute is the all zeros address."
+     ::= { docsIf3CmtsCmRegStatusEntry 4 }
+
+docsIf3CmtsCmRegStatusIPv4Addr OBJECT-TYPE
+     SYNTAX      InetAddressIPv4
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the IPv4 address of this
+        CM. If the CM has no IP address assigned, or the IP address
+        is unknown, this object returns 0.0.0.0."
+     ::= { docsIf3CmtsCmRegStatusEntry 5 }
+
+docsIf3CmtsCmRegStatusValue OBJECT-TYPE
+     SYNTAX      CmtsCmRegState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the current CM connectivity
+        state."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Cable Modem
+         Initialization and Reinitialization section."
+     ::= { docsIf3CmtsCmRegStatusEntry 6 }
+
+docsIf3CmtsCmRegStatusMdIfIndex OBJECT-TYPE
+     SYNTAX      InterfaceIndexOrZero
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the interface Index of
+        the CMTS MAC Domain where the CM is active. If the interface
+        is unknown, the CMTS returns a value of zero."
+     ::= { docsIf3CmtsCmRegStatusEntry 7 }
+
+docsIf3CmtsCmRegStatusMdCmSgId OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the ID of the MAC Domain
+        CM Service Group Id (MD-CM-SG-ID) in which the CM is registered.
+        If the ID is unknown, the CMTS returns a value
+        of zero."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Cable Modem
+         Service Group (CM-SG) section."
+     ::= { docsIf3CmtsCmRegStatusEntry 8 }
+
+docsIf3CmtsCmRegStatusRcpId OBJECT-TYPE
+     SYNTAX      RcpId
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the RCP-ID associated
+        with the CM if the CM is in DOCSIS 3.0 mode. If the 
+        RCP-ID is unknown or the CM is in DOCSIS 3.1 mode,
+        the CMTS returns a five octet long string of zeros."
+     REFERENCE -- Update reference to 3.1 MULPI
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, RCP-ID
+         section in the Common Radio Frequency Interface
+         Encodings Annex."
+     ::= { docsIf3CmtsCmRegStatusEntry 9 }
+
+docsIf3CmtsCmRegStatusRccStatusId OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the RCC Id the CMTS used
+        to configure the CM receive channel set during the registration
+        process, if the CM is in DOCSIS 3.0 mode. If unknown or the CM
+        is in DOCSIS 3.1 mode, the CMTS returns the value zero."
+     ::= { docsIf3CmtsCmRegStatusEntry 10 }
+
+docsIf3CmtsCmRegStatusRcsId OBJECT-TYPE
+     SYNTAX      ChSetId
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the Receive Channel Set
+        (RCS) that the CM is currently using. If the RCS is unknown,
+        the CMTS returns the value zero."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Cable Modem
+         Physical Receive Channel Configuration section and the
+         Receive Channels section in the Common Radio Frequency
+         Interface Encodings Annex."
+     ::= { docsIf3CmtsCmRegStatusEntry 11 }
+
+docsIf3CmtsCmRegStatusTcsId OBJECT-TYPE
+     SYNTAX      ChSetId
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents Transmit Channel Set (TCS)
+        the CM is currently using. If the TCS is unknown,
+        the CMTS returns the value zero."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Changes to
+         the Transmit Channel Set section."
+     ::= { docsIf3CmtsCmRegStatusEntry 12 }
+
+docsIf3CmtsCmRegStatusQosVersion OBJECT-TYPE
+     SYNTAX      DocsisQosVersion
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes the queuing services the CM 
+        registered, either DOCSIS 1.1 QoS or DOCSIS 1.0 CoS mode."
+     ::= { docsIf3CmtsCmRegStatusEntry 13 }
+
+docsIf3CmtsCmRegStatusLastRegTime OBJECT-TYPE
+     SYNTAX      DateAndTime
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the last time the CM registered."
+     ::= { docsIf3CmtsCmRegStatusEntry 14 }
+
+docsIf3CmtsCmRegStatusAddrResolutionReqs OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute counts the number of upstream
+        packets received on the SIDs assigned to a CM that
+        are any of the following:
+        Upstream IPv4 ARP Requests
+        Upstream IPv6 Neighbor Solicitation Requests
+        (For Routing CMTSs) Upstream IPv4 or IPv6 packets to
+        unresolved destinations in locally connected downstream
+        subnets in the HFC.
+        Discontinuities in the value of this counter can occur
+        at re-initialization of the managed system, and at
+        other times as indicated by the value of
+        ifCounterDiscontinuityTime for the associated MAC Domain
+        interface."
+     REFERENCE
+         "DOCSIS 3.0 Security Specification CM-SP-SECv3.0-I13-100611,
+         Secure Provisioning section.
+         RFC 2863."
+     ::= { docsIf3CmtsCmRegStatusEntry 15 }
+
+docsIf3CmtsCmRegStatusEnergyMgtEnabled OBJECT-TYPE
+     SYNTAX      BITS { 
+                       em1x1Mode(0),
+                       dlsMode(1)
+                      }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute indicates which, if any, of the Energy 
+        Management Features are enabled for this CM. If this attribute
+        returns the em1x1Mode(0) bit set, the CM is configured with the 
+        Energy Management 1x1 Feature enabled. If this attribute returns
+        the dlsMode(1) bit set, the CM is configured with the DLS Feature
+        enabled. If this attribute returns all bits cleared, the CM will 
+        not request to operate in any Energy Management mode of operation.  
+
+        Note: This attribute only indicates if an Energy Management Feature 
+        is enabled/disabled via the CM config file and registration 
+        request/response exchange and does not indicate whether the CM is 
+        actively operating in an Energy Management Mode."
+     REFERENCE
+        "DOCSIS 3.1 MAC and Upper Layer Protocols Interface
+        Specification CM-SP-MULPIv3.1-I03-140610,
+        Energy Management Features section."
+     ::= { docsIf3CmtsCmRegStatusEntry 16 }
+
+docsIf3CmtsCmRegStatusEnergyMgtOperStatus OBJECT-TYPE
+     SYNTAX      BITS { 
+                       em1x1Mode(0),
+                       dlsMode(1)
+                      }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute indicates whether the CM is currently operating
+        in an Energy Management Mode. If this attribute returns the
+        em1x1Mode(0) bit set, the CM is operating in Energy Management
+        1x1 Mode. If this attribute returns the dlsMode(1) bit set, the
+        CM is operating in DLS Mode. If this attribute returns all bits 
+        cleared, the CM is not operating in any Energy Management Mode. 
+        This attribute always returns 0x00 (no bits set) in the case when 
+        docsIf3CmtsCmRegStatusEnergyMgtEnabled is set to 0x00 (no Energy 
+        Management Features enabled).
+
+        Note: dlsMode(1) and em1x1Mode(0) are mutually exclusive, thus 
+        a return value where both of these bits are 'true' is invalid."
+     REFERENCE
+        "DOCSIS 3.1 MAC and Upper Layer Protocols Interface
+        Specification CM-SP-MULPIv3.1-I03-140610,
+        Energy Management Mode Indicator section."
+     ::= { docsIf3CmtsCmRegStatusEntry 17 }
+
+docsIf3CmtsCmUsStatusTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3CmtsCmUsStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object defines status information of the CM
+        currently in use Upstream Logical Channels, as reported
+        by the CMTS."
+     ::= { docsIf3MibObjects 4}
+
+docsIf3CmtsCmUsStatusEntry OBJECT-TYPE
+     SYNTAX      DocsIf3CmtsCmUsStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3CmtsCmUsStatusTable."
+     INDEX {
+             docsIf3CmtsCmRegStatusId,
+             docsIf3CmtsCmUsStatusChIfIndex
+           }
+     ::= { docsIf3CmtsCmUsStatusTable 1 }
+
+DocsIf3CmtsCmUsStatusEntry ::= SEQUENCE {
+     docsIf3CmtsCmUsStatusChIfIndex
+                  InterfaceIndex,
+     docsIf3CmtsCmUsStatusModulationType
+                  DocsisUpstreamType,
+     docsIf3CmtsCmUsStatusRxPower
+                  TenthdBmV,
+     docsIf3CmtsCmUsStatusSignalNoise
+                  TenthdB,
+     docsIf3CmtsCmUsStatusMicroreflections
+                  Unsigned32,
+     docsIf3CmtsCmUsStatusEqData
+                  DocsEqualizerData,
+     docsIf3CmtsCmUsStatusUnerroreds
+                  Counter32,
+     docsIf3CmtsCmUsStatusCorrecteds
+                  Counter32,
+     docsIf3CmtsCmUsStatusUncorrectables
+                  Counter32,
+     docsIf3CmtsCmUsStatusHighResolutionTimingOffset
+                  Integer32,
+     docsIf3CmtsCmUsStatusIsMuted
+                  TruthValue,
+     docsIf3CmtsCmUsStatusRangingStatus
+                  RangingState
+
+     }
+
+docsIf3CmtsCmUsStatusChIfIndex OBJECT-TYPE
+     SYNTAX      InterfaceIndex
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This attribute is a key that represents the ifIndex
+        of the upstream interface."
+     ::= { docsIf3CmtsCmUsStatusEntry 1 }
+
+docsIf3CmtsCmUsStatusModulationType OBJECT-TYPE
+     SYNTAX      DocsisUpstreamType
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the modulation type currently
+        used by this upstream channel."
+     ::= { docsIf3CmtsCmUsStatusEntry 2 }
+
+docsIf3CmtsCmUsStatusRxPower OBJECT-TYPE
+     SYNTAX      TenthdBmV
+     UNITS       "TenthdBmV"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the receive power of this
+        upstream channel.
+        The reported value represents the total average power for the 
+        channel regardless of whether the CM is reporting Pr, total 
+        average power, or P1.6r, the power spectral density in an 
+        equivalent 1.6 MHz spectrum."
+     ::= { docsIf3CmtsCmUsStatusEntry 3 }
+
+docsIf3CmtsCmUsStatusSignalNoise OBJECT-TYPE
+     SYNTAX      TenthdB
+     UNITS       "TenthdB"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents Signal/Noise ratio as
+        perceived for upstream data from the CM on this upstream
+        channel."
+     ::= { docsIf3CmtsCmUsStatusEntry 4 }
+
+docsIf3CmtsCmUsStatusMicroreflections OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..65535)
+     UNITS       "-dBc"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents microreflections received
+        on this upstream channel."
+     ::= { docsIf3CmtsCmUsStatusEntry 5 }
+
+docsIf3CmtsCmUsStatusEqData OBJECT-TYPE
+     SYNTAX      DocsEqualizerData
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the equalization data
+        for the CM on this upstream channel."
+     ::= { docsIf3CmtsCmUsStatusEntry 6 }
+
+docsIf3CmtsCmUsStatusUnerroreds OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the codewords received
+        without error from the CM on this interface. Discontinuities
+        in the value of this counter can occur at re-initialization
+        of the managed system, and at other
+        times as indicated by the value of ifCounterDiscontinuityTime
+        for the associated upstream channel."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmtsCmUsStatusEntry 7 }
+
+docsIf3CmtsCmUsStatusCorrecteds OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the codewords received
+        with correctable errors from the CM on this upstream
+        channel. Discontinuities in the value of this counter
+        can occur at re-initialization of the managed system,
+        and at other times as indicated by the value of
+        ifCounterDiscontinuityTime for the associated upstream
+        channel."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmtsCmUsStatusEntry 8 }
+
+docsIf3CmtsCmUsStatusUncorrectables OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the codewords received
+        with uncorrectable errors from the CM on this upstream
+        channel. Discontinuities in the value of this counter
+        can occur at re-initialization of the managed
+        system, and at other times as indicated by the value of
+        ifCounterDiscontinuityTime for the associated upstream
+        channel."
+     REFERENCE
+        "RFC 2863."
+     ::= { docsIf3CmtsCmUsStatusEntry 9 }
+
+docsIf3CmtsCmUsStatusHighResolutionTimingOffset OBJECT-TYPE
+     SYNTAX      Integer32
+     UNITS       "time tick/(64*256)"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the current measured round
+        trip time on this CM's upstream channel in units
+        of (6.25 microseconds/(64*256)).  This attribute returns
+        zero if the value is unknown."
+     ::= { docsIf3CmtsCmUsStatusEntry 10 }
+
+docsIf3CmtsCmUsStatusIsMuted OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute has a value 'true' to indicate that 
+        the CM's upstream channel has been muted via 
+        CM-CTRL-REQ/CM-CTRL-RSP message exchange."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, section
+         Media Access Control specification."
+     ::= { docsIf3CmtsCmUsStatusEntry 11 }
+
+docsIf3CmtsCmUsStatusRangingStatus OBJECT-TYPE
+     SYNTAX      RangingState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute denotes the ranging state of the CM."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, section
+         Media Access Control specification."
+     ::= { docsIf3CmtsCmUsStatusEntry 12 }
+
+docsIf3MdChCfgTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3MdChCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object configures the association of downstream
+        and upstream channels to a particular MAC Domain
+        (MD) on a CMTS.  The creation of channels and MAC domain
+        object interface instances is vendor-specific.
+        In particular, the assignment of the channel interface
+        index is normally vendor-specific. Therefore,
+        this object is intended only for associating channels
+        to a MAC Domain and assumes that those channels were
+        previously configured.
+        The CMTS may have restrictions on which channels can
+        be configured in the same MAC Domain.  For example, it
+        could require the upstream channels to be from the same
+        line card.
+        This object supports the creation and deletion of multiple
+        instances.
+        Creation of a new instance of this object requires the
+        ChId attribute to be set."
+     ::= { docsIf3MibObjects 5}
+
+docsIf3MdChCfgEntry OBJECT-TYPE
+     SYNTAX      DocsIf3MdChCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3MdChCfgTable.
+         The ifIndex key corresponds to the MAC Domain interface
+         where the channel is configured.
+         The CMTS persists all instances of MdChCfg across
+         reinitializations."
+     INDEX {
+             ifIndex,
+             docsIf3MdChCfgChIfIndex
+           }
+     ::= { docsIf3MdChCfgTable 1 }
+
+DocsIf3MdChCfgEntry ::= SEQUENCE {
+     docsIf3MdChCfgChIfIndex
+                  InterfaceIndex,
+     docsIf3MdChCfgIsPriCapableDs
+                  TruthValue,
+     docsIf3MdChCfgChId
+                  ChId,
+     docsIf3MdChCfgSfProvAttrMask
+                  AttributeMask,
+     docsIf3MdChCfgRowStatus
+                  RowStatus
+     }
+
+docsIf3MdChCfgChIfIndex OBJECT-TYPE
+     SYNTAX      InterfaceIndex
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents the interface index of an existing
+        upstream or downstream channel that is configured
+        to be part of the MAC Domain.
+        For the case of upstream interfaces the CMTS could reject
+        the assignment of upstream logical channels under
+        the same physical upstream interface to different
+        MAC Domains."
+     ::= { docsIf3MdChCfgEntry 1 }
+
+docsIf3MdChCfgIsPriCapableDs OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "If set to 'true', this attribute configures the downstream
+        channel as Primary-Capable. 
+        The default value for a downstream channel is 'true'.
+        This attribute is not relevant for upstream interfaces, 
+        therefore it reports the value 'false' for such interfaces.
+        A CMTS may restrict the permitted value of this attribute
+        based upon physical channel capabilities."
+     ::= { docsIf3MdChCfgEntry 2 }
+
+docsIf3MdChCfgChId OBJECT-TYPE
+     SYNTAX      ChId (1..255)
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This attribute contains the 8-bit Downstream Channel
+        ID (DCID) or Upstream Channel ID (UCID) configured
+        for the channel in the MAC Domain."
+     ::= { docsIf3MdChCfgEntry 3 }
+
+docsIf3MdChCfgSfProvAttrMask OBJECT-TYPE
+     SYNTAX      AttributeMask
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This attribute contains Provisioned Attribute Mask
+        of non-bonded service flow assignment to this channel."
+     DEFVAL { '00000000'H }
+     ::= { docsIf3MdChCfgEntry 4 }
+
+docsIf3MdChCfgRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The status of this instance."
+     ::= { docsIf3MdChCfgEntry 5 }
+
+docsIf3RccCfgTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3RccCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      obsolete
+     DESCRIPTION
+        "This object identifies the scope of the Receive Channel
+        Configuration (RCC) and provides a top level container
+        for the Receive Module and Receive Channel
+        objects.  The CMTS selects an instance of this object
+        to assign to a CM when it registers.
+        This object supports the creation and deletion of multiple
+        instances."
+     ::= { docsIf3MibObjects 6}
+
+docsIf3RccCfgEntry OBJECT-TYPE
+     SYNTAX      DocsIf3RccCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      obsolete
+     DESCRIPTION
+         "The conceptual row of docsIf3RccCfgTable.
+         The ifIndex key corresponds to the MAC Domain interface
+         where the RCC is configured.
+          The CMTS persists all instances of RccCfg across
+          reinitializations."
+     INDEX {
+             ifIndex,
+             docsIf3RccCfgRcpId,
+             docsIf3RccCfgRccCfgId
+           }
+     ::= { docsIf3RccCfgTable 1 }
+
+DocsIf3RccCfgEntry ::= SEQUENCE {
+     docsIf3RccCfgRcpId
+                  RcpId,
+     docsIf3RccCfgRccCfgId
+                  Unsigned32,
+     docsIf3RccCfgVendorSpecific
+                  OCTET STRING,
+     docsIf3RccCfgDescription
+                  SnmpAdminString,
+     docsIf3RccCfgRowStatus
+                  RowStatus
+     }
+
+docsIf3RccCfgRcpId OBJECT-TYPE
+     SYNTAX      RcpId
+     MAX-ACCESS  not-accessible
+     STATUS      obsolete
+     DESCRIPTION
+        "This key represents the 'Receive Channel Profile
+        Identifier' (RCP-ID) configured for the MAC Domain
+        indicated by this instance."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Standard
+         Receive Channel Profile Encodings Annex."
+     ::= { docsIf3RccCfgEntry 1 }
+
+docsIf3RccCfgRccCfgId OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..4294967295)
+     MAX-ACCESS  not-accessible
+     STATUS      obsolete
+     DESCRIPTION
+        "This key denotes an RCC combination assignment for
+        a particular RcpId and is unique per combination of
+        MAC Domain and RcpId."
+     ::= { docsIf3RccCfgEntry 2 }
+
+docsIf3RccCfgVendorSpecific OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE(0..252))
+     MAX-ACCESS  read-create
+     STATUS      obsolete
+     DESCRIPTION
+        "This attribute contains vendor-specific information
+        of the CM Receive Channel configuration."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Receive Channel
+         Profile/Configuration Vendor Specific Parameters section
+         in the Common Radio Frequency Interface Encodings Annex."
+     DEFVAL { ''H }
+     ::= { docsIf3RccCfgEntry 3 }
+
+docsIf3RccCfgDescription OBJECT-TYPE
+     SYNTAX      SnmpAdminString (SIZE (0..15))
+     MAX-ACCESS  read-create
+     STATUS      obsolete
+     DESCRIPTION
+        "This attribute contains a human-readable description
+        of the CM RCP Configuration."
+     DEFVAL { "" }
+     ::= { docsIf3RccCfgEntry 4 }
+
+docsIf3RccCfgRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      obsolete
+     DESCRIPTION
+        "The status of this instance."
+     ::= { docsIf3RccCfgEntry 5 }
+
+docsIf3RccStatusTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3RccStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "The RCC Status object provides a read-only view of
+        the statically-configured (from the RccCfg object)
+        and dynamically-created RCCs.
+        The CMTS creates an RCC Status instance for each unique
+        MAC Domain Cable Modem Service Group (MD-CM-SG) to
+        which it signals an RCC to the CM."
+     ::= { docsIf3MibObjects 7}
+
+docsIf3RccStatusEntry OBJECT-TYPE
+     SYNTAX      DocsIf3RccStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3RccStatusTable.
+         The ifIndex key corresponds to the MAC Domain interface
+         where the RCC is configured."
+     INDEX {
+             ifIndex,
+             docsIf3RccStatusRcpId,
+             docsIf3RccStatusRccStatusId
+            }
+     ::= { docsIf3RccStatusTable 1 }
+
+DocsIf3RccStatusEntry ::= SEQUENCE {
+     docsIf3RccStatusRcpId
+                  RcpId,
+     docsIf3RccStatusRccStatusId
+                  Unsigned32,
+     docsIf3RccStatusRccCfgId
+                  Unsigned32,
+     docsIf3RccStatusValidityCode
+                  INTEGER,
+     docsIf3RccStatusValidityCodeText
+                  SnmpAdminString
+     }
+
+docsIf3RccStatusRcpId OBJECT-TYPE
+     SYNTAX      RcpId
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents the RCP-ID to which this instance
+        applies."
+     ::= { docsIf3RccStatusEntry 1 }
+
+docsIf3RccStatusRccStatusId OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..4294967295)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents an RCC combination for a particular
+        RcpId either from an RCC configuration object
+        or a CMTS-determined RCC and is unique per combination
+        of MAC Domain IfIndex and RcpId."
+     ::= { docsIf3RccStatusEntry 2 }
+
+docsIf3RccStatusRccCfgId OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute identifies an RCC-Configured combination
+        from which this instance was defined. If nonzero,
+        it corresponds to the RccCfg instance from which
+        the RCC was created. Zero means that the  RCC was dynamically
+        created by the CMTS."
+     ::= { docsIf3RccStatusEntry 3 }
+
+docsIf3RccStatusValidityCode OBJECT-TYPE
+     SYNTAX      INTEGER {other(1),
+                         valid(2),
+                         invalid(3),
+                         wrongPrimaryDs(4),
+                         missingPrimaryDs(5),
+                         multiplePrimaryDs(6),
+                         duplicateDs(7),
+                         wrongFrequencyRange(8),
+                         wrongConnectivity(9)
+                         }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute indicates whether the RCC instance
+        of this object is valid or not. An RCC Status instance
+        from a configured or a dynamic RCC could become invalid,
+        for example, due changes in the topology."
+     ::= { docsIf3RccStatusEntry 4 }
+
+docsIf3RccStatusValidityCodeText OBJECT-TYPE
+     SYNTAX      SnmpAdminString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute contains the CMTS vendor-specific
+        log information from the Receive Channel Configuration
+        Status encoding."
+     ::= { docsIf3RccStatusEntry 5 }
+
+docsIf3RxChCfgTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3RxChCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      obsolete
+     DESCRIPTION
+        "The Receive Channel Configuration object permits
+        an operator to configure how CMs registered with certain
+        Receive Channel Profiles will configure the Receive
+        Channels within their profile. When a CM registers
+        with an RCP for which all Receive Channel Indices
+        (RcIds) are configured in the Receive Module object
+        and all Receive Channels are configured within this
+        object, the CMTS should use the configuration within
+        these objects to set the Receive Channel Configuration
+        returned to the CM in a REG-RSP message.  A CMTS
+        may require configuration of all pertinent Receive
+        Module and Receive Channel instances in order to register
+        a CM that reports a Receive Channel Profile (RCP),
+        including any standard Receive Channel Profiles.
+        If the CM reports multiple RCPs, and Receive Module
+        and Receive Channel objects have instances for more
+        than one RCP, the particular RCP selected by the CMTS
+        is not specified.  A CMTS is not restricted to assigning
+        Receive Modules based only on the contents of this
+        object.
+        This object supports the creation and deletion of multiple
+        instances.
+        Creation of a new instance of this object requires the
+        ChIfIndex attribute to be set and a valid reference of
+        a RccCfg instance."
+     ::= { docsIf3MibObjects 8}
+
+docsIf3RxChCfgEntry OBJECT-TYPE
+     SYNTAX      DocsIf3RxChCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      obsolete
+     DESCRIPTION
+         "The conceptual row of docsIf3RxChCfgTable.
+         The ifIndex key corresponds to the MAC Domain interface
+         where the RCC is configured.
+         The CMTS persists all instances of ReceiveChannelCfg across
+         reinitializations."
+     INDEX { 
+             ifIndex,
+             docsIf3RccCfgRcpId,
+             docsIf3RccCfgRccCfgId,
+             docsIf3RxChCfgRcId
+           }
+     ::= { docsIf3RxChCfgTable 1 }
+
+DocsIf3RxChCfgEntry ::= SEQUENCE {
+     docsIf3RxChCfgRcId
+                  Unsigned32,
+     docsIf3RxChCfgChIfIndex
+                  InterfaceIndex,
+     docsIf3RxChCfgPrimaryDsIndicator
+                  TruthValue,
+     docsIf3RxChCfgRcRmConnectivityId
+                  Unsigned32,
+     docsIf3RxChCfgRowStatus
+                  RowStatus
+     }
+
+docsIf3RxChCfgRcId OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..255)
+     MAX-ACCESS  not-accessible
+     STATUS      obsolete
+     DESCRIPTION
+        "This key represents an identifier for the parameters
+        of the Receive Channel instance within the Receive
+        Channel Profile."
+     REFERENCE
+        "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+        Specification CM-SP-MULPIv3.0-I08-080522, Receive
+        Channel Index section in the Common Radio Frequency
+        Interface Encodings Annex."
+     ::= { docsIf3RxChCfgEntry 1 }
+
+docsIf3RxChCfgChIfIndex OBJECT-TYPE
+     SYNTAX      InterfaceIndex
+     MAX-ACCESS  read-create
+     STATUS      obsolete
+     DESCRIPTION
+        "This attribute contains the interface index of a Downstream
+        Channel that this Receive Channel Instance
+        defines."
+     ::= { docsIf3RxChCfgEntry 2 }
+
+docsIf3RxChCfgPrimaryDsIndicator OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-create
+     STATUS      obsolete
+     DESCRIPTION
+        "If set to 'true', this attribute indicates the Receive
+        Channel is to be the primary-capable downstream
+        channel for the CM receiving this RCC. Otherwise, the
+        downstream channel is to be a non-primary-capable
+        channel."
+     REFERENCE
+        "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+        Specification CM-SP-MULPIv3.0-I08-080522, Receive Channel
+        Primary Downstream Channel Indicator section in the Common
+        Radio Frequency Interface Encodings Annex."
+     DEFVAL { false }
+     ::= { docsIf3RxChCfgEntry 3 }
+
+docsIf3RxChCfgRcRmConnectivityId OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..255)
+     MAX-ACCESS  read-create
+     STATUS      obsolete
+     DESCRIPTION
+        "This attribute indicates the Receive Module (via
+        the RmId from the ReceiveModule object) to which this
+        Receive Channel connects.  If this object contains
+        a zero value (and thus no Receive Channel Connectivity),
+        the Receive Channel Connectivity TLV is omitted
+        from the RCC."
+     REFERENCE
+        "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+        Specification CM-SP-MULPIv3.0-I08-080522, Receive
+        Channel Connectivity section in the Common Radio
+        Frequency Interface Encodings Annex."
+     DEFVAL { 0 }
+     ::= { docsIf3RxChCfgEntry 4 }
+
+docsIf3RxChCfgRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      obsolete
+     DESCRIPTION
+        "The status of this instance."
+     ::= { docsIf3RxChCfgEntry 5 }
+
+docsIf3RxChStatusTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3RxChStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "The Receive Channel Status object reports the status
+        of the statically-configured and dynamically-created
+        Receive Channels within an RCC."
+     ::= { docsIf3MibObjects 9}
+
+docsIf3RxChStatusEntry OBJECT-TYPE
+     SYNTAX      DocsIf3RxChStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3RxChStatusTable.
+         The ifIndex key corresponds to the MAC Domain interface
+         where the RCC is configured. When this object is defined
+         on the CM, the value of RccStatusId is always 1."
+     INDEX {
+             ifIndex,
+             docsIf3RccStatusRcpId,
+             docsIf3RccStatusRccStatusId,
+             docsIf3RxChStatusRcId
+           }
+     ::= { docsIf3RxChStatusTable 1 }
+
+DocsIf3RxChStatusEntry ::= SEQUENCE {
+     docsIf3RxChStatusRcId
+                  Unsigned32,
+     docsIf3RxChStatusChIfIndex
+                  InterfaceIndex,
+     docsIf3RxChStatusPrimaryDsIndicator
+                  TruthValue,
+     docsIf3RxChStatusRcRmConnectivityId
+                  Unsigned32
+     }
+
+docsIf3RxChStatusRcId OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..255)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents an identifier for the parameters
+        of the Receive Channel instance within the Receive
+        Channel Profile."
+     ::= { docsIf3RxChStatusEntry 1 }
+
+docsIf3RxChStatusChIfIndex OBJECT-TYPE
+     SYNTAX      InterfaceIndex
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute contains the interface index of the
+        Downstream Channel that this Receive Channel Instance
+        defines."
+     ::= { docsIf3RxChStatusEntry 2 }
+
+docsIf3RxChStatusPrimaryDsIndicator OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "If set to 'true', this attribute indicates the Receive
+        Channel is to be the primary-capable downstream
+        channel for the CM receiving this RCC. Otherwise, the
+        downstream channel is to be a non-primary-capable
+        channel."
+     ::= { docsIf3RxChStatusEntry 3 }
+
+docsIf3RxChStatusRcRmConnectivityId OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..255)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute identifies the Receive Module to which
+        this Receive Channel connects.  A value a zero indicates
+        that the Receive Channel Connectivity TLV is
+        omitted from the RCC."
+     ::= { docsIf3RxChStatusEntry 4 }
+
+docsIf3RxModuleCfgTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3RxModuleCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      obsolete
+     DESCRIPTION
+        "The Receive Module Configuration object permits
+        an operator to configure how CMs with certain Receive
+        Channel Profiles (RCPs) will configure the Receive
+        Modules within their profile upon CM registration.
+         When a CM registers with an RCP for which all Receive
+        Module Indices (RmIds) are configured in this object
+        and all Receive Channels are configured within the
+        Receive Channel (ReceiveChannel) object, the CMTS
+        should use the configuration within these objects to
+        set the Receive Channel Configuration assigned to
+        the CM in a REG-RSP message.  A CMTS may require configuration
+        of all pertinent Receive Module and Receive
+        Channel instances (i.e., MIB table entries) in order
+        to register a CM that reports a Receive Channel Profile.
+         If the CM reports multiple RCPs, and Receive Module
+        and Receive Channel objects have instances (i.e.,
+        MIB table entries) for more than one RCP reported by
+        the CM, the particular RCP selected by the CMTS is not
+        specified.  A CMTS is not restricted to assigning Receive
+        Modules based only on the contents of this object.
+
+        This object supports the creation and deletion of multiple
+        instances.
+        Creation of a new instance of this object requires the
+        reference of a valid RccCfg instance."
+     ::= { docsIf3MibObjects 10}
+
+docsIf3RxModuleCfgEntry OBJECT-TYPE
+     SYNTAX      DocsIf3RxModuleCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      obsolete
+     DESCRIPTION
+         "The conceptual row of docsIf3RxModuleCfgTable.
+         The ifIndex key corresponds to the MAC Domain interface
+         where the RCC is configured."
+     INDEX {
+             ifIndex,
+             docsIf3RccCfgRcpId,
+             docsIf3RccCfgRccCfgId,
+             docsIf3RxModuleCfgRmId
+           }
+     ::= { docsIf3RxModuleCfgTable 1 }
+
+DocsIf3RxModuleCfgEntry ::= SEQUENCE {
+     docsIf3RxModuleCfgRmId
+                  Unsigned32,
+     docsIf3RxModuleCfgRmRmConnectivityId
+                  Unsigned32,
+     docsIf3RxModuleCfgFirstCenterFrequency
+                  Unsigned32,
+     docsIf3RxModuleCfgRowStatus
+                  RowStatus
+     }
+
+docsIf3RxModuleCfgRmId OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..255)
+     MAX-ACCESS  not-accessible
+     STATUS      obsolete
+     DESCRIPTION
+        "This key represents an identifier of a Receive Module
+        instance within the Receive Channel Profile."
+     REFERENCE
+        "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+        Specification CM-SP-MULPIv3.0-I08-080522, Receive Module
+        Index in the Common Radio Frequency Interface Encodings
+        Annex."
+     ::= { docsIf3RxModuleCfgEntry 1 }
+
+docsIf3RxModuleCfgRmRmConnectivityId OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..255)
+     MAX-ACCESS  read-create
+     STATUS      obsolete
+     DESCRIPTION
+        "This attribute represents the higher level (i.e.,
+        closer to RF) Receive Module to which this Receive Module
+        connects.  If this object contains a zero value (and
+        thus no Receive Module Connectivity), the Receive
+        Module Connectivity TLV is omitted from the RCC.
+        Within a single instance of the ReceiveModule object,
+        the RmRmConnectivityId attribute cannot contain
+        the same value as the RmId attribute.  The RmRmConnectivityId
+        attribute points to a separate ReceiveModule
+        object instance with the same value of RccCfgId."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Receive Module
+         Connectivity section in the Common Radio Frequency Interface
+         Encodings Annex."
+     DEFVAL { 0 }
+     ::= { docsIf3RxModuleCfgEntry 2 }
+
+docsIf3RxModuleCfgFirstCenterFrequency OBJECT-TYPE
+     SYNTAX      Unsigned32
+     UNITS       "Hz"
+     MAX-ACCESS  read-create
+     STATUS      obsolete
+     DESCRIPTION
+        "This attribute represents the center frequency,
+        in Hz, and a multiple of 62500, that indicates the lowest
+        frequency channel of the Receive Module, or 0 if not
+        applicable to the Receive Module."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Receive Module
+         First Channel Center Frequency Assignment section in the
+         Common Radio Frequency Interface Encodings Annex."
+     ::= { docsIf3RxModuleCfgEntry 3 }
+
+docsIf3RxModuleCfgRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      obsolete
+     DESCRIPTION
+        "The status of this instance."
+     ::= { docsIf3RxModuleCfgEntry 4 }
+
+docsIf3RxModuleStatusTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3RxModuleStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "The Receive Module Status object provides a read-only
+        view of the statically configured and dynamically
+        created Receive Modules within an RCC."
+     ::= { docsIf3MibObjects 11}
+
+docsIf3RxModuleStatusEntry OBJECT-TYPE
+     SYNTAX      DocsIf3RxModuleStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3RxModuleStatusTable.
+         The ifIndex key corresponds to the MAC Domain interface
+         where the RCC is configured. When this object is defined
+         on the CM, the value of RccStatusId is always 1."
+     INDEX {
+             ifIndex,
+             docsIf3RccStatusRcpId,
+             docsIf3RccStatusRccStatusId,
+             docsIf3RxModuleStatusRmId
+           }
+     ::= { docsIf3RxModuleStatusTable 1 }
+
+DocsIf3RxModuleStatusEntry ::= SEQUENCE {
+     docsIf3RxModuleStatusRmId
+                  Unsigned32,
+     docsIf3RxModuleStatusRmRmConnectivityId
+                  Unsigned32,
+     docsIf3RxModuleStatusFirstCenterFrequency
+                  Unsigned32
+     }
+
+docsIf3RxModuleStatusRmId OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..255)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents an identifier of a Receive Module
+        instance within the Receive Channel Profile."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Receive
+         Module Index section in the Common Radio Frequency
+         Interface Encodings Annex."
+     ::= { docsIf3RxModuleStatusEntry 1 }
+
+docsIf3RxModuleStatusRmRmConnectivityId OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..255)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the Receive Module to which
+        this Receive Module connects. Requirements for
+        module connectivity are detailed in the RmRmConnectivityId
+        of the RccCfg object. A value of zero indicates that the
+        Receive Module TLV is omitted from the RCC."
+     ::= { docsIf3RxModuleStatusEntry 2 }
+
+docsIf3RxModuleStatusFirstCenterFrequency OBJECT-TYPE
+     SYNTAX      Unsigned32
+     UNITS       "Hz"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the low frequency channel
+        of the Receive Module, or 0 if not applicable to the
+        Receive Module."
+     ::= { docsIf3RxModuleStatusEntry 3 }
+
+docsIf3MdNodeStatusTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3MdNodeStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object reports the MD-DS-SG-ID and MD-US-SG-ID
+        associated with a MD-CM-SG-ID within a MAC Domain
+        and the Fiber Nodes reached by the MD-CM-SG."
+     ::= { docsIf3MibObjects 12}
+
+docsIf3MdNodeStatusEntry OBJECT-TYPE
+     SYNTAX      DocsIf3MdNodeStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3MdNodeStatusTable.
+         The ifIndex key corresponds to the MAC Domain interface
+         where the MD-CM-SG-ID is configured."
+     INDEX {
+             ifIndex,
+             docsIf3MdNodeStatusNodeName,
+             docsIf3MdNodeStatusMdCmSgId 
+           }
+     ::= { docsIf3MdNodeStatusTable 1 }
+
+DocsIf3MdNodeStatusEntry ::= SEQUENCE {
+     docsIf3MdNodeStatusNodeName
+                  NodeName,
+     docsIf3MdNodeStatusMdCmSgId
+                  Unsigned32,
+     docsIf3MdNodeStatusMdDsSgId
+                  Unsigned32,
+     docsIf3MdNodeStatusMdUsSgId
+                  Unsigned32
+     }
+
+docsIf3MdNodeStatusNodeName OBJECT-TYPE
+     SYNTAX      NodeName (SIZE (1..64))
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents the name of a fiber node associated
+        with a MD-CM-SG of a MAC Domain."
+     ::= { docsIf3MdNodeStatusEntry 1 }
+
+docsIf3MdNodeStatusMdCmSgId OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..4294967295)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This attribute is a key and indicates the MD-CM-SG-ID
+        of this instance. A particular MdCmSgId in a MAC Domain
+        is associated with one or more Fiber Nodes."
+     ::= { docsIf3MdNodeStatusEntry 2 }
+
+docsIf3MdNodeStatusMdDsSgId OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..255)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute corresponds to the MD-DS-SG-ID of
+        the MD-CM-SG of this object instance. The MdDsSgId values
+        are unique within a MAC Domain."
+     ::= { docsIf3MdNodeStatusEntry 3 }
+
+docsIf3MdNodeStatusMdUsSgId OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..255)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute corresponds to the MD-US-SG-ID of
+        the MD-CM-SG of this object instance. The MdUsSgId values
+        are unique within a MAC Domain."
+     ::= { docsIf3MdNodeStatusEntry 4 }
+
+docsIf3MdDsSgStatusTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3MdDsSgStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object returns the list of downstream channel
+        associated with a MAC Domain MD-DS-SG-ID."
+     ::= { docsIf3MibObjects 13}
+
+docsIf3MdDsSgStatusEntry OBJECT-TYPE
+     SYNTAX      DocsIf3MdDsSgStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3MdDsSgStatusTable.
+         The ifIndex key corresponds to the MAC Domain interface
+         where the MD-DS-SG-ID is configured.
+         The CMTS is not required to persist instances of this
+         object across reinitializations."
+     INDEX {
+             ifIndex,
+             docsIf3MdDsSgStatusMdDsSgId
+           }
+     ::= { docsIf3MdDsSgStatusTable 1 }
+
+DocsIf3MdDsSgStatusEntry ::= SEQUENCE {
+     docsIf3MdDsSgStatusMdDsSgId
+                  Unsigned32,
+     docsIf3MdDsSgStatusChSetId
+                  ChSetId
+     }
+
+docsIf3MdDsSgStatusMdDsSgId OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..255)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents a MD-DS-SG-ID in a Mac Domain."
+     ::= { docsIf3MdDsSgStatusEntry 1 }
+
+docsIf3MdDsSgStatusChSetId OBJECT-TYPE
+     SYNTAX      ChSetId
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents a reference to the list
+        of downstream channels of the MD-DS-SG-ID."
+     ::= { docsIf3MdDsSgStatusEntry 2 }
+
+docsIf3MdUsSgStatusTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3MdUsSgStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object returns the list of upstream channels
+        associated with a MAC Domain MD-US-SG-ID."
+     ::= { docsIf3MibObjects 14}
+
+docsIf3MdUsSgStatusEntry OBJECT-TYPE
+     SYNTAX      DocsIf3MdUsSgStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3MdUsSgStatusTable.
+         The ifIndex key corresponds to the MAC Domain interface
+         where the MD-DS-SG-ID is configured.
+         The CMTS is not required to persist instances of this
+         object across reinitializations."
+     INDEX {
+             ifIndex,
+             docsIf3MdUsSgStatusMdUsSgId
+           }
+     ::= { docsIf3MdUsSgStatusTable 1 }
+
+DocsIf3MdUsSgStatusEntry ::= SEQUENCE {
+     docsIf3MdUsSgStatusMdUsSgId
+                  Unsigned32,
+     docsIf3MdUsSgStatusChSetId
+                  ChSetId
+     }
+
+docsIf3MdUsSgStatusMdUsSgId OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..255)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents a MD-US-SG-ID in a Mac Domain."
+     ::= { docsIf3MdUsSgStatusEntry 1 }
+
+docsIf3MdUsSgStatusChSetId OBJECT-TYPE
+     SYNTAX      ChSetId
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents a reference to the list
+        of upstream channels of the MD-US-SG-ID."
+     ::= { docsIf3MdUsSgStatusEntry 2 }
+
+docsIf3MdUsToDsChMappingTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3MdUsToDsChMappingEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object returns the set of downstream channels
+        that carry UCDs and MAPs for a particular upstream channel
+        in a MAC Domain."
+     ::= { docsIf3MibObjects 15}
+
+docsIf3MdUsToDsChMappingEntry OBJECT-TYPE
+     SYNTAX      DocsIf3MdUsToDsChMappingEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3MdUsToDsChMappingTable."
+     INDEX {
+             docsIf3MdUsToDsChMappingUsIfIndex,
+             docsIf3MdUsToDsChMappingDsIfIndex,
+             docsIf3MdUsToDsChMappingMdIfIndex
+           }
+     ::= { docsIf3MdUsToDsChMappingTable 1 }
+
+DocsIf3MdUsToDsChMappingEntry ::= SEQUENCE {
+     docsIf3MdUsToDsChMappingUsIfIndex
+                  InterfaceIndex,
+     docsIf3MdUsToDsChMappingDsIfIndex
+                  InterfaceIndex,
+     docsIf3MdUsToDsChMappingMdIfIndex
+                  InterfaceIndex
+     }
+
+docsIf3MdUsToDsChMappingUsIfIndex OBJECT-TYPE
+     SYNTAX      InterfaceIndex
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents the interface index of the upstream
+        channel to which this instance applies."
+     ::= { docsIf3MdUsToDsChMappingEntry 1 }
+
+docsIf3MdUsToDsChMappingDsIfIndex OBJECT-TYPE
+     SYNTAX      InterfaceIndex
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents the interface index of a downstream
+        channel carrying in UCDs and Maps associated with
+        the upstream channel defined by this instance."
+     ::= { docsIf3MdUsToDsChMappingEntry 2 }
+
+docsIf3MdUsToDsChMappingMdIfIndex OBJECT-TYPE
+     SYNTAX      InterfaceIndex
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This key represents the MAC domain of the upstream
+        and downstream channels of this instance."
+     ::= { docsIf3MdUsToDsChMappingEntry 3 }
+
+docsIf3MdCfgTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3MdCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object contains MAC domain level control and
+        configuration attributes."
+     ::= { docsIf3MibObjects 16}
+
+docsIf3MdCfgEntry OBJECT-TYPE
+     SYNTAX      DocsIf3MdCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3MdCfgTable.
+         The CMTS persists all instances of MdCfg across
+         reinitializations.
+         The ifIndex key corresponds to the MAC Domain interface."
+     INDEX {
+             ifIndex
+           }
+     ::= { docsIf3MdCfgTable 1 }
+
+DocsIf3MdCfgEntry ::= SEQUENCE {
+     docsIf3MdCfgMddInterval
+                  Unsigned32,
+     docsIf3MdCfgIpProvMode
+                  INTEGER,
+     docsIf3MdCfgCmStatusEvCtlEnabled
+                  TruthValue,
+     docsIf3MdCfgUsFreqRange
+                  INTEGER,
+     docsIf3MdCfgMcastDsidFwdEnabled
+                  TruthValue,
+     docsIf3MdCfgMultRxChModeEnabled
+                  TruthValue,
+     docsIf3MdCfgMultTxChModeEnabled
+                  TruthValue,
+     docsIf3MdCfgEarlyAuthEncrCtrl
+                  INTEGER,
+     docsIf3MdCfgTftpProxyEnabled
+                  TruthValue,
+     docsIf3MdCfgSrcAddrVerifEnabled
+                  TruthValue,
+     docsIf3MdCfgDownChannelAnnex
+                  INTEGER,
+     docsIf3MdCfgCmUdcEnabled
+                  TruthValue,
+     docsIf3MdCfgSendUdcRulesEnabled
+                  TruthValue,
+     docsIf3MdCfgServiceTypeIdList
+                  SnmpTagList,
+     docsIf3MdCfgBpi2EnforceCtrl
+                  INTEGER,
+     docsIf3MdCfgEnergyMgt1x1Enabled
+                  TruthValue
+     }
+
+docsIf3MdCfgMddInterval OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..2000)
+     UNITS       "milliseconds"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute configures the interval for the insertion
+        of MDD messages in each downstream channel of
+        a MAC Domain."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Parameters
+         and Constants Annex."
+     DEFVAL { 2000 }
+     ::= { docsIf3MdCfgEntry 1 }
+
+docsIf3MdCfgIpProvMode OBJECT-TYPE
+     SYNTAX      INTEGER {
+        ipv4Only(0),
+        ipv6Only(1),
+        alternate(2),
+        dualStack(3)
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute configures the CMTS IP provisioning
+        mode for a MAC Domain. 
+        When this attribute is set to 'ipv4Only' the CM will acquire
+        a single IPv4 address for the CM management stack.
+        When this attribute is set to 'ipv6Only' the CM will acquire
+        a single IPv6 address for the CM management stack.
+        When this attribute is set to 'alternate' the CM will acquire a
+        single IPv6 address for the CM management stack and, if failures
+        occur, the CM will fall back to provision and operation with
+        an IPv4 address.
+        When this attribute is set to 'dualStack' the CM will acquire both
+        an IPv6 and IPv4 address for provisioning and operation."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, IP Initialization
+         Parameters TLV section."
+     DEFVAL { ipv6Only }
+     ::= { docsIf3MdCfgEntry 2 }
+
+docsIf3MdCfgCmStatusEvCtlEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "If set to 'true', this attribute enables the signaling
+        of the CM-Status Event reporting mechanism."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, CM-STATUS
+         Event Control section "
+     DEFVAL { true }
+     ::= { docsIf3MdCfgEntry 3 }
+
+docsIf3MdCfgUsFreqRange OBJECT-TYPE
+     SYNTAX      INTEGER {
+                           standard(0),
+                           extended(1)
+                         }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute indicates in MDD messages the upstream
+        frequency upper band edge of an upstream Channel.
+
+        A value 'standard' means Standard Frequency Range and
+        a value 'extended' means Extended Frequency Range."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Upstream
+         Frequency Upper Band Edge TLV section."
+     DEFVAL { standard }
+     ::= { docsIf3MdCfgEntry 4 }
+
+docsIf3MdCfgMcastDsidFwdEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "If set to 'true', this attribute enables the CMTS to
+        use IP Multicast DSID Forwarding (MDF) for the MAC domain."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Multicast
+         DSID-based Forwarding (MDF) Modes section in the
+         Compatibility with Previous Versions of DOCSIS Annex."
+     DEFVAL { true }
+     ::= { docsIf3MdCfgEntry 5 }
+
+docsIf3MdCfgMultRxChModeEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "If set to 'true', this attribute enables Downstream
+        Channel Bonding for the MAC Domain."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Downstream
+         Channel Bonding section."
+     DEFVAL { true }
+     ::= { docsIf3MdCfgEntry 6 }
+
+docsIf3MdCfgMultTxChModeEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "If set to 'true', this attribute enables Multiple
+        Transmit Channel (MTC) Mode for the MAC Domain."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Upstream
+         Channel Bonding section."
+     DEFVAL { true }
+     ::= { docsIf3MdCfgEntry 7 }
+
+docsIf3MdCfgEarlyAuthEncrCtrl OBJECT-TYPE
+     SYNTAX      INTEGER {
+                           disableEae(1),
+                           enableEaeRangingBasedEnforcement(2),
+                           enableEaeCapabilityBasedEnforcement(3),
+                           enableEaeTotalEnforcement(4)
+                         }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute enables or disables early authentication
+        and encryption (EAE) signaling for the MAC Domain.
+        It also defines the type of EAE enforcement in
+        the case that EAE is enabled.
+        If set to 'disableEAE', EAE is disabled for the MAC Domain.
+
+        If set to 'enableEaeRangingBasedEnforcement',
+        'enableEaeCapabilityBasedEnforcement'
+        or 'enableEaeTotalEnforcement',
+        EAE is enabled for the MAC Domain.
+
+        The following EAE enforcement methods are defined in
+        the case where EAE signaling is enabled:
+        The option 'enableEaeRangingBasedEnforcement' indicates
+        EAE is enforced on CMs that perform ranging
+        with a B-INIT-RNG-REQ message.
+        The option 'enableEaeCapabilityBasedEnforcement'
+        indicates EAE is enforced on CMs that perform ranging
+        with a B-INIT-RNG-REQ message in which the EAE capability
+        flag is set.
+        The option 'enableEaeTotalEnforcement' indicates
+        EAE is enforced on all CMs regardless of their EAE
+        capabilities."
+     REFERENCE
+         "DOCSIS 3.0 Security Specification CM-SP-SECv3.0-I06-071206,
+          Early Authentication and Encryption section."
+     DEFVAL { enableEaeRangingBasedEnforcement }
+     ::= { docsIf3MdCfgEntry 8 }
+
+docsIf3MdCfgTftpProxyEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "If set to 'true', this attribute enables TFTP Proxy
+        functionality for the MAC Domain."
+     REFERENCE
+         "DOCSIS 3.0 Security Specification CM-SP-SECv3.0-I06-071206,
+         TFTP Configuration File Security section."
+     DEFVAL { true }
+     ::= { docsIf3MdCfgEntry 9 }
+
+docsIf3MdCfgSrcAddrVerifEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "If set to 'true', this attribute enables Source Address
+        Verification (SAV) functionality for the MAC
+        Domain."
+     REFERENCE
+         "DOCSIS 3.0 Security Specification CM-SP-SECv3.0-I06-071206,
+         Source Address Verification section."
+     DEFVAL { true }
+     ::= { docsIf3MdCfgEntry 10 }
+
+docsIf3MdCfgDownChannelAnnex  OBJECT-TYPE
+     SYNTAX      INTEGER {
+         unknown(1),
+         other(2),
+         annexA(3),
+         annexB(4),
+         annexC(5)
+        }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "This attribute defines the ITU-J-83 Annex being used 
+          for this MAC Domain.  The value of this attribute 
+          indicates the conformance of the implementation to 
+          important regional cable standards.  
+          Valid enumerations for the attribute are:
+          unknown
+          other
+          annexA : Annex A from ITU-J83 is used.
+          annexB : Annex B from ITU-J83 is used.
+          annexC : Annex C from ITU-J83 is used. 
+          Values 6-255 are reserved."
+      DEFVAL { unknown }
+     ::= { docsIf3MdCfgEntry 11 }
+
+docsIf3MdCfgCmUdcEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "If set to 'true', this attribute instructs the CMTS MAC 
+         Domain to enable Upstream Drop Classifiers (UDC) for the 
+         CMs attempting registration in this MAC Domain."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Subscriber Management
+         TLVs section in the Common Radio Frequency Interface Encodings
+         Annex."
+     DEFVAL { false }
+     ::= { docsIf3MdCfgEntry 12 }
+
+docsIf3MdCfgSendUdcRulesEnabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "If set to 'true' and when the CM signals to the CMTS
+        'Upstream Drop Classifier Group ID' encodings, this attribute
+        instructs the CMTS MAC Domain to send the Subscriber 
+        Management Filters rules associated with the 'Upstream Drop
+        Classifier Group ID' encodings to the CM in the form of UDCs 
+        when the following conditions occurs:
+        - The attribute CmUdcEnabled value for this MAC Domain 
+          is set to 'true', and 
+        - The CM has the UDC capability advertised as supported. 
+        If there is no a single Subscriber Management Filter 
+        configured in the CMTS for the CM's signaled UDC Group ID,
+        the CMTS does not send UDC encodings to the CM.
+
+        It is vendor specific whether the CMTS maintains enforcement
+        of the CM signaled or default Subscriber Management Filter 
+        groups in the upstream direction."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Subscriber Management
+         TLVs section in the Common Radio Frequency Interface Encodings
+         Annex."
+     DEFVAL { false }
+     ::= { docsIf3MdCfgEntry 13 }
+
+docsIf3MdCfgServiceTypeIdList OBJECT-TYPE
+     SYNTAX      SnmpTagList
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute indicates the list of Service Type IDs 
+        associated with the MAC Domain. 
+        During the CM registration process the CMTS will attempt to
+        redirect the CM to a MAC Domain where the CM' Service Type TLV
+        is contained in this attribute."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Service Type 
+         Identifier section in the Common Radio Frequency Interface 
+         Encodings Annex."
+     DEFVAL { "" }
+     ::= { docsIf3MdCfgEntry 14 }        
+        
+docsIf3MdCfgBpi2EnforceCtrl OBJECT-TYPE
+     SYNTAX      INTEGER {
+                           disable(0),
+                           qosCfgFileWithBpi2AndCapabPrivSupportEnabled(1),
+                           qosCfgFileWithBpi2Enabled(2),
+                           qosCfgFile(3),
+                           total(4)
+                         }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute indicates the level of BPI+ enforcement
+        policies with the MAC Domain.
+
+        The following BPI+ enforcement policies are defined in
+        the case where BPI+ is enabled:
+
+        The option 'disable' indicates the CMTS does not enforce BPI+.
+
+        The option 'qosCfgFileWithBpi2AndCapabPrivSupportEnabled' 
+        indicates the CMTS enforces BPI+ on CMs that register with a 
+        DOCSIS 1.1 style configuration file with parameters indicating
+        BPI+ is enabled (missing TLV 29 or containing TLV 29 set to 
+        enable) and with a Modem Capabilities Privacy Support TLV (5.6) 
+        set to BPI+ support.
+
+        The option 'qosCfgFileWithBpi2Enabled' indicates the CMTS 
+        enforces BPI+ on CMs that register with a DOCSIS 1.1 style 
+        configuration file with parameters indicating BPI+ is enabled 
+        (missing TLV 29 or containing TLV 29 set to enable).
+
+        The option 'qosCfgFile' indicates the CMTS enforces BPI+ on CMs
+        that register with a DOCSIS 1.1 style configuration file.
+
+        The option 'total' indicates the CMTS enforces BPI+ on all CMs."
+     REFERENCE
+         "DOCSIS 3.0 Security Specification CM-SP-SECv3.0-I12-100115,
+          BPI+ Enforce section."
+     DEFVAL { qosCfgFileWithBpi2Enabled }
+     ::= { docsIf3MdCfgEntry 15 }
+
+docsIf3MdCfgEnergyMgt1x1Enabled OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute indicates whether the CMTS is configured for 
+        1x1 Energy Management Mode of operation on a per MAC Domain 
+        basis. If this attribute is set to 'true', the CMTS is 
+        configured for 1x1 Energy Management Mode of operation on this
+        MAC Domain. If this attribute is set to 'false', the Energy 
+        Management 1x1 Mode of operation is disabled in the CMTS on 
+        this MAC Domain"
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I20-121113,
+         Energy Management Capabilities section."
+     DEFVAL { false }
+     ::= { docsIf3MdCfgEntry 16 }
+
+docsIf3BondingGrpCfgTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3BondingGrpCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object defines statically configured Downstream
+        Bonding Groups and Upstream Bonding Groups on
+        the CMTS.
+        This object supports the creation and deletion of multiple
+        instances.
+        Creation of a new instance of this object requires the
+        ChList attribute to be set."
+     ::= { docsIf3MibObjects 17}
+
+docsIf3BondingGrpCfgEntry OBJECT-TYPE
+     SYNTAX      DocsIf3BondingGrpCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3BondingGrpCfgTable.
+         The ifIndex key corresponds to the MAC Domain interface
+         where the Bonding Group is configured.
+         The CMTS persists all instances of BondingGrpCfg
+         across reinitializations."
+     INDEX {
+             ifIndex,
+             docsIf3BondingGrpCfgDir,
+             docsIf3BondingGrpCfgCfgId
+           }
+     ::= { docsIf3BondingGrpCfgTable 1 }
+
+DocsIf3BondingGrpCfgEntry ::= SEQUENCE {
+     docsIf3BondingGrpCfgDir
+                  IfDirection,
+     docsIf3BondingGrpCfgCfgId
+                  Unsigned32,
+     docsIf3BondingGrpCfgChList
+                  ChannelList,
+     docsIf3BondingGrpCfgSfProvAttrMask
+                  AttributeMask,
+     docsIf3BondingGrpCfgDsidReseqWaitTime
+                  Unsigned32,
+     docsIf3BondingGrpCfgDsidReseqWarnThrshld
+                  Unsigned32,
+     docsIf3BondingGrpCfgRowStatus
+                  RowStatus
+     }
+
+docsIf3BondingGrpCfgDir OBJECT-TYPE
+     SYNTAX      IfDirection
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This attribute defines the ordered list of channels
+        that comprise the channel set"
+     ::= { docsIf3BondingGrpCfgEntry 1 }
+
+docsIf3BondingGrpCfgCfgId OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..65535)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents the configured bonding group
+        identifier in the indicated direction for the MAC Domain.
+        This attribute is used for the sole purpose of tracking
+        bonding groups defined by management systems."
+     ::= { docsIf3BondingGrpCfgEntry 2 }
+
+docsIf3BondingGrpCfgChList OBJECT-TYPE
+     SYNTAX      ChannelList (SIZE (2..255))
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This attribute contains the list of channels of the
+        bonding group."
+     ::= { docsIf3BondingGrpCfgEntry 3 }
+
+docsIf3BondingGrpCfgSfProvAttrMask OBJECT-TYPE
+     SYNTAX      AttributeMask
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the Provisioned Attribute
+        Mask encoding for the bonding group."
+     DEFVAL { '80000000'H }
+     ::= { docsIf3BondingGrpCfgEntry 4 }
+
+docsIf3BondingGrpCfgDsidReseqWaitTime OBJECT-TYPE
+     SYNTAX      Unsigned32 (0 | 1..180 | 255)
+     UNITS       "hundredMicroseconds"
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "For a Downstream Bonding Group, this attribute provides
+        the DSID Resequencing Wait Time that is to be used
+        for all DSIDs associated with this Downstream Bonding
+        Group.  The value of 255 indicates that the DSID
+        Resequencing Wait Time is determined by the CMTS. The
+        value zero in not supported for downstream  bonding
+        groups.
+        For an Upstream Bonding Group, this attribute has no
+        meaning and returns the value 0."
+     REFERENCE
+        "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+        Specification CM-SP-MULPIv3.0-I08-080522, Service Flow
+        Assignment section."
+     DEFVAL { 255 }
+     ::= { docsIf3BondingGrpCfgEntry 5 }
+
+docsIf3BondingGrpCfgDsidReseqWarnThrshld OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..179 | 255)
+     UNITS       "hundredMicroseconds"
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "For a Downstream Bonding Group, this attribute provides
+        the DSID Resequencing Warning Threshold that
+        is to be used for all DSIDs associated with this Downstream
+        Bonding Group. The value of 255 indicates that
+        the DSID Resequencing Warning Threshold is determined
+        by the CMTS.  The value of 0 indicates that the threshold
+        warnings are disabled.  When 
+      the value of DsidReseqWaitTime is not equal to 0 or 255,
+      the CMTS must ensure that the value of this object is either 
+      255 or less than the value of DsidReseqWaitTime."
+     DEFVAL { 255 }
+     ::= { docsIf3BondingGrpCfgEntry 6 }
+
+docsIf3BondingGrpCfgRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The status of this instance."
+     ::= { docsIf3BondingGrpCfgEntry 7 }
+
+docsIf3DsBondingGrpStatusTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3DsBondingGrpStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object returns administratively-configured
+        and CMTS defined downstream bonding groups."
+     ::= { docsIf3MibObjects 18}
+
+docsIf3DsBondingGrpStatusEntry OBJECT-TYPE
+     SYNTAX      DocsIf3DsBondingGrpStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3DsBondingGrpStatusTable.
+         The ifIndex key corresponds to the MAC Domain interface
+         where the Bonding Group is configured."
+     INDEX {
+             ifIndex,
+             docsIf3DsBondingGrpStatusChSetId
+           }
+     ::= { docsIf3DsBondingGrpStatusTable 1 }
+
+DocsIf3DsBondingGrpStatusEntry ::= SEQUENCE {
+     docsIf3DsBondingGrpStatusChSetId
+                  ChSetId,
+     docsIf3DsBondingGrpStatusMdDsSgId
+                  Unsigned32,
+     docsIf3DsBondingGrpStatusCfgId
+                  Unsigned32
+     }
+
+docsIf3DsBondingGrpStatusChSetId OBJECT-TYPE
+     SYNTAX      ChSetId
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents the identifier for the Downstream
+        Bonding Group or the single-downstream channel
+        of this instance."
+     ::= { docsIf3DsBondingGrpStatusEntry 1 }
+
+docsIf3DsBondingGrpStatusMdDsSgId OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..255)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute corresponds to the MD-DS-SG-ID that
+        includes all the downstream channels of the Downstream
+        Bonding Group. The value zero indicates that the
+        bonding group does not contain channels from a single
+        MD-DS-SG and therefore the bonding group is not valid
+        and usable."
+     ::= { docsIf3DsBondingGrpStatusEntry 2 }
+
+docsIf3DsBondingGrpStatusCfgId OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute provides the BondingGrpCfgId for
+        the downstream bonding group if it was configured.
+        Otherwise, the zero value indicates that the CMTS will
+        define the bonding group."
+     ::= { docsIf3DsBondingGrpStatusEntry 3 }
+
+docsIf3UsBondingGrpStatusTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3UsBondingGrpStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object returns administratively-configured
+        and CMTS-defined upstream bonding groups."
+     ::= { docsIf3MibObjects 19}
+
+docsIf3UsBondingGrpStatusEntry OBJECT-TYPE
+     SYNTAX      DocsIf3UsBondingGrpStatusEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3UsBondingGrpStatusTable.
+         The ifIndex key corresponds to the MAC Domain interface
+         where the Bonding Group is configured."
+     INDEX {
+             ifIndex,
+             docsIf3UsBondingGrpStatusChSetId
+           }
+     ::= { docsIf3UsBondingGrpStatusTable 1 }
+
+DocsIf3UsBondingGrpStatusEntry ::= SEQUENCE {
+     docsIf3UsBondingGrpStatusChSetId
+                  ChSetId,
+     docsIf3UsBondingGrpStatusMdUsSgId
+                  Unsigned32,
+     docsIf3UsBondingGrpStatusCfgId
+                  Unsigned32
+     }
+
+docsIf3UsBondingGrpStatusChSetId OBJECT-TYPE
+     SYNTAX      ChSetId
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents the identifier for the Upstream
+        Bonding Group or the single-upstream channel of this
+        instance."
+     ::= { docsIf3UsBondingGrpStatusEntry 1 }
+
+docsIf3UsBondingGrpStatusMdUsSgId OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..255)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute corresponds to the MD-US-SG-ID that
+        includes all the upstream channels of the Upstream
+        Bonding Group. The value zero indicates that the bonding
+        group does not contain channels from a single MD-US-SG
+        and therefore the bonding group is not valid
+        and usable."
+     ::= { docsIf3UsBondingGrpStatusEntry 2 }
+
+docsIf3UsBondingGrpStatusCfgId OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute provides the BondingGrpCfgId for
+        the upstream bonding group if it was configured.
+        Otherwise, the zero value indicates that the CMTS
+        defines the bonding group."
+     ::= { docsIf3UsBondingGrpStatusEntry 3 }
+
+docsIf3UsChExtTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3UsChExtEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object defines management extensions for upstream
+        channels, in particular SCDMA parameters."
+     ::= { docsIf3MibObjects 20}
+
+docsIf3UsChExtEntry OBJECT-TYPE
+     SYNTAX      DocsIf3UsChExtEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3UsChExtTable.
+         The ifIndex key corresponds to each of the upstream
+         channels."
+     INDEX {
+             ifIndex
+           }
+     ::= { docsIf3UsChExtTable 1 }
+
+DocsIf3UsChExtEntry ::= SEQUENCE {
+     docsIf3UsChExtSacCodeHoppingSelectionMode
+                  INTEGER,
+     docsIf3UsChExtScdmaSelectionStringActiveCodes
+                  ScdmaSelectionString
+     }
+
+docsIf3UsChExtSacCodeHoppingSelectionMode OBJECT-TYPE
+     SYNTAX      INTEGER {
+                           none(0),
+                           sac1NoCodeHopping(1),
+                           sac1CodeHoppingMode1(2),
+                           sac2CodeHoppingMode2(3),
+                           sac2NoCodeHopping(4)
+                         }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute indicates the selection mode for active
+        codes and code hopping.
+        'none'
+           Non-SCDMA channel
+        'sac1NoCodeHopping'
+           Selectable active codes mode 1 and code hopping disabled
+
+        'sac1CodeHoppingMode1'
+           Selectable active codes mode 1 and code hopping mode
+        1
+        'sac2CodeHoppingMode2'
+          Selectable active codes mode 2 and code hopping mode
+        2
+        'sac2NoCodeHopping'
+          Selectable active codes mode 2 and code hopping disabled."
+     REFERENCE
+         "DOCSIS 3.0 Physical Layer Specification
+         CM-SP-PHYv3.0-I05-070803, Mini-slot Numbering
+         Parameters in UCD section."
+     ::= { docsIf3UsChExtEntry 1 }
+
+docsIf3UsChExtScdmaSelectionStringActiveCodes OBJECT-TYPE
+     SYNTAX      ScdmaSelectionString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the active codes of the
+        upstream channel and it is applicable only when
+        SacCodeHoppingSelectionMode is 'sac2CodeHoppingMode2."
+     REFERENCE
+         "DOCSIS 3.0 Physical Layer Specification
+         CM-SP-PHYv3.0-I05-070803, Mini-slot Numbering
+         Parameters in UCD section."
+     ::= { docsIf3UsChExtEntry 2 }
+
+docsIf3CmCapabilities OBJECT IDENTIFIER ::= { docsIf3MibObjects 21 }
+
+docsIf3CmCapabilitiesReq OBJECT-TYPE
+     SYNTAX      Tlv8
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute contains the TLV encoding for TLV-5
+        sent in a REG-REQ.  The first byte of this encoding is
+        expected to be '05'H."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Modem Capabilities
+         Encoding section in the Common Radio Frequency Interface
+         Encodings Annex."
+     ::= { docsIf3CmCapabilities 1 }
+
+docsIf3CmCapabilitiesRsp OBJECT-TYPE
+     SYNTAX      Tlv8
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute contains the TLV encoding for TLV-5
+        received in a REG-RSP.
+        The first byte of this encoding is expected to be '05'H."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Modem Capabilities
+         Encoding section in the Common Radio Frequency Interface
+         Encodings Annex."
+     ::= { docsIf3CmCapabilities 2 }
+
+docsIf3UsChSetTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3UsChSetEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object defines a set of upstream channels. These
+        channel sets may be associated with channel bonding
+        groups, MD-US-SGs, MD-CM-SGs, or any other channel
+        set that the CMTS may derive from other CMTS processes."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Partial
+         Service Encoding section and Cable Modem Attribute
+         Masks section in the Common Radio Frequency Interface
+         Encodings Annex."
+     ::= { docsIf3MibObjects 22}
+
+docsIf3UsChSetEntry OBJECT-TYPE
+     SYNTAX      DocsIf3UsChSetEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3UsChSetTable.
+         The ifIndex key corresponds to the MAC Domain interface
+         where the upstream channel set is defined."
+     INDEX {
+             ifIndex,
+             docsIf3UsChSetId
+           }
+     ::= { docsIf3UsChSetTable 1 }
+
+DocsIf3UsChSetEntry ::= SEQUENCE {
+     docsIf3UsChSetId
+                  ChSetId,
+     docsIf3UsChSetChList
+                  ChannelList
+     }
+
+docsIf3UsChSetId OBJECT-TYPE
+     SYNTAX      ChSetId
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key defines a reference identifier for the upstream
+        channel set within the MAC Domain."
+     ::= { docsIf3UsChSetEntry 1 }
+
+docsIf3UsChSetChList OBJECT-TYPE
+     SYNTAX      ChannelList (SIZE (0 | 2..255))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute defines the ordered list of channels
+        that comprise the upstream channel set"
+     ::= { docsIf3UsChSetEntry 2 }
+
+docsIf3DsChSetTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3DsChSetEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object defines a set of downstream channels.
+        These channel sets may be associated with channel bonding
+        groups, MD-DS-SGs, MD-CM-SGs, or any other channel
+        set that the CMTS may derive from other CMTS processes."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, Partial
+         Service Encoding section and Cable Modem Attribute
+         Masks section in the Common Radio Frequency Interface
+         Encodings Annex."
+     ::= { docsIf3MibObjects 23}
+
+docsIf3DsChSetEntry OBJECT-TYPE
+     SYNTAX      DocsIf3DsChSetEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3DsChSetTable.
+         The ifIndex key corresponds to the MAC Domain interface
+         where the downstream channel set is defined."
+     INDEX {
+             ifIndex,
+             docsIf3DsChSetId
+           }
+     ::= { docsIf3DsChSetTable 1 }
+
+DocsIf3DsChSetEntry ::= SEQUENCE {
+     docsIf3DsChSetId
+                  ChSetId,
+     docsIf3DsChSetChList
+                  ChannelList
+     }
+
+docsIf3DsChSetId OBJECT-TYPE
+     SYNTAX      ChSetId
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key defines a reference identifier for the downstream
+        channel set within the MAC Domain."
+     ::= { docsIf3DsChSetEntry 1 }
+
+docsIf3DsChSetChList OBJECT-TYPE
+     SYNTAX      ChannelList (SIZE (0 | 2..255))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute defines the ordered list of channels
+        that comprise the downstream channel set."
+     ::= { docsIf3DsChSetEntry 2 }
+
+docsIf3SignalQualityExtTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3SignalQualityExtEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object provides an in-channel received modulation
+        error ratio metric for CM and CMTS."
+     ::= { docsIf3MibObjects 24}
+
+docsIf3SignalQualityExtEntry OBJECT-TYPE
+     SYNTAX      DocsIf3SignalQualityExtEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3SignalQualityExtTable.
+         At the CM, this object describes the received modulation 
+         error ratio of each downstream channel. At the CMTS, 
+         it describes the received modulation error ratio of each
+         logical upstream channel. 
+         An entry in this table exists for each ifEntry with an
+         ifType of docsCableDownstream(128) for Cable Modems.
+         For Cable Modem Termination Systems, an entry exists for 
+         each ifEntry with an ifType of docsCableUpstreamChannel(205)."
+     INDEX {
+             ifIndex
+           }
+     ::= { docsIf3SignalQualityExtTable 1 }
+
+DocsIf3SignalQualityExtEntry ::= SEQUENCE {
+     docsIf3SignalQualityExtRxMER
+                  TenthdB,
+     docsIf3SignalQualityExtRxMerSamples
+                  Unsigned32
+     }
+
+docsIf3SignalQualityExtRxMER OBJECT-TYPE
+     SYNTAX      TenthdB (-2147483648..2147483647)
+    UNITS     "TenthdB"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "RxMER provides an in-channel received Modulation
+        Error Ratio (MER). RxMER is defined as an estimate,
+        provided by the demodulator, of the ratio:
+        (average constellation energy with equally likely
+        symbols) / (average squared magnitude of error vector)
+
+        RxMER is measured just prior to FEC (trellis/Reed-Solomon)
+        decoding. RxMER includes the effects of the
+        HFC channel as well as implementation effects of the
+        modulator and demodulator. Error vector estimation
+        may vary among demodulator implementations.  The CMTS
+        RxMER is averaged over a given number of bursts at
+        the burst receiver, which may correspond to transmissions
+        from multiple users. In the case of S-CDMA mode,
+        RxMER is measured on the de-spread signal."
+     ::= { docsIf3SignalQualityExtEntry 1 }
+
+docsIf3SignalQualityExtRxMerSamples OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "RxMerSamples is a statistically significant number
+        of symbols for the CM, or bursts for the CMTS, processed
+        to arrive at the RxMER value. For the CMTS, the MER
+        measurement includes only valid bursts that are not
+        in contention regions."
+     ::= { docsIf3SignalQualityExtEntry 2 }
+
+docsIf3CmtsSignalQualityExtTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3CmtsSignalQualityExtEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object provides metrics and parameters associated
+        with received carrier, noise and interference
+        power levels in the upstream channels of the CMTS."
+     ::= { docsIf3MibObjects 25}
+
+docsIf3CmtsSignalQualityExtEntry OBJECT-TYPE
+     SYNTAX      DocsIf3CmtsSignalQualityExtEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3CmtsSignalQualityExtTable.
+         The ifIndex key corresponds to each of the upstream
+         channels.
+         The CMTS is not required to persist the values of all 
+         instances of CmtsSignalQualityExt across reinitialization."
+     INDEX {
+             ifIndex
+           }
+     ::= { docsIf3CmtsSignalQualityExtTable 1 }
+
+DocsIf3CmtsSignalQualityExtEntry ::= SEQUENCE {
+     docsIf3CmtsSignalQualityExtCNIR
+                  TenthdB,
+     docsIf3CmtsSignalQualityExtExpectedRxSignalPower
+                  TenthdBmV
+     }
+
+docsIf3CmtsSignalQualityExtCNIR OBJECT-TYPE
+     SYNTAX      TenthdB
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute provides an upstream in-channel Carrier-to-Noise
+        plus Interference Ratio (CNIR). CNIR
+        is defined as the ratio of the expected commanded
+        received signal power at the CMTS input, assuming
+        QPSK0 modulation, to the noise plus
+        interference in the channel.
+        This measurement occurs prior to the point at which 
+        the desired CM signal, when present, is demodulated.
+        The measurement includes the effect of the receive matched
+        filter but does not include the effect of any ingress filtering.
+        Both the signal power and noise/interference power
+        are referenced to the same point, e.g., CMTS input."
+     ::= { docsIf3CmtsSignalQualityExtEntry 1 }
+
+docsIf3CmtsSignalQualityExtExpectedRxSignalPower OBJECT-TYPE
+     SYNTAX      TenthdBmV
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "ExpectedReceivedSignalPower is the power of the
+        expected commanded received signal in the channel,
+        referenced to the CMTS input."
+     ::= { docsIf3CmtsSignalQualityExtEntry 2 }
+
+docsIf3CmtsSpectrumAnalysisMeasTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3CmtsSpectrumAnalysisMeasEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object is used to configure the logical upstream
+        interfaces to perform the spectrum measurements.
+        This object supports creation and deletion of instances."
+     ::= { docsIf3MibObjects 26}
+
+docsIf3CmtsSpectrumAnalysisMeasEntry OBJECT-TYPE
+     SYNTAX      DocsIf3CmtsSpectrumAnalysisMeasEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3CmtsSpectrumAnalysisMeasTable.
+         The ifIndex key corresponds to each of the upstream
+         channels.
+         The CMTS is not required to persist instances of this
+         object across reinitializations."
+     INDEX {
+             ifIndex
+           }
+     ::= { docsIf3CmtsSpectrumAnalysisMeasTable 1 }
+
+DocsIf3CmtsSpectrumAnalysisMeasEntry ::= SEQUENCE {
+     docsIf3CmtsSpectrumAnalysisMeasAmplitudeData
+                  AmplitudeData,
+     docsIf3CmtsSpectrumAnalysisMeasTimeInterval
+                  Unsigned32,
+     docsIf3CmtsSpectrumAnalysisMeasRowStatus
+                  RowStatus
+     }
+
+docsIf3CmtsSpectrumAnalysisMeasAmplitudeData OBJECT-TYPE
+     SYNTAX      AmplitudeData
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute provides a list of the spectral amplitudes
+        corresponding to the frequency bins ordered
+        from lowest to highest frequencies covering the frequency
+        span. Information about the center frequency,
+        frequency span, number of bins and resolution bandwidth
+        are included to provide context to the measurement
+        point
+        The CMTS must support the number of bins as an odd number
+        in order to provide a spectrum representation that
+        is symmetric about the middle data point or bin. The
+        CMTS must support a number of bins greater than or equal
+        to 257 for frequency spans greater than or equal to
+        6.4 MHz.
+
+        The CMTS must not exceed 25 kHz bin spacing for measurement
+        of frequency spans less than or equal to 6.4 MHz.
+
+        The bins measurements are updated periodically at time
+        intervals given by the TimeInterval attribute."
+     ::= { docsIf3CmtsSpectrumAnalysisMeasEntry 1 }
+
+docsIf3CmtsSpectrumAnalysisMeasTimeInterval OBJECT-TYPE
+     SYNTAX      Unsigned32
+     UNITS       "milliseconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "TimeInterval is the CMTS estimated average repetition
+        period of measurements. This attribute defines
+        the average rate at which new spectra can be retrieved."
+     ::= { docsIf3CmtsSpectrumAnalysisMeasEntry 2 }
+
+docsIf3CmtsSpectrumAnalysisMeasRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The status of this instance."
+     ::= { docsIf3CmtsSpectrumAnalysisMeasEntry 3 }
+
+docsIf3CmtsCmCtrl OBJECT IDENTIFIER ::= { docsIf3MibObjects 27 }
+
+docsIf3CmtsCmCtrlCmdMacAddr OBJECT-TYPE
+     SYNTAX      MacAddress
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the MAC Address of the CM which the 
+        CMTS is instructed to send the CM-CTRL-REQ message."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522,
+         Media Access Control Specification section."
+     DEFVAL { '000000000000'H }
+     ::= { docsIf3CmtsCmCtrl 1 }  
+     
+docsIf3CmtsCmCtrlCmdMuteUsChId OBJECT-TYPE
+     SYNTAX      ChId
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the Upstream Channel ID (UCID) to 
+        mute or unmute.  A value of zero indicates all upstream 
+        channels.  This attribute is only applicable when the 
+        docsIf3CmtsCmCtrlCmdCommit attribute is set to 
+        'mute'."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, 
+         Media Access Control Specification section."
+     DEFVAL { 0 }
+     ::= { docsIf3CmtsCmCtrl 2 }    
+     
+docsIf3CmtsCmCtrlCmdMuteInterval OBJECT-TYPE
+     SYNTAX      Unsigned32  
+     UNITS       "milliseconds"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the length of time that the mute 
+        operation is in effect.  This attribute is only applicable 
+        when the docsIf3CmtsCmCtrlCmdCommit attribute is set to 
+        'mute'.  A value of 0 is an indication to unmute the
+        channel referenced by the docsIf3CmtsCmCtrlCmdMuteUsChId
+        attribute while a value of 0xFFFFFFFF is used to mute
+        the channel referenced by the docsIf3CmtsCmCtrlCmdMuteUsChId
+        attribute indefinitely."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, 
+         Media Access Control Specification section."
+     DEFVAL { 1 }
+     ::= { docsIf3CmtsCmCtrl 3 }  
+     
+docsIf3CmtsCmCtrlCmdDisableForwarding OBJECT-TYPE
+     SYNTAX      TruthValue 
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "When set to 'true', this attribute disables data forwarding 
+        to the CMCI when the docsIf3CmtsCmCtrlCmdCommit attribute is
+        set to 'disableForwarding'. 
+        When set to 'false', this attribute enables data forwarding
+        to the CMCI when the docsIf3CmtsCmCtrlCmdCommit attribute is
+        set to 'disableForwarding'. 
+        This attribute is only applicable when the 
+        docsIf3CmtsCmCtrlCmdCommit attribute is set to 
+        'disableForwarding'." 
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, 
+         Media Access Control Specification section."   
+     DEFVAL { false }
+     ::= { docsIf3CmtsCmCtrl 4 }
+
+docsIf3CmtsCmCtrlCmdCommit OBJECT-TYPE
+     SYNTAX      INTEGER {
+                         mute(1),
+                         cmReinit(2),
+                         disableForwarding(3) }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute indicates the type of command for the 
+        CMTS to trigger in the CM-CTRL-REQ message.
+        This attribute will return the value of the last operation 
+        performed or the default value if no operation has been 
+        performed."  
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, 
+         Media Access Control Specification section."   
+     DEFVAL { mute }
+     ::= { docsIf3CmtsCmCtrl 5 }       
+     
+docsIf3CmDpvStatsTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3CmDpvStatsEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object represents the DOCSIS Path Verify Statistics
+        collected in the cable modem device.
+        The CMTS controls the logging of DPV statistics in the
+        cable modem. Therefore the context and nature of the
+        measurements are governed by the CMTS and not self-descriptive
+        when read from the CM."
+     ::= { docsIf3MibObjects 28}
+
+docsIf3CmDpvStatsEntry OBJECT-TYPE
+     SYNTAX      DocsIf3CmDpvStatsEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3CmDpvStatsTable."
+     INDEX { 
+             ifIndex,
+             docsIf3CmDpvStatsGrpId
+           }
+     ::= { docsIf3CmDpvStatsTable 1 }
+
+DocsIf3CmDpvStatsEntry ::= SEQUENCE {
+     docsIf3CmDpvStatsGrpId
+                  Unsigned32,
+     docsIf3CmDpvStatsLastMeasLatency
+                  Unsigned32,
+     docsIf3CmDpvStatsLastMeasTime
+                  DateAndTime,
+     docsIf3CmDpvStatsMinLatency
+                  Unsigned32,
+     docsIf3CmDpvStatsMaxLatency
+                  Unsigned32,
+     docsIf3CmDpvStatsAvgLatency
+                  Unsigned32,
+     docsIf3CmDpvStatsNumMeas
+                  Unsigned32,
+     docsIf3CmDpvStatsLastClearTime
+                  DateAndTime
+     }
+
+docsIf3CmDpvStatsGrpId OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..2)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents the DPV Group ID. The CM reports
+        two instance of DPV statistics per downstream normally
+        referred as Statistical Group 1 and Statistical
+        Group 2."
+     ::= { docsIf3CmDpvStatsEntry 1 }
+
+docsIf3CmDpvStatsLastMeasLatency OBJECT-TYPE
+     SYNTAX      Unsigned32
+     UNITS       "nanoseconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the last latency measurement
+        for this statistical group."
+     ::= { docsIf3CmDpvStatsEntry 2 }
+
+docsIf3CmDpvStatsLastMeasTime OBJECT-TYPE
+     SYNTAX      DateAndTime
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the last measurement time
+        of the last latency measurement for this statistical
+        group.
+        This attribute reports the EPOC time value when no measurements
+        are being reported or after the statistics
+        were cleared."
+     ::= { docsIf3CmDpvStatsEntry 3 }
+
+docsIf3CmDpvStatsMinLatency OBJECT-TYPE
+     SYNTAX      Unsigned32
+     UNITS       "nanoseconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the minimum latency measurement
+        for this statistical group since the last
+        time statistics were cleared."
+     ::= { docsIf3CmDpvStatsEntry 4 }
+
+docsIf3CmDpvStatsMaxLatency OBJECT-TYPE
+     SYNTAX      Unsigned32
+     UNITS       "nanoseconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the maximum latency measurement
+        for this statistical group since the last
+        time statistics were cleared."
+     ::= { docsIf3CmDpvStatsEntry 5 }
+
+docsIf3CmDpvStatsAvgLatency OBJECT-TYPE
+     SYNTAX      Unsigned32
+     UNITS       "nanoseconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the average latency measurement
+        for this statistical group since the last
+        time statistics were cleared. The averaging mechanism
+        is controlled by the CMTS, and can be a simple average
+        (mean) or an exponential moving average."
+     REFERENCE
+        "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I08-080522, DOCSIS Path 
+         Verification section."
+     ::= { docsIf3CmDpvStatsEntry 6 }
+
+docsIf3CmDpvStatsNumMeas OBJECT-TYPE
+     SYNTAX      Unsigned32
+     UNITS       "measurements"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the number of latency measurements
+        made for this statistical group since the
+        last time statistics were cleared."
+     ::= { docsIf3CmDpvStatsEntry 7 }
+
+docsIf3CmDpvStatsLastClearTime OBJECT-TYPE
+     SYNTAX      DateAndTime
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute represents the last time statistics
+        were cleared for this statistical group."
+     ::= { docsIf3CmDpvStatsEntry 8 }
+
+docsIf3CmEventCtrlTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3CmEventCtrlEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object represents the control mechanism to enable the
+        dispatching of events based on the event Id. The following
+        rules define the event control behavior:
+        
+        - The CmEventCtrl object has no instances or contains an 
+          instance with Event ID 0. All events matching the Local Log
+          settings of docsDevEvReporting are sent to local log ONLY.
+
+        - The CmEventCtrl object contains configured instances
+          Only events matching the Event Ids configured in the object
+          are sent according to the settings of the docsDevEvReporting
+          object. 
+          
+          The CM does not persist instances of CmEventCtrl across 
+          reinitializations."
+     REFERENCE
+        "DOCSIS 3.0 Operations Support System Interface
+         Specification CM-SP-OSSIv3.0-I11-100115, Section N.2.2.5 
+         CmEventCtrl Object."
+     ::= { docsIf3MibObjects 29}
+
+    docsIf3CmEventCtrlEntry OBJECT-TYPE
+     SYNTAX      DocsIf3CmEventCtrlEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3CmEventCtrlTable."
+     INDEX { 
+             docsIf3CmEventCtrlEventId
+           }
+     ::= { docsIf3CmEventCtrlTable 1 }
+
+DocsIf3CmEventCtrlEntry ::= SEQUENCE {
+             docsIf3CmEventCtrlEventId
+                  Unsigned32,
+             docsIf3CmEventCtrlStatus
+                  RowStatus
+     }
+
+docsIf3CmEventCtrlEventId OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents the Event ID of the event being 
+        enabled for delivery to a dispatch mechanism (e.g., syslog)."
+     REFERENCE
+        "DOCSIS 3.0 Operations Support System Interface
+         Specification CM-SP-OSSIv3.0-I07-080522, Format and Content
+         for Event, Syslog, and SNMP Notification Annex."
+     ::= { docsIf3CmEventCtrlEntry  1 }
+     
+docsIf3CmEventCtrlStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The status of this instance."
+     ::= { docsIf3CmEventCtrlEntry  2 }     
+
+docsIf3CmtsEventCtrlTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3CmtsEventCtrlEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object represents the control mechanism to enable the
+        dispatching of  events based on the event Id. The following
+        rules define the event control behavior:
+        
+        - The CmtsEventCtrl object has no instances or contains an 
+          instance with Event ID 0. All events matching the Local Log 
+          settings of docsDevEvReporting are sent to local log ONLY.
+
+        - The CmtsEventCtrl object contains configured instances
+          Only events matching the Event Ids configured in the object
+          are sent according to the settings of the docsDevEvReporting
+          object. 
+          
+        - The CMTS persists all instances of CmtsEventCtrl across 
+          reinitializations."
+     REFERENCE
+        "DOCSIS 3.0 Operations Support System Interface Specification 
+         CM-SP-OSSIv3.0-I11-100115, Section N.2.3.4 CmtsEventCtrl Object."
+     ::= { docsIf3MibObjects 30}
+
+docsIf3CmtsEventCtrlEntry OBJECT-TYPE
+     SYNTAX      DocsIf3CmtsEventCtrlEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3CmtsEventCtrlTable."
+     INDEX { 
+             docsIf3CmtsEventCtrlEventId
+           }
+     ::= { docsIf3CmtsEventCtrlTable 1 }
+
+DocsIf3CmtsEventCtrlEntry ::= SEQUENCE {
+             docsIf3CmtsEventCtrlEventId
+                  Unsigned32,
+             docsIf3CmtsEventCtrlStatus
+                  RowStatus
+     }
+
+docsIf3CmtsEventCtrlEventId OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents the Event ID of the event being 
+        enabled for delivery to a dispatch mechanism (e.g., syslog)."
+     REFERENCE
+        "DOCSIS 3.0 Operations Support System Interface
+         Specification CM-SP-OSSIv3.0-I07-080522, Format and Content
+         for Event, Syslog, and SNMP Notification Annex."
+     ::= { docsIf3CmtsEventCtrlEntry  1 }
+     
+docsIf3CmtsEventCtrlStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The status of this instance."
+     ::= { docsIf3CmtsEventCtrlEntry  2 }     
+
+docsIf3CmMdCfgTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3CmMdCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object contains CM MAC domain level control and
+        configuration attributes."
+     ::= { docsIf3MibObjects 31}
+
+docsIf3CmMdCfgEntry OBJECT-TYPE
+     SYNTAX      DocsIf3CmMdCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3CmMdCfgTable.
+          The ifIndex key corresponds to the MAC Domain interface."
+     INDEX {
+             ifIndex
+           }
+     ::= { docsIf3CmMdCfgTable 1 }
+
+DocsIf3CmMdCfgEntry ::= SEQUENCE {
+     docsIf3CmMdCfgIpProvMode
+                  INTEGER,
+     docsIf3CmMdCfgIpProvModeResetOnChange      
+                  TruthValue,
+     docsIf3CmMdCfgIpProvModeResetOnChangeHoldOffTimer  
+                  Unsigned32,
+     docsIf3CmMdCfgIpProvModeStorageType        
+                  StorageType          
+     }
+
+docsIf3CmMdCfgIpProvMode OBJECT-TYPE
+     SYNTAX      INTEGER {
+        ipv4Only(0),
+        ipv6Only(1),
+        honorMdd(4)
+     }
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute specifies whether the CM honors or ignores the 
+        CMTS MDD TLV 5.1 setting in order to configure its IP provisioning 
+        mode. The CM relies upon the CMTS to facilitate the successful 
+        IP address acquisition independently of the MDD. When this attribute
+        is set to 'ipv4Only' the CM will initiate the acquisition of a single 
+        IPv4 address for the CM management stack.
+        When this attribute is set to 'ipv6Only' the CM will initiate the 
+        acquisition of a single IPv6 address for the CM management stack.
+        When this attribute is set to 'honorMdd' the CM will initiate the 
+        acquisition of an IPv6 or IPv4 address as directed by the MDD 
+        message for provisioning and operation."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I14-101008, IP Initialization
+         Parameters TLV section."
+     DEFVAL { honorMdd }
+     ::= { docsIf3CmMdCfgEntry 1 }
+
+docsIf3CmMdCfgIpProvModeResetOnChange OBJECT-TYPE
+     SYNTAX      TruthValue
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute determines if the CM is to automatically
+        reset upon change of the IpProvMode attribute. The attribute has a
+        default value of 'false' (2) which means that the CM does not reset
+        upon change to IpProvMode attribute.  When this attribute is set to
+        'true' (1), the CM resets upon a change to the IpProvMode attribute."
+     REFERENCE
+        "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+        Specification CM-SP-MULPIv3.0-I14-101008, IP Initialization
+        Parameters TLV section."
+     DEFVAL { false }
+     ::= { docsIf3CmMdCfgEntry 2 }
+
+docsIf3CmMdCfgIpProvModeResetOnChangeHoldOffTimer OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..300)
+     UNITS       "seconds"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute determines how long a CM with 
+        IpProvModeResetOnChange set to 'true' waits to reset. When the 
+        IpProvModeResetOnChange attribute is set to 'true' (1), the CM
+        will decrement from the configured timer value before resetting.
+        The default value of the IpProvModeResetOnChangeHoldOffTimer is 0 
+        seconds which is equivalent to an immediate reset." 
+    REFERENCE
+        "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+        Specification CM-SP-MULPIv3.0-I14-101008, IP Initialization
+        Parameters TLV section." 
+     DEFVAL { 0 }
+     ::= { docsIf3CmMdCfgEntry 3 }
+
+docsIf3CmMdCfgIpProvModeStorageType OBJECT-TYPE
+     SYNTAX      StorageType
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute determines if the CM persists the value of 
+        IpProvMode across a single reset or across all resets.   The 
+        default value of this attribute is 'nonVolatile' (3) which means
+        that the CM persists the value of IpProvMode across all resets. 
+        The CM persists the value of IpProveMode across only a single 
+        reset when IpProvModeStorageType is set to volatile(2). Other 
+        StorageType values are not applicable for this object; an attempt to
+        set this object to a value of other(1), permanent(4), or readOnly(5)
+        will be rejected with an error code of inconsistentValue."
+     REFERENCE
+        "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+        Specification CM-SP-MULPIv3.0-I14-101008, IP Initialization
+        Parameters TLV section."
+     DEFVAL { nonVolatile }
+     ::= { docsIf3CmMdCfgEntry 4 }
+
+docsIf3CmEnergyMgtCfg OBJECT IDENTIFIER ::= { docsIf3MibObjects 32 }
+
+docsIf3CmEnergyMgtCfgFeatureEnabled OBJECT-TYPE
+     SYNTAX      BITS { em1x1Feature(0),
+                        dls(1)
+                      }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute indicates which energy savings features have
+        been enabled in the Cable Modem. The CM enables use of Energy
+        Management Features only if both the Energy Management Feature
+        Control TLV and Energy Management Modem Capability Response from
+        the CMTS indicate that the feature is enabled.  
+        If bit 0 is set, the Energy Management 1x1 Mode feature is 
+        enabled.
+        If bit 1 is set, the DOCSIS Light Sleep Mode feature is 
+        enabled."
+     REFERENCE
+        "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+        Specification CM-SP-MULPIv3.0-I20-121113,
+        Energy Management Features section."
+     ::= { docsIf3CmEnergyMgtCfg 1 }  
+     
+docsIf3CmEnergyMgtCfgCyclePeriod OBJECT-TYPE
+     SYNTAX      Unsigned32(0..65535)
+     UNITS       "seconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute specifies a minimum time period (in seconds) 
+        that must elapse between EM-REQ transactions in certain 
+        situations: 
+        - This attribute sets the minimum cycle time that a CM will use 
+          for sending requests to enter an Energy Management Mode. The 
+          CM will not request to enter an Energy Management Mode while 
+          this amount of time has yet to elapse since the last time the 
+          CM requested an Energy Management Mode and received a response 
+          indicating (0) OK or (1) Reject Temporary (with no Hold-off 
+          Timer value provided).
+
+        - In the case that the CM fails to receive an EM-RSP message
+          after the maximum number of retries, this attribute sets 
+          the minimum amount of time to elapse before the CM can 
+          attempt another EM-REQ transaction."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I20-121113, 
+         Energy Management Cycle Period section."
+     DEFVAL { 900 }
+     ::= { docsIf3CmEnergyMgtCfg 2 }    
+
+docsIf3CmEnergyMgt1x1CfgTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF DocsIf3CmEnergyMgt1x1CfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object provides configuration state information 
+         on the CM for the Energy Management 1x1 Mode feature."
+     REFERENCE
+         "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I20-121113, 
+         Energy Management 1x1 Mode Encodings section."
+     ::= { docsIf3MibObjects 33}
+
+docsIf3CmEnergyMgt1x1CfgEntry OBJECT-TYPE
+     SYNTAX      DocsIf3CmEnergyMgt1x1CfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of docsIf3CmEnergyMgt1x1CfgTable."
+     INDEX {
+             docsIf3CmEnergyMgt1x1CfgDirection
+           }
+     ::= { docsIf3CmEnergyMgt1x1CfgTable 1 }
+
+DocsIf3CmEnergyMgt1x1CfgEntry ::= SEQUENCE {
+     docsIf3CmEnergyMgt1x1CfgDirection
+                  IfDirection,
+     docsIf3CmEnergyMgt1x1CfgEntryBitrateThrshld      
+                  Unsigned32,
+     docsIf3CmEnergyMgt1x1CfgEntryTimeThrshld  
+                  Unsigned32,
+     docsIf3CmEnergyMgt1x1CfgExitBitrateThrshld        
+                  Unsigned32,  
+     docsIf3CmEnergyMgt1x1CfgExitTimeThrshld  
+                  Unsigned32   
+     }
+
+docsIf3CmEnergyMgt1x1CfgDirection OBJECT-TYPE
+     SYNTAX      IfDirection
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This index indicates whether the threshold applies to the 
+        upstream or downstream."
+     ::= { docsIf3CmEnergyMgt1x1CfgEntry 1 }
+
+docsIf3CmEnergyMgt1x1CfgEntryBitrateThrshld OBJECT-TYPE
+     SYNTAX      Unsigned32
+     UNITS       "bps"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute specifies the upstream or downstream bitrate
+        threshold (in bps) below which the CM will request to enter 
+        Energy Management 1x1 Mode operation."
+     ::= { docsIf3CmEnergyMgt1x1CfgEntry 2 }
+
+docsIf3CmEnergyMgt1x1CfgEntryTimeThrshld OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..65535)
+     UNITS       "seconds"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute specifies the number of consecutive seconds 
+        that the upstream or downstream data rate needs to remain below
+        the Upstream or Downstream Entry Bitrate Threshold in order to 
+        determine that a transition to Energy Management 1x1 Mode is 
+        required." 
+     ::= { docsIf3CmEnergyMgt1x1CfgEntry 3 }
+
+docsIf3CmEnergyMgt1x1CfgExitBitrateThrshld OBJECT-TYPE
+     SYNTAX      Unsigned32
+     UNITS       "bps"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute specifies the upstream or downstream bitrate 
+        threshold (in bps) above which the CM will request to leave 
+        Energy Management 1x1 Mode operation."
+     ::= { docsIf3CmEnergyMgt1x1CfgEntry 4 }
+
+docsIf3CmEnergyMgt1x1CfgExitTimeThrshld OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..65535)
+     UNITS       "seconds"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute specifies the number of consecutive seconds 
+        that the upstream or downstream data rate needs to remain above
+        the Upstream or Downstream Exit Bitrate Threshold in order to 
+        determine that a transition out of Energy Management 1x1 Mode 
+        is required." 
+     ::= { docsIf3CmEnergyMgt1x1CfgEntry 5 }
+
+docsIf3CmSpectrumAnalysisCtrlCmd OBJECT IDENTIFIER ::= { docsIf3MibObjects 34}
+
+docsIf3CmSpectrumAnalysisCtrlCmdEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This attribute is used to enable or disable the spectrum 
+        analyzer feature. Setting this attribute to true triggers the CM
+        to initiate measurements for the spectrum analyzer feature based
+        on the other configuration attributes for the feature. By 
+        default, the feature is disabled unless explicitly enabled.
+
+        Note that the feature may be disabled by the system under 
+        certain circumstances if the spectrum analyzer would affect 
+        critical services. In such a case, the attribute will return
+        'false' when read, and will reject sets to 'true' with an 
+        error. Once the feature is enabled, any Set operation on 
+        the docsIf3CmSpectrumAnalysisCtrlCmd MIB group might not 
+        be effective until the feature is re-enabled again."
+    DEFVAL { false }
+    ::= { docsIf3CmSpectrumAnalysisCtrlCmd 1 }
+
+docsIf3CmSpectrumAnalysisCtrlCmdInactivityTimeout OBJECT-TYPE
+    SYNTAX      INTEGER (0..86400)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This attribute controls the length of time after the last 
+        spectrum analysis measurement before the feature is 
+        automatically disabled. If set to a value of 0, the feature will
+        remain enabled until it is explicitly disabled."
+    DEFVAL { 300 }
+    ::= { docsIf3CmSpectrumAnalysisCtrlCmd 2 }    
+
+docsIf3CmSpectrumAnalysisCtrlCmdFirstSegmentCenterFrequency OBJECT-TYPE
+     SYNTAX      Unsigned32 
+     UNITS       "Hz"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+         "This attribute controls the center frequency of the
+          first segment for the spectrum analysis measurement.
+          The frequency bins for this segment lie symmetrically
+          to the left and right of this center frequency.  
+          
+          If the number of bins in a segment is odd, the segment
+          center frequency lies directly on the center bin.  
+          
+          If the number of bins in a segment is even, the segment
+          center frequency lies halfway between two bins.
+          
+          Changing the value of this attribute may result in 
+          changes to the docsIf3CmSpectrumAnalysisMeasTable.
+          Note that if this attribute is set to an invalid value, 
+          the device may return an error, or may adjust the 
+          value of the attribute to the closest valid value."
+     DEFVAL { 93000000 }
+     ::= { docsIf3CmSpectrumAnalysisCtrlCmd 3 }  
+
+docsIf3CmSpectrumAnalysisCtrlCmdLastSegmentCenterFrequency OBJECT-TYPE
+     SYNTAX      Unsigned32 
+     UNITS       "Hz"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute controls the center frequency of
+         the last segment of the spectrum analysis measurement.
+
+         The frequency bins for this segment lie symmetrically
+         to the left and right of this center frequency.  
+         If the number of bins in a segment is odd, the segment
+         center frequency lies directly on the center bin.  
+         If the number of bins in a segment is even, the segment
+         center frequency lies halfway between two bins.
+ 
+         The value of the LastSegmentCenterFrequency attribute 
+         should be equal to the FirstSegmentCenterFrequency 
+         plus and integer number of segment spans as determined 
+         by the SegmentFrequencySpan.
+
+         Changing the value of this attribute may result in changes
+         to the docsIf3CmSpectrumAnalysisMeasTable.
+
+         Note that if this attribute is set to an invalid value, 
+         the device may return an error, or may adjust the 
+         value of the attribute to the closest valid value."
+     DEFVAL { 993000000 }
+     ::= { docsIf3CmSpectrumAnalysisCtrlCmd 4 }
+
+docsIf3CmSpectrumAnalysisCtrlCmdSegmentFrequencySpan OBJECT-TYPE
+     SYNTAX      Unsigned32 (1000000..900000000)
+     UNITS       "Hz"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute controls the frequency span of each 
+        segment (instance) in the docsIf3CmSpectrumAnalysisMeasTable.  
+        
+        If set to a value of 0, then a default span will be
+        chosen based on the hardware capabilities of the 
+        device. Segments are contiguous from the 
+        FirstSegementCenterFrequency to the 
+        LastSegmentCenterFrequency and the center frequency 
+        for each successive segment is incremented by the 
+        SegmentFequencySpan. 
+        The number of segments is (LastSegmentCenterFrequency -
+        FirstSegmentCenterFrequency)/SegmentFrequencySpan + 1. 
+        A segment is equivalent to an instance in the 
+        docsIf3CmSpectrumAnalysisMeasTable. The chosen 
+        SegmentFrequencySpan affects the number of entries in 
+        the docsIf3CmSpectrumAnalysisMeasTable. A more granular 
+        SegmentFrequencySpan may adversely affect the amount of 
+        time needed to query the table entries in addition to 
+        possibly increasing the acquisition time.
+
+        Changing the value of this attribute may result in 
+        changes to the docsIf3CmSpectrumAnalysisMeasTable.
+
+        Note that if this attribute is set to an invalid value,
+        the device may return an error, or may adjust the value 
+        of the object to the closest valid value."
+     DEFVAL { 7500000 }
+     ::= { docsIf3CmSpectrumAnalysisCtrlCmd 5 }
+
+docsIf3CmSpectrumAnalysisCtrlCmdNumBinsPerSegment OBJECT-TYPE
+     SYNTAX      Unsigned32 (2..2048)
+     UNITS       "bins-per-segment"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute controls the number of bins collected 
+         by the measurement performed for each segment (instance) 
+         in the docsIf3CmSpectrumAnalysisMeasTable.  
+         
+         Note that if this attribute is set to an invalid value, 
+         the device may return an error, or may adjust the value
+         of the attribute to the closest valid value."
+     DEFVAL { 256 }
+     ::= { docsIf3CmSpectrumAnalysisCtrlCmd 6 }
+
+docsIf3CmSpectrumAnalysisCtrlCmdEquivalentNoiseBandwidth OBJECT-TYPE
+     SYNTAX      Unsigned32 (50..500)
+     UNITS       "hundredthsbin"
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute allows the user to request an equivalent 
+         noise bandwidth for the resolution bandwidth filter used 
+         in the spectrum analysis.  This corresponds to the 
+         spectral width of the window function used when performing
+         a discrete Fourier transform for the analysis.  
+
+         The window function which corresponds to a value written 
+         to this object may be obtained by reading the value of the
+         WindowFunction attribute.
+
+         If an unsupported value is requested, the device may 
+         return an error, or choose the closest valid value to the 
+         one which is requested.  
+         If the closest value is chosen, then a subsequent read of 
+         this attribute will return the actual value which is in use."
+     DEFVAL { 150 }
+     ::= { docsIf3CmSpectrumAnalysisCtrlCmd 7 }
+
+docsIf3CmSpectrumAnalysisCtrlCmdWindowFunction OBJECT-TYPE
+     SYNTAX      SpectrumAnalysisWindowFunction
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute controls or indicates the windowing function 
+         which will be used when performing the discrete Fourier
+         transform for the analysis.  The WindowFunction and the
+         Equivalent Noise Bandwidth are related. If a particular
+         WindowFunction is selected, then the EquivalentNoiseBandwidth 
+         for the function which is in use, will be reported by the
+         EquivalentNoiseBandwidth attribute. Alternatively if
+         an EquivalentNoiseBandwidth value is chosen then if a
+         WindowFunction function representing that 
+         EquivalentNoiseBandwidth is defined in the CM, that value will
+         be reported in the WindowFunction MIB object, or a value of 
+         'other' will be reported. Use of 'modern' windowing
+         functions not yet defined will likely be reported as 'other'.
+ 
+         Note that all window functions may not be supported by all 
+         devices.  If an attempt is made to set the object to an 
+         unsupported window function, or if writing of the 
+         WindowFunction is not supported, an error will be returned."
+     ::= { docsIf3CmSpectrumAnalysisCtrlCmd 8 }
+
+docsIf3CmSpectrumAnalysisCtrlCmdNumberOfAverages OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..1000)
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+        "This attribute controls the number of averages 
+        that will be performed on spectral bins.  
+        The average will be computed using the 'leaky integrator'
+        method, where:
+          reported bin value = alpha*accumulated bin values + 
+                               (1-alpha)*current bin value.  
+        
+        Alpha is one minus the reciprocal of the number of averages.
+        For example, if N=25, then alpha = 0.96.  
+        A value of 1 indicates no averaging.  
+        Re-writing the number of averages will restart the averaging
+        process.  If there are no accumulated values, the 
+        accumulators are made equal to the first measured bin 
+        amplitudes.
+
+        If an attempt is made to set the attribute to an unsupported 
+        number of averages, an error will be returned."
+     DEFVAL { 1 }
+     ::= { docsIf3CmSpectrumAnalysisCtrlCmd 9 }
+
+-- Note: This set of CtrlCmd objects is extended.
+-- The DOCS-PNM-MIB adds the following object id definitions:
+-- docsIf3CmSpectrumAnalysisCtrlCmdFileName   ::= 
+--                      { docsIf3CmSpectrumAnalysisCtrlCmd 10 }
+-- docsIf3CmSpectrumAnalysisCtrlCmdFileEnable ::= 
+--                      { docsIf3CmSpectrumAnalysisCtrlCmd 11 }
+-- docsIf3CmSpectrumAnalysisCtrlCmdMeasStatus ::= 
+--                      { docsIf3CmSpectrumAnalysisCtrlCmd 12 }
+
+docsIf3CmSpectrumAnalysisMeasTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DocsIf3CmSpectrumAnalysisMeasEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table provides a list of spectral analysis measurements 
+         as performed across a range of center frequencies. The table 
+         is capable of representing a full scan of the spectrum."
+    ::= { docsIf3MibObjects 35 }
+
+docsIf3CmSpectrumAnalysisMeasEntry OBJECT-TYPE
+    SYNTAX      DocsIf3CmSpectrumAnalysisMeasEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION     
+        "Each row in the docsIf3CmSpectrumAnalysisMeasTable 
+         represents the spectral analysis around a single center 
+         frequency point in the spectrum."
+    INDEX { docsIf3CmSpectrumAnalysisMeasFrequency }
+    ::= { docsIf3CmSpectrumAnalysisMeasTable 1 }
+
+DocsIf3CmSpectrumAnalysisMeasEntry ::= 
+    SEQUENCE    {
+                docsIf3CmSpectrumAnalysisMeasFrequency          Integer32,
+                docsIf3CmSpectrumAnalysisMeasAmplitudeData      AmplitudeData,
+                docsIf3CmSpectrumAnalysisMeasTotalSegmentPower  TenthdB
+                }
+
+docsIf3CmSpectrumAnalysisMeasFrequency OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "This index indicates the center frequency of the spectral
+         analysis span which is represented by this instance."
+     ::= { docsIf3CmSpectrumAnalysisMeasEntry 1 }
+
+docsIf3CmSpectrumAnalysisMeasAmplitudeData OBJECT-TYPE
+     SYNTAX      AmplitudeData
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "This attribute provides a list of the spectral amplitudes as 
+         measured at the center frequency specified by the Frequency
+         index.
+
+         The frequency bins are ordered from lowest to highest 
+         frequencies covering the frequency span. Information about the
+         center frequency, frequency span, number of bins and resolution
+         bandwidth are included to provide context to the measurement 
+         point."
+     ::= { docsIf3CmSpectrumAnalysisMeasEntry 2 }
+
+docsIf3CmSpectrumAnalysisMeasTotalSegmentPower OBJECT-TYPE
+     SYNTAX      TenthdB 
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+        "This attribute provides the total RF power present in the 
+         segment with the center frequency equal to the Frequency index
+         and the span equal to the SegmentFrequencySpan. The value 
+         represents the sum of the spectrum power in all of the 
+         associated bins. The value is computed by summing power (not 
+         dB) values and converting the final sum to TenthdB."
+     ::= { docsIf3CmSpectrumAnalysisMeasEntry 3 }
+
+docsIf3CmtsCmEmStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DocsIf3CmtsCmEmStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table defines Energy Management mode statistics for the
+         CM as reported by the CMTS.  For example, such metrics can
+         provide insight into configuration of appropriate EM 1x1 Mode
+         Activity Detection thresholds on the CM and/or to get feedback
+         on how/if the current thresholds are working well or are 
+         causing user experience issues."
+    ::= { docsIf3MibObjects 36 }
+
+docsIf3CmtsCmEmStatsEntry OBJECT-TYPE
+    SYNTAX      DocsIf3CmtsCmEmStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION     
+        "The conceptual row of docsIf3CmtsCmEmStatsTable."
+    INDEX { docsIf3CmtsCmRegStatusId }
+    ::= { docsIf3CmtsCmEmStatsTable 1 }
+
+DocsIf3CmtsCmEmStatsEntry ::= 
+    SEQUENCE    {
+                docsIf3CmtsCmEmStatsEm1x1ModeTotalDuration    Unsigned32
+                }
+
+docsIf3CmtsCmEmStatsEm1x1ModeTotalDuration OBJECT-TYPE
+     SYNTAX      Unsigned32
+     UNITS       "seconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "This attribute indicates the total time duration, in seconds
+          since registration, the CM identified by 
+          docsIf3CmtsCmRegStatusId has been in Energy Management 1x1 
+          mode, as controlled by the DBC-REQ Energy Management 1x1 
+          Mode Indicator TLV."
+     ::= { docsIf3CmtsCmEmStatsEntry 1 }
+
+docsIf3CmEm1x1StatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DocsIf3CmEm1x1StatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This object defines Energy Management 1x1 mode statistics on
+         the CM to provide insight into configuration of appropriate EM
+         1x1 Mode Activity Detection thresholds and/or to get feedback
+         on how/if the current thresholds are working well or are 
+         causing user experience issues.
+         These statistics are only applicable/valid when the Energy 
+         Management 1x1 mode is enabled in the CM."
+    ::= { docsIf3MibObjects 37 }
+
+docsIf3CmEm1x1StatsEntry OBJECT-TYPE
+    SYNTAX      DocsIf3CmEm1x1StatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION     
+        "The conceptual row of docsIf3CmEm1x1StatsTable.
+         An instance exist for the CM MAC Domain Interface."
+    INDEX { ifIndex }
+    ::= { docsIf3CmEm1x1StatsTable 1 }
+
+DocsIf3CmEm1x1StatsEntry ::= 
+    SEQUENCE    {
+        docsIf3CmEm1x1StatsNumberTimesCrossedBelowUsEntryThrshlds    Unsigned32,
+        docsIf3CmEm1x1StatsNumberTimesCrossedBelowDsEntryThrshlds    Unsigned32,
+        docsIf3CmEm1x1StatsTotalDuration                             Unsigned32,
+        docsIf3CmEm1x1StatsTotalDurationBelowUsThrshlds              Unsigned32,
+        docsIf3CmEm1x1StatsTotalDurationBelowDsThrshlds              Unsigned32,
+        docsIf3CmEm1x1StatsTotalDurationBelowUsDsThrshlds            Unsigned32
+                }
+
+
+docsIf3CmEm1x1StatsNumberTimesCrossedBelowUsEntryThrshlds OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "This attribute indicates the number of times since 
+          registration the CM crossed below the upstream entry bitrate
+          threshold for a number of consecutive seconds equal to or 
+          exceeding the upstream entry time threshold."
+     ::= { docsIf3CmEm1x1StatsEntry 1 }
+
+docsIf3CmEm1x1StatsNumberTimesCrossedBelowDsEntryThrshlds OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "This attribute indicates the number of times since 
+          registration the CM crossed below the downstream entry 
+          bitrate threshold for a number of consecutive seconds equal
+          to or exceeding the downstream entry time threshold."
+     ::= { docsIf3CmEm1x1StatsEntry 2 }
+     
+docsIf3CmEm1x1StatsTotalDuration OBJECT-TYPE
+     SYNTAX      Unsigned32
+     UNITS       "seconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "This attribute indicates the total time duration, in seconds
+          since registration, the CM has been in Energy Management 1x1
+          mode, as controlled by the DBC-REQ Energy Management 1x1 Mode
+          Indicator TLV. This attribute differs from 
+          docsIf3CmEm1x1StatsTotalDurationBelowUsDsThrshlds because it
+          is dependent on effects of the Energy Management Cycle 
+          Period, and processing of EM-REQ/EM-RSP messages and DBC 
+          messages that specifically indicate entry into or exit from
+          Energy Management 1x1 mode."
+     ::= { docsIf3CmEm1x1StatsEntry 3 }
+
+docsIf3CmEm1x1StatsTotalDurationBelowUsThrshlds OBJECT-TYPE
+     SYNTAX      Unsigned32
+     UNITS       "seconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "This attribute indicates the total time duration, in seconds
+          since registration, the CM satisfied upstream conditions for 
+          entry into or remaining in Energy Management 1x1 mode."
+     ::= { docsIf3CmEm1x1StatsEntry 4 }
+     
+docsIf3CmEm1x1StatsTotalDurationBelowDsThrshlds OBJECT-TYPE
+     SYNTAX      Unsigned32
+     UNITS       "seconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "This attribute indicates the total time duration, in seconds
+          since registration, the CM satisfied downstream conditions for 
+          entry into or remaining in Energy Management 1x1 mode."
+     ::= { docsIf3CmEm1x1StatsEntry 5 } 
+     
+docsIf3CmEm1x1StatsTotalDurationBelowUsDsThrshlds OBJECT-TYPE
+     SYNTAX      Unsigned32
+     UNITS       "seconds"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "This attribute indicates the total time duration, in seconds 
+          since registration, the CM, with respect to both upstream and 
+          downstream entry and exit thresholds, satisfied conditions for 
+          entry into and remaining in Energy Management 1x1 mode.  This 
+          attribute differs from docsIf3CmEm1x1StatsTotalDuration 
+          because it is not dependent on effects of the Energy 
+          Management Cycle Period or processing of EM-REQ/EM-RSP 
+          messages and DBC messages that specifically indicate entry
+          into or exit from Energy Management 1x1 mode."
+     ::= { docsIf3CmEm1x1StatsEntry 6 }     
+     
+-- Conformance Definitions
+docsIf3MibConformance OBJECT IDENTIFIER ::= { docsIf3Mib 2 }
+docsIf3MibCompliances OBJECT IDENTIFIER ::= { docsIf3MibConformance 1 }
+docsIf3MibGroups      OBJECT IDENTIFIER ::= { docsIf3MibConformance 2 }
+
+docsIf3CmtsCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the CMTS."
+
+    MODULE -- this MODULE
+    MANDATORY-GROUPS {
+     docsIf3CmtsGroup,
+     docsIf3CmtsNotificationGroup
+     }
+
+    OBJECT docsIf3CmtsCmUsStatusRangingStatus
+    SYNTAX      RangingState 
+    DESCRIPTION
+        "The CMTS does not report 'timeoutT4'."
+    ::= { docsIf3MibCompliances 1 }
+
+docsIf3CmCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the CM."
+
+    MODULE -- this MODULE
+    MANDATORY-GROUPS {
+     docsIf3CmGroup,
+     docsIf3CmNotificationGroup
+     }
+     
+    OBJECT      docsIf3CmSpectrumAnalysisCtrlCmdWindowFunction
+    MIN-ACCESS  read-only
+    DESCRIPTION
+            "This object can be read-only for vendor implementations where the 
+             CM Spectrum Analysis window function is not configurable."
+    ::= { docsIf3MibCompliances 2 }
+
+docsIf3CmtsGroup OBJECT-GROUP
+    OBJECTS {
+     docsIf3SignalQualityExtRxMER,
+     docsIf3SignalQualityExtRxMerSamples,
+     docsIf3MdNodeStatusMdDsSgId,
+     docsIf3MdNodeStatusMdUsSgId,
+     docsIf3MdDsSgStatusChSetId,
+     docsIf3MdUsSgStatusChSetId,
+     docsIf3CmtsSignalQualityExtCNIR,
+     docsIf3CmtsSignalQualityExtExpectedRxSignalPower,
+     docsIf3CmtsSpectrumAnalysisMeasAmplitudeData,
+     docsIf3CmtsSpectrumAnalysisMeasTimeInterval,
+     docsIf3CmtsSpectrumAnalysisMeasRowStatus,
+     docsIf3CmtsCmRegStatusMacAddr,
+     docsIf3CmtsCmRegStatusIPv6Addr,
+     docsIf3CmtsCmRegStatusIPv6LinkLocal,
+     docsIf3CmtsCmRegStatusIPv4Addr,
+     docsIf3CmtsCmRegStatusValue,
+     docsIf3CmtsCmRegStatusMdIfIndex,
+     docsIf3CmtsCmRegStatusMdCmSgId,
+     docsIf3CmtsCmRegStatusRcpId,
+     docsIf3CmtsCmRegStatusRccStatusId,
+     docsIf3CmtsCmRegStatusRcsId,
+     docsIf3CmtsCmRegStatusTcsId,
+     docsIf3CmtsCmRegStatusQosVersion,
+     docsIf3CmtsCmRegStatusLastRegTime,
+     docsIf3CmtsCmRegStatusAddrResolutionReqs,
+     docsIf3CmtsCmRegStatusEnergyMgtEnabled,
+     docsIf3CmtsCmRegStatusEnergyMgtOperStatus,
+     docsIf3CmtsCmUsStatusModulationType,
+     docsIf3CmtsCmUsStatusRxPower,
+     docsIf3CmtsCmUsStatusSignalNoise,
+     docsIf3CmtsCmUsStatusMicroreflections,
+     docsIf3CmtsCmUsStatusEqData,
+     docsIf3CmtsCmUsStatusUnerroreds,
+     docsIf3CmtsCmUsStatusCorrecteds,
+     docsIf3CmtsCmUsStatusUncorrectables,
+     docsIf3CmtsCmUsStatusHighResolutionTimingOffset,
+     docsIf3CmtsCmUsStatusIsMuted,
+     docsIf3CmtsCmUsStatusRangingStatus,
+     docsIf3UsChExtSacCodeHoppingSelectionMode,
+     docsIf3UsChExtScdmaSelectionStringActiveCodes,
+     docsIf3MdCfgMddInterval,
+     docsIf3MdCfgIpProvMode,
+     docsIf3MdCfgCmStatusEvCtlEnabled,
+     docsIf3MdCfgUsFreqRange,
+     docsIf3MdCfgMcastDsidFwdEnabled,
+     docsIf3MdCfgMultRxChModeEnabled,
+     docsIf3MdCfgMultTxChModeEnabled,
+     docsIf3MdCfgEarlyAuthEncrCtrl,
+     docsIf3MdCfgTftpProxyEnabled,
+     docsIf3MdCfgSrcAddrVerifEnabled,
+     docsIf3MdCfgDownChannelAnnex,
+     docsIf3MdCfgCmUdcEnabled,
+     docsIf3MdCfgSendUdcRulesEnabled,
+     docsIf3MdCfgServiceTypeIdList,
+     docsIf3MdCfgBpi2EnforceCtrl,
+     docsIf3MdCfgEnergyMgt1x1Enabled,
+     docsIf3MdChCfgIsPriCapableDs,
+     docsIf3MdChCfgChId,
+     docsIf3MdChCfgSfProvAttrMask,
+     docsIf3MdChCfgRowStatus,
+     docsIf3MdUsToDsChMappingMdIfIndex,
+     docsIf3DsChSetChList,
+     docsIf3UsChSetChList,
+     docsIf3BondingGrpCfgChList,
+     docsIf3BondingGrpCfgSfProvAttrMask,
+     docsIf3BondingGrpCfgDsidReseqWaitTime,
+     docsIf3BondingGrpCfgDsidReseqWarnThrshld,
+     docsIf3BondingGrpCfgRowStatus,
+     docsIf3DsBondingGrpStatusMdDsSgId,
+     docsIf3DsBondingGrpStatusCfgId,
+     docsIf3UsBondingGrpStatusMdUsSgId,
+     docsIf3UsBondingGrpStatusCfgId,
+     docsIf3RccStatusRccCfgId,
+     docsIf3RccStatusValidityCode,
+     docsIf3RccStatusValidityCodeText,
+     docsIf3RxChStatusChIfIndex,
+     docsIf3RxChStatusPrimaryDsIndicator,
+     docsIf3RxChStatusRcRmConnectivityId,
+     docsIf3RxModuleStatusRmRmConnectivityId,
+     docsIf3RxModuleStatusFirstCenterFrequency,
+     docsIf3CmtsCmCtrlCmdMacAddr,
+     docsIf3CmtsCmCtrlCmdMuteUsChId,
+     docsIf3CmtsCmCtrlCmdMuteInterval,
+     docsIf3CmtsCmCtrlCmdDisableForwarding,
+     docsIf3CmtsCmCtrlCmdCommit,
+     docsIf3CmtsEventCtrlStatus,
+     docsIf3CmtsCmEmStatsEm1x1ModeTotalDuration
+     }
+    STATUS      current
+    DESCRIPTION
+         "Group of objects implemented in a DOCSIS 3.0 CMTS"
+    ::= { docsIf3MibGroups 1 }
+
+docsIf3CmGroup OBJECT-GROUP
+    OBJECTS {
+     docsIf3SignalQualityExtRxMER,
+     docsIf3SignalQualityExtRxMerSamples,
+     docsIf3CmStatusValue,
+     docsIf3CmStatusCode,
+     docsIf3CmStatusResets,
+     docsIf3CmStatusLostSyncs,
+     docsIf3CmStatusInvalidMaps,
+     docsIf3CmStatusInvalidUcds,
+     docsIf3CmStatusInvalidRangingRsps,
+     docsIf3CmStatusInvalidRegRsps,
+     docsIf3CmStatusT1Timeouts,
+     docsIf3CmStatusT2Timeouts,
+     docsIf3CmStatusEnergyMgt1x1OperStatus,
+     docsIf3CmStatusUsTxPower,
+     docsIf3CmStatusUsT3Timeouts,
+     docsIf3CmStatusUsT4Timeouts,
+     docsIf3CmStatusUsRangingAborteds,
+     docsIf3CmStatusUsModulationType,
+     docsIf3CmStatusUsEqData,
+     docsIf3CmStatusUsT3Exceededs,
+     docsIf3CmStatusUsIsMuted,
+     docsIf3CmStatusUsRangingStatus,
+     docsIf3CmCapabilitiesReq,
+     docsIf3CmCapabilitiesRsp,
+     docsIf3UsChExtSacCodeHoppingSelectionMode,
+     docsIf3UsChExtScdmaSelectionStringActiveCodes,
+     docsIf3RxChStatusChIfIndex,
+     docsIf3RxChStatusPrimaryDsIndicator,
+     docsIf3RxChStatusRcRmConnectivityId,
+     docsIf3RxModuleStatusRmRmConnectivityId,
+     docsIf3RxModuleStatusFirstCenterFrequency,
+     docsIf3CmDpvStatsLastMeasLatency,
+     docsIf3CmDpvStatsLastMeasTime,
+     docsIf3CmDpvStatsMinLatency,
+     docsIf3CmDpvStatsMaxLatency,
+     docsIf3CmDpvStatsAvgLatency,
+     docsIf3CmDpvStatsNumMeas,
+     docsIf3CmDpvStatsLastClearTime,
+     docsIf3CmEventCtrlStatus,
+     docsIf3CmMdCfgIpProvMode,
+     docsIf3CmMdCfgIpProvModeResetOnChange,
+     docsIf3CmMdCfgIpProvModeResetOnChangeHoldOffTimer,
+     docsIf3CmMdCfgIpProvModeStorageType,
+     docsIf3CmEnergyMgtCfgFeatureEnabled,
+     docsIf3CmEnergyMgtCfgCyclePeriod,
+     docsIf3CmEnergyMgt1x1CfgDirection,
+     docsIf3CmEnergyMgt1x1CfgEntryBitrateThrshld,
+     docsIf3CmEnergyMgt1x1CfgEntryTimeThrshld,
+     docsIf3CmEnergyMgt1x1CfgExitBitrateThrshld,
+     docsIf3CmEnergyMgt1x1CfgExitTimeThrshld,
+     docsIf3CmSpectrumAnalysisCtrlCmdEnable,
+     docsIf3CmSpectrumAnalysisCtrlCmdInactivityTimeout,
+     docsIf3CmSpectrumAnalysisCtrlCmdFirstSegmentCenterFrequency,
+     docsIf3CmSpectrumAnalysisCtrlCmdLastSegmentCenterFrequency,
+     docsIf3CmSpectrumAnalysisCtrlCmdSegmentFrequencySpan,
+     docsIf3CmSpectrumAnalysisCtrlCmdNumBinsPerSegment,
+     docsIf3CmSpectrumAnalysisCtrlCmdEquivalentNoiseBandwidth,
+     docsIf3CmSpectrumAnalysisCtrlCmdWindowFunction,
+     docsIf3CmSpectrumAnalysisCtrlCmdNumberOfAverages,
+     docsIf3CmSpectrumAnalysisMeasAmplitudeData,
+     docsIf3CmSpectrumAnalysisMeasTotalSegmentPower,
+     docsIf3CmEm1x1StatsNumberTimesCrossedBelowUsEntryThrshlds,
+     docsIf3CmEm1x1StatsNumberTimesCrossedBelowDsEntryThrshlds,
+     docsIf3CmEm1x1StatsTotalDuration,
+     docsIf3CmEm1x1StatsTotalDurationBelowUsThrshlds,
+     docsIf3CmEm1x1StatsTotalDurationBelowDsThrshlds,
+     docsIf3CmEm1x1StatsTotalDurationBelowUsDsThrshlds
+     }
+    STATUS      current
+    DESCRIPTION
+         "Group of objects implemented in a DOCSIS 3.0 CM"
+    ::= { docsIf3MibGroups 2 }
+
+docsIf3CmtsNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            docsIf3CmtsEventNotif
+            }
+        STATUS    current
+        DESCRIPTION
+            "CMTS is required to support notifications in this group"
+        ::= { docsIf3MibGroups 3 }
+
+docsIf3CmNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            docsIf3CmEventNotif
+            }
+        STATUS    current
+        DESCRIPTION
+            "CM is required to support notifications in this group"
+        ::= { docsIf3MibGroups 4 }
+
+docsIf3ObsoleteGroup OBJECT-GROUP
+    OBJECTS {
+     docsIf3RccCfgVendorSpecific,
+     docsIf3RccCfgDescription,
+     docsIf3RccCfgRowStatus,
+     docsIf3RxChCfgChIfIndex,
+     docsIf3RxChCfgPrimaryDsIndicator,
+     docsIf3RxChCfgRcRmConnectivityId,
+     docsIf3RxChCfgRowStatus,
+     docsIf3RxModuleCfgRmRmConnectivityId,
+     docsIf3RxModuleCfgFirstCenterFrequency,
+     docsIf3RxModuleCfgRowStatus,
+     docsIf3CmStatusUCCsSuccesses,
+     docsIf3CmStatusUCCFails
+     }
+    STATUS      obsolete
+    DESCRIPTION
+         "Group of objects not implemented on or for DOCSIS 3.1 devices."
+    ::= { docsIf3MibGroups 5 }
+
+
+END

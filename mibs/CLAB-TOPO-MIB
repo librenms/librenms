@@ -1,0 +1,234 @@
+CLAB-TOPO-MIB DEFINITIONS ::= BEGIN
+  IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE
+             FROM SNMPv2-SMI         -- RFC 2578
+    TEXTUAL-CONVENTION,
+    RowStatus
+             FROM SNMPv2-TC          -- RFC 2579
+    OBJECT-GROUP,
+    MODULE-COMPLIANCE
+             FROM SNMPv2-CONF        -- RFC 2580
+    SnmpAdminString
+             FROM SNMP-FRAMEWORK-MIB -- RFC 3411
+    InterfaceIndex
+             FROM IF-MIB             -- RFC 2863
+    clabCommonMibs
+             FROM CLAB-DEF-MIB;
+
+clabTopoMib MODULE-IDENTITY
+     LAST-UPDATED    "201706150000Z" -- June 15, 2017
+     ORGANIZATION    "Cable Television Laboratories, Inc."
+     CONTACT-INFO
+         "
+         Postal: Cable Television Laboratories, Inc.
+         858 Coal Creek Circle
+         Louisville, Colorado 80027-9750
+         U.S.A.
+         Phone: +1 303-661-9100
+         Fax:   +1 303-661-9199
+         E-mail: mibs@cablelabs.com"
+     DESCRIPTION
+         "Licensed under the Apache License, Version 2.0 (the 'License');
+         you may not use this file except in compliance with the License.
+         You may obtain a copy of the License at:
+ 
+             http://www.apache.org/licenses/LICENSE-2.0
+ 
+         Unless required by applicable law or agreed to in writing, software
+         distributed under the License is distributed on an 'AS IS' BASIS,
+         WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or 
+         implied.
+
+         See the License for the specific language governing permissions and
+         limitations under the License.
+
+         This MIB module contains the management objects for the
+         management of fiber nodes in the Cable plant.
+         Copyright 2006-2017 Cable Television Laboratories, Inc.
+         All rights reserved."
+     REVISION    "201706150000Z" -- June 15, 2017
+     DESCRIPTION
+         "Revised Version includes ECN
+         CLAB-TOPO-MIB-N-17.0161-1 to add Apache License."
+     REVISION    "200901210000Z" -- January 21, 2009
+     DESCRIPTION
+         "Revised Version includes ECNs
+         OSSIv3.0-N-08.0651-3
+         OSSIv3.0-N-08.0700-4
+         and published as I08"
+     REVISION        "200612071700Z" -- Dec 7, 2006
+     DESCRIPTION
+        "Initial version, published as part of the CableLabs
+        OSSIv3.0 specification CM-SP-OSSIv3.0-I01-061207
+        Copyright 1999-2009 Cable Television Laboratories, Inc.
+        All rights reserved."
+     ::= { clabCommonMibs 2 }
+
+-- Textual Conventions
+
+NodeName ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+        "This data type is a human readable string that represents
+        the name of a fiber node. Internationalization is supported
+        by conforming to the SNMP textual convention SnmpAdminString.
+        The US-ASCII control characters (0x00 – 0x1F), the DEL
+        Character (0x7F), and the double-quote mark (0x22) are 
+        prohibited within the syntax of this data type."
+     REFERENCE
+        "RFC 3411."
+     SYNTAX      OCTET STRING (SIZE(0..64))
+
+-- Object Definitions
+clabTopoMibObjects  OBJECT IDENTIFIER ::= { clabTopoMib 1 }
+
+clabTopoFiberNodeCfgTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF ClabTopoFiberNodeCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object defines the cable HFC plant Fiber Nodes
+        known at a CMTS.
+        This object supports the creation and deletion of multiple
+        instances."
+     ::= { clabTopoMibObjects 1}
+
+clabTopoFiberNodeCfgEntry OBJECT-TYPE
+     SYNTAX      ClabTopoFiberNodeCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of clabTopoFiberNodeCfg.
+         The CMTS persists all instances of FiberNodeCfg
+         across reinitializations."
+     INDEX { 
+             clabTopoFiberNodeCfgNodeName
+           }
+     ::= { clabTopoFiberNodeCfgTable 1 }
+
+ClabTopoFiberNodeCfgEntry ::= SEQUENCE {
+     clabTopoFiberNodeCfgNodeName
+                  NodeName,
+     clabTopoFiberNodeCfgNodeDescr
+                  SnmpAdminString,
+     clabTopoFiberNodeCfgRowStatus
+                  RowStatus
+     }
+
+clabTopoFiberNodeCfgNodeName OBJECT-TYPE
+     SYNTAX      NodeName (SIZE (1..64))
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents a human-readable name for a fiber
+        node."
+     REFERENCE
+        "DOCSIS 3.0 MAC and Upper Layer Protocols Interface
+         Specification CM-SP-MULPIv3.0-I01-060804, RF Topology 
+         Configuration section."
+     ::= { clabTopoFiberNodeCfgEntry 1 }
+
+clabTopoFiberNodeCfgNodeDescr OBJECT-TYPE
+     SYNTAX      SnmpAdminString
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "Administratively configured human-readable description
+        of the fiber node"
+     DEFVAL { ''H }
+     ::= { clabTopoFiberNodeCfgEntry 2 }
+
+clabTopoFiberNodeCfgRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The status of this instance."
+     ::= { clabTopoFiberNodeCfgEntry 3 }
+
+clabTopoChFnCfgTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF ClabTopoChFnCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This object defines the RF topology by defining the
+        connectivity of a CMTS's downstream and upstream channels
+        to the fiber nodes. Each instance of this object
+        describes connectivity of one downstream or upstream
+        channel with a single fiber node.
+        This object supports the creation and deletion of multiple
+        instances."
+     ::= { clabTopoMibObjects 2}
+
+clabTopoChFnCfgEntry OBJECT-TYPE
+     SYNTAX      ClabTopoChFnCfgEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "The conceptual row of clabTopoChFnCfg.
+          The CMTS persists all instances of ChFnCfg
+          across reinitializations."
+     INDEX { 
+             clabTopoFiberNodeCfgNodeName, 
+             clabTopoChFnCfgChIfIndex
+           }
+     ::= { clabTopoChFnCfgTable 1 }
+
+ClabTopoChFnCfgEntry ::= SEQUENCE {
+     clabTopoChFnCfgChIfIndex
+                  InterfaceIndex,
+     clabTopoChFnCfgRowStatus
+                  RowStatus
+     }
+
+clabTopoChFnCfgChIfIndex OBJECT-TYPE
+     SYNTAX      InterfaceIndex
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+        "This key represents the interface index of an upstream
+        or downstream channel associated with this fiber
+        node. In the upstream direction, only ifIndices
+        docsCableUpstream channels are reflected."
+     ::= { clabTopoChFnCfgEntry 1 }
+
+clabTopoChFnCfgRowStatus OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+        "The status of this instance."
+     ::= { clabTopoChFnCfgEntry 2 }
+
+-- Conformance Definitions
+clabTopoMibConformance OBJECT IDENTIFIER ::= { clabTopoMib 2 }
+clabTopoMibCompliances OBJECT IDENTIFIER
+                              ::= { clabTopoMibConformance 1 }
+clabTopoMibGroups      OBJECT IDENTIFIER
+                              ::= { clabTopoMibConformance 2 }
+
+clabTopoCompliance MODULE-COMPLIANCE
+STATUS      current
+DESCRIPTION
+        "The compliance statement for devices that implement the
+         CableLabs Topology MIB."
+
+    MODULE -- this MODULE
+MANDATORY-GROUPS {
+     clabTopoGroup
+     }
+::= { clabTopoMibCompliances 1 }
+
+clabTopoGroup OBJECT-GROUP
+    OBJECTS {
+     clabTopoFiberNodeCfgNodeDescr,
+     clabTopoFiberNodeCfgRowStatus,
+     clabTopoChFnCfgRowStatus
+     }
+    STATUS      current
+    DESCRIPTION
+         "Group of objects implemented in the CMTS."
+    ::= { clabTopoMibGroups 1 }
+END
+
