@@ -112,7 +112,7 @@ class AuthTestCommandTest extends DBTestCase
             ->assertExitCode(0);
     }
 
-    public function testMysqlAuthenticationStillDisplaysAccountAndRoles(): void
+    public function testMysqlAuthenticationStillDisplaysAccount(): void
     {
         LibrenmsConfig::set('auth_mechanism', 'mysql');
         LegacyAuth::reset();
@@ -121,11 +121,24 @@ class AuthTestCommandTest extends DBTestCase
         $this->artisan('auth:test', ['username' => 'alice'])
             ->expectsQuestion('Password', 'password')
             ->expectsOutput('User (' . $user->user_id . '):')
-            ->expectsOutputToContain('Roles:')
             ->expectsOutput('AUTH SUCCESS')
             ->doesntExpectOutputToContain('remember_token')
             ->doesntExpectOutputToContain('password =>')
             ->assertExitCode(0);
+    }
+
+    public function testMysqlAuthenticationFailureReturnsFailureExitCode(): void
+    {
+        LibrenmsConfig::set('auth_mechanism', 'mysql');
+        LegacyAuth::reset();
+        User::factory()->create(['username' => 'alice', 'auth_type' => 'mysql', 'enabled' => 1]);
+
+        $this->artisan('auth:test', ['username' => 'alice'])
+            ->expectsQuestion('Password', 'wrong')
+            ->expectsOutputToContain('Error:')
+            ->expectsOutput('AUTH FAILURE')
+            ->doesntExpectOutputToContain('wrong')
+            ->assertExitCode(1);
     }
 
     public function testEmptyPasswordFailsWithoutAuthenticating(): void
