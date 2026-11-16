@@ -21,7 +21,7 @@
                         <td class="tw:text-right tw:text-gray-500">{{ $index + 1 }}</td>
                         <td>
                             <a href="{{ route('device', ['device' => $sensor->device_id]) }}" class="tw:text-inherit tw:no-underline hover:tw:underline">
-                                {{ $sensor->device?->displayName() ?? __('Unknown device') }}
+                                {{ $sensor->device?->display ?? __('Unknown device') }}
                             </a>
                         </td>
                         <td>
@@ -69,7 +69,7 @@
                                                                     <div class="tw:text-2xl tw:font-semibold tw:leading-tight">
                                                                         <a href="{{ $graphUrl }}" class="tw:block tw:w-full tw:no-underline tw:hover:no-underline">{{ $sensor->formatValue() }}</a>
                                                                     </div>
-                                                                    <div class="tw:text-xl tw-font-semibold tw-leading-tight tw:text-right"><a href="{{ $deviceUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline tw:dark:text-gray-500">{{ $sensor->device?->displayName() ?? __('Unknown device') }}</a>
+                                                                    <div class="tw:text-xl tw-font-semibold tw-leading-tight tw:text-right"><a href="{{ $deviceUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline tw:dark:text-gray-500">{{ $sensor->device?->display ?? __('Unknown device') }}</a>
                                                                     </div>
                                                                 </div>
                                                                 <div class="tw:mt-2 tw:h-3 tw:w-full tw:rounded tw:bg-black/10 tw:dark:bg-black/40 tw:overflow-hidden">
@@ -82,7 +82,7 @@
                     <div class="col-sm-{{ $colWidth }}">
                         <div class="tw:mb-3 tw:pt-1.5">
                             <div class="tw:text-center tw:text-base tw:font-bold tw:dark:text-gray-500">
-                                <a href="{{ $graphUrl }}" class="tw:no-underline tw:hover:no-underline">{{ \Str::limit($sensor->sensor_descr, 42) }}</a> - <a href="{{ $deviceUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline tw:dark:text-gray-500">{{ $sensor->device?->displayName() ?? __('Unknown device') }}</a>
+                                <a href="{{ $graphUrl }}" class="tw:no-underline tw:hover:no-underline">{{ \Str::limit($sensor->sensor_descr, 42) }}</a> - <a href="{{ $deviceUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline tw:dark:text-gray-500">{{ $sensor->device?->display ?? __('Unknown device') }}</a>
                             </div>
                             <div
                                 id="health-gauge-{{ $id }}-{{ $sensor->sensor_id }}"
@@ -98,7 +98,7 @@
                 <div class="col-sm-{{ $colWidth }}">
                     <div class="tw:mb-3 tw:rounded tw:border tw:border-black/10 tw:dark:border-black/60 tw:bg-black/5 tw:dark:bg-[#3e444c] tw:p-2">
                         <div class="tw:text-center tw:text-base tw:font-medium tw:dark:text-gray-700 tw:dark:text-gray-300">
-                            <a href="{{ $graphUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline tw:dark:text-gray-500">{{ \Str::limit($sensor->sensor_descr, 52) }}</a> - <a href="{{ $deviceUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline tw:dark:text-gray-500">{{ $sensor->device?->displayName() ?? __('Unknown device') }}</a>
+                            <a href="{{ $graphUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline tw:dark:text-gray-500">{{ \Str::limit($sensor->sensor_descr, 52) }}</a> - <a href="{{ $deviceUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline tw:dark:text-gray-500">{{ $sensor->device?->display ?? __('Unknown device') }}</a>
                         </div>
                         <x-graph
                             :type="$graphType"
@@ -129,7 +129,7 @@
                         </a>
                         <div class="tw:mt-1.5 tw:w-full tw:text-center tw:text-sm tw:text-gray-500">
                             <a href="{{ $deviceUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline">
-                                {{ $sensor->device?->displayName() ?? __('Unknown device') }}
+                                {{ $sensor->device?->display ?? __('Unknown device') }}
                             </a>
                         </div>
                     </div>

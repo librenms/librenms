@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "mrv-od",
-                    "type": "network",
+                    "type": "optical",
                     "serial": "012345EMF8K0",
                     "icon": "mrv.png"
                 }

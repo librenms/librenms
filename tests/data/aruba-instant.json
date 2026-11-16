@@ -4624,7 +4624,16 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.14823.2.3.3.1.2.1.1.7.112.58.14.201.194.70",
+                    "processor_index": "703a0ec9c246",
+                    "processor_type": "aruba-instant",
+                    "processor_usage": 9,
+                    "processor_descr": "CNBJHMV0WN",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                },
+                {
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.3.3.1.2.1.1.7.104.40.207.199.233.192",
                     "processor_index": "6828cfc7e9c0",
@@ -4635,24 +4644,12 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.3.3.1.2.1.1.7.104.40.207.200.4.72",
                     "processor_index": "6828cfc80448",
                     "processor_type": "aruba-instant",
                     "processor_usage": 5,
                     "processor_descr": "PHRCKYJ4N1",
-                    "processor_precision": 1,
-                    "processor_perc_warn": 75
-                },
-                {
-                    "entPhysicalIndex": 0,
-                    "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.14823.2.3.3.1.2.1.1.7.112.58.14.201.194.70",
-                    "processor_index": "703a0ec9c246",
-                    "processor_type": "aruba-instant",
-                    "processor_usage": 9,
-                    "processor_descr": "CNBJHMV0WN",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }

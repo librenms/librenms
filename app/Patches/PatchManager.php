@@ -34,6 +34,7 @@ namespace App\Patches;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\Binaries;
 use LibreNMS\Util\Http;
 use Symfony\Component\Process\Process;
 
@@ -43,11 +44,11 @@ use Symfony\Component\Process\Process;
  */
 class PatchManager
 {
-    private const DIFF_URL = 'https://github.com/librenms/librenms/pull/%d.diff';
-    private const RAW_URL = 'https://raw.githubusercontent.com/librenms/librenms/%s/%s';
+    private const string DIFF_URL = 'https://github.com/librenms/librenms/pull/%d.diff';
+    private const string RAW_URL = 'https://raw.githubusercontent.com/librenms/librenms/%s/%s';
 
     /** Directories cleaned of untracked files by reset() */
-    private const RESET_DIRS = ['app/', 'bootstrap/', 'database/', 'doc/', 'html/', 'includes/', 'LibreNMS/', 'licenses/', 'misc/', 'mibs/', 'resources/', 'routes/', 'scripts/', 'tests/'];
+    private const array RESET_DIRS = ['app/', 'bootstrap/', 'database/', 'doc/', 'html/', 'includes/', 'LibreNMS/', 'licenses/', 'misc/', 'mibs/', 'resources/', 'routes/', 'scripts/', 'tests/'];
 
     private readonly string $baseDir;
     private readonly string $storageDir;
@@ -57,6 +58,7 @@ class PatchManager
     private ?array $patches = null;
 
     public function __construct(
+        private readonly Binaries $binaries,
         ?string $baseDir = null,
         ?string $storageDir = null,
         ?string $apiUrl = null,
@@ -629,7 +631,7 @@ class PatchManager
         $dir ??= $this->baseDir;
 
         // GIT_CEILING_DIRECTORIES: installs without .git (docker) must not pick up a repository in a parent directory
-        $process = new Process(['git', ...$args], $dir, ['GIT_TERMINAL_PROMPT' => '0', 'GIT_CEILING_DIRECTORIES' => dirname($dir)]);
+        $process = new Process([$this->binaries->path('git'), ...$args], $dir, ['GIT_TERMINAL_PROMPT' => '0', 'GIT_CEILING_DIRECTORIES' => dirname($dir)]);
         $process->setInput($input);
         $process->run();
 

@@ -18,7 +18,7 @@ class PortGroupPortsController extends Controller
      *
      * @var array<string, string>
      */
-    private const SORT_FIELDS = [
+    private const array SORT_FIELDS = [
         'device' => 'device',
         'ifName' => 'ifName',
         'ifOperStatus' => 'ifOperStatus',
@@ -26,7 +26,7 @@ class PortGroupPortsController extends Controller
         'ifAlias' => 'ifAlias',
     ];
 
-    private const MEMBERSHIP = ['members', 'available', 'all'];
+    private const array MEMBERSHIP = ['members', 'available', 'all'];
 
     public function index(Request $request, PortGroup $portGroup): View
     {

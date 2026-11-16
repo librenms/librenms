@@ -19,7 +19,7 @@
         <label for="device-{{ $id }}" class="control-label">{{ __('Device') }}</label>
         <select class="form-control" id="device-{{ $id }}" name="device" data-placeholder="{{ __('All Devices') }}">
             @if($device)
-                <option value="{{ $device->device_id }}">{{ $device->displayName() }}</option>
+                <option value="{{ $device->device_id }}">{{ $device->display }}</option>
             @endif
         </select>
     </div>
@@ -72,7 +72,7 @@
 @section('javascript')
     <script type="application/javascript">
         init_select2('#device-{{ $id }}', 'device', {limit: 100}, '{{ $device ? $device->device_id : '' }}');
-        init_select2('#stream-{{ $id }}', 'graylog-streams', {}, '{{ $stream }}');
+        init_select2('#stream-{{ $id }}', 'graylog-streams', {}, @json($stream ?: ''));
 
         $('#hidenavigation-{{ $id }}')
             .bootstrapSwitch('offColor','danger')

@@ -3234,7 +3234,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.5.9",
                     "processor_index": "9",
@@ -3819,6 +3818,57 @@
                     "context_name": "",
                     "ipv4_network": "192.168.250.64/27",
                     "ifIndex": 19
+                }
+            ]
+        }
+    },
+    "fdb-table": {
+        "discovery": {
+            "ports_fdb": [
+                {
+                    "mac_address": "bcc493cc60b0",
+                    "vlan": 1,
+                    "ifIndex": 4
+                },
+                {
+                    "mac_address": "ecbd1dcec508",
+                    "vlan": 1,
+                    "ifIndex": 4
+                },
+                {
+                    "mac_address": "f4cfe2ffb9d4",
+                    "vlan": 1,
+                    "ifIndex": 4
+                },
+                {
+                    "mac_address": "bcc493cc60b0",
+                    "vlan": 99,
+                    "ifIndex": 4
+                },
+                {
+                    "mac_address": "bcc493cc60c1",
+                    "vlan": 99,
+                    "ifIndex": 4
+                },
+                {
+                    "mac_address": "ecbd1dcec508",
+                    "vlan": 99,
+                    "ifIndex": 4
+                },
+                {
+                    "mac_address": "f4cfe2ffb9d4",
+                    "vlan": 99,
+                    "ifIndex": 4
+                },
+                {
+                    "mac_address": "bc9911aa77e2",
+                    "vlan": 600,
+                    "ifIndex": 4
+                },
+                {
+                    "mac_address": "bcc493cc60b0",
+                    "vlan": 600,
+                    "ifIndex": 4
                 }
             ]
         }

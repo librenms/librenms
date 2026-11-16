@@ -31,14 +31,13 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Observers\DeviceObserver;
+use Illuminate\Support\Str;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Compare;
 use LibreNMS\Util\Number;
@@ -56,18 +55,35 @@ class Core implements Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    /**
+     * ICMP alone is enough to poll uptime and availability.
+     */
+    public function pollingMethods(Device $device): array
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return [PollingMethodType::Snmp, PollingMethodType::Icmp];
+    }
+
+    public function shouldDiscover(OS $os): bool
+    {
+        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp);
     }
 
     public function discover(OS $os): void
     {
-        $snmpdata = SnmpQuery::numeric()->get([
+        $response = SnmpQuery::numeric()->get([
             'SNMPv2-MIB::sysObjectID.0',
             'SNMPv2-MIB::sysDescr.0',
             'SNMPv2-MIB::sysName.0',
-        ])->values();
+        ]);
+
+        if ($response->hasConnectionError()) {
+            // device stopped answering after shouldDiscover(), keep what we have like poll() does
+            Log::warning('Core discovery: SNMP connection error, keeping os ' . $os->getDevice()->os);
+
+            return;
+        }
+
+        $snmpdata = $response->values();
 
         $snmp_engine = SnmpQuery::get('SNMP-FRAMEWORK-MIB::snmpEngineID.0')->value();
 
@@ -100,9 +116,9 @@ class Core implements Module
         }
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldPoll(OS $os): bool
     {
-        return $status->isEnabled() && ($connectivity->snmpIsAvailable() || $connectivity->icmpIsEnabled());
+        return $os->getMethodResults()->isAvailable(PollingMethodType::Snmp) || $os->getDevice()->polling()->isEnabled(PollingMethodType::Icmp);
     }
 
     public function poll(OS $os, DataStorageInterface $datastore): void
@@ -286,11 +302,11 @@ class Core implements Module
                     return false;
                 }
             } elseif ($key === 'sysDescr_regex') {
-                if (preg_match_any($sysDescr, $value) === $check) {
+                if (Str::isMatch($value, $sysDescr) === $check) {
                     return false;
                 }
             } elseif ($key === 'sysObjectID_regex') {
-                if (preg_match_any($sysObjectID, $value) === $check) {
+                if (Str::isMatch($value, $sysObjectID) === $check) {
                     return false;
                 }
             } elseif ($key === 'snmpget') {

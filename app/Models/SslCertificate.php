@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use AcmePhp\Ssl\Exception\CertificateParsingException;
+use App\Facades\LibrenmsConfig;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -145,6 +146,16 @@ class SslCertificate extends Model
     }
 
     /**
+     * Check whether the certificate is within the configured warning expiry window.
+     */
+    public function isWithinWarningWindow(): bool
+    {
+        $warning = (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_warning', 30);
+
+        return $this->expiresWithinDays($warning);
+    }
+
+    /**
      * Get a formatted string of changes for tracked attributes.
      */
     public function getTrackedChanges(): string
@@ -152,18 +163,34 @@ class SslCertificate extends Model
         $dirty = $this->getDirty();
         $parts = [];
         $fields = ['subject', 'issuer', 'valid_to', 'valid_from', 'fingerprint', 'days_until_expiry'];
+        $warning = (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_warning', 30);
+        $danger = (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_danger', 0);
 
         foreach ($fields as $field) {
-            if (array_key_exists($field, $dirty)) {
-                $o = $this->getOriginal($field);
-                $n = $this->getAttribute($field);
-
-                $oStr = $o instanceof \DateTimeInterface ? $o->format('Y-m-d H:i:s') : (string) $o;
-                $nStr = $n instanceof \DateTimeInterface ? $n->format('Y-m-d H:i:s') : (string) $n;
-
-                if ($oStr !== $nStr) {
-                    $parts[] = "{$field} ({$oStr} → {$nStr})";
+            if (! array_key_exists($field, $dirty)) {
+                continue;
+            }
+            if ($field === 'days_until_expiry') {
+                $days = $this->getAttribute($field);
+                $oldDays = $this->getOriginal($field);
+                if (! is_int($days) || ! is_int($oldDays)) {
+                    continue;
                 }
+                $crossedWarning = $oldDays > $warning && $this->isWithinWarningWindow();
+                $crossedDanger = $oldDays > $danger && $days <= $danger;
+                if (! $crossedWarning && ! $crossedDanger) {
+                    continue;
+                }
+            }
+
+            $o = $this->getOriginal($field);
+            $n = $this->getAttribute($field);
+
+            $oStr = $o instanceof \DateTimeInterface ? $o->format('Y-m-d H:i:s') : (string) $o;
+            $nStr = $n instanceof \DateTimeInterface ? $n->format('Y-m-d H:i:s') : (string) $n;
+
+            if ($oStr !== $nStr) {
+                $parts[] = "{$field} ({$oStr} → {$nStr})";
             }
         }
 

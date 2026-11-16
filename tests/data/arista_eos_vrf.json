@@ -5834,7 +5834,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 1,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.1",
                     "processor_index": "1",
@@ -5845,7 +5844,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 2,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.2",
                     "processor_index": "2",
@@ -5856,7 +5854,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 3,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.3",
                     "processor_index": "3",
@@ -7650,15 +7647,18 @@
         "discovery": {
             "vrfs": [
                 {
-                    "vrf_oid": "Mgt",
+                    "vrf_oid": "3.77.103.116",
                     "vrf_name": "Mgt",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": "62003:1",
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "999001"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "entity-physical": {
         "discovery": {

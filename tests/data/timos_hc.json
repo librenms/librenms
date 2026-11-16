@@ -6834,7 +6834,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.6527.3.1.2.1.1.1.0",
                     "processor_index": "0",
@@ -6881,7 +6880,9 @@
                 {
                     "vrf_oid": "1",
                     "vrf_name": "Base",
-                    "bgpLocalAs": 0,
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": "1,2,3,131073,131074,131075"
@@ -6889,7 +6890,9 @@
                 {
                     "vrf_oid": "4093",
                     "vrf_name": "vmhost-management",
-                    "bgpLocalAs": 0,
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": null
@@ -6897,7 +6900,9 @@
                 {
                     "vrf_oid": "4094",
                     "vrf_name": "vpls-management",
-                    "bgpLocalAs": 0,
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": null
@@ -6905,13 +6910,16 @@
                 {
                     "vrf_oid": "4095",
                     "vrf_name": "management",
-                    "bgpLocalAs": 0,
+                    "context_name": null,
+                    "context_verified": false,
+                    "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

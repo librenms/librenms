@@ -15,8 +15,8 @@ class LegacyPageEscapingTest extends TestCase
 {
     use DatabaseTransactions;
 
-    private const PAYLOAD = '<img src=x onerror=alert(1)>';
-    private const ESCAPED = '&lt;img src=x onerror=alert(1)&gt;';
+    private const string PAYLOAD = '<img src=x onerror=alert(1)>';
+    private const string ESCAPED = '&lt;img src=x onerror=alert(1)&gt;';
 
     protected function setUp(): void
     {
@@ -58,7 +58,7 @@ class LegacyPageEscapingTest extends TestCase
             ->assertSee(self::ESCAPED, false);
 
         $this->actingAs($this->admin())
-            ->get('/search/search=packages')
+            ->get(route('device', ['device' => $device, 'tab' => 'packages']))
             ->assertOk()
             ->assertDontSee(self::PAYLOAD, false)
             ->assertSee(self::ESCAPED, false);

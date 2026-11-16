@@ -77,7 +77,6 @@ final class DeviceDataPolicyTest extends TestCase
             'Ospfv3Nbr' => [\App\Models\Ospfv3Nbr::class, 'routing'],
             'Ospfv3Port' => [\App\Models\Ospfv3Port::class, 'routing'],
             'Pseudowire' => [\App\Models\Pseudowire::class, 'routing'],
-            'VrfLite' => [\App\Models\VrfLite::class, 'routing'],
             'Ipv4Address' => [\App\Models\Ipv4Address::class, 'port'],
             'Ipv4Mac' => [\App\Models\Ipv4Mac::class, 'port'],
             'Ipv4Network' => [\App\Models\Ipv4Network::class, 'port'],

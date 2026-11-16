@@ -26,8 +26,8 @@
 
 namespace LibreNMS;
 
-use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
+use LibreNMS\Util\Binaries;
 use Symfony\Component\Process\Process;
 
 class SNMPCapabilities
@@ -98,7 +98,7 @@ class SNMPCapabilities
 
     private static function detectCapabilities(): void
     {
-        $process = new Process([LibrenmsConfig::get('snmpget', 'snmpget'), '--help']);
+        $process = new Process([resolve(Binaries::class)->path('snmpget'), '--help']);
         $process->run();
 
         self::$sha2 = Str::contains($process->getErrorOutput(), 'SHA-512');

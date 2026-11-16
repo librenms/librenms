@@ -530,8 +530,37 @@ export function settingArraySubKeyed() {
             });
         },
 
-        updateSubItem(index, subindex, value) {
-            if (this.subGroups[index][subindex] === value) return;
+        // nested values (such as a saml2 attribute_map) are edited as json
+        isNested(value) {
+            return value !== null && typeof value === "object";
+        },
+
+        displaySubItem(value) {
+            return this.isNested(value) ? JSON.stringify(value) : value;
+        },
+
+        updateSubItem(index, subindex, input) {
+            const current = this.subGroups[index][subindex];
+            let value = input.value;
+
+            if (this.isNested(current)) {
+                try {
+                    value = JSON.parse(value);
+                } catch {
+                    value = undefined;
+                }
+
+                if (!this.isNested(value)) {
+                    input.value = this.displaySubItem(current);
+                    toastr.error("Invalid JSON");
+                    return;
+                }
+
+                if (isEqual(current, value)) return;
+            } else if (current === value) {
+                return;
+            }
+
             this.update((groups) => (groups[index][subindex] = value));
         },
 

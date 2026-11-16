@@ -49,6 +49,11 @@ class PortsSearchController extends GroupedSearchController
                 'url' => Url::portUrl($port),
             ]);
 
-        return [$ports->isEmpty() ? null : ['type' => 'ports', 'label' => __('search.ports'), 'results' => $ports]];
+        return [$ports->isEmpty() ? null : [
+            'type' => 'ports',
+            'label' => __('search.ports'),
+            'url' => route('ports', ['filter' => ['search' => ['contains' => $search]]]),
+            'results' => $ports,
+        ]];
     }
 }

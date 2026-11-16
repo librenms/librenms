@@ -18,7 +18,7 @@ foreach (dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY di
     $graph_array_zoom['from'] = \App\Facades\LibrenmsConfig::get('time.twoday');
     $graph_array_zoom['to'] = \App\Facades\LibrenmsConfig::get('time.now');
 
-    $overlib_link = \LibreNMS\Util\Url::overlibLink($fs_url, $drive['diskio_descr'], \LibreNMS\Util\Url::graphTag($graph_array_zoom));
+    $overlib_link = \LibreNMS\Util\Url::overlibLink($fs_url, e($drive['diskio_descr']), \LibreNMS\Util\Url::graphTag($graph_array_zoom));
 
     $types = [
         'diskio_bits',

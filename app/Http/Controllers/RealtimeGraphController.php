@@ -8,7 +8,7 @@ use Illuminate\Http\Response;
 
 class RealtimeGraphController extends Controller
 {
-    private const DEFAULT_INTERVAL = 1.0;
+    private const float DEFAULT_INTERVAL = 1.0;
 
     public function __invoke(Request $request, Port $port): Response
     {
@@ -35,7 +35,7 @@ class RealtimeGraphController extends Controller
                 'graphDuration' => $interval * $nbPlot,
                 'fetchLink' => route('realtime.data', ['port' => $port->port_id]),
                 'graphTitle' => $title,
-                'deviceName' => $port->device->displayName(),
+                'deviceName' => $port->device->display,
                 'errorText' => "Cannot get data about interface $port->ifIndex",
             ])
             ->header('Content-Type', 'image/svg+xml; charset=UTF-8');

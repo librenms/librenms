@@ -33,6 +33,7 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use LibreNMS\ComposerHelper;
+use LibreNMS\Util\Binaries;
 use LibreNMS\Util\EnvHelper;
 use LibreNMS\Util\Git;
 use LibreNMS\ValidationResult;
@@ -67,7 +68,7 @@ class Updates extends BaseValidation
             $git = Git::make();
             if ($git->commitHash() != $git->remoteHash()) {
                 if (! $git->commitDate()) {
-                    $process = new Process(['git', 'show', '--quiet', '--pretty=%H|%ct'], base_path());
+                    $process = new Process([resolve(Binaries::class)->path('git'), 'show', '--quiet', '--pretty=%H|%ct'], base_path());
                     $process->run();
                     $error = rtrim($process->getErrorOutput());
 

@@ -17,7 +17,6 @@ discovery:
 discovery_modules:
     arp-table: false
     bgp-peers: false
-    cisco-vrf-lite: false
     ports-stack: false
     mempools: false
     discovery-protocols: false

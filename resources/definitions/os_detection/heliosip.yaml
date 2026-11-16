@@ -1,6 +1,6 @@
 os: heliosip
 text: 'Helios IP'
-type: appliance
+type: voice
 icon: 2n
 over:
     - { graph: device_uptime, text: 'Device Uptime' }

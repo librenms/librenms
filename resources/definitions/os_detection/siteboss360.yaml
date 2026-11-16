@@ -1,6 +1,6 @@
 os: siteboss360
 text: 'Asentria SiteBoss'
-type: server
+type: environment
 icon: siteboss
 group: asentria
 mib_dir: asentria

@@ -100,13 +100,7 @@ class Patch
 
     public function changesDependencies(): bool
     {
-        foreach ($this->files as $file) {
-            if (in_array($file['path'], ['composer.json', 'composer.lock'])) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->files, fn ($file) => in_array($file['path'], ['composer.json', 'composer.lock']));
     }
 
     /**

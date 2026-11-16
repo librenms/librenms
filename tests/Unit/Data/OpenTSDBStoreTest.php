@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
@@ -93,6 +94,24 @@ final class OpenTSDBStoreTest extends TestCase
         $mockSocket->shouldReceive('write')
             ->with("put net.testmeasure $this->timestamp 53453.000000 hostname=testhost ifName=testifname type=testtype key=ifOut\n")->once();
         $opentsdb->write($measurement, $fields, $tags, $meta);
+    }
+
+    public function testMetricIdentityTagsReplaceTheDeviceHostname(): void
+    {
+        $mockSocket = \Mockery::mock(\Socket\Raw\Socket::class);
+        $opentsdb = $this->mockOpenTSDB($mockSocket);
+        $meta = ['device' => new Device(['hostname' => 'pve1'])];
+
+        $host = new MetricIdentity('vm.cpu', ['hostname' => 'pve1', 'type' => 'qemu', 'id' => 100]);
+        $cluster = new MetricIdentity('vm.cpu', ['cluster' => 'pve-cluster', 'type' => 'qemu', 'id' => 100]);
+
+        $mockSocket->shouldReceive('write')
+            ->with("put net.vm.cpu $this->timestamp 5.000000 hostname=pve1 type=qemu id=100 key=usage\n")->once();
+        $mockSocket->shouldReceive('write')
+            ->with("put net.vm.cpu $this->timestamp 5.000000 cluster=pve-cluster type=qemu id=100 key=usage\n")->once();
+
+        $opentsdb->write($host->measurement, ['usage' => 5], $host->tags, [...$meta, 'metric' => $host]);
+        $opentsdb->write($cluster->measurement, ['usage' => 5], $cluster->tags, [...$meta, 'metric' => $cluster]);
     }
 
     public function testPortWrite(): void

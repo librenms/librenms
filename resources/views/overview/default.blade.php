@@ -6,6 +6,7 @@
 <div class="container-fluid">
 @include('alerts.modals.ack')
 @include('alerts.modals.notes')
+@include('alerts.modals.details')
 @if (!$bare)
 <div class="row collapse @if(!$hide_dashboard_editor)in @endif" id="dashboard-editor">
     <div class="col-md-12 tw:pl-0!">
@@ -619,7 +620,7 @@
             url: ajax_url + '/dash/' + data_type,
             data: {
                 id: id,
-                dimensions: {x: $widget_body.width(), y: $widget_body.height()},
+                dimensions: {x: Math.floor($widget_body.width()), y: Math.floor($widget_body.height())},
                 settings: $widget_body.closest('.grid-stack-item').data('settings') == 1 ? 1 : 0
             },
             dataType: 'json',

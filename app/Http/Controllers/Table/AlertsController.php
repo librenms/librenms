@@ -49,7 +49,7 @@ class AlertsController extends TableController
     protected array $default_sort = ['timestamp' => 'desc'];
 
     /** Maps the min_severity filter's UI values to alert_rules.severity comparisons. */
-    private const SEVERITY_MAP = [
+    private const array SEVERITY_MAP = [
         'ok' => 1,
         'warning' => 2,
         'critical' => 3,
@@ -64,11 +64,12 @@ class AlertsController extends TableController
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, mixed>
      */
     protected function rules(): array
     {
         return [
+            ...AlertFault::filterValidationRules(),
             'rule_id' => 'nullable|integer|min:1',
             'alert_id' => 'nullable|integer',
             'device_id' => 'nullable|integer',
@@ -79,6 +80,7 @@ class AlertsController extends TableController
             'min_severity' => 'nullable|string',
             'group' => 'nullable|integer|min:1',
             'uncollapse_key_count' => 'nullable|integer',
+            'widget_id' => 'nullable|integer|min:1',
         ];
     }
 
@@ -134,26 +136,10 @@ class AlertsController extends TableController
                 }
             },
 
-            'unreachable' => function (Builder $q, ?string $unreachable): void {
-                if ($unreachable === null) {
-                    return;
-                }
-
-                $hasParent = fn ($query) => $query
-                    ->from('device_relationships')
-                    ->whereColumn('device_relationships.child_device_id', 'alert_faults.device_id');
-
-                $hasUpParent = fn ($query) => $query
-                    ->from('device_relationships')
-                    ->join('devices as parent_devices', 'parent_devices.device_id', '=',
-                        'device_relationships.parent_device_id')
-                    ->whereColumn('device_relationships.child_device_id', 'alert_faults.device_id')
-                    ->where('parent_devices.status', '!=', 0);
-
-                if ((int) $unreachable) {
-                    $q->whereExists($hasParent)->whereNotExists($hasUpParent);
-                } else {
-                    $q->where(fn ($query) => $query->whereNotExists($hasParent)->orWhereExists($hasUpParent));
+            'unreachable' => function ($q, ?string $unreachable): void {
+                /** @var Builder<AlertFault> $q */
+                if ($unreachable !== null) {
+                    $q->unreachable((bool) $unreachable);
                 }
             },
 
@@ -204,7 +190,8 @@ class AlertsController extends TableController
             ->where('alert_faults.open', 1)
             ->whereHas('device', fn (Builder $q) => $q->where('disabled', 0))
             ->whereHas('rule', fn (Builder $q) => $q->where('disabled', 0))
-            ->hasAccess($request->user());
+            ->hasAccess($request->user())
+            ->when($request->array('filter'), fn (Builder $q, array $filters) => $q->applyFilters($filters));
 
         $stateFilter = $request->input('state');
         if ($stateFilter === null || (int) $stateFilter !== AlertState::RECOVERED) {
@@ -261,12 +248,13 @@ class AlertsController extends TableController
         }
 
         $alertLogId = AlertLog::query()->where('fault_id', $model->id)->max('id');
+        $incidentId = $this->incidentId($model->id);
 
         return [
             'rule' => '<i title="' . e(json_encode($model->rule?->builder)) . '"><a href="' . Url::generate(['page' => 'alert-rules']) . '">' . $ruleName . '</a></i>',
-            'details' => '<a class="fa-solid fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . $model->id . '" data-parent="#alerts"></a>',
+            'details' => '<a class="fa-solid fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#' . $incidentId . '" data-parent="#alerts"></a>',
             'verbose_details' => $this->verboseDetailsButton($alertLogId),
-            'hostname' => $this->renderHostname($model),
+            'hostname' => $this->renderHostname($model, $incidentId),
             'location' => '<a href="' . e(Url::generate(['page' => 'devices', 'location' => $location ?? ''])) . '">' . e($location ?? 'N/A') . '</a>',
             'timestamp' => $model->timestamp ? Time::format($model->timestamp, 'compact') : 'N/A',
             'severity' => $this->severityIcon($model->rule?->severity, $state),
@@ -329,15 +317,25 @@ class AlertsController extends TableController
         ])->render();
     }
 
-    private function renderHostname(AlertFault $fault): string
+    private function renderHostname(AlertFault $fault, string $incidentId): string
     {
         $faultDetail = $this->renderFaultDetail($fault);
         $collapseClass = $this->incidentCollapseClass($faultDetail);
 
         return '<div class="incident">'
             . Url::modernDeviceLink($fault->device)
-            . '<div id="incident' . $fault->id . '"' . $collapseClass . '>' . $faultDetail . '</div>'
+            . '<div id="' . $incidentId . '"' . $collapseClass . '>' . $faultDetail . '</div>'
             . '</div>';
+    }
+
+    /**
+     * Build the incident element id, namespaced by the dashboard widget instance when present.
+     */
+    private function incidentId(int $faultId): string
+    {
+        $widgetId = request()->integer('widget_id');
+
+        return $widgetId > 0 ? "incident{$widgetId}-{$faultId}" : "incident{$faultId}";
     }
 
     private function countPrintableCharacters(string $string): int

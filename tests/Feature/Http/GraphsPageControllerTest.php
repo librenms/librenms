@@ -3,7 +3,7 @@
 namespace LibreNMS\Tests\Feature\Http;
 
 use App\Facades\LibrenmsConfig;
-use App\Http\Requests\GraphsPageRequest;
+use App\Http\Requests\GraphRequest;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\User;
@@ -190,8 +190,8 @@ class GraphsPageControllerTest extends TestCase
         $device = Device::factory()->create();
         $secondDevice = Device::factory()->create();
 
-        $request = GraphsPageRequest::create("/graphs?id={$device->device_id},{$secondDevice->device_id}&type=device_poller_perf");
-        $validator = validator($request->all(), (new GraphsPageRequest())->rules());
+        $request = GraphRequest::create("/graphs?id={$device->device_id},{$secondDevice->device_id}&type=device_poller_perf");
+        $validator = validator($request->all(), new GraphRequest()->rules());
 
         $this->assertFalse($validator->errors()->has('id'));
     }
@@ -200,8 +200,8 @@ class GraphsPageControllerTest extends TestCase
     {
         $device = Device::factory()->create();
 
-        $request = GraphsPageRequest::create("/graphs?id={$device->device_id},abc&type=device_poller_perf");
-        $validator = validator($request->all(), (new GraphsPageRequest())->rules());
+        $request = GraphRequest::create("/graphs?id={$device->device_id},abc&type=device_poller_perf");
+        $validator = validator($request->all(), new GraphRequest()->rules());
 
         $this->assertTrue($validator->errors()->has('id'));
     }
@@ -276,6 +276,53 @@ class GraphsPageControllerTest extends TestCase
         $response->assertOk();
         $response->assertSee(' :: Poller Time');
         $this->assertNoPhpWarningOutput($response->getContent());
+    }
+
+    public function testCustomoidGraphPageRenders(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'customoid-device.example.com']);
+        \App\Models\Customoid::create([
+            'device_id' => $device->device_id,
+            'customoid_descr' => 'Test OID',
+            'customoid_oid' => '.1.3.6.1.2.1.1.1.0',
+            'customoid_unit' => '%',
+        ]);
+
+        // The device Graphs tab links to the full-size page as
+        // type=customoid_<descr>&device=<id>&unit=<unit>. A description with
+        // a space and a unit like % must pass page validation.
+        $response = $this->actingAs($this->adminUser())
+            ->get('/graphs?type=customoid_Test%20OID&device=' . $device->device_id . '&unit=%25');
+
+        $response->assertOk();
+        $response->assertSee(' :: Custom OID ');
+        $this->assertNoPhpWarningOutput($response->getContent());
+    }
+
+    public function testCustomoidGraphPageRendersWithSpecialUnit(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'customoid-device.example.com']);
+        \App\Models\Customoid::create([
+            'device_id' => $device->device_id,
+            'customoid_descr' => 'Temperature',
+            'customoid_oid' => '.1.3.6.1.2.1.1.1.0',
+            'customoid_unit' => '°C',
+        ]);
+
+        $response = $this->actingAs($this->adminUser())
+            ->get('/graphs?type=customoid_Temperature&device=' . $device->device_id . '&unit=%C2%B0C');
+
+        $response->assertOk();
+        $response->assertSee(' :: Custom OID ');
+        $this->assertNoPhpWarningOutput($response->getContent());
+    }
+
+    public function testBareGraphTypeStillForbidden(): void
+    {
+        $response = $this->actingAs($this->adminUser())
+            ->get('/graphs?type=port&id=1');
+
+        $response->assertForbidden();
     }
 
     private function adminUser(): User

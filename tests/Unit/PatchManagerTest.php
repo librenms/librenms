@@ -8,6 +8,7 @@ use App\Patches\PatchManager;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 use LibreNMS\Tests\TestCase;
+use LibreNMS\Util\Binaries;
 use Symfony\Component\Process\Process;
 
 final class PatchManagerTest extends TestCase
@@ -129,7 +130,7 @@ final class PatchManagerTest extends TestCase
         $this->local = "$parent/install";
         mkdir($this->local);
         $this->git($this->upstream, 'archive', '--output', "$this->tmp/export.tar", 'master');
-        (new Process(['tar', '-xf', "$this->tmp/export.tar", '-C', $this->local]))->mustRun();
+        new Process(['tar', '-xf', "$this->tmp/export.tar", '-C', $this->local])->mustRun();
         $manager = $this->newManager();
 
         $this->createPullRequest(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO', $c), 'logo.png' => "\x89PNG\0data"]);
@@ -509,7 +510,7 @@ final class PatchManagerTest extends TestCase
 
     private function newManager(): PatchManager
     {
-        return new PatchManager($this->local, "$this->tmp/storage", 'http://github.test/');
+        return new PatchManager(new Binaries, $this->local, "$this->tmp/storage", 'http://github.test/');
     }
 
     /**

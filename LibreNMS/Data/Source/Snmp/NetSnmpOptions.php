@@ -12,6 +12,7 @@ use LibreNMS\Exceptions\SnmpException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Exceptions\UnsupportedSnmpOption;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
+use LibreNMS\Util\Binaries;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Mib;
 
@@ -32,7 +33,7 @@ class NetSnmpOptions
         }
 
         $cmd = [
-            LibrenmsConfig::get($command, $command),
+            resolve(Binaries::class)->path($command),
             '-M', implode(':', $options->mibDirs ?: [LibrenmsConfig::get('mib_dir')]),
             '-m', implode(':', $options->mibs),
             ...$this->buildAuth($config, $options->context),

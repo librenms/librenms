@@ -11,6 +11,7 @@ modules:
                         - PROBE-MIB::temperatureMin
                         - PROBE-MIB::humidityMax
                         - PROBE-MIB::humidityMin
+                        - UPS-MIB::upsInputNumLines
         state:
             data:
                 -
@@ -52,6 +53,190 @@ modules:
                         - { descr: unknown, value: 0, generic: 3 }
                         - { descr: normal, value: 1, generic: 0 }
                         - { descr: abnormal, value: 2, generic: 2 }
+                -
+                    oid: XPPC-MIB::upsBaseOutputStatus
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.4.1.1.{{ $index }}'
+                    descr: UPS state
+                    index: 0
+                    state_name: netagent2upsstate
+                    high_limit: 10
+                    states:
+                        - { descr: unknown, value: 0, generic: 3 }
+                        - { descr: unknown, value: 1, generic: 3 }
+                        - { descr: OnLine, value: 2, generic: 0 }
+                        - { descr: OnBattery, value: 3, generic: 1 }
+                        - { descr: OnBoost, value: 4, generic: 0 }
+                        - { descr: Sleeping, value: 5, generic: 1 }
+                        - { descr: OnBypass, value: 6, generic: 0 }
+                        - { descr: Rebooting, value: 7, generic: 1 }
+                        - { descr: Standby, value: 8, generic: 0 }
+                        - { descr: OnBuck, value: 9, generic: 0 }
+                -
+                    oid: XPPC-MIB::upsThreePhaseDCandRectifierStatusInAndOut
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.8.5.4.{{ $index }}'
+                    descr: In And Out
+                    index: 0
+                    state_name: upsThreePhaseDCandRectifierStatusInAndOut
+                    high_limit: 10
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 3
+                    states:
+                        - { descr: threeInOneOut, value: 2, generic: 3 }
+                        - { descr: threeInThreeOut, value: 3, generic: 3 }
+                -
+                    oid: XPPC-MIB::upsThreePhaseDCandRectifierStatusBatteryStatus
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.8.5.5.{{ $index }}'
+                    descr: Back Status
+                    index: 0
+                    state_name: upsThreePhaseDCandRectifierStatusBatteryStatus
+                    high_limit: 10
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 3
+                    states:
+                        - { descr: backup, value: 4, generic: 1 }
+                        - { descr: acnormal, value: 5, generic: 0 }
+                -
+                    oid: XPPC-MIB::upsThreePhaseDCandRectifierStatusChargeStatus
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.8.5.6.{{ $index }}'
+                    descr: Charge Status
+                    index: 0
+                    state_name: upsThreePhaseDCandRectifierStatusChargeStatus
+                    high_limit: 10
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 3
+                    states:
+                        - { descr: boost, value: 6, generic: 0 }
+                        - { descr: float, value: 7, generic: 0 }
+                        - { descr: 'no', value: 16, generic: 2 }
+                -
+                    oid: XPPC-MIB::upsThreePhaseUPSStatusManualBypassBreaker
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.8.6.2.{{ $index }}'
+                    descr: Breaker Status
+                    index: 0
+                    state_name: upsThreePhaseUPSStatusManualBypassBreaker
+                    high_limit: 10
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 3
+                    states:
+                        - { descr: close, value: 8, generic: 1 }
+                        - { descr: open, value: 9, generic: 0 }
+                -
+                    oid: XPPC-MIB::upsThreePhaseUPSStatusACStatus
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.8.6.3.{{ $index }}'
+                    descr: AC status
+                    index: 0
+                    state_name: upsThreePhaseUPSStatusACStatus
+                    high_limit: 10
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 3
+                    states:
+                        - { descr: normal, value: 10, generic: 0 }
+                        - { descr: abnormal, value: 11, generic: 2 }
+                -
+                    oid: XPPC-MIB::upsThreePhaseUPSStatusInverterOperating
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.8.6.5.{{ $index }}'
+                    descr: Inverter Operating
+                    index: 0
+                    state_name: upsThreePhaseUPSStatusInverterOperating
+                    high_limit: 10
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 3
+                    states:
+                        - { descr: 'yes', value: 14, generic: 0 }
+                        - { descr: 'no', value: 16, generic: 2 }
+                -
+                    oid: XPPC-MIB::upsThreePhaseDCandRectifierStatusRecOperating
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.8.5.7.{{ $index }}'
+                    descr: Rectifier Operating
+                    index: 0
+                    state_name: upsThreePhaseDCandRectifierStatusRecOperating
+                    high_limit: 10
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 3
+                    states:
+                        - { descr: 'yes', value: 14, generic: 0 }
+                        - { descr: 'no', value: 16, generic: 2 }
+                -
+                    oid: XPPC-MIB::upsThreePhaseUPSStaticSwitchMode
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.8.6.4.{{ $index }}'
+                    descr: Switch Mode
+                    index: 0
+                    state_name: upsThreePhaseUPSStaticSwitchMode
+                    high_limit: 10
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 3
+                    states:
+                        - { descr: invermode, value: 12, generic: 0 }
+                        - { descr: bypassmode, value: 13, generic: 1 }
+                -
+                    oid: XPPC-MIB::upsThreePhaseDCandRectifierStatusRecRotError
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.8.5.1.{{ $index }}'
+                    descr: Rectifier Rotation Error
+                    index: 0
+                    state_name: upsThreePhaseDCandRectifierStatusRecRotError
+                    high_limit: 10
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 3
+                    states:
+                        - { descr: 'yes', value: 14, generic: 2 }
+                        - { descr: 'no', value: 16, generic: 0 }
+                -
+                    oid: XPPC-MIB::upsThreePhaseUPSStatusBypassFreqFail
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.8.6.1.{{ $index }}'
+                    descr: Bypass freq. fail
+                    index: 0
+                    state_name: upsThreePhaseUPSStatusBypassFreqFail
+                    high_limit: 10
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 3
+                    states:
+                        - { descr: 'yes', value: 14, generic: 2 }
+                        - { descr: 'no', value: 16, generic: 0 }
+                -
+                    oid: XPPC-MIB::upsThreePhaseFaultStatusShortCircuit
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.8.7.7.{{ $index }}'
+                    descr: Short Circuit
+                    index: 0
+                    state_name: upsThreePhaseFaultStatusShortCircuit
+                    high_limit: 10
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 3
+                    states:
+                        - { descr: 'yes', value: 14, generic: 2 }
+                        - { descr: 'no', value: 16, generic: 0 }
         runtime:
             data:
                 -
@@ -69,6 +254,16 @@ modules:
                     index: 'probeStatusTemperature.0'
                     low_limit: PROBE-MIB::temperatureMin
                     high_limit: PROBE-MIB::temperatureMax
+                -
+                    oid: XPPC-MIB::upsSmartBatteryTemperature
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.2.2.3.{{ $index }}'
+                    descr: 'Temperature'
+                    index: 0
+                    divisor: 10
+                    low_limit: 0
+                    low_warn_limit: 6
+                    warn_limit: 50
+                    high_limit: 110
         humidity:
             data:
                 -
@@ -77,3 +272,156 @@ modules:
                     descr: 'Humidity'
                     divisor: 10
                     index: 'probeStatusHumidity.0'
+        charge:
+            data:
+                -
+                    oid: XPPC-MIB::upsSmartBatteryCapacity
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.2.2.1.{{ $index }}'
+                    descr: 'Battery Charge'
+                    index: 0
+                    low_limit: 0
+                    low_warn_limit: 10
+                    skip_values: 0
+        current:
+            data:
+                -
+                    oid: XPPC-MIB::upsSmartBatteryCurrent
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.2.2.7.{{ $index }}'
+                    descr: 'Battery Current'
+                    index: 0
+                    divisor: 10
+                    high_limit: 30
+        frequency:
+            data:
+                -
+                    oid: XPPC-MIB::upsSmartInputFrequency
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.3.2.4.{{ $index }}'
+                    descr: 'Input frequency'
+                    index: 0
+                    divisor: 10
+                    low_limit: 0
+                    low_warn_limit: 49
+                    warn_limit: 51
+                    high_limit: 60
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 1
+                -
+                    oid: XPPC-MIB::upsSmartOutputFrequency
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.4.2.2.{{ $index }}'
+                    descr: 'Output frequency'
+                    index: 1
+                    divisor: 10
+                    low_limit: 0
+                    low_warn_limit: 49
+                    warn_limit: 51
+                    high_limit: 60
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 1
+                -
+                    oid: XPPC-MIB::upsThreePhaseInputFrequency
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.8.2.1.{{ $index }}'
+                    descr: 'Input frequency'
+                    index: 0
+                    divisor: 10
+                    low_limit: 0
+                    low_warn_limit: 49
+                    warn_limit: 51
+                    high_limit: 60
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 3
+                -
+                    oid: XPPC-MIB::upsThreePhaseOutputFrequency
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.8.3.1.{{ $index }}'
+                    descr: 'Output frequency'
+                    index: 1
+                    divisor: 10
+                    low_limit: 0
+                    low_warn_limit: 49
+                    warn_limit: 51
+                    high_limit: 60
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 3
+                -
+                    oid: XPPC-MIB::upsThreePhaseBypassSourceFrequency
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.8.4.1.{{ $index }}'
+                    descr: 'Bypass frequency'
+                    index: 2
+                    divisor: 10
+                    low_limit: 0
+                    low_warn_limit: 49
+                    warn_limit: 51
+                    high_limit: 60
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 3
+        load:
+            data:
+                -
+                    oid: XPPC-MIB::upsSmartOutputLoad
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.4.2.3.{{ $index }}'
+                    descr: 'Output load'
+                    index: 0
+                    low_limit: 0
+                    warn_limit: 80
+                    high_limit: 100
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 1
+                -
+                    oid: XPPC-MIB::upsThreePhaseOutputLoadPercentageR
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.8.3.5.{{ $index }}'
+                    descr: 'Out L1 (R)'
+                    index: 0
+                    divisor: 10
+                    low_limit: 0
+                    warn_limit: 80
+                    high_limit: 100
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 3
+                -
+                    oid: XPPC-MIB::upsThreePhaseOutputLoadPercentageS
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.8.3.6.{{ $index }}'
+                    descr: 'Out L2 (S)'
+                    index: 1
+                    divisor: 10
+                    low_limit: 0
+                    warn_limit: 80
+                    high_limit: 100
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 3
+                -
+                    oid: XPPC-MIB::upsThreePhaseOutputLoadPercentageT
+                    num_oid: '.1.3.6.1.4.1.935.1.1.1.8.3.7.{{ $index }}'
+                    descr: 'Out L3 (T)'
+                    index: 2
+                    divisor: 10
+                    low_limit: 0
+                    warn_limit: 80
+                    high_limit: 100
+                    skip_values:
+                        -
+                            oid: UPS-MIB::upsInputNumLines.0
+                            op: '!='
+                            value: 3

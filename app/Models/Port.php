@@ -33,6 +33,7 @@ class Port extends DeviceRelatedModel
     protected $guarded = [];
     protected array $filterable = [
         'device_id',
+        'port_id',
         'ifName',
         'ifDescr',
         'portName',

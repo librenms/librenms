@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "SNMP Location",
                     "os": "nokia-1830",
-                    "type": "network",
+                    "type": "optical",
                     "serial": "1",
                     "icon": "nokia.svg"
                 }

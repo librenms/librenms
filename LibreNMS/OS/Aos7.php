@@ -31,14 +31,17 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
+use App\Models\BgpPeer;
+use App\Models\BgpPeerCbgp;
 use App\Models\Mempool;
-use LibreNMS\Device\Processor;
 use App\Models\PortsNac;
 use App\Models\PortVlan;
+use App\Models\Processor;
 use App\Models\Transceiver;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
 use LibreNMS\Discovery\Neighbors\NeighborParser;
+use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
@@ -46,10 +49,14 @@ use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
+use LibreNMS\OS\Traits\AlcatelMacAddressMib;
+use LibreNMS\Util\Bgp;
 use SnmpQuery;
 
-class Aos7 extends OS implements MempoolsDiscovery, ProcessorDiscovery, VlanDiscovery, VlanPortDiscovery, TransceiverDiscovery, NacPolling
+class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, ProcessorDiscovery, VlanDiscovery, VlanPortDiscovery, TransceiverDiscovery, NacPolling
 {
+    use AlcatelMacAddressMib;
+
     public function preCache()
     {
         $data = parent::preCache();
@@ -83,7 +90,7 @@ class Aos7 extends OS implements MempoolsDiscovery, ProcessorDiscovery, VlanDisc
         return $data;
     }
 
-    public function discoverProcessors(): array
+    public function discoverProcessors(): Collection
     {
         $mibDir = 'nokia/aos7';
 
@@ -129,7 +136,7 @@ class Aos7 extends OS implements MempoolsDiscovery, ProcessorDiscovery, VlanDisc
             ];
         }
 
-        $processors = [];
+        $processors = new Collection;
 
         foreach ($modulesByChassis as $chassisId => $modules) {
             // Select the first numbered health-module entry for each VC unit.
@@ -144,19 +151,14 @@ class Aos7 extends OS implements MempoolsDiscovery, ProcessorDiscovery, VlanDisc
                 continue;
             }
 
-            $processor = Processor::discover(
-                'aos7',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.6486.801.1.2.1.16.1.1.1.1.1.11.' . $module['slot'],
-                "vc.$chassisId",
-                "VC Unit $chassisId CPU",
-                1,
-                (int) $module['percent']
-            );
-
-            if ($processor->isValid()) {
-                $processors[] = $processor;
-            }
+            $processors->push(new Processor([
+                'processor_type' => 'aos7',
+                'processor_oid' => '.1.3.6.1.4.1.6486.801.1.2.1.16.1.1.1.1.1.11.' . $module['slot'],
+                'processor_index' => "vc.$chassisId",
+                'processor_descr' => "VC Unit $chassisId CPU",
+                'processor_precision' => 1,
+                'processor_usage' => $module['percent'],
+            ]));
         }
 
         return $processors;
@@ -903,5 +905,63 @@ class Aos7 extends OS implements MempoolsDiscovery, ProcessorDiscovery, VlanDisc
         );
 
         return $this->lldpLocalPorts()->byDescr($descr)?->port_id;
+    }
+
+    /**
+     * Sessions are read from BGP4-MIB, ALCATEL-IND1-BGP-MIB adds their name
+     *
+     * @return Collection<int, BgpPeer>
+     */
+    public function discoverBgpPeers(): Collection
+    {
+        $peers = new Collection;
+
+        foreach ($this->getDevice()->getVrfContexts() as $context) {
+            $names = [];
+            foreach ($this->walkBgpTable($context, 'ALCATEL-IND1-BGP-MIB', ['bgpPeerDescr' => 'alaBgpPeerName']) as $index => $row) {
+                $parts = explode('.', (string) $index);
+                $names[(string) Bgp::shiftIp($parts)?->compressed()] = $row['bgpPeerDescr'];
+            }
+
+            $peers = $peers->merge($this->discoverBgp4MibPeers($context)->each(function (BgpPeer $peer) use ($names): void {
+                $peer->bgpPeerDescr = $names[$peer->bgpPeerIdentifier] ?? $peer->bgpPeerDescr;
+            }));
+        }
+
+        return $peers->values();
+    }
+
+    /**
+     * Only received IPv4 unicast prefixes are reported
+     *
+     * @return Collection<int, BgpPeerCbgp>
+     */
+    public function discoverBgpAddressFamilies(Collection $peers): Collection
+    {
+        $families = new Collection;
+
+        foreach ($peers->pluck('context_name')->unique() as $context) {
+            foreach ($this->walkBgpTable($context, 'ALCATEL-IND1-BGP-MIB', ['AcceptedPrefixes' => 'alaBgpPeerRcvdPrefixes']) as $index => $counters) {
+                $parts = explode('.', (string) $index);
+                $families->push($this->makeBgpAddressFamily(Bgp::shiftIp($parts), null, $context, 'ipv4', 'unicast', $counters));
+            }
+        }
+
+        return $families->filter()->values();
+    }
+
+    public function discoverFdbTable(): Collection
+    {
+        $fdb = SnmpQuery::walk('ALCATEL-IND1-MAC-ADDRESS-MIB::slMacAddressGblManagement')
+            ->mapTable(fn ($data, $domain, $locale, $bridgePort, $vlan, $subId, $mac) => $subId == 0
+                ? $this->alcatelFdbEntry($vlan, $mac, (int) $bridgePort, $this->bridgePortIfIndexes())
+                : null)
+            ->filter();
+
+        if ($fdb->isEmpty()) {
+            $fdb = $this->alcatelDispositionFdb();
+        }
+
+        return $fdb->isNotEmpty() ? $fdb : parent::discoverFdbTable();
     }
 }

@@ -11,14 +11,14 @@ foreach ($processors as $proc) {
 
     $text_descr = e(rewrite_entity_descr($proc['processor_descr']));
 
-    $percent = round($proc['processor_usage']);
+    $percent = $proc['processor_usage'] === null ? '?' : round($proc['processor_usage']) . '%';
 
     $graph_array['id'] = $proc['processor_id'];
     $graph_array['type'] = 'processor_usage';
 
     echo "<div class='panel panel-default'>
             <div class='panel-heading'>
-                <h3 class='panel-title'>$text_descr <div class='pull-right'>$percent% used</div></h3>
+                <h3 class='panel-title'>$text_descr <div class='pull-right'>$percent used</div></h3>
             </div>";
     echo "<div class='panel-body'>";
     include 'includes/html/print-graphrow.inc.php';

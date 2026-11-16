@@ -714,6 +714,7 @@ systemctl restart snmpd
 
 ```
 cp /opt/librenms/dist/librenms.cron /etc/cron.d/librenms
+chmod 644 /etc/cron.d/librenms
 ```
 
 !!! note
@@ -740,6 +741,7 @@ configuration file:
 
 ```
 cp /opt/librenms/misc/librenms.logrotate /etc/logrotate.d/librenms
+chmod 644 /etc/logrotate.d/librenms
 ```
 
 ## Web installer

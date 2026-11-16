@@ -1,7 +1,7 @@
 os: mlos-nsp
 group: trellix
 text: 'McAfee Linux OS - NSP'
-type: appliance
+type: security
 icon: trellix
 mib_dir: trellix
 over:

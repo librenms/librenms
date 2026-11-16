@@ -66,7 +66,7 @@ if (! empty($filter_device)) {
 
 ';
     if (! empty($vars['device']) && $device = Device::find($vars['device'])) {
-        $tmp_output .= '"<option value=\"' . $device->device_id . '\">" + ' . json_encode(htmlspecialchars($device->displayName())) . ' + "</option>" +';
+        $tmp_output .= '"<option value=\"' . $device->device_id . '\">" + ' . json_encode(htmlspecialchars($device->display)) . ' + "</option>" +';
         $filter_device = $device->device_id;
     }
 
