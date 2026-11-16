@@ -110,42 +110,50 @@ if (count($cgroup_labels) > 0) {
 print_optionbar_end();
 
 if ($page_view === 'overview') {
-    // A sortable table per pressure type, with a row for the system wide pressure
-    // followed by one for each cgroup, showing avg10, avg60, and avg300.
+    // One sortable table with a row per pressure type for the system wide pressure
+    // and each cgroup, showing avg10, avg60, and avg300. Pressure types a cgroup
+    // does not report are skipped.
     $averages = ['avg10', 'avg60', 'avg300'];
-    foreach ($compare_types as $pressure_key => $pressure_type) {
-        $table_info = [
-            'headers' => ['Cgroup', ...$averages],
-            'rows' => [],
-        ];
+    $table_info = [
+        'headers' => ['Cgroup', 'Resource', 'Stall Type', ...$averages],
+        'rows' => [],
+    ];
 
-        $row_sources = [
-            ['link' => generate_link('System', $link_array), 'pressure' => $system_pressure[$pressure_key] ?? []],
+    $row_sources = [
+        ['link' => generate_link('System', $link_array), 'pressure' => $system_pressure],
+    ];
+    foreach ($cgroup_labels as $safe_cgroup => $cgroup) {
+        $row_sources[] = [
+            'link' => generate_link(htmlspecialchars($cgroup), $link_array, ['cgroup' => $safe_cgroup]),
+            'pressure' => $cgroup_pressure[$cgroup] ?? [],
         ];
-        foreach ($cgroup_labels as $safe_cgroup => $cgroup) {
-            $row_sources[] = [
-                'link' => generate_link(htmlspecialchars($cgroup), $link_array, ['cgroup' => $safe_cgroup]),
-                'pressure' => $cgroup_pressure[$cgroup][$pressure_key] ?? [],
+    }
+
+    foreach ($row_sources as $row_source) {
+        foreach ($pressure_types as $pressure_key => $pressure_type) {
+            if (! isset($row_source['pressure'][$pressure_key])) {
+                continue;
+            }
+            $row = [
+                ['data' => $row_source['link'], 'raw' => true],
+                ['data' => $pressure_type['resource']],
+                ['data' => $pressure_type['stall_type']],
             ];
-        }
-
-        foreach ($row_sources as $row_source) {
-            $row = [['data' => $row_source['link'], 'raw' => true]];
             foreach ($averages as $average) {
-                $value = $row_source['pressure'][$average] ?? null;
+                $value = $row_source['pressure'][$pressure_key][$average] ?? null;
                 $row[] = ['data' => is_numeric($value) ? number_format($value, 2) : '-'];
             }
             $table_info['rows'][] = $row;
         }
+    }
 
-        echo '<div class="panel panel-default">
+    echo '<div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">' . $menu_link($pressure_type['label'] . ' Percent Stalled', ['compare' => $pressure_key], false) . '</h3>
+        <h3 class="panel-title">Percent Stalled</h3>
     </div>
     <div class="panel-body">';
-        echo view('widgets/sortable_table', $table_info);
-        echo "</div>\n</div>\n";
-    }
+    echo view('widgets/sortable_table', $table_info);
+    echo "</div>\n</div>\n";
 
     return;
 }
