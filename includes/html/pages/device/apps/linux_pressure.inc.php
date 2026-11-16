@@ -110,14 +110,18 @@ if (count($cgroup_labels) > 0) {
 print_optionbar_end();
 
 if ($page_view === 'overview') {
-    // One sortable table with a row per pressure type for the system wide pressure
-    // and each cgroup, showing avg10, avg60, and avg300. Pressure types a cgroup
-    // does not report are skipped.
+    // One sortable table with a row for the system wide pressure and one for each
+    // cgroup. Every pressure type gets an avg10, avg60, and avg300 column.
     $averages = ['avg10', 'avg60', 'avg300'];
     $table_info = [
-        'headers' => ['Cgroup', 'Resource', 'Stall Type', ...$averages],
+        'headers' => ['Cgroup'],
         'rows' => [],
     ];
+    foreach ($compare_types as $pressure_type) {
+        foreach ($averages as $average) {
+            $table_info['headers'][] = $pressure_type['label'] . ' ' . $average;
+        }
+    }
 
     $row_sources = [
         ['link' => generate_link('System', $link_array), 'pressure' => $system_pressure],
@@ -130,28 +134,21 @@ if ($page_view === 'overview') {
     }
 
     foreach ($row_sources as $row_source) {
-        foreach ($pressure_types as $pressure_key => $pressure_type) {
-            if (! isset($row_source['pressure'][$pressure_key])) {
-                continue;
-            }
-            $row = [
-                ['data' => $row_source['link'], 'raw' => true],
-                ['data' => $pressure_type['resource']],
-                ['data' => $pressure_type['stall_type']],
-            ];
+        $row = [['data' => $row_source['link'], 'raw' => true]];
+        foreach ($compare_types as $pressure_key => $pressure_type) {
             foreach ($averages as $average) {
                 $value = $row_source['pressure'][$pressure_key][$average] ?? null;
                 $row[] = ['data' => is_numeric($value) ? number_format($value, 2) : '-'];
             }
-            $table_info['rows'][] = $row;
         }
+        $table_info['rows'][] = $row;
     }
 
     echo '<div class="panel panel-default">
     <div class="panel-heading">
         <h3 class="panel-title">Percent Stalled</h3>
     </div>
-    <div class="panel-body">';
+    <div class="panel-body table-responsive">';
     echo view('widgets/sortable_table', $table_info);
     echo "</div>\n</div>\n";
 
