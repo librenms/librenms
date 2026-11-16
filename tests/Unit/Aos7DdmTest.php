@@ -65,7 +65,7 @@ class Aos7DdmTest extends TestCase
                 'ALCATEL-IND1-PORT-MIB::ddmPortChannel' => 1,
             ];
         }
-        (new \ReflectionProperty(OS::class, 'pre_cache'))->setValue($os, $data);
+        new \ReflectionProperty(OS::class, 'pre_cache')->setValue($os, $data);
 
         return $os->preCache();
     }
