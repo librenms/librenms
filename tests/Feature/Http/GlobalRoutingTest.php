@@ -21,6 +21,7 @@ use App\Models\Ospfv3Instance;
 use App\Models\Port;
 use App\Models\User;
 use App\Models\Vrf;
+use App\View\Components\Routing\BgpPeerTable;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Tests\TestCase;
@@ -192,6 +193,7 @@ class GlobalRoutingTest extends TestCase
         ]);
         $this->insertCbgp($device, '203.0.113.1', '', 'ipv4', 'vpn', 8, 10);
         $this->insertCbgp($device, '203.0.113.1', '', 'ipv6', 'vpn', 3, 4294967295); // no limit configured (IOS-XR)
+        $this->insertCbgp($device, '203.0.113.1', '', 'l2vpn', 'vpls', 749, 1000); // 74.9% shows as 75%, below the 75% threshold
 
         foreach ([route('routing.bgp'), route('device.routing.bgp', ['device' => $device])] as $url) {
             $this->actingAs($this->admin())
@@ -211,8 +213,16 @@ class GlobalRoutingTest extends TestCase
                 ->assertSee('/ 10 (80%)')
                 ->assertSee('text-warning')
                 ->assertSee('ipv6.vpn: 3')
-                ->assertDontSee('4,294,967,295');
+                ->assertDontSee('4,294,967,295')
+                ->assertSee('/ 1,000 (75%)');
         }
+
+        // the threshold is compared unrounded, 74.9% is displayed as 75% but has not reached the 75% threshold
+        $prefixes = collect((new BgpPeerTable($device->bgppeers()->get()))->rows)->pluck('prefixes')->flatten(1)->keyBy('family');
+        $this->assertSame(75, $prefixes['l2vpn.vpls']['percent']);
+        $this->assertSame('', $prefixes['l2vpn.vpls']['class']);
+        $this->assertSame('text-warning', $prefixes['ipv4.vpn']['class']);
+        $this->assertSame('text-danger', $prefixes['ipv4.unicast']['class']);
     }
 
     public function testBgpPeerTableHidesEmptyColumns(): void

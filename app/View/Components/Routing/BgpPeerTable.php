@@ -254,7 +254,9 @@ class BgpPeerTable extends Component
         // 0 or the maximum of the Unsigned32 (IOS-XR) when no limit is configured
         $limit = (int) $cbgp->PrefixAdminLimit >= 4294967295 ? 0 : (int) $cbgp->PrefixAdminLimit;
         $threshold = (int) $cbgp->PrefixThreshold;
-        $percent = $limit > 0 ? (int) round($accepted / $limit * 100) : null;
+        // compare the unrounded ratio, the percentage is rounded for display only
+        $ratio = $limit > 0 ? $accepted / $limit * 100 : null;
+        $percent = $ratio === null ? null : (int) round($ratio);
 
         return [
             'family' => "$cbgp->afi.$cbgp->safi",
@@ -262,9 +264,9 @@ class BgpPeerTable extends Component
             'limit' => $limit,
             'percent' => $percent,
             'class' => match (true) {
-                $percent === null => '',
+                $ratio === null => '',
                 $accepted >= $limit => 'text-danger',
-                $threshold > 0 && $percent >= $threshold => 'text-warning',
+                $threshold > 0 && $ratio >= $threshold => 'text-warning',
                 default => '',
             },
         ];
