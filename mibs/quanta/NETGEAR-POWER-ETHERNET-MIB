@@ -13,15 +13,15 @@ NETGEAR-POWER-ETHERNET-MIB DEFINITIONS ::= BEGIN
 -- Specification.
     
     IMPORTS
-      MODULE-IDENTITY, OBJECT-TYPE, Gauge32                  FROM SNMPv2-SMI
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32       FROM SNMPv2-SMI
       TruthValue                                             FROM SNMPv2-TC
-      lb6m                                               FROM QUANTA-LB6M-REF-MIB
+      ng7000managedswitch                                               FROM NETGEAR-REF-MIB
       DisplayString                                          FROM RFC1213-MIB
       pethPsePortEntry, pethMainPseEntry                     FROM POWER-ETHERNET-MIB;
     
 
     fastPathpowerEthernetMIB MODULE-IDENTITY
-    LAST-UPDATED "201503130000Z" -- 13 Mar 2015 12:00:00 GMT
+    LAST-UPDATED "201803020000Z" -- 02 Mar 2018 12:00:00 GMT
     ORGANIZATION "Netgear Inc"
     CONTACT-INFO ""
 
@@ -33,6 +33,20 @@ NETGEAR-POWER-ETHERNET-MIB DEFINITIONS ::= BEGIN
          on this platform which are not represented in the draft MIB."
          
       -- Revision history.
+   REVISION
+        "201803020000Z" -- 02 Mar 2018 12:00:00 GMT
+   DESCRIPTION
+        "Deprecated agentPethPoeMainPseThresholdPower and 
+         agentPethPoeMainPseUsageThreshold objects from 
+         agentPethPoeMainPseObjects group as threshold 
+         should be maintained for unit (system) instead of per slot. 
+         Threshold Power is not present in agentPethPseTable, hence 
+         added agentPethPseThresholdPower in agentPethPseTable."
+   REVISION
+        "201801250000Z" -- 25 Jan 2018 12:00:00 GMT
+   DESCRIPTION
+        "agentPethPoeMainPseObjects Group is added to get/set the 
+         PoE System Data for all slots in a unit."
    REVISION
         "201503130000Z" -- 13 Mar 2015 12:00:00 GMT
    DESCRIPTION
@@ -57,7 +71,7 @@ NETGEAR-POWER-ETHERNET-MIB DEFINITIONS ::= BEGIN
         "200311101200Z" -- 10 Nov 2003 12:00:00 GMT
    DESCRIPTION
         "Initial revision."
-    ::= {  lb6m 15 }
+    ::= {  ng7000managedswitch 15 }
 
     agentPethObjects       OBJECT IDENTIFIER ::= { fastPathpowerEthernetMIB 1 }
 
@@ -105,9 +119,6 @@ NETGEAR-POWER-ETHERNET-MIB DEFINITIONS ::= BEGIN
              Gauge32,
           agentPethPowerLimitMax
              Gauge32
-             ,
-          agentPethHighPowerMode
-             INTEGER
           }
              
     agentPethPowerLimit OBJECT-TYPE
@@ -193,21 +204,29 @@ NETGEAR-POWER-ETHERNET-MIB DEFINITIONS ::= BEGIN
     agentPethPowerDetectionType OBJECT-TYPE
     SYNTAX INTEGER   {
                none(0),
-               pre-ieee(1),
-               ieee(2),
-               auto(3)
+               legacy(1),
+               fourPtdot3afonly(2),
+               fourPtdot3afandlegacy(3),
+               twoPtdot3afonly(4),
+               twoPtdot3afandlegacy(5)
      }
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
         "Describes PD detection mechanism performed by the PSE port.
          A value of none(0) means no detection is done.
-         A value of pre-ieee(1) means only legacy capacitive detection scheme is
+         A value of legacy(1) means only legacy capacitive detection scheme is
          used.
-         A value of ieee(2) means that IEEE 802.3af 4point detection scheme is used.
-         A value of auto(3) means that IEEE 802.3af 4point detection scheme is used
-         and when that fails to detect a connected PD, legacity capacitive detection
+         A value of 4ptdot3afonly(2) means that IEEE 802.3af 4point detection scheme
          is used.
+         A value of 4ptdot3afandlegacy(3) means that IEEE 802.3af 4point detection scheme
+         is used and when that fails to detect a connected PD, legacity capacitive detection
+         is used.
+         A value of 2ptdot3afonly(4) means that IEEE 802.3af 2point detection scheme
+         is used.
+         A value of 2ptdot3afandlegacy(5)means that IEEE 802.3af 2point detection scheme
+         is used and when that fails to detect a connected PD, legacity capacitive detection
+         is used.          
          The value 'none' can not be forcibly set by the administrator."
     REFERENCE
       "Broadcom 5910X programmers guide, IEEE Std 802.3af Section 30.9.1.1.6"
@@ -278,25 +297,6 @@ NETGEAR-POWER-ETHERNET-MIB DEFINITIONS ::= BEGIN
              "The maximum power this port can be configured to provide, measured in Milliwatts."
     ::= { agentPethPsePortEntry 12 }
     
-    agentPethHighPowerMode OBJECT-TYPE
-          SYNTAX  INTEGER   {
-                  disable(0),
-                  legacy(1),
-                  pre-dot3at(2),
-                  dot3at(3),
-                  upoe(4)
-          }
-          MAX-ACCESS  read-write
-          STATUS      current
-          DESCRIPTION
-             "The mode configured for a PSE port to deliver high power. 'disable' means that
-              a port is powered in the IEEE 802.3af mode. 'legacy' means that a port is
-              powered using high-inrush current. 'pre-dot3at' means that a port is powered
-              in the IEEE 802.3af mode initially, switched to the high-power IEEE 802.3at mode
-              before 75msec. 'dot3at' means that a port is powered in the IEEE 802.3at mode. 
-              'upoe' means that a port is powered in IEEE 802.3at mode using spare pair and
-              data pair simultaneously to deliver up to 60W power."
-    ::= { agentPethPsePortEntry 13 }
 
 -- Main objects
     agentPethMainPseObjects       OBJECT IDENTIFIER ::= { agentPethObjects 2 }
@@ -362,13 +362,9 @@ NETGEAR-POWER-ETHERNET-MIB DEFINITIONS ::= BEGIN
           agentPethPsePowerManagementMode
 
             INTEGER
-          , 
-          agentPethPseCardModel
-            DisplayString,
-          agentPethPseCardHost
-            DisplayString,
-          agentPethPseCardStatus
-            INTEGER
+          ,
+          agentPethPseThresholdPower
+            Gauge32
           }
 
     agentPethPsePowerManagementMode OBJECT-TYPE
@@ -391,37 +387,193 @@ NETGEAR-POWER-ETHERNET-MIB DEFINITIONS ::= BEGIN
 
     ::= { agentPethPseEntry 1 }
 
-    agentPethPseCardModel OBJECT-TYPE
-    SYNTAX DisplayString (SIZE(1..32))
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        "Displays the PoE daughther card model at PSE side."
+    agentPethPseThresholdPower OBJECT-TYPE
+      SYNTAX      Gauge32
+      UNITS       "Watts"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+          "Measured usage power expressed in Watts."
+    ::= { agentPethPseEntry 6 }         
 
-    ::= { agentPethPseEntry 3 }         
+   agentPethPoeMainPseObjects       OBJECT IDENTIFIER ::= { agentPethObjects 4 }
+   agentPethPoeMainPseTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF AgentPethPoeMainPseEntry 
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of objects that display and control attributes
+            of the main power source in a PSE  device.  Ethernet
+            switches are one example of boxes that would support
+            these objects.
+            Values of all read-write objects in this table are
+            persistent at restart/reboot."
+       ::= { agentPethPoeMainPseObjects 1 }
 
-    agentPethPseCardHost OBJECT-TYPE
-    SYNTAX DisplayString (SIZE(1..32))
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        "Displays the board which hosts the PoE daughther card at PSE side."
+   agentPethPoeMainPseEntry OBJECT-TYPE
+       SYNTAX      AgentPethPoeMainPseEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+            "A set of objects that display and control the Main
+             power of a PSE. "
+       INDEX    { agentPethPoeMainPseGroupIndex, agentPethPoeMainPseSlotIndex }
+       ::= { agentPethPoeMainPseTable 1 }
 
-    ::= { agentPethPseEntry 4 }         
+   AgentPethPoeMainPseEntry ::= SEQUENCE {
+       agentPethPoeMainPseGroupIndex
+           Integer32,
+       agentPethPoeMainPseSlotIndex
+           Integer32,
+       agentPethPoeMainPsePower
+           Gauge32,
+       agentPethPoeMainPseOperStatus
+           INTEGER,
+       agentPethPoeMainPseThresholdPower
+           Gauge32,
+       agentPethPoeMainPseConsumptionPower
+           Gauge32,
+       agentPethPoeMainPseUsageThreshold
+           Integer32,
+       agentPethPoeMainPseFWImageVersion
+           OCTET STRING,
+       agentPethPoePsePowerManagementMode
+           INTEGER,
+       agentPethPoePseCardModel
+           DisplayString,
+       agentPethPoePseCardHost
+           DisplayString,
+       agentPethPoePseCardStatus
+           INTEGER
+   }
+   agentPethPoeMainPseGroupIndex OBJECT-TYPE
+       SYNTAX       Integer32 (1..2147483647)
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+           "This variable uniquely identifies the group to which
+           power Ethernet PSE is connected.  Group means (box in
+           the stack, module in a rack) and the value 1 MUST be
+           used for non-modular devices.  Furthermore, the same
+           value MUST be used in this variable, pethPsePortGroupIndex,
+           and pethNotificationControlGroupIndex to refer to a
+           given box in a stack or module in a rack."
+       ::= { agentPethPoeMainPseEntry 1 }
 
-    agentPethPseCardStatus OBJECT-TYPE
-    SYNTAX  INTEGER   {
-                absent-or-failed(0),
-                running(1)
-          }
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        "Displays running status of the PoE daughther card at PSE side. The value 
-         absent-or-failed(0) means that the card is either not present or some error has occurred.
-         The value running(1) means that card is present and working fine."
+   agentPethPoeMainPseSlotIndex OBJECT-TYPE
+       SYNTAX       Integer32 (1..2147483647)
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+           "This variable uniquely identifies the slot in an unit."
+       ::= { agentPethPoeMainPseEntry 2 }
 
+   agentPethPoeMainPsePower OBJECT-TYPE
+       SYNTAX      Gauge32  (1..65535)
+       UNITS       "Watts"
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "The nominal power of the PSE expressed in Watts."
+       ::= { agentPethPoeMainPseEntry 3 }
 
-    ::= { agentPethPseEntry 5 }         
+   agentPethPoeMainPseOperStatus OBJECT-TYPE
+       SYNTAX      INTEGER   {
+                   on(1),
+                   off(2),
+                   faulty(3)
+                   }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "The operational status of the main PSE."
+       ::= { agentPethPoeMainPseEntry 4 }
+
+   agentPethPoeMainPseThresholdPower OBJECT-TYPE
+       SYNTAX      Gauge32
+       UNITS       "Watts"
+       MAX-ACCESS  read-only
+       STATUS      deprecated 
+       DESCRIPTION
+           "Measured usage power expressed in Watts. This object is deprecated as 
+            per slot Threshold is no longer supported"
+       ::= { agentPethPoeMainPseEntry 5 }
+
+   agentPethPoeMainPseConsumptionPower OBJECT-TYPE
+       SYNTAX      Gauge32
+       UNITS       "Milliwatts"
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Measured usage power expressed in Watts."
+       ::= { agentPethPoeMainPseEntry 6 }
+
+   agentPethPoeMainPseUsageThreshold OBJECT-TYPE
+       SYNTAX      Integer32  (1..99)
+       UNITS       "%"
+       MAX-ACCESS  read-write
+       STATUS      deprecated 
+       DESCRIPTION
+           "The usage threshold expressed in percents for
+            comparing the measured power and initiating
+            an alarm if the threshold is exceeded. This 
+            object is deprecated as per slot Usage Threshold 
+            is no longer supported."
+       ::= { agentPethPoeMainPseEntry 7 }
+
+   agentPethPoeMainPseFWImageVersion OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE(256))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Version of the PoE controller's FW image."
+       ::= { agentPethPoeMainPseEntry 8 }
+
+   agentPethPoePsePowerManagementMode OBJECT-TYPE
+       SYNTAX      INTEGER   {
+                   none(0),
+                   dynamic(1),
+                   static(2)
+                   }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "Describes or controls the power management algorithm used by the pse 
+            to deliver power to the requesting PDs. A value of dynamic(1) 
+            means that power consumption of each port is measured and calculated in 
+            real-time. A value of static(2) means that power allocated for each port 
+            depends on the type of power threshold configured on the port."
+       REFERENCE
+           "Broadcom 5910X programmers guide"
+       ::= { agentPethPoeMainPseEntry 9 }
+
+   agentPethPoePseCardModel OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(1..32))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Displays the PoE daughther card model at PSE side."
+       ::= { agentPethPoeMainPseEntry 10 }         
+
+   agentPethPoePseCardHost OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(1..32))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Displays the board which hosts the PoE daughther card at PSE side."
+       ::= { agentPethPoeMainPseEntry 11 }         
+
+   agentPethPoePseCardStatus OBJECT-TYPE
+       SYNTAX      INTEGER   {
+                   absent-or-failed(0),
+                   running(1)
+                   }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "Displays running status of the PoE daughther card at PSE side. The value 
+            absent-or-failed(0) means that the card is either not present or some error 
+            has occurred. The value running(1) means that card is present and working fine."
+       ::= { agentPethPoeMainPseEntry 12 }         
 
 END

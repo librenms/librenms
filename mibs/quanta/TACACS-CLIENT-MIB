@@ -1,24 +1,33 @@
 TACACS-CLIENT-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32 	FROM SNMPv2-SMI
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32         FROM SNMPv2-SMI
     InetAddress, InetAddressType               FROM INET-ADDRESS-MIB
     TEXTUAL-CONVENTION, RowStatus              FROM SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP            FROM SNMPv2-CONF
-    lb6m                                   FROM QUANTA-LB6M-REF-MIB
+    fastPath                                   FROM LANCOM-REF-MIB
     InterfaceIndexOrZero                       FROM IF-MIB;
 
 agentTacacsClientMIB MODULE-IDENTITY
-    LAST-UPDATED "201112140000Z" -- 14 Dec 2011 12:00:00 GMT
-    ORGANIZATION "Netgear Inc"
-    CONTACT-INFO ""
+    LAST-UPDATED "201611210000Z" -- 21 Nov 2016 12:00:00 GMT 
+    ORGANIZATION "Broadcom Corporation"
+    CONTACT-INFO
+        "Postal: Broadcom Corporation
+                 1030 Swabia Court
+                 Suite 400
+                 Durham, NC 27703
+         Phone:  +1 919 865 2700"
 
     DESCRIPTION
         "This MIB module defines a portion of the SNMP MIB under
-         the Netgear Inc enterprise OID pertaining to
+         the Broadcom Corporation enterprise OID pertaining to
          TACACS+ client configuration."
 
       -- Revision history.
+    REVISION
+          "201611210000Z" -- 21 Nov 2016 12:00:00 GMT
+    DESCRIPTION
+          "Tacacs IPv6 Link Local Interface objects are added."
     REVISION
         "201112140000Z" -- 14 Dec 2011 12:00:00 GMT
     DESCRIPTION
@@ -30,13 +39,13 @@ agentTacacsClientMIB MODULE-IDENTITY
     REVISION
         "200705230000Z" -- 23 May 2007 12:00:00 GMT
     DESCRIPTION
-        "Netgear branding related changes."
+        "Broadcom branding related changes."
     REVISION 
         "200508170044Z"  -- Wed Aug 17 00:44 GMT 2005
     DESCRIPTION 
         "Initial version of this MIB module."
 
-    ::= { lb6m 18 }
+    ::= { fastPath 18 }
 
     --***********************************************************************
     -- MIB Objects
@@ -67,7 +76,8 @@ agentTacacsClientMIB MODULE-IDENTITY
     STATUS      current
     DESCRIPTION
         "The Encryption and Authentication key used in 
-         communication with  TACACS servers ."
+         communication with  TACACS servers. This is write-only value.
+         It always returns empty string on request."
     ::= { agentTacacsGlobalConfigGroup 2 }
 
     agentTacacsServerTable   OBJECT-TYPE
@@ -102,7 +112,9 @@ agentTacacsClientMIB MODULE-IDENTITY
            agentTacacsServerStatus
                 RowStatus,
            agentTacacsServerIpAddrType
-                InetAddressType
+                InetAddressType,
+           agentTacacsServerLinkLocalIntf
+                InterfaceIndexOrZero
        }
    
     agentTacacsServerIpAddress OBJECT-TYPE
@@ -110,7 +122,8 @@ agentTacacsClientMIB MODULE-IDENTITY
        MAX-ACCESS  not-accessible
        STATUS      current
        DESCRIPTION
-               "The IP address or HostName of the TACACS server."
+               "The IP address or HostName of the TACACS server.
+                Specify link local address if link local interface is configured."
        ::= { agentTacacsServerEntry 1 }
 
     agentTacacsPortNumber OBJECT-TYPE
@@ -169,6 +182,17 @@ agentTacacsClientMIB MODULE-IDENTITY
                 IPv4 and DNS types are supported currently"
        ::= { agentTacacsServerEntry 7 }
 
+    agentTacacsServerLinkLocalIntf OBJECT-TYPE
+       SYNTAX      InterfaceIndexOrZero
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION 
+                   "A link local interface selection on an Interface Index(supported
+                    link local interfaces are physical interface, network port and service port).
+                    A non-zero value indicates ifIndex for the corresponding interface
+                    entry in the ifTable is selected."
+       ::= { agentTacacsServerEntry 8 }
+
     agentTacacsSourceInterface OBJECT-TYPE
        SYNTAX      InterfaceIndexOrZero
        MAX-ACCESS  read-write
@@ -180,4 +204,13 @@ agentTacacsClientMIB MODULE-IDENTITY
                 entry in the ifTable is selected. A zero value indicates the
                 source-interface un-selection."
        ::= { agentTacacsGlobalConfigGroup 3 }
+
+   agentTacacsServicePortSrcInterface OBJECT-TYPE
+       SYNTAX  INTEGER { servicePortEnable(1),
+                         servicePortDisable(2) }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "To select Service Port as a source-interface."
+       ::= {agentTacacsGlobalConfigGroup 4 }
 END

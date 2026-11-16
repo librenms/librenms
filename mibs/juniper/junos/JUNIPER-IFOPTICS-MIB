@@ -21,7 +21,7 @@ IMPORTS
         FROM JUNIPER-SMI;
 
 jnxIfOpticsMib MODULE-IDENTITY
-    LAST-UPDATED "201805020000Z" -- Wed May 2, 2018 00:00:00 UTC
+    LAST-UPDATED "202406240000Z" -- Tue June 25, 2024 00:00:00 UTC
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
@@ -29,37 +29,51 @@ jnxIfOpticsMib MODULE-IDENTITY
                      1133 Innovation Way
                      Sunnyvale, CA 94089
                      E-mail: support@juniper.net"
-
-    DESCRIPTION "Deprecated OCh2 related tables and entries"
-    REVISION      "201609280000Z"
-    DESCRIPTION
-               "Removed INDEX clause from unwanted places"
-    REVISION    "201609122018Z"
-    DESCRIPTION
-           " Added Optics table entries for handling sub-port
-             in the interface name. With suffix OCH2"
-    REVISION     "201506241242Z"
     DESCRIPTION
             "This MIB module defines objects used for managing the
              Optics interface for Juniper products."
-    REVISION      "201201260000Z"
-    DESCRIPTION
-               "Added Optics Config, Alarms and PM data."
-    REVISION      "201201260000Z"
-    DESCRIPTION
-               "Initial revision."
 
-    REVISION    "201605310000Z" -- 31-May-16
+    REVISION      "202406240000Z"
     DESCRIPTION
-            "Corrected name in table sequence"
+               "Updated the PM optics mib tables to extend SNMP support for newly added CLI/OpenConfig PMs 
+                for cohernet ZR optics."
+
+    REVISION      "202404160000Z"
+    DESCRIPTION
+               "Updated the PM optics mib tables to add new PMs supported for coherent ZR optics"
+
+    REVISION    "201808090000Z" -- 9-Aug-18
+    DESCRIPTION
+            "Added FRR related pre-FEC BER threshold objects for ot interface"
 
     REVISION    "201805020000Z" -- 2-May-18
     DESCRIPTION
             "Added jnxOpticsOTIfHighPolarization object"
 
-    REVISION    "201808090000Z" -- 9-Aug-18
+    REVISION      "201609280000Z"
     DESCRIPTION
-            "Added FRR related pre-FEC BER threshold objects for ot interface"
+               "Removed INDEX clause from unwanted places"
+
+    REVISION    "201609122018Z"
+    DESCRIPTION
+               "Deprecated OCh2 related tables and entries"
+
+    REVISION    "201605310000Z" -- 31-May-16
+    DESCRIPTION
+            "Corrected name in table sequence"
+
+    REVISION     "201506241242Z"
+    DESCRIPTION
+           "Added Optics table entries for handling sub-port
+             in the interface name. With suffix OCH2"
+
+    REVISION      "201201260000Z"
+    DESCRIPTION
+               "Added Optics Config, Alarms and PM data."
+
+    REVISION      "201201260000Z"
+    DESCRIPTION
+               "Initial revision."
 
     ::= { jnxOpticsMibRoot 1 }
 
@@ -181,95 +195,87 @@ JnxOpticsNotificationId  ::= TEXTUAL-CONVENTION
     STATUS       current
     DESCRIPTION  "Optic alarm types"
     SYNTAX       INTEGER {
-        jnxOpticsLOS(1),                  -- input loss of signal
-        jnxOpticsWavelenthLockErr(2),     -- wavelength lock
-        jnxOpticsPowerHighAlarm(3),       -- Tx high power alarm
-        jnxOpticsPowerLowAlarm(4),        -- Tx low power alarm
-        jnxOpticsBiasCurrentHighAlarm(5), -- Bias Current High
-        jnxOpticsBiasCurrentLowAlarm(6),  -- Bias Current Low
-        jnxOpticsTemperatureHighAlarm(7), -- Temperature High
-        jnxOpticsTemperaturelowAlarm(8),  -- Temperature low
-        jnxOpticsTxPLLLockAlarm(9),       -- Tx PLL Lock
-        jnxOpticsRxPLLLockAlarm(10),      -- Rx PLL Lock
-        jnxOpticsAvgPowerAlarm(11),       -- Avg Power
-        jnxOpticsRxLossAvgPowerAlarm(12), -- Rx Loss Avg Power
-        jnxOpticsLossofACPowerAlarm(13),  -- Loss of AC Power
-        jnxOpticsTxPowerHighThreshAlert(14), -- Tx Power High TCA
-        jnxOpticsTxPowerLowThreshAlert(15),  -- Tx Power Low TCA
-        jnxOpticsRxPowerHighThreshAlert(16), -- Rx Power High TCA
-        jnxOpticsRxPowerLowThreshAlert(17),  -- Rx Power Low TCA
-        jnxOpticsModuleTempHighThreshAlert(18),    -- Temp High TCA
-        jnxOpticsModuleTempLowThreshAlert(19),     -- Temp Low TCA
-        jnxOptics24HourTxPowerHighThreshAlert(20), -- 24 HourTxPowerHigh TCA
-        jnxOptics24HourTxPowerLowThreshAlert(21),  -- 24 HourTxPowerLow TCA
-        jnxOptics24HourRxPowerHighThreshAlert(22), -- 24 HourRxPowerHigh TCA
-        jnxOptics24HourRxPowerLowThreshAlert(23),  -- 24 HourRxPowerLow TCA
-        jnxOptics24HourModuleTempHighThreshAlert(24), -- 24 Hour Temp High TCA
-        jnxOptics24HourModuleTempLowThreshAlert(25),  -- 24 Hour Temp Low TCA
-        jnxOpticsRxPowerHighAlarm(26),                -- Rx high power alarm
-        jnxOpticsRxPowerLowAlarm(27),                 -- Rx high power alarm
-        jnxOpticsTxPowerHighWarning(28),              -- Rx high power warning
-        jnxOpticsTxPowerLowWarning(29),               -- Rx high power warning
-        jnxOpticsRxPowerHighWarning(30),              -- Rx high power warning
-        jnxOpticsRxPowerLowWarning(31),               -- Rx high power warning
-        jnxOpticsModuleTempHighWarning(32),           -- Mod temp high warning
-        jnxOpticsModuleTempLowWarning(33),            -- Mod temp low warning
-        jnxOpticsRxCarrierFreqHigh(34),               -- rx Carrier freq high
-                                                      -- warning
-        jnxOpticsRxCarrierFreqLow(35),                -- rx Carrier freq low
-                                                      -- warning
-        jnxOpticsChromaticDispHighWarning(36),        -- CD high warning
-        jnxOpticsChromaticDispLowWarning(37),         -- CD low warning
-        jnxOpticsQLowWarning(38),                     -- Q low warning
-        jnxOpticsOSNRLowWarning(39),                  -- OSNR low warning
-        jnxOpticsCarrierFreqHighAlert(40),            --  Carrier freq high
-                                                      -- TCA
-        jnxOpticsCarrierFreqLowAlert(41),             -- Carrier freq Low
-                                                      -- TCA
-        jnxOptics24HourCarrierFreqHighAlert(42),      -- Carrier freq high
-                                                      -- TCA 24Hour
-        jnxOptics24HourCarrierFreqLowAlert(43),        -- Carrier freq Low
-                                                      -- TCA 24Hour
-        jnxOpticsLossOfLock(44),                       -- Loss Of Lock
-        jnxOpticsLossOfSignal(45),                     -- Loss Of Signal
-        jnxOpticsLossOfFrame(46),                      -- Loss Of Frame
-        jnxOpticsLossOfMultiFrame(47),                 -- Loss Of Multi Frame
-        jnxOpticsOTUBDI(48),                           -- Loss of backward defect indication
-        jnxOpticsRxModemSYncFault(49),                 -- Rx Modem Sync Fault
-        jnxOpticsRxModemLOL(50),                       -- Rx Modem Loss of Lock
-        jnxOpticsRxLOA(51),                            -- Rx Loss of Alignment
-        jnxOpticsModBiasControlLoopFail(52),           -- Modulator bias control loop fail
-        jnxOpticsILTAfault(53),                        -- ILTA fault
-        jnxOpticsDACcalibrationfault(54),              -- DAC calibration fault
-        jnxOpticsADCcalibrationfault(55),              -- ADC calibration fault
-        jnxOpticsTecCurrentHighAlert(56),             -- TEC Current high alarm                                                  
-        jnxOpticsTecCurrentLowAlert(57),              -- TEC Current low alarm                                                   
-        jnxOpticsPamHistogramHighAlert(58),           -- PAM Histogram high alarm                                                
-        jnxOpticsResidualIsiHighAlert(59),            -- Residual ISI high alarm                                                 
-        jnxOpticsResidualIsiLowAlert(60),             -- Residual ISI low alarm                                                  
-        jnxOpticsFecCorrectedErrorsHighAlert(61),     -- Fec-Corrected Error Ratio high alarm                                    
-        jnxOpticsFecUCorrectedWordsHighAlert(62),     -- Fec-UCorrected Words Ratio high alarm                                   
-        jnxOptics24HourTecCurrentHighAlert(63),             -- TCA 24Hour - TEC Current high alarm                               
-        jnxOptics24HourTecCurrentLowAlert(64),              -- TCA 24Hour - TEC Current low alarm                                
-        jnxOptics24HourPamHistogramHighAlert(65),           -- TCA 24Hour - PAM Histogram high alarm                             
-        jnxOptics24HourResidualIsiHighAlert(66),            -- TCA 24Hour - Residual ISI high alarm                              
-        jnxOptics24HourResidualIsiLowAlert(67),             -- TCA 24Hour - Residual ISI low alarm                               
-        jnxOptics24HourFecCorrectedErrorsHighAlert(68),     -- TCA 24Hour - Fec-Corrected Error Ratio high alarm                 
-        jnxOptics24HourFecUCorrectedWordsHighAlert(69),     -- TCA 24Hour - Fec-UCorrected Words Ratio high alarm                
-        jnxOpticsLaserFreqErrorHighAlert(70),            -- Laser freq error high                                                
-                                                         -- TCA                                                                  
-        jnxOpticsLaserFreqErrorLowAlert(71),             -- Laser freq error Low                                                 
-                                                         -- TCA                                                                  
-        jnxOptics24HourLaserFreqErrorHighAlert(72),      -- Laser freq error high                                                
-                                                         -- TCA 24Hour
-        jnxOptics24HourLaserFreqErrorLowAlert(73),       -- Laser freq error Low                                                 
-                                                         -- TCA 24Hour
-        jnxOpticsSnrLowAlert(74),                        -- SNR low warning                                                      
-        jnxOptics24HourSnrLowAlert(75),                  -- SNR low warning                                                      
-                                                         -- TCA 24Hour
-        jnxOpticsPreFecBERHighAlert(76),                 -- PreFecBER warning                                                      
-        jnxOptics24HourPreFecBERHignAlert(77)            -- PreFecBER warning                                                      
-                                                         -- TCA 24Hour
+        jnxOpticsLOS(1),                                    -- input loss of signal
+        jnxOpticsWavelenthLockErr(2),                       -- wavelength lock
+        jnxOpticsPowerHighAlarm(3),                         -- Tx high power alarm
+        jnxOpticsPowerLowAlarm(4),                          -- Tx low power alarm
+        jnxOpticsBiasCurrentHighAlarm(5),                   -- Bias Current High
+        jnxOpticsBiasCurrentLowAlarm(6),                    -- Bias Current Low
+        jnxOpticsTemperatureHighAlarm(7),                   -- Temperature High
+        jnxOpticsTemperaturelowAlarm(8),                    -- Temperature low
+        jnxOpticsTxPLLLockAlarm(9),                         -- Tx PLL Lock
+        jnxOpticsRxPLLLockAlarm(10),                        -- Rx PLL Lock
+        jnxOpticsAvgPowerAlarm(11),                         -- Avg Power
+        jnxOpticsRxLossAvgPowerAlarm(12),                   -- Rx Loss Avg Power
+        jnxOpticsLossofACPowerAlarm(13),                    -- Loss of AC Power
+        jnxOpticsTxPowerHighThreshAlert(14),                -- Tx Power High TCA
+        jnxOpticsTxPowerLowThreshAlert(15),                 -- Tx Power Low TCA
+        jnxOpticsRxPowerHighThreshAlert(16),                -- Rx Power High TCA
+        jnxOpticsRxPowerLowThreshAlert(17),                 -- Rx Power Low TCA
+        jnxOpticsModuleTempHighThreshAlert(18),             -- Temp High TCA
+        jnxOpticsModuleTempLowThreshAlert(19),              -- Temp Low TCA
+        jnxOptics24HourTxPowerHighThreshAlert(20),          -- 24 Hour Tx Power High TCA
+        jnxOptics24HourTxPowerLowThreshAlert(21),           -- 24 Hour Tx Power Low TCA
+        jnxOptics24HourRxPowerHighThreshAlert(22),          -- 24 Hour Rx Power High TCA
+        jnxOptics24HourRxPowerLowThreshAlert(23),           -- 24 Hour Rx Power Low TCA
+        jnxOptics24HourModuleTempHighThreshAlert(24),       -- 24 Hour Temp High TCA
+        jnxOptics24HourModuleTempLowThreshAlert(25),        -- 24 Hour Temp Low TCA
+        jnxOpticsRxPowerHighAlarm(26),                      -- Rx high power alarm
+        jnxOpticsRxPowerLowAlarm(27),                       -- Rx high power alarm
+        jnxOpticsTxPowerHighWarning(28),                    -- Rx high power warning
+        jnxOpticsTxPowerLowWarning(29),                     -- Rx high power warning
+        jnxOpticsRxPowerHighWarning(30),                    -- Rx high power warning
+        jnxOpticsRxPowerLowWarning(31),                     -- Rx high power warning
+        jnxOpticsModuleTempHighWarning(32),                 -- Mod temp high warning
+        jnxOpticsModuleTempLowWarning(33),                  -- Mod temp low warning
+        jnxOpticsRxCarrierFreqHigh(34),                     -- rx Carrier freq high warning
+        jnxOpticsRxCarrierFreqLow(35),                      -- rx Carrier freq low warning
+        jnxOpticsChromaticDispHighWarning(36),              -- CD high warning
+        jnxOpticsChromaticDispLowWarning(37),               -- CD low warning
+        jnxOpticsQLowWarning(38),                           -- Q low warning
+        jnxOpticsOSNRLowWarning(39),                        -- OSNR low warning
+        jnxOpticsCarrierFreqHighAlert(40),                  -- Carrier freq high TCA
+        jnxOpticsCarrierFreqLowAlert(41),                   -- Carrier freq low TCA
+        jnxOptics24HourCarrierFreqHighAlert(42),            -- 24 Hour Carrier freq high TCA
+        jnxOptics24HourCarrierFreqLowAlert(43),             -- 24 Hour Carrier freq Low TCA
+        jnxOpticsLossOfLock(44),                            -- Loss Of Lock
+        jnxOpticsLossOfSignal(45),                          -- Loss Of Signal
+        jnxOpticsLossOfFrame(46),                           -- Loss Of Frame
+        jnxOpticsLossOfMultiFrame(47),                      -- Loss Of Multi Frame
+        jnxOpticsOTUBDI(48),                                -- Loss of backward defect indication
+        jnxOpticsRxModemSYncFault(49),                      -- Rx Modem Sync Fault
+        jnxOpticsRxModemLOL(50),                            -- Rx Modem Loss of Lock
+        jnxOpticsRxLOA(51),                                 -- Rx Loss of Alignment
+        jnxOpticsModBiasControlLoopFail(52),                -- Modulator bias control loop fail
+        jnxOpticsILTAfault(53),                             -- ILTA fault
+        jnxOpticsDACcalibrationfault(54),                   -- DAC calibration fault
+        jnxOpticsADCcalibrationfault(55),                   -- ADC calibration fault
+        jnxOpticsTecCurrentHighAlert(56),                   -- TEC Current high alarm
+        jnxOpticsTecCurrentLowAlert(57),                    -- TEC Current low alarm
+        jnxOpticsPamHistogramHighAlert(58),                 -- PAM Histogram high alarm
+        jnxOpticsResidualIsiHighAlert(59),                  -- Residual ISI high alarm
+        jnxOpticsResidualIsiLowAlert(60),                   -- Residual ISI low alarm
+        jnxOpticsFecCorrectedErrorsHighAlert(61),           -- Fec-Corrected Error Ratio high TCA
+        jnxOpticsFecUCorrectedWordsHighAlert(62),           -- Fec-UCorrected Words Ratio high TCA
+        jnxOptics24HourTecCurrentHighAlert(63),             -- TCA 24Hour - TEC Current high alarm
+        jnxOptics24HourTecCurrentLowAlert(64),              -- TCA 24Hour - TEC Current low alarm
+        jnxOptics24HourPamHistogramHighAlert(65),           -- TCA 24Hour - PAM Histogram high alarm
+        jnxOptics24HourResidualIsiHighAlert(66),            -- TCA 24Hour - Residual ISI high alarm
+        jnxOptics24HourResidualIsiLowAlert(67),             -- TCA 24Hour - Residual ISI low alarm
+        jnxOptics24HourFecCorrectedErrorsHighAlert(68),     -- TCA 24Hour - Fec-Corrected Error Ratio high alarm
+        jnxOptics24HourFecUCorrectedWordsHighAlert(69),     -- TCA 24Hour - Fec-UCorrected Words Ratio high alarm
+        jnxOpticsLaserFreqErrorHighAlert(70),               -- TCA Laser freq error high alarm
+        jnxOpticsLaserFreqErrorLowAlert(71),                -- TCA Laser freq error low alarm
+        jnxOptics24HourLaserFreqErrorHighAlert(72),         -- TCA 24Hour Laser freq error high alarm
+        jnxOptics24HourLaserFreqErrorLowAlert(73),          -- TCA 24Hour Laser freq error low alarm
+        jnxOpticsSnrLowAlert(74),                           -- SNR low TCA
+        jnxOptics24HourSnrLowAlert(75),                     -- 24 Hour SNR low TCA
+        jnxOpticsPreFecBERHighAlert(76),                    -- TCA PreFecBER warning
+        jnxOptics24HourPreFecBERHignAlert(77),              -- TCA 24Hour PreFecBER warning
+        jnxOpticsRxSignalPowerHighThreshAlert(78),          -- Rx Signal Power High TCA$
+        jnxOpticsRxSignalPowerLowThreshAlert(79),           -- Rx Signal Power Low TCA$
+        jnxOptics24HourRxSignalPowerHighThreshAlert(80),    -- 24 Hour Rx Signal Power High TCA$
+        jnxOptics24HourRxSignalPowerLowThreshAlert(81)      -- 24 Hour Rx Signal Power Low TCA$
 
     }
 
@@ -1336,7 +1342,7 @@ jnxOpticsPMCurrentTable OBJECT-TYPE
      MAX-ACCESS not-accessible
      STATUS     current
      DESCRIPTION
-         "A table of current PM entries."
+         "A table of current PM entries for coherent optics."
 
      ::= { jnxOpticsPerformanceMonitoring 1 }
 
@@ -1512,9 +1518,105 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
    jnxPMCurMaxFECUCorrectedWordsExponent
                             Integer32,
    jnxPMCurAvgFECUCorrectedWordsMantissa
-                            Integer32,          
+                            Integer32,
    jnxPMCurAvgFECUCorrectedWordsExponent
-                            Integer32          
+                            Integer32,
+   jnxPMCurRxSignalPower
+                            Integer32,
+   jnxPMCurMinRxSignalPower
+                            Integer32,
+   jnxPMCurMaxRxSignalPower
+                            Integer32,
+   jnxPMCurAvgRxSignalPower
+                            Integer32,
+   jnxPMCurOSNR
+                            Integer32,
+   jnxPMCurMinOSNR
+                            Integer32,
+   jnxPMCurMaxOSNR
+                            Integer32,
+   jnxPMCurAvgOSNR
+                            Integer32,
+   jnxPMCurSOPMD
+                            Integer32,
+   jnxPMCurMinSOPMD
+                            Integer32,
+   jnxPMCurMaxSOPMD
+                            Integer32,
+   jnxPMCurAvgSOPMD
+                            Integer32,
+   jnxPMCurSupplyVoltage
+                            Integer32,
+   jnxPMCurMinSupplyVoltage
+                            Integer32,
+   jnxPMCurMaxSupplyVoltage
+                            Integer32,
+   jnxPMCurAvgSupplyVoltage
+                            Integer32,
+   jnxPMCurSOPROC
+                            Integer32,
+   jnxPMCurMinSOPROC
+                            Integer32,
+   jnxPMCurMaxSOPROC
+                            Integer32,
+   jnxPMCurAvgSOPROC
+                            Integer32,
+   jnxPMCurModulatorBiasXI
+                            Integer32,
+   jnxPMCurMinModulatorBiasXI
+                            Integer32,
+   jnxPMCurMaxModulatorBiasXI
+                            Integer32,
+   jnxPMCurAvgModulatorBiasXI
+                            Integer32,
+   jnxPMCurModulatorBiasXQ
+                            Integer32,
+   jnxPMCurMinModulatorBiasXQ
+                            Integer32,
+   jnxPMCurMaxModulatorBiasXQ
+                            Integer32,
+   jnxPMCurAvgModulatorBiasXQ
+                            Integer32,
+   jnxPMCurModulatorBiasYI
+                            Integer32,
+   jnxPMCurMinModulatorBiasYI
+                            Integer32,
+   jnxPMCurMaxModulatorBiasYI
+                            Integer32,
+   jnxPMCurAvgModulatorBiasYI
+                            Integer32,
+   jnxPMCurModulatorBiasYQ
+                            Integer32,
+   jnxPMCurMinModulatorBiasYQ
+                            Integer32,
+   jnxPMCurMaxModulatorBiasYQ
+                            Integer32,
+   jnxPMCurAvgModulatorBiasYQ
+                            Integer32,
+   jnxPMCurModulatorBiasXPhase
+                            Integer32,
+   jnxPMCurMinModulatorBiasXPhase
+                            Integer32,
+   jnxPMCurMaxModulatorBiasXPhase
+                            Integer32,
+   jnxPMCurAvgModulatorBiasXPhase
+                            Integer32,
+   jnxPMCurModulatorBiasYPhase
+                            Integer32,
+   jnxPMCurMinModulatorBiasYPhase
+                            Integer32,
+   jnxPMCurMaxModulatorBiasYPhase
+                            Integer32,
+   jnxPMCurAvgModulatorBiasYPhase
+                            Integer32,
+   jnxPMCurQMargin
+                            Integer32,
+   jnxPMCurMinQMargin
+                            Integer32,
+   jnxPMCurMaxQMargin
+                            Integer32,
+   jnxPMCurAvgQMargin
+                            Integer32
     }
 
     jnxPMCurChromaticDispersion OBJECT-TYPE
@@ -1523,7 +1625,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Residual Chromatic Dispersion measured at Rx Transceiver
+            "Chromatic Dispersion measured at Rx Transceiver
               port"
         ::= { jnxOpticsPMCurrentEntry 1 }
 
@@ -1599,7 +1701,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Min Residual Chromatic Dispersion measured at Rx Transceiver
+            "Min Chromatic Dispersion measured at Rx Transceiver
               port"
         ::= { jnxOpticsPMCurrentEntry 9 }
 
@@ -1609,7 +1711,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Max Residual Chromatic Dispersion measured at Rx Transceiver
+            "Max Chromatic Dispersion measured at Rx Transceiver
               port"
         ::= { jnxOpticsPMCurrentEntry 10 }
 
@@ -1619,7 +1721,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Average Residual Chromatic Dispersion measured at Rx Transceiver
+            "Average Chromatic Dispersion measured at Rx Transceiver
               port"
         ::= { jnxOpticsPMCurrentEntry 11 }
 
@@ -1838,6 +1940,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
               9 - far end unavailable
              10 - partial data
              11 - missing intervals due to restarts
+             12 - data not available
             "
         ::= { jnxOpticsPMCurrentEntry 34 }
 
@@ -1884,7 +1987,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Temperature  measured at  Transceiver port"
+            "Module Temperature"
         ::= { jnxOpticsPMCurrentEntry 39 }
 
     jnxPMCurMinTemperature OBJECT-TYPE
@@ -1893,7 +1996,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Minimum   Temperature  measured at  Transceiver port"
+            "Minimum Module Temperature"
         ::= { jnxOpticsPMCurrentEntry 40 }
 
     jnxPMCurMaxTemperature OBJECT-TYPE
@@ -1902,7 +2005,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Maximum Temperature measure  at  Transceiver port"
+            "Maximum Module Temperature"
         ::= { jnxOpticsPMCurrentEntry 41 }
 
     jnxPMCurAvgTemperature OBJECT-TYPE
@@ -1911,7 +2014,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Average Temperature measure  at  Transceiver port"
+            "Average Module Temperature"
         ::= { jnxOpticsPMCurrentEntry 42 }
 
 
@@ -2136,7 +2239,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Pre-FEC BER since last counter reset"
+            "Pre-FEC BER - provides the mantissa value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMCurrentEntry 67 }
 
  jnxPMCurFECCorrectedErrorsExponent OBJECT-TYPE
@@ -2144,7 +2247,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Pre-FEC BER since last counter reset"
+            "Pre-FEC BER - provides the negetive exponent value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMCurrentEntry 68 }
 
  jnxPMCurMinFECCorrectedErrorsMantissa OBJECT-TYPE
@@ -2152,7 +2255,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Minimum Pre-FEC BER since last counter reset"
+            "Minimum Pre-FEC BER - provides the mantissa value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMCurrentEntry 69 }
    
  jnxPMCurMinFECCorrectedErrorsExponent OBJECT-TYPE
@@ -2160,7 +2263,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Minimum Pre-FEC BER since last counter reset"
+            "Minimum Pre-FEC BER - provides the negetive exponent value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMCurrentEntry 70 }
 
  jnxPMCurMaxFECCorrectedErrorsMantissa OBJECT-TYPE
@@ -2168,7 +2271,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Maximum Pre-FEC BER since last counter reset"
+            "Maximum Pre-FEC BER - provides the mantissa value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMCurrentEntry 71 }
 
  jnxPMCurMaxFECCorrectedErrorsExponent OBJECT-TYPE
@@ -2176,7 +2279,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Maximum Pre-FEC BER since last counter reset"
+            "Maximum Pre-FEC BER - provides the negetive exponent value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMCurrentEntry 72 }
    
  jnxPMCurAvgFECCorrectedErrorsMantissa OBJECT-TYPE
@@ -2184,7 +2287,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Average Pre-FEC BER since last counter reset"
+            "Average Pre-FEC BER - provides the mantissa value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMCurrentEntry 73 }
 
  jnxPMCurAvgFECCorrectedErrorsExponent OBJECT-TYPE
@@ -2192,7 +2295,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Average Pre-FEC BER since last counter reset"
+            "Average Pre-FEC BER - provides the negetive exponent value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMCurrentEntry 74 }
    
  jnxPMCurFECUCorrectedWordsMantissa OBJECT-TYPE
@@ -2200,7 +2303,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Uncorrected BER since last counter reset"
+            "Uncorrected BER - provides the mantissa value for Uncorrected BER expressed in scientific notation"
         ::= { jnxOpticsPMCurrentEntry 75 }
 
  jnxPMCurFECUCorrectedWordsExponent OBJECT-TYPE
@@ -2208,7 +2311,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Uncorrected BER since last counter reset"
+            "Uncorrected BER - provides the negetive exponent value for Uncorrected BER expressed in scientific notation"
         ::= { jnxOpticsPMCurrentEntry 76 }
    
  jnxPMCurMinFECUCorrectedWordsMantissa OBJECT-TYPE
@@ -2216,7 +2319,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Minimum Uncorrected BER since last counter reset"
+            "Minimum Uncorrected BER - provides the mantissa value for Uncorrected BER expressed in scientific notation"
         ::= { jnxOpticsPMCurrentEntry 77 }
 
  jnxPMCurMinFECUCorrectedWordsExponent OBJECT-TYPE
@@ -2224,7 +2327,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Minimum Uncorrected BER since last counter reset"
+            "Minimum Uncorrected BER - provides the negetive exponent value for Uncorrected BER expressed in scientific notation"
         ::= { jnxOpticsPMCurrentEntry 78 }
    
  jnxPMCurMaxFECUCorrectedWordsMantissa OBJECT-TYPE
@@ -2232,7 +2335,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Maximum Uncorrected BER since last counter reset"
+            "Maximum Uncorrected BER - provides the mantissa value for Uncorrected BER expressed in scientific notation"
         ::= { jnxOpticsPMCurrentEntry 79 }
 
  jnxPMCurMaxFECUCorrectedWordsExponent OBJECT-TYPE
@@ -2240,7 +2343,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Maximum Uncorrected BER since last counter reset"
+            "Maximum Uncorrected BER - provides the negetive exponent value for Uncorrected BER expressed in scientific notation"
         ::= { jnxOpticsPMCurrentEntry 80 }
    
  jnxPMCurAvgFECUCorrectedWordsMantissa OBJECT-TYPE
@@ -2248,7 +2351,7 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Average Uncorrected BER since last counter reset"
+            "Average Uncorrected BER - provides the mantissa value for Uncorrected BER expressed in scientific notation"
         ::= { jnxOpticsPMCurrentEntry 81 }
 
  jnxPMCurAvgFECUCorrectedWordsExponent OBJECT-TYPE
@@ -2256,10 +2359,440 @@ JnxOpticsPMCurrentEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Average Uncorrected BER since last counter reset"
+            "Average Uncorrected BER - provides the negetive exponent value for Uncorrected BER expressed in scientific notation"
         ::= { jnxOpticsPMCurrentEntry 82 }
 
+ jnxPMCurRxSignalPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "RxSignalPower   - receive signal power"
+        ::= { jnxOpticsPMCurrentEntry 83}
 
+ jnxPMCurMinRxSignalPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Min RxSignalPower   - receive signal power"
+        ::= { jnxOpticsPMCurrentEntry 84 }
+
+ jnxPMCurMaxRxSignalPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Max RxSignalPower   - receive signal power"
+        ::= { jnxOpticsPMCurrentEntry 85 }
+
+ jnxPMCurAvgRxSignalPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Avg RxSignalPower   - receive signal power"
+        ::= { jnxOpticsPMCurrentEntry 86 }
+
+ jnxPMCurOSNR OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "OSNR   - optical signal to noise ratio"
+        ::= { jnxOpticsPMCurrentEntry 87}
+
+ jnxPMCurMinOSNR OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Min OSNR   - optical signal to noise ratio"
+        ::= { jnxOpticsPMCurrentEntry 88}
+
+ jnxPMCurMaxOSNR OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Max OSNR   - optical signal to noise ratio"
+        ::= { jnxOpticsPMCurrentEntry 89}
+
+ jnxPMCurAvgOSNR OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Avg OSNR   - optical signal to noise ratio"
+        ::= { jnxOpticsPMCurrentEntry 90}
+
+ jnxPMCurSOPMD OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 ps^2"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "SOPMD  - second-order polarization mode dispersion"
+        ::= { jnxOpticsPMCurrentEntry 91}
+
+ jnxPMCurMinSOPMD OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 ps^2"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Min SOPMD  - second-order polarization mode dispersion"
+        ::= { jnxOpticsPMCurrentEntry 92}
+
+ jnxPMCurMaxSOPMD OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 ps^2"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Max SOPMD  - second-order polarization mode dispersion"
+        ::= { jnxOpticsPMCurrentEntry 93}
+
+ jnxPMCurAvgSOPMD OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 ps^2"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Avg SOPMD  - second-order polarization mode dispersion"
+        ::= { jnxOpticsPMCurrentEntry 94}
+
+ jnxPMCurSupplyVoltage OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 V"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Supply Voltage"
+        ::= { jnxOpticsPMCurrentEntry 95}
+
+ jnxPMCurMinSupplyVoltage OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 V"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Supply Voltage"
+        ::= { jnxOpticsPMCurrentEntry 96}
+
+ jnxPMCurMaxSupplyVoltage OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 V"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Supply Voltage"
+        ::= { jnxOpticsPMCurrentEntry 97}
+
+ jnxPMCurAvgSupplyVoltage OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 V"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Supply Voltage"
+        ::= { jnxOpticsPMCurrentEntry 98}
+
+ jnxPMCurSOPROC OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "krad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "SOPROC - State of Polarisation Rate of Change"
+        ::= { jnxOpticsPMCurrentEntry 99}
+
+ jnxPMCurMinSOPROC OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "krad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum SOPROC  - State of Polarisation Rate of Change"
+        ::= { jnxOpticsPMCurrentEntry 100}
+
+ jnxPMCurMaxSOPROC OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "krad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum SOPROC  - State of Polarisation Rate of Change"
+        ::= { jnxOpticsPMCurrentEntry 101}
+
+ jnxPMCurAvgSOPROC OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "krad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average SOPROC  - State of Polarisation Rate of Change"
+        ::= { jnxOpticsPMCurrentEntry 102}
+
+ jnxPMCurModulatorBiasXI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Modulator Bias XI"
+        ::= { jnxOpticsPMCurrentEntry 103}
+
+ jnxPMCurMinModulatorBiasXI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias XI"
+        ::= { jnxOpticsPMCurrentEntry 104}
+
+ jnxPMCurMaxModulatorBiasXI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias XI"
+        ::= { jnxOpticsPMCurrentEntry 105}
+
+ jnxPMCurAvgModulatorBiasXI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias XI"
+        ::= { jnxOpticsPMCurrentEntry 106}
+
+ jnxPMCurModulatorBiasXQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Modulator Bias XQ"
+        ::= { jnxOpticsPMCurrentEntry 107}
+
+ jnxPMCurMinModulatorBiasXQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias XQ"
+        ::= { jnxOpticsPMCurrentEntry 108}
+
+ jnxPMCurMaxModulatorBiasXQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias XQ"
+        ::= { jnxOpticsPMCurrentEntry 109}
+
+ jnxPMCurAvgModulatorBiasXQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias XQ"
+        ::= { jnxOpticsPMCurrentEntry 110}
+
+ jnxPMCurModulatorBiasYI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Modulator Bias YI"
+        ::= { jnxOpticsPMCurrentEntry 111}
+
+ jnxPMCurMinModulatorBiasYI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias YI"
+        ::= { jnxOpticsPMCurrentEntry 112}
+
+ jnxPMCurMaxModulatorBiasYI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias YI"
+        ::= { jnxOpticsPMCurrentEntry 113}
+
+ jnxPMCurAvgModulatorBiasYI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias YI"
+        ::= { jnxOpticsPMCurrentEntry 114}
+
+ jnxPMCurModulatorBiasYQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Modulator Bias YQ"
+        ::= { jnxOpticsPMCurrentEntry 115}
+
+ jnxPMCurMinModulatorBiasYQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias YQ"
+        ::= { jnxOpticsPMCurrentEntry 116}
+
+ jnxPMCurMaxModulatorBiasYQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias YQ"
+        ::= { jnxOpticsPMCurrentEntry 117}
+
+ jnxPMCurAvgModulatorBiasYQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias YQ"
+        ::= { jnxOpticsPMCurrentEntry 118}
+
+ jnxPMCurModulatorBiasXPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Modulator Bias XPhase"
+        ::= { jnxOpticsPMCurrentEntry 119}
+
+ jnxPMCurMinModulatorBiasXPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias XPhase"
+        ::= { jnxOpticsPMCurrentEntry 120}
+
+ jnxPMCurMaxModulatorBiasXPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias XPhase"
+        ::= { jnxOpticsPMCurrentEntry 121}
+
+ jnxPMCurAvgModulatorBiasXPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias XPhase"
+        ::= { jnxOpticsPMCurrentEntry 122}
+
+ jnxPMCurModulatorBiasYPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Modulator Bias YPhase"
+        ::= { jnxOpticsPMCurrentEntry 123}
+
+ jnxPMCurMinModulatorBiasYPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias YPhase"
+        ::= { jnxOpticsPMCurrentEntry 124}
+
+ jnxPMCurMaxModulatorBiasYPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias YPhase"
+        ::= { jnxOpticsPMCurrentEntry 125}
+
+ jnxPMCurAvgModulatorBiasYPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias YPhase"
+        ::= { jnxOpticsPMCurrentEntry 126}
+
+ jnxPMCurQMargin OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 db"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Q Margin"
+        ::= { jnxOpticsPMCurrentEntry 127}
+
+ jnxPMCurMinQMargin OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 db"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Q Margin"
+        ::= { jnxOpticsPMCurrentEntry 128}
+
+ jnxPMCurMaxQMargin OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 db"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Q Margin"
+        ::= { jnxOpticsPMCurrentEntry 129}
+
+ jnxPMCurAvgQMargin OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 db"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Q Margin"
+        ::= { jnxOpticsPMCurrentEntry 130}
 --
 -- PM Interval Table
 --
@@ -2269,7 +2802,7 @@ jnxOpticsPMIntervalTable OBJECT-TYPE
      MAX-ACCESS not-accessible
      STATUS     current
      DESCRIPTION
-         "A table of current PM  entries."
+         "A table of interval PM entries for coherent optics."
      ::= { jnxOpticsPerformanceMonitoring 2 }
 
 jnxOpticsPMIntervalEntry  OBJECT-TYPE
@@ -2408,9 +2941,81 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
    jnxPMIntMaxFECUCorrectedWordsExponent
                             Integer32,
    jnxPMIntAvgFECUCorrectedWordsMantissa
-                            Integer32, 
+                            Integer32,
    jnxPMIntAvgFECUCorrectedWordsExponent
-                            Integer32  
+                            Integer32,
+   jnxPMIntMinRxSignalPower
+                            Integer32,
+   jnxPMIntMaxRxSignalPower
+                            Integer32,
+   jnxPMIntAvgRxSignalPower
+                            Integer32,
+   jnxPMIntMinOSNR
+                            Integer32,
+   jnxPMIntMaxOSNR
+                            Integer32,
+   jnxPMIntAvgOSNR
+                            Integer32,
+   jnxPMIntMinSOPMD
+                            Integer32,
+   jnxPMIntMaxSOPMD
+                            Integer32,
+   jnxPMIntAvgSOPMD
+                            Integer32,
+   jnxPMIntMinSupplyVoltage
+                            Integer32,
+   jnxPMIntMaxSupplyVoltage
+                            Integer32,
+   jnxPMIntAvgSupplyVoltage
+                            Integer32,
+   jnxPMIntMinSOPROC
+                            Integer32,
+   jnxPMIntMaxSOPROC
+                            Integer32,
+   jnxPMIntAvgSOPROC
+                            Integer32,
+   jnxPMIntMinModulatorBiasXI
+                            Integer32,
+   jnxPMIntMaxModulatorBiasXI
+                            Integer32,
+   jnxPMIntAvgModulatorBiasXI
+                            Integer32,
+   jnxPMIntMinModulatorBiasXQ
+                            Integer32,
+   jnxPMIntMaxModulatorBiasXQ
+                            Integer32,
+   jnxPMIntAvgModulatorBiasXQ
+                            Integer32,
+   jnxPMIntMinModulatorBiasYI
+                            Integer32,
+   jnxPMIntMaxModulatorBiasYI
+                            Integer32,
+   jnxPMIntAvgModulatorBiasYI
+                            Integer32,
+   jnxPMIntMinModulatorBiasYQ
+                            Integer32,
+   jnxPMIntMaxModulatorBiasYQ
+                            Integer32,
+   jnxPMIntAvgModulatorBiasYQ
+                            Integer32,
+   jnxPMIntMinModulatorBiasXPhase
+                            Integer32,
+   jnxPMIntMaxModulatorBiasXPhase
+                            Integer32,
+   jnxPMIntAvgModulatorBiasXPhase
+                            Integer32,
+   jnxPMIntMinModulatorBiasYPhase
+                            Integer32,
+   jnxPMIntMaxModulatorBiasYPhase
+                            Integer32,
+   jnxPMIntAvgModulatorBiasYPhase
+                            Integer32,
+   jnxPMIntMinQMargin
+                            Integer32,
+   jnxPMIntMaxQMargin
+                            Integer32,
+   jnxPMIntAvgQMargin
+                            Integer32
     }
 
     jnxOpticsPMIntervalNumber OBJECT-TYPE
@@ -2418,7 +3023,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS     not-accessible
         STATUS         current
         DESCRIPTION
-            "This is the 15 mintute interavl number."
+            "This is the 15 mintute interval number."
         ::= { jnxOpticsPMIntervalEntry 1 }
 
     jnxPMIntMinChromaticDispersion OBJECT-TYPE
@@ -2427,7 +3032,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Residual Chromatic Dispersion measured at Rx Transceiver
+            "Chromatic Dispersion measured at Rx Transceiver
              port - min in the 15 minute interval"
         ::= { jnxOpticsPMIntervalEntry 2 }
 
@@ -2437,7 +3042,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Residual Chromatic Dispersion measured at Rx Transceiver
+            "Chromatic Dispersion measured at Rx Transceiver
              port - max in the 15 minute interval"
         ::= { jnxOpticsPMIntervalEntry 3 }
 
@@ -2447,7 +3052,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Residual Chromatic Dispersion measured at Rx Transceiver
+            "Chromatic Dispersion measured at Rx Transceiver
              port - average in the 15 minute interval"
         ::= { jnxOpticsPMIntervalEntry 4 }
 
@@ -2678,6 +3283,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
               9 - far end unavailable
              10 - partial data
              11 - missing intervals due to restarts
+             12 - data not available
             "
         ::= { jnxOpticsPMIntervalEntry 28 }
 
@@ -2714,7 +3320,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Minimum   Temperature  measured at  Transceiver port"
+            "Minimum Module Temperature"
         ::= { jnxOpticsPMIntervalEntry 32 }
 
     jnxPMIntMaxTemperature OBJECT-TYPE
@@ -2723,7 +3329,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Maximum Temperature measure  at  Transceiver port"
+            "Maximum Module Temperature"
         ::= { jnxOpticsPMIntervalEntry 33 }
 
     jnxPMIntAvgTemperature OBJECT-TYPE
@@ -2732,7 +3338,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Average Temperature measure  at  Transceiver port"
+            "Average Module Temperature"
         ::= { jnxOpticsPMIntervalEntry 34 }
 
     jnxPMIntMinCarFreqOffset OBJECT-TYPE
@@ -2912,7 +3518,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Minimum Pre-FEC BER since last counter reset
+            "Minimum Pre-FEC BER - provides the mantissa value for Pre-FEC BER expressed in scientific notation
         -- min in the 15 minute interval"
         ::= { jnxOpticsPMIntervalEntry 53 }
 
@@ -2921,7 +3527,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Minimum Pre-FEC BER since last counter reset
+            "Minimum Pre-FEC BER - provides the negetive exponent value for Pre-FEC BER expressed in scientific notation
         -- min in the 15 minute interval"
         ::= { jnxOpticsPMIntervalEntry 54 }
  
@@ -2930,7 +3536,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Maximum Pre-FEC BER since last counter reset
+            "Maximum Pre-FEC BER - provides the mantissa value for Pre-FEC BER expressed in scientific notation
         -- min in the 15 minute interval"
         ::= { jnxOpticsPMIntervalEntry 55 }
 
@@ -2939,7 +3545,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Maximum Pre-FEC BER since last counter reset
+            "Maximum Pre-FEC BER - provides the negetive exponent value for Pre-FEC BER expressed in scientific notation
         -- min in the 15 minute interval"
         ::= { jnxOpticsPMIntervalEntry 56 }
 
@@ -2948,7 +3554,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Average Pre-FEC BER since last counter reset
+            "Average Pre-FEC BER - provides the mantissa value for Pre-FEC BER expressed in scientific notation
         -- min in the 15 minute interval"
         ::= { jnxOpticsPMIntervalEntry 57 }
 
@@ -2957,7 +3563,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Average Pre-FEC BER since last counter reset
+            "Average Pre-FEC BER - provides the negetive exponent value for Pre-FEC BER expressed in scientific notation
         -- min in the 15 minute interval"
         ::= { jnxOpticsPMIntervalEntry 58 }
  
@@ -2966,7 +3572,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Minimum Uncorrected BER since last counter reset
+            "Minimum Uncorrected BER - provides the mantissa value for Uncorrected BER expressed in scientific notation
         -- min in the 15 minute interval"
         ::= { jnxOpticsPMIntervalEntry 59 }
 
@@ -2975,7 +3581,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Minimum Uncorrected BER since last counter reset
+            "Minimum Uncorrected BER - provides the negetive exponent value for Uncorrected BER expressed in scientific notation
         -- min in the 15 minute interval"
         ::= { jnxOpticsPMIntervalEntry 60 }
 
@@ -2984,7 +3590,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Maximum Uncorrected BER since last counter reset
+            "Maximum Uncorrected BER - provides the mantissa value for Uncorrected BER expressed in scientific notation
         -- min in the 15 minute interval"
         ::= { jnxOpticsPMIntervalEntry 61 }
 
@@ -2993,7 +3599,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Maximum Uncorrected BER since last counter reset
+            "Maximum Uncorrected BER - provides the negetive exponent value for Uncorrected BER expressed in scientific notation
         -- min in the 15 minute interval"
         ::= { jnxOpticsPMIntervalEntry 62 }
 
@@ -3002,7 +3608,7 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Average Uncorrected BER since last counter reset
+            "Average Uncorrected BER - provides the mantissa value for Uncorrected BER expressed in scientific notation
         -- min in the 15 minute interval"
         ::= { jnxOpticsPMIntervalEntry 63 }
 
@@ -3011,9 +3617,333 @@ JnxOpticsPMIntervalEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Average Uncorrected BER since last counter reset
+            "Average Uncorrected BER - provides the negetive exponent value for Uncorrected BER expressed in scientific notation
         -- min in the 15 minute interval"
         ::= { jnxOpticsPMIntervalEntry 64 }
+
+ jnxPMIntMinRxSignalPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Min RxSignalPower   - receive signal power"
+        ::= { jnxOpticsPMIntervalEntry 65 }
+
+ jnxPMIntMaxRxSignalPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Max RxSignalPower   - receive signal power"
+        ::= { jnxOpticsPMIntervalEntry 66 }
+
+ jnxPMIntAvgRxSignalPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Avg RxSignalPower   - receive signal power"
+        ::= { jnxOpticsPMIntervalEntry 67 }
+
+ jnxPMIntMinOSNR OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Min OSNR   - optical signal to noise ratio"
+        ::= { jnxOpticsPMIntervalEntry 68}
+
+ jnxPMIntMaxOSNR OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Max OSNR   - optical signal to noise ratio"
+        ::= { jnxOpticsPMIntervalEntry 69}
+
+ jnxPMIntAvgOSNR OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Avg OSNR   - optical signal to noise ratio"
+        ::= { jnxOpticsPMIntervalEntry 70}
+
+ jnxPMIntMinSOPMD OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 ps^2"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Min SOPMD  - second-order polarization mode dispersion"
+        ::= { jnxOpticsPMIntervalEntry 71}
+
+ jnxPMIntMaxSOPMD OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 ps^2"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Max SOPMD  - second-order polarization mode dispersion"
+        ::= { jnxOpticsPMIntervalEntry 72}
+
+ jnxPMIntAvgSOPMD OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 ps^2"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Avg SOPMD  - second-order polarization mode dispersion"
+        ::= { jnxOpticsPMIntervalEntry 73}
+
+ jnxPMIntMinSupplyVoltage OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 V"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Supply Voltage"
+        ::= { jnxOpticsPMIntervalEntry 74}
+
+ jnxPMIntMaxSupplyVoltage OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 V"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Supply Voltage"
+        ::= { jnxOpticsPMIntervalEntry 75}
+
+ jnxPMIntAvgSupplyVoltage OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 V"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Supply Voltage"
+        ::= { jnxOpticsPMIntervalEntry 76}
+
+ jnxPMIntMinSOPROC OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "krad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum SOPROC  - State of Polarisation Rate of Change"
+        ::= { jnxOpticsPMIntervalEntry 77}
+
+ jnxPMIntMaxSOPROC OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "krad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum SOPROC  - State of Polarisation Rate of Change"
+        ::= { jnxOpticsPMIntervalEntry 78}
+
+ jnxPMIntAvgSOPROC OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "krad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average SOPROC  - State of Polarisation Rate of Change"
+        ::= { jnxOpticsPMIntervalEntry 79}
+
+ jnxPMIntMinModulatorBiasXI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias XI"
+        ::= { jnxOpticsPMIntervalEntry 80}
+
+ jnxPMIntMaxModulatorBiasXI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias XI"
+        ::= { jnxOpticsPMIntervalEntry 81}
+
+ jnxPMIntAvgModulatorBiasXI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias XI"
+        ::= { jnxOpticsPMIntervalEntry 82}
+
+ jnxPMIntMinModulatorBiasXQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias XQ"
+        ::= { jnxOpticsPMIntervalEntry 83}
+
+ jnxPMIntMaxModulatorBiasXQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias XQ"
+        ::= { jnxOpticsPMIntervalEntry 84}
+
+ jnxPMIntAvgModulatorBiasXQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias XQ"
+        ::= { jnxOpticsPMIntervalEntry 85}
+
+ jnxPMIntMinModulatorBiasYI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias YI"
+        ::= { jnxOpticsPMIntervalEntry 86}
+
+ jnxPMIntMaxModulatorBiasYI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias YI"
+        ::= { jnxOpticsPMIntervalEntry 87}
+
+ jnxPMIntAvgModulatorBiasYI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias YI"
+        ::= { jnxOpticsPMIntervalEntry 88}
+
+ jnxPMIntMinModulatorBiasYQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias YQ"
+        ::= { jnxOpticsPMIntervalEntry 89}
+
+ jnxPMIntMaxModulatorBiasYQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias YQ"
+        ::= { jnxOpticsPMIntervalEntry 90}
+
+ jnxPMIntAvgModulatorBiasYQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias YQ"
+        ::= { jnxOpticsPMIntervalEntry 91}
+
+ jnxPMIntMinModulatorBiasXPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias XPhase"
+        ::= { jnxOpticsPMIntervalEntry 92}
+
+ jnxPMIntMaxModulatorBiasXPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias XPhase"
+        ::= { jnxOpticsPMIntervalEntry 93}
+
+ jnxPMIntAvgModulatorBiasXPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias XPhase"
+        ::= { jnxOpticsPMIntervalEntry 94}
+
+ jnxPMIntMinModulatorBiasYPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias YPhase"
+        ::= { jnxOpticsPMIntervalEntry 95}
+
+ jnxPMIntMaxModulatorBiasYPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias YPhase"
+        ::= { jnxOpticsPMIntervalEntry 96}
+
+ jnxPMIntAvgModulatorBiasYPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias YPhase"
+        ::= { jnxOpticsPMIntervalEntry 97}
+
+ jnxPMIntMinQMargin OBJECT-TYPE
+        SYNTAX          Integer32 
+        UNITS           "0.1 db"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Q Margin"
+        ::= { jnxOpticsPMIntervalEntry 98}
+
+ jnxPMIntMaxQMargin OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 db"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Q Margin"
+        ::= { jnxOpticsPMIntervalEntry 99}
+
+ jnxPMIntAvgQMargin OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 db"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Q Margin"
+        ::= { jnxOpticsPMIntervalEntry 100}
 --
 -- Cur/Prev Day Table
 --
@@ -3022,7 +3952,7 @@ jnxOpticsPMDayTable OBJECT-TYPE
      MAX-ACCESS not-accessible
      STATUS     current
      DESCRIPTION
-         "A table of current PM Day entries."
+         "A table of 24 hour interval PM entries for coherent optics."
 
      ::= { jnxOpticsPerformanceMonitoring 3 }
 
@@ -3164,8 +4094,79 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
    jnxPMDayAvgFECUCorrectedWordsMantissa
                                            Integer32,
    jnxPMDayAvgFECUCorrectedWordsExponent
-                                           Integer32
-
+                                           Integer32,
+   jnxPMDayMinRxSignalPower
+                            Integer32,
+   jnxPMDayMaxRxSignalPower
+                            Integer32,
+   jnxPMDayAvgRxSignalPower
+                            Integer32,
+   jnxPMDayMinOSNR
+                            Integer32,
+   jnxPMDayMaxOSNR
+                            Integer32,
+   jnxPMDayAvgOSNR
+                            Integer32,
+   jnxPMDayMinSOPMD
+                            Integer32,
+   jnxPMDayMaxSOPMD
+                            Integer32,
+   jnxPMDayAvgSOPMD
+                            Integer32,
+   jnxPMDayMinSupplyVoltage
+                            Integer32,
+   jnxPMDayMaxSupplyVoltage
+                            Integer32,
+   jnxPMDayAvgSupplyVoltage
+                            Integer32,
+   jnxPMDayMinSOPROC
+                            Integer32,
+   jnxPMDayMaxSOPROC
+                            Integer32,
+   jnxPMDayAvgSOPROC
+                            Integer32,
+   jnxPMDayMinModulatorBiasXI
+                            Integer32,
+   jnxPMDayMaxModulatorBiasXI
+                            Integer32,
+   jnxPMDayAvgModulatorBiasXI
+                            Integer32,
+   jnxPMDayMinModulatorBiasXQ
+                            Integer32,
+   jnxPMDayMaxModulatorBiasXQ
+                            Integer32,
+   jnxPMDayAvgModulatorBiasXQ
+                            Integer32,
+   jnxPMDayMinModulatorBiasYI
+                            Integer32,
+   jnxPMDayMaxModulatorBiasYI
+                            Integer32,
+   jnxPMDayAvgModulatorBiasYI
+                            Integer32,
+   jnxPMDayMinModulatorBiasYQ
+                            Integer32,
+   jnxPMDayMaxModulatorBiasYQ
+                            Integer32,
+   jnxPMDayAvgModulatorBiasYQ
+                            Integer32,
+   jnxPMDayMinModulatorBiasXPhase
+                            Integer32,
+   jnxPMDayMaxModulatorBiasXPhase
+                            Integer32,
+   jnxPMDayAvgModulatorBiasXPhase
+                            Integer32,
+   jnxPMDayMinModulatorBiasYPhase
+                            Integer32,
+   jnxPMDayMaxModulatorBiasYPhase
+                            Integer32,
+   jnxPMDayAvgModulatorBiasYPhase
+                            Integer32,
+   jnxPMDayMinQMargin
+                            Integer32,
+   jnxPMDayMaxQMargin
+                            Integer32,
+   jnxPMDayAvgQMargin
+                            Integer32
     }
 
     jnxOpticsPMDayIndex OBJECT-TYPE
@@ -3182,7 +4183,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Residual Chromatic Dispersion measured at Rx Transceiver
+            "Chromatic Dispersion measured at Rx Transceiver
              port - min in the day"
         ::= { jnxOpticsPMDayEntry 2 }
 
@@ -3192,7 +4193,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Residual Chromatic Dispersion measured at Rx Transceiver
+            "Chromatic Dispersion measured at Rx Transceiver
              port - max in the day"
         ::= { jnxOpticsPMDayEntry 3 }
 
@@ -3202,7 +4203,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Residual Chromatic Dispersion measured at Rx Transceiver
+            "Chromatic Dispersion measured at Rx Transceiver
              port - average in the day"
         ::= { jnxOpticsPMDayEntry 4 }
 
@@ -3430,6 +4431,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
               5 - cleared by user
               6 - partial data
               7 - one or more intervals are invaild
+              8 - data not available
             "
         ::= { jnxOpticsPMDayEntry 28 }
 
@@ -3466,7 +4468,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Minimum   Temperature  measured at  Transceiver port"
+            "Minimum Module Temperature"
         ::= { jnxOpticsPMDayEntry 32 }
 
     jnxPMDayMaxTemperature OBJECT-TYPE
@@ -3475,7 +4477,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Maximum Temperature measure  at  Transceiver port"
+            "Maximum Module Temperature"
         ::= { jnxOpticsPMDayEntry 33 }
 
     jnxPMDayAvgTemperature OBJECT-TYPE
@@ -3484,7 +4486,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Average Temperature measure  at  Transceiver port"
+            "Average Module Temperature"
         ::= { jnxOpticsPMDayEntry 34 }
 
     jnxPMDayMinCarFreqOffset OBJECT-TYPE
@@ -3657,7 +4659,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Minimum Pre-FEC BER since last counter reset"
+            "Minimum Pre-FEC BER - provides the mantissa value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMDayEntry 53 }
    
  jnxPMDayMinFECCorrectedErrorsExponent OBJECT-TYPE
@@ -3665,7 +4667,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Minimum Pre-FEC BER since last counter reset"
+            "Minimum Pre-FEC BER - provides the negetive exponent value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMDayEntry 54 }
    
  jnxPMDayMaxFECCorrectedErrorsMantissa OBJECT-TYPE
@@ -3673,7 +4675,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Maximum Pre-FEC BER since last counter reset"
+            "Maximum Pre-FEC BER - provides the mantissa value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMDayEntry 55 }
    
  jnxPMDayMaxFECCorrectedErrorsExponent OBJECT-TYPE
@@ -3681,7 +4683,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Maximum Pre-FEC BER since last counter reset"
+            "Maximum Pre-FEC BER - provides the negetive exponent value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMDayEntry 56 }
    
  jnxPMDayAvgFECCorrectedErrorsMantissa OBJECT-TYPE
@@ -3689,7 +4691,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Average Pre-FEC BER since last counter reset"
+            "Average Pre-FEC BER - provides the mantissa value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMDayEntry 57 }
    
  jnxPMDayAvgFECCorrectedErrorsExponent OBJECT-TYPE
@@ -3697,7 +4699,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Average Pre-FEC BER since last counter reset"
+            "Average Pre-FEC BER - provides the negetive exponent value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMDayEntry 58 }
    
  jnxPMDayMinFECUCorrectedWordsMantissa OBJECT-TYPE
@@ -3705,7 +4707,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Minimum Uncorrected BER since last counter reset"
+            "Minimum Uncorrected BER - provides the mantissa value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMDayEntry 59 }
    
  jnxPMDayMinFECUCorrectedWordsExponent OBJECT-TYPE
@@ -3713,7 +4715,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Minimum Uncorrected BER since last counter reset"
+            "Minimum Uncorrected BER - provides the negetive exponent value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMDayEntry 60 }
    
  jnxPMDayMaxFECUCorrectedWordsMantissa OBJECT-TYPE
@@ -3721,7 +4723,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Maximum Uncorrected BER since last counter reset"
+            "Maximum Uncorrected BER - provides the mantissa value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMDayEntry 61 }
    
  jnxPMDayMaxFECUCorrectedWordsExponent OBJECT-TYPE
@@ -3729,7 +4731,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Maximum Uncorrected BER since last counter reset"
+            "Maximum Uncorrected BER - provides the negetive exponent value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMDayEntry 62 }
    
  jnxPMDayAvgFECUCorrectedWordsMantissa OBJECT-TYPE
@@ -3737,7 +4739,7 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Average Uncorrected BER since last counter reset"
+            "Average Uncorrected BER - provides the mantissa value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMDayEntry 63 }
 
  jnxPMDayAvgFECUCorrectedWordsExponent OBJECT-TYPE
@@ -3745,8 +4747,332 @@ JnxOpticsPMDayEntry  ::= SEQUENCE {
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-            "Average Uncorrected BER since last counter reset"
+            "Average Uncorrected BER - provides the negetive exponent value for Pre-FEC BER expressed in scientific notation"
         ::= { jnxOpticsPMDayEntry 64 }
+
+ jnxPMDayMinRxSignalPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Min RxSignalPower   - receive signal power"
+        ::= { jnxOpticsPMDayEntry 65 }
+
+ jnxPMDAyMaxRxSignalPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Max RxSignalPower   - receive signal power"
+        ::= { jnxOpticsPMDayEntry 66 }
+
+ jnxPMDAyAvgRxSignalPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 dbm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Avg RxSignalPower   - receive signal power"
+        ::= { jnxOpticsPMDayEntry 67 }
+
+ jnxPMDayMinOSNR OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Min OSNR   - optical signal to noise ratio"
+        ::= { jnxOpticsPMDayEntry 68}
+
+ jnxPMDayMaxOSNR OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Max OSNR   - optical signal to noise ratio"
+        ::= { jnxOpticsPMDayEntry 69}
+
+ jnxPMDayAvgOSNR OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Avg OSNR   - optical signal to noise ratio"
+        ::= { jnxOpticsPMDayEntry 70}
+
+ jnxPMDayMinSOPMD OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 ps^2"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Min SOPMD  - second-order polarization mode dispersion"
+        ::= { jnxOpticsPMDayEntry 71}
+
+ jnxPMDayMaxSOPMD OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 ps^2"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Max SOPMD  - second-order polarization mode dispersion"
+        ::= { jnxOpticsPMDayEntry 72}
+
+ jnxPMDayAvgSOPMD OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 ps^2"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Avg SOPMD  - second-order polarization mode dispersion"
+        ::= { jnxOpticsPMDayEntry 73}
+
+ jnxPMDayMinSupplyVoltage OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 V"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Supply Voltage"
+        ::= { jnxOpticsPMDayEntry 74}
+
+ jnxPMDayMaxSupplyVoltage OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 V"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Supply Voltage"
+        ::= { jnxOpticsPMDayEntry 75}
+
+ jnxPMDayAvgSupplyVoltage OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 V"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Supply Voltage"
+        ::= { jnxOpticsPMDayEntry 76}
+
+ jnxPMDayMinSOPROC OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "krad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minmum SOPROC  - State of Polarisation Rate of Change"
+        ::= { jnxOpticsPMDayEntry 77}
+
+ jnxPMDayMaxSOPROC OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "krad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum SOPROC  - State of Polarisation Rate of Change"
+        ::= { jnxOpticsPMDayEntry 78}
+
+ jnxPMDayAvgSOPROC OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "krad/s"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average SOPROC  - State of Polarisation Rate of Change"
+        ::= { jnxOpticsPMDayEntry 79}
+
+ jnxPMDayMinModulatorBiasXI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias XI"
+        ::= { jnxOpticsPMDayEntry 80}
+
+ jnxPMDayMaxModulatorBiasXI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias XI"
+        ::= { jnxOpticsPMDayEntry 81}
+
+ jnxPMDayAvgModulatorBiasXI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias XI"
+        ::= { jnxOpticsPMDayEntry 82}
+
+ jnxPMDayMinModulatorBiasXQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias XQ"
+        ::= { jnxOpticsPMDayEntry 83}
+
+ jnxPMDayMaxModulatorBiasXQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias XQ"
+        ::= { jnxOpticsPMDayEntry 84}
+
+ jnxPMDayAvgModulatorBiasXQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias XQ"
+        ::= { jnxOpticsPMDayEntry 85}
+
+ jnxPMDayMinModulatorBiasYI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias YI"
+        ::= { jnxOpticsPMDayEntry 86}
+
+ jnxPMDayMaxModulatorBiasYI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias YI"
+        ::= { jnxOpticsPMDayEntry 87}
+
+ jnxPMDayAvgModulatorBiasYI OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias YI"
+        ::= { jnxOpticsPMDayEntry 88}
+
+ jnxPMDayMinModulatorBiasYQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias YQ"
+        ::= { jnxOpticsPMDayEntry 89}
+
+ jnxPMDayMaxModulatorBiasYQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias YQ"
+        ::= { jnxOpticsPMDayEntry 90}
+
+ jnxPMDayAvgModulatorBiasYQ OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias YQ"
+        ::= { jnxOpticsPMDayEntry 91}
+
+ jnxPMDayMinModulatorBiasXPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias XPhase"
+        ::= { jnxOpticsPMDayEntry 92}
+
+ jnxPMDayMaxModulatorBiasXPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias XPhase"
+        ::= { jnxOpticsPMDayEntry 93}
+
+ jnxPMDayAvgModulatorBiasXPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias XPhase"
+        ::= { jnxOpticsPMDayEntry 94}
+
+ jnxPMDayMinModulatorBiasYPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Modulator Bias YPhase"
+        ::= { jnxOpticsPMDayEntry 95}
+
+ jnxPMDayMaxModulatorBiasYPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Modulator Bias YPhase"
+        ::= { jnxOpticsPMDayEntry 96}
+
+ jnxPMDayAvgModulatorBiasYPhase OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.01 %"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Modulator Bias YPhase"
+        ::= { jnxOpticsPMDayEntry 97}
+
+ jnxPMDayMinQMargin OBJECT-TYPE
+        SYNTAX          Integer32 
+        UNITS           "0.1 db"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Minimum Q Margin"
+        ::= { jnxOpticsPMDayEntry 98}
+
+ jnxPMDayMaxQMargin OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 db"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Maximum Q Margin"
+        ::= { jnxOpticsPMDayEntry 99}
+
+ jnxPMDayAvgQMargin OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "0.1 db"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Average Q Margin"
+        ::= { jnxOpticsPMDayEntry 100}
 
 --
 -- Optical PM data

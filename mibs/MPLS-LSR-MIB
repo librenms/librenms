@@ -1,38 +1,48 @@
--- *****************************************************************
--- MPLS-LSR-MIB.my
+-- Extracted from draft-ietf-mpls-lsr-mib-06.txt
 --
--- August 2000, Tom Nadeau
+-- Network Working Group                               Cheenu Srinivasan
+-- Internet Draft                                 Tachion Networks, Inc.
+-- Expires: January 2001                                                
+--                                                     Arun Viswanathan
+--                                               Force10 Networks, Inc.
+--                                                                     
+--                                                     Thomas D. Nadeau
+--                                                  Cisco Systems, Inc.
+--                                                            July 2000
 --
--- Copyright (c) 2000 by cisco Systems, Inc.
--- All rights reserved.
--- 
--- *****************************************************************
+--                                  
+--  MPLS Label Switch Router Management Information Base Using SMIv2
+--                                
+--                   draft-ietf-mpls-lsr-mib-06.txt
+                                  
 MPLS-LSR-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
    experimental, Integer32, Counter32, Unsigned32,
-   Counter64, Gauge32 
+   IpAddress,
+   Counter64, Gauge32
       FROM SNMPv2-SMI
-
+      
    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
       FROM SNMPv2-CONF
-
+      
    TEXTUAL-CONVENTION, TruthValue, RowStatus, StorageType,
    RowPointer, TimeStamp
       FROM SNMPv2-TC
-
-   InterfaceIndex, InterfaceIndexOrZero
-      FROM IF-MIB
-
+      
    AddressFamilyNumbers
       FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB
 
+   InterfaceIndex, InterfaceIndexOrZero
+      FROM IF-MIB
+      
    InetAddressIPv4, InetAddressIPv6, InetAddressType
       FROM INET-ADDRESS-MIB;
 
+
 mplsLsrMIB MODULE-IDENTITY
-   LAST-UPDATED "200004261200Z"  -- 26 April 2000 12:00:00 EST
+   LAST-UPDATED "200007121200Z"  -- 12 July 2000 12:00:00 EST
    ORGANIZATION "Multiprotocol Label Switching (MPLS) Working Group"
    CONTACT-INFO
        "        Cheenu Srinivasan
@@ -42,55 +52,64 @@ mplsLsrMIB MODULE-IDENTITY
                 West Long Branch, NJ 07764
         Tel:    +1-732-542-7750 x1234
         Email:  cheenu@tachion.com
-
+       
                 Arun Viswanathan
         Postal: Force10 Networks, Inc.
                 1440 McCarthy Blvd
                 Milpitas, CA 95035
         Tel:    +1-408-571-3516
         Email:  arun@force10networks.com
-
+       
                 Thomas D. Nadeau
         Postal: Cisco Systems, Inc.
                 250 Apollo Drive
                 Chelmsford, MA 01824
         Tel:    +1-978-244-3051
         Email:  tnadeau@cisco.com"
-
+   
    DESCRIPTION
        "This MIB contains managed object definitions for the
         Multiprotocol Label Switching (MPLS) Router as
         defined in: Rosen, E., Viswanathan, A., and R.
         Callon, Multiprotocol Label Switching Architecture,
         Internet Draft <draft-ietf-mpls-arch-06.txt>,
-        February 2000."
-
+        August 1999."
+   
    -- Revision history.
    REVISION
-       "199906161200Z"  -- 16 June 1999 12:00:00 EST
+       "200007121200Z"  -- 12 July 2000 12:00:00 EST
    DESCRIPTION
-      "Initial draft version."
+       "Seventh draft version. Fix minor compilation errors."
    REVISION
-       "200002161200Z"  -- 16 February 2000 12:00:00 EST
+       "200007071200Z"  -- 07 July 2000 12:00:00 EST
    DESCRIPTION
-
-
-       "Second draft version."
+       "Sixth draft version. Made minor typographical corrections 
+        noted from WG mailing list during second working group last
+        call."
    REVISION
-       "200003061200Z"  -- 6 March 2000 12:00:00 EST
+       "200004261200Z"  -- 26 April 2000 12:00:00 EST
    DESCRIPTION
-       "Third draft version."
+       "Fifth draft version. Made minor typographical corrections 
+        noted from WG mailing list."
    REVISION
        "200004211200Z"  -- 21 April 2000 12:00:00 EST
    DESCRIPTION
        "Fourth draft version.  Made corrections from WG Last 
         Call comments."
    REVISION
-       "200004261200Z"  -- 26 April 2000 12:00:00 EST
+       "200003061200Z"  -- 6 March 2000 12:00:00 EST
    DESCRIPTION
-       "Fifth draft version. Made minor typographical corrections 
-        noted from WG mailing list."
+       "Third draft version."
+   REVISION
+       "200002161200Z"  -- 16 February 2000 12:00:00 EST
+   DESCRIPTION
+       "Second draft version."
+   REVISION
+       "199906161200Z"  -- 16 June 1999 12:00:00 EST
+   DESCRIPTION
+      "Initial draft version."
    ::= { experimental 96 }
+
 
 -- Textual Conventions.
 
@@ -128,8 +147,6 @@ MplsLabel ::= TEXTUAL-CONVENTION
         the control plane for an MPLS shim header label and
         is not a valid label value in the data path."
    REFERENCE
-
-
        "1. MPLS Label Stack Encoding, Rosen et al, draft-
           ietf-mpls-label-encaps-07.txt, March 2000.
         2. Use of Label Switching on Frame Relay Networks,
@@ -160,13 +177,6 @@ MplsBurstSize ::= TEXTUAL-CONVENTION
         may send back-to-back without concern for policing."
    SYNTAX  Integer32 (1..2147483647)
 
-MplsBufferSize ::= TEXTUAL-CONVENTION
-   DISPLAY-HINT "d"
-   STATUS      current
-   DESCRIPTION
-       "Size of buffer in octets of MPLS data."
-   SYNTAX  Integer32 (1..2147483647)
-
 MplsObjectOwner ::= TEXTUAL-CONVENTION
    STATUS      current
    DESCRIPTION
@@ -176,10 +186,10 @@ MplsObjectOwner ::= TEXTUAL-CONVENTION
                 snmp(2),
                 ldp(3),
                 rsvp(4),
-                policyAgent(5),
-                unknown (6)
+                crldp(5),
+                policyAgent(6),
+                unknown (7)
              }
-
 
 -- Top level components of this MIB.
 
@@ -187,8 +197,10 @@ MplsObjectOwner ::= TEXTUAL-CONVENTION
 mplsLsrObjects       OBJECT IDENTIFIER ::= { mplsLsrMIB 1 }
 -- traps
 mplsLsrNotifications OBJECT IDENTIFIER ::= { mplsLsrMIB 2 }
+mplsLsrNotifyPrefix OBJECT IDENTIFIER ::= { mplsLsrNotifications 0 }
 -- conformance
 mplsLsrConformance   OBJECT IDENTIFIER ::= { mplsLsrMIB 3 }
+
 
 -- MPLS Interface Configuration Table.
 
@@ -229,8 +241,6 @@ MplsInterfaceConfEntry ::= SEQUENCE {
   mplsInterfaceLabelMaxOut            MplsLabel,
   mplsInterfaceTotalBandwidth         MplsBitRate,
   mplsInterfaceAvailableBandwidth     MplsBitRate,
-  mplsInterfaceTotalBuffer            MplsBufferSize,
-  mplsInterfaceAvailableBuffer        MplsBufferSize,
   mplsInterfaceLabelParticipationType BITS,
   mplsInterfaceConfStorageType        StorageType
 }
@@ -281,7 +291,6 @@ mplsInterfaceLabelMinOut OBJECT-TYPE
         LSR is willing to send on this interface."
    ::= { mplsInterfaceConfEntry 4 }
 
-
 mplsInterfaceLabelMaxOut OBJECT-TYPE
    SYNTAX        MplsLabel
    MAX-ACCESS    read-only
@@ -318,35 +327,11 @@ mplsInterfaceAvailableBandwidth       OBJECT-TYPE
         interface with index 0."
 ::= { mplsInterfaceConfEntry 7 }
 
-mplsInterfaceTotalBuffer        OBJECT-TYPE
-   SYNTAX        MplsBufferSize
-   MAX-ACCESS    read-only
-   STATUS        current
-   DESCRIPTION
-       "This value indicates the total amount of buffer
-        space allocated for this interface.  This variable
-        is not applicable when applied to the interface with
-        index 0."
-::= { mplsInterfaceConfEntry 8 }
-
-mplsInterfaceAvailableBuffer       OBJECT-TYPE
-   SYNTAX        MplsBufferSize
-
-
-   MAX-ACCESS    read-only
-   STATUS        current
-   DESCRIPTION
-       "This value reflects the total amount of buffer space
-        available on this interface.  This variable is not
-        applicable when applied to the interface with index
-        0."
-::= { mplsInterfaceConfEntry 9 }
-
 mplsInterfaceLabelParticipationType OBJECT-TYPE
    SYNTAX  BITS {
-                  perPlatform (0),
-                  perInterface (1)
-                }
+                perPlatform (0),
+                perInterface (1)
+              }
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
@@ -369,7 +354,7 @@ mplsInterfaceLabelParticipationType OBJECT-TYPE
    REFERENCE
       "Multiprotocol Label Switching, Rosen et al, draft-ietf-mpls-
        arch-06.txt, August 1999."
-::= { mplsInterfaceConfEntry 10 }
+::= { mplsInterfaceConfEntry 8 }
 
 mplsInterfaceConfStorageType  OBJECT-TYPE
    SYNTAX      StorageType
@@ -377,13 +362,12 @@ mplsInterfaceConfStorageType  OBJECT-TYPE
    STATUS      current
    DESCRIPTION
        "The storage type for this entry."
-   ::= { mplsInterfaceConfEntry 11 }
+   ::= { mplsInterfaceConfEntry 9 }
 
 -- End of mplsInterfaceConfTable
 
+
 -- MPLS Interface Performance Table.
-
-
 mplsInterfacePerfTable  OBJECT-TYPE
    SYNTAX        SEQUENCE OF MplsInterfacePerfEntry
    MAX-ACCESS    not-accessible
@@ -407,14 +391,10 @@ mplsInterfacePerfEntry OBJECT-TYPE
 MplsInterfacePerfEntry ::= SEQUENCE {
       -- incoming direction
       mplsInterfaceInLabelsUsed          Gauge32,
-      mplsInterfaceInPackets             Counter32,
-      mplsInterfaceInDiscards            Counter32,
       mplsInterfaceFailedLabelLookup     Counter32,
-
+      
       -- outgoing direction
       mplsInterfaceOutLabelsUsed         Gauge32,
-      mplsInterfaceOutPackets            Counter32,
-      mplsInterfaceOutDiscards           Counter32,
       mplsInterfaceOutFragments          Counter32
    }
 
@@ -423,87 +403,55 @@ mplsInterfaceInLabelsUsed OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-       "This value indicates the specific number of labels
+       "This object counts the number of labels
         that are in use at this point in time on this
-        interface in the incoming direction."
+        interface in the incoming direction. If the interface
+        participates in the per-platform label space only,
+        then this instance of this object MUST be identical
+        with the instance with index 0. If the interface
+        participates in the per-interface label space, then this
+        this instance of this object MUST represent the number of
+        of per-interface labels that are in use at this point in
+        time on this interface."
    ::= { mplsInterfacePerfEntry 1 }
-
-mplsInterfaceInPackets OBJECT-TYPE
-   SYNTAX        Counter32
-   MAX-ACCESS    read-only
-   STATUS        current
-   DESCRIPTION
-
-
-       "This variable reflects the number of labeled packets
-        that have been received on this interface."
-   ::= { mplsInterfacePerfEntry 2 }
-
-mplsInterfaceInDiscards OBJECT-TYPE
-   SYNTAX        Counter32
-   MAX-ACCESS    read-only
-   STATUS        current
-   DESCRIPTION
-       "The number of inbound labeled packets, which were
-        chosen to be discarded even though no errors had
-        been detected to prevent their being transmitted.
-        One possible reason for discarding such a labeled
-        packet could be to free up buffer space."
-   ::= { mplsInterfacePerfEntry 3 }
 
 mplsInterfaceFailedLabelLookup OBJECT-TYPE
    SYNTAX        Counter32
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-       "This value indicates the number of labeled packets
+       "This object counts the number of labeled packets
         that have been received on this interface and were
-        discarded because there were no matching entries
-        found for them in mplsInSegmentTable."
-   ::= { mplsInterfacePerfEntry 4 }
+        discarded because there was no matching cross-connect
+        entry. This object MUST count on a per-interface basis
+        regardless of which label space the interface participates
+        in."
+   ::= { mplsInterfacePerfEntry 2 }
 
 mplsInterfaceOutLabelsUsed OBJECT-TYPE
    SYNTAX        Gauge32
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-       "Indicates the number of top-most labels in the
+       "This object counts the number of top-most labels in the
         outgoing label stacks that are in use at this point
-        in time on this interface."
-   ::= { mplsInterfacePerfEntry 5 }
-
-mplsInterfaceOutPackets OBJECT-TYPE
-   SYNTAX        Counter32
-   MAX-ACCESS    read-only
-   STATUS        current
-   DESCRIPTION
-       "This variable contains the number of labeled packets
-        that have been transmitted on this interface."
-   ::= { mplsInterfacePerfEntry 6 }
-
-mplsInterfaceOutDiscards OBJECT-TYPE
-   SYNTAX        Counter32
-   MAX-ACCESS    read-only
-   STATUS        current
-
-
-   DESCRIPTION
-       "The number of outbound labeled packets, which were
-        chosen to be discarded even though no errors had
-        been detected to prevent their being transmitted.
-        One possible reason for discarding such a labeled
-        packet could be to free up buffer space."
-   ::= { mplsInterfacePerfEntry 7 }
+        in time on this interface. This object
+        MUST count on a per-interface basis regardless of
+        which label space the interface participates in."
+   ::= { mplsInterfacePerfEntry 3 }
 
 mplsInterfaceOutFragments OBJECT-TYPE
    SYNTAX        Counter32
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-       "This variable indicates the number of outgoing MPLS
+       "This object counts the number of outgoing MPLS
         packets that required fragmentation before
-        transmission on this interface."
-::= { mplsInterfacePerfEntry 8 }
+        transmission on this interface. This object
+        transmission on this interface. This object
+        MUST count on a per-interface basis regardless of 
+        which label space the interface participates in."
+::= { mplsInterfacePerfEntry 4 }
 
 -- In-segment table.
 
@@ -537,19 +485,15 @@ MplsInSegmentEntry ::= SEQUENCE {
   mplsInSegmentNPop                 Integer32,
   mplsInSegmentAddrFamily           AddressFamilyNumbers,
   mplsInSegmentXCIndex              Integer32,
-
-
   mplsInSegmentOwner                MplsObjectOwner,
   mplsInSegmentTrafficParamPtr      RowPointer,
   mplsInSegmentRowStatus            RowStatus,
-  mplsInSegmentStorageType          StorageType,
-  mplsInSegmentAdminStatus          INTEGER,
-  mplsInSegmentOperStatus           INTEGER
+  mplsInSegmentStorageType          StorageType
 }
 
 mplsInSegmentIfIndex OBJECT-TYPE
    SYNTAX        InterfaceIndexOrZero
-   MAX-ACCESS    not-accessible
+   MAX-ACCESS    accessible-for-notify
    STATUS        current
    DESCRIPTION
        "This is a unique index for an entry in the
@@ -563,7 +507,7 @@ mplsInSegmentIfIndex OBJECT-TYPE
 
 mplsInSegmentLabel OBJECT-TYPE
    SYNTAX        MplsLabel
-   MAX-ACCESS    not-accessible
+   MAX-ACCESS    accessible-for-notify
    STATUS        current
    DESCRIPTION
        "The incoming label for this segment."
@@ -589,8 +533,6 @@ mplsInSegmentAddrFamily OBJECT-TYPE
    STATUS        current
    DESCRIPTION
        "The IANA address family [IANAFamily] of the incoming
-
-
         packet.  A value of other(0) indicates that the
         family type is either unknown or undefined."
    DEFVAL        { other }
@@ -610,7 +552,7 @@ SYNTAX        Integer32 (0..2147483647)
         of mplsXCIndex of that cross-connect entry."
    DEFVAL        { 0 }
    ::= { mplsInSegmentEntry 5 }
-
+   
 mplsInSegmentOwner OBJECT-TYPE
    SYNTAX        MplsObjectOwner
    MAX-ACCESS    read-create
@@ -641,14 +583,12 @@ mplsInSegmentTrafficParamPtr OBJECT-TYPE
 mplsInSegmentRowStatus OBJECT-TYPE
    SYNTAX        RowStatus
    MAX-ACCESS    read-create
-
-
    STATUS        current
    DESCRIPTION
        "This variable is used to create, modify, and/or
         delete a row in this table."
    ::= { mplsInSegmentEntry 8 }
-
+   
 mplsInSegmentStorageType OBJECT-TYPE
    SYNTAX        StorageType
    MAX-ACCESS    read-create
@@ -658,40 +598,7 @@ mplsInSegmentStorageType OBJECT-TYPE
         object."
    ::= { mplsInSegmentEntry 9 }
 
-mplsInSegmentAdminStatus OBJECT-TYPE
-   SYNTAX        INTEGER {
-                up(1),      -- ready to pass packets
-                down(2),
-                testing(3)  -- in some test mode
-      }
-   MAX-ACCESS    read-create
-   STATUS        current
-   DESCRIPTION
-       "This value is used to represent the manager’s
-        desired operational status of this segment."
-   ::= { mplsInSegmentEntry 10 }
-
-mplsInSegmentOperStatus OBJECT-TYPE
-   SYNTAX        INTEGER {
-       up(1),          -- ready to pass packets
-       down(2),
-       testing(3),     -- in some test mode
-       unknown(4),     -- status cannot be determined for
-                       -- some reason
-       dormant(5),
-       notPresent(6),    -- some component is missing
-       lowerLayerDown(7) -- down due to the state of
-                         -- lower layer interfaces
-      }
-   MAX-ACCESS    read-only
-   STATUS        current
-   DESCRIPTION
-       "This value represents the actual operational status
-        of this segment."
-   ::= { mplsInSegmentEntry 11 }
-
 -- End of mplsInSegmentTable
-
 
 -- In-segment performance table.
 
@@ -722,12 +629,13 @@ MplsInSegmentPerfEntry ::= SEQUENCE {
     mplsInSegmentPackets                Counter32,
     mplsInSegmentErrors                 Counter32,
     mplsInSegmentDiscards               Counter32,
-
+    
     -- high capacity counter
     mplsInSegmentHCOctets               Counter64,
-
+    
     mplsInSegmentPerfDiscontinuityTime  TimeStamp
    }
+
 
 mplsInSegmentOctets OBJECT-TYPE
    SYNTAX        Counter32
@@ -743,8 +651,6 @@ mplsInSegmentPackets OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-
-
        "Total number of packets received by this segment."
    ::= { mplsInSegmentPerfEntry 2 }
 
@@ -778,7 +684,7 @@ mplsInSegmentHCOctets OBJECT-TYPE
        "The total number of octets received.  This is the 64
         bit version of mplsInSegmentOctets."
    ::= { mplsInSegmentPerfEntry 5 }
-
+   
 mplsInSegmentPerfDiscontinuityTime OBJECT-TYPE
        SYNTAX      TimeStamp
        MAX-ACCESS  read-only
@@ -791,9 +697,9 @@ mplsInSegmentPerfDiscontinuityTime OBJECT-TYPE
           initialization of the local management subsystem, then
           this object contains a zero value."
        ::= { mplsInSegmentPerfEntry 6 }
+   
 
 -- End of mplsInSegmentPerfTable.
-
 
 -- Out-segment table.
 
@@ -817,6 +723,7 @@ mplsOutSegmentIndexNext OBJECT-TYPE
         policy when this index value will be made available
         for reuse."
    ::= { mplsLsrObjects 5 }
+
 
 mplsOutSegmentTable  OBJECT-TYPE
    SYNTAX        SEQUENCE OF MplsOutSegmentEntry
@@ -842,26 +749,24 @@ mplsOutSegmentEntry  OBJECT-TYPE
 
 MplsOutSegmentEntry ::= SEQUENCE {
   mplsOutSegmentIndex                Integer32,
-  mplsOutSegmentIfIndex              InterfaceIndex,
-
-
+--  mplsOutSegmentIfIndex              InterfaceIndex,
+  mplsOutSegmentIfIndex              InterfaceIndexOrZero,
   mplsOutSegmentPushTopLabel         TruthValue,
   mplsOutSegmentTopLabel             MplsLabel,
   mplsOutSegmentNextHopIpAddrType    InetAddressType,
-  mplsOutSegmentNextHopIpv4Addr      InetAddressIPv4,
+--  mplsOutSegmentNextHopIpv4Addr      InetAddressIPv4,
+  mplsOutSegmentNextHopIpv4Addr      IpAddress,
   mplsOutSegmentNextHopIpv6Addr      InetAddressIPv6,
   mplsOutSegmentXCIndex              Integer32,
   mplsOutSegmentOwner                MplsObjectOwner,
   mplsOutSegmentTrafficParamPtr      RowPointer,
   mplsOutSegmentRowStatus            RowStatus,
-  mplsOutSegmentStorageType          StorageType,
-  mplsOutSegmentAdminStatus          INTEGER,
-  mplsOutSegmentOperStatus           INTEGER
+  mplsOutSegmentStorageType          StorageType
 }
 
 mplsOutSegmentIndex OBJECT-TYPE
-   SYNTAX        Integer32(0..2147483647)
-   MAX-ACCESS    not-accessible
+   SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    accessible-for-notify
    STATUS        current
    DESCRIPTION
        "This value contains a unique index for this row.
@@ -871,8 +776,12 @@ mplsOutSegmentIndex OBJECT-TYPE
         segment has been configured."
    ::= { mplsOutSegmentEntry 1 }
 
+-- mplsOutSegmentIfIndex can take a value of 0. Hence InterfaceIndexOrZero
+-- is the more correct definition for this object. This definition has been 
+-- corrected in a later revision of the draft.  
 mplsOutSegmentIfIndex OBJECT-TYPE
-   SYNTAX        InterfaceIndex
+--   SYNTAX        InterfaceIndex
+   SYNTAX        InterfaceIndexOrZero
    MAX-ACCESS    read-create
    STATUS        current
    DESCRIPTION
@@ -895,8 +804,6 @@ mplsOutSegmentPushTopLabel OBJECT-TYPE
         set to false, but the cross-connect entry which
         refers to this out-segment has a non-zero
         mplsLabelStackIndex.  The LSR MUST ensure that this
-
-
         situation does not happen "
    ::= { mplsOutSegmentEntry 3 }
 
@@ -923,7 +830,8 @@ mplsOutSegmentNextHopIpAddrType OBJECT-TYPE
    ::= { mplsOutSegmentEntry 5 }
 
 mplsOutSegmentNextHopIpv4Addr OBJECT-TYPE
-   SYNTAX        InetAddressIPv4
+--   SYNTAX        InetAddressIPv4
+   SYNTAX        IpAddress
    MAX-ACCESS    read-create
    STATUS        current
    DESCRIPTION
@@ -947,8 +855,6 @@ mplsOutSegmentNextHopIpv6Addr OBJECT-TYPE
 mplsOutSegmentXCIndex OBJECT-TYPE
    SYNTAX        Integer32 (0..2147483647)
    MAX-ACCESS    read-only
-
-
    STATUS        current
    DESCRIPTION
        "Index into mplsXCTable which identifies which cross-
@@ -999,8 +905,6 @@ mplsOutSegmentRowStatus OBJECT-TYPE
 
 mplsOutSegmentStorageType OBJECT-TYPE
    SYNTAX        StorageType
-
-
    MAX-ACCESS    read-create
    STATUS        current
    DESCRIPTION
@@ -1008,37 +912,8 @@ mplsOutSegmentStorageType OBJECT-TYPE
         object."
    ::= { mplsOutSegmentEntry 12 }
 
-mplsOutSegmentAdminStatus OBJECT-TYPE
-   SYNTAX        INTEGER {
-         up(1),     -- ready to pass packets
-         down(2),
-         testing(3) -- in some test mode
-      }
-   MAX-ACCESS    read-create
-   STATUS        current
-   DESCRIPTION
-       "The desired operational status of this segment."
-   ::= { mplsOutSegmentEntry 13 }
-
-mplsOutSegmentOperStatus OBJECT-TYPE
-   SYNTAX        INTEGER {
-         up(1),            -- ready to pass packets
-         down(2),
-         testing(3),       -- in some test mode
-         unknown(4),       -- status cannot be determined
-                           -- for some reason
-         dormant(5),
-         notPresent(6),    -- some component is missing
-         lowerLayerDown(7) -- down due to the state
-                            -- of lower layer interfaces
-      }
-   MAX-ACCESS    read-only
-   STATUS        current
-   DESCRIPTION
-       "The actual operational status of this segment."
-   ::= { mplsOutSegmentEntry 14 }
-
 -- End of mplsOutSegmentTable
+
 
 -- Out-segment performance table.
 
@@ -1050,8 +925,6 @@ mplsOutSegmentPerfTable  OBJECT-TYPE
        "This table contains statistical information about
         outgoing segments from an LSR. The counters in this
         entry should behave in a manner similar to that of
-
-
         the interface."
    ::= { mplsLsrObjects 7 }
 
@@ -1071,10 +944,10 @@ MplsOutSegmentPerfEntry ::= SEQUENCE {
       mplsOutSegmentPackets               Counter32,
       mplsOutSegmentErrors                Counter32,
       mplsOutSegmentDiscards              Counter32,
-
+      
       -- HC counter
       mplsOutSegmentHCOctets              Counter64,
-
+      
       mplsOutSegmentPerfDiscontinuityTime  TimeStamp
    }
 
@@ -1102,8 +975,6 @@ mplsOutSegmentErrors OBJECT-TYPE
    STATUS        current
    DESCRIPTION
        "Number of packets that could not be sent due to
-
-
         errors on this segment."
    ::= { mplsOutSegmentPerfEntry 3 }
 
@@ -1128,7 +999,7 @@ mplsOutSegmentHCOctets OBJECT-TYPE
        "Total number of octets sent.  This is the 64 bit
         version of mplsOutSegmentOctets."
    ::= { mplsOutSegmentPerfEntry 5 }
-
+   
 mplsOutSegmentPerfDiscontinuityTime OBJECT-TYPE
        SYNTAX      TimeStamp
        MAX-ACCESS  read-only
@@ -1141,6 +1012,7 @@ mplsOutSegmentPerfDiscontinuityTime OBJECT-TYPE
           initialization of the local management subsystem, then
           this object contains a zero value."
        ::= { mplsOutSegmentPerfEntry 6 }
+   
 
 -- End of mplsOutSegmentPerfTable.
 
@@ -1153,8 +1025,6 @@ mplsXCIndexNext OBJECT-TYPE
    DESCRIPTION
        "This object contains an appropriate value to be used
         for mplsXCIndex when creating entries in the
-
-
         mplsXCTable.  The value 0 indicates that no
         unassigned entries are available.  To obtain the
         value of mplsXCIndex for a new entry in the
@@ -1188,24 +1058,23 @@ mplsXCEntry  OBJECT-TYPE
    DESCRIPTION
        "A row in this table represents one cross-connect
         entry.  The following objects index it:
-
+       
         - cross-connect index mplsXCIndex that uniquely
           identifies a group of cross-connect entries
         - interface index of the in-segment,
           mplsInSegmentIfIndex
         - incoming label(s), mplsInSegmentLabel
         - out-segment index, mplsOutSegmentIndex
-
+       
        Originating LSPs:
         These are represented by using the special
         combination of values mplsInSegmentIfIndex=0 and
         mplsInSegmentLabel=0 as indexes.  In this case the
         mplsOutSegmentIndex MUST be non-zero.
-
+       
        Terminating LSPs:
        These are represented by using the special value
         mplsOutSegmentIndex=0 as index.
-
 
        Special labels:
         Entries indexed by reserved MPLS label values 0
@@ -1217,7 +1086,7 @@ mplsXCEntry  OBJECT-TYPE
         because the mplsOutSegmentIfIndex = 0.  The
         mplsOutSegmentIfIndex MUST only be set to 0 in
         cases of terminating LSPs.
-
+       
         An entry can be created by a network administrator
         or by an SNMP agent as instructed by an MPLS
         signaling protocol."
@@ -1240,11 +1109,11 @@ MplsXCEntry ::= SEQUENCE {
 
 mplsXCIndex OBJECT-TYPE
    SYNTAX        Integer32 (1..2147483647)
-   MAX-ACCESS    not-accessible
+   MAX-ACCESS    accessible-for-notify
    STATUS        current
    DESCRIPTION
-       "Primary index for the row identifying a group of
-        cross-connect segments."
+       "Primary index for the conceptual row identifying 
+        a group of cross-connect segments."
    ::= { mplsXCEntry 1 }
 
 mplsXCLspId OBJECT-TYPE
@@ -1255,7 +1124,6 @@ mplsXCLspId OBJECT-TYPE
        "This value identifies the label switched path that
         this cross-connect entry belongs to."
    ::= { mplsXCEntry 2 }
-
 
 mplsXCLabelStackIndex OBJECT-TYPE
    SYNTAX        Integer32 (0..2147483647)
@@ -1283,7 +1151,7 @@ mplsXCIsPersistent OBJECT-TYPE
         was created by a signaling protocol."
    DEFVAL        { false }
    ::= { mplsXCEntry 4 }
-
+   
 mplsXCOwner OBJECT-TYPE
    SYNTAX    MplsObjectOwner
    MAX-ACCESS    read-create
@@ -1300,15 +1168,13 @@ mplsXCRowStatus OBJECT-TYPE
    DESCRIPTION
        "For creating, modifying, and deleting this row."
    ::= { mplsXCEntry 6 }
-
+   
 mplsXCStorageType OBJECT-TYPE
    SYNTAX        StorageType
    MAX-ACCESS    read-create
    STATUS        current
    DESCRIPTION
        "Defines the storage type for this object."
-
-
    ::= { mplsXCEntry 7 }
 
 mplsXCAdminStatus OBJECT-TYPE
@@ -1344,6 +1210,7 @@ mplsXCOperStatus OBJECT-TYPE
 
 -- End of mplsXCTable
 
+
 -- Label stack table.
 mplsMaxLabelStackDepth  OBJECT-TYPE
    SYNTAX        Integer32 (1..2147483647)
@@ -1358,8 +1225,6 @@ mplsLabelStackIndexNext  OBJECT-TYPE
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-
-
        "This object contains an appropriate value to be used
         for mplsLabelStackIndex when creating entries in the
         mplsLabelStackTable.  The value 0 indicates that no
@@ -1410,8 +1275,6 @@ mplsLabelStackIndex OBJECT-TYPE
    SYNTAX        Integer32 (1..2147483647)
    MAX-ACCESS    not-accessible
    STATUS        current
-
-
    DESCRIPTION
        "Primary index for this row identifying a stack of
         labels to be pushed on an outgoing packet, beneath
@@ -1447,7 +1310,7 @@ mplsLabelStackRowStatus OBJECT-TYPE
    DESCRIPTION
        "For creating, modifying, and deleting this row."
    ::= { mplsLabelStackEntry 4 }
-
+   
 mplsLabelStackStorageType OBJECT-TYPE
    SYNTAX        StorageType
    MAX-ACCESS    read-create
@@ -1462,8 +1325,6 @@ mplsLabelStackStorageType OBJECT-TYPE
 
 mplsTrafficParamIndexNext OBJECT-TYPE
    SYNTAX        Integer32 (0..2147483647)
-
-
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
@@ -1514,8 +1375,6 @@ MplsTrafficParamEntry ::= SEQUENCE {
 
 mplsTrafficParamIndex OBJECT-TYPE
    SYNTAX        Integer32 (1..2147483647)
-
-
    MAX-ACCESS    not-accessible
    STATUS        current
    DESCRIPTION
@@ -1557,7 +1416,7 @@ mplsTrafficParamRowStatus OBJECT-TYPE
    DESCRIPTION
        "For creating, modifying, and deleting this row."
    ::= { mplsTrafficParamEntry 5 }
-
+   
 mplsTrafficParamStorageType OBJECT-TYPE
    SYNTAX        StorageType
    MAX-ACCESS    read-create
@@ -1566,33 +1425,9 @@ mplsTrafficParamStorageType OBJECT-TYPE
        "The storage type for this object."
    ::= { mplsTrafficParamEntry 6 }
 
-
 -- End of mplsTrafficParamTable
 
 -- Notification Configuration
-
-mplsInSegmentTrapEnable OBJECT-TYPE
-   SYNTAX        TruthValue
-   MAX-ACCESS    read-write
-   STATUS        current
-   DESCRIPTION
-       "If this object is true, then it enables the
-        generation of mplsInSegmentUp and mplsInSegmentDown
-        traps, otherwise these traps are not emitted."
-   DEFVAL { false }
-   ::= { mplsLsrObjects 15 }
-
-mplsOutSegmentTrapEnable OBJECT-TYPE
-   SYNTAX        TruthValue
-   MAX-ACCESS    read-write
-   STATUS        current
-   DESCRIPTION
-       "If this object is true, then it enables the
-        generation of mplsOutSegmentUp and
-        mplsOutSegmentDown traps, otherwise these traps are
-        not emitted."
-   DEFVAL { false }
-   ::= { mplsLsrObjects 16 }
 
 mplsXCTrapEnable OBJECT-TYPE
    SYNTAX        TruthValue
@@ -1603,77 +1438,7 @@ mplsXCTrapEnable OBJECT-TYPE
         generation of mplsXCUp and mplsXCDown traps,
         otherwise these traps are not emitted."
    DEFVAL { false }
-   ::= { mplsLsrObjects 17 }
-
--- Interface
-
--- In-segment.
-
-mplsInSegmentUp NOTIFICATION-TYPE
-   OBJECTS     { mplsInSegmentIfIndex,
-                 mplsInSegmentLabel,
-                 mplsInSegmentAdminStatus,
-                 mplsInSegmentOperStatus }
-   STATUS      current
-   DESCRIPTION
-
-
-       "This notification is generated when a
-        mplsInSegmentOperStatus object for one of the
-        configured in-segments is about to leave the down
-        state and transition into some other state (but not
-        into the notPresent state).  This other state is
-        indicated by the included value of
-        mplsInSegmentOperStatus."
-   ::= { mplsLsrNotifications 1 }
-
-mplsInSegmentDown NOTIFICATION-TYPE
-   OBJECTS     { mplsInSegmentIfIndex,
-                  mplsInSegmentLabel,
-                  mplsInSegmentAdminStatus,
-                  mplsInSegmentOperStatus }
-   STATUS      current
-   DESCRIPTION
-       "This notification is generated when a
-        mplsInSegmentOperStatus object for one of the
-        configured in-segments is about to enter the down
-        state from some other state (but not from the
-        notPresent state).  This other state is indicated by
-        the included value of mplsInSegmentOperStatus."
-   ::= { mplsLsrNotifications 2 }
-
--- Out-segment.
-
-mplsOutSegmentUp NOTIFICATION-TYPE
-   OBJECTS     { mplsOutSegmentIndex,
-                  mplsInSegmentAdminStatus,
-                  mplsInSegmentOperStatus }
-   STATUS      current
-   DESCRIPTION
-       "This notification is generated when a
-        mplsOutSegmentOperStatus object for one of the
-        configured out-segments is about to leave the down
-        state and transition into some other state (but not
-        into the notPresent state).  This other state is
-        indicated by the included value of
-        mplsOutSegmentOperStatus."
-   ::= { mplsLsrNotifications 3 }
-
-mplsOutSegmentDown NOTIFICATION-TYPE
-   OBJECTS     { mplsOutSegmentIndex,
-                  mplsInSegmentAdminStatus,
-                  mplsInSegmentOperStatus }
-   STATUS      current
-   DESCRIPTION
-       "This notification is generated when a
-        mplsOutSegmentOperStatus object for one of the
-        configured out-segments is about to enter the down
-
-
-        state from some other state (but not from the
-        notPresent state).  This other state is indicated by
-        the included value of mplsOutSegmentOperStatus."
-   ::= { mplsLsrNotifications 4 }
+   ::= { mplsLsrObjects 15 }
 
 -- Cross-connect.
 
@@ -1693,7 +1458,7 @@ mplsXCUp NOTIFICATION-TYPE
         into the notPresent state).  This other state is
         indicated by the included value of
         mplsXCOperStatus."
-   ::= { mplsLsrNotifications 5 }
+   ::= { mplsLsrNotifyPrefix 1 }
 
 mplsXCDown NOTIFICATION-TYPE
    OBJECTS     { mplsXCIndex,
@@ -1710,15 +1475,15 @@ mplsXCDown NOTIFICATION-TYPE
         state from some other state (but not from the
         notPresent state).  This other state is indicated by
         the included value of mplsXCOperStatus."
-   ::= { mplsLsrNotifications 6 }
+   ::= { mplsLsrNotifyPrefix 2 }
 
 -- End of notifications.
+
 
 -- Module compliance.
 
 mplsLsrGroups
    OBJECT IDENTIFIER ::= { mplsLsrConformance 1 }
-
 
 mplsLsrCompliances
    OBJECT IDENTIFIER ::= { mplsLsrConformance 2 }
@@ -1728,6 +1493,7 @@ mplsLsrModuleCompliance MODULE-COMPLIANCE
    DESCRIPTION
        "Compliance statement for agents that support the
         MPLS LSR MIB."
+
    MODULE -- this module
 
       -- The mandatory groups have to be implemented
@@ -1754,7 +1520,7 @@ mplsLsrModuleCompliance MODULE-COMPLIANCE
           "This group is mandatory for those out-segment
            entries for which the object
            mplsOutSegmentOctets wraps around too quickly."
-
+          
       GROUP mplsTrafficParamGroup
       DESCRIPTION
           "This group is mandatory for those LSRs that
@@ -1771,13 +1537,13 @@ mplsLsrModuleCompliance MODULE-COMPLIANCE
            following constraints apply: mplsXCIsPersistent
            must at least be read-only returning true(2)."
 
-
       GROUP mplsXCIsNotPersistentGroup
       DESCRIPTION
           "This group is mandatory for devices which
            support non-persistent cross-connects.  The
            following constraints apply: mplsXCIsPersistent
            must at least be read-only returning false(1)."
+
 
       -- mplsInterfaceConfTable
 
@@ -1786,9 +1552,9 @@ mplsLsrModuleCompliance MODULE-COMPLIANCE
       MIN-ACCESS  read-only
       DESCRIPTION
           "Only other(1) needs to be supported."
-
+      
       -- mplsInSegmentTable
-
+          
       OBJECT     mplsInSegmentXCIndex
       DESCRIPTION
           "Write access is not required."
@@ -1806,21 +1572,9 @@ mplsLsrModuleCompliance MODULE-COMPLIANCE
            be cases where the agent may not know about or
            support any address types."
 
-      OBJECT      mplsInSegmentAdminStatus
-      SYNTAX      INTEGER { up(1), down(2) }
-      MIN-ACCESS  read-only
-      DESCRIPTION
-          "A value of testing(3) need not be supported."
-
-      OBJECT      mplsInSegmentOperStatus
-      SYNTAX      INTEGER { up(1), down(2) }
-      DESCRIPTION
-          "Only up(1) and down(2) need to be supported."
-
       OBJECT      mplsInSegmentStorageType
       SYNTAX      INTEGER { other(1) }
       MIN-ACCESS  read-only
-
 
       DESCRIPTION
           "Only other(1) needs to be supported."
@@ -1831,7 +1585,7 @@ mplsLsrModuleCompliance MODULE-COMPLIANCE
       MIN-ACCESS  read-only
       DESCRIPTION
           "Write access is not required."
-
+      
       OBJECT      mplsOutSegmentPushTopLabel
       MIN-ACCESS  read-only
       DESCRIPTION
@@ -1857,23 +1611,10 @@ mplsLsrModuleCompliance MODULE-COMPLIANCE
       DESCRIPTION
           "Write access is not required."
 
-      OBJECT      mplsOutSegmentAdminStatus
-      SYNTAX      INTEGER { up(1), down(2) }
-      MIN-ACCESS  read-only
-      DESCRIPTION
-          "A value of testing(3) need not be supported."
-
-      OBJECT      mplsOutSegmentOperStatus
-      SYNTAX      INTEGER { up(1), down(2) }
-      DESCRIPTION
-          "Only up(1) and down(2) need to be supported."
-
       OBJECT      mplsOutSegmentRowStatus
       SYNTAX      INTEGER { active(1), notInService(2),
                             createAndGo(4), destroy(6) }
       MIN-ACCESS  read-only
-
-
       DESCRIPTION
           "The notReady(3) and createAndWait(5) states need
            not be supported."
@@ -1905,7 +1646,7 @@ mplsLsrModuleCompliance MODULE-COMPLIANCE
       SYNTAX      INTEGER { up(1), down(2) }
       DESCRIPTION
           "Only up(1) and down(2) need to be supported."
-
+      
       OBJECT      mplsXCRowStatus
       SYNTAX      INTEGER { active(1),
                              notInService(2),
@@ -1915,7 +1656,7 @@ mplsLsrModuleCompliance MODULE-COMPLIANCE
       DESCRIPTION
           "The notReady(3) and createAndWait(5) states need
            not be supported."
-
+      
       OBJECT      mplsXCStorageType
       SYNTAX      INTEGER { other(1) }
       MIN-ACCESS  read-only
@@ -1923,7 +1664,6 @@ mplsLsrModuleCompliance MODULE-COMPLIANCE
           "Only other(1) needs to be supported."
 
    ::= { mplsLsrCompliances 1 }
-
 
 -- Units of conformance.
 
@@ -1934,12 +1674,10 @@ mplsInterfaceGroup OBJECT-GROUP
              mplsInterfaceLabelMaxOut,
              mplsInterfaceTotalBandwidth,
              mplsInterfaceAvailableBandwidth,
-             mplsInterfaceTotalBuffer,
-             mplsInterfaceAvailableBuffer,
              mplsInterfaceLabelParticipationType,
              mplsInterfaceConfStorageType
           }
-
+             
    STATUS  current
    DESCRIPTION
           "Collection of objects needed for MPLS interface
@@ -1953,10 +1691,7 @@ mplsInSegmentGroup  OBJECT-GROUP
              mplsInSegmentOctets,
              mplsInSegmentDiscards,
              mplsInSegmentOwner,
-             mplsInSegmentAdminStatus,
-             mplsInSegmentOperStatus,
              mplsInSegmentRowStatus,
-             mplsInSegmentTrapEnable,
              mplsInSegmentStorageType,
              mplsInSegmentTrafficParamPtr
           }
@@ -1974,17 +1709,12 @@ mplsOutSegmentGroup  OBJECT-GROUP
              mplsOutSegmentNextHopIpAddrType,
              mplsOutSegmentNextHopIpv4Addr,
              mplsOutSegmentNextHopIpv6Addr,
-
-
              mplsOutSegmentXCIndex,
              mplsOutSegmentOwner,
              mplsOutSegmentOctets,
              mplsOutSegmentDiscards,
              mplsOutSegmentErrors,
-             mplsOutSegmentAdminStatus,
-             mplsOutSegmentOperStatus,
              mplsOutSegmentRowStatus,
-             mplsOutSegmentTrapEnable,
              mplsOutSegmentStorageType,
              mplsOutSegmentTrafficParamPtr
           }
@@ -1996,7 +1726,6 @@ mplsOutSegmentGroup  OBJECT-GROUP
 
 mplsXCGroup  OBJECT-GROUP
    OBJECTS { mplsXCIndexNext,
-             mplsXCLspId,
              mplsXCLabelStackIndex,
              mplsXCOwner,
              mplsXCAdminStatus,
@@ -2011,6 +1740,14 @@ mplsXCGroup  OBJECT-GROUP
            cross-connect entry."
    ::= { mplsLsrGroups 4 }
 
+mplsXCOptionalGroup  OBJECT-GROUP
+   OBJECTS { mplsXCLspId }
+   STATUS  current
+   DESCRIPTION
+          "Collection of optional objects for implementing 
+           a cross-connect entry."
+   ::= { mplsLsrGroups 5 }
+
 mplsPerfGroup OBJECT-GROUP
    OBJECTS { mplsInSegmentOctets,
              mplsInSegmentPackets,
@@ -2020,23 +1757,17 @@ mplsPerfGroup OBJECT-GROUP
              mplsOutSegmentPackets,
              mplsOutSegmentDiscards,
              mplsInterfaceInLabelsUsed,
-             mplsInterfaceInPackets,
-             mplsInterfaceInDiscards,
              mplsInterfaceFailedLabelLookup,
-             mplsInterfaceOutPackets,
-             mplsInterfaceOutDiscards,
              mplsInterfaceOutFragments,
-
-
              mplsInterfaceOutLabelsUsed
           }
-
+   
    STATUS  current
    DESCRIPTION
           "Collection of objects providing performance
            information
         about an LSR."
-   ::= { mplsLsrGroups 5 }
+   ::= { mplsLsrGroups 6 }
 
 mplsHCInSegmentPerfGroup OBJECT-GROUP
    OBJECTS { mplsInSegmentHCOctets }
@@ -2045,7 +1776,7 @@ mplsHCInSegmentPerfGroup OBJECT-GROUP
           "Object(s) providing performance information
            specific to out-segments for which the object
            mplsInterfaceInOctets wraps around too quickly."
-   ::= { mplsLsrGroups 6 }
+   ::= { mplsLsrGroups 7 }
 
 mplsHCOutSegmentPerfGroup OBJECT-GROUP
    OBJECTS { mplsOutSegmentHCOctets }
@@ -2055,8 +1786,8 @@ mplsHCOutSegmentPerfGroup OBJECT-GROUP
            specific to out-segments for which the object
            mplsInterfaceOutOctets wraps around too
            quickly."
-   ::= { mplsLsrGroups 7 }
-
+   ::= { mplsLsrGroups 8 }
+   
 mplsTrafficParamGroup OBJECT-GROUP
    OBJECTS { mplsTrafficParamIndexNext,
              mplsTrafficParamMaxRate,
@@ -2069,7 +1800,7 @@ mplsTrafficParamGroup OBJECT-GROUP
    DESCRIPTION
           "Object(s) required for supporting QoS resource
            reservation."
-   ::= { mplsLsrGroups 8 }
+   ::= { mplsLsrGroups 9 }
 
 mplsXCIsPersistentGroup OBJECT-GROUP
    OBJECTS { mplsXCIsPersistent }
@@ -2077,8 +1808,7 @@ mplsXCIsPersistentGroup OBJECT-GROUP
    DESCRIPTION
           "Objects needed to support persistent cross-
            connects."
-   ::= { mplsLsrGroups 9 }
-
+   ::= { mplsLsrGroups 10 }
 
 mplsXCIsNotPersistentGroup OBJECT-GROUP
    OBJECTS { mplsXCIsPersistent }
@@ -2086,8 +1816,8 @@ mplsXCIsNotPersistentGroup OBJECT-GROUP
    DESCRIPTION
           "Objects needed to support non-persistent cross-
            connects."
-   ::= { mplsLsrGroups 10 }
-
+   ::= { mplsLsrGroups 11 }
+   
 mplsLabelStackGroup OBJECT-GROUP
    OBJECTS {mplsLabelStackLabel,
              mplsLabelStackRowStatus,
@@ -2097,31 +1827,29 @@ mplsLabelStackGroup OBJECT-GROUP
    STATUS current
    DESCRIPTION
           "Objects needed to support label stacking."
-      ::= { mplsLsrGroups 11 }
-
+      ::= { mplsLsrGroups 12 }
+      
 mplsSegmentDiscontinuityGroup OBJECT-GROUP
    OBJECTS { mplsInSegmentPerfDiscontinuityTime,
              mplsOutSegmentPerfDiscontinuityTime
           }
-
+   
    STATUS  current
    DESCRIPTION
        " A collection of objects providing information
         specific to segment discontinuities.."
-   ::= { mplsLsrGroups 12 }
+   ::= { mplsLsrGroups 13 }
+      
 
 mplsLsrNotificationGroup NOTIFICATION-GROUP
-   NOTIFICATIONS { mplsInSegmentUp,
-                   mplsInSegmentDown,
-                   mplsOutSegmentUp,
-                   mplsOutSegmentDown,
-                   mplsXCUp,
+   NOTIFICATIONS { mplsXCUp,
                    mplsXCDown }
    STATUS  current
    DESCRIPTION
           "Set of notifications implemented in this module.
            None is mandatory."
-   ::= { mplsLsrGroups 13 }
+   ::= { mplsLsrGroups 14 }
 
 -- End of MPLS-LSR-MIB
 END
+

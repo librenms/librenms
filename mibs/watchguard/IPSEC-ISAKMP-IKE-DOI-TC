@@ -1,19 +1,12 @@
-IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
+   IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
 
    IMPORTS
-   -- make this mib a temporary watchguard extension before it becomes RFC
-      watchguard	
-                                       FROM WATCHGUARD-MIB
-   -- delete next line before release
-      experimental,
-      MODULE-IDENTITY, Unsigned32         FROM SNMPv2-SMI
-   -- uncomment next line before release
-      mib-2                               FROM RFC1213-MIB
-      TEXTUAL-CONVENTION                  FROM SNMPv2-TC;
+      MODULE-IDENTITY, Unsigned32, mib-2         FROM SNMPv2-SMI
+      TEXTUAL-CONVENTION                         FROM SNMPv2-TC;
 
    ipsecIsakmpIkeDoiTC MODULE-IDENTITY
-      LAST-UPDATED "9907132145Z"
-      ORGANIZATION "Shiva"
+      LAST-UPDATED "9911232135Z"
+      ORGANIZATION "Intel"
       CONTACT-INFO "John Shriver
                    Intel Corporation
                    28 Crosby Drive
@@ -26,7 +19,7 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
                    John.Shriver@intel.com"
 
       DESCRIPTION  "The MIB module which defines the textual conventions
-                   used in IPSEC MIBs.  This includes Internet DOI
+                   used in IPsec MIBs.  This includes Internet DOI
                    numbers defined in RFC 2407, ISAKMP numbers defined
                    in RFC 2408, and IKE numbers defined in RFC 2409.
 
@@ -45,19 +38,18 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
                    IkeNotifyMessageType off of IsakmpNotifyMessageType."
       REVISION     "9910151950Z"
       DESCRIPTION  "Removed stray comma in IsakmpNotifyMessageType."
+      REVISION     "9911232135Z"
+      DESCRIPTION  "Consistent capitalization of IPsec."
 
-   -- replace xxx in next line before release, uncomment before release
-   -- ::= { mib-2 xxx }
-   -- delete next line before release
-   --      ::= { experimental 100 }
-      ::= { watchguard 100 }
+    ::= { mib-2 700 }
+
    -- The first group of textual conventions are based on definitions
-   -- in the IPSEC DOI, RFC 2407.
+   -- in the IPsec DOI, RFC 2407.
 
    IpsecDoiSituation ::= TEXTUAL-CONVENTION
        DISPLAY-HINT "x"
        STATUS      current
-       DESCRIPTION "The IPSEC DOI Situation provides information that
+       DESCRIPTION "The IPsec DOI Situation provides information that
                    can be used by the responder to make a policy
                    determination about how to process the incoming
                    Security Association request.
@@ -81,7 +73,7 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
    IpsecDoiSecProtocolId ::= TEXTUAL-CONVENTION
        DISPLAY-HINT "d"
        STATUS      current
-       DESCRIPTION "These are the IPSEC DOI values for the Protocol-Id
+       DESCRIPTION "These are the IPsec DOI values for the Protocol-Id
                    field in an ISAKMP Proposal Payload, and in all
                    Notification Payloads.
 
@@ -107,7 +99,7 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
    IpsecDoiTransformIdent ::= TEXTUAL-CONVENTION
        DISPLAY-HINT "d"
        STATUS      current
-       DESCRIPTION "The IPSEC DOI ISAKMP Transform Identifier is an
+       DESCRIPTION "The IPsec DOI ISAKMP Transform Identifier is an
                    8-bit value which identifies a key exchange protocol
                    to be used for the negotiation.  It is used in the
                    Transform-Id field of an IKE Phase I Transform
@@ -126,11 +118,11 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
    IpsecDoiAhTransform ::= TEXTUAL-CONVENTION
        DISPLAY-HINT "d"
        STATUS      current
-       DESCRIPTION "The IPSEC DOI AH Transform Identifier is an 8-bit
+       DESCRIPTION "The IPsec DOI AH Transform Identifier is an 8-bit
                    value which identifies a particular algorithm to be
                    used to provide integrity protection for AH.  It is
                    used in the Tranform-ID field of a ISAKMP Transform
-                   Payload for the IPSEC DOI, when the Protocol-Id of
+                   Payload for the IPsec DOI, when the Protocol-Id of
                    the associated Proposal Payload is 2 (AH).
 
                    The values 249-255 are reserved for private use
@@ -150,11 +142,11 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
    IpsecDoiEspTransform ::= TEXTUAL-CONVENTION
        DISPLAY-HINT "d"
        STATUS      current
-       DESCRIPTION "The IPSEC DOI ESP Transform Identifier is an 8-bit
+       DESCRIPTION "The IPsec DOI ESP Transform Identifier is an 8-bit
                    value which identifies a particular algorithm to be
                    used to provide secrecy protection for ESP.  It is
                    used in the Tranform-ID field of a ISAKMP Transform
-                   Payload for the IPSEC DOI, when the Protocol-Id of
+                   Payload for the IPsec DOI, when the Protocol-Id of
                    the associated Proposal Payload is 2 (AH), 3 (ESP),
                    and 4 (IPCOMP).
 
@@ -186,7 +178,7 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
    IpsecDoiAuthAlgorithm ::= TEXTUAL-CONVENTION
        DISPLAY-HINT "d"
        STATUS      current
-       DESCRIPTION "The ESP Authentication Algorithm used in the IPSEC
+       DESCRIPTION "The ESP Authentication Algorithm used in the IPsec
                    DOI as a SA Attributes definition in the Transform
                    Payload of Phase II of an IKE negotiation.  This
                    set of values defines the AH authentication
@@ -214,11 +206,11 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
    IpsecDoiIpcompTransform ::= TEXTUAL-CONVENTION
        DISPLAY-HINT "d"
        STATUS      current
-       DESCRIPTION "The IPSEC DOI IPCOMP Transform Identifier is an
+       DESCRIPTION "The IPsec DOI IPCOMP Transform Identifier is an
                    8-bit value which identifies a particular algorithm
                    to be used to provide IP-level compression before
                    ESP.  It is used in the Tranform-ID field of a ISAKMP
-                   Transform Payload for the IPSEC DOI, when the
+                   Transform Payload for the IPsec DOI, when the
                    Protocol-Id of the associated Proposal Payload
                    is 4 (IPCOMP).
 
@@ -241,7 +233,7 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
    IpsecDoiEncapsulationMode ::= TEXTUAL-CONVENTION
        DISPLAY-HINT "d"
        STATUS      current
-       DESCRIPTION "The Encapsulation Mode used as an IPSEC DOI
+       DESCRIPTION "The Encapsulation Mode used as an IPsec DOI
                    SA Attributes definition in the Transform Payload
                    of a Phase II IKE negotiation.  This set of
                    values defines encapsulation modes used for AH,
@@ -260,7 +252,7 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
    IpsecDoiIdentType ::= TEXTUAL-CONVENTION
        DISPLAY-HINT "d"
        STATUS      current
-       DESCRIPTION "The IPSEC DOI Identification Type is an 8-bit value
+       DESCRIPTION "The IPsec DOI Identification Type is an 8-bit value
                    which is used in the ID Type field as a discriminant
                    for interpretation of the variable-length
                    Identification Payload.
@@ -327,6 +319,7 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
                    the ISAKMP Protocol.  They are a 32-bit value
                    used in the Domain of Interpretation field of the
                    Security Association Payload.
+
                    Values 2-4294967295 are reserved to the IANA."
        REFERENCE   "RFC 2048 section 3.4."
        SYNTAX      INTEGER {
@@ -419,7 +412,6 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
                    as notification types amongst cooperating systems."
        REFERENCE   "RFC 2408 section 3.14.1"
        SYNTAX      INTEGER {
-
                        -- Values defined for errors in ISAKMP
                        --
                        reserved(0),        -- reserved in DOI
@@ -454,7 +446,7 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
                        unsupportedExchangeType(29),
                        unequalPayloadLengths(30)
 
-                       -- values defined for errors in IPSEC DOI
+                       -- values defined for errors in IPsec DOI
                        -- (none)
 
                        -- values defined for notification in ISAKMP
@@ -467,7 +459,6 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
 
    -- The third group of textual conventions are based on defintions
    -- the IKE key exchange protocol, RFC 2409.
-
    IkeExchangeType ::= TEXTUAL-CONVENTION
        DISPLAY-HINT "d"
        STATUS      current
@@ -475,7 +466,7 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
                    the ISAKMP header.
 
                    The values 32-239 are DOI-specific, these values are
-                   for the IPSec DOI used by IKE.
+                   for the IPsec DOI used by IKE.
 
                    The values 240-255 are reserved for private use
                    amongst cooperating systems."
@@ -515,6 +506,7 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
                        rc5R16B64Cbc(4),    -- RC5 R16 B64 CBC
                        tripleDesCbc(5),    -- 3DES CBC
                        castCbc(6)
+
                    }
 
    IkeHashAlgorithm ::= TEXTUAL-CONVENTION
@@ -634,7 +626,7 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
 
                    This textual convention is a merge of values
                    defined by ISAKMP with the additional values
-                   defined in the IPSEC DOI.
+                   defined in the IPsec DOI.
 
                    The values 16001-16383 are reserved for private use
                    as error types amongst cooperating systems.
@@ -679,16 +671,16 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
                        unsupportedExchangeType(29),
                        unequalPayloadLengths(30),
 
-                       -- values defined for errors in IPSEC DOI
+                       -- values defined for errors in IPsec DOI
                        -- (none)
 
                        -- values defined for notification in ISAKMP
                        -- (none)
 
-                       -- values defined for notification in IPSEC
+                       -- values defined for notification in IPsec
                        -- DOI
                        responderLifetime(24576),
-                                           -- used to communicate IPSEC
+                                           -- used to communicate IPsec
                                            -- SA lifetime chosen by the
                                            -- responder
 
@@ -707,6 +699,4 @@ IPSEC-ISAKMP-IKE-DOI-TC DEFINITIONS ::= BEGIN
                                            -- established with the
                                            -- remote system
                    }
-END
-
-
+   END

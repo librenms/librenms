@@ -10,24 +10,41 @@
 
         MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
 
-        gbnPlatform                             FROM ADMIN-MASTER-MIB
+        gbnPlatform                             FROM GREENTECH-MASTER-MIB
 
         SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
 
         PortList, dot1qStaticMulticastEntry     FROM Q-BRIDGE-MIB;
 
     gbnPlatformOAM MODULE-IDENTITY
-        LAST-UPDATED    "0011020000Z"  -- November 2, 2000
-        ORGANIZATION    "Admin Co., Ltd."
-        CONTACT-INFO    "Admin Co., Ltd.
-                         E-mail: support@admin.com"
+        LAST-UPDATED    "201802140000Z"  -- February 14, 2018
+        ORGANIZATION    "Greentech"
+        CONTACT-INFO    "Adam Armstrong
+                         E-mail: adama@observium.org"
 
-        DESCRIPTION     "ADMIN Common Enterprise MIB definition."
+        DESCRIPTION     "Gbn Common Enterprise MIB definition."
+
+        REVISION        "201802140000Z"  -- February 14, 2018
+        DESCRIPTION     "Fix a few ASN.1 syntax errors (replace underscores
+                         with hyphens in descriptors) so that Net-SNMP tools
+                         can now load the MIB."
 
         REVISION        "0011020000Z"  -- November 2, 2000
         DESCRIPTION     "Initial MIB creation."
 
         ::= { gbnPlatform 1 }
+
+VctRunResultTxRxPairNoType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "txpair1、rxpair1、txpair2、rxpair2"
+    SYNTAX      INTEGER { txpair1(0), rxpair1 (1), txpair2(2),  rxpair2(3) }
+
+VctRunResultStatusType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "normal、short、open、impedance mismatch"
+    SYNTAX      INTEGER { normal(0), short (1), open(2),  impedance-mismatch(3) }
 
 ------------------------------------------------------------------------------
 --  define groups in GBN-COMMON-MIB
@@ -44,10 +61,9 @@
     gbnPlatformOAMPortCar         OBJECT IDENTIFIER ::= { gbnPlatformOAM 10 }
     gbnPlatformOAMSsh             OBJECT IDENTIFIER ::= { gbnPlatformOAM 11 }
     gbnPlatformOAMMailalarm       OBJECT IDENTIFIER ::= { gbnPlatformOAM 12 }
-    gbnPlatformOAMVctRun          OBJECT IDENTIFIER ::= { gbnPlatformOAM 13 }
-    gbnPlatformOAMVctRunResult    OBJECT IDENTIFIER ::= { gbnPlatformOAM 14 }
-    gbnPlatformOAMTelnet          OBJECT IDENTIFIER ::= { gbnPlatformOAM 15 }
-    gbnPlatformOAMIpControl       OBJECT IDENTIFIER ::= { gbnPlatformOAM 16 }
+    gbnPlatformOAMVctRun           OBJECT IDENTIFIER ::= { gbnPlatformOAM 13 }
+    gbnPlatformOAMVctRunResult  OBJECT IDENTIFIER ::= { gbnPlatformOAM 14 }
+
 ------------------------------------------------------------------------------
 --
 --  gbnPlatformOAMSysIf - System IP Group
@@ -117,7 +133,7 @@
             If gbnCommonIPStatus returns modified(2), one or more objects
             were changed, but have not been applied.  Both notModified(1)
             and modified(2) are read-only values; the agent returns a
-            SNMPBADVALUE for sets using these values.  Both restore(3) and
+            SNMP_BADVALUE for sets using these values.  Both restore(3) and
             apply(4) are valid SET values.  If one or more of the gbnCommonIP
             objects were modified, the user can restore the parameters to a
             mirror of the NVM values using restore(3)."
@@ -159,7 +175,6 @@
               STATUS  mandatory
               DESCRIPTION
                       "ManageVlan table"
-                      --管理VLAN表格。
               ::= { gbnPlatformOAMSysIf 9 }
 
     sysIfManageVLANEntry OBJECT-TYPE
@@ -168,7 +183,6 @@
               STATUS  mandatory
               DESCRIPTION
                       "ManageVlan entry"
-                      --管理VLAN实体。
               INDEX   { sysIfManageVLANVid }
               ::= { sysIfManageVLANTbale 1 }
 
@@ -186,7 +200,6 @@
               STATUS  current
               DESCRIPTION
                       "ManageVLAN-ID, as an index, the maximum number is 26."
-                      --管理VLAN，作为索引。最多可以创建26个。
               ::= { sysIfManageVLANEntry 1 }
 
     sysIfManageVLANRowStatus OBJECT-TYPE
@@ -209,7 +222,6 @@
             STATUS current
             DESCRIPTION
                 "Software platform used by switches."
-                --交换机采用的软件平台。
             ::= { gbnPlatformOAMSystem 1 }
 
     softwareVersion OBJECT-TYPE
@@ -218,7 +230,6 @@
             STATUS current
             DESCRIPTION
                 "Software version, the format is V100R001B02D06P03SP3"
-                --软件版本，格式为V100R001B02D06P03SP3
             ::= { gbnPlatformOAMSystem 2 }
 
     softwareCompiledTimeE OBJECT-TYPE
@@ -227,7 +238,6 @@
             STATUS current
             DESCRIPTION
                 "Software Compiled time displayed in English, the format is Feburary 17 2003 15:47:00"
-                --软件编译时间，格式为Feburary 17 2003 15:47:00
             ::= { gbnPlatformOAMSystem 3 }
 
     softwareCompiledTimeC OBJECT-TYPE
@@ -235,8 +245,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Software Compiled time displayed in Chinese, the format is 2003nian06yue18ri13dian15fen"
-                --软件编译时间，格式为2003年06月18日13点15分
+                "Software Compiled time "
             ::= { gbnPlatformOAMSystem 4 }
 
     cpuDescription OBJECT-TYPE
@@ -245,7 +254,6 @@
             STATUS current
             DESCRIPTION
                 "System CPU description, the format is Mips 32334, 133MHz"
-                --系统CPU描述，格式为Mips 32334, 133MHz
             ::= { gbnPlatformOAMSystem 5 }
 
     sdramDescription OBJECT-TYPE
@@ -253,8 +261,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "System Memery description, the format is 32M"
-                --系统内存描述，格式为32M
+                "System Memory description, the format is 32M"
             ::= { gbnPlatformOAMSystem 6 }
 
     flashDescription OBJECT-TYPE
@@ -263,7 +270,6 @@
             STATUS current
             DESCRIPTION
                 "System Flash description, the format is 4096k"
-                --系统FLASH描述，格式为4096k
             ::= { gbnPlatformOAMSystem 7 }
 
     hardwareVersion OBJECT-TYPE
@@ -272,7 +278,6 @@
             STATUS current
             DESCRIPTION
                 "Hardware version, the format is V3.0"
-                --系统主板的版本号，格式为V3.0
             ::= { gbnPlatformOAMSystem 8 }
 
     bootromVersion OBJECT-TYPE
@@ -281,11 +286,10 @@
             STATUS current
             DESCRIPTION
                 "Bootrom version, the format is V2.0"
-                --系统主板的版本号，格式为V2.0
             ::= { gbnPlatformOAMSystem 9 }
 
     hostName OBJECT-TYPE
-            SYNTAX DisplayString (SIZE (1..128))
+            SYNTAX DisplayString (SIZE (1..32))
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
@@ -332,7 +336,7 @@
         MAX-ACCESS   read-write
         STATUS   current
         DESCRIPTION
-           "the timezone name,1-32 letters.eg CCT(China Coast, USSR Zone 7)"
+           "the timezone name,1-32 letters."
        ::= { systemClock 2 }
 
     timeZoneOffset OBJECT-TYPE
@@ -344,10 +348,7 @@
       ::= { systemClock 3 }
 
     offsetNegFlag OBJECT-TYPE
-        SYNTAX INTEGER{    
-               true(1),
-               false(2)
-        }
+        SYNTAX   TruthValue
         MAX-ACCESS   read-write
         STATUS   current
         DESCRIPTION
@@ -419,7 +420,7 @@
     saveNMInterfaceConfig   OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 18 }
 ------------------------------------------------------------------------------
 --
---  saveNMInterfaceConfig - Save nminterface configuration Group
+--  saveNMInterfaceConfig - Save nm_interface configuration Group
 --
 ------------------------------------------------------------------------------
     nmInterfaceId OBJECT-TYPE
@@ -427,8 +428,7 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "interface id of vlan saved for nminterface configuration."
-            --此节点用于存储vlan接口ID。当值为0时默认为vlan 1 的接口。
+            "interface id of vlan saved for nm_interface configuration."
         ::= { saveNMInterfaceConfig 1 }
 
     nmInterfaceIpAddress OBJECT-TYPE
@@ -436,8 +436,7 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "ip address saved for nminterface configuration."
-            --此节点用于存储vlan接口的ip地址。
+            "ip address saved for nm_interface configuration."
         ::= { saveNMInterfaceConfig 2 }
 
     nmInterfaceNetMask OBJECT-TYPE
@@ -445,8 +444,7 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "mask saved for nminterface configuration. "
-            --此节点用于存储vlan接口的掩码。
+            "mask saved for nm_interface configuration. "
         ::= { saveNMInterfaceConfig 3 }
 
     nmInterfaceGateAddress OBJECT-TYPE
@@ -454,38 +452,26 @@
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "gateway address saved for nminterface configuration. "
-            --此节点用于存储vlan接口的网关地址。
+            "gateway address saved for nm_interface configuration. "
         ::= { saveNMInterfaceConfig 4 }
 
         writeNMInterfaceConifig OBJECT-TYPE
         SYNTAX INTEGER{
-                   saveNmconfig(1)
+                   saveNmconfig(1)        -- save nm_interface configuration parameters to NVM
           }
           MAX-ACCESS read-write
           STATUS current
           DESCRIPTION
-            "We save the nminterface configuration through setting this Mib. When setting to
-            'saveNmconfig(1)', nminterface configuration is starting to be saved.
+            "We save the nm_interface configuration through setting this Mib. When setting to
+            'saveNmconfig(1)', nm_interface configuration is starting to be saved.
             At the same time the value of writeNMInterfaceConifigStatus Mib is set to 'saveInProgress(2)'.
             Then the value of nmInterfaceId, nmInterfaceIpAddress, nmInterfaceNetMask,
             nmInterfaceGateAddress will be read one by one.According to these value,
-            the nminterface configuration is to be saved.
+            the nm_interface configuration is to be saved.
             Untill the process was over the value of writeNMInterfaceConifigStatus Mib is
             changed to 'saveSuccess(1)'. And if the process was ended for exception the value
             of writeNMInterfaceConifigStatus Mib is set to a error code from
             'saveFailed(3)' to 'invalidIpOrMask(11)'. "
-            --我们通过设置这个Mib来保存最小管理配置，当设此Mib的值为1时，ccd模块将调用相应的处理函数
-            --来保存和最小配置相关的信息。此处理函数一开始就将writeNMInterfaceConifigStatus的值设为2，
-            --然后依次读取nmInterfaceId, nmInterfaceIpAddress, nmInterfaceNetMask,nmInterfaceGateAddress
-            --节点中的值，以这些值作为参数对和最小配置相关的信息进行保存。等到完成保存操作，如果成功保存，
-            --处理函数将writeNMInterfaceConifigStatus值设为1，失败设置为相应错误状态为3－11。
-
-            --补充：nmInterfaceId，nmInterfaceIpAddress, nmInterfaceNetMask,nmInterfaceGateAddress
-            --4个节点的值可以都不设置。 如果设置了nmInterfaceId节点，后三个节点可以不设置，但如果设置了
-            --nmInterfaceIpAddress节点的值，nmInterfaceNetMask, nmInterfaceGateAddress的值必须设置。如果
-            --没有设置nmInterfaceIpAddress节点的值，后两个就不能设置。如果nmInterfaceId节点没有设置，
-            --后三个就都不能设置。
           ::= { saveNMInterfaceConfig 5 }
 
     writeNMInterfaceConifigStatus OBJECT-TYPE
@@ -506,8 +492,6 @@
         STATUS current
         DESCRIPTION
             "Reserve the status of process in saving Nmconfig."
-            --存储保存最小管理配置过程中的状态。
-
         ::= { saveNMInterfaceConfig 6 }
 
     prodSerialNo OBJECT-TYPE
@@ -516,7 +500,6 @@
         STATUS current
         DESCRIPTION
            "Product Serial Number"
-           --产品序列号
         ::= { gbnPlatformOAMSystem 19 }
 
     cpuBusyStatus OBJECT-TYPE
@@ -525,7 +508,6 @@
         STATUS current
         DESCRIPTION
             "CPU busy status"
-            --CPU忙状态
         ::= { gbnPlatformOAMSystem 20 }
 
     cpuBusyAlarmEnable OBJECT-TYPE
@@ -537,17 +519,15 @@
         STATUS current
         DESCRIPTION
             "the enable status of cpu busy alarm."
-            --CPU忙告警开启/关闭状态
-        DEFVAL {true}
+        DEFVAL {true}    
         ::= { gbnPlatformOAMSystem 21 }
 
     cpuBusyThreshold OBJECT-TYPE
-        SYNTAX  Integer32
+        SYNTAX  INTEGER(0..100)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
             "CPU busy threshold."
-            --CPU忙的阈值
         ::= { gbnPlatformOAMSystem 22 }
 
     cpuUnbusyThreshold OBJECT-TYPE
@@ -556,7 +536,6 @@
         STATUS current
         DESCRIPTION
             "CPU unbusy threshold."
-            --CPU不忙的阈值
         ::= { gbnPlatformOAMSystem 23 }
 
 ------------------------------------------------------------------------------
@@ -570,93 +549,13 @@
         STATUS  current
         DESCRIPTION
                "cpu busy trap."
-               --CPU 忙TRAP
         ::= { cpuStatusTrap 1 }
 
     cpuUnbusyTrap NOTIFICATION-TYPE
         STATUS  current
         DESCRIPTION
                "cpu unbusy trap."
-               --CPU 不忙TRAP
         ::= { cpuStatusTrap 2 }
-------------------------------------------------------------------------------
---
---  dramStatusTrap - DRAM status 
---
-------------------------------------------------------------------------------
-		dramAlarmEnable OBJECT-TYPE
-        SYNTAX TruthValue {
-                  true     (1),
-                  false    (2)
-                          }
-        MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "the enable status of dram alarm."
-            --DRAM警开启/关闭状态
-        DEFVAL {true}
-        ::= { gbnPlatformOAMSystem 25 }
-
-    dramAlarmThreshold OBJECT-TYPE
-        SYNTAX  Integer32
-        MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "the DRAM set alarm threshold."
-            --DRAM使用的利用率超出实际利用率
-        ::= { gbnPlatformOAMSystem 26 }
-        
-    dramStatus OBJECT-TYPE
-    		SYNTAX TruthValue {
-                  true     (1),
-                  false    (2)
-                          }
-    		MAX-ACCESS read-only
-        STATUS current
-        DESCRIPTION
-            "DRAM Status（Beyond the threshold）."
-            --DRAM是否超出阈值（利用率）
-        ::= { gbnPlatformOAMSystem 27 }
-
-    dramUtilization OBJECT-TYPE
-    		SYNTAX  Integer32
-    		MAX-ACCESS read-only
-        STATUS current
-        DESCRIPTION
-            "DRAM Utilization."
-            --DRAM的利用率
-        ::= { gbnPlatformOAMSystem 28 }        
-
-dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
-
-    dramBusyTrap NOTIFICATION-TYPE
-        STATUS  current
-        DESCRIPTION
-               "dram trap."
-               --DRAM TRAP
-        ::= { dramStatusTrap 1 }
-	
-    copyRunSta OBJECT-TYPE
-        SYNTAX INTEGER {
-               noop(1),           -- no operation
-               op(2)             -- operation
-        }
-        MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "copy running-config startup-config."
-        ::= { gbnPlatformOAMSystem 30 }     
-        
-     copyStaRun OBJECT-TYPE
-        SYNTAX INTEGER {
-               noop(1),           -- no operation
-               op(2)             -- operation
-        }
-        MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "copy startup-config running-config."
-        ::= { gbnPlatformOAMSystem 31 }
 
 ------------------------------------------------------------------------------
 --
@@ -669,7 +568,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "IP address access control table."
-            --能够访问交换机的ip地址列表.
         ::= { gbnPlatformOAMIpAccessControl 1 }
 
     ipAccessControlEntry OBJECT-TYPE
@@ -678,7 +576,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "IP address access control entry."
-            --能够访问交换机的ip地址列表.
         INDEX { controlIpAddress, controlIpMask, controlTeminal}
         ::= { ipAccessControlTable 1 }
 
@@ -695,7 +592,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS      current
         DESCRIPTION
             "The accessible ip address of the switch"
-            --能够访问交换机的ip地址.
         ::= { ipAccessControlEntry 1 }
 
     controlIpMask OBJECT-TYPE
@@ -704,7 +600,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS      current
         DESCRIPTION
             "The accessible ip address mask of the switch, wildcard supports mask and unmask"
-            --能够访问交换机的ip地址掩码, 通配符支持掩码和反掩码.
         ::= { ipAccessControlEntry 2 }
 
     controlTeminal OBJECT-TYPE
@@ -719,7 +614,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         DESCRIPTION
             "The client type connected to switch, snmp(1) means connecting switch by SNMP,
             web(2) means connecting switch by WEB, telnet(3) means connecting switch by telnet."
-            --访问交换机客户端类型。snmp(1)表示通过snmp网管访问，web(2)表示通过web网管访问，telnet(3)表示通过telnet网管访问.
         ::= { ipAccessControlEntry 3 }
 
     controlStatus OBJECT-TYPE
@@ -733,7 +627,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         DESCRIPTION
             "IP address control status, active(1) means adding the ip address to list,
             destroy(2) means deleting the ip address from list"
-            --ip地址状态, active(1)表示加入到活动列表;destroy(2)表示将此ip地址删除。
         ::= { ipAccessControlEntry 4 }
 
 ------------------------------------------------------------------------------
@@ -762,7 +655,7 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
-            "A Table of usrname and Password."
+            "A Table of usr_name and Password."
         ::= { gbnPlatformOAMMuser 1 }
 
     musrEntry OBJECT-TYPE
@@ -778,7 +671,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
             musrIndex            Integer32,
             musrName             DisplayString,
             musrPassword         DisplayString,
-            musrPwdEncrypt       INTEGER,
             musrType             INTEGER,
             musrRowStatus        INTEGER
         }
@@ -807,37 +699,10 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
             " A simple password of gbnCommonUsrEntry."
         ::= { musrEntry 3 }
 
-    musrPwdEncrypt OBJECT-TYPE
-        SYNTAX INTEGER {
-            clearText(0),
-            encrypt(7)
-        }
-        MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "DURABLE: { 0 }
-            Password in 'gbnCommonUsrTable' is in 
-            format of clear text(0) or enrypt(7)."
-        ::= { musrEntry 6 }
-
     musrType OBJECT-TYPE
         SYNTAX INTEGER {
-                    normalUser0(0),
-                    normalUser1(1),
-                    administrator2(2),
-                    administrator3(3),
-                    administrator4(4),
-                    administrator5(5),
-                    administrator6(6),
-                    administrator7(7),
-                    administrator8(8),
-                    administrator9(9),
-                    administrator10(10),
-                    administrator11(11),
-                    administrator12(12),
-                    administrator13(13),
-                    administrator14(14),
-                    administrator15(15)
+                    normalUser(0),
+                    superUser(1)
         }
         MAX-ACCESS read-write
         STATUS current
@@ -871,8 +736,7 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "Authentication method，1:local, 2:radius, 3:radius first，and then local after failed,4:tacacsplus,5:tacacsplus first, and then local after failed."
-            --管理用户认证方式，1:本地方式, 2:radius认证,3:先radius认证，radius服务器连接失败后Local，4:tacacs+认证，5:先tacacs+认证，tacacs+服务器连接失败后Local.
+            "Authentication method 1:local, 2:radius, 3:radius first and then local after failed,4:tacacsplus,5:tacacsplus first, and then local after failed."
         ::= { gbnPlatformOAMMuser 2 }
 
     manageUserAuthenRadiusName OBJECT-TYPE
@@ -881,7 +745,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "radius server name."
-            --radius服务器方案名称.
         ::= { gbnPlatformOAMMuser 3 }
 
     manageUserAuthChallegeType OBJECT-TYPE
@@ -893,7 +756,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "Radius authentication method，1:CHAP, 2:PAP."
-            --管理用户radius认证方式，1:CHAP, 2:PAP.
         ::= { gbnPlatformOAMMuser 4 }
 
     manageUserTacacsAuthor OBJECT-TYPE
@@ -902,7 +764,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "authorization afer authenticastion."
-            --在tacacs认证后是否进行shell授权.
         ::= { gbnPlatformOAMMuser 5 }
 
     manageUserTacacsAccount OBJECT-TYPE
@@ -911,7 +772,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "accounting after authorization."
-            --用户在使用tacacs+认证后登录/退出时发送计费操作.
         ::= { gbnPlatformOAMMuser 6 }
 
 ------------------------------------------------------------------------------
@@ -930,7 +790,7 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         ::= { gbnPlatformOAMUpDownLoad 1 }
 
     loadTftpFileName OBJECT-TYPE
-        SYNTAX DisplayString (SIZE (1..64))
+        SYNTAX DisplayString (SIZE (1..128))
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -946,19 +806,8 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
                bootCode(4),
                alarm(5),
                syslog(6),
-               wholeBootRom(7),
-               oltImage(8),
-               onuImage(9),
-               geApplication(10),
-               geBootRom(11),
-               10geApplication(12),
-               10geBootRom(13),
-               eponApplication(14),
-               eponBootRom(15),
-               10geponApplication(16),
-               10geponBootRom(17),
-               gponApplication(18),
-               gponBootRom(19)
+               wholeBootRom(7)
+
         }
         MAX-ACCESS read-write
         STATUS current
@@ -1033,7 +882,7 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         ::= { gbnPlatformOAMUpDownLoad 6 }
 
     loadFtpFileName OBJECT-TYPE
-        SYNTAX DisplayString (SIZE (1..64))
+        SYNTAX DisplayString (SIZE (1..128))
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -1042,7 +891,7 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         ::= { gbnPlatformOAMUpDownLoad 7 }
 
     loadFtpUserName OBJECT-TYPE
-        SYNTAX DisplayString (SIZE (1..32))
+        SYNTAX DisplayString (SIZE (1..64))
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -1051,7 +900,7 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         ::= { gbnPlatformOAMUpDownLoad 8 }
 
     loadFtpUserPassword OBJECT-TYPE
-        SYNTAX DisplayString (SIZE (1..32))
+        SYNTAX DisplayString (SIZE (1..64))
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -1059,37 +908,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
              The FTP user password."
         ::= { gbnPlatformOAMUpDownLoad 9 }
 
-    FtpdOnOff OBJECT-TYPE
-        SYNTAX INTEGER {
-               enable(1),
-               disable(2)
-        }
-        MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "DURABLE: { disable }
-             Enable/Disable Ftpd."
-        ::= { gbnPlatformOAMUpDownLoad 10 }
-
-    FtpdAnonymousOnOff OBJECT-TYPE
-        SYNTAX INTEGER {
-               enable(1),
-               disable(2)
-        }
-        MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "DURABLE: { disable }
-             Enable/Disable Ftpd anonymous login."
-        ::= { gbnPlatformOAMUpDownLoad 11 }
-		
-    loadSlotID OBJECT-TYPE
-        SYNTAX INTEGER(0..15)
-        MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "Slot ID"
-        ::= { gbnPlatformOAMUpDownLoad 12 }
 ------------------------------------------------------------------------------
 --
 --  gbnPlatformOAMSnmp - Snmp Group
@@ -1211,7 +1029,7 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         ::= { snmpNotifyTypeTable 1 }
 
     SnmpNotifyTypeEntry ::=
-        SEQUENCE {
+    SEQUENCE {
         snmpPrivateNotifyType      DisplayString,
         snmpNotifyTypeStatus       INTEGER
         }
@@ -1222,7 +1040,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "notify type."
-            -- 通告类型
         ::= { snmpNotifyTypeEntry 1 }
 
      snmpNotifyTypeStatus  OBJECT-TYPE
@@ -1235,7 +1052,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "It signifies if the traps with corresponding notify-type can be sent."
-            -- 如果通告对应状态为"enable(1)"表示可以发送此类型的通告，否则不可发送。
         ::= { snmpNotifyTypeEntry 2 }
 
       gbnPlatformOAMSnmpNotifyType       OBJECT IDENTIFIER ::= { gbnPlatformOAMSnmp 3 }
@@ -1245,7 +1061,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         DESCRIPTION
             "A private type for traps or informs. It signifies that the SNMPv2 entity
             have just saved the configuration."
-            -- 私有的trap类型。发送此类型的trap表示设备刚才有保存配置文件的操作。
         ::= { gbnPlatformOAMSnmpNotifyType 1 }
 
      snmpTrapSource OBJECT-TYPE
@@ -1255,10 +1070,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         DESCRIPTION
             "The id of vlan or supervlan which interface traps or informs are
              sent from belongs to.  vlan id: 0-4094; supervlan id: 0-11."
-            -- trap或inform的源地址所属vlan或supervlan。vlan id：0-4094；
-            -- supervlan id：0-11。本节点值为0表示不指定Trap源地址接口。当
-            -- snmpTrapSourceType节点值为1时，本节点取值范围为0-4094；当
-            -- snmpTrapSourceType节点值为2时，本节点取值范围为0-11。
         ::= { gbnPlatformOAMSnmp 4 }
 
     snmpRemoteEngineTable OBJECT-TYPE
@@ -1279,7 +1090,7 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         ::= { snmpRemoteEngineTable 1 }
 
     SnmpRemoteEngineEntry ::=
-        SEQUENCE {
+    SEQUENCE {
         snmpRemoteHostTAddr      OCTET STRING,
         snmpRemoteEngineID       DisplayString,
         snmpDeleteRemoteEngineTableRow  INTEGER
@@ -1292,7 +1103,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         DESCRIPTION
             "The remote engine's id.Note that the engine id can
             only appear once in the table."
-            -- 远程引擎id。
         ::= { snmpRemoteEngineEntry 1 }
 
     snmpRemoteHostTAddr OBJECT-TYPE
@@ -1302,8 +1112,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         DESCRIPTION
             "The ip and port number of remote host.Note that the value including ip and
             port number can only appear once in the table."
-            -- 远程主机ip和端口号,前四位为主机ip后两位为端口号。其值和一个引擎id必须一一对应，
-            -- 不能出现一对多的情况。一个引擎id只能对应一个主机ip和端口号。
         ::= { snmpRemoteEngineEntry 2 }
 
     snmpDeleteRemoteEngineTableRow OBJECT-TYPE
@@ -1314,7 +1122,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "You can delete a row by setting the value to 'deleteRow(1)'."
-            -- 设置此对象实例值为1将删除此实例所在行。
         ::= { snmpRemoteEngineEntry 3 }
 
      snmpTrapSourceType OBJECT-TYPE
@@ -1324,11 +1131,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         DESCRIPTION
             "The type of the interface which traps or informs are sent from.
              1: vlan interface; 2: supervlan interface."
-            -- trap或inform的源地址接口的类型。1：vlan接口类型；2：supervlan接
-            -- 口类型（要设置为此类型必须确保snmpTrapSource节点的值不大于11）。
-            -- 配置Trap源地址接口时，请先设置snmpTrapSource节点的值为0，再设置
-            -- 本节点的值，然后再设置snmpTrapSource节点的值为指定vlan或
-            -- supervlan的接口id。
         ::= { gbnPlatformOAMSnmp 6 }
 
 ------------------------------------------------------------------------------
@@ -1342,7 +1144,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "A Table of port CAR."
-            --端口CAR表
         ::= { gbnPlatformOAMPortCar 1 }
 
     portCarEntry OBJECT-TYPE
@@ -1351,7 +1152,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "A list of port CAR."
-            --端口CAR列表
         INDEX { portCarPort }
         ::= { portCarTable 1 }
 
@@ -1359,7 +1159,7 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
             portCarPort            Integer32,
             portCarEnable          TruthValue,
             portDiscardBpdu        Integer32,
-            portCarRateBpdu        Integer32
+            portCarRateBpdu      Integer32
         }
 
     portCarPort OBJECT-TYPE
@@ -1368,7 +1168,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "The port number."
-            --端口号，端口CAR表的索引值
         ::= { portCarEntry 1 }
 
     portCarEnable OBJECT-TYPE
@@ -1377,7 +1176,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "The enable status of the port CAR"
-            --端口CAR开启/关闭状态
         ::= { portCarEntry 2 }
 
     portDiscardBpdu OBJECT-TYPE
@@ -1386,16 +1184,14 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "The enable status of the port discard BPDU"
-            --端口discard BPDU开启/关闭状态
         ::= { portCarEntry 3 }
 
     portCarRateBpdu OBJECT-TYPE
-        SYNTAX Integer32 (1..128)
+        SYNTAX Integer32
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
             "The port CAR max packet receive rate."
-            --端口CAR的值
         ::= { portCarEntry 4 }
 
     portCarGlobalEnable OBJECT-TYPE
@@ -1404,7 +1200,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "The global enable status of port CAR."
-            --全局端口CAR开启/关闭状态
         ::= { gbnPlatformOAMPortCar 2 }
 
     portCarOpenTime OBJECT-TYPE
@@ -1413,16 +1208,14 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "The closed port Re-open time."
-            --被端口CAR关闭的端口重新打开的时间
         ::= { gbnPlatformOAMPortCar 3 }
 
     discardBpdu OBJECT-TYPE
-        SYNTAX  Integer32
+        SYNTAX  Integer32 (0..1)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "discard specific BPDU, bit 0 for STP packet, bit 1 for GVRP packet, bit 2 for GMRP packet."
-            --丢弃BPDU标记，以位图形式记录BPDU的丢弃状态。第0位表示STP报文，第1位表示GVRP报文，第2位表示GMRP报文
+            "The global enable status of port discard BPDU."
         ::= { gbnPlatformOAMPortCar 4 }
 
     portCarRate OBJECT-TYPE
@@ -1430,18 +1223,8 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "The global port CAR max packet receive rate."
-            --端口CAR的值
+            "The port CAR max packet receive rate."
         ::= { gbnPlatformOAMPortCar 5 }
-
-    cpuCarRate OBJECT-TYPE
-    	SYNTAX  INTEGER (0..10000)
-        MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "The  CPU CAR max packet receive rate. value 0 is default 400/4000 pps"
-            --CPU CAR的值, 配置为0时, 设置CPU-CAR为默认值400/4000pps
-        ::= { gbnPlatformOAMPortCar 6 }
 
 ------------------------------------------------------------------------------
 --
@@ -1454,7 +1237,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "A Table of VCT run."
-            --VCT run表
         ::= { gbnPlatformOAMVctRun 1 }
 
     vctRunEntry OBJECT-TYPE
@@ -1463,14 +1245,13 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "A list of VCT run."
-            --VCT run列表
         INDEX { vctRunPort }
         ::= { vctRunTable 1 }
 
     VctRunEntry ::= SEQUENCE {
             vctRunPort            Integer32,
             vctRunEnable          TruthValue,
-            vctAutoRunEnable      TruthValue
+            vctAutoRunEnable          TruthValue
         }
 
     vctRunPort OBJECT-TYPE
@@ -1479,7 +1260,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "The port number."
-            --端口号，VCT run表的索引值
         ::= { vctRunEntry 1 }
 
     vctRunEnable OBJECT-TYPE
@@ -1488,7 +1268,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "The enable status of the VCT run"
-            --是否启动VCT run
         ::= { vctRunEntry 2 }
 
     vctAutoRunEnable OBJECT-TYPE
@@ -1497,7 +1276,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "The enable status of the VCT auto run"
-            --是否启动VCT auto run
         ::= { vctRunEntry 3 }
 
     vctAutoRunGlobalEnable OBJECT-TYPE
@@ -1506,21 +1284,12 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "The global enable status of VCT auto run."
-            --全局VCT auto run开启/关闭状态
         ::= { gbnPlatformOAMVctRun 2 }
-
-    vctRunGlobalEnable OBJECT-TYPE
-        SYNTAX TruthValue
-        MAX-ACCESS read-write
-        STATUS current
-        DESCRIPTION
-            "The global enable status of VCT  run."
-            --全局VCT  run开启/关闭状态
-        ::= { gbnPlatformOAMVctRun 3 }
 
 ------------------------------------------------------------------------------
 --
 --  gbnPlatformOAMVctRunResult - Vct Run Result Group
+--  以下MIB只在2926V中支持
 --
 ------------------------------------------------------------------------------
     vctRunResultTable OBJECT-TYPE
@@ -1529,7 +1298,6 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "A Table of VCT run result."
-            --VCT run result表
         ::= { gbnPlatformOAMVctRunResult 1 }
 
     vctRunResultEntry OBJECT-TYPE
@@ -1538,15 +1306,14 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "A list of VCT run result."
-            --VCT run result列表
         INDEX { vctRunResultPort, vctRunResultTxRxPairNo }
         ::= { vctRunResultTable 1 }
 
     VctRunResultEntry ::= SEQUENCE {
             vctRunResultPort            Integer32,
-            vctRunResultTxRxPairNo      Integer32,
-            vctRunResultStatus          Integer32,
-            vctRunResultErrorLocation   Integer32
+            vctRunResultTxRxPairNo VctRunResultTxRxPairNoType,
+            vctRunResultStatus         VctRunResultStatusType,
+            vctRunResultErrorLocation  Integer32
         }
 
     vctRunResultPort OBJECT-TYPE
@@ -1555,31 +1322,22 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         STATUS current
         DESCRIPTION
             "The port number."
-            --端口号，VCT run result表的索引值之一
         ::= { vctRunResultEntry 1 }
 
     vctRunResultTxRxPairNo OBJECT-TYPE
-        SYNTAX Integer32
+        SYNTAX VctRunResultTxRxPairNoType
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
             "The tx rx pair NO."
-            --tx rx pair NO，VCT run result表的索引值之一
         ::= { vctRunResultEntry 2 }
 
     vctRunResultStatus OBJECT-TYPE
-        SYNTAX Integer32
-        {
-            Normal(1),
-            Open(2),
-            Short(3),
-            Mismatch(4)
-        }
+        SYNTAX VctRunResultStatusType
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
             "The status of the VCT run result"
-            --VCT run result 状态
         ::= { vctRunResultEntry 3 }
 
     vctRunResultErrorLocation OBJECT-TYPE
@@ -1587,25 +1345,9 @@ dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-            "The error location of the VCT run result. length(m)"
-            --VCT run result的出错地点,长度(米)
+            "The error location of the VCT run result"
         ::= { vctRunResultEntry 4 }
-------------------------------------------------------------------------------
---
---  gbnPlatformOAMIpControl - OAM ip control Group
---
-------------------------------------------------------------------------------
-  ipControlTtl OBJECT-TYPE
-        SYNTAX	INTEGER{
-	        disable(0),
-	        enable(1)
-        }
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION
-            "Enable/disable the ip control ttl"
-            ::= { gbnPlatformOAMIpControl 1 }
-         
+
 --
 -- END of GBN-COMMON-MIB
 --
