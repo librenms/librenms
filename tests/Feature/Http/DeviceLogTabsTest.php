@@ -30,10 +30,10 @@ class DeviceLogTabsTest extends TestCase
     {
         return [
             'device syslog' => ['device.syslog', true, []],
-            'device eventlog' => ['device.eventlog', true, ['eventtype']],
+            'device eventlog' => ['device.eventlog', true, []],
             'device graylog' => ['device.graylog', true, []],
             'global syslog' => ['syslog', false, []],
-            'global eventlog' => ['eventlog', false, ['eventtype']],
+            'global eventlog' => ['eventlog', false, []],
             'global graylog' => ['graylog', false, []],
         ];
     }
@@ -58,23 +58,22 @@ class DeviceLogTabsTest extends TestCase
         }
     }
 
-    public function testGlobalPagesPreselectTheFilteredDevice(): void
+    public function testGraylogPreselectsTheFilteredDevice(): void
     {
         $device = Device::factory()->create();
 
-        foreach (['eventlog', 'graylog'] as $route) {
-            $this->actingAs($this->admin())
-                ->get(route($route, ['device' => $device->device_id]))
-                ->assertOk()
-                ->assertSee((string) Js::from(['id' => $device->device_id, 'text' => $device->display]), false);
-        }
+        $this->actingAs($this->admin())
+            ->get(route('graylog', ['device' => $device->device_id]))
+            ->assertOk()
+            ->assertSee((string) Js::from(['id' => $device->device_id, 'text' => $device->display]), false);
     }
 
-    public function testSyslogFilterBarIsEscaped(): void
+    public function testFilterBarIsEscaped(): void
     {
         $device = Device::factory()->create();
+        $urls = [route('syslog'), route('device.syslog', ['device' => $device]), route('eventlog'), route('device.eventlog', ['device' => $device])];
 
-        foreach ([route('syslog'), route('device.syslog', ['device' => $device])] as $url) {
+        foreach ($urls as $url) {
             $this->actingAs($this->admin())
                 ->get($url . '?' . http_build_query(['filter' => ['program' => ['eq' => self::PAYLOAD]]]))
                 ->assertOk()

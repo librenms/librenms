@@ -28,10 +28,11 @@
 </x-panel>
 
 <template id="syslog-filter">
-    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-        <x-filter :name="$filterName" :fields="$filterFields" :initial="$filter" />
-        <x-date-range-picker :start="$from" :end="$to" :reload="true" class="form-control tw:min-w-64" />
-    </div>
+    <x-filter :name="$filterName" :fields="$filterFields" :initial="$filter" />
+</template>
+
+<template id="syslog-range">
+    <x-date-range-picker :start="$from" :end="$to" :reload="true" class="form-control tw:min-w-64" />
 </template>
 
 @push('scripts')
@@ -43,7 +44,7 @@
             ajax: true,
             rowCount: [50, 100, 250, -1],
             templates: {
-                header: "<div id=\"@{{ctx.id}}\" class=\"@{{css.header}}\"><div class=\"syslog-actionbar tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2\"><p class=\"@{{css.actions}}\"></p></div></div>",
+                header: "<div id=\"@{{ctx.id}}\" class=\"@{{css.header}}\"><div class=\"syslog-actionbar tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2\"><div class=\"syslog-filter\"></div><div class=\"tw:flex tw:items-center tw:gap-2\"><div class=\"syslog-range\"></div><p class=\"@{{css.actions}}\"></p></div></div></div>",
                 search: "" // replaced by the filter bar
             },
             post: function () {
@@ -56,7 +57,8 @@
             }
         });
 
-        $('.syslog-actionbar').prepend(document.getElementById('syslog-filter').content.cloneNode(true));
+        $('.syslog-filter').append(document.getElementById('syslog-filter').content.cloneNode(true));
+        $('.syslog-range').append(document.getElementById('syslog-range').content.cloneNode(true));
 
         $(window).on('filter:apply', function (event) {
             if (event.originalEvent.detail.name === @js($filterName)) {

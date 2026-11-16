@@ -14,14 +14,11 @@ class LogController extends Controller
     {
         $this->authorize('viewAny', Eventlog::class);
 
-        $request->validate([
-            'device' => 'nullable|int',
-            'eventtype' => 'nullable|string',
-        ]);
+        $request->validate(Eventlog::filterValidationRules());
 
         return view('logs.eventlog', [
-            'device' => $this->device($request),
-            'eventtype' => $request->string('eventtype')->value(),
+            'filter' => $request->array('filter'),
+            'filterFields' => Eventlog::filterFieldDefinitions(),
         ]);
     }
 

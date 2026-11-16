@@ -4,6 +4,6 @@
 
 @section('content')
 <div class="container-fluid">
-    <x-logs.eventlog :device="$device" :eventtype="$eventtype" />
+    <x-logs.eventlog filter-name="eventlog" :filter="$filter" :filter-fields="$filterFields" />
 </div>
 @endsection

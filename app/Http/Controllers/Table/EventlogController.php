@@ -52,6 +52,7 @@ class EventlogController extends TableController
             'eventtype' => 'nullable|string',
             'age' => 'nullable|int',
             'message' => 'nullable|string',
+            ...Eventlog::filterValidationRules(),
         ];
     }
 
@@ -105,6 +106,7 @@ class EventlogController extends TableController
 
         return Eventlog::hasAccess($request->user())
             ->with('device')
+            ->when($request->array('filter'), fn ($query, $filters) => $query->applyFilters($filters))
             ->when($request->device_group, function ($query) use ($request): void {
                 $query->inDeviceGroup($request->device_group);
             })

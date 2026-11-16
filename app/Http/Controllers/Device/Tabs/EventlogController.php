@@ -40,13 +40,14 @@ class EventlogController extends Controller
         $this->authorize('viewAny', Eventlog::class);
 
         $request->validate([
-            'eventtype' => 'nullable|string',
             'port' => 'nullable|int',
+            ...Eventlog::filterValidationRules(),
         ]);
 
         return view('device.tabs.logs.eventlog', [
             'device' => $device,
-            'eventtype' => $request->string('eventtype')->value(),
+            'filter' => $request->array('filter'),
+            'filterFields' => Eventlog::filterFieldDefinitions(withDevice: false),
             'port' => $request->filled('port') ? $device->ports()->find($request->integer('port')) : null,
         ]);
     }

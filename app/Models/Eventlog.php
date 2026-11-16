@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\Filterable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
@@ -34,12 +35,33 @@ use LibreNMS\Enum\Severity;
 
 class Eventlog extends DeviceRelatedModel
 {
+    use Filterable;
     use HasFactory;
 
     protected $table = 'eventlog';
     protected $primaryKey = 'event_id';
     public $timestamps = false;
     protected $fillable = ['datetime', 'device_id', 'message', 'type', 'reference', 'username', 'severity'];
+
+    /** @var string[] */
+    protected array $filterable = ['device_id', 'type'];
+
+    /**
+     * @param  bool  $withDevice  offer the device filter, leave it out on device pages
+     * @return array<array{key: string, label: string, type: string, endpoint?: string, params?: array<string, string>}>
+     */
+    public static function filterFieldDefinitions(bool $withDevice = true): array
+    {
+        $fields = [
+            ['key' => 'type', 'label' => __('Type'), 'type' => 'select', 'endpoint' => route('ajax.select.eventlog'), 'params' => ['field' => 'type']],
+        ];
+
+        if ($withDevice) {
+            $fields[] = ['key' => 'device_id', 'label' => __('Device'), 'type' => 'select', 'endpoint' => route('ajax.select.device')];
+        }
+
+        return $fields;
+    }
 
     /**
      * @return array<string, string>

@@ -152,13 +152,8 @@ class PortEventlogLinksTest extends TestCase
             ->get(route('device.eventlog', ['device' => $device->device_id, 'port' => $port->port_id]));
         $response->assertOk()
             ->assertSee('GigabitEthernet0', false)
-            ->assertSee('name="port"', false)
-            ->assertSee('value="' . $port->port_id . '"', false);
-
-        $html = $response->getContent();
-        $this->assertNotFalse(mb_strpos($html, 'Filter</button>'));
-        $this->assertNotFalse(mb_strpos($html, 'Clear port filter'));
-        $this->assertTrue(mb_strpos($html, 'Filter</button>') < mb_strpos($html, 'Clear port filter'));
+            ->assertSee('Clear port filter', false)
+            ->assertSee('port: ' . $port->port_id, false);
     }
 
     public function testEventlogPageEscapesHtmlInPortLabel(): void

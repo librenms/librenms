@@ -1,7 +1,8 @@
 @props([
     'device' => null,
-    'deviceFilter' => true,
-    'eventtype' => '',
+    'filterName',
+    'filter' => [],
+    'filterFields' => [],
     'port' => null,
 ])
 
@@ -24,57 +25,45 @@
 </x-panel>
 
 <template id="eventlog-filter">
-    <form method="GET" class="form-inline pull-left tw:flex tw:flex-wrap tw:items-center tw:gap-2" role="form">
-        @if($deviceFilter)
-            <div class="form-group">
-                <label class="tw:mr-1" for="eventlog-device">{{ __('Device') }}</label>
-                <select name="device" id="eventlog-device" class="form-control"></select>
-            </div>
-        @endif
-        <div class="form-group">
-            <label class="tw:mr-1" for="eventlog-type">{{ __('Type') }}</label>
-            <select name="eventtype" id="eventlog-type" class="form-control input-sm"></select>
-        </div>
-        <button type="submit" class="btn btn-default">{{ __('Filter') }}</button>
+    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+        <x-filter :name="$filterName" :fields="$filterFields" :initial="$filter" />
         @if($port)
-            <input type="hidden" name="port" value="{{ $port->port_id }}">
-            <div class="form-group">
-                <label class="tw:mr-1">{{ __('Port') }}</label>
-                <span class="form-control-static">
-                    {{ $port->getLabel() }}
-                    <a href="{{ request()->fullUrlWithoutQuery('port') }}" title="{{ __('Clear port filter') }}">&times;</a>
-                </span>
-            </div>
+            <span>
+                {{ __('Port') }}: {{ $port->getLabel() }}
+                <a href="{{ request()->fullUrlWithoutQuery('port') }}" title="{{ __('Clear port filter') }}">&times;</a>
+            </span>
         @endif
-    </form>
+    </div>
 </template>
 
 @push('scripts')
 <script>
-    $("#eventlog").bootgrid({
-        ajax: true,
-        rowCount: [50, 100, 250, -1],
-        post: function () {
-            return {
-                device: @js($device?->device_id),
-                eventtype: @js($eventtype),
-                port: @js($port?->port_id),
-            };
-        }
-    });
+    (function () {
+        let filter = @js($filter);
 
-    $('#eventlog-header .actionBar').prepend(document.getElementById('eventlog-filter').content.cloneNode(true));
+        const grid = $("#eventlog").bootgrid({
+            ajax: true,
+            rowCount: [50, 100, 250, -1],
+            templates: {
+                header: "<div id=\"@{{ctx.id}}\" class=\"@{{css.header}}\"><div class=\"eventlog-actionbar tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2\"><p class=\"@{{css.search}}\"></p><p class=\"@{{css.actions}}\"></p></div></div>"
+            },
+            post: function () {
+                return {
+                    device: @js($device?->device_id),
+                    port: @js($port?->port_id),
+                    filter: filter,
+                };
+            }
+        });
 
-    @if($deviceFilter)
-        init_select2("#eventlog-device", "device", {limit: 100}, @js($device ? ['id' => $device->device_id, 'text' => $device->display] : null), @js(__('All Devices')));
-    @endif
-    init_select2("#eventlog-type", "eventlog", function (params) {
-        return {
-            field: "type",
-            device: @if($deviceFilter) $('#eventlog-device').val() @else @js($device?->device_id) @endif,
-            term: params.term,
-            page: params.page || 1
-        };
-    }, @js($eventtype), @js(__('All Types')));
+        $('.eventlog-actionbar').prepend(document.getElementById('eventlog-filter').content.cloneNode(true));
+
+        $(window).on('filter:apply', function (event) {
+            if (event.originalEvent.detail.name === @js($filterName)) {
+                filter = event.originalEvent.detail.filters;
+                grid.bootgrid('reload');
+            }
+        });
+    })();
 </script>
 @endpush

@@ -36,6 +36,8 @@ use Illuminate\Http\Request;
 class EventlogController extends SelectController
 {
     protected array $default_sort = ['type' => 'asc'];
+    protected ?string $idField = 'type';
+    protected ?string $textField = 'type';
 
     /**
      * Defines validation rules (will override base validation rules for select2 responses too)

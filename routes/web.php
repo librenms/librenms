@@ -143,6 +143,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::post('oxidized/search', [OxidizedController::class, 'search'])->name('oxidized.search');
     Route::post('oxidized/reload', [OxidizedController::class, 'reload'])->name('oxidized.reload');
     Route::get('eventlog', [LogController::class, 'eventlog'])->name('eventlog');
+    Route::get('eventlog', [LogController::class, 'eventlog'])->middleware('saved-filter:eventlog')->name('eventlog');
     Route::get('syslog', [LogController::class, 'syslog'])->middleware('saved-filter:syslog')->name('syslog');
     Route::get('graylog', [LogController::class, 'graylog'])->name('graylog');
     Route::get('packages', [PackagesController::class, 'index'])->middleware('saved-filter:packages')->name('packages.index');
@@ -314,7 +315,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('alerts/{vars?}', [Device\Tabs\FaultsController::class, 'legacy'])->where('vars', '.*')->name('faults.legacy');
         Route::get('alert-stats', [Device\Tabs\FaultsController::class, 'legacy']);
         Route::redirect('logs', 'logs/eventlog')->name('logs');
-        Route::get('logs/eventlog', Device\Tabs\EventlogController::class)->name('eventlog');
+        Route::get('logs/eventlog', Device\Tabs\EventlogController::class)->middleware('saved-filter:device.eventlog')->name('eventlog');
         Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
         Route::get('logs/outages', Device\Tabs\OutagesController::class)->name('outages');
         Route::get('logs/syslog', Device\Tabs\SyslogController::class)->name('syslog');
