@@ -3,8 +3,9 @@
 use App\Models\RadiusServer;
 
 // RADIUS responses per minute of a server (vars id), or of all servers of the device
+$serverId = $vars['id'] ?? null;
 $servers = RadiusServer::where('device_id', $device['device_id'])
-    ->when(isset($vars['id']), fn ($query) => $query->where('id', $vars['id']))
+    ->when($serverId !== null, fn ($query) => $query->where('id', $serverId))
     ->get();
 $series = $servers->contains(fn (RadiusServer $server) => $server->accepts !== null)
     ? ['accepts' => 'Accepts', 'rejects' => 'Rejects', 'timeouts' => 'Timeouts']
