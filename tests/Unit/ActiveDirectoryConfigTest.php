@@ -64,6 +64,9 @@ class ActiveDirectoryConfigTest extends TestCase
         $this->assertSame($expected, app(ActiveDirectoryConfig::class)->connection()['username']);
     }
 
+    /**
+     * @return list<array{string, string}>
+     */
     public static function bindNames(): array
     {
         return [

@@ -201,11 +201,17 @@ class ActiveDirectoryAuthTest extends DBTestCase
         $this->assertNull(Auth::user()->password);
     }
 
+    /**
+     * @return array{username?: string, password?: string, samaccountname?: string, userprincipalname?: string, fallback?: array{username: string, password: string, auth_type: string, enabled: int}}
+     */
     private function credentials(string $password = 'secret'): array
     {
         return app(ActiveDirectoryConfig::class)->credentials(['username' => 'alice', 'password' => $password]);
     }
 
+    /**
+     * @param  array<string, string|int>  $attributes
+     */
     private function ldapUser(array $attributes = []): ActiveDirectoryUser
     {
         return ActiveDirectoryUser::create(array_merge([

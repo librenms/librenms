@@ -46,6 +46,10 @@ class ActiveDirectoryConfig
         ];
     }
 
+    /**
+     * @param  array{username?: string, password?: string}  $credentials
+     * @return array{username?: string, password?: string, samaccountname?: string, userprincipalname?: string, fallback?: array{username: string, password: string, auth_type: string, enabled: int}}
+     */
     public function credentials(array $credentials): array
     {
         if (LibrenmsConfig::get('auth_mechanism') !== 'active_directory') {
