@@ -364,7 +364,7 @@ class RunAlerts
                 $unit = $alert;
                 $unit['state'] = $faultState;
                 $unit['fault_id'] = $fault->id;
-                $unit['note'] = $fault->note ?? '';
+                $unit['note'] = $faultState === AlertState::ACKNOWLEDGED ? ($fault->note ?? '') : '';
                 $unit['details']['rule'] = $fault->details['rule'] ?? [];
                 $unit['details']['contacts'] = $fault->details['contacts'] ?? ($alert['details']['contacts'] ?? []);
                 $latestLogId = AlertLog::query()->where('fault_id', $fault->id)->max('id');

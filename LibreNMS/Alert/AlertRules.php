@@ -340,13 +340,14 @@ readonly class AlertRules
                 }
                 $alertRow->timestamp = Carbon::now();
             }
-            if ($newState === AlertState::RECOVERED) {
+            if ($newState === AlertState::RECOVERED || $newState === AlertState::ACTIVE) {
                 $alertRow->note = '';
             } elseif ($newState === AlertState::ACKNOWLEDGED) {
                 $notes = AlertFault::query()
                     ->where('rule_id', $rule->id)
                     ->where('device_id', $this->device->device_id)
                     ->where('open', 1)
+                    ->where('state', '!=', AlertState::RECOVERED)
                     ->whereNotNull('note')
                     ->where('note', '!=', '')
                     ->pluck('note')
@@ -369,6 +370,7 @@ readonly class AlertRules
                     ->where('rule_id', $rule->id)
                     ->where('device_id', $this->device->device_id)
                     ->where('open', 1)
+                    ->where('state', '!=', AlertState::RECOVERED)
                     ->whereNotNull('note')
                     ->where('note', '!=', '')
                     ->pluck('note')

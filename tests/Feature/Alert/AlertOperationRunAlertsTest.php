@@ -194,12 +194,6 @@ final class AlertOperationRunAlertsTest extends TestCase
 
         $runAlerts->runAlerts();
 
-        // Simulate a stale note on the alerts table row from an older alert
-        DB::table('alerts')
-            ->where('rule_id', $context['rule']->id)
-            ->where('device_id', $context['device']->device_id)
-            ->update(['note' => 'Stale note from prior alert']);
-
         AlertFault::query()
             ->where('rule_id', $context['rule']->id)
             ->where('device_id', $context['device']->device_id)
@@ -209,6 +203,13 @@ final class AlertOperationRunAlertsTest extends TestCase
                 'note' => 'Fault acknowledgement note',
             ]);
         new AlertRules($context['device']->device_id)->syncAlertState($context['rule']);
+
+        // Set a stale note on the alerts table row after synchronization to verify
+        // that notification-side note selection independently chooses the fault's note
+        DB::table('alerts')
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->update(['note' => 'Stale note from prior alert']);
 
         $objs = [];
         $runAlerts->runAlerts();
