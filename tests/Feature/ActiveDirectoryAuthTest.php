@@ -8,6 +8,7 @@ use App\Ldap\ActiveDirectoryUser;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use LdapRecord\Laravel\Auth\DatabaseUserProvider;
 use LdapRecord\Laravel\Testing\DirectoryEmulator;
 use LdapRecord\Models\ActiveDirectory\Group;
@@ -74,6 +75,7 @@ class ActiveDirectoryAuthTest extends DBTestCase
 
     public function testFailedPasswordDoesNotCreateAnAccount(): void
     {
+        $log = Log::spy();
         DirectoryEmulator::setup('active_directory');
         $this->ldapUser();
 
@@ -82,6 +84,25 @@ class ActiveDirectoryAuthTest extends DBTestCase
         $this->assertGuest();
         $this->assertDatabaseHas('authlog', ['user' => 'alice', 'result' => 'Invalid credentials']);
         $this->assertDatabaseMissing('users', ['auth_type' => 'active_directory', 'username' => 'alice']);
+        $log->shouldHaveReceived('warning')->once()->with('Active Directory authentication failed', [
+            'username' => 'alice',
+            'user_id' => null,
+            'reason' => 'Password validation or an access rule failed',
+        ]);
+    }
+
+    public function testMissingDirectoryUserLogsLookupFailure(): void
+    {
+        $log = Log::spy();
+        DirectoryEmulator::setup('active_directory');
+
+        $this->assertFalse(Auth::once($this->credentials()));
+
+        $log->shouldHaveReceived('warning')->once()->with('Active Directory authentication failed', [
+            'username' => 'alice',
+            'user_id' => null,
+            'reason' => 'No LDAP user found and no matching local fallback account',
+        ]);
     }
 
     public function testGroupRequirementRejectsNonmembers(): void
