@@ -35,6 +35,7 @@ class AuthTestCommandTest extends DBTestCase
             'ldap.connections.active_directory' => app(ActiveDirectoryConfig::class)->connection(),
         ]);
         Container::addConnection(new Connection(config('ldap.connections.active_directory')), 'active_directory');
+        Container::setDefaultConnection('active_directory');
         Auth::forgetGuards();
     }
 

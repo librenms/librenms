@@ -9,6 +9,8 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use LdapRecord\Connection;
+use LdapRecord\Container;
 use LdapRecord\Laravel\Auth\DatabaseUserProvider;
 use LdapRecord\Laravel\Testing\DirectoryEmulator;
 use LdapRecord\Models\ActiveDirectory\Group;
@@ -18,31 +20,27 @@ class ActiveDirectoryAuthTest extends DBTestCase
 {
     use DatabaseTransactions;
 
-    public function createApplication(): \Illuminate\Foundation\Application
-    {
-        $app = require self::basePath('bootstrap/app.php');
-        $app->beforeBootstrapping(\Illuminate\Foundation\Bootstrap\BootProviders::class, function (): void {
-            LibrenmsConfig::set('auth_mechanism', 'active_directory');
-            LibrenmsConfig::set('auth_ad_domain', 'example.com');
-            LibrenmsConfig::set('auth_ad_url', '');
-            LibrenmsConfig::set('auth_ad_base_dn', '');
-        });
-        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-
-        return $app;
-    }
-
     protected function setUp(): void
     {
         parent::setUp();
+        Container::flush();
         LibrenmsConfig::set('auth_mechanism', 'active_directory');
         LibrenmsConfig::set('auth_ad_domain', 'example.com');
+        LibrenmsConfig::set('auth_ad_url', '');
+        LibrenmsConfig::set('auth_ad_base_dn', '');
         LibrenmsConfig::set('auth_ad_user_filter', '(objectclass=user)');
         LibrenmsConfig::set('auth_ad_group_filter', '(objectclass=group)');
         LibrenmsConfig::set('auth_ad_groups', []);
         LibrenmsConfig::set('auth_ad_require_groupmembership', false);
         LibrenmsConfig::set('auth_ad_global_read', false);
         LibrenmsConfig::set('auth_fallback_local', false);
+        config([
+            'auth.guards.web.provider' => 'active_directory',
+            'ldap.default' => 'active_directory',
+            'ldap.connections.active_directory' => app(ActiveDirectoryConfig::class)->connection(),
+        ]);
+        Container::addConnection(new Connection(config('ldap.connections.active_directory')), 'active_directory');
+        Container::setDefaultConnection('active_directory');
         Auth::forgetGuards();
     }
 
