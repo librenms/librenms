@@ -110,73 +110,42 @@ if (count($cgroup_labels) > 0) {
 print_optionbar_end();
 
 if ($page_view === 'overview') {
-    $average = in_array($vars['average'] ?? null, ['avg10', 'avg60', 'avg300']) ? $vars['average'] : 'avg300';
-    // highest sorts by the highest pressure a cgroup has of any type, name sorts by the cgroup name,
-    // and a pressure type key sorts by that column
-    $sort = $vars['sort'] ?? 'highest';
-    if ($sort !== 'name' && ! isset($compare_types[$sort])) {
-        $sort = 'highest';
-    }
-
-    $average_links = [];
-    foreach (['avg10', 'avg60', 'avg300'] as $average_option) {
-        $average_links[] = $menu_link($average_option, ['view' => 'overview', 'average' => $average_option, 'sort' => $sort], $average === $average_option);
-    }
-
-    // one row per cgroup, with the highest value saved for sorting
-    $table_rows = [];
-    foreach ($cgroup_labels as $safe_cgroup => $cgroup) {
-        $row_values = [];
-        foreach ($compare_types as $pressure_key => $pressure_type) {
-            $row_values[$pressure_key] = $cgroup_pressure[$cgroup][$pressure_key][$average] ?? null;
-        }
-        $table_rows[] = [
-            'safe_cgroup' => $safe_cgroup,
-            'cgroup' => $cgroup,
-            'values' => $row_values,
-            'highest' => max([0, ...array_values(array_filter($row_values, is_numeric(...)))]),
+    // A sortable table per pressure type, with a row for the system wide pressure
+    // followed by one for each cgroup, showing avg10, avg60, and avg300.
+    $averages = ['avg10', 'avg60', 'avg300'];
+    foreach ($compare_types as $pressure_key => $pressure_type) {
+        $table_info = [
+            'headers' => ['Cgroup', ...$averages],
+            'rows' => [],
         ];
-    }
 
-    usort($table_rows, function ($row_a, $row_b) use ($sort) {
-        if ($sort === 'name') {
-            return strcmp($row_a['cgroup'], $row_b['cgroup']);
+        $row_sources = [
+            ['link' => generate_link('System', $link_array), 'pressure' => $system_pressure[$pressure_key] ?? []],
+        ];
+        foreach ($cgroup_labels as $safe_cgroup => $cgroup) {
+            $row_sources[] = [
+                'link' => generate_link(htmlspecialchars($cgroup), $link_array, ['cgroup' => $safe_cgroup]),
+                'pressure' => $cgroup_pressure[$cgroup][$pressure_key] ?? [],
+            ];
         }
-        $value_a = $sort === 'highest' ? $row_a['highest'] : ($row_a['values'][$sort] ?? -1);
-        $value_b = $sort === 'highest' ? $row_b['highest'] : ($row_b['values'][$sort] ?? -1);
 
-        return $value_b <=> $value_a ?: strcmp($row_a['cgroup'], $row_b['cgroup']);
-    });
+        foreach ($row_sources as $row_source) {
+            $row = [['data' => $row_source['link'], 'raw' => true]];
+            foreach ($averages as $average) {
+                $value = $row_source['pressure'][$average] ?? null;
+                $row[] = ['data' => is_numeric($value) ? number_format($value, 2) : '-'];
+            }
+            $table_info['rows'][] = $row;
+        }
 
-    echo '<div class="panel panel-default">
+        echo '<div class="panel panel-default">
     <div class="panel-heading">
-        <h3 class="panel-title">Percent Stalled, ' . $average . ' &nbsp; <small>' . implode(' | ', $average_links) . '</small></h3>
+        <h3 class="panel-title">' . $menu_link($pressure_type['label'] . ' Percent Stalled', ['compare' => $pressure_key], false) . '</h3>
     </div>
-    <div class="panel-body">
-    <table class="table table-condensed table-hover table-striped">
-    <thead><tr><th>' . $menu_link('Cgroup', ['view' => 'overview', 'average' => $average, 'sort' => 'name'], $sort === 'name') . '</th>';
-    foreach ($compare_types as $pressure_key => $pressure_type) {
-        echo '<th>' . $menu_link($pressure_type['label'], ['view' => 'overview', 'average' => $average, 'sort' => $pressure_key], $sort === $pressure_key) . '</th>';
+    <div class="panel-body">';
+        echo view('widgets/sortable_table', $table_info);
+        echo "</div>\n</div>\n";
     }
-    echo '<th>' . $menu_link('Highest', ['view' => 'overview', 'average' => $average, 'sort' => 'highest'], $sort === 'highest') . "</th></tr></thead>\n<tbody>\n";
-
-    // the system wide pressure goes first as a point of reference and is not sorted
-    echo '<tr class="info"><td>' . generate_link('System', $link_array) . '</td>';
-    foreach ($compare_types as $pressure_key => $pressure_type) {
-        $value = $system_pressure[$pressure_key][$average] ?? null;
-        echo '<td>' . (is_numeric($value) ? number_format($value, 2) : '-') . '</td>';
-    }
-    echo "<td></td></tr>\n";
-
-    foreach ($table_rows as $table_row) {
-        echo '<tr><td>' . generate_link(htmlspecialchars($table_row['cgroup']), $link_array, ['cgroup' => $table_row['safe_cgroup']]) . '</td>';
-        foreach ($table_row['values'] as $value) {
-            echo '<td>' . (is_numeric($value) ? number_format($value, 2) : '-') . '</td>';
-        }
-        echo '<td>' . number_format($table_row['highest'], 2) . "</td></tr>\n";
-    }
-
-    echo "</tbody></table>\n</div>\n</div>\n";
 
     return;
 }
