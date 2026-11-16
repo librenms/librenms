@@ -165,7 +165,7 @@
                             'secretFieldLabels' => (object) collect($method['secret_types'])->flatMap(fn (array $t) => $t['schema_fields'])->mapWithKeys(fn (array $f) => [$f['key'] => $f['label'] ?? $f['key']])->all(),
                             'newSecretType' => $method['secret_types'][0]['type'] ?? '',
                             'secretTypeById' => (object) $method['secret_type_by_id'],
-                            'formData' => (object) ($method['schema_defaults'] ?? []),
+                            'formData' => $method['schema_defaults'] ?? (object) [],
                             'settingsData' => (object) ($method['settings'] ?? []),
                             'updateUrl' => route('device.edit.polling.update', ['device' => $device, 'methodType' => $method['type']]),
                             'storeUrl' => route('device.edit.polling.store', ['device' => $device]),

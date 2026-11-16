@@ -54,7 +54,7 @@
                 term: params.term,
                 page: params.page || 1
             }
-        }, '{{ $eventtype ?: "" }}');
+        }, @json($eventtype ?: ''));
 
         $('#hidenavigation-{{ $id }}')
             .bootstrapSwitch('offColor','danger')

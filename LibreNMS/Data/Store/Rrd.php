@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -86,10 +87,10 @@ class Rrd extends BaseDatastore
             self::renameFile($device_model, $meta['rrd_oldname'], $rrd_name);
         }
 
-        if (isset($meta['rrd_proxmox_name'])) {
-            $pmxvars = $meta['rrd_proxmox_name'];
-            $rrd = self::proxmoxName($pmxvars['pmxcluster'], $pmxvars['vmid'], $pmxvars['vmport']);
-            self::checkDirExists(RrdPath::proxmox($pmxvars['pmxcluster']));
+        $metric = $meta['metric'] ?? null;
+        if ($metric instanceof MetricIdentity) {
+            self::checkDirExists(RrdPath::make($metric->group())); // not always a device, those are created when polling starts
+            $rrd = $this->metricName($metric);
         } else {
             $rrd = RrdPath::make($device_model->hostname, self::filenameString($rrd_name) . '.rrd');
         }
@@ -223,14 +224,6 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * Generates a filename for a proxmox cluster rrd
-     */
-    public function proxmoxName(string $pmxcluster, string $vmid, string $vmport): RrdPath
-    {
-        return RrdPath::proxmox($pmxcluster, $vmid . '_netif_' . $vmport . '.rrd');
-    }
-
-    /**
      * Get the name of the port rrd file.  For alternate rrd, specify the suffix.
      */
     public function portName(int $port_id, ?string $suffix = null): string
@@ -279,6 +272,41 @@ class Rrd extends BaseDatastore
     public function name(string $hostname, array|string $filename): RrdPath
     {
         return RrdPath::make($hostname, self::filenameString($filename) . '.rrd');
+    }
+
+    /**
+     * The rrd file of a metric: in the directory of its group, named after the measurement and the other tag values.
+     */
+    public function metricName(MetricIdentity $metric): RrdPath
+    {
+        return $this->name($metric->group(), [$metric->measurement, ...array_values($metric->tagsInGroup())]);
+    }
+
+    /**
+     * The rrd files a metric may be kept in, the one the poller writes to first.
+     * A metric whose identity was cleaned up may still be kept in the file it had before.
+     *
+     * @return list<RrdPath>
+     */
+    public function metricNames(MetricIdentity $metric): array
+    {
+        if ($metric->group() === '') {
+            return [];
+        }
+
+        $names = app(MetricNames::class);
+        $paths = [$this->metricName($metric)];
+
+        if ($legacy = $names->legacyOf($metric)) {
+            $legacyPath = $this->name($metric->group(), $legacy->rrdNameOf($metric) ?? $legacy->measurement);
+
+            // some metrics kept their file name when the identity was cleaned up
+            if ($legacyPath->relativePath() !== $paths[0]->relativePath()) {
+                $paths[] = $legacyPath;
+            }
+        }
+
+        return $names->isCanonical() ? $paths : array_reverse($paths);
     }
 
     /**

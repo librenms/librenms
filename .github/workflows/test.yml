@@ -51,7 +51,7 @@ jobs:
 
     env:
       # keep in sync with LibreNMS/Util/Snmpsim.php
-      SNMPSIM_VERSION: 2.0.1
+      SNMPSIM_VERSION: 2.0.3
     steps:
       -
         # mysql is the runner's own MySQL, anything else is a docker image
@@ -184,7 +184,7 @@ jobs:
         wait: database
       -
         name: Migrate Database
-        run: php artisan migrate
+        run: php artisan migrate --seed
 
       -
         name: Wait for SNMPSIM

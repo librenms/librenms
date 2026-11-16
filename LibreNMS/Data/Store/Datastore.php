@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
@@ -67,7 +68,7 @@ class Datastore implements WriteInterface, DataStorageInterface
      *
      * @param  DatastoreContract[]  $stores
      */
-    public function __construct(protected array $stores)
+    public function __construct(protected array $stores, private readonly MetricNames $metricNames = new MetricNames)
     {
     }
 
@@ -138,6 +139,20 @@ class Datastore implements WriteInterface, DataStorageInterface
      */
     public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
+        $metric = $meta['metric'] ?? null;
+        $legacy = $metric instanceof MetricIdentity ? $this->metricNames->storedAs($metric) : null;
+
+        if ($legacy !== null) {
+            // stored under the names it always had
+            $measurement = $legacy->measurement;
+            $tags = $legacy->tagsOf($metric);
+            unset($meta['metric']);
+
+            if ($rrdName = $legacy->rrdNameOf($metric)) {
+                $meta['rrd_name'] = $rrdName;
+            }
+        }
+
         foreach ($this->stores as $store) {
             $store->write($measurement, $fields, $tags, $meta);
         }

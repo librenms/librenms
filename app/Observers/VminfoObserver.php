@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Vminfo;
 use LibreNMS\Enum\Severity;
@@ -28,6 +29,13 @@ class VminfoObserver
     public function updating(Vminfo $vminfo)
     {
         foreach ($vminfo->getDirty() as $field => $value) {
+            if ($field === 'device_id') {
+                $from = Device::find($vminfo->getOriginal('device_id'))?->hostname;
+                Eventlog::log("Virtual Machine migrated: $vminfo->vmwVmDisplayName from $from", $value, 'vm', Severity::Notice, $vminfo->vmwVmVMID);
+
+                continue;
+            }
+
             Eventlog::log($vminfo->vmwVmDisplayName . ' (' . preg_replace('/^vmwVm/', '', $field) . ') -> ' . $value, $vminfo->device_id, 'vm');
         }
     }

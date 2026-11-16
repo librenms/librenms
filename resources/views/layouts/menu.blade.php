@@ -893,7 +893,7 @@
                 this.lastRunQuery = q;
                 this.open = true;
                 this.navigateOnLoad = false;
-                this.activeIndex = -1;
+                this.activeIndex = 0;
                 this.results = [];
                 let seq = this.seq;
                 let all = this.endpoints.map((url, i) => i);

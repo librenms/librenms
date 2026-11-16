@@ -1,8 +1,21 @@
 <?php
 
-$row = 1;
+use App\Models\Device;
+use Illuminate\Support\Facades\Gate;
 
-$device_id = $vars['device_id'];
+$device_id = filter_var($vars['device_id'] ?? null, FILTER_VALIDATE_INT);
+$component_device = is_int($device_id) ? Device::find($device_id) : null;
+
+if ($component_device === null || Gate::denies('view', $component_device)) {
+    echo json_encode([
+        'current' => $current,
+        'rowCount' => $rowCount,
+        'rows' => [],
+        'total' => 0,
+    ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+
+    return;
+}
 
 $OBJCOMP = new LibreNMS\Component();
 
@@ -37,7 +50,7 @@ $response[] = [
     'ignore' => '<button type="submit" id="ignore-toggle" class="btn btn-default btn-sm" title="Toggle alert tag for all components">Toggle</button><button type="button" id="ignore-select" class="btn btn-default btn-sm" title="Disable alert tag on all components">Select All</button>',
 ];
 
-foreach ($COMPONENTS[$device_id] as $ID => $AVP) {
+foreach ($COMPONENTS[$device_id] ?? [] as $ID => $AVP) {
     if ($AVP['status'] == 0) {
         $class = 'green';
         $status = 'Ok';

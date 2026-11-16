@@ -216,6 +216,22 @@ final class EditPollingControllerTest extends DBTestCase
         $this->assertStringNotContainsString('"text":"SNMP Secret 456"', $html);
     }
 
+    public function testIndexShowsSnmpBulkAsNoForV1(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+        ]);
+
+        $html = $this->actingAs($admin)->get(route('device.edit.polling', ['device' => $device]))->assertOk()->getContent();
+
+        // a disabled stand-in shows No in its place, the real select is hidden but still keeps and submits its value
+        $this->assertMatchesRegularExpression('/name="settings\[bulk\]"[^>]*x-show="!\(settingsData\[&quot;version&quot;\] === &quot;v1&quot; &amp;&amp; \(!currentSecretType/', $html);
+        $this->assertMatchesRegularExpression('/<select class="form-control" disabled aria-label="SNMP bulk requests" x-show="settingsData\[&quot;version&quot;\] === &quot;v1&quot;[^"]*" x-cloak>\s*<option>No<\/option>/', $html);
+    }
+
     public function testIndexRendersSnmpEngineId(): void
     {
         $admin = User::factory()->admin()->create(['enabled' => 1]);
@@ -921,7 +937,7 @@ final class EditPollingControllerTest extends DBTestCase
 
         $freshMethod = $method->fresh();
         $this->assertEquals([], $freshMethod->settings);
-        $config = $device->fresh()->polling()->unixAgent();
+        $config = $device->fresh()->polling()->get(PollingMethodType::UnixAgent);
         $this->assertInstanceOf(UnixAgentConfig::class, $config);
         $this->assertEquals(6556, $config->port);
         $this->assertEquals(10, $config->timeout);
@@ -943,7 +959,7 @@ final class EditPollingControllerTest extends DBTestCase
 
         $freshMethod = $method->fresh();
         $this->assertEquals(['port' => 6557], $freshMethod->settings);
-        $config = $device->fresh()->polling()->unixAgent();
+        $config = $device->fresh()->polling()->get(PollingMethodType::UnixAgent);
         $this->assertInstanceOf(UnixAgentConfig::class, $config);
         $this->assertEquals(6557, $config->port);
 
@@ -964,7 +980,7 @@ final class EditPollingControllerTest extends DBTestCase
 
         $freshMethod = $method->fresh();
         $this->assertEquals([], $freshMethod->settings);
-        $config = $device->fresh()->polling()->unixAgent();
+        $config = $device->fresh()->polling()->get(PollingMethodType::UnixAgent);
         $this->assertInstanceOf(UnixAgentConfig::class, $config);
         $this->assertEquals(6556, $config->port);
     }

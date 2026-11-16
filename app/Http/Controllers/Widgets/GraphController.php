@@ -38,7 +38,6 @@ use App\Models\Service;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
-use LibreNMS\Util\Graph;
 use LibreNMS\Util\Time;
 
 class GraphController extends WidgetController
@@ -133,11 +132,9 @@ class GraphController extends WidgetController
     {
         $data = $this->getSettings(true);
 
-        // format display name for selected graph type
         $type_parts = explode('_', (string) $data['graph_type']);
         $primary = array_shift($type_parts);
-        $secondary = implode('_', $type_parts);
-        $name = $primary . ' ' . (Graph::isMibGraph($primary, $secondary) ? $secondary : implode(' ', $type_parts));
+        $name = $primary . ' ' . implode(' ', $type_parts);
 
         // format display for selected items
         if ($primary == 'device' && $data['graph_device']) {

@@ -39,10 +39,13 @@ Schedule::call(function (): void {
     Cache::put('scheduler_working', now()->timestamp, now()->addMinutes(6));
 })->name('schedule operational check')->everyFiveMinutes();
 
-Schedule::when(WorkerNode::inUse(...))
-    ->everyTenSeconds() // DispatchPollingWork::INTERVAL
-    ->onOneServer()
-    ->job(new DispatchPollingWork);
+// only register when in use: any sub-minute event keeps schedule:run looping for the whole minute
+if (WorkerNode::inUse()) {
+    Schedule::when(WorkerNode::inUse(...))
+        ->everyTenSeconds() // DispatchPollingWork::INTERVAL
+        ->onOneServer()
+        ->job(new DispatchPollingWork);
+}
 
 // metrics for the horizon dashboard
 Schedule::command('horizon:snapshot')

@@ -132,13 +132,19 @@ if ($asamPortNumberingMethod == 2) {
         '4481' => '4481', // FIXME define this
     ];
 }
-$pre_cache['nokiaIsamSlot'] = SnmpQuery::walk('ASAM-EQUIP-MIB::eqptBoardContainerOffset')->table(1);
+$pre_cache['nokiaIsamSlot'] = SnmpQuery::walk('ASAM-EQUIP-MIB::eqptBoardContainerId')->table(1);
 SnmpQuery::walk('ASAM-EQUIP-MIB::eqptBoardIfSlotId')->table(1, $pre_cache['nokiaIsamSlot']);
 foreach ($pre_cache['nokiaIsamSlot'] as $slotId => $slot) {
     $pre_cache['nokiaIsamSlot'][$slotId] = $slotTable[$slotId] ?? $slotId;
     $pre_cache['nokiaProductName'] = $eqptHolderTable[$eqptHolderActualType];
     if ($pre_cache['nokiaProductName'] == null) {
         $pre_cache['nokiaProductName'] = 'Shelf:';
+    }
+    if (isset($slot['ASAM-EQUIP-MIB::eqptBoardContainerId'])) {
+        $rack = $slot['ASAM-EQUIP-MIB::eqptBoardContainerId'] >> 4; // holder id: rack << 4 | shelf
+        $pre_cache['nokiaIsamBoardGroup'][$slotId] = $rack > 1 ? "Remote Shelf: $rack" : $pre_cache['nokiaProductName'];
+    } else {
+        $pre_cache['nokiaIsamBoardGroup'][$slotId] = ''; // no holder id
     }
 }
 

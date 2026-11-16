@@ -324,8 +324,8 @@ To see the available data, run this command on a device with the app:
 `lnms report:devices -o json -r applications $device | jq -S .applications | less`.
 Then read the app data section.
 
-The index `[0]` is necessary because the legacy apps proxmox and drbd
-do not use app data. They can have several instances instead.
+The index `[0]` is necessary because the legacy app drbd
+does not use app data. It can have several instances instead.
 
 #### Metrics
 

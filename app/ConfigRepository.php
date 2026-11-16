@@ -27,7 +27,6 @@
 namespace App;
 
 use App\Events\SettingChanged;
-use App\Models\Callback;
 use App\Models\GraphType;
 use Exception;
 use Illuminate\Database\QueryException;
@@ -471,10 +470,6 @@ class ConfigRepository
             }
 
             $this->persistDefault('device_display_default', $display_value);
-        }
-
-        if (! $this->has('reporting.usage')) {
-            $this->persistDefault('reporting.usage', (bool) Callback::get('enabled'));
         }
 
         // populate legacy DB credentials, just in case something external uses them.  Maybe remove this later

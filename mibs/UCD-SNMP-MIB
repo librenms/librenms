@@ -40,7 +40,7 @@ IMPORTS
 	FROM SNMPv2-TC;
 
 ucdavis MODULE-IDENTITY
-    LAST-UPDATED "201606100000Z"
+    LAST-UPDATED "202008210000Z"
     ORGANIZATION "University of California, Davis"
     CONTACT-INFO    
 	"This mib is no longer being maintained by the University of
@@ -58,6 +58,10 @@ ucdavis MODULE-IDENTITY
     DESCRIPTION
 	"This file defines the private UCD SNMP MIB extensions."
 
+    REVISION     "202008210000Z"
+    DESCRIPTION
+	"Add new memSysAvail object"
+
     REVISION     "201606100000Z"
     DESCRIPTION
 	"New 64-bit memory objects"
@@ -65,6 +69,7 @@ ucdavis MODULE-IDENTITY
     REVISION     "201407310000Z"
     DESCRIPTION
 	"New object for number of CPUs as counted by the agent"
+
     REVISION	 "201105140000Z"
     DESCRIPTION
 	"New objects for monitoring CPU Steal, Guest and Nice values"
