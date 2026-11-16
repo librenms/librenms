@@ -8,6 +8,8 @@ use App\Ldap\ActiveDirectoryUser;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Auth;
+use LdapRecord\Connection;
+use LdapRecord\Container;
 use LdapRecord\Laravel\Testing\DirectoryEmulator;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Tests\DBTestCase;
@@ -19,6 +21,7 @@ class AuthTestCommandTest extends DBTestCase
     protected function setUp(): void
     {
         parent::setUp();
+        Container::flush();
         LibrenmsConfig::set('auth_mechanism', 'active_directory');
         LibrenmsConfig::set('auth_ad_domain', 'example.com');
         LibrenmsConfig::set('auth_ad_url', '');
@@ -31,6 +34,7 @@ class AuthTestCommandTest extends DBTestCase
             'ldap.default' => 'active_directory',
             'ldap.connections.active_directory' => app(ActiveDirectoryConfig::class)->connection(),
         ]);
+        Container::addConnection(new Connection(config('ldap.connections.active_directory')), 'active_directory');
         Auth::forgetGuards();
     }
 
