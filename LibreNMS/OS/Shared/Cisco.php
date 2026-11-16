@@ -1449,10 +1449,17 @@ class Cisco extends OS implements
             'sessions' => (int) $data['csubAggStatsUpSessions'],
         ]));
 
-        // the device counts are the chassis entry, or the sum of the nodes (route processors, line cards)
+        // the device counts are the sum of the outermost nodes (chassis, line card or route processor),
+        // a node inside another reported node (a cpu on a line card) is already counted in it
         $nodes = $table[1] ?? [];
-        $chassis = $this->getDevice()->entityPhysical()->whereIn('entPhysicalIndex', array_keys($nodes))->where('entPhysicalClass', 'chassis')->value('entPhysicalIndex');
-        foreach ($chassis ? [$chassis => $nodes[$chassis]] : $nodes as $types) {
+        $parents = $this->getDevice()->entityPhysical()->pluck('entPhysicalContainedIn', 'entPhysicalIndex');
+        foreach ($nodes as $entPhysicalIndex => $types) {
+            for ($parent = $parents->get($entPhysicalIndex), $depth = 0; $parent && $depth < 20; $parent = $parents->get($parent), $depth++) {
+                if (isset($nodes[$parent])) {
+                    continue 2;
+                }
+            }
+
             foreach ($types as $sessionType => $data) {
                 $count(null, $sessionType, $data);
             }
@@ -1487,7 +1494,7 @@ class Cisco extends OS implements
                 'CISCO-AAA-SERVER-MIB::casStatisticsTable',
             ])->throwIfConnectionError()->table(2)[2] ?? []; // casProtocol radius(2)
         } catch (SnmpException) {
-            return $servers;
+            return null; // keep the servers and their state
         }
 
         foreach ($cisco as $row) {

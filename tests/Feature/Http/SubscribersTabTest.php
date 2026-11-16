@@ -109,6 +109,21 @@ class SubscribersTabTest extends TestCase
             ->assertDontSee('BE100.customer11<', false);
     }
 
+    public function testPortWithOnlyATotalHasOneTotalColumn(): void
+    {
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create(['ifIndex' => 5, 'ifName' => 'ae0.100', 'ifDescr' => 'ae0.100']);
+        $device->subscriberCounts()->createMany([
+            ['port_id' => null, 'session_type' => 'total', 'sessions' => 12],
+            ['port_id' => $port->port_id, 'session_type' => 'total', 'sessions' => 12],
+        ]);
+
+        $response = $this->actingAs($this->admin())->get(route('device', ['device' => $device->device_id, 'tab' => 'subscribers']))->assertOk();
+        $table = substr((string) $response->getContent(), strpos((string) $response->getContent(), 'Subscribers per interface'));
+        $this->assertSame(1, substr_count($table, '>Total</th>'));
+        $response->assertSee('1 interface');
+    }
+
     public function testTabHiddenWithoutSubscribers(): void
     {
         $device = Device::factory()->create();

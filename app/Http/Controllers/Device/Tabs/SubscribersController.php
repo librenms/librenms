@@ -25,6 +25,7 @@ use App\Models\Device;
 use App\Models\Port;
 use App\Models\SubscriberCount;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
 class SubscribersController implements DeviceTab
@@ -80,22 +81,28 @@ class SubscribersController implements DeviceTab
             ->get()->each->setRelation('device', $device)->keyBy('port_id');
         $sessions = (clone $portCounts)->whereIn('port_id', $page->pluck('port_id'))->get()->groupBy('port_id');
 
-        $totals = (clone $portCounts)->groupBy('port_id')->selectRaw('SUM(sessions) AS total')->pluck('total');
+        $summary = DB::query()->fromSub((clone $portCounts)->toBase()->groupBy('port_id')->selectRaw('SUM(sessions) AS total'), 'port_totals')
+            ->selectRaw('COUNT(*) AS ports, COALESCE(SUM(CASE WHEN total = 0 THEN 1 ELSE 0 END), 0) AS down')->first();
 
         return [
             'system' => $device->subscriberCounts()->whereNull('port_id')->pluck('sessions', 'session_type')
                 ->sortBy(fn ($sessions, $type) => array_search($type, array_keys(SubscriberCount::SESSION_TYPES))),
-            'ports' => $page->getCollection()->map(fn (SubscriberCount $row) => [
-                'port' => $ports->get($row->port_id),
-                'sessions' => $sessions->get($row->port_id, collect())->pluck('sessions', 'session_type')->all(),
-                'total' => (int) $row->getAttribute('total'),
-            ])->filter(fn (array $row) => $row['port'] !== null)->values(),
+            'ports' => $page->getCollection()->map(function (SubscriberCount $row) use ($ports, $sessions) {
+                $counts = $sessions->get($row->port_id, collect())->pluck('sessions', 'session_type');
+
+                return [
+                    'port' => $ports->get($row->port_id),
+                    'sessions' => $counts->all(),
+                    'total' => (int) $counts->sum(), // a port has session types or only a total
+                ];
+            })->filter(fn (array $row) => $row['port'] !== null)->values(),
             'paginator' => $page,
             'per_page' => $perPage,
             'search' => $search,
-            'port_count' => $totals->count(),
-            'ports_down' => $totals->filter(fn ($total) => (int) $total === 0)->count(),
-            'port_types' => collect(SubscriberCount::SESSION_TYPES)->keys()
+            'port_count' => (int) $summary->ports,
+            'ports_down' => (int) $summary->down,
+            // the total column shows the total of a port
+            'port_types' => collect(SubscriberCount::SESSION_TYPES)->keys()->reject(fn (string $type) => $type === 'total')
                 ->intersect((clone $portCounts)->distinct()->pluck('session_type'))->values(),
             'type_names' => SubscriberCount::SESSION_TYPES,
             'radius_servers' => $device->radiusServers()->orderBy('address')->orderBy('port')->get(),

@@ -52,7 +52,7 @@ final class SubscribersTest extends DBTestCase
         $os->reply = collect([$this->subscribers(null, 'ppp', 0)]);
         (new Subscribers)->discover($os);
 
-        $this->assertSame(['ppp' => 0], $os->getDevice()->subscriberCounts()->pluck('sessions', 'session_type')->all());
+        $this->assertSame([['session_type' => 'ppp', 'sessions' => 0]], $os->getDevice()->subscriberCounts()->get(['session_type', 'sessions'])->toArray());
     }
 
     public function testDiscoveryKeepsCountsWhenTheDeviceDoesNotAnswer(): void
@@ -82,6 +82,24 @@ final class SubscribersTest extends DBTestCase
         $this->assertSame(
             $expected,
             $os->getDevice()->subscriberCounts()->get()->mapWithKeys(fn (SubscriberCount $count) => [$count->getCompositeKey() => $count->sessions])->sortKeys()->all(),
+        );
+    }
+
+    public function testPollingAddsNewCounts(): void
+    {
+        $os = $this->os([$this->subscribers(null, 'total', 5)]);
+        $port = Port::factory()->for($os->getDevice())->create();
+        (new Subscribers)->discover($os);
+
+        // the port total is replaced by session types, a new port appears
+        $os->reply = collect([$this->subscribers(null, 'total', 6), $this->subscribers($port->port_id, 'pppoe', 1)]);
+        $datastore = Mockery::mock(DataStorageInterface::class);
+        $datastore->shouldReceive('put')->once();
+        (new Subscribers)->poll($os, $datastore);
+
+        $this->assertSame(
+            [['port_id' => null, 'session_type' => 'total', 'sessions' => 6], ['port_id' => $port->port_id, 'session_type' => 'pppoe', 'sessions' => 1]],
+            $os->getDevice()->subscriberCounts()->orderBy('port_id')->get(['port_id', 'session_type', 'sessions'])->toArray(),
         );
     }
 

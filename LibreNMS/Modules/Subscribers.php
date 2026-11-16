@@ -83,7 +83,7 @@ class Subscribers implements Module
         }
 
         ModuleModelObserver::observe(SubscriberCount::class);
-        $this->syncModels($os->getDevice(), 'subscriberCounts', $counts);
+        $this->syncModels($os->getDevice(), 'subscriberCounts', $counts, $os->getDevice()->subscriberCounts()->get());
         ModuleModelObserver::done();
 
         $this->discoverRadiusServers($os);
@@ -113,13 +113,13 @@ class Subscribers implements Module
         }
 
         ModuleModelObserver::observe(RadiusServer::class, 'RADIUS servers');
-        $this->syncModels($device, 'radiusServers', $servers);
+        $this->syncModels($device, 'radiusServers', $servers, $device->radiusServers()->get());
         ModuleModelObserver::done();
     }
 
     /**
      * Counts the device no longer reports are set to 0 until discovery removes them,
-     * so all sessions of a port dropping is seen and can be alerted on.
+     * so all sessions of a port dropping is seen and can be alerted on. New counts are added.
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
@@ -140,8 +140,11 @@ class Subscribers implements Module
         }
 
         $polled = self::normalize($polled)->keyBy->getCompositeKey();
-        foreach ($existing as $count) {
-            $count->sessions = $polled->get($count->getCompositeKey())->sessions ?? 0;
+        $existing = $existing->toBase()->keyBy->getCompositeKey(); // an eloquent merge would key by id
+        $os->getDevice()->subscriberCounts()->saveMany($polled->diffKeys($existing));
+
+        foreach ($existing->merge($polled->diffKeys($existing)) as $key => $count) {
+            $count->sessions = $polled->get($key)->sessions ?? 0;
             $count->save();
 
             if ($count->port_id === null) {
