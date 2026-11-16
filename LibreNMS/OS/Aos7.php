@@ -161,6 +161,22 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
             ]));
         }
 
+        // Without a configured chassis ID, retain the original CMM CPU identity.
+        if ($processors->isEmpty()) {
+            $chassisId = $chassisIds[0] ?? null;
+            $percent = $usage[0] ?? null;
+            if (is_numeric($chassisId) && (float) $chassisId === 0.0 && is_numeric($percent) && $percent >= 0 && $percent <= 100) {
+                $processors->push(new Processor([
+                    'processor_type' => 'aos7',
+                    'processor_oid' => '.1.3.6.1.4.1.6486.801.1.2.1.16.1.1.1.1.1.11.0',
+                    'processor_index' => '0',
+                    'processor_descr' => 'Processor',
+                    'processor_precision' => 1,
+                    'processor_usage' => $percent,
+                ]));
+            }
+        }
+
         return $processors;
     }
 
