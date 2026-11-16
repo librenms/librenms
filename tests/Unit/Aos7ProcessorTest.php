@@ -41,6 +41,11 @@ class Aos7ProcessorTest extends TestCase
         $this->assertCount(0, $this->discover([0 => '0', 1 => '0'], [0 => '101', 1 => '-1']));
     }
 
+    /**
+     * @param  array<int, string>  $chassisIds
+     * @param  array<int, string>  $usage
+     * @return \Illuminate\Support\Collection<int, \App\Models\Processor>
+     */
     private function discover(array $chassisIds, array $usage): \Illuminate\Support\Collection
     {
         $prefix = 'ALCATEL-IND1-HEALTH-MIB::';
