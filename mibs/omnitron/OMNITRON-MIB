@@ -3,16 +3,16 @@ OMNITRON-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32, Unsigned32, Counter32,
     Counter64
-        FROM SNMPv2-SMI  -- RFC-2578
-    DisplayString, TruthValue, TimeInterval
-        FROM SNMPv2-TC   -- RFC-2579
+        FROM SNMPv2-SMI           -- RFC-2578
+    DisplayString, TruthValue
+        FROM SNMPv2-TC            -- RFC-2579
     MODULE-COMPLIANCE, OBJECT-GROUP
-        FROM SNMPv2-CONF -- RFC-2580
+        FROM SNMPv2-CONF          -- RFC-2580
     omnitron, OstVlanId, OstModeType, icAgent, OstPortNumber, OstPortList
-        FROM OMNITRON-TC-MIB;
+        FROM OMNITRON-TC-MIB;     -- Omnitron Textual Convention MIB
 
 omnitronMIB MODULE-IDENTITY
-    LAST-UPDATED "201510211200Z"     -- October 21, 2015
+    LAST-UPDATED "201702161200Z"  -- February 16, 2017
     ORGANIZATION "Omnitron Systems Technology, Inc."
     CONTACT-INFO "Omnitron Systems Technology, Inc.
                   38 Tesla
@@ -30,20 +30,30 @@ omnitronMIB MODULE-IDENTITY
    International: +1 949 250 6510"
 
     DESCRIPTION
-            "Omnitron MIB for use with v5.2 iConverter Management Modules
+            "Omnitron MIB for use with v5.3 iConverter Management Modules
              and NetOutlook
 
-             Copyright 2015 Omnitron Systems Technology, Inc.
+             Copyright 2017 Omnitron Systems Technology, Inc.
              All rights reserved
             "
 
-    REVISION    "201510211200Z"     -- October 21, 2015
-    DESCRIPTION "Added modHwRev and modPcbRev
+    REVISION    "201702161200Z"  -- February 16, 2017
+    DESCRIPTION "Modified size syntax portSFPpageA0, portSFPpageA1, 
+                   portSfpTxPower, portSfpRxPower, snmpv3AuthPassword, 
+                   snmpv3PrivPassword 
                 "
-
-    REVISION    "201501191200Z"     -- January 19, 2015
-    DESCRIPTION "Initial version of v5.2 MIB.
-                   Updated resetmod and modreset to allow reboot from backup
+                
+    REVISION    "201611171200Z"  -- November 17, 2016
+    DESCRIPTION "Added portSfpType, portSfpWavelength, portSfpTxDistance
+                 Changed length to 255 for sysloc, syscon, mmname
+                 Changed chassisname back to 32 bytes, only used for 
+                   communicatino between modules.
+                "
+                
+    REVISION    "201603211200Z"     -- March 21, 2016
+    DESCRIPTION "Initial version of v5.3 MIB.
+                   Added ostProtocolStatusIpAddressString
+                   Removed ostProtocolStatusTable (never implemented)
                 "
     ::= { omnitron 3 }
 
@@ -214,21 +224,12 @@ prodtype    OBJECT-TYPE
     ::= { chassisEntry 4 }
 
 chassisname OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE(0..64))
+    SYNTAX      DisplayString (SIZE(0..32))
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-       "The name of the chassis.
-
-        For the M2 modules the max size is 32 octets.
-
-        For the GM3, GM4, XM5 the max size is 64 octets when a module is
-        accessed directly through the serial port, or via its own IP address
-        for Telnet, SSH, or SNMP.
-
-        For the GM3, GM4, XM5 when the object is indirectly accessed via the
-        backplane, through IP-less, or through 802.3ah peer-to-peer the value
-        is truncated to 32 bytes.
+       "The name of the chassis that is used to set and get names from 
+        other modules in the chassis.
        "
     ::= { chassisEntry 5 }
 
@@ -1017,35 +1018,35 @@ ipAddr      OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "IP of the management module"
+    DESCRIPTION "Management address 1 IPv4 address"
     ::= { moduleMgtCfgEntry 4 }
 
 subnetmask  OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "subnetmask for the management module"
+    DESCRIPTION "Management address 1 IPv4 subnet mask"
     ::= { moduleMgtCfgEntry 5 }
 
 gateway     OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "IP address for the gateway the management module will use."
+    DESCRIPTION "Management address 1 IPv4 gateway address"
     ::= { moduleMgtCfgEntry 6 }
 
 readCommunity OBJECT-TYPE
     SYNTAX      DisplayString (SIZE(1..32))
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "SNMP read community name."
+    DESCRIPTION "SNMPv1/v2c read community name."
     ::= { moduleMgtCfgEntry 7 }
 
 writeCommunity OBJECT-TYPE
     SYNTAX      DisplayString (SIZE(1..32))
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "SNMP set community name."
+    DESCRIPTION "SNMPv1/v2c write community name."
     ::= { moduleMgtCfgEntry 8 }
 
 mychassnum     OBJECT-TYPE
@@ -1056,7 +1057,7 @@ mychassnum     OBJECT-TYPE
     ::= { moduleMgtCfgEntry 9 }
 
 mmname         OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE(0..64))
+    SYNTAX      DisplayString (SIZE(0..255))
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -1064,7 +1065,7 @@ mmname         OBJECT-TYPE
 
         For the M2 modules the max size is 32 octets.
 
-        For the GM3, GM4, XM5 the max size is 64 octets when a module is
+        For the GM3, GM4, XM5 the max size is 255 octets when a module is
         accessed directly through the serial port, or via its own IP address
         for Telnet, SSH, or SNMP.
 
@@ -1078,60 +1079,124 @@ traphost1       OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "NMMs traphost1 IP address."
+    DESCRIPTION 
+       "This object is the trap host 1 IPv4 address.  
+        
+        Setting this object also impacts the equivalent ostIpTraphostCfgTable
+        returned  value. If an IPv4 address is written to this object the
+        two objects return the same value. If ostIpTraphostCfgTable
+        is set with an IPv6 address then this object returns an all zeros
+        value.
+       "
     ::= { moduleMgtCfgEntry 11 }
 
 traphost2       OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "NMMs traphost2 IP address."
+    DESCRIPTION 
+       "This object is the trap host 2 IPv4 address.  
+        
+        Setting this object also impacts the equivalent ostIpTraphostCfgTable
+        returned  value. If an IPv4 address is written to this object the
+        two objects return the same value. If ostIpTraphostCfgTable
+        is set with an IPv6 address then this object returns an all zeros
+        value.
+       "
     ::= { moduleMgtCfgEntry 12 }
 
 traphost3       OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "NMMs traphost3 IP address."
+    DESCRIPTION 
+       "This object is the trap host 3 IPv4 address.  
+        
+        Setting this object also impacts the equivalent ostIpTraphostCfgTable
+        returned  value. If an IPv4 address is written to this object the
+        two objects return the same value. If ostIpTraphostCfgTable
+        is set with an IPv6 address then this object returns an all zeros
+        value.
+       "
     ::= { moduleMgtCfgEntry 13 }
 
 traphost4       OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "NMMs traphost4 IP address."
+    DESCRIPTION 
+       "This object is the trap host 4 IPv4 address.  
+        
+        Setting this object also impacts the equivalent ostIpTraphostCfgTable
+        returned  value. If an IPv4 address is written to this object the
+        two objects return the same value. If ostIpTraphostCfgTable
+        is set with an IPv6 address then this object returns an all zeros
+        value.
+       "
     ::= { moduleMgtCfgEntry 14 }
 
 traphost5       OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "NMMs traphost5 IP address."
+    DESCRIPTION 
+       "This object is the trap host 5 IPv4 address.  
+        
+        Setting this object also impacts the equivalent ostIpTraphostCfgTable
+        returned  value. If an IPv4 address is written to this object the
+        two objects return the same value. If ostIpTraphostCfgTable
+        is set with an IPv6 address then this object returns an all zeros
+        value.
+       "    
     ::= { moduleMgtCfgEntry 15 }
 
 traphost6       OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "NMMs traphost6 IP address."
+    DESCRIPTION 
+       "This object is the trap host 6 IPv4 address.  
+        
+        Setting this object also impacts the equivalent ostIpTraphostCfgTable
+        returned  value. If an IPv4 address is written to this object the
+        two objects return the same value. If ostIpTraphostCfgTable
+        is set with an IPv6 address then this object returns an all zeros
+        value.
+       "    
     ::= { moduleMgtCfgEntry 16 }
 
 traphost7       OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "NMMs traphost7 IP address."
+    DESCRIPTION 
+       "This object is the trap host 7 IPv4 address.  
+        
+        Setting this object also impacts the equivalent ostIpTraphostCfgTable
+        returned  value. If an IPv4 address is written to this object the
+        two objects return the same value. If ostIpTraphostCfgTable
+        is set with an IPv6 address then this object returns an all zeros
+        value.
+       "    
     ::= { moduleMgtCfgEntry 17 }
 
 traphost8       OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "NMMs traphost8 IP address."
+    DESCRIPTION 
+       "This object is the trap host 8 IPv4 address.  
+        
+        Setting this object also impacts the equivalent ostIpTraphostCfgTable
+        returned  value. If an IPv4 address is written to this object the
+        two objects return the same value. If ostIpTraphostCfgTable
+        is set with an IPv6 address then this object returns an all zeros
+        value.
+       "    
     ::= { moduleMgtCfgEntry 18 }
 
 sysloc          OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE(0..64))
+    SYNTAX      DisplayString (SIZE(0..255))
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -1150,7 +1215,7 @@ sysloc          OBJECT-TYPE
     ::= { moduleMgtCfgEntry 19 }
 
 syscon          OBJECT-TYPE
-    SYNTAX      DisplayString (SIZE(0..64))
+    SYNTAX      DisplayString (SIZE(0..255))
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -1172,21 +1237,24 @@ serialpass      OBJECT-TYPE
     SYNTAX      DisplayString (SIZE(0..32))
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "NMMs serial interface password."
+    DESCRIPTION 
+       "Serial interfacce password for M2 and M3 modules"
     ::= { moduleMgtCfgEntry 21 }
 
 telnetpass      OBJECT-TYPE
     SYNTAX      DisplayString (SIZE(0..32))
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "NMMs telnet interface password."
+    DESCRIPTION 
+       "Telnet and SSH plain text password for the M2 and M3 modules"
     ::= { moduleMgtCfgEntry 22 }
 
 ftppasswrd      OBJECT-TYPE
     SYNTAX      DisplayString (SIZE(0..32))
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "NMMs ftp password."
+    DESCRIPTION 
+       "FTP password for the M2 and M3 modules"
     ::= { moduleMgtCfgEntry 23 }
 
 keepAliveInterval OBJECT-TYPE
@@ -1338,28 +1406,34 @@ nmmSecureSlaveSlot  OBJECT-TYPE
     SYNTAX      Integer32 (0..19)
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "The slot number of the secure slave in the remote chassis when configured for SECURE COMMUNICATIONS."
+    DESCRIPTION 
+       "The slot number of the secure slave in the remote chassis when 
+        configured for SECURE COMMUNICATIONS.
+       "
     ::= { moduleMgtCfgEntry 39 }
 
 dhcpIpAddr      OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "IP of the management module as assigned by a DHCP server"
+    DESCRIPTION 
+       "This object is the IPv4 address as returned by the DHCP server"  
     ::= { moduleMgtCfgEntry 40 }
 
 dhcpSubnetmask  OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "subnetmask of the management module as assigned by a DHCP server"
+    DESCRIPTION 
+       "This object is the IPv4 subnet mask as returned by the DHCP server"
     ::= { moduleMgtCfgEntry 41 }
 
 dhcpGateway      OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Gateway IP address of the management module as assigned by a DHCP Server"
+    DESCRIPTION 
+       "This object is theIPv4 gateway address as returned by the DHCP server"
     ::= { moduleMgtCfgEntry 42 }
 
 nmmOAMmgmtMode  OBJECT-TYPE
@@ -1471,21 +1545,24 @@ ipAddr2     OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "IP 2 of the management module"
+    DESCRIPTION 
+      "Management address 2 IPv4 address"
     ::= { moduleMgtCfgEntry 54 }
 
 subnetmask2 OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "subnetmask 2 for the management module"
+    DESCRIPTION 
+       "Management address 2 IPv4 subnet mask"
     ::= { moduleMgtCfgEntry 55}
 
 gateway2    OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "IP address for the gateway 2 the management module will use."
+    DESCRIPTION 
+       "Management address 2 IPv4 gateway address"
     ::= { moduleMgtCfgEntry 56 }
 
 ipaddrEVCassociation OBJECT-TYPE
@@ -1493,10 +1570,7 @@ ipaddrEVCassociation OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-       "*** This object is deprecated ***
-
-        EVC associated with ipaddr 1.
-       "
+       "*** This object is deprecated ***"
     ::= { moduleMgtCfgEntry 57 }
 
 ipaddr2EVCassociation OBJECT-TYPE
@@ -1504,10 +1578,7 @@ ipaddr2EVCassociation OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-       "*** This object is deprecated ***
-
-        EVC associated with ipaddr 2.
-       "
+       "*** This object is deprecated ***"
     ::= { moduleMgtCfgEntry 58 }
 
 bootpEnable OBJECT-TYPE
@@ -1530,14 +1601,24 @@ tftpServerIpAddress OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "TFTP server IP address."
+    DESCRIPTION 
+       "This object is the TFTP IPv4 address.  
+        
+        Setting this object also impacts the tftpServerIpAddressString
+        returned  value. If an IPv4 address is written to this object the
+        two objects return the same value. If ostIpTraphostCfgTable
+        is set with an IPv6 address then this object returns an all zeros
+        value.
+       "      
+      
     ::= { moduleMgtCfgEntry 61 }
 
 dhcptftpServerIpAddress      OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "TFTP Server IP address as assigned by a DHCP Server"
+    DESCRIPTION 
+       "TFTP Server IPv4 address as returned by the DHCP Server"
     ::= { moduleMgtCfgEntry 62 }
 
 tftpFileName OBJECT-TYPE
@@ -1570,7 +1651,8 @@ dhcpTagVid OBJECT-TYPE
     SYNTAX      OstVlanId
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "Sets the DHCP Tag VLAN ID."
+    DESCRIPTION 
+       "This object configures the DHCP Tag VLAN ID."
     ::= { moduleMgtCfgEntry 66 }
 
 trapSrcIpSelect OBJECT-TYPE
@@ -2900,7 +2982,10 @@ PortSFPEntry ::= SEQUENCE {
     portSfpVcc                 OCTET STRING,
     portSfpBiasCurrent         OCTET STRING,
     portSfpTxPower             OCTET STRING,
-    portSfpRxPower             OCTET STRING
+    portSfpRxPower             OCTET STRING,
+    portSfpType                OCTET STRING,
+    portSfpWavelength          OCTET STRING, 
+    portSfpTxDistance          OCTET STRING
     }
 
 portSFPstatus   OBJECT-TYPE
@@ -2914,14 +2999,14 @@ portSFPstatus   OBJECT-TYPE
     ::= { portSFPEntry 1 }
 
 portSFPpageA0   OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE(256))
+    SYNTAX      OCTET STRING (SIZE(0..256))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "Used to get SFP device EEPROM address A0"
     ::= { portSFPEntry 2 }
 
 portSFPpageA2   OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE(256))
+    SYNTAX      OCTET STRING (SIZE(0..256))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "Used to get SFP device EEPROM address A2"
@@ -2984,19 +3069,48 @@ portSfpBiasCurrent OBJECT-TYPE
     ::= { portSFPEntry 11 }
 
 portSfpTxPower OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE(0..8))
+    SYNTAX      OCTET STRING (SIZE(0..16))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "SFP Transmission power in dBm"
     ::= { portSFPEntry 12 }
 
 portSfpRxPower OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE(0..8))
+    SYNTAX      OCTET STRING (SIZE(0..16))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "SFP Transmission power in dBm"
     ::= { portSFPEntry 13 }
 
+portSfpType OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SFP type based upon Transceiver Code field. For example:
+                   '1000BASE-LX', '1000BASE-T', '10G BASE-SR', etc.
+                "
+    ::= { portSFPEntry 14 }
+    
+portSfpWavelength OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SFP Transmission wavelength in nm"
+    ::= { portSFPEntry 15 }
+    
+portSfpTxDistance OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SFP transmission distance, all non-zero fields displayed. If
+                 more than one field is filled displays fields separated by a
+                 comma. For example:
+                   '12km (9um), 12000m (9um)'
+                   '100m (cable)'
+                   '30m (OM1), 80m (OM2), 300m (OM3)'
+                "
+    ::= { portSFPEntry 16 }
+    
 
 -------------------------------------------------------------------------------
 -- SNMPv3 User Table
@@ -3052,14 +3166,14 @@ snmpv3SecurityLevel OBJECT-TYPE
     ::= { userEntry 3 }
 
 snmpv3AuthPassword OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE(1..16))
+    SYNTAX      OCTET STRING (SIZE(1..32))
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION "SNMPv3 user authentication password."
     ::= { userEntry 4 }
 
 snmpv3PrivPassword OBJECT-TYPE
-    SYNTAX      OCTET STRING (SIZE(1..16))
+    SYNTAX      OCTET STRING (SIZE(1..32))
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION "SNMPv3 user privacy password."
@@ -3076,130 +3190,6 @@ snmpv3UserType OBJECT-TYPE
                     3 = read-only
                     4 = deny"
     ::= { userEntry 6 }
-
-
---------------------------------------------------------------------------------
--- User Session Status Table
---------------------------------------------------------------------------------
-
-ostProtocolStatusTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF OstProtocolStatusEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-       "This table supports the Serial, Telnet, FTP user session status."
-    ::= { enhancedchassisTable 10 }
-
-ostProtocolStatusEntry OBJECT-TYPE
-    SYNTAX      OstProtocolStatusEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-       "This is a user protocol table entry."
-    INDEX       { modchassnum, modslotnum, userIndex, ostProtocolStatusIndex}
-    ::= { ostProtocolStatusTable 1 }
-
-OstProtocolStatusEntry ::= SEQUENCE {
-    ostProtocolStatusIndex                Unsigned32,
-    ostProtocolStatusType                 INTEGER,
-    ostProtocolStatusState                INTEGER,
-    ostProtocoManagementPort              INTEGER,
-    ostProtocolStatusIpAddress            IpAddress,
-    ostProtocolStatusSessionOpenLockTime  TimeInterval
-    }
-
-ostProtocolStatusIndex OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-       "An index that is used to identify a specific user protocol session.
-
-        The index should remain constant until the session is closed.
-       "
-    ::= { ostProtocolStatusEntry 1 }
-
-ostProtocolStatusType OBJECT-TYPE
-    SYNTAX      INTEGER {
-        serial    (1),
-        telnet    (2),
-        ftp       (3)
-    }
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-       "This object indicates the specific user protocol session identity
-        state.
-
-        serial    (1)  User protocol session type is the serial port
-        telnet    (2)  User protocol session type is TELNET
-        ftp       (3)  User protocol session type is FTP
-       "
-    ::= { ostProtocolStatusEntry 2 }
-
-ostProtocolStatusState OBJECT-TYPE
-    SYNTAX      INTEGER {
-        inactive  (1),
-        active    (2),
-        lockedout (3)
-    }
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-       "This object indicates the status of the specific user protocol session
-        state.
-
-        inactive(1)   User is currently inactive (reserved value, not used)
-        active(2)     User is currently authenticated and active
-        lockedout(3)  User is currently locked out for authentication and
-                      cannot become active until the locked out timeout
-                      expires and the user status goes back to idle.
-       "
-    ::= { ostProtocolStatusEntry 3 }
-
-ostProtocoManagementPort OBJECT-TYPE
-    SYNTAX      INTEGER {
-        notDefined  (1),
-        mgt1        (2),
-        mgt2        (3)
-    }
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-       "This object indicates the status of the specific user protocol session
-        state. It is not applicable to the 'serial' interface or to a
-        session type that is locked out. In these cases the object is returned
-        with a value of 'notDefined'.
-
-        notDefined(1)  Management port is unknown or undefined
-        mgt1(2)        Management Port 1 association
-        mgt2(3)        Management Port 2 association
-
-       "
-    ::= { ostProtocolStatusEntry 4 }
-
-ostProtocolStatusIpAddress OBJECT-TYPE
-    SYNTAX      IpAddress
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-       "This object indicates the IP address of the specific user protocol
-        session. It is not applicable to the 'serial' interface or to a
-        session type that is locked out. In these cases this object is returned
-        as '0.0.0.0'.
-       "
-    ::= { ostProtocolStatusEntry 5 }
-
-ostProtocolStatusSessionOpenLockTime OBJECT-TYPE
-    SYNTAX      TimeInterval
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-       "The object indicates the time a specific user protocol session has
-        been open or is locked out, in 0.01 seconds, based upon the value of
-        ostProtocolStatusState.
-       "
-    ::= { ostProtocolStatusEntry 6 }
 
 
 --------------------------------------------------------------------------------
@@ -3743,12 +3733,6 @@ omnitronGroup OBJECT-GROUP
         snmpv3PrivPassword,
         snmpv3UserType,
 
-        ostProtocolStatusType,
-        ostProtocolStatusState,
-        ostProtocoManagementPort,
-        ostProtocolStatusIpAddress,
-        ostProtocolStatusSessionOpenLockTime,
-
         ostEnvironmentalPs1Status,
         ostEnvironmentalPs1VoltageIn,
         ostEnvironmentalPs1VoltageOut,
@@ -3785,7 +3769,10 @@ omnitronSFPGroup OBJECT-GROUP
         portSfpVcc,
         portSfpBiasCurrent,
         portSfpTxPower,
-        portSfpRxPower
+        portSfpRxPower,
+        portSfpType,
+        portSfpWavelength, 
+        portSfpTxDistance
     }
     STATUS       current
     DESCRIPTION "A collection of Omnitron port SFP objects."
@@ -3793,3 +3780,5 @@ omnitronSFPGroup OBJECT-GROUP
 
 
 END
+
+

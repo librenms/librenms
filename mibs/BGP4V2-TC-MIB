@@ -1,26 +1,32 @@
 BGP4V2-TC-MIB DEFINITIONS ::= BEGIN
 
     IMPORTS
-        mib-2, MODULE-IDENTITY FROM SNMPv2-SMI
+        mib-2, experimental, MODULE-IDENTITY FROM SNMPv2-SMI
         TEXTUAL-CONVENTION FROM SNMPv2-TC;
 
         bgp4V2TC MODULE-IDENTITY
-            LAST-UPDATED "201002010000Z"
+            LAST-UPDATED "201401230000Z"
             ORGANIZATION "IETF IDR Working Group"
             CONTACT-INFO "E-mail:  idr@ietf.org"
 
             DESCRIPTION
                     "Textual conventions for BGP-4.
-                     Copyright (C) The IETF Trust (2010).  This
+
+                     Copyright (C) The IETF Trust (2014).  This
                      version of this MIB module is part of RFC XXX;
                      see the RFC itself for full legal notices."
 -- RFC Editor - replace XXX with RFC number
 
-            REVISION "201002010000Z"
+            REVISION "201401230000Z"
+
+
             DESCRIPTION
                    "Initial version."
-            ::= { mib-2 100}
+            --  ::= { mib-2 15 }
+              ::= { frr 1 }
 
+    frr OBJECT IDENTIFIER ::= { experimental 5 } -- FRR base oid. Added by Observium developers
+    
     --
     -- Textual Conventions
     --
@@ -42,7 +48,8 @@ BGP4V2-TC-MIB DEFINITIONS ::= BEGIN
         STATUS       current
         DESCRIPTION
             "The representation of a BGP AFI.  The value of this object
-             should be restricted to be between the values of 0 and 65535."
+             should be restricted to be between the values of 0 and
+             65535."
         REFERENCE
             "RFC 4760, Section 3"
         SYNTAX INTEGER {

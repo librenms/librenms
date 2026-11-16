@@ -1,7 +1,8 @@
 -- ****************************************************************************
 --  COLUBRIS-WDS-MIB definitions
 --
---  Copyright (c) 2006, Colubris Networks, Inc.
+--  (c) Copyright 2006-2008,2010,2012,2013 Hewlett-Packard Development Company, L.P.
+--  The information contained herein is subject to change without notice.
 --  All Rights Reserved.
 --
 --  Colubris WDS MIB file.
@@ -24,7 +25,7 @@ IMPORTS
 
 
 colubrisWdsMIB MODULE-IDENTITY
-    LAST-UPDATED    "200801040000Z"
+    LAST-UPDATED    "201306110000Z"
     ORGANIZATION    "Colubris Networks, Inc."
     CONTACT-INFO    "Colubris Networks
                      Postal: 200 West Street Ste 300
@@ -53,14 +54,14 @@ coWDSNumberOfGroup OBJECT-TYPE
     SYNTAX      Unsigned32 (1..6)
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Number of WDS groups supported by the product."
+    DESCRIPTION "Number of local mesh profiles supported by the AP."
     ::= { coWDSInfoGroup 1 }
 
 coWDSDynamicModeImplemented OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Indicates if dynamic WDS mode is available in the product."
+    DESCRIPTION "Indicates if dynamic local mesh mode is available in the AP."
     ::= { coWDSInfoGroup 2 }
 
 coWDSRadioTable OBJECT-TYPE
@@ -74,10 +75,10 @@ coWDSRadioEntry OBJECT-TYPE
     SYNTAX      CoWDSRadioEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "An Entry (conceptual row) in the ACK distance Table.
+    DESCRIPTION "An entry (conceptual row) in the ACK distance table.
 
-                 coWDSRadioIndex - Radio number where the ACK
-                                      distance is applied."
+                 coWDSRadioIndex - Number of the radio on which the ACK
+                                   distance is applied."
     INDEX       { coWDSRadioIndex }
     ::= { coWDSRadioTable 1 }
 
@@ -100,7 +101,7 @@ coWDSRadioAckDistance OBJECT-TYPE
     UNITS       "km"
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Maximum distance between the device and the remote peers."
+    DESCRIPTION "Maximum distance between the AP and its remote peers."
     ::= { coWDSRadioEntry 2 }
 
 coWDSRadioQoS OBJECT-TYPE
@@ -118,7 +119,7 @@ coWDSRadioQoS OBJECT-TYPE
                 }
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "QoS priority mechanism used to maps the traffic to
+    DESCRIPTION "QoS priority mechanism used to map the traffic to
                  one of the four WMM traffic queues."
     ::= { coWDSRadioEntry 3 }
 
@@ -126,15 +127,15 @@ coWDSGroupTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF CoWDSGroupEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "Conceptual table for the WDS Groups. This table contains
-                 the six WDS Groups configuration information."
+    DESCRIPTION "Conceptual table for the local mesh profiles. This table contains
+                 configuration information for each profile."
     ::= { coWDSGroupGroup 1 }
 
 coWDSGroupEntry OBJECT-TYPE
     SYNTAX      CoWDSGroupEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "An Entry (conceptual row) in the WDS Group Table.
+    DESCRIPTION "An Entry (conceptual row) in the local mesh table.
 
                  coWDSGroupIndex - Uniquely identify a WDS group
                                    inside the WDS group table."
@@ -157,15 +158,15 @@ coWDSGroupIndex OBJECT-TYPE
     SYNTAX      Integer32 (1..6)
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "The auxiliary variable used to identify instances of WDS
-                 groups."
+    DESCRIPTION "The auxiliary variable used to identify instances of local 
+                 mesh profiles."
     ::= { coWDSGroupEntry 1 }
 
 coWDSGroupName OBJECT-TYPE
     SYNTAX      DisplayString (SIZE(0..32))
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Friendly name of the WDS group."
+    DESCRIPTION "Friendly name of the local mesh profile."
     ::= { coWDSGroupEntry 2 }
 
 coWDSGroupState OBJECT-TYPE
@@ -176,7 +177,7 @@ coWDSGroupState OBJECT-TYPE
                 }
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Specifies if the WDS group is active in the radios."
+    DESCRIPTION "Indicates if the local mesh profile is active on the radios."
     ::= { coWDSGroupEntry 3 }
 
 coWDSGroupSecurity OBJECT-TYPE
@@ -189,7 +190,7 @@ coWDSGroupSecurity OBJECT-TYPE
                 }
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Specifies the encryption used by the WDS group."
+    DESCRIPTION "Indicates the encryption used by the WDS group."
     ::= { coWDSGroupEntry 4 }
 
 coWDSGroupAddressing OBJECT-TYPE
@@ -200,15 +201,15 @@ coWDSGroupAddressing OBJECT-TYPE
                 }
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Specifies if the WDS group is static or dynamic."
+    DESCRIPTION "Indicates if the local mesh profile is static or dynamic."
     ::= { coWDSGroupEntry 5 }
 
 coWDSGroupStaticMacAddress OBJECT-TYPE
     SYNTAX      MacAddress
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "For static WDS group, this object specify the MAC
-                 address of the remote WDS device."
+    DESCRIPTION "For static local mesh profiles, this object indicates the MAC
+                 address of the remote AP."
     ::= { coWDSGroupEntry 6 }
 
 coWDSGroupDynamicMode OBJECT-TYPE
@@ -221,34 +222,35 @@ coWDSGroupDynamicMode OBJECT-TYPE
                 }
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Specifies the mode of the dynamic WDS group."
+    DESCRIPTION "Indicates the mode of the dynamic local mesh profile."
     ::= { coWDSGroupEntry 7 }
 
 coWDSGroupDynamicGroupId OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Specifies the group identifier of the dynamic WDS group."
+    DESCRIPTION "Indicates the profile indentifier for the dynamic local mesh profile."
     ::= { coWDSGroupEntry 8 }
 
 coWDSLinkTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF CoWDSLinkEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "Conceptual table for the WDS links. This table contains
-                 up to 54 WDS links status information."
+    DESCRIPTION "Conceptual table for the local mesh profiles. This table contains
+                 status information for up to 54 local mesh links."
     ::= { coWDSLinkGroup 1 }
 
 coWDSLinkEntry OBJECT-TYPE
     SYNTAX      CoWDSLinkEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "An Entry (conceptual row) in the WDS Link Table.
+    DESCRIPTION "An Entry (conceptual row) in the local mesh link table.
 
-                 coWDSGroupIndex - Uniquely identify a WDS group
-                                   inside the WDS group table.
-                 coWDSLinkIndex - Uniquely identify a WDS link
-                                  inside a WDS group."
+                 coWDSGroupIndex - Uniquely identify a local mesh profile
+                                   inside the local mesh profile table.
+
+                 coWDSLinkIndex - Uniquely identify a local mesh link
+                                  inside a local mesh profile."
     INDEX       { coWDSGroupIndex, coWDSLinkIndex }
     ::= { coWDSLinkTable 1 }
 
@@ -270,15 +272,16 @@ CoWDSLinkEntry ::= SEQUENCE
     coWDSLinkTxMCS          Unsigned32,
     coWDSLinkRxMCS          Unsigned32,
     coWDSLinkSignal         Integer32,
-    coWDSLinkNoise          Integer32
+    coWDSLinkNoise          Integer32,
+    coWDSLinkVHT            TruthValue
 }
 
 coWDSLinkIndex OBJECT-TYPE
     SYNTAX      Integer32 (1..54)
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "The auxiliary variable used to identify instances of WDS
-                 links."
+    DESCRIPTION "The auxiliary variable used to identify instances of local 
+                 mesh links."
     ::= { coWDSLinkEntry 1 }
 
 coWDSLinkState OBJECT-TYPE
@@ -291,29 +294,29 @@ coWDSLinkState OBJECT-TYPE
                 }
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Specifies the state of the WDS link."
+    DESCRIPTION "Specifies the state of the local mesh link."
     ::= { coWDSLinkEntry 2 }
 
 coWDSLinkRadio OBJECT-TYPE
     SYNTAX      Integer32 (1..3)
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Radio number where the WDS peer was detected."
+    DESCRIPTION "Radio number where the local mesh peer was detected."
     ::= { coWDSLinkEntry 3 }
 
 coWDSLinkPeerMacAddress OBJECT-TYPE
     SYNTAX      MacAddress
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "MAC address of the WDS peer."
+    DESCRIPTION "MAC address of the local mesh peer."
     ::= { coWDSLinkEntry 4 }
 
 coWDSLinkMaster OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Determine if this link is a link to a master.
-                 Providing upstream network access."
+    DESCRIPTION "Indicates if this link is a link to a master node,
+                 which provides access to the root network for the mesh."
     ::= { coWDSLinkEntry 5 }
 
 coWDSLinkAuthorized OBJECT-TYPE
@@ -333,7 +336,7 @@ coWDSLinkEncryption OBJECT-TYPE
                 }
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Specifies the encryption used by the WDS link."
+    DESCRIPTION "Indicates the encryption used by the local mesh link."
     ::= { coWDSLinkEntry 7 }
 
 coWDSLinkIdleTime OBJECT-TYPE
@@ -349,7 +352,7 @@ coWDSLinkSNR OBJECT-TYPE
     UNITS       "dBm"
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Signal noise ratio of the WDS peer."
+    DESCRIPTION "Signal noise ratio of the local mesh peer."
     ::= { coWDSLinkEntry 9 }
 
 coWDSLinkTxRate OBJECT-TYPE
@@ -357,7 +360,7 @@ coWDSLinkTxRate OBJECT-TYPE
     UNITS       "500Kb/s"
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Current transmit rate of the WDS peer."
+    DESCRIPTION "Current transmit rate of the local mesh peer."
     ::= { coWDSLinkEntry 10 }
 
 coWDSLinkRxRate OBJECT-TYPE
@@ -365,7 +368,7 @@ coWDSLinkRxRate OBJECT-TYPE
     UNITS       "500Kb/s"
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Current receive rate of the WDS peer."
+    DESCRIPTION "Current receive rate of the local mesh peer."
     ::= { coWDSLinkEntry 11 }
 
 coWDSLinkIfIndex OBJECT-TYPE
@@ -387,14 +390,14 @@ coWDSLinkTxMCS OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Current transmit MCS of the HT WDS peer."
+    DESCRIPTION "Current transmit MCS of the HT/VHT local mesh peer."
     ::= { coWDSLinkEntry 14 }
 
 coWDSLinkRxMCS OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Current receive MCS of the HT WDS peer."
+    DESCRIPTION "Current receive MCS of the HT/VHT local mesh peer."
     ::= { coWDSLinkEntry 15 }
 
 coWDSLinkSignal OBJECT-TYPE
@@ -413,11 +416,19 @@ coWDSLinkNoise OBJECT-TYPE
     DESCRIPTION "Level of local background noise."
     ::= { coWDSLinkEntry 17 }
 
+coWDSLinkVHT OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if the link is using very high throughput
+                 data rates."
+    ::= { coWDSLinkEntry 18 } 
+
 coWDSNetworkScanTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF CoWDSNetworkScanEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "Conceptual table for the WDS network scans."
+    DESCRIPTION "Conceptual table for local mesh network scans."
     ::= { coWDSNetworkScanGroup 1 }
 
 coWDSNetworkScanEntry OBJECT-TYPE
@@ -427,10 +438,11 @@ coWDSNetworkScanEntry OBJECT-TYPE
     DESCRIPTION "An Entry (conceptual row) in the WDS Network Scan
                  Table.
 
-                 coWDSScanRadioIndex - Radio number where the WDS peer
+                 coWDSScanRadioIndex - Radio number where the local mesh peer
                                        was detected.
-                 coWDSScanPeerIndex - Uniquely identify a WDS peer
-                                      on a radio inside the WDS
+
+                 coWDSScanPeerIndex - Uniquely identify a local mesh peer
+                                      on a radio inside the local mesh 
                                       network scan table."
     INDEX       { coWDSScanRadioIndex, coWDSScanPeerIndex }
     ::= { coWDSNetworkScanTable 1 }
@@ -451,35 +463,35 @@ coWDSScanRadioIndex OBJECT-TYPE
     SYNTAX      Integer32 (1..3)
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "Radio number where the WDS peer was detected."
+    DESCRIPTION "Radio number on which  the local mesh peer was detected."
     ::= { coWDSNetworkScanEntry 1 }
 
 coWDSScanPeerIndex OBJECT-TYPE
     SYNTAX      Integer32 (1..100)
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "Uniquely identify a WDS peer on a radio."
+    DESCRIPTION "Uniquely identify a local mesh peer on a radio."
     ::= { coWDSNetworkScanEntry 2 }
 
 coWDSScanGroupId OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Group id used by the WDS peer."
+    DESCRIPTION "Mesh ID used by the local mesh peer."
     ::= { coWDSNetworkScanEntry 3 }
 
 coWDSScanPeerMacAddress OBJECT-TYPE
     SYNTAX      MacAddress
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "MAC address of the WDS peer."
+    DESCRIPTION "MAC address of the local mesh peer."
     ::= { coWDSNetworkScanEntry 4 }
 
 coWDSScanChannel OBJECT-TYPE
     SYNTAX      Unsigned32 (1..199)
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Channel on which the peer is transmitting."
+    DESCRIPTION "Channel on which the local mesh peer is transmitting."
     ::= { coWDSNetworkScanEntry 5 }
 
 coWDSScanSNR OBJECT-TYPE
@@ -487,7 +499,7 @@ coWDSScanSNR OBJECT-TYPE
     UNITS       "dBm"
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Signal noise ratio of the WDS peer."
+    DESCRIPTION "Signal noise ratio of the local mesh peer."
     ::= { coWDSNetworkScanEntry 6 }
 
 coWDSScanMode OBJECT-TYPE
@@ -499,7 +511,7 @@ coWDSScanMode OBJECT-TYPE
                 }
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Current mode of the WDS peer."
+    DESCRIPTION "Current mode of the local mesh peer."
     ::= { coWDSNetworkScanEntry 7 }
 
 coWDSScanAvailable OBJECT-TYPE
@@ -545,7 +557,7 @@ colubrisWDSRadioMIBGroup OBJECT-GROUP
                     coWDSRadioQoS
                 }
     STATUS      current
-    DESCRIPTION "A collection of objects for the WDS radios."
+    DESCRIPTION "A collection of objects for the local mesh radios."
     ::= { colubrisWdsMIBGroups 2 }
 
 colubrisWDSGroupMIBGroup OBJECT-GROUP
@@ -559,7 +571,7 @@ colubrisWDSGroupMIBGroup OBJECT-GROUP
                     coWDSGroupDynamicGroupId
                 }
     STATUS      current
-    DESCRIPTION "A collection of objects for the WDS groups."
+    DESCRIPTION "A collection of objects for the local mesh profiles."
     ::= { colubrisWdsMIBGroups 3 }
 
 colubrisWDSLinkMIBGroup OBJECT-GROUP
@@ -579,10 +591,11 @@ colubrisWDSLinkMIBGroup OBJECT-GROUP
                     coWDSLinkTxMCS,
                     coWDSLinkRxMCS,
                     coWDSLinkSignal,
-                    coWDSLinkNoise
+                    coWDSLinkNoise,
+                    coWDSLinkVHT
                 }
     STATUS      current
-    DESCRIPTION "A collection of objects for the WDS links."
+    DESCRIPTION "A collection of objects for the local mesh links."
     ::= { colubrisWdsMIBGroups 4 }
 
 colubrisWDSScanMIBGroup OBJECT-GROUP
@@ -595,7 +608,7 @@ colubrisWDSScanMIBGroup OBJECT-GROUP
                     coWDSScanAvailable
                 }
     STATUS      current
-    DESCRIPTION "A collection of objects for the WDS network scan."
+    DESCRIPTION "A collection of objects for the local mesh network scan."
     ::= { colubrisWdsMIBGroups 5 }
 
 END

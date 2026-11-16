@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: BGP policy accounting MIB File
 -- Reference:
--- Version: V1.2
+-- Version: V1.3
 -- History:
 -- V1.0 2013-08-14 created by wangzhenjun
 -- V1.1 2013-11-13 modified by wangzhenjun
@@ -17,6 +17,11 @@
 -- V1.2 2014-11-20 modified by gongqing
 --      Modified the value range of hh3cBpaTrafficIndex from
 --      (1..64) to (1..128)
+-- V1.3 2021-08-26 modified by xiebin
+--      Added node 'hh3cBpaInPktRateInLast30Sec' in Hh3cBpaStatEntry
+--      Added node 'hh3cBpaInBitRateInLast30Sec' in Hh3cBpaStatEntry
+--      Added node 'hh3cBpaOutPktRateInLast30Sec' in Hh3cBpaStatEntry
+--      Added node 'hh3cBpaOutBitRateInLast30Sec' in Hh3cBpaStatEntry
 -- =================================================================
 HH3C-BPA-MIB DEFINITIONS ::= BEGIN
 
@@ -34,7 +39,7 @@ IMPORTS
 
 hh3cBpa MODULE-IDENTITY
     LAST-UPDATED
-        "201411200927Z"
+        "202108261525Z"
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -47,6 +52,10 @@ hh3cBpa MODULE-IDENTITY
          of BGP policy accounting.  It accounts IP packets by user defined
          BGP policy.
         "
+    REVISION
+        "202108261525Z"
+    DESCRIPTION
+        "Add new node in Hh3cBpaStatEntry"
     REVISION
         "201411200927Z"
     DESCRIPTION
@@ -151,12 +160,16 @@ hh3cBpaStatEntry OBJECT-TYPE
 Hh3cBpaStatEntry ::=
     SEQUENCE
     {
-            hh3cBpaTrafficType        InetAddressType,
-            hh3cBpaTrafficIndex       Integer32,
-            hh3cBpaInPacketCount      Counter64,
-            hh3cBpaInOctetCount       Counter64,
-            hh3cBpaOutPacketCount     Counter64,
-            hh3cBpaOutOctetCount      Counter64
+            hh3cBpaTrafficType             InetAddressType,
+            hh3cBpaTrafficIndex            Integer32,
+            hh3cBpaInPacketCount           Counter64,
+            hh3cBpaInOctetCount            Counter64,
+            hh3cBpaOutPacketCount          Counter64,
+            hh3cBpaOutOctetCount           Counter64,
+            hh3cBpaInPktRateInLast30Sec    Counter64,
+            hh3cBpaInBitRateInLast30Sec    Counter64,
+            hh3cBpaOutPktRateInLast30Sec   Counter64,
+            hh3cBpaOutBitRateInLast30Sec   Counter64
     }
 
 hh3cBpaTrafficType    OBJECT-TYPE
@@ -204,5 +217,37 @@ hh3cBpaOutOctetCount   OBJECT-TYPE
     DESCRIPTION "The total number of output bytes with the specified
                  traffic type and traffic index."
     ::= { hh3cBpaStatEntry 6 }
+
+hh3cBpaInPktRateInLast30Sec   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The rate of received packets with the specified
+                 traffic type and traffic index in last 30 seconds."
+    ::= { hh3cBpaStatEntry 7 }
+
+hh3cBpaInBitRateInLast30Sec   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The rate of received bits with the specified
+                 traffic type and traffic index in last 30 seconds."
+    ::= { hh3cBpaStatEntry 8 }
+
+hh3cBpaOutPktRateInLast30Sec   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The rate of sent packets with the specified
+                 traffic type and traffic index in last 30 seconds."
+    ::= { hh3cBpaStatEntry 9 }
+
+hh3cBpaOutBitRateInLast30Sec   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The rate of sent bits with the specified
+                 traffic type and traffic index in last 30 seconds."
+    ::= { hh3cBpaStatEntry 10 }
 
 END

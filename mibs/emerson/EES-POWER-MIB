@@ -15,15 +15,15 @@ IMPORTS
 		
 		
 powerMIB MODULE-IDENTITY
-	LAST-UPDATED "201504100857Z"
+	LAST-UPDATED "202012101427Z"
 	ORGANIZATION "
-		Emerson Energy Systems (EES)"
+		Vertiv Tech Co. Ltd"
 	CONTACT-INFO "
-		Emerson Energy Systems
-		141 82 Stockholm
+		Vertiv Sweden AB
+		120 07 Stockholm
 		Sweden"
 	DESCRIPTION "
-		Emerson Energy Systems (EES) Power MIB, revision D."
+		Vertiv Tech Co. Ltd. Power MIB, revision E."
 	::= { enterprises 6302 2 1 }
 
 ------------------------------------------------------------
@@ -209,7 +209,7 @@ psBattery OBJECT IDENTIFIER ::= { system 5 }
 		sign. The integer 2147483647 represents invalid value."
         ::= { psBattery 2 }
 
-	psBatteryCapacity OBJECT-TYPE
+	psLowestBatteryCapacity OBJECT-TYPE
 		SYNTAX Integer32
 		MAX-ACCESS read-only
 		STATUS current
@@ -247,7 +247,10 @@ psBattery OBJECT IDENTIFIER ::= { system 5 }
     PSBatteryEntry ::= SEQUENCE {
         psBatteryIndex              Integer32,
         psBatteryCurrent         	Integer32,
-        psBatteryName		  		DisplayString
+        psBatteryName		  		DisplayString,
+        psBatteryRatedCapacity		Integer32,
+		psBatteryCapacity			Integer32,
+		psBatteryCapacityPercent	Integer32
     }
 
     psBatteryIndex OBJECT-TYPE
@@ -263,7 +266,7 @@ psBattery OBJECT IDENTIFIER ::= { system 5 }
         MAX-ACCESS              read-only
         STATUS                  current
         DESCRIPTION
-                "Battery current in Amps."
+                "Battery current in mA."
     ::= { psBatteryEntry 2 }
 
     psBatteryName OBJECT-TYPE
@@ -273,8 +276,219 @@ psBattery OBJECT IDENTIFIER ::= { system 5 }
         DESCRIPTION
                 "Battery shunt name."
     ::= { psBatteryEntry 3 }
+    
+    psBatteryRatedCapacity OBJECT-TYPE
+        SYNTAX 		  Integer32
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "Battery reted capacity."
+    ::= { psBatteryEntry 4 }
+
+    psBatteryCapacity OBJECT-TYPE
+        SYNTAX 		  Integer32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "Battery capacity in Ah."
+    ::= { psBatteryEntry 5 }
+
+    psBatteryCapacityPercent OBJECT-TYPE
+        SYNTAX 		  Integer32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "Battery capacity in percent."
+    ::= { psBatteryEntry 6 }
 
 
+	numberOfBatteryStrings OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION "
+			Number of battery strings, including SMDUBat and MainboardBat.
+			The integer 2147483647 represents invalid value."
+		::= { psBattery 6 }
+		
+	temperatureOfBattery OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION "
+			Temperature of battery.
+			The integer 2147483647 represents invalid value."
+		::= { psBattery 7 }
+
+	maxCurrentOfCharging OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION "
+			Maximun battery charging current.
+			The integer 2147483647 represents invalid value."
+		::= { psBattery 8 }
+		
+chargingVoltage OBJECT IDENTIFIER ::= { psBattery 9 }
+
+	floatVoltage OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION "
+			Float charging voltage.
+			The integer 2147483647 represents invalid value."
+		::= { chargingVoltage 1 }
+		
+		
+	boostVoltage OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION "
+			Boost charging voltage.
+			The integer 2147483647 represents invalid value."
+		::= { chargingVoltage 2 }
+	
+highBatteryTemperature OBJECT IDENTIFIER ::= { psBattery 10 }
+
+	psHighBatteryTemperature OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION "
+			High battery temperature.
+			The integer 2147483647 represents invalid value."
+		::= { highBatteryTemperature 1 }
+
+	psVeryHighBatteryTemperature OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION "
+			Very high battery temperature.
+			The integer 2147483647 represents invalid value."
+		::= { highBatteryTemperature 2 }
+		
+temperatureCompensationCoefficient OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION "
+			Temperature compensation coefficient.
+			The integer 2147483647 represents invalid value."
+		::= { psBattery 11 }		
+		
+temperatureCompensation OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION "
+			Temperature compensation .
+			The integer 2147483647 represents invalid value."
+		::= { psBattery 12 }	
+		
+batt1RemainingCapacity OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Remain capacity of battery, stored as % of the total capacity.
+		 The integer 2147483647 represents invalid value."
+        ::= { psBattery 13 }
+        
+batt1ShuntFullScaleCurrent OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION "
+			Battery 1 Shunt Full Scale Current in mA.
+			The integer 2147483647 represents invalid value."
+		::= { psBattery 14 }		
+		
+batt1ShuntFullScaleVoltage OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION "
+			Battery 1 Shunt Full Scale Voltage in thousandths of mV.
+			The integer 2147483647 represents invalid value."
+		::= { psBattery 15 }		
+		
+psBatteryCurrentLimit OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Battery charge current limit stored as thousandths of C10"
+	::= { psBattery 16 }
+
+psBatteryType OBJECT-TYPE
+        SYNTAX INTEGER  (1..10)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+            Battery Type number"
+	::= { psBattery 17 }
+
+psResetBatteryCapacity OBJECT-TYPE
+        SYNTAX INTEGER  {
+	    yes(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+            Reset Battery Capacity, 
+		Yes(1)"
+	::= { psBattery 18 }
+	
+psBatteryOverCurrentLimit OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Battery over current limit stored as thousandths of C10"
+	::= { psBattery 19 }
+
+psBatteryAccumDischargeNarada OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION "
+			Narada Battery's Cumulated Discharge."
+		::= { psBattery 20 }
+
+psBatterySOHNarada OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION "
+			Narada Battery's SOH."
+		::= { psBattery 21 }
+
+psBatterySOHIncell OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION "
+			Incell Battery's SOH."
+		::= { psBattery 22 }
+
+psBatterySOHVision OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION "
+			Vision Battery's SOH."
+		::= { psBattery 23 }		
+
+psBatterySOHNokia OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION "
+			Nokia Battery's SOH."
+		::= { psBattery 24 }	
 -- ------------------------------------------------------------------------ 
 -- 1.2.6. the psInput group
 -- ------------------------------------------------------------------------ 
@@ -308,6 +522,49 @@ psInput OBJECT IDENTIFIER ::= { system 6 }
 		represents invalid value."
         ::= { psInput 3 }
 
+    psInputPhaseACurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The AC Phase A current, stored as mA. The integer 2147483647 
+		represents invalid value."
+        ::= { psInput 4 }
+
+    psInputPhaseBCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The AC Phase B current, stored as mA. The integer 2147483647 
+		represents invalid value."
+        ::= { psInput 5 }
+
+    psInputPhaseCCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The AC Phase C current, stored as mA. The integer 2147483647 
+		represents invalid value."
+        ::= { psInput 6 }
+
+    psInputPowerCP OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Rectifier Total Input Power(CP) in thousandths of watts."
+        ::= { psInput 7 }
+        
+    psInputPowerDG OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Rectifier Total Input Power(DG) in thousandths of watts."
+        ::= { psInput 8 }
+        
 -- ------------------------------------------------------------------------ 
 -- 1.2.7. the temperatures
 -- ------------------------------------------------------------------------ 
@@ -371,7 +628,7 @@ psTemperature OBJECT IDENTIFIER ::= { system 7 }
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
-                "Temperature Value In Centigrade."
+                "Temperature Value In 0.001 Celsius Degree."
     ::= { psTemperatureEntry 2 }
 
     psTemperatureName OBJECT-TYPE
@@ -542,7 +799,8 @@ PSRectifierEntry ::= SEQUENCE {
 	psRectifierSerialNumber DisplayString,
 	psRectifierCurrent Integer32,
 	psRectifierIdent DisplayString,
-	psRectifierFail StatusChange
+	psRectifierFail StatusChange,
+	psRectifierTemperature Integer32
 	}
 
 psRectifierIndex OBJECT-TYPE
@@ -610,6 +868,92 @@ psRectifierFail OBJECT-TYPE
 	(2) deactivated"
 ::= { psRectifierEntry 8}
 
+psRectifierTemperature OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Rectifier Temperature."
+::= { psRectifierEntry 9}
+
+
+psPowerOfRectifiers OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Total power of rectifiers.
+		The integer 2147483647 represents invalid value."
+	::= { psRectifier 5 }
+
+psOverOutputVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Rectifier output over voltage protection point.
+		The integer 2147483647 represents invalid value."
+	::= { psRectifier 7 }	
+
+psVeryOverOutputVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Rectifier output very over voltage protection point.
+		The integer 2147483647 represents invalid value."
+	::= { psRectifier 8 }	
+
+psSoftStartStatus OBJECT-TYPE
+	SYNTAX INTEGER{
+		enable(1),
+		disabled(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Soft-start functuin status.
+		The integer 2147483647 represents invalid value."
+	::= { psRectifier 9 }
+	
+psSoftStartTime OBJECT-TYPE
+	SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		"SoftStart Time, stored as Sec.
+		Value range: 8~128."
+	::= { psRectifier 10 }	
+	
+psACEnergyOfRectifiers OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Total AC energy of rectifiers.
+		The integer 2147483647 represents invalid value."
+	::= { psRectifier 11 }
+	
+psDCEnergyOfRectifiers OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Total DC energy of rectifiers.
+		The integer 2147483647 represents invalid value."
+	::= { psRectifier 12 }
+	
+psRectifierAllONOFF OBJECT-TYPE
+	SYNTAX INTEGER{
+		Open(0),
+		Close(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		ON OFF of all rectifiers.
+		The integer 2147483647 represents invalid value."
+	::= { psRectifier 13 }	
 -- ------------------------------------------------------------------------ 
 -- 1.2.12. the Distribution
 -- ------------------------------------------------------------------------ 
@@ -621,7 +965,7 @@ psTotalLoadCurrent OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION "
-		Total Load current, stored as integer.
+		Total Load current, stored as mA.
 		The integer 2147483647 represents invalid value."
 	::= { psDistribution 1 }
     psDistributionLoadTable OBJECT-TYPE
@@ -660,7 +1004,7 @@ psTotalLoadCurrent OBJECT-TYPE
         MAX-ACCESS              read-only
         STATUS                  current
         DESCRIPTION
-                "Distribution current in Amps."
+                "Distribution current in mA."
     ::= { psDistributionLoadEntry 2 }
 
     psDistributionLoadName OBJECT-TYPE
@@ -707,7 +1051,7 @@ psTotalLoadCurrent OBJECT-TYPE
         MAX-ACCESS              read-only
         STATUS                  current
         DESCRIPTION
-                "Distribution current in Amps."
+                "Distribution current in mA."
     ::= { psDistributionGeneralEntry 2 }
 
     psDistributionGeneralName OBJECT-TYPE
@@ -765,7 +1109,7 @@ psTotalConverterCurrent OBJECT-TYPE
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION "
-		Total Converter current in Amps.
+		Total Converter current in mA.
 		The integer 2147483647 represents invalid value."
 	::= { psConverter 5 }
 
@@ -872,7 +1216,7 @@ controlBatteryTest OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION "
-		Control battery test, start(1), stop (0)."
+		Control battery test, start(1), stop(0)."
 	::= { psControl 1 }
 
 controlRelay8 OBJECT-TYPE
@@ -904,7 +1248,7 @@ controlRelayTest OBJECT-TYPE
 	MAX-ACCESS read-write
 	STATUS current
 	DESCRIPTION "
-		Control Relay test, start(1), stop (0)."
+		Control Relay test, auto(2), manual(1), disabled(0)."
 	::= { psControl 5 }
 
 
@@ -948,6 +1292,1372 @@ psEquipmentSignalValue OBJECT-TYPE
 	DESCRIPTION "
 		Indexed equipment signal value."
 	::= { equipmentSignalTableEntry 2 }
+
+ambientTemperature OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		AmbientTemperature.
+		The integer 2147483647 represents invalid value."
+	::= { system 16 }
+
+autoManualMode OBJECT-TYPE
+	SYNTAX INTEGER{
+	    auto(1),
+	    manual(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Auto/Manual Mode of system.
+		The integer 2147483647 represents invalid value."
+	::= { system 17 }
+
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.18. LVDVoltage
+-- ------------------------------------------------------------------------ 
+
+psLVDVoltage OBJECT IDENTIFIER ::= { system 18 }
+
+    psLVD1DisconnectVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		"LVD1 Disconnect voltage, stored as mV.
+		The integer 2147483647 represents invalid value."
+	::= { psLVDVoltage 1 }
+	
+    psLVD2DisconnectVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		"LVD2 Disconnect voltage, stored as mV.
+		The integer 2147483647 represents invalid value."
+	::= { psLVDVoltage 2 }
+	
+    psLVD1ReconnectVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		"LVD1 Reconnect voltage, stored as mV.
+		The integer 2147483647 represents invalid value."
+	::= { psLVDVoltage 3 }
+	
+    psLVD2ReconnectVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		"LVD2 Reconnect voltage, stored as mV.
+		The integer 2147483647 represents invalid value."
+	::= { psLVDVoltage 4 }
+
+    smdu1LVD1DisconnectVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		"SMDU1 LVD1 Disconnect voltage, stored as mV.
+		The integer 2147483647 represents invalid value."
+	::= { psLVDVoltage 5 }
+	
+    smdu1LVD2DisconnectVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		"SMDU1 LVD2 Disconnect voltage, stored as mV.
+		The integer 2147483647 represents invalid value."
+	::= { psLVDVoltage 6 }
+	
+    smdu1LVD1ReconnectVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		"SMDU1 LVD1 Reconnect voltage, stored as mV.
+		The integer 2147483647 represents invalid value."
+	::= { psLVDVoltage 7 }
+	
+    smdu1LVD2ReconnectVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		"SMDU1 LVD2 Reconnect voltage, stored as mV.
+		The integer 2147483647 represents invalid value."
+	::= { psLVDVoltage 8 }
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.19. DCLowVoltage
+-- ------------------------------------------------------------------------ 
+
+psDCLowVoltage OBJECT IDENTIFIER ::= { system 19 }
+
+    psDCLowAlarmVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		"DC low voltage, stored as mV.
+		The integer 2147483647 represents invalid value."
+	::= { psDCLowVoltage 1 }
+
+    psDCVeryLowAlarmVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+		"DC very low voltage, stored as mV.
+		The integer 2147483647 represents invalid value."
+	::= { psDCLowVoltage 2 }
+	
+-- ------------------------------------------------------------------------ 
+-- 1.2.20. ACLowVoltage
+-- ------------------------------------------------------------------------ 
+
+acLowVoltage OBJECT IDENTIFIER ::= { system 20 }
+
+    psACLowAlarmVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                   "AC low voltage, stored as V.
+                   The integer 2147483647 represents invalid value."
+         ::= { acLowVoltage 1 }
+
+    psACVeryLowAlarmVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                   "AC very low voltage, stored as V.
+                   The integer 2147483647 represents invalid value."
+         ::= { acLowVoltage 2 }
+		
+-- ------------------------------------------------------------------------ 
+-- 1.2.21. SMDUHCurrentTable
+-- ------------------------------------------------------------------------ 
+
+psSMDUHCurrent OBJECT IDENTIFIER ::= { system 21 }
+
+numberOfInstalledSMDUH OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		number of SMDHU units, stored as integer.
+		The integer 2147483647 represents invalid value."
+	::= { psSMDUHCurrent 1 }
+
+psSMDUH1Voltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		SMDUH1 Voltage in mV."
+	::= { psSMDUHCurrent 2 }
+
+psSMDUH2Voltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		SMDUH2 Voltage in mV."
+	::= { psSMDUHCurrent 3 }
+
+psSMDUH3Voltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		SMDUH3 Voltage in mV."
+	::= { psSMDUHCurrent 4 }
+
+psSMDUH4Voltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		SMDUH4 Voltage in mV."
+	::= { psSMDUHCurrent 5 }
+
+psSMDUH5Voltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		SMDUH5 Voltage in mV."
+	::= { psSMDUHCurrent 6 }
+
+psSMDUH6Voltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		SMDUH6 Voltage in mV."
+	::= { psSMDUHCurrent 7 }
+
+psSMDUH7Voltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		SMDUH7 Voltage in mV."
+	::= { psSMDUHCurrent 8 }
+
+psSMDUH8Voltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		SMDUH8 Voltage in mV."
+	::= { psSMDUHCurrent 9 }
+
+psSMDUHCurrentTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PSSMDUHCurrentEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		Table holding information about SMDUH currents."
+	::= { psSMDUHCurrent 10 }
+
+psSMDUHCurrentEntry OBJECT-TYPE
+	SYNTAX PSSMDUHCurrentEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		An entry (conceptual row) in the SMDUHTable."
+	INDEX { psSMDUHCurrentIndex }
+	::= { psSMDUHCurrentTable 1 }
+
+PSSMDUHCurrentEntry ::= SEQUENCE {
+	psSMDUHCurrentIndex Integer32,
+	psSMDUHCurrent1 Integer32,
+	psSMDUHCurrent2 Integer32,
+	psSMDUHCurrent3 Integer32,
+	psSMDUHCurrent4 Integer32,
+	psSMDUHCurrent5 Integer32,
+	psSMDUHCurrent6 Integer32,
+	psSMDUHCurrent7 Integer32,
+	psSMDUHCurrent8 Integer32,
+	psSMDUHCurrent9 Integer32,
+	psSMDUHCurrent10 Integer32,
+	psSMDUHCurrent11 Integer32,
+	psSMDUHCurrent12 Integer32,
+	psSMDUHCurrent13 Integer32,
+	psSMDUHCurrent14 Integer32,
+	psSMDUHCurrent15 Integer32,
+	psSMDUHCurrent16 Integer32,
+	psSMDUHCurrent17 Integer32,
+	psSMDUHCurrent18 Integer32,
+	psSMDUHCurrent19 Integer32,
+	psSMDUHCurrent20 Integer32 }
+
+psSMDUHCurrentIndex OBJECT-TYPE
+  SYNTAX Integer32(1..64)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { psSMDUHCurrentEntry 1 }
+
+psSMDUHCurrent1 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 1 in mA."
+::= { psSMDUHCurrentEntry 2}
+
+psSMDUHCurrent2 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 2 in mA."
+::= { psSMDUHCurrentEntry 3}
+
+psSMDUHCurrent3 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 3 in mA."
+::= { psSMDUHCurrentEntry 4}
+
+psSMDUHCurrent4 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 4 in mA."
+::= { psSMDUHCurrentEntry 5}
+
+psSMDUHCurrent5 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 5 in mA."
+::= { psSMDUHCurrentEntry 6}
+
+psSMDUHCurrent6 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 6 in mA."
+::= { psSMDUHCurrentEntry 7}
+
+psSMDUHCurrent7 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 7 in mA."
+::= { psSMDUHCurrentEntry 8}
+
+psSMDUHCurrent8 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 8 in mA."
+::= { psSMDUHCurrentEntry 9}
+
+psSMDUHCurrent9 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 9 in mA."
+::= { psSMDUHCurrentEntry 10}
+
+psSMDUHCurrent10 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 10 in mA."
+::= { psSMDUHCurrentEntry 11}
+
+psSMDUHCurrent11 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 11 in mA."
+::= { psSMDUHCurrentEntry 12}
+
+psSMDUHCurrent12 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 12 in mA."
+::= { psSMDUHCurrentEntry 13}
+
+psSMDUHCurrent13 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 13 in mA."
+::= { psSMDUHCurrentEntry 14}
+
+psSMDUHCurrent14 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 14 in mA."
+::= { psSMDUHCurrentEntry 15}
+
+psSMDUHCurrent15 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 15 in mA."
+::= { psSMDUHCurrentEntry 16}
+
+psSMDUHCurrent16 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 16 in mA."
+::= { psSMDUHCurrentEntry 17}
+
+psSMDUHCurrent17 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 17 in mA."
+::= { psSMDUHCurrentEntry 18}
+
+psSMDUHCurrent18 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 18 in mA."
+::= { psSMDUHCurrentEntry 19}
+
+psSMDUHCurrent19 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 19 in mA."
+::= { psSMDUHCurrentEntry 20}
+
+psSMDUHCurrent20 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Current 20 in mA."
+::= { psSMDUHCurrentEntry 21}
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.22. SMDUHPowerTable
+-- ------------------------------------------------------------------------ 
+
+psSMDUHPower OBJECT IDENTIFIER ::= { system 22 }
+
+psSMDUHPowerTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PSSMDUHPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		Table holding information about SMDUH power."
+	::= { psSMDUHPower 1 }
+
+psSMDUHPowerEntry OBJECT-TYPE
+	SYNTAX PSSMDUHPowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		An entry (conceptual row) in the SMDUHPowerTable."
+	INDEX { psSMDUHPowerIndex }
+	::= { psSMDUHPowerTable 1 }
+
+PSSMDUHPowerEntry ::= SEQUENCE {
+	psSMDUHPowerIndex Integer32,
+	psSMDUHPower1 Integer32,
+	psSMDUHPower2 Integer32,
+	psSMDUHPower3 Integer32,
+	psSMDUHPower4 Integer32,
+	psSMDUHPower5 Integer32,
+	psSMDUHPower6 Integer32,
+	psSMDUHPower7 Integer32,
+	psSMDUHPower8 Integer32,
+	psSMDUHPower9 Integer32,
+	psSMDUHPower10 Integer32,
+	psSMDUHPower11 Integer32,
+	psSMDUHPower12 Integer32,
+	psSMDUHPower13 Integer32,
+	psSMDUHPower14 Integer32,
+	psSMDUHPower15 Integer32,
+	psSMDUHPower16 Integer32,
+	psSMDUHPower17 Integer32,
+	psSMDUHPower18 Integer32,
+	psSMDUHPower19 Integer32,
+	psSMDUHPower20 Integer32 }
+
+psSMDUHPowerIndex OBJECT-TYPE
+  SYNTAX Integer32(1..64)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { psSMDUHPowerEntry 1 }
+
+psSMDUHPower1 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 1 in thousandths of kW."
+::= { psSMDUHPowerEntry 2}
+
+psSMDUHPower2 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 2."
+::= { psSMDUHPowerEntry 3}
+
+psSMDUHPower3 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 3."
+::= { psSMDUHPowerEntry 4}
+
+psSMDUHPower4 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 4."
+::= { psSMDUHPowerEntry 5}
+
+psSMDUHPower5 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 5."
+::= { psSMDUHPowerEntry 6}
+
+psSMDUHPower6 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 6."
+::= { psSMDUHPowerEntry 7}
+
+psSMDUHPower7 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 7."
+::= { psSMDUHPowerEntry 8}
+
+psSMDUHPower8 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 8."
+::= { psSMDUHPowerEntry 9}
+
+psSMDUHPower9 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 9."
+::= { psSMDUHPowerEntry 10}
+
+psSMDUHPower10 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 10."
+::= { psSMDUHPowerEntry 11}
+
+psSMDUHPower11 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 11."
+::= { psSMDUHPowerEntry 12}
+
+psSMDUHPower12 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 12."
+::= { psSMDUHPowerEntry 13}
+
+psSMDUHPower13 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 13."
+::= { psSMDUHPowerEntry 14}
+
+psSMDUHPower14 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 14."
+::= { psSMDUHPowerEntry 15}
+
+psSMDUHPower15 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 15."
+::= { psSMDUHPowerEntry 16}
+
+psSMDUHPower16 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 16."
+::= { psSMDUHPowerEntry 17}
+
+psSMDUHPower17 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 17."
+::= { psSMDUHPowerEntry 18}
+
+psSMDUHPower18 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 18."
+::= { psSMDUHPowerEntry 19}
+
+psSMDUHPower19 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 19."
+::= { psSMDUHPowerEntry 20}
+
+psSMDUHPower20 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Power 20."
+::= { psSMDUHPowerEntry 21}
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.23. SMDUHEnergyTable
+-- ------------------------------------------------------------------------ 
+
+psSMDUHEnergy OBJECT IDENTIFIER ::= { system 23 }
+
+psSMDUHEnergyTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PSSMDUHEnergyEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		Table holding information about SMDUH energy counters."
+	::= { psSMDUHEnergy 1 }
+
+psSMDUHEnergyEntry OBJECT-TYPE
+	SYNTAX PSSMDUHEnergyEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		An entry (conceptual row) in the SMDUHEnergyTable."
+	INDEX { psSMDUHEnergyIndex }
+	::= { psSMDUHEnergyTable 1 }
+
+PSSMDUHEnergyEntry ::= SEQUENCE {
+	psSMDUHEnergyIndex Integer32,
+	psSMDUHTotalEnergy1 Integer32,
+	psSMDUHTotalEnergy2 Integer32,
+	psSMDUHTotalEnergy3 Integer32,
+	psSMDUHTotalEnergy4 Integer32,
+	psSMDUHTotalEnergy5 Integer32,
+	psSMDUHTotalEnergy6 Integer32,
+	psSMDUHTotalEnergy7 Integer32,
+	psSMDUHTotalEnergy8 Integer32,
+	psSMDUHTotalEnergy9 Integer32,
+	psSMDUHTotalEnergy10 Integer32,
+	psSMDUHTotalEnergy11 Integer32,
+	psSMDUHTotalEnergy12 Integer32,
+	psSMDUHTotalEnergy13 Integer32,
+	psSMDUHTotalEnergy14 Integer32,
+	psSMDUHTotalEnergy15 Integer32,
+	psSMDUHTotalEnergy16 Integer32,
+	psSMDUHTotalEnergy17 Integer32,
+	psSMDUHTotalEnergy18 Integer32,
+	psSMDUHTotalEnergy19 Integer32,
+	psSMDUHTotalEnergy20 Integer32 }
+
+psSMDUHEnergyIndex OBJECT-TYPE
+  SYNTAX Integer32(1..64)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { psSMDUHEnergyEntry 1 }
+
+psSMDUHTotalEnergy1 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 1."
+::= { psSMDUHEnergyEntry 2}
+
+psSMDUHTotalEnergy2 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 2."
+::= { psSMDUHEnergyEntry 3}
+
+psSMDUHTotalEnergy3 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 3."
+::= { psSMDUHEnergyEntry 4}
+
+psSMDUHTotalEnergy4 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 4."
+::= { psSMDUHEnergyEntry 5}
+
+psSMDUHTotalEnergy5 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 5."
+::= { psSMDUHEnergyEntry 6}
+
+psSMDUHTotalEnergy6 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 6."
+::= { psSMDUHEnergyEntry 7}
+
+psSMDUHTotalEnergy7 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 7."
+::= { psSMDUHEnergyEntry 8}
+
+psSMDUHTotalEnergy8 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 8."
+::= { psSMDUHEnergyEntry 9}
+
+psSMDUHTotalEnergy9 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 9."
+::= { psSMDUHEnergyEntry 10}
+
+psSMDUHTotalEnergy10 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 10."
+::= { psSMDUHEnergyEntry 11}
+
+psSMDUHTotalEnergy11 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 11."
+::= { psSMDUHEnergyEntry 12}
+
+psSMDUHTotalEnergy12 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 12."
+::= { psSMDUHEnergyEntry 13}
+
+psSMDUHTotalEnergy13 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 13."
+::= { psSMDUHEnergyEntry 14}
+
+psSMDUHTotalEnergy14 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 14."
+::= { psSMDUHEnergyEntry 15}
+
+psSMDUHTotalEnergy15 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 15."
+::= { psSMDUHEnergyEntry 16}
+
+psSMDUHTotalEnergy16 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 16."
+::= { psSMDUHEnergyEntry 17}
+
+psSMDUHTotalEnergy17 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 17."
+::= { psSMDUHEnergyEntry 18}
+
+psSMDUHTotalEnergy18 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 18."
+::= { psSMDUHEnergyEntry 19}
+
+psSMDUHTotalEnergy19 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 19."
+::= { psSMDUHEnergyEntry 20}
+
+psSMDUHTotalEnergy20 OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDUH Total Energy 20."
+::= { psSMDUHEnergyEntry 21}
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.24. SMDUTable
+-- ------------------------------------------------------------------------ 
+
+psSMDU OBJECT IDENTIFIER ::= { system 24 }
+
+psSMDUTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PSSMDUEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		Table holding information about SMDU."
+	::= { psSMDU 1 }
+
+psSMDUEntry OBJECT-TYPE
+	SYNTAX PSSMDUEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		An entry (conceptual row) in the SMDU Table."
+	INDEX { psSMDUIndex }
+	::= { psSMDUTable 1 }
+
+PSSMDUEntry ::= SEQUENCE {
+	psSMDUIndex Integer32,
+	psSMDULoad1Power Integer32,
+	psSMDULoad2Power Integer32,
+	psSMDULoad3Power Integer32,
+	psSMDULoad4Power Integer32,
+	psSMDULoad5Power Integer32,
+	psSMDUShunt1FullScaleCurrent Integer32,
+	psSMDUShunt1FullScaleVoltage Integer32,
+	psSMDUShunt2FullScaleCurrent Integer32,
+	psSMDUShunt2FullScaleVoltage Integer32,
+	psSMDUShunt3FullScaleCurrent Integer32,
+	psSMDUShunt3FullScaleVoltage Integer32,
+	psSMDUShunt4FullScaleCurrent Integer32,
+	psSMDUShunt4FullScaleVoltage Integer32,
+	psSMDUShunt5FullScaleCurrent Integer32,
+	psSMDUShunt5FullScaleVoltage Integer32 }
+
+psSMDUIndex OBJECT-TYPE
+  SYNTAX Integer32(1..8)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { psSMDUEntry 1 }
+
+psSMDULoad1Power OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDU Load1 Power in thousandths of kW"
+::= { psSMDUEntry 2 }
+
+psSMDULoad2Power OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDU Load2 Power in thousandths of kW"
+::= { psSMDUEntry 3 }
+
+psSMDULoad3Power OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDU Load3 Power in thousandths of kW"
+::= { psSMDUEntry 4 }
+
+psSMDULoad4Power OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDU Load4 Power in thousandths of kW"
+::= { psSMDUEntry 5 }
+
+psSMDULoad5Power OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SMDU Load5 Power in thousandths of kW"
+::= { psSMDUEntry 6 }
+
+psSMDUShunt1FullScaleCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "SMDU Shunt1 Full Scale Current in mA."
+::= { psSMDUEntry 7 }
+
+psSMDUShunt1FullScaleVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "SMDU Shunt1 Full Scale Voltage in thousandths of mV."
+::= { psSMDUEntry 8 }
+
+psSMDUShunt2FullScaleCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "SMDU Shunt2 Full Scale Current in mA."
+::= { psSMDUEntry 9 }
+
+psSMDUShunt2FullScaleVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "SMDU Shunt2 Full Scale Voltage in thousandths of mV."
+::= { psSMDUEntry 10 }
+
+psSMDUShunt3FullScaleCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "SMDU Shunt3 Full Scale Current in mA."
+::= { psSMDUEntry 11 }
+
+psSMDUShunt3FullScaleVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "SMDU Shunt3 Full Scale Voltage in thousandths of mV."
+::= { psSMDUEntry 12 }
+
+psSMDUShunt4FullScaleCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "SMDU Shunt4 Full Scale Current in mA."
+::= { psSMDUEntry 13 }
+
+psSMDUShunt4FullScaleVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "SMDU Shunt4 Full Scale Voltage in thousandths of mV."
+::= { psSMDUEntry 14 }
+
+psSMDUShunt5FullScaleCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "SMDU Shunt5 Full Scale Current in mA."
+::= { psSMDUEntry 15 }
+
+psSMDUShunt5FullScaleVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "SMDU Shunt5 Full Scale Voltage in thousandths of mV."
+::= { psSMDUEntry 16 }
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.25. Solar group
+-- ------------------------------------------------------------------------ 
+
+psSolar OBJECT IDENTIFIER ::= { system 25 }
+
+numberOfInstalledSolar OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		number of Solar converters, stored as integer.
+		The integer 2147483647 represents invalid value."
+	::= { psSolar 1 }
+	
+numberOfSolarCommunicating OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		number of Solar converters communicating, stored as integer.
+		The integer 2147483647 represents invalid value."
+	::= { psSolar 2 }
+
+solarsUsedCapacity OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Used capacity, stored as % of the total capacity.
+		The integer 2147483647 represents invalid value."
+	::= { psSolar 3 }
+
+psSolarTotalCurrent OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Solar Converter Total output current in mA.
+		The integer 2147483647 represents invalid value."
+	::= { psSolar 4 }
+	
+psSolarTotalPower OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Solar Converter Total Output Power in W * 1000."
+	::= { psSolar 5 }
+
+psSolarTotalInputCurrent OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "
+		Solar Converter Total input current in mA.
+		The integer 2147483647 represents invalid value."
+	::= { psSolar 6 }
+	
+psSolarTotalInputPower OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Solar Converter Total input Power in kW * 1000."
+	::= { psSolar 7 }
+
+psSolarMode OBJECT-TYPE
+        SYNTAX INTEGER  {
+	    disabled(0),
+	    rect-solar(1),
+	    solar(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+            Solar mode, 
+		Disabled(0),
+		RECT-SOLAR(1),
+		Solar(2)"
+	::= { psSolar 8 }
+
+psSolarRunningWay OBJECT-TYPE
+        SYNTAX INTEGER  {
+	    rect-first(0),
+	    mppt-first(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+            Solar mode, 
+		Disabled(0),
+		RECT-SOLAR(1),
+		Solar(2)"
+	::= { psSolar 9 }
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.26. Setting group
+-- ------------------------------------------------------------------------ 
+
+psSetting OBJECT IDENTIFIER ::= { system 26 }
+
+settingSolarFloatVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Solar Float voltage stored as mV"
+	::= { psSetting 1 }
+
+settingSolarEQChargeVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Solar Equalize voltage stored as mV"
+	::= { psSetting 2 }
+	
+settingRectifierFloatVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Rectifier Float voltage stored as mV"
+	::= { psSetting 3 }
+
+settingRectifierEQChargeVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Rectifier Equalize voltage stored as mV"
+	::= { psSetting 4 }
+	
+settingRectifierWalkInEnable OBJECT-TYPE
+        SYNTAX INTEGER  {
+	    disabled(0),
+	    enabled(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Rectifier walk-in Enable,
+		    Disabled(0),
+		    Active(1)"
+	::= { psSetting 5 }
+
+settingRectifierWalkInTime OBJECT-TYPE
+    SYNTAX INTEGER  (8..128)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Rectifier walk-in time in seconds."
+	::= { psSetting 6 }
+
+settingRectifierCurrentLimitEnable OBJECT-TYPE
+        SYNTAX INTEGER  {
+	    disabled(0),
+	    enabled(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Rectifier Current Limit Enable,
+		    Disabled(0),
+		    Active(1)"
+	::= { psSetting 7 }
+
+settingRectifierCurrentLimit OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Rectifier current limit stored as mA"
+	::= { psSetting 8 }
+
+settingRectifierInputCurrentLimit OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Rectifier input current limit stored as mA"
+	::= { psSetting 9 }
+
+settingGeneratorPowerLimitEnable OBJECT-TYPE
+        SYNTAX INTEGER  {
+	    disabled(0),
+	    enabled(1)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Diesel Generator Power Limit Enable,
+		    Disabled(0),
+		    Active(1)"
+	::= { psSetting 10 }
+
+settingGeneratorPowerLimitPoint OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Diesel Generator Power Limit point in percent * 1000."
+	::= { psSetting 11 }
+	
+settingGeneratorStartVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Diesel Generator Start voltage stored as mV"
+	::= { psSetting 12 }
+	
+settingGeneratorStopVoltage OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+		Diesel Generator Stop voltage stored as mV"
+	::= { psSetting 13 }
+	
+settingHybridMode OBJECT-TYPE
+        SYNTAX INTEGER  {
+	    disabled(0),
+	    single-diesel(1),
+	    dieselandAC(2)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "
+            Solar mode, 
+		Disabled(0),
+		RECT-SOLAR(1),
+		Solar(2)"
+	::= { psSetting 14 }
+
+settingGeneratorRelay OBJECT-TYPE
+        SYNTAX INTEGER  {
+        none(0),
+        relayOutput1(1),
+        relayOutput2(2),
+        relayOutput3(3),
+        relayOutput4(4),
+        relayOutput5(5),
+        relayOutput6(6),
+		relayOutput7(7),
+		relayOutput8(8)	
+    }    
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "
+			Diesel Generator Relay,
+		None(0),
+        Relay Output 1(1),
+        Relay Output 2(2),
+        Relay Output 3(3),
+        Relay Output 4(4),
+        Relay Output 5(5),
+        Relay Output 6(6),
+        Relay Output 7(7),
+        Relay Output 8(8)"    
+	::= { psSetting 15 }
+
+-- ------------------------------------------------------------------------ 
+-- 1.2.27. CabinetTable
+-- ------------------------------------------------------------------------ 
+
+psCabinet OBJECT IDENTIFIER ::= { system 27 }
+
+psCabinetTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PSCabinetEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		Table holding information about Cabinet."
+	::= { psCabinet 1 }
+
+psCabinetEntry OBJECT-TYPE
+	SYNTAX PSCabinetEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "
+		An entry (conceptual row) in the Cabinet Table."
+	INDEX { psCabinetIndex }
+	::= { psCabinetTable 1 }
+
+PSCabinetEntry ::= SEQUENCE {
+	psCabinetIndex Integer32,
+	psCabinetTotalCurrent Integer32,
+	psCabinetTotalPower Integer32,
+	psCabinetTotalEnergy Integer32,
+	psCabinetAlarmStatus INTEGER }
+
+psCabinetIndex OBJECT-TYPE
+  SYNTAX Integer32(1..20)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Automatically generated index object."
+::= { psCabinetEntry 1 }
+
+psCabinetTotalCurrent OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Cabinet Total Current in mA"
+::= { psCabinetEntry 2 }
+
+psCabinetTotalPower OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Cabinet Total Power in thousandths of W"
+::= { psCabinetEntry 3 }
+
+psCabinetTotalEnergy OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Cabinet Total Energy in thousandths of KWh"
+::= { psCabinetEntry 4 }
+
+psCabinetAlarmStatus OBJECT-TYPE
+        SYNTAX INTEGER  {
+	    notAlarmed(0),
+	    alarmLevel1(1),
+	    alarmLevel2(2)
+	}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Cabinet Alarm Status"
+::= { psCabinetEntry 5 }
+
+
 
 ------------------------------------------------------------
 -- Alarm trap counter { powerMIB 3 }

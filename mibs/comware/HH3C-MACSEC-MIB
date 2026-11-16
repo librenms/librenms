@@ -1,24 +1,25 @@
 -- ==========================================================================
--- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: The file defines a MIB to provide MACSEC configuration
 -- Reference:
--- Version: V1.0
+-- Version: V1.1
 -- History:
 --   V1.0 2015-09-01 created by liubo
+--   V1.1 2022-05-11 Add hh3cMACsecTrap by zhengjun
 -- ==========================================================================
 HH3C-MACSEC-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
-    InterfaceIndex
+    InterfaceIndex, ifDescr, ifIndex
         FROM IF-MIB
     hh3cCommon
         FROM HH3C-OID-MIB;
 
 hh3cMACsec MODULE-IDENTITY
-    LAST-UPDATED "201509011615Z"
+    LAST-UPDATED "202205111427Z"
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -29,6 +30,10 @@ hh3cMACsec MODULE-IDENTITY
     DESCRIPTION
         "This MIB provides information for MACSEC configuration.
         MACSEC presents secure communication method."
+    REVISION "202205111427Z"
+    DESCRIPTION
+        "This version added the MKA session lifetime expired notification and
+        its recovery notification."
     REVISION "201509011615Z"
     DESCRIPTION
         "Initial version."
@@ -84,5 +89,53 @@ hh3cMACsecCFGPortPSKCAKValue OBJECT-TYPE
     DESCRIPTION
     "The connectivity asociation key value."
 ::= { hh3cMACsecCFGPortEntry 3 }
+
+-- trap --
+hh3cMACsecTrap      OBJECT IDENTIFIER ::= { hh3cMACsec 2 }
+
+hh3cMACsecTrapPrex OBJECT IDENTIFIER ::= { hh3cMACsecTrap 0 }
+
+hh3cMACsecTimeout NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cMACsecDeviceRole
+        }
+    STATUS       current
+    DESCRIPTION
+        "The lifetime of the MKA session on the specified local interface expired."
+    ::= { hh3cMACsecTrapPrex 1 }
+
+hh3cMACsecTimeoutResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cMACsecDeviceRole
+        }
+    STATUS       current
+    DESCRIPTION
+        "The MKA session on the specified local interface restored."
+    ::= { hh3cMACsecTrapPrex 2 }
+
+hh3cMACsecTrapOjbects OBJECT IDENTIFIER ::= { hh3cMACsecTrap 1 }
+
+hh3cMACsecDeviceRole OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        unknown(1),
+        server(2),
+        client(3)
+        }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The role of the local device role in MKA.
+        unknown : The device role is unknown.
+        server  : The device is the key server.
+        client  : The device is the client.
+        "
+    ::= { hh3cMACsecTrapOjbects 1 }
 
 END

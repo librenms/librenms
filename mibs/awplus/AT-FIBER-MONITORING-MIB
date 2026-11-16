@@ -18,7 +18,7 @@
                 FROM SNMPv2-TC;
 
         atFiberMon MODULE-IDENTITY 
-            LAST-UPDATED "201509080000Z"
+            LAST-UPDATED "202006160000Z"
             ORGANIZATION
                 "Allied Telesis, Inc"
             CONTACT-INFO
@@ -26,6 +26,9 @@
             DESCRIPTION
                 "This MIB contains managed objects definition and notification
                 definitions for AT Fiber Monitoring feature."
+            REVISION "202006160000Z"
+            DESCRIPTION
+                "Added atFiberMonLastReading."
             REVISION "201509080000Z"
             DESCRIPTION
                 "Initial revision"
@@ -252,6 +255,8 @@
                 atFiberMonMinReading
                     Integer32,
                 atFiberMonMaxReading
+                    Integer32,
+                atFiberMonLastReading
                     Integer32
              }
 
@@ -318,6 +323,14 @@
             DESCRIPTION
                 "The maximum reading of rx power, in units of 0.0001mW."
             ::= { atFiberMonStateEntry 8 }
+
+        atFiberMonLastReading OBJECT-TYPE
+            SYNTAX Integer32 (-1..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The most recent reading of rx power, in units of 0.0001mW. -1 is returned if no readings have been taken yet."
+            ::= { atFiberMonStateEntry 9 }
 
 
     END

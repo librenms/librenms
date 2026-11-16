@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: MSTP MIB
 -- Reference:
--- Version: V1.17
+-- Version: V1.18
 -- History:
 --      v1.0 (1) Created by Zhang Shilin, 2001.6.29
 --           (2) Revised by Qi Zhenglin, 2002.01.08
@@ -43,6 +43,11 @@
 --            Add hh3cMstiNewRoot, hh3cPortPvstBpduProtection in mstp traps table.
 --     V1.17 2021-02-03 Updated by tuchanyong
 --            Add hh3cdot1sMstiPortLoopbackGuard in hh3cdot1sPortTable.
+--     V1.18 2022-05-27 Updated by zhengjun
+--            Add hh3cPortMstiTcGuarded hh3cPortMstiLostEdge, hh3cMstiTopologyChange
+--            in hh3cdot1sPortTable.
+--           2022-06-28 Updated by zhengjun
+--            Add hh3cPortMstiProTcGuarded in hh3cdot1sPortTable.
 -- ==================================================================
 -- ==================================================================
 --
@@ -61,11 +66,13 @@ IMPORTS
         FROM SNMPv2-TC
     dot1dStpPortEntry, dot1dStpPort
         FROM BRIDGE-MIB
+    ifDescr
+        FROM IF-MIB
     hh3clswCommon
         FROM HH3C-OID-MIB;
 
     hh3cdot1sMstp MODULE-IDENTITY
-            LAST-UPDATED "202102030000Z"
+            LAST-UPDATED "202206281952Z"
             ORGANIZATION
                 "New H3C Tech. Co., Ltd."
             CONTACT-INFO
@@ -74,6 +81,13 @@ IMPORTS
                 http://www.h3c.com
                 Zip:100085
                 "
+            DESCRIPTION
+            "Added node hh3cPortMstiProTcGuarded."
+            REVISION "202206281952Z"
+            DESCRIPTION
+            "Added node hh3cPortMstiTcGuarded, hh3cPortMstiLostEdge
+            hh3cMstiTopologyChange."
+            REVISION "202205271518Z"
             DESCRIPTION
             "Added node hh3cdot1sMstiPortLoopbackGuard."
             REVISION "202102030000Z"
@@ -929,4 +943,49 @@ IMPORTS
          bridge ID can't be obtained from the BPDU, the designated bridge ID
          will be zero."
      ::= { hh3cMstpEventsV2 8 }
+
+  hh3cMstiTopologyChange NOTIFICATION-TYPE
+     OBJECTS  { hh3cdot1sInstanceID }
+     STATUS   current
+     DESCRIPTION
+         "A topology change trap is sent by a bridge when any of
+         its configured ports transits from the Learning state
+         to the Forwarding state, or from the Forwarding state to
+         the Blocking state."
+     ::= { hh3cMstpEventsV2 9 }
+
+  hh3cPortMstiLostEdge NOTIFICATION-TYPE
+     OBJECTS  { hh3cdot1sMstiPortIndex, ifDescr }
+     STATUS   current
+     DESCRIPTION
+         "The SNMP trap is generated when an edge port
+         receives a BPDU packet, and the port is no longer an edge port."
+     ::= { hh3cMstpEventsV2 10 }
+
+  hh3cMstiTcGuarded NOTIFICATION-TYPE
+     OBJECTS  { hh3cdot1sInstanceID }
+     STATUS   current
+     DESCRIPTION
+         "The SNMP trap is generated when a port received a BPDU after the
+         number of TC BPDUs received by an instance exceeded the threshold."
+     ::= { hh3cMstpEventsV2 11 }
+
+  hh3cMstiProTcGuarded NOTIFICATION-TYPE
+     OBJECTS  { hh3cdot1sInstanceID, hh3cMstiTcGuardVal }
+     STATUS   current
+     DESCRIPTION
+         "The SNMP trap is generated when a port received a BPDU after the
+         number of TC BPDUs received by an instance exceeded the threshold."
+     ::= { hh3cMstpEventsV2 12 }
+
+  hh3cMstpEventsObjects OBJECT IDENTIFIER ::= { hh3cdot1sMstp 22 }
+
+  hh3cMstiTcGuardVal OBJECT-TYPE
+    SYNTAX  Integer32(1..255)
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The msti tc guard value."
+    ::= { hh3cMstpEventsObjects 1 }
+
 END

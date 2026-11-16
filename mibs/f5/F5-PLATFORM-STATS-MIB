@@ -13,7 +13,7 @@ IMPORTS
 
 --================================================================
 f5PlatformStats MODULE-IDENTITY
-    LAST-UPDATED "202101300000Z"
+    LAST-UPDATED "202404180000Z"
     ORGANIZATION "F5 Networks, Inc."
     CONTACT-INFO
          "postal: F5 Networks, Inc.
@@ -23,6 +23,27 @@ f5PlatformStats MODULE-IDENTITY
           email:  support@f5.com"
     DESCRIPTION
         "Top-level infrastructure of the F5 enterprise MIB tree."
+
+    REVISION      "202404180000Z"
+    DESCRIPTION
+            "Added MIB support for FantrayStats on controllers."
+
+    REVISION      "202403060000Z"
+    DESCRIPTION
+            "Added MIB support for baud rate."
+
+    REVISION      "202312260000Z"
+    DESCRIPTION
+            "Added MIB support for PSU stats."
+
+    REVISION      "202312050000Z"
+    DESCRIPTION
+            "Added MIB support for platform components info."
+
+    REVISION      "202309120000Z"
+    DESCRIPTION
+            "Changed display type for platform temperature stats."
+
     ::= { platform 2 }
 
 --================================================================
@@ -34,6 +55,8 @@ platformMemoryStatsTable   OBJECT IDENTIFIER ::= { f5PlatformStatsObjects 4 }
 platformFpgaTable          OBJECT IDENTIFIER ::= { f5PlatformStatsObjects 5 }
 platformFwTable            OBJECT IDENTIFIER ::= { f5PlatformStatsObjects 6 }
 platformFantrayTable       OBJECT IDENTIFIER ::= { f5PlatformStatsObjects 7 }
+platformCompInfoTable      OBJECT IDENTIFIER ::= { f5PlatformStatsObjects 8 }
+platformPsuStatsTable      OBJECT IDENTIFIER ::= { f5PlatformStatsObjects 9 }
 
 --
 -- Textual Conventions
@@ -53,6 +76,18 @@ String ::= TEXTUAL-CONVENTION
     STATUS       current
     DESCRIPTION  "Textual-convention for DisplayString"
     SYNTAX       DisplayString(SIZE(1..255))
+
+TemperatureType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS      current
+    DESCRIPTION "display temperature stats in integer value"
+    SYNTAX      Integer32
+
+PSUStatsType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-3"
+    STATUS      current
+    DESCRIPTION "display type for PSU stats like current, voltage and power stats in decimals value"
+    SYNTAX      Integer32
 
 --
 -- cpu processor statistics table
@@ -90,14 +125,14 @@ index OBJECT-TYPE
     STATUS         current
     DESCRIPTION    "Primary index of Platform Stats Table"
     ::= { cpuProcessorStatsEntry 1 }
-
+              
 cpuIndex OBJECT-TYPE
     SYNTAX         Integer32 (0..255)
     MAX-ACCESS     read-only
     STATUS         current
     DESCRIPTION    "The CPU index"
     ::= { cpuProcessorStatsEntry 2 }
-
+              
 cpuCacheSize OBJECT-TYPE
     SYNTAX         String
     MAX-ACCESS     read-only
@@ -118,7 +153,7 @@ cpuFreq OBJECT-TYPE
     STATUS         current
     DESCRIPTION    "CPU frequency"
     ::= { cpuProcessorStatsEntry 5 }
-
+              
 cpuStepping OBJECT-TYPE
     SYNTAX         String
     MAX-ACCESS     read-only
@@ -132,7 +167,7 @@ cpuThreadCnt OBJECT-TYPE
     STATUS         current
     DESCRIPTION    "CPU currently running thread count"
     ::= { cpuProcessorStatsEntry 7 }
-
+              
 cpuModelName OBJECT-TYPE
     SYNTAX         String
     MAX-ACCESS     read-only
@@ -197,7 +232,7 @@ cpuTotal1minAvg OBJECT-TYPE
      STATUS         current
      DESCRIPTION    "CPU utilization average over the last one minute"
      ::= { cpuUtilizationStatsEntry 4 }
-
+              
 cpuTotal5minAvg OBJECT-TYPE
      SYNTAX         Integer32
      UNITS          "percentage"
@@ -250,7 +285,7 @@ coreName OBJECT-TYPE
      ::= { cpuCoreStatsEntry 2 }
 
 coreCurrent OBJECT-TYPE
-    SYNTAX         Integer32
+    SYNTAX         Integer32 
     UNITS          "percentage"
     MAX-ACCESS     read-only
     STATUS         current
@@ -489,14 +524,14 @@ temperatureStatsEntry OBJECT-TYPE
 
 TEMPERATUREStatsEntry ::=
     SEQUENCE {
-        tempCurrent             DisplayString,
-        tempAverage             DisplayString,
-        tempMinimum             DisplayString,
-        tempMaximum             DisplayString
+        tempCurrent             TemperatureType,
+        tempAverage             TemperatureType,
+        tempMinimum             TemperatureType,
+        tempMaximum             TemperatureType
     }
 
 tempCurrent OBJECT-TYPE
-    SYNTAX         DisplayString(SIZE(1..128))
+    SYNTAX         TemperatureType
     UNITS          "centigrade"
     MAX-ACCESS     read-only
     STATUS         current
@@ -504,7 +539,7 @@ tempCurrent OBJECT-TYPE
     ::= { temperatureStatsEntry 2 }
 
 tempAverage OBJECT-TYPE
-    SYNTAX         DisplayString(SIZE(1..128))
+    SYNTAX         TemperatureType
     UNITS          "centigrade"
     MAX-ACCESS     read-only
     STATUS         current
@@ -513,7 +548,7 @@ tempAverage OBJECT-TYPE
     ::= { temperatureStatsEntry 3 }
 
 tempMinimum OBJECT-TYPE
-    SYNTAX         DisplayString(SIZE(1..128))
+    SYNTAX         TemperatureType
     UNITS          "centigrade"
     MAX-ACCESS     read-only
     STATUS         current
@@ -521,7 +556,7 @@ tempMinimum OBJECT-TYPE
     ::= { temperatureStatsEntry 4 }
 
 tempMaximum OBJECT-TYPE
-    SYNTAX         DisplayString(SIZE(1..128))
+    SYNTAX         TemperatureType
     UNITS          "centigrade"
     MAX-ACCESS     read-only
     STATUS         current
@@ -719,7 +754,14 @@ FANTRAYStatsEntry ::=
         fan-9-speed     Integer32,
         fan-10-speed    Integer32,
         fan-11-speed    Integer32,
-        fan-12-speed    Integer32
+        fan-12-speed    Integer32, 
+	fantray-temperature   TemperatureType,
+	inlet-fan-1-speed     Integer32,
+   	inlet-fan-2-speed     Integer32,
+ 	inlet-fan-3-speed     Integer32,
+  	exhaust-fan-1-speed   Integer32,
+	exhaust-fan-2-speed   Integer32,
+	exhaust-fan-3-speed   Integer32
     }
 
 fan-1-speed OBJECT-TYPE
@@ -818,6 +860,253 @@ fan-12-speed OBJECT-TYPE
     DESCRIPTION    "The current fan speed in RPM"
     ::= { fantrayStatsEntry 12 }
 
+fantray-temperature OBJECT-TYPE
+    SYNTAX         TemperatureType
+    UNITS          "°C"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The temperature sensor reading of the fantray in degrees Celsius."
+    ::= { fantrayStatsEntry 13 }
+
+inlet-fan-1-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry 14 }
+
+inlet-fan-2-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry 15 }
+
+inlet-fan-3-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry 16 }
+
+exhaust-fan-1-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry 17 }
+
+exhaust-fan-2-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry 18 }
+
+exhaust-fan-3-speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current fan speed in RPM"
+    ::= { fantrayStatsEntry 19 }
+
+--
+-- system's component info table
+--
+componentInfoTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF ComponentInfoEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Information about the platform's component info."
+    ::= { platformCompInfoTable 1 }
+
+componentInfoEntry OBJECT-TYPE
+    SYNTAX       ComponentInfoEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Information about the platform's component info."
+    INDEX   { index }
+    ::= { componentInfoTable 1 }
+
+ComponentInfoEntry ::=
+    SEQUENCE {
+        serialNo             DisplayString,
+        model                DisplayString,
+        baudRate             Integer32
+    }
+
+serialNo OBJECT-TYPE
+    SYNTAX         DisplayString
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "component serial number"
+    ::= { componentInfoEntry 1 }
+
+model OBJECT-TYPE
+    SYNTAX         DisplayString
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "component model"
+    ::= { componentInfoEntry 2 }
+
+baudRate OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "component baud rate in bits per second"
+    ::= { componentInfoEntry 3 }
+
+--
+-- platform statistics table
+--
+psuStatsTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF PSUStatsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Information about the platform psu stats."
+    ::= { platformPsuStatsTable 1 }
+
+psuStatsEntry OBJECT-TYPE
+    SYNTAX       PSUStatsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "Information about a single platform."
+    INDEX       { index, psuName}
+    ::= { psuStatsTable 1 }
+
+PSUStatsEntry ::=
+    SEQUENCE {
+        psuName             String,
+        psuSerialNo         String,
+        psuPartNo           String,
+        psuCurrentIn        PSUStatsType,
+        psuCurrentOut       PSUStatsType,
+        psuVoltageIn        PSUStatsType,
+        psuVoltageOut       PSUStatsType,
+        psuTemperature1     TemperatureType,
+        psuTemperature2     TemperatureType,
+        psuTemperature3     TemperatureType,
+        psuFan1Speed        Integer32,
+        psuFan2Speed        Integer32,
+        psuPowerIn          PSUStatsType,
+        psuPowerOut         PSUStatsType
+    }
+
+psuName OBJECT-TYPE
+    SYNTAX         String
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "PSU name"
+    ::= { psuStatsEntry 1 }
+
+psuSerialNo OBJECT-TYPE
+    SYNTAX         String
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Serial number of PSU"
+    ::= { psuStatsEntry 2 }
+
+psuPartNo OBJECT-TYPE
+    SYNTAX         String
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Part number of PSU"
+    ::= { psuStatsEntry 3 }
+
+psuCurrentIn OBJECT-TYPE
+    SYNTAX         PSUStatsType
+    UNITS          "mA"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current input to the power supply unit (PSU) in milliamperes (mA)."
+    ::= { psuStatsEntry 4 }
+
+psuCurrentOut OBJECT-TYPE
+    SYNTAX         PSUStatsType
+    UNITS          "mA"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The current output from the power supply unit (PSU) in milliamperes (mA)."
+    ::= { psuStatsEntry 5 }
+
+psuVoltageIn OBJECT-TYPE
+    SYNTAX         PSUStatsType
+    UNITS          "mV"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The voltage input to the power supply unit (PSU) in millivolts (mV)."
+    ::= { psuStatsEntry 6 }
+
+psuVoltageOut OBJECT-TYPE
+    SYNTAX         PSUStatsType
+    UNITS          "mV"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The voltage output to the power supply unit (PSU) in millivolts (mV)."
+    ::= { psuStatsEntry 7 }
+
+psuTemperature1 OBJECT-TYPE
+    SYNTAX         TemperatureType
+    UNITS          "°C"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The first temperature sensor reading of the power supply unit (PSU) in degrees Celsius."
+    ::= { psuStatsEntry 8 }
+
+psuTemperature2 OBJECT-TYPE
+    SYNTAX         TemperatureType
+    UNITS          "°C"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The second temperature sensor reading of the power supply unit (PSU) in degrees Celsius."
+    ::= { psuStatsEntry 9 }
+
+psuTemperature3 OBJECT-TYPE
+    SYNTAX         TemperatureType
+    UNITS          "°C"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The third temperature sensor reading of the power supply unit (PSU) in degrees Celsius."
+    ::= { psuStatsEntry 10 }
+
+psuFan1Speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The speed of the first fan in the power supply unit (PSU) in RPM (Revolutions Per Minute)."
+    ::= { psuStatsEntry 11 }
+
+psuFan2Speed OBJECT-TYPE
+    SYNTAX         Integer32
+    UNITS          "RPM"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The speed of the second fan in the power supply unit (PSU) in RPM (Revolutions Per Minute)."
+    ::= { psuStatsEntry 12 }
+
+psuPowerIn OBJECT-TYPE
+    SYNTAX         PSUStatsType
+    UNITS          "mW"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The power input to the power supply unit (PSU) in milliwatts (mW)."
+    ::= { psuStatsEntry 13 }
+
+psuPowerOut OBJECT-TYPE
+    SYNTAX         PSUStatsType
+    UNITS          "mW"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The power output from the power supply unit (PSU) in milliwatts (mW)."
+    ::= { psuStatsEntry 14 }
+
 --
 -- Platform Groups
 --
@@ -836,7 +1125,8 @@ platformCompliance MODULE-COMPLIANCE
         MANDATORY-GROUPS { platformCPUGroup, platformDiskGroup,
                            platformTempGroup, platformMemGroup,
                            platformFpgaGroup, platformFwVersionGroup,
-                           platformFantrayGroup }
+                           platformFantrayGroup, componentInfoGroup,
+                           platformPsuStatsGroup }
 ::= { platformCompliances 1 }
 
 platformCPUGroup    OBJECT-GROUP
@@ -888,10 +1178,24 @@ platformFwVersionGroup    OBJECT-GROUP
     ::= { platformGroups 6 }
 
 platformFantrayGroup    OBJECT-GROUP
-    OBJECTS { fan-1-speed, fan-2-speed, fan-3-speed, fan-4-speed, fan-5-speed, fan-6-speed, fan-7-speed, fan-8-speed, fan-9-speed, fan-10-speed, fan-11-speed, fan-12-speed }
+    OBJECTS { fan-1-speed, fan-2-speed, fan-3-speed, fan-4-speed, fan-5-speed, fan-6-speed, fan-7-speed, fan-8-speed, fan-9-speed, fan-10-speed, fan-11-speed, fan-12-speed, fantray-temperature, inlet-fan-1-speed, inlet-fan-2-speed, inlet-fan-3-speed, exhaust-fan-1-speed, exhaust-fan-2-speed, exhaust-fan-3-speed }
     STATUS  current
     DESCRIPTION
             "A collection of objects providing information about Fantray stats."
     ::= { platformGroups 7 }
+
+componentInfoGroup    OBJECT-GROUP
+    OBJECTS { serialNo, model }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing information about platform's component info."
+    ::= { platformGroups 8 }
+
+platformPsuStatsGroup    OBJECT-GROUP
+    OBJECTS { psuName, psuSerialNo, psuPartNo, psuCurrentIn, psuCurrentOut, psuVoltageIn, psuVoltageOut, psuTemperature1, psuTemperature2, psuTemperature3, psuFan1Speed, psuFan2Speed, psuPowerIn, psuPowerOut }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing information about psu stats."
+    ::= { platformGroups 9 }
 
 END

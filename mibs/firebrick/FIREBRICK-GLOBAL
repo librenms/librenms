@@ -27,7 +27,7 @@ IMPORTS
         ;
 
 fbGlobalMib MODULE-IDENTITY
-    LAST-UPDATED "202302170000Z"
+    LAST-UPDATED "202307030000Z"
     ORGANIZATION "Andrews & Arnold Limited"
     CONTACT-INFO
         "Andrews & Arnold
@@ -38,6 +38,8 @@ fbGlobalMib MODULE-IDENTITY
         Tel: +44 3333 400 999
         Email: support@aa.net.uk"
     DESCRIPTION "System wide status"
+    REVISION "202307030000Z"
+    DESCRIPTION "Add buffer free counts"
     REVISION "202302170000Z"
     DESCRIPTION "Add memory usage"
     ::= { firebrickNewStyle 4 }
@@ -58,4 +60,19 @@ fbFreeMem OBJECT-TYPE
     DESCRIPTION "Free RAM (KiB)"
     ::= { fbGlobalMemory 2 }
 
+fbGlobalBuffers OBJECT IDENTIFIER ::= { fbGlobalMib 2 }
+
+fbFreeBuffers OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Small buffers in the global free pool"
+    ::= { fbGlobalBuffers 1 }
+
+fbFreeLargeBuffers OBJECT-TYPE
+    SYNTAX Gauge32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Large buffers in the global free pool"
+    ::= { fbGlobalBuffers 2 }
 END

@@ -19,7 +19,7 @@ EXTREME-SYSTEM-MIB DEFINITIONS ::= BEGIN
     InetAddressType, InetAddress FROM INET-ADDRESS-MIB;
 
     extremeSystem MODULE-IDENTITY
-        LAST-UPDATED "202002121739Z"  --  Wed Feb 12 17:39:00 UTC 2020
+        LAST-UPDATED "202501281400Z" -- Tue Jan 28 14:00 UTC 2025
         ORGANIZATION "Extreme Networks, Inc."
         CONTACT-INFO
                      "Postal:  Extreme Networks, Inc.
@@ -30,6 +30,77 @@ EXTREME-SYSTEM-MIB DEFINITIONS ::= BEGIN
                       WWW:     http://www.extremenetworks.com"
 
         DESCRIPTION "Extreme System objects: objects common to all platforms"
+
+        REVISION    "202501281400Z" -- Tue Jan 28 14:00 UTC 2025
+        DESCRIPTION "Added 5420M-24W-24S-4YE SlotType entry"
+
+        REVISION    "202501091330Z" -- Thu Jan 9 13:30 UTC 2025
+        DESCRIPTION "Changed Inlet Temperature Range to be -24C .. 100C."
+
+        REVISION    "202411221110Z" -- Fri Nov 22 11:10 UTC 2024
+        DESCRIPTION "Added support for Inlet Temperature."
+
+        REVISION    "202408071934Z" -- Wed Aug  7 19:34 UTC 2024
+        DESCRIPTION "Fix name of the 5320-16P-2MXT-2X SlotType entry"
+
+        REVISION    "202405011200Z" -- Wed May 01 12:00 UTC 2024
+        DESCRIPTION "Add 5320-16P-2XT-2X SlotType entry"
+
+        REVISION    "202404261200Z" -- Fri Apr 26 12:00 UTC 2023
+        DESCRIPTION "Add 5120 SlotType entries"
+
+        REVISION    "202309221200Z" -- Fri Sep 22 12:00 UTC 2023
+        DESCRIPTION "Add 4120 SlotType entries"
+
+        REVISION    "202309131430Z" -- Tue Sep 13 14:30 UTC 2023
+        DESCRIPTION "5320 Extended Temperature (XT) models"
+
+        REVISION    "202305022130Z" -- Tue May 2 21:30 UTC 2023
+        DESCRIPTION "Add 5520 ACDC SlotType entries"
+
+        REVISION    "202302162130Z"  -- Thu Feb 16 21:30 UTC 2023
+        DESCRIPTION "Add 7520-48YE-8CE SlotType entry"
+
+        REVISION    "202210111900Z" -- Tue Oct 11 19:00 UTC 2022
+        DESCRIPTION "Add 4220 SlotType entries"
+
+        REVISION    "202209091600Z" -- Fri Sep 09 16:00 UTC 2022
+        DESCRIPTION "Added extremeFanPositionSlotNum, extremeFanPositionTrayNum
+                     and extremeFanPositionFanNum"
+
+        REVISION    "202208222200Z" -- Mon Aug 22 22:00 UTC 2022
+        DESCRIPTION "Add extremeFanFlowType and extremePowerSupplyFanFlowType"
+
+        REVISION    "202204051229Z" -- Thu Apr 05 12:29 UTC 2022
+        DESCRIPTION "Add extremePortNotation OID"
+
+        REVISION    "202203171530Z" -- Thu Mar 17 15:30 UTC 2022
+        DESCRIPTION "Rename extremePowerSupplyTotalPowerAvailable to extremePowerSupplyWattage"
+
+        REVISION    "202203112030Z" -- Fri Mar 11 20:30 UTC 2022
+        DESCRIPTION "Add extremePowerSupplyTotalPowerAvailable"
+
+        REVISION    "202111012000Z" -- Mon Nov 01 20:00 UTC 2021
+        DESCRIPTION "Add 5720, 7520, and 7720 SlotTypes"
+
+        REVISION    "202110071730Z" -- Thu Oct 07 17:30 UTC 2021
+        DESCRIPTION "Remove Exos suffix and shorten prefix to es (for
+                     ExtremeSwitching) from extreme for 5320 SlotTypes"
+
+        REVISION    "202106281630Z" -- Mon Jun 28 16:30 UTC 2021
+        DESCRIPTION "Add 5320 SlotType entries"
+
+        REVISION    "202106031400Z" -- Thu Jun 3 14:00 UTC 2021
+        DESCRIPTION "Added extremeFanPresent."
+
+        REVISION    "202010271400Z" -- Tue Oct 27 14:00 UTC 2020
+        DESCRIPTION "Updated extremeCurrentTemperature range."
+
+        REVISION    "202005282108Z"  --  Thu May 28 21:08:00 UTC 2020
+        DESCRIPTION "Add 5420 SlotType entries"
+
+        REVISION    "202004030108Z"  --  Fri Apr  3 01:08:00 UTC 2020
+        DESCRIPTION "Add 5520 SlotType entries"
 
         REVISION    "202002121739Z"  --  Wed Feb 12 17:39:00 UTC 2020
         DESCRIPTION "Add V300 SlotType entries"
@@ -361,6 +432,9 @@ EXTREME-SYSTEM-MIB DEFINITIONS ::= BEGIN
             x8900msm96(638),
             x870-32c(639),
             x870-96x-8c(640),
+            x560-48mp-10GE4-100GE2(641),
+            x560-48mt-10GE4-100GE2(642),
+            x560-24mp-10GE4-100GE2(643),
             x690-48t-4q-2c(644),
             x690-48x-4q-2c(645),
             x460-G2-16mp-32p-10GE4(646),
@@ -393,7 +467,65 @@ EXTREME-SYSTEM-MIB DEFINITIONS ::= BEGIN
             x435-8p-4s(681),
             x435-8t-4s(682),
             x435-8p-2t-w(683),
-            x465i-48w(684)
+            x465i-48w(684),
+            extreme552024tExos(685),
+            extreme552024wExos(686),
+            extreme552048tExos(687),
+            extreme552048wExos(688),
+            extreme552012mw36wExos(689),
+            extreme552048seExos(690),
+            extreme552024xExos(691),
+            extreme5420f24p4xeExos(692),
+            extreme5420f8w16p4xeExos(693),
+            extreme5420f24t4xeExos(694),
+            extreme5420f48p4xeExos(695),
+            extreme5420f16w32p4xeExos(696),
+            extreme5420f48t4xeExos(697),
+            extreme5420f16mw32p4xeExos(698),
+            extreme5420f24s4xeExos(699),
+            extreme5420f48p4xlExos(700),
+            extreme5420m24w4yeExos(701),
+            extreme5420m24t4yeExos(702),
+            extreme5420m48w4yeExos(703),
+            extreme5420m48t4yeExos(704),
+            extreme5420m16mw32p4yeExos(705),
+            es552024tacdc(706),
+            es552048tacdc(707),
+            es552048seacdc(708),
+            es552024xacdc(709),
+            es532024p8xe(717),
+            es532024t8xe(718),
+            es532048p8xe(719),
+            es532048t8xe(720),
+            es532016p4xe(721),
+            es532016p4xeDc(722),
+            es572024mw(723),
+            es572048mw(724),
+            es572024mxw(725),
+            es572048mxw(726),
+            es752048y8c(727),
+            es752048xt6c(728),
+            es772032c(729),
+            es422012t4x(730),
+            es422024t4x(731),
+            es422048t4x(732),
+            es422012p4x(733),
+            es422024p4x(734),
+            es422048p4x(735),
+            es42204mw8p4x(736),
+            es42204mw20p4x(737),
+            es42208mw40p4x(738),
+            es42208x(739),
+            es532024t4xxt(740),
+            es532024t24s4xext(741),
+            es752048ye8ce(742),
+            es412024mw4y(743),
+            es412048mw4y(744),
+            es512044x4y2c(745),
+            es512024x4y(746),
+            es512024xt4y(747),
+            es532016p2mxt2x(748),
+            es5420m24w24s4ye(749)
         }
 
     PowerValue ::= TEXTUAL-CONVENTION
@@ -457,7 +589,7 @@ EXTREME-SYSTEM-MIB DEFINITIONS ::= BEGIN
     ::= { extremeSystemCommon 7 }
 
     extremeCurrentTemperature OBJECT-TYPE
-        SYNTAX INTEGER (0..100)
+        SYNTAX INTEGER (0..110)
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
@@ -490,8 +622,12 @@ EXTREME-SYSTEM-MIB DEFINITIONS ::= BEGIN
             extremeFanNumber Integer32,
             extremeFanOperational TruthValue,
             extremeFanEntPhysicalIndex  Integer32,
-            extremeFanSpeed Integer32
-
+            extremeFanSpeed Integer32,
+            extremeFanPresent TruthValue,
+            extremeFanFlowType INTEGER,
+            extremeFanPositionSlotNum Unsigned32,
+            extremeFanPositionTrayNum Unsigned32,
+            extremeFanPositionFanNum Unsigned32
         }
 
     extremeFanNumber OBJECT-TYPE
@@ -527,6 +663,55 @@ EXTREME-SYSTEM-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "The speed (RPM) of a cooling fan in the fantray."
     ::= { extremeFanStatusEntry 4 }              
+
+    extremeFanPresent OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object has a value 'true(1)' if the fan is present
+            and a value 'false(2)' otherwise."
+    ::= { extremeFanStatusEntry 5 }
+
+    extremeFanFlowType OBJECT-TYPE
+       SYNTAX INTEGER {
+               frontToBack(1),
+               backToFront(2),
+               unknown(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Direction of the Fan Air Flow:
+             -frontToBack(1) - Front to back flow.
+             -backToFront(2) - Back to front flow.
+             -unknown(3) - Flow can not be determined."
+    ::= { extremeFanStatusEntry 6 }
+
+    extremeFanPositionSlotNum OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The 1-based slot number."
+    ::= { extremeFanStatusEntry 7 }
+
+    extremeFanPositionTrayNum OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The 1-based fan tray number in a slot."
+    ::= { extremeFanStatusEntry 8 }
+
+    extremeFanPositionFanNum OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The 1-based fan number in a fan tray."
+    ::= { extremeFanStatusEntry 9 }
+
 
     extremePrimaryPowerOperational OBJECT-TYPE
         SYNTAX TruthValue
@@ -707,8 +892,10 @@ EXTREME-SYSTEM-MIB DEFINITIONS ::= BEGIN
             extremePowerSupplySource INTEGER,
             extremePowerSupplyInputPowerUsage Integer32,
             extremePowerMonSupplyNumOutput Integer32,
-            extremePowerSupplyInputPowerUsageUnitMultiplier UnitMultiplier
-            
+            extremePowerSupplyInputPowerUsageUnitMultiplier UnitMultiplier,
+            extremePowerSupplyWattage Integer32,
+            extremePowerSupplyFanFlowType INTEGER
+
         }
 
     extremePowerSupplyNumber OBJECT-TYPE
@@ -805,6 +992,28 @@ EXTREME-SYSTEM-MIB DEFINITIONS ::= BEGIN
                         " The magnitude of watts for the usage value in extremePowerSupplyInputPowerUsage."
     ::= { extremePowerSupplyEntry 11 }
 
+    extremePowerSupplyWattage OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        " Total power available in watts from the power supply unit"
+     ::= { extremePowerSupplyEntry 12 }
+
+    extremePowerSupplyFanFlowType OBJECT-TYPE
+                SYNTAX INTEGER {
+                       frontToBack(1),
+                       backToFront(2),
+                       unknown(3)
+                }
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Direction of power supply Fan Air Flow.
+                         -frontToBack(1) - Front to back flow.
+                         -backToFront(2) - Back to front flow.
+                         -unknown(3) - Flow can not be determined."
+     ::= { extremePowerSupplyEntry 13 }
 
      extremeCpuAggregateUtilization OBJECT-TYPE
         SYNTAX Integer32
@@ -2487,5 +2696,48 @@ extremeSystemPowerUsageNotification NOTIFICATION-TYPE
                "Configure how often configuration is automatically saved. It is configured
                 in minutes."
       ::= { extremeAutoSave 3 }
+
+      extremePortNotation OBJECT-TYPE
+          SYNTAX INTEGER {
+              portColonChannel(1), -- 4:5
+              slotColonPortColonChannel(2), -- 1:4:5
+              portSlashChannel(3), -- 4/5
+              slotSlashPortSlashChannel(4) -- 1/4/5
+          }
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+              "Identifies the port notation and delimiter format used by ifName.  It is
+               used to disambiguate port specifications having a single delimiter.  That
+               is, to determine whether a slot number is included in a port specification
+               or not. By default, a standalone setup does not specify a slot number, but
+               port notation can be configured to include a slot number.  If the notation
+               is portColonChannel(1), no slot number is included and port specifications
+               will be formatted as 'port:channel' or 'port'.  For stacking or VPEX, a
+               slot number is included and notation will be slotColonPortColonChannel(2)
+               meaning that ports are formatted as 'slot:port:channel' or 'slot:port'.
+               The values of portSlotChannel(3) and slotSlashPortSlashChannel(4) are not
+               used currently but are reserved for future use.  Note that a channel number
+               will only (and always) be specified for channelized ports, regardless of
+               port notation."
+      ::= { extremeSystemCommon 54 }
+
+      extremeInletTemperature OBJECT-TYPE
+          SYNTAX INTEGER (-24..100)
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+          "Current temperature in degrees celcius measured outside
+          device enclosure."
+      ::= { extremeSystemCommon 55 }
+
+      extremeInletTemperatureStatus OBJECT-TYPE
+          SYNTAX INTEGER { notPresent(1), present(2) }
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION
+          "Operational status of inlet temperature sensor."
+    ::= { extremeSystemCommon 56 }
+
 
 END

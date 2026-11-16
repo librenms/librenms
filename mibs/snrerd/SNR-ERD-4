@@ -3,7 +3,7 @@ SNR-ERD-4 DEFINITIONS ::= BEGIN
 IMPORTS
 	MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
 		FROM SNMPv2-SMI
-	enterprises, IpAddress, Counter					
+	enterprises, IpAddress, Counter			
 		FROM RFC1155-SMI
 	DisplayString
 		FROM RFC1213-MIB
@@ -11,172 +11,205 @@ IMPORTS
 		FROM SNMPv2-CONF
 	; 
 
-snr MODULE-IDENTITY
-	LAST-UPDATED	"201810261200Z"
+snr-erd-4 MODULE-IDENTITY
+	LAST-UPDATED	"202103021200Z"
 	ORGANIZATION	"NAG "
 	CONTACT-INFO	"erd@nag.ru"
 	DESCRIPTION
-		"The MIB module for SNR-ERD"
-	REVISION		"201504291200Z"
+		"The MIB module for SNR-ERD-4"
+	REVISION	"202104271200Z"
 	DESCRIPTION
-		"Initial revision." 
-	::= { enterprises 40418 }
+		"Unofficial version for ERD-4 that fix compatibility for 202103021200Z"
+	REVISION	"202102151200Z"
+	DESCRIPTION
+		"Official version for ERD-4 that broke compatibility because all oid renamed"
+	REVISION	"202103021200Z"
+	DESCRIPTION
+		"UNofficial version for ERD-4 with firmware 2.x
+		add units in MIB, change MIB style"
+	REVISION	"202008221200Z"
+	DESCRIPTION
+		"version for ERD-4 with firmware 2.x"
+	REVISION	"201907291200Z"
+	DESCRIPTION
+		"version for ERD-4 with firmware 0.2.x indutrial"
+	REVISION	"201812291200Z"
+	DESCRIPTION
+		"version 1.9 for ERD-4 with firmware 1.x"
+	REVISION	"201809121200Z"
+	DESCRIPTION
+		"version 1.8 for ERD-4 with firmware 1.x"
+	REVISION	"201805181200Z"
+	DESCRIPTION
+		"version 1.7 for ERD-4 with firmware 1.x"
+	REVISION	"201712271200Z"
+	DESCRIPTION
+		"version 1.6 for ERD-4 with firmware 1.x"
+	REVISION	"201504291200Z"
+	DESCRIPTION
+		"Initial revision."
+::= { snr-erd 6 }
 
-
+snr		OBJECT IDENTIFIER	::= { enterprises 40418 }
 snr-erd		OBJECT IDENTIFIER	::= { snr 2 }
-snr-erd-4	OBJECT IDENTIFIER	::= { snr-erd 6 }
 
-measurements		OBJECT IDENTIFIER	 ::= { snr-erd-4 1 }
+SensorID ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT "d"
+	STATUS       current
+	DESCRIPTION
+		"This data type is a non-negative value."
+	SYNTAX       Unsigned32 (0..4294967295)
 
-dio			OBJECT IDENTIFIER	::= { snr-erd-4 2 }
-serial			OBJECT IDENTIFIER	::= { snr-erd-4 4 }
-modules			OBJECT IDENTIFIER	::= { snr-erd-4 5 }
-options			OBJECT IDENTIFIER	::= { snr-erd-4 10 }
-diffparams		OBJECT IDENTIFIER	::= { snr-erd-4 11 }
+measurements	OBJECT IDENTIFIER	 ::= { snr-erd-4 1 }
+dio		OBJECT IDENTIFIER	::= { snr-erd-4 2 }
+serial		OBJECT IDENTIFIER	::= { snr-erd-4 4 }
+modules		OBJECT IDENTIFIER	::= { snr-erd-4 5 }
+options		OBJECT IDENTIFIER	::= { snr-erd-4 10 }
+diffparams	OBJECT IDENTIFIER	::= { snr-erd-4 11 }
 
 
 oneWire		OBJECT IDENTIFIER	::= { measurements 1 }
-sp			OBJECT IDENTIFIER	::= { measurements 30 }
+sp		OBJECT IDENTIFIER	::= { measurements 30 }
 sensorsTemplate	OBJECT IDENTIFIER	::= { measurements 50 }
 
 rs485		OBJECT IDENTIFIER	::= { serial 1 }
 rs232		OBJECT IDENTIFIER	::= { serial 2 }
 
-gsm			OBJECT IDENTIFIER	::= { modules 1 }
-rf			OBJECT IDENTIFIER	::= { modules 2 }
+gsm		OBJECT IDENTIFIER	::= { modules 1 }
+rf		OBJECT IDENTIFIER	::= { modules 2 }
 
-upsStatus		OBJECT IDENTIFIER	::= { diffparams 1 }
+upsStatus	OBJECT IDENTIFIER	::= { diffparams 1 }
 
-pid			OBJECT IDENTIFIER	::= { diffparams 10 }
+pid		OBJECT IDENTIFIER	::= { diffparams 10 }
 
-traps			OBJECT IDENTIFIER	::= { snr-erd-4 0 }
+traps		OBJECT IDENTIFIER	::= { snr-erd-4 0 }
 
-crit			OBJECT IDENTIFIER	::= { options 10 }
+crit		OBJECT IDENTIFIER	::= { options 10 }
 
 -- measurements
 
-adcSensor		OBJECT-TYPE
-	SYNTAX		INTEGER
-        MAX-ACCESS	read-only
-        STATUS		current
-        DESCRIPTION	"ADC sensor value"
+adcSensor OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"Volt DC"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"ADC sensor value"
 ::= { measurements 2 }
 
-temperatureDHT		OBJECT-TYPE
-	SYNTAX		INTEGER
-        MAX-ACCESS	read-only
-        STATUS		current
-        DESCRIPTION	"DHT temperature value"
+temperatureDHT OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"degrees Centigrade"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"DHT temperature value"
 ::= { measurements 8 }
 
-humidityDHT		OBJECT-TYPE
-	SYNTAX		INTEGER
-        MAX-ACCESS	read-only
-        STATUS		current
-        DESCRIPTION	"DHT humidity value"
+humidityDHT OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"%"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"DHT humidity value"
 ::= { measurements 9 }
 
 -- dtsTable
 
 dtsTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF dtsEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION	"A list of temperature sensors values"
-    ::= { oneWire 1 }
+	SYNTAX		SEQUENCE OF dtsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A list of temperature sensors values"
+::= { oneWire 1 }
 
 dtsEntry OBJECT-TYPE
-    SYNTAX      dtsEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION	"An entry (conceptual row) in the dtsTable"
-    INDEX   { dtsId } 
+	SYNTAX		dtsEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry (conceptual row) in the dtsTable"
+	INDEX   { dtsId } 
 ::= { dtsTable 1 }
 
 dtsEntry ::=
     SEQUENCE {
-        dtsId           	UInteger32,
-	dtsName			OctetString,
-        dtsTemp            	Integer,
-		tempCritNotif		Integer,
-		tempCritMin			Integer,
-		tempCritMax			Integer
+	dtsId		SensorID,
+	dtsName		OctetString,
+	dtsTemp		Integer,
+	tempCritNotif	Integer,
+	tempCritMin	Integer,
+	tempCritMax	Integer
     }
 
-dtsId 		OBJECT-TYPE
-    SYNTAX      UInteger32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION	"Temperature sensor id"
-    ::= { dtsEntry 1 }
+dtsId OBJECT-TYPE
+	SYNTAX		SensorID
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Temperature sensor id"
+::= { dtsEntry 1 }
 
-dtsName 	OBJECT-TYPE
-    SYNTAX      OCTET STRING
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION	"Name (max 20)"
-    ::= { dtsEntry 2 }
+dtsName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Name (max 20)"
+::= { dtsEntry 2 }
 
-dtsTemp 	OBJECT-TYPE
-    SYNTAX      INTEGER
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "Temperature value"
-    ::= { dtsEntry 3 }
+dtsTemp OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS		"degrees Centigrade"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Temperature value"
+::= { dtsEntry 3 }
 	
-tempCritNotif	OBJECT-TYPE
+tempCritNotif OBJECT-TYPE
 	SYNTAX		INTEGER
 		{
-				No	(0),
-				Yes	(1),
+			No	(0),
+			Yes	(1),
 		}
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"Enable notifications on the critical temperature"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Enable notifications on the critical temperature"
 ::= { dtsEntry 10 }
-	
-tempCritMin		OBJECT-TYPE
+
+tempCritMin OBJECT-TYPE
 	SYNTAX		INTEGER
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"Minimal critical temperature. 
-Up to -55 °C"
+	UNITS		"degrees Centigrade"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Minimal critical temperature. Up to -55 C"
 ::= { dtsEntry 15 }
 
-tempCritMax	OBJECT-TYPE
+tempCritMax OBJECT-TYPE
 	SYNTAX		INTEGER
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"Maximum critical temperature. 
-Up to +125°C"
+	UNITS		"degrees Centigrade"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Maximum critical temperature. Up to +125 C"
 ::= { dtsEntry 16 }
 
 -- shuntTable
-
 shuntTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF shuntEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-            "A list of SNR-SHUNT values"
-    ::= { oneWire 2 }
+	SYNTAX		SEQUENCE OF shuntEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A list of SNR-SHUNT values"
+::= { oneWire 2 }
 
 shuntEntry OBJECT-TYPE
-    SYNTAX      shuntEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-            "An entry (conceptual row) in the shuntTable"
-    INDEX   { shuntId }
-    ::= { shuntTable 1 }
+	SYNTAX		shuntEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry (conceptual row) in the shuntTable"
+	INDEX   { shuntId }
+::= { shuntTable 1 }
 
 shuntEntry ::=
     SEQUENCE {
-        shuntId      	UInteger32,
+	shuntId		SensorID,
 	shuntName	OctetString,
-        shuntTemp       Integer,
-        shuntVolt       Integer,
+	shuntTemp	Integer,
+	shuntVolt	Integer,
 	shuntCurrent	Integer,
 	shuntCapacity	Integer,
 	shuntChrgCap	Integer,
@@ -187,176 +220,163 @@ shuntEntry ::=
 	shuntDischTime	TimeTicks
     }
 
-shuntId 	OBJECT-TYPE
-    SYNTAX      UInteger32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "SNR-SHUNT id"
-    ::= { shuntEntry 1 }
+shuntId OBJECT-TYPE
+	SYNTAX		SensorID
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"SNR-SHUNT id"
+::= { shuntEntry 1 }
 
 shuntName OBJECT-TYPE
-    SYNTAX      OCTET STRING
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-            "Name (max 20)"
-    ::= { shuntEntry 2 }
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Name (max 20)"
+::= { shuntEntry 2 }
 
 shuntTemp OBJECT-TYPE
-    SYNTAX      INTEGER
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "Temperature value"
-    ::= { shuntEntry 3 }
+	SYNTAX		INTEGER
+	UNITS		"degrees Centigrade"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Temperature value"
+::= { shuntEntry 3 }
 
 shuntVolt OBJECT-TYPE
-    SYNTAX      INTEGER
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-            "Voltage"
-    ::= { shuntEntry 4 }
+	SYNTAX		INTEGER
+	UNITS		"Volt DC"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Voltage"
+::= { shuntEntry 4 }
 
 shuntCurrent OBJECT-TYPE
-    SYNTAX      INTEGER
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-            "Current"
-    ::= { shuntEntry 5 }
+	SYNTAX		INTEGER
+	UNITS		"Amp DC"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Current"
+::= { shuntEntry 5 }
 
 shuntChrgLvl OBJECT-TYPE
-    SYNTAX      INTEGER
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-            "Battery charge level (0..100%)"
-    ::= { shuntEntry 6 }
+	SYNTAX		INTEGER
+	UNITS		"%"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Battery charge level (0..100%)"
+::= { shuntEntry 6 }
 
-shuntChrgCap 	OBJECT-TYPE
-    SYNTAX      INTEGER
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "Charge capacity"
-    ::= { shuntEntry 7 }
+shuntChrgCap OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Charge capacity"
+::= { shuntEntry 7 }
 
 shuntDischCap OBJECT-TYPE
-    SYNTAX      INTEGER
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "Discharge capacity"
-    ::= { shuntEntry 8 }
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Discharge capacity"
+::= { shuntEntry 8 }
 
 shuntEndOfChrg OBJECT-TYPE
-    SYNTAX      OCTET STRING
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "End of charge time"
-    ::= { shuntEntry 9 }
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"End of charge time"
+::= { shuntEntry 9 }
 
 shuntDiscn OBJECT-TYPE
-    SYNTAX      OCTET STRING
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "Disconnect time"
-    ::= { shuntEntry 10 }
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Disconnect time"
+::= { shuntEntry 10 }
 
 shuntBatLive OBJECT-TYPE
-    SYNTAX      TimeTicks
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "Battery using period"
-    ::= { shuntEntry 11 }
+	SYNTAX		TimeTicks
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Battery using period"
+::= { shuntEntry 11 }
 
 shuntDischTime OBJECT-TYPE
-    SYNTAX      TimeTicks
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "Time to full discharge"
-    ::= { shuntEntry 12 }
+	SYNTAX		TimeTicks
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Time to full discharge"
+::= { shuntEntry 12 }
 
 
 -- wirelessSensors
 
 rfshtpTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF rfshtpEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-            "A list of wireless sensors values"
-    ::= { measurements 10 }
+	SYNTAX		SEQUENCE OF rfshtpEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A list of wireless sensors values"
+::= { measurements 10 }
 
 rfshtpEntry OBJECT-TYPE
-    SYNTAX      rfshtpEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-            "An entry (conceptual row) 
-in the wrlssSensTable"
-    INDEX   { wrlssSensIdent }
-    ::= { rfshtpTable 1 }
+	SYNTAX		rfshtpEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry (conceptual row) in the wrlssSensTable"
+	INDEX   { wrlssSensIdent }
+::= { rfshtpTable 1 }
 
 rfshtpEntry ::=
     SEQUENCE {
-        rfshtpId           OctetString,
-        rfshtpName         OctetString,
-        rfshtpTemp         Integer,
-	rfshtpHum	   Integer,
-	rfshtpPres	   Integer
+	rfshtpId	OctetString,
+	rfshtpName	OctetString,
+	rfshtpTemp	Integer,
+	rfshtpHum	Integer,
+	rfshtpPres	Integer
     }
 
 rfshtpId OBJECT-TYPE
-    SYNTAX      OCTET STRING
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "Wireless sensor id"
-    ::= { rfshtpEntry 1 }
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Wireless sensor id"
+::= { rfshtpEntry 1 }
 
 rfshtpName OBJECT-TYPE
-    SYNTAX      OCTET STRING
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-            "Name (max 20)"
-    ::= { rfshtpEntry 2 }
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Name (max 20)"
+::= { rfshtpEntry 2 }
 
 rfshtpTemp OBJECT-TYPE
-    SYNTAX      INTEGER
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "Temperature value"
-    ::= { rfshtpEntry 3 }
+	SYNTAX		INTEGER
+	UNITS		"degrees Centigrade"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Temperature value"
+::= { rfshtpEntry 3 }
 
 rfshtpHum OBJECT-TYPE
-    SYNTAX      INTEGER
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "Humidity value"
-    ::= { rfshtpEntry 4 }
+	SYNTAX		INTEGER
+	UNITS		"%"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Humidity value"
+::= { rfshtpEntry 4 }
 
 rfshtpPres OBJECT-TYPE
-    SYNTAX      INTEGER
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "Pressure value"
-    ::= { rfshtpEntry 5 }
+	SYNTAX		INTEGER
+	UNITS		"mm Hg"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Pressure value"
+::= { rfshtpEntry 5 }
 
 -- sp
 
 -- rsshtpTable
-rsshtpTable		OBJECT-TYPE
+rsshtpTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF rsshtpEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
@@ -367,88 +387,90 @@ rsshtpEntry OBJECT-TYPE
 	SYNTAX		rsshtpEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
-	DESCRIPTION	"An entry (conceptual row) 
-in the rsshtpTable"
+	DESCRIPTION	"An entry (conceptual row) in the rsshtpTable"
 	INDEX		{ rsshtpIdent }
 ::= { rsshtpTable 1 }
 
-rsshtpEntry ::= SEQUENCE 
-{
-    rsshtpIdent	OctetString,
+rsshtpEntry ::=
+    SEQUENCE {
+	rsshtpIdent	OctetString,
 	rsshtpName	OctetString,
-    rsshtpTemp	Integer,
-	rsshtpHum	Integer,
-	rsshtpPssr	Integer,
-	tempCritNotif		Integer,
-	tempCritMin			Integer,
-	tempCritMax			Integer
-}
+	rsshtpTemp	Integer32,
+	rsshtpHum	Integer32,
+	rsshtpPssr	Integer32,
+	tempCritNotif	Integer,
+	tempCritMin	Integer32,
+	tempCritMax	Integer32
+    }
 
-rsshtpIdent		OBJECT-TYPE
+rsshtpIdent OBJECT-TYPE
 	SYNTAX		OCTET STRING
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"SNR-RSsensor-H/T/P id"
 ::= { rsshtpEntry 1 }
 
-rsshtpName		OBJECT-TYPE
-    	SYNTAX      	OCTET STRING
-    	MAX-ACCESS  	read-write
-    	STATUS      	current
-    	DESCRIPTION 	"Name (max 20)"
+rsshtpName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION 	"Name (max 20)"
 ::= { rsshtpEntry 2 }
 
-rsshtpTemp		OBJECT-TYPE
-	SYNTAX		INTEGER
+rsshtpTemp OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"degrees Centigrade"
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"Temperature value 1"
+	DESCRIPTION	"Temperature value"
 ::= { rsshtpEntry 3 }
 
-rsshtpHum		OBJECT-TYPE
-	SYNTAX		INTEGER
+rsshtpHum OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"%"
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"Humidity value"
 ::= { rsshtpEntry 4 }
 
-rsshtpPssr		OBJECT-TYPE
-	SYNTAX		INTEGER
+rsshtpPssr OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"mm Hg"
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"Pressure value"
 ::= { rsshtpEntry 6 }
 
-tempCritNotif	OBJECT-TYPE
+tempCritNotif OBJECT-TYPE
 	SYNTAX		INTEGER
 		{
-				No	(0),
-				Yes	(1),
+			No	(0),
+			Yes	(1)
 		}
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"Enable notifications on the critical temperature"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Enable notifications on the critical temperature"
 ::= { rsshtpEntry 10 }
 	
-tempCritMin		OBJECT-TYPE
-	SYNTAX		INTEGER
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"Minimal critical temperature. 
-Up to -55 °C"
+tempCritMin OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"degrees Centigrade"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Minimal critical temperature. Up to -55 C"
 ::= { rsshtpEntry 15 }
 
-tempCritMax	OBJECT-TYPE
-	SYNTAX		INTEGER
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"Maximum critical temperature. 
-Up to +125°C"
+tempCritMax OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"degrees Centigrade"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Maximum critical temperature. Up to +125 C"
 ::= { rsshtpEntry 16 }
 
 -- rscounterTable
 
-rscounterTable		OBJECT-TYPE
+rscounterTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF rscounterEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
@@ -464,153 +486,149 @@ in the rscounterTable"
 	INDEX		{ rscounterIdent }
 ::= { rscounterTable 1 }
 
-rscounterEntry ::= SEQUENCE 
-{
-    rscounterIdent	OctetString,
+rscounterEntry ::=
+    SEQUENCE {
+	rscounterIdent	OctetString,
 	rscounterName	OctetString,
-}
+    }
 
-rscounterIdent		OBJECT-TYPE
+rscounterIdent OBJECT-TYPE
 	SYNTAX		OCTET STRING
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"SNR-RS-Counter id"
 ::= { rscounterEntry 1 }
 
-rscounterName		OBJECT-TYPE
-    	SYNTAX      	OCTET STRING
-    	MAX-ACCESS  	read-write
-    	STATUS      	current
-    	DESCRIPTION 	"Name (max 20)"
+rscounterName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Name (max 20)"
 ::= { rscounterEntry 2 }
 
 
 -- rsshtp1WTable
-rsshtp1WTable		OBJECT-TYPE
+rsshtp1WTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF rsshtp1WEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
-	DESCRIPTION	"A list of temperature sensors 
-are connected to SNR-RSsensor-H/T/P"
+	DESCRIPTION	"A list of temperature sensors are connected to SNR-RSsensor-H/T/P"
 ::= { sp 100 }
 
-rsshtp1WEntry 		OBJECT-TYPE
+rsshtp1WEntry OBJECT-TYPE
 	SYNTAX		rsshtp1WEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
-	DESCRIPTION	"An entry (conceptual row) 
-in the rsshtp1WTable"
+	DESCRIPTION	"An entry (conceptual row) in the rsshtp1WTable"
 	INDEX		{ rsshtp1WIdent }
 ::= { rsshtp1WTable 1 }
 
-rsshtp1WEntry ::= SEQUENCE 
-{
-        rsshtp1WIdent	UInteger32,
+rsshtp1WEntry ::=
+    SEQUENCE {
+	rsshtp1WIdent	SensorID,
 	rsshtp1WName	OctetString,
-        rsshtp1WTemp	Integer,
+	rsshtp1WTemp	Integer32,
 	rsshtp1WMaster	OctetString,
-	tempCritNotif		Integer,
-	tempCritMin			Integer,
-	tempCritMax			Integer
-}
+	tempCritNotif	Integer,
+	tempCritMin	Integer32,
+	tempCritMax	Integer32
+    }
 
-rsshtp1WIdent		OBJECT-TYPE
-	SYNTAX		UInteger32
+rsshtp1WIdent OBJECT-TYPE
+	SYNTAX		SensorID
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"Temperature sensor id"
 ::= { rsshtp1WEntry 1 }
 
 rsshtp1WName OBJECT-TYPE
-    	SYNTAX      OCTET STRING
-    	MAX-ACCESS  read-write
-    	STATUS      current
-    	DESCRIPTION "Name (max 20)"
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Name (max 20)"
 ::= { rsshtp1WEntry 2 }
 
-rsshtp1WTemp		OBJECT-TYPE
-	SYNTAX		INTEGER
+rsshtp1WTemp OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"degrees Centigrade"
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"Temperature value"
 ::= { rsshtp1WEntry 3 }
 
-rsshtp1WMaster		OBJECT-TYPE
+rsshtp1WMaster OBJECT-TYPE
 	SYNTAX		OCTET STRING
 	MAX-ACCESS	read-only
 	STATUS		current
-	DESCRIPTION	"Name of the SNR-RSsensor-H/T/P 
-which this temperature sensor 
-is connected to"
+	DESCRIPTION	"Name of the SNR-RSsensor-H/T/P which this temperature sensor is connected to"
 ::= { rsshtp1WEntry 4 }
 
-tempCritNotif	OBJECT-TYPE
-	SYNTAX		INTEGER
+tempCritNotif OBJECT-TYPE
+	SYNTAX	INTEGER
 		{
-				No	(0),
-				Yes	(1),
+			No	(0),
+			Yes	(1)
 		}
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"Enable notifications on the critical temperature"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Enable notifications on the critical temperature"
 ::= { rsshtp1WEntry 10 }
 	
-tempCritMin		OBJECT-TYPE
-	SYNTAX		INTEGER
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"Minimal critical temperature. 
-Up to -55 °C"
+tempCritMin OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"degrees Centigrade"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Minimal critical temperature. Up to -55 \B0C"
 ::= { rsshtp1WEntry 15 }
 
-tempCritMax	OBJECT-TYPE
-	SYNTAX		INTEGER
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"Maximum critical temperature. 
-Up to +125°C"
+tempCritMax OBJECT-TYPE
+	SYNTAX		Integer32
+	UNITS		"degrees Centigrade"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Maximum critical temperature. Up to +125\B0C"
 ::= { rsshtp1WEntry 16 }
 
 -- sensorsTemplate
 
-sensorsTemplateTable		OBJECT-TYPE
+sensorsTemplateTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF sensorsTemplateEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION	"A list of sensors values"
 ::= { sensorsTemplate 1 }
 
-sensorsTemplateEntry 		OBJECT-TYPE
+sensorsTemplateEntry OBJECT-TYPE
 	SYNTAX		sensorsTemplateEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
-	DESCRIPTION	"An entry (conceptual row) 
-in the rsshtp1WTable"
+	DESCRIPTION	"An entry (conceptual row) in the rsshtp1WTable"
 	INDEX		{ sensorsTemplateValue }
 ::= { sensorsTemplateTable 1 }
 
-sensorsTemplateEntry ::= SEQUENCE 
-{
-    sensorsTemplateValue	Integer,
-	sensorsTemplateName		OctetString
-}
+sensorsTemplateEntry ::=
+    SEQUENCE {
+	sensorsTemplateValue	Integer,
+	sensorsTemplateName	OctetString
+    }
 
-sensorsTemplateValue		OBJECT-TYPE
+sensorsTemplateValue OBJECT-TYPE
 	SYNTAX		INTEGER
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"Current value"
 ::= { sensorsTemplateEntry 1 }
 
-sensorsTemplateName			OBJECT-TYPE
+sensorsTemplateName OBJECT-TYPE
     	SYNTAX      OCTET STRING
     	MAX-ACCESS  read-write
     	STATUS      current
     	DESCRIPTION "Name"
 ::= { sensorsTemplateEntry 2 }
 
-sensorsTemplateTotalConnected		OBJECT-TYPE
-	SYNTAX		INTEGER
+sensorsTemplateTotalConnected OBJECT-TYPE
+	SYNTAX		Integer32
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"Total value of connected sensors"
@@ -618,44 +636,43 @@ sensorsTemplateTotalConnected		OBJECT-TYPE
 
 -- dio
 
-diTable			OBJECT-TYPE
+diTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF diEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION	"A list of digital inputs values"
 ::= { dio 1 }
 
-diEntry 		OBJECT-TYPE
+diEntry OBJECT-TYPE
 	SYNTAX		diEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
-	DESCRIPTION	"An entry (conceptual row) 
-in the diTable"
+	DESCRIPTION	"An entry (conceptual row) in the diTable"
 ::= { diTable 1 }
 
 diEntry ::= SEQUENCE 
 {
 	diName		OctetString,
-    diAlarmName	OctetString,
+	diAlarmName	OctetString,
 	diState		Integer,
 	diCnt		Counter
 }
 
-diName			OBJECT-TYPE
+diName OBJECT-TYPE
 	SYNTAX		OCTET STRING
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"Digital input name"
 ::= { diEntry 1 }
 
-diAlarmName		OBJECT-TYPE
+diAlarmName OBJECT-TYPE
 	SYNTAX		OCTET STRING
 	MAX-ACCESS	read-write
 	STATUS		current
 	DESCRIPTION	"Alarm name"
 ::= { diEntry 2 }
 
-diState			OBJECT-TYPE
+diState OBJECT-TYPE
 	SYNTAX		INTEGER
 			{
 				low	(0),
@@ -667,612 +684,549 @@ diState			OBJECT-TYPE
 	DESCRIPTION	"Digital input state"
 ::= { diEntry 3 }
 
-diCnt			OBJECT-TYPE
+diCnt OBJECT-TYPE
 	SYNTAX		Counter
 	MAX-ACCESS	read-write
 	STATUS		current
-	DESCRIPTION	"Digital input impulse counter. 
-	Writable for reset only. Set 0 to reset"
+	DESCRIPTION	"Digital input impulse counter. Writable for reset only. Set 0 to reset"
 ::= { diEntry 4 }
 
 
-doTable			OBJECT-TYPE
+doTable OBJECT-TYPE
 	SYNTAX		SEQUENCE OF doEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
 	DESCRIPTION	"A list of digital outputs values"
 ::= { dio 2 }
 
-doEntry 		OBJECT-TYPE
+doEntry OBJECT-TYPE
 	SYNTAX		doEntry
 	MAX-ACCESS	not-accessible
 	STATUS		current
-	DESCRIPTION	"An entry (conceptual row) 
-in the doTable"
+	DESCRIPTION	"An entry (conceptual row) in the doTable"
 ::= { doTable 1 }
 
-doEntry ::= SEQUENCE 
-{
-	doName			OctetString,
+doEntry ::=
+    SEQUENCE {
+	doName		OctetString,
 	doDeviceName	OctetString,
-	doState			Integer,
-	doResetTime		Integer
-}
+	doState		Integer,
+	doResetTime	Integer
+    }
 
-doName			OBJECT-TYPE
+doName OBJECT-TYPE
 	SYNTAX		OCTET STRING
 	MAX-ACCESS	read-only
 	STATUS		current
 	DESCRIPTION	"Digital output name"
 ::= { doEntry 1 }
 
-doDeviceName	OBJECT-TYPE
+doDeviceName OBJECT-TYPE
 	SYNTAX		OCTET STRING
 	MAX-ACCESS	read-write
 	STATUS		current
 	DESCRIPTION	"Digital output custom name"
 ::= { doEntry 2 }
 
-doState			OBJECT-TYPE
-	SYNTAX		INTEGER
-			{
-				off	(0),
-				on	(1),
-				reload	(2)
-			}
+doState OBJECT-TYPE
+	SYNTAX	INTEGER
+		{
+			off	(0),
+			on	(1),
+			reload	(2)
+		}
 	MAX-ACCESS	read-write
 	STATUS		current
 	DESCRIPTION	"Digital output state"
 ::= { doEntry 3 }
 
-doResetDelay		OBJECT-TYPE
+doResetDelay OBJECT-TYPE
 	SYNTAX		INTEGER
+	UNITS		"sec"
 	MAX-ACCESS	read-write
 	STATUS		current
-	DESCRIPTION	"Reload period (sec)"
+	DESCRIPTION	"Reload period"
 ::= { doEntry 4 }
 
-uSenseState		OBJECT-TYPE
-	SYNTAX		INTEGER
-			{
-				off	(0),
-				on	(1)
-			}
-        MAX-ACCESS	read-only
-        STATUS		current
-        DESCRIPTION	"Voltage sensor state"
+uSenseState OBJECT-TYPE
+	SYNTAX	INTEGER
+		{
+			off	(0),
+			on	(1)
+		}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Voltage sensor state"
 ::= { dio 3 }
 
 --serial
 
-connectStatusRS485		OBJECT-TYPE
-		SYNTAX		INTEGER
-			{
-				No	(0),
-				Yes	(1)
-			}
-        MAX-ACCESS	read-only
-        STATUS		current
-        DESCRIPTION	"RS485 TCP connection status"
+connectStatusRS485 OBJECT-TYPE
+	SYNTAX	INTEGER
+		{
+			No	(0),
+			Yes	(1)
+		}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"RS485 TCP connection status"
 ::= { rs485 1 }
 
-ipAddrRS485		OBJECT-TYPE
-		SYNTAX		IPADDRESS
-        MAX-ACCESS	read-only
-        STATUS		current
-        DESCRIPTION	"RS485 TCP connection IP address"
+ipAddrRS485 OBJECT-TYPE
+	SYNTAX		IPADDRESS
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"RS485 TCP connection IP address"
 ::= { rs485 2 }
 
-connectStatusRS232		OBJECT-TYPE
-		SYNTAX		INTEGER
-			{
-				No	(0),
-				Yes	(1)
-			}
-        MAX-ACCESS	read-only
-        STATUS		current
-        DESCRIPTION	"RS232 TCP connection status"
+connectStatusRS232 OBJECT-TYPE
+	SYNTAX	INTEGER
+		{
+			No	(0),
+			Yes	(1)
+		}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"RS232 TCP connection status"
 ::= { rs232 1 }
 	
-ipAddrRS232		OBJECT-TYPE
-		SYNTAX		IPADDRESS
-        MAX-ACCESS	read-only
-        STATUS		current
-        DESCRIPTION	"RS232 TCP connection IP address"
+ipAddrRS232 OBJECT-TYPE
+	SYNTAX		IPADDRESS
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"RS232 TCP connection IP address"
 ::= { rs232 2 }
 
 
 -- gsm
 
-gsmModuleStatus		OBJECT-TYPE
-		SYNTAX		INTEGER
+gsmModuleStatus OBJECT-TYPE
+	SYNTAX		INTEGER
 			{
-				No			(0),
-				Yes			(1),
+				No		(0),
+				Yes		(1),
 				NoSim		(2),
 				Error		(3),
 				Connected	(4)
 			}
-        MAX-ACCESS	read-only
-        STATUS		current
-        DESCRIPTION	"GSM module status"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"GSM module status"
 ::= { gsm 1 }
 
-gsmStrength		OBJECT-TYPE
-		SYNTAX		INTEGER
-        MAX-ACCESS	read-only
-        STATUS		current
-        DESCRIPTION	"Signal level (dBm)"
+gsmStrength OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS		"dBm"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Signal level"
 ::= { gsm 2 }
 
-gsmReconnCount		OBJECT-TYPE
-		SYNTAX		INTEGER
-        MAX-ACCESS	read-only
-        STATUS		current
-        DESCRIPTION	"Number of connection attempts"
+gsmReconnCount OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Number of connection attempts"
 ::= { gsm 10 }
 
 -- rf
 
-rfModuleStatus		OBJECT-TYPE
+rfModuleStatus OBJECT-TYPE
 	SYNTAX		INTEGER
 			{
 				No	(0),
 				Yes	(1)
 			}
-        MAX-ACCESS	read-only
-        STATUS		current
-        DESCRIPTION	"Status of the rf module"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Status of the rf module"
 ::= { rf 1 }
 
 -- options
 
-dataType		OBJECT-TYPE
+dataType OBJECT-TYPE
 	SYNTAX		INTEGER
 			{
 				integer	(0),
 				float	(1),
 				ufloat	(2)
 			}
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"Values data type"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Values data type"
 ::= { options 1 }
 
-reboot			OBJECT-TYPE
-		SYNTAX		INTEGER
-        MAX-ACCESS	write-only
-        STATUS		current
-        DESCRIPTION	"Send 1 to reboot"
+reboot OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	write-only
+	STATUS		current
+	DESCRIPTION	"Send 1 to reboot"
 ::= { options 300 }
 
 -- crit
 
-humCrit		OBJECT-TYPE
+humCrit OBJECT-TYPE
 	SYNTAX		INTEGER
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"Critical humidity. 
-From 0 to 100%"
+	UNITS		"%"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Critical humidity. From 0 to 100%"
 ::= { crit 20 }
 
-adcCritMin		OBJECT-TYPE
+adcCritMin OBJECT-TYPE
 	SYNTAX		INTEGER
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"ADC IN critical min"
+	UNITS		"Volt DC"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"ADC IN critical min"
 ::= { crit 30 }
 
-adcCritMax		OBJECT-TYPE
+adcCritMax OBJECT-TYPE
 	SYNTAX		INTEGER
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"ADC IN critical max"
+	UNITS		"Volt DC"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"ADC IN critical max"
 ::= { crit 31 }
 
-adcHysteresis	OBJECT-TYPE
+adcHysteresis OBJECT-TYPE
 	SYNTAX		INTEGER
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"ADC IN hysteresis"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"ADC IN hysteresis"
 ::= { crit 35 }
 
 -- diffparams
 
 -- upsStatus
 
-statusUPS		OBJECT-TYPE
+statusUPS OBJECT-TYPE
 	SYNTAX		INTEGER
 			{
 				fail	(1),
 				ok	(0),
 				unknown	(2) 
 			}
-        MAX-ACCESS	read-only
-        STATUS		current
-        DESCRIPTION	"UPS status"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"UPS status"
 ::= { upsStatus 1 }
 
-beeperStatusUPS		OBJECT-TYPE
+beeperStatusUPS OBJECT-TYPE
 	SYNTAX		INTEGER
-        MAX-ACCESS	read-only
-        STATUS		current
-        DESCRIPTION	"Beeper status. 
-Megatec only"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Beeper status. Megatec only"
 ::= { upsStatus 8 }
 
-shutdownStatusUPS		OBJECT-TYPE
+shutdownStatusUPS OBJECT-TYPE
 	SYNTAX		INTEGER
-        MAX-ACCESS	read-only
-        STATUS		current
-        DESCRIPTION	"Shutdown is active.
-Megatec only"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Shutdown is active. Megatec only"
 ::= { upsStatus 10 }
 
-lastBatteryChangeUPS	OBJECT-TYPE
+lastBatteryChangeUPS OBJECT-TYPE
 	SYNTAX		OCTET STRING
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"Last battery change date (mm/dd/yyyy).  
-Smart only"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Last battery change date (mm/dd/yyyy). Smart only"
 ::= { upsStatus 20 }
 
-shutdownTimeUPS		OBJECT-TYPE
-		SYNTAX		INTEGER
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"Shutdown period,
-minutes for Megatec, seconds for Smart.
-Writeble for Megatec only"
+shutdownTimeUPS OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Shutdown period, minutes for Megatec, seconds for Smart. Writeble for Megatec only"
 ::= { upsStatus 51 }
 
-turnOnTimeUPS		OBJECT-TYPE
-		SYNTAX		INTEGER
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"Turn on period, minutes.
-Megatec only"
+turnOnTimeUPS OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS		"min"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Turn on period, minutes. Megatec only"
 ::= { upsStatus 52 }
 
-startShutdownTurnOnUPS		OBJECT-TYPE
-		SYNTAX		INTEGER
-        MAX-ACCESS	write-only
-        STATUS		current
-        DESCRIPTION	"Shutdown after shutdownTimeUPS 
-and turn on after turnOnTimeUPS for Megatec. 
-Shutdown after shutdownTimeUPS for Smart. 
-Send 1 to start, 0 to stop"
+startShutdownTurnOnUPS OBJECT-TYPE
+	SYNTAX		INTEGER
+			{
+				stop	(0),
+				start	(1) 
+			}
+	MAX-ACCESS	write-only
+	STATUS		current
+	DESCRIPTION	"Shutdown after shutdownTimeUPS and turn on after turnOnTimeUPS for Megatec. Shutdown after shutdownTimeUPS for Smart."
 ::= { upsStatus 53 }
 
-startTurnOnUPS		OBJECT-TYPE
-		SYNTAX		INTEGER
-        MAX-ACCESS	write-only
-        STATUS		current
-        DESCRIPTION	"Turn on immediately, send 1 to turn on.
-Smart only"
+startTurnOnUPS OBJECT-TYPE
+	SYNTAX		INTEGER
+			{
+				turn-on	(1)
+			}
+	MAX-ACCESS	write-only
+	STATUS		current
+	DESCRIPTION	"Turn on immediately, send 1 to turn on. Smart only"
 ::= { upsStatus 54 }
 
-startLongTestUPS		OBJECT-TYPE
-		SYNTAX		INTEGER
-        MAX-ACCESS	read-write
-        STATUS		current
-        DESCRIPTION	"Start specified time period test. 
-Send period in minutes to start.
-Megatec only"
+startLongTestUPS OBJECT-TYPE
+	SYNTAX		INTEGER
+	UNITS		"min"
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION	"Start specified time period test. Send period in minutes to start. Megatec only"
 ::= { upsStatus 71 }
 
 -- pid
 
-inputPID		OBJECT-TYPE
-	
+inputPID OBJECT-TYPE
 	SYNTAX		INTEGER
-        
 	MAX-ACCESS	read-write
-
-        STATUS		current
-
-        DESCRIPTION	"PID SNMP input value"
-
+	STATUS		current
+	DESCRIPTION	"PID SNMP input value"
 ::= { pid 1 }
 
-
-	
-outputPercentPID	OBJECT-TYPE
-
+outputPercentPID OBJECT-TYPE
 	SYNTAX		INTEGER
-
-        MAX-ACCESS	read-only
-
-        STATUS		current
-
-        DESCRIPTION	"PID output value. 
-0 to 100%"
-
+	UNITS		"%"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"PID output value. 0 to 100%"
 ::= { pid 2 }
 
-
-
-outputRealPID		OBJECT-TYPE
-
+outputRealPID OBJECT-TYPE
 	SYNTAX		INTEGER
-
-        MAX-ACCESS	read-only
-
-        STATUS		current
-
-        DESCRIPTION	"PID output value 
-(voltage if PID runs in analog mode 
-or time if PID runs in PWM mode)"
-
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"PID output value 
+(voltage if PID runs in analog mode or time if PID runs in PWM mode)"
 ::= { pid 3 }
 
-
-
-ypPID			OBJECT-TYPE
-
+ypPID OBJECT-TYPE
 	SYNTAX		INTEGER
-
-        MAX-ACCESS	read-only
-
-        STATUS		current
-
-        DESCRIPTION	"Proportional gain"
-
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Proportional gain"
 ::= { pid 4 }
 
-
-
-yiPID			OBJECT-TYPE
-
+yiPID OBJECT-TYPE
 	SYNTAX		INTEGER
-
-        MAX-ACCESS	read-only
-
-        STATUS		current
-
-        DESCRIPTION	"Integral gain"
-
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Integral gain"
 ::= { pid 5 }
 
-
-
-ydPID			OBJECT-TYPE
-
+ydPID OBJECT-TYPE
 	SYNTAX		INTEGER
-
-        MAX-ACCESS	read-only
-
-        STATUS		current
-
-        DESCRIPTION	"Derivative gain"
-
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Derivative gain"
 ::= { pid 6 }
 
-
-
-errorPID		OBJECT-TYPE
-
+errorPID OBJECT-TYPE
 	SYNTAX		INTEGER
-
-        MAX-ACCESS	read-only
-
-        STATUS		current
-
-        DESCRIPTION	"Error. Difference between setpoint 
-and input value"
-
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Error. Difference between setpoint and input value"
 ::= { pid 7 }
 
 
 -- Traps
 
-DI1Alarm		NOTIFICATION-TYPE
+DI1Alarm NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Input 1 Alarm fires"		
+	DESCRIPTION	"Input 1 Alarm fires"
 ::= { traps 1 }
 
-DI1Release		NOTIFICATION-TYPE
+DI1Release NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Input 1 Alarm released"		
+	DESCRIPTION	"Input 1 Alarm released"
 ::= { traps 2 }
 
-DI2Alarm		NOTIFICATION-TYPE
+DI2Alarm NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Input 2 Alarm fires"		
+	DESCRIPTION	"Input 2 Alarm fires"
 ::= { traps 3 }
 
-DI2Release		NOTIFICATION-TYPE
+DI2Release NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Input 2 Alarm released"		
+	DESCRIPTION	"Input 2 Alarm released"
 ::= { traps 4 }
 
-DI3Alarm		NOTIFICATION-TYPE
+DI3Alarm NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Input 3 Alarm fires"		
+	DESCRIPTION	"Input 3 Alarm fires"
 ::= { traps 5 }
 
-DI3Release		NOTIFICATION-TYPE
+DI3Release NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Input 3 Alarm released"		
+	DESCRIPTION	"Input 3 Alarm released"
 ::= { traps 6 }
 
-DI4Alarm		NOTIFICATION-TYPE
+DI4Alarm NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Input 4 Alarm fires"		
+	DESCRIPTION	"Input 4 Alarm fires"
 ::= { traps 7 }
 
-DI4Release		NOTIFICATION-TYPE
+DI4Release  NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Input 4 Alarm released"		
+	DESCRIPTION	"Input 4 Alarm released"
 ::= { traps 8 }
 
-DI5Alarm		NOTIFICATION-TYPE
+DI5Alarm NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Input 5 Alarm fires"		
+	DESCRIPTION	"Input 5 Alarm fires"
 ::= { traps 9 }
 
-DI5Release		NOTIFICATION-TYPE
+DI5Release NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Input 5 Alarm released"		
+	DESCRIPTION	"Input 5 Alarm released"
 ::= { traps 10 }
 
-uSenseAlarm		NOTIFICATION-TYPE
+uSenseAlarm NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Signifies that Phase sensor 
-Alarm fires"		
+	DESCRIPTION	"Signifies that Phase sensor Alarm fires"
 ::= { traps 11 }
 
-uSenseRelease	NOTIFICATION-TYPE
+uSenseRelease NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Signifies that Phase sensor 
-Alarm released"		
+	DESCRIPTION	"Signifies that Phase sensor Alarm released"
 ::= { traps 12 }
 
-reloutOn		NOTIFICATION-TYPE
+reloutOn NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Signifies that Rele was swithed on 
-by Thermostat or Gigrostat mode"		
+	DESCRIPTION	"Signifies that Rele was swithed on by Thermostat or Gigrostat mode"
 ::= { traps 13 }
 
-reloutOff		NOTIFICATION-TYPE
+reloutOff NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Signifies that Rele was swithed off 
-by Thermostat or Gigrostat mode"		
+	DESCRIPTION	"Signifies that Rele was swithed off by Thermostat or Gigrostat mode"
 ::= { traps 14 }
 
-DO1On			NOTIFICATION-TYPE
+DO1On NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Signifies that Output 1 was swithed on 
-by Thermostat or Gigrostat mode"		
+	DESCRIPTION	"Signifies that Output 1 was swithed on by Thermostat or Gigrostat mode"
 ::= { traps 15 }
 
-DO1Off			NOTIFICATION-TYPE
+DO1Off NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Signifies that Output 1 was swithed off 
-by Thermostat or Gigrostat mode"		
+	DESCRIPTION	"Signifies that Output 1 was swithed off by Thermostat or Gigrostat mode"
 ::= { traps 16 }
 
-DO2On			NOTIFICATION-TYPE
+DO2On NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Signifies that Output 2 was swithed on 
-by Thermostat or Gigrostat mode"		
+	DESCRIPTION	"Signifies that Output 2 was swithed on by Thermostat or Gigrostat mode"
 ::= { traps 17 }
 
-DO2Off			NOTIFICATION-TYPE
+DO2Off NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Signifies that Output 2 was swithed off 
-by Thermostat or Gigrostat mode"		
+	DESCRIPTION	"Signifies that Output 2 was swithed off by Thermostat or Gigrostat mode"
 ::= { traps 18 }
 
-DO3On			NOTIFICATION-TYPE
+DO3On NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Signifies that Output 3 was swithed on 
-by Thermostat or Gigrostat mode"		
+	DESCRIPTION	"Signifies that Output 3 was swithed on by Thermostat or Gigrostat mode"
 ::= { traps 19 }
 
-DO3Off			NOTIFICATION-TYPE
+DO3Off NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Signifies that Output 3 was swithed off 
-by Thermostat or Gigrostat mode"		
+	DESCRIPTION	"Signifies that Output 3 was swithed off by Thermostat or Gigrostat mode"
 ::= { traps 20 }
 
-DO4On			NOTIFICATION-TYPE
+DO4On NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Signifies that Output 4 was swithed on 
-by Thermostat or Gigrostat mode"		
+	DESCRIPTION	"Signifies that Output 4 was swithed on by Thermostat or Gigrostat mode"
 ::= { traps 21 }
 
-DO4Off			NOTIFICATION-TYPE
+DO4Off NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Signifies that Output 4 was swithed off 
-by Thermostat or Gigrostat mode"		
+	DESCRIPTION	"Signifies that Output 4 was swithed off by Thermostat or Gigrostat mode"
 ::= { traps 22 }
 
-DO5On			NOTIFICATION-TYPE
+DO5On NOTIFICATION-TYPE
 	STATUS		current
 	DESCRIPTION	"Signifies that Output 5 was swithed on 
-by Thermostat or Gigrostat mode"		
+by Thermostat or Gigrostat mode"
 ::= { traps 23 }
 
-DO5Off			NOTIFICATION-TYPE
+DO5Off NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Signifies that Output 5 was swithed off 
-by Thermostat or Gigrostat mode"		
+	DESCRIPTION	"Signifies that Output 5 was swithed off by Thermostat or Gigrostat mode"
 ::= { traps 24 }
 
-tempSensorAlarm		NOTIFICATION-TYPE
-	STATUS			current
-	DESCRIPTION		"Temperature alarm"		
+tempSensorAlarm NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION	"Temperature alarm"
 ::= { traps 29 }
 
-tempSensorRelease	NOTIFICATION-TYPE
-	STATUS			current
-	DESCRIPTION		"Temperature release"		
+tempSensorRelease NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION	"Temperature release"
 ::= { traps 30 }
 
-adcSensorAlarm		NOTIFICATION-TYPE
-	STATUS			current
-	DESCRIPTION		"Voltage sensor alarm"		
+adcSensorAlarm NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION	"Voltage sensor alarm"
 ::= { traps 31 }
 
-adcSensorRelease	NOTIFICATION-TYPE
+adcSensorRelease NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Voltage sensor release"		
+	DESCRIPTION	"Voltage sensor release"
 ::= { traps 32 }
 
-humSensorAlarm		NOTIFICATION-TYPE
-	STATUS			current
-	DESCRIPTION		"Humidity alarm"		
+humSensorAlarm NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION	"Humidity alarm"
 ::= { traps 33 }
 
-humSensorRelease	NOTIFICATION-TYPE
-	STATUS			current
-	DESCRIPTION		"Humidity release"		
+humSensorRelease NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION	"Humidity release"
 ::= { traps 34 }
 
-task1Done		NOTIFICATION-TYPE
+task1Done NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Task 1 done"		
+	DESCRIPTION	"Task 1 done"
 ::= { traps 36 }
 
-task2Done		NOTIFICATION-TYPE
+task2Done NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Task 2 done"		
+	DESCRIPTION	"Task 2 done"
 ::= { traps 37 }
 
-task3Done		NOTIFICATION-TYPE
+task3Done NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Task 3 done"		
+	DESCRIPTION	"Task 3 done"
 ::= { traps 38 }
 
-task4Done		NOTIFICATION-TYPE
+task4Done NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Task 4 done"		
+	DESCRIPTION	"Task 4 done"
 ::= { traps 39 }
 
-pingLost		NOTIFICATION-TYPE
+pingLost NOTIFICATION-TYPE
 	STATUS		current
-	DESCRIPTION	"Ping lost"		
+	DESCRIPTION	"Ping lost"
 ::= { traps 45 }
 
-batteryChargeLow	NOTIFICATION-TYPE
-	STATUS			current
-	DESCRIPTION		"Battery charge is low"		
+batteryChargeLow NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION	"Battery charge is low"
 ::= { traps 47 }
 
-upsUtilityFail		NOTIFICATION-TYPE
-	STATUS			current
-	DESCRIPTION		"UPS utility fail"		
+upsUtilityFail NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION	"UPS utility fail"
 ::= { traps 50 }
 
-upsUtilityOk		NOTIFICATION-TYPE
-	STATUS			current
-	DESCRIPTION		"UPS utility OK"		
+upsUtilityOk NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION	"UPS utility OK"
 ::= { traps 51 }
 
 -- erd4Group
 
-erd4Group		NOTIFICATION-GROUP  
+erd4Group NOTIFICATION-GROUP
 	NOTIFICATIONS 
 	{
 		DI1Alarm,

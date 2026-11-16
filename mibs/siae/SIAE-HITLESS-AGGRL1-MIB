@@ -25,7 +25,7 @@
         FROM SIAE-AGGRL1-MANAGEMENT-MIB;
 
     hitlessAggregationL1 MODULE-IDENTITY
-        LAST-UPDATED "201602290000Z"
+        LAST-UPDATED "201612200000Z"
         ORGANIZATION "SIAE MICROELETTRONICA spa"
         CONTACT-INFO
             "SIAE MICROELETTONICA s.p.a.
@@ -33,7 +33,7 @@
              20093 - Cologno Monzese
              Milano - ITALY
              Phone :  +39-02-27325-1
-             E-mail: tbd@siaemic.com
+             E-mail: help@siaemic.com
             "
         DESCRIPTION
             "This module contains the hitless extension for a Level 1
@@ -51,12 +51,13 @@
              during all the time that the current modulation remain under
              the predefined HITLESS profile (modulation). 
 
-             Every radio link is considered working in three separate ZONEs
+             Every radio link is considered working in four separate ZONEs
              - GOOD ZONE: When it is working between the HITLESS profile
                           (included) and the UPPER profile (included) 
              - HITLESS ZONE: When it is working between the LOWER profile 
                              (included) and the HITLESS profile (excluded)
              - BAD ZONE: When the modem is unlocked
+             - DISQUALIFIED: When it is excluded by the the balancing algorithm
 
              NE is in charge to select which of the links, that are working into
              the HITLESS ZONE, participate in RLAG. The decision is taken 
@@ -72,6 +73,11 @@
              Note that when HITLESS profile is configured equal to the LOWER 
              profile, the ONE survive and NONE survive behave like the ALL
              survive. 
+            "
+        REVISION "201612200000Z"
+        DESCRIPTION 
+            "Initial version 01.00.01
+             - Added the value disqualified(4) to linkHitlessZone.
             "
         REVISION "201602290000Z"
         DESCRIPTION 
@@ -248,9 +254,10 @@
 
     linkHitlessZone OBJECT-TYPE
         SYNTAX      INTEGER  {
-                               goodZone    (1),
-                               hitlessZone (2),
-                               badZone     (3)
+                               goodZone     (1),
+                               hitlessZone  (2),
+                               badZone      (3),
+                               disqualified (4)
                              }
         MAX-ACCESS  read-only
         STATUS      current

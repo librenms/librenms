@@ -1,9 +1,9 @@
 -- =========================================================================
--- Copyright (c) 2004-2018 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Secure Shell(SSH) MIB
 -- Reference: draft-ylonen-ssh-protocol-00.txt
--- Version: V1.5
+-- Version: V1.7
 -- History:
 --  V1.0 2007-11-19 created by ZhangJun 03132
 --       Initial version.
@@ -21,21 +21,30 @@
 --                  aes256GCM(9), and aes256CBC(10) to hh3cSSHSessionEncry by DaiRuiqiang 04358.
 --       2018-02-06 Added enum value keyboard-interactive(6) in hh3cSSHUserAuthType by DaiRuiqiang 04358
 --  V1.5 2018-06-28 Added enum value other(11) to hh3cSSHSessionEncry by DaiRuiqiang 04358.
+--  V1.6 2021-09-15 Added hh3cSSHUserAuthFailureTime to hh3cSSHUserAuthFailure by yinwenyao kf8812
+--                  Added hh3cSSHSessionLoginTime to hh3cSSHUserLogin by yinwenyao kf8812
+--                  Added hh3cSSHSessionUserRoleName to hh3cSSHUserLogin by yinwenyao kf8812
+--                  Added hh3cSSHSessionLogoffTime to hh3cSSHUserLogoff by yinwenyao kf8812
+--                  Added hh3cSSHSessionUserRoleName to hh3cSSHUserLogoff by yinwenyao kf8812
+--  V1.7 2022-05-31 Added hh3cSSHLoginFailedTimes to hh3cSSHServerObjForTrap by zhangfeng kf9168.
+--                  Added hh3cSSHStatisticPeriod to hh3cSSHServerObjForTrap by zhangfeng kf9168.
+--                  Added hh3cSSHLoginFailed to hh3cSSHServerNotificationsPrefix by zhangfeng kf9168.
+--                  Added hh3cSSHLoginFailedClear to hh3cSSHServerNotificationsPrefix by zhangfeng kf9168.
 -- =========================================================================
 HH3C-SSH-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
         hh3cCommon
     FROM HH3C-OID-MIB
-        Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Unsigned32
     FROM SNMPv2-SMI
         InetAddressType, InetAddress
     FROM INET-ADDRESS-MIB
-        DisplayString, RowStatus
+        DisplayString, RowStatus, DateAndTime
     FROM SNMPv2-TC;
 
 hh3cSSH MODULE-IDENTITY
-    LAST-UPDATED "201806280000Z"
+    LAST-UPDATED "202205310000Z"
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -45,6 +54,17 @@ hh3cSSH MODULE-IDENTITY
         Zip:100085"
     DESCRIPTION
         "This MIB is used to configure SSH server."
+    REVISION "202205310000Z"
+    DESCRIPTION
+        "Added hh3cSSHLoginFailedTimes to hh3cSSHServerObjForTrap.
+         Added hh3cSSHStatisticPeriod to hh3cSSHServerObjForTrap.
+         Added hh3cSSHLoginFailed to hh3cSSHServerNotificationsPrefix.
+         Added hh3cSSHLoginFailedClear to hh3cSSHServerNotificationsPrefix."
+    REVISION "202109150000Z"
+    DESCRIPTION
+        "Added hh3cSSHUserAuthFailureTime to hh3cSSHUserAuthFailure.
+         Added hh3cSSHSessionLoginTime and hh3cSSHSessionUserRoleName to hh3cSSHUserLogin.
+         Added hh3cSSHSessionLogoffTime and hh3cSSHSessionUserRoleName to hh3cSSHUserLogoff."
     REVISION "201806280000Z"
     DESCRIPTION
         "Added enum value other(11) to hh3cSSHSessionEncry."
@@ -559,7 +579,57 @@ hh3cSSHUserAuthFailureReason OBJECT-TYPE
     DESCRIPTION
         "The reason for that a user failed to log in."
     ::= { hh3cSSHServerObjForTrap 4 }
-
+hh3cSSHUserAuthFailureTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The time when authentication failed to log in.
+         For example: 2021-09-14,13:30:16.
+        "
+    ::= { hh3cSSHServerObjForTrap 5 }
+hh3cSSHSessionLoginTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The Login time of SSH session.
+         For example: 2021-09-14,13:30:16.
+        "
+    ::= { hh3cSSHServerObjForTrap 6 }
+hh3cSSHSessionLogoffTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The Logoff time of SSH session.
+         For example: 2021-09-14,13:30:16.
+        "
+    ::= { hh3cSSHServerObjForTrap 7 }
+hh3cSSHSessionUserRoleName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..63))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The user role of SSH session.
+         such as network-admin network-operation etc.
+        "
+    ::= { hh3cSSHServerObjForTrap 8 }
+hh3cSSHLoginFailedTimes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The number of user login failures."
+    ::= { hh3cSSHServerObjForTrap 9 }
+hh3cSSHStatisticPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "minutes"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "User login failure statistics period."
+    ::= { hh3cSSHServerObjForTrap 10 }
 --
 -- Notification definitions
 --
@@ -577,7 +647,8 @@ hh3cSSHUserAuthFailure NOTIFICATION-TYPE
             hh3cSSHAttemptUserName,
             hh3cSSHAttemptIpAddrType,
             hh3cSSHAttemptIpAddr,
-            hh3cSSHUserAuthFailureReason
+            hh3cSSHUserAuthFailureReason,
+            hh3cSSHUserAuthFailureTime
         }
     STATUS      current
     DESCRIPTION
@@ -601,7 +672,9 @@ hh3cSSHUserLogin NOTIFICATION-TYPE
         {
             hh3cSSHSessionUserName,
             hh3cSSHSessionUserIpAddrType,
-            hh3cSSHSessionUserIpAddr
+            hh3cSSHSessionUserIpAddr,
+            hh3cSSHSessionLoginTime,
+            hh3cSSHSessionUserRoleName
         }
     STATUS      current
     DESCRIPTION
@@ -613,11 +686,30 @@ hh3cSSHUserLogoff NOTIFICATION-TYPE
         {
             hh3cSSHSessionUserName,
             hh3cSSHSessionUserIpAddrType,
-            hh3cSSHSessionUserIpAddr
+            hh3cSSHSessionUserIpAddr,
+            hh3cSSHSessionLogoffTime,
+            hh3cSSHSessionUserRoleName
         }
     STATUS      current
     DESCRIPTION
         "The trap is generated when a user logs off."
     ::= { hh3cSSHServerNotificationsPrefix 4 }
+
+hh3cSSHLoginFailed NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSSHLoginFailedTimes,
+            hh3cSSHStatisticPeriod
+        }
+    STATUS      current
+    DESCRIPTION
+        "Users failed to login ssh server too frequently."
+    ::= { hh3cSSHServerNotificationsPrefix 5 }
+
+hh3cSSHLoginFailedClear NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "The ssh user login-failed alarm was cleared."
+    ::= { hh3cSSHServerNotificationsPrefix 6 }
 
 END

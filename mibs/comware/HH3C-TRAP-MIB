@@ -1,10 +1,10 @@
 -- =================================================================
--- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2023 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: This file describes the enterprise mib implementation
 --              of sending some traps.
 -- Reference:
--- Version: V1.6
+-- Version: V1.8
 -- History:
 --   V1.0 created by Huang Yang
 --     Initial version 2005-01-25
@@ -19,6 +19,12 @@
 --        2010-06-05  added hh3cTrapDesAddrTAddress by jinyi
 --   V1.6 2013-09-13  added hh3cPeriodicalTrapSwitch2 and
 --                    hh3cTrapConfigSwitch2 by duyanbing
+--   V1.7 2022-06-17  Add hh3cTrapSnmp to hh3cTableGroup.
+--                  Add hh3cTrapPrex to hh3cTrapSnmp
+--                  Add hh3cTrapSnmpSystemReset to hh3cTrapPrex.
+--   V1.8 2023-04-21  Add hh3cArpTabTrapNotification to hh3cArpTabStatGroup.
+--                  Add hh3cArpTabTrapNotificationPrefix to hh3cArpTabTrapNotification
+--                  Add hh3cArpTabFullResumeTrap to hh3cArpTabTrapNotificationPrefix.
 -- =================================================================
 HH3C-TRAP-MIB DEFINITIONS ::= BEGIN
 
@@ -40,7 +46,7 @@ HH3C-TRAP-MIB DEFINITIONS ::= BEGIN
             FROM HH3C-OID-MIB;
 
     hh3cTrap MODULE-IDENTITY
-        LAST-UPDATED "201006051050Z"
+        LAST-UPDATED "202304211050Z"
         ORGANIZATION
             "New H3C Technologies Co., Ltd."
         CONTACT-INFO
@@ -55,6 +61,16 @@ HH3C-TRAP-MIB DEFINITIONS ::= BEGIN
             so users should refer to the related documents to acquire more
             detail information.
             "
+        REVISION "202304211050Z"
+        DESCRIPTION
+            "Add hh3cArpTabTrapNotification to hh3cArpTabStatGroup.
+             Add hh3cArpTabTrapNotificationPrefix to hh3cArpTabTrapNotification
+             Add hh3cArpTabFullResumeTrap to hh3cArpTabTrapNotificationPrefix."
+        REVISION "202206171050Z"
+        DESCRIPTION
+            "Add hh3cTrapSnmp to hh3cTableGroup.
+             Add hh3cTrapPrex to hh3cTrapSnmp
+             Add hh3cTrapSnmpSystemReset to hh3cTrapPrex."
         REVISION "201006051050Z"
         DESCRIPTION
             "The initial revision of this MIB module."
@@ -182,6 +198,21 @@ HH3C-TRAP-MIB DEFINITIONS ::= BEGIN
                 of this port. The interval between two traps should be
                 longer than hh3cArpTabTrapInterval."
             ::= { hh3cArpTabTrap 2 }
+
+    hh3cArpTabTrapNotification OBJECT IDENTIFIER
+        ::= { hh3cArpTabStatGroup 5 }
+
+    hh3cArpTabTrapNotificationPrefix OBJECT IDENTIFIER
+        ::= { hh3cArpTabTrapNotification 0 }
+
+    hh3cArpTabFullResumeTrap NOTIFICATION-TYPE
+            OBJECTS { hh3cArpTabLen }
+            STATUS current
+            DESCRIPTION
+                "Send this trap when the ARP table is filled for
+                recovery. The interval between two traps generated
+                should be longer than hh3cArpTabTrapInterval."
+            ::= { hh3cArpTabTrapNotificationPrefix 3 }
 
 -- Describe objects for routing table
     hh3cRtTabStatGroup OBJECT IDENTIFIER ::= { hh3cTableGroup 3 }
@@ -671,5 +702,15 @@ HH3C-TRAP-MIB DEFINITIONS ::= BEGIN
                 This node differs from hh3cTrapConfigSwitch in value."
             DEFVAL { on }
             ::= { hh3cTrapConfigEntry 5 }
+
+    hh3cTrapSnmp OBJECT IDENTIFIER ::= { hh3cTableGroup 9 }
+    hh3cTrapPrex OBJECT IDENTIFIER ::= { hh3cTrapSnmp 0 }
+
+    hh3cTrapSnmpSystemReset NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION
+                "The notification is generated when the SNMP process restarts or
+                the HA smoothing of the active/standby switchover is complete."
+            ::= { hh3cTrapPrex 1 }
 
 END

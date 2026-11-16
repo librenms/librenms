@@ -1,40 +1,49 @@
--- *------------------------------------------------
--- * Firebrick 2900 BGP MIB
--- *
--- * April 2020, C Malton
--- *
--- * Copyright (c) 2020 by Andrews & Arnold
--- * 
--- * See the Firebrick Manuals for more information
--- *------------------------------------------------
-
 FIREBRICK-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY,
     OBJECT-TYPE,
+    Counter32,
+    Integer32
     enterprises
-        FROM SNMPv2-SMI
-        ;
+            FROM SNMPv2-SMI
+    ;
 
 firebrick MODULE-IDENTITY
-    LAST-UPDATED "202004060000Z"
-    ORGANIZATION "Andrews & Arnold Limited"
-    CONTACT-INFO
-        "Andrews & Arnold
-        Unit 1&2, Enterprise Court
-        Bracknell, Berkshire, RG12 1QS
-        United Kingdom
+        LAST-UPDATED    "202210081200Z"
+        ORGANIZATION    "Observium Limited"
+        CONTACT-INFO
+                "Adam Armstrong
+                Email: adama@observium.org"
+        DESCRIPTION
+                "Unofficial Firebrick MIB. For Observium use only."
+        ::= { enterprises 24693 }
 
-        Tel: +44 3333 400 999
-        Email: support@aa.net.uk"
+fbSensorObjects         OBJECT IDENTIFIER ::= { firebrick 1 }
+firebrickNewStyle       OBJECT IDENTIFIER ::= { firebrick 100 }
+
+fbSensorVoltage OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
     DESCRIPTION
-        "This is a MIB Module for monitoring the Firebrick-specific structures
-        for general system features."
-    REVISION "202004060000Z"
-    DESCRIPTION "Initial version of this MIB module"
-    ::= { enterprises 24693 }
+        "Firebrick voltage sensors. Reported in thousandths of a volt."
+    ::= { fbSensorObjects 1 }
 
-firebrickNewStyle  OBJECT IDENTIFIER ::= { firebrick 100 }
+fbSensorTemperature OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Firebrick temperature sensors. Reported in thousandths of a degree celsius."
+    ::= { fbSensorObjects 2 }
+
+fbSensorFanspeed OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Firebrick fanspeed sensors. Reported in RPM."
+    ::= { fbSensorObjects 3 }
 
 END
