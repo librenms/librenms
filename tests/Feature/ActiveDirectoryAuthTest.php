@@ -107,6 +107,8 @@ class ActiveDirectoryAuthTest extends DBTestCase
 
     public function testGroupRequirementRejectsNonmembers(): void
     {
+        $log = Log::spy();
+        LibrenmsConfig::set('auth_ad_debug', true);
         LibrenmsConfig::set('auth_ad_require_groupmembership', true);
         LibrenmsConfig::set('auth_ad_groups', ['Admins' => ['roles' => ['admin']]]);
         $fake = DirectoryEmulator::setup('active_directory');
@@ -115,6 +117,18 @@ class ActiveDirectoryAuthTest extends DBTestCase
 
         $this->assertFalse(Auth::attempt($this->credentials()));
         $this->assertDatabaseMissing('users', ['auth_type' => 'active_directory', 'username' => 'alice']);
+        $log->shouldHaveReceived('warning')->with('Active Directory access denied', [
+            'reason' => 'User is not a member of any configured AD group',
+            'dn' => $ldap->getDn(),
+            'user_id' => null,
+            'configured_groups' => ['Admins'],
+        ])->once();
+        $log->shouldHaveReceived('debug')->with('Active Directory group membership check', [
+            'group' => 'Admins',
+            'matching_groups' => 0,
+            'is_member' => false,
+            'user_dn' => $ldap->getDn(),
+        ])->once();
     }
 
     public function testNestedGroupRolesAndLegacyLevelsAreSynchronized(): void

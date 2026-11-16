@@ -3,6 +3,7 @@
 namespace App\Ldap;
 
 use App\Facades\LibrenmsConfig;
+use Illuminate\Support\Facades\Log;
 use LdapRecord\Models\ActiveDirectory\Group;
 use LdapRecord\Models\ActiveDirectory\User;
 use LibreNMS\Enum\LegacyAuthLevel;
@@ -21,7 +22,16 @@ class ActiveDirectoryGroups
                 $query->rawFilter(\LdapRecord\Query\Filter\Parser::parse($filter));
             }
             $groups = $query->limit(2)->get();
-            if (count($groups) === 1 && $user->groups()->recursive()->exists($groups[0])) {
+            $isMember = count($groups) === 1 && $user->groups()->recursive()->exists($groups[0]);
+            if (LibrenmsConfig::get('auth_ad_debug')) {
+                Log::debug('Active Directory group membership check', [
+                    'group' => $name,
+                    'matching_groups' => count($groups),
+                    'is_member' => $isMember,
+                    'user_dn' => $user->getDn(),
+                ]);
+            }
+            if ($isMember) {
                 $memberships[] = $name;
             }
         }
