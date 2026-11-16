@@ -1,4 +1,4 @@
--- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+-- Mib files packaged on  Wed Jun 19 01:31:39 EDT 2019 for Storage Array Firmware V10.0.3 (R469188)
 
 --FROM SNMP-FRAMEWORK-MIB; 
 -- RFC 2571  
@@ -24,7 +24,7 @@ IMPORTS
             FROM EQLGROUP-MIB;
 
 eqlStoragePoolModule MODULE-IDENTITY      
-	LAST-UPDATED "201503171528Z"
+	LAST-UPDATED "201906190531Z"
     ORGANIZATION  "EqualLogic Inc."
     CONTACT-INFO      
         "Contact: Customer Support
@@ -37,7 +37,7 @@ eqlStoragePoolModule MODULE-IDENTITY
     DESCRIPTION          
         "Equallogic Inc. Storage Array volume information 
 
-        Copyright (c) 2002-2011 by Dell, Inc. 
+        Copyright (c) 2002-2014 by Dell, Inc. 
         
         All rights reserved.  This software may not be copied, disclosed, 
         transferred, or used except in accordance with a license granted 
@@ -148,15 +148,17 @@ EqlStoragePoolEntry ::=
         eqlStoragePoolUUID                                 OCTET STRING,
         eqlStoragePoolExecMergeTo                          Unsigned32,
         eqlStoragePoolBorrow                               StatusEnabledDefault,
-		eqlStoragePoolSnapTrimThreshold                    Unsigned32,
-		eqlStoragePoolSnapTrimBuffer                       Counter64,
+        eqlStoragePoolSnapTrimThreshold                    Unsigned32,
+        eqlStoragePoolSnapTrimBuffer                       Counter64,
         eqlStoragePoolSnapTrimmerHWMLifeTime               Integer32,
         eqlStoragePoolSnapTrimmerBorrowInfoRefreshInterval Integer32,
         eqlStoragePoolDefaultCompressionStrategy           INTEGER,
         eqlStoragePoolDefaultCompressionMinSnapDelay       Integer32,
         eqlStoragePoolDefaultCompressionMinSnapAge         Integer32,
         eqlStoragePoolSnapMemberTrimThresholdAmount        Counter64,
-        eqlStoragePoolSnapTrimRecheckTimer                 Unsigned32
+        eqlStoragePoolSnapTrimRecheckTimer                 Unsigned32,
+        eqlStoragePoolMaintenanceFlag                      TruthValue,
+        eqlStoragePoolFSTStatus				   INTEGER		                  	 
      }
 
 eqlStoragePoolIndex OBJECT-TYPE      
@@ -357,6 +359,27 @@ eqlStoragePoolSnapTrimRecheckTimer OBJECT-TYPE
     DEFVAL          { 20 }
     ::= { eqlStoragePoolEntry 21 }
 
+eqlStoragePoolMaintenanceFlag OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies if this storage pool is the maintenance pool.  TRUE == maintenance pool."
+    DEFVAL          { false }
+    ::=  {  eqlStoragePoolEntry 22 }
+
+eqlStoragePoolFSTStatus OBJECT-TYPE
+    SYNTAX            INTEGER {
+                                passed(0),
+                                failed-vol-migr-active(1)
+    			}
+
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies if FST is passed or failed.
+		     FST passed if there is NO FST failed.
+		     FST failed due to active volume migration."
+    DEFVAL          { passed }
+    ::=  {  eqlStoragePoolEntry 23 }
 
 ---*************************************************************  
 
@@ -419,7 +442,15 @@ EqlStoragePoolStatsEntry ::=
         eqlStoragePoolStatsVirtualSpaceSize         Counter64,
         eqlStoragePoolStatsStorageContainerVolumeCount Integer32,
         eqlStoragePoolStatsStorageContainerSnapCount Integer32,
-        eqlStoragePoolStatsStorageContainerVolumesOnline Integer32        
+        eqlStoragePoolStatsStorageContainerVolumesOnline Integer32,
+        eqlStoragePoolStatsOtherSpaceBorrowing      Counter64,
+        eqlStoragePoolStatsReplicantSiteFreeSpace   Counter64,
+        eqlStoragePoolStatsReplicantSiteBorrowing   Counter64,
+        eqlStoragePoolStatsSnapshotVirtualSpaceUsed Counter64,
+        eqlStoragePoolStatsSnapshotPhysicalSpaceUsed Counter64,
+        eqlStoragePoolStatsReplicationBorrowing     Counter64,
+        eqlStoragePoolStatsVolumeVirtualSpaceUsed    Counter64,
+        eqlStoragePoolStatsVolumePhysicalSpaceUsed   Counter64
     }
 
 eqlStoragePoolStatsSpace OBJECT-TYPE      
@@ -643,9 +674,8 @@ eqlStoragePoolStatsSnapshotResvBorrowing OBJECT-TYPE
     SYNTAX          Counter64   
     UNITS           "MB"
     MAX-ACCESS      read-only      
-    STATUS          current      
-    DESCRIPTION     "This field specifies the amount of free snapshot reserve that is being borrowed against by other volumes 
-                     for either Recoverable Volumes or snapshots"
+    STATUS          deprecated      
+    DESCRIPTION     "This field is deprecated and is superceded by eqlStoragePoolStatsOtherSpaceBorrowing."
     ::=  { eqlStoragePoolStatsEntry 28 }
 
 eqlStoragePoolStatsFreeSpaceBorrowing OBJECT-TYPE      
@@ -653,8 +683,8 @@ eqlStoragePoolStatsFreeSpaceBorrowing OBJECT-TYPE
     UNITS           "MB"
     MAX-ACCESS      read-only      
     STATUS          current      
-    DESCRIPTION     "This field specifies the amount of free space that is being borrowed against by volumes for 
-                     either Recoverable Volumes or snapshots"
+    DESCRIPTION     "This field specifies the amount of free space that is being borrowed against for 
+                     Recoverable Volumes, snapshots, replicas, and other objects that borrow space."
     ::=  { eqlStoragePoolStatsEntry 29 }
 
 eqlStoragePoolStatsAvailableForBorrowing OBJECT-TYPE      
@@ -693,7 +723,7 @@ eqlStoragePoolStatsTotalSpaceBorrowing OBJECT-TYPE
     MAX-ACCESS      read-only      
     STATUS          current      
     DESCRIPTION     "This field specifies the total space used for borrowing and includes
-                     Recoverable Volumes and Snapshots"
+                     Recoverable Volumes, Snapshots, and other objects that borrow space."
     ::=  { eqlStoragePoolStatsEntry 33 }
 
 eqlStoragePoolStatsSnapShotBorrowing OBJECT-TYPE      
@@ -759,6 +789,72 @@ eqlStoragePoolStatsVirtualSpaceSize OBJECT-TYPE
     DESCRIPTION     "This field indicates the total online volumes in storage containers within this storage 
                      pool. This is a dynamic value, it is not Administrator setable."
     ::=  { eqlStoragePoolStatsEntry 41 }
+
+eqlStoragePoolStatsOtherSpaceBorrowing OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the amount of other space that is being borrowed against for 
+                     Recoverable Volumes, snapshots, and other objects that borrow space."
+    ::=  { eqlStoragePoolStatsEntry 42 }
+
+eqlStoragePoolStatsReplicantSiteFreeSpace OBJECT-TYPE      
+    SYNTAX          Counter64     
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space is available to remote replicas in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 43 }
+
+eqlStoragePoolStatsReplicantSiteBorrowing OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total amount of borrowing for just remote replicas"
+    ::=  { eqlStoragePoolStatsEntry 44 }
+
+eqlStoragePoolStatsSnapshotVirtualSpaceUsed OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space would be utilized by snapshots if there was no compression."
+    ::=  { eqlStoragePoolStatsEntry 45 }
+
+eqlStoragePoolStatsSnapshotPhysicalSpaceUsed OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space is utilized by snapshots, including compression savings"
+    ::=  { eqlStoragePoolStatsEntry 46 }
+
+eqlStoragePoolStatsReplicationBorrowing OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total amount of borrowing for just local replication."
+    ::=  { eqlStoragePoolStatsEntry 47 }
+
+eqlStoragePoolStatsVolumeVirtualSpaceUsed OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space would be utilized by volumes if there was no compression."
+    ::=  { eqlStoragePoolStatsEntry 48 }
+
+eqlStoragePoolStatsVolumePhysicalSpaceUsed OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space is utilized by volumes, including compression savings"
+    ::=  { eqlStoragePoolStatsEntry 49 }
 
 ---*************************************************************  
 

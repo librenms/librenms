@@ -1998,7 +1998,7 @@
             "order": 285,
             "group": "discovery",
             "section": "discovery_modules",
-            "default": true,
+            "default": false,
             "type": "boolean"
         },
         "discovery_modules.storage": {
@@ -6116,7 +6116,7 @@
             "order": 210,
             "group": "poller",
             "section": "poller_modules",
-            "default": true,
+            "default": false,
             "type": "boolean"
         },
         "poller_modules.qos": {

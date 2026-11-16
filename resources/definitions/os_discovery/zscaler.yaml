@@ -2,7 +2,8 @@ modules:
     os:
         sysDescr_regex:
             - '/ZscalerOS (?<version>\S+) FreeBSD/'
-            - '/(?<hardware>aarch64|amd64|arm\w*|i386)\s*$/i'
+            - '/^Linux zpa-service-edge (?<version>\S+) /'
+            - '/(?<hardware>aarch64|amd64|arm\w*|i386|x86_64)\s*$/i'
     sensors:
         percent:
             data:

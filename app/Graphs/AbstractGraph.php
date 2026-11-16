@@ -90,16 +90,24 @@ abstract class AbstractGraph implements GraphInterface
 
     public function render(): GraphImage
     {
+        $title = null;
+
         try {
             $this->checkRenderable();
+            $title = $this->params->visible('title') ? ($this->params->user_title ?? $this->getTitle()) : null;
             $image = $this->draw();
         } catch (GraphException $e) {
+            $e->graphTitle ??= $title;
+
             throw $e;
         } catch (Throwable $e) {
             // drawing libraries and queries fail with their own exceptions, keep the details out of the image
             report($e);
 
-            throw new GraphException('Graph Error', 'Error', $e);
+            $error = new GraphException('Graph Error', 'Error', $e);
+            $error->graphTitle = $title;
+
+            throw $error;
         }
 
         // the image is named after the title the user set

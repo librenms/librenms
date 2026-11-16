@@ -112,8 +112,7 @@ class Ipmi implements Module
     public function shouldPoll(OS $os): bool
     {
         // without discovered sensors there is nothing to poll, don't check IPMI
-        return $os->getDevice()->polling()->isEnabled(PollingMethodType::Ipmi)
-            && $this->dataExists($os->getDevice())
+        return $this->dataExists($os->getDevice())
             && $this->hasAvailableMethod($os);
     }
 

@@ -293,6 +293,16 @@ final class RancidProviderTest extends TestCase
         $this->assertStringContainsString('ntp server 2.2.2.2', $provider->content($this->makeDevice(), 'current'));
     }
 
+    public function testHostnameCannotEscapeConfigsDirectory(): void
+    {
+        LibrenmsConfig::set('rancid_repo_type', 'cvs');
+        file_put_contents($this->repo . '/outside', "secret\n");
+        $provider = resolve(RancidProvider::class);
+
+        $this->assertFalse($provider->supportsDevice($this->makeDevice('../outside')));
+        $this->assertFalse($provider->supportsDevice($this->makeDevice('sub/../../outside', 43)));
+    }
+
     public function testDiffWithUnknownRevisionIsBackupNotFound(): void
     {
         $this->initGitRepo();

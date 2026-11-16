@@ -297,7 +297,8 @@ class AppServiceProvider extends ServiceProvider
                 return $request->header('X-Auth-Token')
                     ?? $request->bearerToken()
                     ?? $request->query('api_token')
-                    ?? $request->input('api_token');
+                    ?? $request->input('api_token')
+                    ?? $request->getPassword();
             }
 
             return $request->bearerToken();

@@ -80,7 +80,7 @@ class VmInfoController implements DeviceTab
             'nav' => VminfoGraphs::nav($request->query(), fn (array $query): string => route('device', ['device' => $device->device_id, 'tab' => 'vm', ...$query])),
             'vms' => $graph ? $device->vminfo()
                 ->chaperone()
-                ->recordsMetrics()
+                ->recordsMetrics(VminfoGraphs::types()[$graph]['metric'])
                 ->applyFilters($request->array('filter'))
                 ->orderBy('vmwVmDisplayName')
                 ->paginate($request->integer('per_page', VminfoGraphs::PER_PAGE_OPTIONS[0]))

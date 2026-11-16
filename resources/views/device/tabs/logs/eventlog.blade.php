@@ -35,6 +35,7 @@
                 return {
                     device: {{ $device->device_id }},
                     eventtype: @json($eventtype),
+                    port: @json($port_id),
                 };
             },
             url: "{{ route('table.eventlog') }}"
@@ -61,6 +62,15 @@
             '</select>' +
             '</div>&nbsp;&nbsp;' +
             '<button type="submit" class="btn btn-default">Filter</button>' +
+
+            @if($port_id)
+                '<input type="hidden" name="port" value="{{ $port_id }}">' +
+                '&nbsp;&nbsp;' +
+                '<div class="form-group"><label><strong>{{ __('Port') }}&nbsp;&nbsp;</strong></label>' +
+                '<span class="form-control-static">' + @json($port ? e($port->getLabel()) : (string) $port_id) +
+                ' <a href="' + @json($clear_port_url) + '" title="{{ __('Clear port filter') }}">&times;</a></span></div>' +
+            @endif
+
             '</form>' +
             '</div>'
         );

@@ -142,12 +142,19 @@ function get_device_divisor($device, $os_version, SensorType|string $sensor_type
                 return 1;
             }
         }
+
     } elseif ($device['os'] == 'deltaups') {
         if ($sensor_type === SensorType::Voltage
             && ! Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.5.')
-            && Str::startsWith($device['hardware'] ?? '', 'Delta UPS602R2RT')) {
+            && Str::startsWith($device['hardware'] ?? '', [
+                'Delta UPS602R2RT',
+                'Delta UPA102',
+                'Delta UPS302R2RT',
+                'Delta UPS502R2RT',
+            ])) {
             return 10;
         }
+
     } elseif ($device['os'] == 'huaweiups') {
         if ($sensor_type === SensorType::Frequency) {
             if (Str::startsWith($device['hardware'], 'UPS2000')) {

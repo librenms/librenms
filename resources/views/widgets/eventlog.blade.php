@@ -18,15 +18,15 @@
         var grid = $("#eventlog-{{ $id }}").bootgrid({
             ajax: true,
             rowCount: [50, 100, 250, -1],
-            navigation: ! {{ $hidenavigation }},
+            navigation: @json(! $hidenavigation),
             post: function ()
             {
                 return {
-                    @if($message_filter) message: "{{ $message_filter }}", @endif
-                    @if($age) age: "{{ LibreNMS\Util\Time::durationToSeconds($age) }}", @endif
-                    device: "{{ $device }}",
-                    device_group: "{{ $device_group }}",
-                    eventtype: "{{ $eventtype }}"
+                    @if($message_filter) message: @json($message_filter), @endif
+                    @if($age) age: @json(LibreNMS\Util\Time::durationToSeconds($age)), @endif
+                    device: @json($device),
+                    device_group: @json($device_group),
+                    eventtype: @json($eventtype)
                 };
             },
             url: "{{ url('/ajax/table/eventlog') }}"

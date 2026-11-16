@@ -41,14 +41,14 @@ class RrdSeriesDefinitionTest extends TestCase
             'DEF:ds1min=host/test.rrd:out:MIN',
             'DEF:ds1max=host/test.rrd:out:MAX',
             'CDEF:ds1drawn=ds1,-1,*',
-            'LINE1.25:ds0#FF0000:In               ',
             'AREA:ds0#FF000020',
+            'AREA:ds1drawn#BB0000',
+            'LINE1.25:ds0#FF0000:In               ',
             'GPRINT:ds0:LAST:%5.2lf%sbps',
             'GPRINT:ds0min:MIN:%5.2lf%sbps',
             'GPRINT:ds0max:MAX:%5.2lf%sbps',
             'GPRINT:ds0:AVERAGE:%5.2lf%sbps\n',
             'LINE1.25:ds1drawn#AA0000:Out              ',
-            'AREA:ds1drawn#BB0000',
             'GPRINT:ds1:LAST:%5.2lf%sbps',
             'GPRINT:ds1min:MIN:%5.2lf%sbps',
             'GPRINT:ds1max:MAX:%5.2lf%sbps',
@@ -58,6 +58,24 @@ class RrdSeriesDefinitionTest extends TestCase
             'in' => new DataSeries($this->metric, 'in', 'In', 'bps', style: new SeriesStyle(fill: true)),
             'out' => new DataSeries($this->metric, 'out', 'Out', 'bps', style: new SeriesStyle(color: 'AA0000', fill: true, fillColor: 'BB0000', invert: true)),
         ], new GraphOptions(legendTitle: 'Traffic')));
+    }
+
+    public function test_max_fills_are_drawn_behind_the_fills(): void
+    {
+        $definition = $this->build([
+            'in' => new DataSeries($this->metric, 'in', 'In', scale: 8, style: new SeriesStyle(color: '608720', fill: true, fillColor: '90B040', maxFillColor: 'D7FFC7')),
+            'out' => new DataSeries($this->metric, 'out', 'Out', style: new SeriesStyle(color: '606090', maxFillColor: 'E0E0FF', invert: true)),
+        ]);
+
+        $this->assertContains('CDEF:ds1maxdrawn=ds1max,-1,*', $definition);
+        $drawing = array_values(preg_grep('/^(AREA|LINE)/', $definition));
+        $this->assertSame([
+            'AREA:ds0max#D7FFC7',
+            'AREA:ds1maxdrawn#E0E0FF',
+            'AREA:ds0#90B040',
+            'LINE1.25:ds0#608720:In               ',
+            'LINE1.25:ds1drawn#606090:Out              ',
+        ], $drawing);
     }
 
     public function test_draw_scale_only_changes_the_drawing(): void

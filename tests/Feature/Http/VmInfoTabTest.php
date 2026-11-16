@@ -133,6 +133,7 @@ final class VmInfoTabTest extends TestCase
     public function testAllVmsGraphViewShowsTheVmsThatRecordedTheGraph(): void
     {
         $recorded = Vminfo::factory()->create(['vm_type' => 'proxmox', 'vmwVmVMID' => 100]);
+        $container = Vminfo::factory()->create(['vm_type' => 'proxmox-lxc']);
         $unrecorded = Vminfo::factory()->create(['vm_type' => 'vmware']);
         $rrdDir = $this->useTemporaryRrdDir();
 
@@ -144,6 +145,7 @@ final class VmInfoTabTest extends TestCase
                 ->assertOk()
                 ->assertSee('vminfo_cpu')
                 ->assertSee(route('device.vm.show', ['device' => $recorded->device_id, 'vminfo' => $recorded->id]))
+                ->assertSee(route('device.vm.show', ['device' => $container->device_id, 'vminfo' => $container->id]))
                 ->assertDontSee(route('device.vm.show', ['device' => $unrecorded->device_id, 'vminfo' => $unrecorded->id]))
                 ->assertDontSee('data-url="' . route('table.vminfo') . '"', false);
         } finally {
@@ -183,6 +185,32 @@ final class VmInfoTabTest extends TestCase
             ->assertOk()
             ->assertSee(route('device.vm.show', ['device' => $recorded->device_id, 'vminfo' => $recorded->id]))
             ->assertDontSee('No virtual machines with graphs found.');
+    }
+
+    public function testLxcContainersDoNotTakeUpTheDiskOperationsGraphPage(): void
+    {
+        $containers = Vminfo::factory()->count(VminfoGraphs::PER_PAGE_OPTIONS[0])->create(['vm_type' => 'proxmox-lxc', 'vmwVmDisplayName' => 'a-container']);
+        $vm = Vminfo::factory()->proxmox()->create(['vmwVmDisplayName' => 'z-vm']);
+
+        $this->actingAs($this->admin())
+            ->get(route('vminfo.index', ['graph' => 'diskio_ops']))
+            ->assertOk()
+            ->assertSee(route('device.vm.show', ['device' => $vm->device_id, 'vminfo' => $vm->id]))
+            ->assertDontSee(route('device.vm.show', ['device' => $containers->first()->device_id, 'vminfo' => $containers->first()->id]))
+            ->assertViewHas('vms', fn ($vms): bool => $vms->total() === 1);
+    }
+
+    public function testDeviceDiskOperationsGraphsExcludeLxcContainers(): void
+    {
+        $device = Device::factory()->create();
+        $vm = Vminfo::factory()->for($device)->proxmox()->create();
+        $container = Vminfo::factory()->for($device)->create(['vm_type' => 'proxmox-lxc']);
+
+        $this->actingAs($this->admin())
+            ->get(route('device', ['device' => $device, 'tab' => 'vm', 'graph' => 'diskio_ops']))
+            ->assertOk()
+            ->assertSee(route('device.vm.show', ['device' => $device, 'vminfo' => $vm->id]))
+            ->assertDontSee(route('device.vm.show', ['device' => $device, 'vminfo' => $container->id]));
     }
 
     public function testListViewLinksToEachGraphViewKeepingTheFilter(): void

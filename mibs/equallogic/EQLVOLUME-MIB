@@ -1,4 +1,4 @@
--- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+-- Mib files packaged on  Wed Jun 19 01:31:39 EDT 2019 for Storage Array Firmware V10.0.3 (R469188)
 
 --FROM SNMP-FRAMEWORK-MIB; 
 -- RFC 2571  
@@ -27,10 +27,10 @@ IMPORTS
             FROM EQLSTORAGEPOOL-MIB;
 
 eqliscsiModule MODULE-IDENTITY      
-	LAST-UPDATED "201503171528Z"
+	LAST-UPDATED "201906190531Z"
     ORGANIZATION  "EqualLogic Inc."
     CONTACT-INFO      
-        "Contact: Customer Support
+        "Contact: Customer SupportFlags
          Postal:  Dell Inc
                   300 Innovative Way, Suite 301, Nashua, NH 03062
          Tel:     +1 603-579-9762
@@ -40,12 +40,12 @@ eqliscsiModule MODULE-IDENTITY
     DESCRIPTION          
         "Storage Array volume information 
 
-        Copyright (c) 2004-2011 by Dell, Inc. 
+        Copyright (c) 2004-2017 by Dell Inc. 
         
         All rights reserved.  This software may not be copied, disclosed, 
         transferred, or used except in accordance with a license granted 
-        by Dell, Inc.  This software embodies proprietary information 
-        and trade secrets of Dell, Inc. 
+        by Dell Inc.  This software embodies proprietary information 
+        and trade secrets of Dell Inc. 
         "
 
     -- Revision history, in reverse chronological order
@@ -157,7 +157,9 @@ VirtualVolumeType ::= TEXTUAL-CONVENTION
                               unknown(0),
                               config-VVol(1),
                               data-VVol(2),
-                              swap-VVol(3)
+                              swap-VVol(3),
+                              memory-VVol(4),
+                              other-VVol(5)
                            }
 
 
@@ -244,6 +246,63 @@ VirtualVolumeCreatedAs ::= TEXTUAL-CONVENTION
                                    snapshot (2),
                                    fast-clone (3)                        
                            }
+SharedVolumeGroupRole ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT       "d"
+       STATUS              current
+       DESCRIPTION        "This textual convention defines the possible roles of an
+                           SV in a Shared Volume Group"
+       SYNTAX              INTEGER  {
+                              unknown (0),
+                              member (1),
+                              dependent (2),
+                              readonly-shared-dependent (3)
+                           }
+
+
+BinaryUUID ::= TEXTUAL-CONVENTION
+       STATUS              current
+       DESCRIPTION         "Used to represent binary data that is 16 bytes long (UUID/PSVID)"
+       SYNTAX              OCTET STRING (SIZE(16))
+
+BinaryVendorId ::= TEXTUAL-CONVENTION
+       STATUS              current
+       DESCRIPTION         "Used to represent binary data that is 16 bytes long"
+       SYNTAX              OCTET STRING (SIZE(16))
+
+VirtualVolumeBitMap ::= TEXTUAL-CONVENTION
+       STATUS              current
+       DESCRIPTION         "Some vvol functions require a bitmap to be returned. The bitmap is 4096 bits,
+                            which is 512 bytes"
+       SYNTAX              OCTET STRING (SIZE(512))
+
+VirtualVolumeBitMapType ::= TEXTUAL-CONVENTION
+       STATUS              current
+       DESCRIPTION        "This textual convention defines the possible values for virtual volume bitmap type
+                           none      - Do not generate a bitmap
+                           unshared  - bitmap for unsharedChunksVirtualVolume
+                           allocated - bitmap for allocatedBitmapVirtualVolume" 
+       SYNTAX              INTEGER  {
+                              none(0),
+                              unshared(1),
+                              allocated(2)
+                           }
+
+VirtualVolumeAllocationPolicy ::= TEXTUAL-CONVENTION
+       STATUS              current
+       DESCRIPTION        "This textual convention defines the possible values for virtual volume allocation type
+                           thin      - no pages are allocated during vvol creation
+                           thick     - all pages are allocated during vvol creation, or a failure is returned" 
+       SYNTAX              INTEGER  {
+                              thin(0),
+                              thick(1)
+                           }
+
+Unsigned64 ::= TEXTUAL-CONVENTION
+       STATUS current
+       DESCRIPTION
+           "A non-negative 64-bit bit integer, without counter
+            semantics."
+       SYNTAX Counter64
 
 --***********************************************************************************
 
@@ -310,7 +369,11 @@ EqliscsiVolumeEntry ::=
         eqliscsiVolumeAdminAccountKey     Unsigned32,
         eqliscsiVolumeSCSIQErr            INTEGER, 
         eqliscsiVolumeBorrow              StatusAutoDefault,
-        eqliscsiVolumeSectorSize          INTEGER
+        eqliscsiVolumeSectorSize          INTEGER,
+        eqliscsiVolumeReplRollbackPsvId   OCTET STRING,
+        eqliscsiVolumeUUID                BinaryUUID,
+        eqliscsiVolumeMigrationState      INTEGER,
+        eqliscsiVolumeMigrationCookie     Unsigned64
    }
 
 eqliscsiVolumeIndex OBJECT-TYPE      
@@ -534,7 +597,8 @@ eqliscsiVolumeReplService  OBJECT-TYPE
                         replica-control-target(4),
                         host-control-target(5),
                         failover(6),
-			pe-control-target(7)
+                        pe-control-target(7),
+                        xpr-control-target(8)
     }     
     MAX-ACCESS      read-write      
     STATUS          current      
@@ -815,6 +879,43 @@ eqliscsiVolumeSectorSize OBJECT-TYPE
     DEFVAL          { sector-size-512-bytes }
     ::=   { eqliscsiVolumeEntry 42 } 
 
+eqliscsiVolumeReplRollbackPsvId  OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (16))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the psvId of snap from which this volume was rolled back as part of demote or as part of replicaset rollback."
+    ::=   { eqliscsiVolumeEntry 43 }
+
+eqliscsiVolumeUUID OBJECT-TYPE
+    SYNTAX          BinaryUUID
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Snapshot UUID used in XPR. This UUID conforms to RFC 4122 version 1."
+    ::=   { eqliscsiVolumeEntry 44 }
+
+eqliscsiVolumeMigrationState OBJECT-TYPE
+    SYNTAX          INTEGER     {
+                        none(0),
+                        normal(1),
+                        prep-for-migration(2),
+                        source-disabled-for-io(3),
+                        source-migration-in-progress(4),
+                        source-migration-done(5),
+                        source-aborted(6)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies migration state of volume. migration state 0/1 means same i.e. volume is not in migration."
+    DEFVAL          {normal}
+    ::=   { eqliscsiVolumeEntry 45 }
+
+eqliscsiVolumeMigrationCookie  OBJECT-TYPE
+    SYNTAX          Unsigned64
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the Cookie."
+    ::=   { eqliscsiVolumeEntry 46 }
+
 ---*************************************************************  
 
 eqliscsiSnapshotTable OBJECT-TYPE      
@@ -861,7 +962,11 @@ EqliscsiSnapshotEntry ::=
         eqliscsiSnapshotMultInitiator       INTEGER,
         eqliscsiSnapshotFlags               BITS,
         eqliscsiSnapshotCompressionDelay    Unsigned32,
-        eqliscsiSnapshotLifeExpectancy      Unsigned32
+        eqliscsiSnapshotLifeExpectancy      Unsigned32,
+        eqliscsiSnapshotOriginalUUID        OCTET STRING,
+        eqliscsiSnapshotParentOrigUUID      OCTET STRING,
+        eqliscsiSnapshotUUID                BinaryUUID,
+        eqliscsiSnapshotExpirationTime      Unsigned32
     }
 
 eqliscsiSnapshotIndex  OBJECT-TYPE      
@@ -1040,7 +1145,9 @@ eqliscsiSnapshotType  OBJECT-TYPE
     MAX-ACCESS      read-only      
     STATUS          current      
     DESCRIPTION     "Specifies the type of snapshot. Snapshot is of type of replica-site when
-                     the parent volume is of type replica-site.
+                     the parent volume is of type replica-site. The type default(5) indicates
+                     that this snapshot was generated by the default snapshot schedule -- NOT
+                     that 5 is the default value for a snapshot type.
                     "
     DEFVAL          { 1 }
     ::=   {eqliscsiSnapshotEntry 18 }
@@ -1093,7 +1200,7 @@ eqliscsiSnapshotFlags OBJECT-TYPE
                     iSNSDiscoverable(0), -- is the snapshot iSNS discoverable?
                     externalPauseReplication(1), -- Allow us to create replica snapshot in the paused state
                     compressible(2), -- Allow snapshot to be compressed
-                    flag3(3),
+                    createdByDefaultSched(3), -- Created by default snapshot schedule
                     flag4(4),
                     flag5(5),
                     flag6(6),
@@ -1134,18 +1241,59 @@ eqliscsiSnapshotCompressionDelay OBJECT-TYPE
     SYNTAX          Unsigned32
     UNITS           "minutes"
     MAX-ACCESS      read-write
-    STATUS          current
-    DESCRIPTION     "The minimum amount of time (minutes) to wait before allowing this snapshot to be compressed."
+    STATUS          deprecated
+    DESCRIPTION     "This field is deprecated and will not be used."
     ::=   { eqliscsiSnapshotEntry 25 }
 
 eqliscsiSnapshotLifeExpectancy OBJECT-TYPE
     SYNTAX          Unsigned32
     UNITS           "minutes"
     MAX-ACCESS      read-write
-    STATUS          current
-    DESCRIPTION     "The amount of time (minutes) this snapshot is estimated to be around."
+    STATUS          deprecated
+    DESCRIPTION     "This field is deprecated and will not be used."
     ::=   { eqliscsiSnapshotEntry 26 }
 
+eqliscsiSnapshotOriginalUUID  OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (16))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field contains the UUID of the original snapshot associated with this local snapshot through 
+                     replication. This could be the UUID of the local snapshot or the snapshot on the remote partner, 
+                     depending on where the replicated data originated from. If this snapshot is the source of the replicated 
+                     data then this column will match eqliscsiSnapshotUUID in this row. 
+                     If this snapshot is the target of the replicated data then this field will contain the UUID of the 
+                     remote snapshot (the source of the replicated data). This field is only used for Cross Platform 
+                     Replication (XPR)."
+    ::=  {  eqliscsiSnapshotEntry 27 }  
+
+eqliscsiSnapshotParentOrigUUID  OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (16))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field contains the original UUID (eqliscsiSnapshotOriginalUUID) of the parent(i.e., previous) 
+                     replication snapshot.  This field is used for replica snaps created for XPR partners. This field 
+                     represents the original snapshot that was previously replicated. The current snapshot (i.e., this 
+                     snapshot entry) is considered a delta from the parent snapshot represented by this field. This field 
+                     is only populated for replicas. This field is only used for Cross Platform Replication (XPR)" 
+    ::=  {  eqliscsiSnapshotEntry 28 } 
+
+eqliscsiSnapshotUUID OBJECT-TYPE
+    SYNTAX          BinaryUUID
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Snapshot UUID used in XPR. This UUID conforms to RFC 4122 version 1."
+    ::=  {  eqliscsiSnapshotEntry 29 } 
+
+eqliscsiSnapshotExpirationTime OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field indicates the Time to live (in seconds) i.e expiration time of the replica snapshot as sent
+                    by the XPR partner.This field is used only in cross-platform Replication(XPR).By default the value is 0
+                    which indicates no expiry"
+    DEFVAL          { 0 }
+    ::=  {  eqliscsiSnapshotEntry 30 }
 ---************************************************************      
 eqliscsiVolumeMemberTable OBJECT-TYPE      
     SYNTAX          SEQUENCE OF EqliscsiVolumeMemberEntry      
@@ -1621,7 +1769,8 @@ EqliscsiVolumeACLEntry ::=
         eqliscsiVolumeACLInitiatorInetAddressType         InetAddressType,
         eqliscsiVolumeACLInitiatorInetAddress             InetAddress,
         eqliscsiVolumeACLInitiatorInetWildcardType        InetAddressType,
-        eqliscsiVolumeACLInitiatorInetWildcard            InetAddress
+        eqliscsiVolumeACLInitiatorInetWildcard            InetAddress,
+        eqliscsiVolumeACLInitiatorDescription           UTFString
     }
 eqliscsiVolumeACLIndex  OBJECT-TYPE      
     SYNTAX          Integer32    
@@ -1784,6 +1933,15 @@ eqliscsiVolumeACLInitiatorInetWildcard OBJECT-TYPE
                      address must match exactly unless this variable is specified."
     ::=   { eqliscsiVolumeACLEntry 15}
 
+eqliscsiVolumeACLInitiatorDescription OBJECT-TYPE 
+    SYNTAX          UTFString (SIZE (0..128))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a descriptive string that provides 
+                     details of the access point.  The description can be up 
+                     to 127 bytes plus NULL."  
+    DEFVAL          { "" }
+    ::=  { eqliscsiVolumeACLEntry 16 }
 
 --*************************************************************************
 
@@ -1826,7 +1984,15 @@ EqliscsiVolumeStatusEntry ::=
         eqliscsiVolumeStatusPagesSharedWithParent Unsigned32,
         eqliscsiVolumeStatusExternalConnections   Integer32,
         eqliscsiVolumeStatusSpaceBorrowing        Integer32,     
-        eqliscsiVolumeStatusBorrow                INTEGER
+        eqliscsiVolumeStatusBorrow                INTEGER,
+        eqliscsiVolumeStatusVirtualSnapUsage      Counter32,
+        eqliscsiVolumeStatusPhysicalSnapUsage     Counter32,
+        eqliscsiVolumeStatusCompressedSnapData    Counter32, 
+        eqliscsiVolumeStatusPhysicalCompressedSnapDataSize Counter32,
+        eqliscsiVolumeStatusVirtualVolUsage      Counter32,
+        eqliscsiVolumeStatusPhysicalVolUsage     Counter32,
+        eqliscsiVolumeStatusCompressedVolData    Counter32, 
+        eqliscsiVolumeStatusPhysicalCompressedVolDataSize Counter32
     }
 
 eqliscsiVolumeStatusPsvId OBJECT-TYPE      
@@ -2032,6 +2198,70 @@ eqliscsiVolumeStatusBorrow OBJECT-TYPE
     DESCRIPTION     "This field specifies operational status of borrowing."
     ::= { eqliscsiVolumeStatusEntry 20 }
 
+eqliscsiVolumeStatusVirtualSnapUsage OBJECT-TYPE      
+    SYNTAX          Counter32
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space would be utilized by compressed pages in this pool if there was no compression."
+    ::=  { eqliscsiVolumeStatusEntry 21 }
+
+eqliscsiVolumeStatusPhysicalSnapUsage OBJECT-TYPE      
+    SYNTAX          Counter32
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space is currently utilized for compressed pages in this storage pool.   This is a dynamic value and cannot be set."
+    ::=  { eqliscsiVolumeStatusEntry 22 }
+
+eqliscsiVolumeStatusCompressedSnapData OBJECT-TYPE      
+    SYNTAX          Counter32
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "TBD"
+    ::=  { eqliscsiVolumeStatusEntry 23 }
+
+eqliscsiVolumeStatusPhysicalCompressedSnapDataSize OBJECT-TYPE      
+    SYNTAX          Counter32
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "TBD"
+    ::=  { eqliscsiVolumeStatusEntry 24 }
+
+eqliscsiVolumeStatusVirtualVolUsage OBJECT-TYPE      
+    SYNTAX          Counter32
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space would be utilized by compressed pages in this pool if there was no compression."
+    ::=  { eqliscsiVolumeStatusEntry 25 }
+
+eqliscsiVolumeStatusPhysicalVolUsage OBJECT-TYPE      
+    SYNTAX          Counter32
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space is currently utilized for compressed pages in this storage pool.   This is a dynamic value and cannot be set."
+    ::=  { eqliscsiVolumeStatusEntry 26 }
+
+eqliscsiVolumeStatusCompressedVolData OBJECT-TYPE      
+    SYNTAX          Counter32
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "TBD"
+    ::=  { eqliscsiVolumeStatusEntry 27 }
+
+eqliscsiVolumeStatusPhysicalCompressedVolDataSize OBJECT-TYPE      
+    SYNTAX          Counter32
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "TBD"
+    ::=  { eqliscsiVolumeStatusEntry 28 }
+    
 --*************************************************************************
 
 eqliscsiSnapshotStatusTable OBJECT-TYPE      
@@ -2497,7 +2727,14 @@ EqliscsiVolumeReplSiteEntry ::= SEQUENCE {
    eqliscsiVolumeReplSiteNASPartnershipId    Unsigned32,
    eqliscsiVolumeReplSiteBlockState          StatusEnabledDefault,
    eqliscsiVolumeReplSiteNASState            StatusDisabledDefault,
-   eqliscsiVolumeReplSiteType                INTEGER
+   eqliscsiVolumeReplSiteType                INTEGER,
+   eqliscsiVolumeReplSiteSpaceAvail          Unsigned32,
+   eqliscsiVolumeReplSiteSpaceBorrowing      Unsigned32,
+   eqliscsiVolumeReplSiteSpaceTimeStamp      Unsigned32,
+   eqliscsiVolumeReplControlTargetLun        Unsigned32,
+   eqliscsiVolumeReplSiteSystemUUID          DisplayString,
+   eqliscsiVolumeReplSiteBiDirControlCredentials  RowPointer,
+   eqliscsiVolumeReplSiteCHAPType            INTEGER
 }
 
 eqliscsiVolumeReplSiteIndex    OBJECT-TYPE
@@ -2720,13 +2957,93 @@ eqliscsiVolumeReplSiteNASState OBJECT-TYPE
 eqliscsiVolumeReplSiteType OBJECT-TYPE
    SYNTAX      INTEGER{
                normal(0),
-               external(1)
+               external(1),
+               grpPartner(2),
+               compellent(3)
    }
    MAX-ACCESS  read-create
    STATUS      current
-   DESCRIPTION "This field represents the site type. 0 is normal aka regular repl site. 1 is external site that is not an EQL array."
+   DESCRIPTION "This field represents the site type. 
+               0 is EQL IPC based replication partner. 
+               1 is external site that is not an EQL array. 
+               2 is a Generic Replication Protocol Partner. 
+               3 is a Compellent replication partner."
    DEFVAL     { normal }
     ::=  {  eqliscsiVolumeReplSiteEntry 24 }
+    
+eqliscsiVolumeReplSiteSpaceAvail OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "This field specifies how many MB of reserved
+                space on the site are unused by the replicated volumes."
+    ::=  { eqliscsiVolumeReplSiteEntry  25 }
+
+eqliscsiVolumeReplSiteSpaceBorrowing OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "This field specifies how many MB of space
+                replicated volumes on the site are borrowing."
+    ::=  { eqliscsiVolumeReplSiteEntry  26 }
+    
+eqliscsiVolumeReplSiteSpaceTimeStamp OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "This is the timestamp that the ReplSiteSpace in-use information 
+                (avail/borrowing/allocated/used) was last modified.  If the timestamp is zero 
+                it means the available and borrowing values are not valid."
+    ::=  { eqliscsiVolumeReplSiteEntry  27 }
+
+eqliscsiVolumeReplControlTargetLun OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "This field represent the Remote Control Target Lun,
+                which is used when eqliscsiVolumeReplSiteType is compellent."
+    ::=  { eqliscsiVolumeReplSiteEntry  28 }
+
+eqliscsiVolumeReplSiteSystemUUID OBJECT-TYPE
+   SYNTAX          DisplayString(SIZE(0..37))
+   MAX-ACCESS      read-create
+   STATUS          current
+   DESCRIPTION     "String representation of the Partner's System UUID used 
+                    for Compellent replication. 
+                    This UUID conforms to RFC 4122 version 1."
+    ::=  { eqliscsiVolumeReplSiteEntry  29 }
+
+eqliscsiVolumeReplSiteBiDirControlCredentials  OBJECT-TYPE
+    SYNTAX          RowPointer
+    MAX-ACCESS      read-create     
+    STATUS          current      
+    DESCRIPTION
+        "EQL-SECONDARY-KEY 
+         A pointer to the corresponding IPS-AUTH MIB 
+         ipsAuthCredChapAttributesEntry that contains the  
+         chap credentials which this PSA will use to 
+         verify the response received from the target
+         when the PSA, acting as an initiator, has sent
+         a CHAP challenge."
+    REFERENCE
+        "IPS-AUTH MIB"
+::= { eqliscsiVolumeReplSiteEntry 30 }
+
+eqliscsiVolumeReplSiteCHAPType OBJECT-TYPE
+   SYNTAX      INTEGER{
+               none(0),
+               single(1),
+               mutual(2)
+   }
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "This field represents the site type. 
+                0 is no CHAP authentication
+                1 is single CHAP authentication (target issues challenge). 
+                2 is mutual CHAP authentication "
+   DEFVAL     { mutual }
+    ::=  { eqliscsiVolumeReplSiteEntry  31 }
+
 
 --
 -- Volume Replication Table
@@ -2776,7 +3093,9 @@ EqliscsiVolumeReplicationEntry ::= SEQUENCE {
    eqliscsiVolumeReplSyncAdminStatus   INTEGER,
    eqliscsiVolumeReplSyncOperStatus    INTEGER,
    eqliscsiVolumeReplTemplateReplicated   TruthValue,
-   eqliscsiVolumeReplThinClone           TruthValue
+   eqliscsiVolumeReplThinClone         TruthValue,
+   eqliscsiVolumeReplLSRSnapPsvId      OCTET STRING,
+   eqliscsiVolumeReplReplicaTimeToLiveSecs Unsigned32 
 }
 
 eqliscsiVolumeReplRowStatus   OBJECT-TYPE     
@@ -2824,7 +3143,7 @@ eqliscsiVolumeReplRemoteIscsiPort   OBJECT-TYPE
 
 eqliscsiVolumeReplRemotePsvId OBJECT-TYPE      
     SYNTAX          OCTET STRING (SIZE (16))     
-    MAX-ACCESS      read-only      
+    MAX-ACCESS      read-create      
     STATUS          current      
     DESCRIPTION     "EQL-SECONDARY-KEY 
                      A 16 byte, universally unique identifier for
@@ -3071,6 +3390,30 @@ eqliscsiVolumeReplThinClone  OBJECT-TYPE
     DEFVAL          {false}
     ::=   { eqliscsiVolumeReplicationEntry 26 }
 
+
+eqliscsiVolumeReplLSRSnapPsvId OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (16))     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "A 16 byte universally unique identifier for
+                     the most recent snapshot that was successfully 
+                     replicated to the partner."
+::= { eqliscsiVolumeReplicationEntry 27 }   
+
+eqliscsiVolumeReplReplicaTimeToLiveSecs OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "
+                     This field specifies the time-to-live parameter of replica snapshots made 
+                     for this volume in the PSG to Compellent Storage Center replication only.
+                     In the Storage Center to PSG direction, this field is not used and given a
+                     default of never-delete or 0.
+                    " 
+    DEFVAL         { 0 }
+   
+::= { eqliscsiVolumeReplicationEntry 28 }   
+
 --
 -- Volume Replication Status Table
 --
@@ -3218,7 +3561,8 @@ EqliscsiRemoteReplicaEntry ::= SEQUENCE {
    eqliscsiRemoteReplTimeStamp   Counter32,
    eqliscsiRemoteReplSnapColIndex Unsigned32,
    eqliscsiRemoteReplScheduleIndex Unsigned32,
-   eqliscsiRemoteReplLocalMemberId Unsigned32
+   eqliscsiRemoteReplLocalMemberId Unsigned32,
+   eqliscsiRemoteReplLun           Unsigned32
 }
 
 eqliscsiRemoteVolumeIndex OBJECT-TYPE      
@@ -3327,6 +3671,14 @@ eqliscsiRemoteReplLocalMemberId OBJECT-TYPE
                      This field represents eqliscsiLocalMemberId field of the snapshot index of the replica on secondary site."
     ::= {   eqliscsiRemoteReplicaEntry 10 }
 
+eqliscsiRemoteReplLun OBJECT-TYPE      
+    SYNTAX          Unsigned32  
+    MAX-ACCESS      read-only     
+    STATUS          current      
+   DESCRIPTION      "This field represents the LUN for the remote replica.
+                     This field is used when replicating to compellent."
+    ::= {   eqliscsiRemoteReplicaEntry 11 }
+
 ----------------------------------------------------------------------
 --
 -- Replica Site Volume replication control MIBs
@@ -3372,7 +3724,10 @@ EqliscsiReplicaSetEntry ::= SEQUENCE {
    eqliscsiReplicaSetSyncAdminStatus    INTEGER,
    eqliscsiReplicaSetTemplateReplicated TruthValue,
    eqliscsiReplicaSetThinClone          TruthValue,
-   eqliscsiReplicaSetRemotePsvId        OCTET STRING
+   eqliscsiReplicaSetRemotePsvId        OCTET STRING,
+   eqliscsiReplicaSetPriStoragePoolName UTFString,
+   eqliscsiReplicaSetDynamicThinReserve Unsigned32,
+   eqliscsiReplicaSetLSRSnapshotIndex   Unsigned32
 }
 
 
@@ -3568,6 +3923,30 @@ eqliscsiReplicaSetRemotePsvId OBJECT-TYPE
                      by the array where the volume is located."  
 ::= { eqliscsiReplicaSetEntry 25 }
 
+eqliscsiReplicaSetPriStoragePoolName OBJECT-TYPE
+    SYNTAX          UTFString (SIZE (1..64))    
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "EQL-SECONDARY-KEY
+                     This field specifies the pool name for this replica set's primary volume."
+    DEFVAL           { "default" }
+    ::=  {  eqliscsiReplicaSetEntry 26 }  
+
+eqliscsiReplicaSetDynamicThinReserve OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The value of this column represents the eqliscsiVolumeReplDynamicThinReserve
+                     of the corresponding volume on the primary site."
+::= { eqliscsiReplicaSetEntry 27 }
+
+eqliscsiReplicaSetLSRSnapshotIndex  OBJECT-TYPE      
+    SYNTAX          Unsigned32    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The index of the last successful replication snapshot in this replicaset."
+::= { eqliscsiReplicaSetEntry 28 }
+  
 --
 -- ReplicaSet status table
 --
@@ -3663,7 +4042,8 @@ EqliscsiReplicantSiteEntry ::= SEQUENCE {
    eqliscsiReplicantSiteInetAddrType         InetAddressType,
    eqliscsiReplicantSiteInetAddr             InetAddress,
    eqliscsiReplicantSiteUnmanagedSpace       Unsigned32,
-   eqliscsiReplicantSiteReplType                INTEGER
+   eqliscsiReplicantSiteReplType             INTEGER,
+   eqliscsiReplicantSiteBiDirControlCredentials RowPointer
 }
 
 eqliscsiReplicantSiteIndex    OBJECT-TYPE
@@ -3879,13 +4259,36 @@ eqliscsiReplicantSiteUnmanagedSpace OBJECT-TYPE
 eqliscsiReplicantSiteReplType OBJECT-TYPE
    SYNTAX      INTEGER{
                normal(0),
-               external(1)
+               external(1),
+               grpPartner(2),
+               compellent(3)
    }
    MAX-ACCESS  read-create
    STATUS      current
-   DESCRIPTION "This field represents the site type. 0 is normal aka regular repl site. 1 is external site that is not EQL."
+   DESCRIPTION "This field represents the site type. 
+                0 is EQL IPC based replication partner.
+                1 is external site that is not an EQL array. 
+                2 is a Generic Replication Protocol Partner. 
+                3 is a Compellent replication partner."
    DEFVAL     { normal }
     ::=  { eqliscsiReplicantSiteEntry  23 }
+    
+eqliscsiReplicantSiteBiDirControlCredentials  OBJECT-TYPE
+    SYNTAX          RowPointer
+    MAX-ACCESS      read-create     
+    STATUS          current      
+    DESCRIPTION
+        "EQL-SECONDARY-KEY 
+         A pointer to the corresponding IPS-AUTH MIB 
+         ipsAuthCredChapAttributesEntry that contains the  
+         chap credentials which this PSA will use to 
+         verify the response received from the target
+         when the PSA, acting as an initiator, has sent
+         a CHAP challenge."
+    REFERENCE
+        "IPS-AUTH MIB"
+::= { eqliscsiReplicantSiteEntry 24 }
+
 ----------------------------------------------------------------------
 
 -- Volume collection objects table
@@ -6217,7 +6620,13 @@ EqliscsiReplicantSiteStatusEntry ::= SEQUENCE {
    eqliscsiReplicantSiteStatusAvailable     INTEGER,
    eqliscsiReplicantSiteStatusMajorVersion  Unsigned32,
    eqliscsiReplicantSiteStatusMinorVersion  Unsigned32,
-   eqliscsiReplicantSiteStatusMaintVersion  Unsigned32
+   eqliscsiReplicantSiteStatusMaintVersion  Unsigned32,
+   eqliscsiReplicantSiteStatusSpaceAvail    Unsigned32,
+   eqliscsiReplicantSiteStatusSpaceBorrowing Unsigned32,
+   eqliscsiReplicantSiteStatusVirtualSpaceUsed Unsigned32,
+   eqliscsiReplicantSiteStatusPhysicalSpaceUsed Unsigned32,
+   eqliscsiReplicantSiteStatusCompressedSpaceUsed Unsigned32,
+   eqliscsiReplicantSiteStatusPhysicalCompressedSpaceUsed Unsigned32
 }
 
 eqliscsiReplicantSiteStatusAvailable     OBJECT-TYPE
@@ -6259,6 +6668,60 @@ eqliscsiReplicantSiteStatusMaintVersion  OBJECT-TYPE
                      of the remote replication site group."
     DEFVAL          { 0 }
     ::=  { eqliscsiReplicantSiteStatusEntry  4 }
+
+eqliscsiReplicantSiteStatusSpaceAvail  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The amount of delegated space that is not reserved, plus
+                     any unused remote replica reserves within the delegated
+                     space. The value is an aggregate across all pools in which
+                     this site has delegated space."
+    DEFVAL          { 0 }
+    ::=  { eqliscsiReplicantSiteStatusEntry  5 }
+
+eqliscsiReplicantSiteStatusSpaceBorrowing  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The amount of space the replica sets for this site are
+                     borrowing beyond their remote replica reserves. The value
+                     is an aggregate across all pools in which this site has
+                     delegated space."
+    DEFVAL          { 0 }
+    ::=  { eqliscsiReplicantSiteStatusEntry  6 }
+
+eqliscsiReplicantSiteStatusVirtualSpaceUsed  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The amount of storage data within the replicaset"
+    DEFVAL          { 0 }
+    ::=  { eqliscsiReplicantSiteStatusEntry  7 }
+
+eqliscsiReplicantSiteStatusPhysicalSpaceUsed  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The amount of storage taken up by the virtual space used, due to compression."
+    DEFVAL          { 0 }
+    ::=  { eqliscsiReplicantSiteStatusEntry  8 }
+
+eqliscsiReplicantSiteStatusCompressedSpaceUsed  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The amount of snapshot (replica) data that was sent to the compression engine"
+    DEFVAL          { 0 }
+    ::=  { eqliscsiReplicantSiteStatusEntry  9 }
+
+eqliscsiReplicantSiteStatusPhysicalCompressedSpaceUsed  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The amount of storage required for the snapshot (replica) data that was compressed."
+    DEFVAL          { 0 }
+    ::=  { eqliscsiReplicantSiteStatusEntry  10 }
 
 --******************************************************************
 eqliscsiVolumeTaskStatusTable OBJECT-TYPE      
@@ -7006,7 +7469,8 @@ EqliscsiVolumeSyncReplVirtualStatusEntry ::=
         eqliscsiVolumeSyncReplVirtualStatusConnections         Integer32,
         eqliscsiVolumeSyncReplVirtualStatusAllocatedSpace      Unsigned32,
         eqliscsiVolumeSyncReplVirtualStatusVolReserveSpace     Unsigned32,
-        eqliscsiVolumeSyncReplVirtualStatusExtConnections      Integer32
+        eqliscsiVolumeSyncReplVirtualStatusExtConnections      Integer32,
+        eqliscsiVolumeSyncReplVirtualStatusSpaceBorrowing      Integer32 
     }
 
 eqliscsiVolumeSyncReplVirtualStatusReservedSpace OBJECT-TYPE      
@@ -7097,6 +7561,17 @@ eqliscsiVolumeSyncReplVirtualStatusExtConnections OBJECT-TYPE
              connections to this volume, not counting EQL generated connections.
             "
     ::= {   eqliscsiVolumeSyncReplVirtualStatusEntry 8 }
+    
+eqliscsiVolumeSyncReplVirtualStatusSpaceBorrowing OBJECT-TYPE      
+    SYNTAX          Integer32
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     
+            "
+             This field specifies how many MB of space that this volume is borrowing.
+            "
+    ::= { eqliscsiVolumeSyncReplVirtualStatusEntry 9 }
 
 ---*************************************************************  
 
@@ -8116,7 +8591,10 @@ EqliscsiSharedVolumeEntry ::=
         eqliscsiSharedVolumeSharedVolumeSet                   EQL2PartRowPointerStr,
         eqliscsiSharedVolumeDescription                       UTFString,
         eqliscsiSharedVolumeFlags                             BITS,
-        eqliscsiSharedVolumeSecondaryLunId                    Unsigned32
+        eqliscsiSharedVolumeSecondaryLunId                    Unsigned32,
+        eqliscsiSharedVolumeSVG                               OCTET STRING,
+        eqliscsiSharedVolumeExternalSVId                      OCTET STRING,
+        eqliscsiSharedVolumeAllocationPolicy                  VirtualVolumeAllocationPolicy
     }
 
 eqliscsiSharedVolumeIndex OBJECT-TYPE      
@@ -8207,7 +8685,9 @@ eqliscsiSharedVolumeDescription OBJECT-TYPE
 
 eqliscsiSharedVolumeFlags OBJECT-TYPE
     SYNTAX          BITS {
-                        isVvol(0)
+                        isVvol(0),
+                        isReadOnly(1),         -- is this sv created as read-only
+                        isDeleted(2)           -- is sv deleted but still referenced in a recovery point
     }
     MAX-ACCESS      read-only
     STATUS          current
@@ -8224,7 +8704,30 @@ eqliscsiSharedVolumeSecondaryLunId OBJECT-TYPE
                      This is an auto-generated field for internal use only."
     ::=   { eqliscsiSharedVolumeEntry 11 }
 
+eqliscsiSharedVolumeSVG OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (16))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "If this shared volume is a member of a shared volume group, this field is the
+         unique universal identifier of the corresponding Shared Volume Group that contains this member." 
+     ::=  { eqliscsiSharedVolumeEntry 12 }
+		 
+eqliscsiSharedVolumeExternalSVId OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (16))     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the SV PsvId used to
+                     create external access (NAAID) to the shared volume."   
+    ::= { eqliscsiSharedVolumeEntry 13 }
 
+eqliscsiSharedVolumeAllocationPolicy OBJECT-TYPE      
+    SYNTAX          VirtualVolumeAllocationPolicy     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the Allocation type of the vvol"   
+    ::= { eqliscsiSharedVolumeEntry 14 }
+    
 --******************************************************************
 
 
@@ -8254,7 +8757,8 @@ EqlVmwareVirtualVolumeEntry ::=
                 
         eqlVmwareVirtualVolumeRowStatus               RowStatus,
         eqlVmwareVirtualVolumeType                    VirtualVolumeType,   
-        eqlVmWareVirtualVolumeIfSnapshotCreateDate    Counter32
+        eqlVmWareVirtualVolumeIfSnapshotCreateDate    Counter32,
+        eqlVmwareVirtualVolumeLastBoundActivity       Integer32
     }
 
 eqlVmwareVirtualVolumeRowStatus OBJECT-TYPE      
@@ -8281,6 +8785,12 @@ eqlVmWareVirtualVolumeIfSnapshotCreateDate OBJECT-TYPE
                      in-progress snapshots that were never completed by VMware" 
     ::= { eqlVmwareVirtualVolumeEntry 3 }
 
+eqlVmwareVirtualVolumeLastBoundActivity OBJECT-TYPE      
+    SYNTAX          Integer32  
+    MAX-ACCESS      read-write
+    STATUS          current      
+    DESCRIPTION     "This field specifies the time at which the bound status of the vvol last changed" 
+    ::= { eqlVmwareVirtualVolumeEntry 4 }
 
 --******************************************************************
 
@@ -8333,7 +8843,8 @@ eqliscsiSharedVolumeStatusOperStatus OBJECT-TYPE
                         not-available-due-to-thin-max-growth-met(5),
                         not-available-due-to-nospace-for-auto-grow(7),
                         not-available-due-to-missing-pages(8),                        
-                        not-available-due-to-internal-error(9)
+                        not-available-due-to-internal-error(9),
+                        available-lost-cached-blocks(10)
     }         
     MAX-ACCESS      read-only      
     STATUS          current      
@@ -8381,7 +8892,8 @@ EqliscsiDynVVolEntry ::=
         eqliscsiDynVVolCreateDerivedType                 INTEGER,
         eqliscsiDynVVolCreateDerivedFromParent           EQL2PartRowPointerStr,
         eqliscsiDynVVolIfSnapshotMyStatus                VirtualVolumeSnapshotStatus,
-        eqliscsiDynVVolPsvid                             OCTET STRING
+        eqliscsiDynVVolPsvid                             OCTET STRING,
+        eqliscsiDynVVolAllocationPolicy                  VirtualVolumeAllocationPolicy
     }
 
 eqliscsiDynVVolRowStatus OBJECT-TYPE
@@ -8489,6 +9001,14 @@ eqliscsiDynVVolPsvid OBJECT-TYPE
     DESCRIPTION     "This is read-only field, it stores the unique universal identifier for this
                      Virtual volume. " 
     ::=  { eqliscsiDynVVolEntry 13 }
+
+eqliscsiDynVVolAllocationPolicy OBJECT-TYPE      
+    SYNTAX          VirtualVolumeAllocationPolicy    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "Specifies the allocation policy for the vvol"
+    ::=  { eqliscsiDynVVolEntry 14 }
+
 
 ---*************************************************************  
 
@@ -8785,8 +9305,8 @@ eqlDynamicSharedVolumeDiffTable OBJECT-TYPE
     MAX-ACCESS      not-accessible      
     STATUS          current      
     DESCRIPTION     "EqualLogic-Dynamic shared volume difference table
-                     This write-only table is a dynamic table used by clients to perform a difference 
-                     between 2 volumes"
+                     This create-only table is a dynamic table used by clients to perform a difference 
+                     between 2 volumes. Generates an entry in the table eqlDynamicSharedVolumeDiffChunkTable"
 
     ::=    { eqliscsiTarget 91 }
 
@@ -8802,11 +9322,11 @@ eqlDynamicSharedVolumeDiffEntry OBJECT-TYPE
 EqlDynamicSharedVolumeDiffEntry ::= 
     SEQUENCE {
         eqlDynamicSharedVolumeDiffRowStatus             RowStatus,
-        eqlDynamicSharedVolumeDiffBaseIndex             EQL2PartRowPointerStr,        
-        eqlDynamicSharedVolumeDiffAdmin                 INTEGER,
-        eqlDynamicSharedVolumeDiffStartSegmentOffset    Counter64,
-        eqlDynamicSharedVolumeDiffSegmentsLength        Counter64, 
-        eqlDynamicSharedVolumeDiffChunkSize             Unsigned32
+        eqlDynamicSharedVolumeDiffParentIndex           EQL2PartRowPointerStr,        
+        eqlDynamicSharedVolumeDiffBitMapType            VirtualVolumeBitMapType,
+        eqlDynamicSharedVolumeDiffStartByteOffset       Counter64,
+        eqlDynamicSharedVolumeDiffByteCount             Counter64, 
+        eqlDynamicSharedVolumeDiffChunkSize             Counter64
     }
 
 eqlDynamicSharedVolumeDiffRowStatus OBJECT-TYPE      
@@ -8816,25 +9336,24 @@ eqlDynamicSharedVolumeDiffRowStatus OBJECT-TYPE
     DESCRIPTION     "This field is used indicate the status of this entry."
     ::=   { eqlDynamicSharedVolumeDiffEntry 1 }
 
-eqlDynamicSharedVolumeDiffBaseIndex OBJECT-TYPE      
+eqlDynamicSharedVolumeDiffParentIndex OBJECT-TYPE      
     SYNTAX          EQL2PartRowPointerStr    
     MAX-ACCESS      read-create
     STATUS          current      
     DESCRIPTION     "This field specifies the base shared volume index associated with the shared volume."
     ::=   { eqlDynamicSharedVolumeDiffEntry 2}
 
-eqlDynamicSharedVolumeDiffAdmin OBJECT-TYPE      
-    SYNTAX          INTEGER    {
-                        unSharedBitMap  (1),
-                        allocatedBitMap (2),
-                        unsharedChunks  (3)
-    }
+eqlDynamicSharedVolumeDiffBitMapType OBJECT-TYPE      
+    SYNTAX          VirtualVolumeBitMapType
     MAX-ACCESS      read-create      
     STATUS          current      
-    DESCRIPTION     "This field identifes the type of diff ooperation"                    
+    DESCRIPTION     "The type of bitmap to generate.
+                        none      - Do not generate a bitmap
+                        unshared  - bitmap for unsharedChunksVirtualVolume
+                        allocated - bitmap for allocatedBitmapVirtualVolume"                  
     ::=  { eqlDynamicSharedVolumeDiffEntry 3 }
 
-eqlDynamicSharedVolumeDiffStartSegmentOffset    OBJECT-TYPE
+eqlDynamicSharedVolumeDiffStartByteOffset    OBJECT-TYPE
     SYNTAX        Counter64 
     MAX-ACCESS    read-create
     STATUS        current
@@ -8842,7 +9361,7 @@ eqlDynamicSharedVolumeDiffStartSegmentOffset    OBJECT-TYPE
       "This value represents the starting segment for the diff operation"
     ::= { eqlDynamicSharedVolumeDiffEntry 4 }
 
-eqlDynamicSharedVolumeDiffSegmentsLength    OBJECT-TYPE
+eqlDynamicSharedVolumeDiffByteCount    OBJECT-TYPE
     SYNTAX        Counter64 
     MAX-ACCESS    read-create
     STATUS        current
@@ -8851,7 +9370,7 @@ eqlDynamicSharedVolumeDiffSegmentsLength    OBJECT-TYPE
     ::= { eqlDynamicSharedVolumeDiffEntry 5 }
 
 eqlDynamicSharedVolumeDiffChunkSize    OBJECT-TYPE
-    SYNTAX        Unsigned32 
+    SYNTAX        Counter64 
     MAX-ACCESS    read-create
     STATUS        current
     DESCRIPTION
@@ -8863,17 +9382,17 @@ eqlDynamicSharedVolumeDiffChunkSize    OBJECT-TYPE
 eqliscsiVolumeCompressionConfigurationTable OBJECT-TYPE
     SYNTAX        SEQUENCE OF EqliscsiVolumeCompressionConfigurationEntry
     MAX-ACCESS    not-accessible
-    STATUS        current
+    STATUS        deprecated
     DESCRIPTION
      "EqualLogic-Persistent
       This table defines volume specific compression paramters.
-      "
+      This table is deprecated and will not be used."
 ::= { eqliscsiTarget 92 }
 
 eqliscsiVolumeCompressionConfigurationEntry OBJECT-TYPE
     SYNTAX        EqliscsiVolumeCompressionConfigurationEntry
     MAX-ACCESS    not-accessible
-    STATUS        current
+    STATUS        deprecated
     DESCRIPTION
       "An entry in the volume compression configuration table."
     INDEX           { eqliscsiLocalMemberId , eqliscsiVolumeIndex }
@@ -8888,7 +9407,7 @@ EqliscsiVolumeCompressionConfigurationEntry ::= SEQUENCE {
 eqliscsiVolumeCompressionConfigurationRowStatus OBJECT-TYPE      
     SYNTAX          RowStatus    
     MAX-ACCESS      read-create      
-    STATUS          current      
+    STATUS          deprecated     
     DESCRIPTION     "This field is used indicate the status of this table entry."  
     ::= { eqliscsiVolumeCompressionConfigurationEntry 1 }  
 
@@ -8900,7 +9419,7 @@ eqliscsiVolumeCompressionConfigurationPolicy OBJECT-TYPE
             never(3) -- Never mark snapshots created by this schedule as compressible
    }
     MAX-ACCESS        read-create
-    STATUS            current      
+    STATUS            deprecated     
     DESCRIPTION       "Specify how this volume's snapshots should be compressed."
     DEFVAL            { automatic }
     ::=   { eqliscsiVolumeCompressionConfigurationEntry 2 }
@@ -8909,7 +9428,7 @@ eqliscsiVolumeCompressionConfigurationSnapDelay  OBJECT-TYPE
     SYNTAX          Integer32 
     UNITS           "minutes"
     MAX-ACCESS      read-create      
-    STATUS          current      
+    STATUS          deprecated      
     DESCRIPTION     
           " 
             The value of this object represents how long to wait prior
@@ -8929,7 +9448,10 @@ eqlDynamicSharedVolumeDiffChunkTable OBJECT-TYPE
     MAX-ACCESS    not-accessible
     STATUS        current
     DESCRIPTION
-     "EqualLogic-Dynamic. This table exposes the vvol as number of chunks."
+     "EqualLogic-Dynamic. This table exposes the vvol as number of chunks. An entry in this 
+      table is generated when you write to the eqlDynamicSharedVolumeDiffTable.
+      When a successful get is performed on this table, the entry is deleted from the 
+      cache in MgmtExec"
 ::= { eqliscsiTarget 93 }
 
 eqlDynamicSharedVolumeDiffChunkEntry OBJECT-TYPE
@@ -8937,49 +9459,59 @@ eqlDynamicSharedVolumeDiffChunkEntry OBJECT-TYPE
     MAX-ACCESS    not-accessible
     STATUS        current
     DESCRIPTION   "Information related to each chunk."
-    INDEX        { eqliscsiLocalMemberId , eqliscsiSharedVolumeIndex, eqlDynamicSharedVolumeDiffChunkIndex }
+    INDEX        { eqliscsiLocalMemberId , eqliscsiSharedVolumeIndex }
 ::= { eqlDynamicSharedVolumeDiffChunkTable 1 }
 
 EqlDynamicSharedVolumeDiffChunkEntry ::= SEQUENCE {
-   eqlDynamicSharedVolumeDiffChunkIndex         Unsigned32,
-   eqlDynamicSharedVolumeDiffChunkSegmentSize   Unsigned32,
-   eqlDynamicSharedVolumeDiffNumChunkSegments   Unsigned32,
-   eqlDynamicSharedVolumeDiffChunkModified      OCTET STRING
+   eqlDynamicSharedVolumeDiffChunkSizeUsed       Counter64,
+   eqlDynamicSharedVolumeDiffChunkNumAllocated   Counter64,
+   eqlDynamicSharedVolumeDiffChunkNumUnshared    Counter64,
+   eqlDynamicSharedVolumeDiffChunkBitMap         VirtualVolumeBitMap,
+   eqlDynamicSharedVolumeDiffChunkBitMapType     VirtualVolumeBitMapType
 }
-eqlDynamicSharedVolumeDiffChunkIndex    OBJECT-TYPE
-   SYNTAX        Unsigned32 
-   MAX-ACCESS    not-accessible
+eqlDynamicSharedVolumeDiffChunkSizeUsed    OBJECT-TYPE
+   SYNTAX        Counter64 
+   MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-      "This value represents index of the chunk. "
+      "The chunk size used to generate the bitmap and for scanning the volume"
 ::= { eqlDynamicSharedVolumeDiffChunkEntry 1 }
 
 
-eqlDynamicSharedVolumeDiffChunkSegmentSize    OBJECT-TYPE
-   SYNTAX        Unsigned32 
-   UNITS         "KB"
+eqlDynamicSharedVolumeDiffChunkNumAllocated    OBJECT-TYPE
+   SYNTAX        Counter64
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-      "This value represents the size of a segment. This is passed in to the row create of the eqlDynamicSharedVolumeDiffChunkTable"
+      "The number of allocated chunks"
 ::= { eqlDynamicSharedVolumeDiffChunkEntry 2 }
 
-eqlDynamicSharedVolumeDiffNumChunkSegments    OBJECT-TYPE
-   SYNTAX        Unsigned32 
-   UNITS         "segments"
+eqlDynamicSharedVolumeDiffChunkNumUnshared    OBJECT-TYPE
+   SYNTAX        Counter64 
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-      "This value represents the size of the chunk expressed as number of segments. "
+      "The number of unshared chunks"
 ::= { eqlDynamicSharedVolumeDiffChunkEntry 3 }
 
-eqlDynamicSharedVolumeDiffChunkModified    OBJECT-TYPE
-   SYNTAX        OCTET STRING (SIZE(1024))
+eqlDynamicSharedVolumeDiffChunkBitMap    OBJECT-TYPE
+   SYNTAX        VirtualVolumeBitMap
    MAX-ACCESS    read-only
    STATUS        current
    DESCRIPTION
-      "This value represents a bit mask of modified segments in the given chunk."
+      "The bitmap. The meaning of the bitmap is defined by the type"
 ::= { eqlDynamicSharedVolumeDiffChunkEntry 4 }
+
+eqlDynamicSharedVolumeDiffChunkBitMapType    OBJECT-TYPE
+   SYNTAX        VirtualVolumeBitMapType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+      "The type of bitmap returned.
+                        none      - Bitmap is empty
+                        unshared  - bitmap for unsharedChunksVirtualVolume
+                        allocated - bitmap for allocatedBitmapVirtualVolume"
+::= { eqlDynamicSharedVolumeDiffChunkEntry 5 }
 
 --******************************************************************
 
@@ -9319,5 +9851,1462 @@ eqliscsiSharedVolumeStatsMisAlignedIO  OBJECT-TYPE
 ::= { eqliscsiSharedVolumeStatisticsEntry 15 }
 
 ---*************************************************************  
+
+eqliscsiDynVVolLookupTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqliscsiDynVVolLookupEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic"  
+    ::=  {  eqliscsiTarget 98 }
+
+eqliscsiDynVVolLookupEntry OBJECT-TYPE      
+    SYNTAX          EqliscsiDynVVolLookupEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) which uses the eqliscsiDynVVolName
+                     secondary key to lookup a eqliscsiSharedVolumeIndex."
+    INDEX           { eqliscsiDynVVolName, eqliscsiLocalMemberId, eqliscsiSharedVolumeIndex }
+
+    ::=   { eqliscsiDynVVolLookupTable 1 }
+
+EqliscsiDynVVolLookupEntry ::=
+    SEQUENCE {
+        eqliscsiDynVVolLookupIndex Unsigned32
+    }
+
+eqliscsiDynVVolLookupIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field is the value of the eqliscsiSharedVolumeIndex
+                     of the corresponding entry in the eqliscsiDynVVolTable"  
+
+    ::=  { eqliscsiDynVVolLookupEntry 1  }  
+
+-- Skip { eqliscsitarget 99 }. The opcodes that are generated for this entry conflict
+-- with the opcodes generated by eqliscsitarget 9. This is because the mib compiler
+-- appends a 9 to opcodes if the oid is short enough (which it is for eqliscsitarget 9)
+
+eqliscsiDoNotUse99 OBJECT IDENTIFIER ::=  { eqliscsiTarget 99 }   
+
+--******************************************************************
+
+eqliscsiVMTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqliscsiVMEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This table contains a list of VMs"
+    ::=  { eqliscsiTarget 100 }
+
+eqliscsiVMEntry OBJECT-TYPE
+    SYNTAX          EqliscsiVMEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) which contains the name of the VM and some other information about the VM"
+    INDEX           {eqliscsiVMIndex}
+    ::=  { eqliscsiVMTable 1 }
+
+EqliscsiVMEntry ::=
+    SEQUENCE {
+        eqliscsiVMIndex       Unsigned32,
+        eqliscsiVMRowStatus   RowStatus,
+        eqliscsiVMName        UTFString,
+        eqliscsiVMGuestOS     UTFString,
+        eqliscsiVMDescription UTFString,
+        eqliscsiVMUUID        BinaryUUID
+    }
+
+eqliscsiVMIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The index for the eqliscsiVMEntry. Used in the index for eqliscsiVMVVolEntry"
+    ::= { eqliscsiVMEntry 1 }
+
+eqliscsiVMRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqliscsiVMEntry 2 } 
+
+eqliscsiVMName OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (1..64))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is the same as the name of the VM from the VVol metadata.
+                     This field is set at creation and is not populated automatically from the metadata"
+    ::=  {  eqliscsiVMEntry 3 }
+
+eqliscsiVMGuestOS OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (1..64))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is the same as the guest OS of the VM from the VVol metadata.
+                     This field is set at creation and is not populated automatically from the metadata"
+    ::=  {  eqliscsiVMEntry 4 }
+
+eqliscsiVMDescription OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (1..128))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is the same as the description OS of the VM from the VVol metadata.
+                     This field is set at creation and is not populated automatically from the metadata"
+    ::=  {  eqliscsiVMEntry 5 }
+
+eqliscsiVMUUID OBJECT-TYPE      
+    SYNTAX          BinaryUUID
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is the same as the UUID of the VM from the VVol metadata.
+                     This field is set at creation and is not populated automatically from the metadata"
+    ::=  {  eqliscsiVMEntry 6 }
+
+
+--******************************************************************
+
+eqliscsiVMVVolBindingTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqliscsiVMVVolBindingEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This table contains vvols that are associated with VMs"
+    ::=  { eqliscsiTarget 101 }
+
+eqliscsiVMVVolBindingEntry OBJECT-TYPE
+    SYNTAX          EqliscsiVMVVolBindingEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) which contains the index of the vvol and the VM the vmvvol belongs to"
+    INDEX           {eqliscsiVMIndex, eqliscsiLocalMemberId, eqliscsiSharedVolumeIndex}
+    ::=  { eqliscsiVMVVolBindingTable 1 }
+
+EqliscsiVMVVolBindingEntry ::=
+    SEQUENCE {
+        eqliscsiVMVVolBindingRowStatus  RowStatus
+    }
+
+eqliscsiVMVVolBindingRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqliscsiVMVVolBindingEntry 1 } 
+
+--******************************************************************
+
+eqliscsiSharedVolumeSetStatusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqliscsiSharedVolumeSetStatusEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION      "EqualLogic-Dynamic table for status used to display vvols in the group manager"
+    ::=  { eqliscsiTarget 102 }
+
+eqliscsiSharedVolumeSetStatusEntry OBJECT-TYPE
+    SYNTAX          EqliscsiSharedVolumeSetStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) which contains stats of the vvol"
+    AUGMENTS        { eqliscsiSharedVolumeSetEntry }
+    ::=  { eqliscsiSharedVolumeSetStatusTable 1 }
+
+EqliscsiSharedVolumeSetStatusEntry ::=
+    SEQUENCE {
+        eqliscsiSharedVolumeSetStatusNumSnaps        Unsigned32,
+        eqliscsiSharedVolumeSetStatusNumFastClones   Unsigned32,
+        eqliscsiSharedVolumeSetStatusAllocatedSpace  Unsigned32
+    }
+
+eqliscsiSharedVolumeSetStatusNumSnaps OBJECT-TYPE
+    SYNTAX           Unsigned32
+    MAX-ACCESS       read-create
+    STATUS           current
+    DESCRIPTION      "number of snapshots for a specific shared volume set"
+    ::= { eqliscsiSharedVolumeSetStatusEntry 1 }
+
+eqliscsiSharedVolumeSetStatusNumFastClones OBJECT-TYPE
+    SYNTAX           Unsigned32
+    MAX-ACCESS       read-create
+    STATUS           current
+    DESCRIPTION      "number of fast clones for a specific shared volume set"
+    ::= { eqliscsiSharedVolumeSetStatusEntry 2 }
+
+eqliscsiSharedVolumeSetStatusAllocatedSpace OBJECT-TYPE
+    SYNTAX           Unsigned32
+    MAX-ACCESS       read-create
+    STATUS           current
+    DESCRIPTION      "allocated space (in MB) for a specific shared volume set"
+    ::= { eqliscsiSharedVolumeSetStatusEntry 3 }
+
+--******************************************************************
+
+eqliscsiVMStatusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqliscsiVMStatusEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION      "EqualLogic-Dynamic table for status used to display vvols in the group manager"
+    ::=  { eqliscsiTarget 103 }
+
+eqliscsiVMStatusEntry OBJECT-TYPE
+    SYNTAX          EqliscsiVMStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) which contains stats of the vvol"
+    AUGMENTS        { eqliscsiVMEntry }
+    ::=  { eqliscsiVMStatusTable 1 }
+
+EqliscsiVMStatusEntry ::=
+    SEQUENCE {
+        eqliscsiVMStatusOnline          Unsigned32,
+        eqliscsiVMStatusAllocatedSpace  Unsigned32
+    }
+
+eqliscsiVMStatusOnline OBJECT-TYPE
+    SYNTAX           Unsigned32
+    MAX-ACCESS       read-create
+    STATUS           current
+    DESCRIPTION      "1 if the Vm is online, 0 otherwise. A VM is considered online 
+                      if all the vvols assigned to that vm are online"
+    ::= { eqliscsiVMStatusEntry 1 }
+
+eqliscsiVMStatusAllocatedSpace OBJECT-TYPE
+    SYNTAX           Unsigned32
+    MAX-ACCESS       read-create
+    STATUS           current
+    DESCRIPTION      "Allocated space used by the VM"
+    ::= { eqliscsiVMStatusEntry 2 }
+
+--******************************************************************
+
+eqliscsiVolumeReplicationUsageTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqliscsiVolumeReplicationUsageEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "EqualLogic-Dynamic Volume Replication Usage Table"
+::= { eqliscsiTarget 104 }
+
+eqliscsiVolumeReplicationUsageEntry OBJECT-TYPE
+    SYNTAX        EqliscsiVolumeReplicationUsageEntry 
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      ""
+    INDEX           { eqliscsiLocalMemberId, eqliscsiVolumeIndex, eqliscsiVolumeReplSiteIndex }
+::= { eqliscsiVolumeReplicationUsageTable 1 }
+
+EqliscsiVolumeReplicationUsageEntry ::= SEQUENCE {
+    eqliscsiVolumeReplUsageTimeStamp      Unsigned32,
+    eqliscsiVolumeReplUsageInfoValid      TruthValue,
+	eqliscsiVolumeReplUsageSpaceAvail     Integer32,
+    eqliscsiVolumeReplUsageSpaceBorrowing Integer32
+}
+
+eqliscsiVolumeReplUsageTimeStamp OBJECT-TYPE      
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The timestamp is set on the secondary so the structure can be transmitted
+                     as a complete MIB entry.  This timestamp is re-written on the primary so 
+                     that the time of collection on the primary is based off the primary's
+                     clock.  Time is represented as the time in seconds since 
+                     00:00:00 UTC, 1970-01-01."
+    ::=   { eqliscsiVolumeReplicationUsageEntry 1 } 
+
+eqliscsiVolumeReplUsageInfoValid OBJECT-TYPE      
+    SYNTAX          TruthValue 
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies whether the usage values in this entry are valid.
+                     This field will indicate the values are not valid if an error occurs
+					 when trying to obtain the values from the partner."
+    ::=   { eqliscsiVolumeReplicationUsageEntry 2 } 
+
+eqliscsiVolumeReplUsageSpaceAvail OBJECT-TYPE      
+    SYNTAX          Integer32 
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of reserved space that is unused
+                     by the replica set on the partner."
+    ::=   { eqliscsiVolumeReplicationUsageEntry 3 } 
+
+eqliscsiVolumeReplUsageSpaceBorrowing OBJECT-TYPE      
+    SYNTAX          Integer32 
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space is being borrowed
+                     by the replica set on the partner."
+    ::=   { eqliscsiVolumeReplicationUsageEntry 4 } 
+
+
+--**************************************************************************
+-- VVol Replication Tables - Begin
+--**************************************************************************
+
+--**************************************************************************
+-- Shared Volume Group Table
+
+eqliscsiSharedVolumeGroupTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqliscsiSharedVolumeGroupEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Table"  
+    ::=  {  eqliscsiTarget 111 }
+    
+eqliscsiSharedVolumeGroupEntry OBJECT-TYPE
+    SYNTAX          EqliscsiSharedVolumeGroupEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing shared volume group (SVG) info.
+                     The SVG maps to a VMware consistency group.
+                     Index definition:
+                           - member id of the group lead on row create
+                           - monotonically increasing index value for SVG table type"
+    INDEX           { eqliscsiSharedVolumeGroupMemberId, eqliscsiSharedVolumeGroupIndex }
+    ::=   { eqliscsiSharedVolumeGroupTable 1 }
+
+EqliscsiSharedVolumeGroupEntry ::=
+    SEQUENCE {
+        eqliscsiSharedVolumeGroupMemberId               Unsigned32,
+        eqliscsiSharedVolumeGroupIndex                  Unsigned32,
+        eqliscsiSharedVolumeGroupRowStatus              RowStatus,
+        eqliscsiSharedVolumeGroupId                     OCTET STRING,
+        eqliscsiSharedVolumeGroupDescription            UTFString,    
+        eqliscsiSharedVolumeGroupVendorId               BinaryVendorId,
+        eqliscsiSharedVolumeGroupReplicationPartner     SiteIndexOrZero,
+        eqliscsiSharedVolumeGroupReplicationAdminStatus INTEGER,
+        eqliscsiSharedVolumeGroupReplicationOperStatus  INTEGER,
+        eqliscsiSharedVolumeGroupLastRPId               OCTET STRING,
+        eqliscsiSharedVolumeGroupActiveRPId             OCTET STRING,
+        eqliscsiSharedVolumeGroupIdText					UTFString
+    }
+    
+eqliscsiSharedVolumeGroupMemberId OBJECT-TYPE
+    SYNTAX          Unsigned32    
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the member id of the group lead
+                     member when the SVG entry was created."
+    ::=  { eqliscsiSharedVolumeGroupEntry 1 }  
+
+eqliscsiSharedVolumeGroupIndex OBJECT-TYPE
+    SYNTAX          Unsigned32    
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a unique index for identifing a 
+                     shared volume group."
+    ::= { eqliscsiSharedVolumeGroupEntry 2 }  
+
+eqliscsiSharedVolumeGroupRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field indicates whether the shared volume group
+                     is active or not."
+    ::= { eqliscsiSharedVolumeGroupEntry 3 }
+
+
+eqliscsiSharedVolumeGroupId OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (16))     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a UUID generated by the system 
+                     to uniquely identify this SVG across all PSS groups."  
+    ::= { eqliscsiSharedVolumeGroupEntry 4 }
+    
+eqliscsiSharedVolumeGroupVendorId OBJECT-TYPE      
+    SYNTAX          BinaryVendorId     
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies an id which is optionally provided
+                     by the vendor to map a vendor specific id to an SVG.  If
+                     no vendor id is provided then the eqliscsiSharedVolumeGroupId
+                     value is returned when this object is requested."
+    ::= { eqliscsiSharedVolumeGroupEntry 5 }
+    
+eqliscsiSharedVolumeGroupDescription OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..128))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "An optional description field for this SVG."
+    ::= { eqliscsiSharedVolumeGroupEntry 6 } 
+
+eqliscsiSharedVolumeGroupReplicationPartner OBJECT-TYPE      
+    SYNTAX          SiteIndexOrZero   
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the site index for the remote
+                     replication partner or zero if undefined. A non zero
+                     value indicates that replication has successfully been
+                     enabled for this SVG."  
+    ::=  { eqliscsiSharedVolumeGroupEntry 7 }
+
+eqliscsiSharedVolumeGroupReplicationAdminStatus OBJECT-TYPE      
+    SYNTAX          INTEGER  {
+                        ready (0),
+                        sync (1),
+                        pause (2),
+                        resume (3),
+                        cancel (4),
+                        reprotect (5),
+                        revert (6)
+                    }     
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the administrative actions that 
+                     can be initiated for this SVG.  The current valid actions
+                     are dependent upon the current operational status of
+                     replication for this SVG as follows:
+                         ready  - returned by a get operation - never a valid action
+                         resume - resumes a paused replication
+                         cancel - cancels a paused replication
+                         sync   - initiates replication if replication status
+                                  is enabled or failed"  
+    ::=  { eqliscsiSharedVolumeGroupEntry 8 }
+
+eqliscsiSharedVolumeGroupReplicationOperStatus OBJECT-TYPE      
+    SYNTAX          INTEGER  {
+                        quiescent (0),
+                        enabled (1),
+                        in-progress (2),
+                        paused (3),
+                        failed (4),
+                        failover (5)
+                    }     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the operational status of replication 
+                     for an SVG.
+                         quiescent   - On initial SVG create to allow SV membership.
+                                       On disable from enabled status or failover
+                                       status or failed status.
+                         enabled     - On enable replication from quiescent status or
+                                       failover status.  On replication completion from
+                                       in-progress status. 
+                         in-progress - On create recovery point initiation from
+                                       enabled status or failed status. 
+                                       On recovery point resume from paused status.
+                         paused      - On replication failure from in-progress status.
+                         failed      - On recovery point cancel from paused status.
+                         failover    - On create of an SVG during failover."
+     ::=  { eqliscsiSharedVolumeGroupEntry 9 }
+
+eqliscsiSharedVolumeGroupLastRPId OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (16))     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the UUID which uniquely identifies the 
+                     most recent completed recovery point if one exists. On the primary 
+                     this refers to the fast failback recovery point. After
+                     failover to a recovery point this references the recovery 
+                     point used for the failover on what is now the new primary."  
+    ::= { eqliscsiSharedVolumeGroupEntry 10 }
+    
+eqliscsiSharedVolumeGroupActiveRPId OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (16))     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the UUID which uniquely identifies 
+                     a recovery point that is in progress or paused." 
+    ::= { eqliscsiSharedVolumeGroupEntry 11 }
+    
+eqliscsiSharedVolumeGroupIdText OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..36))     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "EQL-SECONDARY-KEY 
+                     This field specifies a ascii text version of the eqliscsiSharedVolumeGroupId."
+    ::= { eqliscsiSharedVolumeGroupEntry 12 }
+
+--******************************************************************
+-- Shared Volume Group Membership Table
+
+eqliscsiSVGMembershipTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqliscsiSVGMembershipEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Table"  
+    ::=  {  eqliscsiTarget 112 }
+    
+eqliscsiSVGMembershipEntry OBJECT-TYPE
+    SYNTAX          EqliscsiSVGMembershipEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing shared volume group (SVG) membership info.
+                     Index definition:
+                           - SVG table index from the eqliscsiSharedVolumeGroupTable
+                                 - SVG member id
+                                 - SVG index
+                           - SV table index from the eqliscsiSharedVolumeTable
+                                 - SV member id
+                                 - SV index"
+    INDEX           { eqliscsiSharedVolumeGroupMemberId, eqliscsiSharedVolumeGroupIndex,
+                      eqliscsiLocalMemberId, eqliscsiSharedVolumeIndex }
+    ::=   { eqliscsiSVGMembershipTable 1 }
+
+EqliscsiSVGMembershipEntry ::=
+    SEQUENCE {
+        eqliscsiSVGMembershipRowStatus     RowStatus,
+        eqliscsiSVGMembershipRole          SharedVolumeGroupRole,
+        eqliscsiSVGMembershipRemoteSCId    BinaryUUID,
+        eqliscsiSVGMembershipRemoteSVId    OCTET STRING,
+        eqliscsiSVGMembershipFlags     	   BITS
+    }
+
+eqliscsiSVGMembershipRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field indicates whether the SVG membership row
+                     is active or not."
+    ::= { eqliscsiSVGMembershipEntry 1 }
+
+eqliscsiSVGMembershipRole OBJECT-TYPE      
+    SYNTAX          SharedVolumeGroupRole
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field specifies this sv's membership role within
+                     the shared volume group."  
+    ::=  { eqliscsiSVGMembershipEntry 2 }
+    
+eqliscsiSVGMembershipRemoteSCId OBJECT-TYPE
+    SYNTAX          BinaryUUID
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the UUID of the storage container 
+                     to be used for replication of this SV on the remote replication 
+                     partner."
+    ::= { eqliscsiSVGMembershipEntry 3}
+    
+eqliscsiSVGMembershipRemoteSVId OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (16))     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the PsvId of the paired
+                     SV on the replication partner site." 
+    ::=  { eqliscsiSVGMembershipEntry 4 }
+    
+eqliscsiSVGMembershipFlags OBJECT-TYPE
+    SYNTAX          BITS {
+                        isRoot(0)          -- is sv the root SV within an SVS for this SVG
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This fields defines the common place holder for SVGMembership operational flags. " 
+    DEFVAL          { {} }
+    ::= { eqliscsiSVGMembershipEntry 5 }
+    
+--**************************************************************************
+-- SVG Recovery Point Table
+
+eqliscsiSVGRecoveryPointTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqliscsiSVGRecoveryPointEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Table"  
+    ::=  {  eqliscsiTarget 113 }
+    
+eqliscsiSVGRecoveryPointEntry OBJECT-TYPE
+    SYNTAX          EqliscsiSVGRecoveryPointEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing shared volume group (SVG)
+                     recovery point info.  Entries exist on the primary site to 
+                     represent a fast failback option.  Entries exist on the
+                     remote replica site to represent the available recovery
+                     points for an SVG that can be targeted for failover operations.
+                     Index Definition:
+                           - remote partner index or 0 for local
+                           - SVG index to be used to create an SVG table entry from 
+                             this recovery point. All recovery points for this SVG
+                             will use this same index on row entry create
+                                - current group lead member id when this entry is created
+                                - monotonically increasing index value using the SVG table type
+                           - monotonically increasing index value to distinguish this
+                             recovery point using the SVGRP table type"
+    INDEX           { eqliscsiReplicantSiteIndex, 
+                      eqliscsiSharedVolumeGroupMemberId, eqliscsiSharedVolumeGroupIndex, 
+                      eqliscsiSVGRecoveryPointIndex }
+    ::=   { eqliscsiSVGRecoveryPointTable 1 }
+
+EqliscsiSVGRecoveryPointEntry ::=
+    SEQUENCE {
+        eqliscsiSVGRecoveryPointIndex              Unsigned32,
+        eqliscsiSVGRecoveryPointRowStatus          RowStatus,
+        eqliscsiSVGRecoveryPointReplicationStatus  INTEGER,
+        eqliscsiSVGRecoveryPointAdminStatus        INTEGER,
+        eqliscsiSVGRecoveryPointReplicationId      OCTET STRING,
+        eqliscsiSVGRecoveryPointTimestamp          Unsigned32,
+        eqliscsiSVGRecoveryPointSVGId              OCTET STRING,
+        eqliscsiSVGRecoveryPointVendorId           BinaryVendorId,
+        eqliscsiSVGRecoveryPointReplicationIdText  UTFString,
+        eqliscsiSVGRecoveryPointType               INTEGER
+    }
+    
+eqliscsiSVGRecoveryPointIndex OBJECT-TYPE
+    SYNTAX          Unsigned32    
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a unique index used to distinguish
+                     recovery points for a given SVG on the primary and
+                     the remote replica sites."
+    ::= { eqliscsiSVGRecoveryPointEntry 1 }  
+
+eqliscsiSVGRecoveryPointRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field indicates whether the shared volume group
+                     is active or not."
+    ::= { eqliscsiSVGRecoveryPointEntry 2 }
+    
+eqliscsiSVGRecoveryPointReplicationStatus OBJECT-TYPE      
+    SYNTAX          INTEGER  {
+                        unknown (0),
+                        in-progress (1),
+                        paused (2),
+                        failed (3),
+                        complete (4)
+                        
+                    }
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the current replication status for the
+                     SVG.  An entry is created prior to the start of replication
+                     with an in-progress status.  If replication is terminated with
+                     an error then status transitions to paused.  When replication
+                     successfully completes then status transitions to completed.
+                     If a paused replication is cancelled then this entry is removed."
+    ::=  { eqliscsiSVGRecoveryPointEntry 3 }
+
+eqliscsiSVGRecoveryPointAdminStatus OBJECT-TYPE      
+    SYNTAX          INTEGER  {
+                        ready (0),
+                        failover (1),
+                        rollback (2),
+                        clone (3)
+                    }     
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the administrative actions that 
+                     can be initiated for this recovery point.  The current
+                     valid actions are dependent upon the current replication
+                     status of this recovery point as follows:
+                         ready    - returned by a get operation - never a valid set action
+                         failover - fails over to this recovery point on the remote replica site
+                         rollback - rolls back to a local recovery point"
+    ::=  { eqliscsiSVGRecoveryPointEntry 4 }
+
+eqliscsiSVGRecoveryPointReplicationId OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (16))     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the UUID used to uniquely identify
+                     this recovery point.  This is set at row create prior
+                     to initiating the replication with IOM."
+    ::= { eqliscsiSVGRecoveryPointEntry 5 }
+    
+eqliscsiSVGRecoveryPointTimestamp OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the creation time for a recovery point
+                     for this SVG. Time is represented as the time in seconds
+                     since 00:00:00 UTC, 1970-01-01."
+    ::= { eqliscsiSVGRecoveryPointEntry 6 }
+
+eqliscsiSVGRecoveryPointSVGId OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (16))     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the original SVG uuid assigned
+                     on the primary site when this SVG was first created.
+                     This field provides an alternate lookup for
+                     recovery points associated with this SVG. It is also
+                     set as the value of the SVG Id if failover occurs to
+                     this recovery point and a new SVG entry is created."
+    ::= { eqliscsiSVGRecoveryPointEntry 7 }
+    
+eqliscsiSVGRecoveryPointVendorId OBJECT-TYPE      
+    SYNTAX          BinaryVendorId    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies an id which is optionally provided
+                     by the vendor to map a vendor specific id to an SVG.  If
+                     no vendor id is provided then the eqliscsiSharedVolumeGroupId
+                     value is returned when this object is requested."
+    ::= { eqliscsiSVGRecoveryPointEntry 8 }
+
+eqliscsiSVGRecoveryPointReplicationIdText OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..36))     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "EQL-SECONDARY-KEY 
+                     This field specifies a ascii text version of the 
+                     eqliscsiSVGRecoveryPointReplicationId."
+    ::= { eqliscsiSVGRecoveryPointEntry 9 }
+
+eqliscsiSVGRecoveryPointType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(0),
+                        recovery-point(1),
+                        fast-failback(2),
+                        post-rollback(3)
+                     }
+    MAX-ACCESS       read-create
+    STATUS           current
+    DESCRIPTION      "This fields represents the type of recovery point. 
+                      recovery-point indicates a completed recovery point on the
+                      remote replica site; post-rollback identifies a recovery point
+                      taken prior to a rollback operation; and, fast-failover identifies
+                      a recovery point constructed on the primary site during 
+                      replication."
+    ::= { eqliscsiSVGRecoveryPointEntry 10 }
+    
+--******************************************************************
+-- SVG Recovery Point SV Membership Table
+
+eqliscsiSVGRPMembershipTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqliscsiSVGRPMembershipEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Table"  
+    ::=  {  eqliscsiTarget 114 }
+    
+eqliscsiSVGRPMembershipEntry OBJECT-TYPE
+    SYNTAX          EqliscsiSVGRPMembershipEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing SVG recovery point SV membership info.
+                     Index definition:
+                           - remote partner index or 0 for local
+                           - SVG index from eqliscsiSVGRecoveryPointTable
+                                - RP SVG member id
+                                - RP SVG index
+                           - monotonically increasing index value to distinguish this
+                             recovery point
+                           - SV table index from the local eqliscsiSharedVolumeTable
+                                 - SV member id
+                                 - SV index"
+    INDEX           { eqliscsiReplicantSiteIndex,
+                      eqliscsiSharedVolumeGroupMemberId, eqliscsiSharedVolumeGroupIndex, 
+                      eqliscsiSVGRecoveryPointIndex,
+                      eqliscsiLocalMemberId, eqliscsiSharedVolumeIndex }
+    ::= { eqliscsiSVGRPMembershipTable 1 }
+
+EqliscsiSVGRPMembershipEntry ::=
+    SEQUENCE {
+        eqliscsiSVGRPMembershipRowStatus      RowStatus,
+        eqliscsiSVGRPMembershipRole           SharedVolumeGroupRole,
+        eqliscsiSVGRPMembershipRemoteSCId     BinaryUUID,
+        eqliscsiSVGRPMembershipRemoteSVId     OCTET STRING,
+        eqliscsiSVGRPMembershipSVSize         Integer32
+    }
+
+
+eqliscsiSVGRPMembershipRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field indicates whether the entry
+                     is active or not."
+    ::= { eqliscsiSVGRPMembershipEntry 1 }
+    
+
+eqliscsiSVGRPMembershipRole OBJECT-TYPE      
+    SYNTAX          SharedVolumeGroupRole
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies this sv's membership role within
+                     the shared volume group."  
+    ::=  { eqliscsiSVGRPMembershipEntry 2 }
+    
+eqliscsiSVGRPMembershipRemoteSCId OBJECT-TYPE
+    SYNTAX          BinaryUUID
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the UUID of the storage container 
+                     to be used for replication of this SV on the remote replication 
+                     partner."
+    ::= { eqliscsiSVGRPMembershipEntry 3 }
+    
+eqliscsiSVGRPMembershipRemoteSVId OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (16))     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the PsvId of the paired
+                     SV on the replication partner site." 
+    ::=  { eqliscsiSVGRPMembershipEntry 4 }
+
+eqliscsiSVGRPMembershipSVSize OBJECT-TYPE      
+    SYNTAX          Integer32
+    UNITS           "MB"  
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the shared volume advertized
+                     size in MB at the time the SV was replicated for this 
+                     recovery point."
+    ::=   { eqliscsiSVGRPMembershipEntry 5 }
+
+--******************************************************************
+-- SVG Lookup Table
+
+eqliscsiSVGLookupTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqliscsiSVGLookupEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic"  
+    ::=  {  eqliscsiTarget 115 }
+
+eqliscsiSVGLookupEntry OBJECT-TYPE      
+    SYNTAX          EqliscsiSVGLookupEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) which uses the eqliscsiSharedVolumeGroupId
+                     secondary key to lookup a eqliscsiSharedVolumeGroupIndex."
+    INDEX           { eqliscsiSharedVolumeGroupIdText, eqliscsiSharedVolumeGroupMemberId, eqliscsiSharedVolumeGroupIndex }
+
+    ::=   { eqliscsiSVGLookupTable 1 }
+
+EqliscsiSVGLookupEntry ::=
+    SEQUENCE {
+        eqliscsiSVGLookupIndex Unsigned32
+    }
+
+eqliscsiSVGLookupIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field is the value of the eqliscsiSharedVolumeGroupIndex
+                     of the corresponding entry in the eqliscsiSharedVolumeGroupTable"  
+
+    ::=  { eqliscsiSVGLookupEntry 1  }  
+
+--******************************************************************
+-- Recovery Point Lookup Table
+
+eqliscsiRecoveryPointLookupTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqliscsiRecoveryPointLookupEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic"  
+    ::=  {  eqliscsiTarget 116 }
+
+eqliscsiRecoveryPointLookupEntry OBJECT-TYPE      
+    SYNTAX          EqliscsiRecoveryPointLookupEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) which uses the eqliscsiSVGRecoveryPointReplicationId
+                     secondary key to lookup a eqliscsiSVGRecoveryPointIndex."
+    INDEX           { eqliscsiSVGRecoveryPointReplicationIdText, eqliscsiReplicantSiteIndex, 
+                      eqliscsiSharedVolumeGroupMemberId, eqliscsiSharedVolumeGroupIndex, 
+                      eqliscsiSVGRecoveryPointIndex }
+    ::=   { eqliscsiRecoveryPointLookupTable 1 }
+
+EqliscsiRecoveryPointLookupEntry ::=
+    SEQUENCE {
+        eqliscsiRecoveryPointLookupIndex Unsigned32
+    }
+
+eqliscsiRecoveryPointLookupIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field is the value of the eqliscsiSVGRecoveryPointIndex
+                     of the corresponding entry in the eqliscsiSVGRecoveryPointTable"  
+
+    ::=  { eqliscsiRecoveryPointLookupEntry 1  }  
+
+--******************************************************************
+-- Recovery Point Statistics Table
+
+eqliscsiSVGRecoveryPointStatusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqliscsiSVGRecoveryPointStatusEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION      "EqualLogic-Dynamic table for recovery point replication status"
+    ::=  { eqliscsiTarget 117 }
+
+eqliscsiSVGRecoveryPointStatusEntry OBJECT-TYPE
+    SYNTAX          EqliscsiSVGRecoveryPointStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) which contains stats of the vvol"
+    INDEX           { eqliscsiReplicantSiteIndex, 
+                      eqliscsiSharedVolumeGroupMemberId, eqliscsiSharedVolumeGroupIndex, 
+                      eqliscsiSVGRecoveryPointIndex }
+    ::=  { eqliscsiSVGRecoveryPointStatusTable 1 }
+
+EqliscsiSVGRecoveryPointStatusEntry ::=
+    SEQUENCE {
+        eqliscsiSVGRecoveryPointStatusOperStatus   INTEGER,
+        eqliscsiSVGRecoveryPointStatusMBRemaining  Counter64,
+        eqliscsiSVGRecoveryPointStatusMBCompleted  Counter64,
+        eqliscsiSVGRecoveryPointStatusSVRemaining  Counter64,
+        eqliscsiSVGRecoveryPointStatusSVCompleted  Counter64
+    }
+
+eqliscsiSVGRecoveryPointStatusOperStatus OBJECT-TYPE
+    SYNTAX           INTEGER {
+                        unknown (0),
+                        in-progress (1),
+                        paused (2),
+                        replicated (3),
+                        failed (4),
+                        cancelled (5)
+                     }
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION      "This field represents the status of replication for this recovery point.
+                      The status is based on all the members of the RP.
+                         not-replicated - If any RPM in this RP is in the not-replicated state
+                         in-progress - If all RPMs in this RP are in one of the states: queued, in-progress, replicated
+                         paused      - If any RPM in this RP are in the paused state
+                         replicated  - If all RPMs in this RP are in the replicated state
+                         failed      - If any RPM in this RP is in the failed state
+                         cancelled   - If any RPM in this RP is in the cancelled state"
+    ::= { eqliscsiSVGRecoveryPointStatusEntry 1 }
+
+eqliscsiSVGRecoveryPointStatusMBRemaining OBJECT-TYPE
+    SYNTAX           Counter64
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION      "If a transfer of data is in progress, the 
+                      count of MB successfully transferred to the 
+                      replica site. If no transfer is in 
+                      progress, this object will read zero (0)."
+    ::= { eqliscsiSVGRecoveryPointStatusEntry 2 }
+
+eqliscsiSVGRecoveryPointStatusMBCompleted OBJECT-TYPE
+    SYNTAX           Counter64
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION      "If a transfer of data is in progress, the 
+                      count of MB successfully transferred to the 
+                      remote site. If no transfer is in 
+                      progress, this object will read zero (0)."
+    ::= { eqliscsiSVGRecoveryPointStatusEntry 3 }
+
+eqliscsiSVGRecoveryPointStatusSVRemaining OBJECT-TYPE
+    SYNTAX           Counter64
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION      "If a transfer of data is in progress, the 
+                      count of shared volumes reamining to be transferred to the 
+                      remote site. If no transfer is in 
+                      progress, this object will read zero (0)."
+    ::= { eqliscsiSVGRecoveryPointStatusEntry 4 }
+
+eqliscsiSVGRecoveryPointStatusSVCompleted OBJECT-TYPE
+    SYNTAX           Counter64
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION      "If a transfer of data is in progress, the 
+                      count of shared volumes successfully transferred to the 
+                      replica site. If no transfer is in 
+                      progress, this object will read zero (0)."
+    ::= { eqliscsiSVGRecoveryPointStatusEntry 5 }
+
+
+--**************************************************************************
+-- VVol Replication Tables - End
+--**************************************************************************
+
+
+eqliscsiReplicantSiteStoragePoolTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqliscsiReplicantSiteStoragePoolEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Replicant Site Storage Pool Table.
+                     This table contains a list of delegated space allocated
+                     and used in storage pools for a replicant site."
+    ::=    { eqliscsiTarget 121 }
+
+eqliscsiReplicantSiteStoragePoolEntry OBJECT-TYPE      
+    SYNTAX          EqliscsiReplicantSiteStoragePoolEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing delegated space statistics of a
+                     replicant site"
+    INDEX           { eqliscsiReplicantSiteIndex, eqlStoragePoolIndex }    
+    ::=   { eqliscsiReplicantSiteStoragePoolTable 1 }     
+
+EqliscsiReplicantSiteStoragePoolEntry ::= 
+    SEQUENCE {
+        eqliscsiReplicantSiteStoragePoolRowStatus RowStatus,
+        eqliscsiReplicantSiteStoragePoolSpaceAllocated Unsigned32,
+        eqliscsiReplicantSiteStoragePoolSpaceUsed Unsigned32
+    }
+
+eqliscsiReplicantSiteStoragePoolRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::=  { eqliscsiReplicantSiteStoragePoolEntry 1 }
+
+eqliscsiReplicantSiteStoragePoolSpaceAllocated OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "The total amount of pool space reserved, for use by the site,
+                in the designated storage pool."
+    ::=  { eqliscsiReplicantSiteStoragePoolEntry 2 }
+
+eqliscsiReplicantSiteStoragePoolSpaceUsed     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "The amount of reserve space, in the designated storage pool
+                This value may not exceed the corresponding value
+                for eqliscsiReplicantSiteStoragePoolSpaceAllocated"
+    ::=  { eqliscsiReplicantSiteStoragePoolEntry 3 }
+
+---******************************************************************
+
+eqliscsiReplicantSiteStoragePoolMapTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqliscsiReplicantSiteStoragePoolMapEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Replicant Site Storage Pool Map Table.
+                     This table contains a mapping of primary pool names to
+                     secondary pools.  Volumes enabled for replication in
+                     a primary pool are mapped to a secondary pool, where the
+                     replica set will be initially placed."
+    ::=    { eqliscsiTarget 122 }
+
+eqliscsiReplicantSiteStoragePoolMapEntry OBJECT-TYPE      
+    SYNTAX          EqliscsiReplicantSiteStoragePoolMapEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a replication mapping of a primary
+                     pool to a secondary pool"
+    INDEX           { eqliscsiReplicantSiteIndex, eqliscsiReplicantSiteStoragePoolMapPriPoolName }
+    ::=   { eqliscsiReplicantSiteStoragePoolMapTable 1 }     
+
+EqliscsiReplicantSiteStoragePoolMapEntry ::= 
+    SEQUENCE {
+        eqliscsiReplicantSiteStoragePoolMapPriPoolName UTFString,
+        eqliscsiReplicantSiteStoragePoolMapRowStatus   RowStatus,
+        eqliscsiReplicantSiteStoragePoolMapPoolIndex   Unsigned32
+    }
+
+eqliscsiReplicantSiteStoragePoolMapPriPoolName OBJECT-TYPE
+    SYNTAX          UTFString (SIZE (1..64))    
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field specifies the primary pool name for this mapping 
+                     record."
+    ::=  {  eqliscsiReplicantSiteStoragePoolMapEntry 1 }  
+
+eqliscsiReplicantSiteStoragePoolMapRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used to indicate the status of this entry."  
+    ::=  { eqliscsiReplicantSiteStoragePoolMapEntry 2 }
+
+eqliscsiReplicantSiteStoragePoolMapPoolIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is the index of a mapped secondary pool."
+
+    ::=  { eqliscsiReplicantSiteStoragePoolMapEntry 3 }
+
+---******************************************************************
+
+eqliscsiReplDestVolTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EqliscsiReplDestVolEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Repl Dest Volume  Table.
+                     This table is a dynamic table used by clients to CREATE or DELETE a
+                     destination volume on the EQL array that serves as a target volume for
+                     replication from a non Equallogic partner. A successful CREATE on this
+                     table will result in CREATION of rows in eqliscsiVolumeTable and xxx.
+                     A successful DELETE on this table will result in DELETION of rows in
+                     eqliscsiVolumeTable and xxx.
+                     TimeoutCreate:60"
+    ::=    { eqliscsiTarget 123 }
+
+eqliscsiReplDestVolEntry OBJECT-TYPE
+    SYNTAX          EqliscsiReplDestVolEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing the Dynamic Repl Dest Volume Information."
+    INDEX   { eqliscsiLocalMemberId , eqliscsiVolumeIndex }
+    ::=   { eqliscsiReplDestVolTable 1}
+
+EqliscsiReplDestVolEntry ::=
+    SEQUENCE {
+        eqliscsiReplDestVolRowStatus                         RowStatus,
+        eqliscsiReplDestVolSiteIndex                         SiteIndex,
+        eqliscsiReplDestVolPresentedSize                     Integer32,
+        eqliscsiReplDestVolName                              UTFString,
+        eqliscsiReplDestVolSourceUUID                        BinaryUUID,
+        eqliscsiReplDestVolSectorSize                        INTEGER,
+        eqliscsiReplDestVolTargetIscsiName                   OCTET STRING,
+        eqliscsiReplDestVolSourceNaaid                       BinaryUUID,
+        eqliscsiReplDestVolUUID                              BinaryUUID,
+        eqliscsiReplDestVolReserve                           Unsigned32
+            }
+eqliscsiReplDestVolRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field indicates whether the xxx row is ACTIVE or not."
+    ::= { eqliscsiReplDestVolEntry 1}
+
+eqliscsiReplDestVolSiteIndex  OBJECT-TYPE
+   SYNTAX      SiteIndex
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+       "Represents the value of eqliscsiReplicantSiteIndex that
+        corresponds to the site to which this volume belongs."
+::= { eqliscsiReplDestVolEntry 2 }
+
+eqliscsiReplDestVolPresentedSize OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the VVol size in MB. There is no default.
+                     Note: VVol size is round to a multiple of 15MB."
+    ::=   { eqliscsiReplDestVolEntry 3 }
+
+eqliscsiReplDestVolName OBJECT-TYPE
+    SYNTAX          UTFString (SIZE (1..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies a user friendly name for a xxx.
+                     The name must be unique within a group.
+                     The name must not contain spaces or special characters.
+                     The name can be up to 64 characters in length. There is no default."
+    ::=  {  eqliscsiReplDestVolEntry 4 }
+
+eqliscsiReplDestVolSourceUUID OBJECT-TYPE
+    SYNTAX          BinaryUUID
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This is  stores the unique universal identifier for this
+                     source volume. "
+    ::=  { eqliscsiReplDestVolEntry 5 }
+
+eqliscsiReplDestVolSectorSize OBJECT-TYPE
+    SYNTAX          INTEGER     {
+                        sector-size-512-bytes(0),
+                        sector-size-4096-bytes(1)
+    }         
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies, in bytes, the sector size of this volume."
+    ::=   { eqliscsiReplDestVolEntry 6 }
+
+eqliscsiReplDestVolTargetIscsiName OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (0..223))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the iSCSI target name for the volume."
+    ::=  {  eqliscsiReplDestVolEntry 7 }
+
+
+eqliscsiReplDestVolSourceNaaid OBJECT-TYPE
+    SYNTAX          BinaryUUID
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This  field stores the unique universal identifier for the
+                      source volume. "
+    ::=  { eqliscsiReplDestVolEntry 8 }
+
+eqliscsiReplDestVolUUID OBJECT-TYPE
+    SYNTAX          BinaryUUID
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field stores the RFC 4122 v1 unique universal identifier 
+                     for this volume. "
+    ::=  { eqliscsiReplDestVolEntry 9 }
+
+eqliscsiReplDestVolReserve OBJECT-TYPE 
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This value represents the percentage of space reserved for 
+                     a replicaset. This value is written to eqliscsiReplicaSetReserve
+                     field of the replicaset corresponding to this row."
+    DEFVAL          { 200 }
+    ::=  { eqliscsiReplDestVolEntry 10 }   
+
+
+---******************************************************************
+
+eqliscsiVolumeReplSiteXprTargetTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqliscsiVolumeReplSiteXprTargetEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION     "EqualLogic-Persistent
+                     This table contains ISCSI target information for a replication site.
+                     This table is used when replicating to non-Equallogic (cross-platform
+                     replication, XPR) partners that require persistent ISCSI sessions. An
+                     example of such partners is the Compellent SC array. An Equallogic group
+                     logs in to these targets and maintains ISCSI sessions to these targets
+                     even when there is no active replication in progress."
+    ::=    { eqliscsiTarget 124 }
+
+eqliscsiVolumeReplSiteXprTargetEntry OBJECT-TYPE
+    SYNTAX        EqliscsiVolumeReplSiteXprTargetEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      ""
+    INDEX           { eqliscsiVolumeReplSiteIndex, eqliscsiVolumeReplSiteXprTargetIndex }
+    ::= { eqliscsiVolumeReplSiteXprTargetTable 1 }
+
+EqliscsiVolumeReplSiteXprTargetEntry ::= SEQUENCE {
+   eqliscsiVolumeReplSiteXprTargetIndex               Unsigned32,
+   eqliscsiVolumeReplSiteXprTargetRowStatus           RowStatus,
+   eqliscsiVolumeReplSiteXprTargetIscsiName           OCTET STRING,
+   eqliscsiVolumeReplSiteXprTargetInetAddrType        InetAddressType,
+   eqliscsiVolumeReplSiteXprTargetInetAddr            InetAddress,
+   eqliscsiVolumeReplSiteXprTargetIscsiCookie         Unsigned32
+}
+eqliscsiVolumeReplSiteXprTargetIndex    OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+      "A unique 32 bit identifier for this row"
+::= { eqliscsiVolumeReplSiteXprTargetEntry 1 }
+
+eqliscsiVolumeReplSiteXprTargetRowStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "The status of the row"
+::= { eqliscsiVolumeReplSiteXprTargetEntry 2 }
+
+eqliscsiVolumeReplSiteXprTargetIscsiName OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (0..223))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The iSCSI name of the target to which a persistent
+                     connection will be maintained"
+::= { eqliscsiVolumeReplSiteXprTargetEntry 3 }
+
+eqliscsiVolumeReplSiteXprTargetInetAddrType  OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION   "The type of the IP address to connect to this target"
+::= { eqliscsiVolumeReplSiteXprTargetEntry 4 }
+
+eqliscsiVolumeReplSiteXprTargetInetAddr  OBJECT-TYPE
+   SYNTAX InetAddress
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION   "The IP address to connect to this target"
+::= { eqliscsiVolumeReplSiteXprTargetEntry 5 }
+
+eqliscsiVolumeReplSiteXprTargetIscsiCookie  OBJECT-TYPE 
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This is cookie value of last connection."
+    DEFVAL          { 0 }
+::=  { eqliscsiVolumeReplSiteXprTargetEntry 6 }	
+	
+---******************************************************************
+
+eqliscsiVolumeOfflineStatusforSnmpTrapTable  OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqliscsiVolumeOfflineStatusforSnmpTrapEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION     "EqualLogic-Dynamic 
+                     This dummy table relates an iscsi offline volume to the
+                     reason for going offline and sends SNMP trap to the subscribers."
+    ::=    { eqliscsiTarget 125 }
+
+eqliscsiVolumeOfflineStatusforSnmpTrapEntry     OBJECT-TYPE
+    SYNTAX        EqliscsiVolumeOfflineStatusforSnmpTrapEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      ""
+    INDEX           { eqliscsiLocalMemberId , eqliscsiVolumeIndex }
+    ::= { eqliscsiVolumeOfflineStatusforSnmpTrapTable 1 }
+
+EqliscsiVolumeOfflineStatusforSnmpTrapEntry ::= SEQUENCE {
+        eqliscsiVolumeOfflineStatusIndex            Unsigned32,   
+        eqliscsiVolumeiOfflineStatusRowStatus       RowStatus,
+        eqliscsiVolumeOfflineStatusVolumeName       DisplayString,
+        eqliscsiVolumeOfflineStatusReason          INTEGER
+}
+
+eqliscsiVolumeOfflineStatusIndex    OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+      "A unique 32 bit identifier for this row"
+::= { eqliscsiVolumeOfflineStatusforSnmpTrapEntry 1 }
+
+eqliscsiVolumeiOfflineStatusRowStatus       OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "The status of the row"
+::= { eqliscsiVolumeOfflineStatusforSnmpTrapEntry 2 }
+
+eqliscsiVolumeOfflineStatusVolumeName     OBJECT-TYPE
+    SYNTAX   DisplayString(SIZE(1..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The iSCSI name of the target which has gone offline"
+::= { eqliscsiVolumeOfflineStatusforSnmpTrapEntry 3 }
+
+eqliscsiVolumeOfflineStatusReason  OBJECT-TYPE
+   SYNTAX        INTEGER {
+                    available(0),
+                    snap-reserve-met(1),
+                    members-offline(2),
+                    repl-over-commit-not-allowed-cancel-replication(3),
+                    repl-over-commit-no-free-pages-cancel-replication(4),
+                    repl-over-commit-have-free-space(5),
+                    thin-max-grow-met(6),
+                    thin-no-space-for-auto-grow(7),
+                    missing-pages(8),
+                    thin-max-grow(9),
+                    thin-auto-grow-failure(10),
+                    sync-rep-not-ready-for-io(11)
+            }
+
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION   "Reason the volume has gone offline"
+::= { eqliscsiVolumeOfflineStatusforSnmpTrapEntry 4 }
+
+--**************************************************************************
+--Keep this comment at the end of the file
+--Because of the way opcodes are created (incorrectly) the lower number entries
+--in this mib sometimes have a 9 appended to their opcode. This opcode will conflict
+--with later opcodes in this file, starting at 99, 109, 119, 129 etc...
+--These numbers should be avoided. If these numbers are used, there is a chance
+--agent will permacore because of duplicate opcodes.
+--**************************************************************************
+--
+--  SNMP TRAPS
+--
+
+eqliscsiVolumeNotifications OBJECT IDENTIFIER ::= {eqliscsiNotifications 1}
+
+
+eqliscsiVolumeMultiInitiatorAttributeChanged NOTIFICATION-TYPE
+   OBJECTS{
+        eqliscsiVolumeName,
+        eqliscsiVolumeMultInitiator
+   }
+   STATUS current
+   DESCRIPTION
+   "Sent when the volume iscsi multi inititor access is modified."
+    ::= { eqliscsiVolumeNotifications 1 }
+
+
+eqliscsiVolumeOfflineStatusAlert NOTIFICATION-TYPE
+    OBJECTS{
+        eqliscsiVolumeOfflineStatusVolumeName,
+        eqliscsiVolumeOfflineStatusReason
+    }
+    STATUS current
+    DESCRIPTION
+    "Sent when a volume goes offline."
+    ::= { eqliscsiVolumeNotifications 2 }
+
+eqliscsiVolumeReplRemoteReservLow NOTIFICATION-TYPE
+    OBJECTS{
+        eqliscsiVolumeName
+    }
+    STATUS current
+    DESCRIPTION
+    "Sent when the remote replica reserve of a volume goes low"
+    ::= { eqliscsiVolumeNotifications 3 }
+
+eqliscsiVolumeReplReplicaNoProgress NOTIFICATION-TYPE
+    OBJECTS{
+        eqliscsiVolumeName
+    }
+    STATUS current
+    DESCRIPTION
+    "Sent when there is no progress in replicating the volume"
+    ::= { eqliscsiVolumeNotifications 4 }
+
+eqliscsiVolumeReplRemoteReplicaSetNotFound NOTIFICATION-TYPE
+    OBJECTS{
+        eqliscsiVolumeName
+    }
+    STATUS current
+    DESCRIPTION
+    "Sent when the remote replica is does not exist. Perhaps has been promoted"
+    ::= { eqliscsiVolumeNotifications 5 }
+
+eqliscsiVolumeReplRemoteResizeFailed NOTIFICATION-TYPE
+    OBJECTS{
+        eqliscsiVolumeName
+    }
+    STATUS current
+    DESCRIPTION
+    "Sent when the replication is paused due to insufficient delegated space
+     on partner"
+    ::= { eqliscsiVolumeNotifications 6 }
+
+---******************************************************************
+
+eqliscsiVolumePRKeysFullStatusTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqliscsiVolumePRKeysFullStatusEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION     "EqualLogic-Dynamic
+                     This table contains pr reservation info.
+                     "
+    ::=    { eqliscsiTarget 126 }
+
+eqliscsiVolumePRKeysFullStatusEntry OBJECT-TYPE
+    SYNTAX        EqliscsiVolumePRKeysFullStatusEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      ""
+    INDEX           { eqliscsiLocalMemberId , eqliscsiVolumeIndex, 
+    eqliscsiVolumePRKeysFullStatusIndex }
+    ::= { eqliscsiVolumePRKeysFullStatusTable 1 }
+
+EqliscsiVolumePRKeysFullStatusEntry ::= SEQUENCE {
+   eqliscsiVolumePRKeysFullStatusIndex               Unsigned32,
+   eqliscsiVolumePRKeysFullStatusRowStatus           RowStatus,
+   eqliscsiVolumePRKeysFullStatusKeyList             OCTET STRING
+}
+
+eqliscsiVolumePRKeysFullStatusIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies a unique index for identifing a Key."
+    ::=   { eqliscsiVolumePRKeysFullStatusEntry 1}
+
+eqliscsiVolumePRKeysFullStatusRowStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+      "The status of the row."
+::= { eqliscsiVolumePRKeysFullStatusEntry 2 }
+
+eqliscsiVolumePRKeysFullStatusKeyList OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(0..1024))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Comma separated list of PR info."
+::= { eqliscsiVolumePRKeysFullStatusEntry 3 }
+
+---******************************************************************
 
 END

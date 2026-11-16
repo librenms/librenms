@@ -937,7 +937,7 @@ final class EditPollingControllerTest extends DBTestCase
 
         $freshMethod = $method->fresh();
         $this->assertEquals([], $freshMethod->settings);
-        $config = $device->fresh()->polling()->unixAgent();
+        $config = $device->fresh()->polling()->get(PollingMethodType::UnixAgent);
         $this->assertInstanceOf(UnixAgentConfig::class, $config);
         $this->assertEquals(6556, $config->port);
         $this->assertEquals(10, $config->timeout);
@@ -959,7 +959,7 @@ final class EditPollingControllerTest extends DBTestCase
 
         $freshMethod = $method->fresh();
         $this->assertEquals(['port' => 6557], $freshMethod->settings);
-        $config = $device->fresh()->polling()->unixAgent();
+        $config = $device->fresh()->polling()->get(PollingMethodType::UnixAgent);
         $this->assertInstanceOf(UnixAgentConfig::class, $config);
         $this->assertEquals(6557, $config->port);
 
@@ -980,7 +980,7 @@ final class EditPollingControllerTest extends DBTestCase
 
         $freshMethod = $method->fresh();
         $this->assertEquals([], $freshMethod->settings);
-        $config = $device->fresh()->polling()->unixAgent();
+        $config = $device->fresh()->polling()->get(PollingMethodType::UnixAgent);
         $this->assertInstanceOf(UnixAgentConfig::class, $config);
         $this->assertEquals(6556, $config->port);
     }
