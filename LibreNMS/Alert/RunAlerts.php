@@ -461,6 +461,7 @@ class RunAlerts
                     $unit = $alert;
                     $unit['state'] = AlertState::RECOVERED;
                     $unit['fault_id'] = $fault->id;
+                    $unit['note'] = '';
                     $unit['details']['rule'] = $fault->details['rule'] ?? [];
                     $unit['details']['contacts'] = $fault->details['contacts'] ?? ($alert['details']['contacts'] ?? []);
                     $recoveryLog = AlertLog::query()->where('fault_id', $fault->id)->orderByDesc('id')->first();
