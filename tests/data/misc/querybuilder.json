@@ -45,14 +45,14 @@
         "",
         {"condition":"AND","rules":[{"id":"ports.ifDescr","field":"ports.ifDescr","type":"string","input":"text","operator":"is_null","value":""}],"valid":true},
         "ports.ifDescr IS NULL",
-        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND ports.ifDescr IS NULL",
+        "SELECT * FROM devices LEFT JOIN ports ON devices.device_id = ports.device_id WHERE (devices.device_id = ?) AND ports.ifDescr IS NULL",
         ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` where (`ports`.`ifDescr` is null)", []]
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"ports.ifDescr","field":"ports.ifDescr","type":"string","input":"text","operator":"is_not_null","value":""}],"valid":true},
         "ports.ifDescr IS NOT NULL",
-        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND ports.ifDescr IS NOT NULL",
+        "SELECT * FROM devices LEFT JOIN ports ON devices.device_id = ports.device_id WHERE (devices.device_id = ?) AND ports.ifDescr IS NOT NULL",
         ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` where (`ports`.`ifDescr` is not null)", []]
     ],
     [
@@ -94,7 +94,7 @@
         "%sensors.sensor_current > %sensors.sensor_limit",
         {"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"greater","value":"`sensors.sensor_limit`"}],"valid":true},
         "sensors.sensor_current > sensors.sensor_limit",
-        "SELECT * FROM devices,sensors WHERE (devices.device_id = ? AND devices.device_id = sensors.device_id) AND sensors.sensor_current > sensors.sensor_limit",
+        "SELECT * FROM devices LEFT JOIN sensors ON devices.device_id = sensors.device_id WHERE (devices.device_id = ?) AND sensors.sensor_current > sensors.sensor_limit",
         ["select * from `devices` left join `sensors` on `devices`.`device_id` = `sensors`.`device_id` where (`sensors`.`sensor_current` > sensors.sensor_limit)", []]
     ],
     [
@@ -108,28 +108,28 @@
         "%macros.state_sensor_critical",
         {"condition":"AND","rules":[{"id":"macros.state_sensor_critical","field":"macros.state_sensor_critical","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
         "macros.state_sensor_critical = 1",
-        "SELECT * FROM devices,sensors,sensors_to_state_indexes,state_indexes,state_translations WHERE (devices.device_id = ? AND devices.device_id = sensors.device_id AND sensors.sensor_id = sensors_to_state_indexes.sensor_id AND sensors_to_state_indexes.state_index_id = state_indexes.state_index_id AND state_indexes.state_index_id = state_translations.state_index_id) AND (sensors.sensor_current = state_translations.state_value && state_translations.state_generic_value = 2) = 1",
+        "SELECT * FROM devices LEFT JOIN sensors ON devices.device_id = sensors.device_id LEFT JOIN sensors_to_state_indexes ON sensors.sensor_id = sensors_to_state_indexes.sensor_id LEFT JOIN state_indexes ON sensors_to_state_indexes.state_index_id = state_indexes.state_index_id LEFT JOIN state_translations ON state_indexes.state_index_id = state_translations.state_index_id WHERE (devices.device_id = ?) AND (sensors.sensor_current = state_translations.state_value && state_translations.state_generic_value = 2) = 1",
         ["select * from `devices` left join `sensors` on `devices`.`device_id` = `sensors`.`device_id` left join `sensors_to_state_indexes` on `sensors`.`sensor_id` = `sensors_to_state_indexes`.`sensor_id` left join `state_indexes` on `sensors_to_state_indexes`.`state_index_id` = `state_indexes`.`state_index_id` left join `state_translations` on `state_indexes`.`state_index_id` = `state_translations`.`state_index_id` where ((sensors.sensor_current = state_translations.state_value && state_translations.state_generic_value = 2) = ?)", ["1"]]
     ],
     [
         "",
         {"condition":"AND","rules":[{"id":"macros.device","field":"macros.device","type":"integer","input":"radio","operator":"equal","value":"1"},{"condition":"OR","rules":[{"id":"ports.ifName","field":"ports.ifName","type":"string","input":"text","operator":"equal","value":"Ge12"},{"id":"ports.ifName","field":"ports.ifName","type":"string","input":"text","operator":"equal","value":"Ge13"}]},{"id":"ports.ifInOctets_delta","field":"ports.ifInOctets_delta","type":"integer","input":"number","operator":"greater","value":"42"}],"valid":true},
         "macros.device = 1 AND (ports.ifName = \"Ge12\" OR ports.ifName = \"Ge13\") AND ports.ifInOctets_delta > 42",
-        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (devices.disabled = 0 && devices.ignore = 0) = 1 AND (ports.ifName = \"Ge12\" OR ports.ifName = \"Ge13\") AND ports.ifInOctets_delta > 42",
+        "SELECT * FROM devices LEFT JOIN ports ON devices.device_id = ports.device_id WHERE (devices.device_id = ?) AND (devices.disabled = 0 && devices.ignore = 0) = 1 AND (ports.ifName = \"Ge12\" OR ports.ifName = \"Ge13\") AND ports.ifInOctets_delta > 42",
         ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` where ((devices.disabled = 0 && devices.ignore = 0) = ? AND (`ports`.`ifName` = ? OR `ports`.`ifName` = ?) AND `ports`.`ifInOctets_delta` > ?)", ["1","Ge12","Ge13","42"]]
     ],
     [
         "%bills.bill_name = \"Neil's Bill\"",
         {"condition":"AND","rules":[{"id":"bills.bill_name","field":"bills.bill_name","type":"string","input":"text","operator":"equal","value":"Neil's Bill"}],"valid":true},
         "bills.bill_name = \"Neil's Bill\"",
-        "SELECT * FROM devices,ports,bill_ports,bills WHERE (devices.device_id = ? AND devices.device_id = ports.device_id AND ports.port_id = bill_ports.port_id AND bill_ports.bill_id = bills.bill_id) AND bills.bill_name = \"Neil's Bill\"",
+        "SELECT * FROM devices LEFT JOIN ports ON devices.device_id = ports.device_id LEFT JOIN bill_ports ON ports.port_id = bill_ports.port_id LEFT JOIN bills ON bill_ports.bill_id = bills.bill_id WHERE (devices.device_id = ?) AND bills.bill_name = \"Neil's Bill\"",
         ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` left join `bill_ports` on `ports`.`port_id` = `bill_ports`.`port_id` left join `bills` on `bill_ports`.`bill_id` = `bills`.`bill_id` where (`bills`.`bill_name` = ?)", ["Neil's Bill"]]
     ],
     [
         "%ports.ifOutErrors_rate >= \"100\" || %ports.ifInErrors_rate >= \"100\"",
         {"condition":"OR","rules":[{"id":"ports.ifOutErrors_rate","field":"ports.ifOutErrors_rate","type":"string","input":"text","operator":"greater_or_equal","value":"100"},{"id":"ports.ifInErrors_rate","field":"ports.ifInErrors_rate","type":"string","input":"text","operator":"greater_or_equal","value":"100"}],"valid":true},
         "ports.ifOutErrors_rate >= 100 OR ports.ifInErrors_rate >= 100",
-        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (ports.ifOutErrors_rate >= 100 OR ports.ifInErrors_rate >= 100)",
+        "SELECT * FROM devices LEFT JOIN ports ON devices.device_id = ports.device_id WHERE (devices.device_id = ?) AND (ports.ifOutErrors_rate >= 100 OR ports.ifInErrors_rate >= 100)",
         ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` where (`ports`.`ifOutErrors_rate` >= ? OR `ports`.`ifInErrors_rate` >= ?)", ["100","100"]]
     ],
     [
@@ -150,14 +150,14 @@
         "syslog.timestamp > %macros.past_5m && syslog.msg ~ \"@Port Down@\"",
         {"condition":"AND","rules":[{"id":"syslog.timestamp","field":"syslog.timestamp","type":"datetime","input":"text","operator":"greater","value":"`macros.past_5m`"},{"id":"syslog.msg","field":"syslog.msg","type":"string","input":"text","operator":"regex","value":".*Port Down.*"}],"valid":true},
         "syslog.timestamp > macros.past_5m AND syslog.msg REGEXP \".*Port Down.*\"",
-        "SELECT * FROM devices,syslog WHERE (devices.device_id = ? AND devices.device_id = syslog.device_id) AND syslog.timestamp > (DATE_SUB(NOW(),INTERVAL 5 MINUTE)) AND syslog.msg REGEXP \".*Port Down.*\"",
+        "SELECT * FROM devices LEFT JOIN syslog ON devices.device_id = syslog.device_id WHERE (devices.device_id = ?) AND syslog.timestamp > (DATE_SUB(NOW(),INTERVAL 5 MINUTE)) AND syslog.msg REGEXP \".*Port Down.*\"",
         ["select * from `devices` left join `syslog` on `devices`.`device_id` = `syslog`.`device_id` where (`syslog`.`timestamp` > (DATE_SUB(NOW(),INTERVAL 5 MINUTE)) AND `syslog`.`msg` REGEXP ?)", [".*Port Down.*"]]
     ],
     [
         "%macros.port_usage_perc > 80",
         {"condition":"AND","rules":[{"id":"macros.port_usage_perc","field":"macros.port_usage_perc","type":"integer","input":"text","operator":"greater","value":"80"}],"valid":true},
         "macros.port_usage_perc > 80",
-        "SELECT * FROM devices,ports WHERE (devices.device_id = ? AND devices.device_id = ports.device_id) AND (((SELECT IF(ports.ifOutOctets_rate>ports.ifInOctets_rate, ports.ifOutOctets_rate, ports.ifInOctets_rate)*8) / ports.ifSpeed)*100) > 80",
+        "SELECT * FROM devices LEFT JOIN ports ON devices.device_id = ports.device_id WHERE (devices.device_id = ?) AND (((SELECT IF(ports.ifOutOctets_rate>ports.ifInOctets_rate, ports.ifOutOctets_rate, ports.ifInOctets_rate)*8) / ports.ifSpeed)*100) > 80",
         ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` where ((((SELECT IF(ports.ifOutOctets_rate>ports.ifInOctets_rate, ports.ifOutOctets_rate, ports.ifInOctets_rate)*8) / ports.ifSpeed)*100) > ?)", ["80"]]],
     [
         "%devices.sysName ~ \"..domain.com\" || %devices.sysName ~ \"switch.\" &&",
@@ -177,7 +177,7 @@
         "%locations.location ~ somewhere",
         {"condition":"AND","rules":[{"id":"locations.location","field":"locations.location","type":"string","input":"text","operator":"regex","value":"somewhere"}],"valid":true},
         "locations.location REGEXP \"somewhere\"",
-        "SELECT * FROM locations,devices WHERE (devices.device_id = ? AND locations.id = devices.location_id) AND locations.location REGEXP \"somewhere\"",
+        "SELECT * FROM devices LEFT JOIN locations ON locations.id = devices.location_id WHERE (devices.device_id = ?) AND locations.location REGEXP \"somewhere\"",
         ["select * from `devices` left join `locations` on `locations`.`id` = `devices`.`location_id` where (`locations`.`location` REGEXP ?)", ["somewhere"]]
     ]
 ,
@@ -185,7 +185,98 @@
         "%device_groups.id = 1",
         {"condition":"AND","rules":[{"id":"device_groups.id","field":"device_groups.id","type":"string","input":"text","operator":"equal","value":"1"}],"valid":true},
         "device_groups.id = 1",
-        "SELECT * FROM devices,device_group_device,device_groups WHERE (devices.device_id = ? AND devices.device_id = device_group_device.device_id AND device_group_device.device_group_id = device_groups.id) AND device_groups.id = 1",
+        "SELECT * FROM devices LEFT JOIN device_group_device ON devices.device_id = device_group_device.device_id LEFT JOIN device_groups ON device_group_device.device_group_id = device_groups.id WHERE (devices.device_id = ?) AND device_groups.id = 1",
         ["select * from `devices` left join `device_group_device` on `devices`.`device_id` = `device_group_device`.`device_id` left join `device_groups` on `device_group_device`.`device_group_id` = `device_groups`.`id` where (`device_groups`.`id` = ?)", ["1"]]
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.ip","field":"devices.ip","type":"string","input":"text","operator":"ip_in_prefix","value":"10.0.0.0/24"}],"valid":true},
+        "(LENGTH(`devices`.`ip`) = 4 AND (CONV(HEX(`devices`.`ip`), 16, 10) & 4294967040) = 167772160)",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND (LENGTH(`devices`.`ip`) = 4 AND (CONV(HEX(`devices`.`ip`), 16, 10) & 4294967040) = 167772160)",
+        ["select * from `devices` where ((LENGTH(`devices`.`ip`) = 4 AND (CONV(HEX(`devices`.`ip`), 16, 10) & 4294967040) = 167772160))", []]
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.ip","field":"devices.ip","type":"string","input":"text","operator":"ip_not_in_prefix","value":"10.0.0.0/24"}],"valid":true},
+        "NOT ((LENGTH(`devices`.`ip`) = 4 AND (CONV(HEX(`devices`.`ip`), 16, 10) & 4294967040) = 167772160))",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND NOT ((LENGTH(`devices`.`ip`) = 4 AND (CONV(HEX(`devices`.`ip`), 16, 10) & 4294967040) = 167772160))",
+        ["select * from `devices` where (NOT ((LENGTH(`devices`.`ip`) = 4 AND (CONV(HEX(`devices`.`ip`), 16, 10) & 4294967040) = 167772160)))", []]
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.ip","field":"devices.ip","type":"string","input":"text","operator":"ip_in_prefix","value":"10.0.0.5/32"}],"valid":true},
+        "(LENGTH(`devices`.`ip`) = 4 AND (CONV(HEX(`devices`.`ip`), 16, 10) & 4294967295) = 167772165)",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND (LENGTH(`devices`.`ip`) = 4 AND (CONV(HEX(`devices`.`ip`), 16, 10) & 4294967295) = 167772165)",
+        ["select * from `devices` where ((LENGTH(`devices`.`ip`) = 4 AND (CONV(HEX(`devices`.`ip`), 16, 10) & 4294967295) = 167772165))", []]
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.ip","field":"devices.ip","type":"string","input":"text","operator":"ip_in_prefix","value":"0.0.0.0/0"}],"valid":true},
+        "(LENGTH(`devices`.`ip`) = 4 AND (CONV(HEX(`devices`.`ip`), 16, 10) & 0) = 0)",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND (LENGTH(`devices`.`ip`) = 4 AND (CONV(HEX(`devices`.`ip`), 16, 10) & 0) = 0)",
+        ["select * from `devices` where ((LENGTH(`devices`.`ip`) = 4 AND (CONV(HEX(`devices`.`ip`), 16, 10) & 0) = 0))", []]
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"ipv4_networks.ipv4_network","field":"ipv4_networks.ipv4_network","type":"string","input":"text","operator":"ip_in_prefix","value":"203.0.113.0/24"}],"valid":true},
+        "(INET_ATON(SUBSTRING_INDEX(`ipv4_networks`.`ipv4_network`, '/', 1)) & 4294967040) = 3405803776",
+        "SELECT * FROM devices LEFT JOIN ports ON devices.device_id = ports.device_id LEFT JOIN ipv4_addresses ON ports.port_id = ipv4_addresses.port_id LEFT JOIN ipv4_networks ON ipv4_addresses.ipv4_network_id = ipv4_networks.ipv4_network_id WHERE (devices.device_id = ?) AND (INET_ATON(SUBSTRING_INDEX(`ipv4_networks`.`ipv4_network`, '/', 1)) & 4294967040) = 3405803776",
+        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` left join `ipv4_addresses` on `ports`.`port_id` = `ipv4_addresses`.`port_id` left join `ipv4_networks` on `ipv4_addresses`.`ipv4_network_id` = `ipv4_networks`.`ipv4_network_id` where ((INET_ATON(SUBSTRING_INDEX(`ipv4_networks`.`ipv4_network`, '/', 1)) & 4294967040) = 3405803776)", []]
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"ipv4_networks.ipv4_network","field":"ipv4_networks.ipv4_network","type":"string","input":"text","operator":"ip_not_in_prefix","value":"203.0.113.0/24"}],"valid":true},
+        "NOT EXISTS (SELECT 1 FROM `ports` INNER JOIN `ipv4_addresses` ON ports.port_id = ipv4_addresses.port_id INNER JOIN `ipv4_networks` ON ipv4_addresses.ipv4_network_id = ipv4_networks.ipv4_network_id WHERE ports.device_id = devices.device_id AND (INET_ATON(SUBSTRING_INDEX(`ipv4_networks`.`ipv4_network`, '/', 1)) & 4294967040) = 3405803776)",
+        "SELECT * FROM devices LEFT JOIN ports ON devices.device_id = ports.device_id LEFT JOIN ipv4_addresses ON ports.port_id = ipv4_addresses.port_id LEFT JOIN ipv4_networks ON ipv4_addresses.ipv4_network_id = ipv4_networks.ipv4_network_id WHERE (devices.device_id = ?) AND NOT EXISTS (SELECT 1 FROM `ports` INNER JOIN `ipv4_addresses` ON ports.port_id = ipv4_addresses.port_id INNER JOIN `ipv4_networks` ON ipv4_addresses.ipv4_network_id = ipv4_networks.ipv4_network_id WHERE ports.device_id = devices.device_id AND (INET_ATON(SUBSTRING_INDEX(`ipv4_networks`.`ipv4_network`, '/', 1)) & 4294967040) = 3405803776)",
+        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` left join `ipv4_addresses` on `ports`.`port_id` = `ipv4_addresses`.`port_id` left join `ipv4_networks` on `ipv4_addresses`.`ipv4_network_id` = `ipv4_networks`.`ipv4_network_id` where (NOT EXISTS (SELECT 1 FROM `ports` INNER JOIN `ipv4_addresses` ON ports.port_id = ipv4_addresses.port_id INNER JOIN `ipv4_networks` ON ipv4_addresses.ipv4_network_id = ipv4_networks.ipv4_network_id WHERE ports.device_id = devices.device_id AND (INET_ATON(SUBSTRING_INDEX(`ipv4_networks`.`ipv4_network`, '/', 1)) & 4294967040) = 3405803776))", []]
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.ip","field":"devices.ip","type":"string","input":"text","operator":"ip_in_prefix","value":"fd42:cafe:d00d::/64"}],"valid":true},
+        "(LENGTH(`devices`.`ip`) = 16 AND SUBSTRING(`devices`.`ip`, 1, 8) = SUBSTRING(INET6_ATON('fd42:cafe:d00d::'), 1, 8))",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND (LENGTH(`devices`.`ip`) = 16 AND SUBSTRING(`devices`.`ip`, 1, 8) = SUBSTRING(INET6_ATON('fd42:cafe:d00d::'), 1, 8))",
+        ["select * from `devices` where ((LENGTH(`devices`.`ip`) = 16 AND SUBSTRING(`devices`.`ip`, 1, 8) = SUBSTRING(INET6_ATON('fd42:cafe:d00d::'), 1, 8)))", []]
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.ip","field":"devices.ip","type":"string","input":"text","operator":"ip_in_prefix","value":"fd42:cafe:d00d::/100"}],"valid":true},
+        "(LENGTH(`devices`.`ip`) = 16 AND SUBSTRING(`devices`.`ip`, 1, 12) = SUBSTRING(INET6_ATON('fd42:cafe:d00d::'), 1, 12) AND ORD(SUBSTRING(`devices`.`ip`, 13, 1)) & 240 = ORD(SUBSTRING(INET6_ATON('fd42:cafe:d00d::'), 13, 1)) & 240)",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND (LENGTH(`devices`.`ip`) = 16 AND SUBSTRING(`devices`.`ip`, 1, 12) = SUBSTRING(INET6_ATON('fd42:cafe:d00d::'), 1, 12) AND ORD(SUBSTRING(`devices`.`ip`, 13, 1)) & 240 = ORD(SUBSTRING(INET6_ATON('fd42:cafe:d00d::'), 13, 1)) & 240)",
+        ["select * from `devices` where ((LENGTH(`devices`.`ip`) = 16 AND SUBSTRING(`devices`.`ip`, 1, 12) = SUBSTRING(INET6_ATON('fd42:cafe:d00d::'), 1, 12) AND ORD(SUBSTRING(`devices`.`ip`, 13, 1)) & 240 = ORD(SUBSTRING(INET6_ATON('fd42:cafe:d00d::'), 13, 1)) & 240))", []]
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.ip","field":"devices.ip","type":"string","input":"text","operator":"ip_in_prefix","value":"fd42:cafe:d00d::/127"}],"valid":true},
+        "(LENGTH(`devices`.`ip`) = 16 AND SUBSTRING(`devices`.`ip`, 1, 15) = SUBSTRING(INET6_ATON('fd42:cafe:d00d::'), 1, 15) AND ORD(SUBSTRING(`devices`.`ip`, 16, 1)) & 254 = ORD(SUBSTRING(INET6_ATON('fd42:cafe:d00d::'), 16, 1)) & 254)",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND (LENGTH(`devices`.`ip`) = 16 AND SUBSTRING(`devices`.`ip`, 1, 15) = SUBSTRING(INET6_ATON('fd42:cafe:d00d::'), 1, 15) AND ORD(SUBSTRING(`devices`.`ip`, 16, 1)) & 254 = ORD(SUBSTRING(INET6_ATON('fd42:cafe:d00d::'), 16, 1)) & 254)",
+        ["select * from `devices` where ((LENGTH(`devices`.`ip`) = 16 AND SUBSTRING(`devices`.`ip`, 1, 15) = SUBSTRING(INET6_ATON('fd42:cafe:d00d::'), 1, 15) AND ORD(SUBSTRING(`devices`.`ip`, 16, 1)) & 254 = ORD(SUBSTRING(INET6_ATON('fd42:cafe:d00d::'), 16, 1)) & 254))", []]
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"ipv6_networks.ipv6_network","field":"ipv6_networks.ipv6_network","type":"string","input":"text","operator":"ip_in_prefix","value":"2001:db8::/48"}],"valid":true},
+        "SUBSTRING(INET6_ATON(SUBSTRING_INDEX(`ipv6_networks`.`ipv6_network`, '/', 1)), 1, 6) = SUBSTRING(INET6_ATON('2001:db8::'), 1, 6)",
+        "SELECT * FROM devices LEFT JOIN ports ON devices.device_id = ports.device_id LEFT JOIN ipv6_addresses ON ports.port_id = ipv6_addresses.port_id LEFT JOIN ipv6_networks ON ipv6_addresses.ipv6_network_id = ipv6_networks.ipv6_network_id WHERE (devices.device_id = ?) AND SUBSTRING(INET6_ATON(SUBSTRING_INDEX(`ipv6_networks`.`ipv6_network`, '/', 1)), 1, 6) = SUBSTRING(INET6_ATON('2001:db8::'), 1, 6)",
+        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` left join `ipv6_addresses` on `ports`.`port_id` = `ipv6_addresses`.`port_id` left join `ipv6_networks` on `ipv6_addresses`.`ipv6_network_id` = `ipv6_networks`.`ipv6_network_id` where (SUBSTRING(INET6_ATON(SUBSTRING_INDEX(`ipv6_networks`.`ipv6_network`, '/', 1)), 1, 6) = SUBSTRING(INET6_ATON('2001:db8::'), 1, 6))", []]
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"ipv6_networks.ipv6_network","field":"ipv6_networks.ipv6_network","type":"string","input":"text","operator":"ip_in_prefix","value":"2001:db8::/100"}],"valid":true},
+        "SUBSTRING(INET6_ATON(SUBSTRING_INDEX(`ipv6_networks`.`ipv6_network`, '/', 1)), 1, 12) = SUBSTRING(INET6_ATON('2001:db8::'), 1, 12) AND ORD(SUBSTRING(INET6_ATON(SUBSTRING_INDEX(`ipv6_networks`.`ipv6_network`, '/', 1)), 13, 1)) & 240 = ORD(SUBSTRING(INET6_ATON('2001:db8::'), 13, 1)) & 240",
+        "SELECT * FROM devices LEFT JOIN ports ON devices.device_id = ports.device_id LEFT JOIN ipv6_addresses ON ports.port_id = ipv6_addresses.port_id LEFT JOIN ipv6_networks ON ipv6_addresses.ipv6_network_id = ipv6_networks.ipv6_network_id WHERE (devices.device_id = ?) AND SUBSTRING(INET6_ATON(SUBSTRING_INDEX(`ipv6_networks`.`ipv6_network`, '/', 1)), 1, 12) = SUBSTRING(INET6_ATON('2001:db8::'), 1, 12) AND ORD(SUBSTRING(INET6_ATON(SUBSTRING_INDEX(`ipv6_networks`.`ipv6_network`, '/', 1)), 13, 1)) & 240 = ORD(SUBSTRING(INET6_ATON('2001:db8::'), 13, 1)) & 240",
+        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` left join `ipv6_addresses` on `ports`.`port_id` = `ipv6_addresses`.`port_id` left join `ipv6_networks` on `ipv6_addresses`.`ipv6_network_id` = `ipv6_networks`.`ipv6_network_id` where (SUBSTRING(INET6_ATON(SUBSTRING_INDEX(`ipv6_networks`.`ipv6_network`, '/', 1)), 1, 12) = SUBSTRING(INET6_ATON('2001:db8::'), 1, 12) AND ORD(SUBSTRING(INET6_ATON(SUBSTRING_INDEX(`ipv6_networks`.`ipv6_network`, '/', 1)), 13, 1)) & 240 = ORD(SUBSTRING(INET6_ATON('2001:db8::'), 13, 1)) & 240)", []]
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"ipv6_networks.ipv6_network","field":"ipv6_networks.ipv6_network","type":"string","input":"text","operator":"ip_not_in_prefix","value":"2001:db8::/48"}],"valid":true},
+        "NOT EXISTS (SELECT 1 FROM `ports` INNER JOIN `ipv6_addresses` ON ports.port_id = ipv6_addresses.port_id INNER JOIN `ipv6_networks` ON ipv6_addresses.ipv6_network_id = ipv6_networks.ipv6_network_id WHERE ports.device_id = devices.device_id AND SUBSTRING(INET6_ATON(SUBSTRING_INDEX(`ipv6_networks`.`ipv6_network`, '/', 1)), 1, 6) = SUBSTRING(INET6_ATON('2001:db8::'), 1, 6))",
+        "SELECT * FROM devices LEFT JOIN ports ON devices.device_id = ports.device_id LEFT JOIN ipv6_addresses ON ports.port_id = ipv6_addresses.port_id LEFT JOIN ipv6_networks ON ipv6_addresses.ipv6_network_id = ipv6_networks.ipv6_network_id WHERE (devices.device_id = ?) AND NOT EXISTS (SELECT 1 FROM `ports` INNER JOIN `ipv6_addresses` ON ports.port_id = ipv6_addresses.port_id INNER JOIN `ipv6_networks` ON ipv6_addresses.ipv6_network_id = ipv6_networks.ipv6_network_id WHERE ports.device_id = devices.device_id AND SUBSTRING(INET6_ATON(SUBSTRING_INDEX(`ipv6_networks`.`ipv6_network`, '/', 1)), 1, 6) = SUBSTRING(INET6_ATON('2001:db8::'), 1, 6))",
+        ["select * from `devices` left join `ports` on `devices`.`device_id` = `ports`.`device_id` left join `ipv6_addresses` on `ports`.`port_id` = `ipv6_addresses`.`port_id` left join `ipv6_networks` on `ipv6_addresses`.`ipv6_network_id` = `ipv6_networks`.`ipv6_network_id` where (NOT EXISTS (SELECT 1 FROM `ports` INNER JOIN `ipv6_addresses` ON ports.port_id = ipv6_addresses.port_id INNER JOIN `ipv6_networks` ON ipv6_addresses.ipv6_network_id = ipv6_networks.ipv6_network_id WHERE ports.device_id = devices.device_id AND SUBSTRING(INET6_ATON(SUBSTRING_INDEX(`ipv6_networks`.`ipv6_network`, '/', 1)), 1, 6) = SUBSTRING(INET6_ATON('2001:db8::'), 1, 6)))", []]
+    ],
+    [
+        "",
+        {"condition":"AND","rules":[{"id":"devices.ip","field":"devices.ip","type":"string","input":"text","operator":"ip_in_prefix","value":"::/0"}],"valid":true},
+        "(LENGTH(`devices`.`ip`) = 16)",
+        "SELECT * FROM devices WHERE (devices.device_id = ?) AND (LENGTH(`devices`.`ip`) = 16)",
+        ["select * from `devices` where ((LENGTH(`devices`.`ip`) = 16))", []]
     ]
 ]
