@@ -57,6 +57,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
+use LibreNMS\Interfaces\Polling\Sensors\WirelessCellPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\QosPolling;
 use LibreNMS\OS;
@@ -74,6 +75,7 @@ class Routeros extends OS implements
     TransceiverDiscovery,
     WirelessCcqDiscovery,
     WirelessCellDiscovery,
+    WirelessCellPolling,
     WirelessCqiDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
@@ -499,9 +501,9 @@ class Routeros extends OS implements
                 continue;
             }
 
-            $cellId = (int) $cellIds[$index];
-            if ($cellId < 0 || $cellId >= 0xFFFFFFFF) {
-                continue; // -1 (or all ones): modem does not report the cell id (seen on SXT LTE)
+            $cellId = self::validCellId($cellIds[$index]);
+            if ($cellId === null) {
+                continue;
             }
 
             $sensors[] = new WirelessSensor(
@@ -543,6 +545,38 @@ class Routeros extends OS implements
         }
 
         return $sensors;
+    }
+
+    /**
+     * The cell id is fetched numerically like at discovery, an invalid cell id is unknown (null)
+     *
+     * @param  array<int, \App\Models\WirelessSensor>  $sensors
+     * @return array<int, int|null>
+     */
+    public function pollWirelessCell(array $sensors): array
+    {
+        $values = SnmpQuery::numeric()->get(array_map(fn ($sensor) => $sensor->sensor_oids[0], $sensors))->values();
+
+        $cellIds = [];
+        foreach ($sensors as $sensor) {
+            $cellIds[$sensor->sensor_id] = self::validCellId($values[$sensor->sensor_oids[0]] ?? null);
+        }
+
+        return $cellIds;
+    }
+
+    /**
+     * -1 (or all ones) means the modem does not report the cell id (seen on SXT LTE)
+     */
+    public static function validCellId(mixed $value): ?int
+    {
+        if (! is_numeric($value)) {
+            return null;
+        }
+
+        $cellId = (int) $value;
+
+        return $cellId < 0 || $cellId >= 0xFFFFFFFF ? null : $cellId;
     }
 
     /**
@@ -612,13 +646,17 @@ class Routeros extends OS implements
         $chassis = $inventory->firstWhere('entPhysicalClass', 'chassis')->entPhysicalIndex ?? 0;
 
         foreach ($this->lteModems() as $index => $entry) {
+            if (self::lteEntityIndex($index, true) === null) {
+                continue;
+            }
+
             $model = trim($entry['mtxrLTEModemModel'] ?? '');
             $firmware = trim($entry['mtxrLTEModemFirmware'] ?? '');
             $iccid = trim($entry['mtxrLTEModemUICC'] ?? '');
             $imsi = trim($entry['mtxrLTEModemIMSI'] ?? '');
 
             $inventory->push(new EntPhysical([
-                'entPhysicalIndex' => $this->lteEntityIndex($index),
+                'entPhysicalIndex' => self::lteEntityIndex($index),
                 'entPhysicalContainedIn' => $chassis,
                 'entPhysicalClass' => 'module',
                 'entPhysicalName' => $this->lteName($index),
@@ -635,8 +673,8 @@ class Routeros extends OS implements
             }
 
             $inventory->push(new EntPhysical([
-                'entPhysicalIndex' => $this->lteEntityIndex($index, true),
-                'entPhysicalContainedIn' => $this->lteEntityIndex($index),
+                'entPhysicalIndex' => self::lteEntityIndex($index, true),
+                'entPhysicalContainedIn' => self::lteEntityIndex($index),
                 'entPhysicalClass' => 'module',
                 'entPhysicalName' => 'SIM card',
                 'entPhysicalDescr' => $iccid === '' ? 'SIM card not detected' : 'SIM card' . ($imsi ? ", IMSI $imsi" : ''),
@@ -649,11 +687,14 @@ class Routeros extends OS implements
     }
 
     /**
-     * Inventory index for the LTE modem (or its SIM card), offset to stay clear of RouterOS ENTITY-MIB indexes
+     * Inventory index for the LTE modem (or its SIM card), offset to stay clear of RouterOS ENTITY-MIB indexes.
+     * Null when it does not fit the entPhysicalIndex column (signed int), the modem then has no inventory entry.
      */
-    private function lteEntityIndex(int|string $ifIndex, bool $sim = false): int
+    public static function lteEntityIndex(int|string $ifIndex, bool $sim = false): ?int
     {
-        return 1000000000 + (int) $ifIndex * 10 + ($sim ? 1 : 0);
+        $index = 1000000000 + (int) $ifIndex * 10 + ($sim ? 1 : 0);
+
+        return (int) $ifIndex >= 0 && $index <= 2147483647 ? $index : null;
     }
 
     /**
@@ -699,7 +740,7 @@ class Routeros extends OS implements
                     'sensor_descr' => $this->lteName($index) . ': ' . $descr,
                     'sensor_current' => self::normalizeLteState($column, $entry[$column]),
                     'group' => 'LTE',
-                    'entPhysicalIndex' => $this->lteEntityIndex($index, $column === 'mtxrLTEModemUICC'),
+                    'entPhysicalIndex' => self::lteEntityIndex($index, $column === 'mtxrLTEModemUICC'),
                 ]));
             }
         }

@@ -14,6 +14,36 @@ class RouterosLteStateTest extends TestCase
         $this->assertSame($expected, Routeros::normalizeLteState($column, $value));
     }
 
+    public function testLteEntityIndexFitsTheInventoryColumn(): void
+    {
+        $this->assertSame(1000000030, Routeros::lteEntityIndex(3));
+        $this->assertSame(1000000031, Routeros::lteEntityIndex('3', true));
+        $this->assertSame(2147483641, Routeros::lteEntityIndex(114748364, true), 'largest ifIndex that fits');
+        $this->assertNull(Routeros::lteEntityIndex(114748365));
+        $this->assertNull(Routeros::lteEntityIndex(200000000));
+        $this->assertNull(Routeros::lteEntityIndex(200000000, true));
+    }
+
+    #[DataProvider('cellIds')]
+    public function testValidCellId(mixed $value, ?int $expected): void
+    {
+        $this->assertSame($expected, Routeros::validCellId($value));
+    }
+
+    /**
+     * @return array<string, array{mixed, int|null}>
+     */
+    public static function cellIds(): array
+    {
+        return [
+            'cell id' => ['81592885', 81592885],
+            'not reported' => ['-1', null],
+            'all ones' => ['4294967295', null],
+            'empty' => ['', null],
+            'missing' => [null, null],
+        ];
+    }
+
     /**
      * @return array<string, array{string, string, int}>
      */
