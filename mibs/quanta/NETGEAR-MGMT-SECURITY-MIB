@@ -1,13 +1,14 @@
 NETGEAR-MGMT-SECURITY-MIB DEFINITIONS ::= BEGIN
 
--- Broadcom FastPath Mgmt Security MIB
--- Copyright 2016-2019 Broadcom.
+-- Netgear Mgmt Security MIB
+-- Copyright Netgear Inc (2003-2007) All rights reserved.
+
 -- This SNMP Management Information Specification
--- embodies Broadcom's confidential and proprietary
--- intellectual property.  Broadcom retains all title
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
 -- and ownership in the Specification including any revisions.
 
--- This Specification is supplied "AS IS", Broadcom 
+-- This Specification is supplied "AS IS", Netgear Inc
 -- makes no warranty, either expressed or implied,
 -- as to the use, operation, condition, or performance of the
 -- Specification.
@@ -15,31 +16,19 @@ NETGEAR-MGMT-SECURITY-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
-    IpAddress, Integer32, Unsigned32    FROM SNMPv2-SMI
-    ng7000managedswitch                            FROM NETGEAR-REF-MIB
+    IpAddress, Integer32                FROM SNMPv2-SMI
+    lb6m                            FROM QUANTA-LB6M-REF-MIB
     DisplayString                       FROM RFC1213-MIB
-    TruthValue, RowStatus               FROM SNMPv2-TC;
+    TruthValue                          FROM SNMPv2-TC;
 
     fastPathMgmtSecurity MODULE-IDENTITY
-        LAST-UPDATED "201707110000Z" -- 11 Jul 2017 12:00:00 GMT
+        LAST-UPDATED "201311110000Z" -- 11 Nov 2013 12:00:00 GMT
         ORGANIZATION "Netgear Inc"
         CONTACT-INFO ""
         DESCRIPTION
           "The Netgear Private MIB for FastPath Security"
 
         -- Revision history.
-        REVISION
-          "201707110000Z" -- 11 Jul 2017 12:00:00 GMT
-        DESCRIPTION
-          "Modified the description of the object agentSSHProtocolLevel."
-        REVISION
-          "201705180000Z" -- 18 May 2017 12:00:00 GMT
-        DESCRIPTION
-          "Added objects agentScpServerAdminMode."
-        REVISION
-          "201703100000Z" -- 10 Mar 2017 12:00:00 GMT
-        DESCRIPTION
-          "Added objects agentAccountingUpdateNewinfo, agentAccountingUpdatePeriodic."
         REVISION
           "201311110000Z" -- 11 Nov 2013 12:00:00 GMT
         DESCRIPTION
@@ -61,7 +50,7 @@ IMPORTS
         DESCRIPTION
           "Initial revision."
 
-    ::= { ng7000managedswitch 11 }
+    ::= { lb6m 11 }
 
     --**************************************************************************************
     -- agentSSLConfigGroup
@@ -94,15 +83,14 @@ IMPORTS
     agentSSLProtocolLevel OBJECT-TYPE
          SYNTAX      INTEGER {
                      ssl30(1), -- SSL 3.0
-                     tls10(2), -- TLS 1.0 is no longer supported
-                     both(3),
-                     tls12(4) -- TLS 1.2
+                     tls10(2), -- TSL 1.0
+                     both(3)
                      }
-         MAX-ACCESS  read-only
+         MAX-ACCESS  read-write
          STATUS      current
          DESCRIPTION
-                     "Indicates which protocol versions of SSL are enabled on this
-                     switch. The default value is tls12(4)."
+                     "Configures which protocol versions of SSL are enabled on this
+                     switch.  The default value is both(3)."
          ::= { agentSSLConfigGroup 3 }
 
     agentSSLMaxSessions OBJECT-TYPE
@@ -181,17 +169,15 @@ IMPORTS
 
     agentSSHProtocolLevel OBJECT-TYPE
          SYNTAX      INTEGER {
-                     ssh10(1), -- deprecated, SSH 1.0 no longer supported
+                     ssh10(1), -- SSH 1.0
                      ssh20(2), -- SSH 2.0
-                     both(3)   -- deprecated, SSH 1.0 no longer supported 
+                     both(3)
                      }
-         MAX-ACCESS  read-only
-         STATUS      current 
+         MAX-ACCESS  read-write
+         STATUS      current
          DESCRIPTION
-                     "Indicates the protocol version of SSH enabled on this switch.
-                      Starting with the use of OpenSSH version 7.5P1,
-                      SSH Protocol Version 1.0 is no longer supported."
-         DEFVAL { ssh20}
+                     "Configures which protocol versions of SSH are enabled on this
+                     switch.  The default value is both(3)."
          ::= { agentSSHConfigGroup 2 }
 
     agentSSHSessionsCount OBJECT-TYPE
@@ -284,548 +270,5 @@ IMPORTS
                      port number."
          ::= { agentSSHConfigGroup 10 }
 
-    agentScpServerAdminMode OBJECT-TYPE
-         SYNTAX      INTEGER {
-                     enable(1),
-                     disable(2)
-                     }
-         MAX-ACCESS  read-write
-         STATUS      current
-         DESCRIPTION
-                     "Configures SCP server admin mode to download files to the switch.
-                      The default value is disable(2)."
-         DEFVAL { disable }        
-         ::= { agentSSHConfigGroup 11 }
 
-
-
-    --************************************************************************************
-    -- agentListAuthenticationGroup
-    --
-    --************************************************************************************
-
-    agentListAuthenticationGroup                   OBJECT IDENTIFIER ::= { fastPathMgmtSecurity 3 }
-
-    agentListAuthenticationTable OBJECT-TYPE
-         SYNTAX SEQUENCE OF AgentListAuthenticationEntry
-         MAX-ACCESS         not-accessible
-         STATUS             current
-         DESCRIPTION
-                            "This table contains sets of authentication lists."
-         ::= { agentListAuthenticationGroup 1 }
-
-    agentListAuthenticationEntry OBJECT-TYPE
-         SYNTAX        AgentListAuthenticationEntry
-         MAX-ACCESS    not-accessible
-         STATUS        current
-         DESCRIPTION
-                       "Specifies objects for agentListAuthenticationTable table."
-         INDEX         { agentListAuthenticationAccessLevel, 
-                         agentListAuthenticationIndex }
-         ::= { agentListAuthenticationTable 1 }
-
-    AgentListAuthenticationEntry ::= SEQUENCE {
-         agentListAuthenticationAccessLevel
-             INTEGER,
-         agentListAuthenticationIndex
-             Unsigned32,
-         agentListAuthenticationName
-             DisplayString,
-         agentListAuthenticationAccessLine
-             BITS,
-         agentListAuthenticationRowStatus
-             RowStatus
-         }
-
-    agentListAuthenticationAccessLevel OBJECT-TYPE
-         SYNTAX       INTEGER {
-                      login(0),
-                      enable(1)
-                      }
-         MAX-ACCESS   not-accessible
-         STATUS       current
-         DESCRIPTION
-                      "Specifies access level of authentication list, login(0) or enable(1)."
-         ::= { agentListAuthenticationEntry 1 }
-
-    agentListAuthenticationIndex OBJECT-TYPE
-         SYNTAX       Unsigned32
-         MAX-ACCESS   not-accessible
-         STATUS       current
-         DESCRIPTION
-                      "Index of authentication list. Maximum allowed value for login is 5.
-                       Maximum allowed value for enable is 5."
-         ::= { agentListAuthenticationEntry 2 }
-
-    agentListAuthenticationName OBJECT-TYPE
-         SYNTAX       DisplayString (SIZE(1..15))
-         MAX-ACCESS   read-write
-         STATUS       current
-         DESCRIPTION
-                      "Name of selected authentication list. Setting a value for an empty row 
-                       prevents creating a new row in the table. Value must not be empty."
-         ::= { agentListAuthenticationEntry 3 }
-
-    agentListAuthenticationAccessLine OBJECT-TYPE
-         SYNTAX       BITS {
-                      undefined(0),
-                      console(1),
-                      telnet(2),
-                      ssh(3)
-                      }
-         MAX-ACCESS   read-write
-         STATUS       current
-         DESCRIPTION
-                      "This object is being used for assigning specified authentication list to 
-                       access line. One list can be assigned to different access lines at one time. 
-                       Bit mask value is being used for configuring and has values as follows:
-                       - undefined(0) - show that list is not assigned. Used for clearing any 
-                                        assigned value;
-                       - console(1) - assign specified list to console access line;
-                       - telnet(2) - assign specified list to telnet access line;
-                       - ssh(3) - assign specified list to ssh access line.
-                       Before configuring this field authentication methods must be configured for 
-                       specified list."
-         ::= { agentListAuthenticationEntry 4 }
-
-    agentListAuthenticationRowStatus OBJECT-TYPE
-         SYNTAX       RowStatus
-         MAX-ACCESS   read-write
-         STATUS       current
-         DESCRIPTION
-                      "Status of authentication list entry row.
-                       active(1) - Shows that configured row is operational.
-                       notReady(3) - Shows that configured row doesn't have configured methods in 
-                                     the table agentListAuthenticationMethodsTable
-                       destroy(6) - Delete specified row from table. For default list, default
-                                    method sets will be restored."
-         ::= { agentListAuthenticationEntry 5 }
-
-    agentListAuthenticationMethodsGroup            OBJECT IDENTIFIER ::= { agentListAuthenticationGroup 2 }
-
-    agentListAuthenticationMethodsTable OBJECT-TYPE
-         SYNTAX SEQUENCE OF AgentListAuthenticationMethodsEntry
-         MAX-ACCESS         not-accessible
-         STATUS             current
-         DESCRIPTION
-                            "This table contains set of methods for specified authentication list 
-                             and is child table for agentListAuthenticationTable. When a row in 
-                             parent table is removed, the same row in this table is removed."
-         ::= { agentListAuthenticationMethodsGroup 1 }
-
-    agentListAuthenticationMethodsEntry OBJECT-TYPE
-         SYNTAX        AgentListAuthenticationMethodsEntry
-         MAX-ACCESS    not-accessible
-         STATUS        current
-         DESCRIPTION
-                       "Specify objects for agentListAuthenticationMethodsTable."
-         INDEX         { agentListAuthenticationAccessLevel, 
-                         agentListAuthenticationIndex,
-                         agentListAuthenticationMethodsIndex }
-         ::= { agentListAuthenticationMethodsTable 1 }
-
-    AgentListAuthenticationMethodsEntry ::= SEQUENCE {
-         agentListAuthenticationMethodsIndex
-             Unsigned32,
-         agentListAuthenticationMethodsValue
-             INTEGER
-         }
-
-    agentListAuthenticationMethodsIndex OBJECT-TYPE
-         SYNTAX       Unsigned32
-         MAX-ACCESS   not-accessible
-         STATUS       current
-         DESCRIPTION
-                      "Index of method in specified authentication list."
-         ::= { agentListAuthenticationMethodsEntry 1 }
-
-    agentListAuthenticationMethodsValue OBJECT-TYPE
-         SYNTAX       INTEGER {
-                      undefined(0),
-                      enable(1),
-                      line(2),
-                      local(3),
-                      none(4),
-                      radius(5),
-                      tacacs(6),
-                      deny(7)
-                      }
-         MAX-ACCESS   read-write
-         STATUS       current
-         DESCRIPTION
-                      "Value of specified method. For login and enable access lines
-                       set of method values are different and are as follows:
-                       * login access line: enable(1), line(2), local(3), none(4),
-                                            radius(5), tacacs(6);
-                       * enable access line: enable(1), line(2), none(4), radius(5),
-                                             tacacs(6), deny(7).
-                       Undefined(0) value is used for displaying empty method. Setting
-                       this value will clear configured method from the list. A list
-                       of authentication methods may not be modified once associated
-                       to an access line."
-         ::= { agentListAuthenticationMethodsEntry 2 }
-
-    --************************************************************************************
-    -- agentListAutorizationGroup
-    --
-    --************************************************************************************
-
-    agentListAutorizationGroup                   OBJECT IDENTIFIER ::= { fastPathMgmtSecurity 4 }
-
-    agentListAutorizationTable OBJECT-TYPE
-         SYNTAX SEQUENCE OF AgentListAutorizationEntry
-         MAX-ACCESS         not-accessible
-         STATUS             current
-         DESCRIPTION
-                            "This table contains sets of authorization lists."
-         ::= { agentListAutorizationGroup 1 }
-
-    agentListAutorizationEntry OBJECT-TYPE
-         SYNTAX        AgentListAutorizationEntry
-         MAX-ACCESS    not-accessible
-         STATUS        current
-         DESCRIPTION
-                       "Specifies objects for agentListAutorizationTable table."
-         INDEX         { agentListAutorizationType, 
-                         agentListAutorizationIndex }
-         ::= { agentListAutorizationTable 1 }
-
-    AgentListAutorizationEntry ::= SEQUENCE {
-         agentListAutorizationType
-             INTEGER,
-         agentListAutorizationIndex
-             Unsigned32,
-         agentListAutorizationName
-             DisplayString,
-         agentListAutorizationAccessLine
-             BITS,
-         agentListAutorizationRowStatus
-             RowStatus
-         }
-
-    agentListAutorizationType OBJECT-TYPE
-         SYNTAX       INTEGER {
-                      command(0),
-                      exec(1)
-                      }
-         MAX-ACCESS   not-accessible
-         STATUS       current
-         DESCRIPTION
-                      "Specify type of authorization list, command(0) or exec(1)."
-         ::= { agentListAutorizationEntry 1 }
-
-    agentListAutorizationIndex OBJECT-TYPE
-         SYNTAX       Unsigned32
-         MAX-ACCESS   not-accessible
-         STATUS       current
-         DESCRIPTION
-                      "Index of authorization list. Maximum value is 5."
-         ::= { agentListAutorizationEntry 2 }
-
-    agentListAutorizationName OBJECT-TYPE
-         SYNTAX       DisplayString (SIZE(1..20))
-         MAX-ACCESS   read-write
-         STATUS       current
-         DESCRIPTION
-                      "Name of selected authorization list. Setting a value for an empty row 
-                       prevents creating a new row in the table. Value must not be empty."
-         ::= { agentListAutorizationEntry 3 }
-
-    agentListAutorizationAccessLine OBJECT-TYPE
-         SYNTAX       BITS {
-                      undefined(0),
-                      console(1),
-                      telnet(2),
-                      ssh(3)
-                      }
-         MAX-ACCESS   read-write
-         STATUS       current
-         DESCRIPTION
-                      "This object is being used for assigning specified authorization list to 
-                       an access line. One list can be assigned to different access lines. Bit 
-                       mask value is being used for configuring and has values as follows:
-                       - undefined(0) - show that list isn't assigned, used for clearing any 
-                                        assigned value;
-                       - console(1) - assign specified list to console access line;
-                       - telnet(2) - assign specified list to telnet access line;
-                       - ssh(3) - assign specified list to ssh access line.
-                       Before configuring this field, authorization methods must be configured 
-                       for specified list."
-         ::= { agentListAutorizationEntry 4 }
-
-    agentListAutorizationRowStatus OBJECT-TYPE
-         SYNTAX       RowStatus
-         MAX-ACCESS   read-write
-         STATUS       current
-         DESCRIPTION
-                      "Status of authorization list entry row.
-                       active(1) - Shows that configured row is operational.
-                       notReady(3) - Shows that configured row doesn't have configured methods in 
-                                     the table agentListAutorizationMethodsTable.
-                       destroy(6) - Delete specified row from table. For default list, default
-                                    method sets will be restored."
-
-         ::= { agentListAutorizationEntry 5 }
-
-    agentListAutorizationMethodsGroup            OBJECT IDENTIFIER ::= { agentListAutorizationGroup 2 }
-
-    agentListAutorizationMethodsTable OBJECT-TYPE
-         SYNTAX SEQUENCE OF AgentListAutorizationMethodsEntry
-         MAX-ACCESS         not-accessible
-         STATUS             current
-         DESCRIPTION
-                            "This table contains set of methods for specified authorization list 
-                             and is a child table for agentListAuthorizationTable. When a row in
-                             parent table is removed, the same row in this table is removed."
-         ::= { agentListAutorizationMethodsGroup 1 }
-
-    agentListAutorizationMethodsEntry OBJECT-TYPE
-         SYNTAX        AgentListAutorizationMethodsEntry
-         MAX-ACCESS    not-accessible
-         STATUS        current
-         DESCRIPTION
-                       "Specify objects for agentListAutorizationMethodsTable."
-         INDEX         { agentListAutorizationType, 
-                         agentListAutorizationIndex,
-                         agentListAutorizationMethodsIndex }
-         ::= { agentListAutorizationMethodsTable 1 }
-
-    AgentListAutorizationMethodsEntry ::= SEQUENCE {
-         agentListAutorizationMethodsIndex
-             Unsigned32,
-         agentListAutorizationMethodsValue
-             INTEGER
-         }
-
-    agentListAutorizationMethodsIndex OBJECT-TYPE
-         SYNTAX       Unsigned32
-         MAX-ACCESS   not-accessible
-         STATUS       current
-         DESCRIPTION
-                      "Index of method in specified authorization list."
-         ::= { agentListAutorizationMethodsEntry 1 }
-
-    agentListAutorizationMethodsValue OBJECT-TYPE
-         SYNTAX       INTEGER {
-                      undefined(0),
-                      tacacs(1),
-                      radius(2),
-                      local(3),
-                      none(4)
-                      }
-         MAX-ACCESS   read-write
-         STATUS       current
-         DESCRIPTION
-                      "Value of specified method. For command and exec authorization types, 
-                       set of method values are different and are as follows:
-                       * command: tacacs(1), radius(2), none(4);
-                       * exec: tacacs(1), radius(2), local(3), none(4).
-                       Undefined(0) value is being used for displaying empty method. Setting
-                       this object to undefined will clear configured method from the list.
-                       A list of authentication methods may not be modified once associated 
-                       to an access line."
-         ::= { agentListAutorizationMethodsEntry 2 }
-
-    --************************************************************************************
-    -- agentListAccountingGroup
-    --
-    --************************************************************************************
-
-    agentListAccountingGroup                   OBJECT IDENTIFIER ::= { fastPathMgmtSecurity 5 }
-
-    agentListAccountingTable OBJECT-TYPE
-         SYNTAX SEQUENCE OF AgentListAccountingEntry
-         MAX-ACCESS         not-accessible
-         STATUS             current
-         DESCRIPTION
-                            "This table contains sets of accounting lists."
-         ::= { agentListAccountingGroup 1 }
-
-    agentListAccountingEntry OBJECT-TYPE
-         SYNTAX        AgentListAccountingEntry
-         MAX-ACCESS    not-accessible
-         STATUS        current
-         DESCRIPTION
-                       "Specify objects for agentListAccountingTable."
-         INDEX         { agentListAccountingType, 
-                         agentListAccountingIndex }
-         ::= { agentListAccountingTable 1 }
-
-    AgentListAccountingEntry ::= SEQUENCE {
-         agentListAccountingType
-             INTEGER,
-         agentListAccountingIndex
-             Unsigned32,
-         agentListAccountingName
-             DisplayString,
-         agentListAccountingRecordType
-             INTEGER,
-         agentListAccountingAccessLine
-             BITS,
-         agentListAccountingRowStatus
-             RowStatus
-         }
-
-    agentListAccountingType OBJECT-TYPE
-         SYNTAX       INTEGER {
-                      command(0),
-                      exec(1)
-                      }
-         MAX-ACCESS   not-accessible
-         STATUS       current
-         DESCRIPTION
-                      "Specify type of accounting list, command(0) or exec(1)."
-         ::= { agentListAccountingEntry 1 }
-
-    agentListAccountingIndex OBJECT-TYPE
-         SYNTAX       Unsigned32
-         MAX-ACCESS   not-accessible
-         STATUS       current
-         DESCRIPTION
-                      "Index of accounting list. Maximum value is 5."
-         ::= { agentListAccountingEntry 2 }
-
-    agentListAccountingName OBJECT-TYPE
-         SYNTAX       DisplayString (SIZE(1..15))
-         MAX-ACCESS   read-write
-         STATUS       current
-         DESCRIPTION
-                      "Name of selected accounting list. Setting a value for an empty row 
-                       prevents creating a new row in the table. Value must not be empty."
-         ::= { agentListAccountingEntry 3 }
-
-    agentListAccountingRecordType OBJECT-TYPE
-         SYNTAX       INTEGER {
-                      undefined(0),
-                      start-stop(1),
-                      stop-only(2),
-                      none(3)
-                      }
-         MAX-ACCESS   read-write
-         STATUS       current
-         DESCRIPTION
-                      "Specify record type of accounting list, start-stop(1), stop-only(2) or 
-                       none(3)."
-         ::= { agentListAccountingEntry 4 }
-
-    agentListAccountingAccessLine OBJECT-TYPE
-         SYNTAX       BITS {
-                      undefined(0),
-                      console(1),
-                      telnet(2),
-                      ssh(3)
-                      }
-         MAX-ACCESS   read-write
-         STATUS       current
-         DESCRIPTION
-                      "This object is being used for assigning specified accounting list to an 
-                       access line. One list can be assigned to different access lines. Bit mask 
-                       value is being used for configuring and has values as follows:
-                       - undefined(0) - show that list isn't assigned, used for clearing any 
-                                        assigned value;
-                       - console(1) - assign specified list to console access line;
-                       - telnet(2) - assign specified list to telnet access line;
-                       - ssh(3) - assign specified list to ssh access line.
-                       Before configuring this field, accounting methods must be configured for 
-                       specified list."
-         ::= { agentListAccountingEntry 5 }
-
-    agentListAccountingRowStatus OBJECT-TYPE
-         SYNTAX       RowStatus
-         MAX-ACCESS   read-write
-         STATUS       current
-         DESCRIPTION
-                      "Status of accounting list entry row.
-                       active(1) - Shows that configured row is operational.
-                       notReady(3) - Shows that configured row doesn't have configured methods in 
-                                     the table agentListAccountingMethodsTable or record type 
-                                     is not configured.
-                       destroy(6) - Delete specified row from table. For default list default
-                                    method sets will be restored."
-
-         ::= { agentListAccountingEntry 6 }
-
-    agentListAccountingMethodsGroup            OBJECT IDENTIFIER ::= { agentListAccountingGroup 2 }
-
-    agentListAccountingMethodsTable OBJECT-TYPE
-         SYNTAX SEQUENCE OF AgentListAccountingMethodsEntry
-         MAX-ACCESS         not-accessible
-         STATUS             current
-         DESCRIPTION
-                            "This table contains set of methods for specified accounting list."
-         ::= { agentListAccountingMethodsGroup 1 }
-
-    agentListAccountingMethodsEntry OBJECT-TYPE
-         SYNTAX        AgentListAccountingMethodsEntry
-         MAX-ACCESS    not-accessible
-         STATUS        current
-         DESCRIPTION
-                       "This table contains set of methods for specified accounting list and is 
-                        a child table for agentListAccountingTable. When a row in parent table is
-                        removed, the same row in this table is removed."
-         INDEX         { agentListAccountingType, 
-                         agentListAccountingIndex,
-                         agentListAccountingMethodsIndex }
-         ::= { agentListAccountingMethodsTable 1 }
-
-    AgentListAccountingMethodsEntry ::= SEQUENCE {
-         agentListAccountingMethodsIndex
-             Unsigned32,
-         agentListAccountingMethodsValue
-             INTEGER
-         }
-
-    agentListAccountingMethodsIndex OBJECT-TYPE
-         SYNTAX       Unsigned32
-         MAX-ACCESS   not-accessible
-         STATUS       current
-         DESCRIPTION
-                      "Index of method in specified accounting list."
-         ::= { agentListAccountingMethodsEntry 1 }
-
-    agentListAccountingMethodsValue OBJECT-TYPE
-         SYNTAX       INTEGER {
-                      undefined(0),
-                      tacacs(1),
-                      radius(2)
-                      }
-         MAX-ACCESS   read-write
-         STATUS       current
-         DESCRIPTION
-                      "Value of specified method. For command and exec authorization types
-                       set of method values are as follows:
-                       * command: tacacs(1);
-                       * exec: tacacs(1), radius(2).
-                       Undefined(0) value is being used for displaying empty method. Setting
-                       this object to undefined will clear configured method from the list.
-                       A list of authentication methods may not be modified once associated 
-                       to an access line."
-         ::= { agentListAccountingMethodsEntry 2 }
-
-    agentAccountingUpdateConfigGroup            OBJECT IDENTIFIER ::= { agentListAccountingGroup 3 }
-
-    agentAccountingUpdateNewinfo OBJECT-TYPE
-        SYNTAX      INTEGER {
-                    enable(1),
-                    disable(2)
-                    }
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION
-                    "Configures interim accounting record to be sent to the
-                     accounting server, whenever there is new accounting
-                     information to be reported. By default sending newinfo
-                     to accouting servers is disabled."
-        ::= { agentAccountingUpdateConfigGroup 1 }
-
-    agentAccountingUpdatePeriodic OBJECT-TYPE
-        SYNTAX       Integer32 (0..200)
-        MAX-ACCESS  read-write
-        STATUS      current
-        DESCRIPTION
-                    "Configures interim accounting record to be sent to the
-                     accounting server periodically. By default the periodic
-                     timeout is 0 and no interim accouting record is sent to
-                     accouting servers."
-        ::= { agentAccountingUpdateConfigGroup 2 }
 END

@@ -1,0 +1,37 @@
+
+GREENTECH-MASTER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises              FROM SNMPv2-SMI;
+
+    greentech MODULE-IDENTITY
+        LAST-UPDATED    "0008290000Z"  -- August 29, 2000
+        ORGANIZATION    "Greentech"
+        CONTACT-INFO    "Adam Armstrong E-mail: adama@memetic.org"
+
+        DESCRIPTION     "Greentech Master MIB OID defines and documentation.
+                         Unofficial version for Observium use."
+
+        REVISION        "0008290000Z"  -- August 29, 2000
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { enterprises 13464 }
+    
+
+dataCom                 OBJECT IDENTIFIER ::= {greentech 1} 
+ 
+
+gbn                     OBJECT IDENTIFIER ::= {dataCom 2 } 
+switch			OBJECT IDENTIFIER ::= {dataCom 3}
+
+    gbnPlatform     OBJECT IDENTIFIER ::= { gbn 1 }     
+    gbnDevice       OBJECT IDENTIFIER ::= { gbn 2 }     
+    gbnService      OBJECT IDENTIFIER ::= { gbn 3 }     
+    gbnL2           OBJECT IDENTIFIER ::= { gbn 4 }     
+    gbnL3           OBJECT IDENTIFIER ::= { gbn 5 } 
+    gbnLS           OBJECT IDENTIFIER ::= { gbn 6 } 
+
+    gbnServiceAAA      OBJECT IDENTIFIER ::= { gbnService 1 } 
+    rmonMib            OBJECT IDENTIFIER ::= { gbnService 2 }
+    
+END

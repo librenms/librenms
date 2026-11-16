@@ -1,2191 +1,2142 @@
+-- *****************************************************************
+-- TN-LLDP-MIB.mib : TN LLPD private MIB
+--
+-- Copyright (c) 2015 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
 TN-LLDP-MIB DEFINITIONS ::= BEGIN
 
--- (c) Copyright 2021 Nokia Networks.  All rights reserved.
--- This software is the confidential and proprietary property of
--- Nokia and may only be used in accordance with the terms of the
--- license agreement provided with this software.
-
 IMPORTS
-    SnmpAdminString                              FROM SNMP-FRAMEWORK-MIB
-
-    MODULE-IDENTITY, OBJECT-TYPE,
-    Integer32, Counter32, Unsigned32
-                                                 FROM SNMPv2-SMI
-
-    MacAddress, TEXTUAL-CONVENTION, TruthValue   FROM SNMPv2-TC
-
-    AddressFamilyNumbers                         FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB
-
-    LldpPortId, LldpPortIdSubtype,
-    LldpChassisId, LldpChassisIdSubtype,
-    LldpManAddress, LldpManAddrIfSubtype,
-    LldpSystemCapabilitiesMap                    FROM LLDP-MIB
-
-    TimeFilter, ZeroBasedCounter32               FROM RMON2-MIB
-
-    tnSRMIBModules,
-    tnSRNotifyPrefix, tnSRObjs                   FROM TROPIC-GLOBAL-REG
-
-    TmnxEnabledDisabled                          FROM TN-TC-MIB
-
-    tnSysSwitchId                                FROM TROPIC-SYSTEM-MIB
-
-    tnPortPortID                                 FROM TN-PORT-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    tnProducts
+        FROM TRANSITION-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    TNDisplayString FROM TN-TC
+    TNInteger64 FROM TN-TC
+    TNInterfaceIndex FROM TN-TC
+    TNRowEditorState FROM TN-TC
+    TNUnsigned16 FROM TN-TC
+    TNUnsigned64 FROM TN-TC
+    TNUnsigned8 FROM TN-TC
     ;
 
-
-tnLldpMIBModule MODULE-IDENTITY
-    LAST-UPDATED    "202009250000Z"
-    ORGANIZATION    "Nokia"
+tnLldpMib MODULE-IDENTITY
+    LAST-UPDATED "201506080000Z"
+    ORGANIZATION "Transition Networks, Inc."
     CONTACT-INFO
-        "Nokia SROS Support
-         Web: http://support.nokia.com"
+        "Transition Networks
+        Technical Support
+
+        10900 Red Circle Drive
+        Minnetonka, MN 55343 USA
+        Tel: +1-800-526-9267
+
+            E-mail: techsupport@transition.com"
     DESCRIPTION
-        "This document is the SNMP MIB module to manage and provision
-        LLDP on the Nokia SROS device.
-
-        This SNMP MIB module (Specification) embodies Nokia's
-        proprietary intellectual property.  Nokia retains
-        all title and ownership in the Specification, including any
-        revisions.
-
-        Nokia grants all interested parties a non-exclusive
-        license to use and distribute an unmodified copy of this
-        Specification in connection with management of Nokia
-        products, and without fee, provided this copyright notice and
-        license appear on all copies.
-
-        This Specification is supplied 'as is', and Nokia
-        makes no warranty, either express or implied, as to the use,
-        operation, condition, or performance of the Specification."
-
---
---  Revision History
---
-
-    REVISION        "202009250000Z"
-    DESCRIPTION     "Changed DEFVAL of the following from 5 to 30 per
-                     IEEE802.1AB-2009 standard for lldpV2NotificationInterval:
-                     tnLldpNotificationInterval."
-
-    REVISION        "201904190000Z"
-    DESCRIPTION     "Added the following to the tnLldpStatsRxPortTable:
-                     tnLldpStatsRxPortTtl."
-
-    REVISION        "201701130000Z"
-    DESCRIPTION     "Changed SYNTAX of the following from TimeStamp to Unsigned32:
-                     tnLldpStatsRemTablesLastChangeTime."
-
-    REVISION        "201612170000Z"
-    DESCRIPTION     "Updated the description of the following:
-                     tnLldpRemTimeMark
-                     tnLldpStatsRemTablesLastChangeTime."
-
-    REVISION        "201606210000Z"
-    DESCRIPTION     "Added two MIB tables
-                     tnLldpRemPortIndexTable
-                     tnLldpRemManAddrPortIndexTable."
-
-    REVISION        "201603050000Z"
-    DESCRIPTION     "Added MIB support for TN-LLDP-MIB."
-
-    REVISION        "201602230000Z" -- 23 Feb 2016 00:00
-    DESCRIPTION     "Initial version of the TN-LLDP-MIB,
-                     corresponding to Rev 7.0 of TIMETRA-LLDP-MIB."
-
-    ::= { tnSRMIBModules  59 }
-
-tnLldpNotifications             OBJECT IDENTIFIER ::= { tnSRNotifyPrefix 59 }
-tnLldpObjects                   OBJECT IDENTIFIER ::= { tnSRObjs         59 }
--- tnLldpConformance               OBJECT IDENTIFIER ::= { tnSRConfs        59 }
-
-tnLldpConfiguration             OBJECT IDENTIFIER ::= { tnLldpObjects     1 }
-tnLldpStatistics                OBJECT IDENTIFIER ::= { tnLldpObjects     2 }
-tnLldpLocalSystemData           OBJECT IDENTIFIER ::= { tnLldpObjects     3 }
-tnLldpRemoteSystemsData         OBJECT IDENTIFIER ::= { tnLldpObjects     4 }
-
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
---
---   TIMETRA-LLDP-MIB Textual Conventions
---
-
-TmnxLldpDestAddressTableIndex   ::= TEXTUAL-CONVENTION
-    STATUS     current
+        "This is a private version of the LLDP MIB"    
+    REVISION    "201506080000Z"
     DESCRIPTION
-        "An index value, used as the index to the table of destination
-         MAC addresses used both as the destination addresses on
-         transmitted LLDPDUs and on received LLDPDUs. This index value
-         is also used as a secondary index value in tables indexed
-         by fields of type ifIndex, in order to associate
-         a destination address with each row of the table."
-    SYNTAX     Integer32 (1..4096)
+        "Initial version"
+    ::= { tnProducts 151 }
 
-TmnxLldpManAddressIndex         ::= TEXTUAL-CONVENTION
-    STATUS     current
+TNlldpAdminState ::= TEXTUAL-CONVENTION
+    STATUS      current
     DESCRIPTION
-        "An Index value, used as the index to the table of local port
-         management addresses, tnLldpConfigManAddrPortsTable. The
-         index represents a specific local management address application
-         on the system which may, or may not exist."
-    SYNTAX    INTEGER {
-                  system (1)
-              }
+        "This enumerations the admin state."
+    SYNTAX      INTEGER { disabled(0), txAndRx(1), txOnly(2), rxOnly(3) }
 
-
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
---
---   TN-LLDP-MIB Configuration
---
-
---==================================================
--- tnLldpConfigTable
---
--- LLDP configuration indexed on a tnSysSwitchId basis.
---
-
-tnLldpConfigTable           OBJECT-TYPE
-    SYNTAX       SEQUENCE OF TnLldpConfigEntry
-    MAX-ACCESS   not-accessible
-    STATUS       current
+TNlldpmedAltitudeType ::= TEXTUAL-CONVENTION
+    STATUS      current
     DESCRIPTION
-        "The table that controls LLDP agent configuration information."
-    ::= { tnLldpConfiguration 1 }
+        "This enumerations the altitude type."
+    SYNTAX      INTEGER { meters(1), floors(2) }
 
-tnLldpConfigEntry           OBJECT-TYPE
-    SYNTAX       TnLldpConfigEntry
-    MAX-ACCESS   not-accessible
-    STATUS       current
+TNlldpmedCivicAddressType ::= TEXTUAL-CONVENTION
+    STATUS      current
     DESCRIPTION
-        "LLDP agent configuration information.
-         The content of this table is persistent across
-         re-initializations or re-boots."
-    INDEX { tnSysSwitchId }
+        "This enumerations the civic address type."
+    SYNTAX      INTEGER { state(1), county(2), city(3), district(4), block(5), street(6), leadingStreetDirection(16), trailingStreetSuffix(17), streetSuffix(18), houseNo(19), houseNoSuffix(20), landmark(21), additionalInformation(22), name(23), zipCode(24), building(25), apartment(26), floor(27), roomNumber(28), placeType(29), postalCommunityName(30), poBox(31), additionalCode(32) }
+
+TNlldpmedDatumType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumerations the datum (geodetic system)."
+    SYNTAX      INTEGER { wgs84(1), nad83navd88(2), nad83mllw(3) }
+
+TNlldpmedDeviceType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumerations the device type that the device shall operate as."
+    SYNTAX      INTEGER { connectivity(0), endpoint(1) }
+
+TNlldpmedRemoteDeviceType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumerations the remote neighbor's device type."
+    SYNTAX      INTEGER { notDefined(0), endpointClassI(1), endpointClassII(2), endpointClassIII(3), networkConnectivity(4), reserved(5) }
+
+TNlldpmedRemoteNetworkPolicyApplicationType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumerations the remote neighbor's network policy's application
+         type."
+    SYNTAX      INTEGER { voice(1), voiceSignaling(2), guestVoice(3), guestVoiceSignaling(4), softphoneVoice(5), videoConferencing(6), streamingVideo(7), videoSignaling(8) }
+
+tnLldpMibObjects OBJECT IDENTIFIER
+    ::= { tnLldpMib 1 }
+
+tnLldpConfig OBJECT IDENTIFIER
+    ::= { tnLldpMibObjects 2 }
+
+tnLldpConfigGlobal OBJECT IDENTIFIER
+    ::= { tnLldpConfig 1 }
+
+tnLldpConfigGlobalReInitDelay OBJECT-TYPE
+    SYNTAX      TNUnsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Set the LLDP tx reinitialization delay in seconds. Valid range 1-10.
+         
+         When a port is disabled, LLDP is disabled or the switch is rebooted, a
+         LLDP shutdown frame is transmitted to the neighboring units, signaling
+         that the LLDP information isn't valid anymore.
+         
+         Tx reinitialization delay controls the amount of seconds between the
+         shutdown frame and a new LLDP initialization.
+         
+         
+         
+         Note: Must be less than 0.25 times the Tx interval."
+    ::= { tnLldpConfigGlobal 1 }
+
+tnLldpConfigGlobalMsgTxHold OBJECT-TYPE
+    SYNTAX      TNUnsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Set the LLDP tx hold times . Valid range 2-10.
+         
+         Each LLDP frame contains information about how long time the
+         information in the LLDP frame shall be considered valid. The LLDP
+         information valid period is set to tx hold times multiplied by tx
+         interval seconds."
+    ::= { tnLldpConfigGlobal 2 }
+
+tnLldpConfigGlobalMsgTxInterval OBJECT-TYPE
+    SYNTAX      TNUnsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Set the LLDP tx interval in seconds.
+         
+         The switch periodically transmits LLDP frames to its neighbors for
+         having the network discovery information up-to-date. The interval
+         between each LLDP frame is determined by the tx Interval value.
+         
+         
+         
+         Valid range 5-32768 seconds."
+    ::= { tnLldpConfigGlobal 3 }
+
+tnLldpConfigGlobalTxDelay OBJECT-TYPE
+    SYNTAX      TNUnsigned16
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Set the LLDP tx delay in seconds. Valid range 1-8192.
+         
+         If some configuration is changed (e.g. the IP address) a new LLDP frame
+         is transmitted, but the time between the LLDP frames will always be at
+         least the value of tx delay seconds.
+         
+         Note: tx Delay cannot be larger than 1/4 of the tx interval."
+    ::= { tnLldpConfigGlobal 4 }
+
+tnLldpConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNLldpConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to configure LLDP configurations for a specific
+         interface."
+    ::= { tnLldpConfig 2 }
+
+tnLldpConfigEntry OBJECT-TYPE
+    SYNTAX      TNLldpConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface has a set of control parameters"
+    INDEX       { tnLldpConfigIfIndex }
     ::= { tnLldpConfigTable 1 }
 
-TnLldpConfigEntry           ::= SEQUENCE {
-    tnLldpMessageTxInterval         Integer32,
-    tnLldpMessageTxHoldMultiplier   Integer32,
-    tnLldpReinitDelay               Integer32,
-    tnLldpTxDelay                   Integer32,
-    tnLldpNotificationInterval      Integer32,
-    tnLldpTxCreditMax               Integer32,
-    tnLldpMessageFastTx             Integer32,
-    tnLldpMessageFastTxInit         Integer32,
-    tnLldpAdminStatus               TmnxEnabledDisabled
+TNLldpConfigEntry ::= SEQUENCE {
+    tnLldpConfigIfIndex   TNInterfaceIndex,
+    tnLldpConfigAdminState    TNlldpAdminState,
+    tnLldpConfigCdpAware      TruthValue,
+    tnLldpConfigOptionalTlvs      TNUnsigned8
 }
 
-tnLldpMessageTxInterval OBJECT-TYPE
-    SYNTAX      Integer32(5..32768)
-    UNITS       "seconds"
-    MAX-ACCESS  read-write
+tnLldpConfigIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
-            "The interval at which LLDP frames are transmitted on
-            behalf of this LLDP agent.
-
-            The default value for tnLldpMessageTxInterval object is
-            30 seconds.
-
-            The value of this object must be restored from non-volatile
-            storage after a re-initialization of the management system."
-    REFERENCE
-            "IEEE 802.1AB-2005 10.5.3.3"
-    DEFVAL     { 30 }
+    DESCRIPTION 
+        "Logical interface number index."
     ::= { tnLldpConfigEntry 1 }
 
-tnLldpMessageTxHoldMultiplier OBJECT-TYPE
-    SYNTAX      Integer32(2..10)
+tnLldpConfigAdminState OBJECT-TYPE
+    SYNTAX      TNlldpAdminState
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
-            "The time-to-live value expressed as a multiple of the
-            tnLldpMessageTxInterval object.  The actual time-to-live value
-            used in LLDP frames, transmitted on behalf of this LLDP agent,
-            can be expressed by the following formula: TTL = min(65535,
-            (tnLldpMessageTxInterval * tnLldpMessageTxHoldMultiplier)) For
-            example, if the value of tnLldpMessageTxInterval is '30', and
-            the value of tnLldpMessageTxHoldMultiplier is '4', then the
-            value '120' is encoded in the TTL field in the LLDP header.
-
-            The default value for tnLldpMessageTxHoldMultiplier object is 4.
-
-            The value of this object must be restored from non-volatile
-            storage after a re-initialization of the management system."
-    REFERENCE
-            "IEEE 802.1AB-2005 10.5.3.3"
-    DEFVAL      { 4 }
-    ::= { tnLldpConfigEntry 2 }
-
-tnLldpReinitDelay OBJECT-TYPE
-    SYNTAX      Integer32(1..10)
-    UNITS       "seconds"
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-            "The tnLldpReinitDelay indicates the delay (in units of
-            seconds) from when tnLldpPortConfigAdminStatus object of a
-            particular port becomes 'disabled' until re-initialization
-            will be attempted.
-
-            The default value for tnLldpReintDelay object is two seconds.
-
-            The value of this object must be restored from non-volatile
-            storage after a re-initialization of the management system."
-    REFERENCE
-            "IEEE 802.1AB-2005 10.5.3.3"
-    DEFVAL      { 2 }
+    DESCRIPTION 
+        "Sets the LLDP admin state for the interface."
     ::= { tnLldpConfigEntry 3 }
 
-tnLldpTxDelay OBJECT-TYPE
-    SYNTAX      Integer32(1..8192)
-    UNITS       "seconds"
+tnLldpConfigCdpAware OBJECT-TYPE
+    SYNTAX      TruthValue
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
-            "The tnLldpTxDelay indicates the delay (in units
-            of seconds) between successive LLDP frame transmissions
-            initiated by value/status changes in the LLDP local systems
-            MIB.  The recommended value for the tnLldpTxDelay is set by the
-            following  formula:
-
-               1 <= tnLldpTxDelay <= (0.25 * tnLldpMessageTxInterval)
-
-            The default value for tnLldpTxDelay object is two seconds.
-
-            The value of this object must be restored from non-volatile
-            storage after a re-initialization of the management system."
-    REFERENCE
-            "IEEE 802.1AB-2005 10.5.3.3"
-    DEFVAL      { 2 }
+    DESCRIPTION 
+        "Enables/disables CDP awareness for the interface.
+         
+         CDP is Cisco's equivalent to LLDP.
+         
+         
+         
+         The CDP operation is restricted to decoding incoming CDP frames (The
+         switch doesn't transmit CDP frames). CDP frames are only decoded if
+         LLDP on the port is enabled.
+         
+         
+         
+         Only CDP TLVs that can be mapped to a corresponding field in the LLDP
+         neighbors' table are decoded. All other TLVs are discarded
+         (Unrecognized CDP TLVs and discarded CDP frames are not shown in the
+         LLDP statistics.).
+         
+         CDP TLVs are mapped onto LLDP neighbors' table as shown below.
+         
+         CDP TLV 'Device ID' is mapped to the LLDP 'Chassis ID' field.
+         
+         CDP TLV 'Address' is mapped to the LLDP 'Management Address' field. The
+         CDP address TLV can contain multiple addresses, but only the first
+         address is shown in the LLDP neighbors table.
+         
+         CDP TLV 'Port ID' is mapped to the LLDP 'Port ID' field.
+         
+         CDP TLV 'Version and Platform' is mapped to the LLDP 'System
+         Description' field.
+         
+         Both the CDP and LLDP support 'system capabilities', but the CDP
+         capabilities cover capabilities that are not part of the LLDP. These
+         capabilities are shown as 'others' in the LLDP neighbors' table.
+         
+         
+         
+         If all ports have CDP awareness disabled the switch forwards CDP frames
+         received from neighbor devices. If at least one port has CDP awareness
+         enabled all CDP frames are terminated by the switch.
+         
+         
+         
+         Note: When CDP awareness on a port is disabled the CDP information
+         isn't removed immediately, but gets removed when the hold time is
+         exceeded."
     ::= { tnLldpConfigEntry 4 }
 
-tnLldpNotificationInterval OBJECT-TYPE
-    SYNTAX      Integer32(5..3600)
-    UNITS       "seconds"
+tnLldpConfigOptionalTlvs OBJECT-TYPE
+    SYNTAX      TNUnsigned8
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
-            "This object controls the transmission of LLDP notifications.
+    DESCRIPTION 
+        "Enables/Disables the LLDP optional TLVs. Bit mask, where setting the
+         bit to 1 means enable transmission of the corresponding TLV.
+         
+         Bit 0 represents Port Description TLV.
+         
+         Bit 1 represents System Name TLV.
+         
+         Bit 2 represents System Description.
+         
+         Bit 3 represents System Capabilities TLV.
+         
+         Bit 4 represents Management Address TLV."
+    ::= { tnLldpConfigEntry 5 }
 
-            the agent must not generate more than one lldpRemTablesChange
-            notification-event in the indicated period, where a
-            'notification-event' is the transmission of a single
-            notification PDU type to a list of notification destinations.
-            If additional changes in tnLldpRemoteSystemsData object
-            groups occur within the indicated throttling period,
-            then these trap- events must be suppressed by the
-            agent. An NMS should periodically check the value of
-            tnLldpStatsRemTableLastChangeTime to detect any missed
-            lldpRemTablesChange notification-events, e.g. due to
-            throttling or transmission loss.
+tnLldpConfigMed OBJECT IDENTIFIER
+    ::= { tnLldpConfig 3 }
 
-            If notification transmission is enabled for particular ports,
-            the suggested default throttling period is 5 seconds.
-
-            The value of this object must be restored from non-volatile
-            storage after a re-initialization of the management system."
-    DEFVAL { 30 }
-    ::= { tnLldpConfigEntry  5 }
-
-tnLldpTxCreditMax               OBJECT-TYPE
-    SYNTAX     Integer32 (1..100)
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-        "The maximum number of consecutive LLDPDUs that can be
-         transmitted at any time.
-         The default value for tnLldpTxCreditMax object is 5.
-         The value of this object must be restored from non-volatile
-         storage after a re-initialization of the management system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 10.2.5.16"
-    DEFVAL { 5 }
-    ::= { tnLldpConfigEntry  6 }
-
-tnLldpMessageFastTx             OBJECT-TYPE
-    SYNTAX     Integer32 (1..3600)
-    UNITS      "seconds"
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-        "The interval at which LLDP frames are transmitted on
-         behalf of this LLDP agent during fast transmission period
-         (e.g. when a new neighbor is detected).
-         The default value for tnLldpMessageFastTx object is 1 second.
-         The value of this object must be restored from non-volatile
-         storage after a re-initialization of the management system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 10.2.5.3"
-    DEFVAL { 1 }
-    ::= { tnLldpConfigEntry  7 }
-
-tnLldpMessageFastTxInit          OBJECT-TYPE
-    SYNTAX     Integer32 (1..8)
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-        "The tnLldpMessageFastTxInit specifies the number of PDUs
-         to transmit during a fast transmission period."
-    DEFVAL { 4 }
-    ::= { tnLldpConfigEntry  8 }
-
-tnLldpAdminStatus               OBJECT-TYPE
-    SYNTAX     TmnxEnabledDisabled
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-        "The tnLldpAdminStatus specifies whether or not LLDP
-        is operationally 'enabled(1)' on the system, or
-        'disabled(2).' This is a system-wide configuration and
-        overrides the individual port admin status."
-    ::= { tnLldpConfigEntry  9 }
-
-
---==================================================
--- tnLldpPortConfigTable
---
--- LLDP configuration indexed on a per port, per destination
--- address basis. The ifIndex is used as a means of indexing
--- individual ports in the system; an index into the
--- tnLldpPortCfgDestAddressIndex is used to index per address.
---
-
-tnLldpPortConfigTable         OBJECT-TYPE
-    SYNTAX     SEQUENCE OF TnLldpPortConfigEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-        "The table that controls LLDP frame transmission on individual
-         ports and using particular destination MAC addresses."
-    ::= { tnLldpConfiguration   2 }
-
-tnLldpPortConfigEntry         OBJECT-TYPE
-    SYNTAX     TnLldpPortConfigEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-        "LLDP configuration information for a particular port and
-         destination MAC address.
-
-         This configuration parameter controls the transmission and
-         the reception of LLDP frames on those interface/address
-         combinations whose rows are created in this table.
-
-         Rows in this table can only be created for MAC addresses
-         that can validly be used in association with the type of
-         interface concerned, as defined by table 8-2.
-
-         The contents of this table is persistent across
-         re-initializations or re-boots."
-    INDEX {
-              tnPortPortID,
-              tnLldpPortCfgDestAddressIndex
-          }
-    ::= { tnLldpPortConfigTable   1 }
-
-TnLldpPortConfigEntry         ::= SEQUENCE {
-    tnLldpPortCfgDestAddressIndex   TmnxLldpDestAddressTableIndex,
-    tnLldpPortCfgAdminStatus        INTEGER,
-    tnLldpPortCfgNotifyEnable       TruthValue,
-    tnLldpPortCfgTLVsTxEnable       BITS
-}
-
-tnLldpPortCfgDestAddressIndex OBJECT-TYPE
-    SYNTAX      TmnxLldpDestAddressTableIndex
+tnLldpConfigMedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNLldpConfigMedEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
-        "The index value used to identify the destination
-         MAC address associated with this entry. Its value identifies
-         the row in the tnLldpPortConfigTable where the MAC address
-         can be found."
-    ::= { tnLldpPortConfigEntry   1 }
+    DESCRIPTION 
+        "This is a table to configure LLDP MEDIA configurations for a specific
+         interface."
+    ::= { tnLldpConfigMed 1 }
 
-tnLldpPortCfgAdminStatus      OBJECT-TYPE
-    SYNTAX     INTEGER {
-                   txOnly   (1),
-                   rxOnly   (2),
-                   txAndRx  (3),
-                   disabled (4)
-               }
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-        "The administratively desired status of the local LLDP agent.
+tnLldpConfigMedEntry OBJECT-TYPE
+    SYNTAX      TNLldpConfigMedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface has a set of control parameters"
+    INDEX       { tnLldpConfigMedIfIndex }
+    ::= { tnLldpConfigMedTable 1 }
 
-         If the associated tnLldpPortCfgAdminStatus object has a
-         value of 'txOnly(1)', then LLDP agent will transmit LLDP
-         frames on this port and it will not store any information
-         about the remote systems connected.
+TNLldpConfigMedEntry ::= SEQUENCE {
+    tnLldpConfigMedIfIndex    TNInterfaceIndex,
+    tnLldpConfigMedOptionalTlvs   TNUnsigned8,
+    tnLldpConfigMedDeviceType     TNlldpmedDeviceType
+}
 
-         If the associated tnLldpPortCfgAdminStatus object has a
-         value of 'rxOnly(2)', then the LLDP agent will receive,
-         but it will not transmit LLDP frames on this port.
+tnLldpConfigMedIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { tnLldpConfigMedEntry 1 }
 
-         If the associated tnLldpPortCfgAdminStatus object has a
-         value of 'txAndRx(3)', then the LLDP agent will transmit
-         and receive LLDP frames on this port.
-
-         If the associated tnLldpPortCfgAdminStatus object has a
-         value of 'disabled(4)', then LLDP agent will not transmit or
-         receive LLDP frames on this port.  If there is remote systems
-         information which is received on this port and stored in
-         other tables, before the port's tnLldpPortCfgAdminStatus
-         becomes disabled, then the information will naturally age out."
-    REFERENCE
-        "IEEE 802.1AB-2005 10.5.1"
-    DEFVAL { disabled }
-    ::= { tnLldpPortConfigEntry  2 }
-
-tnLldpPortCfgNotifyEnable     OBJECT-TYPE
-    SYNTAX     TruthValue
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-        "The tnLldpPortCfgNotifyEnable controls, on a per
-         port basis,  whether or not notifications from the agent
-         are enabled. The value true(1) means that notifications are
-         enabled; the value false(2) means that they are not."
-    DEFVAL { false }
-   ::= { tnLldpPortConfigEntry  3 }
-
-tnLldpPortCfgTLVsTxEnable     OBJECT-TYPE
-    SYNTAX      BITS {
-                    portDesc (0),
-                    sysName  (1),
-                    sysDesc  (2),
-                    sysCap   (3)
-                }
+tnLldpConfigMedOptionalTlvs OBJECT-TYPE
+    SYNTAX      TNUnsigned8
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
-        "The tnLldpPortCfgTLVsTxEnable, defined as a bitmap,
-         includes the basic set of LLDP TLVs whose transmission is
-         allowed on the local LLDP agent by the network management.
-         Each bit in the bitmap corresponds to a TLV type associated
-         with a specific optional TLV.
+    DESCRIPTION 
+        "Enables/Disables the LLDP optional TLVs. Bit mask, where setting the
+         bit to 1 means
+         
+         enable transmission of the corresponding optional TLV.
+         
+         Bit 0 represents the capabilities TLV.
+         
+         Bit 1 represents the network Policy TLV.
+         
+         Bit 2 represents the location TLV.
+         
+         Bit 3 represents the PoE TLV."
+    ::= { tnLldpConfigMedEntry 3 }
 
-         It should be noted that the organizationally-specific TLVs
-         are excluded from the tnLldpPortCfgTLVsTxEnable bitmap.
+tnLldpConfigMedDeviceType OBJECT-TYPE
+    SYNTAX      TNlldpmedDeviceType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Setting device type to configure the mode the device shall operate as."
+    ::= { tnLldpConfigMedEntry 4 }
 
-         LLDP Organization Specific Information Extension MIBs should
-         have similar configuration object to control transmission
-         of their organizationally defined TLVs.
-
-         The bit 'portDesc(0)' indicates that LLDP agent should
-         transmit 'Port Description TLV'.
-
-         The bit 'sysName(1)' indicates that LLDP agent should transmit
-         'System Name TLV'.
-
-         The bit 'sysDesc(2)' indicates that LLDP agent should transmit
-         'System Description TLV'.
-
-         The bit 'sysCap(3)' indicates that LLDP agent should transmit
-         'System Capabilities TLV'.
-
-         There is no bit reserved for the management address TLV type
-         since transmission of management address TLVs are controlled
-         by another object.
-
-         The default value for tnLldpPortCfgTLVsTxEnable object is
-         empty set, which means no enumerated values are set.
-
-         The value of this object must be restored from non-volatile
-         storage after a re-initialization of the management system."
-    REFERENCE
-        "IEEE 802.1AB-2005 10.2.1.1"
-    DEFVAL { { } }
-    ::= { tnLldpPortConfigEntry   4 }
-
---==================================================
--- tnLldpConfigManAddrPortsTable
---
--- LLDP configuration on a per port/per ManAddr basis.
---
-tnLldpConfigManAddrPortsTable OBJECT-TYPE
-    SYNTAX     SEQUENCE OF TnLldpConfigManAddrPortsEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-        "The table that controls selection of LLDP management address
-         TLV instances to be transmitted on individual ports."
-    ::= { tnLldpConfiguration   3 }
-
-tnLldpConfigManAddrPortsEntry OBJECT-TYPE
-    SYNTAX     TnLldpConfigManAddrPortsEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-        "LLDP configuration information that specifies the set of ports
-         on which the local system management address instance will be
-         transmitted.
-
-         This configuration object joins the tnLldpPortConfigTable and the
-         tnLldpLocManAddrTable. An entry exists for each Port/Management
-         address in the system. Rows are auto-created by the system when
-         ports are provisioned."
-    INDEX {
-              tnPortPortID,
-              tnLldpPortCfgDestAddressIndex,
-              tnLldpPortCfgAddressIndex
-          }
-    ::= { tnLldpConfigManAddrPortsTable   1 }
-
-TnLldpConfigManAddrPortsEntry ::= SEQUENCE {
-    tnLldpPortCfgAddressIndex       TmnxLldpManAddressIndex,
-    tnLldpPortCfgManAddrTxEnabled   TmnxEnabledDisabled,
-    tnLldpPortCfgManAddrSubtype     AddressFamilyNumbers,
-    tnLldpPortCfgManAddress         LldpManAddress
-}
-
-tnLldpPortCfgAddressIndex     OBJECT-TYPE
-    SYNTAX     TmnxLldpManAddressIndex
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-        "The tnLldpPortCfgAddressIndex represents the system man address associated
-         with a particular row in the tnLldpConfigManAddrPortsTable."
-    ::= { tnLldpConfigManAddrPortsEntry   1 }
-
-tnLldpPortCfgManAddrTxEnabled    OBJECT-TYPE
-    SYNTAX     TmnxEnabledDisabled
-    MAX-ACCESS read-write
-    STATUS     current
-    DESCRIPTION
-        "The tnLldpPortCfgManAddrTxEnabled specifies whether the port and
-         MAC address will transmit the managment address information."
-    DEFVAL { disabled }
-    ::= { tnLldpConfigManAddrPortsEntry   2 }
-
-tnLldpPortCfgManAddrSubtype   OBJECT-TYPE
-    SYNTAX     AddressFamilyNumbers
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The tnLldpPortCfgManAddrSubtype indicates the management address
-         representation in the tnLldpPortCfgManAddress object. The value
-         of 'other (0)' indicates that no management address is in use."
-    ::= { tnLldpConfigManAddrPortsEntry   3 }
-
-tnLldpPortCfgManAddress       OBJECT-TYPE
-    SYNTAX     LldpManAddress
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The tnLldpPortCfgManAddress indicates the management address
-         used by the tnLldpPortCfgAddressIndex."
-    ::= { tnLldpConfigManAddrPortsEntry   4 }
-
-
---==================================================
--- tnLldpDestAddressTable
---
--- Destination MAC addresses used by LLDP
---
-tnLldpDestAddressTable        OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TnLldpDestAddressTableEntry
+tnLldpConfigMedPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNLldpConfigMedPolicyEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
-        "The table that contains the set of MAC addresses used
-         by LLDP for transmission and reception of LLDPDUs."
-    ::= { tnLldpConfiguration   4 }
+    DESCRIPTION 
+        "This is a table to configure LLDP MED Policies for the device."
+    ::= { tnLldpConfigMed 2 }
 
-tnLldpDestAddressTableEntry   OBJECT-TYPE
-    SYNTAX     TnLldpDestAddressTableEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-        "Destination MAC address information for LLDP.
-
-         This configuration parameter identifies a MAC address
-         corresponding to a TmnxLldpDestAddressTableIndex value.
-
-         Rows in this table are created as necessary, to support
-         MAC addresses needed by other tables in the MIB that
-         are indexed by MAC address.
-
-         A given row in this table cannot be deleted if the MAC
-         address table index value is in use in any other table
-         in the MIB.
-
-         The contents of this table is persistent across
-         re-initializations or re-boots."
-     INDEX  {
-                tnSysSwitchId,
-                tnLldpAddressTableIndex
-            }
-    ::= { tnLldpDestAddressTable   1 }
-
-TnLldpDestAddressTableEntry   ::= SEQUENCE {
-      tnLldpAddressTableIndex       TmnxLldpDestAddressTableIndex,
-      tnLldpDestMacAddress          MacAddress
-}
-
-tnLldpAddressTableIndex       OBJECT-TYPE
-    SYNTAX     TmnxLldpDestAddressTableIndex
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-        "The index value used to identify the destination
-         MAC address associated with this entry.
-
-         The value of this object is used as an index to the
-         tnLldpDestAddressTable."
-    ::= { tnLldpDestAddressTableEntry   1 }
-
-tnLldpDestMacAddress          OBJECT-TYPE
-    SYNTAX     MacAddress
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The MAC address associated with this entry.
-
-         The octet string identifies an individual or a group
-         MAC address that is in use by LLDP as a destination
-         MAC address.
-         The MAC address is encoded in the octet string in
-         canonical format (see IEEE Std 802)."
-    ::= { tnLldpDestAddressTableEntry   2 }
-
---==================================================
--- tnLldpStatsTxPortTable
---
--- TX statistics
--- revised LLDP version indexed by port (via tnPortPortID) and
--- destination address.
---
-
-tnLldpStatsTxPortTable        OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TnLldpStatsTxPortEntry
+tnLldpConfigMedPolicyEntry OBJECT-TYPE
+    SYNTAX      TNLldpConfigMedPolicyEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
-            "A table containing LLDP transmission statistics for
-            individual port/destination address combinations.
-            Entries are not required to exist in
-            this table while the tnLldpPortConfigEntry object is equal to
-            'disabled(4)'."
-    ::= { tnLldpStatistics   1 }
+    DESCRIPTION 
+        "Network Policy Discovery enables the efficient discovery and diagnosis
+         of mismatch issues with the VLAN configuration, along with the
+         associated Layer 2 and Layer 3 attributes, which apply for a set of
+         specific protocol applications on that port. Improper network policy
+         configurations are a very significant issue in VoIP environments that
+         frequently result in voice quality degradation or loss of service.
+         Policies are only intended for use with applications that have specific
+         'real-time' network policy requirements, such as interactive voice
+         and/or video services."
+    INDEX       { tnLldpConfigMedPolicyLldpmedPolicy }
+    ::= { tnLldpConfigMedPolicyTable 1 }
 
-tnLldpStatsTxPortEntry        OBJECT-TYPE
-     SYNTAX      TnLldpStatsTxPortEntry
-     MAX-ACCESS  not-accessible
-     STATUS      current
-     DESCRIPTION
-         "LLDP frame transmission statistics for a particular port
-          and destination MAC address.
-          The port must be contained in the same chassis as the
-          LLDP agent.
-
-          All counter values in a particular entry shall be
-          maintained on a continuing basis and shall not be deleted
-          upon expiration of rx Info TTL timing counters in the LLDP
-          remote systems MIB of the receipt of a shutdown frame from
-          a remote LLDP agent.
-
-          All statistical counters associated with a particular
-          port on the local LLDP agent become frozen whenever the
-          admin status is disabled for the same port.
-
-          Rows in this table can only be created for MAC addresses
-          that can validly be used in association with the type of
-          interface concerned, as defined by table 8-2.
-
-          The contents of this table is persistent across
-          re-initializations or re-boots."
-     INDEX {
-               tnPortPortID,
-               tnLldpStatsTxDestMACAddress
-           }
-     ::= { tnLldpStatsTxPortTable   1 }
-
-TnLldpStatsTxPortEntry        ::= SEQUENCE {
-    tnLldpStatsTxDestMACAddress     TmnxLldpDestAddressTableIndex,
-    tnLldpStatsTxPortFrames         Counter32,
-    tnLldpStatsTxLLDPDULengthErrs   Counter32
+TNLldpConfigMedPolicyEntry ::= SEQUENCE {
+    tnLldpConfigMedPolicyLldpmedPolicy    Integer32,
+    tnLldpConfigMedPolicyApplicationType      TNlldpmedRemoteNetworkPolicyApplicationType,
+    tnLldpConfigMedPolicyTagged   TruthValue,
+    tnLldpConfigMedPolicyVlanId   TNUnsigned16,
+    tnLldpConfigMedPolicyL2Priority   TNUnsigned8,
+    tnLldpConfigMedPolicyDscp     TNUnsigned8,
+    tnLldpConfigMedPolicyAction   TNRowEditorState
 }
 
-tnLldpStatsTxDestMACAddress   OBJECT-TYPE
-    SYNTAX      TmnxLldpDestAddressTableIndex
+tnLldpConfigMedPolicyLldpmedPolicy OBJECT-TYPE
+    SYNTAX      Integer32 (0..31)
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
-        "The index value used to identify the destination
-         MAC address associated with this entry. Its value identifies
-         the row in the tnLldpPortConfigTable where the MAC address
-         can be found.
+    DESCRIPTION 
+        "Policy index."
+    ::= { tnLldpConfigMedPolicyEntry 1 }
 
-         The value of this object is used as an index to the
-         tnLldpStatsTxPortTable."
-    ::= { tnLldpStatsTxPortEntry   1 }
+tnLldpConfigMedPolicyApplicationType OBJECT-TYPE
+    SYNTAX      TNlldpmedRemoteNetworkPolicyApplicationType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy application type."
+    ::= { tnLldpConfigMedPolicyEntry 3 }
 
-tnLldpStatsTxPortFrames       OBJECT-TYPE
-    SYNTAX        Counter32
-    MAX-ACCESS    read-only
-    STATUS        current
-    DESCRIPTION
-        "The number of LLDP frames transmitted by this LLDP agent
-         on the indicated port."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 10.5.2"
-    ::= { tnLldpStatsTxPortEntry   2 }
+tnLldpConfigMedPolicyTagged OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy tagged flag. Defines if LLDP policy uses tagged VLAN."
+    ::= { tnLldpConfigMedPolicyEntry 4 }
 
-tnLldpStatsTxLLDPDULengthErrs OBJECT-TYPE
-    SYNTAX        Counter32
-    MAX-ACCESS    read-only
-    STATUS        current
-    DESCRIPTION
-        "The number of LLDPD Length Errors recorded for the Port."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 10.2.7.2"
-    ::= { tnLldpStatsTxPortEntry   3 }
+tnLldpConfigMedPolicyVlanId OBJECT-TYPE
+    SYNTAX      TNUnsigned16 (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy VLAN ID. Only valid when policy 'Tagged' is TRUE"
+    ::= { tnLldpConfigMedPolicyEntry 5 }
 
---==================================================
--- tnLldpStatsRemTable
---
--- RX statistics index on tnSysSwitchId basis.
---
+tnLldpConfigMedPolicyL2Priority OBJECT-TYPE
+    SYNTAX      TNUnsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy L2 priority."
+    ::= { tnLldpConfigMedPolicyEntry 6 }
 
-tnLldpStatsRemTable           OBJECT-TYPE
-    SYNTAX       SEQUENCE OF TnLldpStatsRemEntry
-    MAX-ACCESS   not-accessible
-    STATUS       current
-    DESCRIPTION
-        "The table that stores LLDP RX stats for remote systems."
-    ::= { tnLldpStatistics   2 }
+tnLldpConfigMedPolicyDscp OBJECT-TYPE
+    SYNTAX      TNUnsigned8 (0..63)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy DSCP."
+    ::= { tnLldpConfigMedPolicyEntry 7 }
 
-tnLldpStatsRemEntry           OBJECT-TYPE
-    SYNTAX       TnLldpStatsRemEntry
-    MAX-ACCESS   not-accessible
-    STATUS       current
-    DESCRIPTION
-        "LLDP RX stats for remote systems."
-    INDEX { tnSysSwitchId }
-    ::= { tnLldpStatsRemTable 1 }
+tnLldpConfigMedPolicyAction OBJECT-TYPE
+    SYNTAX      TNRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { tnLldpConfigMedPolicyEntry 100 }
 
-TnLldpStatsRemEntry          ::= SEQUENCE {
-    tnLldpStatsRemTablesLastChangeTime           Unsigned32,
-    tnLldpStatsRemTablesInserts                  ZeroBasedCounter32,
-    tnLldpStatsRemTablesDeletes                  ZeroBasedCounter32,
-    tnLldpStatsRemTablesDrops                    ZeroBasedCounter32,
-    tnLldpStatsRemTablesAgeouts                  ZeroBasedCounter32
+tnLldpConfigMedPolicyListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNLldpConfigMedPolicyListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface can be mapped to multiple policies. Set to TRUE in order
+         to enable the corresponding policy to be transmitted at the interface.
+         It is a requirement that the policy is defined."
+    ::= { tnLldpConfigMed 3 }
+
+tnLldpConfigMedPolicyListEntry OBJECT-TYPE
+    SYNTAX      TNLldpConfigMedPolicyListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each location information has a control parameter"
+    INDEX       { tnLldpConfigMedPolicyListIfIndex, tnLldpConfigMedPolicyListLldpmedPolicy }
+    ::= { tnLldpConfigMedPolicyListTable 1 }
+
+TNLldpConfigMedPolicyListEntry ::= SEQUENCE {
+    tnLldpConfigMedPolicyListIfIndex      TNInterfaceIndex,
+    tnLldpConfigMedPolicyListLldpmedPolicy    Integer32,
+    tnLldpConfigMedPolicyListLldpmedPoliciesList      TruthValue
 }
 
-tnLldpStatsRemTablesLastChangeTime OBJECT-TYPE
+tnLldpConfigMedPolicyListIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { tnLldpConfigMedPolicyListEntry 1 }
+
+tnLldpConfigMedPolicyListLldpmedPolicy OBJECT-TYPE
+    SYNTAX      Integer32 (0..31)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Policy index."
+    ::= { tnLldpConfigMedPolicyListEntry 3 }
+
+tnLldpConfigMedPolicyListLldpmedPoliciesList OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Set to TRUE assign the corresponding policy index to the interface."
+    ::= { tnLldpConfigMedPolicyListEntry 4 }
+
+tnLldpConfigMedGlobal OBJECT IDENTIFIER
+    ::= { tnLldpConfigMed 4 }
+
+tnLldpConfigMedGlobalFastRepeatCount OBJECT-TYPE
+    SYNTAX      TNUnsigned8 (1..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Number of times to repeat LLDP frame transmission at fast start
+         
+         Rapid startup and Emergency Call Service Location Identification
+         Discovery of endpoints is a critically important aspect of VoIP systems
+         in general. In addition, it is best to advertise only those pieces of
+         information which are specifically relevant to particular endpoint
+         types (for example only advertise the voice network policy to permitted
+         voice-capable devices), both in order to conserve the limited LLDPU
+         space and to reduce security and system integrity issues that can come
+         with inappropriate knowledge of the network policy.
+         
+         With this in mind LLDP-MED defines an LLDP-MED Fast Start interaction
+         between the protocol and the application layers on top of the protocol,
+         in order to achieve these related properties. Initially, a Network
+         Connectivity Device will only transmit LLDP TLVs in an LLDPDU. Only
+         after an LLDP-MED Endpoint Device is detected, will an LLDP-MED capable
+         Network Connectivity Device start to advertise LLDP-MED TLVs in
+         outgoing LLDPDUs on the associated port. The LLDP-MED application will
+         temporarily speed up the transmission of the LLDPDU to start within a
+         second, when a new LLDP-MED neighbor has been detected in order share
+         LLDP-MED information as fast as possible to new neighbors.
+         
+         Because there is a risk of an LLDP frame being lost during transmission
+         between neighbors, it is recommended to repeat the fast start
+         transmission multiple times to increase the possibility of the
+         neighbors receiving the LLDP frame. With fast start repeat count it is
+         possible to specify the number of times the fast start transmission
+         would be repeated. The recommended value is 4 times, given that 4 LLDP
+         frames with a 1 second interval will be transmitted, when an LLDP frame
+         with new information is received.
+         
+         It should be noted that LLDP-MED and the LLDP-MED Fast Start mechanism
+         is only intended to run on links between LLDP-MED Network Connectivity
+         Devices and Endpoint Devices, and as such does not apply to links
+         between LAN infrastructure elements, including Network Connectivity
+         Devices, or other types of links."
+    ::= { tnLldpConfigMedGlobal 1 }
+
+tnLldpConfigMedGlobalLatitude OBJECT-TYPE
+    SYNTAX      TNInteger64
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Latitude degrees in 2s-complement as specified in RFC 3825. Positive
+         numbers are north of the equator and negative numbers are south of the
+         equator."
+    ::= { tnLldpConfigMedGlobal 2 }
+
+tnLldpConfigMedGlobalLongitude OBJECT-TYPE
+    SYNTAX      TNInteger64
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Longitude degrees in 2s-complement as specified in RFC 3825. Positive
+         values are East of the prime meridian and negative numbers are West of
+         the prime meridian."
+    ::= { tnLldpConfigMedGlobal 3 }
+
+tnLldpConfigMedGlobalAltitudeType OBJECT-TYPE
+    SYNTAX      TNlldpmedAltitudeType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Setting altitude type
+         
+         Possible to select between two altitude types (floors or meters).
+         Meters are representing meters of altitude defined by the vertical
+         datum specified. Floors are representing altitude in a form more
+         relevant in buildings which have different floor-to-floor dimensions.
+         An altitude = 0.0 is meaningful even outside a building, and represents
+         ground level at the given latitude and longitude. Inside a building,
+         0.0 represents the floor level associated with ground level at the main
+         entrance."
+    ::= { tnLldpConfigMedGlobal 4 }
+
+tnLldpConfigMedGlobalAltitude OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Altitude value in 2s-complement as specified in RFC 3825"
+    ::= { tnLldpConfigMedGlobal 5 }
+
+tnLldpConfigMedGlobalElinAddr OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..25))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Emergency Call Service ELIN identifier data format is defined to carry
+         the ELIN identifier as used during emergency call setup to a
+         traditional CAMA or ISDN trunk-based PSAP. This format consists of a
+         numerical digit string, corresponding to the ELIN to be used for
+         emergency calling. Maximum number of octets are 25."
+    ::= { tnLldpConfigMedGlobal 6 }
+
+tnLldpConfigMedGlobalDatum OBJECT-TYPE
+    SYNTAX      TNlldpmedDatumType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Setting datum to configure the datum (geodetic system) to use.
+         
+         The Map Datum is used for the coordinates given in these options:
+         
+         WGS84: (Geographical 3D) - World Geodesic System 1984, CRS Code 4327,
+         Prime Meridian Name: Greenwich.
+         
+         NAD83/NAVD88: North American Datum 1983, CRS Code 4269, Prime Meridian
+         Name: Greenwich;The associated vertical datum is the North American
+         Vertical Datum of 1988 (NAVD88).This datum pair is to be used when
+         referencing locations on land, not near tidal water(which would use
+         Datum = NAD83/MLLW).
+         
+         NAD83/MLLW: North American Datum 1983, CRS Code 4269, Prime Meridian
+         Name: Greenwich; The associated vertical datum is Mean Lower Low Water
+         (MLLW). This datum pair is to be used when referencing locations on
+         water/sea/ocean."
+    ::= { tnLldpConfigMedGlobal 7 }
+
+tnLldpConfigMedGlobalCountryCode OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..2))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The two-letter ISO 3166 country code in capital ASCII letters -
+         Example: DK, DE or US."
+    ::= { tnLldpConfigMedGlobal 8 }
+
+tnLldpConfigMedLocationInformationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNLldpConfigMedLocationInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The civic address location information. Each civic address can contain
+         up to 250 characters, but the total amount of characters for the
+         combined civic address locations must not exceed 250 bytes. Note: If an
+         civic address location is non-empty it uses the amount of characters
+         plus addition two characters. This is described in TIA1057, Section
+         10.2.4.3.2."
+    ::= { tnLldpConfigMed 5 }
+
+tnLldpConfigMedLocationInformationEntry OBJECT-TYPE
+    SYNTAX      TNLldpConfigMedLocationInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each civic address type as defined in TIA1057, Section 3.4 in Annex B"
+    INDEX       { tnLldpConfigMedLocationInformationLldpmedIndex }
+    ::= { tnLldpConfigMedLocationInformationTable 1 }
+
+TNLldpConfigMedLocationInformationEntry ::= SEQUENCE {
+    tnLldpConfigMedLocationInformationLldpmedIndex    TNlldpmedCivicAddressType,
+    tnLldpConfigMedLocationInformationCivicAddress    TNDisplayString
+}
+
+tnLldpConfigMedLocationInformationLldpmedIndex OBJECT-TYPE
+    SYNTAX      TNlldpmedCivicAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Civic address type.
+         
+         1 - State/National subdivisions
+         
+         2 - County, parish, gun (JP), district (IN)
+         
+         3 - City, township
+         
+         4 - City division, borough, city district, ward, chou (JP)
+         
+         5 - Neighborhood, block
+         
+         6 - Street
+         
+         16 - Leading street direction
+         
+         17 - Trailing street direction
+         
+         18 - Street suffix
+         
+         19 - House number
+         
+         20 - House number suffix
+         
+         21 - Landmark or vanity address
+         
+         22 - Additional location information
+         
+         23 - Name
+         
+         24 - Postal/zip code
+         
+         25 - Building
+         
+         26 - Unit
+         
+         27 - Floor
+         
+         28 - Room
+         
+         29 - Place type
+         
+         30 - Postal
+         
+         31 - Post office
+         
+         32 - Additional code"
+    ::= { tnLldpConfigMedLocationInformationEntry 2 }
+
+tnLldpConfigMedLocationInformationCivicAddress OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Civic address"
+    ::= { tnLldpConfigMedLocationInformationEntry 3 }
+
+tnLldpConfigMedPolicyRowEditor OBJECT IDENTIFIER
+    ::= { tnLldpConfigMed 6 }
+
+tnLldpConfigMedPolicyRowEditorLldpmedPolicy OBJECT-TYPE
+    SYNTAX      Integer32 (0..31)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Policy index."
+    ::= { tnLldpConfigMedPolicyRowEditor 1 }
+
+tnLldpConfigMedPolicyRowEditorApplicationType OBJECT-TYPE
+    SYNTAX      TNlldpmedRemoteNetworkPolicyApplicationType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy application type."
+    ::= { tnLldpConfigMedPolicyRowEditor 3 }
+
+tnLldpConfigMedPolicyRowEditorTagged OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy tagged flag. Defines if LLDP policy uses tagged VLAN."
+    ::= { tnLldpConfigMedPolicyRowEditor 4 }
+
+tnLldpConfigMedPolicyRowEditorVlanId OBJECT-TYPE
+    SYNTAX      TNUnsigned16 (1..4095)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy VLAN ID. Only valid when policy 'Tagged' is TRUE"
+    ::= { tnLldpConfigMedPolicyRowEditor 5 }
+
+tnLldpConfigMedPolicyRowEditorL2Priority OBJECT-TYPE
+    SYNTAX      TNUnsigned8 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy L2 priority."
+    ::= { tnLldpConfigMedPolicyRowEditor 6 }
+
+tnLldpConfigMedPolicyRowEditorDscp OBJECT-TYPE
+    SYNTAX      TNUnsigned8 (0..63)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy DSCP."
+    ::= { tnLldpConfigMedPolicyRowEditor 7 }
+
+tnLldpConfigMedPolicyRowEditorAction OBJECT-TYPE
+    SYNTAX      TNRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { tnLldpConfigMedPolicyRowEditor 100 }
+
+tnLldpStatus OBJECT IDENTIFIER
+    ::= { tnLldpMibObjects 3 }
+
+tnLldpStatusStatistics OBJECT IDENTIFIER
+    ::= { tnLldpStatus 1 }
+
+tnLldpStatusStatisticsGlobalCounters OBJECT IDENTIFIER
+    ::= { tnLldpStatusStatistics 1 }
+
+tnLldpStatusStatisticsGlobalCountersTableInserts OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
-            "The value of sysUpTime object (defined in IETF RFC 3418)
-            at the time an entry is created, modified, or deleted in the
-            in tables associated with the tnLldpRemoteSystemsData objects
-            and all LLDP extension objects associated with remote systems.
+    DESCRIPTION 
+        "Shows the number of new entries added since switch reboot."
+    ::= { tnLldpStatusStatisticsGlobalCounters 1 }
 
-            This attribute is the number of seconds since Unix Epoch time
-            (ie, 1 January 1970 00:00:00), not the number of ticks since
-            the LC card is up.
-
-            An NMS can use this object to reduce polling of the
-            tnLldpRemoteSystemsData objects."
-    ::= { tnLldpStatsRemEntry 1 }
-
-tnLldpStatsRemTablesInserts OBJECT-TYPE
-    SYNTAX      ZeroBasedCounter32
-    UNITS       "table entries"
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "The number of times the complete set of information
-            advertised by a particular MSAP has been inserted into tables
-            contained in tnLldpRemoteSystemsData and lldpExtensions objects.
-
-            The complete set of information received from a particular
-            MSAP should be inserted into related tables.  If partial
-            information cannot be inserted for a reason such as lack
-            of resources, all of the complete set of information should
-            be removed.
-
-            This counter should be incremented only once after the
-            complete set of information is successfully recorded
-            in all related tables.  Any failures during inserting
-            information set which result in deletion of previously
-            inserted information should not trigger any changes in
-            tnLldpStatsRemTablesInserts since the insert is not completed
-            yet or or in tnLldpStatsRemTablesDeletes, since the deletion
-            would only be a partial deletion. If the failure was the
-            result of lack of resources, the tnLldpStatsRemTablesDrops
-            counter should be incremented once."
-    ::= { tnLldpStatsRemEntry 2 }
-
-tnLldpStatsRemTablesDeletes   OBJECT-TYPE
-    SYNTAX      ZeroBasedCounter32
-    UNITS       "table entries"
-    MAX-ACCESS  read-only
-    STATUS      current
-
-    DESCRIPTION
-            "The number of times the complete set of information
-            advertised by a particular MSAP has been deleted from
-            tables contained in tnLldpRemoteSystemsData and lldpExtensions
-            objects.
-
-            This counter should be incremented only once when the
-            complete set of information is completely deleted from all
-            related tables.  Partial deletions, such as deletion of
-            rows associated with a particular MSAP from some tables,
-            but not from all tables are not allowed, thus should not
-            change the value of this counter."
-    ::= { tnLldpStatsRemEntry 3 }
-
-tnLldpStatsRemTablesDrops  OBJECT-TYPE
-    SYNTAX      ZeroBasedCounter32
-    UNITS       "table entries"
-    MAX-ACCESS  read-only
-
-    STATUS      current
-    DESCRIPTION
-            "The number of times the complete set of information
-            advertised by a particular MSAP could not be entered into
-            tables contained in tnLldpRemoteSystemsData and lldpExtensions
-            objects because of insufficient resources."
-    ::= { tnLldpStatsRemEntry 4 }
-
-tnLldpStatsRemTablesAgeouts   OBJECT-TYPE
-    SYNTAX      ZeroBasedCounter32
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "The number of times the complete set of information
-            advertised by a particular MSAP has been deleted from tables
-            contained in tnLldpRemoteSystemsData and lldpExtensions objects
-            because the information timeliness interval has expired.
-
-            This counter should be incremented only once when the complete
-            set of information is completely invalidated (aged out)
-            from all related tables.  Partial aging, similar to deletion
-            case, is not allowed, and thus, should not change the value
-            of this counter."
-    ::= { tnLldpStatsRemEntry 5 }
-
---==================================================
--- tnLldpStatsRxPortTable
---
--- RX statistics
--- This version is indexed by tnPortPortID and destination
--- MAC address.
---
-
-tnLldpStatsRxPortTable        OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TnLldpStatsRxPortEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "A table containing LLDP reception statistics for individual
-         ports and destination MAC addresses.
-         Entries are not required to exist in this table while
-         the tnLldpPortCfgAdminStatus object is equal to 'disabled(4)'."
-    ::= { tnLldpStatistics 3 }
-
-tnLldpStatsRxPortEntry        OBJECT-TYPE
-     SYNTAX      TnLldpStatsRxPortEntry
-     MAX-ACCESS  not-accessible
-     STATUS      current
-     DESCRIPTION
-         "LLDP frame reception statistics for a particular port.
-          The port must be contained in the same chassis as the
-          LLDP agent.
-
-          All counter values in a particular entry shall be
-          maintained on a continuing basis and shall not be deleted
-          upon expiration of rx Info TTL timing counters in the LLDP
-          remote systems MIB of the receipt of a shutdown frame from
-          a remote LLDP agent.
-
-          All statistical counters associated with a particular
-          port on the local LLDP agent become frozen whenever the
-          admin status is disabled for the same port.
-
-          Rows in this table can only be created for MAC addresses
-          that can validly be used in association with the type of
-          interface concerned, as defined by table 8-2.
-
-          The contents of this table is persistent across
-          re-initializations or re-boots."
-     INDEX {
-               tnPortPortID,
-               tnLldpStatsRxDestMACAddress
-           }
-     ::= { tnLldpStatsRxPortTable   1 }
-
-TnLldpStatsRxPortEntry        ::= SEQUENCE {
-    tnLldpStatsRxDestMACAddress     TmnxLldpDestAddressTableIndex,
-    tnLldpStatsRxPortFrameDiscard   Counter32,
-    tnLldpStatsRxPortFrameErrs      Counter32,
-    tnLldpStatsRxPortFrames         Counter32,
-    tnLldpStatsRxPortTLVDiscard     Counter32,
-    tnLldpStatsRxPortTLVUnknown     Counter32,
-    tnLldpStatsRxPortAgeouts        ZeroBasedCounter32,
-    tnLldpStatsRxPortTtl            Unsigned32
-}
-
-tnLldpStatsRxDestMACAddress   OBJECT-TYPE
-    SYNTAX      TmnxLldpDestAddressTableIndex
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The index value used to identify the destination
-         MAC address associated with this entry. Its value identifies
-         the row in the tnLldpStatsRxPortTable where the MAC address
-         can be found."
-    ::= { tnLldpStatsRxPortEntry   1 }
-
-tnLldpStatsRxPortFrameDiscard OBJECT-TYPE
-    SYNTAX     Counter32
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The number of LLDP frames received by this LLDP agent on
-         the indicated port, and then discarded for any reason.
-         This counter can provide an indication that LLDP header
-         formating problems may exist with the local LLDP agent in
-         the sending system or that LLDPDU validation problems may
-         exist with the local LLDP agent in the receiving system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 10.5.2"
-    ::= { tnLldpStatsRxPortEntry   2 }
-
-tnLldpStatsRxPortFrameErrs    OBJECT-TYPE
-    SYNTAX     Counter32
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The number of invalid LLDP frames received by this LLDP
-         agent on the indicated port, while this LLDP agent is enabled."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 10.5.2"
-    ::= { tnLldpStatsRxPortEntry   3 }
-
-tnLldpStatsRxPortFrames       OBJECT-TYPE
-    SYNTAX     Counter32
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The number of valid LLDP frames received by this LLDP agent
-         on the indicated port, while this LLDP agent is enabled."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 10.5.2"
-    ::= { tnLldpStatsRxPortEntry   4 }
-
-tnLldpStatsRxPortTLVDiscard   OBJECT-TYPE
-    SYNTAX     Counter32
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The number of LLDP TLVs discarded for any reason by this LLDP
-         agent on the indicated port."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 10.5.2"
-    ::= { tnLldpStatsRxPortEntry   5 }
-
-tnLldpStatsRxPortTLVUnknown   OBJECT-TYPE
-    SYNTAX     Counter32
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The number of LLDP TLVs received on the given port that
-         are not recognized by this LLDP agent on the indicated port.
-
-         An unrecognized TLV is referred to as the TLV whose type value
-         is in the range of reserved TLV types (000 1001 - 111 1110)
-         in Table 9.1 of IEEE Std 802.1AB-2004. An unrecognized
-         TLV may be a basic management TLV from a later LLDP version."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 10.5.2"
-    ::= { tnLldpStatsRxPortEntry   6 }
-
-tnLldpStatsRxPortAgeouts      OBJECT-TYPE
-    SYNTAX     ZeroBasedCounter32
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The counter that represents the number of age-outs that
-         occurred on a given port. An age-out is the number of
-         times the complete set of information advertised by a
-         particular MSAP has been deleted from tables contained in
-         tnLldpRemoteSystemsData and lldpExtensions objects because
-         the information timeliness interval has expired.
-
-         This counter is similar to tnLldpStatsRemTablesAgeouts, except
-         that the counter is on a per port basis. This enables NMS to
-         poll tables associated with the tnLldpRemoteSystemsData objects
-         and all LLDP extension objects associated with remote systems
-         on the indicated port only.
-
-         This counter should be set to zero during agent initialization
-         and its value should not be saved in non-volatile storage.
-         When a port's admin status changes from 'disabled' to
-         'rxOnly', 'txOnly' or 'txAndRx', the counter associated with
-         the same port should reset to 0. The agent should also flush
-         all remote system information associated with the same port.
-
-         This counter should be incremented only once when the
-         complete set of information is invalidated (aged out) from
-         all related tables on a particular port. Partial ageing
-         is not allowed, and thus, should not change the value of
-         this counter."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 10.5.2"
-    ::= { tnLldpStatsRxPortEntry   7 }
-
-tnLldpStatsRxPortTtl OBJECT-TYPE
+tnLldpStatusStatisticsGlobalCountersTableDeletes OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
-        "The last Time-To-Live (TTL) value that was received for a configured
-         destination MAC by this LLDP agent on the indicated port,while this
-         LLDP agent is enabled."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 10.5.2"
-    ::= { tnLldpStatsRxPortEntry   8 }
+    DESCRIPTION 
+        "Shows the number of new entries deleted since switch reboot."
+    ::= { tnLldpStatusStatisticsGlobalCounters 2 }
 
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
---
---   TN-LLDP-MIB Local System Data
---
+tnLldpStatusStatisticsGlobalCountersTableDrops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the number of LLDP frames dropped due to the entry table being
+         full."
+    ::= { tnLldpStatusStatisticsGlobalCounters 3 }
 
---==================================================
--- tnLldpLocSysDataTable
---
--- Local system data table indexed by tnSysSwitchId
---
+tnLldpStatusStatisticsGlobalCountersTableAgeOuts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the number of entries deleted due to Time-To-Live expiring."
+    ::= { tnLldpStatusStatisticsGlobalCounters 4 }
 
-tnLldpLocSysDataTable           OBJECT-TYPE
-    SYNTAX       SEQUENCE OF TnLldpLocSysDataEntry
-    MAX-ACCESS   not-accessible
-    STATUS       current
-    DESCRIPTION
-        "The table that stores LLDP local system data."
-    ::= { tnLldpLocalSystemData   1 }
+tnLldpStatusStatisticsGlobalCountersLastChangeTime OBJECT-TYPE
+    SYNTAX      TNUnsigned64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the time when the last entry was last deleted or added. It also
+         shows the time elapsed since the last change was detected."
+    ::= { tnLldpStatusStatisticsGlobalCounters 5 }
 
-tnLldpLocSysDataEntry           OBJECT-TYPE
-    SYNTAX       TnLldpLocSysDataEntry
-    MAX-ACCESS   not-accessible
-    STATUS       current
-    DESCRIPTION
-        "LLDP local system data."
-    INDEX { tnSysSwitchId }
-    ::= { tnLldpLocSysDataTable 1 }
+tnLldpStatusStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNLldpStatusStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table represents the LLDP interface counters"
+    ::= { tnLldpStatusStatistics 2 }
 
-TnLldpLocSysDataEntry           ::= SEQUENCE {
-    tnLldpLocChassisIdSubtype           LldpChassisIdSubtype,
-    tnLldpLocChassisId                  LldpChassisId,
-    tnLldpLocSysName                    SnmpAdminString,
-    tnLldpLocSysDesc                    SnmpAdminString,
-    tnLldpLocSysCapSupported            LldpSystemCapabilitiesMap,
-    tnLldpLocSysCapEnabled              LldpSystemCapabilitiesMap
+tnLldpStatusStatisticsEntry OBJECT-TYPE
+    SYNTAX      TNLldpStatusStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each port interface has a set of statistics counters"
+    INDEX       { tnLldpStatusStatisticsIfIndex }
+    ::= { tnLldpStatusStatisticsTable 1 }
+
+TNLldpStatusStatisticsEntry ::= SEQUENCE {
+    tnLldpStatusStatisticsIfIndex     TNInterfaceIndex,
+    tnLldpStatusStatisticsTxTotal     Unsigned32,
+    tnLldpStatusStatisticsRxTotal     Unsigned32,
+    tnLldpStatusStatisticsRxError     Unsigned32,
+    tnLldpStatusStatisticsRxDiscarded     Unsigned32,
+    tnLldpStatusStatisticsTLVsDiscarded   Unsigned32,
+    tnLldpStatusStatisticsTLVsUnrecognized    Unsigned32,
+    tnLldpStatusStatisticsTLVsOrgDiscarded    Unsigned32,
+    tnLldpStatusStatisticsAgeOuts     Unsigned32
 }
 
-tnLldpLocChassisIdSubtype  OBJECT-TYPE
-    SYNTAX      LldpChassisIdSubtype
+tnLldpStatusStatisticsIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { tnLldpStatusStatisticsEntry 1 }
+
+tnLldpStatusStatisticsTxTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
-            "The type of encoding used to identify the chassis
-            associated with the local system."
-    REFERENCE
-            "IEEE 802.1AB-2005 9.5.2.2"
-    ::= { tnLldpLocSysDataEntry 1 }
+    DESCRIPTION 
+        "Shows the number of LLDP frames transmitted."
+    ::= { tnLldpStatusStatisticsEntry 2 }
 
-tnLldpLocChassisId  OBJECT-TYPE
-    SYNTAX      LldpChassisId
+tnLldpStatusStatisticsRxTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
-            "The string value used to identify the chassis component
-            associated with the local system."
-    REFERENCE
-            "IEEE 802.1AB-2005 9.5.2.3"
-    ::= { tnLldpLocSysDataEntry 2 }
+    DESCRIPTION 
+        "Shows the number of LLDP frames received."
+    ::= { tnLldpStatusStatisticsEntry 3 }
 
-tnLldpLocSysName  OBJECT-TYPE
-    SYNTAX      SnmpAdminString (SIZE(0..255))
+tnLldpStatusStatisticsRxError OBJECT-TYPE
+    SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
-            "The string value used to identify the system name of the
-            local system.  If the local agent supports IETF RFC 3418,
-            tnLldpLocSysName object should have the same value of sysName
-            object."
-    REFERENCE
-            "IEEE 802.1AB-2005 9.5.6.2"
-    ::= { tnLldpLocSysDataEntry 3 }
+    DESCRIPTION 
+        "Shows the number of received LLDP frames containing some kind of error."
+    ::= { tnLldpStatusStatisticsEntry 4 }
 
-tnLldpLocSysDesc  OBJECT-TYPE
-    SYNTAX      SnmpAdminString (SIZE(0..255))
+tnLldpStatusStatisticsRxDiscarded OBJECT-TYPE
+    SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
-            "The string value used to identify the system description
-            of the local system.  If the local agent supports IETF RFC 3418,
-            tnLldpLocSysDesc object should have the same value of sysDesc
-            object."
-    REFERENCE
-            "IEEE 802.1AB-2005 9.5.7.2"
-    ::= { tnLldpLocSysDataEntry 4 }
+    DESCRIPTION 
+        "Show the number of LLDP frames discarded. If a LLDP frame is received
+         at an interface, and the switch's internal table has run full, the LLDP
+         frame is counted and discarded. This situation is known as 'Too Many
+         Neighbors' in the LLDP standard. LLDP frames require a new entry in the
+         table when the Chassis ID or Remote Port ID is not already contained
+         within the table. Entries are removed from the table when a given
+         interface's link is down, an LLDP shutdown frame is received, or when
+         the entry ages out."
+    ::= { tnLldpStatusStatisticsEntry 5 }
 
-tnLldpLocSysCapSupported OBJECT-TYPE
-    SYNTAX      LldpSystemCapabilitiesMap
+tnLldpStatusStatisticsTLVsDiscarded OBJECT-TYPE
+    SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
-            "The bitmap value used to identify which system capabilities
-            are supported on the local system."
-    REFERENCE
-            "IEEE 802.1AB-2005 9.5.8.1"
-    ::= { tnLldpLocSysDataEntry 5 }
+    DESCRIPTION 
+        "Shows the number of TLVs discarded. Each LLDP frame can contain
+         multiple pieces of information, known as TLVs (TLV is short for 'Type
+         Length Value'). If a TLV is malformed, it is counted and discarded."
+    ::= { tnLldpStatusStatisticsEntry 6 }
 
-tnLldpLocSysCapEnabled  OBJECT-TYPE
-    SYNTAX      LldpSystemCapabilitiesMap
+tnLldpStatusStatisticsTLVsUnrecognized OBJECT-TYPE
+    SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
-            "The bitmap value used to identify which system capabilities
-            are enabled on the local system."
-    REFERENCE
-            "IEEE 802.1AB-2005 9.5.8.2"
-    ::= { tnLldpLocSysDataEntry 6 }
+    DESCRIPTION 
+        "Shows the number of well-formed TLVs, but with an unknown type value."
+    ::= { tnLldpStatusStatisticsEntry 7 }
 
---==================================================
--- tnLldpLocPortTable
---
--- Port specific Local system data
--- New version of the local system data table indexed
--- by tnPortPortID and destination MAC address.
---
+tnLldpStatusStatisticsTLVsOrgDiscarded OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the number of well-formed TLVs, but with an organizationally TLV
+         which is not supported."
+    ::= { tnLldpStatusStatisticsEntry 8 }
 
-tnLldpLocPortTable            OBJECT-TYPE
-    SYNTAX     SEQUENCE OF TnLldpLocPortEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-        "This table contains one or more rows, per port and
-         destination MAC address, of information
-         associated with the local system known to this agent."
-    ::= { tnLldpLocalSystemData   2 }
+tnLldpStatusStatisticsAgeOuts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Show the number of age-outs. Each frame contains information about how
+         long time the LLDP information is valid (age-out time). If no new LLDP
+         frame is received within the age out time, the information is removed,
+         and the counter is incremented."
+    ::= { tnLldpStatusStatisticsEntry 9 }
 
-tnLldpLocPortEntry            OBJECT-TYPE
-    SYNTAX     TnLldpLocPortEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-        "Information about a particular port component.
+tnLldpStatusNeighborsInformationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNLldpStatusNeighborsInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to show the LLDP neighbors information for a specific
+         interface."
+    ::= { tnLldpStatus 2 }
 
-         Entries may be created and deleted in this table by the
-         agent.
+tnLldpStatusNeighborsInformationEntry OBJECT-TYPE
+    SYNTAX      TNLldpStatusNeighborsInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface has a set of neighbors information"
+    INDEX       { tnLldpStatusNeighborsInformationIfIndex, tnLldpStatusNeighborsInformationLldpmedIndex }
+    ::= { tnLldpStatusNeighborsInformationTable 1 }
 
-         Rows in this table can only be created for MAC addresses
-         that can validly be used in association with the type of
-         interface concerned, as defined by table 8-2.
-
-         The contents of this table is persistent across
-         re-initializations or re-boots."
-    INDEX {
-              tnPortPortID,
-              tnLldpLocPortDestMACAddress
-          }
-    ::= { tnLldpLocPortTable   1 }
-
-TnLldpLocPortEntry            ::= SEQUENCE {
-    tnLldpLocPortDestMACAddress     TmnxLldpDestAddressTableIndex,
-    tnLldpLocPortIdSubtype          LldpPortIdSubtype,
-    tnLldpLocPortId                 LldpPortId,
-    tnLldpLocPortDesc               SnmpAdminString
+TNLldpStatusNeighborsInformationEntry ::= SEQUENCE {
+    tnLldpStatusNeighborsInformationIfIndex   TNInterfaceIndex,
+    tnLldpStatusNeighborsInformationLldpmedIndex      Integer32,
+    tnLldpStatusNeighborsInformationChassisId     TNDisplayString,
+    tnLldpStatusNeighborsInformationPortId    TNDisplayString,
+    tnLldpStatusNeighborsInformationPortDescription   TNDisplayString,
+    tnLldpStatusNeighborsInformationSystemName    TNDisplayString,
+    tnLldpStatusNeighborsInformationSystemDescription     TNDisplayString,
+    tnLldpStatusNeighborsInformationSystemCapabilities    TNUnsigned16,
+    tnLldpStatusNeighborsInformationSystemCapabilitiesEnable      TNUnsigned16
 }
 
-tnLldpLocPortDestMACAddress   OBJECT-TYPE
-    SYNTAX     TmnxLldpDestAddressTableIndex
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-        "The index value used to identify the destination
-         MAC address associated with this entry. Its value identifies
-         the row in the tnLldpLocPortTable where the MAC address
-         can be found."
-    ::= { tnLldpLocPortEntry   1 }
-
-tnLldpLocPortIdSubtype        OBJECT-TYPE
-    SYNTAX     LldpPortIdSubtype
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The type of port identifier encoding used in the associated
-         'tnLldpLocPortId' object."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.3.2"
-    ::= { tnLldpLocPortEntry   2 }
-
-tnLldpLocPortId               OBJECT-TYPE
-    SYNTAX     LldpPortId
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The string value used to identify the port component
-         associated with a given port in the local system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.3.3"
-    ::= { tnLldpLocPortEntry   3 }
-
-tnLldpLocPortDesc             OBJECT-TYPE
-    SYNTAX     SnmpAdminString (SIZE(0..255))
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The string value used to identify the IEEE 802 LAN station's port
-         description associated with the local system. If the local
-         agent supports IETF RFC 2863, tnLldpLocPortDesc object should
-         have the same value of ifDescr object."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.5.2"
-    ::= { tnLldpLocPortEntry   4 }
-
---==================================================
--- tnLldpLocManAddrTable : Management addresses of the local system
---
-
-tnLldpLocManAddrTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TnLldpLocManAddrEntry
+tnLldpStatusNeighborsInformationIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
-            "This table contains management address information on the
-            local system known to this agent."
-    ::= { tnLldpLocalSystemData   3 }
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { tnLldpStatusNeighborsInformationEntry 1 }
 
-tnLldpLocManAddrEntry OBJECT-TYPE
-    SYNTAX      TnLldpLocManAddrEntry
+tnLldpStatusNeighborsInformationLldpmedIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..192)
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
-            "Management address information about a particular chassis
-            component.  There may be multiple management addresses
-            configured on the system identified by a particular
-            tnLldpLocChassisId.  Each management address should have
-            distinct 'management address type' (tnLldpLocManAddrSubtype) and
-            'management address' (tnLldpLocManAddr.)
+    DESCRIPTION 
+        "Neighbor information table entry index."
+    ::= { tnLldpStatusNeighborsInformationEntry 2 }
 
-            Entries may be created and deleted in this table by the
-            agent."
-    INDEX   { tnSysSwitchId,
-              tnLldpLocManAddrSubtype,
-              tnLldpLocManAddr }
-    ::= { tnLldpLocManAddrTable 1 }
+tnLldpStatusNeighborsInformationChassisId OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's chassis Id."
+    ::= { tnLldpStatusNeighborsInformationEntry 4 }
 
-TnLldpLocManAddrEntry ::= SEQUENCE {
-      tnLldpLocManAddrSubtype    AddressFamilyNumbers,
-      tnLldpLocManAddr           LldpManAddress,
-      tnLldpLocManAddrLen        Integer32,
-      tnLldpLocManAddrIfSubtype  LldpManAddrIfSubtype,
-      tnLldpLocManAddrIfId       Integer32,
-      tnLldpLocManAddrOID        OBJECT IDENTIFIER
+tnLldpStatusNeighborsInformationPortId OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's port id."
+    ::= { tnLldpStatusNeighborsInformationEntry 5 }
+
+tnLldpStatusNeighborsInformationPortDescription OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's port description."
+    ::= { tnLldpStatusNeighborsInformationEntry 6 }
+
+tnLldpStatusNeighborsInformationSystemName OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's system name."
+    ::= { tnLldpStatusNeighborsInformationEntry 7 }
+
+tnLldpStatusNeighborsInformationSystemDescription OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's system description."
+    ::= { tnLldpStatusNeighborsInformationEntry 8 }
+
+tnLldpStatusNeighborsInformationSystemCapabilities OBJECT-TYPE
+    SYNTAX      TNUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's system capabilities as bit mask.
+         
+         If the bit is set, it means that the functionality is supported by the
+         neighbor system.
+         
+         Bit 0 represents Other.
+         
+         Bit 1 represents Repeater.
+         
+         Bit 2 represents Bridge.
+         
+         Bit 3 represents WLAN Access Point.
+         
+         Bit 4 represents Router.
+         
+         Bit 5 represents Telephone.
+         
+         Bit 6 represents DOCSIS cable device.
+         
+         Bit 7 represents Station Only.
+         
+         Bit 8 represents Reserved."
+    ::= { tnLldpStatusNeighborsInformationEntry 9 }
+
+tnLldpStatusNeighborsInformationSystemCapabilitiesEnable OBJECT-TYPE
+    SYNTAX      TNUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's system capabilities which is enabled.
+         
+         If the bit is set, it means that the functionality is currently enabled
+         at the neighbor system.
+         
+         Bit 0 represents Other.
+         
+         Bit 1 represents Repeater.
+         
+         Bit 2 represents Bridge.
+         
+         Bit 3 represents WLAN Access Point.
+         
+         Bit 4 represents Router.
+         
+         Bit 5 represents Telephone.
+         
+         Bit 6 represents DOCSIS cable device.
+         
+         Bit 7 represents Station Only.
+         
+         Bit 8 represents Reserved."
+    ::= { tnLldpStatusNeighborsInformationEntry 10 }
+
+tnLldpStatusNeighborsMgmtInformationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNLldpStatusNeighborsMgmtInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to show the LLDP neighbors information for a specific
+         interface."
+    ::= { tnLldpStatus 3 }
+
+tnLldpStatusNeighborsMgmtInformationEntry OBJECT-TYPE
+    SYNTAX      TNLldpStatusNeighborsMgmtInformationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface has a set of neighbors information"
+    INDEX       { tnLldpStatusNeighborsMgmtInformationIfIndex, tnLldpStatusNeighborsMgmtInformationLldpmedIndex, tnLldpStatusNeighborsMgmtInformationLldpManagement }
+    ::= { tnLldpStatusNeighborsMgmtInformationTable 1 }
+
+TNLldpStatusNeighborsMgmtInformationEntry ::= SEQUENCE {
+    tnLldpStatusNeighborsMgmtInformationIfIndex   TNInterfaceIndex,
+    tnLldpStatusNeighborsMgmtInformationLldpmedIndex      Integer32,
+    tnLldpStatusNeighborsMgmtInformationLldpManagement    Integer32,
+    tnLldpStatusNeighborsMgmtInformationSystemMgmAddressSubtype   TNUnsigned8,
+    tnLldpStatusNeighborsMgmtInformationSystemMgmtAddress     TNDisplayString,
+    tnLldpStatusNeighborsMgmtInformationSystemMgmtInterfaceSubtype    Integer32,
+    tnLldpStatusNeighborsMgmtInformationSystemMgmtInterface   Integer32,
+    tnLldpStatusNeighborsMgmtInformationSystemMgmtOid     OBJECT IDENTIFIER
 }
 
-tnLldpLocManAddrSubtype  OBJECT-TYPE
-    SYNTAX      AddressFamilyNumbers
+tnLldpStatusNeighborsMgmtInformationIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
-            "The type of management address identifier encoding used in
-            the associated 'tnLldpLocManagmentAddr' object."
-    REFERENCE
-            "IEEE 802.1AB-2005 9.5.9.3"
-    ::= { tnLldpLocManAddrEntry 1 }
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { tnLldpStatusNeighborsMgmtInformationEntry 1 }
 
-tnLldpLocManAddr  OBJECT-TYPE
-    SYNTAX      LldpManAddress
+tnLldpStatusNeighborsMgmtInformationLldpmedIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..192)
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
-            "The string value used to identify the management address
-            component associated with the local system.  The purpose of
-            this address is to contact the management entity."
-    REFERENCE
-            "IEEE 802.1AB-2005 9.5.9.4"
-    ::= { tnLldpLocManAddrEntry 2 }
+    DESCRIPTION 
+        "Neighbor information table entry index."
+    ::= { tnLldpStatusNeighborsMgmtInformationEntry 2 }
 
-tnLldpLocManAddrLen  OBJECT-TYPE
+tnLldpStatusNeighborsMgmtInformationLldpManagement OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Neighbor management information table entry index."
+    ::= { tnLldpStatusNeighborsMgmtInformationEntry 4 }
+
+tnLldpStatusNeighborsMgmtInformationSystemMgmAddressSubtype OBJECT-TYPE
+    SYNTAX      TNUnsigned8
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "LLDP neighbor's management address subtype , section 9.5.9.3
+         IEEE802.1AB-2005."
+    ::= { tnLldpStatusNeighborsMgmtInformationEntry 5 }
+
+tnLldpStatusNeighborsMgmtInformationSystemMgmtAddress OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "LLDP neighbor's management address string, section 9.5.9.4
+         IEEE802.1AB-2005."
+    ::= { tnLldpStatusNeighborsMgmtInformationEntry 6 }
+
+tnLldpStatusNeighborsMgmtInformationSystemMgmtInterfaceSubtype OBJECT-TYPE
     SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
-            "The total length of the management address subtype and the
-            management address fields in LLDPDUs transmitted by the
-            local LLDP agent.
+    DESCRIPTION 
+        "Interface numbering subtype, section 9.5.9.5 IEEE802.1AB-2005."
+    ::= { tnLldpStatusNeighborsMgmtInformationEntry 7 }
 
-            The management address length field is needed so that the
-            receiving systems that do not implement SNMP will not be
-            required to implement an iana family numbers/address length
-            equivalency table in order to decode the management adress."
-    REFERENCE
-            "IEEE 802.1AB-2005 9.5.9.2"
-    ::= { tnLldpLocManAddrEntry 3 }
-
-
-tnLldpLocManAddrIfSubtype  OBJECT-TYPE
-    SYNTAX      LldpManAddrIfSubtype
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-            "The enumeration value that identifies the interface numbering
-            method used for defining the interface number, associated
-            with the local system."
-    REFERENCE
-            "IEEE 802.1AB-2005 9.5.9.5"
-    ::= { tnLldpLocManAddrEntry 4 }
-
-tnLldpLocManAddrIfId  OBJECT-TYPE
+tnLldpStatusNeighborsMgmtInformationSystemMgmtInterface OBJECT-TYPE
     SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
-            "The integer value used to identify the interface number
-            regarding the management address component associated with
-            the local system."
-    REFERENCE
-            "IEEE 802.1AB-2005 9.5.9.6"
-    ::= { tnLldpLocManAddrEntry 5 }
+    DESCRIPTION 
+        "Interface number, section 9.5.9.6 IEEE802.1AB-2005."
+    ::= { tnLldpStatusNeighborsMgmtInformationEntry 8 }
 
-tnLldpLocManAddrOID  OBJECT-TYPE
+tnLldpStatusNeighborsMgmtInformationSystemMgmtOid OBJECT-TYPE
     SYNTAX      OBJECT IDENTIFIER
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
-            "The OID value used to identify the type of hardware component
-            or protocol entity associated with the management address
-            advertised by the local system agent."
-    REFERENCE
-            "IEEE 802.1AB-2005 9.5.9.8"
-    ::= { tnLldpLocManAddrEntry 6 }
+    DESCRIPTION 
+        "Object identifier, section 9.5.9.8 IEEE802.1AB-2005."
+    ::= { tnLldpStatusNeighborsMgmtInformationEntry 9 }
 
---%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
---
---   TN-LLDP-MIB Remote System Data
---
--- This version of the remote systems data table includes an additional index
--- to allow data to be recorded per tnPortPortID and destination MAC address
+tnLldpStatusMed OBJECT IDENTIFIER
+    ::= { tnLldpStatus 4 }
 
---==================================================
--- tnLldpRemTable
---
---
+tnLldpStatusMedRemoteDeviceInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNLldpStatusMedRemoteDeviceInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to show the LLDP neighbors information for a specific
+         interface."
+    ::= { tnLldpStatusMed 1 }
 
-tnLldpRemTable                OBJECT-TYPE
-    SYNTAX     SEQUENCE OF TnLldpRemEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-        "This table contains one or more rows per physical network
-         connection known to this agent. The agent may wish to ensure
-         that only one tnLldpRemEntry is present for each local port
-         and destination MAC address,
-         or it may choose to maintain multiple tnLldpRemEntry rows for
-         the same local port and destination MAC address.
+tnLldpStatusMedRemoteDeviceInfoEntry OBJECT-TYPE
+    SYNTAX      TNLldpStatusMedRemoteDeviceInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface has a set of neighbors information"
+    INDEX       { tnLldpStatusMedRemoteDeviceInfoIfIndex, tnLldpStatusMedRemoteDeviceInfoLldpmedIndex }
+    ::= { tnLldpStatusMedRemoteDeviceInfoTable 1 }
 
-         The following procedure may be used to retrieve remote
-         systems information updates from an LLDP agent:
-
-            1. NMS polls all tables associated with remote systems
-               and keeps a local copy of the information retrieved.
-               NMS polls periodically the values of the following
-               objects:
-                  a. tnLldpStatsRemTablesInserts
-                  b. tnLldpStatsRemTablesDeletes
-                  c. tnLldpStatsRemTablesDrops
-                  d. tnLldpStatsRemTablesAgeouts
-                  e. tnLldpStatsRxPortAgeouts for all ports.
-
-            2. LLDP agent updates remote systems MIB objects, and
-               sends out notifications to a list of notification
-               destinations.
-
-            3. NMS receives the notifications and compares the new
-               values of objects listed in step 1.
-
-               Periodically, NMS should poll the object
-               tnLldpStatsRemTablesLastChangeTime to find out if anything
-               has changed since the last poll. if something has
-               changed, NMS will poll the objects listed in step 1 to
-               figure out what kind of changes occurred in the tables.
-
-               if value of tnLldpStatsRemTablesInserts has changed,
-               then NMS will walk all tables by employing TimeFilter
-               with the last-polled time value. This request will
-               return new objects or objects whose values are updated
-               since the last poll.
-
-               if value of tnLldpStatsRemTablesAgeouts has changed,
-               then NMS will walk the tnLldpStatsRxPortAgeouts and
-               compare the new values with previously recorded ones.
-               For ports whose tnLldpStatsRxPortAgeouts value is
-               greater than the recorded value, NMS will have to
-               retrieve objects associated with those ports from
-               table(s) without employing a TimeFilter (which is
-               performed by specifying 0 for the TimeFilter.)
-
-               tnLldpStatsRemTablesDeletes and tnLldpStatsRemTablesDrops
-               objects are provided for informational purposes."
-    ::= { tnLldpRemoteSystemsData   1 }
-
-tnLldpRemEntry                OBJECT-TYPE
-    SYNTAX     TnLldpRemEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-        "Information about a particular physical network connection.
-         Entries may be created and deleted in this table by the agent,
-         if a physical topology discovery process is active.
-
-         Rows in this table can only be created for MAC addresses
-         that can validly be used in association with the type of
-         interface concerned, as defined by table 8-2.
-
-         The contents of this table is persistent across
-         re-initializations or re-boots."
-    INDEX {
-              tnSysSwitchId,
-              tnLldpRemTimeMark,
-              tnPortPortID,
-              tnLldpRemLocalDestMACAddress,
-              tnLldpRemIndex
-          }
-    ::= { tnLldpRemTable   1 }
-
-TnLldpRemEntry                ::= SEQUENCE {
-    tnLldpRemTimeMark               TimeFilter,
-    tnLldpRemLocalDestMACAddress    TmnxLldpDestAddressTableIndex,
-    tnLldpRemIndex                  Integer32,
-    tnLldpRemChassisIdSubtype       LldpChassisIdSubtype,
-    tnLldpRemChassisId              LldpChassisId,
-    tnLldpRemPortIdSubtype          LldpPortIdSubtype,
-    tnLldpRemPortId                 LldpPortId,
-    tnLldpRemPortDesc               SnmpAdminString,
-    tnLldpRemSysName                SnmpAdminString,
-    tnLldpRemSysDesc                SnmpAdminString,
-    tnLldpRemSysCapSupported        LldpSystemCapabilitiesMap,
-    tnLldpRemSysCapEnabled          LldpSystemCapabilitiesMap
+TNLldpStatusMedRemoteDeviceInfoEntry ::= SEQUENCE {
+    tnLldpStatusMedRemoteDeviceInfoIfIndex    TNInterfaceIndex,
+    tnLldpStatusMedRemoteDeviceInfoLldpmedIndex   Integer32,
+    tnLldpStatusMedRemoteDeviceInfoCapabilities   TNUnsigned16,
+    tnLldpStatusMedRemoteDeviceInfoCapabilitiesEnabled    TNUnsigned16,
+    tnLldpStatusMedRemoteDeviceInfoLatitude   TNInteger64,
+    tnLldpStatusMedRemoteDeviceInfoLongitude      TNInteger64,
+    tnLldpStatusMedRemoteDeviceInfoAltitudeType   TNlldpmedAltitudeType,
+    tnLldpStatusMedRemoteDeviceInfoAltitude   Integer32,
+    tnLldpStatusMedRemoteDeviceInfoDatum      TNlldpmedDatumType,
+    tnLldpStatusMedRemoteDeviceInfoElinaddr   TNDisplayString,
+    tnLldpStatusMedRemoteDeviceInfoDeviceType     TNlldpmedRemoteDeviceType,
+    tnLldpStatusMedRemoteDeviceInfoHwRev      TNDisplayString,
+    tnLldpStatusMedRemoteDeviceInfoFwRev      TNDisplayString,
+    tnLldpStatusMedRemoteDeviceInfoSwRev      TNDisplayString,
+    tnLldpStatusMedRemoteDeviceInfoSerialNo   TNDisplayString,
+    tnLldpStatusMedRemoteDeviceInfoManufacturerName   TNDisplayString,
+    tnLldpStatusMedRemoteDeviceInfoModelName      TNDisplayString,
+    tnLldpStatusMedRemoteDeviceInfoAssetId    TNDisplayString,
+    tnLldpStatusMedRemoteDeviceInfoEeeRxTwSys     TNUnsigned16,
+    tnLldpStatusMedRemoteDeviceInfoEeeTxTwSys     TNUnsigned16,
+    tnLldpStatusMedRemoteDeviceInfoEeeFbTwSys     TNUnsigned16,
+    tnLldpStatusMedRemoteDeviceInfoEeeTxTwSysEcho     TNUnsigned16,
+    tnLldpStatusMedRemoteDeviceInfoEeeRxTwSysEcho     TNUnsigned16
 }
 
-tnLldpRemTimeMark  OBJECT-TYPE
-    SYNTAX     TimeFilter
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-        "A TimeFilter for this entry. See the TimeFilter textual
-         convention in IETF RFC 4502 and
-         http://www.ietf.org/IESG/Implementations/RFC2021-Implementation.txt
-         to see how TimeFilter works.
-
-         This attribute is the number of seconds since Unix Epoch time
-         (ie, 1 January 1970 00:00:00), not the number of ticks since
-         the LC card is up. "
-    REFERENCE
-        "IETF RFC 4502 section 6"
-    ::= { tnLldpRemEntry   1 }
-
-tnLldpRemLocalDestMACAddress  OBJECT-TYPE
-    SYNTAX     TmnxLldpDestAddressTableIndex
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-        "The index value used to identify the destination
-         MAC address associated with this entry. Its value identifies
-         the row in the tnLldpRemTable where the MAC address
-         can be found."
-    ::= { tnLldpRemEntry   2 }
-
-tnLldpRemIndex                OBJECT-TYPE
-    SYNTAX     Integer32 (1..2147483647)
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-        "This object represents an arbitrary local integer value used
-         by this agent to identify a particular connection instance,
-         unique only for the indicated remote system.
-
-         An agent is encouraged to assign monotonically increasing
-         index values to new entries, starting with one, after each
-         reboot. It is considered unlikely that the tnLldpRemIndex
-         will wrap between reboots."
-    ::= { tnLldpRemEntry   3 }
-
-tnLldpRemChassisIdSubtype     OBJECT-TYPE
-    SYNTAX     LldpChassisIdSubtype
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The type of encoding used to identify the chassis associated
-         with the remote system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.2.2"
-    ::= { tnLldpRemEntry   4 }
-
-tnLldpRemChassisId            OBJECT-TYPE
-    SYNTAX     LldpChassisId
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The string value used to identify the chassis component
-         associated with the remote system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.2.3"
-    ::= { tnLldpRemEntry   5 }
-
-tnLldpRemPortIdSubtype        OBJECT-TYPE
-    SYNTAX     LldpPortIdSubtype
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The type of port identifier encoding used in the associated
-         'tnLldpRemPortId' object."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.3.2"
-    ::= { tnLldpRemEntry   6 }
-
-tnLldpRemPortId               OBJECT-TYPE
-    SYNTAX     LldpPortId
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The string value used to identify the port component
-         associated with the remote system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.3.3"
-    ::= { tnLldpRemEntry   7 }
-
-tnLldpRemPortDesc             OBJECT-TYPE
-    SYNTAX     SnmpAdminString (SIZE(0..255))
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The string value used to identify the description of
-         the given port associated with the remote system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.5.2"
-    ::= { tnLldpRemEntry   8 }
-
-tnLldpRemSysName              OBJECT-TYPE
-    SYNTAX     SnmpAdminString (SIZE(0..255))
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The string value used to identify the system name of the
-         remote system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.6.2"
-    ::= { tnLldpRemEntry   9 }
-
-tnLldpRemSysDesc              OBJECT-TYPE
-    SYNTAX     SnmpAdminString (SIZE(0..255))
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The string value used to identify the system description
-         of the remote system."
-    REFERENCE
-            "IEEE Std 802.1AB-200X 9.5.7.2"
-    ::= { tnLldpRemEntry  10 }
-
-tnLldpRemSysCapSupported      OBJECT-TYPE
-    SYNTAX     LldpSystemCapabilitiesMap
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The bitmap value used to identify which system capabilities
-         are supported on the remote system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.8.1"
-    ::= { tnLldpRemEntry  11 }
-
-tnLldpRemSysCapEnabled        OBJECT-TYPE
-    SYNTAX     LldpSystemCapabilitiesMap
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The bitmap value used to identify which system capabilities
-         are enabled on the remote system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.8.2"
-    ::= { tnLldpRemEntry  12 }
-
---==================================================
--- tnLldpRemManAddrTable
---
--- Management addresses of the remote system
---
-
-tnLldpRemManAddrTable         OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TnLldpRemManAddrEntry
+tnLldpStatusMedRemoteDeviceInfoIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
-        "This table contains one or more rows per management address
-         information on the remote system learned on a particular port
-         contained in the local chassis known to this agent."
-    ::= { tnLldpRemoteSystemsData   2 }
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 1 }
 
-tnLldpRemManAddrEntry         OBJECT-TYPE
-    SYNTAX      TnLldpRemManAddrEntry
+tnLldpStatusMedRemoteDeviceInfoLldpmedIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..192)
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
-            "Management address information about a particular chassis
-            component.  There may be multiple management addresses
-            configured on the remote system identified by a particular
-            tnLldpRemIndex whose information is received on
-            ifIndex and tnLldpRemLocalDestMACAddress of the local system.
-            Each management address should have distinct 'management address
-            type' (tnLldpRemManAddrSubtype) and 'management address'
-            (tnLldpRemManAddr.)
+    DESCRIPTION 
+        "Neighbor information table entry index."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 2 }
 
-            Entries may be created and deleted in this table by the
-            agent."
-    INDEX   { tnSysSwitchId,
-              tnLldpRemTimeMark,
-              tnPortPortID,
-              tnLldpRemLocalDestMACAddress,
-              tnLldpRemIndex,
-              tnLldpRemManAddrSubtype,
-              tnLldpRemManAddr
- }
-    ::= { tnLldpRemManAddrTable 1 }
-
-TnLldpRemManAddrEntry             ::= SEQUENCE {
-      tnLldpRemManAddrSubtype     AddressFamilyNumbers,
-      tnLldpRemManAddr            LldpManAddress,
-      tnLldpRemManAddrIfSubtype   LldpManAddrIfSubtype,
-      tnLldpRemManAddrIfId        Integer32,
-      tnLldpRemManAddrOID         OBJECT IDENTIFIER
-}
-
-tnLldpRemManAddrSubtype       OBJECT-TYPE
-    SYNTAX      AddressFamilyNumbers
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The type of management address identifier encoding used in
-         the associated 'tnLldpRemManagmentAddr' object."
-    REFERENCE
-        "IEEE 802.1AB-2005 9.5.9.3"
-    ::= { tnLldpRemManAddrEntry 1 }
-
-tnLldpRemManAddr              OBJECT-TYPE
-    SYNTAX      LldpManAddress
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION
-        "The string value used to identify the management address
-         component associated with the remote system.  The purpose
-         of this address is to contact the management entity."
-    REFERENCE
-        "IEEE 802.1AB-2005 9.5.9.4"
-    ::= { tnLldpRemManAddrEntry   2 }
-
-tnLldpRemManAddrIfSubtype     OBJECT-TYPE
-    SYNTAX      LldpManAddrIfSubtype
+tnLldpStatusMedRemoteDeviceInfoCapabilities OBJECT-TYPE
+    SYNTAX      TNUnsigned16
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
-        "The enumeration value that identifies the interface numbering
-         method used for defining the interface number, associated
-         with the remote system."
-    REFERENCE
-        "IEEE 802.1AB-2005 9.5.9.5"
-    ::= { tnLldpRemManAddrEntry   3 }
+    DESCRIPTION 
+        "LLDP neighbor's capabilities bit mask.
+         
+         Bit 0 represents LLDP-MED capabilities.
+         
+         Bit 1 represents Network Policy.
+         
+         Bit 2 represents Location Identification.
+         
+         Bit 3 represents Extended Power via MDI - PSE.
+         
+         Bit 4 represents Extended Power via MDI - PD
+         
+         Bit 5 represents Inventory
+         
+         "
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 4 }
 
-tnLldpRemManAddrIfId          OBJECT-TYPE
+tnLldpStatusMedRemoteDeviceInfoCapabilitiesEnabled OBJECT-TYPE
+    SYNTAX      TNUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "LLDP neighbor's capabilities bit mask for the capabilities which are
+         currently enabled.
+         
+         Bit 0 represents LLDP-MED capabilities.
+         
+         Bit 1 represents Network Policy.
+         
+         Bit 2 represents Location Identification.
+         
+         Bit 3 represents Extended Power via MDI - PSE.
+         
+         Bit 4 represents Extended Power via MDI - PD
+         
+         Bit 5 represents Inventory
+         
+         "
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 5 }
+
+tnLldpStatusMedRemoteDeviceInfoLatitude OBJECT-TYPE
+    SYNTAX      TNInteger64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Latitude degrees in 2s-complement as specified in RFC 3825. Positive
+         numbers are north of the equator and negative numbers are south of the
+         equator."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 6 }
+
+tnLldpStatusMedRemoteDeviceInfoLongitude OBJECT-TYPE
+    SYNTAX      TNInteger64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Longitude degrees in 2s-complement as specified in RFC 3825. Positive
+         values are East of the prime meridian and negative numbers are West of
+         the prime meridian."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 7 }
+
+tnLldpStatusMedRemoteDeviceInfoAltitudeType OBJECT-TYPE
+    SYNTAX      TNlldpmedAltitudeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Altitude type as either floors or meters. Meters are representing
+         meters of altitude defined by the vertical datum specified. Floors are
+         representing altitude in a form more relevant in buildings which have
+         different floor-to-floor dimensions. An altitude = 0.0 is meaningful
+         even outside a building, and represents ground level at the given
+         latitude and longitude. Inside a building, 0.0 represents the floor
+         level associated with ground level at the main entrance."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 8 }
+
+tnLldpStatusMedRemoteDeviceInfoAltitude OBJECT-TYPE
     SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
-        "The integer value used to identify the interface number
-        regarding the management address component associated with
-        the remote system."
-    REFERENCE
-        "IEEE 802.1AB-2005 9.5.9.6"
-    ::= { tnLldpRemManAddrEntry   4 }
+    DESCRIPTION 
+        "Altitude value in 2s-complement as specified in RFC 3825"
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 9 }
 
-tnLldpRemManAddrOID           OBJECT-TYPE
-    SYNTAX      OBJECT IDENTIFIER
+tnLldpStatusMedRemoteDeviceInfoDatum OBJECT-TYPE
+    SYNTAX      TNlldpmedDatumType
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
-        "The OID value used to identify the type of hardware component
-         or protocol entity associated with the management address
-         advertised by the remote system agent."
-    REFERENCE
-        "IEEE 802.1AB-2005 9.5.9.8"
-    ::= { tnLldpRemManAddrEntry   5 }
+    DESCRIPTION 
+        "Datum (geodetic system) .
+         
+         The Map Datum is used for the coordinates given in these options:
+         
+         WGS84: (Geographical 3D) - World Geodesic System 1984, CRS Code 4327,
+         Prime Meridian Name: Greenwich.
+         
+         NAD83/NAVD88: North American Datum 1983, CRS Code 4269, Prime Meridian
+         Name: Greenwich; The associated vertical datum is the North American
+         Vertical Datum of 1988 (NAVD88). This datum pair is to be used when
+         referencing locations on land, not near tidal water(which would use
+         Datum = NAD83/MLLW).
+         
+         NAD83/MLLW: North American Datum 1983, CRS Code 4269, Prime Meridian
+         Name: Greenwich; The associated vertical datum is Mean Lower Low Water
+         (MLLW). This datum pair is to be used when referencing locations on
+         water/sea/ocean."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 10 }
 
---==================================================
--- tnLldpRemPortIndexTable
---
---
+tnLldpStatusMedRemoteDeviceInfoElinaddr OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..25))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Emergency Call Service ELIN identifier data format is defined to carry
+         the ELIN identifier as used during emergency call setup to a
+         traditional CAMA or ISDN trunk-based PSAP. This format consists of a
+         numerical digit string, corresponding to the ELIN to be used for
+         emergency calling. Maximum number of octets are 25."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 11 }
 
-tnLldpRemPortIndexTable                OBJECT-TYPE
-    SYNTAX     SEQUENCE OF TnLldpRemPortIndexEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-        "Note that this table is same as tnLldpRemTable except that the order of two
-         indices tnLldpRemTimeMark and tnPortPortID are reversed.
+tnLldpStatusMedRemoteDeviceInfoDeviceType OBJECT-TYPE
+    SYNTAX      TNlldpmedRemoteDeviceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's device type."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 12 }
 
-         This table contains one or more rows per physical network
-         connection known to this agent. The agent may wish to ensure
-         that only one tnLldpRemEntry is present for each local port
-         and destination MAC address,
-         or it may choose to maintain multiple tnLldpRemEntry rows for
-         the same local port and destination MAC address.
+tnLldpStatusMedRemoteDeviceInfoHwRev OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's hardware revision."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 13 }
 
-         The following procedure may be used to retrieve remote
-         systems information updates from an LLDP agent:
+tnLldpStatusMedRemoteDeviceInfoFwRev OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's firmware revision."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 14 }
 
-            1. NMS polls all tables associated with remote systems
-               and keeps a local copy of the information retrieved.
-               NMS polls periodically the values of the following
-               objects:
-                  a. tnLldpStatsRemTablesInserts
-                  b. tnLldpStatsRemTablesDeletes
-                  c. tnLldpStatsRemTablesDrops
-                  d. tnLldpStatsRemTablesAgeouts
-                  e. tnLldpStatsRxPortAgeouts for all ports.
+tnLldpStatusMedRemoteDeviceInfoSwRev OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's software revision."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 15 }
 
-            2. LLDP agent updates remote systems MIB objects, and
-               sends out notifications to a list of notification
-               destinations.
+tnLldpStatusMedRemoteDeviceInfoSerialNo OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's serial number."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 16 }
 
-            3. NMS receives the notifications and compares the new
-               values of objects listed in step 1.
+tnLldpStatusMedRemoteDeviceInfoManufacturerName OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's manufacturer name."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 17 }
 
-               Periodically, NMS should poll the object
-               tnLldpStatsRemTablesLastChangeTime to find out if anything
-               has changed since the last poll. if something has
-               changed, NMS will poll the objects listed in step 1 to
-               figure out what kind of changes occurred in the tables.
+tnLldpStatusMedRemoteDeviceInfoModelName OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's model name."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 18 }
 
-               if value of tnLldpStatsRemTablesInserts has changed,
-               then NMS will walk all tables by employing TimeFilter
-               with the last-polled time value. This request will
-               return new objects or objects whose values are updated
-               since the last poll.
+tnLldpStatusMedRemoteDeviceInfoAssetId OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's asset id."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 19 }
 
-               if value of tnLldpStatsRemTablesAgeouts has changed,
-               then NMS will walk the tnLldpStatsRxPortAgeouts and
-               compare the new values with previously recorded ones.
-               For ports whose tnLldpStatsRxPortAgeouts value is
-               greater than the recorded value, NMS will have to
-               retrieve objects associated with those ports from
-               table(s) without employing a TimeFilter (which is
-               performed by specifying 0 for the TimeFilter.)
+tnLldpStatusMedRemoteDeviceInfoEeeRxTwSys OBJECT-TYPE
+    SYNTAX      TNUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's Receive tw_sys_rx . Tw_sys_rx is defined as
+         the time (expressed in microseconds) that the transmitting link partner
+         will wait before it starts transmitting data after leaving the Low
+         Power Idle (LPI) mode. Section 79.3.5.2, IEEE802.3az."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 20 }
 
-               tnLldpStatsRemTablesDeletes and tnLldpStatsRemTablesDrops
-               objects are provided for informational purposes."
-    ::= { tnLldpRemoteSystemsData   3 }
+tnLldpStatusMedRemoteDeviceInfoEeeTxTwSys OBJECT-TYPE
+    SYNTAX      TNUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's Transmit Tw_sys_tx . Tw_sys_tx is defined as
+         the time (expressed in microseconds) that the receiving link partner is
+         requesting the transmitting link partner to wait before starting the
+         transmission data following the Low Power Idle (LPI) mode. Section
+         79.3.5.1, IEEE802.3az."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 21 }
 
-tnLldpRemPortIndexEntry                OBJECT-TYPE
-    SYNTAX     TnLldpRemPortIndexEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
-    DESCRIPTION
-        "Information about a particular physical network connection.
-         Entries may be created and deleted in this table by the agent,
-         if a physical topology discovery process is active.
+tnLldpStatusMedRemoteDeviceInfoEeeFbTwSys OBJECT-TYPE
+    SYNTAX      TNUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's Fallback tw_sys_tx. A receiving link partner
+         may inform the transmitter of an alternate desired Tw_sys_tx. Since a
+         receiving link partner is likely to have discrete levels for savings,
+         this provides the transmitter with additional information that it may
+         use for a more efficient allocation. Section 79.3.5.3, IEEE802.3az."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 22 }
 
-         Rows in this table can only be created for MAC addresses
-         that can validly be used in association with the type of
-         interface concerned, as defined by table 8-2.
+tnLldpStatusMedRemoteDeviceInfoEeeTxTwSysEcho OBJECT-TYPE
+    SYNTAX      TNUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's echo transmit Tw. The respective echo values
+         shall be defined as the local link partners reflection (echo) of the
+         remote link partners respective values. When a local link partner
+         receives its echoed values from the remote link partner it can
+         determine whether or not the remote link partner has received,
+         registered, and processed its most recent values. Section 79.3.5.4,
+         IEEE802.3az."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 23 }
 
-         The contents of this table is persistent across
-         re-initializations or re-boots."
-    INDEX {
-              tnSysSwitchId,
-              tnPortPortID,
-              tnLldpRemTimeMark,
-              tnLldpRemLocalDestMACAddress,
-              tnLldpRemIndex
-          }
-    ::= { tnLldpRemPortIndexTable   1 }
+tnLldpStatusMedRemoteDeviceInfoEeeRxTwSysEcho OBJECT-TYPE
+    SYNTAX      TNUnsigned16
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's echo receive Tw. The respective echo values
+         shall be defined as the local link partners reflection (echo) of the
+         remote link partners respective values. When a local link partner
+         receives its echoed values from the remote link partner it can
+         determine whether or not the remote link partner has received,
+         registered, and processed its most recent values. Section 79.3.5.4,
+         IEEE802.3az."
+    ::= { tnLldpStatusMedRemoteDeviceInfoEntry 24 }
 
-TnLldpRemPortIndexEntry                ::= SEQUENCE {
-    tnLldpRemPortIndexChassisIdSubtype       LldpChassisIdSubtype,
-    tnLldpRemPortIndexChassisId              LldpChassisId,
-    tnLldpRemPortIndexPortIdSubtype          LldpPortIdSubtype,
-    tnLldpRemPortIndexPortId                 LldpPortId,
-    tnLldpRemPortIndexPortDesc               SnmpAdminString,
-    tnLldpRemPortIndexSysName                SnmpAdminString,
-    tnLldpRemPortIndexSysDesc                SnmpAdminString,
-    tnLldpRemPortIndexSysCapSupported        LldpSystemCapabilitiesMap,
-    tnLldpRemPortIndexSysCapEnabled          LldpSystemCapabilitiesMap
-}
-
-tnLldpRemPortIndexChassisIdSubtype     OBJECT-TYPE
-    SYNTAX     LldpChassisIdSubtype
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The type of encoding used to identify the chassis associated
-         with the remote system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.2.2"
-    ::= { tnLldpRemPortIndexEntry   1 }
-
-tnLldpRemPortIndexChassisId            OBJECT-TYPE
-    SYNTAX     LldpChassisId
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The string value used to identify the chassis component
-         associated with the remote system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.2.3"
-    ::= { tnLldpRemPortIndexEntry   2 }
-
-tnLldpRemPortIndexPortIdSubtype        OBJECT-TYPE
-    SYNTAX     LldpPortIdSubtype
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The type of port identifier encoding used in the associated
-         'tnLldpRemPortId' object."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.3.2"
-    ::= { tnLldpRemPortIndexEntry   3 }
-
-tnLldpRemPortIndexPortId               OBJECT-TYPE
-    SYNTAX     LldpPortId
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The string value used to identify the port component
-         associated with the remote system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.3.3"
-    ::= { tnLldpRemPortIndexEntry   4 }
-
-tnLldpRemPortIndexPortDesc             OBJECT-TYPE
-    SYNTAX     SnmpAdminString (SIZE(0..255))
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The string value used to identify the description of
-         the given port associated with the remote system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.5.2"
-    ::= { tnLldpRemPortIndexEntry   5 }
-
-tnLldpRemPortIndexSysName              OBJECT-TYPE
-    SYNTAX     SnmpAdminString (SIZE(0..255))
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The string value used to identify the system name of the
-         remote system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.6.2"
-    ::= { tnLldpRemPortIndexEntry   6 }
-
-tnLldpRemPortIndexSysDesc              OBJECT-TYPE
-    SYNTAX     SnmpAdminString (SIZE(0..255))
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The string value used to identify the system description
-         of the remote system."
-    REFERENCE
-            "IEEE Std 802.1AB-200X 9.5.7.2"
-    ::= { tnLldpRemPortIndexEntry  7 }
-
-tnLldpRemPortIndexSysCapSupported      OBJECT-TYPE
-    SYNTAX     LldpSystemCapabilitiesMap
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The bitmap value used to identify which system capabilities
-         are supported on the remote system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.8.1"
-    ::= { tnLldpRemPortIndexEntry  8 }
-
-tnLldpRemPortIndexSysCapEnabled        OBJECT-TYPE
-    SYNTAX     LldpSystemCapabilitiesMap
-    MAX-ACCESS read-only
-    STATUS     current
-    DESCRIPTION
-        "The bitmap value used to identify which system capabilities
-         are enabled on the remote system."
-    REFERENCE
-        "IEEE Std 802.1AB-200X 9.5.8.2"
-    ::= { tnLldpRemPortIndexEntry  9 }
-
---==================================================
--- tnLldpRemManAddrPortIndexTable
---
--- Management addresses of the remote system
---
-
-tnLldpRemManAddrPortIndexTable         OBJECT-TYPE
-    SYNTAX      SEQUENCE OF TnLldpRemManAddrPortIndexEntry
+tnLldpStatusMedRemoteDeviceLocInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNLldpStatusMedRemoteDeviceLocInfoEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
-        "Note that this table is same as tnLldpRemManAddrTable except that the order of two
-         indices tnLldpRemTimeMark and tnPortPortID are reversed.
+    DESCRIPTION 
+        "This is a table to show the LLDP-MED remote device (neighbor) civic
+         location information for a specific interface."
+    ::= { tnLldpStatusMed 2 }
 
-         This table contains one or more rows per management address
-         information on the remote system learned on a particular port
-         contained in the local chassis known to this agent."
-    ::= { tnLldpRemoteSystemsData   4 }
-
-tnLldpRemManAddrPortIndexEntry         OBJECT-TYPE
-    SYNTAX      TnLldpRemManAddrPortIndexEntry
+tnLldpStatusMedRemoteDeviceLocInfoEntry OBJECT-TYPE
+    SYNTAX      TNLldpStatusMedRemoteDeviceLocInfoEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
-            "Management address information about a particular chassis
-            component.  There may be multiple management addresses
-            configured on the remote system identified by a particular
-            tnLldpRemIndex whose information is received on
-            ifIndex and tnLldpRemLocalDestMACAddress of the local system.
-            Each management address should have distinct 'management address
-            type' (tnLldpRemManAddrSubtype) and 'management address'
-            (tnLldpRemManAddr.)
+    DESCRIPTION 
+        "Each interface has a set of neighbors information"
+    INDEX       { tnLldpStatusMedRemoteDeviceLocInfoIfIndex, tnLldpStatusMedRemoteDeviceLocInfoLldpmedIndex }
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoTable 1 }
 
-            Entries may be created and deleted in this table by the
-            agent."
-    INDEX   { tnSysSwitchId,
-              tnPortPortID,
-              tnLldpRemTimeMark,
-              tnLldpRemLocalDestMACAddress,
-              tnLldpRemIndex,
-              tnLldpRemManAddrSubtype,
-              tnLldpRemManAddr
-            }
-    ::= { tnLldpRemManAddrPortIndexTable 1 }
-
-TnLldpRemManAddrPortIndexEntry             ::= SEQUENCE {
-      tnLldpRemManAddrPortIndexIfSubtype   LldpManAddrIfSubtype,
-      tnLldpRemManAddrPortIndexIfId        Integer32,
-      tnLldpRemManAddrPortIndexOID         OBJECT IDENTIFIER
+TNLldpStatusMedRemoteDeviceLocInfoEntry ::= SEQUENCE {
+    tnLldpStatusMedRemoteDeviceLocInfoIfIndex     TNInterfaceIndex,
+    tnLldpStatusMedRemoteDeviceLocInfoLldpmedIndex    Integer32,
+    tnLldpStatusMedRemoteDeviceLocInfoState   TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoCounty      TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoCity    TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoDistrict    TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoBlock   TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoStreet      TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoLeadingStreetDirection      TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoTrailingStreetSuffix    TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoStreetSuffix    TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoHouseNo     TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoHouseNoSuffix   TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoLandmark    TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoAdditionalInfo      TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoName    TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoZipCode     TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoBuilding    TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoApartment   TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoFloor   TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoRoomNumber      TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoPlaceType   TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoPostalCommunityName     TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoPoBox   TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoAdditionalCode      TNDisplayString,
+    tnLldpStatusMedRemoteDeviceLocInfoCountryCode     TNDisplayString
 }
 
-tnLldpRemManAddrPortIndexIfSubtype     OBJECT-TYPE
-    SYNTAX      LldpManAddrIfSubtype
+tnLldpStatusMedRemoteDeviceLocInfoIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 1 }
+
+tnLldpStatusMedRemoteDeviceLocInfoLldpmedIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..192)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Neighbor information table entry index."
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 2 }
+
+tnLldpStatusMedRemoteDeviceLocInfoState OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
-        "The enumeration value that identifies the interface numbering
-         method used for defining the interface number, associated
-         with the remote system."
-    REFERENCE
-        "IEEE 802.1AB-2005 9.5.9.5"
-    ::= { tnLldpRemManAddrPortIndexEntry   1 }
+    DESCRIPTION 
+        "National subdivision"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 5 }
 
-tnLldpRemManAddrPortIndexIfId          OBJECT-TYPE
-    SYNTAX      Integer32
+tnLldpStatusMedRemoteDeviceLocInfoCounty OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
-        "The integer value used to identify the interface number
-        regarding the management address component associated with
-        the remote system."
-    REFERENCE
-        "IEEE 802.1AB-2005 9.5.9.6"
-    ::= { tnLldpRemManAddrPortIndexEntry   2 }
+    DESCRIPTION 
+        "County"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 6 }
 
-tnLldpRemManAddrPortIndexOID           OBJECT-TYPE
-    SYNTAX      OBJECT IDENTIFIER
+tnLldpStatusMedRemoteDeviceLocInfoCity OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
     MAX-ACCESS  read-only
     STATUS      current
+    DESCRIPTION 
+        "City"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 7 }
+
+tnLldpStatusMedRemoteDeviceLocInfoDistrict OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "City district"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 8 }
+
+tnLldpStatusMedRemoteDeviceLocInfoBlock OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Block (Neighborhood)"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 9 }
+
+tnLldpStatusMedRemoteDeviceLocInfoStreet OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Street"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 10 }
+
+tnLldpStatusMedRemoteDeviceLocInfoLeadingStreetDirection OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Street Direction"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 11 }
+
+tnLldpStatusMedRemoteDeviceLocInfoTrailingStreetSuffix OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Trailing Street Suffix"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 12 }
+
+tnLldpStatusMedRemoteDeviceLocInfoStreetSuffix OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Street Suffix"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 13 }
+
+tnLldpStatusMedRemoteDeviceLocInfoHouseNo OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "House No."
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 14 }
+
+tnLldpStatusMedRemoteDeviceLocInfoHouseNoSuffix OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "House No. Suffix"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 15 }
+
+tnLldpStatusMedRemoteDeviceLocInfoLandmark OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Landmark"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 16 }
+
+tnLldpStatusMedRemoteDeviceLocInfoAdditionalInfo OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Additional Location Info"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 17 }
+
+tnLldpStatusMedRemoteDeviceLocInfoName OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Name"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 18 }
+
+tnLldpStatusMedRemoteDeviceLocInfoZipCode OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Zip code"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 19 }
+
+tnLldpStatusMedRemoteDeviceLocInfoBuilding OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Building"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 20 }
+
+tnLldpStatusMedRemoteDeviceLocInfoApartment OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Apartment/unit"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 21 }
+
+tnLldpStatusMedRemoteDeviceLocInfoFloor OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Floor"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 22 }
+
+tnLldpStatusMedRemoteDeviceLocInfoRoomNumber OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Room Number"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 23 }
+
+tnLldpStatusMedRemoteDeviceLocInfoPlaceType OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Place type"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 24 }
+
+tnLldpStatusMedRemoteDeviceLocInfoPostalCommunityName OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Postal Community Name"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 25 }
+
+tnLldpStatusMedRemoteDeviceLocInfoPoBox OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Post Office Box"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 26 }
+
+tnLldpStatusMedRemoteDeviceLocInfoAdditionalCode OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..250))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Addination Code"
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 27 }
+
+tnLldpStatusMedRemoteDeviceLocInfoCountryCode OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..2))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The two-letter ISO 3166 country code in capital ASCII letters -
+         Example: DK, DE or US."
+    ::= { tnLldpStatusMedRemoteDeviceLocInfoEntry 28 }
+
+tnLldpStatusMedRemoteDeviceNetworkPolicyInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to show the LLDP-MED remote device (neighbor) network
+         policies information for a specific interface."
+    ::= { tnLldpStatusMed 3 }
+
+tnLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry OBJECT-TYPE
+    SYNTAX      TNLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface has a set of neighbors information"
+    INDEX       { tnLldpStatusMedRemoteDeviceNetworkPolicyInfoIfIndex, tnLldpStatusMedRemoteDeviceNetworkPolicyInfoLldpmedIndex, tnLldpStatusMedRemoteDeviceNetworkPolicyInfoLldpmedPolicy }
+    ::= { tnLldpStatusMedRemoteDeviceNetworkPolicyInfoTable 1 }
+
+TNLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry ::= SEQUENCE {
+    tnLldpStatusMedRemoteDeviceNetworkPolicyInfoIfIndex   TNInterfaceIndex,
+    tnLldpStatusMedRemoteDeviceNetworkPolicyInfoLldpmedIndex      Integer32,
+    tnLldpStatusMedRemoteDeviceNetworkPolicyInfoLldpmedPolicy     Integer32,
+    tnLldpStatusMedRemoteDeviceNetworkPolicyInfoApplicationType   TNlldpmedRemoteNetworkPolicyApplicationType,
+    tnLldpStatusMedRemoteDeviceNetworkPolicyInfoUnknownPolicy     TruthValue,
+    tnLldpStatusMedRemoteDeviceNetworkPolicyInfoTagged    TruthValue,
+    tnLldpStatusMedRemoteDeviceNetworkPolicyInfoVlanId    TNUnsigned16,
+    tnLldpStatusMedRemoteDeviceNetworkPolicyInfoL2Priority    TNUnsigned8,
+    tnLldpStatusMedRemoteDeviceNetworkPolicyInfoDscp      TNUnsigned8
+}
+
+tnLldpStatusMedRemoteDeviceNetworkPolicyInfoIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { tnLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 1 }
+
+tnLldpStatusMedRemoteDeviceNetworkPolicyInfoLldpmedIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..192)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Neighbor information table entry index."
+    ::= { tnLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 2 }
+
+tnLldpStatusMedRemoteDeviceNetworkPolicyInfoLldpmedPolicy OBJECT-TYPE
+    SYNTAX      Integer32 (0..31)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Policy index."
+    ::= { tnLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 3 }
+
+tnLldpStatusMedRemoteDeviceNetworkPolicyInfoApplicationType OBJECT-TYPE
+    SYNTAX      TNlldpmedRemoteNetworkPolicyApplicationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The LLDP policy application type."
+    ::= { tnLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 5 }
+
+tnLldpStatusMedRemoteDeviceNetworkPolicyInfoUnknownPolicy OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Policy indicates that an Endpoint Device wants to explicitly advertise
+         that the policy is required by the device. Can be either Defined or
+         Unknown
+         
+         Unknown: The network policy for the specified application type is
+         currently unknown.
+         
+         Defined: The network policy is defined (known)."
+    ::= { tnLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 6 }
+
+tnLldpStatusMedRemoteDeviceNetworkPolicyInfoTagged OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Defines if LLDP policy uses tagged VLAN."
+    ::= { tnLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 7 }
+
+tnLldpStatusMedRemoteDeviceNetworkPolicyInfoVlanId OBJECT-TYPE
+    SYNTAX      TNUnsigned16 (1..4095)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The policy VLAN ID. Only valid when policy 'Tagged' is TRUE"
+    ::= { tnLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 8 }
+
+tnLldpStatusMedRemoteDeviceNetworkPolicyInfoL2Priority OBJECT-TYPE
+    SYNTAX      TNUnsigned8 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Shows the LLDP neighbor's policy L2 priority."
+    ::= { tnLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 9 }
+
+tnLldpStatusMedRemoteDeviceNetworkPolicyInfoDscp OBJECT-TYPE
+    SYNTAX      TNUnsigned8 (0..63)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "LLDP policy DSCP."
+    ::= { tnLldpStatusMedRemoteDeviceNetworkPolicyInfoEntry 10 }
+
+tnLldpControl OBJECT IDENTIFIER
+    ::= { tnLldpMibObjects 4 }
+
+tnLldpControlStatisticsClear OBJECT IDENTIFIER
+    ::= { tnLldpControl 1 }
+
+tnLldpControlStatisticsClearTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNLldpControlStatisticsClearEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table to clear LLDP statistics for a specific interface."
+    ::= { tnLldpControlStatisticsClear 1 }
+
+tnLldpControlStatisticsClearEntry OBJECT-TYPE
+    SYNTAX      TNLldpControlStatisticsClearEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each interface has a set of statistics counters"
+    INDEX       { tnLldpControlStatisticsClearIfIndex }
+    ::= { tnLldpControlStatisticsClearTable 1 }
+
+TNLldpControlStatisticsClearEntry ::= SEQUENCE {
+    tnLldpControlStatisticsClearIfIndex   TNInterfaceIndex,
+    tnLldpControlStatisticsClearStatisticsClear   TruthValue
+}
+
+tnLldpControlStatisticsClearIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number index."
+    ::= { tnLldpControlStatisticsClearEntry 1 }
+
+tnLldpControlStatisticsClearStatisticsClear OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Set to TRUE to clear the LLDP statistics of an interface."
+    ::= { tnLldpControlStatisticsClearEntry 2 }
+
+tnLldpControlStatisticsClearGlobal OBJECT IDENTIFIER
+    ::= { tnLldpControlStatisticsClear 2 }
+
+tnLldpControlStatisticsClearGlobalClear OBJECT-TYPE
+    SYNTAX      TNUnsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Clear LLDP global counters."
+    ::= { tnLldpControlStatisticsClearGlobal 1 }
+
+tnLldpMibConformance OBJECT IDENTIFIER
+    ::= { tnLldpMib 2 }
+
+tnLldpMibCompliances OBJECT IDENTIFIER
+    ::= { tnLldpMibConformance 1 }
+
+tnLldpMibGroups OBJECT IDENTIFIER
+    ::= { tnLldpMibConformance 2 }
+
+tnLldpConfigGlobalInfoGroup OBJECT-GROUP
+    OBJECTS     { tnLldpConfigGlobalReInitDelay, tnLldpConfigGlobalMsgTxHold, 
+                  tnLldpConfigGlobalMsgTxInterval, tnLldpConfigGlobalTxDelay }
+    STATUS      current
     DESCRIPTION
-        "The OID value used to identify the type of hardware component
-         or protocol entity associated with the management address
-         advertised by the remote system agent."
-    REFERENCE
-        "IEEE 802.1AB-2005 9.5.9.8"
-    ::= { tnLldpRemManAddrPortIndexEntry   3 }
+        "A collection of objects suitable for bulk operations."
+    ::= { tnLldpMibGroups 1 }
 
+tnLldpConfigInfoGroup OBJECT-GROUP
+    OBJECTS     { tnLldpConfigAdminState, tnLldpConfigCdpAware, 
+                  tnLldpConfigOptionalTlvs }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnLldpMibGroups 2 }
 
--- %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
---
---   TN-LLDP-MIB Conformance
---
+tnLldpConfigMedInfoGroup OBJECT-GROUP
+    OBJECTS     { tnLldpConfigMedOptionalTlvs, tnLldpConfigMedDeviceType }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnLldpMibGroups 3 }
 
--- tnLldpCompliances             OBJECT IDENTIFIER ::= { tnLldpConformance  1 }
--- tnLldpGroups                  OBJECT IDENTIFIER ::= { tnLldpConformance  2 }
---
--- tnLldpCompliance              MODULE-COMPLIANCE
---     STATUS      current
---     DESCRIPTION
---         "The compliance statement for SNMP entities which implement the LLDP MIB."
---     MODULE this module
---         MANDATORY-GROUPS {
---             tnLldpConfigGroup,
---             tnLldpStatsRxGroup,
---             tnLldpStatsTxGroup,
---             tnLldpLocSysGroup,
---             tnLldpRemSysGroup,
---             tnLldpRemManAddrGroup
---         }
---     ::= { tnLldpCompliances   1 }
---
---
--- MIB groupings
---
--- tnLldpConfigGroup             OBJECT-GROUP
---     OBJECTS {
---         tnLldpTxCreditMax,
---         tnLldpMessageFastTx,
---         tnLldpMessageFastTxInit,
---         tnLldpAdminStatus,
---         tnLldpPortCfgAdminStatus,
---         tnLldpPortCfgNotifyEnable,
---         tnLldpPortCfgTLVsTxEnable,
---         tnLldpPortCfgManAddrTxEnabled,
---         tnLldpPortCfgManAddrSubtype,
---         tnLldpPortCfgManAddress,
---         tnLldpDestMacAddress
---     }
---     STATUS      current
---     DESCRIPTION
---         "The collection of objects which are used to configure the LLDP
---          implementation behavior.
---
---          This group is mandatory for agents which implement the LLDP."
---     ::= { tnLldpGroups   1 }
---
--- tnLldpStatsRxGroup            OBJECT-GROUP
---     OBJECTS {
---         tnLldpStatsRxPortFrameDiscard,
---         tnLldpStatsRxPortFrameErrs,
---         tnLldpStatsRxPortFrames,
---         tnLldpStatsRxPortTLVDiscard,
---         tnLldpStatsRxPortTLVUnknown,
---         tnLldpStatsRxPortAgeouts,
---         tnLldpStatsRxPortTtl
---     }
---     STATUS      current
---     DESCRIPTION
---         "The collection of objects which are used to represent LLDP
---          reception statistics.
---
---          This group is mandatory for agents which implement the LLDP
---          and have the capability of receiving LLDP frames."
---     ::= { tnLldpGroups   2 }
---
--- tnLldpStatsTxGroup            OBJECT-GROUP
---     OBJECTS {
---         tnLldpStatsTxPortFrames,
---         tnLldpStatsTxLLDPDULengthErrs
---     }
---     STATUS      current
---     DESCRIPTION
---         "The collection of objects which are used to represent LLDP
---          transmission statistics.
---
---          This group is mandatory for agents which implement the LLDP
---          and have the capability of transmitting LLDP frames."
---     ::= { tnLldpGroups   3 }
---
--- tnLldpLocSysGroup             OBJECT-GROUP
---     OBJECTS {
---         tnLldpLocPortIdSubtype,
---         tnLldpLocPortId,
---         tnLldpLocPortDesc
---     }
---     STATUS      current
---     DESCRIPTION
---             "The collection of objects which are used to represent LLDP
---             Local System Information.
---
---             This group is mandatory for agents which implement the LLDP
---             and have the capability of transmitting LLDP frames."
---     ::= { tnLldpGroups   4 }
---
--- tnLldpRemSysGroup             OBJECT-GROUP
---     OBJECTS {
---         tnLldpRemChassisIdSubtype,
---         tnLldpRemChassisId,
---         tnLldpRemPortIdSubtype,
---         tnLldpRemPortId,
---         tnLldpRemPortDesc,
---         tnLldpRemSysName,
---         tnLldpRemSysDesc,
---         tnLldpRemSysCapSupported,
---         tnLldpRemSysCapEnabled
---
---     }
---     STATUS      current
---     DESCRIPTION
---         "The collection of objects which are used to represent
---          LLDP Remote Systems Information. The objects represent the
---          information associated with the basic TLV set. Please note
---          that even the agent doesn't implement some of the optional
---          TLVs, it shall recognize all the optional TLV information
---          that the remote system may advertise.
---
---          This group is mandatory for agents which implement the LLDP
---          and have the capability of receiving LLDP frames."
---     ::= { tnLldpGroups   5 }
---
--- tnLldpRemManAddrGroup          OBJECT-GROUP
---     OBJECTS {
---         tnLldpRemManAddrIfSubtype,
---         tnLldpRemManAddrIfId,
---         tnLldpRemManAddrOID
---     }
---     STATUS      current
---     DESCRIPTION
---         "The collection of objects which are used to represent LLDP
---          Remote management address information.
---
---          This group is mandatory for agents which implement the LLDP
---          and have the capability of receiving LLDP frames."
---     ::= { tnLldpGroups   6 }
---
--- tnLldpRemPortIndexGroup          OBJECT-GROUP
---     OBJECTS {
---         tnLldpRemPortIndexChassisIdSubtype,
---         tnLldpRemPortIndexChassisId,
---         tnLldpRemPortIndexPortIdSubtype,
---         tnLldpRemPortIndexPortId
---         tnLldpRemPortIndexPortDesc
---         tnLldpRemPortIndexSysName
---         tnLldpRemPortIndexSysDesc
---         tnLldpRemPortIndexSysCapSupported
---         tnLldpRemPortIndexSysCapEnabled
---     }
---     STATUS      current
---     DESCRIPTION
---         "The collection of objects which are used to represent LLDP
---          Remote Port information.
---
---          This group is mandatory for agents which implement the LLDP
---          and have the capability of receiving LLDP frames."
---     ::= { tnLldpGroups   7 }
---
--- tnLldpRemManAddrPortIndexGroup          OBJECT-GROUP
---     OBJECTS {
---         tnLldpRemManAddrPortIndexIfSubtype,
---         tnLldpRemManAddrPortIndexIfId,
---         tnLldpRemManAddrPortIndexOID
---     }
---     STATUS      current
---     DESCRIPTION
---         "The collection of objects which are used to represent LLDP
---          Remote Mandatory Port information.
---
---          This group is mandatory for agents which implement the LLDP
---          and have the capability of receiving LLDP frames."
---     ::= { tnLldpGroups   8 }
+tnLldpConfigMedPolicyInfoGroup OBJECT-GROUP
+    OBJECTS     { tnLldpConfigMedPolicyApplicationType, 
+                  tnLldpConfigMedPolicyTagged, tnLldpConfigMedPolicyVlanId, 
+                  tnLldpConfigMedPolicyL2Priority, tnLldpConfigMedPolicyDscp, 
+                  tnLldpConfigMedPolicyAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnLldpMibGroups 4 }
+
+tnLldpConfigMedPolicyListInfoGroup OBJECT-GROUP
+    OBJECTS     { tnLldpConfigMedPolicyListLldpmedPoliciesList }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnLldpMibGroups 5 }
+
+tnLldpConfigMedGlobalInfoGroup OBJECT-GROUP
+    OBJECTS     { tnLldpConfigMedGlobalFastRepeatCount, 
+                  tnLldpConfigMedGlobalLatitude, 
+                  tnLldpConfigMedGlobalLongitude, 
+                  tnLldpConfigMedGlobalAltitudeType, 
+                  tnLldpConfigMedGlobalAltitude, 
+                  tnLldpConfigMedGlobalElinAddr, tnLldpConfigMedGlobalDatum, 
+                  tnLldpConfigMedGlobalCountryCode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnLldpMibGroups 6 }
+
+tnLldpConfigMedLocationInformationInfoGroup OBJECT-GROUP
+    OBJECTS     { tnLldpConfigMedLocationInformationCivicAddress }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnLldpMibGroups 7 }
+
+tnLldpConfigMedPolicyRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { tnLldpConfigMedPolicyRowEditorLldpmedPolicy, 
+                  tnLldpConfigMedPolicyRowEditorApplicationType, 
+                  tnLldpConfigMedPolicyRowEditorTagged, 
+                  tnLldpConfigMedPolicyRowEditorVlanId, 
+                  tnLldpConfigMedPolicyRowEditorL2Priority, 
+                  tnLldpConfigMedPolicyRowEditorDscp, 
+                  tnLldpConfigMedPolicyRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnLldpMibGroups 8 }
+
+tnLldpStatusStatisticsGlobalCountersInfoGroup OBJECT-GROUP
+    OBJECTS     { tnLldpStatusStatisticsGlobalCountersTableInserts, 
+                  tnLldpStatusStatisticsGlobalCountersTableDeletes, 
+                  tnLldpStatusStatisticsGlobalCountersTableDrops, 
+                  tnLldpStatusStatisticsGlobalCountersTableAgeOuts, 
+                  tnLldpStatusStatisticsGlobalCountersLastChangeTime }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnLldpMibGroups 9 }
+
+tnLldpStatusStatisticsTableInfoGroup OBJECT-GROUP
+    OBJECTS     { tnLldpStatusStatisticsTxTotal, 
+                  tnLldpStatusStatisticsRxTotal, 
+                  tnLldpStatusStatisticsRxError, 
+                  tnLldpStatusStatisticsRxDiscarded, 
+                  tnLldpStatusStatisticsTLVsDiscarded, 
+                  tnLldpStatusStatisticsTLVsUnrecognized, 
+                  tnLldpStatusStatisticsTLVsOrgDiscarded, 
+                  tnLldpStatusStatisticsAgeOuts }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnLldpMibGroups 10 }
+
+tnLldpStatusNeighborsInformationInfoGroup OBJECT-GROUP
+    OBJECTS     { tnLldpStatusNeighborsInformationChassisId, 
+                  tnLldpStatusNeighborsInformationPortId, 
+                  tnLldpStatusNeighborsInformationPortDescription, 
+                  tnLldpStatusNeighborsInformationSystemName, 
+                  tnLldpStatusNeighborsInformationSystemDescription, 
+                  tnLldpStatusNeighborsInformationSystemCapabilities, 
+                  tnLldpStatusNeighborsInformationSystemCapabilitiesEnable }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnLldpMibGroups 11 }
+
+tnLldpStatusNeighborsMgmtInformationInfoGroup OBJECT-GROUP
+    OBJECTS     { 
+                  tnLldpStatusNeighborsMgmtInformationSystemMgmAddressSubtype, 
+                  tnLldpStatusNeighborsMgmtInformationSystemMgmtAddress, 
+                  tnLldpStatusNeighborsMgmtInformationSystemMgmtInterfaceSubtype, 
+                  tnLldpStatusNeighborsMgmtInformationSystemMgmtInterface, 
+                  tnLldpStatusNeighborsMgmtInformationSystemMgmtOid }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnLldpMibGroups 12 }
+
+tnLldpStatusMedRemoteDeviceInfoInfoGroup OBJECT-GROUP
+    OBJECTS     { tnLldpStatusMedRemoteDeviceInfoCapabilities, 
+                  tnLldpStatusMedRemoteDeviceInfoCapabilitiesEnabled, 
+                  tnLldpStatusMedRemoteDeviceInfoLatitude, 
+                  tnLldpStatusMedRemoteDeviceInfoLongitude, 
+                  tnLldpStatusMedRemoteDeviceInfoAltitudeType, 
+                  tnLldpStatusMedRemoteDeviceInfoAltitude, 
+                  tnLldpStatusMedRemoteDeviceInfoDatum, 
+                  tnLldpStatusMedRemoteDeviceInfoElinaddr, 
+                  tnLldpStatusMedRemoteDeviceInfoDeviceType, 
+                  tnLldpStatusMedRemoteDeviceInfoHwRev, 
+                  tnLldpStatusMedRemoteDeviceInfoFwRev, 
+                  tnLldpStatusMedRemoteDeviceInfoSwRev, 
+                  tnLldpStatusMedRemoteDeviceInfoSerialNo, 
+                  tnLldpStatusMedRemoteDeviceInfoManufacturerName, 
+                  tnLldpStatusMedRemoteDeviceInfoModelName, 
+                  tnLldpStatusMedRemoteDeviceInfoAssetId, 
+                  tnLldpStatusMedRemoteDeviceInfoEeeRxTwSys, 
+                  tnLldpStatusMedRemoteDeviceInfoEeeTxTwSys, 
+                  tnLldpStatusMedRemoteDeviceInfoEeeFbTwSys, 
+                  tnLldpStatusMedRemoteDeviceInfoEeeTxTwSysEcho, 
+                  tnLldpStatusMedRemoteDeviceInfoEeeRxTwSysEcho }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnLldpMibGroups 13 }
+
+tnLldpStatusMedRemoteDeviceLocInfoInfoGroup OBJECT-GROUP
+    OBJECTS     { tnLldpStatusMedRemoteDeviceLocInfoState, 
+                  tnLldpStatusMedRemoteDeviceLocInfoCounty, 
+                  tnLldpStatusMedRemoteDeviceLocInfoCity, 
+                  tnLldpStatusMedRemoteDeviceLocInfoDistrict, 
+                  tnLldpStatusMedRemoteDeviceLocInfoBlock, 
+                  tnLldpStatusMedRemoteDeviceLocInfoStreet, 
+                  tnLldpStatusMedRemoteDeviceLocInfoLeadingStreetDirection, 
+                  tnLldpStatusMedRemoteDeviceLocInfoTrailingStreetSuffix, 
+                  tnLldpStatusMedRemoteDeviceLocInfoStreetSuffix, 
+                  tnLldpStatusMedRemoteDeviceLocInfoHouseNo, 
+                  tnLldpStatusMedRemoteDeviceLocInfoHouseNoSuffix, 
+                  tnLldpStatusMedRemoteDeviceLocInfoLandmark, 
+                  tnLldpStatusMedRemoteDeviceLocInfoAdditionalInfo, 
+                  tnLldpStatusMedRemoteDeviceLocInfoName, 
+                  tnLldpStatusMedRemoteDeviceLocInfoZipCode, 
+                  tnLldpStatusMedRemoteDeviceLocInfoBuilding, 
+                  tnLldpStatusMedRemoteDeviceLocInfoApartment, 
+                  tnLldpStatusMedRemoteDeviceLocInfoFloor, 
+                  tnLldpStatusMedRemoteDeviceLocInfoRoomNumber, 
+                  tnLldpStatusMedRemoteDeviceLocInfoPlaceType, 
+                  tnLldpStatusMedRemoteDeviceLocInfoPostalCommunityName, 
+                  tnLldpStatusMedRemoteDeviceLocInfoPoBox, 
+                  tnLldpStatusMedRemoteDeviceLocInfoAdditionalCode, 
+                  tnLldpStatusMedRemoteDeviceLocInfoCountryCode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnLldpMibGroups 14 }
+
+tnLldpStatusMedRemoteDeviceNetworkPolicyInfoInfoGroup OBJECT-GROUP
+    OBJECTS     { 
+                  tnLldpStatusMedRemoteDeviceNetworkPolicyInfoApplicationType, 
+                  tnLldpStatusMedRemoteDeviceNetworkPolicyInfoUnknownPolicy, 
+                  tnLldpStatusMedRemoteDeviceNetworkPolicyInfoTagged, 
+                  tnLldpStatusMedRemoteDeviceNetworkPolicyInfoVlanId, 
+                  tnLldpStatusMedRemoteDeviceNetworkPolicyInfoL2Priority, 
+                  tnLldpStatusMedRemoteDeviceNetworkPolicyInfoDscp }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnLldpMibGroups 15 }
+
+tnLldpControlStatisticsClearTableInfoGroup OBJECT-GROUP
+    OBJECTS     { tnLldpControlStatisticsClearStatisticsClear }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnLldpMibGroups 16 }
+
+tnLldpControlStatisticsClearGlobalInfoGroup OBJECT-GROUP
+    OBJECTS     { tnLldpControlStatisticsClearGlobalClear }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnLldpMibGroups 17 }
+
+tnLldpMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { tnLldpConfigGlobalInfoGroup, 
+                  tnLldpConfigInfoGroup, tnLldpConfigMedInfoGroup, 
+                  tnLldpConfigMedPolicyInfoGroup, 
+                  tnLldpConfigMedPolicyListInfoGroup, 
+                  tnLldpConfigMedGlobalInfoGroup, 
+                  tnLldpConfigMedLocationInformationInfoGroup, 
+                  tnLldpConfigMedPolicyRowEditorInfoGroup, 
+                  tnLldpStatusStatisticsGlobalCountersInfoGroup, 
+                  tnLldpStatusStatisticsTableInfoGroup, 
+                  tnLldpStatusNeighborsInformationInfoGroup, 
+                  tnLldpStatusNeighborsMgmtInformationInfoGroup, 
+                  tnLldpStatusMedRemoteDeviceInfoInfoGroup, 
+                  tnLldpStatusMedRemoteDeviceLocInfoInfoGroup, 
+                  tnLldpStatusMedRemoteDeviceNetworkPolicyInfoInfoGroup, 
+                  tnLldpControlStatisticsClearTableInfoGroup, 
+                  tnLldpControlStatisticsClearGlobalInfoGroup }
+
+    ::= { tnLldpMibCompliances 1 }
+
 END
