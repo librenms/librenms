@@ -28,6 +28,7 @@ namespace App\Models;
 
 use App\Models\Traits\Filterable;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Auth;
@@ -44,23 +45,66 @@ class Eventlog extends DeviceRelatedModel
     protected $fillable = ['datetime', 'device_id', 'message', 'type', 'reference', 'username', 'severity'];
 
     /** @var string[] */
-    protected array $filterable = ['device_id', 'type'];
+    protected array $filterable = ['device_id', 'type', 'port', 'search'];
 
     /**
-     * @param  bool  $withDevice  offer the device filter, leave it out on device pages
-     * @return array<array{key: string, label: string, type: string, endpoint?: string, params?: array<string, string>}>
+     * @param  Device|null  $device  limit the port choices to this device and leave out the device filter
+     * @return array<array{key: string, label: string, type: string, search?: bool, endpoint?: string, params?: array<string, string|int>}>
      */
-    public static function filterFieldDefinitions(bool $withDevice = true): array
+    public static function filterFieldDefinitions(?Device $device = null): array
     {
         $fields = [
+            ['key' => 'search', 'label' => __('Message'), 'type' => 'text', 'search' => true],
             ['key' => 'type', 'label' => __('Type'), 'type' => 'select', 'endpoint' => route('ajax.select.eventlog'), 'params' => ['field' => 'type']],
+            ['key' => 'port', 'label' => __('Port'), 'type' => 'select', 'endpoint' => route('ajax.select.port'), 'params' => $device ? ['device' => $device->device_id] : []],
         ];
 
-        if ($withDevice) {
+        if ($device === null) {
             $fields[] = ['key' => 'device_id', 'label' => __('Device'), 'type' => 'select', 'endpoint' => route('ajax.select.device')];
         }
 
         return $fields;
+    }
+
+    /**
+     * Match the message, or the label of the port of interface events
+     *
+     * @param  Builder<static>  $query
+     * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
+     */
+    public function filterSearch(Builder $query, mixed $value, array $config): void
+    {
+        $positive = ['not' => false] + $config;
+
+        // empty checks only apply to the message
+        $ports = isset($config['operator']) ? Port::query()->select('port_id')->where(function (Builder $query) use ($value, $config): void {
+            $pattern = isset($config['wildcard']) ? str_replace('?', (string) $value, $config['wildcard']) : $value;
+            foreach (['ifName', 'ifAlias', 'ifDescr'] as $column) {
+                $query->orWhere($column, $config['operator'], $pattern);
+            }
+        }) : null;
+
+        $match = fn (Builder $query) => $query
+            ->where(fn (Builder $query) => $this->applyQueryLogic($query, $this->qualifyColumn('message'), $value, $positive))
+            ->when($ports, fn (Builder $query, $ports) => $query->orWhere(fn (Builder $query) => $query->where('eventlog.type', 'interface')->whereIn('eventlog.reference', $ports)));
+
+        ($config['not'] ?? false) ? $query->whereNot($match) : $query->where($match);
+    }
+
+    /**
+     * Interface events of the port
+     *
+     * @param  Builder<static>  $query
+     * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
+     */
+    public function filterPort(Builder $query, mixed $value, array $config): void
+    {
+        $positive = ['not' => false] + $config;
+        $match = fn (Builder $query) => $query
+            ->where('eventlog.type', 'interface')
+            ->where(fn (Builder $query) => $this->applyQueryLogic($query, 'eventlog.reference', $value, $positive));
+
+        ($config['not'] ?? false) ? $query->whereNot($match) : $query->where($match);
     }
 
     /**

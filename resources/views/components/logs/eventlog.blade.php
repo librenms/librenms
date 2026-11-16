@@ -3,7 +3,6 @@
     'filterName',
     'filter' => [],
     'filterFields' => [],
-    'port' => null,
 ])
 
 <x-panel title="{{ __('Eventlog') }}">
@@ -25,15 +24,7 @@
 </x-panel>
 
 <template id="eventlog-filter">
-    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-        <x-filter :name="$filterName" :fields="$filterFields" :initial="$filter" />
-        @if($port)
-            <span>
-                {{ __('Port') }}: {{ $port->getLabel() }}
-                <a href="{{ request()->fullUrlWithoutQuery('port') }}" title="{{ __('Clear port filter') }}">&times;</a>
-            </span>
-        @endif
-    </div>
+    <x-filter :name="$filterName" :fields="$filterFields" :initial="$filter" />
 </template>
 
 @push('scripts')
@@ -45,12 +36,12 @@
             ajax: true,
             rowCount: [50, 100, 250, -1],
             templates: {
-                header: "<div id=\"@{{ctx.id}}\" class=\"@{{css.header}}\"><div class=\"eventlog-actionbar tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2\"><p class=\"@{{css.search}}\"></p><p class=\"@{{css.actions}}\"></p></div></div>"
+                header: "<div id=\"@{{ctx.id}}\" class=\"@{{css.header}}\"><div class=\"eventlog-actionbar tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2\"><p class=\"@{{css.actions}}\"></p></div></div>",
+                search: "" // replaced by the filter bar
             },
             post: function () {
                 return {
                     device: @js($device?->device_id),
-                    port: @js($port?->port_id),
                     filter: filter,
                 };
             }

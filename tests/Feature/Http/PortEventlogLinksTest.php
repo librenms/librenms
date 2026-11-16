@@ -143,17 +143,38 @@ class PortEventlogLinksTest extends TestCase
             ->assertJsonPath('rows.0.message', 'port event');
     }
 
-    public function testEventlogPageShowsPortLabelAndPortPassThrough(): void
+    public function testPortLinksBecomeAPortFilter(): void
     {
         $device = Device::factory()->create();
-        $port = Port::factory()->for($device)->create(['ifName' => 'GigabitEthernet0/1', 'ifDescr' => 'GigabitEthernet0/1', 'ifOperStatus' => 'up']);
+        $port = Port::factory()->for($device)->create();
 
-        $response = $this->actingAs($this->admin())
-            ->get(route('device.eventlog', ['device' => $device->device_id, 'port' => $port->port_id]));
-        $response->assertOk()
-            ->assertSee('GigabitEthernet0', false)
-            ->assertSee('Clear port filter', false)
-            ->assertSee('port: ' . $port->port_id, false);
+        $this->actingAs($this->admin())
+            ->get(route('device.eventlog', ['device' => $device->device_id, 'port' => $port->port_id]))
+            ->assertOk()
+            ->assertSee((string) \Illuminate\Support\Js::from(['port' => ['eq' => $port->port_id]]), false);
+    }
+
+    public function testFilterBarPortAndSearch(): void
+    {
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create(['ifName' => 'uplink-port', 'ifDescr' => 'uplink-port', 'ifAlias' => '']);
+        Eventlog::factory()->create(['device_id' => $device->device_id, 'type' => 'interface', 'reference' => $port->port_id, 'message' => 'ifSpeed changed']);
+        Eventlog::factory()->create(['device_id' => $device->device_id, 'type' => 'system', 'reference' => $port->port_id, 'message' => 'not a port event']);
+        Eventlog::factory()->create(['device_id' => $device->device_id, 'type' => 'system', 'message' => 'uplink-port mentioned']);
+
+        $post = fn (array $filter) => $this->actingAs($this->admin())->postJson(route('table.eventlog'), [
+            'current' => 1,
+            'rowCount' => 50,
+            'device' => $device->device_id,
+            'filter' => $filter,
+        ])->assertOk()->json('rows.*.message');
+
+        $this->assertSame(['ifSpeed changed'], $post(['port' => ['eq' => $port->port_id]]));
+        $this->assertEqualsCanonicalizing(['ifSpeed changed', 'uplink-port mentioned'], $post(['search' => ['contains' => 'uplink']]));
+        $excluded = $post(['search' => ['not_contains' => 'uplink']]);
+        $this->assertContains('not a port event', $excluded);
+        $this->assertNotContains('ifSpeed changed', $excluded);
+        $this->assertNotContains('uplink-port mentioned', $excluded);
     }
 
     public function testEventlogPageEscapesHtmlInPortLabel(): void
@@ -167,6 +188,5 @@ class PortEventlogLinksTest extends TestCase
             ->getContent();
 
         $this->assertStringNotContainsString('<b>bold</b>', $html);
-        $this->assertStringContainsString('evil &lt;b&gt;bold&lt;/b&gt;', $html);
     }
 }

@@ -46,9 +46,9 @@ class EventlogController extends Controller
 
         return view('device.tabs.logs.eventlog', [
             'device' => $device,
-            'filter' => $request->array('filter'),
-            'filterFields' => Eventlog::filterFieldDefinitions(withDevice: false),
-            'port' => $request->filled('port') ? $device->ports()->find($request->integer('port')) : null,
+            // port links from the ports pages
+            'filter' => $request->filled('port') ? ['port' => ['eq' => $request->integer('port')]] : $request->array('filter'),
+            'filterFields' => Eventlog::filterFieldDefinitions($device),
         ]);
     }
 }
