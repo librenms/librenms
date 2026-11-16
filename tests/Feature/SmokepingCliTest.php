@@ -27,6 +27,7 @@
 namespace LibreNMS\Tests\Feature;
 
 use App\Console\Commands\SmokepingGenerateCommand;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -114,6 +115,9 @@ final class SmokepingCliTest extends DBTestCase
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate --probes --targets --no-header'));
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate --probes --targets --single-process'));
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate --probes --targets'));
+        $this->assertNotEquals(0, \Artisan::call('smokeping:generate --slaves --targets'));
+        $this->assertNotEquals(0, \Artisan::call('smokeping:generate --slaves --probes'));
+        $this->assertNotEquals(0, \Artisan::call('smokeping:generate --slaves --compat'));
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate --no-header'));
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate --single-process'));
         $this->assertNotEquals(0, \Artisan::call('smokeping:generate'));
@@ -458,6 +462,107 @@ final class SmokepingCliTest extends DBTestCase
 
         $this->assertMatchesRegularExpression('/\+\+ v4only_example_com\n.*\n.*\n   probe = lnmsFPing-\d+\n/', $output);
         $this->assertMatchesRegularExpression('/\+\+ v6only_example_com\n.*\n.*\n   probe = lnmsFPing6-\d+\n/', $output);
+    }
+
+    public function testBuildSlaves(): void
+    {
+        $saved = [
+            'secrets = /etc/smokeping/qL3vB8xkTe.conf',
+            '',
+            '+ probe1_example_org',
+            '  display_name = probe1.example.org',
+            '  color = e6194b',
+            '',
+            '+ 10_0_0_9',
+            '  display_name = 10.0.0.9',
+            '  color = 3cb44b',
+            '',
+            '+ site_b',
+            '  display_name = site b',
+            '  color = 4363d8',
+            '',
+        ];
+
+        $output = $this->instance->buildSlaves(['probe1.example.org', '10.0.0.9', ' ', 'site b'], '/etc/smokeping/qL3vB8xkTe.conf');
+
+        $this->assertEquals(implode(PHP_EOL, $saved), implode(PHP_EOL, $output));
+        $this->assertEmpty($this->instance->buildSlaves([], '/etc/smokeping/qL3vB8xkTe.conf'));
+        $this->assertEmpty($this->instance->buildSlaves(null, '/etc/smokeping/qL3vB8xkTe.conf'));
+    }
+
+    public function testSlaveColors(): void
+    {
+        $palette = SmokepingGenerateCommand::SLAVECOLORS;
+        $slaves = array_map(fn (int $i): string => "probe$i.example.org", range(0, count($palette) + 1));
+
+        $output = $this->instance->buildSlaves($slaves, '/etc/smokeping/qL3vB8xkTe.conf');
+        $colors = array_values(array_filter($output, fn (string $line): bool => str_starts_with($line, '  color = ')));
+
+        // smokeping requires a colour for every slave and only accepts lowercase rrggbb
+        $this->assertCount(count($slaves), $colors);
+        foreach ($colors as $line) {
+            $this->assertMatchesRegularExpression('/^  color = [0-9a-f]{6}$/', $line);
+        }
+
+        // the palette wraps around, and the same list always gets the same colours
+        $this->assertSame('  color = ' . $palette[0], $colors[0]);
+        $this->assertSame($colors[0], $colors[count($palette)]);
+        $this->assertSame($colors[1], $colors[count($palette) + 1]);
+        $this->assertSame($output, $this->instance->buildSlaves($slaves, '/etc/smokeping/qL3vB8xkTe.conf'));
+    }
+
+    public function testTargetsInheritSlaves(): void
+    {
+        LibrenmsConfig::set('smokeping.slaves', ['Cl09bZU4sn', 'probe1.example.org']);
+
+        $saved = [
+            '+ 4diY0pWFik',
+            '  menu = 4diY0pWFik',
+            '  title = 4diY0pWFik',
+            '  slaves = Cl09bZU4sn probe1_example_org',
+            '',
+            '++ example_org',
+            '   menu = example.org',
+            '   title = example.org',
+            '   host = example.org',
+            '',
+            '+ Le23HKVMvN',
+            '  menu = Le23HKVMvN',
+            '  title = Le23HKVMvN',
+            '  slaves = Cl09bZU4sn probe1_example_org',
+            '',
+            '++ Cl09bZU4sn',
+            '   menu = Cl09bZU4sn',
+            '   title = Cl09bZU4sn',
+            '   slaves =',
+            '   host = Cl09bZU4sn',
+            '',
+        ];
+
+        $groups = [
+            '4diY0pWFik' => ['example.org' => $this->groups['4diY0pWFik']['example.org']],
+            'Le23HKVMvN' => ['Cl09bZU4sn' => $this->groups['Le23HKVMvN']['Cl09bZU4sn']],
+        ];
+
+        $output = $this->instance->buildTargets($groups, 4, true);
+
+        $this->assertEquals(implode(PHP_EOL, $saved), implode(PHP_EOL, $output));
+    }
+
+    public function testSlavesCommand(): void
+    {
+        $this->assertNotEquals(0, \Artisan::call('smokeping:generate --slaves'));
+        $this->assertStringContainsString(__('commands.smokeping:generate.no-slaves'), \Artisan::output());
+
+        LibrenmsConfig::set('smokeping.slaves', ['probe1.example.org']);
+
+        $this->assertEquals(0, \Artisan::call('smokeping:generate --slaves --no-header'));
+        $output = \Artisan::output();
+
+        $this->assertStringContainsString('secrets = /etc/smokeping/slavesecrets.conf', $output);
+        $this->assertStringContainsString('+ probe1_example_org', $output);
+        $this->assertStringContainsString('  display_name = probe1.example.org', $output);
+        $this->assertStringContainsString('  color = e6194b', $output);
     }
 
     public function legacyAlgo($data)

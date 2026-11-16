@@ -394,6 +394,85 @@ Then add the `auth_basic` parameters to your config
         }
 ```
 
+## Remote Probes (Master/Slave) - Optional
+
+Smokeping can measure latency from other locations using
+[slaves](https://oss.oetiker.ch/smokeping/doc/smokeping_master_slave.en.html).
+A slave fetches its targets from the master's `smokeping.cgi`, probes them,
+and posts the results back. The master stores them in `Target~Slave.rrd`
+next to its own results, and LibreNMS shows them on the Latency tab.
+
+List the names your slaves report to the master. Any name works, but if it
+matches the hostname of a device in LibreNMS you also get a graph per slave
+on each target, and an "out" tab on the slave device. The "out" tab only
+lists targets with the same device type as the slave, since LibreNMS looks
+for a device's files in the directory of its own type.
+
+Matching a slave to a device needs `smokeping.integration` set to `true`.
+LibreNMS turns every underscore in the RRD file name back into a dot, so a
+slave whose name contains an underscore or a space is never matched to a
+device. The same goes for target hostnames.
+
+!!! setting "external/smokeping"
+    ```bash
+    lnms config:set smokeping.slaves '["probe1.example.org", "probe2.example.org"]'
+    lnms config:set smokeping.slave_secrets '/etc/smokeping/slavesecrets.conf'
+    ```
+
+Generate the slave list alongside the probes and targets, for example in
+the cron script:
+
+```
+sudo -u librenms /opt/librenms/lnms smokeping:generate --slaves > /etc/smokeping/config.d/librenms-slaves.conf
+```
+
+Include it in the `*** Slaves ***` stanza, which needs to come before
+`*** Targets ***`:
+
+```
+*** Slaves ***
+
+@include /etc/smokeping/config.d/librenms-slaves.conf
+```
+
+Once slaves are configured, `--targets` adds `slaves = ...` to every device
+group, so each slave probes every target. A device that is itself a slave
+gets an empty `slaves =`, so it does not probe itself.
+
+Each slave gets a `color` for the graphs that combine several slaves. They
+come from a fixed list in the order of `smokeping.slaves`, and repeat after
+eight slaves.
+
+`slavesecrets.conf` holds one `name:secret` per line. The name is the
+section name from the generated file: dots and spaces become underscores,
+the same as target names.
+
+The master checks the secret and stores the results a slave sends in the
+smokeping CGI, not in the smokeping daemon. So the secrets file has to be
+readable by the user the CGI runs as (`www-data` with Apache or fcgiwrap on
+Debian, the `User` of the fcgiwrap service above on RHEL), for example
+owned by `smokeping:www-data` with mode `640`. It must not be world-readable
+or smokeping refuses to load its configuration. That user also needs write
+access to smokeping's `dyndir` (`datadir` if `dyndir` is not set), which is
+where the results wait for the daemon to pick them up. The Debian package
+already sets `dyndir` up this way.
+
+Start each slave with its name and its own secret. `--master-url` is the URL
+of the smokeping CGI: `https://yourlibrenms/smokeping/` with the Nginx
+configuration above, `http://yourlibrenms/cgi-bin/smokeping.cgi` with Apache.
+
+```bash
+smokeping --master-url=https://yourlibrenms/smokeping/ \
+          --slave-name=probe1_example_org \
+          --shared-secret=/etc/smokeping/secret.txt \
+          --cache-dir=/var/lib/smokeping/
+```
+
+Slaves use the master's probe configuration, so `fping` must be at the same
+path on each slave (or use an `override` section on the slave). A slave
+can't log in through HTTP authentication, so leave the master URL
+reachable for it if you protect the web UI.
+
 ## Common Problems
 
 ### RRDs::update ERROR: opening ... Permission denied
