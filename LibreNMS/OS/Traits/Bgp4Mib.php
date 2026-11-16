@@ -113,14 +113,17 @@ trait Bgp4Mib
 
     /**
      * Walk the columns of a table, rows are keyed by numeric index and hold the values by model column.
-     * The first column is walked alone, so devices without the table only cost a single walk.
+     * Every column is a separate walk, the first one alone, so devices without the table only cost a single walk.
+     * With $entry the whole table entry is walked once instead, which is cheaper when most columns are needed
+     * and the table is walked in many contexts.
      *
      * @param  array<string, string>  $columns  model column to table column
+     * @param  string|null  $entry  table entry that holds all the columns
      * @return array<string, array<string, string>>
      */
-    protected function walkBgpTable(string $context, string $mib, array $columns): array
+    protected function walkBgpTable(string $context, string $mib, array $columns, ?string $entry = null): array
     {
-        $oids = array_map(fn (string $column) => "$mib::$column", array_values(array_unique($columns)));
+        $oids = $entry === null ? array_map(fn (string $column) => "$mib::$column", array_values(array_unique($columns))) : ["$mib::$entry"];
         $first = SnmpQuery::context($context)->hideMib()->enumStrings()->numericIndex()->walk(array_shift($oids))->throwIfConnectionError();
         if (! $first->isValid()) {
             return [];

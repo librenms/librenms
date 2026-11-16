@@ -28,6 +28,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 
@@ -88,6 +89,16 @@ class BgpPeer extends DeviceRelatedModel implements Keyable, HasSyncProtectedAtt
     public function getSyncProtectedAttributes(): array
     {
         return self::POLLED_ATTRIBUTES;
+    }
+
+    // ---- Define Relationships ----
+
+    /**
+     * @return BelongsTo<Vrf, $this>
+     */
+    public function vrf(): BelongsTo
+    {
+        return $this->belongsTo(Vrf::class, 'vrf_id', 'vrf_id');
     }
 
     // ---- Query scopes ----
