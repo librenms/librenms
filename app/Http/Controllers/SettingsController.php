@@ -119,13 +119,24 @@ class SettingsController
 
         $email = $request->validate(['email' => 'required|email|max:254'])['email'];
         try {
-            $sent = Mail::send($email, __('LibreNMS test email'), __('This is a test email from LibreNMS to verify your email settings.'), false, false, false);
+            $sent = Mail::send(
+                $email,
+                __('LibreNMS test email'),
+                __('This is a test email from LibreNMS to verify your email settings.'),
+                false,
+                false,
+                false
+            );
         } catch (\Exception $e) {
             report($e);
             $sent = false;
         }
 
-        return response()->json(['message' => $sent ? __('Test email sent') : __('Unable to send test email. Check your email settings and the LibreNMS log.')], $sent ? 200 : 500);
+        return response()->json([
+            'message' => $sent
+                ? __('Test email sent')
+                : __('Unable to send test email. Check your email settings and the LibreNMS log.'),
+        ], $sent ? 200 : 500);
     }
 
     /**

@@ -117,14 +117,22 @@ final class SettingsControllerTest extends TestCase
         $user->assignRole('admin');
         $mail = Mockery::mock('alias:' . Mail::class);
         $mail->shouldReceive('send')->once()
-            ->with('recipient@example.com', 'LibreNMS test email', 'This is a test email from LibreNMS to verify your email settings.', false, false, false)
+            ->with(
+                'recipient@example.com',
+                'LibreNMS test email',
+                'This is a test email from LibreNMS to verify your email settings.',
+                false,
+                false,
+                false
+            )
             ->andReturn(true);
 
         $this->actingAs($user)->postJson(route('settings.email.test'), ['email' => 'recipient@example.com'])
             ->assertOk()
             ->assertJsonPath('message', 'Test email sent');
 
-        $mail->shouldReceive('send')->once()->andThrow(new \PHPMailer\PHPMailer\Exception('SMTP connection failed'));
+        $mail->shouldReceive('send')->once()
+            ->andThrow(new \PHPMailer\PHPMailer\Exception('SMTP connection failed'));
         $this->actingAs($user)->postJson(route('settings.email.test'), ['email' => 'recipient@example.com'])
             ->assertStatus(500)
             ->assertJsonPath('message', 'Unable to send test email. Check your email settings and the LibreNMS log.')
