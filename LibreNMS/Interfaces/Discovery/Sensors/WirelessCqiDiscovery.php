@@ -30,9 +30,8 @@ interface WirelessCqiDiscovery
 {
     /**
      * Discover the Channel Quality Indicator a cellular modem reports to the base station. Type is cqi.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
-     * @return array
+     * @return array<\LibreNMS\Device\WirelessSensor>
      */
-    public function discoverWirelessCqi();
+    public function discoverWirelessCqi(): array;
 }
