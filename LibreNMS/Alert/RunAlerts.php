@@ -420,7 +420,7 @@ class RunAlerts
             }
             // runAcks sends one acknowledgement for the rule/device. Mark its entities
             // too, so a later per-entity problem does not send their acknowledgements again.
-            $ackIds = (int) $alert['state'] === AlertState::ACKNOWLEDGED && $perEntity
+            $ackIds = (int) $alert['state'] === AlertState::ACKNOWLEDGED
                 ? $faults->where('state', AlertState::ACKNOWLEDGED)
                     ->where('alerted', '!=', AlertState::ACKNOWLEDGED)->pluck('id')->all()
                 : array_values(array_filter(array_map(
