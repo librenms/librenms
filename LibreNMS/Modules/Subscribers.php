@@ -141,6 +141,11 @@ class Subscribers implements Module
 
         $polled = self::normalize($polled)->keyBy->getCompositeKey();
         $existing = $existing->toBase()->keyBy->getCompositeKey(); // an eloquent merge would key by id
+
+        // a port total is replaced by the session types of the port once it reports them
+        $typedPorts = $polled->filter(fn (SubscriberCount $count) => $count->port_id !== null && $count->session_type !== 'total')->pluck('port_id')->flip();
+        $existing = $existing->reject(fn (SubscriberCount $count) => $count->port_id !== null && $count->session_type === 'total' && $typedPorts->has($count->port_id) && $count->delete());
+
         $os->getDevice()->subscriberCounts()->saveMany($polled->diffKeys($existing));
 
         foreach ($existing->merge($polled->diffKeys($existing)) as $key => $count) {
