@@ -460,6 +460,18 @@ class ConfigRepository
         $this->deprecatedVariable('poller_modules.ipSystemStats', 'poller_modules.ip-system-stats');
         $this->deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
+        foreach (['alerting', 'billing', 'discovery', 'ping', 'poller', 'services'] as $type) {
+            if ($this->get("schedule_type.$type") !== 'legacy') {
+                continue;
+            }
+
+            $enabled = $this->get("service_{$type}_enabled");
+            if ($enabled === true || $enabled === 1 || $enabled === '1') {
+                $this->set("schedule_type.$type", 'dispatcher');
+            } elseif ($enabled === false || $enabled === 0 || $enabled === '0') {
+                $this->set("schedule_type.$type", 'cron');
+            }
+        }
         // migrate device display
         if (! $this->has('device_display_default')) {
             $display_value = '{{ $hostname }}';
