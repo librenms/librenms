@@ -155,7 +155,7 @@ class ProxmoxApiDataSource implements VminfoClusterSource, VminfoDiscovery, Vmin
     }
 
     /**
-     * The CPU usage measured by pvestatd. The node lists report 0 now and then, see ProxmoxApi::clusterGuestCpu().
+     * The CPU usage measured by pvestatd, the node lists report 0 now and then (a Proxmox VE bug), see ProxmoxApi::clusterGuestCpu().
      * Without it the node lists are used.
      *
      * @return array{proxmox: array<int, float>, proxmox-lxc: array<int, float>}

@@ -84,7 +84,8 @@ readonly class ProxmoxApi
 
     /**
      * The CPU usage of the guests of the cluster, from the statistics pvestatd collects every few seconds.
-     * The guest lists of a node measure it per API worker process instead: a worker reports 0 for a guest it was not asked about before.
+     * Works around a Proxmox VE bug: the guest lists of a node measure it per pvedaemon worker, a new worker reports 0 for every guest.
+     * Pvedaemon restarts its workers after 1000 requests, so on a busy API that happens every few minutes. https://bugzilla.proxmox.com/show_bug.cgi?id=8345
      * Guests without statistics, such as those on an offline node, are left out.
      *
      * @return array{qemu: array<int, float>, lxc: array<int, float>} keyed by guest id
