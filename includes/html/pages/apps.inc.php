@@ -661,6 +661,19 @@ $graphs['syslog-ng'] = [
     'truncated_count',
     'written',
 ];
+$graphs['haproxy'] = [
+    'srv_states',
+    'be_states',
+    'traffic',
+    'sessions',
+    'rates',
+    'hrsp',
+    'errors',
+    'denied',
+    'aborts',
+    'retries',
+    'queue',
+];
 
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
