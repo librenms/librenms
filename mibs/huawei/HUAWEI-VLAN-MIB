@@ -1,9 +1,9 @@
 -- ============================================================================
--- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:  The mib is used for configuring the information of the VLAN, including
 --               VLAN management, VLAN interface, VLAN aggregation and so on.
 -- Reference:
--- Version:      V3.83
+-- Version:      V4.00
 --
 -- ============================================================================
 
@@ -19,11 +19,11 @@
            TimeTicks, IpAddress, Integer32, Unsigned32, Counter64,OBJECT-TYPE,
            MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE
                FROM SNMPv2-SMI
-           TruthValue, RowStatus, TEXTUAL-CONVENTION
+           TruthValue, RowStatus, TEXTUAL-CONVENTION, MacAddress
                FROM SNMPv2-TC;
 
        hwVlan MODULE-IDENTITY
-           LAST-UPDATED "201508071000Z"
+           LAST-UPDATED "202204280000Z"
            ORGANIZATION
                "Huawei Technologies Co.,Ltd."
            CONTACT-INFO
@@ -38,7 +38,67 @@
                "The mib is used for configuring the information of the VLAN, including
                 VLAN management,VLAN interface,VLAN aggregation and so on."
 
-           -- Revision history    
+           -- Revision history
+           REVISION    "202204280000Z"
+           DESCRIPTION "V4.00, added table node hwVlanIfDhcpsDomainTable, hwVlanIfDhcpsExclIpTable,
+                        hwVlanIfDhcpsStaBindTable, hwVlanIfDhcpsIpInUseTable.
+                        Added leaf nodes hwVlanIfDhcpsDns, hwVlanIfDhcpsDnsUndo."
+
+           REVISION    "202203010000Z"
+           DESCRIPTION "V3.99, added table node hwVlanIfDhcpsOptionTable."
+
+           REVISION    "202202240000Z"
+           DESCRIPTION "V3.98, add hwDedicatedNetwork to traps hwVlanNameChangeInfoTrap, hwVlanForwardingModeInfoTrap,
+                        hwVlanAndVlanSrvProfOperInfoTrap, hwVlanAddInfoTrap, hwVlanDelInfoTrap,
+                        hwVlanAttrChangedInfoTrap, hwPortVlanChangedInfoTrap."
+   
+           REVISION    "202201121000Z"
+           DESCRIPTION "V3.97, modified the description of leaf node hwVlanIfDhcpsSubOptCode in HwVlanInterfaceEntry."
+
+           REVISION    "202112031000Z"
+           DESCRIPTION "V3.96, modified the value range of leaf nodes hwVlanIfDhcpsLeaseDay, hwVlanIfDhcpsLeaseHour,
+                        hwVlanIfDhcpsLeaseMinute in HwVlanInterfaceEntry."
+
+           REVISION    "202111011000Z"
+           DESCRIPTION "V3.95, modified the value range of hwVlanIndex, hwVlanAggregationSuperVlanId, hwVlanAggregationSubVlanId, hwVlanConnectOuterVlanID."	   
+
+           REVISION    "202110281000Z"
+           DESCRIPTION "V3.94, A leaf node name was changed from hwVlanIfDHCPSStatus to hwVlanIfDhcpsStatus.
+                        Added leaf nodes hwVlanIfDhcpsLeaseMode, hwVlanIfDhcpsLeaseDay, hwVlanIfDhcpsLeaseHour,
+                        hwVlanIfDhcpsLeaseMinute, hwVlanIfDhcpsStartIpAddr, hwVlanIfDhcpsEndIpAddr, hwVlanIfDhcpsMask,
+                        hwVlanIfDhcpsGateway, hwVlanIfDhcpsGatewayUndo, hwVlanIfDhcpsOption, hwVlanIfDhcpsOptCode,
+                        hwVlanIfDhcpsSubOptCode, hwVlanIfDhcpsOptType and hwVlanIfDhcpsOptStr in HwVlanInterfaceEntry."
+
+           REVISION    "202109101000Z"
+           DESCRIPTION "V3.93, added table node hwPacketVlanSwitchPortTable and hwPacketVlanSwitchRuleTable."
+
+           REVISION    "202108091000Z"
+           DESCRIPTION "V3.92, Modify the node type of hwVlanConnectSrcPara."
+
+           REVISION    "202106181000Z"
+           DESCRIPTION "V3.91, added leaf node hwVlanPortsExtendFrame."
+
+           REVISION    "202001211000Z"
+           DESCRIPTION "V3.90, Added hwDhcpOption82CaptureArpSwitch, hwDhcpv6OptionCaptureNaSwitch."
+
+           REVISION    "201901161000Z"
+           DESCRIPTION "V3.89, modified the value range of hwVOIPAddressIndex."
+	   
+           REVISION    "201803211000Z"
+           DESCRIPTION "V3.88, modified the description of hwPortVlanOuterEthernetTypeTable and hwPortVlanOuterEthernetTypeEntry."
+
+		   REVISION    "201711101000Z"
+           DESCRIPTION "V3.87, Added hwArpDetectMaxUserCountSwitch in hwVlanSrvProfTable."
+		   
+           REVISION    "201608301000Z"
+           DESCRIPTION "V3.86, modified the value range and description of hwIPv6MTU and hwIPv4MTU."
+
+           REVISION    "201605281000Z"
+           DESCRIPTION "V3.85, Added hwAntiMacDuplicateSwitch in hwVlanSrvProfTable."
+
+           REVISION    "201511101000Z"
+           DESCRIPTION "V3.84, Added hwPortVlanOuterEthernetTypeTable in hwVlanMngObject."
+
            REVISION    "201508071000Z"
            DESCRIPTION "V3.83, modified the value range and description of hwIPv6MTU."
 
@@ -95,7 +155,7 @@
            DESCRIPTION "V3.67, added layer3option16 option to hwDhcpv6Mode.
                         Added hwRipngTunnelSwitch in hwVlanSrvProfTable."
 
-           REVISION    "201308021000Z"    
+           REVISION    "201310021000Z"    
            DESCRIPTION "V3.66, added hwVOIPDhcpQosTable.
                         Added hwVOIPIPAddressSrc in hwVOIPAddressTable.
                         Added hwVOIPQosIPAddressSrc in hwVOIPQosTable."
@@ -411,7 +471,9 @@
              hwVlanTrafficSuppressUnknowncastNetwork
                Integer32,
              hwVlanMethL2Forward
-               INTEGER
+               INTEGER,
+             hwVlanPortsExtendFrame
+	           OCTET STRING
             }
 
        hwVlanIndex OBJECT-TYPE
@@ -420,7 +482,7 @@
            STATUS current
            DESCRIPTION
                "Indicates the VLAN ID.
-                Range: 1-4093.
+                Range: 1-36863.
                 VLAN 1 is the native VLAN.
                 It cannot be deleted, but its attributes can be modified.
                "
@@ -657,7 +719,7 @@
                 The value can be subvlan(4) only in the read operation. Adding a VLAN to
                 or deleting a VLAN from a super VLAN must be performed through hwVlanAggregationTable.
                "
-           DEFVAL { 1 }
+           DEFVAL { common }
            ::= { hwVlanMIBEntry 14 }
 
        hwVlanSuperID OBJECT-TYPE
@@ -693,7 +755,7 @@
                 is bound to the VLAN, the configuration in the VLAN service profile
                 takes effect.
                "
-           DEFVAL { 1 }
+           DEFVAL { vlanMac }
            ::= { hwVlanMIBEntry 16 }
 
        hwVlanPolicyBroadcast OBJECT-TYPE
@@ -717,7 +779,7 @@
                 configured in hwPolicyBroadcast of hwVlanSrvProfTable. If a VLAN service
                 profile is bound to the VLAN, the configuration in the VLAN service profile takes effect.
                "
-           DEFVAL { 1 }
+           DEFVAL { forward }
            ::= { hwVlanMIBEntry 17 }
 
        hwVlanPolicyMulticast OBJECT-TYPE
@@ -741,7 +803,7 @@
                 also be configured in hwPolicyMulticast of hwVlanSrvProfTable. If a VLAN service
                 profile is bound to the VLAN, the configuration in the VLAN service profile takes effect.
                "
-           DEFVAL { 1 }
+           DEFVAL { forward }
            ::= { hwVlanMIBEntry 18 }
 
        hwVlanPolicyUnknowncast OBJECT-TYPE
@@ -765,7 +827,7 @@
                 configured in hwPolicyUnknowncast of hwVlanSrvProfTable. If a VLAN service profile is bound
                 to the VLAN, the configuration in the VLAN service profile takes effect.
                "
-           DEFVAL { 1 }
+           DEFVAL { forward }
            ::= { hwVlanMIBEntry 19 }
 
        hwVlanOuterTpid OBJECT-TYPE
@@ -872,6 +934,48 @@
                 The default value is disable(2).
                "
            ::= { hwVlanMIBEntry 25 }
+
+       hwVlanPortsExtendFrame OBJECT-TYPE
+           SYNTAX OCTET STRING (SIZE (0..2048))
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "Indicates the list of the extend frame standard ports in the VLAN. If 
+                the VLAN contains a port, the corresponding bit of the port is set to 1. 
+                The value of hwVlanPortsExtendFrame is mixed encoding of the index 
+                and octet string. Encoding area, which specifies the index of the FrameId 
+                and SlotId, consisting of 4 characters and 2 characters respectively. 
+                Port area, which is represented in octet string format and occupies 16 characters. 
+                One bit in each octet indicates one port, so 8 octet means 64 ports in a slot. 
+                When a bit is set to 0, it indicates that the corresponding port does not 
+		        belong to this VLAN. When a bit is set to 1, it indicates that the corresponding 
+		        port belongs to this VLAN. The order is as follows:
+                If a extend frame has a port that belongs to a VLAN, the port in the 
+                corresponding frame and slot are represented by octet strings.  The maximum number
+                of ports in a slot is 64, so the ports need to occupy eight octets.
+                The order, from left to right, is presented as eight groups, 0-7, 8-15,
+                16-23, 24-31, 32-39, 40-47, 48-55, and 56-63. In each octet,
+                the PortId in ascending order are presented from low bit to high bit.
+                For example, ports 0/11/2 and 0/11/3 need to added to the same VLAN.
+                The values of hwVlanPortsExtendFrame of the upstream ports
+                (ports 1/02/2 and 1/02/3 and 1/03/1) to be added is calculated as follows:
+                For ports 0-7 in slot 02 in frame 1, their corresponding character string
+                positions are 76543210, and after ports 1/02/2 and 1/02/3 are added, the bitmap is 
+		        00001100 00000000 00000000 00000000 00000000 00000000 00000000 00000000,
+                and the string is (HEX) 0C 00 00 00 00 00 00 00.
+                After the FrameId (2 Octet) and SoltId (1 Octet) are added at the front, 
+		        the string is 0001 02 0c 00 00 00 00 00 00 00.
+                In the same way, 1 / 03 / 1 is encoded as 0001 03 02 00 00 00 00 00 00 00.
+                Assuming that the other slots do not have any port that is added to the VLAN,
+                The slot information is not filled in. 
+                Therefore, the length of the code is variable, but usually is an integer multiple 
+		        of 22 characters.finally, the string is
+                00 01 02 0C 00 00 00 00 00 00 00
+                00 01 03 02 00 00 00 00 00 00 00
+		        Under special circumstances, none port in VLAN is described by '0',which is 
+		        just one character.
+               "
+           ::= { hwVlanMIBEntry 26 }
 
        hwifSVLANVlanListTable OBJECT-TYPE
            SYNTAX SEQUENCE OF HwifSVLANVlanListEntry
@@ -1210,7 +1314,7 @@
                 1. uplinkPort(1)    -uplink port
                 2. cascadingPort(2) -cascading port
                "
-           DEFVAL { 2 }
+           DEFVAL { cascadingPort }
            ::= { hwMuxVlanPortConfEntry 1 }
 
        hwMuxVlanStartVlanId OBJECT-TYPE
@@ -1411,22 +1515,22 @@
                  }
 
        hwVlanAggregationSuperVlanId  OBJECT-TYPE
-           SYNTAX  Integer32 (2..4093)
+           SYNTAX  Integer32 (2..36863)
            MAX-ACCESS  read-only
            STATUS  current
            DESCRIPTION
                "Indicates the super VLAN ID in a VLAN aggregation.
-                Range: 2-4093
+                Range: 2-36863
                "
            ::= { hwVlanAggregationEntry 1 }
 
        hwVlanAggregationSubVlanId  OBJECT-TYPE
-           SYNTAX  Integer32 (2..4093)
+           SYNTAX  Integer32 (2..36863)
            MAX-ACCESS  read-only
            STATUS  current
            DESCRIPTION
                "Indicates the sub VLAN ID in a VLAN aggregation.
-                Range: 2-4093
+                Range: 2-36863
                "
            ::= { hwVlanAggregationEntry 2 }
 
@@ -1753,7 +1857,7 @@
                 1. enabled(1)    -Enable MAC learning by VLAN.
                 2. disabled(2)   -Disable MAC learning by VLAN.
                "
-           DEFVAL { 1 }
+           DEFVAL { enabled }
            ::= { hwVlanParaEntry 2 }
 
        hwVlanMaxMacLearnNum OBJECT-TYPE
@@ -1880,7 +1984,7 @@
                                   connection-oriented service streams with two VLAN tags on the port.
                 Default: dot1qTpid(1)
                "
-           DEFVAL { 1 }
+           DEFVAL { dot1qTpid }
            ::= { hwPortOuterEthernetTypeEntry 1 }
 
        hwVlanLocalSwitch OBJECT-TYPE
@@ -1941,7 +2045,7 @@
                 1. enable(1)  -Enable local VLAN.
                 2. disable(2) -Disable local VLAN.
                "
-           DEFVAL { 2 }
+           DEFVAL { disable }
            ::= { hwLocalVlanEntry 1 }
 
         hwVlanInterfaceTable OBJECT-TYPE
@@ -1995,13 +2099,44 @@
                INTEGER,
              hwVlanIfVlanInnerLabel
                Integer32,
-             hwVlanIfDHCPSStatus
+             hwVlanIfDhcpsStatus
                INTEGER,
              hwIPv6MTU
                Integer32,
-	     hwIPv4MTU
-               Integer32
-
+             hwIPv4MTU
+               Integer32,
+             hwVlanIfDhcpsLeaseMode
+               INTEGER,
+             hwVlanIfDhcpsLeaseDay
+               Integer32,
+             hwVlanIfDhcpsLeaseHour
+               Integer32,
+             hwVlanIfDhcpsLeaseMinute
+               Integer32,
+             hwVlanIfDhcpsStartIpAddr
+               IpAddress,
+             hwVlanIfDhcpsEndIpAddr
+               IpAddress,
+             hwVlanIfDhcpsMask
+               IpAddress,
+             hwVlanIfDhcpsGateway
+               OCTET STRING,
+             hwVlanIfDhcpsGatewayUndo
+               OCTET STRING,
+             hwVlanIfDhcpsOption
+               INTEGER,
+             hwVlanIfDhcpsOptCode
+               Integer32,
+             hwVlanIfDhcpsSubOptCode
+               Integer32,
+             hwVlanIfDhcpsOptType
+               INTEGER,
+             hwVlanIfDhcpsOptStr
+               OCTET STRING,
+             hwVlanIfDhcpsDns
+               OCTET STRING,
+             hwVlanIfDhcpsDnsUndo
+               OCTET STRING
             }
 
        hwVlanInterfaceID OBJECT-TYPE
@@ -2164,7 +2299,7 @@
                "
            ::= { hwVlanInterfaceEntry 12 }
 
-       hwVlanIfDHCPSStatus OBJECT-TYPE
+       hwVlanIfDhcpsStatus OBJECT-TYPE
            SYNTAX INTEGER
              {
                disable(1),
@@ -2182,30 +2317,237 @@
             ::= { hwVlanInterfaceEntry 13 }
 
        hwIPv6MTU OBJECT-TYPE
-           SYNTAX Integer32 (-1|1280..1499|1501..1560)
+           SYNTAX Integer32 (-1|1280..1499|1501..9600)
            MAX-ACCESS read-write
            STATUS current
            DESCRIPTION
                "Used to configure the maximum transmission unit of vlanif.If you set it on one vlanif,all the vlanif will
                 be configured. For P300 device, the node can take effect on IPV4 and IPV6. For Saturn device, it only takes 
                 effect on IPV6.
-                Range: -1,1280-1499,1501-1560. For P300 device, the range is -1,1501-1560. For Saturn device, the range is
-                -1,1280-1499,1501-1560. 
+                Range: -1,1280-1499,1501-9600. For P300 device, the range is -1,1501-1560. For Saturn device, the range is
+                -1,1280-1499,1501-9600. 
                 Deafult:-1,this value means the MTU of vlanif is the default value(for example: 1500).
                "
            ::= { hwVlanInterfaceEntry 14 }
 
        hwIPv4MTU OBJECT-TYPE
-           SYNTAX Integer32 (-1|1501..1560)
+           SYNTAX Integer32 (-1|1501..9600)
            MAX-ACCESS read-write
            STATUS current
            DESCRIPTION
                "Used to configure the maximum transmission unit of vlanif. The node is only supported on Saturn device. It
                only takes effect on IPV4.
-                Range: -1,1501-1560
+                Range: -1,1501-9600
                 Deafult:-1,this value means the MTU of vlanif is the default value(for example: 1500).
                "
            ::= { hwVlanInterfaceEntry 15 }
+
+       hwVlanIfDhcpsLeaseMode OBJECT-TYPE
+           SYNTAX INTEGER
+             {
+               delete(0),
+               limited(1),
+               unlimited(2)
+             }
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "Indicates that the lease mode.
+                Options:
+                1. delete(0)     -Set zero to delete the current lease configuration.
+                2. limited(1)    -The lease mode is limited.
+                3. unlimited(2)  -The lease mode is unlimited.
+                Default: limited(1)
+                If you want to set limited mode, you have to set leaseDay, leaseHour and leaseMin simultaneously.
+               "
+           ::= { hwVlanInterfaceEntry 16 }
+
+       hwVlanIfDhcpsLeaseDay OBJECT-TYPE
+           SYNTAX Integer32 (-1|0..999)
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "Used to configure the day number of leasing dhcp server time.
+                Range: -1, 0-999.
+                Deafult:-1, this value means the lease mode is unlimited or dhcp server is unset.
+               "
+           ::= { hwVlanInterfaceEntry 17 }
+
+       hwVlanIfDhcpsLeaseHour OBJECT-TYPE
+           SYNTAX Integer32 (-1|0..23)
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "Used to configure the hour number of leasing dhcp server time.
+                Range: -1, 0-23.
+                Deafult:-1, this value means the lease mode is unlimited or dhcp server is unset.
+               "
+           ::= { hwVlanInterfaceEntry 18 }
+
+       hwVlanIfDhcpsLeaseMinute OBJECT-TYPE
+           SYNTAX Integer32 (-1|0..59)
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "Used to configure the minute number of leasing dhcp server time.
+                Range: -1, 0-59.
+                Deafult:-1, this value means the lease mode is unlimited or dhcp server is unset.
+               "
+           ::= { hwVlanInterfaceEntry 19 }
+
+       hwVlanIfDhcpsStartIpAddr OBJECT-TYPE
+           SYNTAX IpAddress
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "Indicates the start address of the ip range.
+                Default: 0.0.0.0.
+                When you set 0.0.0.0, it means to delete the configuration of ip-range.
+                However, you need to set 0.0.0.0 for endIpAddr simultaneously to delete ip-range.
+               "
+           ::= { hwVlanInterfaceEntry 20 }
+           
+       hwVlanIfDhcpsEndIpAddr OBJECT-TYPE
+           SYNTAX IpAddress
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "Indicates the end address of the ip range.
+                Default: 0.0.0.0.
+                When you set 0.0.0.0, it means to delete the configuration of ip-range.
+                However, you need to set 0.0.0.0 for startIpAddr simultaneously to delete ip-range.
+               "
+           ::= { hwVlanInterfaceEntry 21 }
+           
+       hwVlanIfDhcpsMask OBJECT-TYPE
+           SYNTAX IpAddress
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "Indicates the mask of the dhcp server.
+                Default: 0.0.0.0.
+                Please set 0.0.0.0 to delete current mask.
+               "
+           ::= { hwVlanInterfaceEntry 22 }
+
+       hwVlanIfDhcpsGateway OBJECT-TYPE
+           SYNTAX OCTET STRING (SIZE (0..129))
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "String of gateway ip addresses for DHCP server.
+                Since mostly 8 ip addresses can be configured for a pool
+                totally, a string is defined to get or configure 8 ip
+                addresses at a time. Please use ',' to separate them.
+               "
+           ::= { hwVlanInterfaceEntry 23 }
+
+       hwVlanIfDhcpsGatewayUndo OBJECT-TYPE
+           SYNTAX OCTET STRING (SIZE (0..16))
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "A gateway ip address to be deleted. This object is
+                only for deleting a given ip address of gateway-list.
+               "
+           ::= { hwVlanInterfaceEntry 24 }
+
+       hwVlanIfDhcpsOption OBJECT-TYPE
+           SYNTAX INTEGER
+             {
+              config(1),
+              delete(2)
+             }
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "Indicates the option operation of DHCP server.
+                Default: config(1).
+               "
+           ::= { hwVlanInterfaceEntry 25 }
+
+       hwVlanIfDhcpsOptCode OBJECT-TYPE
+           SYNTAX Integer32 (0..254)
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "Indicates the option code of DHCP server.
+                Default: 0. This means option is unset.
+               "
+           ::= { hwVlanInterfaceEntry 26 }
+
+       hwVlanIfDhcpsSubOptCode OBJECT-TYPE
+           SYNTAX Integer32 (0..254)
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "Indicates the sub-option code of DHCP server.
+                Setting the node, this node must match with hwVlanIfDhcpsOptType. 
+                When the value is 0, it means setting option.
+                When the value is not 0, it means setting sub-option.
+                The rules ara as follow:
+                1.subOptCode == 0, optType can choose all the types.
+                2.subOptCode == 1, optType must be hex.
+                3.subOptCode == 2, optType must be ipAddress.
+                4.subOptCode == 3, optType must be ascii.
+                5.subOptCode == 4, optType must be cipher.
+               "
+           ::= { hwVlanInterfaceEntry 27 }
+       
+       hwVlanIfDhcpsOptType OBJECT-TYPE
+           SYNTAX INTEGER
+             {
+               unset(0),
+               ascii(1),
+               hex(2),
+               cipher(3),
+               ipAddress(4)
+             }
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "Indicates the option type of DHCP server option.
+                The type you choose must match the sub-option code.
+                Types:
+                1. unset(0)
+                2. ascii(1)
+                3. hex(2)
+                4. cipher(3)
+                5. ipAddress(4)
+               "
+           ::= { hwVlanInterfaceEntry 28 }
+
+       hwVlanIfDhcpsOptStr OBJECT-TYPE
+           SYNTAX OCTET STRING (SIZE (0..256))
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "This node is an IP string of dhcp server option.
+                The string you input must match the type that you choose in hwVlanIfDhcpsOptType.
+               "
+           ::= { hwVlanInterfaceEntry 29 }
+
+       hwVlanIfDhcpsDns OBJECT-TYPE
+           SYNTAX OCTET STRING (SIZE (0..129))
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "String of dns server ip addresses for DHCP clients.
+                Since mostly 8 ip can be configured for a pool
+                totally, a string is defined to get or configure 8 ip
+                addresses at a time. Please use ',' to separate them.
+               "
+           ::= { hwVlanInterfaceEntry 30 }
+
+       hwVlanIfDhcpsDnsUndo OBJECT-TYPE
+           SYNTAX OCTET STRING (SIZE (0..16))
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "A dns server ip address to be deleted. This object is
+                only for deleting a given ip address of dns-list.
+               "
+           ::= { hwVlanInterfaceEntry 31 }
 
        hwVlanInterfaceSubIpAddrTable OBJECT-TYPE
            SYNTAX SEQUENCE OF HwVlanInterfaceSubIpAddrEntry
@@ -2412,7 +2754,7 @@
        HwVOIPAddressEntry ::=
            SEQUENCE {
              hwVOIPAddressIndex
-               Integer32,
+               Unsigned32,
              hwVOIPIPType
                INTEGER,
              hwVOIPIPAddress
@@ -2438,7 +2780,7 @@
            }
 
        hwVOIPAddressIndex OBJECT-TYPE
-           SYNTAX Integer32 (0..63)
+           SYNTAX Unsigned32 (0..63|4294967295)
            MAX-ACCESS not-accessible
            STATUS current
            DESCRIPTION
@@ -2766,6 +3108,14 @@
              hwRouterRedirectReverse
                INTEGER,
              hwCableIPv6SourceVerify
+               INTEGER,
+             hwAntiMacDuplicateSwitch
+               INTEGER,  
+             hwArpDetectMaxUserCountSwitch
+               INTEGER,	       
+             hwDhcpOption82CaptureArpSwitch
+               INTEGER,
+             hwDhcpv6OptionCaptureNaSwitch
                INTEGER,
              hwProfileRowStatus
                RowStatus
@@ -3817,6 +4167,89 @@
                "
            ::= { hwVlanSrvProfEntry 46 }
 
+       hwAntiMacDuplicateSwitch OBJECT-TYPE
+           SYNTAX INTEGER
+             {
+               enable(1),
+               disable(2),
+               notConfig(3)
+             }
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "Indicates the VLAN-based mac-duplicate function.
+                Options:
+                1. enable(1)     -indicates that the mac-duplicate function is enabled.
+                2. disable(2)    -indicates that the mac-duplicate function is disabled.
+                3. notConfig(3)  -indicates by VLAN single switch.
+                This leaf is optional for creating a VLAN service profile.
+                The VLAN-based mac-duplicate function can be configured in
+                hwIpDslamL2pVlanCtrlAntiMacDuplicate of HUAWEI-IPDSLAML2PPORTCONFIG-MIB.
+                The status of the mac-duplicate function is determined by its
+                VLAN-level switch. The mac-duplicate function of a VLAN is enabled
+                only when the VLAN-level switch is enabled.
+                If a VLAN service profile is bound to the VLAN,
+                the configuration of the VLAN-based mac-duplicate function
+                in the VLAN service profile takes effect.
+               "
+           ::= { hwVlanSrvProfEntry 47 }
+           
+       hwArpDetectMaxUserCountSwitch OBJECT-TYPE
+           SYNTAX INTEGER
+             {
+               enable(1),
+               disable(2)
+             }
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "Indicates the VLAN-based arp-detect max-user-count function.
+                Options:
+                1. enable(1)  -indicates that the arp-detect max-user-count function is enabled.
+                2. disable(2) -indicates that the arp-detect max-user-count function is disabled.
+                This leaf is optional for creating a VLAN service profile.  
+                The arp-detect max-user-count function in the global mode can be set in
+                hwIpDslamArpDetectMaxUserCountSwitch of HUAWEI-IPDSLAM-SECURITY-MIB.
+                The final status of the arp-detect max-user-count function is determined by its
+                global-level switch and VLAN-level switch. The arp-detect max-user-count function
+                of a VLAN is enabled only when the switches at both levels are enabled and the number 
+                of users exceeds specification.
+				Default: enable(1)
+               "
+           ::= { hwVlanSrvProfEntry 48 }
+
+	   hwDhcpOption82CaptureArpSwitch OBJECT-TYPE
+           SYNTAX INTEGER
+             {
+               enable(1),
+               disable(2)
+             }
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "Indicates the VLAN-based DHCP option 82 capture ARP function.
+                Options:
+                1. enable(1)  -enable ARP packet capturing when DHCP option82 is enabled.
+                2. disable(2) -disable ARP packet capturing when DHCP option82 is enabled.
+               "
+           ::= { hwVlanSrvProfEntry 49 }
+		  
+       hwDhcpv6OptionCaptureNaSwitch OBJECT-TYPE
+           SYNTAX INTEGER
+             {
+               enable(1),
+               disable(2)
+             }
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "Indicates the VLAN-based DHCPv6 option capture NA function.
+                Options:
+                1. enable(1)  -enable NA packet capturing when DHCPv6 option is enabled.
+                2. disable(2) -disable NA packet capturing when DHCPv6 option is enabled.
+               "
+           ::= { hwVlanSrvProfEntry 50 }
+           
        hwProfileRowStatus   OBJECT-TYPE
            SYNTAX RowStatus
            MAX-ACCESS read-create
@@ -3946,7 +4379,7 @@
                 2. virtualIp(2)            -The source IP address obtaining mode is virtual IP.
                 Default: clientIp(1)
                "
-           DEFVAL { 1 }
+           DEFVAL { clientIp }
            ::= { hwVlanIpAwareEntry 4 }
 
        hwVlanIpAwareArpSendPeriod OBJECT-TYPE
@@ -4470,7 +4903,7 @@
              hwVlanConnectSrcType
                INTEGER,
              hwVlanConnectSrcPara
-               Integer32,
+               Unsigned32,
              hwVlanConnectDstType
                INTEGER,
              hwVlanConnectDstPara
@@ -4480,7 +4913,7 @@
             }
 
         hwVlanConnectOuterVlanID OBJECT-TYPE
-           SYNTAX Integer32 (-1 | 1..4095)
+           SYNTAX Integer32 (-1 | 1..36863)
            MAX-ACCESS not-accessible
            STATUS current
            DESCRIPTION
@@ -4514,7 +4947,7 @@
            ::= { hwVlanConnectEntry 3 }
 
        hwVlanConnectSrcPara OBJECT-TYPE
-           SYNTAX Integer32
+           SYNTAX Unsigned32
            MAX-ACCESS read-write
            STATUS current
            DESCRIPTION
@@ -4810,7 +5243,86 @@
                 Default: -1
                "
            ::= { hwVlanMngObject 65010 }
-           
+
+        --hwPortVlanOuterEthernetTypeTable 
+        hwPortVlanOuterEthernetTypeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPortVlanOuterEthernetTypeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the Ethernet protocol type of the outer VLAN tag of a port and VLAN.
+                The indexes of this table are ifIndex and hwPortVlanOuterEthernetTypeVlanid.
+                "
+            ::= { hwVlanMngObject 65011 }
+
+        hwPortVlanOuterEthernetTypeEntry OBJECT-TYPE
+            SYNTAX HwPortVlanOuterEthernetTypeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the Ethernet protocol type of the outer VLAN tag of a port and VLAN.
+                The indexes of this entry are ifIndex and hwPortVlanOuterEthernetTypeVlanid.
+                "
+            INDEX { ifIndex, hwPortVlanOuterEthernetTypeVlanid }
+            ::= { hwPortVlanOuterEthernetTypeTable 1 }
+
+        HwPortVlanOuterEthernetTypeEntry ::=
+            SEQUENCE {
+                hwPortVlanOuterEthernetTypeVlanid
+                    Integer32,
+                hwPortVlanOuterEthernetType
+                    INTEGER,
+                hwPortVlanOuterEthernetTypeRowStatus
+                    RowStatus
+             }
+
+        hwPortVlanOuterEthernetTypeVlanid OBJECT-TYPE
+            SYNTAX Integer32 (1..4095)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the VLAN ID input in TPID configuration.
+                Range: 1-4095.
+                "
+            ::= { hwPortVlanOuterEthernetTypeEntry 1 }
+
+        hwPortVlanOuterEthernetType OBJECT-TYPE
+           SYNTAX INTEGER
+             {
+               dot1adTpid(2)
+             }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the TPID based on port and VLAN.
+                Options:
+                1. dot1adTpid(2) -indicates that hwPortVlanOuterEthernetType is dot1adTpid
+                "
+            ::= { hwPortVlanOuterEthernetTypeEntry 2 }
+
+        hwPortVlanOuterEthernetTypeRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the row status, used for setting, querying or deleting a hwPortVlanOuterEthernetType.
+                Options:
+                1. active(1)
+                2. createAndGo(4)
+                3. destroy(6)
+                To set a hwPortVlanOuterEthernetType, you must specify hwPortVlanOuterEthernetTypeVlanid and set
+                hwPortVlanOuterEthernetTypeRowStatus to createAndGo(4) to perform the set operation.
+                To delete a hwPortVlanOuterEthernetType, set hwPortVlanOuterEthernetTypeRowStatus to destroy(6) to perform the set operation.
+                During query, the value of this leaf is the fixed active(1).
+                "
+            ::= { hwPortVlanOuterEthernetTypeEntry 3 }
+        --hwPortVlanOuterEthernetTypeTable
+
        hwVlanInterfaceTrapsVbOids OBJECT IDENTIFIER ::= { hwVlanMngObject 30 }
 
        hwL3InterfaceType
@@ -4939,6 +5451,13 @@
                "
            ::= { hwVlanCfgTrapsVbOids 4 }
 
+        hwDedicatedNetwork OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                  "Indicates the dedicated network ID."
+            ::= { hwVlanCfgTrapsVbOids 5 }
 
        hwVlanCfgTraps OBJECT IDENTIFIER ::= { hwVlanMngObject 33 }
 
@@ -4950,7 +5469,8 @@
             OBJECTS {
                     hwConfigChangeIP,
                     hwVlanIndex,
-                    hwVlanName
+                    hwVlanName,
+                    hwDedicatedNetwork
                     }
             STATUS current
             DESCRIPTION
@@ -4961,7 +5481,8 @@
             OBJECTS {
                     hwConfigChangeIP,
                     hwVlanIndex,
-                    hwVlanForwarding
+                    hwVlanForwarding,
+                    hwDedicatedNetwork
                     }
             STATUS current
             DESCRIPTION
@@ -4983,7 +5504,8 @@
             OBJECTS {
                     hwConfigChangeIP,
                     hwVlanList,
-                    hwVlanSrvProfName
+                    hwVlanSrvProfName,
+                    hwDedicatedNetwork
                     }
             STATUS current
             DESCRIPTION
@@ -4995,7 +5517,8 @@
                     hwConfigChangeIP,
                     hwVlanList,
                     hwVlanListType,
-                    hwVlanListAttrib
+                    hwVlanListAttrib,
+                    hwDedicatedNetwork
                     }
             STATUS current
             DESCRIPTION
@@ -5005,7 +5528,8 @@
     hwVlanDelInfoTrap NOTIFICATION-TYPE
             OBJECTS {
                     hwConfigChangeIP,
-                    hwVlanList
+                    hwVlanList,
+                    hwDedicatedNetwork
                     }
             STATUS current
             DESCRIPTION
@@ -5016,7 +5540,8 @@
             OBJECTS {
                     hwConfigChangeIP,
                     hwVlanList,
-                    hwVlanListAttrib
+                    hwVlanListAttrib,
+                    hwDedicatedNetwork
                     }
             STATUS current
             DESCRIPTION
@@ -5026,11 +5551,525 @@
     hwPortVlanChangedInfoTrap NOTIFICATION-TYPE
             OBJECTS {
                     hwConfigChangeIP,
-                    hwVlanList
+                    hwVlanList,
+                    hwDedicatedNetwork
                     }
             STATUS current
             DESCRIPTION
                 "The trap to be sent when the list of the standard ports in VLANs are changed."
             ::= { hwVlanCfgCommonTraps 0 8 }
 
-  END
+    hwPacketVlanSwitchPortTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPacketVlanSwitchPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "
+                Configure the port that supports switching VLAN of packet, corresponding to the command line,
+                packet vlan-switch port frameid/slotid port-list.
+               "
+            ::= { hwVlanMngObject 65012 }
+
+    hwPacketVlanSwitchPortEntry OBJECT-TYPE
+            SYNTAX HwPacketVlanSwitchPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "
+                Configure the port that supports switching VLAN of packet, the index is ifIndex.
+               "
+           INDEX { ifIndex }
+           ::= { hwPacketVlanSwitchPortTable 1 }
+
+    HwPacketVlanSwitchPortEntry ::=
+           SEQUENCE {
+             hwVlanSwitchPortRowStatus
+               RowStatus
+            }
+
+    hwVlanSwitchPortRowStatus  OBJECT-TYPE
+           SYNTAX RowStatus
+           MAX-ACCESS read-create
+           STATUS current
+           DESCRIPTION
+               "
+                Indicates the row status, used for setting, querying or deleting a hwVlanSwitchPortRowStatus.
+                Options:
+                1. active(1)
+                2. createAndGo(4)
+                3. destroy(6)
+                To set a hwVlanSwitchPortRowStatus, you must specify ifIndex and set
+                hwVlanSwitchPortRowStatus to createAndGo(4) to perform the set operation.
+                To delete a ifIndex, set hwVlanSwitchPortRowStatus to destroy(6) to perform the set operation.
+                During query, the value of this leaf is the fixed active(1)
+               "
+           ::= { hwPacketVlanSwitchPortEntry 1 }
+
+    hwPacketVlanSwitchRuleTable OBJECT-TYPE
+           SYNTAX SEQUENCE OF HwPacketVlanSwitchRuleEntry
+           MAX-ACCESS not-accessible
+           STATUS current
+           DESCRIPTION
+               "
+                Configure the VLAN switching rule for the outgoing packets of the device's upstream port,
+                corresponding to the command line : packet vlan-switch mac mac-addr vlan-from vlanid vlan-to vlanid.
+               "
+           ::= { hwVlanMngObject 65013 }
+
+    hwPacketVlanSwitchRuleEntry OBJECT-TYPE
+           SYNTAX HwPacketVlanSwitchRuleEntry
+           MAX-ACCESS not-accessible
+           STATUS current
+           DESCRIPTION
+               "
+                Configure the VLAN switching rule for the outgoing packets of the device's upstream port,
+                the index is hwPacketVlanSwitchMac.
+               "
+           INDEX { hwPacketVlanSwitchMac }
+           ::= { hwPacketVlanSwitchRuleTable 1 }
+
+    HwPacketVlanSwitchRuleEntry ::=
+           SEQUENCE {
+             hwPacketVlanSwitchMac
+               MacAddress,
+             hwPacketSwitchVlanFrom
+               Unsigned32,
+             hwPacketSwitchVlanTo
+               Unsigned32,
+             hwVlanSwitchRuleRowStatus
+               RowStatus
+            }
+
+    hwPacketVlanSwitchMac OBJECT-TYPE
+           SYNTAX MacAddress
+           MAX-ACCESS not-accessible
+           STATUS current
+           DESCRIPTION
+               "
+                Physical address of Vlan, its index.the format of hwPacketVlanSwitchMac is 0.0.0.0.0.0.
+               "
+           ::= { hwPacketVlanSwitchRuleEntry 1 }
+
+    hwPacketSwitchVlanFrom OBJECT-TYPE
+           SYNTAX Unsigned32
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "
+                Packet switch vlan from, its type is Unsigned32.
+               "
+           ::= { hwPacketVlanSwitchRuleEntry 2 }
+
+    hwPacketSwitchVlanTo OBJECT-TYPE
+           SYNTAX Unsigned32
+           MAX-ACCESS read-write
+           STATUS current
+           DESCRIPTION
+               "
+                Packet switch vlan to, its type is Unsigned32.
+               "
+           ::= { hwPacketVlanSwitchRuleEntry 3 }
+
+    hwVlanSwitchRuleRowStatus OBJECT-TYPE
+           SYNTAX RowStatus
+           MAX-ACCESS read-create
+           STATUS current
+           DESCRIPTION
+               "
+                Indicates the row status, used for setting, querying or deleting a hwVlanSwitchRuleRowStatus.
+                Options:
+                1. active(1)
+                2. createAndGo(4)
+                3. destroy(6)
+                To set a hwVlanSwitchRuleRowStatus, you must specify hwPacketVlanSwitchMac and set
+                hwVlanSwitchRuleRowStatus to createAndGo(4) to perform the set operation.
+                To delete a hwPacketVlanSwitchMac, set hwVlanSwitchRuleRowStatus to destroy(6) to perform the set operation.
+                During query, the value of this leaf is the fixed active(1)
+              "
+           ::= { hwPacketVlanSwitchRuleEntry 4 }
+
+    hwVlanIfDhcpsOptionTable OBJECT-TYPE
+           SYNTAX SEQUENCE OF HwVlanIfDhcpsOptionEntry
+           MAX-ACCESS not-accessible
+           STATUS current
+           DESCRIPTION
+              "
+               A table for configuring options to DHCP Server of vlan interface,
+               include option code type and value and so on.
+              "
+           ::= { hwVlanMngObject 65014 }
+
+    hwVlanIfDhcpsOptionEntry OBJECT-TYPE
+           SYNTAX HwVlanIfDhcpsOptionEntry
+           MAX-ACCESS not-accessible
+           STATUS current
+           DESCRIPTION
+              "
+               An entry of objects for configuring options to DHCP Server of vlan interface.
+ 	             The indexes of this entry is hwVlanInterfaceID, hwVlanIfDhcpsOpionCode, hwVlanIfDhcpsOptionSubCode.
+              "
+           INDEX { hwVlanInterfaceID, hwVlanIfDhcpsOptionCode, hwVlanIfDhcpsOptionSubCode }
+           ::= { hwVlanIfDhcpsOptionTable 1 }
+
+    HwVlanIfDhcpsOptionEntry ::=
+          SEQUENCE {
+              hwVlanIfDhcpsOptionCode
+                  Integer32,
+              hwVlanIfDhcpsOptionSubCode
+                  Integer32,
+              hwVlanIfDhcpsOptionType
+                  INTEGER,
+              hwVlanIfDhcpsOptionRowStatus
+                  RowStatus,
+              hwVlanIfDhcpsOptionAscii
+                  OCTET STRING,
+              hwVlanIfDhcpsOptionHexString
+                  OCTET STRING,
+              hwVlanIfDhcpsOptionCipher
+                  OCTET STRING,
+              hwVlanIfDhcpsOptionIPString
+                  OCTET STRING
+          }
+
+    hwVlanIfDhcpsOptionCode OBJECT-TYPE
+        SYNTAX Integer32 (1..254)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+             Option code, All options begin with a tag octet, which uniquely
+             identifies the option.
+            "
+        ::= { hwVlanIfDhcpsOptionEntry 1 }
+    
+    hwVlanIfDhcpsOptionSubCode OBJECT-TYPE
+        SYNTAX Integer32 (0..254)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Option sub-code, which is used for identifying the sub-option.
+             Default: 0. While choosing 0, it means setting option without sub-option."
+        ::= { hwVlanIfDhcpsOptionEntry 2 }
+
+    hwVlanIfDhcpsOptionType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            ascii(1),
+            hex(2),
+            cipher(3),
+            ip(4)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The object means option type in DHCP server.
+            The value means :
+            ascii(1)- The option type is ascii string
+            hex(2)  - The option type is hex number
+            cipher(3) - The option type is cipher string
+            ip(4)   - The option type is ip address"
+        ::= { hwVlanIfDhcpsOptionEntry 3 }
+
+    hwVlanIfDhcpsOptionRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to configuration new rows in this
+            table, modify existing rows, and to delete
+            existing rows.Only three actions are used: active(1),
+            createAndGo(4), destroy(6).
+            while configuration new option, you must specify option type 
+            and value"
+        ::= { hwVlanIfDhcpsOptionEntry 4 }
+
+    hwVlanIfDhcpsOptionAscii OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..255))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Ascii string of a option"
+        ::= { hwVlanIfDhcpsOptionEntry 5 }
+
+    hwVlanIfDhcpsOptionHexString OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..255))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Hex string of a option."
+        ::= { hwVlanIfDhcpsOptionEntry 6 }
+
+    hwVlanIfDhcpsOptionCipher OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..255))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Cipher string of a option."
+        ::= { hwVlanIfDhcpsOptionEntry 7 }
+
+    hwVlanIfDhcpsOptionIPString OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..255))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Ip string of a option."
+        ::= { hwVlanIfDhcpsOptionEntry 8 }
+
+    hwVlanIfDhcpsDomainTable OBJECT-TYPE
+           SYNTAX SEQUENCE OF HwVlanIfDhcpsDomainEntry
+           MAX-ACCESS not-accessible
+           STATUS current
+           DESCRIPTION
+              "
+               A table for configuring domain search list to DHCP Server of vlan interface.
+              "
+           ::= { hwVlanMngObject 65015 }
+
+    hwVlanIfDhcpsDomainEntry OBJECT-TYPE
+           SYNTAX HwVlanIfDhcpsDomainEntry
+           MAX-ACCESS not-accessible
+           STATUS current
+           DESCRIPTION
+              "
+               An entry of objects for configuring domain search list to DHCP Server of vlan interface.
+ 	             The indexes of this entry is hwVlanInterfaceID, hwVlanIfDhcpsDomainIndex.
+              "
+           INDEX { hwVlanInterfaceID, hwVlanIfDhcpsDomainIndex }
+           ::= { hwVlanIfDhcpsDomainTable 1 }
+
+    HwVlanIfDhcpsDomainEntry ::=
+          SEQUENCE {
+              hwVlanIfDhcpsDomainIndex
+                  Integer32,
+              hwVlanIfDhcpsDomainName
+                  OCTET STRING,
+              hwVlanIfDhcpsDomainRowStatus
+                  RowStatus
+          }
+
+    hwVlanIfDhcpsDomainIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..3)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+             It is index of the DHCP Server domain search list.
+            "
+        ::= { hwVlanIfDhcpsDomainEntry 1 }
+    
+    hwVlanIfDhcpsDomainName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..32))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The domain name that client will use when resolving hostnames via the Domain Name System."
+        ::= { hwVlanIfDhcpsDomainEntry 2 }
+
+    hwVlanIfDhcpsDomainRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to configuration new rows in this
+            table, modify existing rows, and to delete
+            existing rows.Only three actions are used: active(1),
+            createAndGo(4), destroy(6)."
+        ::= { hwVlanIfDhcpsDomainEntry 3 }
+
+    hwVlanIfDhcpsExclIpTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwVlanIfDhcpsExclIpEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for configuring exclude ip to DHCP server, which don't allow to allocate to clients"
+        ::= { hwVlanMngObject 65016 }
+
+    hwVlanIfDhcpsExclIpEntry OBJECT-TYPE
+        SYNTAX HwVlanIfDhcpsExclIpEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry for configuring exclude ip to DHCP server"
+        INDEX { hwVlanInterfaceID, hwVlanIfDhcpsExclStartIp }
+        ::= { hwVlanIfDhcpsExclIpTable 1 }
+
+    HwVlanIfDhcpsExclIpEntry ::=
+        SEQUENCE {
+            hwVlanIfDhcpsExclStartIp
+                IpAddress,
+            hwVlanIfDhcpsExclEndIp
+                IpAddress,
+            hwVlanIfDhcpsExclIpRowStatus
+                RowStatus
+        }
+
+    hwVlanIfDhcpsExclStartIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Start ip address of exclude ip"
+        ::= { hwVlanIfDhcpsExclIpEntry 1 }
+
+    hwVlanIfDhcpsExclEndIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "End ip address of exclude ip"
+        ::= { hwVlanIfDhcpsExclIpEntry 2 }
+
+    hwVlanIfDhcpsExclIpRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to configuration new rows in this
+            table, modify existing rows, and to delete
+            existing rows.Only three actions are used: active(1),
+            createAndGo(4), destroy(6)
+            "
+        ::= { hwVlanIfDhcpsExclIpEntry 3 }
+
+    hwVlanIfDhcpsStaBindTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwVlanIfDhcpsStaBindEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for configuring static binding to DHCP server, which manual binding ip address and mac address"
+        ::= { hwVlanMngObject 65017 }
+
+    hwVlanIfDhcpsStaBindEntry OBJECT-TYPE
+        SYNTAX HwVlanIfDhcpsStaBindEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry of objects for configuring static binding to DHCP server."
+        INDEX { hwVlanInterfaceID, hwVlanIfDhcpsStaBindIp }
+        ::= { hwVlanIfDhcpsStaBindTable 1 }
+
+    HwVlanIfDhcpsStaBindEntry ::=
+        SEQUENCE {
+            hwVlanIfDhcpsStaBindIp
+                IpAddress,
+            hwVlanIfDhcpsStaBindMac
+                MacAddress,
+            hwVlanIfDhcpsStaBindDesc
+                OCTET STRING,
+            hwVlanIfDhcpsStaBindRowStatus
+                RowStatus
+        }
+
+    hwVlanIfDhcpsStaBindIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ip address in static binding for DHCP server"
+        ::= { hwVlanIfDhcpsStaBindEntry 1 }
+
+    hwVlanIfDhcpsStaBindMac OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Mac address in static binding for DHCP server"
+        ::= { hwVlanIfDhcpsStaBindEntry 2 }
+
+    hwVlanIfDhcpsStaBindDesc OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..255))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "A description of the static binding for DHCP server."
+        ::= { hwVlanIfDhcpsStaBindEntry 3 }
+
+    hwVlanIfDhcpsStaBindRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to configuration new rows in this
+            table, modify existing rows, and to delete
+            existing rows.Only three actions are used: active(1),
+            createAndGo(4), destroy(6)
+            "
+        ::= { hwVlanIfDhcpsStaBindEntry 4 }
+    
+    hwVlanIfDhcpsIpInUseTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwVlanIfDhcpsIpInUseEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for displaying the information of ip allocation to clients
+            for each vlanif DHCP server pools"
+        ::= { hwVlanMngObject 65018 }
+
+    hwVlanIfDhcpsIpInUseEntry OBJECT-TYPE
+        SYNTAX HwVlanIfDhcpsIpInUseEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry of objects for displaying information
+            of ip in use for each vlanif DHCP server pools"
+        INDEX { hwVlanIfDhcpsIpInUseVlan, hwVlanIfDhcpsIpInUseHAddr }
+        ::= { hwVlanIfDhcpsIpInUseTable 1 }
+
+    HwVlanIfDhcpsIpInUseEntry ::=
+        SEQUENCE {
+            hwVlanIfDhcpsIpInUseVlan
+                Integer32,
+            hwVlanIfDhcpsIpInUseHAddr
+                MacAddress,
+            hwVlanIfDhcpsIpInUseIP
+                IpAddress,
+            hwVlanIfDhcpsIpInUseEndLease
+                OCTET STRING,
+            hwVlanIfDhcpsIpInUseInterface
+                Integer32
+         }
+
+    hwVlanIfDhcpsIpInUseVlan OBJECT-TYPE
+        SYNTAX Integer32 (1..4094)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Vlan informationg that ip address belong to"
+        ::= { hwVlanIfDhcpsIpInUseEntry 1 }
+
+    hwVlanIfDhcpsIpInUseHAddr OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The MAC addreess of host use the ip address in DHCP pools"
+        ::= { hwVlanIfDhcpsIpInUseEntry 2 }
+
+    hwVlanIfDhcpsIpInUseIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ip address allocation to clients in DHCP pools"
+        ::= { hwVlanIfDhcpsIpInUseEntry 3 }
+
+    hwVlanIfDhcpsIpInUseEndLease OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..20))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "End time of ip address leasese.
+            The structure of the OCTET STRING is
+            year/month/day:hour:munite:second --
+            YYYY/MM/DD:hh:mm:ss"
+        ::= { hwVlanIfDhcpsIpInUseEntry 4 }
+
+    hwVlanIfDhcpsIpInUseInterface OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interface index information that ip address belong to"
+        ::= { hwVlanIfDhcpsIpInUseEntry 5 }
+
+END
