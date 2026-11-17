@@ -43,7 +43,7 @@ valid data.
 
 OS polling is not always the correct place for your own polling code.
 For guidance, ask a core developer on
-[Discord](https://t.libren.ms/discord).
+[Discord](https://discord.com/invite/librenms).
 
 Update the example file with more polling:
 
