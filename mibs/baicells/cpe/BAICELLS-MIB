@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (misspelled type)
 BAICELLS-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -154,7 +155,7 @@ SoftwareVersion OBJECT-TYPE
     ::= { deviceInfo 8 }
 
 UpTime OBJECT-TYPE
-    SYNTAX      Interger
+    SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
 	DESCRIPTION

@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing import)
 
 
                 -- Teldat, S.A.
@@ -50,7 +51,9 @@ TELDAT-MON-INTERF-CELLULAR-MIB
         DisplayString
             FROM RFC1213-MIB
         telProdNpMonInterfRouter
-            FROM TELDAT-SW-STRUCTURE-MIB;
+            FROM TELDAT-SW-STRUCTURE-MIB
+    Gauge32
+        FROM SNMPv2-SMI;
 
 
 -- Monitorizaci�n privada del interfaz CELLULAR
