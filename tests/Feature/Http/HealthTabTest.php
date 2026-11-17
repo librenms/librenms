@@ -58,6 +58,25 @@ final class HealthTabTest extends TestCase
             ->assertSee('type=sensor_temperature', false);
     }
 
+    public function testCounterSensorShowsRateButConfiguredLimits(): void
+    {
+        $device = Device::factory()->create();
+        Sensor::factory()->create([
+            'device_id' => $device->device_id,
+            'sensor_class' => 'count',
+            'rrd_type' => 'COUNTER',
+            'sensor_current' => 1000,
+            'sensor_prev' => 400,
+            'sensor_limit' => 5000,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.health', ['device' => $device, 'metric' => 'count']))
+            ->assertOk()
+            ->assertSee('Current: 2', false)
+            ->assertSee('High Limit: 5000', false);
+    }
+
     public function testMempoolShowsCompositeGraphForMultiplePools(): void
     {
         $device = Device::factory()->create();
