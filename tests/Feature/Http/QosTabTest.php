@@ -78,6 +78,19 @@ final class QosTabTest extends TestCase
             ->assertSee(e(route('device.port', ['device' => $device, 'port' => $port->port_id, 'view' => 'qos', 'show' => $qos->qos_id])), false);
     }
 
+    public function testPortQosTreeLinksDropUnrelatedQuery(): void
+    {
+        $device = Device::factory()->create();
+        $port = Port::factory()->create(['device_id' => $device->device_id]);
+        $qos = $this->qos($device, $port->port_id);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.port', ['device' => $device, 'port' => $port->port_id, 'view' => 'qos', 'interval' => '5']))
+            ->assertOk()
+            ->assertSee(e(route('device.port', ['device' => $device, 'port' => $port->port_id, 'view' => 'qos', 'show' => $qos->qos_id])), false)
+            ->assertDontSee('interval=5&amp;show=', false);
+    }
+
     private function qos(Device $device, ?int $portId = null): Qos
     {
         return Qos::create([

@@ -7,9 +7,9 @@
         @if($qosGraph->qos_id == $show)
         <span title="{{ $qosGraph->tooltip }}">{{ $qosGraph->title }}</span>
         @else
-        <a href="{{ request()->fullUrlWithQuery(['show' => $qosGraph->qos_id]) }}" title="{{ $qosGraph->tooltip }}">{{ $qosGraph->title }}</a>
+        <a href="{{ $link($qosGraph->qos_id) }}" title="{{ $qosGraph->tooltip }}">{{ $qosGraph->title }}</a>
         @endif
-        <x-qos-tree :qosItems="$qosItems" :parentQosId="$qosGraph->qos_id" :show="$show" />
+        <x-qos-tree :qosItems="$qosItems" :deviceId="$deviceId" :portId="$portId" :parentQosId="$qosGraph->qos_id" :show="$show" />
     </li>
     @endforeach
     @if($parentQosId)
