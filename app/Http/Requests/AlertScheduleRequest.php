@@ -32,6 +32,7 @@ class AlertScheduleRequest extends FormRequest
             'title' => 'required|string|max:255',
             'notes' => 'nullable|string',
             'recurring' => 'boolean',
+            'timezone' => 'nullable|timezone:all_with_bc',
             'behavior' => ['required', Rule::enum(MaintenanceBehavior::class)],
             'maps' => 'required|array|min:1',
             'maps.*' => 'regex:/^[gl]?\d+$/',

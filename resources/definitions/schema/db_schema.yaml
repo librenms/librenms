@@ -163,6 +163,7 @@ alert_schedule:
     - { Field: recurring, Type: 'tinyint unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: start, Type: datetime, 'Null': false, Extra: '', Default: '1970-01-02 00:00:01' }
     - { Field: end, Type: datetime, 'Null': false, Extra: '', Default: '1970-01-02 00:00:01' }
+    - { Field: timezone, Type: varchar(64), 'Null': false, Extra: '', Default: UTC }
     - { Field: recurring_day, Type: varchar(15), 'Null': true, Extra: '' }
     - { Field: title, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: notes, Type: text, 'Null': false, Extra: '' }

@@ -65,6 +65,7 @@ class AlertScheduleController extends TableController
             'end' => 'end',
             'status' => DB::raw("end < '" . Carbon::now('UTC') . "'"), // only partition lapsed
             'behavior' => 'behavior',
+            'timezone' => 'timezone',
         ];
     }
 
@@ -79,6 +80,7 @@ class AlertScheduleController extends TableController
             'notes' => htmlentities((string) $model->notes),
             'behavior' => $model->behavior->descr(),
             'id' => $model->schedule_id,
+            'timezone' => htmlentities((string) $model->timezone),
             'start' => $model->recurring ? '' : $model->start->toDateTimeString('minutes'),
             'end' => $model->recurring ? '' : $model->end->toDateTimeString('minutes'),
             'start_recurring_dt' => $model->recurring ? $model->start_recurring_dt : '',

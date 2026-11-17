@@ -128,6 +128,150 @@ final class AlertScheduleControllerTest extends TestCase
         $this->assertSame(['Mo', 'We', 'Fr'], $schedule->recurring_day);
     }
 
+    public function testStoreDefaultsToUserTimezone(): void
+    {
+        $device = Device::factory()->create();
+
+        $response = $this->actingAs($this->admin())
+            ->withSession(['preferences.timezone' => 'Asia/Tokyo'])
+            ->postJson(route('alert-schedule.store'), [
+                'title' => 'User timezone',
+                'behavior' => MaintenanceBehavior::SkipAlerts->value,
+                'start' => '2026-10-02 12:00',
+                'end' => '2026-10-02 14:00',
+                'maps' => [$device->device_id],
+            ])
+            ->assertCreated();
+
+        $schedule = AlertSchedule::findOrFail($response->json('schedule_id'));
+        $this->assertSame('Asia/Tokyo', $schedule->timezone);
+        $this->assertTrue($schedule->start->equalTo(Carbon::parse('2026-10-02 03:00', 'UTC')));
+        $this->assertSame('12:00', $schedule->start->format('H:i'));
+    }
+
+    public function testStoreFallsBackToServerTimezone(): void
+    {
+        $device = Device::factory()->create();
+
+        $response = $this->actingAs($this->admin())
+            ->postJson(route('alert-schedule.store'), [
+                'title' => 'Server timezone',
+                'behavior' => MaintenanceBehavior::SkipAlerts->value,
+                'start' => '2026-10-02 12:00',
+                'end' => '2026-10-02 14:00',
+                'maps' => [$device->device_id],
+            ])
+            ->assertCreated();
+
+        $this->assertSame(config('app.timezone'), AlertSchedule::findOrFail($response->json('schedule_id'))->timezone);
+    }
+
+    public function testStoreUsesSelectedTimezone(): void
+    {
+        $device = Device::factory()->create();
+
+        $one_time = $this->actingAs($this->admin())
+            ->withSession(['preferences.timezone' => 'Asia/Tokyo'])
+            ->postJson(route('alert-schedule.store'), [
+                'title' => 'One time',
+                'behavior' => MaintenanceBehavior::SkipAlerts->value,
+                'timezone' => 'America/New_York',
+                'start' => '2026-10-02 12:00',
+                'end' => '2026-10-02 14:00',
+                'maps' => [$device->device_id],
+            ])
+            ->assertCreated();
+
+        $schedule = AlertSchedule::findOrFail($one_time->json('schedule_id'));
+        $this->assertSame('America/New_York', $schedule->timezone);
+        $this->assertTrue($schedule->start->equalTo(Carbon::parse('2026-10-02 16:00', 'UTC')));
+        $this->assertTrue($schedule->end->equalTo(Carbon::parse('2026-10-02 18:00', 'UTC')));
+
+        $recurring = $this->postJson(route('alert-schedule.store'), [
+            'title' => 'Recurring',
+            'behavior' => MaintenanceBehavior::SkipAlerts->value,
+            'timezone' => 'America/New_York',
+            'recurring' => 1,
+            'start_recurring_dt' => '2026-10-02',
+            'start_recurring_hr' => '23:00',
+            'end_recurring_hr' => '01:00',
+            'maps' => [$device->device_id],
+        ])->assertCreated();
+
+        $schedule = AlertSchedule::findOrFail($recurring->json('schedule_id'));
+        $this->assertSame('2026-10-02', $schedule->start_recurring_dt);
+        $this->assertSame('23:00', $schedule->start_recurring_hr);
+        $this->assertSame('01:00', $schedule->end_recurring_hr);
+    }
+
+    public function testStoreKeepsAbsoluteStartWhenOffsetProvided(): void
+    {
+        $device = Device::factory()->create();
+
+        $response = $this->actingAs($this->admin())
+            ->withSession(['preferences.timezone' => 'Asia/Tokyo'])
+            ->postJson(route('alert-schedule.store'), [
+                'title' => 'Absolute',
+                'behavior' => MaintenanceBehavior::SkipAlerts->value,
+                'start' => '2026-10-02T12:00:00Z',
+                'duration' => '1:00',
+                'maps' => [$device->device_id],
+            ])
+            ->assertCreated();
+
+        $schedule = AlertSchedule::findOrFail($response->json('schedule_id'));
+        $this->assertSame('Asia/Tokyo', $schedule->timezone);
+        $this->assertTrue($schedule->start->equalTo(Carbon::parse('2026-10-02 12:00', 'UTC')));
+        $this->assertTrue($schedule->end->equalTo(Carbon::parse('2026-10-02 13:00', 'UTC')));
+    }
+
+    public function testStoreRejectsInvalidTimezone(): void
+    {
+        $this->actingAs($this->admin())
+            ->postJson(route('alert-schedule.store'), ['timezone' => 'Mars/Olympus'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['timezone']);
+    }
+
+    public function testUpdateKeepsTimezoneWhenOmitted(): void
+    {
+        $device = Device::factory()->create();
+        $schedule = AlertSchedule::factory()->create(['timezone' => 'Europe/Berlin']);
+
+        $this->actingAs($this->admin())
+            ->withSession(['preferences.timezone' => 'Asia/Tokyo'])
+            ->putJson(route('alert-schedule.update', $schedule), [
+                'title' => 'Updated',
+                'behavior' => MaintenanceBehavior::SkipAlerts->value,
+                'start' => '2026-10-02 12:00',
+                'end' => '2026-10-02 14:00',
+                'maps' => [$device->device_id],
+            ])
+            ->assertOk();
+
+        $schedule->refresh();
+        $this->assertSame('Europe/Berlin', $schedule->timezone);
+        $this->assertTrue($schedule->start->equalTo(Carbon::parse('2026-10-02 10:00', 'UTC')));
+    }
+
+    public function testShowReturnsTimesInScheduleTimezone(): void
+    {
+        $schedule = AlertSchedule::factory()->create([
+            'timezone' => 'Asia/Tokyo',
+            'start' => '2026-10-02 12:00:00',
+            'end' => '2026-10-02 14:00:00',
+        ]);
+
+        $this->actingAs($this->admin())
+            ->getJson(route('alert-schedule.show', $schedule))
+            ->assertOk()
+            ->assertJson([
+                'timezone' => 'Asia/Tokyo',
+                'start' => '2026-10-02 12:00',
+                'end' => '2026-10-02 14:00',
+            ]);
+    }
+
     public function testStoreAppendsNoteToDevicesWhenPreferenceEnabled(): void
     {
         Carbon::setTestNow('2026-10-02 12:00:00');
@@ -351,6 +495,27 @@ final class AlertScheduleControllerTest extends TestCase
             ->assertDontSee('<maintenance-mode', false);
     }
 
+    public function testFormPreselectsUserTimezone(): void
+    {
+        $this->actingAs($this->admin())
+            ->withSession(['preferences.timezone' => 'Asia/Tokyo'])
+            ->get('/alert-schedule')
+            ->assertOk()
+            ->assertSee('<option value="Asia/Tokyo" selected>', false)
+            ->assertSee('$(\'#timezone\').val("Asia\/Tokyo")', false)
+            ->assertSee('js/RrdGraphJS/moment-timezone-with-data.js', false);
+    }
+
+    public function testFormPreselectsServerTimezoneMissingFromList(): void
+    {
+        config(['app.timezone' => 'US/Eastern']);
+
+        $this->actingAs($this->admin())
+            ->get('/alert-schedule')
+            ->assertOk()
+            ->assertSee('<option value="US/Eastern" selected>', false);
+    }
+
     public function testTableShowsBehaviorLabel(): void
     {
         AlertSchedule::factory()->create([
@@ -363,5 +528,22 @@ final class AlertScheduleControllerTest extends TestCase
             ->assertOk()
             ->assertJsonPath('rows.0.title', 'Muted window')
             ->assertJsonPath('rows.0.behavior', MaintenanceBehavior::MuteAlerts->descr());
+    }
+
+    public function testTableShowsTimesInScheduleTimezone(): void
+    {
+        AlertSchedule::factory()->create([
+            'title' => 'Tokyo window',
+            'timezone' => 'Asia/Tokyo',
+            'start' => '2026-10-02 12:00:00',
+            'end' => '2026-10-02 14:00:00',
+        ]);
+
+        $this->actingAs($this->admin())
+            ->postJson('/ajax/table/alert-schedule', ['searchPhrase' => 'Tokyo window'])
+            ->assertOk()
+            ->assertJsonPath('rows.0.timezone', 'Asia/Tokyo')
+            ->assertJsonPath('rows.0.start', '2026-10-02 12:00')
+            ->assertJsonPath('rows.0.end', '2026-10-02 14:00');
     }
 }

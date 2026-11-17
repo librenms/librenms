@@ -32,7 +32,6 @@ use Date;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\AlertScheduleStatus;
 use LibreNMS\Enum\MaintenanceBehavior;
@@ -48,9 +47,8 @@ class AlertSchedule extends Model
     protected $table = 'alert_schedule';
     protected $primaryKey = 'schedule_id';
     protected $appends = ['start_recurring_dt', 'end_recurring_dt', 'start_recurring_hr', 'end_recurring_hr', 'status'];
-    protected $fillable = ['title', 'notes', 'recurring', 'behavior'];
+    protected $fillable = ['title', 'notes', 'recurring', 'behavior', 'timezone'];
 
-    private $timezone;
     private $days = [
         'Mo' => 1,
         'Tu' => 2,
@@ -64,7 +62,7 @@ class AlertSchedule extends Model
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->timezone = config('app.timezone');
+        $this->attributes['timezone'] ??= config('app.timezone');
     }
 
     /**
@@ -100,7 +98,7 @@ class AlertSchedule extends Model
 
     public function setStartAttribute($start)
     {
-        $this->attributes['start'] = $this->fromDateTime(Date::parse($start)->tz('UTC'));
+        $this->attributes['start'] = $this->fromDateTime(Date::parse($start, $this->timezone)->tz('UTC'));
     }
 
     public function getEndAttribute()
@@ -110,7 +108,7 @@ class AlertSchedule extends Model
 
     public function setEndAttribute($end)
     {
-        $this->attributes['end'] = $this->fromDateTime(Date::parse($end)->tz('UTC'));
+        $this->attributes['end'] = $this->fromDateTime(Date::parse($end, $this->timezone)->tz('UTC'));
     }
 
     public function getStartRecurringDtAttribute()
@@ -160,7 +158,7 @@ class AlertSchedule extends Model
      */
     public function getStatusAttribute()
     {
-        $now = Carbon::now();
+        $now = Carbon::now($this->timezone);
 
         if ($now > $this->end) {
             return AlertScheduleStatus::LAPSED;
@@ -171,54 +169,42 @@ class AlertSchedule extends Model
         }
 
         // recurring
-        $now_time = $now->secondsSinceMidnight();
-        $start_time = $this->start->secondsSinceMidnight();
-        $end_time = $this->end->secondsSinceMidnight();
+        // compare wall clock times in the schedule timezone so the window doesn't shift with DST
+        $now_time = $now->format('H:i:s');
+        $start_time = $this->start->format('H:i:s');
+        $end_time = $this->end->format('H:i:s');
         $after_start = $now > $this->start;
         $spans_days = $start_time > $end_time;
 
         // check inside start and end times or outside start and end times (if we span a day)
         $active = $spans_days ? ($after_start && ($now_time < $end_time || $now_time >= $start_time)) : ($now_time >= $start_time && $now_time < $end_time);
 
-        return $active && Str::contains($this->attributes['recurring_day'], $now->format('N')) ? AlertScheduleStatus::ACTIVE : AlertScheduleStatus::SET;
+        $on_day = empty($this->attributes['recurring_day']) || Str::contains($this->attributes['recurring_day'], $now->format('N'));
+
+        return $active && $on_day ? AlertScheduleStatus::ACTIVE : AlertScheduleStatus::SET;
     }
 
     // ---- Query scopes ----
 
     public function scopeIsActive($query)
     {
-        return $query->where(function ($query): void {
-            $now = CarbonImmutable::now('UTC');
-            $localDayNum = CarbonImmutable::now()->format('N');
-            $query->where('start', '<=', $now)
-                ->where('end', '>=', $now)
-                ->where(function ($query) use ($now, $localDayNum): void {
-                    $query->where('recurring', 0) // Non recurring simply between start and end
-                    ->orWhere(function ($query) use ($now, $localDayNum): void {
-                        $query->where('recurring', 1)
-                            // Check the time is after the start date and before the end date, or end date is not set
-                            ->where(function ($query) use ($now): void {
-                                $query->where(function ($query) use ($now): void {
-                                    // normal, inside one day
-                                    $query->whereTime('start', '<', DB::raw('time(`end`)'))
-                                        ->whereTime('start', '<=', $now->toTimeString())
-                                        ->whereTime('end', '>', $now->toTimeString());
-                                })->orWhere(function ($query) use ($now): void {
-                                    // outside, spans days
-                                    $query->whereTime('start', '>', DB::raw('time(`end`)'))
-                                        ->where(function ($query) use ($now): void {
-                                            $query->whereTime('start', '<=', $now->toTimeString())
-                                                ->orWhereTime('end', '>', $now->toTimeString());
-                                        });
-                                });
-                            })
-                            // Check we are on the correct day of the week
-                            ->where(function ($query) use ($localDayNum): void {
-                                $query->where('recurring_day', 'like', "%{$localDayNum}%")
-                                    ->orWhereNull('recurring_day');
-                            });
-                    });
-                });
+        $now = CarbonImmutable::now('UTC');
+
+        // recurring windows depend on each schedule's timezone, which SQL can't evaluate without the server's timezone tables
+        $activeRecurringIds = self::query()
+            ->where('recurring', 1)
+            ->where('start', '<=', $now)
+            ->where('end', '>=', $now)
+            ->get(['schedule_id', 'recurring', 'start', 'end', 'recurring_day', 'timezone'])
+            ->filter(fn (self $schedule) => $schedule->status === AlertScheduleStatus::ACTIVE)
+            ->modelKeys();
+
+        return $query->where(function ($query) use ($now, $activeRecurringIds): void {
+            $query->where(function ($query) use ($now): void {
+                $query->where('recurring', 0)
+                    ->where('start', '<=', $now)
+                    ->where('end', '>=', $now);
+            })->orWhereIn($query->qualifyColumn('schedule_id'), $activeRecurringIds);
         });
     }
 
