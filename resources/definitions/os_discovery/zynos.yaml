@@ -80,9 +80,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.1.1.3.{{ $index }}'
                     descr: 'Switch {{ ZYXEL-HW-MONITOR-MIB::zyHwMonitorFanRpmDescription }}'
                     index: 'zyHwMonitorFanRpmCurrentValue.{{ $index }}'
-                    high_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorFanRpmMaxValue
-                    low_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorFanRpmMinValue
-                    low_warn_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorFanRpmLowThreshold
+                    low_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorFanRpmLowThreshold
                 -
                     oid: ZYXEL-MGS3712-MIB::fanRpmTable
                     value: ZYXEL-MGS3712-MIB::fanRpmCurValue
@@ -98,9 +96,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.890.1.15.3.26.1.2.1.3.{{ $index }}'
                     descr: 'Switch {{ ZYXEL-HW-MONITOR-MIB::zyHwMonitorTemperatureDescription }}'
                     index: 'zyHwMonitorTemperatureCurrentValue.{{ $index }}'
-                    high_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorTemperatureMaxValue
-                    low_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorTemperatureMinValue
-                    warn_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorTemperatureHighThreshold
+                    high_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorTemperatureHighThreshold
                 -
                     oid: ZYXEL-MGS3712-MIB::tempTable
                     value: ZYXEL-MGS3712-MIB::tempCurValue
@@ -183,9 +179,7 @@ modules:
                     divisor: 1000
                     descr: 'Switch {{ ZYXEL-HW-MONITOR-MIB::zyHwMonitorVoltageDescription }}'
                     index: 'zyHwMonitorVoltageCurrentValue.{{ $index }}'
-                    high_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorVoltageMaxValue
-                    low_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorVoltageMinValue
-                    low_warn_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorVoltageLowThreshold
+                    low_limit: ZYXEL-HW-MONITOR-MIB::zyHwMonitorVoltageLowThreshold
                 -
                     oid: ZYXEL-MGS3712-MIB::voltageTable
                     value: ZYXEL-MGS3712-MIB::voltageCurValue

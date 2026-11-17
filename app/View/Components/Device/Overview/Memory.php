@@ -19,19 +19,20 @@ class Memory extends Component
     public function __construct(public Device $device)
     {
         $this->mempools = $device->mempools->map(function (Mempool $mempool) use ($device): array {
-            $total = Number::formatBi($mempool->mempool_total);
-            $used = Number::formatBi($mempool->mempool_used);
-            $free = Number::formatBi($mempool->mempool_free);
+            $isPercent = $mempool->mempool_total == 100;
+            $total = $isPercent ? '100%' : Number::formatBi($mempool->mempool_total);
+            $used = $isPercent ? $mempool->mempool_used . '%' : Number::formatBi($mempool->mempool_used);
+            $free = $isPercent ? $mempool->mempool_free . '%' : Number::formatBi($mempool->mempool_free);
             $percent = (float) $mempool->mempool_perc;
             $shadow = null;
 
-            if ($mempool->mempool_class === 'system' && $device->mempools->count() > 1) {
+            if (! $isPercent && $mempool->mempool_class === 'system' && $device->mempools->count() > 1) {
                 $buffers = $device->mempools->where('mempool_class', 'buffers')->sum('mempool_used');
                 $cached = $device->mempools->where('mempool_class', 'cached')->sum('mempool_used');
                 $shadow = Number::calculatePercent($mempool->mempool_used + $buffers + $cached, $mempool->mempool_total, 0);
             }
 
-            [$leftText, $rightText] = match ($mempool->mempool_class) {
+            [$leftText, $rightText] = $isPercent ? ["$percent%", $free] : match ($mempool->mempool_class) {
                 'system', 'virtual', 'swap' => ["$used / $total ($percent%)", $free],
                 default => ["$used ($percent%)", ''],
             };
