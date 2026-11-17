@@ -258,7 +258,7 @@ trait FakesBgpTables
         return $os;
     }
 
-    protected function walkBgpTable(string $context, string $mib, array $columns, ?string $entry = null): array
+    protected function walkBgpTable(string $context, string $mib, array $columns, ?string $table = null): array
     {
         $this->walked[] = "$context:$mib::" . reset($columns);
         $data = $this->snmp[$context] ?? [];
