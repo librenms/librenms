@@ -31,7 +31,6 @@ use App\Models\Device;
 use App\Models\Link;
 use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
-use LibreNMS\Util\Url;
 
 class NeighboursController implements DeviceTab
 {
@@ -57,7 +56,11 @@ class NeighboursController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        $selection = Url::parseOptions('selection', 'list');
+        $request->validate([
+            'selection' => 'nullable|in:list,map',
+        ]);
+
+        $selection = $request->string('selection', 'list')->value();
 
         if ($selection == 'list') {
             $linksQuery = $device->links()->with('port', 'remoteDevice', 'remotePort');
@@ -71,11 +74,11 @@ class NeighboursController implements DeviceTab
             'selections' => [
                 'list' => [
                     'text' => 'List',
-                    'link' => route('device', ['device' => $device, 'tab' => 'neighbours', 'vars' => 'selection=list']),
+                    'link' => route('device', ['device' => $device, 'tab' => 'neighbours', 'selection' => 'list']),
                 ],
                 'map' => [
                     'text' => 'Map',
-                    'link' => route('device', ['device' => $device, 'tab' => 'neighbours', 'vars' => 'selection=map']),
+                    'link' => route('device', ['device' => $device, 'tab' => 'neighbours', 'selection' => 'map']),
                 ],
             ],
             'selection' => $selection,

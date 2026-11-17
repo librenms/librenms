@@ -30,7 +30,6 @@ use App\Models\Device;
 use App\Models\Pseudowire;
 use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
-use LibreNMS\Util\Url;
 
 class PseudowiresController implements DeviceTab
 {
@@ -56,10 +55,11 @@ class PseudowiresController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        $view = Url::parseOptions('view', 'detail');
-        if (! in_array($view, ['detail', 'minigraphs'], true)) {
-            $view = 'detail';
-        }
+        $request->validate([
+            'view' => 'nullable|in:detail,minigraphs',
+        ]);
+
+        $view = $request->string('view', 'detail')->value();
 
         $pseudowires = $device->pseudowires()
             ->with(['port', 'peerDevice'])
@@ -104,11 +104,11 @@ class PseudowiresController implements DeviceTab
             'options' => [
                 'detail' => [
                     'text' => __('Details'),
-                    'link' => route('device', ['device' => $device, 'tab' => 'pseudowires', 'vars' => 'view=detail']),
+                    'link' => route('device', ['device' => $device, 'tab' => 'pseudowires', 'view' => 'detail']),
                 ],
                 'minigraphs' => [
                     'text' => __('Mini Graphs'),
-                    'link' => route('device', ['device' => $device, 'tab' => 'pseudowires', 'vars' => 'view=minigraphs']),
+                    'link' => route('device', ['device' => $device, 'tab' => 'pseudowires', 'view' => 'minigraphs']),
                 ],
             ],
             'rows' => $rows,

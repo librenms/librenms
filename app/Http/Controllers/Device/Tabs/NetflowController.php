@@ -32,7 +32,6 @@ use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Binaries;
 use LibreNMS\Util\Nfsen;
-use LibreNMS\Util\Url;
 use Symfony\Component\Process\Process;
 
 class NetflowController implements DeviceTab
@@ -77,10 +76,19 @@ class NetflowController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
+        $request->validate([
+            'nfsen' => 'nullable|string',
+            'channel' => 'nullable|string',
+            'topN' => 'nullable|integer',
+            'lastN' => 'nullable|integer',
+            'stattype' => 'nullable|string',
+            'statorder' => 'nullable|string',
+        ]);
+
         $channels = Nfsen::channels($device->hostname);
-        $channel = Url::parseOptions('channel');
+        $channel = $request->string('channel')->value();
         $channel = isset($channels[$channel]) ? $channel : null;
-        $view = Url::parseOptions('nfsen');
+        $view = $request->string('nfsen')->value();
         $view = match ($view) {
             'stats' => 'stats',
             'channel' => $channel ? 'channel' : 'general',
@@ -117,18 +125,18 @@ class NetflowController implements DeviceTab
      */
     private function stats(Device $device, Request $request): array
     {
-        $topN = (int) $request->input('topN');
+        $topN = $request->integer('topN');
         $topN = $topN > 0 && $topN <= LibrenmsConfig::get('nfsen_top_max') ? $topN : (int) LibrenmsConfig::get('nfsen_top_default');
-        $lastN = (int) $request->input('lastN');
+        $lastN = $request->integer('lastN');
         $lastN = $lastN > 0 && $lastN <= LibrenmsConfig::get('nfsen_last_max') ? $lastN : (int) LibrenmsConfig::get('nfsen_last_default');
-        $type = $request->input('stattype');
+        $type = $request->string('stattype')->value();
         $type = isset(self::STAT_TYPES[$type]) ? $type : LibrenmsConfig::get('nfsen_stats_default');
-        $order = $request->input('statorder');
+        $order = $request->string('statorder')->value();
         $order = in_array($order, self::ORDERS) ? $order : LibrenmsConfig::get('nfsen_order_default');
 
         return [
             'form' => [
-                'action' => $this->link($device, ['nfsen' => 'stats']),
+                'action' => $this->link($device, []),
                 'topN' => $topN,
                 'lastN' => $lastN,
                 'stattype' => $type,

@@ -89,6 +89,36 @@ final class NetflowTabTest extends TestCase
             ->assertDontSee('<pre>', false);
     }
 
+    public function testStatsFormKeepsViewInQuery(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'router.example.com']);
+
+        $this->actingAs($this->admin())
+            ->get(route('device', ['device' => $device, 'tab' => 'netflow', 'nfsen' => 'stats']))
+            ->assertOk()
+            ->assertSee('<input type="hidden" name="nfsen" value="stats">', false)
+            ->assertSee('netflow?nfsen=stats', false);
+    }
+
+    public function testLegacyPathOptionsRedirectToQuery(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'router.example.com']);
+
+        $this->actingAs($this->admin())
+            ->get(route('device', ['device' => $device, 'tab' => 'netflow', 'vars' => 'nfsen=channel/channel=upstream', 'topN' => 20]))
+            ->assertRedirect(route('device', ['device' => $device, 'tab' => 'netflow', 'topN' => 20, 'nfsen' => 'channel', 'channel' => 'upstream']));
+    }
+
+    public function testLegacyPathPostIsNotRedirected(): void
+    {
+        $device = Device::factory()->create(['hostname' => 'router.example.com']);
+
+        $this->actingAs($this->admin())
+            ->post(route('device', ['device' => $device, 'tab' => 'netflow', 'vars' => 'nfsen=stats']))
+            ->assertOk()
+            ->assertSee('type=device_nfsen_flows', false);
+    }
+
     private function admin(): User
     {
         $admin = User::factory()->create(['enabled' => 1]);

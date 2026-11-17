@@ -94,17 +94,29 @@ class PortController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        $port = $device->ports()->findOrFail((int) Url::parseOptions('port'));
+        $request->validate([
+            'view' => 'nullable|string',
+            'show' => 'nullable|integer',
+            'graph' => 'nullable|string',
+            'subview' => 'nullable|string',
+            'interval' => 'nullable|string',
+            'sort' => 'nullable|string',
+            'period' => 'nullable|string',
+        ]);
+
+        // resolved and authorized from the /port/{id} path by DeviceController
+        $port = $request->attributes->get('port');
+        abort_unless($port instanceof Port && $port->device_id == $device->device_id, 404);
         $port->setRelation('device', $device);
 
         $views = $this->views($device, $port);
-        $view = Url::parseOptions('view', 'graphs');
+        $view = $request->string('view', 'graphs')->value();
         $view = isset($views[$view]) || in_array($view, ['macaccounting', 'junose-atm-vp']) ? $view : 'graphs';
 
         $data = [
             'port' => $port,
             'view' => $view,
-            'menus' => $this->menus($port, $views, $view),
+            'menus' => $this->menus($port, $views, $view, $request),
             'bill' => $this->billLink($port),
             'neighbors' => [$port->port_id => (new PortsController)->findPortNeighbors($port)],
             'portsWithEvents' => (new PortsController)->portsWithEvents($device->device_id, [$port->port_id]),
@@ -113,14 +125,14 @@ class PortController implements DeviceTab
         return $data + match ($view) {
             'graphs' => ['graphs' => $this->existingGraphs($device, $port, self::GRAPHS)],
             'xdsl' => ['graphs' => $this->existingGraphs($device, $port, self::XDSL_GRAPHS)],
-            'realtime' => $this->realtime($device),
+            'realtime' => $this->realtime($device, $request),
             'notes' => ['notes' => $device->getAttrib("port_id_notes:$port->port_id") ?? ''],
             'sensors' => ['sensors' => $this->sensors($device, $port)->get()],
             'pagp' => ['members' => $device->ports()->where('pagpGroupIfIndex', $port->ifIndex)->get()],
             'vlans' => ['vlans' => $this->vlans($device, $port)],
-            'macaccounting' => $this->macAccounting($port),
-            'junose-atm-vp' => $this->atmVps($port),
-            'qos' => ['show' => Url::parseOptions('show')],
+            'macaccounting' => $this->macAccounting($port, $request),
+            'junose-atm-vp' => $this->atmVps($port, $request),
+            'qos' => ['show' => $request->filled('show') ? $request->integer('show') : null],
             'plugins' => ['plugins' => $this->plugins($device, $port)],
             default => [],
         };
@@ -193,7 +205,7 @@ class PortController implements DeviceTab
      * @param  array<string, string>  $views
      * @return list<array{name: string, options: array<string, array{text: string, link: string}>, selected: ?string}>
      */
-    private function menus(Port $port, array $views, string $view): array
+    private function menus(Port $port, array $views, string $view, Request $request): array
     {
         $options = collect($views)->map(fn ($text, $view) => ['text' => $text, 'link' => Url::portUrl($port, ['view' => $view])])->all();
         $options['eventlog'] = ['text' => __('Eventlog'), 'link' => route('device.eventlog', ['device' => $port->device_id, 'port' => $port->port_id])];
@@ -210,7 +222,7 @@ class PortController implements DeviceTab
             $menus[] = [
                 'name' => __('MAC Accounting'),
                 'options' => $options,
-                'selected' => $view == 'macaccounting' ? Url::parseOptions('graph', 'bits') . '-' . Url::parseOptions('subview', 'graphs') : null,
+                'selected' => $view == 'macaccounting' ? $request->string('graph', 'bits') . '-' . $request->string('subview', 'graphs') : null,
             ];
         }
 
@@ -218,7 +230,7 @@ class PortController implements DeviceTab
             $menus[] = [
                 'name' => __('ATM VPs'),
                 'options' => collect(self::ATM_GRAPHS)->map(fn ($text, $graph) => ['text' => __($text), 'link' => Url::portUrl($port, ['view' => 'junose-atm-vp', 'graph' => $graph])])->all(),
-                'selected' => $view == 'junose-atm-vp' ? Url::parseOptions('graph', 'bits') : null,
+                'selected' => $view == 'junose-atm-vp' ? $request->string('graph', 'bits')->value() : null,
             ];
         }
 
@@ -249,9 +261,9 @@ class PortController implements DeviceTab
     /**
      * @return array<string, mixed>
      */
-    private function realtime(Device $device): array
+    private function realtime(Device $device, Request $request): array
     {
-        $interval = Url::parseOptions('interval');
+        $interval = $request->string('interval')->value();
 
         return [
             'interval' => in_array($interval, self::REALTIME_INTERVALS) ? $interval : ($device->os == 'linux' ? '15' : '2'),
@@ -301,15 +313,15 @@ class PortController implements DeviceTab
     /**
      * @return array<string, mixed>
      */
-    private function macAccounting(Port $port): array
+    private function macAccounting(Port $port, Request $request): array
     {
-        $subview = Url::parseOptions('subview');
+        $subview = $request->string('subview')->value();
         $subview = in_array($subview, ['minigraphs', 'top10']) ? $subview : 'graphs';
-        $graph = Url::parseOptions('graph') == 'pkts' ? 'pkts' : 'bits';
+        $graph = $request->string('graph')->value() == 'pkts' ? 'pkts' : 'bits';
 
         if ($subview == 'top10') {
-            $sort = Url::parseOptions('sort');
-            $period = Url::parseOptions('period');
+            $sort = $request->string('sort')->value();
+            $period = $request->string('period')->value();
 
             return [
                 'subview' => $subview,
@@ -345,9 +357,9 @@ class PortController implements DeviceTab
     /**
      * @return array<string, mixed>
      */
-    private function atmVps(Port $port): array
+    private function atmVps(Port $port, Request $request): array
     {
-        $graph = Url::parseOptions('graph');
+        $graph = $request->string('graph')->value();
 
         return [
             'graph' => isset(self::ATM_GRAPHS[$graph]) ? $graph : 'bits',

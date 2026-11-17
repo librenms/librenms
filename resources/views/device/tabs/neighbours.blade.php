@@ -101,7 +101,7 @@ var network = new vis.Network(container, data, options);
 visPopups.attach(network, {ports: true});
 network.on('click', function (properties) {
     if (properties.nodes > 0) {
-       window.location.href = "{{ @url('device') }}/device="+properties.nodes+"/tab=neighbours/selection=map/"
+       window.location.href = {{ \Illuminate\Support\Js::from(route('device', ['device' => '__DEVICE__', 'tab' => 'neighbours', 'selection' => 'map'])) }}.replace('__DEVICE__', properties.nodes);
     }
 });
 </script>

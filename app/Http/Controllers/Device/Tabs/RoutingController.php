@@ -30,7 +30,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
 use LibreNMS\Interfaces\UI\DeviceTab;
-use LibreNMS\Util\Url;
 
 class RoutingController implements DeviceTab
 {
@@ -56,12 +55,17 @@ class RoutingController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        $options = Url::parseOptions();
+        $request->validate([
+            'proto' => 'nullable|string',
+            'section' => 'nullable|string',
+        ]);
+
+        $options = $request->query();
 
         $routingTabs = RoutingTabs::getRoutingTabs($device);
         $tabKeys = array_keys($routingTabs);
 
-        $proto = $options['proto'] ?? $options['section'] ?? $tabKeys[0] ?? 'cef';
+        $proto = $request->string('proto')->value() ?: $request->string('section')->value() ?: $tabKeys[0] ?? 'cef';
 
         // Map any legacy names if needed (e.g. ipsec_tunnels -> ipsec-tunnels)
         $protoNormalized = str_replace('_', '-', $proto);

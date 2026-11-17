@@ -14,6 +14,7 @@
     @if($data['view'] == 'stats')
         <x-panel>
             <form method="get" action="{{ $data['form']['action'] }}" class="form-inline">
+                <input type="hidden" name="nfsen" value="stats">
                 <label>{{ __('Top N') }}
                     <select name="topN" class="form-control input-sm">
                         @foreach($data['tops'] as $top)

@@ -11,7 +11,7 @@
                     $transceiver->setRelation('port', $port); // save a query
                 @endphp
                 <x-popup>
-                    <a href="{{ \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $port->device_id, 'tab' => 'port','port' => $port->port_id], ['view' => 'transceiver']) }}" class="tw:text-current">
+                    <a href="{{ \LibreNMS\Util\Url::portUrl($port, ['view' => 'transceiver']) }}" class="tw:text-current">
                         <span class="tw:ml-3 tw:text-3xl"><x-icons.transceiver/></span>
                     </a>
                     <x-slot name="body" class="tw:p-0">
@@ -28,7 +28,7 @@
         </div>
         <div>
             @if($port->ifInErrors_delta > 0 || $port->ifOutErrors_delta > 0)
-                <a href="{{ route('device', ['device' => $port->device_id, 'tab' => 'port', 'vars' => 'port=' . $port->port_id]) }}"><i class="fa fa-flag fa-lg tw:text-red-600"></i></a>
+                <a href="{{ \LibreNMS\Util\Url::portUrl($port) }}"><i class="fa fa-flag fa-lg tw:text-red-600"></i></a>
             @endif
             @if(($data['ports_with_events'] ?? collect())->contains($port->port_id))
                 <a href="{{ route('device.eventlog', ['device' => $port->device_id, 'port' => $port->port_id]) }}">

@@ -29,7 +29,6 @@ namespace App\Http\Controllers\Device\Tabs;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
-use LibreNMS\Util\Url;
 
 class StpController implements DeviceTab
 {
@@ -55,9 +54,13 @@ class StpController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
+        $request->validate([
+            'vlan' => 'nullable|integer',
+        ]);
+
         $stpInstances = $device->stpInstances->sortBy('vlan');
         // Get first available VLAN from instances (or default to 1 if no instances)
-        $active_vlan = Url::parseOptions('vlan') ?? $stpInstances->first()->vlan ?? 1;
+        $active_vlan = $request->filled('vlan') ? $request->integer('vlan') : $stpInstances->first()->vlan ?? 1;
 
         $vlanOptions = $stpInstances->pluck('vlan')->mapWithKeys(function ($vlan) use ($device) {
             if (empty($vlan)) {
@@ -66,7 +69,7 @@ class StpController implements DeviceTab
 
             return [$vlan => [
                 'text' => $vlan,
-                'link' => Url::deviceUrl($device, ['tab' => 'stp', 'vlan' => $vlan]),
+                'link' => route('device', ['device' => $device->device_id, 'tab' => 'stp', 'vlan' => $vlan]),
             ]];
         });
 

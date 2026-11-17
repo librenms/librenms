@@ -101,9 +101,37 @@ class PseudowiresTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'pseudowires', 'vars' => 'view=minigraphs']))
+            ->get(route('device', ['device' => $device, 'tab' => 'pseudowires', 'view' => 'minigraphs']))
             ->assertOk()
-            ->assertSee('type=port_bits', false);
+            ->assertSee('type=port_bits', false)
+            ->assertSee('pseudowires?view=detail', false)
+            ->assertSee('pseudowires?view=minigraphs', false);
+    }
+
+    public function testLegacyPathViewRedirectsToQuery(): void
+    {
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create(['ifDescr' => 'GigabitEthernet0/1', 'ifOperStatus' => 'up']);
+        Pseudowire::factory()->create([
+            'device_id' => $device->device_id,
+            'port_id' => $port->port_id,
+            'peer_device_id' => 0,
+            'cpwVcID' => 101,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device', ['device' => $device, 'tab' => 'pseudowires', 'vars' => 'view=minigraphs']))
+            ->assertRedirect(route('device', ['device' => $device, 'tab' => 'pseudowires', 'view' => 'minigraphs']));
+    }
+
+    public function testInvalidViewIsRejected(): void
+    {
+        $device = Device::factory()->create();
+        Pseudowire::factory()->create(['device_id' => $device->device_id, 'peer_device_id' => 0]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device', ['device' => $device, 'tab' => 'pseudowires', 'view' => 'bogus']))
+            ->assertSessionHasErrors('view');
     }
 
     public function testUserWithoutDeviceAccessGetsForbidden(): void
