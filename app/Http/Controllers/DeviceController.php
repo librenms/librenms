@@ -49,6 +49,10 @@ class DeviceController
             return $this->redirectToTabRoute($request, $device_id, $current_tab, (string) $vars, $port);
         }
 
+        if ($current_tab === 'edit' && Url::parseLegacyPath($vars)->get('section') === 'services') {
+            return redirect()->route('device.edit.services', $device, 301);
+        }
+
         $tab_controller = PageTabs::getTab($current_tab);
         $title = $tab_controller->name();
         $data = $tab_controller->data($device, $request);

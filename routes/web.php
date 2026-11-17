@@ -205,7 +205,8 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('templates/apply/{template}', [ServiceTemplateController::class, 'apply'])->name('templates.apply');
         Route::post('templates/remove/{template}', [ServiceTemplateController::class, 'remove'])->name('templates.remove');
     });
-    Route::resource('services', ServiceController::class)->except(['create', 'edit'])->where(['service' => '[0-9]+']);
+    Route::resource('services', ServiceController::class)->except(['create'])->where(['service' => '[0-9]+']);
+    Route::get('services/{legacy}', [ServiceController::class, 'legacy'])->where('legacy', '[^/=]+=.*');
     Route::redirect('addsrv', 'services#create-service');
     Route::post('customoid/test/{customoid?}', [CustomoidController::class, 'test'])->name('customoid.test');
     Route::resource('customoid', CustomoidController::class)->only(['show', 'store', 'update', 'destroy']);

@@ -43,19 +43,35 @@ final class ServiceControllerTest extends TestCase
         $device = Device::factory()->create(['hostname' => 'services-host.example.com']);
         Service::factory()->for($device)->create(['service_name' => 'Healthy', 'service_status' => 0, 'service_ignore' => 0, 'service_disabled' => 0]);
         Service::factory()->for($device)->create(['service_name' => 'Broken', 'service_status' => 2, 'service_ignore' => 0, 'service_disabled' => 0]);
+        Service::factory()->for($device)->create(['service_name' => 'Ignored check', 'service_status' => 2, 'service_ignore' => 1, 'service_disabled' => 0]);
+        Service::factory()->for($device)->create(['service_name' => 'Disabled check', 'service_status' => 2, 'service_ignore' => 0, 'service_disabled' => 1]);
 
         $this->actingAs($this->admin())
             ->get(route('services.index'))
             ->assertOk()
             ->assertSee('services-host.example.com')
             ->assertSee('Healthy')
-            ->assertSee('Broken');
+            ->assertSee('Broken')
+            ->assertSee('x-bind:disabled="busy || false"', false)
+            ->assertSee("x-on:change=\"toggleService(\$el, '", false);
 
         $this->actingAs($this->admin())
             ->get(route('services.index', ['state' => 'critical']))
             ->assertOk()
             ->assertSee('Broken')
-            ->assertDontSee('Healthy');
+            ->assertDontSee('Healthy')
+            ->assertDontSee('Ignored check')
+            ->assertDontSee('Disabled check');
+
+        $this->get(route('services.index', ['state' => 'ignored']))
+            ->assertOk()
+            ->assertSee('Ignored check')
+            ->assertDontSee('Disabled check');
+
+        $this->get(route('services.index', ['state' => 'disabled']))
+            ->assertOk()
+            ->assertSee('Disabled check')
+            ->assertDontSee('Ignored check');
     }
 
     public function testIndexOnlyShowsServicesOfAccessibleDevices(): void
@@ -71,6 +87,29 @@ final class ServiceControllerTest extends TestCase
             ->get(route('services.index'))
             ->assertOk()
             ->assertDontSee('Hidden Service');
+    }
+
+    public function testIndexPaginatesWholeDeviceGroupsWithTheSelectedFilter(): void
+    {
+        Device::factory()->count(25)->has(Service::factory()->state([
+            'service_disabled' => 1,
+        ]))->sequence(fn ($sequence) => ['hostname' => sprintf('a-service-%02d.example.com', $sequence->index)])->create();
+        $device = Device::factory()->create(['hostname' => 'z-service.example.com']);
+        Service::factory()->for($device)->create(['service_disabled' => 1, 'service_name' => 'First check on last device']);
+        Service::factory()->for($device)->create(['service_disabled' => 1, 'service_name' => 'Second check on last device']);
+
+        $this->actingAs($this->admin());
+        $filters = ['state' => 'disabled'];
+
+        $this->get(route('services.index', $filters))
+            ->assertOk()
+            ->assertDontSee('z-service.example.com')
+            ->assertSee(route('services.index', $filters + ['page' => 2]));
+
+        $this->get(route('services.index', $filters + ['page' => 2]))
+            ->assertOk()
+            ->assertSee('First check on last device')
+            ->assertSee('Second check on last device');
     }
 
     public function testStoreCreatesService(): void
@@ -113,9 +152,14 @@ final class ServiceControllerTest extends TestCase
             ->assertOk()
             ->assertJsonPath('service_name', 'Before');
 
+        $this->getJson(route('services.edit', $service))
+            ->assertOk()
+            ->assertJsonPath('service_disabled', false);
+
         $this->actingAs($this->admin())
             ->patchJson(route('services.update', $service), ['service_name' => 'After', 'service_disabled' => true])
-            ->assertOk();
+            ->assertOk()
+            ->assertSessionHas('toasts.0.message', 'Service After updated');
 
         $service->refresh();
         $this->assertSame('After', $service->service_name);
@@ -137,7 +181,12 @@ final class ServiceControllerTest extends TestCase
         $user->assignRole('user');
         $user->devicesOwned()->attach($device);
 
+        $this->actingAs($user)->get(route('services.index'))
+            ->assertOk()
+            ->assertSee('x-bind:disabled="busy || true"', false);
+
         $this->actingAs($user)->postJson(route('services.store'), ['device_id' => $device->device_id, 'service_type' => 'http'])->assertForbidden();
+        $this->actingAs($user)->getJson(route('services.edit', $service))->assertForbidden();
         $this->actingAs($user)->patchJson(route('services.update', $service), ['service_name' => 'x'])->assertForbidden();
         $this->actingAs($user)->deleteJson(route('services.destroy', $service))->assertForbidden();
     }
@@ -151,7 +200,22 @@ final class ServiceControllerTest extends TestCase
             ->get(route('device.edit.services', $device))
             ->assertOk()
             ->assertSee('Edit Page Service')
-            ->assertSee('service-create');
+            ->assertSee('createService()');
+
+        $this->get('/device/device=' . $device->device_id . '/tab=edit/section=services')
+            ->assertRedirect(route('device.edit.services', $device));
+    }
+
+    public function testLegacyDashboardServiceLinksRedirectToFilters(): void
+    {
+        $this->actingAs($this->admin());
+
+        $this->get('/services/state=ok/view=details')
+            ->assertRedirect(route('services.index', ['state' => 'ok']));
+        $this->get('/services/view=details/ignore=1')
+            ->assertRedirect(route('services.index', ['state' => 'ignored']));
+        $this->get('/services/view=details/disabled=1')
+            ->assertRedirect(route('services.index', ['state' => 'disabled']));
     }
 
     public function testAddsrvRedirectsToAddDialog(): void

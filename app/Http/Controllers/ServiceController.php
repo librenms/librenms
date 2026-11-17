@@ -2,133 +2,145 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Interfaces\ToastInterface;
+use App\Http\Requests\ServiceRequest;
 use App\Models\Device;
 use App\Models\Service;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Services;
+use LibreNMS\Util\Url;
 
 class ServiceController extends Controller
 {
-    private const array STATES = ['ok' => 0, 'warning' => 1, 'critical' => 2];
-
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
         $this->authorize('viewAny', Service::class);
 
-        $request->validate([
-            'state' => ['nullable', Rule::in(['all', ...array_keys(self::STATES)])],
+        $labels = [
+            'all' => __('All'),
+            'ok' => __('Ok'),
+            'warning' => __('Warning'),
+            'critical' => __('Critical'),
+            'ignored' => __('Ignored'),
+            'disabled' => __('Disabled'),
+        ];
+        $validated = $request->validate([
+            'state' => ['nullable', 'string', Rule::in(array_keys($labels))],
         ]);
-        $state = $request->input('state', 'all');
+        $state = $validated['state'] ?? 'all';
+        $filters = $state === 'all' ? [] : ['state' => $state];
 
-        $services = Service::hasAccess($request->user())
-            ->with('device')
-            ->when(isset(self::STATES[$state]), fn ($query) => $query->isActive()->where('service_status', self::STATES[$state]))
-            ->orderBy('service_type')
-            ->orderBy('service_name')
-            ->get()
-            ->groupBy('device_id')
-            ->sortBy(fn ($services) => $services->first()->device?->hostname);
+        $devices = Device::query()
+            ->withWhereHas('services', function ($query) use ($request, $state): void {
+                $query->hasAccess($request->user())->ordered();
 
-        return view('services.index', [
-            'state' => $state,
-            'states' => collect(['all' => __('All'), 'ok' => __('Ok'), 'warning' => __('Warning'), 'critical' => __('Critical')])
-                ->map(fn ($text, $option) => ['text' => $text, 'link' => route('services.index', ['state' => $option])])
-                ->all(),
-            'services' => $services,
-        ]);
+                match ($state) {
+                    'ok' => $query->isOk(),
+                    'warning' => $query->isWarning(),
+                    'critical' => $query->isCritical(),
+                    'ignored' => $query->isIgnored(),
+                    'disabled' => $query->isDisabled(),
+                    default => null,
+                };
+            })
+            ->orderBy('hostname')
+            ->orderBy('device_id')
+            ->paginate(25)
+            ->appends($filters);
+
+        if ($devices->currentPage() > $devices->lastPage()) {
+            $request->session()->keep('toasts');
+
+            return redirect()->to($devices->url($devices->lastPage()));
+        }
+
+        $states = [];
+        foreach ($labels as $option => $text) {
+            $states[$option] = [
+                'text' => $text,
+                'link' => route('services.index', $option === 'all' ? [] : ['state' => $option]),
+            ];
+        }
+
+        return view('services.index', compact('devices', 'state', 'states'));
     }
 
-    public function store(Request $request): JsonResponse
+    public function legacy(string $legacy): RedirectResponse
     {
-        $this->authorize('create', Service::class);
+        $options = Url::parseLegacyPath($legacy);
+        $state = match (true) {
+            $options->get('disabled') === '1' => 'disabled',
+            $options->get('ignore') === '1' => 'ignored',
+            default => $options->get('state'),
+        };
 
-        $validated = $request->validate([
-            'device_id' => 'required|integer|exists:devices,device_id',
-            'service_type' => ['required', Rule::in(Services::list())],
-            ...$this->rules(),
-        ]);
+        return redirect()->route('services.index', $state ? ['state' => $state] : [], 301);
+    }
 
-        $device = Device::findOrFail($validated['device_id']);
+    public function store(ServiceRequest $request, ToastInterface $toast): JsonResponse
+    {
+        $device = Device::findOrFail($request->validated('device_id'));
         $this->authorize('view', $device);
 
-        $service = Services::addService(
-            $device->device_id,
-            $validated['service_type'],
-            strip_tags($validated['service_desc'] ?? ''),
-            $validated['service_ip'] ?? '',
-            $validated['service_param'] ?? '',
-            (int) ($validated['service_ignore'] ?? false),
-            (int) ($validated['service_disabled'] ?? false),
-            0,
-            strip_tags($validated['service_name'] ?? ''),
-        );
+        $service = Services::createForDevice($device, $request->attributesForService());
 
-        return response()->json([
-            'message' => __('Service :name added', ['name' => $service->service_name ?: $service->service_type]),
-        ]);
+        return $this->saved($toast, __('Service :name added', ['name' => $service->displayName()]));
     }
 
     public function show(Service $service): JsonResponse
     {
         $this->authorize('view', $service);
 
-        return response()->json($service->only([
-            'service_id',
-            'device_id',
-            'service_name',
-            'service_type',
-            'service_desc',
-            'service_ip',
-            'service_param',
-            'service_ignore',
-            'service_disabled',
-        ]));
+        return $this->serviceData($service);
     }
 
-    public function update(Request $request, Service $service): JsonResponse
+    public function edit(Service $service): JsonResponse
     {
         $this->authorize('update', $service);
 
-        $validated = $request->validate($this->rules());
-        foreach (array_intersect_key($validated, ['service_name' => 0, 'service_desc' => 0]) as $field => $value) {
-            $validated[$field] = strip_tags((string) $value); // legacy pages display these unescaped
-        }
-
-        $service->update($validated);
-
-        return response()->json([
-            'message' => __('Service :name updated', ['name' => $service->service_name ?: $service->service_type]),
-        ]);
+        return $this->serviceData($service);
     }
 
-    public function destroy(Service $service): JsonResponse
+    public function update(ServiceRequest $request, Service $service, ToastInterface $toast): JsonResponse
+    {
+        $service->update($request->attributesForService());
+
+        return $this->saved($toast, __('Service :name updated', ['name' => $service->displayName()]));
+    }
+
+    public function destroy(Service $service, ToastInterface $toast): JsonResponse
     {
         $this->authorize('delete', $service);
-
         $service->delete();
 
+        return $this->saved($toast, __('Service :name deleted', ['name' => $service->displayName()]));
+    }
+
+    private function serviceData(Service $service): JsonResponse
+    {
         return response()->json([
-            'message' => __('Service :name deleted', ['name' => $service->service_name ?: $service->service_type]),
+            ...$service->only([
+                'service_id',
+                'device_id',
+                'service_name',
+                'service_type',
+                'service_desc',
+                'service_ip',
+                'service_param',
+            ]),
+            'service_ignore' => (bool) $service->service_ignore,
+            'service_disabled' => (bool) $service->service_disabled,
         ]);
     }
 
-    /**
-     * Rules for the fields that can be set when creating and updating a service.
-     *
-     * @return array<string, string>
-     */
-    private function rules(): array
+    private function saved(ToastInterface $toast, string $message): JsonResponse
     {
-        return [
-            'service_name' => 'nullable|string|max:255',
-            'service_desc' => 'nullable|string',
-            'service_ip' => 'nullable|string|max:255',
-            'service_param' => 'nullable|string',
-            'service_ignore' => 'sometimes|boolean',
-            'service_disabled' => 'sometimes|boolean',
-        ];
+        $toast->success(e($message));
+
+        return response()->json(['message' => $message]);
     }
 }

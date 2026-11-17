@@ -17,7 +17,7 @@ class EditServicesController extends Controller
 
         return view('device.edit.services', [
             'device' => $device,
-            'services' => $device->services()->hasAccess($request->user())->orderBy('service_type')->orderBy('service_name')->get(),
+            'services' => $device->services()->hasAccess($request->user())->ordered()->get(),
         ]);
     }
 }

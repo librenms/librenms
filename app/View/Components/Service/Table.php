@@ -46,18 +46,9 @@ class Table extends Component
      */
     public function dataSources(Service $service): array
     {
-        $serviceDs = htmlspecialchars_decode((string) $service->service_ds);
-        $checkScript = Services::customCheckPath($service->service_type);
-        if (is_file($checkScript)) {
-            include $checkScript; // may define $check_ds
-            if (isset($check_ds) && is_string($check_ds)) {
-                $serviceDs = $check_ds;
-            }
-        }
-
         $sources = [];
-        foreach ((array) json_decode($serviceDs, true) as $ds => $info) {
-            $sources[(string) $ds] = (string) ($info['full_name'] ?? $ds);
+        foreach (Services::graphDefinitions($service)['sources'] as $ds => $info) {
+            $sources[$ds] = is_string($info['full_name'] ?? null) ? $info['full_name'] : (string) $ds;
         }
 
         return $sources;

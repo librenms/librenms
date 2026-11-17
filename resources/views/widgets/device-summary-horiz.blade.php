@@ -44,8 +44,8 @@
                 <tr>
                     <td><a href="{{ url('services') }}">{{ __('Services') }}</a></td>
                     <td><a href="{{ url('services') }}"><span>{{ $services['total'] }}</span></a></td>
-                    <td><a href="{{ url('services/state=ok/view=details') }}"><span class="green">{{ $services['ok'] }}</span></a></td>
-                    <td><a href="{{ url('services/state=critical/view=details') }}"><span class="red"> {{ $services['critical'] }}</span></a></td>
+                    <td><a href="{{ route('services.index', ['state' => 'ok']) }}"><span class="green">{{ $services['ok'] }}</span></a></td>
+                    <td><a href="{{ route('services.index', ['state' => 'critical']) }}"><span class="red"> {{ $services['critical'] }}</span></a></td>
                     <td><a href="{{ url('services/ignore=1/view=details') }}"><span class="blue"> {{ $services['ignored'] }}</span></a></td>
                     <td><span class="grey"> -</span></td>
                     <td><a href="{{ url('services/disabled=1/view=details') }}"><span class="black"> {{ $services['disabled'] }}</span></a></td>

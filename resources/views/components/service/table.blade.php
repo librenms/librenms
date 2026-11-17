@@ -14,10 +14,11 @@
         </thead>
         <tbody>
         @forelse($services as $service)
+            @php($canUpdate = Gate::allows('update', $service))
             <tr>
                 <td>
                     <span class="alert-status {{ $statusClass($service) }}" title="{{ $statusText($service) }}">
-                        <span class="device-services-page text-nowrap">{{ $service->service_name ?: $service->service_type }}</span>
+                        <span class="device-services-page text-nowrap">{{ $service->displayName() }}</span>
                     </span>
                     @if($service->service_ignore)
                         <i class="fa fa-bell-slash text-muted" title="{{ __('Alerts ignored') }}" aria-hidden="true"></i>
@@ -30,22 +31,25 @@
                 <td class="text-muted">
                     {{ $service->service_changed ? \LibreNMS\Util\Time::formatInterval(time() - $service->service_changed) : __('Waiting for first check') }}
                 </td>
-                <td>
-                    <input type="checkbox" @checked(! $service->service_disabled) @cannot('update', $service) disabled @endcannot
-                           title="{{ __('Disable polling and alerting') }}"
-                           x-data x-on:change="$dispatch('service-toggle', {id: {{ $service->service_id }}, enabled: $el.checked})">
+                <td title="{{ __('Disable polling and alerting') }}">
+                    <x-toggle :checked="! $service->service_disabled"
+                              :disabled="! $canUpdate"
+                              :aria-label="__('Enabled')"
+                              x-bind:disabled="busy || {{ Js::from(! $canUpdate) }}"
+                              x-on:change="toggleService($el, {{ Js::from(route('services.update', $service)) }})" />
                 </td>
                 <td class="text-right">
                     <div class="btn-group">
-                        @can('update', $service)
+                        @if($canUpdate)
                             <button type="button" class="btn btn-primary btn-sm" aria-label="{{ __('Edit') }}"
-                                    x-data x-on:click="$dispatch('service-edit', {id: {{ $service->service_id }}})">
+                                    x-bind:disabled="busy"
+                                    x-on:click="editService(@js(route('services.edit', $service)), @js(route('services.update', $service)))">
                                 <i class="fa fa-pencil" aria-hidden="true"></i>
                             </button>
-                        @endcan
+                        @endif
                         @can('delete', $service)
                             <button type="button" class="btn btn-danger btn-sm" aria-label="{{ __('Delete') }}"
-                                    x-data x-on:click="$dispatch('service-delete', {id: {{ $service->service_id }}})">
+                                    x-bind:disabled="busy" x-on:click="confirmDeleteService(@js(route('services.destroy', $service)))">
                                 <i class="fa fa-trash" aria-hidden="true"></i>
                             </button>
                         @endcan
