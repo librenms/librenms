@@ -68,27 +68,27 @@
                             <div class='form-group form-inline'>
                                 <label for='invert' class='col-sm-3 col-md-2 control-label' title="Alert when this rule doesn't match.">Invert rule match </label>
                                 <div class='col-sm-2' title="Alert when this rule doesn't match.">
-                                    <input type='checkbox' name='invert' id='invert'>
+                                    <x-toggle name="invert" id="invert" />
                                 </div>
                                 <label for='mute' class='col-sm-3 col-md-3 control-label' title="Suppress all notifications for this rule (alerts still appear in the Web UI)." style="vertical-align: top;">Mute alerts </label>
                                 <div class='col-sm-2' title="Suppress all notifications for this rule (alerts still appear in the Web UI).">
-                                    <input type='checkbox' name='mute' id='mute'>
+                                    <x-toggle name="mute" id="mute" />
                                 </div>
                             </div>
                             <div class="form-group form-inline">
                                 <label for='recovery' class='col-sm-3 col-md-2 control-label' title="Issue recovery alerts.">Recovery alerts </label>
                                 <div class='col-sm-2' title="Issue recovery alerts.">
-                                    <input type='checkbox' name='recovery' id='recovery'>
+                                    <x-toggle name="recovery" id="recovery" />
                                 </div>
                                 <label for='acknowledgement' class='col-sm-3 col-md-3 control-label' title="Issue acknowledgement alerts." style="vertical-align: top;">Acknowledgement alerts </label>
                                 <div class='col-sm-2' title="Issue acknowledgement alerts.">
-                                    <input type='checkbox' name='acknowledgement' id='acknowledgement'>
+                                    <x-toggle name="acknowledgement" id="acknowledgement" />
                                 </div>
                             </div>
                             <div class="form-group form-inline">
                                 <label for='notify_per_entity' class='col-sm-3 col-md-2 control-label' title="Send a separate notification per matching entity (e.g. each port) instead of one grouped notification.">Notify per matching entity </label>
                                 <div class='col-sm-2' title="Send a separate notification per matching entity (e.g. each port) instead of one grouped notification.">
-                                    <input type='checkbox' name='notify_per_entity' id='notify_per_entity'>
+                                    <x-toggle name="notify_per_entity" id="notify_per_entity" />
                                 </div>
                                 <label for='max_entities' class='col-sm-3 col-md-3 control-label' title="When notifying per entity, show and notify separately up to this many matching entities per device; above the limit, faults are grouped into one alert.">Max entities per device </label>
                                 <div class='col-sm-2' title="When notifying per entity, show and notify separately up to this many matching entities per device; above the limit, faults are grouped into one alert.">
@@ -111,7 +111,7 @@
                                 </div>
                                 <div>
                                     <label for='invert_map' class='col-md-1' style="width: 14.1333%;" text-align="left" title="If ON, alert rule check will run on all devices except the selected devices and groups.">All devices except in list </label>
-                                    <input type='checkbox' name='invert_map' id='invert_map'>
+                                    <x-toggle name="invert_map" id="invert_map" />
                                 </div>
                             </div>
                             <div class='form-group' title="A link to some documentation on how to handle this alert. This will be included in notifications.">
@@ -131,7 +131,7 @@
                             <div class="form-group">
                                 <label for="override_query" class="col-sm-3 col-md-2 control-label">Override SQL</label>
                                 <div class="col-sm-9 col-md-10">
-                                    <input type='checkbox' name='override_query' id='override_query'>
+                                    <x-toggle name="override_query" id="override_query" />
                                 </div>
                             </div>
                             <div class="form-group">
@@ -293,11 +293,11 @@
         $('#adv_query, #notes').val('');
         $('#severity').val(alertRuleDefaults.severity);
         $('#max_entities').val(alertRuleDefaults.max_entities);
-        $('#invert').bootstrapSwitch('state', alertRuleDefaults.invert);
-        $('#recovery').bootstrapSwitch('state', alertRuleDefaults.recovery);
-        $('#acknowledgement').bootstrapSwitch('state', alertRuleDefaults.acknowledgement);
-        $('#invert_map').bootstrapSwitch('state', alertRuleDefaults.invert_map);
-        $('#mute, #override_query, #notify_per_entity').bootstrapSwitch('state', false);
+        $('#invert').prop('checked', alertRuleDefaults.invert);
+        $('#recovery').prop('checked', alertRuleDefaults.recovery);
+        $('#acknowledgement').prop('checked', alertRuleDefaults.acknowledgement);
+        $('#invert_map').prop('checked', alertRuleDefaults.invert_map);
+        $('#mute, #override_query, #notify_per_entity').prop('checked', false);
         $('#alert_operation_id').empty().val(null).trigger('change');
         setMaps(null);
     });
@@ -322,13 +322,13 @@
         if (extra.adv_query) {
             $('#adv_query').val(extra.adv_query);
         }
-        $('#invert').bootstrapSwitch('state', Boolean(extra.invert));
-        $('#recovery').bootstrapSwitch('state', extra.recovery ?? alertRuleDefaults.recovery);
-        $('#acknowledgement').bootstrapSwitch('state', extra.acknowledgement ?? alertRuleDefaults.acknowledgement);
-        $('#mute').bootstrapSwitch('state', Boolean(extra.mute));
-        $('#override_query').bootstrapSwitch('state', Boolean(extra.options?.override_query));
-        $('#invert_map').bootstrapSwitch('state', rule.invert_map == 1);
-        $('#notify_per_entity').bootstrapSwitch('state', rule.notify_per_entity == 1);
+        $('#invert').prop('checked', Boolean(extra.invert));
+        $('#recovery').prop('checked', extra.recovery ?? alertRuleDefaults.recovery);
+        $('#acknowledgement').prop('checked', extra.acknowledgement ?? alertRuleDefaults.acknowledgement);
+        $('#mute').prop('checked', Boolean(extra.mute));
+        $('#override_query').prop('checked', Boolean(extra.options?.override_query));
+        $('#invert_map').prop('checked', rule.invert_map == 1);
+        $('#notify_per_entity').prop('checked', rule.notify_per_entity == 1);
         $('#max_entities').val(rule.max_entities ?? alertRuleDefaults.max_entities);
     }
 

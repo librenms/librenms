@@ -120,7 +120,7 @@
                             @endif
                         </td>
                         <td>
-                            <x-toggle size="sm" x-model="enabled" x-on:change="toggle()" :disabled="Gate::denies('update', $rule)" :aria-label="__('Enabled')" />
+                            <x-toggle :checked="! $rule->disabled" x-model="enabled" x-on:change="toggle()" :disabled="Gate::denies('update', $rule)" :aria-label="__('Enabled')" />
                         </td>
                         <td class="tw:whitespace-nowrap">
                             @can('update', $rule)
