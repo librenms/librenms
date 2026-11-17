@@ -74,24 +74,6 @@ final class WebWriteAuthorizationTest extends DBTestCase
         return $user;
     }
 
-    /**
-     * Run a legacy ajax form with the given POST data and return its output.
-     *
-     * @param  array<string, mixed>  $post
-     */
-    private function runForm(string $form, array $post): string
-    {
-        $_POST = $post;
-        ob_start();
-        try {
-            include base_path("includes/html/forms/$form.inc.php");
-        } finally {
-            $output = (string) ob_get_clean();
-        }
-
-        return $output;
-    }
-
     public function testDependencyUpdateIsScopedToAccessibleDevices(): void
     {
         $user = $this->limitedUser(['device.update']);
