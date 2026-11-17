@@ -16,13 +16,18 @@ class ActiveDirectoryGroups
     public function memberships(User $user): array
     {
         $memberships = [];
+        $recursiveGroups = null;
         foreach (array_keys(LibrenmsConfig::get('auth_ad_groups', [])) as $name) {
             $query = Group::on($user->getConnectionName())->where('cn', '=', $name);
             if ($filter = LibrenmsConfig::get('auth_ad_group_filter')) {
                 $query->rawFilter(\LdapRecord\Query\Filter\Parser::parse($filter));
             }
             $groups = $query->limit(2)->get();
-            $isMember = count($groups) === 1 && $user->groups()->recursive()->exists($groups[0]);
+            $isMember = false;
+            if (count($groups) === 1) {
+                $recursiveGroups ??= $user->groups()->recursive()->get('objectclass');
+                $isMember = $recursiveGroups->exists($groups[0]);
+            }
             if (LibrenmsConfig::get('auth_ad_debug')) {
                 Log::debug('Active Directory group membership check', [
                     'group' => $name,

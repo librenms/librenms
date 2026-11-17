@@ -4,6 +4,7 @@ namespace LibreNMS\Tests\Feature;
 
 use App\Facades\LibrenmsConfig;
 use App\Ldap\ActiveDirectoryConfig;
+use App\Ldap\ActiveDirectoryGroups;
 use App\Ldap\ActiveDirectoryUser;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -15,6 +16,7 @@ use LdapRecord\Laravel\Auth\DatabaseUserProvider;
 use LdapRecord\Laravel\Testing\DirectoryEmulator;
 use LdapRecord\Models\ActiveDirectory\Group;
 use LibreNMS\Tests\DBTestCase;
+use Mockery;
 
 class ActiveDirectoryAuthTest extends DBTestCase
 {
@@ -148,6 +150,33 @@ class ActiveDirectoryAuthTest extends DBTestCase
         $this->assertTrue(Auth::user()->hasAllRoles(['admin', 'global-read']));
     }
 
+    public function testMembershipChecksReuseRecursiveGroups(): void
+    {
+        LibrenmsConfig::set('auth_ad_groups', ['Admins' => [], 'Readers' => []]);
+        DirectoryEmulator::setup('active_directory');
+        $ldap = $this->ldapUser();
+        $admins = Group::create(['cn' => 'Admins']);
+        $readers = Group::create(['cn' => 'Readers']);
+        $admins->members()->attach($ldap);
+        $readers->members()->attach($ldap);
+        $user = Mockery::mock(ActiveDirectoryUser::class)->makePartial();
+        $user->shouldReceive('groups')->once()->andReturn($ldap->groups());
+
+        $this->assertSame(['Admins', 'Readers'], app(ActiveDirectoryGroups::class)->memberships($user));
+    }
+
+    public function testMembershipChecksSkipRecursiveGroupsWithoutUniqueMatches(): void
+    {
+        LibrenmsConfig::set('auth_ad_groups', ['Missing' => [], 'Ambiguous' => []]);
+        DirectoryEmulator::setup('active_directory');
+        Group::create(['dn' => 'cn=Ambiguous,ou=First,dc=example,dc=com', 'cn' => 'Ambiguous']);
+        Group::create(['dn' => 'cn=Ambiguous,ou=Second,dc=example,dc=com', 'cn' => 'Ambiguous']);
+        $user = Mockery::mock(ActiveDirectoryUser::class)->makePartial();
+        $user->shouldNotReceive('groups');
+
+        $this->assertSame([], app(ActiveDirectoryGroups::class)->memberships($user));
+    }
+
     public function testDisabledDirectoryAccountsCannotLogin(): void
     {
         $fake = DirectoryEmulator::setup('active_directory');
@@ -196,6 +225,18 @@ class ActiveDirectoryAuthTest extends DBTestCase
         $this->assertFalse(Auth::attempt($this->credentials()));
         $this->assertFalse(Auth::attempt(['samaccountname' => '*)(|(objectclass=*))', 'password' => 'secret']));
         $this->assertDatabaseMissing('users', ['auth_type' => 'active_directory', 'username' => 'alice']);
+    }
+
+    public function testEscapingRejectsInjectionForUserMatchingCustomFilter(): void
+    {
+        LibrenmsConfig::set('auth_ad_user_filter', '(department=Engineering)');
+        $fake = DirectoryEmulator::setup('active_directory');
+        $fake->actingAs($this->ldapUser(['department' => 'Engineering']));
+
+        $this->assertTrue(Auth::once($this->credentials()));
+        Auth::forgetGuards();
+        $this->assertFalse(Auth::attempt(['samaccountname' => '*)(|(objectclass=*))', 'password' => 'secret']));
+        $this->assertGuest();
     }
 
     public function testCustomGroupFilterRejectsOtherwiseValidMembership(): void
