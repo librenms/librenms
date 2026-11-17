@@ -32,6 +32,7 @@ use App\Http\Controllers\GraphsPageController;
 use App\Http\Controllers\Install;
 use App\Http\Controllers\LegacyController;
 use App\Http\Controllers\LocationController;
+use App\Http\Controllers\LogController;
 use App\Http\Controllers\Maps;
 use App\Http\Controllers\Maps\CustomMapBackgroundController;
 use App\Http\Controllers\Maps\CustomMapController;
@@ -141,6 +142,11 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('oxidized', [OxidizedController::class, 'index'])->name('oxidized');
     Route::post('oxidized/search', [OxidizedController::class, 'search'])->name('oxidized.search');
     Route::post('oxidized/reload', [OxidizedController::class, 'reload'])->name('oxidized.reload');
+    Route::get('eventlog', [LogController::class, 'eventlog'])->middleware('saved-filter:eventlog')->name('eventlog');
+    Route::get('syslog', [LogController::class, 'syslog'])->middleware('saved-filter:syslog')->name('syslog');
+    Route::get('syslog/action=expunge', [LogController::class, 'confirmSyslogExpunge']); // legacy bookmark
+    Route::post('syslog/expunge', [LogController::class, 'expungeSyslog'])->name('syslog.expunge');
+    Route::get('graylog', [LogController::class, 'graylog'])->name('graylog');
     Route::get('packages', [PackagesController::class, 'index'])->middleware('saved-filter:packages')->name('packages.index');
     Route::get('packages/{legacy}', [PackagesController::class, 'legacy'])->where('legacy', '.*=.*');
     Route::prefix('peering')->name('peering.')->group(function (): void {
@@ -310,10 +316,10 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('alerts/{vars?}', [Device\Tabs\FaultsController::class, 'legacy'])->where('vars', '.*')->name('faults.legacy');
         Route::get('alert-stats', [Device\Tabs\FaultsController::class, 'legacy']);
         Route::redirect('logs', 'logs/eventlog')->name('logs');
-        Route::get('logs/eventlog', Device\Tabs\EventlogController::class)->name('eventlog');
-        Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
+        Route::get('logs/eventlog', [LogController::class, 'eventlog'])->middleware('saved-filter:device.eventlog')->name('eventlog');
+        Route::get('logs/graylog', [LogController::class, 'graylog'])->name('graylog');
         Route::get('logs/outages', Device\Tabs\OutagesController::class)->name('outages');
-        Route::get('logs/syslog', Device\Tabs\SyslogController::class)->name('syslog');
+        Route::get('logs/syslog', [LogController::class, 'syslog'])->middleware('saved-filter:device.syslog')->name('syslog');
         Route::get('graphs', [Device\Tabs\GraphsController::class, 'index'])->name('graphs')->whereNumber('device');
         Route::get('health', [Device\Tabs\HealthController::class, 'index'])->name('health')->whereNumber('device');
         Route::get('loadbalancer', [Device\Tabs\LoadBalancerController::class, 'index'])->name('loadbalancer')->whereNumber('device');
