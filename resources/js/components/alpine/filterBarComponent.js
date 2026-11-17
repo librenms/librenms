@@ -146,21 +146,6 @@ export default function filterBarComponent({
             this.filters = filters;
             this.isCleared = from === "clear";
             this.syncPageUrls();
-            await this.hydrateAll();
-
-            this.$dispatch("filter:loaded", {
-                name: this.name,
-                filters: this.formattedFilters,
-                from,
-            });
-
-            if (this.filters.length > 0 && !this.reload) {
-                this.$dispatch("filter:apply", {
-                    name: this.name,
-                    filters: this.formattedFilters,
-                    initial: true,
-                });
-            }
 
             if (!this.reload) {
                 window.addEventListener("popstate", () => this.restoreHistory());
@@ -179,6 +164,25 @@ export default function filterBarComponent({
                     });
                 }
             });
+
+            const initialFilters = this.filters;
+            const initialUrl = window.location.href;
+            await this.hydrateAll();
+            if (this.filters !== initialFilters || window.location.href !== initialUrl) return;
+
+            this.$dispatch("filter:loaded", {
+                name: this.name,
+                filters: this.formattedFilters,
+                from,
+            });
+
+            if (this.filters.length > 0 && !this.reload) {
+                this.$dispatch("filter:apply", {
+                    name: this.name,
+                    filters: this.formattedFilters,
+                    initial: true,
+                });
+            }
         },
 
         // --- Data Restoration ---
