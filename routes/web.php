@@ -59,6 +59,7 @@ use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\QueueController;
 use App\Http\Controllers\RealtimeDataController;
 use App\Http\Controllers\RealtimeGraphController;
+use App\Http\Controllers\RipeNccApiController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\Routing;
 use App\Http\Controllers\Search;
@@ -375,6 +376,8 @@ Route::middleware(['auth'])->group(function (): void {
     Route::put('dashboard/widgets/{widget}', [WidgetSettingsController::class, 'update'])->name('dashboard.widget.settings');
 
     Route::get('tool/oui-lookup', OuiLookupController::class)->name('tool.oui-lookup');
+    Route::get('tool/ripe', RipeNccApiController::class)->name('tool.ripe');
+    Route::redirect('ripenccapi', 'tool/ripe');
 
     // Notifications
     Route::prefix('notifications')->name('notifications.')->whereNumber('notification')->group(function (): void {
@@ -473,7 +476,6 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('search/logs', Ajax\Search\LogsSearchController::class)->name('ajax.search.logs');
         Route::post('set_resolution', [Ajax\SessionController::class, 'resolution']);
         Route::post('set_style', [Ajax\SessionController::class, 'style']);
-        Route::post('ripe/raw', [Ajax\RipeNccApiController::class, 'raw']);
         Route::post('template/preview', Ajax\TemplatePreviewController::class)->name('ajax.template.preview');
 
         // js select2 data controllers
