@@ -32,6 +32,7 @@ modules:
                     index: 'upsSmartBatteryReplaceIndicator.{{ $index }}'
                     state_name: upsSmartBatteryReplaceIndicator
                     states:
+                        - { descr: unknown, value: 0, generic: 3 }
                         - { descr: noBatteryNeedsReplacing, value: 1, generic: 0 }
                         - { descr: batteryNeedsReplacing, value: 2, generic: 2 }
                 -

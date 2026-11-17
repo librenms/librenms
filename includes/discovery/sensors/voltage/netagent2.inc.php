@@ -393,11 +393,13 @@ if ($out_phaseNum == '3') {
 // BATTERY Voltage
 // Set divisor and limit ranges 1 phase UPS systems
 if ($in_phaseNum == '1') {
-    $battery_voltage1_oid = '.1.3.6.1.4.1.935.1.1.1.2.2.2.0';
+    // UPS-MIB::upsBatteryVoltage is the battery string voltage. XPPC-MIB::upsSmartBatteryVoltage is not reliable
+    // on every model (CORE ONE1K/ONE2K, firmware 3.13.DA806, return 22 while UPS-MIB returns 409/545),
+    // so it is only used when UPS-MIB has no value (older NetAgent cards).
+    $battery_voltage1_oid = '.1.3.6.1.2.1.33.1.2.5.0';
     $battery_voltage1 = SnmpQuery::get($battery_voltage1_oid)->value();
-    if (! is_numeric($battery_voltage1)) {
-        // newer firmware only serves the battery voltage in UPS-MIB
-        $battery_voltage1_oid = '.1.3.6.1.2.1.33.1.2.5.0';
+    if (! is_numeric($battery_voltage1) || $battery_voltage1 <= 0) {
+        $battery_voltage1_oid = '.1.3.6.1.4.1.935.1.1.1.2.2.2.0';
         $battery_voltage1 = SnmpQuery::get($battery_voltage1_oid)->value();
     }
     $limit = $bat_1phase_limit;
@@ -405,6 +407,16 @@ if ($in_phaseNum == '1') {
     $lowlimit = $bat_1phase_lowlimit;
     $lowwarnlimit = $bat_1phase_lowwarnlimit;
     $divisor = $bat_1phase_divisor;
+
+    // the limits above are for a 24 V battery system, scale them to the rating reported by the UPS
+    $battery_rating = SnmpQuery::get('.1.3.6.1.4.1.935.1.1.1.2.2.6.0')->value(); // upsSmartBatteryFullChargeVoltage, 1/10 V
+    if (is_numeric($battery_rating) && $battery_rating > 0) {
+        $scale = $battery_rating / 10 / 24;
+        $limit = round($limit * $scale, 1);
+        $warnlimit = round($warnlimit * $scale, 1);
+        $lowlimit = round($lowlimit * $scale, 1);
+        $lowwarnlimit = round($lowwarnlimit * $scale, 1);
+    }
 }
 
 // Set divisor and limit ranges 3 phase UPS systems
