@@ -76,6 +76,9 @@ class BgpPeerTable extends Component
         'macaccounting_pkts',
     ];
 
+    /** PrefixAdminLimit is 0, or the maximum of an Unsigned32 (IOS-XR), when no limit is configured */
+    private const int NO_PREFIX_LIMIT = 4294967295;
+
     /** @var list<PeerRow> */
     public array $rows;
     public int $columnCount;
@@ -251,8 +254,7 @@ class BgpPeerTable extends Component
     private function formatPrefixes(BgpPeerCbgp $cbgp): array
     {
         $accepted = (int) $cbgp->AcceptedPrefixes;
-        // 0 or the maximum of the Unsigned32 (IOS-XR) when no limit is configured
-        $limit = (int) $cbgp->PrefixAdminLimit >= 4294967295 ? 0 : (int) $cbgp->PrefixAdminLimit;
+        $limit = (int) $cbgp->PrefixAdminLimit >= self::NO_PREFIX_LIMIT ? 0 : (int) $cbgp->PrefixAdminLimit;
         $threshold = (int) $cbgp->PrefixThreshold;
         // compare the unrounded ratio, the percentage is rounded for display only
         $ratio = $limit > 0 ? $accepted / $limit * 100 : null;

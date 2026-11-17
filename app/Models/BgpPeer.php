@@ -98,7 +98,7 @@ class BgpPeer extends DeviceRelatedModel implements Keyable, HasSyncProtectedAtt
      */
     public function vrf(): BelongsTo
     {
-        return $this->belongsTo(Vrf::class, 'vrf_id', 'vrf_id');
+        return $this->belongsTo(Vrf::class, 'vrf_id');
     }
 
     // ---- Query scopes ----
