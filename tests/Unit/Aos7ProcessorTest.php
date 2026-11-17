@@ -41,6 +41,25 @@ class Aos7ProcessorTest extends TestCase
         $this->assertCount(0, $this->discover([0 => '0', 1 => '0'], [0 => '101', 1 => '-1']));
     }
 
+    public function testProcessorAndMemoryDiscoveryReuseChassisIds(): void
+    {
+        $query = Mockery::mock(SnmpQueryBuilder::class);
+        foreach ([
+            ['ALCATEL-IND1-HEALTH-MIB::healthModuleChassisId', 1001, '2'],
+            ['ALCATEL-IND1-HEALTH-MIB::healthModuleCpu1MinAvg', 1001, '22'],
+            ['ALCATEL-IND1-HEALTH-MIB::healthModuleMemory1MinAvg', 1001, '65'],
+            ['ALCATEL-IND1-SYSTEM-MIB::systemVcHardwareMemorySize', 2, '880918528'],
+        ] as [$oid, $index, $value]) {
+            $query->shouldReceive('walk')->with($oid)->once()->andReturn(new SnmpResponse(["$oid.$index" => $value]));
+        }
+        $this->app->instance(SnmpQueryBuilder::class, $query);
+
+        $device = ['os' => 'aos7'];
+        $os = OS::make($device);
+        $this->assertSame(['vc.2'], $os->discoverProcessors()->pluck('processor_index')->all());
+        $this->assertSame(['vc.2'], $os->discoverMempools()->pluck('mempool_index')->all());
+    }
+
     /**
      * @param  array<int, string>  $chassisIds
      * @param  array<int, string>  $usage
@@ -50,7 +69,6 @@ class Aos7ProcessorTest extends TestCase
     {
         $prefix = 'ALCATEL-IND1-HEALTH-MIB::';
         $query = Mockery::mock(SnmpQueryBuilder::class);
-        $query->shouldReceive('mibDir')->with('nokia/aos7')->andReturnSelf();
         foreach (['healthModuleCpu1MinAvg' => $usage, 'healthModuleChassisId' => $chassisIds] as $oid => $values) {
             $response = [];
             foreach ($values as $index => $value) {

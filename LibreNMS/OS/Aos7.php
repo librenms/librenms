@@ -53,37 +53,38 @@ use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\AlcatelMacAddressMib;
 use LibreNMS\Util\Bgp;
+use LibreNMS\Util\Mac;
 use SnmpQuery;
 
 class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, ProcessorDiscovery, VlanDiscovery, VlanPortDiscovery, TransceiverDiscovery, NacPolling
 {
     use AlcatelMacAddressMib;
 
+    private const NAC_AUTH_IDLE = 1;
+    private const NAC_AUTHENTICATED = 3;
+    private const NAC_NO_MATCHING_UNP_BLOCK = 60;
+
+    /** @var array<int|string, string>|null */
+    private ?array $healthModuleChassisIds = null;
+
     public function preCache()
     {
         $data = parent::preCache();
         $names = $data['IF-MIB::ifName'] ?? [];
-        $interfaces = [];
-        foreach ($names as $ifIndex => $row) {
-            $interfaces[$row['IF-MIB::ifName']] = $ifIndex;
-        }
+        $interfaceNames = array_fill_keys(array_column($names, 'IF-MIB::ifName'), true);
 
-        foreach ($data['ALCATEL-IND1-PORT-MIB::ddmPortInfoTable'] ?? [] as $index => $row) {
+        foreach (array_keys($data['ALCATEL-IND1-PORT-MIB::ddmPortInfoTable'] ?? []) as $index) {
             [$ifIndex, $channel] = explode('.', (string) $index);
             $name = $names[$ifIndex]['IF-MIB::ifName'] ?? (string) $ifIndex;
-            $sensorName = $name;
+            $sensorName = $channel > 1 ? "$name Lane $channel" : $name;
 
             // The table uses the cage's base ifIndex, even for breakout lanes.
             // Use the OID index: some firmware returns inconsistent ddmPortChannel values.
             if (preg_match('/^(\d+\/\d+\/\d+)A$/', $name, $matches) && $channel >= 1 && $channel <= 4) {
                 $laneName = $matches[1] . chr(64 + (int) $channel);
-                if (isset($interfaces[$laneName])) {
+                if (isset($interfaceNames[$laneName])) {
                     $sensorName = $laneName;
-                } elseif ($channel > 1) {
-                    $sensorName .= ' Lane ' . $channel;
                 }
-            } elseif ($channel > 1) {
-                $sensorName .= ' Lane ' . $channel;
             }
 
             $data['ALCATEL-IND1-PORT-MIB::ddmPortInfoTable'][$index]['aos7DdmPortName'] = $sensorName;
@@ -94,91 +95,31 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
 
     public function discoverProcessors(): Collection
     {
-        $mibDir = 'nokia/aos7';
-
-        $usage = SnmpQuery::mibDir($mibDir)
-            ->walk('ALCATEL-IND1-HEALTH-MIB::healthModuleCpu1MinAvg')
+        $usage = SnmpQuery::walk('ALCATEL-IND1-HEALTH-MIB::healthModuleCpu1MinAvg')
             ->throwIfConnectionError()
-            ->valuesByIndex();
+            ->pluck();
+        $chassisIds = $this->chassisIdsBySlot();
+        $readings = $this->primaryChassisReadings($usage, $chassisIds);
 
-        $usage = array_map(
-            fn ($row) => $row['ALCATEL-IND1-HEALTH-MIB::healthModuleCpu1MinAvg'] ?? null,
-            $usage
-        );
-
-        $chassisIds = SnmpQuery::mibDir($mibDir)
-            ->walk('ALCATEL-IND1-HEALTH-MIB::healthModuleChassisId')
-            ->throwIfConnectionError()
-            ->valuesByIndex();
-
-        $chassisIds = array_map(
-            fn ($row) => $row['ALCATEL-IND1-HEALTH-MIB::healthModuleChassisId'] ?? null,
-            $chassisIds
-        );
-
-        $modulesByChassis = [];
-
-        foreach ($usage as $slot => $percent) {
-            if ((int) $slot === 0 || ! isset($chassisIds[$slot])) {
-                continue;
-            }
-
-            $chassisId = (int) $chassisIds[$slot];
-
-            if (
-                $chassisId <= 0 ||
-                ! is_numeric($percent) ||
-                $percent < 0 ||
-                $percent > 100
-            ) {
-                continue;
-            }
-
-            $modulesByChassis[$chassisId][] = [
-                'slot' => $slot,
-                'percent' => (float) $percent,
-            ];
-        }
-
-        $processors = new Collection;
-
-        foreach ($modulesByChassis as $chassisId => $modules) {
-            // Select the first numbered health-module entry for each VC unit.
-            // The chassis ID is verified using healthModuleChassisId.
-            $primarySlot = ($chassisId - 1) * 1000 + 1;
-
-            $module = collect($modules)->first(
-                fn ($module) => (int) $module['slot'] === $primarySlot
-            );
-
-            if ($module === null) {
-                continue;
-            }
-
-            $processors->push(new Processor([
-                'processor_type' => 'aos7',
-                'processor_oid' => '.1.3.6.1.4.1.6486.801.1.2.1.16.1.1.1.1.1.11.' . $module['slot'],
-                'processor_index' => "vc.$chassisId",
-                'processor_descr' => "VC Unit $chassisId CPU",
-                'processor_precision' => 1,
-                'processor_usage' => $module['percent'],
-            ]));
-        }
-
-        // Without a configured chassis ID, retain the original CMM CPU identity.
-        if ($processors->isEmpty()) {
+        if ($readings === []) {
+            // Chassis ID 0 indicates that no VC ID is configured. Keep the original CMM CPU.
             $chassisId = $chassisIds[0] ?? null;
             $percent = $usage[0] ?? null;
             if (is_numeric($chassisId) && (float) $chassisId === 0.0 && is_numeric($percent) && $percent >= 0 && $percent <= 100) {
-                $processors->push(new Processor([
-                    'processor_type' => 'aos7',
-                    'processor_oid' => '.1.3.6.1.4.1.6486.801.1.2.1.16.1.1.1.1.1.11.0',
-                    'processor_index' => '0',
-                    'processor_descr' => 'Processor',
-                    'processor_precision' => 1,
-                    'processor_usage' => $percent,
-                ]));
+                $readings[0] = [0, $percent];
             }
+        }
+
+        $processors = new Collection;
+        foreach ($readings as $chassisId => [$slot, $percent]) {
+            $processors->push(new Processor([
+                'processor_type' => 'aos7',
+                'processor_oid' => '.1.3.6.1.4.1.6486.801.1.2.1.16.1.1.1.1.1.11.' . $slot,
+                'processor_index' => $chassisId === 0 ? '0' : "vc.$chassisId",
+                'processor_descr' => $chassisId === 0 ? 'Processor' : "VC Unit $chassisId CPU",
+                'processor_precision' => 1,
+                'processor_usage' => $percent,
+            ]));
         }
 
         return $processors;
@@ -186,95 +127,27 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
 
     public function discoverMempools(): Collection
     {
-        $mibDir = 'nokia/aos7';
-
         // RAM capacity in bytes, indexed by virtual-chassis unit.
-        $capacities = SnmpQuery::mibDir($mibDir)
-            ->walk('ALCATEL-IND1-SYSTEM-MIB::systemVcHardwareMemorySize')
+        $capacities = SnmpQuery::walk('ALCATEL-IND1-SYSTEM-MIB::systemVcHardwareMemorySize')
             ->throwIfConnectionError()
-            ->valuesByIndex();
-
-        $capacities = array_map(
-            fn ($row) => $row['ALCATEL-IND1-SYSTEM-MIB::systemVcHardwareMemorySize'] ?? null,
-            $capacities
-        );
+            ->pluck();
 
         if (empty($capacities)) {
             return $this->discoverYamlMempools();
         }
 
-        // Memory utilization and chassis membership are indexed by module.
-        $usage = SnmpQuery::mibDir($mibDir)
-            ->walk('ALCATEL-IND1-HEALTH-MIB::healthModuleMemory1MinAvg')
+        $usage = SnmpQuery::walk('ALCATEL-IND1-HEALTH-MIB::healthModuleMemory1MinAvg')
             ->throwIfConnectionError()
-            ->valuesByIndex();
-
-        $usage = array_map(
-            fn ($row) => $row['ALCATEL-IND1-HEALTH-MIB::healthModuleMemory1MinAvg'] ?? null,
-            $usage
-        );
-
-        $chassisIds = SnmpQuery::mibDir($mibDir)
-            ->walk('ALCATEL-IND1-HEALTH-MIB::healthModuleChassisId')
-            ->throwIfConnectionError()
-            ->valuesByIndex();
-
-        $chassisIds = array_map(
-            fn ($row) => $row['ALCATEL-IND1-HEALTH-MIB::healthModuleChassisId'] ?? null,
-            $chassisIds
-        );
-
-        $modulesByChassis = [];
-
-        foreach ($usage as $slot => $percent) {
-            // Index 0 is a special CMM entry, not a separate VC member.
-            if ((int) $slot === 0 || ! isset($chassisIds[$slot])) {
-                continue;
-            }
-
-            $chassisId = (int) $chassisIds[$slot];
-
-            if (
-                $chassisId <= 0 ||
-                ! is_numeric($percent) ||
-                $percent < 0 ||
-                $percent > 100
-            ) {
-                continue;
-            }
-
-            $modulesByChassis[$chassisId][] = [
-                'slot' => $slot,
-                'percent' => (float) $percent,
-            ];
-        }
-
+            ->pluck();
+        $readings = $this->primaryChassisReadings($usage, $this->chassisIdsBySlot());
         $mempools = collect();
 
         foreach ($capacities as $chassisId => $total) {
-            $chassisId = (int) $chassisId;
-            $modules = $modulesByChassis[$chassisId] ?? [];
-
-            if (
-                $chassisId <= 0 ||
-                ! is_numeric($total) ||
-                $total <= 0
-            ) {
+            if (! isset($readings[$chassisId]) || ! is_numeric($total) || $total <= 0) {
                 continue;
             }
 
-            // Select the first health-module index belonging to this VC unit.
-            // Other module readings must not prevent chassis memory discovery.
-            $primarySlot = ($chassisId - 1) * 1000 + 1;
-
-            $module = collect($modules)->first(
-                fn ($module) => (int) $module['slot'] === $primarySlot
-            );
-
-            if ($module === null) {
-                continue;
-            }
-
+            [$slot, $percent] = $readings[$chassisId];
             $mempool = new Mempool([
                 'mempool_type' => 'aos7',
                 'mempool_class' => 'module',
@@ -282,12 +155,12 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
                 'mempool_descr' => "VC Unit $chassisId Memory",
                 'mempool_precision' => 1,
                 'mempool_total_oid' => '.1.3.6.1.4.1.6486.801.1.1.1.2.1.1.10.1.1.6.' . $chassisId,
-                'mempool_perc_oid' => '.1.3.6.1.4.1.6486.801.1.2.1.16.1.1.1.1.1.8.' . $module['slot'],
+                'mempool_perc_oid' => '.1.3.6.1.4.1.6486.801.1.2.1.16.1.1.1.1.1.8.' . $slot,
             ]);
 
             $mempool->fillUsage(
                 total: (float) $total,
-                percent: $module['percent']
+                percent: $percent
             );
 
             if ($mempool->isValid()) {
@@ -300,25 +173,47 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
             : $this->discoverYamlMempools();
     }
 
+    /**
+     * @return array<int|string, string>
+     */
+    private function chassisIdsBySlot(): array
+    {
+        return $this->healthModuleChassisIds ??= SnmpQuery::walk('ALCATEL-IND1-HEALTH-MIB::healthModuleChassisId')
+            ->throwIfConnectionError()
+            ->pluck();
+    }
+
+    /**
+     * @param  array<int|string, string>  $usage
+     * @param  array<int|string, string>  $chassisIds
+     * @return array<int, array{int|string, float}>
+     */
+    private function primaryChassisReadings(array $usage, array $chassisIds): array
+    {
+        $readings = [];
+
+        foreach ($usage as $slot => $percent) {
+            $chassisId = (int) ($chassisIds[$slot] ?? 0);
+            // Row 0 represents the CMM. The first numbered row for each unit represents that VC member.
+            if ($chassisId > 0 && (int) $slot === ($chassisId - 1) * 1000 + 1
+                && is_numeric($percent) && $percent >= 0 && $percent <= 100
+            ) {
+                $readings[$chassisId] = [$slot, (float) $percent];
+            }
+        }
+
+        return $readings;
+    }
+
     public function pollNac(): Collection
     {
         $nac = collect();
 
-        $raw = SnmpQuery::mibDir('nokia/aos7')
-            ->walk('ALCATEL-IND1-DA-MIB::alaDaMacVlanUserTable')
+        $rows = SnmpQuery::walk('ALCATEL-IND1-DA-MIB::alaDaMacVlanUserTable')
             ->throwIfConnectionError()
             ->valuesByIndex();
 
-        $rows = collect($raw);
-        if ($rows->isEmpty()) {
-            return $nac;
-        }
-
-        if ($this->isColumnOrientedDaTable($raw)) {
-            $rows = collect($this->flattenColumnOrientedDaTable($raw));
-        }
-
-        if ($rows->isEmpty()) {
+        if (empty($rows)) {
             return $nac;
         }
 
@@ -326,80 +221,40 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
         $ipOptions = SnmpQueryOptions::quickPrint();
         $ipOptions->stringFormat = SnmpStringOutput::Hex;
         $ipRows = SnmpQuery::options($ipOptions)
-            ->mibDir('nokia/aos7')
             ->walk('ALCATEL-IND1-DA-MIB::alaDaMacVlanUserIpAddress')
             ->throwIfConnectionError()
             ->valuesByIndex();
 
-        $portTimeoutRows = collect(
-            SnmpQuery::mibDir('nokia/aos7')
-                ->walk('ALCATEL-IND1-DA-MIB::alaDaUNPPort8021XSuppTimeOut')
-                ->valuesByIndex()
-        );
+        $portTimeoutByIfIndex = null;
+        $prefix = 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUser';
 
-        $portTimeoutByIfIndex = [];
-
-        foreach ($portTimeoutRows as $index => $value) {
-            $ifIndex = (int) $index;
-
-            if ($ifIndex <= 0) {
-                continue;
-            }
-
-            $timeout = is_array($value)
-                ? ($value['ALCATEL-IND1-DA-MIB::alaDaUNPPort8021XSuppTimeOut']
-                    ?? $value['alaDaUNPPort8021XSuppTimeOut']
-                    ?? null)
-                : $value;
-
-            if ($timeout !== null && is_numeric($timeout)) {
-                $portTimeoutByIfIndex[$ifIndex] = (int) $timeout;
-            }
-        }
-
+        $clients = [];
         $authenticatedCountByIfIndex = [];
 
         foreach ($rows as $index => $row) {
-            [$ifIndex, , , $vlan] = $this->parseAosDaIndex((string) $index);
-
-            if (! $ifIndex || $vlan === null) {
+            $client = $this->parseNacIndex((string) $index);
+            if ($client === null) {
                 continue;
             }
 
-            $authStatus = (int) ($this->rowValue(
-                $row,
-                'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserAuthStatus'
-            ) ?? 0);
-
-            if ($authStatus === 3) {
+            $clients[$index] = $client;
+            if ((int) ($row[$prefix . 'AuthStatus'] ?? 0) === self::NAC_AUTHENTICATED) {
+                [$ifIndex] = $client;
                 $authenticatedCountByIfIndex[$ifIndex] =
                     ($authenticatedCountByIfIndex[$ifIndex] ?? 0) + 1;
             }
         }
 
-        foreach ($rows as $index => $row) {
-            [$ifIndex, $macColon, $macNoSep, $vlan] = $this->parseAosDaIndex((string) $index);
-
-            if (! $ifIndex || ! $macNoSep || $vlan === null) {
-                continue;
-            }
-
-            $authStatus = (int) ($this->rowValue(
-                $row,
-                'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserAuthStatus'
-            ) ?? 0);
-
-            $classificationSource = (int) ($this->rowValue(
-                $row,
-                'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserClassificationSource'
-            ) ?? 0);
-
-            $isNoMatchingUnpBlock = $classificationSource === 60;
+        foreach ($clients as $index => [$ifIndex, $mac, $vlan]) {
+            $row = $rows[$index];
+            $authStatus = (int) ($row[$prefix . 'AuthStatus'] ?? 0);
+            $classificationSource = (int) ($row[$prefix . 'ClassificationSource'] ?? 0);
+            $isNoMatchingUnpBlock = $classificationSource === self::NAC_NO_MATCHING_UNP_BLOCK;
 
             // AOS normally reports inactive users as idle(1), which we do not
             // need to retain. However, "No Matching UNP - Block" is also
             // reported as idle(1), so keep that entry visible in LibreNMS.
-            if ($authStatus === 1 && ! $isNoMatchingUnpBlock) {
+            if ($authStatus === self::NAC_AUTH_IDLE && ! $isNoMatchingUnpBlock) {
                 continue;
             }
 
@@ -409,59 +264,10 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
                 continue;
             }
 
-            $username = (string) ($this->rowValue(
-                $row,
-                'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserName'
-            ) ?? $macColon);
-
-            $authType = (int) ($this->rowValue(
-                $row,
-                'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserAuthtype'
-            ) ?? 0);
-
-            $loginTimestamp = (string) ($this->rowValue(
-                $row,
-                'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserLoginTimeStamp'
-            ) ?? '');
-
-            $ipRaw = (string) ($this->rowValue(
-                $row,
-                'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserIpAddress'
-            ) ?? '');
-
-            $ip = '0.0.0.0';
-            $ipRaw = trim($ipRaw, " \"'");
-            $ipHex = $ipRows[$index]['ALCATEL-IND1-DA-MIB::alaDaMacVlanUserIpAddress'] ?? '';
-
-            if (($hexIp = $this->decodeHexIp($ipHex)) !== null) {
-                $ip = $hexIp;
-            } elseif (filter_var($ipRaw, FILTER_VALIDATE_IP)) {
-                $ip = $ipRaw;
-            } elseif (ctype_digit($ipRaw) && strlen($ipRaw) <= 10 && (float) $ipRaw <= 4294967295) {
-                // A decimal IPv4 integer must not be decoded as hexadecimal bytes.
-                $ip = long2ip((int) $ipRaw) ?: $ip;
-            } elseif (($hexIp = $this->decodeHexIp($ipRaw)) !== null) {
-                $ip = $hexIp;
-            }
-
-            $unpUsed = $this->normalizeAosDaString(
-                (string) ($this->rowValue(
-                    $row,
-                    'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserUnpUsed'
-                ) ?? '')
-            );
-
-            $unpFromAuthServer = $this->normalizeAosDaString(
-                (string) ($this->rowValue(
-                    $row,
-                    'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserUnpFromAuthServer'
-                ) ?? '')
-            );
-
-            $authServer = (string) ($this->rowValue(
-                $row,
-                'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserAuthServerUsed'
-            ) ?? '');
+            $authType = (int) ($row[$prefix . 'Authtype'] ?? 0);
+            $unpUsed = $this->normalizeAosDaString((string) ($row[$prefix . 'UnpUsed'] ?? ''));
+            $unpFromAuthServer = $this->normalizeAosDaString((string) ($row[$prefix . 'UnpFromAuthServer'] ?? ''));
+            $authServer = (string) ($row[$prefix . 'AuthServerUsed'] ?? '');
 
             $method = match ($authType) {
                 0 => 'mab',
@@ -469,65 +275,83 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
                 default => 'unknown',
             };
 
-            $authId = sprintf('%d-%s-%d', $ifIndex, $macNoSep, (int) $vlan);
-            $timeElapsed = $this->parseAosTimestamp($loginTimestamp);
+            $status = match ($authStatus) {
+                self::NAC_AUTH_IDLE => 'Idle',
+                2 => 'InProgress',
+                self::NAC_AUTHENTICATED => 'Success',
+                4, 5, 6, 7 => 'Fail',
+                default => 'Unknown',
+            };
+            // Authentication can succeed even if the requested UNP was not applied.
+            $unpMismatch = $authStatus === self::NAC_AUTHENTICATED && $unpFromAuthServer !== ''
+                && strcasecmp($unpFromAuthServer, $unpUsed) !== 0;
 
-            $authcStatus = $this->mapAosAuthcStatus($authStatus);
-            $authzStatus = $this->mapAosAuthzStatus($authStatus);
-
-            $authzStatus = $this->adjustAosAuthzStatusForUnp(
-                $authzStatus,
-                $authStatus,
-                $unpUsed,
-                $unpFromAuthServer
-            );
-
-            if ($isNoMatchingUnpBlock) {
-                $authzStatus = 'authzFail';
+            $timeout = 0;
+            if ($method === 'dot1x') {
+                $portTimeoutByIfIndex ??= SnmpQuery::walk('ALCATEL-IND1-DA-MIB::alaDaUNPPort8021XSuppTimeOut')->pluck();
+                $portTimeout = $portTimeoutByIfIndex[$ifIndex] ?? null;
+                $timeout = is_numeric($portTimeout) ? (int) $portTimeout : 0;
             }
 
-            $hostMode = (($authenticatedCountByIfIndex[$ifIndex] ?? 0) > 1)
-                ? 'multiAuth'
-                : 'singleHost';
+            $authzBy = match (true) {
+                $isNoMatchingUnpBlock => 'UNP',
+                $authServer === '', $authServer === '-' => 'RADIUS',
+                default => $authServer,
+            };
 
-            $timeout = $method === 'dot1x'
-                ? ($portTimeoutByIfIndex[$ifIndex] ?? 0)
-                : 0;
+            $domain = match (true) {
+                $isNoMatchingUnpBlock => 'No Matching UNP - Block',
+                $unpUsed !== '' => $unpUsed,
+                $unpFromAuthServer !== '' => $unpFromAuthServer,
+                default => 'UNP',
+            };
 
-            $authzBy = $isNoMatchingUnpBlock
-                ? 'UNP'
-                : (($authServer !== '' && $authServer !== '-')
-                    ? $authServer
-                    : 'RADIUS');
+            $ip = $this->parseNacIp(
+                (string) ($ipRows[$index][$prefix . 'IpAddress'] ?? ''),
+                (string) ($row[$prefix . 'IpAddress'] ?? '')
+            );
+            $timeElapsed = $this->parseAosTimestamp((string) ($row[$prefix . 'LoginTimeStamp'] ?? ''));
 
-            $domain = $isNoMatchingUnpBlock
-                ? 'No Matching UNP - Block'
-                : ($unpUsed !== ''
-                    ? $unpUsed
-                    : ($unpFromAuthServer !== '' ? $unpFromAuthServer : 'UNP'));
-
-            $entry = new PortsNac([
+            $nac->push(new PortsNac([
                 'port_id' => $portId,
-                'auth_id' => $authId,
+                'auth_id' => "$ifIndex-{$mac->hex()}-$vlan",
                 'domain' => $domain,
-                'username' => $username,
-                'mac_address' => $macNoSep,
+                'username' => (string) ($row[$prefix . 'Name'] ?? $mac->readable()),
+                'mac_address' => $mac->hex(),
                 'ip_address' => $ip,
-                'host_mode' => $hostMode,
-                'authz_status' => $authzStatus,
+                'host_mode' => ($authenticatedCountByIfIndex[$ifIndex] ?? 0) > 1 ? 'multiAuth' : 'singleHost',
+                'authz_status' => $isNoMatchingUnpBlock || $unpMismatch ? 'authzFail' : 'authz' . $status,
                 'authz_by' => $authzBy,
-                'authc_status' => $authcStatus,
+                'authc_status' => 'authc' . $status,
                 'method' => $method,
                 'timeout' => $timeout,
                 'time_left' => null,
-                'vlan' => (int) $vlan,
+                'vlan' => $vlan,
                 'time_elapsed' => $timeElapsed > 0 ? $timeElapsed : null,
-            ]);
-
-            $nac->push($entry);
+            ]));
         }
 
         return $nac;
+    }
+
+    private function parseNacIp(string $hex, string $raw): string
+    {
+        $ip = $this->decodeHexIp($hex);
+        if ($ip !== null) {
+            return $ip;
+        }
+
+        $raw = trim($raw, " \"'");
+        if (filter_var($raw, FILTER_VALIDATE_IP)) {
+            return $raw;
+        }
+
+        // Prefer a decimal IPv4 integer over hex when the fallback is all digits.
+        if (ctype_digit($raw) && strlen($raw) <= 10 && (float) $raw <= 4294967295) {
+            return long2ip((int) $raw) ?: '0.0.0.0';
+        }
+
+        return $this->decodeHexIp($raw) ?? '0.0.0.0';
     }
 
     private function decodeHexIp(string $hex): ?string
@@ -551,102 +375,6 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
         return $bytes === false ? null : (inet_ntop($bytes) ?: null);
     }
 
-    private function isColumnOrientedDaTable(array $raw): bool
-    {
-        if (empty($raw)) {
-            return false;
-        }
-
-        $firstKey = array_key_first($raw);
-
-        if (! is_string($firstKey)) {
-            return false;
-        }
-
-        return str_contains($firstKey, 'alaDaMacVlanUser');
-    }
-
-    private function flattenColumnOrientedDaTable(array $raw): array
-    {
-        $flat = [];
-
-        foreach ($raw as $column => $interfaces) {
-            if (! is_array($interfaces)) {
-                continue;
-            }
-
-            $shortColumn = is_string($column)
-                ? preg_replace('/^.*::/', '', $column)
-                : $column;
-
-            foreach ($interfaces as $ifIndex => $macs) {
-                if (! is_array($macs)) {
-                    continue;
-                }
-
-                foreach ($macs as $mac => $vlans) {
-                    if (! is_array($vlans)) {
-                        continue;
-                    }
-
-                    foreach ($vlans as $vlan => $value) {
-                        $index = sprintf('%s.%s.%s', $ifIndex, $mac, $vlan);
-
-                        $flat[$index][$column] = $value;
-
-                        if (is_string($shortColumn)) {
-                            $flat[$index][$shortColumn] = $value;
-                        }
-                    }
-                }
-            }
-        }
-
-        return $flat;
-    }
-
-    private function mapAosAuthcStatus(int $authStatus): string
-    {
-        return match ($authStatus) {
-            3 => 'authcSuccess',
-            2 => 'authcInProgress',
-            1 => 'authcIdle',
-            4, 5, 6, 7 => 'authcFail',
-            default => 'authcUnknown',
-        };
-    }
-
-    private function mapAosAuthzStatus(int $authStatus): string
-    {
-        return match ($authStatus) {
-            3 => 'authzSuccess',
-            2 => 'authzInProgress',
-            1 => 'authzIdle',
-            4, 5, 6, 7 => 'authzFail',
-            default => 'authzUnknown',
-        };
-    }
-
-    private function adjustAosAuthzStatusForUnp(
-        string $authzStatus,
-        int $authStatus,
-        string $unpUsed,
-        string $unpFromAuthServer
-    ): string {
-        if ($authStatus !== 3 || $authzStatus !== 'authzSuccess') {
-            return $authzStatus;
-        }
-
-        if (
-            $unpFromAuthServer !== ''
-            && ($unpUsed === '' || strcasecmp($unpFromAuthServer, $unpUsed) !== 0)
-        ) {
-            return 'authzFail';
-        }
-
-        return $authzStatus;
-    }
-
     private function normalizeAosDaString(string $value): string
     {
         $value = trim($value);
@@ -655,99 +383,35 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
         return ($value === '' || $value === '-') ? '' : $value;
     }
 
-    private function parseAosDaIndex(string $index): array
+    /**
+     * @return array{int, Mac, int}|null
+     */
+    private function parseNacIndex(string $index): ?array
     {
         $parts = explode('.', $index);
 
         if (count($parts) === 3) {
-            $ifIndex = (int) $parts[0];
-            $macRaw = (string) $parts[1];
-            $vlanRaw = $parts[2];
-
-            if ($ifIndex <= 0 || ! is_numeric($vlanRaw)) {
-                return [0, '', '', null];
-            }
-
-            $macColon = $this->normalizeMacColon($macRaw);
-
-            return [
-                $ifIndex,
-                $macColon,
-                $this->normalizeMacNoSep($macColon),
-                (int) $vlanRaw,
-            ];
-        }
-
-        if (count($parts) >= 8) {
-            $ifIndex = (int) $parts[0];
-            $macBytes = array_slice($parts, 1, 6);
+            [$ifIndex, $address, $vlan] = $parts;
+        } elseif (count($parts) === 8) {
+            // Net-SNMP can render the MAC index as six decimal octets.
+            $ifIndex = $parts[0];
             $vlan = $parts[7];
-
-            if ($ifIndex <= 0 || ! is_numeric($vlan)) {
-                return [0, '', '', null];
+            $octets = array_slice($parts, 1, 6);
+            foreach ($octets as $octet) {
+                if (! ctype_digit($octet) || (int) $octet > 255) {
+                    return null;
+                }
             }
-
-            $macColon = strtolower(implode(':', array_map(
-                static fn ($byte) => str_pad(
-                    dechex((int) $byte),
-                    2,
-                    '0',
-                    STR_PAD_LEFT
-                ),
-                $macBytes
-            )));
-
-            return [
-                $ifIndex,
-                $macColon,
-                $this->normalizeMacNoSep($macColon),
-                (int) $vlan,
-            ];
+            $address = implode(':', array_map(static fn (string $octet) => sprintf('%02x', (int) $octet), $octets));
+        } else {
+            return null;
         }
 
-        return [0, '', '', null];
-    }
+        $mac = Mac::parse($address);
 
-    private function normalizeMacColon(string $mac): string
-    {
-        $mac = strtolower(trim($mac));
-        $parts = preg_split('/[:\\-]/', $mac);
-
-        if (! $parts || count($parts) !== 6) {
-            return $mac;
-        }
-
-        return implode(':', $this->normalizeMacIndexGroups($parts));
-    }
-
-    private function normalizeMacIndexGroups(array $parts): array
-    {
-        return array_map(static function ($part) {
-            $part = strtolower(trim((string) $part));
-            $part = preg_replace('/[^0-9a-f]/', '', $part) ?? '';
-
-            return str_pad($part, 2, '0', STR_PAD_LEFT);
-        }, $parts);
-    }
-
-    private function normalizeMacNoSep(string $mac): string
-    {
-        return strtolower(str_replace(':', '', trim($mac)));
-    }
-
-    private function rowValue($row, string $oid)
-    {
-        if (is_array($row) && array_key_exists($oid, $row)) {
-            return $row[$oid];
-        }
-
-        $shortOid = preg_replace('/^.*::/', '', $oid);
-
-        if (is_array($row) && array_key_exists($shortOid, $row)) {
-            return $row[$shortOid];
-        }
-
-        return null;
+        return ctype_digit($ifIndex) && (int) $ifIndex > 0 && ctype_digit($vlan) && $mac->isValid()
+            ? [(int) $ifIndex, $mac, (int) $vlan]
+            : null;
     }
 
     private function parseAosTimestamp(string $timestamp): int
@@ -785,8 +449,7 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
             return $QBridgeMibVlans;
         }
 
-        return SnmpQuery::mibDir('nokia/aos7')
-            ->walk('ALCATEL-IND1-VLAN-MGR-MIB::vlanDescription')
+        return SnmpQuery::walk('ALCATEL-IND1-VLAN-MGR-MIB::vlanDescription')
             ->mapTable(fn ($vlans, $vlan_id) => new Vlan([
                 'vlan_vlan' => $vlan_id,
                 'vlan_name' => $vlans['ALCATEL-IND1-VLAN-MGR-MIB::vlanDescription'] ?? null,
@@ -801,8 +464,7 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
             return $QBridgeMibPorts;
         }
 
-        return SnmpQuery::mibDir('nokia/aos7')
-            ->walk('ALCATEL-IND1-VLAN-MGR-MIB::vpaType')
+        return SnmpQuery::walk('ALCATEL-IND1-VLAN-MGR-MIB::vpaType')
             ->mapTable(function ($data, $vpaVlanNumber, $vpaIfIndex) {
                 $baseport = $this->bridgePortFromIfIndex($vpaIfIndex);
 
@@ -824,43 +486,41 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
 
     public function discoverTransceivers(): Collection
     {
-        $device = $this->getDevice();
-        $transceivers = collect();
-        $ports = $device->ports()->get()->keyBy('ifIndex');
-        $invalidValue = -2147483648;
-
-        $ddmData = SnmpQuery::mibDir('nokia/aos7')
-            ->walk('ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPower')
+        $ddmData = SnmpQuery::walk('ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPower')
             ->throwIfConnectionError()
-            ->valuesByIndex();
+            ->pluck();
 
+        // The DDM table is indexed by ifIndex and channel.
+        $channelsByPort = [];
+        foreach ($ddmData as $index => $value) {
+            if (! is_numeric($value) || $value <= -2147483648 || (int) $value === -200000) {
+                continue;
+            }
+
+            [$ifIndex] = explode('.', (string) $index, 2);
+            $ifIndex = (int) $ifIndex;
+            if ($ifIndex > 0) {
+                $channelsByPort[$ifIndex] = ($channelsByPort[$ifIndex] ?? 0) + 1;
+            }
+        }
+
+        if (empty($channelsByPort)) {
+            return collect();
+        }
+
+        $device = $this->getDevice();
+        $ports = $device->ports()
+            ->whereIn('ifIndex', array_keys($channelsByPort))
+            ->get(['port_id', 'ifIndex', 'ifName'])
+            ->keyBy('ifIndex');
         $entities = $device->entityPhysical()
             ->where('entPhysicalName', 'like', '%TRANSCEIVER%')
-            ->get();
+            ->get()
+            ->uniqueStrict('entPhysicalName')
+            ->keyBy('entPhysicalName');
+        $transceivers = collect();
 
-        foreach ($ddmData as $index => $entry) {
-            $value = is_array($entry)
-                ? ($entry['ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPower'] ?? $invalidValue)
-                : $entry;
-
-            if (! is_numeric($value) || $value <= $invalidValue || (int) $value === -200000) {
-                continue;
-            }
-
-            $parts = explode('.', (string) $index);
-            $ifIndex = (int) $parts[0];
-
-            if ($ifIndex <= 0) {
-                continue;
-            }
-
-            // ddmPortInfoTable is indexed by ifIndex.channel: one transceiver per port, count its lanes
-            if ($existing = $transceivers->get($ifIndex)) {
-                $existing->channels++;
-
-                continue;
-            }
-
+        foreach ($channelsByPort as $ifIndex => $channels) {
             $port = $ports->get($ifIndex);
 
             if (! $port) {
@@ -875,12 +535,10 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
             ) {
                 $entityName = "{$matches[1]}/SLOT-{$matches[2]} TRANSCEIVER-{$matches[3]}";
 
-                $entity = $entities->first(
-                    fn ($item) => $item->entPhysicalName === $entityName
-                );
+                $entity = $entities->get($entityName);
             }
 
-            $transceivers->put($ifIndex, new Transceiver([
+            $transceivers->push(new Transceiver([
                 'port_id' => $port->port_id,
                 'index' => $ifIndex,
                 'entity_physical_index' => $ifIndex,
@@ -890,11 +548,11 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
                 'serial' => $entity?->entPhysicalSerialNum ?: null,
                 'revision' => $entity?->entPhysicalHardwareRev ?: null,
                 'ddm' => 1,
-                'channels' => 1,
+                'channels' => $channels,
             ]));
         }
 
-        return $transceivers->values();
+        return $transceivers;
     }
 
     /**

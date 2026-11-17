@@ -11,20 +11,20 @@ class Aos7PoeTest extends TestCase
 {
     public function testCapturedPowerIsMappedToVirtualChassisPorts(): void
     {
+        $oids = [
+            1 => 'ALCATEL-IND1-INLINE-POWER-MIB::alaPethPsePortPowerMaximum',
+            2 => 'ALCATEL-IND1-INLINE-POWER-MIB::alaPethPsePortPowerActual',
+        ];
         $values = [];
         foreach (file(base_path('tests/snmpsim/aos7.snmprec'), FILE_IGNORE_NEW_LINES) as $record) {
             if (preg_match('/^1\.3\.6\.1\.4\.1\.6486\.801\.1\.2\.1\.27\.1\.1\.1\.1\.([12])\.(\d+\.\d+)\|2\|(\d+)$/', $record, $matches)) {
-                $values[".1.3.6.1.4.1.6486.801.1.2.1.27.1.1.1.1.{$matches[1]}.{$matches[2]}"] = $matches[3];
+                $values["{$oids[$matches[1]]}.{$matches[2]}"] = $matches[3];
             }
         }
         $this->assertCount(96, $values);
 
         $query = \Mockery::mock(SnmpQueryBuilder::class);
-        $query->shouldReceive('numeric')->once()->andReturnSelf();
-        $query->shouldReceive('walk')->once()->with([
-            '.1.3.6.1.4.1.6486.801.1.2.1.27.1.1.1.1.1',
-            '.1.3.6.1.4.1.6486.801.1.2.1.27.1.1.1.1.2',
-        ])->andReturn(new SnmpResponse($values));
+        $query->shouldReceive('walk')->once()->with(array_values($oids))->andReturn(new SnmpResponse($values));
         $this->app->instance(SnmpQueryBuilder::class, $query);
         LibrenmsConfig::set('enable_ports_poe', true);
 
@@ -49,7 +49,7 @@ class Aos7PoeTest extends TestCase
     public function testDisabledPoeDoesNotQuerySnmp(): void
     {
         $query = \Mockery::mock(SnmpQueryBuilder::class);
-        $query->shouldNotReceive('numeric');
+        $query->shouldNotReceive('walk');
         $this->app->instance(SnmpQueryBuilder::class, $query);
         LibrenmsConfig::set('enable_ports_poe', false);
         $port_stats = [71 => ['ifName' => '1/1/3']];

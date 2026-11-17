@@ -15,40 +15,54 @@ use PHPUnit\Framework\Attributes\DataProvider;
 class Aos7NacTest extends TestCase
 {
     #[DataProvider('nacCases')]
-    public function testNacAddressAndAuthorization(string $rawIp, string $hexIp, string $message, int $status, int $classification, string $expectedIp, string $expectedAuthz): void
+    public function testNacAddressAndAuthorization(string $rawIp, string $hexIp, string $message, int $status, int $classification, string $expectedIp, string $expectedAuthz, int $authType = 0, array $client = []): void
     {
         $prefix = 'ALCATEL-IND1-DA-MIB::';
-        $index = '1001.00:11:22:33:44:55.10';
+        $index = $client['index'] ?? '1001.00:11:22:33:44:55.10';
         $table = [];
         foreach ([
             'alaDaMacVlanUserIpAddress' => $rawIp,
             'alaDaMacVlanUserAuthStatus' => (string) $status,
+            'alaDaMacVlanUserAuthtype' => (string) $authType,
             'alaDaMacVlanUserClassificationSource' => (string) $classification,
             'alaDaMacVlanUserServerMessage' => $message,
+            'alaDaMacVlanUserUnpUsed' => $client['unpUsed'] ?? '',
+            'alaDaMacVlanUserUnpFromAuthServer' => $client['unpFromAuthServer'] ?? '',
         ] as $column => $value) {
             $table["$prefix$column.$index"] = $value;
         }
 
         $query = Mockery::mock(SnmpQueryBuilder::class);
-        $query->shouldReceive('mibDir')->with('nokia/aos7')->andReturnSelf();
         $query->shouldReceive('options')->with(Mockery::on(fn ($options) => $options instanceof SnmpQueryOptions && $options->stringFormat === SnmpStringOutput::Hex))->andReturnSelf();
         $query->shouldReceive('walk')->with("{$prefix}alaDaMacVlanUserTable")->andReturn(new SnmpResponse($table));
         $query->shouldReceive('walk')->with("{$prefix}alaDaMacVlanUserIpAddress")->andReturn(new SnmpResponse(["{$prefix}alaDaMacVlanUserIpAddress.$index" => $hexIp]));
-        $query->shouldReceive('walk')->with("{$prefix}alaDaUNPPort8021XSuppTimeOut")->andReturn(new SnmpResponse);
+        $timeoutOid = "{$prefix}alaDaUNPPort8021XSuppTimeOut";
+        $timeoutWalk = $query->shouldReceive('walk')->with($timeoutOid);
+        if ($authType === 2) {
+            $timeoutWalk->once()->andReturn(new SnmpResponse(["$timeoutOid.1001" => '60']));
+        } else {
+            $timeoutWalk->never();
+        }
         $this->app->instance(SnmpQueryBuilder::class, $query);
-        PortCache::shouldReceive('getIdFromIfIndex')->andReturn(71);
+        PortCache::shouldReceive('getIdFromIfIndex')->once()->with(1001, 1)->andReturn(71);
 
         $device = ['os' => 'aos7', 'device_id' => 1];
         $os = OS::make($device);
         $this->assertInstanceOf(\LibreNMS\Interfaces\Polling\NacPolling::class, $os);
         $entries = $os->pollNac();
         $this->assertCount(1, $entries);
-        $this->assertSame($expectedIp, $entries->first()->ip_address);
-        $this->assertSame($expectedAuthz, $entries->first()->authz_status);
+        $entry = $entries->first();
+        $this->assertSame('1001-001122334455-10', $entry->auth_id);
+        $this->assertSame('001122334455', $entry->mac_address);
+        $this->assertSame('00:11:22:33:44:55', $entry->username);
+        $this->assertSame('singleHost', $entry->host_mode);
+        $this->assertSame($expectedIp, $entry->ip_address);
+        $this->assertSame($expectedAuthz, $entry->authz_status);
+        $this->assertEquals($authType === 2 ? 60 : 0, $entry->timeout);
     }
 
     /**
-     * @return array<string, array{string, string, string, int, int, string, string}>
+     * @return array<string, array{string, string, string, int, int, string, string, 7?: int, 8?: array{index?: string, unpUsed?: string, unpFromAuthServer?: string}}>
      */
     public static function nacCases(): array
     {
@@ -61,6 +75,18 @@ class Aos7NacTest extends TestCase
             'legacy dotted fallback' => ['192.168.1.1', '', '', 3, 0, '192.168.1.1', 'authzSuccess'],
             'legacy hex fallback' => ['C0 A8 01 01', '', '', 3, 0, '192.168.1.1', 'authzSuccess'],
             'blocked UNP' => ['192.168.1.1', 'C0 A8 01 01', '', 1, 60, '192.168.1.1', 'authzFail'],
+            'authenticated client with wrong UNP' => ['192.168.1.1', '', '', 3, 0, '192.168.1.1', 'authzFail', 0, [
+                'unpUsed' => 'fallback',
+                'unpFromAuthServer' => 'staff',
+            ]],
+            'UNP comparison ignores case' => ['192.168.1.1', '', '', 3, 0, '192.168.1.1', 'authzSuccess', 0, [
+                'unpUsed' => 'Staff',
+                'unpFromAuthServer' => 'staff',
+            ]],
+            'decimal MAC index' => ['192.168.1.1', '', '', 3, 0, '192.168.1.1', 'authzSuccess', 0, [
+                'index' => '1001.0.17.34.51.68.85.10',
+            ]],
+            '802.1X client' => ['192.168.1.1', 'C0 A8 01 01', '', 3, 0, '192.168.1.1', 'authzSuccess', 2],
         ];
     }
 
@@ -68,7 +94,6 @@ class Aos7NacTest extends TestCase
     {
         $prefix = 'ALCATEL-IND1-DA-MIB::';
         $query = Mockery::mock(SnmpQueryBuilder::class);
-        $query->shouldReceive('mibDir')->with('nokia/aos7')->andReturnSelf();
         $query->shouldReceive('options')->andReturnSelf();
         $query->shouldReceive('walk')->with("{$prefix}alaDaMacVlanUserTable")
             ->andReturn(new SnmpResponse(["{$prefix}alaDaMacVlanUserAuthStatus.1001.00:11:22:33:44:55.10" => '3']));
