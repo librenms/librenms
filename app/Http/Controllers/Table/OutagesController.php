@@ -182,8 +182,10 @@ class OutagesController extends TableController
      */
     protected function formatExportRow(Model $outage): array
     {
+        $device = $outage->device;
+
         return [
-            $outage->device ? $outage->device->displayName() : '',
+            $outage->device ? $device->display : '',
             Carbon::createFromTimestamp($outage->going_down)->toIso8601ZuluString(),
             $outage->up_again ? Carbon::createFromTimestamp($outage->up_again)->toIso8601ZuluString() : '-',
             $this->asDuration($outage)->format('%H:%I:%S'),

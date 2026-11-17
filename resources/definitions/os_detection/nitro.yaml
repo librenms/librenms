@@ -1,6 +1,6 @@
 os: nitro
 text: 'McAfee SIEM Nitro'
-type: appliance
+type: security
 icon: mcafee
 over:
     - { graph: device_bits, text: 'Device Traffic' }

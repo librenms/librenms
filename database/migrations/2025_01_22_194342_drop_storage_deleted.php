@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('storage', function (Blueprint $table) {
+        Schema::table('storage', function (Blueprint $table): void {
             $table->dropColumn('storage_deleted');
         });
     }
@@ -21,7 +21,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('storage', function (Blueprint $table) {
+        Schema::table('storage', function (Blueprint $table): void {
             $table->boolean('storage_deleted')->default(0);
         });
     }

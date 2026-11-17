@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('entPhysical', function (Blueprint $table) {
+        Schema::table('entPhysical', function (Blueprint $table): void {
             $table->text('entPhysicalDescr')->nullable()->change();
             $table->text('entPhysicalClass')->nullable()->change();
             $table->text('entPhysicalName')->nullable()->change();
@@ -28,7 +28,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('entPhysical', function (Blueprint $table) {
+        Schema::table('entPhysical', function (Blueprint $table): void {
             $table->text('entPhysicalDescr')->change();
             $table->text('entPhysicalClass')->change();
             $table->text('entPhysicalName')->change();

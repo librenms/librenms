@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sensors', function (Blueprint $table) {
+        Schema::create('sensors', function (Blueprint $table): void {
             $table->increments('sensor_id');
             $table->boolean('sensor_deleted')->default(0);
             $table->string('sensor_class', 64)->index();

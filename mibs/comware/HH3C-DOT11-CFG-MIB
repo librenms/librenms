@@ -4,7 +4,7 @@
 -- Description:
 --   The file defines a MIB to provide WLAN configuration information.
 -- Reference:
--- Version: V3.6
+-- Version: V3.7
 -- History:
 --   V1.0 2006-05-10 Initial version, created by shiyang (Richard)
 --   V1.1 2007-02-01 modified by xingjichen(Daniel)
@@ -281,6 +281,9 @@
 --        2020-12-29 Add by zhoucailu,sunchangquan
 --        Add hh3cDot11RmtIfManagement to hh3cDot11RemoteCfgIFTable
 --        Add hh3cDot11WlanInfCustomerPVID to hh3cDot11ServicePolicyTable
+--   V3.7 2021-06-18 modified by liyapeng
+--        Modify description of hh3cDot11PreambleLen
+--        Modify description of hh3cDot11StatisIntervMode, hh3cDot11StatisIntervModeCM And hh3cDot11SIDAPStatisIntervMode
 -- =============================================================================
 HH3C-DOT11-CFG-MIB DEFINITIONS ::= BEGIN
 
@@ -324,7 +327,7 @@ IMPORTS
     FROM HH3C-DOT11-REF-MIB;
 
 hh3cDot11CFG MODULE-IDENTITY
-    LAST-UPDATED "202012111800Z"        -- Dec 11, 2020 at 18:00 GMT
+    LAST-UPDATED "202106181800Z"        -- Jun 18, 2021 at 18:00 GMT
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -394,6 +397,9 @@ hh3cDot11CFG MODULE-IDENTITY
         AKM
         The authentication and key management method defined by
         802.11i, and which includes 802.1x and pre-shared key."
+    REVISION "202106181800Z"        -- Jun 18, 2021 at 18:00 GMT
+    DESCRIPTION
+        " Modify nodes with incorrect description information "
     REVISION "202012111800Z"        -- Dec 11, 2020 at 18:00 GMT
     DESCRIPTION
         "Modified to add new nodes and new tables."
@@ -2629,8 +2635,8 @@ hh3cDot11StatisIntervMode OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "This object represents the mode of statics interval.
-         normal    - statics interval value between 10s to 120s
-         realtime  - statics interval value between 2s to 5s"
+         normal    - statics interval value between 10s to 240s
+         realtime  - statics interval value between 0s to 5s"
     DEFVAL      { normal }
     ::= { hh3cDot11APTemplateEntry 18 }
 
@@ -2673,8 +2679,8 @@ hh3cDot11StatisIntervModeCM OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "This object represents the mode of statistic interval.
-        off    - statistic interval value between 10s to 120s
-        on     - statistic interval value between 2s to 5s"
+        off    - statistic interval value between 10s to 240s
+        on     - statistic interval value between 0s to 5s"
     DEFVAL      { off }
     ::= { hh3cDot11APTemplateEntry 21 }
 
@@ -2946,7 +2952,7 @@ hh3cDot11PreambleLen OBJECT-TYPE
     DESCRIPTION
         "Represents whether use long or short preamble for 802.11 MAC
         frame.
-        When hh3cDot11CfgRadioType is either dot11b or dot11g,
+        When hh3cDot11CfgRadioType is either dot11b, dot11g or dot11gn,
         then value for hh3cDot11PreambleLen will be valid.
         Otherwise, the value for it will be invalid."
     DEFVAL      { short }
@@ -3737,7 +3743,7 @@ hh3cDot11RCPreambleLen OBJECT-TYPE
     DESCRIPTION
         "This object represents whether use long or short preamble for 802.11
          MAC frame.
-        When hh3cDot11CfgRadioType is either dot11b or dot11g,
+        When hh3cDot11CfgRadioType is either dot11b, dot11g or dot11gn,
         then value for hh3cDot11PreambleLen will be valid.
         Otherwise, the value for it will be invalid."
     DEFVAL      { short }
@@ -3827,7 +3833,7 @@ hh3cDot11RCPreambleLenCM OBJECT-TYPE
     DESCRIPTION
         "This object represents whether use long or short preamble for 802.11
          MAC frame.
-        When hh3cDot11CfgRadioType is either dot11b or dot11g,
+        When hh3cDot11CfgRadioType is either dot11b, dot11g or dot11gn,
         then value for hh3cDot11PreambleLenCM will be valid.
         Otherwise, the value for it will be invalid."
     DEFVAL      { short }
@@ -4228,8 +4234,8 @@ hh3cDot11SIDAPStatisIntervMode OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "This object represents the mode of statics interval.
-         normal    - statics interval value between 10s to 120s
-         realtime  - statics interval value between 2s to 5s"
+         normal    - statics interval value between 10s to 240s
+         realtime  - statics interval value between 0s to 5s"
     DEFVAL      { normal }
     ::= { hh3cDot11APSerialIDEntry 18 }
 

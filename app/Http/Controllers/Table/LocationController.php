@@ -68,6 +68,37 @@ class LocationController extends TableController
     }
 
     /**
+     * @return list<string>
+     */
+    protected function getExportHeaders(): array
+    {
+        return [
+            __('ID'),
+            __('Location'),
+            __('Latitude'),
+            __('Longitude'),
+            __('Devices'),
+            __('Down'),
+        ];
+    }
+
+    /**
+     * @param  Location  $item
+     * @return list<scalar|null>
+     */
+    protected function formatExportRow(Model $item): array
+    {
+        return [
+            $item->id,
+            $item->location,
+            $item->lat,
+            $item->lng,
+            $item->devices_count,
+            $item->getAttribute('down_count'),
+        ];
+    }
+
+    /**
      * @param  Location  $model
      * @return array<string, scalar>
      */

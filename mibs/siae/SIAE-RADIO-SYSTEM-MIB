@@ -31,7 +31,7 @@ SIAE-RADIO-SYSTEM-MIB
         FROM SIAE-EQUIP-MIB;
 
     radioSystem MODULE-IDENTITY
-        LAST-UPDATED "201607140000Z"
+        LAST-UPDATED "201805220000Z"
         ORGANIZATION "SIAE MICROELETTRONICA spa"
         CONTACT-INFO
             "SIAE MICROELETTONICA s.p.a.
@@ -43,6 +43,38 @@ SIAE-RADIO-SYSTEM-MIB
             "
         DESCRIPTION
             "Radio System MIB.
+            "
+        REVISION "201808230000Z"
+        DESCRIPTION
+            "MIB version 01.00.10
+             - Added echoCanceler in RadioCapability definition
+             - Added radioEchoCancelerTable
+            "
+        REVISION "201805220000Z"
+        DESCRIPTION
+            "MIB version 01.00.09
+             - Added radioStatusXpicAlarm object and related severity
+             - Added value to radioAtpcManual object and RadioCapability definition
+            "
+        REVISION "201802080000Z"
+        DESCRIPTION
+            "MIB version 01.00.08
+             - Changed description of linkBandwidthAndModulation adding channel
+               spacing 62.5MHz, 125MHz and 1500MHz
+             - Added type radio1p0XpicH and radio1p0XpicV to linkType
+            "
+        REVISION "201612200000Z"
+        DESCRIPTION
+            "MIB version 01.00.07
+             - Added value iQLoopAtRxFreq to the TEXTUAL-CONVENTION
+               RadioCapability
+             - Modified default alarm severity codes
+            "
+        REVISION "201609130000Z"
+        DESCRIPTION
+            "MIB version 01.00.06
+             - Added value bw2000Mhz (changed ChannelSpacing TEXTUAL-CONVENTION)
+             - Changed description of linkBandwidthAndModulation
             "
         REVISION "201607140000Z"
         DESCRIPTION
@@ -134,6 +166,10 @@ SIAE-RADIO-SYSTEM-MIB
               bw500Mhz  (8),
               bw750Mhz  (9),
               bw1000Mhz (10),
+              bw2000Mhz (17),
+              bw62M5hz  (18),
+              bw125Mhz  (19),
+              bw1500Mhz (20),
               -- FCC
               bw10Mhz   (11),
               bw20Mhz   (12),
@@ -219,7 +255,10 @@ SIAE-RADIO-SYSTEM-MIB
               carrierOnly      (4),
               iQLoop           (5),
               rfLoopGivenMod   (6),  -- only at a given modulation
-              rfLoopAnyMod     (7)   -- at any modulation
+              rfLoopAnyMod     (7),  -- at any modulation
+              iQLoopAtRxFreq   (8),  -- IQ loop is carried out at RX frequency
+              atpcMinPower     (9),
+              echoCanceler    (10)   -- echo canceler calibration supported
          }
 
     BitsPerSymbol ::= TEXTUAL-CONVENTION
@@ -562,14 +601,17 @@ SIAE-RADIO-SYSTEM-MIB
                               radio2p0Xpic(4),     -- 2+0 XPIC
                               radio2p2XpicHS(5),   -- 2+2 XPIC Hot Standby
                               radio2p2XpicFD(6),   -- 2+2 XPIC Frequency Diversity
-                              radioNp1(7)          -- N+1
+                              radioNp1(7),         -- N+1
+                              radio1p0XpicH(8),    -- 1+0 XPIC Horizontal polarization
+                              radio1p0XpicV(9)     -- 1+0 XPIC Vertical   polarization
                               }
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
             "This object identifies link type. Supported link types are:
              single link, 1+1 Hot Standby, 1+1 Frequency Diversity, 2+0 XPIC,
-             2+2 XPIC Hot Standby, 2+2 XPIC Frequency Diversity and N+1.
+             2+2 XPIC Hot Standby, 2+2 XPIC Frequency Diversity, N+1, and
+             1+0 XPIC Horizontal/Vertical polarization.
             "
         DEFVAL  {radio1p0}    
     ::= {linkEntry 2}
@@ -757,7 +799,7 @@ SIAE-RADIO-SYSTEM-MIB
               The value of this object value is computed by:
                  65536*modulation+bandwidth
                where bandwidth selection is:
-                 0 = 3.5Mhz
+                 0 = 3.5MHz
                  1 = 7MHz
                  2 = 14MHz
                  3 = 28MHz
@@ -767,13 +809,17 @@ SIAE-RADIO-SYSTEM-MIB
                  7 = 30MHz
                  8 = 40MHz
                  9 = 50MHz
-                10 = 112Mhz
-                11 = 250Mhz
-                12 = 500Mhz
-                13 = 750Mhz
-                14 = 1Ghz
+                10 = 112MHz
+                11 = 250MHz
+                12 = 500MHz
+                13 = 750MHz
+                14 = 1GHz
                 15 = 60MHz
                 16 = 80MHz
+                17 = 2GHz
+                18 = 62.5MHz
+                19 = 125MHz
+                20 = 1.5GHz
                and modulation is in bit-per-symbol:
                  1 = BPSK
                  2 = 4QAM
@@ -998,13 +1044,17 @@ SIAE-RADIO-SYSTEM-MIB
 
     radioAtpcManual  OBJECT-TYPE
         SYNTAX      INTEGER {
-                             disable  (1),
-                             enable   (2)
+                             disable           (1),
+                             enable            (2),
+                             enable-min-power  (3)
                             }
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
-            "Enables/disables Atpc Manual operation."
+            "Enables/disables Atpc Manual operation.
+             When the feature is enabled there are 2 behaviour:
+             - (enable) after an air los the ODU transmits the maximum available power
+             - (enable-min-power) after an air los the ODU transmits the minimum available power."
         DEFVAL {disable}
     ::= {radioSettingsEntry 7}
 
@@ -1253,7 +1303,8 @@ SIAE-RADIO-SYSTEM-MIB
             radioConfigAlarmReason          ConfigMismatchReason,
             radioRxQualityLowAlarm          AlarmStatus,
             radioRxQualityWarningAlarm      AlarmStatus,
-            radioXpd                        Integer32
+            radioXpd                        Integer32,
+            radioXpicAlarm                  AlarmStatus
       }
 
     radioCurrentDuplexFrequency  OBJECT-TYPE
@@ -1510,6 +1561,18 @@ SIAE-RADIO-SYSTEM-MIB
                condition, the extimated XPD is greater than the real one.
             "
     ::= {radioStatusEntry 28}
+
+    radioXpicAlarm OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This alarm raises when the xpic configuration isn't working
+             on the specified radioIndex. This could be due to an external
+             issue in case of cable connection or to an internal issue in
+             case of an integrated system. The root cause depends on the
+             hardware characteristics."
+    ::= {radioStatusEntry 29}
 --
 -------  End of radioStatusTable
 
@@ -4208,6 +4271,117 @@ SIAE-RADIO-SYSTEM-MIB
 --
 -------  End of radioRxThresholdTable
 
+-------  Begin of radioEchoCancelerTable
+--
+    radioEchoCancelerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RadioEchoCancelerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with radio settings entries for Echo Canceler procedure.
+            "
+    ::= {radioSystem 40}
+
+    radioEchoCancelerEntry OBJECT-TYPE
+        SYNTAX      RadioEchoCancelerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Radio echo canceler.
+            "
+        INDEX       {radioIndex}
+    ::= {radioEchoCancelerTable 1}
+
+    RadioEchoCancelerEntry  ::=
+        SEQUENCE  {
+          radioEchoCancelerFunctionEn  INTEGER,
+          radioEchoCancelerCableLenMin Integer32,
+          radioEchoCancelerCableLenMax Integer32,
+          radioEchoCancelerDelayLine1  Integer32,
+          radioEchoCancelerDelayLine2  Integer32,
+          radioEchoCancStatus          INTEGER, 
+          radioEchoCancStart           INTEGER
+         }
+
+    radioEchoCancelerFunctionEn OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               disable (1),
+                               enable  (2)
+                              }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to enable or disable echo canceler calibration function..
+            "
+    ::= {radioEchoCancelerEntry 1}
+
+    radioEchoCancelerCableLenMin  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Minimum cable len (Meter range 0 to 300) -."
+        DEFVAL {0}
+    ::= {radioEchoCancelerEntry 2}
+
+    radioEchoCancelerCableLenMax  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Maximum cable len (Meter range 0 to 300) -."
+        DEFVAL {300}
+    ::= {radioEchoCancelerEntry 3}
+
+    radioEchoCancelerDelayLine1  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Echo canceler line 1 delay (retrieved by calibration function) -."
+        DEFVAL {0}
+    ::= {radioEchoCancelerEntry 4}
+
+    radioEchoCancelerDelayLine2  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Echo canceler line 2 delay (retrieved by calibration function) -."
+        DEFVAL {0}
+    ::= {radioEchoCancelerEntry 5}
+
+    radioEchoCancStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             disabled          (0),
+                             uncalibrated      (1),
+                             calibrating       (2),
+                             calibrated        (3),
+                             fail              (4),
+                             unavailable       (5)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current echo canceler calibration status."
+    ::= {radioEchoCancelerEntry 6}
+ 
+    radioEchoCancStart  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             stop              (0),
+                             start             (1)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Echo canceler calibration function trigger."
+         DEFVAL      {stop}
+    ::= {radioEchoCancelerEntry 7}
+ 
+
+--
+-------  End of radioEchoCancelerTable
+
 
     radioRemDemodulatorFailAlarmSeverityCode  OBJECT-TYPE
         SYNTAX      AlarmSeverityCode
@@ -4216,7 +4390,7 @@ SIAE-RADIO-SYSTEM-MIB
         DESCRIPTION
             "Defines the severity associated to the radioRemDemodulatorFailAlarm
              and enables/disables the trap generation on status change event."
-        DEFVAL {majorTrapEnable}
+        DEFVAL {majorTrapDisable}
     ::= {radioSystem 50}
 
     radioRxActiveStatusTrapNotification OBJECT-TYPE
@@ -4292,7 +4466,7 @@ SIAE-RADIO-SYSTEM-MIB
         DESCRIPTION
             "Defines the severity associated to the radioModulatorFailAlarm
              and enables/disables the trap generation on status change event."
-        DEFVAL {majorTrapEnable}
+        DEFVAL {majorTrapDisable}
     ::= {radioSystem 57}
 
     radioDemodulatorFailAlarmSeverityCode  OBJECT-TYPE
@@ -4312,7 +4486,7 @@ SIAE-RADIO-SYSTEM-MIB
         DESCRIPTION
             "Defines the severity associated to the radioRxPowerLowAlarm
              and enables/disables the trap generation on status change event."
-        DEFVAL {majorTrapEnable}
+        DEFVAL {majorTrapDisable}
     ::= {radioSystem 59}
 
     radioTxPowerLowAlarmSeverityCode  OBJECT-TYPE
@@ -4342,7 +4516,7 @@ SIAE-RADIO-SYSTEM-MIB
         DESCRIPTION
             "Defines the severity associated to the radioRxIFAgcAlarm
              and enables/disables the trap generation on status change event."
-        DEFVAL {majorTrapEnable}
+        DEFVAL {majorTrapDisable}
     ::= {radioSystem 62}
 
     radioTxIFAgcAlarmSeverityCode  OBJECT-TYPE
@@ -4402,7 +4576,7 @@ SIAE-RADIO-SYSTEM-MIB
         DESCRIPTION
             "Defines the severity associated to the radioConfigMismatchAlarm
              and enables/disables the trap generation on status change event."
-        DEFVAL {majorTrapEnable}
+        DEFVAL {majorTrapDisable}
     ::= {radioSystem 68}
 
     radioPrxHysteresisValue  OBJECT-TYPE
@@ -4460,7 +4634,7 @@ SIAE-RADIO-SYSTEM-MIB
         DESCRIPTION
             "Define the severity associated to the radioRxQualityLowAlarm
              and enable/disable the trap generation on status change event."
-        DEFVAL {majorTrapEnable}
+        DEFVAL {majorTrapDisable}
     ::= {radioSystem 73}
 
     radioRxQualityWarningAlarmSeverityCode OBJECT-TYPE
@@ -4470,7 +4644,7 @@ SIAE-RADIO-SYSTEM-MIB
         DESCRIPTION
             "Define the severity associated to the radioRxQualityWarningAlarm
              and enable/disable the trap generation on status change event."
-        DEFVAL {majorTrapEnable}
+        DEFVAL {majorTrapDisable}
     ::= {radioSystem 74}
 
     linkReducedCapacityAlarmSeverityCode OBJECT-TYPE
@@ -4480,7 +4654,7 @@ SIAE-RADIO-SYSTEM-MIB
         DESCRIPTION
            "Define the severity associated to the linkReducedCapacityAlarm
             and enable/disable the trap generation on status change event."
-        DEFVAL {warningTrapEnable}
+        DEFVAL {warningTrapDisable}
     ::= {radioSystem 75}
 
     linkLinkTelemetryFailAlarmSeverityCode OBJECT-TYPE
@@ -4510,7 +4684,7 @@ SIAE-RADIO-SYSTEM-MIB
         DESCRIPTION
            "Define the severity associated to the linkRadioEocAlarm
             and enable/disable the trap generation on status change event."
-        DEFVAL {majorTrapEnable}
+        DEFVAL {majorTrapDisable}
     ::= {radioSystem 78}
 
     linkSetupMismatchAlarmSeverityCode OBJECT-TYPE
@@ -4540,7 +4714,7 @@ SIAE-RADIO-SYSTEM-MIB
         DESCRIPTION
            "Define the severity associated to the linkXpicProcedureBlockAlarm
             and enable/disable the trap generation on status change event."
-        DEFVAL {majorTrapEnable}
+        DEFVAL {majorTrapDisable}
     ::= {radioSystem 81}
 
     linkXpicRemTxOffAlarmAlarmSeverityCode OBJECT-TYPE
@@ -4550,7 +4724,7 @@ SIAE-RADIO-SYSTEM-MIB
         DESCRIPTION
            "Define the severity associated to the linkXpicRemTxOffAlarm
             and enable/disable the trap generation on status change event."
-        DEFVAL {majorTrapEnable}
+        DEFVAL {majorTrapDisable}
     ::= {radioSystem 82}
 
     linkLocalIduAlarmSynthesis  OBJECT-TYPE
@@ -4588,7 +4762,7 @@ SIAE-RADIO-SYSTEM-MIB
         DESCRIPTION
            "Define the severity associated to the linkTfcV2Alarm (linkTfcAlarm)
             and enable/disable the trap generation on status change event."
-        DEFVAL      { minorTrapEnable }
+        DEFVAL      { minorTrapDisable }
     ::= {radioSystem 86}
 
     linkBerSyncLossAlarmSeverityCode OBJECT-TYPE
@@ -4608,7 +4782,7 @@ SIAE-RADIO-SYSTEM-MIB
         DESCRIPTION
             "Define the severity associated to the linkNotMatchingRadiosAlarm
              and enable/disable the trap generation on status change event."
-        DEFVAL {majorTrapEnable}
+        DEFVAL {majorTrapDisable}
     ::= {radioSystem 88} 
 
     channelSpacingSelection OBJECT-TYPE
@@ -4653,6 +4827,16 @@ SIAE-RADIO-SYSTEM-MIB
              generation on status change event for linkConfigurationInProgress"
         DEFVAL{ trapEnable }
     ::=  {radioSystem 91}
+
+    radioXpicAlarmSeverityCode OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the radioXpicAlarm
+             and enable/disable the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {radioSystem 92}
 
 -----------------------
 --  This MIB module generates the following TRAPs:

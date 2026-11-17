@@ -26,13 +26,14 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Http\Controllers\Controller;
 use App\Models\Device;
 use App\Models\Pseudowire;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use LibreNMS\Interfaces\UI\DeviceTab;
-use LibreNMS\Util\Url;
 
-class PseudowiresController implements DeviceTab
+class PseudowiresController extends Controller implements DeviceTab
 {
     public function visible(Device $device): bool
     {
@@ -54,12 +55,23 @@ class PseudowiresController implements DeviceTab
         return __('Pseudowires');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function data(Device $device, Request $request): array
     {
-        $view = Url::parseOptions('view', 'detail');
-        if (! in_array($view, ['detail', 'minigraphs'], true)) {
-            $view = 'detail';
-        }
+        return [];
+    }
+
+    public function index(Device $device, Request $request): View
+    {
+        $this->authorize('view', $device);
+
+        $request->validate([
+            'view' => 'nullable|in:detail,minigraphs',
+        ]);
+
+        $view = $request->string('view')->value() ?: 'detail';
 
         $pseudowires = $device->pseudowires()
             ->with(['port', 'peerDevice'])
@@ -99,19 +111,20 @@ class PseudowiresController implements DeviceTab
             ];
         }
 
-        return [
+        return view('device.tabs.pseudowires', [
+            'device' => $device,
             'view' => $view,
             'options' => [
                 'detail' => [
                     'text' => __('Details'),
-                    'link' => route('device', ['device' => $device, 'tab' => 'pseudowires', 'vars' => 'view=detail']),
+                    'link' => route('device.pseudowires', ['device' => $device, 'view' => 'detail']),
                 ],
                 'minigraphs' => [
                     'text' => __('Mini Graphs'),
-                    'link' => route('device', ['device' => $device, 'tab' => 'pseudowires', 'vars' => 'view=minigraphs']),
+                    'link' => route('device.pseudowires', ['device' => $device, 'view' => 'minigraphs']),
                 ],
             ],
             'rows' => $rows,
-        ];
+        ]);
     }
 }

@@ -1,6 +1,6 @@
 os: ibm-amm
 text: 'IBM AMM'
-type: appliance
+type: management
 icon: ibmos
 mib_dir: ibm
 discovery:

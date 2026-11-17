@@ -1,12 +1,15 @@
 -- =================================================================
--- Copyright (C) 2009 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (C) 2009-2021 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: DNS MIB File
 -- Reference:
--- Version: V1.0
+-- Version: V1.1
 -- History:
 --      V1.0 created by jiangshuaihua
 --      initial version 2009-02-12
+--      V1.1 Modified by yujunjie 2021-06-23
+--      Delete the size of InetAddress for nodes hh3cDnsStaticSrvIpAddr,
+--      hh3cDnsDynamicSrvIpAddr
 -- =================================================================
 HH3C-DNS-MIB DEFINITIONS ::= BEGIN
 
@@ -24,7 +27,7 @@ HH3C-DNS-MIB DEFINITIONS ::= BEGIN
 
     hh3cDns MODULE-IDENTITY
         LAST-UPDATED
-            "200902120000Z"
+            "202106230000Z"
         ORGANIZATION
             "New H3C Tech. Co., Ltd."
         CONTACT-INFO
@@ -33,6 +36,11 @@ HH3C-DNS-MIB DEFINITIONS ::= BEGIN
             http://www.h3c.com
             Zip:100085
             "
+        DESCRIPTION
+            "Delete the size of InetAddress for nodes
+            hh3cDnsStaticSrvIpAddr,hh3cDnsDynamicSrvIpAddr."
+        REVISION
+            "202106230000Z"
         DESCRIPTION
             "This MIB contains objects to manage the DNS."
         REVISION
@@ -90,7 +98,7 @@ HH3C-DNS-MIB DEFINITIONS ::= BEGIN
         ::= { hh3cDnsStaticSrvIpEntry 1 }
 
     hh3cDnsStaticSrvIpAddr        OBJECT-TYPE
-        SYNTAX      InetAddress (SIZE (1..64))
+        SYNTAX      InetAddress
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION
@@ -166,7 +174,7 @@ HH3C-DNS-MIB DEFINITIONS ::= BEGIN
         ::= { hh3cDnsDynamicSrvIpEntry 1 }
 
     hh3cDnsDynamicSrvIpAddr          OBJECT-TYPE
-        SYNTAX      InetAddress (SIZE (1..64))
+        SYNTAX      InetAddress
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION

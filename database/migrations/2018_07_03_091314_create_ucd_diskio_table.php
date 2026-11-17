@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ucd_diskio', function (Blueprint $table) {
+        Schema::create('ucd_diskio', function (Blueprint $table): void {
             $table->increments('diskio_id');
             $table->unsignedInteger('device_id')->index();
             $table->integer('diskio_index');

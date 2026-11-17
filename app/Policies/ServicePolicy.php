@@ -55,19 +55,21 @@ class ServicePolicy
 
     /**
      * Determine whether the user can update the model.
+     * Without a model, only the global permission is checked.
      */
-    public function update(User $user, Service $service): bool
+    public function update(User $user, ?Service $service = null): bool
     {
         return $this->hasGlobalPermission($user, 'update')
-            && Permissions::canAccessDevice($service->device_id, $user);
+            && ($service === null || Permissions::canAccessDevice($service->device_id, $user));
     }
 
     /**
      * Determine whether the user can delete the model.
+     * Without a model, only the global permission is checked.
      */
-    public function delete(User $user, Service $service): bool
+    public function delete(User $user, ?Service $service = null): bool
     {
         return $this->hasGlobalPermission($user, 'delete')
-            && Permissions::canAccessDevice($service->device_id, $user);
+            && ($service === null || Permissions::canAccessDevice($service->device_id, $user));
     }
 }

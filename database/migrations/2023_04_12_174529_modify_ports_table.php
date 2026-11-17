@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ports', function (Blueprint $table) {
+        Schema::table('ports', function (Blueprint $table): void {
             $table->string('ifVlan', 8)->nullable()->default(null)->change();
             $table->dropColumn(['ifHardType', 'counter_in', 'counter_out', 'detailed', 'ifPromiscuousMode']);
         });
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ports', function (Blueprint $table) {
+        Schema::table('ports', function (Blueprint $table): void {
             $table->string('ifVlan', 8)->default('')->change();
             $table->string('ifHardType', 64)->nullable()->after('ifPhysAddress');
             $table->integer('counter_in')->nullable()->after('ifVrf');

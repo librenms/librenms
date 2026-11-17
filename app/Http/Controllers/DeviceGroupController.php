@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Interfaces\ToastInterface;
+use App\Models\Device;
 use App\Models\DeviceGroup;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use LibreNMS\Alerting\QueryBuilderFilter;
 
 class DeviceGroupController extends Controller
@@ -56,13 +59,14 @@ class DeviceGroupController extends Controller
             'devices.*' => 'integer',
             'rules' => 'json|required_if:type,dynamic',
         ]);
+        $devices = $request->type == 'static' ? $this->staticMembers($request) : [];
 
         $deviceGroup = new DeviceGroup($request->only(['name', 'desc', 'type']));
         $deviceGroup->rules = json_decode($request->rules);
         $deviceGroup->save();
 
         if ($request->type == 'static') {
-            $deviceGroup->devices()->sync($request->devices);
+            $deviceGroup->devices()->sync($devices);
         }
 
         $toast->success(__('Device Group :name created', ['name' => htmlentities((string) $deviceGroup->name)]));
@@ -123,13 +127,14 @@ class DeviceGroupController extends Controller
             'devices.*' => 'integer',
             'rules' => 'json|required_if:type,dynamic',
         ]);
+        $devices = $request->type == 'static' ? $this->staticMembers($request, $deviceGroup) : [];
 
         $deviceGroup->fill($request->only(['name', 'desc', 'type']));
 
         $devices_updated = false;
         if ($deviceGroup->type == 'static') {
-            // sync device_ids from input
-            $updated = $deviceGroup->devices()->sync($request->input('devices', []));
+            // sync device_ids from input (plus existing members the user cannot see)
+            $updated = $deviceGroup->devices()->sync($devices);
             // check for attached/detached/updated
             $devices_updated = array_sum(array_map(count(...), $updated)) > 0;
         } else {
@@ -158,24 +163,67 @@ class DeviceGroupController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  DeviceGroup  $deviceGroup
-     * @return \Illuminate\Http\Response
+     * Schedule all devices in the group for rediscovery.
      */
-    public function destroy(DeviceGroup $deviceGroup)
+    public function rediscover(Request $request, DeviceGroup $deviceGroup): JsonResponse
+    {
+        $this->authorize('view', $deviceGroup);
+        $this->authorize('update', Device::class);
+
+        // all or nothing: every member device must be accessible to the user
+        $members = $deviceGroup->devices()->pluck('devices.device_id');
+        $accessible = Device::hasAccess($request->user())->whereIntegerInRaw('device_id', $members)->count();
+        abort_if($accessible !== $members->count(), 403);
+
+        Device::whereIntegerInRaw('device_id', $members)->update(['last_discovered' => null]);
+
+        return response()->json([
+            'message' => __('Devices of group :name will be rediscovered', ['name' => htmlentities($deviceGroup->name)]),
+        ]);
+    }
+
+    /**
+     * Resolve the device ids to sync to a static group from the request.
+     * Users may only add devices they can access. Existing members the user
+     * cannot access are always kept, they can neither be added nor removed.
+     *
+     * @return int[]
+     *
+     * @throws ValidationException when a device that is not accessible would be added
+     */
+    private function staticMembers(Request $request, ?DeviceGroup $deviceGroup = null): array
+    {
+        $requested = $request->collect('devices')->map(fn ($id): int => (int) $id)->unique();
+        $current = $deviceGroup?->devices()->pluck('devices.device_id') ?? collect();
+
+        $accessible = Device::hasAccess($request->user())
+            ->whereIntegerInRaw('device_id', $requested->merge($current))
+            ->pluck('device_id');
+        $hidden = $current->diff($accessible);
+
+        if ($requested->diff($accessible)->diff($hidden)->isNotEmpty()) {
+            throw ValidationException::withMessages(['devices' => __('validation.exists', ['attribute' => 'devices'])]);
+        }
+
+        return $requested->merge($hidden)->unique()->values()->all();
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(DeviceGroup $deviceGroup): JsonResponse
     {
         $this->authorize('delete', $deviceGroup);
 
         if ($deviceGroup->serviceTemplates()->exists()) {
-            $msg = __('Device Group :name still has Service Templates associated with it. Please remove or update the Service Template accordingly', ['name' => htmlentities($deviceGroup->name)]);
-
-            return response($msg, 200);
+            return response()->json([
+                'message' => __('Device Group :name still has Service Templates associated with it. Please remove or update the Service Template accordingly', ['name' => htmlentities($deviceGroup->name)]),
+            ], 422);
         }
         $deviceGroup->delete();
 
-        $msg = __('Device Group :name deleted', ['name' => htmlentities($deviceGroup->name)]);
-
-        return response($msg, 200);
+        return response()->json([
+            'message' => __('Device Group :name deleted', ['name' => htmlentities($deviceGroup->name)]),
+        ]);
     }
 }

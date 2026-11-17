@@ -4,6 +4,7 @@ return [
     'title' => 'Konfig',
     'backups' => 'Säkerhetskopieringar',
     'configuration' => 'Konfiguration',
+    'author' => 'Författare',
     'diff' => 'Diff',
     'show_diff' => 'Visa Diff',
     'show_config' => 'Visa Config',

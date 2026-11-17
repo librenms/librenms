@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('slas', function (Blueprint $table) {
+        Schema::table('slas', function (Blueprint $table): void {
             $table->unsignedInteger('sla_nr')->change();
             $table->double('rtt')->unsigned()->nullable()->after('rtt_type');
         });
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('slas', function (Blueprint $table) {
+        Schema::table('slas', function (Blueprint $table): void {
             $table->integer('sla_nr')->change();
             $table->dropColumn('rtt');
         });

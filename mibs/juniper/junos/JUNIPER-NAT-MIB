@@ -23,7 +23,7 @@
     jnxSvcsMibRoot                  FROM JUNIPER-SMI;
 
 	jnxNatMIB MODULE-IDENTITY
-        LAST-UPDATED  "201007122022Z" -- July 12, 2010" 
+        LAST-UPDATED  "202008272022Z" -- August 27, 2020"
     	ORGANIZATION  "Juniper Networks, Inc."
     	CONTACT-INFO
 					"Juniper Technical Assistance Center
@@ -39,6 +39,13 @@
 
         REVISION        "201007122022Z" -- July 12, 2010
     	DESCRIPTION 	"Creation Date"
+
+        REVISION        "202008272022Z" -- August 27, 2020
+        DESCRIPTION     "Added jnxNatSrcNumAddressMapped in jnxSrcNatStatsEntry
+                         and jnxNatPbaPoolName, jnxNatPbaOutOfPortError,
+                         jnxNatPbaMaxNumberOfPortBlocksUsed, jnxNatPbaCurrentNumberOfPortBlocksInUse,
+                         jnxNatPbaPortBlockAllocErrors, jnxNatPbaPortBlockMemAllocErrors,
+                         jnxNatPbaPortBlockLimitExeededErrors in JnxNatPbaStatsEntry."
 
     ::= { jnxSvcsMibRoot 1 }
 
@@ -88,7 +95,8 @@
         jnxNatSrcNumPortInuse     Unsigned32,
         jnxNatSrcNumAddressAvail  Unsigned32,
         jnxNatSrcNumAddressInUse  Unsigned32,
-        jnxNatSrcNumSessions      Unsigned32
+        jnxNatSrcNumSessions      Unsigned32,
+        jnxNatSrcNumAddressMapped Unsigned32
     }
 
 
@@ -152,7 +160,9 @@
         MAX-ACCESS    read-only
         STATUS        current
         DESCRIPTION
-            "The number of ports available with this pool."
+            "The maxmimum number of ports available with this pool.
+
+            This attribute is only applicable to NAT translations with PAT."
         ::= { jnxSrcNatStatsEntry 4 }
 
     jnxNatSrcNumPortInuse OBJECT-TYPE
@@ -170,7 +180,7 @@
         MAX-ACCESS    read-only
         STATUS        current
         DESCRIPTION
-            "The total number of addresses available in this pool."
+            "The maximum number of addresses available in this pool."
         ::= { jnxSrcNatStatsEntry 6 }
 
     jnxNatSrcNumAddressInUse OBJECT-TYPE
@@ -179,8 +189,7 @@
         STATUS        current
         DESCRIPTION
             "The number of addresses in use from this pool.
-            This attribute is only applicable to pools used with
-            source dynamic translations."
+            This attribute is only applicable to NAT translations without PAT." 
         ::= { jnxSrcNatStatsEntry 7 }
 
     jnxNatSrcNumSessions OBJECT-TYPE
@@ -192,6 +201,16 @@
          entry."
 
         ::= { jnxSrcNatStatsEntry 8 }
+
+    jnxNatSrcNumAddressMapped OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of public addresses mapped
+            This attribute is only applicable for NAT translations with PAT."
+
+        ::= { jnxSrcNatStatsEntry 9 }
 
 -- ***************************************************************
 --  NAT Rule Hit Table
@@ -340,6 +359,94 @@
         DESCRIPTION
         	"The number of hits on this NAT Pool"
     ::= { jnxNatPoolEntry 3 }
+
+-- ***************************************************************
+--  NAT PBA Stat Table
+-- ***************************************************************
+
+    jnxNatPbaStatsTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxNatPbaStatsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table monitors NAT PBA stats  "
+        ::= { jnxNatObjects 4 }
+
+    jnxNatPbaStatsEntry OBJECT-TYPE
+        SYNTAX        JnxNatPbaStatsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "NAT PBA stats entries.  It is indexed by the pool index"
+        INDEX   { jnxNatPbaPoolName }
+        ::= { jnxNatPbaStatsTable 1 }
+
+    JnxNatPbaStatsEntry ::= SEQUENCE
+    {
+        jnxNatPbaPoolName                          DisplayString,
+        jnxNatPbaOutOfPortError                    Unsigned32,
+        jnxNatPbaMaxNumberOfPortBlocksUsed         Unsigned32,
+        jnxNatPbaCurrentNumberOfPortBlocksInUse    Unsigned32,
+        jnxNatPbaPortBlockAllocErrors              Unsigned32,
+        jnxNatPbaPortBlockMemAllocErrors           Unsigned32,
+        jnxNatPbaPortBlockLimitExeededErrors       Unsigned32
+    }
+
+    jnxNatPbaPoolName OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(0..64))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "NAT PBA Pool name"
+    ::= { jnxNatPbaStatsEntry 1 }
+
+    jnxNatPbaOutOfPortError OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Number of times the out of port error is hit"
+    ::= { jnxNatPbaStatsEntry 2 }
+
+    jnxNatPbaMaxNumberOfPortBlocksUsed OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The count of Max number of blocks used for the pool"
+    ::= { jnxNatPbaStatsEntry 3 }
+
+    jnxNatPbaCurrentNumberOfPortBlocksInUse OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The count of current number of blocks used for the pool"
+    ::= { jnxNatPbaStatsEntry 4 }
+
+    jnxNatPbaPortBlockAllocErrors OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The count of port block allocation errors"
+    ::= { jnxNatPbaStatsEntry 5 }
+
+    jnxNatPbaPortBlockMemAllocErrors OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The count of port block memory allocation errors"
+    ::= { jnxNatPbaStatsEntry 6 }
+
+    jnxNatPbaPortBlockLimitExeededErrors OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The count of port block limit exceeded errors hit"
+    ::= { jnxNatPbaStatsEntry 7 }
 
 -- ***************************************************************
 --  NAT Trap definition

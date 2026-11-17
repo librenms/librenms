@@ -14,8 +14,12 @@ if (isset($options['r']) && isset($options['h'])) {
     $runAlerts = new RunAlerts();
 
     $rule_id = (int) $options['r'];
-    $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
-    $where = "alerts.device_id = $device_id && alerts.rule_id = $rule_id";
+    $device = DeviceCache::get($options['h']);
+    if (! $device->exists) {
+        echo "Device {$options['h']} not found\n";
+        exit(1);
+    }
+    $where = "alerts.device_id = {$device->device_id} && alerts.rule_id = $rule_id";
     $alerts = $runAlerts->loadAlerts($where);
     if (empty($alerts)) {
         echo 'No active alert found, please check that you have the correct ids';

@@ -76,6 +76,12 @@
   @apply tw:inline-flex tw:items-center tw:gap-1 tw:rounded-lg tw:px-2 tw:py-1 tw:font-normal tw:no-underline;
 }
 
+@layer components {
+  .lnms-input {
+    @apply tw:block tw:w-full tw:h-[30px] tw:px-2.5 tw:rounded-[3px] tw:border tw:border-gray-300 tw:bg-white tw:text-gray-700! tw:placeholder-gray-400 tw:focus:outline-none tw:focus:border-blue-500 tw:focus:ring-1 tw:focus:ring-blue-500 tw:disabled:bg-gray-100 tw:disabled:cursor-not-allowed;
+  }
+}
+
 .lnms-btn-badge {
   @apply tw:inline-flex tw:text-xs tw:min-w-5 tw:px-1.5 tw:items-center tw:justify-center tw:rounded-xl tw:font-bold;
 }

@@ -57,7 +57,7 @@ class SslCertificateController extends TableController
             $deviceLink = '<a href="' . url('device/' . $sslCertificate->device_id) . '">' . e($sslCertificate->device->hostname) . '</a>';
         }
 
-        $validTo = $sslCertificate->valid_to !== null ? $sslCertificate->valid_to->format('Y-m-d H:i') : null;
+        $validTo = $sslCertificate->valid_to?->format('Y-m-d H:i');
         $status = '';
         if ($sslCertificate->disabled) {
             $status = '<span class="label label-default">' . __('Disabled') . '</span>';

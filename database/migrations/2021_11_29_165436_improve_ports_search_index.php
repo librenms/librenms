@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ports', function (Blueprint $table) {
+        Schema::table('ports', function (Blueprint $table): void {
             $table->index(['ifAlias', 'port_descr_descr', 'portName']);
             $table->index(['ifDescr', 'ifName']);
             $table->dropIndex('ports_ifdescr_index');
@@ -27,7 +27,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ports', function (Blueprint $table) {
+        Schema::table('ports', function (Blueprint $table): void {
             $table->index('ifDescr');
             $table->dropIndex('ports_ifalias_port_descr_descr_portname_index');
             $table->dropIndex('ports_ifdescr_ifname_index');

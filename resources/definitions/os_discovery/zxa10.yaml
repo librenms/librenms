@@ -20,6 +20,11 @@ modules:
                 value: ZTE-AN-CHASSIS-MIB::zxAnCardCpuLoad
                 num_oid: '.1.3.6.1.4.1.3902.1082.10.1.2.4.1.9.{{ $index }}'
                 descr: '{{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }} Processor'
+            -
+                oid: ZXR10-SYSTEM-HARDWARE-MIB::zxr10CpusystemTable
+                value: ZXR10-SYSTEM-HARDWARE-MIB::zxr10SystemCpuUtility5s
+                num_oid: '.1.3.6.1.4.1.3902.3.6002.2.1.1.7.{{ $index }}'
+                descr: '{{ ZXR10-SYSTEM-HARDWARE-MIB::zxr10SystemOamCpuName }} CPU'
     sensors:
         additional_oids:
             data:
@@ -35,16 +40,32 @@ modules:
                     oid: ZTE-AN-ENVMON-MIB::zxAnCardEnvParamTable
                     value: ZTE-AN-ENVMON-MIB::zxAnCardTemp
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.6.1.2.{{ $index }}'
-                    descr: "Temp Card {{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }}"
+                    descr: "Temp Card Slot {{ $subindex2 }} {{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }}"
+                -
+                    oid: ZXR10-SYSTEM-HARDWARE-MIB::zxr10BoardTempTable
+                    value: ZXR10-SYSTEM-HARDWARE-MIB::zxr10BoardTempCurTemp
+                    num_oid: '.1.3.6.1.4.1.3902.3.6002.2.5.1.9.{{ $index }}'
+                    descr: 'Temp Card Slot {{ $subindex2 }} {{ ZXR10-SYSTEM-HARDWARE-MIB::zxr10BoardTempBoard }} {{ ZXR10-SYSTEM-HARDWARE-MIB::zxr10BoardTempDescription }}'
+                -
+                    oid: ZXR10-SYSTEM-HARDWARE-MIB::zxr10ShelfTemperatureTable
+                    value: ZXR10-SYSTEM-HARDWARE-MIB::zxr10EnvironTemperature
+                    num_oid: '.1.3.6.1.4.1.3902.3.6002.2.4.1.3.{{ $index }}'
+                    descr: 'Shelf Temperature'
         fanspeed:
             data:
                 -
                     oid: ZTE-AN-ENVMON-MIB::zxAnEnvFanTable
                     value: ZTE-AN-ENVMON-MIB::zxAnEnvFanActualSpeed
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.4.11.1.7.{{ $index }}'
-                    descr: "Fan speed Slot {{ $subindex2 }}"
+                    descr: "Fan speed {{ $subindex1 }}/{{ $subindex2 }}"
                     low_limit: 0
-
+        percent:
+            data:
+                -
+                    oid: ZXR10-SYSTEM-HARDWARE-MIB::zxr10FanTable
+                    value: ZXR10-SYSTEM-HARDWARE-MIB::zxr10FanRatio
+                    num_oid: '.1.3.6.1.4.1.3902.3.6002.2.3.1.14.{{ $index }}'
+                    descr: 'Fan Speed {{ $subindex2 }}/{{ $subindex3 }} Ratio'
         voltage:
             data:
                 -
@@ -57,17 +78,21 @@ modules:
                     oid: ZTE-AN-ENVMON-MIB::zxAnCardEnvParamTable
                     value: ZTE-AN-ENVMON-MIB::zxAnCardVoltage
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.6.1.4.{{ $index }}'
-                    descr: "Voltage Card {{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }}"
+                    descr: "Voltage Card Slot {{ $subindex2 }} {{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }}"
                     skip_value_lt: 1
                     divisor: 1000
-
+                -
+                    oid: ZXR10-SYSTEM-HARDWARE-MIB::zxr10PowerDivisionTable
+                    value: ZXR10-SYSTEM-HARDWARE-MIB::zxr10PowerDivisionOutputVoltage
+                    num_oid: '.1.3.6.1.4.1.3902.3.6002.2.6.3.1.5.{{ $index }}'
+                    descr: 'Output Voltage Slot {{ $subindex3 }}'
         power:
             data:
                 -
                     oid: ZTE-AN-ENVMON-MIB::zxAnCardEnvParamTable
                     value: ZTE-AN-ENVMON-MIB::zxAnCardPowerConsumption
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.6.1.3.{{ $index }}'
-                    descr: "Power Consumption Card {{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }}"
+                    descr: "Power Consumption Card Slot {{ $subindex2 }} {{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }}"
                     skip_value_lt: 1
                     divisor: 1000
         current:
@@ -76,10 +101,9 @@ modules:
                     oid: ZTE-AN-ENVMON-MIB::zxAnCardEnvParamTable
                     value: ZTE-AN-ENVMON-MIB::zxAnCardCurrent
                     num_oid: '.1.3.6.1.4.1.3902.1082.10.10.2.1.6.1.5.{{ $index }}'
-                    descr: "Current Card {{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }}"
+                    descr: "Current Card Slot {{ $subindex2 }} {{ ZTE-AN-CHASSIS-MIB::zxAnCardActualType }}"
                     skip_value_lt: 1
                     divisor: 1000
-
         state:
             data:
                 -
@@ -116,3 +140,38 @@ modules:
                         - { value: 2, generic: 1, descr: 'overVoltage' }
                         - { value: 3, generic: 1, descr: 'underVoltage' }
                         - { value: 4, generic: 2, descr: 'off' }
+                -
+                    oid: ZXR10-SYSTEM-HARDWARE-MIB::zxr10FanTable
+                    value: ZXR10-SYSTEM-HARDWARE-MIB::zxr10FanStatus
+                    num_oid: '.1.3.6.1.4.1.3902.3.6002.2.3.1.7.{{ $index }}'
+                    index: 'zxr10FanStatus.{{ $index }}'
+                    descr: 'Fan Status {{ $subindex2 }}/{{ $subindex3 }}'
+                    group: Fans
+                    state_name: zxr10FanStatus
+                    states:
+                        - { value: 0, generic: 2, descr: 'abnormal' }
+                        - { value: 1, generic: 0, descr: 'normal' }
+                -
+                    oid: ZXR10-SYSTEM-HARDWARE-MIB::zxr10PowerModuleTable
+                    value: ZXR10-SYSTEM-HARDWARE-MIB::zxr10PowerModulePhyStatus
+                    num_oid: '.1.3.6.1.4.1.3902.3.6002.2.6.2.1.4.{{ $index }}'
+                    index: 'zxr10PowerModulePhyStatus.{{ $index }}'
+                    descr: '{{ ZXR10-SYSTEM-HARDWARE-MIB::zxr10PowerModuleName }} Slot {{ $subindex3 }} Physical Status'
+                    group: Power
+                    state_name: zxr10PowerModulePhyStatus
+                    states:
+                        - { value: 0, generic: 2, descr: 'unknown' }
+                        - { value: 1, generic: 0, descr: 'Present' }
+                        - { value: 2, generic: 1, descr: 'not present' }
+                -
+                    oid: ZXR10-SYSTEM-HARDWARE-MIB::zxr10PowerModuleTable
+                    value: ZXR10-SYSTEM-HARDWARE-MIB::zxr10PowerModuleRunStatus
+                    num_oid: '.1.3.6.1.4.1.3902.3.6002.2.6.2.1.7.{{ $index }}'
+                    index: 'zxr10PowerModuleRunStatus.{{ $index }}'
+                    descr: '{{ ZXR10-SYSTEM-HARDWARE-MIB::zxr10PowerModuleName }} Slot {{ $subindex3 }} Run Status'
+                    group: Power
+                    state_name: zxr10PowerModuleRunStatus
+                    states:
+                        - { value: 0, generic: 2, descr: 'unknown' }
+                        - { value: 1, generic: 0, descr: 'normal' }
+                        - { value: 2, generic: 2, descr: 'abnormal' }

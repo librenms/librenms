@@ -1,22 +1,29 @@
 -- =============================================================================
--- Copyright (c) 2004-2018 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2023 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Layer 2 Virtual Private Network (L2VPN) MIB
 -- Reference:
--- Version: V1.2
+-- Version: V1.5
 -- History:
--- V1.0 2015-01-16 Created by Yanneng
+-- V1.5 2023-01-17 Modified by xuwentao
+--   Add hh3cL2vpnFlowLabelNonSuppTable, hh3cL2vpnCCCTable and hh3cL2vpnPwInfoTable.
+--   Add nodes hh3cL2vpnFlowLabelNonSupp, hh3cL2vpnSingleCCCVcDown,
+--   hh3cL2vpnSingleCCCVcUp, hh3cL2vpnPwOutAgeClear and hh3cL2vpnPwOutAge.
+-- V1.4 2021-11-30 Modified by lifei
+--   Add hh3cL2vpnMacLimitPwTable and Added nodes hh3cL2vpnMacLimitMaxAc hh3cL2vpnMacLimitMaxAcClear hh3cL2vpnMacLimitMaxPw
+--   hh3cL2vpnMacLimitMaxPwClear hh3cL2vpnPwParaMisMatch hh3cL2vpnPwParaMatch
+-- V1.3 2020-08-08 Modified by Gaolei
+--   Added node hh3cL2vpnPwOutboundQosCarCir hh3cL2vpnPwOutboundQosCarCbs
+--   hh3cL2vpnPwOutboundQosCarEbs hh3cL2vpnPwOutboundQosCarPir
+-- V1.2 2018-04-27  Modified by fuzhihua
+--      Added nodes hh3cL2vpnXcgConnRedundancy and hh3cL2vpnXcgPwIgnoreStandby
 -- V1.1 2018-01-17 Modified by Chenjuxi
--- Add node hh3cL2vpnPwcFlowLabel
+--   Add node hh3cL2vpnPwcFlowLabel
 --      2017-11-21 Modified by Chenjian
--- Add hh3cL2vpnLinkTable
+--   Add hh3cL2vpnLinkTable
 --      2016-09-30 Modified by Liyun
--- Add hh3cL2vpnAcCfgTable and hh3cL2vpnPwCfgTable
--- V1.2 2018-09-03 Modified by WangShuji
--- Modified the value range of the hh3cL2vpnLinkIfIndex
---      2018-04-27 Modified by fuzhihua
--- Added nodes hh3cL2vpnXcgConnRedundancy and hh3cL2vpnXcgPwIgnoreStandby
-
+--   Add hh3cL2vpnAcCfgTable and hh3cL2vpnPwCfgTable
+-- V1.0 2015-01-16 Created by Yanneng
 -- =============================================================================
 HH3C-L2VPN-MIB DEFINITIONS ::= BEGIN
 
@@ -40,7 +47,7 @@ IMPORTS
 -- module identity part
 -- =============================================================================
 hh3cL2vpn MODULE-IDENTITY
-    LAST-UPDATED "201804271800Z"       -- Apr 27, 2018 at 18:00 GMT
+    LAST-UPDATED "202301171100Z"       -- Dec 01, 2023 at 11:00 GMT
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -49,6 +56,21 @@ hh3cL2vpn MODULE-IDENTITY
         http://www.h3c.com
         Zip:100085
         "
+    DESCRIPTION
+        "Add hh3cL2vpnFlowLabelNonSuppTable hh3cL2vpnCCCTable and hh3cL2vpnPwInfoTable
+         Added nodes hh3cL2vpnFlowLabelNonSupp hh3cL2vpnSingleCCCVcDown
+         hh3cL2vpnSingleCCCVcUp hh3cL2vpnPwOutAgeClear and hh3cL2vpnPwOutAge."
+    REVISION
+        "202301171100Z"   -- Dec 01, 2023 at 11:00 GMT
+    DESCRIPTION
+        "Added hh3cL2vpnMacLimitMaxAc hh3cL2vpnMacLimitMaxAcClear hh3cL2vpnMacLimitMaxPw hh3cL2vpnMacLimitMaxPwClear
+         hh3cL2vpnPwParaMisMatch hh3cL2vpnPwParaMatch."
+    REVISION
+        "202112101100Z"   -- Dec 10, 2021 at 11:00 GMT
+    DESCRIPTION
+        "Added hh3cL2vpnPwOutboundQosCarCir hh3cL2vpnPwOutboundQosCarCbs hh3cL2vpnPwOutboundQosCarEbs and hh3cL2vpnPwOutboundQosCarPir."
+    REVISION
+        "202010291800Z"   -- Oct 29, 2020 at 18:00 GMT
     DESCRIPTION
         "Added hh3cL2vpnXcgConnRedundancy and hh3cL2vpnXcgPwIgnoreStandby."
     REVISION
@@ -229,7 +251,7 @@ Hh3cL2vpnLinkEntry ::= SEQUENCE
         hh3cL2vpnLinkVsiIndex        Unsigned32,
         hh3cL2vpnLinkLinkID          Unsigned32,
         hh3cL2vpnLinkType            INTEGER,
-        hh3cL2vpnLinkIfIndex         InterfaceIndexOrZero,
+        hh3cL2vpnLinkIfIndex         InterfaceIndex,
         hh3cL2vpnLinkSrvID           Unsigned32,
         hh3cL2vpnLinkTunnelID        Unsigned32
     }
@@ -267,7 +289,7 @@ hh3cL2vpnLinkType OBJECT-TYPE
     ::= { hh3cL2vpnLinkEntry 3 }
 
 hh3cL2vpnLinkIfIndex OBJECT-TYPE
-    SYNTAX      InterfaceIndexOrZero
+    SYNTAX      InterfaceIndex
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -292,6 +314,177 @@ hh3cL2vpnLinkTunnelID OBJECT-TYPE
         "The tunnel ID of the L2VPN link.  The maximum value of unsigned32 means
          that the tunnel ID is invalid."
     ::= { hh3cL2vpnLinkEntry 6 }
+
+-- ==================================================================
+-- ======================= hh3cL2vpnMacLimitPwTable definition ==========
+-- ==================================================================
+
+hh3cL2vpnMacLimitPwTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cL2vpnMacLimitPwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains L2VPN Mac Limit information."
+    ::= { hh3cL2vpnGlobalTable 3 }
+
+hh3cL2vpnMacLimitPwEntry OBJECT-TYPE
+    SYNTAX      Hh3cL2vpnMacLimitPwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides information about an L2VPN Mac Limit entry."
+    INDEX
+        {
+            hh3cL2vpnMacLimitPwVsiIndex,
+            hh3cL2vpnMacLimitPwLinkID
+        }
+    ::= { hh3cL2vpnMacLimitPwTable 1 }
+
+Hh3cL2vpnMacLimitPwEntry ::= SEQUENCE
+    {
+        hh3cL2vpnMacLimitPwVsiIndex        Unsigned32,
+        hh3cL2vpnMacLimitPwLinkID          Unsigned32,
+        hh3cL2vpnMacLimitPwVsiName         OCTET STRING,
+        hh3cL2vpnMacLimitPwRowStatus       RowStatus
+    }
+
+hh3cL2vpnMacLimitPwVsiIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Index of VSI.  Its value ranges from 0x1 to 0xFFFFFFFE."
+    ::= { hh3cL2vpnMacLimitPwEntry 1 }
+
+hh3cL2vpnMacLimitPwLinkID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "VSI link Identifier (ID) of the l2vpn link.  The maximum value of
+         unsigned32 means that the VSI link ID is invalid."
+    ::= { hh3cL2vpnMacLimitPwEntry 2 }
+
+hh3cL2vpnMacLimitPwVsiName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Name of VSI.  Max string length of VSI name is 31."
+    ::= { hh3cL2vpnMacLimitPwEntry 3 }
+hh3cL2vpnMacLimitPwRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cL2vpnMacLimitPwEntry 4 }
+
+-- ==================================================================
+-- ======================= hh3cL2vpnPwInfoTable definition ==========
+-- ==================================================================
+
+hh3cL2vpnPwInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cL2vpnPwInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains L2VPN PW warning information."
+    ::= { hh3cL2vpnGlobalTable 4 }
+
+hh3cL2vpnPwInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cL2vpnPwInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry describes configurations for a PW."
+    INDEX
+        {
+            hh3cL2vpnPeerIp,
+            hh3cL2vpnPWPwID
+        }
+    ::= { hh3cL2vpnPwInfoTable 1 }
+
+Hh3cL2vpnPwInfoEntry ::= SEQUENCE
+    {
+        hh3cL2vpnPeerIp                  IpAddress,
+        hh3cL2vpnPWPwID                  Unsigned32,
+        hh3cL2vpnPwType                  INTEGER
+    }
+
+hh3cL2vpnPeerIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Peer IP address."
+    ::= { hh3cL2vpnPwInfoEntry 1 }
+
+hh3cL2vpnPWPwID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "PW identifier (ID)."
+    ::= { hh3cL2vpnPwInfoEntry 2 }
+
+hh3cL2vpnPwType      OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        vlan(4),
+        ethernet(5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "L2VPN PW type."
+    ::= { hh3cL2vpnPwInfoEntry 3 }
+
+-- ==================================================================
+-- =========== hh3cL2vpnFlowLabelNonSuppTable definition ============
+-- ==================================================================
+
+hh3cL2vpnFlowLabelNonSuppTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cL2vpnFlowLabelNonSuppEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains Slot configuration."
+    ::= { hh3cL2vpnGlobalTable 5}
+
+hh3cL2vpnFlowLabelNonSuppEntry OBJECT-TYPE
+    SYNTAX      Hh3cL2vpnFlowLabelNonSuppEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry describes configurations about a Slot."
+        INDEX
+        {
+            hh3cL2vpnFlowLabelSlotId
+        }
+    ::= { hh3cL2vpnFlowLabelNonSuppTable 1 }
+
+Hh3cL2vpnFlowLabelNonSuppEntry ::= SEQUENCE
+    {
+        hh3cL2vpnFlowLabelSlotId                Unsigned32,
+        hh3cL2vpnFlowLabelOID                   OBJECT IDENTIFIER
+    }
+
+hh3cL2vpnFlowLabelSlotId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "SlotId identifier (ID)."
+    ::= { hh3cL2vpnFlowLabelNonSuppEntry 1 }
+
+hh3cL2vpnFlowLabelOID OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OID identifier (ID)."
+    ::= { hh3cL2vpnFlowLabelNonSuppEntry 2 }
 
 -- ==================================================================
 -- =======================hh3cL2vpnVpwsTable definition  ============
@@ -408,8 +601,7 @@ hh3cL2vpnXcgConnRedundancy OBJECT-TYPE
     SYNTAX      INTEGER
     {
         slave(1),
-        master(2),
-        independent(3)
+        master(2)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -596,6 +788,83 @@ hh3cL2vpnXcgPwIgnoreStandby OBJECT-TYPE
         "Ignores the PW standby state advertised by the remote PE."
     DEFVAL { false }
     ::= { hh3cL2vpnXcgPwEntry 8 }
+-- ==================================================================
+-- ======================= hh3cL2vpnCCCTable definition =============
+-- ==================================================================
+hh3cL2vpnCCCTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cL2vpnCCCEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains Circuit Cross Connect(CCC)
+         remote connection warning information."
+    ::= { hh3cL2vpnVpwsTable 5 }
+
+hh3cL2vpnCCCEntry OBJECT-TYPE
+    SYNTAX      Hh3cL2vpnCCCEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry describes configurations for a CCC."
+        INDEX
+        {
+            hh3cL2vpnInInterfaceIndex, hh3cL2vpnOutInterfaceIndex
+        }
+    ::= { hh3cL2vpnCCCTable 1 }
+
+Hh3cL2vpnCCCEntry ::= SEQUENCE
+    {
+        hh3cL2vpnInInterfaceIndex     InterfaceIndex,
+        hh3cL2vpnOutInterfaceIndex    InterfaceIndex,
+        hh3cL2vpnChangeReason         Unsigned32,
+        hh3cL2vpnInInterfaceName      OCTET STRING,
+        hh3cL2vpnOutInterfaceName     OCTET STRING
+    }
+
+hh3cL2vpnInInterfaceIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Index of the inbound interface."
+    ::= { hh3cL2vpnCCCEntry 1 }
+
+hh3cL2vpnOutInterfaceIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Index of the outbound interface."
+    ::= { hh3cL2vpnCCCEntry 2 }
+
+hh3cL2vpnChangeReason OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The reason for the CCC state change.
+         Local AC Up/Down(4);
+         Local AC (not) bind(5);
+         Local Xconnect-group Up/Down(8);
+         Label (not) allocated(11)."
+    ::= { hh3cL2vpnCCCEntry 3 }
+
+hh3cL2vpnInInterfaceName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the inbound interface."
+    ::= { hh3cL2vpnCCCEntry 4 }
+
+hh3cL2vpnOutInterfaceName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the outbound interface."
+    ::= { hh3cL2vpnCCCEntry 5 }
+
 -- ==================================================================
 -- ===============hh3cL2vpnPwNotifications definition  ==============
 -- ==================================================================
@@ -796,7 +1065,11 @@ Hh3cL2vpnPwCfgEntry ::= SEQUENCE
         hh3cL2vpnPwInboundQosEbs         Unsigned32,
         hh3cL2vpnPwOutboundQosCir        Unsigned32,
         hh3cL2vpnPwOutboundQosCbs        Unsigned32,
-        hh3cL2vpnPwOutboundQosEbs        Unsigned32
+        hh3cL2vpnPwOutboundQosEbs        Unsigned32,
+        hh3cL2vpnPwOutboundQosCarCir     Unsigned32,
+        hh3cL2vpnPwOutboundQosCarCbs     Unsigned32,
+        hh3cL2vpnPwOutboundQosCarEbs     Unsigned32,
+        hh3cL2vpnPwOutboundQosCarPir     Unsigned32
     }
 
 hh3cL2vpnPwPeerIp OBJECT-TYPE
@@ -925,4 +1198,193 @@ hh3cL2vpnPwOutboundQosEbs OBJECT-TYPE
     DESCRIPTION
         "Excess Burst Size in the outbound direction."
     ::= { hh3cL2vpnPwCfgEntry 15 }
+hh3cL2vpnPwOutboundQosCarCir OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Committed Information Rate in kbps."
+    ::= { hh3cL2vpnPwCfgEntry 16 }
+
+hh3cL2vpnPwOutboundQosCarCbs OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Committed Burst Size in bytes."
+    ::= { hh3cL2vpnPwCfgEntry 17 }
+
+hh3cL2vpnPwOutboundQosCarEbs OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Excess Burst Size in bytes.
+         Only software QoS supports this node.
+         4294967295 is returned when getting value from hardware QoS."
+    ::= { hh3cL2vpnPwCfgEntry 18 }
+
+hh3cL2vpnPwOutboundQosCarPir OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Peak Information Rate in kbps.
+         Only hardware QoS supports this node.
+         4294967295 is returned when getting value from software QoS."
+    ::= { hh3cL2vpnPwCfgEntry 19 }
+
+-- ==================================================================
+-- ===============hh3cL2vpnPwNotifications definition  ==============
+-- ==================================================================
+hh3cL2vpnMacLimitMaxAc NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cL2vpnAcIfName,
+            hh3cL2vpnAcVsiName
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when The number
+         of MAC address entries on the AC reached the
+         upper limit happens. The first element show
+         the ServiceID"
+    ::= { hh3cL2vpnPwNotifications 3 }
+
+hh3cL2vpnMacLimitMaxAcClear NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cL2vpnAcIfName,
+            hh3cL2vpnAcVsiName
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when The number of
+         MAC address entries on the AC fell below the upper
+         limit happens. The first element show the the ServiceID."
+    ::= { hh3cL2vpnPwNotifications 4 }
+
+hh3cL2vpnMacLimitMaxPw NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cL2vpnMacLimitPwVsiIndex,
+            hh3cL2vpnMacLimitPwLinkID,
+            hh3cL2vpnMacLimitPwVsiName
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when The number
+         of MAC address entries on the PW reached the
+         upper limit happens. The first  element show
+         the vsi index"
+    ::= { hh3cL2vpnPwNotifications 5 }
+
+hh3cL2vpnMacLimitMaxPwClear NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cL2vpnMacLimitPwVsiIndex,
+            hh3cL2vpnMacLimitPwLinkID,
+            hh3cL2vpnMacLimitPwVsiName
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when The number of
+         MAC address entries on the PW fell below the upper
+         limit happens. The first element show the the vsi
+         index."
+    ::= { hh3cL2vpnPwNotifications 6 }
+
+hh3cL2vpnPwParaMisMatch NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cL2vpnPwVsiName,
+            hh3cL2vpnPwXcgName,
+            hh3cL2vpnPwXcgConnName
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the e PW parameter
+         mismatch happens. The first element show the Pw PeerIp"
+    ::= { hh3cL2vpnPwNotifications 7 }
+
+hh3cL2vpnPwParaMatch NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cL2vpnPwVsiName,
+            hh3cL2vpnPwXcgName,
+            hh3cL2vpnPwXcgConnName
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the e PW parameter
+         match happens. The first element show the Pw PeerIp"
+    ::= { hh3cL2vpnPwNotifications 8 }
+
+hh3cL2vpnPwOutAge NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cL2vpnPeerIp,
+            hh3cL2vpnPWPwID,
+            hh3cL2vpnPwType
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when both main PW and backup PW are
+         down."
+    ::= { hh3cL2vpnPwNotifications 9 }
+
+hh3cL2vpnPwOutAgeClear NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cL2vpnPeerIp,
+            hh3cL2vpnPWPwID,
+            hh3cL2vpnPwType
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the main PW or backup PW is
+         recovered."
+    ::= { hh3cL2vpnPwNotifications 10 }
+
+hh3cL2vpnSingleCCCVcUp NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cL2vpnInInterfaceIndex,
+            hh3cL2vpnOutInterfaceIndex,
+            hh3cL2vpnChangeReason,
+            hh3cL2vpnInInterfaceName,
+            hh3cL2vpnOutInterfaceName
+        }
+    STATUS      current
+    DESCRIPTION
+        "The status of the single CCC turned UP."
+    ::= { hh3cL2vpnPwNotifications 11 }
+
+hh3cL2vpnSingleCCCVcDown NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cL2vpnInInterfaceIndex,
+            hh3cL2vpnOutInterfaceIndex,
+            hh3cL2vpnChangeReason,
+            hh3cL2vpnInInterfaceName,
+            hh3cL2vpnOutInterfaceName
+        }
+    STATUS      current
+    DESCRIPTION
+        "The status of the single CCC turned DOWN."
+    ::= { hh3cL2vpnPwNotifications 12 }
+
+hh3cL2vpnFlowLabelNonSupp NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cL2vpnFlowLabelSlotId,
+            hh3cL2vpnFlowLabelOID
+        }
+    STATUS      current
+    DESCRIPTION
+        "The device has detected that there is a board with
+         unsupported stream tag function."
+    ::= { hh3cL2vpnPwNotifications 13 }
+-- ==================================================================
+
 END

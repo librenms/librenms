@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::dropIfExists('ospfv3_nbrs');
-        Schema::create('ospfv3_nbrs', function (Blueprint $table) {
+        Schema::create('ospfv3_nbrs', function (Blueprint $table): void {
             $table->increments('id');
             $table->unsignedInteger('device_id');
             $table->unsignedInteger('ospfv3_instance_id');
@@ -45,7 +45,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('ospfv3_nbrs');
-        Schema::create('ospfv3_nbrs', function (Blueprint $table) {
+        Schema::create('ospfv3_nbrs', function (Blueprint $table): void {
             $table->increments('id');
             $table->unsignedInteger('device_id');
             $table->unsignedInteger('port_id')->nullable();

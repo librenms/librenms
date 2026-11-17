@@ -1,6 +1,6 @@
 os: sitemonitor
 text: 'Packetflux SiteMonitor'
-type: appliance
+type: environment
 icon: packetflux
 over:
     - { graph: device_poller_perf, text: 'Poller time' }

@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2023 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Device Management MIB
 -- Reference:
--- Version: V2.7
+-- Version: V2.9
 -- History:
 --      V1.0 (1) Created by Hou Qiang, 2001.06.29
 --           (2) Revised by Qi Zhenglin, 2001.12.30 ----r003 revision
@@ -39,6 +39,11 @@
 --      V2.7  2020-05-11
 --           Added hh3cDevMPowerRatedVoltage, hh3cDevMPowerRatedCurrent, hh3cDevMPowerLoadFactor,
 --           hh3cDevMPowerUsedPower and hh3cDevMPowerRemainingPower by meishenhe.
+--      V2.8  2022-11-03
+--           Added hh3cDevMPowerSupplyType by fangliwen.
+--      V2.9  2023-02-17
+--           Added hh3cDevMFanSpeedPercent, hh3cDevMFanSpeedMode, hh3cDevMPowerOutputVoltage,
+--           hh3cDevMPowerOutputCurrent and hh3cDevMPowerCapacity by hezheng
 -- ==================================================================
 -- ==================================================================
 --
@@ -58,7 +63,7 @@ IMPORTS
         ;
 
 hh3cLswdevMMib MODULE-IDENTITY
-        LAST-UPDATED "202005110000Z"
+        LAST-UPDATED "202302170000Z"
         ORGANIZATION
             "New H3C Tech. Co., Ltd."
         CONTACT-INFO
@@ -67,6 +72,14 @@ hh3cLswdevMMib MODULE-IDENTITY
             http://www.h3c.com
             Zip:100085
             "
+        DESCRIPTION
+        "Added hh3cDevMFanSpeedPercent, hh3cDevMFanSpeedMode,
+        hh3cDevMPowerOutputVoltage, hh3cDevMPowerOutputCurrent and
+        hh3cDevMPowerCapacity."
+        REVISION "202302170000Z"
+        DESCRIPTION
+        "Added hh3cDevMPowerSupplyType."
+        REVISION "202211030000Z"
         DESCRIPTION
         "Added hh3cDevMPowerRatedVoltage, hh3cDevMPowerRatedCurrent, hh3cDevMPowerLoadFactor,
         hh3cDevMPowerUsedPower and hh3cDevMPowerRemainingPower."
@@ -416,7 +429,9 @@ Hh3cDevMFanStatusEntry ::=
                 hh3cDevMFanPosSlot       Integer32,
                 hh3cDevMFanPosIndex      Integer32,
                 hh3cDevMFanMaxSpeed      Integer32,
-                hh3cDevMFanCurrentSpeed  Integer32
+                hh3cDevMFanCurrentSpeed  Integer32,
+                hh3cDevMFanSpeedPercent  Integer32,
+                hh3cDevMFanSpeedMode     INTEGER
             }
 
 hh3cDevMFanNum  OBJECT-TYPE
@@ -474,6 +489,24 @@ hh3cDevMFanCurrentSpeed  OBJECT-TYPE
         DESCRIPTION " Current speed of the fan, in RPM"
         ::= { hh3cdevMFanStatusEntry 7 }
 
+hh3cDevMFanSpeedPercent OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Percentage of current fan speed to maximum fan speed "
+        ::= { hh3cdevMFanStatusEntry 8 }
+
+hh3cDevMFanSpeedMode OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        auto(1),
+        manual(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Speed mode of a fan "
+        ::= { hh3cdevMFanStatusEntry 9 }
+
 hh3cdevMPowerStatusTable OBJECT-TYPE
         SYNTAX SEQUENCE OF Hh3cDevMPowerStatusEntry
         MAX-ACCESS not-accessible
@@ -498,7 +531,11 @@ Hh3cDevMPowerStatusEntry ::=
                 hh3cDevMPowerRatedCurrent   Integer32,
                 hh3cDevMPowerLoadFactor     Integer32,
                 hh3cDevMPowerUsedPower      Integer32,
-                hh3cDevMPowerRemainingPower Integer32
+                hh3cDevMPowerRemainingPower Integer32,
+                hh3cDevMPowerSupplyType     INTEGER,
+                hh3cDevMPowerOutputVoltage  Integer32,
+                hh3cDevMPowerOutputCurrent  Integer32,
+                hh3cDevMPowerCapacity       Integer32
             }
 
 hh3cDevMPowerNum  OBJECT-TYPE
@@ -566,6 +603,42 @@ hh3cDevMPowerRemainingPower  OBJECT-TYPE
         STATUS current
         DESCRIPTION "Remaining of power "
         ::= { hh3cdevMPowerStatusEntry 8 }
+
+hh3cDevMPowerSupplyType  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        ac    (1),
+        dc    (2),
+        hvdc  (3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Power supply type"
+        ::= { hh3cdevMPowerStatusEntry 9 }
+
+hh3cDevMPowerOutputVoltage OBJECT-TYPE
+        SYNTAX  Integer32
+        UNITS      "V"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Power output voltage "
+        ::= { hh3cdevMPowerStatusEntry 10 }
+
+hh3cDevMPowerOutputCurrent OBJECT-TYPE
+        SYNTAX  Integer32
+        UNITS      "A"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Power output current "
+        ::= { hh3cdevMPowerStatusEntry 11 }
+
+hh3cDevMPowerCapacity OBJECT-TYPE
+        SYNTAX  Integer32
+        UNITS      "W"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Power capacity "
+        ::= { hh3cdevMPowerStatusEntry 12 }
 
 hh3cdevMSlotEnvironmentTable OBJECT-TYPE
         SYNTAX SEQUENCE OF Hh3cdevMSlotEnvironmentEntry

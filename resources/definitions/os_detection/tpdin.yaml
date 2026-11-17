@@ -1,6 +1,6 @@
 os: tpdin
 text: 'Tycon Systems TPDIN'
-type: appliance
+type: power
 icon: tyconsystems
 over:
     - { graph: device_voltage, text: 'Device Voltage' }

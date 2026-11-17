@@ -8,7 +8,7 @@
         <label for="device-{{ $id }}" class="control-label">{{ __('Device') }}</label>
         <select class="form-control" id="device-{{ $id }}" name="device" required>
             @if($device)
-                <option value="{{ $device->device_id }}">{{ $device->displayName() }}</option>
+                <option value="{{ $device->device_id }}">{{ $device->display }}</option>
             @endif
         </select>
     </div>
@@ -38,7 +38,7 @@
 @endsection
 @section('javascript')
     <script type="text/javascript">
-        init_select2('#device-{{ $id }}', 'device', {}, @json($device ? ['id' => $device->device_id, 'text' => $device->displayName()] : ''));
+        init_select2('#device-{{ $id }}', 'device', {}, @json($device ? ['id' => $device->device_id, 'text' => $device->display] : ''));
         $('#gauges-{{ $id }}').select2({width: '100%'});
     </script>
 @endsection

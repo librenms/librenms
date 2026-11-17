@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('alert_rules', function (Blueprint $table) {
+        Schema::table('alert_rules', function (Blueprint $table): void {
             $table->boolean('invert_map')->default(0);
         });
     }
@@ -24,7 +24,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('alert_rules', function (Blueprint $table) {
+        Schema::table('alert_rules', function (Blueprint $table): void {
             $table->dropColumn(['invert_map']);
         });
     }

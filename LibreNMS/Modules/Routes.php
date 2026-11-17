@@ -30,18 +30,17 @@ use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Route;
-use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\DB\SyncsModels;
+use LibreNMS\DB\BulkTableSync;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\TooManyRoutes;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\RouteDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Number;
@@ -49,7 +48,7 @@ use SnmpQuery;
 
 class Routes implements Module
 {
-    use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -59,18 +58,15 @@ class Routes implements Module
         return ['ports'];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function pollingMethods(Device $device): array
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return [PollingMethodType::Snmp];
     }
 
     /**
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldPoll(OS $os): bool
     {
         return false;
     }
@@ -80,7 +76,7 @@ class Routes implements Module
      */
     public function discover(OS $os): void
     {
-        $update_timestamp = \Carbon\Carbon::now();
+        $update_timestamp = \Carbon\Carbon::now()->toDateTimeString();
         $max_routes = (int) LibrenmsConfig::get('routes_max_number') ?: 1000;
 
         $routesFromOs = new Collection;
@@ -102,7 +98,7 @@ class Routes implements Module
             }
         }
 
-        $routes = $routesFromOs->merge($routesFromDiscovery)->filter(function ($data) use ($update_timestamp) {
+        $routes = $routesFromOs->merge($routesFromDiscovery)->filter(function ($data) {
             $dst = trim(str_replace('"', '', $data->inetCidrRouteDest ?? ''));
             $hop = trim(str_replace('"', '', $data->inetCidrRouteNextHop ?? ''));
             $context = trim(str_replace('"', '', $data->context_name ?? ''));
@@ -143,7 +139,6 @@ class Routes implements Module
                 return null;
             }
 
-            $data->updated_at = $update_timestamp;
             $data->port_id ??= 0;
             $data->context_name = $context;
             $data->inetCidrRouteIfIndex = intval($data->inetCidrRouteIfIndex);
@@ -161,16 +156,11 @@ class Routes implements Module
             return $data;
         });
 
-        ModuleModelObserver::observe(Route::class);
-
-        $routesExisting = $os->getDevice()->routes()->get()->transform(function ($row) {
-            unset($row->route_id);
-
-            return $row;
-        });
-        $this->syncModels($os->getDevice(), 'routes', $this->fillNew($routesExisting, $routes));
-        // We add (or update) routes, but old ones are kept for history
-        // Cleaning is done in `daily`.
+        $sync = new BulkTableSync($os->getDevice()->routes(), 'inetCidrRouteDest');
+        // Only observed routes are refreshed; absent routes remain as history
+        // until daily cleanup removes them.
+        $counts = $sync->sync($routes, $update_timestamp);
+        Log::info("Routes: {$counts['inserted']} added, {$counts['updated']} updated, {$counts['unchanged']} unchanged, {$counts['deleted']} duplicates removed");
     }
 
     /**

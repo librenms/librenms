@@ -13,11 +13,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('pollers', function (Blueprint $table) {
+        Schema::table('pollers', function (Blueprint $table): void {
             $table->longText('poller_details')->nullable()->after('time_taken');
         });
 
-        Schema::table('poller_cluster', function (Blueprint $table) {
+        Schema::table('poller_cluster', function (Blueprint $table): void {
             $table->longText('poller_details')->nullable()->after('poller_version');
         });
     }
@@ -29,11 +29,11 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('pollers', function (Blueprint $table) {
+        Schema::table('pollers', function (Blueprint $table): void {
             $table->dropColumn('poller_details');
         });
 
-        Schema::table('poller_cluster', function (Blueprint $table) {
+        Schema::table('poller_cluster', function (Blueprint $table): void {
             $table->dropColumn('poller_details');
         });
     }

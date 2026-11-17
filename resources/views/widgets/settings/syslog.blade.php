@@ -9,7 +9,7 @@
         <label for="device-{{ $id }}" class="control-label">{{ __('Device') }}</label>
         <select class="form-control" id="device-{{ $id }}" name="device" data-placeholder="{{ __('All devices') }}">
             @if($device)
-                <option value="{{ $device->device_id }}">{{ $device->displayName() }}</option>
+                <option value="{{ $device->device_id }}">{{ $device->display }}</option>
             @endif
         </select>
     </div>

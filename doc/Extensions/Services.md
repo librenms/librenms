@@ -211,19 +211,6 @@ values below are not the defaults and are not recommendations.
     ```
 Also read [Dispatcher Service](../Extensions/Dispatcher-Service.md).
 
-### Service checks polling logic
-
-LibreNMS skips a service check when the device does not answer a ping.
-It writes an entry in the event log. LibreNMS polls the service check
-when its `IP address` parameter differs from the IP address of the
-device. This behaviour also applies to a device without a ping
-response.
-
-To poll the service checks always, disable the ICMP test of the device.
-Set `Disable ICMP Test` to ON under Edit -> Misc.
-
-LibreNMS never polls the service checks of a disabled device.
-
 ### CHECK_MRPE
 
 Usually, only the Nagios plugins with the `-H` option for a remote host

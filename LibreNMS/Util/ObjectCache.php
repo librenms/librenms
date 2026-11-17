@@ -42,7 +42,7 @@ use App\Models\Sensor;
 use App\Models\Service;
 use App\Models\Vrf;
 use Cache;
-use LibreNMS\Enum\Sensor as SensorEnum;
+use LibreNMS\Enum\SensorType;
 
 class ObjectCache
 {
@@ -74,8 +74,8 @@ class ObjectCache
             return [
                 'vrf' => Vrf::hasAccess($user)->count(),
                 'mpls' => Mpls::hasAccess($user)->count(),
-                'ospf' => OspfInstance::hasAccess($user)->count(),
-                'ospfv3' => Ospfv3Instance::hasAccess($user)->count(),
+                'ospf' => OspfInstance::hasAccess($user)->where('ospfAdminStat', 'enabled')->count(),
+                'ospfv3' => Ospfv3Instance::hasAccess($user)->where('ospfv3AdminStatus', 'enabled')->count(),
                 'isis' => IsisAdjacency::hasAccess($user)->count(),
                 'cisco-otv' => Component::hasAccess($user)->where('type', 'Cisco-OTV')->count(),
                 'bgp' => BgpPeer::hasAccess($user)->count(),
@@ -107,7 +107,7 @@ class ObjectCache
 
                 $sensor_menu[$group][] = [
                     'class' => $class,
-                    'icon' => SensorEnum::from($class)->icon(),
+                    'icon' => SensorType::from($class)->icon(),
                     'descr' => $sensor_model->classDescr(),
                 ];
             }

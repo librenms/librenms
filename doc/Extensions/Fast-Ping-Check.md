@@ -5,6 +5,11 @@ This ping tests the up state or the down state. The check uses the
 poller frequency, usually 5 minutes. A down device therefore takes up
 to 5 minutes to appear.
 
+Only devices with an enabled ICMP polling method are pinged. A failed
+ping marks the device down only when **Affects availability** is on.
+See [ICMP](../Support/Configuration.md#fping) to change this for one
+device.
+
 Some users need a faster report of a device without a ping response.
 The `ping.php` script runs the ping checks as fast as possible. It does
 not increase the SNMP load of 1-minute polling on your devices.

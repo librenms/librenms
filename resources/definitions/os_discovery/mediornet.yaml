@@ -1,0 +1,126 @@
+modules:
+    os:
+        hardware: SNMPv2-MIB::sysDescr.0
+        hardware_regex: '/MediorNet (?<hardware>[^(]+?)(?: \(|$)/'
+        version: RIEDEL-MEDIORNET-MIB::packageVersion.0
+        serial: RIEDEL-MEDIORNET-MIB::serialNumber.0
+        sysName: RIEDEL-MEDIORNET-MIB::name.0
+        location: RIEDEL-MEDIORNET-MIB::location.0
+    processors:
+        data:
+            -
+                oid: RIEDEL-MEDIORNET-MIB::cpuLoad
+                num_oid: '.1.3.6.1.4.1.23056.2.12.{{ $index }}'
+                precision: 10
+                descr: 'CPU'
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: RIEDEL-MEDIORNET-MIB::temperature
+                    num_oid: '.1.3.6.1.4.1.23056.2.11.{{ $index }}'
+                    descr: 'System Temperature'
+                    index: 'temperature.{{ $index }}'
+                -
+                    oid: RIEDEL-MEDIORNET-MIB::slotTable
+                    value: RIEDEL-MEDIORNET-MIB::cardTemperature
+                    num_oid: '.1.3.6.1.4.1.23056.2.20.1.5.{{ $index }}'
+                    descr: 'Slot {{ RIEDEL-MEDIORNET-MIB::slot }} {{ RIEDEL-MEDIORNET-MIB::cardName }}'
+                    index: 'cardTemperature.{{ $index }}'
+                    skip_values:
+                        -
+                            oid: RIEDEL-MEDIORNET-MIB::cardStatus
+                            op: '='
+                            value: 0
+                        -
+                            oid: RIEDEL-MEDIORNET-MIB::cardType
+                            op: '='
+                            value: 'Main Module'
+                        -
+                            oid: RIEDEL-MEDIORNET-MIB::cardType
+                            op: '='
+                            value: 'Video In Module'
+                        -
+                            oid: RIEDEL-MEDIORNET-MIB::cardType
+                            op: '='
+                            value: 'Video Out Module'
+                        -
+                            oid: RIEDEL-MEDIORNET-MIB::cardType
+                            op: 'starts'
+                            value: 'Link Module'
+        fanspeed:
+            data:
+                -
+                    oid: RIEDEL-MEDIORNET-MIB::fanSpeed
+                    num_oid: '.1.3.6.1.4.1.23056.2.10.{{ $index }}'
+                    descr: 'System Fans'
+                    index: 'fanSpeed.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: RIEDEL-MEDIORNET-MIB::psu1
+                    num_oid: '.1.3.6.1.4.1.23056.2.13.{{ $index }}'
+                    descr: 'Power Supply 1'
+                    index: 'psu1.{{ $index }}'
+                    state_name: RIEDEL-MEDIORNET-MIB::psu1
+                    states:
+                        - { value: 0, descr: 'notAvailable', generic: 1 }
+                        - { value: 1, descr: 'operating', generic: 0 }
+                        - { value: 2, descr: 'notOperating', generic: 2 }
+                -
+                    oid: RIEDEL-MEDIORNET-MIB::psu2
+                    num_oid: '.1.3.6.1.4.1.23056.2.14.{{ $index }}'
+                    descr: 'Power Supply 2'
+                    index: 'psu2.{{ $index }}'
+                    state_name: RIEDEL-MEDIORNET-MIB::psu2
+                    states:
+                        - { value: 0, descr: 'notAvailable', generic: 1 }
+                        - { value: 1, descr: 'operating', generic: 0 }
+                        - { value: 2, descr: 'notOperating', generic: 2 }
+                -
+                    oid: RIEDEL-MEDIORNET-MIB::slotTable
+                    value: RIEDEL-MEDIORNET-MIB::cardStatus
+                    num_oid: '.1.3.6.1.4.1.23056.2.20.1.4.{{ $index }}'
+                    descr: 'Slot {{ RIEDEL-MEDIORNET-MIB::slot }} {{ RIEDEL-MEDIORNET-MIB::cardName }}'
+                    index: 'cardStatus.{{ $index }}'
+                    state_name: RIEDEL-MEDIORNET-MIB::cardStatus
+                    skip_values:
+                        -
+                            oid: RIEDEL-MEDIORNET-MIB::cardStatus
+                            op: '='
+                            value: 0
+                    states:
+                        - { value: 0, descr: 'empty', generic: 1 }
+                        - { value: 1, descr: 'active', generic: 0 }
+                        - { value: 2, descr: 'wrongSlot', generic: 2 }
+                        - { value: 3, descr: 'updateRequired', generic: 1 }
+                        - { value: 4, descr: 'failed', generic: 2 }
+                -
+                    oid: RIEDEL-MEDIORNET-MIB::linkTable
+                    value: RIEDEL-MEDIORNET-MIB::linkStatus
+                    num_oid: '.1.3.6.1.4.1.23056.2.30.1.4.{{ $index }}'
+                    descr: 'Fiber Link {{ RIEDEL-MEDIORNET-MIB::linkSlot }}/{{ RIEDEL-MEDIORNET-MIB::link }}'
+                    index: 'linkStatus.{{ $index }}'
+                    state_name: RIEDEL-MEDIORNET-MIB::linkStatus
+                    skip_values:
+                        -
+                            oid: RIEDEL-MEDIORNET-MIB::linkStatus
+                            op: '='
+                            value: 0
+                    states:
+                        - { value: -1, descr: 'sfpNotPresentLinkUp', generic: 1 }
+                        - { value: 0, descr: 'sfpNotPresentLinkDown', generic: 1 }
+                        - { value: 1, descr: 'sfpPresentLinkDown', generic: 2 }
+                        - { value: 2, descr: 'sfpPresentLinkUp', generic: 0 }
+                -
+                    oid: RIEDEL-MEDIORNET-MIB::syncState
+                    num_oid: '.1.3.6.1.4.1.23056.2.17.{{ $index }}'
+                    descr: 'Sync State'
+                    index: 'syncState.{{ $index }}'
+                    state_name: RIEDEL-MEDIORNET-MIB::syncState
+                    states:
+                        - { value: 0, descr: 'slave', generic: 0 }
+                        - { value: 1, descr: 'masterFreerun', generic: 1 }
+                        - { value: 2, descr: 'masterLocking', generic: 1 }
+                        - { value: 3, descr: 'masterLocked', generic: 0 }
+                        - { value: 100, descr: 'undefined', generic: 3 }

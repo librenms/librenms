@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         if (! Schema::hasColumn('application_metrics', 'id')) {
-            Schema::table('application_metrics', function (Blueprint $table) {
+            Schema::table('application_metrics', function (Blueprint $table): void {
                 $table->id()->first();
             });
         }

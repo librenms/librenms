@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('mpls_lsp_paths', function (Blueprint $table) {
+        Schema::table('mpls_lsp_paths', function (Blueprint $table): void {
             /** add
              * vRtrMplsLspPathTunnelARHopListIndex
              * vRtrMplsLspPathTunnelCHopListIndex
@@ -31,7 +31,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('mpls_lsp_paths', function (Blueprint $table) {
+        Schema::table('mpls_lsp_paths', function (Blueprint $table): void {
             $table->dropColumn(['mplsLspPathTunnelARHopListIndex', 'mplsLspPathTunnelCHopListIndex']);
         });
     }

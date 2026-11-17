@@ -27,6 +27,7 @@
 namespace LibreNMS\Validations;
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Util\Binaries;
 use LibreNMS\Validator;
 
 class Mail extends BaseValidation
@@ -47,11 +48,8 @@ class Mail extends BaseValidation
                 $validator->fail('default_mail config option needs to be specified to test email');
                 $run_test = 0;
             } elseif (LibrenmsConfig::get('email_backend') == 'sendmail') {
-                if (! LibrenmsConfig::has('email_sendmail_path')) {
-                    $validator->fail('You have selected sendmail but not configured email_sendmail_path');
-                    $run_test = 0;
-                } elseif (! file_exists(LibrenmsConfig::get('email_sendmail_path'))) {
-                    $validator->fail('The configured email_sendmail_path is not valid');
+                if (resolve(Binaries::class)->find('sendmail') === null) {
+                    $validator->fail('You have selected sendmail but it was not found', 'Install sendmail or, if it is installed somewhere else or under another name, add SENDMAIL_PATH=/path/to/sendmail to .env.');
                     $run_test = 0;
                 }
             } elseif (LibrenmsConfig::get('email_backend') == 'smtp') {

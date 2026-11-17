@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('custom_map_nodes', function (Blueprint $table) {
+        Schema::create('custom_map_nodes', function (Blueprint $table): void {
             $table->increments('custom_map_node_id');
             $table->integer('custom_map_id')->unsigned()->index();
             $table->integer('device_id')->nullable()->unsigned()->index();

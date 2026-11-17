@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ospfv3_instances', function (Blueprint $table) {
+        Schema::table('ospfv3_instances', function (Blueprint $table): void {
             $table->string('ospfv3RestartSupport', 32)->nullable()->change();
             $table->unsignedInteger('ospfv3RestartInterval')->nullable()->change();
             $table->string('ospfv3RestartStrictLsaChecking', 32)->nullable()->change();
@@ -30,7 +30,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ospfv3_instances', function (Blueprint $table) {
+        Schema::table('ospfv3_instances', function (Blueprint $table): void {
             $table->string('ospfv3RestartSupport', 32)->change();
             $table->unsignedInteger('ospfv3RestartInterval')->change();
             $table->string('ospfv3RestartStrictLsaChecking', 32)->change();

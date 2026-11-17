@@ -28,7 +28,7 @@
 
 
 	jnxJsNatMIB  	MODULE-IDENTITY
-    	LAST-UPDATED  "201301051022Z" -- January 05, 2012
+    	LAST-UPDATED  "202106220000Z" -- June 22, 2021
     	ORGANIZATION  "Juniper Networks, Inc."
     	CONTACT-INFO
 					"Juniper Technical Assistance Center
@@ -65,7 +65,33 @@
                          jnxJsNatSrcNumAddressInuse in jnxJsSrcNatStatsEntry;
                          added jnxJsNatTransType in jnxJsNatRuleTable."
 
-    ::= { jnxJsNAT 1 }   
+        REVISION        "202008271022Z" -- August 27, 2020
+        DESCRIPTION     "added jnxJsNatSrcNumAddressMapped in
+                         JnxJsSrcNatStatsEntry and
+                         jnxJsNatPbaPoolName, jnxJsNatPbaOutOfPortError,
+                         jnxJsNatPbaMaxNumberOfPortBlocksUsed, jnxJsNatPbaCurrentNumberOfPortBlocksInUse,
+                         jnxJsNatPbaPortBlockAllocErrors, jnxJsNatPbaPortBlockMemAllocErrors,
+                         jnxJsNatPbaPortBlockLimitExeededErrors in JnxJsNatPbaStatsEntry."
+
+        REVISION        "202106220000Z" -- June 22, 2021
+        DESCRIPTION     "increased all pool & rule name length from 32 to 64"
+
+        REVISION        "202303240000Z" -- March 24, 2023
+        DESCRIPTION     "added jnxJsNatOverloadedPoolTable"
+
+        REVISION        "202306230000Z" -- June 23, 2023
+        DESCRIPTION     "added new SNMP Trap jnxJsSrcNatOverloadedPoolThresholdStatus
+                         carrying varbinds jnxJsNatTrapPoolName, jnxJsNatPoolIpAddress,
+                         jnxJsNatPortOverloadingIndex and jnxJsNatOverloadedPatPoolUtil.
+                         Changed jnxJsNatOverloadedPoolTable to jnxJsNatPortOverloadUtilTable."
+
+        REVISION        "202306230000Z" -- May 03, 2024
+        DESCRIPTION     "added new SNMP Trap jnxJsSrcNatSubThresholdStatus
+                         carrying varbinds jnxJsNatSubscriberIp, jnxJsNatTrapPoolName,
+                         jnxJsSrcNatPoolType and jnxJsNatSubsPoolUtil."
+
+
+    ::= { jnxJsNAT 1 }
 
 
     jnxJsNatNotifications OBJECT IDENTIFIER ::= { jnxJsNatMIB 0 }
@@ -135,7 +161,7 @@
 
 
     jnxJsNatSrcIpPoolName OBJECT-TYPE
-        SYNTAX        DisplayString (SIZE(1..32)) 
+        SYNTAX        DisplayString (SIZE(1..64))
         MAX-ACCESS    accessible-for-notify 
         STATUS        deprecated
         DESCRIPTION
@@ -346,12 +372,13 @@
         jnxJsNatSrcNumSessions      INTEGER,
         jnxJsNatSrcNumPortAvail     Counter32,
         jnxJsNatSrcNumAddressAvail  Counter32,
-        jnxJsNatSrcNumAddressInuse  Counter32
+        jnxJsNatSrcNumAddressInuse  Counter32,
+        jnxJsNatSrcNumAddressMapped Counter32
     }
 
 
     jnxJsNatSrcPoolName OBJECT-TYPE
-        SYNTAX        DisplayString (SIZE(1..32)) 
+        SYNTAX        DisplayString (SIZE(1..64))
         MAX-ACCESS    accessible-for-notify 
         STATUS        current
         DESCRIPTION
@@ -428,9 +455,8 @@
         STATUS        current
         DESCRIPTION
         	"The number of sessions are in use based on this NAT address 
-			 entry.
+			 entry."
 
-			 This attribute is only applicable to NAT translation without PAT."
 		::= { jnxJsSrcNatStatsEntry 6 }
 
         jnxJsNatSrcNumPortAvail OBJECT-TYPE
@@ -438,7 +464,9 @@
         MAX-ACCESS    read-only
         STATUS        current
         DESCRIPTION
-            "The number of ports available with this pool."
+            "The maximum number of ports available with this pool.
+
+            This attribute is only applicable on MX platform to NAT translations with PAT."
         ::= { jnxJsSrcNatStatsEntry 7 }
 
         jnxJsNatSrcNumAddressAvail OBJECT-TYPE
@@ -446,7 +474,9 @@
         MAX-ACCESS    read-only
         STATUS        current
         DESCRIPTION
-            "The total number of addresses available in this pool."
+            "The maximum number of addresses available in this pool.
+
+            This attribute is only applicable on MX platform."
         ::= { jnxJsSrcNatStatsEntry 8 }
 
         jnxJsNatSrcNumAddressInuse OBJECT-TYPE
@@ -455,9 +485,17 @@
         STATUS        current
         DESCRIPTION
             "The number of addresses in use from this pool.
-            This attribute is only applicable to pools used with
-            source dynamic translations."
+            This attribute is only applicable on MX platform to NAT translations without PAT."
         ::= { jnxJsSrcNatStatsEntry 9 }
+
+        jnxJsNatSrcNumAddressMapped OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of public addresses mapped.
+            This attribute is only applicable on MX platform for NAT translations with PAT."
+        ::= { jnxJsSrcNatStatsEntry 10 }
 
     -- ***************************************************************
     --  NAT Rule Hit Table
@@ -491,7 +529,7 @@
     }
 
     jnxJsNatRuleName OBJECT-TYPE
-        SYNTAX        DisplayString (SIZE(1..32)) 
+        SYNTAX        DisplayString (SIZE(1..64))
         MAX-ACCESS    read-only
         STATUS        current
         DESCRIPTION
@@ -589,7 +627,7 @@
     }
 
     jnxJsNatPoolName OBJECT-TYPE
-        SYNTAX        DisplayString (SIZE(1..32)) 
+        SYNTAX        DisplayString (SIZE(1..64))
         MAX-ACCESS    read-only
         STATUS        current
         DESCRIPTION
@@ -635,6 +673,223 @@
     ::= { jnxJsNatPoolEntry 5 }
 
     -- ***************************************************************
+    --  NAT PBA stats Table
+    -- ***************************************************************
+
+    jnxJsNatPbaStatsTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxJsNatPbaStatsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table monitors NAT PBA stats"
+        ::= { jnxJsNatObjects 7 }
+
+    jnxJsNatPbaStatsEntry OBJECT-TYPE
+        SYNTAX        JnxJsNatPbaStatsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "NAT pool hit entries.  It is indexed by the pool index"
+        INDEX   { jnxJsNatPbaPoolName }
+        ::= { jnxJsNatPbaStatsTable 1 }
+
+    JnxJsNatPbaStatsEntry ::= SEQUENCE
+    {
+        jnxJsNatPbaPoolName                             DisplayString,
+        jnxJsNatPbaOutOfPortError                       Counter32,
+        jnxJsNatPbaMaxNumberOfPortBlocksUsed            Counter32,
+        jnxJsNatPbaCurrentNumberOfPortBlocksInUse       Counter32,
+        jnxJsNatPbaPortBlockAllocErrors                 Counter32,
+        jnxJsNatPbaPortBlockMemAllocErrors              Counter32,
+        jnxJsNatPbaPortBlockLimitExeededErrors          Counter32
+    }
+
+    jnxJsNatPbaPoolName OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..64))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "NAT PBA Pool name"
+    ::= { jnxJsNatPbaStatsEntry 1 }
+
+    jnxJsNatPbaOutOfPortError OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Number of times the out of port error is hit"
+    ::= { jnxJsNatPbaStatsEntry 2 }
+
+    jnxJsNatPbaMaxNumberOfPortBlocksUsed OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The count of Max number of blocks used for the pool"
+    ::= { jnxJsNatPbaStatsEntry 3 }
+
+    jnxJsNatPbaCurrentNumberOfPortBlocksInUse OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The count of current number of blocks used for the pool"
+    ::= { jnxJsNatPbaStatsEntry 4 }
+
+    jnxJsNatPbaPortBlockAllocErrors OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The count of port block allocation errors"
+    ::= { jnxJsNatPbaStatsEntry 5 }
+
+    jnxJsNatPbaPortBlockMemAllocErrors OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The count of port block memory allocation errors"
+    ::= { jnxJsNatPbaStatsEntry 6 }
+
+    jnxJsNatPbaPortBlockLimitExeededErrors OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The count of port block limit exceeded errors hit"
+    ::= { jnxJsNatPbaStatsEntry 7 }
+
+    -- *************************************************************************
+    -- Source NAT (Network Address Translation) pool port overloading stats Table
+    -- *************************************************************************
+
+    jnxJsNatPortOverloadUtilTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxJsNatPortOverloadUtilEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table provides utilization information of Port overloaded 
+             Source NAT Pool, per NAT IP address and per port overloading index."
+        ::= { jnxJsNatObjects 8 }
+
+    jnxJsNatPortOverloadUtilEntry OBJECT-TYPE
+        SYNTAX        JnxJsNatPortOverloadUtilEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Source NAT overloaded address-port entries. 
+             Indexed by NAT Pool name, IP address and port overloading index "
+        INDEX   { jnxJsNatPortOverloadUtilPoolName,
+                  jnxJsNatPortOverloadUtilIpAddressType,
+                  jnxJsNatPortOverloadUtilIpAddress,
+                  jnxJsNatPortOverloadUtilPortOvIndex }
+        ::= { jnxJsNatPortOverloadUtilTable 1 }
+
+    JnxJsNatPortOverloadUtilEntry ::= SEQUENCE
+    {
+        jnxJsNatPortOverloadUtilPoolName              DisplayString,
+        jnxJsNatPortOverloadUtilIpAddressType	      InetAddressType,
+        jnxJsNatPortOverloadUtilIpAddress             InetAddress,
+        jnxJsNatPortOverloadUtilPortOvIndex           INTEGER,
+        jnxJsNatPortOverloadUtilSinglePortTotal       Counter32,
+        jnxJsNatPortOverloadUtilSinglePortAlloc       Counter32,
+        jnxJsNatPortOverloadUtilSinglePortUtil        Counter32,
+        jnxJsNatPortOverloadUtilTwinPortAlloc         Counter32,
+        jnxJsNatPortOverloadUtilTwinPortTotal         Counter32,
+        jnxJsNatPortOverloadUtilTwinPortUtil          Counter32
+    }
+
+
+    jnxJsNatPortOverloadUtilPoolName OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..64))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Source NAT Pool name. "
+        ::= { jnxJsNatPortOverloadUtilEntry 1 }
+
+    jnxJsNatPortOverloadUtilIpAddressType OBJECT-TYPE
+        SYNTAX        InetAddressType
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "NAT IP address type, ipv4 or ipv6."
+        ::= { jnxJsNatPortOverloadUtilEntry 2 }
+
+    jnxJsNatPortOverloadUtilIpAddress OBJECT-TYPE
+        SYNTAX        InetAddress
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Dynamic source IP address allocated from
+             the address pool used in the NAT translation. "
+        ::= { jnxJsNatPortOverloadUtilEntry 3 }
+
+    jnxJsNatPortOverloadUtilPortOvIndex OBJECT-TYPE
+        SYNTAX        INTEGER(0..32)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Port overloading index corresponding to the NAT IP address."
+        ::= { jnxJsNatPortOverloadUtilEntry 4 }
+
+    jnxJsNatPortOverloadUtilSinglePortTotal OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Total number of single ports corresponding to the NAT address 
+             and port overloading index."
+
+        ::= { jnxJsNatPortOverloadUtilEntry 5 }
+
+    jnxJsNatPortOverloadUtilSinglePortAlloc OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Single ports in use corresponding to the NAT address
+             and port overloading index."
+        ::= { jnxJsNatPortOverloadUtilEntry 6 }
+
+    jnxJsNatPortOverloadUtilSinglePortUtil OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Single ports utilization (in percentage) corresponding to
+             the NAT address and port overloading index."
+        ::= { jnxJsNatPortOverloadUtilEntry 7 }
+
+    jnxJsNatPortOverloadUtilTwinPortTotal OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Total number of twin ports corresponding to the NAT address
+             and port overloading index."
+        ::= { jnxJsNatPortOverloadUtilEntry 8 }
+
+    jnxJsNatPortOverloadUtilTwinPortAlloc OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Twin ports in use corresponding to the NAT address
+             and port overloading index."
+        ::= { jnxJsNatPortOverloadUtilEntry 9 }
+
+    jnxJsNatPortOverloadUtilTwinPortUtil OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Twin ports utilization (in percentage) corresponding to
+             the NAT address and port overloading index."
+        ::= { jnxJsNatPortOverloadUtilEntry 10 }
+
+    -- ***************************************************************
     --  NAT Trap definition
     -- ***************************************************************
 
@@ -650,7 +905,7 @@
         ::= { jnxJsNatTrapVars 1 }
 
     jnxJsNatTrapPoolName OBJECT-TYPE
-        SYNTAX        DisplayString (SIZE(1..32))
+        SYNTAX        DisplayString (SIZE(1..64))
         MAX-ACCESS    accessible-for-notify
         STATUS        current
         DESCRIPTION
@@ -666,7 +921,7 @@
         ::= { jnxJsNatTrapVars 3 }
 
     jnxJsNatTrapRuleName OBJECT-TYPE
-        SYNTAX      DisplayString (SIZE(1..32))
+        SYNTAX      DisplayString (SIZE(1..64))
 		MAX-ACCESS  accessible-for-notify
 		STATUS      current
 		DESCRIPTION
@@ -693,9 +948,57 @@
 			"The number of sessions"
         ::= { jnxJsNatTrapVars 6 }
 
+    jnxJsNatPoolIpAddress OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..40))
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "NAT IP address."
+        ::= { jnxJsNatTrapVars 7 }
+
+    jnxJsNatPortOverloadingIndex OBJECT-TYPE
+        SYNTAX      Integer32 (0..127)
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Port overload index under the NAT IP."
+        ::= { jnxJsNatTrapVars 8 }
+
+    jnxJsNatOverloadedPatPoolUtil OBJECT-TYPE
+        SYNTAX      Integer32 (0..100)
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "pat pool utilization per port overload index in percentage."
+        ::= { jnxJsNatTrapVars 9 }
+
+    jnxJsNatSubscriberIp OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(1..40))
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION
+            "Subscriber IP address."
+        ::= { jnxJsNatTrapVars 10 }
+
+    jnxJsSrcNatPoolType OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..8))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "NAT Pool Type."
+        ::= { jnxJsNatTrapVars 11 }
+
+    jnxJsNatSubsPoolUtil OBJECT-TYPE
+        SYNTAX      Integer32 (0..100)
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Subscriber utilization of pool in percentage."
+        ::= { jnxJsNatTrapVars 12 }
+
     --
-	-- Trap notifications 
-	--
+    -- Trap notifications 
+    --
 
     --
     -- NAT Address Pool Utilization Threshold Status 
@@ -756,8 +1059,52 @@
               of that rule."
         ::= { jnxJsNatNotifications 3 }
 
+    -- NAT Source Pool Utilization Threshold Status per Port Overload Index
+    --
+    jnxJsSrcNatOverloadedPoolThresholdStatus NOTIFICATION-TYPE
+        OBJECTS         { jnxJsNatTrapPoolName,
+                          jnxJsNatPoolIpAddress,
+                          jnxJsNatPortOverloadingIndex,
+                          jnxJsNatOverloadedPatPoolUtil }
+        STATUS         current
+        DESCRIPTION
+             "The Source NAT overloaded pool utilization threshold status
+              trap signifies that the PAT utilization per port overload index
+              under a NAT IP address is either exceeding certain percentage,
+              or clear of that percentage.
+
+              jnxJsNatTrapPoolName is name of the source pool
+              jnxJsNatPoolIpAddress is the NAT IP address from the source pool
+              jnxJsNatPortOverloadingIndex is the port overload index
+              corresponding to the NAT IP address.
+              jnxJsNatOverloadedPatPoolUtil is the percentage of utilization
+              of the pat pool for the given NAT IP and port overload index."
+        ::= { jnxJsNatNotifications 4 }
+
+
+    -- NAT Source pool subscriber utilization of port-blocks/ports from a pool
+    --
+    jnxJsSrcNatSubThresholdStatus NOTIFICATION-TYPE
+        OBJECTS         { jnxJsNatSubscriberIp,
+                          jnxJsNatTrapPoolName,
+                          jnxJsSrcNatPoolType,
+                          jnxJsNatSubsPoolUtil }
+        STATUS         current
+        DESCRIPTION
+             "The SRC NAT subscriber threshold status
+              trap signifies that the utilization of port-bloks/ports
+              usage for a pool is either exceeds certain percentage,
+              or clear of that percentage.
+
+              jnxJsNatSubscriberIp is the subscriber IP address
+              jnxJsNatTrapPoolName is name of the source pool
+              jnxJsSrcNatPoolType  indicates the type of the pool
+              jnxJsNatSubsPoolUtil is the percentage of subscriber
+              utilization of port-blocks/ports from the pool."
+        ::= { jnxJsNatNotifications 5 }
+
     -- ***************************************************************
-    --  END of File 
+    --  END of File
     -- ***************************************************************
 
-END 
+END

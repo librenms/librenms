@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ospfv3_nbrs', function (Blueprint $table) {
+        Schema::table('ospfv3_nbrs', function (Blueprint $table): void {
             $table->string('ospfv3NbrRestartHelperStatus', 32)->nullable()->change();
             $table->unsignedInteger('ospfv3NbrRestartHelperAge')->nullable()->change();
             $table->string('ospfv3NbrRestartHelperExitReason', 32)->nullable()->change();
@@ -23,7 +23,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ospfv3_nbrs', function (Blueprint $table) {
+        Schema::table('ospfv3_nbrs', function (Blueprint $table): void {
             $table->string('ospfv3NbrRestartHelperStatus', 32)->change();
             $table->unsignedInteger('ospfv3NbrRestartHelperAge')->change();
             $table->string('ospfv3NbrRestartHelperExitReason', 32)->change();

@@ -26,8 +26,8 @@ ruckusSystemMIB MODULE-IDENTITY
         "Ruckus Wireless Inc.
 
         Postal:
-        880 W Maude Ave
-        Sunnyvale, CA 94085
+        350 West Java Dr.
+        Sunnyvale, CA 94089
         USA
 
         EMail: support@ruckuswireless.com
@@ -168,6 +168,39 @@ ruckusSystemSyslogServerPort OBJECT-TYPE
     DESCRIPTION
         "Port of syslog server."
     ::= { ruckusSystemSyslog 3 }
+
+ruckusSystemSyslogServerProto OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+          "Proto type of syslog server."
+    ::= { ruckusSystemSyslog 4 }
+
+ruckusSystemSyslogSecondaryServerIP OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "IP(v4 or v6) of secondary syslog server."
+    ::= { ruckusSystemSyslog 5 }
+
+
+ruckusSystemSyslogSecondaryServerPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Port of secondary syslog server."
+    ::= { ruckusSystemSyslog 6 }
+
+ruckusSystemSyslogSecondaryServerProto OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+         "Proto type of secondary syslog server."
+    ::= { ruckusSystemSyslog 7 }
 
 
 ruckusSystemNTPStatus OBJECT-TYPE

@@ -23,11 +23,13 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Util\Oid;
 
 $snmpData = SnmpQuery::cache()->hideMib()->walk('LM-SENSORS-MIB::lmSensors')->table(1);
 if (! empty($snmpData)) {
-    echo 'LM-SENSORS-MIB: ' . PHP_EOL;
+    Log::info('LM-SENSORS-MIB: ', ['nlb' => true]);
     foreach ($snmpData as $lmData) {
         $type = 'lmTempSensors';
         $divisor = 1000;
@@ -41,14 +43,14 @@ if (! empty($snmpData)) {
         $value = intval($lmData[$type . 'Value']) / $divisor;
         if (! empty($descr)) {
             $oid = Oid::of('LM-SENSORS-MIB::' . $type . 'Value.' . $index)->toNumeric();
-            discover_sensor(null, 'temperature', $device, $oid, $index, 'lmsensors', $descr, $divisor, 1, null, null, null, null, $value, 'snmp', null, null, null, 'lmsensors');
+            discover_sensor(null, SensorType::Temperature, $device, $oid, $index, 'lmsensors', $descr, $divisor, 1, null, null, null, null, $value, 'snmp', null, null, null, 'lmsensors');
         }
     }
 }
 
 $snmpData = SnmpQuery::cache()->hideMib()->walk('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut"')->table(3);
 if (! empty($snmpData)) {
-    echo 'UPS-NUT-MIB: ' . PHP_EOL;
+    Log::info('UPS-NUT-MIB: ', ['nlb' => true]);
     $snmpData = array_shift($snmpData); //drop [ups-nut]
     $upsnut = [
         24 => ['descr' => 'Battery Temperature', 'LL' => 10, 'LW' => 15, 'W' => 35, 'H' => 40],
@@ -60,7 +62,7 @@ if (! empty($snmpData)) {
                 $oid = Oid::of('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index)->toNumeric();
                 discover_sensor(
                     null,
-                    'temperature',
+                    SensorType::Temperature,
                     $device,
                     $oid,
                     $index,

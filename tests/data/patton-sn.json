@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "patton-sn",
-                    "type": "network",
+                    "type": "voice",
                     "serial": "00A0BA0BD1EC",
                     "icon": "patton.svg"
                 }
@@ -634,7 +634,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.1768.100.70.10.2.1.2.1",
                     "processor_index": "cpu.1",
@@ -660,6 +659,7 @@
                     "sensor_type": "patton-sn",
                     "sensor_descr": "H.323 ongoing calls",
                     "group": "Ongoing calls",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -685,6 +685,7 @@
                     "sensor_type": "patton-sn",
                     "sensor_descr": "SIP ongoing calls",
                     "group": "Ongoing calls",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 4,
@@ -710,6 +711,7 @@
                     "sensor_type": "patton-sn",
                     "sensor_descr": "isdn 0 0 ongoing calls",
                     "group": "Ongoing calls",
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 4,
@@ -735,6 +737,7 @@
                     "sensor_type": "patton-sn",
                     "sensor_descr": "Probe 1",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 47,
@@ -760,6 +763,7 @@
                     "sensor_type": "patton-sn",
                     "sensor_descr": "Probe 2",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 43,

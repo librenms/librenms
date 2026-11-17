@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('device_group_device', function (Blueprint $table) {
+        Schema::create('device_group_device', function (Blueprint $table): void {
             $table->unsignedInteger('device_group_id')->unsigned()->index();
             $table->unsignedInteger('device_id')->unsigned()->index();
             $table->primary(['device_group_id', 'device_id']);

@@ -76,8 +76,14 @@ function dbUpdate($data, $table, $where = null, $parameters = [])
     foreach ($data as $key => $value) {
         $sql .= '`' . $key . '`=';
         if (is_array($value)) {
-            $sql .= reset($value);
-            unset($data[$key]);
+            $raw = dbRawSqlExpression($value);
+            if ($raw !== null) {
+                $sql .= $raw;
+                unset($data[$key]);
+            } else {
+                $sql .= '?';
+                $data[$key] = null;
+            }
         } else {
             $sql .= '?';
         }
@@ -235,10 +241,17 @@ function dbPlaceHolders(&$values)
     $data = [];
     foreach ($values as $key => $value) {
         if (is_array($value)) {
-            // array wrapped values are raw sql
-            $data[] = reset($value);
-            unset($values[$key]);
-        } elseif (is_numeric($key)) {
+            $raw = dbRawSqlExpression($value);
+            if ($raw !== null) {
+                $data[] = $raw;
+                unset($values[$key]);
+                continue;
+            }
+
+            $values[$key] = null; // never splice arbitrary array values into sql
+        }
+
+        if (is_numeric($key)) {
             $data[] = '?';
         } else {
             $data[] = ':' . $key;
@@ -247,6 +260,22 @@ function dbPlaceHolders(&$values)
 
     return $data;
 }//end dbPlaceHolders()
+
+/**
+ * Array wrapped values (ex: ['NOW()']) are treated as raw sql, but only for a fixed list of safe expressions.
+ * Returns the raw sql expression, or null if the value is not an allowed expression.
+ *
+ * @param  array<mixed>  $value
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
+function dbRawSqlExpression(array $value): ?string
+{
+    $expression = reset($value);
+
+    return count($value) === 1 && in_array($expression, ['NOW()'], true) ? $expression : null;
+}
 
 /**
  * Generate a string of placeholders to pass to fill in a list

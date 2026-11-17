@@ -14,7 +14,7 @@
                             <div class="tw:flex tw:items-center tw:gap-3 tw:px-2 tw:py-1 tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
                                 <span class="tw:min-w-0 tw:flex-1 tw:truncate">{{ $sensor->sensor_descr }}</span>
                                 <div class="tw:hidden tw:w-25 tw:shrink-0 tw:justify-end tw:sm:flex">
-                                    <x-graph :type="'sensor_' . $sensor->sensor_class" :vars="['id' => $sensor->sensor_id]" width="100" height="24" popup
+                                    <x-graph :type="$sensor->getGraphType()" :vars="['id' => $sensor->sensor_id]" width="100" height="24" popup
                                              :popup-title="$device->display . ' - ' . $sensor->sensor_descr" />
                                 </div>
                                 <div class="tw:flex tw:w-28 tw:shrink-0 tw:justify-end">

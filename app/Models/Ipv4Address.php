@@ -27,9 +27,11 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class Ipv4Address extends PortRelatedModel implements Keyable
@@ -63,6 +65,18 @@ class Ipv4Address extends PortRelatedModel implements Keyable
     public function deviceViaPort(): HasOneThrough
     {
         return $this->hasOneThrough(Device::class, Port::class, 'port_id', 'device_id', 'port_id', 'device_id');
+    }
+
+    /**
+     * This table has no device_id column, so filter by accessible ports only.
+     */
+    protected function scopeHasAccess(Builder $query, User $user): Builder
+    {
+        if (Gate::forUser($user)->allows('viewAll', Port::class)) {
+            return $query;
+        }
+
+        return $query->whereIn($this->qualifyColumn('port_id'), Port::query()->hasAccess($user)->select('ports.port_id'));
     }
 
     public function getCompositeKey(): string

@@ -61,6 +61,9 @@ $rancid_map['mrv-od'] = 'mrv';
 foreach (Device::query()->where('ignore', 0)->where('type', '!=', '')->groupBy('hostname')->get() as $devices) {
     if (isset($rancid_map[$devices->os])) {
         $status = 'up';
+        if (! $devices->status) {
+            $status = 'down';
+        }
         if ($devices->disabled) {
             $status = 'down';
         }

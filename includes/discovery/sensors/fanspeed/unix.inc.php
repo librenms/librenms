@@ -23,11 +23,13 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Util\Oid;
 
 $snmpData = SnmpQuery::cache()->hideMib()->walk('LM-SENSORS-MIB::lmSensors')->table(1);
 if (! empty($snmpData)) {
-    echo 'LM-SENSORS-MIB: ' . PHP_EOL;
+    Log::info('LM-SENSORS-MIB: ', ['nlb' => true]);
     foreach ($snmpData as $lmData) {
         $type = 'lmFanSensors';
         $divisor = 1;
@@ -41,7 +43,7 @@ if (! empty($snmpData)) {
         $value = intval($lmData[$type . 'Value']) / $divisor;
         if (! empty($descr)) {
             $oid = Oid::of('LM-SENSORS-MIB::' . $type . 'Value.' . $index)->toNumeric();
-            discover_sensor(null, 'fanspeed', $device, $oid, $index, 'lmsensors', $descr, $divisor, 1, null, null, null, null, $value, 'snmp', null, null, null, 'lmsensors');
+            discover_sensor(null, SensorType::Fanspeed, $device, $oid, $index, 'lmsensors', $descr, $divisor, 1, null, null, null, null, $value, 'snmp', null, null, null, 'lmsensors');
         }
     }
 }

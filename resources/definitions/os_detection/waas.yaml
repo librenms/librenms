@@ -29,7 +29,6 @@ discovery_modules:
     cisco-otv: false
     cisco-pw: false
     slas: false
-    cisco-vrf-lite: false
     vrf: false
     ntp: false
     stp: false

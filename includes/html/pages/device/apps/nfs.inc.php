@@ -228,12 +228,12 @@ if ($vars['app_page'] == 'general') {
                     $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
                     if (isset($port)) {
                         $new_host['raw'] = true;
-                        $new_host['data'] = $data['host'] . ' (' .
+                        $new_host['data'] = e($data['host']) . ' (' .
                             generate_device_link(['device_id' => $port->device_id]) . ', ' .
                             generate_port_link([
-                                'label' => $port->label,
+                                'label' => e($port->getLabel()),
                                 'port_id' => $port->port_id,
-                                'ifName' => $port->ifName,
+                                'ifName' => e($port->ifName),
                                 'device_id' => $port->device_id,
                             ]) . ')';
                     } else {
@@ -289,7 +289,7 @@ if ($vars['app_page'] == 'general') {
                     $path_graph_array['bg'] = 'ffffff00';
                     $path_minigraph = \LibreNMS\Util\Url::lazyGraphTag($path_graph_array);
 
-                    $new_path['data'] = \LibreNMS\Util\Url::overlibLink($path_link, $data['path'], $path_overlib_content) .
+                    $new_path['data'] = \LibreNMS\Util\Url::overlibLink($path_link, e($data['path']), $path_overlib_content) .
                         ' (' . round($storage_info['storage_perc']) . '%)' .
                         \LibreNMS\Util\Url::overlibLink($path_link, $path_minigraph, $path_overlib_content);
                     $new_path['raw'] = true;
@@ -340,12 +340,12 @@ if ($vars['app_page'] == 'general') {
                     $port = Port::with('device')->firstWhere(['port_id' => $ip_info->port_id]);
                     if (isset($port)) {
                         $new_host['raw'] = true;
-                        $new_host['data'] = $data['host'] . ' (' .
+                        $new_host['data'] = e($data['host']) . ' (' .
                             generate_device_link(['device_id' => $port->device_id]) . ', ' .
                             generate_port_link([
-                                'label' => $port->label,
+                                'label' => e($port->getLabel()),
                                 'port_id' => $port->port_id,
-                                'ifName' => $port->ifName,
+                                'ifName' => e($port->ifName),
                                 'device_id' => $port->device_id,
                             ]) . ')';
                     } else {
@@ -390,7 +390,7 @@ if ($vars['app_page'] == 'general') {
                     $rpath_graph_array['bg'] = 'ffffff00';
                     $rpath_minigraph = \LibreNMS\Util\Url::lazyGraphTag($rpath_graph_array);
 
-                    $new_rpath['data'] = \LibreNMS\Util\Url::overlibLink($rpath_link, $storage_info['storage_descr'], $rpath_overlib_content) .
+                    $new_rpath['data'] = \LibreNMS\Util\Url::overlibLink($rpath_link, e($storage_info['storage_descr']), $rpath_overlib_content) .
                         ' (' . round($storage_info['storage_perc']) . '%)' .
                         \LibreNMS\Util\Url::overlibLink($rpath_link, $rpath_minigraph, $rpath_overlib_content);
                     $new_rpath['raw'] = true;

@@ -1,5 +1,5 @@
 os: gos
-type: appliance
+type: security
 group: greenbone
 text: 'Greenbone OS'
 ifXmcbc: true

@@ -32,8 +32,6 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Laravel;
 
-global $vars, $console_color;
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 
@@ -103,5 +101,3 @@ if (is_numeric(LibrenmsConfig::get('php_memory_limit')) && LibrenmsConfig::get('
 if (module_selected('web', $init_modules)) {
     require $install_dir . '/includes/html/vars.inc.php';
 }
-
-$console_color = new Console_Color2();

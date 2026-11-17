@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('users_prefs', function (Blueprint $table) {
+        Schema::create('users_prefs', function (Blueprint $table): void {
             $table->unsignedInteger('user_id');
             $table->string('pref', 32);
             $table->string('value', 128);

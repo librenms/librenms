@@ -169,13 +169,8 @@ class Html
         return implode('', $output);
     }
 
-    /**
-     * @param  int|string  $state
-     */
-    public static function powerStateLabel($state): array
+    public static function powerStateLabel(int $state): array
     {
-        $state = is_string($state) ? PowerState::STATES[$state] : $state;
-
         return match ($state) {
             PowerState::OFF => ['OFF', 'label-default'],
             PowerState::ON => ['ON', 'label-success'],
@@ -184,9 +179,12 @@ class Html
         };
     }
 
-    public static function severityToLabel(Severity $severity, string $text = '', string $title = '', string $class = 'label'): string
+    /**
+     * Return the bootstrap label class for this severity.
+     */
+    public static function severityClass(Severity $severity): string
     {
-        $state_label = match ($severity) {
+        return match ($severity) {
             Severity::Ok => 'label-success',
             Severity::Info => 'label-info',
             Severity::Notice => 'label-primary',
@@ -194,11 +192,14 @@ class Html
             Severity::Error => 'label-danger',
             default => 'label-default',
         };
+    }
 
+    public static function severityToLabel(Severity $severity, string $text = '', string $title = '', string $class = 'label'): string
+    {
         if ($title) {
             $title = " title=\"$title\"";
         }
 
-        return "<span class=\"$class $state_label\"$title>$text</span>";
+        return "<span class=\"$class " . self::severityClass($severity) . "\"$title>$text</span>";
     }
 }

@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('vrfs', function (Blueprint $table) {
+        Schema::create('vrfs', function (Blueprint $table): void {
             $table->increments('vrf_id');
             $table->string('vrf_oid', 256);
             $table->string('vrf_name', 128)->nullable();

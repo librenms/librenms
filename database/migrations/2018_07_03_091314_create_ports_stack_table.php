@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ports_stack', function (Blueprint $table) {
+        Schema::create('ports_stack', function (Blueprint $table): void {
             $table->id();
             $table->unsignedInteger('device_id');
             $table->unsignedInteger('high_ifIndex');

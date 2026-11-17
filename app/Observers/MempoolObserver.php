@@ -32,12 +32,6 @@ use Rrd;
 
 class MempoolObserver
 {
-    public function updating(Mempool $mempool): void
-    {
-        // prevent update of mempool_perc_warn
-        $mempool->mempool_perc_warn = $mempool->getOriginal('mempool_perc_warn');
-    }
-
     public function updated(Mempool $mempool): void
     {
         if ($mempool->isDirty('mempool_class')) {

@@ -62,28 +62,19 @@ let worker = null;
 let currentJobId = 0;
 let activeElement = null;
 
-function renderLineNumbers(element, lines, pre) {
-    const startLine = parseInt(pre.getAttribute("data-start"), 10) || 1;
-    const maxLineNumber = startLine + lines - 1;
-    const digits = Math.max(3, String(maxLineNumber).length);
-    const rowsWidth = Number((digits * 0.9).toFixed(2));
-    const paddingLeft = Number((rowsWidth + 0.9).toFixed(2));
+// One block per line so line numbers stay aligned when a line wraps
+function renderLines(element, lines, property) {
+    const fragment = document.createDocumentFragment();
+    lines.forEach((line, i) => {
+        const span = document.createElement("span");
+        span.className = "line";
+        span.dataset.line = i + 1;
+        span[property] = line + "\n";
+        fragment.append(span);
+    });
 
-    pre.style.paddingLeft = `${paddingLeft}em`;
-
-    const existingRows = element.querySelector(".line-numbers-rows");
-    if (existingRows) {
-        existingRows.remove();
-    }
-
-    const rows = document.createElement("span");
-    rows.className = "line-numbers-rows";
-    rows.setAttribute("aria-hidden", "true");
-    rows.style.left = `-${paddingLeft}em`;
-    rows.style.width = `${rowsWidth}em`;
-    rows.innerHTML = Array(lines + 1).join("<span></span>");
-
-    element.appendChild(rows);
+    element.style.setProperty("--line-digits", String(lines.length).length);
+    element.replaceChildren(fragment);
 }
 
 function getWorker() {
@@ -93,13 +84,9 @@ function getWorker() {
         });
 
         worker.onmessage = function (e) {
-            const { id, html, lines } = e.data;
+            const { id, lines } = e.data;
             if (id === currentJobId && activeElement) {
-                const pre = activeElement.parentElement;
-                activeElement.innerHTML = html;
-                if (pre) {
-                    renderLineNumbers(activeElement, lines, pre);
-                }
+                renderLines(activeElement, lines, "innerHTML");
             }
         };
     }
@@ -109,22 +96,11 @@ function getWorker() {
 export default function highlightConfig(element, content) {
     const rawContent = typeof content === "string" ? content : (content?.content ? String(content.content) : "");
     const language = resolveLanguage(element.dataset.os, element.dataset.configHighlighting);
-    const pre = element.parentElement;
-
-    element.className = `language-${language}`;
-    if (pre) {
-        pre.className = `config-highlight line-numbers language-${language} ${pre.className.split(" ").filter(c => !c.startsWith("language-") && c !== "line-numbers" && c !== "config-highlight").join(" ")}`.trim();
-    }
 
     // Immediate display of raw text so user never waits for parsing
-    element.textContent = rawContent;
+    const lines = rawContent.replace(/\n$/, "").split("\n");
+    renderLines(element, lines, "textContent");
     activeElement = element;
-
-    const lines = rawContent ? (rawContent.match(/\n(?!$)/g) || []).length + 1 : 1;
-
-    if (pre) {
-        renderLineNumbers(element, lines, pre);
-    }
 
     // Cancel / supercede any ongoing tokenization job
     const jobId = ++currentJobId;
@@ -132,9 +108,8 @@ export default function highlightConfig(element, content) {
     if (rawContent) {
         getWorker().postMessage({
             id: jobId,
-            content: rawContent,
-            language,
             lines,
+            language,
         });
     }
 }

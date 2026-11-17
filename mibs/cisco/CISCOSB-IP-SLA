@@ -1,36 +1,29 @@
 CISCOSB-IP-SLA DEFINITIONS ::= BEGIN
 
--- Title:                CISCOSB
---                       SLA MIB
--- Date:                 24-Mar-2016
-
 IMPORTS
-    switch001                                       FROM CISCOSB-MIB
     MODULE-IDENTITY, OBJECT-TYPE,
     Unsigned32,IpAddress                            FROM SNMPv2-SMI
     RowStatus, TEXTUAL-CONVENTION, MacAddress,
     DisplayString, TruthValue                       FROM SNMPv2-TC
-    InetAddressType,InetAddress                     FROM INET-ADDRESS-MIB; -- RFC2851;
+    InetAddressType,InetAddress                                                FROM INET-ADDRESS-MIB -- RFC2851
+    switch001                                                                   FROM CISCOSB-MIB;
 
 rlSLA   MODULE-IDENTITY
-                LAST-UPDATED "201101050000Z"
-      ORGANIZATION "Cisco Systems, Inc."
+		LAST-UPDATED "201602280000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
 
-      CONTACT-INFO
-      "Postal: 170 West Tasman Drive
-      San Jose , CA 95134-1706
-      USA
-
-      
-      Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
-
-                DESCRIPTION
-                      "This private MIB module is used for definition of Service Level Agreements"
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+        DESCRIPTION
+                "The private MIB module definition for Service Level Agreements."
 		REVISION "201602280000Z"
-                DESCRIPTION
+        DESCRIPTION
                 "Added this MODULE-IDENTITY clause."
         ::= { switch001 231 }
-
 -- =======================================================
 -- IP SLA operation Table
 -- =======================================================
@@ -100,7 +93,7 @@ rlSLAOperState    OBJECT-TYPE
     ::= { rlSLAOperEntry 3 }
 
 rlSLAOperTimeout       OBJECT-TYPE
-    SYNTAX Unsigned32 
+    SYNTAX Unsigned32
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -109,7 +102,7 @@ rlSLAOperTimeout       OBJECT-TYPE
     ::= { rlSLAOperEntry 4  }
 
 rlSLAOperFrequency     OBJECT-TYPE
-    SYNTAX Unsigned32 
+    SYNTAX Unsigned32
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION

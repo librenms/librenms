@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mpls_saps', function (Blueprint $table) {
+        Schema::create('mpls_saps', function (Blueprint $table): void {
             $table->increments('sap_id');
             $table->unsignedInteger('svc_id');
             $table->unsignedInteger('svc_oid');

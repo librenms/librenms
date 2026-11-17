@@ -1,6 +1,6 @@
 modules:
     os:
-        sysDescr_regex: 
+        sysDescr_regex:
             - '/(?<hardware>S.+-\d+) \d/'
             - '/(?<hardware>CBS[^\s]+) /'
         hardware: CISCOSB-Physicaldescription-MIB::rlPhdUnitGenParamModelName.1
@@ -13,6 +13,23 @@ modules:
                 num_oid: '.1.3.6.1.4.1.9.6.1.101.1.8.{{ $index }}'
                 descr: CPU
     sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - IF-MIB::ifDescr
+        power:
+            data:
+                -
+                    oid: CISCOSB-POE-MIB::rlPethPsePortTable
+                    value: CISCOSB-POE-MIB::rlPethPsePortOutputPower
+                    num_oid: '.1.3.6.1.4.1.9.6.1.101.108.1.1.5.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr:1 }} PoE'
+                    index: '{{ $index }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    divisor: 1000
+                    high_limit: CISCOSB-POE-MIB::rlPethPsePortOperPowerLimit
+                    skip_values: 0
         state:
             data:
                 -
@@ -33,7 +50,7 @@ modules:
                         -
                             oid: CISCOSB-HWENVIROMENT::rlEnvMonFanState
                             op: '=='
-                            value: 5   
+                            value: 5
                 -
                     oid: CISCOSB-HWENVIROMENT::rlEnvMonSupplyState
                     value: CISCOSB-HWENVIROMENT::rlEnvMonSupplyState
@@ -52,7 +69,7 @@ modules:
                         -
                             oid: CISCOSB-HWENVIROMENT::rlEnvMonSupplyState
                             op: '=='
-                            value: 5  
+                            value: 5
 #        power:
 #            data:
 #                -
@@ -73,20 +90,20 @@ modules:
                     descr: 'FAN {{ $index }} Temperature'
 #                    user_func: fahrenheit_to_celsius
                     warn_limit: 91
-                    high_limit: 95 
-# true for all switches, got data from cli output "show system sensors" on a SG350-8F8T, 
-# temperature seems to be the cpu/processing unit temperature, not the fan-in temperature. 
+                    high_limit: 95
+# true for all switches, got data from cli output "show system sensors" on a SG350-8F8T,
+# temperature seems to be the cpu/processing unit temperature, not the fan-in temperature.
 # See CLI-output. All other temperatures are not accessable via SNMP (to my research). SG350X-24P and CBS250-4X have higher values
                     low_limit: 0 # true for CBS250-8T-D and CBS250-8PP-D, all other tolerate -5
                     skip_values:
                         -
                             oid: CISCOSB-HWENVIROMENT::rlEnvFanDataTemp
                             op: '=='
-                            value: 0               
+                            value: 0
 #                        -
 #                            oid: rlEnvFanDataTemp
 #                            op: '=='
-#                            value: -17.78 # Fahrenheit = 0     
+#                            value: -17.78 # Fahrenheit = 0
                 -
                     oid: CISCOSB-Physicaldescription-MIB::rlPhdUnitEnvParamEntry
                     value: CISCOSB-Physicaldescription-MIB::rlPhdUnitEnvParamTempSensorValue
@@ -95,6 +112,11 @@ modules:
                     descr: 'Unit {{ $index }} Temperature'
                     warn_limit: CISCOSB-Physicaldescription-MIB::rlPhdUnitEnvParamTempSensorWarningThresholdValue
                     high_limit: CISCOSB-Physicaldescription-MIB::rlPhdUnitEnvParamTempSensorCriticalThresholdValue
+                    skip_values:
+                        -
+                            device: hardware
+                            op: starts
+                            value: SG300
         fanspeed:
             data:
                 -

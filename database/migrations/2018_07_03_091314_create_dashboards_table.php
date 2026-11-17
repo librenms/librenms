@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('dashboards', function (Blueprint $table) {
+        Schema::create('dashboards', function (Blueprint $table): void {
             $table->increments('dashboard_id');
             $table->unsignedInteger('user_id')->default(0);
             $table->string('dashboard_name');

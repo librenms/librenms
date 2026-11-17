@@ -31,8 +31,10 @@ use Illuminate\Database\Eloquent\Collection;
 interface MempoolsPolling
 {
     /**
+     * Update the usage of mempools this source discovered.
+     *
      * @param  Collection<int, \App\Models\Mempool>  $mempools
-     * @return Collection<int, \App\Models\Mempool>
+     * @return Collection<int, \App\Models\Mempool> the mempools that were polled
      */
-    public function pollMempools(Collection $mempools);
+    public function pollMempools(Collection $mempools): Collection;
 }

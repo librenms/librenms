@@ -23,19 +23,16 @@ class MergeSavedFilter
             return $next($request);
         }
 
-        $filter = $request->array('filter');
-
-        // Explicit clear via '?filter=' parameter
-        if ($request->has('filter') && empty($filter)) {
-            $request->merge(['filter' => []]);
+        // Filters in the url replace the saved filter, '?filter=' explicitly clears it
+        if ($request->has('filter')) {
+            $request->merge(['filter' => $request->array('filter')]);
 
             return $next($request);
         }
 
         if ($request->user() !== null) {
             $prefKey = 'filters.' . $filterName;
-            $savedFilter = UserPref::getPref($request->user(), $prefKey) ?: [];
-            $request->merge(['filter' => array_merge($savedFilter, $filter)]);
+            $request->merge(['filter' => UserPref::getPref($request->user(), $prefKey) ?: []]);
         }
 
         return $next($request);

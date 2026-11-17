@@ -55,8 +55,6 @@ if ($alerts_lock->get()) {
         echo 'Start: ' . date('r') . "\r\n";
         echo 'ClearStaleAlerts():' . PHP_EOL;
         $alerts->clearStaleAlerts();
-        echo "RunFollowUp():\r\n";
-        $alerts->runFollowUp();
         echo "RunAlerts():\r\n";
         $alerts->runAlerts();
         echo "RunAcks():\r\n";

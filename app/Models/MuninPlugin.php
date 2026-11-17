@@ -34,4 +34,16 @@ class MuninPlugin extends DeviceRelatedModel
 
     public $timestamps = false;
     protected $primaryKey = 'mplug_id';
+    protected $fillable = [
+        'device_id',
+        'mplug_type',
+        'mplug_instance',
+        'mplug_category',
+        'mplug_title',
+        'mplug_info',
+        'mplug_vlabel',
+        'mplug_args',
+        'mplug_total',
+        'mplug_graph',
+    ];
 }

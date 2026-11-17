@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Device\Tabs;
 use App\Facades\LibrenmsConfig;
 use App\Http\Controllers\PortSecurityController;
 use App\Models\Device;
+use App\Models\Eventlog;
 use App\Models\Link;
 use App\Models\Port;
 use App\Models\PortSecurity;
@@ -137,7 +138,7 @@ class PortsController implements DeviceTab
 
         /** @var Collection<int, Port>|LengthAwarePaginator<Port> $ports */
         $ports = $this->getFilteredPortsQuery($device, $relationships, $request)
-            ->paginate(fn ($total) => $this->settings['perPage'] == 'all' ? $total : (int) $this->settings['perPage']) // @phpstan-ignore-line missing closure type
+            ->paginate(fn ($total) => $this->settings['perPage'] == 'all' ? $total : (int) $this->settings['perPage'])
             ->appends('perPage', $this->settings['perPage']);
 
         $data = [
@@ -148,6 +149,7 @@ class PortsController implements DeviceTab
                 'upkts' => [['type' => 'port_upkts', 'title' => trans('Packets (Unicast)'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
                 'errors' => [['type' => 'port_errors', 'title' => trans('Errors'), 'vars' => [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']]]],
             ],
+            'ports_with_events' => $this->portsWithEvents($device->device_id, $ports->pluck('port_id')),
         ];
 
         if ($this->detail) {
@@ -158,6 +160,22 @@ class PortsController implements DeviceTab
         }
 
         return $data;
+    }
+
+    /**
+     * The ids of the given ports that have interface eventlog entries.
+     *
+     * @param  iterable<int>  $port_ids
+     * @return Collection<int, string>
+     */
+    public function portsWithEvents(int $device_id, iterable $port_ids): Collection
+    {
+        return Eventlog::query()
+            ->where('device_id', $device_id)
+            ->where('type', 'interface')
+            ->whereIn('reference', $port_ids)
+            ->distinct()
+            ->pluck('reference');
     }
 
     public function findPortNeighbors(Port $port): array

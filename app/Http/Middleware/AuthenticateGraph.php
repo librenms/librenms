@@ -26,14 +26,12 @@
 
 namespace App\Http\Middleware;
 
-use App\Facades\LibrenmsConfig;
+use App\Graphs\GraphAccess;
 use Closure;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Auth\Middleware\Authenticate;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use LibreNMS\Exceptions\InvalidIpException;
-use LibreNMS\Util\IP;
 
 class AuthenticateGraph
 {
@@ -44,6 +42,10 @@ class AuthenticateGraph
         VerifyTwoFactor::class,
         LoadUserPreferences::class,
     ];
+
+    public function __construct(private readonly GraphAccess $access)
+    {
+    }
 
     /**
      * Handle an incoming request.
@@ -61,42 +63,17 @@ class AuthenticateGraph
             return $next($request);
         }
 
-        // bypass normal auth if signed
+        // bypass normal auth if signed, the signature vouches for the graph
         if ($request->hasValidSignature($relative !== 'relative')) {
-            return $next($request);
+            return $this->access->trusted(fn () => $next($request));
         }
 
         // bypass normal auth if ip is allowed (or all IPs)
-        if ($this->isAllowed($request)) {
+        if ($this->access->allowsGuests($request)) {
             return $next($request);
         }
 
         // unauthenticated, force login
         throw new AuthenticationException('Unauthenticated.');
-    }
-
-    protected function isAllowed(Request $request): bool
-    {
-        if (LibrenmsConfig::get('allow_unauth_graphs', false)) {
-            d_echo("Unauthorized graphs allowed\n");
-
-            return true;
-        }
-
-        $ip = $request->getClientIp();
-        try {
-            $client_ip = IP::parse($ip);
-            foreach (LibrenmsConfig::get('allow_unauth_graphs_cidr', []) as $range) {
-                if ($client_ip->inNetwork($range)) {
-                    d_echo("Unauthorized graphs allowed from $range\n");
-
-                    return true;
-                }
-            }
-        } catch (InvalidIpException) {
-            d_echo("Client IP ($ip) is invalid.\n");
-        }
-
-        return false;
     }
 }

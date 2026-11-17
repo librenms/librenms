@@ -11,15 +11,33 @@ IMPORTS
         FROM SNMPv2-TC
     Ipv6Address
         FROM IPV6-TC
-    viptela
+    viptela, VpnIndex
         FROM VIPTELA-GLOBAL
 ;
 
 viptela-oper-vpn MODULE-IDENTITY
-    LAST-UPDATED "202007010000Z"
+    LAST-UPDATED "202307010000Z"
     ORGANIZATION "Viptela, Inc."
     CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
     DESCRIPTION "This module defines the data model for VPN operational data"
+    REVISION "202307010000Z"
+    DESCRIPTION "Viptela Revision 20.12"
+    REVISION "202303010000Z"
+    DESCRIPTION "Viptela Revision 20.11"
+    REVISION "202212150000Z"
+    DESCRIPTION "Viptela Revision 20.10"
+    REVISION "202206010000Z"
+    DESCRIPTION "Viptela Revision 20.9"
+    REVISION "202203010000Z"
+    DESCRIPTION "Viptela Revision 20.8"
+    REVISION "202111010000Z"
+    DESCRIPTION "Viptela Revision 20.7"
+    REVISION "202107010000Z"
+    DESCRIPTION "Viptela Revision 20.6"
+    REVISION "202103010000Z"
+    DESCRIPTION "Viptela Revision 20.5"
+    REVISION "202011010000Z"
+    DESCRIPTION "Viptela Revision 20.4"
     REVISION "202007010000Z"
     DESCRIPTION "Viptela Revision 20.3"
     REVISION "202002240000Z"
@@ -226,6 +244,7 @@ CloudExpressAppType ::= TEXTUAL-CONVENTION
                           zohoCrm           (12),
                           zendesk           (13),
                           gotomeeting       (14),
+                          webex             (15),
                           googleApps        (16)
                         }
 TlocColorEnum ::= TEXTUAL-CONVENTION
@@ -468,7 +487,7 @@ AppLogFlowsEntry ::=
 
 -- tagpath /app/log/flows/vpn-id
 appLogFlowsVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -644,7 +663,7 @@ AppLogFlowCountEntry ::=
 
 -- tagpath /app/log/flow-count/vpn-id
 appLogFlowCountVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "Flow VPN"
@@ -698,7 +717,7 @@ AppTcpOptActiveFlowsEntry ::=
 
 -- tagpath /app/tcp-opt/active-flows/vpn-id
 appTcpOptActiveFlowsVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -846,7 +865,7 @@ appTcpOptExpiredFlowsTimestamp OBJECT-TYPE
 
 -- tagpath /app/tcp-opt/expired-flows/vpn-id
 appTcpOptExpiredFlowsVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -1169,7 +1188,7 @@ ArpEntry ::=
 
 -- tagpath /arp/vpn-id
 arpVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -1253,7 +1272,7 @@ Nd6Entry ::=
 
 -- tagpath /nd6/vpn-id
 nd6VpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -1332,6 +1351,7 @@ InterfaceEntry ::=
         interfaceIpv6Address String,
         interfaceIfAdminStatus String,
         interfaceIfOperStatus String,
+        interfaceIpv6AdminStatus String,
         interfaceIfTrackerStatus String,
         interfaceDesc String,
         interfaceEncapType INTEGER,
@@ -1434,12 +1454,13 @@ InterfaceEntry ::=
         interfaceAddrType IfAddressTypeEnum,
         interfaceIcmpRedirectTxDrops Counter64,
         interfaceIcmpRedirectRxDrops Counter64,
-        interfaceDevicePolicyDrops  Counter64
+        interfaceDevicePolicyDrops  Counter64,
+        interfaceTxArpReplyRateLimitDrops Counter64
     }
 
 -- tagpath /interface/vpn-id
 interfaceVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -1500,6 +1521,14 @@ interfaceDesc OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Interface description"
     ::= { interfaceEntry 7 }
+
+-- tagpath /interface/if-ipv6-admin-status
+interfaceIpv6AdminStatus OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface IPv6 administrative status"
+    ::= { interfaceEntry 8 }
 
 -- tagpath /interface/encap-type
 interfaceEncapType OBJECT-TYPE
@@ -2307,6 +2336,14 @@ interfaceDevicePolicyDrops OBJECT-TYPE
     DESCRIPTION "Device Policy Rx drops"
     ::= { interfaceEntry 110 }
 
+-- tagpath /interface/tx-arp-reply-rate-limit-drops
+interfaceTxArpReplyRateLimitDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { interfaceEntry 111 }
+
 -- tagpath /interface/if-addr
 interfaceIfAddrTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF InterfaceIfAddrEntry
@@ -2555,7 +2592,7 @@ AppCflowdFlowsEntry ::=
 
 -- tagpath /app/cflowd/flows/vpn-id
 appCflowdFlowsVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -2755,7 +2792,7 @@ AppCflowdCollectorEntry ::=
 
 -- tagpath /app/cflowd/collector/vpn-id
 appCflowdCollectorVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "Collector VPN ID"
@@ -2866,7 +2903,7 @@ AppCflowdFlowCountEntry ::=
 
 -- tagpath /app/cflowd/flow-count/vpn-id
 appCflowdFlowCountVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "Flow count"
@@ -2912,7 +2949,7 @@ AppDpiApplicationsEntry ::=
 
 -- tagpath /app/dpi/applications/vpn-id
 appDpiApplicationsVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -3011,12 +3048,17 @@ AppDpiFlowsEntry ::=
         appDpiFlowsFamily String,
         appDpiFlowsActiveSince DateAndTime,
         appDpiFlowsPackets Unsigned32,
-        appDpiFlowsOctets Counter64
+        appDpiFlowsOctets Counter64,
+        appDpiFlowsFirstPktApplication String,
+        appDpiFlowsFirstPktFamily String,
+        appDpiFlowsStickyFlow TruthValue,
+        appDpiFlowsVisibilityApplication String,
+        appDpiFlowsVisibilityFamily String
     }
 
 -- tagpath /app/dpi/flows/vpn-id
 appDpiFlowsVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -3101,6 +3143,46 @@ appDpiFlowsOctets OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Octet count for the flow"
     ::= { appDpiFlowsEntry 11 }
+
+-- tagpath /app/dpi/flows/first-pkt-application
+appDpiFlowsFirstPktApplication OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Application for first packet in the flow"
+    ::= { appDpiFlowsEntry 12 }
+
+-- tagpath /app/dpi/flows/first-pkt-family
+appDpiFlowsFirstPktFamily OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Application family for first packet in the flow"
+    ::= { appDpiFlowsEntry 13 }
+
+-- tagpath /app/dpi/flows/sticky-flow
+appDpiFlowsStickyFlow OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Implies flow-stickiness i.e. first packet classification will be used for the flow"
+    ::= { appDpiFlowsEntry 14 }
+
+-- tagpath /app/dpi/flows/visibility-application
+appDpiFlowsVisibilityApplication OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Visibility Application"
+    ::= { appDpiFlowsEntry 15 }
+
+-- tagpath /app/dpi/flows/visibility-family
+appDpiFlowsVisibilityFamily OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Visibility family"
+    ::= { appDpiFlowsEntry 16 }
 
 -- tagpath /app/dpi/flows/tunnels-in
 appDpiFlowsTunnelsInTable OBJECT-TYPE
@@ -3440,7 +3522,7 @@ IpRoutesTableEntry ::=
 
 -- tagpath /ip/routes-table/vpn-id
 ipRoutesTableVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -3608,7 +3690,7 @@ ipRoutesTableEncap OBJECT-TYPE
 
 -- tagpath /ip/routes-table/nexthop-vpn
 ipRoutesTableNexthopVpn OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "Next-hop VPN"
@@ -3696,7 +3778,7 @@ IpLongerRoutesTableEntry ::=
 
 -- tagpath /ip/longer-routes-table/vpn-id
 ipLongerRoutesTableVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -3872,7 +3954,7 @@ ipLongerRoutesTableTlocEncap OBJECT-TYPE
 
 -- tagpath /ip/longer-routes-table/nexthop-vpn
 ipLongerRoutesTableNexthopVpn OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "Next-hop VPN"
@@ -3960,7 +4042,7 @@ IpBestMatchRouteEntry ::=
 
 -- tagpath /ip/best-match-route/vpn-id
 ipBestMatchRouteVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -4204,7 +4286,7 @@ IpMfibSummaryEntry ::=
 
 -- tagpath /ip/mfib/summary/vpn-id
 ipMfibSummaryVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN"
@@ -4284,7 +4366,7 @@ IpMfibOilEntry ::=
 
 -- tagpath /ip/mfib/oil/vpn-id
 ipMfibOilVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN"
@@ -4395,7 +4477,7 @@ IpMfibStatsEntry ::=
 
 -- tagpath /ip/mfib/stats/vpn-id
 ipMfibStatsVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN"
@@ -4541,7 +4623,7 @@ ipMfibStatsTxPolicyDrop OBJECT-TYPE
 ipFibTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF IpFibEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION "List of routes in FIB"
     ::= { ip 8 }
 
@@ -4549,7 +4631,7 @@ ipFibTable OBJECT-TYPE
 ipFibEntry OBJECT-TYPE
     SYNTAX      IpFibEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION ""
     INDEX { ipFibVpnId, ipFibAddressFamily, ipFibPrefix, ipFibPathId }
         ::= { ipFibTable 1 }
@@ -4571,9 +4653,9 @@ IpFibEntry ::=
 
 -- tagpath /ip/fib-routes/vpn-id
 ipFibVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION "VPN ID"
     ::= { ipFibEntry 1 }
 
@@ -4581,7 +4663,7 @@ ipFibVpnId OBJECT-TYPE
 ipFibPrefix OBJECT-TYPE
     SYNTAX      IpPrefix
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION "Route"
     ::= { ipFibEntry 2 }
 
@@ -4589,7 +4671,7 @@ ipFibPrefix OBJECT-TYPE
 ipFibPathId OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION "Path ID"
     ::= { ipFibEntry 3 }
 
@@ -4597,7 +4679,7 @@ ipFibPathId OBJECT-TYPE
 ipFibOutIfname OBJECT-TYPE
     SYNTAX      String (SIZE (1 .. 32))
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION "Next-hop interface name"
     ::= { ipFibEntry 4 }
 
@@ -4605,7 +4687,7 @@ ipFibOutIfname OBJECT-TYPE
 ipFibNexthopAddress OBJECT-TYPE
     SYNTAX      InetAddressIP
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION "Next-hop address"
     ::= { ipFibEntry 5 }
 
@@ -4613,7 +4695,7 @@ ipFibNexthopAddress OBJECT-TYPE
 ipFibNexthopLabel OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION "Next-hop label"
     ::= { ipFibEntry 6 }
 
@@ -4621,7 +4703,7 @@ ipFibNexthopLabel OBJECT-TYPE
 ipFibSaIndex OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION "Outbound SA index"
     ::= { ipFibEntry 7 }
 
@@ -4629,7 +4711,7 @@ ipFibSaIndex OBJECT-TYPE
 ipFibIp OBJECT-TYPE
     SYNTAX      InetAddressIP
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION "IP address"
     ::= { ipFibEntry 8 }
 
@@ -4637,7 +4719,7 @@ ipFibIp OBJECT-TYPE
 ipFibColor OBJECT-TYPE
     SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION "Color"
     ::= { ipFibEntry 9 }
 
@@ -4645,7 +4727,7 @@ ipFibColor OBJECT-TYPE
 ipFibAddressFamily OBJECT-TYPE
     SYNTAX      INTEGER{ipv4(0), ipv6(1)}
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION "Address Family"
     ::= { ipFibEntry 10 }
 
@@ -4653,9 +4735,231 @@ ipFibAddressFamily OBJECT-TYPE
 ipFibNexthopVpn OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION "Next-hop VPN"
     ::= { ipFibEntry 11 }
+
+-- tagpath /ip/fib-routes4
+ipFib4Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpFib4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of routes in FIB"
+    ::= { ip 11 }
+
+-- tagpath /ip/fib-routes4
+ipFib4Entry OBJECT-TYPE
+    SYNTAX      IpFib4Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ipFib4VpnId, ipFib4Prefix, ipFib4PathId }
+        ::= { ipFib4Table 1 }
+
+IpFib4Entry ::=
+    SEQUENCE {
+        ipFib4VpnId Unsigned32,
+        ipFib4Prefix IpPrefix,
+        ipFib4PathId Unsigned32,
+        ipFib4OutIfname String,
+        ipFib4NexthopAddress InetAddressIP,
+        ipFib4NexthopLabel Unsigned32,
+        ipFib4SaIndex Unsigned32,
+        ipFib4Ip InetAddressIP,
+        ipFib4Color   INTEGER,
+        ipFib4NexthopVpn Unsigned32
+    }
+
+-- tagpath /ip/fib-routes4/vpn-id
+ipFib4VpnId OBJECT-TYPE
+    SYNTAX      VpnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { ipFib4Entry 1 }
+
+-- tagpath /ip/fib-routes4/prefix
+ipFib4Prefix OBJECT-TYPE
+    SYNTAX      IpPrefix
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Route"
+    ::= { ipFib4Entry 2 }
+
+-- tagpath /ip/fib-routes4/path-id
+ipFib4PathId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Path ID"
+    ::= { ipFib4Entry 3 }
+
+-- tagpath /ip/fib-routes4/out-ifname
+ipFib4OutIfname OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next-hop interface name"
+    ::= { ipFib4Entry 4 }
+
+-- tagpath /ip/fib-routes4/nexthop-address
+ipFib4NexthopAddress OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next-hop address"
+    ::= { ipFib4Entry 5 }
+
+-- tagpath /ip/fib-routes4/nexthop-label
+ipFib4NexthopLabel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next-hop label"
+    ::= { ipFib4Entry 6 }
+
+-- tagpath /ip/fib-routes4/sa-index
+ipFib4SaIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound SA index"
+    ::= { ipFib4Entry 7 }
+
+-- tagpath /ip/fib-routes4/ip
+ipFib4Ip OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ipFib4Entry 8 }
+
+-- tagpath /ip/fib-routes4/color
+ipFib4Color OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { ipFib4Entry 9 }
+
+-- tagpath /ip/fib-routes4/nexthop-vpn
+ipFib4NexthopVpn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next-hop VPN"
+    ::= { ipFib4Entry 10 }
+
+-- tagpath /ip/fib-routes6
+ipFib6Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpFib6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of routes in FIB"
+    ::= { ip 12 }
+
+-- tagpath /ip/fib-routes6
+ipFib6Entry OBJECT-TYPE
+    SYNTAX      IpFib6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ipFib6VpnId, ipFib6Prefix, ipFib6PathId }
+        ::= { ipFib6Table 1 }
+
+IpFib6Entry ::=
+    SEQUENCE {
+        ipFib6VpnId Unsigned32,
+        ipFib6Prefix IpPrefix,
+        ipFib6PathId Unsigned32,
+        ipFib6OutIfname String,
+        ipFib6NexthopAddress InetAddressIP,
+        ipFib6NexthopLabel Unsigned32,
+        ipFib6SaIndex Unsigned32,
+        ipFib6Ip InetAddressIP,
+        ipFib6Color   INTEGER,
+        ipFib6NexthopVpn Unsigned32
+    }
+
+-- tagpath /ip/fib-routes6/vpn-id
+ipFib6VpnId OBJECT-TYPE
+    SYNTAX      VpnIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { ipFib6Entry 1 }
+
+-- tagpath /ip/fib-routes6/prefix
+ipFib6Prefix OBJECT-TYPE
+    SYNTAX      IpPrefix
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Route"
+    ::= { ipFib6Entry 2 }
+
+-- tagpath /ip/fib-routes6/path-id
+ipFib6PathId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Path ID"
+    ::= { ipFib6Entry 3 }
+
+-- tagpath /ip/fib-routes6/out-ifname
+ipFib6OutIfname OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next-hop interface name"
+    ::= { ipFib6Entry 4 }
+
+-- tagpath /ip/fib-routes6/nexthop-address
+ipFib6NexthopAddress OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next-hop address"
+    ::= { ipFib6Entry 5 }
+
+-- tagpath /ip/fib-routes6/nexthop-label
+ipFib6NexthopLabel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next-hop label"
+    ::= { ipFib6Entry 6 }
+
+-- tagpath /ip/fib-routes6/sa-index
+ipFib6SaIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound SA index"
+    ::= { ipFib6Entry 7 }
+
+-- tagpath /ip/fib-routes6/ip
+ipFib6Ip OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { ipFib6Entry 8 }
+
+-- tagpath /ip/fib-routes6/color
+ipFib6Color OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { ipFib6Entry 9 }
+
+-- tagpath /ip/fib-routes6/nexthop-vpn
+ipFib6NexthopVpn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next-hop VPN"
+    ::= { ipFib6Entry 10 }
 
 -- tagpath /ip/nat/interface
 ipNatInterfaceTable OBJECT-TYPE
@@ -4688,7 +4992,7 @@ IpNatInterfaceEntry ::=
 
 -- tagpath /ip/nat/interface/vpn-id
 ipNatInterfaceVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -4789,12 +5093,21 @@ IpNatInterfaceStatisticsEntry ::=
         ipNatInterfaceStatisticsNatMapNoPorts Counter64,
         ipNatInterfaceStatisticsNatMapCannotXlate Counter64,
         ipNatInterfaceStatisticsNatFilterMapMismatch Counter64,
-        ipNatInterfaceStatisticsNatMapIpPoolExhausted Counter64
+        ipNatInterfaceStatisticsNatMapIpPoolExhausted Counter64,
+        ipNatInterfaceStatisticsNatpoolInsideXlateOutbound Counter64,
+        ipNatInterfaceStatisticsNatpoolInsideXlateDestIp Counter64,
+        ipNatInterfaceStatisticsNatXlateOutboundGre Counter64,
+        ipNatInterfaceStatisticsNatpoolInsideXlateInbound Counter64,
+        ipNatInterfaceStatisticsNatXlateInboundTcpopt Counter64,
+        ipNatInterfaceStatisticsNatpoolOutsideXlateOutbound Counter64,
+        ipNatInterfaceStatisticsNatpoolXlateInboundSvcPacket Counter64,
+        ipNatInterfaceStatisticsNatDiaXlateOutbound Counter64,
+        ipNatInterfaceStatisticsNatXlateInbound Counter64
     }
 
 -- tagpath /ip/nat/interface-statistics/vpn-id
 ipNatInterfaceStatisticsVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -4960,6 +5273,78 @@ ipNatInterfaceStatisticsNatMapIpPoolExhausted OBJECT-TYPE
     DESCRIPTION "Ran out of NAT ip pools to map to"
     ::= { ipNatInterfaceStatisticsEntry 21 }
 
+-- tagpath /ip/nat/interface-statistics/natpool-inside-xlate-outbound
+ipNatInterfaceStatisticsNatpoolInsideXlateOutbound OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound nat translation for natpool inside"
+    ::= { ipNatInterfaceStatisticsEntry 22 }
+
+-- tagpath /ip/nat/interface-statistics/natpool-inside-xlate-dest-ip
+ipNatInterfaceStatisticsNatpoolInsideXlateDestIp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Translate destination ip for outbound traffic from service side"
+    ::= { ipNatInterfaceStatisticsEntry 23 }
+
+-- tagpath /ip/nat/interface-statistics/nat-xlate-outbound-gre
+ipNatInterfaceStatisticsNatXlateOutboundGre OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound NAT translation for a packet going through GRE tunnel"
+    ::= { ipNatInterfaceStatisticsEntry 24 }
+
+-- tagpath /ip/nat/interface-statistics/natpool-inside-xlate-inbound
+ipNatInterfaceStatisticsNatpoolInsideXlateInbound OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound nat translation for natpool inside interface"
+    ::= { ipNatInterfaceStatisticsEntry 25 }
+
+-- tagpath /ip/nat/interface-statistics/nat-xlate-inbound-tcpopt
+ipNatInterfaceStatisticsNatXlateInboundTcpopt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound nat translation for a packet from proxy"
+    ::= { ipNatInterfaceStatisticsEntry 26 }
+
+-- tagpath /ip/nat/interface-statistics/natpool-outside-xlate-outbound
+ipNatInterfaceStatisticsNatpoolOutsideXlateOutbound OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound nat translation for incoming packets for nat outside"
+    ::= { ipNatInterfaceStatisticsEntry 27 }
+
+-- tagpath /ip/nat/interface-statistics/natpool-xlate-inbound-svc-packet
+ipNatInterfaceStatisticsNatpoolXlateInboundSvcPacket OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound nat translation for a packets coming from service side and dest ip is natpool address"
+    ::= { ipNatInterfaceStatisticsEntry 28 }
+
+-- tagpath /ip/nat/interface-statistics/nat-dia-xlate-outbound
+ipNatInterfaceStatisticsNatDiaXlateOutbound OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound nat translation for DIA interface"
+    ::= { ipNatInterfaceStatisticsEntry 29 }
+
+-- tagpath /ip/nat/interface-statistics/nat-inside-xlate-inbound 
+ipNatInterfaceStatisticsNatXlateInbound OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound nat translation for nat interface"
+    ::= { ipNatInterfaceStatisticsEntry 30 }
+
 -- tagpath /ip/nat/filter
 ipNatFilterTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF IpNatFilterEntry
@@ -5002,7 +5387,7 @@ IpNatFilterEntry ::=
 
 -- tagpath /ip/nat/filter/nat-vpn-id
 ipNatFilterNatVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "NAT interface VPN ID"
@@ -5018,7 +5403,7 @@ ipNatFilterNatIfname OBJECT-TYPE
 
 -- tagpath /ip/nat/filter/private-vpn-id
 ipNatFilterPrivateVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "Private VPN ID"
@@ -5175,12 +5560,13 @@ IpRoutesSummaryEntry ::=
         ipRoutesSummaryAddressFamily INTEGER,
         ipRoutesSummaryRouteProtocol INTEGER,
         ipRoutesSummaryReceived Unsigned32,
-        ipRoutesSummaryInstalled Unsigned32
+        ipRoutesSummaryInstalled Unsigned32,
+        ipRoutesSummaryImport Unsigned32
     }
 
 -- tagpath /ip/routes-summary/vpn-id
 ipRoutesSummaryVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -5218,6 +5604,14 @@ ipRoutesSummaryInstalled OBJECT-TYPE
     DESCRIPTION "Number of routes installed"
     ::= { ipRoutesSummaryEntry 5 }
 
+-- tagpath /ip/routes-summary/imported
+ipRoutesSummaryImport OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of routes imported"
+	::= { ipRoutesSummaryEntry 6 }
+    
 -- tagpath /vrrp
 vrrpTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF VrrpEntry
@@ -5242,7 +5636,7 @@ VrrpEntry ::=
 
 -- tagpath /vrrp/vpn-id
 vrrpVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -5429,7 +5823,7 @@ DhcpInterfaceEntry ::=
 
 -- tagpath /dhcp/client-interface/vpn-id
 dhcpInterfaceVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -5555,7 +5949,7 @@ DhcpServerEntry ::=
 
 -- tagpath /dhcp/server/vpn-id
 dhcpServerVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -5675,7 +6069,7 @@ Dhcpv6InterfaceEntry ::=
 
 -- tagpath /dhcpv6/interface/vpn-id
 dhcpv6InterfaceVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -5807,7 +6201,7 @@ PppoeSessionEntry ::=
 
 -- tagpath /pppoe/session/vpn-id
 pppoeSessionVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -5901,7 +6295,7 @@ PppInterfaceEntry ::=
 
 -- tagpath /ppp/interface/vpn-id
 pppInterfaceVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -6672,7 +7066,7 @@ sfpRawA0Table OBJECT-TYPE
     SYNTAX      SEQUENCE OF SfpRawA0Entry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "(HIDDEN) Display SFP raw page A0 data"
+    DESCRIPTION "(TESTBED) Display SFP raw page A0 data"
     ::= { sfp 5 }
 
 -- tagpath /sfp/raw-a0
@@ -6855,7 +7249,7 @@ sfpRawA2Table OBJECT-TYPE
     SYNTAX      SEQUENCE OF SfpRawA2Entry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "(HIDDEN) Display SFP raw page A2 data"
+    DESCRIPTION "(TESTBED) Display SFP raw page A2 data"
     ::= { sfp 6 }
 
 -- tagpath /sfp/raw-a2
@@ -7078,7 +7472,7 @@ CloudAppEntry ::=
 
 -- tagpath /cloudexpress/applications/vpn-id
 cloudAppVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -7180,7 +7574,7 @@ CloudLocalExitEntry ::=
 
 -- tagpath /cloudexpress/localexit/vpn-id
 cloudLocalExitVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -7248,7 +7642,7 @@ CloudGatewayExitEntry ::=
 
 -- tagpath /cloudexpress/gatewayexit/vpn-id
 cloudGatewayExitVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"

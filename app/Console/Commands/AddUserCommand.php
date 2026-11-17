@@ -59,7 +59,7 @@ class AddUserCommand extends LnmsCommand
 
     public function handle(): int
     {
-        if (LibrenmsConfig::get('auth_mechanism') !== 'mysql') {
+        if (LibrenmsConfig::get('auth_mechanism') !== 'mysql' && ! LibrenmsConfig::get('auth_fallback_local')) {
             $this->warn(__('commands.user:add.wrong-auth'));
         }
 

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Console\Commands\Traits\CompletesConfigArgument;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
+use App\Models\Config;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use JsonSchema\Constraints\Constraint;
@@ -41,7 +42,7 @@ class SetConfigCommand extends LnmsCommand
         $force = $this->option('ignore-checks');
         $parent = null;
 
-        if (preg_match('/^os\.(?<os>[a-z_\-]+)\.(?<setting>.*)$/', $setting, $matches)) {
+        if (preg_match('/^os\.(?<os>[a-z0-9_\-]+)\.(?<setting>.*)$/', $setting, $matches)) {
             $os = $matches['os'];
             try {
                 if (! $force) {
@@ -55,7 +56,8 @@ class SetConfigCommand extends LnmsCommand
             }
         } elseif (! $definition->isValidSetting($setting)) {
             $parent = $this->findParentSetting($definition, $setting);
-            if (! $force && ! $parent) {
+            // allow removing settings that are no longer defined
+            if (! $force && ! $parent && ! ($value === null && Eloquent::isConnected() && Config::query()->where('config_name', $setting)->exists())) {
                 $this->error(trans('commands.config:set.errors.invalid'));
 
                 return 2;

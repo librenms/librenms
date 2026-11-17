@@ -20,8 +20,8 @@
     (function () {
         var grid = $("#graylog-{{ $id }}").bootgrid({
             ajax: true,
-            rowCount: ['{{ $limit }}', 25,50,100,250,-1],
-            navigation: ! {{ $hidenavigation }},
+            rowCount: [@json($limit), 25,50,100,250,-1],
+            navigation: @json(! $hidenavigation),
             formatters: {
                 "browserTime": function(column, row) {
                     @config('graylog.timezone')
@@ -34,10 +34,10 @@
             post: function ()
             {
                 return {
-                    stream: "{{ $stream }}",
-                    device: "{{ $device }}",
-                    range: "{{ $range }}",
-                    loglevel: "{{ $loglevel }}"
+                    stream: @json($stream),
+                    device: @json($device),
+                    range: @json($range),
+                    loglevel: @json($loglevel)
                 };
             },
             url: "{{ url('/ajax/table/graylog') }}"

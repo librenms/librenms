@@ -124,8 +124,10 @@ class InventoryController extends TableController
      */
     protected function formatExportRow(Model $entPhysical): array
     {
+        $device = $entPhysical->device;
+
         return [
-            $entPhysical->device ? $entPhysical->device->displayName() : '',
+            $entPhysical->device ? $device->display : '',
             $entPhysical->entPhysicalDescr,
             $entPhysical->entPhysicalName,
             $entPhysical->entPhysicalModelName,

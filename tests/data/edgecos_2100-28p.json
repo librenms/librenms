@@ -10041,7 +10041,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "A-SWC/S/1",
-                    "remote_port": "3C 2C 99 04 83 4B (3c2c9904834b)",
+                    "remote_port": "3c:2c:99:04:83:4b",
                     "remote_platform": null,
                     "remote_version": "ECS4120-28F",
                     "ifAlias": "Ethernet Port on unit 1, port 25",
