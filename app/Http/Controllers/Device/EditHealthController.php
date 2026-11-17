@@ -89,7 +89,8 @@ class EditHealthController
                 // mark limits as custom so discovery does not overwrite them
                 $sensor->sensor_custom = 'Yes';
             }
-            $saved = $sensor->save();
+            // Alert toggles must not consume a reset waiting for discovery.
+            $saved = $sensor->sensor_custom === 'Reset' ? $sensor->saveQuietly() : $sensor->save();
         }
 
         if ($saved) {
