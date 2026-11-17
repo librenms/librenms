@@ -6,6 +6,7 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Port;
 use App\Models\User;
+use App\Models\UserPref;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\TestCase;
 use Spatie\Permission\Models\Role;
@@ -143,24 +144,44 @@ class PortEventlogLinksTest extends TestCase
             ->assertJsonPath('rows.0.message', 'port event');
     }
 
-    public function testPortLinksBecomeAPortFilter(): void
+    public function testExplicitFiltersOverrideThePortShortcut(): void
     {
         $device = Device::factory()->create();
         $port = Port::factory()->for($device)->create();
+        $admin = $this->admin();
+        $savedFilter = ['type' => ['eq' => 'system']];
+        $urlFilter = ['search' => ['eq' => 'ifSpeed changed']];
+        UserPref::setPref($admin, 'filters.device.eventlog', $savedFilter);
 
-        $this->actingAs($this->admin())
+        $this->actingAs($admin)
+            ->get(route('device.eventlog', ['device' => $device->device_id]))
+            ->assertOk()
+            ->assertViewHas('filter', $savedFilter);
+
+        $this->actingAs($admin)
             ->get(route('device.eventlog', ['device' => $device->device_id, 'port' => $port->port_id]))
             ->assertOk()
-            ->assertSee((string) \Illuminate\Support\Js::from(['port' => ['eq' => $port->port_id]]), false);
+            ->assertViewHas('filter', ['port' => ['eq' => $port->port_id]]);
+
+        $this->actingAs($admin)
+            ->get(route('device.eventlog', ['device' => $device->device_id, 'port' => $port->port_id, 'filter' => $urlFilter]))
+            ->assertOk()
+            ->assertViewHas('filter', $urlFilter);
+
+        $this->actingAs($admin)
+            ->get(route('device.eventlog', ['device' => $device->device_id, 'port' => $port->port_id, 'filter' => '']))
+            ->assertOk()
+            ->assertViewHas('filter', []);
     }
 
     public function testFilterBarPortAndSearch(): void
     {
-        $device = Device::factory()->create();
+        $device = Device::factory()->createQuietly();
         $port = Port::factory()->for($device)->create(['ifName' => 'uplink-port', 'ifDescr' => 'uplink-port', 'ifAlias' => '']);
         Eventlog::factory()->create(['device_id' => $device->device_id, 'type' => 'interface', 'reference' => $port->port_id, 'message' => 'ifSpeed changed']);
         Eventlog::factory()->create(['device_id' => $device->device_id, 'type' => 'system', 'reference' => $port->port_id, 'message' => 'not a port event']);
         Eventlog::factory()->create(['device_id' => $device->device_id, 'type' => 'system', 'message' => 'uplink-port mentioned']);
+        Eventlog::factory()->create(['device_id' => $device->device_id, 'type' => null, 'reference' => $port->port_id, 'message' => 'uncategorized event']);
 
         $post = fn (array $filter) => $this->actingAs($this->admin())->postJson(route('table.eventlog'), [
             'current' => 1,
@@ -170,11 +191,13 @@ class PortEventlogLinksTest extends TestCase
         ])->assertOk()->json('rows.*.message');
 
         $this->assertSame(['ifSpeed changed'], $post(['port' => ['eq' => $port->port_id]]));
+        $this->assertEqualsCanonicalizing(['not a port event', 'uplink-port mentioned', 'uncategorized event'], $post(['port' => ['neq' => $port->port_id]]));
+        $this->assertSame(['ifSpeed changed'], $post(['search' => ['eq' => 'uplink-port']]));
         $this->assertEqualsCanonicalizing(['ifSpeed changed', 'uplink-port mentioned'], $post(['search' => ['contains' => 'uplink']]));
-        $excluded = $post(['search' => ['not_contains' => 'uplink']]);
-        $this->assertContains('not a port event', $excluded);
-        $this->assertNotContains('ifSpeed changed', $excluded);
-        $this->assertNotContains('uplink-port mentioned', $excluded);
+        $this->assertEqualsCanonicalizing(['not a port event', 'uncategorized event'], $post(['search' => ['not_contains' => 'uplink']]));
+        $this->assertEqualsCanonicalizing(['ifSpeed changed', 'uplink-port mentioned'], $post(['search' => ['in' => ['uplink-port', 'uplink-port mentioned']]]));
+        $this->assertEqualsCanonicalizing(['not a port event', 'uncategorized event'], $post(['search' => ['not_in' => 'uplink-port,uplink-port mentioned']]));
+        $this->assertSame([], $post(['search' => ['is_empty' => '']]));
     }
 
     public function testEventlogPageEscapesHtmlInPortLabel(): void

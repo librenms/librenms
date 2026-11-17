@@ -13,7 +13,7 @@
             <table id="syslog" class="table table-hover table-condensed table-striped" data-url="{{ route('table.syslog') }}">
                 <thead>
                 <tr>
-                    <th data-column-id="label"></th>
+                    <th data-column-id="label" data-sortable="false"></th>
                     <th data-column-id="timestamp" data-order="desc">{{ __('Timestamp') }}</th>
                     <th data-column-id="level">{{ __('Level') }}</th>
                     <th data-column-id="device_id">{{ __('device.attributes.hostname') }}</th>

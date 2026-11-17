@@ -176,7 +176,6 @@
                 needles: {text: [], macs: []},
                 controller: null,
                 init() {
-                    window.addEventListener('popstate', () => this.loadFromUrl());
                     window.addEventListener('keydown', (event) => this.macFormatKey(event));
                     window.addEventListener('filter:apply', (event) => this.applyFilters(event.detail));
                     try { this.recent = (JSON.parse(localStorage.getItem(RECENT_KEY)) || []).slice(0, RECENT_LIMIT); } catch { this.recent = []; }
@@ -208,7 +207,13 @@
                     this.needles = this.findNeedles(query);
                 },
                 applyFilters(detail) {
-                    if (detail.name !== 'network-search' || JSON.stringify(detail.filters) === JSON.stringify(this.filters)) { return; }
+                    if (detail.name !== 'network-search') { return; }
+                    if (detail.restored) {
+                        this.filters = detail.filters;
+                        this.loadFromUrl();
+                        return;
+                    }
+                    if (JSON.stringify(detail.filters) === JSON.stringify(this.filters)) { return; }
                     this.filters = detail.filters;
                     this.view = null;
                     // the filter bar already added its history entry, a reload shouldn't bring the old view or page back
@@ -237,7 +242,9 @@
                     const link = event.target.closest('nav a[href]');
                     if (!link || event.ctrlKey || event.metaKey || event.shiftKey) { return; }
                     event.preventDefault();
-                    history.pushState({}, '', link.href);
+                    const cleared = new URLSearchParams(window.location.search).has('filter');
+                    const url = LibreNMS.Url.applyNestedParamsToUrl(new URL(link.href), 'filter', this.filters, cleared);
+                    history.pushState({}, '', url);
                     this.loadFromUrl();
                     window.scrollTo({top: 0});
                 },
@@ -280,12 +287,6 @@
                 },
                 loadFromUrl() {
                     const params = new URLSearchParams(window.location.search);
-                    const filters = {};
-                    for (const [key, value] of params.entries()) {
-                        const match = key.match(/^filter\[(.+)\]\[(.+)\]$/);
-                        if (match) { (filters[match[1]] ??= {})[match[2]] = value; }
-                    }
-                    this.filters = filters;
                     this.input = params.get('q') || '';
                     this.view = supportedView(params.get('view'));
                     this.readListOptions();
@@ -293,6 +294,9 @@
                         this.setQuery(this.input);
                         this.fetchResults();
                     } else {
+                        this.controller?.abort();
+                        this.loading = false;
+                        this.error = false;
                         this.searched = false;
                         this.query = '';
                         this.result = {};

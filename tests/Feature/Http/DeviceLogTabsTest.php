@@ -24,38 +24,42 @@ class DeviceLogTabsTest extends TestCase
     }
 
     /**
-     * @return array<string, array{string, bool, array<int, string>}>
+     * @return array<string, array{string, bool, string}>
      */
-    public static function logPages(): array
+    public static function filterBarPages(): array
     {
         return [
-            'device syslog' => ['device.syslog', true, []],
-            'device eventlog' => ['device.eventlog', true, []],
-            'device graylog' => ['device.graylog', true, []],
-            'global syslog' => ['syslog', false, []],
-            'global eventlog' => ['eventlog', false, []],
-            'global graylog' => ['graylog', false, []],
+            'device syslog' => ['device.syslog', true, 'program'],
+            'device eventlog' => ['device.eventlog', true, 'search'],
+            'global syslog' => ['syslog', false, 'program'],
+            'global eventlog' => ['eventlog', false, 'search'],
         ];
     }
 
-    /**
-     * @param  array<int, string>  $params
-     */
-    #[DataProvider('logPages')]
-    public function testFilterParametersAreEscaped(string $route, bool $deviceTab, array $params): void
+    #[DataProvider('filterBarPages')]
+    public function testFilterParametersAreEscaped(string $route, bool $deviceTab, string $field): void
     {
-        $device = Device::factory()->create();
-        $query = array_fill_keys($params, self::PAYLOAD);
-        $parameters = ($deviceTab ? ['device' => $device] : ['device' => $device->device_id]) + $query;
+        $filter = [$field => ['eq' => self::PAYLOAD]];
+        $parameters = ['filter' => $filter];
+        if ($deviceTab) {
+            $parameters['device'] = Device::factory()->create();
+        }
 
-        $response = $this->actingAs($this->admin())
+        $this->actingAs($this->admin())
             ->get(route($route, $parameters))
             ->assertOk()
-            ->assertDontSee(self::PAYLOAD, false);
+            ->assertDontSee(self::PAYLOAD, false)
+            ->assertSee('filterBarComponent', false)
+            ->assertSee((string) Js::from($filter), false);
+    }
 
-        if ($params) {
-            $response->assertSee((string) Js::from(self::PAYLOAD), false);
-        }
+    public function testDeviceGraylogPageLoads(): void
+    {
+        $device = Device::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->get(route('device.graylog', ['device' => $device]))
+            ->assertOk();
     }
 
     public function testGraylogPreselectsTheFilteredDevice(): void
@@ -66,20 +70,6 @@ class DeviceLogTabsTest extends TestCase
             ->get(route('graylog', ['device' => $device->device_id]))
             ->assertOk()
             ->assertSee((string) Js::from(['id' => $device->device_id, 'text' => $device->display]), false);
-    }
-
-    public function testFilterBarIsEscaped(): void
-    {
-        $device = Device::factory()->create();
-        $urls = [route('syslog'), route('device.syslog', ['device' => $device]), route('eventlog'), route('device.eventlog', ['device' => $device])];
-
-        foreach ($urls as $url) {
-            $this->actingAs($this->admin())
-                ->get($url . '?' . http_build_query(['filter' => ['program' => ['eq' => self::PAYLOAD]]]))
-                ->assertOk()
-                ->assertDontSee(self::PAYLOAD, false)
-                ->assertSee('filterBarComponent', false);
-        }
     }
 
     public function testGraylogRejectsInvalidStream(): void

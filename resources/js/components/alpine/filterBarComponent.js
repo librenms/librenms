@@ -100,7 +100,7 @@ export default function filterBarComponent({
             const formatted = {};
             this.filters.forEach((f) => {
                 if (!formatted[f.key]) formatted[f.key] = {};
-                formatted[f.key][f.op] = this.encodeValue(f.value);
+                formatted[f.key][f.op] = this.isNullary(f.op) ? "1" : this.encodeValue(f.value);
             });
             return formatted;
         },
@@ -136,25 +136,13 @@ export default function filterBarComponent({
                 }
             });
 
-            const params = new URLSearchParams(window.location.search);
-            const hasUrlFilters = Array.from(params.keys()).some((k) => k.startsWith("filter["));
-            this.isCleared = params.has("filter") && !hasUrlFilters;
-
-            if (hasUrlFilters) {
-                await this.restoreFromUrl(params);
-            } else if (this.isCleared) {
-                this.filters = []; // URL explicitly asked for no filters; bypass defaults
-            } else if (Object.keys(this.initial || {}).length > 0) {
-                await this.restoreFromData(this.initial); // Fresh page load; load backend defaults
-            }
-
-            // Sync external links on load
-            this.syncPageUrls();
+            const from = this.restoreFromLocation();
+            await this.hydrateAll();
 
             this.$dispatch("filter:loaded", {
                 name: this.name,
                 filters: this.formattedFilters,
-                from: hasUrlFilters ? "url" : (this.isCleared ? "clear" : "initial"),
+                from,
             });
 
             if (this.filters.length > 0 && !this.reload) {
@@ -164,9 +152,17 @@ export default function filterBarComponent({
                 });
             }
 
-            window.addEventListener("popstate", () =>
-                this.restoreFromUrl(new URLSearchParams(window.location.search))
-            );
+            if (!this.reload) {
+                window.addEventListener("popstate", () => {
+                    this.restoreFromLocation();
+                    this.hydrateAll();
+                    this.$dispatch("filter:apply", {
+                        name: this.name,
+                        filters: this.formattedFilters,
+                        restored: true,
+                    });
+                });
+            }
 
             this.$watch("filters", () => {
                 this.$nextTick(() => this.updateScroll());
@@ -184,7 +180,23 @@ export default function filterBarComponent({
         },
 
         // --- Data Restoration ---
-        async restoreFromUrl(params) {
+        restoreFromLocation() {
+            const params = new URLSearchParams(window.location.search);
+            const hasUrlFilters = Array.from(params.keys()).some((key) => key.startsWith("filter["));
+            this.isCleared = params.has("filter") && !hasUrlFilters;
+
+            if (hasUrlFilters) {
+                this.restoreFromUrl(params);
+            } else {
+                this.restoreFromData(this.isCleared ? [] : this.initial || []);
+            }
+
+            this.syncPageUrls();
+
+            return hasUrlFilters ? "url" : (this.isCleared ? "clear" : "initial");
+        },
+
+        restoreFromUrl(params) {
             const newFilters = [];
             for (const [fullKey, val] of params.entries()) {
                 const match = fullKey.match(/^filter\[(.+)\]\[(.+)\]$/);
@@ -198,10 +210,9 @@ export default function filterBarComponent({
                 }
             }
             this.filters = newFilters;
-            await this.hydrateAll();
         },
 
-        async restoreFromData(data) {
+        restoreFromData(data) {
             const newFilters = [];
             Object.entries(data).forEach(([key, ops]) => {
                 const field = this.fields.find((f) => f.key === key);
@@ -214,7 +225,6 @@ export default function filterBarComponent({
                 }
             });
             this.filters = newFilters;
-            await this.hydrateAll();
         },
 
         createFilterObject(field, op, val) {

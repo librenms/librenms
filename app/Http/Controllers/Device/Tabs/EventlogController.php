@@ -44,10 +44,15 @@ class EventlogController extends Controller
             ...Eventlog::filterValidationRules(),
         ]);
 
+        // The query input also contains filters merged by the saved-filter middleware.
+        parse_str($request->getQueryString() ?? '', $query);
+
         return view('device.tabs.logs.eventlog', [
             'device' => $device,
             // port links from the ports pages
-            'filter' => $request->filled('port') ? ['port' => ['eq' => $request->integer('port')]] : $request->array('filter'),
+            'filter' => ! array_key_exists('filter', $query) && $request->filled('port')
+                ? ['port' => ['eq' => $request->integer('port')]]
+                : $request->array('filter'),
             'filterFields' => Eventlog::filterFieldDefinitions($device),
         ]);
     }

@@ -77,16 +77,18 @@ class Eventlog extends DeviceRelatedModel
         $positive = ['not' => false] + $config;
 
         // empty checks only apply to the message
-        $ports = isset($config['operator']) ? Port::query()->select('port_id')->where(function (Builder $query) use ($value, $config): void {
-            $pattern = isset($config['wildcard']) ? str_replace('?', (string) $value, $config['wildcard']) : $value;
+        $ports = ($config['null'] ?? false) ? null : Port::query()->select('port_id')->where(function (Builder $query) use ($value, $positive): void {
             foreach (['ifName', 'ifAlias', 'ifDescr'] as $column) {
-                $query->orWhere($column, $config['operator'], $pattern);
+                $this->applyQueryLogic($query, $column, $value, $positive, 'or');
             }
-        }) : null;
+        });
 
         $match = fn (Builder $query) => $query
             ->where(fn (Builder $query) => $this->applyQueryLogic($query, $this->qualifyColumn('message'), $value, $positive))
-            ->when($ports, fn (Builder $query, $ports) => $query->orWhere(fn (Builder $query) => $query->where('eventlog.type', 'interface')->whereIn('eventlog.reference', $ports)));
+            ->when($ports, fn (Builder $query, $ports) => $query->orWhere(fn (Builder $query) => $query
+                ->whereNotNull('eventlog.type')
+                ->where('eventlog.type', 'interface')
+                ->whereIn('eventlog.reference', $ports)));
 
         ($config['not'] ?? false) ? $query->whereNot($match) : $query->where($match);
     }
@@ -101,6 +103,7 @@ class Eventlog extends DeviceRelatedModel
     {
         $positive = ['not' => false] + $config;
         $match = fn (Builder $query) => $query
+            ->whereNotNull('eventlog.type')
             ->where('eventlog.type', 'interface')
             ->where(fn (Builder $query) => $this->applyQueryLogic($query, 'eventlog.reference', $value, $positive));
 
