@@ -317,6 +317,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('neighbours', [Device\Tabs\NeighboursController::class, 'index'])->name('neighbours');
         Route::get('netflow', [Device\Tabs\NetflowController::class, 'index'])->name('netflow');
         Route::get('port/{port}', [Device\Tabs\PortController::class, 'show'])->name('port')->scopeBindings()->whereNumber('port');
+        Route::get('qos', [Device\Tabs\QosController::class, 'index'])->name('qos');
         Route::get('pseudowires', [Device\Tabs\PseudowiresController::class, 'index'])->name('pseudowires');
         Route::get('stp', [Device\Tabs\StpController::class, 'index'])->name('stp');
         Route::get('routing', [Device\Tabs\RoutingController::class, 'index'])->name('routing');

@@ -21,7 +21,7 @@ class DeviceController
     use AuthorizesRequests;
 
     /** Tabs with their own device.{tab} route, the legacy url only redirects to it */
-    private const array ROUTED_TABS = ['neighbours', 'netflow', 'port', 'pseudowires', 'routing', 'stp'];
+    private const array ROUTED_TABS = ['neighbours', 'netflow', 'port', 'pseudowires', 'qos', 'routing', 'stp'];
 
     public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {

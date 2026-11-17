@@ -2,6 +2,6 @@
 
 @section('content')
     <x-device.page :device="$device">
-        <x-qos :qosItems="$device->qos" :show="$data['show']" />
+        <x-qos :qosItems="$device->qos" :show="$show" />
     </x-device.page>
 @endsection
