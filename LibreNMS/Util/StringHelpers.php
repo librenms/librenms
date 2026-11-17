@@ -49,6 +49,7 @@ class StringHelpers
             'hv-monitor' => 'HV Monitor',
             'http_access_log_combined' => 'HTTP Access Log Combined',
             'i2pd' => 'I2PD Router',
+            'linux_pressure' => 'Linux Pressure',
             'mojo_cape_submit' => 'Mojo CAPE Submit',
             'mailcow-postfix' => 'mailcow-dockerized postfix',
             'mysql' => 'MySQL',

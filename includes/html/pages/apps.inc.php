@@ -498,6 +498,13 @@ $graphs['logsize'] = [
     'mode_size',
     'min_size',
 ];
+$graphs['linux_pressure'] = [
+    'cpu',
+    'io',
+    'memory',
+    'irq',
+    'stall_time',
+];
 $graphs['linux_config_files'] = [
     'number_of_confs',
 ];
