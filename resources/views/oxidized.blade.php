@@ -15,6 +15,7 @@
                     <thead>
                     <tr>
                         <th data-column-id="id" data-visible="false" data-identifier="true">{{ __('ID') }}</th>
+                        <th data-column-id="device_id" data-visible="false">{{ __('Device ID') }}</th>
                         <th data-column-id="hostname" data-formatter="hostname" data-order="asc">{{ __('Hostname') }}</th>
                         <th data-column-id="sysname" data-visible="false">{{ __('SysName') }}</th>
                         <th data-column-id="last_status" data-formatter="status">{{ __('Last Status') }}</th>
@@ -27,9 +28,10 @@
                     <tbody>
                     @foreach($nodes as $node)
                         <tr>
-                            <td>{{ $node['device']->device_id }}</td>
+                            <td>{{ $loop->index }}</td>
+                            <td>{{ $node['device']?->device_id }}</td>
                             <td>{{ $node['name'] }}</td>
-                            <td>{{ $node['device']->sysName }}</td>
+                            <td>{{ $node['device']?->sysName }}</td>
                             <td>{{ $node['status'] }}</td>
                             <td>{{ $node['time'] }}</td>
                             <td>{{ $node['model'] }}</td>
@@ -125,10 +127,15 @@
         },
         formatters: {
             hostname: function (column, row) {
-                return '<a href="' + deviceUrl.replace('__id__', encodeURIComponent(row.id)) + '">' + escapeOxidizedHtml(row.hostname) + '</a>';
+                return row.device_id
+                    ? '<a href="' + deviceUrl.replace('__id__', encodeURIComponent(row.device_id)) + '">' + escapeOxidizedHtml(row.hostname) + '</a>'
+                    : escapeOxidizedHtml(row.hostname);
             },
             actions: function (column, row) {
-                const id = encodeURIComponent(row.id);
+                if (! row.device_id) {
+                    return '';
+                }
+                const id = encodeURIComponent(row.device_id);
                 return @can('config-backup.refresh') '<button type="button" class="btn btn-default btn-sm oxidized-refresh" data-url="' + refreshUrl.replace('__id__', id) + '" title="' + @js(__('Refetch config')) + '"><i class="fa fa-refresh"></i></button> ' + @endcan
                     '<a href="' + configUrl.replace('__id__', id) + '" title="' + @js(__('View config')) + '"><i class="fa fa-align-justify fa-lg icon-theme"></i></a>';
             },

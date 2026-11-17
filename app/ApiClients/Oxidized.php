@@ -203,16 +203,21 @@ class Oxidized extends BaseApi
 
     /**
      * Ask oxidized to refresh the node list for the source (likely the LibreNMS API).
+     * Returns null when disabled, false on failure, and true on a successful HTTP response.
      */
-    public function reloadNodes(): void
+    public function reloadNodes(): ?bool
     {
         if ($this->enabled && LibrenmsConfig::get('oxidized.reload_nodes') === true) {
             try {
-                $this->getClient()->get('/reload.json');
+                return $this->getClient()->get('/reload.json')->successful();
             } catch (ConnectionException $e) {
                 Log::warning('Oxidized is not reachable: ' . $e->getMessage());
+
+                return false;
             }
         }
+
+        return null;
     }
 
     /**

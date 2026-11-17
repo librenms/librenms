@@ -14,16 +14,16 @@ class OxidizedController extends Controller
 {
     public function index(Request $request, Oxidized $oxidized): View
     {
-        $nodes = collect($oxidized->nodes() ?? []);
+        $nodeData = $oxidized->nodes();
+        $nodes = collect($nodeData ?? []);
         $devices = Device::hasAccess($request->user())
             ->whereIn('hostname', $nodes->pluck('name'))
             ->get()
             ->keyBy('hostname');
 
         return view('oxidized', [
-            'reachable' => $oxidized->lastError() === null,
+            'reachable' => $nodeData !== null && $oxidized->lastError() === null,
             'nodes' => $nodes
-                ->filter(fn (array $node) => $devices->has($node['name'] ?? ''))
                 ->map(fn (array $node) => [
                     'device' => $devices->get($node['name']),
                     'name' => $node['name'],
@@ -46,10 +46,8 @@ class OxidizedController extends Controller
             return response()->json(['message' => __('Oxidized is not reachable')], 503);
         }
 
-        // link LibreNMS devices, and hide nodes of devices the user may not see
-        $devices = Device::whereIn('hostname', array_column($results, 'node'))->get()->keyBy('hostname');
-        $results = array_filter($results, fn (array $result) => ! $devices->has($result['node'] ?? '')
-            || $request->user()->can('view', $devices->get($result['node'])));
+        $devices = Device::hasAccess($request->user())
+            ->whereIn('hostname', array_column($results, 'node'))->get()->keyBy('hostname');
 
         return response()->json([
             'results' => array_map(function (array $result) use ($devices) {
@@ -66,13 +64,23 @@ class OxidizedController extends Controller
     {
         $this->authorize('config-backup.refresh');
 
-        $oxidized->reloadNodes();
+        $reloaded = $oxidized->reloadNodes();
+        if ($reloaded === null) {
+            return response()->json(['message' => __('Oxidized node list reload is disabled')], 409);
+        }
+        if (! $reloaded) {
+            return response()->json(['message' => __('Oxidized node list could not be reloaded')], 503);
+        }
 
         return response()->json(['message' => __('Oxidized node list was reloaded')]);
     }
 
     private function localTime(string $time): string
     {
+        if ($time === '') {
+            return '';
+        }
+
         try {
             return Carbon::parse($time, 'UTC')->setTimezone(config('app.timezone'))->format('Y-m-d H:i:s T');
         } catch (InvalidFormatException) {
