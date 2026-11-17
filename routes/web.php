@@ -426,8 +426,11 @@ Route::middleware(['auth'])->group(function (): void {
     Route::resource('roles', RoleController::class);
 
     Route::post('alert/transports/{transport}/test', [AlertTransportController::class, 'test'])->name('alert.transports.test');
-    Route::delete('alert/transports/{transport}', [AlertTransportController::class, 'destroy'])->name('alert.transports.destroy');
-    Route::delete('alert/transport-groups/{alert_transport_group}', [AlertTransportGroupController::class, 'destroy'])->name('alert.transport-groups.destroy');
+    Route::get('alert-transports', [AlertTransportController::class, 'index'])->name('alert-transports.index');
+    Route::resource('alert/transports', AlertTransportController::class)->only(['show', 'store', 'update', 'destroy'])
+        ->names('alert-transports')->parameters(['transports' => 'transport']);
+    Route::resource('alert/transport-groups', AlertTransportGroupController::class)->only(['show', 'store', 'update', 'destroy'])
+        ->names('alert-transport-groups')->parameters(['transport-groups' => 'alert_transport_group']);
     Route::delete('alert-templates/{alert_template}', [AlertTemplateController::class, 'destroy'])->name('alert-templates.destroy');
     Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);
     Route::resource('alert-operation', AlertOperationController::class)->only(['show', 'store', 'update', 'destroy']);
