@@ -65,11 +65,17 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
 
     private ?array $portIfIndexes = null;
 
+    /**
+     * Power to report for a minus infinity reading: 3 dB under the low alarm threshold, or -40 dBm without threshold.
+     */
     public static function minusInfinityPower(float|string|null $lowLimit): float
     {
         return is_numeric($lowLimit) ? (float) $lowLimit - self::OPTICAL_POWER_INFINITY_MARGIN : self::OPTICAL_POWER_FLOOR;
     }
 
+    /**
+     * Read the firmware, bootloader and serial number from IFOTEC-SMI, and the hardware from sysDescr.
+     */
     public function discoverOS(Device $device): void
     {
         if (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.21362.100.')) {
@@ -93,6 +99,8 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
     }
 
     /**
+     * One transceiver for each plugged SFP whose port is known.
+     *
      * @return Collection<Transceiver>
      */
     public function discoverTransceivers(): Collection
@@ -120,6 +128,11 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
         return $transceivers;
     }
 
+    /**
+     * Discover the SFP sensors of the requested classes, called from the dbm and state include files.
+     *
+     * @param  string[]  $types
+     */
     public function discoverTransceiverSensors($types = ['dbm', 'state']): void
     {
         if (in_array('dbm', $types)) {
@@ -131,6 +144,9 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
         }
     }
 
+    /**
+     * Receive and transmit optical power sensors of the plugged optical SFPs (SC or LC connector).
+     */
     private function discoverSfpPowerSensors(): void
     {
         $sysIndex = $this->sysProductIndex();
@@ -186,6 +202,9 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
         }
     }
 
+    /**
+     * Presence, signal and status sensors of each SFP cage, linked to the port entity.
+     */
     private function discoverSfpStateSensors(): void
     {
         $sysIndex = $this->sysProductIndex();
@@ -226,6 +245,9 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
         }
     }
 
+    /**
+     * Rows of ifoSFPTable for the device system, indexed by SFP index.
+     */
     private function sfpRows(): array
     {
         $sysIndex = $this->sysProductIndex();
@@ -251,6 +273,9 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
         return isset($this->portEntities[$ifIndex]) ? (int) $this->portEntities[$ifIndex] : null;
     }
 
+    /**
+     * First index of the IFOTEC-SMI tables, or null when the device does not report it.
+     */
     private function sysProductIndex(): ?string
     {
         $index = SnmpQuery::cache()->get('IFOTEC-SMI::ifoSysProductIndex.0')->value();
@@ -273,6 +298,8 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
     }
 
     /**
+     * Numeric state value of an enum returned as a number or as its name, 0 when unknown.
+     *
      * @param  array<int, array{string, int}>  $map
      */
     private function stateValue(mixed $raw, array $map): int
@@ -290,11 +317,17 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
         return 0;
     }
 
+    /**
+     * True for the noData value of IfotecDataStatus, returned as a number or as its name.
+     */
     private function isNoData(mixed $status): bool
     {
         return $status === 'noData' || (is_numeric($status) && (int) $status === 1);
     }
 
+    /**
+     * True for the yes value of IfotecYesNoType, returned as a number or as its name.
+     */
     private function isYes(mixed $value): bool
     {
         return $value === 'yes' || (is_numeric($value) && (int) $value === 1);
@@ -315,6 +348,9 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
         return isset($this->portIfIndexes[$name]) ? (int) $this->portIfIndexes[$name] : null;
     }
 
+    /**
+     * Connector name from SFP_CONNECTORS, whether the enum is returned as a number or as its name.
+     */
     private function sfpConnector(array $sfp): ?string
     {
         $connector = $sfp['ifoSFPConnectorType'] ?? null;

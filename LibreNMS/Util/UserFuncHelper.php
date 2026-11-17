@@ -52,6 +52,10 @@ class UserFuncHelper
         return Number::cast(explode(',', $this->value_raw)[$channel] ?? '') * $this->sensor['sensor_multiplier'] / $this->sensor['sensor_divisor'];
     }
 
+    /**
+     * IFOTEC optical power: replaces a minus infinity reading by a value under the low threshold (receive)
+     * or by the low threshold (transmit).
+     */
     public function ifotecOpticalPower(): float
     {
         if ((float) $this->value >= \LibreNMS\OS\Ifotec::OPTICAL_POWER_MIN_VALID) {
