@@ -41,20 +41,20 @@ use SnmpQuery;
 class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
 {
     // IfotecSFPConnectorType (IFOTEC-SMI)
-    private const SFP_CONNECTORS = [1 => 'undefined', 2 => 'SC', 3 => 'LC', 4 => 'RJ45', 5 => 'DAC'];
+    private const array SFP_CONNECTORS = [1 => 'undefined', 2 => 'SC', 3 => 'LC', 4 => 'RJ45', 5 => 'DAC'];
 
     // -10000000 (-1000000.0 after the IfotecTenthDbm display hint) means minus infinity: no optical signal
     public const OPTICAL_POWER_MIN_VALID = -1000.0;
 
-    private const OPTICAL_POWER_FLOOR = -40.0;
+    private const float OPTICAL_POWER_FLOOR = -40.0;
 
     // the device reports minus infinity when the power is 3 dB under the low alarm threshold
-    private const OPTICAL_POWER_INFINITY_MARGIN = 3.0;
+    private const float OPTICAL_POWER_INFINITY_MARGIN = 3.0;
 
     // IfotecYesNoType and IfotecDataStatus (IFOTEC-SMI): value => [name, generic state]
-    private const YES_NO = [1 => ['yes', 0], 2 => ['no', 3]];
+    private const array YES_NO = [1 => ['yes', 0], 2 => ['no', 3]];
 
-    private const DATA_STATUS = [
+    private const array DATA_STATUS = [
         1 => ['noData', 3], 2 => ['ok', 0], 3 => ['warning', 1], 4 => ['warningLowThreshold', 1],
         5 => ['warningHighThreshold', 1], 6 => ['error', 2], 7 => ['errorLowThreshold', 2],
         8 => ['errorHighThreshold', 2], 9 => ['errorWrongData', 2], 10 => ['errorLowDataOverflow', 2],
