@@ -72,15 +72,6 @@ class PseudowiresController extends Controller implements DeviceTab
         ]);
 
         $view = $request->string('view')->value() ?: 'detail';
-        $user = $request->user();
-
-        $pseudowires = $device->pseudowires()
-            ->with(['port.device', 'peerDevice'])
-            ->hasAccess($user)
-            ->join('ports', 'pseudowires.port_id', '=', 'ports.port_id')
-            ->orderBy('ports.ifDescr')
-            ->select('pseudowires.*')
-            ->get();
 
         return view('device.tabs.pseudowires', [
             'device' => $device,
@@ -95,7 +86,7 @@ class PseudowiresController extends Controller implements DeviceTab
                     'link' => route('device.pseudowires', ['device' => $device, 'view' => 'minigraphs']),
                 ],
             ],
-            'circuits' => Pseudowire::pairEndpoints($pseudowires, $user),
+            'circuits' => Pseudowire::circuits($request->user(), $device),
         ]);
     }
 }

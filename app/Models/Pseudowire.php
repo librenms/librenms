@@ -29,8 +29,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Collection;
 
+/** @phpstan-type CircuitEndpoint array{device: ?Device, description: ?string, port: ?Port, mtu: ?int} */
 class Pseudowire extends PortRelatedModel
 {
     /** @use HasFactory<\Database\Factories\PseudowireFactory> */
@@ -63,13 +63,30 @@ class Pseudowire extends PortRelatedModel
     }
 
     /**
-     * Pair pseudowires with their accessible remote endpoints, listing each circuit once.
+     * List each accessible circuit once, scoped to a local device when given.
      *
-     * @param  Collection<int, self>  $pseudowires
-     * @return list<array{pseudowire: self, peer: ?self}>
+     * @return list<array{
+     *     vcId: int,
+     *     type: string,
+     *     psnType: string,
+     *     endpoints: array{local: CircuitEndpoint, remote: CircuitEndpoint},
+     * }>
      */
-    public static function pairEndpoints(Collection $pseudowires, User $user): array
+    public static function circuits(User $user, ?Device $device = null): array
     {
+        $query = self::hasAccess($user)
+            ->with(['port.device', 'peerDevice'])
+            ->join('ports', 'pseudowires.port_id', '=', 'ports.port_id');
+
+        if ($device) {
+            $query->whereBelongsTo($device, 'device');
+        } else {
+            $query->with('device')
+                ->join('devices', 'pseudowires.device_id', '=', 'devices.device_id')
+                ->orderBy('devices.hostname');
+        }
+
+        $pseudowires = $query->orderBy('ports.ifDescr')->select('pseudowires.*')->get();
         $peerDeviceIds = $pseudowires->pluck('peer_device_id')->filter()->unique();
         $peers = $peerDeviceIds->isEmpty()
             ? collect()
@@ -100,7 +117,25 @@ class Pseudowire extends PortRelatedModel
                 unset($circuits[$peer->pseudowire_id]);
             }
 
-            $circuits[$pseudowire->pseudowire_id] = ['pseudowire' => $pseudowire, 'peer' => $peer];
+            $circuits[$pseudowire->pseudowire_id] = [
+                'vcId' => $pseudowire->cpwVcID,
+                'type' => $pseudowire->pw_type,
+                'psnType' => $pseudowire->pw_psntype,
+                'endpoints' => [
+                    'local' => [
+                        'device' => $device ?? $pseudowire->device,
+                        'description' => $pseudowire->pw_descr,
+                        'port' => $pseudowire->port,
+                        'mtu' => $pseudowire->pw_local_mtu,
+                    ],
+                    'remote' => [
+                        'device' => $peer->device ?? $pseudowire->peerDevice,
+                        'description' => $peer?->pw_descr,
+                        'port' => $peer?->port,
+                        'mtu' => $peer?->pw_local_mtu,
+                    ],
+                ],
+            ];
         }
 
         return array_values($circuits);
