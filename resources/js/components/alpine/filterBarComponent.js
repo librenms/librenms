@@ -1,3 +1,5 @@
+import isEqual from "lodash/isEqual";
+
 export default function filterBarComponent({
     name,
     fields,
@@ -97,8 +99,12 @@ export default function filterBarComponent({
         },
 
         get formattedFilters() {
+            return this.formatFilters(this.filters);
+        },
+
+        formatFilters(filters) {
             const formatted = {};
-            this.filters.forEach((f) => {
+            filters.forEach((f) => {
                 if (!formatted[f.key]) formatted[f.key] = {};
                 formatted[f.key][f.op] = this.isNullary(f.op) ? "1" : this.encodeValue(f.value);
             });
@@ -136,7 +142,10 @@ export default function filterBarComponent({
                 }
             });
 
-            const from = this.restoreFromLocation();
+            const { filters, from } = this.readFiltersFromLocation();
+            this.filters = filters;
+            this.isCleared = from === "clear";
+            this.syncPageUrls();
             await this.hydrateAll();
 
             this.$dispatch("filter:loaded", {
@@ -149,19 +158,12 @@ export default function filterBarComponent({
                 this.$dispatch("filter:apply", {
                     name: this.name,
                     filters: this.formattedFilters,
+                    initial: true,
                 });
             }
 
             if (!this.reload) {
-                window.addEventListener("popstate", () => {
-                    this.restoreFromLocation();
-                    this.hydrateAll();
-                    this.$dispatch("filter:apply", {
-                        name: this.name,
-                        filters: this.formattedFilters,
-                        restored: true,
-                    });
-                });
+                window.addEventListener("popstate", () => this.restoreHistory());
             }
 
             this.$watch("filters", () => {
@@ -180,23 +182,42 @@ export default function filterBarComponent({
         },
 
         // --- Data Restoration ---
-        restoreFromLocation() {
+        readFiltersFromLocation() {
             const params = new URLSearchParams(window.location.search);
-            const hasUrlFilters = Array.from(params.keys()).some((key) => key.startsWith("filter["));
-            this.isCleared = params.has("filter") && !hasUrlFilters;
-
-            if (hasUrlFilters) {
-                this.restoreFromUrl(params);
-            } else {
-                this.restoreFromData(this.isCleared ? [] : this.initial || []);
+            if (Array.from(params.keys()).some((key) => key.startsWith("filter["))) {
+                return { filters: this.filtersFromUrl(params), from: "url" };
+            }
+            if (params.has("filter")) {
+                return { filters: [], from: "clear" };
             }
 
-            this.syncPageUrls();
-
-            return hasUrlFilters ? "url" : (this.isCleared ? "clear" : "initial");
+            return { filters: this.filtersFromData(this.initial || []), from: "initial" };
         },
 
-        restoreFromUrl(params) {
+        async restoreHistory() {
+            const url = window.location.href;
+            const previous = this.filters;
+            const { filters, from } = this.readFiltersFromLocation();
+            const formatted = this.formatFilters(filters);
+            const changed = !isEqual(this.formattedFilters, formatted);
+
+            if (changed) {
+                await this.hydrateAll(filters);
+                if (window.location.href !== url || this.filters !== previous) return;
+                this.filters = filters;
+            }
+
+            this.isCleared = from === "clear";
+            this.syncPageUrls();
+            const detail = { name: this.name, filters: formatted };
+            this.$dispatch("filter:loaded", { ...detail, from: "history" });
+
+            if (changed) {
+                this.$dispatch("filter:apply", { ...detail, restored: true });
+            }
+        },
+
+        filtersFromUrl(params) {
             const newFilters = [];
             for (const [fullKey, val] of params.entries()) {
                 const match = fullKey.match(/^filter\[(.+)\]\[(.+)\]$/);
@@ -209,10 +230,10 @@ export default function filterBarComponent({
                         );
                 }
             }
-            this.filters = newFilters;
+            return newFilters;
         },
 
-        restoreFromData(data) {
+        filtersFromData(data) {
             const newFilters = [];
             Object.entries(data).forEach(([key, ops]) => {
                 const field = this.fields.find((f) => f.key === key);
@@ -224,7 +245,7 @@ export default function filterBarComponent({
                     });
                 }
             });
-            this.filters = newFilters;
+            return newFilters;
         },
 
         createFilterObject(field, op, val) {
@@ -350,8 +371,8 @@ export default function filterBarComponent({
             this.apply();
         },
 
-        async hydrateAll() {
-            await Promise.all(this.filters.map((f) => this.hydrate(f)));
+        async hydrateAll(filters = this.filters) {
+            await Promise.all(filters.map((f) => this.hydrate(f)));
         },
 
         async hydrate(filter) {

@@ -27,7 +27,6 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Eventlog;
-use App\Models\Port;
 use App\Models\Sensor;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -66,19 +65,7 @@ class EventlogController extends TableController
      */
     protected function search(?string $search, Builder $query, array $fields): Builder
     {
-        if (! $search) {
-            return $query;
-        }
-
-        return $query->where(fn (Builder $query) => parent::search($search, $query, $fields)
-            ->orWhere(fn (Builder $query) => $query
-                ->where('type', 'interface')
-                ->whereIn('reference', Port::select('port_id')->where(fn (Builder $query) => $query
-                    ->where('ifName', 'like', "%$search%")
-                    ->orWhere('ifAlias', 'like', "%$search%")
-                    ->orWhere('ifDescr', 'like', "%$search%")
-                ))
-            ));
+        return $search ? $query->applyFilters(['search' => ['contains' => $search]]) : $query;
     }
 
     protected function filterFields(Request $request): array
@@ -87,7 +74,7 @@ class EventlogController extends TableController
             'device_id' => 'device',
             'type' => 'eventtype',
             'port' => function (Builder $query, int $port_id): void {
-                $query->where('type', 'interface')->where('reference', $port_id);
+                $query->applyFilters(['port' => ['eq' => $port_id]]);
             },
         ];
     }

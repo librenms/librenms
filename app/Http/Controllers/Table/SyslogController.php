@@ -30,7 +30,6 @@ use App\Models\Syslog;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Enum\SyslogSeverity;
 use LibreNMS\Util\Time;
@@ -87,10 +86,10 @@ class SyslogController extends TableController
                 $query->inDeviceGroup($group);
             })
             ->when(Time::parseInput($request->input('from')), function ($query, int $from): void {
-                $query->where('timestamp', '>=', Carbon::createFromTimestamp($from, config('app.timezone')));
+                $query->whereRaw('syslog.timestamp >= FROM_UNIXTIME(?)', [$from]);
             })
             ->when(Time::parseInput($request->input('to')), function ($query, int $to): void {
-                $query->where('timestamp', '<=', Carbon::createFromTimestamp($to, config('app.timezone')));
+                $query->whereRaw('syslog.timestamp <= FROM_UNIXTIME(?)', [$to]);
             })
             ->when($request->level, function ($query, $level): void {
                 if ($level >= 7) {

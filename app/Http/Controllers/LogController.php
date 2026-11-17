@@ -6,6 +6,7 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Syslog;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class LogController extends Controller
@@ -38,6 +39,22 @@ class LogController extends Controller
             'from' => $request->string('from')->value(),
             'to' => $request->string('to')->value(),
         ]);
+    }
+
+    public function confirmSyslogExpunge(): View
+    {
+        $this->authorize('syslog.delete');
+
+        return view('logs.syslog-expunge');
+    }
+
+    public function expungeSyslog(): RedirectResponse
+    {
+        $this->authorize('syslog.delete');
+
+        Syslog::truncate();
+
+        return to_route('syslog')->with('syslogCleared', true);
     }
 
     public function graylog(Request $request): View

@@ -61,8 +61,9 @@
         $('.syslog-range').append(document.getElementById('syslog-range').content.cloneNode(true));
 
         $(window).on('filter:apply', function (event) {
-            if (event.originalEvent.detail.name === @js($filterName)) {
-                filter = event.originalEvent.detail.filters;
+            const { name, filters, initial } = event.originalEvent.detail;
+            if (!initial && name === @js($filterName)) {
+                filter = filters;
                 grid.bootgrid('reload');
             }
         });

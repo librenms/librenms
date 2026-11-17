@@ -178,6 +178,12 @@
                 init() {
                     window.addEventListener('keydown', (event) => this.macFormatKey(event));
                     window.addEventListener('filter:apply', (event) => this.applyFilters(event.detail));
+                    window.addEventListener('filter:loaded', ({detail}) => {
+                        if (detail.name === 'network-search' && detail.from === 'history') {
+                            this.filters = detail.filters;
+                            this.loadFromUrl();
+                        }
+                    });
                     try { this.recent = (JSON.parse(localStorage.getItem(RECENT_KEY)) || []).slice(0, RECENT_LIMIT); } catch { this.recent = []; }
                     this.readListOptions();
                     if (options.hasQuery || this.hasFilters()) {
@@ -207,13 +213,7 @@
                     this.needles = this.findNeedles(query);
                 },
                 applyFilters(detail) {
-                    if (detail.name !== 'network-search') { return; }
-                    if (detail.restored) {
-                        this.filters = detail.filters;
-                        this.loadFromUrl();
-                        return;
-                    }
-                    if (JSON.stringify(detail.filters) === JSON.stringify(this.filters)) { return; }
+                    if (detail.name !== 'network-search' || detail.restored || JSON.stringify(detail.filters) === JSON.stringify(this.filters)) { return; }
                     this.filters = detail.filters;
                     this.view = null;
                     // the filter bar already added its history entry, a reload shouldn't bring the old view or page back
