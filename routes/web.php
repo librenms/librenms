@@ -386,7 +386,7 @@ Route::middleware(['auth'])->group(function (): void {
     });
 
     // dashboard
-    Route::resource('dashboard', DashboardController::class)->except(['show']);
+    Route::resource('dashboard', DashboardController::class)->except(['create', 'show', 'edit']);
     Route::post('dashboard/{dashboard}/copy', [DashboardController::class, 'copy'])->name('dashboard.copy');
     Route::post('dashboard/{dashboard}/widgets', [DashboardWidgetController::class, 'add'])->name('dashboard.widget.add');
     Route::delete('dashboard/{dashboard}/widgets', [DashboardWidgetController::class, 'clear'])->name('dashboard.widget.clear');

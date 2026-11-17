@@ -44,7 +44,8 @@
             <div class="form-group @error('rules') has-error @enderror @error('rules.*') has-error @enderror">
                 <label for="rules" class="control-label col-sm-3 col-md-2 text-nowrap">{{ __('Alert rules') }}</label>
                 <div class="col-sm-9 col-md-10">
-                    @php($selected = collect(old('rules', $selectedRules))->map(fn ($id) => (int) $id))
+                    {{-- after a failed save, a missing rules key means every rule was removed --}}
+                    @php($selected = collect(session()->hasOldInput() ? old('rules', []) : $selectedRules)->map(fn ($id) => (int) $id))
                     <select class="form-control" id="rules" name="rules[]" multiple style="width: 100%">
                         @foreach($rules as $rule)
                             <option value="{{ $rule->id }}" @selected($selected->contains($rule->id)) @disabled($usedBy->has($rule->id)) data-template="{{ $usedBy->get($rule->id) }}">{{ $rule->name }}</option>

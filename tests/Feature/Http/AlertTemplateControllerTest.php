@@ -178,6 +178,23 @@ final class AlertTemplateControllerTest extends TestCase
         $this->assertSame('Original', $template->refresh()->name);
     }
 
+    public function testFailedUpdateKeepsRemovedRulesUnselected(): void
+    {
+        $template = AlertTemplate::factory()->create(['name' => 'Original', 'template' => 'Original body']);
+        $rule = AlertRule::factory()->create();
+        $template->map()->create(['alert_rule_id' => $rule->id]);
+
+        $page = $this->dom($this->actingAs($this->admin())
+            ->from(route('alert-templates.edit', $template))
+            ->followingRedirects()
+            ->put(route('alert-templates.update', $template), ['name' => 'Original', 'template' => '@if(true) unsaved'])
+            ->assertOk()
+            ->assertSee('Template failed to be parsed'));
+
+        $this->assertFalse($page->querySelector('#rules option[value="' . $rule->id . '"]')->hasAttribute('selected'));
+        $this->assertSame([$rule->id], $template->map()->pluck('alert_rule_id')->all());
+    }
+
     public function testUpdateAndDestroy(): void
     {
         $template = AlertTemplate::factory()->create();
