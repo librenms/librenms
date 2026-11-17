@@ -27,6 +27,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Device\Tabs\LoadBalancer\AcosSource;
 use App\Http\Controllers\Device\Tabs\LoadBalancer\CiscoAceSource;
 use App\Http\Controllers\Device\Tabs\LoadBalancer\Data\LoadBalancerItem;
 use App\Http\Controllers\Device\Tabs\LoadBalancer\F5Source;
@@ -161,6 +162,7 @@ class LoadBalancerController extends Controller implements DeviceTab
     {
         if (! $this->sources->offsetExists($device)) {
             $this->sources[$device] = match ($device->os) {
+                'acos' => new AcosSource($device),
                 'f5' => new F5Source($device),
                 'netscaler' => new NetscalerSource($device),
                 'acsw' => new CiscoAceSource($device),

@@ -321,6 +321,68 @@ final class LoadBalancerTabTest extends TestCase
         $this->assertLabel('label-danger', 'Server is down', (string) $response->getContent());
     }
 
+    public function testAcosSectionsListSlbObjects(): void
+    {
+        $device = Device::factory()->create(['os' => 'acos']);
+        $vs = $this->createComponent($device, 'acos-slb-vs', 'vs <web>', ['address' => '10.0.0.10'], status: 2, error: 'Virtual Server is Down');
+        $pool = $this->createComponent($device, 'acos-slb-pool', 'sg-web');
+        $this->createComponent($device, 'acos-slb-vport', 'vs <web>:80', ['vsname' => 'vs <web>', 'address' => '10.0.0.10', 'port' => 80, 'servicegroup' => 'sg-web']);
+        $this->createComponent($device, 'acos-slb-member', 'web1:80', ['poolname' => 'sg-web', 'servername' => 'web1', 'port' => 80, 'priority' => 1]);
+        $this->createComponent($device, 'acos-slb-server', 'web1', ['address' => '10.1.0.1', 'healthmonitor' => 'ping']);
+        $this->createComponent($device, 'acos-slb-vs', 'Disabled VS', disabled: 1);
+
+        $response = $this->actingAs($this->admin())
+            ->get(route('device.loadbalancer', ['device' => $device]))
+            ->assertOk()
+            ->assertSeeInOrder(['Virtual Servers (1)', 'Virtual Services (1)', 'Pools (1)', 'Pool Members (1)', 'Real Servers (1)'])
+            ->assertSee('vs &lt;web&gt;', false)
+            ->assertSee('10.0.0.10')
+            ->assertSee('type=device_acos_slb_allvs_curconns', false)
+            ->assertSee('graph=device_acos_slb_vs_curconns', false)
+            ->assertDontSee('Disabled VS');
+
+        $this->assertLabel('label-danger', 'Virtual Server is Down', (string) $response->getContent());
+
+        $this->actingAs($this->admin())
+            ->get(route('device.loadbalancer', ['device' => $device, 'type' => 'virtual-services']))
+            ->assertOk()
+            ->assertSee('10.0.0.10:80')
+            ->assertSee('type=pools&amp;id=' . $pool->id, false);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.loadbalancer', ['device' => $device, 'type' => 'real-servers']))
+            ->assertOk()
+            ->assertSee('Health Monitor')
+            ->assertSee('10.1.0.1')
+            ->assertSee('ping');
+
+        $this->actingAs($this->admin())
+            ->get(route('device.loadbalancer', ['device' => $device, 'type' => 'virtual-servers', 'id' => $vs->id]))
+            ->assertOk()
+            ->assertSee('type=device_acos_slb_vs_bytesin', false)
+            ->assertSee('id=' . $vs->id, false);
+    }
+
+    public function testAcosPoolDetailShowsOnlyItsMembers(): void
+    {
+        $device = Device::factory()->create(['os' => 'acos']);
+        $pool = $this->createComponent($device, 'acos-slb-pool', 'sg-web');
+        $this->createComponent($device, 'acos-slb-pool', 'sg-web2');
+        $this->createComponent($device, 'acos-slb-server', 'web1', ['address' => '10.1.0.1']);
+        $this->createComponent($device, 'acos-slb-member', 'web1:80', ['poolname' => 'sg-web', 'servername' => 'web1', 'port' => 80, 'priority' => 2], status: 2, error: 'Pool Member is Down');
+        $this->createComponent($device, 'acos-slb-member', 'other:80', ['poolname' => 'sg-web2', 'servername' => 'other', 'port' => 80]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.loadbalancer', ['device' => $device, 'type' => 'pools', 'id' => $pool->id]))
+            ->assertOk()
+            ->assertSee('Pool Members (1)')
+            ->assertSee('web1')
+            ->assertSee('10.1.0.1:80')
+            ->assertSee('Pool Member is Down')
+            ->assertDontSee('other')
+            ->assertSee('type=device_acos_slb_allpm_curconns', false);
+    }
+
     /**
      * @param  array<string, mixed>  $prefs
      */
