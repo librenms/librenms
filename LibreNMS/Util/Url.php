@@ -291,9 +291,16 @@ class Url
         return route('device.port', ['device' => $port->device_id, 'port' => $port->port_id] + $vars);
     }
 
-    public static function sensorUrl($sensor, $vars = [])
+    /**
+     * Device health page url for the sensor's class
+     *
+     * @param  array<string, mixed>  $vars
+     */
+    public static function sensorUrl($sensor, $vars = []): string
     {
-        return self::generate(['page' => 'device', 'device' => $sensor->device_id, 'tab' => 'health', 'metric' => $sensor->sensor_class], $vars);
+        $sensorClass = $sensor->sensor_class instanceof \BackedEnum ? $sensor->sensor_class->value : $sensor->sensor_class;
+
+        return route('device.health', ['device' => $sensor->device_id, 'metric' => $sensorClass] + $vars);
     }
 
     public static function generate($vars, $new_vars = [])

@@ -64,11 +64,12 @@ class PageLinks extends Component
         if (Gate::allows('update', $device)) {
             // check if metric has more specific edit page
             $path = \Request::path();
-            if (preg_match('#health/metric=(\w+)#', $path, $matches)) {
-                if ($this->editTabUrl($device, $matches[1])) {
-                    $currentTab = $matches[1];
-                } elseif ($this->editTabUrl($device, $matches[1] . 's')) {
-                    $currentTab = $matches[1] . 's';
+            $metric = request()->routeIs('device.health') ? (string) request()->query('metric') : '';
+            if ($metric !== '') {
+                if ($this->editTabUrl($device, $metric)) {
+                    $currentTab = $metric;
+                } elseif ($this->editTabUrl($device, $metric . 's')) {
+                    $currentTab = $metric . 's';
                 }
             } elseif (preg_match('#device/\d+/ports/transceivers#', $path)) {
                 $currentTab = 'transceivers';

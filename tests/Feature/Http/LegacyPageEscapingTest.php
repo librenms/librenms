@@ -73,7 +73,7 @@ class LegacyPageEscapingTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'health', 'vars' => 'metric=processor']))
+            ->get(route('device.health', ['device' => $device, 'metric' => 'processor']))
             ->assertOk()
             ->assertDontSee(self::PAYLOAD, false)
             ->assertSee(self::ESCAPED, false);
