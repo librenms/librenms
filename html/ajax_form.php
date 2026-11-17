@@ -44,7 +44,6 @@ $ajax_form = match ($_POST['type'] ?? '') {
     'show-alert-transport' => 'includes/html/forms/show-alert-transport.inc.php',
     'show-transport-group' => 'includes/html/forms/show-transport-group.inc.php',
     'transport-groups' => 'includes/html/forms/transport-groups.inc.php',
-    'update-port-notes' => 'includes/html/forms/update-port-notes.inc.php',
     default => null,
 };
 
