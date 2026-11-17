@@ -29,8 +29,10 @@ namespace App\Http\Controllers\Device\Tabs\LoadBalancer;
 enum LoadBalancerSection: string
 {
     case VirtualServers = 'virtual-servers';
+    case VirtualServices = 'virtual-services';
     case Pools = 'pools';
     case PoolMembers = 'pool-members';
+    case RealServers = 'real-servers';
     case BandwidthControllers = 'bandwidth-controllers';
     case WideIps = 'wide-ips';
     case GslbPools = 'gslb-pools';
@@ -40,8 +42,10 @@ enum LoadBalancerSection: string
     {
         return match ($this) {
             self::VirtualServers => __('Virtual Servers'),
+            self::VirtualServices => __('Virtual Services'),
             self::Pools => __('Pools'),
             self::PoolMembers => __('Pool Members'),
+            self::RealServers => __('Real Servers'),
             self::BandwidthControllers => __('Bandwidth Controllers'),
             self::WideIps => __('Wide IPs'),
             self::GslbPools => __('GSLB Pools'),
