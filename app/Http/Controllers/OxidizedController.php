@@ -24,6 +24,7 @@ class OxidizedController extends Controller
         return view('oxidized', [
             'reachable' => $nodeData !== null && $oxidized->lastError() === null,
             'nodes' => $nodes
+                ->filter(fn (array $node) => $devices->has($node['name'] ?? ''))
                 ->map(fn (array $node) => [
                     'device' => $devices->get($node['name']),
                     'name' => $node['name'],
@@ -46,8 +47,12 @@ class OxidizedController extends Controller
             return response()->json(['message' => __('Oxidized is not reachable')], 503);
         }
 
+        $nodeNames = array_column($results, 'node');
         $devices = Device::hasAccess($request->user())
-            ->whereIn('hostname', array_column($results, 'node'))->get()->keyBy('hostname');
+            ->whereIn('hostname', $nodeNames)->get()->keyBy('hostname');
+        $knownHostnames = Device::whereIn('hostname', $nodeNames)->pluck('hostname')->flip();
+        $results = array_filter($results, fn (array $result) => ! $knownHostnames->has($result['node'] ?? '')
+            || $devices->has($result['node'] ?? ''));
 
         return response()->json([
             'results' => array_map(function (array $result) use ($devices) {

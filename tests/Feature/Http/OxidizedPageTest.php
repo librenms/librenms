@@ -25,7 +25,7 @@ final class OxidizedPageTest extends TestCase
         LibrenmsConfig::set('oxidized.url', 'http://oxidized.test');
     }
 
-    public function testNodeListShowsAllNodesAndOnlyLinksAccessibleDevices(): void
+    public function testNodeListOnlyShowsAccessibleDevices(): void
     {
         $visible = Device::factory()->create(['hostname' => 'visible.example.com']);
         Device::factory()->create(['hostname' => 'hidden.example.com']);
@@ -44,10 +44,9 @@ final class OxidizedPageTest extends TestCase
             ->get(route('oxidized'))
             ->assertOk()
             ->assertSee('visible.example.com')
-            ->assertSee('hidden.example.com')
-            ->assertSee('unknown.example.com')
-            ->assertViewHas('nodes', fn ($nodes) => $nodes[0]['device']?->is($visible)
-                && $nodes[1]['device'] === null && $nodes[2]['device'] === null);
+            ->assertDontSee('hidden.example.com')
+            ->assertDontSee('unknown.example.com')
+            ->assertViewHas('nodes', fn ($nodes) => $nodes->count() === 1 && $nodes[0]['device']->is($visible));
     }
 
     public function testPageShowsUnreachableOxidized(): void
@@ -60,7 +59,7 @@ final class OxidizedPageTest extends TestCase
             ->assertSee('Oxidized is not reachable');
     }
 
-    public function testSearchShowsAllNodesAndOnlyLinksAccessibleDevices(): void
+    public function testSearchHidesInaccessibleDevicesAndRetainsUnknownNodes(): void
     {
         $visible = Device::factory()->create(['hostname' => 'visible.example.com']);
         Device::factory()->create(['hostname' => 'hidden.example.com']);
@@ -81,7 +80,6 @@ final class OxidizedPageTest extends TestCase
             ->assertOk()
             ->assertExactJson(['results' => [
                 ['name' => $visible->display, 'url' => route('device', ['device' => $visible->device_id, 'tab' => 'config'])],
-                ['name' => 'hidden.example.com', 'url' => null],
                 ['name' => 'core/other', 'url' => null],
             ]]);
 
@@ -145,6 +143,9 @@ final class OxidizedPageTest extends TestCase
     public function testNodeTimesPreserveMissingValuesAndConvertNonEmptyTimes(): void
     {
         config(['app.timezone' => 'America/Chicago']);
+        foreach (['missing', 'empty', 'valid', 'invalid'] as $hostname) {
+            Device::factory()->create(['hostname' => $hostname]);
+        }
         Http::preventStrayRequests();
         Http::fake(['oxidized.test/nodes?format=json' => Http::response([
             ['name' => 'missing'],
