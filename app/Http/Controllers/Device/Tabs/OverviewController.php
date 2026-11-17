@@ -182,13 +182,13 @@ class OverviewController implements DeviceTab
 
                 // a panel with a single sensor class links to that class on the health tab, like the class panels
                 $classes = $sensors->pluck('sensor_class')->unique();
-                $healthVars = $classes->count() === 1 ? ['vars' => 'metric=' . $classes->first()] : [];
+                $metric = $classes->count() === 1 ? $classes->first() : null;
                 $groups = $this->groupSensors($device, $sensors);
 
                 return [
                     'title' => $category->label($groups->count()),
                     'icon' => 'fa fa-' . $category->icon(),
-                    'href' => route('device', ['device' => $device->device_id, 'tab' => 'health'] + $healthVars),
+                    'href' => route('device.health', ['device' => $device->device_id, 'metric' => $metric]),
                     'groups' => $groups,
                 ];
             });
@@ -198,7 +198,7 @@ class OverviewController implements DeviceTab
             ->map(fn (SensorType $sensorClass): array => [
                 'title' => $sensorClass->label(),
                 'icon' => 'fa fa-' . $sensorClass->icon(),
-                'href' => route('device', ['device' => $device->device_id, 'tab' => 'health', 'vars' => 'metric=' . $sensorClass->value]),
+                'href' => route('device.health', ['device' => $device->device_id, 'metric' => $sensorClass->value]),
                 'groups' => $this->groupSensors($device, $classSensors->get($sensorClass->value)),
             ]);
 

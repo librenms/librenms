@@ -20,6 +20,7 @@ final class HealthTabTest extends TestCase
         parent::setUp();
 
         Role::findOrCreate('admin');
+        Role::findOrCreate('user');
     }
 
     public function testOverviewListsMetricGraphs(): void
@@ -29,11 +30,12 @@ final class HealthTabTest extends TestCase
         Sensor::factory()->create(['device_id' => $device->device_id, 'sensor_class' => 'temperature']);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'health']))
+            ->get(route('device.health', ['device' => $device]))
             ->assertOk()
             ->assertSee('type=device_processor', false)
             ->assertSee('type=device_temperature', false)
-            ->assertSee(route('device', ['device' => $device->device_id, 'tab' => 'health', 'metric' => 'temperature']), false);
+            ->assertSee('health?metric=temperature', false)
+            ->assertSee(route('device.edit.health', $device->device_id), false);
     }
 
     public function testSensorMetricShowsValuesAndLimits(): void
@@ -48,7 +50,7 @@ final class HealthTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'health', 'metric' => 'temperature']))
+            ->get(route('device.health', ['device' => $device, 'metric' => 'temperature']))
             ->assertOk()
             ->assertSee('Inlet &lt;Temp&gt;', false)
             ->assertSee('Current')
@@ -62,10 +64,21 @@ final class HealthTabTest extends TestCase
         Mempool::factory()->count(2)->create(['device_id' => $device->device_id]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'health', 'vars' => 'metric=mempool']))
+            ->get(route('device.health', ['device' => $device, 'metric' => 'mempool']))
             ->assertOk()
             ->assertSee('type=device_mempool', false)
             ->assertSee('type=mempool_usage', false);
+    }
+
+    public function testMetricLinksToItsEditPage(): void
+    {
+        $device = Device::factory()->create();
+        Processor::factory()->create(['device_id' => $device->device_id]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.health', ['device' => $device, 'metric' => 'processor']))
+            ->assertOk()
+            ->assertSee(route('device.edit.processors', $device->device_id), false);
     }
 
     public function testUnknownMetricFallsBackToOverview(): void
@@ -74,9 +87,62 @@ final class HealthTabTest extends TestCase
         Processor::factory()->create(['device_id' => $device->device_id]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'health', 'metric' => '../../etc']))
+            ->get(route('device.health', ['device' => $device, 'metric' => '../../etc']))
             ->assertOk()
             ->assertSee('type=device_processor', false);
+    }
+
+    public function testEmptyMetricShowsOverview(): void
+    {
+        $device = Device::factory()->create();
+        Processor::factory()->create(['device_id' => $device->device_id]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.health', ['device' => $device]) . '?metric=')
+            ->assertOk()
+            ->assertSee('type=device_processor', false)
+            ->assertDontSee('type=processor_usage', false);
+    }
+
+    public function testNonStringMetricIsRejected(): void
+    {
+        $device = Device::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->get(route('device.health', ['device' => $device, 'metric' => ['processor']]))
+            ->assertSessionHasErrors('metric');
+    }
+
+    public function testLegacyPathMetricRedirectsToQuery(): void
+    {
+        $device = Device::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->get("/device/$device->device_id/health/metric=mempool/")
+            ->assertRedirect(route('device.health', ['device' => $device, 'metric' => 'mempool']))
+            ->assertStatus(301);
+    }
+
+    public function testLegacyDeviceSegmentRedirects(): void
+    {
+        $device = Device::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->get("/device/device=$device->device_id/tab=health/metric=processor/")
+            ->assertRedirect(route('device.health', ['device' => $device, 'metric' => 'processor']))
+            ->assertStatus(301);
+    }
+
+    public function testUserWithoutAccessGetsForbidden(): void
+    {
+        $device = Device::factory()->create();
+
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->assignRole('user');
+
+        $this->actingAs($user)
+            ->get(route('device.health', ['device' => $device]))
+            ->assertForbidden();
     }
 
     private function admin(): User

@@ -27,14 +27,15 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Facades\LibrenmsConfig;
+use App\Http\Controllers\Controller;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\View\View;
 use LibreNMS\Component;
 use LibreNMS\Interfaces\UI\DeviceTab;
-use LibreNMS\Util\Url;
 
-class HealthController implements DeviceTab
+class HealthController extends Controller implements DeviceTab
 {
     public function visible(Device $device): bool
     {
@@ -56,20 +57,35 @@ class HealthController implements DeviceTab
         return __('Health');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function data(Device $device, Request $request): array
     {
+        return [];
+    }
+
+    public function index(Device $device, Request $request): View
+    {
+        $this->authorize('view', $device);
+
+        $request->validate([
+            'metric' => 'nullable|string',
+        ]);
+
         $qfp = $this->qfpComponents($device);
         $metrics = $this->metrics($device, $qfp->isNotEmpty());
-        $metric = Url::parseOptions('metric', 'overview');
+        $metric = $request->string('metric')->value() ?: 'overview';
         if (! isset($metrics[$metric])) {
             $metric = 'overview';
         }
 
-        return [
+        return view('device.tabs.health', [
+            'device' => $device,
             'metric' => $metric,
             'metrics' => $metrics,
             'options' => collect(['overview' => __('Overview')] + $metrics)
-                ->map(fn ($text, $option) => ['text' => $text, 'link' => route('device', ['device' => $device->device_id, 'tab' => 'health', 'metric' => $option])])
+                ->map(fn ($text, $option) => ['text' => $text, 'link' => route('device.health', ['device' => $device->device_id, 'metric' => $option === 'overview' ? null : $option])])
                 ->all(),
             'items' => match ($metric) {
                 'overview' => collect(),
@@ -80,7 +96,7 @@ class HealthController implements DeviceTab
                 'qfp' => $qfp,
                 default => $device->sensors()->where('sensor_class', $metric)->orderBy('sensor_descr')->get(),
             },
-        ];
+        ]);
     }
 
     /**
