@@ -85,7 +85,7 @@
                                     @endcan
                                 @endconfig
                                 @config('oxidized.enabled')
-                                <li><a href="{{ url('oxidized') }}"><i class="fa fa-stack-overflow fa-fw fa-lg"
+                                <li><a href="{{ route('oxidized') }}"><i class="fa fa-stack-overflow fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Oxidized') }}</a>
                                 </li>
                                 @endconfig
