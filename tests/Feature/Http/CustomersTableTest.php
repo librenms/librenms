@@ -13,6 +13,18 @@ final class CustomersTableTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function testPageRendersTable(): void
+    {
+        Role::findOrCreate('admin');
+        $admin = User::factory()->create(['enabled' => 1])->assignRole('admin');
+
+        $this->actingAs($admin)
+            ->get(route('customers'))
+            ->assertOk()
+            ->assertSee('id="customers"', false)
+            ->assertSee('data-url="' . route('table.customers') . '"', false);
+    }
+
     public function testCustomerGraphLinksUseCustomerName(): void
     {
         Role::findOrCreate('admin');

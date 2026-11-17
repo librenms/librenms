@@ -127,6 +127,7 @@ Route::middleware(['auth'])->group(function (): void {
         ->middleware('saved-filter:faults')->name('faults');
     Route::get('alerts/{vars?}', [FaultsController::class, 'index'])->where('vars', '.*')
         ->middleware('saved-filter:faults'); // legacy alias
+    Route::view('customers', 'customers.index')->name('customers');
     Route::resource('device-groups', DeviceGroupController::class);
     Route::get('device-dependencies', [DeviceDependencyController::class, 'index'])->name('device-dependencies.index');
     Route::post('device-groups/{device_group}/rediscover', [DeviceGroupController::class, 'rediscover'])->name('device-groups.rediscover');
@@ -513,7 +514,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('bills', Table\BillsController::class)->name('table.bills');
             Route::post('alert-schedule', Table\AlertScheduleController::class);
             Route::post('access-points', Table\AccessPointController::class)->name('table.access-points');
-            Route::post('customers', Table\CustomersController::class);
+            Route::post('customers', Table\CustomersController::class)->name('table.customers');
             Route::post('diskio', Table\DiskioController::class)->name('table.diskio');
             Route::post('device', Table\DeviceController::class)->name('table.device');
             Route::post('device-dependencies', Table\DeviceDependenciesController::class)->name('table.device-dependencies');
