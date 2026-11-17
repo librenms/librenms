@@ -24,14 +24,16 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Http\Controllers\Controller;
 use App\Models\Device;
 use App\View\Components\Device\RoutingTabs;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Route;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
-class RoutingController implements DeviceTab
+class RoutingController extends Controller implements DeviceTab
 {
     public function visible(Device $device): bool
     {
@@ -53,8 +55,21 @@ class RoutingController implements DeviceTab
         return __('Routing');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function data(Device $device, Request $request): array
     {
+        return [];
+    }
+
+    /**
+     * The routing tab has no page of its own, send it to a protocol page
+     */
+    public function index(Device $device, Request $request): RedirectResponse
+    {
+        $this->authorize('view', $device);
+
         $request->validate([
             'proto' => 'nullable|string',
             'section' => 'nullable|string',
@@ -73,13 +88,13 @@ class RoutingController implements DeviceTab
         $queryParams = Arr::except($options, ['proto', 'section', 'tab', 'device']);
 
         if (Route::has('device.routing.' . $protoNormalized)) {
-            abort(redirect()->route('device.routing.' . $protoNormalized, array_merge(['device' => $device], $queryParams)));
+            return redirect()->route('device.routing.' . $protoNormalized, array_merge(['device' => $device], $queryParams));
         }
 
         if (! empty($tabKeys) && Route::has('device.routing.' . $tabKeys[0])) {
-            abort(redirect()->route('device.routing.' . $tabKeys[0], array_merge(['device' => $device], $queryParams)));
+            return redirect()->route('device.routing.' . $tabKeys[0], array_merge(['device' => $device], $queryParams));
         }
 
-        abort(redirect()->route('device.routing.cef', array_merge(['device' => $device], $queryParams)));
+        return redirect()->route('device.routing.cef', array_merge(['device' => $device], $queryParams));
     }
 }

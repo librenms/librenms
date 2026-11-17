@@ -20,8 +20,8 @@ class DeviceController
 {
     use AuthorizesRequests;
 
-    /** Converted tabs that read their options from the query string */
-    private const array QUERY_OPTION_TABS = ['neighbours', 'netflow', 'port', 'pseudowires', 'routing', 'stp'];
+    /** Tabs with their own device.{tab} route, the legacy url only redirects to it */
+    private const array ROUTED_TABS = ['neighbours', 'netflow', 'port', 'pseudowires', 'routing', 'stp'];
 
     public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {
@@ -41,13 +41,12 @@ class DeviceController
         if ($current_tab == 'port') {
             $port = $device->ports()->findOrFail($this->portId((string) $vars));
             Gate::authorize('view', $port);
-            $request->attributes->set('port', $port);
         } else {
             Gate::authorize('view', $device);
         }
 
-        if ($request->isMethod('GET') && in_array($current_tab, self::QUERY_OPTION_TABS, true)) {
-            $this->redirectLegacyOptions($request, $device_id, $current_tab, (string) $vars, $port);
+        if (in_array($current_tab, self::ROUTED_TABS, true)) {
+            return $this->redirectToTabRoute($request, $device_id, $current_tab, (string) $vars, $port);
         }
 
         $tab_controller = PageTabs::getTab($current_tab);
@@ -84,36 +83,24 @@ class DeviceController
     }
 
     /**
-     * Send legacy /key=value/ path options to the native query string form so old links keep working.
-     * The port tab moves to /port/{id}.
+     * Send legacy urls to the tab's own route, /key=value/ path options move to the query string
      */
-    private function redirectLegacyOptions(Request $request, int $deviceId, string $tab, string $vars, ?Port $port): void
+    private function redirectToTabRoute(Request $request, int $deviceId, string $tab, string $vars, ?Port $port): RedirectResponse
     {
-        $path = [];
         $options = [];
-        $legacyPort = false;
         foreach (explode('/', $vars) as $segment) {
             $segment = urldecode($segment);
-            if (! str_contains($segment, '=')) {
-                $path[] = $segment;
-                continue;
-            }
-
-            [$key, $value] = explode('=', $segment, 2);
-            if ($port && $key == 'port') {
-                $legacyPort = true;
-            } elseif (! in_array($key, ['device', 'tab'], true)) {
-                $options[$key] = $value;
+            if (str_contains($segment, '=')) {
+                [$key, $value] = explode('=', $segment, 2);
+                if (! in_array($key, ['device', 'tab', 'port'], true)) {
+                    $options[$key] = $value;
+                }
             }
         }
 
-        if (empty($options) && ! $legacyPort) {
-            return;
-        }
+        $params = ['device' => $deviceId] + ($port ? ['port' => $port->port_id] : []);
 
-        $vars = $port ? (string) $port->port_id : implode('/', array_filter($path, fn ($segment) => $segment !== ''));
-
-        abort(redirect()->route('device', array_filter(['device' => $deviceId, 'tab' => $tab, 'vars' => $vars]) + $request->query() + $options, 301));
+        return redirect()->route("device.$tab", $params + $request->query() + $options, 301);
     }
 
     private function renderLegacyTab($tab, Device $device, $data)

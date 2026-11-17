@@ -29,6 +29,7 @@ namespace App\Http\Controllers\Device\Tabs;
 use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
 use App\Facades\Rrd;
+use App\Http\Controllers\Controller;
 use App\Models\Bill;
 use App\Models\Device;
 use App\Models\Ipv4Mac;
@@ -39,12 +40,12 @@ use App\Models\PortVlan;
 use App\Models\Sensor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 use LibreNMS\Interfaces\Plugins\Hooks\PortTabHook;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Plugins;
-use LibreNMS\Util\Url;
 
-class PortController implements DeviceTab
+class PortController extends Controller implements DeviceTab
 {
     /** graph type => [title, rrd suffix that must exist] */
     private const array GRAPHS = [
@@ -92,8 +93,18 @@ class PortController implements DeviceTab
         return __('Port');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function data(Device $device, Request $request): array
     {
+        return [];
+    }
+
+    public function show(Device $device, Port $port, Request $request): View
+    {
+        $this->authorize('view', $port);
+
         $request->validate([
             'view' => 'nullable|string',
             'show' => 'nullable|integer',
@@ -104,38 +115,35 @@ class PortController implements DeviceTab
             'period' => 'nullable|string',
         ]);
 
-        // resolved and authorized from the /port/{id} path by DeviceController
-        $port = $request->attributes->get('port');
-        abort_unless($port instanceof Port && $port->device_id == $device->device_id, 404);
         $port->setRelation('device', $device);
 
         $views = $this->views($device, $port);
         $view = $request->string('view', 'graphs')->value();
         $view = isset($views[$view]) || in_array($view, ['macaccounting', 'junose-atm-vp']) ? $view : 'graphs';
 
-        $data = [
+        return view('device.tabs.port', [
+            'device' => $device,
             'port' => $port,
             'view' => $view,
             'menus' => $this->menus($port, $views, $view, $request),
             'bill' => $this->billLink($port),
             'neighbors' => [$port->port_id => (new PortsController)->findPortNeighbors($port)],
             'portsWithEvents' => (new PortsController)->portsWithEvents($device->device_id, [$port->port_id]),
-        ];
-
-        return $data + match ($view) {
-            'graphs' => ['graphs' => $this->existingGraphs($device, $port, self::GRAPHS)],
-            'xdsl' => ['graphs' => $this->existingGraphs($device, $port, self::XDSL_GRAPHS)],
-            'realtime' => $this->realtime($device, $request),
-            'notes' => ['notes' => $device->getAttrib("port_id_notes:$port->port_id") ?? ''],
-            'sensors' => ['sensors' => $this->sensors($device, $port)->get()],
-            'pagp' => ['members' => $device->ports()->where('pagpGroupIfIndex', $port->ifIndex)->get()],
-            'vlans' => ['vlans' => $this->vlans($device, $port)],
-            'macaccounting' => $this->macAccounting($port, $request),
-            'junose-atm-vp' => $this->atmVps($port, $request),
-            'qos' => ['show' => $request->filled('show') ? $request->integer('show') : null],
-            'plugins' => ['plugins' => $this->plugins($device, $port)],
-            default => [],
-        };
+            'viewData' => match ($view) {
+                'graphs' => ['graphs' => $this->existingGraphs($device, $port, self::GRAPHS)],
+                'xdsl' => ['graphs' => $this->existingGraphs($device, $port, self::XDSL_GRAPHS)],
+                'realtime' => $this->realtime($device, $request),
+                'notes' => ['notes' => $device->getAttrib("port_id_notes:$port->port_id") ?? ''],
+                'sensors' => ['sensors' => $this->sensors($device, $port)->get()],
+                'pagp' => ['members' => $device->ports()->where('pagpGroupIfIndex', $port->ifIndex)->get()],
+                'vlans' => ['vlans' => $this->vlans($device, $port)],
+                'macaccounting' => $this->macAccounting($port, $request),
+                'junose-atm-vp' => $this->atmVps($port, $request),
+                'qos' => ['show' => $request->filled('show') ? $request->integer('show') : null],
+                'plugins' => ['plugins' => $this->plugins($device, $port)],
+                default => [],
+            },
+        ]);
     }
 
     /**
@@ -207,7 +215,7 @@ class PortController implements DeviceTab
      */
     private function menus(Port $port, array $views, string $view, Request $request): array
     {
-        $options = collect($views)->map(fn ($text, $view) => ['text' => $text, 'link' => Url::portUrl($port, ['view' => $view])])->all();
+        $options = collect($views)->map(fn ($text, $view) => ['text' => $text, 'link' => route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => $view])])->all();
         $options['eventlog'] = ['text' => __('Eventlog'), 'link' => route('device.eventlog', ['device' => $port->device_id, 'port' => $port->port_id])];
         $menus = [['name' => '', 'options' => $options, 'selected' => $view]];
 
@@ -215,7 +223,7 @@ class PortController implements DeviceTab
             $options = [];
             foreach (['bits' => __('Bits'), 'pkts' => __('Packets')] as $graph => $text) {
                 foreach (['graphs' => $text, 'minigraphs' => "$text (" . __('Mini') . ')', 'top10' => "$text (" . __('Top 10') . ')'] as $subview => $subtext) {
-                    $options["$graph-$subview"] = ['text' => $subtext, 'link' => Url::portUrl($port, ['view' => 'macaccounting', 'subview' => $subview, 'graph' => $graph])];
+                    $options["$graph-$subview"] = ['text' => $subtext, 'link' => route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => 'macaccounting', 'subview' => $subview, 'graph' => $graph])];
                 }
             }
 
@@ -229,7 +237,7 @@ class PortController implements DeviceTab
         if (JuniAtmVp::where('port_id', $port->port_id)->exists()) {
             $menus[] = [
                 'name' => __('ATM VPs'),
-                'options' => collect(self::ATM_GRAPHS)->map(fn ($text, $graph) => ['text' => __($text), 'link' => Url::portUrl($port, ['view' => 'junose-atm-vp', 'graph' => $graph])])->all(),
+                'options' => collect(self::ATM_GRAPHS)->map(fn ($text, $graph) => ['text' => __($text), 'link' => route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => 'junose-atm-vp', 'graph' => $graph])])->all(),
                 'selected' => $view == 'junose-atm-vp' ? $request->string('graph', 'bits')->value() : null,
             ];
         }

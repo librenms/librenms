@@ -2,8 +2,8 @@
 
 @section('content')
 <x-device.page :device="$device">
-    <x-option-bar name="Neighbours" :options="$data['selections']" :selected="$data['selection']"></x-option-bar>
-@if($data['selection'] == 'list')
+    <x-option-bar name="Neighbours" :options="$selections" :selected="$selection"></x-option-bar>
+@if($selection == 'list')
     <table class="table table-hover table-condensed" id="neighbour-table">
         <thead>
             <tr>
@@ -14,7 +14,7 @@
             </tr>
         </thead>
         <tbody>
-@foreach($data['links'] as $link)
+@foreach($links as $link)
             <tr>
                 <td>
                 @if($link->port)
@@ -44,7 +44,7 @@
 @endforeach
         </tbody>
     </table>
-@elseif($data['selection'] == 'map')
+@elseif($selection == 'map')
     <div id="netmap"></div>
 
 @push('scripts')
@@ -53,7 +53,7 @@
 var network_nodes = new vis.DataSet({queue: {delay: 100}});
 var network_edges = new vis.DataSet({queue: {delay: 100}});
 
-$.post( '{{ route('maps.getdevicelinks') }}', {device: {{$device->device_id}}, link_types: @json($data['link_types'])})
+$.post( '{{ route('maps.getdevicelinks') }}', {device: {{$device->device_id}}, link_types: @json($link_types)})
     .done(function( data ) {
         var devices = [];
         $.each(data, function( link_id, link ) {
@@ -90,7 +90,7 @@ $('#netmap').height(height + 'px');
 
 // create a network
 var container = document.getElementById('netmap');
-var options = {{ Js::from($data['visoptions']) }};
+var options = {{ Js::from($visoptions) }};
 var data = {
     nodes: network_nodes,
     edges: network_edges,
@@ -101,7 +101,7 @@ var network = new vis.Network(container, data, options);
 visPopups.attach(network, {ports: true});
 network.on('click', function (properties) {
     if (properties.nodes > 0) {
-       window.location.href = {{ \Illuminate\Support\Js::from(route('device', ['device' => '__DEVICE__', 'tab' => 'neighbours', 'selection' => 'map'])) }}.replace('__DEVICE__', properties.nodes);
+       window.location.href = {{ \Illuminate\Support\Js::from(route('device.neighbours', ['device' => '__DEVICE__', 'selection' => 'map'])) }}.replace('__DEVICE__', properties.nodes);
     }
 });
 </script>
@@ -111,7 +111,7 @@ network.on('click', function (properties) {
 @endsection
 
 @section('javascript')
-@if($data['selection'] == 'map')
+@if($selection == 'map')
     <script src="{{ url('js/vis-network.min.js') }}"></script>
     <script src="{{ url('js/vis-data.min.js') }}"></script>
 @endif

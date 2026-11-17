@@ -725,7 +725,7 @@ class RoutingTabTest extends TestCase
         \App\Models\BgpPeer::factory()->for($device)->create();
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'routing']))
+            ->get(route('device.routing', ['device' => $device]))
             ->assertRedirect(route('device.routing.bgp', ['device' => $device]));
     }
 
@@ -748,7 +748,7 @@ class RoutingTabTest extends TestCase
         $device = Device::factory()->create();
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'paths']))
+            ->get(route('device.routing', ['device' => $device, 'proto' => 'mpls', 'view' => 'paths']))
             ->assertRedirect(route('device.routing.mpls', ['device' => $device, 'view' => 'paths']));
     }
 
@@ -781,7 +781,7 @@ class RoutingTabTest extends TestCase
      */
     private function assertLegacyRedirect(Device $device, string $legacyUrl, array $query, string $final): void
     {
-        $native = route('device', ['device' => $device, 'tab' => 'routing'] + $query);
+        $native = route('device.routing', ['device' => $device] + $query);
 
         $this->actingAs($this->admin())
             ->get($legacyUrl)

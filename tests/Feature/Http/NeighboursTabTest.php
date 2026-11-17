@@ -25,7 +25,7 @@ final class NeighboursTabTest extends TestCase
         $device = $this->device();
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'neighbours']))
+            ->get(route('device.neighbours', ['device' => $device]))
             ->assertOk()
             ->assertSee('neighbour.example.com')
             ->assertSee('neighbours?selection=list', false)
@@ -37,7 +37,7 @@ final class NeighboursTabTest extends TestCase
         $device = $this->device();
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'neighbours', 'selection' => 'map']))
+            ->get(route('device.neighbours', ['device' => $device, 'selection' => 'map']))
             ->assertOk()
             ->assertDontSee('neighbour.example.com')
             ->assertSee('neighbours?selection=map', false);
@@ -49,7 +49,7 @@ final class NeighboursTabTest extends TestCase
 
         $this->actingAs($this->admin())
             ->get(route('device', ['device' => $device, 'tab' => 'neighbours', 'vars' => 'selection=map']))
-            ->assertRedirect(route('device', ['device' => $device, 'tab' => 'neighbours', 'selection' => 'map']));
+            ->assertRedirect(route('device.neighbours', ['device' => $device, 'selection' => 'map']));
     }
 
     public function testInvalidSelectionIsRejected(): void
@@ -57,7 +57,7 @@ final class NeighboursTabTest extends TestCase
         $device = $this->device();
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'neighbours', 'selection' => 'bogus']))
+            ->get(route('device.neighbours', ['device' => $device, 'selection' => 'bogus']))
             ->assertSessionHasErrors('selection');
     }
 

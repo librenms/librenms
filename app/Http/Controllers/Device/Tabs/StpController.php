@@ -26,11 +26,13 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Http\Controllers\Controller;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
-class StpController implements DeviceTab
+class StpController extends Controller implements DeviceTab
 {
     public function visible(Device $device): bool
     {
@@ -52,8 +54,18 @@ class StpController implements DeviceTab
         return __('STP');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function data(Device $device, Request $request): array
     {
+        return [];
+    }
+
+    public function index(Device $device, Request $request): View
+    {
+        $this->authorize('view', $device);
+
         $request->validate([
             'vlan' => 'nullable|integer',
         ]);
@@ -69,17 +81,18 @@ class StpController implements DeviceTab
 
             return [$vlan => [
                 'text' => $vlan,
-                'link' => route('device', ['device' => $device->device_id, 'tab' => 'stp', 'vlan' => $vlan]),
+                'link' => route('device.stp', ['device' => $device->device_id, 'vlan' => $vlan]),
             ]];
         });
 
-        return [
+        return view('device.tabs.stp', [
+            'device' => $device,
             'vlans' => $vlanOptions->all(),
             'vlan' => $active_vlan,
             'device_id' => $device->device_id,
             'stpInstances' => $stpInstances->filter(fn ($instance) => $active_vlan == 1 && $instance->vlan == null || $instance->vlan == $active_vlan),
             'stpPorts' => $device->stpPorts()->where('vlan', $active_vlan)->when($active_vlan == 1, fn ($query) => $query->orWhereNull('vlan'))->exists(),
             'bootgridUrl' => url('/ajax/table/'),
-        ];
+        ]);
     }
 }

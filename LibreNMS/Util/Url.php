@@ -288,7 +288,7 @@ class Url
     {
         $vars = array_filter($vars, fn ($value) => $value !== null && $value !== '');
 
-        return route('device', ['device' => $port->device_id, 'tab' => 'port', 'vars' => $port->port_id] + $vars);
+        return route('device.port', ['device' => $port->device_id, 'port' => $port->port_id] + $vars);
     }
 
     public static function sensorUrl($sensor, $vars = [])

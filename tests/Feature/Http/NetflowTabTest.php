@@ -45,7 +45,7 @@ final class NetflowTabTest extends TestCase
         $device = Device::factory()->create(['hostname' => 'router.example.com']);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'netflow']))
+            ->get(route('device.netflow', ['device' => $device]))
             ->assertOk()
             ->assertSee('type=device_nfsen_flows', false)
             ->assertSee('nfsen=channel&amp;channel=upstream', false)
@@ -57,7 +57,7 @@ final class NetflowTabTest extends TestCase
         $device = Device::factory()->create(['hostname' => 'router.example.com']);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'netflow', 'nfsen' => 'channel', 'channel' => 'upstream']))
+            ->get(route('device.netflow', ['device' => $device, 'nfsen' => 'channel', 'channel' => 'upstream']))
             ->assertOk()
             ->assertSee('port &lt;80&gt;', false)
             ->assertSee('type=device_nfsen_channel_traffic', false)
@@ -69,7 +69,7 @@ final class NetflowTabTest extends TestCase
         $device = Device::factory()->create(['hostname' => 'router.example.com']);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'netflow', 'nfsen' => 'channel', 'channel' => '../router_example_com']))
+            ->get(route('device.netflow', ['device' => $device, 'nfsen' => 'channel', 'channel' => '../router_example_com']))
             ->assertOk()
             ->assertSee('type=device_nfsen_flows', false)
             ->assertDontSee('type=device_nfsen_channel_flows', false);
@@ -80,7 +80,7 @@ final class NetflowTabTest extends TestCase
         $device = Device::factory()->create(['hostname' => 'router.example.com']);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'netflow', 'nfsen' => 'stats', 'topN' => 50, 'lastN' => 3600, 'stattype' => 'dstport', 'statorder' => 'bogus']))
+            ->get(route('device.netflow', ['device' => $device, 'nfsen' => 'stats', 'topN' => 50, 'lastN' => 3600, 'stattype' => 'dstport', 'statorder' => 'bogus']))
             ->assertOk()
             ->assertSee('<option value="50" selected', false)
             ->assertSee('<option value="3600" selected', false)
@@ -94,7 +94,7 @@ final class NetflowTabTest extends TestCase
         $device = Device::factory()->create(['hostname' => 'router.example.com']);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'netflow', 'nfsen' => 'stats']))
+            ->get(route('device.netflow', ['device' => $device, 'nfsen' => 'stats']))
             ->assertOk()
             ->assertSee('<input type="hidden" name="nfsen" value="stats">', false)
             ->assertSee('netflow?nfsen=stats', false);
@@ -106,17 +106,7 @@ final class NetflowTabTest extends TestCase
 
         $this->actingAs($this->admin())
             ->get(route('device', ['device' => $device, 'tab' => 'netflow', 'vars' => 'nfsen=channel/channel=upstream', 'topN' => 20]))
-            ->assertRedirect(route('device', ['device' => $device, 'tab' => 'netflow', 'topN' => 20, 'nfsen' => 'channel', 'channel' => 'upstream']));
-    }
-
-    public function testLegacyPathPostIsNotRedirected(): void
-    {
-        $device = Device::factory()->create(['hostname' => 'router.example.com']);
-
-        $this->actingAs($this->admin())
-            ->post(route('device', ['device' => $device, 'tab' => 'netflow', 'vars' => 'nfsen=stats']))
-            ->assertOk()
-            ->assertSee('type=device_nfsen_flows', false);
+            ->assertRedirect(route('device.netflow', ['device' => $device, 'topN' => 20, 'nfsen' => 'channel', 'channel' => 'upstream']));
     }
 
     private function admin(): User

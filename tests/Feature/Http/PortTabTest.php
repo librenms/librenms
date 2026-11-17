@@ -27,7 +27,7 @@ final class PortTabTest extends TestCase
         $port = $this->port();
 
         $this->actingAs($this->admin())
-            ->get(Url::portUrl($port))
+            ->get(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id]))
             ->assertOk()
             ->assertSee('Real time')
             ->assertSee('Eventlog')
@@ -39,7 +39,7 @@ final class PortTabTest extends TestCase
         $port = $this->port();
 
         $this->actingAs($this->admin())
-            ->get(Url::portUrl($port, ['view' => '../../etc']))
+            ->get(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => '../../etc']))
             ->assertOk()
             ->assertSee('<span class="pagemenu-selected">', false);
     }
@@ -51,7 +51,7 @@ final class PortTabTest extends TestCase
         $admin = $this->admin();
 
         $this->actingAs($admin)
-            ->get(Url::portUrl($port, ['view' => 'notes']))
+            ->get(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => 'notes']))
             ->assertOk()
             ->assertSee('Notes*')
             ->assertDontSee('uplink <a>', false);
@@ -71,7 +71,7 @@ final class PortTabTest extends TestCase
         PortVlan::create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'vlan' => 10, 'state' => 'forwarding', 'untagged' => 0, 'baseport' => 1, 'priority' => 0, 'cost' => 4]);
 
         $this->actingAs($this->admin())
-            ->get(Url::portUrl($port, ['view' => 'vlans']))
+            ->get(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => 'vlans']))
             ->assertOk()
             ->assertSee('Users &lt;10&gt;', false)
             ->assertSee('eth2')
@@ -93,7 +93,7 @@ final class PortTabTest extends TestCase
         $port = $this->port();
 
         $this->actingAs($this->admin())
-            ->get(Url::portUrl($port))
+            ->get(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id]))
             ->assertOk()
             ->assertSee("port/$port->port_id?view=realtime", false)
             ->assertDontSee("/port=$port->port_id", false);
@@ -104,10 +104,11 @@ final class PortTabTest extends TestCase
         $port = $this->port();
 
         $this->actingAs($this->admin())
-            ->get(Url::portUrl($port, ['view' => 'realtime', 'interval' => '60']))
+            ->get(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => 'realtime', 'interval' => '60']))
             ->assertOk()
             ->assertSee('view=realtime&amp;interval=60', false)
-            ->assertViewHas('data', fn ($data) => $data['view'] == 'realtime' && $data['interval'] == '60');
+            ->assertViewHas('view', 'realtime')
+            ->assertViewHas('viewData', fn ($viewData) => $viewData['interval'] == '60');
     }
 
     public function testLegacyPathOptionsRedirectToQueryKeepingPortId(): void
@@ -116,7 +117,7 @@ final class PortTabTest extends TestCase
 
         $this->actingAs($this->admin())
             ->get('/device/device=' . $port->device_id . "/tab=port/port=$port->port_id/view=notes/")
-            ->assertRedirect(Url::portUrl($port, ['view' => 'notes']));
+            ->assertRedirect(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => 'notes']));
     }
 
     public function testLegacyPortIdRedirectsToNativePath(): void
@@ -153,7 +154,7 @@ final class PortTabTest extends TestCase
         $port = $this->port();
 
         $this->actingAs($this->admin())
-            ->get(Url::portUrl($port, ['view' => 'qos', 'show' => 'abc']))
+            ->get(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => 'qos', 'show' => 'abc']))
             ->assertSessionHasErrors('show');
     }
 
@@ -171,7 +172,7 @@ final class PortTabTest extends TestCase
         $port = $this->port();
 
         $this->actingAs($this->admin())
-            ->get(Url::portUrl($port, ['view' => ['notes']]))
+            ->get(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => ['notes']]))
             ->assertSessionHasErrors('view');
     }
 

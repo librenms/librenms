@@ -27,12 +27,14 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Facades\LibrenmsConfig;
+use App\Http\Controllers\Controller;
 use App\Models\Device;
 use App\Models\Link;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
-class NeighboursController implements DeviceTab
+class NeighboursController extends Controller implements DeviceTab
 {
     public function visible(Device $device): bool
     {
@@ -54,8 +56,18 @@ class NeighboursController implements DeviceTab
         return __('Neighbours');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function data(Device $device, Request $request): array
     {
+        return [];
+    }
+
+    public function index(Device $device, Request $request): View
+    {
+        $this->authorize('view', $device);
+
         $request->validate([
             'selection' => 'nullable|in:list,map',
         ]);
@@ -70,15 +82,15 @@ class NeighboursController implements DeviceTab
             $links = [];
         }
 
-        return [
+        return view('device.tabs.neighbours', [
             'selections' => [
                 'list' => [
                     'text' => 'List',
-                    'link' => route('device', ['device' => $device, 'tab' => 'neighbours', 'selection' => 'list']),
+                    'link' => route('device.neighbours', ['device' => $device, 'selection' => 'list']),
                 ],
                 'map' => [
                     'text' => 'Map',
-                    'link' => route('device', ['device' => $device, 'tab' => 'neighbours', 'selection' => 'map']),
+                    'link' => route('device.neighbours', ['device' => $device, 'selection' => 'map']),
                 ],
             ],
             'selection' => $selection,
@@ -86,6 +98,6 @@ class NeighboursController implements DeviceTab
             'links' => $links,
             'link_types' => LibrenmsConfig::get('network_map_items', ['xdp', 'mac']),
             'visoptions' => \LibreNMS\Util\NetworkMapOptions::networkMap(),
-        ];
+        ]);
     }
 }

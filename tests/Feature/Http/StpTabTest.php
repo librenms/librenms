@@ -25,7 +25,7 @@ final class StpTabTest extends TestCase
         $device = $this->device();
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'stp']))
+            ->get(route('device.stp', ['device' => $device]))
             ->assertOk()
             ->assertSee('proto-ten')
             ->assertDontSee('proto-twenty')
@@ -37,7 +37,7 @@ final class StpTabTest extends TestCase
         $device = $this->device();
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'stp', 'vlan' => 20]))
+            ->get(route('device.stp', ['device' => $device, 'vlan' => 20]))
             ->assertOk()
             ->assertSee('proto-twenty')
             ->assertDontSee('proto-ten');
@@ -49,7 +49,7 @@ final class StpTabTest extends TestCase
 
         $this->actingAs($this->admin())
             ->get('/device/device=' . $device->device_id . '/tab=stp/vlan=20/')
-            ->assertRedirect(route('device', ['device' => $device, 'tab' => 'stp', 'vlan' => 20]))
+            ->assertRedirect(route('device.stp', ['device' => $device, 'vlan' => 20]))
             ->assertStatus(301);
     }
 
@@ -58,7 +58,7 @@ final class StpTabTest extends TestCase
         $device = $this->device();
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'stp', 'vlan' => 'abc']))
+            ->get(route('device.stp', ['device' => $device, 'vlan' => 'abc']))
             ->assertSessionHasErrors('vlan');
     }
 

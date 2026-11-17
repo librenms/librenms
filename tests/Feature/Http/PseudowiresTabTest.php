@@ -43,7 +43,7 @@ class PseudowiresTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'pseudowires']))
+            ->get(route('device.pseudowires', ['device' => $device]))
             ->assertOk()
             ->assertSee('101')
             ->assertSee('Test-PW-101')
@@ -77,7 +77,7 @@ class PseudowiresTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $deviceA, 'tab' => 'pseudowires']))
+            ->get(route('device.pseudowires', ['device' => $deviceA]))
             ->assertOk()
             ->assertSee('200')
             ->assertSee('Local-PW-200')
@@ -101,7 +101,7 @@ class PseudowiresTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'pseudowires', 'view' => 'minigraphs']))
+            ->get(route('device.pseudowires', ['device' => $device, 'view' => 'minigraphs']))
             ->assertOk()
             ->assertSee('type=port_bits', false)
             ->assertSee('pseudowires?view=detail', false)
@@ -121,7 +121,7 @@ class PseudowiresTabTest extends TestCase
 
         $this->actingAs($this->admin())
             ->get(route('device', ['device' => $device, 'tab' => 'pseudowires', 'vars' => 'view=minigraphs']))
-            ->assertRedirect(route('device', ['device' => $device, 'tab' => 'pseudowires', 'view' => 'minigraphs']));
+            ->assertRedirect(route('device.pseudowires', ['device' => $device, 'view' => 'minigraphs']));
     }
 
     public function testInvalidViewIsRejected(): void
@@ -130,7 +130,7 @@ class PseudowiresTabTest extends TestCase
         Pseudowire::factory()->create(['device_id' => $device->device_id, 'peer_device_id' => 0]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'pseudowires', 'view' => 'bogus']))
+            ->get(route('device.pseudowires', ['device' => $device, 'view' => 'bogus']))
             ->assertSessionHasErrors('view');
     }
 
@@ -147,7 +147,7 @@ class PseudowiresTabTest extends TestCase
         $user->assignRole('user');
 
         $this->actingAs($user)
-            ->get(route('device', ['device' => $device, 'tab' => 'pseudowires']))
+            ->get(route('device.pseudowires', ['device' => $device]))
             ->assertForbidden();
     }
 }

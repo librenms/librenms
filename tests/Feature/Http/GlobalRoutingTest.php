@@ -22,7 +22,6 @@ use App\Models\User;
 use App\Models\Vrf;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\TestCase;
-use LibreNMS\Util\Url;
 use Spatie\Permission\Models\Role;
 
 class GlobalRoutingTest extends TestCase
@@ -289,7 +288,7 @@ class GlobalRoutingTest extends TestCase
             ->get(route('routing.mpls', ['view' => 'saps']))
             ->assertOk()
             ->assertSee('Customer-SAP')
-            ->assertSee(Url::portUrl($sapPort), false)
+            ->assertSee(route('device.port', ['device' => $sapPort->device_id, 'port' => $sapPort->port_id]), false)
             ->assertSee('200.1234.4095');
     }
 
