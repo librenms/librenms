@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (BITS without named bits)
 NMS-GPON-MIB  DEFINITIONS ::= BEGIN
 
 	IMPORTS
@@ -2350,7 +2351,7 @@ onuVLANProfile   OBJECT IDENTIFIER ::= { nmsGponProfile 1 }
               ::= { onuVLANProfileEntry 4 }
                  
           onuVLANProfileTrunkVlans OBJECT-TYPE
-              SYNTAX  BITS
+              SYNTAX  OCTET STRING
               ACCESS  read-write
               STATUS  mandatory
 

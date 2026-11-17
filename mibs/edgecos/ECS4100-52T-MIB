@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing comma)
 ECS4100-52T-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -10875,7 +10876,7 @@ RadiusServerEntry ::= SEQUENCE
    radiusServerKey                    DisplayString,
    radiusServerRetransmit             Integer32,
    radiusServerTimeout                Integer32,
-   radiusServerStatus                 ValidStatus
+   radiusServerStatus                 ValidStatus,
    radiusServerType                    EnabledStatus  
 }
 

@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (BITS without named bits)
 -- ZyXEL Communications Corporation
 -- Private Enterprise MIB definition
 
@@ -9665,7 +9666,7 @@ alarmTarget OBJECT-TYPE
         ::= { vdslLineConfEntry 75 }
         
         vdslLineConfSosMultiStepDs OBJECT-TYPE
-        SYNTAX 	BITS
+        SYNTAX 	OCTET STRING
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -9680,7 +9681,7 @@ alarmTarget OBJECT-TYPE
         ::= { vdslLineConfEntry 76 }
         
         vdslLineConfSosMultiStepUs OBJECT-TYPE
-        SYNTAX 	BITS
+        SYNTAX 	OCTET STRING
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -15392,7 +15393,7 @@ alarmTarget OBJECT-TYPE
 	    ::= { vdsl2LineConfProfileExtendedEntry 14 }
 	
 	    vdsl2LineProfSosMultiStepDs OBJECT-TYPE
-	    SYNTAX BITS 
+	    SYNTAX OCTET STRING 
 	    MAX-ACCESS  read-write
 	    STATUS  current
 	    DESCRIPTION
@@ -15407,7 +15408,7 @@ alarmTarget OBJECT-TYPE
 	    ::= { vdsl2LineConfProfileExtendedEntry 15 }
 	
 	    vdsl2LineProfSosMultiStepUs OBJECT-TYPE
-	    SYNTAX BITS 
+	    SYNTAX OCTET STRING 
 	    MAX-ACCESS  read-write
 	    STATUS  current
 	    DESCRIPTION
@@ -15518,7 +15519,7 @@ alarmTarget OBJECT-TYPE
 	    ::= { vdsl2LineConfProfileExtendedEntry 25 }
 
 	    vdsl2LineProfTransmissionType OBJECT-TYPE
-        SYNTAX BITS
+        SYNTAX OCTET STRING
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
