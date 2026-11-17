@@ -329,11 +329,13 @@
                                                             aria-hidden="true"></i> {{ __('Traffic Bills') }}</a></li>
                         @endCan
 
-                        @if($port_counts['pseudowire'] > 0)
-                            <li><a href="{{ url('pseudowires') }}"><i class="fa fa-arrows-alt fa-fw fa-lg"
-                                                                      aria-hidden="true"></i> {{ __('Pseudowires') }}</a>
-                            </li>
-                        @endif
+                        @can('viewAny', \App\Models\Pseudowire::class)
+                            @if($port_counts['pseudowire'] > 0)
+                                <li><a href="{{ route('pseudowires') }}"><i class="fa fa-arrows-alt fa-fw fa-lg"
+                                                                          aria-hidden="true"></i> {{ __('Pseudowires') }}</a>
+                                </li>
+                            @endif
+                        @endcan
 
                         @can('viewAny', \App\Models\Port::class)
                             <li><a href="{{ route('port-security.index') }}"><i class="fa fa-shield fa-fw fa-lg"

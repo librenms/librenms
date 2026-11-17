@@ -58,6 +58,7 @@ use App\Http\Controllers\PortGroupController;
 use App\Http\Controllers\PortGroupPortsController;
 use App\Http\Controllers\PortSecurityController;
 use App\Http\Controllers\PortTypeController;
+use App\Http\Controllers\PseudowiresController;
 use App\Http\Controllers\PushNotificationController;
 use App\Http\Controllers\QueueController;
 use App\Http\Controllers\RealtimeDataController;
@@ -169,6 +170,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('vrf', Routing\VrfController::class)->name('vrf');
         Route::get('{legacy?}', Routing\RoutingController::class)->where('legacy', '.*=.*')->name('index');
     });
+    Route::get('pseudowires', PseudowiresController::class)->name('pseudowires');
     Route::get('port-security', [PortSecurityController::class, 'index'])->name('port-security.index');
     Route::prefix('search')->group(function (): void {
         Route::get('', [SearchController::class, 'index'])->middleware('saved-filter:network-search')->name('search');
