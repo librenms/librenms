@@ -40,6 +40,8 @@ use App\Models\Processor;
 use App\Models\Transceiver;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
+use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
+use LibreNMS\Enum\SnmpStringOutput;
 use LibreNMS\Discovery\Neighbors\NeighborParser;
 use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
@@ -320,6 +322,15 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
             return $nac;
         }
 
+        // Read address octets in hex so printable bytes cannot be mistaken for text.
+        $ipOptions = SnmpQueryOptions::quickPrint();
+        $ipOptions->stringFormat = SnmpStringOutput::Hex;
+        $ipRows = SnmpQuery::options($ipOptions)
+            ->mibDir('nokia/aos7')
+            ->walk('ALCATEL-IND1-DA-MIB::alaDaMacVlanUserIpAddress')
+            ->throwIfConnectionError()
+            ->valuesByIndex();
+
         $portTimeoutRows = collect(
             SnmpQuery::mibDir('nokia/aos7')
                 ->walk('ALCATEL-IND1-DA-MIB::alaDaUNPPort8021XSuppTimeOut')
@@ -420,8 +431,11 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
 
             $ip = '0.0.0.0';
             $ipRaw = trim($ipRaw, " \"'");
+            $ipHex = $ipRows[$index]['ALCATEL-IND1-DA-MIB::alaDaMacVlanUserIpAddress'] ?? '';
 
-            if (filter_var($ipRaw, FILTER_VALIDATE_IP)) {
+            if (($hexIp = $this->decodeHexIp($ipHex)) !== null) {
+                $ip = $hexIp;
+            } elseif (filter_var($ipRaw, FILTER_VALIDATE_IP)) {
                 $ip = $ipRaw;
             } elseif (ctype_digit($ipRaw) && strlen($ipRaw) <= 10 && (float) $ipRaw <= 4294967295) {
                 // A decimal IPv4 integer must not be decoded as hexadecimal bytes.
@@ -449,11 +463,6 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
                 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserAuthServerUsed'
             ) ?? '');
 
-            $serverMessage = trim((string) ($this->rowValue(
-                $row,
-                'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserServerMessage'
-            ) ?? ''));
-
             $method = match ($authType) {
                 0 => 'mab',
                 2 => 'dot1x',
@@ -471,11 +480,6 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
                 $authStatus,
                 $unpUsed,
                 $unpFromAuthServer
-            );
-
-            $authzStatus = $this->adjustAosAuthzStatusForServerMessage(
-                $authzStatus,
-                $serverMessage
             );
 
             if ($isNoMatchingUnpBlock) {
@@ -636,30 +640,6 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
         if (
             $unpFromAuthServer !== ''
             && ($unpUsed === '' || strcasecmp($unpFromAuthServer, $unpUsed) !== 0)
-        ) {
-            return 'authzFail';
-        }
-
-        return $authzStatus;
-    }
-
-    private function adjustAosAuthzStatusForServerMessage(
-        string $authzStatus,
-        string $serverMessage
-    ): string {
-        if ($serverMessage === '' || $serverMessage === '-') {
-            return $authzStatus;
-        }
-
-        $message = strtolower($serverMessage);
-
-        if (
-            str_contains($message, 'block')
-            || str_contains($message, 'deny')
-            || str_contains($message, 'reject')
-            || str_contains($message, 'unauthor')
-            || str_contains($message, 'quarantine')
-            || str_contains($message, 'critical')
         ) {
             return 'authzFail';
         }
