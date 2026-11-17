@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\Device\Tabs\LoadBalancer\CiscoAceSource;
 use App\Http\Controllers\Device\Tabs\LoadBalancer\Data\LoadBalancerItem;
 use App\Http\Controllers\Device\Tabs\LoadBalancer\F5Source;
@@ -37,6 +38,7 @@ use Closure;
 use Illuminate\Container\Attributes\Scoped;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\View\View;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use WeakMap;
 
@@ -44,7 +46,7 @@ use WeakMap;
  * Scoped so the tab bar and the page share the sources and their counts for the same Device
  */
 #[Scoped]
-class LoadBalancerController implements DeviceTab
+class LoadBalancerController extends Controller implements DeviceTab
 {
     /** @var WeakMap<Device, LoadBalancerSource|null> */
     private WeakMap $sources;
@@ -79,6 +81,13 @@ class LoadBalancerController implements DeviceTab
      */
     public function data(Device $device, Request $request): array
     {
+        return [];
+    }
+
+    public function index(Device $device, Request $request): View
+    {
+        $this->authorize('view', $device);
+
         $link = fn (LoadBalancerSection $section, array $params = []): string => $this->link($device, $section, $params);
         $source = $this->source($device);
         $counts = $source?->counts() ?? [];
@@ -95,6 +104,7 @@ class LoadBalancerController implements DeviceTab
         $section = in_array($section, $sections, true) ? $section : reset($sections);
 
         $data = [
+            'device' => $device,
             'section' => $section ? $section->value : null,
             'options' => collect($sections)->mapWithKeys(fn (LoadBalancerSection $option) => [$option->value => [
                 'text' => $option->title() . ' (' . $counts[$option->value] . ')',
@@ -106,7 +116,7 @@ class LoadBalancerController implements DeviceTab
         ];
 
         if ($source === null || ! $section) {
-            return $data;
+            return view('device.tabs.loadbalancer', $data);
         }
 
         $items = $source->items($section);
@@ -115,14 +125,14 @@ class LoadBalancerController implements DeviceTab
         if ($item) {
             $members = $source->members($section, $item);
 
-            return [
-                'view' => 'detail',
+            return view('device.tabs.loadbalancer', [
+                'page' => 'detail',
                 'item' => $item,
                 'columns' => $source->columns($section),
                 'members' => $members->isEmpty() ? null : $this->table($device, $members, LoadBalancerSection::PoolMembers, $source->columns(LoadBalancerSection::PoolMembers), showPool: false),
                 'graphs' => $source->itemGraphs($section),
                 'graphVars' => ['id' => $item->id],
-            ] + $data;
+            ] + $data);
         }
 
         // the list can show one of the item graphs under each row
@@ -130,13 +140,13 @@ class LoadBalancerController implements DeviceTab
         $rowGraph = $request->string('graph')->value();
         $rowGraph = isset($itemGraphs[$rowGraph]) ? $rowGraph : null;
         $sorting = [
-            'sort' => $request->string('sort', 'name')->value(),
-            'order' => $request->string('order', 'asc')->value(),
+            'sort' => $request->string('sort')->value() ?: 'name',
+            'order' => $request->string('order')->value() ?: 'asc',
             'graph' => $rowGraph,
         ];
 
-        return [
-            'view' => 'list',
+        return view('device.tabs.loadbalancer', [
+            'page' => 'list',
             'table' => $this->table($device, $items, $section, $source->columns($section), $sorting),
             'rowGraph' => $rowGraph,
             'rowGraphOptions' => empty($itemGraphs) ? [] : collect(['' => 'None'] + $itemGraphs)->map(fn (string $title, string $graph) => [
@@ -144,7 +154,7 @@ class LoadBalancerController implements DeviceTab
                 'link' => $link($section, ['graph' => $graph, 'sort' => $sorting['sort'], 'order' => $sorting['order']]),
             ])->all(),
             'graphs' => $source->sectionGraphs($section),
-        ] + $data;
+        ] + $data);
     }
 
     private function source(Device $device): ?LoadBalancerSource
@@ -166,7 +176,7 @@ class LoadBalancerController implements DeviceTab
      */
     private function link(Device $device, LoadBalancerSection $section, array $params = []): string
     {
-        return route('device', ['device' => $device->device_id, 'tab' => 'loadbalancer', 'type' => $section->value] + array_filter($params));
+        return route('device.loadbalancer', ['device' => $device->device_id, 'type' => $section->value] + array_filter($params));
     }
 
     /**

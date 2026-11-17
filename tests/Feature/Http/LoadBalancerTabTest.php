@@ -28,7 +28,7 @@ final class LoadBalancerTabTest extends TestCase
     public function testTabOnlyShownWithLoadBalancerData(): void
     {
         $device = Device::factory()->create(['os' => 'f5']);
-        $tabLink = 'href="' . route('device', ['device' => $device, 'tab' => 'loadbalancer']) . '"';
+        $tabLink = 'href="' . route('device.loadbalancer', ['device' => $device]) . '"';
 
         $this->actingAs($this->admin())
             ->get(route('device', ['device' => $device, 'tab' => 'notes']))
@@ -53,7 +53,7 @@ final class LoadBalancerTabTest extends TestCase
         $this->createComponent($device, 'f5-ltm-vs', 'Disabled VS', disabled: 1);
 
         $response = $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer']))
+            ->get(route('device.loadbalancer', ['device' => $device]))
             ->assertOk()
             ->assertSeeInOrder(['Virtual Servers (2)', 'Pools (1)'])
             ->assertSee('VS &lt;1&gt;', false)
@@ -74,13 +74,13 @@ final class LoadBalancerTabTest extends TestCase
         $vs = $this->createComponent($device, 'f5-ltm-vs', 'VS 1');
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'graph' => 'device_bigip_ltm_vs_bytes']))
+            ->get(route('device.loadbalancer', ['device' => $device, 'graph' => 'device_bigip_ltm_vs_bytes']))
             ->assertOk()
             ->assertSee('type=device_bigip_ltm_vs_bytes', false)
             ->assertSee('id=' . $vs->id, false);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'graph' => 'not_a_graph']))
+            ->get(route('device.loadbalancer', ['device' => $device, 'graph' => 'not_a_graph']))
             ->assertOk()
             ->assertDontSee('type=not_a_graph', false);
     }
@@ -95,7 +95,7 @@ final class LoadBalancerTabTest extends TestCase
         $this->createComponent($device, 'f5-ltm-poolmember', 'Pool 10', ['nodename' => 'Other Node']);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'type' => 'pools', 'id' => $pool->id]))
+            ->get(route('device.loadbalancer', ['device' => $device, 'type' => 'pools', 'id' => $pool->id]))
             ->assertOk()
             ->assertSee('Pool Down Action')
             ->assertSee('Failover')
@@ -115,7 +115,7 @@ final class LoadBalancerTabTest extends TestCase
         $this->createComponent($device, 'f5-ltm-poolmember', 'Pool 1', ['nodename' => '', 'IP' => '192.0.2.6', 'port' => 80]);
 
         $response = $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'type' => 'pool-members']))
+            ->get(route('device.loadbalancer', ['device' => $device, 'type' => 'pool-members']))
             ->assertOk()
             ->assertSee('Pool Members (2)')
             ->assertSee('Node A')
@@ -133,14 +133,14 @@ final class LoadBalancerTabTest extends TestCase
         $wide = $this->createComponent($device, 'f5-gtm-wide', 'www.example.com');
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer']))
+            ->get(route('device.loadbalancer', ['device' => $device]))
             ->assertOk()
             ->assertSee('Wide IPs (1)')
             ->assertSee('type=wide-ips&amp;id=' . $wide->id, false)
             ->assertSee('type=device_bigip_gtm_allwide_requests', false);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'type' => 'wide-ips', 'id' => $wide->id]))
+            ->get(route('device.loadbalancer', ['device' => $device, 'type' => 'wide-ips', 'id' => $wide->id]))
             ->assertOk()
             ->assertSee('www.example.com')
             ->assertSee('type=device_bigip_gtm_wide_requests', false)
@@ -153,7 +153,7 @@ final class LoadBalancerTabTest extends TestCase
         $vsvr = $this->createVserver($device, ['vsvr_name' => 'web <vs>', 'vsvr_state' => 'outOfService', 'vsvr_clients' => 3]);
 
         $response = $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'graph' => 'netscalervsvr_conns']))
+            ->get(route('device.loadbalancer', ['device' => $device, 'graph' => 'netscalervsvr_conns']))
             ->assertOk()
             ->assertSee('Virtual Servers (1)')
             ->assertSee('web &lt;vs&gt;', false)
@@ -165,7 +165,7 @@ final class LoadBalancerTabTest extends TestCase
         $this->assertLabel('label-warning', 'outOfService', (string) $response->getContent());
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'id' => $vsvr->vsvr_id]))
+            ->get(route('device.loadbalancer', ['device' => $device, 'id' => $vsvr->vsvr_id]))
             ->assertOk()
             ->assertSee('Clients')
             ->assertSee('type=netscalervsvr_bits', false)
@@ -178,29 +178,36 @@ final class LoadBalancerTabTest extends TestCase
         foreach (['alpha' => [9000, 'up'], 'beta' => [100000, 'down'], 'gamma' => [20, 'outOfService']] as $name => [$bps, $state]) {
             $this->createVserver($device, ['vsvr_name' => $name, 'vsvr_bps_in' => $bps, 'vsvr_state' => $state]);
         }
-        $list = ['device' => $device, 'tab' => 'loadbalancer'];
+        $list = ['device' => $device];
 
         // traffic sorts by bps, not by its formatted text
         $this->actingAs($this->admin())
-            ->get(route('device', $list + ['sort' => 'traffic_in', 'order' => 'desc']))
+            ->get(route('device.loadbalancer', $list + ['sort' => 'traffic_in', 'order' => 'desc']))
             ->assertOk()
             ->assertSeeInOrder(['beta', 'alpha', 'gamma'])
             ->assertSee('sort=traffic_in&amp;order=asc', false)
             ->assertSee('fa-sort-down', false);
 
         $this->actingAs($this->admin())
-            ->get(route('device', $list + ['sort' => 'status', 'order' => 'desc']))
+            ->get(route('device.loadbalancer', $list + ['sort' => 'status', 'order' => 'desc']))
             ->assertOk()
             ->assertSeeInOrder(['beta', 'gamma', 'alpha']);
 
         $this->actingAs($this->admin())
-            ->get(route('device', $list + ['sort' => 'name', 'order' => 'desc', 'graph' => 'netscalervsvr_bits']))
+            ->get(route('device.loadbalancer', $list + ['sort' => 'name', 'order' => 'desc', 'graph' => 'netscalervsvr_bits']))
             ->assertOk()
             ->assertSeeInOrder(['gamma', 'beta', 'alpha'])
             ->assertSee('graph=netscalervsvr_bits&amp;sort=traffic_in&amp;order=asc', false);
 
+        // empty values arrive as null (ConvertEmptyStringsToNull) and fall back to the defaults
         $this->actingAs($this->admin())
-            ->get(route('device', $list + ['sort' => 'not-a-column']))
+            ->get(route('device.loadbalancer', $list) . '?sort=&order=')
+            ->assertOk()
+            ->assertSeeInOrder(['alpha', 'beta', 'gamma'])
+            ->assertSee('fa-sort-up', false);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.loadbalancer', $list + ['sort' => 'not-a-column']))
             ->assertOk()
             ->assertSeeInOrder(['alpha', 'beta', 'gamma'])
             ->assertDontSee('fa-sort-', false);
@@ -216,7 +223,7 @@ final class LoadBalancerTabTest extends TestCase
 
         $this->actingAs($this->admin())
             ->withSession(['preferences' => ['locale' => 'zh-CN']])
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'sort' => 'traffic_in', 'order' => 'desc']))
+            ->get(route('device.loadbalancer', ['device' => $device, 'sort' => 'traffic_in', 'order' => 'desc']))
             ->assertOk()
             ->assertSeeInOrder(['入站流量', '出站流量', 'beta', 'alpha'])
             ->assertSee('sort=traffic_in&amp;order=asc', false)
@@ -230,7 +237,7 @@ final class LoadBalancerTabTest extends TestCase
 
         DB::enableQueryLog();
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer']))
+            ->get(route('device.loadbalancer', ['device' => $device]))
             ->assertOk()
             ->assertSee('Virtual Servers (1)');
 
@@ -244,17 +251,27 @@ final class LoadBalancerTabTest extends TestCase
         LoadbalancerVserver::unguarded(fn () => LoadbalancerVserver::create(['device_id' => $device->device_id, 'classmap_id' => 7, 'classmap' => 'vip-1', 'serverstate' => 'inService']));
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'type' => 'certificates', 'id' => 999]))
+            ->get(route('device.loadbalancer', ['device' => $device, 'type' => 'certificates', 'id' => 999]))
             ->assertOk()
             ->assertSee('vip-1')
             ->assertSee('graph=vserver_bits', false);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'type' => 'virtual-servers', 'id' => 7]))
+            ->get(route('device.loadbalancer', ['device' => $device, 'type' => 'virtual-servers', 'id' => 7]))
             ->assertOk()
             ->assertSee('vip-1')
             ->assertSee('type=vserver_bits', false)
             ->assertDontSee('graph=vserver_bits', false);
+    }
+
+    public function testUserWithoutAccessIsForbidden(): void
+    {
+        $device = Device::factory()->create(['os' => 'f5']);
+        $this->createComponent($device, 'f5-ltm-vs', 'VS 1');
+
+        $this->actingAs(User::factory()->create(['enabled' => 1]))
+            ->get(route('device.loadbalancer', ['device' => $device]))
+            ->assertForbidden();
     }
 
     public function testOptionsComeFromTheQueryString(): void
@@ -263,21 +280,20 @@ final class LoadBalancerTabTest extends TestCase
         LoadbalancerVserver::unguarded(fn () => LoadbalancerVserver::create(['device_id' => $device->device_id, 'classmap_id' => 7, 'classmap' => 'vip-1', 'serverstate' => 'inService']));
         LoadbalancerRserver::unguarded(fn () => LoadbalancerRserver::create(['device_id' => $device->device_id, 'farm_id' => 'farm-1', 'StateDescr' => 'Server is now operational']));
 
-        // legacy /key=value path segments are not read
+        // legacy /key=value path segments redirect to the query string
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer']) . '/type=pools')
-            ->assertOk()
-            ->assertSee('vip-1')
-            ->assertDontSee('farm-1');
+            ->get("/device/device=$device->device_id/tab=loadbalancer/type=pools/")
+            ->assertRedirect(route('device.loadbalancer', ['device' => $device, 'type' => 'pools']))
+            ->assertStatus(301);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'type' => 'pools']))
+            ->get(route('device.loadbalancer', ['device' => $device, 'type' => 'pools']))
             ->assertOk()
             ->assertSee('farm-1')
             ->assertDontSee('vip-1');
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'id' => 'abc', 'order' => 'sideways']))
+            ->get(route('device.loadbalancer', ['device' => $device, 'id' => 'abc', 'order' => 'sideways']))
             ->assertSessionHasErrors(['id', 'order']);
     }
 
@@ -288,7 +304,7 @@ final class LoadBalancerTabTest extends TestCase
         LoadbalancerRserver::unguarded(fn () => LoadbalancerRserver::create(['device_id' => $device->device_id, 'farm_id' => 'farm-1', 'StateDescr' => 'Server is down']));
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'graph' => 'vserver_conns']))
+            ->get(route('device.loadbalancer', ['device' => $device, 'graph' => 'vserver_conns']))
             ->assertOk()
             ->assertSeeInOrder(['Virtual Servers (1)', 'Pools (1)'])
             ->assertSee('vip &lt;a&gt;', false)
@@ -296,7 +312,7 @@ final class LoadBalancerTabTest extends TestCase
             ->assertSee('id=7', false);
 
         $response = $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'type' => 'pools']))
+            ->get(route('device.loadbalancer', ['device' => $device, 'type' => 'pools']))
             ->assertOk()
             ->assertSee('farm-1')
             ->assertSee('graph=rserver_curr', false)

@@ -91,13 +91,13 @@ class LegacyPageEscapingTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'vars' => 'type=ltm_vs']))
+            ->get(route('device.loadbalancer', ['device' => $device, 'type' => 'virtual-servers']))
             ->assertOk()
             ->assertDontSee(self::PAYLOAD, false)
             ->assertSee(self::ESCAPED, false);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'vars' => "type=ltm_vs/subtype=ltm_vs_det/vsid=$vs->id"]))
+            ->get(route('device.loadbalancer', ['device' => $device, 'type' => 'virtual-servers', 'id' => $vs->id]))
             ->assertOk()
             ->assertDontSee(self::PAYLOAD, false)
             ->assertSee(self::ESCAPED, false);

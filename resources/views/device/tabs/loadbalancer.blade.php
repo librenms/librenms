@@ -2,15 +2,15 @@
 
 @section('content')
 <x-device.page :device="$device">
-    <x-option-bar :name="__('Load Balancer')" :options="$data['options']" :selected="$data['section']" />
+    <x-option-bar :name="__('Load Balancer')" :options="$options" :selected="$section" />
 
-    @isset($data['view'])
-        @include('device.tabs.loadbalancer.' . $data['view'], $data)
+    @isset($page)
+        @include('device.tabs.loadbalancer.' . $page)
     @endisset
 
-    @foreach($data['graphs'] as $graphType => $graphTitle)
+    @foreach($graphs as $graphType => $graphTitle)
         <x-panel :title="__($graphTitle)">
-            <x-graph-row :type="$graphType" :device="$device" :vars="$data['graphVars']" columns="responsive" />
+            <x-graph-row :type="$graphType" :device="$device" :vars="$graphVars" columns="responsive" />
         </x-panel>
     @endforeach
 </x-device.page>
