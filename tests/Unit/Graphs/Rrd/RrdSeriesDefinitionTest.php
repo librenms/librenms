@@ -197,7 +197,7 @@ class RrdSeriesDefinitionTest extends TestCase
         $this->rrdFiles->shouldReceive('pathFor')->with($this->metric)->andReturn(null);
 
         $this->expectException(NoGraphData::class);
-        $this->expectExceptionMessage('No Data files');
+        $this->expectExceptionMessageIsOrContains('No Data files');
 
         $this->build(['a' => new DataSeries($this->metric, 'a', 'A')]);
     }
