@@ -64,19 +64,11 @@
                                 <span class="tw:rounded-full tw:bg-gray-100 tw:px-2.5 tw:py-0.5 tw:text-sm tw:font-medium tw:text-gray-600 tw:dark:bg-dark-gray-300 tw:dark:text-dark-white-200" x-text="results?.length"></span>
                             </div>
 
-                            <ul x-show="results?.length" class="tw:m-0 tw:list-none tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200 tw:bg-white tw:p-0 tw:dark:border-dark-gray-200 tw:dark:bg-dark-gray-400">
+                            <ul x-show="results?.length" class="tw:m-0 tw:grid tw:list-none tw:grid-cols-1 tw:gap-x-8 tw:gap-y-2 tw:p-0 tw:sm:grid-cols-2 tw:lg:grid-cols-3">
                                 <template x-for="(result, index) in results ?? []" :key="index">
-                                    <li class="tw:flex tw:items-center tw:gap-3 tw:border-b tw:border-gray-200 tw:px-4 tw:py-3 tw:last:border-b-0 tw:dark:border-dark-gray-200">
-                                        <i class="fa fa-file-text-o tw:shrink-0 tw:text-gray-400 tw:dark:text-dark-white-400" aria-hidden="true"></i>
-                                        <span class="tw:min-w-0 tw:flex-1 tw:break-all tw:font-mono tw:font-medium tw:text-gray-800 tw:dark:text-dark-white-100">
-                                            <a x-show="result.url" x-bind:href="result.url" x-text="result.name" class="tw:text-blue-700 tw:hover:underline tw:dark:text-blue-400"></a>
-                                            <span x-show="! result.url" x-text="result.name"></span>
-                                        </span>
-                                        <a x-show="result.url" x-bind:href="result.url" class="tw:flex tw:shrink-0 tw:items-center tw:gap-2 tw:rounded tw:px-2 tw:py-1 tw:text-blue-700 tw:hover:bg-blue-50 tw:hover:no-underline tw:focus-visible:outline-2 tw:focus-visible:outline-offset-2 tw:focus-visible:outline-blue-500 tw:dark:text-blue-400 tw:dark:hover:bg-dark-gray-300">
-                                            <span class="tw:hidden tw:sm:inline">{{ __('View config') }}</span>
-                                            <i class="fa fa-angle-right" aria-hidden="true"></i>
-                                            <span class="sr-only" x-text="@js(__('View config for')) + ' ' + result.name"></span>
-                                        </a>
+                                    <li class="tw:min-w-0 tw:wrap-anywhere tw:py-1">
+                                        <a x-show="result.url" x-bind:href="result.url" x-text="result.name" class="tw:font-semibold tw:hover:underline"></a>
+                                        <span x-show="! result.url" x-text="result.name" class="tw:text-gray-700 tw:dark:text-dark-white-200"></span>
                                     </li>
                                 </template>
                             </ul>
