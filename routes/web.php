@@ -316,9 +316,10 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('alerts/{vars?}', [Device\Tabs\FaultsController::class, 'legacy'])->where('vars', '.*')->name('faults.legacy');
         Route::get('alert-stats', [Device\Tabs\FaultsController::class, 'legacy']);
         Route::redirect('logs', 'logs/eventlog')->name('logs');
-        Route::get('logs/eventlog', Device\Tabs\EventlogController::class)->middleware('saved-filter:device.eventlog')->name('eventlog');
-        Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
+        Route::get('logs/eventlog', [LogController::class, 'eventlog'])->middleware('saved-filter:device.eventlog')->name('eventlog');
+        Route::get('logs/graylog', [LogController::class, 'graylog'])->name('graylog');
         Route::get('logs/outages', Device\Tabs\OutagesController::class)->name('outages');
+        Route::get('logs/syslog', [LogController::class, 'syslog'])->middleware('saved-filter:device.syslog')->name('syslog');
         Route::get('graphs', [Device\Tabs\GraphsController::class, 'index'])->name('graphs')->whereNumber('device');
         Route::get('health', [Device\Tabs\HealthController::class, 'index'])->name('health')->whereNumber('device');
         Route::get('loadbalancer', [Device\Tabs\LoadBalancerController::class, 'index'])->name('loadbalancer')->whereNumber('device');
@@ -332,7 +333,6 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('stp', [Device\Tabs\StpController::class, 'index'])->name('stp')->whereNumber('device');
         Route::get('wireless', [Device\Tabs\WirelessController::class, 'index'])->name('wireless')->whereNumber('device');
         Route::get('routing', [Device\Tabs\RoutingController::class, 'index'])->name('routing')->whereNumber('device');
-        Route::get('logs/syslog', Device\Tabs\SyslogController::class)->middleware('saved-filter:device.syslog')->name('syslog');
         Route::prefix('routing')->name('routing.')->group(function (): void {
             Route::get('bgp', Device\Tabs\Routing\BgpController::class)->name('bgp');
             Route::get('cef', Device\Tabs\Routing\CefController::class)->name('cef');

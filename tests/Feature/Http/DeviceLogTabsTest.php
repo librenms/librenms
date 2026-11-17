@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Js;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class DeviceLogTabsTest extends TestCase
@@ -60,6 +61,22 @@ class DeviceLogTabsTest extends TestCase
         $this->actingAs($this->admin())
             ->get(route('device.graylog', ['device' => $device]))
             ->assertOk();
+    }
+
+    public function testDeviceLogPagesRequireDeviceAccess(): void
+    {
+        $device = Device::factory()->create();
+        $user = User::factory()->create(['enabled' => 1])->givePermissionTo(
+            Permission::findOrCreate('eventlog.viewAll'),
+            Permission::findOrCreate('syslog.viewAll'),
+        );
+
+        $this->actingAs($user);
+
+        foreach (['eventlog', 'syslog', 'graylog'] as $page) {
+            $this->get(route($page))->assertOk();
+            $this->get(route('device.' . $page, $device))->assertForbidden();
+        }
     }
 
     public function testGraylogPreselectsTheFilteredDevice(): void

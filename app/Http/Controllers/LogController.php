@@ -11,21 +11,34 @@ use Illuminate\Http\Request;
 
 class LogController extends Controller
 {
-    public function eventlog(Request $request): View
+    public function eventlog(Request $request, ?Device $device = null): View
     {
-        $this->authorize('viewAny', Eventlog::class);
+        $this->authorizeLogPage(Eventlog::class, $device);
 
-        $request->validate(Eventlog::filterValidationRules());
+        $request->validate([
+            ...($device ? ['port' => 'nullable|int'] : []),
+            ...Eventlog::filterValidationRules(),
+        ]);
 
-        return view('logs.eventlog', [
-            'filter' => $request->array('filter'),
-            'filterFields' => Eventlog::filterFieldDefinitions(),
+        $filter = $request->array('filter');
+        if ($device && $request->filled('port')) {
+            // Only an explicit query parameter overrides the port shortcut.
+            parse_str($request->getQueryString() ?? '', $query);
+            if (! array_key_exists('filter', $query)) {
+                $filter = ['port' => ['eq' => $request->integer('port')]];
+            }
+        }
+
+        return view($device ? 'device.tabs.logs.eventlog' : 'logs.eventlog', [
+            'device' => $device,
+            'filter' => $filter,
+            'filterFields' => Eventlog::filterFieldDefinitions($device),
         ]);
     }
 
-    public function syslog(Request $request): View
+    public function syslog(Request $request, ?Device $device = null): View
     {
-        $this->authorize('viewAny', Syslog::class);
+        $this->authorizeLogPage(Syslog::class, $device);
 
         $request->validate([
             'from' => 'nullable|date_or_relative',
@@ -33,9 +46,10 @@ class LogController extends Controller
             ...Syslog::filterValidationRules(),
         ]);
 
-        return view('logs.syslog', [
+        return view($device ? 'device.tabs.logs.syslog' : 'logs.syslog', [
+            'device' => $device,
             'filter' => $request->array('filter'),
-            'filterFields' => Syslog::filterFieldDefinitions(),
+            'filterFields' => Syslog::filterFieldDefinitions(withDevice: $device === null),
             'from' => $request->string('from')->value(),
             'to' => $request->string('to')->value(),
         ]);
@@ -57,26 +71,35 @@ class LogController extends Controller
         return to_route('syslog')->with('syslogCleared', true);
     }
 
-    public function graylog(Request $request): View
+    public function graylog(Request $request, ?Device $device = null): View
     {
-        $this->authorize('viewAny', Syslog::class); // Graylog replaces syslog
+        $this->authorizeLogPage(Syslog::class, $device); // Graylog replaces syslog
 
         $request->validate([
-            'device' => 'nullable|int',
+            ...($device ? [] : ['device' => 'nullable|int']),
             'stream' => 'nullable|alpha_num',
             'range' => 'nullable|int',
             'loglevel' => 'nullable|int|min:0|max:7',
         ]);
 
-        return view('logs.graylog', [
-            'device' => $this->device($request),
+        return view($device ? 'device.tabs.logs.graylog' : 'logs.graylog', [
+            'device' => $device ?? $this->requestedDevice($request),
             'stream' => $request->string('stream')->value(),
             'range' => $request->integer('range'),
             'loglevel' => $request->filled('loglevel') ? $request->integer('loglevel') : null,
         ]);
     }
 
-    private function device(Request $request): ?Device
+    private function authorizeLogPage(string $model, ?Device $device): void
+    {
+        if ($device) {
+            $this->authorize('view', $device);
+        }
+
+        $this->authorize('viewAny', $model);
+    }
+
+    private function requestedDevice(Request $request): ?Device
     {
         return $request->filled('device')
             ? Device::hasAccess($request->user())->find($request->integer('device'))

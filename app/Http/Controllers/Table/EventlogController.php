@@ -55,27 +55,11 @@ class EventlogController extends TableController
         ];
     }
 
-    public function searchFields(Request $request): array
-    {
-        return ['message'];
-    }
-
-    /**
-     * Also match interface events by the label (ifName, ifAlias, ifDescr) of their port.
-     */
-    protected function search(?string $search, Builder $query, array $fields): Builder
-    {
-        return $search ? $query->applyFilters(['search' => ['contains' => $search]]) : $query;
-    }
-
     protected function filterFields(Request $request): array
     {
         return [
             'device_id' => 'device',
             'type' => 'eventtype',
-            'port' => function (Builder $query, int $port_id): void {
-                $query->applyFilters(['port' => ['eq' => $port_id]]);
-            },
         ];
     }
 
@@ -94,6 +78,8 @@ class EventlogController extends TableController
         return Eventlog::hasAccess($request->user())
             ->with('device')
             ->when($request->array('filter'), fn ($query, $filters) => $query->applyFilters($filters))
+            ->when($request->input('searchPhrase'), fn ($query, $search) => $query->applyFilters(['search' => ['contains' => $search]]))
+            ->when($request->filled('port'), fn ($query) => $query->applyFilters(['port' => ['eq' => $request->integer('port')]]))
             ->when($request->device_group, function ($query) use ($request): void {
                 $query->inDeviceGroup($request->device_group);
             })

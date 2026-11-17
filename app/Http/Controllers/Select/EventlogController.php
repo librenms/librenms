@@ -63,7 +63,7 @@ class EventlogController extends SelectController
      */
     protected function searchFields(Request $request): array
     {
-        return [$request->input('field')];
+        return ['type'];
     }
 
     /**
@@ -73,8 +73,7 @@ class EventlogController extends SelectController
     {
         $this->authorize('viewAny', Eventlog::class);
 
-        $query = Eventlog::hasAccess($request->user())
-            ->select($request->input('field'))->distinct();
+        $query = Eventlog::hasAccess($request->user())->distinct();
 
         if ($device_id = $request->input('device')) {
             $query->where('device_id', $device_id);
