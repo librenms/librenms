@@ -4,100 +4,109 @@
 
 @section('content')
 <div class="container-fluid" x-data="alertTransports(@js($templates))">
-    <x-panel>
-        <x-slot:heading class="tw:flex tw:items-center tw:justify-between">
-            <h3 class="panel-title">
-                {{ __('Alert Transports') }}
-                <a href="https://docs.librenms.org/Alerting/Transports/" target="_blank" rel="noopener" title="{{ __('Docs') }}"><i class="fa fa-book" aria-hidden="true"></i></a>
-            </h3>
-            @can('create', \App\Models\AlertTransport::class)
-                <button type="button" class="btn btn-primary btn-sm" x-on:click="editTransport(null)">{{ __('Create alert transport') }}</button>
-            @endcan
-        </x-slot:heading>
-        <x-slot:table>
-            <div class="table-responsive">
-                <table class="table table-hover table-condensed">
-                    <thead>
-                        <tr>
-                            <th>{{ __('Transport Name') }}</th>
-                            <th>{{ __('Transport Type') }}</th>
-                            <th>{{ __('Default') }}</th>
-                            <th>{{ __('Details') }}</th>
-                            <th class="tw:w-36">{{ __('Action') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($transports as $transport)
-                        @php($instance = $transport->instance())
-                        <tr id="transport-{{ $transport->transport_id }}">
-                            <td>{{ $transport->transport_name }}</td>
-                            <td>{{ $instance->name() }}</td>
-                            <td>{{ $transport->is_default ? __('Yes') : __('No') }}</td>
-                            <td class="col-sm-4"><i>{!! nl2br(e($instance->displayDetails())) !!}</i></td>
-                            <td>
-                                <div class="btn-group btn-group-sm" role="group">
-                                    @can('update', $transport)
-                                        <button type="button" class="btn btn-primary btn-sm" x-on:click="editTransport({{ $transport->transport_id }})" title="{{ __('Edit transport') }}"><i class="fa fa-lg fa-pencil" aria-hidden="true"></i></button>
-                                    @endcan
-                                    @can('delete', $transport)
-                                        <button type="button" class="btn btn-danger btn-sm" x-on:click="confirmDelete(route('alert-transports.destroy', {transport: {{ $transport->transport_id }}}))" title="{{ __('Delete transport') }}"><i class="fa fa-lg fa-trash" aria-hidden="true"></i></button>
-                                    @endcan
-                                    @can('update', $transport)
-                                        <button type="button" class="btn btn-warning btn-sm" x-on:click="test({{ $transport->transport_id }}, @js($transport->transport_name))" title="{{ __('Test transport') }}"><i class="fa fa-lg fa-check" aria-hidden="true"></i></button>
-                                    @endcan
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </x-slot:table>
-    </x-panel>
-
-    <x-panel>
-        <x-slot:heading class="tw:flex tw:items-center tw:justify-between">
-            <h3 class="panel-title">{{ __('Transport Groups') }}</h3>
-            @can('create', \App\Models\AlertTransportGroup::class)
-                <button type="button" class="btn btn-primary btn-sm" x-on:click="editGroup(null)">{{ __('Create transport group') }}</button>
-            @endcan
-        </x-slot:heading>
-        <x-slot:table>
-            <div class="table-responsive">
-                <table class="table table-hover table-condensed">
-                    <thead>
-                        <tr>
-                            <th>{{ __('Transport Group') }}</th>
-                            <th>{{ __('Members') }}</th>
-                            <th class="tw:w-36">{{ __('Action') }}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($groups as $group)
-                        <tr id="transport-group-{{ $group->transport_group_id }}">
-                            <td>{{ $group->transport_group_name }}</td>
-                            <td>
-                                @foreach($group->transports as $member)
-                                    <i>{{ ucfirst((string) $member->transport_type) }}: {{ $member->transport_name }}</i><br>
-                                @endforeach
-                            </td>
-                            <td>
-                                <div class="btn-group btn-group-sm" role="group">
-                                    @can('update', $group)
-                                        <button type="button" class="btn btn-primary btn-sm" x-on:click="editGroup({{ $group->transport_group_id }})" title="{{ __('Edit transport group') }}"><i class="fa fa-lg fa-pencil" aria-hidden="true"></i></button>
-                                    @endcan
-                                    @can('delete', $group)
-                                        <button type="button" class="btn btn-danger btn-sm" x-on:click="confirmDelete(route('alert-transport-groups.destroy', {alert_transport_group: {{ $group->transport_group_id }}}))" title="{{ __('Delete transport group') }}"><i class="fa fa-lg fa-trash" aria-hidden="true"></i></button>
-                                    @endcan
-                                </div>
-                            </td>
-                        </tr>
-                    @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </x-slot:table>
-    </x-panel>
+    <x-tabs :active="$tab" x-on:tab-change="selectTab($event.detail)">
+        <x-tab :name="__('Transports') . ' (' . $transports->count() . ')'" value="transports">
+            <x-panel>
+                <x-slot:heading class="tw:flex tw:items-center tw:justify-between">
+                    <h3 class="panel-title">
+                        {{ __('Alert Transports') }}
+                        <a href="https://docs.librenms.org/Alerting/Transports/" target="_blank" rel="noopener" title="{{ __('Docs') }}"><i class="fa fa-book" aria-hidden="true"></i></a>
+                    </h3>
+                    @can('create', \App\Models\AlertTransport::class)
+                        <button type="button" class="btn btn-primary btn-sm" x-on:click="editTransport(null)">{{ __('Create alert transport') }}</button>
+                    @endcan
+                </x-slot:heading>
+                <x-slot:table>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>{{ __('Transport Name') }}</th>
+                                    <th>{{ __('Transport Type') }}</th>
+                                    <th>{{ __('Default') }}</th>
+                                    <th>{{ __('Details') }}</th>
+                                    <th>{{ __('Action') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @forelse($transports as $transport)
+                                @php($instance = $transport->instance())
+                                <tr id="transport-{{ $transport->transport_id }}">
+                                    <td>{{ $transport->transport_name }}</td>
+                                    <td>{{ $instance->name() }}</td>
+                                    <td>@if($transport->is_default)<span class="label label-primary">{{ __('Default') }}</span>@endif</td>
+                                    <td class="tw:wrap-anywhere"><i>{!! nl2br(e($instance->displayDetails())) !!}</i></td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm tw:inline-flex" role="group">
+                                            @can('update', $transport)
+                                                <button type="button" class="btn btn-primary btn-sm" x-on:click="editTransport({{ $transport->transport_id }})" title="{{ __('Edit transport') }}"><i class="fa fa-lg fa-pencil" aria-hidden="true"></i></button>
+                                            @endcan
+                                            @can('delete', $transport)
+                                                <button type="button" class="btn btn-danger btn-sm" x-on:click="confirmDelete(route('alert-transports.destroy', {transport: {{ $transport->transport_id }}}), @js($transport->transport_name))" title="{{ __('Delete transport') }}"><i class="fa fa-lg fa-trash" aria-hidden="true"></i></button>
+                                            @endcan
+                                            @can('update', $transport)
+                                                <button type="button" class="btn btn-warning btn-sm" x-on:click="test({{ $transport->transport_id }}, @js($transport->transport_name))" title="{{ __('Test transport') }}"><i class="fa fa-lg fa-check" aria-hidden="true"></i></button>
+                                            @endcan
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="5" class="tw:text-center tw:italic">{{ __('No alert transports configured') }}</td></tr>
+                            @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </x-slot:table>
+            </x-panel>
+        </x-tab>
+        <x-tab :name="__('Groups') . ' (' . $groups->count() . ')'" value="groups">
+            <x-panel>
+                <x-slot:heading class="tw:flex tw:items-center tw:justify-between">
+                    <h3 class="panel-title">{{ __('Transport Groups') }}</h3>
+                    @can('create', \App\Models\AlertTransportGroup::class)
+                        <button type="button" class="btn btn-primary btn-sm" x-on:click="editGroup(null)">{{ __('Create transport group') }}</button>
+                    @endcan
+                </x-slot:heading>
+                <x-slot:table>
+                    <div class="table-responsive">
+                        <table class="table table-hover table-condensed">
+                            <thead>
+                                <tr>
+                                    <th>{{ __('Transport Group') }}</th>
+                                    <th>{{ __('Members') }}</th>
+                                    <th>{{ __('Action') }}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            @forelse($groups as $group)
+                                <tr id="transport-group-{{ $group->transport_group_id }}">
+                                    <td>{{ $group->transport_group_name }}</td>
+                                    <td>
+                                        @foreach($group->transports as $member)
+                                            <i>{{ $member->instance()->name() }}: {{ $member->transport_name }}</i><br>
+                                        @endforeach
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm tw:inline-flex" role="group">
+                                            @can('update', $group)
+                                                <button type="button" class="btn btn-primary btn-sm" x-on:click="editGroup({{ $group->transport_group_id }})" title="{{ __('Edit transport group') }}"><i class="fa fa-lg fa-pencil" aria-hidden="true"></i></button>
+                                            @endcan
+                                            @can('delete', $group)
+                                                <button type="button" class="btn btn-danger btn-sm" x-on:click="confirmDelete(route('alert-transport-groups.destroy', {alert_transport_group: {{ $group->transport_group_id }}}), @js($group->transport_group_name))" title="{{ __('Delete transport group') }}"><i class="fa fa-lg fa-trash" aria-hidden="true"></i></button>
+                                            @endcan
+                                        </div>
+                                    </td>
+                                </tr>
+                            @empty
+                                <tr><td colspan="3" class="tw:text-center tw:italic">{{ __('No transport groups configured') }}</td></tr>
+                            @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </x-slot:table>
+            </x-panel>
+        </x-tab>
+    </x-tabs>
 
     <x-modal show="transportOpen" maxWidth="2xl">
         <x-slot:heading>
@@ -123,9 +132,7 @@
             </div>
             <div class="form-group">
                 <div class="col-sm-offset-3 col-sm-9">
-                    <div class="checkbox">
-                        <label><input type="checkbox" x-model="transport.is_default"> {{ __('Default alert transport') }}</label>
-                    </div>
+                    <x-toggle model="transport.is_default" size="sm" :label="__('Default alert transport')" />
                 </div>
             </div>
 
@@ -139,7 +146,9 @@
                                 <div class="col-sm-9">
                                     @switch($field['type'])
                                         @case('checkbox')
-                                            <input type="checkbox" id="{{ $id }}" x-model="transport.config[@js($field['name'])]">
+                                            <div class="tw:pt-2">
+                                                <x-toggle :id="$id" :model="'transport.config[' . Js::from($field['name']) . ']'" size="sm" />
+                                            </div>
                                             @break
                                         @case('select')
                                             <select id="{{ $id }}" class="form-control" x-model="transport.config[@js($field['name'])]">
@@ -192,7 +201,7 @@
     </x-modal>
 
     <x-modal show="deleteUrl" :title="__('Confirm Delete')" maxWidth="md">
-        <p>{{ __('If you would like to remove this then please click Delete.') }}</p>
+        <p x-text="@js(__('Delete :name?')).replace(':name', deleteName)"></p>
         <x-slot:footer>
             <button type="button" class="btn btn-default" x-on:click="deleteUrl = null">{{ __('Cancel') }}</button>
             <button type="button" class="btn btn-danger" x-on:click="destroy()" x-bind:disabled="saving">{{ __('Delete') }}</button>
@@ -209,6 +218,7 @@
             groupOpen: false,
             saving: false,
             deleteUrl: null,
+            deleteName: '',
             transport: {config: {}},
             group: {},
 
@@ -286,8 +296,15 @@
                 request.then((response) => this.done(response)).catch(() => {});
             },
 
-            confirmDelete(url) {
+            confirmDelete(url, name) {
                 this.deleteUrl = url;
+                this.deleteName = name;
+            },
+
+            selectTab(tab) {
+                const url = new URL(window.location);
+                url.searchParams.set('tab', tab);
+                history.replaceState(null, '', url);
             },
 
             destroy() {

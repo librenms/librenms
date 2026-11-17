@@ -21,14 +21,16 @@ use LibreNMS\Util\Exceptions;
 
 class AlertTransportController extends Controller
 {
-    public function index(): View
+    public function index(Request $request): View
     {
         $this->authorize('viewAny', AlertTransport::class);
+        $this->validate($request, ['tab' => Rule::in(['transports', 'groups'])]);
 
         $types = Transport::list();
         asort($types);
 
         return view('alert-transports.index', [
+            'tab' => $request->string('tab', 'transports'),
             'transports' => AlertTransport::orderBy('transport_name')->get(),
             'groups' => AlertTransportGroup::with(['transports' => fn ($query) => $query->orderBy('transport_name')])->orderBy('transport_group_name')->get(),
             'types' => $types,

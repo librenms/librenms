@@ -38,6 +38,49 @@ final class AlertTransportControllerTest extends TestCase
             ->assertSee('Mail: Ops &lt;Mail&gt;', false);
     }
 
+    public function testIndexShowsGroupMemberTypeNameAndSkipsEmptyDetails(): void
+    {
+        $transport = AlertTransport::factory()->api(body: '', password: '')->create(['transport_name' => 'Webhook']);
+        $group = new AlertTransportGroup(['transport_group_name' => 'Hooks']);
+        $group->save();
+        $group->transports()->attach($transport);
+
+        $this->actingAs($this->admin())
+            ->get(route('alert-transports.index'))
+            ->assertOk()
+            ->assertSee('API: Webhook')
+            ->assertSee('API URL: https://librenms.org')
+            ->assertDontSee('Auth Username:')
+            ->assertDontSee('Auth Password:');
+    }
+
+    public function testIndexEmptyStates(): void
+    {
+        AlertTransportGroup::query()->delete();
+        AlertTransport::query()->delete();
+
+        $this->actingAs($this->admin())
+            ->get(route('alert-transports.index'))
+            ->assertOk()
+            ->assertSee('No alert transports configured')
+            ->assertSee('No transport groups configured');
+    }
+
+    public function testIndexSelectsTab(): void
+    {
+        $this->actingAs($this->admin())
+            ->get(route('alert-transports.index', ['tab' => 'groups']))
+            ->assertOk()
+            ->assertSee("activeTab: 'groups'", false);
+    }
+
+    public function testIndexRejectsInvalidTab(): void
+    {
+        $this->actingAs($this->admin())
+            ->get(route('alert-transports.index', ['tab' => 'bogus']))
+            ->assertSessionHasErrors('tab');
+    }
+
     #[TestWith(['view'])]
     #[TestWith(['update'])]
     public function testShowAllowsViewOrUpdatePermission(string $permission): void

@@ -115,7 +115,11 @@ abstract class Transport implements TransportInterface
             }
 
             $val = $this->config[$item['name']] ?? '';
-            if ($item['type'] == 'password') {
+            if ($item['type'] == 'checkbox') {
+                $val = in_array($val, [true, 'on'], true) ? __('Yes') : __('No');
+            } elseif ($val === '') {
+                continue; // skip unset fields
+            } elseif ($item['type'] == 'password') {
                 $val = '********';
             } elseif ($item['type'] == 'select') {
                 // Match value to key name for select inputs
