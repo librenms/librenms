@@ -13,6 +13,14 @@ final class UrlTest extends TestCase
         $this->assertSame(url('plugin/v1') . '/', Url::generate(['page' => 'plugin/v1', 'opt' => 'x']));
     }
 
+    public function testDeviceUrlUsesRoutedTabs(): void
+    {
+        $this->assertSame(route('device.graphs', ['device' => 4, 'group' => 'poller']), Url::deviceUrl(4, ['tab' => 'graphs', 'group' => 'poller', 'empty' => '']));
+        $this->assertSame(route('device.health', ['device' => 4]), Url::deviceUrl(4, ['tab' => 'health']));
+        $this->assertSame(route('device', [4, 'apps']) . '/app=nginx/', Url::deviceUrl(4, ['tab' => 'apps', 'app' => 'nginx']));
+        $this->assertSame(route('device', [4]), Url::deviceUrl(4));
+    }
+
     public function testGenerateEncodesPage(): void
     {
         $url = Url::generate(['page' => "x';alert(1);//\"><img>", 'device' => 1]);

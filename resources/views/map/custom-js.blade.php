@@ -732,7 +732,7 @@
                             menuItems.push({
                                 icon: 'fa-solid fa-chart-area',
                                 label: "{{ __('View Graphs') }}",
-                                action: function () { window.location.href = (self.baseUrl || '') + 'device/' + node.device_id + '/tab=graphs/'; }
+                                action: function () { window.location.href = (self.baseUrl || '') + 'device/' + node.device_id + '/graphs'; }
                             });
                             if (node.label) {
                                 menuItems.push({

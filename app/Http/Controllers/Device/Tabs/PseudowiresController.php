@@ -71,7 +71,7 @@ class PseudowiresController extends Controller implements DeviceTab
             'view' => 'nullable|in:detail,minigraphs',
         ]);
 
-        $view = $request->string('view', 'detail')->value();
+        $view = $request->string('view')->value() ?: 'detail';
 
         $pseudowires = $device->pseudowires()
             ->with(['port', 'peerDevice'])

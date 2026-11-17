@@ -134,6 +134,17 @@ class PseudowiresTabTest extends TestCase
             ->assertSessionHasErrors('view');
     }
 
+    public function testEmptyViewDefaultsToDetail(): void
+    {
+        $device = Device::factory()->create();
+        Pseudowire::factory()->create(['device_id' => $device->device_id, 'peer_device_id' => 0]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.pseudowires', ['device' => $device]) . '?view=')
+            ->assertOk()
+            ->assertViewHas('view', 'detail');
+    }
+
     public function testUserWithoutDeviceAccessGetsForbidden(): void
     {
         $device = Device::factory()->create();
