@@ -61,10 +61,11 @@ class Aos7PoeTest extends TestCase
     {
         $device = ['os' => 'aos7'];
         $port_id = 71;
-        $ifName = '1/1/1';
-        $this_port = ['alaPethPsePortPowerMaximum' => '95000', 'alaPethPsePortPowerActual' => '0'];
+        // The outer polling loop may still contain the previous port's name.
+        $ifName = '1/1/2';
+        $this_port = ['ifName' => '1/1/1', 'alaPethPsePortPowerMaximum' => '95000', 'alaPethPsePortPowerActual' => '0'];
         $datastore = \Mockery::mock();
-        $datastore->shouldReceive('put')->once()->with($device, 'poe', \Mockery::on(fn ($tags) => $tags['ifName'] === $ifName), [
+        $datastore->shouldReceive('put')->once()->with($device, 'poe', \Mockery::on(fn ($tags) => $tags['ifName'] === '1/1/1'), [
             'PortPwrAllocated' => null,
             'PortPwrAvailable' => '95000',
             'PortConsumption' => '0',

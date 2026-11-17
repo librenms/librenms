@@ -21,7 +21,7 @@ if ($device['os'] == 'aos7') {
             'PortMaxPwrDrawn' => null,
         ];
 
-        $tags = ['ifName' => $ifName, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
+        $tags = ['ifName' => $this_port['ifName'] ?? null, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
         app('Datastore')->put($device, 'poe', $tags, $fields);
         echo 'PoE(AOS7) ';
     }
