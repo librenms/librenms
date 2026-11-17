@@ -620,7 +620,7 @@
                             </a></li>
                         @endcan
                         @can('viewAny', \App\Models\AlertTemplate::class)
-                        <li><a href="{{ url('templates') }}"><i class="fa fa-file fa-fw fa-lg"
+                        <li><a href="{{ route('alert-templates.index') }}"><i class="fa fa-file fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Alert Templates') }}</a>
                         </li>
                         @endcan
