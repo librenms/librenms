@@ -13,7 +13,6 @@ unit of each value:
 | ccq         | %           | WirelessCcqDiscovery         | The Client Connection Quality                                                                   |
 | channel     | count       | WirelessChannelDiscovery     | The channel, use of frequency is preferred                                                      |
 | cell        | count       | WirelessCellDiscovery        | The cell in a multicell technology                                                              |
-| cqi         | count       | WirelessCqiDiscovery         | The Channel Quality Indicator a cellular modem reports to the base station                      |
 | clients     | count       | WirelessClientsDiscovery     | The number of clients connected to/managed by this device                                       |
 | distance    | km          | WirelessDistanceDiscovery    | The distance of a radio link in Kilometers                                                      |
 | error-rate  | bps         | WirelessErrorRateDiscovery   | The rate of errored packets or bits, etc                                                        |

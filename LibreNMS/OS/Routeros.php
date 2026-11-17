@@ -43,7 +43,6 @@ use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\QosDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessCqiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
@@ -76,7 +75,6 @@ class Routeros extends OS implements
     WirelessCcqDiscovery,
     WirelessCellDiscovery,
     WirelessCellPolling,
-    WirelessCqiDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
     WirelessNoiseFloorDiscovery,
@@ -299,6 +297,25 @@ class Routeros extends OS implements
             );
         }
 
+        // LTE/5G channel quality indicator 0-15 as percent
+        foreach ($this->lteModems() as $index => $entry) {
+            if (! is_numeric($entry['mtxrLTEModemCQI'] ?? null)) {
+                continue;
+            }
+
+            $sensors[] = new WirelessSensor(
+                WirelessSensorType::Quality,
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.14988.1.1.16.1.1.21.' . $index,
+                'routeros-cqi',
+                $index,
+                $this->lteName($index) . ': CQI',
+                $entry['mtxrLTEModemCQI'] * 20 / 3,
+                20,
+                3
+            );
+        }
+
         return $sensors;
     }
 
@@ -514,33 +531,6 @@ class Routeros extends OS implements
                 $index,
                 $this->lteName($index) . ': Cell ID',
                 $cellId
-            );
-        }
-
-        return $sensors;
-    }
-
-    /**
-     * Discover the Channel Quality Indicator the LTE/5G modem reports to the cell (0-15)
-     *
-     * @return array<WirelessSensor>
-     */
-    public function discoverWirelessCqi(): array
-    {
-        $sensors = [];
-        foreach ($this->lteModems() as $index => $entry) {
-            if (! is_numeric($entry['mtxrLTEModemCQI'] ?? null)) {
-                continue;
-            }
-
-            $sensors[] = new WirelessSensor(
-                WirelessSensorType::Cqi,
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.14988.1.1.16.1.1.21.' . $index,
-                'routeros',
-                $index,
-                $this->lteName($index) . ': CQI',
-                $entry['mtxrLTEModemCQI']
             );
         }
 
