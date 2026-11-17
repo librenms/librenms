@@ -1,0 +1,1523 @@
+IEEE8021-EVBB-MIB DEFINITIONS ::= BEGIN
+
+-- =============================================================
+-- MIB for IEEE 802.1Q devices
+-- =============================================================
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32,Counter32,Unsigned32
+        FROM SNMPv2-SMI
+    MacAddress, TruthValue, TimeInterval,TEXTUAL-CONVENTION,RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ieee802dot1mibs, IEEE8021PbbComponentIdentifier,
+    IEEE8021BridgePortNumber, IEEE8021PbbComponentIdentifierOrZero,
+    IEEE8021BridgePortNumberOrZero
+        FROM IEEE8021-TC-MIB
+    VlanIndex
+        FROM Q-BRIDGE-MIB
+        
+    SnmpAdminString  
+        FROM SNMP-FRAMEWORK-MIB
+     
+    ;
+
+ ieee8021BridgeEvbMib  MODULE-IDENTITY
+    LAST-UPDATED "201010250000Z" -- October 25, 2010
+    ORGANIZATION "IEEE 802.1 Working Group"
+    CONTACT-INFO
+        "  WG-URL: http://grouper.ieee.org/groups/802/1/index.html
+         WG-EMail: stds-802-1@ieee.org
+
+          Contact: <TBD>
+           Postal: C/O IEEE 802.1 Working Group
+                   IEEE Standards Association
+                   445 Hoes Lane
+                   P.O. Box 1331
+                   Piscataway
+                   NJ 08855-1331
+                   USA
+           E-mail: STDS-802-1-L@LISTSERV.IEEE.ORG"
+    DESCRIPTION
+        "The EVB MIB module for managing devices that support
+        Ethernet Virtual Bridging.
+
+        Unless otherwise indicated, the references in this MIB
+        module are to IEEE Std 802.1Q-2010.
+
+        Copyright (C) IEEE.
+        This version of this MIB module is part of IEEE802.1Q;
+        see the draft itself for full legal notices."
+    REVISION     "201010250000Z" -- October 25, 2010
+    DESCRIPTION
+         "Initial revision."
+    ::= { ieee802dot1mibs 100 }
+    
+    
+-- =============================================================
+-- subtrees in the EVBB MIB
+-- =============================================================
+
+ieee8021BridgeEvbNotifications
+    OBJECT IDENTIFIER ::= { ieee8021BridgeEvbMib 0 }
+
+ieee8021BridgeEvbObjects
+    OBJECT IDENTIFIER ::= { ieee8021BridgeEvbMib 1 }
+
+ieee8021BridgeEvbConformance
+    OBJECT IDENTIFIER ::= { ieee8021BridgeEvbMib 2 }
+    
+     
+    
+--
+-- Textual Conventions
+--
+
+
+IEEE8021BridgeEvbTLVTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "EVB TLV structure."
+    SYNTAX   BITS {
+                vdpCapable        (0),
+                ecpCapable        (1),
+                ecpRTE            (2),
+                vdpTimerCapable   (3),
+                reflectiveRelayCap(14),
+                stdForwardingCap  (15)
+
+                }
+--
+--  EVB Bridge managed object
+--
+    
+ieee8021BridgeEvbConfig  OBJECT IDENTIFIER ::=   { ieee8021BridgeEvbObjects 1  } 
+ 
+ ieee8021BridgeEvbSysMACAddress    OBJECT-TYPE
+ SYNTAX      MacAddress
+ MAX-ACCESS  read-only
+ STATUS      current
+ DESCRIPTION "The evbSysMACAddress is any single MAC which uniquely identifies the system. 
+ This MAC may be chosen to be one of the MAC used to identify each component of the system"
+ 
+ ::= { ieee8021BridgeEvbConfig 1}
+ 
+ ieee8021BridgeEvbSysName    OBJECT-TYPE
+  SYNTAX      SnmpAdminString (SIZE(0..32))
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION "The evbSysName is a string which may to set by management to identify this system."
+  
+ ::= {ieee8021BridgeEvbConfig 2}
+ 
+ ieee8021BridgeEvbSysType    OBJECT-TYPE
+   SYNTAX      INTEGER {
+                evbBridge (1),
+                evbStation (2)
+               }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "The evbSysType determines if this is an EVB Bridge or EVB station."
+   
+ ::= { ieee8021BridgeEvbConfig 3}
+ 
+ieee8021BridgeEvbSysNumExternalPorts  OBJECT-TYPE
+   SYNTAX      Unsigned32 (1..4095)
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION   "TBD"
+   ::= {ieee8021BridgeEvbConfig 4}
+   
+ieee8021BridgeEvbSysEvbLldpEnables  OBJECT-TYPE
+   SYNTAX      BITS {
+                evbTLVEnable (0),
+                autoEvbLLDPTLV (1)
+                                
+                }
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION   "This object is used to initialize the S-Channel
+                  interface table entry."
+ 
+   ::= {ieee8021BridgeEvbConfig 5}
+   
+ieee8021BridgeEvbSysEvbLldpDfltMode  OBJECT-TYPE
+   SYNTAX       IEEE8021BridgeEvbTLVTC
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION   "The value of this object is used as the initial 
+                  value for the  ieee8021BridgeEvbCAPLldpAdminCap."
+   ::= {ieee8021BridgeEvbConfig 6}   
+   
+ieee8021BridgeEvbSysEvbLldpNumVsisSup  OBJECT-TYPE
+   SYNTAX       Unsigned32
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION   "This is the total number of VSIs
+                 which this system may support and is used to fill out 
+                 the EVB TLV field for Number VSIs Supported "
+   ::= {ieee8021BridgeEvbConfig 7}    
+
+ 
+ ieee8021BridgeEvbSysNumCorErComps  OBJECT-TYPE
+  SYNTAX            Unsigned32
+  MAX-ACCESS        read-only
+  STATUS            current
+  DESCRIPTION    "TBD"
+  ::= {ieee8021BridgeEvbConfig 8}
+  
+  
+ieee8021BridgeEvbSysNumSComps  OBJECT-TYPE
+ SYNTAX            Unsigned32
+ MAX-ACCESS        read-only
+ STATUS            current
+ DESCRIPTION    "TBD"
+::= {ieee8021BridgeEvbConfig 9}
+ 
+  
+ ieee8021BridgeEvbECPACkTimer  OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "A value indicating the  Bridge Proposed ECP ackTimer."
+    REFERENCE
+           "D.2.8, 44.3.7.1"
+      ::= { ieee8021BridgeEvbConfig 10 }
+   
+ ieee8021BridgeEvbECPMaxRetires  OBJECT-TYPE
+    SYNTAX         Integer32 (0..7)
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+    "A value indicating the Bridge ECP maxRetries. "
+
+    REFERENCE "D.2.8, 44.3.7.6"
+    ::= { ieee8021BridgeEvbConfig 11 }
+ 
+ 
+ ieee8021BridgeEvbSysVdpDfltRsrcWaitDelay OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS    read-write
+    STATUS   current
+    DESCRIPTION "A value indicating the  Bridge Resource VDP Timeout."
+
+    REFERENCE "D.2.8, 42.2.6.8"
+    ::= { ieee8021BridgeEvbConfig 12 }
+ 
+ 
+ ieee8021BridgeEvbSysVdpDfltReinitKeepAlive OBJECT-TYPE
+  SYNTAX  Integer32
+  MAX-ACCESS    read-write
+  STATUS   current
+  DESCRIPTION "A value indicating the Bridge Proposed VDP Keep Alive Timeout."
+  
+  REFERENCE "D.2.8, 42.2.6.7"
+ ::= { ieee8021BridgeEvbConfig 13 }
+ 
+ 
+ --
+ --  EVB Physical port table entry managed object 
+ --
+ 
+ ieee8021BridgeEvbPhyPortTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF Ieee8021BridgeEvbPhyPortEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "A table that contains ."
+     REFERENCE   "12.24.4"
+     ::= { ieee8021BridgeEvbConfig 14}
+ 
+ ieee8021BridgeEvbPhyPortEntry OBJECT-TYPE
+     SYNTAX      Ieee8021BridgeEvbPhyPortEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+         "A list of objects containing EVB port type objects.
+         
+        Creation of an entry in this table will implicitly also
+        create a corresponding entry in the ieee8021BridgeBasePortTable."
+         
+     INDEX  { ieee8021BridgeEvbPhyPort
+                
+             }
+     ::= { ieee8021BridgeEvbPhyPortTable 1 }
+ 
+ Ieee8021BridgeEvbPhyPortEntry ::=
+     SEQUENCE {
+     
+    ieee8021BridgeEvbPhyPort                 IEEE8021BridgePortNumber,
+    
+    
+    ieee8021BridgeEvbPhyPortMacAddress        MacAddress,
+    ieee8021BridgeEvbPhyPortTypeCap           BITS,
+    ieee8021BridgeEvbPhyPortType              INTEGER,
+    
+    ieee8021BridgeEvbPhyPortToComponentId    IEEE8021PbbComponentIdentifierOrZero, 
+    ieee8021BridgeEvbPhyPortToInternalPort   IEEE8021BridgePortNumberOrZero
+
+    }
+    
+    
+   ieee8021BridgeEvbPhyPort  OBJECT-TYPE
+      SYNTAX   IEEE8021BridgePortNumber
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+      "The external port."
+      REFERENCE   "12.24"
+      ::= { ieee8021BridgeEvbPhyPortEntry 1 }  
+      
+      
+    ieee8021BridgeEvbPhyPortMacAddress   OBJECT-TYPE
+    SYNTAX   MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION  "TBD"
+    REFERENCE    "12.4.1.1.3a"
+    
+    ::= { ieee8021BridgeEvbPhyPortEntry 2 }
+    
+    
+    ieee8021BridgeEvbPhyPortTypeCap   OBJECT-TYPE
+    SYNTAX    BITS {
+                    customerVlanPort(0),
+                    providerNetworkPort(1),
+                    customerNetworkPort(2),
+                    customerEdgePort(3),
+                    customerBackbonePort(4),
+                    virtualInstancePort(5),
+                    dBridgePort(6),
+                    serverEdgePort (7)
+                }
+    
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION  "TBD"
+        REFERENCE    "12.4"
+        
+    ::= { ieee8021BridgeEvbPhyPortEntry 3 }
+    
+    
+    ieee8021BridgeEvbPhyPortType  OBJECT-TYPE
+          SYNTAX     INTEGER {
+            customerVlanPort (1),
+            uplinkAccessPort (2)
+          }
+          
+          MAX-ACCESS  read-write
+          STATUS      current
+          DESCRIPTION
+          "The port type for this portIndex."
+          REFERENCE   "12.24"
+      ::= { ieee8021BridgeEvbPhyPortEntry 4 } 
+      
+    
+   ieee8021BridgeEvbPhyPortToComponentId  OBJECT-TYPE
+      SYNTAX   IEEE8021PbbComponentIdentifierOrZero
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION  "The component ID that this EVB port belongs to."
+
+      REFERENCE "12.4"
+      ::= { ieee8021BridgeEvbPhyPortEntry 5 }
+      
+      
+    ieee8021BridgeEvbPhyPortToInternalPort   OBJECT-TYPE
+      SYNTAX      IEEE8021BridgePortNumberOrZero
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+      "The internal port number to which this externel/physical port maps to."
+      REFERENCE   "12.24"
+      ::= { ieee8021BridgeEvbPhyPortEntry 6 }
+      
+  
+  
+   --
+   --  EVB Bridge Port Type managed object 
+   --
+   
+   ieee8021BridgeEvbPortTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF Ieee8021BridgeEvbPortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table that contains ."
+       REFERENCE   "12.24.4"
+       ::= { ieee8021BridgeEvbConfig 15}
+   
+   ieee8021BridgeEvbPortEntry OBJECT-TYPE
+       SYNTAX      Ieee8021BridgeEvbPortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A list of objects containing EVB port type objects.
+           
+          Creation of an entry in this table will implicitly also
+          create a corresponding entry in the ieee8021BridgeBasePortTable."
+           
+       INDEX  { ieee8021BridgeEvbPortComponentId, 
+                ieee8021BridgeEvbPort
+                           
+               }
+       ::= { ieee8021BridgeEvbPortTable 1 }
+   
+   Ieee8021BridgeEvbPortEntry ::=
+       SEQUENCE {
+      ieee8021BridgeEvbPortComponentId       IEEE8021PbbComponentIdentifierOrZero, 
+      ieee8021BridgeEvbPort                  IEEE8021BridgePortNumber,
+      
+   
+      ieee8021BridgeEvbPortType              INTEGER,
+      ieee8021BridgeEvbPortRowStatus         RowStatus
+      
+      }
+      
+      
+   ieee8021BridgeEvbPortComponentId  OBJECT-TYPE
+      SYNTAX       IEEE8021PbbComponentIdentifierOrZero
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION  "The component ID that this EVB port belongs to."
+
+      REFERENCE "12.4"
+      ::= { ieee8021BridgeEvbPortEntry 1 }
+
+        
+   ieee8021BridgeEvbPort   OBJECT-TYPE
+      SYNTAX      IEEE8021BridgePortNumber
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+      "The port number of the port for which this entry
+      contains EVB management information."
+      REFERENCE   "12.24"
+      ::= { ieee8021BridgeEvbPortEntry 2 }
+
+       
+   ieee8021BridgeEvbPortType  OBJECT-TYPE
+      SYNTAX     INTEGER {
+        cVlanBridgePort (1),
+        stationFacingBridgePort (2),
+        uplinkAccessPort (3),
+        sChannelAccessPort (4),
+        uplinkRelayPort (5),
+        edgeRelayPort(6)
+
+      }
+
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+      "The port type for this portIndex."
+      REFERENCE   "12.24"
+      ::= { ieee8021BridgeEvbPortEntry 3 }                
+  
+        
+        
+   ieee8021BridgeEvbPortRowStatus  OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS   read-create
+      STATUS      current
+      DESCRIPTION "RowStatus for this table."
+
+      ::= { ieee8021BridgeEvbPortEntry 4 }
+
+   
+            
+            
+--
+-- VSI Database 
+--
+
+ieee8021BridgeEvbVSIDBObjects OBJECT IDENTIFIER ::= { ieee8021BridgeEvbObjects 2 }
+
+ieee8021BridgeEvbVSIDBTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021BridgeEvbVSIDBEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains database of the active Virtual Station Interfaces."
+    REFERENCE   "12.24.4"
+    ::= { ieee8021BridgeEvbVSIDBObjects 1}
+
+ieee8021BridgeEvbVSIDBEntry OBJECT-TYPE
+    SYNTAX      Ieee8021BridgeEvbVSIDBEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing database of the active Virtual Station Interfaces."
+        
+    INDEX  { ieee8021BridgeEvbPhyPort, 
+             ieee8021BridgeEvbVsiSvid,
+             ieee8021BridgeEvbVSIID
+             
+            }
+    ::= { ieee8021BridgeEvbVSIDBTable 1 }
+
+Ieee8021BridgeEvbVSIDBEntry ::=
+    SEQUENCE {
+    
+   ieee8021BridgeEvbVsiSvid                Unsigned32,
+   ieee8021BridgeEvbVSIID                  OCTET STRING,
+   
+  
+   ieee8021BridgeEvbVSIComponentID         IEEE8021PbbComponentIdentifier,
+   ieee8021BridgeEvbVSIPortNumber          IEEE8021BridgePortNumber,
+   
+   
+   ieee8021BridgeEvbVSITimeSinceCreate      TimeInterval,
+   ieee8021BridgeEvbVsiVdpOperCmd           INTEGER,  
+   
+   ieee8021BridgeEvbVsiOperRevert           TruthValue,
+   ieee8021BridgeEvbVsiOperHard             TruthValue,
+   ieee8021BridgeEvbVsiOperReason           BITS,
+    
+    
+   ieee8021BridgeEvbVSIMgrID                OCTET STRING,
+   ieee8021BridgeEvbVSIType                 OCTET STRING,
+   ieee8021BridgeEvbVSITypeVersion          OCTET STRING,
+   
+   ieee8021BridgeEvbVSIMvFormat             INTEGER,
+   ieee8021BridgeEvbVSINumMACs              Integer32,
+   ieee8021BridgeEvbVDPMachineState         INTEGER,   
+   
+   ieee8021BridgeEvbVDPCommandsSucceeded    Counter32,
+   ieee8021BridgeEvbVDPCommandsFailed       Counter32,
+   ieee8021BridgeEvbVDPCommandReverts       Counter32
+   
+    }
+   
+   
+   ieee8021BridgeEvbVsiSvid  OBJECT-TYPE
+      SYNTAX      Unsigned32 (1..4095)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+      "The Svid to identify the S-Channel interface."
+      REFERENCE  "42.2.2.7"
+   ::= { ieee8021BridgeEvbVSIDBEntry 1 }
+   
+    
+   ieee8021BridgeEvbVSIID  OBJECT-TYPE
+      SYNTAX             OCTET STRING (SIZE (16))
+      MAX-ACCESS         not-accessible
+      STATUS             current
+      DESCRIPTION
+      "This object specifies the VSIID that uniquely identifies the VSI in the DCN "
+      REFERENCE   "42.2.2.7"
+      ::= { ieee8021BridgeEvbVSIDBEntry 2 }
+
+   ieee8021BridgeEvbVSIComponentID  OBJECT-TYPE
+      SYNTAX     IEEE8021PbbComponentIdentifier
+      MAX-ACCESS    read-only
+      STATUS      current
+      DESCRIPTION "TBD"
+
+      REFERENCE "12.24.2"
+      ::= { ieee8021BridgeEvbVSIDBEntry 3 }
+
+   ieee8021BridgeEvbVSIPortNumber  OBJECT-TYPE
+      SYNTAX  IEEE8021BridgePortNumber
+      MAX-ACCESS  read-only
+      STATUS   current
+      DESCRIPTION "TBD"
+
+      REFERENCE "12.24.2"
+
+      ::= { ieee8021BridgeEvbVSIDBEntry 4 }
+
+   ieee8021BridgeEvbVSITimeSinceCreate OBJECT-TYPE
+      SYNTAX        TimeInterval
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+         "This object specifies the time since creation "
+      REFERENCE   "42"
+      ::= { ieee8021BridgeEvbVSIDBEntry 5 }
+   
+   
+   ieee8021BridgeEvbVsiVdpOperCmd OBJECT-TYPE
+      SYNTAX     INTEGER
+                 {
+                  preAssociate (1),
+                  preAssociateWithRsrcReservation (2),
+                  associate (3),
+                  deAssociate (4)
+                 }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+      "This object identifies the type of TLV."
+      REFERENCE   "42.2.2.1"
+      ::= { ieee8021BridgeEvbVSIDBEntry 6 }
+
+   ieee8021BridgeEvbVsiOperRevert   OBJECT-TYPE
+      SYNTAX       TruthValue
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION "TBD"
+      REFERENCE     "42.2.2.2"
+      ::= { ieee8021BridgeEvbVSIDBEntry 7 }
+   
+   ieee8021BridgeEvbVsiOperHard   OBJECT-TYPE
+      SYNTAX       TruthValue
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION "TBD"
+      REFERENCE     "42.2.2.2"
+      
+   ::= { ieee8021BridgeEvbVSIDBEntry 8 }
+
+   ieee8021BridgeEvbVsiOperReason  OBJECT-TYPE
+      SYNTAX        BITS 
+                   {
+                     success (0),
+                     invalidFormat (1),
+                     insufficientResources (2),
+                     otherfailure(3)
+                  }
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+      "This object indicates the outcome of a request."
+      REFERENCE     "42.2.2.2"
+
+
+      ::= { ieee8021BridgeEvbVSIDBEntry 9 }
+
+  
+   ieee8021BridgeEvbVSIMgrID      OBJECT-TYPE
+      SYNTAX        OCTET STRING (SIZE (1))
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+      "This object identifies the VSI Manager with a database that holds the detailed 
+      VSI type and or instance definitions."
+      REFERENCE   "42.2.2.3"
+      ::= { ieee8021BridgeEvbVSIDBEntry 10 }
+
+   ieee8021BridgeEvbVSIType OBJECT-TYPE
+      SYNTAX     OCTET STRING (SIZE(3)) 
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION " The VTID is an integer value used to identify a pre-configured set of
+      controls and attributes that are associated with a set of VSIs."
+
+      REFERENCE  " 42.2.2.4"
+
+      ::= { ieee8021BridgeEvbVSIDBEntry 11 }
+
+   
+   ieee8021BridgeEvbVSITypeVersion  OBJECT-TYPE
+      SYNTAX        OCTET STRING (SIZE (1))
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+      "The VSI Type Version is an integer identifier designating the expected/desired VTID version. 
+      The VTID version allows a VSI Manager Database to contain multiple versions of a 
+      given VSI Type, allowing smooth migration to newer VSI types."
+
+      REFERENCE   "42.2.2.5"
+      ::= { ieee8021BridgeEvbVSIDBEntry 12 }    
+
+
+   ieee8021BridgeEvbVSIMvFormat       OBJECT-TYPE
+      SYNTAX        INTEGER 
+                    {
+                      basic (0),
+                      partial (1),
+                      vlanOnly (2)
+                    }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+      "This object specifies the MAC/VLAN format.
+      basic   - Basic MAC/VLAN format
+      partial - Partial MAC/VLAN format
+      vlanOnly - Vlan-only MAC/VLAN format
+      "
+      REFERENCE   "42.2.2.7"
+      ::= { ieee8021BridgeEvbVSIDBEntry 13 }
+
+   ieee8021BridgeEvbVSINumMACs    OBJECT-TYPE
+      SYNTAX        Integer32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+      "This object specifies the the number of MAC address/VLAN ID pairs contained in 
+      the repeated protion of the MAC/VLANs field in the VDP TLV."
+      REFERENCE   "42.2.2.8"
+      ::= { ieee8021BridgeEvbVSIDBEntry 14 }
+
+
+   ieee8021BridgeEvbVDPMachineState   OBJECT-TYPE
+      SYNTAX      INTEGER
+                   {
+                   preAssociate (1),
+                   preAssociateWithRsrcReservation (2),
+                   associate (3),
+                   deAssociate (4)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+      "This object specifies the VDP state machine. "
+      REFERENCE   "42.2.6.16"
+      ::= { ieee8021BridgeEvbVSIDBEntry 15 }  
+
+
+   ieee8021BridgeEvbVDPCommandsSucceeded  OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+      "This object specifies the VDP number of successful commands since creation."
+      REFERENCE   "42.2.6"
+      ::= { ieee8021BridgeEvbVSIDBEntry 16 }
+
+   ieee8021BridgeEvbVDPCommandsFailed   OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+      "This object specifies the VDP number of failed commands since creation "
+      REFERENCE   "42.2.6"
+      ::= { ieee8021BridgeEvbVSIDBEntry 17 }
+
+   ieee8021BridgeEvbVDPCommandReverts   OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+      "This object specifies the VDP command reverts since creation  "
+      REFERENCE   "42.2.6"
+      ::= { ieee8021BridgeEvbVSIDBEntry 18 }
+
+
+-- List of MAC/VLANs 
+
+ieee8021BridgeEvbVSIDBMacTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Ieee8021BridgeEvbVSIDBMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains database of the active Virtual Station Interfaces."
+    REFERENCE   "12.24.4"
+    ::= { ieee8021BridgeEvbVSIDBObjects 2 }
+
+ieee8021BridgeEvbVSIDBMacEntry OBJECT-TYPE
+    SYNTAX      Ieee8021BridgeEvbVSIDBMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of objects containing database of the MAC/VLANs associated with
+        Virtual Station Interfaces."
+        
+    INDEX  { ieee8021BridgeEvbPhyPort, 
+             ieee8021BridgeEvbVsiSvid,
+             ieee8021BridgeEvbVSIID,
+             ieee8021BridgeEvbGroupID,
+             ieee8021BridgeEvbVSIMac,
+             ieee8021BridgeEvbVSIVlanId
+             
+            }
+    ::= { ieee8021BridgeEvbVSIDBMacTable 1 }
+
+Ieee8021BridgeEvbVSIDBMacEntry ::=
+    SEQUENCE {
+   ieee8021BridgeEvbGroupID              Unsigned32,
+   ieee8021BridgeEvbVSIMac               MacAddress,
+   ieee8021BridgeEvbVSIVlanId            VlanIndex
+   }
+   
+   
+   ieee8021BridgeEvbGroupID   OBJECT-TYPE
+   SYNTAX        Unsigned32 
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "Group ID"
+   REFERENCE     "42.2.2.8"
+   
+   ::= { ieee8021BridgeEvbVSIDBMacEntry 1}
+   
+   ieee8021BridgeEvbVSIMac OBJECT-TYPE
+   SYNTAX         MacAddress
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION 
+   "The mac-address part of the MAC/VLANs for a VSI."
+   REFERENCE  "12.24.4.1.3 k"
+   
+   ::= { ieee8021BridgeEvbVSIDBMacEntry 2}
+   
+   
+   ieee8021BridgeEvbVSIVlanId OBJECT-TYPE
+      SYNTAX         VlanIndex
+      MAX-ACCESS     read-only
+      STATUS         current
+      DESCRIPTION 
+      "The Vlan ID part of the MAC/VLANs for a VSI."
+      
+   ::= { ieee8021BridgeEvbVSIDBMacEntry 3}
+   
+   
+  
+-- Uplink Access Port table entry managed object
+
+
+   ieee8021BridgeEvbSChannelObjects OBJECT IDENTIFIER ::= { ieee8021BridgeEvbObjects 4 }
+
+
+   ieee8021BridgeEvbUAPConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Ieee8021BridgeEvbUAPConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table that contains  configuration parameters for UAP."
+        REFERENCE   "12.24.4.1 "
+        ::= { ieee8021BridgeEvbSChannelObjects 1 }
+    
+    ieee8021BridgeEvbUAPConfigEntry OBJECT-TYPE
+        SYNTAX      Ieee8021BridgeEvbUAPConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of objects containing information to configure the attributes for UAP."
+            
+        INDEX  { 
+                ieee8021BridgeEvbPhyPort
+                }
+        ::= { ieee8021BridgeEvbUAPConfigTable 1 }
+    
+    Ieee8021BridgeEvbUAPConfigEntry ::=
+        SEQUENCE {
+        ieee8021BridgeEvbUAPComponentId              IEEE8021PbbComponentIdentifier,
+        ieee8021BridgeEvbUAPPort                     IEEE8021BridgePortNumber,
+        
+        
+        ieee8021BridgeEvbUAPSchCdcpAdminEnable         INTEGER,  
+        ieee8021BridgeEvbUAPSchAdminCDCPRole           INTEGER,   
+        ieee8021BridgeEvbUAPSchAdminCDCPChanCap        Integer32,    
+        ieee8021BridgeEvbUAPSchOperCDCPChanCap         Integer32,    
+        
+        
+        ieee8021BridgeEvbUAPSchAdminCDCPSVIDPoolLow       VlanIndex,
+        ieee8021BridgeEvbUAPSchAdminCDCPSVIDPoolHigh      VlanIndex,
+        
+        
+        ieee8021BridgeEvbUAPSchOperState               INTEGER,   
+        ieee8021BridgeEvbSchCdcpRemoteEnabled          INTEGER,  
+        ieee8021BridgeEvbSchCdcpRemoteRole             INTEGER,
+        ieee8021BridgeEvbUAPConfigRowStatus            RowStatus
+        
+       }
+        
+    
+   ieee8021BridgeEvbUAPComponentId OBJECT-TYPE
+      SYNTAX      IEEE8021PbbComponentIdentifier
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION 
+      "The ComponentID of the port for the UAP."
+   ::= { ieee8021BridgeEvbUAPConfigEntry 1 }
+
+
+   ieee8021BridgeEvbUAPPort OBJECT-TYPE
+      SYNTAX      IEEE8021BridgePortNumber
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION 
+      "The port number of the port for the UAP."
+   ::= { ieee8021BridgeEvbUAPConfigEntry 2 }
+
+
+   ieee8021BridgeEvbUAPSchCdcpAdminEnable  OBJECT-TYPE
+      SYNTAX     INTEGER
+      {
+         enable (1),
+         disable (2)
+      }
+      MAX-ACCESS   read-create
+      STATUS       current
+      DESCRIPTION  "Administrative staus of CDCP."
+      REFERENCE   "43.1.5.4"
+
+   ::= { ieee8021BridgeEvbUAPConfigEntry 3 }
+
+
+   ieee8021BridgeEvbUAPSchAdminCDCPRole  OBJECT-TYPE
+      SYNTAX    INTEGER
+      {
+         cdcpRoleB(1),
+         cdcpRoleS (2)
+      }
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION  "The administratively configured value for the local 
+      port's role parameter. The value of AdminRole is not reflected in 
+      the S-channel TLV. The AdminRole may take the value S or B. S indicates
+      the sender is unwilling to accept S-channels configuration 
+      (mode, # channels supported, channel index) from its neighbor and 
+      that the sender is willing to accept SVID assignments from the neighbor. 
+      Stations usually take the S role.B indicates the sender is willing to accept 
+      S-channels configuration (mode, # channels supported, channel index) 
+      from its neighbor and that the sender is willing do the best it can to fill 
+      the SVID assignments from the neighbor. Bridges usually take the B role."
+      
+      REFERENCE  "43.1.5.2"
+      DEFVAL  { 1 }
+
+   ::= { ieee8021BridgeEvbUAPConfigEntry 4 }  
+
+
+   ieee8021BridgeEvbUAPSchAdminCDCPChanCap OBJECT-TYPE
+      SYNTAX             Integer32 (1 .. 167)
+      MAX-ACCESS         read-create
+      STATUS             current
+      DESCRIPTION       "The administratively configured value for the Number of 
+      Channels supported parameter. This value is included as 
+      the ChnCap parameter in the S-channel TLV."
+      
+      REFERENCE "43.1.5.1"
+
+   ::= { ieee8021BridgeEvbUAPConfigEntry 5 } 
+   
+   
+   ieee8021BridgeEvbUAPSchOperCDCPChanCap  OBJECT-TYPE
+      SYNTAX             Integer32 (1 .. 167)
+      MAX-ACCESS         read-only
+      STATUS             current
+      DESCRIPTION       "The operational value for the Number of 
+      Channels supported parameter. This value is included as 
+      the ChnCap parameter in the S-channel TLV."
+      
+      REFERENCE "43.1.5.10"
+
+   ::= { ieee8021BridgeEvbUAPConfigEntry 6 }   
+
+   ieee8021BridgeEvbUAPSchAdminCDCPSVIDPoolLow  OBJECT-TYPE
+      SYNTAX           VlanIndex
+      MAX-ACCESS       read-create
+      STATUS           current
+      DESCRIPTION      "Determines the lowest S-VIDs available for assignment by CDCP."
+      
+      REFERENCE "43.1.5.9"
+   ::= { ieee8021BridgeEvbUAPConfigEntry 7 } 
+
+
+   ieee8021BridgeEvbUAPSchAdminCDCPSVIDPoolHigh  OBJECT-TYPE
+      SYNTAX           VlanIndex
+      MAX-ACCESS       read-create
+      STATUS           current
+      DESCRIPTION      "Determines the highest S-VIDs available for assignment by CDCP."
+      
+      REFERENCE     "43.1.5.9"
+
+   ::= { ieee8021BridgeEvbUAPConfigEntry 8 } 
+   
+   
+   ieee8021BridgeEvbUAPSchOperState     OBJECT-TYPE
+      SYNTAX     INTEGER
+      {
+         running (1),
+         notRunning (2)
+      }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION  "The current runnning state of CDCP."
+      
+      REFERENCE "43.1.5.18"
+      
+   ::= { ieee8021BridgeEvbUAPConfigEntry 9 }
+   
+   
+   
+   ieee8021BridgeEvbSchCdcpRemoteEnabled  OBJECT-TYPE
+      SYNTAX     INTEGER
+      {
+         enable (1),
+         disable (2)
+      }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION  "CDCP state for the remote S-channel."
+      
+      REFERENCE   "43.1.5.17"
+      
+   ::= { ieee8021BridgeEvbUAPConfigEntry 10 }
+   
+   
+   
+   ieee8021BridgeEvbSchCdcpRemoteRole   OBJECT-TYPE
+      SYNTAX    INTEGER
+      {
+         cdcpRoleB (1),
+         cdcpRoleS (2)
+      }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION  "The  value for the remote
+      port's role parameter."
+      
+      REFERENCE "43.1.5.15"
+      
+   ::= { ieee8021BridgeEvbUAPConfigEntry 11 } 
+   
+   
+   ieee8021BridgeEvbUAPConfigRowStatus  OBJECT-TYPE
+     SYNTAX       RowStatus
+     MAX-ACCESS   read-create
+     STATUS       current
+     DESCRIPTION  "RowStatus for creating a UAP table entry."
+     
+    ::= { ieee8021BridgeEvbUAPConfigEntry 12 } 
+   
+   
+  
+  
+  -- S-Channel Interface Table
+  
+   ieee8021BridgeEvbCAPConfigTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF Ieee8021BridgeEvbCAPConfigEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+      "A table that contains  configuration information for 
+      the S-Channel Access Ports (CAP)."
+      REFERENCE   "12.24.4.2 "
+      ::= { ieee8021BridgeEvbSChannelObjects 2 }
+
+   ieee8021BridgeEvbCAPConfigEntry OBJECT-TYPE
+      SYNTAX      Ieee8021BridgeEvbCAPConfigEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+      "A list of objects containing information for the S-Channel Access Ports (CAP)"
+
+      INDEX  { ieee8021BridgeEvbPhyPort, 
+             ieee8021BridgeEvbVsiSvid
+      }
+   ::= { ieee8021BridgeEvbCAPConfigTable 1 }
+
+   Ieee8021BridgeEvbCAPConfigEntry ::=
+      SEQUENCE {
+      ieee8021BridgeEvbCAPComponentId            IEEE8021PbbComponentIdentifier,
+      ieee8021BridgeEvbCAPPort                   IEEE8021BridgePortNumber,
+
+      ieee8021BridgeEvbCAPSChannelID             Integer32,
+     
+      ieee8021BridgeEvbCAPAssociateSBPCompID     IEEE8021PbbComponentIdentifier,
+      ieee8021BridgeEvbCAPAssociateSBPPort       IEEE8021BridgePortNumber,
+      
+      ieee8021BridgeEvbCAPLldpAdminEnables       BITS,
+      
+      ieee8021BridgeEvbCAPLldpAdminCap           IEEE8021BridgeEvbTLVTC,
+      ieee8021BridgeEvbCAPLldpOperMode           IEEE8021BridgeEvbTLVTC,
+       
+      ieee8021BridgeEvbCAPEcpAdminAckTimerInit     TimeInterval,
+      ieee8021BridgeEvbCAPEcpOperAckTimerInit      TimeInterval,
+      ieee8021BridgeEvbCAPEcpAdminMaxTries         Unsigned32,
+
+      ieee8021BridgeEvbCAPEcpOperMaxRetries        Unsigned32, 
+      ieee8021BridgeEvbCAPEcpTxFrameCount          Counter32,
+      ieee8021BridgeEvbCAPEcpTxRetryCount          Counter32,
+      ieee8021BridgeEvbCAPEcpTxFailures            Counter32,
+      ieee8021BridgeEvbCAPEcpRxFrameCount          Counter32,
+
+
+      ieee8021BridgeEvbCAPVdpOperRsrcWaitDelay     TimeInterval,
+
+      ieee8021BridgeEvbCAPVdpOperRespWaitDelay     TimeInterval,
+      ieee8021BridgeEvbCAPVdpOperReinitKeepAlive   TimeInterval,
+      ieee8021BridgeEvbCAPVdpOperToutKeepAlive     TimeInterval,
+
+      ieee8021BridgeEvbCAPRowStatus                RowStatus
+
+   
+          
+      }
+
+
+   ieee8021BridgeEvbCAPComponentId   OBJECT-TYPE
+      SYNTAX       IEEE8021PbbComponentIdentifier
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION "Component ID for S-channel Access Port."
+
+      ::= { ieee8021BridgeEvbCAPConfigEntry 1 }
+
+
+   ieee8021BridgeEvbCAPPort   OBJECT-TYPE
+      SYNTAX       IEEE8021BridgePortNumber
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION  "Port number for the S-Channel Access Port."
+
+      ::= { ieee8021BridgeEvbCAPConfigEntry 2 }
+
+
+   ieee8021BridgeEvbCAPSChannelID    OBJECT-TYPE
+      SYNTAX       Integer32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION  "S-Channel ID (SCID) for this CAP."
+      REFERENCE   "43.1.5.2" 
+
+      ::= { ieee8021BridgeEvbCAPConfigEntry 3 }
+
+   ieee8021BridgeEvbCAPAssociateSBPCompID   OBJECT-TYPE
+      SYNTAX      IEEE8021PbbComponentIdentifier
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "Component ID of the Server Edge Port to be 
+      associated with the CAP."
+
+   ::= { ieee8021BridgeEvbCAPConfigEntry 6 }
+
+
+
+   ieee8021BridgeEvbCAPAssociateSBPPort    OBJECT-TYPE
+      SYNTAX       IEEE8021BridgePortNumber
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION  "Port number of the Server Edge Port to be 
+      associated with the CAP."
+ 
+   ::= { ieee8021BridgeEvbCAPConfigEntry 7 }
+   
+   ieee8021BridgeEvbCAPLldpAdminEnables   OBJECT-TYPE
+      SYNTAX BITS {
+                evbTLVEnable (0),
+                autoEvbLLDPTLV (1)
+                                
+                }
+      MAX-ACCESS   read-create
+      STATUS       current
+      DESCRIPTION  
+            "To use manual or auto configuration for EVB LLDP TLV.
+             In manual operation the system may exchange the EVB
+             TLV however does not use the information supplied to set
+             the operating parameters for RR, ECP and VDP.The default
+             value for the ieee8021BridgeEvbSysEvbLldpEnables is LLDP
+             on and manual off."
+      REFERENCE  "D.2.8, 41"
+             
+      ::= { ieee8021BridgeEvbCAPConfigEntry 8 }
+             
+             
+             
+             
+   ieee8021BridgeEvbCAPLldpAdminCap    OBJECT-TYPE
+      SYNTAX        IEEE8021BridgeEvbTLVTC
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION  "EVB current configured capabilities."
+      REFERENCE    "D.2.8, 41"
+
+      ::= { ieee8021BridgeEvbCAPConfigEntry 9}
+      
+
+
+
+   ieee8021BridgeEvbCAPLldpOperMode  OBJECT-TYPE
+      SYNTAX        IEEE8021BridgeEvbTLVTC
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  "EVB current operational capabilities."
+      REFERENCE    "D.2.8, 41"
+      
+
+      ::= { ieee8021BridgeEvbCAPConfigEntry 10 }
+
+        
+   ieee8021BridgeEvbCAPEcpAdminAckTimerInit  OBJECT-TYPE
+      SYNTAX        TimeInterval
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION  "The initial value used to initialize ackTimer 
+                   (44.3.6.1)."
+       REFERENCE    "D.2.8, 44.3.7.1"
+       
+      ::= { ieee8021BridgeEvbCAPConfigEntry 11 }
+
+                     
+                
+    ieee8021BridgeEvbCAPEcpOperAckTimerInit      OBJECT-TYPE
+      SYNTAX        TimeInterval
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  "The initial value used to initialize ackTimer 
+                   (44.3.6.1)."
+      
+      REFERENCE    "D.2.8, 44.3.7.1"
+
+      ::= { ieee8021BridgeEvbCAPConfigEntry 12 }
+      
+      
+      
+   ieee8021BridgeEvbCAPEcpAdminMaxTries    OBJECT-TYPE
+      SYNTAX        Unsigned32 (0..16)
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION  "This integer variable defines the maximum number
+                   of times that the ECP transmit state machine will
+                   retry a transmission if no ACK is received."
+      REFERENCE    "D.2.8, 44.3.7.6"
+
+      ::= { ieee8021BridgeEvbCAPConfigEntry 13 }
+     
+       
+   ieee8021BridgeEvbCAPEcpOperMaxRetries       OBJECT-TYPE
+      SYNTAX        Unsigned32 (0..15)
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  "This integer variable defines the maximum number
+                   of times that the ECP transmit state machine will
+                   retry a transmission if no ACK is received."
+      REFERENCE    "D.2.8, 44.3.7.6"
+
+      ::= { ieee8021BridgeEvbCAPConfigEntry 14 }
+      
+      
+      
+   ieee8021BridgeEvbCAPEcpTxFrameCount  OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  "TBD."
+      REFERENCE    "44"
+
+      ::= { ieee8021BridgeEvbCAPConfigEntry 15 }
+             
+    ieee8021BridgeEvbCAPEcpTxRetryCount     OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  "TBD."
+      REFERENCE    "44"
+      ::= { ieee8021BridgeEvbCAPConfigEntry 16 }
+      
+      
+      
+   ieee8021BridgeEvbCAPEcpTxFailures    OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  "TBD."
+      REFERENCE    "44"
+
+      ::= { ieee8021BridgeEvbCAPConfigEntry 17 }
+      
+      
+      
+   ieee8021BridgeEvbCAPEcpRxFrameCount      OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION  "TBD."
+      REFERENCE     "44"
+
+      ::= { ieee8021BridgeEvbCAPConfigEntry 18 }
+       
+        
+   ieee8021BridgeEvbCAPVdpOperRsrcWaitDelay     OBJECT-TYPE
+      SYNTAX        TimeInterval
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION  "The value used to initialize the waitWhile timer
+                   (42.2.5.1) by the EVBCB VDP state machine when the
+                    state machine is waiting for a response. "
+      REFERENCE    "D.2.8, 42.2.6.8"
+
+      ::= { ieee8021BridgeEvbCAPConfigEntry 19 }
+             
+       
+   ieee8021BridgeEvbCAPVdpOperRespWaitDelay     OBJECT-TYPE
+      SYNTAX        TimeInterval
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION  "The value used to initialize the waitWhile timer 
+                    (42.2.5.1) by the station VDP state machine when
+                    the state machine is waiting for a response."
+      REFERENCE     "D.2.8, 42.2.6.10"
+
+      ::= { ieee8021BridgeEvbCAPConfigEntry 20 }
+   
+   
+   ieee8021BridgeEvbCAPVdpOperReinitKeepAlive  OBJECT-TYPE
+      SYNTAX        TimeInterval
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION  "The value used to initialize the waitWhile timer 
+                   (42.2.5.1) by the station VDP state machine in order
+                   to determine when to transmit a keep alive message."
+      REFERENCE    " D.2.8, 42.2.6.7" 
+      ::= { ieee8021BridgeEvbCAPConfigEntry 21 }
+      
+      
+   ieee8021BridgeEvbCAPVdpOperToutKeepAlive     OBJECT-TYPE
+      SYNTAX        TimeInterval
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION  "The value used to initialize the waitWhile timer
+                   (42.2.5.1) by the EVBCB VDP state machine n order to
+                   determine when to transmit a keep alive message."
+      REFERENCE "D.2.8, 42.2.6.14"
+      
+      ::= { ieee8021BridgeEvbCAPConfigEntry 22 }
+      
+       
+   ieee8021BridgeEvbCAPRowStatus       OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION  "RowStatus to create/destroy this table."
+
+      ::= { ieee8021BridgeEvbCAPConfigEntry 23 }
+
+   
+   
+
+-- =============================================================
+-- Conformance Information
+-- =============================================================
+
+ieee8021BridgeEvbGroups
+    OBJECT IDENTIFIER ::= { ieee8021BridgeEvbConformance 1 }
+    
+ieee8021BridgeEvbCompliances
+    OBJECT IDENTIFIER ::= { ieee8021BridgeEvbConformance 2 }
+
+-- =============================================================
+-- Units of conformance
+-- =============================================================
+ieee8021BridgeEvbConfigGroup OBJECT-GROUP
+    OBJECTS {
+        ieee8021BridgeEvbSysMACAddress,
+        ieee8021BridgeEvbSysName,
+        ieee8021BridgeEvbSysType,
+        ieee8021BridgeEvbSysNumExternalPorts,
+        ieee8021BridgeEvbSysEvbLldpEnables,
+        ieee8021BridgeEvbSysEvbLldpDfltMode,
+        ieee8021BridgeEvbSysEvbLldpNumVsisSup,
+        ieee8021BridgeEvbSysNumCorErComps,
+        ieee8021BridgeEvbSysNumSComps,
+        ieee8021BridgeEvbECPACkTimer,
+        ieee8021BridgeEvbECPMaxRetires,
+        ieee8021BridgeEvbSysVdpDfltRsrcWaitDelay,
+        ieee8021BridgeEvbSysVdpDfltReinitKeepAlive
+        
+   
+    }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects used to represent a EVB management objects."
+    ::= { ieee8021BridgeEvbGroups 1 }
+    
+  ieee8021BridgeEvbPhyPortGroup OBJECT-GROUP
+  OBJECTS {
+    
+       ieee8021BridgeEvbPhyPortMacAddress,
+       ieee8021BridgeEvbPhyPortTypeCap ,   
+       ieee8021BridgeEvbPhyPortType ,     
+       
+       ieee8021BridgeEvbPhyPortToComponentId ,
+       ieee8021BridgeEvbPhyPortToInternalPort 
+       }
+       STATUS current
+       DESCRIPTION "The collection of objects used to represent external ports."
+       
+      ::= { ieee8021BridgeEvbGroups 2 }
+    
+
+ieee8021BridgeEvbPortGroup OBJECT-GROUP
+     OBJECTS {
+              ieee8021BridgeEvbPortType,        
+              ieee8021BridgeEvbPortRowStatus
+     }
+     STATUS      current
+     DESCRIPTION
+         "The collection of objects used to represent a EVB management objects."
+    ::= { ieee8021BridgeEvbGroups 3 }
+
+ieee8021BridgeEvbVSIDBGroup OBJECT-GROUP
+    OBJECTS {
+        
+           ieee8021BridgeEvbVSIComponentID,         
+           ieee8021BridgeEvbVSIPortNumber ,         
+           
+           
+           ieee8021BridgeEvbVSITimeSinceCreate ,    
+           ieee8021BridgeEvbVsiVdpOperCmd,          
+           
+           ieee8021BridgeEvbVsiOperRevert,          
+           ieee8021BridgeEvbVsiOperHard,            
+           ieee8021BridgeEvbVsiOperReason,          
+            
+            
+           ieee8021BridgeEvbVSIMgrID,               
+           ieee8021BridgeEvbVSIType,                
+           ieee8021BridgeEvbVSITypeVersion ,        
+           
+           ieee8021BridgeEvbVSIMvFormat,            
+           ieee8021BridgeEvbVSINumMACs ,            
+           ieee8021BridgeEvbVDPMachineState ,       
+           
+           ieee8021BridgeEvbVDPCommandsSucceeded ,  
+           ieee8021BridgeEvbVDPCommandsFailed ,     
+           ieee8021BridgeEvbVDPCommandReverts ,
+           ieee8021BridgeEvbVSIVlanId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects used to represent a EVB VSI DB table."
+    ::= { ieee8021BridgeEvbGroups 4 } 
+    
+    
+  ieee8021BridgeEvbUAPGroup OBJECT-GROUP
+     OBJECTS {
+             ieee8021BridgeEvbUAPComponentId,             
+             ieee8021BridgeEvbUAPPort,                    
+             
+             
+             ieee8021BridgeEvbUAPSchCdcpAdminEnable,      
+             ieee8021BridgeEvbUAPSchAdminCDCPRole,        
+             ieee8021BridgeEvbUAPSchAdminCDCPChanCap,     
+             ieee8021BridgeEvbUAPSchOperCDCPChanCap,      
+             
+             
+             ieee8021BridgeEvbUAPSchAdminCDCPSVIDPoolLow, 
+             ieee8021BridgeEvbUAPSchAdminCDCPSVIDPoolHigh,
+             
+             
+             ieee8021BridgeEvbUAPSchOperState,            
+             ieee8021BridgeEvbSchCdcpRemoteEnabled,       
+             ieee8021BridgeEvbSchCdcpRemoteRole,           
+             ieee8021BridgeEvbUAPConfigRowStatus          
+   
+     }
+     STATUS      current
+     DESCRIPTION
+         "The collection of objects used to represent a EVB UAP table."
+    ::= { ieee8021BridgeEvbGroups 5 } 
+    
+    
+      
+   ieee8021BridgeEvbCAPConfigGroup OBJECT-GROUP
+        OBJECTS {
+              ieee8021BridgeEvbCAPComponentId,
+              ieee8021BridgeEvbCAPPort,
+              ieee8021BridgeEvbCAPSChannelID,            
+          
+              ieee8021BridgeEvbCAPAssociateSBPCompID,    
+              ieee8021BridgeEvbCAPAssociateSBPPort,      
+          
+              ieee8021BridgeEvbCAPLldpAdminEnables,      
+          
+              ieee8021BridgeEvbCAPLldpAdminCap,          
+              ieee8021BridgeEvbCAPLldpOperMode ,         
+               
+              ieee8021BridgeEvbCAPEcpAdminAckTimerInit,  
+              ieee8021BridgeEvbCAPEcpOperAckTimerInit,   
+              ieee8021BridgeEvbCAPEcpAdminMaxTries ,     
+          
+              ieee8021BridgeEvbCAPEcpOperMaxRetries,     
+              ieee8021BridgeEvbCAPEcpTxFrameCount,       
+              ieee8021BridgeEvbCAPEcpTxRetryCount ,      
+              ieee8021BridgeEvbCAPEcpTxFailures ,        
+              ieee8021BridgeEvbCAPEcpRxFrameCount,       
+          
+          
+              ieee8021BridgeEvbCAPVdpOperRsrcWaitDelay , 
+          
+                
+              ieee8021BridgeEvbCAPVdpOperReinitKeepAlive,
+                      
+              ieee8021BridgeEvbCAPRowStatus             
+                   
+          
+        }
+        STATUS      current
+        DESCRIPTION
+            "The collection of objects used to represent a EVB CAP management objects."
+    ::= { ieee8021BridgeEvbGroups 6 } 
+    
+    
+    
+    ieee8021BridgeEvbbCAPConfigGroup OBJECT-GROUP
+      OBJECTS {
+
+            ieee8021BridgeEvbCAPVdpOperToutKeepAlive  
+
+      }
+      STATUS      current
+      DESCRIPTION
+          "The collection of objects used to represent a EVBB CAP management objects."
+  ::= { ieee8021BridgeEvbGroups 7 } 
+        
+        
+   ieee8021BridgeEvbsCAPConfigGroup OBJECT-GROUP
+      OBJECTS {
+
+      ieee8021BridgeEvbCAPVdpOperRespWaitDelay  
+
+      }
+      STATUS      current
+      DESCRIPTION
+      "The collection of objects used to represent a EVBS CAP management objects."
+      ::= { ieee8021BridgeEvbGroups 8 } 
+    
+    
+    
+-- =============================================================
+-- compliance statements
+-- =============================================================
+
+ieee8021BridgeEvbbCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices supporting EVBB
+        as defined in IEEE 802.1Qbg."
+    MODULE
+        MANDATORY-GROUPS {
+            ieee8021BridgeEvbConfigGroup,
+            ieee8021BridgeEvbPhyPortGroup,
+            ieee8021BridgeEvbPortGroup,
+            ieee8021BridgeEvbVSIDBGroup,
+            ieee8021BridgeEvbUAPGroup,
+            ieee8021BridgeEvbCAPConfigGroup,
+            ieee8021BridgeEvbbCAPConfigGroup
+            
+        }
+        
+    ::= { ieee8021BridgeEvbCompliances 1 }
+    
+    
+ ieee8021BridgeEvbsCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices supporting EVBS
+        as defined in IEEE 802.1Qbg."
+    MODULE
+        MANDATORY-GROUPS {
+            ieee8021BridgeEvbConfigGroup,
+            ieee8021BridgeEvbPhyPortGroup,
+            ieee8021BridgeEvbPortGroup,
+            ieee8021BridgeEvbVSIDBGroup,
+            ieee8021BridgeEvbUAPGroup,
+            ieee8021BridgeEvbCAPConfigGroup,
+            ieee8021BridgeEvbsCAPConfigGroup
+            
+        }
+        
+    ::= { ieee8021BridgeEvbCompliances 2 }
+       
+   
+   
+   
+     
+ END 

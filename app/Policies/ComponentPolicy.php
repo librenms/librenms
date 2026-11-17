@@ -45,17 +45,21 @@ class ComponentPolicy
 
     /**
      * Determine whether the user can update the model.
+     * Without a component, only the global permission is checked.
      */
-    public function update(User $user): bool
+    public function update(User $user, ?Component $component = null): bool
     {
-        return $this->hasGlobalPermission($user, 'update');
+        return $this->hasGlobalPermission($user, 'update')
+            && ($component === null || $this->view($user, $component));
     }
 
     /**
      * Determine whether the user can delete the model.
+     * Without a component, only the global permission is checked.
      */
-    public function delete(User $user): bool
+    public function delete(User $user, ?Component $component = null): bool
     {
-        return $this->hasGlobalPermission($user, 'delete');
+        return $this->hasGlobalPermission($user, 'delete')
+            && ($component === null || $this->view($user, $component));
     }
 }

@@ -8,13 +8,13 @@ use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\Ipv6NdDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Mac;
 use SnmpQuery;
@@ -22,6 +22,7 @@ use SnmpQuery;
 class Ipv6Nd implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -31,18 +32,15 @@ class Ipv6Nd implements Module
         return ['ports'];
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function pollingMethods(Device $device): array
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return [PollingMethodType::Snmp];
     }
 
     /**
      * @inheritDoc
      */
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function shouldPoll(OS $os): bool
     {
         return false;
     }
@@ -57,7 +55,7 @@ class Ipv6Nd implements Module
             : $this->discoverNeighborsFromIpMib($os->getDevice());
 
         ModuleModelObserver::observe(\App\Models\Ipv6Nd::class);
-        $this->syncModels($os->getDevice(), 'nd', $arp);
+        $this->syncVrfContextModels($os->getDevice(), 'nd', $arp);
     }
 
     /**

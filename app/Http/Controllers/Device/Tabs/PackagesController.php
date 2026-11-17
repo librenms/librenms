@@ -26,7 +26,10 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Http\Controllers\PackagesController as AllPackagesController;
 use App\Models\Device;
+use App\Models\Package;
+use App\Models\User;
 use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
@@ -54,8 +57,13 @@ class PackagesController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
+        /** @var User $user */
+        $user = $request->user();
+
         return [
-            'packages' => $device->packages()->orderBy('name')->get(),
+            'packages' => AllPackagesController::filteredQuery($request, $device->device_id)->orderBy('name')->orderBy('version')->orderBy('build')->get(),
+            'filter' => $request->array('filter'),
+            'filterFields' => Package::filterFieldDefinitions($user, $device->device_id),
         ];
     }
 }

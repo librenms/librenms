@@ -30,7 +30,9 @@ use App\Models\Device;
 use App\Models\WirelessSensor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use LibreNMS\Util\Url;
 
 class WirelessController implements DeviceTab
 {
@@ -56,6 +58,20 @@ class WirelessController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [];
+        // order the classes as the enum does
+        $present = $device->wirelessSensors()->distinct()->pluck('sensor_class');
+        $classes = array_values(array_filter(WirelessSensorType::cases(), fn (WirelessSensorType $class) => $present->contains($class)));
+
+        $metric = WirelessSensorType::tryFrom((string) Url::parseOptions('metric'));
+
+        return [
+            'classes' => $classes,
+            'metric' => $metric,
+            'options' => collect(['overview' => __('Overview')])
+                ->merge(collect($classes)->mapWithKeys(fn (WirelessSensorType $class) => [$class->value => __("wireless.$class->value.short")]))
+                ->map(fn ($text, $metric) => ['text' => $text, 'link' => route('device', ['device' => $device->device_id, 'tab' => 'wireless', 'metric' => $metric])])
+                ->all(),
+            'sensors' => $metric ? $device->wirelessSensors()->where('sensor_class', $metric)->orderBy('sensor_descr')->get() : collect(),
+        ];
     }
 }

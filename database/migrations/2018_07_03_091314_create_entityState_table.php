@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('entityState', function (Blueprint $table) {
+        Schema::create('entityState', function (Blueprint $table): void {
             $table->increments('entity_state_id');
             $table->unsignedInteger('device_id')->nullable()->index();
             $table->unsignedInteger('entPhysical_id')->nullable();

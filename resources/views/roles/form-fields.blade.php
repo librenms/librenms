@@ -56,12 +56,13 @@
     <div class="tw:grid tw:grid-cols-1 tw:md:grid-cols-2 tw:gap-4">
         @foreach($groups as $group => $perms)
             @php
-    $groupPerms = array_map(function ($perm) use ($labels, $group) {
+    $groupPerms = array_map(function ($perm) use ($labels, $group, $risky) {
         $permName = explode('.', $perm)[1] ?? $perm;
         return [
             'name' => $perm,
             'label' => $labels[$group][$permName]['label'] ?? ($labels[$group]['label'] ?? $perm),
-            'description' => $labels[$group][$permName]['description'] ?? ($labels[$group]['description'] ?? '')
+            'description' => $labels[$group][$permName]['description'] ?? ($labels[$group]['description'] ?? ''),
+            'risk' => in_array($perm, $risky) ? ($labels[$group][$permName]['risk'] ?? '') : null,
         ];
     }, $perms);
             @endphp
@@ -87,10 +88,18 @@
                                 <div class="tw:flex-1">
                                     <div class="tw:font-bold">
                                         {{ $p['label'] }}
+                                        @if($p['risk'] !== null)
+                                            <span class="label label-warning tw:ml-1"><i class="fas fa-triangle-exclamation" aria-hidden="true"></i> {{ __('permissions.rbac.risky') }}</span>
+                                        @endif
                                     </div>
                                     @if($p['description'])
                                         <div class="tw:text-base tw:text-slate-500 tw:dark:text-dark-white-400">
                                             {{ $p['description'] }}
+                                        </div>
+                                    @endif
+                                    @if($p['risk'])
+                                        <div class="tw:text-base tw:text-amber-700 tw:dark:text-amber-400">
+                                            {{ $p['risk'] }}
                                         </div>
                                     @endif
                                 </div>

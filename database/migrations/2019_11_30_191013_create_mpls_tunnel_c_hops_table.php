@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mpls_tunnel_c_hops', function (Blueprint $table) {
+        Schema::create('mpls_tunnel_c_hops', function (Blueprint $table): void {
             $table->increments('c_hop_id');
             $table->unsignedInteger('mplsTunnelCHopListIndex');
             $table->unsignedInteger('mplsTunnelCHopIndex');

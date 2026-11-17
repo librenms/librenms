@@ -1,6 +1,6 @@
 os: raritan-kvm
 text: 'Raritan KVM'
-type: appliance
+type: management
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 mib_dir: raritan

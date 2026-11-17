@@ -99,7 +99,7 @@
                     x-cloak
                     x-show="defaultSearchField && !isActive(defaultSearchField.key)"
                     @click="open(defaultSearchField)"
-                    :title="defaultSearchField.label"
+                    :title="defaultSearchField?.label"
                     class="tw:w-10 tw:py-2 tw:sm:py-0 tw:h-full tw:relative tw:max-sm:w-full tw:flex tw:items-center tw:justify-center tw:text-base tw:text-neutral-400! tw:dark:text-dark-white-400! tw:hover:text-neutral-900! tw:dark:hover:text-dark-white-100! tw:hover:bg-neutral-50 tw:dark:hover:bg-dark-gray-400 tw:transition-colors tw:border-b tw:sm:border-b-0 tw:sm:border-r tw:border-neutral-200 tw:dark:border-dark-gray-300">
                 <i class="fa-solid fa-search"></i>
             </button>
@@ -185,8 +185,8 @@
                         <span class="tw:block tw:text-xs tw:font-bold tw:text-neutral-500 tw:dark:text-dark-white-400 tw:uppercase tw:tracking-wider tw:mb-2.5">{{ __('Value') }}</span>
 
                         {{-- Text/Number/Date --}}
-                        <template x-if="current && ['text','email','number','date'].includes(current?.type) && !current?.endpoint">
-                            <input x-ref="valInput" :type="current?.type" x-model="value" @input="display = value"
+                        <template x-if="current && ['text','email','number','date','version'].includes(current?.type) && !current?.endpoint">
+                            <input x-ref="valInput" :type="current?.type === 'version' ? 'text' : current?.type" x-model="value" @input="display = value"
                                    x-init="$nextTick(() => $el.focus())"
                                    @keydown.enter="apply()"
                                    class="tw:w-full tw:px-3.5 tw:py-2 tw:text-sm tw:bg-neutral-50 tw:dark:bg-dark-gray-400 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:rounded-lg tw:focus:ring-2 tw:focus:ring-blue-500/50 tw:focus:border-blue-500 tw:outline-none tw:text-neutral-900! tw:dark:text-dark-white-100! tw:transition-all"/>
@@ -266,7 +266,3 @@
         </div>
     </template>
 </div>
-
-@push('scripts')
-    @routes
-@endpush

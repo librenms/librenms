@@ -10,8 +10,8 @@
                             <x-graph type="processor_usage" :vars="['id' => $processor->processor_id]" width="80" height="20" popup
                                      :popup-title="$device->display . ' - ' . $processor->getFormattedDescription()" />
                         </div>
-                        <x-device.overview.percentage class="tw:w-full tw:min-w-0 tw:max-w-50 tw:flex-1" :percent="$processor->processor_usage" :warning="$processor->processor_perc_warn"
-                            :left_text="''" :right_text="$processor->processor_usage . '%'" graph_type="processor_usage"
+                        <x-device.overview.percentage class="tw:w-full tw:min-w-0 tw:max-w-50 tw:flex-1" :percent="$processor->processor_usage ?? 0" :warning="$processor->processor_perc_warn"
+                            :left_text="''" :right_text="$processor->processor_usage === null ? '?' : $processor->processor_usage . '%'" graph_type="processor_usage"
                             :graph_vars="['id' => $processor->processor_id]" :graph_title="$device->display . ' - ' . $processor->getFormattedDescription()" />
                     </div>
                 @endforeach

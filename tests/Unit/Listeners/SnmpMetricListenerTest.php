@@ -24,11 +24,11 @@ final class SnmpMetricListenerTest extends TestCase
             duration: 0.123,
             response: new SnmpResponse(['sysDescr.0' => 'Linux']),
             options: new SnmpQueryOptions,
-            config: new \LibreNMS\Polling\Method\Config\SnmpConfig,
+            config: \LibreNMS\Polling\Method\Config\SnmpConfig::make((new \LibreNMS\Polling\Method\Methods\SnmpPollingMethod)->defaults(), new \LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData),
             backend: 'NetSnmp',
         );
 
-        (new SnmpMetricListener())->handle($event);
+        new SnmpMetricListener()->handle($event);
 
         $this->assertSame($initialCount + 1, $manager->getCategory('snmp')->getTotalCount());
         $this->assertEqualsWithDelta($initialDuration + 0.123, $manager->getCategory('snmp')->getTotalDuration(), 0.0001);
@@ -47,11 +47,11 @@ final class SnmpMetricListenerTest extends TestCase
             duration: 0.045,
             response: new SnmpResponse(['sysDescr.0' => 'Linux']),
             options: new SnmpQueryOptions,
-            config: new \LibreNMS\Polling\Method\Config\SnmpConfig,
+            config: \LibreNMS\Polling\Method\Config\SnmpConfig::make((new \LibreNMS\Polling\Method\Methods\SnmpPollingMethod)->defaults(), new \LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData),
             backend: 'PhpExtension',
         );
 
-        (new SnmpMetricListener())->handle($event);
+        new SnmpMetricListener()->handle($event);
 
         $this->assertSame($initialCount + 1, $manager->getCategory('snmp_backend')->getTotalCount());
         $this->assertEqualsWithDelta($initialDuration + 0.045, $manager->getCategory('snmp_backend')->getTotalDuration(), 0.0001);

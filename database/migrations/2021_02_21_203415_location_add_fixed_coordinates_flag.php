@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('locations', function (Blueprint $table) {
+        Schema::table('locations', function (Blueprint $table): void {
             $table->boolean('fixed_coordinates')->default(0);
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('locations', function (Blueprint $table) {
+        Schema::table('locations', function (Blueprint $table): void {
             $table->dropColumn('fixed_coordinates');
         });
     }

@@ -18,7 +18,7 @@ return new class extends Migration
             ->update(['ipv4_network_id' => 0]);
 
         if (LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
-            Schema::table('ipv4_addresses', function (Blueprint $table) {
+            Schema::table('ipv4_addresses', function (Blueprint $table): void {
                 $table->unsignedInteger('ipv4_network_id')->default(0)->change();
             });
         }
@@ -29,7 +29,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ipv4_addresses', function (Blueprint $table) {
+        Schema::table('ipv4_addresses', function (Blueprint $table): void {
             $table->string('ipv4_network_id', 128)->change();
         });
     }

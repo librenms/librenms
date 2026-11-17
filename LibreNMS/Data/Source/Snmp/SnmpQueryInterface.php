@@ -104,6 +104,12 @@ interface SnmpQueryInterface
     public function enumStrings(): SnmpQueryInterface;
 
     /**
+     * Apply MIB DISPLAY-HINTs to output values (default is true).
+     * Disabling outputs raw values, for example 793 instead of 79.3 or a hex string instead of a MAC.
+     */
+    public function displayHints(bool $apply = true): SnmpQueryInterface;
+
+    /**
      * Set option(s) for net-snmp command line.
      * Some options may break parsing, but you can manually parse the raw output if needed.
      * This will override other options set such as setting numeric.  Call with no options to reset to default.

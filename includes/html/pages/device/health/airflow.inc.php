@@ -23,6 +23,6 @@
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-$class = \LibreNMS\Enum\Sensor::Airflow;
+$class = \LibreNMS\Enum\SensorType::Airflow;
 
 require 'sensors.inc.php';

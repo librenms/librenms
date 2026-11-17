@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Facades\Request;
 use Illuminate\View\Component;
+use LibreNMS\Enum\PollingMethodType;
 
 class EditTabs extends Component
 {
@@ -47,37 +48,30 @@ class EditTabs extends Component
                 'text' => __('Device Settings'),
                 'link' => route('device.edit', $this->device->device_id),
             ],
-            'snmp' => [
-                'text' => 'SNMP',
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=snmp/'),
+            'polling' => [
+                'text' => __('Polling'),
+                'link' => route('device.edit.polling', $this->device->device_id),
             ],
         ];
 
-        if (! $device->snmp_disable) {
+        if ($this->device->ports()->exists()) {
             $this->tabs['ports'] = [
-                'text' => __('Port Settings'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=ports/'),
+                'text' => __('Ports'),
+                'link' => route('device.edit.ports', $this->device->device_id),
             ];
         }
 
-        if ($device->bgppeers()->exists()) {
+        if ($device->bgppeers()->exists() || $device->vrfs()->exists()) {
             $this->tabs['routing'] = [
                 'text' => __('Routing'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=routing/'),
+                'link' => route('device.edit.routing', $this->device->device_id),
             ];
         }
 
-        if (count(LibrenmsConfig::get("os.{$device->os}.icons", []))) {
-            $this->tabs['icon'] = [
-                'text' => __('Icon'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=icon/'),
-            ];
-        }
-
-        if (! $device->snmp_disable) {
+        if ($this->device->polling()->isEnabled(PollingMethodType::Snmp)) {
             $this->tabs['apps'] = [
                 'text' => __('Applications'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=apps/'),
+                'link' => route('device.edit.apps', $this->device->device_id),
             ];
         }
 
@@ -86,12 +80,10 @@ class EditTabs extends Component
             'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=alert-rules/'),
         ];
 
-        if (! $device->snmp_disable) {
-            $this->tabs['modules'] = [
-                'text' => __('Modules'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=modules/'),
-            ];
-        }
+        $this->tabs['modules'] = [
+            'text' => __('Modules'),
+            'link' => route('device.edit.modules', $this->device->device_id),
+        ];
 
         if (LibrenmsConfig::get('show_services')) {
             $this->tabs['services'] = [
@@ -99,11 +91,6 @@ class EditTabs extends Component
                 'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=services/'),
             ];
         }
-
-        $this->tabs['ipmi'] = [
-            'text' => __('IPMI'),
-            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=ipmi/'),
-        ];
 
         if ($this->device->sensors()->exists()) {
             $this->tabs['health'] = [
@@ -115,22 +102,28 @@ class EditTabs extends Component
         if ($this->device->wirelessSensors()->exists()) {
             $this->tabs['wireless-sensors'] = [
                 'text' => __('Wireless Sensors'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=wireless-sensors/'),
+                'link' => route('device.edit.wireless-sensors', $this->device->device_id),
             ];
         }
 
-        if (! $device->snmp_disable) {
+        if ($this->device->storage()->exists()) {
             $this->tabs['storage'] = [
                 'text' => __('Storage'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=storage/'),
+                'link' => route('device.edit.storage', $this->device->device_id),
             ];
+        }
+
+        if ($this->device->processors()->exists()) {
             $this->tabs['processors'] = [
                 'text' => __('Processors'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=processors/'),
+                'link' => route('device.edit.processors', $this->device->device_id),
             ];
+        }
+
+        if ($this->device->mempools()->exists()) {
             $this->tabs['mempools'] = [
                 'text' => __('Memory'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=mempools/'),
+                'link' => route('device.edit.mempools', $this->device->device_id),
             ];
         }
 
@@ -141,12 +134,12 @@ class EditTabs extends Component
 
         $this->tabs['component'] = [
             'text' => __('Components'),
-            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=component/'),
+            'link' => route('device.edit.components', $this->device->device_id),
         ];
 
         $this->tabs['customoid'] = [
             'text' => __('Custom OID'),
-            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=customoid/'),
+            'link' => route('device.edit.customoids', $this->device->device_id),
         ];
     }
 

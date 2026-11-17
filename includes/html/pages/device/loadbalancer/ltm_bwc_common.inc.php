@@ -32,7 +32,7 @@ print_optionbar_start();
 ?>
     <div class='row' style="margin-bottom: 10px;">
         <div class='col-md-12'>
-            <span style="font-size: 20px;">Bandwidth Controller - <?php echo $components[$vars['bwcid']]['label'] ?></span><br /> 
+            <span style="font-size: 20px;">Bandwidth Controller - <?php echo e($components[$vars['bwcid']]['label']); ?></span><br /> 
         </div>
     </div>
     <div class='row'>

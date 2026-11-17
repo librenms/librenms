@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ports_stp', function (Blueprint $table) {
+        Schema::table('ports_stp', function (Blueprint $table): void {
             $table->unsignedInteger('designatedCost')->change();
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ports_stp', function (Blueprint $table) {
+        Schema::table('ports_stp', function (Blueprint $table): void {
             $table->smallInteger('designatedCost')->unsigned()->change();
         });
     }

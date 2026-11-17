@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ports_fdb', function (Blueprint $table) {
+        Schema::create('ports_fdb', function (Blueprint $table): void {
             $table->unsignedBigInteger('ports_fdb_id', true);
             $table->unsignedInteger('port_id')->index();
             $table->string('mac_address', 32)->index();

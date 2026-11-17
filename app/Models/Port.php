@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Models\Traits\Filterable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -33,6 +34,7 @@ class Port extends DeviceRelatedModel
     protected $guarded = [];
     protected array $filterable = [
         'device_id',
+        'port_id',
         'ifName',
         'ifDescr',
         'portName',
@@ -115,6 +117,11 @@ class Port extends DeviceRelatedModel
 
     // ---- Helper Functions ----
 
+    public function metricIdentity(string $measurement): MetricIdentity
+    {
+        return new MetricIdentity($measurement, ['hostname' => (string) $this->device?->hostname, 'id' => $this->port_id]);
+    }
+
     /**
      * Returns a human readable label for this port
      *
@@ -190,20 +197,25 @@ class Port extends DeviceRelatedModel
      */
     public function getSpeeds(): array
     {
-        $egress = $ingress = (int) $this->ifSpeed;
+        return $this->circuitSpeeds() ?? [(int) $this->ifSpeed, (int) $this->ifSpeed];
+    }
 
-        if (! empty($this->port_descr_speed)) {
-            $speed_parts = explode('/', (string) $this->port_descr_speed, 2);
-            $parsed_egress = Number::toBytes($speed_parts[0]);
-            $parsed_ingress = isset($speed_parts[1]) ? Number::toBytes($speed_parts[1]) : $parsed_egress;
-
-            if ($parsed_egress > 0 && $parsed_ingress > 0) {
-                $egress = $parsed_egress;
-                $ingress = $parsed_ingress;
-            }
+    /**
+     * Circuit speeds from port_descr_speed, which may be asymmetric: "egress/ingress" for example 100M/20M
+     *
+     * @return array{int, int}|null [egress bps, ingress bps]
+     */
+    public function circuitSpeeds(): ?array
+    {
+        if (empty($this->port_descr_speed)) {
+            return null;
         }
 
-        return [$egress, $ingress];
+        $speed_parts = explode('/', (string) $this->port_descr_speed, 2);
+        $egress = Number::toBytes($speed_parts[0]);
+        $ingress = isset($speed_parts[1]) ? Number::toBytes($speed_parts[1]) : $egress;
+
+        return $egress > 0 && $ingress > 0 ? [(int) $egress, (int) $ingress] : null;
     }
 
     // ---- Accessors/Mutators ----
@@ -345,6 +357,15 @@ class Port extends DeviceRelatedModel
     public function scopeInPortGroup($query, $portGroup)
     {
         return $query->whereIn($query->qualifyColumn('port_id'), function ($query) use ($portGroup): void {
+            $query->select('port_id')
+                ->from('port_group_port')
+                ->where('port_group_id', $portGroup);
+        });
+    }
+
+    public function scopeNotInPortGroup($query, $portGroup)
+    {
+        return $query->whereNotIn($query->qualifyColumn('port_id'), function ($query) use ($portGroup): void {
             $query->select('port_id')
                 ->from('port_group_port')
                 ->where('port_group_id', $portGroup);

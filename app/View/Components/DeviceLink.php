@@ -40,7 +40,7 @@ class DeviceLink extends Component
         $this->tab = $tab;
         $this->section = $section;
         $this->status = $this->status();
-        $this->href = route('device', ['device' => $device->device_id ?? 1, 'tab' => $tab, 'section' => $section]);
+        $this->href = route('device', ['device' => $this->device->device_id ?? 1, 'tab' => $tab, 'section' => $section]);
     }
 
     /**

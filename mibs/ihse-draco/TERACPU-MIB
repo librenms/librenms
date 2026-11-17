@@ -1,0 +1,878 @@
+TERACPU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        enterprises FROM RFC1155-SMI
+        OBJECT-TYPE, Integer32 FROM SNMPv2-SMI;
+
+
+ihse        	OBJECT IDENTIFIER ::= {enterprises 38034}
+teracpu       	OBJECT IDENTIFIER ::= {ihse 1}
+teraoem   		OBJECT IDENTIFIER ::= {teracpu 1}
+teraconf   		OBJECT IDENTIFIER ::= {teracpu 2}
+teratab   		OBJECT IDENTIFIER ::= {teracpu 3}
+teravar   		OBJECT IDENTIFIER ::= {teracpu 4}
+teratrap 		OBJECT IDENTIFIER ::= {teracpu 5}
+
+DisplayString ::= OCTET STRING
+
+
+teraCPU MODULE-IDENTITY
+	LAST-UPDATED	"201602100000Z"
+	ORGANIZATION	"IHSE GmbH"
+	CONTACT-INFO	"support@ihse.de"
+	DESCRIPTION		"The MIB module for managing the Draco tera devices"
+
+	REVISION		"201602100000Z"
+	DESCRIPTION		"Implementation of firmware version 3.02"
+
+	REVISION		"201312020000Z"
+	DESCRIPTION		"Implementation of firmware version 3.00"
+
+	REVISION		"201305030000Z"
+	DESCRIPTION		"Range of object teraSlotIndex changed from (0..65) to (0..64)"
+
+	REVISION		"201301100000Z"
+	DESCRIPTION		"Implementation of objects teraFan*, teraTrapFan*, teraPower* and teraTrapPower*"
+
+	REVISION		"201211260000Z"
+	DESCRIPTION		"Implementation of objects teraSwitch* and teraTrapSwitch"
+
+	REVISION		"201211160000Z"
+	DESCRIPTION		"Object teraTaskStatus extended"
+
+	REVISION		"201211150000Z"
+	DESCRIPTION		"Added support for Extender, CPU and CON data tables"
+
+	REVISION		"201211140000Z"
+	DESCRIPTION		"The initial relase"
+	::= {teracpu 10}
+
+
+--
+-- teraoem group
+--
+
+teraManufacturer OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..255))
+	ACCESS  	read-only
+	STATUS  	mandatory
+	DESCRIPTION "Company name"
+	::= {teraoem 1}
+
+teraFamily OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..255))
+	ACCESS  	read-only
+	STATUS  	mandatory
+	DESCRIPTION "Product family"
+	::= {teraoem 2}
+
+teraType OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..255))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Product type"
+	::= {teraoem 3}
+
+
+
+--
+-- teraconf group
+--
+
+teraName OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..255))
+	ACCESS  	read-only
+	STATUS  	mandatory
+	DESCRIPTION "Name of the configuration"
+	::= {teraconf 1}
+
+teraInfo OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..255))
+	ACCESS  	read-only
+	STATUS  	mandatory
+	DESCRIPTION "Description of the configuration"
+	::= {teraconf 2}
+
+teraDevice OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..255))
+	ACCESS  	read-only
+	STATUS  	mandatory
+	DESCRIPTION "Device name"
+	::= {teraconf 3}
+
+
+
+--
+-- teratab group
+--
+
+-- task data table
+
+teraTaskTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF teraTaskEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION	"Task data table"
+	::= {teratab 1}
+
+teraTaskEntry OBJECT-TYPE
+	SYNTAX		teraTaskEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION	"An entry of the task data table"
+	INDEX { teraTaskIndex }
+	::= {teraTaskTable 1}
+
+teraTaskEntry ::=
+	SEQUENCE {
+		teraTaskIndex		Integer32,
+		teraTaskName		DisplayString,
+		teraTaskStatus		INTEGER,
+		teraTaskCounter		Integer32,
+		teraTaskCycle		Integer32}
+
+teraTaskIndex OBJECT-TYPE
+	SYNTAX		Integer32(0..6)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Task index (0..6)"
+	::= {teraTaskEntry 1}
+
+teraTaskName OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..255))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Task name"
+	::= {teraTaskEntry 2}
+
+teraTaskStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+					unknown(0),
+					starting(1),
+					active(2),
+					busy(3),
+					waiting(4),
+					stopped(5),
+					error(6)
+				}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Status information"
+	::= {teraTaskEntry 3}
+
+teraTaskCounter OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Performance counter"
+	::= {teraTaskEntry 4}
+
+teraTaskCycle OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Cycle time in microseconds"
+	::= {teraTaskEntry 5}
+
+
+-- slot data table
+
+teraSlotTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF teraSlotEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION	"Slot data table"
+	::= {teratab 2}
+
+teraSlotEntry OBJECT-TYPE
+	SYNTAX		teraSlotEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION	"An entry of the slot data table"
+	INDEX { teraSlotIndex }
+	::= {teraSlotTable 1}
+
+teraSlotEntry ::=
+	SEQUENCE {
+		teraSlotIndex		Integer32,
+		teraSlotStatus		Unsigned32,
+		teraSlotVersion		DisplayString}
+
+teraSlotIndex OBJECT-TYPE
+	SYNTAX		Integer32(0..64)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Slot index, 0 = CPU-Card, 1..64 = IO-Card"
+	::= {teraSlotEntry 1}
+
+teraSlotStatus OBJECT-TYPE
+	SYNTAX		Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Slot status
+				Bit 1 - 3 set: ready
+				Bit 4 set: active
+				Bit 27 set: error
+				Bit 31 set: module is on hold
+				Bit 32 set: module is invalid"
+	::= {teraSlotEntry 2}
+
+teraSlotVersion OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..255))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Type and firmware information"
+	::= {teraSlotEntry 3}
+
+
+-- port data table
+
+teraPortTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF teraPortEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION	"Port data table"
+	::= {teratab 3}
+
+teraPortEntry OBJECT-TYPE
+	SYNTAX		teraPortEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION	"An entry of the port data table"
+	INDEX { teraPortIndex }
+	::= {teraPortTable 1}
+
+teraPortEntry ::=
+	SEQUENCE {
+		teraPortIndex			Integer32,
+		teraPortStatus			Unsigned32,
+		teraPortOutput			Integer32,
+		teraPortExtenderIndex	Integer32,
+		teraPortExtenderID		Integer32}
+
+teraPortIndex OBJECT-TYPE
+	SYNTAX		Integer32(1..2032)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Port index (1..2032)"
+	::= {teraPortEntry 1}
+
+teraPortStatus OBJECT-TYPE
+	SYNTAX		Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Port status
+				Bit 1-3 set: available but not in use
+				Bit 1-7 set: port connected
+				Bit 16 set: error"
+	::= {teraPortEntry 2}
+
+teraPortOutput OBJECT-TYPE
+	SYNTAX		Integer32(1..2032)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Index of the port connected (0=not connected)"
+	::= {teraPortEntry 3}
+
+teraPortExtenderIndex OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Index of the extender connected"
+	::= {teraPortEntry 4}
+
+teraPortExtenderID OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"ID of the extender connected"
+	::= {teraPortEntry 5}
+
+
+-- extender data table
+
+teraExtenderTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF teraExtenderEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION	"Extender data table"
+	::= {teratab 4}
+
+teraExtenderEntry OBJECT-TYPE
+	SYNTAX		teraExtenderEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION	"An entry of the extender data table"
+	INDEX { teraExtenderIndex }
+	::= {teraExtenderTable 1}
+
+teraExtenderEntry ::=
+	SEQUENCE {
+		teraExtenderIndex			Integer32,
+		teraExtenderStatus			OCTET STRING,
+		teraExtenderID				Integer32,
+		teraExtenderType			Unsigned32,
+		teraExtenderPort			Integer32,
+		teraExtenderSPort			Integer32,
+		teraExtenderCpuConIndex		Integer32,
+		teraExtenderCpuConID		Integer32,
+		teraExtenderCpuConType		INTEGER}
+
+teraExtenderIndex OBJECT-TYPE
+	SYNTAX		Integer32(1..2048)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Extender index (1..2048)"
+	::= {teraExtenderEntry 1}
+
+teraExtenderStatus OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Extender status
+                 Bit0=KVM1
+                 Bit1=KVM2
+                 Bit2=HID active
+                 Bit3=HID1 device
+                 Bit4=HID2 device
+                 Bit5=HID sync
+                 Bit6=Video1
+                 Bit7=Video2"
+	::= {teraExtenderEntry 2}
+
+teraExtenderID OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Extender ID"
+	::= {teraExtenderEntry 3}
+
+teraExtenderType OBJECT-TYPE
+	SYNTAX		Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Extender type"
+	::= {teraExtenderEntry 4}
+
+teraExtenderPort OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Primary port index (0=not connected)"
+	::= {teraExtenderEntry 5}
+
+teraExtenderSPort OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Secondary port index (0=not connected)"
+	::= {teraExtenderEntry 6}
+
+teraExtenderCpuConIndex OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Index of the CPU/CON device assigned (0=not assigned)"
+	::= {teraExtenderEntry 7}
+
+teraExtenderCpuConID OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"ID of the CPU/CON device assigned (0=not assigned)"
+	::= {teraExtenderEntry 8}
+
+teraExtenderCpuConType OBJECT-TYPE
+	SYNTAX		INTEGER {
+					unknown(0),
+					CPU(1),
+					CON(2)
+				}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Device type information 1=CPU 2=CON"
+	::= {teraExtenderEntry 9}
+
+
+-- cpu data table
+
+teraCpuTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF teraCpuEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION	"CPU data table"
+	::= {teratab 5}
+
+teraCpuEntry OBJECT-TYPE
+	SYNTAX		teraCpuEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION	"An entry of the CPU data table"
+	INDEX { teraCpuIndex }
+	::= {teraCpuTable 1}
+
+teraCpuEntry ::=
+	SEQUENCE {
+		teraCpuIndex			Integer32,
+		teraCpuStatus			Unsigned32,
+		teraCpuID				Integer32,
+		teraCpuRealCpuIndex		Integer32,
+		teraCpuRealCpuID		Integer32,
+		teraCpuConIndex			Integer32,
+		teraCpuConID			Integer32}
+
+teraCpuIndex OBJECT-TYPE
+	SYNTAX		Integer32(1..512)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"CPU index (1..512)"
+	::= {teraCpuEntry 1}
+
+teraCpuStatus OBJECT-TYPE
+	SYNTAX		Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"CPU status
+				Bit 2 set: private mode connection
+				Bit 32 set: device has been defined"
+	::= {teraCpuEntry 2}
+
+teraCpuID OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"CPU ID"
+	::= {teraCpuEntry 3}
+
+teraCpuRealCpuIndex OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"For a virtual/real CPU device the index of the real/virtual CPU assigned"
+	::= {teraCpuEntry 4}
+
+teraCpuRealCpuID OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"For a virtual/real CPU device the ID of the real/virtual CPU assigned"
+	::= {teraCpuEntry 5}
+
+teraCpuConIndex OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Index of the CON device connected (0=not connected)"
+	::= {teraCpuEntry 6}
+
+teraCpuConID OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"ID of the CON device connected (0=not connected)"
+	::= {teraCpuEntry 7}
+
+
+-- con data table
+
+teraConTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF teraConEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION	"CON data table"
+	::= {teratab 6}
+
+teraConEntry OBJECT-TYPE
+	SYNTAX		teraConEntry
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION	"An entry of the CON data table"
+	INDEX { teraConIndex }
+	::= {teraConTable 1}
+
+teraConEntry ::=
+	SEQUENCE {
+		teraConIndex			Integer32,
+		teraConStatus			Unsigned32,
+		teraConID				Integer32,
+		teraConVirtualConIndex	Integer32,
+		teraConVirtualConID		Integer32,
+		teraConCpuIndex			Integer32,
+		teraConCpuID			Integer32}
+
+teraConIndex OBJECT-TYPE
+	SYNTAX		Integer32(1..512)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"CON index (1..512)"
+	::= {teraConEntry 1}
+
+teraConStatus OBJECT-TYPE
+	SYNTAX		Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"CON status
+				Bit 2 set: private mode connection
+				Bit 3 set: video only connection
+				Bit 32 set: device has been defined"
+	::= {teraConEntry 2}
+
+teraConID OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"CON ID"
+	::= {teraConEntry 3}
+
+teraConVirtualConIndex OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"For a real CON device the index of the virtual CON assigned"
+	::= {teraConEntry 4}
+
+teraConVirtualConID OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"For a real CON device the ID of the virtual CON assigned"
+	::= {teraConEntry 5}
+
+teraConCpuIndex OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Index of the CPU device connected (0=not connected)"
+	::= {teraConEntry 6}
+
+teraConCpuID OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"ID of the CPU device connected (0=not connected)"
+	::= {teraConEntry 7}
+
+
+
+--
+-- teravar group
+--
+
+teraStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+					unknown(0),
+					active(1),
+					disabled(2)
+				}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Status of the matrix chip"
+	::= {teravar 1}
+
+teraTemperature OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature of the matrix chip
+				recommended temperature: < 110°C
+				maximum temperature:  130°C"
+	::= {teravar 2}
+
+teraInsertSlot OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Last slot inserted"
+	::= {teravar 10}
+
+teraRemoveSlot OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Last slot removed"
+	::= {teravar 11}
+
+teraInvalidSlot OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Last slot marked as invalid"
+	::= {teravar 12}
+
+teraInsertExtender OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Last extender inserted"
+	::= {teravar 20}
+
+teraRemoveExtender OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Last extender removed"
+	::= {teravar 21}
+
+teraSwitchFromUser OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"User ID"
+	::= {teravar 30}
+
+teraSwitchFromCon OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"CON ID"
+	::= {teravar 31}
+
+teraSwitchCpu OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"CPU ID to connect"
+	::= {teravar 32}
+
+teraSwitchCon OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"CON ID to connect"
+	::= {teravar 33}
+
+teraSwitchMode OBJECT-TYPE
+	SYNTAX		INTEGER {
+					Standard(0),
+					VideoOnly(1),
+					Private(2),
+					ControlOnly(3)
+				}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Mode how to connect"
+	::= {teravar 34}
+
+teraFan1Status OBJECT-TYPE
+	SYNTAX		INTEGER {
+					unknown(0),
+					okay(1),
+					faulty(2)
+				}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Status of fan tray #1"
+	::= {teravar 40}
+
+teraFan1Speed OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Speed of fan tray #1 in steps
+	min: 0, max: 15"
+	::= {teravar 41}
+
+teraFan2Status OBJECT-TYPE
+	SYNTAX		INTEGER {
+					unknown(0),
+					okay(1),
+					faulty(2)
+				}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Status of fan tray #2"
+	::= {teravar 42}
+
+teraFan2Speed OBJECT-TYPE
+	SYNTAX		Integer32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Speed of fan tray #2 in steps
+	min: 0, max: 15"
+	::= {teravar 43}
+
+teraPower1Status OBJECT-TYPE
+	SYNTAX		INTEGER {
+					unknown(0),
+					available(1),
+					power(3),
+					faulty(4)
+				}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Status of power supply #1"
+	::= {teravar 50}
+
+teraPower2Status OBJECT-TYPE
+	SYNTAX		INTEGER {
+					unknown(0),
+					available(1),
+					power(3),
+					faulty(4)
+				}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Status of power supply #2"
+	::= {teravar 51}
+
+teraPower3Status OBJECT-TYPE
+	SYNTAX		INTEGER {
+					unknown(0),
+					available(1),
+					power(3),
+					faulty(4)
+				}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Status of power supply #3"
+	::= {teravar 52}
+
+teraPower4Status OBJECT-TYPE
+	SYNTAX		INTEGER {
+					unknown(0),
+					available(1),
+					power(3),
+					faulty(4)
+				}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Status of power supply #4"
+	::= {teravar 53}
+
+teraExtenderPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION	"Extender port"
+    ::= {teravar 60}
+
+teraExtenderID OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION	"Extender ID"
+    ::= {teravar 61}
+--
+teraExtenderStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION	"Extender status"
+    ::= {teravar 62}
+
+-- teratrap group
+--
+
+teraTrapList OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"Notification objects"
+	::= {teratrap 0}
+
+teraTrapStatus NOTIFICATION-TYPE
+	OBJECTS		{ teraStatus }
+	STATUS		current
+	DESCRIPTION	"Status of the matrix"
+	::= {teraTrapList 1}
+
+teraTrapTemperature NOTIFICATION-TYPE
+	OBJECTS		{ teraTemperature }
+	STATUS		current
+	DESCRIPTION	"Temperature of the matrix chip
+	 			recommended temperature: <110°C
+	 			maximum temperature: 130°C"
+	::= {teraTrapList 2}
+
+teraTrapInsertSlot NOTIFICATION-TYPE
+	OBJECTS		{ teraInsertSlot }
+	STATUS		current
+	DESCRIPTION	"Last slot inserted"
+	::= {teraTrapList 10}
+
+teraTrapRemoveSlot NOTIFICATION-TYPE
+	OBJECTS		{ teraRemoveSlot }
+	STATUS		current
+	DESCRIPTION	"Last slot removed"
+	::= {teraTrapList 11}
+
+teraTrapInvalidSlot NOTIFICATION-TYPE
+	OBJECTS		{ teraInvalidSlot }
+	STATUS		current
+	DESCRIPTION	"Last slot marked as invalid"
+	::= {teraTrapList 12}
+
+teraTrapInsertExtender NOTIFICATION-TYPE
+	OBJECTS		{ teraInsertExtender }
+	STATUS		current
+	DESCRIPTION	"Last extender inserted"
+	::= {teraTrapList 20}
+
+teraTrapRemoveExtender NOTIFICATION-TYPE
+	OBJECTS		{ teraRemoveExtender }
+	STATUS		current
+	DESCRIPTION	"Last extender removed"
+	::= {teraTrapList 21}
+
+teraTrapSwitch NOTIFICATION-TYPE
+	OBJECTS		{ teraSwitchFromUser,
+				  teraSwitchFromCon,
+				  teraSwitchCpu,
+				  teraSwitchCon,
+				  teraSwitchMode }
+	STATUS		current
+	DESCRIPTION	"Switch command"
+	::= {teraTrapList 30}
+
+teraTrapFan1 NOTIFICATION-TYPE
+	OBJECTS		{ teraFan1Status,
+				  teraFan1Speed }
+	STATUS		current
+	DESCRIPTION	"Status and speed of fan tray #1"
+	::= {teraTrapList 40}
+
+teraTrapFan2 NOTIFICATION-TYPE
+	OBJECTS		{ teraFan2Status,
+				  teraFan2Speed }
+	STATUS		current
+	DESCRIPTION	"Status and speed of fan tray #2"
+	::= {teraTrapList 41}
+
+teraTrapPower1 NOTIFICATION-TYPE
+	OBJECTS		{ teraPower1Status }
+	STATUS		current
+	DESCRIPTION	"Status of power supply #1"
+	::= {teraTrapList 50}
+
+teraTrapPower2 NOTIFICATION-TYPE
+	OBJECTS		{ teraPower2Status }
+	STATUS		current
+	DESCRIPTION	"Status of power supply #2"
+	::= {teraTrapList 51}
+
+teraTrapPower3 NOTIFICATION-TYPE
+	OBJECTS		{ teraPower3Status }
+	STATUS		current
+	DESCRIPTION	"Status of power supply #3"
+	::= {teraTrapList 52}
+
+teraTrapPower4 NOTIFICATION-TYPE
+	OBJECTS		{ teraPower4Status }
+	STATUS		current
+	DESCRIPTION	"Status of power supply #4"
+	::= {teraTrapList 53}
+
+teraTrapExtenderStatus NOTIFICATION-TYPE
+    OBJECTS		{ teraExtenderPort,
+                  teraExtenderID,
+                  teraExtenderStatus }
+    STATUS      current
+    DESCRIPTION "Extender status
+                 Bit0=KVM1
+                 Bit1=KVM2
+                 Bit2=HID active
+                 Bit3=HID1 device
+                 Bit4=HID2 device
+                 Bit5=HID sync
+                 Bit6=Video1
+                 Bit7=Video2"
+    ::= {teraTrapList 60}
+END

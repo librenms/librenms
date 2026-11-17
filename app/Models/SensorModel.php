@@ -56,6 +56,13 @@ use LibreNMS\Enum\WirelessSensorType;
  */
 abstract class SensorModel extends DeviceRelatedModel
 {
+    public const LIMITS = [
+        'sensor_limit',
+        'sensor_limit_warn',
+        'sensor_limit_low_warn',
+        'sensor_limit_low',
+    ];
+
     use HasThresholds;
 
     abstract public function formatValue(string $field = 'sensor_current'): string;

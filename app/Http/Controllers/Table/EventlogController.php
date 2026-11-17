@@ -27,13 +27,14 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Eventlog;
+use App\Models\Port;
 use App\Models\Sensor;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
-use LibreNMS\Enum\Severity;
+use LibreNMS\Util\Html;
 use LibreNMS\Util\Time;
 use LibreNMS\Util\Url;
 
@@ -47,6 +48,7 @@ class EventlogController extends TableController
         return [
             'device' => 'nullable|int',
             'device_group' => 'nullable|int',
+            'port' => 'nullable|int',
             'eventtype' => 'nullable|string',
             'age' => 'nullable|int',
             'message' => 'nullable|string',
@@ -58,11 +60,34 @@ class EventlogController extends TableController
         return ['message'];
     }
 
+    /**
+     * Also match interface events by the label (ifName, ifAlias, ifDescr) of their port.
+     */
+    protected function search(?string $search, Builder $query, array $fields): Builder
+    {
+        if (! $search) {
+            return $query;
+        }
+
+        return $query->where(fn (Builder $query) => parent::search($search, $query, $fields)
+            ->orWhere(fn (Builder $query) => $query
+                ->where('type', 'interface')
+                ->whereIn('reference', Port::select('port_id')->where(fn (Builder $query) => $query
+                    ->where('ifName', 'like', "%$search%")
+                    ->orWhere('ifAlias', 'like', "%$search%")
+                    ->orWhere('ifDescr', 'like', "%$search%")
+                ))
+            ));
+    }
+
     protected function filterFields(Request $request): array
     {
         return [
             'device_id' => 'device',
             'type' => 'eventtype',
+            'port' => function (Builder $query, int $port_id): void {
+                $query->where('type', 'interface')->where('reference', $port_id);
+            },
         ];
     }
 
@@ -117,7 +142,7 @@ class EventlogController extends TableController
             }
         } elseif ($eventlog->type == 'stp') {
             return Blade::render('<x-device-link :device="$device" tab="stp">stp</x-device-link>', ['device' => $eventlog->device]);
-        } elseif (in_array($eventlog->type, \LibreNMS\Enum\Sensor::values())) {
+        } elseif (in_array($eventlog->type, \LibreNMS\Enum\SensorType::values())) {
             if (is_numeric($eventlog->reference)) {
                 $sensor = $eventlog->related;
                 if (isset($sensor) && $sensor instanceof Sensor) {
@@ -131,23 +156,7 @@ class EventlogController extends TableController
 
     private function formatDatetime(Eventlog $eventlog): string
     {
-        $output = "<span class='alert-status ";
-        $output .= $this->severityLabel($eventlog->severity);
-        $output .= " eventlog-status'></span>";
-        $output .= Time::format($eventlog->datetime, 'compact');
-
-        return $output;
-    }
-
-    private function severityLabel(Severity $eventlog_severity): string
-    {
-        return match ($eventlog_severity) {
-            Severity::Ok => 'label-success',
-            Severity::Info => 'label-info',
-            Severity::Notice => 'label-primary',
-            Severity::Warning => 'label-warning',
-            Severity::Error => 'label-danger',
-            default => 'label-default', // Unknown
-        };
+        return Html::severityToLabel($eventlog->severity, '', class: 'alert-status eventlog-status')
+            . Time::format($eventlog->datetime, 'compact');
     }
 }

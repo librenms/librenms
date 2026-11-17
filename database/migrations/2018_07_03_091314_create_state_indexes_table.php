@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('state_indexes', function (Blueprint $table) {
+        Schema::create('state_indexes', function (Blueprint $table): void {
             $table->increments('state_index_id');
             $table->string('state_name', 64)->unique();
         });

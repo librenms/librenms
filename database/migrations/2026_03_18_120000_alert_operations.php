@@ -75,7 +75,7 @@ return new class extends Migration
     private function createOperationsSchemaUp(): void
     {
         if (! Schema::hasTable('alert_operations')) {
-            Schema::create('alert_operations', function (Blueprint $table) {
+            Schema::create('alert_operations', function (Blueprint $table): void {
                 $table->increments('id');
                 $table->string('name', 255);
                 $table->unsignedInteger('default_operation_step_duration_seconds')->nullable();
@@ -83,7 +83,7 @@ return new class extends Migration
         }
 
         if (! Schema::hasTable('alert_operation_segments')) {
-            Schema::create('alert_operation_segments', function (Blueprint $table) {
+            Schema::create('alert_operation_segments', function (Blueprint $table): void {
                 $table->increments('id');
                 $table->unsignedInteger('alert_operation_id');
                 $table->unsignedSmallInteger('position')->default(0);
@@ -98,7 +98,7 @@ return new class extends Migration
         }
 
         if (! Schema::hasTable('alert_operation_transport_map')) {
-            Schema::create('alert_operation_transport_map', function (Blueprint $table) {
+            Schema::create('alert_operation_transport_map', function (Blueprint $table): void {
                 $table->increments('id');
                 $table->unsignedInteger('segment_id');
                 $table->unsignedInteger('transport_or_group_id');
@@ -108,7 +108,7 @@ return new class extends Migration
         }
 
         if (! Schema::hasColumn('alert_rules', 'alert_operation_id')) {
-            Schema::table('alert_rules', function (Blueprint $table) {
+            Schema::table('alert_rules', function (Blueprint $table): void {
                 $table->unsignedInteger('alert_operation_id')->nullable()->after('notes');
                 $table->index(['alert_operation_id']);
             });
@@ -178,9 +178,7 @@ return new class extends Migration
             }
 
             // Create only unique operations: key off the legacy operation parameters + transport selection.
-            usort($transportRows, static function (array $a, array $b): int {
-                return ($a['target_type'] <=> $b['target_type']) ?: ($a['transport_or_group_id'] <=> $b['transport_or_group_id']);
-            });
+            usort($transportRows, static fn (array $a, array $b): int => ($a['target_type'] <=> $b['target_type']) ?: ($a['transport_or_group_id'] <=> $b['transport_or_group_id']));
 
             $signature = sha1((string) json_encode([
                 'delay' => max(0, $delay),
@@ -241,7 +239,7 @@ return new class extends Migration
         }
 
         if (! Schema::hasTable('alert_transport_map')) {
-            Schema::create('alert_transport_map', function (Blueprint $table) {
+            Schema::create('alert_transport_map', function (Blueprint $table): void {
                 $table->increments('id');
                 $table->unsignedInteger('rule_id');
                 $table->unsignedInteger('transport_or_group_id');
@@ -306,7 +304,7 @@ return new class extends Migration
     private function dropOperationsSchemaDown(): void
     {
         if (Schema::hasColumn('alert_rules', 'alert_operation_id')) {
-            Schema::table('alert_rules', function (Blueprint $table) {
+            Schema::table('alert_rules', function (Blueprint $table): void {
                 $table->dropColumn('alert_operation_id');
             });
         }

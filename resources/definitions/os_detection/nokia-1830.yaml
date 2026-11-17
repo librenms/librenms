@@ -2,7 +2,7 @@ os: nokia-1830
 group: nokia
 text: 'Nokia 1830 PSS'
 mib_dir: nokia/1830
-type: network
+type: optical
 ifXmcbc: true
 ifname: true
 empty_ifdescr: true

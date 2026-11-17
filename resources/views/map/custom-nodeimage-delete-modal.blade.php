@@ -37,7 +37,7 @@
 
     function deleteImage() {
         $.ajax({
-            url: "{{ route('maps.nodeimage.destroy', ['image' => '?']) }}".replace('?', pendingImageToDelete.id),
+            url: route('maps.nodeimage.destroy', {image: pendingImageToDelete.id}),
             type: 'DELETE'
         }).done(() => {
             $('#image-' + pendingImageToDelete.id).remove();

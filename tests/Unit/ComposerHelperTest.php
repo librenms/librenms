@@ -74,4 +74,25 @@ final class ComposerHelperTest extends TestCase
             @rmdir($decoy);
         }
     }
+
+    public function testPluginsFileCanBeSetInTheEnvironment(): void
+    {
+        $default = ComposerHelper::getPluginsFile();
+        $this->assertSame(base_path('composer.plugins.json'), $default);
+
+        $file = sys_get_temp_dir() . '/librenms-composer-plugins-' . getmypid() . '.json';
+        file_put_contents($file, '{"require":{"custom/package":"^1.0"}}');
+
+        try {
+            putenv("LIBRENMS_COMPOSER_PLUGINS=$file");
+
+            $this->assertSame($file, ComposerHelper::getPluginsFile());
+            $this->assertSame(['custom/package' => '^1.0'], ComposerHelper::getPlugins());
+        } finally {
+            putenv('LIBRENMS_COMPOSER_PLUGINS');
+            @unlink($file);
+        }
+
+        $this->assertSame($default, ComposerHelper::getPluginsFile());
+    }
 }

@@ -26,9 +26,19 @@
 
 namespace LibreNMS\Exceptions;
 
+use LibreNMS\Enum\PollingMethodType;
+
 class HostUnreachableException extends \Exception
 {
     protected $reasons = [];
+
+    /**
+     * @param  PollingMethodType|null  $method  the polling method that could not reach the host
+     */
+    public function __construct(string $message = '', public readonly ?PollingMethodType $method = null)
+    {
+        parent::__construct($message);
+    }
 
     public function __toString(): string
     {
@@ -41,23 +51,11 @@ class HostUnreachableException extends \Exception
     }
 
     /**
-     * Add additional reasons
-     *
-     * @param  string  $snmpVersion
-     * @param  string  $credentials
+     * Add a human-readable reason the host could not be reached
      */
-    public function addReason(string $snmpVersion, string $credentials)
+    public function addReason(string $reason): void
     {
-        $vars = [
-            'version' => $snmpVersion,
-            'credentials' => $credentials,
-        ];
-
-        if ($snmpVersion == 'v3') {
-            $this->reasons[] = trans('exceptions.host_unreachable.no_reply_credentials', $vars);
-        } else {
-            $this->reasons[] = trans('exceptions.host_unreachable.no_reply_community', $vars);
-        }
+        $this->reasons[] = $reason;
     }
 
     /**

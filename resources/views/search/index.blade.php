@@ -1,0 +1,430 @@
+@extends('layouts.librenmsv1')
+
+@section('title', __('search.title'))
+
+@section('content')
+    <div class="container-fluid" x-data="networkSearch({
+            query: @js($query),
+            hasQuery: @js($hasQuery),
+            view: @js($view),
+            filters: @js((object) $filter),
+            resultsUrl: @js($resultsUrl),
+            macFormat: @js($macFormat),
+            preferencesUrl: @js(route('preferences.store')),
+        })">
+        <x-panel>
+            <form @submit.prevent="submit()" role="search">
+                <div class="tw:flex tw:flex-wrap tw:gap-2">
+                    <div class="tw:relative tw:flex-1 tw:min-w-64">
+                        <span class="tw:absolute tw:left-3 tw:top-1/2 tw:-translate-y-1/2 tw:text-gray-400 tw:pointer-events-none">
+                            <i class="fa" :class="loading ? 'fa-spinner fa-spin' : 'fa-search'" aria-hidden="true"></i>
+                        </span>
+                        <input type="search" name="q" x-model="input" x-ref="input" autofocus autocomplete="off"
+                               @paste="paste($event)"
+                               @keydown.escape.prevent="clear()"
+                               @keydown.up.prevent="recall(1)"
+                               @keydown.down.prevent="recall(-1)"
+                               title="{{ __('search.keyboard_help') }}"
+                               aria-label="{{ __('search.title') }}"
+                               placeholder="{{ __('search.page_placeholder') }}"
+                               class="form-control tw:pl-9! tw:pr-8! tw:[&::-webkit-search-cancel-button]:appearance-none">
+                        <button type="button" x-show="input !== ''" x-cloak @click="clear(); $refs.input.focus()"
+                                title="{{ __('search.clear_input') }}" aria-label="{{ __('search.clear_input') }}"
+                                class="tw:absolute tw:right-2 tw:top-1/2 tw:-translate-y-1/2 tw:px-1 tw:text-gray-400 tw:hover:text-gray-700">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <button type="submit" class="btn btn-primary">{{ __('search.search') }}</button>
+                </div>
+
+                <div class="tw:mt-2 tw:flex tw:flex-wrap tw:items-center tw:gap-1.5 tw:text-sm" x-show="recent.length" x-cloak>
+                    <span class="tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.recent') }}</span>
+                    <template x-for="item in recent" :key="item">
+                        <button type="button" @click="input = item; submit()"
+                                class="tw:px-2 tw:rounded tw:font-mono tw:max-w-64 tw:truncate tw:bg-gray-100 tw:text-gray-700 tw:hover:bg-gray-200 tw:dark:bg-dark-gray-300 tw:dark:text-dark-white-200 tw:dark:hover:bg-dark-gray-200"
+                                :title="item" x-text="item"></button>
+                    </template>
+                    <a href="#" @click.prevent="clearRecent()" class="tw:ml-1">{{ __('search.clear') }}</a>
+                </div>
+            </form>
+
+            <div class="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-x-4 tw:gap-y-2">
+                <x-filter name="network-search" :fields="$filterFields" :initial="$filter" />
+                <div class="tw:flex tw:items-center tw:gap-2 tw:text-sm" x-show="result.mode === 'host' || result.mode === 'list'" x-cloak>
+                    <label for="mac-format" class="tw:mb-0 tw:font-normal tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.mac_format') }}</label>
+                    <select id="mac-format" x-model="macFormat" @change="savePreference('network_search_mac_format', macFormat)"
+                            title="{{ __('search.mac_format_keys') }}"
+                            class="form-control input-sm tw:w-auto! tw:font-mono">
+                        <option value="colon">aa:bb:cc:dd:ee:ff</option>
+                        <option value="dash">aa-bb-cc-dd-ee-ff</option>
+                        <option value="dot">aabb.ccdd.eeff</option>
+                        <option value="bare">aabbccddeeff</option>
+                    </select>
+                </div>
+            </div>
+        </x-panel>
+
+        {{-- the title of what was found, a list's table attaches to it --}}
+        <x-panel x-show="result.mode === 'host' || result.mode === 'list'" x-cloak x-bind:class="result.mode === 'list' ? 'tw:mb-0! tw:rounded-b-none!' : 'tw:mb-4!'">
+            <x-slot:heading class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-2 tw:px-4 tw:py-2 tw:text-sm">
+                <div class="tw:min-w-0 tw:flex-1" x-show="result.mode === 'host'" x-html="result.heading ?? ''"></div>
+                <span class="tw:font-semibold" x-show="result.mode === 'list'" x-text="result.summary"></span>
+                <span class="tw:flex-1" x-show="result.mode === 'list'"></span>
+                <div class="tw:flex tw:items-center tw:gap-2" x-show="result.mode === 'list'">
+                    <label for="per-page" class="tw:mb-0 tw:font-normal tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('search.per_page') }}</label>
+                    <select id="per-page" x-model.number="listPerPage" @change="showFirstPage()" class="form-control input-sm tw:w-auto!">
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+                {{-- the button has its own page and perPage, the list's are named so they can be read here --}}
+                <x-table-export :export-route="route('search.export')" :filter="$filter" filter-name="network-search" class="tw:shrink-0"
+                                x-show="result.mode === 'list'" x-cloak
+                                x-effect="filter = filters; page = listPage; perPage = listPerPage; params = {q: query, sort: sort.key, dir: sort.dir}" />
+            </x-slot:heading>
+        </x-panel>
+
+        <div x-html="result.html" @click="followPageLink($event)"></div>
+
+        <div x-show="error" x-cloak class="tw:py-12 tw:text-center tw:text-red-600">{{ __('search.error') }}</div>
+    </div>
+@endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('alpine:init', () => {
+            const RECENT_KEY = 'network-search-recent';
+            const RECENT_LIMIT = 5;
+            const DEFAULT_PER_PAGE = 25;
+            const MAC_FORMATS = ['colon', 'dash', 'dot', 'bare'];
+            const jsonHeaders = {'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest'};
+
+            const supportedView = (view) => ['host', 'locations'].includes(view) ? view : null;
+            const setParam = (url, key, value, keep = Boolean(value)) => keep ? url.searchParams.set(key, value) : url.searchParams.delete(key);
+
+            const dnsIcons = {
+                loading: 'fa-spinner tw:opacity-50 tw:motion-safe:animate-[spin_3s_linear_infinite]',
+                failed: 'fa-question-circle',
+                missing: 'fa-minus-circle',
+                match: 'fa-globe',
+                mismatch: 'fa-exclamation-triangle tw:text-amber-600 tw:dark:text-amber-300',
+            };
+
+            // the host heading, nested in networkSearch so its lookup is aborted with the search
+            window.Alpine.data('searchHost', (options) => ({
+                dns: null,
+                dnsLoading: Boolean(options.nameUrl),
+
+                async init() {
+                    if (!options.nameUrl) {
+                        return;
+                    }
+
+                    // let x-html finish tracking the heading before reading the search's abort controller
+                    await this.$nextTick();
+
+                    try {
+                        const response = await fetch(options.nameUrl, {signal: this.controller.signal, headers: jsonHeaders});
+                        this.dns = response.ok ? await response.json() : null;
+                    } catch {
+                        this.dns = null;
+                    } finally {
+                        this.dnsLoading = false;
+                    }
+                },
+                get dnsStatus() {
+                    if (this.dnsLoading) { return 'loading'; }
+                    if (!this.dns) { return 'failed'; }
+                    if (!this.dns.name) { return 'missing'; }
+                    return this.dns.forward_match ? 'match' : 'mismatch';
+                },
+                get dnsIcon() {
+                    return dnsIcons[this.dnsStatus];
+                },
+                get dnsDescription() {
+                    return options.messages[this.dnsStatus]
+                        .replaceAll(':name', this.dns?.name ?? '')
+                        .replaceAll(':ip', this.dns?.ip ?? '');
+                },
+                get confirmedName() {
+                    return this.dns?.forward_match ? this.dns.name : null;
+                },
+                get addDeviceUrl() {
+                    const url = new URL(options.addDeviceUrl);
+                    url.searchParams.set('hostname', options.hostname ?? this.confirmedName ?? options.ip ?? '');
+                    return url.toString();
+                },
+            }));
+
+            window.Alpine.data('networkSearch', (options) => ({
+                input: options.query,
+                query: '',
+                searched: false,
+                view: supportedView(options.view),
+                filters: options.filters || {},
+                result: {},
+                loading: false,
+                error: false,
+                listPage: 1,
+                listPerPage: DEFAULT_PER_PAGE,
+                sort: {key: null, dir: 'asc'},
+                macFormat: options.macFormat,
+                recent: [],
+                recallIndex: -1,
+                needles: {text: [], macs: []},
+                controller: null,
+                init() {
+                    window.addEventListener('popstate', () => this.loadFromUrl());
+                    window.addEventListener('keydown', (event) => this.macFormatKey(event));
+                    window.addEventListener('filter:apply', (event) => this.applyFilters(event.detail));
+                    try { this.recent = (JSON.parse(localStorage.getItem(RECENT_KEY)) || []).slice(0, RECENT_LIMIT); } catch { this.recent = []; }
+                    this.readListOptions();
+                    if (options.hasQuery || this.hasFilters()) {
+                        this.submit(false);
+                    }
+                },
+                hasFilters() {
+                    return Object.keys(this.filters).length > 0;
+                },
+                // an empty search lists every host
+                submit(push = true) {
+                    if (push) {
+                        this.view = null;
+                        this.listPage = 1;
+                    }
+                    this.setQuery(this.input.trim());
+                    this.remember(this.query);
+                    this.updateUrl(push);
+                    this.fetchResults();
+                    // the next paste or keystroke replaces this search
+                    this.$nextTick(() => this.$refs.input.select());
+                },
+                setQuery(query) {
+                    this.query = query;
+                    this.searched = true;
+                    this.recallIndex = -1;
+                    this.needles = this.findNeedles(query);
+                },
+                applyFilters(detail) {
+                    if (detail.name !== 'network-search' || JSON.stringify(detail.filters) === JSON.stringify(this.filters)) { return; }
+                    this.filters = detail.filters;
+                    this.view = null;
+                    // the filter bar already added its history entry, a reload shouldn't bring the old view or page back
+                    const url = new URL(window.location);
+                    url.searchParams.delete('view');
+                    url.searchParams.delete('page');
+                    history.replaceState({}, '', url);
+                    if (this.searched || this.hasFilters()) {
+                        this.listPage = 1;
+                        this.setQuery(this.input.trim());
+                        this.fetchResults();
+                    }
+                },
+                setSort(key) {
+                    this.sort = {key: key, dir: this.result.sort === key && this.result.dir === 'asc' ? 'desc' : 'asc'};
+                    this.showFirstPage();
+                },
+                // after the sort or page size changes
+                showFirstPage() {
+                    this.listPage = 1;
+                    this.updateUrl(true);
+                    this.fetchResults();
+                },
+                // the page links are regular links to this page, stay on it without reloading
+                followPageLink(event) {
+                    const link = event.target.closest('nav a[href]');
+                    if (!link || event.ctrlKey || event.metaKey || event.shiftKey) { return; }
+                    event.preventDefault();
+                    history.pushState({}, '', link.href);
+                    this.loadFromUrl();
+                    window.scrollTo({top: 0});
+                },
+                readListOptions() {
+                    const params = new URLSearchParams(window.location.search);
+                    this.listPage = parseInt(params.get('page')) || 1;
+                    this.listPerPage = parseInt(params.get('per_page')) || DEFAULT_PER_PAGE;
+                    this.sort = {key: params.get('sort'), dir: params.get('dir') || 'asc'};
+                },
+                fetchResults() {
+                    this.controller?.abort();
+                    this.controller = new AbortController();
+                    this.loading = true;
+                    this.error = false;
+                    const url = new URL(options.resultsUrl, window.location.origin);
+                    url.search = new URLSearchParams({q: this.query, page: this.listPage, per_page: this.listPerPage});
+                    setParam(url, 'sort', this.sort.key);
+                    setParam(url, 'dir', this.sort.dir, Boolean(this.sort.key));
+                    setParam(url, 'view', this.view);
+                    LibreNMS.Url.applyNestedParamsToUrl(url, 'filter', this.filters);
+                    fetch(url, {signal: this.controller.signal, headers: jsonHeaders})
+                        .then(response => response.ok ? response.json() : Promise.reject(response))
+                        .then(data => { this.result = data; this.loading = false; })
+                        .catch(error => {
+                            if (error?.name === 'AbortError') { return; }
+                            this.result = {};
+                            this.loading = false;
+                            this.error = true;
+                        });
+                },
+                updateUrl(push) {
+                    const url = new URL(window.location);
+                    url.searchParams.set('q', this.query);
+                    setParam(url, 'view', this.view);
+                    setParam(url, 'page', this.listPage, this.listPage > 1);
+                    setParam(url, 'per_page', this.listPerPage, this.listPerPage !== DEFAULT_PER_PAGE);
+                    setParam(url, 'sort', this.sort.key);
+                    setParam(url, 'dir', this.sort.dir, Boolean(this.sort.key));
+                    push ? history.pushState({}, '', url) : history.replaceState({}, '', url);
+                },
+                loadFromUrl() {
+                    const params = new URLSearchParams(window.location.search);
+                    const filters = {};
+                    for (const [key, value] of params.entries()) {
+                        const match = key.match(/^filter\[(.+)\]\[(.+)\]$/);
+                        if (match) { (filters[match[1]] ??= {})[match[2]] = value; }
+                    }
+                    this.filters = filters;
+                    this.input = params.get('q') || '';
+                    this.view = supportedView(params.get('view'));
+                    this.readListOptions();
+                    if (params.has('q') || this.hasFilters()) {
+                        this.setQuery(this.input);
+                        this.fetchResults();
+                    } else {
+                        this.searched = false;
+                        this.query = '';
+                        this.result = {};
+                    }
+                },
+                // inputs drop line breaks, keep a pasted list of addresses separated and search it right away
+                paste(event) {
+                    const text = event.clipboardData?.getData('text') ?? '';
+                    const el = event.target;
+                    const replacesAll = el.selectionStart === 0 && el.selectionEnd === el.value.length;
+                    event.preventDefault();
+                    el.setRangeText(text.replace(/\s+/g, ' ').trim(), el.selectionStart, el.selectionEnd, 'end');
+                    this.input = el.value;
+                    if (replacesAll) { this.submit(); }
+                },
+                clear() {
+                    this.input = '';
+                    this.recallIndex = -1;
+                },
+                // step through recent searches like shell history
+                recall(direction) {
+                    if (this.recent.length === 0) { return; }
+                    this.recallIndex = Math.max(-1, Math.min(this.recent.length - 1, this.recallIndex + direction));
+                    this.input = this.recallIndex === -1 ? '' : this.recent[this.recallIndex];
+                },
+                remember(query) {
+                    if (query === '') { return; }
+                    this.recent = [query, ...this.recent.filter(item => item !== query)].slice(0, RECENT_LIMIT);
+                    try { localStorage.setItem(RECENT_KEY, JSON.stringify(this.recent)); } catch {}
+                },
+                clearRecent() {
+                    this.recent = [];
+                    try { localStorage.removeItem(RECENT_KEY); } catch {}
+                },
+                // the parts of the search to highlight in the results, networks match by range so they are skipped
+                findNeedles(query) {
+                    const tokens = query.split(/[\s,;]+/)
+                        .map(token => token.replace(/^["'`(\[{<]+|["'`)\]}>]+$/g, '').replace(/^(ip|ipv4|ipv6|addr|address|mac|hwaddr|ether|lladdr|host|hostname)\s*[=:]\s*/i, '').replace(/^(\d+(?:\.\d+){3}):\d+$/, '$1').toLowerCase())
+                        .filter(token => token.length > 1 && !token.includes('/'));
+
+                    return {
+                        text: tokens,
+                        macs: tokens.map(token => token.replace(/^0x|[:\-. ]/g, '')).filter(token => /^[0-9a-f]{4,12}$/.test(token)),
+                    };
+                },
+                escapeHtml(text) {
+                    return text.replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'})[c]);
+                },
+                mark(html) {
+                    // not <mark>, the legacy styles give it a loud background
+                    return '<span class="tw:bg-amber-200/60 tw:dark:bg-amber-300/20 tw:rounded-sm">' + html + '</span>';
+                },
+                highlightText(text) {
+                    const lower = text.toLowerCase();
+                    for (const needle of this.needles.text) {
+                        const start = lower.indexOf(needle);
+                        if (start !== -1) {
+                            return this.escapeHtml(text.slice(0, start)) + this.mark(this.escapeHtml(text.slice(start, start + needle.length))) + this.escapeHtml(text.slice(start + needle.length));
+                        }
+                    }
+                    return this.escapeHtml(text);
+                },
+                // highlight the matched hex digits in whichever format the MAC is shown
+                highlightMac(hex) {
+                    const formatted = this.formatMac(hex);
+                    const needle = this.needles.macs.find(needle => hex.includes(needle));
+                    if (!needle) { return formatted; }
+                    const start = hex.indexOf(needle), end = start + needle.length;
+                    let html = '', digit = 0, run = '';
+                    for (const char of formatted) {
+                        const separator = !/[0-9a-f]/i.test(char);
+                        const inside = separator ? digit > start && digit < end : digit >= start && digit < end;
+                        if (!separator) { digit++; }
+                        if (inside) { run += char; continue; }
+                        if (run) { html += this.mark(run); run = ''; }
+                        html += char;
+                    }
+                    return html + (run ? this.mark(run) : '');
+                },
+                formatMac(hex) {
+                    const pairs = hex.match(/../g) || [];
+                    return {
+                        dash: pairs.join('-'),
+                        dot: (hex.match(/..../g) || []).join('.'),
+                        bare: hex,
+                    }[this.macFormat] ?? pairs.join(':');
+                },
+                copy(event, text) {
+                    const icon = event.currentTarget.querySelector('i');
+                    const done = () => {
+                        icon.classList.replace('fa-copy', 'fa-check');
+                        setTimeout(() => icon.classList.replace('fa-check', 'fa-copy'), 1200);
+                    };
+                    if (navigator.clipboard) {
+                        navigator.clipboard.writeText(text).then(done);
+                        return;
+                    }
+                    // the clipboard API needs https
+                    const area = Object.assign(document.createElement('textarea'), {value: text});
+                    document.body.appendChild(area);
+                    area.select();
+                    document.execCommand('copy');
+                    area.remove();
+                    done();
+                },
+                // m cycles the MAC format, 1-4 picks one, only while not typing in a field
+                macFormatKey(event) {
+                    const el = document.activeElement;
+                    if (!this.searched || event.ctrlKey || event.metaKey || event.altKey
+                        || (el && (['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName) || el.isContentEditable))) {
+                        return;
+                    }
+                    const index = event.key.toLowerCase() === 'm'
+                        ? (MAC_FORMATS.indexOf(this.macFormat) + (event.shiftKey ? MAC_FORMATS.length - 1 : 1)) % MAC_FORMATS.length
+                        : ['1', '2', '3', '4'].indexOf(event.key);
+                    if (index === -1) { return; }
+                    event.preventDefault();
+                    this.macFormat = MAC_FORMATS[index];
+                    this.savePreference('network_search_mac_format', this.macFormat);
+                },
+                savePreference(pref, value) {
+                    fetch(options.preferencesUrl, {
+                        method: 'POST',
+                        headers: {
+                            ...jsonHeaders,
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                        },
+                        body: JSON.stringify({pref: pref, value: value}),
+                    });
+                },
+            }));
+        });
+    </script>
+@endpush

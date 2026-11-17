@@ -56,7 +56,7 @@ final class SocialiteControllerTest extends TestCase
         \App\Facades\LibrenmsConfig::set('auth.socialite.debug', false);
 
         // Stub the Socialite user.
-        $socialiteUserStub = $this->createMock(AbstractUser::class);
+        $socialiteUserStub = $this->createStub(AbstractUser::class);
         $socialiteUserStub
             ->method('getRaw')
             ->willReturn($rawAttributes);

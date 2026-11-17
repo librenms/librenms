@@ -12,8 +12,8 @@
                 data.addColumn({type: 'string', role: 'tooltip', 'p': {'html': true}});
                 data.addRows(@json($locations));
                 var options = {
-                    region: '{{ $region }}',
-                    resolution: '{{ $resolution }}',
+                    region: @json($region),
+                    resolution: @json($resolution),
                     displayMode: 'markers',
                     keepAspectRatio: 1,
                     magnifyingGlass: {enable: true, zoomFactor: 100},

@@ -1121,10 +1121,6 @@ return [
             'description' => 'Aktivera Libvirt',
             'help' => 'Aktiverar sidan libvirt, som visar enheters virtuella maskiner.',
         ],
-        'enable_proxmox' => [
-            'description' => 'Aktivera Proxmox',
-            'help' => 'Aktiverar Proxmox-sidan, som visar enheters virtuella maskiner.',
-        ],
         'enable_pseudowires' => [
             'description' => 'Aktivera Pseudowires',
             'help' => 'Aktiverar sidan pseudotrådar, som visar enheters pseudotrådar.',
@@ -1150,13 +1146,15 @@ return [
             'help' => 'Antal enheter att visa i nedrutan på framsidan',
         ],
         'front_page_settings' => [
-            'top_devices' => [
-                'description' => 'Toppenheter',
-                'help' => 'Antal toppenheter att visa på förstasidan',
-            ],
-            'top_ports' => [
-                'description' => 'Bästa hamnar',
-                'help' => 'Antal toppportar att visa på framsidan',
+            'top' => [
+                'devices' => [
+                    'description' => 'Toppenheter',
+                    'help' => 'Antal toppenheter att visa på förstasidan',
+                ],
+                'ports' => [
+                    'description' => 'Bästa hamnar',
+                    'help' => 'Antal toppportar att visa på framsidan',
+                ],
             ],
         ],
         'fping' => [
@@ -1239,6 +1237,10 @@ return [
                 'description' => 'Schemalagt underhåll påverkar inte tillgängligheten',
                 'help' => 'Inaktiverar skapandet av avbrott och minskad tillgänglighet för enheter som är i underhållsläge.',
             ],
+        ],
+        'graph_stat_percentile_disable' => [
+            'description' => 'Inaktivera Percentil för statistikgrafer globalt',
+            'help' => 'Inaktiverar visning av percentilvärden och linjer för grafer som visar dessa',
         ],
         'graphs' => [
             'row' => [
@@ -1334,10 +1336,6 @@ return [
         'https_proxy' => [
             'description' => 'HTTPS-proxy',
             'help' => 'Ställ in detta som en reserv om miljövariabeln https_proxy inte är tillgänglig.',
-        ],
-        'icmp_check' => [
-            'description' => 'ICMP-kontroll',
-            'help' => 'Aktivera ICMP-kontroll för alla enheter globalt, detta kommer att pinga enheter för att kontrollera om de är uppe eller nere. Om du inaktiverar detta kan det leda till att omröstningen inte slutförs i tid.',
         ],
         'ignore_mount' => [
             'description' => 'Monteringspunkter som ska ignoreras',
@@ -1623,9 +1621,11 @@ return [
         'ipmitool' => [
             'description' => 'Sökväg till ipmtool',
         ],
-        'ipmi.type' => [
-            'description' => 'IPMI typ',
-            'help' => 'Typ av IPMI att använda, kan vara "lan", "lanplus", "öppen", "sol", "rå" eller "skal".',
+        'ipmi' => [
+            'type' => [
+                'description' => 'IPMI typ',
+                'help' => 'Typ av IPMI att använda, kan vara "lan", "lanplus", "öppen", "sol", "rå" eller "skal".',
+            ],
         ],
         'ipmi_unit' => [
             'description' => 'IPMI-enhet',
@@ -1896,7 +1896,7 @@ return [
             'ucd-mib' => [
                 'description' => 'Ucd Mib',
             ],
-            'ipSystemStats' => [
+            'ip-system-stats' => [
                 'description' => 'ipSystemStats',
             ],
             'ports' => [
@@ -2011,9 +2011,11 @@ return [
                 'description' => 'Portsäkerhet',
             ],
         ],
-        'polling.selected_ports' => [
-            'description' => 'Vald portavsökning',
-            'help' => 'Aktivera vald portpolling för att endast pollingportar som är uppe och aktiverade',
+        'polling' => [
+            'selected_ports' => [
+                'description' => 'Vald portavsökning',
+                'help' => 'Aktivera vald portpolling för att endast pollingportar som är uppe och aktiverade',
+            ],
         ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB-poster äldre än',
@@ -2035,9 +2037,11 @@ return [
             'description' => 'Rensa portar raderade',
             'help' => 'Städning utförd av daily.sh',
         ],
-        'processor.default_perc_warn' => [
-            'description' => 'Varning för standardprocessorprocent',
-            'help' => 'Standard Procentandel av processor som används innan en varning visas.',
+        'processor' => [
+            'default_perc_warn' => [
+                'description' => 'Varning för standardprocessorprocent',
+                'help' => 'Standard Procentandel av processor som används innan en varning visas.',
+            ],
         ],
         'prometheus' => [
             'enable' => [
@@ -2048,7 +2052,7 @@ return [
                 'description' => 'URL',
                 'help' => 'URL-adressen till Prometheus Push Gateway som data ska skickas till',
             ],
-            'Job' => [
+            'job' => [
                 'description' => 'Jobb',
                 'help' => 'Jobbetikett för exporterade mätvärden',
             ],
@@ -2133,10 +2137,6 @@ return [
             'description' => 'RANCID förrådstyp',
             'help' => 'Typ av arkiv som används av RANCID, används för att visa konfigurationsdifferenser på enhetssidor',
         ],
-        'rancid_repo_url' => [
-            'description' => 'RANCID Repository URL',
-            'help' => 'RANCID repository URL, används för att peka på GitWeb som visualiserar ett blott Git repository',
-        ],
         'rancid_ignorecomments' => [
             'description' => 'RANCID Ignorera kommentarer',
             'help' => 'Ignorera kommentarer när du jämför RANCID-konfigurationer, används för att visa konfigurationsdifferenser på enhetssidor',
@@ -2153,10 +2153,6 @@ return [
             'dump_errors' => [
                 'description' => 'Dumpa felsökningsfel (kommer att bryta din installation)',
                 'help' => 'Dumpa bort fel som normalt är dolda så att du som utvecklare kan hitta och åtgärda eventuella problem.',
-            ],
-            'throttle' => [
-                'description' => 'Gasspjällsfelrapporter',
-                'help' => 'Rapporter kommer endast att skickas varje angivet antal sekunder. Utan detta kan om du har ett fel i vanlig kodrapportering gå över styr. Ställ in på 0 för att inaktivera gasreglaget.',
             ],
         ],
         'rewrite_if' => [
@@ -2680,10 +2676,6 @@ return [
                 'description' => 'Ställ in den lägsta grafhöjden',
                 'help' => 'Minsta grafhöjd (standard: 300)',
             ],
-            'graph_stat_percentile_disable' => [
-                'description' => 'Inaktivera Percentil för statistikgrafer globalt',
-                'help' => 'Inaktiverar visning av percentilvärden och linjer för grafer som visar dessa',
-            ],
         ],
         'device_display_default' => [
             'description' => 'Standardmall för enhetsvisningsnamn',
@@ -2711,21 +2703,23 @@ return [
             'description' => 'Medelvärdesfaktor',
             'help' => 'Vi beräknar ett glidande medelvärde med hjälp av en exponentiellt vägd glidande medelvärdefunktion.  Detta är den faktor som används av funktionen för att styra hur mycket det aktuella värdet påverkar medelvärdet.  Värden närmare 1 kommer att göra den genomsnittliga förändringen snabbare.',
         ],
-        'smokeping.integration' => [
-            'description' => 'Aktivera',
-            'help' => 'Aktivera integrering av rökning',
-        ],
-        'smokeping.dir' => [
-            'description' => 'Vägen till rrds',
-            'help' => 'Hela vägen till Smoking RRDs',
-        ],
-        'smokeping.pings' => [
-            'description' => 'Pingar',
-            'help' => 'Antal pingar konfigurerade i Smokeping',
-        ],
-        'smokeping.url' => [
-            'description' => 'URL till rökning',
-            'help' => 'Fullständig URL till rökningsguiden',
+        'smokeping' => [
+            'integration' => [
+                'description' => 'Aktivera',
+                'help' => 'Aktivera integrering av rökning',
+            ],
+            'dir' => [
+                'description' => 'Vägen till rrds',
+                'help' => 'Hela vägen till Smoking RRDs',
+            ],
+            'pings' => [
+                'description' => 'Pingar',
+                'help' => 'Antal pingar konfigurerade i Smokeping',
+            ],
+            'url' => [
+                'description' => 'URL till rökning',
+                'help' => 'Fullständig URL till rökningsguiden',
+            ],
         ],
     ],
     'twofactor' => [
@@ -2748,7 +2742,6 @@ return [
         'select' => ':value är inte ett tillåtet värde',
         'text' => ':value är inte tillåtet',
         'array' => 'Ogiltigt format',
-        'password-array' => 'Ogiltigt format',
         'executable' => ':value är inte en giltig körbar fil',
         'directory' => ':value är inte en giltig katalog',
     ],

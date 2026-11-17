@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.32620.1.1",
+                    "sysDescr": "Vision 400 6.8.1.5-20250505-154400-9c919c",
+                    "sysContact": "<private>",
+                    "version": "6.8.1.5-20250505-154400-9c919c",
+                    "hardware": "Vision 400",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "anue",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "ixia.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

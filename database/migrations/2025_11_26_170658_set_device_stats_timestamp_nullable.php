@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('device_stats', function (Blueprint $table) {
+        Schema::table('device_stats', function (Blueprint $table): void {
             $table->timestamp('ping_last_timestamp')->nullable()->change();
         });
     }

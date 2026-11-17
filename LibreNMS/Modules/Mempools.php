@@ -29,19 +29,21 @@ namespace LibreNMS\Modules;
 use App\Models\Device;
 use App\Models\Mempool;
 use App\Observers\ModuleModelObserver;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MempoolsPolling;
+use LibreNMS\Interfaces\RemovesMethodData;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
 
-class Mempools implements Module
+class Mempools implements Module, RemovesMethodData
 {
     use SyncsModels;
 
@@ -53,57 +55,75 @@ class Mempools implements Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    /**
+     * In order of preference, SNMP knows more about the device than the agent, so its mempools are preferred.
+     */
+    public function pollingMethods(Device $device): array
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return [PollingMethodType::Snmp, PollingMethodType::UnixAgent];
     }
 
+    public function shouldDiscover(OS $os): bool
+    {
+        return $this->preferredMethod($os) !== null;
+    }
+
+    /**
+     * Mempools come from one method: the most preferred enabled method that has mempools for this device.
+     * Its mempools replace those of other methods, so a device polled by several methods has no duplicates.
+     * Methods after one that is down are not tried, so mempools do not move to another method while it is down.
+     * When no method has mempools, the existing ones are kept, so an incomplete agent output does not remove them.
+     */
     public function discover(OS $os): void
     {
-        $mempools = $os->discoverMempools()->filter(function (Mempool $mempool) {
-            if ($mempool->isValid()) {
-                return true;
+        foreach ($this->enabledMethods($os->getDevice()) as $type) {
+            if (! $os->getMethodResults()->isAvailable($type)) {
+                break;
             }
 
-            $reason = 'Not enough data';
-            if ($mempool->mempool_total <= 0) {
-                $reason = "Invalid total value $mempool->mempool_total";
+            $mempools = $this->discoverValid($os, $type);
+            if ($mempools->isNotEmpty()) {
+                // check if linux or similar and calculate available ram
+                $this->calculateAvailable($mempools);
+
+                ModuleModelObserver::observe(Mempool::class);
+                $this->syncModelsFromMethod($os->getDevice(), 'mempools', $type, $mempools);
+
+                Log::info('');
+                $mempools->each($this->printMempool(...));
+
+                return;
             }
-
-            Log::debug("Rejecting Mempool $mempool->mempool_index $mempool->mempool_descr: $reason");
-            Log::info('x');
-
-            return false;
-        });
-
-        // check if linux or similar and calculate available ram
-        $this->calculateAvailable($mempools);
-
-        ModuleModelObserver::observe(Mempool::class);
-        $this->syncModels($os->getDevice(), 'mempools', $mempools);
-
-        Log::info('');
-        $mempools->each($this->printMempool(...));
-    }
-
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
-    {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
-    }
-
-    public function poll(OS $os, DataStorageInterface $datastore): void
-    {
-        $mempools = $os->getDevice()->mempools;
-
-        if ($mempools->isEmpty()) {
-            return;
         }
 
-        $os instanceof MempoolsPolling
-            ? $os->pollMempools($mempools)
-            : $this->defaultPolling($os, $mempools);
+        Log::info('No mempools found, keeping existing mempools');
+    }
 
-        $this->calculateAvailable($mempools)->each(function (Mempool $mempool) use ($os, $datastore): void {
+    /**
+     * Methods are only checked when the device has mempools from an enabled method.
+     */
+    public function shouldPoll(OS $os): bool
+    {
+        $methods = $this->enabledMethods($os->getDevice());
+
+        return $os->getDevice()->mempools->contains(fn (Mempool $mempool): bool => in_array($mempool->polling_method, $methods, true));
+    }
+
+    /**
+     * Each mempool is polled by the method that discovered it, mempools of unavailable methods are skipped.
+     */
+    public function poll(OS $os, DataStorageInterface $datastore): void
+    {
+        $polled = new EloquentCollection;
+
+        foreach ($os->getDevice()->mempools->groupBy(fn (Mempool $mempool): string => $mempool->polling_method->value) as $type => $mempools) {
+            $source = $os->dataSource(PollingMethodType::from($type), MempoolsPolling::class);
+            if ($source !== null) {
+                $polled = $polled->merge($source->pollMempools($mempools));
+            }
+        }
+
+        $this->calculateAvailable($polled)->each(function (Mempool $mempool) use ($os, $datastore): void {
             $this->printMempool($mempool);
 
             if (empty($mempool->mempool_class)) {
@@ -135,32 +155,56 @@ class Mempools implements Module
     }
 
     /**
-     * @param  OS  $os
-     * @param  Collection  $mempools
-     * @return Collection
+     * The valid mempools of a method.
+     *
+     * @return Collection<int, Mempool>
      */
-    private function defaultPolling($os, $mempools)
+    private function discoverValid(OS $os, PollingMethodType $type): Collection
     {
-        // fetch all data
-        $oids = $mempools->map->only(['mempool_perc_oid', 'mempool_used_oid', 'mempool_free_oid', 'mempool_total_oid'])
-            ->flatten()->filter()->unique()->values()->all();
-        $data = snmp_get_multi_oid($os->getDeviceArray(), $oids);
+        return ($os->dataSource($type, MempoolsDiscovery::class)?->discoverMempools() ?? new Collection)->filter(function (Mempool $mempool) {
+            if ($mempool->isValid()) {
+                return true;
+            }
 
-        $mempools->each(function (Mempool $mempool) use ($data): void {
-            $mempool->fillUsage(
-                $data[(string) $mempool->mempool_used_oid] ?? null,
-                $data[(string) $mempool->mempool_total_oid] ?? null,
-                $data[(string) $mempool->mempool_free_oid] ?? null,
-                $data[(string) $mempool->mempool_perc_oid] ?? null
-            );
+            $reason = 'Not enough data';
+            if ($mempool->mempool_total <= 0) {
+                $reason = "Invalid total value $mempool->mempool_total";
+            }
+
+            Log::debug("Rejecting Mempool $mempool->mempool_index $mempool->mempool_descr: $reason");
+            Log::info('x');
+
+            return false;
         });
+    }
 
-        return $mempools;
+    /**
+     * The most preferred enabled method, null when it is not available.
+     * Does not fall back to other methods, so mempools are kept while the preferred method is down.
+     */
+    private function preferredMethod(OS $os): ?PollingMethodType
+    {
+        $type = $this->enabledMethods($os->getDevice())[0] ?? null;
+
+        return $type !== null && $os->getMethodResults()->isAvailable($type) ? $type : null;
+    }
+
+    /**
+     * @return list<PollingMethodType>
+     */
+    private function enabledMethods(Device $device): array
+    {
+        return array_values(array_filter($this->pollingMethods($device), $device->polling()->isEnabled(...)));
     }
 
     public function dataExists(Device $device): bool
     {
         return $device->mempools()->exists();
+    }
+
+    public function removeMethodData(Device $device, PollingMethodType $type): void
+    {
+        $device->mempools()->where('polling_method', $type)->delete();
     }
 
     public function cleanup(Device $device): int
@@ -175,7 +219,7 @@ class Mempools implements Module
     {
         return [
             'mempools' => $device->mempools()->orderBy('mempool_type')->orderBy('mempool_id')
-                ->get()->map->makeHidden(['device_id', 'mempool_id']),
+                ->get()->map->makeHidden(['device_id', 'mempool_id', 'polling_method']), // test data is all snmp
         ];
     }
 

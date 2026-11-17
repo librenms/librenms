@@ -26,9 +26,11 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use LibreNMS\Util\Url;
 
 class GraphsController implements DeviceTab
 {
@@ -54,6 +56,25 @@ class GraphsController implements DeviceTab
 
     public function data(Device $device, Request $request): array
     {
-        return [];
+        // graphs are grouped by the section of their graph type
+        $groups = $device->graphs()->orderBy('graph')->pluck('graph')
+            ->groupBy(fn ($graph) => strtolower((string) LibrenmsConfig::get("graph_types.device.$graph.section")))
+            ->forget('');
+
+        $group = Url::parseOptions('group');
+        $group = $groups->has($group) ? $group : $groups->keys()->first();
+
+        return [
+            'group' => $group,
+            'groups' => $groups->map(fn ($graphs, $group) => [
+                'text' => $group == 'customoid' ? __('Custom OID') : ucwords($group),
+                'link' => route('device', ['device' => $device->device_id, 'tab' => 'graphs', 'group' => $group]),
+            ])->all(),
+            'graphs' => $groups->get($group, collect())
+                ->mapWithKeys(fn ($graph) => ["device_$graph" => LibrenmsConfig::get("graph_types.device.$graph.descr")])
+                ->all(),
+            'availability' => $group == 'availability' ? $device->availability()->orderBy('duration')->get() : collect(),
+            'customoids' => $group == 'customoid' ? $device->customoids()->orderBy('customoid_descr')->get() : collect(),
+        ];
     }
 }

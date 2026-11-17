@@ -1,0 +1,658 @@
+RIEDEL-MEDIORNET-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		OBJECT-TYPE
+			FROM RFC-1212
+		enterprises, MODULE-IDENTITY, Integer32, Unsigned32
+			FROM SNMPv2-SMI
+		OBJECT-GROUP, MODULE-COMPLIANCE
+			FROM SNMPv2-CONF
+		DisplayString
+			FROM SNMPv2-TC;
+
+	riedelMediornetMib MODULE-IDENTITY
+		LAST-UPDATED "202311020000Z"
+
+		ORGANIZATION "Riedel Communications GmbH & Co. KG"
+		CONTACT-INFO
+			"RIEDEL Communications GmbH & Co. KG
+			Customerservice
+			Uellendahler Str. 353
+			42109 Wuppertal
+			Germany
+			phone: +49 (0) 202 292 - 9400
+			email: customerservice@riedel.net"
+
+		DESCRIPTION
+			"This document contains the MIB for the Mediornet system.
+			Copyright 2017 Riedel Communications GmbH & Co. KG
+
+			This module can be extended or modified as required,
+			please contact Riedel Communications GmbH for the latest
+			version and requested enhancements."
+
+		REVISION "202311020000Z"
+		DESCRIPTION
+			"Removed inputUsage and outputUsage of linkTable. Removed videoPortTable."
+
+		REVISION "201903220000Z"
+		DESCRIPTION
+			"New port status: linkUp25G."
+
+		REVISION "201708220000Z"
+		DESCRIPTION
+			"New port status: validNotUsed, testsignalNotUsed."
+
+		REVISION "201412110000Z"
+		DESCRIPTION
+			"New port statuses: clipping, linkUp, linkUp10G, linkUp10M, linkUp100M, linkUp1G, locking, gpiOn, gpiOff."
+
+		REVISION "201401310000Z"
+		DESCRIPTION
+			"New port status: freezed."
+
+		REVISION "201310230000Z"
+		DESCRIPTION
+			"New sync formats: invalid, jitterTooHigh."
+
+		REVISION "201307310000Z"
+		DESCRIPTION
+			"New sync formats: triLevel1080psF24, triLevel1080psF23."
+
+		REVISION "201305300000Z"
+		DESCRIPTION
+			"Introduced NodeId and serialNumber. Link table with NodeId. Slot table with cardSerialNumber."
+
+		REVISION "201304110000Z"
+		DESCRIPTION
+			"New sync formats: wordclock48kHzPulse, wordclock96kHzPulse, wordclock192kHzPulse."
+
+		REVISION "201302040000Z"
+		DESCRIPTION
+			"New tables: slotTable, linkTable, videoPortTable, gpiTable."
+
+		REVISION "201010110000Z"
+		DESCRIPTION
+			"First release of the mediornet mib."
+
+	::= { mediornet 1 }
+
+	riedel OBJECT IDENTIFIER
+	::= { enterprises 23056 }
+	-- Assigned by the IANA for Riedel Communications GmbH & Co. KG, the full list can be retrieved at www.iana.org
+
+	mediornet OBJECT IDENTIFIER ::= { riedel 2 }
+
+
+	guid OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (1..14))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"A unique identifier used to identify a MediorNet frame."
+	::= { mediornet 2 }
+
+	name OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"A free configurable, human readable name for the frame."
+	::= { mediornet 3 }
+
+	userNotes OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"A free configurable string."
+	::= { mediornet 4 }
+
+	packageVersion OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (1..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The MediorNet package version installed on the frame."
+	::= { mediornet 5 }
+
+	contact OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The email address of the contact person for this frame."
+	::= { mediornet 6 }
+
+	location OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The physical location of this frame."
+	::= { mediornet 7 }
+
+	nodeId OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The user given node ID of this frame."
+	::= { mediornet 8 }
+
+	serialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (13))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The Riedel serial number of this frame."
+	::= { mediornet 9 }
+
+	fanSpeed OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The rotation speed of the fans in RPM."
+	::= { mediornet 10 }
+
+	temperature OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The temperature of the frame in degree celsius."
+	::= { mediornet 11 }
+
+	cpuLoad OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The processor load in per mille for the last 5 seconds."
+	::= { mediornet 12 }
+
+	psu1 OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			operating(1),
+			notOperating(2)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The operating status of power supply 1."
+	::= { mediornet 13 }
+
+	psu2 OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			notAvailable(0),
+			operating(1),
+			notOperating(2)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The operating status of power supply 2."
+	::= { mediornet 14 }
+
+	syncIn OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			none(0),
+			blackburstNTSC(1),
+			blackburstPAL(2),
+			triLevel720p60(3),
+			triLevel720p59(4),
+			triLevel720p50(5),
+			triLevel720p30(6),
+			triLevel720p29(7),
+			triLevel720p25(8),
+			triLevel720p24(9),
+			triLevel720p23(10),
+			triLevel1080i60(11),
+			triLevel1080i59(12),
+			triLevel1080i50(13),
+			triLevel1080p30(14),
+			triLevel1080p29(15),
+			triLevel1080p25(16),
+			triLevel1080p24(17),
+			triLevel1080p23(18),
+			wordclock48kHz(19),
+			wordclock96kHz(20),
+			wordclock192kHz(21),
+			wordclock48kHzPulse(22),
+			wordclock96kHzPulse(23),
+			wordclock192kHzPulse(24),
+			triLevel1080psF24(25),
+			triLevel1080psF23(26),
+			invalid(27),
+			jitterTooHigh(28)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The synchronization input signal type."
+	::= { mediornet 15 }
+
+	syncOut OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			none(0),
+			blackburstNTSC(1),
+			blackburstPAL(2),
+			triLevel720p60(3),
+			triLevel720p59(4),
+			triLevel720p50(5),
+			triLevel720p30(6),
+			triLevel720p29(7),
+			triLevel720p25(8),
+			triLevel720p24(9),
+			triLevel720p23(10),
+			triLevel1080i60(11),
+			triLevel1080i59(12),
+			triLevel1080i50(13),
+			triLevel1080p30(14),
+			triLevel1080p29(15),
+			triLevel1080p25(16),
+			triLevel1080p24(17),
+			triLevel1080p23(18),
+			wordclock48kHz(19),
+			wordclock96kHz(20),
+			wordclock192kHz(21),
+			wordclock48kHzPulse(22),
+			wordclock96kHzPulse(23),
+			wordclock192kHzPulse(24),
+			triLevel1080psF24(25),
+			triLevel1080psF23(26)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The synchronization output signal type."
+	::= { mediornet 16 }
+
+	syncState OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			slave(0),
+			masterFreerun(1),
+			masterLocking(2),
+			masterLocked(3),
+			undefined(100)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The synchronization status of the frame."
+	::= { mediornet 17 }
+
+
+	-- SlotTable
+
+	slotTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF SlotEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Provides information about the slots of a frame."
+	::= { mediornet 20 }
+
+	slotEntry OBJECT-TYPE
+		SYNTAX SlotEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry (conceptual row) in the slotTable."
+		INDEX { slotTableIndex }
+	::= { slotTable 1 }
+
+	SlotEntry ::= SEQUENCE
+	{
+		slotTableIndex Integer32,
+		slot Integer32,
+		cardName DisplayString,
+		cardStatus INTEGER,
+		cardTemperature Integer32,
+		cardType DisplayString,
+		cardSerialNumber DisplayString
+	}
+
+	slotTableIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..65535)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A unique identifier."
+		::= { slotEntry 1 }
+
+	slot OBJECT-TYPE
+		SYNTAX Integer32 (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of the slot."
+	::= { slotEntry 2 }
+
+	cardName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (1..255))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"A free configurable, human readable name for the card."
+	::= { slotEntry 3 }
+
+	cardStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			empty(0),
+			active(1),
+			wrongSlot(2),
+			updateRequired(3),
+			failed(4)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The actual status of a card."
+	::= { slotEntry 4 }
+
+	cardTemperature OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The actual temperature of the card in degree celsius."
+	::= { slotEntry 5 }
+
+	cardType OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The card type."
+	::= { slotEntry 6 }
+
+	cardSerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (13))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The Riedel serial number of a card."
+	::= { slotEntry 7 }
+
+	-- End of SlotTable
+
+
+	-- LinkTable
+
+	linkTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF LinkEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Provides infomation about the fiber links of a frame."
+	::= { mediornet 30 }
+
+	linkEntry OBJECT-TYPE
+		SYNTAX LinkEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry (conceptual row) in the linkTable."
+		INDEX { linkTableIndex }
+	::= { linkTable 1 }
+
+	LinkEntry ::= SEQUENCE
+	{
+		linkTableIndex Integer32,
+		linkSlot Integer32,
+		link Integer32,
+		linkStatus Integer32,
+		linkCapacity Integer32,
+		destNodeMac Unsigned32,
+		destNodeIp Integer32,
+		destLink Integer32
+	}
+
+	linkTableIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..65535)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A unique identifier."
+		::= { linkEntry 1 }
+
+    linkSlot OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of the slot in which the link card resides."
+        ::= { linkEntry 2 }
+
+	link OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of the link on the link card."
+	::= { linkEntry 3 }
+
+	linkStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			sfpNotPresentLinkUp(-1),
+			sfpNotPresentLinkDown(0),
+			sfpPresentLinkDown(1),
+			sfpPresentLinkUp(2)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The actual status of the link."
+	::= { linkEntry 4 }
+
+	linkCapacity OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The total number of timeslots on that link"
+	::= { linkEntry 7 }
+
+	destNodeMac OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The MAC of the remote MediorNet frame of that link."
+	::= { linkEntry 8 }
+
+	destNodeIp OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The IP of the remote MediorNet frame of that link."
+	::= { linkEntry 9 }
+
+	destLink OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The link number on the link card of the remote MediorNet frame of that link."
+	::= { linkEntry 10 }
+
+	-- End of LinkTable
+
+
+	-- GPITable
+
+	gpiTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF GpiEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Provides infomation about the status of GPIs."
+	::= { mediornet 80 }
+
+	gpiEntry OBJECT-TYPE
+		SYNTAX GpiEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry (conceptual row) in the gpiTable."
+		INDEX { gpiTableIndex }
+	::= { gpiTable 1 }
+
+	GpiEntry ::= SEQUENCE
+	{
+		gpiTableIndex Integer32,
+		gpiSlot Integer32,
+		gpi Integer32,
+		gpiDirection INTEGER,
+		gpiName DisplayString,
+		gpiStatus Integer32
+	}
+
+	gpiTableIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..65535)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A unique identifier."
+		::= { gpiEntry 1 }
+
+	gpiSlot OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of the slot in which the gpi module resides."
+	::= { gpiEntry 2 }
+
+	gpi OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of the gpi."
+	::= { gpiEntry 3 }
+
+	gpiDirection OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			input(0),
+			output(1)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The direction of the gpi."
+	::= { gpiEntry 4 }
+
+	gpiName OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"A free configurable, human readable name for the gpi."
+	::= { gpiEntry 5 }
+
+	gpiStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+			off(0),
+			on(1)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The actual status of the gpi."
+	::= { gpiEntry 6 }
+
+	-- End of GPITable
+
+
+	-- conformance
+
+	riedelMediornetMibConformance OBJECT IDENTIFIER
+	::= { riedelMediornetMib 1 }
+
+	riedelMediornetMibCompliances OBJECT IDENTIFIER
+	::= { riedelMediornetMibConformance 1 }
+
+	riedelMediornetMibGroups OBJECT IDENTIFIER
+	::= { riedelMediornetMibConformance 2 }
+
+	-- End of conformance
+
+
+	-- compliance statements
+
+	riedelMediornetMibCompliance MODULE-COMPLIANCE
+		STATUS current
+		DESCRIPTION
+			"The compliance statement for mediornet MIB"
+		MODULE
+		MANDATORY-GROUPS
+		{
+			riedelMediornetMibGroup
+		}
+	::= { riedelMediornetMibCompliances 1 }
+
+	-- end of compliance statements
+
+
+	-- units of conformance
+
+	riedelMediornetMibGroup OBJECT-GROUP
+		OBJECTS
+		{
+			guid,
+			name,
+			userNotes,
+			packageVersion,
+			contact,
+			location,
+			nodeId,
+			serialNumber,
+			fanSpeed,
+			temperature,
+			cpuLoad,
+			psu1,
+			psu2,
+			syncIn,
+			syncOut,
+			syncState,
+			slot,
+			cardName,
+			cardStatus,
+			cardTemperature,
+			cardType,
+			cardSerialNumber,
+			linkSlot,
+			link,
+			linkStatus,
+			linkCapacity,
+			destNodeMac,
+			destNodeIp,
+			destLink,
+			gpiSlot,
+			gpi,
+			gpiDirection,
+			gpiName,
+			gpiStatus
+		}
+		STATUS current
+		DESCRIPTION
+			"A collection of objects providing basic mediornet snmp information."
+	::= { riedelMediornetMibGroups 1 }
+
+
+
+END

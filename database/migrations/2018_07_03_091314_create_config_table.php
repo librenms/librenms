@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('config', function (Blueprint $table) {
+        Schema::create('config', function (Blueprint $table): void {
             $table->increments('config_id');
             $table->string('config_name')->unique();
             $table->string('config_value', 512);

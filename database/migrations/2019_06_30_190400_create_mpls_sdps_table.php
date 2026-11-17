@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mpls_sdps', function (Blueprint $table) {
+        Schema::create('mpls_sdps', function (Blueprint $table): void {
             $table->increments('sdp_id');
             $table->unsignedInteger('sdp_oid');
             $table->unsignedInteger('device_id')->index();

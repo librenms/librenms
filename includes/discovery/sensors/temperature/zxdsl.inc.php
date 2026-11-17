@@ -1,6 +1,9 @@
 <?php
 
-echo 'ZTE ZXDSL:';
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\SensorType;
+
+Log::info('ZTE ZXDSL:', ['nlb' => true]);
 
 // System temperature
 $high_limit = 70;
@@ -16,7 +19,7 @@ $value = str_replace('"', '', $value);
 if (is_numeric($value)) {
     discover_sensor(
         null,
-        'temperature',
+        SensorType::Temperature,
         $device,
         $valueoid,
         0,

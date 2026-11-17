@@ -65,10 +65,10 @@ class ProcessorsController extends TableController
      */
     public function formatItem(Model $model): array
     {
-        $perc = round($model->processor_usage);
+        $perc = (int) round($model->processor_usage ?? 0);
         $graph_array = [
             'type' => 'processor_usage',
-            'popup_title' => htmlentities(strip_tags($model->device->displayName() . ': ' . $model->processor_descr)),
+            'popup_title' => htmlentities(strip_tags($model->device->display . ': ' . $model->processor_descr)),
             'id' => $model->processor_id,
             'from' => '-1d',
             'height' => 20,
@@ -78,7 +78,9 @@ class ProcessorsController extends TableController
         $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $model->device]);
         $descr = htmlspecialchars((string) $model->processor_descr);
         $mini_graph = Url::graphPopup($graph_array);
-        $bar = Html::percentageBar(400, 10, $perc, $perc . '%', (100 - $perc) . '%', $model->processor_perc_warn);
+        $bar = $model->processor_usage === null
+            ? Html::percentageBar(400, 10, 0, '?', '', $model->processor_perc_warn)
+            : Html::percentageBar(400, 10, $perc, $perc . '%', (100 - $perc) . '%', $model->processor_perc_warn);
         $usage = Url::graphPopup($graph_array, $bar);
 
         if (\Request::input('view') == 'graphs') {
@@ -117,8 +119,10 @@ class ProcessorsController extends TableController
      */
     protected function formatExportRow(Model $processor): array
     {
+        $device = $processor->device;
+
         return [
-            $processor->device ? $processor->device->displayName() : '',
+            $processor->device ? $device->display : '',
             $processor->processor_descr,
             $processor->processor_usage,
         ];

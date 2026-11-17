@@ -12,7 +12,7 @@
                     "features": "Bios 3.3",
                     "location": "<private>",
                     "os": "supermicro-bmc",
-                    "type": "appliance",
+                    "type": "management",
                     "serial": null,
                     "icon": "supermicro.png"
                 }
@@ -1234,7 +1234,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 196608,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196608",
                     "processor_index": "196608",
@@ -1347,6 +1346,7 @@
                     "sensor_type": "smPowerState",
                     "sensor_descr": "Power Status 0",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,

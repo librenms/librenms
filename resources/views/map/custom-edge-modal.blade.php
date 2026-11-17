@@ -216,9 +216,7 @@
         edgedata.edge1.title = edgedata.edge2.title = $("#port_id").val();
         edgedata.edge1.arrowStrikethrough = edgedata.edge2.arrowStrikethrough = false;
         let newlabel = $("#edgelabel").val() || '';
-        if (newlabel == '' && edgedata.mid.label != '') {
-            $("#map-renderButton").show();
-        }
+        const labelCleared = newlabel == '' && Boolean(edgedata.mid.label);
         edgedata.mid.label = newlabel;
 
         if(edgedata.id) {
@@ -252,7 +250,10 @@
                 edgedata.mid.x = mid_pos.x;
                 edgedata.mid.y = mid_pos.y;
                 network_nodes.update([edgedata.mid]);
-                $("#map-renderButton").show();
+            }
+
+            if (labelCleared) {
+                recreateNode(edgedata.mid);
             }
 
             // Blank labels need to be selected to update.  Select both to ensure this happens
@@ -264,6 +265,9 @@
                 // Select the first edge, which will trigger another update
                 network.selectEdges([edgedata.edge1.id]);
             }
+
+            // endpoints, style or mid position may have changed
+            repositionBezierNodes();
         }
         $("#edgerecenter").prop( "checked", false );
         $("#map-saveDataButton").show();

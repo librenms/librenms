@@ -1,6 +1,6 @@
 os: primekey
 text: "Hardware Appliance"
-type: appliance
+type: security
 icon: primekey
 group: primekey
 mib_dir: primekey
@@ -16,7 +16,6 @@ poller_modules:
     mpls: false
 discovery_modules:
     bgp-peers: false
-    cisco-vrf-lite: false
     stp: false
 discovery:
     -

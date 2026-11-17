@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('component_prefs', function (Blueprint $table) {
+        Schema::create('component_prefs', function (Blueprint $table): void {
             $table->increments('id')->comment('ID for each entry');
             $table->unsignedInteger('component')->index()->comment('id from the component table');
             $table->string('attribute')->comment('Attribute for the Component');

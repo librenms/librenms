@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ospfv3_ports', function (Blueprint $table) {
+        Schema::table('ospfv3_ports', function (Blueprint $table): void {
             $table->dropColumn('ospfv3IfInstId');
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ospfv3_ports', function (Blueprint $table) {
+        Schema::table('ospfv3_ports', function (Blueprint $table): void {
             $table->integer('ospfv3IfInstId')->after('ospfv3IfIndex');
         });
     }

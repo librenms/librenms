@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ports_nac', function (Blueprint $table) {
+        Schema::create('ports_nac', function (Blueprint $table): void {
             $table->increments('ports_nac_id');
             $table->string('auth_id', 50);
             $table->unsignedInteger('device_id')->index();

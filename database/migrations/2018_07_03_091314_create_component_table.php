@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('component', function (Blueprint $table) {
+        Schema::create('component', function (Blueprint $table): void {
             $table->increments('id')->comment('ID for each component, unique index');
             $table->unsignedInteger('device_id')->index()->comment('device_id from the devices table');
             $table->string('type', 50)->index()->comment('name from the component_type table');

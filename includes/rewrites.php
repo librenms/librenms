@@ -161,20 +161,6 @@ function ipmiSensorName($hardwareId, $sensorIpmi)
 }
 
 /**
- * @param  $descr
- * @return int
- */
-function get_nagios_state($descr)
-{
-    return match ($descr) {
-        'On', 'Okay', 'Ok' => 0,
-        'Standby', 'Idle', 'Maintenance' => 1,
-        'Under', 'Over' => 2,
-        default => 3,
-    };
-}
-
-/**
  * @param  $state
  * @return int|void
  */
@@ -190,36 +176,4 @@ function apc_relay_state($state)
             return 2;
             break;
     }
-}
-
-function parse_entity_state($state, $value)
-{
-    $data = [
-        'entStateOper' => [
-            1 => ['text' => 'unavailable', 'color' => 'default'],
-            2 => ['text' => 'disabled', 'color' => 'danger'],
-            3 => ['text' => 'enabled', 'color' => 'success'],
-            4 => ['text' => 'testing', 'color' => 'warning'],
-        ],
-        'entStateUsage' => [
-            1 => ['text' => 'unavailable', 'color' => 'default'],
-            2 => ['text' => 'idle', 'color' => 'info'],
-            3 => ['text' => 'active', 'color' => 'success'],
-            4 => ['text' => 'busy', 'color' => 'success'],
-        ],
-        'entStateStandby' => [
-            1 => ['text' => 'unavailable', 'color' => 'default'],
-            2 => ['text' => 'hotStandby', 'color' => 'info'],
-            3 => ['text' => 'coldStandby', 'color' => 'info'],
-            4 => ['text' => 'providingService', 'color' => 'success'],
-        ],
-        'entStateAdmin' => [
-            1 => ['text' => 'unknown', 'color' => 'default'],
-            2 => ['text' => 'locked', 'color' => 'info'],
-            3 => ['text' => 'shuttingDown', 'color' => 'warning'],
-            4 => ['text' => 'unlocked', 'color' => 'success'],
-        ],
-    ];
-
-    return $data[$state][$value] ?? ['text' => 'na', 'color' => 'default'];
 }

@@ -1,6 +1,6 @@
 os: lambdatrail
 text: 'Lambdatrail'
-type: network
+type: optical
 icon: lambdatrail
 group: deltanet
 over:
