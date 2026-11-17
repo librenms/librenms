@@ -127,6 +127,25 @@ final class EditHealthControllerTest extends TestCase
         $this->assertSame('Yes', $sensor->sensor_custom);
     }
 
+    public function testAlertTogglePreservesPendingLimitReset(): void
+    {
+        $device = Device::factory()->create();
+        $sensor = $this->sensor($device);
+        $limits = $sensor->only(Sensor::LIMITS);
+        $this->actingAs($this->admin())
+            ->postJson(route('device.edit.health.update', [$device, $sensor]), ['sensor_custom' => 'No'])
+            ->assertOk();
+
+        foreach ([0, 1] as $enabled) {
+            $this->postJson(route('device.edit.health.update', [$device, $sensor]), ['sensor_alert' => $enabled])
+                ->assertOk();
+            $sensor->refresh();
+            $this->assertEquals($enabled, $sensor->sensor_alert);
+            $this->assertSame('Reset', $sensor->sensor_custom);
+            $this->assertEquals($limits, $sensor->only(Sensor::LIMITS));
+        }
+    }
+
     public function testEmptyLimitClearsIt(): void
     {
         $device = Device::factory()->create();
