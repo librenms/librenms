@@ -1,7 +1,7 @@
 -- ***********************************************************************
 --  Management MIB definitions
 -- ***********************************************************************
-                   
+
 IEC-62439-2-MIB         DEFINITIONS::= BEGIN
 
 -- ***********************************************************************
@@ -11,12 +11,12 @@ IEC-62439-2-MIB         DEFINITIONS::= BEGIN
 IMPORTS
        MODULE-IDENTITY,
        OBJECT-IDENTITY,
-       OBJECT-TYPE, 
+       OBJECT-TYPE,
        TimeTicks,
-       Counter32, 
-       Unsigned32, 
+       Counter32,
+       Unsigned32,
        Integer32                FROM SNMPv2-SMI
-       OBJECT-GROUP, 
+       OBJECT-GROUP,
        MODULE-COMPLIANCE        FROM SNMPv2-CONF
        TEXTUAL-CONVENTION,
        DisplayString, RowStatus FROM SNMPv2-TC;
@@ -24,8 +24,8 @@ IMPORTS
 -- Root OID
 -- ***********************************************************************
 iec62439    MODULE-IDENTITY
-            LAST-UPDATED "201405090000Z"  --  May 09, 2014
-            ORGANIZATION "IEC/SC 65C"
+            LAST-UPDATED "202212140000Z"  --  December 14, 2022
+            ORGANIZATION "IEC TC65/SC 65C/WG 15"
             CONTACT-INFO "
                          International Electrotechnical Commission
                          IEC Central Office
@@ -38,18 +38,34 @@ iec62439    MODULE-IDENTITY
                          email: info@iec.ch
                          "
             DESCRIPTION  "
+                65c-62439-2:2021/COR1:2023
+                Copyright (C) IEC. This version of this MIB module is part
+                of 65c-62439-2:2021/COR1:2023;
+                see 65c-62439-2:2021 for full legal notices.
+
                 This MIB module defines the Network Management interfaces
-                for the Redundancy Protocols defined by the IEC
-                standard 62439. 
-                This definitions specify the monitoring and management  
-                variant of a SNMP entity. If the SNMP entity only contains 
-                monitoring functionality, then IEC 62439 monitoring MIB  
+                for the Redundancy Protocols defined by the IEC 62439 suite.
+                This MIB exposes the IEC62439-2 objects (MRP).
+                These definitions specify the monitoring and management
+                variant of an SNMP entity. If the SNMP entity only contains
+                monitoring functionality, then IEC 62439 monitoring MIB
                 definitions shall be used instead of this MIB module.
-                An entity may support either the monitoring facet only 
+                An entity may support either the monitoring facet only
                 or the management facet including the monitoring facet
                 as a subset.
                 "
-                
+
+            REVISION      "202212140000Z" -- December 14, 2022
+            DESCRIPTION   "
+            replacement of FDIS version with final IS version
+            "
+
+            REVISION    "201901300000Z"  --  January 30, 2019
+            DESCRIPTION  "
+            mrpInterconnectionAdminMICPosition and mrpInterconnectionOperMICPosition
+            have been added to mrpInterconnectionTable.
+            "
+
             REVISION    "201405090000Z"  --  May 09, 2014
             DESCRIPTION  "
             Manager (auto) support has been added in mrpDomainAdminRole.
@@ -64,33 +80,33 @@ iec62439    MODULE-IDENTITY
 
             REVISION    "200711120000Z"  --  November 12, 2007
             DESCRIPTION  "
-            The undefined use of the value 'badValue' for objects 
-            of the optional 'mrpDomainDiagGroup' has been removed 
+            The undefined use of the value 'badValue' for objects
+            of the optional 'mrpDomainDiagGroup' has been removed
             from DESCRIPTION clause at the objects concerned.
             The role dependency of the objects 'mrpDomainState' and
             'mrpDomainError' in the DESCRIPTION clause removed.
- 			"                                                
-            
+ 			"
+
             REVISION    "200708240000Z"  --  August 24, 2007
             DESCRIPTION  "
-                Final Draft Proposal version of the Network Management 
-                interface for the Media Redundancy Protocol (MRP) with 
-                the monitoring functionality and the additional 
-                management functionality. 
+                Final Draft Proposal version of the Network Management
+                interface for the Media Redundancy Protocol (MRP) with
+                the monitoring functionality and the additional
+                management functionality.
                 "
-   ::= { iso std(0) 62439 }
+ ::= { iso std(0) 62439 }
 
 -- ***********************************************************************
 -- Declaration of  IEC62439UuidType
 -- ***********************************************************************
-IEC62439UuidType   ::= TEXTUAL-CONVENTION
+IEC62439UuidType ::= TEXTUAL-CONVENTION
     STATUS          current
     DESCRIPTION "
-        The IEC 61158-5-10 defines the structure of 
-        the UUID as a data type numeric 
+        The IEC 61158-5-10 defines the structure of
+        the UUID as a data type numeric
         identifier 1025.
         "
-    SYNTAX          OCTET STRING (SIZE (16)) 
+    SYNTAX          OCTET STRING (SIZE (16))
 
 -- ***********************************************************************
 -- Redundancy Protocols
@@ -103,9 +119,9 @@ brp                 OBJECT IDENTIFIER::= { iec62439 4 }
 -- ***********************************************************************
 -- objects groups of redundancy object identifiers
 -- ***********************************************************************
-mrpObjects          OBJECT IDENTIFIER  ::= { mrp 1 } 
-mrpNotifications    OBJECT IDENTIFIER  ::= { mrp 2 } 
-mrpConformance      OBJECT IDENTIFIER  ::= { mrp 3 } 
+mrpObjects          OBJECT IDENTIFIER::= { mrp 1 }
+mrpNotifications    OBJECT IDENTIFIER::= { mrp 2 }
+mrpConformance      OBJECT IDENTIFIER::= { mrp 3 }
 
 -- ***********************************************************************
 -- Objects of the MRP Network Management
@@ -118,13 +134,13 @@ mrpDomainTable      OBJECT-TYPE
                     Every entry in this table contains information about
                     a Media Redundancy Protocol (MRP) domain.
 
-                    Row entries can be created or deleted via 
-                    SNMP operations. Therefore the MAX-ACCESS values 
-                    of some Object Identifier are different from the 
-                    values of the same Object Identifier in the 
-                    pure monitoring facet. 
+                    Row entries can be created or deleted via
+                    SNMP operations. Therefore the MAX-ACCESS values
+                    of some Object Identifier are different from the
+                    values of the same Object Identifier in the
+                    pure monitoring facet.
                     "
-   ::= { mrpObjects 1 }
+ ::= { mrpObjects 1 }
 
 mrpDomainEntry      OBJECT-TYPE
     SYNTAX          MrpDomainEntry
@@ -132,7 +148,7 @@ mrpDomainEntry      OBJECT-TYPE
     STATUS          current
     DESCRIPTION     "An entry in the mrpDomainTable."
     INDEX           { mrpDomainIndex }
-   ::= { mrpDomainTable 1 }
+ ::= { mrpDomainTable 1 }
 
 MrpDomainEntry::=  SEQUENCE {
                     mrpDomainIndex                   Unsigned32,
@@ -149,7 +165,7 @@ MrpDomainEntry::=  SEQUENCE {
                     mrpDomainBlocked                 INTEGER,
                     mrpDomainVlanId                  Unsigned32,
                     mrpDomainManagerPriority         INTEGER,
-                    mrpDomainRingOpenCount           Counter32, 
+                    mrpDomainRingOpenCount           Counter32,
                     mrpDomainLastRingOpenChange      TimeTicks,
                     mrpDomainRoundTripDelayMax       Unsigned32,
                     mrpDomainRoundTripDelayMin       Unsigned32,
@@ -157,13 +173,13 @@ MrpDomainEntry::=  SEQUENCE {
                     mrpDomainMRMReactOnLinkChange    INTEGER,
                     mrpDomainRowStatus               RowStatus
                     }
-                    
+
 mrpDomainIndex      OBJECT-TYPE
-    SYNTAX          Unsigned32      
+    SYNTAX          Unsigned32
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION     "The index of the entry"
-   ::= { mrpDomainEntry 1 }
+ ::= { mrpDomainEntry 1 }
 
 mrpDomainID         OBJECT-TYPE
     SYNTAX          IEC62439UuidType
@@ -173,91 +189,91 @@ mrpDomainID         OBJECT-TYPE
                     Universally unique identifier belongs to the MRP domain
                     which represents a ring.
                     "
-   ::= { mrpDomainEntry 2 }
+ ::= { mrpDomainEntry 2 }
 
 mrpDomainName       OBJECT-TYPE
     SYNTAX          DisplayString
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION     "
-                    A logical name for the MRP domain to ease the 
+                    A logical name for the MRP domain to ease the
                     management of MRP domains.
                     "
-   ::= { mrpDomainEntry 3 }
+ ::= { mrpDomainEntry 3 }
 
 mrpDomainAdminRole  OBJECT-TYPE
     SYNTAX          INTEGER {
                     disable(0),
-                    client(1), 
+                    client(1),
                     manager(2),
                     managerAutoComp(3),
                     managerAuto(4)
-                    }   
+                    }
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION     "
-                    Control the MRP behavior of the system per domain. 
-                    
-                    If the value is set to disable(0) the MRP entity of  
+                    Control the MRP behavior of the system per domain.
+
+                    If the value is set to disable(0), the MRP entity of
                     this domain shall be disabled.
-                    If the value is set to client(1) the entity shall be set 
+                    If the value is set to client(1), the entity shall be set
                     to the role of a Media Redundancy Client (MRC).
-                    If the value is set to manager(2) the entity shall be
+                    If the value is set to manager(2), the entity shall be
                     set to the role of a Media Redundancy Manager (MRM).
-                    If the value is set to managerAutoComp(3) the entity shall be
+                    If the value is set to managerAutoComp(3), the entity shall be
                     set to the role of a Media Redundancy Manager Auto (MRA)
-                    complying to Annex A.
-                    If the value is set to managerAuto(4) the entity shall be 
-                    set to the role of a Media Redundancy Manager Auto (MRA) not 
+                    complying with Annex A.
+                    If the value is set to managerAuto(4), the entity shall be
+                    set to the role of a Media Redundancy Manager Auto (MRA) not
                     supporting Annex A.
-                    The factory settings are recommended to adjust the 
-                    value of this object to the client(1) capability of the 
-                    component, or, if supported, to the managerAutoComp(3) 
+                    The factory settings are recommended to adjust the
+                    value of this object to the client(1) capability of the
+                    component, or, if supported, to the managerAutoComp(3)
                     or managerAuto(4) capability,
                     in order to prevent multiple managers are
-                    in ring (the order of the capabilities are not  
+                    in ring (the order of the capabilities are not
                     necessarily conform to the order of the object values
                     here).
-                    If the agent restricts the write access, no matter what 
-                    reason, it shall reject write requests by responding  
-                    with 'badValue'.                     
+                    If the agent restricts the write access, no matter what
+                    reason, it shall reject write requests by responding
+                    with 'badValue'.
                     "
-   ::= { mrpDomainEntry 4 }
+ ::= { mrpDomainEntry 4 }
 
 mrpDomainOperRole   OBJECT-TYPE
     SYNTAX          INTEGER {
                         disable(0),
-                        client(1), 
+                        client(1),
                         manager(2),
                         managerAutoComp(3),
                         managerAuto(4)
-                    }   
+                    }
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION     "
-                    The operational role of an MRP entity per domain. 
+                    The operational role of an MRP entity per domain.
                     A value of disabled(0) signals that the entity doesn't
-                    work   (whatever reason).
-                    A value of client(1) signals that the entity is in a 
+                    work (for whatever reason).
+                    A value of client(1) signals that the entity is in a
                     client role.
-                    A value of manager(2) signals that the entity is the 
+                    A value of manager(2) signals that the entity is the
                     manager of this MRP domain.
-                    A value of managerAutoComp(3) signals that the entity is 
-                    in automanager role complying to Annex A.
+                    A value of managerAutoComp(3) signals that the entity is
+                    in automanager role complying with Annex A.
                     A value of managerAuto(4) signals that the entity is in
                     automanager role not supporting Annex A.
                     "
-   ::= { mrpDomainEntry 5 }
+ ::= { mrpDomainEntry 5 }
 
 mrpDomainRingPort1  OBJECT-TYPE
-    SYNTAX          Integer32       
+    SYNTAX          Integer32
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION     "
-                    The ifIndex of the layer 2 interface which is used  
+                    The ifIndex of the layer 2 interface which is used
                     as ring port 1.
                     "
-   ::= {  mrpDomainEntry 6  } 
+ ::= {  mrpDomainEntry 6  }
 
 mrpDomainRingPort1State  OBJECT-TYPE
     SYNTAX          INTEGER {
@@ -270,33 +286,33 @@ mrpDomainRingPort1State  OBJECT-TYPE
     STATUS          current
     DESCRIPTION     "
                     Operational state of the first Ring-Port.
-        
+
      disabled(1)      indicates that all frames are dropped.
      blocked(2)       indicates that all frames are dropped except
-                     - MRP topology change frames and MRP test frames from 
+                     - MRP topology change frames and MRP test frames from
                         a MRM,
                      - MRP link change frames from an MRC,
-                     - MRP interconnection topology change from a MIM,
-                     - MRP interconnection link change from a MIC,
+                     - MRP Interconnection topology change from a MIM,
+                     - MRP Interconnection link change from a MIC,
                      - frames from other protocols that also define to pass
                         blocked(2) ports.
     forwarding(3)     indicates that all frames are passed through
-                      according to the forwarding behavior 
-                      of IEEE 802.1D.
+                      in accordance with the forwarding behavior
+                      of IEEE 802.1Q.
     not-connected(4)  indicates that the port has no link.
                     "
-   ::= {  mrpDomainEntry 7  }
+ ::= {  mrpDomainEntry 7  }
 
 mrpDomainRingPort2  OBJECT-TYPE
-    SYNTAX          Integer32       
+    SYNTAX          Integer32
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION     "
-                    The ifIndex of the layer 2 interface which is 
+                    The ifIndex of the layer 2 interface, which is
                     used as ring port 2.
                     "
-   ::= {  mrpDomainEntry 8  }
-      
+ ::= {  mrpDomainEntry 8  }
+
 mrpDomainRingPort2State OBJECT-TYPE
     SYNTAX          INTEGER {
                         disabled(1),
@@ -308,22 +324,22 @@ mrpDomainRingPort2State OBJECT-TYPE
     STATUS          current
     DESCRIPTION     "
                     Operational state of the second Ring-Port.
-        
+
      disabled(1)      indicates that all frames are dropped.
      blocked(2)       indicates that all frames are dropped except
                      - MRP topology change frames and MRP test frames from
                         a MRM,
                      - MRP link change frames from an MRC,
-                     - MRP interconnection topology change from a MIM,
-                     - MRP interconnection link change from a MIC,
+                     - MRP Interconnection topology change from a MIM,
+                     - MRP Interconnection link change from a MIC,
                      - frames from other protocols that also define to pass
                         blocked(2) ports.
      forwarding(3)    indicates that all frames are passed through
-                      according to the forwarding behavior 
-                      of IEEE 802.1D.
+                      in accordance with the forwarding behavior
+                      of IEEE 802.1Q.
      not-connected(4) indicates that the port has no link.
         "
-   ::= {  mrpDomainEntry 9  }
+ ::= {  mrpDomainEntry 9  }
 
 mrpDomainState  OBJECT-TYPE
     SYNTAX          BITS {
@@ -336,7 +352,7 @@ mrpDomainState  OBJECT-TYPE
     STATUS          current
     DESCRIPTION     "
                     Operational status of the MRP entity.
-       disabled(0) - MRP switched off. All higher bits are invalid 
+       disabled(0) - MRP switched off. All higher bits are invalid
                         and shall be reset.
        undefined(1) - Value is not valid.
                         All higher bits are invalid and shall be reset.
@@ -345,35 +361,35 @@ mrpDomainState  OBJECT-TYPE
        reserved(3) - reserved for further extensions.
 
                     "
-   ::= {  mrpDomainEntry 10  }
+ ::= {  mrpDomainEntry 10  }
 
 mrpDomainError  OBJECT-TYPE
-    SYNTAX          BITS {         
+    SYNTAX          BITS {
                         noError(0),
                         invalidVlanId(1),
-                        invalid(2), 
+                        invalid(2),
                         multipleMRM(3),
                         singleSideReceive(4)
                     }
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION     "
-        If the device couldn't switch to the desired administrative state 
-        (thus the value of 'mrpDomainState' is not the expected one), 
-        this value provides the reason. Otherwise the bit noError(0) is set.
+        If the device couldn't switch to the desired administrative state
+        (thus the value of 'mrpDomainState' is not the expected one),
+        this value provides the reason. Otherwise, the bit noError(0) is set.
 
-       noError(0)          - the operational state of the device is confom 
-                              to administrative state. 
+       noError(0)          - the operational state of the device is confom
+                              to administrative state.
                               All higher bits are invalid and shall be reset.
        invalidVlanId(1)    - the assigned VLAN ID is not permitted .
-       invalid (2)         - Value is not valid. 
+       invalid (2)         - Value is not valid.
                               All higher bits are invalid and shall be reset.
        multipleMRM(3)      - multiple active managers in ring domain.
        singleSideReceive(4) - the test frames of an MRM
                               have been seen, but only on one port.
-                    " 
-   ::= {  mrpDomainEntry 11  } 
-    
+                    "
+ ::= {  mrpDomainEntry 11  }
+
 mrpDomainBlocked    OBJECT-TYPE
     SYNTAX          INTEGER {
                         enabled(1),
@@ -383,39 +399,39 @@ mrpDomainBlocked    OBJECT-TYPE
     STATUS          current
     DESCRIPTION     "
                     The entity supports blocked ring ports.
-                    Shows whether a mrp domain requires the support of the
+                    Shows whether an MRP domain requires the support of the
                     BLOCKED port state at ring ports.
-                    The manager of a mrp domain decides whether this support
+                    The manager of an MRP domain decides whether this support
                     is required.
-                    Set to enabled the manager demands that all clients 
+                    Set to enabled, the manager demands that all clients
                     shall support the blocked attribute also set to enabled.
-                    If mrpDomainBlocked is set disabled at the manager, 
-                    then the value of mrpDomainBlocked can be arbitrary 
+                    If mrpDomainBlocked is set disabled at the manager,
+                    then the value of mrpDomainBlocked can be arbitrary
                     at the clients.
-        enabled(1)  client:  supports ring ports whose port state can be 
+        enabled(1)  client:  supports ring ports whose port state can be
                              blocked.
-                    manager: works only with clients supporting blocked 
+                    manager: works only with clients supporting blocked
                              ring ports.
         disabled(2) client:  no support of blocked ring ports.
-                    manager: Work with clients supporting blocked ring  
-                             ports and with clients not supporting  
+                    manager: Work with clients supporting blocked ring
+                             ports and with clients not supporting
                              blocked ring ports.
                     "
-   ::= { mrpDomainEntry 12 }
-                    
+ ::= { mrpDomainEntry 12 }
+
 mrpDomainVlanId OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION     "
-                    The VLAN ID assigned to the MRP protocol.       
-                    The VLAN ID only is in use when the bit invalidVlanId 
+                    The VLAN ID assigned to the MRP protocol.
+                    The VLAN ID only is in use when the bit invalidVlanId
                     is not set in mrpDomainError.
-                    If value is set to 0 no VLAN is assigned. 
+                    If value is set to 0 no VLAN is assigned.
                     The invalidVlanId shall be set to 0 (no Error).
                     "
-   ::= {  mrpDomainEntry 13  }
-    
+ ::= {  mrpDomainEntry 13  }
+
 -- ***********************************************************************
 -- Objects of the MRP Network Management for manager role
 -- ***********************************************************************
@@ -423,15 +439,15 @@ mrpDomainManagerPriority    OBJECT-TYPE
     SYNTAX          INTEGER (0..65535)
     MAX-ACCESS      read-create
     STATUS          current
-    DESCRIPTION     "   
-                    The priority of this MRP entity. If the device is 
-                    client only, the value of this object shall be ignored   
-                    by the MRP entity. Only the four most significant bits  
-                    shall be used, the bits 0 to 11 are reserved. The 
+    DESCRIPTION     "
+                    The priority of this MRP entity. If the device is
+                    client only, the value of this object shall be ignored
+                    by the MRP entity. Only the four most significant bits
+                    shall be used, the bits 0 to 11 are reserved. The
                     smaller value has the higher priority.
                     "
-   ::= { mrpDomainEntry 14 } 
-    
+ ::= { mrpDomainEntry 14 }
+
 mrpDomainRingOpenCount  OBJECT-TYPE
     SYNTAX          Counter32
     MAX-ACCESS      read-only
@@ -439,7 +455,7 @@ mrpDomainRingOpenCount  OBJECT-TYPE
     DESCRIPTION     "
                     Counter for ring-state changes to open.
                     "
-   ::= {  mrpDomainEntry 15  }
+ ::= {  mrpDomainEntry 15  }
 
 mrpDomainLastRingOpenChange OBJECT-TYPE
     SYNTAX          TimeTicks
@@ -449,7 +465,7 @@ mrpDomainLastRingOpenChange OBJECT-TYPE
                     Timeticks since last change of ring-state
                     to ring open.
                     "
-   ::= {  mrpDomainEntry 16  }
+ ::= {  mrpDomainEntry 16  }
 
 mrpDomainRoundTripDelayMax  OBJECT-TYPE
     SYNTAX          Unsigned32
@@ -457,10 +473,10 @@ mrpDomainRoundTripDelayMax  OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION     "
-                    The max. Round-Trip-Delay (in milliseconds) 
-                    which was measured since startup.
+                    The maximum Round-Trip-Delay (in milliseconds)
+                    that was measured since startup.
                     "
-   ::= {  mrpDomainEntry 17  }
+ ::= {  mrpDomainEntry 17  }
 
 mrpDomainRoundTripDelayMin  OBJECT-TYPE
     SYNTAX          Unsigned32
@@ -468,10 +484,10 @@ mrpDomainRoundTripDelayMin  OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION     "
-                    The min. Round-Trip-Delay (in milliseconds) 
-                    which was measured since startup.
+                    The minimum Round-Trip-Delay (in milliseconds)
+                    that was measured since startup.
                     "
-   ::= {  mrpDomainEntry 18  }
+ ::= {  mrpDomainEntry 18  }
 
 mrpDomainResetRoundTripDelays   OBJECT-TYPE
     SYNTAX          INTEGER {
@@ -480,13 +496,13 @@ mrpDomainResetRoundTripDelays   OBJECT-TYPE
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION     "
-                    A write request with resetDelays(1) shall reset  
+                    A write request with resetDelays(1) shall reset
                     the values of mrpDomainRoundTripDelayMax and
-                    mrpDomainRoundTripDelayMin to zero at the 
+                    mrpDomainRoundTripDelayMin to zero at the
                     same time.
                     "
-   ::= {  mrpDomainEntry 19  } 
-                                
+ ::= {  mrpDomainEntry 19  }
+
 mrpDomainMRMReactOnLinkChange   OBJECT-TYPE
     SYNTAX          INTEGER {
                         enabled(1),
@@ -495,14 +511,14 @@ mrpDomainMRMReactOnLinkChange   OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION     "
-                    Tells whether the MRM reacts on link down MRP link change 
+                    Tells whether the MRM reacts on link down MRP link change
                     frames.
-       enabled(1)   indicates that the MRM reacts immediately on link down MRP 
+       enabled(1)   indicates that the MRM reacts immediately on link down MRP
                     link change frames.
-       disabled(2)  indicates that the MRM does not react on 
+       disabled(2)  indicates that the MRM does not react on
                     link down MRP link change frames.
                     "
-   ::= { mrpDomainEntry 20 }
+ ::= { mrpDomainEntry 20 }
 
 -- ***********************************************************************
 -- additional Objects of the MRP Network Management for management
@@ -514,10 +530,10 @@ mrpDomainRowStatus  OBJECT-TYPE
     STATUS          current
     DESCRIPTION     "
                     Support of creation and deletion of rows.
-                    A row can be taken out of service by writing 
+                    A row can be taken out of service by writing
                     the value notInService(2).
                     "
-   ::= { mrpDomainEntry 21}  
+ ::= { mrpDomainEntry 21}
 
 -- ***********************************************************************
 -- Objects of the Media redundancy Interconnection
@@ -530,13 +546,13 @@ mrpInterconnectionTable      OBJECT-TYPE
                     Every entry in this table contains information about
                     a Media redundancy Interconnection domain.
 
-                    Row entries can be created or deleted via 
-                    SNMP operations. Therefore the MAX-ACCESS values 
-                    of some Object Identifier are different from the 
-                    values of the same Object Identifier in the 
-                    pure monitoring facet. 
+                    Row entries can be created or deleted via
+                    SNMP operations. Therefore the MAX-ACCESS values
+                    of some Object Identifier are different from the
+                    values of the same Object Identifier in the
+                    pure monitoring facet.
                     "
-   ::= { mrpObjects 2 }
+ ::= { mrpObjects 2 }
 
 mrpInterconnectionEntry      OBJECT-TYPE
     SYNTAX          MrpInterconnectionEntry
@@ -544,7 +560,7 @@ mrpInterconnectionEntry      OBJECT-TYPE
     STATUS          current
     DESCRIPTION     "An entry in the mrpInterconnectionTable."
     INDEX           { mrpInterconnectionID }
-   ::= { mrpInterconnectionTable 1 }
+ ::= { mrpInterconnectionTable 1 }
 
 MrpInterconnectionEntry::=  SEQUENCE {
                     mrpInterconnectionID                     Unsigned32,
@@ -557,7 +573,7 @@ MrpInterconnectionEntry::=  SEQUENCE {
                     mrpInterconnectionOperRole               INTEGER,
                     mrpInterconnectionState                  INTEGER,
                     mrpInterconnectionError                  BITS,
-                    mrpInterconnectionOpenCount              Counter32, 
+                    mrpInterconnectionOpenCount              Counter32,
                     mrpInterconnectionLastOpenChange         TimeTicks,
                     mrpInterconnectionPeerMAC                OCTET STRING,
                     mrpInterconnectionOwnMRMMAC              OCTET STRING,
@@ -565,13 +581,13 @@ MrpInterconnectionEntry::=  SEQUENCE {
                     mrpInterconnectionPeerRingDomainUUID     IEC62439UuidType,
                     mrpInterconnectionRowStatus              RowStatus
                     }
-                    
+
 mrpInterconnectionID      OBJECT-TYPE
-    SYNTAX          Unsigned32      
+    SYNTAX          Unsigned32
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION     "The index of the entry"
-   ::= { mrpInterconnectionEntry 1 }
+ ::= { mrpInterconnectionEntry 1 }
 
 mrpInterconnectionName       OBJECT-TYPE
     SYNTAX          DisplayString
@@ -581,17 +597,17 @@ mrpInterconnectionName       OBJECT-TYPE
                     A logical name for the Media redundancy Interconnection domain to
 ease the management of Media redundancy Interconnection domains.
                     "
-   ::= { mrpInterconnectionEntry 2 }
+ ::= { mrpInterconnectionEntry 2 }
 
 mrpInterconnectionPort  OBJECT-TYPE
-    SYNTAX          Integer32       
+    SYNTAX          Integer32
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION     "
-                    The ifIndex of the layer 2 interface which is used  
-                    as interconnection port.
+                    The ifIndex of the layer 2 interface, which is used
+                    as an interconnection port.
                     "
-   ::= {  mrpInterconnectionEntry 3 } 
+ ::= {  mrpInterconnectionEntry 3 }
 
 mrpInterconnectionPortState  OBJECT-TYPE
     SYNTAX          INTEGER {
@@ -604,7 +620,7 @@ mrpInterconnectionPortState  OBJECT-TYPE
     STATUS          current
     DESCRIPTION     "
                     Operational state of the Interconnection port.
-        
+
      disabled(1)    indicates that all frames are dropped.
      blocked(2)     indicates that all frames are dropped except
                     - MRP Interconnection topology change frames,
@@ -614,100 +630,100 @@ mrpInterconnectionPortState  OBJECT-TYPE
                     - frames from other protocols that also define to pass
                        blocked(2) ports.
      forwarding(3)   indicates that all frames are passed through
-                     according to the forwarding behavior of IEEE 802.1D.
+                     in accordance with the forwarding behavior of IEEE 802.1Q.
      notConnected(4) indicates that the port has no link.
                     "
-   ::= {  mrpInterconnectionEntry 4 }
+ ::= {  mrpInterconnectionEntry 4 }
 
 mrpInterconnectionVlanId OBJECT-TYPE
     SYNTAX          Unsigned32
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION     "
-                    The VLAN ID assigned to the MRP Interconnection protocol.       
-                    The VLAN ID only is in use when mrpInterconnectionError 
-                    does not signal invalidVlanId. 
-                    If value is set to 0 no VLAN is assigned. 
+                    The VLAN ID assigned to the MRP Interconnection protocol.
+                    The VLAN ID only is in use when mrpInterconnectionError
+                    does not signal invalidVlanId.
+                    If value is set to 0 no VLAN is assigned.
                     "
-   ::= {  mrpInterconnectionEntry 5 }
-  
+ ::= {  mrpInterconnectionEntry 5 }
+
 mrpInterconnectionMode  OBJECT-TYPE
     SYNTAX          INTEGER {
                     undefined(1),
-                    lcMode(2), 
+                    lcMode(2),
                     rcMode(3)
-                    }   
+                    }
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION     "
-                    Control the MRP Interconnection mode. 
-                    
-                    The value undefined(1) signals that the interconnection mode is 
+                    Control the MRP Interconnection mode.
+
+                    The value undefined(1) signals that the interconnection mode is
 neither set to lcMode(2) nor to rcMode(3).
-                    If the value is set to lcMode(2) the device in Media redundancy
+                    If the value is set to lcMode(2), the device in Media redundancy
                     Interconnection Manager (MIM) role is using the link check mode to
                     detect open or closed interconnection links.
-                    If the value is set to rcMode(3) the device in Media redundancy
+                    If the value is set to rcMode(3), the device in Media redundancy
                     Interconnection Manager (MIM) role is using the ring check mode to
                     detect open or closed interconnection links.
 
-                    The factory settings are recommended to adjust the   
+                    The factory settings are recommended to adjust the
                     value of this object to the lcMode(2) capability.
-                    If the agent restricts the write access, no matter what 
-                    reason, it shall reject write requests by responding  
-                    with 'badValue'.                     
+                    If the agent restricts the write access, no matter what
+                    reason, it shall reject write requests by responding
+                    with 'badValue'.
                     "
-   ::= { mrpInterconnectionEntry 6 }
+ ::= { mrpInterconnectionEntry 6 }
 
 mrpInterconnectionAdminRole  OBJECT-TYPE
     SYNTAX          INTEGER {
                     disable(0),
-                    client(1), 
+                    client(1),
                     manager(2)
-                    }   
+                    }
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION     "
-                    Control the MRP Interconnection behavior of the system per 
-                    Media redundancy Interconnection domain. 
-                    
-                    If the value is set to disable(0) the MRP Interconnection   
+                    Control the MRP Interconnection behavior of the system per
+                    Media redundancy Interconnection domain.
+
+                    If the value is set to disable(0), the MRP Interconnection
                     entity of this domain shall be disabled.
-                    If the value is set to client(1) the entity shall be set 
+                    If the value is set to client(1), the entity shall be set
                     to the role of a Media redundancy Interconnection Client (MIC).
-                    If the value is set to manager(2) the entity shall be set
+                    If the value is set to manager(2), the entity shall be set
                     to the role of a Media redundancy Interconnection Manager (MIM).
-                    The factory settings are recommended to adjust the   
-                    value of this object to the client(1) capability of the 
+                    The factory settings are recommended to adjust the
+                    value of this object to the client(1), capability of the
                     component in order to prevent multiple managers are
-                    in the interconnection (the order of the capabilities are not  
+                    in the interconnection (the order of the capabilities are not
                     necessarily conform to the order of the object values
                     here).
-                    If the agent restricts the write access, no matter what 
-                    reason, it shall reject write requests by responding  
-                    with 'badValue'.                     
+                    If the agent restricts the write access, no matter what
+                    reason, it shall reject write requests by responding
+                    with 'badValue'.
                     "
-   ::= { mrpInterconnectionEntry 7 }
+ ::= { mrpInterconnectionEntry 7 }
 
 mrpInterconnectionOperRole   OBJECT-TYPE
     SYNTAX          INTEGER {
                     disable(0),
-                    client(1), 
+                    client(1),
                     manager(2)
-                    }   
+                    }
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION     "
-                    The operational role of an MRP Interconnection entity 
-                    per Media redundancy Interconnection domain. 
+                    The operational role of an MRP Interconnection entity
+                    per Media redundancy Interconnection domain.
                     A value of disabled(0) signals that the entity doesn't
                     work (whatever reason).
-                    A value of client(1) signals that the entity is in a 
+                    A value of client(1) signals that the entity is in a
                     Media redundancy Interconnection Client role.
-                    A value of manager(2) signals that the entity is the 
+                    A value of manager(2) signals that the entity is the
                     manager of this Media redundancy Interconnection domain.
                     "
-   ::= { mrpInterconnectionEntry 8 }
+ ::= { mrpInterconnectionEntry 8 }
 
 mrpInterconnectionState  OBJECT-TYPE
     SYNTAX          INTEGER {
@@ -727,10 +743,10 @@ mrpInterconnectionState  OBJECT-TYPE
        interconnClosed(3) - MRP Interconnection redundancy available of this Media
                           redundancy Interconnection domain.
                     "
-   ::= {  mrpInterconnectionEntry 9 }
+ ::= {  mrpInterconnectionEntry 9 }
 
 mrpInterconnectionError  OBJECT-TYPE
-    SYNTAX          BITS {         
+    SYNTAX          BITS {
                     noError(0),
                     invalidVlanId(1)
                     }
@@ -741,28 +757,28 @@ mrpInterconnectionError  OBJECT-TYPE
 
        noError(0)      - no configuration error detected.
        invalidVlanId(1) - the assigned VLAN ID is not permitted.
-                    " 
-   ::= {  mrpInterconnectionEntry 10 } 
-    
+                    "
+ ::= {  mrpInterconnectionEntry 10 }
+
 mrpInterconnectionOpenCount  OBJECT-TYPE
     SYNTAX          Counter32
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION     "
-                    Counter for MRP Interconnection state changes to 
+                    Counter for MRP Interconnection state changes to
                     interconnOpen.
                     "
-   ::= {  mrpInterconnectionEntry 11 }
+ ::= {  mrpInterconnectionEntry 11 }
 
 mrpInterconnectionLastOpenChange OBJECT-TYPE
     SYNTAX          TimeTicks
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION     "
-                    Timeticks since last change of 
+                    Timeticks since last change of
                     mrpInterconnectionState to interconnOpen.
                     "
-   ::= {  mrpInterconnectionEntry 12 }
+ ::= {  mrpInterconnectionEntry 12 }
 
 mrpInterconnectionPeerMAC OBJECT-TYPE
     SYNTAX          OCTET STRING
@@ -770,11 +786,11 @@ mrpInterconnectionPeerMAC OBJECT-TYPE
     STATUS          current
     DESCRIPTION     "
                     Device-MAC-Address of the devices interconnection peer, connected
-                    to the devices interlink port. This variable contains 
-                    the MAC-Address contained in the media link check frame received at the
+                    to the devices interlink port. This variable contains the
+                    MAC-Address contained in the media link check frame received at the
                     interconnection port.
                     "
-   ::= {  mrpInterconnectionEntry 13 }
+ ::= {  mrpInterconnectionEntry 13 }
 
 mrpInterconnectionOwnMRMMAC OBJECT-TYPE
     SYNTAX          OCTET STRING
@@ -787,34 +803,34 @@ mrpInterconnectionOwnMRMMAC OBJECT-TYPE
                     If the ring managers MAC-Address is not known, the variable shall
                     contain ff-ff-ff-ff-ff-ff.
                     "
-   ::= {  mrpInterconnectionEntry 14 }
+ ::= {  mrpInterconnectionEntry 14 }
 
 mrpInterconnectionPeerMRMMAC OBJECT-TYPE
     SYNTAX          OCTET STRING
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION     "
-                    Device-MAC-Address of devices interconnection peers, connected
+                    Device-MAC-Address of devices interconnection peer's, connected
                     to the devices interlink port, ring manager.
-                    This variable contains the MRM-MAC-Address of the peers ring manager
-                    contained in the media link check frame received at the interconnection port.
+                    This variable contains the MRM-MAC-Address of the peers ring
+                    Manager if known. 
                     If the ring managers MAC-Address is not known, the variable shall
                     contain ff-ff-ff-ff-ff-ff.
                     "
-   ::= {  mrpInterconnectionEntry 15 }
+ ::= {  mrpInterconnectionEntry 15 }
 
 mrpInterconnectionPeerRingDomainUUID  OBJECT-TYPE
     SYNTAX          IEC62439UuidType
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION     "
-                    The domain UUID of the ring the interconnection peers, connected
+                    The domain UUID of the ring the interconnection peer's, connected
                     to the devices interlink port, ring.
-                    This variable contains the MRM_DomainUUID of the peers ring 
-                    contained in the media link check frame received at the interconnection port.
+                    This variable contains the MRM_DomainUUID of the peers ring
+                    contained in the frames received at the
+                    interconnection port.
                     "
-   ::= {  mrpInterconnectionEntry 16 }
-
+ ::= {  mrpInterconnectionEntry 16 }
 
 mrpInterconnectionRowStatus  OBJECT-TYPE
     SYNTAX          RowStatus
@@ -822,20 +838,89 @@ mrpInterconnectionRowStatus  OBJECT-TYPE
     STATUS          current
     DESCRIPTION     "
                     Support of creation and deletion of rows.
-                    A row can be taken out of service by writing 
+                    A row can be taken out of service by writing
                     the value notInService(2).
                     "
-   ::= { mrpInterconnectionEntry 18 }  
+ ::= { mrpInterconnectionEntry 17 }
 
-    
+
+--  ***********************************************************
+--
+--     ... E X T E N S I O N S
+--
+--  ***********************************************************
+mrpInterconnectionXTable      OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MrpInterconnectionXEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "
+                    Every entry in this table contains information about
+                    a Media redundancy Interconnection domain.
+
+                    Row entries can be created or deleted via
+                    SNMP operations. Therefore, the MAX-ACCESS values
+                    of some Object Identifiers are different from the
+                    values of the same Object Identifiers in the
+                    pure monitoring facet.
+                    "
+ ::= { mrpObjects 3 }
+
+mrpInterconnectionXEntry      OBJECT-TYPE
+    SYNTAX          MrpInterconnectionXEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry in the mrpInterconnectionTable."
+    AUGMENTS    { mrpInterconnectionEntry }
+ ::= { mrpInterconnectionXTable 1 }
+
+MrpInterconnectionXEntry::=  SEQUENCE {
+                    mrpInterconnectionAdminMICPosition       INTEGER,
+                    mrpInterconnectionOperMICPosition        INTEGER
+                    }
+
+mrpInterconnectionAdminMICPosition  OBJECT-TYPE
+    SYNTAX INTEGER {
+                   primary(0),
+                   secondary(1)
+                   }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "
+                   Controls the MRP Interconnection Client position in the
+                   interconnection setup.
+                   If the value is set to primary(0), the MRP Interconnection Client is
+                   a primary MRP Interconnection Client.
+                   If the value is set to secondary(1), the MRP Interconnection Client
+                   is a secondary MRP Interconnection Client.
+                   (Default: primary(0))
+                   "
+::= {  mrpInterconnectionXEntry 1 }
+
+mrpInterconnectionOperMICPosition  OBJECT-TYPE
+    SYNTAX INTEGER {
+                   primary(0),
+                   secondary(1)
+                   }
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "
+                   Reads the MRP Interconnection Client position in the
+                   interconnection setup.
+                   If the value is set to primary(0), the MRP Interconnection Client is
+                   a primary MRP Interconnection Client.
+                   If the value is set to secondary(1), the MRP Interconnection Client
+                   is a secondary MRP Interconnection Client.
+                   (Default: primary(0))
+                   "
+::= {  mrpInterconnectionXEntry 2 }
+
 -- ***********************************************************************
 --  conformance statements
 -- ***********************************************************************
 mrpRedundancyGroups OBJECT IDENTIFIER::= { mrpConformance 1 }
 
 mrpDomainBasicGroup OBJECT-GROUP
-    OBJECTS {   
-        mrpDomainIndex,
+    OBJECTS {
         mrpDomainID,
         mrpDomainName,
         mrpDomainAdminRole,
@@ -850,37 +935,37 @@ mrpDomainBasicGroup OBJECT-GROUP
         }
     STATUS                      current
     DESCRIPTION                 "
-                                Parameters which are necessary to monitor
-                                and control the status of MRP domains.
+                                Parameters that are necessary for monitoring
+                                and controlling the status of MRP domains.
                                 "
-   ::= { mrpRedundancyGroups 1 }   
-    
+ ::= { mrpRedundancyGroups 1 }
+
 mrpDomainManagerGroup   OBJECT-GROUP
-    OBJECTS {   
+    OBJECTS {
         mrpDomainManagerPriority
         }
     STATUS                      current
     DESCRIPTION                 "
-                                Parameters which are additional to monitor
+                                Parameters, which are additional, to monitor
                                 and control the status of MRP domain managers.
                                 "
-   ::= { mrpRedundancyGroups 2 }   
+ ::= { mrpRedundancyGroups 2 }
 
 mrpDomainBlockingCntrlGroup OBJECT-GROUP
-    OBJECTS {   
-        mrpDomainMRMReactOnLinkChange  
+    OBJECTS {
+        mrpDomainMRMReactOnLinkChange
         }
     STATUS          current
     DESCRIPTION     "
-                    Parameters which are optional to monitor and control 
+                    Parameters, which are optional, to monitor and control
                     blocking behavior of MRP domains.
                     "
-   ::= { mrpRedundancyGroups 3 } 
+ ::= { mrpRedundancyGroups 3 }
 
 mrpDomainDiagGroup  OBJECT-GROUP
-    OBJECTS {   
+    OBJECTS {
         mrpDomainError,
-        mrpDomainRingOpenCount, 
+        mrpDomainRingOpenCount,
         mrpDomainLastRingOpenChange,
         mrpDomainRoundTripDelayMax,
         mrpDomainRoundTripDelayMin,
@@ -888,24 +973,24 @@ mrpDomainDiagGroup  OBJECT-GROUP
         }
     STATUS          current
     DESCRIPTION     "
-                    Parameters which are optional to monitor  
+                    Parameters, which are optional, to monitor
                     and control the diagnostic status of MRP domains.
                     "
-   ::= { mrpRedundancyGroups 4 } 
+ ::= { mrpRedundancyGroups 4 }
 
 mrpDomainAdvancedGroup  OBJECT-GROUP
-    OBJECTS {   
-        mrpDomainVlanId  
+    OBJECTS {
+        mrpDomainVlanId
         }
     STATUS          current
     DESCRIPTION     "
-                    Parameters which are optional to monitor and control 
+                    Parameters, which are optional, to monitor and control
                     the status of MRP domains.
                     "
-   ::= { mrpRedundancyGroups 5 } 
+ ::= { mrpRedundancyGroups 5 }
 
 mrpInterconnectionBasicGroup OBJECT-GROUP
-    OBJECTS {   
+    OBJECTS {
         mrpInterconnectionName,
         mrpInterconnectionPort,
         mrpInterconnectionPortState,
@@ -913,20 +998,22 @@ mrpInterconnectionBasicGroup OBJECT-GROUP
         mrpInterconnectionOperRole,
         mrpInterconnectionMode,
         mrpInterconnectionState,
+        mrpInterconnectionAdminMICPosition,
+        mrpInterconnectionOperMICPosition,
         mrpInterconnectionRowStatus
         }
     STATUS         current
     DESCRIPTION    "
-                   Parameters which are necessary to monitor
-                   and control the status of Media redundancy 
+                   Parameters, which are necessary, to monitor
+                   and control the status of Media redundancy
                    Interconnection domains.
                    "
-   ::= { mrpRedundancyGroups 6 }   
-    
+ ::= { mrpRedundancyGroups 6 }
+
 mrpInterconnectionDiagGroup  OBJECT-GROUP
-    OBJECTS {   
+    OBJECTS {
         mrpInterconnectionError,
-        mrpInterconnectionOpenCount, 
+        mrpInterconnectionOpenCount,
         mrpInterconnectionLastOpenChange,
         mrpInterconnectionPeerMAC,
         mrpInterconnectionOwnMRMMAC,
@@ -935,22 +1022,22 @@ mrpInterconnectionDiagGroup  OBJECT-GROUP
         }
     STATUS          current
     DESCRIPTION     "
-                    Parameters which are optional to monitor  
+                    Parameters, which are optional, to monitor
                     and control the diagnostic status of Media
                     redundancy Interconnection domains.
                     "
-   ::= { mrpRedundancyGroups 7 } 
+ ::= { mrpRedundancyGroups 7 }
 
 mrpInterconnectionAdvancedGroup  OBJECT-GROUP
-    OBJECTS {   
-        mrpInterconnectionVlanId  
+    OBJECTS {
+        mrpInterconnectionVlanId
         }
     STATUS          current
     DESCRIPTION     "
-                    Parameters which are optional to monitor and control 
+                    Parameters, which are optional, to monitor and control
                     the status of Media redundancy Interconnection domains.
                     "
-   ::= { mrpRedundancyGroups 8 } 
+ ::= { mrpRedundancyGroups 8 }
 
 
 -- ***********************************************************************
@@ -965,18 +1052,18 @@ mrpDomainBasicCompliance    MODULE-COMPLIANCE
                 The agent shall support the monitoring and control
                 of redundancy domains.
                 "
-    MODULE                      
-    MANDATORY-GROUPS {       
+    MODULE
+    MANDATORY-GROUPS {
                       mrpDomainBasicGroup
                      }
 
-    GROUP   mrpDomainAdvancedGroup     
+    GROUP   mrpDomainAdvancedGroup
     DESCRIPTION             "
-                            For SNMP agents it is optional to support 
+                            For SNMP agents, it is optional to support
                             advanced monitoring and control of
-                            redundancy domains.
+                redundancy domains.
                             "
-   ::= { mrpRedundancyCompliances 1 }   
+ ::= { mrpRedundancyCompliances 1 }
 
 mrpDomainManagerCompliance  MODULE-COMPLIANCE
     STATUS                  current
@@ -985,23 +1072,23 @@ mrpDomainManagerCompliance  MODULE-COMPLIANCE
                             support. The agent shall support the monitoring
                             and control of redundancy domains.
                             "
-    MODULE                      
-    MANDATORY-GROUPS        {       
+    MODULE
+    MANDATORY-GROUPS        {
                              mrpDomainBasicGroup,
                              mrpDomainManagerGroup
                             }
 
-    GROUP   mrpDomainBlockingCntrlGroup     
+    GROUP   mrpDomainBlockingCntrlGroup
     DESCRIPTION             "
-                 For SNMP agents it is optional to support blocking control.
+                 For SNMP agents, it is optional to support blocking control.
                             "
 
-    GROUP   mrpDomainDiagGroup     
+    GROUP   mrpDomainDiagGroup
     DESCRIPTION             "
-                            For SNMP agents it is optional to support 
+                            For SNMP agents, it is optional to support
                             monitoring of the diagnostic status of MRP domains.
                             "
-   ::= { mrpRedundancyCompliances 2 }
+ ::= { mrpRedundancyCompliances 2 }
 
 mrpInterconnectionCompliance    MODULE-COMPLIANCE
     STATUS      current
@@ -1010,28 +1097,29 @@ mrpInterconnectionCompliance    MODULE-COMPLIANCE
                 The agent shall support the monitoring and control
                 of Media redundancy Interconnection domains.
                 "
-    MODULE                      
-    MANDATORY-GROUPS {       
+    MODULE
+    MANDATORY-GROUPS {
                       mrpInterconnectionBasicGroup
                      }
 
-    GROUP   mrpInterconnectionAdvancedGroup  
+    GROUP   mrpInterconnectionAdvancedGroup
     DESCRIPTION "
-                For SNMP agents it is optional to support 
+                For SNMP agents, it is optional to support
                 advanced monitoring and control of Media
                 redundancy Interconnection domains.
                 "
 
-    GROUP   mrpInterconnectionDiagGroup  
+    GROUP   mrpInterconnectionDiagGroup
     DESCRIPTION "
-                For SNMP agents it is optional to support 
+                For SNMP agents, it is optional to support
                 monitoring of the diagnostic status of Media
                 redundancy Interconnection domains.
                 "
 
-   ::= { mrpRedundancyCompliances 3 }      
+ ::= { mrpRedundancyCompliances 3 }
 
 END
 -- ***********************************************************************
 --   EOF
 -- ***********************************************************************
+
