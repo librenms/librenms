@@ -1,0 +1,846 @@
+AOS-CORE-ALARM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32
+             FROM SNMPv2-SMI
+    TimeStamp, DisplayString, TruthValue, RowPointer,
+    TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    aosCommon
+             FROM ADVA-MIB;
+
+aosCoreAlarmMIB MODULE-IDENTITY
+    LAST-UPDATED    "201510230000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+                    "ADVA Optical Networking, Inc."
+    DESCRIPTION     "This module defines the Alarm Monitoring MIB definitions
+                     used by the AOS based product lines.
+                     Copyright (C) ADVA Optical Networking."
+    REVISION        "201510230000Z"
+    DESCRIPTION     "Initial release."
+    ::= {aosCommon 1}
+
+--
+-- OID definitions
+--
+alarmObjects             OBJECT IDENTIFIER ::= {aosCoreAlarmMIB 1}
+alarmNotifications       OBJECT IDENTIFIER ::= {aosCoreAlarmMIB 2}
+alarmConformance         OBJECT IDENTIFIER ::= {aosCoreAlarmMIB 3}
+alarmNotificationsPrefix OBJECT IDENTIFIER ::= {alarmNotifications 0}
+--
+-- Textual conventions.
+--
+ServiceEffect ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Indicates whether a condition is service affecting or not."
+    SYNTAX       INTEGER {
+                   none(0),
+                   nonServiceAffecting(1),
+                   serviceAffecting(2)
+                 }
+
+NotificationCode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Indicates the severity of an alarm/condition."
+    SYNTAX       INTEGER {
+                   critical(1),
+                   major(2),
+                   minor(3),
+                   warning(4),
+                   notAlarmed(5),
+                   notReported(6),
+                   clear(7)
+                 }
+
+Direction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Specifies the direction associated with the alarm/condition."
+    SYNTAX       INTEGER {
+                   noDirection(1),
+                   transmit(2),
+                   receive(3),
+                   biDirectional(4)
+                 }
+
+Location ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Identifies the location associated with the alarm/condition."
+    SYNTAX       INTEGER {
+                   nearEnd(1),
+                   farEnd(2),
+                   noLocation(3)
+                 }
+
+--
+-- New values may be added to future releases as long as existing
+-- values are preserved.
+--
+ConditionType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Identifies the type of condition or alarm being reported."
+    SYNTAX     INTEGER {
+                 voltAnr(1),
+                 removed(2),
+                 fault(3),
+                 mea(4),
+                 incompatibleHardware(5),
+                 meaApprove(6),
+                 meaAccept(7),
+                 meaCapability(8),
+                 fwPackageMismatch(9),
+                 fwReboot(10),
+                 backplaneCommFail(11),
+                 meaPhys(12),
+                 meaDiffer(13),
+                 psuRedundancyMismatch(14),
+                 insufficientPower(15),
+                 backplaneEepromCommFail(16),
+                 powerFeedUndervoltage(17),
+                 powerFeedAFail(18),
+                 powerFeedBFail(19),
+                 outPowerFail(20),
+                 tcaOutCurrentHigh(21),
+                 tcaPowerConsumptionHigh(22),
+                 tcaTempHigh(23),
+                 tcaTempLow(24),
+                 lossOfSignal(25),
+                 laserFail(26),
+                 forceLaserOn(27),
+                 forceTransmitShutdown(28),
+                 lossOfClock(29),
+                 lossOfOverhead(30),
+                 lossOfPrbsPattern(31),
+                 laserOnDelay(32),
+                 autoPowerReduction(33),
+                 supportingEqptFailure(35),
+                 payloadMissingIndication(36),
+                 lossOfSignalPayload(37),
+                 tcaOptRcvPowerHigh(38),
+                 tcaOptTrmtPowerHigh(39),
+                 tcaOptLaserBiasCurrHigh(40),
+                 laserTempHigh(41),
+                 tcaOptRcvPowerLow(42),
+                 tcaOptTrmtPowerLow(43),
+                 laserTempLow(44),
+                 alarmIndicatorSigDefect(45),
+                 backwardDefectIndicator(46),
+                 backwardDefectIndicatorPayload(47),
+                 backwardDefectIndicatorOverhead(48),
+                 clientSigFail(49),
+                 degradedSig(50),
+                 forwardDefectIndicatorPayload(51),
+                 forwardDefectIndicatorOverhead(52),
+                 incomingAlignError(53),
+                 backwardIncomingAlignError(54),
+                 lossOfFrame(55),
+                 lossOfMultiframe(56),
+                 lossOfFrameAndMultiframe(57),
+                 lockedCondition(58),
+                 lossOfTandemConn(59),
+                 multiplexStructIdentifierMismatch(60),
+                 openConnIndication(61),
+                 payloadMismatch(62),
+                 serverSigFail(63),
+                 serverSigFailPayload(64),
+                 serverSigFailOverhead(65),
+                 trailSigFail(66),
+                 trailSigFailPayload(67),
+                 trailSigFailOverhead(68),
+                 trailTraceIdentifierMismatch(69),
+                 lossOfSignalOverhead(70),
+                 pumpEndOfLife(71),
+                 midstageLossHigh(72),
+                 ampControlAbnormal(73),
+                 autoPowerShutdown(74),
+                 voaControlFail(75),
+                 gainControlFail(76),
+                 tiltControlFail(77),
+                 optLimitHt(78),
+                 optLimitHtEx(79),
+                 oscLaserFail(80),
+                 oscPower(81),
+                 lossOfSigMidstage(82),
+                 lossOfOpuMultiframeId(83),
+                 tcaUnavailableSecondsHigh(84),
+                 tcaErroredSecondHigh(85),
+                 tcaSeverlyErroredSecondHigh(86),
+                 tcaBackgroundBlockErrorsHigh(87),
+                 tcaOscOptLaserBiasCurrHigh(88),
+                 tcaOscLaserTempHigh(89),
+                 tcaOscOptRcvPowerHigh(90),
+                 tcaOscOptTrmtPowerHigh(91),
+                 tcaSesPayloadHigh(92),
+                 tcaSesOverheadHigh(93),
+                 tcaUasPayloadHigh(94),
+                 tcaUasOverheadHigh(95),
+                 tcaOscLaserTempLow(96),
+                 tcaOscOptRcvPowerLow(97),
+                 tcaOscOptTrmtPowerLow(98),
+                 lossOfModemSync(99),
+                 lossOfCouplingAlignment(100),
+                 autoCdcFail(101),
+                 tcaDiffGroupDelayHigh(102),
+                 tcaCdcHigh(103),
+                 tcaCarrierFreqOffsetHigh(104),
+                 tcaSnrLow(105),
+                 tcaCdcLow(106),
+                 tcaCarrierFreqOffsetLow(107),
+                 lnkFail(108),
+                 lnkCblFault(109),
+                 lnkCblRmv(110),
+                 lnkAutonegFail(111),
+                 lnkNoRootCause(112),
+                 fendDupModeUnknown(113),
+                 jabThldExceed(114),
+                 lossOfSync(115),
+                 rxLocalFault(116),
+                 txLocalFault(117),
+                 lossOfBlockLock(118),
+                 hiBer(119),
+                 autoCdcInProgress(120),
+                 lossOfBlockLockLane(121),
+                 lossOfLaneAlgnMarkLane(122),
+                 lnkDownDeact(123),
+                 negBwExceed(124),
+                 rxSsf(125),
+                 txSsf(126),
+                 outputOvercurrent(127),
+                 tcaOutputPowerHigh(128),
+                 lossOfAlignment(129),
+                 ntpServerUnavailable(130),
+                 tunedFrequencyMismatch(131),
+                 temperatureHigh(133),
+                 temperatureLow(134),
+                 manifestMismatch(135),
+                 manifestIncomplete(136),
+                 laserBiasCurrentAbnormal(137),
+                 lossOfTrafficAfterFirmwareActivation(138),
+                 softwareVersionMismatch(139),
+                 fanFault(140),
+                 portConfigMismatch(141),
+                 licenseServerDisconnect(142),
+                 hwResourceUnavailableRecoverable(143),
+                 licenseInvalid(144),
+                 ssdWearoutLevelWarning(145),
+                 licenseExpire(146),
+                 databaseMismatch(147),
+                 licenseMissing(148),
+                 licenseOverdraft(149),
+                 cryptoPasswordMissing(150),
+                 vmResumeFailed(151),
+                 keyExchangeAuthMissing(152),
+                 keyLifetimeExpired(153),
+                 tamperDetected(154),
+                 selfTestFailed(155),
+                 cryptoTemporaryLockout(156),
+                 batteryLow(157),
+                 selfTestInProgress(158),
+                 vmCrashed(159),
+                 keyExchangeDegrade(160),
+                 internalEncryptionFailed(161),
+                 keyExchangeInProgress(162),
+                 keyExchangeChannelFail(163),
+                 terminalLoopbackInProgress(164),
+                 localOscBiarCurAbnormal(165),
+                 licenseFileMissing(166),
+                 licenseServerConfigMissing(167),
+                 hardwareBusy(168),
+                 fanFilterReplace(169),
+                 rebootInProgress(170),
+                 prbsDetectionInProgress(171),
+                 tcaOutOfFrameSecondHigh(172),
+                 msLineAis(173),
+                 localOscTemperatureLow(174),
+                 localOscTemperatureHigh(175),
+                 facilityLoopbackInProgress(176),
+                 prbsGenerationInProgress(177),
+                 transmitSignalFail(178),
+                 loopbackActive(179),
+                 meaPhyChanged(180),
+                 licenseBackupServerDisconnect(181),
+                 callHomeServerUnreachable(182),
+                 timinglicensemissing(183),
+                 eomplslicensemissing(184),
+                 fullcapacitylicensemissing(185),
+                 elephantflowlicensemissing(186),
+                 snmpdyinggasp(187),
+                 snmpdyinggasphostresourcesbusy(188),
+                 snmpdyinggasphostunreachable(189),
+                 controlplanelicensemissing(190),  
+                 l3licensemissing(191),
+                 coldrebootrequired(192),
+                 --tcaByteSent(183),
+                 --tcaByteRcvd(184),
+                 --tcaFrameSent(185),
+                 --tcaFrameRcvd(186),
+                 --tcaTotalByteSent(187),
+                 --tcaTotalByteRcvd(188),
+                 --tcaBroadcastFrameRcvd(189),
+                 --tcaMulticastFrameRcvd(190),
+                 --tcaBroadcastFrameSent(191),
+                 --tcaMulticastFrameSent(192),
+                 --tcaRxCrcErroredPkt(193),
+                 --tcaOversizedFrameDiscarded(194),
+                 --tcaOversizedPktRcvd(195),
+                 --tcaUndersizedPktRcvd(196),
+                 ----tcaDropEvent(197),
+                 --tcaFragmentRcv(198),
+                 --tcaCollisionRcv(199),
+                 --tcaPktsRcv(200),
+                 --tcaOctetsRcv(201),
+                 --tcaPkts64OctetsRcv(202),
+                 --tcaPkts65to127OctetsRcv(203),
+                 --tcaPkts128to255OctetsRcv(204),
+                 --tcaPkts256to511OctetsRcv(205),
+                 --tcaPkts512to1023OctetsRcv(206),
+                 --tcaPkts1024to1518OctetsRcv(207),
+                 --tcaPkts1519tomtuOctetsRcv(208),
+                 --tcaTxCrcErroredPkt(209),
+                 --tcaOctetsSend(210),
+                 --tcaUnicastRrameRcvd(211),
+                 --tcaUnicastFrameSent(212),
+                 --tcaAverageBitRateRcvd(213),
+                 --tcaAverageBitRateSent(214),
+                 --tcaByteRandomEarlyDiscardDropped(215),
+                 --tcaFrameRandomEarlyDiscardDropped(216),
+                 --tcaByteTailDropped(217),
+                 --tcaFrameTailDropped(218),
+                 --tcaAfpTaggedFrameDropped(219),
+                 --tcaAfpUntaggedFrameDropped(220),
+                 --tcaAfpPriTaggedFrameDropped(221),
+                 --tcaFrameMarkGreenPassed(222), 
+                 --tcaFrameMarkGreenDropped(223),
+                 --tcaFrameMarkYellowPassed(224),
+                 --tcaFrameMarkYellowDropped(225),
+                 --tcaFrameMarkRedDropped(226),
+
+                 efmRemoteDyingGasp(227),
+                 efmFail(228),
+                 efmRemoteCriticalEvent(229),
+                 efmRemoteLinkDown(230),
+                 efmRemoteLoopbackFail(231),
+                 efmRemoteLoopbackRequest(232),
+                 
+                 tcaQFactorLow(233),
+                 tcaPolarizationDependentLHigh(234),
+                 tcaStateOfPolarizationChangeRateHigh(235),
+                 tcaOpticalSnrLow(236),
+
+                 --LAG--
+                 srvDiscarded(300),
+                 bwExceedPortSpeed(301),
+                 meaPortalAddress(302),
+                 meaPortalPri(303),
+                 meaThreePortal(304),
+                 meaPortalSysNumber(305),
+                 meaActorAdminKey(306),
+                 meaPortDigest(307),
+                 meaGatewayDigest(308),
+
+                 --ZTP--
+                 ztpInProgress(400),
+                 ztpFailed(401),
+                 
+                 cryptoConfigMismatch(410),
+                 keyExchangeConfigMismatch(411),
+                 fingerprintAuthMissing(412),
+                 cryptoConfigError(413),
+                 keyExchangeAuthMismatch(414),
+
+                 --CFM--
+                 crossConnectCCM(550),
+                 errorCCM(551),
+                 someRemoteMEPCCM(552),
+                 someMACstatus(553),
+                 someRDI(554),
+                 ethAIS(555),
+                 
+                 --SAT--
+                 remoteInitSAT(570),
+                 
+                 -- ERP--
+                 erpFoPPM(580),         -- Failure of Protocol, Protocol Mismatch
+                 erpFoPTO(581),         -- Failure of Protocol, Timeout
+                 erpBlockPort0RPL(582), -- Blocking Port 0 - Ring Protection Link
+                 erpBlockPort0SF(583),  -- Blocking Port 0 - Signal Fail
+                 erpBlockPort0MS(584),  -- Blocking Port 0 - Manual Switch
+                 erpBlockPort0FS(585),  -- Blocking Port 0 - Forced Switch
+                 erpBlockPort0WTR(586), -- Blocking Port 0 - Wait To Restore
+                 erpBlockPort1RPL(587), -- Blocking Port 1 - Ring Protection LinkLink
+                 erpBlockPort1SF(588),  -- Blocking Port 1 - Signal Fail
+                 erpBlockPort1MS(589),  -- Blocking Port 1 - Manual Switch
+                 erpBlockPort1FS(590),  -- Blocking Port 1 - Forced Switch
+                 erpBlockPort1WTR(591), -- Blocking Port 1 - Wait To Restore
+
+                 --Sync--
+                 avgHoldoverNotReady(600),
+                 freerun(601),
+                 fastAccquisition(602),
+                 holdover(603),
+                 lossOfLock(604),
+                 allSyncRefFail(605),
+                 syncRefLockOut(606), -- sync reference locked out
+                 syncRefFS(607), -- sync reference forced switch
+                 syncRefMS(608), -- sync reference manual switch
+                 syncRefWTR(609), -- sync reference wait to restore
+                 syncRefSW(610), -- sync reference switch
+                 syncRefFail(611), -- sync reference failed
+                 syncRefFreqOffset(612), -- sync reference frequency offset
+                 ais(616),
+                 bitsLossOfFrame(617),
+                 qlMismatch(618),
+                 qlInvalid(619),
+                 esmcFail(620),
+                 linkdownMasterSlaveCfg(621), -- Link Down: Master Slave Configuration Fault
+                 autoNegoMasterSlaveCfg(622), -- Auto Negotiation:Master Slave Configuration Fault
+                 squelched(623), -- Tx Squelched
+
+                 --PTP--
+                 ptpFreerun(650),
+                 ptpTimeFreeRun(651),
+                 ptpFreqHoldover(652),
+                 ptpTimeHoldover(653),
+                 ptpFreqNotTraceable(654),
+                 ptpTimeNotTraceable(655),
+                 ptpAnnounceTimeout(656),
+                 ptpSyncTimeout(657),
+                 ptpDelayrespTimeout(658),
+                 ptpMultiplePeers(659),
+                 ptpWrongDomain(660),
+                 ptpNoTrafficFP(661),
+
+                 --BGP ---
+                 bgpNbrLinkDown(670),
+				 
+                 --Port Authentication---
+                 paAuthFail(680),
+                 
+                 --IGMP SNOOPING---
+                 noMGroupRes(690),
+                 
+                 --tcaAnnounceRx(700),
+                 --tcaAnnounceTx(701),
+                 --tcaSyncRx(702),
+                 --tcaSyncTx(703),
+                 --tcaFollowUpRx(704),
+                 --tcaFollowUpTx(705),
+                 --tcaDelayReqRx(706),
+                 --tcaDelayReqTx(707),
+                 --tcaDelayRespRx(708),
+                 --tcaDelayRespTx(709),
+                 --tcaPdelayReqRx(710),
+                 --tcaPdelayReqTx(711),
+                 --tcaPdelayRespRx(712),
+                 --tcaPdelayRespTx(713),
+                 --tcaPdelayRespFollowUpRx(714),
+                 --tcaPdelayRespFollowUpTx(715),
+                 --tcaSignalingRx(716),
+                 --tcaSignalingTx(717),
+                 --tcaManagementRx(718),
+                 --tcaManagementTx(719),
+                 --tcaPtpUnknownRx(720),
+                 --tcaPtpUnknownTx(721),
+                 --tcaAverageResidenceTimeSync(722),
+                 --tcaMaximumResidenceTimeSync(723),
+                 --tcaMinimumResidenceTimeSync(724),
+                 --tcaAverageResidenceTimeDelayReq(725),
+                 --tcaMaximumResidenceTimeDelayReq(726),
+                 --tcaMinimumResidenceTimeDelayReq(727),
+                 --tcaAverageResidenceTimePdelayReq(728),
+                 --tcaMaximumResidenceTimePdelayReq(729),
+                 --tcaMinimumResidenceTimePdelayReq(730),
+                 --tcaAverageResidenceTimePdelayResp(731),
+                 --tcaMaximumResidenceTimePdelayResp(732),
+                 --tcaMinimumResidenceTimePdelayResp(733),
+                 --tcaAverageAnnounceMessageRate(734),
+                 --tcaAverageSyncMessageRate(735),
+                 --tcaAverageDelayReqMessageRate(736),
+                 --tcaAverageDelayRespMessageRate(737),
+                 --tcaTagMismatchedDiscard(738),
+                 --tcaDomainMismatchDiscard(739),
+                 --tcaWrongTypeDiscard(740),
+                 --tcaWrongLengthDiscard(741),
+                 --tcaUnknownMasterDiscard(742),
+                 --tcaMiscDiscard(743),
+                 --tcaAverageOffsetFromMaster(744),
+                 --tcaMinimumOffsetFromMaster(745),
+                 --tcaMaximumOffsetFromMaster(746),
+                 --tcaAverageSyncPathDelay(747),
+                 --tcaMinimumSyncPathDelay(748),
+                 --tcaMaximumSyncPathDelay(749),
+                 --tcaAverageMeanPathDelay(750),
+                 --tcaMinimumMeanPathDelay(751),
+                 --tcaMaximumMeanPathDelay(752),
+                 
+                 --tcaLmForwardTransmittedFrames(800),
+                 --tcaLmForwardReceivedFrames(801),
+                 --tcaLmForwardMinFlr(802),
+                 --tcaLmForwardMaxFlr(803),
+                 --tcaLmForwardAverageFlr(804),
+                 --tcaLmBackwardTransmittedFrames(805),
+                 --tcaLmBackwardReceivedFrames(806),
+                 --tcaLmBackwardMinFlr(807),
+                 --tcaLmBackwardMaxFlr(808),
+                 --tcaLmBackwardAverageFlr(809),
+                 --tcaLmSoamPdusSent(810),
+                 --tcaLmSoamPdusReceived(811),
+                 --tcaLmAvailabilityForwardHighLoss(812),
+                 --tcaLmAvailabilityConsecutiveForwardHighLoss(813),
+                 --tcaLmAvailabilityForwardAvailable(814),
+                 --tcaLmAvailabilityForwardUnavailable(815),
+                 --tcaLmAvailabilityForwardMinFlr(816),
+                 --tcaLmAvailabilityForwardMaxFlr(817),
+                 --tcaLmAvailabilityForwardAverageFlr(818),
+                 --tcaLmAvailabilityBackwardHighLoss(819),
+                 --tcaLmAvailabilityConsecutiveBackwardHighLoss(820),
+                 --tcaLmAvailabilityBackwardAvailable(821),
+                 --tcaLmAvailabilityBackwardUnavailable(822),
+                 --tcaLmAvailabilityBackwardMinFlr(823),
+                 --tcaLmAvailabilityBackwardMaxFlr(824),
+                 --tcaLmAvailabilityBackwardAverageFlr(825),
+                 --tcaDmSoamPdusSent(826),
+                 --tcaDmSoamPdusReceived(827),
+                 --tcaDmFrameDelayTwoWayMin(828),
+                 --tcaDmFrameDelayTwoWayMax(829),
+                 --tcaDmFrameDelayTwoWayAverage(830),
+                 --tcaDmFrameDelayForwardMin(831),
+                 --tcaDmFrameDelayForwardMax(832),
+                 --tcaDmFrameDelayForwardAverage(833),
+                 --tcaDmFrameDelayBackwardMin(834),
+                 --tcaDmFrameDelayBackwardMax(835),
+                 --tcaDmFrameDelayBackwardAverage(836),
+                 --tcaDmInterFrameDelayVariationForwardMin(837),
+                 --tcaDmInterFrameDelayVariationForwardMax(838),
+                 --tcaDmInterFrameDelayVariationForwardAverage(839),
+                 --tcaDmInterFrameDelayVariationBackwardMin(840),
+                 --tcaDmInterFrameDelayVariationBackwardMax(841),
+                 --tcaDmInterFrameDelayVariationBackwardAverage(842),
+                 --tcaDmInterFrameDelayVariationTwoWayMin(843),
+                 --tcaDmInterFrameDelayVariationTwoWayMax(844),
+                 --tcaDmInterFrameDelayVariationTwoWayAverage(845),
+                 --tcaDmFrameDelayRangeForwardMax(846),
+                 --tcaDmFrameDelayRangeForwardAverage(847),
+                 --tcaDmFrameDelayRangeBackwardMax(848),
+                 --tcaDmFrameDelayRangeBackwardAverage(849),
+                 --tcaDmFrameDelayRangeTwoWayMax(850),
+                 --tcaDmFrameDelayRangeTwoWayAverage(851),
+                 --tcaSyncErrorsForward(852),
+                 --tcaSyncErrorsBackward(853),
+     
+                 --tcaTwampS2rPackets(900),
+                 --tcaTwampR2sPackets(901),
+                 --tcaTwampS2rLostPackets(902),
+                 --tcaTwampR2sLostPackets(903),
+                 --tcaTwampS2rSyncErrors(904),
+                 --tcaTwampR2sSyncErrors(905),
+                 --tcaTwampOutOfSequenceErrors(906),
+                 --tcaTwampSequenceGapErrors(907),
+                 --tcaTwampMinTwoWayPathDelay(908),
+                 --tcaTwampMaxTwoWayPathDelay(909),
+                 --tcaTwampAvgTwoWayPathDelay(910),
+                 --tcaTwampSumTwoWayPathDelay(911),
+                 --tcaTwampSumOfSquaresTwoWayPathDelay(912),
+                 --tcaTwampNumTwoWayPathDelay(913),
+                 --tcaTwampMinOneWayS2rPathDelay(914),
+                 --tcaTwampMaxOneWayS2rPathDelay(915),
+                 --tcaTwampAvgOneWayS2rPathDelay(916),
+                 --tcaTwampSumOneWayS2rPathDelay(917),
+                 --tcaTwampSumOfSquaresOneWayS2rPathDelay(918),
+                 --tcaTwampNumOneWayS2rPathDelay(919),
+                 --tcaTwampMinOneWayR2sPathDelay(920),
+                 --tcaTwampMaxOneWayR2sPathDelay(921),
+                 --tcaTwampAvgOneWayR2sPathDelay(922),
+                 --tcaTwampSumOneWayR2sPathDelay(923),
+                 --tcaTwampSumOfSquaresOneWayR2sPathDelay(924),
+                 --tcaTwampNumOneWayR2sPathDelay(925),
+                 --tcaTwampMinOneWayS2rAbsPathDelayVariation(926),
+                 --tcaTwampMaxOneWayS2rAbsPathDelayVariation(927),
+                 --tcaTwampAvgOneWayS2rAbsPathDelayVariation(928),
+                 --tcaTwampSumOneWayS2rAbsPathDelayVariation(929),
+                 --tcaTwampSumOfSquaresOneWayS2rAbsPathDelayVariation(930),
+                 --tcaTwampNumOneWayS2rAbsPathDelayVariation(931),
+                 --tcaTwampMinOneWayR2sAbsPathDelayVariation(932),
+                 --tcaTwampMaxOneWayR2sAbsPathDelayVariation(933),
+                 --tcaTwampAvgOneWayR2sAbsPathDelayVariation(934),
+                 --tcaTwampSumOneWayR2sAbsPathDelayVariation(935),
+                 --tcaTwampSumOfSquaresOneWayR2sAbsPathDelayVariation(936),
+                 --tcaTwampNumOneWayR2sAbsPathDelayVariation(937),
+                 --tcaTwampMinOneWayS2rNegativePathDelayVariation(938),
+                 --tcaTwampMaxOneWayS2rNegativePathDelayVariation(939),
+                 --tcaTwampAvgOneWayS2rNegativePathDelayVariation(940),
+                 --tcaTwampSumOneWayS2rNegativePathDelayVariation(941),
+                 --tcaTwampSumOfSquaresOneWayS2rNegativePathDelayVariation(942),
+                 --tcaTwampNumOneWayS2rNegativePathDelayVariation(943),
+                 --tcaTwampMinOneWayR2sNegativePathDelayVariation(944),
+                 --tcaTwampMaxOneWayR2sNegativePathDelayVariation(945),
+                 --tcaTwampAvgOneWayR2sNegativePathDelayVariation(946),
+                 --tcaTwampSumOneWayR2sNegativePathDelayVariation(947),
+                 --tcaTwampSumOfSquaresOneWayR2sNegativePathDelayVariation(948),
+                 --tcaTwampNumOneWayR2sNegativePathDelayVariation(949),
+                 --tcaTwampMinOneWayS2rPositivePathDelayVariation(950),
+                 --tcaTwampMaxOneWayS2rPositivePathDelayVariation(951),
+                 --tcaTwampAvgOneWayS2rPositivePathDelayVariation(952),
+                 --tcaTwampSumOneWayS2rPositivePathDelayVariation(953),
+                 --tcaTwampSumOfSquaresOneWayS2rPositivePathDelayVariation(954),
+                 --tcaTwampNumOneWayS2rPositivePathDelayVariation(955),
+                 --tcaTwampMinOneWayR2sPositivePathDelayVariation(956),
+                 --tcaTwampMaxOneWayR2sPositivePathDelayVariation(957),
+                 --tcaTwampAvgOneWayR2sPositivePathDelayVariation(958),
+                 --tcaTwampSumOneWayR2sPositivePathDelayVariation(959),
+                 --tcaTwampSumOfSquaresOneWayR2sPositivePathDelayVariation(960),
+                 --tcaTwampNumOneWayR2sPositivePathDelayVariation(961),
+                 --EoMPLS---
+                 eomplsDstUnresovled(1000),
+                 --L3--
+                 trafficArpTableFull(1020),
+                 noRouteResources(1021),
+                 ipAddressConflict(1022),
+                 --NTP--
+                 ntpLossOfServer(1500),
+                 --RADIUS and TACACS--
+                 remoteServerUnreachable(1501),
+                 --SysLog Server--
+                 sysLogServerUnreachable(1502),
+                 --SNMP Target Address--
+                 targetAddressUnreachable(1503)
+               }
+
+
+ConditionDescr ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "A detailed text description of the condition or alarm
+         being reported.  This string may contain any printable
+         ASCII character."
+    SYNTAX     OCTET STRING (SIZE (1..64))
+
+ConditionEntityTranslation ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Identifies the entity type on which condition exists."
+    SYNTAX     OCTET STRING (SIZE (1..255))
+--
+-- Scalar definitions.
+--
+
+--
+-- Table definitions.
+--
+aosCoreAlarmTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosCoreAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the standing conditions
+             that exist as alarms.
+
+             Entries cannot be created in this table by management
+             application action."
+    ::= { alarmObjects 1 }
+
+aosCoreAlarmEntry  OBJECT-TYPE
+    SYNTAX     AosCoreAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             condition."
+    INDEX { aosCoreAlarmIndex }
+    ::= { aosCoreAlarmTable 1 }
+
+AosCoreAlarmEntry ::= SEQUENCE {
+    aosCoreAlarmIndex              INTEGER,
+    aosCoreAlarmConditionType      ConditionType,
+    aosCoreAlarmEntityTranslation  ConditionEntityTranslation,
+    aosCoreAlarmEntity             RowPointer,
+    aosCoreAlarmCondDescr          ConditionDescr,
+    aosCoreAlarmTimestamp          DisplayString,
+    aosCoreAlarmDirection          Direction,
+    aosCoreAlarmLocation           Location,
+    aosCoreAlarmSrvEff             ServiceEffect,
+    aosCoreAlarmNotifCode          NotificationCode,
+    aosCoreAlarmNotifTimestamp     DisplayString,
+    aosCoreAlarmAdditionalInfo     DisplayString
+}
+
+aosCoreAlarmIndex OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+         "This object is an order number of an alarm in aosCoreAlarmTable."
+     ::= { aosCoreAlarmEntry 1 }
+
+aosCoreAlarmConditionType OBJECT-TYPE
+    SYNTAX     ConditionType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the type of the condition."
+     ::= { aosCoreAlarmEntry 2 }
+
+aosCoreAlarmEntityTranslation OBJECT-TYPE
+    SYNTAX     ConditionEntityTranslation
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object translates numerical entity representation aosCoreAlarmEntity
+          into Uniform Resource Identifier (URI)."
+     ::= { aosCoreAlarmEntry 3 }
+
+aosCoreAlarmEntity OBJECT-TYPE
+    SYNTAX     RowPointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Pointer to the table that contains definition of the alarmed entity."
+     ::= { aosCoreAlarmEntry 4 }
+
+aosCoreAlarmCondDescr OBJECT-TYPE
+    SYNTAX     ConditionDescr
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object contains a text description of the condition."
+     ::= { aosCoreAlarmEntry 5 }
+
+aosCoreAlarmTimestamp OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object contains the system time when the condition occurred."
+     ::= { aosCoreAlarmEntry 6 }
+
+aosCoreAlarmDirection OBJECT-TYPE
+    SYNTAX     Direction
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the direction of the condition."
+     ::= { aosCoreAlarmEntry 7 }
+
+aosCoreAlarmLocation OBJECT-TYPE
+    SYNTAX     Location
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the location of the condition."
+     ::= { aosCoreAlarmEntry 8 }
+
+aosCoreAlarmSrvEff OBJECT-TYPE
+    SYNTAX     ServiceEffect
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies whether the condition is service affecting
+         or not."
+     ::= { aosCoreAlarmEntry 9 }
+
+aosCoreAlarmNotifCode OBJECT-TYPE
+    SYNTAX     NotificationCode
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object identifies the severity of the alarm."
+     ::= { aosCoreAlarmEntry 10 }
+
+aosCoreAlarmNotifTimestamp OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object contains the system time when the alarm notification
+          was raised."
+     ::= { aosCoreAlarmEntry 11 }
+
+aosCoreAlarmAdditionalInfo OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides additional information of the alarm."
+     ::= { aosCoreAlarmEntry 12 }
+
+--
+-- Alarm raise/clear trap.
+--
+aosCoreAlarmTrap  NOTIFICATION-TYPE
+    OBJECTS { aosCoreAlarmIndex,
+              aosCoreAlarmConditionType,
+              aosCoreAlarmEntityTranslation,
+              aosCoreAlarmEntity,
+              aosCoreAlarmCondDescr,
+              aosCoreAlarmTimestamp,
+              aosCoreAlarmDirection,
+              aosCoreAlarmLocation,
+              aosCoreAlarmSrvEff,
+              aosCoreAlarmNotifCode,
+              aosCoreAlarmNotifTimestamp,
+              aosCoreAlarmAdditionalInfo
+            }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time an alarm condition is raised and
+             inserted into to the aosCoreAlarmTable.
+             It is also sent each time an alarm condition is cleared and
+             removed from the aosCoreAlarmTable."
+  ::= { alarmNotificationsPrefix 1 }
+
+--
+-- Conformance
+--
+aosCoreAlarmCompliances OBJECT IDENTIFIER ::= {alarmConformance 1}
+aosCoreAlarmGroups      OBJECT IDENTIFIER ::= {alarmConformance 2}
+
+aosCoreAlarmCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the Alarm
+             Condition Services."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              aosCoreAlarmObjectGroup, aosCoreAlarmNotifGroup
+        }
+    ::= { aosCoreAlarmCompliances 1 }
+
+aosCoreAlarmObjectGroup OBJECT-GROUP
+    OBJECTS {
+        aosCoreAlarmIndex,
+        aosCoreAlarmConditionType,
+        aosCoreAlarmEntityTranslation,
+        aosCoreAlarmEntity,
+        aosCoreAlarmCondDescr,
+        aosCoreAlarmTimestamp,
+        aosCoreAlarmDirection,
+        aosCoreAlarmLocation,
+        aosCoreAlarmSrvEff,
+        aosCoreAlarmNotifCode,
+        aosCoreAlarmNotifTimestamp,
+        aosCoreAlarmAdditionalInfo
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the Alarm
+             Conditions Services."
+    ::= { aosCoreAlarmGroups 1 }
+
+aosCoreAlarmNotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        aosCoreAlarmTrap
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of notifications related to the Alarm
+             Conditions Services."
+    ::= { aosCoreAlarmGroups 2 }
+
+END
