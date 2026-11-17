@@ -14,6 +14,9 @@ use PHPUnit\Framework\Attributes\DataProvider;
 
 class Aos7NacTest extends TestCase
 {
+    /**
+     * @param  array{index?: string, unpUsed?: string, unpFromAuthServer?: string}  $client
+     */
     #[DataProvider('nacCases')]
     public function testNacAddressAndAuthorization(string $rawIp, string $hexIp, string $message, int $status, int $classification, string $expectedIp, string $expectedAuthz, int $authType = 0, array $client = []): void
     {

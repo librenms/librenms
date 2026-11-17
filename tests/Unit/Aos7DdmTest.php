@@ -2,16 +2,19 @@
 
 namespace LibreNMS\Tests\Unit;
 
+use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Device\YamlDiscovery;
-use LibreNMS\OS;
+use LibreNMS\OS\Aos7;
 use LibreNMS\Tests\TestCase;
+use Mockery;
 
 class Aos7DdmTest extends TestCase
 {
     public function testBreakoutChannelsKeepLaneNamesAndPhysicalTransceiverAssociation(): void
     {
         // Interface names and RX values from the reported OS6900 polling output.
-        $data = $this->cache([
+        $data = $this->labelDdmRows([
             1057 => '1/1/51A', 1058 => '1/1/51B',
             1059 => '1/1/51C', 1060 => '1/1/51D',
         ], [
@@ -39,7 +42,7 @@ class Aos7DdmTest extends TestCase
 
     public function testMissingBreakoutInterfaceKeepsCageAssociation(): void
     {
-        $data = $this->cache([1049 => '1/1/49A'], ['1049.1' => 725, '1049.2' => 725]);
+        $data = $this->labelDdmRows([1049 => '1/1/49A'], ['1049.1' => 725, '1049.2' => 725]);
         $rows = $data['ALCATEL-IND1-PORT-MIB::ddmPortInfoTable'];
         $this->assertSame('1/1/49A', $rows['1049.1']['aos7DdmPortName']);
         $this->assertSame('1/1/49A Lane 2', $rows['1049.2']['aos7DdmPortName']);
@@ -50,23 +53,30 @@ class Aos7DdmTest extends TestCase
      * @param  array<string, int>  $readings
      * @return array<string, array<int|string, array<string, int|string>>>
      */
-    private function cache(array $names, array $readings): array
+    private function labelDdmRows(array $names, array $readings): array
     {
         $device = ['os' => 'aos7'];
-        $os = OS::make($device);
-        $data = [];
+        $os = Aos7::make($device);
+        $this->assertInstanceOf(Aos7::class, $os);
+
+        $ifNames = [];
         foreach ($names as $index => $name) {
-            $data['IF-MIB::ifName'][$index] = ['IF-MIB::ifName' => $name];
+            $ifNames["IF-MIB::ifName.$index"] = $name;
         }
+        $query = Mockery::mock(SnmpQueryBuilder::class);
+        $query->shouldReceive('cache')->once()->andReturnSelf();
+        $query->shouldReceive('walk')->once()->with('IF-MIB::ifName')->andReturn(new SnmpResponse($ifNames));
+        $this->app->instance(SnmpQueryBuilder::class, $query);
+
+        $rows = [];
         foreach ($readings as $index => $value) {
-            $data['ALCATEL-IND1-PORT-MIB::ddmPortInfoTable'][$index] = [
+            $rows[$index] = [
                 'ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPower' => $value,
                 // The reported walk repeats channel 1; mapping must use the index.
                 'ALCATEL-IND1-PORT-MIB::ddmPortChannel' => 1,
             ];
         }
-        new \ReflectionProperty(OS::class, 'pre_cache')->setValue($os, $data);
 
-        return $os->preCache();
+        return ['ALCATEL-IND1-PORT-MIB::ddmPortInfoTable' => $os->ddmRowsWithPortNames($rows)];
     }
 }

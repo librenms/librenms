@@ -34,7 +34,6 @@ modules:
             data:
                 -
                     oid:
-                        - IF-MIB::ifName
                         - ENTITY-MIB::entPhysicalName
                         - ALCATEL-IND1-LAG-MIB::alclnkaggAggNumber
         current:

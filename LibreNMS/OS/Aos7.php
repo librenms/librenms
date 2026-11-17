@@ -60,22 +60,25 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
 {
     use AlcatelMacAddressMib;
 
-    private const NAC_AUTH_IDLE = 1;
-    private const NAC_AUTHENTICATED = 3;
-    private const NAC_NO_MATCHING_UNP_BLOCK = 60;
+    private const int NAC_AUTH_IDLE = 1;
+    private const int NAC_AUTHENTICATED = 3;
+    private const int NAC_NO_MATCHING_UNP_BLOCK = 60;
 
     /** @var array<int|string, string>|null */
     private ?array $healthModuleChassisIds = null;
 
-    public function preCache()
+    /**
+     * @param  array<int|string, array<string, int|string>>  $rows
+     * @return array<int|string, array<string, int|string>>
+     */
+    public function ddmRowsWithPortNames(array $rows): array
     {
-        $data = parent::preCache();
-        $names = $data['IF-MIB::ifName'] ?? [];
-        $interfaceNames = array_fill_keys(array_column($names, 'IF-MIB::ifName'), true);
+        $names = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck();
+        $interfaceNames = array_fill_keys($names, true);
 
-        foreach (array_keys($data['ALCATEL-IND1-PORT-MIB::ddmPortInfoTable'] ?? []) as $index) {
-            [$ifIndex, $channel] = explode('.', (string) $index);
-            $name = $names[$ifIndex]['IF-MIB::ifName'] ?? (string) $ifIndex;
+        foreach (array_keys($rows) as $index) {
+            [$ifIndex, $channel] = explode('.', (string) $index, 2);
+            $name = $names[$ifIndex] ?? $ifIndex;
             $sensorName = $channel > 1 ? "$name Lane $channel" : $name;
 
             // The table uses the cage's base ifIndex, even for breakout lanes.
@@ -87,10 +90,10 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
                 }
             }
 
-            $data['ALCATEL-IND1-PORT-MIB::ddmPortInfoTable'][$index]['aos7DdmPortName'] = $sensorName;
+            $rows[$index]['aos7DdmPortName'] = $sensorName;
         }
 
-        return $data;
+        return $rows;
     }
 
     public function discoverProcessors(): Collection
