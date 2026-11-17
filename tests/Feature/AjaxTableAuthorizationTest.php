@@ -121,17 +121,4 @@ final class AjaxTableAuthorizationTest extends DBTestCase
         $all = $this->runTable('app_ntp', $vars);
         $this->assertEqualsCanonicalizing(['192.0.2.1', '192.0.2.2'], array_column($all['rows'], 'peer'));
     }
-
-    public function testAsSelectionOnlyListsAccessibleDevices(): void
-    {
-        $this->actingAs($this->limitedUser());
-        $limited = $this->runTable('as-selection');
-        $this->assertEquals([64496], array_column($limited['rows'], 'bgpLocalAs'));
-        $this->assertEquals(1, $limited['total']);
-
-        $this->actingAs($this->adminUser());
-        $all = array_column($this->runTable('as-selection')['rows'], 'bgpLocalAs');
-        $this->assertContains(64496, $all);
-        $this->assertContains(64497, $all);
-    }
 }

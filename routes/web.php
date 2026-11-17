@@ -45,6 +45,7 @@ use App\Http\Controllers\OutagesController;
 use App\Http\Controllers\OxidizedController;
 use App\Http\Controllers\OverviewController;
 use App\Http\Controllers\PackagesController;
+use App\Http\Controllers\PeeringController;
 use App\Http\Controllers\PluginLegacyController;
 use App\Http\Controllers\PluginPageController;
 use App\Http\Controllers\PluginSettingsController;
@@ -142,6 +143,11 @@ Route::middleware(['auth'])->group(function (): void {
     Route::post('oxidized/reload', [OxidizedController::class, 'reload'])->name('oxidized.reload');
     Route::get('packages', [PackagesController::class, 'index'])->middleware('saved-filter:packages')->name('packages.index');
     Route::get('packages/{legacy}', [PackagesController::class, 'legacy'])->where('legacy', '.*=.*');
+    Route::prefix('peering')->name('peering.')->group(function (): void {
+        Route::get('', [PeeringController::class, 'index'])->name('index');
+        Route::get('{asn}', [PeeringController::class, 'exchanges'])->name('exchanges')->whereNumber('asn');
+        Route::get('{asn}/{ix}', [PeeringController::class, 'peers'])->name('peers')->whereNumber(['asn', 'ix']);
+    });
     Route::resource('port', PortController::class)->only('update');
     Route::put('port/{port}/notes', [PortController::class, 'notes'])->name('port.notes.update');
     Route::get('port/{port}/popup', App\Http\Controllers\PortPopupController::class)->name('port.popup');
