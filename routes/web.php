@@ -314,6 +314,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
         Route::get('logs/outages', Device\Tabs\OutagesController::class)->name('outages');
         Route::get('logs/syslog', Device\Tabs\SyslogController::class)->name('syslog');
+        Route::get('loadbalancer', [Device\Tabs\LoadBalancerController::class, 'index'])->name('loadbalancer')->whereNumber('device');
         Route::get('neighbours', [Device\Tabs\NeighboursController::class, 'index'])->name('neighbours')->whereNumber('device');
         Route::get('netflow', [Device\Tabs\NetflowController::class, 'index'])->name('netflow')->whereNumber('device');
         Route::get('port/{port}', [Device\Tabs\PortController::class, 'show'])->name('port')->scopeBindings()->whereNumber(['device', 'port']);
