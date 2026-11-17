@@ -242,6 +242,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('/device/add', [Device\AddDeviceController::class, 'index'])->name('device.add');
     Route::post('/device/add', [Device\AddDeviceController::class, 'store'])->name('device.add.store');
     Route::redirect('/addhost', '/device/add');
+    Route::redirect('/api-docs', 'https://docs.librenms.org/API/');
     Route::get('/device/{device}/edit', [Device\EditDeviceController::class, 'index'])->name('device.edit');
     Route::put('/device/{device}/edit', [Device\EditDeviceController::class, 'update'])->name('device.edit.update');
     Route::get('/device/{device}/edit/apps', [Device\EditApplicationsController::class, 'index'])->name('device.edit.apps');
