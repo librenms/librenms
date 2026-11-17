@@ -33808,6 +33808,13 @@
                     "vlan_state": 1
                 },
                 {
+                    "vlan_vlan": 997,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 997",
+                    "vlan_type": null,
+                    "vlan_state": 1
+                },
+                {
                     "vlan_vlan": 998,
                     "vlan_domain": 1,
                     "vlan_name": "VLAN 998",
@@ -35037,6 +35044,30 @@
                     "state": "unknown",
                     "cost": 0,
                     "untagged": 1
+                },
+                {
+                    "vlan": 997,
+                    "baseport": 5,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 997,
+                    "baseport": 50,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 997,
+                    "baseport": 306,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
                 },
                 {
                     "vlan": 998,
