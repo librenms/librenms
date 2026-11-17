@@ -58,10 +58,10 @@
             <h4 class="tw:m-0 tw:text-base tw:font-semibold" x-text="form.id ? @js(__('Edit alert template')) : @js(__('Create alert template'))"></h4>
         </x-slot:heading>
 
-        <form id="template-form" x-on:submit.prevent="save()">
+        <form id="template-form" x-ref="editor" x-on:submit.prevent="save()">
             <div class="form-group">
                 <label for="template-name">{{ __('Template name') }}</label>
-                <input type="text" id="template-name" class="form-control input-sm" x-model="form.name" x-bind:readonly="form.name === @js('Default Alert Template') && form.id" required>
+                <input type="text" id="template-name" class="form-control input-sm" x-model="form.name" x-bind:readonly="isDefault && form.id" required>
             </div>
             <div class="form-group">
                 <label for="template-body">{{ __('Template') }}</label>
@@ -106,6 +106,7 @@
             saving: false,
             deleteId: null,
             form: {},
+            isDefault: false,
 
             edit(id) {
                 const template = id
@@ -114,6 +115,7 @@
 
                 Promise.all([template, this.request('GET', route('alert-templates.rules'))]).then(([template, rules]) => {
                     this.form = template;
+                    this.isDefault = template.name === @js('Default Alert Template');
                     this.formOpen = true;
                     this.$nextTick(() => this.initRules(rules, template));
 
@@ -141,7 +143,7 @@
                 $rules.select2({
                     width: '100%',
                     placeholder: @js(__('Nothing selected')),
-                    dropdownParent: $(this.$el),
+                    dropdownParent: $(this.$refs.editor),
                     templateResult: (data) => {
                         if (data.element?.disabled) {
                             return $('<span>').text(data.text + ' ').append($('<span class="label label-default">').text(@js(__('Used in template')) + ' "' + data.element.dataset.template + '"'));

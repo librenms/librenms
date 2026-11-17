@@ -6,6 +6,7 @@ use App\Models\AlertRule;
 use App\Models\AlertTemplate;
 use App\Models\AlertTemplateMap;
 use App\Models\Device;
+use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -68,7 +69,7 @@ class AlertTemplateController extends Controller
         $this->authorize('create', AlertTemplate::class);
 
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::notIn([self::DEFAULT_TEMPLATE])],
+            'name' => [...$this->nameRules(), Rule::notIn([self::DEFAULT_TEMPLATE])],
             ...$this->fieldRules(),
         ], ['name.not_in' => __('This template name is reserved!')]);
 
@@ -83,8 +84,8 @@ class AlertTemplateController extends Controller
 
         $validated = $request->validate([
             'name' => $alertTemplate->name === self::DEFAULT_TEMPLATE
-                ? ['required', Rule::in([self::DEFAULT_TEMPLATE])] // the default template cannot be renamed
-                : ['required', 'string', 'max:255', Rule::notIn([self::DEFAULT_TEMPLATE])],
+                ? [...$this->nameRules(), Rule::in([self::DEFAULT_TEMPLATE])] // the default template cannot be renamed
+                : [...$this->nameRules(), Rule::notIn([self::DEFAULT_TEMPLATE])],
             ...$this->fieldRules(),
         ]);
 
@@ -126,6 +127,18 @@ class AlertTemplateController extends Controller
     }
 
     /**
+     * @return list<string|Closure>
+     */
+    private function nameRules(): array
+    {
+        return ['required', 'string', 'max:255', function (string $attribute, mixed $value, Closure $fail): void {
+            if (is_string($value) && strip_tags($value) !== $value) {
+                $fail(__('The template name must not contain HTML tags.'));
+            }
+        }];
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private function fieldRules(): array
@@ -150,7 +163,7 @@ class AlertTemplateController extends Controller
 
         DB::transaction(function () use ($template, $validated): void {
             $template->fill([
-                'name' => strip_tags($validated['name']),
+                'name' => $validated['name'],
                 'template' => $validated['template'],
                 'title' => $validated['title'] ?? null,
                 'title_rec' => $validated['title_rec'] ?? null,

@@ -7,6 +7,7 @@ use App\Models\AlertTemplate;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\TestCase;
+use PHPUnit\Framework\Attributes\TestWith;
 use Spatie\Permission\Models\Role;
 
 final class AlertTemplateControllerTest extends TestCase
@@ -40,14 +41,14 @@ final class AlertTemplateControllerTest extends TestCase
 
         $this->actingAs($this->admin())
             ->postJson(route('alert-templates.store'), [
-                'name' => 'New Template',
+                'name' => 'New & Original < 10',
                 'template' => '{{ $alert->title }}',
                 'title' => 'Alert {{ $alert->hostname }}',
                 'rules' => [$rule->id],
             ])
             ->assertCreated();
 
-        $template = AlertTemplate::where('name', 'New Template')->sole();
+        $template = AlertTemplate::where('name', 'New & Original < 10')->sole();
         $this->assertSame([$rule->id], $template->map()->pluck('alert_rule_id')->all());
     }
 
@@ -64,6 +65,48 @@ final class AlertTemplateControllerTest extends TestCase
             ->assertJsonValidationErrors('name');
     }
 
+    #[TestWith(['POST', '<b>Custom Template</b>'])]
+    #[TestWith(['POST', '<!-- comment -->Custom Template'])]
+    #[TestWith(['POST', '<b>Default Alert Template</b>'])]
+    #[TestWith(['POST', '<b></b>'])]
+    #[TestWith(['POST', '<b> </b>'])]
+    #[TestWith(['POST', ['invalid']])]
+    #[TestWith(['PUT', '<b>Custom Template</b>'])]
+    #[TestWith(['PUT', '<!-- comment -->Custom Template'])]
+    #[TestWith(['PUT', '<b>Default Alert Template</b>'])]
+    #[TestWith(['PUT', '<b></b>'])]
+    #[TestWith(['PUT', '<b> </b>'])]
+    #[TestWith(['PUT', ['invalid']])]
+    public function testSaveRejectsInvalidName(string $method, string|array $name): void
+    {
+        $template = AlertTemplate::factory()->create(['name' => 'Original', 'template' => 'Original body']);
+        $templateCount = AlertTemplate::count();
+        $url = $method === 'POST' ? route('alert-templates.store') : route('alert-templates.update', $template);
+
+        $this->actingAs($this->admin())
+            ->json($method, $url, ['name' => $name, 'template' => 'Updated body'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors('name');
+
+        $this->assertSame($templateCount, AlertTemplate::count());
+        $this->assertSame('Original', $template->refresh()->name);
+        $this->assertSame('Original body', $template->template);
+    }
+
+    public function testDefaultTemplateRejectsHtmlName(): void
+    {
+        $default = AlertTemplate::firstOrCreate(['name' => 'Default Alert Template'], ['template' => 'x']);
+        $originalBody = $default->template;
+
+        $this->actingAs($this->admin())
+            ->putJson(route('alert-templates.update', $default), ['name' => '<b>Default Alert Template</b>', 'template' => 'Updated body'])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['name' => 'The template name must not contain HTML tags.']);
+
+        $this->assertSame('Default Alert Template', $default->refresh()->name);
+        $this->assertSame($originalBody, $default->template);
+    }
+
     public function testShowUpdateAndDestroy(): void
     {
         $template = AlertTemplate::factory()->create(['template' => '{if %x}a{/if}']);
@@ -75,9 +118,9 @@ final class AlertTemplateControllerTest extends TestCase
             ->assertJsonPath('legacy', true);
 
         $this->actingAs($this->admin())
-            ->putJson(route('alert-templates.update', $template), ['name' => 'Renamed', 'template' => 'body', 'rules' => [$rule->id]])
+            ->putJson(route('alert-templates.update', $template), ['name' => 'Renamed & Updated < 10', 'template' => 'body', 'rules' => [$rule->id]])
             ->assertOk();
-        $this->assertSame('Renamed', $template->refresh()->name);
+        $this->assertSame('Renamed & Updated < 10', $template->refresh()->name);
         $this->assertSame([$rule->id], $template->map()->pluck('alert_rule_id')->all());
 
         $this->actingAs($this->admin())
