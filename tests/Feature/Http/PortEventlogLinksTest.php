@@ -36,6 +36,7 @@ class PortEventlogLinksTest extends TestCase
         $port = Port::factory()->for($device)->create(['ifDescr' => 'GigabitEthernet0/1', 'ifOperStatus' => 'up']);
 
         $this->actingAs($this->admin())
+            ->followingRedirects()
             ->get(route('device', [
                 'device' => $device,
                 'tab' => 'port',
@@ -71,6 +72,7 @@ class PortEventlogLinksTest extends TestCase
         $port = Port::factory()->for($device)->create(['ifDescr' => 'GigabitEthernet0/1', 'ifOperStatus' => 'up']);
 
         $this->actingAs($this->admin())
+            ->followingRedirects()
             ->get(route('device', [
                 'device' => $device,
                 'tab' => 'port',

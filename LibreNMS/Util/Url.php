@@ -279,9 +279,16 @@ class Url
         return route('device', $routeParams) . self::urlParams($vars);
     }
 
-    public static function portUrl($port, $vars = [])
+    /**
+     * Port page url: /device/{device}/port/{port} with any options in the query string
+     *
+     * @param  array<string, mixed>  $vars
+     */
+    public static function portUrl($port, $vars = []): string
     {
-        return self::generate(['page' => 'device', 'device' => $port->device_id, 'tab' => 'port', 'port' => $port->port_id], $vars);
+        $vars = array_filter($vars, fn ($value) => $value !== null && $value !== '');
+
+        return route('device.port', ['device' => $port->device_id, 'port' => $port->port_id] + $vars);
     }
 
     public static function sensorUrl($sensor, $vars = [])

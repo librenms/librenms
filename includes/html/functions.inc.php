@@ -183,7 +183,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
 
 function generate_port_url($port, $vars = [])
 {
-    return Url::generate(['page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']], $vars);
+    return Url::portUrl((object) ['device_id' => $port['device_id'], 'port_id' => $port['port_id']], $vars);
 }//end generate_port_url()
 
 /**

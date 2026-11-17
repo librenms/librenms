@@ -27,15 +27,16 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Facades\LibrenmsConfig;
+use App\Http\Controllers\Controller;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use LibreNMS\Interfaces\UI\DeviceTab;
 use LibreNMS\Util\Binaries;
 use LibreNMS\Util\Nfsen;
-use LibreNMS\Util\Url;
 use Symfony\Component\Process\Process;
 
-class NetflowController implements DeviceTab
+class NetflowController extends Controller implements DeviceTab
 {
     private const array STAT_TYPES = [
         'record' => 'Flow Records',
@@ -75,12 +76,31 @@ class NetflowController implements DeviceTab
         return __('Netflow');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function data(Device $device, Request $request): array
     {
+        return [];
+    }
+
+    public function index(Device $device, Request $request): View
+    {
+        $this->authorize('view', $device);
+
+        $request->validate([
+            'nfsen' => 'nullable|string',
+            'channel' => 'nullable|string',
+            'topN' => 'nullable|integer',
+            'lastN' => 'nullable|integer',
+            'stattype' => 'nullable|string',
+            'statorder' => 'nullable|string',
+        ]);
+
         $channels = Nfsen::channels($device->hostname);
-        $channel = Url::parseOptions('channel');
+        $channel = $request->string('channel')->value();
         $channel = isset($channels[$channel]) ? $channel : null;
-        $view = Url::parseOptions('nfsen');
+        $view = $request->string('nfsen')->value();
         $view = match ($view) {
             'stats' => 'stats',
             'channel' => $channel ? 'channel' : 'general',
@@ -91,12 +111,12 @@ class NetflowController implements DeviceTab
             'view' => $view,
             'channel' => $channel,
             'options' => [
-                'general' => ['text' => __('General'), 'link' => $this->link($device, ['nfsen' => 'general'])],
-                'stats' => ['text' => __('Stats'), 'link' => $this->link($device, ['nfsen' => 'stats'])],
+                'general' => ['text' => __('General'), 'link' => route('device.netflow', ['device' => $device->device_id, 'nfsen' => 'general'])],
+                'stats' => ['text' => __('Stats'), 'link' => route('device.netflow', ['device' => $device->device_id, 'nfsen' => 'stats'])],
             ],
             'channels' => collect($channels)->map(fn ($rrd, $name) => [
                 'text' => $name,
-                'link' => $this->link($device, ['nfsen' => 'channel', 'channel' => $name]),
+                'link' => route('device.netflow', ['device' => $device->device_id, 'nfsen' => 'channel', 'channel' => $name]),
             ])->all(),
         ];
 
@@ -109,7 +129,7 @@ class NetflowController implements DeviceTab
             $data += $this->stats($device, $request);
         }
 
-        return $data;
+        return view('device.tabs.netflow', $data + ['device' => $device]);
     }
 
     /**
@@ -117,18 +137,18 @@ class NetflowController implements DeviceTab
      */
     private function stats(Device $device, Request $request): array
     {
-        $topN = (int) $request->input('topN');
+        $topN = $request->integer('topN');
         $topN = $topN > 0 && $topN <= LibrenmsConfig::get('nfsen_top_max') ? $topN : (int) LibrenmsConfig::get('nfsen_top_default');
-        $lastN = (int) $request->input('lastN');
+        $lastN = $request->integer('lastN');
         $lastN = $lastN > 0 && $lastN <= LibrenmsConfig::get('nfsen_last_max') ? $lastN : (int) LibrenmsConfig::get('nfsen_last_default');
-        $type = $request->input('stattype');
+        $type = $request->string('stattype')->value();
         $type = isset(self::STAT_TYPES[$type]) ? $type : LibrenmsConfig::get('nfsen_stats_default');
-        $order = $request->input('statorder');
+        $order = $request->string('statorder')->value();
         $order = in_array($order, self::ORDERS) ? $order : LibrenmsConfig::get('nfsen_order_default');
 
         return [
             'form' => [
-                'action' => $this->link($device, ['nfsen' => 'stats']),
+                'action' => route('device.netflow', ['device' => $device->device_id] + []),
                 'topN' => $topN,
                 'lastN' => $lastN,
                 'stattype' => $type,
@@ -163,13 +183,5 @@ class NetflowController implements DeviceTab
         $process->run();
 
         return $process->getOutput() . $process->getErrorOutput();
-    }
-
-    /**
-     * @param  array<string, string>  $params
-     */
-    private function link(Device $device, array $params): string
-    {
-        return route('device', ['device' => $device->device_id, 'tab' => 'netflow'] + $params);
     }
 }

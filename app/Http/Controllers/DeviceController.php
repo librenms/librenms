@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\Port;
 use App\View\Components\Device\PageTabs;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
@@ -18,6 +19,9 @@ use LibreNMS\Util\Url;
 class DeviceController
 {
     use AuthorizesRequests;
+
+    /** Tabs with their own device.{tab} route, the legacy url only redirects to it */
+    private const array ROUTED_TABS = ['neighbours', 'netflow', 'port', 'pseudowires', 'qos', 'routing', 'stp'];
 
     public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {
@@ -33,12 +37,16 @@ class DeviceController
 
         $current_tab = str_replace('tab=', '', $current_tab) ?: 'overview';
 
+        $port = null;
         if ($current_tab == 'port') {
-            $vars = Url::parseLegacyPath($request->path());
-            $port = $device->ports()->findOrFail($vars->get('port'));
+            $port = $device->ports()->findOrFail($this->portId((string) $vars));
             Gate::authorize('view', $port);
         } else {
             Gate::authorize('view', $device);
+        }
+
+        if (in_array($current_tab, self::ROUTED_TABS, true)) {
+            return $this->redirectToTabRoute($request, $device_id, $current_tab, (string) $vars, $port);
         }
 
         $tab_controller = PageTabs::getTab($current_tab);
@@ -62,6 +70,37 @@ class DeviceController
         $data_array['tab_content'] = $this->renderLegacyTab($current_tab, $device, $data);
 
         return view('device.tabs.legacy', $data_array);
+    }
+
+    /**
+     * Port id from the native /port/{id} path or the legacy /port/port={id} path
+     */
+    private function portId(string $vars): int
+    {
+        $first = explode('/', $vars)[0];
+
+        return (int) (ctype_digit($first) ? $first : Url::parseLegacyPath($vars)->get('port'));
+    }
+
+    /**
+     * Send legacy urls to the tab's own route, /key=value/ path options move to the query string
+     */
+    private function redirectToTabRoute(Request $request, int $deviceId, string $tab, string $vars, ?Port $port): RedirectResponse
+    {
+        $options = [];
+        foreach (explode('/', $vars) as $segment) {
+            $segment = urldecode($segment);
+            if (str_contains($segment, '=')) {
+                [$key, $value] = explode('=', $segment, 2);
+                if (! in_array($key, ['device', 'tab', 'port'], true)) {
+                    $options[$key] = $value;
+                }
+            }
+        }
+
+        $params = ['device' => $deviceId] + ($port ? ['port' => $port->port_id] : []);
+
+        return redirect()->route("device.$tab", $params + $request->query() + $options, 301);
     }
 
     private function renderLegacyTab($tab, Device $device, $data)
