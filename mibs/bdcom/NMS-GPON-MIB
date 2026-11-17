@@ -2301,7 +2301,7 @@ onuVLANProfile   OBJECT IDENTIFIER ::= { nmsGponProfile 1 }
                      onuVLANProfilePVID
                          INTEGER,   
                      onuVLANProfileTrunkVlans 
-                         BITS,
+                         OCTET STRING,
                      onuVLANProfileRowStatus
                          RowStatus                      
                  }
