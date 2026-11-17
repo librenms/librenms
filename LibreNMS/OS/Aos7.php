@@ -96,6 +96,7 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
 
         $usage = SnmpQuery::mibDir($mibDir)
             ->walk('ALCATEL-IND1-HEALTH-MIB::healthModuleCpu1MinAvg')
+            ->throwIfConnectionError()
             ->valuesByIndex();
 
         $usage = array_map(
@@ -105,6 +106,7 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
 
         $chassisIds = SnmpQuery::mibDir($mibDir)
             ->walk('ALCATEL-IND1-HEALTH-MIB::healthModuleChassisId')
+            ->throwIfConnectionError()
             ->valuesByIndex();
 
         $chassisIds = array_map(
@@ -187,6 +189,7 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
         // RAM capacity in bytes, indexed by virtual-chassis unit.
         $capacities = SnmpQuery::mibDir($mibDir)
             ->walk('ALCATEL-IND1-SYSTEM-MIB::systemVcHardwareMemorySize')
+            ->throwIfConnectionError()
             ->valuesByIndex();
 
         $capacities = array_map(
@@ -201,6 +204,7 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
         // Memory utilization and chassis membership are indexed by module.
         $usage = SnmpQuery::mibDir($mibDir)
             ->walk('ALCATEL-IND1-HEALTH-MIB::healthModuleMemory1MinAvg')
+            ->throwIfConnectionError()
             ->valuesByIndex();
 
         $usage = array_map(
@@ -210,6 +214,7 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
 
         $chassisIds = SnmpQuery::mibDir($mibDir)
             ->walk('ALCATEL-IND1-HEALTH-MIB::healthModuleChassisId')
+            ->throwIfConnectionError()
             ->valuesByIndex();
 
         $chassisIds = array_map(
@@ -299,6 +304,7 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
 
         $raw = SnmpQuery::mibDir('nokia/aos7')
             ->walk('ALCATEL-IND1-DA-MIB::alaDaMacVlanUserTable')
+            ->throwIfConnectionError()
             ->valuesByIndex();
 
         $rows = collect($raw);
@@ -845,6 +851,7 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
 
         $ddmData = SnmpQuery::mibDir('nokia/aos7')
             ->walk('ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPower')
+            ->throwIfConnectionError()
             ->valuesByIndex();
 
         $entities = $device->entityPhysical()
