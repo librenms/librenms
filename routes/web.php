@@ -314,13 +314,13 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
         Route::get('logs/outages', Device\Tabs\OutagesController::class)->name('outages');
         Route::get('logs/syslog', Device\Tabs\SyslogController::class)->name('syslog');
-        Route::get('neighbours', [Device\Tabs\NeighboursController::class, 'index'])->name('neighbours');
-        Route::get('netflow', [Device\Tabs\NetflowController::class, 'index'])->name('netflow');
-        Route::get('port/{port}', [Device\Tabs\PortController::class, 'show'])->name('port')->scopeBindings()->whereNumber('port');
-        Route::get('qos', [Device\Tabs\QosController::class, 'index'])->name('qos');
-        Route::get('pseudowires', [Device\Tabs\PseudowiresController::class, 'index'])->name('pseudowires');
-        Route::get('stp', [Device\Tabs\StpController::class, 'index'])->name('stp');
-        Route::get('routing', [Device\Tabs\RoutingController::class, 'index'])->name('routing');
+        Route::get('neighbours', [Device\Tabs\NeighboursController::class, 'index'])->name('neighbours')->whereNumber('device');
+        Route::get('netflow', [Device\Tabs\NetflowController::class, 'index'])->name('netflow')->whereNumber('device');
+        Route::get('port/{port}', [Device\Tabs\PortController::class, 'show'])->name('port')->scopeBindings()->whereNumber(['device', 'port']);
+        Route::get('qos', [Device\Tabs\QosController::class, 'index'])->name('qos')->whereNumber('device');
+        Route::get('pseudowires', [Device\Tabs\PseudowiresController::class, 'index'])->name('pseudowires')->whereNumber('device');
+        Route::get('stp', [Device\Tabs\StpController::class, 'index'])->name('stp')->whereNumber('device');
+        Route::get('routing', [Device\Tabs\RoutingController::class, 'index'])->name('routing')->whereNumber('device');
         Route::prefix('routing')->name('routing.')->group(function (): void {
             Route::get('bgp', Device\Tabs\Routing\BgpController::class)->name('bgp');
             Route::get('cef', Device\Tabs\Routing\CefController::class)->name('cef');

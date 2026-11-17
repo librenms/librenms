@@ -72,7 +72,7 @@ class NeighboursController extends Controller implements DeviceTab
             'selection' => 'nullable|in:list,map',
         ]);
 
-        $selection = $request->string('selection', 'list')->value();
+        $selection = $request->string('selection')->value() ?: 'list';
 
         if ($selection == 'list') {
             $linksQuery = $device->links()->with('port', 'remoteDevice', 'remotePort');

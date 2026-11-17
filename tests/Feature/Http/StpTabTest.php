@@ -53,6 +53,15 @@ final class StpTabTest extends TestCase
             ->assertStatus(301);
     }
 
+    public function testLegacyDeviceSegmentRedirects(): void
+    {
+        $device = $this->device();
+
+        $this->actingAs($this->admin())
+            ->get("/device/device=$device->device_id/stp")
+            ->assertRedirect(route('device.stp', ['device' => $device]));
+    }
+
     public function testNonNumericVlanIsRejected(): void
     {
         $device = $this->device();

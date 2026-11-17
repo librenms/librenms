@@ -43,6 +43,17 @@ final class NeighboursTabTest extends TestCase
             ->assertSee('neighbours?selection=map', false);
     }
 
+    public function testEmptySelectionShowsList(): void
+    {
+        $device = $this->device();
+
+        $this->actingAs($this->admin())
+            ->get(route('device.neighbours', ['device' => $device]) . '?selection=')
+            ->assertOk()
+            ->assertSee('neighbour.example.com')
+            ->assertViewHas('selection', 'list');
+    }
+
     public function testLegacyPathSelectionRedirectsToQuery(): void
     {
         $device = $this->device();
