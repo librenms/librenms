@@ -601,6 +601,7 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
      * The table only numbers the instance of a session, so the VRF of an instance is the VRF of
      * the interface that holds the local address of one of its sessions.
      * Instance 0 is the master instance, its sessions are in no VRF.
+     * A local address held by more than one interface is skipped, instances may reuse addresses.
      *
      * @param  iterable<int|string, BgpPeer>  $peers  keyed by session index
      */
@@ -615,7 +616,7 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
         foreach ($instances as $sessions) {
             $vrfId = 0;
             foreach ($sessions as $peer) {
-                $vrfId = (int) PortCache::getByIfIndex($peer->bgpPeerIface, $this->getDeviceId())?->ifVrf;
+                $vrfId = $this->vrfIdOfLocalAddress($peer);
                 if ($vrfId) {
                     break;
                 }
@@ -625,6 +626,24 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
                 $peer->vrf_id = $vrfId;
             }
         }
+    }
+
+    /**
+     * The VRF of the only interface that holds the local address of a session, 0 when there is none
+     */
+    private function vrfIdOfLocalAddress(BgpPeer $peer): int
+    {
+        $ip = IP::parse((string) $peer->bgpLocalAddr, true);
+        if ($ip === null) {
+            return 0;
+        }
+
+        $addresses = $ip->getFamily() == 'ipv4'
+            ? $this->getDevice()->ipv4()->where('ipv4_address', $ip->uncompressed())
+            : $this->getDevice()->ipv6()->where('ipv6_address', $ip->uncompressed());
+        $vrfIds = $addresses->pluck('ifVrf');
+
+        return $vrfIds->count() == 1 ? (int) $vrfIds->first() : 0;
     }
 
     /**

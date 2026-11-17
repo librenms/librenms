@@ -209,6 +209,11 @@ final class BgpPeerDiscoveryTest extends DBTestCase
         $uplink = Port::factory()->for($this->device)->create(['ifIndex' => 538, 'ifName' => 'ge-0/0/0.0', 'ifVrf' => $vrf->vrf_id]);
         Ipv4Address::factory()->create(['ipv4_address' => '192.0.2.254', 'port_id' => $loopback->port_id, 'context_name' => '']);
         Ipv4Address::factory()->create(['ipv4_address' => '198.51.100.2', 'port_id' => $uplink->port_id, 'context_name' => '']);
+        // instances may reuse an address, it does not tell them apart
+        $other = Vrf::factory()->for($this->device)->create(['vrf_name' => 'OTHER']);
+        foreach ([$uplink->port_id, Port::factory()->for($this->device)->create(['ifIndex' => 539, 'ifVrf' => $other->vrf_id])->port_id] as $portId) {
+            Ipv4Address::factory()->create(['ipv4_address' => '10.0.0.1', 'port_id' => $portId, 'context_name' => '']);
+        }
 
         $os = FakeBgpJunos::fake($this->device, ['' => [
             'jnxBgpM2PeerRemoteAs' => [
@@ -216,12 +221,14 @@ final class BgpPeerDiscoveryTest extends DBTestCase
                 '9.1.198.51.100.2.1.198.51.100.1' => '65002',
                 '9.1.203.0.113.2.1.203.0.113.1' => '65003',
                 '12.1.203.0.113.6.1.203.0.113.5' => '65004',
+                '14.1.10.0.0.1.1.10.0.0.2' => '65005',
             ],
             'jnxBgpM2PeerLocalAddr' => [
                 '0.1.192.0.2.254.1.192.0.2.1' => 'C0 00 02 FE',
                 '9.1.198.51.100.2.1.198.51.100.1' => 'C6 33 64 02',
                 '9.1.203.0.113.2.1.203.0.113.1' => 'CB 00 71 02',
                 '12.1.203.0.113.6.1.203.0.113.5' => 'CB 00 71 06',
+                '14.1.10.0.0.1.1.10.0.0.2' => '0A 00 00 01',
             ],
         ]]);
 
@@ -230,6 +237,7 @@ final class BgpPeerDiscoveryTest extends DBTestCase
             ['198.51.100.1', $vrf->vrf_id],
             ['203.0.113.1', $vrf->vrf_id], // local address is not known, another session of the instance is
             ['203.0.113.5', null], // no session of the instance has a known local address
+            ['10.0.0.2', null], // local address is on interfaces of two VRFs
         ], $os->discoverBgpPeers()->map(fn (BgpPeer $peer) => [$peer->bgpPeerIdentifier, $peer->vrf_id])->all());
     }
 
