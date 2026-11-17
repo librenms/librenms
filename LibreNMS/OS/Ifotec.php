@@ -52,6 +52,9 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
     private const float OPTICAL_POWER_INFINITY_MARGIN = 3.0;
 
     // IfotecYesNoType and IfotecDataStatus (IFOTEC-SMI): value => [name, generic state]
+    // ifoSFPTable: column of the power value => its status
+    private const array POWER_STATUS_COLUMNS = [10 => 'ifoSFPrxPowerStatus', 16 => 'ifoSFPtxPowerStatus'];
+
     private const array YES_NO = [1 => ['yes', 0], 2 => ['no', 3]];
 
     private const array DATA_STATUS = [
@@ -64,6 +67,8 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
     private ?array $portEntities = null;
 
     private ?array $portIfIndexes = null;
+
+    private ?array $powerSensorCustoms = null;
 
     /**
      * Power to report for a minus infinity reading: 3 dB under the low alarm threshold, or -40 dBm without threshold.
@@ -117,8 +122,13 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
                 continue;
             }
 
+            $portId = PortCache::getIdFromIfIndex($ifIndex, $this->getDevice());
+            if ($portId === null) {
+                continue;
+            }
+
             $transceivers->push(new Transceiver([
-                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
+                'port_id' => $portId,
                 'index' => $sfpIndex,
                 'entity_physical_index' => $this->portEntityIndex($ifIndex),
                 'connector' => $this->sfpConnector($sfp),
@@ -166,7 +176,7 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
 
             foreach ($directions as $prefix => [$label, $valueColumn]) {
                 $value = $sfp['ifoSFP' . $prefix . 'PowerVal'] ?? null;
-                if (! is_numeric($value) || $this->isNoData($sfp['ifoSFP' . $prefix . 'PowerStatus'] ?? null)) {
+                if (! is_numeric($value) || self::isNoData($sfp['ifoSFP' . $prefix . 'PowerStatus'] ?? null)) {
                     continue;
                 }
 
@@ -177,13 +187,14 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
                 }
 
                 [$limitLow, $limitLowWarn, $limitWarn, $limitHigh] = $this->sfpThresholds($sfp, $prefix);
+                $sensorIndex = "ifoSFP{$prefix}PowerVal.$sfpIndex";
 
                 // values read through the MIB are in dBm (DISPLAY-HINT d-1), the numeric OID polled is in tenths of dBm
-                app('sensor-discovery')->discover(new \App\Models\Sensor([
+                $sensor = new \App\Models\Sensor([
                     'poller_type' => 'snmp',
                     'sensor_class' => 'dbm',
                     'sensor_oid' => ".1.3.6.1.4.1.21362.101.5.1.1.$valueColumn.$sysIndex.$sfpIndex",
-                    'sensor_index' => "ifoSFP{$prefix}PowerVal.$sfpIndex",
+                    'sensor_index' => $sensorIndex,
                     'sensor_type' => 'ifotecSfp',
                     'sensor_descr' => "$ifName Transceiver $label Power",
                     'sensor_divisor' => 10,
@@ -197,9 +208,47 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
                     'entPhysicalIndex' => $this->portEntityIndex($ifIndex),
                     'entPhysicalIndex_measured' => 'port',
                     'group' => 'transceiver',
-                ]));
+                ]);
+
+                // rejected thresholds (e.g. after a module change): drop the limits kept from the previous module,
+                // unless the user set them
+                if ($limitLow === null && $this->powerSensorCustom($sensorIndex) === 'No') {
+                    $sensor->sensor_custom = 'Reset';
+                }
+
+                app('sensor-discovery')->discover($sensor);
             }
         }
+    }
+
+    /**
+     * True when the status of a polled optical power value is noData: the value is then not a measure.
+     */
+    public static function powerReadingIsNoData(string $sensorOid): bool
+    {
+        [$column, $sysIndex, $sfpIndex] = array_slice(explode('.', $sensorOid), -3);
+        $statusName = self::POWER_STATUS_COLUMNS[(int) $column] ?? null;
+        if ($statusName === null) {
+            return false;
+        }
+
+        $statuses = SnmpQuery::cache()->hideMib()->walk(array_map(fn ($name) => "IFOTEC-SMI::$name", self::POWER_STATUS_COLUMNS))->valuesByIndex();
+
+        return self::isNoData($statuses["$sysIndex.$sfpIndex"][$statusName] ?? null);
+    }
+
+    /**
+     * sensor_custom of an existing optical power sensor, null when the sensor does not exist yet.
+     */
+    private function powerSensorCustom(string $sensorIndex): ?string
+    {
+        $this->powerSensorCustoms ??= \App\Models\Sensor::where('device_id', $this->getDevice()->device_id)
+            ->where('sensor_class', 'dbm')
+            ->where('sensor_type', 'ifotecSfp')
+            ->pluck('sensor_custom', 'sensor_index')
+            ->all();
+
+        return $this->powerSensorCustoms[$sensorIndex] ?? null;
     }
 
     /**
@@ -320,7 +369,7 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
     /**
      * True for the noData value of IfotecDataStatus, returned as a number or as its name.
      */
-    private function isNoData(mixed $status): bool
+    private static function isNoData(mixed $status): bool
     {
         return $status === 'noData' || (is_numeric($status) && (int) $status === 1);
     }
@@ -390,8 +439,10 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
             return $none; // the agent reports 0 for absent thresholds
         }
 
-        if ($thresholds !== collect($thresholds)->sort()->values()->all()) {
-            return $none; // not in increasing order
+        for ($i = 1; $i < count($thresholds); $i++) {
+            if ($thresholds[$i] <= $thresholds[$i - 1]) {
+                return $none; // not in strictly increasing order
+            }
         }
 
         return $thresholds;

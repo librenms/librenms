@@ -53,21 +53,23 @@ class UserFuncHelper
     }
 
     /**
-     * IFOTEC optical power: replaces a minus infinity reading by a value under the low threshold (receive)
-     * or by the low threshold (transmit).
+     * IFOTEC optical power: a minus infinity reading is an alarm on the received power (a value under the low
+     * threshold), but only "not measured" on the transmit power (unknown). No reading is unknown too.
      */
-    public function ifotecOpticalPower(): float
+    public function ifotecOpticalPower(): ?float
     {
+        // empty when there is no answer or when the status is noData (includes/polling/sensors/dbm/ifotec.inc.php)
+        if (! is_numeric($this->value_raw)) {
+            return null;
+        }
+
         if ((float) $this->value >= \LibreNMS\OS\Ifotec::OPTICAL_POWER_MIN_VALID) {
             return (float) $this->value;
         }
 
-        $lowLimit = $this->sensor['sensor_limit_low'] ?? null;
-
-        // minus infinity is an alarm on the received power, but only "not measured" on the transmit power
         return str_starts_with((string) ($this->sensor['sensor_index'] ?? ''), 'ifoSFPrxPowerVal')
-            ? \LibreNMS\OS\Ifotec::minusInfinityPower($lowLimit)
-            : (is_numeric($lowLimit) ? (float) $lowLimit : \LibreNMS\OS\Ifotec::minusInfinityPower(null));
+            ? \LibreNMS\OS\Ifotec::minusInfinityPower($this->sensor['sensor_limit_low'] ?? null)
+            : null;
     }
 
     public function hhmmssToMinutes(): int
