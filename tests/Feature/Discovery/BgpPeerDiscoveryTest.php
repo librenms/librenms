@@ -209,6 +209,7 @@ final class BgpPeerDiscoveryTest extends DBTestCase
         $uplink = Port::factory()->for($this->device)->create(['ifIndex' => 538, 'ifName' => 'ge-0/0/0.0', 'ifVrf' => $vrf->vrf_id]);
         Ipv4Address::factory()->create(['ipv4_address' => '192.0.2.254', 'port_id' => $loopback->port_id, 'context_name' => '']);
         Ipv4Address::factory()->create(['ipv4_address' => '198.51.100.2', 'port_id' => $uplink->port_id, 'context_name' => '']);
+        Ipv4Address::factory()->create(['ipv4_address' => '198.51.100.2', 'port_id' => $uplink->port_id, 'context_name' => 'PUBLIC']); // one interface
         // instances may reuse an address, it does not tell them apart
         $other = Vrf::factory()->for($this->device)->create(['vrf_name' => 'OTHER']);
         foreach ([$uplink->port_id, Port::factory()->for($this->device)->create(['ifIndex' => 539, 'ifVrf' => $other->vrf_id])->port_id] as $portId) {

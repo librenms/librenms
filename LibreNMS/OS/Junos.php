@@ -638,10 +638,12 @@ class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscov
             return 0;
         }
 
-        $addresses = $ip->getFamily() == 'ipv4'
-            ? $this->getDevice()->ipv4()->where('ipv4_address', $ip->uncompressed())
-            : $this->getDevice()->ipv6()->where('ipv6_address', $ip->uncompressed());
-        $vrfIds = $addresses->pluck('ifVrf');
+        // an interface may hold the address in more than one context, so count interfaces
+        $ports = $this->getDevice()->ports();
+        $vrfIds = ($ip->getFamily() == 'ipv4'
+            ? $ports->whereHas('ipv4', fn ($query) => $query->where('ipv4_address', $ip->uncompressed()))
+            : $ports->whereHas('ipv6', fn ($query) => $query->where('ipv6_address', $ip->uncompressed()))
+        )->pluck('ifVrf');
 
         return $vrfIds->count() == 1 ? (int) $vrfIds->first() : 0;
     }
