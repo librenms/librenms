@@ -257,6 +257,30 @@ final class LoadBalancerTabTest extends TestCase
             ->assertDontSee('graph=vserver_bits', false);
     }
 
+    public function testOptionsComeFromTheQueryString(): void
+    {
+        $device = Device::factory()->create(['os' => 'acsw']);
+        LoadbalancerVserver::unguarded(fn () => LoadbalancerVserver::create(['device_id' => $device->device_id, 'classmap_id' => 7, 'classmap' => 'vip-1', 'serverstate' => 'inService']));
+        LoadbalancerRserver::unguarded(fn () => LoadbalancerRserver::create(['device_id' => $device->device_id, 'farm_id' => 'farm-1', 'StateDescr' => 'Server is now operational']));
+
+        // legacy /key=value path segments are not read
+        $this->actingAs($this->admin())
+            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer']) . '/type=pools')
+            ->assertOk()
+            ->assertSee('vip-1')
+            ->assertDontSee('farm-1');
+
+        $this->actingAs($this->admin())
+            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'type' => 'pools']))
+            ->assertOk()
+            ->assertSee('farm-1')
+            ->assertDontSee('vip-1');
+
+        $this->actingAs($this->admin())
+            ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'id' => 'abc', 'order' => 'sideways']))
+            ->assertSessionHasErrors(['id', 'order']);
+    }
+
     public function testCiscoAceVirtualServersAndPools(): void
     {
         $device = Device::factory()->create(['os' => 'acsw']);

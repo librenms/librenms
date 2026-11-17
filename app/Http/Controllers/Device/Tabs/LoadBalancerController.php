@@ -38,7 +38,6 @@ use Illuminate\Container\Attributes\Scoped;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\UI\DeviceTab;
-use LibreNMS\Util\Url;
 use WeakMap;
 
 /**
@@ -84,7 +83,15 @@ class LoadBalancerController implements DeviceTab
         $source = $this->source($device);
         $counts = $source?->counts() ?? [];
         $sections = array_filter(LoadBalancerSection::cases(), fn (LoadBalancerSection $section) => isset($counts[$section->value]));
-        $section = LoadBalancerSection::tryFrom((string) Url::parseOptions('type'));
+        $request->validate([
+            'type' => 'nullable|string',
+            'id' => 'nullable|integer',
+            'graph' => 'nullable|string',
+            'sort' => 'nullable|string',
+            'order' => 'nullable|in:asc,desc',
+        ]);
+
+        $section = $request->enum('type', LoadBalancerSection::class);
         $section = in_array($section, $sections, true) ? $section : reset($sections);
 
         $data = [
@@ -103,8 +110,7 @@ class LoadBalancerController implements DeviceTab
         }
 
         $items = $source->items($section);
-        $id = filter_var(Url::parseOptions('id'), FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
-        $item = $id === null ? null : $items->get($id);
+        $item = $request->filled('id') ? $items->get($request->integer('id')) : null;
 
         if ($item) {
             $members = $source->members($section, $item);
@@ -121,11 +127,11 @@ class LoadBalancerController implements DeviceTab
 
         // the list can show one of the item graphs under each row
         $itemGraphs = $source->itemGraphs($section);
-        $rowGraph = (string) Url::parseOptions('graph');
+        $rowGraph = $request->string('graph')->value();
         $rowGraph = isset($itemGraphs[$rowGraph]) ? $rowGraph : null;
         $sorting = [
-            'sort' => (string) Url::parseOptions('sort', 'name'),
-            'order' => Url::parseOptions('order') == 'desc' ? 'desc' : 'asc',
+            'sort' => $request->string('sort', 'name')->value(),
+            'order' => $request->string('order', 'asc')->value(),
             'graph' => $rowGraph,
         ];
 
