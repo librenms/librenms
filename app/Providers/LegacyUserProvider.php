@@ -36,12 +36,13 @@ use Illuminate\Support\Facades\DB;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Authentication\MysqlAuthorizer;
 use LibreNMS\Exceptions\AuthenticationException;
+use LibreNMS\Interfaces\Authentication\PreAuthenticated;
 use LibreNMS\Util\Debug;
 use Log;
 use Request;
 use Session;
 
-class LegacyUserProvider implements UserProvider
+class LegacyUserProvider implements UserProvider, PreAuthenticated
 {
     /**
      * Retrieve a user by their unique identifier.
@@ -153,6 +154,22 @@ class LegacyUserProvider implements UserProvider
         }
 
         return false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function isPreAuthenticated(): bool
+    {
+        return LegacyAuth::get()->authIsExternal();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getPreAuthenticatedUsername(): ?string
+    {
+        return LegacyAuth::get()->getExternalUsername();
     }
 
     private function localFallbackEnabled(): bool

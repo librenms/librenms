@@ -9,6 +9,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Authentication\AuthorizerBase;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Exceptions\AuthenticationException;
+use LibreNMS\Interfaces\Authentication\PreAuthenticated;
 use LibreNMS\Tests\DBTestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
 
@@ -32,6 +33,23 @@ final class AuthLocalFallbackTest extends DBTestCase
         LibrenmsConfig::set('auth_fallback_local', false);
         LegacyAuth::reset();
         parent::tearDown();
+    }
+
+    public function testProviderReportsPreAuthentication(): void
+    {
+        $provider = new LegacyUserProvider();
+
+        LegacyAuth::reset();
+        $this->assertFalse($provider->isPreAuthenticated());
+
+        LibrenmsConfig::set('auth_mechanism', 'http-auth');
+        LegacyAuth::reset();
+        $this->assertTrue($provider->isPreAuthenticated());
+    }
+
+    public function testPreAuthenticatedResolvesToTheActiveUserProvider(): void
+    {
+        $this->assertInstanceOf(LegacyUserProvider::class, app(PreAuthenticated::class));
     }
 
     public function testLocalUserLogsInWhenTheConfiguredAuthDoesNotKnowThem(): void

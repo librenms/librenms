@@ -55,6 +55,36 @@ class UserControllerTest extends TestCase
 
         $response->assertRedirect(route('users.index'));
         $this->assertDatabaseHas('users', ['username' => 'newuser']);
+
+        $created = User::firstWhere('username', 'newuser');
+        $this->assertSame((string) $created->user_id, $created->auth_id);
+    }
+
+    public function testPasswordFieldsFollowUserAuthType(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('user.create', 'user.update');
+
+        $this->actingAs($admin)->get(route('users.create'))->assertSee('name="can_modify_passwd"', false);
+
+        $local = User::factory()->create(['auth_type' => 'mysql']);
+        $this->actingAs($admin)->get(route('users.edit', $local))->assertSee('name="can_modify_passwd"', false);
+
+        $ldap = User::factory()->create(['auth_type' => 'ldap']);
+        $this->actingAs($admin)->get(route('users.edit', $ldap))->assertDontSee('name="can_modify_passwd"', false);
+    }
+
+    public function testPasswordChangeFormFollowsUserAuthType(): void
+    {
+        $local = User::factory()->create(['auth_type' => 'mysql', 'can_modify_passwd' => 1, 'enabled' => 1]);
+        $this->actingAs($local)->get(route('preferences.index'))->assertSee('Change Password');
+
+        $local->update(['can_modify_passwd' => 0]);
+        $this->actingAs($local)->get(route('preferences.index'))->assertDontSee('Change Password');
+
+        $ldap = User::factory()->create(['auth_type' => 'ldap', 'can_modify_passwd' => 1, 'enabled' => 1]);
+        $this->actingAs($ldap)->get(route('preferences.index'))->assertDontSee('Change Password');
     }
 
     public function testAdminWithUpdatePermissionCanUpdateAnyUser(): void

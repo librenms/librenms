@@ -35,7 +35,6 @@ use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
-use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Authentication\TwoFactor;
 use LibreNMS\Util\DynamicConfig;
 use Session;
@@ -68,7 +67,7 @@ class UserPreferencesController extends Controller implements HasMiddleware
 
         $data = [
             'user' => $user,
-            'can_change_password' => LegacyAuth::get()->canUpdatePasswords($user->username),
+            'can_change_password' => $user->auth_type === 'mysql' && $user->can_modify_passwd,
             'dashboards' => Dashboard::hasAccess($user)->with('user')->get(),
             'default_dashboard' => UserPref::getPref($user, 'dashboard'),
             'note_to_device' => UserPref::getPref($user, 'add_schedule_note_to_device'),

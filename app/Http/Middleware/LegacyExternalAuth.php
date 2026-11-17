@@ -6,11 +6,15 @@ use App\Facades\LibrenmsConfig;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Interfaces\Authentication\PreAuthenticated;
 use Symfony\Component\HttpFoundation\Response;
 
 class LegacyExternalAuth
 {
+    public function __construct(private readonly PreAuthenticated $provider)
+    {
+    }
+
     /**
      * Handle an incoming request.
      *
@@ -27,9 +31,9 @@ class LegacyExternalAuth
                 }
             }
 
-            if (LegacyAuth::get()->authIsExternal()) {
+            if ($this->provider->isPreAuthenticated()) {
                 $credentials = [
-                    'username' => LegacyAuth::get()->getExternalUsername(),
+                    'username' => $this->provider->getPreAuthenticatedUsername(),
                     'password' => $_SERVER['PHP_AUTH_PW'] ?? '',
                 ];
 

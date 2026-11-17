@@ -72,7 +72,8 @@ class UserController extends Controller implements HasMiddleware
         $this->authorize('create', User::class);
 
         $tmp_user = new User;
-        $tmp_user->can_modify_passwd = LegacyAuth::getType() == 'mysql' ? 1 : 0; // default to true mysql
+        $tmp_user->auth_type = 'mysql'; // creating users is only allowed for mysql auth
+        $tmp_user->can_modify_passwd = 1;
 
         return view('user.create', [
             'user' => $tmp_user,
@@ -96,7 +97,7 @@ class UserController extends Controller implements HasMiddleware
 
         $user->setPassword($request->new_password);
         $user->syncRoles($request->array('roles'));
-        $user->auth_id = (string) LegacyAuth::get()->getUserid($user->username) ?: $user->user_id;
+        $user->auth_id = (string) $user->user_id;
         $this->updateDashboard($user, $request->integer('dashboard'));
         $this->updateTimezone($user, $request->string('timezone'));
 

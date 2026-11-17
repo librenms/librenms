@@ -80,7 +80,7 @@
     </div>
 </div>
 
-@if(\LibreNMS\Authentication\LegacyAuth::get()->canUpdatePasswords())
+@if($user->auth_type === 'mysql')
 <div class="form-group @if($errors->has('can_modify_passwd')) has-error @endif">
     <label for="can_modify_passwd" class="control-label col-sm-3">{{ __('Can Modify Password') }}</label>
     <div class="col-sm-9">

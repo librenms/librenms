@@ -43,6 +43,7 @@ use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
 use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Data\Source\Snmp\SnmpTranslatorInterface;
 use LibreNMS\Enum\SensorType;
+use LibreNMS\Interfaces\Authentication\PreAuthenticated;
 use LibreNMS\Interfaces\Geocoder;
 use LibreNMS\RRD\Backend\PhpRrd;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
@@ -291,6 +292,14 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Role::class, RolePolicy::class);
 
         Auth::provider('legacy', fn ($app, array $config) => new LegacyUserProvider());
+
+        $this->app->bind(PreAuthenticated::class, function () {
+            $provider = Auth::guard()->getProvider();
+
+            return $provider instanceof PreAuthenticated
+                ? $provider
+                : throw new \RuntimeException('The active auth user provider does not implement ' . PreAuthenticated::class);
+        });
 
         Sanctum::getAccessTokenFromRequestUsing(function (Request $request) {
             if ($request->is('api/v0*')) {
