@@ -29,6 +29,18 @@ class AlertScheduleController extends Controller
     {
         $this->authorize('view', $alertSchedule);
 
+        return $this->scheduleResponse($alertSchedule);
+    }
+
+    public function edit(AlertSchedule $alertSchedule): JsonResponse
+    {
+        $this->authorize('update', $alertSchedule);
+
+        return $this->scheduleResponse($alertSchedule);
+    }
+
+    private function scheduleResponse(AlertSchedule $alertSchedule): JsonResponse
+    {
         $targets = $alertSchedule->devices()->get()
             ->map(fn (Device $device) => ['id' => $device->device_id, 'text' => $device->display])
             ->concat($alertSchedule->deviceGroups()->get()

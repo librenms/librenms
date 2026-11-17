@@ -155,6 +155,7 @@
             formOpen: false,
             saving: false,
             id: null,
+            editGeneration: 0,
             deleteId: null,
             form: {},
 
@@ -164,9 +165,10 @@
             },
 
             edit(id) {
-                this.id = id;
+                const generation = ++this.editGeneration;
 
                 if (! id) {
+                    this.id = null;
                     this.form = {
                         title: '',
                         notes: '',
@@ -184,7 +186,11 @@
                     return;
                 }
 
-                this.request('GET', route('alert-schedule.show', {alert_schedule: id})).then((schedule) => {
+                this.request('GET', route('alert-schedule.edit', {alert_schedule: id})).then((schedule) => {
+                    if (generation !== this.editGeneration) {
+                        return;
+                    }
+
                     this.form = {
                         title: schedule.title,
                         notes: schedule.notes ?? '',
@@ -198,6 +204,7 @@
                         recurring_day: (schedule.recurring_day ?? []).map((day) => scheduleDays[day]),
                         behavior: schedule.behavior,
                     };
+                    this.id = id;
                     this.open(schedule.targets);
                 }).catch(() => {});
             },

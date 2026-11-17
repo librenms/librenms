@@ -452,7 +452,7 @@ Route::middleware(['auth'])->group(function (): void {
         // page ajax controllers
         Route::resource('location', LocationController::class)->only('update', 'destroy');
         Route::resource('pollergroup', PollerGroupController::class)->only('destroy', 'show', 'store', 'update');
-        Route::resource('alert-schedule', AlertScheduleController::class)->only('show', 'store', 'update', 'destroy');
+        Route::resource('alert-schedule', AlertScheduleController::class)->only('show', 'edit', 'store', 'update', 'destroy');
         Route::post('alert-schedule/{alert_schedule}/end', [AlertScheduleController::class, 'end'])->name('alert-schedule.end');
         Route::put('device-dependencies', [DeviceDependencyController::class, 'update'])->name('device-dependencies.update');
         Route::delete('device-dependencies', [DeviceDependencyController::class, 'destroy'])->name('device-dependencies.destroy');

@@ -13,6 +13,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Tests\TestCase;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 final class AlertScheduleControllerTest extends TestCase
@@ -261,6 +262,21 @@ final class AlertScheduleControllerTest extends TestCase
         $this->actingAs($this->user())
             ->getJson(route('alert-schedule.show', $schedule))
             ->assertForbidden();
+    }
+
+    public function testEditAndShowUseTheirOwnPermissions(): void
+    {
+        $schedule = AlertSchedule::factory()->create();
+        $editor = $this->user()->givePermissionTo(Permission::findOrCreate('alert-schedule.update'));
+        $viewer = $this->user()->givePermissionTo(Permission::findOrCreate('alert-schedule.view'));
+
+        $this->actingAs($editor)->getJson(route('alert-schedule.edit', $schedule))
+            ->assertOk()
+            ->assertJsonPath('schedule_id', $schedule->schedule_id);
+        $this->getJson(route('alert-schedule.show', $schedule))->assertForbidden();
+
+        $this->actingAs($viewer)->getJson(route('alert-schedule.show', $schedule))->assertOk();
+        $this->getJson(route('alert-schedule.edit', $schedule))->assertForbidden();
     }
 
     public function testAdminCanUpdateSchedule(): void
