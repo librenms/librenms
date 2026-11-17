@@ -135,4 +135,4 @@ An interactive script can create basic definitions from an existing device:
 ./scripts/new-os.php -h 101 -o test-os -t network -v cisco
 ```
 
-This script is in pre-beta. It adds basic sensors, but it does not add state sensors. Report problems on [Discord](https://t.libren.ms/discord).
+This script is in pre-beta. It adds basic sensors, but it does not add state sensors. Report problems on [Discord](https://discord.com/invite/librenms).
