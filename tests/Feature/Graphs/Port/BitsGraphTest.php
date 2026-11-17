@@ -32,7 +32,7 @@ class BitsGraphTest extends TestCase
         LibrenmsConfig::set('percentile_value', 95);
         LibrenmsConfig::set('rrdgraph_real_percentile', false);
         $this->port = Port::factory()->for(Device::factory())->create([
-            'ifDescr' => 'GigabitEthernet0/1', 'ifAlias' => 'Uplink', 'ifSpeed' => 1000000000,
+            'ifDescr' => 'GigabitEthernet0/1', 'ifAlias' => 'Transit & <Peering>', 'ifSpeed' => 1000000000,
         ]);
     }
 
@@ -57,7 +57,7 @@ class BitsGraphTest extends TestCase
         $this->assertInstanceOf(BitsGraph::class, $graph);
         $this->assertSame($this->port->port_id, $graph->getPageContext()->port->port_id);
         $this->assertSame($this->port->device_id, $graph->getPageContext()->device->device_id);
-        $this->assertSame($this->port->device->shortDisplayName() . '::gi0/1::Uplink', $graph->getTitle());
+        $this->assertSame($this->port->device->shortDisplayName() . '::gi0/1::Transit & <Peering>', $graph->getTitle());
     }
 
     public function test_it_converts_octets_to_bits_with_positive_legend_values(): void

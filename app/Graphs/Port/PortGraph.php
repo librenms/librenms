@@ -6,7 +6,6 @@ use App\Data\Graphing\GraphPageContext;
 use App\Graphs\AbstractSeriesGraph;
 use App\Models\Port;
 use LibreNMS\Exceptions\NoGraphData;
-use LibreNMS\Util\Clean;
 use LibreNMS\Util\Rewrite;
 
 abstract class PortGraph extends AbstractSeriesGraph
@@ -37,7 +36,7 @@ abstract class PortGraph extends AbstractSeriesGraph
         $title = $device->shortDisplayName() . '::' . strtolower(Rewrite::shortenIfName($port->ifDescr));
 
         if ($port->ifAlias != '' && $port->ifAlias != $port->ifDescr) {
-            $title .= '::' . Clean::html($port->ifAlias, []);
+            $title .= '::' . $port->ifAlias;
         }
 
         return $title;
