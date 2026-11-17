@@ -1,19 +1,23 @@
 -- =============================================================================
--- Copyright (c) 2004-2017 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: The EVPN(Ethernet VPN) MIB
 -- Reference:
--- Version: V1.0
+-- Version: V1.1
 -- History:
---   V1.0 2017-10-21 Initial version Created by Jian Chen
+-- V1.1 2022-05-23 Modified by Lei Gao
+--    Add hh3cEvpnRouteMobilityTable and Added nodes hh3cEvpnMacMobilitySup
+--    hh3cEvpnMacMobilitySupClear
+-- V1.0 2017-10-21 Initial version Created by Jian Chen
 -- =============================================================================
 HH3C-EVPN-MIB DEFINITIONS ::= BEGIN
 IMPORTS
-        TruthValue, DisplayString
+        RowStatus, TruthValue, DisplayString
     FROM SNMPv2-TC
         MODULE-IDENTITY,
         OBJECT-TYPE,
-        Unsigned32
+        Unsigned32,
+        NOTIFICATION-TYPE
     FROM SNMPv2-SMI
         InetAddressType,
         InetAddress
@@ -29,7 +33,7 @@ IMPORTS
 -- =============================================================================
 hh3cEvpn MODULE-IDENTITY
     LAST-UPDATED
-        "201710210900Z"        -- Oct 21, 2017 at 09:00 GMT
+        "202205230900Z"        -- May 23, 2022 at 09:00 GMT
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -38,12 +42,23 @@ hh3cEvpn MODULE-IDENTITY
          http://www.h3c.com
          Zip:100085"
     DESCRIPTION
+        "Add hh3cEvpnRouteMobilityTable and Added nodes hh3cEvpnMacMobilitySup
+         hh3cEvpnMacMobilitySupClear"
+    REVISION
+        "202205230900Z"   -- May 23, 2022 at 09:00 GMT
+    DESCRIPTION
         "The EVPN MIB."
     REVISION
         "201710210900Z"   -- Oct 21, 2017 at 09:00 GMT
     DESCRIPTION
         "Initial version."
     ::= { hh3cCommon 173 }
+
+-- =============================================================================
+-- =================== hh3cEvpnMacMobilityNotifications definition =============
+-- =============================================================================
+
+hh3cEvpnMacMobilityNotifications OBJECT IDENTIFIER ::= { hh3cEvpn 0 }
 
 -- =============================================================================
 -- object definition begin
@@ -265,6 +280,98 @@ hh3cEvpnESDFRouterIP    OBJECT-TYPE
 
 -- =============================================================================
 -- End of hh3cEvpnESDFTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cEvpnRouteMobilityTable Definition
+-- =============================================================================
+hh3cEvpnRouteMobilityTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cEvpnRouteMobilityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for the EVPN route mobility suppression information."
+    ::= { hh3cEvpnObjects 4 }
+
+hh3cEvpnRouteMobilityEntry  OBJECT-TYPE
+    SYNTAX      Hh3cEvpnRouteMobilityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides information about an EVPN route mobility entry."
+    INDEX
+    {
+        hh3cEvpnVsiName,
+        hh3cEvpnInstanceName
+    }
+    ::= { hh3cEvpnRouteMobilityTable 1 }
+
+Hh3cEvpnRouteMobilityEntry ::=
+    SEQUENCE
+    {
+        hh3cEvpnVsiName            OCTET STRING,
+        hh3cEvpnInstanceName       OCTET STRING,
+        hh3cEvpnRouteRowStatus     RowStatus
+    }
+
+hh3cEvpnVsiName    OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..31))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "VSI name. The maximum length of a VSI
+         is 31 characters."
+    ::= { hh3cEvpnRouteMobilityEntry 1 }
+
+hh3cEvpnInstanceName    OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..31))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "EVPN instance name. The maximum length of an EVPN instance
+         is 31 characters."
+    ::= { hh3cEvpnRouteMobilityEntry 2 }
+
+hh3cEvpnRouteRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cEvpnRouteMobilityEntry 3 }
+
+-- =============================================================================
+-- End of hh3cEvpnRouteMobilityTable Definition
+-- =============================================================================
+
+-- ==================================================================
+-- hh3cEvpnMacMobilityNotifications Definition
+-- ==================================================================
+hh3cEvpnMacMobilitySup NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cEvpnVsiName,
+            hh3cEvpnInstanceName
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the move count for one or more MAC
+         addresses crosses the threshold for the EVPN instance."
+    ::= { hh3cEvpnMacMobilityNotifications 1 }
+
+hh3cEvpnMacMobilitySupClear NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cEvpnVsiName,
+            hh3cEvpnInstanceName
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the move count for all MAC
+         addresses drops below the threshold for the EVPN instance."
+    ::= { hh3cEvpnMacMobilityNotifications 2 }
+-- =============================================================================
+-- End of hh3cEvpnRouteMacMobilityNotifications Definition
 -- =============================================================================
 
 END

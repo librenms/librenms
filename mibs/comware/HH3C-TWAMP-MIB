@@ -1,21 +1,31 @@
 -- =================================================================
--- Copyright (c) 2019-2020 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2019-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: The MIB is designed to configure the Two-Way Active Measurement Protocol.
 -- Reference:
--- Version: V1.2
+-- Version: V1.5
 -- History:
--- V1.0 2019-06-22, Lv zhanbaobin, Initial Version
--- V1.1 2019-12-04 Modified by zhangzheng
+-- V1.0 2019-06-22, Zhan Baobin, Initial Version
+-- V1.1 2019-12-04 Modified by Zhang Zheng
 --      Add interval10s in hh3cTwamplightSendAdminTxPeriod.
--- V1.2 2020-09-10 Modified by zhanbaobin
+-- V1.2 2020-09-10 Modified by Zhan Baobin
 --      Complement the MIB of TWAMP-light according to the NETCONF.
 --      Contains Hh3cTwamplightClientEntry,hh3cTwamplightReactionTable.
+-- V1.3 2022-06-28 Modified by Du Wei
+--      Complement the MIB of TWAMP-light notifications.
+--      Modify the value range for hh3cTwamplightSendAdminDuration and
+--      hh3cTwamplightSendAdminTimeOut.
+-- V1.4 2022-09-01 Modified by Du Wei
+--      Added hh3cTwampRespSessionNumLimit.
+-- V1.5 2022-12-01 Modified by Du Wei
+--      Added hh3cTwampSenderStartFailure for trap.
+--      Added hh3cTwampRespStartFailure for trap.
+--      Added hh3cTwampStatisticsAbnormal for trap.
 -- =================================================================
 HH3C-TWAMP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE,
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
     Integer32, Gauge32, Unsigned32
         FROM SNMPv2-SMI
     DateAndTime, DisplayString, RowStatus, TruthValue, MacAddress
@@ -27,7 +37,7 @@ IMPORTS
 
 
 hh3cTwamp MODULE-IDENTITY
-    LAST-UPDATED "202009100000Z"
+    LAST-UPDATED "202212010000Z"
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -38,6 +48,19 @@ hh3cTwamp MODULE-IDENTITY
     DESCRIPTION
         "The private MIB file includes the test information of the
         device.  It is to configure the Two-Way Active Measurement Protocol."
+    REVISION "202212010000Z"
+    DESCRIPTION
+        "Added hh3cTwampSenderStartFailure for trap.
+         Added hh3cTwampRespStartFailure for trap.
+         Added hh3cTwampStatisticsAbnormal for trap."
+    REVISION "202209010000Z"
+    DESCRIPTION
+        "Added hh3cTwampRespSessionNumLimit."
+    REVISION "202206280000Z"
+    DESCRIPTION
+        "Complement the MIB of TWAMP-light notifications.
+         Modify the value range for hh3cTwamplightSendAdminDuration and
+         hh3cTwamplightSendAdminTimeOut"
     REVISION "202009100000Z"
     DESCRIPTION
         "Complement the MIB of TWAMP-light according to the NETCONF.  Contains
@@ -49,13 +72,182 @@ hh3cTwamp MODULE-IDENTITY
 
 
 hh3cTwampNotifications OBJECT IDENTIFIER ::= { hh3cTwamp 1 }
+
+hh3cTwampNotification OBJECT IDENTIFIER ::= { hh3cTwampNotifications 0 }
+
+hh3cTwampTwoWayLossExceed NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cTwamplightControllerID,
+            hh3cTwamplightReactItemIndex,
+            hh3cTwamplightReactValue,
+            hh3cTwamplightReactUpperLimit,
+            hh3cTwamplightReactLowerLimit
+         }
+    STATUS current
+    DESCRIPTION
+        "It is generated when the monitored condition is above threshold.
+
+          1. The two-way loss value is not in the range of
+             hh3cTwamplightReactLowerLimit through
+             hh3cTwamplightReactUpperLimit.
+
+        This notification is valid only when hh3cTwamplightReactActionType
+        is 'trapOnly'."
+    ::= { hh3cTwampNotification 1 }
+
+hh3cTwampTwoWayLossRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cTwamplightControllerID,
+            hh3cTwamplightReactItemIndex,
+            hh3cTwamplightReactValue,
+            hh3cTwamplightReactUpperLimit,
+            hh3cTwamplightReactLowerLimit
+         }
+    STATUS current
+    DESCRIPTION
+        "It is generated when the monitored condition is below threshold.
+
+          1. The two-way loss value is in the range of
+             hh3cTwamplightReactLowerLimit through
+             hh3cTwamplightReactUpperLimit.
+
+        This notification is valid only when hh3cTwamplightReactActionType
+        is 'trapOnly'."
+    ::= { hh3cTwampNotification 2 }
+
+hh3cTwampTwoWayDelayExceed NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cTwamplightControllerID,
+            hh3cTwamplightReactItemIndex,
+            hh3cTwamplightReactValue,
+            hh3cTwamplightReactUpperLimit,
+            hh3cTwamplightReactLowerLimit
+         }
+    STATUS current
+    DESCRIPTION
+        "It is generated when the monitored condition is above threshold.
+
+          1. The two-way delay value is not in the range of
+             hh3cTwamplightReactLowerLimit through
+             hh3cTwamplightReactUpperLimit.
+
+        This notification is valid only when hh3cTwamplightReactActionType
+        is 'trapOnly'."
+    ::= { hh3cTwampNotification 3 }
+
+hh3cTwampTwoWayDelayRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cTwamplightControllerID,
+            hh3cTwamplightReactItemIndex,
+            hh3cTwamplightReactValue,
+            hh3cTwamplightReactUpperLimit,
+            hh3cTwamplightReactLowerLimit
+         }
+    STATUS current
+    DESCRIPTION
+        "It is generated when the monitored condition is below threshold.
+
+          1. The two-way delay value is in the range of
+             hh3cTwamplightReactLowerLimit through
+             hh3cTwamplightReactUpperLimit.
+
+        This notification is valid only when hh3cTwamplightReactActionType
+        is 'trapOnly'."
+    ::= { hh3cTwampNotification 4 }
+
+hh3cTwampTwoWayJitterExceed NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cTwamplightControllerID,
+            hh3cTwamplightReactItemIndex,
+            hh3cTwamplightReactValue,
+            hh3cTwamplightReactUpperLimit,
+            hh3cTwamplightReactLowerLimit
+         }
+    STATUS current
+    DESCRIPTION
+        "It is generated when the monitored condition is above threshold.
+
+          1. The two-way jitter value is in the range of
+             hh3cTwamplightReactLowerLimit through
+             hh3cTwamplightReactUpperLimit.
+
+        This notification is valid only when hh3cTwamplightReactActionType
+        is 'trapOnly'."
+    ::= { hh3cTwampNotification 5 }
+
+hh3cTwampTwoWayJitterRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cTwamplightControllerID,
+            hh3cTwamplightReactItemIndex,
+            hh3cTwamplightReactValue,
+            hh3cTwamplightReactUpperLimit,
+            hh3cTwamplightReactLowerLimit
+         }
+    STATUS current
+    DESCRIPTION
+        "It is generated when the monitored condition is below threshold.
+
+          1. The two-way jitter value is in the range of
+             hh3cTwamplightReactLowerLimit through
+             hh3cTwamplightReactUpperLimit.
+
+        This notification is valid only when hh3cTwamplightReactActionType
+        is 'trapOnly'."
+    ::= { hh3cTwampNotification 6 }
+
+hh3cTwampSenderSessionNumLimit NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+        "It is generated when the number of sessions reaches the limit."
+::= { hh3cTwampNotification 7 }
+
+hh3cTwampRespSessionNumLimit NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+        "It is generated when the number of responder sessions reaches the limit."
+    ::= { hh3cTwampNotification 8 }
+
+hh3cTwampSenderStartFailure NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cTwamplightControllerID
+    }
+    STATUS current
+    DESCRIPTION
+        "It is generated when TWAMP Light sender test session failed to start."
+    ::= { hh3cTwampNotification 9 }
+
+hh3cTwampRespStartFailure NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cTwamplightRespID
+    }
+    STATUS current
+    DESCRIPTION
+        "It is generated when TWAMP Light responder test session failed to start."
+    ::= { hh3cTwampNotification 10 }
+
+hh3cTwampStatisticsAbnormal NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cTwamplightControllerID,
+        hh3cTwamplightTWLossSeq
+    }
+    STATUS current
+    DESCRIPTION
+        "It is generated when the number of packets captured for statistics collection is invalid."
+    ::= { hh3cTwampNotification 11 }
+
 hh3cTwamplightObjects OBJECT IDENTIFIER ::= { hh3cTwamp 2 }
 
 hh3cTwamplightController            OBJECT IDENTIFIER ::= { hh3cTwamplightObjects 1 }
 hh3cTwamplightReponsder             OBJECT IDENTIFIER ::= { hh3cTwamplightObjects 2 }
-
-
-
 
 hh3cTwamplightClientEnable OBJECT-TYPE
     SYNTAX      TruthValue
@@ -68,7 +260,6 @@ hh3cTwamplightClientEnable OBJECT-TYPE
     DEFVAL      { false }
     ::= {hh3cTwamplightController 1 }
 
-
 hh3cTwamplightSenderEnable OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
@@ -79,7 +270,6 @@ hh3cTwamplightSenderEnable OBJECT-TYPE
             false: Stop all TWAMP-light test sessions."
     DEFVAL      { false }
     ::= {hh3cTwamplightController 2 }
-
 
 hh3cTwamplightClientTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF Hh3cTwamplightClientEntry
@@ -128,8 +318,8 @@ Hh3cTwamplightClientEntry ::=
     }
 
 hh3cTwamplightControllerID OBJECT-TYPE
-    SYNTAX      Integer32
-    MAX-ACCESS  not-accessible
+    SYNTAX      Integer32 (1..512)
+    MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
        "The session ID of the TWAMP-light test."
@@ -376,7 +566,6 @@ hh3cTwamplightClientBindIfName OBJECT-TYPE
     DEFVAL      { "" }
     ::= { hh3cTwamplightClientEntry 23 }
 
-
 hh3cTwamplightSenderAdminTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF Hh3cTwamplightSenderAdminEntry
     MAX-ACCESS  not-accessible
@@ -421,7 +610,7 @@ hh3cTwamplightSendAdminContinual OBJECT-TYPE
     ::= { hh3cTwamplightSenderAdminEntry 1 }
 
 hh3cTwamplightSendAdminDuration OBJECT-TYPE
-    SYNTAX      Integer32 (60..300)
+    SYNTAX      Integer32 (60..3600)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -455,7 +644,7 @@ hh3cTwamplightSendAdminTxPeriod OBJECT-TYPE
     ::= { hh3cTwamplightSenderAdminEntry 4 }
 
 hh3cTwamplightSendAdminTimeOut OBJECT-TYPE
-    SYNTAX      Integer32 (1..10)
+    SYNTAX      Integer32 (1..60)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -545,8 +734,6 @@ hh3cTwamplightLastStopTime OBJECT-TYPE
     DESCRIPTION
         "Date and time when the last test stopped."
     ::= { hh3cTwamplightSenderStatusEntry 5 }
-
-
 
 hh3cTwamplightTwoWayDelayTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF Hh3cTwamplightTwoWayDelayEntry
@@ -807,7 +994,6 @@ hh3cTwamplightTWTotalErrorCount OBJECT-TYPE
         cycles of a TWAMP-light test."
     ::= { hh3cTwamplightTwoWayLossEntry 7 }
 
-
 hh3cTwamplightSenderLossSeqTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF Hh3cTwamplightSenderLossSeqEntry
     MAX-ACCESS  not-accessible
@@ -882,8 +1068,6 @@ hh3cTwamplightSenderDelaySeqNum OBJECT-TYPE
         "The largest index value in a TWAMP packet delay test session."
     ::= { hh3cTwamplightSendDelaySeqEntry 1 }
 
-
-
 hh3cTwamplightResetStatTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF Hh3cTwamplightResetStatEntry
     MAX-ACCESS  not-accessible
@@ -921,7 +1105,6 @@ hh3cTwamplightResetStatistics OBJECT-TYPE
           all: reset all."
     ::= { hh3cTwamplightResetStatEntry 1 }
 
-
 hh3cTwamplightReactionTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF Hh3cTwamplightReactionEntry
     MAX-ACCESS  not-accessible
@@ -950,12 +1133,13 @@ Hh3cTwamplightReactionEntry ::=
         hh3cTwamplightReactUpperLimit          Unsigned32,
         hh3cTwamplightReactLowerLimit          Unsigned32,
         hh3cTwamplightReactActionType          INTEGER,
-        hh3cTwamplightReactRowStatus           RowStatus
+        hh3cTwamplightReactRowStatus           RowStatus,
+        hh3cTwamplightReactValue               Unsigned32
     }
 
 hh3cTwamplightReactItemIndex OBJECT-TYPE
     SYNTAX      Unsigned32 (1..10)
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
         "The second index of hh3cTwamplightReactionTable, It definitely
@@ -1024,6 +1208,13 @@ hh3cTwamplightReactRowStatus OBJECT-TYPE
         Conventions for SMIv2.'"
     ::= { hh3cTwamplightReactionEntry 6 }
 
+hh3cTwamplightReactValue OBJECT-TYPE
+    SYNTAX Unsigned32 (1..1000000)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "This object defines current value for the monitored element."
+    ::= { hh3cTwamplightReactionEntry 7 }
 
 hh3cTwamplightResponderEnable OBJECT-TYPE
     SYNTAX      TruthValue
@@ -1082,8 +1273,8 @@ Hh3cTwamplightResponderEntry ::=
     }
 
 hh3cTwamplightRespID OBJECT-TYPE
-    SYNTAX      Integer32
-    MAX-ACCESS  not-accessible
+    SYNTAX      Integer32 (1..512)
+    MAX-ACCESS accessible-for-notify
     STATUS      current
     DESCRIPTION
        "TWAMP test session reflector index."
@@ -1188,7 +1379,6 @@ hh3cTwamplightRespRowStatus OBJECT-TYPE
         Conventions for SMIv2.'"
     ::= { hh3cTwamplightResponderEntry 10 }
 
-
 hh3cTwamplightRespSrcIfName OBJECT-TYPE
     SYNTAX      DisplayString (SIZE (0..47))
     MAX-ACCESS  read-create
@@ -1256,3 +1446,4 @@ hh3cTwamplightRespCVlanID OBJECT-TYPE
     ::= { hh3cTwamplightResponderEntry 17 }
 
 END
+

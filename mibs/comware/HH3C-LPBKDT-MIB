@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (C) 2008-2015 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (C) 2008-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Loopback detection MIB
 -- Reference:
--- Version: V1.2
+-- Version: V1.4
 -- History:
 -- V1.0 2008-09-27 Created by LuoXuefang
 -- V1.1 2009-03-30 Added hh3cLpbkdtTrapPerVlanLoopbacked,
@@ -14,6 +14,12 @@
 --                 hh3cLpbkdtPortEntry, hh3cLpbkdtPortIfIndex,
 --                 hh3cLpbkdtPortVlanEnable, hh3cLpbkdtPortAction and
 --                 hh3cLpbkdtPortLoopbacked by ZhangWei.
+-- V1.3 2022-05-27 Added hh3cLpbkdtTrapVsiLoopbacked,
+--                 hh3cLpbkdtTrapVsiRecovered by zhengjun.
+-- V1.4 2022-07-18 Added hh3cLpbkdtTrapActionLOG, hh3cLpbkdtTrapActionLOGClear,
+--                 hh3cLpbkdtTrapActionBlock, hh3cLpbkdtTrapActionBlockClear,
+--                 hh3cLpbkdtTrapActionDown, hh3cLpbkdtTrapActionDownClear
+--                 by zhengjun.
 -- ==================================================================
 HH3C-LPBKDT-MIB DEFINITIONS ::= BEGIN
 
@@ -24,7 +30,7 @@ IMPORTS
         FROM IF-MIB
     VlanId
         FROM Q-BRIDGE-MIB
-    TEXTUAL-CONVENTION, TruthValue
+    TEXTUAL-CONVENTION, TruthValue, DisplayString
         FROM SNMPv2-TC
     OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32
         FROM SNMPv2-SMI
@@ -32,7 +38,7 @@ IMPORTS
         FROM IF-MIB;
 
 hh3cLpbkdt MODULE-IDENTITY
-    LAST-UPDATED "201407261518Z"        -- July 26, 2014 at 15:18 GMT
+    LAST-UPDATED "202207181101Z"        -- July 18, 2022 at 11:01 GMT
     ORGANIZATION "New H3C Technologies Co., Ltd."
     CONTACT-INFO
         "Comware Team New H3C Technologies Co., Ltd.
@@ -42,7 +48,14 @@ hh3cLpbkdt MODULE-IDENTITY
     DESCRIPTION
         "Loops may cause broadcast storms.  The purpose of loopback detection
          is to detect loops on the device and to protect the network."
-
+    REVISION "202207181101Z"
+    DESCRIPTION
+        "Added new trap hh3cLpbkdtTrapActionLOG, hh3cLpbkdtTrapActionLOGClear,
+        hh3cLpbkdtTrapActionBlock, hh3cLpbkdtTrapActionBlockClear,
+        hh3cLpbkdtTrapActionDown, hh3cLpbkdtTrapActionDownClear."
+    REVISION "202205280926Z"
+    DESCRIPTION
+        "Added new trap hh3cLpbkdtTrapVsiLoopbacked, hh3cLpbkdtTrapVsiRecovered."
     REVISION "201407261518Z"
     DESCRIPTION
         "Added new nodes to configure the loop detection."
@@ -112,6 +125,69 @@ hh3cLpbkdtTrapPerVlanRecovered NOTIFICATION-TYPE
         "Trap message is generated when the loop on the interface
          is eliminated in the VLAN."
     ::= { hh3cLpbkdtTrapPrefix 4 }
+
+hh3cLpbkdtTrapVsiLoopbacked NOTIFICATION-TYPE
+    OBJECTS { ifIndex, hh3cLpbkdtACName, hh3cLpbkdtVsiName, hh3cLpbkdtSVlanID, hh3cLpbkdtCVlanID }
+    STATUS current
+    DESCRIPTION
+        "This trap message is generated when an interface is looped in a VSI."
+    ::= { hh3cLpbkdtTrapPrefix 5 }
+
+hh3cLpbkdtTrapVsiRecovered NOTIFICATION-TYPE
+    OBJECTS { ifIndex, hh3cLpbkdtACName, hh3cLpbkdtVsiName }
+    STATUS current
+    DESCRIPTION
+        "This trap message is generated when the loops on a VSI
+         are eliminated."
+    ::= { hh3cLpbkdtTrapPrefix 6 }
+
+hh3cLpbkdtTrapActionLOG NOTIFICATION-TYPE
+    OBJECTS { ifIndex, ifDescr }
+    STATUS current
+    DESCRIPTION
+        "This trap message is generated when the log action is triggered
+         by a loop on an interface."
+    ::= { hh3cLpbkdtTrapPrefix 7 }
+
+hh3cLpbkdtTrapActionLOGClear NOTIFICATION-TYPE
+    OBJECTS { ifIndex, ifDescr }
+    STATUS current
+    DESCRIPTION
+        "This trap message is generated when a loop is removed from an
+         interface when the log action is triggered."
+    ::= { hh3cLpbkdtTrapPrefix 8 }
+
+hh3cLpbkdtTrapActionBlock NOTIFICATION-TYPE
+    OBJECTS { ifIndex, ifDescr }
+    STATUS current
+    DESCRIPTION
+        "This trap message is generated when the block action is triggered
+         by a loop on an interface."
+    ::= { hh3cLpbkdtTrapPrefix 9 }
+
+hh3cLpbkdtTrapActionBlockClear NOTIFICATION-TYPE
+    OBJECTS { ifIndex, ifDescr }
+    STATUS current
+    DESCRIPTION
+        "This trap message is generated when a loop is removed froam an
+         interface where the block is triggered."
+    ::= { hh3cLpbkdtTrapPrefix 10 }
+
+hh3cLpbkdtTrapActionDown NOTIFICATION-TYPE
+    OBJECTS { ifIndex, ifDescr }
+    STATUS current
+    DESCRIPTION
+        "This trap message is generated when the shutdown action triggeded
+         by a loop on an interface."
+    ::= { hh3cLpbkdtTrapPrefix 11 }
+
+hh3cLpbkdtTrapActionDownClear NOTIFICATION-TYPE
+    OBJECTS { ifIndex, ifDescr }
+    STATUS current
+    DESCRIPTION
+        "This trap message is generated when a loop is removed from an interface
+         where the shutdown action is triggered."
+    ::= { hh3cLpbkdtTrapPrefix 12 }
 
 hh3cLpbkdtVlanID OBJECT-TYPE
     SYNTAX      VlanId
@@ -225,5 +301,39 @@ hh3cLpbkdtPortLoopbacked OBJECT-TYPE
     DESCRIPTION
         "Whether the port is looped."
     ::={ hh3cLpbkdtPortEntry 4 }
+
+hh3cLpbkdtTrapOjbects OBJECT IDENTIFIER ::= { hh3cLpbkdtNotifications 1 }
+
+hh3cLpbkdtVsiName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "VSI name."
+    ::= { hh3cLpbkdtTrapOjbects 1 }
+
+hh3cLpbkdtSVlanID OBJECT-TYPE
+    SYNTAX VlanId
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Outer VLAN ID."
+    ::= { hh3cLpbkdtTrapOjbects 2 }
+
+hh3cLpbkdtCVlanID OBJECT-TYPE
+    SYNTAX VlanId
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Inner VLAN ID."
+    ::= { hh3cLpbkdtTrapOjbects 3 }
+
+hh3cLpbkdtACName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Ethernet service instance name."
+    ::= { hh3cLpbkdtTrapOjbects 4 }
 
 END

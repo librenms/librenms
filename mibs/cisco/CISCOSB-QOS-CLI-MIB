@@ -44,22 +44,25 @@ IMPORTS
     Counter64, OBJECT-TYPE                      FROM SNMPv2-SMI
     PortList,VlanId                             FROM Q-BRIDGE-MIB
     VlanList1, VlanList2, VlanList3, VlanList4  FROM CISCOSB-BRIDGEMIBOBJECTS-MIB
-    Percents,switch001                          FROM CISCOSB-MIB
-    StatisticsDPType,StatisticsClearActionType  FROM CISCOSB-POLICY-MIB;
+    StatisticsDPType,StatisticsClearActionType  FROM CISCOSB-POLICY-MIB
+    Percents,switch001                           FROM CISCOSB-MIB;
 
 
 rlQosCliMib MODULE-IDENTITY
-        LAST-UPDATED "200604040001Z"
-        ORGANIZATION "Cisco Systems, Inc."
+        LAST-UPDATED "201707020000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
 
-        CONTACT-INFO
-        "Postal: 170 West Tasman Drive
-        San Jose , CA 95134-1706
-        USA
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
-        
-        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
-
+        DESCRIPTION
+                "The private MIB module definition for Quality Of Service CLI
+                 in CISCOSB devices."
+        REVISION "201707020000Z"
         DESCRIPTION
                  "Added rlQosPolicyMapIsBoundToInterface, rlQosAclIsBoundToInterface"
         REVISION "200602120000Z"
@@ -73,10 +76,6 @@ rlQosCliMib MODULE-IDENTITY
                      rlQosAggregatePolicerStatisticsTable
                      rlQosOutQueueStatisticsTable
                      rlQosGlobalStatisticsCntrsTable."
-        REVISION "200602120000Z"
-        DESCRIPTION
-                "The private MIB module definition for Quality Of Service CLI
-                 in CISCOSB devices."
         REVISION "200602120000Z"
         DESCRIPTION
                  "Editorial changes to support new MIB compilers."
@@ -861,12 +860,13 @@ rlQosAclEntry OBJECT-TYPE
     ::= { rlQosAclTable 1 }
 
 RlQosAclEntry ::= SEQUENCE {
-    rlQosAclIndex               INTEGER,
-    rlQosAclName                DisplayString,
-    rlQosAclType                AclObjectType,
-    rlQosAclStatus              RowStatus,
-    rlQosAclNumOfAces           INTEGER,
-    rlQosAclIsBoundToInterface  TruthValue
+    rlQosAclIndex						INTEGER,
+    rlQosAclName						DisplayString,
+    rlQosAclType						AclObjectType,
+    rlQosAclStatus						RowStatus,
+    rlQosAclNumOfAces			          		INTEGER,
+    rlQosAclIsBoundToInterface			                TruthValue,
+    rlQosAclLastAceIndex                                        INTEGER
     }
 
 rlQosAclIndex OBJECT-TYPE
@@ -920,6 +920,14 @@ rlQosAclIsBoundToInterface OBJECT-TYPE
     DESCRIPTION
        "Indicates whether the ACL is bound to any interface or not."
     ::= { rlQosAclEntry 6 }
+
+rlQosAclLastAceIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "Holds the last ace index in the acl."
+    ::= { rlQosAclEntry 7 }
 
 
 --QoS ACE ACL refernce table
@@ -1216,7 +1224,7 @@ RlQosPolicerEntry ::= SEQUENCE {
     rlQosPolicerName             DisplayString,
     rlQosPolicerType             PolicerType,
     rlQosPolicerCir              Unsigned32,
-    rlQosPolicerCbs              Unsigned32,   
+    rlQosPolicerCbs              Unsigned32,
     rlQosPolicerAction           PolicerAction,
     rlQosPolicerCasPointerRemVal INTEGER,
     rlQosPolicerStatus           RowStatus,
@@ -1304,7 +1312,7 @@ rlQosPolicerPir OBJECT-TYPE
          When both this and rlQosPolicerPbs are 0 this means the mode is Single Rate
          and when they are both non 0 this means the mode is Two Rate."
     ::= { rlQosPolicerEntry 9 }
-    
+
 rlQosPolicerPbs OBJECT-TYPE
     SYNTAX Unsigned32
     UNITS      "bytes"
@@ -1599,7 +1607,7 @@ rlQosAclDefaultAction OBJECT-TYPE
     STATUS current
     DESCRIPTION
         " When one ACL is enterd then what to do for the last rull."
-    ::= { rlQosIfPolicyEntry 12 } 
+    ::= { rlQosIfPolicyEntry 12 }
 
 rlQosIfPolicyMapStatus OBJECT-TYPE
     SYNTAX  RowStatus
@@ -1695,14 +1703,14 @@ rlQosIfIpv6AclOut OBJECT-TYPE
          0 - means no ACL applied."
     DEFVAL {0}
     ::= { rlQosIfPolicyEntry 21 }
-    
+
 rlQosAclDefaultActionOut OBJECT-TYPE
     SYNTAX AclDefaultAction
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
         " When one egress ACL is enterd then what to do for the last rull."
-    ::= { rlQosIfPolicyEntry 22 }       
+    ::= { rlQosIfPolicyEntry 22 }
 
 -- QoS Interface Profile table
 
@@ -1972,7 +1980,7 @@ rlQosRmNewDscp OBJECT-TYPE
     DESCRIPTION
         "Specifies new DSCP in the violation action."
     ::= { rlQosDscpRemarkEntry 2 }
-    
+
 rlQosRmNewExceedDscp OBJECT-TYPE
     SYNTAX INTEGER (0..63)
     MAX-ACCESS read-create
@@ -3728,11 +3736,12 @@ rlQosClearCounters OBJECT-TYPE
       STATUS         current
       DESCRIPTION
            "A Single entry containing Classifier utilization information."
-      INDEX          { rlQosClassifierUtilizationUnitId }
+      INDEX          { rlQosClassifierUtilizationUnitId, rlQosClassifierUtilizationPoolId}
       ::= { rlQosClassifierUtilizationTable 1 }
 
     RlQosClassifierUtilizationEntry ::= SEQUENCE {
       rlQosClassifierUtilizationUnitId            Unsigned32,
+      rlQosClassifierUtilizationPoolId            Unsigned32,
       rlQosClassifierUtilizationPercent           Unsigned32,
       rlQosClassifierUtilizationRulesNumber       Unsigned32,
       rlQosClassifierUtilizationFreeRulesNumber   Unsigned32
@@ -3744,18 +3753,26 @@ rlQosClearCounters OBJECT-TYPE
       STATUS         current
       DESCRIPTION
            "The Unit ID of this Classifier. must be unique per entry.
-            This is an index into the table."
+            This is an index into the table. Main Pool ID is 1."
       ::= { rlQosClassifierUtilizationEntry 1 }
 
+     rlQosClassifierUtilizationPoolId OBJECT-TYPE
+      SYNTAX         Unsigned32  (1..4294967295)
+      MAX-ACCESS     not-accessible
+      STATUS         current
+      DESCRIPTION
+           "The Pool ID of this Classifier.
+            This is an index into the table."
+      ::= { rlQosClassifierUtilizationEntry 2 }
 
     rlQosClassifierUtilizationPercent OBJECT-TYPE
-      SYNTAX         Unsigned32  (0..100)
+      SYNTAX         Unsigned32  (0..100 | 255)
       MAX-ACCESS     read-only
       STATUS         current
       DESCRIPTION
-           "The classifier utilization percentage. "
+           "The classifier utilization percentage. 255(0xFF) represents NA"
       DEFVAL { 0 }
-      ::= { rlQosClassifierUtilizationEntry 2 }
+      ::= { rlQosClassifierUtilizationEntry 3 }
 
    rlQosClassifierUtilizationRulesNumber OBJECT-TYPE
       SYNTAX         Unsigned32  (0..4294967295)
@@ -3764,7 +3781,7 @@ rlQosClearCounters OBJECT-TYPE
       DESCRIPTION
            "The classifier utilization number of used rules, in short rules resolution."
       DEFVAL { 0 }
-      ::= { rlQosClassifierUtilizationEntry 3 }
+      ::= { rlQosClassifierUtilizationEntry 4 }
 
    rlQosClassifierUtilizationFreeRulesNumber OBJECT-TYPE
       SYNTAX         Unsigned32  (0..4294967295)
@@ -3773,7 +3790,7 @@ rlQosClearCounters OBJECT-TYPE
       DESCRIPTION
            "The classifier utilization number of not used yet rules on the unit, in short rules resolution."
       DEFVAL { 0 }
-      ::= { rlQosClassifierUtilizationEntry 4 }
+      ::= { rlQosClassifierUtilizationEntry 5 }
 
 rlQosClassifierUtilizationSystem OBJECT-TYPE
     SYNTAX         Unsigned32  (0..100)
@@ -4267,15 +4284,15 @@ rlQosCosProfileEntry OBJECT-TYPE
     SYNTAX RlQosCosProfileEntry
     MAX-ACCESS not-accessible
     STATUS current
-    DESCRIPTION        "Each entry in this table describes a QoS profile. The indices are 
+    DESCRIPTION        "Each entry in this table describes a QoS profile. The indices are
          Application index, represented by rlQosCosProfileAppIndex
-	 Profile index, represent by rlQosCosProfileIndex 
+	 Profile index, represent by rlQosCosProfileIndex
 	 and CoS represent by rlQosCosProfileCosIndex"
     INDEX { rlQosCosProfileAppIndex, rlQosCosProfileIndex , rlQosCosProfileCosIndex }
     ::= { rlQosCosProfileTable 1 }
 
 RlQosCosProfileEntry::= SEQUENCE {
-	rlQosCosProfileAppIndex     INTEGER,	
+	rlQosCosProfileAppIndex     INTEGER,
         rlQosCosProfileIndex        INTEGER,
         rlQosCosProfileCosIndex     INTEGER,
 	rlQosCosProfileEgressCos    INTEGER,
@@ -4285,14 +4302,14 @@ RlQosCosProfileEntry::= SEQUENCE {
     }
 
 rlQosCosProfileAppIndex OBJECT-TYPE
-    SYNTAX INTEGER 
+    SYNTAX INTEGER
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION        "Application index."
     ::= { rlQosCosProfileEntry 1 }
 
 rlQosCosProfileIndex    OBJECT-TYPE
-    SYNTAX INTEGER 
+    SYNTAX INTEGER
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION        "Profile index per-application."
@@ -4316,7 +4333,7 @@ rlQosCosProfileEgressQueue OBJECT-TYPE
     SYNTAX INTEGER (1..8)
     MAX-ACCESS read-write
     STATUS current
-    DESCRIPTION        
+    DESCRIPTION
         "Traffic class queue assigned to matching packets."
     ::= { rlQosCosProfileEntry 5 }
 
@@ -4354,26 +4371,26 @@ rlQosCosProfileInterfaceEntry OBJECT-TYPE
 
 RlQosCosProfileInterfaceEntry::= SEQUENCE {
 	rlQosCosProfileInterfaceIfIndex             InterfaceIndex,
-	rlQosCosProfileInterfaceAppIndex            INTEGER,	
+	rlQosCosProfileInterfaceAppIndex            INTEGER,
         rlQosCosProfileInterfaceCosProfileIndex     INTEGER
     }
 
 rlQosCosProfileInterfaceIfIndex OBJECT-TYPE
-    SYNTAX InterfaceIndex 
+    SYNTAX InterfaceIndex
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION        "Interface index."
     ::= { rlQosCosProfileInterfaceEntry 1 }
 
 rlQosCosProfileInterfaceAppIndex OBJECT-TYPE
-    SYNTAX INTEGER 
+    SYNTAX INTEGER
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION        "Application index."
     ::= { rlQosCosProfileInterfaceEntry 2 }
 
 rlQosCosProfileInterfaceCosProfileIndex    OBJECT-TYPE
-    SYNTAX INTEGER 
+    SYNTAX INTEGER
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION        "CoS-Profile index per-application."
@@ -4401,7 +4418,7 @@ rlQosAclBoundIfEntry OBJECT-TYPE
     ::= { rlQosAclBoundIfTable 1 }
 
 RlQosAclBoundIfEntry ::= SEQUENCE {
-    rlQosAclBoundIfAclId			      INTEGER,        
+    rlQosAclBoundIfAclId			      INTEGER,
 	rlQosAclBoundedIfPortsList			  PortList,
 	rlQosAclBoundedIfVlansList1to1024     VlanList1,
     rlQosAclBoundedIfVlansList1025to2048  VlanList2,
@@ -4420,11 +4437,11 @@ rlQosAclBoundIfAclId OBJECT-TYPE
 rlQosAclBoundedIfPortsList OBJECT-TYPE
     SYNTAX PortList
     MAX-ACCESS read-only
-    STATUS current  
+    STATUS current
     DESCRIPTION
        "Ports list bounded to Acl "
     ::= { rlQosAclBoundIfEntry 2 }
- 
+
 rlQosAclBoundedIfVlansList1to1024 OBJECT-TYPE
    SYNTAX      VlanList1
    MAX-ACCESS  read-only

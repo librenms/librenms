@@ -1,32 +1,32 @@
 -- =================================================================
--- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: Power over ethernet extend MIB
 -- Reference: POWER-ETHERNET-MIB
--- Version: V1.7
+-- Version: V1.8
 -- History:
 --   V1.0 2004-07-24 Created by Gaolong
 --   V1.1 2004-09-08 Update file by Gaolong for some syntax errors.
 --   V1.2 2004-11-19 Update file by liuhongxu for poe need.
---                   add hh3cMainPsePriorityMode、hh3cPsePowerMaxValue、
+--                   Added hh3cMainPsePriorityMode、hh3cPsePowerMaxValue、
 --                   hh3cpsePDChangNotification adjust the objects' sequence of
 --                   hh3cPsePortTable and hh3cMainPseTable add the description
 --                   of MANDATORY-GROUPS in hh3cPseCompliance.
 --   V1.3 2004-12-16 Update file by liuhongxu for poe profile
---                   add hh3cPsePortProfile, hh3cPseProfilesTable
+--                   Added hh3cPsePortProfile, hh3cPseProfilesTable
 --                   change the name of hh3cPseProfileIndex add
 --                   hh3cPseProfileApplyNum.  adjust the format of this mib.
 --   V1.4 2005-03-29 Update file by Wangzhaoyan for poe pow need.
---                   add hh3cPOEPowerObjects, hh3cPOEThresholdLimitObjs,
+--                   Added hh3cPOEPowerObjects, hh3cPOEThresholdLimitObjs,
 --                   hh3cPOESupModuleInfoObjs, hh3cPOEDCOutStateObjects,
 --                   hh3cPOEDCDCOutInfoObjects, hh3cPOEACSwitchStateModuleObjs,
 --                   hh3cPOEInCurStateObjects, hh3cPOEAlarmStateObjects and the
---                   sub-nodes.  add 17 traps change the node name from
+--                   sub-nodes.  Added 17 traps change the node name from
 --                   hh3cpsePDChangNotification to hh3cpsePDChangeNotification
 --                   change some detail as the suggestion from Wangyingxia and
 --                   Yangyang.  adjust the format of this mib.
 --   V1.5 2005-11-21 Update file by Liweizhen for controling the power-management
---                   policy of PSE or PD.  Add hh3cPsePolicyMode, hh3cPDPolicyMode,
+--                   policy of PSE or PD.  Added hh3cPsePolicyMode, hh3cPDPolicyMode,
 --                   hh3cMainPsePowerPriority.
 --                   Delete some description of hh3cPsePortProfileIndex node.
 --                   Change the description of hh3cPseProfilePowerMode node.
@@ -36,9 +36,13 @@
 --                   Adjust the format of this mib.
 --   V1.6 2015-07-21 Update file by Fangliwen for profile power limit.
 --                   Change the syntax of hh3cPseProfilePowerLimit node.
---   V1.7 2019-5-23  Update file for PoE-AI. Add the following nodes:
+--   V1.7 2019-5-23  Update file for PoE-AI. Added the following nodes:
 --                   hh3cPsePDDisableNotification,hh3cPsePortGroupIndex,
 --                   hh3cPsePortIndex and hh3cPsePortDisableInfo.
+--   V1.8 2021-7-23  Update file for PoE-track. Added the following nodes:
+--                   hh3cPOETrackNotification, and hh3cPsePortTrackAction.
+--        2022-07-22 Added hh3cPOEPortName, hh3cPOEPdClassInvalid,
+--                   hh3cPOEPdClassOvercurrent, and hh3cPOEPdPowerOvercurrent.
 -- =================================================================
 HH3C-POWER-ETH-EXT-MIB DEFINITIONS ::= BEGIN
 
@@ -57,7 +61,7 @@ IMPORTS
 
 
 hh3cPowerEthernetExt MODULE-IDENTITY
-      LAST-UPDATED "201905230000Z"      -- May 23, 2019 at 00:00 GMT
+      LAST-UPDATED "202207220000Z"      -- Jul 22, 2022 at 00:00 GMT
 
       ORGANIZATION
           "New H3C Tech. Co., Ltd."
@@ -69,11 +73,21 @@ hh3cPowerEthernetExt MODULE-IDENTITY
           "
       DESCRIPTION
               "Description."
+      REVISION "202207220000Z"
+      DESCRIPTION
+          "Added hh3cPOEPortName,
+           hh3cPOEPdClassInvalid,
+           hh3cPOEPdClassOvercurrent,
+           and hh3cPOEPdPowerOvercurrent."
+      REVISION "202107230000Z"
+      DESCRIPTION
+          "Added the following nodes:
+           hh3cPOETrackNotification, and hh3cPsePortTrackAction."
       REVISION "201905230000Z"
       DESCRIPTION
-          "Add the following nodes:
+          "Added the following nodes:
           hh3cPsePDDisableNotification,hh3cPsePortGroupIndex,
-          hh3cPsePortIndex and hh3cPsePortDisableInfo."
+          hh3cPsePortIndex, and hh3cPsePortDisableInfo."
       REVISION      "201507250000Z"
       DESCRIPTION
           "The initial version of this MIB module."
@@ -128,7 +142,9 @@ Hh3cPsePortEntry ::=
               hh3cPsePortPowerLimit
                       Integer32,
               hh3cPsePortProfileIndex
-                      Integer32
+                      Integer32,
+              hh3cPsePortTrackAction
+                      INTEGER
       }
 
 hh3cPsePortFaultDescription OBJECT-TYPE
@@ -215,6 +231,21 @@ hh3cPsePortProfileIndex OBJECT-TYPE
              of rfc3621-Power-Ethernet.mib."
       ::= { hh3cPsePortEntry 7 }
 
+hh3cPsePortTrackAction OBJECT-TYPE
+       SYNTAX     INTEGER {
+              none(0),
+              alarm(1),
+              alarmRebootPD(2)
+              }
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION
+             "Action taken when the state of the track entry associated with
+              the PoE port changes from positive to negative.
+              none(0):None.
+              alarm(1):Outputs alarm information.
+              alarmRebootPD(2):Outputs alarm information and restarts the PD."
+      ::= { hh3cPsePortEntry 8 }
 
 hh3cMainPseTable OBJECT-TYPE
       SYNTAX SEQUENCE OF Hh3cMainPseEntry
@@ -567,6 +598,14 @@ hh3cPDPolicyMode OBJECT-TYPE
              value of this object is disabled(1)."
       ::= { hh3cPowerEthernetExt 10 }
 
+hh3cPOEPortName OBJECT-TYPE
+      SYNTAX     DisplayString (SIZE(1..15))
+      MAX-ACCESS accessible-for-notify
+      STATUS     current
+      DESCRIPTION
+          "PoE-capable interface name."
+      ::= { hh3cPowerEthernetExt 12 }
+
 hh3cpseportNotification  OBJECT IDENTIFIER ::= { hh3cPowerEthernetExt 6 }
 
 -- Notification  Control  Objects
@@ -703,6 +742,45 @@ hh3cPOEShutdownNotification NOTIFICATION-TYPE
       DESCRIPTION
              "This notification indicates the whole POE power has been shutdown."
       ::= { hh3cpseportNotification 18 }
+
+hh3cPOETrackNotification NOTIFICATION-TYPE
+      OBJECTS { hh3cPsePortTrackAction }
+      STATUS current
+      DESCRIPTION
+             "This notification indicates that the PD attached to the PoE port
+              is unreachable"
+      ::= { hh3cpseportNotification 19 }
+
+hh3cPOEPdClassInvalid NOTIFICATION-TYPE
+      OBJECTS
+          {
+              hh3cPOEPortName
+          }
+      STATUS current
+      DESCRIPTION
+          "This notification is generated when an invalid class of PD is detected on a PoE-capable interface."
+      ::= { hh3cpseportNotification 20 }
+
+hh3cPOEPdClassOvercurrent NOTIFICATION-TYPE
+      OBJECTS
+          {
+              hh3cPOEPortName
+          }
+      STATUS current
+      DESCRIPTION
+          "This notification is generated when an overloaded class of PD is detected on a PoE-capable interface."
+      ::= { hh3cpseportNotification 21 }
+
+hh3cPOEPdPowerOvercurrent NOTIFICATION-TYPE
+      OBJECTS
+          {
+              hh3cPOEPortName
+          }
+      STATUS current
+      DESCRIPTION
+          "This notification is generated when the power of a PD is overloaded."
+      ::= { hh3cpseportNotification 22 }
+
 hh3cPseComformance OBJECT IDENTIFIER ::= { hh3cPowerEthernetExt 4 }
 
 hh3cPseCompliances OBJECT IDENTIFIER ::= { hh3cPseComformance 1 }

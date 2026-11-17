@@ -1,18 +1,21 @@
 --  =============================================================================
---  Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+--  Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 --  Description: This MIB module contains managed object definitions for
 --               Border Gateway Protocol (BGP) Virtual Private Networks (VPNs).
 --  Reference:
---  Version: V1.0
+--  Version: V1.2
 --  History:
 --    V1.0 2021-02-04 Initial version Created by Yueyongxia
+--    V1.1 2021-06-04 Add mib table items by Wangchao
+--    V1.2 2022-08-18 Add Hh3cBgpAFI and Hh3cBgpSAFI items and a trap node
+--                    hh3cBgpPeerGRStatusChange by Baisong
 --  =============================================================================
 HH3C-BGP-VPN-MIB DEFINITIONS ::= BEGIN
 
     IMPORTS
         OBJECT-TYPE, MODULE-IDENTITY,
-        Unsigned32, Counter32
+        Unsigned32, Counter32, Gauge32, Integer32, NOTIFICATION-TYPE
             FROM SNMPv2-SMI
         TEXTUAL-CONVENTION
             FROM SNMPv2-TC
@@ -25,7 +28,7 @@ HH3C-BGP-VPN-MIB DEFINITIONS ::= BEGIN
 --  module identity part
 --  =============================================================================
 hh3cBgpVpn MODULE-IDENTITY
-    LAST-UPDATED "202102040000Z"        -- Feb 04, 2021 at 00:00 GMT
+    LAST-UPDATED "202208180000Z"        -- Aug 18, 2022 at 00:00 GMT
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -36,6 +39,13 @@ hh3cBgpVpn MODULE-IDENTITY
     DESCRIPTION
         "The MIB module for management of Border Gateway Protocol (BGP)
          Virtual Private Networks (VPNs)."
+    REVISION "202208180000Z"            -- Aug 18, 2022 at 00:00 GMT
+    DESCRIPTION
+        "Add a new trap hh3cBgpPeerGRStatusChange, in addition,
+         modify Hh3cBgpAFI and Hh3cBgpSAFI."
+    REVISION "202106040000Z"            -- Jun 04, 2021 at 00:00 GMT
+    DESCRIPTION
+        "Add some MIB nodes and trap nodes for hh3cBgpVpn."
     REVISION "202102040000Z"            -- Feb 04, 2021 at 00:00 GMT
     DESCRIPTION
         "Update"
@@ -52,7 +62,8 @@ Hh3cBgpAFI ::= TEXTUAL-CONVENTION
                 ipv4(1),
                 ipv6(2),
                 l2vpn(25),
-                l2vpnDraft(196)
+                l2vpnDraft(196),
+                dedicated(6000)
                 }
 
 Hh3cBgpSAFI ::= TEXTUAL-CONVENTION
@@ -69,7 +80,8 @@ Hh3cBgpSAFI ::= TEXTUAL-CONVENTION
                 mdt(66),
                 evpn(70),
                 vpn(128),
-                routeTarget(132)
+                routeTarget(132),
+                dedicated(255)
                 }
 
 Hh3cBgpVpnId ::= TEXTUAL-CONVENTION
@@ -95,10 +107,11 @@ Hh3cBgpVpnId ::= TEXTUAL-CONVENTION
 --  hh3cBgpVpnObjects definition begin
 --  =============================================================================
 hh3cBgpVpnObjects OBJECT IDENTIFIER ::= { hh3cBgpVpn 1 }
-hh3cBgpPeers   OBJECT IDENTIFIER ::= { hh3cBgpVpnObjects 1 }
--- =============================================================================
--- hh3cBgpPeerAddrFamilyTable Definition
--- =============================================================================
+hh3cBgpPeers      OBJECT IDENTIFIER ::= { hh3cBgpVpnObjects 1 }
+hh3cBgpVpnRoute   OBJECT IDENTIFIER ::= { hh3cBgpVpnObjects 2 }
+--  =============================================================================
+--  hh3cBgpPeerAddrFamilyTable Definition
+--  =============================================================================
 hh3cBgpPeerAddrFamilyTable OBJECT-TYPE
     SYNTAX SEQUENCE OF Hh3cBgpPeerAddrFamilyEntry
     MAX-ACCESS not-accessible
@@ -191,10 +204,209 @@ hh3cBgpPeerVpnName OBJECT-TYPE
         "The human-readable name of this VPN.  This MAY
          be equivalent to the RFC2685 VPN-ID."
     ::= { hh3cBgpPeerAddrFamilyEntry 7 }
+--  =============================================================================
+--  hh3cBgpPeerTable   Definition
+--  =============================================================================
+hh3cBgpPeerTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF Hh3cBgpPeerEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+         "BGP Peer Table.
+         This table contains information about the connections for BGP peers."
+     ::= { hh3cBgpPeers 2 }
 
--- =============================================================================
--- hh3cBgpPeerRouteTable Definition
--- =============================================================================
+hh3cBgpPeerEntry OBJECT-TYPE
+     SYNTAX Hh3cBgpPeerEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+         "The information about the connections with BGP peers."
+     INDEX {
+            hh3cBgpPeerInstanceId,
+            hh3cBgpPeerVpnIndex,
+            hh3cBgpPeerAddrFamilyId,
+            hh3cBgpPeerSubAddrFamilyId,
+            hh3cBgpPeerType,
+            hh3cBgpPeerIPAddr
+          }
+     ::= { hh3cBgpPeerTable 1 }
+
+Hh3cBgpPeerEntry ::= SEQUENCE {
+    hh3cBgpPeerNegotiatedVersion     Unsigned32,
+    hh3cBgpPeerRemoteAs              Unsigned32,
+    hh3cBgpPeerRemoteAddr            InetAddress,
+    hh3cBgpPeerState                 INTEGER,
+    hh3cBgpPeerFsmEstablishedCounter Unsigned32,
+    hh3cBgpPeerFsmEstablishedTime    Gauge32,
+    hh3cBgpPeerGRStatus              INTEGER,
+    hh3cBgpPeerLastError             OCTET STRING,
+    hh3cBgpPeerUnAvaiReason          INTEGER,
+    hh3cBgpPeerAdminStatus           INTEGER
+    }
+
+hh3cBgpPeerNegotiatedVersion OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "The version negotiated with the remote BGP peer."
+    ::= { hh3cBgpPeerEntry 1 }
+
+hh3cBgpPeerRemoteAs OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The AS number of the remote BGP peer."
+    ::= { hh3cBgpPeerEntry 2 }
+
+
+hh3cBgpPeerRemoteAddr OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IP address of the remote BGP peer."
+    ::= { hh3cBgpPeerEntry 3 }
+
+hh3cBgpPeerState OBJECT-TYPE
+     SYNTAX INTEGER
+     {
+         idle(1),
+         connect(2),
+         active(3),
+         openSent(4),
+         openConfirm(5),
+         established(6)
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+           "The status of the remote BGP peer, including:
+            1: Idle(1)
+            2: Connect(2)
+            3: Active(3)
+            4: OpenSent(4)
+            5: OpenConfirm(5)
+            6: Established(6)"
+      ::= { hh3cBgpPeerEntry 4 }
+
+hh3cBgpPeerFsmEstablishedCounter OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+          "The Counter That Records the Times the Remote BGP Peer Is Correctly Connected
+          The counter is increased by one if the remote BGP peer is correctly connected once.
+          The counter could be set to zero."
+      ::= { hh3cBgpPeerEntry 5 }
+
+hh3cBgpPeerFsmEstablishedTime OBJECT-TYPE
+      SYNTAX Gauge32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The counter that records the times the remote BGP peer is correctly connected."
+      ::= { hh3cBgpPeerEntry 6 }
+
+hh3cBgpPeerGRStatus OBJECT-TYPE
+      SYNTAX INTEGER
+          {
+             peerNotBeingHelped(1),
+             peerRestarting(2),
+             peerFinishRestart(3),
+             peerHelping(4)
+          }
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION
+          "Graceful restart status of the BGP peer, including:
+          1: peerNotBeingHelped, indicating that the BGP peer will not be helped during restarting.
+          2: peerRestarting, indicating that the BGP peer is detected restarting.
+          3: peerFinishRestart, indicating that the BGP peer finishes the latest GR.
+          4: peerHelping, indicating that the BGP peer is helping the local end to perform GR."
+      ::= { hh3cBgpPeerEntry 7 }
+
+hh3cBgpPeerLastError OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE (0..31))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The last error code and subcode seen by this
+          peer on this connection.  If no error has
+          occurred, this field is zero.  Otherwise, the
+          first byte of this two byte OCTET STRING
+          contains the error code, and the second byte
+          contains the subcode."
+      ::= { hh3cBgpPeerEntry 8 }
+
+hh3cBgpPeerUnAvaiReason OBJECT-TYPE
+     SYNTAX INTEGER
+     {
+          otherErrCode(1),
+          errSubCodeUnspecified(2),
+          unknownErrSubcode(3),
+          connectionNoSynchronized(4),
+          badMessageLength(5),
+          badMessageType(6),
+          unsupportedVersionNumber(7),
+          badPeerAS(8),
+          badBGPIdentifier(9),
+          unsupportedOptionalParameter(10),
+          authenticationFailure(11),
+          unacceptableHoldTime(12),
+          unsupportedCapability(13),
+          malformedAttributeList(14),
+          unrecognizedWellknownAttr(15),
+          missingWellknownAttribute(16),
+          attributeFlagsError(17),
+          attributeLengthError(18),
+          invalidORIGINAttribute(19),
+          asRoutingLoop(20),
+          invalidNEXTHOPAttribute(21),
+          optionalAttributeError(22),
+          invalidNetworkField(23),
+          malformedASPATH(24),
+          receiveUnexpectedMessageinOpenSent(25),
+          receiveUnexpectedMessageinOpenConfirm(26),
+          receiveUnexpectedMessageinEstablished(27),
+          maximumNumberofPrefixesReached(28),
+          administrativeShutdown(29),
+          peerDeconfigured(30),
+          administrativeReset(31),
+          connectionRejected(32),
+          otherConfigurationChange(33),
+          connectionCollisionResolution(34),
+          outofResources(35)
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The reason of BGP states change."
+      ::= { hh3cBgpPeerEntry 9 }
+
+hh3cBgpPeerAdminStatus OBJECT-TYPE
+      SYNTAX     INTEGER {
+          stop(1),
+          start(2)
+          }
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+          "The desired state of the BGP connection.
+          A transition from 'stop' to 'start' will
+          cause the BGP Start Event to be generated.
+          A transition from 'start' to 'stop' will
+          cause the BGP Stop Event to be generated.
+          This parameter can be used to restart BGP
+          peer connections.  Care should be used in
+          providing write access to this object
+          without adequate authentication."
+       ::= { hh3cBgpPeerEntry 10 }
+--  =============================================================================
+--  hh3cBgpPeerRouteTable Definition
+--  =============================================================================
 hh3cBgpPeerRouteTable OBJECT-TYPE
     SYNTAX SEQUENCE OF Hh3cBgpPeerRouteEntry
     MAX-ACCESS not-accessible
@@ -249,10 +461,821 @@ hh3cBgpPeerRouteAdvCount OBJECT-TYPE
     DESCRIPTION
         "Denotes the number of routes sent to the BGP peer."
     ::= { hh3cBgpPeerRouteEntry 3 }
+--  =============================================================================
+--  hh3cBgpPeerConfigTable Definition
+--  =============================================================================
+hh3cBgpPeerConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cBgpPeerConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is BGP peer configuration table, it contains configuration
+        information of BGP peers."
+    ::= { hh3cBgpPeers 4 }
+
+hh3cBgpPeerConfigEntry OBJECT-TYPE
+    SYNTAX Hh3cBgpPeerConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Denotes the configurations of BGP peers."
+    INDEX {
+            hh3cBgpPeerInstanceId,
+            hh3cBgpPeerVpnIndex,
+            hh3cBgpPeerAddrFamilyId,
+            hh3cBgpPeerSubAddrFamilyId,
+            hh3cBgpPeerType,
+            hh3cBgpPeerIPAddr
+          }
+    ::= { hh3cBgpPeerConfigTable 1 }
+
+Hh3cBgpPeerConfigEntry ::= SEQUENCE {
+    hh3cBgpPeerConfigRouteLimitNum       Unsigned32,
+    hh3cBgpPeerConfigRouteLimitThreshold Unsigned32
+}
+
+hh3cBgpPeerConfigRouteLimitNum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Denotes the maximum routes received from the BGP peer."
+    ::= { hh3cBgpPeerConfigEntry 1 }
+
+hh3cBgpPeerConfigRouteLimitThreshold OBJECT-TYPE
+    SYNTAX Unsigned32 (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Denotes the alarm threshold (%) of the maximum routes received from the BGP peer."
+    ::= { hh3cBgpPeerConfigEntry 2 }
+
+--  =============================================================================
+--  hh3cBgpPeerStatisticTable Definition
+--  =============================================================================
+
+hh3cBgpPeerStatisticTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cBgpPeerStatisticEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "BGP neighbor statistic table.which contains BGP neighbor connection information,
+        and each BGP neighbor corresponds to a table item."
+    ::= { hh3cBgpPeers 5 }
+
+hh3cBgpPeerStatisticEntry OBJECT-TYPE
+    SYNTAX Hh3cBgpPeerStatisticEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing connection information with a BGP peer."
+    INDEX {
+            hh3cBgpPeerProcessId,
+            hh3cBgpPeerVrfInstanceId,
+            hh3cBgpPeerAddr
+          }
+    ::= { hh3cBgpPeerStatisticTable 1 }
+
+Hh3cBgpPeerStatisticEntry ::= SEQUENCE {
+    hh3cBgpPeerProcessId                      Unsigned32,
+    hh3cBgpPeerVrfInstanceId                Unsigned32,
+    hh3cBgpPeerAddr                       InetAddress,
+    hh3cBgpPeerFsmEstablishedTransitions      Counter32,
+    hh3cBgpPeerDownCounts                 Counter32,
+    hh3cBgpPeerInUpdateMsgs               Counter32,
+    hh3cBgpPeerOutUpdateMsgs              Counter32,
+    hh3cBgpPeerInTotalMsgs                Counter32,
+    hh3cBgpPeerOutTotalMsgs               Counter32
+}
+
+hh3cBgpPeerProcessId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The process ID of the BGP instance."
+    ::= { hh3cBgpPeerStatisticEntry 1 }
+
+hh3cBgpPeerVrfInstanceId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "VPN instance ID index of remote BGP peer."
+    ::= { hh3cBgpPeerStatisticEntry 2 }
+
+hh3cBgpPeerAddr OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The IP address of the BGP neighbor."
+    ::= { hh3cBgpPeerStatisticEntry 3 }
+
+hh3cBgpPeerFsmEstablishedTransitions OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "BGP FSM migrates to the established state count."
+    ::= { hh3cBgpPeerStatisticEntry 4 }
+
+hh3cBgpPeerDownCounts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Based on peer BGP FSM migration from established to non-established state count."
+    ::= { hh3cBgpPeerStatisticEntry 5 }
+
+hh3cBgpPeerInUpdateMsgs OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of Update messages received from BGP neighbors."
+    ::= { hh3cBgpPeerStatisticEntry 6 }
+
+hh3cBgpPeerOutUpdateMsgs OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of Update messages sent to BGP neighbors."
+    ::= { hh3cBgpPeerStatisticEntry 7 }
+
+hh3cBgpPeerInTotalMsgs OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of all packets received from BGP neighbors."
+    ::= { hh3cBgpPeerStatisticEntry 8 }
+
+hh3cBgpPeerOutTotalMsgs OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of all packets sent to BGP neighbors."
+    ::= { hh3cBgpPeerStatisticEntry 9 }
+
+--  =============================================================================
+--  hh3cBgpPeerSessionTable Definition
+--  =============================================================================
+hh3cBgpPeerSessionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cBgpPeerSessionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "BGP Peer Session Table.
+        This table contains BGP peer session informations."
+    ::= { hh3cBgpPeers 6 }
+
+hh3cBgpPeerSessionEntry OBJECT-TYPE
+    SYNTAX Hh3cBgpPeerSessionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The information about the BGP peer sessions."
+    INDEX {
+             hh3cBgpPeerSessionVrfId,
+             hh3cBgpPeerSessionRemoteAddrType,
+             hh3cBgpPeerSessionRemoteAddr
+           }
+    ::= { hh3cBgpPeerSessionTable 1 }
+
+Hh3cBgpPeerSessionEntry ::= SEQUENCE {
+    hh3cBgpPeerSessionVrfId             Unsigned32,
+    hh3cBgpPeerSessionRemoteAddrType    InetAddressType,
+    hh3cBgpPeerSessionRemoteAddr        InetAddress,
+    hh3cBgpPeerSessionRemotePort        Integer32,
+    hh3cBgpPeerSessionLocalAddrType     InetAddressType,
+    hh3cBgpPeerSessionLocalAddr         InetAddress,
+    hh3cBgpPeerSessionLocalPort         Integer32,
+    hh3cBgpPeerSessionUnavailableType   INTEGER,
+    hh3cBgpPeerSessionLocalIfName       OCTET STRING,
+    hh3cBgpPeerSessionReason            INTEGER,
+    hh3cBgpPeerSessionVrfName           OCTET STRING
+}
+
+hh3cBgpPeerSessionVrfId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The VPN instance Id of the remote BGP peer."
+    ::= { hh3cBgpPeerSessionEntry 1 }
+
+hh3cBgpPeerSessionRemoteAddrType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "BGP peer session remote address type."
+    ::= { hh3cBgpPeerSessionEntry 2 }
+
+hh3cBgpPeerSessionRemoteAddr OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "BGP peer session remote address."
+    ::= { hh3cBgpPeerSessionEntry 3 }
+
+hh3cBgpPeerSessionRemotePort OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The remote port for BGP peers."
+    ::= { hh3cBgpPeerSessionEntry 4 }
+
+hh3cBgpPeerSessionLocalAddrType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "BGP peer session local address type."
+    ::= { hh3cBgpPeerSessionEntry 5 }
+
+hh3cBgpPeerSessionLocalAddr OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "BGP peer session local address."
+    ::= { hh3cBgpPeerSessionEntry 6 }
+
+hh3cBgpPeerSessionLocalPort OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The local port for BGP peers."
+    ::= { hh3cBgpPeerSessionEntry 7 }
+
+hh3cBgpPeerSessionUnavailableType OBJECT-TYPE
+    SYNTAX INTEGER {
+                upToDown(1),
+                alwaysDown(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "BGP peer unavailable type including:
+        1: Up To Down(1)
+        2: Always Down(2)"
+    ::= { hh3cBgpPeerSessionEntry 8 }
+
+hh3cBgpPeerSessionLocalIfName OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "BGP peer session local IFName."
+    ::= { hh3cBgpPeerSessionEntry 9 }
+
+hh3cBgpPeerSessionReason OBJECT-TYPE
+    SYNTAX INTEGER {
+          otherErrCode(1),
+          errSubCodeUnspecified(2),
+          unknownErrSubcode(3),
+          connectionNoSynchronized(4),
+          badMessageLength(5),
+          badMessageType(6),
+          unsupportedVersionNumber(7),
+          badPeerAS(8),
+          badBGPIdentifier(9),
+          unsupportedOptionalParameter(10),
+          authenticationFailure(11),
+          unacceptableHoldTime(12),
+          unsupportedCapability(13),
+          malformedAttributeList(14),
+          unrecognizedWellknownAttr(15),
+          missingWellknownAttribute(16),
+          attributeFlagsError(17),
+          attributeLengthError(18),
+          invalidORIGINAttribute(19),
+          asRoutingLoop(20),
+          invalidNEXTHOPAttribute(21),
+          optionalAttributeError(22),
+          invalidNetworkField(23),
+          malformedASPATH(24),
+          receiveUnexpectedMessageinOpenSent(25),
+          receiveUnexpectedMessageinOpenConfirm(26),
+          receiveUnexpectedMessageinEstablished(27),
+          maximumNumberofPrefixesReached(28),
+          administrativeShutdown(29),
+          peerDeconfigured(30),
+          administrativeReset(31),
+          connectionRejected(32),
+          otherConfigurationChange(33),
+          connectionCollisionResolution(34),
+          outofResources(35)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The reason of BGP states change."
+    ::= { hh3cBgpPeerSessionEntry 10 }
+
+hh3cBgpPeerSessionVrfName OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE (0..31))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of the VPN instance."
+    ::= { hh3cBgpPeerSessionEntry 11 }
+--  =============================================================================
+--  hh3cBgpPeerMessageTable Definition
+--  =============================================================================
+hh3cBgpPeerMessageTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cBgpPeerMessageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Protocol Packet data Table for BGP Peers.
+        This table contains information about the protocol packet data of BGP peers."
+    ::= { hh3cBgpPeers 7 }
+
+hh3cBgpPeerMessageEntry OBJECT-TYPE
+    SYNTAX Hh3cBgpPeerMessageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The information about the protocol packet data of the BGP peers."
+    INDEX {
+            hh3cBgpPeerInstanceId,
+            hh3cBgpPeerVpnIndex,
+            hh3cBgpPeerAddrFamilyId,
+            hh3cBgpPeerSubAddrFamilyId,
+            hh3cBgpPeerType,
+            hh3cBgpPeerIPAddr
+          }
+    ::= { hh3cBgpPeerMessageTable 1 }
+
+Hh3cBgpPeerMessageEntry ::= SEQUENCE {
+    hh3cBgpPeerInTotalMsgCounter         Counter32,
+    hh3cBgpPeerOutTotalMsgCounter        Counter32,
+    hh3cBgpPeerInOpenMsgCounter          Counter32,
+    hh3cBgpPeerInUpdateMsgCounter        Counter32,
+    hh3cBgpPeerInNotificationMsgCounter  Counter32,
+    hh3cBgpPeerInKeepAliveMsgCounter     Counter32,
+    hh3cBgpPeerInRouteFreshMsgCounter    Counter32,
+    hh3cBgpPeerOutOpenMsgCounter         Counter32,
+    hh3cBgpPeerOutUpdateMsgCounter       Counter32,
+    hh3cBgpPeerOutNotificationMsgCounter Counter32,
+    hh3cBgpPeerOutKeepAliveMsgCounter    Counter32,
+    hh3cBgpPeerOutRouteFreshMsgCounter   Counter32
+}
+
+hh3cBgpPeerInTotalMsgCounter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of protocol packet data received from the remote BGP peer."
+    ::= { hh3cBgpPeerMessageEntry 1 }
+
+hh3cBgpPeerOutTotalMsgCounter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of protocol packet data sent to the remote BGP peer."
+    ::= { hh3cBgpPeerMessageEntry 2 }
+
+hh3cBgpPeerInOpenMsgCounter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of Open packet data received from the remote BGP peer."
+    ::= { hh3cBgpPeerMessageEntry 3 }
+
+hh3cBgpPeerInUpdateMsgCounter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of Update packet data received from the remote BGP peer."
+    ::= { hh3cBgpPeerMessageEntry 4 }
+
+hh3cBgpPeerInNotificationMsgCounter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of Notification packet data received from the remote BGP peer."
+    ::= { hh3cBgpPeerMessageEntry 5 }
+
+hh3cBgpPeerInKeepAliveMsgCounter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of Keepalive packet data received from the remote BGP peer."
+    ::= { hh3cBgpPeerMessageEntry 6 }
+
+hh3cBgpPeerInRouteFreshMsgCounter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of Route-Refresh packet data received from the remote BGP peer."
+    ::= { hh3cBgpPeerMessageEntry 7 }
+
+hh3cBgpPeerOutOpenMsgCounter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of Open packet data sent to the remote BGP peer."
+    ::= { hh3cBgpPeerMessageEntry 8 }
+
+hh3cBgpPeerOutUpdateMsgCounter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of Update packet data sent to the remote BGP peer."
+    ::= { hh3cBgpPeerMessageEntry 9 }
+
+hh3cBgpPeerOutNotificationMsgCounter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of Notification packet data sent to the remote BGP peer."
+    ::= { hh3cBgpPeerMessageEntry 10 }
+
+hh3cBgpPeerOutKeepAliveMsgCounter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of Keepalive packet data sent to the remote BGP peer."
+    ::= { hh3cBgpPeerMessageEntry 11 }
+
+hh3cBgpPeerOutRouteFreshMsgCounter OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of Route-Refresh packet data sent to the remote BGP peer."
+    ::= { hh3cBgpPeerMessageEntry 12 }
+
+--  =============================================================================
+--  hh3cBgpVpnRouteTable Definition
+--  =============================================================================
+
+hh3cBgpVpnRouteTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cBgpVpnRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "BGP VRF routing table."
+    ::= { hh3cBgpVpnRoute 1 }
+
+hh3cBgpVpnRouteEntry OBJECT-TYPE
+    SYNTAX     Hh3cBgpVpnRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "BGP routing entry."
+    INDEX { hh3cBgpVpnRouteType, hh3cBgpVpnInstName, hh3cBgpVpnAddressFamily }
+    ::= { hh3cBgpVpnRouteTable 1 }
+
+Hh3cBgpVpnRouteEntry ::= SEQUENCE {
+    hh3cBgpVpnRouteType      Unsigned32,
+    hh3cBgpVpnInstName       Hh3cBgpVpnId,
+    hh3cBgpVpnAddressFamily  Unsigned32,
+    hh3cBgpVpnCurrRouteNum   Unsigned32,
+    hh3cBgpVpnThresholdValue Unsigned32
+}
+
+hh3cBgpVpnRouteType OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Route type."
+    ::= { hh3cBgpVpnRouteEntry 1 }
+
+hh3cBgpVpnInstName OBJECT-TYPE
+     SYNTAX Hh3cBgpVpnId
+     MAX-ACCESS accessible-for-notify
+     STATUS current
+     DESCRIPTION
+         "VPN instance name."
+     ::= { hh3cBgpVpnRouteEntry 2 }
+
+hh3cBgpVpnAddressFamily OBJECT-TYPE
+     SYNTAX Unsigned32
+     MAX-ACCESS accessible-for-notify
+     STATUS current
+     DESCRIPTION
+         "Address family."
+     ::= { hh3cBgpVpnRouteEntry 3 }
+
+hh3cBgpVpnCurrRouteNum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current number of BGP peer routes."
+    ::= { hh3cBgpVpnRouteEntry 4 }
+
+hh3cBgpVpnThresholdValue OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total threshold value."
+    ::= { hh3cBgpVpnRouteEntry 5 }
+--  =============================================================================
+--  hh3cBgpVpnScalars Definition
+--  =============================================================================
+hh3cBgpVpnScalars OBJECT IDENTIFIER ::= { hh3cBgpVpnObjects 3 }
+
+hh3cBgpConfiguredVrfs OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of VRFs on this node."
+    ::= { hh3cBgpVpnScalars 1 }
+
+hh3cBgpConfiguredIpv4Vrfs  OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of IPv4-family VRFs on this node."
+    ::= { hh3cBgpVpnScalars 2 }
+
+hh3cBgpConfiguredIpv6Vrfs  OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of IPv6-family VRFs on this node."
+    ::= { hh3cBgpVpnScalars 3 }
+
+hh3cBgpConfiguredIpv4Flowspec OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of IPv4-Flowspec-family VRFs on this node."
+    ::= { hh3cBgpVpnScalars 4 }
+
+hh3cBgpConfiguredIpv6Flowspec  OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of IPv6-Flowspec-family VRFs on this node."
+    ::= { hh3cBgpVpnScalars 5 }
+
+hh3cBgpConfiguredEvpnVrfs  OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of Evpn-family VRFs on this node."
+    ::= { hh3cBgpVpnScalars 6 }
 
 --  ============================================================================
 --  End of hh3cBgpVpnObjects Definition
 --  ============================================================================
 
+--  ============================================================================
+--  Begin of hh3cBgpProcess Definition
+--  ============================================================================
+hh3cBgpInstanceObjects OBJECT IDENTIFIER ::= { hh3cBgpVpn 2 }
+
+hh3cBgpInstance OBJECT IDENTIFIER ::= { hh3cBgpInstanceObjects 1 }
+
+--  ==============================================================================
+--  hh3cBgpInstanceCommTable Definition
+--  =============================================================================
+hh3cBgpInstanceCommTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cBgpInstanceCommEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table describe BGP peer address family table,
+         it shows the address family information of BGP peers."
+    ::= { hh3cBgpInstance 1 }
+
+hh3cBgpInstanceCommEntry OBJECT-TYPE
+    SYNTAX Hh3cBgpInstanceCommEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in this table shows the information address family
+         information of BGP peers."
+    INDEX {
+            hh3cBgpInstanceName
+          }
+    ::= { hh3cBgpInstanceCommTable 1 }
+
+Hh3cBgpInstanceCommEntry ::= SEQUENCE {
+    hh3cBgpInstanceName                   OCTET STRING,
+    hh3cBgpInstanceId                     Unsigned32
+}
+
+hh3cBgpInstanceName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The parameter of BGP instance name."
+    ::= { hh3cBgpInstanceCommEntry 1 }
+
+hh3cBgpInstanceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The parameter of BGP instance ID."
+    ::= { hh3cBgpInstanceCommEntry 2 }
+--  ============================================================================
+--  End of hh3cBgpProcessObjects Definition
+--  ============================================================================
+
+--  ============================================================================
+--  Begin of hh3cBgpVpnRpkiObjects Definition
+--  ============================================================================
+hh3cBgpVpnRpkiObjects OBJECT IDENTIFIER ::= { hh3cBgpVpn 3 }
+
+hh3cBgpVpnRpkiSessions OBJECT IDENTIFIER ::= { hh3cBgpVpnRpkiObjects 1 }
+
+hh3cBgpVpnRpkiTraps OBJECT IDENTIFIER ::= { hh3cBgpVpnRpkiObjects 2 }
+
+--  =============================================================================
+--  hh3cBgpVpnRpkiSessions Definition
+--  =============================================================================
+
+hh3cBgpVpnRpkiSessionVrfName OBJECT-TYPE
+    SYNTAX Hh3cBgpVpnId
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The index of the instance session."
+    ::= { hh3cBgpVpnRpkiSessions 1 }
+
+hh3cBgpVpnRpkiSessionType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The address family type for the remote session."
+    ::= { hh3cBgpVpnRpkiSessions 2 }
+
+hh3cBgpVpnRpkiSessionIPAddr OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The session IP address."
+    ::= { hh3cBgpVpnRpkiSessions 3 }
+
+hh3cBgpVpnRpkiSessionRoaLimitNum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Restriction number of rpki session ROA."
+    ::= { hh3cBgpVpnRpkiSessions 4 }
+
+--  =============================================================================
+--  hh3cBgpVpnRpkiTrapNotifications Definition
+--  =============================================================================
+hh3cBgpVpnRpkiTrapNotifications OBJECT IDENTIFIER ::= { hh3cBgpVpnRpkiTraps 0 }
+
+hh3cBgpVpnRpkiSessionRoaExceed NOTIFICATION-TYPE
+    OBJECTS { hh3cBgpVpnRpkiSessionRoaLimitNum }
+    STATUS current
+    DESCRIPTION
+        "The RPKI SessionRoaExceed event will be generated when the number of rpki session ROA exceeds."
+    ::= { hh3cBgpVpnRpkiTrapNotifications 1 }
+
+hh3cBgpVpnRpkiSessionRoaExceedClear NOTIFICATION-TYPE
+    OBJECTS { hh3cBgpVpnRpkiSessionRoaLimitNum }
+    STATUS current
+    DESCRIPTION
+        "Generate rpki sessionroaedeclear event when the number of rpki session ROAs exceeds clear."
+    ::= { hh3cBgpVpnRpkiTrapNotifications 2 }
+
+hh3cBgpVpnTraps OBJECT IDENTIFIER ::= { hh3cBgpVpn 4 }
+
+hh3cBgpVpnTrapNotifications OBJECT IDENTIFIER ::= { hh3cBgpVpnTraps 0 }
+
+hh3cBgpPeerRouteNumThresholdExceed NOTIFICATION-TYPE
+    OBJECTS { hh3cBgpPeerConfigRouteLimitNum, hh3cBgpPeerConfigRouteLimitThreshold }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when the number of routes received from the BGP peer exceeds the alarm threshold."
+    ::= { hh3cBgpVpnTrapNotifications 1 }
+
+hh3cBgpPeerRouteNumThresholdClear NOTIFICATION-TYPE
+    OBJECTS { hh3cBgpPeerConfigRouteLimitNum, hh3cBgpPeerConfigRouteLimitThreshold }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when the number of routes received from the BGP peer decreases below the alarm threshold."
+    ::= { hh3cBgpVpnTrapNotifications 2 }
+
+hh3cBgpPeerRouteExceed NOTIFICATION-TYPE
+    OBJECTS { hh3cBgpPeerConfigRouteLimitNum, hh3cBgpPeerConfigRouteLimitThreshold }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when bgp peer session route number exceed."
+    ::= { hh3cBgpVpnTrapNotifications 3 }
+
+hh3cBgpPeerRouteExceedClear NOTIFICATION-TYPE
+    OBJECTS { hh3cBgpPeerConfigRouteLimitNum, hh3cBgpPeerConfigRouteLimitThreshold }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when bgp peer session route number exceed clear."
+    ::= { hh3cBgpVpnTrapNotifications 4 }
+
+hh3cBgpPeerEstablished NOTIFICATION-TYPE
+    OBJECTS { hh3cBgpPeerLastError, hh3cBgpPeerState }
+    STATUS current
+    DESCRIPTION
+        "When the BGP FSM enters the established state, the BGP established event is generated."
+    ::= { hh3cBgpVpnTrapNotifications 5 }
+
+hh3cBgpPeerBackwardTransition NOTIFICATION-TYPE
+    OBJECTS { hh3cBgpPeerLastError, hh3cBgpPeerState, hh3cBgpPeerUnAvaiReason}
+    STATUS current
+    DESCRIPTION
+        "The BGPBackwardTransition Event is generated
+        when the BGP FSM number moves from a higher
+        state to a lower state."
+    ::= { hh3cBgpVpnTrapNotifications 6 }
+
+hh3cBgpVrfRouteNumReachThreshold NOTIFICATION-TYPE
+    OBJECTS { hh3cBgpVpnRouteType, hh3cBgpVpnInstName, hh3cBgpVpnAddressFamily, hh3cBgpVpnCurrRouteNum, hh3cBgpVpnThresholdValue }
+    STATUS current
+    DESCRIPTION
+        "The VPN instance routes reached the alarm threshould."
+    ::= { hh3cBgpVpnTrapNotifications 7 }
+
+hh3cBgpVrfRouteNumReachThresholdClear NOTIFICATION-TYPE
+    OBJECTS { hh3cBgpVpnRouteType, hh3cBgpVpnInstName, hh3cBgpVpnAddressFamily, hh3cBgpVpnCurrRouteNum, hh3cBgpVpnThresholdValue }
+    STATUS current
+    DESCRIPTION
+        "The VPN instance routes fell below the clear alarm threshold."
+    ::= { hh3cBgpVpnTrapNotifications 8 }
+
+hh3cBgpPeerAFRouteThresholdExceed NOTIFICATION-TYPE
+    OBJECTS { hh3cBgpVpnAddressFamily, hh3cBgpPeerConfigRouteLimitNum, hh3cBgpPeerConfigRouteLimitThreshold, hh3cBgpInstanceName }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when when the number of
+        routes received by the neighbor under the BGP address family
+        reaches an alarm threshold state."
+    ::= { hh3cBgpVpnTrapNotifications 9 }
+
+hh3cBgpPeerAFRouteThresholdClear NOTIFICATION-TYPE
+    OBJECTS { hh3cBgpVpnAddressFamily, hh3cBgpPeerConfigRouteLimitNum, hh3cBgpPeerConfigRouteLimitThreshold, hh3cBgpInstanceName }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when the number of
+        routes received by the neighbor below the BGP address
+        family drops below the alert threshold."
+    ::= { hh3cBgpVpnTrapNotifications 10 }
+
+hh3cBgpPeerAFRouteExceed NOTIFICATION-TYPE
+    OBJECTS { hh3cBgpVpnAddressFamily, hh3cBgpPeerConfigRouteLimitNum, hh3cBgpInstanceName }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when the number of
+        routes received by the neighbor under the BGP address
+        family reaches a maximum state."
+    ::= { hh3cBgpVpnTrapNotifications 11 }
+
+hh3cBgpPeerAFRouteExceedClear NOTIFICATION-TYPE
+    OBJECTS { hh3cBgpVpnAddressFamily, hh3cBgpPeerConfigRouteLimitNum, hh3cBgpInstanceName }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when the number of
+        routes received by the neighbors below the BGP address
+        family drops below a maximum."
+    ::= { hh3cBgpVpnTrapNotifications 12 }
+
+hh3cBgpPeerGRStatusChange NOTIFICATION-TYPE
+    OBJECTS { hh3cBgpPeerGRStatus }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when the graceful restart status of the
+        BGP peer is changed."
+    ::= { hh3cBgpVpnTrapNotifications 13 }
+
 --  End of HH3C-BGP-VPN-MIB
 END
+
