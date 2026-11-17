@@ -26,13 +26,15 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Http\Controllers\Controller;
 use App\Models\Device;
 use App\Models\Sla;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use LibreNMS\Interfaces\UI\DeviceTab;
-use LibreNMS\Util\Url;
 
-class SlasController implements DeviceTab
+class SlasController extends Controller implements DeviceTab
 {
     /**
      * Extra graphs, by graph type => title, for SLA types that have more than the round trip time.
@@ -79,24 +81,36 @@ class SlasController implements DeviceTab
         return __('SLAs');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function data(Device $device, Request $request): array
     {
-        $slas = $device->slas()->where('deleted', 0)->orderBy('sla_nr')->get();
+        return [];
+    }
 
-        $sla = Url::parseOptions('id') ? $slas->firstWhere('sla_id', (int) Url::parseOptions('id')) : null;
-        if ($sla) {
-            return [
-                'sla' => $sla,
-                'title' => $this->title($sla),
-                'graphs' => ['device_sla' => __('Round Trip Time')] + (self::TYPE_GRAPHS[$sla->rtt_type] ?? []),
-            ];
+    public function index(Device $device, Request $request): View|RedirectResponse
+    {
+        $this->authorize('view', $device);
+
+        $request->validate([
+            'id' => 'nullable|integer',
+            'view' => 'nullable|string',
+            'opstatus' => 'nullable|in:all,up,down',
+        ]);
+
+        // legacy /slas/id=X urls
+        if ($request->filled('id')) {
+            return redirect()->route('device.slas.show', ['device' => $device->device_id, 'sla' => $request->integer('id')], 301);
         }
 
+        $slas = $device->slas()->where('deleted', 0)->orderBy('sla_nr')->get();
         $types = $slas->pluck('rtt_type')->unique()->mapWithKeys(fn ($type) => [$type => $this->typeName($type)])->sort()->all();
-        $type = Url::parseOptions('view', 'all');
-        $status = Url::parseOptions('opstatus', 'all');
+        $type = $request->string('view')->value() ?: 'all';
+        $status = $request->string('opstatus')->value() ?: 'all';
 
-        return [
+        return view('device.tabs.slas', [
+            'device' => $device,
             'slas' => $slas
                 ->when($type !== 'all', fn ($slas) => $slas->where('rtt_type', $type))
                 ->when($status === 'up', fn ($slas) => $slas->where('opstatus', 0))
@@ -109,7 +123,21 @@ class SlasController implements DeviceTab
                 ->map(fn ($text, $option) => ['text' => $text, 'link' => $this->link($device, $type, $option)])->all(),
             'titles' => $slas->mapWithKeys(fn (Sla $sla) => [$sla->sla_id => $this->title($sla)]),
             'detailTypes' => array_keys(self::TYPE_GRAPHS),
-        ];
+        ]);
+    }
+
+    public function show(Device $device, Sla $sla): View
+    {
+        $this->authorize('view', $device);
+
+        abort_if((bool) $sla->deleted, 404);
+
+        return view('device.tabs.sla', [
+            'device' => $device,
+            'sla' => $sla,
+            'title' => $this->title($sla),
+            'graphs' => ['device_sla' => __('Round Trip Time')] + (self::TYPE_GRAPHS[$sla->rtt_type] ?? []),
+        ]);
     }
 
     private function title(Sla $sla): string
@@ -129,6 +157,10 @@ class SlasController implements DeviceTab
 
     private function link(Device $device, string $type, string $status): string
     {
-        return route('device', ['device' => $device->device_id, 'tab' => 'slas', 'view' => $type, 'opstatus' => $status]);
+        return route('device.slas', [
+            'device' => $device->device_id,
+            'view' => $type === 'all' ? null : $type,
+            'opstatus' => $status === 'all' ? null : $status,
+        ]);
     }
 }

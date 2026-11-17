@@ -314,6 +314,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('logs/graylog', Device\Tabs\GraylogController::class)->name('graylog');
         Route::get('logs/outages', Device\Tabs\OutagesController::class)->name('outages');
         Route::get('logs/syslog', Device\Tabs\SyslogController::class)->name('syslog');
+        Route::get('graphs', [Device\Tabs\GraphsController::class, 'index'])->name('graphs')->whereNumber('device');
         Route::get('health', [Device\Tabs\HealthController::class, 'index'])->name('health')->whereNumber('device');
         Route::get('loadbalancer', [Device\Tabs\LoadBalancerController::class, 'index'])->name('loadbalancer')->whereNumber('device');
         Route::get('neighbours', [Device\Tabs\NeighboursController::class, 'index'])->name('neighbours')->whereNumber('device');
@@ -321,7 +322,10 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('port/{port}', [Device\Tabs\PortController::class, 'show'])->name('port')->scopeBindings()->whereNumber(['device', 'port']);
         Route::get('qos', [Device\Tabs\QosController::class, 'index'])->name('qos')->whereNumber('device');
         Route::get('pseudowires', [Device\Tabs\PseudowiresController::class, 'index'])->name('pseudowires')->whereNumber('device');
+        Route::get('slas', [Device\Tabs\SlasController::class, 'index'])->name('slas')->whereNumber('device');
+        Route::get('slas/{sla}', [Device\Tabs\SlasController::class, 'show'])->name('slas.show')->scopeBindings()->whereNumber(['device', 'sla']);
         Route::get('stp', [Device\Tabs\StpController::class, 'index'])->name('stp')->whereNumber('device');
+        Route::get('wireless', [Device\Tabs\WirelessController::class, 'index'])->name('wireless')->whereNumber('device');
         Route::get('routing', [Device\Tabs\RoutingController::class, 'index'])->name('routing')->whereNumber('device');
         Route::prefix('routing')->name('routing.')->group(function (): void {
             Route::get('bgp', Device\Tabs\Routing\BgpController::class)->name('bgp');

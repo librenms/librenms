@@ -26,15 +26,16 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Http\Controllers\Controller;
 use App\Models\Device;
 use App\Models\WirelessSensor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\View\View;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\UI\DeviceTab;
-use LibreNMS\Util\Url;
 
-class WirelessController implements DeviceTab
+class WirelessController extends Controller implements DeviceTab
 {
     public function visible(Device $device): bool
     {
@@ -56,22 +57,37 @@ class WirelessController implements DeviceTab
         return __('Wireless');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function data(Device $device, Request $request): array
     {
+        return [];
+    }
+
+    public function index(Device $device, Request $request): View
+    {
+        $this->authorize('view', $device);
+
+        $request->validate([
+            'metric' => 'nullable|string',
+        ]);
+
         // order the classes as the enum does
         $present = $device->wirelessSensors()->distinct()->pluck('sensor_class');
         $classes = array_values(array_filter(WirelessSensorType::cases(), fn (WirelessSensorType $class) => $present->contains($class)));
 
-        $metric = WirelessSensorType::tryFrom((string) Url::parseOptions('metric'));
+        $metric = WirelessSensorType::tryFrom($request->string('metric')->value());
 
-        return [
+        return view('device.tabs.wireless', [
+            'device' => $device,
             'classes' => $classes,
             'metric' => $metric,
             'options' => collect(['overview' => __('Overview')])
                 ->merge(collect($classes)->mapWithKeys(fn (WirelessSensorType $class) => [$class->value => __("wireless.$class->value.short")]))
-                ->map(fn ($text, $metric) => ['text' => $text, 'link' => route('device', ['device' => $device->device_id, 'tab' => 'wireless', 'metric' => $metric])])
+                ->map(fn ($text, $metric) => ['text' => $text, 'link' => route('device.wireless', ['device' => $device->device_id, 'metric' => $metric === 'overview' ? null : $metric])])
                 ->all(),
             'sensors' => $metric ? $device->wirelessSensors()->where('sensor_class', $metric)->orderBy('sensor_descr')->get() : collect(),
-        ];
+        ]);
     }
 }

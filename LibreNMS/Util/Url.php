@@ -27,6 +27,7 @@
 namespace LibreNMS\Util;
 
 use App\Facades\LibrenmsConfig;
+use App\Http\Controllers\DeviceController;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\Sensor;
@@ -270,7 +271,18 @@ class Url
      */
     public static function deviceUrl($device, $vars = [])
     {
-        $routeParams = [($device instanceof Device) ? $device->device_id : (int) $device];
+        $deviceId = ($device instanceof Device) ? $device->device_id : (int) $device;
+        $tab = $vars['tab'] ?? null;
+
+        // tabs with their own route take their options in the query string
+        if ($tab !== 'port' && in_array($tab, DeviceController::ROUTED_TABS, true)) {
+            unset($vars['tab']);
+            $vars = array_filter($vars, fn ($value) => $value !== null && $value !== '');
+
+            return route("device.$tab", ['device' => $deviceId] + $vars);
+        }
+
+        $routeParams = [$deviceId];
         if (isset($vars['tab'])) {
             $routeParams[] = $vars['tab'];
             unset($vars['tab']);
