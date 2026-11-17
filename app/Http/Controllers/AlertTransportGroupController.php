@@ -8,12 +8,13 @@ use App\Models\AlertTransportGroup;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class AlertTransportGroupController extends Controller
 {
     public function show(AlertTransportGroup $alertTransportGroup): JsonResponse
     {
-        $this->authorize('view', $alertTransportGroup);
+        abort_unless(Gate::any(['view', 'update'], $alertTransportGroup), 403);
 
         return response()->json([
             'id' => $alertTransportGroup->transport_group_id,

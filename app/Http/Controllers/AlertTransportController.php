@@ -11,6 +11,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use LibreNMS\Alert\AlertData;
@@ -37,7 +38,7 @@ class AlertTransportController extends Controller
 
     public function show(AlertTransport $transport): JsonResponse
     {
-        $this->authorize('view', $transport);
+        abort_unless(Gate::any(['view', 'update'], $transport), 403);
 
         return response()->json([
             'id' => $transport->transport_id,
@@ -134,6 +135,9 @@ class AlertTransportController extends Controller
 
         $template = Transport::getClass($validated['type'])::configTemplate();
         $input = $request->input('config', []);
+        if ($validated['type'] === 'mail' && ($input['mail-contact'] ?? null) !== 'role' && in_array($input['role'] ?? null, [null, ''], true)) {
+            unset($input['role']);
+        }
         Validator::make($input, $template['validation'] ?? [])->validate();
 
         $config = [];

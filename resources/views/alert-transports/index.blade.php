@@ -268,7 +268,7 @@
                     this.$nextTick(() => {
                         const $members = $(this.$refs.members);
                         if (! $members.hasClass('select2-hidden-accessible')) {
-                            init_select2($members, 'alert-transport', {}, null, @js(__('Select transports')), {dropdownParent: $(this.$el), width: '100%'});
+                            init_select2($members, 'alert-transport', {}, null, @js(__('Select transports')), {dropdownParent: $members.closest('form'), width: '100%'});
                         }
                         $members.empty();
                         group.members.forEach((member) => $members.append(new Option(member.text, member.id, true, true)));
