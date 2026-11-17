@@ -244,6 +244,11 @@ Route::middleware(['auth'])->group(function (): void {
     Route::redirect('/addhost', '/device/add');
     Route::get('/device/{device}/edit', [Device\EditDeviceController::class, 'index'])->name('device.edit');
     Route::put('/device/{device}/edit', [Device\EditDeviceController::class, 'update'])->name('device.edit.update');
+    Route::get('/device/{device}/edit/apps', [Device\EditApplicationsController::class, 'index'])->name('device.edit.apps');
+    Route::put('/device/{device}/edit/apps/{type}', [Device\EditApplicationsController::class, 'update'])->name('device.edit.apps.update');
+    Route::get('/device/{device}/edit/components', [Device\EditComponentsController::class, 'index'])->name('device.edit.components');
+    Route::put('/device/{device}/edit/components', [Device\EditComponentsController::class, 'update'])->name('device.edit.components.update');
+    Route::get('/device/{device}/edit/customoids', [Device\EditCustomoidsController::class, 'index'])->name('device.edit.customoids');
     Route::get('/device/{device}/edit/health', [Device\EditHealthController::class, 'index'])->name('device.edit.health');
     Route::post('/device/{device}/edit/health/reset', [Device\EditHealthController::class, 'reset'])->name('device.edit.health.reset');
     Route::post('/device/{device}/edit/health/{sensor}', [Device\EditHealthController::class, 'update'])->name('device.edit.health.update')->scopeBindings()->whereNumber('sensor');

@@ -106,34 +106,6 @@ final class AjaxTableAuthorizationTest extends DBTestCase
         return json_decode($output, true, flags: JSON_THROW_ON_ERROR);
     }
 
-    public function testComponentTableRequiresDeviceAccess(): void
-    {
-        $mine = Component::factory()->create(['device_id' => $this->accessible->device_id, 'label' => 'mine']);
-        Component::factory()->create(['device_id' => $this->other->device_id, 'label' => 'secret']);
-        $this->actingAs($this->limitedUser());
-
-        $denied = $this->runTable('component', ['device_id' => $this->other->device_id]);
-        $this->assertSame([], $denied['rows']);
-        $this->assertSame(0, $denied['total']);
-
-        $this->assertSame(0, $this->runTable('component', ['device_id' => 'invalid'])['total']);
-        $this->assertSame(0, $this->runTable('component')['total']);
-
-        $allowed = $this->runTable('component', ['device_id' => (string) $this->accessible->device_id]);
-        $this->assertSame(1, $allowed['total']);
-        $this->assertContains($mine->id, array_column($allowed['rows'], 'id'));
-    }
-
-    public function testComponentTableAllowsAdmin(): void
-    {
-        $component = Component::factory()->create(['device_id' => $this->other->device_id]);
-        $this->actingAs($this->adminUser());
-
-        $result = $this->runTable('component', ['device_id' => $this->other->device_id]);
-        $this->assertSame(1, $result['total']);
-        $this->assertContains($component->id, array_column($result['rows'], 'id'));
-    }
-
     public function testNtpTableOnlyListsAccessibleDevices(): void
     {
         $this->ntpComponent($this->accessible, '192.0.2.1');

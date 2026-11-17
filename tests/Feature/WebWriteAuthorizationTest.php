@@ -195,22 +195,16 @@ final class WebWriteAuthorizationTest extends DBTestCase
     public function testApplicationUpdateIsScopedToAccessibleDevices(): void
     {
         $user = $this->limitedUser(['application.update']);
-        $this->actingAs($user);
 
-        $output = $this->runForm('application-update', [
-            'device_id' => $this->other->device_id,
-            'application' => 'nginx',
-            'state' => 'true',
-        ]);
-        $this->assertSame('You need permission', json_decode($output, true)['message'] ?? null);
+        $this->actingAs($user)
+            ->putJson(route('device.edit.apps.update', [$this->other, 'nginx']), ['enabled' => true])
+            ->assertForbidden();
         $this->assertFalse($this->other->applications()->withTrashed()->exists());
 
-        $output = $this->runForm('application-update', [
-            'device_id' => $this->accessible->device_id,
-            'application' => 'nginx',
-            'state' => 'true',
-        ]);
-        $this->assertSame('Application enabled', json_decode($output, true)['message'] ?? null);
+        $this->actingAs($user)
+            ->putJson(route('device.edit.apps.update', [$this->accessible, 'nginx']), ['enabled' => true])
+            ->assertOk()
+            ->assertJson(['message' => 'Application enabled']);
         $this->assertTrue($this->accessible->applications()->where('app_type', 'nginx')->exists());
     }
 }

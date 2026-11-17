@@ -874,6 +874,14 @@ class Device extends BaseModel
     }
 
     /**
+     * @return HasMany<Customoid, $this>
+     */
+    public function customoids(): HasMany
+    {
+        return $this->hasMany(Customoid::class, 'device_id');
+    }
+
+    /**
      * @return HasMany<DiskIo, $this>
      */
     public function diskIo(): HasMany
