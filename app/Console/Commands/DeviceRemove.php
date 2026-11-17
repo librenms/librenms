@@ -2,11 +2,14 @@
 
 namespace App\Console\Commands;
 
+use App\Console\Commands\Traits\CompletesDeviceArgument;
 use App\Facades\DeviceCache;
 use Illuminate\Console\Command;
 
 class DeviceRemove extends Command
 {
+    use CompletesDeviceArgument;
+
     /**
      * The name and signature of the console command.
      *

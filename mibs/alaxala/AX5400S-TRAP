@@ -1,0 +1,140 @@
+
+-- Traps for use by AlaxalA networks AX5400S
+
+-- Traps are defined using the conventions in RFC 1215.
+AX5400S-TRAP DEFINITIONS ::= BEGIN
+IMPORTS
+TRAP-TYPE
+    FROM RFC-1215
+ifIndex
+    FROM RFC1213-MIB
+ax5400s, ax5400sSystemMsgType, ax5400sSystemMsgTimeStamp, ax5400sSystemMsgLevel, ax5400sSystemMsgEventPoint,
+ax5400sSystemMsgEventInterfaceID, ax5400sSystemMsgEventCode, ax5400sSystemMsgAdditionalCode, ax5400sSystemMsgText,
+ax5400sChassisIndex, ax5400sBcuBoardIndex, ax5400sTemperatureStatusIndex, ax5400sTemperatureStatusDescr, 
+ax5400sTemperatureStatusValue, ax5400sTemperatureState,
+axsLoginName, axsLoginTime, axsLoginLocation, axsLoginLine, axsLoginFailureTime, axsLogoutTime, axsLogoutStatus,
+axsGsrpGroupId, axsGsrpVlanGroupId, axsGsrpState
+    FROM AX7800S
+;
+
+ax5400sSystemMsgTrap TRAP-TYPE
+	ENTERPRISE      ax5400s
+	VARIABLES       { ax5400sSystemMsgType, ax5400sSystemMsgTimeStamp,
+                          ax5400sSystemMsgLevel, ax5400sSystemMsgEventPoint,
+                          ax5400sSystemMsgEventInterfaceID, ax5400sSystemMsgEventCode,
+                          ax5400sSystemMsgAdditionalCode, ax5400sSystemMsgText }
+	DESCRIPTION
+		"System message is displayed."
+	::= 1
+
+ax5400sStandbySystemUpTrap TRAP-TYPE
+	ENTERPRISE      ax5400s
+	VARIABLES       { ax5400sChassisIndex, ax5400sBcuBoardIndex }
+	DESCRIPTION
+		"Standby system is restarted."
+	::= 2
+
+ax5400sStandbySystemDownTrap TRAP-TYPE
+	ENTERPRISE      ax5400s
+	VARIABLES       { ax5400sChassisIndex, ax5400sBcuBoardIndex }
+	DESCRIPTION
+		"Standby system is failed."
+	::= 3
+
+ax5400sTemperatureTrap TRAP-TYPE
+	ENTERPRISE ax5400s
+	VARIABLES {
+		ax5400sChassisIndex,
+		ax5400sBcuBoardIndex,
+		ax5400sTemperatureStatusIndex,
+		ax5400sTemperatureStatusDescr, 
+		ax5400sTemperatureStatusValue, 
+		ax5400sTemperatureState }
+	DESCRIPTION
+		"A ax5400sTemperatureTrap is sent if the 
+		temperature measured at a given testpoint is outside 
+		the normal range for the testpoint (i.e. is at the warning, 
+		critical, or shutdown stage)."
+	::= 4
+
+-- axsGsrpStateTransitionTrap TRAP-TYPE
+ax5400sGsrpStateTransitionTrap TRAP-TYPE
+	ENTERPRISE      ax5400s
+	VARIABLES       { axsGsrpGroupId, axsGsrpVlanGroupId, axsGsrpState }
+	DESCRIPTION
+		"Changes of the VLAN group state of GSRP"
+	::= 6
+
+ax5400sAirFanStopTrap TRAP-TYPE
+	ENTERPRISE      ax5400s
+	DESCRIPTION
+             "This trap indicates a fan failure." 
+	::= 8 
+
+ax5400sPowerSupplyFailureTrap TRAP-TYPE
+	ENTERPRISE      ax5400s
+	DESCRIPTION
+             "This trap indicates one ( or more ) of power supplies fail ure." 
+	::= 9 
+
+ax5400sLoginSuccessTrap TRAP-TYPE
+	ENTERPRISE      ax5400s
+	VARIABLES       { axsLoginName, axsLoginTime, axsLoginLocation, axsLoginLine }
+	DESCRIPTION
+             "This trap indicates success of user log in." 
+	::= 10 
+
+ax5400sLoginFailureTrap TRAP-TYPE
+	ENTERPRISE      ax5400s
+	VARIABLES       { axsLoginName, axsLoginFailureTime, 
+                          axsLoginLocation, axsLoginLine }
+	DESCRIPTION
+             "This trap indicates failure of user log in." 
+	::= 11
+
+ax5400sLogoutTrap TRAP-TYPE
+	ENTERPRISE      ax5400s
+	VARIABLES       { axsLoginName, axsLoginTime, axsLogoutTime, 
+                          axsLoginLocation, axsLoginLocation, axsLoginLine, 
+                          axsLogoutStatus }
+	DESCRIPTION
+             "This trap indicates success of following log out.
+                'logout' command, 'exit' command, 'quit' command."
+	::= 12
+
+ax5400sMemoryUsageTrap  TRAP-TYPE
+	ENTERPRISE      ax5400s
+	DESCRIPTION
+             "This indicates available memory is fewer than lower limit." 
+	::= 13
+	
+ax5400sFrameErrorReceiveTrap  TRAP-TYPE
+	ENTERPRISE      ax5400s
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "This indicates frame receive error." 
+	::= 18
+
+ax5400sFrameErrorSendTrap  TRAP-TYPE
+	ENTERPRISE      ax5400s
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "This indicates frame send error." 
+	::= 19
+	
+-- axsEfmoamUdldPortInactivateTrap TRAP-TYPE
+ax5400sEfmoamUdldPortInactivateTrap TRAP-TYPE
+	ENTERPRISE      ax5400s
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "Efmoam udld port inactivate trap."
+	::= 29
+
+-- axsEfmoamLoopDetectPortInactivateTrap TRAP-TYPE
+ax5400sEfmoamLoopDetectPortInactivateTrap TRAP-TYPE
+	ENTERPRISE      ax5400s
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "Efmoam loop detect port inactivate trap."
+    ::= 30
+END

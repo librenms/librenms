@@ -21,6 +21,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Fortiap extends OS implements
     WirelessClientsDiscovery,
@@ -34,11 +35,11 @@ class Fortiap extends OS implements
         if (empty($fapVapStaInfoCounts)) {
             return [];
         }
-        $fapVapSSIDs = $this->getCacheByIndex('fapVapSSID', 'FORTINET-FORTIAP-MIB');
+        $fapVapSSIDs = SnmpQuery::walk('FORTINET-FORTIAP-MIB::fapVapSSID')->pluck();
 
         $ssids = [];
         foreach ($fapVapStaInfoCounts as $index => $entry) {
-            $ssid = $fapVapSSIDs[$index];
+            $ssid = $fapVapSSIDs[$index] ?? null;
             if (empty($ssid)) {
                 continue;
             }
@@ -73,7 +74,7 @@ class Fortiap extends OS implements
 
     public function discoverWirelessFrequency()
     {
-        $fapRadioChannelOper = $this->getCacheByIndex('fapRadioChannelOper', 'FORTINET-FORTIAP-MIB');
+        $fapRadioChannelOper = SnmpQuery::walk('FORTINET-FORTIAP-MIB::fapRadioChannelOper')->pluck();
 
         $sensors = [];
 
@@ -99,7 +100,7 @@ class Fortiap extends OS implements
 
     public function discoverWirelessPower()
     {
-        $fapRadioTxPowerOper = $this->getCacheByIndex('fapRadioTxPowerOper', 'FORTINET-FORTIAP-MIB');
+        $fapRadioTxPowerOper = SnmpQuery::walk('FORTINET-FORTIAP-MIB::fapRadioTxPowerOper')->pluck();
 
         $sensors = [];
 

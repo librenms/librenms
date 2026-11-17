@@ -1,10 +1,10 @@
 -- =========================================================================
--- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: This MIB file is used for management of hh3c Class Based
 --             QoS information.
 -- Reference:
--- Version: V2.4
+-- Version: V2.7
 -- History:
 -- V1.0 created by tangshun.
 -- V1.1 2006/01/17 modified by wangjinwang
@@ -111,6 +111,16 @@
 --   Add hh3cCBQoSCarYellowbps to hh3cCBQoSCarRunInfoEntry.
 -- V2.4 2019/05/29 modified by gaomengfei
 --   Modify the value range of hh3cCBQoSQueueBandwidthValue from "1~10000000" to "1~100000000".
+-- V2.5 2021/09/16 modified by gaomengfei
+--   Add hh3cCBQoSGlobalAclNotSupport.
+--   Add hh3cCBQoSGlobalQPPBNotSupport.
+--   Add hh3cCBQoSNotificationsBindings.
+-- V2.6 2022/06/09 modified by lizhaocheng
+--   Add hh3cCBQoSRedirectInvalidAlarm
+--   Add hh3cCBQoSRedirectInvalidAlarmRecover
+-- V2.7 2022/11/21 modified by zhangxiaowei
+--   Add hh3cCBQoSRdtNHLackResAlarm
+--   Add hh3cCBQoSRdtNHLackResRecover
 -- ==========================================================================
 HH3C-CBQOS2-MIB DEFINITIONS ::= BEGIN
 
@@ -125,7 +135,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 hh3cCBQos2 MODULE-IDENTITY
-    LAST-UPDATED "201905290000Z"        --May 29, 2019 at 00:00 GMT
+    LAST-UPDATED "202211210000Z"        --November 21, 2022 at 00:00 GMT
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -220,7 +230,21 @@ hh3cCBQos2 MODULE-IDENTITY
             76:  hh3cCBQoSPolicyAccRunInfoTable
             77:  hh3cCBQoSApplyingStatusObjects
             78:  hh3cCBQoSNotifications
+            79:  hh3cCBQoSNotificationsBindings
         "
+    REVISION "202211210000Z"        --November 21, 2022 at 00:00 GMT
+    DESCRIPTION
+        "Add hh3cCBQoSRdtNHLackResAlarm.
+         Add hh3cCBQoSRdtNHLackResRecover."
+    REVISION "202206090000Z"        --June 9, 2022 at 00:00 GMT
+    DESCRIPTION
+        "Add hh3cCBQoSRedirectInvalidAlarm.
+         Add hh3cCBQoSRedirectInvalidAlarmRecover."
+    REVISION "202109160000Z"        --Sep 16, 2021 at 00:00 GMT
+    DESCRIPTION
+        "Add hh3cCBQoSGlobalAclNotSupport.
+         Add hh3cCBQoSGlobalQPPBNotSupport.
+         Add hh3cCBQoSNotificationsBindings."
     REVISION "201905290000Z"        --May 29, 2019 at 00:00 GMT
     DESCRIPTION
         "Modify the value range of hh3cCBQoSQueueBandwidthValue from 1~10000000 to 1~100000000."
@@ -6866,5 +6890,156 @@ hh3cCBQoSVlanPolicyChanged NOTIFICATION-TYPE
         "This notification will be sent when the applying status
         of the policy on the VLAN is changed."
     ::= { hh3cCBQoSNotificationsPrefix 2 }
+
+hh3cCBQoSGlobalAclNotSupport NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cCBQoSChassis,
+        hh3cCBQoSSlot,
+        hh3cCBQoSCPU,
+        hh3cCBQoSDirection
+    }
+    STATUS current
+    DESCRIPTION
+        "The global ACL configuration cannot work."
+    ::= { hh3cCBQoSNotificationsPrefix 3 }
+
+hh3cCBQoSGlobalQPPBNotSupport NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cCBQoSChassis,
+        hh3cCBQoSSlot,
+        hh3cCBQoSCPU,
+        hh3cCBQoSDirection
+    }
+    STATUS current
+    DESCRIPTION
+        "The global QPPB will not be effective."
+    ::= { hh3cCBQoSNotificationsPrefix 4 }
+
+hh3cCBQoSRedirectInvalidAlarm NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cCBQoSRedirectAlarmBehaviorName,
+        hh3cCBQoSRedirectAlarmProtoFamily,
+        hh3cCBQoSRedirectAlarmNextHop
+    }
+    STATUS current
+    DESCRIPTION
+        "The redirection action becomes invalid."
+    ::= { hh3cCBQoSNotificationsPrefix 5 }
+
+hh3cCBQoSRedirectInvalidAlarmRecover NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cCBQoSRedirectAlarmBehaviorName,
+        hh3cCBQoSRedirectAlarmProtoFamily,
+        hh3cCBQoSRedirectAlarmNextHop
+    }
+    STATUS current
+    DESCRIPTION
+        "The redirection action has been recovered."
+    ::= { hh3cCBQoSNotificationsPrefix 6 }
+
+hh3cCBQoSRdtNHLackResAlarm NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cCBQoSRedirectAlarmBehaviorName,
+        hh3cCBQoSSlot,
+        hh3cCBQoSRedirectAlarmProtoFamily,
+        hh3cCBQoSRedirectAlarmNextHop,
+        hh3cCBQoSDirection,
+        hh3cCBQoSApplyObject
+    }
+    STATUS current
+    DESCRIPTION
+        "Redirect the next hop resource shortage alarm."
+    ::= { hh3cCBQoSNotificationsPrefix 7 }
+
+hh3cCBQoSRdtNHLackResRecover NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cCBQoSRedirectAlarmBehaviorName,
+        hh3cCBQoSSlot,
+        hh3cCBQoSRedirectAlarmProtoFamily,
+        hh3cCBQoSRedirectAlarmNextHop,
+        hh3cCBQoSDirection,
+        hh3cCBQoSApplyObject
+    }
+    STATUS current
+    DESCRIPTION
+        "Redirect to next hop Recovery from resource shortage."
+    ::= { hh3cCBQoSNotificationsPrefix 8 }
+--
+-- Nodes of hh3cCBQoSNotificationsBindings
+--
+
+hh3cCBQoSNotificationsBindings OBJECT IDENTIFIER ::= { hh3cCBQoSObjects 8 }
+
+hh3cCBQoSChassis OBJECT-TYPE
+    SYNTAX Integer32   (0..65534)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The chassis number."
+    ::= { hh3cCBQoSNotificationsBindings 1 }
+
+hh3cCBQoSSlot OBJECT-TYPE
+    SYNTAX Integer32   (0..65534)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The slot number."
+    ::= { hh3cCBQoSNotificationsBindings 2 }
+
+hh3cCBQoSCPU OBJECT-TYPE
+    SYNTAX Integer32   (0..65534)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The CPU number."
+    ::= { hh3cCBQoSNotificationsBindings 3 }
+
+hh3cCBQoSDirection OBJECT-TYPE
+    SYNTAX DirectionType
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Policy direction:
+         inbound (1)
+         outbound (2)"
+    ::= { hh3cCBQoSNotificationsBindings 4 }
+
+hh3cCBQoSRedirectAlarmBehaviorName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..31))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Name of the traffic behavior."
+    ::= { hh3cCBQoSNotificationsBindings 5 }
+
+hh3cCBQoSRedirectAlarmProtoFamily OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Protocol family of the redirection next-hop."
+    ::= { hh3cCBQoSNotificationsBindings 6 }
+
+hh3cCBQoSRedirectAlarmNextHop OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Next-hop addresss of the traffic redirection action."
+    ::= { hh3cCBQoSNotificationsBindings 7 }
+
+hh3cCBQoSApplyObject OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..127))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Name of the applying object."
+    ::= { hh3cCBQoSNotificationsBindings 8 }
 
 END

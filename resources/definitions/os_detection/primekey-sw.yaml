@@ -1,13 +1,12 @@
 os: primekey-sw
 text: "Software Appliance"
-type: appliance
+type: security
 icon: primekey
 group: primekey
 mib_dir: primekey
 snmp_bulk: false
 discovery_modules:
     bgp-peers: false
-    cisco-vrf-lite: false
     stp: false
 discovery:
     - sysObjectID:

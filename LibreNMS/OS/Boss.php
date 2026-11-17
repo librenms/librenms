@@ -33,17 +33,14 @@ use App\Models\Device;
 use App\Models\PortVlan;
 use App\Models\Vlan;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
-use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\OS;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
-class Boss extends OS implements OSDiscovery, ProcessorDiscovery, VlanDiscovery, VlanPortDiscovery
+class Boss extends OS implements OSDiscovery, VlanDiscovery, VlanPortDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -77,45 +74,16 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery, VlanDiscovery,
         }
     }
 
-    /**
-     * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
-     *
-     * @return array Processors
-     */
-    public function discoverProcessors()
-    {
-        $data = snmpwalk_group($this->getDeviceArray(), 's5ChasUtilCPUUsageLast10Minutes', 'S5-CHASSIS-MIB');
-
-        $processors = [];
-        $count = 1;
-        foreach ($data as $index => $entry) {
-            $processors[] = Processor::discover(
-                'avaya-ers',
-                $this->getDeviceId(),
-                ".1.3.6.1.4.1.45.1.6.3.8.1.1.6.$index",
-                Str::padLeft((string) $count, 2, '0'),
-                "Unit $count processor",
-                1,
-                $entry['sgProxyCpuCoreBusyPerCent'] ?? null
-            );
-
-            $count++;
-        }
-
-        return $processors;
-    }
-
     public function discoverVlans(): Collection
     {
         if (($QBridgeMibVlans = parent::discoverVlans())->isNotEmpty()) {
             return $QBridgeMibVlans;
         }
 
-        return SnmpQuery::walk('RC-VLAN-MIB::rcVlanName')
+        return SnmpQuery::walk('RAPID-CITY::rcVlanName')
             ->mapTable(fn ($vlan, $vlan_id) => new Vlan([
                 'vlan_vlan' => $vlan_id,
-                'vlan_name' => $vlan['RC-VLAN-MIB::rcVlanName'] ?? '',
+                'vlan_name' => $vlan['RAPID-CITY::rcVlanName'] ?? '',
                 'vlan_domain' => 1,
             ]));
     }
@@ -127,7 +95,7 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery, VlanDiscovery,
             return $ports;
         }
 
-        $egress_vlans = SnmpQuery::walk('RC-VLAN-MIB::rcVlanPortMembers')->pluck();
+        $egress_vlans = SnmpQuery::walk('RAPID-CITY::rcVlanPortMembers')->pluck();
 
         if (empty($egress_vlans)) {
             return $ports;
@@ -135,14 +103,14 @@ class Boss extends OS implements OSDiscovery, ProcessorDiscovery, VlanDiscovery,
 
         // find default vlans (untagged or otherwise)
         $port_data = SnmpQuery::walk([
-            'RC-VLAN-MIB::rcVlanPortDefaultVlanId',
-            'RC-VLAN-MIB::rcVlanPortPerformTagging',
+            'RAPID-CITY::rcVlanPortDefaultVlanId',
+            'RAPID-CITY::rcVlanPortPerformTagging',
         ])->table(1);
         $pvid_untagged = [];
         foreach ($port_data as $rcVlanPortIndex => $data) {
-            $vlan_id = $data['RC-VLAN-MIB::rcVlanPortDefaultVlanId'] ?? '';
-            // 2 false, 4 untagPvidOnly from RC-VLAN-MIB
-            $untagged = in_array($data['RC-VLAN-MIB::rcVlanPortPerformTagging'] ?? '', ['2', '4']) ? 1 : 0;
+            $vlan_id = $data['RAPID-CITY::rcVlanPortDefaultVlanId'] ?? '';
+            // 2 false, 4 untagPvidOnly from RAPID-CITY
+            $untagged = in_array($data['RAPID-CITY::rcVlanPortPerformTagging'] ?? '', ['2', '4']) ? 1 : 0;
 
             $pvid_untagged[$vlan_id][$rcVlanPortIndex] = $untagged;
         }

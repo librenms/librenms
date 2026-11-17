@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Enum\SensorType;
+
 $oids = snmpwalk_cache_oid($device, 'cmdExcFrequency', [], 'RS-XX8000-DVB-TX-MIB');
 
 echo 'Output-Frequency ';
@@ -11,6 +13,6 @@ foreach ($oids as $id => $data) {
     $descr = (count($oids) > 1) ? 'Frequency ' . $id : 'Frequency';
     $type = 'rs';
     $current = $data['cmdExcFrequency'];
-    discover_sensor(null, 'frequency', $device, $num_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
+    discover_sensor(null, SensorType::Frequency, $device, $num_oid, $index, $type, $descr, '1', '1', null, null, null, null, $current);
     $count++;
 }

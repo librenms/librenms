@@ -1,4 +1,4 @@
--- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+-- Mib files packaged on  Wed Jun 19 01:31:39 EDT 2019 for Storage Array Firmware V10.0.3 (R469188)
 
 EQLGROUP-MIB DEFINITIONS  ::= BEGIN
 IMPORTS
@@ -12,7 +12,7 @@ IMPORTS
             FROM INET-ADDRESS-MIB;      -- RFC2851
 
 eqlgroupModule MODULE-IDENTITY
-	LAST-UPDATED "201503171528Z"
+	LAST-UPDATED "201906190531Z"
     ORGANIZATION  "EqualLogic Inc."
     CONTACT-INFO
         "Contact: Customer Support
@@ -25,7 +25,7 @@ eqlgroupModule MODULE-IDENTITY
     DESCRIPTION
         "Equallogic Inc. group information
 
-        Copyright (c) 2002-2013 by Dell Inc. 
+        Copyright (c) 2002-2017 by Dell Inc. 
         
         All rights reserved.  This software may not be copied, disclosed, 
         transferred, or used except in accordance with a license granted 
@@ -43,9 +43,6 @@ eqlgroupModule MODULE-IDENTITY
 eqlgroupObjects OBJECT IDENTIFIER ::=  { eqlgroupModule 1 }
 eqlgroupNotifications OBJECT IDENTIFIER ::= { eqlgroupModule 2 }
 eqlgroupConformance OBJECT IDENTIFIER ::=  { eqlgroupModule 3 }
-
-
-
 
 
 --*********************************************************************************
@@ -110,7 +107,7 @@ UTFString ::= TEXTUAL-CONVENTION
                     Note that the size of an SnmpAdminString object is
                     measured in octets, not characters.
                    "
-         SYNTAX       OCTET STRING (SIZE (0..255))
+         SYNTAX       OCTET STRING (SIZE (0..1000))
 
 
 AdminAccountPrivilegeType ::= TEXTUAL-CONVENTION
@@ -128,7 +125,13 @@ AdminAccountPrivilegeType ::= TEXTUAL-CONVENTION
                             global-admin (0),
                             pool-admin  (1),
                             pool-admin-group-read  (2),
-                            volume-admin (3)
+                            volume-admin (3),
+                            pool-admin-config (4),
+                            pool-admin-diag (5),
+                            pool-admin-diag-config (6),
+                            read-only-config (7),
+                            read-only-diag (8),
+                            read-only-diag-config (9)
                             }
 
 AdminAccountType ::= TEXTUAL-CONVENTION
@@ -148,6 +151,19 @@ AdminAccountType ::= TEXTUAL-CONVENTION
                              read-write (1),
                              read-only  (2)
 			    }
+
+BinaryUUID ::= TEXTUAL-CONVENTION
+       STATUS              current
+       DESCRIPTION         "Used to represent binary data that is 16 bytes long (UUID/PSVID)"
+       SYNTAX              OCTET STRING (SIZE(16))
+
+Unsigned64 ::= TEXTUAL-CONVENTION
+       STATUS current
+       DESCRIPTION
+           "A non-negative 64-bit bit integer, without counter
+            semantics."
+       SYNTAX Counter64
+
 
 --*******************************
 
@@ -252,7 +268,13 @@ EqlStorageGroupEntry ::=
         eqlGroupDefaultSectorSize                INTEGER,
         eqlGroupCompressionScanFreq              Integer32,
         eqlGroupRunCompressionScan               INTEGER,
-        eqlGroupMonitorReminderTimestamp         Unsigned32
+        eqlGroupMonitorReminderTimestamp         Unsigned32,
+        eqlGroupDefaultThinWarnSoftThreshold     INTEGER,
+        eqlGroupDefaultThinWarnHardThreshold     INTEGER,
+        eqlGroupCreateDefaultTags                INTEGER,
+        eqlGroupFastVacate                       TruthValue,
+        eqlGroupSecureDelete                     TruthValue,
+        eqlGroupVolumeMigration                  INTEGER
         }
 
 
@@ -826,7 +848,31 @@ EqlStorageGroupEntry ::=
 		america-Creston(452),
 		asia-Khandyga(453),
 		europe-Busingen(454),
-		asia-Ust-Nera(455)
+		asia-Ust-Nera(455),
+		antarctica-Troll(456),
+		america-Coral-Harbour(457),
+		america-Ensenada(458),
+		asia-Srednekolymsk(459),
+		europe-Belfast(460),
+		asia-Tel-Aviv(461),
+		america-Argentina-ComodRivadavia(462),
+		asia-Hanoi(463),
+		asia-Chita(464),
+		america-Rosario(465),
+		pacific-Bougainville(466),
+		africa-Timbuktu(467),
+		america-Fort-Nelson(468),
+		europe-Astrakhan(469),
+		asia-Barnaul(470),
+		europe-Ulyanovsk(471),
+		asia-Tomsk(472),
+		europe-Kirov(473),
+		asia-Yangon(474),
+		asia-Famagusta(475),
+		america-Punta-Arenas(476),
+		europe-Saratov(477),
+		asia-Atyrau(478),
+		asia-Qostanay(479)
     }
     MAX-ACCESS      read-write
     STATUS          current
@@ -1288,7 +1334,31 @@ EqlStorageGroupEntry ::=
 		America/Creston,
 		Asia/Khandyga,
 		Europe/Busingen,
-		Asia/Ust-Nera "
+		Asia/Ust-Nera,
+		Antarctica/Troll,
+		America/Coral_Harbour,
+		America/Ensenada,
+		Asia/Srednekolymsk,
+		Europe/Belfast,
+		Asia/Tel_Aviv,
+		America/Argentina/ComodRivadavia,
+		Asia/Hanoi,
+		Asia/Chita,
+		America/Rosario,
+		Pacific/Bougainville,
+		Africa/Timbuktu,
+		America/Fort_Nelson,
+		Europe/Astrakhan,
+		Asia/Barnaul,
+		Europe/Ulyanovsk,
+		Asia/Tomsk,
+		Europe/Kirov,
+		Asia/Yangon,
+		Asia/Famagusta,
+		America/Punta_Arenas,
+		Europe/Saratov,
+		Asia/Atyrau,
+		Asia/Qostanay "
     
     DEFVAL          { est }
     ::=  {  eqlStorageGroupEntry 13 }
@@ -1642,7 +1712,7 @@ EqlStorageGroupEntry ::=
                         array-restart-flag(2), -- array restart flag
                         repl-use-jumbos(3), -- use jumbo frames for replication 0-yes 1-no
                         force-SCSI-QErr-OldBehavior(4), -- deprecated by per-volume QErr settings
-                        dcb-disable(5), -- set to disable the switch from Data Center Bridging Mode
+                        dcb-disable(5), -- set to disable the switch from Data Center Bridging Mode. deprecated
                         lldp-vlanidneg-disable(6), -- set to disable vlan id negotiation via LLDP
                         mpio-dynamic-scaling-mask0(7), -- Set in combination with -mask1...
                         unmap-disable(8), -- set to disable the unmap feature
@@ -2010,7 +2080,81 @@ EqlStorageGroupEntry ::=
                      display immediately.  0x7fffffff to never display."
     DEFVAL          { 0 }
     ::=  {  eqlStorageGroupEntry 82 }
-                       
+    
+    eqlGroupDefaultThinWarnSoftThreshold OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        disabled  (0),
+                        enabled   (1)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field enables/disables the default setting for the soft warning when
+                     creating a thin provisioned volume. When this setting is combined with 
+                     eqlGroupDefaultThinWarnHardThreshold, four different eqliscsiVolumeThinWarnMode 
+                     are possible, warnWithIscsi (both are enabled), warnWithHardOnly (only hard is enabled),
+                     warnWtihSoftOnly (only soft is enabled), 
+                     and warnWithOffline (default, and when neither are enabled)."
+    DEFVAL          { disabled }
+    ::=  {  eqlStorageGroupEntry 83 }
+    
+    eqlGroupDefaultThinWarnHardThreshold OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        disabled  (0),
+                        enabled   (1)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field enables/disables the default setting for the hard warning when
+                     creating a thin provisioned volume. When this setting is combined with 
+                     eqlGroupDefaultThinWarnSoftThreshold, four different eqliscsiVolumeThinWarnMode 
+                     are possible, warnWithIscsi (both are enabled), warnWithHardOnly (only hard is enabled),
+                     warnWtihSoftOnly (only soft is enabled), 
+                     and warnWithOffline (default, and when neither are enabled)."
+    DEFVAL          { disabled }
+    ::=  {  eqlStorageGroupEntry 84 }
+    
+    eqlGroupCreateDefaultTags OBJECT-TYPE
+    SYNTAX          INTEGER { 
+                        never-created      (0), 
+                        previously-created (1) 
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "A flag used internally to determine if the Default Tags have ever
+                     been created. The Default Tags may subsequently be deleted by 
+                     the user."
+    DEFVAL          { never-created }
+    ::=  {  eqlStorageGroupEntry 85 }
+
+    eqlGroupFastVacate OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Specifies whether fast vacate is enabled for the group."
+    DEFVAL          { true }
+    ::=  {  eqlStorageGroupEntry 86 }
+
+    eqlGroupSecureDelete OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Specifies whether secure delete is enabled for the group"
+    DEFVAL          { false }
+    ::=  {  eqlStorageGroupEntry 87 }
+
+    eqlGroupVolumeMigration OBJECT-TYPE
+    SYNTAX          INTEGER{
+                    enabled(0),
+                    disabled(1)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Specifies if volume migration is allowed for the group. default is enabled always."
+    DEFVAL          { enabled }
+    ::=  {  eqlStorageGroupEntry 88 }
+
+-- Do not add more columns to this MIB. There is a 2k limit due to the size of mbuf extension!
+
 --***********************************************************************************
 eqlStorageGroupStatusTable OBJECT-TYPE
     SYNTAX  SEQUENCE OF EqlStorageGroupStatusEntry
@@ -2069,7 +2213,9 @@ EqlStorageGroupStatusEntry ::=
         eqlStorageGroupStatusCompressedSpaceUsed      Counter64,
         eqlStorageGroupStatusVirtualSpaceSize         Counter64,
         eqlStorageGroupStatusReplicationSnapCount   Unsigned32,
-        eqlStorageGroupStatusStorageContainerVolumesBound Integer32
+        eqlStorageGroupStatusStorageContainerVolumesBound Integer32,
+        eqlStorageGroupStatusSnapVirtualSpaceUsed      Counter64,
+        eqlStorageGroupStatusSnapPhysicalSpaceUsed     Counter64
         }
 
 eqlStorageGroupStatusPoolSpace OBJECT-TYPE
@@ -2332,8 +2478,9 @@ eqlStorageGroupStatusVirtualVolumesInUse OBJECT-TYPE
     UNITS           "MB"
     MAX-ACCESS      read-only      
     STATUS          current      
-    DESCRIPTION     "This field specifies the total amount of borrowing against other volume's free snapshot reserve
-                     and pool free space. This includes snapshots and recoverable volumes."
+    DESCRIPTION     "This field specifies the total amount of borrowing against reserves
+                     and pool free space. This includes snapshots, recoverable volumes,
+                     and other objects that borrow space."
     ::=  { eqlStorageGroupStatusEntry 32 }
 
  eqlStorageGroupStatusStorageContainerCount OBJECT-TYPE      
@@ -2407,6 +2554,22 @@ eqlStorageGroupStatusStorageContainerVolumesBound OBJECT-TYPE
     STATUS          current      
     DESCRIPTION     "This field specifies the total number of bound volume across all storage containers."
     ::=  { eqlStorageGroupStatusEntry 42 }
+
+eqlStorageGroupStatusSnapVirtualSpaceUsed OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total amount of space in MB that would be utilized by snapshot data if there was no compression."
+    ::=  { eqlStorageGroupStatusEntry 43 }
+
+eqlStorageGroupStatusSnapPhysicalSpaceUsed OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total amount of space in MB utilized by snapshot data including compression-reduced space."
+    ::=  { eqlStorageGroupStatusEntry 44 }
 
 --**********************************************************************************
 
@@ -3835,7 +3998,8 @@ EqlStorageGroupProfileEntry ::=
         eqlStorageGroupProfileMaxConnections        Unsigned32,
         eqlStorageGroupProfileMaxPartners           Unsigned32,
         eqlStorageGroupProfileMaxConnWarning        Unsigned32,
-        eqlStorageGroupProfileMaxSyncReplVolumes    Unsigned32
+        eqlStorageGroupProfileMaxSyncReplVolumes    Unsigned32,
+        eqlStorageGroupProfileMaxOnlineSnaps        Unsigned32
 
         }
 
@@ -3921,6 +4085,13 @@ eqlStorageGroupProfileMaxSyncReplVolumes OBJECT-TYPE
     STATUS          current
     DESCRIPTION     "This field specifies the maximum number of Sync Repl volumes allowed in the group."
     ::=  {  eqlStorageGroupProfileEntry 12 }
+
+eqlStorageGroupProfileMaxOnlineSnaps OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the maximum number of online user-created snapshots allowed in the group. This number excludes snapshots temporarily set online for replication."
+    ::=  {  eqlStorageGroupProfileEntry 13 }
 
 --******************************************************************
 
@@ -4048,7 +4219,9 @@ EqlLDAPServerEntry ::=
         eqlLDAPServerAnonymousAccess TruthValue,
         eqlLDAPServerBindDN          OCTET STRING,
         eqlLDAPServerBindPassword    OCTET STRING,
-        eqlLDAPServerRowStatus       RowStatus
+        eqlLDAPServerRowStatus       RowStatus,
+        eqlLDAPServerUserSearchDN    OCTET STRING,
+        eqlLDAPServerGroupSearchDN   OCTET STRING
         }
 
 eqlLDAPServerIndex OBJECT-TYPE
@@ -4136,6 +4309,20 @@ eqlLDAPServerRowStatus OBJECT-TYPE
     STATUS          current
     DESCRIPTION     "row status"
     ::= {  eqlLDAPServerEntry 10 }
+
+eqlLDAPServerUserSearchDN OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(0..255))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the LDAP DN used for AD User LDAP search queries." 
+    ::=  {  eqlLDAPServerEntry 11 }
+
+eqlLDAPServerGroupSearchDN OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(0..255))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the LDAP DN used for AD Group LDAP search queries."
+    ::=  {  eqlLDAPServerEntry 12 }
 
 --*************************************************************************************
 eqlLdapLoginAccessTable OBJECT-TYPE
@@ -4360,7 +4547,7 @@ eqlGroupSessionBannerEntry OBJECT-TYPE
 EqlGroupSessionBannerEntry ::=
     SEQUENCE {
         eqlGroupSessionBannerRowStatus   RowStatus,
-        eqlGroupSessionBannerText        OCTET STRING
+        eqlGroupSessionBannerText        UTFString
         }
 
 eqlGroupSessionBannerRowStatus   OBJECT-TYPE
@@ -4371,7 +4558,7 @@ eqlGroupSessionBannerRowStatus   OBJECT-TYPE
     ::=  {  eqlGroupSessionBannerEntry 1 }
 
 eqlGroupSessionBannerText OBJECT-TYPE
-    SYNTAX          OCTET STRING (SIZE (0..1000))
+    SYNTAX          UTFString (SIZE (0..1000))
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION     "Up to 1000 bytes of UTF-8 string to display at the beginning of any session"
@@ -4570,7 +4757,384 @@ eqlEULAAcceptInfoTimestamp OBJECT-TYPE
     DESCRIPTION     "The timestamp when the EULA was accepted.."
     ::= { eqlEULAAcceptInfoEntry 5 }
 
+--******************************************************************
+
+eqlDefaultSnapshotSchedTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF EqlDefaultSnapshotSchedEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION      "EqualLogic-Persistent Table for storing extra default snapshot schedule settings."
+    ::= { eqlgroupObjects 33 }
+
+eqlDefaultSnapshotSchedEntry OBJECT-TYPE
+    SYNTAX          EqlDefaultSnapshotSchedEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing additional global default snapshot schedule settings."
+    INDEX           { eqlDefaultSnapshotSchedInstanceId }
+
+    ::=   { eqlDefaultSnapshotSchedTable 1 }
+
+EqlDefaultSnapshotSchedEntry ::=
+    SEQUENCE {
+        eqlDefaultSnapshotSchedInstanceId                  Unsigned32,
+        eqlDefaultSnapshotSchedRowStatus                   RowStatus,
+        eqlDefaultSnapshotSchedDegradePoolSpaceThreshold   Unsigned32,
+        eqlDefaultSnapshotSchedStagger                     Unsigned32,
+        eqlDefaultSnapshotSchedNumOfVolsSkippedBeforeYield Unsigned32
+    }
+
+eqlDefaultSnapshotSchedInstanceId OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This index identifies the default snapshot shcedule index. 
+                     This index should always be 1."
+    ::=  { eqlDefaultSnapshotSchedEntry 1 }
+
+    eqlDefaultSnapshotSchedRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Rowstatus"
+    ::=  { eqlDefaultSnapshotSchedEntry 2 }
+
+eqlDefaultSnapshotSchedDegradePoolSpaceThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32(0..100)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The minimum percentage of actual free space that must be in 
+                     every pool in the group in order to run in regular mode, with 
+                     the default snapshot scheduler honoring the default snapshot 
+                     schedule's eqliscsiVolumeSnapshotPolicyMaxKeep. If any of the 
+                     pools drop below this percentage, the schedular runs in degraded 
+                     mode, only keeping one snapshot. Setting to 0 means that
+                     default snapshot schedule will never run in degraded mode."
+    DEFVAL          { 15 }
+    ::=  { eqlDefaultSnapshotSchedEntry 3 }
+
+
+eqlDefaultSnapshotSchedStagger OBJECT-TYPE
+    SYNTAX          Unsigned32(0..30)
+    UNITS           "seconds"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The number of seconds that the default snapshot schedular delays 
+                     between subsequent snapshots in order to reduce load on the system 
+                     and allow other snapshot schedules to run. Set to 0 to disable."
+    DEFVAL          { 5 }
+    ::=  { eqlDefaultSnapshotSchedEntry 4 }
+
+eqlDefaultSnapshotSchedNumOfVolsSkippedBeforeYield OBJECT-TYPE 
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The number of inelligible volumes that can be skipped in succession before default scheduler 
+                     resubmits itself to the scheduler, yielding by at least 
+                     eqlDefaultSnapshotSchedStagger seconds. Set to 0 to disable."
+    DEFVAL          { 10 }
+    ::=  { eqlDefaultSnapshotSchedEntry 5 }
+
+--***********************************************************************************
+
+eqlStorageGroupVVolTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageGroupVVolEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Group VVol Table"
+    ::=  {  eqlgroupObjects  34}
+
+eqlStorageGroupVVolEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupVVolEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing Group VVol information."
+    INDEX           { eqlGroupId}
+    ::=    { eqlStorageGroupVVolTable 1 }
+
+EqlStorageGroupVVolEntry ::=
+    SEQUENCE {
+        eqlStorageGroupVVolCount             Unsigned32,   
+        eqlStorageGroupVVolSnapshotCount     Unsigned32,
+        eqlStorageGroupVVolLinkedCloneCount  Unsigned32   
+    }
+    
+eqlStorageGroupVVolCount OBJECT-TYPE 
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of VVols."
+    DEFVAL          { 0 }
+    ::=  { eqlStorageGroupVVolEntry 1 }
+
+eqlStorageGroupVVolSnapshotCount OBJECT-TYPE 
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of VVol snapshots."
+    DEFVAL          { 0 }
+    ::=  { eqlStorageGroupVVolEntry 2 }
+
+eqlStorageGroupVVolLinkedCloneCount OBJECT-TYPE 
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of VVol linked clones."
+    DEFVAL          { 0 }
+    ::=  { eqlStorageGroupVVolEntry 3 }
+
+--***********************************************************************************
+
+eqlCrossPlatReplTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF EqlCrossPlatReplEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION      "EqualLogic-Persistent Table for for cross-platform replication settings."
+    ::= { eqlgroupObjects 35 }
+
+eqlCrossPlatReplEntry OBJECT-TYPE
+    SYNTAX          EqlCrossPlatReplEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing attributes used in cross-platform replication."
+    AUGMENTS        { eqlStorageGroupEntry }
+
+    ::=   { eqlCrossPlatReplTable 1 }
+
+EqlCrossPlatReplEntry ::=
+    SEQUENCE {
+        eqlCrossPlatReplTransId                            Unsigned64,
+        eqlCrossPlatReplGroupSystemUUID                    DisplayString,
+        eqlCrossPlatReplTTLFeatureStatus                   TruthValue,
+        eqlCrossPlatReplTTLScrubberFrequency               Unsigned32,
+        eqlCrossPlatReplTTLScrubberBailoutTime             Unsigned32,
+        eqlCrossPlatReplTTLScrubberSnapCount               Unsigned32
+    }
+
+eqlCrossPlatReplTransId OBJECT-TYPE
+    SYNTAX          Unsigned64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The starting transaction ID used by Cross-Platform Replication."
+    DEFVAL          { 1 }
+    ::=  { eqlCrossPlatReplEntry 1 }
+
+eqlCrossPlatReplGroupSystemUUID OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(0..37))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "System UUID used for XPR.  This UUID conforms to RFC 4122 version 1."
+    ::=  { eqlCrossPlatReplEntry 2 }
+eqlCrossPlatReplTTLFeatureStatus OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Specifies if XPR replica TTL(Time-to-Live) functionality is enabled/disabled. By default this is enabled, Enabled(1) and disabled(2)."
+    DEFVAL          { true }
+    ::=  {  eqlCrossPlatReplEntry 3 }
+    
+eqlCrossPlatReplTTLScrubberFrequency OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field sets the frequency value of the TTL-scrubber for checking the expired replica snapshots and snapshots of XPR promoted volumes."
+    DEFVAL          { 120 }
+    ::=  {  eqlCrossPlatReplEntry 4 }
+
+eqlCrossPlatReplTTLScrubberBailoutTime OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the bailout time (in msecs) for TTL scrubber for XPR."
+    DEFVAL          { 5 }
+    ::=  { eqlCrossPlatReplEntry 5 }
+
+eqlCrossPlatReplTTLScrubberSnapCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field indicates maximmum number of replica snapshots or failover volume's snapshots that TTL scrubber will iterate 
+    through in one invocation in Cross-Platform Replication."
+    DEFVAL          { 50 }
+    ::=  { eqlCrossPlatReplEntry 6 }
+
+
+--*************************************************************************************
+
+eqlStorageGroupAdminAccountPublicKeyTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EqlStorageGroupAdminAccountPublicKeyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Storage Group Administration
+                     Account Public Key table. This table contains a collection of
+                     SSH Public Key records. It is indexed by group id and administration
+                     account record index."
+    ::= { eqlgroupObjects 36 }
+
+eqlStorageGroupAdminAccountPublicKeyEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupAdminAccountPublicKeyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing administration
+                     Account Public Key settings."
+
+    INDEX           {  eqlGroupId, eqlStorageGroupAdminAccountIndex }
+
+    ::=   { eqlStorageGroupAdminAccountPublicKeyTable 1 }
+
+EqlStorageGroupAdminAccountPublicKeyEntry ::=
+    SEQUENCE {
+        eqlStorageGroupAdminAccountPublicKeyRowStatus     RowStatus,
+        eqlStorageGroupAdminAccountPublicKeyUserName      DisplayString,
+        eqlStorageGroupAdminAccountPublicKeyValue         OCTET STRING,
+        eqlStorageGroupAdminAccountPublicKeyDescription   DisplayString
+    }
+
+eqlStorageGroupAdminAccountPublicKeyRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This value is used to manage the conceptual row."
+    ::=   { eqlStorageGroupAdminAccountPublicKeyEntry 1 }
+
+eqlStorageGroupAdminAccountPublicKeyUserName OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (1..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The name of the administration account."
+    ::=   { eqlStorageGroupAdminAccountPublicKeyEntry 2 }
+
+eqlStorageGroupAdminAccountPublicKeyValue OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (1..1024))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "An octet string containing the SSH Public Key for this
+                     account."
+    ::=   { eqlStorageGroupAdminAccountPublicKeyEntry 3 }
+
+eqlStorageGroupAdminAccountPublicKeyDescription OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (1..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Description string for the SSH Public Key."
+    ::=   { eqlStorageGroupAdminAccountPublicKeyEntry 4 }
+
+--*************************************************************************************
+ eqlStorageGroupGrpAdminLoginStatusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageGroupGrpAdminLoginStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Storage Group grpadmin login/logout status Table"
+    ::=  {  eqlgroupObjects  37}
+
+eqlStorageGroupGrpAdminLoginStatusEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupGrpAdminLoginStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing group grpadmin login/logout status info."
+    INDEX           { eqlGroupId}
+    ::=    { eqlStorageGroupGrpAdminLoginStatusTable 1 }
+
+EqlStorageGroupGrpAdminLoginStatusEntry ::=
+    SEQUENCE {
+        eqlStorageGroupGrpadminLoginStatusIndex        Integer32,
+        eqlStorageGroupGrpadminName                    DisplayString,
+        eqlStorageGroupGrpadminLoginStatus             INTEGER,
+        eqlStorageGroupServerIpAddr                    DisplayString,
+        eqlStoragGroupGrpadminLoginStatusRowStatus     RowStatus
+        }
+
+eqlStorageGroupGrpadminLoginStatusIndex     OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies an index that uniquely identifies the grpadmin user login status "
+    ::=  {  eqlStorageGroupGrpAdminLoginStatusEntry 1 }
+
+eqlStorageGroupGrpadminName     OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (1..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the account name of the grpadmin"
+    ::=  {  eqlStorageGroupGrpAdminLoginStatusEntry 2 }
+
+eqlStorageGroupGrpadminLoginStatus             OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        login-stat-success(0),
+                        login-stat-logout(1),
+                        login-stat-failed(2)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Grpadmin account login status"
+    ::= { eqlStorageGroupGrpAdminLoginStatusEntry 3 }
+
+eqlStorageGroupServerIpAddr      OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (1..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This is the IP address, from the user attempted login/logout"
+    ::=  {  eqlStorageGroupGrpAdminLoginStatusEntry 4 }
+
+eqlStoragGroupGrpadminLoginStatusRowStatus    OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This value is used to manage the conceptual row."
+    ::=   { eqlStorageGroupGrpAdminLoginStatusEntry 5 }
+
+--*************************************************************************************
 --
+--  SNMP TRAPS
+--
+
+eqlgroupMgmtNotifications OBJECT IDENTIFIER ::= {eqlgroupNotifications 1}
+
+eqlgroupIPv4AddrChanged NOTIFICATION-TYPE
+    OBJECTS{
+        eqlGroupName,
+        eqlGroupInetAddrType,
+        eqlGroupInetAddr
+    }
+    STATUS current
+    DESCRIPTION
+    "The Group IPv4 address has changed. Contact the group administrator."
+    ::= { eqlgroupMgmtNotifications 1 }
+
+eqlgroupIPv6AddrChanged NOTIFICATION-TYPE
+    OBJECTS{
+        eqlGroupName,
+        eqlGroupInet6AddrType,
+        eqlGroupInet6Addr
+    }
+    STATUS current
+    DESCRIPTION
+    "The Group IPv6 address has changed. Contact the group administrator."
+    ::= { eqlgroupMgmtNotifications 2 }
+
+eqlMWKAChangeNotification NOTIFICATION-TYPE
+    OBJECTS{
+        eqlGroupName,
+        eqlGroupInetAddrType,
+        eqlGroupInetAddr
+    }
+    STATUS current
+    DESCRIPTION
+    "The MWKA of the Equallogic array has changed. Contact the group administrator."
+::= { eqlgroupMgmtNotifications 3 }
+
+eqlgroupAdminLoginStatus NOTIFICATION-TYPE
+    OBJECTS{
+        eqlStorageGroupGrpadminName,
+        eqlStorageGroupGrpadminLoginStatus,
+        eqlStorageGroupServerIpAddr
+    }
+    STATUS current
+    DESCRIPTION
+    "Sent when a Grpadmin account status is modified
+(login/logout/login-failed)"
+    ::= { eqlgroupMgmtNotifications 4 }
 
 END
 

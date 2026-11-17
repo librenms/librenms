@@ -1,7 +1,8 @@
 -- ****************************************************************************
 --  COLUBRIS-PUBLIC-ACCESS-MIB definitions
 --
---  Copyright (c) 2004, Colubris Networks, Inc.
+--  (c) Copyright 2003-2006,2008,2010,2012-2013 Hewlett-Packard Development Company, L.P.
+--  The information contained herein is subject to change without notice.
 --  All Rights Reserved.
 --
 --  Colubris Networks Public Access MIB file.
@@ -31,7 +32,7 @@ IMPORTS
 
 
 colubrisPublicAccessMIB  MODULE-IDENTITY
-    LAST-UPDATED    "200511040000Z"
+    LAST-UPDATED    "201306100000Z"
     ORGANIZATION    "Colubris Networks, Inc."
     CONTACT-INFO    "Colubris Networks
                      Postal: 200 West Street Ste 300
@@ -593,7 +594,8 @@ publicAccessUserPHYType OBJECT-TYPE
                     ieee802dot11a(1),
                     ieee802dot11b(2),
                     ieee802dot11g(3),
-		    ieee802dot11n(4)
+		    ieee802dot11n(4),
+		    ieee802dot11ac(5)
                 }
     MAX-ACCESS  read-only
     STATUS      current

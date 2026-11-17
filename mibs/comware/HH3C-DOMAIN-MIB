@@ -3,7 +3,7 @@
 --
 -- Description: Domain MIB
 -- Reference:
--- Version: V2.8
+-- Version: V2.9
 -- History:
 -- V1.0 2005.03.23 The initial version, created by Xulei
 -- V1.1 2005.06.03 updated by Xulei
@@ -62,6 +62,9 @@
 -- V2.8 2021.3.24 updated by jinyu
 --      Added hh3cDomainActiveWebServerUrl, hh3cUserWebServerDownAlarm,
 --      hh3cUserWebServerUpAlarm, hh3cUserWebServerChangeAlarm
+-- V2.9 2021.9.3 updated by wudegen
+--      Added hh3cDomainActiveWebServerIpv6Url, hh3cUserIPv6WebServerDownAlarm,
+--      hh3cUserIPv6WebServerUpAlarm, hh3cUserIPv6WebServerChangeAlarm
 -- ==================================================================
 HH3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
     IMPORTS
@@ -77,7 +80,7 @@ HH3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
             FROM SNMPv2-TC;
 
     hh3cDomain MODULE-IDENTITY
-        LAST-UPDATED "202103240000Z"            -- March 24, 2021 at 00:00 GMT
+        LAST-UPDATED "202109030000Z"            -- September 03, 2021 at 00:00 GMT
         ORGANIZATION
             "New H3C Tech. Co., Ltd."
         CONTACT-INFO
@@ -90,6 +93,10 @@ HH3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
             "The MIB module is used for managing domain."
 
 --  Revision history
+    REVISION     "202109030000Z"          -- September 03, 2021 at 00:00 GMT
+        DESCRIPTION  "Added hh3cDomainActiveWebServerIpv6Url, hh3cUserIPv6WebServerDownAlarm,
+                  hh3cUserIPv6WebServerUpAlarm, hh3cUserIPv6WebServerChangeAlarm"
+
     REVISION     "202103240000Z"          -- March 24, 2021 at 00:00 GMT
         DESCRIPTION  "Added hh3cDomainActiveWebServerUrl, hh3cUserWebServerDownAlarm,
                   hh3cUserWebServerUpAlarm, hh3cUserWebServerChangeAlarm"
@@ -282,7 +289,8 @@ HH3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
         hh3cDomainNdPrefixPoolGroupName  OCTET STRING,
         hh3cDomainIpv6Prefix             Ipv6AddressPrefix,
         hh3cDomainIpv6PrefixLength       Integer32,
-        hh3cDomainActiveWebServerUrl     OCTET STRING}
+        hh3cDomainActiveWebServerUrl     OCTET STRING,
+        hh3cDomainActiveWebServerIpv6Url OCTET STRING}
 
     hh3cDomainName   OBJECT-TYPE
         SYNTAX  OCTET STRING (SIZE (1..255))
@@ -602,6 +610,14 @@ HH3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
         "Active URL(Uniform Resource Locator) of the Web server in ISP domain."
     ::= { hh3cDomainInfoEntry  30 }
+
+    hh3cDomainActiveWebServerIpv6Url   OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..255))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Active IPv6 URL of the Web server in ISP domain."
+    ::= { hh3cDomainInfoEntry  31 }
 
     -- ----------------------------------------------------------------------
     -- Scheme Table
@@ -1744,7 +1760,7 @@ HH3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
             STATUS current
             DESCRIPTION
                 "
-                This trap is generated when the Web server is not reachable
+                This trap is generated when the Web server is not reachable.
                 "
             ::= { hh3cDomainTrapsDefine 17 }
 
@@ -1753,7 +1769,7 @@ HH3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
             STATUS current
             DESCRIPTION
                 "
-                This trap is generated when the Web server is restored to accessibility
+                This trap is generated when the Web server becomes reachable.
                 "
             ::= { hh3cDomainTrapsDefine 18 }
 
@@ -1762,7 +1778,34 @@ HH3C-DOMAIN-MIB DEFINITIONS ::= BEGIN
             STATUS current
             DESCRIPTION
                 "
-                This trap is generated when the valid URL of the Web Server changes
+                This trap is generated when the valid URL of the Web Server changes.
                 "
             ::= { hh3cDomainTrapsDefine 19 }
+
+    hh3cUserIPv6WebServerDownAlarm NOTIFICATION-TYPE
+            OBJECTS { hh3cDomainActiveWebServerIpv6Url }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap is generated when the IPv6 Web server is not reachable.
+                "
+            ::= { hh3cDomainTrapsDefine 20 }
+
+    hh3cUserIPv6WebServerUpAlarm NOTIFICATION-TYPE
+            OBJECTS { hh3cDomainActiveWebServerIpv6Url }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap is generated when the IPv6 Web server becomes reachable.
+                "
+            ::= { hh3cDomainTrapsDefine 21 }
+
+    hh3cUserIPv6WebServerChangeAlarm NOTIFICATION-TYPE
+            OBJECTS { hh3cDomainActiveWebServerIpv6Url }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap is generated when the valid IPv6 URL of the Web Server changes.
+                "
+            ::= { hh3cDomainTrapsDefine 22 }
 END

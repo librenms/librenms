@@ -1,14 +1,16 @@
 -- =================================================================
--- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: This MIB file is used for querying MP (Multilink PPP)
 --              link status information.
 -- Reference:
--- Version: V1.1
+-- Version: V1.2
 -- History:
 --   V1.0 Initial version 2013-07-15
 --   V1.1 2013-10-08 updated by jinlei 07761
 --        Added enum active(1) and inactive(2) to hh3cMpMemberlinkMpStatusV2
+--   V1.2 2022-06-16 add hh3cMpRxLossPktAlarmTrapOid
+--                   add hh3cMpRxLossPktAlarmTrap by wangzhenjun
 -- =================================================================
 HH3C-MP-V2-MIB DEFINITIONS ::= BEGIN
 
@@ -17,13 +19,13 @@ IMPORTS
         FROM HH3C-OID-MIB
     ifIndex
         FROM IF-MIB
-    Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY
+    Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
     DisplayString
         FROM SNMPv2-TC;
 
 hh3cMultilinkPPPV2 MODULE-IDENTITY
-    LAST-UPDATED "201307150000Z"            -- July 15, 2013 at 00:00 GMT
+    LAST-UPDATED "202206160000Z"            -- June 16, 2022 at 00:00 GMT
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -31,6 +33,9 @@ hh3cMultilinkPPPV2 MODULE-IDENTITY
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
          Zip:100085"
+    DESCRIPTION
+         "Supporting the trap for MP(Multilink PPP)"
+    REVISION "202206160000Z"        -- June 16, 2022 at 00:00 GMT
     DESCRIPTION
          "The HH3C-MP-V2-MIB provides read access to MP(Multilink PPP) link
           status information. The information available through this MIB includes:
@@ -268,4 +273,72 @@ hh3cMpMemberlinkMpStatusV2 OBJECT-TYPE
         "
     ::= { hh3cMpMemberlinkV2Entry 4 }
 
+hh3cMpRxLossPktAlarmTrapOid OBJECT IDENTIFIER ::= { hh3cMpObjectsV2 3 }
+
+hh3cMpRxLossAlarmIfName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..47))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved MP group interface name of trap information."
+    ::= { hh3cMpRxLossPktAlarmTrapOid 1 }
+
+hh3cMpRxLossCurValueString OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved current loss rate of received packet of
+         trap information."
+    ::= { hh3cMpRxLossPktAlarmTrapOid 2 }
+
+hh3cMpRxLossAlarmValueString OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved alarm threshold of received packet dropped
+         of trap information."
+    ::= { hh3cMpRxLossPktAlarmTrapOid 3 }
+
+hh3cMpRxLossResumeValueString OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved resume threshold of received packet dropped
+         of trap information."
+    ::= { hh3cMpRxLossPktAlarmTrapOid 4 }
+
+hh3cMpRxLossPktAlarmTrap OBJECT IDENTIFIER  ::= { hh3cMpObjectsV2 4 }
+
+hh3cMpRxLossPktAlarmTrapPrefix OBJECT IDENTIFIER  ::= { hh3cMpRxLossPktAlarmTrap 0 }
+
+hh3cMpRxLossPktAlarm NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cMpRxLossAlarmIfName,
+        hh3cMpRxLossCurValueString,
+        hh3cMpRxLossAlarmValueString,
+        hh3cMpRxLossResumeValueString
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the rate of received packets dropped
+         exceds the alarm threshold."
+    ::= { hh3cMpRxLossPktAlarmTrapPrefix 1 }
+
+hh3cMpRxLossPktAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cMpRxLossAlarmIfName,
+        hh3cMpRxLossCurValueString,
+        hh3cMpRxLossAlarmValueString,
+        hh3cMpRxLossResumeValueString
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the rate of received packets dropped
+         drops below the resume threshold."
+    ::= { hh3cMpRxLossPktAlarmTrapPrefix 2 }
 END

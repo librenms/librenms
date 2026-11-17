@@ -18,3 +18,9 @@ discovery:
             mib_dir: carel
             op: '!='
             value: false
+    -
+        sysObjectID_regex: '/^\.1\.3\.6\.1\.4\.1$/'
+        snmpget:
+            oid: '.1.3.6.1.4.1.9839.1.2.0'
+            op: '='
+            value: '2'

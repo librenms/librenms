@@ -1,6 +1,6 @@
 os: edfamux
 text: 'Solid Optics EDFAMUX'
-type: network
+type: optical
 icon: solidoptics
 mib_dir: solidoptics
 over:

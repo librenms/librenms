@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('isis_adjacencies', function (Blueprint $table) {
+        Schema::create('isis_adjacencies', function (Blueprint $table): void {
             $table->increments('id');
             $table->integer('device_id')->index();
             $table->integer('port_id')->index();

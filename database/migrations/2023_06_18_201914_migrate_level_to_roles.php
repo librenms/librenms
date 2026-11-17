@@ -37,7 +37,7 @@ return new class extends Migration
             }
         }
 
-        Schema::table('users', function (Blueprint $table) {
+        Schema::table('users', function (Blueprint $table): void {
             $table->dropColumn('level');
         });
     }
@@ -48,7 +48,7 @@ return new class extends Migration
     public function down(): void
     {
         if (! Schema::hasColumn('users', 'level')) {
-            Schema::table('users', function (Blueprint $table) {
+            Schema::table('users', function (Blueprint $table): void {
                 $table->tinyInteger('level')->default(0)->after('descr');
             });
         }
@@ -61,9 +61,7 @@ return new class extends Migration
                 DB::raw('GROUP_CONCAT(roles.name ORDER BY roles.name ASC SEPARATOR ",c") as roles')
             )
             ->groupBy('assigned_roles.entity_id')
-            ->pluck('roles', 'user_id')->map(function ($roles) {
-                return explode(',', $roles);
-            })->all();
+            ->pluck('roles', 'user_id')->map(fn ($roles) => explode(',', $roles))->all();
 
         foreach (DB::table('users')->select('user_id')->get() as $user) {
             DB::table('users')->where('user_id', $user->user_id)->update([

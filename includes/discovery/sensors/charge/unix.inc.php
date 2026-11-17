@@ -23,11 +23,13 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Util\Oid;
 
 $snmpData = SnmpQuery::cache()->hideMib()->walk('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut"')->table(3);
 if (! empty($snmpData)) {
-    echo 'UPS-NUT-MIB: ' . PHP_EOL;
+    Log::info('UPS-NUT-MIB: ', ['nlb' => true]);
     $snmpData = array_shift($snmpData); //drop [ups-nut]
     $upsnut = [
         1 => ['descr' => 'Battery Charge', 'LL' => 0, 'LW' => 10, 'W' => null, 'H' => null],
@@ -39,7 +41,7 @@ if (! empty($snmpData)) {
                 $oid = Oid::of('NET-SNMP-EXTEND-MIB::nsExtendOutLine."ups-nut".' . $index)->toNumeric();
                 discover_sensor(
                     null,
-                    'charge',
+                    SensorType::Charge,
                     $device,
                     $oid,
                     $index,

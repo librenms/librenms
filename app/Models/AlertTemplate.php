@@ -35,6 +35,7 @@ class AlertTemplate extends BaseModel
     use HasFactory;
 
     public $timestamps = false;
+    protected $fillable = ['name', 'template', 'title', 'title_rec'];
 
     // ---- Define Relationships ----
     /**

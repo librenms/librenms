@@ -60,7 +60,7 @@ return new class extends Migration
             $this->renameIndex('eventlog', 'datetime', 'eventlog_datetime_index', ['datetime']);
             $this->renameIndex('eventlog', 'device_id', 'eventlog_device_id_index', ['device_id']);
             if (! Schema::hasIndex('entityState', 'entitystate_device_id_index')) {
-                Schema::table('entityState', function (Blueprint $table) {
+                Schema::table('entityState', function (Blueprint $table): void {
                     // must be dropped and re-added because of case insensitivity
                     if (Schema::hasIndex('entityState', 'entityState_device_id_index')) {
                         $table->dropIndex('entityState_device_id_index');

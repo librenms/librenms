@@ -2,7 +2,7 @@
 
 @section('content')
 <x-device.page :device="$device">
-    <x-option-bar name="{{ __('Pseudowires') }}" :options="$data['options']" :selected="$data['view']" />
+    <x-option-bar name="{{ __('Pseudowires') }}" :options="$options" :selected="$view" />
 
     <table class="table table-hover table-condensed table-striped">
         <thead>
@@ -16,7 +16,7 @@
             </tr>
         </thead>
         <tbody>
-        @forelse($data['rows'] as $row)
+        @forelse($rows as $row)
             @php
                 $pw = $row['pw'];
                 $peerPw = $row['peerPw'];
@@ -88,7 +88,7 @@
                 </td>
             </tr>
 
-            @if($data['view'] === 'minigraphs')
+            @if($view === 'minigraphs')
                 <tr>
                     <td></td>
                     <td colspan="2">

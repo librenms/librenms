@@ -53,15 +53,16 @@
             ajax: true,
             requestHandler: request => ({
                 ...request,
-                acknowledged: '{{ $acknowledged }}',
-                unreachable: '{{ $unreachable }}',
-                fired: '{{ $fired }}',
-                state: '{{ $state }}',
+                acknowledged: @json($acknowledged),
+                unreachable: @json($unreachable),
+                fired: @json($fired),
+                state: @json($state),
                 min_severity: severityQuickFilter !== null ? severityQuickFilter : (widgetDefaultMinSeverity ?? ''),
-                group: '{{ $device_group }}',
-                proc: '{{ $proc }}',
-                uncollapse_key_count: '{{ $uncollapse_key_count }}',
-                device_id: '{{ $device }}'
+                group: @json($device_group),
+                proc: @json($proc),
+                uncollapse_key_count: @json($uncollapse_key_count),
+                device_id: @json($device),
+                widget_id: @json($id)
             }),
             responseHandler: response => {
                 $("#widget_title_counter_{{ $id }}").text(response.total ? ` (${response.total})` : '')
@@ -76,7 +77,7 @@
                 @endif
             },
             url: "{{ route('table.alerts') }}",
-            navigation: ! {{ $hidenavigation }},
+            navigation: @json(! $hidenavigation),
             rowCount: [50, 100, 250, -1],
             templates: {
                 header: "<div id=\"@{{ctx.id}}\" class=\"@{{css.header}}\"><div class=\"row\">" +
@@ -90,36 +91,7 @@
         }).on("loaded.rs.jquery.bootgrid", function() {
             alerts_grid = $(this);
             updateSeverityQuickFilterButtons();
-            alerts_grid.find(".incident-toggle").each( function() {
-                $(this).parent().addClass('incident-toggle-td');
-            }).on("click", function(e) {
-                var target = $(this).data("target");
-                $(target).collapse('toggle');
-                $(this).toggleClass('fa-plus fa-minus');
-            });
-            alerts_grid.find(".incident").each( function() {
-                $(this).parent().addClass('col-lg-4 col-md-4 col-sm-4 col-xs-4');
-                $(this).parent().parent().on("mouseenter", function() {
-                    $(this).find(".incident-toggle").fadeIn(200);
-                }).on("mouseleave", function() {
-                    $(this).find(".incident-toggle").fadeOut(200);
-                });
-            });
-            alerts_grid.find(".command-ack-alert").on("click", function(e) {
-                e.preventDefault();
-                var alert_state = $(this).data("alert_state");
-                var alert_id = $(this).data('alert_id');
-                $('#ack_alert_id').val(alert_id);
-                $('#ack_alert_state').val(alert_state);
-                $('#ack_msg').val('');
-                $("#alert_ack_modal").modal('show');
-            });
-            alerts_grid.find(".command-alert-note").on("click", function(e) {
-                e.preventDefault();
-                var alert_id = $(this).data('alert_id');
-                $('#alert_id').val(alert_id);
-                $("#alert_notes_modal").modal('show');
-            });
+            @include('alerts.partials.init-rows', ['grid' => 'alerts_grid'])
         });
 
         $('#alerts_container-{{ $id }}').on('refresh', function (event) {

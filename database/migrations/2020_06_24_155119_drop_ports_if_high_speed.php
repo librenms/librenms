@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ports', function (Blueprint $table) {
+        Schema::table('ports', function (Blueprint $table): void {
             $table->dropColumn(['ifHighSpeed', 'ifHighSpeed_prev']);
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ports', function (Blueprint $table) {
+        Schema::table('ports', function (Blueprint $table): void {
             $table->integer('ifHighSpeed')->nullable()->after('ifPromiscuousMode');
             $table->integer('ifHighSpeed_prev')->nullable()->after('ifHighSpeed');
         });

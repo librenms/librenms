@@ -3,6 +3,7 @@ text: 'Imco Power LS/PS'
 type: power
 icon: imco
 group: IMCO POWER
+snmp_bulk: false
 discovery:
     -
         sysObjectID:

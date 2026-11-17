@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bill_port_counters', function (Blueprint $table) {
+        Schema::create('bill_port_counters', function (Blueprint $table): void {
             $table->unsignedInteger('port_id');
             $table->timestamp('timestamp')->useCurrent();
             $table->bigInteger('in_counter')->nullable();

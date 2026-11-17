@@ -4,8 +4,28 @@
 -- This file describes the ZyXEL Communications Corporation Enterprise MIB.
 -- It contains ZyXEL products OIDs, and common managed objects.
 
--- ZYXEL-HW-MONITOR-MIB.mib
--- Revision 1.10  2016/02/24 
+-- $Log: ZYXEL-HW-MONITOR-MIB.mib $ 
+-- Revision 1.10  2016/02/24 03:52:13  Viktor 
+-- Add new MIB feature "HwmonitorPowerSourceStatusChange" trap for multi-power source model (XGS3700).  
+-- Revision 1.9  2015/05/27 07:08:12  Shinge 
+-- add power source trap  
+-- Revision 1.8  2013/12/06 07:05:10  ccho 
+-- remove uncessary imports 
+-- Revision 1.7  2013/06/26 07:14:07  Mandy 
+-- Support notified trap for error recovered 
+-- Revision 1.6  2013/01/16 12:10:51  Kevin 
+-- add new entries to descript index on Fan, Temperature and Voltage 
+-- Revision 1.5  2012/10/18 03:12:50  Kevin 
+-- revise zyHwMonitorTemperatureIndex syntax is inconsistent with CLI and Web. 
+-- Revision 1.4  2012/09/19 07:35:31  Kevin 
+-- if it's leaf node, revise the vender name from zyxel to zy 
+-- Revision 1.3  2012/09/13 10:46:09  12893 
+-- for fan airflow notification 
+-- Revision 1.2  2012/07/05 06:22:45  Kevin 
+-- 1. upgrade from SNMP to SNMPv2  
+-- 2. clean warning 
+-- Revision 1.1  2012/05/30 07:48:50  Kevin 
+-- Initial revision 
 
 ZYXEL-HW-MONITOR-MIB DEFINITIONS ::= BEGIN
     IMPORTS
@@ -14,7 +34,10 @@ ZYXEL-HW-MONITOR-MIB DEFINITIONS ::= BEGIN
 		
 	MODULE-IDENTITY
 		FROM SNMPv2-SMI
-		
+
+	EnabledStatus
+		FROM  P-BRIDGE-MIB
+	
 	DisplayString                                          
 	  FROM SNMPv2-TC
 
@@ -36,7 +59,7 @@ ZYXEL-HW-MONITOR-MIB DEFINITIONS ::= BEGIN
 	zyxelHwMonitorStatus 			OBJECT IDENTIFIER ::= { zyxelHwMonitor 1 }		
 	zyxelHwMonitorNotifications 	OBJECT IDENTIFIER ::= { zyxelHwMonitor 2 }
 	zyxelHwMonitorTrapInfoObject	OBJECT IDENTIFIER ::= { zyxelHwMonitor 3 }	
-
+	zyxelHwMonitorSetup 			OBJECT IDENTIFIER ::= { zyxelHwMonitor 4 }	
 --  26.HwMonitor
 
 -- 		fanRpmTable
@@ -66,7 +89,9 @@ ZYXEL-HW-MONITOR-MIB DEFINITIONS ::= BEGIN
         	zyHwMonitorFanRpmMaxValue		INTEGER,
         	zyHwMonitorFanRpmMinValue		INTEGER,
         	zyHwMonitorFanRpmLowThreshold	INTEGER,
-        	zyHwMonitorFanRpmStatus			DisplayString
+        	zyHwMonitorFanRpmStatus			DisplayString,
+        	zyHwMonitorFanRpmDetect			DisplayString
+
            }
 
         zyHwMonitorFanRpmIndex OBJECT-TYPE
@@ -125,6 +150,16 @@ ZYXEL-HW-MONITOR-MIB DEFINITIONS ::= BEGIN
 		"'Normal' indicates that this fan is functioning above the minimum speed. 
 		 'Error' indicates that this fan is functioning below the minimum speed."
         ::= { zyxelHwMonitorFanRpmEntry 7 }
+
+        zyHwMonitorFanRpmDetect OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+		"' ' indicates that no detection. 
+		 'SFP' indicates that this fan change due to SFP detection."
+        ::= { zyxelHwMonitorFanRpmEntry 8 }
+
 
 -- 		tempTable
 
@@ -369,7 +404,7 @@ ZYXEL-HW-MONITOR-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS  read-only
         STATUS  current
         DESCRIPTION
-        "The current power source status  (normal/error/absent/present)."
+        "The current power source status  (normal, error, absent, present, active, standby, N/A)."
         ::= { zyxelHwMonitorPowerSourceEntry 3 } 
 		
 		zyHwMonitorPowerSourceDescription OBJECT-TYPE
@@ -387,7 +422,87 @@ ZYXEL-HW-MONITOR-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
 		"Power source Previous Status  (normal/error/absent/present)."
         ::= { zyxelHwMonitorPowerSourceEntry 5 }
-		
+
+--      etherPortTable
+
+        zyxelHwMonitorEtherPortTable    OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ZyxelHwMonitorEtherPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The table contains HW monitor ether port information."
+        ::= { zyxelHwMonitorStatus 5 }
+
+        zyxelHwMonitorEtherPortEntry OBJECT-TYPE
+        SYNTAX  ZyxelHwMonitorEtherPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "An entry contains ethernet port information."
+        INDEX           { zyHwMonitorEtherPortIndex }
+        ::= { zyxelHwMonitorEtherPortTable 1 }
+
+        ZyxelHwMonitorEtherPortEntry ::=
+           SEQUENCE {
+            zyHwMonitorEtherPortIndex         INTEGER,
+            zyHwMonitorEtherPortLinkStatus    INTEGER
+            zyHwMonitorEtherPortLinkSpeed     INTEGER
+            zyHwMonitorEtherPortDuplexMode    INTEGER
+            zyHwMonitorEtherPortLinkUpTime    INTEGER
+           }
+
+        zyHwMonitorEtherPortIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "Index of the ethernet port."
+        ::= { zyxelHwMonitorEtherPortEntry 1 }
+
+        zyHwMonitorEtherPortLinkStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            down(0),
+            up(1)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Status the ethernet port."
+        ::= { zyxelHwMonitorEtherPortEntry 2 }
+
+        zyHwMonitorEtherPortLinkSpeed OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Speed of the ethernet port."
+        ::= { zyxelHwMonitorEtherPortEntry 3 }
+
+        zyHwMonitorEtherPortDuplexMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+            half-duplex(0),
+            full-duplex(1)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Duplex mode of the ethernet port."
+        ::= { zyxelHwMonitorEtherPortEntry 4 }
+
+        zyHwMonitorEtherPortLinkUpTime OBJECT-TYPE
+        SYNTAX  TimeTicks
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Link up time of the ethernet port."
+        ::= { zyxelHwMonitorEtherPortEntry 5 }
+
+
+-- *******************************************************************
+-- *
+-- * zyxelHwMonitorNotifications
+-- *
+-- ******************************************************************		
 	   zyHwMonitorFanSpeedOutOfRange NOTIFICATION-TYPE
        OBJECTS {
 				zyHwMonitorFanRpmIndex,
@@ -503,6 +618,15 @@ ZYXEL-HW-MONITOR-MIB DEFINITIONS ::= BEGIN
        "Check power source status change situation."
        ::= { zyxelHwMonitorNotifications 12 } 	   
 	   
+  	  zyHwMonitorFanSpeedChangeDueToDetection NOTIFICATION-TYPE   
+  	   OBJECTS {
+				zyHwMonitorFanRpmDetect
+         }      
+	   STATUS  current
+       DESCRIPTION
+       "Fan speed change due to detection."
+       ::= { zyxelHwMonitorNotifications 13 }
+      
 -- *******************************************************************
 -- *
 -- * zyxelHwMonitorTrapInfoObject
@@ -515,5 +639,18 @@ ZYXEL-HW-MONITOR-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
 			"There are the error type of power source."  
         ::= { zyxelHwMonitorTrapInfoObject 1 }  
-  END
+
+-- *******************************************************************
+-- *
+-- * zyxelHwMonitorSetup
+-- *
+-- *******************************************************************		
+        zyHwMonitorFanControlSfpDetectionState OBJECT-TYPE  
+        SYNTAX  EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION	
+        "Enable/disable the fan control action to perform when the switch SFP module temperature reach warm high limitation"
+        ::= { zyxelHwMonitorSetup 1 }
+END
 

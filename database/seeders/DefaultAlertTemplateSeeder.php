@@ -72,8 +72,6 @@ class DefaultAlertTemplateSeeder extends Seeder
 
         $existing = DB::table('alert_templates')->pluck('name');
 
-        DB::table('alert_templates')->insert(array_filter($templates, function ($entry) use ($existing) {
-            return ! $existing->contains($entry['name']);
-        }));
+        DB::table('alert_templates')->insert(array_filter($templates, fn ($entry) => ! $existing->contains($entry['name'])));
     }
 }

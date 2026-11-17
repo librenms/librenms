@@ -34,9 +34,9 @@ use Illuminate\Support\Facades\Log;
 
 class Unimus extends BaseApi
 {
-    private const DEVICE_ID_CACHE_TTL = 3600;
-    private const DEVICE_ID_MISS_TTL = 300;
-    private const NOT_FOUND_SENTINEL = -1;
+    private const int DEVICE_ID_CACHE_TTL = 3600;
+    private const int DEVICE_ID_MISS_TTL = 300;
+    private const int NOT_FOUND_SENTINEL = -1;
 
     private readonly bool $enabled;
     private readonly string $token;

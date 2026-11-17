@@ -1,23 +1,28 @@
 -- =================================================================
--- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: OSPF (Open Shortest Path First) MIB
 -- Reference:
--- Version: V1.0
+-- Version: V1.2
 -- History:
 -- V1.0 2014-12-17 Created by Xu Jing
+-- V1.1 2021-12-31 updated by wanggaoyu
+--      Add the objects of hh3cOspf, hh3cOspfNotificationObjects, hh3cOspfNotifications.
+-- V1.2 2022-07-12 updated by pengqing
+--      Add hh3cOspfSrPrefixSidConflict, hh3cOspfSrPrefixSidConflictClear
 -- =================================================================
 HH3C-OSPF-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY
+    IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
     hh3cCommon
         FROM HH3C-OID-MIB;
 
-
 hh3cOspf MODULE-IDENTITY
-    LAST-UPDATED "201412171700Z"
+    LAST-UPDATED "202207121658Z"
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -27,11 +32,20 @@ hh3cOspf MODULE-IDENTITY
         Zip:100085
         "
     DESCRIPTION
+        "Add hh3cOspfSrPrefixSidConflict, hh3cOspfSrPrefixSidConflictClear."
+    REVISION "202207121658Z"
+    DESCRIPTION
         "This MIB file provides information about OSPF."
+    REVISION "202112301002Z"
+    DESCRIPTION
+        "Add the objects of hh3cOspf, hh3cOspfNotificationObjects, hh3cOspfNotifications."
     REVISION "201412171700Z"
     DESCRIPTION
         "The initial version of this MIB file."
     ::= { hh3cCommon 161 }
+
+hh3cOspfNotifications        OBJECT IDENTIFIER ::= { hh3cOspf 0 }
+hh3cOspfNotificationObjects  OBJECT IDENTIFIER ::= { hh3cOspf 2 }
 
 hh3cOspfNetworkTable OBJECT-TYPE
     SYNTAX SEQUENCE OF Hh3cOspfNetworkEntry
@@ -94,5 +108,195 @@ hh3cOspfNetworkIpMask OBJECT-TYPE
     DESCRIPTION
         "This field is the wildcard mask of the network."
     ::= { hh3cOspfNetworkEntry 4 }
+
+hh3cOspfProcessIdForNotify OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The process ID field indicates the OSPF process number."
+    ::= { hh3cOspfNotificationObjects 1 }
+
+hh3cOspfAreaIdForNotify OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "A 32-bit integer uniquely identifying an area.
+        Area ID 0.0.0.0 is used for the OSPF backbone."
+    ::= { hh3cOspfNotificationObjects 2 }
+
+hh3cOspfIfName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The interface name."
+    ::= { hh3cOspfNotificationObjects 3 }
+
+hh3cOspfRouterID OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The Router ID of OSPF protocol."
+    ::= { hh3cOspfNotificationObjects 4 }
+
+hh3cOspfNbrIpAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The IP address of neighbor."
+    ::= { hh3cOspfNotificationObjects 5 }
+
+hh3cOspfLsaAdvRtr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The Router ID for link state advertisement."
+    ::= { hh3cOspfNotificationObjects 6 }
+
+hh3cOspfLsaLsid OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The link state ID for link state advertisement."
+    ::= { hh3cOspfNotificationObjects 7 }
+
+hh3cOspfPeerFlappingStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+       notSuppressed (1),
+       holdDown (2),
+       holdMaxCost (3)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The peer flapping suppression status."
+    ::= { hh3cOspfNotificationObjects 8 }
+
+hh3cOspfPeerFlappingReason OBJECT-TYPE
+    SYNTAX INTEGER {
+       resumed (1),
+       configurationChanged (2),
+       suppressed (3),
+       exitHoldDownIntoHoldMaxCost (4)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The reason of peer flapping suppression status change."
+    ::= { hh3cOspfNotificationObjects 9 }
+
+hh3cOspfPrefixSid OBJECT-TYPE
+    SYNTAX Integer32 (2048..1048575)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The prefix sid."
+    ::= { hh3cOspfNotificationObjects 10 }
+
+hh3cOspfPrefixAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The IP address of prefix sid."
+    ::= { hh3cOspfNotificationObjects 11 }
+
+hh3cOspfPrefixMask OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The mask of prefix sid."
+    ::= { hh3cOspfNotificationObjects 12 }
+
+hh3cOspfSrConflictType OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The conflict type."
+    ::= { hh3cOspfNotificationObjects 13 }
+
+hh3cOspfSrConflictState OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The conflict state."
+    ::= { hh3cOspfNotificationObjects 14 }
+
+hh3cOspfIntraAreaRtrIdConflict NOTIFICATION-TYPE
+    OBJECTS {
+        hh3cOspfProcessIdForNotify,
+        hh3cOspfAreaIdForNotify,
+        hh3cOspfIfName,
+        hh3cOspfRouterID,
+        hh3cOspfNbrIpAddr
+    }
+    STATUS current
+    DESCRIPTION
+        "A notification sent when Router ID conflict"
+    ::= { hh3cOspfNotifications 1 }
+
+hh3cOspfDRIpAddressConflict NOTIFICATION-TYPE
+    OBJECTS {
+        hh3cOspfProcessIdForNotify,
+        hh3cOspfAreaIdForNotify,
+        hh3cOspfIfName,
+        hh3cOspfNbrIpAddr,
+        hh3cOspfLsaAdvRtr,
+        hh3cOspfLsaLsid
+    }
+    STATUS current
+    DESCRIPTION
+        "A notification sent when DR IP address conflict."
+    ::= { hh3cOspfNotifications 2 }
+
+hh3cOspfPeerFlappingStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        hh3cOspfProcessIdForNotify,
+        hh3cOspfAreaIdForNotify,
+        hh3cOspfIfName,
+        hh3cOspfPeerFlappingStatus,
+        hh3cOspfPeerFlappingReason
+    }
+    STATUS current
+    DESCRIPTION
+        "A notification sent when peer flapping suppression status changes."
+    ::= { hh3cOspfNotifications 3 }
+
+hh3cOspfSrPrefixSidConflict NOTIFICATION-TYPE
+    OBJECTS {
+        hh3cOspfProcessIdForNotify,
+        hh3cOspfPrefixSid,
+        hh3cOspfPrefixAddress,
+        hh3cOspfPrefixMask,
+        hh3cOspfSrConflictType,
+        hh3cOspfSrConflictState
+    }
+    STATUS current
+    DESCRIPTION
+        "The prefix-sid conflict is detected."
+    ::= { hh3cOspfNotifications 4 }
+
+hh3cOspfSrPrefixSidConflictClear NOTIFICATION-TYPE
+    OBJECTS {
+        hh3cOspfProcessIdForNotify,
+        hh3cOspfPrefixSid,
+        hh3cOspfPrefixAddress,
+        hh3cOspfPrefixMask,
+        hh3cOspfSrConflictType,
+        hh3cOspfSrConflictState
+    }
+    STATUS current
+    DESCRIPTION
+        "The prefix-sid conflict is resolved."
+    ::= { hh3cOspfNotifications 5 }
 
 END

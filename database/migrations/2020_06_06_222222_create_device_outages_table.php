@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('device_outages', function (Blueprint $table) {
+        Schema::create('device_outages', function (Blueprint $table): void {
             $table->bigIncrements('id');
             $table->unsignedInteger('device_id')->index();
             $table->bigInteger('going_down');
@@ -20,7 +20,7 @@ return new class extends Migration
             $table->bigInteger('uptime')->nullable();
             $table->unique(['device_id', 'going_down']);
         });
-        Schema::create('availability', function (Blueprint $table) {
+        Schema::create('availability', function (Blueprint $table): void {
             $table->increments('availability_id');
             $table->unsignedInteger('device_id')->index();
             $table->bigInteger('duration');

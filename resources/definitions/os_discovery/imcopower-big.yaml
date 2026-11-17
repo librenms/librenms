@@ -10,7 +10,43 @@ modules:
                     oid: IMCO-BIG-MIB::imPm1BatLeg1Temperature
                     num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.7.11.{{ $index }}'
                     index: imPm1BatLeg1Temperature.{{ $index }}
-                    descr: Battery Temperature
+                    descr: 'Battery Leg 1 Temperature'
+                    group: Battery
+                -
+                    oid: IMCO-BIG-MIB::imPm1BatLeg2Temperature
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.8.11.{{ $index }}'
+                    index: imPm1BatLeg2Temperature.{{ $index }}
+                    descr: 'Battery Leg 2 Temperature'
+                    group: Battery
+                    skip_values: 0
+                -
+                    oid: IMCO-BIG-MIB::imPm1BatLeg3Temperature
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.9.11.{{ $index }}'
+                    index: imPm1BatLeg3Temperature.{{ $index }}
+                    descr: 'Battery Leg 3 Temperature'
+                    group: Battery
+                    skip_values: 0
+                -
+                    oid: IMCO-BIG-MIB::imPm1Power1Temperature
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.3.31.{{ $index }}'
+                    index: imPm1Power1Temperature.{{ $index }}
+                    descr: 'Power 1 Temperature'
+                    group: Power
+                    skip_values: 0
+                -
+                    oid: IMCO-BIG-MIB::imPm1Power2Temperature
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.4.31.{{ $index }}'
+                    index: imPm1Power2Temperature.{{ $index }}
+                    descr: 'Power 2 Temperature'
+                    group: Power
+                    skip_values: 0
+                -
+                    oid: IMCO-BIG-MIB::imPm1Power3Temperature
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.5.31.{{ $index }}'
+                    index: imPm1Power3Temperature.{{ $index }}
+                    descr: 'Power 3 Temperature'
+                    group: Power
+                    skip_values: 0
         current:
             data:
                 -
@@ -31,13 +67,85 @@ modules:
                     index: 'imPm1Power3OutputCurrent.{{ $index }}'
                     descr: 'Power 3 Current'
                     divisor: 10
+                -
+                    oid: IMCO-BIG-MIB::imPm1Power1InputCurrent
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.3.6.{{ $index }}'
+                    index: 'imPm1Power1InputCurrent.{{ $index }}'
+                    descr: 'Power 1 Input Current'
+                    group: Power
+                    divisor: 10
+                    skip_values: 0
+                -
+                    oid: IMCO-BIG-MIB::imPm1Power2InputCurrent
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.4.6.{{ $index }}'
+                    index: 'imPm1Power2InputCurrent.{{ $index }}'
+                    descr: 'Power 2 Input Current'
+                    group: Power
+                    divisor: 10
+                    skip_values: 0
+                -
+                    oid: IMCO-BIG-MIB::imPm1Power3InputCurrent
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.5.6.{{ $index }}'
+                    index: 'imPm1Power3InputCurrent.{{ $index }}'
+                    descr: 'Power 3 Input Current'
+                    group: Power
+                    divisor: 10
+                    skip_values: 0
+                -
+                    oid: IMCO-BIG-MIB::imPm1BatteryCurrent
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.6.3.{{ $index }}'
+                    index: 'imPm1BatteryCurrent.{{ $index }}'
+                    descr: 'Battery Current'
+                    group: Battery
+                    divisor: 10
         charge:
             data:
                 -
                     oid: IMCO-BIG-MIB::imPm1BatLeg1ChargeState
                     num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.7.12.{{ $index }}'
                     index: 'imPm1BatLeg1ChargeState.{{ $index }}'
-                    descr: 'Battery Charge'
+                    descr: 'Battery Leg 1 Charge'
+                    group: Battery
+                -
+                    oid: IMCO-BIG-MIB::imPm1BatLeg2ChargeState
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.8.12.{{ $index }}'
+                    index: 'imPm1BatLeg2ChargeState.{{ $index }}'
+                    descr: 'Battery Leg 2 Charge'
+                    group: Battery
+                    skip_values: 0
+                -
+                    oid: IMCO-BIG-MIB::imPm1BatLeg3ChargeState
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.9.12.{{ $index }}'
+                    index: 'imPm1BatLeg3ChargeState.{{ $index }}'
+                    descr: 'Battery Leg 3 Charge'
+                    group: Battery
+                    skip_values: 0
+        frequency:
+            data:
+                -
+                    oid: IMCO-BIG-MIB::imPm1Power1OutputFrequency
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.3.30.{{ $index }}'
+                    index: 'imPm1Power1OutputFrequency.{{ $index }}'
+                    descr: 'Power 1 Frequency'
+                    group: Power
+                    divisor: 10
+                    skip_values: 0
+                -
+                    oid: IMCO-BIG-MIB::imPm1Power2OutputFrequency
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.4.30.{{ $index }}'
+                    index: 'imPm1Power2OutputFrequency.{{ $index }}'
+                    descr: 'Power 2 Frequency'
+                    group: Power
+                    divisor: 10
+                    skip_values: 0
+                -
+                    oid: IMCO-BIG-MIB::imPm1Power3OutputFrequency
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.5.30.{{ $index }}'
+                    index: 'imPm1Power3OutputFrequency.{{ $index }}'
+                    descr: 'Power 3 Frequency'
+                    group: Power
+                    divisor: 10
+                    skip_values: 0
 
         load:
             data:
@@ -45,17 +153,17 @@ modules:
                     oid: IMCO-BIG-MIB::imPm1Power1OutputLoad
                     num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.3.29.{{ $index }}'
                     index: 'imPm1Power1OutputLoad.{{ $index }}'
-                    descr: 'Power 1 Load (VA)'
+                    descr: 'Power 1 Load'
                 -
                     oid: IMCO-BIG-MIB::imPm1Power2OutputLoad
                     num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.4.29.{{ $index }}'
                     index: 'imPm1Power2OutputLoad.{{ $index }}'
-                    descr: 'Power 2 Load (VA)'
+                    descr: 'Power 2 Load'
                 -
                     oid: IMCO-BIG-MIB::imPm1Power3OutputLoad
                     num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.5.29.{{ $index }}'
                     index: 'imPm1Power3OutputLoad.{{ $index }}'
-                    descr: 'Power 3 Load (VA)'
+                    descr: 'Power 3 Load'
         power:
             data:
                 -
@@ -71,7 +179,7 @@ modules:
                 -
                     oid: IMCO-BIG-MIB::imPm1Power3OutputPowerW
                     num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.5.27.{{ $index }}'
-                    index: 'imPm1Power3OutputPowerW.{{ index }}'
+                    index: 'imPm1Power3OutputPowerW.{{ $index }}'
                     descr: 'Output Power 3'
 
         runtime:
@@ -80,7 +188,22 @@ modules:
                     oid: IMCO-BIG-MIB::imPm1BatLeg1Autonomytime
                     num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.7.14.{{ $index }}'
                     index: 'imPm1BatLeg1Autonomytime.{{ $index }}'
-                    descr: 'Runtime'
+                    descr: 'Battery Leg 1 Runtime'
+                    group: Battery
+                -
+                    oid: IMCO-BIG-MIB::imPm1BatLeg2Autonomytime
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.8.14.{{ $index }}'
+                    index: 'imPm1BatLeg2Autonomytime.{{ $index }}'
+                    descr: 'Battery Leg 2 Runtime'
+                    group: Battery
+                    skip_values: 0
+                -
+                    oid: IMCO-BIG-MIB::imPm1BatLeg3Autonomytime
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.9.14.{{ $index }}'
+                    index: 'imPm1BatLeg3Autonomytime.{{ $index }}'
+                    descr: 'Battery Leg 3 Runtime'
+                    group: Battery
+                    skip_values: 0
         state:
             data:
                 -
@@ -464,9 +587,56 @@ modules:
                     group: Power
                     divisor: 10
                 -
+                    oid: IMCO-BIG-MIB::imPm1Power1InputVoltage
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.3.5.{{ $index }}'
+                    index: 'imPm1Power1InputVoltage.{{ $index }}'
+                    descr: 'Power 1 Input Voltage'
+                    group: Power
+                    divisor: 10
+                    skip_values: 0
+                -
+                    oid: IMCO-BIG-MIB::imPm1Power2InputVoltage
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.4.5.{{ $index }}'
+                    index: 'imPm1Power2InputVoltage.{{ $index }}'
+                    descr: 'Power 2 Input Voltage'
+                    group: Power
+                    divisor: 10
+                    skip_values: 0
+                -
+                    oid: IMCO-BIG-MIB::imPm1Power3InputVoltage
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.5.5.{{ $index }}'
+                    index: 'imPm1Power3InputVoltage.{{ $index }}'
+                    descr: 'Power 3 Input Voltage'
+                    group: Power
+                    divisor: 10
+                    skip_values: 0
+                -
                     oid: IMCO-BIG-MIB::imPm1BatteryVoltage
                     num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.6.2.{{ $index }}'
                     index: 'imPm1BatteryVoltage.{{ $index }}'
                     descr: 'Battery Voltage'
                     group: Battery
                     divisor: 10
+                -
+                    oid: IMCO-BIG-MIB::imPm1BatLeg1Voltage
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.7.9.{{ $index }}'
+                    index: 'imPm1BatLeg1Voltage.{{ $index }}'
+                    descr: 'Battery Leg 1 Voltage'
+                    group: Battery
+                    divisor: 10
+                -
+                    oid: IMCO-BIG-MIB::imPm1BatLeg2Voltage
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.8.9.{{ $index }}'
+                    index: 'imPm1BatLeg2Voltage.{{ $index }}'
+                    descr: 'Battery Leg 2 Voltage'
+                    group: Battery
+                    divisor: 10
+                    skip_values: 0
+                -
+                    oid: IMCO-BIG-MIB::imPm1BatLeg3Voltage
+                    num_oid: '.1.3.6.1.4.1.2185.1.3.11.2.1.9.9.{{ $index }}'
+                    index: 'imPm1BatLeg3Voltage.{{ $index }}'
+                    descr: 'Battery Leg 3 Voltage'
+                    group: Battery
+                    divisor: 10
+                    skip_values: 0

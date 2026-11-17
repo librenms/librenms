@@ -1,9 +1,9 @@
 -- ===========================================================
--- Copyright (c) 2004-2018 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Epon MIB
 -- Reference:  IF-MIB
--- Version:  V2.0
+-- Version:  V2.2
 -- History:
 -- V1.0 created by liuhongxu.
 --   Initial version 2006-01-10
@@ -64,6 +64,10 @@
 --   Modify hh3cEponUniVlanType and hh3cEponUniVlanConfiguration to hh3cEponUniSysManTable.
 -- V2.0 Updated by zhuhaifeng 2018-11-28.
 --   Add hh3cUniPoeTable, hh3cUniPoeInfoTable.
+-- V2.1 Updated by yangke 2021-07-08.
+--   Modify hh3cEponUniDescr.
+-- V2.2 Updated by yangke 2021-09-10.
+--   Modify hh3cEponUniTrunkPvid and hh3cEponUniMulticastIndex.
 -- =================================================================
 HH3C-EPON-UNI-MIB DEFINITIONS ::= BEGIN
 
@@ -79,7 +83,7 @@ IMPORTS
     FROM SNMPv2-TC;
 
 hh3cEponUni MODULE-IDENTITY
-    LAST-UPDATED "201811281049Z"  -- November 28, 2018
+    LAST-UPDATED "202109101049Z"  --September 10, 2021
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -91,6 +95,10 @@ hh3cEponUni MODULE-IDENTITY
         "The objects in this MIB module are used to manage and
         display current configuration of UNI (user network interface)
         which is based on the ONU(Optical Network Unit)."
+    REVISION    "202109101049Z"  -- September 10, 2021
+    DESCRIPTION "Modify hh3cEponUniTrunkPvid and hh3cEponUniMulticastIndex." 
+    REVISION    "202107081049Z"  -- July 08, 2021
+    DESCRIPTION "Modify hh3cEponUniDescr."
     REVISION    "201811281049Z"  -- November 28, 2018
     DESCRIPTION "Add hh3cUniPoeTable, hh3cUniPoeInfoTable."
     REVISION    "201706061145Z"  -- June 06, 2017
@@ -133,7 +141,7 @@ Hh3cEponUniSysManEntry ::= SEQUENCE
         hh3cEponUniPriority                  Integer32,
         hh3cEponUniVlanType                  INTEGER,
         hh3cEponUniAccessVlan                Integer32,
-        hh3cEponUniTrunkPvid                 INTEGER,
+        hh3cEponUniTrunkPvid                 Integer32,
         hh3cEponUniVLANTrunkAllowListLow     OCTET STRING,
         hh3cEponUniVLANTrunkAllowListHigh    OCTET STRING,
         hh3cEponUniInboundLineRate           Integer32,
@@ -174,7 +182,7 @@ hh3cEponUniIndex OBJECT-TYPE
 
 hh3cEponUniDescr OBJECT-TYPE
     SYNTAX      OCTET STRING
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "A textual string containing information about the interface.  This
@@ -255,7 +263,7 @@ hh3cEponUniAccessVlan OBJECT-TYPE
     ::= { hh3cEponUniSysManEntry 7 }
 
 hh3cEponUniTrunkPvid OBJECT-TYPE
-    SYNTAX      INTEGER(1..4094)
+    SYNTAX      Integer32(1..4094)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -1368,7 +1376,7 @@ Hh3cEponUniMulticastControlEntry ::= SEQUENCE
         hh3cEponUniMulticastPreTimes         Integer32,
         hh3cEponUniMulticastPreInterval      Integer32,
         hh3cEponUniMulticastRowStatus        RowStatus,
-        hh3cEponUniMulticastIndex            INTEGER,
+        hh3cEponUniMulticastIndex            Integer32,
         hh3cEponUniMulticastSourceIpList     OCTET STRING,
         hh3cEponUniMulticastResetInterval    Integer32
     }
@@ -1464,7 +1472,7 @@ hh3cEponUniMulticastRowStatus OBJECT-TYPE
     ::= { hh3cEponUniMulticastControlEntry 8 }
 
 hh3cEponUniMulticastIndex OBJECT-TYPE
-    SYNTAX      INTEGER
+    SYNTAX      Integer32
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -2554,7 +2562,7 @@ hh3cUniPoeInfoLegacyEnable OBJECT-TYPE
         "
         UNI PoE legacy PD detection enabling status.
         "
-    DEFVAL { 0 }
+    DEFVAL { false }
     ::= { hh3cUniPoeInfoEntry 3 }
 
 hh3cUniPoeInfoMode OBJECT-TYPE

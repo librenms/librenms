@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ports_statistics', function (Blueprint $table) {
+        Schema::table('ports_statistics', function (Blueprint $table): void {
             $table->bigInteger('ifInNUcastPkts_delta')->nullable()->change();
             $table->bigInteger('ifOutNUcastPkts_delta')->nullable()->change();
             $table->bigInteger('ifInDiscards_delta')->nullable()->change();

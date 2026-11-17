@@ -1,9 +1,9 @@
 -- =============================================================
--- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:
 -- Reference:
--- Version: V1.6
+-- Version: V1.8
 -- History:
 --   V1.0 2009-04-30 Initial Version by jinyi
 --   V1.1 2009-12-30 Added hh3cAccessMediaChanged by jinyi
@@ -29,6 +29,10 @@
 --                   Added hh3c3GCdmaEvDoSubNetID in hh3c3GCdmaEvDoTable by lijuan.
 --   V1.6 2015-12-01 Modified description and added lte(5) in
 --                   hh3cWirelessCardModemMode by maqianli.
+--   V1.7 2021-12-07 Modified description and added hh3cWirelessBackupStatus in
+--                   hh3cWirelessCardTable by zhengdawei.
+--   V1.8 2022-11-11 Modified description and added hh3c3GWcdmaCurrentEcio in
+--                   hh3c3GGsmInfoTable by fengshuxiang.
 -- =============================================================
 HH3C-3GMODEM-MIB DEFINITIONS ::= BEGIN
 IMPORTS
@@ -45,7 +49,7 @@ IMPORTS
         FROM HH3C-OID-MIB;
 
 hh3c3GModem MODULE-IDENTITY
-    LAST-UPDATED    "201512011200Z"
+    LAST-UPDATED    "202211111200Z"
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -54,8 +58,14 @@ hh3c3GModem MODULE-IDENTITY
          http://www.h3c.com
          Zip: 100085"
     DESCRIPTION
+        "The information about The Current Ecio of Wcdma"
+    REVISION        "202211111200Z"
+    DESCRIPTION
         "The information about the wireless card and the UIM
          (User Identification Module)."
+    REVISION        "202112071200Z"
+    DESCRIPTION
+        "Modified description and added hh3cWirelessBackupStatus in hh3cWirelessCardTable."
     REVISION        "201512011200Z"
     DESCRIPTION
         "Modified description and added lte(5) in hh3cWirelessCardModemMode."
@@ -139,7 +149,8 @@ Hh3cWirelessCardEntry ::= SEQUENCE
         hh3cWirelessCardInterfaceIndex       InterfaceIndex,
         hh3cWirelessCardModemStatus          INTEGER,
         hh3cWirelessCardModemMode            INTEGER,
-        hh3cWirelessCardCurNetConn           INTEGER
+        hh3cWirelessCardCurNetConn           INTEGER,
+        hh3cWirelessCardBackupStatus         INTEGER
     }
 
 hh3cWirelessCardIndex OBJECT-TYPE
@@ -273,6 +284,19 @@ hh3cWirelessCardCurNetConn OBJECT-TYPE
         "The current network connection."
     ::= { hh3cWirelessCardEntry 13 }
 
+hh3cWirelessCardBackupStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        notSupport(1),
+                        main(2),
+                        backup(3),
+                        both(4),
+                        none(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of sim card."
+    ::= { hh3cWirelessCardEntry 14 }
 
 -- SMS group
 hh3cSmsGroup OBJECT IDENTIFIER ::= { hh3cWirelessCard 2 }
@@ -779,7 +803,8 @@ Hh3c3GGsmInfoEntry ::= SEQUENCE
         hh3c3GGsmCurServiceStatus        INTEGER,
         hh3c3GGsmCurRoamingStatus        INTEGER,
         hh3c3GGsmMcc                     SnmpAdminString,
-        hh3c3GGsmMnc                     SnmpAdminString
+        hh3c3GGsmMnc                     SnmpAdminString,
+        hh3c3GWcdmaCurrentEcio           Integer32
     }
 
 hh3c3GGsmCurrentRssi OBJECT-TYPE
@@ -945,6 +970,14 @@ hh3c3GGsmMnc OBJECT-TYPE
         "The Mobile Network Code of GSM."
     ::= { hh3c3GGsmInfoEntry 16 }
 
+hh3c3GWcdmaCurrentEcio OBJECT-TYPE
+    SYNTAX      Integer32 (-2147483648 | -150..0)
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current WCDMA Ecio."
+    ::= { hh3c3GGsmInfoEntry 17}
 
 -- The LTE infomation table
 hh3cLteInfoTable OBJECT-TYPE

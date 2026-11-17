@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('bill_history', function (Blueprint $table) {
+        Schema::table('bill_history', function (Blueprint $table): void {
             $table->bigInteger('bill_peak_out')->nullable()->after('traf_total');
             $table->bigInteger('bill_peak_in')->nullable()->after('bill_peak_out');
         });
@@ -26,7 +26,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('bill_history', function (Blueprint $table) {
+        Schema::table('bill_history', function (Blueprint $table): void {
             $table->dropColumn(['bill_peak_in', 'bill_peak_out']);
         });
     }

@@ -1,3 +1,8 @@
+-- Extreme Networks 33.4.1.15 Proprietary MIB
+
+
+-- ################################################################################
+
 EXTREME-BASE-MIB DEFINITIONS ::= BEGIN
 
     IMPORTS
@@ -8,7 +13,8 @@ EXTREME-BASE-MIB DEFINITIONS ::= BEGIN
     --  Organization & Product branches
     extremenetworks MODULE-IDENTITY
 
-                LAST-UPDATED "202204281500Z" -- Thu Apr 28 15:00 UTC 2022
+
+                LAST-UPDATED "202504021600Z" -- Wed Apr  2 16:00 UTC 2025
 
                 ORGANIZATION "Extreme Networks, Inc."
                 CONTACT-INFO
@@ -21,6 +27,110 @@ EXTREME-BASE-MIB DEFINITIONS ::= BEGIN
                      WWW:     http://www.extremenetworks.com"
 
                 DESCRIPTION "Extreme Base MIB"
+
+                REVISION    "202504021600Z" -- Wed Apr  2 16:00 UTC 2025
+                DESCRIPTION "Added MIB base OID extreme5420M24W24S4YESwitchEngine and
+                             made extreme5420M24W24S4YEFabricEngine description consistent."
+
+                REVISION    "202503061600Z" -- Thu Mar  6 16:00 UTC 2025
+                DESCRIPTION "Added MIB base OID extremeX465Stack."
+
+                REVISION    "202501281400Z" -- Tue Jan 28 14:00 UTC 2025
+                DESCRIPTION "Added MIB base OID extreme5420M24W24S4YEFabricEngine."
+
+                REVISION    "202501171415Z" -- Thu Jan 10 14:15 UTC 2025
+                DESCRIPTION "Added 7830 FabricEngine product."
+
+                REVISION    "202501102115Z" -- Fri Jan 10 21:15 UTC 2025
+                DESCRIPTION "Added MIB base OID extreme532016P2MXT2XSwitchEngine and
+                             made extreme532016P2MXT2XFabricEngine description consistent."
+
+                REVISION    "202412160800Z" -- Mon Dec 16 08:00 UTC 2024
+                DESCRIPTION "Added the following MIB OIDs for Extreme ONE OS products: extremeONEOSProducts,
+			     extreme8series, extreme873032D, extreme9series, extreme9920.
+			     Repurposed extremeProduct.504."
+
+                REVISION    "202412091427Z"  -- Mon Dec 09 14:27 UTC 2024
+                DESCRIPTION "Updated the OID of extremeUCPx3160C to fix the conflict with extreme512044X4Y2CSwitchEngine."
+
+                REVISION    "202408071934Z"  -- Wed Aug  7 19:34 UTC 2024
+                DESCRIPTION "Fix name and description of 5320-16P-2MXT-2X platform."
+
+                REVISION    "202405231557Z"  -- Thu May 23 15:57 UTC 2024
+                DESCRIPTION "Added extremeXCCxCE3000, extremeUCPx3150C and extremeUCPx3160C."
+
+                REVISION    "202405011200Z"  -- Wed May 01 12:00 UTC 2024
+                DESCRIPTION "Added MIB base OID extreme532016P2XT2XFabricEngine."
+
+                REVISION    "202404261200Z"  -- Fri Apr 26 12:00 UTC 2024
+                DESCRIPTION "Added 5120 SwitchEngine products."
+
+                REVISION    "202404150000Z"  --  Mon Apr 15 2024 00:00:00 GMT
+                DESCRIPTION "Added SLXOS MIB base OID: extremeInterfaceStatsMIB."
+
+                REVISION    "202404121200Z"  -- Fri Apr 12 12:00 UTC 2024
+                DESCRIPTION "Fix 4120 descriptions."
+
+                REVISION    "202402141200Z"  -- Wed Feb 14 12:00 UTC 2024
+                DESCRIPTION "Added SLXOS MIB base OID: extremeUserMIB."
+
+                REVISION    "202402131200Z"  -- Tue Feb 13 12:00 UTC 2024
+                DESCRIPTION "Added SLXOS MIB base OID: extremeSystemSensorMIB"
+
+                REVISION    "202401132209Z"  -- Sat Jan 13 22:09 UTC 2024
+                DESCRIPTION "Added extremeXCCxCE1000 and extremeXCCxCE2000."
+
+
+                REVISION    "202401101200Z" -- Thu Jan 10 12:00 UTC 2024
+                DESCRIPTION "Added 4220 FabricEngine products. Add 5Gb to 4220 MW SwitchEngine description."
+
+                REVISION    "202311061200Z" -- Mon Nov 06 12:00 UTC 2023
+                DESCRIPTION "Added MIB base OIDs: extremeSwitchEngine4120Stack,
+                             extremeSwitchEngine4220Stack product"
+
+                REVISION    "202309271126Z" -- Wed Sep 27 11:26 UTC 2023
+                DESCRIPTION "Added extremeUCPx1130C and extremeUCPx2130C"
+
+
+                REVISION    "202309221200Z" -- Fri Sep 22 12:00 UTC 2023
+                DESCRIPTION "Added 4120 SwitchEngine products."
+
+                REVISION    "202309131430Z" -- Tue Sep 13 14:30 UTC 2023
+                DESCRIPTION "5320 Extended Temperature (XT) models"
+
+                REVISION    "202306011230Z"  -- Thu Jun 1 12:30 UTC 2023
+                DESCRIPTION "Strike 1Gb from extreme752048YE8CESwitchEngine"
+
+                REVISION    "202305311600Z"  -- Wed May 31 16:00 UTC 2023
+                DESCRIPTION "Changed OID 490 from extremeISW12W12P4X to extremeISW24W4X"
+
+                REVISION    "202302171130Z"  -- Fri Feb 17 11:30 UTC 2023
+                DESCRIPTION "Added following MIB base OIDs: extreme552024TACDCFabricEngine,
+                             extreme552048TACDCFabricEngine, extreme552024XACDCFabricEngine,
+                             extreme552048ACDCSEFabricEngine, extreme752048YE8CEFabricEngine."
+
+                REVISION    "202302162130Z"  -- Thu Feb 16 21:30 UTC 2023
+                DESCRIPTION "Added extreme752048YE8CESwitchEngine"
+
+                REVISION    "202302150451Z"  -- Wed Feb 15 04:51 UTC 2023
+                DESCRIPTION "Added SLXOS MIB base OID: extremeCertExpiryMIB"
+
+                REVISION    "202302081352Z"  -- Wed Feb 8 13:52 UTC 2023
+                DESCRIPTION "Added extremeXCCx3125"
+
+                REVISION    "202301241200Z"  -- Tue Jan 24 12:00 UTC 2023
+                DESCRIPTION "Added the following SLX OS platforms MIB OIDS:
+                             extreme872032CSLXOS, extreme852048YSLXOS,
+                             extreme852048XTSLXOS, extreme882040CSLXOS,
+                             extreme882080CSLXOS. Added the following MIB
+                             base OIDs: extremeBfdMIB, extremeMCTClusterMIB,
+                             extremeMaintModeMIB, extremeThresholdMonitorMIB"
+
+                REVISION    "202210210800Z" -- Fri Oct 21 08:00 UTC 2022
+                DESCRIPTION "Added OID for platform running TierraOS software"
+
+                REVISION    "202210111900Z" -- Tue Oct 11 19:00 UTC 2022
+                DESCRIPTION "Added 4220 SwitchEngine products."
 
                 REVISION    "202204281500Z" -- Thu Apr 28 15:00 UTC 2022
                 DESCRIPTION "Added extremeSwitchEngineOnieStack product."
@@ -2606,6 +2716,16 @@ extremeAnalyticsAppliance OBJECT-IDENTITY
          ExtremeControl where applications are managed."
     ::= { extremeProduct 428 }
 
+extremeXCCxCE3000 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "CE3000"
+--  Date      202405231557Z"  - Thu May 23 15:57 UTC 2024
+    DESCRIPTION
+        "ExtremeCloud IQ Controller CE3000 - Premium management platform
+         for the high-tier on-premise Campus wireless deployment for UCP Large Scale Platform installs."
+    ::= { extremeProduct 429 }
+
+
 extreme552024TSwitchEngine OBJECT-IDENTITY
     STATUS    current
 --  Name      "5520-24T-SwitchEngine"
@@ -3156,14 +3276,14 @@ extremeISW4W4WS4X OBJECT-IDENTITY
         plus 4 10GBASE-X SFP+ ports, Oper Temp -40C - +75C, dual DC power inputs, fanless"
     ::= { extremeProduct 489 }
 
-extremeISW12W12P4X OBJECT-IDENTITY
+extremeISW24W4X OBJECT-IDENTITY
     STATUS  current
---  Name    "isw-12W-12P-4X"
---  Date    "202204271500Z" - Wed Apr 27 15:00 UTC 2022
+--  Name    "isw-24W-4X"
+--  Date    "202305311600Z" - Wed May 31 16:00 UTC 2023
     DESCRIPTION
-        "28-Port ISW Industrial Ethernet Switch 12 10/100/1000BASE-T 90W PoE ports,
-        12 10/100/1000BASE-T 30W PoE ports, plus 4 10GBASE-X SFP+ ports, Operating
-        Temp -40C - +75C, dual DC power inputs, fanless, 1RU"
+        "28-Port ISW Industrial Ethernet Switch 24 10/100/1000BASE-T 90W PoE ports,
+        plus 4 10GBASE-X SFP+ ports, 720W PoE, Operating Temp -40C - +75C,
+        dual DC power inputs, fanless, 1RU"
     ::= { extremeProduct 490 }
 
 extremeSwitchEngineOnieStack OBJECT-IDENTITY
@@ -3173,6 +3293,571 @@ extremeSwitchEngineOnieStack OBJECT-IDENTITY
     DESCRIPTION
         "A stacked version of Switch Engine ONIE-based switches"
     ::= { extremeProduct 491 }
+
+extreme422012T4XSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4220-12T-4X-SwitchEngine"
+--  Date      "202210111900Z" - Tue Oct 11 19:00 UTC 2022
+    DESCRIPTION
+        "ExtremeSwitching 4220 (SwitchEngine) 12 10/100/1000BASET FDX/HDX,
+         4 10G unpopulated SFP+, internal fixed PSU, fans"
+    ::= { extremeProduct 492 }
+
+extreme422024T4XSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4220-24T-4X-SwitchEngine"
+--  Date      "202210111900Z" - Tue Oct 11 19:00 UTC 2022
+    DESCRIPTION
+        "ExtremeSwitching 4220 (SwitchEngine) 24 10/100/1000BASET FDX/HDX,
+         4 10G unpopulated SFP+, internal fixed PSU, fans"
+    ::= { extremeProduct 493 }
+
+extreme422048T4XSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4220-48T-4X-SwitchEngine"
+--  Date      "202210111900Z" - Tue Oct 11 19:00 UTC 2022
+    DESCRIPTION
+        "ExtremeSwitching 4220 (SwitchEngine) 48 10/100/1000BASET FDX/HDX,
+         4 10G unpopulated SFP+, internal fixed PSU, fans"
+    ::= { extremeProduct 494 }
+
+extreme422012P4XSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4220-12P-4X-SwitchEngine"
+--  Date      "202210111900Z" - Tue Oct 11 19:00 UTC 2022
+    DESCRIPTION
+        "ExtremeSwitching 4220 (SwitchEngine) 12 10/100/1000BASET FDX/HDX PoE+,
+         4 10G unpopulated SFP+, internal fixed PSU, fans"
+    ::= { extremeProduct 495 }
+
+extreme422024P4XSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4220-24P-4X-SwitchEngine"
+--  Date      "202210111900Z" - Tue Oct 11 19:00 UTC 2022
+    DESCRIPTION
+        "ExtremeSwitching 4220 (SwitchEngine) 24 10/100/1000BASET FDX/HDX PoE+,
+         4 10G unpopulated SFP+, internal fixed PSU, fans"
+    ::= { extremeProduct 496 }
+
+extreme422048P4XSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4220-48P-4X-SwitchEngine"
+--  Date      "202210111900Z" - Tue Oct 11 19:00 UTC 2022
+    DESCRIPTION
+        "ExtremeSwitching 4220 (SwitchEngine) 48 10/100/1000BASET FDX/HDX PoE+,
+         4 10G unpopulated SFP+, internal fixed PSU, fans"
+    ::= { extremeProduct 497 }
+
+extreme42204MW8P4XSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4220-4MW-8P-4X-SwitchEngine"
+--  Date      "202210111900Z" - Tue Oct 11 19:00 UTC 2022
+    DESCRIPTION
+        "ExtremeSwitching 4220 (SwitchEngine) 4 1Gb/2.5Gb/5Gb 802.3bt,
+         8 10/100/1000BASET FDX/HDX PoE+, 4 10G unpopulated SFP+,
+         internal fixed PSU, fans"
+    ::= { extremeProduct 498 }
+
+extreme42204MW20P4XSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4220-4MW-20P-4X-SwitchEngine"
+--  Date      "202210111900Z" - Tue Oct 11 19:00 UTC 2022
+    DESCRIPTION
+        "ExtremeSwitching 4220 (SwitchEngine) 4 1Gb/2.5Gb/5Gb 802.3bt,
+         20 10/100/1000BASET FDX/HDX PoE+, 4 10G unpopulated SFP+,
+         internal fixed PSU, fans"
+    ::= { extremeProduct 499 }
+
+extreme42208MW40P4XSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4220-8MW-40P-4X-SwitchEngine"
+--  Date      "202210111900Z" - Tue Oct 11 19:00 UTC 2022
+    DESCRIPTION
+        "ExtremeSwitching 4220 (SwitchEngine) 8 1Gb/2.5Gb/5Gb 802.3bt,
+         40 10/100/1000BASET FDX/HDX PoE+, 4 10G unpopulated SFP+,
+         internal fixed PSU, fans"
+    ::= { extremeProduct 500 }
+
+extreme42208XSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4220-8X-SwitchEngine"
+--  Date      "202210111900Z" - Tue Oct 11 19:00 UTC 2022
+    DESCRIPTION
+        "ExtremeSwitching 4220 (SwitchEngine) 8 10G unpopulated SFP+,
+         internal fixed PSU, fans"
+    ::= { extremeProduct 501 }
+
+extreme532024T4XXTSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5320-24T-4X-XT-SwitchEngine"
+--  Date      "202309131430Z" - Tue Sep 13 14:30 UTC 2023
+    DESCRIPTION
+        "ExtremeSwitching 5320 (SwitchEngine) Extended Temperature (0-60C),
+         24 10/100/1000BASET FDX/HDX, 4 10G unpopulated SFP+,
+         internal fixed PSU, fans, RPS support"
+    ::= { extremeProduct 502 }
+
+extreme532024T24S4XEXTSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5320-24T-24S-4XE-XT-SwitchEngine"
+--  Date      "202309131430Z" - Tue Sep 13 14:30 UTC 2023
+    DESCRIPTION
+        "ExtremeSwitching 5320 (SwitchEngine) Extended Temperature (0-60C),
+         24 10/100/1000BASET FDX/HDX, 24 100/1G unpopulated SFP,
+         4 10G unpopulated SFP+, MACsec capable, internal fixed PSU, fans,
+         RPS support"
+    ::= { extremeProduct 503 }
+
+extremeONEOSProducts OBJECT-IDENTITY
+    STATUS current
+--  Name      "Extreme ONE OS"
+--  Date      "202412160800Z" - Mon Dec 16 08:00 UTC 2024
+    DESCRIPTION "Platforms running Extreme ONE OS software"
+    ::= { extremeProduct 504 }
+
+extreme8series OBJECT-IDENTITY
+	STATUS current
+--  Name      "Extreme 8-series products"
+--  Date      "202412160800Z" - Mon Dec 16 08:00 UTC 2024
+	DESCRIPTION "Extreme 8-series products running Extreme ONE OS software"
+    ::= { extremeONEOSProducts 1 }
+
+extreme873032D OBJECT-IDENTITY
+	STATUS current
+--  Name      "Extreme 8730"
+--  Date      "202412160800Z" - Mon Dec 16 08:00 UTC 2024
+	DESCRIPTION "Extreme 8730 platform with 32 400G QSFP-DD, running Extreme ONE OS software"
+    ::= { extreme8series 1 }
+
+extreme9series OBJECT-IDENTITY
+	STATUS current
+--  Name      "Extreme 8-series products"
+--  Date      "202412160800Z" - Mon Dec 16 08:00 UTC 2024
+	DESCRIPTION "Extreme 9-series products running Extreme ONE OS software"
+    ::= { extremeONEOSProducts 2 }
+
+extreme9920 OBJECT-IDENTITY
+	STATUS current
+--  Name      "Extreme 9920"
+--  Date      "202412160800Z" - Mon Dec 16 08:00 UTC 2024
+	DESCRIPTION "Extreme 9920 platform running Extreme ONE OS software"
+    ::= { extreme9series 1 }
+
+extreme872032CSLXOS OBJECT-IDENTITY
+    STATUS    current
+--  Name      "8720-32C-SLXOS"
+--  Date      "202301241200Z"  - Tue Jan 24 12:00 UTC 2023
+    DESCRIPTION
+        "Extreme L2/L3 Switch/Router with SLX-OS, 32x100GE, QSFP28 model"
+    ::= { extremeProduct 505 }
+
+extreme852048YSLXOS OBJECT-IDENTITY
+    STATUS    current
+--  Name      "8520-48Y-SLXOS"
+--  Date      "202301241200Z"  - Tue Jan 24 12:00 UTC 2023
+    DESCRIPTION
+        "Extreme L2/L3 Switch/Router with SLX-OS, 48x25G SFP28 + 8x100G QSFP28"
+    ::= { extremeProduct 506}
+
+extreme852048XTSLXOS OBJECT-IDENTITY
+    STATUS    current
+--  Name      "8520-48XT-SLXOS"
+--  Date      "202301241200Z"  - Tue Jan 24 12:00 UTC 2023
+    DESCRIPTION
+        "Extreme L2/L3 Switch/Router with SLX-OS, 48x10G Base-T RJ45 + 6x100G QSFP28"
+    ::= { extremeProduct 507 }
+
+extreme882040CSLXOS OBJECT-IDENTITY
+    STATUS    current
+--  Name      "8820-40C-SLXOS"
+--  Date      "202301241200Z"  - Tue Jan 24 12:00 UTC 2023
+    DESCRIPTION
+        "Extreme L2/L3 Switch/Router with SLX-OS, 40x100G QSFP28"
+    ::= { extremeProduct 508 }
+
+extreme882080CSLXOS OBJECT-IDENTITY
+    STATUS    current
+--  Name      "8820-80C-SLXOS"
+--  Date      "202301241200Z"  - Tue Jan 24 12:00 UTC 2023
+    DESCRIPTION
+        "Extreme L2/L3 Switch/Router with SLX-OS, 80x100G QSFP28"
+    ::= { extremeProduct 509 }
+
+extremeUCPx1130C OBJECT-IDENTITY
+    STATUS    current
+--  Name      "1130C"
+--  Date      "202309271126Z"  - Wed Sep 27 11:26 UTC 2023
+    DESCRIPTION
+        "Extreme Universal Compute Platform 1130C Appliance - Software distribution and orchestration platform for network edge computing."
+    ::= { extremeProduct 510 }
+
+extremeUCPx2130C OBJECT-IDENTITY
+    STATUS    current
+--  Name      "2130C"
+--  Date      "202309271126Z"  - Wed Sep 27 11:26 UTC 2023
+    DESCRIPTION
+        "Extreme Universal Compute Platform 2130C Appliance - Software distribution and orchestration platform for network edge computing."
+    ::= { extremeProduct 511 }
+
+extremeUCPx3150C OBJECT-IDENTITY
+    STATUS    current
+--  Name      "3150C"
+--  Date      "202405231557Z"  - Thu May 23 15:57 UTC 2024
+    DESCRIPTION
+        "Extreme Universal Compute Platform 3150C Appliance - Software distribution and orchestration platform for network edge computing."
+    ::= { extremeProduct 512 }
+
+
+extremeXCCxCE1000 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "CE1000"
+--  Date     "202401132209Z"  - Sat Jan 13 22:09 UTC 2024
+    DESCRIPTION
+        "ExtremeCloud IQ Controller CE1000 - Premium management platform
+         for the entry-tier on-premise Campus wireless deployment for UCP Small Scale Platform installs."
+    ::= { extremeProduct 513 }
+
+extremeXCCxCE2000 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "CE2000"
+--  Date      "202401132209Z"  - Sat Jan 13 22:09 UTC 2024
+    DESCRIPTION
+        "ExtremeCloud IQ Controller CE2000 - Premium management platform
+         for the mid-tier on-premise Campus wireless deployment for UCP Medium Scale Platform installs."
+    ::= { extremeProduct 514 }
+
+extremeXCCx3125 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "E3125"
+--  Date      "202302081352Z"   - Wed Feb 8 13:52 UTC 2023
+    DESCRIPTION
+        "ExtremeCloud IQ Controller E3125 - Premium management platform
+         for the high-end tier on-premise Campus wireless deployment."
+    ::= { extremeProduct 515 }
+
+extreme752048YE8CESwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "7520-48YE-8CE-SwitchEngine"
+--  Date      "202302162130Z"   - Thu Feb 16 21:30 UTC 2023
+    DESCRIPTION
+        "7520-48YE-8CE (Switch Engine) with 48 10Gb/25Gb SFP28, 8 40Gb/100Gb QSFP28,
+        MACSec capable, 2 unpopulated modular PSU slots, 6 unpopulated fan slots"
+    ::= { extremeProduct 516 }
+
+extreme752048YE8CEFabricEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "7520-48YE-8CE-FabricEngine"
+--  Date      "202302171130Z"   - Fri Feb 17 11:30 UTC 2023
+    DESCRIPTION
+        "7520-48YE-8CE (Fabric Engine) with 48 1Gb/10Gb/25Gb SFP28, 8 40Gb/100Gb QSFP28,
+        MACSec capable, 2 unpopulated modular PSU slots, 6 unpopulated fan slots"
+    ::= { extremeProduct 517 }
+
+extreme552024TACDCSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5520-24T-ACDC-SwitchEngine"
+--  Date      "202302171130Z"   - Fri Feb 17 11:30 UTC 2023
+    DESCRIPTION
+        "ExtremeSwitching 5520-24T-ACDC (Switch Engine) with 24 10/100/1000BASE-T FDX/HDX MACsec
+        capable ports, two stacking/QSFP28 Universal Ethernet ports, 1 VIM slot, two ACDC unpopulated
+        power supplies."
+    ::= { extremeProduct 518 }
+
+extreme552048TACDCSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5520-48T-ACDC-SwitchEngine"
+--  Date      "202302171130Z"   - Fri Feb 17 11:30 UTC 2023
+    DESCRIPTION
+        "ExtremeSwitching 5520-48T-ACDC (Switch Engine) with 48 10/100/1000BASE-T FDX/HDX MACsec
+        capable ports, two stacking/QSFP28 Universal Ethernet ports, 1 VIM slot, two ACDC unpopulated
+        power supplies."
+    ::= { extremeProduct 519 }
+
+extreme552024XACDCSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5520-24X-ACDC-SwitchEngine"
+--  Date      "202302171130Z"   - Fri Feb 17 11:30 UTC 2023
+    DESCRIPTION
+        "ExtremeSwitching 5520-24X-ACDC (Switch Engine) with 24 100/1000BASE-X unpopulated SFP ports
+        upgradeable to 10Gb SFP+, two stacking/QSFP28 Universal Ethernet ports, 1 VIM slot, two ACDC unpopulated
+        power supplies."
+    ::= { extremeProduct 520 }
+
+extreme552048SEACDCSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5520-48SE-ACDC-SwitchEngine"
+--  Date      "202302171130Z"   - Fri Feb 17 11:30 UTC 2023
+    DESCRIPTION
+        "ExtremeSwitching 5520-48SE-ACDC (Switch Engine) with 48 100/1000BASE-X MACsec capable
+        SFP ports, two stacking/QSFP28 Universal Ethernet ports, 1 VIM slot, two ACDC unpopulated
+        power supplies."
+    ::= { extremeProduct 521 }
+
+extreme552024TACDCFabricEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5520-24T-ACDC-FabricEngine"
+--  Date      "202302171130Z"   - Fri Feb 17 11:30 UTC 2023
+    DESCRIPTION
+        "ExtremeSwitching 5520-24T-ACDC (Fabric Engine) with 24 10/100/1000BASE-T FDX/HDX MACsec
+        capable ports, two stacking/QSFP28 Universal Ethernet ports, 1 VIM slot, two ACDC unpopulated
+        power supplies."
+    ::= { extremeProduct 522 }
+
+extreme552048TACDCFabricEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5520-48T-ACDC-FabricEngine"
+--  Date      "202302171130Z"   - Fri Feb 17 11:30 UTC 2023
+    DESCRIPTION
+        "ExtremeSwitching 5520-48T-ACDC (Fabric Engine) with 48 10/100/1000BASE-T FDX/HDX MACsec
+        capable ports, two stacking/QSFP28 Universal Ethernet ports, 1 VIM slot, two ACDC unpopulated
+        power supplies."
+    ::= { extremeProduct 523 }
+
+extreme552024XACDCFabricEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5520-24X-ACDC-FabricEngine"
+--  Date      "202302171130Z"   - Fri Feb 17 11:30 UTC 2023
+    DESCRIPTION
+        "ExtremeSwitching 5520-24X-ACDC (Fabric Engine) with 24 100/1000BASE-X/10GBASE-X SFP+,
+         two stacking/QSFP28 Universal Ethernet ports, 1 VIM slot, two ACDC unpopulated
+         power supplies."
+    ::= { extremeProduct 524 }
+
+extreme552048SEACDCFabricEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5520-48SE-ACDC-FabricEngine"
+--  Date      "202302171130Z"   - Fri Feb 17 11:30 UTC 2023
+    DESCRIPTION
+        "ExtremeSwitching 5520-48SE-ACDC (Fabric Engine) with 48 100/1000BASE-X MACsec capable
+         SFP ports, two stacking/QSFP28 Universal Ethernet ports, 1 VIM slot, two ACDC unpopulated
+         power supplies."
+    ::= { extremeProduct 525 }
+
+extreme412024MW4YSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4120-24MW-4Y-SwitchEngine"
+--  Date      "202404121200Z"   - Fri Apr 12 12:00 UTC 2024
+    DESCRIPTION
+        "ExtremeSwitching 4120 (SwitchEngine) 24 10Mb/100Mb/1Gb/2.5Gb 802.3bt 90W PoE,
+         4 1Gb/10Gb/25Gb SFP28 ports, 2 stacking/QSFP28 Universal Ethernet ports, fans,
+         1 fixed AC PSU, 1 unpopulated modular PSU slot"
+    ::= { extremeProduct 526 }
+
+extreme412048MW4YSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4120-48MW-4Y-SwitchEngine"
+--  Date      "202404121200Z"   - Fri Apr 12 12:00 UTC 2024
+    DESCRIPTION
+        "ExtremeSwitching 4120 (SwitchEngine) 48 10Mb/100Mb/1Gb/2.5Gb 802.3bt 90W PoE,
+         4 1Gb/10Gb/25Gb SFP28 ports, 2 stacking/QSFP28 Universal Ethernet ports, fans,
+         1 fixed AC PSU, 1 unpopulated modular PSU slot"
+    ::= { extremeProduct 527 }
+
+extremeSwitchEngine4120Stack OBJECT-IDENTITY
+    STATUS    current
+--  Name      "extremeSwitchEngine4120Stack"
+--  Date      "202311061200Z" - Mon Nov 06 12:00 UTC 2023
+    DESCRIPTION
+        "A stacked version of Switch Engine 4120-based switches"
+    ::= { extremeProduct 528 }
+
+extremeSwitchEngine4220Stack OBJECT-IDENTITY
+    STATUS    current
+--  Name      "extremeSwitchEngine4220Stack"
+--  Date      "202311061200Z" - Mon Nov 06 12:00 UTC 2023
+    DESCRIPTION
+        "A stacked version of Switch Engine 4220-based switches"
+    ::= { extremeProduct 529 }
+
+extreme422012T4XFabricEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4220-12T-4X-FabricEngine"
+--  Date      "202401041200Z" - Thu Jan 04 12:00 UTC 2024
+    DESCRIPTION
+        "ExtremeSwitching 4220 (FabricEngine) 12 10/100/1000BASET FDX/HDX,
+         4 10G unpopulated SFP+, internal fixed PSU, fans"
+    ::= { extremeProduct 530 }
+
+extreme422024T4XFabricEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4220-24T-4X-FabricEngine"
+--  Date      "202401041200Z" - Thu Jan 04 12:00 UTC 2024
+    DESCRIPTION
+        "ExtremeSwitching 4220 (FabricEngine) 24 10/100/1000BASET FDX/HDX,
+         4 10G unpopulated SFP+, internal fixed PSU, fans"
+    ::= { extremeProduct 531 }
+
+extreme422012P4XFabricEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4220-12P-4X-FabricEngine"
+--  Date      "202401041200Z" - Thu Jan 04 12:00 UTC 2024
+    DESCRIPTION
+        "ExtremeSwitching 4220 (FabricEngine) 12 10/100/1000BASET FDX/HDX PoE+,
+         4 10G unpopulated SFP+, internal fixed PSU, fans"
+    ::= { extremeProduct 532 }
+
+extreme422024P4XFabricEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4220-24P-4X-FabricEngine"
+--  Date      "202401041200Z" - Thu Jan 04 12:00 UTC 2024
+    DESCRIPTION
+        "ExtremeSwitching 4220 (FabricEngine) 24 10/100/1000BASET FDX/HDX PoE+,
+         4 10G unpopulated SFP+, internal fixed PSU, fans"
+    ::= { extremeProduct 533 }
+
+extreme42204MW8P4XFabricEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4220-4MW-8P-4X-FabricEngine"
+--  Date      "202401041200Z" - Thu Jan 04 12:00 UTC 2024
+    DESCRIPTION
+        "ExtremeSwitching 4220 (FabricEngine) 4 1Gb/2.5Gb/5Gb 802.3bt,
+         8 10/100/1000BASET FDX/HDX PoE+, 4 10G unpopulated SFP+,
+         internal fixed PSU, fans"
+    ::= { extremeProduct 534 }
+
+extreme42204MW20P4XFabricEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4220-4MW-20P-4X-FabricEngine"
+--  Date      "202401041200Z" - Thu Jan 04 12:00 UTC 2024
+    DESCRIPTION
+        "ExtremeSwitching 4220 (FabricEngine) 4 1Gb/2.5Gb/5Gb 802.3bt,
+         20 10/100/1000BASET FDX/HDX PoE+, 4 10G unpopulated SFP+,
+         internal fixed PSU, fans"
+    ::= { extremeProduct 535 }
+
+extreme42208XFabricEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "4220-8X-FabricEngine"
+--  Date      "202401041200Z" - Thu Jan 04 12:00 UTC 2024
+    DESCRIPTION
+        "ExtremeSwitching 4220 (FabricEngine) 8 10G unpopulated SFP+,
+         internal fixed PSU, fans"
+    ::= { extremeProduct 536 }
+
+extreme532024T4XXTFabricEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5320-24T-4X-XT-FabricEngine"
+--  Date      "202401041200Z" - Thu Jan 04 12:00 UTC 2024
+    DESCRIPTION
+        "ExtremeSwitching 5320 (FabricEngine) Extended Temperature (0-60C),
+         24 10/100/1000BASET FDX/HDX, 4 10G unpopulated SFP+,
+         internal fixed PSU, fans, RPS support"
+    ::= { extremeProduct 537 }
+
+extreme532024T24S4XEXTFabricEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5320-24T-24S-4XE-XT-FabricEngine"
+--  Date      "202401041200Z" - Thu Jan 04 12:00 UTC 2024
+    DESCRIPTION
+        "ExtremeSwitching 5320 (FabricEngine) Extended Temperature (0-60C),
+         24 10/100/1000BASET FDX/HDX, 24 100/1G unpopulated SFP,
+         4 10G unpopulated SFP+, MACsec capable, internal fixed PSU, fans,
+         RPS support"
+    ::= { extremeProduct 538 }
+
+
+
+extreme512044X4Y2CSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5120-44X-4Y-2C-SwitchEngine"
+--  Date      "202404261200Z"   - Fri Apr 26 12:00 UTC 2024
+    DESCRIPTION
+        "ExtremeSwitching 5120 (SwitchEngine) 44 1G/10G SFP+ ports, 4 10G/25G SFP28 ports,
+         2 100G QSFP28 Universal/Stacking ports, MACSEC capable, 6 unpopulated fan slots,
+         2 unpopulated modular PSU slots"
+    ::= { extremeProduct 539 }
+
+extreme512024X4YSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5120-24X-4Y-SwitchEngine"
+--  Date      "202404261200Z"   - Fri Apr 26 12:00 UTC 2024
+    DESCRIPTION
+        "ExtremeSwitching 5120 (SwitchEngine) 24 1G/10G SFP+ ports, 4 10G/25G SFP28 ports,
+         MACSEC capable, 4 unpopulated fan slots,
+         2 unpopulated modular PSU slots"
+    ::= { extremeProduct 540 }
+
+extreme512024XT4YSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5120-24XT-4Y-SwitchEngine"
+--  Date      "202404261200Z"   - Fri Apr 26 12:00 UTC 2024
+    DESCRIPTION
+        "ExtremeSwitching 5120 (SwitchEngine) 24 1G/10GBase-T Non-PoE ports, 4 10G/25G SFP28 ports,
+         MACSEC capable, 4 unpopulated fan slots,
+         2 unpopulated modular PSU slots"
+    ::= { extremeProduct 541 }
+
+extremeSwitchEngine5120Stack OBJECT-IDENTITY
+    STATUS    current
+--  Name      "extremeSwitchEngine5120Stack"
+--  Date      "202404261200Z"   - Fri Apr 26 12:00 UTC 2024
+    DESCRIPTION
+        "A stacked version of Switch Engine 5120-based switches"
+    ::= { extremeProduct 542 }
+
+extreme532016P2MXT2XFabricEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5320-16P-2MXT-2X-FabricEngine"
+--  Date      "202408071934Z"   - Wed Aug  7 19:34 UTC 2024
+    DESCRIPTION
+        "ExtremeSwitching 5320 (FabricEngine) with 16 10/100/1000Base-T FDX/HDX PoE+ ports,
+         2 1G/2.5G/5G/10G Base-T ports and 2 10G SFP+ uplink ports, 1 internal AC PSU, Fanless"
+    ::= { extremeProduct 543 }
+
+extremeUCPx3160C OBJECT-IDENTITY
+    STATUS    current
+--  Name      "3160C"
+--  Date      "202412091427Z"  - Mon Dec 09 14:27 UTC 2024
+    DESCRIPTION
+        "Extreme Universal Compute Platform 3160C Appliance - Software distribution and orchestration platform for network edge computing."
+    ::= { extremeProduct 544 }
+
+extreme532016P2MXT2XSwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5320-16P-2MXT-2X-SwitchEngine"
+--  Date      "202501102115Z"   - Fri Jan 10 21:15 UTC 2025
+    DESCRIPTION
+        "ExtremeSwitching 5320 (SwitchEngine) with 16 10/100/1000Base-T FDX/HDX PoE+ ports,
+         2 1G/2.5G/5G/10G Base-T ports and 2 10G SFP+ uplink ports, 1 internal AC PSU, Fanless"
+    ::= { extremeProduct 545 }
+
+extreme783032CE8DEFabricEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name    "7830-32CE-8DE-FabricEngine"
+--  Date    "202501171415Z" - Fri Jan 17 14:15 UTC 2025
+    DESCRIPTION
+        "7830-32CE-8DE (FabricEngine) with 32x100Gb QSFP28, 8x400Gb QSFPDD,
+        2 unpopulated modular PSU slots, 4 unpopulated fan slots, 2 VIM Slots"
+    ::= { extremeProduct 546 }
+
+extreme5420M24W24S4YEFabricEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5420M-24W-24S-4YE-FabricEngine"
+--  Date      "202501281400Z"  - Tue Jan 28 14:00 UTC 2025
+    DESCRIPTION
+        "ExtremeSwitching 5420M (FabricEngine) with 24 10/100/1000 BASE-T 90W PoE w/ Half Duplex
+         on 10/100M ports, 24 100M (FX/LX)/1G SFP, 4 1/10/25G unpopulated SFP28 ports,
+         MACSec capable, unpopulated Dual Modular PSUs and Modular Fans (F2B only)"
+    ::= { extremeProduct 547 }
+
+extremeX465Stack OBJECT-IDENTITY
+    STATUS    current
+--  Name      "extremeX465Stack"
+--  Date      "202503061600Z"  - Thu Mar  6 16:00 UTC 2025
+    DESCRIPTION
+        "A stacked version of EXOS X465 switches"
+    ::= { extremeProduct 548 }
+
+extreme5420M24W24S4YESwitchEngine OBJECT-IDENTITY
+    STATUS    current
+--  Name      "5420M-24W-24S-4YE-SwitchEngine"
+--  Date      "202504021600Z"  - Wed Apr  2 16:00 UTC 2025
+    DESCRIPTION
+        "ExtremeSwitching 5420M (SwitchEngine) with 24 10/100/1000 BASE-T 90W PoE w/ Half Duplex
+         on 10/100M ports, 24 100M (FX/LX)/1G SFP, 4 1/10/25G unpopulated SFP28 ports, 2 stacking/
+         SFP-DD Universal Ethernet ports, MACSec capable, unpopulated Dual Modular PSUs and
+         Modular Fans (F2B only)"
+    ::= { extremeProduct 549 }
 
     --
     -- Assorted OIDs that are pointed to by other MIBs 
@@ -3413,6 +4098,16 @@ extremeSwitchEngineOnieStack OBJECT-IDENTITY
     extremeBgp4V2          OBJECT IDENTIFIER ::= { extremeAgent 51 }
     extremeBgp4V2TC        OBJECT IDENTIFIER ::= { extremeAgent 52 }
     extremeRemoteConnectionMIB    OBJECT IDENTIFIER ::= { extremeAgent 53 }
+    extremeBfdMIB          OBJECT IDENTIFIER ::= { extremeAgent 55 }
+    extremeMCTClusterMIB   OBJECT IDENTIFIER ::= { extremeAgent 56 }
+    extremeMaintModeMIB    OBJECT IDENTIFIER ::= { extremeAgent 57 }
+    extremeThresholdMonitorMIB OBJECT IDENTIFIER ::= { extremeAgent 58 }
+    extremeCertExpiryMIB   OBJECT IDENTIFIER ::= { extremeAgent 59 }
+    extremeSystemSensorMIB   OBJECT IDENTIFIER ::= { extremeAgent 60 }
+    extremeUserMIB         OBJECT IDENTIFIER ::= { extremeAgent 61 }
+    extremeInterfaceStatsMIB  OBJECT IDENTIFIER ::= { extremeAgent 62 }
+    extremeMLAGMIB  OBJECT IDENTIFIER ::= { extremeAgent 63 }
+
 
     extremeInternal        OBJECT IDENTIFIER ::= { extremeAgent 1000 }
 

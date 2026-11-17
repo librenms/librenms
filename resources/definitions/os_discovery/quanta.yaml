@@ -6,5 +6,80 @@ modules:
                 free: NETGEAR-SWITCHING-MIB::agentSwitchCpuProcessMemFree
                 precision: 1024
     os:
-        sysDescr_regex: '/(?<hardware>[^,]+), (?<features>[^,]+), (?<version>[^,]+)/'
+        sysDescr_regex: '/(?<hardware>[^,]+), (?<version>[^,]+), (?<features>[^,]+)/'
+        hardware: NETGEAR-SWITCHING-MIB::agentInventoryMachineType.0
+        version: NETGEAR-SWITCHING-MIB::agentInventorySoftwareVersion.0
+        version_replace:
+            - '/^Runtime Code /'
+        features:
+            - NETGEAR-SWITCHING-MIB::agentInventoryOperatingSystem.0
+            - NETGEAR-SWITCHING-MIB::agentInventoryAdditionalPackages.0
+        features_template: '{{ NETGEAR-SWITCHING-MIB::agentInventoryOperatingSystem.0 }}, {{ NETGEAR-SWITCHING-MIB::agentInventoryAdditionalPackages.0 }}'
+        features_replace:
+            - '/^, |,$/'
         serial: NETGEAR-SWITCHING-MIB::agentInventorySerialNumber.0
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesNormalTempRangeMin
+                        - NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesNormalTempRangeMax
+        fanspeed:
+            data:
+                -
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFansTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFanSpeed
+                    num_oid: '.1.3.6.1.4.1.4413.1.1.43.1.6.1.4.{{ $index }}'
+                    index: '{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    skip_values: 0
+        percent:
+            data:
+                -
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFansTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFanDutyLevel
+                    num_oid: '.1.3.6.1.4.1.4413.1.1.43.1.6.1.5.{{ $index }}'
+                    index: 'boxServicesFanDutyLevel.{{ $index }}'
+                    descr: 'Fan {{ $index }} Duty Level'
+                    group: Fans
+                    skip_values:
+                        -
+                            oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFanItemState
+                            op: '!='
+                            value: 2
+        temperature:
+            data:
+                -
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorsTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesTempSensorState
+                    num_oid: '.1.3.6.1.4.1.4413.1.1.43.1.8.1.4.{{ $index }}'
+                    index: '{{ $index }}'
+                    descr: 'Temperature {{ $index }}'
+                    low_limit: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesNormalTempRangeMin
+                    high_limit: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesNormalTempRangeMax
+                    skip_values: 0
+        state:
+            data:
+                -
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFansTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFanItemState
+                    num_oid: '.1.3.6.1.4.1.4413.1.1.43.1.6.1.3.{{ $index }}'
+                    index: '{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    states: &item_states
+                        - { value: 0, generic: 3, descr: other }
+                        - { value: 1, generic: 3, descr: notpresent }
+                        - { value: 2, generic: 0, descr: operational }
+                        - { value: 3, generic: 2, descr: failed }
+                        - { value: 4, generic: 0, descr: powering }
+                        - { value: 5, generic: 1, descr: nopower }
+                        - { value: 6, generic: 1, descr: notpowering }
+                        - { value: 7, generic: 2, descr: incompatible }
+                -
+                    oid: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesPowSuppliesTable
+                    value: NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesPowSupplyItemState
+                    num_oid: '.1.3.6.1.4.1.4413.1.1.43.1.7.1.3.{{ $index }}'
+                    index: '{{ $index }}'
+                    descr: 'Power Supply {{ $index }}'
+                    states: *item_states

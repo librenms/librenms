@@ -15,7 +15,7 @@ return new class extends Migration
             ->whereNull('display')
             ->update(['display' => '']);
 
-        Schema::table('devices', function (Blueprint $table) {
+        Schema::table('devices', function (Blueprint $table): void {
             $table->string('display', 128)->default('')->change();
 
             if (! Schema::hasColumn('devices', 'display_template')) {
@@ -34,7 +34,7 @@ return new class extends Migration
             'display' => DB::raw('display_template'),
         ]);
 
-        Schema::table('devices', function (Blueprint $table) {
+        Schema::table('devices', function (Blueprint $table): void {
             $table->string('display', 128)->nullable()->change();
             $table->dropColumn('display_template');
         });

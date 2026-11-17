@@ -1,0 +1,898 @@
+        LAN-EMULATION-BUS-MIB DEFINITIONS ::= BEGIN
+
+	    IMPORTS
+
+--                MODULE-IDENTITY, OBJECT-TYPE, 
+--                Counter32, Integer32                   
+--                    FROM SNMPv2-SMI
+
+--		enterprises
+--			FROM RFC1155-SMI
+		
+		Counter
+			FROM RFC1155-SMI
+		
+		OBJECT-TYPE
+			FROM RFC-1212
+
+--                TEXTUAL-CONVENTION, DisplayString,
+--                RowStatus, MacAddress,
+--                TruthValue, TimeStamp
+--                      FROM SNMPv2-TC
+		DisplayString
+			FROM RFC1213-MIB
+
+--                  MODULE-COMPLIANCE, OBJECT-GROUP
+--                      FROM SNMPv2-CONF
+
+-- Since the definition of AtmLaneAddress is changed in LAN-EMULATION-CLIENT-MIB,
+-- we need to restore its definition.
+--              AtmLaneAddress,
+                atmfLanEmulation,
+                VpiInteger, 
+                VciInteger
+                        FROM LAN-EMULATION-CLIENT-MIB
+
+                IfIndexOrZero, Integer, TIMESTAMP, 
+		AtmLaneMask
+                        FROM LAN-EMULATION-ELAN-MIB;
+
+
+--         busMIB MODULE-IDENTITY
+--                LAST-UPDATED "9602121200Z"
+--                ORGANIZATION "ATM Forum LAN Emulation Sub-Working Group"
+--                CONTACT-INFO
+--                      "
+--                        The ATM Forum
+--
+--                        2570 West El Camino Real, Ste 304,
+--                        Mountain View, CA 94040-1313
+--                        E-mail: info@atmforum.com"
+--
+--        DESCRIPTION
+--                " The MIB module for the management of LANE broadcast and 
+--                known servers. This MIB should be used in conjunction
+--                with the ELAN and LES MIBs." 
+--        ::= { atmfLanEmulation 4}
+
+--	    atmForum  OBJECT IDENTIFIER ::= { enterprises 353 }
+--	    atmForumNetworkManagement  OBJECT IDENTIFIER ::= { atmForum 5 }
+--          atmfLanEmulation OBJECT IDENTIFIER ::= { atmForumNetworkManagement  3 }
+--	    atmfLanEmulation IMPORTED from LAN-EMULATION-CLIENT-MI
+          busMIB OBJECT IDENTIFIER ::= { atmfLanEmulation  4 }
+
+            
+	    --
+            --    Textual Conventions
+            --
+
+	 --   Integer32 ::= INTEGER
+	    
+	 --   Counter32 ::= Counter
+	    
+	    RowStatus ::= INTEGER
+
+	 --   TimeStamp ::= INTEGER (0..2147483647)
+
+	    AtmLaneAddress ::= OCTET STRING (SIZE (0 | 20))
+
+--            BusLocalIndex ::= TEXTUAL-CONVENTION
+--                STATUS     mandatory
+--                DESCRIPTION
+--                    "An unique number identifying an
+--                    BUS.  This number is only
+--                    used locally by the agent to
+--                    distinguish between BUS."
+--                SYNTAX     Integer32
+--            BusLocalIndex ::= Integer
+
+--            BusErrLogIndexType ::= TEXTUAL-CONVENTION
+--                STATUS     mandatory
+--                DESCRIPTION
+--                         "An arbitrary integer used in identifying
+--                         an erro log associated with a BUS." 
+--                SYNTAX     Integer32(1..2147483647)
+
+
+            -- This MIB module consists of the following groups:
+            --
+            --  (1) BUS Conf Group
+            --      (a) BUS table
+            --      (b) BUS-VCC table
+            --      (c) BUS-LEC table
+            --
+            --  (2) Stat Group
+            --      (d) BUS Stat table
+            --      (e) BUS-LEC Statistics table
+            --
+            --  (3) Fault Management Group
+            --      (a) error control table
+            --      (b) error log table
+
+
+            busConfGroup  OBJECT IDENTIFIER ::= { busMIB 1 }
+ 
+            busStatGroup  OBJECT IDENTIFIER ::= { busMIB 2 }
+           
+            busFaultGroup OBJECT IDENTIFIER ::= { busMIB 3 }
+
+            --
+            --  (1) BUS Conf Group
+            --  (a) BUS table
+            --
+
+
+            busConfNextId  OBJECT-TYPE
+                SYNTAX     INTEGER
+                ACCESS read-only
+                STATUS     mandatory
+                DESCRIPTION
+                    "The next available BUS index.  The
+                    value of this object can be used as
+                    the index by the network manager to
+                    create an entry in the busConfTable."
+                ::= { busConfGroup 1 }
+ 
+            busConfTable   OBJECT-TYPE
+                SYNTAX     SEQUENCE OF BusConfEntry
+                ACCESS not-accessible
+                STATUS     mandatory
+                DESCRIPTION
+                    "This table contains all LAN Emulation
+                    Broadcast and Unknown Servers (BUS) this 
+                    agent manages.  The BUS handles data sent
+                    by an LE Client to the broadcast MAC
+                    address, all multicast traffic, and initial unicast
+                    frames which are sent by a LEC before the data
+                    direct target ATM address has been resolved.
+                    There can be multiple BUSs per ELAN, but a
+                    BUS can service only one ELAN."
+                ::= { busConfGroup 2 }
+
+             busConfEntry  OBJECT-TYPE
+                SYNTAX     BusConfEntry
+                ACCESS not-accessible
+                STATUS     mandatory
+                DESCRIPTION
+                    "Each entry in this table represents a
+                    BUS.  The parameters in each entry apply
+                    to one emulated LAN served by one BUS.
+                    Object busRowStatus is required during
+                    row creation and deletion.  Object busElanName
+                    is used to indicate the ELAN this BUS
+                    is servicing and is used to cross reference
+                    tables defined in the LAN Emulation Server MIB.
+                    Note that objects busAtmAddrSpec and busAtmAddrMask
+                    are used to configure the ATM address of a BUS.
+                    The BUS typically derives it's ATM address
+                    from the switch or the network and the actual
+                    ATM address used is indicated in the object
+                    busAtmAddrActual."
+                INDEX      { busConfIndex }
+                ::= { busConfTable 1 }
+
+
+             BusConfEntry ::= SEQUENCE {
+                busConfIndex                 INTEGER,
+                busConfAtmAddrSpec           AtmLaneAddress,
+                busConfAtmAddrMask           AtmLaneMask,
+                busConfAtmAddrActual           AtmLaneAddress,
+                busConfElanName              DisplayString,
+                busConfLastChange            TIMESTAMP,
+                busConfMaxFrameAge           INTEGER,
+                busConfOperStatus            INTEGER,
+                busConfAdminStatus           INTEGER,
+                busConfRowStatus             RowStatus
+             }
+
+             busConfIndex OBJECT-TYPE
+                SYNTAX     INTEGER
+                ACCESS not-accessible
+                STATUS     mandatory
+                DESCRIPTION
+                  "A value which uniquely identifies a
+                  conceptual row in the busConfTable.
+
+                  If the conceptual row identified by this value
+                  of busConfIndex is recreated following an agent
+                  restart, the same value of busConfIndex must be
+                  used to identify the recreated row."
+                ::= { busConfEntry 1 }
+
+             busConfAtmAddrSpec OBJECT-TYPE
+                SYNTAX     AtmLaneAddress
+                ACCESS read-write
+                STATUS     mandatory
+                DESCRIPTION
+                  "An ATM  address specified by  the  
+                  network or local management that, 
+                  with the ATM address mask, determines
+                  a  portion of  the  ATM address  that 
+                  the  BUS on the designated ATM interface  
+                  will use  to derive the actual ATM
+                  address from the network or ILMI.  The derived
+                  ATM address is specified in the object
+                  busAtmAddrActual, which is used to
+                  receive multicast or broadcast traffic."
+                ::= { busConfEntry 2 }
+
+             busConfAtmAddrMask OBJECT-TYPE
+                SYNTAX     AtmLaneMask
+                ACCESS read-write
+                STATUS     mandatory
+                DESCRIPTION
+                  "The ATM address mask associated with
+                  the object busAtmAddrSpec.  The value
+                  of the mask is an ATM address with
+                  the don't care portion set to zero
+                  and the valid ATM address portion set to one."
+                DEFVAL { 'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF'H }
+                ::= { busConfEntry 3 }
+
+             busConfAtmAddrActual OBJECT-TYPE
+                SYNTAX     AtmLaneAddress
+                ACCESS read-only
+                STATUS     mandatory
+                DESCRIPTION
+                    " The resultant ATM address  in use by  the BUS.  This
+                    object is a product of the specified ATM address, mask
+                    and  interaction  with  the network.  This object is
+                    created by the agent."
+                ::= { busConfEntry 4 }
+
+             busConfElanName OBJECT-TYPE
+                SYNTAX     DisplayString (SIZE (0..32))
+                ACCESS read-write
+                STATUS     mandatory
+                DESCRIPTION
+                    "The name of the ELAN this BUS is providing service to."
+                ::= { busConfEntry 5 }
+
+             busConfLastChange OBJECT-TYPE
+                SYNTAX     TIMESTAMP
+                ACCESS read-only
+                STATUS     mandatory
+                DESCRIPTION
+                        "The  value of the sysUpTime  when  this BUS 
+                        has entered the state indicated by the 
+                        object busConfOperStatus."
+                ::= { busConfEntry 6 }
+
+            busConfMaxFrameAge  OBJECT-TYPE
+                  SYNTAX       INTEGER (1..4)
+                  ACCESS   read-write
+                  STATUS       mandatory
+                  DESCRIPTION
+                      "Time out period for a frame that has been
+                      received but not been transmitted by BUS
+                      to all relevant Multicast Send VCCs or
+                      Multicast Forward VCCs."
+                  REFERENCE
+                       "LAN Emulation Over ATM Specification -
+                       version 1.0. S5."
+                  DEFVAL { 1 }
+                  ::= { busConfEntry 7 }
+ 
+             busConfOperStatus OBJECT-TYPE
+                SYNTAX     INTEGER {
+                       other(1),       -- unknown state
+                       up(2),          -- BUS is up and running
+                       down(3)         -- BUS is down or not available
+                   }
+                ACCESS read-only
+                STATUS     mandatory
+                DESCRIPTION
+                       "The operational state of this BUS entry. 
+                        When in 'up' state the BUS will forward
+                        LEC traffic.  Any other state the
+                        BUS is not available for service and may
+                        release all the existing VCCs and refuse
+                        service to all clients."
+                ::= { busConfEntry 8 } 
+
+             busConfAdminStatus OBJECT-TYPE
+                SYNTAX     INTEGER {
+                       up(2),          -- BUS is up and running
+                       down(3)         -- BUS is down or not available
+                   }
+                ACCESS read-write
+                STATUS     mandatory
+                DESCRIPTION
+                        "  The  desired  state   of  the  designated   BUS  as
+                        prescribed by the operator. The  actions of the  agent
+                        will, if at  all  possible, eventually  result  in the
+                        desired state being  reflected in  the busOperStatus."
+                DEFVAL     { up } 
+                ::= { busConfEntry 9 }
+
+             busConfRowStatus OBJECT-TYPE
+                SYNTAX     RowStatus
+                ACCESS read-write
+                STATUS     mandatory
+                DESCRIPTION
+                        "This object is used to create or
+                        delete entries in the busConfTable."
+                REFERENCE "RFC 1443, [10] Textual Conventions
+                    for version 2 of the Simple Network Management 
+                    Protocol (SNMPv2)."
+                ::= { busConfEntry 10 }
+
+            --
+            --  (b) BUS VCC table
+            --
+            busVccTable     OBJECT-TYPE
+                SYNTAX      SEQUENCE OF BusVccEntry
+                ACCESS  not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                    "This table contains all the Multicast Forward
+                    VCCs used by the BUS to forward multicast traffic
+                    to the participating LECs.  The Multicast Forward
+                    VCC can either be point-to-point or point-to-
+                    multipoint calls.  This table is read only if
+                    SVCs are used and writable if PVCs are used."
+                ::= { busConfGroup 3 }
+
+            busVccEntry      OBJECT-TYPE
+                SYNTAX       BusVccEntry
+                ACCESS   not-accessible
+                STATUS       mandatory
+                DESCRIPTION
+                    "Each entry in this table represents a
+                     Multicast Forward VCC of the BUS."
+                INDEX { busConfIndex, busVccAtmIfIndex,
+                        busVccMtFwdVpi, busVccMtFwdVci }
+                ::= { busVccTable 1 }
+
+            BusVccEntry ::=
+                SEQUENCE {
+                    busVccAtmIfIndex
+                        IfIndexOrZero,
+                    busVccMtFwdVpi
+                        VpiInteger,
+                    busVccMtFwdVci
+                        VciInteger,
+                    busVccRowStatus
+                        RowStatus
+                }
+
+            busVccAtmIfIndex  OBJECT-TYPE
+                   SYNTAX     IfIndexOrZero
+                   ACCESS not-accessible
+                   STATUS     mandatory
+                   DESCRIPTION
+                      "The ATM interface which the Multicast
+                      Forward VCC is running on.
+                      This value must match an existing
+                      value  in the   ifTable.  
+                      The value of this object is set
+                      to zero when the ATM interface is
+                      undefined."
+                   ::= { busVccEntry 1 }
+       
+            busVccMtFwdVpi    OBJECT-TYPE
+                   SYNTAX     VpiInteger
+                   ACCESS not-accessible
+                   STATUS     mandatory
+                   DESCRIPTION
+                      "The VPI value of the Multicast
+                      Forward VCC.  The object
+                      busVccAtmIfIndex, busVccMtFwdVci
+                      and the value of this object uniquely
+                      identfies a VCC within a ATM host."
+                   ::= { busVccEntry 2 }
+
+            busVccMtFwdVci    OBJECT-TYPE
+                   SYNTAX     VciInteger
+                   ACCESS not-accessible
+                   STATUS     mandatory
+                   DESCRIPTION
+                      "The VCI value of the Multicast
+                      Forward VCC.  The object
+                      busVccAtmIfIndex, busVccMtFwdVpi
+                      and the value of this object uniquely
+                      identfies a VCC within a ATM host."
+                   ::= { busVccEntry 3 }
+
+            busVccRowStatus   OBJECT-TYPE
+                   SYNTAX     RowStatus
+                   ACCESS read-write
+                   STATUS     mandatory
+                   DESCRIPTION
+                        "This object is used to create or
+                        delete entries in the busConfTable."
+                   REFERENCE "RFC 1443, [10] Textual Conventions
+                        for version 2 of the Simple Network Management 
+                        Protocol (SNMPv2)."
+                   ::= { busVccEntry 4 }
+       
+
+                        
+            --
+            --  (b) BUS - LEC table
+            --
+
+            busLecTableLastChange OBJECT-TYPE
+                SYNTAX     TIMESTAMP
+                ACCESS read-only
+                STATUS     mandatory
+                DESCRIPTION
+                       "The value of sysUpTime when an entry of the
+                        busLecTable was created/deleted."
+                ::= { busConfGroup 4 }
+
+            busLecTable    OBJECT-TYPE
+                SYNTAX     SEQUENCE OF BusLecEntry
+                ACCESS not-accessible
+                STATUS     mandatory
+                DESCRIPTION
+                        " This table contains the BUS and the 
+                        actual LECs being serviced by the BUS.
+                        It can be used as the actual mapping
+                        between BUS and LEC.
+
+                        This table provides information
+                        for Multicast send VCCs
+                        between BUS and clients.  Objects
+                        busLecMcastSendAtmIfIndex, busLecMcastSendVpi,
+                        and busLecMcstSendVci can only be modified
+                        if PVC is used."
+                ::= { busConfGroup 5 }
+
+            busLecEntry OBJECT-TYPE
+                SYNTAX       BusLecEntry
+                ACCESS   not-accessible
+                STATUS       mandatory
+                DESCRIPTION
+                    "Each entry represents a BUS to LEC
+                    mapping."
+                INDEX { busConfIndex , busLecAtmAddr }
+                ::= { busLecTable 1 }
+
+            BusLecEntry ::=
+                   SEQUENCE {
+                    busLecAtmAddr
+                        AtmLaneAddress,
+                    busLecMcastSendAtmIfIndex
+                        IfIndexOrZero,
+                    busLecMcastSendVpi
+                        VpiInteger,
+                    busLecMcastSendVci
+                        VciInteger,
+                    busLecRowStatus
+                        RowStatus
+                }
+
+            busLecAtmAddr     OBJECT-TYPE
+                SYNTAX        AtmLaneAddress
+                ACCESS    not-accessible
+                STATUS        mandatory
+                DESCRIPTION
+                        "The ATM address of the LEC.  This
+                        is the primary ATM address of the LEC."
+                ::= { busLecEntry 1 }
+
+            busLecMcastSendAtmIfIndex  OBJECT-TYPE
+                SYNTAX     IfIndexOrZero
+                ACCESS read-write
+                STATUS     mandatory
+                DESCRIPTION
+                        "The  ATM  interface  index this BUS uses for 
+                        Multicast Send traffic.  The value of this
+                        object has to exist in the ifTable in MIB II
+                        unless an internal connection is used.  When
+                        an internal connection is used, this object
+                        is set to zero."
+                ::= { busLecEntry 2 }
+
+            busLecMcastSendVpi        OBJECT-TYPE
+                SYNTAX     VpiInteger
+                ACCESS read-write
+                STATUS     mandatory
+                DESCRIPTION
+                        " The   virtual  path  identifier used to receive
+                        multicast traffic by this BUS."
+                ::= { busLecEntry 4 }
+
+            busLecMcastSendVci        OBJECT-TYPE
+                SYNTAX     VciInteger
+                ACCESS read-write
+                STATUS     mandatory
+                DESCRIPTION
+                        " The   virtual  channel  identifier used to receive
+                        multicast traffic by this BUS."
+                ::= { busLecEntry 5 }
+
+            busLecRowStatus OBJECT-TYPE
+                SYNTAX     RowStatus
+                ACCESS read-write
+                STATUS     mandatory
+                DESCRIPTION
+                        " This object provides a way for the network manager
+                        to selectively remove a LE Client from the designated
+                        BUS.  Or in a system where PVCs are used, this table
+                        is used to create Multicast Send VCCs between BUS
+                        and LEC."
+            ::= { busLecEntry 6 }
+ 
+ 
+            --
+            --  (2) BUS Stat Group
+            --
+            --  (a) BUS Statistic table
+            --
+
+            busStatTable    OBJECT-TYPE
+                SYNTAX      SEQUENCE OF BusStatEntry
+                ACCESS  not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                    "This table contains all counters the
+                    BUS maintain.  This table is an extention
+                    to the busConfTable."
+                ::= { busStatGroup 1 }
+
+
+            busStatEntry OBJECT-TYPE
+                SYNTAX     BusStatEntry
+                ACCESS not-accessible
+                STATUS     mandatory
+                DESCRIPTION
+                    "Each entry in this table contains a
+                    BUS and its counters."
+		-- AUGMENTS { busConfEntry }
+                INDEX { busConfIndex }
+                ::= { busStatTable 1 }
+
+            BusStatEntry ::= SEQUENCE {
+                busStatInDiscards               Counter,
+                busStatInOctets                 Counter,
+                busStatInUcastFrms              Counter,
+                busStatInMcastFrms              Counter,
+                busStatFrmTimeOuts              Counter,
+                busStatMcastSendRefused         Counter,
+                busStatMcastFwdFailure          Counter
+            }
+
+            busStatInDiscards OBJECT-TYPE
+                SYNTAX     Counter
+                ACCESS read-only
+                STATUS     mandatory
+                DESCRIPTION
+                        "  The number of frames discarded due to resource
+                        error."
+                ::= { busStatEntry 1 }
+ 
+            busStatInOctets OBJECT-TYPE
+                SYNTAX     Counter
+                ACCESS read-only
+                STATUS     mandatory
+                DESCRIPTION
+                        "  The number of  octets that  this  BUS has received
+                        since its initialization."
+                ::= { busStatEntry 2 }
+ 
+            busStatInUcastFrms OBJECT-TYPE
+                SYNTAX     Counter
+                ACCESS read-only
+                STATUS     mandatory
+                DESCRIPTION
+                        " The number  of  frames that  the BUS  has  received
+                        which were  unicast data frames  and all control
+                        frames (i.e. they were flooded from the client)."
+                ::= { busStatEntry 3 }
+ 
+            busStatInMcastFrms OBJECT-TYPE
+                SYNTAX     Counter
+                ACCESS read-only
+                STATUS     mandatory
+                DESCRIPTION
+                        "  The number of  frames  that  the BUS has  received
+                        which were multicast frames."
+                ::= { busStatEntry 4 }
+ 
+            busStatFrmTimeOuts OBJECT-TYPE
+                SYNTAX     Counter
+                ACCESS read-only
+                STATUS     mandatory
+                DESCRIPTION
+                        " The number of frames dropped by 
+                        the BUS due to time out."
+                ::= { busStatEntry 5 }
+ 
+            busStatMcastSendRefused OBJECT-TYPE
+                SYNTAX     Counter
+                ACCESS read-only
+                STATUS     mandatory
+                DESCRIPTION
+                        "  The number of  multicast send VCCconnection setup 
+                        attempts to the BUS which were refused."
+                ::= { busStatEntry 6 }
+
+            busStatMcastFwdFailure OBJECT-TYPE                                       
+                SYNTAX     Counter 
+                ACCESS read-only
+                STATUS     mandatory 
+                DESCRIPTION 
+                        "  The number of  multicast forward VCCconnection setup 
+                        attempts from the BUS which were unsuccessful
+                        for any reason."
+                ::= { busStatEntry 7 } 
+  
+
+            --
+            --  (b) BUS - LEC statistics table
+            --
+ 
+            busLecStatTable    OBJECT-TYPE
+                SYNTAX      SEQUENCE OF BusLecStatEntry
+                ACCESS  not-accessible
+                STATUS      mandatory
+                DESCRIPTION
+                    "This table contains all LEC counters
+                    the BUS maintains.  This table can also
+                    be used to retrieve all LECs a BUS
+                    is providing service to."
+                ::= { busStatGroup 2 }
+ 
+            busLecStatEntry     OBJECT-TYPE
+                SYNTAX       BusLecStatEntry
+                ACCESS   not-accessible
+                STATUS       mandatory
+                DESCRIPTION
+                    "Each entry in this table represents a
+                    LEC and its counters."
+		-- AUGMENTS { busLecEntry }
+                INDEX { busConfIndex , busLecAtmAddr }
+                ::= { busLecStatTable 1 }
+ 
+               BusLecStatEntry ::=
+                   SEQUENCE {
+                       busLecRecvs         Counter,
+                       busLecForwards      Counter,
+                       busLecDiscards      Counter
+                       }
+
+ 
+               busLecRecvs     OBJECT-TYPE
+                   SYNTAX      Counter
+                   ACCESS  read-only
+                   STATUS      mandatory
+                   DESCRIPTION
+                       "Number of Multicast, Broadcast and
+                       Unknown Forward requests received by
+                       the BUS from this LEC."
+                   ::= { busLecStatEntry 1 }
+ 
+               busLecForwards  OBJECT-TYPE
+                   SYNTAX      Counter
+                   ACCESS  read-only
+                   STATUS      mandatory
+                   DESCRIPTION
+                       "Number of Multicast, Broadcast and
+                       Unkown Forward requests forwarded by
+                       the BUS from this LEC.  The value
+                       of this object indicate how many requests
+                       have been forwarded by the BUS."
+                   ::= { busLecStatEntry 2 }
+ 
+               busLecDiscards  OBJECT-TYPE
+                   SYNTAX      Counter
+                   ACCESS  read-only
+                   STATUS      mandatory
+                   DESCRIPTION
+                       "Number of Multicast, Broadcast and
+                       Unkown Forward requests discarded by
+                       the BUS from this LEC.  The value
+                       of this object indicate how many requests
+                       have been discarded by the BUS."
+                   ::= { busLecStatEntry 3 }
+
+
+
+
+        --
+        -- BUS Fault Mangement Group
+        --   (a) BUS Error Control Table
+        --   (b) BUS Error Log Table
+        --
+
+           busErrCtlTable OBJECT-TYPE
+                SYNTAX     SEQUENCE OF BusErrCtlEntry
+                ACCESS not-accessible
+                STATUS     mandatory
+                DESCRIPTION
+                       "This table contains error log control 
+                        information of all BUS instances.
+                        This table is an extention to the
+                        busConfTable.  It is used to enable
+                        or disable error logs for a particular
+                        BUS entry."
+                ::= { busFaultGroup 1 }
+
+           busErrCtlEntry OBJECT-TYPE
+                SYNTAX     BusErrCtlEntry
+                ACCESS not-accessible
+                STATUS     mandatory
+                DESCRIPTION
+                      "Each entry represents a BUS entry
+                      in the busConfTable."
+		-- AUGMENTS { busConfEntry }
+                INDEX { busConfIndex }
+                ::= { busErrCtlTable 1 }
+
+            BusErrCtlEntry ::=
+                SEQUENCE {
+                    busErrCtlAdminStatus
+                        INTEGER,
+                    busErrCtlOperStatus
+                        INTEGER,
+                    busErrCtlClearLog
+                        INTEGER,
+                    busErrCtlMaxEntries
+                        INTEGER,
+                    busErrCtlLastEntry
+                        INTEGER
+                    }
+
+            busErrCtlAdminStatus     OBJECT-TYPE
+                    SYNTAX        INTEGER {
+                        enable(1),        -- enable error log
+                        disable(2)        -- disable error log
+                    }
+                    ACCESS    read-write
+                    STATUS        mandatory
+                    DESCRIPTION
+                        "This object is used to enable/disable error 
+                        logging for the BUS."
+                    ::= { busErrCtlEntry 1 }
+
+            busErrCtlOperStatus            OBJECT-TYPE
+                SYNTAX        INTEGER {
+                     other(1),        -- not specified
+                     active(2),        -- error logging
+                     outOfRes(3),        -- Out of buffer error
+                     failed(4),        -- failed to start
+                                     -- error log for reasons
+                                     -- other than out of
+                                     -- resources 
+                     disabled(5)     -- error loggin was disabled       
+                }
+                ACCESS    read-only
+                STATUS        mandatory
+                DESCRIPTION
+                   "This object is used to indicate
+                   the result of a set operation to the
+                   object busErrCtlAdminStatus.
+                   If the error log was successfully
+                   started, it is in active(2) mode.
+                   Otherwise, it is set to either
+                   outOfRes(3) or failed(4) for
+                   the respective reasons."
+                ::= { busErrCtlEntry 2 }
+
+            busErrCtlClearLog            OBJECT-TYPE
+                SYNTAX        INTEGER {
+                   noOp(1),        -- read only value
+                   clear(2)        -- clear the error log associated
+                                 -- with this BUS entry
+                }
+                ACCESS        read-write
+                STATUS                mandatory
+                DESCRIPTION
+                    "This object is used to clear the error log
+                     entries associated with this BUS."
+                ::= { busErrCtlEntry 3 }
+
+            busErrCtlMaxEntries        OBJECT-TYPE
+                SYNTAX        INTEGER ( 1..65535 )
+                ACCESS    read-only
+                STATUS        mandatory
+                DESCRIPTION
+                   "The maximum entries of the error
+                   log a BUS can support."
+                ::= { busErrCtlEntry 4 }
+
+            busErrCtlLastEntry        OBJECT-TYPE
+                SYNTAX        INTEGER(1..2147483647)
+                ACCESS    read-write
+                STATUS        mandatory
+                DESCRIPTION
+                    "The index to the last entry in the error
+                     log table for this BUS."
+                ::= { busErrCtlEntry 5 }
+
+            --
+            --
+            --   BUS error log table
+            --
+
+            busErrLogTable OBJECT-TYPE
+                SYNTAX     SEQUENCE OF BusErrLogEntry
+                ACCESS not-accessible
+                STATUS     mandatory
+                DESCRIPTION
+                    "This table contains error logs
+                    of the BUS instances enabled
+                    in the busErrCtlTable.  This table
+                    is indexed by the BUS instance
+                    index and an arbitrary integer
+                    uniquely identifies an error
+                    log."
+                ::= { busFaultGroup 2 }
+
+            busErrLogEntry OBJECT-TYPE
+                SYNTAX     BusErrLogEntry
+                ACCESS not-accessible
+                STATUS     mandatory
+                DESCRIPTION
+                    "Each entry represents aan error detected by the BUS."
+                INDEX { busConfIndex, busErrLogIndex }
+                ::= { busErrLogTable 1 }
+
+            BusErrLogEntry ::=
+                SEQUENCE {
+                    busErrLogIndex 
+                        INTEGER,
+                    busErrLogAtmAddr
+                        AtmLaneAddress,
+                    busErrLogErrCode
+                        INTEGER,
+                    busErrLogTime
+                        TIMESTAMP
+                }
+
+            busErrLogIndex     OBJECT-TYPE
+                SYNTAX          INTEGER(1..2147483647)
+                ACCESS      not-accessible
+                STATUS          mandatory
+                DESCRIPTION
+                    "An arbitrary integer which uniquely
+                    identifies an error log entry. The first
+                    entry after reset or clearing the error
+                    log is an assigned value (2^32-1).  Succeding
+                    entries are assigned with descending values 
+                    consecutively.  Entries after 1 are discarded.The 
+                    enabling/disabling of
+                    the error log capability is done in
+                    the busErrCtlTable."
+                ::= { busErrLogEntry 1 }
+
+            busErrLogAtmAddr OBJECT-TYPE
+                SYNTAX        AtmLaneAddress 
+                ACCESS    read-only
+                STATUS        mandatory
+                DESCRIPTION
+                    "The primary ATM address of the LE Client on whose Multicast
+                    Send VCC the error occured. 
+                    The corresponding error code is
+                    specified in the object busErrLogErrCode."
+                ::= { busErrLogEntry 2 }
+
+            busErrLogErrCode OBJECT-TYPE
+                SYNTAX        INTEGER {
+                              outOfRes(1),     -- Out of resources error
+                              badCtlFrame(2),  -- Malformed control frame
+                              badDataFrame(3), -- Malformed data frame, i.e.
+                                               -- the frame received by the
+                                               -- BUS is either too big or 
+                                               -- too small
+                              other(4)         -- any other errors
+                              }
+                ACCESS    read-only
+                STATUS        mandatory
+                DESCRIPTION
+                    "The Error code which indicates the
+                    cause of the error."
+                ::= { busErrLogEntry 3 }
+
+            busErrLogTime    OBJECT-TYPE
+                SYNTAX        TIMESTAMP
+                ACCESS    read-only
+                STATUS        mandatory
+                DESCRIPTION
+                    "The sysUpTime when this entry was logged by
+                     the BUS."
+                ::= { busErrLogEntry 4 }
+   
+   END

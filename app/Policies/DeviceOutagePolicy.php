@@ -21,6 +21,11 @@ class DeviceOutagePolicy
             || $this->hasGlobalPermission($user, 'viewAll');
     }
 
+    public function viewAll(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'viewAll');
+    }
+
     public function view(User $user, DeviceOutage $deviceOutage): bool
     {
         if ($this->hasGlobalPermission($user, 'viewAll')) {

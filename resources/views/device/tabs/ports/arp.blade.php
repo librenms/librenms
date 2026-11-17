@@ -3,7 +3,9 @@
     <table id="ports-arp" class="table table-condensed table-hover table-striped tw:mt-1 tw:mb-0!">
         <thead>
         <tr>
+            @empty($port)
             <th data-column-id="interface">Port</th>
+            @endempty
             <th data-column-id="mac_address" data-formatter="tooltip">MAC address</th>
             @config('mac_oui.enabled')
                 <th data-column-id="mac_oui" data-sortable="false" data-width="150px" data-visible="false" data-formatter="tooltip">Vendor</th>
@@ -25,7 +27,8 @@
         {
             return {
                 id: "arp-search",
-                device_id: "{{ $device->device_id }}"
+                device_id: "{{ $device->device_id }}",
+                port_id: @js($port->port_id ?? null),
             };
         },
         formatters: {

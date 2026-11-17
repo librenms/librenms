@@ -1,9 +1,9 @@
 -- =============================================================================
--- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2023 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: The MIB for VSI (Virtual Switch Instance).
 -- Reference:
--- Version: V1.7
+-- Version: V2.0
 -- History:
 --   V1.0 2009-08-08 Initial version Created by Zhonghua Gao
 --   V1.1 2012-11-21 Modified by yanneng, added hh3cVsiSpbIsid,
@@ -20,6 +20,23 @@
 --   V1.6 2015-05-19 Modified by fuzhihua, modified hh3cVsiXconnectEvcSrvInstId
 --   V1.7 2016-10-29 Modified by liuqingye, added value 'vxlan(9)' for
 --               data type 'hh3cVsiMode'
+--   V1.8 2021-11-30 Modified by lifei
+--   Added nodes hh3cVsiStateChangeToUp, hh3cVsiStateChangeToDown, hh3cVsiMacLimitMax,
+--        hh3cVsiMacLimitMaxClear, hh3cVsiLabelResourceNotEnough,  hh3cVsiLabelResourceRestore
+--        and hh3cVsiPwNumberMaxExceed
+--   V1.9 2022-03-21 Modified by wangshuji, added hh3cVsiPerfInRateOctets,
+--               hh3cVsiPerfInRatePackets,hh3cVsiPerfOutRateOctets,hh3cVsiPerfOutRatePackets
+--   V2.0 2022-07-29 Modified by wangzhenzhen, added nodes hh3cVsiDelete
+--   2023-03-01 Modified by wangshuji, added nodes hh3cVsiMacCount,hh3cVsiAcCount,
+--               hh3cVsiPerfInUcastPackets,hh3cVsiPerfOutUcastPackets,hh3cVsiPerfInMcastPackets,
+--               hh3cVsiPerfOutMcastPackets,hh3cVsiPerfInBcastPackets,hh3cVsiPerfOutBcastPackets,
+--               hh3cVsiXconnectInOctets,hh3cVsiXconnectInPackets,hh3cVsiXconnectInErrors,
+--               hh3cVsiXconnectInDiscards,hh3cVsiXconnectInRateOctets,hh3cVsiXconnectInRatePackets,
+--               hh3cVsiXconnectInUcastPackets,hh3cVsiXconnectInMcastPackets,hh3cVsiXconnectInBcastPackets,
+--               hh3cVsiXconnectOutOctets,hh3cVsiXconnectOutPackets,hh3cVsiXconnectOutErrors,
+--               hh3cVsiXconnectOutDiscards,hh3cVsiXconnectOutRateOctets,hh3cVsiXconnectOutRatePackets,
+--               hh3cVsiXconnectOutUcastPackets,hh3cVsiXconnectOutMcastPackets,hh3cVsiXconnectOutBcastPackets
+--               and added hh3cVsiPwPerfTable table
 -- =============================================================================
 HH3C-VSI-MIB DEFINITIONS ::= BEGIN
 IMPORTS
@@ -29,7 +46,9 @@ IMPORTS
         OBJECT-TYPE,
         Integer32,
         Counter64,
-        Unsigned32
+        Unsigned32,
+        NOTIFICATION-TYPE,
+        IpAddress
     FROM SNMPv2-SMI
         InterfaceIndex
     FROM IF-MIB
@@ -41,7 +60,7 @@ IMPORTS
 -- =============================================================================
 hh3cVsi MODULE-IDENTITY
     LAST-UPDATED
-        "201610291650Z"        -- Oct 29, 2016 at 16:50 GMT
+        "202303011726Z"        --  Mar 01, 2023 at 17:26 GMT
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -51,6 +70,34 @@ hh3cVsi MODULE-IDENTITY
          Zip:100085"
     DESCRIPTION
         "The MIB for VSI (Virtual Switch Instance)."
+    REVISION
+        "202303011726Z"   -- Mar 01, 2023 at 17:26 GMT
+    DESCRIPTION
+        "added nodes hh3cVsiMacCount hh3cVsiAcCount
+        hh3cVsiPerfInUcastPackets hh3cVsiPerfOutUcastPackets hh3cVsiPerfInMcastPackets
+        hh3cVsiPerfOutMcastPackets hh3cVsiPerfInBcastPackets hh3cVsiPerfOutBcastPackets
+        hh3cVsiXconnectInOctets hh3cVsiXconnectInPackets hh3cVsiXconnectInErrors
+        hh3cVsiXconnectInDiscards hh3cVsiXconnectInRateOctets hh3cVsiXconnectInRatePackets
+        hh3cVsiXconnectInUcastPackets hh3cVsiXconnectInMcastPackets hh3cVsiXconnectInBcastPackets
+        hh3cVsiXconnectOutOctets hh3cVsiXconnectOutPackets hh3cVsiXconnectOutErrors
+        hh3cVsiXconnectOutDiscards hh3cVsiXconnectOutRateOctets hh3cVsiXconnectOutRatePackets
+        hh3cVsiXconnectOutUcastPackets hh3cVsiXconnectOutMcastPackets hh3cVsiXconnectOutBcastPackets
+        and added hh3cVsiPwPerfTable table."
+    REVISION
+        "202207291427Z"   -- July 29, 2022 at 14:27 GMT
+    DESCRIPTION
+        "Added hh3cVsiDelete."
+    REVISION
+        "202203231415Z"   -- Mar 23, 2022 at 14:15 GMT
+    DESCRIPTION
+        "Added hh3cVsiPerfInRateOctets hh3cVsiPerfInRatePackets hh3cVsiPerfOutRateOctets
+        hh3cVsiPerfOutRatePackets."
+    REVISION
+        "202112101130Z"   -- Dec 10, 2021 at 11:30 GMT
+    DESCRIPTION
+        "Added hh3cVsiStateChangeToUp hh3cVsiStateChangeToDown hh3cVsiMacLimitMax
+         hh3cVsiMacLimitMaxClear hh3cVsiLabelResourceNotEnough  hh3cVsiLabelResourceRestore
+         and hh3cVsiPwNumberMaxExceed."
     REVISION
         "201610291650Z"   -- Oct 29, 2016 at 16:50 GMT
     DESCRIPTION
@@ -64,6 +111,12 @@ hh3cVsi MODULE-IDENTITY
     DESCRIPTION
         "Initial version."
     ::= { hh3cCommon 105 }
+
+-- ==================================================================
+-- =================== hh3cVsiNotifications definition ==========
+-- ==================================================================
+
+hh3cVsiNotifications OBJECT IDENTIFIER ::= { hh3cVsi 0 }
 
 -- =============================================================================
 -- object definition begin
@@ -133,7 +186,9 @@ Hh3cVsiEntry ::=
         hh3cVsiLocalMacCount     Unsigned32,
         hh3cVsiInterfaceID       Unsigned32,
         hh3cVsiStatistics        TruthValue,
-        hh3cVsiNvgreID           Unsigned32
+        hh3cVsiNvgreID           Unsigned32,
+        hh3cVsiMacCount          Unsigned32,
+        hh3cVsiAcCount           Unsigned32
     }
 
 hh3cVsiIndex    OBJECT-TYPE
@@ -313,6 +368,22 @@ hh3cVsiNvgreID    OBJECT-TYPE
         this VSI does not enable NVGRE service."
     ::= { hh3cVsiEntry 17 }
 
+hh3cVsiMacCount    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of VSI MAC addresses."
+    ::= { hh3cVsiEntry 18 }
+
+hh3cVsiAcCount    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of VSI Ac."
+    ::= { hh3cVsiEntry 19 }
+
 -- =============================================================================
 -- End of hh3cVsiTable Definition
 -- =============================================================================
@@ -345,12 +416,26 @@ hh3cVsiXconnectEntry  OBJECT-TYPE
 Hh3cVsiXconnectEntry ::=
     SEQUENCE
     {
-        hh3cVsiXconnectIfIndex      Unsigned32,
-        hh3cVsiXconnectEvcSrvInstId Unsigned32,
-        hh3cVsiXconnectVsiName      OCTET STRING,
-        hh3cVsiXconnectAccessMode   INTEGER,
-        hh3cVsiXconnectHubSpoke     INTEGER,
-        hh3cVsiXconnectRowStatus    RowStatus
+        hh3cVsiXconnectIfIndex          Unsigned32,
+        hh3cVsiXconnectEvcSrvInstId     Unsigned32,
+        hh3cVsiXconnectVsiName          OCTET STRING,
+        hh3cVsiXconnectAccessMode       INTEGER,
+        hh3cVsiXconnectHubSpoke         INTEGER,
+        hh3cVsiXconnectRowStatus        RowStatus,
+        hh3cVsiXconnectInOctets         Counter64,
+        hh3cVsiXconnectInPackets        Counter64,
+        hh3cVsiXconnectInErrors         Counter64,
+        hh3cVsiXconnectInDiscards       Counter64,
+        hh3cVsiXconnectInUcastPackets   Counter64,
+        hh3cVsiXconnectInMcastPackets   Counter64,
+        hh3cVsiXconnectInBcastPackets   Counter64,
+        hh3cVsiXconnectOutOctets        Counter64,
+        hh3cVsiXconnectOutPackets       Counter64,
+        hh3cVsiXconnectOutErrors        Counter64,
+        hh3cVsiXconnectOutDiscards      Counter64,
+        hh3cVsiXconnectOutUcastPackets  Counter64,
+        hh3cVsiXconnectOutMcastPackets  Counter64,
+        hh3cVsiXconnectOutBcastPackets  Counter64
     }
 hh3cVsiXconnectIfIndex    OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -410,6 +495,118 @@ hh3cVsiXconnectRowStatus     OBJECT-TYPE
     DESCRIPTION
         "Operation status of this table entry."
     ::= { hh3cVsiXconnectEntry 6 }
+
+hh3cVsiXconnectInOctets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets received by the AC."
+    ::= { hh3cVsiXconnectEntry 7 }
+
+hh3cVsiXconnectInPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received by the AC."
+    ::= { hh3cVsiXconnectEntry 8 }
+
+hh3cVsiXconnectInErrors    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of error packets received by the AC."
+    ::= { hh3cVsiXconnectEntry 9 }
+
+hh3cVsiXconnectInDiscards    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of incoming packets discarded by the AC."
+    ::= { hh3cVsiXconnectEntry 10 }
+
+hh3cVsiXconnectInUcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Unicast packets sent by the AC."
+    ::= { hh3cVsiXconnectEntry 11 }
+
+hh3cVsiXconnectInMcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Rate of packets sent by the AC."
+    ::= { hh3cVsiXconnectEntry 12 }
+
+hh3cVsiXconnectInBcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Rate of packets sent by the AC."
+    ::= { hh3cVsiXconnectEntry 13 }
+
+hh3cVsiXconnectOutOctets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of octets sent by the AC."
+    ::= { hh3cVsiXconnectEntry 14 }
+
+hh3cVsiXconnectOutPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets sent by the AC."
+    ::= { hh3cVsiXconnectEntry 15 }
+
+hh3cVsiXconnectOutErrors    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets that failed to be sent because of a AC error."
+    ::= { hh3cVsiXconnectEntry 16 }
+
+hh3cVsiXconnectOutDiscards    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Number of packets discarded by the AC because of transmission failure."
+    ::= { hh3cVsiXconnectEntry 17 }
+
+hh3cVsiXconnectOutUcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Unicast packets received by the AC."
+    ::= { hh3cVsiXconnectEntry 18 }
+
+hh3cVsiXconnectOutMcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Rate of packets received by the AC."
+    ::= { hh3cVsiXconnectEntry 19 }
+
+hh3cVsiXconnectOutBcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Rate of packets sent by the AC."
+    ::= { hh3cVsiXconnectEntry 20 }
 
 -- =============================================================================
 -- End of hh3cVsiXconnectTable Definition
@@ -630,7 +827,17 @@ Hh3cVsiPerfEntry ::=
         hh3cVsiPerfOutOctets           Counter64,
         hh3cVsiPerfOutPackets          Counter64,
         hh3cVsiPerfOutErrors           Counter64,
-        hh3cVsiPerfOutDiscards         Counter64
+        hh3cVsiPerfOutDiscards         Counter64,
+        hh3cVsiPerfInRateOctets        Counter64,
+        hh3cVsiPerfInRatePackets       Counter64,
+        hh3cVsiPerfOutRateOctets       Counter64,
+        hh3cVsiPerfOutRatePackets      Counter64,
+        hh3cVsiPerfInUcastPackets      Counter64,
+        hh3cVsiPerfInMcastPackets      Counter64,
+        hh3cVsiPerfInBcastPackets      Counter64,
+        hh3cVsiPerfOutUcastPackets     Counter64,
+        hh3cVsiPerfOutMcastPackets     Counter64,
+        hh3cVsiPerfOutBcastPackets     Counter64
     }
 
 hh3cVsiPerfInOctets    OBJECT-TYPE
@@ -696,6 +903,87 @@ hh3cVsiPerfOutDiscards    OBJECT-TYPE
     DESCRIPTION
        "Number of packets discarded by the VSI because of transmission failure."
     ::= { hh3cVsiPerfEntry 8 }
+
+hh3cVsiPerfInRateOctets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of octets received by the VSI."
+    ::= { hh3cVsiPerfEntry 9 }
+
+hh3cVsiPerfInRatePackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Rate of packets received by the VSI."
+    ::= { hh3cVsiPerfEntry 10 }
+
+hh3cVsiPerfOutRateOctets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of octets sent by the VSI."
+    ::= { hh3cVsiPerfEntry 11 }
+
+hh3cVsiPerfOutRatePackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Rate of packets sent by the VSI."
+    ::= { hh3cVsiPerfEntry 12 }
+
+hh3cVsiPerfInUcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Unicast packets sent by the VSI."
+    ::= { hh3cVsiPerfEntry 13 }
+
+hh3cVsiPerfInMcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Rate of packets sent by the VSI."
+    ::= { hh3cVsiPerfEntry 14 }
+
+hh3cVsiPerfInBcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Rate of packets sent by the VSI."
+    ::= { hh3cVsiPerfEntry 15 }
+
+hh3cVsiPerfOutUcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Unicast packets received by the VSI."
+    ::= { hh3cVsiPerfEntry 16 }
+
+hh3cVsiPerfOutMcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Rate of packets received by the VSI."
+    ::= { hh3cVsiPerfEntry 17 }
+
+hh3cVsiPerfOutBcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Rate of packets sent by the VSI."
+    ::= { hh3cVsiPerfEntry 18 }
+
 -- =============================================================================
 -- End of hh3cVsiPerfTable Definition
 -- =============================================================================
@@ -774,4 +1062,249 @@ hh3cVsiIfRowStatus     OBJECT-TYPE
 -- End of hh3cVsiIfTable Definition
 -- =============================================================================
 
+-- =============================================================================
+-- ======================hh3cVsiPwPerfTable Definition==========================
+-- =============================================================================
+hh3cVsiPwPerfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVsiPwPerfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains performance statistics for each VSI PW."
+    ::= { hh3cVsiObjects 10 }
+
+hh3cVsiPwPerfEntry  OBJECT-TYPE
+    SYNTAX      Hh3cVsiPwPerfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A row in this table contains statistics for a VSI PW."
+    INDEX
+    {
+        hh3cVsiIndex,
+        hh3cVsiPwPerfPeerIp,
+        hh3cVsiPwPerfPwID
+    }
+    ::= { hh3cVsiPwPerfTable 1 }
+
+Hh3cVsiPwPerfEntry ::=
+    SEQUENCE
+    {
+        hh3cVsiPwPerfPeerIp              IpAddress,
+        hh3cVsiPwPerfPwID                Unsigned32,
+        hh3cVsiPwPerfInPackets           Counter64,
+        hh3cVsiPwPerfOutPackets          Counter64,
+        hh3cVsiPwPerfInUcastPackets      Counter64,
+        hh3cVsiPwPerfOutUcastPackets     Counter64,
+        hh3cVsiPwPerfInMcastPackets      Counter64,
+        hh3cVsiPwPerfOutMcastPackets     Counter64,
+        hh3cVsiPwPerfInBcastPackets      Counter64,
+        hh3cVsiPwPerfOutBcastPackets     Counter64,
+        hh3cVsiPwPerfInDiscards          Counter64,
+        hh3cVsiPwPerfInOctets            Counter64,
+        hh3cVsiPwPerfOutOctets           Counter64
+    }
+
+hh3cVsiPwPerfPeerIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Peer IP address."
+    ::= { hh3cVsiPwPerfEntry 1 }
+
+hh3cVsiPwPerfPwID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "PW identifier(ID)."
+    ::= { hh3cVsiPwPerfEntry 2 }
+
+hh3cVsiPwPerfInPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Total number of packets received by the VSI PW."
+    ::= { hh3cVsiPwPerfEntry 3 }
+
+hh3cVsiPwPerfOutPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Total number of packets sent by the VSI PW."
+    ::= { hh3cVsiPwPerfEntry 4 }
+
+hh3cVsiPwPerfInUcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Unicast packets received by the VSI PW."
+    ::= { hh3cVsiPwPerfEntry 5 }
+
+hh3cVsiPwPerfOutUcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Unicast packets sent by the VSI PW."
+    ::= { hh3cVsiPwPerfEntry 6 }
+
+hh3cVsiPwPerfInMcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Multicast packets received by the VSI PW."
+    ::= { hh3cVsiPwPerfEntry 7 }
+
+hh3cVsiPwPerfOutMcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Multicast packets sent by the VSI PW."
+    ::= { hh3cVsiPwPerfEntry 8 }
+
+hh3cVsiPwPerfInBcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Broad packets received by the VSI PW."
+    ::= { hh3cVsiPwPerfEntry 9 }
+
+hh3cVsiPwPerfOutBcastPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Broad packets sent by the VSI PW."
+    ::= { hh3cVsiPwPerfEntry 10 }
+
+hh3cVsiPwPerfInDiscards    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Number of packets that failed to be sent because of a VSI PW error."
+    ::= { hh3cVsiPwPerfEntry 11 }
+
+hh3cVsiPwPerfInOctets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Total number of Octets received by the VSI PW."
+    ::= { hh3cVsiPwPerfEntry 12 }
+
+hh3cVsiPwPerfOutOctets    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Total number of Octets sent by the VSI PW."
+    ::= { hh3cVsiPwPerfEntry 13 }
+
+-- =============================================================================
+-- ====================End of hh3cVsiPwPerfTable Definition=====================
+-- =============================================================================
+
+-- ==================================================================
+-- ===============hh3cVsiNotifications definition  ==============
+-- ==================================================================
+hh3cVsiStateChangeToUp NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cVsiName
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when vsi state change to up
+         happens."
+    ::= { hh3cVsiNotifications 1 }
+
+hh3cVsiStateChangeToDown NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cVsiName
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when vsi state change to down
+         happens."
+    ::= { hh3cVsiNotifications 2 }
+
+hh3cVsiMacLimitMax NOTIFICATION-TYPE
+    OBJECTS
+        {
+             hh3cVsiName
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when The number
+         of MAC address entries on the VSI reached the
+         upper limit happens.  The first  element show
+         the vsi name"
+    ::= { hh3cVsiNotifications 3 }
+
+hh3cVsiMacLimitMaxClear NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cVsiName
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when The number of
+         MAC address entries on the VSI fell below the upper
+         limit happens.  The first element show the the vsi
+         name."
+    ::= { hh3cVsiNotifications 4 }
+
+hh3cVsiLabelResourceNotEnough NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cVsiName
+        }
+    STATUS      current
+    DESCRIPTION
+    "This notification is generated when alloc label failed due to no enough
+    label resource."
+    ::= {hh3cVsiNotifications 5}
+
+hh3cVsiLabelResourceRestore NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cVsiName
+        }
+    STATUS      current
+    DESCRIPTION
+    "This notification is generated when label resource restores available."
+    ::= {hh3cVsiNotifications 6}
+
+hh3cVsiPwNumberMaxExceed NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cVsiName
+        }
+    STATUS      current
+    DESCRIPTION
+    "This notification is generated when pw number exceed specification."
+    ::= {hh3cVsiNotifications 7}
+
+hh3cVsiDelete NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cVsiName
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when a VSI is deleted."
+    ::= { hh3cVsiNotifications 8 }
+-- =============================================================================
+-- End of Notifications
+-- =============================================================================
 END

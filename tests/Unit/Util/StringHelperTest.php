@@ -54,6 +54,10 @@ final class StringHelperTest extends TestCase
         $this->assertEquals('Øverbyvegen', StringHelpers::inferEncoding(base64_decode('2HZlcmJ5dmVnZW4=')));
         $this->assertEquals('教科网IPv4', StringHelpers::inferEncoding(base64_decode('vcy/xs34SVB2NA==')));
 
+        // Huawei SmartAX MA5608T returns GBK-encoded "风机盒" (fan box) in
+        // ENTITY-MIB::entPhysicalDescr, which crashed discovery. See #20361
+        $this->assertEquals('MA5610&MA5616风机盒', StringHelpers::inferEncoding("MA5610&MA5616\xB7\xE7\xBB\xFA\xBA\xD0"));
+
         config(['app.charset' => 'Shift_JIS']);
         $this->assertEquals('コンサート', StringHelpers::inferEncoding(base64_decode('g1KDk4NUgVuDZw==')));
     }
@@ -123,5 +127,30 @@ final class StringHelperTest extends TestCase
         $this->assertSame('plain text', StringHelpers::decodeSnmpHexText('plain text'));
         $this->assertSame('41 42', StringHelpers::decodeSnmpHexText('41 42'));
         $this->assertSame('', StringHelpers::decodeSnmpHexText(''));
+    }
+
+    public function testHasNumber(): void
+    {
+        $this->assertTrue(StringHelpers::hasNumber('123'));
+        $this->assertTrue(StringHelpers::hasNumber('123.45'));
+        $this->assertTrue(StringHelpers::hasNumber('123.'));
+        $this->assertTrue(StringHelpers::hasNumber('.30'));
+        $this->assertTrue(StringHelpers::hasNumber('.5'));
+        $this->assertTrue(StringHelpers::hasNumber('-123'));
+        $this->assertTrue(StringHelpers::hasNumber('-123.45'));
+        $this->assertTrue(StringHelpers::hasNumber('-.30'));
+        $this->assertTrue(StringHelpers::hasNumber('  123'));
+        $this->assertTrue(StringHelpers::hasNumber('  .30'));
+        $this->assertTrue(StringHelpers::hasNumber('0'));
+        $this->assertTrue(StringHelpers::hasNumber('0.0'));
+        $this->assertTrue(StringHelpers::hasNumber('123abc'));
+
+        $this->assertFalse(StringHelpers::hasNumber(''));
+        $this->assertFalse(StringHelpers::hasNumber('abc'));
+        $this->assertFalse(StringHelpers::hasNumber('abc123'));
+        $this->assertFalse(StringHelpers::hasNumber('.'));
+        $this->assertFalse(StringHelpers::hasNumber('-.'));
+        $this->assertFalse(StringHelpers::hasNumber('  abc'));
+        $this->assertFalse(StringHelpers::hasNumber('  .'));
     }
 }

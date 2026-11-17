@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ports_vlans', function (Blueprint $table) {
+        Schema::create('ports_vlans', function (Blueprint $table): void {
             $table->increments('port_vlan_id');
             $table->unsignedInteger('device_id');
             $table->unsignedInteger('port_id');

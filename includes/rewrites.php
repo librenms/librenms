@@ -161,20 +161,6 @@ function ipmiSensorName($hardwareId, $sensorIpmi)
 }
 
 /**
- * @param  $descr
- * @return int
- */
-function get_nagios_state($descr)
-{
-    return match ($descr) {
-        'On', 'Okay', 'Ok' => 0,
-        'Standby', 'Idle', 'Maintenance' => 1,
-        'Under', 'Over' => 2,
-        default => 3,
-    };
-}
-
-/**
  * @param  $state
  * @return int|void
  */
@@ -190,55 +176,4 @@ function apc_relay_state($state)
             return 2;
             break;
     }
-}
-
-function parse_entity_state($state, $value)
-{
-    $data = [
-        'entStateOper' => [
-            1 => ['text' => 'unavailable', 'color' => 'default'],
-            2 => ['text' => 'disabled', 'color' => 'danger'],
-            3 => ['text' => 'enabled', 'color' => 'success'],
-            4 => ['text' => 'testing', 'color' => 'warning'],
-        ],
-        'entStateUsage' => [
-            1 => ['text' => 'unavailable', 'color' => 'default'],
-            2 => ['text' => 'idle', 'color' => 'info'],
-            3 => ['text' => 'active', 'color' => 'success'],
-            4 => ['text' => 'busy', 'color' => 'success'],
-        ],
-        'entStateStandby' => [
-            1 => ['text' => 'unavailable', 'color' => 'default'],
-            2 => ['text' => 'hotStandby', 'color' => 'info'],
-            3 => ['text' => 'coldStandby', 'color' => 'info'],
-            4 => ['text' => 'providingService', 'color' => 'success'],
-        ],
-        'entStateAdmin' => [
-            1 => ['text' => 'unknown', 'color' => 'default'],
-            2 => ['text' => 'locked', 'color' => 'info'],
-            3 => ['text' => 'shuttingDown', 'color' => 'warning'],
-            4 => ['text' => 'unlocked', 'color' => 'success'],
-        ],
-    ];
-
-    return $data[$state][$value] ?? ['text' => 'na', 'color' => 'default'];
-}
-
-function parse_entity_state_alarm($bits)
-{
-    // not sure if this is correct
-    $data = [
-        0 => ['text' => 'unavailable', 'color' => 'default'],
-        1 => ['text' => 'underRepair', 'color' => 'warning'],
-        2 => ['text' => 'critical', 'color' => 'danger'],
-        3 => ['text' => 'major', 'color' => 'danger'],
-        4 => ['text' => 'minor', 'color' => 'info'],
-        5 => ['text' => 'warning', 'color' => 'warning'],
-        6 => ['text' => 'indeterminate', 'color' => 'default'],
-    ];
-
-    $alarms = str_split(base_convert((string) $bits, 16, 2));
-    $active_alarms = array_filter($alarms);
-
-    return array_intersect_key($data, $active_alarms);
 }

@@ -14,6 +14,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
@@ -29,51 +30,19 @@ class Msteams extends Transport
         $client = Http::client();
 
         if ($useJson) {
-            // JSON mode: template must supply the full payload.
-            // For Workflow webhooks the template must include the
-            // {"type":"message","attachments":[...]} envelope.
-            // For legacy O365 connectors a bare MessageCard JSON is fine.
+            // JSON mode: the template must supply the full payload, including
+            // the {"type":"message","attachments":[...]} envelope.
             $msg = $alert_data['uid'] === '000'
                 ? $this->testJsonMessage() // use pre-made JSON for tests
                 : $alert_data['msg'];
 
             $client->withBody($msg, 'application/json');
-            $res = $client->post($url, []);
         } else {
-            // Markdown/MessageCard mode.
-            // Build the MessageCard payload from alert data.
-            $messageCard = [
-                '@type' => 'MessageCard',
-                '@context' => 'http://schema.org/extensions',
-                'title' => $alert_data['title'],
-                'themeColor' => self::getColorForState($alert_data['state']),
-                'text' => strip_tags(
-                    (string) $alert_data['msg'],
-                    '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>'
-                ),
-                'summary' => $alert_data['title'],
-            ];
-
-            if (! $this->isLegacyConnectorWebhook($url)) {
-                // New Workflow (Power Automate) webhook:
-                // MessageCard must be wrapped in the "message"/"attachments" envelope.
-                // Supported as of February 2026 per Microsoft dev blog update.
-                $payload = [
-                    'type' => 'message',
-                    'attachments' => [
-                        [
-                            'contentType' => 'application/vnd.microsoft.teams.card.o365connector',
-                            'content' => $messageCard,
-                        ],
-                    ],
-                ];
-                $client->withBody(json_encode($payload), 'application/json');
-                $res = $client->post($url, []);
-            } else {
-                // Legacy O365 Connector webhook: send bare MessageCard directly.
-                $res = $client->post($url, $messageCard);
-            }
+            $payload = $this->adaptiveCard($alert_data);
+            $client->withBody(json_encode($payload), 'application/json');
         }
+
+        $res = $client->post($url, []);
 
         if ($res->successful()) {
             return true;
@@ -83,16 +52,54 @@ class Msteams extends Transport
             $alert_data,
             $res->status(),
             $res->body(),
-            $messageCard['text'] ?? $alert_data['msg'],
-            $messageCard ?? []
+            $alert_data['msg'],
+            $payload ?? []
         );
     }
 
-    private function isLegacyConnectorWebhook(string $url): bool
+    private function adaptiveCard(array $alert_data): array
     {
-        return str_contains($url, 'outlook.office.com')
-            || str_contains($url, 'outlook.office365.com')
-            || str_contains($url, '.webhook.office.com');
+        $color = match ((int) $alert_data['state']) {
+            AlertState::CLEAR => 'Good',
+            AlertState::ACKNOWLEDGED => 'Accent',
+            AlertState::BETTER, AlertState::CHANGED => 'Warning',
+            default => 'Attention',
+        };
+
+        // A TextBlock renders markdown but not HTML and needs a blank line for a line break.
+        $text = preg_replace('#<br\s*/?>|</(p|div|li|h[1-6])>#i', "\n", (string) $alert_data['msg']);
+        $text = preg_replace('/\R+/', "\n\n", trim(strip_tags($text)));
+        // Teams rejects messages over 28 KB.
+        $text = mb_strcut($text, 0, 20000);
+
+        return [
+            'type' => 'message',
+            'attachments' => [
+                [
+                    'contentType' => 'application/vnd.microsoft.card.adaptive',
+                    'content' => [
+                        '$schema' => 'http://adaptivecards.io/schemas/adaptive-card.json',
+                        'type' => 'AdaptiveCard',
+                        'version' => '1.4',
+                        'body' => [
+                            [
+                                'type' => 'TextBlock',
+                                'size' => 'Medium',
+                                'weight' => 'Bolder',
+                                'color' => $color,
+                                'text' => $alert_data['title'],
+                                'wrap' => true,
+                            ],
+                            [
+                                'type' => 'TextBlock',
+                                'text' => $text,
+                                'wrap' => true,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ];
     }
 
     public static function configTemplate(): array
@@ -102,13 +109,13 @@ class Msteams extends Transport
                 [
                     'title' => 'Webhook URL',
                     'name' => 'msteam-url',
-                    'descr' => 'Microsoft Teams Webhook URL (legacy O365 connector or new Workflow webhook)',
+                    'descr' => 'Microsoft Teams Workflow webhook URL',
                     'type' => 'text',
                 ],
                 [
                     'title' => 'Use JSON?',
                     'name' => 'use-json',
-                    'descr' => 'Compose MessageCard with JSON rather than Markdown. Your template must be valid MessageCard JSON',
+                    'descr' => 'Send the alert template as the raw JSON payload instead of the built-in card. Your template must be valid JSON with the message/attachments envelope',
                     'type' => 'checkbox',
                     'default' => false,
                 ],

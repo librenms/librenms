@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('device_groups', function (Blueprint $table) {
+        Schema::table('device_groups', function (Blueprint $table): void {
             $table->string('desc')->nullable()->default('')->change();
             $table->string('type', 16)->default('dynamic')->after('desc');
             $table->text('rules')->nullable()->after('type');
@@ -29,7 +29,7 @@ return new class extends Migration
     public function down(): void
     {
         if (LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
-            Schema::table('device_groups', function (Blueprint $table) {
+            Schema::table('device_groups', function (Blueprint $table): void {
                 $table->string('desc')->change();
                 $table->dropColumn(['type', 'rules']);
                 $table->text('params')->nullable()->after('pattern');

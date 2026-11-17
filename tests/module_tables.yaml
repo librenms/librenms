@@ -7,21 +7,6 @@ applications:
             - { custom: 'INNER JOIN (SELECT app_id, app_type FROM applications WHERE `device_id`=?) I USING (app_id)', select: ['app_type'] }
         custom_where: ''
         order_by: metric
-bgp-peers:
-    bgpPeers:
-        excluded_fields: [device_id, bgpPeer_id, vrf_id]
-        joins:
-        - { left: bgpPeers.device_id, right: devices.device_id, select: [devices.bgpLocalAs] }
-        - { left: bgpPeers.vrf_id, right: vrfs.vrf_id, select: [vrfs.bgpLocalAs as vrfLocalAs] }
-    bgpPeers_cbgp:
-        excluded_fields: [device_id]
-fdb-table:
-    ports_fdb:
-        excluded_fields: [device_id, ports_fdb_id, port_id, vlan_id, created_at, updated_at]
-        joins:
-            - { left: ports_fdb.port_id, right: ports.port_id, select: [ifIndex] }
-            - { left: ports_fdb.vlan_id, right: vlans.vlan_id, select: [vlan_vlan] }
-        order_by: ports.ifIndex, vlans.vlan_vlan, ports_fdb.mac_address
 loadbalancers:
     component: true
 ports:
@@ -44,9 +29,6 @@ route:
     route:
         excluded_fields: [port_id, device_id, route_id, created_at, updated_at]
         order_by: inetCidrRouteDest
-processors:
-    processors:
-        excluded_fields: [device_id, processor_id]
 sensors:
     sensors:
         excluded_fields: [device_id, sensor_id, state_translation_id, state_index_id, sensors_to_state_translations_id, lastupdate]
@@ -72,15 +54,3 @@ vlans:
     ports_vlans:
         excluded_fields: [port_vlan_id, device_id, port_id]
         order_by: vlan, baseport
-vrf:
-    vrfs:
-        excluded_fields: [vrf_id, device_id]
-        joins:
-            - { custom: "LEFT JOIN (SELECT ifVrf, GROUP_CONCAT(ifIndex ORDER BY ifIndex ASC SEPARATOR ',') as ifIndices FROM ports GROUP BY ifVrf) p ON p.ifVrf = vrfs.vrf_id", select: ["p.ifIndices"] }
-discovery-protocols:
-    links:
-        joins:
-            - { left: links.local_port_id, right: ports.port_id, select: [ports.ifAlias, ports.ifDescr, ports.ifName] }
-        custom_where: WHERE links.local_device_id=?
-        excluded_fields: [local_device_id, local_port_id, remote_port_id, remote_device_id, id]
-        order_by: ports.ifAlias,ports.ifDescr,ports.ifName,remote_hostname,remote_version,remote_port

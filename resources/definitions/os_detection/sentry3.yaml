@@ -15,7 +15,6 @@ poller_modules:
     ospf: false
     stp: false
 discovery_modules:
-    cisco-vrf-lite: false
     discovery-protocols: false
     arp-table: false
     bgp-peers: false

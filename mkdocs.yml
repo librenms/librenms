@@ -300,6 +300,7 @@ nav:
       - Unit Tests: Developing/os/Test-Units.md
       - Sensor State Support: Developing/Sensor-State-Support.md
     - SNMP Traps: Developing/SNMP-Traps.md
+    - Creating Graphs: Developing/Graphs.md
     - Dynamic Config: Developing/Dynamic-Config.md
     - Localization: Developing/Localization.md
     - Time Handling: Developing/Time-Handling.md

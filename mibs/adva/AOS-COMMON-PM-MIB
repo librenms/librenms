@@ -1,0 +1,88 @@
+AOS-COMMON-PM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, TimeTicks
+             FROM SNMPv2-SMI
+    ifIndex
+             FROM IF-MIB
+    aosCommon
+             FROM ADVA-MIB
+    entPhysicalIndex
+             FROM ENTITY-MIB;
+
+--
+-- OID definitions
+--
+
+-- 
+-- OID definitions
+-- 
+
+-- 
+-- Textual Conventions 
+-- 
+PerfCounter64 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This type represents a non-negative 64-bit integer. The initial
+         value of this integer will  be 0.  It will increment with time,
+         however, the value will revert back to 0 when the time period
+         for history interval elapses.  Typically,  this will be noticed
+         at 15minute intervals and 1 day intervals.  Only the rollover
+         interval periods will keep counting to a maximum 64-bit value
+         and will wrap to 0 when this occurs."
+    SYNTAX       Counter64 
+
+
+PmIntervalType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Describes the Performance Monitoring Interval Type."
+    SYNTAX       INTEGER {
+                   interval-1sec (1),
+                   interval-1min (2),
+                   interval-5min (3),
+                   interval-10min (4),
+                   interval-15min (5),
+                   interval-1day  (6),
+                   rollover (7),
+                   interval-1hour (8)
+                  }
+
+PmBinAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Provides ability to clear the contents of PM bin."
+    SYNTAX       INTEGER {
+                   not-applicable(0),
+                   clear (1)
+                 }
+
+PmSuspectReasonType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Describes the Suspect Reason providing information on validity of 
+         Performance Monitoring Interval."
+    SYNTAX       INTEGER {
+                   suspect-admin-state      (1),
+                   suspect-tod-change       (2),
+                   suspect-pm-halted        (3),
+                   suspect-partial-interval (4),
+                   suspect-no-reasons       (5),
+                   suspect-invalid-values   (6)
+                  }
+
+PmTcaType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Describes the TCA type."
+    SYNTAX       INTEGER {
+                   tca-disabled      (1),
+                   upper-threshold       (2),
+                   lower-threshold        (3),
+                   value-range (4)
+                  }
+END
+

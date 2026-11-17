@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('alert_templates', function (Blueprint $table) {
+        Schema::create('alert_templates', function (Blueprint $table): void {
             $table->increments('id');
             $table->string('name');
             $table->longText('template');

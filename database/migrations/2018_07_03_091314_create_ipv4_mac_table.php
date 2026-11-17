@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ipv4_mac', function (Blueprint $table) {
+        Schema::create('ipv4_mac', function (Blueprint $table): void {
             $table->id();
             $table->unsignedInteger('port_id')->index();
             $table->unsignedInteger('device_id')->nullable();

@@ -29,6 +29,7 @@ namespace LibreNMS\Util;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\ProcessType;
 use LibreNMS\Polling\ModuleStatus;
 
@@ -109,7 +110,7 @@ class ModuleList
         return ['core' => new ModuleStatus(true)] + $module_status;
     }
 
-    private function moduleStatus(ProcessType $type, string $module_name, Device $device): ModuleStatus
+    public function moduleStatus(ProcessType $type, string $module_name, Device $device): ModuleStatus
     {
         $override = $this->overrides[$module_name] ?? null;
 
@@ -120,6 +121,7 @@ class ModuleList
                 $device->getAttrib("discover_$module_name"),
                 $override == null ? null : true,
                 is_array($override) ? $override : null,
+                $this->methodSetting($module_name, $device),
             ),
             ProcessType::Poller => new ModuleStatus(
                 LibrenmsConfig::get("poller_modules.$module_name"),
@@ -127,7 +129,21 @@ class ModuleList
                 $device->getAttrib("poll_$module_name"),
                 $override == null ? null : true,
                 is_array($override) ? $override : null,
+                $this->methodSetting($module_name, $device),
             ),
         };
+    }
+
+    /**
+     * True when one of the module's non-SNMP methods is enabled, otherwise null.
+     */
+    public function methodSetting(string $module_name, Device $device): ?bool
+    {
+        $methods = array_filter(
+            Module::fromName($module_name)->pollingMethods($device),
+            fn (PollingMethodType $method): bool => $method !== PollingMethodType::Snmp,
+        );
+
+        return $device->polling()->anyEnabled($methods) ?: null;
     }
 }

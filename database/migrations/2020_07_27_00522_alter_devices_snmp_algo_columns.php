@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('devices', function (Blueprint $table) {
+        Schema::table('devices', function (Blueprint $table): void {
             $table->string('authalgo', 10)->nullable()->change();
             $table->string('cryptoalgo', 10)->nullable()->change();
         });

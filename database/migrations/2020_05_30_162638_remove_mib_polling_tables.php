@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::create('device_mibs', function (Blueprint $table) {
+        Schema::create('device_mibs', function (Blueprint $table): void {
             $table->unsignedInteger('device_id');
             $table->string('module');
             $table->string('mib');
@@ -37,7 +37,7 @@ return new class extends Migration
             }
             $table->primary(['device_id', 'module', 'mib']);
         });
-        Schema::create('device_oids', function (Blueprint $table) {
+        Schema::create('device_oids', function (Blueprint $table): void {
             $table->unsignedInteger('device_id');
             $table->string('oid');
             $table->string('module');
@@ -52,7 +52,7 @@ return new class extends Migration
             }
             $table->primary(['device_id', 'oid']);
         });
-        Schema::create('mibdefs', function (Blueprint $table) {
+        Schema::create('mibdefs', function (Blueprint $table): void {
             $table->string('module');
             $table->string('mib');
             $table->string('object_type');

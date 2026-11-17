@@ -1,5 +1,8 @@
 <?php
 
+use App\Facades\DeviceCache;
+use Illuminate\Support\Facades\Gate;
+
 $component = new LibreNMS\Component();
 $options = [];
 $options['filter']['ignore'] = ['=', 0];
@@ -12,6 +15,10 @@ $showAll = $vars['rowCount'] == -1; // Show all devices y/n
 $count = 0;
 // Loop through each device in the component array
 foreach ($components as $devid => $comp) {
+    if (Gate::denies('view', DeviceCache::get($devid))) {
+        continue; // user may not see this device
+    }
+
     $device = device_by_id_cache($devid);
 
     // Loop through each component
@@ -79,7 +86,7 @@ foreach ($components as $devid => $comp) {
                 ];
 
                 // Do we want a graphrow.
-                if (is_array($graph_array)) {
+                if (isset($graph_array)) {
                     $return_data = true;
                     require 'includes/html/print-graphrow.inc.php';
                     unset($return_data);
