@@ -170,11 +170,12 @@ function record_sensor_data($device, $all_sensors)
         app('Datastore')->put($device, 'sensor', $tags, $fields);
 
         // FIXME also warn when crossing WARN level!
-        // an unknown value (null, from a user_func) is neither under nor above a threshold
-        if ($sensor_value !== null && $sensor['sensor_limit_low'] != '' && $prev_sensor_value > $sensor['sensor_limit_low'] && $sensor_value < $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {
+        // an unknown value (null, from a user_func) is neither under nor above a threshold,
+        // and the first known value after an unknown one is checked as a crossing
+        if ($sensor_value !== null && $sensor['sensor_limit_low'] != '' && ($prev_sensor_value === null || $prev_sensor_value > $sensor['sensor_limit_low']) && $sensor_value < $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {
             Log::info('Alerting for ' . $device['hostname'] . ' ' . $sensor['sensor_descr']);
             Eventlog::log("$class under threshold: $sensor_value $unit (< {$sensor['sensor_limit_low']} $unit)", $device['device_id'], $sensor['sensor_class'], Severity::Warning, $sensor['sensor_id']);
-        } elseif ($sensor_value !== null && $sensor['sensor_limit'] != '' && $prev_sensor_value < $sensor['sensor_limit'] && $sensor_value > $sensor['sensor_limit'] && $sensor['sensor_alert'] == 1) {
+        } elseif ($sensor_value !== null && $sensor['sensor_limit'] != '' && ($prev_sensor_value === null || $prev_sensor_value < $sensor['sensor_limit']) && $sensor_value > $sensor['sensor_limit'] && $sensor['sensor_alert'] == 1) {
             Log::info('Alerting for ' . $device['hostname'] . ' ' . $sensor['sensor_descr']);
             Eventlog::log("$class above threshold: $sensor_value $unit (> {$sensor['sensor_limit']} $unit)", $device['device_id'], $sensor['sensor_class'], Severity::Warning, $sensor['sensor_id']);
         }
