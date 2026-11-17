@@ -32,21 +32,8 @@ Debug::set(isset($_REQUEST['debug']));
 
 $ajax_form = match ($_POST['type'] ?? '') {
     'alert-notes' => 'includes/html/forms/alert-notes.inc.php',
-    'alert-templates' => 'includes/html/forms/alert-templates.inc.php',
-    'alert-transports' => 'includes/html/forms/alert-transports.inc.php',
-    'application-update' => 'includes/html/forms/application-update.inc.php',
-    'component' => 'includes/html/forms/component.inc.php',
-    'convert-template' => 'includes/html/forms/convert-template.inc.php',
     'create-service' => 'includes/html/forms/create-service.inc.php',
     'override-config' => 'includes/html/forms/override-config.inc.php',
-    'parse-alert-template' => 'includes/html/forms/parse-alert-template.inc.php',
-    'refresh-oxidized-node' => 'includes/html/forms/refresh-oxidized-node.inc.php',
-    'reload-oxidized-nodes-list' => 'includes/html/forms/reload-oxidized-nodes-list.inc.php',
-    'search-oxidized-config' => 'includes/html/forms/search-oxidized-config.inc.php',
-    'show-alert-transport' => 'includes/html/forms/show-alert-transport.inc.php',
-    'show-transport-group' => 'includes/html/forms/show-transport-group.inc.php',
-    'transport-groups' => 'includes/html/forms/transport-groups.inc.php',
-    'update-port-notes' => 'includes/html/forms/update-port-notes.inc.php',
     default => null,
 };
 

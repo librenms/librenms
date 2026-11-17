@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Polling\Measure\Measurement;
@@ -63,6 +64,23 @@ abstract class BaseDatastore implements DatastoreContract
         }
 
         return DeviceCache::getPrimary();
+    }
+
+    /**
+     * The tags that tell series apart. A metric identity carries what the series belongs to in its own tags,
+     * usually hostname, other writes belong to the device and are tagged with its hostname.
+     *
+     * @param  array<string, mixed>  $tags
+     * @param  array<string, mixed>  $meta
+     * @return array<string, mixed>
+     */
+    protected function seriesTags(array $tags, array $meta): array
+    {
+        if (($meta['metric'] ?? null) instanceof MetricIdentity) {
+            return $tags;
+        }
+
+        return ['hostname' => $this->getDevice($meta)->hostname, ...$tags];
     }
 
     public function __destruct()

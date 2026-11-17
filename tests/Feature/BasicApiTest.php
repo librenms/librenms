@@ -38,6 +38,7 @@ use App\Models\Vminfo;
 use App\Models\WirelessSensor;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Tests\DBTestCase;
@@ -45,6 +46,43 @@ use LibreNMS\Tests\DBTestCase;
 final class BasicApiTest extends DBTestCase
 {
     use DatabaseTransactions;
+
+    public function testSearchOxidizedConfigs(): void
+    {
+        LibrenmsConfig::set('oxidized.enabled', true);
+        LibrenmsConfig::set('oxidized.url', 'http://oxidized.test');
+        $user = User::factory()->admin()->create(['enabled' => 1]);
+        $token = $user->createToken('test');
+        $nodes = [['node' => 'router.example.com', 'full_name' => 'core/router.example.com']];
+        Http::preventStrayRequests();
+        Http::fake(['oxidized.test/nodes/conf_search?format=json' => Http::response($nodes)]);
+
+        $this->json('GET', '/api/v0/oxidized/config/search/hostname', [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertOk()
+            ->assertJsonPath('status', 'ok')
+            ->assertJsonPath('nodes', $nodes)
+            ->assertJsonPath('count', 1);
+
+        Http::assertSent(fn ($request) => $request->method() === 'POST'
+            && $request['search_in_conf_textbox'] === 'hostname');
+    }
+
+    public function testSearchOxidizedConfigsReturns404WithoutData(): void
+    {
+        LibrenmsConfig::set('oxidized.enabled', true);
+        LibrenmsConfig::set('oxidized.url', 'http://oxidized.test');
+        $user = User::factory()->admin()->create(['enabled' => 1]);
+        $token = $user->createToken('test');
+        Http::preventStrayRequests();
+        Http::fake(['oxidized.test/nodes/conf_search?format=json' => Http::response([])]);
+
+        $this->json('GET', '/api/v0/oxidized/config/search/hostname', [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertNotFound()
+            ->assertJsonPath('status', 'error')
+            ->assertJsonPath('message', 'Received no data from Oxidized');
+
+        Http::assertSentCount(1);
+    }
 
     public function testListDevices(): void
     {
@@ -167,6 +205,19 @@ final class BasicApiTest extends DBTestCase
         $this->json('GET', "/api/v0/devices?api_token={$token->plainTextToken}")
             ->assertStatus(200)
             ->assertJsonPath('status', 'ok');
+
+        auth()->forgetGuards();
+
+        // Test with HTTP Basic auth password
+        $this->json('GET', '/api/v0/devices', [], ['Authorization' => 'Basic ' . base64_encode("X-Auth-Token:{$token->plainTextToken}")])
+            ->assertStatus(200)
+            ->assertJsonPath('status', 'ok');
+
+        auth()->forgetGuards();
+
+        // Test with invalid HTTP Basic auth password
+        $this->json('GET', '/api/v0/devices', [], ['Authorization' => 'Basic ' . base64_encode('X-Auth-Token:invalid')])
+            ->assertStatus(401);
 
         auth()->forgetGuards();
 
@@ -345,6 +396,12 @@ final class BasicApiTest extends DBTestCase
 
         // Query parameter api_token should be rejected on v1
         $this->json('GET', "/api/v1/system?api_token={$token->plainTextToken}")
+            ->assertStatus(401);
+
+        auth()->forgetGuards();
+
+        // HTTP Basic auth password should be rejected on v1
+        $this->json('GET', '/api/v1/system', [], ['Authorization' => 'Basic ' . base64_encode("X-Auth-Token:{$token->plainTextToken}")])
             ->assertStatus(401);
     }
 

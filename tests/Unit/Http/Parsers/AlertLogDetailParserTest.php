@@ -227,8 +227,7 @@ class AlertLogDetailParserTest extends TestCase
 
         $this->assertEquals('BGP Peer', $fields[0]['label']);
         $this->assertEquals('10.0.0.1', $fields[0]['value']);
-        $this->assertStringContainsString('routing', $fields[0]['url']);
-        $this->assertStringContainsString('proto=bgp', $fields[0]['url']);
+        $this->assertEquals(route('device.routing.bgp', ['device' => 1]), $fields[0]['url']);
         $this->assertEquals('Description', $fields[1]['label']);
         $this->assertEquals('ISP-A', $fields[1]['value']);
         $this->assertEquals('Remote AS', $fields[2]['label']);

@@ -1,0 +1,348 @@
+
+
+AXS-AX2130S-TRAP DEFINITIONS ::= BEGIN
+IMPORTS
+enterprises
+        FROM RFC1155-SMI
+OBJECT-TYPE
+        FROM RFC-1212
+TRAP-TYPE
+        FROM RFC-1215
+ifIndex, DisplayString
+        FROM RFC1213-MIB
+MacAddress
+        FROM SNMPv2-TC
+ax2130s, ax2130sSystemMsgType, ax2130sSystemMsgTimeStamp,
+ax2130sSystemMsgLevel, ax2130sSystemMsgEventPoint,
+ax2130sSystemMsgEventInterfaceID, ax2130sSystemMsgEventCode,
+ax2130sSystemMsgAdditionalCode, ax2130sSystemMsgText,
+ax2130sChassisIndex, ax2130sTemperatureStatusIndex, ax2130sTemperatureStatusDescr,
+ax2130sTemperatureStatusValue, ax2130sTemperatureState,
+axsLoginName, axsLoginTime, axsLoginLocation, axsLoginLine,
+axsLoginFailureTime, axsLogoutTime, axsLogoutStatus,
+axsL2ldPortIndex, axsL2ldPortIfIndex, axsL2ldPortSourcePortIfindex,
+axsL2ldPortDestinationPortIfindex, axsL2ldPortSourceVlan,
+axsUlrPortIfIndex, axsUlrPairedPortIfIndex, ax2130sMemoryError, ax2130sAuthInfo
+        FROM AX1240S
+;
+
+-- Traps for use by AlaxalA networks AX2130S
+
+-- Traps are defined using the conventions in RFC 1215.
+
+-- ax2130sAuth group
+
+ax2130sAuthSysName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..60))
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"System name of authentication."
+	::= { ax2130sAuthInfo 1 }
+
+ax2130sAuthIfIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"ifIndex of authentication."
+	::= { ax2130sAuthInfo 2 }
+
+ax2130sAuthSupplicantMac OBJECT-TYPE
+	SYNTAX  MacAddress
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Mac address of authentication."
+	::= { ax2130sAuthInfo 3 }
+
+ax2130sAuthMessage OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..280))
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Message of authentication."
+	::= { ax2130sAuthInfo 4 }
+
+ax2130sSystemMsgTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ax2130sSystemMsgType, ax2130sSystemMsgTimeStamp,
+                          ax2130sSystemMsgLevel, ax2130sSystemMsgEventPoint,
+                          ax2130sSystemMsgEventInterfaceID, ax2130sSystemMsgEventCode,
+                          ax2130sSystemMsgAdditionalCode, ax2130sSystemMsgText }
+	DESCRIPTION
+		"System message is displayed."
+	::= 1
+
+ax2130sTemperatureTrap TRAP-TYPE
+	ENTERPRISE ax2130s
+	VARIABLES {
+		ax2130sChassisIndex,
+		ax2130sTemperatureStatusIndex,
+		ax2130sTemperatureStatusDescr, 
+		ax2130sTemperatureStatusValue, 
+		ax2130sTemperatureState }
+	DESCRIPTION
+		"A ax2130sTemperatureTrap is sent if the 
+		temperature measured at a given testpoint is outside 
+		the normal range for the testpoint (i.e. is at the warning, 
+		critical, or shutdown stage)."
+	::= 4
+
+ax2130sAirFanStopTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	DESCRIPTION
+             "This trap indicates a fan failure." 
+	::= 8 
+
+ax2130sPowerSupplyFailureTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	DESCRIPTION
+             "This trap indicates one ( or more ) of power supplies failure." 
+	::= 9 
+
+ax2130sLoginSuccessTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { axsLoginName, axsLoginTime, axsLoginLocation, axsLoginLine }
+	DESCRIPTION
+             "This trap indicates success of user log in." 
+	::= 10 
+
+ax2130sLoginFailureTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { axsLoginName, axsLoginFailureTime, 
+                          axsLoginLocation, axsLoginLine }
+	DESCRIPTION
+             "This trap indicates failure of user log in." 
+	::= 11
+
+ax2130sLogoutTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { axsLoginName, axsLoginTime, axsLogoutTime, 
+                          axsLoginLocation, axsLoginLine, axsLogoutStatus }
+	DESCRIPTION
+             "This trap indicates success of following log out.
+	       'logout' command, 'exit' command, 'quit' command." 
+	::= 12
+
+ax2130sMemoryUsageTrap  TRAP-TYPE
+	ENTERPRISE      ax2130s
+	DESCRIPTION
+             "This indicates available memory is fewer than lower limit." 
+	::= 13
+
+ax2130sFrameErrorReceiveTrap  TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "This indicates frame receive error." 
+	::= 18
+
+ax2130sFrameErrorSendTrap  TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "This indicates frame send error." 
+	::= 19
+
+--axsBroadcastStormDetectTrap TRAP-TYPE
+ax2130sBroadcastStormDetectTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "This indicates decection on broad-cast storm." 
+	::= 20
+
+--axsMulticastStormDetectTrap TRAP-TYPE
+ax2130sMulticastStormDetectTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "This indicates decection on multi-cast storm." 
+	::= 21
+
+--axsUnicastStormDetectTrap TRAP-TYPE
+ax2130sUnicastStormDetectTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "This indicates decection on uni-cast storm." 
+	::= 22
+
+--axsBroadcastStormPortInactivateTrap TRAP-TYPE
+ax2130sBroadcastStormPortInactivateTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "This indicates the port inactivated for decection on broad-cast storm." 
+	::= 23
+
+--axsMulticastStormPortInactivateTrap TRAP-TYPE
+ax2130sMulticastStormPortInactivateTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "This indicates the port inactivated for decection on multi-cast storm." 
+	::= 24
+
+--axsUnicastStormPortInactivateTrap TRAP-TYPE
+ax2130sUnicastStormPortInactivateTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "This indicates the port inactivated for decection on uni-cast storm." 
+	::= 25
+
+--axsBroadcastStormRecoverTrap TRAP-TYPE
+ax2130sBroadcastStormRecoverTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "This indicates the end of broad-cast storm." 
+	::= 26
+
+--axsMulticastStormRecoverTrap TRAP-TYPE
+ax2130sMulticastStormRecoverTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "This indicates the end of multi-cast storm." 
+	::= 27
+	
+--axsUnicastStormRecoverTrap TRAP-TYPE
+ax2130sUnicastStormRecoverTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "This indicates the end of uni-cast storm." 
+	::= 28
+	
+--axsEfmoamUdldPortInactivateTrap TRAP-TYPE
+ax2130sEfmoamUdldPortInactivateTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "Efmoam udld port inactivate trap."
+	::= 29
+
+--axsEfmoamLoopDetectPortInactivateTrap TRAP-TYPE
+ax2130sEfmoamLoopDetectPortInactivateTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "Efmoam loop detect port inactivate trap."
+	::= 30
+
+ax2130sDot1xFailureTrap  TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ax2130sAuthSysName, ax2130sAuthIfIndex, ax2130sAuthSupplicantMac, ax2130sAuthMessage }
+	DESCRIPTION
+             "Private trap of 802.1X authentication failure." 
+	::= 31
+
+ax2130sDot1xEventTrap  TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ax2130sAuthSysName, ax2130sAuthIfIndex, ax2130sAuthSupplicantMac, ax2130sAuthMessage }
+	DESCRIPTION
+             "Private trap of 802.1X authentication event." 
+	::= 32
+
+ax2130sWauthFailureTrap  TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ax2130sAuthSysName, ax2130sAuthIfIndex, ax2130sAuthSupplicantMac, ax2130sAuthMessage }
+	DESCRIPTION
+             "Private trap of Web authentication failure." 
+	::= 33
+
+ax2130sWauthEventTrap  TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ax2130sAuthSysName, ax2130sAuthIfIndex, ax2130sAuthSupplicantMac, ax2130sAuthMessage }
+	DESCRIPTION
+             "Private trap of Web authentication event." 
+	::= 34
+
+ax2130sMauthFailureTrap  TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ax2130sAuthSysName, ax2130sAuthIfIndex, ax2130sAuthSupplicantMac, ax2130sAuthMessage }
+	DESCRIPTION
+             "Private trap of Mac authentication failure." 
+	::= 35
+
+ax2130sMauthEventTrap  TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ax2130sAuthSysName, ax2130sAuthIfIndex, ax2130sAuthSupplicantMac, ax2130sAuthMessage }
+	DESCRIPTION
+             "Private trap of Mac authentication event." 
+	::= 36
+
+ax2130sDot1xSystemTrap  TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ax2130sAuthSysName, ax2130sAuthIfIndex, ax2130sAuthSupplicantMac, ax2130sAuthMessage }
+	DESCRIPTION
+             "Private trap of 802.1X authentication system." 
+	::= 37
+
+ax2130sWauthSystemTrap  TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ax2130sAuthSysName, ax2130sAuthIfIndex, ax2130sAuthSupplicantMac, ax2130sAuthMessage }
+	DESCRIPTION
+             "Private trap of Web authentication system." 
+	::= 38
+
+ax2130sMauthSystemTrap  TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ax2130sAuthSysName, ax2130sAuthIfIndex, ax2130sAuthSupplicantMac, ax2130sAuthMessage }
+	DESCRIPTION
+             "Private trap of Mac authentication system." 
+	::= 39
+			
+--axsL2ldLinkDown TRAP-TYPE
+ax2130sL2ldLinkDown TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { axsL2ldPortIfIndex,axsL2ldPortSourcePortIfindex,axsL2ldPortDestinationPortIfindex,axsL2ldPortSourceVlan }
+	DESCRIPTION
+           "When the operation of the interface changes from ACTIVE(state that can be communicated)
+           into DISABLE (state that cannot be communicated) by the L2 loop detection."
+	::= 51
+
+--axsL2ldLinkUp TRAP-TYPE
+ax2130sL2ldLinkUp TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { axsL2ldPortIfIndex }
+	DESCRIPTION
+           "When the operation of the interface changes from DISABLE (state that cannot be communicated)
+           into ACTIVE (state that can be communicated) by the automatic restoration function of the L2 loop detection."
+	::= 52
+
+--axsL2ldLoopDetection TRAP-TYPE
+ax2130sL2ldLoopDetection TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { axsL2ldPortIndex,axsL2ldPortIfIndex,axsL2ldPortSourcePortIfindex,axsL2ldPortSourceVlan }
+	DESCRIPTION
+           "When you detect the L2 loop. It notifies every 60 seconds when the state of the L2 loop continues."
+	::= 53
+
+--axsUlrChangeSecondary TRAP-TYPE
+ax2130sUlrChangeSecondary TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { axsUlrPortIfIndex,axsUlrPairedPortIfIndex }
+	DESCRIPTION
+           "When secondary port changed to active port."
+	::= 87
+
+--axsUlrChangePrimary TRAP-TYPE
+ax2130sUlrChangePrimary TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { axsUlrPortIfIndex,axsUlrPairedPortIfIndex }
+	DESCRIPTION
+           "When primary port changed to active port."
+	::= 88
+
+ax2130sDeviceErrorTrap TRAP-TYPE
+	ENTERPRISE      ax2130s
+	VARIABLES       { ax2130sMemoryError }
+	DESCRIPTION
+             "This indicates decection on Device Error." 
+	::= 90
+
+END

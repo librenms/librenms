@@ -60,6 +60,11 @@ class ImageController extends WidgetController
             $data['image_url'] .= '?' . mt_rand();
         }
 
+        // only link to http(s) or relative urls, never javascript: or other schemes
+        if (! preg_match('#^(?:https?://|[^:]*(?:[/?\#]|$))#i', (string) $data['target_url'])) {
+            $data['target_url'] = null;
+        }
+
         return view('widgets.generic-image', $data);
     }
 

@@ -3,7 +3,7 @@
 --   
 -- June 2001, Ravindra Rathi
 --   
--- Copyright (c) 2001, 2010, 2020 by Cisco Systems Inc.
+-- Copyright (c) 2001, 2010, 2020, 2025 by Cisco Systems Inc.
 -- All rights reserved.
 --   
 -- *****************************************************************
@@ -44,7 +44,7 @@ IMPORTS
 
 
 ciscoBgp4MIB MODULE-IDENTITY
-    LAST-UPDATED    "202005080000Z"
+    LAST-UPDATED    "202507310000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -111,6 +111,9 @@ ciscoBgp4MIB MODULE-IDENTITY
            Secondary identifier to indicate the type of the 
            Network Layer Reachability Information(NLRI) being 
            carried."
+    REVISION        "202507310000Z"
+    DESCRIPTION
+        "+cbgpPeer3Table: Changed cbgpPeer3VrfId range to be 0-65535"
     REVISION        "202005060000Z"
     DESCRIPTION
         "+cbgpPeer3Table: Changed VrfId, Type, RemoteAddr, VrfName to read-only"
@@ -186,6 +189,7 @@ CbgpSafi ::= TEXTUAL-CONVENTION
                         unicast(1),
                         multicast(2),
                         unicastAndMulticast(3),
+                        evpn(70),
                         vpn(128)
                     }
 
@@ -1883,7 +1887,7 @@ CbgpPeer3Entry ::= SEQUENCE {
 }
 
 cbgpPeer3VrfId OBJECT-TYPE
-    SYNTAX          Unsigned32 (1..65535)
+    SYNTAX          Unsigned32 (0..65535)
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION

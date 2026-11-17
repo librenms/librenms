@@ -583,6 +583,10 @@ return [
                 'sso' => 'Single Sign On',
             ],
         ],
+        'auth_fallback_local' => [
+            'description' => 'Allow local users to log in if the configured authentication does not know them',
+            'help' => 'Users created in LibreNMS (auth type mysql) can log in with their LibreNMS password when the configured authentication (LDAP, Active Directory, RADIUS, ...) does not know them or cannot be reached.',
+        ],
         'auth_remember' => [
             'description' => 'Remember me duration',
             'help' => 'Number of days to keep a user logged in when the user selects the remember me checkbox.',
@@ -985,10 +989,6 @@ return [
         'enable_libvirt' => [
             'description' => 'Enable Libvirt',
             'help' => 'Enables the libvirt page, which shows the virtual machines of devices.',
-        ],
-        'enable_proxmox' => [
-            'description' => 'Enable Proxmox',
-            'help' => 'Enables the Proxmox page, which shows the virtual machines of devices.',
         ],
         'enable_pseudowires' => [
             'description' => 'Enable Pseudowires',
@@ -1773,6 +1773,9 @@ return [
             ],
             'netstats' => [
                 'description' => 'Netstats',
+            ],
+            'fdb-table' => [
+                'description' => 'FDB Tables',
             ],
             'hr-mib' => [
                 'description' => 'HR Mib',

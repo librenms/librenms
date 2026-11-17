@@ -26,6 +26,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Facades\PortCache;
 use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
@@ -217,5 +218,18 @@ class Arubaos extends OS implements
     public function pollWirelessFrequency(array $sensors)
     {
         return $this->pollWirelessChannelAsFrequency($sensors, $this->decodeChannel(...));
+    }
+
+    /**
+     * Bridge ports may only be reported in the context of the VLAN the MAC address is in.
+     * Unknown bridge ports are not ifIndexes.
+     */
+    protected function fdbPortId(int|string $bridgePort, int|string $vlan): ?int
+    {
+        // VLAN 0 means the table has no VLANs, so there is no context to walk
+        $vlanContext = $vlan ? (string) $vlan : '';
+        $ifIndex = $this->bridgePortIfIndexes($vlanContext)[$bridgePort] ?? $this->bridgePortIfIndexes()[$bridgePort] ?? null;
+
+        return PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0;
     }
 }

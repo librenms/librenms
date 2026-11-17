@@ -9,7 +9,7 @@ IMPORTS
             FROM SNMPv2-TC;                              -- [RFC2579]
 
 ianaCharsetMIB MODULE-IDENTITY
-    LAST-UPDATED    "201405220000Z"
+    LAST-UPDATED    "202101040000Z"
     ORGANIZATION    "IANA"
     CONTACT-INFO    "       Internet Assigned Numbers Authority
 
@@ -19,6 +19,7 @@ ianaCharsetMIB MODULE-IDENTITY
 
                     Tel:    +1 310-301-5800
                     E-Mail: iana&iana.org"
+
     DESCRIPTION     "This MIB module defines the IANACharset
                     TEXTUAL-CONVENTION.  The IANACharset TC is used to
                     specify the encoding of string objects defined in
@@ -46,6 +47,9 @@ ianaCharsetMIB MODULE-IDENTITY
 
     --  revision history
 
+    REVISION        "202101040000Z"
+    DESCRIPTION     "Registration of new charset 1021."
+
     REVISION        "201405220000Z"
     DESCRIPTION     "Updated contact info."
 
@@ -60,7 +64,7 @@ ianaCharsetMIB MODULE-IDENTITY
 
     REVISION        "201009150000Z"
     DESCRIPTION     "Registration of new charset 2108."
-
+    
     REVISION        "200705140000Z"
     DESCRIPTION     "Registration of new charset 2107."
 
@@ -72,6 +76,7 @@ ianaCharsetMIB MODULE-IDENTITY
     DESCRIPTION     "Original version transferred from Printer MIB,
                     generated from the IANA maintained assignments
                     http://www.iana.org/assignments/character-sets."
+
     ::= { mib-2 106 }
 
 IANACharset ::= TEXTUAL-CONVENTION
@@ -235,6 +240,7 @@ IANACharset ::= TEXTUAL-CONVENTION
         csUTF32BE(1018),
         csUTF32LE(1019),
         csBOCU1(1020),
+        csUTF7IMAP(1021),
         csWindows30Latin1(2000),
         csWindows31Latin1(2001),
         csWindows31Latin2(2002),
@@ -359,3 +365,4 @@ IANACharset ::= TEXTUAL-CONVENTION
         reserved(3000)
     }
 END
+

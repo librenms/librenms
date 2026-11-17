@@ -698,7 +698,7 @@
                     }
 
                     if (edge_id && (edge_id in self.edgePortMap)) {
-                        window.location.href = (self.baseUrl || '') + 'device/device=' + self.edgePortMap[edge_id].device_id + '/tab=port/port=' + self.edgePortMap[edge_id].port_id + '/';
+                        window.location.href = (self.baseUrl || '') + 'device/' + self.edgePortMap[edge_id].device_id + '/port/' + self.edgePortMap[edge_id].port_id;
                     }
                 });
 
@@ -732,7 +732,7 @@
                             menuItems.push({
                                 icon: 'fa-solid fa-chart-area',
                                 label: "{{ __('View Graphs') }}",
-                                action: function () { window.location.href = (self.baseUrl || '') + 'device/' + node.device_id + '/tab=graphs/'; }
+                                action: function () { window.location.href = (self.baseUrl || '') + 'device/' + node.device_id + '/graphs'; }
                             });
                             if (node.label) {
                                 menuItems.push({
@@ -762,7 +762,7 @@
                             menuItems.push({
                                 icon: 'fa-solid fa-network-wired',
                                 label: "{{ __('View Port') }}",
-                                action: function () { window.location.href = (self.baseUrl || '') + 'device/device=' + portData.device_id + '/tab=port/port=' + portData.port_id + '/'; }
+                                action: function () { window.location.href = (self.baseUrl || '') + 'device/' + portData.device_id + '/port/' + portData.port_id; }
                             });
                         }
                     }

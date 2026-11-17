@@ -46,7 +46,6 @@ class LegacyModule implements Module, SupportsSubmodules
 
     private array $module_deps = [
         'arp-table' => ['ports'],
-        'fdb-table' => ['ports', 'vlans'],
         'transceivers' => ['ports'],
         'vlans' => ['ports'],
     ];

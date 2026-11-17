@@ -1,11 +1,11 @@
 -- ==========================================================================
--- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: The purpose of this MIB file is to provide the object definition
 --              of the SNMP (Simple Network Management Protocol) extended
 --              information.
 -- Reference:
--- Version: V1.7
+-- Version: V1.9
 -- History:
 -- V1.0 2009-04-07  Initial version, created by Lisong
 -- V1.1 2010-03-12  Added hh3cSnmpExtReadCommunitySingle and
@@ -21,31 +21,43 @@
 --      2016-08-08  Modify hh3cSnmpExtCommunityAclNum, hh3cSnmpExtCommunityIPv6AclNum
 --                  of the range by zhangbaohong
 -- V1.7 2019-04-16  Added hh3cSnmpExtAclNum, hh3cSnmpExtIPv6AclNum by zhangzichao.
+-- V1.8 2022-04-19  Added hh3cSnmpExtTrapObjects, hh3cSnmpExtRemoteIpAddressType, hh3cSnmpExtRemoteIpAddress by Zhangjiatong.
+-- V1.9 2022-10-28  Added hh3cSnmpExtTargetAddress, hh3cSnmpExtFallingThreshold, hh3cSnmpExtRisingThreshold,
+--                  hh3cSnmpExtTargetHostDel, hh3cSnmpExtLockThreshold, hh3cSnmpExtLockThresholdResume by Jiangyongjin.
 -- ==========================================================================
 HH3C-SNMP-EXT-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
         TruthValue, RowStatus
     FROM SNMPv2-TC
-        OBJECT-TYPE, MODULE-IDENTITY, Integer32, OBJECT-IDENTITY
+        OBJECT-TYPE, MODULE-IDENTITY, Integer32, OBJECT-IDENTITY, NOTIFICATION-TYPE
     FROM SNMPv2-SMI
         SnmpAdminString, SnmpSecurityModel
     FROM SNMP-FRAMEWORK-MIB
         hh3cCommon
-    FROM HH3C-OID-MIB;
+    FROM HH3C-OID-MIB
+        InetAddressType, InetAddress
+    FROM INET-ADDRESS-MIB;
 
 hh3cSnmpExt MODULE-IDENTITY
-    LAST-UPDATED "201904160000Z"
+    LAST-UPDATED "202210280000Z"
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
         "Platform Team New H3C Technologies Co., Ltd.
-         Hai-Dian District Beijing P.R. China
-         Http://www.h3c.com
-         Zip: 100085"
+        Hai-Dian District Beijing P.R. China
+        Http://www.h3c.com
+        Zip: 100085"
     DESCRIPTION
         "This MIB file is to provide the object definition of the SNMP extended
-         information."
+        information."
+    REVISION "202210280000Z"
+    DESCRIPTION
+        "Added hh3cSnmpExtTargetAddress, hh3cSnmpExtFallingThreshold, hh3cSnmpExtRisingThreshold,
+         hh3cSnmpExtTargetHostDel, hh3cSnmpExtLockThreshold, hh3cSnmpExtLockThresholdResume."
+    REVISION "202204190000Z"
+    DESCRIPTION
+        "Added hh3cSnmpExtTrapObjects, hh3cSnmpExtRemoteIpAddressType, hh3cSnmpExtRemoteIpAddress."
     REVISION "201904160000Z"
     DESCRIPTION
         "Added hh3cSnmpExtAclNum, hh3cSnmpExtAclName, hh3cSnmpExtIPv6AclNum, hh3cSnmpExtIPv6AclName."
@@ -88,6 +100,8 @@ hh3cSnmpExtTables        OBJECT IDENTIFIER ::= { hh3cSnmpExt 2 }
 hh3cSnmpExtNotifications OBJECT IDENTIFIER ::= { hh3cSnmpExt 3 }
 
 hh3cSnmpExtPrivProtocols OBJECT IDENTIFIER ::= { hh3cSnmpExt 4 }
+
+hh3cSnmpExtTrapObjects   OBJECT IDENTIFIER ::= { hh3cSnmpExt 5 }
 
 --
 -- Scalar Objects
@@ -171,6 +185,31 @@ hh3cSnmpExtPrivProtocols OBJECT IDENTIFIER ::= { hh3cSnmpExt 4 }
         STATUS          current
         DESCRIPTION     "The name of global IPv6 ACL.  It mutually exclusive with hh3cSnmpExtIPv6AclNum."
         ::= { hh3cSnmpExtScalarObjects 11 }
+    hh3cSnmpExtTargetAddress OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE(1..255))
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+             "Trap target host address.
+              The content of this object will be converted to an IP address
+              while it is a host name.
+              Example: traphost.1.1.1.1.public
+                       informhost.1.1.1.1.public
+                       traphost.2001::1.public
+                       informhost.2001::1.public"
+        ::= { hh3cSnmpExtScalarObjects 12 }
+    hh3cSnmpExtFallingThreshold  OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "Lower threshold of SNMPv3 user blacklist."
+        ::= { hh3cSnmpExtScalarObjects 13 }
+    hh3cSnmpExtRisingThreshold  OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "Upper limit of SNMPv3 user blacklist threshold."
+        ::= { hh3cSnmpExtScalarObjects 14 }
 --
 -- Table Objects
 --
@@ -359,6 +398,42 @@ hh3cSnmpExtPrivProtocols OBJECT IDENTIFIER ::= { hh3cSnmpExt 4 }
 -- Notification Objects
 --
 
+hh3cSnmpExtNotificationsPrex OBJECT IDENTIFIER ::= { hh3cSnmpExtNotifications 0 }
+
+    hh3cSnmpExtTargetHostDel NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSnmpExtTargetAddress
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the target host is deleted."
+    ::= { hh3cSnmpExtNotificationsPrex 1 }
+
+    hh3cSnmpExtLockThreshold NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSnmpExtRisingThreshold
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of users
+         joining the SNMPv3 user blacklist exceeds the upper threshold
+         (40% of the maximum number of users blacklist is supported)."
+    ::= { hh3cSnmpExtNotificationsPrex 2 }
+
+    hh3cSnmpExtLockThresholdResume  NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSnmpExtFallingThreshold
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of users joining
+         the SNMPv3 user blacklist recovers below the low threshold
+         (10% of the maximum number of users blacklist is supported)."
+    ::= { hh3cSnmpExtNotificationsPrex 3 }
+
 --
 -- PrivProtocols
 --
@@ -381,5 +456,23 @@ hh3cSnmpExtPrivProtocols OBJECT IDENTIFIER ::= { hh3cSnmpExt 4 }
                   - Use 256 bit key size AES.
                  "
     ::= { hh3cSnmpExtPrivProtocols 2 }
+--
+-- Trap Objects
+--
+    hh3cSnmpExtRemoteIpAddressType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "Remote device IP address type is IPv4/IPv6."
+    ::= { hh3cSnmpExtTrapObjects 1 }
+
+    hh3cSnmpExtRemoteIpAddress OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "Remote device IPv4/IPv6 address."
+    ::= { hh3cSnmpExtTrapObjects 2 }
 
 END

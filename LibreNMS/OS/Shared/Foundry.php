@@ -30,6 +30,7 @@ use App\Models\Processor;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Foundry extends OS implements ProcessorDiscovery
 {
@@ -41,7 +42,7 @@ class Foundry extends OS implements ProcessorDiscovery
      */
     public function discoverProcessors(): Collection
     {
-        $module_descriptions = $this->getCacheByIndex('snAgentConfigModuleDescription', 'FOUNDRY-SN-AGENT-MIB');
+        $module_descriptions = SnmpQuery::walk('FOUNDRY-SN-AGENT-MIB::snAgentConfigModuleDescription')->pluck();
 
         return \SnmpQuery::walk('FOUNDRY-SN-AGENT-MIB::snAgentCpuUtilTable')->mapTable(function ($entry, $slot, $cpu, $interval) use ($module_descriptions) {
             // only discover 5min

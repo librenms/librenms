@@ -68,17 +68,10 @@ class EditTabs extends Component
             ];
         }
 
-        if (count(LibrenmsConfig::get("os.{$device->os}.icons", []))) {
-            $this->tabs['icon'] = [
-                'text' => __('Icon'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=icon/'),
-            ];
-        }
-
         if ($this->device->polling()->isEnabled(PollingMethodType::Snmp)) {
             $this->tabs['apps'] = [
                 'text' => __('Applications'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=apps/'),
+                'link' => route('device.edit.apps', $this->device->device_id),
             ];
         }
 
@@ -141,12 +134,12 @@ class EditTabs extends Component
 
         $this->tabs['component'] = [
             'text' => __('Components'),
-            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=component/'),
+            'link' => route('device.edit.components', $this->device->device_id),
         ];
 
         $this->tabs['customoid'] = [
             'text' => __('Custom OID'),
-            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=customoid/'),
+            'link' => route('device.edit.customoids', $this->device->device_id),
         ];
     }
 

@@ -1,0 +1,128 @@
+ZSCALER-NSS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Counter64,
+	Integer32, TimeTicks, mib-2,enterprises,
+	NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString,
+	PhysAddress, TruthValue, RowStatus,
+	TimeStamp, AutonomousType, TestAndIncr   FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                       FROM SNMPv2-CONF
+	snmpTraps                                FROM SNMPv2-MIB
+	IANAifType                               FROM IANAifType-MIB;
+
+nss MODULE-IDENTITY
+	LAST-UPDATED "201705020814Z"
+	ORGANIZATION "Zscaler"
+	CONTACT-INFO
+		"Zscaler Inc.
+		US"
+	DESCRIPTION
+		"This module describes information specific to the NSS instance."
+	
+	REVISION      "201705020814Z"
+	DESCRIPTION
+		"Initial revision."
+	::= { enterprises 46262 }
+
+zscaler OBJECT IDENTIFIER ::= { enterprises 46262 }
+
+nssinfo OBJECT IDENTIFIER ::= { zscaler 7 }
+
+nssNumber  OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of nss present on this system."
+	::= { nssinfo 1 }
+
+nssTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF NssEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A list of nss entries. The number of entries is
+		given by the value of nssNumber."
+	::= { nssinfo 2 }
+
+nssEntry OBJECT-TYPE
+	SYNTAX      NssEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		particular nss."
+	INDEX   { nssIndex }
+	::= { nssTable 1 }
+
+NssEntry ::=
+	SEQUENCE {
+		nssIndex Integer32,
+		nssName OCTET STRING,
+		nssRole OCTET STRING,
+		nssInstance OCTET STRING,
+		smsm_cur_smca_conn_est Counter64,
+		smsm_cur_weblog_time Counter64,
+		smsm_nss_tot_transactions_processed Counter64,
+	}
+
+nssIndex OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The index of nss in the list of such objects"
+	::= { nssEntry 1 }
+
+nssName OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The name of the nss"
+	::= { nssEntry 2 }
+
+nssRole OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The Zscaler role to which this nss belongs"
+	::= { nssEntry 3 }
+
+nssInstance OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The Zscaler instance path where this nss is present"
+	::= { nssEntry 4 }
+
+smsm_cur_smca_conn_est OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Nss connection to zscaler central authority established or not"
+	::= { nssEntry 5 }
+
+smsm_cur_weblog_time OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Latest time till which Nss has processed data from Nanolog server"
+	::= { nssEntry 6 }
+
+smsm_nss_tot_transactions_processed OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Total number of transaction processed by Nss"
+	::= { nssEntry 7 }
+
+
+END

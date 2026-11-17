@@ -26,11 +26,13 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Http\Controllers\Controller;
 use App\Models\Device;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use LibreNMS\Interfaces\UI\DeviceTab;
 
-class QosController implements DeviceTab
+class QosController extends Controller implements DeviceTab
 {
     public function visible(Device $device): bool
     {
@@ -52,23 +54,25 @@ class QosController implements DeviceTab
         return __('QoS');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function data(Device $device, Request $request): array
     {
-        $show = null;
-        $vars = $request->vars;
-        if ($vars) {
-            $showvars = array_filter(explode('/', $vars), fn ($v) => str_starts_with((string) $v, 'show='));
-            if ($showvars) {
-                $showvar = explode('=', $showvars[0]);
-                $show = array_pop($showvar);
-                if ($show) {
-                    $show = intval($show);
-                }
-            }
-        }
+        return [];
+    }
 
-        return [
-            'show' => $show,
-        ];
+    public function index(Device $device, Request $request): View
+    {
+        $this->authorize('view', $device);
+
+        $request->validate([
+            'show' => 'nullable|integer',
+        ]);
+
+        return view('device.tabs.qos', [
+            'device' => $device,
+            'show' => $request->filled('show') ? $request->integer('show') : null,
+        ]);
     }
 }

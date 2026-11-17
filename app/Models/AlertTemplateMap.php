@@ -32,6 +32,7 @@ class AlertTemplateMap extends BaseModel
 {
     protected $table = 'alert_template_map';
     public $timestamps = false;
+    protected $fillable = ['alert_rule_id', 'alert_templates_id'];
 
     // ---- Define Relationships ----
     /**

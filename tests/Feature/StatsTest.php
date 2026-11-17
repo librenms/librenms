@@ -3,11 +3,14 @@
 namespace LibreNMS\Tests\Feature;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Callback;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Tests\DBTestCase;
@@ -16,6 +19,33 @@ use LibreNMS\Util\Stats;
 final class StatsTest extends DBTestCase
 {
     use DatabaseTransactions;
+
+    public function testSubmitsUsageStatisticsWhenReportingIsEnabled(): void
+    {
+        Callback::where('name', 'enabled')->delete();
+        LibrenmsConfig::set('reporting.usage', true);
+        $endpoint = LibrenmsConfig::get('callback_post');
+        Http::preventStrayRequests();
+        Http::fake([$endpoint => Http::response()]);
+
+        Stats::submit();
+
+        Http::assertSent(fn (Request $request): bool => $request->method() === 'POST'
+            && $request->url() === $endpoint
+            && isset(json_decode($request['data'], true)['uuid']));
+    }
+
+    public function testDoesNotSubmitUsageStatisticsWhenReportingIsDisabled(): void
+    {
+        Callback::set('enabled', 1);
+        LibrenmsConfig::set('reporting.usage', false);
+        Http::preventStrayRequests();
+        Http::fake([LibrenmsConfig::get('callback_post') => Http::response()]);
+
+        Stats::submit();
+
+        Http::assertNothingSent();
+    }
 
     public function testPortAssociationModeUsesTheDefaultWithoutAnOverride(): void
     {

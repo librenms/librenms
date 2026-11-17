@@ -3,7 +3,7 @@
 --
 -- Description: vnf-device mib
 -- Reference:
--- Version: V1.1
+-- Version: V1.2
 -- History:
 --  V1.0 Created by zhoufan
 --      2020-11-18 updated by xuyuanqiang
@@ -14,6 +14,8 @@
 --  V1.1 Updated by dongzhijian
 --      Update hh3cVmInconsist
 --          hh3cVmInconsistResume
+--  V1.2 Updated by zhangfeng
+--      Add mpuvm and lpuvm to hh3cVmType
 --  Initial version 2020-11-18
 -- =================================================================
 HH3C-VNF-DEVICE-MIB DEFINITIONS ::= BEGIN
@@ -29,7 +31,7 @@ IMPORTS
         FROM INET-ADDRESS-MIB;
 
 hh3cVnfDevice MODULE-IDENTITY
-    LAST-UPDATED "202102040000Z"
+    LAST-UPDATED "202107190000Z"
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -39,6 +41,9 @@ hh3cVnfDevice MODULE-IDENTITY
         Zip:100085"
     DESCRIPTION
         "The MIB module is used for VM(virtual machine) management."
+    REVISION "202107190000Z"
+    DESCRIPTION
+        "Add mpuvm and lpuvm to hh3cVmType"
     REVISION "202102040000Z"
     DESCRIPTION
         "Update hh3cVmInconsist hh3cVmInconsistResume"
@@ -103,7 +108,9 @@ hh3cVmType   OBJECT-TYPE
         other   (1),
         ctrlvm  (2),
         brasvm  (3),
-        fwdvm   (4)
+        fwdvm   (4),
+        mpuvm   (5),
+        lpuvm   (6)
     }
     MAX-ACCESS   read-only
     STATUS       current

@@ -220,7 +220,7 @@ class Kafka extends BaseDatastore
             $stat = Measurement::start('write');
 
             // remove tags with empty values
-            $tags = array_filter($tags, fn ($value) => $value !== '' && $value !== null);
+            $tags = array_filter($this->seriesTags($tags, $meta), fn ($value) => $value !== '' && $value !== null);
 
             if (empty($fields)) {
                 Log::warning('KAFKA: All fields empty, skipping update', [
@@ -232,7 +232,6 @@ class Kafka extends BaseDatastore
 
             // add current sent time in unix timestamp format
             $tags['current_polled_time'] = Carbon::now()->timestamp;
-            $tags['hostname'] ??= $device_data->hostname;
 
             $resultArr = [
                 'measurement' => $measurement,

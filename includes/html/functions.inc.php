@@ -183,7 +183,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
 
 function generate_port_url($port, $vars = [])
 {
-    return Url::generate(['page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id']], $vars);
+    return Url::portUrl((object) ['device_id' => $port['device_id'], 'port_id' => $port['port_id']], $vars);
 }//end generate_port_url()
 
 /**
@@ -194,7 +194,7 @@ function generate_port_url($port, $vars = [])
  */
 function graph_error($text, $short = null, $color = [128, 0, 0])
 {
-    header('Content-Type: ' . ImageFormat::forGraph()->contentType());
+    header('Content-Type: ' . ImageFormat::forGraph()->mediaType());
     echo LibreNMS\Util\Graph::error($text, $short, 300, null, $color);
 }
 
@@ -320,95 +320,6 @@ function get_rules_from_json()
     return json_decode(file_get_contents(resource_path('definitions/alert_rules.json')), true);
 }
 
-function search_oxidized_config($search_in_conf_textbox)
-{
-    if (Gate::denies('oxidized.search')) {
-        return false;
-    }
-
-    $oxidized_search_url = LibrenmsConfig::get('oxidized.url') . '/nodes/conf_search?format=json';
-    $postdata = http_build_query(
-        [
-            'search_in_conf_textbox' => $search_in_conf_textbox,
-        ]
-    );
-    $opts = ['http' => [
-        'method' => 'POST',
-        'header' => 'Content-type: application/x-www-form-urlencoded',
-        'content' => $postdata,
-    ],
-    ];
-    $context = stream_context_create($opts);
-
-    $nodes = json_decode(file_get_contents($oxidized_search_url, false, $context), true);
-    // Look up Oxidized node names to LibreNMS devices for a link
-    foreach ($nodes as &$n) {
-        $dev = DeviceCache::getByHostname($n['node']);
-        $n['dev_id'] = $dev ? $dev->device_id : false;
-        $n['full_name'] = $dev ? $dev->display : $n['full_name'];
-    }
-
-    return $nodes;
-}
-
-/**
- * @param  int  $eventlog_severity
- * @return string $eventlog_severity_icon
- */
-function eventlog_severity($eventlog_severity)
-{
-    return match ($eventlog_severity) {
-        1 => 'label-success',
-        2 => 'label-info',
-        3 => 'label-primary',
-        4 => 'label-warning',
-        5 => 'label-danger',
-        default => 'label-default',
-    };
-} // end eventlog_severity
-
-function get_oxidized_nodes_list()
-{
-    $context = stream_context_create([
-        'http' => [
-            'header' => 'Accept: application/json',
-        ],
-    ]);
-
-    $data = json_decode(file_get_contents(LibrenmsConfig::get('oxidized.url') . '/nodes?format=json', false, $context), true);
-
-    foreach ($data as $object) {
-        $device = DeviceCache::getByHostname($object['name']);
-        if (! device_permitted($device->device_id)) {
-            //user cannot see this device, so let's skip it.
-            continue;
-        }
-        try {
-            // Convert UTC time string to local timezone set
-            $utc_time = $object['time'];
-            $utc_date = new DateTime($utc_time, new DateTimeZone('UTC'));
-            $local_timezone = new DateTimeZone(date_default_timezone_get());
-            $local_date = $utc_date->setTimezone($local_timezone);
-
-            // Generate local time string
-            $formatted_local_time = $local_date->format('Y-m-d H:i:s T');
-        } catch (Exception) {
-            // Just display the current value of $object['time'];
-            $formatted_local_time = $object['time'];
-        }
-        echo '<tr>
-        <td>' . e($device->device_id) . '</td>
-        <td>' . e($object['name']) . '</td>
-        <td>' . e($device->sysName) . '</td>
-        <td>' . e($object['status']) . '</td>
-        <td>' . e($formatted_local_time) . '</td>
-        <td>' . e($object['model']) . '</td>
-        <td>' . e($object['group']) . '</td>
-        <td></td>
-        </tr>';
-    }
-}
-
 /**
  * Return stacked graphs information
  *
@@ -421,112 +332,5 @@ function generate_stacked_graphs($force_stack = false, $transparency = '88')
         return ['transparency' => $transparency, 'stacked' => '1'];
     } else {
         return ['transparency' => '', 'stacked' => '-1'];
-    }
-}
-
-/**
- * @params int unix time
- * @params int seconds
- *
- * @return int
- *
- * Rounds down to the nearest interval.
- *
- * The first argument is required and it is the unix time being
- * rounded down.
- *
- * The second value is the time interval. If not specified, it
- * defaults to 300, or 5 minutes.
- */
-function lowest_time($time, $seconds = 300)
-{
-    return $time - ($time % $seconds);
-}
-
-/**
- * @params int
- *
- * @return string|void
- *
- * This returns the subpath for working with nfdump.
- *
- * 1 value is taken and that is a unix time stamp. It will be then be rounded
- * off to the lowest five minutes earlier.
- *
- * The return string will be a path partial you can use with nfdump to tell it what
- * file or range of files to use.
- *
- * Below ie a explanation of the layouts as taken from the NfSen config file.
- *  0             no hierachy levels - flat layout - compatible with pre NfSen version
- *  1 %Y/%m/%d    year/month/day
- *  2 %Y/%m/%d/%H year/month/day/hour
- *  3 %Y/%W/%u    year/week_of_year/day_of_week
- *  4 %Y/%W/%u/%H year/week_of_year/day_of_week/hour
- *  5 %Y/%j       year/day-of-year
- *  6 %Y/%j/%H    year/day-of-year/hour
- *  7 %Y-%m-%d    year-month-day
- *  8 %Y-%m-%d/%H year-month-day/hour
- */
-function time_to_nfsen_subpath($time)
-{
-    $time = lowest_time($time);
-    $layout = LibrenmsConfig::get('nfsen_subdirlayout');
-
-    if ($layout == 0) {
-        return 'nfcapd.' . date('YmdHi', $time);
-    } elseif ($layout == 1) {
-        return date('Y\/m\/d\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ($layout == 2) {
-        return date('Y\/m\/d\/H\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ($layout == 3) {
-        return date('Y\/W\/w\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ($layout == 4) {
-        return date('Y\/W\/w\/H\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ($layout == 5) {
-        return date('Y\/z\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ($layout == 6) {
-        return date('Y\/z\/H\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ($layout == 7) {
-        return date('Y\-m\-d\/\n\f\c\a\p\d\.YmdHi', $time);
-    } elseif ($layout == 8) {
-        return date('Y\-m\-d\/H\/\n\f\c\a\p\d\.YmdHi', $time);
-    }
-}
-
-/**
- * @params string hostname
- *
- * @return string
- *
- * Takes a hostname and transforms it to the name
- * used by nfsen.
- */
-function nfsen_hostname($hostname)
-{
-    $nfsen_hostname = str_replace('.', LibrenmsConfig::get('nfsen_split_char'), $hostname);
-
-    if (! is_null(LibrenmsConfig::get('nfsen_suffix'))) {
-        $nfsen_hostname = str_replace(LibrenmsConfig::get('nfsen_suffix'), '', $nfsen_hostname);
-    }
-
-    return $nfsen_hostname;
-}
-
-/**
- * @params string hostname
- *
- * @return string|void
- *
- * Takes a hostname and returns the path to the nfsen
- * live dir.
- */
-function nfsen_live_dir($hostname)
-{
-    $hostname = nfsen_hostname($hostname);
-
-    foreach (LibrenmsConfig::get('nfsen_base') as $base_dir) {
-        if (file_exists($base_dir) && is_dir($base_dir)) {
-            return $base_dir . '/profiles-data/live/' . $hostname;
-        }
     }
 }

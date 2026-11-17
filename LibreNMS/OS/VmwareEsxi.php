@@ -26,6 +26,7 @@
 
 namespace LibreNMS\OS;
 
+use App\Data\TimeSeries\MetricCollector;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
@@ -35,13 +36,24 @@ class VmwareEsxi extends \LibreNMS\OS implements VminfoDiscovery, VminfoPolling
 {
     use VminfoVmware;
 
-    public function pollVminfo(Collection $vms): Collection
+    /**
+     * @return string[]
+     */
+    public static function vmTypes(): array
+    {
+        return ['vmware'];
+    }
+
+    public function pollVminfo(Collection $vms, MetricCollector $metrics): Collection
     {
         // no VMs, assume there aren't any
         if ($vms->isEmpty()) {
             return $vms;
         }
 
-        return $this->discoverVmInfo(); // just do the same thing as discovery.
+        // just do the same thing as discovery, but a failed walk must not remove the VMs
+        $polled = $this->discoverVmInfo();
+
+        return $polled->isEmpty() ? $vms : $polled;
     }
 }

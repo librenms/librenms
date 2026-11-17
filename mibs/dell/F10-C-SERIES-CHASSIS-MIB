@@ -1,9 +1,6 @@
     F10-C-SERIES-CHASSIS-MIB DEFINITIONS ::= BEGIN
-    --  Force10 Networks, Inc.
-    --  1440 McCarthy Blvd
-    --  Milpitas, CA 95035-7438
 
-    --  This module provides authoritative definitions for Force10
+    --  This module provides authoritative definitions for Dell Force10
     --  enterprise Chassis MIB.
     --
     --  This module will be extended, as needed.
@@ -27,19 +24,19 @@
         
     
     f10CSerChassisMib MODULE-IDENTITY
-    LAST-UPDATED "200809021200Z"  -- Sep 2, 2008 12:00:00 GMT
+    LAST-UPDATED "201305171200Z"  -- May 17, 2013 15:30:00 GMT
     ORGANIZATION
-      "Force10 Networks, Inc."
+      "Dell Inc"
     CONTACT-INFO
-      "Force10 Networks, Inc
-       350 Holger Way
-       San Jose, CA 95134
-       (408) 571-3500
-       support@force10networks.com
-       http://www.force10networks.com"
+       "http://support.dell.com/force10"
 
     DESCRIPTION
-       "Force10 C-Series Enterprise Chassis MIB. "
+       "Dell Force10 C-Series Enterprise Chassis MIB. "
+
+    REVISION     "201207181200Z"
+    DESCRIPTION
+       "Adding new objects - Dell PPID, Revision, Service Tag,
+        Express Service Code."
 
     REVISION     "200809021200Z"
     DESCRIPTION
@@ -58,9 +55,15 @@
          - use gauge32 to define utilization objects.
          - add module conformance."
 
+    REVISION     "201305171200Z"
+    DESCRIPTION
+        "Adding PSU absent under chSysPowerSupplyType
+        Adding support to get the PSU version (1200W or 1600W)
+        Adding support to get the PSU mode (high or low)"
+
     REVISION     "0605010000Z"
     DESCRIPTION
-          "First draft revision of Force10 c-series chassis mib."
+          "First draft revision of Dell Force10 c-series chassis mib."
 
            ::= { f10Mgmt 8 }   
 
@@ -207,6 +210,39 @@
             modules (sfm) slots in the chassis."
         ::= { chObjects 15 }
 
+       chPiecePartID  OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..24))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The chassis piece part id."
+        ::= { chObjects 16 }
+
+       chPPIDRevision OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..3))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The chassis PPID revision."
+        ::= { chObjects 17 }
+
+       chServiceTag   OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..7))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The chassis service tag."
+        ::= { chObjects 18 }
+
+       chExpressServiceCode OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..14))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The chassis express service code."
+        ::= { chObjects 19 }
+
+
     -- ### Chassis System  ###
 
     -- ## Card Table
@@ -246,7 +282,7 @@
 
              ( physical slot numbers )
              1  2  3  4  5 6  7  8  9  10 
-             ( Force10 card number )
+             ( Dell Force10 card number )
              0  1  2  3  0 1  4  5  6  7
              |        |       |        |
              ----------       ----------
@@ -261,7 +297,7 @@
 
              ( physical slot numbers )
              1  2  3 4  5  6 
-             ( Force10 card number )
+             ( Dell Force10 card number )
              0  1  0 1  2  3
              |  |       |  |
              ----       ----
@@ -291,7 +327,11 @@
            chSysCardProductRev      DisplayString,
            chSysCardVendorId        DisplayString,
            chSysCardDateCode        F10MfgDate,
-           chSysCardCountryCode     OCTET STRING
+           chSysCardCountryCode     OCTET STRING,
+           chSysCardPiecePartID         DisplayString,
+           chSysCardPPIDRevision        DisplayString,
+           chSysCardServiceTag          DisplayString,
+           chSysCardExpressServiceCode  DisplayString
         }
 
        chSysCardSlotIndex    OBJECT-TYPE
@@ -454,6 +494,39 @@
             "The card manufacturer's country
             code"
         ::= { chSysCardEntry 16 }
+
+       chSysCardPiecePartID OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..24))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The card's piece part id."
+        ::= { chSysCardEntry 17 }
+
+       chSysCardPPIDRevision OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..3))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The card's PPID revision."
+        ::= { chSysCardEntry 18 }
+
+       chSysCardServiceTag OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..7))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The card's service tag."
+        ::= { chSysCardEntry 19 }
+
+       chSysCardExpressServiceCode OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..14))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The card's express service code."
+        ::= { chSysCardEntry 20 }
+
 
     -- ## Port Table 
 
@@ -876,7 +949,9 @@
         SEQUENCE {
            chSysPowerSupplyIndex        Integer32,
            chSysPowerSupplyOperStatus   INTEGER,        
-           chSysPowerSupplyType         INTEGER        
+           chSysPowerSupplyType         INTEGER,        
+           chSysPowerSupplyVersion      INTEGER,
+           chSysPowerSupplyMode         INTEGER
         }
 
        chSysPowerSupplyIndex    OBJECT-TYPE
@@ -901,7 +976,8 @@
        chSysPowerSupplyType    OBJECT-TYPE
         SYNTAX      INTEGER {
                         ac(1),
-                        dc(2)
+                        dc(2),
+                        absent(3)
                     }
         MAX-ACCESS  read-only
         STATUS      current
@@ -909,6 +985,29 @@
             "The type of the power supply."
         ::= { chSysPowerSupplyEntry 3 }
 
+       chSysPowerSupplyVersion    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown(1),
+                        version1(2),
+                        version2(3),
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of the power supply."
+        ::= { chSysPowerSupplyEntry 4 }
+
+       chSysPowerSupplyMode    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown(1),
+                        low(2),
+                        high(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of the power supply."
+        ::= { chSysPowerSupplyEntry 5 }
     -- ## Fan Tray Table 
 
        chSysFanTrayTable    OBJECT-TYPE
@@ -1275,7 +1374,7 @@
     f10CSerChassisMibCompliance MODULE-COMPLIANCE
         STATUS                  current
         DESCRIPTION
-            "The compliance statement for Force10
+            "The compliance statement for Dell Force10
             product which implement the C-Series
             Chassis MIB."
         MODULE    -- this module
@@ -1301,6 +1400,10 @@
         chVendorId,
         chDateCode,
         chCountryCode,
+        chPiecePartID,
+        chPPIDRevision,
+        chServiceTag,
+        chExpressServiceCode,
         chNumSlots,
         chNumLinecards,
         chNumFanTrays,
@@ -1330,6 +1433,10 @@
         chSysCardVendorId,
         chSysCardDateCode,
         chSysCardCountryCode,
+        chSysCardPiecePartID,
+        chSysCardPPIDRevision,
+        chSysCardServiceTag,
+        chSysCardExpressServiceCode,
         chSysPortType,
         chSysPortAdminStatus,
         chSysPortOperStatus,
@@ -1351,6 +1458,8 @@
         chSysSwCurrentBootImage,
         chSysPowerSupplyOperStatus,
         chSysPowerSupplyType,
+        chSysPowerSupplyVersion,
+        chSysPowerSupplyMode,
         chSysFanTrayOperStatus,
         chSysSfmAdminStatus,
         chSysSfmOperStatus,

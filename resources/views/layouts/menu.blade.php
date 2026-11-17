@@ -68,7 +68,7 @@
                                                                aria-hidden="true"></i> {{ __('Tools') }}</a>
                             <ul class="dropdown-menu">
                                 @can('tools.ripe')
-                                <li><a href="{{ url('ripenccapi') }}"><i class="fa fa-star fa-fw fa-lg"
+                                <li><a href="{{ route('tool.ripe') }}"><i class="fa fa-star fa-fw fa-lg"
                                                                          aria-hidden="true"></i> {{ __('RIPE NCC API') }}
                                     </a></li>
                                 @endcan
@@ -85,7 +85,7 @@
                                     @endcan
                                 @endconfig
                                 @config('oxidized.enabled')
-                                <li><a href="{{ url('oxidized') }}"><i class="fa fa-stack-overflow fa-fw fa-lg"
+                                <li><a href="{{ route('oxidized') }}"><i class="fa fa-stack-overflow fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Oxidized') }}</a>
                                 </li>
                                 @endconfig
@@ -349,7 +349,7 @@
                             @if($port_groups_exist)
                                 <li role="presentation" class="divider"></li>
                                 @config('int_customers')
-                                <li><a href="{{ url('customers') }}"><i class="fa fa-users fa-fw fa-lg"
+                                <li><a href="{{ route('customers') }}"><i class="fa fa-users fa-fw fa-lg"
                                                                         aria-hidden="true"></i> {{ __('Customers') }}</a>
                                 </li>
                                 @endconfig
@@ -579,7 +579,7 @@
                         @can('peering-db.view')
                             @if($show_peeringdb)
                                 <li role="presentation" class="divider"></li>
-                                <li><a href="{{ url('peering') }}"><i class="fa fa-hand-o-right fa-fw fa-lg"
+                                <li><a href="{{ route('peering.index') }}"><i class="fa fa-hand-o-right fa-fw fa-lg"
                                                                       aria-hidden="true"></i> {{ __('PeeringDB') }}</a>
                                 </li>
                             @endif
@@ -620,12 +620,12 @@
                             </a></li>
                         @endcan
                         @can('viewAny', \App\Models\AlertTemplate::class)
-                        <li><a href="{{ url('templates') }}"><i class="fa fa-file fa-fw fa-lg"
+                        <li><a href="{{ route('alert-templates.index') }}"><i class="fa fa-file fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Alert Templates') }}</a>
                         </li>
                         @endcan
                         @can('viewAny', \App\Models\AlertTransport::class)
-                        <li><a href="{{ url('alert-transports') }}"><i class="fa fa-bus fa-fw fa-lg"
+                        <li><a href="{{ route('alert-transports.index') }}"><i class="fa fa-bus fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Alert Transports') }}
                             </a></li>
                         @endcan
@@ -893,7 +893,7 @@
                 this.lastRunQuery = q;
                 this.open = true;
                 this.navigateOnLoad = false;
-                this.activeIndex = -1;
+                this.activeIndex = 0;
                 this.results = [];
                 let seq = this.seq;
                 let all = this.endpoints.map((url, i) => i);

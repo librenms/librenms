@@ -3,7 +3,8 @@
 namespace LibreNMS\Tests\Feature\Http;
 
 use App\Facades\LibrenmsConfig;
-use App\Http\Requests\GraphsPageRequest;
+use App\Facades\Rrd;
+use App\Http\Requests\GraphRequest;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\User;
@@ -83,6 +84,7 @@ class GraphsPageControllerTest extends TestCase
 
     public function testShowCommandUsesGraphVars(): void
     {
+        Rrd::partialMock()->shouldReceive('checkRrdExists')->andReturn(true);
         $device = Device::factory()->create(['hostname' => 'port-device.example.com']);
         $port = Port::factory()->for($device)->create([
             'ifName' => 'GigabitEthernet0/1',
@@ -129,7 +131,7 @@ class GraphsPageControllerTest extends TestCase
 
         try {
             $response = $this->actingAs($this->adminUser())
-                ->get("/graphs?id={$port->port_id}&type=port_bits&showcommand=yes");
+                ->get("/graphs?id={$port->port_id}&type=port_upkts&showcommand=yes");
 
             $response->assertOk();
             $response->assertSee('RRDTool Command');
@@ -190,8 +192,8 @@ class GraphsPageControllerTest extends TestCase
         $device = Device::factory()->create();
         $secondDevice = Device::factory()->create();
 
-        $request = GraphsPageRequest::create("/graphs?id={$device->device_id},{$secondDevice->device_id}&type=device_poller_perf");
-        $validator = validator($request->all(), new GraphsPageRequest()->rules());
+        $request = GraphRequest::create("/graphs?id={$device->device_id},{$secondDevice->device_id}&type=device_poller_perf");
+        $validator = validator($request->all(), new GraphRequest()->rules());
 
         $this->assertFalse($validator->errors()->has('id'));
     }
@@ -200,8 +202,8 @@ class GraphsPageControllerTest extends TestCase
     {
         $device = Device::factory()->create();
 
-        $request = GraphsPageRequest::create("/graphs?id={$device->device_id},abc&type=device_poller_perf");
-        $validator = validator($request->all(), new GraphsPageRequest()->rules());
+        $request = GraphRequest::create("/graphs?id={$device->device_id},abc&type=device_poller_perf");
+        $validator = validator($request->all(), new GraphRequest()->rules());
 
         $this->assertTrue($validator->errors()->has('id'));
     }

@@ -9,7 +9,7 @@ IMPORTS
             FROM SNMPv2-TC;                              -- [RFC2579]
 
 ianaPrinterMIB MODULE-IDENTITY
-    LAST-UPDATED  "201609140000Z" -- September 14, 2016
+    LAST-UPDATED  "202402060000Z" -- February 6, 2024
 
     ORGANIZATION  "IANA"
     CONTACT-INFO  "Internet Assigned Numbers Authority
@@ -19,6 +19,7 @@ ianaPrinterMIB MODULE-IDENTITY
 
                   Tel:    +1 310-301-5800
                   E-Mail: iana&iana.org"
+
     DESCRIPTION   "This MIB module defines a set of printing-related
                   TEXTUAL-CONVENTIONs for use in Printer MIB (RFC 3805),
                   Finisher MIB (RFC 3806), and other MIBs which need to
@@ -36,6 +37,15 @@ ianaPrinterMIB MODULE-IDENTITY
                   in RFC 3805.  For full legal notices see the RFC
                   itself or see:
                   http://www.ietf.org/copyrights/ianamib.html"
+
+    REVISION      "202402060000Z" -- February 6, 2024
+    DESCRIPTION   "Updated PrtAlertCodeTC to cover new IPP marker state
+                  reasons."
+
+    REVISION      "201907080000Z" -- July 8, 2019
+    DESCRIPTION   "Updated PrtAlertGroupTC and PrtAlertCodeTC to
+                  cover groups and codes defined in Sections 5.1,
+                  5.2, and 5.3 of PWG MFD Alerts [PWG5107.3-2019]."
 
     REVISION      "201609140000Z" -- September 14, 2016
     DESCRIPTION   "Replaced references to RFC 2911 with
@@ -78,7 +88,7 @@ ianaPrinterMIB MODULE-IDENTITY
 
     REVISION      "200509140000Z"  -- September 14, 2005
     DESCRIPTION   "Updates to include missing 'unknown' values
-                       for PrtCoverStatusTC, PrtChannelTypeTC,
+	               for PrtCoverStatusTC, PrtChannelTypeTC,
                   PrtAlertGroupTC and removal of comment for
                   for PrtAlertGroupTC."
 
@@ -123,6 +133,7 @@ PrtGeneralResetTC ::= TEXTUAL-CONVENTION
         defined state that is preferably under control of the system
         administrator by some means outside the scope of the Printer
         MIB specification."
+
     SYNTAX    INTEGER {
                   notResetting(3),
                   powerCycleReset(4), -- Cold Start
@@ -679,7 +690,6 @@ PrtInterpreterLangFamilyTC ::= TEXTUAL-CONVENTION
                              -- documents as a collection of data
                              -- objects (text, image, graphics, bar
                              -- codes), resources (fonts, overlays)
-
                              -- and page, form and finishing
                              -- instructions.
                              -- IBM Corporation.
@@ -1072,6 +1082,7 @@ PrtMarkerSuppliesTypeTC ::= TEXTUAL-CONVENTION
     SYNTAX    INTEGER {
                   other(1),
                   unknown(2),
+
                 -- Values for Printer MIB
                   toner(3),
                   wasteToner(4),
@@ -1171,6 +1182,7 @@ PrtConsoleDisableTC ::= TEXTUAL-CONVENTION
 
 PrtAlertTrainingLevelTC ::= TEXTUAL-CONVENTION
     -- This TC was extracted from prtAlertTrainingLevel in RFC 1759.
+
     STATUS    current
     DESCRIPTION
         "The level of training required to handle this alert, if
@@ -1219,6 +1231,7 @@ PrtAlertGroupTC ::= TEXTUAL-CONVENTION
     -- Values of 30 and greater are for use in MIBs that augment
     -- the Printer MIB, such as the Finisher MIB.
     -- This TC extracted from prtAlertGroup in RFC 1759.
+
     STATUS    current
     DESCRIPTION
         "The type of subunit within the printer model that this alert
@@ -1258,8 +1271,20 @@ PrtAlertGroupTC ::= TEXTUAL-CONVENTION
                   finDevice(30),               -- Not in RFC 1759
                   finSupply(31),               -- Not in RFC 1759
                   finSupplyMediaInput(32),     -- Not in RFC 1759
-                  finAttribute(33)             -- Not in RFC 1759
+                  finAttribute(33),             -- Not in RFC 1759
                 -- Values (30) to (39) reserved for Finisher MIB
+                -- Values for the ScanDevice
+                  scanDevice(50),          -- MFD Extension
+                  scanner(51),             -- MFD Extension
+                  scanMediaPath(52),       -- MFD Extension
+                -- Values (50) to (59) reserved for the ScanDevice
+                -- Values for the FaxDevice
+                  faxDevice(60),           -- MFD Extension
+                  faxModem(61),            -- MFD Extension
+                -- Values (60) to (69) reserved for the FaxDevice
+                -- Values for other common subunits
+                  outputChannel(70)        -- MFD Extension
+                -- Values (70) to (79) reserved for common subunits
                   }
 
 PrtAlertCodeTC ::= TEXTUAL-CONVENTION
@@ -1365,6 +1390,7 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   subunitRecoverableFailure(29),
                                                -- Not in RFC 1759
                   subunitUnrecoverableFailure(30),
+
                                                -- Not in RFC 1759
                   subunitRecoverableStorageError(31),
                                                -- Not in RFC 1759
@@ -1413,7 +1439,6 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                       -- description of the medium required to
                       -- satisfy the request.
                   inputManualInputRequest(810), -- Not in RFC 1759
-
                       -- An interpreter has detected that manual
                       -- input is required in this subunit.  The
                       -- prtAlertDescription may be used to convey
@@ -1425,12 +1450,24 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                                         -- Not in RFC 1759
                   inputCannotFeedSizeSelected(813),
                                         -- Not in RFC 1759
+                  inputMediaTrayFeedError(814),
+                  inputMediaTrayJam(815),
+                  inputMediaTrayFailure(816),
+                  inputMediaTrayPickRollerLifeWarn(817),
+                  inputMediaTrayPickRollerLifeOver(818),
+                  inputMediaTrayPickRollerFailure(819),
+                  inputMediaTrayPickRollerMissing(820),
+
                 -- Output Group
                   outputMediaTrayMissing(901),
                   outputMediaTrayAlmostFull(902),
                   outputMediaTrayFull(903),
                   outputMailboxSelectFailure(904),
                                         -- Not in RFC 1759
+                  outputMediaTrayFeedError(905),
+                  outputMediaTrayJam(906),
+                  outputMediaTrayFailure(907),
+
                 -- Marker group
                   markerFuserUnderTemperature(1001),
                   markerFuserOverTemperature(1002),
@@ -1440,6 +1477,56 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                                         -- Not in RFC 1759
                   markerAdjustingPrintQuality(1005),
                                         -- Not in RFC 1759
+                  markerAdded(1006),
+                                        -- HP20230601
+                  markerAtLimit(1007),
+                                        -- HP20230601
+                  markerCarrierFailure(1008),
+                                        -- HP20230601
+                  markerClosed(1009),
+                                        -- HP20230601
+                  markerLifeAlmostOver(1010),
+                                        -- HP20230601
+                  markerLifeOver(1011),
+                                        -- HP20230601
+                  markerMemoryExhausted(1012),
+                                        -- HP20230601
+                  markerMissing(1013),
+                                        -- HP20230601
+                  markerMotorFailure(1014),
+                                        -- HP20230601
+                  markerNearLimit(1015),
+                                        -- HP20230601
+                  markerOffline(1016),
+                                        -- HP20230601
+                  markerOpened(1017),
+                                        -- HP20230601
+                  markerOverTemperature(1018),
+                                        -- HP20230601
+                  markerPowerSaver(1019),
+                                        -- HP20230601
+                  markerRecoverableFailure(1020),
+                                        -- HP20230601
+                  markerRemoved(1021),
+                                        -- HP20230601
+                  markerResourceAdded(1022),
+                                        -- HP20230601
+                  markerResourceRemoved(1023),
+                                        -- HP20230601
+                  markerThermistorFailure(1024),
+                                        -- HP20230601
+                  markerTimingFailure(1025),
+                                        -- HP20230601
+                  markerTurnedOff(1026),
+                                        -- HP20230601
+                  markerTurnedOn(1027),
+                                        -- HP20230601
+                  markerUnderTemperature(1028),
+                                        -- HP20230601
+                  markerUnrecoverableFailure(1029),
+                                        -- HP20230601
+                  markerWarmingUp(1030),
+                                        -- HP20230601
                 -- Marker Supplies group
                   markerTonerEmpty(1101),
                   markerInkEmpty(1102),
@@ -1457,12 +1544,43 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   markerDeveloperEmpty(1114),
                   markerTonerCartridgeMissing(1115),
                                         -- Not in RFC 1759
+                  markerCleanerMissing(1116),
+                  markerDeveloperMissing(1117),
+                  markerFuserMissing(1118),
+                  markerInkMissing(1119),
+                  markerOpcMissing(1120),
+                  markerPrintRibbonMissing(1121),
+                  markerSupplyAlmostEmpty(1122),
+                  markerSupplyEmpty(1123),
+                  markerSupplyMissing(1124),
+                  markerWasteAlmostFull(1125),
+                  markerWasteFull(1126),
+                  markerWasteMissing(1127),
+                  markerWasteInkReceptacleMissing(1128),
+                  markerWasteTonerReceptacleMissing(1129),
+                  markerTonerMissing(1130),
+                  markerSupplyFailure(1131),
+                                        -- HP20230601
+
                 -- Media Path Device Group
                   mediaPathMediaTrayMissing(1301),
                   mediaPathMediaTrayAlmostFull(1302),
                   mediaPathMediaTrayFull(1303),
                   mediaPathCannotDuplexMediaSelected(1304),
                                         -- Not in RFC 1759
+                  mediaPathFailure(1305),
+                  mediaPathJam(1306),
+                  mediaPathInputRequest(1310),
+                  mediaPathInputFeedError(1311),
+                  mediaPathInputJam(1312),
+                  mediaPathOutputFeedError(1321),
+                  mediaPathOutputJam(1322),
+                  mediaPathOutputFull(1323),
+                  mediaPathPickRollerLifeWarn(1331),
+                  mediaPathPickRollerLifeOver(1332),
+                  mediaPathPickRollerFailure(1333),
+                  mediaPathPickRollerMissing(1334),
+
                 -- Interpreter Group
                   interpreterMemoryIncrease(1501),
                   interpreterMemoryDecrease(1502),
@@ -1476,6 +1594,50 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                       -- The interpreter has encountered a page
                       -- that is too complex for the resources that
                       -- are available.
+
+                -- Scanner Group
+                  scannerLightLifeAlmostOver(5101),
+                  scannerLightLifeOver(5102),
+                  scannerLightFailure(5103),
+                  scannerLightMissing(5104),
+                  scannerSensorLifeAlmostOver(5111),
+                  scannerSensorLifeOver(5112),
+                  scannerSensorFailure(5113),
+                  scannerSensorMissing(5114),
+
+                -- Scan Media Path Group
+                  scanMediaPathTrayMissing(5201),
+                  scanMediaPathTrayAlmostFull(5202),
+                  scanMediaPathTrayFull(5203),
+                  scanMediaPathFailure(5205),
+                  scanMediaPathJam(5206),
+                  scanMediaPathInputRequest(5210),
+                  scanMediaPathInputFeedError(5211),
+                  scanMediaPathInputJam(5212),
+                  scanMediaPathOutputFeedError(5221),
+                  scanMediaPathOutputJam(5222),
+                  scanMediaPathOutputFull(5223),
+                  scanMediaPathPickRollerLifeWarn(5231),
+                  scanMediaPathPickRollerLifeOver(5232),
+                  scanMediaPathPickRollerFailure(5233),
+                  scanMediaPathPickRollerMissing(5234),
+
+                -- Fax Modem Group
+                  faxModemMissing(6101),
+                  faxModemLifeAlmostOver(6102),
+                  faxModemLifeOver(6103),
+                  faxModemTurnedOn(6104),
+                  faxModemTurnedOff(6105),
+                  faxModemInactivityTimeout(6110), -- DEPRECATED
+                  faxModemProtocolAlert(6111), -- DEPRECATED
+                  faxModemEquipmentFailure(6112), -- DEPRECATED
+                  faxModemNoDialTone(6113), -- DEPRECATED
+                  faxModemLineBusy(6114), -- DEPRECATED
+                  faxModemNoAnswer(6115), -- DEPRECATED
+                  faxModemVoiceDetected(6116), -- DEPRECATED
+                  faxModemCarrierLost(6117), -- DEPRECATED
+                  faxModemTrainingFailure(6118), -- DEPRECATED
+
                 -- Alert Group
                   alertRemovalOfBinaryChangeEntry(1801),
                                         -- Not in RFC 1759
@@ -1521,6 +1683,7 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   staplerOverTemperature(30236),
                   staplerTimingFailure(30237),
                   staplerThermistorFailure(30238),
+
                   -- FinDeviceTypeTC = stitcher(3) -> stitcher
                   -- FinStitchingTypeTC = saddleStitch(8) or edgeStitch(9)
                   stitcherCoverOpen(30303),
@@ -1559,6 +1722,7 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   stitcherOverTemperature(30336),
                   stitcherTimingFailure(30337),
                   stitcherThermistorFailure(30338),
+
                   -- FinDeviceTypeTC = folder(4)
                   folderCoverOpen(30403),
                   folderCoverClosed(30404),
@@ -1596,6 +1760,7 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   folderOverTemperature(30436),
                   folderTimingFailure(30437),
                   folderThermistorFailure(30438),
+
                   -- FinDeviceTypeTC = binder(5)
                   binderCoverOpen(30503),
                   binderCoverClosed(30504),
@@ -1633,6 +1798,7 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   binderOverTemperature(30536),
                   binderTimingFailure(30537),
                   binderThermistorFailure(30538),
+
                   -- FinDeviceTypeTC = trimmer(6)
                   trimmerCoverOpen(30603),
                   trimmerCoverClosed(30604),
@@ -1670,6 +1836,7 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   trimmerOverTemperature(30636),
                   trimmerTimingFailure(30637),
                   trimmerThermistorFailure(30638),
+
                   -- FinDeviceTypeTC = dieCutter(7)
                   dieCutterCoverOpen(30703),
                   dieCutterCoverClosed(30704),
@@ -1707,6 +1874,7 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   dieCutterOverTemperature(30736),
                   dieCutterTimingFailure(30737),
                   dieCutterThermistorFailure(30738),
+
                   -- FinDeviceTypeTC = puncher(8)
                   puncherCoverOpen(30803),
                   puncherCoverClosed(30804),
@@ -1744,6 +1912,7 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   puncherOverTemperature(30836),
                   puncherTimingFailure(30837),
                   puncherThermistorFailure(30838),
+
                   -- FinDeviceTypeTC = perforater(9)
                   perforaterCoverOpen(30903),
                   perforaterCoverClosed(30904),
@@ -1781,6 +1950,7 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   perforaterOverTemperature(30936),
                   perforaterTimingFailure(30937),
                   perforaterThermistorFailure(30938),
+
                   -- FinDeviceTypeTC = slitter(10)
                   slitterCoverOpen(31003),
                   slitterCoverClosed(31004),
@@ -1818,6 +1988,7 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   slitterOverTemperature(31036),
                   slitterTimingFailure(31037),
                   slitterThermistorFailure(31038),
+
                   -- FinDeviceTypeTC = separationCutter(11)
                   separationCutterCoverOpen(31103),
                   separationCutterCoverClosed(31104),
@@ -1855,6 +2026,7 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   separationCutterOverTemperature(31136),
                   separationCutterTimingFailure(31137),
                   separationCutterThermistorFailure(31138),
+
                   -- FinDeviceTypeTC = imprinter(12)
                   imprinterCoverOpen(31203),
                   imprinterCoverClosed(31204),
@@ -1892,6 +2064,7 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   imprinterOverTemperature(31236),
                   imprinterTimingFailure(31237),
                   imprinterThermistorFailure(31238),
+
                   -- FinDeviceTypeTC = wrapper(13)
                   wrapperCoverOpen(31303),
                   wrapperCoverClosed(31304),
@@ -1929,6 +2102,7 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   wrapperOverTemperature(31336),
                   wrapperTimingFailure(31337),
                   wrapperThermistorFailure(31338),
+
                   -- FinDeviceTypeTC = bander(14)
                   banderCoverOpen(31403),
                   banderCoverClosed(31404),
@@ -1966,6 +2140,7 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   banderOverTemperature(31436),
                   banderTimingFailure(31437),
                   banderThermistorFailure(31438),
+
                   -- FinDeviceTypeTC = makeEnvelope(15)
                   makeEnvelopeCoverOpen(31503),
                   makeEnvelopeCoverClosed(31504),
@@ -2003,6 +2178,7 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   makeEnvelopeOverTemperature(31536),
                   makeEnvelopeTimingFailure(31537),
                   makeEnvelopeThermistorFailure(31538),
+
                   -- FinDeviceTypeTC = stacker(16)
                   stackerCoverOpen(31603),
                   stackerCoverClosed(31604),
@@ -2040,6 +2216,7 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   stackerOverTemperature(31636),
                   stackerTimingFailure(31637),
                   stackerThermistorFailure(31638),
+
                   -- FinDeviceTypeTC = sheetRotator(17)
                   sheetRotatorCoverOpen(31703),
                   sheetRotatorCoverClosed(31704),
@@ -2077,6 +2254,7 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   sheetRotatorOverTemperature(31736),
                   sheetRotatorTimingFailure(31737),
                   sheetRotatorThermistorFailure(31738),
+
                   -- FinDeviceTypeTC = inserter(18)
                   inserterCoverOpen(31803),
                   inserterCoverClosed(31804),
@@ -2116,3 +2294,4 @@ PrtAlertCodeTC ::= TEXTUAL-CONVENTION
                   inserterThermistorFailure(31838)
                   }
 END
+

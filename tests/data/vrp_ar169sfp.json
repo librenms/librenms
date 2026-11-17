@@ -3821,5 +3821,56 @@
                 }
             ]
         }
+    },
+    "fdb-table": {
+        "discovery": {
+            "ports_fdb": [
+                {
+                    "mac_address": "bcc493cc60b0",
+                    "vlan": 1,
+                    "ifIndex": 4
+                },
+                {
+                    "mac_address": "ecbd1dcec508",
+                    "vlan": 1,
+                    "ifIndex": 4
+                },
+                {
+                    "mac_address": "f4cfe2ffb9d4",
+                    "vlan": 1,
+                    "ifIndex": 4
+                },
+                {
+                    "mac_address": "bcc493cc60b0",
+                    "vlan": 99,
+                    "ifIndex": 4
+                },
+                {
+                    "mac_address": "bcc493cc60c1",
+                    "vlan": 99,
+                    "ifIndex": 4
+                },
+                {
+                    "mac_address": "ecbd1dcec508",
+                    "vlan": 99,
+                    "ifIndex": 4
+                },
+                {
+                    "mac_address": "f4cfe2ffb9d4",
+                    "vlan": 99,
+                    "ifIndex": 4
+                },
+                {
+                    "mac_address": "bc9911aa77e2",
+                    "vlan": 600,
+                    "ifIndex": 4
+                },
+                {
+                    "mac_address": "bcc493cc60b0",
+                    "vlan": 600,
+                    "ifIndex": 4
+                }
+            ]
+        }
     }
 }

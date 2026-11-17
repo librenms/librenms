@@ -1,3 +1,5 @@
+    -- /* Copyright (C) 2001-2024 IP Infusion, Inc. All Rights Reserved. */
+
     IPI-CMM-CHASSIS-MIB DEFINITIONS ::= BEGIN
 
     --  This module provides authoritative definitions for cmm modules
@@ -21,13 +23,16 @@
 
 
     cmm  MODULE-IDENTITY
-    LAST-UPDATED "202005060000Z"   -- Jun 05, 2020 12:00:00 GMT
+    LAST-UPDATED "202412120000Z"   -- Dec 12, 2024 12:00:00 GMT
     ORGANIZATION "IP Infusion"
     CONTACT-INFO "support@ipinfusion.com"
 
     DESCRIPTION
        "The Structure of CMM Management Information for
         the IPI enterprise."
+  REVISION "202412120000Z"
+  DESCRIPTION
+      "IPI-CMM-CHASSIS-V2-MIB is renamed to IPI-CMM-CHASSIS-MIB"
   REVISION "202005060000Z"
   DESCRIPTION
       "Complying to level 3 of SMILINT"
@@ -4882,7 +4887,7 @@
         MAX-ACCESS    read-only
         STATUS        current
         DESCRIPTION
-            "Harddisk Reallocated Sectors Count.
+            "Harddisk Reallocated Sectors Count Percentage.
              '-100001' indicates unavailable"
         ::= { cmmSysHardDiskEntry 21 }
 

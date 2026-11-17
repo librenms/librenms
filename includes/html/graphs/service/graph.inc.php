@@ -12,13 +12,13 @@
  * the source code distribution for details.
  */
 
+use App\Data\Graphing\Legacy\LegacyGraphParameters;
 use App\Facades\LibrenmsConfig;
 use App\Models\Service;
-use LibreNMS\Data\Graphing\GraphParameters;
 use LibreNMS\Services;
 
 /** @var Service $service */
-/** @var GraphParameters $graph_params */
+/** @var LegacyGraphParameters $graph_params */
 $rrd_filename = Rrd::name($service->device->hostname, ['services', $service->service_id]);
 
 $service_ds = json_decode(htmlspecialchars_decode((string) $service->service_ds), true) ?: [];

@@ -11498,7 +11498,7 @@
         "discovery": {
             "isis_adjacencies": [
                 {
-                    "index": null,
+                    "index": "559.1",
                     "ifIndex": 559,
                     "isisISAdjState": "up",
                     "isisISAdjNeighSysType": "L2",
@@ -11511,7 +11511,7 @@
                     "isisCircAdminState": "on"
                 },
                 {
-                    "index": null,
+                    "index": "572.2",
                     "ifIndex": 572,
                     "isisISAdjState": "up",
                     "isisISAdjNeighSysType": "L2",

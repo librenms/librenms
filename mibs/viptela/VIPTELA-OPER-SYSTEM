@@ -9,15 +9,33 @@ IMPORTS
     TEXTUAL-CONVENTION, RowStatus, DateAndTime,
     TruthValue
         FROM SNMPv2-TC
-    viptela
+    viptela, VpnIndex
         FROM VIPTELA-GLOBAL
 ;
 
 viptela-oper-system MODULE-IDENTITY
-    LAST-UPDATED "202007010000Z"
+    LAST-UPDATED "202307010000Z"
     ORGANIZATION "Viptela, Inc."
     CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
     DESCRIPTION "This module defines the data model for system operational data"
+    REVISION "202307010000Z"
+    DESCRIPTION "Viptela Revision 20.12"
+    REVISION "202303010000Z"
+    DESCRIPTION "Viptela Revision 20.11"
+    REVISION "202212150000Z"
+    DESCRIPTION "Viptela Revision 20.10"
+    REVISION "202206010000Z"
+    DESCRIPTION "Viptela Revision 20.9"
+    REVISION "202203010000Z"
+    DESCRIPTION "Viptela Revision 20.8"
+    REVISION "202111010000Z"
+    DESCRIPTION "Viptela Revision 20.7"
+    REVISION "202107010000Z"
+    DESCRIPTION "Viptela Revision 20.6"
+    REVISION "202103010000Z"
+    DESCRIPTION "Viptela Revision 20.5"
+    REVISION "202011010000Z"
+    DESCRIPTION "Viptela Revision 20.4"
     REVISION "202007010000Z"
     DESCRIPTION "Viptela Revision 20.3"
     REVISION "202002240000Z"
@@ -841,6 +859,14 @@ systemStatusSystemChassisSerialNumber OBJECT-TYPE
     STATUS      current
     DESCRIPTION ""
     ::= { systemStatus 64 }
+
+-- tagpath /system-status/in_prod_mode
+systemStatusSystemInProdMode OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 65 }
 
 -- Display system statistics
 -- tagpath /system-statistics
@@ -2961,6 +2987,53 @@ systemStatisticsVRRPMismatchedDMACDrops OBJECT-TYPE
     DESCRIPTION ""
     ::= { systemStatistics 265 }
 
+--tagpath /system-statistics/rx_urpf_drops
+systemStatisticsRxUrpfDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 266 }
+
+--tagpath /system-statistics/ip_fwd_sig_no_vrf
+systemStatisticsIpFwdSigNoVrf OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 267 }
+--tagpath /system-statistics/ip_fwd_sig_no_exact_match
+systemStatisticsIpFwdSigNoExactMatch OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 268 }
+
+-- tagpath /system-statistics/ip_fwd_data_pol_nhop_null
+systemStatisticsIpFwdDataPolNullNhop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 269 }
+
+-- tagpath /system-statistics/tx_arp_reply_rate_limit_drops
+systemStatisticsTxArpReplyRateLimitDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 270 }
+
+-- tagpath /system-statistics/nat_skip_unpin_flow
+systemStatisticsNatSkipUnpinFlow OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 271 }
+
 -- Display system statistics information
 
 -- tagpath /system-statistics-diff
@@ -4993,6 +5066,51 @@ systemStatisticsDiffVRRPMismatchedDMACDrops OBJECT-TYPE
     STATUS      current
     DESCRIPTION ""
     ::= { systemStatisticsDiff 256 }
+-- tagpath /system-statistics-diff/rx_urpf_drops
+systemStatisticsDiffRxUrpfDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 257 }
+-- tagpath /system-statistics-diff/ip_fwd_sig_no_vrf
+systemStatisticsDiffIpFwdSigNoVrf OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 258 }
+-- tagpath /system-statistics-diff/ip_fwd_sig_no_exact_vrf
+systemStatisticsDiffIpFwdSigNoExactVrf OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 259 }
+
+-- tagpath /system-statistics-diff/ip_fwd_data_pol_nhop_null
+systemStatisticsDiffIpFwdDataPolNullNhop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 260 }
+
+-- tagpath /system-statistics-diff/tx_arp_reply_rate_limit_drops
+systemStatisticsDiffTxArpReplyRateLimitDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 261 }
+
+-- tagpath /system-statistics-diff/nat_skip_unpin_flow
+systemStatisticsDiffNatSkipUnpinFlow OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 262 }
 
 -- Display system reboot related information
 -- tagpath /reboot
@@ -5032,7 +5150,7 @@ loggingHostPriority OBJECT-TYPE
 
 -- tagpath /logging/host_vpn_id
 loggingHostVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION ""
@@ -5265,7 +5383,7 @@ usersEntry OBJECT-TYPE
 
 UsersEntry ::=
     SEQUENCE {
-        usersSession Unsigned32,
+        usersSession Integer32,
         usersUser String,
         usersContext String,
         usersFrom InetAddressIP,
@@ -5276,7 +5394,7 @@ UsersEntry ::=
 
 -- tagpath /users/session
 usersSession OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      Integer32
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "User session ID"
@@ -5385,7 +5503,7 @@ AaaUsergroupTaskEntry ::=
 
 -- tagpath /aaa/usergroup/task/mode
 aaaUsergroupTaskMode OBJECT-TYPE
-    SYNTAX      INTEGER {system(0),interface(1),policy(2),routing(3),security(4)}
+    SYNTAX      String
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "Task mode"
@@ -5398,6 +5516,109 @@ aaaUsergroupTaskPermission OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Permissions"
     ::= { aaaUsergroupTaskEntry 2 }
+
+-- tagpath /aaa/accounting
+accountingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AccountingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display accounting info for users"
+    ::= { aaa 3 }
+
+-- tagpath /aaa/accounting
+accountingEntry OBJECT-TYPE
+    SYNTAX      AccountingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { accountingSessid }
+        ::= { accountingTable 1 }
+
+AccountingEntry ::=
+    SEQUENCE {
+        accountingSessid Unsigned32,
+        accountingUser String,
+        accountingType INTEGER,
+        accountingFrom String,
+        accountingAge String,
+        accountingServer String,
+        accountingProto INTEGER,
+        accountingNumSent Unsigned32,
+        accountingNumFailed Unsigned32
+    }
+
+-- tagpath /aaa/accounting/sessid
+accountingSessid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "User session ID"
+    ::= { accountingEntry 1 }
+
+-- tagpath /aaa/accounting/user
+accountingUser OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "User name"
+    ::= { accountingEntry 2 }
+
+-- tagpath /aaa/accounting/type
+accountingType OBJECT-TYPE
+    SYNTAX      INTEGER {console(4),ssh(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Console | SSH"
+    ::= { accountingEntry 3 }
+
+-- tagpath /aaa/accounting/from
+accountingFrom OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Address and port from which session originated"
+    ::= { accountingEntry 4 }
+
+-- tagpath /aaa/accounting/age
+accountingAge OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Session Age"
+    ::= { accountingEntry 5 }
+
+-- tagpath /aaa/accounting/server
+accountingServer OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last server which was contacted"
+    ::= { accountingEntry 6 }
+
+-- tagpath /aaa/accounting/proto
+accountingProto OBJECT-TYPE
+    SYNTAX      INTEGER {tacacs(1),radius(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "TACACS | RADIUS"
+    ::= { accountingEntry 7 }
+
+-- tagpath /aaa/accounting/num-sent
+accountingNumSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of records successfully sent"
+    ::= { accountingEntry 8 }
+
+-- tagpath /aaa/accounting/num-failed
+accountingNumFailed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of records failed to sent"
+    ::= { accountingEntry 9 }
+
 
 -- tagpath /ntp/peer
 ntpPeerTable OBJECT-TYPE
@@ -5635,7 +5856,11 @@ transportConnectionEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION ""
-    INDEX { transportConnectionTrackType, transportConnectionSource, transportConnectionDestination }
+    INDEX { transportConnectionTrackType,
+            transportConnectionSource,
+            transportConnectionDestination,
+            transportConnectionHost
+          }
         ::= { transportConnectionTable 1 }
 
 TransportConnectionEntry ::=
@@ -5648,7 +5873,7 @@ TransportConnectionEntry ::=
 
 -- tagpath /transport/connection/track-type
 transportConnectionTrackType OBJECT-TYPE
-    SYNTAX      INTEGER {system(0),tloc(1)}
+    SYNTAX      INTEGER {none(0),ip(1),dnsname(2),apiurl(3)}
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "Tracking Type"
@@ -5692,7 +5917,11 @@ transportConnectionHistoryEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION ""
-    INDEX { transportConnectionTrackType, transportConnectionSource, transportConnectionDestination, transportConnectionHistoryIndex }
+    INDEX { transportConnectionTrackType,
+            transportConnectionSource,
+            transportConnectionDestination,
+            transportConnectionHost,
+            transportConnectionHistoryIndex }
         ::= { transportConnectionHistoryTable 1 }
 
 TransportConnectionHistoryEntry ::=
@@ -5989,4 +6218,62 @@ systemRemoteOnDemandIdleTimeoutExpiry OBJECT-TYPE
     STATUS      current
     DESCRIPTION "idle-timeout-expiry"
     ::= {systemRemoteOnDemandEntry 5}
+
+
+-- tagpath /images
+imagesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ImagesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display downloaded software images"
+    ::= { viptela-oper-system 17 }
+
+-- tagpath /images
+imagesEntry OBJECT-TYPE
+    SYNTAX      ImagesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { imagesIndex }
+        ::= { imagesTable 1 }
+
+ImagesEntry ::=
+    SEQUENCE {
+        imagesIndex Integer32,
+        imagesFilename String,
+        imagesTimestamp String,
+        imagesFilesize Integer32
+    }
+
+-- tagpath /images/index
+imagesIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0 .. 10)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Index on this list"
+    ::= { imagesEntry 1 }
+
+-- tagpath /images/filename
+imagesFilename OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Downloaded Software image file name"
+    ::= { imagesEntry 2 }
+
+-- tagpath /images/timestamp
+imagesTimestamp OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Date and time the software image file was downloaded"
+    ::= { imagesEntry 3 }
+
+-- tagpath /images/filesize
+imagesFilesize OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { imagesEntry 4 }
 END

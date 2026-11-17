@@ -5,6 +5,7 @@ IMPORTS
     NOTIFICATION-TYPE                    FROM SNMPv2-SMI
     MODULE-COMPLIANCE, OBJECT-GROUP,
     NOTIFICATION-GROUP                   FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION                   FROM SNMPv2-TC
     entPhysicalIndex, entPhysicalDescr   FROM ENTITY-MIB
     entStateAlarm                        FROM ENTITY-STATE-MIB
     EntitySensorValue, entPhySensorValue
@@ -14,7 +15,7 @@ IMPORTS
 
 
 aristaEntSensorMIB   MODULE-IDENTITY
-    LAST-UPDATED  "201408150000Z"
+    LAST-UPDATED  "202302100000Z"
     ORGANIZATION  "Arista Networks, Inc."
     CONTACT-INFO
         "Arista Networks, Inc.
@@ -36,6 +37,8 @@ aristaEntSensorMIB   MODULE-IDENTITY
         In addition, on systems where it is supported, if the 
         sensor value crosses the supported threshold value the system
         can generate appropriate notification as well."
+    REVISION       "202302100000Z"
+    DESCRIPTION    "Added aristaFanStateTable."
     REVISION       "201408150000Z"
     DESCRIPTION    "Updated postal and e-mail addresses."
     REVISION       "201305090950Z"
@@ -52,6 +55,29 @@ aristaEntSensorMibObjects  OBJECT IDENTIFIER
 
 aristaEntSensorMibConformance  OBJECT IDENTIFIER
     ::= { aristaEntSensorMIB 2 }
+
+AristaEntityOperState  ::=  TEXTUAL-CONVENTION
+ STATUS         current
+ DESCRIPTION
+      " Represents the possible values of operational states.
+
+        A value of 'disabled' means the resource is totally
+        inoperable.  A value of 'enabled' means the resource
+        is partially or fully operable.  A value of 'testing'
+        means the resource is currently being tested
+        and cannot therefore report whether it is operational
+        or not.  A value of 'unknown' means that this
+        resource is unable to report operational state.
+        A value of 'notInstalled' means the resource is not
+        physically present."
+ SYNTAX         INTEGER
+           {
+           unknown (1),
+           disabled (2),
+           enabled (3),
+           testing (4),
+           notInstalled (5)
+           }
 
 -- entity threshold table --
 
@@ -132,6 +158,66 @@ aristaEntSensorStatusDescr            OBJECT-TYPE
         status including any threshold alerts."
     ::= { aristaEntSensorThresholdEntry 5 }
 
+aristaFanStateTable OBJECT-TYPE
+   SYNTAX           SEQUENCE OF AristaFanStateEntry
+   MAX-ACCESS       not-accessible
+   STATUS           current
+   DESCRIPTION
+      "This table contains brief fan state information for fan tray slot fans
+      and power supply fans.  Once a fan is inserted for the first time, the
+      corresponding table entry will remain persistent even if that fan
+      is subsequently removed from the fan slot; the entry will be deleted
+      only if the supervisor is rebooted."
+   ::= { aristaEntSensorMibObjects 2 }
+
+aristaFanStateEntry OBJECT-TYPE
+   SYNTAX           AristaFanStateEntry
+   MAX-ACCESS       not-accessible
+   STATUS           current
+   DESCRIPTION
+      "A single row containing brief information related to fan."
+   INDEX            { entPhysicalIndex }
+   ::=  { aristaFanStateTable 1 }
+
+AristaFanStateEntry ::= SEQUENCE {
+   aristaFanStateDescr  SnmpAdminString,
+   aristaFanStateOper   AristaEntityOperState
+}
+
+aristaFanStateDescr       OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual description of the logical entity."
+    ::= { aristaFanStateEntry 1 }
+
+aristaFanStateOper  OBJECT-TYPE
+       SYNTAX      AristaEntityOperState
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "The operational state for this entity.
+
+            A value of 'testing' means that entity currently being
+            tested and cannot therefore report whether it is
+            operational or not.
+
+            A value of 'disabled' means that an entity is totally
+            inoperable and unable to provide service both to entities
+            within its containment hierarchy, or to other receivers
+            of its service as defined in ways outside the scope of
+            this MIB.
+
+            A value of 'enabled' means that an entity is fully or
+            partially operable and able to provide service both to
+            entities within its containment hierarchy, or to other
+            receivers of its service as defined in ways outside the
+            scope of this MIB.
+
+            A value of 'notInstalled' means that an entity is no longer
+            physically present and unable to provide service."
+       ::= { aristaFanStateEntry 2 }
 
 -- Notifications --
 
@@ -165,7 +251,8 @@ aristaEntSensorMibCompliance  MODULE-COMPLIANCE
     MODULE        -- this module
     MANDATORY-GROUPS {
         aristaEntSensorThresholdGroup,
-        aristaEntSensorNotificationsGroup
+        aristaEntSensorNotificationsGroup,
+        aristaFanStateGroup
     }
     ::= { aristaEntSensorMibCompliances 1 }
 
@@ -193,6 +280,17 @@ aristaEntSensorNotificationsGroup NOTIFICATION-GROUP
         sensor(s) change value are not within the acceptable operating
         range."
     ::= { aristaEntSensorMibGroups 2 }
+
+aristaFanStateGroup             OBJECT-GROUP
+    OBJECTS  {
+        aristaFanStateDescr,
+        aristaFanStateOper
+    }
+    STATUS   current
+    DESCRIPTION
+        "The collection of objects that provide brief fan state
+        information in the system."
+    ::= { aristaEntSensorMibGroups 3 }
 
 END
         

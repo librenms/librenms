@@ -1,50 +1,74 @@
-# Proxmox graphing
+# Proxmox
 
-LibreNMS creates graphs of the Proxmox **VMs** on your monitored
-machines. It creates only traffic graphs, one for each interface of
-each VM. IO graphs can come later.
+LibreNMS discovers the virtual machines and LXC containers of Proxmox VE
+hosts and polls their CPU, memory, disk, disk IO and network usage with the
+Proxmox VE API. Disk operations are only available for virtual machines.
 
-The final goal is a traffic bill for each VM, on any physical machine.
+Add the Proxmox API polling method to **every node** of a cluster, each node
+reports the guests it runs. The guests of a node without the method are not
+monitored.
 
-## Enabling Proxmox graphs
+A guest shows under the device of the node it runs on. When it migrates, the
+new node takes it over at its next poll and logs a migrated event. The guest
+keeps its page and its graphs.
 
-To enable the Proxmox graphs, do these steps:
+The graphs of a guest are stored per cluster instead of per device, in
+`rrd/proxmox-<cluster id>/`. The cluster id comes from the fingerprint of the
+Proxmox root CA, so clusters with the same name stay apart. Regenerating the
+root CA starts new graphs, rename the directory to keep the old ones.
 
-In `config.php`, enable Proxmox:
+## Create an API token
 
-```php
-$config['enable_proxmox'] = 1;
-```
-
-Then install git and [librenms-agent](Applications.md) on the Proxmox
-machines. Then enable the Proxmox script:
-
-```bash
-cp /opt/librenms-agent/agent-local/proxmox /usr/lib/check_mk_agent/local/proxmox
-chmod +x /usr/lib/check_mk_agent/local/proxmox
-```
-
-Then enable and start the check_mk service with systemd:
+On the Proxmox host, create a user and an API token with the `PVEAuditor`
+role.
 
 ```bash
-cp /opt/librenms-agent/check_mk@.service /opt/librenms-agent/check_mk.socket /etc/systemd/system
-systemctl daemon-reload
-systemctl enable check_mk.socket && systemctl start check_mk.socket
+pveum user add librenms@pve
+pveum aclmod / -user librenms@pve -role PVEAuditor
+pveum user token add librenms@pve monitoring --privsep 0
 ```
 
-Then enable the librenms-agent flag and the proxmox application flag on
-the monitored device in LibreNMS. The application then appears in
-LibreNMS. A new item also appears in the top menu. This item selects
-the cluster to view.
+Note the token ID (`librenms@pve!monitoring`) and the secret value, the
+secret is only shown once.
 
-## Note, if you want to use use xinetd instead of systemd
+Disk usage of a virtual machine is read from the QEMU guest agent when it
+runs in the virtual machine, otherwise the hypervisor values are used. The
+guest OS of a virtual machine also comes from the agent. Hypervisor values
+report no used space for virtual machines and the size of the boot disk only.
 
-xinetd can start the librenms-agent in place of systemd. One use case
-is an old Proxmox installation. Install the librenms-agent, as above.
-Then copy and enable the xinetd config. Then restart the xinetd
-service:
+### Guest agent access
+
+On Proxmox VE 9 and later, `PVEAuditor` includes `VM.GuestAgent.Audit`, so the
+token stays read-only and can use the guest agent.
+
+On Proxmox VE 8 and earlier, `PVEAuditor` does not grant guest agent access.
+The guest OS is not collected and disk usage uses the hypervisor values.
+
+Collecting them on these versions requires `VM.Monitor`, but that privilege
+also allows guest-changing agent operations, such as running commands, writing
+files and setting passwords. The token is then no longer read-only, so only
+grant it if you accept that scope:
 
 ```bash
-cp check_mk_xinetd /etc/xinetd.d/check_mk
-/etc/init.d/xinetd restart
+pveum role add LibreNMSGuestAgent --privs VM.Monitor
+pveum aclmod /vms -user librenms@pve -role LibreNMSGuestAgent
 ```
+
+## Add the polling method
+
+On the device, go to Edit -> Polling, add the **Proxmox API** method and
+create a secret with the token ID and the token secret.
+
+| Setting                | Default            |
+|------------------------|--------------------|
+| Hostname               | device's hostname  |
+| Port                   | 8006               |
+| Timeout                | 10 seconds         |
+| Verify TLS Certificate | Yes                |
+
+Proxmox VE uses a self-signed certificate by default. Install a trusted
+certificate on the host, or set Verify TLS Certificate to No.
+
+The Proxmox API method enables the `vminfo` module for the device, the
+virtual machines are discovered during the next discovery. A device setting
+in Edit -> Modules overrides it.

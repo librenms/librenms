@@ -24,7 +24,7 @@
             screenshot: {{ $screenshot ? 'true' : 'false' }},
             legend: @json($legend),
             networkOptions: {{ Js::from($map_conf) }},
-            baseUrl: '{{ $base_url }}',
+            baseUrl: @json($base_url),
             enableKeyboard: false,
             isWidget: true
         });

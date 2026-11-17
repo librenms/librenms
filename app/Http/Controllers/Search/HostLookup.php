@@ -170,7 +170,7 @@ class HostLookup
         return PortsFdb::hasAccess($this->user)
             ->select(['ports_fdb.*', 'mac_counts.mac_count'])
             ->joinSub($macCounts, 'mac_counts', 'ports_fdb.port_id', '=', 'mac_counts.port_id')
-            ->with(['vlan', 'port' => fn ($q) => $q->with('device')->withCount('links')])
+            ->with(['port' => fn ($q) => $q->with('device')->withCount('links')])
             ->whereIn('ports_fdb.mac_address', $macs)
             ->get()
             ->toBase()

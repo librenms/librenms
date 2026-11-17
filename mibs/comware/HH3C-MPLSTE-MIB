@@ -1,15 +1,17 @@
 -- =============================================================================
--- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Multiprotocol Label Switching Traffic Engineering MIB
 -- Reference:
--- Version: V1.0
+-- Version: V1.2
 -- History:
 --   V1.0 2013-06-13 Initial version Created by Neng Yan
+--   V1.1 2022-06-09 Modified by Zhou wan, Added hh3cMplsTeNotifications
+--   V1.2 2022-07-10 Modified by Zhu jieyi, Modified hh3cMplsTeNotifications
 -- =============================================================================
 HH3C-MPLSTE-MIB DEFINITIONS ::= BEGIN
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
     RowStatus, TruthValue
         FROM SNMPv2-TC
@@ -22,7 +24,7 @@ IMPORTS
 -- =============================================================================
 hh3cMplsTe MODULE-IDENTITY
     LAST-UPDATED
-        "201306131800Z"        -- Jan 13, 2013 at 18:00 GMT
+        "202207101100Z"        -- July 10, 2022 at 11:00 GMT
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -33,6 +35,14 @@ hh3cMplsTe MODULE-IDENTITY
     DESCRIPTION
         "Multiprotocol Label Switching Traffic Engineering MIB"
     REVISION
+        "202207101100Z"   -- July 10, 2022 at 11:00 GMT
+    DESCRIPTION
+        "Modified hh3cMplsTeNotifications."
+    REVISION
+        "202206091100Z"   -- Jan 09, 2022 at 11:00 GMT
+    DESCRIPTION
+        "Added hh3cMplsTeNotifications."
+    REVISION
         "201306131800Z"   -- Jan 13, 2013 at 18:00 GMT
     DESCRIPTION
         "Initial version of this MIB."
@@ -41,9 +51,11 @@ hh3cMplsTe MODULE-IDENTITY
 -- =============================================================================
 -- object definition begin
 -- =============================================================================
-hh3cMplsTeObjects      OBJECT IDENTIFIER ::= { hh3cMplsTe 1 }
+hh3cMplsTeNotifications OBJECT IDENTIFIER ::= { hh3cMplsTe 0 }
 
-hh3cMplsTeScalarGroup  OBJECT IDENTIFIER ::= { hh3cMplsTeObjects 1 }
+hh3cMplsTeObjects       OBJECT IDENTIFIER ::= { hh3cMplsTe 1 }
+
+hh3cMplsTeScalarGroup   OBJECT IDENTIFIER ::= { hh3cMplsTeObjects 1 }
 
 hh3cMplsTeStatus    OBJECT-TYPE
     SYNTAX      TruthValue
@@ -61,6 +73,15 @@ hh3cMplsTeRsvpStatus    OBJECT-TYPE
     DESCRIPTION
         "The global configuration of RSVP(Resource Reservation Protocol)."
     ::= { hh3cMplsTeScalarGroup 2 }
+
+hh3cMplsTeTunnelInfo    OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..127))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The information of MPLS(Multiprotocol Label Switching)
+         TE(Traffic Engineering) Tunnel."
+    ::= { hh3cMplsTeScalarGroup 3 }
 
 -- =============================================================================
 -- hh3cMplsTeTable Definition
@@ -115,7 +136,7 @@ hh3cMplsTeRowStatus     OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Operation status of this table entry.  A row entry cannot
+        "Operation status of this table entry. A row entry cannot
         be modified when the value of this object is 'active'."
     ::= { hh3cMplsTeEntry 3 }
 -- =============================================================================
@@ -176,11 +197,166 @@ hh3cMplsTeRsvpRowStatus     OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Operation status of this table entry.  A row entry cannot
+        "Operation status of this table entry. A row entry cannot
         be modified when the value of this object is 'active'."
     ::= { hh3cMplsTeRsvpEntry 3 }
 -- =============================================================================
 -- End of hh3cMplsTeRsvpTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- Notifications
+-- =============================================================================
+hh3cMplsTeTunnelHsbSwitch  NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the flow switched
+       from main LSP to hot-standby LSP."
+    ::= { hh3cMplsTeNotifications 1 }
+
+hh3cMplsTeTunnelHsbResume  NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the flow switched
+       back from hot-standby LSP to main LSP."
+    ::= { hh3cMplsTeNotifications 2 }
+
+hh3cMplsTeTunnelObSwitch  NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the flow switched
+       from main LSP to Ordinary Backup LSP."
+    ::= { hh3cMplsTeNotifications 3 }
+
+hh3cMplsTeTunnelObResume  NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the flow switched
+       back from Ordinary Backup LSP to main LSP."
+    ::= { hh3cMplsTeNotifications 4 }
+
+hh3cMplsTeTunnelHsbLspDown  NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the hot-standby LSP
+       of the tunnel changed to Down."
+    ::= { hh3cMplsTeNotifications 5 }
+
+hh3cMplsTeTunnelHsbLspUp  NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the hot-standby LSP
+       of the tunnel changed to Up."
+    ::= { hh3cMplsTeNotifications 6 }
+
+hh3cMplsTeTunnelObLspDown  NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the ordinary backup LSP
+       of the tunnel changed to Down."
+    ::= { hh3cMplsTeNotifications 7 }
+
+hh3cMplsTeTunnelObLspUp  NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the ordinary backup LSP
+       of the tunnel changed to Up."
+    ::= { hh3cMplsTeNotifications 8 }
+
+hh3cMplsTeTunnelMainLspDown  NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the Main LSP
+       of the tunnel changed to Down."
+    ::= { hh3cMplsTeNotifications 9 }
+
+hh3cMplsTeTunnelMainLspUp  NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the Main LSP
+       of the tunnel changed to Up."
+    ::= { hh3cMplsTeNotifications 10 }
+
+hh3cMplsTeTunnelChangeBw  NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the Bandwidth
+       of the tunnel changed."
+    ::= { hh3cMplsTeNotifications 11 }
+
+hh3cMplsTeAutoTunnelUp   NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the auto tunnel changed to Up."
+    ::= { hh3cMplsTeNotifications 12 }
+
+hh3cMplsTeLspBfdDown   NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the status of BFD
+       for TE LSP changed to down."
+    ::= { hh3cMplsTeNotifications 13 }
+
+hh3cMplsTeLspBfdDownClear   NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the BFD for TE LSP
+       down alarm is cleared."
+    ::= { hh3cMplsTeNotifications 14 }
+
+hh3cMplsTeTunnelDelete   NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the MPLS TE Tunnel is deleted."
+    ::= { hh3cMplsTeNotifications 15 }
+
+hh3cMplsTeAutoTunnelMainLspUp   NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the Main Lsp of
+       TE Auto Tunnel changed to up."
+    ::= { hh3cMplsTeNotifications 16 }
+
+hh3cMplsTeP2mpTunnelSubLspDown   NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the status of
+       P2MP TE Tunnel sub-lsp changed to down."
+    ::= { hh3cMplsTeNotifications 17 }
+
+hh3cMplsTeP2mpTunnelDown   NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the P2MP TE Tunnel changed to down."
+    ::= { hh3cMplsTeNotifications 18 }
+
+hh3cMplsTeP2mpTunnelUp   NOTIFICATION-TYPE
+    OBJECTS {  hh3cMplsTeTunnelInfo  }
+    STATUS      current
+    DESCRIPTION
+      "This notification is generated when the P2MP TE Tunnel changed to up."
+    ::= { hh3cMplsTeNotifications 19 }
+
+-- =============================================================================
+-- End of notifications.
 -- =============================================================================
 
 END
