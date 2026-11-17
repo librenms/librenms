@@ -216,7 +216,7 @@ class F5Source implements LoadBalancerSource
             ],
             // a pool member's label is the name of its pool
             LoadBalancerSection::PoolMembers => [
-                'name' => $prefs['nodename'] ?? $label,
+                'name' => ($prefs['nodename'] ?? '') ?: $label,
                 'address' => $address,
                 'pool' => $label,
                 'poolId' => $this->poolIds()[$label] ?? null,

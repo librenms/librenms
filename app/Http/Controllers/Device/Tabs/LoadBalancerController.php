@@ -121,7 +121,7 @@ class LoadBalancerController implements DeviceTab
 
         // the list can show one of the item graphs under each row
         $itemGraphs = $source->itemGraphs($section);
-        $rowGraph = Url::parseOptions('graph');
+        $rowGraph = (string) Url::parseOptions('graph');
         $rowGraph = isset($itemGraphs[$rowGraph]) ? $rowGraph : null;
         $sorting = [
             'sort' => (string) Url::parseOptions('sort', 'name'),

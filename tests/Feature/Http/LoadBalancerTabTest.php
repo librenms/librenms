@@ -112,12 +112,16 @@ final class LoadBalancerTabTest extends TestCase
         $device = Device::factory()->create(['os' => 'f5']);
         $pool = $this->createComponent($device, 'f5-ltm-pool', 'Pool 1');
         $this->createComponent($device, 'f5-ltm-poolmember', 'Pool 1', ['nodename' => 'Node A', 'IP' => '192.0.2.5', 'port' => 80], status: 2, error: 'Offline');
+        $this->createComponent($device, 'f5-ltm-poolmember', 'Pool 1', ['nodename' => '', 'IP' => '192.0.2.6', 'port' => 80]);
 
         $response = $this->actingAs($this->admin())
             ->get(route('device', ['device' => $device, 'tab' => 'loadbalancer', 'type' => 'pool-members']))
             ->assertOk()
-            ->assertSee('Pool Members (1)')
+            ->assertSee('Pool Members (2)')
             ->assertSee('Node A')
+            // members without a node name are named after their pool
+            ->assertSeeInOrder(['192.0.2.6:80', 'type=pools'], false)
+            ->assertSee('>Pool 1</a></td>', false)
             ->assertSee('type=pools&amp;id=' . $pool->id, false);
 
         $this->assertLabel('label-danger', 'Offline', (string) $response->getContent());
