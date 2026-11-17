@@ -25,7 +25,7 @@
                                     <th>{{ __('Transport Type') }}</th>
                                     <th>{{ __('Default') }}</th>
                                     <th>{{ __('Details') }}</th>
-                                    <th class="tw:w-36">{{ __('Action') }}</th>
+                                    <th>{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -35,7 +35,7 @@
                                     <td>{{ $transport->transport_name }}</td>
                                     <td>{{ $instance->name() }}</td>
                                     <td>@if($transport->is_default)<span class="label label-primary">{{ __('Default') }}</span>@endif</td>
-                                    <td class="tw:w-1/3 tw:wrap-anywhere tw:whitespace-normal"><i>{!! nl2br(e($instance->displayDetails())) !!}</i></td>
+                                    <td class="tw:wrap-anywhere"><i>{!! nl2br(e($instance->displayDetails())) !!}</i></td>
                                     <td>
                                         <div class="btn-group btn-group-sm tw:inline-flex" role="group">
                                             @can('update', $transport)
@@ -74,7 +74,7 @@
                                 <tr>
                                     <th>{{ __('Transport Group') }}</th>
                                     <th>{{ __('Members') }}</th>
-                                    <th class="tw:w-36">{{ __('Action') }}</th>
+                                    <th>{{ __('Action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
