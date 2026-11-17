@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Interfaces\ToastInterface;
 use App\Models\AlertRule;
 use App\Models\AlertTemplate;
 use App\Models\AlertTemplateMap;
@@ -9,7 +10,9 @@ use App\Models\Device;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
@@ -37,34 +40,14 @@ class AlertTemplateController extends Controller
         ]);
     }
 
-    public function show(AlertTemplate $alertTemplate): JsonResponse
+    public function create(): View
     {
-        $this->authorize('view', $alertTemplate);
+        $this->authorize('create', AlertTemplate::class);
 
-        return response()->json([
-            ...$alertTemplate->only(['id', 'name', 'template', 'title', 'title_rec']),
-            'rules' => $alertTemplate->map()->pluck('alert_rule_id'),
-            'legacy' => LegacyTemplateConverter::isLegacy($alertTemplate->template),
-        ]);
+        return view('alert-templates.create', $this->formData(new AlertTemplate));
     }
 
-    /**
-     * The alert rules a template may be attached to, with the template each one is already attached to.
-     */
-    public function alertRules(): JsonResponse
-    {
-        $this->authorize('viewAny', AlertTemplate::class);
-
-        $usedBy = AlertTemplateMap::with('template:id,name')->get()->pluck('template.name', 'alert_rule_id');
-
-        return response()->json(AlertRule::orderBy('name')->get(['id', 'name'])->map(fn (AlertRule $rule) => [
-            'id' => $rule->id,
-            'name' => $rule->name,
-            'template' => $usedBy->get($rule->id),
-        ]));
-    }
-
-    public function store(Request $request): JsonResponse
+    public function store(Request $request, ToastInterface $toast): RedirectResponse
     {
         $this->authorize('create', AlertTemplate::class);
 
@@ -74,11 +57,19 @@ class AlertTemplateController extends Controller
         ], ['name.not_in' => __('This template name is reserved!')]);
 
         $template = $this->save(new AlertTemplate, $validated);
+        $toast->success(__('Alert template :name created', ['name' => $template->name]));
 
-        return response()->json(['message' => __('Alert template :name created', ['name' => $template->name])], 201);
+        return redirect()->route('alert-templates.index');
     }
 
-    public function update(Request $request, AlertTemplate $alertTemplate): JsonResponse
+    public function edit(AlertTemplate $alertTemplate): View
+    {
+        $this->authorize('update', $alertTemplate);
+
+        return view('alert-templates.edit', $this->formData($alertTemplate));
+    }
+
+    public function update(Request $request, AlertTemplate $alertTemplate, ToastInterface $toast): RedirectResponse
     {
         $this->authorize('update', $alertTemplate);
 
@@ -90,8 +81,9 @@ class AlertTemplateController extends Controller
         ]);
 
         $this->save($alertTemplate, $validated);
+        $toast->success(__('Alert template :name updated', ['name' => $alertTemplate->name]));
 
-        return response()->json(['message' => __('Alert template :name updated', ['name' => $alertTemplate->name])]);
+        return redirect()->route('alert-templates.index');
     }
 
     public function destroy(AlertTemplate $alertTemplate): JsonResponse
@@ -124,6 +116,24 @@ class AlertTemplateController extends Controller
             'template' => $converter->convert($validated['template']),
             'title' => $converter->convert($validated['title'] ?? ''),
         ]);
+    }
+
+    /**
+     * @return array{template: AlertTemplate, isDefault: bool, isLegacy: bool, rules: Collection<int, AlertRule>, usedBy: Collection<int, string>, selectedRules: Collection<int, int>}
+     */
+    private function formData(AlertTemplate $template): array
+    {
+        return [
+            'template' => $template,
+            'isDefault' => $template->exists && $template->name === self::DEFAULT_TEMPLATE,
+            'isLegacy' => $template->exists && LegacyTemplateConverter::isLegacy($template->template),
+            'rules' => AlertRule::orderBy('name')->get(['id', 'name']),
+            // a rule may only use one template
+            'usedBy' => AlertTemplateMap::with('template:id,name')
+                ->where('alert_templates_id', '!=', $template->id ?? 0)
+                ->get()->pluck('template.name', 'alert_rule_id'),
+            'selectedRules' => $template->exists ? $template->map()->pluck('alert_rule_id') : collect(),
+        ];
     }
 
     /**

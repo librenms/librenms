@@ -386,7 +386,7 @@ Route::middleware(['auth'])->group(function (): void {
     });
 
     // dashboard
-    Route::resource('dashboard', DashboardController::class)->except(['create', 'edit']);
+    Route::resource('dashboard', DashboardController::class)->except(['show']);
     Route::post('dashboard/{dashboard}/copy', [DashboardController::class, 'copy'])->name('dashboard.copy');
     Route::post('dashboard/{dashboard}/widgets', [DashboardWidgetController::class, 'add'])->name('dashboard.widget.add');
     Route::delete('dashboard/{dashboard}/widgets', [DashboardWidgetController::class, 'clear'])->name('dashboard.widget.clear');
@@ -431,9 +431,8 @@ Route::middleware(['auth'])->group(function (): void {
         ->names('alert-transports')->parameters(['transports' => 'transport']);
     Route::resource('alert/transport-groups', AlertTransportGroupController::class)->only(['show', 'store', 'update', 'destroy'])
         ->names('alert-transport-groups')->parameters(['transport-groups' => 'alert_transport_group']);
-    Route::get('alert-templates/rules', [AlertTemplateController::class, 'alertRules'])->name('alert-templates.rules');
     Route::post('alert-templates/convert', [AlertTemplateController::class, 'convert'])->name('alert-templates.convert');
-    Route::resource('alert-templates', AlertTemplateController::class)->except(['create', 'edit'])->where(['alert_template' => '[0-9]+']);
+    Route::resource('alert-templates', AlertTemplateController::class)->except(['show'])->where(['alert_template' => '[0-9]+']);
     Route::redirect('templates', 'alert-templates');
     Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);
     Route::resource('alert-operation', AlertOperationController::class)->only(['show', 'store', 'update', 'destroy']);
