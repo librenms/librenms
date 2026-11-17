@@ -247,12 +247,27 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
                         urlParams.push('searchPhrase=' + encodeURIComponent(searchPhrase));
                     }
 
-                    const currentParams = new URLSearchParams(window.location.search);
-                    currentParams.forEach((value, key) => {
-                        if (key.startsWith("filter[")) {
-                            urlParams.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
-                        }
-                    });
+                    // Include the parameters the table sends when it loads (its bootgrid "post" option),
+                    // e.g. device_id on device tabs, the date range on outages, the inventory filters.
+                    // Without them the export ignores what the table is scoped to.
+                    var postParams = {};
+                    var bootgrid = grid.data('.rs.jquery.bootgrid');
+                    if (bootgrid && typeof bootgrid.options.post === 'function') {
+                        postParams = bootgrid.options.post() || {};
+                    }
+                    if (!$.isEmptyObject(postParams)) {
+                        urlParams.push($.param(postParams));
+                    }
+
+                    // filter bar: use the filter from the url unless the table already sends its filter
+                    if (postParams.filter === undefined) {
+                        const currentParams = new URLSearchParams(window.location.search);
+                        currentParams.forEach((value, key) => {
+                            if (key.startsWith("filter[")) {
+                                urlParams.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
+                            }
+                        });
+                    }
 
                     // Only include pagination for visible records export
                     if (exportType === 'visible') {
