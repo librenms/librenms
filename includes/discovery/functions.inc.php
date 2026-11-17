@@ -250,11 +250,11 @@ function discovery_process($os, $sensor_class, $pre_cache)
                     if ($sensor_class === 'temperature') {
                         if (is_string($snmp_value)) {
                           // Attempt to capture Celsius
-                          if (preg_match('/([0-9.-]+)(?:.*?)[cC]/', $snmp_value, $matches)) {
+                          if (preg_match('/([0-9.-]+)[^0-9]*?[cC]/', $snmp_value, $matches)) {
                             $snmp_value = (float) $matches[1];
                           }
                           // Attempt to capture Fahrenheit
-                          elseif (preg_match('/([0-9.-]+)(?:.*?)[fF]/', $snmp_value, $matches)) {
+                          elseif (preg_match('/([0-9.-]+)[^0-9]*?[fF]/', $snmp_value, $matches)) {
                             $snmp_value = (float) $matches[1];
                             $user_function = 'fahrenheit_to_celsius';
                           }
