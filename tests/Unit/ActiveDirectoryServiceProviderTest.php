@@ -33,7 +33,7 @@ class ActiveDirectoryServiceProviderTest extends TestCase
 
     public function testLegacySettingsRegisterTheDefaultConnection(): void
     {
-        (new ActiveDirectoryServiceProvider($this->app))->register();
+        new ActiveDirectoryServiceProvider($this->app)->register();
 
         $this->assertSame('active_directory', config('auth.guards.web.provider'));
         $this->assertSame('active_directory', config('ldap.default'));
@@ -51,7 +51,7 @@ class ActiveDirectoryServiceProviderTest extends TestCase
         LibrenmsConfig::set('auth_ad_url', 'invalid');
         LibrenmsConfig::set('auth_ad_debug', true);
 
-        (new ActiveDirectoryServiceProvider($this->app))->register();
+        new ActiveDirectoryServiceProvider($this->app)->register();
 
         $this->assertSame($connection, config('ldap.connections.active_directory'));
         $this->assertSame($ldap, Container::getDefaultConnection());
@@ -67,7 +67,7 @@ class ActiveDirectoryServiceProviderTest extends TestCase
         Container::addConnection(new Connection(['hosts' => ['stale.example.com']]), 'active_directory');
         LibrenmsConfig::set('auth_ad_url', 'ldap://dc1.example.com ldaps://dc2.example.com');
 
-        (new ActiveDirectoryServiceProvider($this->app))->register();
+        new ActiveDirectoryServiceProvider($this->app)->register();
 
         $this->artisan('list', ['--raw' => true])->assertExitCode(0);
         $this->assertSame('active_directory', config('auth.guards.web.provider'));
