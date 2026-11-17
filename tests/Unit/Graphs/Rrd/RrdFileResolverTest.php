@@ -4,6 +4,7 @@ namespace LibreNMS\Tests\Unit\Graphs\Rrd;
 
 use App\Data\TimeSeries\LegacyMetric;
 use App\Data\TimeSeries\MetricIdentity;
+use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Graphs\Rrd\RrdFileResolver;
 use LibreNMS\Data\Store\MetricNames;
@@ -102,6 +103,22 @@ class RrdFileResolverTest extends TestCase
         $metric = new MetricIdentity('processor', ['hostname' => 'localhost', 'type' => 'hr', 'index' => 1]);
 
         $this->assertSame('localhost/processor-hr-1.rrd', $this->rrdFiles->pathFor($metric));
+    }
+
+    public function test_port_metrics_read_the_existing_port_file(): void
+    {
+        Rrd::shouldReceive('checkRrdExists')->with($this->pathMatcher('localhost/port-id42.rrd'))->once()->andReturn(true);
+
+        $this->assertSame('localhost/port-id42.rrd', $this->rrdFiles->pathFor(new MetricIdentity('port', ['hostname' => 'localhost', 'id' => 42])));
+    }
+
+    public function test_port_metrics_find_legacy_files_when_canonical_names_are_enabled(): void
+    {
+        LibrenmsConfig::set('datastore.canonical_metrics', true);
+        Rrd::shouldReceive('checkRrdExists')->with($this->pathMatcher('localhost/port-42.rrd'))->once()->andReturn(false);
+        Rrd::shouldReceive('checkRrdExists')->with($this->pathMatcher('localhost/port-id42.rrd'))->once()->andReturn(true);
+
+        $this->assertSame('localhost/port-id42.rrd', $this->rrdFiles->pathFor(new MetricIdentity('port', ['hostname' => 'localhost', 'id' => 42])));
     }
 
     public function test_metrics_that_kept_their_file_name_have_one_path(): void

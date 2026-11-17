@@ -32,6 +32,7 @@ class MetricNames
     public function legacyOf(MetricIdentity $metric): ?LegacyMetric
     {
         return match ($metric->measurement) {
+            'port' => new LegacyMetric('ports', rrdName: ['port', 'id{id}']),
             'processor' => new LegacyMetric('processors', ['type' => 'processor_type', 'index' => 'processor_index'], ['processor', '{type}', '{index}']),
             default => null,
         };

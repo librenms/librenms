@@ -258,6 +258,12 @@ fields and inverted series, or `app/Graphs/Device/ProcessorGraph.php` for one
 series per model and stacked drawing. Their regression tests are in
 `tests/Feature/Graphs/Device`.
 
+`app/Graphs/Port/BitsGraph.php` shows a port graph with byte-to-bit conversion
+and maximum fills. It extends `PortGraph`, which checks permission to view the
+port and supplies its page context and title. Its `GraphOptions::traffic`
+uses `TrafficOptions` to add percentiles, transferred-byte totals, previous
+period comparisons, future trend lines, and port speed references.
+
 For graph types outside device graphs, extend `AbstractSeriesGraph` and
 implement `isAuthorized()` for the entities being displayed, using `canView()`
 for each entity. Users need permission to view the entity; guests may only view

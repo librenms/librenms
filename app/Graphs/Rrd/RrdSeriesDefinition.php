@@ -59,6 +59,7 @@ class RrdSeriesDefinition
         $previousValues = [];
         $stacking = false;
         $inverted = false;
+        $traffic = $this->options->traffic === null ? null : new RrdTrafficDefinition($this->options->traffic, $params);
 
         $files = [];
         foreach ($this->series as $key => $series) {
@@ -107,6 +108,9 @@ class RrdSeriesDefinition
             }
 
             array_push($drawing, ...$this->legendValues($id, $series->unit));
+            if ($traffic !== null) {
+                $traffic->addSeries($key, $id, $filename, $series, $drawScale);
+            }
         }
 
         if ($previousValues) {
@@ -119,7 +123,7 @@ class RrdSeriesDefinition
         }
 
         // fills go below all lines, so they do not hide lines of other series
-        return [$this->legendHeader(), ...$defs, ...$maxFills, ...$fills, ...$drawing];
+        return [$this->legendHeader(), ...$defs, ...($traffic?->definitions() ?? []), ...$maxFills, ...$fills, ...$drawing, ...($traffic?->drawing() ?? [])];
     }
 
     /**
@@ -199,6 +203,10 @@ class RrdSeriesDefinition
             $width = $columnWidth;
         }
 
+        if ($this->options->traffic !== null) {
+            $header .= str_pad($this->options->traffic->percentile . 'th %', $columnWidth, ' ', STR_PAD_LEFT);
+        }
+
         return "COMMENT:$header\\l";
     }
 
@@ -214,6 +222,10 @@ class RrdSeriesDefinition
 
         foreach (self::LEGEND_COLUMNS as $column) {
             $values[] = "GPRINT:$id{$column['suffix']}:{$column['cf']}:%5." . self::PRECISION . "lf%s$unit";
+        }
+
+        if ($this->options->traffic !== null) {
+            $values[] = "GPRINT:{$id}pct:%5." . self::PRECISION . "lf%s$unit";
         }
 
         $values[array_key_last($values)] .= '\\n';
