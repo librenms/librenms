@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP)
 -- *****************************************************************
 -- UBQS-MPLS-PW-MIB : Ubiquoss Pseudowire MIB
 --   
@@ -650,14 +651,7 @@ ubiPwMIBGroups  	 	OBJECT IDENTIFIER		::= { ubiPwMIBConformance 2 }
      	::= { ubiPwMIBCompliances 1 }
 
 
-	ubiPwMIBGroup OBJECT-GROUP
-    	OBJECTS         {     
-    	}   
-    	STATUS          current
-    	DESCRIPTION
-        	"A collection of objects containing
-        	information about the pseudowire information."
-    	::= { ubiPwMIBGroups 1 }
+	ubiPwMIBGroup OBJECT IDENTIFIER ::= { ubiPwMIBGroups 1 }
     	                               
     	                               
 END

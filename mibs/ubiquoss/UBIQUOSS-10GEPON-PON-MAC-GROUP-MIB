@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (dashes in comment lines; trailing comma before })
 -- *****************************************************************
 -- UBIQUOSS-10GEPON-PON-MAC-GROUP-MIB.my
 --
@@ -623,7 +624,7 @@
 				dot3MpcpRxReport
 					Counter32,
 				dot3MpcpTxGate
-					Counter32,
+					Counter32
 --				dot3MpcpRxGate
 --					Counter32,
 --				dot3MpcpTxRegister
@@ -764,14 +765,14 @@
 --				"Description."
 --			::= { ubiPonMacMIBObjects 5 }
 --		
---		-- 1.3.6.1.4.1.7800.500.5.1
+--		   1.3.6.1.4.1.7800.500.5.1
 --		onuVlanTagEntry OBJECT-TYPE
 --			SYNTAX OnuVlanTagEntry
 --			MAX-ACCESS not-accessible
 --			STATUS current
 --			DESCRIPTION
 --				"Description."
---			INDEX { ubiPortIndex }   				-- TODO  
+--			INDEX { ubiPortIndex }   				   TODO  
 --			::= { onuVlanTagTable 1 }
 --		
 --		OnuVlanTagEntry ::=
@@ -837,7 +838,7 @@
 --				"delete : onuNetworkVlanId value == 0
 --				add : onuNetworkVlanId > 0
 --				"
---			INDEX { ubiPortIndex }          -- TODO
+--			INDEX { ubiPortIndex }             TODO
 --			::= { onuPriorityVlanTable 1 }
 --		
 --		OnuPriorityVlanEntry ::=
@@ -929,7 +930,7 @@
 --			STATUS current
 --			DESCRIPTION
 --				"Description."
---			INDEX { ubiPortIndex }            -- TODO 
+--			INDEX { ubiPortIndex }               TODO 
 --			::= { igmpVlanTable 1 }
 --		
 --		IgmpVlanEntry ::=
@@ -963,7 +964,7 @@
 --			STATUS current
 --			DESCRIPTION
 --				"Description."
---			INDEX { ubiPortIndex }         -- TODO
+--			INDEX { ubiPortIndex }            TODO
 --			::= { igmpVlanProvTable 1 }
 --		
 --		IgmpVlanProvEntry ::=
@@ -1048,7 +1049,7 @@
 --			STATUS current
 --			DESCRIPTION
 --				"Description."
---			INDEX { ubiPortIndex }  				-- TODO
+--			INDEX { ubiPortIndex }  				   TODO
 --			::= { igmpChanTable 1 }
 --		
 --		IgmpChanEntry ::=
@@ -1390,7 +1391,7 @@
 --			STATUS current
 --			DESCRIPTION
 --				"Description."
---			INDEX { ubiPortIndex }   		-- TODO
+--			INDEX { ubiPortIndex }   		   TODO
 --			::= { onuIpToSnmpIndexTable 1 }
 --		
 --		OnuIpToSnmpIndexEntry ::=
@@ -1561,18 +1562,18 @@
 --		DayRegisteredOnuEntry ::=
 --			SEQUENCE { 
 ---				dayRegisteredOnuId
-----					Integer32,
+--  					Integer32,
 --				dayRegisteredMacAddr
 --					DisplayString
 --			 }
 
-----		dayRegisteredOnuId OBJECT-TYPE
-----			SYNTAX Integer32 (1..32)
-----			MAX-ACCESS not-accessible
-----			STATUS current
-----			DESCRIPTION
-----				"Description."
-----			::= { dayRegisteredOnuEntry 1 }     
+--  		dayRegisteredOnuId OBJECT-TYPE
+--  			SYNTAX Integer32 (1..32)
+--  			MAX-ACCESS not-accessible
+--  			STATUS current
+--  			DESCRIPTION
+--  				"Description."
+--  			::= { dayRegisteredOnuEntry 1 }     
 --			
 --		dayRegisteredMacAddr OBJECT-TYPE
 --			SYNTAX DisplayString
@@ -1809,7 +1810,7 @@
 				tx10gLaserBias
 					DisplayString,
 				tx10gTemperature
-					DisplayString,
+					DisplayString
 			 }
 			              
 		rx10gLaserPower OBJECT-TYPE

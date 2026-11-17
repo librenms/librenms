@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (lowercase type name; missing import)
 --------------------------------------------------------------------
 -- NMS-CHASSIS
 -- Jun 2000
@@ -13,7 +14,9 @@
                     DisplayString
 			FROM RFC1213-MIB
 		    nmstemporary
-			FROM NMS-SMI;
+			FROM NMS-SMI
+    Gauge32
+        FROM SNMPv2-SMI;
           
                nmschassis             OBJECT IDENTIFIER ::= { nmstemporary 6 }
 
@@ -563,7 +566,7 @@
                     ::= { nmschassis 14 }
 
                 nmsAuxTable OBJECT-TYPE
-                    SYNTAX		SEQUENCE OF nmsAuxEntry
+                    SYNTAX		SEQUENCE OF NmsAuxEntry
                     MAX-ACCESS	not-accessible
                     STATUS		current
                     DESCRIPTION
@@ -571,7 +574,7 @@
                     ::= { nmschassis 15 }
 
                 nmsAuxEntry               OBJECT-TYPE
-                    SYNTAX		nmsAuxEntry 
+                    SYNTAX		NmsAuxEntry 
                     MAX-ACCESS	not-accessible
                     STATUS		current
                     DESCRIPTION
@@ -579,7 +582,7 @@
                     INDEX	{ nmsAuxIndex }
                     ::= { nmsAuxTable 1 }
 
-                nmsAuxEntry ::=
+                NmsAuxEntry ::=
                     SEQUENCE {
                         nmsAuxIndex   Gauge32,
                         nmsAuxClass   INTEGER,
@@ -629,7 +632,7 @@
                     ::= {  nmsAuxEntry 5}        
 
      nmssubcardTable OBJECT-TYPE
-                   SYNTAX  SEQUENCE OF nmssubcardTableEntry
+                   SYNTAX  SEQUENCE OF NmssubcardTableEntry
                    ACCESS  not-accessible
                    STATUS  mandatory
                    DESCRIPTION
@@ -637,7 +640,7 @@
                    ::= { nmschassis 16 }
 
                nmssubcardTableEntry OBJECT-TYPE
-                   SYNTAX nmssubcardTableEntry
+                   SYNTAX NmssubcardTableEntry
                    ACCESS  not-accessible
                    STATUS  mandatory
                    DESCRIPTION
@@ -645,7 +648,7 @@
                    INDEX { nmssubcardIndex }
                ::= { nmssubcardTable 1 }
 
-               nmssubcardTableEntry ::=
+               NmssubcardTableEntry ::=
                    SEQUENCE {
                        nmssubcardIndex
                            INTEGER,

@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing commas)
 -- ZyXEL Communications Corporation
 -- Private Enterprise MIB definition 
   
@@ -445,9 +446,9 @@ ZYXEL-HW-MONITOR-MIB DEFINITIONS ::= BEGIN
         ZyxelHwMonitorEtherPortEntry ::=
            SEQUENCE {
             zyHwMonitorEtherPortIndex         INTEGER,
-            zyHwMonitorEtherPortLinkStatus    INTEGER
-            zyHwMonitorEtherPortLinkSpeed     INTEGER
-            zyHwMonitorEtherPortDuplexMode    INTEGER
+            zyHwMonitorEtherPortLinkStatus    INTEGER,
+            zyHwMonitorEtherPortLinkSpeed     INTEGER,
+            zyHwMonitorEtherPortDuplexMode    INTEGER,
             zyHwMonitorEtherPortLinkUpTime    INTEGER
            }
 

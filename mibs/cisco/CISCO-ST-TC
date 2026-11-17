@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (quote in DESCRIPTION)
 -- *********************************************************************
 -- CISCO-ST-TC.my: Storage TC Mib
 --   
@@ -362,7 +363,7 @@ FcIfSpeed ::= TEXTUAL-CONVENTION
           thirtyTwoG  (12) - 32GBit.
           autoMaxThirtyTwoG (13) - Negotiate to determine the
                              speed automatically upto a
-                             maximum of 32Gbit."
+                             maximum of 32Gbit.
           fiftyG      (14) - 50GBit.
           sixtyFourG  (15) - 64GBit.
           autoMaxSixtyFourG (16) - Negotiate to determine the

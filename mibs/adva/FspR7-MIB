@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (enum list repeated)
 FspR7-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -6859,11 +6860,6 @@ FspR7TestMode ::= TEXTUAL-CONVENTION
                   testModePRBS23Inv(3),  --Pseudo Random Bit Sequence with 23 bit inverted
                   testModePRBS31(4),  --Pseudo Random Bit Sequence with 31 bit
                   testModePRBS31Inv(5)  --Pseudo Random Bit Sequence with 31 bit inverted
-                  testModeRls(1),
-                  testModePRBS23(2),  --Pseudo Random Bit Sequence with 23 bit
-                  testModePRBS23Inv(3),  --Pseudo Random Bit Sequence with 23 bit inverted
-                  testModePRBS31(4),  --Pseudo Random Bit Sequence with 31 bit
-                  testModePRBS31Inv(5)  --Pseudo Random Bit Sequence with 31 bit inverted
                 }
 
 FspR7TestModeCaps ::= TEXTUAL-CONVENTION
@@ -6873,11 +6869,6 @@ FspR7TestModeCaps ::= TEXTUAL-CONVENTION
   SYNTAX        BITS
                 {
                   capUndefined(0),
-                  capTestModeRls(1),
-                  capTestModePRBS23(2),
-                  capTestModePRBS23Inv(3),
-                  capTestModePRBS31(4),
-                  capTestModePRBS31Inv(5)
                   capTestModeRls(1),
                   capTestModePRBS23(2),
                   capTestModePRBS23Inv(3),

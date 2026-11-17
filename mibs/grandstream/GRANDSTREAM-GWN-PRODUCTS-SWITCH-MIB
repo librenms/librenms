@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (TEXTUAL-CONVENTION name must start uppercase; trailing comma before })
 -- Copyright 2021 Grandstream Networks, Inc. All Rights Reserved.
 
 GRANDSTREAM-GWN-PRODUCTS-SWITCH-MIB DEFINITIONS ::= BEGIN
@@ -412,7 +413,7 @@ errDisableIfStatusEntry OBJECT-TYPE
     ::= { errDisableIfStatusTable 1 }
 
 errDisableIfStatusEntry ::= SEQUENCE {
-        errDisableIfStatusCause        ErrDisableFeatureID,
+        errDisableIfStatusCause        ErrDisableFeatureID
 }
 
 errDisableIfStatusCause OBJECT-TYPE
@@ -546,7 +547,7 @@ psIfConfigEntry OBJECT-TYPE
 
 psIfConfigEntry ::=
     SEQUENCE {
-        psIfSecureLastMacAddress       MacAddress,
+        psIfSecureLastMacAddress       MacAddress
     }
 
 psIfSecureLastMacAddress OBJECT-TYPE
@@ -770,7 +771,7 @@ cfgEventNotification NOTIFICATION-TYPE
 
 -- Textual Conventions
 
-poePortEventType ::= TEXTUAL-CONVENTION
+PoePortEventType ::= TEXTUAL-CONVENTION
     STATUS          current
     DESCRIPTION
             "Indicates the type of the event that causes the status of the POE port to change.
@@ -822,11 +823,11 @@ poeExtPortEventEntry OBJECT-TYPE
 
 poeExtPortEventEntry ::=
     SEQUENCE {
-        poeExtPortEventType       poePortEventType,
+        poeExtPortEventType       PoePortEventType
     }
 
 poeExtPortEventType OBJECT-TYPE
-     SYNTAX          poePortEventType
+     SYNTAX          PoePortEventType
      MAX-ACCESS      not-accessible
      STATUS          current
      DESCRIPTION

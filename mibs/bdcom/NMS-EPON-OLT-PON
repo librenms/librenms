@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (SEQUENCE member case)
 -- *****************************************************************
 -- NMS-EPON-OLT-PON.MIB:  NMS OLT-COMM MIB file
 -- AUG 2009
@@ -79,7 +80,7 @@
                            DisplayString,
                        fiberProtectHandInHand
                            INTEGER,
-                       FiberProtectGroup
+                       fiberProtectGroup
                            INTEGER,
                        splittingRatio
                            INTEGER,

@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP; trailing comma before })
 -- *****************************************************************
 -- UBIQUOSS-EPON-QOS-PROFILE-GROUP-MIB.my
 --
@@ -2317,7 +2318,7 @@
 		onuPonBridgeType OBJECT-TYPE
 			SYNTAX INTEGER
 				{
-				simpleBridged(0),
+				simpleBridged(0)
 				--sharedVlan(3),
 				--transparentVlan(4),
 				--prioritySharedVlan(11),
@@ -3806,23 +3807,9 @@
        ::= { ubiPonProfileMIBCompliances 1 }
 	                            
 -- compliance statements
-   	ubiPonProfileMIBGroup  OBJECT-GROUP
-		OBJECTS {     
-			-- TODO 
-               }
-        STATUS  current
-        DESCRIPTION
-                "ubiquoss qos profile information MIB"
-        ::= { ubiPonProfileMIBGroups 1 }
+   	ubiPonProfileMIBGroup  OBJECT IDENTIFIER ::= { ubiPonProfileMIBGroups 1 }
      
-     ubiPonProfileMIBNotificationGroup    OBJECT-GROUP
-      	OBJECTS {     
-			-- TODO 
-               }
-        STATUS  current
-        DESCRIPTION
-                "ubiquoss qos profile information Notifications"
-        ::= { ubiPonProfileMIBGroups 2 }
+     ubiPonProfileMIBNotificationGroup    OBJECT IDENTIFIER ::= { ubiPonProfileMIBGroups 2 }
 	
 	END
 

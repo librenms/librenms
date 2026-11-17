@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (invalid range (WAN7 | WAN8))
     ARRIS-D5-SLOT-EXT-MIB DEFINITIONS ::= BEGIN
         
         IMPORTS
@@ -47,7 +48,7 @@
             STATUS    current
             DESCRIPTION
                 "Wan card selection for slot assignment."
-            SYNTAX    Unsigned32 (WAN7 | WAN8)
+            SYNTAX    Unsigned32 (7..8)
 
 -- Slot Assignment
 -- Provides mechanisms to assign slots to wan cards
