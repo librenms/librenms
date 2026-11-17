@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (snSwitch now lives in FOUNDRY-SN-SWITCH-GROUP-MIB)
 FOUNDRY-LAG-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -8,7 +9,7 @@ IMPORTS
     DisplayString, RowStatus, MacAddress
       FROM SNMPv2-TC			-- [RFC2579]
     snSwitch
-      FROM FOUNDRY-SN-ROOT-MIB
+      FROM FOUNDRY-SN-SWITCH-GROUP-MIB
     PhysAddress
       FROM FOUNDRY-SN-SWITCH-GROUP-MIB;
 
