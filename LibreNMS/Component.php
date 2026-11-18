@@ -217,14 +217,20 @@ class Component
         return \App\Models\Component::destroy($id);
     }
 
-    public function setComponentPrefs($device_id, $updated)
+    /**
+     * @param  int  $device_id
+     * @param  array  $updated  component arrays keyed by component id
+     * @param  string[]  $unlogged  attributes whose value changes are not written to the eventlog,
+     *                              for example counters that change on every poll
+     */
+    public function setComponentPrefs($device_id, $updated, array $unlogged = [])
     {
         $updated = Arr::wrap($updated);
         \App\Models\Component::where('device_id', $device_id)
             ->whereIntegerInRaw('id', array_keys($updated))
             ->with('prefs')
             ->get()
-            ->each(function (\App\Models\Component $component) use ($device_id, $updated): void {
+            ->each(function (\App\Models\Component $component) use ($device_id, $updated, $unlogged): void {
                 $update = $updated[$component->id];
                 unset($update['type'], $update['device_id']);  // can't change type or device
 
@@ -256,7 +262,9 @@ class Component
                         $invalid->forget($existing->id);
                         $existing->fill(['value' => $value]);
                         if ($existing->isDirty()) {
-                            Eventlog::log("Component: $component->type($component->id). Attribute: $attribute, was modified from: " . $existing->getOriginal('value') . ", to: $value", $device_id, 'component', Severity::Notice, $component->id);
+                            if (! in_array($attribute, $unlogged, true)) {
+                                Eventlog::log("Component: $component->type($component->id). Attribute: $attribute, was modified from: " . $existing->getOriginal('value') . ", to: $value", $device_id, 'component', Severity::Notice, $component->id);
+                            }
                             $existing->save();
                         }
                     } else {

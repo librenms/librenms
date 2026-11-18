@@ -28,6 +28,7 @@ namespace LibreNMS\Tests\Feature;
 
 use App\Models\ComponentPref;
 use App\Models\ComponentStatusLog;
+use App\Models\Eventlog;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Str;
 use LibreNMS\Component;
@@ -151,6 +152,27 @@ final class ComponentTest extends DBTestCase
         $remove = $this->buildExpected($base)[$base->device_id];
         $component->setComponentPrefs($base->device_id, $remove);
         $this->assertFalse(ComponentPref::where('component', $base->id)->exists());
+    }
+
+    public function testSetComponentPrefsUnlogged(): void
+    {
+        $base = \App\Models\Component::factory()->create(); /** @var \App\Models\Component $base */
+        $component = new Component();
+
+        $prefs = $this->buildExpected($base)[$base->device_id];
+        $prefs[$base->id]['counter'] = 1;
+        $prefs[$base->id]['state'] = 'up';
+        $component->setComponentPrefs($base->device_id, $prefs, ['counter']);
+
+        $prefs[$base->id]['counter'] = 2;
+        $prefs[$base->id]['state'] = 'down';
+        $component->setComponentPrefs($base->device_id, $prefs, ['counter']);
+
+        // The unlogged attribute is still saved, only its change is not logged
+        $this->assertEquals(2, ComponentPref::where(['component' => $base->id, 'attribute' => 'counter'])->value('value'));
+        $messages = Eventlog::where('reference', $base->id)->pluck('message');
+        $this->assertContains("Component: $base->type($base->id). Attribute: state, was modified from: up, to: down", $messages);
+        $this->assertEmpty($messages->filter(fn ($message) => str_contains($message, 'Attribute: counter, was modified')));
     }
 
     public function testCreateComponent(): void

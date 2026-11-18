@@ -149,8 +149,16 @@ if (! empty($components) && is_array($components)) {
 
     /*
      * Update DB Components
+     * The counters change on almost every poll and are graphed already, so don't log their changes
      */
-    $component->setComponentPrefs($device['device_id'], $components);
+    $component->setComponentPrefs($device['device_id'], $components, [
+        'utilization',
+        'packets',
+        'throughput',
+        'average_packet',
+        'memory_used',
+        'memory_free',
+    ]);
 }
 
 unset($component, $components);
