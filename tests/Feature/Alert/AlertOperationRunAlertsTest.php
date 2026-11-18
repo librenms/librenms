@@ -32,18 +32,21 @@ use App\Models\AlertFault;
 use App\Models\AlertLog;
 use App\Models\AlertOperation;
 use App\Models\AlertRule;
+use App\Models\AlertSchedule;
 use App\Models\AlertTransport;
 use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Processor;
 use App\Models\Port;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alert\RunAlerts;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -1095,6 +1098,154 @@ final class AlertOperationRunAlertsTest extends TestCase
         );
     }
 
+    public function testOneStepOperationFiresOnceAfterMuteWindowWhenNeverNotified(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'to' => 1, 'start' => 0, 'dur' => 3600],
+        ]);
+
+        $schedule = $this->startMaintenance($context['device'], MaintenanceBehavior::MuteAlerts);
+
+        $captured = $this->runAlertsCapturing(3);
+        $this->assertCount(0, $captured, 'No alert should fire while the device is in a mute alerts maintenance window');
+
+        $segmentId = $context['segments'][0]['segment']->id;
+        $details = $this->latestAlertLogDetails($context['rule']->id);
+        $this->assertSame(1, (int) ($details['op_seg'][(string) $segmentId]['fires'] ?? 0), 'The step timeline keeps running through the window');
+
+        $this->endMaintenance($schedule);
+
+        $captured = $this->runAlertsCapturing(1);
+        $this->assertCount(1, $captured, 'A step missed during the window must fire once when the window ends if nothing was ever sent');
+        $this->assertSame(['api'], array_map(static fn ($t) => $t['transport_type'], $captured[0]));
+
+        $captured = $this->runAlertsCapturing(2);
+        $this->assertCount(0, $captured, 'The catch-up must only fire once');
+    }
+
+    public function testOneStepOperationFiresOnceAfterSkipWindowWhenNeverNotified(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'to' => 1, 'start' => 0, 'dur' => 3600],
+        ]);
+
+        $schedule = $this->startMaintenance($context['device'], MaintenanceBehavior::SkipAlerts);
+
+        $captured = $this->runAlertsCapturing(3);
+        $this->assertCount(0, $captured, 'No alert should fire while the device is in a skip alerts maintenance window');
+
+        $this->endMaintenance($schedule);
+
+        $captured = $this->runAlertsCapturing(2);
+        $this->assertCount(1, $captured, 'A step missed during the window must fire once when the window ends if nothing was ever sent');
+    }
+
+    public function testNoCatchUpAfterWindowWhenAlreadyNotified(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'from' => 1, 'to' => 2, 'start' => 0, 'dur' => 300],
+        ]);
+
+        $captured = $this->runAlertsCapturing(1);
+        $this->assertCount(1, $captured, 'First step fires before the window');
+
+        $schedule = $this->startMaintenance($context['device'], MaintenanceBehavior::MuteAlerts);
+        $this->expireProblemSegmentTimers($context['rule']->id);
+
+        $captured = $this->runAlertsCapturing(2);
+        $this->assertCount(0, $captured, 'Second step lands in the window and is not sent');
+
+        $this->endMaintenance($schedule);
+
+        $captured = $this->runAlertsCapturing(2);
+        $this->assertCount(0, $captured, 'Nothing is caught up when the alert was already notified before the window');
+    }
+
+    public function testMissedStepIsSentWithStepDueRightAfterWindow(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'to' => 1, 'start' => 0, 'dur' => 3600],
+            ['type' => 'mail', 'to' => 1, 'start' => 600, 'dur' => 3600],
+        ]);
+
+        $schedule = $this->startMaintenance($context['device'], MaintenanceBehavior::MuteAlerts);
+
+        $captured = $this->runAlertsCapturing(2);
+        $this->assertCount(0, $captured);
+
+        $this->endMaintenance($schedule);
+
+        $log = AlertLog::query()->where('rule_id', $context['rule']->id)->orderByDesc('id')->first();
+        $details = $log->details;
+        $details['op_anchor'] = time() - 700;
+        $log->details = $details;
+        $log->save();
+
+        $captured = $this->runAlertsCapturing(1);
+        $this->assertCount(1, $captured);
+        $types = array_map(static fn ($t) => $t['transport_type'], $captured[0]);
+        sort($types);
+        $this->assertSame(['api', 'mail'], $types, 'The missed step goes out together with the step that is due after the window');
+    }
+
+    public function testCatchUpWaitsWhileRuleIsMuted(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'to' => 1, 'start' => 0, 'dur' => 3600],
+        ]);
+
+        $schedule = $this->startMaintenance($context['device'], MaintenanceBehavior::MuteAlerts);
+        $this->runAlertsCapturing(2);
+        $this->endMaintenance($schedule);
+
+        $context['rule']->update(['extra' => ['mute' => true]]);
+        $captured = $this->runAlertsCapturing(1);
+        $this->assertCount(0, $captured, 'Nothing is sent while the rule is muted');
+
+        $context['rule']->update(['extra' => ['mute' => false]]);
+        $captured = $this->runAlertsCapturing(1);
+        $this->assertCount(1, $captured, 'The catch-up is not used up by a muted rule');
+    }
+
+    public function testNoCatchUpFromPreviousOperationAfterRuleIsReassigned(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'to' => 1, 'start' => 0, 'dur' => 3600],
+        ]);
+
+        $schedule = $this->startMaintenance($context['device'], MaintenanceBehavior::MuteAlerts);
+
+        $captured = $this->runAlertsCapturing(2);
+        $this->assertCount(0, $captured);
+
+        $replacement = $this->makeActiveAlert([
+            ['type' => 'mail', 'to' => 1, 'start' => 3600, 'dur' => 3600],
+        ], seedAlert: false);
+        $context['rule']->update(['alert_operation_id' => $replacement['operation']->id]);
+
+        $this->endMaintenance($schedule);
+
+        $captured = $this->runAlertsCapturing(1);
+        $this->assertCount(0, $captured, 'Steps missed under the previous operation must not be caught up after the rule is reassigned');
+    }
+
+    public function testNoCatchUpWhenNoStepWasDueDuringWindow(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'to' => 1, 'start' => 300, 'dur' => 3600],
+        ]);
+
+        $schedule = $this->startMaintenance($context['device'], MaintenanceBehavior::MuteAlerts);
+
+        $captured = $this->runAlertsCapturing(2);
+        $this->assertCount(0, $captured);
+
+        $this->endMaintenance($schedule);
+
+        $captured = $this->runAlertsCapturing(1);
+        $this->assertCount(0, $captured, 'The start delay still applies when no step was missed during the window');
+    }
+
     public function testGroupedRuleSendsRecoveryWhenFaultRecoversBeforeDispatcherReachesAlert(): void
     {
         $context = $this->makeActiveAlert([
@@ -1274,6 +1425,26 @@ final class AlertOperationRunAlertsTest extends TestCase
         }
 
         return $captured;
+    }
+
+    private function startMaintenance(Device $device, MaintenanceBehavior $behavior): AlertSchedule
+    {
+        $schedule = AlertSchedule::factory()->create([
+            'start' => Carbon::now()->subHour(),
+            'end' => Carbon::now()->addHour(),
+            'behavior' => $behavior,
+        ]);
+        $schedule->devices()->attach($device);
+        $this->app->forgetScopedInstances();
+
+        return $schedule;
+    }
+
+    private function endMaintenance(AlertSchedule $schedule): void
+    {
+        $schedule->end = Carbon::now()->subMinute();
+        $schedule->save();
+        $this->app->forgetScopedInstances();
     }
 
     /**
