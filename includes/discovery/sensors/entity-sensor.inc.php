@@ -39,6 +39,20 @@ if (! empty($entity_array)) {
 }
 $progress->end();
 
+// Use the physical inventory already stored by entity discovery; no extra SNMP walks.
+$aristaOpticalEntities = [];
+$aristaOpticalPorts = [];
+if ($device['os'] === 'arista_eos') {
+    $physicalInventory = \App\Models\EntPhysical::where('device_id', $device['device_id'])
+        ->get(['entPhysicalIndex', 'entPhysicalContainedIn', 'entPhysicalParentRelPos', 'entPhysicalClass', 'entPhysicalName', 'entPhysicalDescr']);
+    if ($physicalInventory->count() === $physicalInventory->pluck('entPhysicalIndex')->unique()->count()) {
+        $aristaOpticalEntities = $physicalInventory->keyBy('entPhysicalIndex')
+            ->map(fn ($entity) => $entity->getAttributes())->all();
+        $aristaOpticalPorts = \App\Models\Port::where('device_id', $device['device_id'])->where('deleted', 0)
+            ->get(['ifName', 'ifIndex', 'ifSpeed'])->map(fn ($port) => $port->getAttributes())->all();
+    }
+}
+
 if (! empty($entity_oids)) {
     $entitysensor = [
         'voltsDC' => 'voltage',
@@ -242,6 +256,9 @@ if (! empty($entity_oids)) {
                         $descr = Str::replaceLast('temp sensor', '', $descr);
                     }
                     // End grouping sensors
+                    if ($type === 'dbm') {
+                        $descr = \LibreNMS\Util\AristaOpticalLabel::rewrite((string) $descr, (int) $index, $aristaOpticalEntities, $aristaOpticalPorts);
+                    }
                 }
                 $descr = trim((string) $descr);
                 discover_sensor(null, $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'] ?? null, null, $group);
@@ -249,6 +266,8 @@ if (! empty($entity_oids)) {
         }//end if
     }//end foreach
     unset(
-        $entity_array
+        $entity_array,
+        $aristaOpticalEntities,
+        $aristaOpticalPorts
     );
 }//end if
