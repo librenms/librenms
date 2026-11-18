@@ -498,7 +498,7 @@
                     "entPhysicalIndex": "1000000030",
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": null,
+                    "user_func": "LibreNMS\\OS\\Routeros::pollLteState",
                     "rrd_type": "GAUGE",
                     "state_name": "mtxrLTEModemRAT"
                 },
@@ -524,7 +524,7 @@
                     "entPhysicalIndex": "1000000031",
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": null,
+                    "user_func": "LibreNMS\\OS\\Routeros::pollLteState",
                     "rrd_type": "GAUGE",
                     "state_name": "mtxrLTEModemUICC"
                 }

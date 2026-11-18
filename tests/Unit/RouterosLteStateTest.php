@@ -14,6 +14,18 @@ class RouterosLteStateTest extends TestCase
         $this->assertSame($expected, Routeros::normalizeLteState($column, $value));
     }
 
+    public function testPollLteState(): void
+    {
+        $registration = ['sensor_type' => 'mtxrLTEModemRegStatus', 'sensor_current' => 1];
+        $this->assertSame(3, Routeros::pollLteState(0, 'not registered, searching', $registration));
+        $this->assertSame(2, Routeros::pollLteState(2, '2', $registration), 'already translated by state description');
+        $this->assertSame(1, Routeros::pollLteState(0, '', $registration), 'missing oid keeps the previous state');
+
+        $sim = ['sensor_type' => 'mtxrLTEModemUICC', 'sensor_current' => 1];
+        $this->assertSame(1, Routeros::pollLteState(8.931e18, '8931000000000000000', $sim), 'a numeric ICCID is not a state');
+        $this->assertSame(0, Routeros::pollLteState(0, '', $sim), 'an empty ICCID is a missing SIM');
+    }
+
     public function testLteEntityIndexFitsTheInventoryColumn(): void
     {
         $this->assertSame(1000000030, Routeros::lteEntityIndex(3));
