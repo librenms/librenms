@@ -124,9 +124,33 @@ final class AlertRulesPageTest extends TestCase
             Alert::factory()->create(['state' => $state]);
         }
 
+        $mixed = AlertRule::factory()->create();
+        Alert::factory()->for($mixed, 'rule')->acknowledged()->create();
+        Alert::factory()->for($mixed, 'rule')->create(['state' => AlertState::CHANGED]);
+
         $response = $this->actingAs($this->admin())->get(route('alert-rules.index'))->assertOk();
-        $this->assertSame(5, substr_count((string) $response->getContent(), 'Some devices matching this rule are alerting'));
+        $this->assertSame(6, substr_count((string) $response->getContent(), 'Some devices matching this rule are alerting'));
+        $this->assertSame(2, substr_count((string) $response->getContent(), 'Some alerts for this rule are acknowledged'));
         $this->assertSame(1, substr_count((string) $response->getContent(), 'All devices matching this rule are OK'));
+    }
+
+    public function testListingStatusOnlyUsesAccessibleAlerts(): void
+    {
+        $user = User::factory()->create(['enabled' => 1])->assignRole('user');
+        $accessible = Device::factory()->create();
+        $inaccessible = Device::factory()->create();
+        $user->devicesOwned()->attach($accessible);
+        $rule = AlertRule::factory()->create(['name' => 'Shared rule']);
+        $rule->devices()->attach([$accessible->device_id, $inaccessible->device_id]);
+        Alert::factory()->for($rule, 'rule')->for($accessible, 'device')->clear()->create();
+        Alert::factory()->for($rule, 'rule')->for($inaccessible, 'device')->acknowledged()->create();
+
+        $this->actingAs($user)->get(route('alert-rules.index'))
+            ->assertOk()
+            ->assertSee('Shared rule')
+            ->assertSee('No accessible devices matching this rule are alerting')
+            ->assertDontSee('Some devices matching this rule are alerting')
+            ->assertDontSee('Some alerts for this rule are acknowledged');
     }
 
     public function testSqlOverrideCanBeSavedAndCopiedWithoutBuilderRules(): void

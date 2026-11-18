@@ -70,25 +70,37 @@ class AlertRuleController extends Controller
         $perPage = (int) $request->input('per_page');
         $perPage = in_array($perPage, self::PER_PAGE) ? $perPage : 50;
 
-        $visibleRules = AlertRule::hasAccess($request->user());
+        $user = $request->user();
+        $visibleRules = AlertRule::hasAccess($user);
         $canCreate = Gate::allows('create', AlertRule::class);
-        $rules = AlertRule::hasAccess($request->user())
+        $rules = AlertRule::hasAccess($user)
             ->when($device, fn ($query) => $query->forDevice($device))
             ->with(['devices', 'groups', 'locations', 'alertOperation.segments.transportSingles', 'alertOperation.segments.transportGroups'])
             ->orderBy('name')
             ->paginate($perPage)
             ->withQueryString();
 
+        $canViewAlerts = $user->can('viewAny', Alert::class);
+        $statuses = $canViewAlerts ? Alert::hasAccess($user)
+            ->whereIntegerInRaw('rule_id', $rules->pluck('id'))
+            ->select('rule_id')
+            ->selectRaw('MAX(CASE WHEN state IN (?, ?, ?, ?, ?) THEN 1 ELSE 0 END) AS alerting', [
+                AlertState::ACTIVE, AlertState::ACKNOWLEDGED, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED,
+            ])
+            ->selectRaw('MAX(CASE WHEN state = ? THEN 1 ELSE 0 END) AS acknowledged', [AlertState::ACKNOWLEDGED])
+            ->groupBy('rule_id')
+            ->toBase()->get()->keyBy('rule_id') : collect();
+
         return view('alert-rules.index', [
             'device' => $device,
             'rules' => $rules,
             'perPage' => $perPage,
             'perPageOptions' => self::PER_PAGE,
-            // the most severe alert state of each rule
-            'states' => Alert::whereIn('rule_id', $rules->pluck('id'))
-                ->groupBy('rule_id')
-                ->selectRaw('rule_id, max(state) as state')
-                ->pluck('state', 'rule_id'),
+            'statuses' => $statuses,
+            'canViewAlerts' => $canViewAlerts,
+            'clearStatusTitle' => $user->can('viewAll', Alert::class) || $user->can('viewAll', Device::class)
+                ? __('All devices matching this rule are OK')
+                : __('No accessible devices matching this rule are alerting'),
             'collection' => $canCreate ? resolve(AlertRuleTemplateController::class)->templatesCollection() : [],
             'copyableRules' => $canCreate ? $visibleRules->orderBy('name')->get() : collect(),
             'offerDefaults' => ! $device && $canCreate && $rules->total() === 0 && ! AlertRule::exists(),

@@ -30,7 +30,7 @@ trait AlertFilters
      * @param  int|null  $deviceId  page is limited to this device, leave out the device, location and group filters
      * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: array<string, string>, search?: bool}>
      */
-    protected static function alertFilterFields(?int $deviceId = null): array
+    protected static function alertFilterFields(string $ruleSource, ?int $deviceId = null): array
     {
         $user = auth()->user();
 
@@ -57,7 +57,7 @@ trait AlertFilters
                 'key' => 'rule_id',
                 'label' => __('Rule'),
                 'type' => 'select',
-                'endpoint' => route('ajax.select.alert-rule'),
+                'endpoint' => route('ajax.select.alert-rule', ['source' => $ruleSource, 'device' => $deviceId]),
             ],
         ];
 

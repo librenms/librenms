@@ -27,6 +27,7 @@
 namespace App\Http\ViewComposers;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Alert;
 use App\Models\AlertRule;
 use App\Models\BgpPeer;
 use App\Models\Bill;
@@ -285,15 +286,15 @@ class MenuComposer
         $vars['routing_menu'] = $routing_menu;
 
         // Alert menu
-        $alert_counts = AlertRule::selectRaw('severity, COUNT(*) as count')
+        $alert_counts = $user->can('viewAny', Alert::class) ? AlertRule::selectRaw('severity, COUNT(*) as count')
             ->isActive()
-            ->when($user->cannot('viewAll', AlertRule::class), fn ($query) => $query
+            ->when($user->cannot('viewAll', Alert::class), fn ($query) => $query
                 ->whereIn('alerts.device_id', Device::hasAccess($user)->select('devices.device_id')))
             ->leftJoin('devices', 'alerts.device_id', '=', 'devices.device_id')
             ->where('devices.disabled', '=', '0')
             ->where('devices.ignore', '=', '0')
             ->groupBy('severity')
-            ->pluck('count', 'severity');
+            ->pluck('count', 'severity') : collect();
         $vars['alert_count'] = $alert_counts->sum();
 
         if ($alert_counts->has('critical')) {

@@ -98,7 +98,7 @@ class AlertFault extends DeviceRelatedModel
     public static function filterFieldDefinitions(?int $deviceId = null): array
     {
         return [
-            ...self::alertFilterFields($deviceId),
+            ...self::alertFilterFields('faults', $deviceId),
             [
                 'key' => 'unreachable',
                 'label' => __('Unreachable'),
@@ -162,7 +162,17 @@ class AlertFault extends DeviceRelatedModel
      */
     public function scopeOpen($query): Builder
     {
-        return $query->where('open', 1);
+        return $query->where('alert_faults.open', 1);
+    }
+
+    /**
+     * @param  Builder<AlertFault>  $query
+     * @return Builder<AlertFault>
+     */
+    protected function scopeOnEnabledDevicesAndRules(Builder $query): Builder
+    {
+        return $query->whereHas('device', fn (Builder $device) => $device->where('disabled', 0))
+            ->whereHas('rule', fn (Builder $rule) => $rule->enabled());
     }
 
     /**

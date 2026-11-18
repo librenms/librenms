@@ -3,10 +3,14 @@
 namespace LibreNMS\Tests\Feature\Http;
 
 use App\Models\Alert;
+use App\Models\AlertFault;
+use App\Models\AlertLog;
 use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\User;
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Tests\InMemoryDbTestCase;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 final class AlertFilterPagesTest extends InMemoryDbTestCase
@@ -18,6 +22,11 @@ final class AlertFilterPagesTest extends InMemoryDbTestCase
         $this->actingAs($user)->get(route('faults'))->assertForbidden();
         $this->actingAs($user)->get(route('alert-log'))->assertForbidden();
         $this->actingAs($user)->get(route('ajax.select.alert-rule'))->assertForbidden();
+
+        $user->givePermissionTo(Permission::findOrCreate('alert-log.view'));
+        $this->getJson(route('ajax.select.alert-rule', ['source' => 'history']))->assertOk();
+        $this->getJson(route('ajax.select.alert-rule', ['source' => 'faults']))->assertForbidden();
+        $this->getJson(route('ajax.select.alert-rule', ['source' => 'invalid']))->assertUnprocessable();
     }
 
     public function testFilterFieldsFollowPermissions(): void
@@ -46,6 +55,7 @@ final class AlertFilterPagesTest extends InMemoryDbTestCase
         $this->actingAs($admin)->get(route('device.faults', $device->device_id))
             ->assertOk()
             ->assertViewHas('filterFields', fn ($fields) => ! in_array('device_id', array_column($fields, 'key')))
+            ->assertViewHas('filterFields', fn ($fields) => in_array(route('ajax.select.alert-rule', ['source' => 'faults', 'device' => $device->device_id]), array_column($fields, 'endpoint')))
             ->assertSee("'device.faults'", false)
             ->assertSee('fa-bar-chart', false)
             ->assertSee(route('device.faults.stats', $device->device_id), false)
@@ -54,6 +64,7 @@ final class AlertFilterPagesTest extends InMemoryDbTestCase
         $this->actingAs($admin)->get(route('device.faults.history', $device->device_id))
             ->assertOk()
             ->assertViewHas('filterFields', fn ($fields) => ! in_array('device.location_id', array_column($fields, 'key')))
+            ->assertViewHas('filterFields', fn ($fields) => in_array(route('ajax.select.alert-rule', ['source' => 'history', 'device' => $device->device_id]), array_column($fields, 'endpoint')))
             ->assertSee("'device.alert-log'", false)
             ->assertSee("device_id: $device->device_id", false);
 
@@ -70,22 +81,40 @@ final class AlertFilterPagesTest extends InMemoryDbTestCase
             ->assertRedirect(route('device.faults.history', ['device' => $id, 'filter' => ['state' => ['eq' => 'ok']]]));
     }
 
-    public function testRulePickerOnlyListsRulesOnAccessibleDevices(): void
+    public function testRulePickersUseAccessibleFaultsOrHistoryRows(): void
     {
-        $device = Device::factory()->create();
-        $visible = AlertRule::factory()->create();
-        $hidden = AlertRule::factory()->create();
+        $device = Device::factory()->create(['disabled' => 0]);
+        $other = Device::factory()->create(['disabled' => 0]);
+        $visibleFault = AlertRule::factory()->create();
+        $hiddenFault = AlertRule::factory()->create();
+        $visibleHistory = AlertRule::factory()->create();
+        $hiddenHistory = AlertRule::factory()->create();
+        $closed = AlertRule::factory()->create();
         $unevaluated = AlertRule::factory()->create();
         $unevaluated->devices()->attach($device);
-        Alert::factory()->create(['device_id' => $device->device_id, 'rule_id' => $visible->id]);
-        Alert::factory()->create(['rule_id' => $hidden->id]); // on another device
+        foreach ([[$visibleFault, $device, 1], [$hiddenFault, $other, 1], [$closed, $device, 0]] as [$rule, $faultDevice, $open]) {
+            AlertFault::create([
+                'rule_id' => $rule->id,
+                'device_id' => $faultDevice->device_id,
+                'entity_key' => (string) $faultDevice->device_id,
+                'state' => AlertState::ACTIVE,
+                'open' => $open,
+            ]);
+        }
+        AlertLog::factory()->create(['rule_id' => $visibleHistory->id, 'device_id' => $device->device_id]);
+        AlertLog::factory()->create(['rule_id' => $hiddenHistory->id, 'device_id' => $other->device_id]);
 
         $user = $this->user('user');
         $user->devicesOwned()->attach($device->device_id);
+        $user->givePermissionTo(Permission::findOrCreate('alert-rule.viewAll'));
+        $admin = $this->user('admin');
 
-        $this->assertSame([$visible->id], $this->ruleIds($user));
-        $this->assertSame([], $this->ruleIds($user, ['id' => $hidden->id]));
-        $this->assertEqualsCanonicalizing([$visible->id, $hidden->id, $unevaluated->id], $this->ruleIds($this->user('admin')));
+        $this->assertSame([$visibleFault->id], $this->ruleIds($user));
+        $this->assertSame([], $this->ruleIds($user, ['id' => $hiddenFault->id]));
+        $this->assertSame([$visibleHistory->id], $this->ruleIds($user, ['source' => 'history']));
+        $this->assertEqualsCanonicalizing([$visibleFault->id, $hiddenFault->id], $this->ruleIds($admin));
+        $this->assertEqualsCanonicalizing([$visibleHistory->id, $hiddenHistory->id], $this->ruleIds($admin, ['source' => 'history']));
+        $this->assertSame([$hiddenHistory->id], $this->ruleIds($admin, ['source' => 'history', 'device' => $other->device_id]));
     }
 
     public function testAlertMenuUsesAlertsOnAccessibleDevices(): void
@@ -97,6 +126,7 @@ final class AlertFilterPagesTest extends InMemoryDbTestCase
 
         $user = $this->user('user');
         $user->devicesOwned()->attach($accessible);
+        $user->givePermissionTo(Permission::findOrCreate('alert-rule.viewAll'));
 
         $this->actingAs($user)->get(route('faults'))->assertOk()->assertSee('fa-exclamation-circle text-warning fa-fw fa-lg');
         $this->actingAs($this->user('admin'))->get(route('faults'))->assertOk()->assertSee('fa-exclamation-circle text-danger fa-fw fa-lg');
@@ -158,7 +188,7 @@ final class AlertFilterPagesTest extends InMemoryDbTestCase
     }
 
     /**
-     * @param  array<string, int>  $params
+     * @param  array<string, int|string>  $params
      * @return int[]
      */
     private function ruleIds(User $user, array $params = []): array

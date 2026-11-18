@@ -27,8 +27,8 @@ namespace App\Http\Controllers\Table;
 
 use App\Http\Parsers\AlertLogDetailParser;
 use App\Models\Alert;
-use App\Models\AlertLog;
 use App\Models\AlertFault;
+use App\Models\AlertLog;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -187,9 +187,8 @@ class AlertsController extends TableController
         $query = AlertFault::query()
             ->select('alert_faults.*')
             ->with(['device', 'device.location', 'rule'])
-            ->where('alert_faults.open', 1)
-            ->whereHas('device', fn (Builder $q) => $q->where('disabled', 0))
-            ->whereHas('rule', fn (Builder $q) => $q->where('disabled', 0))
+            ->open()
+            ->onEnabledDevicesAndRules()
             ->hasAccess($request->user())
             ->when($request->array('filter'), fn (Builder $q, array $filters) => $q->applyFilters($filters));
 

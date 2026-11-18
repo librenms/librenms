@@ -1,6 +1,5 @@
 @php
     use LibreNMS\Alerting\QueryBuilderParser;
-    use LibreNMS\Enum\AlertState;
 @endphp
 <x-panel>
     <x-slot:heading class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
@@ -42,12 +41,12 @@
                 <tbody>
                 @foreach($rules as $rule)
                     @php
-                        $state = $states[$rule->id] ?? null;
-                        $alerting = in_array($state, [AlertState::ACTIVE, AlertState::ACKNOWLEDGED, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED]);
+                        $status = $statuses[$rule->id] ?? null;
+                        $alerting = $status?->alerting;
                         $canUpdate = Gate::allows('update', $rule);
                         [$icon, $color] = $alerting
                             ? (['critical' => ['exclamation', 'danger'], 'warning' => ['warning', 'warning'], 'ok' => ['check', 'success']][$rule->severity] ?? ['info', 'info'])
-                            : ['check', 'success'];
+                            : ($canViewAlerts ? ['check', 'success'] : ['question-circle', 'muted']);
                         $except = $rule->invert_map ? __('EXCEPT') . ' ' : '';
                         $operation = $rule->alertOperation;
                         $segments = $operation?->segments ?? collect();
@@ -121,7 +120,7 @@
                         <td>{{ $rule->severity == 'ok' ? 'OK' : ucwords($rule->severity) }}</td>
                         <td class="tw:whitespace-nowrap">
                             <a href="{{ route('faults', ['filter' => ['rule_id' => ['eq' => $rule->id]]]) }}">
-                                <i x-show="enabled" class="fa fa-fw fa-2x fa-{{ $icon }} text-{{ $color }}" title="{{ $alerting ? __('Some devices matching this rule are alerting') : __('All devices matching this rule are OK') }}"></i>
+                                <i x-show="enabled" class="fa fa-fw fa-2x fa-{{ $icon }} text-{{ $color }}" title="{{ $alerting ? __('Some devices matching this rule are alerting') : ($canViewAlerts ? $clearStatusTitle : __('Alert status is unavailable')) }}"></i>
                                 <i x-show="! enabled" x-cloak class="fa fa-fw fa-2x fa-pause" title="{{ __('Rule is disabled') }}"></i>
                             </a>
                             @if($muted)
@@ -129,7 +128,7 @@
                             @elseif($operation?->notifications_suppressed)
                                 <i class="fa fa-fw fa-2x fa-volume-off text-info" title="{{ __('Operation notifications are suppressed') }}"></i>
                             @endif
-                            @if($state == AlertState::ACKNOWLEDGED)
+                            @if($status?->acknowledged)
                                 <i class="fa fa-fw fa-2x fa-sticky-note text-info" title="{{ __('Some alerts for this rule are acknowledged') }}"></i>
                             @endif
                         </td>

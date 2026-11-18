@@ -3,18 +3,27 @@
 namespace App\Http\Controllers\Select;
 
 use App\Models\Alert;
+use App\Models\AlertFault;
 use App\Models\AlertLog;
 use App\Models\AlertRule;
-use App\Models\Device;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use LibreNMS\Enum\AlertState;
 
 /**
  * @extends SelectController<AlertRule>
  */
 class AlertRuleController extends SelectController
 {
+    protected function rules(): array
+    {
+        return [
+            'source' => 'sometimes|in:faults,history',
+            'device' => 'sometimes|integer|min:1',
+        ];
+    }
+
     /**
      * @return list<string>
      */
@@ -29,13 +38,19 @@ class AlertRuleController extends SelectController
     public function baseQuery(Request $request): Builder
     {
         $user = $request->user();
-        // used by both the faults and alert history filters
-        abort_unless($user->can('viewAny', Alert::class) || $user->can('viewAny', AlertLog::class), 403);
+        $history = $request->input('source') === 'history';
+        $this->authorize('viewAny', $history ? AlertLog::class : Alert::class);
 
-        // rule names often contain customer or site names, only list rules on devices the user can access
+        $rows = $history ? AlertLog::hasAccess($user) : AlertFault::hasAccess($user)
+            ->open()
+            ->onEnabledDevicesAndRules()
+            ->where('state', '!=', AlertState::RECOVERED);
+        if ($deviceId = $request->integer('device')) {
+            $rows->where('device_id', $deviceId);
+        }
+
         return AlertRule::query()
-            ->when($user->cannot('viewAll', AlertRule::class), fn ($query) => $query->whereHas('alerts', fn ($alerts) => $alerts
-                ->whereIn('alerts.device_id', Device::hasAccess($user)->select('devices.device_id'))))
+            ->whereExists($rows->selectRaw('1')->whereColumn('rule_id', 'alert_rules.id')->toBase())
             ->select(['alert_rules.id', 'alert_rules.name'])
             ->orderBy('alert_rules.name');
     }
