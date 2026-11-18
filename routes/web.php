@@ -456,7 +456,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::delete('alert-templates/{alert_template}', [AlertTemplateController::class, 'destroy'])->name('alert-templates.destroy');
     Route::get('alert-rules', [AlertRuleController::class, 'index'])->name('alert-rules.index');
     Route::post('alert-rules/defaults', [AlertRuleController::class, 'createDefaults'])->name('alert-rules.defaults');
-    Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);
+    Route::resource('alert-rule', AlertRuleController::class)->except(['index']);
     Route::resource('alert-operation', AlertOperationController::class)->only(['show', 'store', 'update', 'destroy']);
     Route::put('alert-rule/{alert_rule}/toggle', [AlertRuleController::class, 'toggle'])->name('alert-rule.toggle');
     Route::get('alert-rule-from-template/{template_id}', [AlertRuleTemplateController::class, 'template'])->name('alert-rule-template');

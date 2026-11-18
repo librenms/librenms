@@ -5,9 +5,8 @@
     <x-slot:heading class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
         <div>
             @can('create', \App\Models\AlertRule::class)
-                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert">{{ __('Create new alert rule') }}</button>
-                <i>- {{ __('OR') }} -</i>
-                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#search_rule_modal">{{ __('Create rule from collection') }}</button>
+                <a class="btn btn-primary btn-sm" href="{{ route('alert-rule.create', ['device' => $device?->device_id]) }}">{{ __('Create new alert rule') }}</a>
+                <a class="btn btn-default btn-sm" href="{{ route('alert-rule.create', ['device' => $device?->device_id, 'collection' => 1]) }}">{{ __('Create rule from collection') }}</a>
             @endcan
         </div>
         <form method="get" class="form-inline">
@@ -138,7 +137,7 @@
                         </td>
                         <td class="tw:whitespace-nowrap">
                             @if($canUpdate)
-                                <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-rule_id="{{ $rule->id }}" title="{{ __('Edit alert rule') }}"><i class="fa fa-pencil"></i></button>
+                                <a class="btn btn-primary btn-sm" href="{{ route('alert-rule.edit', ['alert_rule' => $rule, 'device' => $device?->device_id]) }}" title="{{ __('Edit alert rule') }}" aria-label="{{ __('Edit alert rule') }}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
                             @endif
                             @can('delete', $rule)
                                 <button type="button" class="btn btn-danger btn-sm" title="{{ __('Delete alert rule') }}"

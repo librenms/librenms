@@ -1,192 +1,232 @@
+@extends('layouts.librenmsv1')
+
 @php
-    $defaults = [
-        'severity' => \App\Facades\LibrenmsConfig::get('alert_rule.severity'),
-        'invert' => (bool) \App\Facades\LibrenmsConfig::get('alert_rule.invert_rule_match'),
-        'recovery' => (bool) \App\Facades\LibrenmsConfig::get('alert_rule.recovery_alerts'),
-        'acknowledgement' => (bool) \App\Facades\LibrenmsConfig::get('alert_rule.acknowledgement_alerts'),
-        'invert_map' => (bool) \App\Facades\LibrenmsConfig::get('alert_rule.invert_map'),
-        'max_entities' => max(1, (int) \App\Facades\LibrenmsConfig::get('alert_rule.default_max_entities', 10)),
+    $title = $rule->exists ? __('Edit Alert Rule') : __('Create Alert Rule');
+    $action = $rule->exists ? route('alert-rule.update', $rule) : route('alert-rule.store');
+    $extra = $draft['extra'] ?? [];
+    $advanced = $errors->has('adv_query');
+    $oldBuilder = old('builder_json');
+    $config = [
+        'filters' => new \LibreNMS\Alerting\QueryBuilderFilter('alert'),
+        'builder' => is_string($oldBuilder) ? json_decode($oldBuilder, true) : ($draft['builder'] ?? []),
+        'createUrl' => route('alert-rule.create', ['device' => $device?->device_id]),
+        'openCollection' => $openCollection,
+        'messages' => [
+            'parseFailed' => __('Your query could not be parsed'),
+            'sqlPrompt' => __('Enter your SQL query:'),
+            'legacyPrompt' => __('Enter your old alert rule:'),
+            'loadFailed' => __('The saved builder rules could not be loaded'),
+            'select' => __('Select'),
+        ],
     ];
 @endphp
-<div class="modal fade" id="create-alert" tabindex="-1" role="dialog"
-     aria-labelledby="Create" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h5 class="modal-title" id="Create">Alert Rule :: <a target="_blank" href="https://docs.librenms.org/Alerting/"><i class="fa fa-book fa-1x"></i> Docs</a> </h5>
-            </div>
-            <div class="modal-body">
-                <ul class="nav nav-tabs" role="tablist">
-                    <li role="presentation" class="active"><a href="#main" aria-controls="main" role="tab" data-toggle="tab">Main </a></li>
-                    <li role="presentation"><a href="#advanced" aria-controls="advanced" role="tab" data-toggle="tab">Advanced</a></li>
-                </ul>
-                <br />
-                <form method="post" role="form" id="rules" class="form-horizontal alerts-form">
-                    <input type="hidden" name="rule_id" id="rule_id" value="">
-                    <input type="hidden" name="builder_json" id="builder_json" value="">
-                    <div id="alert-rule-form-error" class="alert alert-danger" style="display: none; margin-top: 10px;"></div>
-                    <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane active" id="main">
-                            <div class='form-group' title="The description of this alert rule.">
-                                <label for='rule_name' class='col-sm-3 col-md-2 control-label'>Rule name </label>
-                                <div class='col-sm-9 col-md-10'>
-                                    <input type='text' id='rule_name' name='name' class='form-control validation' maxlength='200' required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-sm-3 col-md-2">
-                                    <div class="dropdown">
-                                        <button class="btn btn-default dropdown-toggle" type="button"
-                                                id="import-from" data-toggle="dropdown" aria-haspopup="true"
-                                                aria-expanded="true">
-                                            Import from
-                                            <span class="caret"></span>
-                                        </button>
-                                        <ul class="dropdown-menu" aria-labelledby="import-from" id="import-dropdown">
-                                            <li><a href="#" name="import-query" id="import-query">SQL Query</a></li>
-                                            <li><a href="#" name="import-old-format" id="import-old-format">Old Format</a></li>
-                                            @can('create', \App\Models\AlertRule::class)
-                                                <li><a href="#" name="import-collection" id="import-collection">Collection</a></li>
-                                                <li><a href="#" name="import-alert_rule" id="import-alert_rule">Alert Rule</a></li>
-                                            @endcan
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="col-sm-9 col-md-10">
-                                    <div id="builder"></div>
-                                </div>
-                            </div>
-                            <div class="form-group" title="How to display the alert.  OK: green, Warning: yellow, Critical: red">
-                                <label for='severity' class='col-sm-3 col-md-2 control-label'>Severity </label>
-                                <div class="col-sm-2">
-                                    <select name='severity' id='severity' class='form-control'>
-                                        <option value='ok'>OK</option>
-                                        <option value='warning'>Warning</option>
-                                        <option value='critical' selected>Critical</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class='form-group form-inline'>
-                                <label for='invert' class='col-sm-3 col-md-2 control-label' title="Alert when this rule doesn't match.">Invert rule match </label>
-                                <div class='col-sm-2' title="Alert when this rule doesn't match.">
-                                    <x-toggle name="invert" id="invert" />
-                                </div>
-                                <label for='mute' class='col-sm-3 col-md-3 control-label' title="Suppress all notifications for this rule (alerts still appear in the Web UI)." style="vertical-align: top;">Mute alerts </label>
-                                <div class='col-sm-2' title="Suppress all notifications for this rule (alerts still appear in the Web UI).">
-                                    <x-toggle name="mute" id="mute" />
-                                </div>
-                            </div>
-                            <div class="form-group form-inline">
-                                <label for='recovery' class='col-sm-3 col-md-2 control-label' title="Issue recovery alerts.">Recovery alerts </label>
-                                <div class='col-sm-2' title="Issue recovery alerts.">
-                                    <x-toggle name="recovery" id="recovery" />
-                                </div>
-                                <label for='acknowledgement' class='col-sm-3 col-md-3 control-label' title="Issue acknowledgement alerts." style="vertical-align: top;">Acknowledgement alerts </label>
-                                <div class='col-sm-2' title="Issue acknowledgement alerts.">
-                                    <x-toggle name="acknowledgement" id="acknowledgement" />
-                                </div>
-                            </div>
-                            <div class="form-group form-inline">
-                                <label for='notify_per_entity' class='col-sm-3 col-md-2 control-label' title="Send a separate notification per matching entity (e.g. each port) instead of one grouped notification.">Notify per matching entity </label>
-                                <div class='col-sm-2' title="Send a separate notification per matching entity (e.g. each port) instead of one grouped notification.">
-                                    <x-toggle name="notify_per_entity" id="notify_per_entity" />
-                                </div>
-                                <label for='max_entities' class='col-sm-3 col-md-3 control-label' title="When notifying per entity, show and notify separately up to this many matching entities per device; above the limit, faults are grouped into one alert.">Max entities per device </label>
-                                <div class='col-sm-2' title="When notifying per entity, show and notify separately up to this many matching entities per device; above the limit, faults are grouped into one alert.">
-                                    <input type='number' name='max_entities' id='max_entities' class='form-control' min='1' value='{{ $defaults['max_entities'] }}'>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="alert_operation_id" class="col-sm-3 col-md-2 control-label" title="Notification behaviour (escalation, transports). Configure under Alerts → Operations.">Operation </label>
-                                <div class="col-sm-9 col-md-10">
-                                    <input type="hidden" name="alert_operation_id" id="alert_operation_id_input" value="">
-                                    <select id="alert_operation_id" class="form-control" style="width: 100%;" data-placeholder="{{ __('None (suppress notifications)') }}">
-                                    </select>
-                                    <p class="help-block">{{ __('Leave empty to suppress all notifications for this rule.') }}</p>
-                                </div>
-                            </div>
-                            <div class="form-group form-inline">
-                                <label for='maps' class='col-sm-3 col-md-2 control-label' title="Restricts this alert rule to the selected devices, groups and locations.">Match devices, groups and locations list </label>
-                                <div class="col-sm-7" style="width: 56%;">
-                                    <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
-                                </div>
-                                <div>
-                                    <label for='invert_map' class='col-md-1' style="width: 14.1333%;" text-align="left" title="If ON, alert rule check will run on all devices except the selected devices and groups.">All devices except in list </label>
-                                    <x-toggle name="invert_map" id="invert_map" />
-                                </div>
-                            </div>
-                            <div class='form-group' title="A link to some documentation on how to handle this alert. This will be included in notifications.">
-                                <label for='proc' class='col-sm-3 col-md-2 control-label'>Procedure URL </label>
-                                <div class='col-sm-9 col-md-10'>
-                                    <input type='text' id='proc' name='proc' class='form-control validation' pattern='(http|https)://.*' maxlength='80'>
-                                </div>
-                            </div>
-                            <div class='form-group' title="A brief description for this alert rule">
-                                <label for='notes' class='col-sm-3 col-md-2 control-label'>Notes</label>
-                                <div class='col-sm-9 col-md-10'>
-                                    <textarea class="form-control" rows="6" name="notes" id='notes'></textarea>
-                                </div>
+
+@section('title', $title)
+
+@section('content')
+    <div class="container" data-alert-rule-editor>
+        <x-panel>
+            <x-slot:heading>
+                <h3 class="panel-title">
+                    <a href="{{ $backUrl }}" class="tw:mr-2 tw:text-inherit" title="{{ __('Back to Alert Rules') }}" aria-label="{{ __('Back to Alert Rules') }}">
+                        <i class="fa fa-arrow-left fa-fw" aria-hidden="true"></i>
+                    </a>
+                    {{ $title }}@if($rule->exists) – {{ $rule->name }}@endif
+                </h3>
+            </x-slot:heading>
+
+            @if($errors->any())
+                <div class="alert alert-danger" role="alert">
+                    <ul class="tw:mb-0">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+            <div id="alert-rule-form-error" class="alert alert-danger" role="alert" hidden></div>
+
+            <ul class="nav nav-tabs tw:mb-4" role="tablist">
+                <li role="presentation" @class(['active' => ! $advanced])>
+                    <a href="#alert-rule-main" role="tab" data-toggle="tab">{{ __('Main') }}</a>
+                </li>
+                <li role="presentation" @class(['active' => $advanced])>
+                    <a href="#alert-rule-advanced" role="tab" data-toggle="tab">{{ __('Advanced') }}</a>
+                </li>
+            </ul>
+
+            <form id="alert-rule-form" method="post" action="{{ $action }}" class="form-horizontal">
+                @csrf
+                @if($rule->exists)
+                    @method('PUT')
+                @endif
+                @if($device)
+                    <input type="hidden" name="device" value="{{ $device->device_id }}">
+                @endif
+                @if(isset($draft['template_id']))
+                    <input type="hidden" name="template_id" value="{{ $draft['template_id'] }}">
+                @endif
+                <input type="hidden" name="builder_json" id="builder_json" value="[]">
+
+                <div class="tab-content">
+                    <div id="alert-rule-main" role="tabpanel" @class(['tab-pane', 'active' => ! $advanced])>
+                        <div class="form-group @error('name') has-error @enderror">
+                            <label for="rule_name" class="col-sm-3 col-md-2 control-label">{{ __('Rule name') }}</label>
+                            <div class="col-sm-9 col-md-10">
+                                <input type="text" id="rule_name" name="name" class="form-control" maxlength="200" value="{{ old('name', $draft['name'] ?? '') }}" required>
                             </div>
                         </div>
-                        <div role="tabpanel" class="tab-pane" id="advanced">
-                            <div class="form-group">
-                                <label for="override_query" class="col-sm-3 col-md-2 control-label">Override SQL</label>
-                                <div class="col-sm-9 col-md-10">
-                                    <x-toggle name="override_query" id="override_query" />
+
+                        <div class="form-group @error('builder_json') has-error @enderror">
+                            <div class="col-sm-3 col-md-2">
+                                <div class="dropdown">
+                                    <button class="btn btn-default dropdown-toggle" type="button" id="import-from" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        {{ __('Import from') }} <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" aria-labelledby="import-from">
+                                        <li><a href="#" id="import-query">{{ __('SQL Query') }}</a></li>
+                                        <li><a href="#" id="import-old-format">{{ __('Old Format') }}</a></li>
+                                        @can('create', \App\Models\AlertRule::class)
+                                            <li><a href="#search_rule_modal" data-toggle="modal">{{ __('Collection') }}</a></li>
+                                            <li><a href="#search_alert_rule_modal" data-toggle="modal">{{ __('Alert Rule') }}</a></li>
+                                        @endcan
+                                    </ul>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <label for="adv_query" class="col-sm-3 col-md-2 control-label">Query</label>
-                                <div class="col-sm-9 col-md-10">
-                                    <textarea class="form-control code" rows="6" name="adv_query" id='adv_query' style="font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;"></textarea>
+                            <div class="col-sm-9 col-md-10">
+                                <div id="builder"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="severity" class="col-sm-3 col-md-2 control-label">{{ __('Severity') }}</label>
+                            <div class="col-sm-4 col-md-3">
+                                <select name="severity" id="severity" class="form-control">
+                                    @foreach(['ok' => 'OK', 'warning' => __('Warning'), 'critical' => __('Critical')] as $value => $label)
+                                        <option value="{{ $value }}" @selected(old('severity', $draft['severity'] ?? LibrenmsConfig::get('alert_rule.severity')) === $value)>{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+
+                        @php
+                            $toggles = [
+                                'invert' => [__('Invert rule match'), $extra['invert'] ?? LibrenmsConfig::get('alert_rule.invert_rule_match'), __('Alert when this rule does not match.')],
+                                'mute' => [__('Mute alerts'), $extra['mute'] ?? false, __('Suppress all notifications for this rule. Alerts still appear in the Web UI.')],
+                                'recovery' => [__('Recovery alerts'), $extra['recovery'] ?? LibrenmsConfig::get('alert_rule.recovery_alerts'), __('Issue recovery alerts.')],
+                                'acknowledgement' => [__('Acknowledgement alerts'), $extra['acknowledgement'] ?? LibrenmsConfig::get('alert_rule.acknowledgement_alerts'), __('Issue acknowledgement alerts.')],
+                                'notify_per_entity' => [__('Notify per matching entity'), $draft['notify_per_entity'] ?? false, __('Send a separate notification per matching entity instead of one grouped notification.')],
+                            ];
+                        @endphp
+                        @foreach($toggles as $field => [$label, $checked, $help])
+                            <div class="form-group" title="{{ $help }}">
+                                <label for="{{ $field }}" class="col-sm-3 col-md-2 control-label">{{ $label }}</label>
+                                <div class="col-sm-9 col-md-10 tw:pt-1">
+                                    <x-toggle :name="$field" :id="$field" :checked="(bool) old($field, $checked)" />
                                 </div>
+                            </div>
+                        @endforeach
+
+                        <div class="form-group" title="{{ __('When notifying per entity, show and notify separately up to this many matching entities per device. Above the limit, faults are grouped.') }}">
+                            <label for="max_entities" class="col-sm-3 col-md-2 control-label">{{ __('Max entities per device') }}</label>
+                            <div class="col-sm-4 col-md-3">
+                                <input type="number" name="max_entities" id="max_entities" class="form-control" min="1" value="{{ old('max_entities', $draft['max_entities'] ?? max(1, (int) LibrenmsConfig::get('alert_rule.default_max_entities', 10))) }}">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="alert_operation_id" class="col-sm-3 col-md-2 control-label">{{ __('Operation') }}</label>
+                            <div class="col-sm-9 col-md-10">
+                                <select name="alert_operation_id" id="alert_operation_id" class="form-control"
+                                        data-url="{{ route('ajax.select.alert-operation') }}" data-placeholder="{{ __('None (suppress notifications)') }}">
+                                    <option value=""></option>
+                                    @if($operationId)
+                                        <option value="{{ $operationId }}" selected>{{ $operationName }}</option>
+                                    @endif
+                                </select>
+                                <p class="help-block">{{ __('Leave empty to suppress all notifications for this rule.') }}</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="maps" class="col-sm-3 col-md-2 control-label">{{ __('Match devices, groups and locations list') }}</label>
+                            <div class="col-sm-9 col-md-10">
+                                <select id="maps" name="maps[]" class="form-control" multiple
+                                        data-url="{{ route('ajax.select.devices-groups-locations') }}" data-placeholder="{{ __('Devices, Groups or Locations') }}">
+                                    @foreach($maps as $map)
+                                        <option value="{{ $map['id'] }}" selected>{{ $map['text'] }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" title="{{ __('Run this rule on all devices except the selected devices, groups and locations.') }}">
+                            <label for="invert_map" class="col-sm-3 col-md-2 control-label">{{ __('All devices except in list') }}</label>
+                            <div class="col-sm-9 col-md-10 tw:pt-1">
+                                <x-toggle name="invert_map" id="invert_map" :checked="(bool) old('invert_map', $draft['invert_map'] ?? LibrenmsConfig::get('alert_rule.invert_map'))" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="proc" class="col-sm-3 col-md-2 control-label">{{ __('Procedure URL') }}</label>
+                            <div class="col-sm-9 col-md-10">
+                                <input type="text" id="proc" name="proc" class="form-control" pattern="(http|https)://.*" maxlength="80" value="{{ old('proc', $draft['proc'] ?? '') }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="notes" class="col-sm-3 col-md-2 control-label">{{ __('Notes') }}</label>
+                            <div class="col-sm-9 col-md-10">
+                                <textarea class="form-control" id="notes" rows="6" name="notes">{{ old('notes', $draft['notes'] ?? '') }}</textarea>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="col-sm-12 text-center">
-                            <button type="button" class="btn btn-success" id="btn-save" name="save-alert" disabled>
-                                Save Rule
-                            </button>
+
+                    <div id="alert-rule-advanced" role="tabpanel" @class(['tab-pane', 'active' => $advanced])>
+                        <div class="form-group">
+                            <label for="override_query" class="col-sm-3 col-md-2 control-label">{{ __('Override SQL') }}</label>
+                            <div class="col-sm-9 col-md-10 tw:pt-1">
+                                <x-toggle name="override_query" id="override_query" :checked="(bool) old('override_query', $extra['options']['override_query'] ?? false)" />
+                            </div>
+                        </div>
+                        <div class="form-group @error('adv_query') has-error @enderror">
+                            <label for="adv_query" class="col-sm-3 col-md-2 control-label">{{ __('Query') }}</label>
+                            <div class="col-sm-9 col-md-10">
+                                <textarea class="form-control tw:font-mono" id="adv_query" rows="6" name="adv_query">{{ old('adv_query', $draft['adv_query'] ?? $extra['adv_query'] ?? '') }}</textarea>
+                            </div>
                         </div>
                     </div>
-                </form>
-            </div>
-        </div>
+                </div>
+            </form>
+
+            <x-slot:footer class="tw:flex tw:items-center tw:gap-2">
+                <a href="https://docs.librenms.org/Alerting/" target="_blank" rel="noopener">
+                    <i class="fa fa-book" aria-hidden="true"></i> {{ __('Docs') }}
+                </a>
+                <a class="btn btn-default tw:ml-auto" href="{{ $backUrl }}">{{ __('Cancel') }}</a>
+                <button type="submit" class="btn btn-primary" id="btn-save" form="alert-rule-form" disabled>{{ __('Save Rule') }}</button>
+            </x-slot:footer>
+        </x-panel>
     </div>
-</div>
+
+    @can('create', \App\Models\AlertRule::class)
+        @include('alert-rules.pickers')
+    @endcan
+@endsection
 
 @push('scripts')
 <script src="{{ asset('js/sql-parser.min.js') }}"></script>
 <script src="{{ asset('js/query-builder.standalone.min.js') }}"></script>
 <script src="{{ asset('js/interact.min.js') }}"></script>
 <script>
-    const alertRuleDefaults = @js($defaults);
-    const alertRuleDevice = @js($device ? ['id' => $device->device_id, 'text' => $device->displayName()] : null);
-    const $editor = $('#create-alert');
-    const $saveRule = $('#btn-save');
-    const $ruleError = $('#alert-rule-form-error');
-    let editorSession = 0;
-    let editorReady = false;
+(() => {
+    const $ = window.jQuery;
+    const { filters, builder, createUrl, openCollection, messages } = @js($config);
+    const $editor = $('[data-alert-rule-editor]');
+    const field = (selector) => $editor.find(selector);
+    const $saveRule = field('#btn-save');
     let savingRule = false;
 
-    function setEditorReady(ready) {
-        editorReady = ready;
-        $saveRule.prop('disabled', ! editorReady || savingRule);
-    }
-
-    function startEditorSession() {
-        setEditorReady(false);
-        $('#rule_id').val('');
-        $ruleError.hide().text('');
-        return ++editorSession;
-    }
-
-    $('#builder').on('afterApplyRuleFlags.queryBuilder afterCreateRuleFilters.queryBuilder', function () {
-        $("[name$='_filter']").each(function () {
+    field('#builder').on('afterApplyRuleFlags.queryBuilder afterCreateRuleFilters.queryBuilder', function () {
+        field("[name$='_filter']").each(function () {
             $(this).select2({
-                dropdownParent: $("#create-alert"),
                 dropdownAutoWidth: true,
                 width: 'auto'
             });
@@ -200,7 +240,7 @@
             'bt-tooltip-errors',
             'sortable'
         ],
-        filters: @js(new \LibreNMS\Alerting\QueryBuilderFilter('alert')),
+        filters: filters,
         operators: [
             'equal', 'not_equal', 'between', 'not_between', 'begins_with', 'not_begins_with', 'contains', 'not_contains', 'ends_with', 'not_ends_with', 'is_empty', 'is_not_empty', 'is_null', 'is_not_null',
             {type: 'less', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
@@ -226,64 +266,52 @@
         }
     });
 
-    $saveRule.on('click', async function (e) {
-        e.preventDefault();
-        if (! editorReady || savingRule) return;
-        $ruleError.hide().text('');
+    if (builder?.rules?.length || builder?.length) {
+        try {
+            field('#builder').queryBuilder('setRules', builder);
+        } catch {
+            field('#builder').queryBuilder('reset');
+            field('#alert-rule-form-error').text(messages.loadFailed).prop('hidden', false);
+        }
+    }
 
-        const overrideQuery = $('#override_query').prop('checked');
-        const builder = $('#builder').queryBuilder('getRules');
-        if (! overrideQuery && ! builder?.valid) {
+    field('#alert-rule-form').on('submit', (event) => {
+        if (savingRule) {
+            event.preventDefault();
             return;
         }
 
-        $('#alert_operation_id_input').val($('#alert_operation_id').val() ?? '');
-        $('#builder_json').val(JSON.stringify(builder ?? []));
+        const override = field('#override_query').prop('checked');
+        const rules = field('#builder').queryBuilder('getRules');
+        if (! override && ! rules?.valid) {
+            event.preventDefault();
+            field('a[href="#alert-rule-main"]').tab('show');
+            return;
+        }
 
-        const ruleId = $('#rule_id').val();
-        const session = editorSession;
+        field('#builder_json').val(JSON.stringify(rules ?? []));
         savingRule = true;
         $saveRule.prop('disabled', true);
-        try {
-            const response = await axios({
-                method: ruleId ? 'put' : 'post',
-                url: ruleId ? route('alert-rule.update', ruleId) : route('alert-rule.store'),
-                data: $('form.alerts-form').serialize(),
-            });
-            if (response.data.status === 'ok') {
-                toastr.success(response.data.message);
-                window.location.reload();
-                return;
-            }
-            toastr.error(response.data.message);
-        } catch (error) {
-            if (session === editorSession) {
-                const errors = error.response?.data?.errors ?? {};
-                $ruleError.text(errors.alert_operation_id?.[0] ?? error.response?.data?.message ?? @js(__('Request failed'))).show();
-            }
-        }
-        savingRule = false;
-        setEditorReady(editorReady);
     });
 
     function importSql(sql) {
         if (sql) {
             try {
-                $('#builder').queryBuilder('setRulesFromSQL', sql);
+                field('#builder').queryBuilder('setRulesFromSQL', sql);
             } catch (e) {
-                alert(@js(__('Your query could not be parsed')));
+                alert(messages.parseFailed);
             }
         }
     }
 
-    $('#import-query').on('click', function (e) {
+    field('#import-query').on('click', function (e) {
         e.preventDefault();
-        importSql(window.prompt(@js(__('Enter your SQL query:'))));
+        importSql(window.prompt(messages.sqlPrompt));
     });
 
-    $('#import-old-format').on('click', function (e) {
+    field('#import-old-format').on('click', function (e) {
         e.preventDefault();
-        const old = window.prompt(@js(__('Enter your old alert rule:')));
+        const old = window.prompt(messages.legacyPrompt);
         importSql(old && old.replace(/&&/g, 'AND')
             .replace(/\|\|/g, 'OR')
             .replace(/%/g, '')
@@ -292,118 +320,49 @@
             .replace(/@/g, '.*'));
     });
 
-    $('#import-collection').on('click', function (e) {
-        e.preventDefault();
+    field('#maps, #alert_operation_id').each(function () {
+        $(this).select2({
+            theme: 'bootstrap',
+            width: '100%',
+            placeholder: this.dataset.placeholder,
+            allowClear: ! this.multiple,
+            ajax: { url: this.dataset.url, delay: 150 },
+        });
+    });
+
+    $('.alert-rule-picker').each(function () {
+        const source = this.dataset.draftSource;
+        const $table = $(this);
+        $table.on('loaded.rs.jquery.bootgrid', () => {
+            $table.find('tbody a').on('click', (event) => event.stopPropagation());
+        }).bootgrid({
+            caseSensitive: false,
+            formatters: {
+                select: (_, row) => {
+                    const url = new URL(createUrl, window.location.href);
+                    url.searchParams.set(source, row.id);
+
+                    return $('<a>', {
+                        class: 'btn btn-sm btn-primary',
+                        href: url.href,
+                        text: messages.select,
+                    })[0].outerHTML;
+                },
+            },
+        });
+    });
+
+    if (openCollection) {
         $('#search_rule_modal').modal('show');
-    });
-
-    $('#import-alert_rule').on('click', function (e) {
-        e.preventDefault();
-        $('#search_alert_rule_modal').modal('show');
-    });
-
-    $editor.on('show.bs.modal', function (e) {
-        const session = startEditorSession();
-        // A picker supplies its own rule after opening the editor.
-        if (! e.relatedTarget) return;
-
-        const ruleId = $(e.relatedTarget).data('rule_id');
-        if (ruleId) {
-            axios.get(route('alert-rule.show', ruleId)).then(({data}) => {
-                if (session !== editorSession) return;
-                loadRule(data);
-                $('#rule_id').val(ruleId);
-                setEditorReady(true);
-            }).catch(() => {
-                if (session === editorSession) {
-                    $ruleError.text(@js(__('This alert rule could not be loaded'))).show();
-                }
-            });
-            return;
-        }
-
-        // new rule, reset the form
-        $('#builder').queryBuilder('reset');
-        $(this).find('input[type=text]').val('');
-        $('#adv_query, #notes').val('');
-        $('#severity').val(alertRuleDefaults.severity);
-        $('#max_entities').val(alertRuleDefaults.max_entities);
-        $('#invert').prop('checked', alertRuleDefaults.invert);
-        $('#recovery').prop('checked', alertRuleDefaults.recovery);
-        $('#acknowledgement').prop('checked', alertRuleDefaults.acknowledgement);
-        $('#invert_map').prop('checked', alertRuleDefaults.invert_map);
-        $('#mute, #override_query, #notify_per_entity').prop('checked', false);
-        $('#alert_operation_id').empty().val(null).trigger('change');
-        setMaps(null);
-        setEditorReady(true);
-    }).on('hide.bs.modal', () => {
-        ++editorSession;
-        setEditorReady(false);
-    });
-
-    function applyRuleTemplate(rule) {
-        $editor.modal('show');
-        startEditorSession();
-        loadRule(rule);
-        setEditorReady(true);
     }
 
-    function loadRule(rule) {
-        const extra = rule.extra ?? {};
-        if (rule.builder?.rules?.length || rule.builder?.length) {
-            $('#builder').queryBuilder('setRules', rule.builder);
-        } else {
-            $('#builder').queryBuilder('reset');
-        }
-        $('#rule_name').val(rule.name);
-        $('#proc').val(rule.proc);
-        $('#severity').val(rule.severity).trigger('change');
-        $('#adv_query').val(rule.adv_query ?? extra.adv_query);
-        $('#notes').val(rule.notes);
-
-        const $operation = $('#alert_operation_id').empty().val(null);
-        if (rule.alert_operation_id) {
-            $operation.append(new Option(rule.alert_operation_name || ('#' + rule.alert_operation_id), rule.alert_operation_id, true, true));
-        }
-        $operation.trigger('change');
-
-        setMaps(rule.maps);
-
-        $('#invert').prop('checked', Boolean(extra.invert));
-        $('#recovery').prop('checked', extra.recovery ?? alertRuleDefaults.recovery);
-        $('#acknowledgement').prop('checked', extra.acknowledgement ?? alertRuleDefaults.acknowledgement);
-        $('#mute').prop('checked', Boolean(extra.mute));
-        $('#override_query').prop('checked', Boolean(extra.options?.override_query));
-        $('#invert_map').prop('checked', rule.invert_map == 1);
-        $('#notify_per_entity').prop('checked', rule.notify_per_entity == 1);
-        $('#max_entities').val(rule.max_entities ?? alertRuleDefaults.max_entities);
-    }
-
-    // rules from the collection have no maps, so they get the device of this page
-    function setMaps(maps) {
-        const $maps = $('#maps').empty();
-        (maps ?? (alertRuleDevice ? [alertRuleDevice] : [])).forEach((map) => $maps.append(new Option(map.text, map.id, true, true)));
-        $maps.trigger('change');
-    }
-
-    $('#maps').select2({
-        width: '100%',
-        placeholder: @js(__('Devices, Groups or Locations')),
-        ajax: {
-            url: @js(route('ajax.select.devices-groups-locations')),
-            delay: 150
+    $saveRule.prop('disabled', false);
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+            savingRule = false;
+            $saveRule.prop('disabled', false);
         }
     });
-
-    $('#alert_operation_id').select2({
-        width: '100%',
-        placeholder: @js(__('None (suppress notifications)')),
-        allowClear: true,
-        ajax: {
-            url: @js(route('ajax.select.alert-operation')),
-            delay: 150
-        },
-        dropdownParent: $('#create-alert')
-    });
+})();
 </script>
 @endpush

@@ -10,6 +10,7 @@ use App\Models\DeviceGroup;
 use App\Models\Location;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use LibreNMS\Alerting\AlertRuleDefinitions;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Tests\TestCase;
 use Spatie\Permission\Models\Permission;
@@ -39,7 +40,9 @@ final class AlertRulesPageTest extends TestCase
             ->assertSee('Rule &lt;b&gt;', false)
             ->assertSee('mapped.example.com')
             ->assertSee('Warning')
-            ->assertSee('id="create-alert"', false)
+            ->assertSee(route('alert-rule.create'))
+            ->assertSee(route('alert-rule.edit', $rule))
+            ->assertDontSee('data-alert-rule-editor', false)
             ->assertDontSee('create the default alert rules');
     }
 
@@ -50,16 +53,12 @@ final class AlertRulesPageTest extends TestCase
         AlertRule::factory()->create(['name' => 'Other device rule'])->devices()->attach(Device::factory()->create());
         AlertRule::factory()->create(['name' => 'This device rule'])->devices()->attach($device);
 
-        $content = $this->actingAs($this->admin())
+        $response = $this->actingAs($this->admin())
             ->get(route('device.edit.alert-rules', $device))
             ->assertOk()
-            ->getContent();
+            ->assertSee(route('alert-rule.create', ['device' => $device->device_id]));
 
-        // the rules table, not the dialog that copies any existing rule
-        $table = \Illuminate\Support\Str::betweenFirst((string) $content, 'id="alert-rules-table"', '</table>');
-        $this->assertStringContainsString('Global rule', $table);
-        $this->assertStringContainsString('This device rule', $table);
-        $this->assertStringNotContainsString('Other device rule', $table);
+        $response->assertSee('Global rule')->assertSee('This device rule')->assertDontSee('Other device rule');
     }
 
     public function testListingAndCopyPickerFollowRuleVisibilityWithoutRequiringAlerts(): void
@@ -95,6 +94,11 @@ final class AlertRulesPageTest extends TestCase
         }
         $this->getJson(route('alert-rule.show', $unmapped))->assertForbidden();
         $this->getJson(route('alert-rule-template.rule', $unmapped))->assertForbidden();
+        $this->get(route('alert-rule.create', ['copy' => $unmapped->id]))->assertForbidden();
+        $this->get(route('alert-rule.create', ['copy' => $deviceRule->id]))
+            ->assertOk()
+            ->assertSee('Mapped via device - Copy')
+            ->assertViewHas('copyableRules', fn ($rules) => $rules->pluck('id')->all() === [$deviceRule->id, $groupRule->id, $locationRule->id]);
 
         $user->givePermissionTo(Permission::findOrCreate('alert-rule.viewAll'));
         $this->get(route('alert-rules.index'))->assertOk()->assertSee('Unmapped rule')->assertSee('Inaccessible rule');
@@ -112,10 +116,46 @@ final class AlertRulesPageTest extends TestCase
         $this->actingAs($user)->get(route('alert-rules.index'))
             ->assertOk()
             ->assertSee('Edit alert rule')
-            ->assertSee('id="create-alert"', false)
+            ->assertSee(route('alert-rule.edit', $rule))
             ->assertDontSee('Create new alert rule')
-            ->assertDontSee('id="search_rule_modal"', false)
-            ->assertDontSee('id="import-alert_rule"', false);
+            ->assertDontSee('data-alert-rule-editor', false);
+        $this->get(route('alert-rule.edit', $rule))
+            ->assertOk()
+            ->assertSee('data-alert-rule-editor', false)
+            ->assertDontSee('id="search_rule_modal"', false);
+        $this->get(route('alert-rule.create'))->assertForbidden();
+    }
+
+    public function testFullPageEditorRetainsDeviceContextAndReturnsToItsListing(): void
+    {
+        $device = Device::factory()->create();
+        $context = ['device' => $device->device_id];
+        $backUrl = route('device.edit.alert-rules', $device);
+        $createUrl = route('alert-rule.create', $context);
+
+        $this->actingAs($this->admin())->get($createUrl)
+            ->assertOk()
+            ->assertSee($backUrl)
+            ->assertViewHas('maps', [['id' => $device->device_id, 'text' => $device->displayName()]]);
+
+        $payload = $context + [
+            'name' => 'Device rule', 'severity' => 'warning', 'override_query' => '1',
+            'adv_query' => 'SELECT * FROM devices WHERE status = 1', 'maps' => [(string) $device->device_id],
+        ];
+        $this->post(route('alert-rule.store'), $payload)->assertRedirect($backUrl);
+        $rule = AlertRule::where('name', $payload['name'])->firstOrFail();
+        $editUrl = route('alert-rule.edit', ['alert_rule' => $rule] + $context);
+
+        $this->get($editUrl)->assertOk()->assertSee('name="_method" value="PUT"', false)->assertSee($backUrl);
+        $payload['name'] = 'Updated device rule';
+        $payload['adv_query'] = '';
+        $this->from($editUrl)->put(route('alert-rule.update', $rule), $payload)
+            ->assertRedirect($editUrl)->assertSessionHasErrors('adv_query');
+        $this->get($editUrl)->assertOk()->assertSee('value="Updated device rule"', false);
+
+        $payload['adv_query'] = $rule->query;
+        $this->put(route('alert-rule.update', $rule), $payload)->assertRedirect($backUrl);
+        $this->assertSame('Updated device rule', $rule->refresh()->name);
     }
 
     public function testListingShowsChangedAndAcknowledgedAlertsAsAlerting(): void
@@ -200,8 +240,74 @@ final class AlertRulesPageTest extends TestCase
             ->post(route('alert-rules.defaults'))
             ->assertRedirect();
 
-        $this->assertTrue(AlertRule::where('name', 'Device rebooted')->exists());
-        $this->assertNotEmpty(AlertRule::where('name', 'Device rebooted')->value('query'));
+        $this->post(route('alert-rules.defaults'))->assertRedirect();
+        $rules = AlertRule::where('name', 'Device rebooted')->get();
+        $this->assertCount(1, $rules);
+        $this->assertNotEmpty($rules->firstOrFail()->query);
+        $this->assertSame(1, $rules->firstOrFail()->extra['count']);
+    }
+
+    public function testImportPreservesBundledRuleOptions(): void
+    {
+        $id = array_search('Device rebooted', array_column(AlertRuleDefinitions::all(), 'name'), true);
+        $this->assertIsInt($id);
+        $template = $this->actingAs($this->admin())->getJson(route('alert-rule-template', $id))
+            ->assertOk()->assertJsonPath('extra.count', 1)->json();
+
+        $this->postJson(route('alert-rule.store'), [
+            'name' => 'Imported reboot rule',
+            'severity' => $template['severity'],
+            'builder_json' => json_encode($template['builder']),
+            'template_id' => $template['template_id'],
+        ])->assertOk()->assertJsonPath('status', 'ok');
+
+        $this->assertSame(1, AlertRule::where('name', 'Imported reboot rule')->firstOrFail()->extra['count']);
+    }
+
+    public function testInvalidBuilderOrMappingLeavesTheRuleAndItsTargetsIntact(): void
+    {
+        $rule = AlertRule::factory()->create();
+        $device = Device::factory()->create();
+        $rule->devices()->attach($device);
+        $payload = ['name' => 'Updated rule', 'severity' => $rule->severity];
+
+        $this->actingAs($this->admin())->putJson(route('alert-rule.update', $rule), $payload + ['builder_json' => '[]'])
+            ->assertUnprocessable()->assertJsonValidationErrors('builder_json');
+        $this->putJson(route('alert-rule.update', $rule), $payload + [
+            'override_query' => true, 'adv_query' => $rule->query, 'maps' => ['invalid'],
+        ])->assertUnprocessable()->assertJsonValidationErrors('maps.0');
+        $this->putJson(route('alert-rule.update', $rule), $payload + [
+            'override_query' => true, 'adv_query' => $rule->query, 'maps' => ['l2147483647'],
+        ])->assertUnprocessable()->assertJsonValidationErrors('maps');
+
+        $this->assertNotSame($payload['name'], $rule->refresh()->name);
+        $this->assertSame([$device->device_id], $rule->devices()->pluck('devices.device_id')->all());
+    }
+
+    public function testFailedMappingSyncRollsBackEarlierWrites(): void
+    {
+        $rule = AlertRule::factory()->create();
+        $device = Device::factory()->create();
+        $replacement = Device::factory()->create();
+        $location = Location::factory()->create();
+        $rule->devices()->attach($device);
+        $rule->getConnection()->beforeExecuting(function (string $query): void {
+            if (str_starts_with($query, 'insert') && str_contains($query, 'alert_location_map')) {
+                throw new \RuntimeException('Could not insert location mapping');
+            }
+        });
+
+        $this->actingAs($this->admin())->putJson(route('alert-rule.update', $rule), [
+            'name' => 'Updated rule',
+            'severity' => $rule->severity,
+            'override_query' => true,
+            'adv_query' => $rule->query,
+            'maps' => [(string) $replacement->device_id, 'l' . $location->id],
+        ])->assertInternalServerError();
+
+        $this->assertNotSame('Updated rule', $rule->refresh()->name);
+        $this->assertSame([$device->device_id], $rule->devices()->pluck('devices.device_id')->all());
+        $this->assertFalse($rule->locations()->exists());
     }
 
     public function testCreatingDefaultsRequiresPermission(): void
@@ -211,6 +317,18 @@ final class AlertRulesPageTest extends TestCase
 
         $this->actingAs($user)->post(route('alert-rules.defaults'))->assertForbidden();
         $this->assertFalse(AlertRule::exists());
+    }
+
+    public function testRuleWritesRequirePermissionBeforeValidation(): void
+    {
+        $user = User::factory()->create(['enabled' => 1])->assignRole('user');
+        $rule = AlertRule::factory()->create();
+
+        $this->actingAs($user)->postJson(route('alert-rule.store'), [])->assertForbidden();
+
+        $user->givePermissionTo(Permission::findOrCreate('alert-rule.create'));
+        $this->postJson(route('alert-rule.store'), [])->assertUnprocessable();
+        $this->putJson(route('alert-rule.update', $rule), [])->assertForbidden();
     }
 
     private function admin(): User

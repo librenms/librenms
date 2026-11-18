@@ -3,7 +3,7 @@
     $pickers = [
         'search_rule_modal' => [
             'title' => __('Alert rule collection'),
-            'url' => 'alert-rule-template',
+            'source' => 'template',
             'rows' => collect($collection)->map(fn ($rule, $id) => [
                 'id' => $id,
                 'name' => $rule['name'],
@@ -13,7 +13,7 @@
         ],
         'search_alert_rule_modal' => [
             'title' => __('Running Alert rules'),
-            'url' => 'alert-rule-template.rule',
+            'source' => 'copy',
             'rows' => $copyableRules->map(fn ($rule) => [
                 'id' => $rule->id,
                 'name' => $rule->name,
@@ -32,7 +32,7 @@
                     <h5 class="modal-title" id="{{ $modalId }}-title">{{ $picker['title'] }}</h5>
                 </div>
                 <div class="modal-body">
-                    <table class="table table-condensed table-hover alert-rule-picker" data-template-route="{{ $picker['url'] }}">
+                    <table class="table table-condensed table-hover alert-rule-picker" data-draft-source="{{ $picker['source'] }}">
                         <thead>
                         <tr>
                             <th data-column-id="name" data-width="200px">{{ __('Name') }}</th>
@@ -57,59 +57,3 @@
         </div>
     </div>
 @endforeach
-
-@push('scripts')
-<script>
-    $('.alert-rule-picker').each(function () {
-        const $table = $(this);
-        const $modal = $table.closest('.modal');
-        let requestId = 0;
-        let selection = null;
-
-        const select = function () {
-            const request = ++requestId;
-            const session = editorSession;
-            axios.get(route($table.data('template-route'), $(this).data('id'))).then(({data}) => {
-                if (request !== requestId || session !== editorSession || ! $modal.hasClass('in')) return;
-
-                selection = {session, rule: data};
-                $modal.modal('hide');
-            }).catch(() => {
-                if (request === requestId && session === editorSession) {
-                    toastr.error(@js(__('Failed to process template')));
-                }
-            });
-        };
-
-        // bootgrid stops click propagation in rows, so bind to the buttons each time they render
-        $table.bootgrid({
-            caseSensitive: false,
-            formatters: {
-                select: (column, row) => `<button type="button" class="btn btn-sm btn-primary" data-id="${parseInt(row.id)}">${@js(__('Select'))}</button>`
-            },
-        }).on('loaded.rs.jquery.bootgrid', () => $table.find('button[data-id]').on('click', select));
-
-        $modal.on('show.bs.modal', () => {
-            ++requestId;
-            selection = null;
-        }).on('hide.bs.modal', () => {
-            ++requestId;
-        }).on('hidden.bs.modal', () => {
-            // Keep the editor scrollable when a picker opened over it closes.
-            if ($editor.hasClass('in')) {
-                $('body').addClass('modal-open');
-            }
-
-            const selected = selection;
-            selection = null;
-            if (selected?.session === editorSession) {
-                try {
-                    applyRuleTemplate(selected.rule);
-                } catch {
-                    $ruleError.text(@js(__('Failed to process template'))).show();
-                }
-            }
-        });
-    });
-</script>
-@endpush

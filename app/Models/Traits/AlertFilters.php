@@ -16,7 +16,7 @@ trait AlertFilters
     use Filterable;
 
     /** alert_rules.severity enum values in order, so the position + 1 is the legacy numeric severity */
-    public const SEVERITIES = ['ok', 'warning', 'critical'];
+    public const array SEVERITIES = ['ok', 'warning', 'critical'];
 
     /**
      * States offered by the state filter, keyed by name. String keys keep the options a JSON object,
