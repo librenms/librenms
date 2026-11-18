@@ -98,7 +98,7 @@ class AlertFault extends DeviceRelatedModel
     public static function filterFieldDefinitions(?int $deviceId = null): array
     {
         return [
-            ...self::alertFilterFields('faults', $deviceId),
+            ...self::alertFilterFields('ajax.select.alert-rule', $deviceId),
             [
                 'key' => 'unreachable',
                 'label' => __('Unreachable'),

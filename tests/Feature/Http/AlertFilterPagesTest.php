@@ -22,11 +22,12 @@ final class AlertFilterPagesTest extends InMemoryDbTestCase
         $this->actingAs($user)->get(route('faults'))->assertForbidden();
         $this->actingAs($user)->get(route('alert-log'))->assertForbidden();
         $this->actingAs($user)->get(route('ajax.select.alert-rule'))->assertForbidden();
+        $this->get(route('ajax.select.alert-log-rule'))->assertForbidden();
 
         $user->givePermissionTo(Permission::findOrCreate('alert-log.view'));
-        $this->getJson(route('ajax.select.alert-rule', ['source' => 'history']))->assertOk();
-        $this->getJson(route('ajax.select.alert-rule', ['source' => 'faults']))->assertForbidden();
-        $this->getJson(route('ajax.select.alert-rule', ['source' => 'invalid']))->assertUnprocessable();
+        $this->getJson(route('ajax.select.alert-log-rule'))->assertOk();
+        $this->getJson(route('ajax.select.alert-rule'))->assertForbidden();
+        $this->getJson(route('ajax.select.alert-log-rule', ['device' => 0]))->assertUnprocessable();
     }
 
     public function testFilterFieldsFollowPermissions(): void
@@ -55,7 +56,7 @@ final class AlertFilterPagesTest extends InMemoryDbTestCase
         $this->actingAs($admin)->get(route('device.faults', $device->device_id))
             ->assertOk()
             ->assertViewHas('filterFields', fn ($fields) => ! in_array('device_id', array_column($fields, 'key')))
-            ->assertViewHas('filterFields', fn ($fields) => in_array(route('ajax.select.alert-rule', ['source' => 'faults', 'device' => $device->device_id]), array_column($fields, 'endpoint')))
+            ->assertViewHas('filterFields', fn ($fields) => in_array(route('ajax.select.alert-rule', ['device' => $device->device_id]), array_column($fields, 'endpoint')))
             ->assertSee("'device.faults'", false)
             ->assertSee('fa-bar-chart', false)
             ->assertSee(route('device.faults.stats', $device->device_id), false)
@@ -64,7 +65,7 @@ final class AlertFilterPagesTest extends InMemoryDbTestCase
         $this->actingAs($admin)->get(route('device.faults.history', $device->device_id))
             ->assertOk()
             ->assertViewHas('filterFields', fn ($fields) => ! in_array('device.location_id', array_column($fields, 'key')))
-            ->assertViewHas('filterFields', fn ($fields) => in_array(route('ajax.select.alert-rule', ['source' => 'history', 'device' => $device->device_id]), array_column($fields, 'endpoint')))
+            ->assertViewHas('filterFields', fn ($fields) => in_array(route('ajax.select.alert-log-rule', ['device' => $device->device_id]), array_column($fields, 'endpoint')))
             ->assertSee("'device.alert-log'", false)
             ->assertSee("device_id: $device->device_id", false);
 
@@ -111,10 +112,12 @@ final class AlertFilterPagesTest extends InMemoryDbTestCase
 
         $this->assertSame([$visibleFault->id], $this->ruleIds($user));
         $this->assertSame([], $this->ruleIds($user, ['id' => $hiddenFault->id]));
-        $this->assertSame([$visibleHistory->id], $this->ruleIds($user, ['source' => 'history']));
+        $this->assertSame([$visibleHistory->id], $this->ruleIds($user, route: 'ajax.select.alert-log-rule'));
+        $this->getJson(route('ajax.select.alert-log-rule', ['term' => $visibleHistory->name]))
+            ->assertOk()->assertJsonPath('results.0.text', $visibleHistory->name);
         $this->assertEqualsCanonicalizing([$visibleFault->id, $hiddenFault->id], $this->ruleIds($admin));
-        $this->assertEqualsCanonicalizing([$visibleHistory->id, $hiddenHistory->id], $this->ruleIds($admin, ['source' => 'history']));
-        $this->assertSame([$hiddenHistory->id], $this->ruleIds($admin, ['source' => 'history', 'device' => $other->device_id]));
+        $this->assertEqualsCanonicalizing([$visibleHistory->id, $hiddenHistory->id], $this->ruleIds($admin, route: 'ajax.select.alert-log-rule'));
+        $this->assertSame([$hiddenHistory->id], $this->ruleIds($admin, ['device' => $other->device_id], 'ajax.select.alert-log-rule'));
     }
 
     public function testAlertMenuUsesAlertsOnAccessibleDevices(): void
@@ -188,12 +191,12 @@ final class AlertFilterPagesTest extends InMemoryDbTestCase
     }
 
     /**
-     * @param  array<string, int|string>  $params
+     * @param  array<string, int>  $params
      * @return int[]
      */
-    private function ruleIds(User $user, array $params = []): array
+    private function ruleIds(User $user, array $params = [], string $route = 'ajax.select.alert-rule'): array
     {
-        return array_column($this->actingAs($user)->getJson(route('ajax.select.alert-rule', $params))->assertOk()->json('results'), 'id');
+        return array_column($this->actingAs($user)->getJson(route($route, $params))->assertOk()->json('results'), 'id');
     }
 
     /**
