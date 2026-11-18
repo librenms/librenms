@@ -286,8 +286,13 @@ class Validator
     public static function getUsername(): string
     {
         if (self::$username === null) {
-            $name = function_exists('posix_getpwuid') ? (posix_getpwuid(posix_geteuid())['name'] ?? null) : null;
-            self::$username = $name ?: (getenv('USERNAME') ?: getenv('USER') ?: '?');
+            if (function_exists('posix_getpwuid')) {
+                $uid = posix_geteuid();
+                self::$username = posix_getpwuid($uid)['name'] ?? (string) $uid;
+            } else {
+                // the environment can name another user, so it is only the fallback
+                self::$username = getenv('USERNAME') ?: getenv('USER') ?: '?';
+            }
         }
 
         return self::$username;

@@ -28,14 +28,11 @@ namespace LibreNMS\Validations\Rrd;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Interfaces\Validation;
-use LibreNMS\Util\Rewrite;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
 class CheckRrdcachedConnectivity implements Validation
 {
-    private const ENOENT = 2;
-
     /**
      * @inheritDoc
      */
@@ -50,7 +47,7 @@ class CheckRrdcachedConnectivity implements Validation
             // connect instead of file_exists: the socket can exist while rrdcached is stopped or without
             // permission, and file_exists also returns false when a parent directory is not accessible
             $error = self::connect("unix://$socket", $errno);
-            if ($errno === self::ENOENT) {
+            if ($errno === SOCKET_ENOENT) {
                 return ValidationResult::fail(trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_socket', ['socket' => $socket]));
             }
 
@@ -62,7 +59,8 @@ class CheckRrdcachedConnectivity implements Validation
             }
         } else {
             [$host, $port] = self::hostAndPort($rrdcached);
-            if (self::connect('tcp://' . Rewrite::addIpv6Brackets($host) . ":$port") !== null) {
+            // any colon means ipv6: Rewrite::addIpv6Brackets skips scoped addresses like fe80::1%eth0
+            if (self::connect('tcp://' . (str_contains($host, ':') ? "[$host]" : $host) . ":$port") !== null) {
                 return ValidationResult::fail(trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_port', ['server' => $host, 'port' => $port]));
             }
         }
