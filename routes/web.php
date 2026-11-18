@@ -451,9 +451,6 @@ Route::middleware(['auth'])->group(function (): void {
     Route::post('alert-templates/convert', [AlertTemplateController::class, 'convert'])->name('alert-templates.convert');
     Route::resource('alert-templates', AlertTemplateController::class)->except(['show'])->where(['alert_template' => '[0-9]+']);
     Route::redirect('templates', 'alert-templates');
-    Route::delete('alert/transports/{transport}', [AlertTransportController::class, 'destroy'])->name('alert.transports.destroy');
-    Route::delete('alert/transport-groups/{alert_transport_group}', [AlertTransportGroupController::class, 'destroy'])->name('alert.transport-groups.destroy');
-    Route::delete('alert-templates/{alert_template}', [AlertTemplateController::class, 'destroy'])->name('alert-templates.destroy');
     Route::get('alert-rules', [AlertRuleController::class, 'index'])->name('alert-rules.index');
     Route::post('alert-rules/defaults', [AlertRuleController::class, 'createDefaults'])->name('alert-rules.defaults');
     Route::resource('alert-rule', AlertRuleController::class)->except(['index']);

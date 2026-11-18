@@ -88,7 +88,7 @@
                                 <div>{{ $except }}<a href="{{ route('device-groups.edit', $group->id) }}">{{ $group->name }}</a></div>
                             @endforeach
                             @foreach($rule->devices->sortBy('hostname') as $mapped)
-                                <div>{{ $except }}<a href="{{ route('device.edit', $mapped->device_id) }}">{{ $mapped->displayName() }}</a></div>
+                                <div>{{ $except }}<a href="{{ route('device.edit', $mapped->device_id) }}">{{ $mapped->display }}</a></div>
                             @endforeach
                             @if($rule->devices->isEmpty() && $rule->groups->isEmpty() && $rule->locations->isEmpty())
                                 <a href="{{ route('devices') }}">{{ __('All Devices') }}</a>

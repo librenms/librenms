@@ -136,7 +136,7 @@ final class AlertRulesPageTest extends TestCase
         $this->actingAs($this->admin())->get($createUrl)
             ->assertOk()
             ->assertSee($backUrl)
-            ->assertViewHas('maps', [['id' => $device->device_id, 'text' => $device->displayName()]]);
+            ->assertViewHas('maps', [['id' => $device->device_id, 'text' => $device->display]]);
 
         $payload = $context + [
             'name' => 'Device rule', 'severity' => 'warning', 'override_query' => '1',

@@ -78,7 +78,7 @@ class AlertRuleController extends Controller
         $request->validate(['device' => ['nullable', 'integer', 'min:1']]);
         $device = $this->editorDevice($request);
         $canCreate = Gate::allows('create', AlertRule::class);
-        $maps = $draft['maps'] ?? ($device ? [['id' => $device->device_id, 'text' => $device->displayName()]] : []);
+        $maps = $draft['maps'] ?? ($device ? [['id' => $device->device_id, 'text' => $device->display]] : []);
         $operationId = $draft['alert_operation_id'] ?? null;
         $operationName = $draft['alert_operation_name'] ?? '';
 
