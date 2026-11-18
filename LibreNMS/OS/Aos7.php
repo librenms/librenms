@@ -418,10 +418,9 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
 
     private function parseAosTimestamp(string $timestamp): int
     {
-        $timestamp = trim(trim($timestamp), "\"'");
+        $timestamp = $this->normalizeAosDaString($timestamp);
 
-        // DateAndTime: 2026-10-13,9:0:35.0,+2:0 (the UTC offset is optional)
-        if (! preg_match('/^\d{4}-\d{1,2}-\d{1,2},\d{1,2}:\d{1,2}:\d{1,2}(?:\.\d+)?(?:,[+-]\d{1,2}:\d{1,2})?$/D', $timestamp)) {
+        if (trim($timestamp) === '') {
             return 0;
         }
 

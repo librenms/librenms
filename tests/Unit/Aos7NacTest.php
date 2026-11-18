@@ -116,8 +116,8 @@ class Aos7NacTest extends TestCase
                 'loginTimestamp' => '2026-10-13,0:0:35.0',
                 'expectedLoginTime' => '2026-10-13 00:00:35',
             ]],
-            'relative date from the device is ignored' => ['', '', '', 3, 0, '0.0.0.0', 'authzSuccess', 0, [
-                'loginTimestamp' => 'yesterday',
+            'missing login time placeholder is ignored' => ['', '', '', 3, 0, '0.0.0.0', 'authzSuccess', 0, [
+                'loginTimestamp' => '"-"',
             ]],
             'invalid login time is ignored' => ['', '', '', 3, 0, '0.0.0.0', 'authzSuccess', 0, [
                 'loginTimestamp' => '2026-10-13,99:0:35.0',
