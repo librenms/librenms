@@ -154,25 +154,26 @@ final class ComponentTest extends DBTestCase
         $this->assertFalse(ComponentPref::where('component', $base->id)->exists());
     }
 
-    public function testSetComponentPrefsUnlogged(): void
+    public function testSetComponentPrefsWithoutLog(): void
     {
         $base = \App\Models\Component::factory()->create(); /** @var \App\Models\Component $base */
         $component = new Component();
 
         $prefs = $this->buildExpected($base)[$base->device_id];
         $prefs[$base->id]['counter'] = 1;
-        $prefs[$base->id]['state'] = 'up';
-        $component->setComponentPrefs($base->device_id, $prefs, ['counter']);
+        $component->setComponentPrefs($base->device_id, $prefs, log: false);
 
         $prefs[$base->id]['counter'] = 2;
-        $prefs[$base->id]['state'] = 'down';
-        $component->setComponentPrefs($base->device_id, $prefs, ['counter']);
+        $component->setComponentPrefs($base->device_id, $prefs, log: false);
 
-        // The unlogged attribute is still saved, only its change is not logged
+        // The value is still saved, only the eventlog is skipped
         $this->assertEquals(2, ComponentPref::where(['component' => $base->id, 'attribute' => 'counter'])->value('value'));
-        $messages = Eventlog::where('reference', $base->id)->pluck('message');
-        $this->assertContains("Component: $base->type($base->id). Attribute: state, was modified from: up, to: down", $messages);
-        $this->assertEmpty($messages->filter(fn ($message) => str_contains($message, 'Attribute: counter, was modified')));
+        $this->assertFalse(Eventlog::where('reference', $base->id)->exists());
+
+        // Logging stays on by default
+        $prefs[$base->id]['counter'] = 3;
+        $component->setComponentPrefs($base->device_id, $prefs);
+        $this->assertContains("Component: $base->type($base->id). Attribute: counter, was modified from: 2, to: 3", Eventlog::where('reference', $base->id)->pluck('message'));
     }
 
     public function testCreateComponent(): void
