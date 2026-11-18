@@ -37,6 +37,9 @@ class ServiceRequest extends FormRequest
         return $rules;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function attributesForService(): array
     {
         $attributes = $this->safe()->except('device_id');
