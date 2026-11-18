@@ -166,13 +166,13 @@
 
         const now = () => Math.floor(Date.now() / 1000);
 
-        // the first index whose timestamp is after the time, or at it too
-        const firstAfter = (timestamps, time, orAt = false) => {
+        // the first index whose timestamp is after the time
+        const firstAfter = (timestamps, time) => {
             let low = 0;
             let high = timestamps.length;
             while (low < high) {
                 const middle = (low + high) >> 1;
-                if (timestamps[middle] > time || (orAt && timestamps[middle] === time)) {
+                if (timestamps[middle] > time) {
                     high = middle;
                 } else {
                     low = middle + 1;
@@ -184,7 +184,7 @@
 
         window.Alpine.data('timeSeriesGraph', (src, range) => {
             // not reactive
-            let draw = null; // the chart module
+            let charts = null; // the chart module
             let chart = null;
             let graph = null;
             let view = null; // {from, to} zoomed or panned to
@@ -328,7 +328,7 @@
                             window.axios.get(src, { params, signal: current.signal }),
                         ]);
 
-                        draw = module;
+                        charts = module;
                         graph = response.data;
                         loaded = { from: params.from, to: params.to, detail: (params.to - params.from) / params.width };
                         this.caption = graph.axis.label;
@@ -358,7 +358,7 @@
                 draw() {
                     chart?.destroy();
                     this.tooltip = null;
-                    chart = draw.default(this.$refs.plot, graph, {
+                    chart = charts.default(this.$refs.plot, graph, {
                         view: shown(),
                         hidden: new Set(this.hidden),
                         compact: ! WIDE_SCREEN.matches,
@@ -375,13 +375,13 @@
                     }
 
                     const { from, to } = shown();
-                    // a point covers the interval up to its time, the last one shown may end after the view
+                    // a point covers the interval up to its time, the last one shown may end after the view (times are whole seconds)
                     const start = firstAfter(graph.timestamps, from);
-                    const end = Math.min(firstAfter(graph.timestamps, to, true) + 1, graph.timestamps.length);
+                    const end = Math.min(firstAfter(graph.timestamps, to - 1) + 1, graph.timestamps.length);
 
                     this.legend = graph.series.map((series) => {
-                        const format = (value) => draw.formatValue(value, series.unit, graph.axis.base);
-                        const summary = draw.summarize(series, start, end);
+                        const format = (value) => charts.formatValue(value, series.unit, graph.axis.base);
+                        const summary = charts.summarize(series, start, end);
 
                         return {
                             key: series.key,
@@ -423,7 +423,7 @@
                             label: series.label,
                             color: series.color,
                             amount: series.avg[position.index],
-                            value: draw.formatValue(series.avg[position.index], series.unit, graph.axis.base),
+                            value: charts.formatValue(series.avg[position.index], series.unit, graph.axis.base),
                         }));
 
                     // the busiest ones

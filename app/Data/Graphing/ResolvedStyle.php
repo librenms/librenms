@@ -3,7 +3,6 @@
 namespace App\Data\Graphing;
 
 use App\Facades\LibrenmsConfig;
-use App\Graphs\SeriesPalette;
 
 /**
  * How a series is drawn once the graph is known: defaults filled in and the style rules applied.
@@ -29,7 +28,7 @@ readonly class ResolvedStyle
     }
 
     /**
-     * Series without a color get the next one of the palette, in order
+     * Series without a color get the next one of the palette, in order, starting over when they run out
      *
      * @param  array<string, DataSeries>  $series  the series that are drawn
      * @param  string  $palette  a graph_colours palette
@@ -37,13 +36,15 @@ readonly class ResolvedStyle
      */
     public static function resolve(array $series, string $palette): array
     {
-        $colors = new SeriesPalette($palette);
+        $colors = LibrenmsConfig::get("graph_colours.$palette");
+        $colors = is_array($colors) && $colors !== [] ? array_values($colors) : ['000000'];
+        $next = 0;
         $inverts = ! LibrenmsConfig::get('webui.graph_stacked');
         $averaged = count(array_filter($series, fn (DataSeries $item) => $item->style->stackAverage));
 
-        return array_map(function (DataSeries $item) use ($colors, $inverts, $averaged): self {
+        return array_map(function (DataSeries $item) use ($colors, &$next, $inverts, $averaged): self {
             $style = $item->style;
-            $color = $style->color ?? $colors->next();
+            $color = $style->color ?? $colors[$next++ % count($colors)];
 
             return new self(
                 color: $color,
