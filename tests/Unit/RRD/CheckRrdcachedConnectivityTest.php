@@ -49,12 +49,11 @@ final class CheckRrdcachedConnectivityTest extends TestCase
         $server = stream_socket_server("unix://$socket");
         LibrenmsConfig::set('rrdcached', "unix:$socket");
 
-        try {
-            $this->assertSame(ValidationResult::SUCCESS, (new CheckRrdcachedConnectivity)->validate()->getStatus());
-        } finally {
-            fclose($server);
-            @unlink($socket);
-        }
+        $result = (new CheckRrdcachedConnectivity)->validate();
+        fclose($server);
+        unlink($socket);
+
+        $this->assertSame(ValidationResult::SUCCESS, $result->getStatus());
     }
 
     public function testUnixSocketNotListening(): void
@@ -63,13 +62,10 @@ final class CheckRrdcachedConnectivityTest extends TestCase
         $socket = tempnam(sys_get_temp_dir(), 'librenms-rrdcached-test');
         LibrenmsConfig::set('rrdcached', "unix:$socket");
 
-        try {
-            $result = (new CheckRrdcachedConnectivity)->validate();
+        $result = (new CheckRrdcachedConnectivity)->validate();
+        unlink($socket);
 
-            $this->assertSame(ValidationResult::FAILURE, $result->getStatus());
-            $this->assertStringContainsString("Cannot connect to rrdcached socket $socket", $result->getMessage());
-        } finally {
-            @unlink($socket);
-        }
+        $this->assertSame(ValidationResult::FAILURE, $result->getStatus());
+        $this->assertStringContainsString("Cannot connect to rrdcached socket $socket", $result->getMessage());
     }
 }

@@ -40,7 +40,7 @@ class Validator
     /** @var array<string, ValidationResult[]> */
     private array $results = [];
 
-    private ?string $username = null;
+    private static ?string $username = null;
 
     /**
      * Validator constructor.
@@ -283,18 +283,14 @@ class Validator
      *
      * @return string
      */
-    public function getUsername(): string
+    public static function getUsername(): string
     {
-        if (! isset($this->username)) {
-            if (function_exists('posix_getpwuid')) {
-                $userinfo = posix_getpwuid(posix_geteuid());
-                $this->username = $userinfo['name'];
-            } else {
-                $this->username = getenv('USERNAME') ?: getenv('USER');
-            }
+        if (self::$username === null) {
+            $name = function_exists('posix_getpwuid') ? (posix_getpwuid(posix_geteuid())['name'] ?? null) : null;
+            self::$username = $name ?: (getenv('USERNAME') ?: getenv('USER') ?: '?');
         }
 
-        return $this->username;
+        return self::$username;
     }
 
     /**

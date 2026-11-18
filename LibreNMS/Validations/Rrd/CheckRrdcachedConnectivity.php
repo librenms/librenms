@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Interfaces\Validation;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\ValidationResult;
+use LibreNMS\Validator;
 
 class CheckRrdcachedConnectivity implements Validation
 {
@@ -50,10 +51,8 @@ class CheckRrdcachedConnectivity implements Validation
             // the socket can exist while rrdcached is stopped, or with permissions this user cannot connect with
             $error = self::connect("unix://$socket");
             if ($error !== null) {
-                $user = function_exists('posix_getpwuid') ? (posix_getpwuid(posix_geteuid())['name'] ?? '?') : '?';
-
                 return ValidationResult::fail(
-                    trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_socket_connect', ['socket' => $socket, 'user' => $user, 'error' => $error]),
+                    trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_socket_connect', ['socket' => $socket, 'user' => Validator::getUsername(), 'error' => $error]),
                     trans('validation.validations.rrd.CheckRrdcachedConnectivity.fix_socket_connect', ['group' => config('librenms.group')])
                 );
             }
