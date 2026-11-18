@@ -20,6 +20,9 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
     // For MPLS pseudowires
     $pws = snmpwalk_cache_oid($device, 'cpwVcMplsPeerLdpID', $pws, 'CISCO-IETF-PW-MPLS-MIB');
 
+    // cpwVcID is how existing rows are matched, but it can repeat (e.g. VPLS), so only refresh unique ones
+    $vc_id_counts = array_count_values(array_column($pws, 'cpwVcID'));
+
     $progress = ProgressList::start('Pseudowires');
     foreach ($pws as $pw_id => $pw) {
         // Added By Oirbsiu
@@ -29,17 +32,36 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
         $pw['cpwVcName'] = preg_replace('/(?<=\d)_(?=\d)/', '/', (string) $pw['cpwVcName']);
         // END
 
-        [$cpw_remote_id] = explode(':', (string) $pw['cpwVcMplsPeerLdpID']);
+        [$cpw_remote_ip] = explode(':', (string) $pw['cpwVcMplsPeerLdpID']);
+        $cpw_remote_id = $cpw_remote_ip;
 
-        if (\LibreNMS\Util\IPv4::isValid($cpw_remote_id)) {
+        if (\LibreNMS\Util\IPv4::isValid($cpw_remote_ip)) {
             //If cpwVcMplsPeerLdpID is in the IP form, then convert it to number to store it in DB to avoid failing
-            $cpw_remote_id = ip2long($cpw_remote_id);
+            $cpw_remote_id = ip2long($cpw_remote_ip);
         }
 
-        $cpw_remote_device = dbFetchCell('SELECT device_id from ipv4_addresses AS A, ports AS I WHERE A.ipv4_address=? AND A.port_id=I.port_id', [$cpw_remote_id]);
-        $if_id = dbFetchCell('SELECT port_id from ports WHERE `ifDescr`=? AND `device_id`=?', [$pw['cpwVcName'], $device['device_id']]);
+        // lookup must use the dotted IP, ipv4_addresses stores addresses as strings
+        // only resolve the peer when the address belongs to exactly one device
+        $peer_device_ids = \App\Models\Ipv4Address::join('ports', 'ipv4_addresses.port_id', '=', 'ports.port_id')
+            ->where('ipv4_addresses.ipv4_address', $cpw_remote_ip)
+            ->where('ports.deleted', 0)
+            ->distinct()->limit(2)->pluck('ports.device_id');
+        $cpw_remote_device = $peer_device_ids->count() == 1 ? $peer_device_ids->first() : null;
+        $if_id = \App\Models\Port::where('device_id', $device['device_id'])
+            ->where('ifDescr', $pw['cpwVcName'])
+            ->isNotDeleted()
+            ->value('port_id');
         if (! empty($pws_db[$pw['cpwVcID']])) {
             $pseudowire_id = $pws_db[$pw['cpwVcID']];
+            if ($vc_id_counts[$pw['cpwVcID']] == 1) {
+                // refresh peer and port, columns are NOT NULL so store 0 for an unresolved peer
+                // keep the existing port if it can't be resolved, the tab hides PWs without one
+                $updates = ['peer_device_id' => $cpw_remote_device ?? 0];
+                if ($if_id !== null) {
+                    $updates['port_id'] = $if_id;
+                }
+                \App\Models\Pseudowire::where('pseudowire_id', $pseudowire_id)->update($updates);
+            }
             $progress->mark('.');
         } else {
             $pseudowire_id = dbInsert(
