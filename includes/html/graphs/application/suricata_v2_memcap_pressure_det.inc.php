@@ -5,10 +5,12 @@ $unit_text = 'pressure';
 $ds = 'data';
 $descr = 'Memcap';
 
-if (isset($vars['sinstance'])) {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___memcap_pressure']);
-} else {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___memcap_pressure']);
+$rrd_prefix = isset($vars['sinstance']) ? 'instance_' . $vars['sinstance'] . '___' : 'totals___';
+
+// Suricata 8.0 renamed memcap_pressure to memcap.pressure
+$rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $rrd_prefix . 'memcap__pressure']);
+if (! Rrd::checkRrdExists($rrd_filename)) {
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $rrd_prefix . 'memcap_pressure']);
 }
 
 require 'includes/html/graphs/generic_stats.inc.php';

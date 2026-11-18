@@ -1,7 +1,7 @@
 <?php
 
 $name = 'suricata';
-$unit_text = 'per seconds';
+$unit_text = 'errors/sec';
 $colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 1;
