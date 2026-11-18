@@ -214,7 +214,7 @@ class AlertRuleController extends Controller
     /** @return array<string, mixed> */
     private function editorPayload(AlertRule $rule): array
     {
-        $rule->load(['devices:device_id,hostname,sysName', 'groups:id,name', 'locations:id,location']);
+        $rule->load(['devices:device_id,display,hostname,sysName', 'groups:id,name', 'locations:id,location']);
 
         return ['maps' => $this->formatDeviceMaps($rule)] + AlertRuleEditor::make($rule)->resolve();
     }
