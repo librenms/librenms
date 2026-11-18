@@ -108,6 +108,20 @@ class GraphDataControllerTest extends TestCase
 
         $response->assertStatus(500);
         $response->assertJsonPath('message', 'Graph Error');
+        $response->assertDontSee('/secret/path.rrd');
+    }
+
+    public function testRequestedAxisLimitsApplyWhenTheGraphSetsNone(): void
+    {
+        $device = Device::factory()->create();
+        $this->fakeRrdFiles('localhost/netstats-ip.rrd')->shouldReceive('xport')
+            ->andReturnUsing(fn (array $options) => $this->export($options, [1.0]));
+
+        $response = $this->actingAs($this->adminUser())->getJson("/graph-data?type=device_netstat_ip&device=$device->device_id&scale_min=-5&scale_max=50");
+
+        $response->assertOk();
+        $response->assertJsonPath('axis.min', 0); // set by the graph
+        $response->assertJsonPath('axis.max', 50);
     }
 
     public function testGraphsDrawnByScriptsHaveNoData(): void

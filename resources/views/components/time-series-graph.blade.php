@@ -2,7 +2,8 @@
 
 {{--
     range: ['last' => seconds] up to now, or ['from' => time, 'to' => time].
-    Set another with $el.timeSeriesGraph.setRange(range). Dispatches graph-range-changed with what is shown.
+    Set another with $el.timeSeriesGraph.setRange(range), reload with $el.timeSeriesGraph.refresh().
+    Dispatches graph-range-changed with what is shown.
 --}}
 @php
     $button = 'tw:h-8 tw:min-w-8 tw:px-2 tw:inline-flex tw:items-center tw:justify-center tw:gap-1 tw:rounded tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:text-gray-700 tw:dark:text-gray-200 tw:hover:bg-gray-100 tw:dark:hover:bg-dark-gray-300 tw:disabled:opacity-40 tw:disabled:pointer-events-none';
@@ -100,10 +101,12 @@
                         :class="hidden.includes(item.key) && 'tw:opacity-40'"
                         x-on:click="toggle(item.key, $event)">
                         <td class="tw:pr-2 tw:sm:pr-6 tw:py-1.5 tw:sm:py-0.5">
-                            <span class="tw:flex tw:items-center tw:gap-2">
+                            {{-- the click reaches the row --}}
+                            <button type="button" :aria-pressed="! hidden.includes(item.key)"
+                                    class="tw:flex tw:items-center tw:gap-2 tw:p-0 tw:border-0 tw:bg-transparent tw:text-inherit tw:text-left tw:cursor-pointer">
                                 <span class="tw:inline-block tw:w-3 tw:h-3 tw:rounded-sm tw:shrink-0" :style="{ backgroundColor: item.color }"></span>
                                 <span class="tw:max-w-[30vw] tw:sm:max-w-none tw:truncate" x-text="item.label"></span>
-                            </span>
+                            </button>
                         </td>
                         @foreach (['now', 'min', 'max', 'avg'] as $column)
                             <td class="tw:text-right tw:font-mono tw:tabular-nums tw:whitespace-nowrap tw:px-1.5 tw:sm:px-3" x-text="item.{{ $column }}"></td>
@@ -192,8 +195,10 @@
             let request = null;
             let timer = null;
             let legendFrame = null;
+            let resizes = null;
 
             const shown = () => view ?? ('last' in range ? { from: now() - range.last, to: now() } : range);
+            const keys = (data) => data.series.map((series) => series.key).join('\n');
 
             return {
                 loading: true,
@@ -207,14 +212,16 @@
                 caption: '',
 
                 init() {
-                    this.$root.timeSeriesGraph = { setRange: (next) => this.setRange(next) };
-                    new ResizeObserver(() => chart?.resize()).observe(this.$refs.plot);
+                    this.$root.timeSeriesGraph = { setRange: (next) => this.setRange(next), refresh: () => this.load() };
+                    resizes = new ResizeObserver(() => chart?.resize());
+                    resizes.observe(this.$refs.plot);
                     this.load();
                 },
 
                 destroy() {
                     clearTimeout(timer);
                     cancelAnimationFrame(legendFrame);
+                    resizes?.disconnect();
                     request?.abort();
                     chart?.destroy();
                 },
@@ -291,14 +298,23 @@
                         this.$dispatch('graph-range-changed', view ?? range);
                         if (this.needsData()) {
                             this.load();
+                        } else {
+                            // the loaded data covers it, a load for an earlier view would replace that
+                            request?.abort();
+                            this.refreshing = false;
                         }
                     }, moving ? SETTLE_DELAY : 0);
+                },
+
+                // not laid out while hidden
+                plotWidth() {
+                    return this.$refs.plot.clientWidth || window.innerWidth;
                 },
 
                 // the loaded data is missing a part of the view, newer data, or is too coarse or fine for it
                 needsData() {
                     const { from, to } = shown();
-                    const detail = (to - from) / this.$refs.plot.clientWidth;
+                    const detail = (to - from) / this.plotWidth();
 
                     return loaded === null
                         || from < loaded.from
@@ -315,7 +331,7 @@
                         from: from - margin,
                         to: until,
                         // the same detail as the view alone
-                        width: Math.round(this.$refs.plot.clientWidth * (until - from + margin) / (to - from)),
+                        width: Math.round(this.plotWidth() * (until - from + margin) / (to - from)),
                     };
 
                     request?.abort();
@@ -328,15 +344,18 @@
                             window.axios.get(src, { params, signal: current.signal }),
                         ]);
 
+                        const previous = graph;
                         charts = module;
                         graph = response.data;
                         loaded = { from: params.from, to: params.to, detail: (params.to - params.from) / params.width };
                         this.caption = graph.axis.label;
                         this.error = null;
 
-                        if (chart) {
+                        if (chart && keys(previous) === keys(graph)) {
                             chart.update(graph);
                         } else {
+                            // series came or went, keep the choices for the rest
+                            this.hidden = this.hidden.filter((key) => graph.series.some((series) => series.key === key));
                             this.draw();
                         }
                         this.updateLegend();

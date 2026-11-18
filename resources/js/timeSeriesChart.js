@@ -119,6 +119,19 @@ function drawnValues(series, values) {
     return factor === 1 ? values : values.map((value) => (value === null ? null : value * factor));
 }
 
+// uPlot starts a line at its first point, so give that point the start of its interval: the time before it
+function withFirstInterval(values) {
+    const first = values.findIndex((value) => value !== null);
+    if (first < 1) {
+        return values;
+    }
+
+    const extended = values.slice();
+    extended[first - 1] = values[first];
+
+    return extended;
+}
+
 // a gap in every series stays a gap
 function stack(lists) {
     const totals = [];
@@ -165,7 +178,8 @@ function valueRange(axis) {
         }
 
         const min = Math.min(dataMin, floor);
-        const max = Math.max(dataMax, axis.max ?? dataMax);
+        // zero stays in view for values below the axis
+        const max = Math.max(dataMax, axis.max ?? 0);
         const room = (max - min || 1) * 0.05;
 
         return [min < floor ? min - room : min, max === axis.max ? max : max + room];
@@ -205,7 +219,7 @@ export default function createChart(element, graph, { view, hidden, compact, onV
         const totalsByKey = Object.fromEntries(stacked.map((item, index) => [item.key, totals[index]]));
         const empty = source.timestamps.map(() => null);
 
-        return [source.timestamps, ...layers.map((layer) => layer.values(byKey, totalsByKey) ?? empty)];
+        return [source.timestamps, ...layers.map((layer) => withFirstInterval(layer.values(byKey, totalsByKey) ?? empty))];
     };
 
     // the first point ending at or after the time
@@ -346,7 +360,13 @@ export default function createChart(element, graph, { view, hidden, compact, onV
             // the page zooms to a selection, not uPlot
             drag: { x: true, y: false, setScale: false, dist: MIN_ZOOM_PIXELS },
             bind: {
-                mousedown: (self, target, handler) => (event) => (event.shiftKey ? handler(event) : startPan(event)),
+                mousedown: (self, target, handler) => (event) => {
+                    if (event.shiftKey) {
+                        return handler(event);
+                    }
+
+                    return event.button === 0 ? startPan(event) : null;
+                },
                 dblclick: () => () => {
                     onReset();
 

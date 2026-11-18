@@ -94,8 +94,8 @@ abstract class AbstractSeriesGraph extends AbstractGraph
                 timestamps: $data->timestamps,
                 axis: [
                     'label' => $options->verticalLabel ?? $options->legendTitle,
-                    'min' => $options->scaleMin,
-                    'max' => $options->scaleMax,
+                    'min' => $options->scaleMin ?? $this->params->scale_min,
+                    'max' => $options->scaleMax ?? $this->params->scale_max,
                     'base' => $options->base ?? 1000,
                 ],
                 series: $drawn,

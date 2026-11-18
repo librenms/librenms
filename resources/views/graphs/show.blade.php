@@ -104,7 +104,7 @@
 </div>
 </div>
 
-<x-refresh-timer :refresh="$refresh"></x-refresh-timer>
+<x-refresh-timer :refresh="$refresh" :callback="$drawInBrowser ? 'refreshGraph' : 'location.reload'"></x-refresh-timer>
 @endsection
 
 @section('javascript')
@@ -134,6 +134,11 @@
     }
 
     @if ($drawInBrowser)
+        // the refresh timer loads new data, keeping what the graph shows
+        function refreshGraph() {
+            document.querySelector('[x-data^="timeSeriesGraph"]')?.timeSeriesGraph?.refresh();
+        }
+
         // Thumbnails and date picker set the range of the graph; address, picker and highlight follow it.
         document.addEventListener('alpine:init', () => {
             // last: seconds up to now, null for a fixed range

@@ -279,9 +279,12 @@ class GraphsPageControllerTest extends TestCase
             ->get("/graphs?device={$device->device_id}&type=device_poller_perf&from=1700000000&to=1700003600");
 
         $response->assertOk();
-        $response->assertSee('to=1700003600', false); // the main graph
-        $this->assertDoesNotMatchRegularExpression('/graph\?[^"]*to=1700003600[^"]*absolute=1/', $response->getContent());
-        $this->assertDoesNotMatchRegularExpression('/graph\?[^"]*absolute=1[^"]*to=1700003600/', $response->getContent());
+        $this->assertMatchesRegularExpression('/src="[^"]*to=1700003600[^"]*"\s+fetchpriority="high"/', $response->getContent(), 'the main graph');
+        preg_match_all('/src="([^"]*)"[^>]*fetchpriority="low"/', $response->getContent(), $thumbnails);
+        $this->assertNotEmpty($thumbnails[1]);
+        foreach ($thumbnails[1] as $src) {
+            $this->assertStringNotContainsString('to=', $src);
+        }
     }
 
     public function testGraphsDrawnByScriptsAreAlwaysImages(): void
@@ -296,6 +299,7 @@ class GraphsPageControllerTest extends TestCase
         $response->assertDontSee('Interactive graph');
         $response->assertDontSee('x-data="timeSeriesGraph', false);
         $response->assertSee('Show RRD Command');
+        $this->assertMatchesRegularExpression('/src="[^"]*type=device_poller_perf[^"]*"\s+fetchpriority="high"/', $response->getContent(), 'the main graph is an image');
     }
 
     public function testSensorGraphPageUsesSubtitleFromAuthFile(): void

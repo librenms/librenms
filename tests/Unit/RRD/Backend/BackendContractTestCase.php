@@ -229,7 +229,7 @@ abstract class BackendContractTestCase extends TestCase
         $this->create($rrd);
         $start = intdiv(time(), 300) * 300 + 300;
         foreach ([1, 2, 3] as $row) {
-            $this->backend->update($rrd, [5, null], $start + $row * 300);
+            $this->backend->update($rrd, [$row * 10, null], $start + $row * 300);
         }
 
         $export = $this->backend->xport(['--start', (string) $start, '--end', (string) ($start + 900), '--maxrows', '10', "DEF:a=$rrd:a:AVERAGE", "DEF:b=$rrd:b:AVERAGE", 'XPORT:a:first', 'XPORT:b:second']);
@@ -237,8 +237,7 @@ abstract class BackendContractTestCase extends TestCase
         $this->assertSame(['first', 'second'], array_keys($export));
         $this->assertSame(array_keys($export['first']), array_keys($export['second']));
         // rows are at the end of their interval
-        $this->assertSame(5.0, $export['first'][$start + 600]);
-        $this->assertSame(5.0, $export['first'][$start + 900]);
+        $this->assertSame([$start + 300 => 10.0, $start + 600 => 20.0, $start + 900 => 30.0], array_filter($export['first'], fn (?float $value) => $value !== null));
         $this->assertContains(null, $export['second'], 'unknown values are null');
     }
 
