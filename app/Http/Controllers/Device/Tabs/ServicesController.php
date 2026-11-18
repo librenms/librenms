@@ -76,11 +76,11 @@ class ServicesController implements DeviceTab
         $options = [
             'basic' => [
                 'text' => __('Basic'),
-                'link' => route('device', ['device' => $device, 'tab' => 'services', 'view' => 'basic']),
+                'link' => route('device.services', ['device' => $device, 'view' => 'basic']),
             ],
             'details' => [
                 'text' => __('Details'),
-                'link' => route('device', ['device' => $device, 'tab' => 'services', 'view' => 'details']),
+                'link' => route('device.services', ['device' => $device, 'view' => 'details']),
             ],
         ];
 

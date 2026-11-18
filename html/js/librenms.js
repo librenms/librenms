@@ -31,7 +31,7 @@ function submitCustomRange(frmdata) {
 
 function updateTimezone(tz, staticTz)
 {
-    $.post(ajax_url + '/set_timezone',
+    $.post(timezoneUrl,
         {
             timezone: tz,
             static: staticTz
@@ -47,7 +47,7 @@ function updateTimezone(tz, staticTz)
 
 function updateResolution(refresh)
 {
-    $.post(ajax_url + '/set_resolution',
+    $.post(resolutionUrl,
         {
             width: $(window).width(),
             height:$(window).height()
@@ -148,11 +148,9 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
     var tableId = grid.attr('id');
 
     if ($('#' + tableId + '-export-button').length === 0) {
-        var ajaxUrl = grid.data('url');
-        var params = grid.data('params');
+        var exportUrl = grid.data('export-url');
 
-        if (ajaxUrl) {
-            var exportUrl = ajaxUrl + '/export' + (params ? '?' + params : '');
+        if (exportUrl) {
             var actionsContainer = null;
 
             var panel = grid.closest('div.panel');
@@ -607,7 +605,7 @@ function attachCustomMapBackgroundHooks(container, network, id) {
 function update_location(id, latlng, callback) {
     $.ajax({
         method: 'PATCH',
-        url: ajax_url + '/location/' + id,
+        url: route('location.update', {location: id}),
         data: {lat: latlng.lat, lng: latlng.lng}
     }).done(function () {
         toastr.success('Location updated');
@@ -671,7 +669,7 @@ function init_select2(selector, type, data, selected, placeholder, config) {
         allowClear: true,
         containerCssClass: ":all:",
         ajax: {
-            url: ajax_url + '/select/' + type,
+            url: route('ajax.select.' + type),
             delay: 150,
             data: data_function,
             error: function (jqXHR) {
@@ -755,7 +753,7 @@ function applySiteStyle(newStyle) {
 
     if (window.siteStyle !== newStyle) {
         window.siteStyle = newStyle;
-        $.post(ajax_url + '/set_style', { style: newStyle });
+        $.post(siteStyleUrl, { style: newStyle });
         document.querySelectorAll('img.graph-image').forEach(img => {
             img.src = img.src.replace(/&style=\w+/g, '') + '&style=' + newStyle;
         });

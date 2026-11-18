@@ -49,7 +49,7 @@ class FullscreenMapController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return redirect('fullscreenmap');
+            return redirect()->route('maps.fullscreen');
         }
 
         $group_id = $request->integer('group');

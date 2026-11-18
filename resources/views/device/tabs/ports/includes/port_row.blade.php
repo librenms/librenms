@@ -100,7 +100,7 @@
         @endif
         @if($port->vlans->isNotEmpty())
             <div class="tw:text-blue-800">
-                <a href="{{ \LibreNMS\Util\Url::deviceUrl($port->device_id, ['tab' => 'vlans']) }}">
+                <a href="{{ route('device.vlans', ['device' => $port->device_id]) }}">
                     @if($port->vlans->count() > 1)
                         <span title="{{ $port->vlans->sortby('vlan')->pluck('vlan')->implode(',') }}">{{ __('port.vlan_count', ['count' => $port->vlans->count()]) }}</span>
                     @elseif($port->vlans->count() == 1 || $port->ifVlan)

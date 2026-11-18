@@ -27,13 +27,14 @@
 namespace LibreNMS\Util;
 
 use App\Facades\LibrenmsConfig;
-use App\Http\Controllers\DeviceController;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\Sensor;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\DeviceStatus;
@@ -274,12 +275,19 @@ class Url
         $deviceId = ($device instanceof Device) ? $device->device_id : (int) $device;
         $tab = $vars['tab'] ?? null;
 
-        // tabs with their own route take their options in the query string
-        if ($tab !== 'port' && in_array($tab, DeviceController::ROUTED_TABS, true)) {
+        $route = 'device.' . ($tab ?? 'overview');
+        $editSection = $tab === 'edit' ? ($vars['section'] ?? null) : null;
+        if ($editSection && Route::has("device.edit.$editSection")) {
+            $route = "device.edit.$editSection";
+            unset($vars['section']);
+            $editSection = null;
+        }
+
+        if (! $editSection && ($tab !== 'port' || ! empty($vars['port'])) && Route::has($route)) {
             unset($vars['tab']);
             $vars = array_filter($vars, fn ($value) => $value !== null && $value !== '');
 
-            return route("device.$tab", ['device' => $deviceId] + $vars);
+            return route($route, ['device' => $deviceId] + $vars);
         }
 
         $routeParams = [$deviceId];
@@ -360,11 +368,6 @@ class Url
         return LaravelUrl::signedRoute('graph', $args);
     }
 
-    public static function graphPageUrl(string $type, array $args = []): string
-    {
-        return url()->query('graphs', ['type' => $type, ...$args]);
-    }
-
     /**
      * @param  array<string, mixed>  $args
      * @return string
@@ -397,9 +400,9 @@ class Url
 
         $args['from'] = $original_from;
 
-        $args['link'] = $link ?: self::generate($args, ['page' => 'graphs', 'height' => null, 'width' => null, 'bg' => null]);
+        $link = $link ?: route('graphs', Arr::except($args, ['height', 'width', 'bg', 'popup_title', 'page']));
 
-        return self::overlibLink($args['link'], $graph, $popup);
+        return self::overlibLink($link, $graph, $popup);
     }
 
     public static function lazyGraphTag($args, string $class = 'img-responsive'): string

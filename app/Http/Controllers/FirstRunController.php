@@ -54,7 +54,6 @@ use LibreNMS\Scan\NetworkScanner;
 use LibreNMS\Scan\ScanOptions;
 use LibreNMS\Util\Binaries;
 use LibreNMS\Util\IP;
-use LibreNMS\Util\Url;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Throwable;
 
@@ -340,7 +339,7 @@ class FirstRunController extends Controller
                 'os' => LibrenmsConfig::getOsSetting($device->os, 'text', $device->os),
                 'hardware' => $device->hardware,
                 'logo' => $device->logo(),
-                'url' => Url::deviceUrl($device),
+                'url' => route('device.overview', ['device' => $device]),
             ];
         }
 

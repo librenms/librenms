@@ -73,7 +73,9 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-        var ajax_url = "{{ url('/ajax') }}";
+        var timezoneUrl = @js(route('ajax.set-timezone'));
+        var resolutionUrl = @js(route('ajax.set-resolution'));
+        var siteStyleUrl = @js(route('ajax.set-style'));
     </script>
     <script src="{{ asset('js/librenms.js?ver=18112026') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
@@ -105,7 +107,7 @@
             window.tz = '{{ session('preferences.timezone') }}';
         @endif
         </script>
-        <script src="{{ asset('js/register-service-worker.js') }}" defer></script>
+        <script src="{{ asset('js/register-service-worker.js?ver=18112026') }}" defer></script>
     @endauth
     @yield('javascript')
 </head>

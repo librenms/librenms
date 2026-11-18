@@ -5,6 +5,7 @@ namespace LibreNMS\Tests\Feature\Http;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Service;
+use App\Models\ServiceTemplate;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\TestCase;
@@ -36,6 +37,16 @@ final class ServiceControllerTest extends TestCase
         rmdir($this->pluginDir);
 
         parent::tearDown();
+    }
+
+    public function testTemplateShowRedirectsToTemplatesList(): void
+    {
+        $template = ServiceTemplate::factory()->create();
+        $admin = User::factory()->admin()->create(['enabled' => true]);
+
+        $this->actingAs($admin)
+            ->get(route('services.templates.show', ['template' => $template]))
+            ->assertRedirectToRoute('services.templates.index');
     }
 
     public function testIndexGroupsServicesByDeviceAndFiltersByState(): void

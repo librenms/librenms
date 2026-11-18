@@ -138,7 +138,7 @@
                     vlan: '{{ $vlan }}',
                 };
             },
-            url: "{{ url('/ajax/table/port-stp') }}"
+            url: "{{ route('table.port-stp') }}"
         });
 
     </script>

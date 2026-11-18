@@ -7,10 +7,10 @@
                 <th><a href="{{ route('devices') }}">{{ __('Devices') }}</a></th>
                 <th><a href="{{ route('ports') }}">{{ __('Ports') }}</a></th>
                 @if($show_services)
-                    <th><a href="{{ url('services') }}">{{ __('Services') }}</a></th>
+                    <th><a href="{{ route('services.index') }}">{{ __('Services') }}</a></th>
                 @endif
                 @if($show_sensors)
-                    <th><a href="{{ url('health') }}">{{ __('Health') }}</a></th>
+                    <th><a href="{{ route('sensor.index') }}">{{ __('Health') }}</a></th>
                 @endif
             </tr>
             </thead>
@@ -23,7 +23,7 @@
                     <td><a href="{{ route('services.index', ['state' => 'ok']) }}"><span class="green"> {{ $services['ok'] }}</span></a></td>
                 @endif
                 @if($show_sensors)
-                    <td><a href="{{ url('health') }}"><span class="green"> {{ $sensors['ok'] }}</span></a></td>
+                    <td><a href="{{ route('sensor.index') }}"><span class="green"> {{ $sensors['ok'] }}</span></a></td>
                 @endif
             </tr>
             <tr>
@@ -34,7 +34,7 @@
                     <td><a href="{{ route('services.index', ['state' => 'critical']) }}"><span class="red"> {{ $services['critical'] }}</span></a></td>
                 @endif
                 @if($show_sensors)
-                    <td><a href="{{ url('health') }}"><span class="red"> {{ $sensors['critical'] }}</span></a></td>
+                    <td><a href="{{ route('sensor.index') }}"><span class="red"> {{ $sensors['critical'] }}</span></a></td>
                 @endif
             </tr>
             <tr>
@@ -56,7 +56,7 @@
                     <td><span class="grey"> -</span></td>
                 @endif
                 @if($show_sensors)
-                    <td><a href="{{ url('health') }}"><span class="grey"> {{ $sensors['disable_notify'] }}</span></a></td>
+                    <td><a href="{{ route('sensor.index') }}"><span class="grey"> {{ $sensors['disable_notify'] }}</span></a></td>
                 @endif
             </tr>
             <tr>
@@ -88,10 +88,10 @@
                 <td><a href="{{ route('devices') }}"><span> {{ $devices['total'] }}</span></a></td>
                 <td><a href="{{ route('ports') }}"><span> {{ $ports['total'] }}</span></a></td>
                 @if($show_services)
-                    <td><a href="{{ url('services') }}"><span> {{ $services['total'] }}</span></a></td>
+                    <td><a href="{{ route('services.index') }}"><span> {{ $services['total'] }}</span></a></td>
                 @endif
                 @if($show_sensors)
-                    <td><a href="{{ url('health') }}"><span class="green"> {{ $sensors['total'] }}</span></a></td>
+                    <td><a href="{{ route('sensor.index') }}"><span class="green"> {{ $sensors['total'] }}</span></a></td>
                 @endif
             </tr>
             </tbody>

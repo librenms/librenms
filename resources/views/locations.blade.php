@@ -18,7 +18,7 @@
 
     <x-panel title="{{ __('Locations') }}" id="locations-panel">
         <div class="table-responsive">
-            <table id="locations" class="table table-hover table-condensed table-striped" data-url="{{ route('table.location') }}">
+            <table id="locations" class="table table-hover table-condensed table-striped" data-url="{{ route('table.location') }}" data-export-url="{{ route('table.location.export') }}">
                 <thead>
                 <tr>
                     <th data-column-id="location" data-formatter="location" data-order="asc">{{ __('Location') }}</th>

@@ -47,7 +47,7 @@ $refresh = request()->input('refresh', 30);
 
                 <div class="table-responsive">
                     <table id="outages" class="table table-hover table-condensed table-striped"
-                           data-url="{{ route('table.outages') }}">
+                           data-url="{{ route('table.outages') }}" data-export-url="{{ route('table.outages.export') }}">
                         <thead>
                         <tr>
                             <th data-column-id="status" data-sortable="false" data-visible-in-selection="false"></th>

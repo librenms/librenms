@@ -3,7 +3,7 @@
 @section('content')
     <x-device.page :device="$device">
         <p>
-            <a href="{{ route('device', ['device' => $device, 'tab' => 'vm']) }}">
+            <a href="{{ route('device.vm', ['device' => $device]) }}">
                 <i class="fa fa-arrow-left" aria-hidden="true"></i>
                 {{ __('All virtual machines') }}
             </a>

@@ -29,7 +29,6 @@ use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
-use LibreNMS\Util\Url;
 
 class Alertmanager extends Transport
 {
@@ -45,7 +44,7 @@ class Alertmanager extends Transport
         $alertmanager_msg = strip_tags((string) $alert_data['msg']);
         $data = [[
             $alertmanager_status => date('c'),
-            'generatorURL' => Url::deviceUrl($alert_data['device_id']),
+            'generatorURL' => route('device.overview', ['device' => $alert_data['device_id']]),
             'annotations' => [
                 'summary' => $alert_data['name'],
                 'title' => $alert_data['title'],

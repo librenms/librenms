@@ -44,6 +44,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use LibreNMS\Util\Url;
 
 class PortsController implements DeviceTab
 {
@@ -450,14 +451,13 @@ class PortsController implements DeviceTab
      */
     private function parseTab(Request $request): string
     {
-        if (preg_match('#view=([^/]+)#', $request->fullUrl(), $matches)) {
-            return match ($matches[1]) {
-                'neighbours' => 'links',
-                default => $matches[1],
-            };
+        $path = $request->route('view') ?? $request->route('vars', LibrenmsConfig::get('ports_page_default'));
+        $view = $request->query('view');
+        if (! is_string($view) || $view === '') {
+            $view = Url::parseLegacyPath($path)->get('view', $path);
         }
 
-        return $request->route('vars', LibrenmsConfig::get('ports_page_default')); // fourth segment is called vars to handle legacy urls
+        return $view === 'neighbours' ? 'links' : $view;
     }
 
     private function migrateFilterSettings(array $saved, Request $request): array

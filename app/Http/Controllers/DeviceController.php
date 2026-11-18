@@ -24,8 +24,9 @@ class DeviceController
     /** Tabs with their own device.{tab} route, the legacy url only redirects to it */
     public const array ROUTED_TABS = ['apps', 'graphs', 'health', 'loadbalancer', 'neighbours', 'netflow', 'port', 'pseudowires', 'qos', 'routing', 'slas', 'stp', 'wireless'];
 
-    public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
+    public function index(Request $request, string $device): View|RedirectResponse
     {
+        $vars = $request->route('vars', '');
         $device = str_replace('device=', '', $device);
         $device = DeviceCache::get($device);
         $device_id = $device->device_id;
@@ -36,7 +37,7 @@ class DeviceController
 
         DeviceCache::setPrimary($device_id);
 
-        $current_tab = str_replace('tab=', '', $current_tab) ?: 'overview';
+        $current_tab = str_replace('tab=', '', $request->route('tab', 'overview')) ?: 'overview';
 
         $port = null;
         if ($current_tab == 'port') {
@@ -148,7 +149,7 @@ class DeviceController
         return redirect()->route($route, ['device' => $deviceId] + $params, 301);
     }
 
-    private function renderLegacyTab($tab, Device $device, $data)
+    private function renderLegacyTab(string $tab, Device $device, array $data): string
     {
         ob_start();
         $device = $device->toArray();

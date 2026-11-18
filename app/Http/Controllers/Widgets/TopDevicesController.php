@@ -277,9 +277,8 @@ class TopDevicesController extends WidgetController
             $overlib_content = Url::overlibContent($graph_array, $device->display . ' - ' . $storage->storage_descr);
 
             $link_array = $graph_array;
-            $link_array['page'] = 'graphs';
             unset($link_array['height'], $link_array['width'], $link_array['legend']);
-            $link = Url::generate($link_array);
+            $link = route('graphs', $link_array);
 
             return [
                 Url::deviceLink($device, $device->shortDisplayName()),

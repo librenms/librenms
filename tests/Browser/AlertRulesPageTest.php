@@ -25,9 +25,12 @@ final class AlertRulesPageTest extends DuskTestCase
         ]);
 
         $this->browse(function (Browser $browser) use ($rule): void {
+            $editLink = "a[href$='/alert-rule/{$rule->id}/edit']";
+
             $browser->loginAs($this->browserUser('admin'))->visit('/alert-rules')
+                ->waitFor($editLink)
                 ->assertMissing('#alert-rule-form')
-                ->click("a[href$='/alert-rule/{$rule->id}/edit']")
+                ->click($editLink)
                 ->waitForLocation("/alert-rule/{$rule->id}/edit")
                 ->waitUntilEnabled('#btn-save')
                 ->assertInputValue('#rule_name', 'Original rule')

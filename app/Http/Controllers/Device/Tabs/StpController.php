@@ -92,7 +92,6 @@ class StpController extends Controller implements DeviceTab
             'device_id' => $device->device_id,
             'stpInstances' => $stpInstances->filter(fn ($instance) => $active_vlan == 1 && $instance->vlan == null || $instance->vlan == $active_vlan),
             'stpPorts' => $device->stpPorts()->where('vlan', $active_vlan)->when($active_vlan == 1, fn ($query) => $query->orWhereNull('vlan'))->exists(),
-            'bootgridUrl' => url('/ajax/table/'),
         ]);
     }
 }

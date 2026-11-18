@@ -143,7 +143,7 @@ class AlertLogDetailParser
         $this->addField(
             'Port',
             $port->getLabel(),
-            Url::portUrl($port)
+            route('device.port', ['device' => $port->device_id, 'port' => $port])
         );
 
         if ($port->ifAlias && $port->ifAlias != $port->ifDescr) {
@@ -213,7 +213,7 @@ class AlertLogDetailParser
         $this->addField(
             'Access Point',
             $detail['name'] ?? 'Access Point',
-            Url::deviceUrl($detail['device_id'] ?? 0, ['tab' => 'accesspoints', 'ap' => $detail['accesspoint_id']])
+            route('device.accesspoints.show', ['device' => $detail['device_id'] ?? 0, 'accessPoint' => $detail['accesspoint_id']])
         );
     }
 
@@ -231,7 +231,7 @@ class AlertLogDetailParser
         $this->addField(
             'Service',
             $service_name,
-            Url::deviceUrl($detail['device_id'] ?? 0, ['tab' => 'services', 'view' => 'detail'])
+            route('device.services', ['device' => $detail['device_id'] ?? 0, 'view' => 'details'])
         );
 
         $service_host = ! empty($detail['service_ip'])
@@ -287,7 +287,7 @@ class AlertLogDetailParser
         $this->addField(
             'Memory Pool',
             $detail['mempool_descr'] ?? 'Memory Pool',
-            Url::graphPageUrl('mempool_usage', ['id' => $detail['mempool_id']])
+            route('graphs', ['type' => 'mempool_usage', 'id' => $detail['mempool_id']])
         );
 
         // Build usage statistics
@@ -318,7 +318,7 @@ class AlertLogDetailParser
         $this->addField(
             'Application',
             $app_type,
-            Url::deviceUrl($detail['device_id'] ?? 0, ['tab' => 'apps', 'app' => $app_type])
+            route('device.apps', ['device' => $detail['device_id'] ?? 0, 'app' => $app_type])
         );
 
         if (! empty($detail['app_status'])) {

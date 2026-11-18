@@ -118,7 +118,7 @@ class ServiceTemplateController extends Controller
     {
         $this->authorize('view', $template);
 
-        return redirect(url('/services/templates/' . $template->id));
+        return redirect()->route('services.templates.index');
     }
 
     /**
