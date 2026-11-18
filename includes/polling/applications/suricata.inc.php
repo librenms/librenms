@@ -194,7 +194,7 @@ if ($suricata['version'] == 1) {
 
     foreach ($suricata['data']['totals'] as $stat => $value) {
         // If this is defined, it not something we understand.
-        if (isset($suricata_stat_keys[$stat])) {
+        if (isset($suricata_stat_keys[$stat]) || preg_match($suricata_counter_prefix_regex, $stat)) {
             $rrd_name = ['app', $name, $app->app_id, 'totals___' . $stat];
             $fields = ['data' => $value];
 
@@ -216,7 +216,7 @@ if ($suricata['version'] == 1) {
 
         foreach ($instance_stats as $stat => $value) {
             // If this is defined, it not something we understand.
-            if (isset($suricata_stat_keys[$stat])) {
+            if (isset($suricata_stat_keys[$stat]) || preg_match($suricata_counter_prefix_regex, $stat)) {
                 $rrd_name = ['app', $name, $app->app_id, 'instance_' . $instance . '___' . $stat];
                 $fields = ['data' => $value];
 

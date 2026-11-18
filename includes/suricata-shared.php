@@ -6,6 +6,17 @@
 // The purpose is to make sure when Suricata adds new stats, we don't add stuff before knowing if it is known
 // to be a gauge or counter.
 
+// Stat families where every member is a counter. Members change between
+// Suricata releases, so they are matched by prefix instead of listed.
+//   app_layer__ :: per protocol flow, tx, and error counters, including
+//                  app_layer__error__$proto__exception_policy__$policy
+//   decoder__event__ :: decoder event counters
+//   exception_policy__ :: times an exception policy was applied
+//   ips__ :: IPS accepted/blocked/rejected/replaced and drop_reason counters
+//   firewall__ :: firewall mode accepted/blocked/rejected and drop_reason counters
+//   detect__lua__ and transform__lua__ :: Lua error counters
+$suricata_counter_prefix_regex = '/^(app_layer__|decoder__event__|exception_policy__|ips__|firewall__|detect__lua__|transform__lua__)/';
+
 $suricata_stat_keys = [
     'app_layer__error__bittorrent-dht__alloc' => 1,
     'app_layer__error__bittorrent-dht__gap' => 1,
