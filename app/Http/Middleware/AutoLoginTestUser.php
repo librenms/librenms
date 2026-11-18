@@ -21,7 +21,7 @@ class AutoLoginTestUser
         if (is_string($username) && $username !== '' && app()->isLocal() && $request->user() === null) {
             $user = User::firstWhere('username', $username);
 
-            if ($user) {
+            if ($user && $user->enabled) {
                 Auth::login($user);
             }
         }
