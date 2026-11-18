@@ -36,10 +36,12 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\Exceptions\RrdStoreException;
+use LibreNMS\Exceptions\RrdUnknownException;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\Util\Rewrite;
 use Log;
+use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 
 class Rrd extends BaseDatastore
 {
@@ -83,10 +85,6 @@ class Rrd extends BaseDatastore
         $device_model = $this->getDevice($meta);
 
         $rrd_name = $meta['rrd_name'] ?? $measurement;
-        if (! empty($meta['rrd_oldname'])) {
-            self::renameFile($device_model, $meta['rrd_oldname'], $rrd_name);
-        }
-
         $metric = $meta['metric'] ?? null;
         if ($metric instanceof MetricIdentity) {
             self::checkDirExists(RrdPath::make($metric->group())); // not always a device, those are created when polling starts
@@ -114,6 +112,10 @@ class Rrd extends BaseDatastore
         }
 
         try {
+            if (! empty($meta['rrd_oldname'])) {
+                self::renameFile($device_model, $meta['rrd_oldname'], $rrd_name);
+            }
+
             try {
                 $this->update($rrd, $values);
             } catch (RrdException $e) {
@@ -386,6 +388,8 @@ class Rrd extends BaseDatastore
 
     /**
      * Checks if the rrd file exists on the server
+     *
+     * @throws RrdException if the remote probe fails
      */
     public function checkRrdExists(RrdPath $rrdpath): bool
     {
@@ -400,6 +404,8 @@ class Rrd extends BaseDatastore
             return true;
         } catch (RrdNotFoundException) {
             return false;
+        } catch (ProcessException $e) {
+            throw new RrdUnknownException('RRD existence probe failed: ' . $e->getMessage(), previous: $e);
         } finally {
             $this->recordStatistic($stat->end());
         }

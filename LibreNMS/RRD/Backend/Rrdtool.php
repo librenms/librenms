@@ -26,11 +26,13 @@
 
 namespace LibreNMS\RRD\Backend;
 
+use LibreNMS\Exceptions\RrdCachedConnectionException;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdFileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\Exceptions\RrdSourceException;
+use LibreNMS\Exceptions\RrdUnknownException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\RRD\RrdProcess;
@@ -139,7 +141,22 @@ class Rrdtool implements RrdBackendInterface
      */
     public function last(RrdPath $rrd): int
     {
-        return (int) $this->run('last', $rrd->relativePath());
+        try {
+            $output = $this->run('last', $rrd->relativePath());
+        } catch (RrdNotFoundException $e) {
+            // RRDtool falls back to a local read if it cannot connect to the daemon.
+            if ($this->remote() && ! str_starts_with($e->getMessage(), 'rrdcached@')) {
+                throw new RrdCachedConnectionException('Unable to query rrdcached for ' . $rrd, previous: $e);
+            }
+
+            throw $e;
+        }
+
+        if (! ctype_digit($output)) {
+            throw new RrdUnknownException('Invalid RRD last update response for ' . $rrd);
+        }
+
+        return (int) $output;
     }
 
     /**
@@ -183,7 +200,7 @@ class Rrdtool implements RrdBackendInterface
      */
     private function run(string $command, string $filename, array $arguments = []): string
     {
-        $this->process ??= app(RrdProcess::class, ['timeout' => 1200]);
+        $this->process ??= app(RrdProcess::class, ['timeout' => 1200, 'allowMissingRrdDir' => $this->remote()]);
         $output = $this->process->run(implode(' ', [$command, $filename, ...$arguments]));
 
         if (Debug::isVerbose() && $output) {

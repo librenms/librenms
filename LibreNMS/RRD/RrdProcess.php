@@ -23,7 +23,7 @@ class RrdProcess
     private Closure $processFactory;
     private float $lastUsed = 0;
 
-    public function __construct(private readonly LoggerInterface $logger, Binaries $binaries, private readonly int $timeout = 300, ?Closure $processFactory = null, ?string $timezone = null)
+    public function __construct(private readonly LoggerInterface $logger, Binaries $binaries, private readonly int $timeout = 300, ?Closure $processFactory = null, ?string $timezone = null, bool $allowMissingRrdDir = false)
     {
         $this->rrd_dir = Str::finish(LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd'), '/');
         // set up process factory
@@ -38,7 +38,7 @@ class RrdProcess
             }
             $this->processFactory = fn () => new Process(
                 command: $command,
-                cwd: $this->rrd_dir,
+                cwd: $allowMissingRrdDir && ! is_dir($this->rrd_dir) ? null : $this->rrd_dir,
                 env: $env,
             );
         } else {

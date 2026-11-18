@@ -4,6 +4,8 @@ namespace LibreNMS\Tests\Unit\RRD\Backend;
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\File;
+use LibreNMS\Data\Store\Rrd;
+use LibreNMS\Exceptions\RrdCachedConnectionException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
@@ -85,6 +87,30 @@ abstract class BackendContractTestCase extends TestCase
         $this->create($rrd);
 
         $this->assertFileExists($rrd->fullPath());
+    }
+
+    public function testProbesRemoteFilesWithoutLocalRrdDirectory(): void
+    {
+        $this->start('tcp');
+        $this->create(RrdPath::make('host1', 'test.rrd'));
+        LibrenmsConfig::set('rrd_dir', "$this->directory/no-local-rrd");
+        $this->app->instance(RrdBackendInterface::class, $this->makeBackend(LibrenmsConfig::get('rrdcached')));
+        $store = new Rrd;
+
+        $this->assertTrue($store->checkRrdExists(RrdPath::make('host1', 'test.rrd')));
+        $this->assertFalse($store->checkRrdExists(RrdPath::make('host1', 'missing.rrd')));
+    }
+
+    public function testUnreachableDaemonDoesNotReportFileMissing(): void
+    {
+        $this->start('tcp');
+        $this->daemon->stop(0);
+        LibrenmsConfig::set('rrd_dir', "$this->directory/no-local-rrd");
+        $this->app->instance(RrdBackendInterface::class, $this->backend);
+
+        $this->expectException(RrdCachedConnectionException::class);
+
+        (new Rrd)->checkRrdExists(RrdPath::make('host1', 'test.rrd'));
     }
 
     #[DataProvider('modes')]
