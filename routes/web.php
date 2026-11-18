@@ -273,6 +273,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('/device/{device}/edit/components', [Device\EditComponentsController::class, 'index'])->name('device.edit.components');
     Route::put('/device/{device}/edit/components', [Device\EditComponentsController::class, 'update'])->name('device.edit.components.update');
     Route::get('/device/{device}/edit/customoids', [Device\EditCustomoidsController::class, 'index'])->name('device.edit.customoids');
+    Route::get('/device/{device}/edit/alert-rules', [AlertRuleController::class, 'device'])->name('device.edit.alert-rules');
     Route::get('/device/{device}/edit/health', [Device\EditHealthController::class, 'index'])->name('device.edit.health');
     Route::post('/device/{device}/edit/health/reset', [Device\EditHealthController::class, 'reset'])->name('device.edit.health.reset');
     Route::post('/device/{device}/edit/health/{sensor}', [Device\EditHealthController::class, 'update'])->name('device.edit.health.update')->scopeBindings()->whereNumber('sensor');
@@ -450,7 +451,9 @@ Route::middleware(['auth'])->group(function (): void {
     Route::post('alert-templates/convert', [AlertTemplateController::class, 'convert'])->name('alert-templates.convert');
     Route::resource('alert-templates', AlertTemplateController::class)->except(['show'])->where(['alert_template' => '[0-9]+']);
     Route::redirect('templates', 'alert-templates');
-    Route::resource('alert-rule', AlertRuleController::class)->only(['show', 'store', 'update', 'destroy']);
+    Route::get('alert-rules', [AlertRuleController::class, 'index'])->name('alert-rules.index');
+    Route::post('alert-rules/defaults', [AlertRuleController::class, 'createDefaults'])->name('alert-rules.defaults');
+    Route::resource('alert-rule', AlertRuleController::class)->except(['index']);
     Route::resource('alert-operation', AlertOperationController::class)->only(['show', 'store', 'update', 'destroy']);
     Route::put('alert-rule/{alert_rule}/toggle', [AlertRuleController::class, 'toggle'])->name('alert-rule.toggle');
     Route::get('alert-rule-from-template/{template_id}', [AlertRuleTemplateController::class, 'template'])->name('alert-rule-template');
@@ -525,6 +528,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('alert-transports-groups', Select\AlertTransportsAndGroupsController::class)->name('ajax.select.alert-transports-groups');
             Route::get('alert-operation', Select\AlertOperationController::class)->name('ajax.select.alert-operation');
             Route::get('alert-rule', Select\AlertRuleController::class)->name('ajax.select.alert-rule');
+            Route::get('alert-log-rule', Select\AlertLogRuleController::class)->name('ajax.select.alert-log-rule');
             Route::get('application', Select\ApplicationController::class)->name('ajax.select.application');
             Route::get('bill', Select\BillController::class)->name('ajax.select.bill');
             Route::get('custom-map', Select\CustomMapController::class)->name('ajax.select.custom-map');

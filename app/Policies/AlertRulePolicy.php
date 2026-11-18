@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Facades\Permissions;
 use App\Models\AlertRule;
 use App\Models\User;
 
@@ -32,39 +31,16 @@ class AlertRulePolicy
 
     /**
      * Determine whether the user can view the model.
+     * Without a model, only the global permission is checked.
      */
-    public function view(User $user, AlertRule $alertRule): bool
+    public function view(User $user, ?AlertRule $alertRule = null): bool
     {
-        if ($this->hasGlobalPermission($user, 'viewAll')) {
+        if ($this->viewAll($user)) {
             return true;
         }
 
-        if (! $this->hasGlobalPermission($user, 'view', true)) {
-            return false;
-        }
-
-        // FIXME probably a less brain-dead way to do this
-        foreach ($alertRule->devices as $device) {
-            if (Permissions::canAccessDevice($device, $user)) {
-                return true;
-            }
-        }
-
-        foreach ($alertRule->groups as $group) {
-            if (Permissions::canAccessDeviceGroup($group, $user)) {
-                return true;
-            }
-        }
-
-        foreach ($alertRule->locations as $location) {
-            foreach ($location->devices as $device) {
-                if (Permissions::canAccessDevice($device, $user)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return $this->hasGlobalPermission($user, 'view', true)
+            && ($alertRule === null || AlertRule::mappedToAccessibleDevices($user)->whereKey($alertRule->id)->exists());
     }
 
     /**
