@@ -7,9 +7,11 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Exceptions\RrdCachedConnectionException;
+use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\RRD\RrdPath;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 
@@ -46,6 +48,34 @@ final class RrdStoreTest extends TestCase
         $this->backend->shouldReceive('update')->once()->with(Mockery::any(), [10, 20, null], null);
 
         (new Rrd)->write('test', ['out' => 20, 'in' => 10], [], ['device' => $this->device, 'rrd_def' => $definition]);
+    }
+
+    public function testCreatesMissingRemoteFileAfterRrdcachedStatErrorZero(): void
+    {
+        $definition = RrdDefinition::make()->addDataset('a', 'GAUGE');
+        $rrd = Mockery::on(fn (RrdPath $path) => $path->relativePath() === 'rrd-store-test/test.rrd');
+        $this->backend->shouldReceive('update')->once()->with($rrd, [5], null)->ordered()
+            ->andThrow(RrdException::parse('ERROR: rrdcached@rrdcached:42217: stat failed with error 0.'));
+        $this->backend->shouldReceive('remote')->andReturnTrue();
+        $this->backend->shouldReceive('last')->once()->with($rrd)->ordered()
+            ->andThrow(new RrdNotFoundException('No such file'));
+        $this->backend->shouldReceive('create')->once()->with($rrd, $definition)->ordered();
+        $this->backend->shouldReceive('update')->once()->with($rrd, [5], null)->ordered();
+
+        (new Rrd)->write('test', ['a' => 5], [], ['device' => $this->device, 'rrd_def' => $definition]);
+    }
+
+    public function testKeepsExistingRemoteFileAfterRrdcachedStatErrorZero(): void
+    {
+        $definition = RrdDefinition::make()->addDataset('a', 'GAUGE');
+        $rrd = Mockery::on(fn (RrdPath $path) => $path->relativePath() === 'rrd-store-test/test.rrd');
+        $this->backend->shouldReceive('update')->once()->with($rrd, [5], null)
+            ->andThrow(RrdException::parse('ERROR: rrdcached@rrdcached:42217: stat failed with error 0'));
+        $this->backend->shouldReceive('remote')->andReturnTrue();
+        $this->backend->shouldReceive('last')->once()->with($rrd)->andReturn(1798761600);
+        $this->backend->shouldReceive('create')->never();
+
+        (new Rrd)->write('test', ['a' => 5], [], ['device' => $this->device, 'rrd_def' => $definition]);
     }
 
     public function testOnlyConsecutiveStoreErrorsDisable(): void

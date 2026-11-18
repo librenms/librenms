@@ -116,7 +116,16 @@ class Rrd extends BaseDatastore
         try {
             try {
                 $this->update($rrd, $values);
-            } catch (RrdNotFoundException) {
+            } catch (RrdException $e) {
+                // rrdcached can lose the stat errno while logging the failure.
+                if (! $e instanceof RrdNotFoundException && (
+                    ! isset($rrd_def)
+                    || ! preg_match('/^rrdcached@.+: stat failed with error 0\.?$/', $e->getMessage())
+                    || $this->checkRrdExists($rrd)
+                )) {
+                    throw $e;
+                }
+
                 if (isset($rrd_def)) {
                     $stat = Measurement::start('create');
                     $this->backend()->create($rrd, $rrd_def);
