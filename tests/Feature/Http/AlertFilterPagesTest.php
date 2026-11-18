@@ -75,6 +75,8 @@ final class AlertFilterPagesTest extends InMemoryDbTestCase
         $device = Device::factory()->create();
         $visible = AlertRule::factory()->create();
         $hidden = AlertRule::factory()->create();
+        $unevaluated = AlertRule::factory()->create();
+        $unevaluated->devices()->attach($device);
         Alert::factory()->create(['device_id' => $device->device_id, 'rule_id' => $visible->id]);
         Alert::factory()->create(['rule_id' => $hidden->id]); // on another device
 
@@ -83,7 +85,21 @@ final class AlertFilterPagesTest extends InMemoryDbTestCase
 
         $this->assertSame([$visible->id], $this->ruleIds($user));
         $this->assertSame([], $this->ruleIds($user, ['id' => $hidden->id]));
-        $this->assertEqualsCanonicalizing([$visible->id, $hidden->id], $this->ruleIds($this->user('admin')));
+        $this->assertEqualsCanonicalizing([$visible->id, $hidden->id, $unevaluated->id], $this->ruleIds($this->user('admin')));
+    }
+
+    public function testAlertMenuUsesAlertsOnAccessibleDevices(): void
+    {
+        $accessible = Device::factory()->create(['disabled' => 0, 'ignore' => 0]);
+        $inaccessible = Device::factory()->create(['disabled' => 0, 'ignore' => 0]);
+        Alert::factory()->for(AlertRule::factory()->state(['severity' => 'warning']), 'rule')->create(['device_id' => $accessible->device_id]);
+        Alert::factory()->for(AlertRule::factory()->state(['severity' => 'critical']), 'rule')->create(['device_id' => $inaccessible->device_id]);
+
+        $user = $this->user('user');
+        $user->devicesOwned()->attach($accessible);
+
+        $this->actingAs($user)->get(route('faults'))->assertOk()->assertSee('fa-exclamation-circle text-warning fa-fw fa-lg');
+        $this->actingAs($this->user('admin'))->get(route('faults'))->assertOk()->assertSee('fa-exclamation-circle text-danger fa-fw fa-lg');
     }
 
     public function testLegacyFaultUrlsRedirectToFilters(): void

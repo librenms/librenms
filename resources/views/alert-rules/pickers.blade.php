@@ -14,7 +14,7 @@
         'search_alert_rule_modal' => [
             'title' => __('Running Alert rules'),
             'url' => 'alert-rule-template.rule',
-            'rows' => \App\Models\AlertRule::orderBy('name')->get()->map(fn ($rule) => [
+            'rows' => $copyableRules->map(fn ($rule) => [
                 'id' => $rule->id,
                 'name' => $rule->name,
                 'rule' => in_array($rule->extra['options']['override_query'] ?? null, ['on', true], true) ? __('Custom SQL Query') : \LibreNMS\Alerting\QueryBuilderParser::fromJson($rule->builder)->toSql(false),
@@ -63,15 +63,22 @@
     $('.alert-rule-picker').each(function () {
         const $table = $(this);
         const $modal = $table.closest('.modal');
+        let requestId = 0;
+        let selection = null;
 
         const select = function () {
-            axios.get(route($table.data('template-route'), $(this).data('id'))).then((response) => {
-                $modal.one('hidden.bs.modal', () => {
-                    $('#rule_id').val('');
-                    $('#create-alert').modal('show');
-                    loadRule(response.data);
-                }).modal('hide');
-            }).catch(() => toastr.error(@js(__('Failed to process template'))));
+            const request = ++requestId;
+            const session = editorSession;
+            axios.get(route($table.data('template-route'), $(this).data('id'))).then(({data}) => {
+                if (request !== requestId || session !== editorSession || ! $modal.hasClass('in')) return;
+
+                selection = {session, rule: data};
+                $modal.modal('hide');
+            }).catch(() => {
+                if (request === requestId && session === editorSession) {
+                    toastr.error(@js(__('Failed to process template')));
+                }
+            });
         };
 
         // bootgrid stops click propagation in rows, so bind to the buttons each time they render
@@ -82,10 +89,25 @@
             },
         }).on('loaded.rs.jquery.bootgrid', () => $table.find('button[data-id]').on('click', select));
 
-        // keep the editor scrollable when a picker opened over it closes
-        $modal.on('hidden.bs.modal', () => {
-            if ($('#create-alert').hasClass('in')) {
+        $modal.on('show.bs.modal', () => {
+            ++requestId;
+            selection = null;
+        }).on('hide.bs.modal', () => {
+            ++requestId;
+        }).on('hidden.bs.modal', () => {
+            // Keep the editor scrollable when a picker opened over it closes.
+            if ($editor.hasClass('in')) {
                 $('body').addClass('modal-open');
+            }
+
+            const selected = selection;
+            selection = null;
+            if (selected?.session === editorSession) {
+                try {
+                    applyRuleTemplate(selected.rule);
+                } catch {
+                    $ruleError.text(@js(__('Failed to process template'))).show();
+                }
             }
         });
     });

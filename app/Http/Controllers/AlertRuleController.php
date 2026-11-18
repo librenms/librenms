@@ -11,6 +11,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertState;
@@ -69,7 +70,9 @@ class AlertRuleController extends Controller
         $perPage = (int) $request->input('per_page');
         $perPage = in_array($perPage, self::PER_PAGE) ? $perPage : 50;
 
-        $rules = AlertRule::query()
+        $visibleRules = AlertRule::hasAccess($request->user());
+        $canCreate = Gate::allows('create', AlertRule::class);
+        $rules = AlertRule::hasAccess($request->user())
             ->when($device, fn ($query) => $query->forDevice($device))
             ->with(['devices', 'groups', 'locations', 'alertOperation.segments.transportSingles', 'alertOperation.segments.transportGroups'])
             ->orderBy('name')
@@ -86,8 +89,9 @@ class AlertRuleController extends Controller
                 ->groupBy('rule_id')
                 ->selectRaw('rule_id, max(state) as state')
                 ->pluck('state', 'rule_id'),
-            'collection' => resolve(AlertRuleTemplateController::class)->templatesCollection(),
-            'offerDefaults' => ! $device && $rules->total() === 0,
+            'collection' => $canCreate ? resolve(AlertRuleTemplateController::class)->templatesCollection() : [],
+            'copyableRules' => $canCreate ? $visibleRules->orderBy('name')->get() : collect(),
+            'offerDefaults' => ! $device && $canCreate && $rules->total() === 0 && ! AlertRule::exists(),
         ]);
     }
 

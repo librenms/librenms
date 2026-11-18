@@ -46,8 +46,10 @@
                                         <ul class="dropdown-menu" aria-labelledby="import-from" id="import-dropdown">
                                             <li><a href="#" name="import-query" id="import-query">SQL Query</a></li>
                                             <li><a href="#" name="import-old-format" id="import-old-format">Old Format</a></li>
-                                            <li><a href="#" name="import-collection" id="import-collection">Collection</a></li>
-                                            <li><a href="#" name="import-alert_rule" id="import-alert_rule">Alert Rule</a></li>
+                                            @can('create', \App\Models\AlertRule::class)
+                                                <li><a href="#" name="import-collection" id="import-collection">Collection</a></li>
+                                                <li><a href="#" name="import-alert_rule" id="import-alert_rule">Alert Rule</a></li>
+                                            @endcan
                                         </ul>
                                     </div>
                                 </div>
@@ -144,7 +146,7 @@
                     </div>
                     <div class="form-group">
                         <div class="col-sm-12 text-center">
-                            <button type="button" class="btn btn-success" id="btn-save" name="save-alert">
+                            <button type="button" class="btn btn-success" id="btn-save" name="save-alert" disabled>
                                 Save Rule
                             </button>
                         </div>
@@ -162,6 +164,24 @@
 <script>
     const alertRuleDefaults = @js($defaults);
     const alertRuleDevice = @js($device ? ['id' => $device->device_id, 'text' => $device->displayName()] : null);
+    const $editor = $('#create-alert');
+    const $saveRule = $('#btn-save');
+    const $ruleError = $('#alert-rule-form-error');
+    let editorSession = 0;
+    let editorReady = false;
+    let savingRule = false;
+
+    function setEditorReady(ready) {
+        editorReady = ready;
+        $saveRule.prop('disabled', ! editorReady || savingRule);
+    }
+
+    function startEditorSession() {
+        setEditorReady(false);
+        $('#rule_id').val('');
+        $ruleError.hide().text('');
+        return ++editorSession;
+    }
 
     $('#builder').on('afterApplyRuleFlags.queryBuilder afterCreateRuleFilters.queryBuilder', function () {
         $("[name$='_filter']").each(function () {
@@ -206,34 +226,44 @@
         }
     });
 
-    $('#btn-save').on('click', function (e) {
+    $saveRule.on('click', async function (e) {
         e.preventDefault();
-        $('#alert-rule-form-error').hide().text('');
+        if (! editorReady || savingRule) return;
+        $ruleError.hide().text('');
 
+        const overrideQuery = $('#override_query').prop('checked');
         const builder = $('#builder').queryBuilder('getRules');
-        if (builder === null || ! builder.valid) {
+        if (! overrideQuery && ! builder?.valid) {
             return;
         }
 
         $('#alert_operation_id_input').val($('#alert_operation_id').val() ?? '');
-        $('#builder_json').val(JSON.stringify(builder));
+        $('#builder_json').val(JSON.stringify(builder ?? []));
 
         const ruleId = $('#rule_id').val();
-        axios({
-            method: ruleId ? 'put' : 'post',
-            url: ruleId ? route('alert-rule.update', ruleId) : route('alert-rule.store'),
-            data: $('form.alerts-form').serialize(),
-        }).then((response) => {
+        const session = editorSession;
+        savingRule = true;
+        $saveRule.prop('disabled', true);
+        try {
+            const response = await axios({
+                method: ruleId ? 'put' : 'post',
+                url: ruleId ? route('alert-rule.update', ruleId) : route('alert-rule.store'),
+                data: $('form.alerts-form').serialize(),
+            });
             if (response.data.status === 'ok') {
                 toastr.success(response.data.message);
                 window.location.reload();
-            } else {
-                toastr.error(response.data.message);
+                return;
             }
-        }).catch((error) => {
-            const errors = error.response?.data?.errors ?? {};
-            $('#alert-rule-form-error').text(errors.alert_operation_id?.[0] ?? error.response?.data?.message ?? @js(__('Request failed'))).show();
-        });
+            toastr.error(response.data.message);
+        } catch (error) {
+            if (session === editorSession) {
+                const errors = error.response?.data?.errors ?? {};
+                $ruleError.text(errors.alert_operation_id?.[0] ?? error.response?.data?.message ?? @js(__('Request failed'))).show();
+            }
+        }
+        savingRule = false;
+        setEditorReady(editorReady);
     });
 
     function importSql(sql) {
@@ -272,18 +302,23 @@
         $('#search_alert_rule_modal').modal('show');
     });
 
-    $('#create-alert').on('show.bs.modal', function (e) {
-        $('#alert-rule-form-error').hide().text('');
-        // opened from a picker after loadRule() filled it in
-        if (! e.relatedTarget) {
-            return;
-        }
+    $editor.on('show.bs.modal', function (e) {
+        const session = startEditorSession();
+        // A picker supplies its own rule after opening the editor.
+        if (! e.relatedTarget) return;
 
         const ruleId = $(e.relatedTarget).data('rule_id');
-        $('#rule_id').val(ruleId ?? '');
-
         if (ruleId) {
-            axios.get(route('alert-rule.show', ruleId)).then((response) => loadRule(response.data));
+            axios.get(route('alert-rule.show', ruleId)).then(({data}) => {
+                if (session !== editorSession) return;
+                loadRule(data);
+                $('#rule_id').val(ruleId);
+                setEditorReady(true);
+            }).catch(() => {
+                if (session === editorSession) {
+                    $ruleError.text(@js(__('This alert rule could not be loaded'))).show();
+                }
+            });
             return;
         }
 
@@ -300,14 +335,30 @@
         $('#mute, #override_query, #notify_per_entity').prop('checked', false);
         $('#alert_operation_id').empty().val(null).trigger('change');
         setMaps(null);
+        setEditorReady(true);
+    }).on('hide.bs.modal', () => {
+        ++editorSession;
+        setEditorReady(false);
     });
 
+    function applyRuleTemplate(rule) {
+        $editor.modal('show');
+        startEditorSession();
+        loadRule(rule);
+        setEditorReady(true);
+    }
+
     function loadRule(rule) {
+        const extra = rule.extra ?? {};
+        if (rule.builder?.rules?.length || rule.builder?.length) {
+            $('#builder').queryBuilder('setRules', rule.builder);
+        } else {
+            $('#builder').queryBuilder('reset');
+        }
         $('#rule_name').val(rule.name);
         $('#proc').val(rule.proc);
-        $('#builder').queryBuilder('setRules', rule.builder);
         $('#severity').val(rule.severity).trigger('change');
-        $('#adv_query').val(rule.adv_query);
+        $('#adv_query').val(rule.adv_query ?? extra.adv_query);
         $('#notes').val(rule.notes);
 
         const $operation = $('#alert_operation_id').empty().val(null);
@@ -318,10 +369,6 @@
 
         setMaps(rule.maps);
 
-        const extra = rule.extra ?? {};
-        if (extra.adv_query) {
-            $('#adv_query').val(extra.adv_query);
-        }
         $('#invert').prop('checked', Boolean(extra.invert));
         $('#recovery').prop('checked', extra.recovery ?? alertRuleDefaults.recovery);
         $('#acknowledgement').prop('checked', extra.acknowledgement ?? alertRuleDefaults.acknowledgement);

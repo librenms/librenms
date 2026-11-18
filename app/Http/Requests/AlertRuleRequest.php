@@ -53,8 +53,8 @@ class AlertRuleRequest extends FormRequest
             'severity' => ['required', 'string', 'max:32'],
 
             'override_query' => ['sometimes', 'boolean'],
-            'builder_json' => ['required_unless:override_query,on', 'json'],
-            'adv_query' => ['required_if:override_query,on', 'nullable', 'string'],
+            'builder_json' => ['required_unless:override_query,true', 'json'],
+            'adv_query' => ['required_if:override_query,true', 'nullable', 'string'],
 
             'invert' => ['sometimes', 'boolean'],
             'recovery' => ['sometimes', 'boolean'],

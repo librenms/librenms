@@ -43,7 +43,8 @@
                 @foreach($rules as $rule)
                     @php
                         $state = $states[$rule->id] ?? null;
-                        $alerting = in_array($state, [AlertState::ACTIVE, AlertState::ACKNOWLEDGED]);
+                        $alerting = in_array($state, [AlertState::ACTIVE, AlertState::ACKNOWLEDGED, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED]);
+                        $canUpdate = Gate::allows('update', $rule);
                         [$icon, $color] = $alerting
                             ? (['critical' => ['exclamation', 'danger'], 'warning' => ['warning', 'warning'], 'ok' => ['check', 'success']][$rule->severity] ?? ['info', 'info'])
                             : ['check', 'success'];
@@ -55,9 +56,22 @@
                     @endphp
                     <tr x-data="{
                             enabled: @js(! $rule->disabled),
-                            toggle() {
-                                axios.put(@js(route('alert-rule.toggle', $rule->id)), {state: this.enabled})
-                                    .catch(() => { this.enabled = ! this.enabled; toastr.error(@js(__('This alert rule could not be updated'))); });
+                            canUpdate: @js($canUpdate),
+                            saving: false,
+                            async toggle(state) {
+                                if (! this.canUpdate || this.saving) return;
+
+                                const previous = this.enabled;
+                                this.saving = true;
+                                this.enabled = state;
+                                try {
+                                    await axios.put(@js(route('alert-rule.toggle', $rule->id)), {state});
+                                } catch {
+                                    this.enabled = previous;
+                                    toastr.error(@js(__('This alert rule could not be updated')));
+                                } finally {
+                                    this.saving = false;
+                                }
                             }
                         }" x-bind:class="enabled ? @js($alerting ? $color : '') : 'active'">
                         <td>
@@ -120,12 +134,13 @@
                             @endif
                         </td>
                         <td>
-                            <x-toggle :checked="! $rule->disabled" x-model="enabled" x-on:change="toggle()" :disabled="Gate::denies('update', $rule)" :aria-label="__('Enabled')" />
+                            <x-toggle :checked="! $rule->disabled" x-bind:checked="enabled" x-on:change="toggle($event.target.checked)"
+                                      :disabled="! $canUpdate" x-bind:disabled="saving || ! canUpdate" :aria-label="__('Enabled')" />
                         </td>
                         <td class="tw:whitespace-nowrap">
-                            @can('update', $rule)
+                            @if($canUpdate)
                                 <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-alert" data-rule_id="{{ $rule->id }}" title="{{ __('Edit alert rule') }}"><i class="fa fa-pencil"></i></button>
-                            @endcan
+                            @endif
                             @can('delete', $rule)
                                 <button type="button" class="btn btn-danger btn-sm" title="{{ __('Delete alert rule') }}"
                                         x-on:click="$dispatch('alert-rule-delete', {id: {{ $rule->id }}, name: @js($rule->name)})"><i class="fa fa-trash"></i></button>

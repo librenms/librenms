@@ -287,7 +287,8 @@ class MenuComposer
         // Alert menu
         $alert_counts = AlertRule::selectRaw('severity, COUNT(*) as count')
             ->isActive()
-            ->hasAccess($user)
+            ->when($user->cannot('viewAll', AlertRule::class), fn ($query) => $query
+                ->whereIn('alerts.device_id', Device::hasAccess($user)->select('devices.device_id')))
             ->leftJoin('devices', 'alerts.device_id', '=', 'devices.device_id')
             ->where('devices.disabled', '=', '0')
             ->where('devices.ignore', '=', '0')

@@ -36,17 +36,24 @@ class AlertRuleTemplateController extends Controller
     public function rule(AlertRule $alertRule)
     {
         $this->authorize('create', AlertRule::class);
+        $this->authorize('view', $alertRule);
 
-        $alertRule->loadMissing('alertOperation:id,default_operation_step_duration_seconds');
+        $alertRule->loadMissing('alertOperation:id,name,default_operation_step_duration_seconds');
 
         return response()->json([
             'status' => 'ok',
             'name' => $alertRule->name . ' - Copy',
+            'proc' => $alertRule->proc,
+            'notes' => $alertRule->notes,
             'builder' => $alertRule->builder,
             'extra' => $this->extraWithDefaults((array) $alertRule->extra),
             'severity' => $alertRule->severity ?: LibrenmsConfig::get('alert_rule.severity'),
+            'adv_query' => $alertRule->query,
             'invert_map' => $alertRule->invert_map,
+            'notify_per_entity' => $alertRule->notify_per_entity,
+            'max_entities' => $alertRule->max_entities,
             'alert_operation_id' => $alertRule->alert_operation_id,
+            'alert_operation_name' => $alertRule->alertOperation?->name,
             'operations' => $alertRule->toOperationsApiArray(),
             'default_operation_step_duration_seconds' => $alertRule->alertOperation?->default_operation_step_duration_seconds,
         ]);

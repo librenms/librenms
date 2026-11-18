@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Select;
 use App\Models\Alert;
 use App\Models\AlertLog;
 use App\Models\AlertRule;
+use App\Models\Device;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -27,14 +28,15 @@ class AlertRuleController extends SelectController
      */
     public function baseQuery(Request $request): Builder
     {
+        $user = $request->user();
         // used by both the faults and alert history filters
-        abort_unless($request->user()->can('viewAny', Alert::class) || $request->user()->can('viewAny', AlertLog::class), 403);
+        abort_unless($user->can('viewAny', Alert::class) || $user->can('viewAny', AlertLog::class), 403);
 
         // rule names often contain customer or site names, only list rules on devices the user can access
         return AlertRule::query()
-            ->hasAccess($request->user())
+            ->when($user->cannot('viewAll', AlertRule::class), fn ($query) => $query->whereHas('alerts', fn ($alerts) => $alerts
+                ->whereIn('alerts.device_id', Device::hasAccess($user)->select('devices.device_id'))))
             ->select(['alert_rules.id', 'alert_rules.name'])
-            ->distinct()
             ->orderBy('alert_rules.name');
     }
 
