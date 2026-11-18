@@ -152,3 +152,8 @@ foreach ($pre_cache['nokiaIsamSlot'] as $slotId => $slot) {
 for ($portId = 0x101; $portId <= 0x1FF; $portId++) {
     $pre_cache['nokiaIsamXfp'][$portId] = $portId & 0xFF;
 }
+
+// entPhysicalIndex links the dbm sensors to the transceiver: slot * 10000 + cage (yaml has no arithmetic)
+for ($cage = 0; $cage <= 0x7FF; $cage++) {
+    $pre_cache['nokiaIsamCageEntity'][$cage] = sprintf('%04d', $cage);
+}

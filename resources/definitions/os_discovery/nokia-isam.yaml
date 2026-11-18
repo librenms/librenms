@@ -49,6 +49,7 @@ modules:
                     index: '{{ nokiaIsamSlot:0 }}{{ $subindex1 }}-rx'
                     descr: '{{ nokiaIsamSlot:0 }}{{ $subindex1 }} Rx Power'
                     group: transceiver
+                    entPhysicalIndex: '{{ $subindex0 }}{{ nokiaIsamCageEntity:1 }}'
                     low_limit: -22
                     low_warn_limit: -20
                     warn_limit: -5
@@ -68,6 +69,7 @@ modules:
                     index: '{{ nokiaIsamSlot:0 }}xfp:{{ nokiaIsamXfp:1 }}-rx'
                     descr: '{{ nokiaIsamSlot:0 }}xfp:{{ nokiaIsamXfp:1 }} Rx Power'
                     group: transceiver
+                    entPhysicalIndex: '{{ $subindex0 }}{{ nokiaIsamCageEntity:1 }}'
                     low_limit: -22
                     low_warn_limit: -20
                     warn_limit: -5
@@ -87,6 +89,7 @@ modules:
                     index: '{{ nokiaIsamSlot:0 }}{{ $subindex1 }}-tx'
                     descr: '{{ nokiaIsamSlot:0 }}{{ $subindex1 }} Tx Power'
                     group: transceiver
+                    entPhysicalIndex: '{{ $subindex0 }}{{ nokiaIsamCageEntity:1 }}'
                     low_limit: -9
                     low_warn_limit: -8
                     warn_limit: -4
@@ -106,6 +109,7 @@ modules:
                     index: '{{ nokiaIsamSlot:0 }}xfp:{{ nokiaIsamXfp:1 }}-tx'
                     descr: '{{ nokiaIsamSlot:0 }}xfp:{{ nokiaIsamXfp:1 }} Tx Power'
                     group: transceiver
+                    entPhysicalIndex: '{{ $subindex0 }}{{ nokiaIsamCageEntity:1 }}'
                     low_limit: -9
                     low_warn_limit: -8
                     warn_limit: -4
