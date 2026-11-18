@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\Service;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Stringable;
 use Illuminate\Validation\Rule;
 use LibreNMS\Services;
 
@@ -18,6 +19,9 @@ class ServiceRequest extends FormRequest
             : $this->user()->can('create', Service::class);
     }
 
+    /**
+     * @return array<string, string|array<string|Stringable>>
+     */
     public function rules(): array
     {
         $rules = [
