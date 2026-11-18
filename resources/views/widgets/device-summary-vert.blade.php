@@ -20,7 +20,7 @@
                 <td><a href="{{ route('devices', ['detail', 'filter' => ['state' => ['eq' => 'up']]]) }}"><span class="green"> {{ $devices['up'] }}</span></a></td>
                 <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'up'], 'ignore' => ['eq' => 0], 'disabled' => ['eq' => 0], 'deleted' => ['eq' => 0]]]) }}"><span class="green"> {{ $ports['up'] }}</span></a></td>
                 @if($show_services)
-                    <td><a href="{{ url('services/view=details/state=ok') }}"><span class="green"> {{ $services['ok'] }}</span></a></td>
+                    <td><a href="{{ route('services.index', ['state' => 'ok']) }}"><span class="green"> {{ $services['ok'] }}</span></a></td>
                 @endif
                 @if($show_sensors)
                     <td><a href="{{ url('health') }}"><span class="green"> {{ $sensors['ok'] }}</span></a></td>
@@ -31,7 +31,7 @@
                 <td><a href="{{ route('devices', ['detail', 'filter' => ['state' => ['eq' => 'down']]]) }}"><span class="red"> {{ $devices['down'] }}</span></a></td>
                 <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'down'], 'ignore' => ['eq' => 0], 'disabled' => ['eq' => 0], 'deleted' => ['eq' => 0]]]) }}"><span class="red"> {{ $ports['down'] }}</span></a></td>
                 @if($show_services)
-                    <td><a href="{{ url('services/view=details/state=critical') }}"><span class="red"> {{ $services['critical'] }}</span></a></td>
+                    <td><a href="{{ route('services.index', ['state' => 'critical']) }}"><span class="red"> {{ $services['critical'] }}</span></a></td>
                 @endif
                 @if($show_sensors)
                     <td><a href="{{ url('health') }}"><span class="red"> {{ $sensors['critical'] }}</span></a></td>
@@ -42,7 +42,7 @@
                 <td><a href="{{ route('devices', ['detail', 'filter' => ['ignore' => ['eq' => 1]]]) }}"><span class="blue"> {{ $devices['ignored'] }}</span></a></td>
                 <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['ignore' => ['eq' => '1']]]) }}"><span class="blue"> {{ $ports['ignored'] }}</span></a></td>
                 @if($show_services)
-                    <td><a href="{{ url('services/view=details/ignore=1') }}"><span class="blue"> {{ $services['ignored'] }}</span></a></td>
+                    <td><a href="{{ route('services.index', ['state' => 'ignored']) }}"><span class="blue"> {{ $services['ignored'] }}</span></a></td>
                 @endif
                 @if($show_sensors)
                     <td><span class="grey"> -</span></td>
@@ -64,7 +64,7 @@
                 <td><a href="{{ route('devices', ['detail', 'filter' => ['disabled' => ['eq' => 1]]]) }}"><span class="black"> {{ $devices['disabled'] }}</span></a></td>
                 <td><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['state' => ['eq' => 'shutdown'], 'disabled' => ['eq' => '0'], 'ignore' => ['eq' => '0'], 'deleted' => ['eq' => '0']]]) }}"><span class="black"> {{ $ports['shutdown'] }}</span></a></td>
                 @if($show_services)
-                    <td><a href="{{ url('services/view=details/disabled=1') }}"><span class="black"> {{ $services['disabled'] }}</span></a></td>
+                    <td><a href="{{ route('services.index', ['state' => 'disabled']) }}"><span class="black"> {{ $services['disabled'] }}</span></a></td>
                 @endif
                 @if($show_sensors)
                     <td><span class="grey"> -</span></td>

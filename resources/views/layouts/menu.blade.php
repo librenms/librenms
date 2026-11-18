@@ -198,7 +198,7 @@
             @endif
 {{-- Maps --}}
                 <li class="dropdown">
-                    <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown"
+                    <a href="{{ route('services.index') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-map fa-fw fa-lg fa-nav-icons"
                                                  aria-hidden="true"></i> <span
                             class="tw:md:hidden tw:lg:inline-block">{{ __('Maps') }}</span></a>
@@ -489,12 +489,12 @@
         @config('show_services')
             @can('viewAny', \App\Models\Service::class)
             <li class="dropdown">
-                <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown"
+                <a href="{{ route('services.index') }}" class="dropdown-toggle" data-hover="dropdown"
                    data-toggle="dropdown"><i class="fa fa-cogs fa-fw fa-lg fa-nav-icons"
                                              aria-hidden="true"></i> <span
                         class="tw:md:hidden tw:2xl:inline-block">{{ __('Services') }}</span></a>
                 <ul class="dropdown-menu">
-                    <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Services') }}</a>
+                    <li><a href="{{ route('services.index') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Services') }}</a>
                     </li>
                     @can('viewAny', \App\Models\ServiceTemplate::class)
                     <li><a href="{{ route('services.templates.index') }}"><span class="fa-stack" aria-hidden="true" style="font-size: 12px">
@@ -506,13 +506,13 @@
                     @if($service_counts['warning'] || $service_counts['critical'])
                         <li role="presentation" class="divider"></li>
                         @if($service_counts['warning'])
-                            <li><a href="{{ url('services/state=warning') }}"><i
+                            <li><a href="{{ route('services.index', ['state' => 'warning']) }}"><i
                                         class="fa fa-bell text-warning fa-fw fa-lg"
                                         aria-hidden="true"></i> {{ __('Warning :service_count', ['service_count' => $service_counts['warning']]) }}
                                 </a></li>
                         @endif
                         @if($service_counts['critical'])
-                            <li><a href="{{ url('services/state=critical') }}"><i
+                            <li><a href="{{ route('services.index', ['state' => 'critical']) }}"><i
                                         class="fa fa-bell text-danger fa-fw fa-lg"
                                         aria-hidden="true"></i> {{ __('Critical :service_count', ['service_count' => $service_counts['critical']]) }}
                                 </a></li>
@@ -520,7 +520,7 @@
                     @endif
                     @can('service.create')
                     <li role="presentation" class="divider"></li>
-                    <li><a href="{{ url('addsrv') }}"><i class="fa fa-plus fa-fw fa-lg"
+                    <li><a href="{{ route('services.index') }}#create-service"><i class="fa fa-plus fa-fw fa-lg"
                                                          aria-hidden="true"></i> {{ __('Add Service') }}</a></li>
                     @endcan
                 </ul>

@@ -205,7 +205,9 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('templates/apply/{template}', [ServiceTemplateController::class, 'apply'])->name('templates.apply');
         Route::post('templates/remove/{template}', [ServiceTemplateController::class, 'remove'])->name('templates.remove');
     });
-    Route::resource('service', ServiceController::class)->only(['show', 'destroy']);
+    Route::resource('services', ServiceController::class)->except(['create'])->where(['service' => '[0-9]+']);
+    Route::get('services/{legacy}', [ServiceController::class, 'legacy'])->where('legacy', '[^/=]+=.*');
+    Route::redirect('addsrv', 'services#create-service');
     Route::post('customoid/test/{customoid?}', [CustomoidController::class, 'test'])->name('customoid.test');
     Route::resource('customoid', CustomoidController::class)->only(['show', 'store', 'update', 'destroy']);
     Route::get('bills', [BillController::class, 'index'])->name('bills.index');
@@ -299,6 +301,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::patch('/device/{device}/edit/routing/vrf/{vrf}', [Device\EditRoutingController::class, 'updateVrf'])->name('device.edit.routing.vrf.update')->scopeBindings()->whereNumber('vrf');
     Route::delete('/device/{device}/edit/routing/vrf/{vrf}', [Device\EditRoutingController::class, 'destroyVrf'])->name('device.edit.routing.vrf.destroy')->scopeBindings()->whereNumber('vrf');
     Route::post('/device/{device}/edit/routing/peer/{bgpPeer}', [Device\EditRoutingController::class, 'updatePeer'])->name('device.edit.routing.peer.update')->scopeBindings();
+    Route::get('/device/{device}/edit/services', Device\EditServicesController::class)->name('device.edit.services');
     Route::get('/device/{device}/edit/storage', [Device\EditStorageController::class, 'index'])->name('device.edit.storage');
     Route::post('/device/{device}/edit/storage/{storage}', [Device\EditStorageController::class, 'update'])->name('device.edit.storage.update')->whereNumber('storage');
     Route::get('/device/{device}/edit/wireless-sensors', [Device\EditWirelessSensorsController::class, 'index'])->name('device.edit.wireless-sensors');
