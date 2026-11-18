@@ -35,6 +35,7 @@ use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\Binaries;
+use LibreNMS\Util\EnvHelper;
 use LibreNMS\Util\Http;
 use Symfony\Component\Process\Process;
 
@@ -46,6 +47,9 @@ class PatchManager
 {
     private const string DIFF_URL = 'https://github.com/librenms/librenms/pull/%d.diff';
     private const string RAW_URL = 'https://raw.githubusercontent.com/librenms/librenms/%s/%s';
+
+    /** Directories removed by the official LibreNMS Dockerfile */
+    private const array DOCKER_OMITTED_DIRS = ['doc/', 'html/plugins/Test/', 'tests/'];
 
     /** Directories cleaned of untracked files by reset() */
     private const array RESET_DIRS = ['app/', 'bootstrap/', 'database/', 'doc/', 'html/', 'includes/', 'LibreNMS/', 'licenses/', 'misc/', 'mibs/', 'resources/', 'routes/', 'scripts/', 'tests/'];
@@ -114,12 +118,20 @@ class PatchManager
 
         $diff = '';
         $files = [];
+        $skippedFileCount = 0;
+        $isDocker = EnvHelper::librenmsDocker();
         foreach (preg_split('/^(?=diff --git )/m', $response, flags: PREG_SPLIT_NO_EMPTY) ?: [] as $section) {
             if (! str_starts_with($section, 'diff --git ')) {
                 continue;
             }
 
             $file = $this->parseSection($section);
+            if ($isDocker && $this->isDockerOmittedPath($file['path'])
+                && (! isset($file['old']) || $this->isDockerOmittedPath($file['old']))) {
+                $skippedFileCount++;
+                continue;
+            }
+
             $files[] = $file;
             $diff .= preg_match('/^Binary files .* differ$/m', $section)
                 ? $this->binarySection($section, $file, $sha ?: "refs/pull/$pr/head")
@@ -127,6 +139,10 @@ class PatchManager
         }
 
         if (trim($diff) === '') {
+            if ($skippedFileCount > 0) {
+                throw new PatchException("Pull request #$pr has no changes for this Docker installation");
+            }
+
             throw new PatchException("Pull request #$pr has no changes");
         }
 
@@ -137,6 +153,7 @@ class PatchManager
             files: $files,
             title: $info['title'] ?? '',
             author: $info['user']['login'] ?? '',
+            skippedFileCount: $skippedFileCount,
         );
     }
 
@@ -171,6 +188,11 @@ class PatchManager
         $patch->appliedAt = date('Y-m-d H:i:s');
         $this->forget($patch->pr); // re-add at the top of the stack
         $this->save($patch);
+
+        if ($patch->skippedFileCount > 0) {
+            $changes = $patch->skippedFileCount === 1 ? 'file change' : 'file changes';
+            $warnings[] = "Skipped $patch->skippedFileCount $changes from #$patch->pr in directories omitted from the Docker image";
+        }
 
         return $warnings;
     }
@@ -503,18 +525,24 @@ class PatchManager
         return "$this->storageDir/$pr.diff";
     }
 
+    private function isDockerOmittedPath(string $path): bool
+    {
+        return array_any(self::DOCKER_OMITTED_DIRS, fn (string $directory) => str_starts_with($path, $directory));
+    }
+
     /**
      * @return PatchFile
      */
     private function parseSection(string $section): array
     {
         if (preg_match('/^rename from (.+)$/m', $section, $from) && preg_match('/^rename to (.+)$/m', $section, $to)) {
-            return ['status' => 'R', 'path' => $to[1], 'old' => $from[1]];
+            return ['status' => 'R', 'path' => $this->unquotePath($to[1]), 'old' => $this->unquotePath($from[1])];
         }
 
         // header is "diff --git a/<path> b/<path>", the path is the same on both sides
         $header = substr(strtok($section, "\n") ?: '', strlen('diff --git '));
-        $path = substr($header, 2, intdiv(strlen($header) - 5, 2));
+        $oldName = substr($header, 0, intdiv(strlen($header), 2));
+        $path = substr($this->unquotePath($oldName), 2);
 
         if (preg_match('/^new file mode/m', $section)) {
             $status = 'A';
@@ -525,6 +553,11 @@ class PatchManager
         }
 
         return ['status' => $status, 'path' => $path];
+    }
+
+    private function unquotePath(string $path): string
+    {
+        return str_starts_with($path, '"') ? stripcslashes(substr($path, 1, -1)) : $path;
     }
 
     /**
