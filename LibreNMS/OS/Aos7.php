@@ -39,7 +39,9 @@ use App\Models\PortVlan;
 use App\Models\Processor;
 use App\Models\Transceiver;
 use App\Models\Vlan;
+use Carbon\Exceptions\InvalidFormatException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Date;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Enum\SnmpStringOutput;
 use LibreNMS\Discovery\Neighbors\NeighborParser;
@@ -53,6 +55,7 @@ use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\AlcatelMacAddressMib;
 use LibreNMS\Util\Bgp;
+use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
 use SnmpQuery;
 
@@ -367,15 +370,11 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
 
         // AOS7 currently reports IPv4 here. Accept exactly four octets,
         // either contiguous (C0A80101) or separated (C0 A8 01 01).
-        if (preg_match('/^[0-9a-fA-F]{8}$/D', $hex)) {
-            $bytes = hex2bin($hex);
-        } elseif (preg_match('/^[0-9a-fA-F]{2}(?:[\s:.-]+[0-9a-fA-F]{2}){3}$/D', $hex)) {
-            $bytes = hex2bin(preg_replace('/[\s:.-]+/', '', $hex));
-        } else {
+        if (! preg_match('/^(?:[0-9a-f]{8}|[0-9a-f]{2}(?:[\s:.-]+[0-9a-f]{2}){3})$/iD', $hex)) {
             return null;
         }
 
-        return $bytes === false ? null : (inet_ntop($bytes) ?: null);
+        return IP::fromHexString(preg_replace('/[\s:.-]+/', '', $hex), true)?->uncompressed();
     }
 
     private function normalizeAosDaString(string $value): string
@@ -419,31 +418,20 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, MempoolsDiscovery, P
 
     private function parseAosTimestamp(string $timestamp): int
     {
-        $timestamp = trim($timestamp);
+        $timestamp = trim(trim($timestamp), "\"'");
 
         // DateAndTime: 2026-10-13,9:0:35.0,+2:0 (the UTC offset is optional)
-        if (! preg_match('/(\d+)-(\d+)-(\d+),(\d+):(\d+):(\d+)(?:\.\d+)?(?:,([+-])(\d+):(\d+))?/', $timestamp, $matches)) {
+        if (! preg_match('/^\d{4}-\d{1,2}-\d{1,2},\d{1,2}:\d{1,2}:\d{1,2}(?:\.\d+)?(?:,[+-]\d{1,2}:\d{1,2})?$/D', $timestamp)) {
             return 0;
         }
 
-        $date = sprintf(
-            '%04d-%02d-%02d %02d:%02d:%02d',
-            $matches[1],
-            $matches[2],
-            $matches[3],
-            $matches[4],
-            $matches[5],
-            $matches[6]
-        );
-
-        if (isset($matches[7])) {
-            // use the offset the device reports, not the timezone of the server
-            $date .= sprintf(' %s%02d:%02d', $matches[7], $matches[8], $matches[9]);
+        try {
+            $startTime = Date::parse($timestamp)->getTimestamp();
+        } catch (InvalidFormatException) {
+            return 0;
         }
 
-        $startTime = strtotime($date);
-
-        return $startTime ? time() - $startTime : 0;
+        return $startTime ? Date::now()->getTimestamp() - $startTime : 0;
     }
 
     public function discoverVlans(): Collection

@@ -3,6 +3,7 @@
 namespace LibreNMS\Tests\Unit;
 
 use App\Facades\PortCache;
+use Illuminate\Support\Facades\Date;
 use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
 use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
@@ -12,14 +13,20 @@ use LibreNMS\Tests\TestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
 
+/**
+ * @phpstan-type NacClient array{index?: string, unpUsed?: string, unpFromAuthServer?: string, loginTimestamp?: string, expectedLoginTime?: string}
+ */
 class Aos7NacTest extends TestCase
 {
     /**
-     * @param  array{index?: string, unpUsed?: string, unpFromAuthServer?: string}  $client
+     * @param  NacClient  $client
      */
     #[DataProvider('nacCases')]
-    public function testNacAddressAndAuthorization(string $rawIp, string $hexIp, string $message, int $status, int $classification, string $expectedIp, string $expectedAuthz, int $authType = 0, array $client = []): void
+    public function testNacClient(string $rawIp, string $hexIp, string $message, int $status, int $classification, string $expectedIp, string $expectedAuthz, int $authType = 0, array $client = []): void
     {
+        $now = Date::parse('2026-10-13 15:00:00 UTC');
+        $this->travelTo($now);
+
         $prefix = 'ALCATEL-IND1-DA-MIB::';
         $index = $client['index'] ?? '1001.00:11:22:33:44:55.10';
         $table = [];
@@ -31,6 +38,7 @@ class Aos7NacTest extends TestCase
             'alaDaMacVlanUserServerMessage' => $message,
             'alaDaMacVlanUserUnpUsed' => $client['unpUsed'] ?? '',
             'alaDaMacVlanUserUnpFromAuthServer' => $client['unpFromAuthServer'] ?? '',
+            'alaDaMacVlanUserLoginTimeStamp' => $client['loginTimestamp'] ?? '',
         ] as $column => $value) {
             $table["$prefix$column.$index"] = $value;
         }
@@ -62,10 +70,14 @@ class Aos7NacTest extends TestCase
         $this->assertSame($expectedIp, $entry->ip_address);
         $this->assertSame($expectedAuthz, $entry->authz_status);
         $this->assertEquals($authType === 2 ? 60 : 0, $entry->timeout);
+        $this->assertSame(
+            isset($client['expectedLoginTime']) ? $now->getTimestamp() - Date::parse($client['expectedLoginTime'])->getTimestamp() : null,
+            $entry->time_elapsed
+        );
     }
 
     /**
-     * @return array<string, array{string, string, string, int, int, string, string, 7?: int, 8?: array{index?: string, unpUsed?: string, unpFromAuthServer?: string}}>
+     * @return array<string, array{string, string, string, int, int, string, string, 7?: int, 8?: NacClient}>
      */
     public static function nacCases(): array
     {
@@ -77,6 +89,8 @@ class Aos7NacTest extends TestCase
             'legacy decimal fallback' => ['3232235777', '', '', 3, 0, '192.168.1.1', 'authzSuccess'],
             'legacy dotted fallback' => ['192.168.1.1', '', '', 3, 0, '192.168.1.1', 'authzSuccess'],
             'legacy hex fallback' => ['C0 A8 01 01', '', '', 3, 0, '192.168.1.1', 'authzSuccess'],
+            'quoted hex with a prefix and dashes' => ['', '"0xC0-A8-01-01"', '', 3, 0, '192.168.1.1', 'authzSuccess'],
+            'invalid hex falls back to the raw address' => ['192.168.1.1', 'C0A801G1', '', 3, 0, '192.168.1.1', 'authzSuccess'],
             'blocked UNP' => ['192.168.1.1', 'C0 A8 01 01', '', 1, 60, '192.168.1.1', 'authzFail'],
             'authenticated client with wrong UNP' => ['192.168.1.1', '', '', 3, 0, '192.168.1.1', 'authzFail', 0, [
                 'unpUsed' => 'fallback',
@@ -90,6 +104,24 @@ class Aos7NacTest extends TestCase
                 'index' => '1001.0.17.34.51.68.85.10',
             ]],
             '802.1X client' => ['192.168.1.1', 'C0 A8 01 01', '', 3, 0, '192.168.1.1', 'authzSuccess', 2],
+            'login timestamp with a UTC offset' => ['', '', '', 3, 0, '0.0.0.0', 'authzSuccess', 0, [
+                'loginTimestamp' => '2026-10-13,9:0:35.0,+2:0',
+                'expectedLoginTime' => '2026-10-13 07:00:35 UTC',
+            ]],
+            'login timestamp with a negative offset under an hour' => ['', '', '', 3, 0, '0.0.0.0', 'authzSuccess', 0, [
+                'loginTimestamp' => '2026-10-13,9:0:35.0,-0:30',
+                'expectedLoginTime' => '2026-10-13 09:30:35 UTC',
+            ]],
+            'login timestamp with no UTC offset' => ['', '', '', 3, 0, '0.0.0.0', 'authzSuccess', 0, [
+                'loginTimestamp' => '2026-10-13,0:0:35.0',
+                'expectedLoginTime' => '2026-10-13 00:00:35',
+            ]],
+            'relative date from the device is ignored' => ['', '', '', 3, 0, '0.0.0.0', 'authzSuccess', 0, [
+                'loginTimestamp' => 'yesterday',
+            ]],
+            'invalid login time is ignored' => ['', '', '', 3, 0, '0.0.0.0', 'authzSuccess', 0, [
+                'loginTimestamp' => '2026-10-13,99:0:35.0',
+            ]],
         ];
     }
 
