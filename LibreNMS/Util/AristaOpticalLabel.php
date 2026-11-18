@@ -5,6 +5,10 @@ namespace LibreNMS\Util;
 /** Resolve a PLR4 optical lane label without changing the sensor's identity. */
 class AristaOpticalLabel
 {
+    /**
+     * @param  array<int, array<string, mixed>>  $entities  Physical inventory keyed by ENTITY-MIB index.
+     * @param  array<int, array<string, mixed>>  $ports  Active logical interface inventory.
+     */
     public static function rewrite(string $description, int $sensorIndex, array $entities, array $ports): string
     {
         if (! preg_match('/^DOM (RX|TX) Power\s+For (Ethernet[0-9]+)\/[0-9]+(?: \(optical lane [1-4]\))?$/i', $description, $match)) {

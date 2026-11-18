@@ -7,6 +7,10 @@ use PHPUnit\Framework\TestCase;
 
 class AristaOpticalLabelTest extends TestCase
 {
+    /**
+     * @param  list<int>  $suffixes
+     * @return array{array<int, array<string, mixed>>, list<array<string, mixed>>}
+     */
     private function inventory(array $suffixes = [1, 3, 5, 7]): array
     {
         $entities = [100 => [
