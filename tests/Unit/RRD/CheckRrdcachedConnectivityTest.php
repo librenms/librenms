@@ -68,4 +68,21 @@ final class CheckRrdcachedConnectivityTest extends TestCase
         $this->assertSame(ValidationResult::FAILURE, $result->getStatus());
         $this->assertStringContainsString("Cannot connect to rrdcached socket $socket", $result->getMessage());
     }
+
+    public function testUnixSocketParentNotAccessible(): void
+    {
+        $directory = sys_get_temp_dir() . '/librenms-rrdcached-test-' . getmypid();
+        mkdir($directory, 0);
+        if (is_readable($directory)) {
+            rmdir($directory);
+            $this->markTestSkipped('Directory permissions do not apply to this user');
+        }
+        LibrenmsConfig::set('rrdcached', "unix:$directory/rrdcached.sock");
+
+        $result = (new CheckRrdcachedConnectivity)->validate();
+        rmdir($directory);
+
+        $this->assertSame(ValidationResult::FAILURE, $result->getStatus());
+        $this->assertStringContainsString('Permission denied', $result->getMessage());
+    }
 }

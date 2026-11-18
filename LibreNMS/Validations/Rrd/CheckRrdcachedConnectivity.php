@@ -34,6 +34,8 @@ use LibreNMS\Validator;
 
 class CheckRrdcachedConnectivity implements Validation
 {
+    private const ENOENT = 2;
+
     /**
      * @inheritDoc
      */
@@ -44,12 +46,14 @@ class CheckRrdcachedConnectivity implements Validation
         // librrd treats unix: and bare paths as unix sockets
         if (str_starts_with($rrdcached, 'unix:') || str_starts_with($rrdcached, '/')) {
             $socket = preg_replace('/^unix:/', '', $rrdcached);
-            if (! file_exists($socket)) {
+
+            // connect instead of file_exists: the socket can exist while rrdcached is stopped or without
+            // permission, and file_exists also returns false when a parent directory is not accessible
+            $error = self::connect("unix://$socket", $errno);
+            if ($errno === self::ENOENT) {
                 return ValidationResult::fail(trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_socket', ['socket' => $socket]));
             }
 
-            // the socket can exist while rrdcached is stopped, or with permissions this user cannot connect with
-            $error = self::connect("unix://$socket");
             if ($error !== null) {
                 return ValidationResult::fail(
                     trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_socket_connect', ['socket' => $socket, 'user' => Validator::getUsername(), 'error' => $error]),
@@ -69,7 +73,7 @@ class CheckRrdcachedConnectivity implements Validation
     /**
      * Open and close a connection, returns the error or null on success
      */
-    private static function connect(string $address): ?string
+    private static function connect(string $address, ?int &$errno = null): ?string
     {
         $connection = @stream_socket_client($address, $errno, $errstr, 5);
         if (! is_resource($connection)) {
