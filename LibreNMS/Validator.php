@@ -288,7 +288,8 @@ class Validator
         if (self::$username === null) {
             if (function_exists('posix_getpwuid')) {
                 $uid = posix_geteuid();
-                self::$username = posix_getpwuid($uid)['name'] ?? (string) $uid;
+                // uid 0 is root even without a passwd entry, execAsUser relies on this to drop privileges
+                self::$username = posix_getpwuid($uid)['name'] ?? ($uid === 0 ? 'root' : (string) $uid);
             } else {
                 // the environment can name another user, so it is only the fallback
                 self::$username = getenv('USERNAME') ?: getenv('USER') ?: '?';
