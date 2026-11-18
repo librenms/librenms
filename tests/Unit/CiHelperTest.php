@@ -31,6 +31,31 @@ use LibreNMS\Util\CiHelper;
 
 final class CiHelperTest extends TestCase
 {
+    public function testTemporaryCiLogFailure(): void
+    {
+        $this->fail('Intentional failure to verify GitHub Actions shows PHPUnit diagnostics near the end of the log.');
+    }
+
+    public function testCiUsesStandardPhpunitOutputWithIssueDetails(): void
+    {
+        $helper = new CiHelper();
+        $helper->setFlags(['ci' => true, 'commands' => true]);
+
+        $this->expectOutputRegex('/^(?!.*--testdox).*--display-all-issues/');
+
+        $helper->checkUnit();
+    }
+
+    public function testLocalChecksUseTestDox(): void
+    {
+        $helper = new CiHelper();
+        $helper->setFlags(['commands' => true]);
+
+        $this->expectOutputRegex('/--testdox/');
+
+        $helper->checkUnit();
+    }
+
     public function testSetFlags(): void
     {
         $helper = new CiHelper();
