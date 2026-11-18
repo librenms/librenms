@@ -31,14 +31,12 @@ use LibreNMS\Util\CiHelper;
 
 final class CiHelperTest extends TestCase
 {
-    public function testCiUsesStandardPhpunitOutputWithIssueDetails(): void
+    public function testCiReportsPhpunitIssuesWithoutStoppingOnDefects(): void
     {
-        $helper = new CiHelper();
-        $helper->setFlags(['ci' => true, 'commands' => true]);
+        $this->expectOutputRegex('/^(?!.*(?:--testdox|--stop-on-defect)).*--display-all-issues/m');
 
-        $this->expectOutputRegex('/^(?!.*--testdox).*--display-all-issues/');
-
-        $helper->checkUnit();
+        $this->artisan('dev:check', ['check' => 'ci', '--commands' => true, '--full' => true])
+            ->assertExitCode(500);
     }
 
     public function testLocalChecksUseTestDox(): void
