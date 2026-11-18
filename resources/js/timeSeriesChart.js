@@ -1,4 +1,47 @@
-// Loaded on demand. GraphDataController has the shape of a graph.
+// Loaded on demand. Draws a graph from GraphDataController with uPlot.
+
+/**
+ * @typedef {object} GraphData App\Data\Graphing\GraphData
+ * @property {number[]} timestamps unix time each point's interval ends
+ * @property {{label: string, min: ?number, max: ?number, base: number}} axis min and max are limits when set
+ * @property {GraphSeries[]} series
+ */
+
+/**
+ * @typedef {object} GraphSeries App\Data\Graphing\GraphDataSeries, values line up with the timestamps
+ * @property {string} key
+ * @property {string} label
+ * @property {string} unit
+ * @property {string} color
+ * @property {?string} fillColor the area below the line, or the stacked area
+ * @property {?string} maxFillColor the area below the maximum of a line
+ * @property {boolean} stacked
+ * @property {boolean} invert drawn below the axis
+ * @property {number} drawScale multiplies the drawn value
+ * @property {Array<?number>} avg null where there is no data
+ * @property {?Array<?number>} min null when the same as avg, as it is when each point is a single stored value
+ * @property {?Array<?number>} max null when the same as avg
+ */
+
+/** @typedef {{from: number, to: number}} View unix times */
+
+/**
+ * @typedef {object} ChartOptions
+ * @property {View} view
+ * @property {Set<string>} hidden keys of series not drawn
+ * @property {boolean} compact for small screens
+ * @property {(view: View, moving: boolean) => void} onView zoomed or panned, moving while more is likely to follow
+ * @property {() => void} onReset
+ * @property {(position: ?{index: number, left: number}) => void} onHover the point whose interval the cursor is in
+ */
+
+/**
+ * @typedef {object} Chart
+ * @property {(graph: GraphData) => void} update new data for the same series
+ * @property {(view: View) => void} setView
+ * @property {() => void} resize to the element
+ * @property {() => void} destroy
+ */
 
 import uPlot from 'uplot';
 import 'uplot/dist/uPlot.min.css';
@@ -40,30 +83,38 @@ export function formatValue(value, unit = '', base = 1000) {
     return format(value, 2, 0, unit).trim();
 }
 
-// Legend values of points start to end (exclusive). Min and max use those of each point, keeping consolidated peaks.
+/**
+ * Legend values of points start to end (exclusive). Min and max use those of each point, keeping consolidated peaks.
+ *
+ * @param {GraphSeries} series
+ */
 export function summarize(series, start, end) {
-    const known = (values) => values.slice(start, end).filter((value) => value !== null);
-    const avg = known(series.avg);
+    const mins = series.min ?? series.avg;
+    const maxes = series.max ?? series.avg;
+    let now = null;
+    let min = Infinity;
+    let max = -Infinity;
+    let sum = 0;
+    let count = 0;
 
-    if (avg.length === 0) {
-        return { now: null, min: null, max: null, avg: null };
+    for (let index = start; index < end; index++) {
+        const value = series.avg[index];
+        if (value !== null) {
+            now = value;
+            min = Math.min(min, mins[index] ?? value);
+            max = Math.max(max, maxes[index] ?? value);
+            sum += value;
+            count++;
+        }
     }
 
-    return {
-        now: avg[avg.length - 1],
-        min: Math.min(...known(series.min)),
-        max: Math.max(...known(series.max)),
-        avg: avg.reduce((sum, value) => sum + value, 0) / avg.length,
-    };
-}
-
-// points cover more than one stored value
-function isConsolidated(series) {
-    return series.avg.some((value, index) => value !== null && series.max[index] !== null && series.max[index] !== value);
+    return count === 0
+        ? { now: null, min: null, max: null, avg: null }
+        : { now, min, max, avg: sum / count };
 }
 
 function drawnValues(series, values) {
-    const factor = series.draw_scale * (series.invert ? -1 : 1);
+    const factor = series.drawScale * (series.invert ? -1 : 1);
 
     return factor === 1 ? values : values.map((value) => (value === null ? null : value * factor));
 }
@@ -89,13 +140,14 @@ function layersFor(series) {
     const average = (item) => (data) => drawnValues(data[item.key], data[item.key].avg);
 
     return [
+        // points that cover more than one stored value show their range
         ...lines.map((item) => ({
-            fill: item.max_fill_color ?? `${item.color}26`,
-            values: (data) => (isConsolidated(data[item.key]) ? drawnValues(data[item.key], data[item.key].max) : null),
+            fill: item.maxFillColor ?? `${item.color}26`,
+            values: (data) => (data[item.key].max === null ? null : drawnValues(data[item.key], data[item.key].max)),
         })),
-        ...lines.filter((item) => item.fill_color).map((item) => ({ fill: item.fill_color, values: average(item) })),
+        ...lines.filter((item) => item.fillColor).map((item) => ({ fill: item.fillColor, values: average(item) })),
         ...stacked.map((item) => ({
-            fill: item.fill_color,
+            fill: item.fillColor,
             stroke: item.color,
             values: (data, totals) => totals[item.key],
         })).reverse(),
@@ -128,8 +180,12 @@ function commonUnit(series) {
 
 /**
  * The view may be a part of the data or reach past it: the page moves it first and loads data after.
- * onView(view, moving): zoomed or panned, moving while more is likely to follow. Answer with setView.
- * onHover({index, left} | null): the point whose interval the cursor is in.
+ * Answer onView with setView.
+ *
+ * @param {HTMLElement} element
+ * @param {GraphData} graph
+ * @param {ChartOptions} options
+ * @returns {Chart}
  */
 export default function createChart(element, graph, { view, hidden, compact, onView, onReset, onHover }) {
     const label = compact ? '' : graph.axis.label;

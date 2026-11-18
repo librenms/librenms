@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Data\Graphing\DataSeries;
-use App\Facades\LibrenmsConfig;
+use App\Data\Graphing\GraphData;
+use App\Data\Graphing\GraphDataSeries;
+use App\Data\Graphing\ResolvedStyle;
 use App\Graphs\AbstractSeriesGraph;
-use App\Graphs\SeriesPalette;
 use App\Http\Requests\GraphRequest;
 use Illuminate\Http\JsonResponse;
 use LibreNMS\Exceptions\GraphException;
@@ -31,43 +31,39 @@ class GraphDataController extends Controller
 
         $options = $graph->getOptions();
         $drawn = array_intersect_key($graph->getSeries(), $data->series);
-        $palette = new SeriesPalette($options->palette);
-        $inverts = ! LibrenmsConfig::get('webui.graph_stacked');
-        $averaged = count(array_filter($drawn, fn (DataSeries $series) => $series->style->stackAverage));
+        $styles = ResolvedStyle::resolve($drawn, $options->palette);
+        $hex = fn (?string $color) => $color === null ? null : "#$color";
 
         $series = [];
         foreach ($drawn as $key => $item) {
-            $style = $item->style;
+            $style = $styles[$key];
             $values = $data->series[$key];
-            $color = $style->color ?? $palette->next();
-            $fill = $style->stacked ? $color : ($style->fill ? $style->fillColor ?? $color . '20' : null);
 
-            $series[] = [
-                'key' => $key,
-                'label' => $item->description,
-                'unit' => $item->unit,
-                'color' => "#$color",
-                'fill_color' => $fill === null ? null : "#$fill",
-                'max_fill_color' => $style->maxFillColor === null ? null : "#$style->maxFillColor",
-                'stacked' => $style->stacked,
-                'invert' => $style->invert && $inverts,
-                'draw_scale' => $style->stackAverage ? $style->drawScale / $averaged : $style->drawScale,
-                'avg' => $values['avg'],
-                // the browser fills these in when equal to the average
-                'min' => $values['min'] === $values['avg'] ? null : $values['min'],
-                'max' => $values['max'] === $values['avg'] ? null : $values['max'],
-            ];
+            $series[] = new GraphDataSeries(
+                key: $key,
+                label: $item->description,
+                unit: $item->unit,
+                color: "#$style->color",
+                fillColor: $hex($style->fillColor),
+                maxFillColor: $hex($style->maxFillColor),
+                stacked: $style->stacked,
+                invert: $style->invert,
+                drawScale: $style->drawScale,
+                avg: $values['avg'],
+                min: $values['min'],
+                max: $values['max'],
+            );
         }
 
-        return response()->json([
-            'timestamps' => $data->timestamps,
-            'axis' => [
+        return response()->json(new GraphData(
+            timestamps: $data->timestamps,
+            axis: [
                 'label' => $options->verticalLabel ?? $options->legendTitle,
                 'min' => $options->scaleMin,
                 'max' => $options->scaleMax,
                 'base' => $options->base ?? 1000,
             ],
-            'series' => $series,
-        ]);
+            series: $series,
+        ));
     }
 }

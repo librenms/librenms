@@ -81,7 +81,7 @@ class GraphDataControllerTest extends TestCase
         $response->assertOk();
         $response->assertJsonCount(4, 'series');
         $response->assertJsonPath('series.0.stacked', true);
-        $response->assertJsonPath('series.0.draw_scale', 0.25);
+        $response->assertJsonPath('series.0.drawScale', 0.25);
         $response->assertJsonPath('series.0.avg', [50]);
         $response->assertJsonPath('axis.max', 100);
         $response->assertJsonPath('axis.label', 'Load %');

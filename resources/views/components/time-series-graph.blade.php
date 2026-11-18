@@ -159,9 +159,28 @@
         const ZOOM_STEP = 0.5; // of the view
         const MIN_SPAN = 120;
         const MAX_SPAN = 10 * 365 * 86400;
-        const WIDE_SCREEN = '(min-width: 640px)'; // the sm: classes above
+        const MAX_DETAIL_CHANGE = 2; // zooming further than this from the loaded detail loads again
+        const REFRESH_AFTER = 60; // seconds of newer data a view can miss before it loads again
+        const WIDE_SCREEN = window.matchMedia('(min-width: 640px)'); // the sm: classes above
+        const TOUCH = window.matchMedia('(pointer: coarse)');
 
         const now = () => Math.floor(Date.now() / 1000);
+
+        // the first index whose timestamp is after the time, or at it too
+        const firstAfter = (timestamps, time, orAt = false) => {
+            let low = 0;
+            let high = timestamps.length;
+            while (low < high) {
+                const middle = (low + high) >> 1;
+                if (timestamps[middle] > time || (orAt && timestamps[middle] === time)) {
+                    high = middle;
+                } else {
+                    low = middle + 1;
+                }
+            }
+
+            return low;
+        };
 
         window.Alpine.data('timeSeriesGraph', (src, range) => {
             // not reactive
@@ -169,8 +188,10 @@
             let chart = null;
             let graph = null;
             let view = null; // {from, to} zoomed or panned to
+            let loaded = null; // {from, to, detail} of the data, detail in seconds per pixel
             let request = null;
             let timer = null;
+            let legendFrame = null;
 
             const shown = () => view ?? ('last' in range ? { from: now() - range.last, to: now() } : range);
 
@@ -193,6 +214,7 @@
 
                 destroy() {
                     clearTimeout(timer);
+                    cancelAnimationFrame(legendFrame);
                     request?.abort();
                     chart?.destroy();
                 },
@@ -259,13 +281,30 @@
                     this.zoomed = view !== null;
                     this.tooltip = null;
                     chart?.setView(shown());
-                    this.updateLegend();
+                    legendFrame ??= requestAnimationFrame(() => {
+                        legendFrame = null;
+                        this.updateLegend();
+                    });
 
                     clearTimeout(timer);
                     timer = setTimeout(() => {
                         this.$dispatch('graph-range-changed', view ?? range);
-                        this.load();
+                        if (this.needsData()) {
+                            this.load();
+                        }
                     }, moving ? SETTLE_DELAY : 0);
+                },
+
+                // the loaded data is missing a part of the view, newer data, or is too coarse or fine for it
+                needsData() {
+                    const { from, to } = shown();
+                    const detail = (to - from) / this.$refs.plot.clientWidth;
+
+                    return loaded === null
+                        || from < loaded.from
+                        || Math.min(to, now()) > loaded.to + REFRESH_AFTER
+                        || detail > loaded.detail * MAX_DETAIL_CHANGE
+                        || detail < loaded.detail / MAX_DETAIL_CHANGE;
                 },
 
                 async load() {
@@ -291,11 +330,7 @@
 
                         draw = module;
                         graph = response.data;
-                        // left out by the server when equal to the average
-                        graph.series.forEach((series) => {
-                            series.min ??= series.avg;
-                            series.max ??= series.avg;
-                        });
+                        loaded = { from: params.from, to: params.to, detail: (params.to - params.from) / params.width };
                         this.caption = graph.axis.label;
                         this.error = null;
 
@@ -309,6 +344,7 @@
                         if (current.signal.aborted) {
                             return; // replaced by a newer load
                         }
+                        loaded = null; // try again on the next move
                         if (! error.response) {
                             console.error(error); // a fault in drawing
                         }
@@ -325,7 +361,7 @@
                     chart = draw.default(this.$refs.plot, graph, {
                         view: shown(),
                         hidden: new Set(this.hidden),
-                        compact: ! window.matchMedia(WIDE_SCREEN).matches,
+                        compact: ! WIDE_SCREEN.matches,
                         onView: (next, moving) => this.show(next, moving),
                         onReset: () => this.reset(),
                         onHover: (position) => this.hover(position),
@@ -340,13 +376,12 @@
 
                     const { from, to } = shown();
                     // a point covers the interval up to its time, the last one shown may end after the view
-                    const start = graph.timestamps.findIndex((timestamp) => timestamp > from);
-                    const last = graph.timestamps.findIndex((timestamp) => timestamp >= to);
-                    const end = start === -1 ? 0 : (last === -1 ? graph.timestamps.length : last + 1);
+                    const start = firstAfter(graph.timestamps, from);
+                    const end = Math.min(firstAfter(graph.timestamps, to, true) + 1, graph.timestamps.length);
 
                     this.legend = graph.series.map((series) => {
                         const format = (value) => draw.formatValue(value, series.unit, graph.axis.base);
-                        const summary = draw.summarize(series, Math.max(start, 0), end);
+                        const summary = draw.summarize(series, start, end);
 
                         return {
                             key: series.key,
@@ -407,7 +442,7 @@
                 // Beside the cursor on the side with more room, for touch in the top corner away from the finger
                 tooltipStyle(left) {
                     const plot = this.$refs.plot.getBoundingClientRect();
-                    const touch = window.matchMedia('(pointer: coarse)').matches;
+                    const touch = TOUCH.matches;
                     const before = left > plot.width / 2;
                     const room = before ? left - TOOLTIP_GAP : plot.width - left - TOOLTIP_GAP;
                     const inset = touch ? '0' : `${plot.width - room}px`;

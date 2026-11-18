@@ -58,9 +58,16 @@ class RrdSeriesReader
 
         $values = [];
         foreach ($ids as $key => $id) {
-            foreach (array_keys(self::CONSOLIDATIONS) as $name) {
-                $values[$key][$name] = $this->scale(array_values($export[$id . $name] ?? []), $series[$key]->scale);
-            }
+            $read = fn (string $name) => array_values($export[$id . $name] ?? []);
+            $avg = $read('avg');
+            $min = $read('min');
+            $max = $read('max');
+
+            $values[$key] = [
+                'avg' => $this->scale($avg, $series[$key]->scale),
+                'min' => $min === $avg ? null : $this->scale($min, $series[$key]->scale),
+                'max' => $max === $avg ? null : $this->scale($max, $series[$key]->scale),
+            ];
         }
 
         return new SeriesData(array_keys(Arr::first($export) ?? []), $values);

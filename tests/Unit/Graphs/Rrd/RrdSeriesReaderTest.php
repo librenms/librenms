@@ -70,6 +70,19 @@ class RrdSeriesReaderTest extends TestCase
         $this->assertSame([24.0, null], $data->series['bits']['max']);
     }
 
+    public function test_min_and_max_are_left_out_when_they_are_the_average(): void
+    {
+        $this->backend->shouldReceive('xport')->andReturn([
+            'ds0avg' => [1200 => 2.0, 1500 => null], 'ds0min' => [1200 => 2.0, 1500 => null], 'ds0max' => [1200 => 3.0, 1500 => null],
+        ]);
+
+        $data = $this->reader()->read(['in' => new DataSeries($this->metric, 'in', 'In', scale: 8)], 1000, 1900, 500);
+
+        $this->assertSame([16.0, null], $data->series['in']['avg']);
+        $this->assertNull($data->series['in']['min']);
+        $this->assertSame([24.0, null], $data->series['in']['max']);
+    }
+
     public function test_rrdtool_is_asked_for_at_least_its_minimum_of_rows(): void
     {
         $this->backend->shouldReceive('xport')->once()
