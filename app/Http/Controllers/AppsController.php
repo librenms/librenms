@@ -25,7 +25,7 @@ class AppsController extends Controller
         $type = $selection['app'] ?? null;
         $instance = $selection['instance'] ?? null;
         $definition = $type === null ? null : ApplicationDefinition::forType($type);
-        $content = $definition?->fleetContent(array_filter($request->query(), 'is_string'));
+        $content = $definition?->fleetContent(array_filter($request->query(), is_string(...)));
         $applications = collect();
         if ($content === null) {
             $applications = Application::query()->hasAccess($request->user())->with('device')

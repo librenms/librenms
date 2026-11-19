@@ -34,7 +34,7 @@ final class ApplicationPage
         private readonly Application $application,
         array $options,
     ) {
-        $this->options = array_filter($options, 'is_string');
+        $this->options = array_filter($options, is_string(...));
     }
 
     public function option(string $key): ?string

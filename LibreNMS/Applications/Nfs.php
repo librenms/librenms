@@ -30,16 +30,11 @@ class Nfs extends ApplicationDefinition
             $page->addFilter('NFS', 'app_page', $sections, $section === 'general' ? null : $section);
         }
 
-        switch ($section) {
-            case 'mounts':
-                $this->mounts($page, $data['mounts'] ?? []);
-                break;
-            case 'mounted_by':
-                $this->mountedBy($page, $application, $data['mounted_by'] ?? []);
-                break;
-            default:
-                $this->generalGraphs($page, $data);
-        }
+        match ($section) {
+            'mounts' => $this->mounts($page, $data['mounts'] ?? []),
+            'mounted_by' => $this->mountedBy($page, $application, $data['mounted_by'] ?? []),
+            default => $this->generalGraphs($page, $data),
+        };
     }
 
     private function generalGraphs(ApplicationPage $page, array $data): void
