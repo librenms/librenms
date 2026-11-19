@@ -712,7 +712,7 @@ return [
             'description' => 'Filtere Syslog Meldungen beinhaltend',
         ],
         'syslog_purge' => [
-            'description' => 'Syslog',
+            'description' => 'Syslog-Protokoll',
             'help' => 'Zeitraum in Tagen. 0 deaktiviert die Bereinigung. Ältere Einträge werden stündlich bereinigt',
         ],
         'title_image' => [
