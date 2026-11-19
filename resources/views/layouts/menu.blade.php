@@ -530,25 +530,26 @@
 {{-- App --}}
                 @if(Gate::allows('viewAny', \App\Models\Application::class) && $app_menu->isNotEmpty())
                     <li class="dropdown">
-                        <a href="{{ url('apps') }}" class="dropdown-toggle" data-hover="dropdown"
+                        <a href="{{ route('apps.index') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons"
                                                      aria-hidden="true"></i> <span
                                 class="tw:md:hidden tw:2xl:inline-block">{{ __('Apps') }}</span></a>
                         <ul class="dropdown-menu">
-                            <li><a href="{{ url('apps') }}"><i class="fa fa-object-group fa-fw fa-lg"
+                            <li><a href="{{ route('apps.index') }}"><i class="fa fa-object-group fa-fw fa-lg"
                                                                aria-hidden="true"></i> {{ __('Overview') }}</a></li>
                             @foreach($app_menu as $app_type => $app_instances)
-                                @if($app_instances->filter->app_instance->isNotEmpty())
+                                @php($instances = $app_instances->pluck('app_instance')->filter(fn ($instance) => filled($instance))->unique())
+                                @if($instances->isNotEmpty())
                                     <li class="dropdown-submenu">
-                                        <a href="{{ url('apps/app=' . $app_type) }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ $app_instances->first()->displayName() }}</a>
+                                        <a href="{{ route('apps.index', ['app' => $app_type]) }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ $app_instances->first()->displayName() }}</a>
                                         <ul class="dropdown-menu scrollable-menu">
-                                            @foreach($app_instances as $app_instance)
-                                            <li><a href="{{ url("apps/app=$app_type/instance=$app_instance->app_instance") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($app_instance->app_instance) }}</a></li>
+                                            @foreach($instances as $instance)
+                                                <li><a href="{{ route('apps.index', ['app' => $app_type, 'instance' => $instance]) }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ $instance }}</a></li>
                                             @endforeach
                                         </ul>
                                     </li>
                                 @else
-                                    <li><a href="{{ url('apps/app=' . $app_type) }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ $app_instances->first()->displayName() }}</a></li>
+                                    <li><a href="{{ route('apps.index', ['app' => $app_type]) }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ $app_instances->first()->displayName() }}</a></li>
                                 @endif
                             @endforeach
                         </ul>

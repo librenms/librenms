@@ -13,6 +13,7 @@ use App\Http\Controllers\AlertTemplateController;
 use App\Http\Controllers\AlertTransportController;
 use App\Http\Controllers\AlertTransportGroupController;
 use App\Http\Controllers\ApiAccessController;
+use App\Http\Controllers\AppsController;
 use App\Http\Controllers\Auth;
 use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\AuthLogController;
@@ -260,6 +261,8 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('overview', [OverviewController::class, 'index'])->name('overview');
     Route::get('/', [OverviewController::class, 'index'])->name('home');
     Route::get('vminfo', [VminfoController::class, 'index'])->name('vminfo.index');
+    Route::get('apps', [AppsController::class, 'index'])->name('apps.index');
+    Route::get('apps/{vars}', [AppsController::class, 'legacy'])->where('vars', '.+');
 
     Route::get('nac', [NacController::class, 'index']);
 
@@ -329,6 +332,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('logs/graylog', [LogController::class, 'graylog'])->name('graylog');
         Route::get('logs/outages', Device\Tabs\OutagesController::class)->name('outages');
         Route::get('logs/syslog', [LogController::class, 'syslog'])->middleware('saved-filter:device.syslog')->name('syslog');
+        Route::get('apps', [Device\Tabs\AppsController::class, 'index'])->name('apps')->whereNumber('device');
         Route::get('graphs', [Device\Tabs\GraphsController::class, 'index'])->name('graphs')->whereNumber('device');
         Route::get('health', [Device\Tabs\HealthController::class, 'index'])->name('health')->whereNumber('device');
         Route::get('loadbalancer', [Device\Tabs\LoadBalancerController::class, 'index'])->name('loadbalancer')->whereNumber('device');

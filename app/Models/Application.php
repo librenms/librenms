@@ -29,7 +29,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use LibreNMS\Util\StringHelpers;
+use LibreNMS\Applications\ApplicationDefinition;
 
 class Application extends DeviceRelatedModel
 {
@@ -51,9 +51,23 @@ class Application extends DeviceRelatedModel
 
     // ---- Helper Functions ----
 
-    public function displayName()
+    public function definition(): ApplicationDefinition
     {
-        return StringHelpers::niceCase($this->app_type);
+        return ApplicationDefinition::forType($this->app_type);
+    }
+
+    public function displayName(): string
+    {
+        return $this->definition()->displayName();
+    }
+
+    public function deviceAppsUrl(array $options = []): string
+    {
+        return route('device.apps', [
+            'device' => $this->device_id,
+            'app' => $this->app_type,
+            'instance' => filled($this->app_instance) ? $this->app_id : null,
+        ] + $options);
     }
 
     public function getShowNameAttribute()

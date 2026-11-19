@@ -2,12 +2,9 @@
 
 use App\Facades\DeviceCache;
 use Illuminate\Support\Facades\Gate;
+use LibreNMS\Applications\Ntp;
 
-$component = new LibreNMS\Component();
-$options = [];
-$options['filter']['ignore'] = ['=', 0];
-$options['type'] = 'ntp';
-$components = $component->getComponents(null, $options);
+$components = Ntp::peers();
 
 $first = ($vars['current'] - 1) * $vars['rowCount']; // Which record do we start on.
 $last = $first + $vars['rowCount']; // Which record do we end on.
@@ -57,26 +54,14 @@ foreach ($components as $devid => $comp) {
 
             // If this record is in the range we want.
             if ($showAll || (($count > $first) && ($count <= $last))) {
-                $device_link = generate_device_link($device, null, ['tab' => 'apps', 'app' => 'ntp']);
+                $device_link = generate_device_link($device, null, ['tab' => 'apps', 'app' => Ntp::TYPE]);
 
                 $graph_array = [];
                 $graph_array['device'] = $device['device_id'];
                 $graph_array['width'] = 80;
                 $graph_array['height'] = 20;
 
-                // Which graph type do we want?
-                if ($vars['graph'] == 'stratum') {
-                    $graph_array['type'] = 'device_ntp_stratum';
-                } elseif ($vars['graph'] == 'offset') {
-                    $graph_array['type'] = 'device_ntp_offset';
-                } elseif ($vars['graph'] == 'delay') {
-                    $graph_array['type'] = 'device_ntp_delay';
-                } elseif ($vars['graph'] == 'dispersion') {
-                    $graph_array['type'] = 'device_ntp_dispersion';
-                } else {
-                    // No Graph
-                    unset($graph_array);
-                }
+                $graphType = Ntp::peerGraphType($vars['graph'] ?? 'none');
 
                 $response[] = [
                     'device' => $device_link,
@@ -86,7 +71,8 @@ foreach ($components as $devid => $comp) {
                 ];
 
                 // Do we want a graphrow.
-                if (isset($graph_array)) {
+                if ($graphType !== null) {
+                    $graph_array['type'] = $graphType;
                     $return_data = true;
                     require 'includes/html/print-graphrow.inc.php';
                     unset($return_data);
