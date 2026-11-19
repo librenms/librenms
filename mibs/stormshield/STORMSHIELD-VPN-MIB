@@ -4,7 +4,7 @@ STORMSHIELD-VPN-MIB DEFINITIONS ::= BEGIN
       stormshieldMIB FROM STORMSHIELD-SMI-MIB;
 
    snsVPN MODULE-IDENTITY
-      LAST-UPDATED  "202008200000Z"
+      LAST-UPDATED  "202510090000Z"
       ORGANIZATION  "Stormshield"
       CONTACT-INFO
          "Customer Support
@@ -17,6 +17,8 @@ STORMSHIELD-VPN-MIB DEFINITIONS ::= BEGIN
          E-mail: support@stormshield.eu
          http://www.stormshield.eu"
       DESCRIPTION   "stormshield VPN MIBS"
+      REVISION      "202510090000Z"
+      DESCRIPTION   "Addition of the DR compliant and VTI objects"
       REVISION      "202008200000Z"
       DESCRIPTION   "Initial"
       ::= { stormshieldMIB 1 }

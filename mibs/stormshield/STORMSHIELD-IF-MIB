@@ -7,7 +7,7 @@ STORMSHIELD-IF-MIB DEFINITIONS ::= BEGIN
       stormshieldMIB                                     FROM STORMSHIELD-SMI-MIB;
 
    snsif MODULE-IDENTITY
-      LAST-UPDATED  "201702200000Z"
+      LAST-UPDATED  "202510090000Z"
       ORGANIZATION  "Stormshield"
       CONTACT-INFO
          "Customer Support
@@ -20,6 +20,8 @@ STORMSHIELD-IF-MIB DEFINITIONS ::= BEGIN
          E-mail: support@stormshield.eu
          http://www.stormshield.eu"
       DESCRIPTION   "stormshield Interface MIBS"
+      REVISION      "202510090000Z"
+      DESCRIPTION   "Addition of VtiSaIn/Out interface entries"
       REVISION      "201904250000Z"
       DESCRIPTION   "Initial"
       ::= { stormshieldMIB 4 }
@@ -80,7 +82,9 @@ STORMSHIELD-IF-MIB DEFINITIONS ::= BEGIN
       snsifOutIcmpBytes           Counter64,
       snsifProtected              Integer32,
       snsifDrvName                DisplayString,
-      snsifComment                DisplayString
+      snsifComment                DisplayString,
+      snsifVtiSaIn                Integer32,
+      snsifVtiSaOut               Integer32
    }
 
    snsifIndex OBJECT-TYPE
@@ -396,5 +400,21 @@ STORMSHIELD-IF-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "Interface comment"
       ::= { snsifEntry 39 }
+
+   snsifVtiSaIn OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Current VTI SA In count"
+      ::= { snsifEntry 40 }
+
+   snsifVtiSaOut OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Current VTI SA Out count"
+      ::= { snsifEntry 41 }
 
 END
