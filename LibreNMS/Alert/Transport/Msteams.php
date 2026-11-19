@@ -13,6 +13,7 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
@@ -22,7 +23,11 @@ class Msteams extends Transport
 {
     protected string $name = 'Microsoft Teams';
 
-    public function deliverAlert(array $alert_data): bool
+    /**
+     * @param  array<string, mixed>|AlertData  $alert_data
+     * @return bool
+     */
+    public function deliverAlert($alert_data): bool
     {
         $url = $this->config['msteam-url'];
         $useJson = $this->config['use-json'] === 'on';

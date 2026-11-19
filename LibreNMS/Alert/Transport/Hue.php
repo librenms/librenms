@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
@@ -37,7 +38,11 @@ use LibreNMS\Util\Http;
  */
 class Hue extends Transport
 {
-    public function deliverAlert(array $alert_data): bool
+    /**
+     * @param  array<string, mixed>|AlertData  $alert_data
+     * @return bool
+     */
+    public function deliverAlert($alert_data): bool
     {
         // Don't alert on resolve at this time
         if ($alert_data['state'] == AlertState::RECOVERED) {

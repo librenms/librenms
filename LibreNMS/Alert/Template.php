@@ -32,22 +32,20 @@ use LibreNMS\Enum\AlertState;
 
 class Template
 {
-    public $template;
+    public ?AlertTemplate $template = null;
 
     /**
      * Get the template details
-     *
-     * @param  array|null  $obj
-     * @return mixed
      */
-    public function getTemplate($obj = null)
+    public function getTemplate(?int $ruleId = null): ?AlertTemplate
     {
         if ($this->template) {
             // Return the cached template information.
             return $this->template;
         }
-        $this->template = AlertTemplate::whereHas('map', function ($query) use ($obj): void {
-            $query->where('alert_rule_id', '=', $obj['rule_id']);
+
+        $this->template = AlertTemplate::whereHas('map', function ($query) use ($ruleId): void {
+            $query->where('alert_rule_id', '=', $ruleId);
         })->first();
         if (! $this->template) {
             $this->template = AlertTemplate::where('name', '=', 'Default Alert Template')->first();
@@ -56,73 +54,64 @@ class Template
         return $this->template;
     }
 
-    public function getTitle($data)
+    public function getTitle(AlertData $alert): string
     {
-        return $this->bladeTitle($data);
+        return $this->bladeTitle($alert);
     }
 
-    public function getBody($data)
+    public function getBody(AlertData $alert): string
     {
-        return $this->bladeBody($data);
+        return $this->bladeBody($alert);
     }
 
     /**
      * Parse Blade body
-     *
-     * @param  array  $data
-     * @return string
      */
-    public function bladeBody($data)
+    public function bladeBody(AlertData $alert): string
     {
-        $alert['alert'] = new AlertData($data['alert'] ?? $data);
+        $templateBody = $alert->template?->template;
+        $templateName = $alert->template->name ?? '';
+
+        if (empty($templateBody)) {
+            return Blade::render($this->getDefaultTemplate($templateName, 'No template defined'), ['alert' => $alert]);
+        }
+
         try {
-            return Blade::render($data['template']->template, $alert);
+            return Blade::render($templateBody, ['alert' => $alert]);
         } catch (\Exception $e) {
-            return Blade::render($this->getDefaultTemplate($data['template']->name ?? '', $e->getMessage()), $alert);
+            return Blade::render($this->getDefaultTemplate($templateName, $e->getMessage()), ['alert' => $alert]);
         }
     }
 
     /**
      * Parse Blade title
-     *
-     * @param  array  $data
-     * @return string
      */
-    public function bladeTitle($data)
+    public function bladeTitle(AlertData $alert): string
     {
-        $template = $data['template'] ?? null;
-        $state = $data['state'] ?? ($data['alert']['state'] ?? null);
-        $isRecovered = $state == AlertState::RECOVERED;
+        $isRecovered = $alert->state == AlertState::RECOVERED;
 
-        $alertData = new AlertData($data['alert'] ?? $data);
-
-        $display = $alertData['display'];
-        $name = $alertData['name'];
         $defaultTitle = $isRecovered
-            ? 'Device ' . $display . ' recovered from ' . ($name ?: $alertData['rule'])
-            : 'Alert for device ' . $display . ' - ' . $name;
+            ? 'Device ' . $alert->display . ' recovered from ' . ($alert->name ?: $alert->rule)
+            : 'Alert for device ' . $alert->display . ' - ' . $alert->name;
 
-        $templateTitle = $isRecovered
-            ? ($template->title_rec ?? null)
-            : ($template->title ?? null);
+        $templateTitle = $isRecovered ? $alert->template?->title_rec : $alert->template?->title;
 
+        $title = $defaultTitle;
         if (! empty($templateTitle)) {
             try {
-                $title = Blade::render($templateTitle, ['alert' => $alertData]);
+                $title = Blade::render($templateTitle, ['alert' => $alert]);
             } catch (\Throwable) {
-                $title = $defaultTitle;
+                // fall back to the default title
             }
-        } else {
-            $title = $defaultTitle;
         }
 
-        if ($state == AlertState::ACKNOWLEDGED) {
+        if ($alert->state == AlertState::ACKNOWLEDGED) {
             $title .= ' Has been acknowledged';
-        } elseif ($state == AlertState::WORSE) {
+        } elseif ($alert->state == AlertState::WORSE) {
             $title .= ' Has worsened';
-        } elseif ($state == AlertState::BETTER) {
+        } elseif ($alert->state == AlertState::BETTER) {
             $title .= ' Has improved';
-        } elseif ($state == AlertState::CHANGED) {
+        } elseif ($alert->state == AlertState::CHANGED) {
             $title .= ' changed';
         }
 
