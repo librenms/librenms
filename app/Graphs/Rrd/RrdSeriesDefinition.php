@@ -126,7 +126,7 @@ class RrdSeriesDefinition
         }
 
         // fills go below all lines, so they do not hide lines of other series
-        return [$this->legendHeader(), ...$defs, ...($stats?->definitions ?? []), ...($traffic?->definitions() ?? []), ...$maxFills, ...$fills, ...$drawing, ...($stats?->drawing ?? []), ...($traffic?->drawing() ?? [])];
+        return [$this->legendHeader(), ...$defs, ...($stats->definitions ?? []), ...($traffic?->definitions() ?? []), ...$maxFills, ...$fills, ...$drawing, ...($stats->drawing ?? []), ...($traffic?->drawing() ?? [])];
     }
 
     /**
