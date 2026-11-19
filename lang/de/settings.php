@@ -127,11 +127,11 @@ return [
         ],
         'alert_log_purge' => [
             'description' => 'Alarm Log',
-            'help' => 'Zeitraum in Tagen. Ältere Einträge werden durch daily.sh bereinigt',
+            'help' => 'Zeitraum in Tagen. 0 deaktiviert die Bereinigung. Ältere Einträge werden durch daily.sh bereinigt',
         ],
         'applications_purge' => [
             'description' => 'Gelöschte Anwendungen',
-            'help' => 'Zeitraum in Tagen. Gelöschte Anwendungen, die älter sind, werden durch daily.sh bereinigt',
+            'help' => 'Zeitraum in Tagen. 0 deaktiviert die Bereinigung. Gelöschte Anwendungen, die älter sind, werden durch daily.sh bereinigt',
         ],
         'allow_duplicate_sysName' => [
             'description' => 'Erlaube doppelten sysName',
@@ -322,7 +322,7 @@ return [
         ],
         'authlog_purge' => [
             'description' => 'Auth Log',
-            'help' => 'Zeitraum in Tagen. Ältere Einträge werden durch daily.sh bereinigt',
+            'help' => 'Zeitraum in Tagen. 0 deaktiviert die Bereinigung. Ältere Einträge werden durch daily.sh bereinigt',
         ],
         'base_url' => [
             'description' => 'Spezifiziere URL',
@@ -403,7 +403,7 @@ return [
         ],
         'eventlog_purge' => [
             'description' => 'Event Log',
-            'help' => 'Zeitraum in Tagen. Ältere Einträge werden durch daily.sh bereinigt',
+            'help' => 'Zeitraum in Tagen. 0 deaktiviert die Bereinigung. Ältere Einträge werden durch daily.sh bereinigt',
         ],
         'favicon' => [
             'description' => 'Favicon',
@@ -590,11 +590,11 @@ return [
         ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB',
-            'help' => 'Zeitraum in Tagen. Ältere Einträge werden durch daily.sh bereinigt',
+            'help' => 'Zeitraum in Tagen. 0 deaktiviert die Bereinigung. Ältere Einträge werden durch daily.sh bereinigt',
         ],
         'ports_nac_purge' => [
             'description' => 'Port NAC',
-            'help' => 'Zeitraum in Tagen. Ältere Einträge werden durch daily.sh bereinigt',
+            'help' => 'Zeitraum in Tagen. 0 deaktiviert die Bereinigung. Ältere Einträge werden durch daily.sh bereinigt',
         ],
         'ports_purge' => [
             'description' => 'Gelöschte Ports',
@@ -618,7 +618,7 @@ return [
         ],
         'rrd_purge' => [
             'description' => 'RRD Graphen',
-            'help' => 'Zeitraum in Tagen. Ältere Graphen werden durch daily.sh bereinigt',
+            'help' => 'Zeitraum in Tagen. 0 deaktiviert die Bereinigung. Ältere Graphen werden durch daily.sh bereinigt',
         ],
         'rrd_rra' => [
             'description' => 'RRD Format Einstellungen',
@@ -637,7 +637,7 @@ return [
         ],
         'route_purge' => [
             'description' => 'Route',
-            'help' => 'Zeitraum in Tagen. Ältere Einträge werden durch daily.sh bereinigt',
+            'help' => 'Zeitraum in Tagen. 0 deaktiviert die Bereinigung. Ältere Einträge werden durch daily.sh bereinigt',
         ],
         'shorthost_target_length' => [
             'description' => 'Verkürzt einen Hostnamen auf diese maximale Länge',
@@ -713,7 +713,7 @@ return [
         ],
         'syslog_purge' => [
             'description' => 'Syslog',
-            'help' => 'Zeitraum in Tagen. Ältere Einträge werden durch daily.sh bereinigt',
+            'help' => 'Zeitraum in Tagen. 0 deaktiviert die Bereinigung. Ältere Einträge werden stündlich bereinigt',
         ],
         'title_image' => [
             'description' => 'Titelbild',

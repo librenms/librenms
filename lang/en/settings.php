@@ -243,7 +243,7 @@ return [
         ],
         'alert_log_purge' => [
             'description' => 'Alert log',
-            'help' => 'Period in days. Older entries are cleaned up by daily.sh',
+            'help' => 'Period in days. 0 disables cleanup. Older entries are cleaned up by daily.sh',
         ],
         'discovery_on_reboot' => [
             'description' => 'Discovery on Reboot',
@@ -301,7 +301,7 @@ return [
         ],
         'applications_purge' => [
             'description' => 'Deleted applications',
-            'help' => 'Period in days. Deleted applications older than this period are cleaned up by daily.sh',
+            'help' => 'Period in days. 0 disables cleanup. Deleted applications older than this period are cleaned up by daily.sh',
         ],
         'apps' => [
             'powerdns-recursor' => [
@@ -597,7 +597,7 @@ return [
         ],
         'authlog_purge' => [
             'description' => 'Auth log',
-            'help' => 'Period in days. Older entries are cleaned up by daily.sh',
+            'help' => 'Period in days. 0 disables cleanup. Older entries are cleaned up by daily.sh',
         ],
         'availablity' => [
             'threshold_ok' => [
@@ -1004,7 +1004,7 @@ return [
         ],
         'eventlog_purge' => [
             'description' => 'Event log',
-            'help' => 'Period in days. Older entries are cleaned up by daily.sh',
+            'help' => 'Period in days. 0 disables cleanup. Older entries are cleaned up by daily.sh',
         ],
         'favicon' => [
             'description' => 'Favicon',
@@ -1925,7 +1925,7 @@ return [
         ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB',
-            'help' => 'Period in days. Older entries are cleaned up by daily.sh',
+            'help' => 'Period in days. 0 disables cleanup. Older entries are cleaned up by daily.sh',
         ],
         'ports_ipv4_neighbours' => [
             'description' => 'Port IPv4 neighbour lookup method',
@@ -1933,7 +1933,7 @@ return [
         ],
         'ports_nac_purge' => [
             'description' => 'Port NAC',
-            'help' => 'Period in days. Older entries are cleaned up by daily.sh',
+            'help' => 'Period in days. 0 disables cleanup. Older entries are cleaned up by daily.sh',
         ],
         'ports_page_default' => [
             'description' => 'Default ports tab',
@@ -2087,7 +2087,7 @@ return [
         ],
         'route_purge' => [
             'description' => 'Route',
-            'help' => 'Period in days. Older entries are cleaned up by daily.sh',
+            'help' => 'Period in days. 0 disables cleanup. Older entries are cleaned up by daily.sh',
         ],
         'rrd' => [
             'backend' => [
@@ -2108,7 +2108,7 @@ return [
         ],
         'rrd_purge' => [
             'description' => 'RRD graphs',
-            'help' => 'Period in days. Older graphs are cleaned up by daily.sh',
+            'help' => 'Period in days. 0 disables cleanup. Older graphs are cleaned up by daily.sh',
         ],
         'rrd_rra' => [
             'description' => 'RRD Format Settings',
@@ -2432,7 +2432,7 @@ return [
         ],
         'syslog_purge' => [
             'description' => 'Syslog',
-            'help' => 'Period in days. Older entries are cleaned up by daily.sh',
+            'help' => 'Period in days. 0 disables cleanup. Older entries are cleaned up hourly',
         ],
         'title_image' => [
             'description' => 'Title Image',
