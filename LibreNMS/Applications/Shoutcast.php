@@ -19,10 +19,14 @@ class Shoutcast extends ApplicationDefinition
     protected function buildDevicePage(ApplicationPage $page, Application $application): void
     {
         parent::buildDevicePage($page, $application);
+        $prefix = 'app-' . self::TYPE . '-' . $application->app_id . '-';
         $files = Rrd::getRrdFiles($application->device->hostname, ['app', self::TYPE, (string) $application->app_id]);
         foreach ($files as $file) {
             $hostname = basename($file, '.rrd');
-            $hostname = substr($hostname, strrpos($hostname, '-') + 1);
+            if (! str_starts_with($hostname, $prefix)) {
+                continue; // another app id sharing this prefix, e.g. 70 for 7
+            }
+            $hostname = substr($hostname, strlen($prefix));
             if (! str_contains($hostname, '_')) {
                 continue;
             }

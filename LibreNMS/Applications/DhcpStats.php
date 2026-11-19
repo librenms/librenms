@@ -71,17 +71,23 @@ class DhcpStats extends ApplicationDefinition
     /** @param  list<array<string, mixed>>  $leases */
     private function leases(ApplicationPage $page, array $leases): void
     {
-        $ports = [];
+        $macs = [];
+        foreach ($leases as $lease) {
+            $mac = (string) ($lease['hw_address'] ?? '');
+            if (preg_match('/^(?:[a-f\d]{2}:){5}[a-f\d]{2}$/iD', $mac)) {
+                $macs[] = strtolower(str_replace(':', '', $mac));
+            }
+        }
+        $ports = $macs === [] ? collect() : Port::with('device')->whereIn('ifPhysAddress', array_unique($macs))->orderBy('port_id')->get()
+            ->groupBy(fn (Port $port) => strtolower(str_replace(':', '', (string) $port->ifPhysAddress)))->map->first();
+
         $rows = [];
         foreach ($leases as $lease) {
             $mac = (string) ($lease['hw_address'] ?? '');
-            if (preg_match('/^(?:[a-f\d]{2}:){5}[a-f\d]{2}$/iD', $mac) && ! array_key_exists($mac, $ports)) {
-                $ports[$mac] = Port::with('device')->firstWhere('ifPhysAddress', str_replace(':', '', $mac));
-            }
             $rows[] = [
                 $lease['ip'],
                 $lease['state'],
-                view('apps.port-reference', ['label' => $mac, 'port' => $ports[$mac] ?? null]),
+                view('apps.port-reference', ['label' => $mac, 'port' => $ports->get(strtolower(str_replace(':', '', $mac)))]),
                 gmdate('Y-m-d\TH:i:s\Z', $lease['starts']),
                 gmdate('Y-m-d\TH:i:s\Z', $lease['ends']),
                 base64_decode((string) ($lease['client_hostname'] ?? '')),

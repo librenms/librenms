@@ -50,6 +50,6 @@ class Sagan extends ApplicationDefinition
         $choices = $application->data['instances'] ?? [];
         sort($choices);
         $selected = $page->addResourceFilter('Instances', 'sinstance', $choices, 'Totals');
-        $page->addGraphs(self::GRAPHS, ['instance' => $selected]);
+        $page->addGraphs(self::GRAPHS, ['sinstance' => $selected]);
     }
 }

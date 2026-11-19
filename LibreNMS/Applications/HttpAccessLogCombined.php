@@ -188,12 +188,13 @@ class HttpAccessLogCombined extends ApplicationDefinition
         $logs = $application->data['logs'] ?? [];
         $log = $page->option('log');
         $section = $page->option('access_log_page');
-        $page->addFilter('Details', 'access_log_page', ['' => 'Totals'] + self::SECTIONS, $section, ['log' => $log]);
-        $page->addFilter('Sets', 'log', ['' => 'All Sets'] + array_combine($logs, $logs), $log, ['access_log_page' => $section]);
+        // detail graphs always cover every set, so a detail page and a set are never selected together
+        $page->addFilter('Details', 'access_log_page', ['' => 'Totals'] + self::SECTIONS, $section === null && $log !== null ? false : $section);
+        $page->addFilter('Sets', 'log', array_combine($logs, $logs), $section === null ? $log : false);
 
         if ($section !== null && isset(self::STATS[$section])) {
             foreach (self::STATS[$section] as $stat => $title) {
-                $page->addGraphs(['stat' => $title], ['log' => $log, 'log_stat' => $stat]);
+                $page->addGraphs(['stat' => $title], ['log_stat' => $stat]);
             }
 
             return;
