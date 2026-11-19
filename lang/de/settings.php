@@ -126,7 +126,7 @@ return [
             ],
         ],
         'alert_log_purge' => [
-            'description' => 'Alarm Log',
+            'description' => 'Alarmprotokoll',
             'help' => 'Zeitraum in Tagen. 0 deaktiviert die Bereinigung. Ältere Einträge werden durch daily.sh bereinigt',
         ],
         'applications_purge' => [
@@ -321,7 +321,7 @@ return [
             'help' => 'Anzahl an Tagen welche ein Benutzer eingeloggt bleibt wenn er die Checkbox zum eingeloggt bleiben nutzt',
         ],
         'authlog_purge' => [
-            'description' => 'Auth Log',
+            'description' => 'Auth-Protokoll',
             'help' => 'Zeitraum in Tagen. 0 deaktiviert die Bereinigung. Ältere Einträge werden durch daily.sh bereinigt',
         ],
         'base_url' => [
@@ -402,7 +402,7 @@ return [
             'help' => 'Name benutzt als Teil der "from" E-Mail Adresse',
         ],
         'eventlog_purge' => [
-            'description' => 'Event Log',
+            'description' => 'Event-Protokoll',
             'help' => 'Zeitraum in Tagen. 0 deaktiviert die Bereinigung. Ältere Einträge werden durch daily.sh bereinigt',
         ],
         'favicon' => [
