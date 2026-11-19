@@ -433,7 +433,8 @@ main () {
                                "ports_fdb"
                                "ports_nac"
                                "route"
-                               "ports_purge")
+                               "ports_purge"
+                               "applications_purge")
                 call_daily_php "${options[@]}"
             ;;
         esac

@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -59,6 +60,23 @@ class Application extends DeviceRelatedModel
     public function getShowNameAttribute()
     {
         return $this->displayName();
+    }
+
+    /**
+     * Hard-delete applications that were soft-deleted at least $days ago,
+     * along with their metrics.
+     *
+     * @return array{applications: int, metrics: int}
+     */
+    public static function purgeTrashed(int $days): array
+    {
+        $cutoff = Carbon::now()->subDays($days);
+        $appIds = static::onlyTrashed()->where('deleted_at', '<=', $cutoff)->pluck('app_id');
+
+        $metrics = $appIds->isEmpty() ? 0 : ApplicationMetric::whereIn('app_id', $appIds)->delete();
+        $applications = static::onlyTrashed()->where('deleted_at', '<=', $cutoff)->forceDelete();
+
+        return ['applications' => $applications, 'metrics' => $metrics];
     }
 
     // ---- Define Relationships ----
