@@ -12,7 +12,8 @@ class SystemUser
      */
     public static function name(): string
     {
-        if (function_exists('posix_getpwuid')) {
+        // either can be disabled on its own with disable_functions
+        if (function_exists('posix_geteuid') && function_exists('posix_getpwuid')) {
             $uid = posix_geteuid();
 
             return posix_getpwuid($uid)['name'] ?? (string) $uid;

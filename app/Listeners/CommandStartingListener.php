@@ -88,7 +88,7 @@ class CommandStartingListener
             return;
         }
 
-        if (! function_exists('posix_getpwuid')) {
+        if (! function_exists('posix_getpwuid') || ! function_exists('posix_geteuid')) {
             return;
         }
 
