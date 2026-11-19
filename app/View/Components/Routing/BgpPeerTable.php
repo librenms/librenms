@@ -44,8 +44,10 @@ use LibreNMS\Util\Time;
  * @phpstan-type PeerRow array{
  *     peer: BgpPeer,
  *     local_address: string,
+ *     local_port: Port|null,
  *     identifier: string,
  *     linked_port: Port|null,
+ *     vrf: string,
  *     peer_type: string,
  *     peer_type_class: string,
  *     afi_list: string,
@@ -55,6 +57,7 @@ use LibreNMS\Util\Time;
  *     uptime: string,
  *     in_updates: string,
  *     out_updates: string,
+ *     prefixes: list<array{family: string, accepted: int, limit: int, percent: int|null, class: string}>,
  *     graph_type: string|null,
  *     graph_id: int,
  * }
@@ -73,9 +76,14 @@ class BgpPeerTable extends Component
         'macaccounting_pkts',
     ];
 
+    /** PrefixAdminLimit is 0, or the maximum of an Unsigned32 (IOS-XR), when no limit is configured */
+    private const int NO_PREFIX_LIMIT = 4294967295;
+
     /** @var list<PeerRow> */
     public array $rows;
     public int $columnCount;
+    public bool $showVrf;
+    public bool $showPrefixes;
 
     /**
      * @param  EloquentCollection<int, BgpPeer>  $peers
@@ -86,20 +94,26 @@ class BgpPeerTable extends Component
         public readonly ?string $graph = null,
         public readonly bool $showDevice = false,
     ) {
-        $peers->loadMissing('device');
+        $peers->loadMissing(['device', 'vrf']);
         $peers = self::filterForGraph($peers, $graph);
 
         $cbgp = $this->loadCbgp($peers);
         $linkedPorts = $this->resolveLinkedPorts($peers);
+        $localPorts = $this->resolveLocalPorts($peers);
         $macAccountingIds = str_starts_with((string) $graph, 'macaccounting_') ? self::macAccountingIds($peers) : [];
 
         $this->rows = $peers->map(fn (BgpPeer $peer) => $this->formatPeer(
             $peer,
-            $cbgp->get("$peer->device_id|$peer->bgpPeerIdentifier", collect()),
+            $cbgp->get(self::cbgpKey($peer->device_id, $peer->bgpPeerIdentifier, $peer->context_name), collect()),
             $linkedPorts[$peer->device_id . '|' . $peer->bgpPeerIdentifier] ?? null,
+            $localPorts[$peer->device_id . '|' . $peer->bgpPeerIface] ?? null,
             $macAccountingIds[$peer->device_id . '|' . $peer->bgpPeerIdentifier] ?? null,
         ))->values()->all();
-        $this->columnCount = $showDevice ? 9 : 8;
+
+        // only show the columns when a peer has something to show in them
+        $this->showVrf = collect($this->rows)->contains(fn (array $row) => $row['vrf'] !== '');
+        $this->showPrefixes = collect($this->rows)->contains(fn (array $row) => ! empty($row['prefixes']));
+        $this->columnCount = 9 + (int) $this->showVrf + (int) $this->showPrefixes;
     }
 
     public function render(): View|Closure|string
@@ -150,7 +164,7 @@ class BgpPeerTable extends Component
      * @param  Collection<int, BgpPeerCbgp>  $cbgp
      * @return PeerRow
      */
-    private function formatPeer(BgpPeer $peer, Collection $cbgp, ?Port $linkedPort, ?int $macAccountingId): array
+    private function formatPeer(BgpPeer $peer, Collection $cbgp, ?Port $linkedPort, ?Port $localPort, ?int $macAccountingId): array
     {
         [$peerType, $peerTypeClass] = $this->determinePeerType($peer->bgpPeerRemoteAs, $peer->device?->bgpLocalAs);
         $afiSafis = $cbgp->map(fn (BgpPeerCbgp $c) => $c->afi . $c->safi)->all();
@@ -158,9 +172,11 @@ class BgpPeerTable extends Component
 
         return [
             'peer' => $peer,
-            'local_address' => IP::parse($peer->bgpLocalAddr, true)?->compressed() ?: (string) $peer->bgpLocalAddr,
+            'local_address' => $this->formatLocalAddress($peer),
+            'local_port' => $localPort,
             'identifier' => IP::parse($peer->bgpPeerIdentifier, true)?->compressed() ?: $peer->bgpPeerIdentifier,
             'linked_port' => $linkedPort,
+            'vrf' => (string) ($peer->vrf?->vrf_name ?: $peer->context_name),
             'peer_type' => $peerType,
             'peer_type_class' => $peerTypeClass,
             'afi_list' => $cbgp->map(fn (BgpPeerCbgp $c) => "$c->afi.$c->safi")->implode(', '),
@@ -170,6 +186,7 @@ class BgpPeerTable extends Component
             'uptime' => Time::formatInterval($peer->bgpPeerFsmEstablishedTime),
             'in_updates' => Number::formatSi($peer->bgpPeerInUpdates, 2, 0, ''),
             'out_updates' => Number::formatSi($peer->bgpPeerOutUpdates, 2, 0, ''),
+            'prefixes' => $cbgp->map(fn (BgpPeerCbgp $c) => $this->formatPrefixes($c))->values()->all(),
             'graph_type' => $graphType,
             'graph_id' => $graphId,
         ];
@@ -188,8 +205,73 @@ class BgpPeerTable extends Component
         return BgpPeerCbgp::query()
             ->whereIn('device_id', $peers->pluck('device_id')->unique())
             ->get()
-            ->groupBy(fn (BgpPeerCbgp $c) => "$c->device_id|$c->bgpPeerIdentifier")
+            ->groupBy(fn (BgpPeerCbgp $c) => self::cbgpKey($c->device_id, $c->bgpPeerIdentifier, $c->context_name))
             ->toBase();
+    }
+
+    /**
+     * Address families are stored in the snmp context of their session, the same address may be a session in another context
+     */
+    private static function cbgpKey(int|string|null $deviceId, string $identifier, ?string $context): string
+    {
+        return "$deviceId|$identifier|$context";
+    }
+
+    /**
+     * The local interfaces the sessions are on, keyed by device_id|ifIndex
+     *
+     * @param  Collection<int, BgpPeer>  $peers
+     * @return array<string, Port>
+     */
+    private function resolveLocalPorts(Collection $peers): array
+    {
+        $peers = $peers->filter(fn (BgpPeer $peer) => ! empty($peer->bgpPeerIface));
+
+        if ($peers->isEmpty()) {
+            return [];
+        }
+
+        return Port::whereIn('device_id', $peers->pluck('device_id')->unique())
+            ->whereIn('ifIndex', $peers->pluck('bgpPeerIface')->unique())
+            ->get()
+            ->keyBy(fn (Port $port) => "$port->device_id|$port->ifIndex")
+            ->all();
+    }
+
+    private function formatLocalAddress(BgpPeer $peer): string
+    {
+        $ip = IP::parse($peer->bgpLocalAddr, true);
+
+        return $ip === null || in_array($ip->compressed(), ['0.0.0.0', '::'], true) ? '' : $ip->compressed();
+    }
+
+    /**
+     * Accepted prefixes and the maximum-prefix limit of an address family.
+     * Colored by the warning threshold and limit configured on the device.
+     *
+     * @return array{family: string, accepted: int, limit: int, percent: int|null, class: string}
+     */
+    private function formatPrefixes(BgpPeerCbgp $cbgp): array
+    {
+        $accepted = (int) $cbgp->AcceptedPrefixes;
+        $limit = (int) $cbgp->PrefixAdminLimit >= self::NO_PREFIX_LIMIT ? 0 : (int) $cbgp->PrefixAdminLimit;
+        $threshold = (int) $cbgp->PrefixThreshold;
+        // compare the unrounded ratio, the percentage is rounded for display only
+        $ratio = $limit > 0 ? $accepted / $limit * 100 : null;
+        $percent = $ratio === null ? null : (int) round($ratio);
+
+        return [
+            'family' => "$cbgp->afi.$cbgp->safi",
+            'accepted' => $accepted,
+            'limit' => $limit,
+            'percent' => $percent,
+            'class' => match (true) {
+                $ratio === null => '',
+                $accepted >= $limit => 'text-danger',
+                $threshold > 0 && $ratio >= $threshold => 'text-warning',
+                default => '',
+            },
+        ];
     }
 
     /**

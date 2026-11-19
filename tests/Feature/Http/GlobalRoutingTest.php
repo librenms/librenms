@@ -3,6 +3,7 @@
 namespace LibreNMS\Tests\Feature\Http;
 
 use App\Models\BgpPeer;
+use App\Models\BgpPeerCbgp;
 use App\Models\CefSwitching;
 use App\Models\Device;
 use App\Models\EntPhysical;
@@ -20,7 +21,9 @@ use App\Models\Ospfv3Instance;
 use App\Models\Port;
 use App\Models\User;
 use App\Models\Vrf;
+use App\View\Components\Routing\BgpPeerTable;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Tests\TestCase;
 use Spatie\Permission\Models\Role;
 
@@ -159,6 +162,95 @@ class GlobalRoutingTest extends TestCase
             ->assertOk()
             ->assertSee('Allowed-Peer')
             ->assertDontSee('Denied-Peer');
+    }
+
+    public function testBgpPeerTableShowsVrfLocalPortAndPrefixLimits(): void
+    {
+        $device = Device::factory()->create(['bgpLocalAs' => 65000]);
+        Port::factory()->for($device)->create(['ifIndex' => 42, 'ifName' => 'Bundle-Ether1.100', 'ifDescr' => 'Bundle-Ether1.100']);
+
+        // session walked in the snmp context of its vrf, its address families share the context
+        $vrfA = Vrf::factory()->for($device)->create(['vrf_name' => 'CUSTOMER-A', 'context_name' => 'ctx-a']);
+        BgpPeer::factory()->for($device)->create([
+            'bgpPeerIdentifier' => '198.51.100.1',
+            'bgpLocalAddr' => '198.51.100.2',
+            'bgpPeerIface' => 42,
+            'bgpPeerRemoteAs' => 65010,
+            'context_name' => 'ctx-a',
+            'vrf_id' => $vrfA->vrf_id,
+        ]);
+        $this->insertCbgp($device, '198.51.100.1', 'ctx-a', 'ipv4', 'unicast', 120, 100);
+        $this->insertCbgp($device, '198.51.100.1', 'ctx-b', 'ipv4', 'multicast', 1, 0); // same address in another context
+
+        // session in a vrf reported from the default context
+        $vrfB = Vrf::factory()->for($device)->create(['vrf_name' => 'CUSTOMER-B']);
+        BgpPeer::factory()->for($device)->create([
+            'bgpPeerIdentifier' => '203.0.113.1',
+            'bgpLocalAddr' => '0.0.0.0',
+            'bgpPeerRemoteAs' => 65020,
+            'context_name' => '',
+            'vrf_id' => $vrfB->vrf_id,
+        ]);
+        $this->insertCbgp($device, '203.0.113.1', '', 'ipv4', 'vpn', 8, 10);
+        $this->insertCbgp($device, '203.0.113.1', '', 'ipv6', 'vpn', 3, 4294967295); // no limit configured (IOS-XR)
+        $this->insertCbgp($device, '203.0.113.1', '', 'l2vpn', 'vpls', 749, 1000); // 74.9% shows as 75%, below the 75% threshold
+
+        foreach ([route('routing.bgp'), route('device.routing.bgp', ['device' => $device])] as $url) {
+            $this->actingAs($this->admin())
+                ->get($url)
+                ->assertOk()
+                ->assertSee('<th>VRF</th>', false)
+                ->assertSee('<th>Prefixes / Limit</th>', false)
+                ->assertSee('CUSTOMER-A')
+                ->assertSee('CUSTOMER-B')
+                ->assertSee('198.51.100.2')
+                ->assertSee('Bundle-Ether1.100')
+                ->assertSee('ipv4.unicast: 120')
+                ->assertSee('/ 100 (120%)')
+                ->assertSee('text-danger')
+                ->assertDontSee('ipv4.multicast')
+                ->assertSee('ipv4.vpn: 8')
+                ->assertSee('/ 10 (80%)')
+                ->assertSee('text-warning')
+                ->assertSee('ipv6.vpn: 3')
+                ->assertDontSee('4,294,967,295')
+                ->assertSee('/ 1,000 (75%)');
+        }
+
+        // the threshold is compared unrounded, 74.9% is displayed as 75% but has not reached the 75% threshold
+        $prefixes = collect((new BgpPeerTable($device->bgppeers()->get()))->rows)->pluck('prefixes')->flatten(1)->keyBy('family');
+        $this->assertSame(75, $prefixes['l2vpn.vpls']['percent']);
+        $this->assertSame('', $prefixes['l2vpn.vpls']['class']);
+        $this->assertSame('text-warning', $prefixes['ipv4.vpn']['class']);
+        $this->assertSame('text-danger', $prefixes['ipv4.unicast']['class']);
+    }
+
+    public function testBgpPeerTableHidesEmptyColumns(): void
+    {
+        $device = Device::factory()->create(['bgpLocalAs' => 65000]);
+        BgpPeer::factory()->for($device)->create(['bgpPeerIdentifier' => '192.0.2.1', 'bgpPeerRemoteAs' => 65010, 'context_name' => '', 'vrf_id' => null]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.routing.bgp', ['device' => $device]))
+            ->assertOk()
+            ->assertSee('<th>Local Address</th>', false)
+            ->assertDontSee('<th>VRF</th>', false)
+            ->assertDontSee('<th>Prefixes / Limit</th>', false);
+    }
+
+    private function insertCbgp(Device $device, string $identifier, string $context, string $afi, string $safi, int $accepted, int $limit): void
+    {
+        DB::table('bgpPeers_cbgp')->insert([
+            ...BgpPeerCbgp::emptyCounters(),
+            'device_id' => $device->device_id,
+            'bgpPeerIdentifier' => $identifier,
+            'context_name' => $context,
+            'afi' => $afi,
+            'safi' => $safi,
+            'AcceptedPrefixes' => $accepted,
+            'PrefixAdminLimit' => $limit,
+            'PrefixThreshold' => 75,
+        ]);
     }
 
     public function testCefPage(): void
