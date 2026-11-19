@@ -99,5 +99,18 @@ if (is_numeric(LibrenmsConfig::get('php_memory_limit')) && LibrenmsConfig::get('
 }
 
 if (module_selected('web', $init_modules)) {
-    require $install_dir . '/includes/html/vars.inc.php';
+    $vars = \LibreNMS\Util\Url::parseLegacyPathVars($_SERVER['REQUEST_URI'] ?? null);
+
+    foreach ($_GET as $name => $value) {
+        if (is_scalar($value)) {
+            $vars[$name] = strip_tags((string) $value);
+        }
+    }
+
+    foreach ($_POST as $name => $value) {
+        $vars[$name] = $value;
+    }
+
+    // don't leak login and other data
+    unset($vars['username'], $vars['password'], $vars['_token']);
 }

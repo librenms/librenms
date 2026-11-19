@@ -3,13 +3,11 @@
 namespace LibreNMS\Tests\Browser;
 
 use App\Models\AlertRule;
-use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Laravel\Dusk\Browser;
 use LibreNMS\Alerting\AlertRuleDefinitions;
 use LibreNMS\Tests\DuskTestCase;
 use PHPUnit\Framework\Attributes\Group;
-use Spatie\Permission\Models\Role;
 
 #[Group('browser')]
 final class AlertRulesPageTest extends DuskTestCase
@@ -27,7 +25,7 @@ final class AlertRulesPageTest extends DuskTestCase
         ]);
 
         $this->browse(function (Browser $browser) use ($rule): void {
-            $browser->loginAs($this->admin())->visit('/alert-rules')
+            $browser->loginAs($this->browserUser('admin'))->visit('/alert-rules')
                 ->assertMissing('#alert-rule-form')
                 ->click("a[href$='/alert-rule/{$rule->id}/edit']")
                 ->waitForLocation("/alert-rule/{$rule->id}/edit")
@@ -48,7 +46,7 @@ final class AlertRulesPageTest extends DuskTestCase
         $this->assertIsInt($id);
 
         $this->browse(function (Browser $browser) use ($id): void {
-            $browser->loginAs($this->admin())->visit('/alert-rules')
+            $browser->loginAs($this->browserUser('admin'))->visit('/alert-rules')
                 ->clickLink('Create rule from collection')
                 ->waitForLocation('/alert-rule/create')
                 ->waitFor('#search_rule_modal.in')
@@ -66,12 +64,5 @@ final class AlertRulesPageTest extends DuskTestCase
 
         $rule = AlertRule::where('name', 'Imported reboot rule')->firstOrFail();
         $this->assertSame(1, $rule->extra['count']);
-    }
-
-    private function admin(): User
-    {
-        Role::findOrCreate('admin');
-
-        return User::factory()->create(['enabled' => 1])->assignRole('admin');
     }
 }

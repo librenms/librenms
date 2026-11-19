@@ -10,6 +10,7 @@ use App\Models\Device;
 use App\Models\Port;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Applications\ApplicationDefinition;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Time;
@@ -89,7 +90,7 @@ class GraphsPageController extends Controller
         return [
             array_map(fn ($availType) => [
                 'value' => $this->graphUrl($request, ['type' => "{$type}_{$availType}"]),
-                'text' => StringHelpers::niceCase($availType),
+                'text' => $this->subtypeLabel($type, $availType),
             ], $graphSubtypes),
             $this->graphUrl($request, ['type' => "{$type}_{$request->graphParams()->subtype}"]),
         ];
@@ -188,7 +189,14 @@ class GraphsPageController extends Controller
             return ' :: ' . LibrenmsConfig::get("graph_types.$type.$subtype.descr");
         }
 
-        return ' :: ' . StringHelpers::niceCase($subtype);
+        return ' :: ' . $this->subtypeLabel($type, $subtype);
+    }
+
+    private function subtypeLabel(string $type, string $subtype): string
+    {
+        return $type === 'application'
+            ? ApplicationDefinition::forType($subtype)->displayName()
+            : StringHelpers::niceCase($subtype);
     }
 
     /**

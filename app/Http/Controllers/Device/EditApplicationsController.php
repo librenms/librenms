@@ -10,8 +10,8 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use LibreNMS\Applications\ApplicationDefinition;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Util\StringHelpers;
 
 class EditApplicationsController
 {
@@ -29,7 +29,7 @@ class EditApplicationsController
             'canUpdate' => auth()->user()->can('update', Application::class),
             'applications' => collect($this->types())->map(fn (string $type) => [
                 'type' => $type,
-                'name' => StringHelpers::niceCase($type),
+                'name' => ApplicationDefinition::forType($type)->displayName(),
                 'enabled' => $enabled->has($type),
                 'discovered' => $autoDiscovery && $enabled->get($type),
             ])->all(),
