@@ -1,6 +1,219 @@
 modules:
   os:
     hardware: STORMSHIELD-PROPERTY-MIB::snsModel.0
-    version: STORMSHIELD-PROPERTY-MIB::snsVersion.0
+    version: 
+      - STORMSHIELD-PROPERTY-MIB::snsVersion.0
+      - .1.3.6.1.4.1.11256.1.18.17.0
+    version_template: ' {{ STORMSHIELD-PROPERTY-MIB::snsVersion.0 }} {{ .1.3.6.1.4.1.11256.1.18.17.0 }}'
     serial: STORMSHIELD-PROPERTY-MIB::snsSerialNumber.0
     sysName: STORMSHIELD-PROPERTY-MIB::snsSystemName.0
+    features: STORMSHIELD-PROPERTY-MIB::snsSystemNodeName.0
+  sensors:
+    temperature:
+      data:
+        -
+          oid: STORMSHIELD-SYSTEM-MONITOR-MIB::snsCpuTable
+          value: STORMSHIELD-SYSTEM-MONITOR-MIB::snsCpuTemp
+          num_oid: '.1.3.6.1.4.1.11256.1.10.7.1.2.{{ $index }}'
+          descr: 'CPU Temperature {{ $index }}'
+          index: 'snsCpuTemp.{{ $index }}'
+    fanspeed:
+      data:
+        -
+          oid: STORMSHIELD-SYSTEM-MONITOR-MIB::snsFanTable
+          value: STORMSHIELD-SYSTEM-MONITOR-MIB::snsFanRpm
+          num_oid: '.1.3.6.1.4.1.11256.1.10.9.1.4.{{ $index }}'
+          descr: 'Fan {{ $index }} Speed'
+          index: 'snsFanRpm.{{ $index }}'
+    state:
+      data:
+        -
+          oid: STORMSHIELD-SYSTEM-MONITOR-MIB::snsPowerSupplyTable
+          value: STORMSHIELD-SYSTEM-MONITOR-MIB::snsPowerSupplyPowered
+          num_oid: '.1.3.6.1.4.1.11256.1.10.6.1.2.{{ $index }}'
+          descr: 'Power Supply {{ $index }}'
+          index: 'snsPowerSupplyPowered.{{ $index }}'
+          state_name: snsPowerSupplyPowered
+          states:
+            - { descr: 'Powered',   value: 1, generic: 0 }
+            - { descr: 'Unpowered', value: 2, generic: 2 }
+        -
+          oid: STORMSHIELD-SYSTEM-MONITOR-MIB::snsDiskTable
+          value: STORMSHIELD-SYSTEM-MONITOR-MIB::snsDiskEntrySmartResult
+          num_oid: '.1.3.6.1.4.1.11256.1.10.5.1.3.{{ $index }}'
+          descr: 'Disk {{ $index }} {{ STORMSHIELD-SYSTEM-MONITOR-MIB::snsDiskEntryDiskName }} {{ STORMSHIELD-SYSTEM-MONITOR-MIB::snsDiskEntryRaidStatus }}'
+          index: 'snsDiskEntrySmartResult.{{ $index }}'
+          state_name: snsDiskEntrySmartResult
+          states:
+            - { descr: 'PASSED',        value: 1,  generic: 0 }
+            - { descr: 'unknown',       value: 0,  generic: 2 }
+            - { descr: 'SMART Warning', value: -0, generic: 2 }
+        -
+          oid: STORMSHIELD-HEALTH-MONITOR-MIB::snsFirewallHealthTable
+          value: STORMSHIELD-HEALTH-MONITOR-MIB::snsHaModeHealth
+          num_oid: '.1.3.6.1.4.1.11256.1.16.2.1.3.{{ $index }}'
+          descr: 'Ha Mode'
+          group: 'Global System Health Firewall-{{ $index }}'
+          index: 'snsHaModeHealth.{{ $index }}'
+          state_name: snsHaModeHealth
+          states:
+            - { descr: 'None',    value: 0, generic: 3 }
+            - { descr: 'Active',  value: 1, generic: 0 }
+            - { descr: 'Passive', value: 2, generic: 3 }
+        -
+          oid: STORMSHIELD-HEALTH-MONITOR-MIB::snsFirewallHealthTable
+          value: STORMSHIELD-HEALTH-MONITOR-MIB::snsHaLinkHealth
+          num_oid: '.1.3.6.1.4.1.11256.1.16.2.1.4.{{ $index }}'
+          descr: 'Ha Link'
+          group: 'Global System Health Firewall-{{ $index }}'
+          index: 'snsHaLinkHealth.{{ $index }}'
+          state_name: snsHaLinkHealth
+          states:
+            - { descr: 'Good',  value: 0, generic: 0 }
+            - { descr: 'Minor', value: 1, generic: 1 }
+            - { descr: 'Major', value: 2, generic: 2 }
+        -
+          oid: STORMSHIELD-HEALTH-MONITOR-MIB::snsFirewallHealthTable
+          value: STORMSHIELD-HEALTH-MONITOR-MIB::snsPowerSupplyHealth
+          num_oid: '.1.3.6.1.4.1.11256.1.16.2.1.5.{{ $index }}'
+          descr: 'Power Supply'
+          group: 'Global System Health Firewall-{{ $index }}'
+          index: 'snsPowerSupplyHealth.{{ $index }}'
+          state_name: snsPowerSupplyHealth
+          states:
+            - { descr: 'Good',  value: 0, generic: 0 }
+            - { descr: 'Minor', value: 1, generic: 1 }
+            - { descr: 'Major', value: 2, generic: 2 }
+        -
+          oid: STORMSHIELD-HEALTH-MONITOR-MIB::snsFirewallHealthTable
+          value: STORMSHIELD-HEALTH-MONITOR-MIB::snsFanHealth
+          num_oid: '.1.3.6.1.4.1.11256.1.16.2.1.6.{{ $index }}'
+          descr: 'Power Supply'
+          group: 'Global System Health Firewall-{{ $index }}'
+          index: 'snsFanHealth.{{ $index }}'
+          state_name: snsFanHealth
+          states:
+            - { descr: 'Good',  value: 0, generic: 0 }
+            - { descr: 'Minor', value: 1, generic: 1 }
+            - { descr: 'Major', value: 2, generic: 2 }
+        -
+          oid: STORMSHIELD-HEALTH-MONITOR-MIB::snsFirewallHealthTable
+          value: STORMSHIELD-HEALTH-MONITOR-MIB::snsCpuHealth
+          num_oid: '.1.3.6.1.4.1.11256.1.16.2.1.7.{{ $index }}'
+          descr: 'CPU Utilization'
+          group: 'Global System Health Firewall-{{ $index }}'
+          index: 'snsCpuHealth.{{ $index }}'
+          state_name: snsCpuHealth
+          states:
+            - { descr: 'Good',  value: 0, generic: 0 }
+            - { descr: 'Minor', value: 1, generic: 1 }
+            - { descr: 'Major', value: 2, generic: 2 }
+        -
+          oid: STORMSHIELD-HEALTH-MONITOR-MIB::snsFirewallHealthTable
+          value: STORMSHIELD-HEALTH-MONITOR-MIB::snsMemHealth
+          num_oid: '.1.3.6.1.4.1.11256.1.16.2.1.8.{{ $index }}'
+          descr: 'Memory'
+          group: 'Global System Health Firewall-{{ $index }}'
+          index: 'snsMemHealth.{{ $index }}'
+          state_name: snsMemHealth
+          states:
+            - { descr: 'Good',  value: 0, generic: 0 }
+            - { descr: 'Minor', value: 1, generic: 1 }
+            - { descr: 'Major', value: 2, generic: 2 }
+        -
+          oid: STORMSHIELD-HEALTH-MONITOR-MIB::snsFirewallHealthTable
+          value: STORMSHIELD-HEALTH-MONITOR-MIB::snsDiskHealth
+          num_oid: '.1.3.6.1.4.1.11256.1.16.2.1.9.{{ $index }}'
+          descr: 'Disk'
+          group: 'Global System Health Firewall-{{ $index }}'
+          index: 'snsDiskHealth.{{ $index }}'
+          state_name: snsDiskHealth
+          states:
+            - { descr: 'Good',  value: 0, generic: 0 }
+            - { descr: 'Minor', value: 1, generic: 1 }
+            - { descr: 'Major', value: 2, generic: 2 }
+        -
+          oid: STORMSHIELD-HEALTH-MONITOR-MIB::snsFirewallHealthTable
+          value: STORMSHIELD-HEALTH-MONITOR-MIB::snsRaidHealth
+          num_oid: '.1.3.6.1.4.1.11256.1.16.2.1.10.{{ $index }}'
+          descr: 'RAID'
+          group: 'Global System Health Firewall-{{ $index }}'
+          index: 'snsRaidHealth.{{ $index }}'
+          state_name: snsRaidHealth
+          states:
+            - { descr: 'Good',  value: 0, generic: 0 }
+            - { descr: 'Minor', value: 1, generic: 1 }
+            - { descr: 'Major', value: 2, generic: 2 }
+        -
+          oid: STORMSHIELD-HEALTH-MONITOR-MIB::snsFirewallHealthTable
+          value: STORMSHIELD-HEALTH-MONITOR-MIB::snsCertHealth
+          num_oid: '.1.3.6.1.4.1.11256.1.16.2.1.11.{{ $index }}'
+          descr: 'Certificate'
+          group: 'Global System Health Firewall-{{ $index }}'
+          index: 'snsCertHealth.{{ $index }}'
+          state_name: snsCertHealth
+          states:
+            - { descr: 'Good',  value: 0, generic: 0 }
+            - { descr: 'Minor', value: 1, generic: 1 }
+            - { descr: 'Major', value: 2, generic: 2 }
+        -
+          oid: STORMSHIELD-HEALTH-MONITOR-MIB::snsFirewallHealthTable
+          value: STORMSHIELD-HEALTH-MONITOR-MIB::snsTPMHealth
+          num_oid: '.1.3.6.1.4.1.11256.1.16.2.1.13.{{ $index }}'
+          descr: 'TPM'
+          group: 'Global System Health Firewall-{{ $index }}'
+          index: 'snsTPMHealth.{{ $index }}'
+          state_name: snsTPMHealth
+          states:
+            - { descr: 'Good',  value: 0, generic: 0 }
+            - { descr: 'Minor', value: 1, generic: 1 }
+            - { descr: 'Major', value: 2, generic: 2 }
+        -
+          oid: STORMSHIELD-HEALTH-MONITOR-MIB::snsFirewallHealthTable
+          value: STORMSHIELD-HEALTH-MONITOR-MIB::snsPasswdHealth
+          num_oid: '.1.3.6.1.4.1.11256.1.16.2.1.14.{{ $index }}'
+          descr: 'Admin Password'
+          group: 'Global System Health Firewall-{{ $index }}'
+          index: 'snsPasswdHealth.{{ $index }}'
+          state_name: snsPasswdHealth
+          states:
+            - { descr: 'Good',  value: 0, generic: 0 }
+            - { descr: 'Minor', value: 1, generic: 1 }
+            - { descr: 'Major', value: 2, generic: 2 }
+        -
+          oid: STORMSHIELD-HEALTH-MONITOR-MIB::snsFirewallHealthTable
+          value: STORMSHIELD-HEALTH-MONITOR-MIB::snsCpuTempHealth
+          num_oid: '.1.3.6.1.4.1.11256.1.16.2.1.15.{{ $index }}'
+          descr: 'CPU Temperature'
+          group: 'Global System Health Firewall-{{ $index }}'
+          index: 'snsCpuTempHealth.{{ $index }}'
+          state_name: snsCpuTempHealth
+          states:
+            - { descr: 'Good',  value: 0, generic: 0 }
+            - { descr: 'Minor', value: 1, generic: 1 }
+            - { descr: 'Major', value: 2, generic: 2 }
+        -
+          oid: STORMSHIELD-HEALTH-MONITOR-MIB::snsFirewallHealthTable
+          value: STORMSHIELD-HEALTH-MONITOR-MIB::snsRouterHealth
+          num_oid: '.1.3.6.1.4.1.11256.1.16.2.1.16.{{ $index }}'
+          descr: 'Router Gateway'
+          group: 'Global System Health Firewall-{{ $index }}'
+          index: 'snsRouterHealth.{{ $index }}'
+          state_name: snsRouterHealth
+          states:
+            - { descr: 'Good',  value: 0, generic: 0 }
+            - { descr: 'Minor', value: 1, generic: 1 }
+            - { descr: 'Major', value: 2, generic: 2 }
+        -
+          oid: STORMSHIELD-HEALTH-MONITOR-MIB::snsFirewallHealthTable
+          value: STORMSHIELD-HEALTH-MONITOR-MIB::snsNTPHealth
+          num_oid: '.1.3.6.1.4.1.11256.1.16.2.1.17.{{ $index }}'
+          descr: 'NTP'
+          group: 'Global System Health Firewall-{{ $index }}'
+          index: 'snsNTPHealth.{{ $index }}'
+          state_name: snsNTPHealth
+          states:
+            - { descr: 'Good',  value: 0, generic: 0 }
+            - { descr: 'Minor', value: 1, generic: 1 }
+            - { descr: 'Major', value: 2, generic: 2 }
+            - { descr: 'N/A',   value: 3, generic: 3 }
