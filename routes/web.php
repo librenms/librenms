@@ -565,7 +565,9 @@ Route::middleware(['auth'])->group(function (): void {
         Route::prefix('table')->group(function (): void {
             Route::post('alertlog', Table\AlertLogController::class)->name('table.alertlog');
             Route::get('alertlog/export', [Table\AlertLogController::class, 'export'])->name('table.alertlog.export');
+            Route::post('alertlog-stats', Table\AlertLogStatsController::class)->name('table.alertlog-stats');
             Route::post('alerts', Table\AlertsController::class)->name('table.alerts');
+            Route::post('arp-search', Table\ArpTableController::class)->name('table.arp-search');
             Route::post('bills', Table\BillsController::class)->name('table.bills');
             Route::post('alert-schedule', Table\AlertScheduleController::class)->name('table.alert-schedule');
             Route::post('access-points', Table\AccessPointController::class)->name('table.access-points');
@@ -585,6 +587,7 @@ Route::middleware(['auth'])->group(function (): void {
             Route::get('mempools/export', [Table\MempoolsController::class, 'export']);
             Route::post('outages', Table\OutagesController::class)->name('table.outages');
             Route::get('outages/export', [Table\OutagesController::class, 'export']);
+            Route::post('poll-log', Table\PollLogController::class)->name('table.poll-log');
             Route::post('port-nac', Table\PortNacController::class)->name('table.port-nac');
             Route::get('port-security/export', [Table\PortSecurityController::class, 'export'])->name('port-security.export');
             Route::post('port-stp', Table\PortStpController::class);
