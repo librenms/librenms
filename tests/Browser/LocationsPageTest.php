@@ -3,12 +3,10 @@
 namespace LibreNMS\Tests\Browser;
 
 use App\Models\Location;
-use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Laravel\Dusk\Browser;
 use LibreNMS\Tests\DuskTestCase;
 use PHPUnit\Framework\Attributes\Group;
-use Spatie\Permission\Models\Role;
 
 #[Group('browser')]
 final class LocationsPageTest extends DuskTestCase
@@ -23,9 +21,7 @@ final class LocationsPageTest extends DuskTestCase
     public function testLocationNamesAreEscapedInPage(): void
     {
         $name = '"><script>alert(1)</script>';
-        Role::findOrCreate('admin');
-        $user = User::factory()->create(['enabled' => 1]);
-        $user->assignRole('admin');
+        $user = $this->browserUser('admin');
         Location::factory()->create(['location' => $name]);
 
         $this->browse(function (Browser $browser) use ($user, $name): void {
