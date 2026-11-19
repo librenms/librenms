@@ -11,6 +11,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use LibreNMS\Util\Debug;
@@ -49,8 +50,8 @@ class DeviceController
             return $this->redirectToTabRoute($request, $device_id, $current_tab, (string) $vars, $port);
         }
 
-        if ($current_tab === 'edit' && Url::parseLegacyPath($vars)->get('section') === 'services') {
-            return redirect()->route('device.edit.services', $device, 301);
+        if ($current_tab === 'edit') {
+            return $this->redirectToEditRoute($request, $device_id, (string) $vars);
         }
 
         $tab_controller = PageTabs::getTab($current_tab);
@@ -105,6 +106,44 @@ class DeviceController
         $params = ['device' => $deviceId] + ($port ? ['port' => $port->port_id] : []);
 
         return redirect()->route("device.$tab", $params + $request->query() + $options, 301);
+    }
+
+    private function redirectToEditRoute(Request $request, int $deviceId, string $vars): RedirectResponse
+    {
+        $legacy = Url::parseLegacyPath($vars)->all();
+        $options = $request->query() + $legacy;
+        $section = $legacy['section'] ?? $options['section'] ?? '';
+
+        $route = match ($section) {
+            '', 'default', 'device', 'edit' => 'device.edit',
+            'alert-rules' => 'device.edit.alert-rules',
+            'apps' => 'device.edit.apps',
+            'component', 'components' => 'device.edit.components',
+            'customoid', 'customoids' => 'device.edit.customoids',
+            'health' => 'device.edit.health',
+            'mempools' => 'device.edit.mempools',
+            'misc' => 'device.edit.misc',
+            'modules' => 'device.edit.modules',
+            'snmp', 'ipmi', 'polling' => 'device.edit.polling',
+            'ports' => 'device.edit.ports',
+            'processors' => 'device.edit.processors',
+            'routing' => 'device.edit.routing',
+            'services' => 'device.edit.services',
+            'storage' => 'device.edit.storage',
+            'wireless-sensors' => 'device.edit.wireless-sensors',
+            default => abort(404),
+        };
+
+        $tab = $options['tab'] ?? null;
+        $params = match ($section) {
+            'snmp', 'ipmi' => ['tab' => $section],
+            'polling' => ['tab' => is_string($tab) ? $tab : null],
+            'ports' => array_key_exists('filter', $options) ? ['filter' => $options['filter'] ?? ''] : [],
+            'alert-rules' => Arr::only($options, ['page', 'per_page']),
+            default => [],
+        };
+
+        return redirect()->route($route, ['device' => $deviceId] + $params, 301);
     }
 
     private function renderLegacyTab($tab, Device $device, $data)
