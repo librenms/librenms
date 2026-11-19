@@ -122,6 +122,8 @@ Route::middleware(['auth'])->group(function (): void {
     // pages
     Route::post('alert/{fault}/ack', [AlertController::class, 'ack'])->name('alert.ack');
     Route::post('fault/{fault}/ack', [AlertController::class, 'ack'])->name('fault.ack');
+    Route::get('fault/{fault}/notes', [AlertController::class, 'showNote'])->whereNumber('fault')->name('fault.notes.show');
+    Route::patch('fault/{fault}/notes', [AlertController::class, 'updateNote'])->whereNumber('fault')->name('fault.notes.update');
     Route::get('devices/{view?}/{graph?}/{vars?}', [DevicesController::class, 'index'])->where('vars', '.*')
         ->middleware(['saved-filter:devices'])
         ->name('devices');

@@ -21,6 +21,11 @@ return Application::configure(basePath: dirname(__DIR__))
             '/auth/*/callback',
         ]);
 
+        // Preserve the note's whitespace when editing an alert fault.
+        $middleware->trimStrings(except: [
+            fn (Request $request) => $request->isMethod('PATCH') && $request->is('fault/*/notes'),
+        ]);
+
         $middleware->authenticateSessions();
 
         $middleware->web([
