@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use LibreNMS\Enum\SensorCategory;
-use LibreNMS\Enum\SensorType;
 use LibreNMS\Enum\SensorState;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
@@ -111,8 +111,8 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
             return $field == 'sensor_current' ? 'NaN' : '-';
         }
 
-        if (in_array($this->rrd_type, ['COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE'])) {
-            //compute and display an approx rate for this sensor
+        if ($field == 'sensor_current' && in_array($this->rrd_type, ['COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE'])) {
+            //compute and display an approx rate for this sensor, limits are configured as values and shown as is
             $value = Number::formatSi(max(0, $value - $this->sensor_prev) / LibrenmsConfig::get('rrd.step', 300), 2, 3, '');
         }
 

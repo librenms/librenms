@@ -68,7 +68,7 @@
                                                                aria-hidden="true"></i> {{ __('Tools') }}</a>
                             <ul class="dropdown-menu">
                                 @can('tools.ripe')
-                                <li><a href="{{ url('ripenccapi') }}"><i class="fa fa-star fa-fw fa-lg"
+                                <li><a href="{{ route('tool.ripe') }}"><i class="fa fa-star fa-fw fa-lg"
                                                                          aria-hidden="true"></i> {{ __('RIPE NCC API') }}
                                     </a></li>
                                 @endcan
@@ -85,7 +85,7 @@
                                     @endcan
                                 @endconfig
                                 @config('oxidized.enabled')
-                                <li><a href="{{ url('oxidized') }}"><i class="fa fa-stack-overflow fa-fw fa-lg"
+                                <li><a href="{{ route('oxidized') }}"><i class="fa fa-stack-overflow fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Oxidized') }}</a>
                                 </li>
                                 @endconfig
@@ -97,14 +97,14 @@
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
-                        <li><a href="{{ url('eventlog') }}"><i class="fa fa-bookmark fa-fw fa-lg"
+                        <li><a href="{{ route('eventlog') }}"><i class="fa fa-bookmark fa-fw fa-lg"
                                                                aria-hidden="true"></i> {{ __('Eventlog') }}</a></li>
                         @config('enable_syslog')
-                        <li><a href="{{ url('syslog') }}"><i class="fa fa-clone fa-fw fa-lg"
+                        <li><a href="{{ route('syslog') }}"><i class="fa fa-clone fa-fw fa-lg"
                                                              aria-hidden="true"></i> {{ __('syslog.title') }}</a></li>
                         @endconfig
                         @config('graylog.server')
-                        <li><a href="{{ url('graylog') }}"><i class="fa fa-clone fa-fw fa-lg"
+                        <li><a href="{{ route('graylog') }}"><i class="fa fa-clone fa-fw fa-lg"
                                                               aria-hidden="true"></i> {{ __('Graylog') }}</a></li>
                         @endconfig
 
@@ -198,7 +198,7 @@
             @endif
 {{-- Maps --}}
                 <li class="dropdown">
-                    <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown"
+                    <a href="{{ route('services.index') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-map fa-fw fa-lg fa-nav-icons"
                                                  aria-hidden="true"></i> <span
                             class="tw:md:hidden tw:lg:inline-block">{{ __('Maps') }}</span></a>
@@ -329,11 +329,13 @@
                                                             aria-hidden="true"></i> {{ __('Traffic Bills') }}</a></li>
                         @endCan
 
-                        @if($port_counts['pseudowire'] > 0)
-                            <li><a href="{{ url('pseudowires') }}"><i class="fa fa-arrows-alt fa-fw fa-lg"
-                                                                      aria-hidden="true"></i> {{ __('Pseudowires') }}</a>
-                            </li>
-                        @endif
+                        @can('viewAny', \App\Models\Pseudowire::class)
+                            @if($port_counts['pseudowire'] > 0)
+                                <li><a href="{{ route('pseudowires') }}"><i class="fa fa-arrows-alt fa-fw fa-lg"
+                                                                          aria-hidden="true"></i> {{ __('Pseudowires') }}</a>
+                                </li>
+                            @endif
+                        @endcan
 
                         @can('viewAny', \App\Models\Port::class)
                             <li><a href="{{ route('port-security.index') }}"><i class="fa fa-shield fa-fw fa-lg"
@@ -349,7 +351,7 @@
                             @if($port_groups_exist)
                                 <li role="presentation" class="divider"></li>
                                 @config('int_customers')
-                                <li><a href="{{ url('customers') }}"><i class="fa fa-users fa-fw fa-lg"
+                                <li><a href="{{ route('customers') }}"><i class="fa fa-users fa-fw fa-lg"
                                                                         aria-hidden="true"></i> {{ __('Customers') }}</a>
                                 </li>
                                 @endconfig
@@ -487,12 +489,12 @@
         @config('show_services')
             @can('viewAny', \App\Models\Service::class)
             <li class="dropdown">
-                <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown"
+                <a href="{{ route('services.index') }}" class="dropdown-toggle" data-hover="dropdown"
                    data-toggle="dropdown"><i class="fa fa-cogs fa-fw fa-lg fa-nav-icons"
                                              aria-hidden="true"></i> <span
                         class="tw:md:hidden tw:2xl:inline-block">{{ __('Services') }}</span></a>
                 <ul class="dropdown-menu">
-                    <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Services') }}</a>
+                    <li><a href="{{ route('services.index') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Services') }}</a>
                     </li>
                     @can('viewAny', \App\Models\ServiceTemplate::class)
                     <li><a href="{{ route('services.templates.index') }}"><span class="fa-stack" aria-hidden="true" style="font-size: 12px">
@@ -504,13 +506,13 @@
                     @if($service_counts['warning'] || $service_counts['critical'])
                         <li role="presentation" class="divider"></li>
                         @if($service_counts['warning'])
-                            <li><a href="{{ url('services/state=warning') }}"><i
+                            <li><a href="{{ route('services.index', ['state' => 'warning']) }}"><i
                                         class="fa fa-bell text-warning fa-fw fa-lg"
                                         aria-hidden="true"></i> {{ __('Warning :service_count', ['service_count' => $service_counts['warning']]) }}
                                 </a></li>
                         @endif
                         @if($service_counts['critical'])
-                            <li><a href="{{ url('services/state=critical') }}"><i
+                            <li><a href="{{ route('services.index', ['state' => 'critical']) }}"><i
                                         class="fa fa-bell text-danger fa-fw fa-lg"
                                         aria-hidden="true"></i> {{ __('Critical :service_count', ['service_count' => $service_counts['critical']]) }}
                                 </a></li>
@@ -518,7 +520,7 @@
                     @endif
                     @can('service.create')
                     <li role="presentation" class="divider"></li>
-                    <li><a href="{{ url('addsrv') }}"><i class="fa fa-plus fa-fw fa-lg"
+                    <li><a href="{{ route('services.index') }}#create-service"><i class="fa fa-plus fa-fw fa-lg"
                                                          aria-hidden="true"></i> {{ __('Add Service') }}</a></li>
                     @endcan
                 </ul>
@@ -579,7 +581,7 @@
                         @can('peering-db.view')
                             @if($show_peeringdb)
                                 <li role="presentation" class="divider"></li>
-                                <li><a href="{{ url('peering') }}"><i class="fa fa-hand-o-right fa-fw fa-lg"
+                                <li><a href="{{ route('peering.index') }}"><i class="fa fa-hand-o-right fa-fw fa-lg"
                                                                       aria-hidden="true"></i> {{ __('PeeringDB') }}</a>
                                 </li>
                             @endif
@@ -615,17 +617,17 @@
                                                                        aria-hidden="true"></i> {{ __('Operations') }}</a></li>
                         @endcan
                         @can('viewAny', \App\Models\AlertSchedule::class)
-                        <li><a href="{{ url('alert-schedule') }}"><i class="fa fa-calendar fa-fw fa-lg"
+                        <li><a href="{{ route('alert-schedule.index') }}"><i class="fa fa-calendar fa-fw fa-lg"
                                                                      aria-hidden="true"></i> {{ __('Scheduled Maintenance') }}
                             </a></li>
                         @endcan
                         @can('viewAny', \App\Models\AlertTemplate::class)
-                        <li><a href="{{ url('templates') }}"><i class="fa fa-file fa-fw fa-lg"
+                        <li><a href="{{ route('alert-templates.index') }}"><i class="fa fa-file fa-fw fa-lg"
                                                                 aria-hidden="true"></i> {{ __('Alert Templates') }}</a>
                         </li>
                         @endcan
                         @can('viewAny', \App\Models\AlertTransport::class)
-                        <li><a href="{{ url('alert-transports') }}"><i class="fa fa-bus fa-fw fa-lg"
+                        <li><a href="{{ route('alert-transports.index') }}"><i class="fa fa-bus fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Alert Transports') }}
                             </a></li>
                         @endcan
@@ -893,7 +895,7 @@
                 this.lastRunQuery = q;
                 this.open = true;
                 this.navigateOnLoad = false;
-                this.activeIndex = -1;
+                this.activeIndex = 0;
                 this.results = [];
                 let seq = this.seq;
                 let all = this.endpoints.map((url, i) => i);

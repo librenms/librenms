@@ -12,7 +12,9 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Testing\TestResponse;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\ProcessType;
 use LibreNMS\Tests\TestCase;
+use LibreNMS\Util\ModuleList;
 use Spatie\Permission\Models\Role;
 
 final class EditModulesControllerTest extends TestCase
@@ -85,6 +87,51 @@ final class EditModulesControllerTest extends TestCase
         $this->assertSame('Mempools', $modules['mempools']['name']);
     }
 
+    public function testShowsModulesEnabledByPollingMethods(): void
+    {
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::ProxmoxApi,
+            'settings' => [],
+        ]);
+
+        // the modules tab shows without snmp
+        $this->assertFalse($device->polling()->isEnabled(PollingMethodType::Snmp));
+        $this->actingAs($this->admin())->get(route('device.edit.polling', $device))
+            ->assertSee(route('device.edit.modules', $device), false);
+
+        $modules = $this->modulesFrom($this->get(route('device.edit.modules', $device)));
+        $this->assertTrue($modules['vminfo']['discovery']['method']);
+        $this->assertTrue($modules['vminfo']['polling']['method']);
+        $this->assertArrayNotHasKey('mempools', $modules, 'mempools does not use the proxmox-api method');
+    }
+
+    public function testUnixAgentMethodEnablesTheUnixAgentModule(): void
+    {
+        LibrenmsConfig::set('poller_modules.unix-agent', false);
+        $device = $this->deviceWithMethods([], PollingMethodType::Snmp, PollingMethodType::UnixAgent);
+
+        $modules = $this->modulesFrom($this->actingAs($this->admin())->get(route('device.edit.modules', $device)));
+        $this->assertTrue($modules['unix-agent']['polling']['method']);
+        $this->assertTrue($modules['mempools']['polling']['method']);
+        $this->assertNull($modules['storage']['polling']['method'], 'snmp does not enable modules');
+
+        $this->assertTrue((new ModuleList)->moduleStatus(ProcessType::Poller, 'unix-agent', $device)->isEnabled());
+    }
+
+    public function testIpmiMethodEnablesTheIpmiModule(): void
+    {
+        $snmpOnly = $this->deviceWithMethods([], PollingMethodType::Snmp);
+        $ipmi = $this->deviceWithMethods([], PollingMethodType::Snmp, PollingMethodType::Ipmi);
+        $moduleList = new ModuleList;
+
+        foreach ([ProcessType::Discovery, ProcessType::Poller] as $type) {
+            $this->assertFalse($moduleList->moduleStatus($type, 'ipmi', $snmpOnly)->isEnabled(), 'ipmi is off by default');
+            $this->assertTrue($moduleList->moduleStatus($type, 'ipmi', $ipmi)->isEnabled());
+        }
+    }
+
     public function testAllModulesHaveFriendlyNames(): void
     {
         foreach (['poller_modules', 'discovery_modules'] as $configKey) {
@@ -109,8 +156,8 @@ final class EditModulesControllerTest extends TestCase
         $response = $this->actingAs($this->admin())->get(route('device.edit.modules', $device))->assertOk();
 
         $mempools = $this->modulesFrom($response)['mempools'];
-        $this->assertSame(['global' => true, 'os' => false, 'device' => true], $mempools['polling']);
-        $this->assertSame(['global' => false, 'os' => null, 'device' => null], $mempools['discovery']);
+        $this->assertSame(['global' => true, 'os' => false, 'method' => null, 'device' => true], $mempools['polling']);
+        $this->assertSame(['global' => false, 'os' => null, 'method' => null, 'device' => null], $mempools['discovery']);
     }
 
     public function testModuleOnlyInOneListIsNotApplicableInTheOther(): void

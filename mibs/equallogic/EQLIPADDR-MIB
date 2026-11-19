@@ -1,4 +1,4 @@
--- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+-- Mib files packaged on  Wed Jun 19 01:31:39 EDT 2019 for Storage Array Firmware V10.0.3 (R469188)
 
 
 
@@ -21,7 +21,7 @@ IMPORTS
     
  
     eqlipaddrModule MODULE-IDENTITY
-	LAST-UPDATED "201503171528Z"
+	LAST-UPDATED "201906190531Z"
     ORGANIZATION  "EqualLogic Inc."
     CONTACT-INFO      
         "Contact: Customer Support
@@ -34,12 +34,12 @@ IMPORTS
     DESCRIPTION          
         "Equallogic Inc. Storage Array IP address table mib
 
-         Copyright (c) 2002-2010 by Dell, Inc.
+         Copyright (c) 2002-2016 by Dell Inc.
 
          All rights reserved.  This software may not be copied, disclosed,
          transferred, or used except in accordance with a license granted
-         by Dell, Inc.  This software embodies proprietary information
-         and trade secrets of Dell, Inc.
+         by Dell Inc.  This software embodies proprietary information
+         and trade secrets of Dell Inc.
         "
 
 
@@ -300,7 +300,8 @@ EqlifStatusEntry ::=
     SEQUENCE { 
         eqlifStatusMgmtRolePolicy               INTEGER,
         eqlifStatusConfigurationFlags           BITS,
-        eqlifOperStatus                         INTEGER
+        eqlifOperStatus                         INTEGER,
+        eqlifStatusPortFailover                 INTEGER
     }
 
 	eqlifStatusMgmtRolePolicy  OBJECT-TYPE      
@@ -385,7 +386,23 @@ eqlifOperStatus OBJECT-TYPE
                from going to the up(1) state."
     ::= { eqlifStatusEntry 3 }
 
-
+eqlifStatusPortFailover OBJECT-TYPE
+    SYNTAX  INTEGER {
+                   no(0),       -- Vertical failover hasn't happened for the port
+                   yes(1),      -- Vertical failover has happened
+                   unknown(2)   -- Status can not be determined
+                                -- for some reason.
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+               "The current state indicating if this interface has vertically
+               failed over.No(0) means this interface has not failed over and
+               is using primary controller's network port.
+               Yes(1) means this interface has failed over and is
+               currently using secondary controller's network port.Unknown(2)
+               means the port failover status can not be determined."
+    ::= { eqlifStatusEntry 4 } 
 
 --****************************************************
 
@@ -523,5 +540,20 @@ eqlifOperStatus OBJECT-TYPE
                  other objects in this conceptual row can be modified.
                 "
               ::= { eqlinetAddrEntry 8 }
+
+
+-- SNMP Traps
+eqlipAddrMgmtNotifications  OBJECT IDENTIFIER ::= { eqlipaddrModule 6 }
+
+eqlEthNetmaskChangeNotification NOTIFICATION-TYPE
+    OBJECTS{
+        eqlInetAddrEntIfName,
+        eqlInetAddrEntNetMask
+    }
+    STATUS current
+    DESCRIPTION
+    "The netmask of the interface has changed. Contact the group administrator."
+::= { eqlipAddrMgmtNotifications 1 }
+
 
 END

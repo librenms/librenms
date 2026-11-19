@@ -1,7 +1,8 @@
 -- ****************************************************************************
 --  COLUBRIS-PRODUCTS-MIB definitions
 --
---  Copyright (c) 2004, Colubris Networks, Inc.
+--  (c) Copyright 2001,2004,2007-2011,2013 Hewlett-Packard Development Company, L.P.
+--  The information contained herein is subject to change without notice.
 --  All Rights Reserved.
 --
 --  Colubris Networks Product Identifiers.
@@ -12,25 +13,25 @@
 COLUBRIS-PRODUCTS-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY
-        FROM    SNMPv2-SMI
-    colubrisProducts, colubrisModules
-        FROM    COLUBRIS-SMI
+MODULE-IDENTITY
+FROM    SNMPv2-SMI
+colubrisProducts, colubrisModules
+FROM    COLUBRIS-SMI
 ;
 
 
 colubrisProductsMIB MODULE-IDENTITY
-    LAST-UPDATED    "200709060000Z"
-    ORGANIZATION    "Colubris Networks, Inc."
-    CONTACT-INFO    "Colubris Networks
-                     Postal: 200 West Street Ste 300
-                             Waltham, Massachusetts 02451-1121
-                             UNITED STATES
-                     Phone:  +1 781 684 0001
-                     Fax:    +1 781 684 0009
+LAST-UPDATED    "201306050000Z"
+ORGANIZATION    "Colubris Networks, Inc."
+CONTACT-INFO    "Colubris Networks
+	     Postal: 200 West Street Ste 300
+		     Waltham, Massachusetts 02451-1121
+		     UNITED STATES
+	     Phone:  +1 781 684 0001
+	     Fax:    +1 781 684 0009
 
-                     E-mail: cn-snmp@colubris.com"
-    DESCRIPTION     "Colubris Networks Product Identifiers."
+	     E-mail: cn-snmp@colubris.com"
+DESCRIPTION     "Colubris Networks Product Identifiers."
 
     ::= { colubrisModules 2 }
 
@@ -71,5 +72,24 @@ colubris1300            OBJECT IDENTIFIER ::= { colubrisProducts 33 }
 colubris1500            OBJECT IDENTIFIER ::= { colubrisProducts 34 }
 colubrisMSC5100         OBJECT IDENTIFIER ::= { colubrisProducts 35 }
 colubrisMSM410          OBJECT IDENTIFIER ::= { colubrisProducts 41 }
+colubrisMSM317          OBJECT IDENTIFIER ::= { colubrisProducts 42 }
+colubrisMSM310R         OBJECT IDENTIFIER ::= { colubrisProducts 43 }
+colubrisMSM320R         OBJECT IDENTIFIER ::= { colubrisProducts 44 }
+colubrisMSM313R         OBJECT IDENTIFIER ::= { colubrisProducts 45 }
+colubrisMSM323R         OBJECT IDENTIFIER ::= { colubrisProducts 46 }
+colubrisMSM765          OBJECT IDENTIFIER ::= { colubrisProducts 47 }
+colubrisMSM760          OBJECT IDENTIFIER ::= { colubrisProducts 48 }
+colubrisMSM318          OBJECT IDENTIFIER ::= { colubrisProducts 49 }
+colubrisMSM460          OBJECT IDENTIFIER ::= { colubrisProducts 52 }
+colubrisMSM430          OBJECT IDENTIFIER ::= { colubrisProducts 54 }
+colubrisMSM466          OBJECT IDENTIFIER ::= { colubrisProducts 55 }
+colubrisMSM720          OBJECT IDENTIFIER ::= { colubrisProducts 56 }
+colubrisMSM466R         OBJECT IDENTIFIER ::= { colubrisProducts 58 }
+colubrisMSM775          OBJECT IDENTIFIER ::= { colubrisProducts 59 }
+colubrisHP425           OBJECT IDENTIFIER ::= { colubrisProducts 62 }
+colubrisHP517           OBJECT IDENTIFIER ::= { colubrisProducts 64 }
+colubrisHP560           OBJECT IDENTIFIER ::= { colubrisProducts 65 }
+colubrisMSM760B         OBJECT IDENTIFIER ::= { colubrisProducts 67 }
+colubrisRFManager       OBJECT IDENTIFIER ::= { colubrisProducts 1000 }
 
 END

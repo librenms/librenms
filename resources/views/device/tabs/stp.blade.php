@@ -2,9 +2,9 @@
 
 @section('content')
     <x-device.page :device="$device">
-    <x-option-bar name="{{ trans('stp.vlan') }}" :options="$data['vlans']" :selected="$data['vlan']"></x-option-bar>
+    <x-option-bar name="{{ trans('stp.vlan') }}" :options="$vlans" :selected="$vlan"></x-option-bar>
 
-    @foreach($data['stpInstances'] as $instance)
+    @foreach($stpInstances as $instance)
         <x-panel class="stp-panel">
             <x-slot name="title"><span class="tw:font-bold">{{ trans('stp.stp_info') }}</span></x-slot>
             <table class="table table-condensed table-striped table-hover">
@@ -90,7 +90,7 @@
         </x-panel>
     @endforeach
 
-    @if($data['stpPorts'])
+    @if($stpPorts)
         <x-panel class="stp-panel">
             <x-slot name="title"><span class="tw:font-bold">{{ trans('stp.stp_ports') }}</span></x-slot>
             <div class="table-responsive">
@@ -134,8 +134,8 @@
             },
             post: function () {
                 return {
-                    device_id: '{{ $data['device_id'] }}',
-                    vlan: '{{ $data['vlan'] }}',
+                    device_id: '{{ $device_id }}',
+                    vlan: '{{ $vlan }}',
                 };
             },
             url: "{{ url('/ajax/table/port-stp') }}"

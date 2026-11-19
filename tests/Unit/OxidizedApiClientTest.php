@@ -109,7 +109,6 @@ final class OxidizedApiClientTest extends TestCase
 
         $client = new Oxidized();
 
-        // Should not throw
-        $client->reloadNodes();
+        $this->assertFalse($client->reloadNodes());
     }
 }

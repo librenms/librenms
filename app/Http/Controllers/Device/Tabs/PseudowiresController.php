@@ -26,13 +26,14 @@
 
 namespace App\Http\Controllers\Device\Tabs;
 
+use App\Http\Controllers\Controller;
 use App\Models\Device;
 use App\Models\Pseudowire;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 use LibreNMS\Interfaces\UI\DeviceTab;
-use LibreNMS\Util\Url;
 
-class PseudowiresController implements DeviceTab
+class PseudowiresController extends Controller implements DeviceTab
 {
     public function visible(Device $device): bool
     {
@@ -54,64 +55,38 @@ class PseudowiresController implements DeviceTab
         return __('Pseudowires');
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function data(Device $device, Request $request): array
     {
-        $view = Url::parseOptions('view', 'detail');
-        if (! in_array($view, ['detail', 'minigraphs'], true)) {
-            $view = 'detail';
-        }
+        return [];
+    }
 
-        $pseudowires = $device->pseudowires()
-            ->with(['port', 'peerDevice'])
-            ->hasAccess($request->user())
-            ->join('ports', 'pseudowires.port_id', '=', 'ports.port_id')
-            ->orderBy('ports.ifDescr')
-            ->select('pseudowires.*')
-            ->get();
+    public function index(Device $device, Request $request): View
+    {
+        $this->authorize('view', $device);
 
-        $peerDeviceIds = $pseudowires->pluck('peer_device_id')->filter(fn ($id) => (int) $id !== 0)->unique();
-        $vcIds = $pseudowires->pluck('cpwVcID')->unique();
+        $request->validate([
+            'view' => 'nullable|in:detail,minigraphs',
+        ]);
 
-        $peerPseudowires = Pseudowire::whereIn('device_id', $peerDeviceIds)
-            ->whereIn('cpwVcID', $vcIds)
-            ->with(['port', 'device'])
-            ->hasAccess($request->user())
-            ->get()
-            ->keyBy(fn (Pseudowire $pw) => $pw->device_id . '_' . $pw->cpwVcID);
+        $view = $request->string('view')->value() ?: 'detail';
 
-        $rows = [];
-        $linkdone = [];
-
-        foreach ($pseudowires as $pw) {
-            $key = $pw->device_id . '_' . $pw->port_id;
-            if (in_array($key, $linkdone, true)) {
-                continue;
-            }
-
-            $peerPw = $pw->peer_device_id ? $peerPseudowires->get($pw->peer_device_id . '_' . $pw->cpwVcID) : null;
-            if ($peerPw) {
-                $linkdone[] = $peerPw->device_id . '_' . $peerPw->port_id;
-            }
-
-            $rows[] = [
-                'pw' => $pw,
-                'peerPw' => $peerPw,
-            ];
-        }
-
-        return [
+        return view('device.tabs.pseudowires', [
+            'device' => $device,
             'view' => $view,
             'options' => [
                 'detail' => [
                     'text' => __('Details'),
-                    'link' => route('device', ['device' => $device, 'tab' => 'pseudowires', 'vars' => 'view=detail']),
+                    'link' => route('device.pseudowires', ['device' => $device, 'view' => 'detail']),
                 ],
                 'minigraphs' => [
                     'text' => __('Mini Graphs'),
-                    'link' => route('device', ['device' => $device, 'tab' => 'pseudowires', 'vars' => 'view=minigraphs']),
+                    'link' => route('device.pseudowires', ['device' => $device, 'view' => 'minigraphs']),
                 ],
             ],
-            'rows' => $rows,
-        ];
+            'circuits' => Pseudowire::circuits($request->user(), $device),
+        ]);
     }
 }

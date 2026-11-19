@@ -20,12 +20,14 @@ IMPORTS
 
 	OBJECT-GROUP,
 	MODULE-COMPLIANCE	FROM SNMPv2-CONF
-
+	
+	DisplayString	FROM SNMPv2-TC
+	
 	esMgmt			FROM ZYXEL-ES-SMI;
 
 zyxelAPMgmt MODULE-IDENTITY
 	LAST-UPDATED	"201403100000Z"    
-	ORGANIZATION "Enterprise Solution ZyXEL"     
+	ORGANIZATION "Enterprise Solution Zyxel"     
 	CONTACT-INFO
 		""	   
 	DESCRIPTION
@@ -40,13 +42,38 @@ zyxelAPMgmt MODULE-IDENTITY
 		SYNTAX	  INTEGER  {
 			standalone (1),
     		controller (2),
-    		managed (3)
+    		managed (3),
+			cloud (5)
 		}
 		MAX-ACCESS  read-only
 		STATUS  current
 		DESCRIPTION
 			"Wireless AP operation mode"
 	::= { zyxelAPMgmt 1 } 	
-                                 	                           
+
+	wlanAPTx OBJECT-TYPE
+		SYNTAX		Counter64
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"AP TX bytes"
+	::= { zyxelAPMgmt 2 }
+	
+	wlanAPRx OBJECT-TYPE
+		SYNTAX		Counter64
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"AP RX bytes"
+	::= { zyxelAPMgmt 3 }
+
+	wlanAPDescription OBJECT-TYPE
+		SYNTAX	  DisplayString
+		MAX-ACCESS  read-only
+		STATUS		current
+		DESCRIPTION
+			"WLAN AP Description"
+	::={ zyxelAPMgmt 4}
+	
 END
 

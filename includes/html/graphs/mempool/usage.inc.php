@@ -28,6 +28,7 @@ if ($width > '500') {
 
 $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr(short_hrDeviceDescr($mempool['mempool_descr']), $descr_len);
 
+$amount_format = $mempool['mempool_total'] == 100 ? '%6.2lf%%' : '%6.2lf%sB';
 $perc = round($mempool['mempool_perc'], 0);
 $background = \LibreNMS\Util\Color::percentage($perc, $mempool['mempool_perc_warn']);
 
@@ -40,12 +41,12 @@ $rrd_options[] = "AREA:{$mempool['mempool_id']}perc#" . $background['right'] . '
 
 if ($width > '500') {
     $rrd_options[] = "LINE1.25:{$mempool['mempool_id']}perc#" . $background['left'] . ":$descr";
-    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}size:LAST:%6.2lf%sB ";
-    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}used:LAST:%6.2lf%sB ";
-    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}free:LAST:%6.2lf%sB ";
-    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}free:MIN:%6.2lf%sB ";
-    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}free:MAX:%6.2lf%sB ";
-    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}free:AVERAGE:%6.2lf%sB\\n";
+    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}size:LAST:$amount_format ";
+    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}used:LAST:$amount_format ";
+    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}free:LAST:$amount_format ";
+    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}free:MIN:$amount_format ";
+    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}free:MAX:$amount_format ";
+    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}free:AVERAGE:$amount_format\\n";
     $rrd_options[] = 'COMMENT:' . substr(str_pad('', $descr_len + 15), 0, $descr_len + 15);
     $rrd_options[] = "GPRINT:{$mempool['mempool_id']}perc:LAST:%5.2lf%%   ";
     $rrd_options[] = "GPRINT:{$mempool['mempool_id']}percx:LAST:%5.2lf%%   ";
@@ -54,9 +55,9 @@ if ($width > '500') {
     $rrd_options[] = "GPRINT:{$mempool['mempool_id']}perc:AVERAGE:%5.2lf%%\\n";
 } else {
     $rrd_options[] = "LINE1.25:{$mempool['mempool_id']}perc#" . $background['left'] . ":$descr";
-    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}size:LAST:%6.2lf%sB ";
-    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}used:LAST:%6.2lf%sB ";
-    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}free:LAST:%6.2lf%sB ";
+    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}size:LAST:$amount_format ";
+    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}used:LAST:$amount_format ";
+    $rrd_options[] = "GPRINT:{$mempool['mempool_id']}free:LAST:$amount_format ";
     $rrd_options[] = "COMMENT:\l";
     $rrd_options[] = 'COMMENT:' . substr(str_pad('', $descr_len + 15), 0, $descr_len + 15);
     $rrd_options[] = "GPRINT:{$mempool['mempool_id']}perc:LAST:%6.2lf%% ";

@@ -8,6 +8,7 @@ use App\Models\Secret;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Testing\TestResponse;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
@@ -32,6 +33,33 @@ final class AddDeviceControllerTest extends DBTestCase
 
         Permission::findOrCreate('device.create');
         $this->admin = User::factory()->admin()->create(['enabled' => 1]);
+    }
+
+    public function testNewSecretDataIsAJsonObjectWithoutDefaults(): void
+    {
+        // Alpine sets the fields by name, those are lost when a JSON array is posted
+        $this->actingAs($this->admin)->get(route('device.add'))
+            ->assertOk()
+            ->assertViewHas('add_device_config', fn (array $config): bool => json_encode($config['methods']['proxmox-api']['formData']) === '{}'
+                && json_encode($config['methods']['ipmi']['formData']) === '{}'
+                && json_encode($config['methods']['snmp']['formData']) !== '{}');
+    }
+
+    public function testProxmoxTokenSecretMustBeAUuid(): void
+    {
+        $this->actingAs($this->admin)->postJson(route('device.add.store'), [
+            'hostname' => 'pve.example.com',
+            'polling_methods' => ['proxmox-api' => [
+                'active' => 1,
+                'secret_mode' => 'new',
+                'secret_data' => ['token_id' => 'librenms@pve!monitoring', 'token_secret' => 'Not-A-Token!'],
+            ]],
+        ])->assertJsonValidationErrors('polling_methods.proxmox-api.secret_data.token_secret');
+
+        $this->assertTrue(Validator::make(
+            ['token_id' => 'librenms@pve!monitoring', 'token_secret' => '5b1d6f3e-7c2a-4e8b-9f10-2a3b4c5d6e7f'],
+            SecretType::ProxmoxApi->definition()->rules(),
+        )->passes());
     }
 
     public function testIndexProvidesDefaultDisplayTemplate(): void

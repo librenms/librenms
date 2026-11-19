@@ -1,3 +1,4 @@
+-- ################################################################################
 
 -- ===================================================
 --
@@ -9,11 +10,12 @@ EXTREME-SERVICES-MIB DEFINITIONS ::= BEGIN
         MODULE-IDENTITY, OBJECT-TYPE    FROM SNMPv2-SMI
         InetAddressType, InetAddress    FROM INET-ADDRESS-MIB
         extremeAgent                    FROM EXTREME-BASE-MIB
+	TEXTUAL-CONVENTION 	FROM SNMPv2-TC
         TruthValue, RowStatus           FROM SNMPv2-TC;
 
         
         extremeServices MODULE-IDENTITY
-                      LAST-UPDATED "0007240000Z"
+                      LAST-UPDATED "0502230000Z"
                       ORGANIZATION "Extreme Networks, Inc."
                       CONTACT-INFO "www.extremenetworks.com"
                 DESCRIPTION "Extreme Upper layer services objects"
@@ -137,7 +139,7 @@ EXTREME-SERVICES-MIB DEFINITIONS ::= BEGIN
                     Consequently, all syslog messages of a given severity and higher will be sent to 
                     the syslog server. It is not possible to send messages that match only a few selected
                     non-contiguous severities."
-                DEFVAL { '11111111'B }
+                DEFVAL { {critical, error, warning, notice, info, debugSummary, debugVerbose, debugData} }
             ::= { extremeRemoteSyslogServerEntry 5 }
 
       extremeRemoteSyslogServerStatus               OBJECT-TYPE
@@ -188,7 +190,7 @@ ExtremeDNSServerEntry ::= SEQUENCE {
         }
 
       extremeDNSServerAddressIndex              OBJECT-TYPE
-        SYNTAX          INTEGER
+        SYNTAX          INTEGER(1..2)
         MAX-ACCESS      not-accessible
         STATUS          current
         DESCRIPTION
@@ -407,6 +409,5 @@ extremeAuthServerStatus               OBJECT-TYPE
 		    re-creating the row."
                    
             ::= { extremeAuthServerEntry 12 }
-
 
 END

@@ -18,14 +18,15 @@
         var grid = $("#alertlog_{{ $id }}").bootgrid({
             ajax: true,
             rowCount: [50, 100, 250, -1],
-            navigation: ! {{ $hidenavigation }},
+            navigation: @json(! $hidenavigation),
             post: function () {
                 return {
-                    device_group: "{{ $device_group }}",
-                    state: '{{ $state }}',
+                    device_group: @json($device_group),
+                    state: @json($state),
                     severity: @json($severity),
-                    from: '{{ $from }}',
-                    to: '{{ $to }}',
+                    from: @json($from),
+                    to: @json($to),
+                    widget_id: @json($id),
                 };
             },
             converters: {

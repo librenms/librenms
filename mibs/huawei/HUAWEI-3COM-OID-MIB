@@ -1,0 +1,1314 @@
+-- ============================================================================
+-- Copyright (c) 2004-2018 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: This MIB will maintain the products MIB OID and management
+--              properties root node for H3C products
+--
+-- Reference:  original from huawei-oid-mib and huawei-datacomm-oid-mib
+-- Version:     V2.16
+-- History:
+--      V1.00 2003/12/23 created by xiejianping
+--      V1.01 2004/6/11 add ar18-36 and ar18-37
+--      V1.02 2004/6/11 add h3cVoiceVlan
+--      V1.03 2004/6/18 add h3cL4Redirect
+--      V1.04 2004/6/21 add router and dlsw from original huawei MIB baseline
+--      V1.05 2004/6/23 add vdg10-40 vdg10-41 e026
+--                      e026-SI e050 from original huawei-oid-mib
+--      V1.06 2004/6/25 add s8508
+--      V1.07 2004/6/29 add secpath100N,secpath100V,secpath100S
+--      V1.10 2004/6/30 add all properties root node in h3c-mib-baseline library
+--      V1.11 2004/7/1  change node s3552F-EI to s3552F-HI
+--                      & add sr8805,sr8808,sr8812 sysoid
+--      V1.12 2004/7/2  add s5624P,s5624P-PWR,s5648P,s5648P-PWR
+--            2004/7/5  modify node name s2008C,s2016C,s2403I
+--                      to s2008-EI,s2016-EI,s2403H-EI
+--            2004/7/7  add s2008C,s2016C,s2024C,ar18-13V,ar18-18v
+--            2004/7/13 add isPath1000
+--      V1.13 2004/7/14 synchronization with huawei-datacomm-oid.mib
+--                      add follow nodes:
+--                      hwEntityExtentMIB,hwQoS,hwMultilinkPPP,hwTCPMib,hwBGPMib
+--      V1.14 2004/7/19 add ar18-20S
+--      V1.15 2004/7/27 add h3cIpPBX
+--      V1.16 2004/7/28 add h3cUser, h3cRadius
+--      V1.17 2004/7/28 add h3cPowerEthernetExt
+--      V1.18 2004/8/4  add h3cEntityRelation
+--      V1.19 2004/8/17 add wellhope node & add 14 sysoids under wellhope for OEM
+--      V1.20 2004/8/24 add h3cProtocolVlan
+--      V1.21 2004/8/24 add h3cQosProfile
+--      V1.22 2004/8/25 modify node name ar18-36,ar18-37 to ar18-33E,ar18-34E
+--      V1.23 2004/8/31 add xe200, xe2000
+--      V1.24 2004/9/9  change some nodes root from products to lanSw,
+--                      nodes list: s3552F-SI,s3552F-EI,e026,e026-SI,e050
+--      V1.25 2004/10/10 add h3cNat
+--      V1.26 2004/10/10 modify node ID of hwCluster from 6 to 7
+--      V1.27 2004/10/11 add h3cPos
+--      V1.28 2004/10/14 add subnode 20 under h3cCommon,
+--                       modify node hwLswVlan(under huaweiDatacomm)
+--                       to hwVlan resolve name conflict.
+--      V1.29 2004/10/15 add e026T,e008-FE,e017-FE,e026-FE;
+--                       modify node name s3026E_FM,s3026E_FS,s3526E_FM,s3526E_FS
+--                       to s3026E-FM,s3026E-FS,s3526E-FM,s3526E-FS.
+--      V1.30 2004/10/29 add ar28-12,ar28-13,ar28-14;
+--      V1.31 2004/11/8  add h3cAAL5 and h3cSSH;
+--      V1.33 2004/11/10 add h3cRSA;
+--      V1.34 2004/11/10 add ar18-10,ar18-21,ar18-21A,ar18-21B,
+--                       ar18-21C,ar18-22,ar18-22-8,ar18-22-24,
+--                       ar18-23-1,ar18-30E,ar18-31E,ar18-32E,
+--                       ar18-35E,ar18-36E,ar18-37E,ar18-52;
+--            2004/11/23 add s6502;
+--      V1.35 2004/11/27 add h3cVrrpExt;
+--      V1.36 2004/12/2  add S5124P-EI,S5126C-EI,S5148P-EI,S5150C-EI,
+--                       S5116P-SI,S5124P-SI,S5148P-SI,
+--                       h3cIpa,h3cPortSecurity;
+--      V1.37 2004/12/6  add ar4620E,ar4640E,ar4680E,h3cVpls;
+--      V1.38 2004/12/10 add h3cE1,h3cT1;
+--      V1.39 2004/12/13 add h3cIkeMonitor;
+--      V1.40 2004/12/15 add h3cIfExt;
+--      V1.41 2004/12/16 add h3cWebSwitch,h3cAutoDetect;
+--      V1.42 2004/12/16 add h3cIpBroadcast and h3cIpx;
+--      V1.43 2004/12/20 modife node name secpath100S to secpath100F by xiedong
+--      V1.44 2004/12/21 add secpath1000F and h3cCfCard;
+--      V1.45 2004/12/24 add ar18-22s-8 and ar18-23s-1;
+--      V1.46 2004/12/24 add h3cIPS;
+--              V1.47 2004/12/29 add secEngineP500,h3cEpon,h3cDldp by xiejianping;
+--      V1.48 2005/1/6 add s2108-SI,s2116-SI,s2126-SI,s2108-EI,
+--                     s2116-EI,s2126-EI,s5624F by xiejianping;
+--      V1.49 2005/1/13 add h3cDhcpSnoop by gaolong;
+--      V1.50 2005/1/17 add s3224P,s3226T,s3226P,
+--                      s3250T,s3250P by xiejianping;
+--      V1.51 2005/1/31 add h3cProtocolPriority by gaolong;
+--      V1.52 2005/2/5 add S3108T, S3116T, S3126T, S3108C, S3116C,
+--                      S3126C by gaolong;
+--                     add h3cTrap by gaolong;
+--              V1.53 2005/2/5 add h3cUnicast by xiejianping
+--              V1.54 2005/3/3 add h3cRrpp by xiejianping
+--              V1.55 2005/3/10 modify h3cIkeMonitor to h3cIKEMonitor by gaolong
+--              V1.56 2005/3/25 add ar28-12B by xiejianping
+--      V1.57 2005/3/26 modify product id name for S5624F by gaolong
+--                      add secBladeIDS, secBladeIPS by gaolong
+--                      add h3cDomain, h3cIds by gaolong
+--                      modify initial character of some products
+--                      modify object name for IPSec monitor
+--      V1.58 2005/4/1 add secEngineD500 by xiejianping
+--      V1.59 2005/4/14 add s3928TP-V6,s3928P-V6,s3952P-V6,
+--                      s3928F-V6,s5524P,s5524F by xiejianping
+--      V1.60 2005/4/15 add h3cRcr, xE7000, vg10-40, vg10-41,
+--                      vg20-16, vg20-32, vg20-08L, vg80-20,
+--                      vg80-20T by gaolong
+--      V1.61 2005/4/21 add h3cAtmDxi by xiejianping
+--      V1.62 2005/5/3 add h3cVoice by gaolong
+--      V1.63 2005/5/13 add s2008CT,s2008CP by xiejianping
+--      V1.64 2005/5/20 add secBladeFW,secBladeVPN by xiejianping
+--      V1.65 2005/5/25 add secpath500F, h3cMulticast and h3cMpm by gaolong
+--                      change name of subnode 20 under h3cCommon to h3cNS
+--      V1.66 2005/6/12 add secpath10F, h3cOadp, h3cTunnel, h3cGre by gaolong
+--      V1.67 2005/6/20 add secEngineD200 by gaolong
+--      V1.68 2005/6/25 add intransa and its subidentifier ix5000,
+--                      add h3cStorage, h3cObjectInfo, h3cDvpn,
+--                      h3cDhcpRelay by gaolong
+--      V1.69 2005/7/9 add h3cIsis by gaolong
+--      V1.70 2005/8/2 add h3cRpr by gaolong
+--                     add sJW59, vg21-08, ar19-61, ar19-62, ar29-01, ar29-21,
+--                         ar29-41, ar29-61, ar49-45, ar49-65 by gaolong
+--      V1.71 2005/9/2 add h3cSubnetVlan by gaolong
+--                     add s5112P-EI, s5113C-EI by gaolong
+--      V1.72 2005/9/20 add h3cDlswExt, h3cSyslog by gaolong
+--                     add s5228C, s5252C, s5228C-PWR, s5252C-PWR and by gaolong
+--      V1.73 2005/10/29 add s2008-HI, s2016-HI, s2403H-HI by longyin
+--                       add secpath100FS, secpath100FE by longyin
+--      V1.74 2005/11/24 add vg31-08 by longyin
+--                       add s8508V by longyin
+--                       add e126, s3126TP, e328, e352, s3928P-PWR-SI by longyin
+--      V1.75 2005/11/27 add falcon and its subidentifier ix1000,
+--                       add h3cFlowTemplate and h3cQos2 under h3cCommon,
+--                       add h3cSNMPAgCpb under h3c,
+--                       add subidentifier h3cQosCapability of h3cSNMPAgCpb,
+--                       add subidentifier h3cIfQos2 and h3cCBQos2 of h3cQos2,
+--                       add s8502 by longyin
+--      V1.76 2005/12/2  add h3cRhw and its subidentifier for replace hw,
+--                       add h3cStormConstrain by longyin
+--      V1.77 2005/12/13 modified s5113C-EI to s5112C-EI by longyin,
+--                       confirmed by yangliming
+--      V1.78 2006/01/09 add sr8802, s3328P-SI, s3352P-SI, s3328TP-SI,
+--                       s3328P-PWR-SI, s3328P-EI, s3352P-EI,
+--                       s3328P-PWR-EI, s3352P-PWR-EI, s3328F-EI,
+--                       h3cIpAddrMIBby longyin
+--      V1.79 2006/01/21 add h3cMirrGroup, s6502ME by longyin
+--      V1.80 2006/03/05 add h3cQINQ, secpath100FW, secpath1800FS,
+--                       secpath1800FE by longyin
+--      V1.81 2006/04/06 add h3cTransceiver, h3cIpv6AddrMIB by gaolong
+--      V1.82 2006/02/23 all products sys oids have been moved to
+--                       HUAWEI-PRODUCT-ID-MIB by haobin.
+--      V1.83 2006/06/14 add h3cBfdMIB by longyin
+--      V1.84 2006/09/18 change h3cDismanPing to h3cNqa by gaolong
+--      V1.85 2006/11/25 add h3cRCP by gaolong
+--      V1.86 2007/01/11 add h3cAcfp by gaolong
+--      V1.87 2007/01/24 add h3cDot11 by gaolong
+--      V1.88 2007/05/15 add h3cE1T1VI by gaolong
+--      V1.89 2007/07/10 add h3cwapiMIB, h3cL2VpnPwe3, h3cMplsOam
+--                       and h3cMplsOamPs by gaolong
+--      V1.90 2007/08/09 add h3cSiemMib by gaolong
+--      V1.91 2007/09/25 add h3cSurveillanceMIB, h3cVMMan, h3cPUMan,
+--                       and h3cMSMan by longyin
+--      V1.92 2007/10/25 add h3cStorageRef under h3c,
+--                       and h3cStorageMIB, h3cStorageSnap, h3cDisk,
+--                           h3cRaid, h3cLogicVolume under h3cStorageRef
+--                       and h3cUps under h3cCommon by longyin
+--      V1.93 2007/11/27 add h3cEOCCommon and h3cHPEOC by longyin
+--      V1.94 2007/12/27 add h3cAFC and h3cMultCDR by longyin
+--      V1.95 2008/02/27 add h3cMACInformation, h3cFireWall, h3cDSP by longyin
+--      V1.96 2008/04/29 add h3cNetMan by songhao
+--      V1.97 2008/06/02 add h3cStack, h3cPosa by songhao
+--      V1.98 2008/07/29 add h3cWebAuthentication by songhao
+--      V1.99 2008/08/26 add h3cCATVTransceiver by songhao
+--      V2.00 2008/12/03 add h3cLpbkdt by songhao
+--      V2.01 2009/02/27 add h3cMultiMedia, h3cDns, h3c3GModem
+--                       and h3cPortal by songhao
+--      V2.02 2009/07/22 add h3clldp,h3cDHCPServer,h3cPPPoEServer,h3cL2Isolate,
+--                           h3cSnmpExt by duyanbing
+--      V2.03 2009/11/04 add h3cVsi,h3cEvc,h3cMinm,h3cblg,h3cRS485 by shuaixiaojuan
+--      V2.04 2010/03/16 add h3cARPRatelimit, h3cLI by songhao
+--      V2.05 2011/01/31 add h3cDar, h3cPBR by songhao
+--      V2.06 2011/04/22 add h3cAAANasId by duyanbing
+--      V2.07 2012/04/19 add h3cTeTunnel,h3cLB,h3cDldp2,h3cWIPS,h3cFCoE
+--                           h3cDot11Sa by duyanbing
+--      V2.08 2013/01/08 add h3cInfoCenter, h3cTRNG2, h3cDhcp4, h3cDhcpSnoop2,
+--                           h3cRmonExt, h3cIPsecMonitorV2, h3cSanAgg, h3cSpb,
+--                           h3cPortExtender, h3cSlbg, h3cFdmi, h3cFirmwareUpgrade,
+--                           h3cIssuUpgrade by songhao
+--      V2.09 2013/04/26 add h3cEvb, h3cFcoeMode, h3cMDC, h3cQinQv2, h3cVmap
+--                       modify name of 127, 129, 132 under h3cCommon by songhao
+--      V2.10 2013/09/22 remove h3cFdmi under h3cCommon
+--                       add h3cL2tp, h3cMultilinkPPPV2, h3cBpa by songhao
+--      V2.11 2014/01/27 add h3cLocAAASrv, h3cMplsExt, h3cMplsTe, h3cLicense,
+--                           h3cLBv2, h3cSession, h3cARPSourceSuppression, h3cVxlan
+--                           under h3cCommon by songhao
+--      V2.12 2014/04/27 add h3cRddc, h3cIpRanDcn, h3cContext
+--                       modify name of 129 under h3cCommon by songhao
+--      V2.13 2014/09/18 add h3cMulticastSnoop, h3cPvst, h3cSmlk,
+--                           h3c8021XExt2, h3cObjp, h3cNvgre by songhao
+--      V2.14 2015/04/23 add 157 to 162 under h3cCommon by songhao
+--      V2.15 2016/04/02 add 163 to 165 under h3cCommon by songhao
+--      V2.16 2018/04/18 add 166 to 175 under h3cCommon by jiliyan
+-- ============================================================================
+HUAWEI-3COM-OID-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+enterprises
+        FROM RFC1155-SMI;
+
+-- level 1 under .enterprises
+        huawei OBJECT IDENTIFIER ::= { enterprises 2011 }
+
+-- level 2 under .huawei
+        hwLocal OBJECT IDENTIFIER ::= { huawei 1 }
+        products OBJECT IDENTIFIER ::= { huawei 2 }
+        huaweiMgmt OBJECT IDENTIFIER ::= { huawei 5 }
+        huaweiUtility OBJECT IDENTIFIER ::= { huawei 6 }
+        h3c     OBJECT IDENTIFIER ::= { huawei 10 }            -- July  09,2003,lcl added
+        huaweiTCMIB OBJECT IDENTIFIER ::= { huawei 20021210 }  -- Reference: huawei-TC.mib
+
+-- level 3
+        quidway OBJECT IDENTIFIER ::= { hwLocal 1 }
+        hwInternetProtocol OBJECT IDENTIFIER ::= { hwLocal 3 }
+        router  OBJECT IDENTIFIER ::= { products 2 }    -- Reference: huawei-mlsr.mib
+        lanSw   OBJECT IDENTIFIER ::= { products 23 }
+        mlsr    OBJECT IDENTIFIER ::= { products 33 }
+        dlsw    OBJECT IDENTIFIER ::= { products 34 }   -- Reference: huawei-dlsw.mib
+        hwDhcp OBJECT IDENTIFIER ::= { huaweiMgmt 7 }
+        hwMpls OBJECT IDENTIFIER ::= { huaweiMgmt 12 }
+        hwpaeExtMib OBJECT IDENTIFIER ::= { huaweiMgmt 22 }   -- Reference: huawei-8021x-ext.mib
+        huaweiDatacomm OBJECT IDENTIFIER ::= { huaweiMgmt 25 }
+        hwDevice OBJECT IDENTIFIER ::= { huaweiUtility 1 }    -- Reference: huawei-splat-devm.mib
+        hwCluster OBJECT IDENTIFIER ::= { huaweiUtility 7 }   -- Reference: huawei-hgmp.mib
+
+-- under .huawei.h3c
+        h3cProductId    OBJECT IDENTIFIER ::= { h3c 1 }         -- 2003/12/23, xiejianping added
+        h3cCommon   OBJECT IDENTIFIER ::= { h3c 2 }             -- 2004/1/12, xiejianping changed
+        h3cEntityVendorTypeOID OBJECT IDENTIFIER ::= { h3c 3 }  -- 2004/5/18, xiejianping added
+        h3cNM OBJECT IDENTIFIER ::= { h3c 4 }                   -- 2004/5/18, xiejianping added
+        hwSystem    OBJECT IDENTIFIER ::= { h3c 6 }             -- 2004/4/24, xiejianping changed
+        h3cSNMPAgCpb    OBJECT IDENTIFIER ::= { h3c 7 }         -- 2005/11/27, longyin added, for capability MIBs
+        h3cRhw    OBJECT IDENTIFIER ::= { h3c 8 }               -- 2005/12/2, longyin added for replace hw
+        h3cSurveillanceMIB   OBJECT IDENTIFIER ::= { h3c 9 }    -- 2007/09/25, longyin added for Surveillance
+        h3cStorageRef        OBJECT IDENTIFIER ::= { h3c 10 }   -- 2007/10/25, longyin added for Storage
+
+-- under .huawei.hwLocal.hwInternetProtocol
+        rIp OBJECT IDENTIFIER ::= { hwInternetProtocol 1 }     -- Reference: huawei-ip.mib
+        rIcmp OBJECT IDENTIFIER ::= { hwInternetProtocol 2 }   -- Reference: huawei-icmp.mib
+        vrpProtocol OBJECT IDENTIFIER ::= { hwInternetProtocol 3 }
+        rmonExtend OBJECT IDENTIFIER ::= { hwInternetProtocol 4 }  -- Reference: huawei-rmon-ext.mib
+        huawei-qos OBJECT IDENTIFIER ::= { vrpProtocol 2 }     -- Reference: huawei-qos.mib
+        huawei-vlan OBJECT IDENTIFIER ::= { vrpProtocol 3 }    -- Reference: huawei-vlan.mib
+
+        lswCommon OBJECT IDENTIFIER ::= { lanSw 1 }
+
+-- under .huawei.products.lanSw.lswCommon
+        hwLswExtInterface OBJECT IDENTIFIER ::= { lswCommon 1 }    -- Reference: huawei-splat-inf.mib
+        hwLswVlan OBJECT IDENTIFIER ::= { lswCommon 2 }        -- Reference: huawei-splat-inf.mib,huawei-splat-vlan.mib
+        hwLswMacPort OBJECT IDENTIFIER ::= { lswCommon 3 }     -- Reference: huawei-splat-mam.mib
+        hwLswArpMib OBJECT IDENTIFIER ::= { lswCommon 4 }      -- Reference: huawei-splat-arp.mib
+        hwLswL2InfMib OBJECT IDENTIFIER ::= { lswCommon 5 }    -- Reference: huawei-splat-inf.mib
+        hwLswRstpMib OBJECT IDENTIFIER ::= { lswCommon 6 }     -- Reference: huawei-splat-rstp.mib
+        hwLswIgmpsnoopingMib OBJECT IDENTIFIER ::= { lswCommon 7 }  -- Reference: huawei-splat-igsp.mib
+        hwLswDhcpMib OBJECT IDENTIFIER ::= { lswCommon 8 }     -- Reference: huawei-splat-dhcp.mib
+        hwLswdevMMib OBJECT IDENTIFIER ::= { lswCommon 9 }     -- Reference: huawei-splat-devm.mib
+        hwsLswTrapMib OBJECT IDENTIFIER ::= { lswCommon 12 }   -- Reference: huawei-splat-trap.mib
+        hwdot1sMstp OBJECT IDENTIFIER ::= { lswCommon 14 }     -- Reference: huawei-splat-mstp.mib
+        hwLswQosAclMib OBJECT IDENTIFIER ::= { lswCommon 16 }  -- Reference: huawei-splat-qos.mib
+        hwLswMix OBJECT IDENTIFIER ::= { lswCommon 17 }        -- Reference: huawei-splat-mix.mib
+        hwLswDeviceAdmin OBJECT IDENTIFIER ::= { lswCommon 18 }     -- Reference: huawei-device.mib
+
+        terminalServer OBJECT IDENTIFIER ::= { mlsr 1 }   -- Reference: huawei-terminal.mib
+        huaweiNDEC OBJECT IDENTIFIER ::= { mlsr 2 }       -- Reference: huawei-ndec.mib
+        redundancyPower OBJECT IDENTIFIER ::= { mlsr 4 }  -- Reference: huawei-power.mib
+        redundancyFan OBJECT IDENTIFIER ::= { mlsr 5 }    -- Reference: huawei-power.mib
+        hwmSystem OBJECT IDENTIFIER ::= { mlsr 6 }        -- Reference: huawei-mlsr.mib
+        hw8040If OBJECT IDENTIFIER ::= { mlsr 7 }         -- Reference: huawei-8040if.mib
+        pos OBJECT IDENTIFIER ::= { mlsr 8 }              -- Reference: huawei-pos.mib
+        hwIsdnMib OBJECT IDENTIFIER ::= { mlsr 9 }        -- Reference: huawei-isdn.mib
+        aR46-E200 OBJECT IDENTIFIER ::= { mlsr 20 }       -- Reference: huawei-srm.mib
+
+-- under .huawei.huaweiMgmt.hwDhcp
+        hwDHCPRelayMib OBJECT IDENTIFIER ::= { hwDhcp 1 }       -- Reference: huawei-dhcpr.mib
+        hwDHCPServerMib OBJECT IDENTIFIER ::= { hwDhcp 2 }      -- Reference: huawei-dhcps.mib
+
+-- under .huawei.huaweiMgmt.hwMpls
+        hwMplsLsr OBJECT IDENTIFIER ::= { hwMpls 1 }      -- Reference: huawei-mpls-lsr.mib
+        hwMplsLdp OBJECT IDENTIFIER ::= { hwMpls 2 }      -- Reference: huawei-mpls-ldp.mib
+        hwMplsVpn OBJECT IDENTIFIER ::= { hwMpls 3 }      -- Reference: huawei-mpls-vpn.mib
+
+-- under .huawei.huaweiMgmt.huaweiDatacomm
+
+        voice                   OBJECT IDENTIFIER ::= { huaweiDatacomm 1 }
+        -- name: guoxiaojun
+        -- id: 29157
+        -- product: R2600,R1700,R3600
+        -- reason: new mib requirement for voice General ,voice interface , voice analog interface, voice digital interface, voice dial control, call active, call history, GK client, AAA client,H323 call sataict.
+
+        hwIPX          OBJECT IDENTIFIER ::= { huaweiDatacomm 2 }
+        hwFWTP         OBJECT IDENTIFIER ::= { huaweiDatacomm 3 }
+        hwHIIP         OBJECT IDENTIFIER ::= { huaweiDatacomm 4 }
+        hwHRP          OBJECT IDENTIFIER ::= { huaweiDatacomm 5 }
+        -- name: xuqingwei
+        -- id: 27902
+        -- product:
+        -- reason: new mib requirement for hwIPX,hwFWTP,hwHIIP,hwHRP.
+
+        hwASPF          OBJECT IDENTIFIER ::= { huaweiDatacomm 6 }
+        hwNAT           OBJECT IDENTIFIER ::= { huaweiDatacomm 7 }
+        hwBLS           OBJECT IDENTIFIER ::= { huaweiDatacomm 8 }
+        hwMACBIND       OBJECT IDENTIFIER ::= { huaweiDatacomm 9 }
+        hwATK           OBJECT IDENTIFIER ::= { huaweiDatacomm 10 }
+        hwSECSTAT       OBJECT IDENTIFIER ::= { huaweiDatacomm 11 }
+        hwPFLT          OBJECT IDENTIFIER ::= { huaweiDatacomm 12 }
+        hwTRNG          OBJECT IDENTIFIER ::= { huaweiDatacomm 13 }    -- Reference: huawei-trng.mib
+        hwSMAP          OBJECT IDENTIFIER ::= { huaweiDatacomm 14 }
+        hwSZONE         OBJECT IDENTIFIER ::= { huaweiDatacomm 15 }
+        hwSLOG          OBJECT IDENTIFIER ::= { huaweiDatacomm 16 }
+        -- name: xuqingwei
+        -- id: 27902
+        -- product:
+        -- reason: new mib requirement for safety characteristic.
+
+        hwSSHMIB               OBJECT IDENTIFIER ::= { huaweiDatacomm 17 }
+        -- name: guoxiaojun
+        -- id: 29157
+        -- product: R2600,R1700,R3600
+        -- reason: new mib requirement for SSH.
+        -- Reference: huawei-ssh.mib
+
+        hwUserLogMIB           OBJECT IDENTIFIER ::= { huaweiDatacomm 18 }
+        -- name: libingshan
+        -- id: 22055
+        -- product: NE05/08/08E/16/16E
+        -- reason: new mib requirement for user log.
+        -- Reference: huawei-userlog.mib
+
+        hwSystemMan    OBJECT IDENTIFIER ::= { huaweiDatacomm 19 }
+        -- name: xuqingwei
+        -- id: 27902
+        -- product:
+        -- reason: new mib requirement for system management
+
+        hwTACACS    OBJECT IDENTIFIER ::= { huaweiDatacomm 20 }
+        -- name: limeng
+        -- id: 15814
+        -- product:
+        -- reason: new mib requirement for hwTACACS (to send Email)
+        -- Reference: huawei-hwtacacs.mib
+
+        hwNBPortalMIB          OBJECT IDENTIFIER ::= { huaweiDatacomm 21 }
+        -- name: libingshan
+        -- id: 22055
+        -- product: NE05/08/08E/16/16E
+        -- reason: new mib requirement for portal of router narrowband.
+
+        hwNTP    OBJECT IDENTIFIER ::= { huaweiDatacomm 22 }
+        -- name: xuqingwei
+        -- id: 27902
+        -- product: VRP
+        -- reason: new mib requirement for NTP server,command over snmp
+        -- Reference: huawei-ntp.mib
+
+        hwCmdOverSnmpMib    OBJECT IDENTIFIER ::= { huaweiDatacomm 23 }
+
+
+        hwISIS    OBJECT IDENTIFIER ::= { huaweiDatacomm 24 }
+        -- name: zhangxianping
+        -- id: 29813
+        -- product: VRP
+        -- reason: new mib requirement for ISIS
+
+        hwLAG    OBJECT IDENTIFIER ::= { huaweiDatacomm 25 }
+        -- name: xuqingwei
+        -- id: 27902
+        -- product: Lanswitch platform
+        -- reason: new mib requirement for LACP
+        -- Reference: huawei-lag.mib
+
+        hwSmonExtend    OBJECT IDENTIFIER ::= { huaweiDatacomm 26 }
+        -- name: fuzhenyu
+        -- id: 30224
+        -- product: Lanswitch platform
+        -- reason: new mib requirement for smon vlan enable purpose
+        -- Reference: huawei-splat-smonext.mib
+
+        hwTask    OBJECT IDENTIFIER ::= { huaweiDatacomm 27 }
+        -- name: zhangxianping
+        -- id: 29813
+        -- product: VRP
+        -- reason: new mib requirement for Task mib
+
+        hwDismanPing    OBJECT IDENTIFIER ::= { huaweiDatacomm 28 }
+        -- name: lvzhenfeng
+        -- id: 18230
+        -- product: Quidview
+        -- reason: new mib requirement for RFC DismanPing(MIB) extend
+        -- Reference: huawei-ping.mib
+
+        hwVlan    OBJECT IDENTIFIER ::= { huaweiDatacomm 29 }
+        -- name: fuzhenyu
+        -- id: 30224
+        -- product: Lanswitch platform
+        -- reason: move old mib tree(huawei.products.lanSw.lswCommon) to new location(huawei.huaweiMgmt.hwDatacomm)
+
+        hwAddrMgmt    OBJECT IDENTIFIER ::= { huaweiDatacomm 30 }
+        -- name: cuikemao
+        -- id: 20339
+        -- date: 2003-09-25
+        -- product: Eudemon2000 Series(Eudemon 2100, Eudemon 2200)
+        -- reason: new mib requirement for Eudemon2000 Series
+
+        hwEntityExtentMIB OBJECT IDENTIFIER ::= { huaweiDatacomm 31 }
+        -- name: cuikemao
+        -- id: 20339
+        -- date: 2003-11-06
+        -- product: 8070 8011 8060
+        -- reason: new mib requirement for hwEntityExtentMIB
+
+        hwQoS    OBJECT IDENTIFIER ::= { huaweiDatacomm 32 }
+        -- name: cuikemao
+        -- id: 20339
+        -- date: 2004-05-18
+        -- product: VRP
+        -- reason: new mib requirement for HUAWEI-CBQOS-MIB
+
+        hwMultilinkPPP    OBJECT IDENTIFIER ::= { huaweiDatacomm 33 }
+        -- name: cuikemao
+        -- id: 20339
+        -- date: 2004-05-26
+        -- product: VRP
+        -- reason: new mib requirement for HUAWEI-MP-MIB
+
+        hwTCPMib    OBJECT IDENTIFIER ::= { huaweiDatacomm 34 }
+        -- name: cuikemao
+        -- id: 20339
+        -- date: 2004-06-29
+        -- product: VRP
+        -- reason: new mib requirement for HUAWEI-TCP-MIB
+
+        hwBGPMib    OBJECT IDENTIFIER ::= { huaweiDatacomm 35 }
+        -- name: cuikemao
+        -- id: 20339
+        -- date: 2004-06-29
+        -- product: VRP
+        -- reason: new mib requirement for HUAWEI-BGP-MIB
+
+-- under .huawei.huaweiMgmt.huaweiDatacomm.voice
+
+        -- name: guoxiaojun
+        -- id: 29157
+        -- product: R2600,R1700,R3600
+        -- reason: new mib requirement for voice
+
+        hwVoiceGeneralMIB              OBJECT IDENTIFIER ::= { voice 1 }   -- Reference: huawei-vogeneral.mib
+        hwVoiceIfMIB                   OBJECT IDENTIFIER ::= { voice 2 }   -- Reference: huawei-voif.mib
+        hwVoiceAnalogInterfaceMIB      OBJECT IDENTIFIER ::= { voice 3 }   -- Reference: huawei-voanalogif.mib
+        hwVoiceDigitalInterfaceMIB     OBJECT IDENTIFIER ::= { voice 4 }   -- Reference: huawei-vodigitalif.mib
+        hwVoiceDialControlMIB          OBJECT IDENTIFIER ::= { voice 5 }   -- Reference: huawei-vodialcontrol.mib
+        hwVoiceCallActiveMIB           OBJECT IDENTIFIER ::= { voice 6 }   -- Reference: huawei-vocallactive.mib
+        hwVoiceCallHistoryMIB          OBJECT IDENTIFIER ::= { voice 7 }   -- Reference: huawei-vocallhistory.mib
+        hwVoiceGKClientMIB             OBJECT IDENTIFIER ::= { voice 8 }   -- Reference: huawei-vogkclient.mib
+        hwVoiceAAAClientMIB            OBJECT IDENTIFIER ::= { voice 9 }   -- Reference: huawei-voaaaclient.mib
+        hwVoiceH323CallStatMIB         OBJECT IDENTIFIER ::= { voice 11 }  -- Reference: huawei-voh323statistic.mib
+        hwSIPMIB                       OBJECT IDENTIFIER ::= { voice 12 }  -- Reference: huawei-sip.mib
+
+-- under huawei.h3c.h3cCommon
+
+        h3cFtm    OBJECT IDENTIFIER ::= { h3cCommon 1 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-01-12
+        -- product: VRP Comware
+        -- reason: new mib requirement for VRP Comware
+        -- Reference: h3c-ftm.mib
+
+        h3cUIMgt    OBJECT IDENTIFIER ::= { h3cCommon 2 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-03-18
+        -- product: all products
+        -- reason: new mib requirement for VRP Comware:
+        --   User-interface management such CONSOLE/AUX/TTY/VTY etc.
+
+        h3cSystemMan    OBJECT IDENTIFIER ::= { h3cCommon 3 }
+        -- name: xiejianping, gaolong
+        -- id: 00312
+        -- date: 2004-04-24
+        -- product: VRP Comware
+        -- reason: relocate from "huawei.huaweiMgmt.huaweiDatacomm.hwSystemMan" for VRP Comware:
+        -- Reference: h3c-sys-man.mib
+
+        h3cConfig    OBJECT IDENTIFIER ::= { h3cCommon 4 }
+        -- name: xiejianping, gaolong
+        -- id: 00312
+        -- date: 2004-04-24
+        -- product: all products
+        -- reason: relocate from "huawei.huaweiUtility.hwConfig"
+        -- Reference: h3c-config-man.mib
+
+        h3cFlash    OBJECT IDENTIFIER ::= { h3cCommon 5 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-04-24
+        -- product: all products
+        -- reason: relocate from "huawei.huaweiUtility.hwFlash"
+        -- Reference: h3c-flash-man.mib
+
+        h3cEntityExtend    OBJECT IDENTIFIER ::= { h3cCommon 6 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-05-18
+        -- product: all products
+        -- reason: for Entity MIB extend.
+        -- Reference: h3c-entity-ext.mib
+
+        h3cIPSecMonitor    OBJECT IDENTIFIER ::= { h3cCommon 7 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-06-1
+        -- product: all products
+        -- reason: for IPSEC VPN.
+
+        h3cAcl    OBJECT IDENTIFIER ::= { h3cCommon 8 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-06-1
+        -- product: all products
+        -- reason: for new ACL mib.
+        -- Reference: h3c-acl.mib
+
+        h3cVoiceVlan    OBJECT IDENTIFIER ::= { h3cCommon 9 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-06-11
+        -- product: all products
+        -- reason: for voice vlan.
+        -- Reference: h3c-voice-vlan.mib
+
+        h3cL4Redirect   OBJECT IDENTIFIER ::= { h3cCommon 10 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-06-11
+        -- product: all products
+        -- reason: for Layer 4 Redirection.
+        -- Reference: h3c-l4rdt.mib
+
+        h3cIpPBX        OBJECT IDENTIFIER ::= { h3cCommon 11 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-07-27
+        -- product: all products
+        -- reason: for GateKeeper MIB.
+        -- Reference: h3c-IP-PBX.mib
+
+        h3cUser        OBJECT IDENTIFIER ::= { h3cCommon 12 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-07-28
+        -- product: all products
+        -- Reference: h3c-user.mib
+
+        h3cRadius        OBJECT IDENTIFIER ::= { h3cCommon 13 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-07-28
+        -- product: all products
+        -- Reference: h3c-radius.mib
+
+        h3cPowerEthernetExt        OBJECT IDENTIFIER ::= { h3cCommon 14 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-07-29
+        -- product: all products
+        -- Reference: h3c-power-ethernet-ext.mib
+
+        h3cEntityRelation        OBJECT IDENTIFIER ::= { h3cCommon 15 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-08-04
+        -- product: all products
+        -- Reference: h3c-entity-relation.mib
+
+        h3cProtocolVlan        OBJECT IDENTIFIER ::= { h3cCommon 16 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-08-24
+        -- product: all products
+        -- Reference: h3c-protocol-vlan.mib
+
+        h3cQosProfile        OBJECT IDENTIFIER ::= { h3cCommon 17 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-08-24
+        -- product: all products
+        -- Reference: h3c-qos-profile.mib
+
+        h3cNat        OBJECT IDENTIFIER ::= { h3cCommon 18 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-10-10
+        -- product: all products
+        -- Reference: h3c-nat.mib
+
+        h3cPos        OBJECT IDENTIFIER ::= { h3cCommon 19 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-10-11
+        -- product: all products
+        -- Reference: h3c-pos.mib
+
+        h3cNS          OBJECT IDENTIFIER ::= { h3cCommon 20 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-10-14
+        -- product: all products
+        -- Reference: h3c-ns.mib
+
+        h3cAAL5        OBJECT IDENTIFIER ::= { h3cCommon 21 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-11-8
+        -- product: all products
+        -- Reference: h3c-AAL5.mib
+
+        h3cSSH        OBJECT IDENTIFIER ::= { h3cCommon 22 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-11-8
+        -- product: all products
+        -- Reference: h3c-ssh.mib
+
+        h3cRSA        OBJECT IDENTIFIER ::= { h3cCommon 23 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-11-10
+        -- product: all products
+        -- Reference: h3c-rsa.mib
+
+        h3cVrrpExt        OBJECT IDENTIFIER ::= { h3cCommon 24 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-11-27
+        -- product: all products
+        -- Reference: h3c-vrrp-ext.mib
+
+        h3cIpa        OBJECT IDENTIFIER ::= { h3cCommon 25 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-12-2
+        -- product: all products
+        -- Reference: h3c-ipa.mib
+
+        h3cPortSecurity         OBJECT IDENTIFIER ::= { h3cCommon 26 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-12-2
+        -- product: all products
+        -- Reference: h3c-port-security.mib
+
+        h3cVpls         OBJECT IDENTIFIER ::= { h3cCommon 27 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-12-6
+        -- product: all products
+        -- Reference: h3c-vpls.mib
+
+        h3cE1         OBJECT IDENTIFIER ::= { h3cCommon 28 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-12-10
+        -- product: all products
+        -- Reference: h3c-e1.mib
+
+        h3cT1         OBJECT IDENTIFIER ::= { h3cCommon 29 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-12-10
+        -- product: all products
+        -- Reference: h3c-t1.mib
+
+        h3cIKEMonitor         OBJECT IDENTIFIER ::= { h3cCommon 30 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-12-13
+        -- product: all products
+        -- Reference: h3c-ike-monitor.mib
+
+        h3cWebSwitch         OBJECT IDENTIFIER ::= { h3cCommon 31 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-12-16
+        -- product: all products
+        -- Reference: h3c-web-switch.mib
+
+        h3cAutoDetect         OBJECT IDENTIFIER ::= { h3cCommon 32 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-12-16
+        -- product: all products
+        -- Reference: h3c-auto-detect.mib
+
+        h3cIpBroadcast         OBJECT IDENTIFIER ::= { h3cCommon 33 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2004-12-16
+        -- product: all products
+        -- Reference: h3c-ip-broadcast.mib
+
+        h3cIpx         OBJECT IDENTIFIER ::= { h3cCommon 34 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2004-12-16
+        -- product: all products
+        -- Reference: h3c-ipx.mib
+
+        h3cIPS         OBJECT IDENTIFIER ::= { h3cCommon 35 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2004-12-25
+        -- product: all products
+        -- Reference:
+
+        h3cDhcpSnoop         OBJECT IDENTIFIER ::= { h3cCommon 36 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-01-13
+        -- product: all products
+        -- Reference:
+
+        h3cProtocolPriority         OBJECT IDENTIFIER ::= { h3cCommon 37 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-01-31
+        -- product:
+        -- Reference:
+
+        h3cTrap         OBJECT IDENTIFIER ::= { h3cCommon 38 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-02-05
+        -- product: definiton of traps for all products
+        -- Reference:
+
+        h3cVoice        OBJECT IDENTIFIER ::= { h3cCommon 39 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-05-03
+        -- product: voice products
+        -- Reference:
+
+        h3cIfExt         OBJECT IDENTIFIER ::= { h3cCommon 40 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2004-12-15
+        -- product: all products
+        -- Reference: h3c-if-ext.mib
+
+        h3cCfCard         OBJECT IDENTIFIER ::= { h3cCommon 41 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-12-21
+        -- product: all products
+        -- Reference: h3c-cf-card.mib
+
+        h3cEpon         OBJECT IDENTIFIER ::= { h3cCommon 42 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-12-29
+        -- product: all products
+        -- Reference:
+
+        h3cDldp         OBJECT IDENTIFIER ::= { h3cCommon 43 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2004-12-29
+        -- product: all products
+        -- Reference: h3c-dldp.mib
+
+        h3cUnicast         OBJECT IDENTIFIER ::= { h3cCommon 44 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2005-2-5
+        -- product: all products
+        -- Reference: h3c-unicast.mib
+
+        h3cRrpp         OBJECT IDENTIFIER ::= { h3cCommon 45 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2005-2-5
+        -- product: lanswitch products
+        -- Reference: h3c-rrpp.mib
+        -- RRPP(Rapid Ring Protection Protocol)
+
+        h3cDomain       OBJECT IDENTIFIER ::= { h3cCommon 46 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-03-26
+        -- product: lanswitch products
+        -- Reference:
+
+        h3cIds          OBJECT IDENTIFIER ::= { h3cCommon 47 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-03-26
+        -- product: lanswitch products
+        -- Reference:
+
+        h3cRcr          OBJECT IDENTIFIER ::= { h3cCommon 48 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-04-15
+        -- product:
+        -- Reference:
+
+        h3cAtmDxi        OBJECT IDENTIFIER ::= { h3cCommon 49 }
+        -- name: xiejianping
+        -- id: 00312
+        -- date: 2005-04-21
+        -- product: router products
+        -- Reference: h3c-atm-dxi.mib
+
+        h3cMulticast     OBJECT IDENTIFIER ::= { h3cCommon 50 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-05-25
+        -- product:
+        -- Reference:
+
+        h3cMpm           OBJECT IDENTIFIER ::= { h3cCommon 51 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-05-25
+        -- product:
+        -- Reference: layer 2 multicast port management
+
+        h3cOadp           OBJECT IDENTIFIER ::= { h3cCommon 52 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-06-12
+        -- product:
+        -- Reference:
+
+        h3cTunnel           OBJECT IDENTIFIER ::= { h3cCommon 53 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-06-12
+        -- product:
+        -- Reference:
+
+        h3cGre           OBJECT IDENTIFIER ::= { h3cCommon 54 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-06-12
+        -- product:
+        -- Reference:
+
+    h3cObjectInfo     OBJECT IDENTIFIER ::= { h3cCommon 55 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-06-25
+        -- product:
+        -- Reference:
+
+    h3cStorage     OBJECT IDENTIFIER ::= { h3cCommon 56 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-06-25
+        -- product: ix5000
+        -- Reference:
+
+    h3cDvpn     OBJECT IDENTIFIER ::= { h3cCommon 57 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-06-25
+        -- product:
+        -- Reference:
+
+    h3cDhcpRelay     OBJECT IDENTIFIER ::= { h3cCommon 58 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-06-25
+        -- product:
+        -- Reference:
+
+    h3cIsis     OBJECT IDENTIFIER ::= { h3cCommon 59 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-07-09
+        -- product:
+        -- Reference:
+
+    h3cRpr     OBJECT IDENTIFIER ::= { h3cCommon 60 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-08-02
+        -- product:
+        -- Reference:
+
+    h3cSubnetVlan     OBJECT IDENTIFIER ::= { h3cCommon 61 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-09-02
+        -- product:
+        -- Reference:
+
+    h3cDlswExt     OBJECT IDENTIFIER ::= { h3cCommon 62 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-09-20
+        -- product:
+        -- Reference:
+
+    h3cSyslog     OBJECT IDENTIFIER ::= { h3cCommon 63 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2005-09-20
+        -- product:
+        -- Reference:
+
+    h3cFlowTemplate     OBJECT IDENTIFIER ::= { h3cCommon 64 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2005-11-26
+        -- product:
+        -- Reference:
+
+    h3cQos2     OBJECT IDENTIFIER ::= { h3cCommon 65 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2005-11-26
+        -- product:
+        -- Reference:
+
+    h3cStormConstrain     OBJECT IDENTIFIER ::= { h3cCommon 66 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2005-12-2
+        -- product:
+        -- Reference:
+
+    h3cIpAddrMIB     OBJECT IDENTIFIER ::= { h3cCommon 67 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2006-01-09
+        -- product:
+        -- Reference:
+
+    h3cMirrGroup     OBJECT IDENTIFIER ::= { h3cCommon 68 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2006-01-21
+        -- product:
+        -- Reference:
+
+    h3cQINQ     OBJECT IDENTIFIER ::= { h3cCommon 69 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2006-03-05
+        -- product:
+        -- Reference:
+
+    h3cTransceiver     OBJECT IDENTIFIER ::= { h3cCommon 70 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2006-04-06
+        -- product:
+        -- Reference:
+
+    h3cIpv6AddrMIB     OBJECT IDENTIFIER ::= { h3cCommon 71 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2006-04-06
+        -- product:
+        -- Reference:
+
+    h3cBfdMIB     OBJECT IDENTIFIER ::= { h3cCommon 72 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2006-06-14
+        -- product:
+        -- Reference:
+
+    h3cRCP     OBJECT IDENTIFIER ::= { h3cCommon 73 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2006-11-25
+        -- product:
+        -- Reference:
+
+    h3cAcfp     OBJECT IDENTIFIER ::= { h3cCommon 74 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2007-01-11
+        -- product:
+        -- Reference:
+
+    h3cDot11    OBJECT IDENTIFIER ::= { h3cCommon 75 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2007-01-24
+        -- product:
+        -- Reference:
+
+    h3cE1T1VI   OBJECT IDENTIFIER ::= { h3cCommon 76 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2007-05-15
+        -- product:
+        -- Reference:
+
+    h3cwapiMIB   OBJECT IDENTIFIER ::= { h3cCommon 77 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2007-07-10
+        -- product:
+        -- Reference:
+
+    h3cL2VpnPwe3   OBJECT IDENTIFIER ::= { h3cCommon 78 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2007-07-10
+        -- product:
+        -- Reference:
+
+    h3cMplsOam   OBJECT IDENTIFIER ::= { h3cCommon 79 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2007-07-10
+        -- product:
+        -- Reference:
+
+    h3cMplsOamPs   OBJECT IDENTIFIER ::= { h3cCommon 80 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2007-07-10
+        -- product:
+        -- Reference:
+
+    h3cSiemMib   OBJECT IDENTIFIER ::= { h3cCommon 81 }
+        -- name: gaolong
+        -- id: 00803
+        -- date: 2007-08-09
+        -- product:
+        -- Reference:
+
+    h3cUps   OBJECT IDENTIFIER ::= { h3cCommon 82 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2007-10-25
+        -- product:
+        -- Reference:
+
+    h3cEOCCommon   OBJECT IDENTIFIER ::= { h3cCommon 83 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2007-11-27
+        -- product: SOHO
+        -- Reference:
+
+    h3cHPEOC   OBJECT IDENTIFIER ::= { h3cCommon 84 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2007-11-27
+        -- product: SOHO
+        -- Reference:
+
+    h3cAFC   OBJECT IDENTIFIER ::= { h3cCommon 85 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2007-12-27
+        -- product: SEC
+        -- Reference:
+
+    h3cMultCDR   OBJECT IDENTIFIER ::= { h3cCommon 86 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2007-12-27
+        -- product: ALL
+        -- Reference:
+
+    h3cMACInformation   OBJECT IDENTIFIER ::= { h3cCommon 87 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2008-02-27
+        -- product: ALL
+        -- Reference:
+
+    h3cFireWall    OBJECT IDENTIFIER ::= { h3cCommon 88 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2008-2-27
+        -- product:
+        -- Reference:
+
+    h3cDSP    OBJECT IDENTIFIER ::= { h3cCommon 89 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2008-2-27
+        -- product:
+        -- Reference:
+
+    h3cNetMan    OBJECT IDENTIFIER ::= { h3cCommon 90 }
+        -- name: songhao
+        -- id: 02718
+        -- date: 2008-4-29
+        -- product:
+        -- Reference:
+
+    h3cStack    OBJECT IDENTIFIER ::= { h3cCommon 91 }
+        -- name: songhao
+        -- id: 02718
+        -- date: 2008-6-2
+        -- product:
+        -- Reference:
+
+    h3cPosa    OBJECT IDENTIFIER ::= { h3cCommon 92 }
+        -- name: songhao
+        -- id: 02718
+        -- date: 2008-6-2
+        -- product:
+        -- Reference:
+
+    h3cWebAuthentication    OBJECT IDENTIFIER ::= { h3cCommon 93 }
+        -- name: songhao
+        -- id: 02718
+        -- date: 2008-07-29
+        -- product:
+        -- Reference:
+
+    h3cCATVTransceiver    OBJECT IDENTIFIER ::= { h3cCommon 94 }
+        -- name: songhao
+        -- id: 02718
+        -- date: 2008-08-26
+        -- product:
+        -- Reference:
+
+    h3cLpbkdt                   OBJECT IDENTIFIER ::= { h3cCommon 95 }
+    h3cMultiMedia               OBJECT IDENTIFIER ::= { h3cCommon 96 }
+    h3cDns                      OBJECT IDENTIFIER ::= { h3cCommon 97 }
+    h3c3GModem                  OBJECT IDENTIFIER ::= { h3cCommon 98 }
+    h3cPortal                   OBJECT IDENTIFIER ::= { h3cCommon 99 }
+    h3clldp                     OBJECT IDENTIFIER ::= { h3cCommon 100 }
+    h3cDHCPServer               OBJECT IDENTIFIER ::= { h3cCommon 101 }
+    h3cPPPoEServer              OBJECT IDENTIFIER ::= { h3cCommon 102 }
+    h3cL2Isolate                OBJECT IDENTIFIER ::= { h3cCommon 103 }
+    h3cSnmpExt                  OBJECT IDENTIFIER ::= { h3cCommon 104 }
+    h3cVsi                      OBJECT IDENTIFIER ::= { h3cCommon 105 }
+    h3cEvc                      OBJECT IDENTIFIER ::= { h3cCommon 106 }
+    h3cMinm                     OBJECT IDENTIFIER ::= { h3cCommon 107 }
+    h3cBlg                      OBJECT IDENTIFIER ::= { h3cCommon 108 }
+    h3cRS485                    OBJECT IDENTIFIER ::= { h3cCommon 109 }
+    h3cARPRatelimit             OBJECT IDENTIFIER ::= { h3cCommon 110 }
+    h3cLI                       OBJECT IDENTIFIER ::= { h3cCommon 111 }
+    h3cDar                      OBJECT IDENTIFIER ::= { h3cCommon 112 }
+    h3cPBR                      OBJECT IDENTIFIER ::= { h3cCommon 113 }
+    h3cAAANasId                 OBJECT IDENTIFIER ::= { h3cCommon 114 }
+    h3cTeTunnel                 OBJECT IDENTIFIER ::= { h3cCommon 115 }
+    h3cLB                       OBJECT IDENTIFIER ::= { h3cCommon 116 }
+    h3cDldp2                    OBJECT IDENTIFIER ::= { h3cCommon 117 }
+    h3cWIPS                     OBJECT IDENTIFIER ::= { h3cCommon 118 }
+    h3cInfoCenter               OBJECT IDENTIFIER ::= { h3cCommon 119 }
+    h3cFCoE                     OBJECT IDENTIFIER ::= { h3cCommon 120 }
+    h3cTRNG2                    OBJECT IDENTIFIER ::= { h3cCommon 121 }
+    h3cDhcp4                    OBJECT IDENTIFIER ::= { h3cCommon 122 }
+    h3cMulticastSnoop           OBJECT IDENTIFIER ::= { h3cCommon 123 }
+    h3cDhcpSnoop2               OBJECT IDENTIFIER ::= { h3cCommon 124 }
+    h3cRmonExt                  OBJECT IDENTIFIER ::= { h3cCommon 125 }
+    h3cIPsecMonitorV2           OBJECT IDENTIFIER ::= { h3cCommon 126 }
+    h3cSan                      OBJECT IDENTIFIER ::= { h3cCommon 127 }
+    h3cSpb                      OBJECT IDENTIFIER ::= { h3cCommon 128 }
+    h3cPex                      OBJECT IDENTIFIER ::= { h3cCommon 129 }
+    h3cSlbg                     OBJECT IDENTIFIER ::= { h3cCommon 130 }
+    h3cPvst                     OBJECT IDENTIFIER ::= { h3cCommon 131 }
+    h3cEvi                      OBJECT IDENTIFIER ::= { h3cCommon 132 }
+    h3cIssuUpgrade              OBJECT IDENTIFIER ::= { h3cCommon 133 }
+    h3cEvb                      OBJECT IDENTIFIER ::= { h3cCommon 134 }
+    h3cFcoeMode                 OBJECT IDENTIFIER ::= { h3cCommon 135 }
+    h3cMDC                      OBJECT IDENTIFIER ::= { h3cCommon 136 }
+    h3cQinQv2                   OBJECT IDENTIFIER ::= { h3cCommon 137 }
+    h3cVmap                     OBJECT IDENTIFIER ::= { h3cCommon 138 }
+    h3cL2tp                     OBJECT IDENTIFIER ::= { h3cCommon 139 }
+    h3cMultilinkPPPV2           OBJECT IDENTIFIER ::= { h3cCommon 140 }
+    h3cLocAAASrv                OBJECT IDENTIFIER ::= { h3cCommon 141 }
+    h3cMplsExt                  OBJECT IDENTIFIER ::= { h3cCommon 142 }
+    h3cMplsTe                   OBJECT IDENTIFIER ::= { h3cCommon 143 }
+    h3cBpa                      OBJECT IDENTIFIER ::= { h3cCommon 144 }
+    h3cLicense                  OBJECT IDENTIFIER ::= { h3cCommon 145 }
+    h3cSmlk                     OBJECT IDENTIFIER ::= { h3cCommon 147 }
+    h3cARPSourceSuppression     OBJECT IDENTIFIER ::= { h3cCommon 146 }
+    h3cLBv2                     OBJECT IDENTIFIER ::= { h3cCommon 148 }
+    h3cSession                  OBJECT IDENTIFIER ::= { h3cCommon 149 }
+    h3cVxlan                    OBJECT IDENTIFIER ::= { h3cCommon 150 }
+    h3cRddc                     OBJECT IDENTIFIER ::= { h3cCommon 151 }
+    h3cIpRanDcn                 OBJECT IDENTIFIER ::= { h3cCommon 152 }
+    h3c8021XExt2                OBJECT IDENTIFIER ::= { h3cCommon 153 }
+    h3cContext                  OBJECT IDENTIFIER ::= { h3cCommon 154 }
+    h3cObjp                     OBJECT IDENTIFIER ::= { h3cCommon 155 }
+    h3cNvgre                    OBJECT IDENTIFIER ::= { h3cCommon 156 }
+    h3cWlanMt                   OBJECT IDENTIFIER ::= { h3cCommon 157 }
+    h3cRbac                     OBJECT IDENTIFIER ::= { h3cCommon 158 }
+    h3cDHCP6Server              OBJECT IDENTIFIER ::= { h3cCommon 159 }
+    h3cMplsVpnBgp               OBJECT IDENTIFIER ::= { h3cCommon 160 }
+    h3cOspf                     OBJECT IDENTIFIER ::= { h3cCommon 161 }
+    h3cL2vpn                    OBJECT IDENTIFIER ::= { h3cCommon 162 }
+    h3cMACsec                   OBJECT IDENTIFIER ::= { h3cCommon 163 }
+    h3cFailover                 OBJECT IDENTIFIER ::= { h3cCommon 164 }
+    h3cVpnPeer                  OBJECT IDENTIFIER ::= { h3cCommon 165 }
+    h3cSecp                     OBJECT IDENTIFIER ::= { h3cCommon 166 }
+    h3cOfp                      OBJECT IDENTIFIER ::= { h3cCommon 167 }
+    h3cARPEntry                 OBJECT IDENTIFIER ::= { h3cCommon 168 }
+    h3cResMon                   OBJECT IDENTIFIER ::= { h3cCommon 169 }
+    h3cSslvpn                   OBJECT IDENTIFIER ::= { h3cCommon 170 }
+    h3cSecHigh                  OBJECT IDENTIFIER ::= { h3cCommon 171 }
+    h3cBgpEvpn                  OBJECT IDENTIFIER ::= { h3cCommon 172 }
+    h3cEvpn                     OBJECT IDENTIFIER ::= { h3cCommon 173 }
+    h3cLTE                      OBJECT IDENTIFIER ::= { h3cCommon 174 }
+    h3cPPP                      OBJECT IDENTIFIER ::= { h3cCommon 175 }
+
+
+    h3cQosCapability     OBJECT IDENTIFIER ::= { h3cSNMPAgCpb 1 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2005-11-27
+        -- product:
+        -- Reference:
+
+-- under huawei.h3c.h3cRhw
+
+    h3cNqa     OBJECT IDENTIFIER ::= { h3cRhw 3 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2005-12-2
+        -- product:
+        -- Reference:
+
+    h3cHgmp     OBJECT IDENTIFIER ::= { h3cRhw 7 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2005-12-2
+        -- product:
+        -- Reference:
+
+    h3cNTP     OBJECT IDENTIFIER ::= { h3cRhw 19 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2005-12-2
+        -- product:
+        -- Reference:
+
+-- under huawei.h3c.h3cSurveillanceMIB
+
+    h3cVMMan     OBJECT IDENTIFIER ::= { h3cSurveillanceMIB 1 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2007-09-25
+        -- product:
+        -- Reference:
+
+    h3cPUMan     OBJECT IDENTIFIER ::= { h3cSurveillanceMIB 2 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2007-09-25
+        -- product:
+        -- Reference:
+
+    h3cMSMan     OBJECT IDENTIFIER ::= { h3cSurveillanceMIB 3 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2007-09-25
+        -- product:
+        -- Reference:
+
+-- under huawei.h3c.h3cStorageRef
+    h3cStorageMIB     OBJECT IDENTIFIER ::= { h3cStorageRef 1 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2007-10-25
+        -- product:
+        -- Reference:
+
+    h3cStorageSnap     OBJECT IDENTIFIER ::= { h3cStorageRef 2 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2007-10-25
+        -- product:
+        -- Reference:
+
+    h3cDisk     OBJECT IDENTIFIER ::= { h3cStorageRef 3 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2007-10-25
+        -- product:
+        -- Reference:
+
+    h3cRaid     OBJECT IDENTIFIER ::= { h3cStorageRef 4 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2007-10-25
+        -- product:
+        -- Reference:
+
+    h3cLogicVolume     OBJECT IDENTIFIER ::= { h3cStorageRef 5 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2007-10-25
+        -- product:
+        -- Reference:
+
+-- under huawei.h3c.h3cCommon.h3cQos2
+
+    h3cIfQos2     OBJECT IDENTIFIER ::= { h3cQos2 1 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2005-11-26
+        -- product:
+        -- Reference:
+
+    h3cCBQos2     OBJECT IDENTIFIER ::= { h3cQos2 2 }
+        -- name: longyin
+        -- id: 02874
+        -- date: 2005-11-26
+        -- product:
+        -- Reference:
+END

@@ -84,6 +84,21 @@ class ServicesTabTest extends TestCase
             ->assertInvalid(['view']);
     }
 
+    public function testLegacyDetailsLinkRendersCustomCheckGraphs(): void
+    {
+        $device = Device::factory()->create();
+        Service::factory()->for($device)->create([
+            'service_type' => 'icmp',
+            'service_ip' => null,
+            'service_ds' => '{}',
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get('/device/device=' . $device->device_id . '/tab=services/view=details')
+            ->assertOk()
+            ->assertSee('ds=rta', false);
+    }
+
     public function testUserWithoutServicePermissionGetsForbidden(): void
     {
         $device = Device::factory()->create();

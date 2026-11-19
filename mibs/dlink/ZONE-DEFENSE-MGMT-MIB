@@ -1,8 +1,8 @@
 -- -----------------------------------------------------------------------------
 -- MIB NAME : ZONE-DEFENSE-MGMT-MIB
 -- FILE NAME: ZoneDefense.mib
--- DATE     : 2013/08/22
--- VERSION  : 1.06
+-- DATE     : 2013/08/27
+-- VERSION  : 1.07
 -- PURPOSE  : To construct the MIB structure of Zone Defense function for
 --            proprietary enterprise
 -- -----------------------------------------------------------------------------
@@ -13,6 +13,9 @@
 --  [New Object]
 --  [Modification]
 -- Notes: (Requested by who and which project)
+--
+-- Revision 1.07, 2013/08/27 by Yedda Liao
+-- Add default value for swZoneDefenseStatus
 --
 -- Revision 1.06, 2013/08/22 by Tom Jin
 -- For swZoneDefenseRemains,swZoneDefenseIpRemains,
@@ -64,7 +67,7 @@ ZONE-DEFENSE-MGMT-MIB DEFINITIONS ::= BEGIN
         dlink-common-mgmt               FROM DLINK-ID-REC-MIB;
 
     swZoneDefenseMIB MODULE-IDENTITY
-          LAST-UPDATED "201308220000Z"
+          LAST-UPDATED "201308270000Z"
           ORGANIZATION "D-Link Corp."
           CONTACT-INFO
                        "http://support.dlink.com"
@@ -235,6 +238,7 @@ ZONE-DEFENSE-MGMT-MIB DEFINITIONS ::= BEGIN
         STATUS      current
         DESCRIPTION 
             "The enabled/disabled status of zone defense function."
+        DEFVAL { disabled }
         ::= { swZoneDefenseMIBObjects 3 }
 
     swZoneDefenseRemains OBJECT-TYPE

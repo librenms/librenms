@@ -803,4 +803,4 @@ page](../General/Callback-Stats-and-Privacy.md).
 
 There are [many ways to help](../Support/FAQ.md#faq9) to make LibreNMS
 better. You can also [back LibreNMS on Open
-Collective](https://t.libren.ms/donations).
+Collective](https://opencollective.com/librenms).

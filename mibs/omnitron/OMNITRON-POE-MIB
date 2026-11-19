@@ -7,11 +7,11 @@ IMPORTS
         FROM SNMPv2-TC            -- RFC-2579
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM SNMPv2-CONF          -- RFC-2580
-    omnitron, OstPortSingleIndex, OstFloatValue
-        FROM OMNITRON-TC-MIB;     -- Omnitron Enterprise Extension MIB
+    omnitron, OstPortSingleIndex, OstFloatValue, OstIpAddr
+        FROM OMNITRON-TC-MIB;     -- Omnitron Textual Convention MIB
 
 omnitronPoeMib MODULE-IDENTITY
-    LAST-UPDATED "201501191200Z"     -- January 19, 2015
+    LAST-UPDATED "201611011200Z"     -- November 1, 2016
     ORGANIZATION "Omnitron Systems Technology, Inc."
     CONTACT-INFO "Omnitron Systems Technology, Inc.
                   38 Tesla
@@ -29,15 +29,21 @@ omnitronPoeMib MODULE-IDENTITY
    International: +1 949 250 6510"
 
     DESCRIPTION
-            "Omnitron PoE MIB for use with iConverter Management Modules v5.2
+            "Omnitron PoE MIB for use with iConverter Management Modules v5.3
              and NetOutlook.
 
-             Copyright 2015 Omnitron Systems Technology, Inc.
+             Copyright 2016 Omnitron Systems Technology, Inc.
              All rights reserved.
             "
 
-    REVISION    "201501191200Z"     -- January 19, 2015
-    DESCRIPTION "Initial version of v5.2 MIB.
+    REVISION    "201611011200Z"     -- November 1, 2016
+    DESCRIPTION "Updated ostPoePortPse60wMode to ostPoePortPseMaxMode
+                 Added enumeration to ostPoePortPdMode
+                "
+
+    REVISION    "201603171200Z"  -- March 17, 2016
+    DESCRIPTION "Initial version of v5.3 MIB.
+                   Added ostPoePortHeartbeatIpAddressString
                 "
     ::= { omnitron 15 }
 
@@ -97,7 +103,7 @@ ostPoePortCfgEntry OBJECT-TYPE
 OstPoePortCfgEntry ::= SEQUENCE {
     ostPoePortCfgIndex                   OstPortSingleIndex,
     ostPoePortPseEnable                  INTEGER,
-    ostPoePortPse60wMode                 INTEGER,
+    ostPoePortPseMaxMode                 INTEGER,
     ostPoePortPdMode                     INTEGER,
     ostPoePortPseVoltageSupplied         OstFloatValue,
     ostPoePortPseCurrentSupplied         OstFloatValue,
@@ -110,7 +116,8 @@ OstPoePortCfgEntry ::= SEQUENCE {
     ostPoePortHeartbeatErrorAction       INTEGER,
     ostPoePortHeartbeatNumberRestarts    Unsigned32,
     ostPoEPortHeartbeatStatus            INTEGER,
-    ostPoEPortHeartbeatDeferTime         Unsigned32
+    ostPoEPortHeartbeatDeferTime         Unsigned32,
+    ostPoePortHeartbeatIpAddressString   OstIpAddr
     }
 
 ostPoePortCfgIndex OBJECT-TYPE
@@ -138,24 +145,31 @@ ostPoePortPseEnable OBJECT-TYPE
     DEFVAL { pseEnabled }
     ::= { ostPoePortCfgEntry 2 }
 
-ostPoePortPse60wMode OBJECT-TYPE
+ostPoePortPseMaxMode OBJECT-TYPE
     SYNTAX      INTEGER {
-        pse60wNotAvail (0),
-        pse60wAuto     (1),
-        pse60wForce    (2)
+        pseMaxNotAvail (0),
+        pseMaxAuto     (1),
+        pseMaxForce    (2)
     }
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-       "The object is the PoE PSE 60W mode enable. This is the same control as
+       "The object is the PoE maximum mode enable. This is the same control as
         the physical DIP switch.
 
-        pse60wNotAvail           PSE 60W function not available
-        pse60wAuto(1)            PSE 60W auto mode enabled
-        pse60wForce(2)           PSE 60W force mode enabled
+        pseMaxNotAvail           PSE maximum mode function not available
+        pseMaxAuto(1)            PSE maximum mode auto enabled
+        pseMaxForce(2)           PSE maximum mode force enabled
+        
+        The maximum power supplied is dependent upon the part number. For instance:
+          '8991S' devices can supply a maximum power of 30W
+          '8991T' devices can supply a maximum power of 60W
+          '8991U' devices can supply a maximum power of 75W
+          '8991V' devices can supply a maximum power of 90W
        "
-    DEFVAL { pse60wAuto }
+    DEFVAL { pseMaxAuto }
     ::= { ostPoePortCfgEntry 3 }
+
 
 ostPoePortPdMode OBJECT-TYPE
     SYNTAX      INTEGER {
@@ -167,7 +181,9 @@ ostPoePortPdMode OBJECT-TYPE
         pdModeClass2         (6),
         pdModeClass3         (7),
         pdModeClass4         (8),
-        pdMode60W            (9)
+        pdMode60W            (9),
+        pdMode75W            (10),
+        pdMode90W            (11)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -183,6 +199,8 @@ ostPoePortPdMode OBJECT-TYPE
         pdModeClass3(7)          PD is 802.3af Class 3 15W device
         pdModeClass4(8)          PD is 802.3at Class 4 30W device
         pdMode60W(9)             PD is 60W device
+        pdMode75W(10)            PD is 75W device
+        pdMode90W(11)            PD is 90W device
        "
     DEFVAL { pdModeNotDetected }
     ::= { ostPoePortCfgEntry 4 }
@@ -253,7 +271,13 @@ ostPoePortHeartbeatIpAddress OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-       "This object is the PoE PD heartbeat IP address to ping.
+       "This object is the PoE PD heartbeat IPv4 address to ping.
+
+        Setting this object also impacts the ostPoePortHeartbeatIpAddressString
+        returned value. If an IPv4 address is written to this object the
+        two objects return the same value. If ostPoePortHeartbeatIpAddressString
+        is set with an IPv6 address then ostPoePortHeartbeatIpAddress returns
+        an all zeros value.
        "
     DEFVAL { '00000000'H }
     ::= { ostPoePortCfgEntry 9 }
@@ -351,6 +375,21 @@ ostPoEPortHeartbeatDeferTime OBJECT-TYPE
     DEFVAL { 5 }
     ::= { ostPoePortCfgEntry 15 }
 
+ostPoePortHeartbeatIpAddressString OBJECT-TYPE
+    SYNTAX      OstIpAddr
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is the PoE PD heartbeat IPv4 or IPv6 address to ping.
+
+        Setting this object also impacts the ostPoePortHeartbeatIpAddress
+        returned value. If an IPv4 address is written to this object the
+        two objects return the same value. If this object is set with an IPv6
+        address then ostPoePortHeartbeatIpAddress returns an all zeros value.
+       "
+    DEFVAL { "::" }
+    ::= { ostPoePortCfgEntry 16 }
+
 
 --------------------------------------------------------------------------------
 -- Conformance Information
@@ -368,7 +407,7 @@ ostPoeGroup OBJECT-GROUP
         ostPoeGlobalCfgTotalPwr,
 
         ostPoePortPseEnable,
-        ostPoePortPse60wMode,
+        ostPoePortPseMaxMode,
         ostPoePortPdMode,
         ostPoePortPseVoltageSupplied,
         ostPoePortPseCurrentSupplied,
@@ -381,7 +420,8 @@ ostPoeGroup OBJECT-GROUP
         ostPoePortHeartbeatErrorAction,
         ostPoePortHeartbeatNumberRestarts,
         ostPoEPortHeartbeatStatus,
-        ostPoEPortHeartbeatDeferTime
+        ostPoEPortHeartbeatDeferTime,
+        ostPoePortHeartbeatIpAddressString
     }
     STATUS      current
     DESCRIPTION

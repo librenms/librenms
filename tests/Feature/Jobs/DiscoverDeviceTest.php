@@ -5,7 +5,6 @@ namespace LibreNMS\Tests\Feature\Jobs;
 use App\Actions\Device\CheckDeviceAvailability;
 use App\Events\DiscoveringModule;
 use App\Exceptions\DiscoveryFailedException;
-use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Jobs\DiscoverDevice;
 use App\Jobs\DispatchPollingWork;
@@ -21,6 +20,7 @@ use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Tests\DBTestCase;
 use LibreNMS\Tests\Traits\FakesPollingMethods;
 use LibreNMS\Util\ModuleList;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class DiscoverDeviceTest extends DBTestCase
 {
@@ -76,26 +76,33 @@ final class DiscoverDeviceTest extends DBTestCase
         $this->assertNotNull($device->last_discovered_timetaken);
     }
 
-    public function testOnlyEnabledModulesAreDiscovered(): void
+    #[DataProvider('deviceModuleSettings')]
+    public function testDeviceModuleSettingOverridesPollingMethod(?int $setting, bool $expected): void
     {
         Event::fake([DiscoveringModule::class]);
         LibrenmsConfig::set('discovery_modules', ['mempools' => false]);
         $device = Device::factory()->create(['hostname' => '192.0.2.1', 'status' => 1]);
         DevicePollingMethod::factory()->for($device)->create(['method_type' => PollingMethodType::UnixAgent]);
+        if ($setting !== null) {
+            $device->setAttrib('discover_mempools', $setting);
+        }
         $this->fakeAvailability(true);
         $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => $this->agentMemOutput(100, 50)]);
 
         new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([]))->handle();
 
-        Event::assertNotDispatched(DiscoveringModule::class, fn (DiscoveringModule $event): bool => $event->module === 'mempools');
-        $this->assertSame(0, $device->mempools()->count());
+        $events = Event::dispatched(DiscoveringModule::class, fn (DiscoveringModule $event): bool => $event->module === 'mempools');
+        $this->assertCount($expected ? 1 : 0, $events);
+        $this->assertSame($expected ? 1 : 0, $device->mempools()->count());
+    }
 
-        $device->setAttrib('discover_mempools', 1);
-        DeviceCache::flush(); // the job loads the device again in a new run
-        new DiscoverDevice($device->device_id, ModuleList::fromUserOverrides([]))->handle();
-
-        Event::assertDispatched(DiscoveringModule::class, fn (DiscoveringModule $event): bool => $event->module === 'mempools');
-        $this->assertSame(1, $device->mempools()->count());
+    public static function deviceModuleSettings(): array
+    {
+        return [
+            'polling method enables globally disabled module' => [null, true],
+            'device disables module enabled by polling method' => [0, false],
+            'device explicitly enables module' => [1, true],
+        ];
     }
 
     public function testDeletedDeviceIsSkipped(): void

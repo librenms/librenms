@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'auth:test' => [
+        'description' => 'Test authentication and diagnose login failures',
+        'arguments' => [
+            'username' => 'Username to authenticate',
+        ],
+    ],
     'errors' => [
         'db_connect' => 'Failed to connect to the database. Check that the database service runs and that the connection settings are correct.',
         'db_auth' => 'Failed to connect to the database. Check the credentials: :error',

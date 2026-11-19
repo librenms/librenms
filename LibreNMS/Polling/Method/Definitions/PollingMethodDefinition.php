@@ -25,14 +25,25 @@ abstract class PollingMethodDefinition implements HasFieldSchema
      */
     public function settingsFields(array $defaults, string $dataVar = 'settingsData', ?string $secretTypeVar = null): array
     {
-        return collect($this->fields())->map(function (FieldDefinition $field, string $key) use ($defaults, $dataVar, $secretTypeVar): array {
+        $fields = $this->fields();
+
+        return collect($fields)->map(function (FieldDefinition $field, string $key) use ($fields, $defaults, $dataVar, $secretTypeVar): array {
             $schemaField = $field->toSchemaField($dataVar);
             unset($schemaField['default']); // empty means default, never preselect it
             $default = $defaults[$key] ?? null;
 
             if ($secretTypeVar !== null && $field->secretTypes !== null) {
-                $forType = '(!' . $secretTypeVar . ' || ' . json_encode(array_column($field->secretTypes, 'value')) . '.includes(' . $secretTypeVar . '))';
+                $forType = $this->forSecretTypesExpression($field, $secretTypeVar);
                 $schemaField['visible_if_expression'] = $schemaField['visible_if_expression'] ? "{$schemaField['visible_if_expression']} && $forType" : $forType;
+            }
+
+            // a condition on a field that is not used with the secret type does not match
+            if ($secretTypeVar !== null && $schemaField['fixed_if_expression'] !== null) {
+                foreach (array_keys($field->fixedIf ?? []) as $conditionKey) {
+                    if (isset($fields[$conditionKey]) && $fields[$conditionKey]->secretTypes !== null) {
+                        $schemaField['fixed_if_expression'] .= ' && ' . $this->forSecretTypesExpression($fields[$conditionKey], $secretTypeVar);
+                    }
+                }
             }
 
             if ($field->type === 'select') {
@@ -49,6 +60,29 @@ abstract class PollingMethodDefinition implements HasFieldSchema
 
             return $schemaField;
         })->values()->all();
+    }
+
+    /**
+     * JS expression that is true when the secret type is unknown or one the field is used with.
+     */
+    private function forSecretTypesExpression(FieldDefinition $field, string $secretTypeVar): string
+    {
+        return '(!' . $secretTypeVar . ' || ' . json_encode(array_column($field->secretTypes ?? [], 'value')) . '.includes(' . $secretTypeVar . '))';
+    }
+
+    /**
+     * The values of the form fields for stored settings, empty for those not set.
+     * Select options are strings, so a stored bool has to become its option to be selected.
+     *
+     * @param  array<string, mixed>  $settings
+     * @return array<string, mixed>
+     */
+    public function formValues(array $settings): array
+    {
+        return array_map(
+            fn (mixed $value): mixed => is_bool($value) ? ($value ? '1' : '0') : $value,
+            [...array_fill_keys(array_keys($this->fields()), ''), ...$settings],
+        );
     }
 
     /**

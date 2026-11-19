@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing imports)
 ES4552BH2-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -28,7 +29,9 @@ IMPORTS
         BridgeId, Timeout, dot1dStpPort,dot1dStpPortEntry
                 FROM BRIDGE-MIB
         TOSType,Metric
-                FROM OSPF-MIB;
+                FROM OSPF-MIB
+    pethMainPseEntry, pethPsePortEntry
+        FROM POWER-ETHERNET-MIB;
 
 accton              OBJECT IDENTIFIER ::= { enterprises 259 }
 snmpMgt             OBJECT IDENTIFIER ::= { accton 6 }

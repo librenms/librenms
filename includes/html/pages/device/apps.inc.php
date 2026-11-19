@@ -38,10 +38,10 @@ foreach ($apps as $current_app) {
     } else {
         $text = '';
     }
-    $text .= $current_app->displayName();
+    $text .= e($current_app->displayName());
 
     if (! empty($current_app->app_instance)) {
-        $text .= '(' . $current_app->app_instance . ')';
+        $text .= '(' . e($current_app->app_instance) . ')';
         $link_add['instance'] = $current_app->app_id;
     }
 

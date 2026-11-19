@@ -1,3 +1,4 @@
+
 POWERSUPPLY-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -10,26 +11,46 @@ IMPORTS
     SnmpAdminString
         FROM SNMP-FRAMEWORK-MIB
 
-    TEXTUAL-CONVENTION
+    TEXTUAL-CONVENTION, DisplayString,
+       MacAddress, TruthValue
         FROM SNMPv2-TC
 
+    entPhysicalIndex
+            FROM ENTITY-MIB
+
     hpSwitch 
-        FROM HP-ICF-OID; 
+        FROM HP-ICF-OID;
 
 hpicfPsMIB MODULE-IDENTITY
-    LAST-UPDATED "200808271000Z" --August 27, 2008 10:00 GMT
+    LAST-UPDATED "201308200000Z" --August 20, 2013 00:00 GMT  
     ORGANIZATION "HP Networking"
     CONTACT-INFO "Hewlett-Packard Company
                   8000 Foothills Blvd.
                   Roseville, CA 95747"
-    DESCRIPTION  "This MIB module is for representing 
+    DESCRIPTION  "This MIB module is for representing
                   switch power supply entity."
+
+
+    REVISION     "201308200000Z" --August 20, 2013 00:00 GMT
+    DESCRIPTION  "Modified enumerated values of hpicfXpsZoneStatus."
+
+    REVISION     "201306130000Z" --June 13, 2013 
+    DESCRIPTION  "Added hpicfPsModel, hpicfPsGroup1 and 
+                  hpicfPsCompliance1. Deprecated hpicfPsGroup
+                  and hpicfPsCompliance."
+                  
+
+    REVISION     "201303071000Z" --March 07, 2013 10:00 GMT
+    DESCRIPTION  "Added hpicfXpsTable,hpicfXpsSwitchConfigTable,
+                  hpicfXpsZoneTable,tables hpicfXpsCompliance,
+                  hpicfXpsZoneCompliance"
+
     REVISION     "200808271000Z" --August 27, 2008 10:00 GMT
     DESCRIPTION  "Initial Version of Power Supply MIB, Version 1"
+
     ::= { hpSwitch 55 }
 
 hpicfEntityPs OBJECT IDENTIFIER ::= { hpicfPsMIB 1 }
-
 -- ********************************************************************
 --  POWER SUPPLY Textual Conventions
 -- ********************************************************************
@@ -50,8 +71,41 @@ HpicfDcPsState ::= TEXTUAL-CONVENTION
        psPowered(3),
        psFailed(4),
        psPermFailure(5),    
-       psMax(6)
+       psMax(6),
+       psAuxFailure(7),
+       psNotPowered(8),
+       psAuxNotPowered(9)
     }
+
+HpicfXpsConnectionStatus  ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION   "An enumerated value which provides the state of the
+                   connection between the switch and external power supply."
+    SYNTAX        INTEGER  {
+       notConnected(0),
+       unavailable(1),
+       available(2),
+       active(3),
+       mismatch(4),       
+       notReady(5),
+       overCurrent(6),
+       cannotPower(7),
+       autoDisabled(8)            
+}
+
+HpicfXpsZoneStatus  ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION   "An enumerated value which provides the state of the
+                  current zone of the external power supply."
+
+    SYNTAX INTEGER {
+      notConnected(1),
+      notReady(2),
+      faulted(3),
+      powered(4),
+      inReset(5)
+}
+
 
 hpicfPsTable     OBJECT-TYPE
     SYNTAX       SEQUENCE OF HpicfPsEntry
@@ -77,7 +131,8 @@ HpicfPsEntry ::= SEQUENCE {
       hpicfPsVoltageInfo         SnmpAdminString,
       hpicfPsWattageCur          Integer32,
       hpicfPsWattageMax          Integer32,
-      hpicfPsLastCall            Counter32
+      hpicfPsLastCall            Counter32,
+      hpicfPsModel               DisplayString
 }
 
 hpicfPsBayNum        OBJECT-TYPE
@@ -130,12 +185,481 @@ hpicfPsWattageMax   OBJECT-TYPE
     DESCRIPTION     "The maximum wattage of the power supply."
     ::= { hpicfPsEntry 7 }
 
-hpicfPsLastCall  OBJECT-TYPE
-    SYNTAX       Counter32 
+hpicfPsLastCall     OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of seconds since the switch power supply is up."
+    ::= { hpicfPsEntry 8 }
+
+ hpicfPsModel OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE(1..32))
     MAX-ACCESS   read-only
     STATUS       current
-    DESCRIPTION  "The number of seconds since the switch power supply is up."
-    ::= { hpicfPsEntry 8 }
+    DESCRIPTION  "This object provides the model number of the
+                  power supply unit and it is specified as the 
+                  Jnumber."
+    ::= {  hpicfPsEntry  9 }
+
+
+hpicfXpsTable       OBJECT-TYPE
+    SYNTAX          SEQUENCE OF HpicfXpsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This table contains one row per  port of this
+                     zone of the external power supply."
+    ::= { hpicfEntityPs 2 }
+
+hpicfXpsEntry       OBJECT-TYPE
+    SYNTAX          HpicfXpsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Information about all the ports on the external power supply. 
+                     On a stack, each member can be connected to the one of the 
+                     ports of the external power supply. With entPhysicalIndex, 
+                     the information about the required member can be obtained."
+    INDEX          { entPhysicalIndex , hpicfXpsConnectingPort}
+
+    ::= { hpicfXpsTable 1 }
+
+
+HpicfXpsEntry ::= SEQUENCE {
+      hpicfXpsConnectingPort       Unsigned32,
+      hpicfXpsPortOperStatus       INTEGER,
+      hpicfXpsSwitchSerialNo       DisplayString,
+      hpicfXpsConnectionState      HpicfXpsConnectionStatus,
+      hpicfXpsSysName              DisplayString,
+      hpicfXpsMACAddress           MacAddress,
+      hpicfXpsSwitchOSVersion      DisplayString,
+      hpicfXpsSwitchIpsVoltage     Unsigned32,
+      hpicfXpsSwitchIpsWattage     Unsigned32,
+      hpicfXpsPower                Unsigned32,
+      hpicfXpsSupportedCableVersion Unsigned32,
+      hpicfXpsSupportedZoneVersion  Unsigned32,
+      hpicfXpsSwitchModType         DisplayString
+}
+
+hpicfXpsConnectingPort OBJECT-TYPE
+   SYNTAX               Unsigned32
+   MAX-ACCESS           not-accessible
+   STATUS               current
+   DESCRIPTION          "This is the port which connects the switch to the
+                         current zone of the external power supply. External power 
+                         supply has 3 zones. In zone 1, user can connect upto 4 
+                         switches. In zones 2 and 3, user can connect upto 2 
+                         switches each."
+   ::= { hpicfXpsEntry 1}
+
+hpicfXpsPortOperStatus OBJECT-TYPE
+   SYNTAX               INTEGER {
+                           enable(1),
+                           disable(2)
+                        }
+   MAX-ACCESS           read-only
+   STATUS               current
+   DESCRIPTION          "Operating status of the port which connects the 
+                         switch to the external power supply . By default, 
+                         all the ports are enabled."
+   DEFVAL            {enable}
+
+   ::= { hpicfXpsEntry 2}
+
+hpicfXpsSwitchSerialNo  OBJECT-TYPE
+   SYNTAX               DisplayString
+   MAX-ACCESS           read-only
+   STATUS               current
+   DESCRIPTION          "This is the serial number of the switch
+                         connected to the current port of the external
+                         power supply."
+   ::= { hpicfXpsEntry 3}
+
+hpicfXpsConnectionState OBJECT-TYPE
+   SYNTAX               HpicfXpsConnectionStatus
+   MAX-ACCESS           read-only
+   STATUS               current
+   DESCRIPTION          "The connection status between the external
+                        power supply and the switch."
+   ::= { hpicfXpsEntry 4}
+
+
+hpicfXpsSysName         OBJECT-TYPE
+   SYNTAX               DisplayString
+   MAX-ACCESS           read-only
+   STATUS               current
+   DESCRIPTION          "This indicates the name of the system 
+                        connected to the current port of the external
+                        power supply."
+   ::= { hpicfXpsEntry 5}
+
+hpicfXpsMACAddress      OBJECT-TYPE
+   SYNTAX               MacAddress
+   MAX-ACCESS           read-only
+   STATUS               current
+   DESCRIPTION           "MAC address of the switch connected to the 
+                          current port of the external power supply."   
+   ::= { hpicfXpsEntry 6 }
+
+hpicfXpsSwitchOSVersion OBJECT-TYPE
+   SYNTAX               DisplayString
+   MAX-ACCESS           read-only
+   STATUS               current
+   DESCRIPTION          "This MIB object specifies the OS version of the switch 
+                         connected to the current port of the external power 
+                         supply."
+      ::= { hpicfXpsEntry 7}
+
+hpicfXpsSwitchIpsVoltage OBJECT-TYPE
+   SYNTAX                Unsigned32
+   UNITS                 "Volts"
+   MAX-ACCESS            read-only
+   STATUS                current
+   DESCRIPTION           "Internal power supply voltage of the switch 
+                          connected to this port of the external power supply."
+   ::= { hpicfXpsEntry 8}
+
+hpicfXpsSwitchIpsWattage OBJECT-TYPE
+   SYNTAX                Unsigned32
+   UNITS                 "Watts"
+   MAX-ACCESS            read-only
+   STATUS                current
+   DESCRIPTION           "Internal power supply wattage of the switch 
+                          connected to this port of the external power supply."   
+   ::= { hpicfXpsEntry 9}
+
+
+hpicfXpsPower            OBJECT-TYPE
+   SYNTAX                Unsigned32
+   UNITS                 "Watts"
+   MAX-ACCESS            read-only
+   STATUS                current
+   DESCRIPTION           "The power allocated from the external power supply to
+                          the switch connected to this port. External power is 
+                          available when both the internal power supply and 
+                          external power supply are operational. The amount of
+                          available external power is dependent on the external
+                          power supply and the power domain configuration."
+   ::= { hpicfXpsEntry 10}
+
+hpicfXpsSupportedCableVersion OBJECT-TYPE
+   SYNTAX                     Unsigned32
+   MAX-ACCESS                 read-only
+   STATUS                     current
+   DESCRIPTION                "Cable record version supported by the switch software of 
+                               the switch connected to the current cable. This object 
+                               will be useful for debugging when switches connected 
+                               to a common zone has different versions."
+
+   ::= { hpicfXpsEntry 11}
+
+hpicfXpsSupportedZoneVersion OBJECT-TYPE
+   SYNTAX                  Unsigned32
+   MAX-ACCESS              read-only
+   STATUS                  current
+   DESCRIPTION             "Zone record version supported by the switch software of the 
+                            switch connected to the current port of the external power supply. 
+                            Configurations are not allowed if there is any mismatch between 
+                            supported zone version and hpicfXpsZoneRecordVersion."
+   ::= { hpicfXpsEntry 12}
+
+hpicfXpsSwitchModType OBJECT-TYPE
+   SYNTAX               DisplayString
+   MAX-ACCESS           read-only
+   STATUS               current
+   DESCRIPTION          "J number of the switch connected to the current cable of
+                         external power supply."
+   ::= { hpicfXpsEntry 13}
+
+hpicfXpsSwitchConfigTable   OBJECT-TYPE
+    SYNTAX            SEQUENCE OF HpicfXpsSwitchConfigEntry
+    MAX-ACCESS        not-accessible
+    STATUS            current
+    DESCRIPTION       "This table contains one row per system which is
+                       connected to the external power supply."
+    ::= { hpicfEntityPs 3 }
+
+hpicfXpsSwitchConfigEntry  OBJECT-TYPE
+    SYNTAX                 HpicfXpsSwitchConfigEntry
+    MAX-ACCESS             not-accessible
+    STATUS                 current
+    DESCRIPTION            "This provides the configuration information 
+                            of the switch that is connected to external 
+                           power supply."
+    INDEX             { entPhysicalIndex }
+    ::= { hpicfXpsSwitchConfigTable 1 }
+
+
+HpicfXpsSwitchConfigEntry ::= SEQUENCE {
+        hpicfXpsSwitchAdminStatus    INTEGER,
+        hpicfXpsSwitchAutoRecovery   INTEGER,
+        hpicfXpsAllowPortsSupported  Unsigned32,
+        hpicfXpsReset                INTEGER,
+        hpicfXpsType                 OCTET STRING,
+        hpicfXpsSerialNum            SnmpAdminString,
+        hpicfXpsModuleName           SnmpAdminString,
+        hpicfXpsPowerShareReqStatus  INTEGER,
+        hpicfXpsResetReqStatus       INTEGER
+     }      
+
+hpicfXpsSwitchAdminStatus OBJECT-TYPE
+   SYNTAX                INTEGER {
+                         enable(1),
+                         disable(2)
+                         }
+   MAX-ACCESS            read-write
+   STATUS                current
+   DESCRIPTION          "Administrative status of the switch that is connected
+                         to the external power supply.By default, the status is 
+                         enabled and the switch will receive backup power and 
+                         additional PoE power upon connecting to the external power 
+                         supply."
+   DEFVAL                {enable}
+   ::= {hpicfXpsSwitchConfigEntry 1 }
+
+hpicfXpsSwitchAutoRecovery OBJECT-TYPE
+   SYNTAX                  INTEGER {
+                           yes(1),
+                           no(2)
+                           }
+   MAX-ACCESS              read-write
+   STATUS                  current
+   DESCRIPTION             "The status of external power supply auto recovery on
+                            the switch that is currently connected to the external 
+                            power supply.By default, auto-recovery feature is enabled 
+                            on the switch and there is automatic recovery after 
+                            after  external power supply reboot or after external 
+                            power supply  becomes available."
+   DEFVAL                  {yes}
+   ::= { hpicfXpsSwitchConfigEntry 2}
+
+hpicfXpsAllowPortsSupported  OBJECT-TYPE
+   SYNTAX                    Unsigned32(2..4)
+   MAX-ACCESS                read-write
+   STATUS                    current
+   DESCRIPTION               "From this object, the amount of PoE power
+                              allocated to the current switch can be reduced, 
+                              which might turn off some of the low priority PoE
+                              ports. This object can be set only on a PoE switch.
+                              When the new switch is being added to the current zone
+                              of the external power supply , the amount of
+                              external power allocated for this switch will be
+                              reduced. This object will make sure that the PoE ports
+                              that will be powered by the new power will not be
+                              impacted when the power share map is changed.
+                              This object always returns 0 on read operation.
+                              The set request for this object is blocked if any 
+                              external power supply configuration is in progress."
+   ::= { hpicfXpsSwitchConfigEntry 3}
+
+hpicfXpsReset    OBJECT-TYPE
+   SYNTAX        INTEGER {
+                 noReset(1),
+                 factoryReset(2)
+                 }
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION   "This object indicates the type of reset operation
+                  that will be performed on the current zone of the
+                  external power supply. All the configurations can be
+                  restored to factory default settings with 'factoryReset'
+                  option, which might turn off some of the low Priority
+                  powered PoE ports. The set request for this object is blocked 
+                  if any external power supply configuration is in progress.
+                  Set request for this object will take longer time for 
+                  completion. Status of a successful set request can be read 
+                  from hpicfXpsResetReqStatus  object."
+   ::= { hpicfXpsSwitchConfigEntry 4}                              
+
+
+hpicfXpsType     OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE(0..255))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The name of the external power supply."
+    ::= { hpicfXpsSwitchConfigEntry 5 }
+
+hpicfXpsSerialNum OBJECT-TYPE
+    SYNTAX        SnmpAdminString 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The serial number of the external power supply."
+    ::= { hpicfXpsSwitchConfigEntry 6 }   
+
+hpicfXpsModuleName OBJECT-TYPE
+    SYNTAX         SnmpAdminString
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "This indicates the J number of the external 
+                    power supply."
+
+    ::= { hpicfXpsSwitchConfigEntry 7 }
+
+hpicfXpsPowerShareReqStatus OBJECT-TYPE
+      SYNTAX     INTEGER {
+         idle(1),
+         inProgress(2),
+         success(3),
+         failed(4)
+         }
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION  "Status of the external power supply power share request.
+                    Set requests for hpicfXpsPowerDistMap will take longer 
+                    time for completion.This object can be used to get the
+                    status of the set request. The following are the possible 
+                    values for the object:
+
+               idle - no set request has been issued.   
+               inProgress - configuration request is being processed.
+               success - configuration request is successful.
+               failed - configuration request failed. "
+      ::= { hpicfXpsSwitchConfigEntry 8}
+
+hpicfXpsResetReqStatus OBJECT-TYPE
+      SYNTAX     INTEGER {
+         idle(1),
+         inProgress(2),
+         success(3),
+         failed(4)
+         }
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION  "Status of the external power supply reset request.
+                    Set requests for hpicfXpsReset will take longer time for completion. 
+                    This object can be used to get the status of the set request. The following 
+                    are the possible values for the object:
+
+               idle - no set request has been issued.
+               inProgress - configuration request is being processed.
+               success - configuration request is successful.
+               failed - configuration request failed. "
+      ::= { hpicfXpsSwitchConfigEntry 9} 
+
+hpicfXpsZoneTable    OBJECT-TYPE
+    SYNTAX       	SEQUENCE OF HpicfXpsZoneEntry
+    MAX-ACCESS   	not-accessible
+    STATUS       	current
+    DESCRIPTION  	"This table contains one row per zone of the external
+				 power supply."
+    ::= { hpicfEntityPs 4 }
+
+hpicfXpsZoneEntry    OBJECT-TYPE
+    SYNTAX      	HpicfXpsZoneEntry
+    MAX-ACCESS  	not-accessible
+    STATUS      	current
+    DESCRIPTION 	"Information about this zone of external power supply."
+    INDEX   		{ entPhysicalIndex }
+    ::= { hpicfXpsZoneTable 1 }
+
+
+HpicfXpsZoneEntry ::= SEQUENCE {
+      hpicfXpsZoneNo              Unsigned32,
+      hpicfXpsZoneState           HpicfXpsZoneStatus,
+      hpicfXpsZonePowerShareMap   OCTET STRING,
+      hpicfXpsZoneVoltage         Unsigned32,
+      hpicfXpsZoneWattage         Unsigned32,
+      hpicfXpsPSURev              Unsigned32,
+      hpicfXpsPSUModule           SnmpAdminString,
+      hpicfXpsZonePowerShareForce TruthValue,
+      hpicfXpsZoneRecordVersion   Unsigned32
+      } 
+
+hpicfXpsZoneNo        OBJECT-TYPE
+    SYNTAX            Unsigned32 (1..3)
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION       "This indicates the zone number of the external power
+                       supply. The external power supply  has 3 zones."
+
+::= { hpicfXpsZoneEntry 1}
+
+hpicfXpsZoneState     OBJECT-TYPE
+    SYNTAX            HpicfXpsZoneStatus
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION       "Physical state of the current zone of the external
+                       power supply."
+::= { hpicfXpsZoneEntry 2}
+
+hpicfXpsZonePowerShareMap     OBJECT-TYPE
+    SYNTAX                   OCTET STRING(SIZE(0..255))
+    MAX-ACCESS               read-write
+    STATUS                   current
+    DESCRIPTION              "This indicates the power share map on the
+                              current zone. The map indicates the ports on the
+                              external power supply that is configured to deliver
+                              power to the connected switches. Zone 1 has 4 ports:
+                              A-D. Zone 2 and 3 have only 2 ports: A-B. Within
+                              the map, the most significant bit represents port D
+                              And the least significant bit represents port A.
+                              If a bit is set to 1, then the given port is enabled
+                              on this zone. By default, all the bits are enabled
+                              in this map.Set requests for this object will take 
+                              longer time for completion. Status of the set request
+                              can be read from hpicfXpsPowerShareReqStatus object.
+                              Modifications to power share map needs additional 
+                              force option which depends on
+                              hpicfXpsZonePowerShareForce."
+::= { hpicfXpsZoneEntry 3}
+
+hpicfXpsZoneVoltage   OBJECT-TYPE
+    SYNTAX             Unsigned32
+    UNITS              "Volts"
+    MAX-ACCESS         read-only
+    STATUS             current
+    DESCRIPTION        "The voltage information of the external power supply in
+                        this zone."
+::= { hpicfXpsZoneEntry 4}
+
+hpicfXpsZoneWattage    OBJECT-TYPE
+    SYNTAX             Unsigned32
+    UNITS              "Watts"
+    MAX-ACCESS         read-only
+    STATUS             current
+    DESCRIPTION        "The wattage information of the current zone of the
+                        external power supply."
+::= { hpicfXpsZoneEntry 5}
+
+hpicfXpsPSURev  OBJECT-TYPE
+    SYNTAX            Unsigned32
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION       "This indicates the revision number of the power supply
+                       unit that resides in this zone."
+::= { hpicfXpsZoneEntry 6}
+
+hpicfXpsPSUModule  OBJECT-TYPE
+    SYNTAX            SnmpAdminString
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION       "This indicates the J number of the power supply
+                       unit that resides in this zone."
+::= { hpicfXpsZoneEntry 7}
+
+hpicfXpsZonePowerShareForce  OBJECT-TYPE
+    SYNTAX            TruthValue
+    MAX-ACCESS        read-write
+    STATUS            current
+    DESCRIPTION       "When this option is set as true then hpicfXpsZonePowerShar
+                       will change in un-graceful manner where all low priority P
+                       devices connected to these ports will be shut-down tempora
+                       When this option is set as false then hpicfXpsZonePowerSha
+                       will change in graceful manner where low priority POE devi
+                       connected to it will not be affected. Walkmib or getmib on
+                       will always return false."
+
+::= { hpicfXpsZoneEntry 8}
+
+hpicfXpsZoneRecordVersion OBJECT-TYPE
+   SYNTAX                  Unsigned32
+   MAX-ACCESS              read-only
+   STATUS                  current
+   DESCRIPTION             "Zone record version of the current zone of external power supply.
+                            This object is needed for debugging purpose when there is a 
+                            difference between hpicfXpsSupportedZoneVersion and this object. 
+                            Configurations are not allowed if there is any mismatch between 
+                            hpicfXpsSupportedZoneVersion and this object."
+::= { hpicfXpsZoneEntry 9}
+
 
 -- ********************************************************************
 -- POWER SUPPLY Conformance
@@ -148,7 +672,7 @@ hpicfPsLastCall  OBJECT-TYPE
 -- POWER SUPPLY Complicance
 -- ********************************************************************
    hpicfDcPsCompliance MODULE-COMPLIANCE
-      STATUS       current
+      STATUS       deprecated
       DESCRIPTION
          "The compliance statement for entries which implement the
           POWER SUPPLY MIB."
@@ -159,7 +683,49 @@ hpicfPsLastCall  OBJECT-TYPE
       }
       GROUP        hpicfPsGroup
       DESCRIPTION  "Objects associated with Entity POWER SUPPLY."
-      ::= { hpicfPsCompliance 1 } 
+      ::= { hpicfPsCompliance 1 }
+
+   hpicfXpsCompliance MODULE-COMPLIANCE
+      STATUS       current
+      DESCRIPTION    "The compliance statement for the external power 
+                      supply mib."
+      MODULE
+      MANDATORY-GROUPS
+      {
+         hpicfXpsGroup
+      }
+      GROUP        hpicfXpsGroup
+      DESCRIPTION  "Objects associated with the external power 
+                    supply."
+      ::= { hpicfPsCompliance 2 }
+
+   hpicfXpsZoneCompliance MODULE-COMPLIANCE
+      STATUS       current
+      DESCRIPTION    "The compliance statement for the zone MIB."
+      MODULE
+      MANDATORY-GROUPS
+      {
+         hpicfXpsZoneGroup
+      }
+      GROUP        hpicfXpsZoneGroup
+      DESCRIPTION  "zone objects associated with the external power 
+                supply."
+      ::= { hpicfPsCompliance 3 }
+
+   hpicfDcPsCompliance1 MODULE-COMPLIANCE
+      STATUS       current
+      DESCRIPTION
+         "The compliance statement for entries which implement the
+          POWER SUPPLY MIB."
+      MODULE
+      MANDATORY-GROUPS
+      {
+         hpicfPsGroup1
+      }
+      GROUP        hpicfPsGroup1
+      DESCRIPTION  "Objects associated with Entity POWER SUPPLY."
+      ::= { hpicfPsCompliance 4 }
+
 
 --
 -- POWER SUPPLY Groups
@@ -175,7 +741,72 @@ hpicfPsLastCall  OBJECT-TYPE
          hpicfPsWattageMax,
          hpicfPsLastCall
       }
-      STATUS      current
+      STATUS      deprecated
       DESCRIPTION "POWER SUPPLY parameters "
       ::= { hpicfPsGroups 1 }
+
+   hpicfXpsGroup OBJECT-GROUP
+      OBJECTS
+      {
+         hpicfXpsPortOperStatus,
+         hpicfXpsSwitchSerialNo,
+         hpicfXpsConnectionState,
+         hpicfXpsSysName,
+         hpicfXpsMACAddress,
+         hpicfXpsSwitchOSVersion,
+         hpicfXpsSwitchIpsVoltage,
+         hpicfXpsSwitchIpsWattage,
+         hpicfXpsPower,
+         hpicfXpsSwitchAdminStatus,    
+         hpicfXpsSwitchAutoRecovery,
+         hpicfXpsAllowPortsSupported,
+         hpicfXpsReset,
+         hpicfXpsType,
+         hpicfXpsSerialNum,
+         hpicfXpsModuleName,
+         hpicfXpsPowerShareReqStatus,
+         hpicfXpsResetReqStatus,
+         hpicfXpsSupportedCableVersion,
+         hpicfXpsSupportedZoneVersion,
+         hpicfXpsSwitchModType
+      }
+      STATUS      current
+      DESCRIPTION "External power supply parameters."
+      ::= { hpicfPsGroups 2 }
+
+     hpicfXpsZoneGroup OBJECT-GROUP
+        OBJECTS
+        {
+            hpicfXpsZoneNo,
+            hpicfXpsZoneState,
+            hpicfXpsZonePowerShareMap,
+            hpicfXpsZoneVoltage,
+            hpicfXpsZoneWattage,
+            hpicfXpsPSURev,
+            hpicfXpsPSUModule,
+            hpicfXpsZonePowerShareForce,
+            hpicfXpsZoneRecordVersion
+        }
+     STATUS      current
+     DESCRIPTION "External power supply zone parameters "
+     ::= { hpicfPsGroups 3 }
+
+     hpicfPsGroup1 OBJECT-GROUP
+      OBJECTS
+      {
+         hpicfPsState,
+         hpicfPsFailures,
+         hpicfPsTemp,
+         hpicfPsVoltageInfo,
+         hpicfPsWattageCur,
+         hpicfPsWattageMax,
+         hpicfPsLastCall,
+         hpicfPsModel 
+      }
+      STATUS      current
+      DESCRIPTION "A collection of objects providing 
+                   information about the power supply unit."
+      ::= { hpicfPsGroups 4 }
+
+ 
 END

@@ -14,7 +14,7 @@
                     "os": "secureplatform",
                     "type": "firewall",
                     "serial": null,
-                    "icon": "checkpoint.png"
+                    "icon": "checkpoint.svg"
                 }
             ]
         },

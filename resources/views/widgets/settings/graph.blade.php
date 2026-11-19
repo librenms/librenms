@@ -129,9 +129,9 @@
 
 @section('javascript')
     <script>
-        init_select2('#graph_type-{{ $id }}', 'graph', {}, '{{ $graph_type ?: '' }}');
-        init_select2('#graph_device-{{ $id }}', 'device', {limit: 100}, '{{ $graph_device ?: '' }}');
-        init_select2('#graph_port-{{ $id }}', 'port', {limit: 100}, '{{ $graph_port ?: '' }}');
+        init_select2('#graph_type-{{ $id }}', 'graph', {}, @json($graph_type ?: ''));
+        init_select2('#graph_device-{{ $id }}', 'device', {limit: 100}, @json($graph_device ?: ''));
+        init_select2('#graph_port-{{ $id }}', 'port', {limit: 100}, @json($graph_port ?: ''));
         init_select2('#graph_application-{{ $id }}', 'application', function (params) {
             var graph_type = $('#graph_type-{{ $id }}').val().split('_');
             graph_type.shift();
@@ -141,11 +141,11 @@
                 term: params.term,
                 page: params.page || 1
             };
-        }, '{{ $graph_application ?: '' }}');
-        init_select2('#graph_munin-{{ $id }}', 'munin', {limit: 100}, '{{ $graph_munin ?: '' }}');
-        init_select2('#graph_service-{{ $id }}', 'service', {limit: 100}, '{{ $graph_service ?: '' }}');
-        init_select2('#graph_customoid-{{ $id }}', 'customoid', {limit: 100}, '{{ $graph_customoid ?: '' }}');
-        init_select2('#graph_bill-{{ $id }}', 'bill', {limit: 100}, '{{ $graph_bill ?: '' }}');
+        }, @json($graph_application ?: ''));
+        init_select2('#graph_munin-{{ $id }}', 'munin', {limit: 100}, @json($graph_munin ?: ''));
+        init_select2('#graph_service-{{ $id }}', 'service', {limit: 100}, @json($graph_service ?: ''));
+        init_select2('#graph_customoid-{{ $id }}', 'customoid', {limit: 100}, @json($graph_customoid ?: ''));
+        init_select2('#graph_bill-{{ $id }}', 'bill', {limit: 100}, @json($graph_bill ?: ''));
         init_select2('#graph_custom-{{ $id }}', 'graph-aggregate', {}, false);
         init_select2('#graph_ports-{{ $id }}', 'port', {limit: 100}, false);
 

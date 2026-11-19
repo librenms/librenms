@@ -142,12 +142,19 @@ function get_device_divisor($device, $os_version, SensorType|string $sensor_type
                 return 1;
             }
         }
+
     } elseif ($device['os'] == 'deltaups') {
         if ($sensor_type === SensorType::Voltage
             && ! Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.5.')
-            && Str::startsWith($device['hardware'] ?? '', 'Delta UPS602R2RT')) {
+            && Str::startsWith($device['hardware'] ?? '', [
+                'Delta UPS602R2RT',
+                'Delta UPA102',
+                'Delta UPS302R2RT',
+                'Delta UPS502R2RT',
+            ])) {
             return 10;
         }
+
     } elseif ($device['os'] == 'huaweiups') {
         if ($sensor_type === SensorType::Frequency) {
             if (Str::startsWith($device['hardware'], 'UPS2000')) {
@@ -241,9 +248,16 @@ function discovery_process($os, $sensor_class, $pre_cache)
                 $snmp_value = $snmp_data[$data['value']] ?? '';
                 if (! is_numeric($snmp_value)) {
                     if ($sensor_class === 'temperature') {
-                        // For temp sensors, try and detect fahrenheit values
-                        if (is_string($snmp_value) && Str::endsWith($snmp_value, ['f', 'F'])) {
+                        if (is_string($snmp_value)) {
+                          // Attempt to capture Celsius
+                          if (preg_match('/([0-9.-]+)[^0-9]*?[cC]/', $snmp_value, $matches)) {
+                            $snmp_value = (float) $matches[1];
+                          }
+                          // Attempt to capture Fahrenheit
+                          elseif (preg_match('/([0-9.-]+)[^0-9]*?[fF]/', $snmp_value, $matches)) {
+                            $snmp_value = (float) $matches[1];
                             $user_function = 'fahrenheit_to_celsius';
+                          }
                         }
                     }
                     if ($sensor_class === 'state' && isset($data['states'])) {

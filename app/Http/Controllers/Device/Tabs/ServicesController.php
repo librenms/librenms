@@ -31,8 +31,7 @@ use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
-use LibreNMS\Services;
-use LibreNMS\Util\Time;
+use LibreNMS\Util\Url;
 
 class ServicesController implements DeviceTab
 {
@@ -61,6 +60,9 @@ class ServicesController implements DeviceTab
         Gate::authorize('view', $device);
         abort_if(Gate::none(['service.view', 'service.viewAll']), 403);
 
+        $request->mergeIfMissing([
+            'view' => Url::parseLegacyPath((string) $request->route('vars'))->get('view'),
+        ]);
         $validated = $request->validate([
             'view' => 'nullable|string|in:basic,details',
         ]);
@@ -68,45 +70,8 @@ class ServicesController implements DeviceTab
 
         $services = $device->services()
             ->hasAccess($request->user())
-            ->get()
-            ->map(function ($service) use ($view) {
-                $statusClass = match ((int) $service->service_status) {
-                    0 => 'label-success',
-                    1 => 'label-warning',
-                    2 => 'label-danger',
-                    default => 'label-info',
-                };
-
-                $graphs = [];
-                if ($view === 'details') {
-                    $serviceDs = htmlspecialchars_decode((string) $service->service_ds);
-                    $checkScript = Services::customCheckPath($service->service_type);
-                    if (is_file($checkScript)) {
-                        include $checkScript;
-                        if (isset($check_ds) && is_string($check_ds)) {
-                            $serviceDs = $check_ds;
-                        }
-                    }
-
-                    $decoded = json_decode($serviceDs, true);
-                    if (is_array($decoded)) {
-                        foreach ($decoded as $k => $v) {
-                            $graphTitle = isset($v['full_name']) ? (string) $v['full_name'] : (string) $k;
-                            $graphs[] = [
-                                'title' => $graphTitle,
-                                'ds' => $k,
-                            ];
-                        }
-                    }
-                }
-
-                return [
-                    'service' => $service,
-                    'status_class' => $statusClass,
-                    'last_changed' => $service->service_changed ? Time::formatInterval(time() - $service->service_changed) : __('Waiting for first check'),
-                    'graphs' => $graphs,
-                ];
-            });
+            ->ordered()
+            ->get();
 
         $options = [
             'basic' => [

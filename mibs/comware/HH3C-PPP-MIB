@@ -1,19 +1,23 @@
 -- =================================================================
--- Copyright (c) 2004-2018 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: This MIB file is used for inquiring for PPP access user
 --              authentication information.
 -- Reference:
--- Version:     V1.0
+-- Version:     V1.2
 -- History:
 --   V1.0 Initial version by hkf6733
+--   V1.1 2021-09-01 add hh3cPPPConfigTable by wangzhenjun
+--   V1.2 2022-06-16 add hh3cPPPTrapOid, hh3cPPPLcpNegoFailTrap
+--                   add hh3cPPPNcpNegoFailTrap
+--                   add hh3cPPPLoopbackDetectTrap by wangzhenjun
 -- =================================================================
 HH3C-PPP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     hh3cCommon
         FROM HH3C-OID-MIB
-    OBJECT-TYPE, MODULE-IDENTITY
+    OBJECT-TYPE, MODULE-IDENTITY, Integer32, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
     InterfaceIndex
         FROM IF-MIB
@@ -23,7 +27,7 @@ IMPORTS
 
 
 hh3cPPP MODULE-IDENTITY
-    LAST-UPDATED "201802010000Z"            -- Feb 01th, 2018 at 00:00 GMT
+    LAST-UPDATED "202206160000Z"            -- June 16th, 2022 at 00:00 GMT
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -32,8 +36,14 @@ hh3cPPP MODULE-IDENTITY
          http://www.h3c.com
          Zip: 100085"
     DESCRIPTION
+        "Supporting the trap for PPP."
+    REVISION    "202206160000Z"
+    DESCRIPTION
         "PPP management information base for managing devices that support PPP
         protocol."
+    REVISION    "202109010000Z"
+    DESCRIPTION
+        "Supporting the configuration for PPP on interface virtual template."
     REVISION    "201802010000Z"
     DESCRIPTION
         "Initial version"
@@ -96,7 +106,7 @@ hh3cPPPAuthType OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The type of authentication for for the peer."
+        "The type of authentication for the peer."
     ::= { hh3cPPPAuthEntry 2 }
 
 hh3cPPPUserName OBJECT-TYPE
@@ -105,6 +115,193 @@ hh3cPPPUserName OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The username for access user."
-        ::= { hh3cPPPAuthEntry 3 }
+    ::= { hh3cPPPAuthEntry 3 }
+
+
+hh3cPPPConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cPPPConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table describes the authentication information for PPP access
+        users.  The index of this table is the virtual template interface."
+    ::= { hh3cPPPAuthObjects 2 }
+
+hh3cPPPConfigEntry OBJECT-TYPE
+    SYNTAX Hh3cPPPConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry in this table describes the authentication information of
+        virtual template for PPP access users."
+    INDEX { hh3cPPPConfigIfIndex }
+        ::= { hh3cPPPConfigTable 1 }
+
+Hh3cPPPConfigEntry ::=
+    SEQUENCE {
+        hh3cPPPConfigIfIndex        InterfaceIndex,
+        hh3cPPPConfigAuthMode       INTEGER,
+        hh3cPPPConfigNegTimeout     Integer32,
+        hh3cPPPConfigKeepInterval   Integer32,
+        hh3cPPPConfigKeepRetransmit Integer32
+        }
+
+hh3cPPPConfigIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The index of the virtual template interface on the PPP authentication
+        information are configured."
+    ::= { hh3cPPPConfigEntry 1 }
+
+hh3cPPPConfigAuthMode OBJECT-TYPE
+    SYNTAX INTEGER {
+                none(1),
+                pap(2),
+                chap(3),
+                msChap(4),
+                msChapV2(5)
+               }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The value is type of authentication mode for the peer."
+    DEFVAL { none }
+    ::= { hh3cPPPConfigEntry 2 }
+
+hh3cPPPConfigNegTimeout OBJECT-TYPE
+    SYNTAX Integer32 (1..10)
+    UNITS "seconds"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The timeout of the negotiation."
+    DEFVAL { 3 }
+    ::= { hh3cPPPConfigEntry 3 }
+
+hh3cPPPConfigKeepInterval OBJECT-TYPE
+    SYNTAX Integer32 (0..32767)
+    UNITS "seconds"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The hold time value, the default value is dependent on device."
+    ::= { hh3cPPPConfigEntry 4 }
+
+hh3cPPPConfigKeepRetransmit OBJECT-TYPE
+    SYNTAX Integer32 (1..255)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The maximum number of attempts for transmitting a
+        keepalive message, the default value is dependent on device."
+    ::= { hh3cPPPConfigEntry 5 }
+
+hh3cPPPTrapOid OBJECT IDENTIFIER ::= { hh3cPPP 2 }
+
+hh3cPPPTrapIfName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..47))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved interface name of trap information."
+    ::= { hh3cPPPTrapOid 1 }
+
+hh3cPPPTrapNcpName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved reason string why LCP negotiation failed
+         of trap information."
+    ::= { hh3cPPPTrapOid 2 }
+
+hh3cPPPTrapNegoFailReason OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved reason string why LCP negotiation failed
+         of trap information."
+    ::= { hh3cPPPTrapOid 3 }
+
+hh3cPPPLcpNegoFailTrap OBJECT IDENTIFIER  ::= { hh3cPPP 3 }
+
+hh3cPPPLcpNegoFailTrapPrefix OBJECT IDENTIFIER  ::= { hh3cPPPLcpNegoFailTrap 0 }
+
+hh3cPPPLcpNegoFailed NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cPPPTrapIfName,
+        hh3cPPPTrapNegoFailReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the LCP negotiation failed."
+    ::= { hh3cPPPLcpNegoFailTrapPrefix 1 }
+
+hh3cPPPLcpNegoResumed NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cPPPTrapIfName
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the LCP negotiation succeeded
+         after failure."
+    ::= { hh3cPPPLcpNegoFailTrapPrefix 2 }
+
+hh3cPPPNcpNegoFailTrap OBJECT IDENTIFIER  ::= { hh3cPPP 4 }
+
+hh3cPPPNcpNegoFailTrapPrefix OBJECT IDENTIFIER  ::= { hh3cPPPNcpNegoFailTrap 0 }
+
+hh3cPPPNcpNegoFailed NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cPPPTrapIfName,
+        hh3cPPPTrapNcpName,
+        hh3cPPPTrapNegoFailReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the NCP negotiation failed."
+    ::= { hh3cPPPNcpNegoFailTrapPrefix 1 }
+
+hh3cPPPNcpNegoResumed NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cPPPTrapIfName,
+        hh3cPPPTrapNcpName
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the NCP negotiation succeeded
+         after failure."
+    ::= { hh3cPPPNcpNegoFailTrapPrefix 2 }
+
+hh3cPPPLoopbackDetectTrap OBJECT IDENTIFIER  ::= { hh3cPPP 5 }
+
+hh3cPPPLoopbackDetectTrapPrefix OBJECT IDENTIFIER  ::= { hh3cPPPLoopbackDetectTrap 0 }
+
+hh3cPPPLoopbackDetect NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cPPPTrapIfName
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when a loop is detected."
+    ::= { hh3cPPPLoopbackDetectTrapPrefix 1 }
+
+hh3cPPPLoopbackDetectResume NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cPPPTrapIfName
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the loop is removed."
+    ::= { hh3cPPPLoopbackDetectTrapPrefix 2 }
 
 END

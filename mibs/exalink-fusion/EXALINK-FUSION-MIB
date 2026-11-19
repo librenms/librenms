@@ -2,24 +2,39 @@ EXALINK-FUSION-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Integer32,
-    NOTIFICATION-TYPE, enterprises              FROM SNMPv2-SMI
+    Counter64, NOTIFICATION-TYPE, enterprises   FROM SNMPv2-SMI
     TruthValue                                  FROM SNMPv2-TC
     SnmpAdminString                             FROM SNMP-FRAMEWORK-MIB
 ;
 
 exaFusion MODULE-IDENTITY
-    LAST-UPDATED "201703160000Z"
+    LAST-UPDATED "201912040000Z"
     ORGANIZATION "Exablaze"
     CONTACT-INFO
         "email:    info@exablaze.com"
     DESCRIPTION
-        "Added port statistics"
+        "MIB for the ExaLINK Fusion"
+    REVISION     "201912040000Z"
+    DESCRIPTION
+        "Updated line-card range to reflect new port index numbering"
+    REVISION     "201907160000Z"
+    DESCRIPTION
+        "Updated port index range to reflect new port index numbering"
+    REVISION     "201907020000Z"
+    DESCRIPTION
+        "Added Counter64 definition, updated previous release date, fixed syntax error"
+    REVISION     "201808060000Z"
+    DESCRIPTION
+        "Added rx and tx port CDR details"
+    REVISION     "201703160001Z"
+    DESCRIPTION
+        "Added rx dropped and link statistics"
     REVISION     "201703160000Z"
     DESCRIPTION
-        "Added fusion sysinfo"
+        "Added port statistics"
     REVISION     "201510200000Z"
     DESCRIPTION
-        "MIB for the Exalink-FUSION."
+        "Added fusion sysinfo"
     REVISION     "201507300000Z"
     DESCRIPTION
         "Added initial traps."
@@ -410,11 +425,40 @@ FusionPort ::=
         fusionPortRXBytes           Counter64,
         fusionPortRXErrors          Counter64,
         fusionPortTXPackets         Counter64,
-        fusionPortTXBytes           Counter64
+        fusionPortTXBytes           Counter64,
+        fusionPortRXLink            Integer32,
+        fusionPortRXLinkChanges     Counter64,
+        fusionPortRXDropped         Counter64,
+
+        fusionPortRXUnicast         Counter64,
+        fusionPortRXMulticast       Counter64,
+        fusionPortRXBroadcast       Counter64,
+        fusionPortRXRunt            Counter64,
+        fusionPortRXPause           Counter64,
+        fusionPortRX64b             Counter64,
+        fusionPortRX65to127b         Counter64,
+        fusionPortRX128to255b        Counter64,
+        fusionPortRX256to511b        Counter64,
+        fusionPortRX512to1023b       Counter64,
+        fusionPortRX1024to1518b      Counter64,
+        fusionPortRX1519to1522b      Counter64,
+
+        fusionPortTXUnicast         Counter64,
+        fusionPortTXMulticast       Counter64,
+        fusionPortTXBroadcast       Counter64,
+        fusionPortTX64b             Counter64,
+        fusionPortTX65to127b         Counter64,
+        fusionPortTX128to255b        Counter64,
+        fusionPortTX256to511b        Counter64,
+        fusionPortTX512to1023b       Counter64,
+        fusionPortTX1024to1518b      Counter64,
+        fusionPortTX1519to1522b      Counter64,
+
+        fusionPortL1Source          SnmpAdminString
     }
 
 fusionPortLineCard OBJECT-TYPE
-    SYNTAX          Integer32 (1..255)
+    SYNTAX          Integer32 (1..2147483647)
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
@@ -422,7 +466,7 @@ fusionPortLineCard OBJECT-TYPE
     ::= { fusionPort 1 }
 
 fusionPortIndex OBJECT-TYPE
-    SYNTAX          Integer32 (1..255)
+    SYNTAX          Integer32 (1..2147483647)
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
@@ -498,7 +542,7 @@ fusionPortRXBytes OBJECT-TYPE
 
 fusionPortRXErrors OBJECT-TYPE
     SYNTAX          Counter64
-    UNITS           "B"
+    UNITS           "Packets"
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
@@ -522,6 +566,239 @@ fusionPortTXBytes OBJECT-TYPE
     DESCRIPTION
         "Number of Ethernet bytes transmitted"
     ::= { fusionPort 13 }
+
+fusionPortRXLink OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "True if link is detected on the port"
+    ::= { fusionPort 14 }
+
+fusionPortRXLinkChanges OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "State changes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Link up/down count"
+    ::= { fusionPort 15 }
+
+fusionPortRXDropped OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of received packets dropped"
+    ::= { fusionPort 16 }
+
+fusionPortRXUnicast OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of unicast Ethernet frames received"
+    ::= { fusionPort 17 }
+
+fusionPortRXMulticast OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of multicast Ethernet frames received"
+    ::= { fusionPort 18 }
+
+fusionPortRXBroadcast OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of broadcast Ethernet frames received"
+    ::= { fusionPort 19 }
+
+fusionPortRXRunt OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of runt Ethernet frames received"
+    ::= { fusionPort 20 }
+
+fusionPortRXPause OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of pause Ethernet frames received"
+    ::= { fusionPort 21 }
+
+fusionPortRX64b OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet frames received 64 bytes in length"
+    ::= { fusionPort 22 }
+
+fusionPortRX65to127b OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet frames received 65 - 127 bytes in length"
+    ::= { fusionPort 23 }
+
+fusionPortRX128to255b OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet frames received 128 - 255 bytes in length"
+    ::= { fusionPort 24 }
+
+fusionPortRX256to511b OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet frames received 256 - 511 bytes in length"
+    ::= { fusionPort 25 }
+
+fusionPortRX512to1023b OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet frames received 512 - 1023 bytes in length"
+    ::= { fusionPort 26 }
+
+fusionPortRX1024to1518b OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet frames received 1024 - 1518 bytes in length"
+    ::= { fusionPort 27 }
+
+fusionPortRX1519to1522b OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet frames received 1519 - 1522 bytes in length"
+    ::= { fusionPort 28 }
+
+fusionPortTXUnicast OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of unicast Ethernet frames transmitted"
+    ::= { fusionPort 29 }
+
+fusionPortTXMulticast OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of multicast Ethernet frames transmitted"
+    ::= { fusionPort 30 }
+
+fusionPortTXBroadcast OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of broadcast Ethernet frames transmitted"
+    ::= { fusionPort 31 }
+
+fusionPortTX64b OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet frames transmitted 64 bytes in length"
+    ::= { fusionPort 32 }
+
+fusionPortTX65to127b OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet frames transmitted 65 - 127 bytes in length"
+    ::= { fusionPort 33 }
+
+fusionPortTX128to255b OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet frames transmitted 128 - 255 bytes in length"
+    ::= { fusionPort 34 }
+
+fusionPortTX256to511b OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet frames transmitted 256 - 511 bytes in length"
+    ::= { fusionPort 35 }
+
+fusionPortTX512to1023b OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet frames transmitted 512 - 1023 bytes in length"
+    ::= { fusionPort 36 }
+
+fusionPortTX1024to1518b OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet frames transmitted 1024 - 1518 bytes in length"
+    ::= { fusionPort 37 }
+
+fusionPortTX1519to1522b OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "Packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Number of Ethernet frames transmitted 1519 - 1522 bytes in length"
+    ::= { fusionPort 38 }
+
+fusionPortL1Source OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "L1 source port name, if the port has a source of data that is a L1 path e.g. a tap or patch."
+    ::= { fusionPort 39 }
+
 
 --
 -- Values passed in Traps

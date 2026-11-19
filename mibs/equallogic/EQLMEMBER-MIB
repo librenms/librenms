@@ -1,4 +1,4 @@
--- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+-- Mib files packaged on  Wed Jun 19 01:31:39 EDT 2019 for Storage Array Firmware V10.0.3 (R469188)
 
 EQLMEMBER-MIB DEFINITIONS  ::= BEGIN   
 IMPORTS  
@@ -15,7 +15,7 @@ IMPORTS
             FROM EQLGROUP-MIB;
 
 eqlmemberModule MODULE-IDENTITY      
-	LAST-UPDATED "201503171528Z"
+	LAST-UPDATED "201906190531Z"
     ORGANIZATION  "EqualLogic Inc."
     CONTACT-INFO      
         "Contact: Customer Support
@@ -28,7 +28,7 @@ eqlmemberModule MODULE-IDENTITY
     DESCRIPTION          
         "Dell Inc. Storage Array member information 
 
-         Copyright (c) 2002-2012 by Dell Inc.
+         Copyright (c) 2002-2016 by Dell Inc.
 
          All rights reserved.  This software may not be copied, disclosed,
          transferred, or used except in accordance with a license granted
@@ -101,7 +101,8 @@ EqlMemberEntry ::=
         eqlMemberControllerMajorVersion     Unsigned32,
         eqlMemberControllerMinorVersion     Unsigned32,
         eqlMemberControllerMaintenanceVersion  Unsigned32,
-        eqlMemberCompressionCapable         TruthValue
+        eqlMemberCompressionCapable         TruthValue,
+        eqlMemberEightTBQAR                 TruthValue
         } 
 
 eqlMemberIndex OBJECT-TYPE      
@@ -371,7 +372,15 @@ eqlMemberCompressionCapable  OBJECT-TYPE
     STATUS          current      
     DESCRIPTION     "This variable specifies if the member is capable of supporting compression."
     DEFVAL          { false }
-    ::=  {  eqlMemberEntry 24 }  
+    ::=  {  eqlMemberEntry 24 }
+
+eqlMemberEightTBQAR  OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This variable is set to True if the member is 8TB and a QAR member."
+    ::=  {  eqlMemberEntry 25 }
+  
 
 --**************************************************************************   
 
@@ -836,7 +845,9 @@ eqlMemberHealthCriticalConditions      OBJECT-TYPE
                             smartBatteryFailure     (28), -- Smart Battery failure
                             critbit29               (29), -- available
                             nandFailure             (30), -- NAND chip on control module failed to restore persistent data.
-                            batteryEndOfLife        (31)
+                            batteryEndOfLife        (31), -- Battery has reached its end of life.
+                            raidSsdRaidsetRebuildDelayed (32), -- SSD RAIDset rebuild is being delayed because no suitable spare
+                            raidSsdRaidsetCopyToSpareDelayed (33) -- SSD RAIDset Copy-to-Spare is being delayed because no suitable spare
     }     
     MAX-ACCESS      read-only
     STATUS          current      
@@ -896,28 +907,47 @@ eqlMemberHealthDetailsTempSensorIndex      OBJECT-TYPE
                         cemi1(16),
                         controlModule0batteryThermistor(17),
                         controlModule1batteryThermistor(18),
-                        subExpanderModule0(19),
-                        subExpanderModule1(20),
-                        subExpanderModule2(21),
-                        subExpanderModule3(22),
-                        bottomplane0d0(23),
-                        bottomplane0d1(24),
-                        bottomplane0d2(25),
-                        bottomplane0d3(26),
-                        bottomplane0d4(27),
-                        bottomplane1d0(28),
-                        bottomplane1d1(29),
-                        bottomplane1d2(30),
-                        bottomplane1d3(31),
-                        bottomplane1d4(32),
-                        subExpanderModule0expander0(33),
-                        subExpanderModule0expander1(34),
-                        subExpanderModule1expander0(35),
-                        subExpanderModule1expander1(36),
-                        subExpanderModule2expander0(37),
-                        subExpanderModule2expander1(38),
-                        subExpanderModule3expander0(39),
-                        subExpanderModule3expander1(40)
+                        controlModule0ExhaustLeft(19),
+                        controlModule0ExhaustRight(20),
+                        controlModule1ExhaustLeft(21),
+                        controlModule1ExhaustRight(22),
+                        sideplaneAmbient0(23),
+                        sideplaneAmbient1(24),
+                        sideplaneAmbient2(25),
+                        sideplaneAmbient3(26),
+                        baseplane0DriveTray0(27),
+                        baseplane1DriveTray0(28),
+                        baseplane0DriveTray3(29),
+                        baseplane1DriveTray3(30),
+                        baseplane0DriveTray1(31),
+                        baseplane1DriveTray1(32),
+                        baseplane0DriveTray4(33),
+                        baseplane1DriveTray4(34),
+                        baseplane0DriveTray2(35),
+                        baseplane1DriveTray2(36),
+                        baseplane0DriveTray5(37),
+                        baseplane1DriveTray5(38),
+                        sideplane0Electronics0(39),
+                        sideplane0Electronics1(40),
+                        sideplane0Electronics2(41),
+                        sideplane0Electronics3(42),
+                        sideplane1Electronics0(43),
+                        sideplane1Electronics1(44),
+                        sideplane1Electronics2(45),
+                        sideplane1Electronics3(46),
+                        midplane0(47),
+                        midplane1(48),
+                        midplane2(49),
+                        midplane3(50),
+                        fanControlModule0(51),
+                        fanControlModule1(52),
+                        fanControlModule2(53),
+                        fanControlModule3(54),
+                        fanControlModule4(55),
+                        powerModule0Inlet0(56),
+                        powerModule0Hotspot1(57),
+                        powerModule1Inlet0(58),
+                        powerModule1Hotspot1(59)
                      }
     MAX-ACCESS      not-accessible
     STATUS          current
@@ -1039,7 +1069,9 @@ eqlMemberHealthDetailsFanIndex  OBJECT-TYPE
                         emm2fan0(5),
                         emm2fan1(6),
                         emm3fan0(7),
-                        emm3fan1(8)
+                        emm3fan1(8),
+                        emm4fan0(9),
+                        emm4fan1(10)
                      }
     MAX-ACCESS      not-accessible
     STATUS          current
@@ -1274,12 +1306,17 @@ eqlMemberStorageEntry OBJECT-TYPE
     
 EqlMemberStorageEntry ::= 
     SEQUENCE {     
-        eqlMemberTotalStorage           Integer32,
-        eqlMemberUsedStorage            Integer32,
-        eqlMemberSnapStorage            Integer32,
-        eqlMemberReplStorage            Integer32,
-        eqlMemberVirtualStorage          Counter64,
-        eqlMemberCompressionStackStorage Counter64
+        eqlMemberTotalStorage                           Integer32,
+        eqlMemberUsedStorage                            Integer32,
+        eqlMemberSnapStorage                            Integer32,
+        eqlMemberReplStorage                            Integer32,
+        eqlMemberVirtualStorage                         Counter64,
+        eqlMemberCompressionStackStorage                Counter64,
+        eqlMemberCompressedSnapStorage                  Counter64,
+        eqlMemberPhysicalCompressedSnapStorage          Counter64,
+        eqlMemberCompressionVolStackStorage          Counter64,
+        eqlMemberCompressedVolStorage                Counter64,
+        eqlMemberPhysicalCompressedVolStorage        Counter64
     }
 
 eqlMemberTotalStorage OBJECT-TYPE      
@@ -1323,6 +1360,41 @@ eqlMemberCompressionStackStorage OBJECT-TYPE
     STATUS          current      
     DESCRIPTION     "The amount of space (MB) used to store compressed data on this member."
     ::=   { eqlMemberStorageEntry 6}
+
+eqlMemberCompressedSnapStorage OBJECT-TYPE      
+    SYNTAX          Counter64     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The amount of space (MB) represented by compressed data on this member."
+    ::=   { eqlMemberStorageEntry 7}
+
+eqlMemberPhysicalCompressedSnapStorage OBJECT-TYPE      
+    SYNTAX          Counter64     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The amount of space (MB) consumed on disk by compress-able data on this member."
+    ::=   { eqlMemberStorageEntry 8}
+
+eqlMemberCompressionVolStackStorage OBJECT-TYPE      
+    SYNTAX          Counter64     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The amount of space (MB) used to store compressed data on this member."
+    ::=   { eqlMemberStorageEntry 9}
+
+eqlMemberCompressedVolStorage OBJECT-TYPE      
+    SYNTAX          Counter64     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The amount of space (MB) represented by compressed data on this member."
+    ::=   { eqlMemberStorageEntry 10}
+
+eqlMemberPhysicalCompressedVolStorage OBJECT-TYPE      
+    SYNTAX          Counter64     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "The amount of space (MB) consumed on disk by compress-able data on this member."
+    ::=   { eqlMemberStorageEntry 11}
 
 --**************************************************************************   
 
@@ -1420,8 +1492,8 @@ eqlMemberChassisType  OBJECT-TYPE
                         tDELLSBB2u2425(5),
                         tDELLSBB4u2435(6),
                         tDELL2WB1425V1(7),
-                        tDELLSBB5u6035(8)
-
+                        tDELLSBB5u6035(8),
+                        tDELLQAR5u8435(9)
     }     
     MAX-ACCESS      read-only      
     STATUS          current      
@@ -2009,6 +2081,32 @@ eqlMemberHealthsumoChannelBothFailed NOTIFICATION-TYPE
    "Sent when both the Sumo Channel cards go into failed state."
 ::= { eqlMemberEnclosureMgmtNotifications 25 }
 
+-- traps related to member IP Address, netmask, etc
+
+eqlMemberIPAddressChangeNotifications OBJECT IDENTIFIER ::= {eqlmemberNotifications 2}
+
+
+eqlMemberGatewayIPAddrChanged NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberDefaultInetRouteType,
+        eqlMemberDefaultInetRoute
+   }
+   STATUS current
+   DESCRIPTION
+   "The member gateway IP address has changed. Contact the group administrator."
+::= { eqlMemberIPAddressChangeNotifications 1 }
+
+eqlMemberStatusChangeNotifications  OBJECT IDENTIFIER ::= {eqlmemberNotifications 3}
+
+eqlMemberStatusChanged  NOTIFICATION-TYPE
+   OBJECTS{
+        eqlMemberName,
+        eqlMemberState
+   }
+   STATUS current
+   DESCRIPTION
+   "Sent when a member of a multi-member group changes its state (offline/online)"
+::= { eqlMemberStatusChangeNotifications 2 }
 
 --**************************************************************************   
 
@@ -2242,7 +2340,8 @@ eqlDriveGroupOpsStatusEntry OBJECT-TYPE
 
 EqlDriveGroupOpsStatusEntry ::= 
     SEQUENCE { 
-        eqlDriveGroupOpsStatusCompletePct            Unsigned32
+        eqlDriveGroupOpsStatusCompletePct            Unsigned32,
+        eqlDriveGroupOpsSecureZeroing                INTEGER
     }
 
 eqlDriveGroupOpsStatusCompletePct  OBJECT-TYPE
@@ -2251,6 +2350,16 @@ eqlDriveGroupOpsStatusCompletePct  OBJECT-TYPE
     STATUS          current      
     DESCRIPTION     "The percentage complete an ongoing move or bind operation is"
     ::=   {eqlDriveGroupOpsStatusEntry 1 }
+
+eqlDriveGroupOpsSecureZeroing OBJECT-TYPE
+    SYNTAX          INTEGER {
+                           false(0),     -- secure zeroing operation is not in progress. 
+                           true(1)       -- secure zeroing operation is in progress.
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field spicifies if secure zeroing operation is in progress."
+    ::=  {eqlDriveGroupOpsStatusEntry 2 }
 
 --******************************************************************
 
@@ -2279,7 +2388,7 @@ EqlMemberOpsEntry ::=
         eqlMemberOpsOperationArg                 DisplayString,
         eqlMemberOpsOperationStatus              INTEGER,
         eqlMemberOpsStartTime                    Unsigned32,
-        eqlMemberOpsOperationArg1                DisplayString        
+        eqlMemberOpsOperationArg1                DisplayString
     }
 
 eqlMemberOpsIndex  OBJECT-TYPE
@@ -2326,7 +2435,8 @@ eqlMemberOpsExec OBJECT-TYPE
     SYNTAX INTEGER {
         none(0),
         cancel(1),
-        failed(2)
+        failed(2),
+        migration-inprogress(3)
     }
     MAX-ACCESS     read-create
     STATUS         current
@@ -2470,7 +2580,10 @@ EqlMemberDynamicInfoEntry ::=
     SEQUENCE {     
                  eqlMemberDynamicInfoPendingUpdateVersion                        DisplayString,
                  eqlMemberDynamicInfoIsRestartRunning                            INTEGER,
-                 eqlMemberDynamicInfoIsUpdateRunning                             INTEGER
+                 eqlMemberDynamicInfoIsUpdateRunning                             INTEGER,
+                 eqlMemberRaidRebuildDelayEnable                                 INTEGER,
+                 eqlMemberRaidRebuildDelayStatus                                 INTEGER,
+                 eqlMemberRaidRebuildDelayRemaining                              Counter32
         }
 
 eqlMemberDynamicInfoPendingUpdateVersion       OBJECT-TYPE      
@@ -2504,6 +2617,45 @@ eqlMemberDynamicInfoIsUpdateRunning   OBJECT-TYPE
     DESCRIPTION     "This field specifies the status of the update shell script."
     DEFVAL          {not-running}
     ::=   { eqlMemberDynamicInfoEntry 3 }
+
+eqlMemberRaidRebuildDelayEnable  OBJECT-TYPE
+    SYNTAX          INTEGER     {
+                        enable(1),
+                        disable(2)
+    }     
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field enables or disables a 24 hour delay before RAID rebuild on
+                     supported Hybrid SSD platforms."
+    DEFVAL          { disable }
+    ::=  { eqlMemberDynamicInfoEntry 4 }
+
+eqlMemberRaidRebuildDelayStatus OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        enabled  (1),
+                        disabled (2),
+                        active   (3),
+                        error    (4)
+    }     
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field reflects the status of the extra 24 hour delay before RAID rebuild on
+                     supported Hybrid SSD platforms."
+    DEFVAL          { enabled }
+    ::=  { eqlMemberDynamicInfoEntry 5 }
+
+eqlMemberRaidRebuildDelayRemaining OBJECT-TYPE
+   SYNTAX          Counter32
+   UNITS           "seconds"
+   MAX-ACCESS      read-only
+   STATUS          current
+   DESCRIPTION     "Time remaining time of extra Raid rebuild delay on supported Hybrid SSD 
+                    platform. This field only has meaning on supported platforms
+                    when eqlMemberRaidRebuildDelayEnable is enabled as shown via
+                    eqlMemberRaidRebuildDelayStatus."
+    DEFVAL          { 0 }
+   ::=  { eqlMemberDynamicInfoEntry 6 }
+
 
 --**************************************************************************   
 
@@ -2807,8 +2959,10 @@ eqlMemberFirmwareInfoEntry OBJECT-TYPE
 
 EqlMemberFirmwareInfoEntry ::=
     SEQUENCE {
-        eqlMemberLanguageVersion                    DisplayString,
-        eqlMemberFirmwareInfoDataReduction          INTEGER
+        eqlMemberLanguageVersion                          DisplayString,
+        eqlMemberFirmwareInfoDataReduction                INTEGER,
+        eqlMemberFirmwareInfoCompressionCommand           INTEGER,
+        eqlMemberFirmwareInfoVolumeCompressionCommand     INTEGER
         }
 
 eqlMemberLanguageVersion        OBJECT-TYPE
@@ -2822,18 +2976,44 @@ eqlMemberLanguageVersion        OBJECT-TYPE
 eqlMemberFirmwareInfoDataReduction  OBJECT-TYPE
     SYNTAX            INTEGER {
                                 unknown(0),              -- Current state of data reduction support is unknown.
-                                disabled(1),             -- Member is capable of some form of data-reduction, but it has never been enabled.
+                                not-started(1),          -- Member is capable of some form of data-reduction, but it has never been enabled.
                                 no-capable-hardware(2),  -- Current member does not support data-reduction.
                                 no-capable-raid(3),      -- Data reduction is supported, but the RAID type is not correct.
                                 compression-running(4),  -- Member is actively compressing data.
-                                compression-paused(5)    -- Compression of new data has been paused.
+                                compression-suspended(5) -- Compression of new data has been stopped.
     }
-    MAX-ACCESS        read-write
+    MAX-ACCESS        read-only
     STATUS            current      
     DESCRIPTION       "Current form of data reduction to be used on the member.  
                        The member must support the requested value in order for it to be set."
     DEFVAL            { unknown }
     ::=   { eqlMemberFirmwareInfoEntry 2 }
+
+eqlMemberFirmwareInfoCompressionCommand  OBJECT-TYPE
+    SYNTAX            INTEGER {
+                                ready(0),                -- Returned on read.
+                                start(1),                -- Begin compression for the first time on the member.
+                                suspend(2),              -- Suspend compression on the member.
+                                resume(3)                -- Resume previously suspended compression.
+    }
+    MAX-ACCESS        read-write
+    STATUS            current      
+    DESCRIPTION       "Current form of data reduction to be used on the member.  
+                       The member must support the requested value in order for it to be set."
+    DEFVAL            { ready }
+    ::=   { eqlMemberFirmwareInfoEntry 3 }
+
+eqlMemberFirmwareInfoVolumeCompressionCommand  OBJECT-TYPE
+    SYNTAX            INTEGER {
+                                disable(0),              -- Disable the base vol compression.
+                                enable(1)                -- Enable the base vol compression.
+    }
+    MAX-ACCESS        read-write
+    STATUS            current      
+    DESCRIPTION       "Current form of data reduction to be used on the member.  
+                       The member must support the requested value in order for it to be set."
+    DEFVAL            { disable }
+    ::=   { eqlMemberFirmwareInfoEntry 4 }
 
 --**************************************************************************
 
@@ -3336,6 +3516,159 @@ EqlMemberPerTCPConnectionStatsEntry ::=
 
 
 --************************************************************************** 
+
+eqlMemberCompressionTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlMemberCompressionEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Member Compression Table."
+    ::=  {  eqlmemberObjects 34 }
+
+eqlMemberCompressionEntry OBJECT-TYPE
+    SYNTAX          EqlMemberCompressionEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing member info"
+    INDEX  { eqlGroupId, eqlMemberIndex }
+    ::=    { eqlMemberCompressionTable 1 }
+
+EqlMemberCompressionEntry ::=
+    SEQUENCE {
+        eqlMemberCompressionForcePoolPages   Counter64,
+        eqlMemberCompressionForceCapable     TruthValue,      
+        eqlMemberCompressionInitialized      TruthValue      
+    }
+
+eqlMemberCompressionForcePoolPages OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of pages forced to be available to compression for this member. 
+                     A value of 0 means system defaults for the compression pool size are in use."
+    ::=  { eqlMemberCompressionEntry 1 } 
+
+eqlMemberCompressionForceCapable  OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This variable forces a member capable of supporting compression.
+                     True means this member will be treated as a compression capable member."
+    DEFVAL          { false }
+    ::=  { eqlMemberCompressionEntry 2 }  
+
+eqlMemberCompressionInitialized  OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This variable specifies whether compression has ever been started on this member.
+                     This value treated persistently."
+    DEFVAL          { false }
+    ::=  { eqlMemberCompressionEntry 3 }  
+
+
+--************************************************************************** 
+
+eqlMemberSideplaneExpanderTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberSideplaneExpanderEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Member Hardware sideplane expander table. This table holds data on the sideplane expanders."                      
+    ::=  {  eqlmemberObjects 35 }
+
+eqlMemberSideplaneExpanderEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberSideplaneExpanderEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing sideplane expander info"
+    INDEX  { eqlGroupId, eqlMemberIndex, eqlMemberSideplaneExpanderIndex }    
+    ::=    { eqlMemberSideplaneExpanderTable 1 }
+    
+EqlMemberSideplaneExpanderEntry ::= 
+    SEQUENCE {     
+        eqlMemberSideplaneExpanderIndex                  INTEGER,
+        eqlMemberSideplaneExpanderName                   DisplayString,
+        eqlMemberSideplaneExpanderFirmwareRev            DisplayString,
+        eqlMemberSideplaneExpanderStatus                 INTEGER
+        }
+
+eqlMemberSideplaneExpanderIndex  OBJECT-TYPE
+    SYNTAX          INTEGER 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A unique integer that identifies the sideplane expander that the
+                     corresponding entry refers to."
+    ::=   { eqlMemberSideplaneExpanderEntry 1 }
+
+eqlMemberSideplaneExpanderName   OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (0..64))    
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the name of the sideplane expander."
+    ::=   { eqlMemberSideplaneExpanderEntry 2 }
+
+eqlMemberSideplaneExpanderFirmwareRev   OBJECT-TYPE
+   SYNTAX          DisplayString (SIZE (0..64))    
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the firmware revision of the sideplane expander."
+    ::=   { eqlMemberSideplaneExpanderEntry 3 }
+
+eqlMemberSideplaneExpanderStatus   OBJECT-TYPE
+   SYNTAX           INTEGER {
+                    unknown(0),
+                    not-present(1),
+                    failed(2),
+                    good(3)
+                    }
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the status of the sideplane expander."
+    DEFVAL          {unknown}
+    ::=   { eqlMemberSideplaneExpanderEntry 4 }
+
+
+--**************************************************************************   
+
+eqlMemberDynamicInfoExtTable OBJECT-TYPE      
+    SYNTAX  SEQUENCE OF EqlMemberDynamicInfoExtEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Member Info Extended Table"  
+    ::=  {  eqlmemberObjects 36 }    
+
+eqlMemberDynamicInfoExtEntry OBJECT-TYPE      
+    SYNTAX          EqlMemberDynamicInfoExtEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing dynamic member info "
+    INDEX  { eqlGroupId, eqlMemberIndex }    
+    ::=    { eqlMemberDynamicInfoExtTable 1 }
+    
+EqlMemberDynamicInfoExtEntry ::= 
+    SEQUENCE {     
+                 eqlMemberDynamicInfoExtRowStatus               RowStatus,
+                 eqlMemberDynamicInfoExtRaidExpansionStatus     INTEGER
+        }
+
+eqlMemberDynamicInfoExtRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlMemberDynamicInfoExtEntry 1 }  
+
+eqlMemberDynamicInfoExtRaidExpansionStatus  OBJECT-TYPE
+    SYNTAX          INTEGER     {
+                        enabled(1),
+                        disabled(2)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies raid expansion status when new drives are added."
+    DEFVAL          { enabled }
+    ::=  { eqlMemberDynamicInfoExtEntry 2 }
+
+--**************************************************************************   
 
 -- NOTE: DESCRIPTION strings for *Table entries are parsed.
 END

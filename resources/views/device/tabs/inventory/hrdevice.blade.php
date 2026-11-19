@@ -17,7 +17,7 @@
                 <td>{{ $item['hr']->hrDeviceIndex }}</td>
                 <td>
                     @if($item['hr']->hrDeviceType === 'hrDeviceProcessor' && $item['processor'])
-                        <a href="{{ route('device', ['device' => $device, 'tab' => 'health', 'vars' => 'metric=processor']) }}" class="tw:font-semibold">
+                        <a href="{{ route('device.health', ['device' => $device, 'metric' => 'processor']) }}" class="tw:font-semibold">
                             {{ $item['hr']->hrDeviceDescr }}
                         </a>
                     @elseif($item['hr']->hrDeviceType === 'hrDeviceNetwork' && $item['port'])

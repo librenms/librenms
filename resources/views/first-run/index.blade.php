@@ -238,7 +238,7 @@
                         <p class="tw:text-sm tw:text-gray-500 tw:dark:text-dark-white-400 tw:mb-0" x-show="scan.counts.added + scan.counts.known > 0">
                             {{ __('first_run.next_steps.heading') }}:
                             @can('viewAny', \App\Models\AlertTransport::class)
-                                <a href="{{ url('alert-transports') }}" target="_blank">{{ __('first_run.next_steps.alerts') }}</a> ·
+                                <a href="{{ route('alert-transports.index') }}" target="_blank">{{ __('first_run.next_steps.alerts') }}</a> ·
                             @endcan
                             <a href="{{ route('validate') }}" target="_blank">{{ __('first_run.next_steps.validate') }}</a>
                         </p>
