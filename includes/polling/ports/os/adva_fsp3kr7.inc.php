@@ -36,25 +36,22 @@ $adva_speeds = [
     'ifType100GbE' => 100000,
 ];
 
-$adva_facilities = snmpwalk_cache_oid($device, 'entityFacilityType', [], 'ADVA-FSPR7-MIB');
+// Facilities are indexed by shelf.slot.port.ext.class, the matching ifIndex is entityFacilityOneIndex
+$adva_facilities = SnmpQuery::enumStrings()->walk([
+    'ADVA-FSPR7-MIB::entityFacilityType',
+    'ADVA-FSPR7-MIB::entityFacilityOneIndex',
+])->valuesByIndex();
 
-if (! empty($adva_facilities)) {
-    // Facilities are indexed by shelf.slot.port.ext.class, the matching ifIndex is entityFacilityOneIndex
-    $adva_facilities = snmpwalk_cache_oid($device, 'entityFacilityOneIndex', $adva_facilities, 'ADVA-FSPR7-MIB');
+foreach ($adva_facilities as $adva_facility) {
+    $adva_ifindex = $adva_facility['ADVA-FSPR7-MIB::entityFacilityOneIndex'] ?? null;
+    $adva_speed = $adva_speeds[$adva_facility['ADVA-FSPR7-MIB::entityFacilityType'] ?? ''] ?? null;
 
-    d_echo($adva_facilities);
+    if ($adva_ifindex === null || $adva_speed === null || ! isset($port_stats[$adva_ifindex])) {
+        continue;
+    }
 
-    foreach ($adva_facilities as $adva_facility) {
-        $adva_ifindex = $adva_facility['entityFacilityOneIndex'] ?? null;
-        $adva_speed = $adva_speeds[$adva_facility['entityFacilityType'] ?? ''] ?? null;
-
-        if ($adva_ifindex === null || $adva_speed === null || ! isset($port_stats[$adva_ifindex])) {
-            continue;
-        }
-
-        if (empty($port_stats[$adva_ifindex]['ifHighSpeed'])) {
-            $port_stats[$adva_ifindex]['ifHighSpeed'] = $adva_speed;
-        }
+    if (empty($port_stats[$adva_ifindex]['ifHighSpeed'])) {
+        $port_stats[$adva_ifindex]['ifHighSpeed'] = $adva_speed;
     }
 }
 
