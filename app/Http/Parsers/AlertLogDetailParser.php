@@ -7,7 +7,6 @@ use App\Models\Sensor;
 use App\Models\StateTranslation;
 use Illuminate\Support\Str;
 use LibreNMS\Util\Number;
-use LibreNMS\Util\Url;
 
 /**
  * Alert log detail parser that converts alert details into structured arrays
@@ -175,7 +174,7 @@ class AlertLogDetailParser
         $this->addField(
             'Sensor',
             $sensor->sensor_descr,
-            Url::sensorUrl($sensor)
+            route('device.health', ['device' => $sensor->device_id, 'metric' => $sensor->sensor_class])
         );
 
         if ($sensor->sensor_class == 'state') {

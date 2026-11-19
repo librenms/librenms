@@ -93,7 +93,7 @@ class PollLogController extends TableController
         $location = $model->location?->location;
 
         return [
-            'hostname' => Url::deviceLink($model, null, ['tab' => 'graphs', 'group' => 'poller']),
+            'hostname' => Url::deviceLink($model, null, route('device.graphs', ['device' => $model->device_id, 'group' => 'poller'])),
             'last_polled' => $model->last_polled ? Time::format($model->last_polled, 'compact') : '',
             'poller_group' => e($model->getAttribute('group_name') ?: 'General'),
             'location' => $location === null ? null : e($location),

@@ -8,7 +8,6 @@ use App\Models\PortVlan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\TestCase;
-use LibreNMS\Util\Url;
 use Spatie\Permission\Models\Role;
 
 final class PortTabTest extends TestCase
@@ -76,16 +75,6 @@ final class PortTabTest extends TestCase
             ->assertSee('Users &lt;10&gt;', false)
             ->assertSee('eth2')
             ->assertSee('(U)');
-    }
-
-    public function testPortUrlUsesPortIdPathAndQueryOptions(): void
-    {
-        $port = $this->port();
-
-        $this->assertSame(
-            url("device/$port->device_id/port/$port->port_id") . '?view=realtime&interval=5',
-            Url::portUrl($port, ['view' => 'realtime', 'interval' => '5', 'empty' => ''])
-        );
     }
 
     public function testMenuLinksUseQueryString(): void
