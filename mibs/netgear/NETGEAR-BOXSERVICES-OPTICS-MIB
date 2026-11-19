@@ -1,0 +1,238 @@
+NETGEAR-BOXSERVICES-OPTICS-MIB DEFINITIONS ::= BEGIN
+
+-- Local definitions for the fiber optics tables reported by NETGEAR
+-- M4350 (firmware 14.x) under boxServicesGroup .18 and .19.
+-- Layout derived from live snmpwalk data; .16 (boxServicesFiberPortsOpticsTable,
+-- DisplayString values) is not implemented on these devices.
+-- Replace with the vendor MIB from the M4350 firmware bundle when available.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, Integer32               FROM SNMPv2-SMI
+    TruthValue, DisplayString           FROM SNMPv2-TC
+    boxServicesGroup                    FROM NETGEAR-BOXSERVICES-PRIVATE-MIB;
+
+ngBoxServicesOpticsMIB MODULE-IDENTITY
+    LAST-UPDATED "202611190000Z"
+    ORGANIZATION "LibreNMS"
+    CONTACT-INFO "https://github.com/librenms/librenms"
+    DESCRIPTION
+        "Fiber port optics (DOM) and transceiver info tables for NETGEAR
+         M4350 series switches."
+    REVISION "202611190000Z"
+    DESCRIPTION "Initial version."
+    ::= { boxServicesGroup 99 }
+
+--**************************************************************************************
+-- Fiber port optics (DOM) table
+--**************************************************************************************
+
+ngFiberOpticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NgFiberOpticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Fiber port optics data table."
+    ::= { boxServicesGroup 18 }
+
+ngFiberOpticsEntry OBJECT-TYPE
+    SYNTAX      NgFiberOpticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Fiber port optics entry, indexed by ifIndex."
+    INDEX       { ngFiberOpticsPortIndex }
+    ::= { ngFiberOpticsTable 1 }
+
+NgFiberOpticsEntry ::= SEQUENCE {
+    ngFiberOpticsPortIndex      Unsigned32,
+    ngFiberOpticsTemperature    Integer32,
+    ngFiberOpticsVoltage        Integer32,
+    ngFiberOpticsCurrent        Integer32,
+    ngFiberOpticsPowerOut       Integer32,
+    ngFiberOpticsPowerIn        Integer32,
+    ngFiberOpticsTxFault        TruthValue,
+    ngFiberOpticsLos            TruthValue,
+    ngFiberOpticsFaultStatus    DisplayString
+}
+
+ngFiberOpticsPortIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Port index (ifIndex)."
+    ::= { ngFiberOpticsEntry 1 }
+
+ngFiberOpticsTemperature OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 degrees C"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transceiver temperature in tenths of a degree Celsius."
+    ::= { ngFiberOpticsEntry 2 }
+
+ngFiberOpticsVoltage OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "millivolts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transceiver supply voltage in millivolts."
+    ::= { ngFiberOpticsEntry 3 }
+
+ngFiberOpticsCurrent OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 milliamps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transmit bias current in tenths of a milliamp."
+    ::= { ngFiberOpticsEntry 4 }
+
+ngFiberOpticsPowerOut OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.001 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transmit optical power in thousandths of a dBm."
+    ::= { ngFiberOpticsEntry 5 }
+
+ngFiberOpticsPowerIn OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.001 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Receive optical power in thousandths of a dBm."
+    ::= { ngFiberOpticsEntry 6 }
+
+ngFiberOpticsTxFault OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transmit fault status."
+    ::= { ngFiberOpticsEntry 7 }
+
+ngFiberOpticsLos OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Loss of signal status."
+    ::= { ngFiberOpticsEntry 8 }
+
+ngFiberOpticsFaultStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Fault status text."
+    ::= { ngFiberOpticsEntry 9 }
+
+--**************************************************************************************
+-- Fiber port optics info (transceiver inventory) table
+--**************************************************************************************
+
+ngFiberOpticsInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NgFiberOpticsInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Fiber port transceiver information table."
+    ::= { boxServicesGroup 19 }
+
+ngFiberOpticsInfoEntry OBJECT-TYPE
+    SYNTAX      NgFiberOpticsInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Fiber port transceiver information entry, indexed by ifIndex."
+    INDEX       { ngFiberOpticsInfoPortIndex }
+    ::= { ngFiberOpticsInfoTable 1 }
+
+NgFiberOpticsInfoEntry ::= SEQUENCE {
+    ngFiberOpticsInfoPortIndex          Unsigned32,
+    ngFiberOpticsInfoVendorName         DisplayString,
+    ngFiberOpticsInfoLinkLength50um     Unsigned32,
+    ngFiberOpticsInfoLinkLength62dot5um Unsigned32,
+    ngFiberOpticsInfoSerialNumber       DisplayString,
+    ngFiberOpticsInfoPartNumber         DisplayString,
+    ngFiberOpticsInfoNominalBitRate     Unsigned32,
+    ngFiberOpticsInfoRevision           DisplayString,
+    ngFiberOpticsInfoCompliance         DisplayString,
+    ngFiberOpticsInfoSupported          DisplayString,
+    ngFiberOpticsInfoSpeedDetected      DisplayString
+}
+
+ngFiberOpticsInfoPortIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Port index (ifIndex)."
+    ::= { ngFiberOpticsInfoEntry 1 }
+
+ngFiberOpticsInfoVendorName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transceiver vendor name."
+    ::= { ngFiberOpticsInfoEntry 2 }
+
+ngFiberOpticsInfoLinkLength50um OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "meters"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Supported link length on 50um fiber."
+    ::= { ngFiberOpticsInfoEntry 3 }
+
+ngFiberOpticsInfoLinkLength62dot5um OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "meters"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Supported link length on 62.5um fiber."
+    ::= { ngFiberOpticsInfoEntry 4 }
+
+ngFiberOpticsInfoSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transceiver serial number."
+    ::= { ngFiberOpticsInfoEntry 5 }
+
+ngFiberOpticsInfoPartNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transceiver part number."
+    ::= { ngFiberOpticsInfoEntry 6 }
+
+ngFiberOpticsInfoNominalBitRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Mbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Nominal bit rate."
+    ::= { ngFiberOpticsInfoEntry 7 }
+
+ngFiberOpticsInfoRevision OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transceiver revision."
+    ::= { ngFiberOpticsInfoEntry 8 }
+
+ngFiberOpticsInfoCompliance OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Transceiver compliance code."
+    ::= { ngFiberOpticsInfoEntry 9 }
+
+ngFiberOpticsInfoSupported OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Whether the transceiver is supported."
+    ::= { ngFiberOpticsInfoEntry 10 }
+
+ngFiberOpticsInfoSpeedDetected OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Detected speed."
+    ::= { ngFiberOpticsInfoEntry 11 }
+
+END
