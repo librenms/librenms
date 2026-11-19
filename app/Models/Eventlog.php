@@ -151,7 +151,7 @@ class Eventlog extends DeviceRelatedModel
                 'type' => $type,
                 'severity' => $severity,
                 'reference' => $reference,
-                'username' => Auth::user()?->username ?? '',
+                'username' => Auth::user()->username ?? '',
             ],
         );
     }
