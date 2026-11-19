@@ -9,12 +9,14 @@ use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
 use LibreNMS\Tests\TestCase;
 use Mockery;
+use PHPUnit\Framework\Attributes\TestWith;
 
 class Aos7SnmpFailureTest extends TestCase
 {
     public function testNacWalkConnectionFailureDoesNotReturnAnEmptyInventory(): void
     {
         $query = Mockery::mock(SnmpQueryBuilder::class);
+        $query->shouldReceive('numericIndex')->once()->andReturnSelf();
         $query->shouldReceive('walk')->with('ALCATEL-IND1-DA-MIB::alaDaMacVlanUserTable')
             ->andReturn(new SnmpResponse([], 'Timeout: No Response from udp:192.0.2.1:161', 1));
         $this->app->instance(SnmpQueryBuilder::class, $query);
@@ -29,6 +31,7 @@ class Aos7SnmpFailureTest extends TestCase
     public function testEmptyNacTableStillReturnsAnEmptyCollection(): void
     {
         $query = Mockery::mock(SnmpQueryBuilder::class);
+        $query->shouldReceive('numericIndex')->once()->andReturnSelf();
         $query->shouldReceive('walk')->with('ALCATEL-IND1-DA-MIB::alaDaMacVlanUserTable')->andReturn(new SnmpResponse);
         $this->app->instance(SnmpQueryBuilder::class, $query);
 
@@ -41,7 +44,7 @@ class Aos7SnmpFailureTest extends TestCase
     public function testTransceiverWalkConnectionFailureDoesNotReturnEmptyInventory(): void
     {
         $query = Mockery::mock(SnmpQueryBuilder::class);
-        $query->shouldReceive('walk')->with('ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPower')
+        $query->shouldReceive('walk')->with('ALCATEL-IND1-PORT-MIB::ddmPortSupplyVoltage')
             ->andReturn(new SnmpResponse([], 'Timeout: No Response from udp:192.0.2.1:161', 1));
         $this->app->instance(SnmpQueryBuilder::class, $query);
 
@@ -52,11 +55,17 @@ class Aos7SnmpFailureTest extends TestCase
         $os->discoverTransceivers();
     }
 
-    public function testEmptyTransceiverWalkDoesNotLoadPortInventory(): void
+    /** @param  array<string, string>  $voltages */
+    #[TestWith([[]])]
+    #[TestWith([[
+        'ALCATEL-IND1-PORT-MIB::ddmPortSupplyVoltage.1001.1' => '0',
+        'ALCATEL-IND1-PORT-MIB::ddmPortSupplyVoltage.1002.1' => '-200000',
+    ]])]
+    public function testNoPoweredTransceiversDoesNotLoadPortInventory(array $voltages): void
     {
         $query = Mockery::mock(SnmpQueryBuilder::class);
-        $query->shouldReceive('walk')->with('ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPower')
-            ->andReturn(new SnmpResponse);
+        $query->shouldReceive('walk')->with('ALCATEL-IND1-PORT-MIB::ddmPortSupplyVoltage')
+            ->andReturn(new SnmpResponse($voltages));
         $this->app->instance(SnmpQueryBuilder::class, $query);
 
         $os = Mockery::mock(\LibreNMS\OS\Aos7::class)->makePartial();

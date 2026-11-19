@@ -87,7 +87,7 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, ProcessorDiscovery, 
     {
         $nac = collect();
 
-        $rows = SnmpQuery::walk('ALCATEL-IND1-DA-MIB::alaDaMacVlanUserTable')
+        $rows = SnmpQuery::numericIndex()->walk('ALCATEL-IND1-DA-MIB::alaDaMacVlanUserTable')
             ->throwIfConnectionError()
             ->valuesByIndex();
 
@@ -96,15 +96,17 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, ProcessorDiscovery, 
         }
 
         // Read address octets in hex so printable bytes cannot be mistaken for text.
+        $ipOid = 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserIpAddress';
         $ipAddresses = SnmpQuery::options('-OQUSXx')
-            ->walk('ALCATEL-IND1-DA-MIB::alaDaMacVlanUserIpAddress')
+            ->numericIndex()
+            ->walk($ipOid)
             ->throwIfConnectionError()
-            ->valuesByIndex();
+            ->pluck($ipOid);
 
         $portTimeoutByIfIndex = null;
         $prefix = 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUser';
 
-        $authenticatedClients = [];
+        $authenticatedMacs = [];
         foreach ($rows as $index => $row) {
             $client = $this->parseNacIndex((string) $index);
             if ($client === null) {
@@ -112,6 +114,7 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, ProcessorDiscovery, 
             }
 
             [$ifIndex, $mac, $vlan] = $client;
+            $macAddress = $mac->hex();
             $authStatus = (int) ($row[$prefix . 'AuthStatus'] ?? 0);
             $classificationSource = (int) ($row[$prefix . 'ClassificationSource'] ?? 0);
             $isNoMatchingUnpBlock = $classificationSource === self::NAC_NO_MATCHING_UNP_BLOCK;
@@ -130,7 +133,7 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, ProcessorDiscovery, 
             }
 
             if ($authStatus === self::NAC_AUTHENTICATED) {
-                $authenticatedClients[$portId] = ($authenticatedClients[$portId] ?? 0) + 1;
+                $authenticatedMacs[$portId][$macAddress] = true;
             }
 
             $authType = (int) ($row[$prefix . 'Authtype'] ?? 0);
@@ -176,16 +179,16 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, ProcessorDiscovery, 
             };
 
             $ip = $this->parseNacIp(
-                (string) ($ipAddresses[$index][$prefix . 'IpAddress'] ?? ''),
+                $ipAddresses[$index] ?? '',
                 (string) ($row[$prefix . 'IpAddress'] ?? '')
             );
 
             $nac->push(new PortsNac([
                 'port_id' => $portId,
-                'auth_id' => "$ifIndex-{$mac->hex()}-$vlan",
+                'auth_id' => "$ifIndex-$macAddress-$vlan",
                 'domain' => $domain,
                 'username' => (string) ($row[$prefix . 'Name'] ?? $mac->readable()),
-                'mac_address' => $mac->hex(),
+                'mac_address' => $macAddress,
                 'ip_address' => $ip,
                 'authz_status' => $isNoMatchingUnpBlock || $unpMismatch ? 'authzFail' : 'authz' . $status,
                 'authz_by' => $authzBy,
@@ -199,7 +202,7 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, ProcessorDiscovery, 
         }
 
         foreach ($nac as $entry) {
-            $entry->host_mode = ($authenticatedClients[$entry->port_id] ?? 0) > 1 ? 'multiAuth' : 'singleHost';
+            $entry->host_mode = count($authenticatedMacs[$entry->port_id] ?? []) > 1 ? 'multiAuth' : 'singleHost';
         }
 
         return $nac;
@@ -245,29 +248,17 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, ProcessorDiscovery, 
     private function parseNacIndex(string $index): ?array
     {
         $parts = explode('.', $index);
-
-        if (count($parts) === 3) {
-            [$ifIndex, $address, $vlan] = $parts;
-        } elseif (count($parts) === 8) {
-            // Net-SNMP can render the MAC index as six decimal octets.
-            $ifIndex = $parts[0];
-            $vlan = $parts[7];
-            $octets = array_slice($parts, 1, 6);
-            foreach ($octets as $octet) {
-                if (! ctype_digit($octet) || (int) $octet > 255) {
-                    return null;
-                }
-            }
-            $address = implode(':', array_map(static fn (string $octet) => sprintf('%02x', (int) $octet), $octets));
-        } else {
+        if (count($parts) !== 8 || ! ctype_digit($parts[0]) || (int) $parts[0] < 1 || ! ctype_digit($parts[7])) {
             return null;
         }
 
-        $mac = Mac::parse($address);
+        // Numeric indexes contain the ifIndex, six MAC octets, and the VLAN.
+        $octets = array_slice($parts, 1, 6);
+        if (! array_all($octets, fn (string $octet) => ctype_digit($octet) && (int) $octet <= 255)) {
+            return null;
+        }
 
-        return ctype_digit($ifIndex) && (int) $ifIndex > 0 && ctype_digit($vlan) && $mac->isValid()
-            ? [(int) $ifIndex, $mac, (int) $vlan]
-            : null;
+        return [(int) $parts[0], Mac::parse(bin2hex(pack('C*', ...$octets))), (int) $parts[7]];
     }
 
     private function nacTimeElapsed(string $timestamp): ?int
@@ -328,14 +319,15 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, ProcessorDiscovery, 
     /** @return Collection<int, Transceiver> */
     public function discoverTransceivers(): Collection
     {
-        $ddmData = SnmpQuery::walk('ALCATEL-IND1-PORT-MIB::ddmPortRxOpticalPower')
+        $voltageOid = 'ALCATEL-IND1-PORT-MIB::ddmPortSupplyVoltage';
+        $voltages = SnmpQuery::walk($voltageOid)
             ->throwIfConnectionError()
-            ->pluck();
+            ->pluck($voltageOid);
 
         // The DDM table is indexed by ifIndex and channel.
         $channelsByPort = [];
-        foreach ($ddmData as $index => $value) {
-            if (! is_numeric($value) || $value <= -2147483648 || (int) $value === -200000) {
+        foreach ($voltages as $index => $voltage) {
+            if (! is_numeric($voltage) || $voltage <= 0) {
                 continue;
             }
 
@@ -365,12 +357,9 @@ class Aos7 extends OS implements BgpAddressFamilyDiscovery, ProcessorDiscovery, 
         foreach ($ports as $ifIndex => $port) {
             $entity = null;
 
-            if (
-                $port->ifName
-                && preg_match('/^(\d+)\/(\d+)\/(\d+)[A-Z]?$/', $port->ifName, $matches)
-            ) {
-                $entityName = "{$matches[1]}/SLOT-{$matches[2]} TRANSCEIVER-{$matches[3]}";
-
+            if (preg_match('/^(\d+)\/(\d+)\/(\d+)[A-Z]?$/', $port->ifName ?? '', $matches)) {
+                [, $chassis, $slot, $portNumber] = $matches;
+                $entityName = "$chassis/SLOT-$slot TRANSCEIVER-$portNumber";
                 $entity = $entities->get($entityName);
             }
 

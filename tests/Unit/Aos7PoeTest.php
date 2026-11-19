@@ -17,7 +17,7 @@ class Aos7PoeTest extends TestCase
         $values = [];
         foreach (file(base_path('tests/snmpsim/aos7.snmprec'), FILE_IGNORE_NEW_LINES) as $record) {
             if (preg_match('/^1\.3\.6\.1\.4\.1\.6486\.801\.1\.2\.1\.27\.1\.1\.1\.1\.([12])\.(\d+\.\d+)\|2\|(\d+)$/', $record, $matches)) {
-                $values["{$oids[$matches[1]]}.{$matches[2]}"] = $matches[3];
+                $values[$oids[$matches[1]] . '.' . $matches[2]] = $matches[3];
             }
         }
         $this->assertCount(96, $values);

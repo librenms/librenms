@@ -7,12 +7,14 @@ use Illuminate\Support\Facades\Date;
 use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\OS;
+use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 
 /**
- * @phpstan-type NacClient array{index?: string, unpUsed?: string, unpFromAuthServer?: string, loginTimestamp?: string, expectedLoginTime?: string}
+ * @phpstan-type NacClient array{unpUsed?: string, unpFromAuthServer?: string, loginTimestamp?: string, expectedLoginTime?: string}
  */
 class Aos7NacTest extends TestCase
 {
@@ -26,7 +28,7 @@ class Aos7NacTest extends TestCase
         $this->travelTo($now);
 
         $prefix = 'ALCATEL-IND1-DA-MIB::';
-        $index = $client['index'] ?? '1001.00:11:22:33:44:55.10';
+        $index = '1001.0.17.34.51.68.85.10';
         $table = [];
         foreach ([
             'alaDaMacVlanUserIpAddress' => $rawIp,
@@ -42,10 +44,12 @@ class Aos7NacTest extends TestCase
         }
 
         $query = Mockery::mock(SnmpQueryBuilder::class);
+        $query->shouldReceive('numericIndex')->twice()->andReturnSelf();
         $query->shouldReceive('options')->with('-OQUSXx')->andReturnSelf();
-        $query->shouldReceive('walk')->with("{$prefix}alaDaMacVlanUserTable")->andReturn(new SnmpResponse($table));
-        $query->shouldReceive('walk')->with("{$prefix}alaDaMacVlanUserIpAddress")->andReturn(new SnmpResponse(["{$prefix}alaDaMacVlanUserIpAddress.$index" => $hexIp]));
-        $timeoutOid = "{$prefix}alaDaUNPPort8021XSuppTimeOut";
+        $query->shouldReceive('walk')->with($prefix . 'alaDaMacVlanUserTable')->andReturn(new SnmpResponse($table));
+        $ipOid = $prefix . 'alaDaMacVlanUserIpAddress';
+        $query->shouldReceive('walk')->with($ipOid)->andReturn(new SnmpResponse(["$ipOid.$index" => $hexIp]));
+        $timeoutOid = $prefix . 'alaDaUNPPort8021XSuppTimeOut';
         $timeoutWalk = $query->shouldReceive('walk')->with($timeoutOid);
         if ($authType === 2) {
             $timeoutWalk->once()->andReturn(new SnmpResponse(["$timeoutOid.1001" => '60']));
@@ -57,7 +61,7 @@ class Aos7NacTest extends TestCase
 
         $device = ['os' => 'aos7', 'device_id' => 1];
         $os = OS::make($device);
-        $this->assertInstanceOf(\LibreNMS\Interfaces\Polling\NacPolling::class, $os);
+        $this->assertInstanceOf(NacPolling::class, $os);
         $entries = $os->pollNac();
         $this->assertCount(1, $entries);
         $entry = $entries->first();
@@ -98,9 +102,6 @@ class Aos7NacTest extends TestCase
                 'unpUsed' => 'Staff',
                 'unpFromAuthServer' => 'staff',
             ]],
-            'decimal MAC index' => ['192.168.1.1', '', '', 3, 0, '192.168.1.1', 'authzSuccess', 0, [
-                'index' => '1001.0.17.34.51.68.85.10',
-            ]],
             '802.1X client' => ['192.168.1.1', 'C0 A8 01 01', '', 3, 0, '192.168.1.1', 'authzSuccess', 2],
             'login timestamp with a UTC offset' => ['', '', '', 3, 0, '0.0.0.0', 'authzSuccess', 0, [
                 'loginTimestamp' => '2026-10-13,9:0:35.0,+2:0',
@@ -123,20 +124,43 @@ class Aos7NacTest extends TestCase
         ];
     }
 
+    #[TestWith(['0.17.34.51.68.85', 'singleHost'])]
+    #[TestWith(['0.17.34.51.68.86', 'multiAuth'])]
+    public function testHostModeCountsDistinctAuthenticatedMacs(string $secondMac, string $expectedMode): void
+    {
+        $oid = 'ALCATEL-IND1-DA-MIB::alaDaMacVlanUserAuthStatus';
+        $query = Mockery::mock(SnmpQueryBuilder::class);
+        $query->shouldReceive('numericIndex')->twice()->andReturnSelf();
+        $query->shouldReceive('options')->with('-OQUSXx')->andReturnSelf();
+        $query->shouldReceive('walk')->with('ALCATEL-IND1-DA-MIB::alaDaMacVlanUserTable')->andReturn(new SnmpResponse([
+            "$oid.1001.0.17.34.51.68.85.10" => '3',
+            "$oid.1001.$secondMac.20" => '3',
+        ]));
+        $query->shouldReceive('walk')->with('ALCATEL-IND1-DA-MIB::alaDaMacVlanUserIpAddress')->andReturn(new SnmpResponse);
+        $this->app->instance(SnmpQueryBuilder::class, $query);
+        PortCache::shouldReceive('getIdFromIfIndex')->twice()->with(1001, 1)->andReturn(71);
+
+        $device = ['os' => 'aos7', 'device_id' => 1];
+        $os = OS::make($device);
+        $this->assertInstanceOf(NacPolling::class, $os);
+        $this->assertSame([$expectedMode, $expectedMode], $os->pollNac()->pluck('host_mode')->all());
+    }
+
     public function testAddressWalkTimeoutStopsNacPolling(): void
     {
         $prefix = 'ALCATEL-IND1-DA-MIB::';
         $query = Mockery::mock(SnmpQueryBuilder::class);
+        $query->shouldReceive('numericIndex')->twice()->andReturnSelf();
         $query->shouldReceive('options')->andReturnSelf();
-        $query->shouldReceive('walk')->with("{$prefix}alaDaMacVlanUserTable")
-            ->andReturn(new SnmpResponse(["{$prefix}alaDaMacVlanUserAuthStatus.1001.00:11:22:33:44:55.10" => '3']));
-        $query->shouldReceive('walk')->with("{$prefix}alaDaMacVlanUserIpAddress")
+        $query->shouldReceive('walk')->with($prefix . 'alaDaMacVlanUserTable')
+            ->andReturn(new SnmpResponse([$prefix . 'alaDaMacVlanUserAuthStatus.1001.0.17.34.51.68.85.10' => '3']));
+        $query->shouldReceive('walk')->with($prefix . 'alaDaMacVlanUserIpAddress')
             ->andReturn(new SnmpResponse([], 'Timeout: No Response from udp:192.0.2.1:161', 1));
         $this->app->instance(SnmpQueryBuilder::class, $query);
 
         $device = ['os' => 'aos7', 'device_id' => 1];
         $os = OS::make($device);
-        $this->assertInstanceOf(\LibreNMS\Interfaces\Polling\NacPolling::class, $os);
+        $this->assertInstanceOf(NacPolling::class, $os);
         $this->expectException(\LibreNMS\Exceptions\SnmpException::class);
         $os->pollNac();
     }
