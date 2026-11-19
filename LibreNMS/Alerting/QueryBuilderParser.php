@@ -73,6 +73,8 @@ class QueryBuilderParser implements \JsonSerializable
     ];
     protected Schema $schema;
     private array $tables;
+    /** @var string[] Tables to include in the query even if no rule references them */
+    protected array $required_tables = [];
 
     private function __construct(protected array $builder)
     {
@@ -80,11 +82,34 @@ class QueryBuilderParser implements \JsonSerializable
     }
 
     /**
+     * Require these tables to be part of the query, even if no rule references them.
+     * Used when the caller needs to select from a table the rules may not mention,
+     * such as selecting ports for a dynamic port group whose rules only match on devices.
+     */
+    public function requireTables(string ...$tables): static
+    {
+        $this->required_tables = array_merge($this->required_tables, $tables);
+        unset($this->tables); // invalidate the cache in getTables()
+
+        return $this;
+    }
+
+    /**
      * Get all tables used by this rule
      */
     public function getTables(): array
     {
-        $this->tables ??= $this->findTablesRecursive($this->builder);
+        if (! isset($this->tables)) {
+            $tables = $this->findTablesRecursive($this->builder);
+
+            // pull in required tables along with the tables needed to join them
+            foreach ($this->required_tables as $table) {
+                $path = $this->schema->findRelationshipPath($table);
+                $tables = array_merge($tables, $path ?: [$table]);
+            }
+
+            $this->tables = array_keys(array_flip($tables));
+        }
 
         return $this->tables;
     }

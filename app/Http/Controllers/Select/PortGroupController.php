@@ -36,6 +36,13 @@ use Illuminate\Http\Request;
  */
 class PortGroupController extends SelectController
 {
+    protected function rules(): array
+    {
+        return [
+            'type' => 'nullable|in:static,dynamic',
+        ];
+    }
+
     protected function searchFields(Request $request): array
     {
         return ['name'];
@@ -45,7 +52,9 @@ class PortGroupController extends SelectController
     {
         $this->authorize('viewAny', PortGroup::class);
 
-        return PortGroup::hasAccess($request->user())->select(['id', 'name']);
+        return PortGroup::hasAccess($request->user())
+            ->when($request->input('type'), fn ($query, $type) => $query->where('type', $type))
+            ->select(['id', 'name']);
     }
 
     /**
