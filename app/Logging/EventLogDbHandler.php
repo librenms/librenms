@@ -3,7 +3,6 @@
 namespace App\Logging;
 
 use App\Models\Eventlog;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Date;
 use LibreNMS\Enum\Severity;
 use Monolog\Handler\AbstractProcessingHandler;
@@ -26,7 +25,7 @@ class EventLogDbHandler extends AbstractProcessingHandler
         $log->severity = $record->context['severity'] ?? Severity::Info;
         $log->message = $record->message;
         $log->datetime = Date::now();
-        $log->username = Auth::check() ? Auth::user()->username : '';
+        $log->username = $record->context['username'] ?? '';
         $log->save();
     }
 }

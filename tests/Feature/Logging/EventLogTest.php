@@ -51,6 +51,27 @@ final class EventLogTest extends DBTestCase
         $this->assertSame(Severity::Unknown, $event->severity);
     }
 
+    public function testEventUsernameIsWrittenToBothChannels(): void
+    {
+        $user = User::factory()->create(['username' => 'event-operator']);
+        $this->actingAs($user);
+
+        $file = tempnam(sys_get_temp_dir(), 'eventlog');
+        config([
+            'logging.channels.event.channels' => ['event_db', 'event_file'],
+            'logging.channels.event_file.path' => $file,
+        ]);
+
+        try {
+            Eventlog::log('Configuration updated');
+
+            $this->assertStringContainsString('"username":"event-operator"', file_get_contents($file));
+            $this->assertSame($user->username, Eventlog::where('message', 'Configuration updated')->sole()->username);
+        } finally {
+            unlink($file);
+        }
+    }
+
     #[DataProvider('logLevels')]
     public function testSeverityMapsToLogLevel(Severity $severity, string $level): void
     {

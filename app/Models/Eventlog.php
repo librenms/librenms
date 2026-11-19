@@ -30,6 +30,7 @@ use App\Models\Traits\Filterable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
 
@@ -150,6 +151,7 @@ class Eventlog extends DeviceRelatedModel
                 'type' => $type,
                 'severity' => $severity,
                 'reference' => $reference,
+                'username' => Auth::user()?->username ?? '',
             ],
         );
     }
