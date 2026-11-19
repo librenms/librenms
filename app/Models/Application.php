@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Data\TimeSeries\MetricIdentity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -50,6 +51,18 @@ class Application extends DeviceRelatedModel
     }
 
     // ---- Helper Functions ----
+
+    /**
+     * The metric of the application poller, kept in app-<app_type>-<app_id>.rrd by rrd.
+     * Tags given here follow the app id, in the order the rrd file name holds them.
+     * Apps that name the rrd file with a part before the app id, such as app-asterisk-stats-5.rrd, need their own identity.
+     *
+     * @param  array<string, scalar>  $tags  such as ['category' => 'overview'] for app-backupninja-5-overview.rrd
+     */
+    public function metricIdentity(array $tags = []): MetricIdentity
+    {
+        return new MetricIdentity('app', ['hostname' => (string) $this->device?->hostname, 'name' => $this->app_type, 'app_id' => $this->app_id, ...$tags]);
+    }
 
     public function displayName()
     {

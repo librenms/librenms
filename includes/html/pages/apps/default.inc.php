@@ -34,9 +34,10 @@ foreach ($apps as $app) {
         <div class="row">';
 
     foreach ($graphs[$app->app_type] as $graph_type) {
-        $graph_array['type'] = empty($graph_type) ? 'application_' . $app->app_type : 'application_' . $app->app_type . '_' . $graph_type;
+        $graph_prefix = 'application_' . ($graph_prefixes[$app->app_type] ?? $app->app_type);
+        $graph_array['type'] = empty($graph_type) ? $graph_prefix : $graph_prefix . '_' . $graph_type;
         $graph_array['id'] = $app->app_id;
-        $graph_array_zoom['type'] = 'application_' . $app->app_type . '_' . $graph_type;
+        $graph_array_zoom['type'] = $graph_prefix . '_' . $graph_type;
         $graph_array_zoom['id'] = $app->app_id;
 
         $link = Url::generate(['page' => 'device', 'device' => $app->device_id, 'tab' => 'apps', 'app' => $app->app_type]);

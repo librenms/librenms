@@ -1,10 +1,10 @@
 <?php
 
 $graphs = [
-    'ntp-client_stats' => 'NTP Client - Statistics',
-    'ntp-client_offset' => 'NTP Client - Offset',
-    'ntp-client_freq' => 'NTP Client - Frequency',
-    'ntp-client_stability' => 'NTP Client - Stability',
+    'ntp_client_stats' => 'NTP Client - Statistics',
+    'ntp_client_offset' => 'NTP Client - Offset',
+    'ntp_client_freq' => 'NTP Client - Frequency',
+    'ntp_client_stability' => 'NTP Client - Stability',
 ];
 
 foreach ($graphs as $key => $text) {

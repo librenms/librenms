@@ -23,9 +23,9 @@ foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->s
     foreach ($groupedApps as $app) {
         $graph_type = $graphs[$app->app_type][0] ?? '';
 
-        $graph_array['type'] = 'application_' . $app->app_type . '_' . $graph_type;
+        $graph_array['type'] = 'application_' . ($graph_prefixes[$app->app_type] ?? $app->app_type) . '_' . $graph_type;
         $graph_array['id'] = $app->app_id;
-        $graph_array_zoom['type'] = 'application_' . $app->app_type . '_' . $graph_type;
+        $graph_array_zoom['type'] = $graph_array['type'];
         $graph_array_zoom['id'] = $app->app_id;
 
         $overlib_url = route('device', [$app->device_id, 'apps', "app=$app->app_type"]);

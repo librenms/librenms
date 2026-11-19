@@ -108,6 +108,8 @@ $graphs['ntp-client'] = [
     'stats',
     'freq',
 ];
+// graph names of apps whose graphs dropped the hyphen of the app type, so they resolve to graph classes
+$graph_prefixes = ['ntp-client' => 'ntp_client'];
 $graphs['ntp-server'] = [
     'stats',
     'freq',
