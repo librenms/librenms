@@ -1,43 +1,54 @@
 -- =================================================================
--- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:
 -- Reference:
--- Version: V2.8
+-- Version: V3.0
 -- History:
 --  V1.0 Initial version 2004-07-13
---  V1.1 2004-10-12 updated by gaolong
---       Remove hyphens from DisplayString definition.
---  V2.0 2004-12-28 updated by huguohua02576
---       Add hh3cUserState, hh3cUserInfoRowStatus, hh3cUserIndex under hh3cUserInfoTable
---   Change index from hh3cUserName to hh3cUserIndex under hh3cUserInfoTable
---       Modify hh3cUserName, hh3cUserPassword, hh3cAuthMode, hh3cUserLevel's MAX-ACCESS
---       from read-only to read-create
---       Add hh3cUserAttributeTable, hh3cUserMaxNum, hh3cUserCurrNum and hh3cUserIndexIndicator
---  V2.1 2006-02-07 updated by sunludong03130
---       Modify hh3cFtpService, hh3cLanAccessService, hh3cSshService, hh3cTelnetService,
---       hh3cTerminalService, hh3cFtpDirectory's description
---  V2.2 2006-12-26 updated by zhangzhancheng02444
---       Modify hh3cAccessLimit, hh3cFtpDirectory, hh3cSlotNum, hh3cSubSlotNum,
---       and hh3cPortNum
---  V2.3 2008-03-13 updated by w02260
---       Add hh3cExpirationDate, hh3cUserGroup under hh3cUserAttributeTable,
---       and add hh3cUserGroupObjects
---  V2.4 2008-12-29 updated by liubo04367
---       Add hh3cPortalService under hh3cUserAttributeTable
---  V2.5 2012-02-28 updated by y02965
---       Add hh3cUserRoleTable
---       Add hh3cPPPService, hh3cHttpService and hh3cHttpsService under hh3cUserAttributeTable
---  V2.6 2012-05-28 updated by y06401
---       Modify description of hh3cAuthMode.
---       2012-10-11 updated by l04367
---       Add hh3cUserIfIndex
---       Modify hh3cUserRole
---  V2.7 2013-04-25 updated by q04356
---       Modified the description of hh3cIdleCut
---  V2.8 2016-11-19 updated by y06401
---       Modified the description of hh3cUserGroup
---       Modified the SYNTAX of hh3cUserGroupName
+--  V1.1 2004-10-12 Updated by gaolong
+--       Removed hyphens from DisplayString definition.
+--  V2.0 2004-12-28 Updated by huguohua02576
+--       Added hh3cUserState, hh3cUserInfoRowStatus, and hh3cUserIndex to hh3cUserInfoTable.
+--       Changed the index of hh3cUserInfoTable from hh3cUserName to hh3cUserIndex.
+--       Modified the max access to hh3cUserName, hh3cUserPassword, hh3cAuthMode, and hh3cUserLevel
+--       from read-only to read-create.
+--       Added hh3cUserAttributeTable, hh3cUserMaxNum, hh3cUserCurrNum, and hh3cUserIndexIndicator.
+--  V2.1 2006-02-07 Updated by sunludong03130
+--       Modified the descriptions of hh3cFtpService, hh3cLanAccessService, hh3cSshService,
+--       hh3cTelnetService, hh3cTerminalService, and hh3cFtpDirectory.
+--  V2.2 2006-12-26 Updated by zhangzhancheng02444
+--       Modified hh3cAccessLimit, hh3cFtpDirectory, hh3cSlotNum, hh3cSubSlotNum,
+--       and hh3cPortNum.
+--  V2.3 2008-03-13 Updated by w02260
+--       Added hh3cExpirationDate and hh3cUserGroup to hh3cUserAttributeTable,
+--       and added hh3cUserGroupObjects.
+--  V2.4 2008-12-29 Updated by liubo04367
+--       Added hh3cPortalService to hh3cUserAttributeTable.
+--  V2.5 2012-02-28 Updated by y02965
+--       Added hh3cUserRoleTable.
+--       Added hh3cPPPService, hh3cHttpService, and hh3cHttpsService to hh3cUserAttributeTable.
+--  V2.6 2012-05-28 Updated by y06401
+--       Modified the description of hh3cAuthMode.
+--       2012-10-11 Updated by l04367
+--       Added hh3cUserIfIndex.
+--       Modified hh3cUserRole.
+--  V2.7 2013-04-25 Updated by q04356
+--       Modified the description of hh3cIdleCut.
+--  V2.8 2016-11-19 Updated by y06401
+--       Modified the description of hh3cUserGroup.
+--       Modified the SYNTAX of hh3cUserGroupName.
+--  V2.9 2021-12-13 Updated by z11983
+--       Added hh3cUserTrap, hh3cUserBlacklistTrap, hh3cUserBlacklistNotifications,
+--       hh3cUserBlacklistVarObjects, hh3cUserBlacklistLock, hh3cUserBlacklistUnlock,
+--       hh3cUserIPAddressType, and hh3cUserIPAddress.
+--  V3.0 2022-6-13 Updated by liubo
+--       Added hh3cUserTrapPrefix, hh3cUserTrapNotifications, hh3cUserTrapVarObjects,
+--       hh3cUserManagePasswordChanged, hh3cUserNetworkPasswordChanged, and hh3cUserOperatorType.
+--       2022-07-08 Updated by z11983
+--       Added hh3cUserGroupTrap, hh3cUserGroupNotifications, hh3cUserGroupVarObjects,
+--       hh3cUserGroupThresholdAlarm, hh3cUserGroupThresholdResume,
+--       hh3cUserGroupUsedNum and hh3cUserGroupNumThreshold.
 -- =================================================================
 HH3C-USER-MIB DEFINITIONS ::= BEGIN
 IMPORTS
@@ -45,11 +56,13 @@ IMPORTS
         FROM HH3C-OID-MIB
     RowStatus, MacAddress, TEXTUAL-CONVENTION, DateAndTime, DisplayString
         FROM SNMPv2-TC
-    IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY
-        FROM SNMPv2-SMI;
+    IpAddress, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB;
 
 hh3cUser MODULE-IDENTITY
-    LAST-UPDATED "201611190000Z"            -- November 19, 2016 at 00:00 GMT
+    LAST-UPDATED "202207080000Z"            -- July 08 2022 at 00:00 GMT
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -64,6 +77,20 @@ hh3cUser MODULE-IDENTITY
         Manage configuration and Monitor running state
         for userlog feature.
         "
+    REVISION "202207080000Z"        -- July 08 2022 at 00:00 GMT
+    DESCRIPTION
+        "Added hh3cUserGroupTrap, hh3cUserGroupNotifications, hh3cUserGroupVarObjects,
+        hh3cUserGroupThresholdAlarm, hh3cUserGroupThresholdResume,
+        hh3cUserGroupUsedNum and hh3cUserGroupNumThreshold."
+    REVISION "202206130000Z"        -- June 13 2022 at 00:00 GMT
+    DESCRIPTION
+        "Added hh3cUserTrapPrefix, hh3cUserTrapNotifications, hh3cUserTrapVarObjects,
+         hh3cUserManagePasswordChanged, hh3cUserNetworkPasswordChanged, and hh3cUserOperatorType."
+    REVISION "202112130000Z"        -- December 13 2021 at 00:00 GMT
+    DESCRIPTION
+        "Added hh3cUserTrap, hh3cUserBlacklistTrap, hh3cUserBlacklistNotifications,
+        hh3cUserBlacklistVarObjects, hh3cUserBlacklistLock, hh3cUserBlacklistUnlock,
+        hh3cUserIPAddressType, and hh3cUserIPAddress."
     REVISION "201611190000Z"        -- November 19, 2016 at 00:00 GMT
     DESCRIPTION
         "Modified description of hh3cUserGroup.
@@ -773,5 +800,125 @@ hh3cUserGroupInfoRowStatus OBJECT-TYPE
         and active.
         "
     ::= { hh3cUserGroupInfoEntry 2 }
+
+-- hh3cUserTrap==================================================================
+hh3cUserTrap OBJECT IDENTIFIER ::= { hh3cUser 3 }
+
+-- hh3cUserBlacklistTrap=========================================================
+hh3cUserBlacklistTrap OBJECT IDENTIFIER ::= { hh3cUserTrap 1 }
+
+-- hh3cUserBlacklistNotifications================================================
+hh3cUserBlacklistNotifications OBJECT IDENTIFIER ::= { hh3cUserBlacklistTrap 0 }
+
+hh3cUserBlacklistLock NOTIFICATION-TYPE
+    OBJECTS     { hh3cUserName,
+                  hh3cUserIPAddressType,
+                  hh3cUserIPAddress}
+    STATUS      current
+    DESCRIPTION
+    "A user was added to the password control blacklist."
+    ::= { hh3cUserBlacklistNotifications 1 }
+
+hh3cUserBlacklistUnlock NOTIFICATION-TYPE
+    OBJECTS     { hh3cUserName,
+                  hh3cUserIPAddressType,
+                  hh3cUserIPAddress}
+    STATUS      current
+    DESCRIPTION
+    "The user was removed from the password control blacklist."
+    ::= { hh3cUserBlacklistNotifications 2 }
+
+-- hh3cUserBlacklistVarObjects==================================================
+hh3cUserBlacklistVarObjects OBJECT IDENTIFIER ::= { hh3cUserBlacklistTrap 1 }
+
+hh3cUserIPAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "User IP address type."
+    ::= { hh3cUserBlacklistVarObjects 1 }
+
+hh3cUserIPAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "User IP address."
+    ::= { hh3cUserBlacklistVarObjects 2 }
+
+-- hh3cUserTrapPrefix=========================================================
+hh3cUserTrapPrefix OBJECT IDENTIFIER ::= { hh3cUserTrap 2 }
+
+-- hh3cUserTrapNotifications================================================
+hh3cUserTrapNotifications OBJECT IDENTIFIER ::= { hh3cUserTrapPrefix 0 }
+
+hh3cUserManagePasswordChanged NOTIFICATION-TYPE
+    OBJECTS     { hh3cUserName,
+                  hh3cUserOperatorType}
+    STATUS      current
+    DESCRIPTION
+    "The password of a local device management user was modified."
+    ::= { hh3cUserTrapNotifications 1 }
+
+hh3cUserNetworkPasswordChanged NOTIFICATION-TYPE
+    OBJECTS     { hh3cUserName,
+                  hh3cUserOperatorType}
+    STATUS      current
+    DESCRIPTION
+    "The password of a local network access user was modified."
+    ::= { hh3cUserTrapNotifications 2 }
+
+-- hh3cUserTrapVarObjects==================================================
+hh3cUserTrapVarObjects OBJECT IDENTIFIER ::= { hh3cUserTrapPrefix 1 }
+
+hh3cUserOperatorType OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..63))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The type of the operator, including CLI, MIB, UI, and login."
+    ::= { hh3cUserTrapVarObjects 1 }
+
+-- hh3cUserGroupTrap=========================================================
+hh3cUserGroupTrap OBJECT IDENTIFIER ::= { hh3cUser 4 }
+
+-- hh3cUserGroupNotifications==============================================
+hh3cUserGroupNotifications OBJECT IDENTIFIER ::= { hh3cUserGroupTrap 0 }
+
+hh3cUserGroupThresholdAlarm NOTIFICATION-TYPE
+    OBJECTS     { hh3cUserGroupUsedNum,
+                  hh3cUserGroupNumThreshold }
+    STATUS      current
+    DESCRIPTION
+    "Number of user groups reached the alarm threshold."
+    ::= { hh3cUserGroupNotifications 1 }
+
+hh3cUserGroupThresholdResume NOTIFICATION-TYPE
+    OBJECTS     { hh3cUserGroupUsedNum,
+                  hh3cUserGroupNumThreshold }
+    STATUS      current
+    DESCRIPTION
+    "Number of user groups dropped below the alarm threshold."
+    ::= { hh3cUserGroupNotifications 2 }
+
+-- hh3cUserGroupVarObjects===============================================
+hh3cUserGroupVarObjects OBJECT IDENTIFIER ::= { hh3cUserGroupTrap 1 }
+
+hh3cUserGroupUsedNum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Number of user groups in use."
+    ::= { hh3cUserGroupVarObjects 1 }
+
+hh3cUserGroupNumThreshold OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Alarm threshold for the number of user groups."
+    ::= { hh3cUserGroupVarObjects 2 }
 
 END

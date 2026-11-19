@@ -16,6 +16,11 @@ class AlertLogPolicy
             || $this->hasGlobalPermission($user, 'view', true);
     }
 
+    public function viewAll(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'viewAll');
+    }
+
     public function view(User $user, AlertLog $alertLog): bool
     {
         if ($this->hasGlobalPermission($user, 'viewAll')) {

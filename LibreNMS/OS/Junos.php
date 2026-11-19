@@ -29,6 +29,8 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
+use App\Models\BgpPeer;
+use App\Models\BgpPeerCbgp;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\PortVlan;
@@ -39,6 +41,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
@@ -47,9 +50,11 @@ use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Bgp;
+use LibreNMS\Util\IP;
 use SnmpQuery;
 
-class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling, TransceiverDiscovery, VlanDiscovery, VlanPortDiscovery
+class Junos extends \LibreNMS\OS implements BgpAddressFamilyDiscovery, SlaDiscovery, OSPolling, SlaPolling, TransceiverDiscovery, VlanDiscovery, VlanPortDiscovery
 {
     use EntityMib {
         EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
@@ -510,5 +515,92 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling,
         }
 
         return $legacyPorts;  // if no legacy data, use Q-BRIDGE-MIB
+    }
+
+    /**
+     * Sessions are indexed by instance, local and remote address, and read in each VRF context.
+     * BGP4-MIB is read when the table has no sessions.
+     *
+     * @return Collection<int, BgpPeer>
+     */
+    public function discoverBgpPeers(): Collection
+    {
+        $peers = new Collection;
+
+        foreach ($this->getDevice()->getVrfContexts() as $context) {
+            $vrfId = $this->getDevice()->vrfIdForContext($context);
+            $found = collect($this->walkBgpTable($context, 'BGP4-V2-MIB-JUNIPER', [
+                'bgpPeerRemoteAs' => 'jnxBgpM2PeerRemoteAs',
+                'bgpPeerState' => 'jnxBgpM2PeerState',
+                'bgpPeerAdminStatus' => 'jnxBgpM2PeerStatus',
+                'bgpLocalAddr' => 'jnxBgpM2PeerLocalAddr',
+                'bgpPeerLastError' => 'jnxBgpM2PeerLastErrorReceived',
+                'bgpPeerLastErrorText' => 'jnxBgpM2PeerLastErrorReceivedText',
+                'bgpPeerFsmEstablishedTime' => 'jnxBgpM2PeerFsmEstablishedTime',
+                'bgpPeerInUpdateElapsedTime' => 'jnxBgpM2PeerInUpdatesElapsedTime',
+                'bgpPeerInUpdates' => 'jnxBgpM2PeerInUpdates',
+                'bgpPeerOutUpdates' => 'jnxBgpM2PeerOutUpdates',
+                'bgpPeerInTotalMessages' => 'jnxBgpM2PeerInTotalMessages',
+                'bgpPeerOutTotalMessages' => 'jnxBgpM2PeerOutTotalMessages',
+            ]))->map(function (array $row, int|string $index) use ($context, $vrfId): ?BgpPeer {
+                $address = $this->jnxBgpM2RemoteAddress((string) $index, $zone);
+
+                return $this->makeBgpPeer($address, $zone, $context, $vrfId, $row);
+            })->filter();
+
+            $peers = $peers->merge($found->isNotEmpty() ? $found : $this->discoverBgp4MibPeers($context));
+        }
+
+        return $peers->values();
+    }
+
+    public function discoverBgpLocalAs(): ?int
+    {
+        return $this->bgpLocalAsFallback(parent::discoverBgpLocalAs(), 'BGP4-V2-MIB-JUNIPER::jnxBgpM2PeerLocalAs');
+    }
+
+    /**
+     * Prefix counts are indexed by the peer index of the session
+     *
+     * @return Collection<int, BgpPeerCbgp>
+     */
+    public function discoverBgpAddressFamilies(Collection $peers): Collection
+    {
+        $families = new Collection;
+
+        foreach ($peers->pluck('context_name')->unique() as $context) {
+            $addresses = [];
+            foreach ($this->walkBgpTable($context, 'BGP4-V2-MIB-JUNIPER', ['peer_index' => 'jnxBgpM2PeerIndex']) as $index => $row) {
+                $zone = null;
+                $addresses[$row['peer_index']] = [$this->jnxBgpM2RemoteAddress((string) $index, $zone), $zone];
+            }
+
+            $rows = $this->walkBgpTable($context, 'BGP4-V2-MIB-JUNIPER', [
+                'AcceptedPrefixes' => 'jnxBgpM2PrefixInPrefixesAccepted',
+                'DeniedPrefixes' => 'jnxBgpM2PrefixInPrefixesRejected',
+                'AdvertisedPrefixes' => 'jnxBgpM2PrefixOutPrefixes',
+            ]);
+
+            foreach ($rows as $index => $counters) {
+                [$peerIndex, $afi, $safi] = explode('.', (string) $index) + [null, null, null];
+                if (isset($addresses[$peerIndex], $afi, $safi)) {
+                    $families->push($this->makeBgpAddressFamily($addresses[$peerIndex][0], $addresses[$peerIndex][1], $context, $afi, $safi, $counters));
+                }
+            }
+        }
+
+        return $families->filter()->values();
+    }
+
+    /**
+     * The session index is the instance, then the local and remote address, which are the same family
+     */
+    private function jnxBgpM2RemoteAddress(string $index, ?int &$zone): ?IP
+    {
+        $parts = explode('.', $index);
+        array_shift($parts); // instance
+        Bgp::shiftInetAddress($parts, intdiv(count($parts), 2)); // local address
+
+        return Bgp::shiftInetAddress($parts, 0, $zone);
     }
 }

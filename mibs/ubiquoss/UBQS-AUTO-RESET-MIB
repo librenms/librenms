@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP; trailing comma before })
 -- *****************************************************************
 -- UBQS-AUTO-RESET-MIB:  Ubiquoss Auto Reset MIB file
 --
@@ -190,7 +191,7 @@ ubiAutoResetIcmp                  	OBJECT IDENTIFIER	::= { ubiAutoResetMIBObject
             delay(1),
             reset(2),
             suppress(3),
-            cancel_delay(4),
+            cancel_delay(4)
          }        
          MAX-ACCESS read-only
          STATUS     current
@@ -287,7 +288,7 @@ ubiAutoResetIcmp                  	OBJECT IDENTIFIER	::= { ubiAutoResetMIBObject
             delay(1),
             reset(2),
             suppress(3),
-            cancel_delay(4),
+            cancel_delay(4)
          }        
          MAX-ACCESS read-only
          STATUS     current
@@ -389,7 +390,7 @@ ubiAutoResetIcmp                  	OBJECT IDENTIFIER	::= { ubiAutoResetMIBObject
             delay(1),
             reset(2),
             suppress(3),
-            cancel_delay(4),
+            cancel_delay(4)
          }        
          MAX-ACCESS read-only
          STATUS     current
@@ -499,15 +500,7 @@ ubiAutoResetMIBGroups      	OBJECT IDENTIFIER ::= { ubiAutoResetMIBConformance 2
  
 -- units of conformance
 
-	ubiAutoResetGroup OBJECT-GROUP
-        OBJECTS {       
-        	         
-        	    }
-    	STATUS          current
-    	DESCRIPTION
-        	"A collection of objects containing
-        	information about the Auto-reset of system."
-    	::= { ubiAutoResetMIBGroups 1 }
+	ubiAutoResetGroup OBJECT IDENTIFIER ::= { ubiAutoResetMIBGroups 1 }
 
 
 END

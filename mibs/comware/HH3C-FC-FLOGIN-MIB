@@ -1,18 +1,20 @@
 -- =====================================================================
--- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:
 --      This MIB module is used for representing fabric login information.
 -- Reference:
--- Version: V1.0
+-- Version: V1.1
 -- History:
 --   V1.0 Initial version
 --        created by qiaoxinghua 2013-02-27
+--   V1.1 Modified by Zhaoming May.9 2022.The trap 'hh3cFcFLoginMaxNotify'
+--        was added.
 -- =====================================================================
 HH3C-FC-FLOGIN-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    OBJECT-TYPE, MODULE-IDENTITY
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32
         FROM SNMPv2-SMI
     TruthValue
         FROM SNMPv2-TC
@@ -22,10 +24,12 @@ IMPORTS
     hh3cSan, hh3cVsanIndex
         FROM HH3C-VSAN-MIB
     ifIndex
-        FROM IF-MIB;
+        FROM IF-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
 
 hh3cFcFLogin MODULE-IDENTITY
-    LAST-UPDATED   "201302271100Z"
+    LAST-UPDATED   "202205091523Z"
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -36,6 +40,9 @@ hh3cFcFLogin MODULE-IDENTITY
         "
     DESCRIPTION
         "This MIB module is for representing fabric login information."
+    REVISION "202205091523Z"
+    DESCRIPTION
+        "This revision is about the node hh3cFcFLoginMaxNotify."
     REVISION       "201302271100Z"
     DESCRIPTION
         "Initial version of this MIB module."
@@ -206,5 +213,136 @@ hh3cFcFLoginClass3ReqAgreed OBJECT-TYPE
          Class 3 delivery that the logged-in Nx_Port requested.  It's
          meaningful only when the Class 3 delivery has been requested."
     ::= { hh3cFcFLoginEntry 11 }
+
+-- ===============================================
+-- Begin the hh3cFcFloginTrapObject.
+-- ===============================================
+
+hh3cFcFloginTrapObject OBJECT IDENTIFIER ::= { hh3cFcFLoginMibObjects 2 }
+
+hh3cFcFLoginVsanID OBJECT-TYPE
+    SYNTAX Integer32 (1..3839)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Vsan ID with a trap."
+    ::= { hh3cFcFloginTrapObject 1 }
+
+hh3cFcFLoginMaxNum OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Under the current VSAN ID, the maximum number login nodes with a trap."
+    ::= { hh3cFcFloginTrapObject 2 }
+
+-- ===============================================
+-- Begin the hh3cFcFLoginMaxTrapCntl.
+-- ===============================================
+
+hh3cFcFLoginTrapCntl OBJECT IDENTIFIER ::= { hh3cFcFLoginMibObjects 3 }
+
+hh3cFcFLoginMaxTrapCntl OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indicates whether hh3cFcFLoginMaxNotify traps should be generated."
+    ::= { hh3cFcFLoginTrapCntl 1 }
+
+-- ================================================
+-- definition of traps.
+-- ================================================
+
+hh3cFcFLoginTrap OBJECT IDENTIFIER ::= { hh3cFcFLoginMibObjects 4 }
+hh3cFcFLoginNotifications OBJECT IDENTIFIER ::= { hh3cFcFLoginTrap 0 }
+
+hh3cFcFLoginMaxNotify NOTIFICATION-TYPE
+    OBJECTS {
+                hh3cFcFLoginVsanID,
+                hh3cFcFLoginMaxNum
+            }
+    STATUS     current
+    DESCRIPTION
+        "This notification is generated when the login number reached the
+         maximum."
+    ::= { hh3cFcFLoginNotifications 1 }
+
+
+-- =======================================
+-- Conformance Information
+-- =======================================
+hh3cFcFLoginConformance   OBJECT IDENTIFIER
+                         ::= { hh3cFcFLogin 2 }
+hh3cFcFLoginCompliances   OBJECT IDENTIFIER
+                         ::= { hh3cFcFLoginConformance 1 }
+hh3cFcFLoginGroups        OBJECT IDENTIFIER
+                         ::= { hh3cFcFLoginConformance 2 }
+
+-- =======================================
+-- Compliance Statements
+-- =======================================
+hh3cFcFLoginCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        " "
+    MODULE -- this module
+    MANDATORY-GROUPS
+        {
+            hh3cFcFLoginTableGroup,
+            hh3cFcFLoginTrapObjectGroup,
+            hh3cFcFLoginTrapCntlGroup,
+            hh3cFcFLoginTrapGroup
+        }
+    ::= { hh3cFcFLoginCompliances 1 }
+
+hh3cFcFLoginTableGroup OBJECT-GROUP
+    OBJECTS {
+                hh3cFcFLoginPortNodeWWN,
+                hh3cFcFLoginPortWWN,
+                hh3cFcFLoginPortFcId,
+                hh3cFcFLoginRxBbCredit,
+                hh3cFcFLoginTxBbCredit,
+                hh3cFcFLoginClass2RxMTU,
+                hh3cFcFLoginClass3RxMTU,
+                hh3cFcFLoginSuppClassRequested,
+                hh3cFcFLoginClass2ReqAgreed,
+                hh3cFcFLoginClass3ReqAgreed
+            }
+        STATUS current
+        DESCRIPTION
+            "A group of Fibre Channel related service parameters
+             used to represent fabric login information of a specific
+             Nx_Port."
+    ::= { hh3cFcFLoginGroups 1 }
+
+
+hh3cFcFLoginTrapObjectGroup OBJECT-GROUP
+    OBJECTS {
+                hh3cFcFLoginVsanID,
+                hh3cFcFLoginMaxNum
+            }
+    STATUS current
+    DESCRIPTION
+        "The group contains all of trap objects of FcFlogin module."
+    ::= { hh3cFcFLoginGroups 2 }
+
+hh3cFcFLoginTrapCntlGroup OBJECT-GROUP
+    OBJECTS {
+                hh3cFcFLoginMaxTrapCntl
+            }
+    STATUS current
+    DESCRIPTION
+        "The group contains all of trap switches of FcFLogin module."
+    ::= { hh3cFcFLoginGroups 3 }
+
+hh3cFcFLoginTrapGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+                hh3cFcFLoginMaxNotify
+                  }
+    STATUS current
+    DESCRIPTION
+        "The group contains all of trap of FcFLogin module."
+    ::= { hh3cFcFLoginGroups 4 }
 
 END

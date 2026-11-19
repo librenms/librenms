@@ -22,11 +22,13 @@
             FROM JUNIPER-MIMSTP-MIB
         jnxUserAAAMibRoot
             FROM JUNIPER-SMI
+       CounterBasedGauge64
+            FROM HCNUM-TC
         InetAddressType, InetAddress, InetAddressPrefixLength
             FROM INET-ADDRESS-MIB;
 
     jnxUserAAAMib  	MODULE-IDENTITY
-        LAST-UPDATED "201307100000Z"
+        LAST-UPDATED "202009080000Z"
         ORGANIZATION  "Juniper Networks, Inc."
         CONTACT-INFO
             "Juniper Technical Assistance Center
@@ -39,6 +41,9 @@
         DESCRIPTION
             "This module defines the objects pertaining to User authentication,
              authorization and accounting"
+        REVISION      "202009080000Z"
+        DESCRIPTION   "Fixed syntax of jnxUserAAAAccessPoolAddressTotal and
+                       jnxUserAAAAccessPoolAddressesInUse objects"
         REVISION      "201307100000Z"
         DESCRIPTION   "Adding jnxUserAAADomainStripUsername and 
                        jnxUserAAADomainOverridePassword to jnxUserAAADomain"      
@@ -432,8 +437,8 @@
         jnxUserAAAAccessPoolInetPrefixLength     InetAddressPrefixLength,
         jnxUserAAAAccessPoolOutOfMemory          Counter64,
         jnxUserAAAAccessPoolOutOfAddresses       Counter64,
-        jnxUserAAAAccessPoolAddressTotal         Counter64,
-        jnxUserAAAAccessPoolAddressesInUse       Counter64,
+        jnxUserAAAAccessPoolAddressTotal         CounterBasedGauge64,
+        jnxUserAAAAccessPoolAddressesInUse       CounterBasedGauge64,
         jnxUserAAAAccessPoolAddressUsage         INTEGER,
         jnxUserAAAAccessPoolAddressUsageHigh     INTEGER,
         jnxUserAAAAccessPoolAddressUsageAbate    INTEGER
@@ -512,7 +517,7 @@
          ::= { jnxUserAAAAccessPoolEntry 9 }
 
     jnxUserAAAAccessPoolAddressTotal OBJECT-TYPE
-        SYNTAX       Counter64
+        SYNTAX       CounterBasedGauge64
         MAX-ACCESS   read-only
         STATUS       current
         DESCRIPTION
@@ -520,7 +525,7 @@
          ::= { jnxUserAAAAccessPoolEntry 10 }
 
     jnxUserAAAAccessPoolAddressesInUse OBJECT-TYPE
-        SYNTAX       Counter64
+        SYNTAX       CounterBasedGauge64
         MAX-ACCESS   read-only
         STATUS       current
         DESCRIPTION

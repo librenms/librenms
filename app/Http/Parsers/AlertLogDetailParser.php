@@ -181,7 +181,7 @@ class AlertLogDetailParser
         if ($sensor->sensor_class == 'state') {
             $this->addField('State', $value . ' (numerical: ' . $sensor->sensor_current . ')');
         } else {
-            $this->addField('Value', $value . ' (' . $sensor->sensor_class . ')');
+            $this->addField('Value', $value . ' (' . $sensor->classDescr() . ')');
         }
 
         // Add thresholds if any exist
@@ -262,7 +262,7 @@ class AlertLogDetailParser
         $this->addField(
             'BGP Peer',
             $detail['bgpPeerIdentifier'] ?? 'BGP Peer',
-            Url::deviceUrl($detail['device_id'] ?? 0, ['tab' => 'routing', 'proto' => 'bgp'])
+            route('device.routing.bgp', ['device' => $detail['device_id'] ?? 0])
         );
 
         if (! empty($detail['bgpPeerDescr'])) {

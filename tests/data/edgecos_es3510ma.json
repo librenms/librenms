@@ -3188,13 +3188,13 @@
             "ports_fdb": [
                 {
                     "mac_address": "001cf0bb8374",
-                    "ifIndex": 9,
-                    "vlan_vlan": 200
+                    "vlan": 200,
+                    "ifIndex": 9
                 },
                 {
                     "mac_address": "001b382a7bc6",
-                    "ifIndex": 9,
-                    "vlan_vlan": 1170
+                    "vlan": 1170,
+                    "ifIndex": 9
                 }
             ]
         }

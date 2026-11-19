@@ -1,6 +1,6 @@
 os: hpblmos
 text: 'HP Blade Management'
-type: appliance
+type: management
 icon: hpe
 mib_dir: hp
 over:

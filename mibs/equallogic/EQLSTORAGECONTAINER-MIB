@@ -1,4 +1,4 @@
--- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+-- Mib files packaged on  Wed Jun 19 01:31:39 EDT 2019 for Storage Array Firmware V10.0.3 (R469188)
 
 --FROM SNMP-FRAMEWORK-MIB; 
 -- RFC 2571  
@@ -21,13 +21,13 @@ IMPORTS
             FROM EQUALLOGIC-SMI
     UTFString
             FROM EQLGROUP-MIB
-    eqliscsiLocalMemberId, EQL2PartRowPointerStr
+    eqliscsiLocalMemberId, EQL2PartRowPointerStr, StatusEnabledDefault, BinaryUUID
             FROM EQLVOLUME-MIB
     eqlStoragePoolIndex
             FROM EQLSTORAGEPOOL-MIB;
 
 eqlStorageContainerModule MODULE-IDENTITY      
-	LAST-UPDATED "201503171528Z"
+	LAST-UPDATED "201906190531Z"
     ORGANIZATION  "EqualLogic Inc."
     CONTACT-INFO      
         "Contact: Customer Support
@@ -100,7 +100,9 @@ EqlStorageContainerEntry ::=
         eqlStorageContainerName                    UTFString,
         eqlStorageContainerLookupName              UTFString,
         eqlStorageContainerDescription             UTFString,  
-        eqlStorageContainerLogicalLimit            Unsigned64
+        eqlStorageContainerLogicalLimit            Unsigned64,
+        eqlStorageContainerReplicationEnabled      StatusEnabledDefault,
+        eqlStorageContainerExternalId              BinaryUUID
     }
 
 eqlStorageContainerIndex OBJECT-TYPE      
@@ -160,11 +162,29 @@ eqlStorageContainerLogicalLimit OBJECT-TYPE
     UNITS           "MB" 
     MAX-ACCESS      read-create      
     STATUS          current    
-    DESCRIPTION     "This field specifies the Storage Container *logical* limit in MB. There is no default.
-                     It should be larger than the physical size, as configured for this Storage Container."
-    DEFVAL          {8589934592}  
-    ::=   { eqlStorageContainerEntry 7 }   
+    DESCRIPTION     "UNUSED. The user cannot set the logical limit of a storage container. To get the logical limit
+                     of a storage container, do a get on eqlStorageContainerStatisticsLogicalLimit"
+    DEFVAL          {0}  
+    ::=  { eqlStorageContainerEntry 7 }
+    
+ eqlStorageContainerReplicationEnabled OBJECT-TYPE
+   SYNTAX      StatusEnabledDefault
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION "The state of this storage container for replication."
+   DEFVAL      { enabled }
+   ::=  { eqlStorageContainerEntry 8 }
 
+ eqlStorageContainerExternalId OBJECT-TYPE
+   SYNTAX      BinaryUUID
+   MAX-ACCESS  read-write
+   STATUS      current
+   DESCRIPTION "This field is used for vvol replication. The VMs in vmware expect the storage container uuid to be
+                the same on the replica site. However, each storage container must also have a unique id. This id is 
+                used by VSM as the storage container uuid if it is non-zero"
+   ::=  { eqlStorageContainerEntry 9 }
+   
+    
 --***********************************************************************************
     
 eqlStorageContainerStatisticsTable OBJECT-TYPE      
@@ -196,7 +216,8 @@ EqlStorageContainerStatisticsEntry ::=
         eqlStorageContainerStatisticsSVCount            Counter32,
         eqlStorageContainerStatisticsSVSCount           Counter32,
         eqlStorageContainerStatisticsThinProvisioned    TruthValue,
-        eqlStorageContainerStatisticsVvolsOnline        Counter32
+        eqlStorageContainerStatisticsVvolsOnline        Counter32,
+        eqlStorageContainerStatisticsLogicalLimit       Unsigned64
     }
 
 eqlStorageContainerStatisticsLogicalUsed OBJECT-TYPE      
@@ -285,6 +306,14 @@ eqlStorageContainerStatisticsVvolsOnline OBJECT-TYPE
     DESCRIPTION     "The value of this object represents number of vvols within
                      the storage container that are online."
     ::= {   eqlStorageContainerStatisticsEntry 10 }
+
+eqlStorageContainerStatisticsLogicalLimit OBJECT-TYPE      
+    SYNTAX          Unsigned64
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the logical limit of the storage container.
+                     The limit is equal to 10 times the physical size of all storage buckets."
+    ::=  { eqlStorageContainerStatisticsEntry 11 }
 
 
 --***********************************************************************************
@@ -590,5 +619,47 @@ eqlStorageBucketStatisticsVvolsOnline OBJECT-TYPE
     DESCRIPTION     "The value of this object represents number of vvols within
                      the storage container that are online."
     ::= {   eqlStorageBucketStatisticsEntry 7 }
+
+--***********************************************************************************
+
+eqlStorageContainerVVolTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageContainerVVolEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Storage Container VVol Table"
+    ::=  {  eqlStorageContainerObjects 6 }
+
+eqlStorageContainerVVolEntry OBJECT-TYPE
+    SYNTAX          EqlStorageContainerVVolEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing storage container VVol information."
+    AUGMENTS        { eqlStorageContainerEntry }
+    
+    ::=    { eqlStorageContainerVVolTable 1 }
+
+EqlStorageContainerVVolEntry ::=
+    SEQUENCE {
+        eqlStorageContainerVVolSnapshotCount     Unsigned32,
+        eqlStorageContainerVVolLinkedCloneCount  Unsigned32   
+    }
+
+eqlStorageContainerVVolSnapshotCount OBJECT-TYPE 
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of VVol snapshots in the storage container."
+    DEFVAL          { 0 }
+    ::=  { eqlStorageContainerVVolEntry 1 }
+
+eqlStorageContainerVVolLinkedCloneCount OBJECT-TYPE 
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The number of VVol linked clones in the storage container."
+    DEFVAL          { 0 }
+    ::=  { eqlStorageContainerVVolEntry 2 }
+
+--
 
 END

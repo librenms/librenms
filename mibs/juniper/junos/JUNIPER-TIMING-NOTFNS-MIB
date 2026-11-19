@@ -1,6 +1,6 @@
 -------------------------------------------------------------------------------
 -- Juniper Enterprise Specific MIB: Timing feature defect/event notification MIB
--- 
+--
 -- Copyright (c) 2001-2003, Juniper Networks, Inc.
 -- All rights reserved.
 --
@@ -23,12 +23,12 @@ IMPORTS
         FROM INET-ADDRESS-MIB
     OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE
         FROM SNMPv2-CONF
-    jnxTimingNotfnsMIBRoot
+    jnxTimingNotfnsMIBRoot, Integer64
         FROM JUNIPER-SMI;
 
 
 jnxTimingNotfnsMIB MODULE-IDENTITY
-    LAST-UPDATED "201909020408Z"  -- Mon Sep 02 20:08 2019 IST
+    LAST-UPDATED "202107180000Z"  -- Jun 04, 2021
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
@@ -41,13 +41,30 @@ jnxTimingNotfnsMIB MODULE-IDENTITY
             "This is Juniper Networks' implementation of enterprise
              specific MIB for alarms from the router chassis box."
     --  Revision history
+    REVISION     "202107180000Z" -- July 18, 2021
+    DESCRIPTION  "Removed the un-supported OID's jnxTimingAlarmNoAnnounceMessageSet,
+                  jnxTimingAlarmNoAnnounceMessageClear, jnxTimingAlarmNoSyncMessageSet,
+                  jnxTimingAlarmNoSyncMessageClear, jnxTimingAlarmNoDelayResponseMessageSet,
+                  jnxTimingAlarmNoDelayResponseMessageClear, jnxTimingAlarmHighPDVDetectedSet,
+                  jnxTimingAlarmHighPDVDetectedClear, jnxTimingAlarmSlaveCandidateStateLoseLockSet,
+                  jnxTimingAlarmSlaveCandidateStateLoseLockClear, jnxTimingAlarmPtpSyncFailSet,
+                  jnxTimingAlarmPtpSyncFailClear, jnxTimingAlarmLossOfReference3Set,
+                  jnxTimingAlarmLossOfReference3Clear, jnxTimingAlarmLossOfReference4Set,
+                  jnxTimingAlarmLossOfReference4Clear, jnxTimingAlarmDPLLNotLockedSet,
+                  jnxTimingAlarmDPLLNotLockedClear, jnxTimingEventDelayAsymmetryExceedMinor,
+                  jnxTimingEventDelayAsymmetryExceedCritical."
+    REVISION     "202106040000Z" -- Jun 04, 2021
+    DESCRIPTION  "Deprecated jnxTimingEventSynceLckToHldovr and
+                  jnxTimingEventSynceHldovrToLck. Instead use
+                  jnxTimingEventDpllStatus or jnxTimingEventSynceDpllStatus
+                  for all state change notifications."
     REVISION     "201909020408Z" -- Tue Sep 02 20:08 2019 IST
     DESCRIPTION  "Modified to include additional traps for extensibility"
     REVISION     "201511140408Z" -- Tue Nov 15 04:08 2016 UTC
     DESCRIPTION  "Modifed jnxUtcValid to correct the value
                   when queried from external server"
     REVISION     "201510140000Z" -- Fri Mar 15 15:41 2013 UTC
-    DESCRIPTION  "Modifed jnxClksyncQualityCode to include the list 
+    DESCRIPTION  "Modifed jnxClksyncQualityCode to include the list
                   of possible values (similar to G.781 standard)"
     REVISION     "201303151541Z" -- Fri Mar 15 15:41 2013 UTC
     DESCRIPTION  "Initial Version"
@@ -55,10 +72,12 @@ jnxTimingNotfnsMIB MODULE-IDENTITY
     ::= { jnxTimingNotfnsMIBRoot 1 }
 
 
-jnxTimingFaults          OBJECT IDENTIFIER ::= { jnxTimingNotfnsMIB 1 }
-jnxTimingEvents           OBJECT IDENTIFIER ::= { jnxTimingNotfnsMIB 2 }
-jnxTimingNotfObjects      OBJECT IDENTIFIER ::= { jnxTimingNotfnsMIB 3 }
-jnxTimingConformance      OBJECT IDENTIFIER ::= { jnxTimingNotfnsMIB 4 }
+jnxTimingFaults              OBJECT IDENTIFIER ::= { jnxTimingNotfnsMIB 1 }
+jnxTimingEvents              OBJECT IDENTIFIER ::= { jnxTimingNotfnsMIB 2 }
+jnxTimingNotfObjects         OBJECT IDENTIFIER ::= { jnxTimingNotfnsMIB 3 }
+jnxTimingConformance         OBJECT IDENTIFIER ::= { jnxTimingNotfnsMIB 4 }
+jnxTimingPerformanceMonitor  OBJECT IDENTIFIER ::= { jnxTimingNotfnsMIB 5 }
+jnxTimingPassivePortMonitor  OBJECT IDENTIFIER ::= { jnxTimingNotfnsMIB 6 }
 
 
 -------------------------------------------------------------------------------
@@ -76,9 +95,8 @@ JnxPtpPhaseOffsetTC ::= TEXTUAL-CONVENTION
             "Phase Offset."
     SYNTAX       Integer32 (0..1000)
 
-
 -------------------------------------------------------------------------------
--- Objects 
+-- Objects
 -------------------------------------------------------------------------------
 jnxClksyncState OBJECT-TYPE
     SYNTAX      INTEGER { clear(0), set(1) }
@@ -302,13 +320,23 @@ jnxClksyncColorStr OBJECT-TYPE
             "Color of the LED unit."
         ::= { jnxTimingNotfObjects 23 }
 
+jnxPtpPhaseOffsetThresholdExceeded OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..512))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the Phase Threshold of the monitored Passive Port
+         has exceeded the configured Max Phase Offset Threshold as per
+         Annex G of ITU-T G.8275.1"
+        ::= { jnxTimingNotfObjects 24 }
+
 jnxPtpUtcOffset OBJECT-TYPE
     SYNTAX      JnxPtpPhaseOffsetTC
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
             "UTC Offset."
-    ::= { jnxTimingNotfObjects 24 }
+    ::= { jnxTimingNotfObjects 25 }
 
 jnxGpsRecvStatus OBJECT-TYPE
        SYNTAX       DisplayString
@@ -316,7 +344,7 @@ jnxGpsRecvStatus OBJECT-TYPE
        STATUS       current
        DESCRIPTION
             "Gps Receiver Status"
-        ::= { jnxTimingNotfObjects 25 }
+        ::= { jnxTimingNotfObjects 26 }
 
 jnxPtpAdvClockClass OBJECT-TYPE
     SYNTAX      Integer32
@@ -324,7 +352,7 @@ jnxPtpAdvClockClass OBJECT-TYPE
     STATUS      current
     DESCRIPTION
             "UTC Offset."
-    ::= { jnxTimingNotfObjects 26 }
+    ::= { jnxTimingNotfObjects 27 }
 
 
 jnxClksyncSynceLockedIfIndex  OBJECT-TYPE
@@ -333,7 +361,7 @@ jnxClksyncSynceLockedIfIndex  OBJECT-TYPE
         STATUS      current
         DESCRIPTION
             "Snmp ifIndex of member interface."
-        ::= { jnxTimingNotfObjects 27 }
+        ::= { jnxTimingNotfObjects 28 }
 
 jnxClksyncSynceLockedIntfName OBJECT-TYPE
         SYNTAX      DisplayString
@@ -341,7 +369,7 @@ jnxClksyncSynceLockedIntfName OBJECT-TYPE
         STATUS      current
         DESCRIPTION
             "Interface name."
-        ::= { jnxTimingNotfObjects 28 }
+        ::= { jnxTimingNotfObjects 29 }
 
 jnxClksyncSynceQualityTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF JnxClksyncSynceQualityEntry
@@ -349,7 +377,7 @@ jnxClksyncSynceQualityTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Synce Table to get Quality metrics for all configured sources"
-    ::= { jnxTimingNotfObjects 29 }
+    ::= { jnxTimingNotfObjects 30 }
 
 jnxPtpUtcValid OBJECT-TYPE
     SYNTAX      INTEGER {
@@ -360,7 +388,7 @@ jnxPtpUtcValid OBJECT-TYPE
     STATUS      current
     DESCRIPTION
        "PTP UTC Offset Valid."
-    ::= { jnxTimingNotfObjects 30 }
+    ::= { jnxTimingNotfObjects 31 }
 
 jnxTimingFrequencyTraceability OBJECT-TYPE
    SYNTAX      INTEGER {
@@ -370,8 +398,8 @@ jnxTimingFrequencyTraceability OBJECT-TYPE
    MAX-ACCESS  accessible-for-notify
    STATUS      current
    DESCRIPTION
-        "Frequency Tracable Flag."
-   ::= { jnxTimingNotfObjects 33 }
+        "Frequency Traceable Flag."
+   ::= { jnxTimingNotfObjects 34 }
 
 jnxTimingTimeTraceability OBJECT-TYPE
    SYNTAX      INTEGER {
@@ -381,8 +409,8 @@ jnxTimingTimeTraceability OBJECT-TYPE
    MAX-ACCESS  accessible-for-notify
    STATUS      current
    DESCRIPTION
-        "Time Tracable Flag."
-   ::= { jnxTimingNotfObjects 34 }
+        "Time Traceable Flag."
+   ::= { jnxTimingNotfObjects 35 }
 
 jnxClksyncSynceQualityEntry OBJECT-TYPE
     SYNTAX     JnxClksyncSynceQualityEntry
@@ -404,7 +432,7 @@ jnxClksyncSynceQualityTableIndex OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "The ifName of the configured source"
+        "The index for each configured source, not displayed for get/walk"
     ::= { jnxClksyncSynceQualityEntry 1 }
 
 jnxClksyncSynceQualityIntfName OBJECT-TYPE
@@ -429,7 +457,7 @@ jnxClksyncPtpOperationalMasterTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "PTP Operational Master Table displays the upstream clock details"
-    ::= { jnxTimingNotfObjects 35 }
+    ::= { jnxTimingNotfObjects 36 }
 
 jnxClksyncPtpOperationalMasterEntry OBJECT-TYPE
     SYNTAX     JnxClksyncPtpOperationalMasterEntry 
@@ -470,7 +498,7 @@ jnxClksyncPtpOperationalMasters OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Attributes displayed for each master i.e ifl, localip, no_of_rem_clks 
-         and follwed by remote ips" 
+         and followed by remote ips"
     ::= { jnxClksyncPtpOperationalMasterEntry 3 }
 
 jnxClksyncPtpOperationalSlaveTable OBJECT-TYPE
@@ -479,7 +507,7 @@ jnxClksyncPtpOperationalSlaveTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "PTP Operational Slave Table displays the downstream clock details"
-    ::= { jnxTimingNotfObjects 36 }
+    ::= { jnxTimingNotfObjects 37 }
 
 jnxClksyncAdditionalInformationStr OBJECT-TYPE
         SYNTAX      DisplayString
@@ -487,7 +515,7 @@ jnxClksyncAdditionalInformationStr OBJECT-TYPE
         STATUS      current
         DESCRIPTION
             "Additional information in string format."
-        ::= { jnxTimingNotfObjects 37 }
+        ::= { jnxTimingNotfObjects 38 }
 
 jnxClksyncPtpOperationalSlaveEntry OBJECT-TYPE
     SYNTAX     JnxClksyncPtpOperationalSlaveEntry 
@@ -528,8 +556,669 @@ jnxClksyncPtpOperationalSlaves OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "Attributes displayed for each slave i.e ifl, localip, no_of_rem_clks
-         and follwed by remote ips" 
+         and followed by remote ips"
     ::= { jnxClksyncPtpOperationalSlaveEntry 3 }
+
+------------------------------------------------------
+--  Start: IEEE 1588v2.1 (2019) Annex J1 & J3 Objects
+------------------------------------------------------
+
+jnxPtpPerformanceMonitorEnabled OBJECT-TYPE
+    SYNTAX      INTEGER { false(0), true(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates that performance monitor feature as per Annex J1
+         of IEEE 1588v2.1 (2019) is enabled or disabled."
+        ::= { jnxTimingPerformanceMonitor 1 }
+
+jnxPtpStatisticsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF JnxPtpStatisticsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Performance monitor statistics table as per
+         Annex J3 of IEEE 1588v2.1 (2019)."
+        ::= { jnxTimingPerformanceMonitor 2 }
+
+jnxPtpStatisticsTableEntry OBJECT-TYPE
+    SYNTAX     JnxPtpStatisticsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Performance monitor statistics table entries."
+    INDEX   { jnxPtpStatisticsAttrIndex }
+    ::= { jnxPtpStatisticsTable 1 }
+
+JnxPtpStatisticsTableEntry ::= SEQUENCE {
+    jnxPtpStatisticsAttrIndex                      Unsigned32,
+    jnxPtpStatisticsTimestamp                      DisplayString,
+    jnxPtpStatisticsTxAnnounce                     Unsigned32,
+    jnxPtpStatisticsTxSync                         Unsigned32,
+    jnxPtpStatisticsTxDelayRequest                 Unsigned32,
+    jnxPtpStatisticsTxDelayResponse                Unsigned32,
+    jnxPtpStatisticsTxFollowup                     Unsigned32,
+    jnxPtpStatisticsTxError                        Unsigned32,
+    jnxPtpStatisticsAnnouncedFromAllForeignMasters Unsigned32,
+    jnxPtpStatisticsRxAnnounce                     Unsigned32,
+    jnxPtpStatisticsRxSync                         Unsigned32,
+    jnxPtpStatisticsRxDelayRequest                 Unsigned32,
+    jnxPtpStatisticsRxDelayResponse                Unsigned32,
+    jnxPtpStatisticsRxFollowup                     Unsigned32,
+    jnxPtpStatisticsRxError                        Unsigned32
+}
+
+jnxPtpStatisticsAttrIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..98)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index for each performance monitor statistics data
+         attribute: (1..96) represents 15 min counters; (97..98)
+         represents 24 h counters."
+    ::= { jnxPtpStatisticsTableEntry 1 }
+
+jnxPtpStatisticsTimestamp OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Timestamp of PTP slave port monitor statistics data."
+    ::= { jnxPtpStatisticsTableEntry 2 }
+
+jnxPtpStatisticsTxAnnounce OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counter indicating the number of Announce messages that have been
+         transmitted for each 15 min and 24 h interval."
+    ::= { jnxPtpStatisticsTableEntry 3 }
+
+jnxPtpStatisticsTxSync OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counter indicating the number of Sync messages that have been
+         transmitted for each 15 min and 24 h interval."
+    ::= { jnxPtpStatisticsTableEntry 4 }
+
+jnxPtpStatisticsTxDelayRequest OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counter indicating the number of Delay Request messages that have been
+         transmitted for each 15 min and 24 h interval."
+    ::= { jnxPtpStatisticsTableEntry 5 }
+
+jnxPtpStatisticsTxDelayResponse OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counter indicating the number of Delay Response messages that have been
+         transmitted for each 15 min and 24 h interval."
+    ::= { jnxPtpStatisticsTableEntry 6 }
+
+jnxPtpStatisticsTxFollowup OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counter indicating the number of Follow Up messages that have been
+         transmitted for each 15 min and 24 h interval."
+    ::= { jnxPtpStatisticsTableEntry 7 }
+
+jnxPtpStatisticsTxError OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counter indicating the number of Transmit Error messages that have been
+         transmitted for each 15 min and 24 h interval."
+    ::= { jnxPtpStatisticsTableEntry 8 }
+
+jnxPtpStatisticsAnnouncedFromAllForeignMasters OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counter indicating the total number of announce messages from
+         the foreign Masters that have been received for each 15 min and
+         24 h interval as per Annex J3 of IEEE 1588v2.1 (2019)."
+    ::= { jnxPtpStatisticsTableEntry 9 }
+
+jnxPtpStatisticsRxAnnounce OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counter indicating the number of Announce messages from the current
+         GM that have been received for each 15 min and 24 h interval."
+    ::= { jnxPtpStatisticsTableEntry 10 }
+
+jnxPtpStatisticsRxSync OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counter indicating the number of Sync messages that have been
+         received for each 15 min and 24 h interval."
+    ::= { jnxPtpStatisticsTableEntry 11 }
+
+jnxPtpStatisticsRxDelayRequest OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counter indicating the number of Delay Request messages that have been
+         received for each 15 min and 24 h interval."
+    ::= { jnxPtpStatisticsTableEntry 12 }
+
+jnxPtpStatisticsRxDelayResponse OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counter indicating the number of Delay Response messages that have been
+         received for each 15 min and 24 h interval."
+    ::= { jnxPtpStatisticsTableEntry 13 }
+
+jnxPtpStatisticsRxFollowup OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counter indicating the number of Follow Up messages that have been
+         received for each 15 min and 24 h interval."
+    ::= { jnxPtpStatisticsTableEntry 14 }
+
+jnxPtpStatisticsRxError OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Counter indicating the number of Receive Error messages that have been
+         received for each 15 min and 24 h interval."
+    ::= { jnxPtpStatisticsTableEntry 15 }
+
+jnxPtpPerformanceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPtpPerformanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Performance monitor table as per
+         Annex J1 of IEEE 1588v2.1 (2019)."
+    ::= { jnxTimingPerformanceMonitor 3 }
+
+jnxPtpPerformanceEntry OBJECT-TYPE
+    SYNTAX     JnxPtpPerformanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "PTP performance entry displays the performance monitor data details."
+    INDEX   { jnxPtpPerformanceAttrIndex }
+    ::= { jnxPtpPerformanceTable 1 }
+
+JnxPtpPerformanceEntry ::= SEQUENCE {
+    jnxPtpPerformanceAttrIndex                Unsigned32,
+    jnxPtpPerformanceIntfName                 DisplayString,
+    jnxPtpPerformanceSourcePortIdentity       Unsigned32,
+    jnxPtpPerformanceTimestamp                DisplayString,
+    jnxPtpPerformancePeriodComplete           INTEGER,
+    jnxPtpPerformanceDataValid                INTEGER,
+    jnxPtpPerformanceDataInvalidReason        DisplayString,
+    jnxPtpPerformanceAverageMasterSlaveDelay  Integer64,
+    jnxPtpPerformanceMinMasterSlaveDelay      Integer64,
+    jnxPtpPerformanceMaxMasterSlaveDelay      Integer64,
+    jnxPtpPerformanceStdDevMasterSlaveDelay   Integer64,
+    jnxPtpPerformanceAverageSlaveMasterDelay  Integer64,
+    jnxPtpPerformanceMinSlaveMasterDelay      Integer64,
+    jnxPtpPerformanceMaxSlaveMasterDelay      Integer64,
+    jnxPtpPerformanceStdDevSlaveMasterDelay   Integer64,
+    jnxPtpPerformanceAverageMeanPathDelay     Integer64,
+    jnxPtpPerformanceMinMeanPathDelay         Integer64,
+    jnxPtpPerformanceMaxMeanPathDelay         Integer64,
+    jnxPtpPerformanceStdDevMeanPathDelay      Integer64,
+    jnxPtpPerformanceAverageOffsetFromMaster  Integer64,
+    jnxPtpPerformanceMinOffsetFromMaster      Integer64,
+    jnxPtpPerformanceMaxOffsetFromMaster      Integer64,
+    jnxPtpPerformanceStdDevOffsetFromMaster   Integer64
+}
+
+jnxPtpPerformanceAttrIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..98)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index for each performance monitor attribute: (1..96)
+         represents 15 min counters; (97..98) represents 24 h counters."
+    ::= { jnxPtpPerformanceEntry 1 }
+
+jnxPtpPerformanceIntfName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interface name for ptp performance monitor data."
+    ::= { jnxPtpPerformanceEntry 2 }
+
+jnxPtpPerformanceSourcePortIdentity OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Idenity of the source port associated with the performance monitor data."
+    ::= { jnxPtpPerformanceEntry 3 }
+
+jnxPtpPerformanceTimestamp OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Timestamp of PTP slave port monitor measurement data."
+    ::= { jnxPtpPerformanceEntry 4 }
+
+jnxPtpPerformancePeriodComplete OBJECT-TYPE
+    SYNTAX      INTEGER { false(0), true(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Flag to represent if any data collected within a measurement window
+         (15min or 24h) is partial as per IEEE 1588 2019 Annex J.4.1."
+    ::= { jnxPtpPerformanceEntry 5 }
+
+jnxPtpPerformanceDataValid OBJECT-TYPE
+    SYNTAX      INTEGER { false(0), true(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Validity of performance monitor data for each 15 min and 24 h interval."
+    ::= { jnxPtpPerformanceEntry 6 }
+
+jnxPtpPerformanceDataInvalidReason OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PTP slave port monitor measurement data (15min/24h) invalid reasons:
+	 1) PTP servo sync state not phase aligned & Phy sync state not in sync.
+	 2) PTP servo sync state not phase aligned & Phy sync state in sync.
+	 3) PTP servo sync state phase aligned & Phy sync state not in sync.
+	 4) Measurement not started: PTP servo sync state not phase aligned."
+    ::= { jnxPtpPerformanceEntry 7 }
+
+jnxPtpPerformanceAverageMasterSlaveDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average of the Master to Slave Delay for each 15 min and 24 h interval."
+    ::= { jnxPtpPerformanceEntry 8 }
+
+jnxPtpPerformanceMinMasterSlaveDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum of the Master to Slave Delay for each 15 min and 24 h interval."
+    ::= { jnxPtpPerformanceEntry 9 }
+
+jnxPtpPerformanceMaxMasterSlaveDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum of the Master to Slave Delay for each 15 min and 24 h interval."
+    ::= { jnxPtpPerformanceEntry 10 }
+
+jnxPtpPerformanceStdDevMasterSlaveDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Standard Deviation of the Master to Slave Delay for each 15 min
+         and 24 h interval."
+    ::= { jnxPtpPerformanceEntry 11 }
+
+jnxPtpPerformanceAverageSlaveMasterDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average of the Slave to Master Delay for each 15 min and 24 h interval."
+    ::= { jnxPtpPerformanceEntry 12 }
+
+jnxPtpPerformanceMinSlaveMasterDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum of the Slave to Master Delay for each 15 min and 24 h interval."
+    ::= { jnxPtpPerformanceEntry 13 }
+
+jnxPtpPerformanceMaxSlaveMasterDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum of the Slave to Master Delay for each 15 min and 24 h interval."
+    ::= { jnxPtpPerformanceEntry 14 }
+
+jnxPtpPerformanceStdDevSlaveMasterDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Standard Deviation of the Slave to Master Delay for each 15 min
+         and 24 h interval."
+    ::= { jnxPtpPerformanceEntry 15 }
+
+jnxPtpPerformanceAverageMeanPathDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average of the Mean Path Delay for each 15 min and 24 h interval."
+    ::= { jnxPtpPerformanceEntry 16 }
+
+
+jnxPtpPerformanceMinMeanPathDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum of the Mean Path Delay for each 15 min and 24 h interval."
+    ::= { jnxPtpPerformanceEntry 17 }
+
+jnxPtpPerformanceMaxMeanPathDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum of the Mean Path Delay for each 15 min and 24 h interval."
+    ::= { jnxPtpPerformanceEntry 18 }
+
+jnxPtpPerformanceStdDevMeanPathDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Standard Deviation of the Mean Path Delay for each 15 min
+         and 24 h interval."
+    ::= { jnxPtpPerformanceEntry 19 }
+
+jnxPtpPerformanceAverageOffsetFromMaster OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average of the Phase Offset From Master for each 15 min and 24 h interval."
+    ::= { jnxPtpPerformanceEntry 20 }
+
+jnxPtpPerformanceMinOffsetFromMaster OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum of the Phase Offset From Master for each 15 min and 24 h interval."
+    ::= { jnxPtpPerformanceEntry 21 }
+
+jnxPtpPerformanceMaxOffsetFromMaster OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum of the Phase Offset From Master for each 15 min and 24 h interval."
+    ::= { jnxPtpPerformanceEntry 22 }
+
+jnxPtpPerformanceStdDevOffsetFromMaster OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Stdandard Deviation of the Phase Offset From Master for each 15 min
+         and 24 h interval."
+    ::= { jnxPtpPerformanceEntry 23 }
+
+---------------------------------------------------
+--  End: IEEE 1588v2.1 (2019) Annex J1 & J3 Objects
+---------------------------------------------------
+
+---------------------------------------------------
+--  Start: - Annex G of ITU-T G.8275.1 Objects
+---------------------------------------------------
+
+jnxPtpPassivePortMonitorEnabled OBJECT-TYPE
+    SYNTAX      INTEGER { false(0), true(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates that passive port monitor feature as per
+         Annex G of ITU-T G.8275.1 is enabled or disabled."
+        ::= { jnxTimingPassivePortMonitor 1 }
+
+jnxPtpPassivePortMonitorDelayRequestInterval OBJECT-TYPE
+    SYNTAX      Integer32 (-7..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents passive port monitor feature delay request
+         interval as per Annex G of ITU-T G.8275.1."
+        ::= { jnxTimingPassivePortMonitor 2 }
+
+
+jnxPtpPassivePortMonitorTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF JnxPtpPassivePortMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "PTP passive port performance monitor table to get the passive
+         port performance against the selected slave port."
+        ::= { jnxTimingPassivePortMonitor 3 }
+
+jnxPtpPassivePortMonitorEntry OBJECT-TYPE
+    SYNTAX     JnxPtpPassivePortMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "PTP passive port performance monitor entry table to get the
+         passive port performance against the selected slave port."
+    INDEX   { jnxPtpPassivePortMonitorIntfName }
+    ::= { jnxPtpPassivePortMonitorTable 1 }
+
+JnxPtpPassivePortMonitorEntry ::= SEQUENCE {
+    jnxPtpPassivePortMonitorIntfName                      DisplayString,
+    jnxPtpPassivePortMonitorSourcePortIdentity            DisplayString,
+    jnxPtpPassivePortMonitorDataValid                     INTEGER,
+    jnxPtpPassivePortMonitorStartTimestamp                DisplayString,
+    jnxPtpPassivePortMonitorEndTimestamp                  DisplayString,
+    jnxPtpPassivePortMonitorAveragePhaseOffsetFromMaster  Integer64,
+    jnxPtpPassivePortMonitorMinPhaseOffsetFromMaster      Integer64,
+    jnxPtpPassivePortMonitorMaxPhaseOffsetFromMaster      Integer64,
+    jnxPtpPassivePortMonitorAverageMasterSlaveDelay       Integer64,
+    jnxPtpPassivePortMonitorMinMasterSlaveDelay           Integer64,
+    jnxPtpPassivePortMonitorMaxMasterSlaveDelay           Integer64,
+    jnxPtpPassivePortMonitorAverageSlaveMasterDelay       Integer64,
+    jnxPtpPassivePortMonitorMinSlaveMasterDelay           Integer64,
+    jnxPtpPassivePortMonitorMaxSlaveMasterDelay           Integer64,
+    jnxPtpPassivePortMonitorAveragePathDelay              Integer64,
+    jnxPtpPassivePortMonitorMaxPhaseOffsetThreshold       Unsigned32,
+    jnxPtpPassivePortMonitorPhaseOffsetThresholdExceeded  INTEGER,
+    jnxPtpPassivePortMonitorPortConfig                    INTEGER,
+    jnxPtpPassivePortMonitorPortState                     INTEGER
+}
+
+jnxPtpPassivePortMonitorIntfName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface name for PTP passive port data displayed for the stream."
+    ::= { jnxPtpPassivePortMonitorEntry 1 }
+
+jnxPtpPassivePortMonitorSourcePortIdentity OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identity of the source port to which PTP passive port data is associated."
+    ::= { jnxPtpPassivePortMonitorEntry 2 }
+
+jnxPtpPassivePortMonitorDataValid OBJECT-TYPE
+    SYNTAX      INTEGER { valid(0), inactive(1), not-applicable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This describes the validity of the data. If port state is passive and, passive
+         port monitoring feature is enabled, then there is a valid measurement data
+         available set to (0). If port state is other than passive, then not-applicable
+         will be set to (1); and if port state is passive and servo state is other than
+         phase-aligned, this will be set to (2) inactive."
+    ::= { jnxPtpPassivePortMonitorEntry 3 }
+
+jnxPtpPassivePortMonitorStartTimestamp OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Start Timestamp of PTP passive port monitor performance data."
+    ::= { jnxPtpPassivePortMonitorEntry 4 }
+
+jnxPtpPassivePortMonitorEndTimestamp OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "End Timestamp of PTP passive port monitor performance data."
+    ::= { jnxPtpPassivePortMonitorEntry 5 }
+
+jnxPtpPassivePortMonitorAveragePhaseOffsetFromMaster OBJECT-TYPE
+    SYNTAX      Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average Phase Offset value of the passive port from Master."
+    ::= { jnxPtpPassivePortMonitorEntry 6 }
+
+jnxPtpPassivePortMonitorMinPhaseOffsetFromMaster OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum Phase Offset value of the passive port from Master."
+    ::= { jnxPtpPassivePortMonitorEntry 7 }
+
+jnxPtpPassivePortMonitorMaxPhaseOffsetFromMaster OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum Phase Offset value of the passive port from Master."
+    ::= { jnxPtpPassivePortMonitorEntry 8 }
+
+jnxPtpPassivePortMonitorAverageMasterSlaveDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average Master to Slave Delay value of the passive port from Master."
+    ::= { jnxPtpPassivePortMonitorEntry 9 }
+
+jnxPtpPassivePortMonitorMinMasterSlaveDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum Master to Slave Delay value of the passive port from Master."
+    ::= { jnxPtpPassivePortMonitorEntry 10 }
+
+jnxPtpPassivePortMonitorMaxMasterSlaveDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum Master to Slave Delay value of the passive port from Master."
+    ::= { jnxPtpPassivePortMonitorEntry 11 }
+
+jnxPtpPassivePortMonitorAverageSlaveMasterDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average Slave to Master Delay value of the passive port from Master."
+    ::= { jnxPtpPassivePortMonitorEntry 12 }
+
+jnxPtpPassivePortMonitorMinSlaveMasterDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum Slave to Master Delay value of the passive port from Master."
+    ::= { jnxPtpPassivePortMonitorEntry 13 }
+
+jnxPtpPassivePortMonitorMaxSlaveMasterDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum Slave to Master Delay value of the passive port from Master."
+    ::= { jnxPtpPassivePortMonitorEntry 14 }
+
+jnxPtpPassivePortMonitorAveragePathDelay OBJECT-TYPE
+    SYNTAX     Integer64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Average Mean Path Delay of the passive port from Master."
+    ::= { jnxPtpPassivePortMonitorEntry 15 }
+
+jnxPtpPassivePortMonitorMaxPhaseOffsetThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Phase Offset threshold acceptable between
+         the passive port and slave port."
+    ::= { jnxPtpPassivePortMonitorEntry 16 }
+
+jnxPtpPassivePortMonitorPhaseOffsetThresholdExceeded OBJECT-TYPE
+    SYNTAX      INTEGER { false(0), true(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reflects the status as whether the passive port exceeded the
+         configured Max offset threshold or not."
+    ::= { jnxPtpPassivePortMonitorEntry 17 }
+
+jnxPtpPassivePortMonitorPortConfig OBJECT-TYPE
+    SYNTAX      INTEGER { stateful(0), stateful-slave-only(1),
+                          stateful-master-only(2),
+                          stateful-not-master(3),
+                          stateful-measure-only(4),
+                          stateful-not-master-and-measure-only(5) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the current state of the configured passive port."
+    ::= { jnxPtpPassivePortMonitorEntry 18 }
+
+jnxPtpPassivePortMonitorPortState OBJECT-TYPE
+    SYNTAX      INTEGER { initializing(0), faulty(1), disabled(2),
+                          listening(3), pre-master(4), master(5),
+                          passive(6), uncalibrated(7), slave(8),
+                          unknown(9) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the current state of the port."
+    ::= { jnxPtpPassivePortMonitorEntry 19 }
+
+--------------------------------------------
+--  End: - Annex G of ITU-T G.8275.1 Objects
+--------------------------------------------
 
 -------------------------------------------------------------------------------
 -- Faults
@@ -844,7 +1533,7 @@ jnxClksyncPtpOperationalSlaves OBJECT-TYPE
                 jnxClksyncIfIndex,
                 jnxClksyncIntfName
         }
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
             "A trap which signifies SyncE Holdover to Locked EEC state.
 
@@ -857,7 +1546,7 @@ jnxClksyncPtpOperationalSlaves OBJECT-TYPE
                 jnxClksyncIfIndex,
                 jnxClksyncIntfName
         }
-        STATUS  current
+        STATUS  deprecated
         DESCRIPTION
             "A trap which signifies SyncE Locked to Holdover EEC state.
 
@@ -873,7 +1562,7 @@ jnxClksyncPtpOperationalSlaves OBJECT-TYPE
         STATUS  current
         DESCRIPTION
             "A trap which signifies that DPLL state change
-             (unknown, lock_acq, locked, holder, freerun).
+             (unknown, lock_acq, locked, holdover, freerun).
 
              jnxClksyncDpllState indicates the Dpll status
              jnxClksyncDpllStateStr indicates the Dpll status in string format."
@@ -889,7 +1578,7 @@ jnxClksyncPtpOperationalSlaves OBJECT-TYPE
         STATUS  current
         DESCRIPTION
             "A trap which signifies that Synce DPLL state change
-             (unknown, lock_acq, locked, holder, freerun).
+             (unknown, lock_acq, locked, holdover, freerun).
 
              jnxClksyncIfIndex is the interface index from which Frequency is derived
              jnxClksyncIntfName is the interface name from which Frequency is derived
@@ -906,8 +1595,8 @@ jnxClksyncPtpOperationalSlaves OBJECT-TYPE
         }
         STATUS  current
         DESCRIPTION
-            "A trap which signifies that Synce DPLL state change
-             (unknown, lock_acq, locked, holder, freerun).
+            "A trap which signifies that BITS DPLL state change
+             (unknown, lock_acq, locked, holdover, freerun).
 
              jnxClksyncIfIndex is the interface index from which Frequency is derived
              jnxClksyncIntfName is the interface name from which Frequency is derived
@@ -1006,380 +1695,6 @@ jnxClksyncPtpOperationalSlaves OBJECT-TYPE
              jnxClksyncIntfName is the interface name."
     ::= { jnxTimingFaults 18 }
 
-    jnxTimingAlarmNoAnnounceMessageSet NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that announce messages are not being received.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 19 }
-
-    jnxTimingAlarmNoAnnounceMessageClear NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that announce messages are now being received.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 20 }
-
-    jnxTimingAlarmNoSyncMessageSet NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that sync messages are not being received.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 21 }
-
-    jnxTimingAlarmNoSyncMessageClear NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that sync messages are now being received.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 22 }
-
-    jnxTimingAlarmNoDelayResponseMessageSet NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that delay response messages are not being received.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 23 }
-
-    jnxTimingAlarmNoDelayResponseMessageClear NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that delay response messages are now being received.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 24 }
-
-    jnxTimingAlarmHighPDVDetectedSet NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that high PDV is being observed.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 25 }
-
-    jnxTimingAlarmHighPDVDetectedClear NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that high PDV is now not being observed.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 26 }
-
-    jnxTimingAlarmSlaveCandidateStateLoseLockSet NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that the slave candidate has lost lock.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 27 }
-
-    jnxTimingAlarmSlaveCandidateStateLoseLockClear NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that the slave candidate has regained lock.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 28 }
-
-    jnxTimingAlarmNoForeignMasterSet NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that there is no foreign master available.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 29 }
-
-    jnxTimingAlarmNoForeignMasterClear NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that there is now a foreign master available.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 30 }
-
-    jnxTimingAlarmPtpSyncFailSet NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that synchronization has failed with the master.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 31 }
-
-    jnxTimingAlarmPtpSyncFailClear NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that synchronization failure with master has cleared.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 32 }
-
-    jnxTimingAlarmPtpLocalClockOutOfSyncSet NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that the local clock is out of sync.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 33 }
-
-    jnxTimingAlarmPtpLocalClockOutOfSyncClear NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that the local clock is no more out of sync.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 34 }
-
-    jnxTimingAlarmLossOfReference1Set NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that EEC has lost reference1.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 35 }
-
-    jnxTimingAlarmLossOfReference1Clear NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that EEC has regained reference1.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 36 }
-
-    jnxTimingAlarmLossOfReference2Set NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that EEC has lost reference2.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 37 }
-
-    jnxTimingAlarmLossOfReference2Clear NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that EEC has regained reference2.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 38 }
-
-    jnxTimingAlarmLossOfReference3Set NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that EEC has lost reference3.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 39 }
-
-    jnxTimingAlarmLossOfReference3Clear NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that EEC has regained reference3.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 40 }
-
-    jnxTimingAlarmLossOfReference4Set NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that EEC has lost reference4.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 41 }
-
-    jnxTimingAlarmLossOfReference4Clear NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that EEC has regained reference4.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 42 }
-
-    jnxTimingAlarmNoMoreReferenceSet NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that EEC has no references to lock.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 43 }
-
-    jnxTimingAlarmNoMoreReferenceClear NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that EEC has a reference to lock.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 44 }
-
-    jnxTimingAlarmQlBelowThresholdSet NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that EEC QL has fallen below threshold.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 45 }
-
-    jnxTimingAlarmQlBelowThresholdClear NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that EEC QL has regained the threshold.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 46 }
-
-    jnxTimingAlarmDPLLNotLockedSet NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that DPLL is not locked anymore.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 47 }
-
-    jnxTimingAlarmDPLLNotLockedClear NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that DPLL is locked again.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 48 }
-
-    jnxTimingAlarmTodInSignalFailSet NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that TOD input signal has failed.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 49 }
-
-    jnxTimingAlarmTodInSignalFailClear NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that TOD input signal is good.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 50 }
-
-    jnxTimingEventDelayAsymmetryExceedMinor NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that Delay Asymmetry has exceeded minor threshold.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 51 }
-
-    jnxTimingEventDelayAsymmetryExceedCritical NOTIFICATION-TYPE
-        OBJECTS {
-                jnxClksyncAdditionalInformationStr
-        }
-        STATUS  current
-        DESCRIPTION
-            "A trap which signifies that Delay Asymmetry has exceeded critical threshold.
-
-             jnxClksyncAdditionalInformationStr has additional information for the trap."
-    ::= { jnxTimingFaults 52 }
-
     jnxTimingEventLedColorChange NOTIFICATION-TYPE
         OBJECTS {
                 jnxClksyncIfIndex,
@@ -1395,6 +1710,200 @@ jnxClksyncPtpOperationalSlaves OBJECT-TYPE
              jnxClksyncColorStr is the color of the LED unit."
     ::= { jnxTimingEvents 19 }
 
+    jnxTimingPhaseOffsetThresholdExceeded NOTIFICATION-TYPE
+        OBJECTS {
+                jnxPtpPhaseOffsetThresholdExceeded
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies Passive Port Threshold Exceeded.
+
+             jnxPtpPhaseOffsetThresholdExceeded indicates whether the Phase Threshold
+             of the monitored Passive Port has exceeded the configured Max Phase Offset
+             Threshold as per."
+    ::= { jnxTimingEvents 20 }
+
+    jnxTimingAlarmNoForeignMasterSet NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncAdditionalInformationStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that there is no foreign master available.
+
+             jnxClksyncAdditionalInformationStr has additional information for the trap.
+
+             This TRAP is supported only on ACX710."
+    ::= { jnxTimingFaults 29 }
+
+    jnxTimingAlarmNoForeignMasterClear NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncAdditionalInformationStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that there is now a foreign master available.
+
+             jnxClksyncAdditionalInformationStr has additional information for the trap.
+
+             This TRAP is supported only on ACX710."
+    ::= { jnxTimingFaults 30 }
+
+    jnxTimingAlarmPtpLocalClockOutOfSyncSet NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncAdditionalInformationStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that the local clock is out of sync.
+
+             jnxClksyncAdditionalInformationStr has additional information for the trap.
+
+             This TRAP is supported only on ACX710."
+    ::= { jnxTimingFaults 33 }
+
+    jnxTimingAlarmPtpLocalClockOutOfSyncClear NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncAdditionalInformationStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that the local clock is no more out of sync.
+
+             jnxClksyncAdditionalInformationStr has additional information for the trap.
+
+             This TRAP is supported only on ACX710."
+    ::= { jnxTimingFaults 34 }
+
+    jnxTimingAlarmLossOfReference1Set NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncAdditionalInformationStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that EEC has lost reference1.
+
+             jnxClksyncAdditionalInformationStr has additional information for the trap.
+
+             This TRAP is supported only on ACX710."
+    ::= { jnxTimingFaults 35 }
+
+    jnxTimingAlarmLossOfReference1Clear NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncAdditionalInformationStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that EEC has regained reference1.
+
+             jnxClksyncAdditionalInformationStr has additional information for the trap.
+
+             This TRAP is supported only on ACX710."
+    ::= { jnxTimingFaults 36 }
+
+    jnxTimingAlarmLossOfReference2Set NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncAdditionalInformationStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that EEC has lost reference2.
+
+             jnxClksyncAdditionalInformationStr has additional information for the trap.
+
+             This TRAP is supported only on ACX710."
+    ::= { jnxTimingFaults 37 }
+
+    jnxTimingAlarmLossOfReference2Clear NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncAdditionalInformationStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that EEC has regained reference2.
+
+             jnxClksyncAdditionalInformationStr has additional information for the trap.
+
+             This TRAP is supported only on ACX710."
+    ::= { jnxTimingFaults 38 }
+
+    jnxTimingAlarmNoMoreReferenceSet NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncAdditionalInformationStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that EEC has no references to lock.
+
+             jnxClksyncAdditionalInformationStr has additional information for the trap.
+
+             This TRAP is supported only on ACX710."
+    ::= { jnxTimingFaults 43 }
+
+    jnxTimingAlarmNoMoreReferenceClear NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncAdditionalInformationStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that EEC has a reference to lock.
+
+             jnxClksyncAdditionalInformationStr has additional information for the trap.
+
+             This TRAP is supported only on ACX710."
+    ::= { jnxTimingFaults 44 }
+
+    jnxTimingAlarmQlBelowThresholdSet NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncAdditionalInformationStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that EEC QL has fallen below threshold.
+
+             jnxClksyncAdditionalInformationStr has additional information for the trap.
+
+             This TRAP is supported only on ACX710."
+    ::= { jnxTimingFaults 45 }
+
+    jnxTimingAlarmQlBelowThresholdClear NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncAdditionalInformationStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that EEC QL has regained the threshold.
+
+             jnxClksyncAdditionalInformationStr has additional information for the trap.
+
+             This TRAP is supported only on ACX710."
+    ::= { jnxTimingFaults 46 }
+
+    jnxTimingAlarmTodInSignalFailSet NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncAdditionalInformationStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that TOD input signal has failed.
+
+             jnxClksyncAdditionalInformationStr has additional information for the trap.
+
+             This TRAP is supported only on ACX710."
+    ::= { jnxTimingFaults 49 }
+
+    jnxTimingAlarmTodInSignalFailClear NOTIFICATION-TYPE
+        OBJECTS {
+                jnxClksyncAdditionalInformationStr
+        }
+        STATUS  current
+        DESCRIPTION
+            "A trap which signifies that TOD input signal is good.
+
+             jnxClksyncAdditionalInformationStr has additional information for the trap.
+
+             This TRAP is supported only on ACX710."
+    ::= { jnxTimingFaults 50 }
 
 -------------------------------------------------------------------------------
 -- Conformance
@@ -1446,7 +1955,8 @@ OBJECTS {
         jnxClksyncDpllStateStr,
         jnxPtpServoStateStr,
         jnxClksyncHybridStateStr,
-        jnxClksyncColorStr
+        jnxClksyncColorStr,
+        jnxPtpPhaseOffsetThresholdExceeded
 }
 STATUS current
 DESCRIPTION
@@ -1471,36 +1981,18 @@ NOTIFICATIONS {
         jnxTimingFaultSecSrcFailed,
         jnxTimingFaultPtpUniNegRateRejectSet,
         jnxTimingFaultPtpUniNegRateRejectClear,
-        jnxTimingAlarmNoAnnounceMessageSet,
-        jnxTimingAlarmNoAnnounceMessageClear,
-        jnxTimingAlarmNoSyncMessageSet,
-        jnxTimingAlarmNoSyncMessageClear,
-        jnxTimingAlarmNoDelayResponseMessageSet,
-        jnxTimingAlarmNoDelayResponseMessageClear,
-        jnxTimingAlarmHighPDVDetectedSet,
-        jnxTimingAlarmHighPDVDetectedClear,
-        jnxTimingAlarmSlaveCandidateStateLoseLockSet,
-        jnxTimingAlarmSlaveCandidateStateLoseLockClear,
         jnxTimingAlarmNoForeignMasterSet,
         jnxTimingAlarmNoForeignMasterClear,
-        jnxTimingAlarmPtpSyncFailSet,
-        jnxTimingAlarmPtpSyncFailClear,
         jnxTimingAlarmPtpLocalClockOutOfSyncSet,
         jnxTimingAlarmPtpLocalClockOutOfSyncClear,
         jnxTimingAlarmLossOfReference1Set,
         jnxTimingAlarmLossOfReference1Clear,
         jnxTimingAlarmLossOfReference2Set,
         jnxTimingAlarmLossOfReference2Clear,
-        jnxTimingAlarmLossOfReference3Set,
-        jnxTimingAlarmLossOfReference3Clear,
-        jnxTimingAlarmLossOfReference4Set,
-        jnxTimingAlarmLossOfReference4Clear,
         jnxTimingAlarmNoMoreReferenceSet,
         jnxTimingAlarmNoMoreReferenceClear,
         jnxTimingAlarmQlBelowThresholdSet,
         jnxTimingAlarmQlBelowThresholdClear,
-        jnxTimingAlarmDPLLNotLockedSet,
-        jnxTimingAlarmDPLLNotLockedClear,
         jnxTimingAlarmTodInSignalFailSet,
         jnxTimingAlarmTodInSignalFailClear
 }
@@ -1530,8 +2022,7 @@ NOTIFICATIONS {
         jnxTimingEventSquelchSet,
         jnxTimingEventSquelchClear,
         jnxTimingEventLedColorChange,
-        jnxTimingEventDelayAsymmetryExceedMinor,
-        jnxTimingEventDelayAsymmetryExceedCritical
+        jnxTimingPhaseOffsetThresholdExceeded
 }
 
 STATUS current

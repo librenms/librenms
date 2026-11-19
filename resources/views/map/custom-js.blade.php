@@ -406,7 +406,7 @@
                     }
                     edge_cfg.label += port_bps;
                 }
-                edge_cfg.color = {color: port_colour};
+                edge_cfg.color = {color: port_colour, highlight: port_colour, hover: port_colour};
                 edge_cfg.width = parseFloat(edge.fixed_width) || port_width;
             }
             return edge_cfg;
@@ -633,6 +633,12 @@
                         self.networkNodes.flush();
                         self.networkEdges.flush();
 
+                        if (self.network) {
+                            // dynamic edges use hidden via nodes that are not repositioned when physics is disabled
+                            self.network.body.emitter.emit('_repositionBezierNodes');
+                            self.network.redraw();
+                        }
+
                         if (self.alertId) {
                             if (!data.nodes || Object.keys(data.nodes).length === 0) {
                                 $('#' + self.alertId).text("{{ __('map.custom.view.no_devices') }}");
@@ -670,34 +676,15 @@
                 var self = this;
                 var container = document.getElementById(this.elementId);
 
-                this.network.on('hoverNode', function (params) {
-                    var node = self.networkNodes.get(params.node);
-                    if (node && node.device_id) {
-                        var domPos = self.network.canvasToDOM({ x: node.x, y: node.y });
-                        var canvasEl = $('#' + self.elementId + ' canvas')[0];
-                        var canvasRect = canvasEl ? canvasEl.getBoundingClientRect() : { left: 0, top: 0 };
-                        visPopups.show('/device/' + node.device_id + '/popup?type=device_bits&from[]=-1d&from[]=-7d', canvasRect.left + domPos.x, canvasRect.top + domPos.y);
-                    }
-                });
-
-                this.network.on('blurNode', function () {
-                    visPopups.hide(200);
-                });
-
-                this.network.on('hoverEdge', function (params) {
-                    var edgeId = String(params.edge).split('_')[0];
-                    if (edgeId && self.edgePortMap[edgeId]) {
-                        var portData = self.edgePortMap[edgeId];
-                        var midNode = self.networkNodes.get(edgeId + '_mid');
-                        var canvasEl = $('#' + self.elementId + ' canvas')[0];
-                        var canvasRect = canvasEl ? canvasEl.getBoundingClientRect() : { left: 0, top: 0 };
-                        var domPos = midNode ? self.network.canvasToDOM({ x: midNode.x, y: midNode.y }) : { x: $('#' + self.elementId).width() / 2, y: $('#' + self.elementId).height() / 2 };
-                        visPopups.show('/port/' + portData.port_id + '/popup?from=-1d', canvasRect.left + domPos.x, canvasRect.top + domPos.y);
-                    }
-                });
-
-                this.network.on('blurEdge', function () {
-                    visPopups.hide(200);
+                visPopups.attach(this.network, {
+                    devicePath: function (nodeId) {
+                        var node = self.networkNodes.get(nodeId);
+                        return node && node.device_id ? '/device/' + node.device_id + '/popup?type=device_bits&from[]=-1d&from[]=-7d' : null;
+                    },
+                    portPath: function (edgeId) {
+                        var portData = self.edgePortMap[String(edgeId).split('_')[0]];
+                        return portData ? '/port/' + portData.port_id + '/popup?from=-1d' : null;
+                    },
                 });
 
                 this.network.on('doubleClick', function (properties) {
@@ -724,7 +711,7 @@
                     }
 
                     if (edge_id && (edge_id in self.edgePortMap)) {
-                        window.location.href = (self.baseUrl || '') + 'device/device=' + self.edgePortMap[edge_id].device_id + '/tab=port/port=' + self.edgePortMap[edge_id].port_id + '/';
+                        window.location.href = (self.baseUrl || '') + 'device/' + self.edgePortMap[edge_id].device_id + '/port/' + self.edgePortMap[edge_id].port_id;
                     }
                 });
 
@@ -758,7 +745,7 @@
                             menuItems.push({
                                 icon: 'fa-solid fa-chart-area',
                                 label: "{{ __('View Graphs') }}",
-                                action: function () { window.location.href = (self.baseUrl || '') + 'device/' + node.device_id + '/tab=graphs/'; }
+                                action: function () { window.location.href = (self.baseUrl || '') + 'device/' + node.device_id + '/graphs'; }
                             });
                             if (node.label) {
                                 menuItems.push({
@@ -788,7 +775,7 @@
                             menuItems.push({
                                 icon: 'fa-solid fa-network-wired',
                                 label: "{{ __('View Port') }}",
-                                action: function () { window.location.href = (self.baseUrl || '') + 'device/device=' + portData.device_id + '/tab=port/port=' + portData.port_id + '/'; }
+                                action: function () { window.location.href = (self.baseUrl || '') + 'device/' + portData.device_id + '/port/' + portData.port_id; }
                             });
                         }
                     }

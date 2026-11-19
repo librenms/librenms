@@ -1,9 +1,9 @@
 -- ===========================================================
--- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2023 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description:  Transceiver MIB
 -- Reference:  IF-MIB
--- Version:  V2.3
+-- Version:  V2.4
 -- History:
 -- V1.0 created by liuhongxu and zoudian.
 --   Initial version 2006-01-10
@@ -58,6 +58,12 @@
 -- V2.3 2022-05-12 Updated by fangliwen
 --   Add hh3cTransceiverRelySlotMfgName and hh3cTransceiverRelySlotMfgDate
 --   to hh3cTransceiverInfoTable.
+-- V2.4 2022-07-21 Updated by chendong
+--   Add hh3cTransceiverCurrentPower and hh3cTransceiverMaxPower
+--   to hh3cTransceiverInfoTable.
+--   Added hh3cTransceiverCurrentTotalPower and hh3cTransceiverMaxTotalPower.
+--   2023-03-01 Updated by shenhongxia
+--   Add hh3cTransceiverTotalTXPower and hh3cTransceiverTotalRXPower
 -- =================================================================
 HH3C-TRANSCEIVER-INFO-MIB DEFINITIONS ::= BEGIN
 IMPORTS
@@ -71,7 +77,7 @@ IMPORTS
         FROM HH3C-OID-MIB;
 
     hh3cTransceiver MODULE-IDENTITY
-        LAST-UPDATED "202205120000Z"
+        LAST-UPDATED "202303010000Z"
         ORGANIZATION
             "New H3C Technologies Co., Ltd."
         CONTACT-INFO
@@ -80,8 +86,15 @@ IMPORTS
             http://www.h3c.com
             Zip:100085"
         DESCRIPTION
+            "Add hh3cTransceiverTotalTXPower and hh3cTransceiverTotalRXPower."
+        REVISION "202303010000Z"
+        DESCRIPTION
             "The objects in this MIB module are used to display the
             information of transceiver on interface."
+        REVISION "202207210000Z"
+        DESCRIPTION
+            "Add hh3cTransceiverCurrentPower and hh3cTransceiverMaxPower to hh3cTransceiverInfoTable.
+            Add hh3cTransceiverCurrentTotalPower and hh3cTransceiverMaxTotalPower."
         REVISION "202205120000Z"
         DESCRIPTION
             "Add hh3cTransceiverRelySlotMfgName and hh3cTransceiverRelySlotMfgDate
@@ -232,7 +245,11 @@ IMPORTS
             hh3cTransceiverRcvPwrHiWarnDbm   Integer32,
             hh3cTransceiverRcvPwrLoWarnDbm   Integer32,
             hh3cTransceiverRelySlotMfgName   OCTET STRING,
-            hh3cTransceiverRelySlotMfgDate   DateAndTime
+            hh3cTransceiverRelySlotMfgDate   DateAndTime,
+            hh3cTransceiverCurrentPower      Integer32,
+            hh3cTransceiverMaxPower          Integer32,
+            hh3cTransceiverTotalTXPower      Integer32,
+            hh3cTransceiverTotalRXPower      Integer32
         }
 
     hh3cTransceiverHardwareType OBJECT-TYPE
@@ -858,6 +875,41 @@ IMPORTS
             "Manufacturing date of the card on which the transceiver is installed."
         ::= { hh3cTransceiverInfoEntry 61 }
 
+    hh3cTransceiverCurrentPower OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current transceiver real-time power.
+            The unit is thousandths of w."
+        ::= { hh3cTransceiverInfoEntry 62 }
+
+    hh3cTransceiverMaxPower OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current transceiver maximum power.
+            The unit is thousandths of w."
+        ::= { hh3cTransceiverInfoEntry 63 }
+
+    hh3cTransceiverTotalTXPower OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicating the total transmitted power.
+            The unit is in hundredths of dBm."
+        ::= { hh3cTransceiverInfoEntry 64 }
+
+    hh3cTransceiverTotalRXPower OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicating the total received power.
+            The unit is in hundredths of dBm."
+        ::= { hh3cTransceiverInfoEntry 65 }
 -- Transceiver Channel Table
 
     hh3cTransceiverChannelTable OBJECT-TYPE
@@ -1049,6 +1101,24 @@ IMPORTS
             "Enable alarming upon detection of a third-party transceiver."
         DEFVAL      { true }
         ::= { hh3cTransceiverSystemPara 1 }
+
+    hh3cTransceiverCurrentTotalPower OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current transceivers real-time total power.
+            The unit is thousandths of w."
+        ::= { hh3cTransceiverSystemPara 2 }
+
+    hh3cTransceiverMaxTotalPower OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current transceivers maximum total power.
+            The unit is thousandths of w."
+        ::= { hh3cTransceiverSystemPara 3 }
 
     hh3cTransceiverTrap OBJECT IDENTIFIER ::= {  hh3cTransceiver 3  }
 

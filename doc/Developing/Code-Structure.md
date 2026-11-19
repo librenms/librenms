@@ -23,7 +23,6 @@ for development:
 │  ├─ definitions
 │  ├─ discovery
 │  ├─ html
-│  │  ├─ forms
 │  │  ├─ graphs
 │  │  ├─ pages
 │  │  └─ reports
@@ -99,10 +98,6 @@ works in the same way.
 This directory holds most of the core website files. These files hold
 functions and common code segments. Other files include them and
 therefore do not duplicate the code.
-
-### includes/html/forms/
-
-This directory holds the files of the ajax calls to `ajax/form`.
 
 ### includes/html/api_functions.inc.php
 

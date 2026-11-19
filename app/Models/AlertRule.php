@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Facades\Permissions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -45,6 +46,8 @@ use LibreNMS\Enum\AlertState;
  * @property string $query
  * @property array<string, mixed>|null $builder
  * @property bool|int $invert_map
+ * @property bool|int $notify_per_entity
+ * @property int|null $max_entities
  * @property int|null $alert_operation_id
  * @property AlertOperation|null $alertOperation
  */
@@ -59,6 +62,7 @@ class AlertRule extends BaseModel
         static::deleting(function (AlertRule $rule): void {
             $rule->alerts()->delete();
             $rule->logs()->delete();
+            AlertFault::where('rule_id', $rule->id)->delete();
             $rule->templateMaps()->delete();
 
             $rule->devices()->detach();
@@ -77,6 +81,8 @@ class AlertRule extends BaseModel
         'query',
         'builder',
         'invert_map',
+        'notify_per_entity',
+        'max_entities',
         'alert_operation_id',
     ];
 
@@ -89,10 +95,45 @@ class AlertRule extends BaseModel
             'builder' => 'array',
             'extra' => 'array',
             'alert_operation_id' => 'integer',
+            'notify_per_entity' => 'boolean',
+            'max_entities' => 'integer',
         ];
     }
 
     // ---- Query scopes ----
+
+    /**
+     * @param  Builder<AlertRule>  $query
+     * @return Builder<AlertRule>
+     */
+    protected function scopeHasAccess(Builder $query, User $user): Builder
+    {
+        $gate = Gate::forUser($user);
+        if ($gate->allows('viewAll', self::class)) {
+            return $query;
+        }
+
+        return $gate->allows('view', self::class)
+            ? $query->mappedToAccessibleDevices($user)
+            : $query->whereKey([]);
+    }
+
+    /**
+     * Match rules with an accessible device in their device, group, or location mappings.
+     *
+     * @param  Builder<AlertRule>  $query
+     * @return Builder<AlertRule>
+     */
+    protected function scopeMappedToAccessibleDevices(Builder $query, User $user): Builder
+    {
+        $deviceIds = Permissions::devicesForUser($user);
+        $groupIds = Permissions::deviceGroupsForUser($user);
+
+        return $query->where(fn (Builder $rules) => $rules
+            ->whereHas('devices', fn (Builder $devices) => $devices->whereIntegerInRaw('devices.device_id', $deviceIds))
+            ->orWhereHas('groups', fn (Builder $groups) => $groups->whereIntegerInRaw('device_groups.id', $groupIds))
+            ->orWhereHas('locations.devices', fn (Builder $devices) => $devices->whereIntegerInRaw('devices.device_id', $deviceIds)));
+    }
 
     /**
      * @param  Builder<AlertRule>  $query
@@ -142,27 +183,6 @@ class AlertRule extends BaseModel
         return $query->enabled()
             ->join('alerts', 'alerts.rule_id', 'alert_rules.id')
             ->whereNotIn('alerts.state', [AlertState::CLEAR, AlertState::ACKNOWLEDGED, AlertState::RECOVERED]);
-    }
-
-    /**
-     * Scope to filter rules for devices permitted to user
-     * (do not use for admin and global read-only users)
-     *
-     * @param  Builder<AlertRule>  $query
-     * @param  User  $user
-     * @return mixed
-     */
-    public function scopeHasAccess($query, User $user)
-    {
-        if (Gate::allows('viewAll', AlertRule::class)) {
-            return $query;
-        }
-
-        if (! $this->isJoined($query, 'alerts')) {
-            $query->join('alerts', 'alerts.rule_id', 'alert_rules.id');
-        }
-
-        return $this->hasDeviceAccess($query, $user, 'alerts');
     }
 
     // ---- Define Relationships ----

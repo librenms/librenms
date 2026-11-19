@@ -297,7 +297,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^u\_/', '', $oslvm_name);
             if (isset($app_data['uid_mapping'][$oslvm_name])) {
-                $oslvm_name = $oslvm_name . '(' . $app_data['uid_mapping'][$oslvm_name]['name'] . ')';
+                $oslvm_name = $oslvm_name . '(' . e($app_data['uid_mapping'][$oslvm_name]['name']) . ')';
             }
 
             $label = $oslvm_name;
@@ -321,7 +321,7 @@ if (isset($app_data['backend']) && $app_data['backend'] == 'cgroups') {
             $oslvm_name = $oslvm;
             $oslvm_name = preg_replace('/^u\_/', '', $oslvm_name);
             if (isset($app_data['uid_mapping'][$oslvm_name])) {
-                $oslvm_name = $oslvm_name . '(' . $app_data['uid_mapping'][$oslvm_name]['name'] . ')';
+                $oslvm_name = $oslvm_name . '(' . e($app_data['uid_mapping'][$oslvm_name]['name']) . ')';
             }
 
             $label = $oslvm_name;
@@ -520,9 +520,9 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                         if (isset($port)) {
                             $interface_raw = true;
                             $interface = generate_port_link([
-                                'label' => $port->label,
+                                'label' => e($port->getLabel()),
                                 'port_id' => $port->port_id,
-                                'ifName' => $port->ifName,
+                                'ifName' => e($port->ifName),
                                 'device_id' => $port->device_id,
                             ]);
                         }
@@ -541,9 +541,9 @@ if (isset($vars['oslvm']) && isset($app_data['oslvm_data'][$vars['oslvm']])) {
                         if (isset($port)) {
                             $gw_interface_raw = true;
                             $gw_interface = generate_port_link([
-                                'label' => $port->label,
+                                'label' => e($port->getLabel()),
                                 'port_id' => $port->port_id,
-                                'ifName' => $port->ifName,
+                                'ifName' => e($port->ifName),
                                 'device_id' => $port->device_id,
                             ]);
                         }

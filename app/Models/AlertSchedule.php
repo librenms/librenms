@@ -73,7 +73,7 @@ class AlertSchedule extends Model
     protected function casts(): array
     {
         return [
-            'behaviour' => MaintenanceBehavior::class,
+            'behavior' => MaintenanceBehavior::class,
         ];
     }
 

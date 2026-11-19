@@ -1,0 +1,928 @@
+-- ===================================================================
+-- Copyright (C) 2019 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description: The HUAWEI-VS-MGMT-MIB which contains objects manages virtual system
+-- Reference:
+-- Version: V1.10
+-- ===================================================================
+
+
+    HUAWEI-VS-MGMT-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+            DisplayString, RowStatus
+                FROM SNMPv2-TC
+            TimeTicks, Integer32, Unsigned32, IpAddress, Counter32, OBJECT-TYPE,
+            MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            hwDev
+                FROM HUAWEI-MIB;
+
+
+        hwVSMgmt MODULE-IDENTITY
+            LAST-UPDATED "201902280000Z"
+            ORGANIZATION
+                  "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO
+                  "Huawei Industrial Base
+                   Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                  "
+            DESCRIPTION
+                "The HUAWEI-VS-MGMT-MIB which contains objects manages virtual system
+                "
+-- Revision history
+            REVISION    "201902280000Z"
+            DESCRIPTION "V1.10,Modify the description of hwVSProtocolPortTable,hwVsSwitchAuthentication,hwVsAlarmManageMode"			
+		
+            REVISION    "201807250000Z"
+            DESCRIPTION "V1.09, Added the node hwVsAlarmManageMode for hwVSMgmtTable."
+
+            REVISION    "201806270000Z"
+            DESCRIPTION "V1.08, Add hwVSProtocolPortTable."
+
+            REVISION    "201801180000Z"
+            DESCRIPTION "V1.07,
+                         Added the node hwVsSwitchAuthentication for hwVSMgmtTable."
+                         
+            REVISION    "201712280000Z"
+            DESCRIPTION "V1.06,
+                         Modify the node hwVsPhyResVsID for hwVsPhyResTable."
+
+            REVISION    "201712150000Z"
+            DESCRIPTION "V1.05,
+                         Modify the node hwVsID for hwVSMgmtTable."
+						 
+            REVISION    "201709180000Z"
+            DESCRIPTION "V1.04, Added the following nodes: 
+                         hwVsIdentifier
+                         hwVsMgmtUplinkPort
+                         hwVsMgmtUplinkPortMode
+                         hwVsMgmtVlan
+                         hwVsMgmtVlanPriority
+                         hwVsMgmtIpAddress
+                         hwVsMgmtIpMask
+                         hwVsMgmtGateway
+                         hwVsMgmtSnmpProfileName
+                         "
+                         
+            REVISION    "201610110000Z"
+            DESCRIPTION "V1.03,
+                         Add the node hwVsPhyResAssignMode for hwVsPhyResTable."
+			 
+            REVISION    "201609130000Z"
+            DESCRIPTION "V1.02,
+                         Add the node hwVanVsNum for hwVanLicGlobalPara."
+                         
+            REVISION    "201607090000Z"
+            DESCRIPTION "V1.01,
+                         Modify the description of hwVsResUsage"
+                         
+            REVISION    "201605280000Z"
+            DESCRIPTION "V1.00, completed the draft."
+
+                ::= { hwDev 102 }
+
+
+        hwVSMgmtTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVSMgmtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Virtual system management table, which supports the functions of querying, adding, 
+                deleting and modifying a virtual system. The index of this table is hwVsID.
+                "
+            ::= { hwVSMgmt 1 }
+
+
+        hwVSMgmtEntry OBJECT-TYPE
+            SYNTAX HwVSMgmtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Virtual system management table, which supports the functions of querying, adding, 
+                deleting and modifying a virtual system. The index of this entry is hwVsID.
+                "
+            INDEX { hwVsID }
+            ::= { hwVSMgmtTable 1 }
+
+
+        HwVSMgmtEntry ::=
+            SEQUENCE {
+                hwVsID
+                    Unsigned32,
+                hwVsName
+                    OCTET STRING,
+                hwVsMgmtType
+                    INTEGER,
+                hwVsMode
+                    INTEGER,
+                hwVsResTemplate
+                    OCTET STRING,
+                hwVsState
+                    INTEGER,
+                hwVsRequestID
+                    Integer32,
+		hwVsRowStatus
+                    RowStatus,
+                hwVsIdentifier
+                    OCTET STRING,
+                hwVsMgmtUplinkPort
+                    Integer32,
+                hwVsMgmtUplinkPortMode
+                    INTEGER,                  
+                hwVsMgmtVlan
+                    Integer32,
+                hwVsMgmtVlanPriority
+                    Integer32,
+                hwVsMgmtIpAddress
+                    IpAddress,
+                hwVsMgmtIpMask
+                    IpAddress,
+                hwVsMgmtGateway
+                    IpAddress,
+                hwVsMgmtSnmpProfileName    
+                    OCTET STRING,
+                hwVsSwitchAuthentication
+                    INTEGER,
+                hwVsAlarmManageMode
+                    INTEGER
+             }
+
+        hwVsID OBJECT-TYPE
+            SYNTAX Unsigned32 (0..8 | 4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Virtual system index.
+                "
+            ::= { hwVSMgmtEntry 1 }
+
+
+        hwVsName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the name of a virtual system. 
+                A unique name for each virtual system.
+                "
+            ::= { hwVSMgmtEntry 2 }
+
+
+        hwVsMgmtType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                adminVS(1),
+                normalVS(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the type of a virtual system.
+                Options:
+                1.adminVS(1)    -Indicates the adminVS.
+                2.normalVS(2)   -Indicates the normalVS.
+                "
+            ::= { hwVSMgmtEntry 3 }
+
+
+        hwVsMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                portmode(1),
+                boardmode(2),
+                invalid(255)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the mode of a virtual system.
+                Options:
+                1.portmode(1)    -Indicates the Port mode.
+                2.boardmode(2)   -Indicates the Board mode.
+                3.invalid(255)   -Indicates the invalid mode.
+                "
+            ::= { hwVSMgmtEntry 4 }
+
+
+        hwVsResTemplate OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The resource template of the virtual system.
+                "
+            ::= { hwVSMgmtEntry 5 }
+
+
+        hwVsState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                running(1),
+                shutdown(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the state of a virtual system.
+                Options:
+                1.running(1)    -Indicates the state of the system is running.
+                2.shutdown(2)   -Indicates the state of the system is shutdown.
+                "
+            ::= { hwVSMgmtEntry 6 }
+
+
+        hwVsRequestID OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The requestID of this operation.
+                "
+            ::= { hwVSMgmtEntry 7 }
+
+
+        hwVsRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                Operation status of virtual system, the virtual system can be added, deleted and modified.
+                The virtual system that has online user cannot be deleted.
+                CreateAndGo(4) is supplied to create a new instance of a conceptual row.
+                Destroy(6) is supplied to delete the instances associated with an existing conceptual row.
+                "
+            ::= { hwVSMgmtEntry 8 }
+            
+        hwVsIdentifier OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The identifier of a virtual system.
+                "
+            ::= { hwVSMgmtEntry 9 }
+			
+        hwVsMgmtUplinkPort OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The uplink port of a virtual system.
+                Options:
+                invalid(-1) -Invalid uplink port.
+                "
+            ::= { hwVSMgmtEntry 10 }
+            
+        hwVsMgmtUplinkPortMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                invalid(-1),
+                exclusive(1),
+                shared(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The uplink port mode of a virtual system.
+                Options:
+                1.invalid(-1) -Invalid mode.
+                2.exclusive(1) -Exclusive mode.
+                3.shared(2) -Shared mode.
+                Default: exclusive(1).
+                "
+            ::= { hwVSMgmtEntry 11 }
+
+        hwVsMgmtVlan OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 1..4093)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The vlan of a virtual system.
+                Options:
+                invalid(-1) -Invalid vlan.
+                "
+            ::= { hwVSMgmtEntry 12 }
+
+        hwVsMgmtVlanPriority OBJECT-TYPE
+            SYNTAX Integer32 (-1 | 0..7)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The vlan priority of a virtual system.
+                Options:
+                invalid(-1) -Invalid vlan priority.
+                Default: 0.
+                "
+            ::= { hwVSMgmtEntry 13 }
+
+        hwVsMgmtIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The ip address of a virtual system.
+                Options:
+                invalid(255.255.255.255) -Invalid ip address.
+                "
+            ::= { hwVSMgmtEntry 14 }
+
+        hwVsMgmtIpMask OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The ip mask of a virtual system.
+                Options:
+                invalid(0.0.0.0) -Invalid ip mask.
+                "
+            ::= { hwVSMgmtEntry 15 }
+
+        hwVsMgmtGateway OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The gateway of a virtual system.
+                Options:
+                invalid(255.255.255.255) -Invalid gateway.
+                "
+            ::= { hwVSMgmtEntry 16 }
+
+        hwVsMgmtSnmpProfileName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The name of snmp profile which is used for a virtual system.
+                "
+            ::= { hwVSMgmtEntry 17 }
+
+        hwVsSwitchAuthentication OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Authentication switch.
+                Options:
+                1.enable(1) -switch enable.
+                2.disable(2) -switch disable.
+                Default: enable.
+                "
+            ::= { hwVSMgmtEntry 18 }
+
+        hwVsAlarmManageMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                independent(1),
+                centralized(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Alarm Manage Mode.
+                Options:
+                1.independent(1) -mode is independent
+                2.centralized(2) -mode is centralized
+                Default: independent.
+                "
+            ::= { hwVSMgmtEntry 19 }  
+
+        hwVSLogicResTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVSLogicResEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Virtual system logical resource table, which can be used to 
+                query all of the logical resource as well as their quantity. The index
+                of this table is hwVsResName.
+                "
+            ::= { hwVSMgmt 2 }
+        
+        hwVSLogicResEntry OBJECT-TYPE
+            SYNTAX HwVSLogicResEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Virtual system logical resource table, which can be used to 
+                query all of the logical resource as well as their quantity. The index
+                of this entry is hwVsResName.
+                "
+            INDEX { hwVsResName }
+            ::= { hwVSLogicResTable 1 }
+        
+        HwVSLogicResEntry ::=
+            SEQUENCE { 
+                hwVsResName
+                    OCTET STRING,
+                hwVsResType
+                    INTEGER,
+                hwVsResSpec
+                    Unsigned32
+                }
+
+        hwVsResName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the name of the logical resource in the system.
+                "
+            ::= { hwVSLogicResEntry 1 }
+
+
+        hwVsResType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                spec(1),
+                switch(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the type of the logical resource in the system.
+                Options:
+                1.spec(1)     -Indicates the specification type of the resource.
+                2.switch(2)   -Indicates the switch type of the resource.				
+                "
+            ::= { hwVSLogicResEntry 2 }
+
+
+        hwVsResSpec OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the amount of the logical resource in the system.
+                "
+            ::= { hwVSLogicResEntry 3 }
+
+
+        hwVSResTemplateTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVSResTemplateEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Resource template table, which is used to query, add and delete the resource template.
+                The index of this table is hwVsResTemplateName.
+                "
+            ::= { hwVSMgmt 3 }
+        
+        hwVSResTemplateEntry OBJECT-TYPE
+            SYNTAX HwVSResTemplateEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Resource template table, which is used to query, add and delete the resource template.
+                The index of this entry is hwVsResTemplateName.
+                "
+            INDEX { hwVsResTemplateName }
+            ::= { hwVSResTemplateTable 1 }
+        
+        HwVSResTemplateEntry ::=
+            SEQUENCE { 
+                hwVsResTemplateName
+                    OCTET STRING,
+                hwVsResTemplateRowStatus
+                    RowStatus
+                }
+
+        hwVsResTemplateName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The name of the resource template. The name of the new template must be different from
+                the names of the system template.
+				"
+            ::= { hwVSResTemplateEntry 1 }
+
+
+        hwVsResTemplateRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                This object is used to operate the resource template.
+                The system Template cannot be modified or deleted. 
+                CreateAndGo(4) is supplied to create a new instance of a conceptual row.  
+                Destroy(6) is supplied to delete the instances associated with an existing conceptual row.
+                "
+            ::= { hwVSResTemplateEntry 2 }    
+			
+			
+        hwVSResSpecTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVSResSpecEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Resource template specification table, which is used to query and modify the 
+                specification of the resource template. The indexes of this table are hwVsResTemplateName
+                and hwVsResName.
+                "
+            ::= { hwVSMgmt 4 }
+        
+        hwVSResSpecEntry OBJECT-TYPE
+            SYNTAX HwVSResSpecEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Resource template specification table, which is used to query and modify the 
+                specification of the resource template. The indexes of this entry are hwVsResTemplateName
+                and hwVsResName.
+                "
+            INDEX { hwVsResTemplateName, hwVsResName }
+            ::= { hwVSResSpecTable 1 }
+        
+        HwVSResSpecEntry ::=
+            SEQUENCE { 
+                hwVsResTemplateSpec
+                    Unsigned32
+                }
+
+        hwVsResTemplateSpec OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Support query and modify the specification of the resource in the resource template.
+                "
+            ::= { hwVSResSpecEntry 1 }
+
+
+        hwVSResUsageTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVSResUsageEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Resource usage table, which is used to query the usage of the resource. The indexes 
+                of this table are hwVsID and hwVsResName.
+                "
+            ::= { hwVSMgmt 5 }
+        
+        hwVSResUsageEntry OBJECT-TYPE
+            SYNTAX HwVSResUsageEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Resource usage table, which is used to query the usage of the resource. The indexes 
+                of this entry are hwVsID and hwVsResName.
+                "
+            INDEX { hwVsID, hwVsResName }
+            ::= { hwVSResUsageTable 1 }
+        
+        HwVSResUsageEntry ::=
+            SEQUENCE { 
+                hwVsResUsage
+                    Unsigned32,
+				hwVsResAvailableNum
+                    Unsigned32	
+                }
+
+        hwVsResUsage OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the amount of the used resource in the virtual system.
+                4294967295 indicates invalid value.
+                "
+            ::= { hwVSResUsageEntry 1 }
+			
+			
+        hwVsResAvailableNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the amount of the available resource in the virtual system.
+                "
+            ::= { hwVSResUsageEntry 2 }
+
+        hwVanLicGlobalPara OBJECT IDENTIFIER  ::= { hwVSMgmt 6 } 
+        
+        hwVanLicAuth OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the license state of a virtual system. 
+                Options:
+                1.enable(1)    -  Enable the license.
+                2.disable(2)   -  Disable the license.
+                "    
+            ::= { hwVanLicGlobalPara 1 }
+
+        hwVanVsNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                Indicates the number of the created virtual system.
+                "
+            ::= { hwVanLicGlobalPara 2 }               
+
+        hwVsPhyResTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVsPhyResEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Virtual system physical resource management table, which can be used to 
+                assign some ports. The index of this table is hwVsPhyResVsID.
+				"
+            ::= { hwVSMgmt 7 }
+           
+        hwVsPhyResEntry OBJECT-TYPE
+            SYNTAX HwVsPhyResEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Virtual system physical resource management table, which can be used to 
+                assign some ports. The index of this entry is hwVsPhyResVsID.
+                "
+            INDEX { hwVsPhyResVsID }
+            ::= { hwVsPhyResTable 1 } 
+                  
+        HwVsPhyResEntry ::=
+            SEQUENCE {
+                hwVsPhyResVsID
+                    Unsigned32,
+                hwVsPhyResOperType
+                    INTEGER,
+                hwVsPhyResType
+                    INTEGER,
+                hwVsPhyReslist
+                    OCTET STRING,
+                hwVsPhyResRequestID
+                    Integer32,
+                hwVsPhyResAssignMode
+                    INTEGER
+             } 
+             
+        hwVsPhyResVsID OBJECT-TYPE
+            SYNTAX Unsigned32 (1..8)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the id of a virtual system. A unique value for each virtual system.
+                "
+            ::= { hwVsPhyResEntry 1 }
+            
+        hwVsPhyResOperType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                add(1),
+                delete(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the mode of a virtual system.
+                Options:
+                1.add(1)    -Add the Port .
+                2.delete(2) -Delete the port.
+                "
+            ::= { hwVsPhyResEntry 2 }
+            
+        hwVsPhyResType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                port(1)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the mode of a virtual system.
+                Options:
+                1.port(1)    -Indicates the Port mode.
+                "
+            ::= { hwVsPhyResEntry 3 } 
+            
+        hwVsPhyReslist OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..512))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the portlist of a virtual system. A unique portlist for each virtual system.
+                "
+            ::= { hwVsPhyResEntry 4 }
+            
+        hwVsPhyResRequestID OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The requestID of this operation.
+                "
+            ::= { hwVsPhyResEntry 5 }
+            
+        hwVsPhyResAssignMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                exclusive(1),
+                shared(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the mode of a virtual system.
+                Options:
+                1.exclusive(1)  -Exclusive mode.
+                2.shared(2) -Shared mode.
+                Default: exclusive(1).
+                "
+            ::= { hwVsPhyResEntry 6 }
+   
+        hwVsTraps OBJECT IDENTIFIER ::= { hwVSMgmt 8 }
+        hwVsTrapsPrefix OBJECT IDENTIFIER ::= { hwVsTraps 0 }
+        
+        hwVsPhyResChange NOTIFICATION-TYPE
+            OBJECTS 
+            { 
+                hwVsPhyResVsID, 
+                hwVsPhyResOperType,
+                hwVsPhyResType,
+                hwVsPhyReslist 
+            }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the physical resource is changed.
+                "
+            ::= { hwVsTrapsPrefix 1 }
+            
+        hwVsAddDeleteTrap NOTIFICATION-TYPE
+            OBJECTS 
+            { 
+                hwVsID, 
+                hwVsOperType 
+            }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the virtual system is added or deleted.
+                "
+            ::= { hwVsTrapsPrefix 2 }
+            
+        hwVsStateChangeTrap NOTIFICATION-TYPE
+            OBJECTS 
+            { 
+                hwVsID, 
+                hwVsState 
+            }
+            STATUS current
+            DESCRIPTION
+                "
+                This trap message is reported when the state of virtual system is changed.
+                "
+            ::= { hwVsTrapsPrefix 3 }
+            
+        hwVsTrapVbOids OBJECT IDENTIFIER ::= { hwVSMgmt 9 }
+        
+        hwVsOperType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                add(1),
+                delete(2)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the mode of a virtual system.
+                Options:
+                1.add(1)    -Add the virtual system .
+                2.delete(2) -Delete the virtual system.
+                "
+            ::= { hwVsTrapVbOids 1 }
+
+        hwVSProtocolPortTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVSProtocolPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Virtual system protocol port table, which can be used to query protocol ports used by virtual system. 
+                The indexes of this table are hwVsID and hwVsProtocolType.
+                "
+            ::= { hwVSMgmt 10 }
+
+        hwVSProtocolPortEntry OBJECT-TYPE
+            SYNTAX HwVSProtocolPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                Virtual system protocol port table, which can be used to query protocol ports used by virtual system. 
+                The indexes of this entry are hwVsID and hwVsProtocolType.
+                "
+            INDEX { hwVsID, hwVsProtocolType }
+            ::= { hwVSProtocolPortTable 1 }
+
+        HwVSProtocolPortEntry ::=
+            SEQUENCE { 
+                hwVsProtocolType
+                    INTEGER,
+                hwVsProtocolPort
+                    Integer32
+                }
+
+        hwVsProtocolType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                 telnet(1),
+                 ssh(2),
+                 snmp(3),
+                 trap(4),
+                 syslog(5)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the protocol type.
+                Options:
+                1.telnet(1)     -Indicates the telnet.
+                2.ssh(2)        -Indicates the ssh.
+                3.snmp(3)       -Indicates the snmp.
+                4.trap(4)       -Indicates the trap.
+                5.syslog(5)     -Indicates the syslog.
+                "
+            ::= { hwVSProtocolPortEntry 1 }
+
+        hwVsProtocolPort OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the port number.
+                "
+            ::= { hwVSProtocolPortEntry 2 } 
+
+	END
+
+--
+-- HUAWEI-VS-MGMT-MIB.mib
+--

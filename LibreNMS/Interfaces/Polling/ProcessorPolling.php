@@ -26,13 +26,18 @@
 
 namespace LibreNMS\Interfaces\Polling;
 
+use App\Models\Processor;
+use Illuminate\Support\Collection;
+
 interface ProcessorPolling
 {
     /**
      * Poll processor data.  This can be implemented if custom polling is needed.
      *
-     * @param  array  $processors  Array of processor entries from the database that need to be polled
-     * @return array of polled data
+     * Set processor_usage on each processor (raw value, precision is applied by the model). Leave it null if polling failed.
+     *
+     * @param  Collection<int, Processor>  $processors  Processors from the database that need to be polled, processor_usage is null
+     * @return Collection<int, Processor>
      */
-    public function pollProcessors(array $processors);
+    public function pollProcessors(Collection $processors): Collection;
 }

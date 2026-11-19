@@ -70,7 +70,7 @@ trait SensorTrait
         $request = \Illuminate\Support\Facades\Request::instance();
         $graph_array = [
             'type' => $model->getGraphType(),
-            'popup_title' => htmlentities(strip_tags($model->device?->displayName() . ': ' . $model->sensor_descr)),
+            'popup_title' => htmlentities(strip_tags($model->device?->display . ': ' . $model->sensor_descr)),
             'id' => $model->sensor_id,
             'from' => '-1d',
             'height' => 20,
@@ -78,8 +78,7 @@ trait SensorTrait
         ];
 
         $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $model->device]);
-        $sensor_class = $model->sensor_class instanceof \BackedEnum ? $model->sensor_class->value : $model->sensor_class;
-        $link = Url::generate(['page' => 'device', 'device' => $model['device_id'], 'tab' => 'health', 'metric' => $sensor_class]);
+        $link = Url::sensorUrl($model);
         $descr = Url::graphPopup($graph_array, htmlentities((string) $model->sensor_descr), $link);
         $mini_graph = Url::graphPopup($graph_array);
         $sensor_current = Html::severityToLabel($model->currentStatus(), $model->formatValue());
@@ -129,8 +128,10 @@ trait SensorTrait
      */
     protected function formatExportRow(Model $sensor): array
     {
+        $device = $sensor->device;
+
         return [
-            $sensor->device ? $sensor->device->displayName() : '',
+            $sensor->device ? $device->display : '',
             $sensor->sensor_descr,
             $sensor->formatValue(),
             $sensor->formatValue('sensor_limit_low'),

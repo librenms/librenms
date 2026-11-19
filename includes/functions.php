@@ -16,66 +16,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-function device_discovery_trigger($id)
-{
-    if (App::runningInConsole() === false) {
-        ignore_user_abort(true);
-        set_time_limit(0);
-    }
-
-    $update = dbUpdate(['last_discovered' => null], 'devices', '`device_id` = ?', [$id]);
-    if (! empty($update) || $update == '0') {
-        $message = 'Device will be rediscovered';
-    } else {
-        $message = 'Error rediscovering device';
-    }
-
-    return ['status' => $update, 'message' => $message];
-}
-
-function delete_device($id)
-{
-    $device = DeviceCache::get($id);
-    if (! $device->exists) {
-        return 'No such device.';
-    }
-
-    if ($device->delete()) {
-        return "Removed device $device->hostname\n";
-    }
-
-    return "Failed to remove device $device->hostname";
-}
-
-function isDomainResolves($domain)
-{
-    if (gethostbyname($domain) != $domain) {
-        return true;
-    }
-
-    $records = dns_get_record($domain);  // returns array or false
-
-    return ! empty($records);
-}
-
-// FIXME port to LibreNMS\Util\IPv6 class
-function snmp2ipv6($ipv6_snmp)
-{
-    // Workaround stupid Microsoft bug in Windows 2008 -- this is fixed length!
-    // < fenestro> "because whoever implemented this mib for Microsoft was ignorant of RFC 2578 section 7.7 (2)"
-    $ipv6 = array_slice(explode('.', (string) $ipv6_snmp), -16);
-    $ipv6_2 = [];
-
-    for ($i = 0; $i <= 15; $i++) {
-        $ipv6[$i] = Str::padLeft(dechex($ipv6[$i]), 2, '0');
-    }
-    for ($i = 0; $i <= 15; $i += 2) {
-        $ipv6_2[] = $ipv6[$i] . $ipv6[$i + 1];
-    }
-
-    return implode(':', $ipv6_2);
-}
-
 /**
  * Check if port is valid to poll.
  * Settings: empty_ifdescr, good_if, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype, bad_ifoperstatus
@@ -280,27 +220,14 @@ function hytera_h2f($number, $nd)
 }
 
 /**
- * @param  $device
- * @return int|null
+ * The number of OIDs to request at once from the device's SNMP polling method settings.
+ *
+ * @param  array  $device
+ * @return int
  */
-function get_device_oid_limit($device)
+function get_device_oid_limit($device): int
 {
-    // device takes priority
-    $attrib = DeviceCache::get($device['device_id'] ?? null)->getAttrib('snmp_max_oid');
-    if ($attrib !== null) {
-        return $attrib;
-    }
-
-    // then os
-    $os_max = LibrenmsConfig::getOsSetting($device['os'], 'snmp_max_oid', 0);
-    if ($os_max > 0) {
-        return $os_max;
-    }
-
-    // then global
-    $global_max = LibrenmsConfig::get('snmp.max_oid', 10);
-
-    return $global_max > 0 ? $global_max : 10;
+    return DeviceCache::get($device['device_id'] ?? null)->polling()->snmp()->maxOid;
 }
 
 /**

@@ -183,7 +183,8 @@ class CiHelper
      */
     public function checkUnit(): int
     {
-        $phpunit_cmd = [$this->checkPhpExec('phpunit'), '--colors=always', '--fail-on-all-issues', '--testdox'];
+        $phpunit_cmd = [$this->checkPhpExec('phpunit'), '--colors=always', '--fail-on-all-issues'];
+        $phpunit_cmd[] = $this->flags['ci'] ? '--display-all-issues' : '--testdox';
 
         if ($this->flags['fail-fast']) {
             $phpunit_cmd[] = '--stop-on-defect';
@@ -205,7 +206,7 @@ class CiHelper
             $filter = implode('|', $this->os);
             // include tests that don't have data providers and only data sets that match
             array_push($phpunit_cmd, '--group', 'os');
-            if ($this->flags['os-modules-only']) {
+            if ($this->flags['unit_modules'] || $this->flags['os-modules-only']) {
                 array_push($phpunit_cmd, '--filter', "/::testOS with data set \"($filter)/");
             } else {
                 if ($this->flags['ci']) {
@@ -406,9 +407,10 @@ class CiHelper
         $space = strrpos($name, ' ');
         $type = substr($name, $space ? $space + 1 : 0);
         $quiet = ($this->flags['ci'] && isset($this->ciDefaults['quiet'][$type])) ? $this->ciDefaults['quiet'][$type] : $this->flags['quiet'];
+        $streamOutput = ! ($silence || $quiet);
 
         $proc->setTimeout(7200)->setIdleTimeout(3600);
-        if (! ($silence || $quiet)) {
+        if ($streamOutput) {
             echo PHP_EOL;
 
             // Run the process synchronously with a callback to handle output
@@ -428,8 +430,10 @@ class CiHelper
             if (! $silence) {
                 echo "failed ($duration)\n";
             }
-            echo $proc->getOutput() . PHP_EOL;
-            echo $proc->getErrorOutput() . PHP_EOL;
+            if (! $streamOutput) {
+                echo $proc->getOutput() . PHP_EOL;
+                echo $proc->getErrorOutput() . PHP_EOL;
+            }
         } elseif (! $silence) {
             echo "success ($duration)\n";
         }
@@ -457,7 +461,7 @@ class CiHelper
         $this->flags['full'] = empty($changed_files); // don't disable full if already set
         $files = $changed_files ? explode(' ', $changed_files) : [];
 
-        $this->changed = (new FileCategorizer($files))->categorize();
+        $this->changed = new FileCategorizer($files)->categorize();
         $this->parseChangedFiles();
     }
 

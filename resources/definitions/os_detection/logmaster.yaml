@@ -10,7 +10,6 @@ discovery:
 discovery_modules:
     arp-table: false
     bgp-peers: false
-    cisco-vrf-lite: false
     entity-physical: false
     ports: false
     ports-stack: false

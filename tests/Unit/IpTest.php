@@ -151,6 +151,11 @@ final class IpTest extends TestCase
         $this->assertTrue(IP::parse('2001:db8:85a3::8a2e:370:7334')->inNetwork('2001:db8:85a3::8a2e:370:7334/128'));
         $this->assertFalse(IP::parse('2001:db8:85a3::8a2e:370:7335')->inNetwork('2001:db8:85a3::8a2e:370:7334/128'));
 
+        // a network of the other address family is never a match
+        $this->assertFalse(IP::parse('8.8.8.8')->inNetwork('2001:630:50::/48'));
+        $this->assertFalse(IP::parse('2001:630:50::1')->inNetwork('8.8.8.0/25'));
+        $this->assertTrue(IP::parse('8.8.8.8')->inNetworks(['2001:630:50::/48', '8.8.8.0/25']));
+
         $this->expectException(\LibreNMS\Exceptions\InvalidIpException::class);
         IP::parse('42')->inNetwork('192.168.1.0/4');
 
@@ -197,6 +202,74 @@ final class IpTest extends TestCase
         $this->assertSame('2001:db8:85a3:3600::/55', IP::parse('2001:db8:85a3:369a::370:7334/55')->getNetwork());
         $this->assertSame('2001:db8:85a3:341a::370:7334/128', IP::parse('2001:db8:85a3:341a::370:7334')->getNetwork());
         $this->assertSame('2001:db8:85a3:341a::370:7334', IP::parse('2001:db8:85a3:341a::370:7334/128')->getNetworkAddress());
+    }
+
+    public function testIterateIpv4Network(): void
+    {
+        $this->assertSame(
+            ['192.0.2.1', '192.0.2.2'],
+            iterator_to_array(IP::parse('192.0.2.2/30'))
+        );
+        $this->assertSame(['192.0.2.1'], iterator_to_array(IP::parse('192.0.2.1')));
+        $this->assertSame(['192.0.2.0', '192.0.2.1'], iterator_to_array(IP::parse('192.0.2.0/31')));
+    }
+
+    public function testIterateIpv6Network(): void
+    {
+        $this->assertSame(
+            ['2001:db8::1', '2001:db8::2'],
+            iterator_to_array(IP::parse('2001:db8::2/126'))
+        );
+        $this->assertSame(['2001:db8::1'], iterator_to_array(IP::parse('2001:db8::1')));
+        $this->assertSame(['2001:db8::', '2001:db8::1'], iterator_to_array(IP::parse('2001:db8::/127')));
+    }
+
+    public function testNetworkIterationIsLazy(): void
+    {
+        $addresses = IP::parse('2001:db8::/64')->getIterator();
+
+        $this->assertSame('2001:db8::1', $addresses->current());
+        $addresses->next();
+        $this->assertSame('2001:db8::2', $addresses->current());
+    }
+
+    public function testAddressCount(): void
+    {
+        foreach (['192.0.2.0/24', '192.0.2.0/31', '192.0.2.1/32', '2001:db8::/120', '2001:db8::/127', '2001:db8::1/128'] as $network) {
+            $ip = IP::parse($network);
+            $this->assertSame(iterator_count($ip), $ip->addressCount(), $network);
+        }
+
+        $this->assertSame(2 ** 64 - 2, IP::parse('2001:db8::/64')->addressCount());
+    }
+
+    public function testCovers(): void
+    {
+        $covers = fn (string $network, string $other) => IP::parse($network)->includes(IP::parse($other));
+
+        $this->assertTrue($covers('192.0.2.0/24', '192.0.2.0/24'));
+        $this->assertTrue($covers('192.0.2.0/24', '192.0.2.128/25'));
+        $this->assertTrue($covers('192.0.2.0/24', '192.0.2.5'));
+        $this->assertFalse($covers('192.0.2.0/25', '192.0.2.0/24'));
+        $this->assertFalse($covers('192.0.2.0/24', '192.0.3.0/24'));
+        // the network and broadcast addresses are not yielded
+        $this->assertFalse($covers('192.0.2.0/24', '192.0.2.0'));
+        $this->assertFalse($covers('192.0.2.0/24', '192.0.2.254/31'));
+        $this->assertTrue($covers('192.0.2.0/24', '192.0.2.254'));
+        $this->assertTrue($covers('192.0.2.0/31', '192.0.2.0'));
+
+        $this->assertTrue($covers('2001:db8::/64', '2001:db8::5'));
+        $this->assertFalse($covers('2001:db8::/64', '2001:db8::'));
+        $this->assertFalse($covers('2001:db8::/64', '2001:db8:1::/64'));
+        // compared within an address family only
+        $this->assertFalse($covers('::/0', '192.0.2.5'));
+        $this->assertFalse($covers('0.0.0.0/0', '::1'));
+    }
+
+    public function testInvalidCidr(): void
+    {
+        $this->expectException(\LibreNMS\Exceptions\InvalidIpException::class);
+        IP::parse('192.0.2.1/33');
     }
 
     public function testToSnmpIndex(): void

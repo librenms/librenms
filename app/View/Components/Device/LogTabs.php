@@ -46,7 +46,7 @@ class LogTabs extends Component
         ];
 
         $this->tabs['eventlog'] = [
-            'text' => __('Event Log'),
+            'text' => __('Eventlog'),
             'link' => route('device.eventlog', $this->device->device_id),
         ];
 

@@ -1,3 +1,4 @@
+*.log
 # Ignore all dotfiles #
 #######################
 .*
@@ -6,6 +7,7 @@
 !/.editorconfig
 !/.php_cs
 !/.github/
+!/.github/linters/.yamllint.yml
 !/.mention-bot
 !/.env.example
 

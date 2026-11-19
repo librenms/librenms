@@ -13,7 +13,9 @@
  */
 
 // Define some error messages
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\ProgressList;
 
 $error_poolaction = [];
 $error_poolaction[0] = 'Unused';
@@ -123,7 +125,7 @@ if (! empty($ltmPoolEntry['name'])) {
     d_echo("No Pools Found\n");
 }
 
-echo "#### Unload disco module ltm-bwc ####\n\n";
+Log::info("#### Unload disco module ltm-bwc ####\n");
 $ltmBwcEntry = [];
 //Check for Virtual Server Enries
 $ltmBwcEntry['name'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.13.1.3.1.1', 0);
@@ -376,6 +378,7 @@ if (! empty($f5CertEntry) || ! empty($ltmBwcEntry) || ! empty($ltmVirtualServEnt
      * Let's loop over the SNMP data to see if we need to ADD or UPDATE any components.
      */
 
+    $progress = ProgressList::start('LTM components');
     foreach ($tblBigIP as $key => $array) {
         $component_key = false;
 
@@ -391,11 +394,11 @@ if (! empty($f5CertEntry) || ! empty($ltmBwcEntry) || ! empty($ltmVirtualServEnt
             $new_component = $component->createComponent($device['device_id'], $array['type']);
             $component_key = key($new_component);
             $components[$component_key] = array_merge($new_component[$component_key], $array);
-            echo '+';
+            $progress->mark('+');
         } else {
             // The component does exist, merge the details in - UPDATE.
             $components[$component_key] = array_merge($components[$component_key], $array);
-            echo '.';
+            $progress->mark('.');
         }
     }
 
@@ -415,12 +418,12 @@ if (! empty($f5CertEntry) || ! empty($ltmBwcEntry) || ! empty($ltmVirtualServEnt
 
         if ($found === false) {
             // The component has not been found. we should delete it.
-            echo '-';
+            $progress->mark('-');
             $component->deleteComponent($key);
         }
     }
 
     // Write the Components back to the DB.
     $component->setComponentPrefs($device['device_id'], $components);
-    echo "\n";
+    $progress->end();
 }// End if not error

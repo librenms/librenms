@@ -89,6 +89,24 @@ final class DeviceDependencyControllerTest extends TestCase
         $this->assertEqualsCanonicalizing([$parent->device_id, $child->device_id], array_column($rows, 'device_id'));
     }
 
+    public function testTableSortsByParentHostname(): void
+    {
+        $parentA = Device::factory()->create(['hostname' => 'sortdep-a-parent.example.com']);
+        $parentB = Device::factory()->create(['hostname' => 'sortdep-b-parent.example.com']);
+        $childOfB = Device::factory()->create(['hostname' => 'sortdep-c-child.example.com']);
+        $childOfA = Device::factory()->create(['hostname' => 'sortdep-d-child.example.com']);
+        $childOfB->parents()->attach($parentB);
+        $childOfA->parents()->attach($parentA);
+
+        $sorted = fn (string $direction) => array_column($this->actingAs($this->admin())
+            ->postJson(route('table.device-dependencies'), ['searchPhrase' => 'sortdep-', 'rowCount' => -1, 'sort' => ['parents' => $direction]])
+            ->assertOk()
+            ->json('rows'), 'device_id');
+
+        $this->assertSame([$parentA->device_id, $parentB->device_id, $childOfA->device_id, $childOfB->device_id], $sorted('asc'));
+        $this->assertSame([$childOfB->device_id, $childOfA->device_id, $parentB->device_id, $parentA->device_id], $sorted('desc'));
+    }
+
     public function testUserCannotViewTable(): void
     {
         $this->actingAs($this->user())
@@ -178,6 +196,12 @@ final class DeviceDependencyControllerTest extends TestCase
         $this->assertSame(0, $parent->children()->count());
         $this->assertEquals([$other_parent->device_id], $child2->parents()->pluck('devices.device_id')->all());
         $this->assertEquals([$other_parent->device_id], $other_child->parents()->pluck('devices.device_id')->all());
+
+        $this->assertSame(0, $parent->fresh()->max_depth);
+        $this->assertSame(0, $child1->fresh()->max_depth);
+        $this->assertSame(1, $other_parent->fresh()->max_depth);
+        $this->assertSame(2, $child2->fresh()->max_depth);
+        $this->assertSame(2, $other_child->fresh()->max_depth);
     }
 
     public function testUserCannotDestroyDependencies(): void

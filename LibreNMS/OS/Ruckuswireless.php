@@ -7,6 +7,7 @@ use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Ruckuswireless extends OS implements
     WirelessClientsDiscovery,
@@ -16,8 +17,8 @@ class Ruckuswireless extends OS implements
     {
         // Find Per SSID Client Count
         $sensors = [];
-        $ssids = $this->getCacheByIndex('ruckusZDWLANSSID', 'RUCKUS-ZD-WLAN-MIB');
-        $counts = $this->getCacheByIndex('ruckusZDWLANNumSta', 'RUCKUS-ZD-WLAN-MIB');
+        $ssids = SnmpQuery::walk('RUCKUS-ZD-WLAN-MIB::ruckusZDWLANSSID')->pluck();
+        $counts = SnmpQuery::walk('RUCKUS-ZD-WLAN-MIB::ruckusZDWLANNumSta')->pluck();
 
         $total_oids = [];
         $total = 0;
@@ -33,7 +34,7 @@ class Ruckuswireless extends OS implements
                 $oid,
                 'ruckuswireless',
                 $index,
-                'SSID: ' . $ssids[$index],
+                'SSID: ' . ($ssids[$index] ?? ''),
                 $count
             );
         }

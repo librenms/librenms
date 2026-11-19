@@ -29,8 +29,7 @@ use App\Models\ApplicationMetric;
 use App\Models\Eventlog;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\Enum\Severity;
-
-echo "\nApplications: ";
+use LibreNMS\Util\ProgressList;
 
 // fetch applications from the client
 $results = snmpwalk_cache_oid($device, 'nsExtendStatus', [], 'NET-SNMP-EXTEND-MIB');
@@ -74,6 +73,7 @@ d_echo('Checking for: ' . implode(', ', array_keys($results)) . PHP_EOL);
 
 // enable observer for printing changes
 ModuleModelObserver::observe(\App\Models\Application::class);
+$progress = ProgressList::start('Applications');
 
 // Enable applications
 $current_apps = [];
@@ -103,8 +103,7 @@ DeviceCache::getPrimary()->applications()->whereIn('app_type', $apps_to_remove)-
 
 // clean application_metrics
 ApplicationMetric::doesntHave('app')->delete();
-
-echo PHP_EOL;
+$progress->end();
 
 unset(
     $applications,

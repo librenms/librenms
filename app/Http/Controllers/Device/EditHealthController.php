@@ -85,9 +85,9 @@ class EditHealthController
             $sensor->sensor_custom = 'Reset';
             $saved = $sensor->saveQuietly();
         } else {
-            // SensorObserver turns Saving into Yes so later discovery does not overwrite the limits
-            if (array_intersect_key($validated, array_flip(['sensor_limit', 'sensor_limit_warn', 'sensor_limit_low_warn', 'sensor_limit_low']))) {
-                $sensor->sensor_custom = 'Saving';
+            if (array_intersect_key($validated, array_flip(Sensor::LIMITS))) {
+                // mark limits as custom so discovery does not overwrite them
+                $sensor->sensor_custom = 'Yes';
             }
             $saved = $sensor->save();
         }

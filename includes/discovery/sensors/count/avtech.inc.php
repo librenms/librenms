@@ -9,6 +9,9 @@
  *
  * @copyright  2026 LibreNMS Contributors
  */
+
+use LibreNMS\Enum\SensorType;
+
 if (isset($pre_cache['ramax-channels'])) {
     foreach ($pre_cache['ramax-channels'] as $index => $channel) {
         $type = $channel[3] ?? '';
@@ -19,7 +22,7 @@ if (isset($pre_cache['ramax-channels'])) {
             $sensor_index = 'ramax-' . md5((string) $index);
             $descr = trim($label . ' ' . $type, ' ');
             discover_sensor(
-                null, 'count', $device,
+                null, SensorType::Count, $device,
                 $oid, $sensor_index, 'avtech',
                 $descr, 100, 1,
                 null, null, null, null,

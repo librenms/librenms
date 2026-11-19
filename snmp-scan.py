@@ -29,7 +29,7 @@ from multiprocessing import Pool
 from os import path, chdir
 from socket import gethostbyname, gethostbyaddr, herror, gaierror
 from subprocess import check_output, CalledProcessError
-from sys import stdout
+from sys import stdout, stderr
 from time import time
 
 Result = namedtuple("Result", ["ip", "hostname", "outcome", "output"])
@@ -167,6 +167,11 @@ def scan_host(scan_ip, args):
 
 
 if __name__ == "__main__":
+    print(
+        "snmp-scan.py is deprecated and will be removed, use lnms scan:network instead",
+        file=stderr,
+    )
+
     ###################
     # Parse arguments #
     ###################

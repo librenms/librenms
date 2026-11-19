@@ -30,6 +30,7 @@ use App\Models\Eventlog;
 use App\View\SimpleTemplate;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Discovery\Yaml\YamlDiscoveryField;
 use LibreNMS\Exceptions\InvalidOidException;
@@ -116,20 +117,12 @@ class YamlDiscoveryDefinition
 
             $snmp_data = [];
             if (! empty($numeric_oids)) {
-                $snmpQuery = SnmpQuery::numeric();
-                if (isset($yamlItem['snmp_flags'])) {
-                    $snmpQuery->options($yamlItem['snmp_flags']);
-                }
-                $snmp_data = $snmpQuery->get($numeric_oids)->values();
+                $snmp_data = $this->snmpQuery($yamlItem)->numeric()->get($numeric_oids)->values();
                 $fetchedData = array_merge($fetchedData, $snmp_data);
             }
 
             if (! empty($oids)) {
-                $snmpQuery = SnmpQuery::enumStrings()->numericIndex();
-                if (isset($yamlItem['snmp_flags'])) {
-                    $snmpQuery->options($yamlItem['snmp_flags']);
-                }
-                $response = $snmpQuery->walk($oids);
+                $response = $this->snmpQuery($yamlItem, enumStrings: true)->walk($oids);
                 $response->valuesByIndex($snmp_data); // load into the $snmp_data array
                 $response->valuesByIndex($fetchedData); // load into the $fetchedData array
             }
@@ -137,7 +130,8 @@ class YamlDiscoveryDefinition
             $count = 0;
 
             foreach ($snmp_data as $index => $snmpItem) {
-                if (YamlDiscovery::canSkipItem(null, $index, $yamlItem, $yaml, $fetchedData)) {
+                $rawSingleValue = $snmpItem[$yamlItem['value'] ?? $yamlItem['oid'] ?? ''] ?? null;
+                if (YamlDiscovery::canSkipItem($rawSingleValue, $index, $yamlItem, $yaml, $fetchedData)) {
                     Log::debug('Data at index ' . $index . ' skipped due to skip_values');
                     Log::info('x');
                     continue;
@@ -149,8 +143,10 @@ class YamlDiscoveryDefinition
                 /** @var YamlDiscoveryField $field */
                 foreach ($this->fields as $field) {
                     // fill attributes
-                    $field->calculateValue($yamlItem, $fetchedData, $index, $count);
-                    $modelAttributes[$field->model_column] = $field->value;
+                    if ($field->model_column !== null) {
+                        $field->calculateValue($yamlItem, $fetchedData, $index, $count);
+                        $modelAttributes[$field->model_column] = $field->value;
+                    }
                 }
 
                 // if no pollable oid found, skip this index
@@ -184,13 +180,24 @@ class YamlDiscoveryDefinition
             Eventlog::log('This device discovery yaml is using deprecated pre-cache key, use additional_oids instead.  pre-cache will be removed in a future version.');
         }
 
-        $query = SnmpQuery::enumStrings()->numericIndex();
+        return $this->snmpQuery($data, enumStrings: true)->walk($data['oids'])->valuesByIndex();
+    }
 
-        if (isset($data['snmp_flags'])) {
-            $query->options($data['snmp_flags']);
+    /**
+     * Build an snmp query for a yaml section. Indexes are numeric (so numeric oids can be built from them) unless
+     * snmp_flags override the options. Display hints are always disabled to match the raw values seen when polling.
+     *
+     * @param  array{snmp_flags?: string|string[]}  $yaml
+     */
+    private function snmpQuery(array $yaml, bool $enumStrings = false): SnmpQueryInterface
+    {
+        if (isset($yaml['snmp_flags'])) {
+            return SnmpQuery::options($yaml['snmp_flags'])->displayHints(false);
         }
 
-        return $query->walk($data['oids'])->valuesByIndex();
+        $query = $enumStrings ? SnmpQuery::enumStrings() : SnmpQuery::make();
+
+        return $query->numericIndex()->displayHints(false);
     }
 
     private function fillNumericOids(array &$modelAttributes, array $yaml, int|string $index): bool
@@ -200,12 +207,11 @@ class YamlDiscoveryDefinition
         foreach ($this->fields as $field) {
             if ($field->isOid) {
                 $num_oid = null;
+                [$field_name, $column_name] = $field->getNumericNames();
 
                 if (call_user_func($field->should_poll, $this)) {
-                    $yaml_num_oid_field_name = $field->key . '_num_oid';
-
-                    if (isset($yaml[$yaml_num_oid_field_name])) {
-                        $num_oid = SimpleTemplate::parse($yaml[$yaml_num_oid_field_name], ['index' => $index]);
+                    if (isset($yaml[$field_name])) {
+                        $num_oid = SimpleTemplate::parse($yaml[$field_name], ['index' => $index]);
                         $num_oid_found = true;
                     } elseif (isset($yaml[$field->key])) {
                         if (Oid::of($yaml[$field->key])->isNumeric()) {
@@ -213,7 +219,7 @@ class YamlDiscoveryDefinition
                             $num_oid = $yaml[$field->key];
                             $num_oid_found = true;
                         } else {
-                            Log::debug("$yaml_num_oid_field_name should be added to the discovery yaml to increase discovery performance");
+                            Log::debug("$field_name should be added to the discovery yaml to increase discovery performance");
                             try {
                                 // if index is numeric, exclude it so we can cache the translation
                                 if (Oid::of($index)->isNumeric()) {
@@ -230,7 +236,7 @@ class YamlDiscoveryDefinition
                     }
                 }
 
-                $modelAttributes[$field->model_column . '_oid'] = $num_oid;
+                $modelAttributes[$column_name] = $num_oid;
             }
         }
 

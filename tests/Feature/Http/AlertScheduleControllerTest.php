@@ -13,6 +13,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Tests\TestCase;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 final class AlertScheduleControllerTest extends TestCase
@@ -71,7 +72,7 @@ final class AlertScheduleControllerTest extends TestCase
         $schedule = AlertSchedule::findOrFail($response->json('schedule_id'));
         $this->assertSame('Device maintenance', $schedule->title);
         $this->assertSame('Swapping PSU', $schedule->notes);
-        $this->assertEquals(MaintenanceBehavior::MuteAlerts->value, $schedule->behavior);
+        $this->assertSame(MaintenanceBehavior::MuteAlerts, $schedule->behavior);
         $this->assertEquals(0, $schedule->recurring);
         $this->assertTrue($schedule->start->equalTo(Carbon::now()));
         $this->assertTrue($schedule->end->equalTo(Carbon::now()->addMinutes(90)));
@@ -263,6 +264,21 @@ final class AlertScheduleControllerTest extends TestCase
             ->assertForbidden();
     }
 
+    public function testEditAndShowUseTheirOwnPermissions(): void
+    {
+        $schedule = AlertSchedule::factory()->create();
+        $editor = $this->user()->givePermissionTo(Permission::findOrCreate('alert-schedule.update'));
+        $viewer = $this->user()->givePermissionTo(Permission::findOrCreate('alert-schedule.view'));
+
+        $this->actingAs($editor)->getJson(route('alert-schedule.edit', $schedule))
+            ->assertOk()
+            ->assertJsonPath('schedule_id', $schedule->schedule_id);
+        $this->getJson(route('alert-schedule.show', $schedule))->assertForbidden();
+
+        $this->actingAs($viewer)->getJson(route('alert-schedule.show', $schedule))->assertOk();
+        $this->getJson(route('alert-schedule.edit', $schedule))->assertForbidden();
+    }
+
     public function testAdminCanUpdateSchedule(): void
     {
         $schedule_count = AlertSchedule::count();
@@ -290,7 +306,7 @@ final class AlertScheduleControllerTest extends TestCase
         $schedule->refresh();
         $this->assertSame('New', $schedule->title);
         $this->assertSame('changed', $schedule->notes);
-        $this->assertEquals(MaintenanceBehavior::RunAlerts->value, $schedule->behavior);
+        $this->assertSame(MaintenanceBehavior::RunAlerts, $schedule->behavior);
         $this->assertEquals(0, $schedule->recurring);
         $this->assertSame([], $schedule->recurring_day);
         $this->assertEquals([$new_device->device_id], $schedule->devices()->pluck('devices.device_id')->all());
@@ -339,6 +355,23 @@ final class AlertScheduleControllerTest extends TestCase
         $this->assertNotNull($schedule->fresh());
     }
 
+    public function testIndexPageRendersScheduleTable(): void
+    {
+        $this->actingAs($this->admin())
+            ->get(route('alert-schedule.index'))
+            ->assertOk()
+            ->assertSee('id="alert-schedule"', false)
+            ->assertSee('data-url="' . route('table.alert-schedule') . '"', false)
+            ->assertSee(__('Schedule maintenance'));
+    }
+
+    public function testUserCannotViewIndexPage(): void
+    {
+        $this->actingAs($this->user())
+            ->get(route('alert-schedule.index'))
+            ->assertForbidden();
+    }
+
     public function testDeviceEditPageRendersMaintenanceButton(): void
     {
         $device = Device::factory()->create();
@@ -349,5 +382,19 @@ final class AlertScheduleControllerTest extends TestCase
             ->assertSee('id="maintenance"', false)
             ->assertSee("route('alert-schedule.end'", false)
             ->assertDontSee('<maintenance-mode', false);
+    }
+
+    public function testTableShowsBehaviorLabel(): void
+    {
+        AlertSchedule::factory()->create([
+            'title' => 'Muted window',
+            'behavior' => MaintenanceBehavior::MuteAlerts,
+        ]);
+
+        $this->actingAs($this->admin())
+            ->postJson('/ajax/table/alert-schedule', ['searchPhrase' => 'Muted window'])
+            ->assertOk()
+            ->assertJsonPath('rows.0.title', 'Muted window')
+            ->assertJsonPath('rows.0.behavior', MaintenanceBehavior::MuteAlerts->descr());
     }
 }

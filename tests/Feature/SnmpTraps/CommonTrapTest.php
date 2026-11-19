@@ -36,6 +36,7 @@ use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 use Log;
+use Mockery;
 
 final class CommonTrapTest extends SnmpTrapTestCase
 {
@@ -63,7 +64,9 @@ final class CommonTrapTest extends SnmpTrapTestCase
 UDP: [$ipv4->ipv4_address]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91\n";
 
-        Log::partialMock()->shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => null]);
+        // mock the real logger so other channels (such as the eventlog) keep working
+        Log::swap($log = Mockery::mock(Log::getFacadeRoot()));
+        $log->shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => null]);
 
         $trap = new Trap($trapText);
         $this->assertFalse(Dispatcher::handle($trap), 'Found handler for trap with no snmpTrapOID');
@@ -87,7 +90,9 @@ UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::someOid\n";
 
-        Log::partialMock()->shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => 'SNMPv2-MIB::someOid']);
+        // mock the real logger so other channels (such as the eventlog) keep working
+        Log::swap($log = Mockery::mock(Log::getFacadeRoot()));
+        $log->shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => 'SNMPv2-MIB::someOid']);
 
         $trap = new Trap($trapText);
         $this->assertFalse(Dispatcher::handle($trap));
@@ -117,7 +122,7 @@ SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::authenticationFailure\n";
         // check that eventlog was logged
         $eventlog = Eventlog::latest('event_id')->first();
         $this->assertEquals($device->device_id, $eventlog->device_id, 'Trap eventlog device incorrect');
-        $this->assertEquals('SNMP Trap: Authentication Failure: ' . $device->displayName(), $eventlog->message, 'Trap eventlog message incorrect');
+        $this->assertEquals('SNMP Trap: Authentication Failure: ' . $device->display, $eventlog->message, 'Trap eventlog message incorrect');
         $this->assertEquals('auth', $eventlog->type, 'Trap eventlog type incorrect');
         $this->assertEquals(Severity::Notice, $eventlog->severity, 'Trap eventlog severity incorrect');
     }
@@ -139,7 +144,7 @@ SNMPv2-MIB::snmpTrapOID.0 BRIDGE-MIB::newRoot";
         // check that eventlog was logged
         $eventlog = Eventlog::latest('event_id')->first();
         $this->assertEquals($device->device_id, $eventlog->device_id, 'Trap eventlog device incorrect');
-        $this->assertEquals('SNMP Trap: Device ' . $device->displayName() . ' was elected as new root on one of its Spanning Tree Instances', $eventlog->message, 'Trap eventlog message incorrect');
+        $this->assertEquals('SNMP Trap: Device ' . $device->display . ' was elected as new root on one of its Spanning Tree Instances', $eventlog->message, 'Trap eventlog message incorrect');
         $this->assertEquals('stp', $eventlog->type, 'Trap eventlog type incorrect');
         $this->assertEquals(Severity::Notice, $eventlog->severity, 'Trap eventlog severity incorrect');
     }

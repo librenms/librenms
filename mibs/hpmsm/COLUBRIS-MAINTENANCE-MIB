@@ -1,7 +1,8 @@
 -- ****************************************************************************
 --  COLUBRIS-MAINTENANCE-MIB definitions
 --
---  Copyright (c) 2004, Colubris Networks, Inc.
+--  Copyright (c) 2004, Hewlett-Packard Development Company, L.P. 
+--  The information contained herein is subject to change without notice.
 --  All Rights Reserved.
 --
 --  Colubris Networks Maintenance MIB file.
@@ -27,7 +28,7 @@ IMPORTS
 ;
 
 colubrisMaintenanceMIB MODULE-IDENTITY
-    LAST-UPDATED    "200501170000Z"
+    LAST-UPDATED    "200902060000Z"
     ORGANIZATION    "Colubris Networks, Inc."
     CONTACT-INFO    "Colubris Networks
                      Postal: 200 West Street Ste 300
@@ -58,12 +59,14 @@ firmwarePeriodicUpdate OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Specifies if firmware updates are automatically triggered 
                  on a periodic basis or not.
+
                    'true': Automatically update the firmware based on
                            the information specified in the
                            firmwareUpdateDay and firmwareUpdateTime
                            attributes. 
+
                    'false': No firmware update is triggered unless a request 
-                            is specifically issude using the
+                            is specifically issued using the
                             firmwareUpdateInitiate attribute."
     ::= { firmwareUpdate 1 }
 
@@ -90,18 +93,19 @@ firmwareUpdateTime OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION "When firmwarePeriodicUpdate is set to true, this attribute 
-                 specifies the time of the day for an automatic firmware update.
-                 Specify the time in hours (00-23) and minutes (00-59) in the
-                 format HH:MM. The ':' character is mandatory between the fields."
+                 specifies the time of the day that automatic updates will   
+                 occur. Specify the time in hours (00-23) and minutes (00-59) 
+                 in the format HH:MM. The ':' character is mandatory between 
+                 the fields."
     ::= { firmwareUpdate 3 }
 
 firmwareUpdateLocation OBJECT-TYPE
     SYNTAX      DisplayString
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "Specifies the URL where the new firmware file is located. This is
-                 used when the firmware update is triggered manually or automatically
-                 on a periodic basis."
+    DESCRIPTION "Specifies the URL where the new firmware file is located. This 
+                 is used when the firmware update is triggered manually or 
+                 automatically on a periodic basis."
     ::= { firmwareUpdate 4 }
 
 firmwareUpdateInitiate OBJECT-TYPE
@@ -113,8 +117,8 @@ firmwareUpdateInitiate OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION "Triggers a firmware update using the firmware specified in the
-                 firmwareUpdateLocation attribute. Reading this attribute always
-                 returns 'idle'."
+                 firmwareUpdateLocation attribute. Reading this attribute 
+                 always returns 'idle'."
     ::= { firmwareUpdate 5 }
 
 firmwareUpdateNotificationEnabled OBJECT-TYPE
@@ -128,28 +132,42 @@ firmwareUpdateNotificationEnabled OBJECT-TYPE
 
 firmwareUpdateInfo OBJECT-TYPE
     SYNTAX      DisplayString
-    MAX-ACCESS  accessible-for-notify
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "Contains various information about the firmware update and is
                  used with firmware update notifications to provide more 
                  detailed information."
     ::= { firmwareUpdate 7 }
 
+firmwareUpdateStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    idle(1),
+                    inprogress(2),
+                    success(3),
+                    failure(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Contains the status of the current or last firmware download.
+                 A Textual error message is available in firmwareUpdateInfo."
+    ::= { firmwareUpdate 8 }
+
 -- configuration update group
 configurationPeriodicUpdate OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "Specifies if configuration file updates are automatically triggered 
-                 on a periodic basis or not.
+    DESCRIPTION "Specifies if configuration file updates are automatically
+                 triggered on a periodic basis or not.
 
                    'true': Automatically update the configuration file based on
                            the information specified in the
                            configurationUpdateDay and configurationUpdateTime 
                            attributes. 
 
-                   'false': No configuration file update is triggered unless a request 
-                            is specifically issude using the
+                   'false': No configuration file update is triggered unless a
+                            request is specifically issued using the
                             configurationUpdateInitiate attribute."
     ::= { configurationUpdate 1 }
     
@@ -167,8 +185,9 @@ configurationUpdateDay OBJECT-TYPE
                 }
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "When configurationPeriodicUpdate is set to true, this attribute
-                 specifies the day that automatic updates will occur."
+    DESCRIPTION "When configurationPeriodicUpdate is set to true, this
+                 attribute specifies the day that automatic updates will 
+                 occur."
     ::= { configurationUpdate 2 }
 
 configurationUpdateTime OBJECT-TYPE
@@ -176,18 +195,19 @@ configurationUpdateTime OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION "When configurationPeriodicUpdateis set to true, this attribute 
-                 specifies the time of the day for an automatic configuration file update.
-                 Specify the time in hours (00-23) and minutes (00-59) in the
-                 format HH:MM. The ':' character is mandatory between the fields."
+                 specifies the time of the day for an automatic configuration  
+                 file update. Specify the time in hours (00-23) and minutes 
+                 (00-59) in the format HH:MM. The ':' character is mandatory 
+                 between the fields."
     ::= { configurationUpdate 3 }
 
 configurationUpdateLocation OBJECT-TYPE
     SYNTAX      DisplayString
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "Specifies the URL where the new configuration file is located. This is
-                 used when the update is triggered manually or automatically
-                 on a periodic basis."
+    DESCRIPTION "Specifies the URL where the new configuration file is located.
+                 This is used when the update is triggered manually or
+                 automatically on a periodic basis."
     ::= { configurationUpdate 4 }
 
 configurationUpdateInitiate OBJECT-TYPE
@@ -198,9 +218,9 @@ configurationUpdateInitiate OBJECT-TYPE
                 }
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "Triggers a configuration file update using the configuration file
-                 specified in the configurationUpdateLocation attribute. Reading this 
-                 attribute always returns 'idle'."
+    DESCRIPTION "Triggers a configuration file update using the configuration 
+                 file specified in the configurationUpdateLocation attribute.  
+                 Reading this attribute always returns 'idle'."
     ::= { configurationUpdate 5 }
 
 configurationUpdateOperation OBJECT-TYPE
@@ -214,18 +234,21 @@ configurationUpdateOperation OBJECT-TYPE
     DESCRIPTION "Specifies the operation that is performed on the
                  configuration file.
 
-                    'backup':  Saves the current device configuration into the file
-                               specified in the configurationUpdateLocation attribute.
+                    'backup':  Saves the current device configuration into the 
+                               file specified in the
+                               configurationUpdateLocation attribute.
 
                     'restore':  Loads the file specified in the
-                                configurationUpdateLocation attribute into the device."
+                                configurationUpdateLocation attribute into the 
+                                device."
     ::= { configurationUpdate 6 }
 
 configurationUpdateNotificationEnabled OBJECT-TYPE 
     SYNTAX      ColubrisNotificationEnable
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "Specifies if configurationUpdateNotification notifications are generated."
+    DESCRIPTION "Specifies if configurationUpdateNotification notifications are 
+                 generated."
     DEFVAL      { enable }
     ::= { configurationUpdate 7 }
 
@@ -233,18 +256,19 @@ configurationLocalUpdateNotificationEnabled OBJECT-TYPE
     SYNTAX      ColubrisNotificationEnable
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "Specifies if configurationLocalUpdateNotification notifications
+    DESCRIPTION "Specifies if configurationLocalUpdateNotification 
+                 notifications
                  are generated."
     DEFVAL      { enable }
     ::= { configurationUpdate 8 }
 
 configurationUpdateInfo OBJECT-TYPE
     SYNTAX      DisplayString
-    MAX-ACCESS  accessible-for-notify
+    MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Contains various information about the configuration update and is
-                 used with configuration update notifications to provide more 
-                 detailed information."
+    DESCRIPTION "Contains various information about the configuration update 
+                 and is used with configuration update notifications to provide 
+                 more detailed information."
     ::= { configurationUpdate 9 }
 
 configurationFactoryDefaults OBJECT-TYPE
@@ -256,8 +280,9 @@ configurationFactoryDefaults OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION "Resets the device configuration to Factory Default. 
-                 Important: This will reset the community names and shut down all
-                 connections. Reading this object will always return 'idle'."
+                 Important: This will reset the community names and shut down 
+                 all connections. Reading this object will always return                
+                 'idle'."
     ::= { configurationUpdate 10 }
 
 configurationRestart OBJECT-TYPE
@@ -269,17 +294,32 @@ configurationRestart OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION "Restarts the device.
-                 Important: This will shut down all connections. Reading this object
-		     will always return 'idle'."
+                 Important: This will shut down all connections. Reading this 
+                 object will always return 'idle'."
     ::= { configurationUpdate 11 }
+
+configurationUpdateStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    idle(1),
+                    inprogress(2),
+                    success(3),
+                    failure(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Contains the status of the current or last configuration   
+                 transfer (backup or restore. A textual error message is 
+                 available in configurationUpdateInfo."
+    ::= { configurationUpdate 12 }
 
 -- certificates configuration group
 certificateAboutToExpireNotificationEnabled OBJECT-TYPE 
     SYNTAX      ColubrisNotificationEnable
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "Specifies if certificateAboutToExpireNotification notifications
-                 are generated."
+    DESCRIPTION "Specifies if certificateAboutToExpireNotification 
+                 notifications are generated."
     DEFVAL      { enable }
     ::= { certificate 1 }
 
@@ -287,7 +327,8 @@ certificateExpiredNotificationEnabled OBJECT-TYPE
     SYNTAX      ColubrisNotificationEnable
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION "Specifies if certificateExpiredNotification notifications are generated."
+    DESCRIPTION "Specifies if certificateExpiredNotification notifications are 
+                 generated."
     DEFVAL      { enable }
     ::= { certificate 2 }
 
@@ -394,6 +435,7 @@ colubrisMaintenanceMIBGroup OBJECT-GROUP
                     firmwareUpdateInitiate,
                     firmwareUpdateNotificationEnabled,
                     firmwareUpdateInfo,
+                    firmwareUpdateStatus,
                     configurationPeriodicUpdate,
                     configurationUpdateDay,
                     configurationUpdateTime,
@@ -402,9 +444,10 @@ colubrisMaintenanceMIBGroup OBJECT-GROUP
                     configurationUpdateOperation,
                     configurationUpdateNotificationEnabled,
                     configurationUpdateInfo,
-		    configurationFactoryDefaults,
-		    configurationRestart,
+                    configurationFactoryDefaults,
+                    configurationRestart,
                     configurationLocalUpdateNotificationEnabled,
+                    configurationUpdateStatus,
                     certificateAboutToExpireNotificationEnabled,
                     certificateExpiredNotificationEnabled,
                     certificateExpiryDate

@@ -1,7 +1,7 @@
 os: alteonos
 group: radware
 text: AlteonOS
-type: network
+type: loadbalancer
 icon: radware
 over:
     - { graph: device_bits, text: 'Device Traffic' }

@@ -1,4 +1,4 @@
--- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+-- Mib files packaged on  Wed Jun 19 01:31:39 EDT 2019 for Storage Array Firmware V10.0.3 (R469188)
 
 --  
 --  Appliances that equallogic firmware supports
@@ -24,7 +24,7 @@ IMPORTS
     eqlGroupId               FROM EQLGROUP-MIB;
 
 eqlApplianceModule MODULE-IDENTITY      
-	LAST-UPDATED "201503171528Z"
+	LAST-UPDATED "201906190531Z"
     ORGANIZATION  "EqualLogic Inc."
     CONTACT-INFO      
         "Contact: Customer Support
@@ -37,7 +37,7 @@ eqlApplianceModule MODULE-IDENTITY
     DESCRIPTION          
         "Appliances information.
 
-        Copyright (c) 2004-2013 by Dell Inc. 
+        Copyright (c) 2004-2014 by Dell Inc. 
         
         All rights reserved.  This software may not be copied, disclosed, 
         transferred, or used except in accordance with a license granted 
@@ -81,34 +81,35 @@ eqlApplianceEntry OBJECT-TYPE
 
 EqlApplianceEntry ::= 
     SEQUENCE { 
-        eqlApplianceIndex               Unsigned32,   
-        eqlApplianceRowStatus           RowStatus,
-        eqlApplianceName                OCTET STRING,
-        eqlApplianceType                INTEGER,
-        eqlApplianceState               INTEGER,
-        eqlApplianceDescription         DisplayString,
-        eqlApplianceMgmtAddressType     InetAddressType,
-        eqlApplianceMgmtAddress         InetAddress,
-        eqlApplianceMgmtPort            Unsigned32,
-        eqlApplianceMajorVersion        Unsigned32,
-        eqlApplianceMinorVersion        Unsigned32,
-        eqlApplianceMaintVersion        Unsigned32,
-        eqlApplianceVendorId            OCTET STRING,
-        eqlApplianceSharedSecret        OCTET STRING,
-        eqlApplianceUserName            UTFString,
-        eqlApplianceNumberOfNodes       Unsigned32,
-        eqlApplianceUniqueID            Unsigned32,
-        eqlApplianceConfigStatus        Unsigned32,
-        eqlApplianceAction              INTEGER,
-        eqlApplianceAdminStatus         INTEGER,
-        eqlApplianceGatewayAddrType     InetAddressType,
-        eqlApplianceGatewayAddr         InetAddress,
-        eqlApplianceLastScheduleIndex   Unsigned32,
-        eqlApplianceMPV                 Unsigned32,
-        eqlApplianceEnableFTP           INTEGER,
-        eqlApplianceDesiredServiceMode  INTEGER,
-        eqlApplianceServiceModeStatus   INTEGER,
-        eqlApplianceRequestId           Counter64
+        eqlApplianceIndex                   Unsigned32,   
+        eqlApplianceRowStatus               RowStatus,
+        eqlApplianceName                    OCTET STRING,
+        eqlApplianceType                    INTEGER,
+        eqlApplianceState                   INTEGER,
+        eqlApplianceDescription             DisplayString,
+        eqlApplianceMgmtAddressType         InetAddressType,
+        eqlApplianceMgmtAddress             InetAddress,
+        eqlApplianceMgmtPort                Unsigned32,
+        eqlApplianceMajorVersion            Unsigned32,
+        eqlApplianceMinorVersion            Unsigned32,
+        eqlApplianceMaintVersion            Unsigned32,
+        eqlApplianceVendorId                OCTET STRING,
+        eqlApplianceSharedSecret            OCTET STRING,
+        eqlApplianceUserName                UTFString,
+        eqlApplianceNumberOfNodes           Unsigned32,
+        eqlApplianceUniqueID                Unsigned32,
+        eqlApplianceConfigStatus            Unsigned32,
+        eqlApplianceAction                  INTEGER,
+        eqlApplianceAdminStatus             INTEGER,
+        eqlApplianceGatewayAddrType         InetAddressType,
+        eqlApplianceGatewayAddr             InetAddress,
+        eqlApplianceLastScheduleIndex       Unsigned32,
+        eqlApplianceMPV                     Unsigned32,
+        eqlApplianceEnableFTP               INTEGER,
+        eqlApplianceDesiredServiceMode      INTEGER,
+        eqlApplianceServiceModeStatus       INTEGER,
+        eqlApplianceRequestId               Counter64,
+	eqlApplianceSanClientNetworkOverlap TruthValue
     }
 
 eqlApplianceIndex OBJECT-TYPE      
@@ -166,7 +167,8 @@ eqlApplianceState OBJECT-TYPE
                     cluster-name(1015),
                     start-nas-appliance-create(1016),
                     nas-appliance-create-in-progress(1017),
-                    start-volume-discovery(1018)
+                    start-volume-discovery(1018),
+                    send-nas-eula-approval(1019)
     }     
     MAX-ACCESS      read-create      
     STATUS          current      
@@ -375,6 +377,17 @@ eqlApplianceRequestId OBJECT-TYPE
     STATUS          current      
     DESCRIPTION     "This field represents the operation request identifier."
     ::= { eqlApplianceEntry 28 }
+
+
+eqlApplianceSanClientNetworkOverlap OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field indicates that if there is an overlap in the SAN and Client network.
+                     Customer should be warned if there is an overlap as these network should be
+		     segregated from each other."
+    DEFVAL          { false }
+    ::= { eqlApplianceEntry 29 }
 
 --------------------------------------------------------------------------------------------
 eqlApplianceUniqueIDTable OBJECT-TYPE      
@@ -714,7 +727,8 @@ eqlApplianceNodeConfigState OBJECT-TYPE
                     client-network-complete(1004),
                     gateway-config-complete(1005),
                     configured(1006),
-                    detached(1007)
+                    detached(1007),
+                    client-secondary-network-complete(1008)
     }
     MAX-ACCESS      read-create        
     STATUS          current      
@@ -808,14 +822,16 @@ EqlApplianceNetworksEntry ::=
         eqlApplianceNetworkType                  INTEGER,
         eqlApplianceNetworkID                    Unsigned32,
         eqlApplianceNetworkName                  OCTET STRING,
-	eqlApplianceNetworkBlockIPAddressType    InetAddressType,
-	eqlApplianceNetworkBlockIPAddress        InetAddress,
-	eqlApplianceNetworkBlockNetmaskAddrType  InetAddressType,
-	eqlApplianceNetworkBlockNetmaskAddr      InetAddress,
+	    eqlApplianceNetworkBlockIPAddressType    InetAddressType,
+	    eqlApplianceNetworkBlockIPAddress        InetAddress,
+	    eqlApplianceNetworkBlockNetmaskAddrType  InetAddressType,
+	    eqlApplianceNetworkBlockNetmaskAddr      InetAddress,
         eqlApplianceNetworkVLANTag               Unsigned32,
         eqlApplianceNetworkAdminState            INTEGER,
         eqlApplianceNetworkMTUSize               Unsigned32,
-        eqlApplianceNetworkBondingMode           INTEGER
+        eqlApplianceNetworkBondingMode           INTEGER,
+        eqlApplianceNetworkGeneratedName         OCTET STRING,
+        eqlApplianceNetworkGeneratedNameNew      OCTET STRING
     }
 
 eqlApplianceNetworkRowStatus OBJECT-TYPE      
@@ -830,7 +846,8 @@ eqlApplianceNetworkType OBJECT-TYPE
                     internal(1),
 		            san(2),
 		            client(3),
-                    backplane(4)
+                    backplane(4),
+                    client-secondary(5)
     }
     MAX-ACCESS      not-accessible        
     STATUS          current      
@@ -889,8 +906,9 @@ eqlApplianceNetworkVLANTag OBJECT-TYPE
 eqlApplianceNetworkAdminState OBJECT-TYPE      
     SYNTAX          INTEGER {
                     creating(1),
-		    modifying(2),
-		    done(3)
+		    		modifying(2),
+		    		done(3),
+		    		deleting(4)
     }
     MAX-ACCESS      read-create        
     STATUS          current      
@@ -915,6 +933,19 @@ eqlApplianceNetworkBondingMode OBJECT-TYPE
                      For spartan, only client network supports modifying the bonding mode.Default mode is ALB (adaptive load balancing) for client network. User can change this mode to LACP(802.3 ad) later."  
     ::= { eqlApplianceNetworksEntry 12 }  
 
+eqlApplianceNetworkGeneratedName OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (1..12))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the autogenerated name for a network. This is only applicable for client and client secondary subnets"
+    ::= { eqlApplianceNetworksEntry  13 }  
+
+eqlApplianceNetworkGeneratedNameNew OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (1..128))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the autogenerated name for a network. This is only applicable for client and client secondary subnets. This is used from V4 onwards because of size limitation."
+    ::= { eqlApplianceNetworksEntry  14 }
 --------------------------------------------------------------------------------------------
 eqlApplianceIPTable OBJECT-TYPE      
     SYNTAX          SEQUENCE OF EqlApplianceIPEntry      
@@ -1074,7 +1105,8 @@ eqlApplianceOpsType OBJECT-TYPE
                     nas-cluster-update(16),
                     restore-config(17),
                     service-mode-change(18),
-                    container-cfg-modify(19)
+                    container-cfg-modify(19),
+                    nas-cluster-post-upgrade-validation(20)
     }
     MAX-ACCESS      not-accessible        
     STATUS          current      
@@ -1478,7 +1510,6 @@ eqlApplianceStatsEntry OBJECT-TYPE
 
 EqlApplianceStatsEntry ::= 
     SEQUENCE { 
-
         eqlApplianceStatsTotalCapacity          Counter64,
         eqlApplianceStatsTotalAllocated         Counter64,
         eqlApplianceStatsTotalUsed              Counter64,
@@ -1488,7 +1519,11 @@ EqlApplianceStatsEntry ::=
         eqlApplianceStatsNumberOfNfsExports     Counter64,
         eqlApplianceStatsNumberOfCifsShares     Counter64,
         eqlApplianceStatsNumberOfSnapshots      Counter64,
-        eqlApplianceStatsTotalOptimizationSpaceSavings        Counter64
+        eqlApplianceStatsTotalOptimizationSpaceSavings        Counter64,
+        eqlApplianceStatsTotalFreeReserved      Counter64,
+        eqlApplianceStatsTotalFreeUnreserved    Counter64,
+        eqlApplianceStatsTotalOverCommitted     Counter64,
+        eqlApplianceStatsNumberOfClonedContainers             Counter64
     }
 
 
@@ -1576,6 +1611,35 @@ eqlApplianceStatsTotalOptimizationSpaceSavings OBJECT-TYPE
     ::= { eqlApplianceStatsEntry 10 }  
 
 
+eqlApplianceStatsTotalFreeReserved OBJECT-TYPE
+    SYNTAX          Counter64    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates the total mega bytes of free space reserved."  
+    ::= { eqlApplianceStatsEntry 11 }  
+
+
+eqlApplianceStatsTotalFreeUnreserved OBJECT-TYPE
+    SYNTAX          Counter64    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates the total mega bytes of free space unreserved ."  
+    ::= { eqlApplianceStatsEntry 12 }  
+
+eqlApplianceStatsTotalOverCommitted OBJECT-TYPE
+    SYNTAX          Counter64    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indeicates the total mega bytes of over committed space."  
+    ::= { eqlApplianceStatsEntry 13 }  
+
+eqlApplianceStatsNumberOfClonedContainers      OBJECT-TYPE
+    SYNTAX          Counter64    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "Total number of cloned containers"
+    ::= { eqlApplianceStatsEntry 14 }  
+
 --------------------------------------------------------------------------------------------
 eqlApplianceNodeStatusTable OBJECT-TYPE      
     SYNTAX          SEQUENCE OF EqlApplianceNodeStatusEntry      
@@ -1648,7 +1712,8 @@ EqlApplianceMultiStateOpsEntry ::=
         eqlApplianceMultiStateOpsAction INTEGER,
         eqlApplianceMultiStateOpsCurNodeIndex Unsigned32,
         eqlApplianceMultiStateOpsLongRunningOp TruthValue,
-        eqlApplianceMultiStateOpsRequestId Counter64
+        eqlApplianceMultiStateOpsRequestId Counter64,
+        eqlApplianceMultiStateOpsGenericParam OCTET STRING
 }
 
 eqlApplianceMultiStateOpsIndex OBJECT-TYPE
@@ -1775,6 +1840,7 @@ eqlApplianceMultiStateOpsState OBJECT-TYPE
         add-pair-start-volume-discovery(1522),
         add-pair-start-nas-appliance-join(1523),
         add-pair-nas-appliance-join-inprogress(1524),
+        add-pair-cluster-client-secondary-network(1525),
         -- 1601 to 1699 are for delete operation
         delete-inprogress(1601),
         local-delete-inprogress(1602),
@@ -1793,6 +1859,7 @@ eqlApplianceMultiStateOpsState OBJECT-TYPE
         rename-cluster(1712),
         cifs-operation(1713),
         nas-cluster-update-start(1714),
+        modify-client-secondary-network(1715),
         -- 1801 to 1899 are for NAS Diagnostics
         nas-diags-init(1801),
         nas-diags-start-general(1802),
@@ -1824,7 +1891,11 @@ eqlApplianceMultiStateOpsState OBJECT-TYPE
         restore-done                             (2016),
         -- 2101 to 2199 for service mode change operation
         service-mode-change-inprogress           (2101),
-        container-cfg-modify-inprogress          (2200)
+        container-cfg-modify-inprogress          (2200),
+        cluster-connection-check                 (2201),
+        -- v4 update new labels
+        nas-cluster-update-inprogress-install		(2300),
+        nas-cluster-update-inprogress-start-new-version	(2301)
     }
     MAX-ACCESS      read-create
     STATUS          current      
@@ -1872,6 +1943,13 @@ eqlApplianceMultiStateOpsRequestId OBJECT-TYPE
     STATUS          current      
     DESCRIPTION     "This field represents the the operation request identifier."
     ::= { eqlApplianceMultiStateOpsEntry 14 }
+
+eqlApplianceMultiStateOpsGenericParam OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE(0..64))
+    MAX-ACCESS      read-write
+    STATUS          current      
+    DESCRIPTION     "Additional data for NAS cluster diagnostics and nas pool resize."
+    ::= { eqlApplianceMultiStateOpsEntry 15 }
 
 --------------------------------------------------------------------------------------------
 eqlApplianceNdmpTable OBJECT-TYPE
@@ -2196,15 +2274,22 @@ eqlApplianceCredentialsDatabaseEntry OBJECT-TYPE
 
 EqlApplianceCredentialsDatabaseEntry ::= 
     SEQUENCE { 
-        eqlApplianceCredentialsDatabaseRowStatus                RowStatus,
-        eqlApplianceCredentialsDatabaseType                     INTEGER,
-        eqlApplianceCredentialsDatabaseLdapBaseDn               OCTET STRING,
-        eqlApplianceCredentialsDatabaseLdapServerAddress        OCTET STRING,
-        eqlApplianceCredentialsDatabaseNisDomain                OCTET STRING,
-        eqlApplianceCredentialsDatabaseNisServerAddress         OCTET STRING
-    }
+        eqlApplianceCredentialsDatabaseRowStatus                         RowStatus,
+        eqlApplianceCredentialsDatabaseType                              INTEGER,
+        eqlApplianceCredentialsDatabaseLdapBaseDn                        OCTET STRING,
+        eqlApplianceCredentialsDatabaseLdapServerAddress                 OCTET STRING,
+        eqlApplianceCredentialsDatabaseNisDomain                         OCTET STRING,
+        eqlApplianceCredentialsDatabaseNisServerAddress                  OCTET STRING,
+        eqlApplianceCredentialsDatabaseLDAPServerAnonymousAccessDisabled TruthValue,
+        eqlApplianceCredentialsDatabaseLDAPServerBindDN                  OCTET STRING,
+        eqlApplianceCredentialsDatabaseLDAPServerBindPassword            OCTET STRING,
+        eqlApplianceCredentialsDatabaseLDAPServerSecureProtocol          INTEGER,
+        eqlApplianceCredentialsDatabaseLDAPServerExtendedSchema          TruthValue,
+        eqlApplianceCredentialsDatabaseLDAPCertificateFileName           OCTET STRING,
+        eqlApplianceCredentialsDatabaseLDAPServerIpOrFqdn                OCTET STRING
+   }
 
- 
+
 eqlApplianceCredentialsDatabaseRowStatus  OBJECT-TYPE
     SYNTAX          RowStatus  
     MAX-ACCESS      read-create
@@ -2235,8 +2320,8 @@ eqlApplianceCredentialsDatabaseLdapBaseDn  OBJECT-TYPE
 
 eqlApplianceCredentialsDatabaseLdapServerAddress  OBJECT-TYPE      
     SYNTAX          OCTET STRING(SIZE(1..64))
-    MAX-ACCESS      read-create        
-    STATUS          current      
+    MAX-ACCESS      read-create
+    STATUS          deprecated        
     DESCRIPTION     "The IP address as a string"
     ::= { eqlApplianceCredentialsDatabaseEntry  4 }  
 
@@ -2254,7 +2339,80 @@ eqlApplianceCredentialsDatabaseNisServerAddress  OBJECT-TYPE
     DESCRIPTION     "A comma separated list of NIS server IP addresses"
     ::= { eqlApplianceCredentialsDatabaseEntry 6 }  
 
-----------------------
+eqlApplianceCredentialsDatabaseLDAPServerAnonymousAccessDisabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies whether an anonymous bind can be done, 
+                    in which case the bind DN and bind password are not needed.
+                    The default is anonymous access."
+    DEFVAL          { false }
+    ::= {eqlApplianceCredentialsDatabaseEntry 7 }
+
+eqlApplianceCredentialsDatabaseLDAPServerBindDN OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(0..512))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the LDAP bind DN (username) for this client.
+                     It can be set but it returns a zero-length strings upon read."
+    ::= {eqlApplianceCredentialsDatabaseEntry 8 }
+
+eqlApplianceCredentialsDatabaseLDAPServerBindPassword OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(0..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the LDAP bind DN password for this client.
+                     It can be set but it returns a zero-length strings upon read."
+    --DEFAULT       cookie "secure"
+    ::= {eqlApplianceCredentialsDatabaseEntry 9 }
+
+
+eqlApplianceCredentialsDatabaseLDAPServerSecureProtocol OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        none (0),
+                        tls  (1),
+                        tls-with-certificate (2)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field represent the security protocol between NAS cluster
+                     and LDAP server. Default value is none which does not encode
+                     user credentials and are sent over the network in plain text."
+    DEFVAL         { none }
+    ::= {eqlApplianceCredentialsDatabaseEntry 10 }
+
+eqlApplianceCredentialsDatabaseLDAPServerExtendedSchema OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies whether extended schema is used for LDAP
+                     over Active Directory. UNIX user stored on Active Directory used
+		     as an LDAP server. If the Administrator is keeping the UNIX users 
+		     on Active directory using the AD extended schema, then NAS cluster
+		     needs to be aware of it since a different flow is being used to 
+		     retrieve the UNIX users details."
+    DEFVAL          { false }
+    ::= {eqlApplianceCredentialsDatabaseEntry 11 }
+
+eqlApplianceCredentialsDatabaseLDAPCertificateFileName OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(0..256))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field is used for storing the client certificate file 
+                     name. This field will be used if tls-with-certificate option
+		     is selected for secure protocol." 
+    ::= {eqlApplianceCredentialsDatabaseEntry 12 }
+
+eqlApplianceCredentialsDatabaseLDAPServerIpOrFqdn OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(0..256))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field is used for entering LDAP Server's FQDN or ip address. 
+                     This field deprecates the use of eqlApplianceCredentialsDatabaseLdapServerAddress
+		     which only takes ip address for LDAP server." 
+    ::= {eqlApplianceCredentialsDatabaseEntry 13 }
+
+-----------------------------------------------------------------------------------
 eqlApplianceActiveDirectoryAccessTable OBJECT-TYPE      
     SYNTAX          SEQUENCE OF EqlApplianceActiveDirectoryAccessEntry      
     MAX-ACCESS      not-accessible      
@@ -2289,7 +2447,8 @@ EqlApplianceActiveDirectoryAccessEntry ::=
         eqlApplianceActiveDirectoryMemberOfDomain          OCTET STRING,
         eqlApplianceActiveDirectoryStatus                  INTEGER,
         eqlApplianceActiveDirectoryAccessibleControllers   OCTET STRING,
-        eqlApplianceActiveDirectoryPreferredControllers    OCTET STRING
+        eqlApplianceActiveDirectoryPreferredControllers    OCTET STRING,
+        eqlApplianceActiveDirectoryPreferredControllersNameList OCTET STRING
     }
 
  
@@ -2388,13 +2547,18 @@ eqlApplianceActiveDirectoryDomainControllers OBJECT-TYPE
     MAX-ACCESS      read-create        
     STATUS          current      
     DESCRIPTION     "Truth value if it's member of domain"
-    ::= { eqlApplianceActiveDirectoryAccessEntry  12 }  
+    ::= { eqlApplianceActiveDirectoryAccessEntry  12 }
 
-eqlApplianceActiveDirectoryStatus OBJECT-TYPE      
+eqlApplianceActiveDirectoryStatus OBJECT-TYPE
     SYNTAX          INTEGER {
                     unused(0),
                     enabled(1),
-                    disabled(2)
+                    disabled(2),
+                    notjoined(3),
+                    unknown(4),
+                    offline(5),
+                    problematic(6),
+                    optimal(7)
                     }
     MAX-ACCESS      read-create        
     STATUS          current      
@@ -2413,8 +2577,16 @@ eqlApplianceActiveDirectoryPreferredControllers OBJECT-TYPE
     SYNTAX          OCTET STRING(SIZE(1..128))
     MAX-ACCESS      read-create        
     STATUS          current      
-    DESCRIPTION     "Comman separated list of preferred Active Directory controllers."
+    DESCRIPTION     "Comma separated list of preferred Active Directory controllers."
     ::= { eqlApplianceActiveDirectoryAccessEntry  15 }
+
+eqlApplianceActiveDirectoryPreferredControllersNameList OBJECT-TYPE
+    SYNTAX          OCTET STRING(SIZE(1..200))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Comma separated list of preferred Active Directory 
+                    controllers names."
+    ::= { eqlApplianceActiveDirectoryAccessEntry  16 }
 
 --------------
 eqlApplianceManualMappingTable OBJECT-TYPE      
@@ -2816,7 +2988,8 @@ eqlApplianceSyncedDataType OBJECT-TYPE
                     timezone(3),
                     traprecipient(4),
                     trapcommunity(5),
-                    cluster-san-vip(6)
+                    cluster-san-vip(6),
+                    cluster-name(7)
     }
     MAX-ACCESS      read-only
     STATUS          current      
@@ -3290,7 +3463,7 @@ EqlApplianceVolumeDiscoveryEntry ::=
         eqlApplianceVolumeDiscoveryRowStatus                     RowStatus,
         eqlApplianceVolumeDiscoveryVolumeNodeAccessibleStatus    INTEGER,
         eqlApplianceVolumeDiscoveryVolumeStatus                  INTEGER,
-	eqlApplianceVolumeDiscoveryVolumeLunNumber                   Unsigned32 
+	eqlApplianceVolumeDiscoveryVolumeLunNumber               Unsigned32 
     }
 
 eqlApplianceVolumeDiscoveryRowStatus OBJECT-TYPE      
@@ -3829,6 +4002,87 @@ eqlApplianceGroupQueryGroupSource  OBJECT-TYPE
     DESCRIPTION     "The credential source of the group referenced by this row."
     ::= {  eqlApplianceGroupQueryEntry 11 }
 
+-----------------------------------------------------------------------------------
+eqlApplianceActiveDirectoryTrustedDomainListTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EqlApplianceActiveDirectoryTrustedDomainListEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Appliance Trusted Domain Table
+                     This table is used to store the list of trusted domain 
+                     controllers. TimeoutAll:60"
+    ::=    { eqlApplianceObjects 43 }
 
+eqlApplianceActiveDirectoryTrustedDomainListEntry OBJECT-TYPE
+    SYNTAX          EqlApplianceActiveDirectoryTrustedDomainListEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing an operation."
+    INDEX           { eqlApplianceIndex, eqlApplianceActiveDirectoryTrustedDomainName }
+
+    ::=   { eqlApplianceActiveDirectoryTrustedDomainListTable 1 }
+
+EqlApplianceActiveDirectoryTrustedDomainListEntry ::=
+    SEQUENCE { 
+        eqlApplianceActiveDirectoryTrustedDomainRowStatus       RowStatus,
+		eqlApplianceActiveDirectoryTrustedDomainName           OCTET STRING,
+		eqlApplianceActiveDirectoryTrustedDomainDcName         OCTET STRING,
+		eqlApplianceActiveDirectoryTrustedDomainDcIp           OCTET STRING,
+		eqlApplianceActiveDirectoryTrustedDomainDcTrust        INTEGER,
+		eqlApplianceActiveDirectoryTrustedDomainDcStatus       INTEGER
+    }
+ 
+eqlApplianceActiveDirectoryTrustedDomainRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field is used to manage operations."
+    ::= { eqlApplianceActiveDirectoryTrustedDomainListEntry  1}
+
+eqlApplianceActiveDirectoryTrustedDomainName OBJECT-TYPE
+    SYNTAX          OCTET STRING(SIZE(1..256))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Trusted domain names."
+    ::= { eqlApplianceActiveDirectoryTrustedDomainListEntry  2 }
+
+eqlApplianceActiveDirectoryTrustedDomainDcName OBJECT-TYPE
+    SYNTAX          OCTET STRING(SIZE(1..256))
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Trusted domain's domain controllers names."
+    ::= { eqlApplianceActiveDirectoryTrustedDomainListEntry  3 }
+
+eqlApplianceActiveDirectoryTrustedDomainDcIp OBJECT-TYPE
+    SYNTAX          OCTET STRING(SIZE(1..256))
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Trusted domain's domain controllers IP addresses."
+    ::= { eqlApplianceActiveDirectoryTrustedDomainListEntry  4 }
+
+eqlApplianceActiveDirectoryTrustedDomainDcTrust OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    unused(0),
+                    unknown(1),
+                    inbound(2),
+                    outbound(3),
+                    two-way(4),
+                    primary(5)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Domain's domain controllers trust state."
+    ::= { eqlApplianceActiveDirectoryTrustedDomainListEntry  5 }
+
+eqlApplianceActiveDirectoryTrustedDomainDcStatus OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    unused(0),
+                    online(1),
+                    offline(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Trusted domain's domain controllers online status."
+    ::= { eqlApplianceActiveDirectoryTrustedDomainListEntry  6 }
+------------------------------------------------------------------------------	
 END
 

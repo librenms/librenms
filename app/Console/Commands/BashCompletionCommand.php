@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Device;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -55,11 +54,18 @@ class BashCompletionCommand extends Command
                     // ignore?
                 }
 
-                // check if the command can complete arguments
-                if (method_exists($command, 'completeArgument')) {
+                $optionPrevious = $this->optionPreviousFromLine($current, $previous, end($words));
+                $option = $this->optionExpectsValue($current, $optionPrevious, $command_def);
+
+                // check if the command can complete arguments (not when completing an option value)
+                if (! $option && method_exists($command, 'completeArgument')) {
                     foreach ($input->getArguments() as $name => $value) {
-                        if ($current == $value) {
-                            $values = $command->completeArgument($name, $value, $previous);
+                        // array arguments complete their last (current) element
+                        $isCurrent = is_array($value)
+                            ? $current === '' || end($value) === $current
+                            : $current == $value;
+                        if ($isCurrent) {
+                            $values = $command->completeArgument($name, $current, $previous);
                             if (! empty($values)) {
                                 echo implode(PHP_EOL, $values);
 
@@ -70,8 +76,7 @@ class BashCompletionCommand extends Command
                     }
                 }
 
-                $optionPrevious = $this->optionPreviousFromLine($current, $previous, end($words));
-                if ($option = $this->optionExpectsValue($current, $optionPrevious, $command_def)) {
+                if ($option) {
                     $command_completions = null;
                     [$optionPrefix, $optionCurrent] = $this->splitOptionValue($current);
                     if (method_exists($command, 'completeOptionValue')) {
@@ -243,21 +248,10 @@ class BashCompletionCommand extends Command
      */
     private function completeArguments($command, $partial, $current_word)
     {
-        switch ($command) {
-            case 'device:remove':
-                // fall through
-            case 'device:rename':
-                $device_query = Device::select('hostname')->limit(5)->orderBy('hostname');
-                if ($partial) {
-                    $device_query->where('hostname', 'like', $partial . '%');
-                }
-
-                return $device_query->pluck('hostname');
-            case 'help':
-                return $this->completeCommand($current_word);
-            default:
-                return new Collection();
-        }
+        return match ($command) {
+            'help' => $this->completeCommand($current_word),
+            default => new Collection(),
+        };
     }
 
     /**

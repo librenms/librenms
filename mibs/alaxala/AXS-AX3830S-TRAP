@@ -1,0 +1,394 @@
+
+AXS-AX3830S-TRAP DEFINITIONS     ::= BEGIN
+IMPORTS
+TRAP-TYPE
+    FROM RFC-1215
+ifIndex
+    FROM RFC1213-MIB
+axsGsrpGroupId, axsGsrpVlanGroupId, axsGsrpState,
+axsL2ldPortIndex, axsL2ldPortIfIndex, axsL2ldPortSourcePortIfindex,
+axsL2ldPortDestinationPortIfindex, axsL2ldPortSourceVlan,
+axsUlrPortIfIndex, axsUlrPairedPortIfIndex,
+axsLoginName, axsLoginTime, axsLogoutTime, axsLoginFailureTime,
+axsLoginLocation, axsLoginLine, axsLogoutStatus,
+axsAxrpGroupRingId, axsAxrpGroupMode, axsAxrpGroupRingAttribute, axsAxrpGroupMonitoringState,
+axsAxrpGroupRingport1, axsAxrpGroupRingport2, axsAxrpGroupMultiFaultDetectionState,
+ax3830s,
+ax3830sSystemMsgType, ax3830sSystemMsgTimeStamp, ax3830sSystemMsgLevel,
+ax3830sSystemMsgEventPoint, ax3830sSystemMsgEventInterfaceID,
+ax3830sSystemMsgEventCode, ax3830sSystemMsgAdditionalCode, ax3830sSystemMsgText,
+ax3830sChassisIndex,
+ax3830sTemperatureStatusIndex, ax3830sTemperatureStatusDescr,
+ax3830sTemperatureStatusValue, ax3830sTemperatureState
+    FROM AX3630S
+;
+
+-- Traps for use by AlaxalA networks AX3830S
+-- Traps are defined using the conventions in RFC 1215.
+
+ax3830sSystemMsgTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        ax3830sSystemMsgType,
+        ax3830sSystemMsgTimeStamp,
+        ax3830sSystemMsgLevel,
+        ax3830sSystemMsgEventPoint,
+        ax3830sSystemMsgEventInterfaceID,
+        ax3830sSystemMsgEventCode,
+        ax3830sSystemMsgAdditionalCode,
+        ax3830sSystemMsgText
+    }
+    DESCRIPTION
+        "System message is displayed."
+    ::= 1
+
+ax3830sTemperatureTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        ax3830sChassisIndex,
+        ax3830sTemperatureStatusIndex,
+        ax3830sTemperatureStatusDescr,
+        ax3830sTemperatureStatusValue,
+        ax3830sTemperatureState
+    }
+    DESCRIPTION
+        "A ax3830sTemperatureTrap is sent if the 
+        temperature measured at a given testpoint is outside 
+        the normal range for the testpoint (i.e. is at the warning,
+        critical, or shutdown stage)."
+    ::= 4
+
+ax3830sGsrpStateTransitionTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        axsGsrpGroupId,
+        axsGsrpVlanGroupId,
+        axsGsrpState
+    }
+    DESCRIPTION
+        "Changes of the VLAN group state of GSRP"
+    ::= 6
+
+ax3830sAirFanStopTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    DESCRIPTION
+        "This trap indicates a fan failure." 
+    ::= 8 
+
+ax3830sPowerSupplyFailureTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    DESCRIPTION
+        "This trap indicates one ( or more ) of power supplies failure." 
+    ::= 9 
+
+ax3830sLoginSuccessTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        axsLoginName,
+        axsLoginTime,
+        axsLoginLocation,
+        axsLoginLine
+    }
+    DESCRIPTION
+        "This trap indicates success of user log in." 
+    ::= 10 
+
+ax3830sLoginFailureTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        axsLoginName,
+        axsLoginFailureTime,
+        axsLoginLocation,
+        axsLoginLine
+    }
+    DESCRIPTION
+        "This trap indicates failure of user log in." 
+    ::= 11
+
+ax3830sLogoutTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        axsLoginName,
+        axsLoginTime,
+        axsLogoutTime,
+        axsLoginLocation,
+        axsLoginLine,
+        axsLogoutStatus
+    }
+    DESCRIPTION
+        "This trap indicates success of following log out.
+        'logout' command, 'exit' command, 'quit' command." 
+    ::= 12
+
+ax3830sMemoryUsageTrap  TRAP-TYPE
+    ENTERPRISE   ax3830s
+    DESCRIPTION
+        "This indicates available memory is fewer than lower limit." 
+    ::= 13
+
+ax3830sFrameErrorReceiveTrap  TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        ifIndex
+    }
+    DESCRIPTION
+        "This indicates frame receive error." 
+    ::= 18
+
+ax3830sFrameErrorSendTrap  TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        ifIndex
+    }
+    DESCRIPTION
+        "This indicates frame send error." 
+    ::= 19
+
+ax3830sBroadcastStormDetectTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        ifIndex
+    }
+    DESCRIPTION
+        "This indicates decection on broad-cast storm." 
+    ::= 20
+
+ax3830sMulticastStormDetectTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        ifIndex
+    }
+    DESCRIPTION
+        "This indicates decection on multi-cast storm." 
+    ::= 21
+
+ax3830sUnicastStormDetectTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        ifIndex
+    }
+    DESCRIPTION
+        "This indicates decection on uni-cast storm." 
+    ::= 22
+
+ax3830sBroadcastStormPortInactivateTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        ifIndex
+    }
+    DESCRIPTION
+        "This indicates the port inactivated for decection on broad-cast storm." 
+    ::= 23
+
+ax3830sMulticastStormPortInactivateTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        ifIndex
+    }
+    DESCRIPTION
+        "This indicates the port inactivated for decection on multi-cast storm." 
+    ::= 24
+
+ax3830sUnicastStormPortInactivateTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        ifIndex
+    }
+    DESCRIPTION
+        "This indicates the port inactivated for decection on uni-cast storm." 
+    ::= 25
+
+ax3830sBroadcastStormRecoverTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        ifIndex
+    }
+    DESCRIPTION
+        "This indicates the end of broad-cast storm." 
+    ::= 26
+
+ax3830sMulticastStormRecoverTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        ifIndex
+    }
+    DESCRIPTION
+        "This indicates the end of multi-cast storm." 
+    ::= 27
+
+ax3830sUnicastStormRecoverTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        ifIndex
+    }
+    DESCRIPTION
+        "This indicates the end of uni-cast storm." 
+    ::= 28
+
+ax3830sEfmoamUdldPortInactivateTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        ifIndex
+    }
+    DESCRIPTION
+        "Efmoam udld port inactivate trap."
+    ::= 29
+
+ax3830sEfmoamLoopDetectPortInactivateTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        ifIndex
+    }
+    DESCRIPTION
+        "Efmoam loop detect port inactivate trap."
+    ::= 30
+
+ax3830sAxrpStateTransitionTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        axsAxrpGroupRingId,
+        axsAxrpGroupMode,
+        axsAxrpGroupRingAttribute,
+        axsAxrpGroupMonitoringState
+    }
+    DESCRIPTION
+        "When the state of the ring of ALAXALA Ring Protocol (trouble watch and restoration watch) changes between each state. "
+    ::= 36
+
+ax3830sAxrpRingport1MonitoringStartTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        axsAxrpGroupRingId,
+        axsAxrpGroupMode,
+        axsAxrpGroupRingAttribute,
+        axsAxrpGroupRingport1
+    }
+    DESCRIPTION
+        "When you make the link monitoring function of ring port 1 of Ring Protocol effective. "
+    ::= 37
+
+ax3830sAxrpRingport1DownTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        axsAxrpGroupRingId,
+        axsAxrpGroupMode,
+        axsAxrpGroupRingAttribute,
+        axsAxrpGroupRingport1
+    }
+    DESCRIPTION
+        "When the link for the watch is cut when the link monitoring function of ring port 1 of Ring Protocol is made effective. "
+    ::= 38
+
+ax3830sAxrpRingport2MonitoringStartTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        axsAxrpGroupRingId,
+        axsAxrpGroupMode,
+        axsAxrpGroupRingAttribute,
+        axsAxrpGroupRingport2
+    }
+    DESCRIPTION
+        "When you make the link monitoring function of ring port 2 of Ring Protocol effective. "
+    ::= 39
+
+ax3830sAxrpRingport2DownTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        axsAxrpGroupRingId,
+        axsAxrpGroupMode,
+        axsAxrpGroupRingAttribute,
+        axsAxrpGroupRingport2
+    }
+    DESCRIPTION
+        "When the link for the watch is cut when the link monitoring function of ring port 2 of Ring Protocol is made effective. "
+    ::= 40
+
+ax3830sAxrpMultiFaultDetectionStartTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        axsAxrpGroupRingId,
+        axsAxrpGroupMode,
+        axsAxrpGroupRingAttribute
+    }
+    DESCRIPTION
+        "When the state of watching muliple trouble on ring started."
+    ::= 41
+
+ax3830sAxrpMultiFaultDetectionStateTransitionTrap TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        axsAxrpGroupRingId,
+        axsAxrpGroupMode,
+        axsAxrpGroupRingAttribute,
+        axsAxrpGroupMultiFaultDetectionState
+    }
+    DESCRIPTION
+        "When the state of the ring of ALAXALA Ring Protocol (multiple fault detection and restoration watch) changes between each state. "
+    ::= 42
+
+ax3830sL2ldLinkDown TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        axsL2ldPortIfIndex,
+        axsL2ldPortSourcePortIfindex,
+        axsL2ldPortDestinationPortIfindex,
+        axsL2ldPortSourceVlan
+    }
+    DESCRIPTION
+        "When the operation of the interface changes from ACTIVE(state that can be communicated)
+        into DISABLE (state that cannot be communicated) by the L2 loop detection."
+    ::= 51
+
+ax3830sL2ldLinkUp TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        axsL2ldPortIfIndex
+    }
+    DESCRIPTION
+        "When the operation of the interface changes from DISABLE (state that cannot be communicated)
+        into ACTIVE (state that can be communicated) by the automatic restoration function of the L2 loop detection."
+    ::= 52
+
+ax3830sL2ldLoopDetection TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        axsL2ldPortIndex,
+        axsL2ldPortIfIndex,
+        axsL2ldPortSourcePortIfindex,
+        axsL2ldPortSourceVlan
+    }
+    DESCRIPTION
+        "When you detect the L2 loop. It notifies every 60 seconds when the state of the L2 loop continues."
+    ::= 53
+
+ax3830sUlrChangeSecondary TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        axsUlrPortIfIndex,
+        axsUlrPairedPortIfIndex
+    }
+    DESCRIPTION
+        "When secondary port changed to active port."
+    ::= 87
+
+ax3830sUlrChangePrimary TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        axsUlrPortIfIndex,
+        axsUlrPairedPortIfIndex
+    }
+    DESCRIPTION
+        "When primary port changed to active port."
+    ::= 88
+
+ax3830sUlrActivePortDown TRAP-TYPE
+    ENTERPRISE   ax3830s
+    VARIABLES    {
+        axsUlrPortIfIndex,
+        axsUlrPairedPortIfIndex
+    }
+    DESCRIPTION
+        "When active port disappeared."
+    ::= 89
+
+END

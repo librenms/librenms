@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing comma; trailing comma before })
 -- ****************************************************************************
 -- * APC cPDU SNMP MIB DEFINITIONS
 -- * $Date: 8 MAY 2025 06:00:00 $
@@ -1085,7 +1086,7 @@ PduUnitPsEntry ::= SEQUENCE {
 		pduUnitPsSupportDownstreamStatus		
 			INTEGER,	
 		pduUnitPsOptMode
-			INTEGER
+			INTEGER,
 		pduUnitPsFunc
 			INTEGER,
 		pduUnitPsBackupProtection
@@ -2933,7 +2934,7 @@ PduExternalSensorConfigEntry ::= SEQUENCE {
 	pduExternalSensorConfigAlarmResetThreshold
 		Unsigned32,
 	pduExternalSensorConfigAlarmStateChangeDelay
-		Unsigned32,
+		Unsigned32
 	}
 
 pduExternalSensorConfigIndex  OBJECT-TYPE

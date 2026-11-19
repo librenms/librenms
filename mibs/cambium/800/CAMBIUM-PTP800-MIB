@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (quote in REVISION DESCRIPTION)
    CAMBIUM-PTP800-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
@@ -30,9 +31,9 @@
       DESCRIPTION
          "MIB for licenced microwave point to point wireless ethernet bridge."
       REVISION "201402281518Z"
-      DESCRIPTION "PTP800-06-00: Added objects and traps to support IPv6 management agent."
+      DESCRIPTION "PTP800-06-00: Added objects and traps to support IPv6 management agent.
                                  Renamed 'iPAddress' to 'iPv4Address'.
-                                 Added softwareVersionRemoteCompatibility object and trap.
+                                 Added softwareVersionRemoteCompatibility object and trap."
       REVISION "201204201227Z"
       DESCRIPTION "PTP800-05-00: Added objects and traps to support IRFU, and 1+1 hot standby with receive diversity.
                                  Added queue mapping objects for L3 QOS.

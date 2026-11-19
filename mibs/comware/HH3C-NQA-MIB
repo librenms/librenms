@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2023 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:  Extended MIB File(extended from DISMAN-PING-MIB RFC2925)
 -- Reference:
--- Version: V2.9
+-- Version: V3.2
 -- History:
 -- V1.0  Lv zhenfeng, 2003.08, Initial Version
 -- V1.1 2004-10-12 updated by gaolong
@@ -119,6 +119,16 @@
 --      add hh3cNqaProbeTimeBelowThreshold to hh3cNqaNotifications.
 --      add hh3cNqaProbeFailAboveThreshold to hh3cNqaNotifications.
 --      add hh3cNqaProbeFailBelowThreshold to hh3cNqaNotifications.
+-- V3.0 2022-09-01 Modified by duwei
+--      add hh3cNqaJitterOwdDSOverThreshold to hh3cNqaNotifications.
+--      add hh3cNqaJitterOwdSDOverThreshold to hh3cNqaNotifications.
+--      add hh3cNqaTestFailure to hh3cNqaNotifications.
+--      add hh3cNqaTestResultChange to hh3cNqaNotifications.
+-- V3.1 2022-12-01 Modified by duwei
+--      add hh3cNqaScheduleFailure for trap.
+--      add hh3cNqaServerFailure for trap.
+-- V3.2 2023-01-10 Modified by zhujialin
+--      add hh3cNqaHttp2
 -- =================================================================
 HH3C-NQA-MIB DEFINITIONS ::= BEGIN
 
@@ -139,7 +149,7 @@ HH3C-NQA-MIB DEFINITIONS ::= BEGIN
                 FROM SNMP-FRAMEWORK-MIB;          -- RFC2571
 
     hh3cNqa MODULE-IDENTITY
-        LAST-UPDATED "202003250000Z"
+        LAST-UPDATED "202301100000Z"
         ORGANIZATION
             "New H3C Technologies Co., Ltd."
         CONTACT-INFO
@@ -150,6 +160,19 @@ HH3C-NQA-MIB DEFINITIONS ::= BEGIN
             DESCRIPTION
                 "The private MIB file includes the test information of the
                 device. It is supplementary for rfc2925.txt."
+            REVISION "202301100000Z"
+            DESCRIPTION
+                "Add hh3cNqaHttp2"
+            REVISION "202212010000Z"
+            DESCRIPTION
+                "Add hh3cNqaScheduleFailure for trap.
+                 Add hh3cNqaServerFailure for trap."
+            REVISION "202209010000Z"
+            DESCRIPTION
+                "Add hh3cNqaJitterOwdDSOverThreshold to hh3cNqaNotifications.
+                 Add hh3cNqaJitterOwdSDOverThreshold to hh3cNqaNotifications.
+                 Add hh3cNqaTestFailure to hh3cNqaNotifications.
+                 Add hh3cNqaTestResultChange to hh3cNqaNotifications."
             REVISION "202003250000Z"
             DESCRIPTION
                 "Add hh3cNqaProbeTimeAboveThreshold to hh3cNqaNotifications.
@@ -253,6 +276,16 @@ hh3cNqaArp OBJECT-IDENTITY
          Resolution Protocol (ARP) test facility.
          The type only supports IPv4 network."
     ::= { hh3cNqaImplementationTypeDomains 9 }
+
+hh3cNqaHttp2 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Indicates that an implementation is using udp for name resolution,
+        tcp connect and tcp data transfer mechanisms for HTTP2 data download
+        from a particular HTTP Server.
+        It causes the NQA application to perform a download of the object
+        specified in the URL."
+    ::= { hh3cNqaImplementationTypeDomains 10 }
 
 -- MIB contains 3 groups
 
@@ -2232,7 +2265,9 @@ hh3cNqaReactCheckedElement OBJECT-TYPE
                           icpif(7),
                           mos(8),
                           jitterOwdSD(9),
-                          jitterOwdDS(10)
+                          jitterOwdDS(10),
+                          testfailure(11),
+                          testresultchange(12)
                         }
     MAX-ACCESS  read-create
     STATUS      current
@@ -2241,9 +2276,9 @@ hh3cNqaReactCheckedElement OBJECT-TYPE
         'probetime' and 'probefailure' are valid when pingCtlType of
         the test is not hh3cNqajitter.
 
-        'jitterOwdSD': one way time from source to destination in
+        'jitterOwdSD': one way delay from source to destination in
                        jitter test.
-        'jitterOwdDS': one way time from destination to source in
+        'jitterOwdDS': one way delay from destination to source in
                        jitter test.
 
         'jitterrtt', 'jitterpacketloss', 'jittersd', 'jitterds',
@@ -2498,7 +2533,7 @@ hh3cNqaStatReactTestName OBJECT-TYPE
     ::= { hh3cNqaStatisticsReactionEntry 2 }
 
 hh3cNqaStatReactIndex OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      Unsigned32 (1..10)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -2509,17 +2544,15 @@ hh3cNqaStatReactIndex OBJECT-TYPE
         An implementation MUST start assigning hh3cNqaStatResIndex values
         at 1 and wrap after exceeding the maximum possible value as
         defined by the limit of this object ('ffffffff'h)."
-    DEFVAL { 0 }
     ::= { hh3cNqaStatisticsReactionEntry 3 }
 
 hh3cNqaStatReactItemIndex OBJECT-TYPE
-    SYNTAX      Unsigned32
+    SYNTAX      Unsigned32 (0..'ffffffff'h)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
         "The forth index of hh3cNqaStatisticsReactionTable, it definitely
         identifies one of the reaction configurations for a test"
-    DEFVAL { 0 }
     ::= { hh3cNqaStatisticsReactionEntry 4 }
 
 hh3cNqaStatReactCheckedNum OBJECT-TYPE
@@ -2528,7 +2561,6 @@ hh3cNqaStatReactCheckedNum OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The number of checked element samples that are monitored."
-    DEFVAL { 0 }
     ::= { hh3cNqaStatisticsReactionEntry 5 }
 
 hh3cNqaStatReactThresholdNum OBJECT-TYPE
@@ -2537,7 +2569,6 @@ hh3cNqaStatReactThresholdNum OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The number of checked element samples that are over threshold."
-    DEFVAL { 0 }
     ::= { hh3cNqaStatisticsReactionEntry 6 }
 
 -- =================================================================
@@ -3194,4 +3225,147 @@ hh3cNqaProbeFailBelowThreshold NOTIFICATION-TYPE
         is not hh3cNqajitter."
     ::= { hh3cNqaNotifications 13 }
 
+hh3cNqaJitterOwdSDNotification NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cNqaReactOwnerIndex,
+        hh3cNqaReactTestName,
+        hh3cNqaReactItemIndex,
+        pingCtlTargetAddressType,
+        pingCtlTargetAddress,
+        pingCtlType,
+        pingCtlDescr,
+        hh3cNqaReactThresholdType,
+        hh3cNqaReactCurrentStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "The SD means the delay values from source to destination.
+        It is generated when the value of hh3cNqaReactCurrentStatus
+        changes.
+        The change may occur when the watched condition is over threshold
+        or below threshold.
+
+        The over threshold situations is specified as below.
+          1. The average of SD in one jitter test is not in the range
+             hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit.
+
+        This notification is valid only when hh3cNqaReactActionType
+        is 'trapOnly' and pingCtlType of the test is hh3cNqajitter."
+    ::= { hh3cNqaNotifications 14 }
+
+hh3cNqaJitterOwdDSNotification NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cNqaReactOwnerIndex,
+        hh3cNqaReactTestName,
+        hh3cNqaReactItemIndex,
+        pingCtlTargetAddressType,
+        pingCtlTargetAddress,
+        pingCtlType,
+        pingCtlDescr,
+        hh3cNqaReactThresholdType,
+        hh3cNqaReactCurrentStatus
+    }
+    STATUS current
+    DESCRIPTION
+        "The DS means the delay values from destination to source.
+        It is generated when the value of hh3cNqaReactCurrentStatus
+        changes.
+        The change may occur when the watched condition is over threshold
+        or below threshold.
+
+        The over threshold situations is specified as below.
+          1. The average of DS in one jitter test is not in the range
+             hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit.
+
+        This notification is valid only when hh3cNqaReactActionType
+        is 'trapOnly' and pingCtlType of the test is hh3cNqajitter."
+    ::= { hh3cNqaNotifications 15 }
+
+hh3cNqaTestFailure NOTIFICATION-TYPE
+    OBJECTS {
+            hh3cNqaReactOwnerIndex,
+            hh3cNqaReactTestName,
+            hh3cNqaReactItemIndex,
+            pingCtlTargetAddressType,
+            pingCtlTargetAddress,
+            pingCtlType,
+            pingCtlDescr,
+            hh3cNqaReactThresholdType,
+            hh3cNqaReactCurrentStatus
+        }
+    STATUS current
+    DESCRIPTION
+        "It is generated when the value of hh3cNqaReactCurrentStatus
+        changes.
+        The change may occur when the watched condition is over threshold.
+
+        The over threshold situations is specified as below.
+          1. When the test consecutively failed for a number of times specified
+          in hh3cNqaReactThresholdConsecNum while the value of
+          hh3cNqaReactThresholdType is 'consecutive'.
+
+        This notification is valid only when hh3cNqaReactActionType
+        is 'trapOnly'."
+    ::= { hh3cNqaNotifications 16 }
+
+hh3cNqaTestResultChange NOTIFICATION-TYPE
+    OBJECTS {
+            hh3cNqaReactOwnerIndex,
+            hh3cNqaReactTestName,
+            hh3cNqaReactItemIndex,
+            pingCtlTargetAddressType,
+            pingCtlTargetAddress,
+            pingCtlType,
+            pingCtlDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "It is generated when the test result changed.
+        This notification is valid only when hh3cNqaReactActionType
+        is 'trapOnly'and pingCtlType of the test is pingIcmpEcho."
+    ::= { hh3cNqaNotifications 17 }
+
+-- NotificationV2 Definition section
+hh3cNqaNotificationsV2 OBJECT IDENTIFIER ::= { hh3cNqa 4 }
+
+hh3cNqaNotification OBJECT IDENTIFIER ::= { hh3cNqaNotificationsV2 0 }
+
+hh3cNqaScheduleFailure NOTIFICATION-TYPE
+    OBJECTS { hh3cNqaOwnerIndex, hh3cNqaTestName }
+    STATUS current
+    DESCRIPTION
+        "It is generated upon failure to start the scheduled NQA operation."
+    ::= { hh3cNqaNotification 1 }
+
+hh3cNqaServerFailure NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+        "It is generated upon failure to enable the NQA server."
+    ::= { hh3cNqaNotification 2 }
+
+hh3cNqaNotificationObjects OBJECT IDENTIFIER ::= { hh3cNqaNotificationsV2 1 }
+
+hh3cNqaOwnerIndex OBJECT-TYPE
+    SYNTAX SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The owner of the test. hh3cNqaOwnerIndex and
+        hh3cNqaTestName identify an existing test."
+    ::= { hh3cNqaNotificationObjects 1 }
+
+hh3cNqaTestName OBJECT-TYPE
+    SYNTAX SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The name of the test.hh3cNqaOwnerIndex and
+        hh3cNqaTestName identify an existing test."
+    ::= { hh3cNqaNotificationObjects 2 }
+
 END
+

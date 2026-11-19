@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (lowercase type name)
 -- Synso UPS Software Management Information Base
 -- SYNSO-UPSMIB
 -- {iso org(3) internet(1) private(4) enterprises(1) synso(9557)}
@@ -279,7 +280,7 @@ syupsNoOutlets OBJECT-TYPE
 
 
 syupsOutletTable OBJECT-TYPE
-       SYNTAX     SEQUENCE OF syupsOutletEntry
+       SYNTAX     SEQUENCE OF SyupsOutletEntry
        MAX-ACCESS not-accessible
        STATUS     mandatory
        DESCRIPTION
@@ -297,7 +298,7 @@ syupsOutletEntry OBJECT-TYPE
        INDEX { syupsOutletIndex }
        ::= {syupsOutletTable 1}
 
-syupsOutletEntry ::= SEQUENCE {
+SyupsOutletEntry ::= SEQUENCE {
        syupsOutletIndex              INTEGER,
        syupsOutletDescription        DisplayString (SIZE (0..15)),
        syupsOutletShutdownDelay      INTEGER,

@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Http\Request;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->registered(function ($app): void {
@@ -24,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web([
             \App\Http\Middleware\CheckInstalled::class,
+            \App\Http\Middleware\AutoLoginTestUser::class,
             \App\Http\Middleware\LegacyExternalAuth::class,
             \App\Http\Middleware\VerifyUserEnabled::class,
             \App\Http\Middleware\VerifyTwoFactor::class,
@@ -32,8 +34,15 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->api([
             \App\Http\Middleware\EnforceJson::class,  // prevent redirect to login page
+            \App\Http\Middleware\LogApiAuthFailure::class,
             'auth:sanctum',
         ]);
+
+        // must wrap authentication to see its failures
+        $middleware->prependToPriorityList(
+            before: \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
+            prepend: \App\Http\Middleware\LogApiAuthFailure::class,
+        );
 
         $middleware->replace(\Illuminate\Http\Middleware\TrustProxies::class, \App\Http\Middleware\TrustProxies::class);
         $middleware->replace(\Illuminate\Http\Middleware\HandleCors::class, \App\Http\Middleware\HandleCors::class);
@@ -50,6 +59,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\EnforceJson::class, // must be before auth
+            \App\Http\Middleware\AutoLoginTestUser::class, // must be before auth
             \App\Http\Middleware\LegacyExternalAuth::class, // must be before auth
             \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class,
@@ -60,10 +70,19 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        $exceptions->shouldRenderJsonWhen(
+            fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
+        );
         new \App\Exceptions\ErrorReporting($exceptions);
 
         $exceptions->map(
             \Binaryk\LaravelRestify\Exceptions\RepositoryNotFoundException::class,
             fn (\Binaryk\LaravelRestify\Exceptions\RepositoryNotFoundException $e) => new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException($e->getMessage(), $e),
         );
-    })->create();
+    })
+    ->booting(function (Application $app): void {
+        // Resolve the exception handler early so ErrorReporting installs its error handler
+        // after Laravel's HandleExceptions bootstrapper, otherwise warnings become exceptions in production
+        $app->make(\Illuminate\Contracts\Debug\ExceptionHandler::class);
+    })
+    ->create();

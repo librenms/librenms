@@ -434,7 +434,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 3,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.3",
                     "processor_index": "3",
@@ -487,6 +486,7 @@
                     "sensor_type": "hrDeviceStatus",
                     "sensor_descr": "Printer Device Status",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -512,6 +512,7 @@
                     "sensor_type": "hrPrinterDetectedErrorState",
                     "sensor_descr": "Printer Error Status",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,

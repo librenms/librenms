@@ -86,7 +86,6 @@
 
           <h3>{{ __('Acknowledgements') }}</h3>
 
-          <b>Bruno Pramont</b> Collectd code.<br />
           <b>Dennis de Houx</b> Application monitors for PowerDNS, Shoutcast, NTPD (Client, Server).<br />
           <b>Erik Bosrup</b> Overlib Library.<br />
           <b>Jonathan De Graeve</b> SNMP code improvements.<br />
@@ -104,9 +103,6 @@
                 <td colspan='4'>
                     <div>
                         <label for="reporting.usage" class="bg-info">{{ __('Opt in to send anonymous reports to LibreNMS?') }}</label>
-                    </div>
-                    <div>
-                        {{ __('Error reporting:') }} <input type="checkbox" id="reporting.error" name="reporting" data-size="small" @if($error_reporting_status) checked @endif>
                     </div>
                     <div class="tw:mt-2">
                     {{ __('Usage statistics:') }} <input type="checkbox" id="reporting.usage" name="reporting" data-size="small" @if($usage_reporting_status) checked @endif> <a target="_blank" href='https://stats.librenms.org/'>stats.librenms.org</a>

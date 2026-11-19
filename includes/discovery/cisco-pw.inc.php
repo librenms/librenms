@@ -1,6 +1,7 @@
 <?php
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Util\ProgressList;
 
 if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco') {
     $pws_db = [];
@@ -19,6 +20,7 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
     // For MPLS pseudowires
     $pws = snmpwalk_cache_oid($device, 'cpwVcMplsPeerLdpID', $pws, 'CISCO-IETF-PW-MPLS-MIB');
 
+    $progress = ProgressList::start('Pseudowires');
     foreach ($pws as $pw_id => $pw) {
         // Added By Oirbsiu
         // To correct Interface names that use escaped '/' e.g. GigabitEthernet0_4_0_12
@@ -38,7 +40,7 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
         $if_id = dbFetchCell('SELECT port_id from ports WHERE `ifDescr`=? AND `device_id`=?', [$pw['cpwVcName'], $device['device_id']]);
         if (! empty($pws_db[$pw['cpwVcID']])) {
             $pseudowire_id = $pws_db[$pw['cpwVcID']];
-            echo '.';
+            $progress->mark('.');
         } else {
             $pseudowire_id = dbInsert(
                 [
@@ -54,7 +56,7 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
                 ],
                 'pseudowires'
             );
-            echo '+';
+            $progress->mark('+');
         }
 
         $device['pws'][$pw['cpwVcID']] = $pseudowire_id;
@@ -67,7 +69,7 @@ if (LibrenmsConfig::get('enable_pseudowires') && $device['os_group'] == 'cisco')
         }
     }
 
-    echo "\n";
+    $progress->end();
 } //end if
 
 unset($pws_db, $pws_db_raw, $pw_db);

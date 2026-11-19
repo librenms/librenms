@@ -27,8 +27,10 @@
 namespace LibreNMS\Util;
 
 use App\Facades\LibrenmsConfig;
+use App\Http\Controllers\DeviceController;
 use App\Models\Device;
 use App\Models\Port;
+use App\Models\Sensor;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Facades\Gate;
@@ -221,15 +223,7 @@ class Url
         return Rewrite::normalizeIfName($text);
     }
 
-    /**
-     * @param  \App\Models\Sensor  $sensor
-     * @param  string  $text
-     * @param  string  $type
-     * @param  bool  $overlib
-     * @param  bool  $single_graph
-     * @return string
-     */
-    public static function sensorLink(mixed $sensor, Htmlable|string|null $text = null, ?string $type = null, bool $overlib = true, bool $single_graph = false): string
+    public static function sensorLink(Sensor $sensor, Htmlable|string|null $text = null, ?string $type = null, bool $overlib = true, bool $single_graph = false): string
     {
         $label = $sensor->sensor_descr;
         if (! $text) {
@@ -242,7 +236,7 @@ class Url
 
         $content .= "<div style=\'width: 850px\'>";
         $graph_array = [
-            'type' => $type ?: 'sensor_' . $sensor->sensor_class,
+            'type' => $type ?: $sensor->getGraphType(),
             'legend' => 'yes',
             'height' => 100,
             'width' => 340,
@@ -277,7 +271,18 @@ class Url
      */
     public static function deviceUrl($device, $vars = [])
     {
-        $routeParams = [($device instanceof Device) ? $device->device_id : (int) $device];
+        $deviceId = ($device instanceof Device) ? $device->device_id : (int) $device;
+        $tab = $vars['tab'] ?? null;
+
+        // tabs with their own route take their options in the query string
+        if ($tab !== 'port' && in_array($tab, DeviceController::ROUTED_TABS, true)) {
+            unset($vars['tab']);
+            $vars = array_filter($vars, fn ($value) => $value !== null && $value !== '');
+
+            return route("device.$tab", ['device' => $deviceId] + $vars);
+        }
+
+        $routeParams = [$deviceId];
         if (isset($vars['tab'])) {
             $routeParams[] = $vars['tab'];
             unset($vars['tab']);
@@ -286,21 +291,36 @@ class Url
         return route('device', $routeParams) . self::urlParams($vars);
     }
 
-    public static function portUrl($port, $vars = [])
+    /**
+     * Port page url: /device/{device}/port/{port} with any options in the query string
+     *
+     * @param  array<string, mixed>  $vars
+     */
+    public static function portUrl($port, $vars = []): string
     {
-        return self::generate(['page' => 'device', 'device' => $port->device_id, 'tab' => 'port', 'port' => $port->port_id], $vars);
+        $vars = array_filter($vars, fn ($value) => $value !== null && $value !== '');
+
+        return route('device.port', ['device' => $port->device_id, 'port' => $port->port_id] + $vars);
     }
 
-    public static function sensorUrl($sensor, $vars = [])
+    /**
+     * Device health page url for the sensor's class
+     *
+     * @param  array<string, mixed>  $vars
+     */
+    public static function sensorUrl($sensor, $vars = []): string
     {
-        return self::generate(['page' => 'device', 'device' => $sensor->device_id, 'tab' => 'health', 'metric' => $sensor->sensor_class], $vars);
+        $sensorClass = $sensor->sensor_class instanceof \BackedEnum ? $sensor->sensor_class->value : $sensor->sensor_class;
+
+        return route('device.health', ['device' => $sensor->device_id, 'metric' => $sensorClass] + $vars);
     }
 
     public static function generate($vars, $new_vars = [])
     {
         $vars = array_merge($vars, $new_vars);
 
-        $url = url(LibrenmsConfig::get('base_url', true) . $vars['page'] . '');
+        $page = str_replace('%2F', '/', rawurlencode((string) $vars['page']));
+        $url = url(LibrenmsConfig::get('base_url', true) . $page);
         unset($vars['page']);
 
         return $url . self::urlParams($vars);
@@ -405,7 +425,8 @@ class Url
 
         if (LibrenmsConfig::get('web_mouseover', true)) {
             $defaults = LibrenmsConfig::get('overlib_defaults', ",FGCOLOR,'#ffffff', BGCOLOR, '#e5e5e5', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#555555', TEXTCOLOR, '#3e3e3e'");
-            $output .= " onmouseover=\"return overlib('$contents'$defaults,WRAP,HAUTO,VAUTO); \" onmouseout=\"return nd();\">";
+            // encode for the html attribute so entities in $contents are not decoded into markup before reaching javascript
+            $output .= ' onmouseover="' . htmlspecialchars("return overlib('$contents'$defaults,WRAP,HAUTO,VAUTO); ", ENT_QUOTES) . '" onmouseout="return nd();">';
         } else {
             $output .= '>';
         }
@@ -417,7 +438,7 @@ class Url
 
     public static function overlibContent($graph_array, $text)
     {
-        $overlib_content = '<div class=overlib><span class=overlib-text>' . $text . '</span><br />';
+        $overlib_content = '<div class=overlib><span class=overlib-text>' . addslashes(e($text)) . '</span><br />';
 
         $now = Carbon::now();
 

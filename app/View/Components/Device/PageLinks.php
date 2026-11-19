@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Component;
+use LibreNMS\Enum\PollingMethodType;
 
 class PageLinks extends Component
 {
@@ -63,11 +64,12 @@ class PageLinks extends Component
         if (Gate::allows('update', $device)) {
             // check if metric has more specific edit page
             $path = \Request::path();
-            if (preg_match('#health/metric=(\w+)#', $path, $matches)) {
-                if ($this->editTabUrl($device, $matches[1])) {
-                    $currentTab = $matches[1];
-                } elseif ($this->editTabUrl($device, $matches[1] . 's')) {
-                    $currentTab = $matches[1] . 's';
+            $metric = request()->routeIs('device.health') ? (string) request()->query('metric') : '';
+            if ($metric !== '') {
+                if ($this->editTabUrl($device, $metric)) {
+                    $currentTab = $metric;
+                } elseif ($this->editTabUrl($device, $metric . 's')) {
+                    $currentTab = $metric . 's';
                 }
             } elseif (preg_match('#device/\d+/ports/transceivers#', $path)) {
                 $currentTab = 'transceivers';
@@ -104,10 +106,13 @@ class PageLinks extends Component
         ];
 
         // IPMI
-        if ($device->attribs->firstWhere('attrib_type', 'ipmi_hostname')) {
+        // read the hostname from the settings, the secret is not needed
+        $ipmiMethod = $device->pollingMethod(PollingMethodType::Ipmi);
+        $ipmiHostname = $ipmiMethod?->settings['hostname'] ?? $device->hostname;
+        if ($ipmiMethod?->enabled && $ipmiHostname) {
             $device_links['ipmi'] = [
                 'icon' => 'fa-microchip',
-                'url' => 'https://' . $device->attribs->firstWhere('attrib_type', 'ipmi_hostname')->attrib_value,
+                'url' => 'https://' . $ipmiHostname,
                 'title' => __('IPMI'),
                 'external' => true,
                 'onclick' => 'http_fallback(this); return false;',
@@ -147,21 +152,10 @@ class PageLinks extends Component
         return $device_links;
     }
 
-    /**
-     * The edit page for a device tab, migrated pages have a route, legacy pages a file
-     */
     private function editTabUrl(Device $device, string $tab): ?string
     {
-        if ($tab === '') {
-            return null;
-        }
-
         if (Route::has("device.edit.$tab")) {
             return route("device.edit.$tab", $device->device_id);
-        }
-
-        if (is_file(base_path("includes/html/pages/device/edit/$tab.inc.php"))) {
-            return route('device', [$device->device_id, "edit/section=$tab"]);
         }
 
         return null;

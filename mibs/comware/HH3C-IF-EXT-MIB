@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2023 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: interface extension mib
 -- Reference: IF-MIB
--- Version: V2.6
+-- Version: V3.4
 -- History:
 --   V1.0 Created by gaolong
 --     Initial version 2004-11-13
@@ -39,6 +39,55 @@
 --        2020-08-05 Added hh3cIfFiberOrCopper by shuaixiaojuan.
 --   V2.6 2021-04-27 Added the values 200GE and 400GE to hh3cIfUsingType and hh3cIfUsingSupportType by zhaoqingtao.
 --        2021-05-14 Added hh3cIfTransferMode by lijinshuo.
+--   V2.7 2021-08-03 Added hh3cIfMappingIfStatusBackup and hh3cIfMappingIfStatusNormal by zhuhaifeng.
+--   V2.8 2021-11-08 Added hh3cIfMonTxPauseFrameEnableDown by mazhixing.
+--   V2.9 2022-03-28 Added hh3cIfPortRateDegrade, hh3cIfPortRateDegradeResume, hh3cIfHalfDuplex, hh3cIfRate by zhangjindong.
+--        2022-04-02 Added hh3cIfMonInputBufferDropRising, hh3cIfMonInputBufferDropResume, hh3cIfMonOutputBufferDropRising,
+--        hh3cIfMonOutputBufferResume, hh3cIfMonInputBufferDropStatistics, hh3cIfMonOutputBufferDropStatistics,
+--        hh3cIfMonInputBufferDropLowThres, hh3cIfMonInputBufferDropHighThres, hh3cIfMonInputBufferDropInterval,
+--        hh3cIfMonOutputBufferDropLowThres, hh3cIfMonOutputBufferDropHighThres, hh3cIfMonOutputBufferDropIntercal,
+--        and hh3cIfMonInputBufferDropEnableDown and hh3cIfMonOutputBufferDropEnableDown by zhangjindong.
+--   V3.0 2022-06-17  "Add hh3cIfChassisIndex, hh3cIfSlotIndex, hh3cIfSubSlotIndex,
+--        hh3cIfErrDownDesc to hh3cIfExtScalarGroup,
+--        Add hh3cIfBufferInDiscardAlarm, hh3cIfBufferInDiscardResume, hh3cIfHalfDuplexRising,
+--        hh3cIfChangeMultiChassis, hh3cIfChangeMultiChassisResume, hh3cIfCfgRecoverOverSlot,
+--        hh3cIfCfgRecoverOverSubSlot, hh3cIfInterfaceDelete, hh3cIfErrordown,
+--        hh3cIfErrordownRecovery to hh3cIfExtTrapPrex.
+--        2022-07-12 Added hh3cIfLoopBackType, hh3cIfTtlLoopThreshold, hh3cIfPreDataLowByte, hh3cIfPreDataHighByte,
+--        hh3cIfCurDataLowByte, hh3cIfCurDataHighByte, hh3cIfIntervalTime, hh3cIfSDHHpIndex, hh3cIfUNUCPortRealFlow,
+--        hh3cIfUNUCPortAlarmThreshold, hh3cIfBip8SdErrThreshold to hh3cIfExtScalarGroup.
+--        Added hh3cIfLosAlarm, hh3cIfLosAlarmResume, hh3cIfLofAlarm, hh3cIfLofAlarmResume, hh3cIfLFaultAlarm,
+--        hh3cIfLFaultAlarmResume, hh3cIfRFaultAlarm, hh3cIfRFaultAlarmResume, hh3cIfOofAlarm, hh3cIfOofAlarmResume,
+--        hh3cIfSfbereAlarm, hh3cIfSfbereAlarmResume, hh3cIfPaisAlarm, hh3cIfPaisAlarmResume, hh3cIfHpJ1TiuAlarm,
+--        hh3cIfHpJ1TiuAlarmResume, hh3cIfRroolAlarm, hh3cIfRroolAlarmResume, hh3cIfNegoFailedAlarm,
+--        hh3cIfNegoFailedAlarmResume, hh3cIfEthRxFlowFallAlarm, hh3cIfEthRxFlowFallAlarmResume, hh3cIfEthTxFlowFallAlarm,
+--        hh3cIfEthTxFlowFallAlarmResume, hh3cIfLoopbackAlarm, hh3cIfLoopbackAlarmResume, hh3cIfTtlLoop,
+--        hh3cIfTtlLoopResume to hh3cIfExtTrapPrex.
+--        Added hh3cIfMonInputUFlowFalling, hh3cIfMonInputUFlowRising, hh3cIfMonBip8SdError, hh3cIfMonBip8SdErrorResume to
+--        hh3cIfMonTrapPrex.
+--        2022-07-14 Added hh3cIfMonCRCBitErrorRising, hh3cIfMonCRCBitErrorResume,
+--        hh3cIfMonCRCBitErrorHighThresStr, hh3cIfMonCRCBitErrorLowThresStr, hh3cIfMonCRCBitErrorRatioStr by gaoyanping.
+--   V3.1 2022-08-08 Added hh3cIfCpuId, hh3cIfOldComboType, hh3cIfNewComboType, hh3cIfDropRateThreshold,
+--        hh3cIfCurrentDropRate, hh3cIfDropRateInterval, hh3cIfMessageProtocol, hh3cIfCurrentFlowThreshold,
+--        hh3cIfCurrentFlowValue to hh3cIfExtScalarGroup.
+--        Added hh3cIfMonJamDiscardStatistics, hh3cIfMonBadBytesStatistics, hh3cIfMonErrorRateStatistics to hh3cIfMonStatEntry.
+--        Added hh3cIfMonJamDiscardThres, hh3cIfMonJamDiscardInterval, hh3cIfMonBadBytesThres, hh3cIfMonBadBytesDiscardInterval,
+--        hh3cIfMonErrorRateThres, hh3cIfMonErrorRateDiscardInterval to hh3cIfMonThresholdEntry.
+--        Added hh3cIfHalfDuplexClear, hh3cIfEgressDropAlarm, hh3cIfEgressDropRecover, hh3cIfBoardEgressDropAlarm, hh3cIfBoardEgressDropRecover,
+--        hh3cIfComboTypeChange, hh3cIfIngressAgingDropAlarm,hh3cIfIngressAgingDropResume to hh3cIfExtTrapPrex.
+--        Added hh3cIfMonInputJamDiscardAlarm, hh3cIfMonInputJamDiscardResume, hh3cIfMonOutputJamDiscardAlarm, hh3cIfMonOutputJamDiscardResume,
+--        hh3cIfMonPktDropRateRising, hh3cIfMonPktDropRateRecover, hh3cIfMonBadBytesErrorRising, hh3cIfMonBadBytesErrorResume,
+--        hh3cIfMonPortCrcRateExceed, hh3cIfMonPortErrorRateExceed, hh3cIfMonInBCRapidChange, hh3cIfMonInBCRapidRecover to
+--        hh3cIfMonTrapPrex.
+--   V3.2 2022-09-07  "Added hh3cIfLinkFlapDown by guopeng.
+--        2022-10-11 Added hh3cIfMappingIfStatusBlock and hh3cIfMappingIfStatusLinkageDown by wangweiyi.
+--   V3.3 2022-11-01 Added hh3cIfCurrentUsedRatio, hh3cIfUsedRatioThreshold, hh3cIfDiscardType, hh3cIfDiscardThreshold to hh3cIfExtScalarGroup.
+--        Added hh3cIfFlowControlDLAlarm, hh3cIfFlowControlDLAlarmResume, hh3cIfOutputErrorAlarm, hh3cIfOutputErrorAlarmResume,
+--        hh3cIfCableSnrAbnormal, hh3cIfCableSnrNormal, hh3cIfCableSnrDetectNotSupport, hh3cIfSfpNotSupportSingleFiber, hh3cIfLRMStateAbnormal,
+--        hh3cIfSfpWorkOnlyNonNego, hh3cIfPfcTurnOffAlarm, hh3cIfPfcTurnOffResume, hh3cIfQueueAlarm, hh3cIfQueueResume,
+--        hh3cIfQueueStatDiscardAlarm, hh3cIfQueueStatDiscardResume, hh3cIfPfcDeadLockAlarm, hh3cIfPfcDeadLockResume to hh3cIfExtTrapPrex by zhangjindong.
+--        2022-12-06 Added hh3cIfQueueEgressCongestionAlarm and hh3cIfQueueEgressCongestionClear by tanshuai.
+--   V3.4 2023-01-09 Added hh3cIfAggPortBwChange, hh3cIfRateOfTrafficRising and hh3cIfMonPortCrcRateExceedResume by jiangyongjin.
 -- =================================================================
 HH3C-IF-EXT-MIB DEFINITIONS ::= BEGIN
 
@@ -56,7 +105,7 @@ IMPORTS
     FROM SNMPv2-TC;
 
 hh3cIfExt MODULE-IDENTITY
-    LAST-UPDATED "202105140000Z"
+    LAST-UPDATED "202301090000Z"
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -73,6 +122,81 @@ hh3cIfExt MODULE-IDENTITY
         so users should refer to the related documents to acquire more
         detailed information.
         "
+    REVISION "202301090000Z"
+    DESCRIPTION
+        "Added hh3cIfAggPortBwChange, hh3cIfRateOfTrafficRising and hh3cIfMonPortCrcRateExceedResume."
+    REVISION "202212060000Z"
+    DESCRIPTION
+        "Added hh3cIfQueueEgressCongestionAlarm and hh3cIfQueueEgressCongestionClear."
+    REVISION "202211010000Z"
+    DESCRIPTION
+        "Added hh3cIfCurrentUsedRatio, hh3cIfUsedRatioThreshold, hh3cIfDiscardType, hh3cIfDiscardThreshold to hh3cIfExtScalarGroup.
+        Added hh3cIfFlowControlDLAlarm, hh3cIfFlowControlDLAlarmResume, hh3cIfOutputErrorAlarm, hh3cIfOutputErrorAlarmResume,
+        hh3cIfCableSnrAbnormal, hh3cIfCableSnrNormal, hh3cIfCableSnrDetectNotSupport, hh3cIfSfpNotSupportSingleFiber, hh3cIfLRMStateAbnormal,
+        hh3cIfSfpWorkOnlyNonNego, hh3cIfPfcTurnOffAlarm, hh3cIfPfcTurnOffResume, hh3cIfQueueAlarm, hh3cIfQueueResume,
+        hh3cIfQueueStatDiscardAlarm, hh3cIfQueueStatDiscardResume, hh3cIfPfcDeadLockAlarm, hh3cIfPfcDeadLockResume to hh3cIfExtTrapPrex."
+    REVISION "202210110000Z"
+    DESCRIPTION
+        "Added hh3cIfMappingIfStatusBlock and hh3cIfMappingIfStatusLinkageDown."
+    REVISION "202209070000Z"
+    DESCRIPTION
+        "Added hh3cIfLinkFlapDown."
+    REVISION "202208080000Z"
+    DESCRIPTION
+        "Added hh3cIfCpuId, hh3cIfOldComboType, hh3cIfNewComboType, hh3cIfDropRateThreshold,
+        hh3cIfCurrentDropRate, hh3cIfDropRateInterval, hh3cIfMessageProtocol, hh3cIfCurrentFlowThreshold,
+        hh3cIfCurrentFlowValue to hh3cIfExtScalarGroup.
+        Added hh3cIfMonJamDiscardStatistics, hh3cIfMonBadBytesStatistics, hh3cIfMonErrorRateStatistics to hh3cIfMonStatEntry.
+        Added hh3cIfMonJamDiscardThres, hh3cIfMonJamDiscardInterval, hh3cIfMonBadBytesThres, hh3cIfMonBadBytesDiscardInterval,
+        hh3cIfMonErrorRateThres, hh3cIfMonErrorRateDiscardInterval to hh3cIfMonThresholdEntry.
+        Added hh3cIfHalfDuplexClear, hh3cIfEgressDropAlarm, hh3cIfEgressDropRecover, hh3cIfBoardEgressDropAlarm, hh3cIfBoardEgressDropRecover,
+        hh3cIfComboTypeChange, hh3cIfIngressAgingDropAlarm,hh3cIfIngressAgingDropResume to hh3cIfExtTrapPrex.
+        Added hh3cIfMonInputJamDiscardAlarm, hh3cIfMonInputJamDiscardResume, hh3cIfMonOutputJamDiscardAlarm, hh3cIfMonOutputJamDiscardResume,
+        hh3cIfMonPktDropRateRising, hh3cIfMonPktDropRateRecover, hh3cIfMonBadBytesErrorRising, hh3cIfMonBadBytesErrorResume,
+        hh3cIfMonPortCrcRateExceed, hh3cIfMonPortErrorRateExceed, hh3cIfMonInBCRapidChange, hh3cIfMonInBCRapidRecover to
+        hh3cIfMonTrapPrex."
+    REVISION "202207140000Z"
+    DESCRIPTION
+        "Added hh3cIfMonCRCBitErrorRising, hh3cIfMonCRCBitErrorResume, hh3cIfMonCRCBitErrorHighThresStr,
+        hh3cIfMonCRCBitErrorLowThresStr, hh3cIfMonCRCBitErrorRatioStr."
+    REVISION "202207120000Z"
+    DESCRIPTION
+        "Added hh3cIfLoopBackType, hh3cIfTtlLoopThreshold, hh3cIfPreDataLowByte, hh3cIfPreDataHighByte, hh3cIfCurDataLowByte,
+        hh3cIfCurDataHighByte, hh3cIfIntervalTime, hh3cIfSDHHpIndex, hh3cIfUNUCPortRealFlow, hh3cIfUNUCPortAlarmThreshold,
+        hh3cIfBip8SdErrThreshold to hh3cIfExtScalarGroup.
+        Added hh3cIfLosAlarm, hh3cIfLosAlarmResume, hh3cIfLofAlarm, hh3cIfLofAlarmResume, hh3cIfLFaultAlarm,
+        hh3cIfLFaultAlarmResume, hh3cIfRFaultAlarm, hh3cIfRFaultAlarmResume, hh3cIfOofAlarm, hh3cIfOofAlarmResume,
+        hh3cIfSfbereAlarm, hh3cIfSfbereAlarmResume, hh3cIfPaisAlarm, hh3cIfPaisAlarmResume, hh3cIfHpJ1TiuAlarm,
+        hh3cIfHpJ1TiuAlarmResume, hh3cIfRroolAlarm, hh3cIfRroolAlarmResume, hh3cIfNegoFailedAlarm,
+        hh3cIfNegoFailedAlarmResume, hh3cIfEthRxFlowFallAlarm, hh3cIfEthRxFlowFallAlarmResume, hh3cIfEthTxFlowFallAlarm,
+        hh3cIfEthTxFlowFallAlarmResume, hh3cIfLoopbackAlarm, hh3cIfLoopbackAlarmResume, hh3cIfMonTtlLoop,
+        hh3cIfMonTtlLoopResume to hh3cIfExtTrapPrex.
+        Added hh3cIfMonInputUFlowFalling, hh3cIfMonInputUFlowRising,hh3cIfMonBip8SdError, hh3cIfMonBip8SdErrorResume to
+        hh3cIfMonTrapPrex."
+    REVISION "202206170000Z"
+    DESCRIPTION
+        "Add hh3cIfChassisIndex, hh3cIfSlotIndex, hh3cIfSubSlotIndex,
+        hh3cIfErrDownDesc to hh3cIfExtScalarGroup,
+        Add hh3cIfBufferInDiscardAlarm, hh3cIfBufferInDiscardResume, hh3cIfHalfDuplexRising,
+        hh3cIfChangeMultiChassis, hh3cIfChangeMultiChassisResume, hh3cIfCfgRecoverOverSlot,
+        hh3cIfCfgRecoverOverSubSlot, hh3cIfInterfaceDelete, hh3cIfErrordown,
+        hh3cIfErrordownRecovery to hh3cIfExtTrapPrex."
+    REVISION "202204020000Z"
+    DESCRIPTION
+        "Added hh3cIfMonInputBufferDropRising, hh3cIfMonInputBufferDropResume, hh3cIfMonOutputBufferDropRising,
+        hh3cIfMonOutputBufferDropResume, hh3cIfMonInputBufferDropStatistics, hh3cIfMonOutputBufferDropStatistics,
+        hh3cIfMonInputBufferDropLowThres, hh3cIfMonInputBufferDropHighThres, hh3cIfMonInputBufferDropInterval,
+        hh3cIfMonOutputBufferDropLowThres, hh3cIfMonOutputBufferDropHighThres, hh3cIfMonOutputBufferDropInterval,
+        hh3cIfMonInputBufferDropEnableDown and hh3cIfMonOutputBufferDropEnableDown."
+    REVISION "202203280000Z"
+    DESCRIPTION
+        "Added hh3cIfPortRateDegrade, hh3cIfPortRateDegradeResume, hh3cIfHalfDuplex and hh3cIfRate."
+    REVISION "202111080000Z"
+    DESCRIPTION
+        "Added hh3cIfMonTxPauseFrameEnableDown."
+    REVISION "202108030000Z"
+    DESCRIPTION
+        "Added hh3cIfMappingIfStatusBackup and hh3cIfMappingIfStatusNormal."
     REVISION "202105140000Z"
     DESCRIPTION
         "Added hh3cIfTransferMode to hh3cIfTable."
@@ -106,7 +230,7 @@ hh3cIfExt MODULE-IDENTITY
         "Added hh3cIfMonScalarGroup, hh3cIfMonGroup, hh3cIfMonGroup and hh3cIfMonTrapPrex."
     REVISION "201712131820Z"
     DESCRIPTION
-        "Added Added hh3cIfThroughputInKbps and hh3cIfThroughputOutKbps."
+        "Added hh3cIfThroughputInKbps and hh3cIfThroughputOutKbps."
     REVISION "201707131040Z"
     DESCRIPTION
         "Added hh3cIfFwdErrDiscards."
@@ -179,6 +303,259 @@ hh3cIfThroughputOutKbps OBJECT-TYPE
     DESCRIPTION
         "Actual outgoing throughput of the device in kbps."
     ::= { hh3cIfExtScalarGroup 4 }
+
+hh3cIfRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The rate of the actual bandwidth for an interface."
+    ::= { hh3cIfExtScalarGroup 5 }
+
+hh3cIfChassisIndex   OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Chassis."
+    ::= { hh3cIfExtScalarGroup 6 }
+
+hh3cIfSlotIndex   OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Slot."
+    ::= { hh3cIfExtScalarGroup 7 }
+
+hh3cIfSubSlotIndex   OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Subslot."
+    ::= { hh3cIfExtScalarGroup 8 }
+
+hh3cIfErrDownDesc   OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Interface error down reason."
+    ::= { hh3cIfExtScalarGroup 9 }
+
+hh3cIfLoopBackType   OBJECT-TYPE
+    SYNTAX  INTEGER
+        {
+            noloopback(1),
+            internal(5),
+            external(6)
+        }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Loopback type."
+    ::= { hh3cIfExtScalarGroup 10 }
+
+hh3cIfTtlLoopThreshold   OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS   "seconds"
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Ttl threshold for loop prevention."
+    ::= { hh3cIfExtScalarGroup 11 }
+
+hh3cIfPreDataLowByte   OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Previous lower 32-bit value."
+    ::= { hh3cIfExtScalarGroup 12 }
+
+hh3cIfPreDataHighByte   OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Previous higher 32-bit value."
+    ::= { hh3cIfExtScalarGroup 13 }
+
+hh3cIfCurDataLowByte   OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Current lower 32-bit value."
+    ::= { hh3cIfExtScalarGroup 14 }
+
+hh3cIfCurDataHighByte   OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Current higher 32-bit value."
+    ::= { hh3cIfExtScalarGroup 15 }
+
+hh3cIfIntervalTime   OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS   "seconds"
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Interval."
+    ::= { hh3cIfExtScalarGroup 16 }
+
+hh3cIfSDHHpIndex   OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "SDH high-order path index."
+    ::= { hh3cIfExtScalarGroup 17 }
+
+hh3cIfUNUCPortRealFlow   OBJECT-TYPE
+    SYNTAX  Integer32(0..100)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Percentage of unknown unicast traffic to total traffic."
+    ::= { hh3cIfExtScalarGroup 18 }
+
+hh3cIfUNUCPortAlarmThreshold   OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Unknow unicast traffic threshold for an interface, in percentage."
+    ::= { hh3cIfExtScalarGroup 19 }
+
+hh3cIfBip8SdErrThreshold OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The threshold for BIP8 error-code."
+    ::= { hh3cIfExtScalarGroup 20 }
+
+hh3cIfCpuId   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "CPU ID."
+    ::= { hh3cIfExtScalarGroup 21 }
+
+hh3cIfOldComboType   OBJECT-TYPE
+    SYNTAX  INTEGER
+    {
+        fiber(1),
+        copper(2)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Combo type before switching."
+    ::= { hh3cIfExtScalarGroup 22 }
+
+hh3cIfNewComboType   OBJECT-TYPE
+    SYNTAX  INTEGER
+    {
+        fiber(1),
+        copper(2)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Combo type after switching."
+    ::= { hh3cIfExtScalarGroup 23 }
+
+hh3cIfDropRateThreshold   OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Packet loss rate threshold."
+    ::= { hh3cIfExtScalarGroup 24 }
+
+hh3cIfCurrentDropRate   OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Current packet loss rate."
+    ::= { hh3cIfExtScalarGroup 25 }
+
+hh3cIfDropRateInterval   OBJECT-TYPE
+    SYNTAX  Integer32
+    UNITS   "seconds"
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Packet loss rate detection interval."
+    ::= { hh3cIfExtScalarGroup 26 }
+
+hh3cIfMessageProtocol   OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Message protocol."
+    ::= { hh3cIfExtScalarGroup 27 }
+
+hh3cIfCurrentFlowThreshold   OBJECT-TYPE
+    SYNTAX  CounterBasedGauge64
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Current bursty flow threshold."
+    ::= { hh3cIfExtScalarGroup 28 }
+
+hh3cIfCurrentFlowValue   OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Current bursty flow value."
+    ::= { hh3cIfExtScalarGroup 29 }
+
+hh3cIfCurrentUsedRatio   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Current queue depth usage rate."
+    ::= { hh3cIfExtScalarGroup 30 }
+
+hh3cIfUsedRatioThreshold   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Queue depth usage threshold."
+    ::= { hh3cIfExtScalarGroup 31 }
+
+hh3cIfDiscardType   OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        discardstat(1),
+        discardbyte(2),
+        discardrate(3)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Packet loss type."
+    ::= { hh3cIfExtScalarGroup 32 }
+
+hh3cIfDiscardThreshold   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Packet loss threshold."
+    ::= { hh3cIfExtScalarGroup 33 }
 
 -- =================================================================
 -- All other groups are defined below.  Of course, scalar objects can
@@ -911,7 +1288,7 @@ hh3cIfPfcDot1pOutPps  OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The current outbound rate for the PFC dot1p. "
+        "The current outbound rate for the PFC dot1p."
     ::= { hh3cIfPfcDot1pEntry 3 }
 
 hh3cIfPfcDot1pInPpsThreshold OBJECT-TYPE
@@ -1567,6 +1944,899 @@ hh3cIfPfcInRising NOTIFICATION-TYPE
      If the hh3cIfPfcDot1pInPpsThreshold is set to 0, no hh3cIfPfcInRising will be generated."
     ::= { hh3cIfExtTrapPrex 8 }
 
+hh3cIfMappingIfStatusBackup NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+    "The notification is generated when the mapping status of the interface changes to backup."
+    ::= { hh3cIfExtTrapPrex 9 }
+
+hh3cIfMappingIfStatusNormal NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+    "The notification is generated when the mapping status of the interface changes to normal."
+    ::= { hh3cIfExtTrapPrex 10 }
+
+hh3cIfPortRateDegrade NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfRate
+        }
+    STATUS current
+    DESCRIPTION
+    "The notification is generated when the negotiated interface rate decreases."
+    ::= { hh3cIfExtTrapPrex 11 }
+
+hh3cIfPortRateDegradeResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfRate
+        }
+    STATUS current
+    DESCRIPTION
+    "The notification is generated when the negotiated interface rate recovers."
+    ::= { hh3cIfExtTrapPrex 12 }
+
+hh3cIfHalfDuplex NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+    "The notification is generated when the half duplex mode is autonegotiated for the interface."
+    ::= { hh3cIfExtTrapPrex 13 }
+
+hh3cIfBufferInDiscardAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIfChassisIndex,
+            hh3cIfSlotIndex
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of ingress buffer discard exceeds the
+         upper threshold."
+    ::= { hh3cIfExtTrapPrex 14 }
+
+hh3cIfBufferInDiscardResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIfChassisIndex,
+            hh3cIfSlotIndex
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of ingress buffer discard from
+         above the upper threshold to below the lower threshold."
+    ::= { hh3cIfExtTrapPrex 15 }
+
+hh3cIfHalfDuplexRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when work mode change to half duplex."
+    ::= { hh3cIfExtTrapPrex 16 }
+
+hh3cIfChangeMultiChassis NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when centent or distributed expanded to
+         multiple enclosures, and the interface information is changes."
+    ::= { hh3cIfExtTrapPrex 17 }
+
+hh3cIfChangeMultiChassisResume NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when multiple rolled back to centent or
+         distributed , and the interface information changes."
+    ::= { hh3cIfExtTrapPrex 18 }
+
+hh3cIfCfgRecoverOverSlot NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIfChassisIndex,
+            hh3cIfSlotIndex
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when The slot is inserted successfully."
+    ::= { hh3cIfExtTrapPrex 19 }
+
+hh3cIfCfgRecoverOverSubSlot NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIfChassisIndex,
+            hh3cIfSlotIndex,
+            hh3cIfSubSlotIndex
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when The subslot is inserted successfully."
+    ::= { hh3cIfExtTrapPrex 20 }
+
+hh3cIfInterfaceDelete NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the interface to delete."
+    ::= { hh3cIfExtTrapPrex 21 }
+
+hh3cIfErrordown NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfErrDownDesc
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the interface error-down occured."
+    ::= { hh3cIfExtTrapPrex 22 }
+
+hh3cIfErrordownRecovery NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfErrDownDesc
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the interface error-down recover."
+    ::= { hh3cIfExtTrapPrex 23 }
+
+hh3cIfLosAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when no power is input."
+    ::= { hh3cIfExtTrapPrex 24 }
+
+hh3cIfLosAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the no power input error is removed."
+    ::= { hh3cIfExtTrapPrex 25 }
+
+hh3cIfLofAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when an out of frame (OOF) error occurs."
+    ::= { hh3cIfExtTrapPrex 26 }
+
+hh3cIfLofAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the OOF error is removed."
+    ::= { hh3cIfExtTrapPrex 27 }
+
+hh3cIfLFaultAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when local fault error occurs."
+    ::= { hh3cIfExtTrapPrex 28 }
+
+hh3cIfLFaultAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when local fault error is removed."
+    ::= { hh3cIfExtTrapPrex 29 }
+
+hh3cIfRFaultAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when remote fault error occurs."
+    ::= { hh3cIfExtTrapPrex 30 }
+
+hh3cIfRFaultAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when remote fault error is removed."
+    ::= { hh3cIfExtTrapPrex 31 }
+
+hh3cIfOofAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated if a frame header fails to be identified for five times."
+    ::= { hh3cIfExtTrapPrex 32 }
+
+hh3cIfOofAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the frame header identification failure is fixed."
+    ::= { hh3cIfExtTrapPrex 33 }
+
+hh3cIfSfbereAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the error-code count exceeds the threshold."
+    ::= { hh3cIfExtTrapPrex 34 }
+
+hh3cIfSfbereAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the error-code count drops to the normal range."
+    ::= { hh3cIfExtTrapPrex 35 }
+
+hh3cIfPaisAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfSDHHpIndex
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when error occurs on a high-order path."
+    ::= { hh3cIfExtTrapPrex 36 }
+
+hh3cIfPaisAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfSDHHpIndex
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the error removed from the figh-order path."
+    ::= { hh3cIfExtTrapPrex 37 }
+
+hh3cIfHpJ1TiuAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfSDHHpIndex
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the J1 byte is not steady."
+    ::= { hh3cIfExtTrapPrex 38 }
+
+hh3cIfHpJ1TiuAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfSDHHpIndex
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the J1 byte recovers from the unsteady condition."
+    ::= { hh3cIfExtTrapPrex 39 }
+
+hh3cIfRroolAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the clock is unlocked."
+    ::= { hh3cIfExtTrapPrex 40 }
+
+hh3cIfRroolAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the clock is locket."
+    ::= { hh3cIfExtTrapPrex 41 }
+
+hh3cIfNegoFailedAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the interface auto-negotiation fails."
+    ::= { hh3cIfExtTrapPrex 42 }
+
+hh3cIfNegoFailedAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the interface auto-negotiation succeeds"
+    ::= { hh3cIfExtTrapPrex 43 }
+
+hh3cIfEthRxFlowFallAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the inbound traffic volume drop below the threshold."
+    ::= { hh3cIfExtTrapPrex 44 }
+
+hh3cIfEthRxFlowFallAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the inbound traffic volume traffic volume increases to
+         the normal range."
+    ::= { hh3cIfExtTrapPrex 45 }
+
+hh3cIfEthTxFlowFallAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the outbound traffic volume drops below the threshold."
+    ::= { hh3cIfExtTrapPrex 46 }
+
+hh3cIfEthTxFlowFallAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the outbound traffic volume increases to the normal
+         range."
+    ::= { hh3cIfExtTrapPrex 47 }
+
+hh3cIfLoopbackAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfLoopBackType
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the loopback configration is issued."
+    ::= { hh3cIfExtTrapPrex 48 }
+
+hh3cIfLoopbackAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfLoopBackType
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the loopback configuration is removed."
+    ::= { hh3cIfExtTrapPrex 49 }
+
+hh3cIfTtlLoop NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIfChassisIndex,
+            hh3cIfSlotIndex,
+            hh3cIfPreDataHighByte,
+            hh3cIfPreDataLowByte,
+            hh3cIfCurDataHighByte,
+            hh3cIfCurDataLowByte,
+            hh3cIfIntervalTime,
+            hh3cIfTtlLoopThreshold
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when a TTL timeout alarm occurs."
+    ::= { hh3cIfExtTrapPrex 50 }
+
+hh3cIfTtlLoopResume  NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIfChassisIndex,
+            hh3cIfSlotIndex,
+            hh3cIfPreDataHighByte,
+            hh3cIfPreDataLowByte,
+            hh3cIfCurDataHighByte,
+            hh3cIfCurDataLowByte,
+            hh3cIfIntervalTime,
+            hh3cIfTtlLoopThreshold
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when TTL timeout alarm is cleared."
+    ::= { hh3cIfExtTrapPrex 51 }
+
+hh3cIfHalfDuplexClear NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated When the working mode changes from half duplex to full duplex."
+    ::= { hh3cIfExtTrapPrex 52 }
+
+hh3cIfEgressDropAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfQueId
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when packet loss occurs on a port."
+    ::= { hh3cIfExtTrapPrex 53 }
+
+hh3cIfEgressDropRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfQueId
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when packet loss recovers on a port."
+    ::= { hh3cIfExtTrapPrex 54 }
+
+hh3cIfBoardEgressDropAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIfChassisIndex,
+            hh3cIfSlotIndex,
+            hh3cIfCpuId
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the outgoing unicast traffic of the board is discarded."
+    ::= { hh3cIfExtTrapPrex 55 }
+
+hh3cIfBoardEgressDropRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIfChassisIndex,
+            hh3cIfSlotIndex,
+            hh3cIfCpuId
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the outgoing unicast traffic of the board is restored."
+    ::= { hh3cIfExtTrapPrex 56 }
+
+hh3cIfComboTypeChange NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfOldComboType,
+            hh3cIfNewComboType
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the combo type changes due to command line configuration."
+    ::= { hh3cIfExtTrapPrex 57 }
+
+hh3cIfIngressAgingDropAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIfChassisIndex,
+            hh3cIfSlotIndex,
+            hh3cIfCpuId
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when traffic in the slot ingress buffer is discarded for no schedule."
+    ::= { hh3cIfExtTrapPrex 58 }
+
+hh3cIfIngressAgingDropResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIfChassisIndex,
+            hh3cIfSlotIndex,
+            hh3cIfCpuId
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when traffic in the slot ingress buffer recovered from discard with no schedule."
+    ::= { hh3cIfExtTrapPrex 59 }
+
+hh3cIfLinkFlapDown NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the interface shutdown because the link vibrates frequently."
+    ::= { hh3cIfExtTrapPrex 60 }
+
+hh3cIfMappingIfStatusBlock NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+    "The notification is generated when the mapping status of the interface changes to block."
+    ::= { hh3cIfExtTrapPrex 61 }
+
+hh3cIfMappingIfStatusLinkageDown NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+    "The notification is generated when the mapping status of the interface changes to linkagedown."
+    ::= { hh3cIfExtTrapPrex 62 }
+
+hh3cIfFlowControlDLAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the port does not forward messages but receives a large number of pause frames
+         or the port continuously sends a large number of pause frames, but does not receive messages."
+    ::= { hh3cIfExtTrapPrex 63 }
+
+hh3cIfFlowControlDLAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the port does not forward messages and does not receive a large number of pause frames
+         or the port continuously sends a large number of pause frames and receives messages."
+    ::= { hh3cIfExtTrapPrex 64 }
+
+hh3cIfOutputErrorAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfSlotIndex,
+            hh3cIfSubSlotIndex
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when some service data on the port is discarded."
+    ::= { hh3cIfExtTrapPrex 65 }
+
+hh3cIfOutputErrorAlarmResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfSlotIndex,
+            hh3cIfSubSlotIndex
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when no service data is dropped on the port."
+    ::= { hh3cIfExtTrapPrex 66 }
+
+hh3cIfCableSnrAbnormal NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the working rate of the MultiGE interface is 2.5Gbit/s or above,
+         the network cable quality is poor, or there is signal interference."
+    ::= { hh3cIfExtTrapPrex 67 }
+
+hh3cIfCableSnrNormal NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the working rate of the MultiGE interface is 2.5Gbit/s or above,
+         the network cable is intact, or there is no signal interference."
+    ::= { hh3cIfExtTrapPrex 68 }
+
+hh3cIfCableSnrDetectNotSupport NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when network cable quality cannot be detected, and the
+         MultiGE interface changes from up to down."
+    ::= { hh3cIfExtTrapPrex 69 }
+
+hh3cIfSfpNotSupportSingleFiber NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the optical module inserted in the interface does not support the single fiber function."
+    ::= { hh3cIfExtTrapPrex 70 }
+
+hh3cIfLRMStateAbnormal NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the interface does not support the LRM optical module."
+    ::= { hh3cIfExtTrapPrex 71 }
+
+hh3cIfSfpWorkOnlyNonNego NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the GE optical module inserted into the XGE interface can only work in
+         the non-self-negotiated 1000Mbit/s mode, and the interface rate of the interconnection is configured as mandatory 1000Mbit/s."
+    ::= { hh3cIfExtTrapPrex 72 }
+
+hh3cIfPfcDeadLockAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when PFC deadlock may lead to blocked network traffic."
+    ::= { hh3cIfExtTrapPrex 73 }
+
+hh3cIfPfcDeadLockResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when PFC deadlock recovers network traffic."
+    ::= { hh3cIfExtTrapPrex 74 }
+
+hh3cIfPfcTurnOffAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfQueId
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of deadlock occurrences in a detection interval exceeds
+         the threshold value of PFC automatic shutdown."
+    ::= { hh3cIfExtTrapPrex 75 }
+
+hh3cIfPfcTurnOffResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfQueId
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of deadlock occurrences in a detection interval drops below
+         the threshold value of PFC automatic shutdown."
+    ::= { hh3cIfExtTrapPrex 76 }
+
+hh3cIfQueueAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfQueId,
+            hh3cIfCurrentUsedRatio,
+            hh3cIfUsedRatioThreshold
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the queue depth usage rate of the queue on the interface exceeds
+         the configured value on the interface."
+    ::= { hh3cIfExtTrapPrex 77 }
+
+hh3cIfQueueResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfQueId,
+            hh3cIfCurrentUsedRatio,
+            hh3cIfUsedRatioThreshold
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the queue depth usage rate of the queue on the interface drops below
+         the configured value on the interface."
+    ::= { hh3cIfExtTrapPrex 78 }
+
+hh3cIfQueueStatDiscardAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfQueId,
+            hh3cIfDiscardType,
+            hh3cIfDiscardThreshold
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of packets dropped/bytes dropped/packet loss rate in the port queue
+         reaches the alarm threshold."
+    ::= { hh3cIfExtTrapPrex 79 }
+
+hh3cIfQueueStatDiscardResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfQueId,
+            hh3cIfDiscardType,
+            hh3cIfDiscardThreshold
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of packets dropped/bytes dropped/packet loss rate in the port queue
+         drops below the alarm threshold."
+    ::= { hh3cIfExtTrapPrex 80 }
+
+hh3cIfQueueEgressCongestionAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfQueId
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when congestion occurs in the outgoing direction of the queue on the interface."
+    ::= { hh3cIfExtTrapPrex 81 }
+
+hh3cIfQueueEgressCongestionClear NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfQueId
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the congestion ofin the outgoing direction in the queue on the interface is removed."
+    ::= { hh3cIfExtTrapPrex 82 }
+
+hh3cIfAggPortBwChange NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the trunk interface bandwidth changes."
+    ::= { hh3cIfExtTrapPrex 83 }
+
+hh3cIfRateOfTrafficRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIfChassisIndex,
+            hh3cIfSlotIndex
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the interface slot flow is greater than the threshold."
+    ::= { hh3cIfExtTrapPrex 84 }
+
 hh3cIfExtTrapObject OBJECT IDENTIFIER ::= { hh3cIfExtTrap 1 }
 
 hh3cIfExtTrapCfgTable OBJECT-TYPE
@@ -1659,7 +2929,12 @@ Hh3cIfMonStatEntry ::= SEQUENCE
         hh3cIfMonRxPauseFrameStatistics       Counter64,
         hh3cIfMonTxPauseFrameStatistics       Counter64,
         hh3cIfMonRuntStatistics               Counter64,
-        hh3cIfMonGiantStatistics              Counter64
+        hh3cIfMonGiantStatistics              Counter64,
+        hh3cIfMonInputBufferDropStatistics    Counter64,
+        hh3cIfMonOutputBufferDropStatistics   Counter64,
+        hh3cIfMonJamDiscardStatistics         Counter64,
+        hh3cIfMonBadBytesStatistics           Counter64,
+        hh3cIfMonErrorRateStatistics          Counter64
     }
 
 hh3cIfMonInputUsageStatistics OBJECT-TYPE
@@ -1758,6 +3033,46 @@ hh3cIfMonGiantStatistics OBJECT-TYPE
         "Statistics about the Giant packets."
     ::= { hh3cIfMonStatEntry 12 }
 
+hh3cIfMonInputBufferDropStatistics OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Statistics about the input buffer dropped packets."
+    ::= { hh3cIfMonStatEntry 13 }
+
+hh3cIfMonOutputBufferDropStatistics OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Statistics about the output buffer dropped packets."
+    ::= { hh3cIfMonStatEntry 14 }
+
+hh3cIfMonJamDiscardStatistics  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Statistics of congestion and packet loss."
+    ::= { hh3cIfMonStatEntry 15 }
+
+hh3cIfMonBadBytesStatistics  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bad packet byte statistics."
+    ::= { hh3cIfMonStatEntry 16 }
+
+hh3cIfMonErrorRateStatistics  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Statistics of packet error rate."
+    ::= { hh3cIfMonStatEntry 17 }
+
 -- =================================================================
 hh3cIfMonControl  OBJECT IDENTIFIER ::= { hh3cIfMonGroup 2 }
 
@@ -1828,7 +3143,19 @@ Hh3cIfMonThresholdEntry ::= SEQUENCE
         hh3cIfMonGiantInterval                    Unsigned32,
         hh3cIfMonRuntLowThres                     Unsigned32,
         hh3cIfMonRuntHighThres                    Unsigned32,
-        hh3cIfMonRuntInterval                     Unsigned32
+        hh3cIfMonRuntInterval                     Unsigned32,
+        hh3cIfMonInputBufferDropLowThres          Unsigned32,
+        hh3cIfMonInputBufferDropHighThres         Unsigned32,
+        hh3cIfMonInputBufferDropInterval          Unsigned32,
+        hh3cIfMonOutputBufferDropLowThres         Unsigned32,
+        hh3cIfMonOutputBufferDropHighThres        Unsigned32,
+        hh3cIfMonOutputBufferDropInterval         Unsigned32,
+        hh3cIfMonJamDiscardThres                  Unsigned32,
+        hh3cIfMonJamDiscardInterval               Unsigned32,
+        hh3cIfMonBadBytesThres                    Unsigned32,
+        hh3cIfMonBadBytesDiscardInterval          Unsigned32,
+        hh3cIfMonErrorRateThres                   Unsigned32,
+        hh3cIfMonErrorRateDiscardInterval         Unsigned32
     }
 
 hh3cIfMonInputUsageLowThres        OBJECT-TYPE
@@ -1971,7 +3298,7 @@ hh3cIfMonSdhB1ErrorInterval OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "Inspection interval for the number of SDH B1 error packets. "
+        "Inspection interval for the number of SDH B1 error packets."
     DEFVAL { 10 }
     ::= { hh3cIfMonThresholdEntry 16 }
 
@@ -2148,6 +3475,117 @@ hh3cIfMonRuntInterval OBJECT-TYPE
     DEFVAL { 10 }
     ::= { hh3cIfMonThresholdEntry 35 }
 
+hh3cIfMonInputBufferDropLowThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Lower threshold for the number of input buffer dropped packets."
+    DEFVAL { 100 }
+    ::= { hh3cIfMonThresholdEntry 36 }
+
+hh3cIfMonInputBufferDropHighThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Upper threshold for the number of input buffer dropped packets."
+    DEFVAL { 1000 }
+    ::= { hh3cIfMonThresholdEntry 37 }
+
+hh3cIfMonInputBufferDropInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Inspection interval for the number of input buffer dropped packets."
+    DEFVAL { 10 }
+    ::= { hh3cIfMonThresholdEntry 38 }
+
+hh3cIfMonOutputBufferDropLowThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Lower threshold for the number of output buffer dropped packets."
+    DEFVAL { 100 }
+    ::= { hh3cIfMonThresholdEntry 39 }
+
+hh3cIfMonOutputBufferDropHighThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Upper threshold for the number of output buffer dropped packets."
+    DEFVAL { 1000 }
+    ::= { hh3cIfMonThresholdEntry 40 }
+
+hh3cIfMonOutputBufferDropInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Inspection interval for the number of output buffer dropped packets."
+    DEFVAL { 10 }
+    ::= { hh3cIfMonThresholdEntry 41 }
+
+hh3cIfMonJamDiscardThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Congestion packet loss threshold."
+    DEFVAL { 1000 }
+    ::= { hh3cIfMonThresholdEntry 42 }
+
+hh3cIfMonJamDiscardInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Time interval for counting congestion and packet loss."
+    DEFVAL { 10 }
+    ::= { hh3cIfMonThresholdEntry 43 }
+
+hh3cIfMonBadBytesThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Bad packet byte threshold."
+    DEFVAL { 1000 }
+    ::= { hh3cIfMonThresholdEntry 44 }
+
+hh3cIfMonBadBytesDiscardInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Time interval for counting bad packet bytes."
+    DEFVAL { 10 }
+    ::= { hh3cIfMonThresholdEntry 45 }
+
+hh3cIfMonErrorRateThres OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Packet error rate threshold."
+    DEFVAL { 1000 }
+    ::= { hh3cIfMonThresholdEntry 46 }
+
+hh3cIfMonErrorRateDiscardInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Time interval for statistics of packet error rate."
+    DEFVAL { 10 }
+    ::= { hh3cIfMonThresholdEntry 47 }
+
 -- =================================================================
 hh3cIfMonAlarmDownEnableTable   OBJECT-TYPE
     SYNTAX      SEQUENCE OF Hh3cIfMonAlarmDownEnableEntry
@@ -2177,7 +3615,10 @@ Hh3cIfMonAlarmDownEnableEntry ::= SEQUENCE
         hh3cIfMonSdhB2ErrorEnableDown             TruthValue,
         hh3cIfMonCRCErrorEnableDown               TruthValue,
         hh3cIfMonGiantEnableDown                  TruthValue,
-        hh3cIfMonRuntEnableDown                   TruthValue
+        hh3cIfMonRuntEnableDown                   TruthValue,
+        hh3cIfMonTxPauseFrameEnableDown           TruthValue,
+        hh3cIfMonInputBufferDropEnableDown        TruthValue,
+        hh3cIfMonOutputBufferDropEnableDown       TruthValue
     }
 
 hh3cIfMonInputErrorAlarmEnableDown OBJECT-TYPE
@@ -2186,7 +3627,7 @@ hh3cIfMonInputErrorAlarmEnableDown OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "When the number of inbound error packets exceeds the upper threshold,
-         the physical interface goes down. "
+         the physical interface goes down."
     DEFVAL { false }
     ::= { hh3cIfMonAlarmDownEnableEntry 1 }
 
@@ -2206,7 +3647,7 @@ hh3cIfMonSdhErrorEnableDown OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "When the number of SDH error packets exceeds the upper threshold,
-         the physical interface goes down. "
+         the physical interface goes down."
     DEFVAL { false }
     ::= { hh3cIfMonAlarmDownEnableEntry 3 }
 
@@ -2260,6 +3701,35 @@ hh3cIfMonRuntEnableDown OBJECT-TYPE
     DEFVAL { false }
     ::= { hh3cIfMonAlarmDownEnableEntry 8 }
 
+hh3cIfMonTxPauseFrameEnableDown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When the number of transmitted pause frames exceeds the upper threshold,
+         the physical interface goes down."
+    DEFVAL { false }
+    ::= { hh3cIfMonAlarmDownEnableEntry 9 }
+
+hh3cIfMonInputBufferDropEnableDown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When the number of input buffer dropped packets exceeds the upper threshold,
+         the physical interface goes down."
+    DEFVAL { false }
+    ::= { hh3cIfMonAlarmDownEnableEntry 10 }
+
+hh3cIfMonOutputBufferDropEnableDown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When the number of output buffer dropped packets exceeds the upper threshold,
+         the physical interface goes down."
+    DEFVAL { false }
+    ::= { hh3cIfMonAlarmDownEnableEntry 11 }
 
 -- =================================================================
 -- Traps are defined below.
@@ -2618,7 +4088,7 @@ hh3cIfMonGiantResume NOTIFICATION-TYPE
          above the upper threshold to below the lower threshold within the default interval."
     ::= { hh3cIfMonTrapPrex 22 }
 
- hh3cIfMonRuntRising NOTIFICATION-TYPE
+hh3cIfMonRuntRising NOTIFICATION-TYPE
     OBJECTS
         {
             ifIndex,
@@ -2650,7 +4120,370 @@ hh3cIfMonRuntResume NOTIFICATION-TYPE
          above the upper threshold to below the lower threshold within the default interval."
     ::= { hh3cIfMonTrapPrex 24 }
 
+hh3cIfMonInputBufferDropRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonInputBufferDropLowThres,
+            hh3cIfMonInputBufferDropHighThres,
+            hh3cIfMonInputBufferDropStatistics,
+            hh3cIfMonInputBufferDropInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of input buffer dropped packets exceeds
+         the upper threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 25 }
+
+hh3cIfMonInputBufferDropResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonInputBufferDropLowThres,
+            hh3cIfMonInputBufferDropHighThres,
+            hh3cIfMonInputBufferDropStatistics,
+            hh3cIfMonInputBufferDropInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of input buffer dropped packets drops from
+         above the upper threshold to below the lower threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 26 }
+
+hh3cIfMonOutputBufferDropRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonOutputBufferDropLowThres,
+            hh3cIfMonOutputBufferDropHighThres,
+            hh3cIfMonOutputBufferDropStatistics,
+            hh3cIfMonOutputBufferDropInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of output buffer dropped packets exceeds
+         the upper threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 27 }
+
+hh3cIfMonOutputBufferDropResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonOutputBufferDropLowThres,
+            hh3cIfMonOutputBufferDropHighThres,
+            hh3cIfMonOutputBufferDropStatistics,
+            hh3cIfMonOutputBufferDropInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of output buffer dropped packets drops from
+         above the upper threshold to below the lower threshold within the default interval."
+    ::= { hh3cIfMonTrapPrex 28 }
+
+hh3cIfMonInputUFlowRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfUNUCPortRealFlow,
+            hh3cIfUNUCPortAlarmThreshold
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the unknown unicast traffic percentage exceeds the
+         threshold."
+    ::= { hh3cIfMonTrapPrex 29 }
+
+hh3cIfMonInputUFlowFalling NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfUNUCPortRealFlow,
+            hh3cIfUNUCPortAlarmThreshold
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the unknown unicast traffic percentage drops to the
+         normal range within the default interval."
+    ::= { hh3cIfMonTrapPrex 30 }
+
+hh3cIfMonBip8SdError NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfBip8SdErrThreshold
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the error code count exceeds the threshold."
+    ::= { hh3cIfMonTrapPrex 31 }
+
+hh3cIfMonBip8SdErrorResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfBip8SdErrThreshold
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the error code count drops to the normal range
+         within the default interval."
+    ::= { hh3cIfMonTrapPrex 32 }
+
+hh3cIfMonCRCBitErrorRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonCRCBitErrorHighThresStr,
+            hh3cIfMonCRCBitErrorLowThresStr,
+            hh3cIfMonCRCBitErrorRatioStr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the CRC bit error ratio exceeds the upper threshold."
+    ::= { hh3cIfMonTrapPrex 33 }
+
+hh3cIfMonCRCBitErrorResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonCRCBitErrorHighThresStr,
+            hh3cIfMonCRCBitErrorLowThresStr,
+            hh3cIfMonCRCBitErrorRatioStr
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the CRC bit error ratio drops from above the upper threshold to below the lower threshold."
+    ::= { hh3cIfMonTrapPrex 34 }
+
+hh3cIfMonInputJamDiscardAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonJamDiscardStatistics,
+            hh3cIfMonJamDiscardThres,
+            hh3cIfMonJamDiscardInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of incoming packets lost due to network congestion
+     of the interface exceeds the threshold."
+    ::= { hh3cIfMonTrapPrex 35 }
+
+hh3cIfMonInputJamDiscardResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonJamDiscardStatistics,
+            hh3cIfMonJamDiscardThres,
+            hh3cIfMonJamDiscardInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of incoming packets lost due to network congestion
+     of the interface drops below the threshold."
+    ::= { hh3cIfMonTrapPrex 36 }
+
+hh3cIfMonOutputJamDiscardAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonJamDiscardStatistics,
+            hh3cIfMonJamDiscardThres,
+            hh3cIfMonJamDiscardInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of outgoing packets lost due to network congestion
+     of the interface exceeds the threshold."
+    ::= { hh3cIfMonTrapPrex 37 }
+
+hh3cIfMonOutputJamDiscardResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonJamDiscardStatistics,
+            hh3cIfMonJamDiscardThres,
+            hh3cIfMonJamDiscardInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of outgoing packets lost due to network congestion
+     of the interface drops below the threshold."
+    ::= { hh3cIfMonTrapPrex 38 }
+
+hh3cIfMonPktDropRateRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIfChassisIndex,
+            hh3cIfSlotIndex,
+            hh3cIfCpuId,
+            hh3cIfDropRateThreshold,
+            hh3cIfCurrentDropRate,
+            hh3cIfDropRateInterval,
+            hh3cIfMessageProtocol
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of messages discarded on
+     the interface board exceeds the configured alarm threshold."
+    ::= { hh3cIfMonTrapPrex 39 }
+
+hh3cIfMonPktDropRateRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIfChassisIndex,
+            hh3cIfSlotIndex,
+            hh3cIfCpuId,
+            hh3cIfDropRateThreshold,
+            hh3cIfCurrentDropRate,
+            hh3cIfDropRateInterval,
+            hh3cIfMessageProtocol
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of discarded messages on
+     the interface board drops below the configured alarm threshold."
+    ::= { hh3cIfMonTrapPrex 40 }
+
+hh3cIfMonBadBytesErrorRising NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonBadBytesStatistics,
+            hh3cIfMonBadBytesThres,
+            hh3cIfMonBadBytesDiscardInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of bad packet bytes
+     exceeds the set alarm threshold."
+    ::= { hh3cIfMonTrapPrex 41 }
+
+hh3cIfMonBadBytesErrorResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonBadBytesStatistics,
+            hh3cIfMonBadBytesThres,
+            hh3cIfMonBadBytesDiscardInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the number of bad packet bytes
+     drops below the set alarm threshold."
+    ::= { hh3cIfMonTrapPrex 42 }
+
+hh3cIfMonPortCrcRateExceed NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonErrorRateStatistics,
+            hh3cIfMonErrorRateThres,
+            hh3cIfMonErrorRateDiscardInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the CRC packet error rate is greater than or equal to 1000 / s."
+    ::= { hh3cIfMonTrapPrex 43 }
+
+hh3cIfMonPortErrorRateExceed NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonErrorRateStatistics,
+            hh3cIfMonErrorRateThres,
+            hh3cIfMonErrorRateDiscardInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the average rate of CRC errors, giants and
+     runts exceeded 1000 / s."
+    ::= { hh3cIfMonTrapPrex 44 }
+
+hh3cIfMonInBCRapidChange NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfCurrentFlowThreshold,
+            hh3cIfCurrentFlowValue
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the incoming broadcast traffic
+     of the interface suddenly exceeds the threshold."
+    ::= { hh3cIfMonTrapPrex 45 }
+
+hh3cIfMonInBCRapidRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfCurrentFlowThreshold,
+            hh3cIfCurrentFlowValue
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the incoming broadcast traffic of the interface
+     suddenly drops below the threshold."
+    ::= { hh3cIfMonTrapPrex 46 }
+
+hh3cIfMonPortCrcRateExceedResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cIfMonErrorRateStatistics,
+            hh3cIfMonErrorRateThres,
+            hh3cIfMonErrorRateDiscardInterval
+        }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when the CRC packet error rate is less than 1000 / s."
+    ::= { hh3cIfMonTrapPrex 47 }
 
 hh3cIfMonTrapObject OBJECT IDENTIFIER ::= { hh3cIfMonTrap 1 }
+
+hh3cIfMonCRCBitErrorHighThresStr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Upper threshold for the CRC bit error ratio"
+    ::= { hh3cIfMonTrapObject 1 }
+
+hh3cIfMonCRCBitErrorLowThresStr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Lower threshold for the CRC bit error ratio"
+    ::= { hh3cIfMonTrapObject 2 }
+
+hh3cIfMonCRCBitErrorRatioStr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Statistics about the CRC bit error ratio"
+    ::= { hh3cIfMonTrapObject 3 }
 
 END

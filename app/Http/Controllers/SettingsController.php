@@ -16,7 +16,7 @@ class SettingsController
     /**
      * Display a listing of the resource.
      *
-     * The setting can be given on its own (settings/snmp.community) or after the tab and section
+     * The setting can be given on its own (settings/snmp.timeout) or after the tab and section
      *
      * @param  DynamicConfig  $dynamicConfig
      * @param  string  $tab

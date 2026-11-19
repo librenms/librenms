@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Models\Traits\Filterable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -33,6 +34,7 @@ class Port extends DeviceRelatedModel
     protected $guarded = [];
     protected array $filterable = [
         'device_id',
+        'port_id',
         'ifName',
         'ifDescr',
         'portName',
@@ -114,6 +116,11 @@ class Port extends DeviceRelatedModel
     }
 
     // ---- Helper Functions ----
+
+    public function metricIdentity(string $measurement): MetricIdentity
+    {
+        return new MetricIdentity($measurement, ['hostname' => (string) $this->device?->hostname, 'id' => $this->port_id]);
+    }
 
     /**
      * Returns a human readable label for this port
@@ -350,6 +357,15 @@ class Port extends DeviceRelatedModel
     public function scopeInPortGroup($query, $portGroup)
     {
         return $query->whereIn($query->qualifyColumn('port_id'), function ($query) use ($portGroup): void {
+            $query->select('port_id')
+                ->from('port_group_port')
+                ->where('port_group_id', $portGroup);
+        });
+    }
+
+    public function scopeNotInPortGroup($query, $portGroup)
+    {
+        return $query->whereNotIn($query->qualifyColumn('port_id'), function ($query) use ($portGroup): void {
             $query->select('port_id')
                 ->from('port_group_port')
                 ->where('port_group_id', $portGroup);

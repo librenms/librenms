@@ -8,7 +8,7 @@ NETBOTZ410-MIB DEFINITIONS ::= BEGIN
        TEXTUAL-CONVENTION, DisplayString, DateAndTime                				FROM SNMPv2-TC;
 
 netBotz-APC MODULE-IDENTITY
-    LAST-UPDATED "201104120000Z"
+    LAST-UPDATED "201607220000Z"
     ORGANIZATION "Schneider Electric / APC"
     CONTACT-INFO
             "Postal: Schneider Electric / APC
@@ -16,12 +16,14 @@ netBotz-APC MODULE-IDENTITY
                      West Kingston, RI 02892
                      US
 
-                Tel: +1 401 789 5735
-
-             E-mail: "
+             Contact: http://www.apc.com/us/en/support/contact-us/index.jsp"
    DESCRIPTION
             "NetBotz-APC BotzWare MIB"
-   REVISION     "201002020000Z" --  02 February 2010"
+   REVISION     "201611020000Z" --  02 November 2016
+   DESCRIPTION  "Replaced the generic phone number with the support web page"
+   REVISION     "201604260000Z" --  26 April 2016
+   DESCRIPTION  "for Netbotz Version 4.5.2"
+   REVISION     "201002020000Z" --  02 February 2010
    DESCRIPTION  "for Netbotz Version 4.1.0"
    ::= { enterprises 5528 100 1 }
 
@@ -61,6 +63,12 @@ netBotzMultiRAESensorStatusTraps	OBJECT IDENTIFIER ::= { netBotzSensorTraps 28 }
 netBotzMultiRAEDeviceStatusTraps	OBJECT IDENTIFIER ::= { netBotzSensorTraps 29 }
 netBotzLinkStatusSensorTraps		OBJECT IDENTIFIER ::= { netBotzSensorTraps 30 }
 netBotzLoopVoltageSensorTraps		OBJECT IDENTIFIER ::= { netBotzSensorTraps 31 }
+netBotzVoltageSensorTraps		OBJECT IDENTIFIER ::= { netBotzSensorTraps 32 }
+netBotzFanSpeedSensorTraps		OBJECT IDENTIFIER ::= { netBotzSensorTraps 33 }
+netBotzAppPowerSensorTraps		OBJECT IDENTIFIER ::= { netBotzSensorTraps 34 }
+netBotzPowerFactorSensorTraps		OBJECT IDENTIFIER ::= { netBotzSensorTraps 35 }
+netBotzTimeSensorTraps		OBJECT IDENTIFIER ::= { netBotzSensorTraps 36 }
+netBotzPowerWattsSensorTraps		OBJECT IDENTIFIER ::= { netBotzSensorTraps 37 }
 
 netBotzBasePodTraps	OBJECT IDENTIFIER ::= { netBotzPodTraps 1 }
 netBotzSensorPodTraps	OBJECT IDENTIFIER ::= { netBotzPodTraps 2 }
@@ -8910,4 +8918,2308 @@ netBotzLoopVoltageErrorRTN NOTIFICATION-TYPE
 	"Loop Voltage sensor error resolved."
 	::= { netBotzLoopVoltageSensorTraps 0 101 }
 
+netBotzVoltageTooHigh NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Voltage sensor value too high."
+	::= { netBotzVoltageSensorTraps 0 2 }
+
+netBotzVoltageTooHighRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Voltage sensor value is no longer too high."
+	::= { netBotzVoltageSensorTraps 0 102 }
+
+netBotzVoltageTooLow NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Voltage sensor value too low."
+	::= { netBotzVoltageSensorTraps 0 3 }
+
+netBotzVoltageTooLowRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Voltage sensor value is no longer too low."
+	::= { netBotzVoltageSensorTraps 0 103 }
+
+netBotzVoltageTooHighTooLong NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Voltage sensor value too high for too long."
+	::= { netBotzVoltageSensorTraps 0 4 }
+
+netBotzVoltageTooHighTooLongRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Voltage sensor value is no longer too high for too long."
+	::= { netBotzVoltageSensorTraps 0 104 }
+
+netBotzVoltageTooLowTooLong NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Voltage sensor value too low for too long."
+	::= { netBotzVoltageSensorTraps 0 5 }
+
+netBotzVoltageTooLowForTooLongRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Voltage sensor value is no longer too low for too long."
+	::= { netBotzVoltageSensorTraps 0 105 }
+
+netBotzVoltageUnplugged NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Voltage sensor unplugged."
+	::= { netBotzVoltageSensorTraps 0 6 }
+
+netBotzVoltageReplugged NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Voltage sensor no longer unplugged."
+	::= { netBotzVoltageSensorTraps 0 106 }
+
+netBotzVoltageIncreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Voltage sensor value increasing too quickly."
+	::= { netBotzVoltageSensorTraps 0 8 }
+
+netBotzVoltageNotIncreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Voltage sensor value no longer increasing too quickly."
+	::= { netBotzVoltageSensorTraps 0 108 }
+
+netBotzVoltageDecreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Voltage sensor value decreasing too quickly."
+	::= { netBotzVoltageSensorTraps 0 9 }
+
+netBotzVoltageNotDecreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION
+	"Voltage sensor value no longer decreasing too quickly."
+	::= { netBotzVoltageSensorTraps 0 109 }
+
+netBotzVoltageError NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Voltage sensor error."
+	::= { netBotzVoltageSensorTraps 0 1 }
+
+netBotzVoltageErrorRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Voltage sensor error resolved."
+	::= { netBotzVoltageSensorTraps 0 101 }
+    
+netBotzFanSpeedTooHigh NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Fan Speed sensor value too high."
+	::= { netBotzFanSpeedSensorTraps 0 2 }
+
+netBotzFanSpeedTooHighRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Fan Speed sensor value is no longer too high."
+	::= { netBotzFanSpeedSensorTraps 0 102 }
+
+netBotzFanSpeedTooLow NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Fan Speed sensor value too low."
+	::= { netBotzFanSpeedSensorTraps 0 3 }
+
+netBotzFanSpeedTooLowRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Fan Speed sensor value is no longer too low."
+	::= { netBotzFanSpeedSensorTraps 0 103 }
+
+netBotzFanSpeedTooHighTooLong NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Fan Speed sensor value too high for too long."
+	::= { netBotzFanSpeedSensorTraps 0 4 }
+
+netBotzFanSpeedTooHighTooLongRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Fan Speed sensor value is no longer too high for too long."
+	::= { netBotzFanSpeedSensorTraps 0 104 }
+
+netBotzFanSpeedTooLowTooLong NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Fan Speed sensor value too low for too long."
+	::= { netBotzFanSpeedSensorTraps 0 5 }
+
+netBotzFanSpeedTooLowForTooLongRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Fan Speed sensor value is no longer too low for too long."
+	::= { netBotzFanSpeedSensorTraps 0 105 }
+
+netBotzFanSpeedUnplugged NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Fan Speed sensor unplugged."
+	::= { netBotzFanSpeedSensorTraps 0 6 }
+
+netBotzFanSpeedReplugged NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Fan Speed sensor no longer unplugged."
+	::= { netBotzFanSpeedSensorTraps 0 106 }
+
+netBotzFanSpeedIncreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Fan Speed sensor value increasing too quickly."
+	::= { netBotzFanSpeedSensorTraps 0 8 }
+
+netBotzFanSpeedNotIncreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Fan Speed sensor value no longer increasing too quickly."
+	::= { netBotzFanSpeedSensorTraps 0 108 }
+
+netBotzFanSpeedDecreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Fan Speed sensor value decreasing too quickly."
+	::= { netBotzFanSpeedSensorTraps 0 9 }
+
+netBotzFanSpeedNotDecreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION
+	"Fan Speed sensor value no longer decreasing too quickly."
+	::= { netBotzFanSpeedSensorTraps 0 109 }
+
+netBotzFanSpeedError NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Fan Speed sensor error."
+	::= { netBotzFanSpeedSensorTraps 0 1 }
+
+netBotzFanSpeedErrorRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Fan Speed sensor error resolved."
+	::= { netBotzFanSpeedSensorTraps 0 101 }
+
+netBotzAppPowerTooHigh NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"App Power sensor value too high."
+	::= { netBotzAppPowerSensorTraps 0 2 }
+
+netBotzAppPowerTooHighRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"App Power sensor value is no longer too high."
+	::= { netBotzAppPowerSensorTraps 0 102 }
+
+netBotzAppPowerTooLow NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"App Power sensor value too low."
+	::= { netBotzAppPowerSensorTraps 0 3 }
+
+netBotzAppPowerTooLowRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"App Power sensor value is no longer too low."
+	::= { netBotzAppPowerSensorTraps 0 103 }
+
+netBotzAppPowerTooHighTooLong NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"App Power sensor value too high for too long."
+	::= { netBotzAppPowerSensorTraps 0 4 }
+
+netBotzAppPowerTooHighTooLongRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"App Power sensor value is no longer too high for too long."
+	::= { netBotzAppPowerSensorTraps 0 104 }
+
+netBotzAppPowerTooLowTooLong NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"App Power sensor value too low for too long."
+	::= { netBotzAppPowerSensorTraps 0 5 }
+
+netBotzAppPowerTooLowForTooLongRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"App Power sensor value is no longer too low for too long."
+	::= { netBotzAppPowerSensorTraps 0 105 }
+
+netBotzAppPowerUnplugged NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"App Power sensor unplugged."
+	::= { netBotzAppPowerSensorTraps 0 6 }
+
+netBotzAppPowerReplugged NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"App Power sensor no longer unplugged."
+	::= { netBotzAppPowerSensorTraps 0 106 }
+
+netBotzAppPowerIncreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"App Power sensor value increasing too quickly."
+	::= { netBotzAppPowerSensorTraps 0 8 }
+
+netBotzAppPowerNotIncreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"App Power sensor value no longer increasing too quickly."
+	::= { netBotzAppPowerSensorTraps 0 108 }
+
+netBotzAppPowerDecreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"App Power sensor value decreasing too quickly."
+	::= { netBotzAppPowerSensorTraps 0 9 }
+
+netBotzAppPowerNotDecreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION
+	"App Power sensor value no longer decreasing too quickly."
+	::= { netBotzAppPowerSensorTraps 0 109 }
+
+netBotzAppPowerError NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"App Power sensor error."
+	::= { netBotzAppPowerSensorTraps 0 1 }
+
+netBotzAppPowerErrorRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"App Power sensor error resolved."
+	::= { netBotzAppPowerSensorTraps 0 101 }
+
+netBotzPowerFactorTooHigh NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Factor sensor value too high."
+	::= { netBotzPowerFactorSensorTraps 0 2 }
+
+netBotzPowerFactorTooHighRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Factor sensor value is no longer too high."
+	::= { netBotzPowerFactorSensorTraps 0 102 }
+
+netBotzPowerFactorTooLow NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Factor sensor value too low."
+	::= { netBotzPowerFactorSensorTraps 0 3 }
+
+netBotzPowerFactorTooLowRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Factor sensor value is no longer too low."
+	::= { netBotzPowerFactorSensorTraps 0 103 }
+
+netBotzPowerFactorTooHighTooLong NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Factor sensor value too high for too long."
+	::= { netBotzPowerFactorSensorTraps 0 4 }
+
+netBotzPowerFactorTooHighTooLongRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Factor sensor value is no longer too high for too long."
+	::= { netBotzPowerFactorSensorTraps 0 104 }
+
+netBotzPowerFactorTooLowTooLong NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Factor sensor value too low for too long."
+	::= { netBotzPowerFactorSensorTraps 0 5 }
+
+netBotzPowerFactorTooLowForTooLongRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Factor sensor value is no longer too low for too long."
+	::= { netBotzPowerFactorSensorTraps 0 105 }
+
+netBotzPowerFactorUnplugged NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Factor sensor unplugged."
+	::= { netBotzPowerFactorSensorTraps 0 6 }
+
+netBotzPowerFactorReplugged NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Factor sensor no longer unplugged."
+	::= { netBotzPowerFactorSensorTraps 0 106 }
+
+netBotzPowerFactorIncreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Factor sensor value increasing too quickly."
+	::= { netBotzPowerFactorSensorTraps 0 8 }
+
+netBotzPowerFactorNotIncreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Factor sensor value no longer increasing too quickly."
+	::= { netBotzPowerFactorSensorTraps 0 108 }
+
+netBotzPowerFactorDecreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Factor sensor value decreasing too quickly."
+	::= { netBotzPowerFactorSensorTraps 0 9 }
+
+netBotzPowerFactorNotDecreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION
+	"Power Factor sensor value no longer decreasing too quickly."
+	::= { netBotzPowerFactorSensorTraps 0 109 }
+
+netBotzPowerFactorError NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Factor sensor error."
+	::= { netBotzPowerFactorSensorTraps 0 1 }
+
+netBotzPowerFactorErrorRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Factor sensor error resolved."
+	::= { netBotzPowerFactorSensorTraps 0 101 }
+
+netBotzTimeSensorTooHigh NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Time sensor value too high."
+	::= { netBotzTimeSensorTraps 0 2 }
+
+netBotzTimeSensorTooHighRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Time sensor value is no longer too high."
+	::= { netBotzTimeSensorTraps 0 102 }
+
+netBotzTimeSensorTooLow NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Time sensor value too low."
+	::= { netBotzTimeSensorTraps 0 3 }
+
+netBotzTimeSensorTooLowRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Time sensor value is no longer too low."
+	::= { netBotzTimeSensorTraps 0 103 }
+
+netBotzTimeSensorTooHighTooLong NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Time sensor value too high for too long."
+	::= { netBotzTimeSensorTraps 0 4 }
+
+netBotzTimeSensorTooHighTooLongRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Time sensor value is no longer too high for too long."
+	::= { netBotzTimeSensorTraps 0 104 }
+
+netBotzTimeSensorTooLowTooLong NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Time sensor value too low for too long."
+	::= { netBotzTimeSensorTraps 0 5 }
+
+netBotzTimeSensorTooLowForTooLongRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Time sensor value is no longer too low for too long."
+	::= { netBotzTimeSensorTraps 0 105 }
+
+netBotzTimeSensorUnplugged NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Time sensor unplugged."
+	::= { netBotzTimeSensorTraps 0 6 }
+
+netBotzTimeSensorReplugged NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Time sensor no longer unplugged."
+	::= { netBotzTimeSensorTraps 0 106 }
+    
+netBotzTimeSensorIncreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Time sensor value increasing too quickly."
+	::= { netBotzTimeSensorTraps 0 8 }
+
+netBotzTimeSensorNotIncreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Time sensor value no longer increasing too quickly."
+	::= { netBotzTimeSensorTraps 0 108 }
+
+netBotzTimeSensorDecreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Time sensor value decreasing too quickly."
+	::= { netBotzTimeSensorTraps 0 9 }
+
+netBotzTimeSensorNotDecreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION
+	"Time sensor value no longer decreasing too quickly."
+	::= { netBotzTimeSensorTraps 0 109 }
+
+netBotzTimeSensorError NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Time sensor error."
+	::= { netBotzTimeSensorTraps 0 1 }
+
+netBotzTimeSensorErrorRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Time sensor error resolved."
+	::= { netBotzTimeSensorTraps 0 101 }
+    
+netBotzPowerWattsSensorTooHigh NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Watts sensor value too high."
+	::= { netBotzPowerWattsSensorTraps 0 2 }
+
+netBotzPowerWattsSensorTooHighRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Watts sensor value is no longer too high."
+	::= { netBotzPowerWattsSensorTraps 0 102 }
+
+netBotzPowerWattsSensorTooLow NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Watts sensor value too low."
+	::= { netBotzPowerWattsSensorTraps 0 3 }
+
+netBotzPowerWattsSensorTooLowRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Watts sensor value is no longer too low."
+	::= { netBotzPowerWattsSensorTraps 0 103 }
+
+netBotzPowerWattsSensorTooHighTooLong NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Watts sensor value too high for too long."
+	::= { netBotzPowerWattsSensorTraps 0 4 }
+
+netBotzPowerWattsSensorTooHighTooLongRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Watts sensor value is no longer too high for too long."
+	::= { netBotzPowerWattsSensorTraps 0 104 }
+
+netBotzPowerWattsSensorTooLowTooLong NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Watts sensor value too low for too long."
+	::= { netBotzPowerWattsSensorTraps 0 5 }
+
+netBotzPowerWattsSensorTooLowForTooLongRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Watts sensor value is no longer too low for too long."
+	::= { netBotzPowerWattsSensorTraps 0 105 }
+
+netBotzPowerWattsSensorUnplugged NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Watts sensor unplugged."
+	::= { netBotzPowerWattsSensorTraps 0 6 }
+
+netBotzPowerWattsSensorReplugged NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Watts sensor no longer unplugged."
+	::= { netBotzPowerWattsSensorTraps 0 106 }
+    
+netBotzPowerWattsSensorIncreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Watts sensor value increasing too quickly."
+	::= { netBotzPowerWattsSensorTraps 0 8 }
+
+netBotzPowerWattsSensorNotIncreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Watts sensor value no longer increasing too quickly."
+	::= { netBotzPowerWattsSensorTraps 0 108 }
+
+netBotzPowerWattsSensorDecreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Watts sensor value decreasing too quickly."
+	::= { netBotzPowerWattsSensorTraps 0 9 }
+
+netBotzPowerWattsSensorNotDecreasingTooQuickly NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION
+	"Power Watts sensor value no longer decreasing too quickly."
+	::= { netBotzPowerWattsSensorTraps 0 109 }
+
+netBotzPowerWattsSensorError NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Watts sensor error."
+	::= { netBotzPowerWattsSensorTraps 0 1 }
+
+netBotzPowerWattsSensorErrorRTN NOTIFICATION-TYPE
+	OBJECTS {
+		netBotzTrapErrorID,	
+		netBotzTrapErrorType,
+		netBotzTrapErrorTypeLabel,
+		netBotzTrapSensorID,
+		netBotzTrapSensorLabel,
+		netBotzTrapPodID,
+		netBotzTrapPodLabel,
+		netBotzTrapPortID,
+		netBotzTrapPortLabel,
+		netBotzTrapStartTime,
+		netBotzTrapNotifyTime,
+		netBotzTrapResolveTime,
+		netBotzTrapSeverity,
+		netBotzTrapSensorValue,
+		netBotzTrapSensorValueInt,
+		netBotzTrapSensorValueFraction
+		}
+	STATUS		current
+	DESCRIPTION 
+	"Power Watts sensor error resolved."
+	::= { netBotzPowerWattsSensorTraps 0 101 }
+    
 END

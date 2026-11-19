@@ -58,4 +58,14 @@ class UserFuncHelper
 
         return (int) ((int) $h * 60 + (int) $m + (int) $s / 60);
     }
+
+    /**
+     * Reduce a bitmap to its highest set bit, e.g. 24 (16 + 8) becomes 16
+     */
+    public function highestBit(): int
+    {
+        $value = (int) $this->value;
+
+        return $value > 0 ? 1 << (strlen(decbin($value)) - 1) : 0;
+    }
 }

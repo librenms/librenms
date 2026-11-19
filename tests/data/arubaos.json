@@ -20781,7 +20781,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.0",
                     "processor_index": "0",
@@ -20792,7 +20791,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.1",
                     "processor_index": "1",
@@ -20803,7 +20801,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.2",
                     "processor_index": "2",
@@ -20814,7 +20811,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.3",
                     "processor_index": "3",
@@ -20825,7 +20821,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.4",
                     "processor_index": "4",
@@ -20836,7 +20831,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.5",
                     "processor_index": "5",
@@ -20847,7 +20841,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.6",
                     "processor_index": "6",
@@ -20858,7 +20851,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.7",
                     "processor_index": "7",
@@ -20869,7 +20861,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.8",
                     "processor_index": "8",
@@ -20880,7 +20871,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.9",
                     "processor_index": "9",
@@ -20891,7 +20881,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.10",
                     "processor_index": "10",
@@ -20902,7 +20891,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.11",
                     "processor_index": "11",
@@ -20913,7 +20901,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.12",
                     "processor_index": "12",
@@ -20924,7 +20911,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.13",
                     "processor_index": "13",
@@ -20935,7 +20921,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.14",
                     "processor_index": "14",
@@ -20946,7 +20931,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.15",
                     "processor_index": "15",
@@ -20957,7 +20941,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.16",
                     "processor_index": "16",
@@ -20968,7 +20951,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.17",
                     "processor_index": "17",
@@ -20979,7 +20961,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.18",
                     "processor_index": "18",
@@ -20990,7 +20971,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.19",
                     "processor_index": "19",
@@ -21001,7 +20981,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.20",
                     "processor_index": "20",
@@ -21012,7 +20991,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.21",
                     "processor_index": "21",
@@ -21023,7 +21001,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.22",
                     "processor_index": "22",
@@ -21034,7 +21011,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.23",
                     "processor_index": "23",
@@ -21045,7 +21021,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.24",
                     "processor_index": "24",
@@ -21056,7 +21031,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.25",
                     "processor_index": "25",
@@ -21067,7 +21041,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.26",
                     "processor_index": "26",
@@ -21078,7 +21051,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.27",
                     "processor_index": "27",
@@ -21089,7 +21061,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.28",
                     "processor_index": "28",
@@ -21100,7 +21071,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.29",
                     "processor_index": "29",
@@ -21111,7 +21081,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.30",
                     "processor_index": "30",
@@ -21122,7 +21091,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.14823.2.2.1.2.1.13.1.3.31",
                     "processor_index": "31",
@@ -21195,6 +21163,7 @@
                     "sensor_type": "arubaos",
                     "sensor_descr": "CPU temperature C",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 58,
@@ -21409,6 +21378,202 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_oids": "[\".1.3.6.1.4.1.14823.2.2.1.1.3.2.0\"]",
                     "rrd_type": "GAUGE"
+                }
+            ]
+        }
+    },
+    "fdb-table": {
+        "discovery": {
+            "ports_fdb": [
+                {
+                    "mac_address": "000c291c7f10",
+                    "vlan": 10,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "0025900b5fb0",
+                    "vlan": 10,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "002590369ce0",
+                    "vlan": 10,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c2904e3ca",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c2905cc35",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c2906ff68",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c291aa792",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c291c7f10",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c292701fa",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c292f862e",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c29358d6d",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c29470460",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c297fcaca",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c29a4ae66",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c29b36892",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c29d92d7d",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "00259005cbd2",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "0025900fe285",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "00259011ed7b",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "00259013bbae",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "002590299a50",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "0025905d1d26",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "00259070ad42",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "0025909667cf",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "002590de0270",
+                    "vlan": 20,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c291c7f10",
+                    "vlan": 30,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c292701f9",
+                    "vlan": 30,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c292f8638",
+                    "vlan": 30,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c29358d77",
+                    "vlan": 30,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c2975b363",
+                    "vlan": 30,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c297fcad4",
+                    "vlan": 30,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c29a4ae5c",
+                    "vlan": 30,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c29b17f6d",
+                    "vlan": 30,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "000c29d92d73",
+                    "vlan": 30,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "0025900fcb29",
+                    "vlan": 30,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "0025902e8c37",
+                    "vlan": 30,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "00259030699e",
+                    "vlan": 30,
+                    "ifIndex": null
+                },
+                {
+                    "mac_address": "002590625688",
+                    "vlan": 30,
+                    "ifIndex": null
                 }
             ]
         }

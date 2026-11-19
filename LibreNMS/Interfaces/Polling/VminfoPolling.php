@@ -26,16 +26,19 @@
 
 namespace LibreNMS\Interfaces\Polling;
 
+use App\Data\TimeSeries\MetricCollector;
 use App\Models\Vminfo;
 use Illuminate\Support\Collection;
+use LibreNMS\Interfaces\VminfoSource;
 
-interface VminfoPolling
+interface VminfoPolling extends VminfoSource
 {
     /**
      * Poll the given VMs
      *
-     * @param  Collection<Vminfo>  $vms
-     * @return Collection<Vminfo>
+     * @param  Collection<int, Vminfo>  $vms
+     * @param  MetricCollector<Vminfo>  $metrics
+     * @return Collection<int, Vminfo>
      */
-    public function pollVminfo(Collection $vms): Collection;
+    public function pollVminfo(Collection $vms, MetricCollector $metrics): Collection;
 }

@@ -128,4 +128,29 @@ final class StringHelperTest extends TestCase
         $this->assertSame('41 42', StringHelpers::decodeSnmpHexText('41 42'));
         $this->assertSame('', StringHelpers::decodeSnmpHexText(''));
     }
+
+    public function testHasNumber(): void
+    {
+        $this->assertTrue(StringHelpers::hasNumber('123'));
+        $this->assertTrue(StringHelpers::hasNumber('123.45'));
+        $this->assertTrue(StringHelpers::hasNumber('123.'));
+        $this->assertTrue(StringHelpers::hasNumber('.30'));
+        $this->assertTrue(StringHelpers::hasNumber('.5'));
+        $this->assertTrue(StringHelpers::hasNumber('-123'));
+        $this->assertTrue(StringHelpers::hasNumber('-123.45'));
+        $this->assertTrue(StringHelpers::hasNumber('-.30'));
+        $this->assertTrue(StringHelpers::hasNumber('  123'));
+        $this->assertTrue(StringHelpers::hasNumber('  .30'));
+        $this->assertTrue(StringHelpers::hasNumber('0'));
+        $this->assertTrue(StringHelpers::hasNumber('0.0'));
+        $this->assertTrue(StringHelpers::hasNumber('123abc'));
+
+        $this->assertFalse(StringHelpers::hasNumber(''));
+        $this->assertFalse(StringHelpers::hasNumber('abc'));
+        $this->assertFalse(StringHelpers::hasNumber('abc123'));
+        $this->assertFalse(StringHelpers::hasNumber('.'));
+        $this->assertFalse(StringHelpers::hasNumber('-.'));
+        $this->assertFalse(StringHelpers::hasNumber('  abc'));
+        $this->assertFalse(StringHelpers::hasNumber('  .'));
+    }
 }

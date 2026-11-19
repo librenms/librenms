@@ -20,13 +20,13 @@
         var grid = $("#syslog-{{ $id }}").bootgrid({
             ajax: true,
             rowCount: [50, 100, 250, -1],
-            navigation: ! {{ $hidenavigation }},
+            navigation: @json(! $hidenavigation),
             post: function ()
             {
                 return {
-                    device: '{{ $device ?: '' }}',
-                    device_group: '{{ $device_group }}',
-                    level: '{{ $level }}'
+                    device: @json($device ?: ''),
+                    device_group: @json($device_group),
+                    level: @json($level)
                 };
             },
             url: "{{ url('/ajax/table/syslog') }}"

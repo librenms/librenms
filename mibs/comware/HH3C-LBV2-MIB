@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: Private MIB File For LB
 -- Reference:
--- Version: V1.3
+-- Version: V1.6
 -- History:
 -- V1.0  2013-11 Initial Version created by y04448.
 -- V1.1  2014-04 updated by yuhongqiang.
@@ -21,11 +21,34 @@
 --         hh3cLBv2RSAvailableTrap, hh3cLBv2RSUnavailableTrap, hh3cLBv2SFActiveTrap,
 --         hh3cLBv2SFInactiveTrap, hh3cLBv2ActionInUseSFChangeTrap, hh3cLBv2VSInUseSFChangeTrap  by l08992.
 -- V1.3  2019-05 updated by m16825.
---         Add the following MIB table:
+--       Add the following MIB table:
 --         hh3cLBv2GlobalStatsTable
 --       Add the following MIB nodes:
 --         hh3cLBv2GlobalStatChassis,hh3cLBv2GlobalStatSlot,hh3cLBv2GlobalStatCpuid,
 --         hh3cLBv2GlobalStatTotalConnections, hh3cLBv2GlobalStatActiveConnections,hh3cLBv2GlobalStatConnectionsRate.
+-- V1.4  2021-11 updated by q08977
+--       Add the following MIB nodes:
+--         hh3cLBv2GlobalStatSSLActiveConn, hh3cLBv2GlobalStatSSLConnRate,
+--         hh3cLBv2VSSFCount, hh3cLBv2VSAddressIPv4, hh3cLBv2VSAddressIPv4MaskLen,
+--         hh3cLBv2VSAddressIPv6, hh3cLBv2VSAddressIPv6PrefixLen, hh3cLBv2VSPortNumber,
+--         hh3cLBv2VSStatThroughputIn, hh3cLBv2VSStatThroughputOut,
+--         hh3cLBv2VSStatSSLActiveConn, hh3cLBv2VSStatSSLConnRate,
+--         hh3cLBv2VSTotalCount, hh3cLBv2RSAddressIPv4, hh3cLBv2RSAddressIPv6,
+--         hh3cLBv2RSPortNumber, hh3cLBv2RSTotalCount, hh3cLBv2SFMemberCount,
+--         hh3cLBv2SFStatThroughputIn,hh3cLBv2SFStatThroughputOut,
+--         hh3cLBv2SFActiveMemberCount, hh3cLBv2SFTotalCount.
+-- V1.5 2021-12 updated by q08977
+--       Add the following MIB nodes:
+--         hh3cLBv2RSIndex, hh3cLBv2SFIndex, hh3cLBv2SFStatConnRate
+--       Add the following MIB table:
+--         hh3cLBv2SFMemberStatsTable
+-- V1.6 2022-8 updated by q08977
+--       Add the following MIB table:
+--         hh3cLBv2OverallStatsObjects, hh3cLBv2TrapObjects
+--       Add the following MIB nodes:
+--         hh3cLBv2RSProbeFailedTrap, hh3cLBv2RSProbeRecoveryTrap,
+--         hh3cLBv2SFMemberProbeFailedTrap, hh3cLBv2SFMemberProbeRecoveryTrap,
+--         hh3cLBv2LinkProbeFailedTrap, hh3cLBv2LinkProbeRecoveryTrap
 -- =================================================================
 HH3C-LBV2-MIB DEFINITIONS ::= BEGIN
 
@@ -35,10 +58,14 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter64, NOTIFICATION-TYPE, Gauge32
         FROM SNMPv2-SMI         -- [RFC2578]
     RowStatus, DisplayString
-        FROM SNMPv2-TC;         -- [RFC2578]
+        FROM SNMPv2-TC          -- [RFC2578]
+    InetAddress, InetPortNumber
+        FROM INET-ADDRESS-MIB
+    CounterBasedGauge64
+        FROM HCNUM-TC;
 
 hh3cLBv2 MODULE-IDENTITY
-    LAST-UPDATED "201905130000Z"
+    LAST-UPDATED "202208220000Z"
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -50,6 +77,22 @@ hh3cLBv2 MODULE-IDENTITY
     DESCRIPTION
         "The private MIB file includes the LB information of
          the device."
+    REVISION      "202208220000Z"
+    DESCRIPTION
+        "Add MIB nodes hh3cLBv2RSProbeFailedTrap, hh3cLBv2RSProbeRecoveryTrap,
+         hh3cLBv2SFMemberProbeFailedTrap,hh3cLBv2SFMemberProbeRecoveryTrap,
+         hh3cLBv2LinkProbeFailedTrap, hh3cLBv2LinkProbeRecoveryTrap.
+         Add MIB table hh3cLBv2OverallStatsObjects, hh3cLBv2TrapObjects."
+    REVISION      "202112170000Z"
+    DESCRIPTION
+        "Add MIB nodes hh3cLBv2RSIndex, hh3cLBv2SFIndex, hh3cLBv2SFStatConnRate.
+         Add MIB table hh3cLBv2SFMemberStatsTable."
+    REVISION      "202111080000Z"
+    DESCRIPTION
+        "Add MIB nodes to hh3cLBv2GlobalStatsTable, hh3cLBv2VSTable,
+         hh3cLBv2VSStatsTable, hh3cLBv2RSTable and hh3cLBv2SFTable.
+         Add MIB nodes hh3cLBv2VSTotalCount, hh3cLBv2RSTotalCount and
+         hh3cLBv2SFTotalCount."
     REVISION      "201905130000Z"
     DESCRIPTION
         "Add MIB table hh3cLBv2GlobalStatsTable."
@@ -105,7 +148,9 @@ Hh3cLBv2GlobalStatsEntry  ::=
         hh3cLBv2GlobalStatCpuid                    Unsigned32,
         hh3cLBv2GlobalStatTotalConnections         Counter64,
         hh3cLBv2GlobalStatActiveConnections        Gauge32,
-        hh3cLBv2GlobalStatConnectionsRate          Gauge32
+        hh3cLBv2GlobalStatConnectionsRate          Gauge32,
+        hh3cLBv2GlobalStatSSLActiveConn            Gauge32,
+        hh3cLBv2GlobalStatSSLConnRate              Gauge32
     }
 
 hh3cLBv2GlobalStatChassis OBJECT-TYPE
@@ -156,6 +201,42 @@ hh3cLBv2GlobalStatConnectionsRate OBJECT-TYPE
     DESCRIPTION
         "Connection rate of LB."
     ::= { hh3cLBv2GlobalStatsEntry 6 }
+
+hh3cLBv2GlobalStatSSLActiveConn OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Active SSL connections of LB."
+    ::= { hh3cLBv2GlobalStatsEntry 7}
+
+hh3cLBv2GlobalStatSSLConnRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "cps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "SSL connection rate of LB."
+    ::= { hh3cLBv2GlobalStatsEntry 8 }
+
+hh3cLBv2OverallStatsObjects OBJECT IDENTIFIER ::= { hh3cLBv2GlobalObjects 3 }
+
+hh3cLBv2OverallStatsActiveConn OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Active connections of LB for the entire device."
+    ::= { hh3cLBv2OverallStatsObjects 1 }
+
+hh3cLBv2OverallStatsConnRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "cps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Connection rate of LB for the entire device."
+    ::= { hh3cLBv2OverallStatsObjects 2 }
 
 hh3cLBv2ActionTables OBJECT IDENTIFIER ::= { hh3cLBv2 2 }
 -- =================================================================
@@ -263,7 +344,13 @@ Hh3cLBv2VSEntry  ::=
         hh3cLBv2VSDefaultSF                    DisplayString,
         hh3cLBv2VSBackupSF                     DisplayString,
         hh3cLBv2VSInUseSF                      DisplayString,
-        hh3cLBv2VSRowStatus                    RowStatus
+        hh3cLBv2VSRowStatus                    RowStatus,
+        hh3cLBv2VSSFCount                      Unsigned32,
+        hh3cLBv2VSAddressIPv4                  InetAddress,
+        hh3cLBv2VSAddressIPv4MaskLen           Unsigned32,
+        hh3cLBv2VSAddressIPv6                  InetAddress,
+        hh3cLBv2VSAddressIPv6PrefixLen         Unsigned32,
+        hh3cLBv2VSPortNumber                   InetPortNumber
     }
 
 hh3cLBv2VSName OBJECT-TYPE
@@ -329,6 +416,54 @@ hh3cLBv2VSRowStatus OBJECT-TYPE
          default server farm and backup server farm are optional."
     ::= { hh3cLBv2VSEntry 7 }
 
+hh3cLBv2VSSFCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of server farms associated with the virtual server."
+    ::= { hh3cLBv2VSEntry 8 }
+
+hh3cLBv2VSAddressIPv4  OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IPv4 address of the virtual server."
+    ::= { hh3cLBv2VSEntry 9 }
+
+hh3cLBv2VSAddressIPv4MaskLen  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The mask length for the virtual server IPv4 address."
+    ::= { hh3cLBv2VSEntry 10 }
+
+hh3cLBv2VSAddressIPv6  OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IPv6 address of the virtual server."
+    ::= { hh3cLBv2VSEntry 11 }
+
+hh3cLBv2VSAddressIPv6PrefixLen  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The prefix length for the virtual server IPv6 address."
+    ::= { hh3cLBv2VSEntry 12 }
+
+hh3cLBv2VSPortNumber  OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The port number of the virtual server."
+    ::= { hh3cLBv2VSEntry 13 }
+
 -- =================================================================
 --    LB Virtual Server Statistic Table
 -- =================================================================
@@ -368,7 +503,11 @@ Hh3cLBv2VSStatsEntry  ::=
         hh3cLBv2VSStatClientSideBytesOut       Counter64,
         hh3cLBv2VSStatReceivedRequests         Counter64,
         hh3cLBv2VSStatSentResponses            Counter64,
-        hh3cLBv2VSStatConnectionsRate          Unsigned32
+        hh3cLBv2VSStatConnectionsRate          Unsigned32,
+        hh3cLBv2VSStatThroughputIn             CounterBasedGauge64,
+        hh3cLBv2VSStatThroughputOut            CounterBasedGauge64,
+        hh3cLBv2VSStatSSLActiveConn            Unsigned32,
+        hh3cLBv2VSStatSSLConnRate              Unsigned32
     }
 
 hh3cLBv2VSStatChassis OBJECT-TYPE
@@ -478,6 +617,49 @@ hh3cLBv2VSStatConnectionsRate OBJECT-TYPE
         "Connections rate of the virtual server."
     ::= { hh3cLBv2VSStatsEntry 13 }
 
+hh3cLBv2VSStatThroughputIn OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "bps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Inbound packet throughput in bps."
+    ::= { hh3cLBv2VSStatsEntry 14 }
+
+hh3cLBv2VSStatThroughputOut OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "bps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Outbound packet throughput in bps."
+    ::= { hh3cLBv2VSStatsEntry 15 }
+
+hh3cLBv2VSStatSSLActiveConn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Active SSL connections that the virtual server received."
+    ::= { hh3cLBv2VSStatsEntry 16 }
+
+hh3cLBv2VSStatSSLConnRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "cps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "SSL connection rate of the virtual server."
+    ::= { hh3cLBv2VSStatsEntry 17 }
+
+hh3cLBv2VSTotalCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of virtual servers."
+    ::= { hh3cLBv2VSTables 3 }
+
 hh3cLBv2RSTables OBJECT IDENTIFIER ::= { hh3cLBv2 4 }
 -- =================================================================
 --    LB Real Server Table
@@ -506,7 +688,11 @@ Hh3cLBv2RSEntry  ::=
         hh3cLBv2RSName                         DisplayString,
         hh3cLBv2RSRowStatus                    RowStatus,
         hh3cLBv2RSConnectionsLimit             Unsigned32,
-        hh3cLBv2RSConnectionsRateLimit         Unsigned32
+        hh3cLBv2RSConnectionsRateLimit         Unsigned32,
+        hh3cLBv2RSAddressIPv4                  InetAddress,
+        hh3cLBv2RSAddressIPv6                  InetAddress,
+        hh3cLBv2RSPortNumber                   InetPortNumber,
+        hh3cLBv2RSIndex                        Unsigned32
     }
 
 hh3cLBv2RSName OBJECT-TYPE
@@ -544,6 +730,38 @@ hh3cLBv2RSConnectionsRateLimit OBJECT-TYPE
          no limit."
     DEFVAL { 0 }
     ::= { hh3cLBv2RSEntry 4 }
+
+hh3cLBv2RSAddressIPv4  OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IPv4 address of the real server."
+    ::= { hh3cLBv2RSEntry 5 }
+
+hh3cLBv2RSAddressIPv6  OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IPv6 address of the real server."
+    ::= { hh3cLBv2RSEntry 6 }
+
+hh3cLBv2RSPortNumber  OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The port number of the real server."
+    ::= { hh3cLBv2RSEntry 7 }
+
+hh3cLBv2RSIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index of the real server."
+    ::= { hh3cLBv2RSEntry 8 }
 
 -- =================================================================
 --    LB Real Server Statistic Table
@@ -694,6 +912,14 @@ hh3cLBv2RSStatConnectionsRate OBJECT-TYPE
         "Connections rate of the real server."
     ::= { hh3cLBv2RSStatsEntry 13 }
 
+hh3cLBv2RSTotalCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of real servers."
+    ::= { hh3cLBv2RSTables 3 }
+
 hh3cLBv2SFTables OBJECT IDENTIFIER ::= { hh3cLBv2 5 }
 -- =================================================================
 --    LB Server Farm Table
@@ -720,7 +946,10 @@ hh3cLBv2SFEntry OBJECT-TYPE
 Hh3cLBv2SFEntry  ::=
     SEQUENCE{
         hh3cLBv2SFName                         DisplayString,
-        hh3cLBv2SFRowStatus                    RowStatus
+        hh3cLBv2SFRowStatus                    RowStatus,
+        hh3cLBv2SFMemberCount                  Unsigned32,
+        hh3cLBv2SFActiveMemberCount            Unsigned32,
+        hh3cLBv2SFIndex                        Unsigned32
     }
 
 hh3cLBv2SFName OBJECT-TYPE
@@ -738,6 +967,30 @@ hh3cLBv2SFRowStatus OBJECT-TYPE
     DESCRIPTION
         "Status of this conceptual row."
     ::= { hh3cLBv2SFEntry 2 }
+
+hh3cLBv2SFMemberCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of members in the server farm."
+    ::= { hh3cLBv2SFEntry 3 }
+
+hh3cLBv2SFActiveMemberCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of active members in the server farm."
+    ::= { hh3cLBv2SFEntry 4 }
+
+hh3cLBv2SFIndex  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index of the server farm."
+    ::= { hh3cLBv2SFEntry 5 }
 
 -- =================================================================
 --    LB Server Farm Statistic Table
@@ -777,7 +1030,10 @@ Hh3cLBv2SFStatsEntry  ::=
         hh3cLBv2SFStatServerSideBytesIn        Counter64,
         hh3cLBv2SFStatServerSideBytesOut       Counter64,
         hh3cLBv2SFStatReceivedRequests         Counter64,
-        hh3cLBv2SFStatSentResponses            Counter64
+        hh3cLBv2SFStatSentResponses            Counter64,
+        hh3cLBv2SFStatThroughputIn             CounterBasedGauge64,
+        hh3cLBv2SFStatThroughputOut            CounterBasedGauge64,
+        hh3cLBv2SFStatConnRate                 Gauge32
     }
 
 hh3cLBv2SFStatChassis OBJECT-TYPE
@@ -878,6 +1134,173 @@ hh3cLBv2SFStatSentResponses OBJECT-TYPE
     DESCRIPTION
         "Number of responses that the server farm sent to device."
     ::= { hh3cLBv2SFStatsEntry 12 }
+
+hh3cLBv2SFStatThroughputIn OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "bps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Inbound packet throughput in bps."
+    ::= { hh3cLBv2SFStatsEntry 13 }
+
+hh3cLBv2SFStatThroughputOut OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "bps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Outbound packet throughput in bps."
+    ::= { hh3cLBv2SFStatsEntry 14 }
+
+hh3cLBv2SFStatConnRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Connection rate of the server farm."
+    ::= { hh3cLBv2SFStatsEntry 15 }
+
+hh3cLBv2SFTotalCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of server farms."
+    ::= { hh3cLBv2SFTables 3 }
+
+-- =================================================================
+--    LB Server Farm Member Statistic Table
+-- =================================================================
+hh3cLBv2SFMemberStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cLBv2SFMemberStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Server farm member statistics for LB."
+    ::= { hh3cLBv2SFTables 4 }
+
+hh3cLBv2SFMemberStatsEntry OBJECT-TYPE
+    SYNTAX      Hh3cLBv2SFMemberStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry contains the statistics of the server farm
+         member."
+    INDEX {
+            hh3cLBv2SFIndex,
+            hh3cLBv2RSIndex,
+            hh3cLBv2SFMemberStatPortIndex,
+            hh3cLBv2SFMemberStatChassis,
+            hh3cLBv2SFMemberStatSlot,
+            hh3cLBv2SFMemberStatCpuid
+          }
+    ::= { hh3cLBv2SFMemberStatsTable 1 }
+
+Hh3cLBv2SFMemberStatsEntry  ::=
+    SEQUENCE{
+        hh3cLBv2SFMemberStatPortIndex               InetPortNumber,
+        hh3cLBv2SFMemberStatChassis                 Unsigned32,
+        hh3cLBv2SFMemberStatSlot                    Unsigned32,
+        hh3cLBv2SFMemberStatCpuid                   Unsigned32,
+        hh3cLBv2SFMemberStatSFName                  DisplayString,
+        hh3cLBv2SFMemberStatRSName                  DisplayString,
+        hh3cLBv2SFMemberStatPortNumber              InetPortNumber,
+        hh3cLBv2SFMemberStatActiveConn              Gauge32,
+        hh3cLBv2SFMemberStatConnRate                Gauge32,
+        hh3cLBv2SFMemberStatThroughputIn            CounterBasedGauge64,
+        hh3cLBv2SFMemberStatThroughputOut           CounterBasedGauge64
+    }
+
+hh3cLBv2SFMemberStatPortIndex  OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The port number of the server farm member."
+    ::= { hh3cLBv2SFMemberStatsEntry 1 }
+
+hh3cLBv2SFMemberStatChassis OBJECT-TYPE
+    SYNTAX      Unsigned32(0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ID of the device that holds the card."
+    ::= { hh3cLBv2SFMemberStatsEntry 2 }
+
+hh3cLBv2SFMemberStatSlot OBJECT-TYPE
+    SYNTAX      Unsigned32(0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Member ID of the card on the device."
+    ::= { hh3cLBv2SFMemberStatsEntry 3 }
+
+hh3cLBv2SFMemberStatCpuid OBJECT-TYPE
+    SYNTAX      Unsigned32(0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ID of the CPU on the card."
+    ::= { hh3cLBv2SFMemberStatsEntry 4 }
+
+hh3cLBv2SFMemberStatSFName OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Server farm name of the server farm member."
+    ::= { hh3cLBv2SFMemberStatsEntry 5 }
+
+hh3cLBv2SFMemberStatRSName OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..63))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Real server name of the server farm member."
+    ::= { hh3cLBv2SFMemberStatsEntry 6 }
+
+hh3cLBv2SFMemberStatPortNumber  OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The port number of the server farm member."
+    ::= { hh3cLBv2SFMemberStatsEntry 7 }
+
+hh3cLBv2SFMemberStatActiveConn OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Active connections that the server farm member received."
+    ::= { hh3cLBv2SFMemberStatsEntry 8 }
+
+hh3cLBv2SFMemberStatConnRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Connection rate of the server farm member."
+    ::= { hh3cLBv2SFMemberStatsEntry 9 }
+
+hh3cLBv2SFMemberStatThroughputIn OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "bps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Inbound packet throughput in bps."
+    ::= { hh3cLBv2SFMemberStatsEntry 10 }
+
+hh3cLBv2SFMemberStatThroughputOut OBJECT-TYPE
+    SYNTAX      CounterBasedGauge64
+    UNITS       "bps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Outbound packet throughput in bps."
+    ::= { hh3cLBv2SFMemberStatsEntry 11 }
 
 -- =================================================================
 --    LB NOTIFICATION
@@ -1161,5 +1584,130 @@ hh3cLBv2RSConnsRateRecoveryTrap NOTIFICATION-TYPE
          when the connection rate of the real server is smaller than
          the upper limit."
     ::= { hh3cLBv2TrapPrefix 16 }
+
+-- =================================================================
+--    Real Server Probe Failed Notification
+-- =================================================================
+hh3cLBv2RSProbeFailedTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2RSName,
+            hh3cLBv2TrapObjProbeName
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2RSProbeFailedTrap notification is sent when the
+         state of the probe associated with the real server changes
+         to failed."
+    ::= { hh3cLBv2TrapPrefix 17 }
+
+-- =================================================================
+--    Real Server Probe Recovery Notification
+-- =================================================================
+hh3cLBv2RSProbeRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2RSName,
+            hh3cLBv2TrapObjProbeName
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2RSProbeRecoveryTrap notification is sent when the
+         state of the probe associated with the real server changes
+         from failed to succeeded."
+    ::= { hh3cLBv2TrapPrefix 18 }
+
+-- =================================================================
+--    Server Farm member Probe Failed Notification
+-- =================================================================
+hh3cLBv2SFMemberProbeFailedTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2SFName,
+            hh3cLBv2RSName,
+            hh3cLBv2TrapObjSFMemberPort,
+            hh3cLBv2TrapObjProbeName
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2SFMemberProbeFailedTrap notification is sent when the
+         state of the probe associated with the server farm member changes
+         to failed."
+    ::= { hh3cLBv2TrapPrefix 19 }
+
+-- =================================================================
+--    Server Farm member Probe Recovery Notification
+-- =================================================================
+hh3cLBv2SFMemberProbeRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2SFName,
+            hh3cLBv2RSName,
+            hh3cLBv2TrapObjSFMemberPort,
+            hh3cLBv2TrapObjProbeName
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2SFMemberProbeRecoveryTrap notification is sent when the
+         state of the probe associated with the server farm member changes
+         from failed to succeeded."
+    ::= { hh3cLBv2TrapPrefix 20 }
+
+-- =================================================================
+--   Link Probe Failed Notification
+-- =================================================================
+hh3cLBv2LinkProbeFailedTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2TrapObjLinkName,
+            hh3cLBv2TrapObjProbeName
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2LinkProbeFailedTrap notification is sent when the
+         state of the probe associated with the link changes to failed."
+    ::= { hh3cLBv2TrapPrefix 21 }
+
+-- =================================================================
+--    Link Probe Recovery Notification
+-- =================================================================
+hh3cLBv2LinkProbeRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBv2TrapObjLinkName,
+            hh3cLBv2TrapObjProbeName
+        }
+    STATUS      current
+    DESCRIPTION
+        "A hh3cLBv2LinkProbeRecoveryTrap notification is sent when the
+         state of the probe associated with the link changes from failed
+         to succeeded."
+    ::= { hh3cLBv2TrapPrefix 22 }
+
+hh3cLBv2TrapObjects OBJECT IDENTIFIER ::= { hh3cLBv2Trap 1 }
+
+hh3cLBv2TrapObjLinkName OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..63))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Name of the link."
+    ::= { hh3cLBv2TrapObjects 1 }
+
+hh3cLBv2TrapObjProbeName OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..63))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Name of the probe."
+    ::= { hh3cLBv2TrapObjects 2 }
+
+hh3cLBv2TrapObjSFMemberPort OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Port number of the server farm member."
+    ::= { hh3cLBv2TrapObjects 3 }
 
 END

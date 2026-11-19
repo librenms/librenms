@@ -97,11 +97,9 @@ class SensorController extends SelectController
      */
     public function formatItem(Model $model): array
     {
-        $classDescr = ucfirst((string) $model->sensor_class);
-
         return [
             'id' => $model->sensor_id,
-            'text' => $model->device->shortDisplayName() . ' - ' . $model->sensor_descr . ' (' . $classDescr . ')',
+            'text' => $model->device->shortDisplayName() . ' - ' . $model->sensor_descr . ' (' . $model->classDescr() . ')',
             'device_id' => $model->device_id,
             'sensor_class' => $model->sensor_class,
         ];
