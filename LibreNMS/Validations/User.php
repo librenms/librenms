@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use LibreNMS\Util\EnvHelper;
 use LibreNMS\Util\Git;
+use LibreNMS\Util\SystemUser;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
@@ -45,11 +46,11 @@ class User extends BaseValidation
     public function validate(Validator $validator): void
     {
         // Check we are running this as the root user
-        $username = $validator->getUsername();
+        $username = SystemUser::name();
         $lnms_username = \config('librenms.user');
         $lnms_groupname = \config('librenms.group');
 
-        if (! ($username === 'root' || $username === $lnms_username)) {
+        if (! (SystemUser::isRoot() || $username === $lnms_username)) {
             if (App::runningInConsole()) {
                 $validator->fail("You need to run this script as '$lnms_username' or root");
             } elseif (function_exists('posix_getgrnam')) {
