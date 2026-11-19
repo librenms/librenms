@@ -331,6 +331,8 @@
             if (node.label_stroke_colour) {
                 node_cfg.font.strokeWidth = 3;
                 node_cfg.font.strokeColor = node.label_stroke_colour;
+            } else {
+                node_cfg.font.strokeWidth = 0;
             }
             if (node.label_offset_y != null) {
                 node_cfg.font.vadjust = node.label_offset_y;
@@ -424,6 +426,8 @@
             if (edge.label_stroke_colour) {
                 mid_font.strokeWidth = 3;
                 mid_font.strokeColor = edge.label_stroke_colour;
+            } else {
+                mid_font.strokeWidth = 0;
             }
 
             return {

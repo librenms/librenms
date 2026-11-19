@@ -506,10 +506,10 @@
 
         // Label vertical offset
         var loy = parseInt(nodeconf.label_offset_y) || 0;
-        if (loy !== 0 && loy === nodeTopLabelOffset(nodeconf.size, nodeconf.font.size)) {
-            $("#nodelabeloffset").val('top');
-            $("#nodelabeloffset-custom").hide();
-        } else if (loy !== 0) {
+        // A stored offset is always restored as Custom: the selected position is not persisted,
+        // so a value that happens to match the Top preset cannot be told apart from a custom one.
+        // Explicitly selecting Top still applies the calculated offset on save.
+        if (loy !== 0) {
             $("#nodelabeloffset").val('custom');
             $("#nodelabeloffset-val").val(loy);
             $("#nodelabeloffset-custom").show();
