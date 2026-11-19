@@ -8,7 +8,7 @@ class Portactivity extends ApplicationDefinition
 {
     public const string TYPE = 'portactivity';
 
-    protected const ?array OVERVIEW = [];
+    protected const ?array OVERVIEW = ['ports'];
 
     protected const array GRAPHS = [
         'totals' => 'Total Connections',
