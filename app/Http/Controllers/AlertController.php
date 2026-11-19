@@ -17,7 +17,9 @@ class AlertController extends Controller
 {
     public function showNote(AlertFault $fault): JsonResponse
     {
-        $this->authorizeNote('view', $fault);
+        $alert = Alert::query()->where('rule_id', $fault->rule_id)->where('device_id', $fault->device_id)->first();
+        abort_unless($alert !== null, 403, __('You are not authorised to access this alert'));
+        $this->authorize('view', $alert);
 
         return response()->json([
             'status' => 'ok',
@@ -28,7 +30,9 @@ class AlertController extends Controller
 
     public function updateNote(Request $request, AlertFault $fault): JsonResponse
     {
-        $this->authorizeNote('update', $fault);
+        $alert = Alert::query()->where('rule_id', $fault->rule_id)->where('device_id', $fault->device_id)->first();
+        abort_unless($alert !== null, 403, __('You are not authorised to access this alert'));
+        $this->authorize('update', $alert);
 
         $validated = $request->validate(['note' => 'nullable|string']);
         $note = strip_tags($validated['note'] ?? '');
@@ -128,12 +132,5 @@ class AlertController extends Controller
             'message' => 'Fault has not been acknowledged.',
             'status' => 'error',
         ]);
-    }
-
-    private function authorizeNote(string $ability, AlertFault $fault): void
-    {
-        $alert = Alert::query()->where('rule_id', $fault->rule_id)->where('device_id', $fault->device_id)->first();
-        abort_unless($alert !== null, 403, __('You are not authorised to access this alert'));
-        $this->authorize($ability, $alert);
     }
 }

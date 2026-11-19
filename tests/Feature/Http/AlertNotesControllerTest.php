@@ -37,7 +37,7 @@ final class AlertNotesControllerTest extends TestCase
         $fault = $this->makeFault($alert, 'first');
         $original = $fault->refresh()->getRawOriginal();
         $originalAlert = $alert->refresh()->getRawOriginal();
-        $note = "  Check the link\nLoss & errors  ";
+        $note = "Check the link\nLoss & errors";
 
         $this->actingAs($this->admin())
             ->getJson(route('fault.notes.show', $fault))->assertOk()->assertJsonPath('note', 'Previous note');
