@@ -65,18 +65,6 @@ function graph_error($text, $short = null, $color = [128, 0, 0])
     echo LibreNMS\Util\Graph::error($text, $short, 300, null, $color);
 }
 
-function get_url()
-{
-    // http://stackoverflow.com/questions/2820723/how-to-get-base-url-with-php
-    // http://stackoverflow.com/users/184600/ma%C4%8Dek
-    return sprintf(
-        '%s://%s%s',
-        isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
-        $_SERVER['SERVER_NAME'],
-        $_SERVER['REQUEST_URI']
-    );
-}//end get_url()
-
 /**
  * Return the rows from 'ports' for all ports of a certain type as parsed by port_descr_parser.
  * One or an array of strings can be provided as an argument; if an array is passed, all ports matching

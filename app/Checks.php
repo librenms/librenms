@@ -57,7 +57,7 @@ class Checks
         if (Gate::allows('notification.update')) { // FIXME correct permission check?
             $notifications = Notification::isUnread($user)->where('severity', '>', Severity::Ok->value)->get();
             foreach ($notifications as $notification) {
-                toast()->warning($notification->title, "<a href='notifications/'>$notification->body</a>");
+                toast()->warning($notification->title, '<a href="' . route('notifications.index') . '">' . $notification->body . '</a>');
             }
 
             if (version_compare(PHP_VERSION, Php::PHP_MIN_VERSION, '<')) {
