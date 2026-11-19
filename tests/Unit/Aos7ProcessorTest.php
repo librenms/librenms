@@ -21,6 +21,11 @@ class Aos7ProcessorTest extends TestCase
         $this->assertEquals(22, $processors[0]->processor_usage);
     }
 
+    public function testMissingChassisIdKeepsLegacyCmmCpu(): void
+    {
+        $this->assertSame(['0'], $this->discover([], [0 => '22'])->pluck('processor_index')->all());
+    }
+
     public function testUnconfiguredChassisDoesNotInventFallbackWhenCmmIsMissing(): void
     {
         $processors = $this->discover([1 => '0'], [1 => '24']);
@@ -41,23 +46,15 @@ class Aos7ProcessorTest extends TestCase
         $this->assertCount(0, $this->discover([0 => '0', 1 => '0'], [0 => '101', 1 => '-1']));
     }
 
-    public function testProcessorAndMemoryDiscoveryReuseChassisIds(): void
+    public function testChassisUsesItsFirstNumberedSlot(): void
     {
-        $query = Mockery::mock(SnmpQueryBuilder::class);
-        foreach ([
-            ['ALCATEL-IND1-HEALTH-MIB::healthModuleChassisId', 1001, '2'],
-            ['ALCATEL-IND1-HEALTH-MIB::healthModuleCpu1MinAvg', 1001, '22'],
-            ['ALCATEL-IND1-HEALTH-MIB::healthModuleMemory1MinAvg', 1001, '65'],
-            ['ALCATEL-IND1-SYSTEM-MIB::systemVcHardwareMemorySize', 2, '880918528'],
-        ] as [$oid, $index, $value]) {
-            $query->shouldReceive('walk')->with($oid)->once()->andReturn(new SnmpResponse(["$oid.$index" => $value]));
-        }
-        $this->app->instance(SnmpQueryBuilder::class, $query);
+        $processors = $this->discover(
+            [1000 => '2', 1001 => '2', 1002 => '2'],
+            [1000 => '20', 1001 => '22', 1002 => '24'],
+        );
 
-        $device = ['os' => 'aos7'];
-        $os = OS::make($device);
-        $this->assertSame(['vc.2'], $os->discoverProcessors()->pluck('processor_index')->all());
-        $this->assertSame(['vc.2'], $os->discoverMempools()->pluck('mempool_index')->all());
+        $this->assertSame(['vc.2'], $processors->pluck('processor_index')->all());
+        $this->assertEquals(22, $processors[0]->processor_usage);
     }
 
     /**
@@ -67,14 +64,17 @@ class Aos7ProcessorTest extends TestCase
      */
     private function discover(array $chassisIds, array $usage): \Illuminate\Support\Collection
     {
-        $prefix = 'ALCATEL-IND1-HEALTH-MIB::';
+        $cpu = 'ALCATEL-IND1-HEALTH-MIB::healthModuleCpu1MinAvg';
+        $chassis = 'ALCATEL-IND1-HEALTH-MIB::healthModuleChassisId';
+
         $query = Mockery::mock(SnmpQueryBuilder::class);
-        foreach (['healthModuleCpu1MinAvg' => $usage, 'healthModuleChassisId' => $chassisIds] as $oid => $values) {
+        $query->shouldReceive('enumStrings', 'numericIndex', 'displayHints')->andReturnSelf();
+        foreach ([$cpu => $usage, $chassis => $chassisIds] as $oid => $values) {
             $response = [];
             foreach ($values as $index => $value) {
-                $response["$prefix$oid.$index"] = $value;
+                $response["$oid.$index"] = $value;
             }
-            $query->shouldReceive('walk')->with("$prefix$oid")->andReturn(new SnmpResponse($response));
+            $query->shouldReceive('walk')->with($oid === $chassis ? [$oid] : $oid)->andReturn(new SnmpResponse($response));
         }
         $this->app->instance(SnmpQueryBuilder::class, $query);
 

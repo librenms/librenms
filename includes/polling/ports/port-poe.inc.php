@@ -10,8 +10,8 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('PortMaxPwrDrawn', 'GAUGE', 0);
 
 if ($device['os'] == 'aos7') {
-    $maximum = $this_port['alaPethPsePortPowerMaximum'] ?? null;
-    $actual = $this_port['alaPethPsePortPowerActual'] ?? null;
+    $maximum = $this_port['ALCATEL-IND1-INLINE-POWER-MIB::alaPethPsePortPowerMaximum'] ?? null;
+    $actual = $this_port['ALCATEL-IND1-INLINE-POWER-MIB::alaPethPsePortPowerActual'] ?? null;
     if (is_numeric($maximum) && $maximum > 0 && is_numeric($actual) && $actual >= 0) {
         // AOS reports milliwatts. Allocated power and peak draw are not exposed.
         $fields = [

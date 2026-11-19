@@ -5,9 +5,7 @@ namespace LibreNMS\Tests\Unit;
 use App\Facades\PortCache;
 use Illuminate\Support\Facades\Date;
 use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
-use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
-use LibreNMS\Enum\SnmpStringOutput;
 use LibreNMS\OS;
 use LibreNMS\Tests\TestCase;
 use Mockery;
@@ -44,7 +42,7 @@ class Aos7NacTest extends TestCase
         }
 
         $query = Mockery::mock(SnmpQueryBuilder::class);
-        $query->shouldReceive('options')->with(Mockery::on(fn ($options) => $options instanceof SnmpQueryOptions && $options->stringFormat === SnmpStringOutput::Hex))->andReturnSelf();
+        $query->shouldReceive('options')->with('-OQUSXx')->andReturnSelf();
         $query->shouldReceive('walk')->with("{$prefix}alaDaMacVlanUserTable")->andReturn(new SnmpResponse($table));
         $query->shouldReceive('walk')->with("{$prefix}alaDaMacVlanUserIpAddress")->andReturn(new SnmpResponse(["{$prefix}alaDaMacVlanUserIpAddress.$index" => $hexIp]));
         $timeoutOid = "{$prefix}alaDaUNPPort8021XSuppTimeOut";

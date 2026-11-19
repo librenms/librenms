@@ -11,10 +11,9 @@ class Aos7PoeTest extends TestCase
 {
     public function testCapturedPowerIsMappedToVirtualChassisPorts(): void
     {
-        $oids = [
-            1 => 'ALCATEL-IND1-INLINE-POWER-MIB::alaPethPsePortPowerMaximum',
-            2 => 'ALCATEL-IND1-INLINE-POWER-MIB::alaPethPsePortPowerActual',
-        ];
+        $maximumOid = 'ALCATEL-IND1-INLINE-POWER-MIB::alaPethPsePortPowerMaximum';
+        $actualOid = 'ALCATEL-IND1-INLINE-POWER-MIB::alaPethPsePortPowerActual';
+        $oids = [1 => $maximumOid, 2 => $actualOid];
         $values = [];
         foreach (file(base_path('tests/snmpsim/aos7.snmprec'), FILE_IGNORE_NEW_LINES) as $record) {
             if (preg_match('/^1\.3\.6\.1\.4\.1\.6486\.801\.1\.2\.1\.27\.1\.1\.1\.1\.([12])\.(\d+\.\d+)\|2\|(\d+)$/', $record, $matches)) {
@@ -24,7 +23,7 @@ class Aos7PoeTest extends TestCase
         $this->assertCount(96, $values);
 
         $query = \Mockery::mock(SnmpQueryBuilder::class);
-        $query->shouldReceive('walk')->once()->with(array_values($oids))->andReturn(new SnmpResponse($values));
+        $query->shouldReceive('walk')->once()->with([$maximumOid, $actualOid])->andReturn(new SnmpResponse($values));
         $this->app->instance(SnmpQueryBuilder::class, $query);
         LibrenmsConfig::set('enable_ports_poe', true);
 
@@ -38,10 +37,10 @@ class Aos7PoeTest extends TestCase
         ];
         $port_stats = $this->pollPortStats($port_stats);
 
-        $this->assertSame('10000', $port_stats[71]['alaPethPsePortPowerActual']);
-        $this->assertSame('9700', $port_stats[72]['alaPethPsePortPowerActual']);
-        $this->assertSame('0', $port_stats[73]['alaPethPsePortPowerActual']);
-        $this->assertSame('95000', $port_stats[71]['alaPethPsePortPowerMaximum']);
+        $this->assertSame('10000', $port_stats[71][$actualOid]);
+        $this->assertSame('9700', $port_stats[72][$actualOid]);
+        $this->assertSame('0', $port_stats[73][$actualOid]);
+        $this->assertSame('95000', $port_stats[71][$maximumOid]);
         $this->assertSame(['ifName' => '1/2/1'], $port_stats[74]);
         $this->assertSame(['ifName' => 'Loopback0'], $port_stats[75]);
     }
@@ -63,7 +62,11 @@ class Aos7PoeTest extends TestCase
         $port_id = 71;
         // The outer polling loop may still contain the previous port's name.
         $ifName = '1/1/2';
-        $this_port = ['ifName' => '1/1/1', 'alaPethPsePortPowerMaximum' => '95000', 'alaPethPsePortPowerActual' => '0'];
+        $this_port = [
+            'ifName' => '1/1/1',
+            'ALCATEL-IND1-INLINE-POWER-MIB::alaPethPsePortPowerMaximum' => '95000',
+            'ALCATEL-IND1-INLINE-POWER-MIB::alaPethPsePortPowerActual' => '0',
+        ];
         $datastore = \Mockery::mock();
         $datastore->shouldReceive('put')->once()->with($device, 'poe', \Mockery::on(fn ($tags) => $tags['ifName'] === '1/1/1'), [
             'PortPwrAllocated' => null,
