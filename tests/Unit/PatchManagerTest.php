@@ -189,7 +189,7 @@ final class PatchManagerTest extends TestCase
         $this->createPullRequest(1, ['tests/new.txt' => "new test\n"]);
 
         $this->expectException(PatchException::class);
-        $this->expectExceptionMessage('Pull request #1 has no changes for this Docker installation');
+        $this->expectExceptionMessageIsOrContains('Pull request #1 has no changes for this Docker installation');
         $this->manager->apply($this->manager->fetch(1));
     }
 
