@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP)
 -- *****************************************************************
 -- UBQS-AUTO-RESET-MIB:  Ubiquoss Auto Reset MIB file
 --
@@ -189,15 +190,7 @@ ubiCpuMacFilterMIBGroups      	OBJECT IDENTIFIER ::= { ubiCpuMacFilterMIBConform
  
 -- units of conformance
 
-	ubiCpuMacFilterGroup OBJECT-GROUP
-        OBJECTS {       
-        	         
-        	    }
-    	STATUS          current
-    	DESCRIPTION
-        	"A collection of objects containing
-        	information about the Cpu-mac-filter of system."
-    	::= { ubiCpuMacFilterMIBGroups 1 }
+	ubiCpuMacFilterGroup OBJECT IDENTIFIER ::= { ubiCpuMacFilterMIBGroups 1 }
 
 
 END

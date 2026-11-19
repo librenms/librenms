@@ -41,7 +41,7 @@ interface Module
 
     /**
      * The polling methods this module can get data from, in order of preference.
-     * The module is offered for devices that have one of them enabled.
+     * Offered when one is enabled, enabled by default when a non-SNMP one is.
      *
      * @return list<PollingMethodType>
      */

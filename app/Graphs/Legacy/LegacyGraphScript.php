@@ -114,27 +114,33 @@ final readonly class LegacyGraphScript
     {
         $legacyParams = new LegacyGraphParameters($params);
 
-        $scope = $this->include($this->graphFile, [
-            ...$auth->scope,
-            'graph_params' => $legacyParams,
-            'type' => $params->type,
-            'subtype' => $params->subtype,
-            'height' => $params->height,
-            'width' => $params->width,
-            'from' => $params->from,
-            'to' => $params->to,
-            'period' => $params->period,
-            'prev_from' => $params->prev_from,
-            'inverse' => $params->inverse,
-            'in' => $params->in,
-            'out' => $params->out,
-            'float_precision' => 2,
-            'title' => $params->visible('title'),
-            'nototal' => ! $params->visible('total'),
-            'nodetails' => ! $params->visible('details'),
-            'noagg' => ! $params->visible('aggregate'),
-            'rrd_options' => [],
-        ]);
+        try {
+            $scope = $this->include($this->graphFile, [
+                ...$auth->scope,
+                'graph_params' => $legacyParams,
+                'type' => $params->type,
+                'subtype' => $params->subtype,
+                'height' => $params->height,
+                'width' => $params->width,
+                'from' => $params->from,
+                'to' => $params->to,
+                'period' => $params->period,
+                'prev_from' => $params->prev_from,
+                'inverse' => $params->inverse,
+                'in' => $params->in,
+                'out' => $params->out,
+                'float_precision' => 2,
+                'title' => $params->visible('title'),
+                'nototal' => ! $params->visible('total'),
+                'nodetails' => ! $params->visible('details'),
+                'noagg' => ! $params->visible('aggregate'),
+                'rrd_options' => [],
+            ]);
+        } catch (GraphException $e) {
+            $e->graphTitle ??= $legacyParams->title ?: null;
+
+            throw $e;
+        }
 
         return new LegacyGraphResult(
             rrdOptions: $scope['rrd_options'] ?? [],

@@ -29,7 +29,7 @@ SIAE-EQUIP-MIB
         FROM SIAE-EQUIPTYPE-MIB;
            
     equipment MODULE-IDENTITY
-        LAST-UPDATED "201503230000Z"
+        LAST-UPDATED "201811290000Z"
         ORGANIZATION "SIAE MICROELETTRONICA spa"
         CONTACT-INFO
             "SIAE MICROELETTONICA s.p.a.
@@ -41,6 +41,16 @@ SIAE-EQUIP-MIB
             "
         DESCRIPTION
             "Common parameters of SIAE equipments.
+            "
+        REVISION "201811290000Z"
+        DESCRIPTION
+            "Updated equipMngtIfType, equipMngtIfId and equipMngtIfPortVlanId 
+             descriptions.
+            "
+        REVISION "201803070000Z"
+        DESCRIPTION
+            "MIB version 01.00.03
+             Added the equipMngtTable object to describe the DCN parameters.
             "
         REVISION "201503230000Z"
         DESCRIPTION
@@ -519,6 +529,154 @@ SIAE-EQUIP-MIB
         DESCRIPTION
             "Ip address of the default gateway on Ethernet interface."
     ::= {equipment 40}
+
+    equipMngtTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF    ManagementInterfaceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the table that describes the DCN parameters.
+             Two records are created,
+             the first one represents the operational status,
+             the other one represents the administrative status that is applied after reload.
+             
+             The operational record is loaded at the start up and it can not be modified,
+             so the related fields are read only.
+             While the administrative record can be updated.
+             
+             As a restriction, interface type must be configured before the interface identifier.
+             This is to avoid any discrepancy due to the differencies in valid ranges for each interface type.
+            "
+    ::= {equipment 41}
+
+    equipMngtTableEntry  OBJECT-TYPE
+        SYNTAX      ManagementInterfaceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The DCN parameters."
+        INDEX { equipMngtStatus }
+    ::= { equipMngtTable 1 }
+
+    ManagementInterfaceEntry  ::=
+        SEQUENCE {
+            equipMngtStatus               INTEGER,
+            equipMngtIpAddress            IpAddress,
+            equipMngtIpNetMask            IpAddress,
+            equipMngtIpDefGateway         IpAddress,
+            equipMngtIpDefGatewayIfIndex  InterfaceIndex(1..999),
+            equipMngtIfType               INTEGER,
+            equipMngtIfId                 INTEGER(0..4094),
+            equipMngtIfPortVlanId         InterfaceIndex
+        }
+
+    equipMngtStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        operational    (1),
+                        administrative (2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The index to select one of two records of table:
+             the operational record and the administrative record.
+            "
+    ::= { equipMngtTableEntry 1 }
+
+    equipMngtIpAddress  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The IP address of the equipment.
+            "
+    ::= { equipMngtTableEntry 2 }
+
+    equipMngtIpNetMask  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The network mask associated with the IP address.
+            "
+    ::= { equipMngtTableEntry 3 }
+
+    equipMngtIpDefGateway  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The IP address of the default gateway.
+            "
+    ::= { equipMngtTableEntry 4 }
+
+    equipMngtIpDefGatewayIfIndex  OBJECT-TYPE
+        SYNTAX      InterfaceIndex(1..999)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The interface selected to reach the default gateway.
+             The special value 1 means that the snmp agent selects the interface
+             whose IP address belongs to the defaul gateway subnet.
+            "
+    ::= { equipMngtTableEntry 5 }
+
+    equipMngtIfType  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        ethernet (1),
+                        loopback (2),
+                        vlan     (3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The type of management interface:
+             - value 1 for physical lan interface,
+             - value 2 for virtual loopback interface,
+             - value 3 for management over vlan interface.
+             
+             This object must be configured before the interface identifier (equipMngtIfId),
+             to avoid any discrepancy due to the differencies in valid ranges for each interface type.
+             
+             This object can be modified only in specific equipment and specific software version.
+             Actual accepted values depend on specific equipment and specific software version.
+            "
+    ::= { equipMngtTableEntry 6 }
+
+    equipMngtIfId  OBJECT-TYPE
+        SYNTAX      INTEGER(0..4094)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The identifier of management interface:
+             - if equipMngtIfType is ethernet: equipMngtIfId is the ifIndex of interface;
+             - if equipMngtIfType is loopback: equipMngtIfId is in the interface name (es: loopback1)
+             - if equipMngtIfType is vlan:     equipMngtIfId is the vlan ID.
+
+             This object can be modified only in specific equipment and specific software version.
+            "
+    ::= { equipMngtTableEntry 7 }
+
+    equipMngtIfPortVlanId  OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The ifIndex corresponding to the port registered to vlan ID;
+             it is valid only when equipMngtIfType is vlan, whose value is in equipMngtIfId.
+
+             This object can be modified only in specific equipment and specific software version.
+            "
+    ::= { equipMngtTableEntry 8 }
+    
+    
+     equipLastRestartType  OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..41))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Report the last restart-type performed in the system."
+    ::= {equipment 42}
 
 -----------------------
 --

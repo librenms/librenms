@@ -26,7 +26,7 @@ SIAE-ACM-STATISTICS-MIB
         FROM SIAE-ALARM-MIB;
 
     acmStats MODULE-IDENTITY
-        LAST-UPDATED "201411050000Z"
+        LAST-UPDATED "201609130000Z"
         ORGANIZATION "SIAE MICROELETTRONICA spa"
         CONTACT-INFO
             "SIAE MICROELETTONICA s.p.a.
@@ -38,6 +38,13 @@ SIAE-ACM-STATISTICS-MIB
             "
         DESCRIPTION
             "Adaptive Code Modulation (ACM) Statistics (Performance Monitoring)
+            "
+        REVISION "201609130000Z"
+        DESCRIPTION 
+            "MIB version 01.00.02
+             - Added ACM profiles 4FQAM, 4HQAM, 4QAMlowpower,
+               32QAMlowpower, 64QAMlowpower and 128QAMlowpower  
+              (changed AcmProfile TEXTUAL-CONVENTION)
             "
         REVISION "201411050000Z"
         DESCRIPTION 
@@ -96,7 +103,13 @@ SIAE-ACM-STATISTICS-MIB
               acm2048QAMstrong    (24),
               acm2048QAM          (25),
               acm4096QAMstrong    (26),
-              acm4096QAM          (27)
+              acm4096QAM          (27),
+              acm4FQAM            (28),
+              acm4HQAM            (29),
+              acm4QAMlowpower     (30),
+              acm32QAMlowpower    (31),
+              acm64QAMlowpower    (32),
+              acm128QAMlowpower   (33)
          }
 
 ----------------------------------------------------------------------------------

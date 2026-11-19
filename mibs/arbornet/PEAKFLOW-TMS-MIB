@@ -21,7 +21,8 @@ IMPORTS
         IpAddress,
         TimeTicks,
         Integer32,
-        Unsigned32
+        Unsigned32,
+        Gauge32
                 FROM SNMPv2-SMI
         TEXTUAL-CONVENTION,
         DisplayString
@@ -39,24 +40,30 @@ IMPORTS
 -- =============================================================================
 
 peakflowTmsMIB MODULE-IDENTITY
-        LAST-UPDATED "201403120000Z" -- March 12, 2014
-        ORGANIZATION "Arbor Networks, Inc."
+        LAST-UPDATED "201908290000Z" -- August 29, 2019
+        ORGANIZATION "NETSCOUT Systems, Inc."
         CONTACT-INFO
-                "       Arbor Networks, Inc.
+                "       NETSCOUT Systems, Inc.
                         Arbor Technical Assistance Center
 
-                        Postal: 76 Blanchard Road
-                                Burlington, MA 01803
+                        Postal: 310 Littleton Rd
+                                Westford, MA 01886
                                 USA
 
-                        Tel: +1 866 212 7267 (toll free)
-                             +1 781 362 4300
+                        Tel: +1 866 272 6721 (toll free)
+                             +1 781 362 4301
                         Email: support@arbor.net "
 
         DESCRIPTION
                 "Peakflow TMS MIB"
 
         -- Revision log, reverse chrono
+        REVISION    "201908290000Z" -- August 29, 2019
+        DESCRIPTION "Added tmsOverrunDropRatePps"
+
+        REVISION    "201908270000Z" -- August 27, 2019
+        DESCRIPTION "Update contact info"
+
         REVISION    "201403120000Z" -- March 12, 2014
         DESCRIPTION "Added entry for tmsTrapGreName field"
 
@@ -334,6 +341,15 @@ tmsTrapGreName          OBJECT-TYPE
         DESCRIPTION
                 "User-defined tunnel name"
         ::= { peakflowTmsMgr 21 }
+
+tmsOverrunDropRatePps   OBJECT-TYPE
+        SYNTAX              Gauge32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+                "Traffic rate in pps that TMS was unable to inspect because
+                 incoming queues were full."
+        ::= { peakflowTmsMgr 39 }
 
 -- =============================================================================
 -- peakflowTmsTraps

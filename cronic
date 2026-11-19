@@ -1,14 +1,15 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-# Cronic v2 - cron job report wrapper
-# Copyright 2007 Chuck Houpt. No rights reserved, whatsoever.
+# Cronic v3 - cron job report wrapper
+# Copyright 2007-2016 Chuck Houpt. No rights reserved, whatsoever.
 # Public Domain CC0: http://creativecommons.org/publicdomain/zero/1.0/
 
 set -eu
 
-OUT=/tmp/cronic.out.$$
-ERR=/tmp/cronic.err.$$
-TRACE=/tmp/cronic.trace.$$
+TMP=$(mktemp -d)
+OUT=$TMP/cronic.out
+ERR=$TMP/cronic.err
+TRACE=$TMP/cronic.trace
 
 set +e
 "$@" >$OUT 2>$TRACE
@@ -23,7 +24,7 @@ else
     ERR=$TRACE
 fi
 
-if [ $RESULT -ne 0 ] || [ -s "$ERR" ]
+if [ $RESULT -ne 0 -o -s "$ERR" ]
     then
     echo "Cronic detected failure or error output for the command:"
     echo "$@"
@@ -43,6 +44,4 @@ if [ $RESULT -ne 0 ] || [ -s "$ERR" ]
     fi
 fi
 
-rm -f "$OUT"
-rm -f "$ERR"
-rm -f "$TRACE"
+rm -rf "$TMP"

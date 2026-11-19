@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (stray backtick; dashes in comment lines)
 -- *****************************************************************
 -- NMS-CARD-SYS-MIB.my: NMS Card SYSTEM MIB
 --
@@ -67,7 +68,7 @@ IMPORTS
                        cardMemUtilThresholdMax
                        	   INTEGER,
                       cardSystemTemptureNodeNumber 
-                      `	   INTEGER
+                      	   INTEGER
                   }
 
 
@@ -193,7 +194,7 @@ IMPORTS
                    ::= { cardSys 3 }
 
 
--- Notifications   --cardCPUUtil
+-- Notifications     cardCPUUtil
 	cardSysNotifications OBJECT IDENTIFIER
                                 ::= { cardSys 4 }
 

@@ -82,6 +82,27 @@ LOG_AUTH_FILE=/var/log/librenms/auth.log
 > NOTE: If you remove `event_db` or `auth_db`, the WebUI and API
 > no longer show new entries.
 
+## Composer packages
+
+`lnms plugin:add` records the packages you add in `composer.plugins.json`
+in the install directory. This variable moves that file, for example to
+a persistent volume.
+
+```dotenv
+LIBRENMS_COMPOSER_PLUGINS=/data/composer.plugins.json
+```
+
+`lnms plugin:sync` installs all packages in that file again.
+
+The plugin commands also honor the `COMPOSER` and `COMPOSER_VENDOR_DIR`
+variables of Composer. Set them in the environment to leave the
+`composer.json`, `composer.lock` and `vendor` of the install directory
+unchanged. If the file in `COMPOSER` does not exist, it is created from
+the `composer.json` and `composer.lock` of the install directory.
+The directory in `COMPOSER_VENDOR_DIR` must already contain the installed
+packages, for example a copy of `vendor`. LibreNMS loads `vendor` from
+the install directory, so link it to that directory.
+
 ## Debug
 
 This variable increases the information that LibreNMS shows for an error.

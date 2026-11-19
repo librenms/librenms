@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP)
 -- *****************************************************************
 -- UBQS-MPLS-RSVP-MIB : Ubiquoss RSVP MIB
 --   
@@ -303,14 +304,7 @@ ubiRsvpMIBGroups  	 	OBJECT IDENTIFIER		::= { ubiRsvpMIBConformance 2 }
      	::= { ubiRsvpMIBCompliances 1 }
 
 
-	ubiRsvpMIBGroup OBJECT-GROUP
-    	OBJECTS         {     
-    	}   
-    	STATUS          current
-    	DESCRIPTION
-        	"A collection of objects containing
-        	information about the RSVP information."
-    	::= { ubiRsvpMIBGroups 1 }
+	ubiRsvpMIBGroup OBJECT IDENTIFIER ::= { ubiRsvpMIBGroups 1 }
     	                               
     	                               
 END

@@ -1,18 +1,19 @@
 -- =================================================================
--- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Ths mib is extracted from draft-ietf-isis-wg-mib-13.txt.
 --              Because the draft MIB is not proposed as a standard, so the
---              content of this drafted MIB are moved under Huawei 3Com private
---              branch and 'hh3c' is added to all MIB objects as prefixes
+--              content of this drafted MIB are moved under enterprises branch.
 -- Reference:
--- Version: V1.2
+-- Version: V1.3
 -- History:
 -- V1.0 2020-08-05 The initial version, created by Chen ZiChao
 -- V1.1 2021-04-06 updated by zhangyao
 --      Add the hh3cIsisAdjacencyProtocolChange NOTIFICATION of hh3cIsisNotifications.
 -- V1.2 2021-05-06 updated by zhangyao
 --      Add the hh3cIsisCircTable.
+-- V1.3 2021-12-31 updated by wanggaoyu
+--      Add the objects of hh3cIsisNotifications.
 -- =================================================================
 HH3C-ISIS-MIB DEFINITIONS ::= BEGIN
 
@@ -21,15 +22,18 @@ IMPORTS
         FROM SNMPv2-SMI
     hh3cCommon
         FROM HH3C-OID-MIB
-    isisNotificationSysLevelIndex, isisNotificationCircIfIndex, isisPduLspId
+    isisNotificationSysLevelIndex, isisNotificationCircIfIndex, isisPduLspId,
+    isisSysID
         FROM ISIS-MIB
     IndexInteger
         FROM DIFFSERV-MIB            -- RFC3289
     InterfaceIndex, ifName
-        FROM IF-MIB;                 -- RFC2863
+        FROM IF-MIB                  -- RFC2863
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB;
 
 hh3cIsis MODULE-IDENTITY
-    LAST-UPDATED "202105061038Z"
+    LAST-UPDATED "202112301002Z"
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -38,26 +42,30 @@ hh3cIsis MODULE-IDENTITY
         http://www.h3c.com
         Zip:100085
         "
-  DESCRIPTION
-      "Add the hh3cIsisCircTable."
-  REVISION "202105061038Z"
-  DESCRIPTION
-      "Add the hh3cIsisAdjacencyProtocolChange NOTIFICATION of hh3cIsisNotifications."
-  REVISION "202104061038Z"
-  DESCRIPTION
-      "This document describes a management information base for
-       the IS-IS Routing protocol, as described in ISO 10589,
-       when it is used to construct routing tables for IP networks,
-       as described in RFC 1195.
+    DESCRIPTION
+        "This document describes a management information base for
+         the IS-IS Routing protocol, as described in ISO 10589,
+         when it is used to construct routing tables for IP networks,
+         as described in RFC 1195.
 
-       This document defines an experimental portion of the
-       Management Information Base (MIB) for use with network
-       management protocols in the Internet community.
+         This document defines an experimental portion of the
+         Management Information Base (MIB) for use with network
+         management protocols in the Internet community.
 
-       This document is based on a 1994 IETF draft by Chris Gunner.
-       This version has been modified to include MIB-II syntax, to
-       exclude portions of the protocol that are not relevant to IP,
-       and to add management support for current practice."
+         This document is based on a 1994 IETF draft by Chris Gunner.
+         This version has been modified to include MIB-II syntax, to
+         exclude portions of the protocol that are not relevant to IP,
+         and to add management support for current practice.
+         "
+    REVISION "202112301002Z"
+    DESCRIPTION
+        "Add the objects of hh3cIsisNotifications."
+    REVISION "202105061038Z"
+    DESCRIPTION
+        "Add the hh3cIsisCircTable."
+    REVISION "202104061038Z"
+    DESCRIPTION
+        "Add the hh3cIsisAdjacencyProtocolChange NOTIFICATION of hh3cIsisNotifications."
     REVISION "202008051100Z"
     DESCRIPTION
         "The initial version of this MIB file."
@@ -191,6 +199,38 @@ hh3cIsisAdjProtoState OBJECT-TYPE
         "The state of the adjacency protocol."
     ::= { hh3cIsisNotificationObjects 2 }
 
+hh3cIsisLocalAddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The address type of hh3cIsisLocalAddress."
+    ::= { hh3cIsisNotificationObjects 3 }
+
+hh3cIsisLocalAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The local address."
+    ::= { hh3cIsisNotificationObjects 4 }
+
+hh3cIsisPeerAddressType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The address type of hh3cIsisPeerAddress."
+    ::= { hh3cIsisNotificationObjects 5 }
+
+hh3cIsisPeerAddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The address of peer."
+    ::= { hh3cIsisNotificationObjects 6 }
+
 -- Notification Configuration
 
 hh3cIsisAdjacencyProtocolChange NOTIFICATION-TYPE
@@ -211,5 +251,23 @@ hh3cIsisAdjacencyProtocolChange NOTIFICATION-TYPE
          The hh3cIsisAdjProtoType is the type of adjacency protocol.
          The hh3cIsisAdjProtoState is the state of adjacency protocol."
     ::= { hh3cIsisNotifications 1 }
+
+hh3cIsisSystemIdConflict NOTIFICATION-TYPE
+    OBJECTS {
+        hh3cIsisSysInstance,
+        isisNotificationSysLevelIndex,
+        isisPduLspId,
+        isisSysID,
+        isisNotificationCircIfIndex,
+        ifName,
+        hh3cIsisLocalAddressType,
+        hh3cIsisLocalAddress,
+        hh3cIsisPeerAddressType,
+        hh3cIsisPeerAddress
+    }
+    STATUS current
+    DESCRIPTION
+        "A notification sent when system ID conflict."
+    ::= { hh3cIsisNotifications 2 }
 
 END

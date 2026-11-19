@@ -475,7 +475,10 @@ class RancidProvider implements ConfigBackupProvider
             $candidates[] = $device->hostname . '.' . $domain;
         }
 
-        return array_values(array_unique(array_filter($candidates)));
+        // a config file name never spans directories
+        $candidates = array_filter($candidates, fn ($name) => $name && ! preg_match('#[/\\\\]|\.\.#', $name));
+
+        return array_values(array_unique($candidates));
     }
 
     /**

@@ -3,7 +3,7 @@
 --
 -- Description:  DHCPv6 mib for server and relay
 -- Reference:
--- Version: V1.3
+-- Version: V1.4
 -- History:
 -- V1.0 2018-11-16 Initial version Created by l08263
 -- V1.1 Add hh3cDhcp6Server2PoolGroupTable, hh3cDhcp6Server2PoolGroupExtTable,
@@ -44,6 +44,15 @@
 --      hh3cDhcp6Server2PoolExpirePdLim, hh3cDhcp6Server2PoolExpirePdTime
 --      hh3cDhcp6Server2PrefixPoolTable
 --      by wugang 2021-04-30
+-- V1.4 Add hh3cDhcp6Server2OnlineFailReason,
+--      hh3cDhcp6Svr2AllocIpFailed,hh3cDhcp6Svr2AllocPdFailed
+--      hh3cDhcp6Server2ServerDown,hh3cDhcp6Svr2GpAddrExhaust
+--      hh3cDhcp6Svr2GpAddrExhaustRecov,hh3cDhcp6Server2DevOdapFull
+--      hh3cDhcp6Server2DevOdapPdFull,hh3cDhcp6Server2OdapApplyFail
+--      hh3cDhcp6Server2OdapApplyPdFail,hh3cDhcp6Server2OdapReleaseFail
+--      hh3cDhcp6Server2OdapReleasePdFail,hh3cDhcpSvr2GpUsageOverflow
+--      hh3cDhcp6Svr2GpUsageOverflowRecov
+--      by wangchao 2021-09-15
 -- =================================================================
 HH3C-DHCP6-MIB DEFINITIONS ::= BEGIN
 
@@ -65,7 +74,7 @@ IMPORTS
 -- Module identity
 -- =============================================================================
 hh3cDhcp6 MODULE-IDENTITY
-    LAST-UPDATED "202104300000Z"
+    LAST-UPDATED "202109150000Z"
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -75,6 +84,10 @@ hh3cDhcp6 MODULE-IDENTITY
          Zip: 100085"
     DESCRIPTION
         "DHCPv6 MIB."
+    REVISION
+        "202109150000Z"
+    DESCRIPTION
+        "Modified to add new nodes."
     REVISION
         "202104300000Z"
     DESCRIPTION
@@ -1334,7 +1347,7 @@ hh3cDhcp6Server2PdNetExhaustRecov NOTIFICATION-TYPE
          prefix exhaustion."
     ::= { hh3cDhcp6Server2TrapNotify 16 }
 
-    hh3cDhcp6Server2GpIpNetExhaust NOTIFICATION-TYPE
+hh3cDhcp6Server2GpIpNetExhaust NOTIFICATION-TYPE
     OBJECTS
     {
         hh3cDhcp6Server2PoolGpName
@@ -1378,4 +1391,150 @@ hh3cDhcp6Server2GpPdNetExhaustRecov NOTIFICATION-TYPE
          prefix exhaustion."
     ::= { hh3cDhcp6Server2TrapNotify 20 }
 
+hh3cDhcp6Svr2AllocIpFailed NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcp6Server2OnlineFailReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when DHCPv6 servers fail to alloc address."
+    ::= { hh3cDhcp6Server2TrapNotify 21}
+
+hh3cDhcp6Svr2AllocPdFailed NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcp6Server2OnlineFailReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when DHCPv6 servers fail to alloc prefix."
+    ::= { hh3cDhcp6Server2TrapNotify 22 }
+
+hh3cDhcp6Server2ServerDown NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcp6Server2OnlineFailReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the DHCPv6 servers fail to alloc address."
+    ::= { hh3cDhcp6Server2TrapNotify 23 }
+
+hh3cDhcp6Svr2GpAddrExhaust NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcp6Server2PoolGpName
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when all IPv6 addresses
+         in the DHCPv6 pool group are exhausted."
+    ::= { hh3cDhcp6Server2TrapNotify 24 }
+
+hh3cDhcp6Svr2GpAddrExhaustRecov NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcp6Server2PoolGpName
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the DHCPv6 pool group recovers from
+         IP address exhaustion."
+    ::= { hh3cDhcp6Server2TrapNotify 25 }
+
+hh3cDhcp6Server2DevOdapFull NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when all ODAP
+        address pools on vBRAS device are full."
+    ::= { hh3cDhcp6Server2TrapNotify 26 }
+
+hh3cDhcp6Server2DevOdapPdFull NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when all ODAP
+        address pools on vBRAS device are full."
+    ::= { hh3cDhcp6Server2TrapNotify 27 }
+
+hh3cDhcp6Server2OdapApplyFail NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcp6Server2OnlineFailReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when DHCPv6 servers fail to apply for subnet."
+    ::= { hh3cDhcp6Server2TrapNotify 28 }
+
+hh3cDhcp6Server2OdapReleaseFail NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcp6Server2OnlineFailReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when DHCPv6 servers fail to release subnet."
+    ::= { hh3cDhcp6Server2TrapNotify 29 }
+
+hh3cDhcp6Server2OdapApplyPdFail NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcp6Server2OnlineFailReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when DHCPv6 servers fail to apply for prefix."
+    ::= { hh3cDhcp6Server2TrapNotify 30 }
+
+hh3cDhcp6Server2OdapReleasePdFail NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcp6Server2OnlineFailReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when DHCPv6 servers fail to release prefix."
+    ::= { hh3cDhcp6Server2TrapNotify 31 }
+
+hh3cDhcp6Svr2GpUsageOverflow NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcp6Server2PoolGpName
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the usage of DHCPv6
+         server pool group has reached or exceeded the threshold.
+         The IP address usage data is polled every 5 minutes."
+    ::= { hh3cDhcp6Server2TrapNotify 32 }
+
+hh3cDhcp6Svr2GpUsageOverflowRecov NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcp6Server2PoolGpName
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the DHCPv6 pool group recovers from
+         IP address exhaustion."
+    ::= { hh3cDhcp6Server2TrapNotify 33 }
+
+-- =============================================================================
+-- DHCP6 server scalar objects definition.
+-- =============================================================================
+hh3cDhcp6Server2ScalarObjects     OBJECT IDENTIFIER ::= { hh3cDhcp6 3 }
+
+-- =============================================================================
+-- hh3cDhcp6Server2ScalarObjects: hh3cDhcp6Server2StatGroup
+-- =============================================================================
+hh3cDhcp6Server2StatGroup OBJECT IDENTIFIER ::= { hh3cDhcp6Server2ScalarObjects 1 }
+
+hh3cDhcp6Server2OnlineFailReason OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..511))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The reason why DHCP server fail to alloc address."
+    ::= { hh3cDhcp6Server2StatGroup 1 }
 END

@@ -1,7 +1,7 @@
 --
---   
--- ARBOR NETWORKS (c) 2001-2011
--- 
+--
+-- ARBOR NETWORKS (c) 2001-2019
+--
 --
 --
 --   File:		ARBORNET-SMI.txt
@@ -21,28 +21,38 @@ ARBOR-SMI	DEFINITIONS ::= BEGIN
 IMPORTS
 	MODULE-IDENTITY,
 	OBJECT-IDENTITY,
-	enterprises
-		FROM SNMPv2-SMI;
+	enterprises,
+	Integer32
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC;
 
 arbornetworks MODULE-IDENTITY
-	LAST-UPDATED "201311140000Z" -- November 14, 2013
-	ORGANIZATION "Arbor Networks, Inc."
-	CONTACT-INFO	"	Arbor Networks, Inc.
-				Arbor Technical Assistance Center
+        LAST-UPDATED "201911180000Z" -- November 18, 2019
+        ORGANIZATION "NETSCOUT Systems, Inc."
+        CONTACT-INFO
+                "       NETSCOUT Systems, Inc.
+                        Arbor Technical Assistance Center
 
-				Postal: 76 Blanchard Road
-					Burlington, MA 01803
-					USA
+                        Postal: 310 Littleton Rd
+                                Westford, MA 01886
+                                USA
 
-				Tel: +1 866 212 7267 (toll free)
-				     +1 781 362 4300
-				Email: support@arbor.net "
+                        Tel: +1 866 272 6721 (toll free)
+                             +1 781 362 4301
+                        Email: support@arbor.net "
 
 	DESCRIPTION
 		"The Structure of Management Information for the
 		Arbor Networks enterprise."
 
 	-- Revision log, reverse chrono
+	REVISION    "201911180000Z" -- November 18, 2019
+	DESCRIPTION "Add ArborPercentage textual convention."
+
+	REVISION    "201908270000Z" -- August 27, 2019
+	DESCRIPTION "Update contact info"
+
 	REVISION    "201311140000Z" -- November 14, 2013
 	DESCRIPTION "Add peakflowMobile product."
 
@@ -62,6 +72,18 @@ arbornetworks MODULE-IDENTITY
 	DESCRIPTION "Apply fixes from validation."
 
 	::= { enterprises 9694 }
+
+-- =============================================================================
+-- Textual Conventions
+-- =============================================================================
+ArborPercentage      ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT    "d"
+        STATUS          current
+        DESCRIPTION
+                "A percentage value (0% - 100%)"
+        SYNTAX          Integer32 (0..100)
+
+-- =============================================================================
 
 arbornetworksProducts OBJECT-IDENTITY
 	STATUS  current
@@ -87,5 +109,7 @@ arborExperimental OBJECT-IDENTITY
 -- slsMIB  OBJECT IDENTIFIER  ::= { arbornetworksProducts 9 }
 -- peakflowMobileMIB  OBJECT IDENTIFIER  ::= { arbornetworksProducts 10 }
 -- arbuxMIB OBJECT IDENTIFIER ::= { arbornetworksProducts 11 }
+-- spectrumMIB  OBJECT IDENTIFIER  ::= { arbornetworksProducts 12 }
+-- aedMIB OBJECT IDENTIFIER ::= { arbornetworksProducts 13 }
 
 END

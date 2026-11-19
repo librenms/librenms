@@ -1,19 +1,26 @@
+-- *****************************************************************
+-- System Application MIB 
+--
+-- September 1998, Vince Deters
+--
+-- Copyright (c) 1998, 2005 by cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
    SYSAPPL-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
-       MODULE-IDENTITY, OBJECT-TYPE,
+       MODULE-IDENTITY, OBJECT-TYPE, mib-2,
        Unsigned32, TimeTicks, Counter32, Gauge32
            FROM SNMPv2-SMI
        DateAndTime, TEXTUAL-CONVENTION
            FROM SNMPv2-TC
        MODULE-COMPLIANCE, OBJECT-GROUP
-           FROM SNMPv2-CONF
-       mib-2 FROM SNMPv2-SMI;
+           FROM SNMPv2-CONF;
 
    -- System Application MIB
 
    sysApplMIB MODULE-IDENTITY
-       LAST-UPDATED "9710200000Z"
+       LAST-UPDATED "200601060000Z"
        ORGANIZATION "IETF Applications MIB Working Group"
        CONTACT-INFO
              "Cheryl Krupczak (Editor, WG Advisor)
@@ -40,6 +47,11 @@
            objects in this MIB are limited to those attributes
            that can typically be obtained from the system itself
            without adding special instrumentation to the applications."
+       REVISION     "200601060000Z"
+       DESCRIPTION  "Imported Unsigned32 from SNMPv2-SMI."
+       REVISION     "9710200000Z"
+       DESCRIPTION  "Initial version of the mib module, published as
+                    RFC 2287."
        ::= { mib-2 54  }
 
 
@@ -58,7 +70,6 @@
            "This TC describes the current execution state of
            a running application or process.  The possible
            values are:
-
              running(1),
              runnable(2),  - waiting for a resource (CPU, etc.)
              waiting(3),   - waiting for an event
@@ -107,7 +118,6 @@
    -- describes the application packages, the second, the
    -- sysApplInstallElmtTable, describes the constituent elements
    -- (files and executables) which compose an application package.
-
    --
    -- In order to appear in this group, an application and its
    -- component files must be discoverable by the system itself,
@@ -131,6 +141,7 @@
            to be installed using some type of software
            installation mechanism or global registry so that its
            existence can be detected by the agent implementation."
+
        ::= { sysApplInstalled 1 }
 
    sysApplInstallPkgEntry OBJECT-TYPE
@@ -272,7 +283,8 @@
        sysApplInstallElmtPath                  LongUtf8String,
        sysApplInstallElmtSizeHigh              Unsigned32,
        sysApplInstallElmtSizeLow               Unsigned32,
-       sysApplInstallElmtRole                  BITS,
+--       sysApplInstallElmtRole                  BITS,
+       sysApplInstallElmtRole                  OCTET STRING,
        sysApplInstallElmtModifyDate            DateAndTime,
        sysApplInstallElmtCurSizeHigh           Unsigned32,
        sysApplInstallElmtCurSizeLow            Unsigned32
@@ -298,8 +310,6 @@
            "The name of this element which is contained in the
            application."
        ::= { sysApplInstallElmtEntry 2 }
-
-
 
    sysApplInstallElmtType OBJECT-TYPE
        SYNTAX      INTEGER {
@@ -374,17 +384,18 @@
        ::= { sysApplInstallElmtEntry 7 }
 
    sysApplInstallElmtRole  OBJECT-TYPE
-       SYNTAX      BITS {
-                   executable(0),
+       SYNTAX      OCTET STRING(SIZE(1))
+--       SYNTAX      BITS {
+--                   executable(0),
                       -- An application may have one or
                       -- more executable elements.  The rest of the
                       -- bits have no meaning if the element is not
                       -- executable.
-                   exclusive(1),
+--                   exclusive(1),
                       -- Only one copy of an exclusive element may be
                       -- running per invocation of the running
                       -- application.
-                   primary(2),
+--                   primary(2),
                       -- The primary executable.  An application can
                       -- have one, and only one element that is designated
                       -- as the primary executable.  The execution of
@@ -394,21 +405,22 @@
                       -- an application.  The primary executable must
                       -- remain running long enough for the agent
                       -- implementation to detect its presence.
-                   required(3),
+--                   required(3),
                       -- An application may have zero or more required
                       -- elements. All required elements must be running
                       -- in order for the application to be judged to be
                       -- running and healthy.
-                   dependent(4),
+--                   dependent(4),
                       -- An application may have zero or more
                       -- dependent elements. Dependent elements may
                       -- not be running unless required elements are.
-                   unknown(5)
+--                   unknown(5)
                       -- Default value for the case when an operator
                       -- has not yet assigned one of the other values.
                       -- When set, bits 1, 2, 3, and 4 have no meaning.
-                   }
-        MAX-ACCESS  read-write
+--                   }
+       
+       MAX-ACCESS  read-write
        STATUS      current
        DESCRIPTION
            "An operator assigned value used in the determination of
@@ -445,7 +457,6 @@
                        in order for the application to be judged to be
                        running and healthy.
                    dependent(4),
-
                        An application may have zero or more
                        dependent elements. Dependent elements may
                        not be running unless required elements are.
@@ -460,8 +471,7 @@
             sysApplRunCurrentState), when an application invocation is
             no longer running, and the exit status of a terminated
             application invocation (see sysApplPastRunExitState)."
-
-       DEFVAL { { unknown } }
+--       DEFVAL { 5 }
        ::= { sysApplInstallElmtEntry 8 }
 
    sysApplInstallElmtModifyDate OBJECT-TYPE
@@ -494,7 +504,6 @@
        DESCRIPTION
            "The current file size modulo 2^32 bytes.
            For example, for a file with a total size of 4,294,967,296
-
            bytes this variable would have a value of 0; for a file with
            a total size of 4,294,967,295 bytes this variable would be
            4,294,967,295."
@@ -591,7 +600,6 @@
 
            NOTE: this index is not intended to reflect a real-time
            (wall clock time) ordering of application invocations;
-
            it is merely intended to uniquely identify running
            instances of applications.  Although the
            sysApplInstallPkgIndex is included in the INDEX clause
@@ -640,7 +648,6 @@
    -- sysApplPastRunTblTimeLimit.
    --
    -- When aging out entries, the oldest entry, as determined by
-
    -- the value of sysApplPastRunTimeEnded, will be removed first.
 
    sysApplPastRunTable OBJECT-TYPE
@@ -689,7 +696,6 @@
            which was previously run and has terminated.  The entry
            is basically copied from the sysApplRunTable when the
            application instance terminates.  Hence, the entry's
-
            value for sysApplPastRunIndex is the same as its value was
            for sysApplRunIndex."
        INDEX    { sysApplInstallPkgIndex, sysApplPastRunIndex }
@@ -738,7 +744,6 @@
           when the agent detects that ALL elements of an application
           invocation are no longer running.  Most agent implementations
           will wait until a second internal poll has been completed to
-
           give the system time to either restart partial failures or
           to give all elements time to exit.  A failed state occurs if,
           after the second poll, any elements continue to run but
@@ -787,7 +792,6 @@
            multiple entries in this table for each application.
            Entries are removed from this table when the process
            terminates.
-
            The table is indexed by sysApplElmtRunInstallPkg,
            sysApplElmtRunInvocID, and sysApplElmtRunIndex to
            facilitate the retrieval of all running elements of a
@@ -836,7 +840,6 @@
            value as the sysApplInstallPkgIndex for the
            entry in the sysApplInstallPkgTable that corresponds
            to the installed application of which this process
-
            is a part.
 
            If, however, the 'parent' application cannot be
@@ -981,7 +984,6 @@
    -- the sysApplElmtRunTable and a corresponding entry is created in
    -- this table provided that the process was part of an
    -- identifiable application.  If the process could not be associated
-
    -- with an invoked application, no corresponding entry is created.
    -- Hence, whereas the sysApplElmtRunTable contains an entry for
    -- every process currently executing on the system, the
@@ -1269,7 +1271,6 @@
            to make room for the new entry to be added.  Entries
            will be removed on the basis of oldest
            sysApplElmtPastRunTimeEnded value first.
-
            This object may be used to control the amount of
            system resources that can used for sysApplElemPastRunTable
            entries. A conforming implementation should attempt
@@ -1462,7 +1463,6 @@
 
 
    -- Conformance Macros
-
    sysApplMIBCompliances  OBJECT IDENTIFIER ::= { sysApplConformance 1 }
    sysApplMIBGroups       OBJECT IDENTIFIER ::= { sysApplConformance 2 }
 
@@ -1550,4 +1550,3 @@
    ::= { sysApplMIBGroups 3 }
 
    END
-

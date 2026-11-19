@@ -6,8 +6,10 @@
             <th data-column-id="mac_address" data-width="150px" data-formatter="tooltip">MAC Address</th>
             <th data-column-id="mac_oui" data-sortable="false" data-width="150px" @notconfig('mac_oui.enabled')data-visible="false"@endnotconfig data-formatter="tooltip">Vendor</th>
             <th data-column-id="ipv4_address" data-sortable="false" data-formatter="tooltip">IPv4 Address</th>
+            @empty($port)
             <th data-column-id="interface">Port</th>
             <th data-column-id="description" data-formatter="tooltip">Description</th>
+            @endempty
             <th data-column-id="vlan" data-width="60px">Vlan</th>
             <th data-column-id="dnsname" data-sortable="false" data-visible="false" data-formatter="tooltip">DNS Name</th>
             <th data-column-id="first_seen" data-width="165px">First seen</th>
@@ -25,6 +27,7 @@
         {
             return {
                 device_id: "{{ $device->device_id }}",
+                port_id: @js($port->port_id ?? null),
                 dns: $("#ports-fdb").bootgrid("getColumnSettings").find(col => col.id === "dnsname").visible,
             };
         },

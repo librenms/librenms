@@ -39,6 +39,32 @@ class AbstractGraphTest extends TestCase
         $this->assertSame('Drawn', $this->graph()->render()->title);
     }
 
+    public function test_drawing_errors_preserve_the_enabled_title(): void
+    {
+        $error = new NoGraphData;
+        $graph = $this->graph(fn () => throw $error, ['title' => 'yes']);
+
+        try {
+            $graph->render();
+            $this->fail('Expected a graph exception');
+        } catch (NoGraphData $e) {
+            $this->assertSame($error, $e);
+            $this->assertSame('Device::Test', $e->graphTitle);
+        }
+    }
+
+    public function test_unauthorized_graphs_do_not_resolve_the_title(): void
+    {
+        $graph = $this->graph(params: ['title' => 'yes'], isAuthorized: fn () => false);
+
+        try {
+            $graph->render();
+            $this->fail('Expected a graph exception');
+        } catch (GraphException $e) {
+            $this->assertNull($e->graphTitle);
+        }
+    }
+
     public function test_authorization_is_checked_once(): void
     {
         $checks = 0;

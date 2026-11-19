@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP)
 -- *****************************************************************
 -- UBIQUOSS-EPON-ONTMANAGER-GROUP-MIB.my
 --
@@ -698,23 +699,9 @@
        ::= { ubiOntSwitchMIBCompliances 1 }
 	                            
 -- compliance statements
-   	ubiOntSwitchMIBGroup  OBJECT-GROUP
-		OBJECTS {     
-			-- TODO 
-               }
-        STATUS  current
-        DESCRIPTION
-                "ubiquoss ont switch information MIB"
-        ::= { ubiOntSwitchMIBGroups 1 }
+   	ubiOntSwitchMIBGroup  OBJECT IDENTIFIER ::= { ubiOntSwitchMIBGroups 1 }
      
-     ubiOntSwitchMIBNotificationGroup    OBJECT-GROUP
-      	OBJECTS {     
-			-- TODO 
-               }
-        STATUS  current
-        DESCRIPTION
-                "ubiquoss ont switch information Notifications"
-        ::= { ubiOntSwitchMIBGroups 2 }
+     ubiOntSwitchMIBNotificationGroup    OBJECT IDENTIFIER ::= { ubiOntSwitchMIBGroups 2 }
 	
 	END
 

@@ -71,7 +71,7 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
         $pool_detail_table['rows'] = [];
         // display it this way as a CIDR may have more than one pool defined for it
         // especially true if both IPv4 and IPv6 are in use
-        echo '<center><b>' . $pool['cidr'] . ', ' . $pool['first_ip'] . '-' . $pool['last_ip'] . '</b></center>';
+        echo '<center><b>' . e($pool['cidr']) . ', ' . e($pool['first_ip']) . '-' . e($pool['last_ip']) . '</b></center>';
         $option_row_int = 0;
         // remove these as they are stats and no options related info for the subnet
         unset($pool['cur']);
@@ -131,13 +131,14 @@ if (! isset($vars['app_page']) || ! isset($app->data['pools'])) {
         // look and see if we know what that mac belongs to and if so create a link for the device and port
         $mac = $lease['hw_address'];
         $mac_raw = false;
+        $port = null; // reset so a previous lease's match does not mark this MAC as raw html
         if (preg_match('/^[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]:[A-Ea-e0-9][A-Ea-e0-9]$/', (string) $mac)) {
             $port = Port::with('device')->firstWhere(['ifPhysAddress' => str_replace(':', '', $mac)]);
         }
         if (isset($port)) {
             // safe to set given we know we got a valid MAC if a $port is set
             $mac_raw = true;
-            $mac = $mac . ' (' .
+            $mac = e($mac) . ' (' .
                 generate_device_link(['device_id' => $port->device_id]) . ', ' .
                 generate_port_link([
                     'label' => $port->label,

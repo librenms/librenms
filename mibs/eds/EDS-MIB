@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (lowercase type name; missing commas; COUNTER32 is not a type; missing imports; trailing comma before })
 -- EDS MIB file for all products
 -- Larry Wood	12/15/11	v1.2
 --  Added device types EDS0070, 71, 80, 82, 83, 85, 90, 91, 92
@@ -23,7 +24,7 @@
 --
 EDS-MIB DEFINITIONS ::= BEGIN
     IMPORTS
-    enterprises
+    enterprises, Counter, IpAddress
         FROM RFC1155-SMI
     OBJECT-TYPE
         FROM RFC-1212
@@ -75,13 +76,13 @@ EDS-MIB DEFINITIONS ::= BEGIN
     --device trap table
     dTrap OBJECT IDENTIFIER ::= { edsMain 2 }
     dTrapTable OBJECT-TYPE
-        SYNTAX              SEQUENCE OF dTrapEntry
+        SYNTAX              SEQUENCE OF DTrapEntry
         ACCESS              not-accessible
         STATUS              mandatory
         ::= { dTrap 1 }
 
     dTrapEntry OBJECT-TYPE
-        SYNTAX              dTrapEntry
+        SYNTAX              DTrapEntry
         ACCESS              not-accessible
         STATUS              mandatory
         INDEX               {
@@ -89,7 +90,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { dTrapTable 1 }
 
-    dTrapEntry ::= SEQUENCE {
+    DTrapEntry ::= SEQUENCE {
         dTrapIndex
             INTEGER,
         dTrapEnable
@@ -131,13 +132,13 @@ EDS-MIB DEFINITIONS ::= BEGIN
 
     --dTrapDeviceTable
     dTrapDeviceTable OBJECT-TYPE
-        SYNTAX              SEQUENCE OF dTrapDeviceEntry
+        SYNTAX              SEQUENCE OF DTrapDeviceEntry
         ACCESS              not-accessible
         STATUS              mandatory
         ::= { dTrap 2 }
 
     dTrapDeviceEntry OBJECT-TYPE
-        SYNTAX              dTrapDeviceEntry
+        SYNTAX              DTrapDeviceEntry
         ACCESS              not-accessible
         STATUS              mandatory
         INDEX               {
@@ -145,7 +146,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { dTrapDeviceTable 1 }
 
-    dTrapDeviceEntry ::= SEQUENCE {
+    DTrapDeviceEntry ::= SEQUENCE {
         dTrapDeviceIndex
             INTEGER,
         dTrapDeviceEnable
@@ -694,14 +695,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
     }
 
     owDS2423CounterA OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter A value."
         ::= { owDS2423Entry 1 }
 
     owDS2423CounterB OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter B value."
@@ -785,7 +786,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owDevices 9 }
 
     owDS2408Entry OBJECT-TYPE
-        SYNTAX              owDS2408Entry
+        SYNTAX              OwDS2408Entry
         ACCESS              not-accessible
         STATUS              mandatory
         INDEX               {
@@ -793,7 +794,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { owDS2408Table 1 }
 
-    owDS2408Entry ::= SEQUENCE {
+    OwDS2408Entry ::= SEQUENCE {
         owDS2408PIOLogicState
             INTEGER,
         owDS2408PIOOutputLatchState
@@ -880,7 +881,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owDevices 10 }
 
     owDS2450Entry OBJECT-TYPE
-        SYNTAX              owDS2450Entry
+        SYNTAX              OwDS2450Entry
         ACCESS              not-accessible
         STATUS              mandatory
         INDEX               {
@@ -888,7 +889,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { owDS2450Table 1 }
 
-    owDS2450Entry ::= SEQUENCE {
+    OwDS2450Entry ::= SEQUENCE {
         owDS2450ChannelAConversionValue
             DisplayString,
         owDS2450ChannelAConversionResolution
@@ -1156,14 +1157,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS0064 TABLE
 
     owEDS0064Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF owEDS0064Entry
+        SYNTAX              SEQUENCE OF OwEDS0064Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS0064 device data (temperature)"
         ::= { owDevices 11 }
 
     owEDS0064Entry OBJECT-TYPE
-        SYNTAX              owEDS0064Entry
+        SYNTAX              OwEDS0064Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -1172,7 +1173,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { owEDS0064Table 1 }
 
-    owEDS0064Entry ::= SEQUENCE {
+    OwEDS0064Entry ::= SEQUENCE {
         owEDS0064Temperature
             DisplayString,
         owEDS0064Counter
@@ -1187,7 +1188,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0064Entry 1 }
 
     owEDS0064Counter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter."
@@ -1196,14 +1197,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS0065 TABLE
 
     owEDS0065Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF owEDS0065Entry
+        SYNTAX              SEQUENCE OF OwEDS0065Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS0065 device data (temperature and humiditiy)."
         ::= { owDevices 12 }
 
     owEDS0065Entry OBJECT-TYPE
-        SYNTAX              owEDS0065Entry
+        SYNTAX              OwEDS0065Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -1212,7 +1213,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { owEDS0065Table 1 }
 
-    owEDS0065Entry ::= SEQUENCE {
+    OwEDS0065Entry ::= SEQUENCE {
         owEDS0065Temperature
             DisplayString,
         owEDS0065Humidity
@@ -1263,7 +1264,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0065Entry 5 }
 
     owEDS0065Counter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter."
@@ -1272,14 +1273,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS0066 TABLE
 
     owEDS0066Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF owEDS0066Entry
+        SYNTAX              SEQUENCE OF OwEDS0066Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS0001 device data (temperature and barometric pressure)."
         ::= { owDevices 13 }
 
     owEDS0066Entry OBJECT-TYPE
-        SYNTAX              owEDS0066Entry
+        SYNTAX              OwEDS0066Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -1288,7 +1289,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { owEDS0066Table 1 }
 
-    owEDS0066Entry ::= SEQUENCE {
+    OwEDS0066Entry ::= SEQUENCE {
         owEDS0066Temperature
             DisplayString,
         owEDS0066BarometricPressureMb
@@ -1321,7 +1322,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0066Entry 3 }
 
     owEDS0066Counter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter."
@@ -1330,14 +1331,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS0067 TABLE
 
     owEDS0067Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF owEDS0067Entry
+        SYNTAX              SEQUENCE OF OwEDS0067Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS0067 device data (temperature and light)."
         ::= { owDevices 14 }
 
     owEDS0067Entry OBJECT-TYPE
-        SYNTAX              owEDS0067Entry
+        SYNTAX              OwEDS0067Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -1346,10 +1347,10 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { owEDS0067Table 1 }
 
-    owEDS0067Entry ::= SEQUENCE {
+    OwEDS0067Entry ::= SEQUENCE {
         owEDS0067Temperature
             DisplayString,
-        owEDS0067Light,
+        owEDS0067Light
         	DisplayString,
         owEDS0067Counter
             COUNTER32
@@ -1370,7 +1371,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0067Entry 2 }
 
     owEDS0067Counter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter."
@@ -1379,14 +1380,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS0068 TABLE
 
     owEDS0068Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF owEDS0068Entry
+        SYNTAX              SEQUENCE OF OwEDS0068Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS0068 device data (temperature, humidity, barometric pressure and light)."
         ::= { owDevices 15 }
 
     owEDS0068Entry OBJECT-TYPE
-        SYNTAX              owEDS0068Entry
+        SYNTAX              OwEDS0068Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -1395,7 +1396,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { owEDS0068Table 1 }
 
-    owEDS0068Entry ::= SEQUENCE {
+    OwEDS0068Entry ::= SEQUENCE {
         owEDS0068Temperature
             DisplayString,
         owEDS0068Humidity
@@ -1410,7 +1411,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         	DisplayString,
         owEDS0068BarometricPressureHg
         	DisplayString,
-        owEDS0068Light,
+        owEDS0068Light
         	DisplayString,
         owEDS0068Counter
             COUNTER32
@@ -1473,7 +1474,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0068Entry 8 }
 
     owEDS0068Counter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter."
@@ -1482,14 +1483,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS0069 TABLE - motion
 
     owEDS0069Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF owEDS0069Entry
+        SYNTAX              SEQUENCE OF OwEDS0069Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS0069 device data (temperature and motion)."
         ::= { owDevices 16 }
 
     owEDS0069Entry OBJECT-TYPE
-        SYNTAX              owEDS0069Entry
+        SYNTAX              OwEDS0069Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -1498,7 +1499,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { owEDS0069Table 1 }
 
-    owEDS0069Entry ::= SEQUENCE {
+    OwEDS0069Entry ::= SEQUENCE {
         owEDS0069Temperature
             DisplayString,
         owEDS0069Motion
@@ -1522,7 +1523,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0069Entry 2 }
 
     owEDS0069Counter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter."
@@ -1531,14 +1532,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS0070 TABLE - vibration
 
     owEDS0070Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF owEDS0070Entry
+        SYNTAX              SEQUENCE OF OwEDS0070Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS0070 device data (vibration)."
         ::= { owDevices 17 }
 
     owEDS0070Entry OBJECT-TYPE
-        SYNTAX              owEDS0070Entry
+        SYNTAX              OwEDS0070Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -1547,7 +1548,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { owEDS0070Table 1 }
 
-    owEDS0070Entry ::= SEQUENCE {
+    OwEDS0070Entry ::= SEQUENCE {
         owEDS0070VibrationInstant
             INTEGER,
         owEDS0070VibrationPeak
@@ -1601,7 +1602,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0070Entry 4 }
 
     owEDS0070Counter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter."
@@ -1610,14 +1611,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS0071 TABLE - RTD 4-wire
 
     owEDS0071Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF owEDS0071Entry
+        SYNTAX              SEQUENCE OF OwEDS0071Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS0071 device data (RTD 4-wire)."
         ::= { owDevices 18 }
 
     owEDS0071Entry OBJECT-TYPE
-        SYNTAX              owEDS0071Entry
+        SYNTAX              OwEDS0071Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -1626,7 +1627,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { owEDS0071Table 1 }
 
-    owEDS0071Entry ::= SEQUENCE {
+    OwEDS0071Entry ::= SEQUENCE {
         owEDS0071Temperature
             DisplayString,
         owEDS0071Counter
@@ -1641,7 +1642,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0071Entry 1 }
 
     owEDS0071Counter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter."
@@ -1650,14 +1651,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS0080 TABLE - octal 4-20ma
 
     owEDS0080Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF owEDS0080Entry
+        SYNTAX              SEQUENCE OF OwEDS0080Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS0080 device data (octal 4-20ma)."
         ::= { owDevices 19 }
 
     owEDS0080Entry OBJECT-TYPE
-        SYNTAX              owEDS0080Entry
+        SYNTAX              OwEDS0080Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -1666,7 +1667,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { owEDS0080Table 1 }
 
-    owEDS0080Entry ::= SEQUENCE {
+    OwEDS0080Entry ::= SEQUENCE {
         owEDS0080Input1
             DisplayString,
         owEDS0080Input2
@@ -1744,7 +1745,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0080Entry 8 }
 
     owEDS0080Counter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter."
@@ -1753,14 +1754,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS0082 TABLE - octal 0-10v
 
     owEDS0082Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF owEDS0082Entry
+        SYNTAX              SEQUENCE OF OwEDS0082Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS0082 device data (octal 0-10v)."
         ::= { owDevices 20 }
 
     owEDS0082Entry OBJECT-TYPE
-        SYNTAX              owEDS0082Entry
+        SYNTAX              OwEDS0082Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -1769,7 +1770,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { owEDS0082Table 1 }
 
-    owEDS0082Entry ::= SEQUENCE {
+    OwEDS0082Entry ::= SEQUENCE {
         owEDS0082Input1
             DisplayString,
         owEDS0082Input2
@@ -1847,7 +1848,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0082Entry 8 }
 
     owEDS0082Counter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter."
@@ -1856,14 +1857,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS0083 TABLE - quad 4-20ma
 
     owEDS0083Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF owEDS0083Entry
+        SYNTAX              SEQUENCE OF OwEDS0083Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS0083 device data (quad 4-20ma)."
         ::= { owDevices 21 }
 
     owEDS0083Entry OBJECT-TYPE
-        SYNTAX              owEDS0083Entry
+        SYNTAX              OwEDS0083Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -1872,7 +1873,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { owEDS0083Table 1 }
 
-    owEDS0083Entry ::= SEQUENCE {
+    OwEDS0083Entry ::= SEQUENCE {
         owEDS0083Input1
             DisplayString,
         owEDS0083Input2
@@ -1914,7 +1915,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0083Entry 4 }
 
     owEDS0083Counter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter."
@@ -1923,14 +1924,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS0085 TABLE - quad 0-10v
 
     owEDS0085Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF owEDS0085Entry
+        SYNTAX              SEQUENCE OF OwEDS0085Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS0085 device data (quad 0-10v)."
         ::= { owDevices 22 }
 
     owEDS0085Entry OBJECT-TYPE
-        SYNTAX              owEDS0085Entry
+        SYNTAX              OwEDS0085Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -1939,7 +1940,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { owEDS0085Table 1 }
 
-    owEDS0085Entry ::= SEQUENCE {
+    OwEDS0085Entry ::= SEQUENCE {
         owEDS0085Input1
             DisplayString,
         owEDS0085Input2
@@ -1981,7 +1982,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0085Entry 4 }
 
     owEDS0085Counter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter."
@@ -1990,14 +1991,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS0090 TABLE - octal discrete IO
 
     owEDS0090Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF owEDS0090Entry
+        SYNTAX              SEQUENCE OF OwEDS0090Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS0090 device data (octal discrete IO)."
         ::= { owDevices 23 }
 
     owEDS0090Entry OBJECT-TYPE
-        SYNTAX              owEDS0090Entry
+        SYNTAX              OwEDS0090Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -2006,7 +2007,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { owEDS0090Table 1 }
 
-    owEDS0090Entry ::= SEQUENCE {
+    OwEDS0090Entry ::= SEQUENCE {
         owEDS0090Input1
             INTEGER,
         owEDS0090Input2
@@ -2285,56 +2286,56 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0090Entry 16 }
 
     owEDS0090PulseCounter1 OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Pulse Counter 1."
         ::= { owEDS0090Entry 17 }
 
     owEDS0090PulseCounter2 OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Pulse Counter 2."
         ::= { owEDS0090Entry 18 }
 
     owEDS0090PulseCounter3 OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Pulse Counter 3."
         ::= { owEDS0090Entry 19 }
 
     owEDS0090PulseCounter4 OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Pulse Counter 4."
         ::= { owEDS0090Entry 20 }
 
     owEDS0090PulseCounter5 OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Pulse Counter 5."
         ::= { owEDS0090Entry 21 }
 
     owEDS0090PulseCounter6 OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Pulse Counter 6."
         ::= { owEDS0090Entry 22 }
 
     owEDS0090PulseCounter7 OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Pulse Counter 7."
         ::= { owEDS0090Entry 23 }
 
     owEDS0090PulseCounter8 OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Pulse Counter 8."
@@ -2661,7 +2662,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0090Entry 56 }
 
     owEDS0090Counter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter."
@@ -2671,14 +2672,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS0091 TABLE - quad opto
 
     owEDS0091Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF owEDS0091Entry
+        SYNTAX              SEQUENCE OF OwEDS0091Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS0091 device data (quad opto input)."
         ::= { owDevices 24 }
 
     owEDS0091Entry OBJECT-TYPE
-        SYNTAX              owEDS0091Entry
+        SYNTAX              OwEDS0091Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -2687,7 +2688,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { owEDS0091Table 1 }
 
-    owEDS0091Entry ::= SEQUENCE {
+    OwEDS0091Entry ::= SEQUENCE {
         owEDS0091Input1
             INTEGER,
         owEDS0091Input2
@@ -2813,28 +2814,28 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0091Entry 8 }
 
     owEDS0091PulseCounter1 OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Pulse Counter 1."
         ::= { owEDS0091Entry 9 }
 
     owEDS0091PulseCounter2 OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Pulse Counter 1."
         ::= { owEDS0091Entry 10 }
 
     owEDS0091PulseCounter3 OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Pulse Counter 1."
         ::= { owEDS0091Entry 11 }
 
     owEDS0091PulseCounter4 OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Pulse Counter 1."
@@ -2922,7 +2923,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
 
 
     owEDS0091Counter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter."
@@ -2931,14 +2932,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS0092 TABLE - quad relay
 
     owEDS0092Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF owEDS0092Entry
+        SYNTAX              SEQUENCE OF OwEDS0092Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS0092 device data (quad relay output)."
         ::= { owDevices 25 }
 
     owEDS0092Entry OBJECT-TYPE
-        SYNTAX              owEDS0092Entry
+        SYNTAX              OwEDS0092Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -2947,7 +2948,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { owEDS0092Table 1 }
 
-    owEDS0092Entry ::= SEQUENCE {
+    OwEDS0092Entry ::= SEQUENCE {
         owEDS0092Output1
             DisplayString,
         owEDS0092Output2
@@ -3001,7 +3002,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0092Entry 4 }
 
     owEDS0092Counter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter."
@@ -3042,7 +3043,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
 	owDS28EA00PIOAFlipFlop
 	    INTEGER,
 	owDS28EA00PIOBFlipFlop
-	    INTEGER,
+	    INTEGER
     }
 
     owDS28EA00Temperature OBJECT-TYPE
@@ -3173,7 +3174,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
     	owEDS0050PulseCounterReset2
     		INTEGER,
     	owEDS0050Counter
-    		COUNTER32,
+    		COUNTER32
     }
 
     owEDS0050Temperature OBJECT-TYPE
@@ -3233,14 +3234,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0050Entry 6 }
 
     owEDS0050PulseCounter1 OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-write
         STATUS              mandatory
         DESCRIPTION         "Count of the pulses on input 1."
         ::= { owEDS0050Entry 7 }
 
     owEDS0050PulseCounter2 OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-write
         STATUS              mandatory
         DESCRIPTION         "Count of the pulses on input 2."
@@ -3307,7 +3308,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { owEDS0050Entry 14 }
 
     owEDS0050Counter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Counter."
@@ -3321,13 +3322,13 @@ EDS-MIB DEFINITIONS ::= BEGIN
     --Wireless device trap table
     wTrap OBJECT IDENTIFIER ::= { edsMain 3 }
     wTrapTable OBJECT-TYPE
-        SYNTAX              SEQUENCE OF wTrapEntry
+        SYNTAX              SEQUENCE OF WTrapEntry
         ACCESS              not-accessible
         STATUS              mandatory
         ::= { wTrap 1 }
 
     wTrapEntry OBJECT-TYPE
-        SYNTAX              wTrapEntry
+        SYNTAX              WTrapEntry
         ACCESS              not-accessible
         STATUS              mandatory
         INDEX               {
@@ -3335,7 +3336,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { wTrapTable 1 }
 
-    wTrapEntry ::= SEQUENCE {
+    WTrapEntry ::= SEQUENCE {
         wTrapIndex
             INTEGER,
         wTrapIP
@@ -3349,7 +3350,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
 	wTrapHighThreshold
 	    DisplayString,
 	wTrapLowThreshold
-	    DisplayString,
+	    DisplayString
     }
 
     wTrapIndex OBJECT-TYPE
@@ -3468,13 +3469,13 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { wDeviceInfo 1 }
 
     wDeviceTable OBJECT-TYPE
-        SYNTAX              SEQUENCE OF wDeviceEntry
+        SYNTAX              SEQUENCE OF WDeviceEntry
         ACCESS              not-accessible
         STATUS              mandatory
         ::= { wDevices 3 }
 
     wDeviceEntry OBJECT-TYPE
-        SYNTAX              wDeviceEntry
+        SYNTAX              WDeviceEntry
         ACCESS              not-accessible
         STATUS              mandatory
         INDEX               {
@@ -3482,7 +3483,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { wDeviceTable 1 }
 
-    wDeviceEntry ::= SEQUENCE {
+    WDeviceEntry ::= SEQUENCE {
         wDeviceIndex
             INTEGER,
         wDeviceType
@@ -3496,9 +3497,9 @@ EDS-MIB DEFINITIONS ::= BEGIN
         wDeviceEUI
             OCTET STRING,
         wDeviceHealth
-            INTEGER
+            INTEGER,
         wDeviceTag
-            DisplayString,
+            DisplayString
     }
 
     wDeviceIndex OBJECT-TYPE
@@ -3571,14 +3572,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS1068 TABLE
 
     wEDS1068Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF wEDS1068Entry
+        SYNTAX              SEQUENCE OF WEDS1068Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS1068 device data (temperature, humidity, barometric pressure and light)."
         ::= { wDevices 4 }
 
     wEDS1068Entry OBJECT-TYPE
-        SYNTAX              wEDS1068Entry
+        SYNTAX              WEDS1068Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -3587,7 +3588,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { wEDS1068Table 1 }
 
-    wEDS1068Entry ::= SEQUENCE {
+    WEDS1068Entry ::= SEQUENCE {
         wEDS1068Temperature
             DisplayString,
         wEDS1068Humidity
@@ -3623,7 +3624,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         wEDS1068LEDSetState
         	INTEGER,
         wEDS1068RelaySetState
-        	INTEGER,
+        	INTEGER
     }
 
     wEDS1068Temperature OBJECT-TYPE
@@ -3718,7 +3719,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { wEDS1068Entry 13 }
 
     wEDS1068ReadCounter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Read counter."
@@ -3755,14 +3756,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS1067 TABLE, temp, light, input, relay
 
     wEDS1067Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF wEDS1067Entry
+        SYNTAX              SEQUENCE OF WEDS1067Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS1067 device data (temperature, humidity, barometric pressure and light)."
         ::= { wDevices 5 }
 
     wEDS1067Entry OBJECT-TYPE
-        SYNTAX              wEDS1067Entry
+        SYNTAX              WEDS1067Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -3771,7 +3772,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { wEDS1067Table 1 }
 
-    wEDS1067Entry ::= SEQUENCE {
+    WEDS1067Entry ::= SEQUENCE {
         wEDS1067Temperature
             DisplayString,
         wEDS1067LEDState
@@ -3797,7 +3798,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         wEDS1067LEDSetState
         	INTEGER,
         wEDS1067RelaySetState
-        	INTEGER,
+        	INTEGER
     }
 
     wEDS1067Temperature OBJECT-TYPE
@@ -3857,7 +3858,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { wEDS1067Entry 8 }
 
     wEDS1067ReadCounter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Read counter."
@@ -3894,14 +3895,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS1066 TABLE, temp, BP, input, relay
 
     wEDS1066Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF wEDS1066Entry
+        SYNTAX              SEQUENCE OF WEDS1066Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS1066 device data (temperature, humidity, barometric pressure and light)."
         ::= { wDevices 6 }
 
     wEDS1066Entry OBJECT-TYPE
-        SYNTAX              wEDS1066Entry
+        SYNTAX              WEDS1066Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -3910,7 +3911,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { wEDS1066Table 1 }
 
-    wEDS1066Entry ::= SEQUENCE {
+    WEDS1066Entry ::= SEQUENCE {
         wEDS1066Temperature
             DisplayString,
         wEDS1066BarometricPressure
@@ -3936,7 +3937,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         wEDS1066LEDSetState
         	INTEGER,
         wEDS1066RelaySetState
-        	INTEGER,
+        	INTEGER
     }
 
     wEDS1066Temperature OBJECT-TYPE
@@ -3996,7 +3997,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { wEDS1066Entry 8 }
 
     wEDS1066ReadCounter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Read counter."
@@ -4033,14 +4034,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS1065 TABLE, temp, hum, input, relay
 
     wEDS1065Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF wEDS1065Entry
+        SYNTAX              SEQUENCE OF WEDS1065Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS1065 device data (temperature, humidity, barometric pressure and light)."
         ::= { wDevices 7 }
 
     wEDS1065Entry OBJECT-TYPE
-        SYNTAX              wEDS1065Entry
+        SYNTAX              WEDS1065Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -4049,7 +4050,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { wEDS1065Table 1 }
 
-    wEDS1065Entry ::= SEQUENCE {
+    WEDS1065Entry ::= SEQUENCE {
         wEDS1065Temperature
             DisplayString,
         wEDS1065Humidity
@@ -4081,7 +4082,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         wEDS1065LEDSetState
         	INTEGER,
         wEDS1065RelaySetState
-        	INTEGER,
+        	INTEGER
     }
 
     wEDS1065Temperature OBJECT-TYPE
@@ -4162,7 +4163,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { wEDS1065Entry 11 }
 
     wEDS1065ReadCounter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Read counter."
@@ -4199,14 +4200,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS1064 TABLE, temp, input, relay
 
     wEDS1064Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF wEDS1064Entry
+        SYNTAX              SEQUENCE OF WEDS1064Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS1064 device data (temperature, humidity, barometric pressure and light)."
         ::= { wDevices 8 }
 
     wEDS1064Entry OBJECT-TYPE
-        SYNTAX              wEDS1064Entry
+        SYNTAX              WEDS1064Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -4215,7 +4216,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { wEDS1064Table 1 }
 
-    wEDS1064Entry ::= SEQUENCE {
+    WEDS1064Entry ::= SEQUENCE {
         wEDS1064Temperature
             DisplayString,
         wEDS1064LEDState
@@ -4239,7 +4240,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         wEDS1064LEDSetState
         	INTEGER,
         wEDS1064RelaySetState
-        	INTEGER,
+        	INTEGER
     }
 
     wEDS1064Temperature OBJECT-TYPE
@@ -4292,7 +4293,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { wEDS1064Entry 7 }
 
     wEDS1064ReadCounter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Read counter."
@@ -4329,14 +4330,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS1101 TABLE
 
     wEDS1101Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF wEDS1101Entry
+        SYNTAX              SEQUENCE OF WEDS1101Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS1101 device data (repeater)."
         ::= { wDevices 9 }
 
     wEDS1101Entry OBJECT-TYPE
-        SYNTAX              wEDS1101Entry
+        SYNTAX              WEDS1101Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -4345,11 +4346,11 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { wEDS1101Table 1 }
 
-    wEDS1101Entry ::= SEQUENCE {
+    WEDS1101Entry ::= SEQUENCE {
         wEDS1101DevicesConnected
             INTEGER,
         wEDS1101SendCounter
-            COUNTER32,
+            COUNTER32
     }
 
     wEDS1101DevicesConnected OBJECT-TYPE
@@ -4360,7 +4361,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { wEDS1101Entry 1 }
 
     wEDS1101SendCounter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Send counter."
@@ -4369,14 +4370,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS2101 TABLE
 
     wEDS2101Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF wEDS2101Entry
+        SYNTAX              SEQUENCE OF WEDS2101Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS2101 device data (repeater)."
         ::= { wDevices 10 }
 
     wEDS2101Entry OBJECT-TYPE
-        SYNTAX              wEDS2101Entry
+        SYNTAX              WEDS2101Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -4385,11 +4386,11 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { wEDS2101Table 1 }
 
-    wEDS2101Entry ::= SEQUENCE {
+    WEDS2101Entry ::= SEQUENCE {
         wEDS2101DevicesConnected
             INTEGER,
         wEDS2101SendCounter
-            COUNTER32,
+            COUNTER32
     }
 
     wEDS2101DevicesConnected OBJECT-TYPE
@@ -4400,7 +4401,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { wEDS2101Entry 1 }
 
     wEDS2101SendCounter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Send counter."
@@ -4410,14 +4411,14 @@ EDS-MIB DEFINITIONS ::= BEGIN
 -- EDS2030 TABLE
 
     wEDS2030Table OBJECT-TYPE
-        SYNTAX              SEQUENCE OF wEDS2030Entry
+        SYNTAX              SEQUENCE OF WEDS2030Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         "Table for EDS2030 device data (temperature, probe, light and input)."
         ::= { wDevices 11 }
 
     wEDS2030Entry OBJECT-TYPE
-        SYNTAX              wEDS2030Entry
+        SYNTAX              WEDS2030Entry
         ACCESS              not-accessible
         STATUS              mandatory
         DESCRIPTION         ""
@@ -4426,7 +4427,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
                             }
         ::= { wEDS2030Table 1 }
 
-    wEDS2030Entry ::= SEQUENCE {
+    WEDS2030Entry ::= SEQUENCE {
         wEDS2030Temperature
             DisplayString,
         wEDS2030Probe
@@ -4448,7 +4449,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         wEDS2030LEDFunction
         	INTEGER,
         wEDS2030LEDSetState
-        	INTEGER,
+        	INTEGER
     }
 
     wEDS2030Temperature OBJECT-TYPE
@@ -4508,7 +4509,7 @@ EDS-MIB DEFINITIONS ::= BEGIN
         ::= { wEDS2030Entry 8 }
 
     wEDS2030ReadCounter OBJECT-TYPE
-        SYNTAX              COUNTER32
+        SYNTAX              Counter
         ACCESS              read-only
         STATUS              mandatory
         DESCRIPTION         "Read counter."

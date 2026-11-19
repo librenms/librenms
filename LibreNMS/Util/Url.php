@@ -27,6 +27,7 @@
 namespace LibreNMS\Util;
 
 use App\Facades\LibrenmsConfig;
+use App\Http\Controllers\DeviceController;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\Sensor;
@@ -270,7 +271,18 @@ class Url
      */
     public static function deviceUrl($device, $vars = [])
     {
-        $routeParams = [($device instanceof Device) ? $device->device_id : (int) $device];
+        $deviceId = ($device instanceof Device) ? $device->device_id : (int) $device;
+        $tab = $vars['tab'] ?? null;
+
+        // tabs with their own route take their options in the query string
+        if ($tab !== 'port' && in_array($tab, DeviceController::ROUTED_TABS, true)) {
+            unset($vars['tab']);
+            $vars = array_filter($vars, fn ($value) => $value !== null && $value !== '');
+
+            return route("device.$tab", ['device' => $deviceId] + $vars);
+        }
+
+        $routeParams = [$deviceId];
         if (isset($vars['tab'])) {
             $routeParams[] = $vars['tab'];
             unset($vars['tab']);
@@ -279,14 +291,28 @@ class Url
         return route('device', $routeParams) . self::urlParams($vars);
     }
 
-    public static function portUrl($port, $vars = [])
+    /**
+     * Port page url: /device/{device}/port/{port} with any options in the query string
+     *
+     * @param  array<string, mixed>  $vars
+     */
+    public static function portUrl($port, $vars = []): string
     {
-        return self::generate(['page' => 'device', 'device' => $port->device_id, 'tab' => 'port', 'port' => $port->port_id], $vars);
+        $vars = array_filter($vars, fn ($value) => $value !== null && $value !== '');
+
+        return route('device.port', ['device' => $port->device_id, 'port' => $port->port_id] + $vars);
     }
 
-    public static function sensorUrl($sensor, $vars = [])
+    /**
+     * Device health page url for the sensor's class
+     *
+     * @param  array<string, mixed>  $vars
+     */
+    public static function sensorUrl($sensor, $vars = []): string
     {
-        return self::generate(['page' => 'device', 'device' => $sensor->device_id, 'tab' => 'health', 'metric' => $sensor->sensor_class], $vars);
+        $sensorClass = $sensor->sensor_class instanceof \BackedEnum ? $sensor->sensor_class->value : $sensor->sensor_class;
+
+        return route('device.health', ['device' => $sensor->device_id, 'metric' => $sensorClass] + $vars);
     }
 
     public static function generate($vars, $new_vars = [])

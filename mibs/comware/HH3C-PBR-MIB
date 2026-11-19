@@ -1,21 +1,38 @@
 -- =================================================================
--- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2023 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: policy-based routing(PBR) MIB File
 -- Reference:
--- Version: V1.1
+-- Version: V1.3
 -- History:
---      V1.0 created by houyefei
+--      V1.0 created by Hou Yefei
 --        initial version 2010-12-10
---      V1.1 2012-7-21 modified by houyefei
+--      V1.1 2012-7-21 modified by Hou Yefei
 --         Add hh3cPBRLocalPolicy
 --         Add hh3cPBRMibPolicyNodeTable, hh3cPBRMibIfPolicyTable,
 --             hh3cPBRMibMatchAclTable, hh3cPBRMibMatchAclTable,
 --             hh3cPBRMibApplyNexthopTablel,
 --             hh3cPBRMibApplyDefaultNexthopTable
---           2012-8-13 modified by houyefei
+--           2012-8-13 modified by Hou Yefei
 --         Modify hh3cPBRNexthopTrapEnabled
 --         Add hh3cPBRIPv6NexthopTrapEnabled
+--      V1.2 2022-6-27 modified by Li Ke
+--         Add hh3cPBRMibMinPktLen, hh3cPBRMibMaxPktLen,
+--             hh3cPBRMibQosId, hh3cPBRMibQosIdMode,
+--             hh3cPBRMibVxlanId, hh3cPBRMibDescription, hh3cPBRMibApplyContinue,
+--             hh3cPBRMibApplyFailDropNextHop, hh3cPBRMibApplyIpDf,
+--             hh3cPBRMibApplyLoadShareNextHop, hh3cPBRMibApplyLoadShareOutIf,
+--             hh3cPBRMibApplyLSDefaultNextHop, hh3cPBRMibApplyLSDefaultOutIf,
+--             hh3cPBRMibApplyStatisticsValue
+--         Add hh3cPBRMibIfPolicyShareMode
+--         Add hh3cPBRMibAclGroupName, hh3cPBRMibAclGroupVersion
+--         Add hh3cPBRMibApplyNexthopInboundVpn, hh3cPBRMibApplyNexthopWeight,
+--             hh3cPBRMibApplyNexthopPathId, hh3cPBRMibApplyNexthopPathIndex
+--         Add hh3cPBRMibApplyDefNexthopInbVpn, hh3cPBRMibApplyDefNexthopPathId,
+--             hh3cPBRMibApplyDefNexthopPathInd
+--      V1.3 2023-1-5 modified by Li Ke
+--         Modify hh3cPBRMibApplyNexthopTrackId,
+--             hh3cPBRMibApplyDefaultNexthopTrackId
 -- =================================================================
 HH3C-PBR-MIB DEFINITIONS ::= BEGIN
 
@@ -33,7 +50,7 @@ IMPORTS
 
 hh3cPBR MODULE-IDENTITY
     LAST-UPDATED
-        "201012101558Z"
+        "202301051023Z"
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -47,6 +64,27 @@ hh3cPBR MODULE-IDENTITY
         of PBR.  It routes IP packets by user defined policy
         other than normal destination address based routing.
         "
+    REVISION
+        "202301051023Z"
+    DESCRIPTION
+        "Modify hh3cPBRMibApplyNexthopTrackId and
+             hh3cPBRMibApplyDefaultNexthopTrackId."
+    REVISION
+        "202206271115Z"
+    DESCRIPTION
+        "Add hh3cPBRMibMinPktLen, hh3cPBRMibMaxPktLen,
+             hh3cPBRMibQosId, hh3cPBRMibQosIdMode,
+             hh3cPBRMibVxlanId, hh3cPBRMibDescription, hh3cPBRMibApplyContinue,
+             hh3cPBRMibApplyFailDropNextHop, hh3cPBRMibApplyIpDf,
+             hh3cPBRMibApplyLoadShareNextHop, hh3cPBRMibApplyLoadShareOutIf,
+             hh3cPBRMibApplyLSDefaultNextHop, hh3cPBRMibApplyLSDefaultOutIf,
+             hh3cPBRMibApplyStatisticsValue
+         Add hh3cPBRMibIfPolicyShareMode
+         Add hh3cPBRMibAclGroupName, hh3cPBRMibAclGroupVersion
+         Add hh3cPBRMibApplyNexthopInboundVpn, hh3cPBRMibApplyNexthopWeight,
+             hh3cPBRMibApplyNexthopPathId, hh3cPBRMibApplyNexthopPathIndex
+         Add hh3cPBRMibApplyDefNexthopInbVpn, hh3cPBRMibApplyDefNexthopPathId,
+             hh3cPBRMibApplyDefNexthopPathInd."
     REVISION
         "201012101558Z"
     DESCRIPTION
@@ -89,7 +127,7 @@ hh3cPBRIPv6NexthopTrapEnabled OBJECT-TYPE
          value is set to 'false', the feature is disabled."
     DEFVAL { true }
     ::= { hh3cPBRGlobal 3 }
-    
+
 -- PBR trap table
 hh3cPBRMibTrap OBJECT IDENTIFIER ::= { hh3cPBRObjects 2 }
 
@@ -157,18 +195,32 @@ hh3cPBRMibPolicyNodeEntry  OBJECT-TYPE
 Hh3cPBRMibPolicyNodeEntry ::=
     SEQUENCE
     {
-            hh3cPBRMibPolicyNodeAddrType      InetAddressType,
-            hh3cPBRMibPolicyName              DisplayString,
-            hh3cPBRMibPolicyNodeId            Integer32,
-            hh3cPBRMibPolicyNodeMode          TruthValue,
-            hh3cPBRMibPolicyNodeRowStatus     RowStatus
+            hh3cPBRMibPolicyNodeAddrType           InetAddressType,
+            hh3cPBRMibPolicyName                   DisplayString,
+            hh3cPBRMibPolicyNodeId                 Integer32,
+            hh3cPBRMibPolicyNodeMode               TruthValue,
+            hh3cPBRMibPolicyNodeRowStatus          RowStatus,
+            hh3cPBRMibMinPktLen                    Integer32,
+            hh3cPBRMibMaxPktLen                    Integer32,
+            hh3cPBRMibQosId                        Integer32,
+            hh3cPBRMibQosIdMode                    INTEGER,
+            hh3cPBRMibVxlanId                      Integer32,
+            hh3cPBRMibDescription                  DisplayString,
+            hh3cPBRMibApplyContinue                TruthValue,
+            hh3cPBRMibApplyFailDropNextHop         TruthValue,
+            hh3cPBRMibApplyIpDf                    Integer32,
+            hh3cPBRMibApplyLoadShareNextHop        TruthValue,
+            hh3cPBRMibApplyLoadShareOutIf          TruthValue,
+            hh3cPBRMibApplyLSDefaultNextHop        TruthValue,
+            hh3cPBRMibApplyLSDefaultOutIf          TruthValue,
+            hh3cPBRMibApplyStatisticsValue         TruthValue
     }
 
 hh3cPBRMibPolicyNodeAddrType    OBJECT-TYPE
     SYNTAX      InetAddressType
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "Address type of policy node, which can be IPv4 or IPv6."
+    DESCRIPTION "Address type of policy node, which can be IPv4 or IPv6, Dual-stack."
     ::= { hh3cPBRMibPolicyNodeEntry 1 }
 
 hh3cPBRMibPolicyName    OBJECT-TYPE
@@ -208,6 +260,128 @@ hh3cPBRMibPolicyNodeRowStatus   OBJECT-TYPE
             "
     ::= { hh3cPBRMibPolicyNodeEntry 5 }
 
+hh3cPBRMibMinPktLen    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the minimum IP packet length in the range of 1 and 65535.
+                 Value 0 indicates that this rule is not set."
+    ::= { hh3cPBRMibPolicyNodeEntry 6 }
+
+hh3cPBRMibMaxPktLen    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the maximum IP packet length in the range of 1 and 65535.
+                 The maximum length must be no less than the minimum length.
+                 The maximum and the minimum lengths must be both configured.
+                 Value 0 indicates that this rule is not set."
+    ::= { hh3cPBRMibPolicyNodeEntry 7 }
+
+hh3cPBRMibQosId    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies a local Quality of Service(QoS) ID in the range of 1 and 4095.
+                 Value 0 indicates that this rule is not set."
+    ::= { hh3cPBRMibPolicyNodeEntry 8 }
+
+hh3cPBRMibQosIdMode    OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        invalid(1),
+        normal(2),
+        qppb(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The mode of the QoS Local ID.
+                 The default value is normal."
+    ::= { hh3cPBRMibPolicyNodeEntry 9 }
+
+hh3cPBRMibVxlanId    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies a VXLAN ID in the range of 0 to 16777215.
+                 Value -1 indicates that this rule is not set."
+    ::= { hh3cPBRMibPolicyNodeEntry 10 }
+
+hh3cPBRMibDescription    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..127))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "A description for a policy node."
+    ::= { hh3cPBRMibPolicyNodeEntry 11 }
+
+hh3cPBRMibApplyContinue    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Use apply continue to compare packets
+                 with the next policy node upon failure on the current node.
+                 Value FALSE indicates that this action is not set."
+    ::= { hh3cPBRMibPolicyNodeEntry 12 }
+
+hh3cPBRMibApplyFailDropNextHop    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Configure the policy node to drop matching packets when
+                 the next hop is invalid.  If no next hops are specified
+                 on the policy node, this command drops all packets that
+                 match the node. Value FALSE indicates that this action is not set."
+    ::= { hh3cPBRMibPolicyNodeEntry 13 }
+
+hh3cPBRMibApplyIpDf    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Sets the Don't Fragment(DF) bit in the IP header of
+                 matching packets. The value can be 0 or 1.
+                 Value -1 indicates that this action is not set."
+    ::= { hh3cPBRMibPolicyNodeEntry 14 }
+
+hh3cPBRMibApplyLoadShareNextHop    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Enables load sharing among multiple next hops.
+                 Value FALSE indicates that this action is not set."
+    ::= { hh3cPBRMibPolicyNodeEntry 15 }
+
+hh3cPBRMibApplyLoadShareOutIf    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Enables load sharing among multiple output interfaces.
+                 Value FALSE indicates that this action is not set."
+    ::= { hh3cPBRMibPolicyNodeEntry 16 }
+
+hh3cPBRMibApplyLSDefaultNextHop    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Enables load sharing among multiple default next hops.
+                 Value FALSE indicates that this action is not set."
+    ::= { hh3cPBRMibPolicyNodeEntry 17 }
+
+hh3cPBRMibApplyLSDefaultOutIf    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Enables load sharing among multiple default output interfaces.
+                 Value FALSE indicates that this action is not set."
+    ::= { hh3cPBRMibPolicyNodeEntry 18 }
+
+hh3cPBRMibApplyStatisticsValue    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Use apply statistics to enable match counting on a policy node.
+                 Value FALSE indicates that this action is not set."
+    ::= { hh3cPBRMibPolicyNodeEntry 19 }
+
 -- PBR local policy
 
 
@@ -240,7 +414,8 @@ Hh3cPBRMibIfPolicyEntry ::=
     {
             hh3cPBRMibPolicyAddressType   InetAddressType,
             hh3cPBRMibAppliedPolicyName   DisplayString,
-            hh3cPBRMibIfPolicyRowStatus   RowStatus
+            hh3cPBRMibIfPolicyRowStatus   RowStatus,
+            hh3cPBRMibIfPolicyShareMode   TruthValue
     }
 
 hh3cPBRMibPolicyAddressType    OBJECT-TYPE
@@ -248,7 +423,7 @@ hh3cPBRMibPolicyAddressType    OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION  "Address type of policy node, which can be
-                 IPv4 or IPv6."
+                 IPv4 or IPv6, Dual-stack."
     ::= { hh3cPBRMibIfPolicyEntry 1 }
 
 hh3cPBRMibAppliedPolicyName    OBJECT-TYPE
@@ -269,6 +444,16 @@ hh3cPBRMibIfPolicyRowStatus  OBJECT-TYPE
             "
     ::= { hh3cPBRMibIfPolicyEntry 3 }
 
+hh3cPBRMibIfPolicyShareMode    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Applies the policy in resource sharing mode.
+                 In this mode, all interfaces on an interface card
+                 with the same policy applied share one hardware resource."
+    DEFVAL { false }
+    ::= { hh3cPBRMibIfPolicyEntry 4 }
+
 -- PBR policy node acl rule table
 
 hh3cPBRMibMatchAclTable OBJECT-TYPE
@@ -276,7 +461,7 @@ hh3cPBRMibMatchAclTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "A table for ACLs being used by a policy node.  Only one ACL
-                can be used within a node at most.
+                 can be used within a node at most.
                 "
     ::= { hh3cPBRTables 3 }
 
@@ -297,7 +482,9 @@ hh3cPBRMibMatchAclEntry  OBJECT-TYPE
 Hh3cPBRMibMatchAclEntry ::=
     SEQUENCE
     {
-            hh3cPBRMibAclGroupId   Integer32
+            hh3cPBRMibAclGroupId   Integer32,
+            hh3cPBRMibAclGroupName OCTET STRING,
+            hh3cPBRMibAclGroupVersion   INTEGER
     }
 
 hh3cPBRMibAclGroupId    OBJECT-TYPE
@@ -306,8 +493,36 @@ hh3cPBRMibAclGroupId    OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Index of number-acl group.
                  Setting -1 indicates closing this rule.
+                 When ACLName is configured with a valid value,
+                 value -1 will be returned for ACLNumber.
                 "
     ::= { hh3cPBRMibMatchAclEntry 1 }
+
+hh3cPBRMibAclGroupName   OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..63))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION "ACL match criterion by name. The ACL name must start with
+                 letter a to z or A to Z.  The ACL name cannot be all in
+                 any combination of upper-case and lower-case letters.
+                 To delete an ACL match criterion, you must configure the value
+                 for ACLNumber as -1."
+    ::= { hh3cPBRMibMatchAclEntry 2 }
+
+hh3cPBRMibAclGroupVersion    OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        invalid(1),
+        ipv4(2),
+        ipv6(3),
+        userdefined(4)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The type of the ACL.
+                 The hh3cPBRMibAclGroupVersion can only be configured
+                 when the policy node type is Dual-stack, and cannot be empty."
+    ::= { hh3cPBRMibMatchAclEntry 3 }
 
 -- PBR policy node apply precedence action table
 
@@ -394,7 +609,11 @@ Hh3cPBRMibApplyNexthopEntry ::=
             hh3cPBRMibApplyNexthopAddress     InetAddress,
             hh3cPBRMibApplyNexthopTrackId     Integer32,
             hh3cPBRMibApplyNexthopDirect      TruthValue,
-            hh3cPBRMibApplyNexthopRowStatus   RowStatus
+            hh3cPBRMibApplyNexthopRowStatus   RowStatus,
+            hh3cPBRMibApplyNexthopInboundVpn  TruthValue,
+            hh3cPBRMibApplyNexthopWeight      Integer32,
+            hh3cPBRMibApplyNexthopPathId      Integer32,
+            hh3cPBRMibApplyNexthopPathIndex   Integer32
     }
 
 hh3cPBRMibApplyNexthopIndex    OBJECT-TYPE
@@ -419,7 +638,6 @@ hh3cPBRMibApplyNexthopAddressType     OBJECT-TYPE
                  which can be IPv4 or IPv6."
     ::= { hh3cPBRMibApplyNexthopEntry 3 }
 
-
 hh3cPBRMibApplyNexthopAddress     OBJECT-TYPE
     SYNTAX      InetAddress
     MAX-ACCESS  read-create
@@ -432,6 +650,7 @@ hh3cPBRMibApplyNexthopTrackId     OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION "Identifier of track object related with next hop.
+                 Specifies a track entry by its number in the range of 1 to 1024.
                  Setting 0 indicates closing this function.
                 "
     ::= { hh3cPBRMibApplyNexthopEntry 5 }
@@ -456,6 +675,38 @@ hh3cPBRMibApplyNexthopRowStatus  OBJECT-TYPE
             createAndGo, and destroy.
             "
     ::= { hh3cPBRMibApplyNexthopEntry 7 }
+
+hh3cPBRMibApplyNexthopInboundVpn        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Specifies the VPN instance where the inbound interface belongs.
+                 If the value is set to TRUE, the VPN instance name will be ignored."
+    DEFVAL { false }
+    ::= { hh3cPBRMibApplyNexthopEntry 8 }
+
+hh3cPBRMibApplyNexthopWeight     OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Specifies a load sharing weight in the range of 1 and 100 for the next hop."
+    DEFVAL { 10 }
+    ::= { hh3cPBRMibApplyNexthopEntry 9 }
+
+hh3cPBRMibApplyNexthopPathId     OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Specifies a service chain by its path ID in the range of 1 and 16777215."
+    ::= { hh3cPBRMibApplyNexthopEntry 10 }
+
+hh3cPBRMibApplyNexthopPathIndex     OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Specifies a node in the service chain as
+                 a next hop by its index in the range of 1 and 255."
+    ::= { hh3cPBRMibApplyNexthopEntry 11 }
 
 -- PBR policy node apply default next hop action table
 
@@ -492,14 +743,17 @@ Hh3cPBRMibApplyDefaultNexthopEntry ::=
             hh3cPBRMibApplyDefaultNexthopAddress     InetAddress,
             hh3cPBRMibApplyDefaultNexthopTrackId     Integer32,
             hh3cPBRMibApplyDefaultNexthopDirect      TruthValue,
-            hh3cPBRMibApplyDefaultNexthopRowStatus   RowStatus
+            hh3cPBRMibApplyDefaultNexthopRowStatus   RowStatus,
+            hh3cPBRMibApplyDefNexthopInbVpn          TruthValue,
+            hh3cPBRMibApplyDefNexthopPathId          Integer32,
+            hh3cPBRMibApplyDefNexthopPathInd         Integer32
     }
 
 hh3cPBRMibApplyDefaultNexthopIndex    OBJECT-TYPE
     SYNTAX      Integer32 (0..2147483647)
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "Index of default next hop  for the apply
+    DESCRIPTION "Index of default next hop for the apply
                 default next hop action."
     ::= { hh3cPBRMibApplyDefaultNexthopEntry 1 }
 
@@ -508,7 +762,7 @@ hh3cPBRMibApplyDefaultNexthopVpnName    OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION "Name of VPN instance where apply default next hop action
-                is used."
+                 is used."
     ::= { hh3cPBRMibApplyDefaultNexthopEntry 2 }
 
 hh3cPBRMibApplyDefaultNexthopAddressType     OBJECT-TYPE
@@ -518,7 +772,6 @@ hh3cPBRMibApplyDefaultNexthopAddressType     OBJECT-TYPE
     DESCRIPTION "Address type of hh3cPBRMibApplyDefaultNexthopAddress,
                  which can be IPv4 or IPv6."
     ::= { hh3cPBRMibApplyDefaultNexthopEntry 3 }
-
 
 hh3cPBRMibApplyDefaultNexthopAddress     OBJECT-TYPE
     SYNTAX      InetAddress
@@ -532,6 +785,7 @@ hh3cPBRMibApplyDefaultNexthopTrackId     OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION "Identifier of track object related with default next hop.
+                 Specifies a track entry by its number in the range of 1 to 1024.
                  Setting 0 indicates closing this function."
     ::= { hh3cPBRMibApplyDefaultNexthopEntry 5 }
 
@@ -544,7 +798,6 @@ hh3cPBRMibApplyDefaultNexthopDirect        OBJECT-TYPE
     DEFVAL { false }
     ::= { hh3cPBRMibApplyDefaultNexthopEntry 6 }
 
-
 hh3cPBRMibApplyDefaultNexthopRowStatus  OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
@@ -555,5 +808,29 @@ hh3cPBRMibApplyDefaultNexthopRowStatus  OBJECT-TYPE
             createAndGo, and destroy.
             "
     ::= { hh3cPBRMibApplyDefaultNexthopEntry 7 }
+
+hh3cPBRMibApplyDefNexthopInbVpn        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Specifies the VPN instance where the inbound interface belongs.
+                If the value is set to TRUE, the VPN instance name will be ignored."
+    DEFVAL { false }
+    ::= { hh3cPBRMibApplyDefaultNexthopEntry 8 }
+
+hh3cPBRMibApplyDefNexthopPathId     OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Specifies a service chain by its path ID in the range of 1 and 16777215."
+    ::= { hh3cPBRMibApplyDefaultNexthopEntry 9 }
+
+hh3cPBRMibApplyDefNexthopPathInd     OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Specifies a node in the service chain as
+                 a default next hop by its index in the range of 1 and 255."
+    ::= { hh3cPBRMibApplyDefaultNexthopEntry 10 }
 
 END

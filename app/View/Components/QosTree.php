@@ -19,17 +19,30 @@ class QosTree extends Component
      */
     public function __construct(
         public Collection $qosItems,
-        public ?int $parentPortId = null,
+        public int $deviceId,
+        public ?int $portId = null,
         public ?int $parentQosId = null,
         public ?int $show = null,
     ) {
         if (! is_null($parentQosId)) {
             $this->listItems = $qosItems->where('parent_id', $parentQosId)->sortBy('title');
-        } elseif (! is_null($parentPortId)) {
-            $this->listItems = $qosItems->where('port_id', $parentPortId)->sortBy('title');
+        } elseif (! is_null($portId)) {
+            $this->listItems = $qosItems->where('port_id', $portId)->sortBy('title');
         } else {
             $this->listItems = $qosItems->whereNull('parent_id')->sortBy('title');
         }
+    }
+
+    /**
+     * Link that selects a QoS policy on the port or device QoS page
+     */
+    public function link(int $qosId): string
+    {
+        if ($this->portId) {
+            return route('device.port', ['device' => $this->deviceId, 'port' => $this->portId, 'view' => 'qos', 'show' => $qosId]);
+        }
+
+        return route('device.qos', ['device' => $this->deviceId, 'show' => $qosId]);
     }
 
     /**

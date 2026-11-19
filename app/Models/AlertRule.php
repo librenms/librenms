@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Facades\Permissions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -103,6 +104,39 @@ class AlertRule extends BaseModel
 
     /**
      * @param  Builder<AlertRule>  $query
+     * @return Builder<AlertRule>
+     */
+    protected function scopeHasAccess(Builder $query, User $user): Builder
+    {
+        $gate = Gate::forUser($user);
+        if ($gate->allows('viewAll', self::class)) {
+            return $query;
+        }
+
+        return $gate->allows('view', self::class)
+            ? $query->mappedToAccessibleDevices($user)
+            : $query->whereKey([]);
+    }
+
+    /**
+     * Match rules with an accessible device in their device, group, or location mappings.
+     *
+     * @param  Builder<AlertRule>  $query
+     * @return Builder<AlertRule>
+     */
+    protected function scopeMappedToAccessibleDevices(Builder $query, User $user): Builder
+    {
+        $deviceIds = Permissions::devicesForUser($user);
+        $groupIds = Permissions::deviceGroupsForUser($user);
+
+        return $query->where(fn (Builder $rules) => $rules
+            ->whereHas('devices', fn (Builder $devices) => $devices->whereIntegerInRaw('devices.device_id', $deviceIds))
+            ->orWhereHas('groups', fn (Builder $groups) => $groups->whereIntegerInRaw('device_groups.id', $groupIds))
+            ->orWhereHas('locations.devices', fn (Builder $devices) => $devices->whereIntegerInRaw('devices.device_id', $deviceIds)));
+    }
+
+    /**
+     * @param  Builder<AlertRule>  $query
      * @param  Device  $device
      * @return Builder<AlertRule>
      */
@@ -149,27 +183,6 @@ class AlertRule extends BaseModel
         return $query->enabled()
             ->join('alerts', 'alerts.rule_id', 'alert_rules.id')
             ->whereNotIn('alerts.state', [AlertState::CLEAR, AlertState::ACKNOWLEDGED, AlertState::RECOVERED]);
-    }
-
-    /**
-     * Scope to filter rules for devices permitted to user
-     * (do not use for admin and global read-only users)
-     *
-     * @param  Builder<AlertRule>  $query
-     * @param  User  $user
-     * @return mixed
-     */
-    public function scopeHasAccess($query, User $user)
-    {
-        if (Gate::allows('viewAll', AlertRule::class)) {
-            return $query;
-        }
-
-        if (! $this->isJoined($query, 'alerts')) {
-            $query->join('alerts', 'alerts.rule_id', 'alert_rules.id');
-        }
-
-        return $this->hasDeviceAccess($query, $user, 'alerts');
     }
 
     // ---- Define Relationships ----

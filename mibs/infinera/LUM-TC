@@ -1,0 +1,2313 @@
+LUM-TC DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    lumModules
+        FROM LUM-REG;
+
+lumTcModule MODULE-IDENTITY
+    LAST-UPDATED
+        "201812210000Z" -- Dec 21st 2018
+    ORGANIZATION
+        "Infinera Corporation"
+    CONTACT-INFO
+        "techsupport@infinera.com"
+    DESCRIPTION
+        "Common textual conventions."
+    REVISION
+        "201812210000Z" -- Dec 21st 2018
+    DESCRIPTION
+        "Changes made for release r32.0:
+         - Added missing channels between 913.5 and 961 to support full extended C-band"
+    REVISION
+        "201806290000Z" -- June 29th 2018
+    DESCRIPTION
+        "Changes made for release r31.0:
+         - Added ConnectorType
+         - Added notApplicable value for InterfaceType"
+    REVISION
+        "201804160000Z" -- April 16th 2018
+    DESCRIPTION
+        "Changes made for release r31.1:
+         - Added new value to interfaceType"
+    REVISION
+        "201706150000Z" -- June 15th 2017
+    DESCRIPTION
+        "Changes made for release r29.0:
+         - Changed ORGANIZATION and CONTACT-INFO"
+    REVISION
+        "201611300000Z" -- November 30th 2016
+    DESCRIPTION
+        "Changes made for release r28.0:
+         - Added RS-FEC type.
+         - Removed n/a option value from Dispersion Search Limits."
+    REVISION
+        "201511300000Z" -- Nov 30th 2015
+    DESCRIPTION
+        "Changes made for release r26:
+         - Added Dispersion Search Limits"
+    REVISION
+        "201409300000Z" -- Sep 30th 2014
+    DESCRIPTION
+        "Changes made for release r23.1:
+         - Added signal format CPRI8.
+         - Added signal format OBSAI1x - OBSAI8x.
+         - Added two more (9-10) tribports."
+    REVISION
+        "201405160000Z" -- May 16th 2014
+    DESCRIPTION
+        "Changes made for release r23:
+        - Added ServiceIdWithNotUsed.
+        - Added signal format for fc10Gb & fc16Gb
+        - Added new values for FEC
+        - Added new frequencies to support multi-lane transceiver"
+    REVISION
+        "201311150000Z" -- November 15th 2013
+    DESCRIPTION
+        "Changes made for release r22:
+        - Added signal format for CPRI bit rate 614.4 - 9830.4 Mbps.
+        - Added signal format for fc10Gb & fc16Gb"
+    REVISION
+        "201305010000Z" -- May 1st 2013
+    DESCRIPTION
+        "Changes made for release r21:
+        - PerfPeriodWithNA, PortType2WithNA, and PortType4WithNA added."
+    REVISION
+        "201212200000Z" -- Dec 20th 2012
+    DESCRIPTION
+        "Changes made for release r20:
+        - Added signal format wan40GbE, stm256, oc768, lan40GbE, iwdm40Gb, transpLan10GbE.
+        - BerLevel values added.
+        - New definitions added for new MIBs in R20"
+    REVISION
+        "201112200000Z" -- Dec 20th 2011
+    DESCRIPTION
+        "Changes made for release r18:
+        - Added signal format sdi3G, iWdm4G, sdSdi270 and hdtvNTSC.
+        - Description and syntax for SyncSourceMode changed."
+    REVISION
+        "201105110000Z" -- May 11th 2011
+    DESCRIPTION
+        "Added textual convention for Sync Source State."
+    REVISION
+        "200507070000Z" -- July 7th 2005
+    DESCRIPTION
+        "Added additional wavelengths used in the TS-family"
+    REVISION
+        "200204100000Z" -- April 10th 2002
+    DESCRIPTION
+        "Change lambdaFreq to an enumerated type."
+    REVISION
+        "200203050000Z" -- March 5th 2002
+    DESCRIPTION
+        "-The initial revision of this module.
+         -Removed the 'auto' and associated admin- and operStatus values."
+    REVISION
+        "200112030000Z" -- December 3rd 2001
+    DESCRIPTION
+        "Added common admin and operStatus definitions.
+        Removed the 'undefined' value."
+    REVISION
+        "200110230000Z" -- October 23d 2001
+    DESCRIPTION
+        "Added lambdaType, lambdaFrequency, signalType and PortType."
+    REVISION
+        "200110110000Z" -- October 11th 2001
+    DESCRIPTION
+        "Changed 'unknown' to 'undefined' to follow the same
+        convention as in the other MIBs.
+        Added 0 to portNumber as the undefined value."
+    REVISION
+        "200109040000Z" -- September 4th 2001
+    DESCRIPTION
+        "Extended the range for subracks (again) to 32.
+        Re-wrote the comment for fault status.
+        Added 0 as undefined subrack, slot and port numbers."
+    REVISION
+        "200108140000Z" -- August 14th 2001
+    DESCRIPTION
+        "Extended the range for subracks to 16."
+    REVISION
+        "200108090000Z" -- August 9th 2001
+    DESCRIPTION
+        "Added conventions for subrack, slot and port number."
+    REVISION
+        "200103120000Z" -- March 12th 2001
+    DESCRIPTION
+        "Changed naming convention from 'lumemtis' to 'lum'."
+    ::= { lumModules 2 }
+
+-- ----------------------------------------------------
+-- Definition of textual conventions
+-- ----------------------------------------------------
+
+MgmtNameString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+        "An octet string containing administrative
+        information, in human-readable form.
+
+        More or less the same as SnmpAdminString
+        defined in SNMP-FRAMEWORK-MIB."
+    SYNTAX       OCTET STRING (SIZE (0..255))
+
+FaultStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "A value indicating the current state
+        of a potential fault condition leading to
+        an alarm for an object.
+
+        ok - indicates that no fault condition is present
+        and no alarm is active or the alarm has been cleared.
+
+        alarm - indicates that a fault condition is present
+        and an alarm is active.
+
+        Note: The list of FaultStatus objects forms the list of all
+        potential alarms for the system."
+    SYNTAX       INTEGER {
+                     ok(1),
+                     alarm(2) }
+
+SubrackNumber ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "The number of a subrack within a network element.
+
+        0 signifies an undefined subrack number.
+
+"
+    SYNTAX Unsigned32 (0..15)
+
+SlotNumber ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "The number of a slot within a subrack.
+
+        0 signifies an undefined slot number.
+
+"
+    SYNTAX Unsigned32 (0..22)
+
+
+PortNumber ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "The number of a port on a board.
+        If an interface has two numbers, the lowest number is used.
+
+        0 signifies an undefined port number.
+
+"
+    SYNTAX Unsigned32 (0..116)
+
+SignalType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "tbd description "
+    SYNTAX INTEGER {
+        uni (1),
+        biDi (2) }
+
+PortType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "tbd description
+        tbd rxTx?"
+    SYNTAX INTEGER {
+        rx (1),
+        tx (2),
+        biDi (3) }
+
+LambdaType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Indicates the type of wavelength a port can
+        accomodate.
+
+        fixed - The port received or transmits a fixed
+        frequency.
+
+        range - The port can handle a range of
+        frequencies.
+
+        transparent - There are no frequency
+        properties associated with the port."
+    SYNTAX INTEGER {
+        fixed (1),
+        range (2) ,
+        transparent (3),
+        interleavedOdd (4),  -- interleaved odd
+        interleavedEven (5),
+        interleaved50GHzOdd (6),  -- interleaved odd
+        interleaved50GhzEven (7) }
+
+LambdaFrequency ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The frequency of the 'wavelength' given in hundreds
+        of GHz (0.01 GHz).
+
+"
+
+    SYNTAX INTEGER {
+        undefined (0),
+        iWdmPonFrequency (1),
+        otclg (2),
+        b1300 (130),
+        b1500 (150),
+        w850  (850),
+        w1270 (1270),
+        w1290 (1290),
+        w1310 (1310),
+        w1330 (1330),
+        w1350 (1350),
+        w1370 (1370),
+        w1390 (1390),
+        w1410 (1410),
+        w1430 (1430),
+        w1450 (1450),
+        w1470 (1470),
+        w1490 (1490),
+        w1510 (1510),
+        w1530 (1530),
+        w1550 (1550),
+        w1570 (1570),
+        w1590 (1590),
+        w1610 (1610),
+        ch871 (18710),
+        ch873 (18730),
+        ch875 (18750),
+        ch877 (18770),
+        ch879 (18790),
+        ch881 (18810),
+        ch883 (18830),
+        ch885 (18850),
+        ch887 (18870),
+        ch889 (18890),
+        ch891 (18910),
+        ch893 (18930),
+        ch895 (18950),
+        ch897 (18970),
+        ch899 (18990),
+        ch901 (19010),
+        ch903 (19030),
+        ch905 (19050),
+        ch907 (19070),
+        ch909 (19090),
+        ch9135 (19135),
+        ch914 (19140),
+        ch9145 (19145),
+        ch915 (19150),
+        ch9155 (19155),
+        ch916 (19160),
+        ch9165 (19165),
+        ch917 (19170),
+        ch9175 (19175),
+        ch918 (19180),
+        ch9185 (19185),
+        ch919 (19190),
+        ch9195 (19195),
+        ch920 (19200),
+        ch9205 (19205),
+        ch921 (19210),
+        ch9215 (19215),
+        ch922 (19220),
+        ch9225 (19225),
+        ch923 (19230),
+        ch9235 (19235),
+        ch924 (19240),
+        ch9245 (19245),
+        ch925 (19250),
+        ch9255 (19255),
+        ch926 (19260),
+        ch9265 (19265),
+        ch927 (19270),
+        ch9275 (19275),
+        ch928 (19280),
+        ch9285 (19285),
+        ch929 (19290),
+        ch9295 (19295),
+        ch930 (19300),
+        ch9305 (19305),
+        ch931 (19310),
+        ch9315 (19315),
+        ch932 (19320),
+        ch9325 (19325),
+        ch933 (19330),
+        ch9335 (19335),
+        ch934 (19340),
+        ch9345 (19345),
+        ch935 (19350),
+        ch9355 (19355),
+        ch936 (19360),
+        ch9365 (19365),
+        ch937 (19370),
+        ch9375 (19375),
+        ch938 (19380),
+        ch9385 (19385),
+        ch939 (19390),
+        ch9395 (19395),
+        ch940 (19400),
+        ch9405 (19405),
+        ch941 (19410),
+        ch9415 (19415),
+        ch942 (19420),
+        ch9425 (19425),
+        ch943 (19430),
+        ch9435 (19435),
+        ch944 (19440),
+        ch9445 (19445),
+        ch945 (19450),
+        ch9455 (19455),
+        ch946 (19460),
+        ch9465 (19465),
+        ch947 (19470),
+        ch9475 (19475),
+        ch948 (19480),
+        ch9485 (19485),
+        ch949 (19490),
+        ch9495 (19495),
+        ch950 (19500),
+        ch9505 (19505),
+        ch951 (19510),
+        ch9515 (19515),
+        ch952 (19520),
+        ch9525 (19525),
+        ch953 (19530),
+        ch9535 (19535),
+        ch954 (19540),
+        ch9545 (19545),
+        ch955 (19550),
+        ch9555 (19555),
+        ch956 (19560),
+        ch9565 (19565),
+        ch957 (19570),
+        ch9575 (19575),
+        ch958 (19580),
+        ch9585 (19585),
+        ch959 (19590),
+        ch9595 (19595),
+        ch960 (19600),
+        ch9605 (19605),
+        ch961 (19610) }
+
+BoardOrInterfaceAdminStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The administrative state for a board or
+        interface.
+
+        down - The board/interface should be inactive.
+
+        service - The board/interface is activated but
+        alarms are suppressed. Intended for use during
+        service or re-configuration. When service is
+        concluded adminStatus should be set to 'up'
+        again.
+
+        up - The board/interface should be activated when
+        it becomes available. Alarms are not suppressed."
+    SYNTAX INTEGER {
+        down (1),
+        service (2),
+        up (3) }
+
+BoardOrInterfaceOperStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The operational state for a board or interface.
+
+        notPresent - The board/interface is not available.
+
+        down - The board/interface is de-activated or
+        there are faults preventing it from going to the
+        'up'-state.
+
+        up - The board/interface is active."
+    SYNTAX INTEGER {
+        notPresent (1),
+        down (2),
+        up (3) }
+
+CommandString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+        "tbd"
+    SYNTAX OCTET STRING
+
+SignalFormat ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Signal format for an interfaces.
+
+        other - Unspecified format (see bitrate configuration
+        for speed)
+
+        stm1 - STM-1 SDH signal
+
+        stm4 - STM-4 SDH signal
+
+        stm16 - STM-16 SDH signal
+
+        stm64 - STM-64 SDH signal
+
+        stm256 - STM-256 SDH signal
+
+        oc3 - OC3 Sonet signal
+
+        oc12 - OC12 Sonet signal
+
+        oc48 - OC48 Sonet signal
+
+        oc192 - OC192 Sonet signal
+
+        oc768 - OC768 Sonet signal
+
+        gbE - Gigabit Ethernet signal
+
+        fc1Gb - 1.0625 Gbps signal
+
+        fc2Gb - 2.1250 Gbps signal
+
+        wan10GbE - 10 Gigabit Ethernet WAN signal
+
+        wan40GbE - 40 Gigabit Ethernet WAN signal
+
+        unused - The port is not used at the moment
+
+        lan10GbE - 10 Gigabit Ethernet LAN signal
+
+        lan40GbE - 40 Gigabit Ethernet LAN signal
+
+        escon - ESCON
+
+        esconLL - ESCON Low Latency
+
+        dvb270 - Digital video broadcast (270 Mbps)
+
+        hdtv1485 - HDTV 1485 Mbps
+
+        ethernet - Ethernet 10 Mbps
+
+        fastEthernet - Fast Ethernet 100 Mbps
+
+        fc4Gb - 4.2500 Gbps signal
+
+        etr - 16 Mbps
+
+        auto - automatic protocol detection
+
+        down - for actual value when no traffic
+
+        gbe9Line - 10G iWDM without FEC (10.3125Gb/s)
+
+        gbEorTrm5500 - Gigabit Ethernet or Trm5500 signal
+
+        fc8Gb - 8.500 Gbps signal
+
+        otu2 - OTU-2 OTN signal 10.7 Gb/s
+
+        otu2e - OTU-2e OTN signal 11.1 Gb/s
+
+        e1 - E1 signal
+
+        t1 - T1 signal
+
+        mbh2Gb5 - 2.5 Gbps for MBH
+
+        syncE - Synchrounous Ethernet signal
+
+        line4G - 4 Gbps Line from MSMXP/58xx.
+
+        mbh4Gbps - 4 Gbps for MBH
+
+        fecLan10GbE1A - iWDM 10G framing format type 1A (TPD10GBE-BU)
+
+        fecLan10GbE1B - iWDM 10G framing format type 1B (TPQ10GFEC, MS-MXP/10G, GBE9/MXP10GFEC)
+
+        sdi3G - 3G-SDI video format
+
+        iWdm4G - 4Gbps iWDM format
+
+        sdSdi270 - SD-SDI 270Mbps video format
+
+        hdtvNTSC - HD-SDI 1.485/1.001 Gbps video format
+
+        iwdm40Gb - 40Gbps iWDM framing format (MSTP40G, MSMXP40G)
+
+        otu4 - OTU-4 OTN signal 112 Gb/s
+
+        lan100GbE - 100 Gigabit Ethernet LAN signal
+
+        transpLan10GbE - Transparent 10GbE-LAN
+
+        cpri1 - CPRI 614.4 Mbps
+
+        cpri2 - CPRI 1228.8 Mbps
+
+        cpri3 - CPRI 2457.6 Mbps
+
+        cpri4 - CPRI 3072.0 Mbps
+
+        cpri5 - CPRI 4915.2 Mbps
+
+        cpri6 - CPRI 6144.0 Mbps
+
+        cpri7 - CPRI 9830.4 Mbps
+
+        fc10Gb - 10.52 Gbps signal
+
+        fc16Gb - 14.025 Gbps signal
+
+        cpri8  - CPRI 10.1376 Gbps
+
+        obsai1x - OBSAI 0.768 Gb/s  (1 x 768 Mbps)
+
+        obsai2x - OBSAI 1.536 Gb/s  (2 x 768 Mbps)
+
+        obsai4x - OBSAI 3.072 Gb/s  (4 x 768 Mbps)
+
+        obsai8x - OBSAI 6.144 Gb/s  (8 x 768 Mbps)
+
+        otu1 - OTU-1 OTN signal 2.66 Gb/s
+
+        iwdm11G - iWDM format 11.1 Gbps
+
+        100G - 100 Gbps Redwood
+
+        200G - 200 Gbps Redwood
+
+        otuj1 - Proprietary 100G+SDFEC, Non-differential QPSK used in Acacia AC200
+
+        otuj2 - Proprietary 200G+SDFEC, 16QAM used in Acacia AC200
+
+        notApplicable - Board does not used signal format on line. Used in SNMP.
+
+"
+
+    SYNTAX INTEGER {
+        other (1),
+        stm1 (2),
+        stm4 (3),
+        stm16 (4),
+        gbE (5),
+        stm64 (6),
+        fc1Gb (7),
+        fc2Gb (8),
+        wan10GbE (9),
+        unused (10),
+        lan10GbE (11),
+        escon (12),
+        esconLL (13),
+        dvb270 (14),
+        oc3 (15),
+        oc12 (16),
+        oc48 (17),
+        oc192 (18),
+        hdtv1485 (19),
+        ethernet (20),
+        fastEthernet (21),
+        lan10GbEFec (22),
+        wan10GbEStm64Fec (23),
+        fc4Gb (24),
+        etr (25),
+        auto (26),
+        down (27),
+        stm1Oc3 (28),
+        stm4Oc12 (29),
+        stm16Oc48 (30),
+        stm64Oc192 (31),
+        gbe9Line (32),
+        ddgbeLine (34),
+        gbEorTrm5500 (35),
+        fc8Gb (36),
+        otu2 (37),
+        otu2e (38),
+        e1 (39),
+        t1 (40),
+        mbh2Gb5 (41),
+        syncE (42),
+        line4G (43),
+        mbh4Gbps (44),
+        fecLan10GbE1A (45),
+        fecLan10GbE1B (46),
+        sdi3G (47),
+        iWdm4G (48),
+        sdSdi270 (49),
+        hdtvNTSC (50),
+        oc768 (51),
+        stm256 (52),
+        lan40GbE (53),
+        wan40GbE (54),
+        sfStm256Oc768 (55),
+        iwdm40Gb (56),
+        otu4 (57),
+        lan100GbE (58),
+        transpLan10GbE (59),
+        cpri1 (60),
+        cpri2 (61),
+        cpri3 (62),
+        cpri4 (63),
+        cpri5 (64),
+        cpri6 (65),
+        cpri7 (66),
+        fc10Gb (67),
+        fc16Gb (68),
+        cpri8  (69),
+        obsai1x (70),
+        obsai2x (71),
+        obsai4x (72),
+        obsai8x (73),
+        otu1 (74),
+        iwdm11G (75),
+        rw100G (76),
+        rw200G (77),
+        otu4SdFec (78),
+        otuj1 (79),
+        otuj2 (80),
+        notApplicable (2147483647)
+      }
+
+TrxMedia ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Defines the media and capability of the TRX
+
+        optical         - Optical media
+
+        tp1000BaseT - Twisted-pair capable of 1000BaseT
+
+        tp100BaseT  -  Twisted-pair capable of 100BaseT
+
+        tp10BaseT   -  Twisted-pair capable of 10BaseT
+
+        electrical   -  Electrical media
+
+        "
+    SYNTAX INTEGER {
+           undefined (0),
+           optical(1),
+           tp1000BaseT(2),
+           tp100BaseT(3),
+           tp10BaseT(4),
+           electrical(5) }
+
+OtnMonitorType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "MonitorType for an OTN object.
+
+        sm - section monitor
+
+        pm - path monitor
+
+        tcm - tandem connection monitor"
+
+    SYNTAX INTEGER {
+        sm (0),
+        pm (1),
+        tcm (2)
+	 }
+
+OtnMonitorConfig ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Monitor Configuration for an OTN object.
+
+        terminated - section is terminated in port
+
+        transparent - monitor passes the port transparent"
+
+    SYNTAX INTEGER {
+        terminated (0),
+        transparent (1)
+    }
+
+OtnTIMDetMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "TTI Mismatch detection mode.
+
+        sapi - TTI MM is detected based on SAPI
+
+        dapi - TTI MM is detected based on DAPI
+
+        both - TTI MM is detected based on SAPI and DAPI"
+
+    SYNTAX INTEGER {
+        sapi (0),
+        dapi (1),
+        both (2)
+     }
+
+ObjectProperty ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "A bitmask of length 32 encoding certain properties
+         of an object."
+    SYNTAX Unsigned32 (0..4294967295)
+
+
+PmReset ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "'Action' for reseting performance counters."
+    SYNTAX      INTEGER {
+                        normal (1),
+                        reset  (2) }
+
+EnableDisable ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Represents a boolean value."
+    SYNTAX      INTEGER {
+                    disabled (1),
+                    enabled (2) }
+
+SyncSourceState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "State of synchronization source included in a
+         synchronization selection process as per defined
+         in ITU-T G.781."
+    SYNTAX       INTEGER {
+                    undefined (0),
+                    normal  (1),
+                    failed (2),
+                    waitToRestore(3) }
+
+SyncSourceMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Operating mode of a synchronization source.
+
+	disabled  - The source is disabled from the sync selection process
+                    and will not send or terminate SSM messages.
+                    Any incoming SSM messages will be passed on transparently.
+        enabled   - The source is included in the sync selection process
+                    and will both send and terminate SSM messages.
+        lockedOut - The source is not enabled in the sync selection process,
+                    but terminates all incoming SSM messages.
+                    If the sync selection process is operating in
+                    Quality level enabled mode it will also send the Quality level
+                    of the seleceted sync source."
+    SYNTAX       INTEGER {
+                    disabled (0),
+                    enabled (1),
+                    lockedOut (2) }
+
+AdminStatusWithNA ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The administrative state for an interface.
+
+        down - The interface should be inactive.
+
+        service - The board/interface is activated but
+        alarms are suppressed. Intended for use during
+        service or re-configuration. When service is
+        concluded adminStatus should be set to 'up'
+        again.
+
+        up - The interface should be activated when
+        it becomes available. Alarms are not suppressed.
+
+        notApplicable - used to tell that attribute
+        is not used in current configuration."
+
+    SYNTAX  INTEGER {
+                    down (1),
+                    service (2),
+                    up (3),
+                    notApplicable (2147483647) }
+
+OperStatusWithNA ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The operational state for a interface.
+
+        notPresent - The interface is not available.
+
+        down - The interface is de-activated or
+        there are faults preventing it from going to the
+        'up'-state.
+
+        up - The interface is active.
+
+        notApplicable - used to tell that attribute
+        is not used in current configuration."
+
+    SYNTAX  INTEGER {
+                    notPresent (1),
+                    down (2),
+                    up (3),
+                    notApplicable (2147483647) }
+
+SignalStatusWithNA ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "SignalStatus.
+        notApplicable - used to tell that attribute
+        is not used in current configuration."
+
+    SYNTAX  INTEGER {
+                    down (1),
+                    degraded (2),
+                    up (3),
+                    notApplicable (2147483647) }
+
+Unsigned32WithNA ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "An unsigned32 integer of an object.
+
+	4294967293 used to tell that it is not
+	possible to read attribute at the moment.
+
+        4294967294 is used to indicate that the attribute
+        is not used on the object"
+
+        SYNTAX Unsigned32 (0..4294967292 | 4294967293 | 4294967294)
+
+EnabledDisabledWithNA ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "disabled - Attribute is not set.
+
+        enabled - Attribute is set.
+
+        notApplicable (2147483647) is used when attribute is
+         not used in current configuration."
+
+    SYNTAX  INTEGER {
+                    disabled (1),
+                    enabled (2),
+                    notApplicable (2147483647) }
+
+Layer ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "x"
+    STATUS current
+    DESCRIPTION
+        "Layer in signal. this is a bitmask describing
+        layer. 2147483647 is used to indicate that the
+        attribute is not used on the object."
+
+        SYNTAX Unsigned32 (0.. 2147483646 | 2147483647)
+
+Time7200min ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+       "An Integer32 of an object between 0 and 7200.
+        The value 0 is used in SNMP to indicate that the
+        setting will last forever.
+        2147483647 is used to indicate that the attribute
+        is not used on the object."
+
+        SYNTAX Integer32 (0..7200 | 2147483647)
+
+Time7200minNo0 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+       "An Integer32 of an object between 1 and 7200.
+        The value 2147483647 is used to indicate that
+        the attribute is not used on the object."
+        SYNTAX Integer32 (1..7200 | 2147483647)
+
+Integer32WithNA ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+       "An Integer32 of an object between 0 and 2147483645.
+        2147483647 is used to indicate that the attribute
+        is not used on the object.
+	2147483646 is used to indicate that the attribute is not
+	available currently"
+
+        SYNTAX Integer32 (0..2147483645 | 2147483646 | 2147483647)
+
+Activated ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The attribute is activated, de-activated or notApplicable.
+        activated - the attribute is activated
+        deactivated - the attribute is not activated
+        notApplicable - used to tell that attribute
+        is not used in current configuration."
+
+    SYNTAX  INTEGER {
+                    activated (1),
+                    deactivated (2),
+                    notApplicable (2147483647) }
+
+ResetWithNA ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "When the attribute is set to reset the function is
+        re-initialised. Then the attribute is set to normal again
+        automatically.
+        reset - Re-initialises the function
+        normal - The function is in normal state
+        notApplicable - used to tell that attribute
+        is not used in current configuration."
+
+    SYNTAX  INTEGER {
+                    reset (1),
+                    normal (2),
+                    notApplicable (2147483647) }
+
+FaultStatusWithNA ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "A value indicating the current state
+        of a potential fault condition leading to
+        an alarm for an object.
+
+        ok - indicates that no fault condition is present
+        and no alarm is active or the alarm has been cleared.
+
+        alarm - indicates that a fault condition is present
+        and an alarm is active.
+
+        notApplicable - used to tell that attribute
+        is not used in current configuration.
+
+        Note: The list of FaultStatus objects forms the list of all
+        potential alarms for the system."
+
+    SYNTAX       INTEGER {
+                     ok(1),
+                     alarm(2),
+                     notApplicable (2147483647) }
+
+MgmtNameStringWithNA ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+        "An octet string containing administrative
+        information, in human-readable form.
+
+        More or less the same as SnmpAdminString
+        defined in SNMP-FRAMEWORK-MIB.
+
+	The value _notApplicable_ is used to tell
+	the SNMP client that this attribute is not
+	used in current configuration."
+
+    SYNTAX       OCTET STRING (SIZE (0..255))
+
+DisplayStringWithNA ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION
+            "Represents textual information taken from the NVT ASCII
+
+            character set, as defined in pages 4, 10-11 of RFC 854.
+
+            To summarize RFC 854, the NVT ASCII repertoire specifies:
+
+              - the use of character codes 0-127 (decimal)
+
+              - the graphics characters (32-126) are interpreted as
+                US ASCII
+
+              - NUL, LF, CR, BEL, BS, HT, VT and FF have the special
+                meanings specified in RFC 854
+
+              - the other 25 codes have no standard interpretation
+
+              - the sequence 'CR LF' means newline
+
+              - the sequence 'CR NUL' means carriage-return
+
+              - an 'LF' not preceded by a 'CR' means moving to the
+                same column on the next line.
+
+              - the sequence 'CR x' for any x other than LF or NUL is
+                illegal.  (Note that this also means that a string may
+                end with either 'CR LF' or 'CR NUL', but not with CR.)
+
+            Any object defined using this syntax may not exceed 255
+            characters in length.
+
+	    The string _notApplicable_ is used to tell an SNMP client
+	    that this attribute is not applicable in current configu-
+	    ration."
+
+    SYNTAX       OCTET STRING (SIZE (0..255))
+
+SignalStructure ::= TEXTUAL-CONVENTION
+    STATUS deprecated
+    DESCRIPTION
+        "Describes which layers in the MTOSI MIB the port
+	currently uses.
+        notApplicable - used to tell that attribute
+        is not used in current configuration."
+
+    SYNTAX  INTEGER {
+                    phyTrxOptOtsOptOchOtnOtuOtnOduOtnmonSmOtnmonPm (1),
+                    phyTrxOptOtsOptOchSdhRsSdhMs (2),
+                    phyTrxOptOtsOptOchSonetSectionSonetLine (3),
+                    phyTrxOptOtsOptOchEthPhys (4),
+                    notApplicable (2147483647) }
+
+Signed32WithNA ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+        "A signed integer.
+
+	2147483646 used to tell that it is not
+	possible to read attribute at the moment.
+
+	2147483647 is used to indicate that the attri-
+	bute is not available currently"
+
+        SYNTAX Integer32 (-2147483648.. 2147483645 | 2147483646 | 2147483647)
+
+LaserMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The configured laser mode.
+        notApplicable - used to tell that attribute
+        is not used in current configuration."
+
+    SYNTAX  INTEGER {
+                    forcedOn (1),
+                    als (2),
+                    notApplicable (2147483647) }
+
+OnOff ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The configured laser mode.
+        notApplicable - used to tell that attribute
+        is not used in current configuration.
+	notAvailable - used to tell that it is not
+	possible to read attribute at the moment."
+
+    SYNTAX  INTEGER {
+                    off (1),
+                    on (2),
+                    notAvailable (2147483646),
+                    notApplicable (2147483647) }
+
+LaneFrequency ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The frequency of the 'wavelength' given in hundreds
+        of GHz (0.01 GHz).
+
+        notApplicable - used to tell that attribute
+        is not used in current configuration.
+
+	notAvailable - used to tell that it is not
+	possible to read attribute at the moment.
+
+"
+
+    SYNTAX INTEGER {
+        undefined (0),
+        b1300 (130),
+        b1500 (150),
+        w850  (850),
+        w1270 (1270),
+        w1290 (1290),
+        w1297 (1297),
+        w1301 (1301),
+        w1305 (1305),
+        w1309 (1309),
+        w1310 (1310),
+        w1330 (1330),
+        w1350 (1350),
+        w1370 (1370),
+        w1390 (1390),
+        w1410 (1410),
+        w1430 (1430),
+        w1450 (1450),
+        w1470 (1470),
+        w1490 (1490),
+        w1510 (1510),
+        w1523 (1523),
+        w1530 (1530),
+        w1531 (1531),
+        w1539 (1539),
+        w1547 (1547),
+        w1550 (1550),
+        w1555 (1555),
+        w1563 (1563),
+        w1570 (1570),
+        w1571 (1571),
+        w1579 (1579),
+        w1587 (1587),
+        w1590 (1590),
+        w1595 (1595),
+        w1610 (1610),
+        ch871 (18710),
+        ch873 (18730),
+        ch875 (18750),
+        ch877 (18770),
+        ch879 (18790),
+        ch881 (18810),
+        ch883 (18830),
+        ch885 (18850),
+        ch887 (18870),
+        ch889 (18890),
+        ch891 (18910),
+        ch893 (18930),
+        ch895 (18950),
+        ch897 (18970),
+        ch899 (18990),
+        ch901 (19010),
+        ch903 (19030),
+        ch905 (19050),
+        ch907 (19070),
+        ch909 (19090),
+        ch9185 (19185),
+        ch919 (19190),
+        ch9195 (19195),
+        ch920 (19200),
+        ch9205 (19205),
+        ch921 (19210),
+        ch9215 (19215),
+        ch922 (19220),
+        ch9225 (19225),
+        ch923 (19230),
+        ch9235 (19235),
+        ch924 (19240),
+        ch9245 (19245),
+        ch925 (19250),
+        ch9255 (19255),
+        ch926 (19260),
+        ch9265 (19265),
+        ch927 (19270),
+        ch9275 (19275),
+        ch928 (19280),
+        ch9285 (19285),
+        ch929 (19290),
+        ch9295 (19295),
+        ch930 (19300),
+        ch9305 (19305),
+        ch931 (19310),
+        ch9315 (19315),
+        ch932 (19320),
+        ch9325 (19325),
+        ch933 (19330),
+        ch9335 (19335),
+        ch934 (19340),
+        ch9345 (19345),
+        ch935 (19350),
+        ch9355 (19355),
+        ch936 (19360),
+        ch9365 (19365),
+        ch937 (19370),
+        ch9375 (19375),
+        ch938 (19380),
+        ch9385 (19385),
+        ch939 (19390),
+        ch9395 (19395),
+        ch940 (19400),
+        ch9405 (19405),
+        ch941 (19410),
+        ch9415 (19415),
+        ch942 (19420),
+        ch9425 (19425),
+        ch943 (19430),
+        ch9435 (19435),
+        ch944 (19440),
+        ch9445 (19445),
+        ch945 (19450),
+        ch9455 (19455),
+        ch946 (19460),
+        ch9465 (19465),
+        ch947 (19470),
+        ch9475 (19475),
+        ch948 (19480),
+        ch9485 (19485),
+        ch949 (19490),
+        ch9495 (19495),
+        ch950 (19500),
+        ch9505 (19505),
+        ch951 (19510),
+        ch9515 (19515),
+        ch952 (19520),
+        ch9525 (19525),
+        ch953 (19530),
+        ch9535 (19535),
+        ch954 (19540),
+        ch9545 (19545),
+        ch955 (19550),
+        ch9555 (19555),
+        ch956 (19560),
+        ch9565 (19565),
+        ch957 (19570),
+        ch9575 (19575),
+        ch958 (19580),
+        ch9585 (19585),
+        ch959 (19590),
+        ch9595 (19595),
+        ch960 (19600),
+        ch9605 (19605),
+        ch961 (19610),
+        notAvailable (2147483646),
+        notApplicable (2147483647) }
+
+Frequency ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The frequency of the 'wavelength' given in hundreds
+        of GHz (0.01 GHz).
+
+        notApplicable - used to tell that attribute
+        is not used in current configuration.
+
+	notAvailable - used to tell that it is not
+	possible to read attribute at the moment.
+
+"
+
+    SYNTAX INTEGER {
+        undefined (0),
+        b1300 (130),
+        b1500 (150),
+        w850  (850),
+        w1270 (1270),
+        w1290 (1290),
+        w1310 (1310),
+        w1330 (1330),
+        w1350 (1350),
+        w1370 (1370),
+        w1390 (1390),
+        w1410 (1410),
+        w1430 (1430),
+        w1450 (1450),
+        w1470 (1470),
+        w1490 (1490),
+        w1510 (1510),
+        w1530 (1530),
+        w1550 (1550),
+        w1570 (1570),
+        w1590 (1590),
+        w1610 (1610),
+        ch871 (18710),
+        ch873 (18730),
+        ch875 (18750),
+        ch877 (18770),
+        ch879 (18790),
+        ch881 (18810),
+        ch883 (18830),
+        ch885 (18850),
+        ch887 (18870),
+        ch889 (18890),
+        ch891 (18910),
+        ch893 (18930),
+        ch895 (18950),
+        ch897 (18970),
+        ch899 (18990),
+        ch901 (19010),
+        ch903 (19030),
+        ch905 (19050),
+        ch907 (19070),
+        ch909 (19090),
+        ch9135 (19135),
+        ch914 (19140),
+        ch9145 (19145),
+        ch915 (19150),
+        ch9155 (19155),
+        ch916 (19160),
+        ch9165 (19165),
+        ch917 (19170),
+        ch9175 (19175),
+        ch918 (19180),
+        ch9185 (19185),
+        ch919 (19190),
+        ch9195 (19195),
+        ch920 (19200),
+        ch9205 (19205),
+        ch921 (19210),
+        ch9215 (19215),
+        ch922 (19220),
+        ch9225 (19225),
+        ch923 (19230),
+        ch9235 (19235),
+        ch924 (19240),
+        ch9245 (19245),
+        ch925 (19250),
+        ch9255 (19255),
+        ch926 (19260),
+        ch9265 (19265),
+        ch927 (19270),
+        ch9275 (19275),
+        ch928 (19280),
+        ch9285 (19285),
+        ch929 (19290),
+        ch9295 (19295),
+        ch930 (19300),
+        ch9305 (19305),
+        ch931 (19310),
+        ch9315 (19315),
+        ch932 (19320),
+        ch9325 (19325),
+        ch933 (19330),
+        ch9335 (19335),
+        ch934 (19340),
+        ch9345 (19345),
+        ch935 (19350),
+        ch9355 (19355),
+        ch936 (19360),
+        ch9365 (19365),
+        ch937 (19370),
+        ch9375 (19375),
+        ch938 (19380),
+        ch9385 (19385),
+        ch939 (19390),
+        ch9395 (19395),
+        ch940 (19400),
+        ch9405 (19405),
+        ch941 (19410),
+        ch9415 (19415),
+        ch942 (19420),
+        ch9425 (19425),
+        ch943 (19430),
+        ch9435 (19435),
+        ch944 (19440),
+        ch9445 (19445),
+        ch945 (19450),
+        ch9455 (19455),
+        ch946 (19460),
+        ch9465 (19465),
+        ch947 (19470),
+        ch9475 (19475),
+        ch948 (19480),
+        ch9485 (19485),
+        ch949 (19490),
+        ch9495 (19495),
+        ch950 (19500),
+        ch9505 (19505),
+        ch951 (19510),
+        ch9515 (19515),
+        ch952 (19520),
+        ch9525 (19525),
+        ch953 (19530),
+        ch9535 (19535),
+        ch954 (19540),
+        ch9545 (19545),
+        ch955 (19550),
+        ch9555 (19555),
+        ch956 (19560),
+        ch9565 (19565),
+        ch957 (19570),
+        ch9575 (19575),
+        ch958 (19580),
+        ch9585 (19585),
+        ch959 (19590),
+        ch9595 (19595),
+        ch960 (19600),
+        ch9605 (19605),
+        ch961 (19610),
+        notAvailable (2147483646),
+        notApplicable (2147483647) }
+
+FrequencyOnlyNotApplicable ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The frequency of the 'wavelength' given in hundreds
+        of GHz (0.01 GHz).
+
+        notApplicable - used to tell that attribute
+        is not used in current configuration.
+
+"
+
+    SYNTAX INTEGER {
+        undefined (0),
+        b1300 (130),
+        b1500 (150),
+        w850  (850),
+        w1270 (1270),
+        w1290 (1290),
+        w1310 (1310),
+        w1330 (1330),
+        w1350 (1350),
+        w1370 (1370),
+        w1390 (1390),
+        w1410 (1410),
+        w1430 (1430),
+        w1450 (1450),
+        w1470 (1470),
+        w1490 (1490),
+        w1510 (1510),
+        w1530 (1530),
+        w1550 (1550),
+        w1570 (1570),
+        w1590 (1590),
+        w1610 (1610),
+        ch871 (18710),
+        ch873 (18730),
+        ch875 (18750),
+        ch877 (18770),
+        ch879 (18790),
+        ch881 (18810),
+        ch883 (18830),
+        ch885 (18850),
+        ch887 (18870),
+        ch889 (18890),
+        ch891 (18910),
+        ch893 (18930),
+        ch895 (18950),
+        ch897 (18970),
+        ch899 (18990),
+        ch901 (19010),
+        ch903 (19030),
+        ch905 (19050),
+        ch907 (19070),
+        ch909 (19090),
+        ch9135 (19135),
+        ch914 (19140),
+        ch9145 (19145),
+        ch915 (19150),
+        ch9155 (19155),
+        ch916 (19160),
+        ch9165 (19165),
+        ch917 (19170),
+        ch9175 (19175),
+        ch918 (19180),
+        ch9185 (19185),
+        ch919 (19190),
+        ch9195 (19195),
+        ch920 (19200),
+        ch9205 (19205),
+        ch921 (19210),
+        ch9215 (19215),
+        ch922 (19220),
+        ch9225 (19225),
+        ch923 (19230),
+        ch9235 (19235),
+        ch924 (19240),
+        ch9245 (19245),
+        ch925 (19250),
+        ch9255 (19255),
+        ch926 (19260),
+        ch9265 (19265),
+        ch927 (19270),
+        ch9275 (19275),
+        ch928 (19280),
+        ch9285 (19285),
+        ch929 (19290),
+        ch9295 (19295),
+        ch930 (19300),
+        ch9305 (19305),
+        ch931 (19310),
+        ch9315 (19315),
+        ch932 (19320),
+        ch9325 (19325),
+        ch933 (19330),
+        ch9335 (19335),
+        ch934 (19340),
+        ch9345 (19345),
+        ch935 (19350),
+        ch9355 (19355),
+        ch936 (19360),
+        ch9365 (19365),
+        ch937 (19370),
+        ch9375 (19375),
+        ch938 (19380),
+        ch9385 (19385),
+        ch939 (19390),
+        ch9395 (19395),
+        ch940 (19400),
+        ch9405 (19405),
+        ch941 (19410),
+        ch9415 (19415),
+        ch942 (19420),
+        ch9425 (19425),
+        ch943 (19430),
+        ch9435 (19435),
+        ch944 (19440),
+        ch9445 (19445),
+        ch945 (19450),
+        ch9455 (19455),
+        ch946 (19460),
+        ch9465 (19465),
+        ch947 (19470),
+        ch9475 (19475),
+        ch948 (19480),
+        ch9485 (19485),
+        ch949 (19490),
+        ch9495 (19495),
+        ch950 (19500),
+        ch9505 (19505),
+        ch951 (19510),
+        ch9515 (19515),
+        ch952 (19520),
+        ch9525 (19525),
+        ch953 (19530),
+        ch9535 (19535),
+        ch954 (19540),
+        ch9545 (19545),
+        ch955 (19550),
+        ch9555 (19555),
+        ch956 (19560),
+        ch9565 (19565),
+        ch957 (19570),
+        ch9575 (19575),
+        ch958 (19580),
+        ch9585 (19585),
+        ch959 (19590),
+        ch9595 (19595),
+        ch960 (19600),
+        ch9605 (19605),
+        ch961 (19610),
+        notApplicable (2147483647) }
+
+Rate ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The bit rate of signal.
+
+        notApplicable - used to tell that attribute
+        is not used in current configuration.
+
+	notAvailable - used to tell that it is not
+	possible to read attribute at the moment."
+
+    SYNTAX  INTEGER {
+                    sdh156 (1),
+                    sdh2488 (2),
+                    notAvailable (2147483646),
+                    notApplicable (2147483647) }
+
+TrxMediaWithNA ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Defines the media and capability of the TRX
+
+        optical         - Optical media
+
+        tp1000BaseT - Twisted-pair capable of 1000BaseT
+
+        tp100BaseT  -  Twisted-pair capable of 100BaseT
+
+        tp10BaseT   -  Twisted-pair capable of 10BaseT
+
+        electrical   -  Electrical media
+
+	notApplicable - used to tell that attribute
+        is not used in current configuration.
+
+	notAvailable - used to tell that it is not
+	possible to read attribute at the moment."
+
+    SYNTAX INTEGER {
+           undefined (0),
+           optical(1),
+           tp1000BaseT(2),
+           tp100BaseT(3),
+           tp10BaseT(4),
+           electrical(5),
+	   notAvailable (2147483646),
+           notApplicable (2147483647) }
+
+FecType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Defines the FEC type of the signal.
+
+        disabled -  FEC correction is not activated.
+
+        g709     -  1st  generation FEC according to
+                    ITU-T G.709 (near 6 dB coding gain).
+
+        g9751I4  -  FEC according to G975.1 I.4. Outer code: RS(1023,1007),
+                    Inner code: BCH(2047,1952).
+
+        g9751I7  -  FEC according to G975.1 I.9. Two orthogonally
+                    concatenated BCH codes.
+
+        sdFec    -  Proprietary Soft Decision FEC scheme.
+
+        notApplicable (2147483647) is used when fectype is
+        not used in current configuration."
+
+    SYNTAX INTEGER {
+           disabled (0),
+           g709 (1),
+           g9751I4 (2),
+	       g9751I7 (3),
+	       sdFec (4),
+           notApplicable (2147483647) }
+
+TruthValueWithNA ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Defines a value that can be true, false or not available
+
+	true -        The condition is false
+
+	false -       The condition is not true
+
+	notAvailable (2147483646) is used when attribute is
+        not available under current circumstances. This value
+	is only used when used for a state.
+
+	notApplicable (2147483647) is used when attribute is
+        not used in current configuration."
+
+    SYNTAX INTEGER {
+           true (0),
+           false (1),
+	       notAvailable (2147483646),
+           notApplicable (2147483647) }
+
+TcmMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "TCM mode for a TCM object according to G.798.
+
+        operationl - The TCM section is terminated.
+
+        transparent - The TCM section is transparent.
+
+	monitor - Some consequent actions will occur due to other alarms.
+                  See G.798.
+
+        notApplicable (2147483647) is used when attribute is not used
+        in current configuration."
+
+    SYNTAX INTEGER {
+        operational (0),
+        transparent (1),
+        monitor (2),
+        notApplicable (2147483647) }
+
+TcmNumber ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "TCM number in ODU overhead that is terminated. Can be
+         tcm1 .. tcm6.
+
+        notApplicable (2147483647) is used when attribute is not used
+        in current configuration."
+
+    SYNTAX INTEGER {
+        tcm1 (0),
+        tcm2 (1),
+        tcm3 (2),
+        tcm4 (3),
+        tcm5 (4),
+        tcm6 (5),
+        notApplicable (2147483647) }
+
+OtnTIMDetModeWithNA ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "TTI Mismatch detection mode.
+
+        off  - TTI MM is not monitored on any level
+
+        sapi - TTI MM is detected based on SAPI
+
+        dapi - TTI MM is detected based on DAPI
+
+        both - TTI MM is detected based on SAPI and DAPI
+
+        notApplicable (2147483647) is used when attribute is not used
+        in current configuration."
+
+    SYNTAX INTEGER {
+        off  (0),
+        sapi (1),
+        dapi (2),
+        both (3),
+        notApplicable (2147483647)
+     }
+
+OtnDirectionWithNA ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Indicates the direction applied to the monitoring
+        object the trace is related to.
+
+        None - Unspecified direction.
+
+        Rx  - In bound direction.
+
+        Tx  - out bound direction.
+
+        notApplicable (2147483647) is used when attribute is not used
+        in current configuration."
+
+    SYNTAX INTEGER {
+        none (0),
+        rx (1),
+        tx  (2),
+        notApplicable (2147483647)
+     }
+
+OtnAlarmMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Tells how section specific alarms are handled.
+
+	ignore - Do not show any alarms on non-terminated sections.
+
+	display - Show fault status on non-terminated sections.
+
+	alarm - Alarm also for non-terminating sections.
+
+	notApplicable (2147483647) is used when attribute is not used
+        in current configuration."
+
+    SYNTAX INTEGER {
+        ignore (0),
+        alarm (1),
+        display (2),
+	notApplicable (2147483647)
+     }
+
+CcType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Tells which type of CC that is set up.
+
+	addDrop?.
+
+	broadcast?.
+
+	select?.
+
+	notApplicable (2147483647) is used when attribute is not used
+        in current configuration."
+
+    SYNTAX INTEGER {
+        addDrop (0),
+        broadcast (1),
+        select (2),
+	notApplicable (2147483647)
+     }
+
+AutoNegotiationStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The result of the auto negotiation procedure
+
+         incomplete - the result is still pending
+
+         halfDuplex - half duplex
+
+         fullDuplex - full duplex
+
+         halfDuplexRxPauseOn - half duplex, Rx pause on
+
+         halfDuplexTxPauseOn - half duplex, Tx pause on
+
+         halfDuplexRxTxPauseOn - half duplex, Rx and Tx
+         pause on
+
+         fullDuplexRxPauseOn - full duplex, Rx pause on
+
+         fullDuplexTxPauseOn - full duplex, Tx pause on
+
+         fullDuplexRxTxPauseOn - full duplex, Rx and Tx
+         pause on
+
+         fullDuplexFec - full duplex, forwarding error
+         correction
+
+         fec - forwarding error correction
+
+	 notAvailable (2147483646) is used when attribute is not possible
+         to read at the moment.
+
+	 notApplicable (2147483647) is used when attribute is not used
+         in current configuration."
+
+    SYNTAX INTEGER {
+        incomplete (1),
+        halfDuplex (2),
+        fullDuplex (3),
+        halfDuplexRxPauseOn (4),
+        halfDuplexTxPauseOn (5),
+        halfDuplexRxTxPauseOn (6),
+        fullDuplexRxPauseOn (7),
+        fullDuplexTxPauseOn (8),
+        fullDuplexRxTxPauseOn (9),
+        fullDuplexFec (10),
+        fec (11),
+        notAvailable (2147483646),
+	notApplicable (2147483647)
+     }
+
+FlowControlMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+     "The mode for handling flow control between
+         the local device and link partner.
+
+         The PAUSE settings has the following meaning
+         when auto-negotiation is enabled.
+
+         Setting    802.3 equivalent
+         -------    ----------------
+
+         noPause    No PAUSE.
+
+         txPause    Asymmetric PAUSE toward link partner
+                    (send only).
+
+         bothPause  Symmetric PAUSE (send and receive).
+
+         rxPause    Both symmetric PAUSE and asymmetric
+                    PAUSE toward local device (send
+                    and/or receive).
+
+
+         The PAUSE settings has the following meaning
+         when auto-negotiation is disabled.
+
+         Setting    Result
+         -------    ------
+
+         noPause    PAUSE frame reception and transmission
+                    is disabled.
+
+         txPause    PAUSE frame transmission is enabled.
+
+         bothPause  PAUSE frame reception and transmission
+                    is enabled.
+
+         rxPause    PAUSE frame reception is enabled.
+
+         notApplicable (2147483647) is used to tell that attribute
+         is not used in current configuration."
+
+    SYNTAX INTEGER {
+        noPause (1),
+        rxPause (2),
+        txPause (3),
+        bothPause (4),
+        notApplicable (2147483647)
+    }
+
+OtnType ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+        "Type of overhead.
+
+        sm  - Section monitoring (SM).
+
+        tcm - Tandem connection monitoring (TCM)
+
+        pm  - Path monitoring (PM)"
+
+    SYNTAX INTEGER {
+        sm (0),
+        tcm (1),
+        pm (2)
+    }
+
+OtnTypeWithNA ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+        "Type of overhead.
+
+        sm  - Section monitoring (SM).
+
+        tcm - Tandem connection monitoring (TCM)
+
+        pm  - Path monitoring (PM)"
+
+    SYNTAX INTEGER {
+        sm (0),
+        pm (1),
+        tcm1 (2),
+        tcm2 (3),
+        tcm3 (4),
+        tcm4 (5),
+        tcm5 (6),
+        tcm6 (7),
+        notAvailable (2147483646),
+        notApplicable (2147483647)
+    }
+
+
+AuType ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+        "Type of administrative unit (AU)."
+
+    SYNTAX INTEGER {
+        au4Type64c (0),
+        au4Type16c (1),
+        au4Type4c  (2),
+        au4        (3),
+        au3        (4)
+     }
+
+VcType ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+        "Type of virtual container (VC)."
+
+    SYNTAX INTEGER {
+        vc4Type64c (0),
+        vc4Type16c (1),
+        vc4Type4c  (2),
+        vc4        (3),
+        vc3        (4)
+    }
+
+StsType ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+        "Type of STS."
+
+    SYNTAX INTEGER {
+        stsType192c (0),
+        stsType48c  (1),
+        stsType3c   (2),
+        sts3        (3),
+        sts1        (4)
+    }
+
+StsSpeType ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION
+        "Type of STS-SPE."
+
+    SYNTAX INTEGER {
+        sts192cSpe  (0),
+        sts48cSpe   (1),
+        sts12cSpe   (2),
+        sts3cSpe    (3),
+        sts1Spe     (4)
+    }
+
+AdminStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The administrative state with only up and down.
+
+        down - The interface should be inactive.
+
+        up - The interface should be activated."
+
+    SYNTAX  INTEGER {
+                    down (1),
+                    up (2) }
+
+
+BerLevelMTOSI ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Predefined levels for signal degraded alarm
+
+         rxBerLevel1 = 1E-12
+         rxBerLevel2 = 1E-13
+         rxBerLevel3 = 1E-15
+
+         OSNRMargin1 = 0.5 dB margin with respect to FEC cliff
+         OSNRMargin1 = 1.0 dB margin with respect to FEC cliff
+
+"
+    SYNTAX INTEGER {
+        osnrMargin1 (5),
+        osnrMargin2 (10),
+
+        rxBerLevel1 (12),
+        rxBerLevel2 (13),
+        rxBerLevel3 (15)
+    }
+
+BerLevel ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Predefined BER levels for signal degraded alarm
+
+         rxBerLevel1 = 1E-12
+         rxBerLevel2 = 1E-13
+         rxBerLevel3 = 1E-15
+
+"
+
+    SYNTAX INTEGER {
+        rxBerLevel1 (12),
+        rxBerLevel2 (13),
+        rxBerLevel3 (15)
+    }
+
+AutoAlarmStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The auto alarm enable function is in state
+        suppressTrxSignal, suppressSignal, suppressNone
+        or not Applicable.
+
+        suppressTrxAndSignal  - Both signal alarms and trx alarms are suppressed
+        suppressSignal        - Only signal alarms are suppressed
+        suppressNone          - Neither trx nor signal alarms
+                                are suppressed
+        notApplicable         - used to tell that attribute
+                                is not used in current
+                                configuration."
+
+    SYNTAX INTEGER {
+           suppressTrxAndSignal (1),
+           suppressSignal (2),
+           suppressNone (3),
+           notApplicable (2147483647)
+   }
+
+InterfaceStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The traffic port status calculated dynamically from
+        auto alarm enbale status and admin status.
+
+        outOfService    - No PM and no alarms.
+        autoInService   - No PM and no alarms. Changes to 'inService' when OK.
+        inService       - Reports PM and alarms.
+        maintenance     - Maintenance mode.
+        notApplicable   - Used to tell that attribute
+                          is not applicable in current
+                          configuration."
+
+    SYNTAX INTEGER {
+           outOfService (1),
+           autoInService (2),
+           inService (3),
+           maintenance (4),
+           notApplicable (2147483647)
+   }
+
+OpticalLayerMappingType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Type of optical layer mapping."
+    SYNTAX INTEGER {
+           undefined (0),
+           fourOpticalLanes (1),
+           tenOpticalLanes (2),
+           singleOpticalChannel (3)
+    }
+
+PhysicalLayerMappingType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Type of physical layer mapping."
+    SYNTAX INTEGER {
+           dualFiber (1),
+           singleFiber (2)
+    }
+
+
+TribPortIdType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Tributary port ID."
+    SYNTAX INTEGER {
+        unused (0),
+        tp1 (1),
+        tp2 (2),
+        tp3 (3),
+        tp4 (4),
+        tp5 (5),
+        tp6 (6),
+        tp7 (7),
+        tp8 (8),
+        tp9 (9),
+        tp10 (10),
+        tp11 (11),
+        notApplicable (2147483647)
+   }
+
+ServiceIdWithNotUsed ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+       "An Integer32 of between -1 and 2147483647.
+        -1 is used to indicate that the service Id is not
+        used on this certain object.."
+
+    SYNTAX Integer32 (-1 | 0..2147483647)
+
+TrxRxState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "TRX RX start-up sequence state.
+          - Init started
+          - Init ready
+          - Frequency ready
+          - Input signal received
+          - A/D Converter ready
+          - Dispersion compensated
+          - Ready"
+    SYNTAX INTEGER {
+
+        missing                 (0),
+        initStarted             (1),
+        initReady               (2),
+        frequencyReady          (3),
+        inputSignalReceived     (4),
+        adConverterReady        (5),
+        dispersionCompensated   (6),
+        ready                   (7),
+        notApplicable           (2147483647)
+    }
+
+TrxTxState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "TRX TX start-up sequence state.
+          - Init started
+          - Init ready
+          - Data path locked
+          - Laser ready off
+          - Laser ready
+          - Laser bias ready
+          - Ready"
+    SYNTAX INTEGER {
+        missing         (0),
+        initStarted     (1),
+        initReady       (2),
+        dataPathLocked  (3),
+        laserReadyOff   (4),
+        laserReady      (5),
+        laserBiasReady  (6),
+        ready           (7),
+        notApplicable   (2147483647)
+
+    }
+
+DispersionSearchLimit ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Dispersion Search Limit.
+          - Medium
+          - High"
+    SYNTAX INTEGER {
+        medium          (22500),
+        high            (30000)
+    }
+
+SignalDirection ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Indicates the direction of the signal.
+
+        rx    - Inbound direction
+
+        tx    - Outbound direction
+
+        biDir - Bidirectional
+
+        txRx  - Both Tx and Rx"
+
+    SYNTAX INTEGER {
+        rx            (1),
+        tx            (2),
+        biDir         (3),
+        txRx          (4),
+        notAvailable  (2147483646)
+     }
+
+RsFecMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "RS-FEC configuration modes"
+
+    SYNTAX INTEGER {
+           forcedOff (0),
+           forcedOn (1),
+           auto (2)
+    }
+
+RsFecOnOff ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Ethernet RS-FEC enabled/disabled.
+
+         off       - RS-FEC is disabled for inserted transceiver type.
+         on        - RS-FEC is enabled for inserted transceiver type.
+         undefined - RS-FEC not configured, no transceiver is detected."
+
+    SYNTAX INTEGER {
+           off (0),
+           on (1),
+           undefined (2)
+    }
+
+MplsLabel ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+        "MPLS label with actual label range 16-1048575, 0-15 is reserved."
+    SYNTAX Unsigned32 (0..1048575)
+
+InterfaceType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Indicates the type of interface.
+
+        individual   - The ports of the interface are handled individually
+
+        bundled      - The ports of the interface are bundled
+
+        bundledSplit - The ports of the interface are bundled 2x5"
+
+    SYNTAX INTEGER {
+        individual    (1),
+        bundled       (2),
+        bundledSplit  (3),
+        notAvailable  (2147483646),
+        notApplicable (2147483647)
+     }
+
+ConnectorType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Connector type specifies the mode in which a port containing sub ports (henceforth referred to as
+         a main port) shall operate in. An example is the QSFP+/28 interface which can use
+         break-out QSFP optics in the same physical cage.
+         Specifying the connector type on the main port tells the system which optics are connected
+         which in turn will decide which subsets of ports will be available for provisioning."
+
+    SYNTAX INTEGER {
+        connector4x10Gb    (1),
+        connector1x100Gb   (2),
+        notApplicable      (2147483647)
+     }
+
+Platform ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "shows which platform type (CU type) the node is"
+    SYNTAX INTEGER {
+        unknown            (0),
+        cuosc              (1),
+        cusfpv1            (2),
+        cusfpv2            (3),
+        cusfpv3            (4),
+        culessTU1          (5),
+        culessTU2          (6),
+        culessTU3          (7),
+        culessTU4          (8),
+        pizzaboxFHA1UDC    (9),
+        pizzaboxEMXP1UDC   (10),
+        pizzaboxHDEA1600   (11)
+    }
+
+END
+

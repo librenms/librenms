@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\Port;
 use App\View\Components\Device\PageTabs;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use LibreNMS\Util\Debug;
@@ -18,6 +20,9 @@ use LibreNMS\Util\Url;
 class DeviceController
 {
     use AuthorizesRequests;
+
+    /** Tabs with their own device.{tab} route, the legacy url only redirects to it */
+    public const array ROUTED_TABS = ['graphs', 'health', 'loadbalancer', 'neighbours', 'netflow', 'port', 'pseudowires', 'qos', 'routing', 'slas', 'stp', 'wireless'];
 
     public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {
@@ -33,12 +38,20 @@ class DeviceController
 
         $current_tab = str_replace('tab=', '', $current_tab) ?: 'overview';
 
+        $port = null;
         if ($current_tab == 'port') {
-            $vars = Url::parseLegacyPath($request->path());
-            $port = $device->ports()->findOrFail($vars->get('port'));
+            $port = $device->ports()->findOrFail($this->portId((string) $vars));
             Gate::authorize('view', $port);
         } else {
             Gate::authorize('view', $device);
+        }
+
+        if (in_array($current_tab, self::ROUTED_TABS, true)) {
+            return $this->redirectToTabRoute($request, $device_id, $current_tab, (string) $vars, $port);
+        }
+
+        if ($current_tab === 'edit') {
+            return $this->redirectToEditRoute($request, $device_id, (string) $vars);
         }
 
         $tab_controller = PageTabs::getTab($current_tab);
@@ -62,6 +75,75 @@ class DeviceController
         $data_array['tab_content'] = $this->renderLegacyTab($current_tab, $device, $data);
 
         return view('device.tabs.legacy', $data_array);
+    }
+
+    /**
+     * Port id from the native /port/{id} path or the legacy /port/port={id} path
+     */
+    private function portId(string $vars): int
+    {
+        $first = explode('/', $vars)[0];
+
+        return (int) (ctype_digit($first) ? $first : Url::parseLegacyPath($vars)->get('port'));
+    }
+
+    /**
+     * Send legacy urls to the tab's own route, /key=value/ path options move to the query string
+     */
+    private function redirectToTabRoute(Request $request, int $deviceId, string $tab, string $vars, ?Port $port): RedirectResponse
+    {
+        $options = [];
+        foreach (explode('/', $vars) as $segment) {
+            $segment = urldecode($segment);
+            if (str_contains($segment, '=')) {
+                [$key, $value] = explode('=', $segment, 2);
+                if (! in_array($key, ['device', 'tab', 'port'], true)) {
+                    $options[$key] = $value;
+                }
+            }
+        }
+
+        $params = ['device' => $deviceId] + ($port ? ['port' => $port->port_id] : []);
+
+        return redirect()->route("device.$tab", $params + $request->query() + $options, 301);
+    }
+
+    private function redirectToEditRoute(Request $request, int $deviceId, string $vars): RedirectResponse
+    {
+        $legacy = Url::parseLegacyPath($vars)->all();
+        $options = $request->query() + $legacy;
+        $section = $legacy['section'] ?? $options['section'] ?? '';
+
+        $route = match ($section) {
+            '', 'default', 'device', 'edit' => 'device.edit',
+            'alert-rules' => 'device.edit.alert-rules',
+            'apps' => 'device.edit.apps',
+            'component', 'components' => 'device.edit.components',
+            'customoid', 'customoids' => 'device.edit.customoids',
+            'health' => 'device.edit.health',
+            'mempools' => 'device.edit.mempools',
+            'misc' => 'device.edit.misc',
+            'modules' => 'device.edit.modules',
+            'snmp', 'ipmi', 'polling' => 'device.edit.polling',
+            'ports' => 'device.edit.ports',
+            'processors' => 'device.edit.processors',
+            'routing' => 'device.edit.routing',
+            'services' => 'device.edit.services',
+            'storage' => 'device.edit.storage',
+            'wireless-sensors' => 'device.edit.wireless-sensors',
+            default => abort(404),
+        };
+
+        $tab = $options['tab'] ?? null;
+        $params = match ($section) {
+            'snmp', 'ipmi' => ['tab' => $section],
+            'polling' => ['tab' => is_string($tab) ? $tab : null],
+            'ports' => array_key_exists('filter', $options) ? ['filter' => $options['filter'] ?? ''] : [],
+            'alert-rules' => Arr::only($options, ['page', 'per_page']),
+            default => [],
+        };
+
+        return redirect()->route($route, ['device' => $deviceId] + $params, 301);
     }
 
     private function renderLegacyTab($tab, Device $device, $data)
