@@ -37,9 +37,6 @@
     extend suricata-stats /bin/cat /var/cache/suricata-monitoring/snmp
     ```
 
-    The cron job writes this file as plain JSON or Base64+GZIP, whichever
-    is smaller.
-
 4. Restart snmpd on your system.
 
 Configure Suricata to write the statistics to the eve file one time
