@@ -8,6 +8,7 @@ use App\Models\AlertRule;
 use App\Models\Device;
 use App\Models\Ipv4Address;
 use App\Models\Ipv4Mac;
+use App\Models\Location;
 use App\Models\PollerGroup;
 use App\Models\Port;
 use App\Models\User;
@@ -125,7 +126,8 @@ final class LegacyTableEndpointsTest extends TestCase
         $databaseNow = Carbon::parse(DB::scalar('SELECT NOW()'), 'UTC')->toImmutable();
         $active = ['status' => 1, 'last_polled' => $databaseNow->subSeconds(1300)];
         $group = PollerGroup::factory()->create(['group_name' => 'East']);
-        $overdue = Device::factory()->create($active + ['last_polled_timetaken' => 2.345, 'poller_group' => $group->id]);
+        $location = Location::factory()->create(['location' => 'Test & Lab']);
+        $overdue = Device::factory()->for($location)->create($active + ['last_polled_timetaken' => 2.345, 'poller_group' => $group->id]);
         $recent = Device::factory()->create([
             'status' => 1,
             'last_polled' => $databaseNow->subSeconds(1100),
@@ -146,7 +148,8 @@ final class LegacyTableEndpointsTest extends TestCase
             ->assertJsonPath('total', 2)
             ->assertJsonPath('rows.0.poller_group', 'General')
             ->assertJsonPath('rows.0.last_polled_timetaken', 7.53)
-            ->assertJsonPath('rows.1.poller_group', 'East');
+            ->assertJsonPath('rows.1.poller_group', 'East')
+            ->assertJsonPath('rows.1.location', 'Test &amp; Lab');
 
         $response = $this->postJson(route('table.poll-log'), ['type' => 'unpolled', 'rowCount' => -1])
             ->assertOk()

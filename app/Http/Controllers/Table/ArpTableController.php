@@ -13,7 +13,7 @@ use LibreNMS\Util\Url;
 /**
  * @extends TableController<Ipv4Mac>
  */
-class ArpSearchController extends TableController
+class ArpTableController extends TableController
 {
     /** @var array<string, string> */
     protected array $default_sort = ['hostname' => 'asc'];
@@ -32,25 +32,29 @@ class ArpSearchController extends TableController
     protected function baseQuery(Request $request): Builder
     {
         return Ipv4Mac::hasAccess($request->user())
-            ->with('port.device', 'device', 'remote_ports_maybe.device')
-            ->withAggregate('port', 'ifDescr')
-            ->withAggregate('device', 'hostname');
+            ->select('ipv4_mac.*')
+            ->leftJoin('ports', 'ipv4_mac.port_id', '=', 'ports.port_id')
+            ->leftJoin('devices', 'ipv4_mac.device_id', '=', 'devices.device_id')
+            ->with('port.device', 'device.location', 'remote_ports_maybe.device.location');
     }
 
-    /** @return list<string> */
+    /** @return array<string, string> */
     protected function filterFields(Request $request): array
     {
-        return ['device_id', 'port_id'];
+        return [
+            'ipv4_mac.device_id' => 'device_id',
+            'ipv4_mac.port_id' => 'port_id',
+        ];
     }
 
-    /** @return array<int|string, string> */
+    /** @return array<string, string> */
     protected function sortFields(Request $request): array
     {
         return [
-            'hostname' => 'device_hostname',
-            'interface' => 'port_ifdescr',
-            'mac_address',
-            'ipv4_address',
+            'hostname' => 'devices.hostname',
+            'interface' => 'ports.ifDescr',
+            'mac_address' => 'ipv4_mac.mac_address',
+            'ipv4_address' => 'ipv4_mac.ipv4_address',
         ];
     }
 
@@ -76,7 +80,7 @@ class ArpSearchController extends TableController
 
             $query->where(function (Builder $query) use ($fields, $search, $mac): void {
                 foreach ($fields as $field) {
-                    $query->orWhere($field, 'like', '%' . ($field === 'mac_address' ? $mac : $search) . '%');
+                    $query->orWhereLike('ipv4_mac.' . $field, '%' . ($field === 'mac_address' ? $mac : $search) . '%');
                 }
             });
         }

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Table;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
-use App\Models\DevicePerm;
 use App\Models\PollerCluster;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
@@ -33,21 +32,19 @@ class PollLogController extends TableController
     {
         $this->authorize('viewAny', PollerCluster::class);
 
+        $user = $request->user();
         $query = Device::query()
-            ->select('devices.*', 'locations.location as poll_location', 'poller_groups.group_name')
+            ->select('devices.*', 'poller_groups.group_name')
             ->leftJoin('locations', 'devices.location_id', '=', 'locations.id')
             ->leftJoin('poller_groups', 'devices.poller_group', '=', 'poller_groups.id')
+            ->with('location')
             ->isActive()
-            ->where('devices.status', 1);
-
-        $user = $request->user();
-        if (! $user->can('viewAll', Device::class)) {
-            $query->whereIn('devices.device_id', DevicePerm::where('user_id', $user->getKey())->select('device_id'));
-        }
+            ->where('devices.status', 1)
+            ->when($user->cannot('viewAll', Device::class), fn (Builder $query) => $query->whereAttachedTo($user, 'users'));
 
         if ($request->input('type') === 'unpolled') {
             $overdue = (int) (LibrenmsConfig::get('rrd.step', 300) * 1.2);
-            $query->whereRaw('devices.last_polled <= DATE_SUB(NOW(), INTERVAL ? SECOND)', [$overdue]);
+            $query->whereRaw('devices.last_polled <= NOW() - INTERVAL ? SECOND', [$overdue]);
         }
 
         return $query;
@@ -75,12 +72,14 @@ class PollLogController extends TableController
         if ($search) {
             $like = "%$search%";
 
-            $query->where(function (Builder $query) use ($like): void {
-                $query->where('devices.hostname', 'like', $like)
-                    ->orWhere('devices.sysName', 'like', $like)
-                    ->orWhereRaw('COALESCE(CONVERT_TZ(devices.last_polled, @@session.time_zone, ?), devices.last_polled) LIKE ?', [session('preferences.timezone'), $like])
-                    ->orWhere('devices.last_polled_timetaken', 'like', $like);
-            });
+            $query->where(fn (Builder $query) => $query
+                ->whereLike('devices.hostname', $like)
+                ->orWhereLike('devices.sysName', $like)
+                ->orWhereLike('devices.last_polled_timetaken', $like)
+                ->orWhereRaw(
+                    'COALESCE(CONVERT_TZ(devices.last_polled, @@session.time_zone, ?), devices.last_polled) LIKE ?',
+                    [session('preferences.timezone'), $like],
+                ));
         }
 
         return $query;
@@ -91,7 +90,7 @@ class PollLogController extends TableController
      */
     public function formatItem(Model $model): array
     {
-        $location = $model->getAttribute('poll_location');
+        $location = $model->location?->location;
 
         return [
             'hostname' => Url::deviceLink($model, null, ['tab' => 'graphs', 'group' => 'poller']),

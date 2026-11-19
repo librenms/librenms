@@ -55,15 +55,13 @@ class AlertLogStatsController extends TableController
 
         $days = $request->input('time_interval');
         if (is_numeric($days)) {
-            $groups->whereRaw('alert_log.time_logged > DATE_SUB(NOW(), INTERVAL ? DAY)', [$days]);
+            $groups->whereRaw('alert_log.time_logged > NOW() - INTERVAL ? DAY', [$days]);
         }
 
-        if ($request->filled('min_severity')) {
-            $severity = $request->input('min_severity');
-            if (is_numeric($severity)) {
-                $severity = array_keys(self::SEVERITIES)[(int) $severity - 1];
-            }
-            $groups->whereIn('alert_rules.severity', self::SEVERITIES[$severity]);
+        $severity = $request->input('min_severity');
+        if ($severity !== null) {
+            $severities = self::SEVERITIES[$severity] ?? array_values(self::SEVERITIES)[(int) $severity - 1];
+            $groups->whereIn('alert_rules.severity', $severities);
         }
 
         $this->filter($request, $groups, ['alert_log.device_id' => 'device_id']);
@@ -72,7 +70,7 @@ class AlertLogStatsController extends TableController
         // Paginate the grouped rows so the total and the All option use the same result set.
         return AlertLog::query()
             ->fromSub($groups, 'alert_log')
-            ->with('device')
+            ->with('device.location')
             ->orderByDesc('event_count')
             ->orderBy('device_id')
             ->orderBy('name');
