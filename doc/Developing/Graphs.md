@@ -295,6 +295,19 @@ port and supplies its page context and title. Its `GraphOptions::traffic`
 uses `TrafficOptions` to add percentiles, transferred-byte totals, previous
 period comparisons, future trend lines, and port speed references.
 
+For application graphs, extend `App\Graphs\Application\ApplicationGraph`.
+`$this->metric()` reads the `app-<app_type>-<app_id>.rrd` file the
+application poller writes. For an app with more files, pass the parts that
+follow the app id as tags, in order:
+`$this->metric(['category' => 'overview'])` reads
+`app-backupninja-<app_id>-overview.rrd`.
+A file with a part before the app id, such as `app-asterisk-stats-<app_id>.rrd`,
+needs its own `MetricIdentity` with the tags in that order.
+`app/Graphs/Application/NtpClientOffsetGraph.php` is an example that uses
+`StatsOptions`. Graph names for this can not contain hyphens, so
+the graphs of an app such as `ntp-client` are need to be named like
+`application_ntp_client_*`.
+
 For graph types outside device graphs, extend `AbstractSeriesGraph` and
 implement `isAuthorized()` for the entities being displayed, using `canView()`
 for each entity. Users need permission to view the entity; guests may only view
