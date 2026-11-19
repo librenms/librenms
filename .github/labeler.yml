@@ -40,8 +40,9 @@
   - changed-files:
       - any-glob-to-any-file:
           - 'includes/polling/applications/**'
-          - 'includes/html/pages/apps/**'
-          - 'includes/html/pages/device/apps/**'
+          - 'LibreNMS/Applications/**'
+          - 'resources/views/apps/**'
+          - 'resources/views/device/tabs/apps.blade.php'
           - 'includes/html/graphs/application/**'
 
 'API':

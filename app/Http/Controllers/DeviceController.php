@@ -22,7 +22,7 @@ class DeviceController
     use AuthorizesRequests;
 
     /** Tabs with their own device.{tab} route, the legacy url only redirects to it */
-    public const array ROUTED_TABS = ['graphs', 'health', 'loadbalancer', 'neighbours', 'netflow', 'port', 'pseudowires', 'qos', 'routing', 'slas', 'stp', 'wireless'];
+    public const array ROUTED_TABS = ['apps', 'graphs', 'health', 'loadbalancer', 'neighbours', 'netflow', 'port', 'pseudowires', 'qos', 'routing', 'slas', 'stp', 'wireless'];
 
     public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {
@@ -92,12 +92,14 @@ class DeviceController
      */
     private function redirectToTabRoute(Request $request, int $deviceId, string $tab, string $vars, ?Port $port): RedirectResponse
     {
+        // App filters can contain encoded slashes and plus signs. Split the raw path before decoding.
+        $path = $tab === 'apps' ? $request->path() : $vars;
         $options = [];
-        foreach (explode('/', $vars) as $segment) {
+        foreach (explode('/', $path) as $segment) {
             $segment = urldecode($segment);
             if (str_contains($segment, '=')) {
                 [$key, $value] = explode('=', $segment, 2);
-                if (! in_array($key, ['device', 'tab', 'port'], true)) {
+                if (! in_array($key, ['device', 'tab'], true) && ($key !== 'port' || $tab === 'apps')) {
                     $options[$key] = $value;
                 }
             }

@@ -1,6 +1,6 @@
 @if($application)
     <x-device.overview.panel :title="__('Puppet Agent')" icon="fa fa-cogs"
-        :href="route('device', ['device' => $device->device_id, 'tab' => 'apps', 'vars' => 'app=puppet-agent'])">
+        :href="$application->deviceAppsUrl()">
         <div class="tw:divide-y tw:divide-gray-300 tw:dark:divide-zinc-800">
             <div class="tw:grid tw:grid-cols-3 tw:gap-3 tw:p-3 tw:text-center tw:hover:bg-neutral-100 tw:dark:hover:bg-dark-gray-300">
                 @foreach([

@@ -17,7 +17,7 @@ final class UrlTest extends TestCase
     {
         $this->assertSame(route('device.graphs', ['device' => 4, 'group' => 'poller']), Url::deviceUrl(4, ['tab' => 'graphs', 'group' => 'poller', 'empty' => '']));
         $this->assertSame(route('device.health', ['device' => 4]), Url::deviceUrl(4, ['tab' => 'health']));
-        $this->assertSame(route('device', [4, 'apps']) . '/app=nginx/', Url::deviceUrl(4, ['tab' => 'apps', 'app' => 'nginx']));
+        $this->assertSame(route('device.apps', ['device' => 4, 'app' => 'nginx']), Url::deviceUrl(4, ['tab' => 'apps', 'app' => 'nginx']));
         $this->assertSame(route('device', [4]), Url::deviceUrl(4));
     }
 
