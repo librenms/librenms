@@ -218,7 +218,7 @@ class BillControllerTest extends TestCase
 
         $response = $this->actingAs($admin)->delete(route('bill.destroy', $bill));
 
-        $response->assertRedirect(url('bills'));
+        $response->assertRedirect(route('bills.index'));
         $this->assertDatabaseMissing('bills', ['bill_id' => $bill->bill_id]);
         $this->assertDatabaseMissing('bill_data', ['bill_id' => $bill->bill_id]);
         $this->assertDatabaseMissing('bill_history', ['bill_id' => $bill->bill_id]);

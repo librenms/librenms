@@ -116,7 +116,7 @@ final class PortTabTest extends TestCase
         $this->actingAs($this->admin())
             ->get("/device/$port->device_id/port/port=$port->port_id/")
             ->assertStatus(301)
-            ->assertRedirect(url("device/$port->device_id/port/$port->port_id"));
+            ->assertRedirect(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id]));
     }
 
     public function testLegacyDeviceSegmentRedirects(): void

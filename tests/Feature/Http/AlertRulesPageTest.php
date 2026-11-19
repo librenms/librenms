@@ -5,6 +5,7 @@ namespace LibreNMS\Tests\Feature\Http;
 use App\Models\Alert;
 use App\Models\AlertOperation;
 use App\Models\AlertRule;
+use App\Models\AlertTransport;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Location;
@@ -44,6 +45,26 @@ final class AlertRulesPageTest extends TestCase
             ->assertSee(route('alert-rule.edit', $rule))
             ->assertDontSee('data-alert-rule-editor', false)
             ->assertDontSee('create the default alert rules');
+    }
+
+    public function testIndexLinksTransportsToTheTransportsPage(): void
+    {
+        $operation = AlertOperation::create(['name' => 'Test operation']);
+        $segment = $operation->segments()->create([
+            'position' => 0,
+            'operation_phase' => 'problem',
+            'escalation_step_from' => 1,
+            'start_in_seconds' => 0,
+            'step_duration_seconds' => 300,
+        ]);
+        $transport = AlertTransport::factory()->create(['transport_name' => 'Ops mail']);
+        $segment->transportSingles()->syncWithPivotValues([$transport->transport_id], ['target_type' => 'single']);
+        AlertRule::factory()->create(['alert_operation_id' => $operation->id]);
+
+        $this->actingAs($this->admin())
+            ->get(route('alert-rules.index'))
+            ->assertOk()
+            ->assertSee('href="' . route('alert-transports.index') . "#transport-$transport->transport_id\">Ops mail</a>", false);
     }
 
     public function testDevicePageOnlyListsRulesForTheDevice(): void

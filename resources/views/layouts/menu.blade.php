@@ -758,7 +758,7 @@
                                 @endcan
                                 @if(\App\Horizon\Supervisors::supported())
                                 @can('worker.horizon')
-                                <li><a href="{{ url(config('horizon.path')) }}" target="_blank"><i class="fa fa-external-link fa-fw fa-lg" aria-hidden="true"></i> {{ __('Horizon') }}</a></li>
+                                <li><a href="{{ route('horizon.index') }}" target="_blank"><i class="fa fa-external-link fa-fw fa-lg" aria-hidden="true"></i> {{ __('Horizon') }}</a></li>
                                 @endcan
                                 @endif
                                 @endif

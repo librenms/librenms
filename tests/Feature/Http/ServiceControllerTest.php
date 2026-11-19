@@ -233,7 +233,7 @@ final class ServiceControllerTest extends TestCase
     {
         $this->actingAs($this->admin())
             ->get('/addsrv')
-            ->assertRedirect(url('services') . '#create-service');
+            ->assertRedirect(route('services.index') . '#create-service');
     }
 
     private function admin(): User
