@@ -88,7 +88,7 @@ class Python extends BaseValidation
 
         if ($process->getExitCode() !== 0) {
             $user = \config('librenms.user');
-            $user_mismatch = function_exists('posix_getpwuid') && SystemUser::name() !== $user;
+            $user_mismatch = SystemUser::name() !== $user;
 
             if ($user_mismatch) {
                 $validator->warn(
