@@ -27,12 +27,12 @@
 namespace LibreNMS\Util;
 
 use App\Facades\LibrenmsConfig;
-use App\Http\Controllers\DeviceController;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\Sensor;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Str;
@@ -59,7 +59,7 @@ class Url
         };
 
         return sprintf('<a href="%s" class="%s" x-data="deviceLink({device_id: %d})">%s</a>%s',
-            self::deviceUrl($device),
+            route('device.overview', ['device' => $device->device_id]),
             $class,
             $device->device_id,
             e($text ?: $device->display),
@@ -77,7 +77,7 @@ class Url
         $text = $text ?: $label;
 
         return sprintf('<a href="%s" class="%s" x-data="portLink({port_id: %d})">%s</a>%s',
-            self::portUrl($port),
+            route('device.port', ['device' => $port->device_id, 'port' => $port->port_id]),
             self::portLinkDisplayClass($port),
             $port->port_id,
             e($text),
@@ -87,14 +87,9 @@ class Url
 
     /**
      * @param  Device|null  $device
-     * @param  string|null  $text
-     * @param  array  $vars
-     * @param  int  $start
-     * @param  int  $end
-     * @param  int  $overlib
-     * @return string
+     * @param  string|null  $url  link target, defaults to the device overview
      */
-    public static function deviceLink(mixed $device, Htmlable|string|null $text = '', array $vars = [], int $start = 0, int $end = 0, bool|int $overlib = 1): string
+    public static function deviceLink(mixed $device, Htmlable|string|null $text = '', ?string $url = null, int $start = 0, int $end = 0, bool|int $overlib = 1): string
     {
         if (! $device instanceof Device || ! $device->hostname) {
             return e($text);
@@ -120,7 +115,7 @@ class Url
 
         $class = self::deviceLinkDisplayClass($device);
         $graphs = Graph::getOverviewGraphsForDevice($device);
-        $url = Url::deviceUrl($device, $vars);
+        $url ??= route('device.overview', ['device' => $device->device_id]);
 
         // beginning of overlib box contains large hostname followed by hardware & OS details
         // because we are injecting this into javascript htmlentities alone won't work, so strip_tags too
@@ -217,7 +212,7 @@ class Url
         if (! $overlib) {
             return $content;
         } elseif (Gate::allows('view', $port)) {
-            return self::overlibLink($url ?? self::portUrl($port), $text, $content, self::portLinkDisplayClass($port));
+            return self::overlibLink($url ?? route('device.port', ['device' => $port->device_id, 'port' => $port->port_id]), $text, $content, self::portLinkDisplayClass($port));
         }
 
         return Rewrite::normalizeIfName($text);
@@ -261,89 +256,7 @@ class Url
             return $content;
         }
 
-        return self::overlibLink(self::sensorUrl($sensor), $text, $content, self::sensorLinkDisplayClass($sensor));
-    }
-
-    /**
-     * @param  int|Device  $device
-     * @param  array  $vars
-     * @return string
-     */
-    public static function deviceUrl($device, $vars = [])
-    {
-        $deviceId = ($device instanceof Device) ? $device->device_id : (int) $device;
-        $tab = $vars['tab'] ?? null;
-
-        // tabs with their own route take their options in the query string
-        if ($tab !== 'port' && in_array($tab, DeviceController::ROUTED_TABS, true)) {
-            unset($vars['tab']);
-            $vars = array_filter($vars, fn ($value) => $value !== null && $value !== '');
-
-            return route("device.$tab", ['device' => $deviceId] + $vars);
-        }
-
-        $routeParams = [$deviceId];
-        if (isset($vars['tab'])) {
-            $routeParams[] = $vars['tab'];
-            unset($vars['tab']);
-        }
-
-        return route('device', $routeParams) . self::urlParams($vars);
-    }
-
-    /**
-     * Port page url: /device/{device}/port/{port} with any options in the query string
-     *
-     * @param  array<string, mixed>  $vars
-     */
-    public static function portUrl($port, $vars = []): string
-    {
-        $vars = array_filter($vars, fn ($value) => $value !== null && $value !== '');
-
-        return route('device.port', ['device' => $port->device_id, 'port' => $port->port_id] + $vars);
-    }
-
-    /**
-     * Device health page url for the sensor's class
-     *
-     * @param  array<string, mixed>  $vars
-     */
-    public static function sensorUrl($sensor, $vars = []): string
-    {
-        $sensorClass = $sensor->sensor_class instanceof \BackedEnum ? $sensor->sensor_class->value : $sensor->sensor_class;
-
-        return route('device.health', ['device' => $sensor->device_id, 'metric' => $sensorClass] + $vars);
-    }
-
-    public static function generate($vars, $new_vars = [])
-    {
-        $vars = array_merge($vars, $new_vars);
-
-        $page = str_replace('%2F', '/', rawurlencode((string) $vars['page']));
-        $url = url(LibrenmsConfig::get('base_url', true) . $page);
-        unset($vars['page']);
-
-        return $url . self::urlParams($vars);
-    }
-
-    /**
-     * Generate url parameters to append to url
-     * $prefix will only be prepended if there are parameters
-     *
-     * @param  array  $vars
-     * @param  string  $prefix
-     * @return string
-     */
-    private static function urlParams($vars, $prefix = '/')
-    {
-        $url = empty($vars) ? '' : $prefix;
-        foreach ($vars as $var => $value) {
-            if ($value == '0' || $value != '' && ! Str::contains($var, 'opt') && ! is_numeric($var)) {
-                $url .= urlencode((string) $var) . '=' . urlencode((string) $value) . '/';
-            }
-        }
-
-        return $url;
+        return self::overlibLink(route('device.health', ['device' => $sensor->device_id, 'metric' => $sensor->sensor_class]), $text, $content, self::sensorLinkDisplayClass($sensor));
     }
 
     /**
@@ -358,11 +271,6 @@ class Url
         }
 
         return LaravelUrl::signedRoute('graph', $args);
-    }
-
-    public static function graphPageUrl(string $type, array $args = []): string
-    {
-        return url()->query('graphs', ['type' => $type, ...$args]);
     }
 
     /**
@@ -397,9 +305,9 @@ class Url
 
         $args['from'] = $original_from;
 
-        $args['link'] = $link ?: self::generate($args, ['page' => 'graphs', 'height' => null, 'width' => null, 'bg' => null]);
+        $link = $link ?: route('graphs', Arr::except($args, ['height', 'width', 'bg', 'popup_title', 'page']));
 
-        return self::overlibLink($args['link'], $graph, $popup);
+        return self::overlibLink($link, $graph, $popup);
     }
 
     public static function lazyGraphTag($args, string $class = 'img-responsive'): string

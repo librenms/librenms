@@ -71,7 +71,8 @@ class PageLinks extends Component
                 } elseif ($this->editTabUrl($device, $metric . 's')) {
                     $currentTab = $metric . 's';
                 }
-            } elseif (preg_match('#device/\d+/ports/transceivers#', $path)) {
+            } elseif ((request()->routeIs('device.ports') && request()->query('view') === 'transceivers')
+                || preg_match('#device/\d+/ports/transceivers#', $path)) {
                 $currentTab = 'transceivers';
             }
 
@@ -143,7 +144,7 @@ class PageLinks extends Component
         if (Gate::allows('debug', \App\Models\Device::class)) {
             $device_links['capture'] = [
                 'icon' => 'fa-bug',
-                'url' => route('device', [$device->device_id, 'capture']),
+                'url' => route('device.capture', ['device' => $device]),
                 'title' => __('Capture'),
                 'external' => false,
             ];

@@ -38,7 +38,7 @@
     </span>
     <h2 class="tw:my-0! tw:text-lg! tw:font-semibold! tw:wrap-anywhere" @if($titleScript) x-text="{{ $titleScript }}" @endif>
         @if($device)
-            <a href="{{ route('device', ['device' => $device->device_id]) }}" x-data="deviceLink({device_id: {{ $device->device_id }}})">{{ $name ?? $device->display }}</a>
+            <a href="{{ route('device.overview', ['device' => $device->device_id]) }}" x-data="deviceLink({device_id: {{ $device->device_id }}})">{{ $name ?? $device->display }}</a>
         @else
             {{ $name ?? $host->title() }}
         @endif

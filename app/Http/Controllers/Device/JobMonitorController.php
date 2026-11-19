@@ -21,7 +21,7 @@ class JobMonitorController extends Controller
 
         $monitor->monitor(JobMonitor::deviceTag($device->device_id));
 
-        return redirect()->route('device', ['device' => $device->device_id, 'tab' => 'capture', 'section' => 'jobs']);
+        return redirect()->route('device.capture', ['device' => $device->device_id, 'section' => 'jobs']);
     }
 
     public function destroy(Device $device, JobMonitor $monitor): RedirectResponse
@@ -32,6 +32,6 @@ class JobMonitorController extends Controller
 
         $monitor->stopMonitoring(JobMonitor::deviceTag($device->device_id));
 
-        return redirect()->route('device', ['device' => $device->device_id, 'tab' => 'capture', 'section' => 'jobs']);
+        return redirect()->route('device.capture', ['device' => $device->device_id, 'section' => 'jobs']);
     }
 }

@@ -17,7 +17,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Enum\AlertLogState;
 use LibreNMS\Tests\TestCase;
-use LibreNMS\Util\Url;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
@@ -69,8 +68,8 @@ final class LegacyTableEndpointsTest extends TestCase
             ->assertJsonPath('rows.0.mac_oui', 'Test vendor');
 
         $this->assertStringContainsString('fa-flag', $response->json('rows.0.interface'));
-        $this->assertStringContainsString(Url::deviceUrl($remoteDevice), $response->json('rows.0.remote_device'));
-        $this->assertStringContainsString(Url::portUrl($remotePort), $response->json('rows.0.remote_interface'));
+        $this->assertStringContainsString(route('device.overview', ['device' => $remoteDevice->device_id]), $response->json('rows.0.remote_device'));
+        $this->assertStringContainsString(route('device.port', ['device' => $remotePort->device_id, 'port' => $remotePort->port_id]), $response->json('rows.0.remote_interface'));
 
         $this->postJson(route('table.arp-search'), [
             'device_id' => $device->device_id,
@@ -156,7 +155,7 @@ final class LegacyTableEndpointsTest extends TestCase
             ->assertJsonPath('total', 1)
             ->assertJsonPath('rows.0.last_polled_timetaken', 2.35);
 
-        $this->assertStringContainsString(Url::deviceUrl($overdue, ['tab' => 'graphs', 'group' => 'poller']), $response->json('rows.0.hostname'));
+        $this->assertStringContainsString(route('device.graphs', ['device' => $overdue->device_id, 'group' => 'poller']), $response->json('rows.0.hostname'));
     }
 
     public function testPollLogSearchesLocalPollTimesAndSortsByLastPoll(): void
@@ -182,7 +181,7 @@ final class LegacyTableEndpointsTest extends TestCase
                 ->assertJsonPath('rows.0.last_polled_timetaken', 3)
                 ->assertJsonPath('rows.1.last_polled_timetaken', 4);
 
-            $this->assertStringContainsString(Url::deviceUrl($newer, ['tab' => 'graphs', 'group' => 'poller']), $response->json('rows.0.hostname'));
+            $this->assertStringContainsString(route('device.graphs', ['device' => $newer->device_id, 'group' => 'poller']), $response->json('rows.0.hostname'));
         } finally {
             DB::statement('SET time_zone = ?', [$originalTimezone]);
         }

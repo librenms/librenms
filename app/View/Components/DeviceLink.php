@@ -5,6 +5,7 @@ namespace App\View\Components;
 use App\Facades\DeviceCache;
 use App\Models\Device;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Route;
 use Illuminate\View\Component;
 use LibreNMS\Util\Graph;
 
@@ -41,7 +42,14 @@ class DeviceLink extends Component
         $this->tab = $tab;
         $this->section = $section;
         $this->status = $this->status();
-        $this->href = route('device', ['device' => $this->device->device_id ?? 1, 'tab' => $tab, 'section' => $section] + $query);
+        $route = 'device.' . ($tab ?? 'overview');
+        $parameters = ['device' => $this->device->device_id ?? 1, 'section' => $section];
+        if ($tab === 'routing' && $section !== null && Route::has("device.routing.$section")) {
+            $route = "device.routing.$section";
+            unset($parameters['section']);
+        }
+
+        $this->href = route($route, $parameters + $query);
     }
 
     /**

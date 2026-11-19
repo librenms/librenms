@@ -134,7 +134,7 @@
                                     <th>{{ __('Device') }}</th>
                                     <td>
                                         @if ($certificate->device)
-                                            <a href="{{ url('device/' . $certificate->device_id) }}">{{ $certificate->device->hostname }}</a>
+                                            <a href="{{ route('device.overview', ['device' => $certificate->device_id]) }}">{{ $certificate->device->hostname }}</a>
                                         @else
                                             {{ __('N/A') }}
                                         @endif

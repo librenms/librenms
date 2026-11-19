@@ -225,7 +225,7 @@ Route::middleware(['auth'])->group(function (): void {
         Route::post('ports', [BillController::class, 'attachPort'])->name('port.attach');
         Route::delete('ports/{port}', [BillController::class, 'detachPort'])->name('port.detach');
     });
-    Route::get('locations', [LocationController::class, 'index']);
+    Route::get('locations', [LocationController::class, 'index'])->name('locations.index');
     Route::resource('ssl-certificates', SslCertificateController::class)->except(['edit']);
     Route::resource('preferences', UserPreferencesController::class)->only('index', 'store', 'update');
     Route::middleware('can:api.access')->group(function (): void {
@@ -264,7 +264,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('apps', [AppsController::class, 'index'])->name('apps.index');
     Route::get('apps/{vars}', [AppsController::class, 'legacy'])->where('vars', '.+');
 
-    Route::get('nac', [NacController::class, 'index']);
+    Route::get('nac', [NacController::class, 'index'])->name('nac');
 
     // Device Tabs
     Route::get('/device/add', [Device\AddDeviceController::class, 'index'])->name('device.add');
@@ -319,6 +319,20 @@ Route::middleware(['auth'])->group(function (): void {
     Route::prefix('device/{device}')->name('device.')->group(function (): void {
         Route::get('delete', [DeviceController::class, 'deleteConfirm'])->name('delete.confirm');
         Route::delete('', [DeviceController::class, 'destroy'])->name('destroy');
+
+        Route::get('', [DeviceController::class, 'index'])->whereNumber('device')->name('overview');
+        foreach (['accesspoints', 'capture', 'config', 'inventory', 'latency', 'mef', 'munin', 'nac', 'notes', 'printer', 'processes', 'services', 'tnmsne', 'vlans', 'vm'] as $tab) {
+            Route::get($tab, [DeviceController::class, 'index'])
+                ->whereNumber('device')->defaults('tab', $tab)->name($tab);
+        }
+
+        Route::get('packages', [DeviceController::class, 'index'])
+            ->whereNumber('device')->defaults('tab', 'packages')->middleware('saved-filter:device.packages')->name('packages');
+        Route::get('ports', [DeviceController::class, 'index'])
+            ->whereNumber('device')->defaults('tab', 'ports')->middleware('saved-filter:device.ports')->name('ports');
+        Route::get('ports/portsecurity', [DeviceController::class, 'index'])
+            ->whereNumber('device')->defaults('tab', 'ports')->defaults('view', 'portsecurity')
+            ->middleware('saved-filter:device.port-security')->name('ports.security');
 
         Route::get('faults', [Device\Tabs\FaultsController::class, 'index'])
             ->middleware('saved-filter:device.faults')->name('faults');
@@ -384,9 +398,9 @@ Route::middleware(['auth'])->group(function (): void {
         ->name('device')->where('vars', '.*');
 
     // Maps
-    Route::get('fullscreenmap', [Maps\FullscreenMapController::class, 'fullscreenMap']);
-    Route::get('availability-map', [Maps\AvailabilityMapController::class, 'availabilityMap']);
-    Route::get('map/{vars?}', [Maps\NetMapController::class, 'netMap']);
+    Route::get('fullscreenmap', [Maps\FullscreenMapController::class, 'fullscreenMap'])->name('maps.fullscreen');
+    Route::get('availability-map', [Maps\AvailabilityMapController::class, 'availabilityMap'])->name('maps.availability');
+    Route::get('map/{vars?}', [Maps\NetMapController::class, 'netMap'])->name('maps.network');
     Route::prefix('maps')->group(function (): void {
         Route::resource('custom', CustomMapController::class, ['as' => 'maps'])
             ->parameters(['custom' => 'map'])->except('create');
@@ -486,7 +500,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::get('plugin/{plugin:plugin_name}', PluginPageController::class)->name('plugin.page');
 
     Route::get('health/{metric?}/{legacyview?}', [SensorController::class, 'index'])->name('sensor.index');
-    Route::get('wireless/{metric}/{legacyview?}', [WirelessSensorController::class, 'index'])->name('wireless.index');
+    Route::get('wireless/{metric?}/{legacyview?}', [WirelessSensorController::class, 'index'])->name('wireless.index');
 
     // old route redirects
     Route::permanentRedirect('poll-log', 'poller/log');
@@ -523,8 +537,8 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('search/health', Ajax\Search\HealthSearchController::class)->name('ajax.search.health');
         Route::get('search/routing', Ajax\Search\RoutingSearchController::class)->name('ajax.search.routing');
         Route::get('search/logs', Ajax\Search\LogsSearchController::class)->name('ajax.search.logs');
-        Route::post('set_resolution', [Ajax\SessionController::class, 'resolution']);
-        Route::post('set_style', [Ajax\SessionController::class, 'style']);
+        Route::post('set_resolution', [Ajax\SessionController::class, 'resolution'])->name('ajax.set-resolution');
+        Route::post('set_style', [Ajax\SessionController::class, 'style'])->name('ajax.set-style');
         Route::post('template/preview', Ajax\TemplatePreviewController::class)->name('ajax.template.preview');
 
         // js select2 data controllers
@@ -579,31 +593,31 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('diskio', Table\DiskioController::class)->name('table.diskio');
             Route::post('device', Table\DeviceController::class)->name('table.device');
             Route::post('device-dependencies', Table\DeviceDependenciesController::class)->name('table.device-dependencies');
-            Route::get('device/export', [Table\DeviceController::class, 'export']);
+            Route::get('device/export', [Table\DeviceController::class, 'export'])->name('table.device.export');
             Route::post('eventlog', Table\EventlogController::class)->name('table.eventlog');
-            Route::post('fdb-tables', Table\FdbTablesController::class);
+            Route::post('fdb-tables', Table\FdbTablesController::class)->name('table.fdb-tables');
             Route::post('graylog', Table\GraylogController::class)->name('table.graylog');
             Route::post('inventory', Table\InventoryController::class)->name('table.inventory');
-            Route::get('inventory/export', [Table\InventoryController::class, 'export']);
+            Route::get('inventory/export', [Table\InventoryController::class, 'export'])->name('table.inventory.export');
             Route::post('location', Table\LocationController::class)->name('table.location');
-            Route::get('location/export', [Table\LocationController::class, 'export']);
+            Route::get('location/export', [Table\LocationController::class, 'export'])->name('table.location.export');
             Route::post('mempools', Table\MempoolsController::class)->name('table.mempools');
-            Route::get('mempools/export', [Table\MempoolsController::class, 'export']);
+            Route::get('mempools/export', [Table\MempoolsController::class, 'export'])->name('table.mempools.export');
             Route::post('outages', Table\OutagesController::class)->name('table.outages');
-            Route::get('outages/export', [Table\OutagesController::class, 'export']);
+            Route::get('outages/export', [Table\OutagesController::class, 'export'])->name('table.outages.export');
             Route::post('poll-log', Table\PollLogController::class)->name('table.poll-log');
             Route::post('port-nac', Table\PortNacController::class)->name('table.port-nac');
             Route::get('port-security/export', [Table\PortSecurityController::class, 'export'])->name('port-security.export');
-            Route::post('port-stp', Table\PortStpController::class);
+            Route::post('port-stp', Table\PortStpController::class)->name('table.port-stp');
             Route::post('ports', Table\PortsController::class)->name('table.ports');
-            Route::get('ports/export', [Table\PortsController::class, 'export']);
+            Route::get('ports/export', [Table\PortsController::class, 'export'])->name('table.ports.export');
             Route::post('processors', Table\ProcessorsController::class)->name('table.processors');
-            Route::get('processors/export', [Table\ProcessorsController::class, 'export']);
-            Route::post('routes', Table\RoutesTablesController::class);
+            Route::get('processors/export', [Table\ProcessorsController::class, 'export'])->name('table.processors.export');
+            Route::post('routes', Table\RoutesTablesController::class)->name('table.routes');
             Route::post('sensors', Table\SensorsController::class)->name('table.sensors');
-            Route::get('sensors/export', [Table\SensorsController::class, 'export']);
+            Route::get('sensors/export', [Table\SensorsController::class, 'export'])->name('table.sensors.export');
             Route::post('storages', Table\StoragesController::class)->name('table.storages');
-            Route::get('storages/export', [Table\StoragesController::class, 'export']);
+            Route::get('storages/export', [Table\StoragesController::class, 'export'])->name('table.storages.export');
             Route::post('syslog', Table\SyslogController::class)->name('table.syslog');
             Route::post('printer-supply', Table\PrinterSupplyController::class)->name('table.printer-supply');
             Route::post('tnmsne', Table\TnmsneController::class)->name('table.tnmsne');
@@ -611,36 +625,36 @@ Route::middleware(['auth'])->group(function (): void {
             Route::post('vlan-ports', Table\VlanPortsController::class)->name('table.vlan-ports');
             Route::post('vlan-devices', Table\VlanDevicesController::class)->name('table.vlan-devices');
             Route::post('vminfo', Table\VminfoController::class)->name('table.vminfo');
-            Route::get('vminfo/export', [Table\VminfoController::class, 'export']);
+            Route::get('vminfo/export', [Table\VminfoController::class, 'export'])->name('table.vminfo.export');
             Route::post('ssl-certificates', Table\SslCertificateController::class)->name('table.ssl-certificates');
         });
 
         // dashboard widgets
-        Route::prefix('dash')->group(function (): void {
-            Route::post('alerts', Widgets\AlertsController::class);
-            Route::post('alertlog', Widgets\AlertlogController::class);
-            Route::post('alert-map', Widgets\AlertMapController::class);
-            Route::post('alertlog-stats', Widgets\AlertlogStatsController::class);
-            Route::post('availability-map', Widgets\AvailabilityMapController::class);
-            Route::post('component-status', Widgets\ComponentStatusController::class);
-            Route::post('custom-map', Widgets\CustomMapController::class);
-            Route::post('device-summary-horiz', Widgets\DeviceSummaryHorizController::class);
-            Route::post('device-summary-vert', Widgets\DeviceSummaryVertController::class);
-            Route::post('device-types', Widgets\DeviceTypeController::class);
-            Route::post('eventlog', Widgets\EventlogController::class);
-            Route::post('generic-graph', Widgets\GraphController::class);
-            Route::post('generic-image', Widgets\ImageController::class);
-            Route::post('globe', Widgets\GlobeController::class);
-            Route::post('graylog', Widgets\GraylogController::class);
-            Route::post('health-sensors', Widgets\HealthSensorsController::class);
-            Route::post('placeholder', Widgets\PlaceholderController::class);
-            Route::post('notes', Widgets\NotesController::class);
-            Route::post('server-stats', Widgets\ServerStatsController::class);
-            Route::post('syslog', Widgets\SyslogController::class);
-            Route::post('top-devices', Widgets\TopDevicesController::class);
-            Route::post('top-interfaces', Widgets\TopInterfacesController::class);
-            Route::post('top-errors', Widgets\TopErrorsController::class);
-            Route::post('worldmap', Widgets\WorldMapController::class)->name('widget.worldmap');
+        Route::prefix('dash')->name('widget.')->group(function (): void {
+            Route::post('alerts', Widgets\AlertsController::class)->name('alerts');
+            Route::post('alertlog', Widgets\AlertlogController::class)->name('alertlog');
+            Route::post('alert-map', Widgets\AlertMapController::class)->name('alert-map');
+            Route::post('alertlog-stats', Widgets\AlertlogStatsController::class)->name('alertlog-stats');
+            Route::post('availability-map', Widgets\AvailabilityMapController::class)->name('availability-map');
+            Route::post('component-status', Widgets\ComponentStatusController::class)->name('component-status');
+            Route::post('custom-map', Widgets\CustomMapController::class)->name('custom-map');
+            Route::post('device-summary-horiz', Widgets\DeviceSummaryHorizController::class)->name('device-summary-horiz');
+            Route::post('device-summary-vert', Widgets\DeviceSummaryVertController::class)->name('device-summary-vert');
+            Route::post('device-types', Widgets\DeviceTypeController::class)->name('device-types');
+            Route::post('eventlog', Widgets\EventlogController::class)->name('eventlog');
+            Route::post('generic-graph', Widgets\GraphController::class)->name('generic-graph');
+            Route::post('generic-image', Widgets\ImageController::class)->name('generic-image');
+            Route::post('globe', Widgets\GlobeController::class)->name('globe');
+            Route::post('graylog', Widgets\GraylogController::class)->name('graylog');
+            Route::post('health-sensors', Widgets\HealthSensorsController::class)->name('health-sensors');
+            Route::post('placeholder', Widgets\PlaceholderController::class)->name('placeholder');
+            Route::post('notes', Widgets\NotesController::class)->name('notes');
+            Route::post('server-stats', Widgets\ServerStatsController::class)->name('server-stats');
+            Route::post('syslog', Widgets\SyslogController::class)->name('syslog');
+            Route::post('top-devices', Widgets\TopDevicesController::class)->name('top-devices');
+            Route::post('top-interfaces', Widgets\TopInterfacesController::class)->name('top-interfaces');
+            Route::post('top-errors', Widgets\TopErrorsController::class)->name('top-errors');
+            Route::post('worldmap', Widgets\WorldMapController::class)->name('worldmap');
         });
     });
 
@@ -650,7 +664,7 @@ Route::middleware(['auth'])->group(function (): void {
 
 // routes that don't need authentication
 Route::prefix('ajax')->group(function (): void {
-    Route::post('set_timezone', [Ajax\TimezoneController::class, 'set']);
+    Route::post('set_timezone', [Ajax\TimezoneController::class, 'set'])->name('ajax.set-timezone');
 });
 
 // installation routes

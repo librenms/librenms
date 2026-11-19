@@ -358,6 +358,6 @@ final class SecretControllerTest extends DBTestCase
         $response->assertOk();
         $response->assertSee('Cannot delete secret in use');
         $response->assertSee('Edit Default Secrets');
-        $response->assertSee(url('/settings/poller/snmp'));
+        $response->assertSee(route('settings', ['tab' => 'poller', 'section' => 'snmp']));
     }
 }

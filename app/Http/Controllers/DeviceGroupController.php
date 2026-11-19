@@ -22,8 +22,15 @@ class DeviceGroupController extends Controller
     {
         $this->authorize('viewAny', DeviceGroup::class);
 
+        $request->validate(['serviceTemplates' => 'nullable|integer']);
+        $templateId = $request->integer('serviceTemplates');
+
         return view('device-group.index', [
-            'device_groups' => DeviceGroup::hasAccess($request->user())->orderBy('name')->withCount('devices')->get(),
+            'device_groups' => DeviceGroup::hasAccess($request->user())
+                ->when($templateId, fn ($query) => $query->whereHas('serviceTemplates', fn ($templates) => $templates->whereKey($templateId)))
+                ->orderBy('name')
+                ->withCount('devices')
+                ->get(),
         ]);
     }
 

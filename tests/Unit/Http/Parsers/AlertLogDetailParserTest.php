@@ -172,8 +172,7 @@ class AlertLogDetailParserTest extends TestCase
 
         $this->assertEquals('Access Point', $fields[0]['label']);
         $this->assertEquals('AP-01', $fields[0]['value']);
-        $this->assertStringContainsString('accesspoints', $fields[0]['url']);
-        $this->assertStringContainsString('ap=101', $fields[0]['url']);
+        $this->assertSame('/device/1/accesspoints/101', parse_url($fields[0]['url'], PHP_URL_PATH));
     }
 
     public function testFormatService(): void

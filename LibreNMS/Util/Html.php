@@ -101,9 +101,8 @@ class Html
             $graph_array_zoom['width'] = '400';
 
             $link_array = $graph_array;
-            $link_array['page'] = 'graphs';
             unset($link_array['height'], $link_array['width']);
-            $link = Url::generate($link_array);
+            $link = route('graphs', $link_array);
 
             $full_link = Url::overlibLink($link, Url::lazyGraphTag($graph_array), Url::graphTag($graph_array_zoom));
             $graph_data[] = $full_link;

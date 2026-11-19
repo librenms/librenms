@@ -21,7 +21,7 @@
         </div>
         <div class="table-responsive">
             <table id="sensors" class="table table-hover table-condensed"
-                   data-url="{{ route('table.sensors') }}" data-params="class={{ $metric }}">
+                   data-url="{{ route('table.sensors') }}" data-params="class={{ $metric }}" data-export-url="{{ route('table.sensors.export', ['class' => $metric]) }}">
                 <thead>
                 <tr>
                     <th data-column-id="device_hostname">{{ __('Device') }}</th>

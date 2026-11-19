@@ -54,7 +54,7 @@ class DeviceOverview extends DeviceOverviewHook
         return [
             'title' => 'Example Plugin: Device Notes',
             'device' => $device,
-            'url' => url('device/' . $device->device_id . '/notes'),
+            'url' => route('device.notes', ['device' => $device]),
         ];
     }
 }
