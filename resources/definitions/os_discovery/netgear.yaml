@@ -55,7 +55,11 @@ modules:
                     index: 'ngFiberOpticsTemperature.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} Temperature'
                     divisor: 10
-                    skip_values: 0
+                    skip_values:
+                        -
+                            oid: NETGEAR-BOXSERVICES-OPTICS-MIB::ngFiberOpticsVoltage
+                            op: '='
+                            value: 0
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     group: transceiver
@@ -68,7 +72,11 @@ modules:
                     index: 'ngFiberOpticsVoltage.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} Voltage'
                     divisor: 1000
-                    skip_values: 0
+                    skip_values:
+                        -
+                            oid: NETGEAR-BOXSERVICES-OPTICS-MIB::ngFiberOpticsVoltage
+                            op: '='
+                            value: 0
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     group: transceiver
@@ -81,7 +89,11 @@ modules:
                     index: 'ngFiberOpticsCurrent.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} Bias'
                     divisor: 10000
-                    skip_values: 0
+                    skip_values:
+                        -
+                            oid: NETGEAR-BOXSERVICES-OPTICS-MIB::ngFiberOpticsVoltage
+                            op: '='
+                            value: 0
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     group: transceiver
@@ -94,7 +106,11 @@ modules:
                     index: 'ngFiberOpticsPowerIn.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} Rx Power'
                     divisor: 1000
-                    skip_values: 0
+                    skip_values:
+                        -
+                            oid: NETGEAR-BOXSERVICES-OPTICS-MIB::ngFiberOpticsVoltage
+                            op: '='
+                            value: 0
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     group: transceiver
@@ -105,7 +121,11 @@ modules:
                     index: 'ngFiberOpticsPowerOut.{{ $index }}'
                     descr: '{{ IF-MIB::ifName }} Tx Power'
                     divisor: 1000
-                    skip_values: 0
+                    skip_values:
+                        -
+                            oid: NETGEAR-BOXSERVICES-OPTICS-MIB::ngFiberOpticsVoltage
+                            op: '='
+                            value: 0
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     group: transceiver
