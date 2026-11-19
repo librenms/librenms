@@ -231,6 +231,37 @@ Common named arguments on `GraphOptions` are:
 For example, a percentage graph can use `scaleMin: 0, scaleMax: 100,
 scaleRigid: true`. See `app/Data/Graphing/GraphOptions.php` for all options.
 
+### Statistics
+
+To add rolling averages and percentile lines to each series, as the legacy
+`generic_stats` graphs do, pass `StatsOptions` in the graph's `options()`:
+
+```php
+use App\Data\Graphing\StatsOptions;
+
+protected function options(): GraphOptions
+{
+    return new GraphOptions(
+        verticalLabel: 'Seconds',
+        palette: 'rainbow_stats_purple',
+        stats: new StatsOptions,
+    );
+}
+```
+
+Each series then gets these extra lines and legend rows:
+
+- hourly :: 1 hour average line, with its min and max in the legend
+- daily :: the same for 1 day, shown when the graph covers at least 36 hours
+- weekly :: the same for 1 week, shown when the graph covers at least 8 days
+- percentiles :: horizontal lines, `[25, 50, 75]` by default, hidden when
+  `graph_stat_percentile_disable` is set
+
+Turn parts off with named arguments, for example
+`new StatsOptions(weekly: false, percentiles: [50])`. Graphs 25 pixels tall
+or less leave them all out. The lines take the next colors of the palette;
+`rainbow_stats_purple` matches the legacy graphs.
+
 ## Troubleshooting
 
 | Symptom | What to check |

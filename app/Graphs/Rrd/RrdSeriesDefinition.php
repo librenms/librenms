@@ -14,8 +14,8 @@ use LibreNMS\Exceptions\NoGraphData;
  */
 class RrdSeriesDefinition
 {
-    private const int LABEL_WIDTH = 16;
-    private const int PRECISION = 2;
+    public const int LABEL_WIDTH = 16;
+    public const int PRECISION = 2;
 
     /** @var array<string, array{suffix: string, cf: string}> legend columns and the value each one shows */
     private const array LEGEND_COLUMNS = [
@@ -74,6 +74,8 @@ class RrdSeriesDefinition
             throw new NoGraphData('No Data files');
         }
 
+        $stats = $this->options->stats === null ? null : new RrdStatsDefinition($this->options->stats, $params, $this->nextColor(...), count($files) > 1);
+
         $averaged = count(array_filter(array_keys($files), fn ($key) => $this->series[$key]->style->stackAverage));
 
         $i = 0;
@@ -111,6 +113,7 @@ class RrdSeriesDefinition
             if ($traffic !== null) {
                 $traffic->addSeries($key, $id, $filename, $series, $drawScale);
             }
+            $stats?->addSeries($id, $filename, $series, $drawScale);
         }
 
         if ($previousValues) {
@@ -123,7 +126,7 @@ class RrdSeriesDefinition
         }
 
         // fills go below all lines, so they do not hide lines of other series
-        return [$this->legendHeader(), ...$defs, ...($traffic?->definitions() ?? []), ...$maxFills, ...$fills, ...$drawing, ...($traffic?->drawing() ?? [])];
+        return [$this->legendHeader(), ...$defs, ...($stats?->definitions ?? []), ...($traffic?->definitions() ?? []), ...$maxFills, ...$fills, ...$drawing, ...($stats?->drawing ?? []), ...($traffic?->drawing() ?? [])];
     }
 
     /**

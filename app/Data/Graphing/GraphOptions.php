@@ -28,6 +28,7 @@ readonly class GraphOptions
         public string $legendTitle = '',
         public string $palette = 'mixed',
         public ?TrafficOptions $traffic = null,
+        public ?StatsOptions $stats = null,
     ) {
     }
 }

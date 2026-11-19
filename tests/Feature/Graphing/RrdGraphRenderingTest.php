@@ -3,8 +3,10 @@
 namespace LibreNMS\Tests\Feature\Graphing;
 
 use App\Data\Graphing\DataSeries;
+use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
 use App\Data\Graphing\SeriesStyle;
+use App\Data\Graphing\StatsOptions;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Graphs\Device\DeviceGraph;
@@ -122,6 +124,29 @@ class RrdGraphRenderingTest extends TestCase
             public function getSeries(): array
             {
                 return ['bits' => new DataSeries($this->metric('traffic'), 'bytes', 'Traffic', 'bps', 8, new SeriesStyle(fill: true, invert: true))];
+            }
+        };
+
+        $this->assertStringStartsWith(self::PNG_HEADER, $graph->render()->data);
+    }
+
+    public function test_it_draws_rolling_stats_and_percentiles(): void
+    {
+        $device = Device::factory()->create();
+        $this->createRrd($device, 'offset.rrd', ['offset']);
+        // long enough for the daily and weekly lines
+        $params = new GraphParameters(['type' => 'device_offset', 'device' => $device->device_id, 'graph_type' => 'png', 'from' => time() - 800000, 'to' => time()]);
+
+        $graph = new class($params) extends DeviceGraph
+        {
+            public function getSeries(): array
+            {
+                return ['offset' => new DataSeries($this->metric('offset'), 'offset', 'Offset', 's', 0.001, new SeriesStyle(fill: true, invert: true))];
+            }
+
+            protected function options(): GraphOptions
+            {
+                return new GraphOptions(palette: 'rainbow_stats_purple', stats: new StatsOptions);
             }
         };
 
