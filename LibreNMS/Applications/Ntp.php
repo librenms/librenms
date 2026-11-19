@@ -100,6 +100,11 @@ class Ntp extends ApplicationDefinition
         ]);
     }
 
+    /**
+     * @param  array<string, string>  $options  option values and display text
+     * @param  array<string, string>  $context  other query options kept on each link
+     * @return array<string, array{text: string, link: string}>
+     */
     private function fleetOptions(string $key, array $options, array $context): array
     {
         $links = [];

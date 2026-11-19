@@ -76,6 +76,7 @@ class Wireguard extends ApplicationDefinition
         }
     }
 
+    /** @param  array<string, mixed>  $peer */
     private function peerDetails(ApplicationPage $page, Application $application, string $interface, array $peer): void
     {
         $hostname = $peer['hostname'] ?? '*unknown*';
@@ -90,6 +91,7 @@ class Wireguard extends ApplicationDefinition
         ];
     }
 
+    /** @param  array<string, array<string, array<string, mixed>>>  $interfaces  peers keyed by interface and peer name */
     private function detailsTable(ApplicationPage $page, Application $application, array $interfaces): void
     {
         ksort($interfaces);
@@ -115,6 +117,7 @@ class Wireguard extends ApplicationDefinition
         $page->addTable('Peers', ['Name', 'Interface', 'PubKey', 'Recv', 'Sent', 'Endpoint IP', 'Port', 'Last Handshake', 'Allowed IPs'], $rows);
     }
 
+    /** @param  list<string>  $addresses */
     private function addresses(array $addresses): Htmlable
     {
         return view('apps.address-list', ['addresses' => array_map($this->addressReference(...), $addresses)]);

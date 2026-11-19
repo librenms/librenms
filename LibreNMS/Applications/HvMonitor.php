@@ -73,6 +73,7 @@ class HvMonitor extends ApplicationDefinition
         $page->addGraphs($graphs, ['hv' => $hv, 'vm' => $vm, 'vmdisk' => $disk, 'vmif' => $interface]);
     }
 
+    /** @return array<string, string> */
     private function generalGraphs(?string $vm, string $hv): array
     {
         $status = match (true) {
@@ -85,6 +86,7 @@ class HvMonitor extends ApplicationDefinition
         return $status + self::GRAPHS;
     }
 
+    /** @return array<string, string> */
     private function diskGraphs(string $hv, bool $selected): array
     {
         $graphs = $selected ? ['disk-size' => 'Size'] : ['disk-size2' => 'Disk Size'];
@@ -105,6 +107,7 @@ class HvMonitor extends ApplicationDefinition
         return $graphs;
     }
 
+    /** @param  array<string, string>  $info */
     private function interfaceDetails(ApplicationPage $page, Application $application, array $info): void
     {
         $mac = $info['mac'] ?? '';

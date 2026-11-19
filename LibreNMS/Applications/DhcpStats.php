@@ -41,6 +41,10 @@ class DhcpStats extends ApplicationDefinition
         parent::buildDevicePage($page, $application);
     }
 
+    /**
+     * @param  list<array<string, mixed>>  $pools
+     * @param  list<array<string, mixed>>  $networks
+     */
     private function pools(ApplicationPage $page, array $pools, array $networks): void
     {
         $rows = array_map(fn (array $pool) => [
@@ -64,6 +68,7 @@ class DhcpStats extends ApplicationDefinition
         $page->addTable('Networks', ['Name', 'Max', 'In Use', 'Use%', 'Pools'], $rows);
     }
 
+    /** @param  list<array<string, mixed>>  $leases */
     private function leases(ApplicationPage $page, array $leases): void
     {
         $ports = [];

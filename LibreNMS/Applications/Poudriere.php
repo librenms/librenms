@@ -90,6 +90,7 @@ class Poudriere extends ApplicationDefinition
         }
     }
 
+    /** @return list<list<string>> */
     private function statusRows(string $output, int $columns): array
     {
         $rows = [];
@@ -103,6 +104,7 @@ class Poudriere extends ApplicationDefinition
         return $rows;
     }
 
+    /** @return list<list<string>> */
     private function buildRows(string $output): array
     {
         $rows = [];

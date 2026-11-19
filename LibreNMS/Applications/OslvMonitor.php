@@ -86,6 +86,7 @@ class OslvMonitor extends ApplicationDefinition
         $page->addGraphs($graphs, ['oslvm' => $selected]);
     }
 
+    /** @param  array<string, mixed>  $data */
     private function resourceFilters(ApplicationPage $page, array $data, ?string $selected): void
     {
         $backend = $data['backend'] ?? null;
@@ -122,6 +123,11 @@ class OslvMonitor extends ApplicationDefinition
         }
     }
 
+    /**
+     * @param  list<string>  $containers
+     * @param  array<string, array<string, mixed>>  $users
+     * @return array<string, array<string, string>> container labels grouped by type
+     */
     private function containerGroups(array $containers, array $users): array
     {
         $groups = [];
@@ -143,6 +149,7 @@ class OslvMonitor extends ApplicationDefinition
         return $groups;
     }
 
+    /** @param  list<string>  $paths */
     private function mountPoints(ApplicationPage $page, Device $device, array $paths): void
     {
         $storage = $device->storage()->get()->keyBy('storage_descr');
@@ -161,6 +168,7 @@ class OslvMonitor extends ApplicationDefinition
         $page->addTable('Mount Points', ['Path', 'Mount Point and Usage'], $rows);
     }
 
+    /** @param  list<string|array<string, string>>  $addresses */
     private function network(ApplicationPage $page, Device $device, array $addresses): void
     {
         $rows = [];

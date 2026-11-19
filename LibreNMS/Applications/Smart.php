@@ -114,6 +114,7 @@ class Smart extends ApplicationDefinition
         $page->addGraphs($graphs, ['disk' => $disk, 'scale_min' => '0']);
     }
 
+    /** @param  array<string, mixed>  $info */
     private function driveLabel(string $name, array $info): string
     {
         $health = match ($info['health_pass'] ?? null) {

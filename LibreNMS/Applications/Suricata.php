@@ -430,6 +430,7 @@ class Suricata extends ApplicationDefinition
         $page->addGraphs($graphs, ['sinstance' => $instance]);
     }
 
+    /** @return array<string, string> */
     private function appLayerGraphs(Application $application, string $section): array
     {
         [$metric, $unit] = self::APP_LAYER_METRICS[$section];

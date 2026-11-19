@@ -37,6 +37,7 @@ class Nfs extends ApplicationDefinition
         };
     }
 
+    /** @param  array<string, mixed>  $data */
     private function generalGraphs(ApplicationPage $page, array $data): void
     {
         require base_path('includes/nfs-shared.inc.php');
@@ -69,6 +70,7 @@ class Nfs extends ApplicationDefinition
         $page->addGraphs($graphs, ['nfs_os' => $os]);
     }
 
+    /** @return array<string, string> */
     private function rpcGraphs(string $role, int $count): array
     {
         $title = ucfirst($role) . ' RPC';
@@ -80,6 +82,7 @@ class Nfs extends ApplicationDefinition
         return $graphs;
     }
 
+    /** @param  list<array<string, mixed>>  $mounts */
     private function mountedBy(ApplicationPage $page, Application $application, array $mounts): void
     {
         $rows = [];
@@ -104,6 +107,7 @@ class Nfs extends ApplicationDefinition
         $page->addTable('Mounted By', ['Host', 'Path'], $rows);
     }
 
+    /** @param  list<array<string, mixed>>  $mounts */
     private function mounts(ApplicationPage $page, array $mounts): void
     {
         $show = $page->option('show_mount_options') !== '0';
@@ -152,6 +156,7 @@ class Nfs extends ApplicationDefinition
         $page->addTable('Mounts', $headers, $rows);
     }
 
+    /** @param  array<string, mixed>  $mount */
     private function mountOptions(array $mount, bool $flat): string|\Illuminate\Contracts\Support\Htmlable
     {
         $flags = $mount['flags'] ?? [];
