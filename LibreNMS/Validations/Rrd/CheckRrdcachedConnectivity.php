@@ -28,8 +28,8 @@ namespace LibreNMS\Validations\Rrd;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Interfaces\Validation;
+use LibreNMS\Util\SystemUser;
 use LibreNMS\ValidationResult;
-use LibreNMS\Validator;
 
 class CheckRrdcachedConnectivity implements Validation
 {
@@ -53,7 +53,7 @@ class CheckRrdcachedConnectivity implements Validation
 
             if ($error !== null) {
                 return ValidationResult::fail(
-                    trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_socket_connect', ['socket' => $socket, 'user' => Validator::getUsername(), 'error' => $error]),
+                    trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_socket_connect', ['socket' => $socket, 'user' => SystemUser::name(), 'error' => $error]),
                     trans('validation.validations.rrd.CheckRrdcachedConnectivity.fix_socket_connect', ['group' => config('librenms.group')])
                 );
             }

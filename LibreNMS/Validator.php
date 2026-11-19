@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\Util\Laravel;
+use LibreNMS\Util\SystemUser;
 use ReflectionClass;
 use ReflectionException;
 
@@ -39,8 +40,6 @@ class Validator
     private array $validation_groups = [];
     /** @var array<string, ValidationResult[]> */
     private array $results = [];
-
-    private static ?string $username = null;
 
     /**
      * Validator constructor.
@@ -272,31 +271,10 @@ class Validator
      */
     public function execAsUser(string $command, ?array &$output = null, ?int &$code = null): void
     {
-        if (self::getUsername() === 'root') {
+        if (SystemUser::isRoot()) {
             $command = 'su ' . \config('librenms.user') . ' -s /bin/sh -c "' . $command . '"';
         }
         exec($command, $output, $code);
-    }
-
-    /**
-     * Get the username of the user running this and cache it for future requests.
-     *
-     * @return string
-     */
-    public static function getUsername(): string
-    {
-        if (self::$username === null) {
-            if (function_exists('posix_getpwuid')) {
-                $uid = posix_geteuid();
-                // uid 0 is root even without a passwd entry, execAsUser relies on this to drop privileges
-                self::$username = posix_getpwuid($uid)['name'] ?? ($uid === 0 ? 'root' : (string) $uid);
-            } else {
-                // the environment can name another user, so it is only the fallback
-                self::$username = getenv('USERNAME') ?: getenv('USER') ?: '?';
-            }
-        }
-
-        return self::$username;
     }
 
     /**
