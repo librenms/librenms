@@ -126,8 +126,12 @@ return [
             ],
         ],
         'alert_log_purge' => [
-            'description' => 'Entferne Alarm Logeinträge älter als',
-            'help' => 'Bereinigung wird erledigt von daily.sh',
+            'description' => 'Alarm Log',
+            'help' => 'Zeitraum in Tagen. Ältere Einträge werden durch daily.sh bereinigt',
+        ],
+        'applications_purge' => [
+            'description' => 'Gelöschte Anwendungen',
+            'help' => 'Zeitraum in Tagen. Gelöschte Anwendungen, die älter sind, werden durch daily.sh bereinigt',
         ],
         'allow_duplicate_sysName' => [
             'description' => 'Erlaube doppelten sysName',
@@ -317,8 +321,8 @@ return [
             'help' => 'Anzahl an Tagen welche ein Benutzer eingeloggt bleibt wenn er die Checkbox zum eingeloggt bleiben nutzt',
         ],
         'authlog_purge' => [
-            'description' => 'Entferne Auth log Einträge welche älter sind als',
-            'help' => 'Wird durch daily.sh erledigt',
+            'description' => 'Auth Log',
+            'help' => 'Zeitraum in Tagen. Ältere Einträge werden durch daily.sh bereinigt',
         ],
         'base_url' => [
             'description' => 'Spezifiziere URL',
@@ -398,8 +402,8 @@ return [
             'help' => 'Name benutzt als Teil der "from" E-Mail Adresse',
         ],
         'eventlog_purge' => [
-            'description' => 'Entferne Event Log Daten welche älter sind als',
-            'help' => 'Wird durch daily.sh erledigt',
+            'description' => 'Event Log',
+            'help' => 'Zeitraum in Tagen. Ältere Einträge werden durch daily.sh bereinigt',
         ],
         'favicon' => [
             'description' => 'Favicon',
@@ -546,6 +550,10 @@ return [
             'description' => 'Dateinamensuffix',
             'help' => 'Dies ist sehr wichtig da Gerätenamen in NfSen auf 21 Zeichen limitiert sind. Dies bedeutet das es problematisch werden kann full domain names zu kürzen, daher wird unnützes gewöhnlich entfernt.',
         ],
+        'networks_purge' => [
+            'description' => 'Unbenutzte Netzwerke',
+            'help' => 'Netzwerke ohne IP-Adressen werden wöchentlich bereinigt',
+        ],
         'own_hostname' => [
             'description' => 'LibreNMS hostname',
             'help' => 'Sollte auf den hostname/ip des LibreNMS Servers gesetzt werden',
@@ -581,12 +589,16 @@ return [
             ],
         ],
         'ports_fdb_purge' => [
-            'description' => 'Port FDB Einträge älter als',
-            'help' => 'Bereinigung wird erledigt durch daily.sh',
+            'description' => 'Port FDB',
+            'help' => 'Zeitraum in Tagen. Ältere Einträge werden durch daily.sh bereinigt',
+        ],
+        'ports_nac_purge' => [
+            'description' => 'Port NAC',
+            'help' => 'Zeitraum in Tagen. Ältere Einträge werden durch daily.sh bereinigt',
         ],
         'ports_purge' => [
-            'description' => 'Purge Ports gelöscht',
-            'help' => 'Bereinigung wird erledigt durch daily.sh',
+            'description' => 'Gelöschte Ports',
+            'help' => 'Gelöschte Ports werden durch daily.sh bereinigt',
         ],
         'public_status' => [
             'description' => 'Zeige den Status öffentlich an',
@@ -605,8 +617,8 @@ return [
             'help' => 'Verzeichnis für RRD Dateien. Standardmässig ist RRD innerhalb des LibreNMS Verzeichnisses. Eine Änderung verschiebt nicht die vorhandenen RRD Dateien.',
         ],
         'rrd_purge' => [
-            'description' => 'RRD Dateien älter als',
-            'help' => 'Bereinigung wird erledigt durch daily.sh',
+            'description' => 'RRD Graphen',
+            'help' => 'Zeitraum in Tagen. Ältere Graphen werden durch daily.sh bereinigt',
         ],
         'rrd_rra' => [
             'description' => 'RRD Format Einstellungen',
@@ -622,6 +634,10 @@ return [
         'rrdtool_tune' => [
             'description' => 'Tune alle RRD port Dateien zur Nutzung maximaler Werte',
             'help' => 'Automatisches Tuning auf maximale Werte für RRD port Dateien',
+        ],
+        'route_purge' => [
+            'description' => 'Route',
+            'help' => 'Zeitraum in Tagen. Ältere Einträge werden durch daily.sh bereinigt',
         ],
         'shorthost_target_length' => [
             'description' => 'Verkürzt einen Hostnamen auf diese maximale Länge',
@@ -696,8 +712,8 @@ return [
             'description' => 'Filtere Syslog Meldungen beinhaltend',
         ],
         'syslog_purge' => [
-            'description' => 'Syslog Einträge älter als',
-            'help' => 'Bereinigung wird erledigt durch daily.sh',
+            'description' => 'Syslog',
+            'help' => 'Zeitraum in Tagen. Ältere Einträge werden durch daily.sh bereinigt',
         ],
         'title_image' => [
             'description' => 'Titelbild',
