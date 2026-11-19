@@ -172,25 +172,31 @@ class Fortigate extends OS implements
      * fgWcInfoWtpSessions only counts the APs of the VDOM that answers the SNMP query, so it
      * reports 0 when the APs are managed in another VDOM. fgWcWtpSessionTable is indexed by
      * fgVdEntIndex and also lists the APs of other VDOMs, so count its rows that are not offLine.
-     * Some devices count an AP in the scalar that the table does not list, so report the higher
-     * of the two and never less than the scalar.
+     * Devices without the ConnectionState column count every row. Some devices count an AP in
+     * the scalar that the table does not list, so report the higher of the two and never less
+     * than the scalar.
      *
      * @return int|null null when the device reports no wireless controller data
      */
     private function countConnectedAps(): ?int
     {
         $scalar = $this->wirelessScalar('FORTINET-FORTIGATE-MIB::fgWcInfoWtpSessions.0');
-        $sessions = SnmpQuery::cache()->walk('FORTINET-FORTIGATE-MIB::fgWcWtpSessionWtpStationCount')->values();
+        $response = SnmpQuery::cache()->enumStrings()->walk('FORTINET-FORTIGATE-MIB::fgWcWtpSessionConnectionState');
 
-        if (empty($sessions)) {
+        if ($response->hasConnectionError()) {
             return $scalar;
         }
 
-        $states = SnmpQuery::cache()->enumStrings()
-            ->walk('FORTINET-FORTIGATE-MIB::fgWcWtpSessionConnectionState')->values();
-        $connected = count($sessions) - count(array_filter($states, fn ($state) => $state === 'offLine'));
+        $states = $response->values();
+        $sessions = empty($states)
+            ? SnmpQuery::cache()->walk('FORTINET-FORTIGATE-MIB::fgWcWtpSessionWtpStationCount')->values()
+            : array_filter($states, fn ($state) => $state !== 'offLine');
 
-        return max($connected, (int) $scalar);
+        if (empty($states) && empty($sessions)) {
+            return $scalar;
+        }
+
+        return max(count($sessions), (int) $scalar);
     }
 
     /**
