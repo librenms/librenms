@@ -330,7 +330,6 @@ function set_numeric($value, $default = 0)
     return $value;
 }
 
-
 /**
  * Converts ieee754 32-bit floating point decimal represenation to decimal
  */
