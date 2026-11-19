@@ -12,6 +12,9 @@ final class DeviceEditRedirectTest extends DBTestCase
 {
     use DatabaseTransactions;
 
+    /**
+     * @return array<string, array{string, string, 2?: array<string, mixed>}>
+     */
     public static function bookmarks(): array
     {
         return [
@@ -40,6 +43,9 @@ final class DeviceEditRedirectTest extends DBTestCase
         ];
     }
 
+    /**
+     * @param  array<string, mixed>  $params
+     */
     #[DataProvider('bookmarks')]
     public function testLegacyBookmarkRedirectsPermanently(string $bookmark, string $route, array $params = []): void
     {
