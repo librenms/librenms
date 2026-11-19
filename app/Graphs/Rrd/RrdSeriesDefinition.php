@@ -14,7 +14,6 @@ use LibreNMS\Exceptions\NoGraphData;
  */
 class RrdSeriesDefinition
 {
-    public const int LABEL_WIDTH = 16;
     public const int PRECISION = 2;
 
     /** @var array<string, array{suffix: string, cf: string}> legend columns and the value each one shows */
@@ -74,7 +73,7 @@ class RrdSeriesDefinition
             throw new NoGraphData('No Data files');
         }
 
-        $stats = $this->options->stats === null ? null : new RrdStatsDefinition($this->options->stats, $params, $this->nextColor(...), count($files) > 1);
+        $stats = $this->options->stats === null ? null : new RrdStatsDefinition($this->options->stats, $params, $this->nextColor(...), count($files) > 1, $this->options->labelWidth);
 
         $averaged = count(array_filter(array_keys($files), fn ($key) => $this->series[$key]->style->stackAverage));
 
@@ -85,7 +84,7 @@ class RrdSeriesDefinition
             $style = $series->style;
             $drawScale = $style->stackAverage ? $style->drawScale / $averaged : $style->drawScale;
             $color = $style->color ?? $this->nextColor();
-            $label = Rrd::fixedSafeDescr($series->description, self::LABEL_WIDTH);
+            $label = Rrd::fixedSafeDescr($series->description, $this->options->labelWidth);
             $inverted = $inverted || $style->invert;
 
             array_push($defs, ...$this->valueDefs($id, $filename, $series));
@@ -198,7 +197,7 @@ class RrdSeriesDefinition
         $unitWidth = max([0, ...array_map(fn (DataSeries $series) => strlen($series->unit), $this->series)]);
         $columnWidth = self::LEGEND_VALUE_WIDTH + $unitWidth + self::LEGEND_COLUMN_GAP;
 
-        $header = Rrd::fixedSafeDescr($this->options->legendTitle, self::LABEL_WIDTH);
+        $header = Rrd::fixedSafeDescr($this->options->legendTitle, $this->options->labelWidth);
         $width = $columnWidth + self::LEGEND_COLOR_BOX_WIDTH;
 
         foreach (array_keys(self::LEGEND_COLUMNS) as $label) {

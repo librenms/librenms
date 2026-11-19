@@ -11,6 +11,7 @@ readonly class GraphOptions
      * @param  bool|null  $scaleRigid  defaults to rigid when neither scaleMin nor scaleMax is set
      * @param  string  $legendTitle  heading above the series labels
      * @param  string  $palette  the graph_colours palette for series without a color
+     * @param  int  $labelWidth  characters the series labels and legend title are padded or cut to
      */
     public function __construct(
         public ?float $scaleMin = null,
@@ -27,6 +28,7 @@ readonly class GraphOptions
         public ?int $unitsLength = null,
         public string $legendTitle = '',
         public string $palette = 'mixed',
+        public int $labelWidth = 16,
         public ?TrafficOptions $traffic = null,
         public ?StatsOptions $stats = null,
     ) {

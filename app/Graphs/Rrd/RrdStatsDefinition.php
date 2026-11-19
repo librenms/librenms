@@ -32,12 +32,14 @@ class RrdStatsDefinition
     /**
      * @param  Closure(): string  $nextColor  the next color of the graph palette
      * @param  bool  $nameSeries  start each label with the series description, so the lines of several series can be told apart
+     * @param  int  $labelWidth  characters each label is padded or cut to
      */
     public function __construct(
         private readonly StatsOptions $options,
         private readonly GraphParameters $params,
         private readonly Closure $nextColor,
         private readonly bool $nameSeries,
+        private readonly int $labelWidth,
     ) {
     }
 
@@ -81,11 +83,11 @@ class RrdStatsDefinition
             }
 
             // only the average is drawn, min and max are legend rows
-            $this->drawing[] = "LINE1.25:$drawnId#$color:" . Rrd::fixedSafeDescr("$prefix$label avg", RrdSeriesDefinition::LABEL_WIDTH);
+            $this->drawing[] = "LINE1.25:$drawnId#$color:" . Rrd::fixedSafeDescr("$prefix$label avg", $this->labelWidth);
             array_push($this->drawing, ...$this->legendRow($periodId, $unit));
             foreach (['min', 'max'] as $suffix) {
                 // two spaces take the place of the color box, aligning the label with the others
-                $this->drawing[] = 'COMMENT:  ' . Rrd::fixedSafeDescr("$prefix$label $suffix", RrdSeriesDefinition::LABEL_WIDTH);
+                $this->drawing[] = 'COMMENT:  ' . Rrd::fixedSafeDescr("$prefix$label $suffix", $this->labelWidth);
                 array_push($this->drawing, ...$this->legendRow($periodId . $suffix, $unit));
             }
         }
@@ -106,7 +108,7 @@ class RrdStatsDefinition
                 array_push($this->definitions, "CDEF:{$lineId}line=$id,POP,$percentileId,$factor,*", "VDEF:$lineId={$lineId}line,FIRST");
             }
 
-            $this->drawing[] = "HRULE:$lineId#$percentileColors[$index]:" . Rrd::fixedSafeDescr("$prefix{$percentile}th Percentile", RrdSeriesDefinition::LABEL_WIDTH);
+            $this->drawing[] = "HRULE:$lineId#$percentileColors[$index]:" . Rrd::fixedSafeDescr("$prefix{$percentile}th Percentile", $this->labelWidth);
             $this->drawing[] = "GPRINT:$percentileId:%5." . RrdSeriesDefinition::PRECISION . "lf%s$unit\\n";
         }
     }

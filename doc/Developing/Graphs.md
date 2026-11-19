@@ -224,6 +224,7 @@ Common named arguments on `GraphOptions` are:
 | `scaleRigid` | Controls whether the graph strictly follows the scale limits. |
 | `verticalLabel` | Labels the vertical axis. |
 | `legendTitle` | Adds a heading above the series labels. |
+| `labelWidth` | Pads or cuts the series labels and legend title to this many characters; defaults to `16`. |
 | `palette` | Selects a palette from `graph_colours`; defaults to `mixed`. |
 | `base` | Sets the scaling base, such as `1024` for binary units. |
 | `unitsExponent` | Controls the axis unit exponent; `0` uses unprefixed units. |
@@ -262,6 +263,10 @@ Turn parts off with named arguments, for example
 or less leave them all out. The lines take the next colors of the palette;
 `rainbow_stats_purple` matches the legacy graphs.
 
+With several series, each label starts with the series description, such as
+`Jitter 1 hour avg`, so labels are cut at 16 characters unless `labelWidth`
+is increased.
+
 ## Troubleshooting
 
 | Symptom | What to check |
@@ -282,7 +287,7 @@ falls back to the legacy include.
 Replace legacy RRD filename and dataset variables with `MetricIdentity` and
 `DataSeries`, and move presentation settings into `SeriesStyle` and
 `GraphOptions`. Compare the resulting graph and legend before removing the
-old include.
+old include. A legacy `$descr_len` becomes `labelWidth`.
 
 For working examples, read `app/Graphs/Device/NetstatIpGraph.php` for multiple
 fields and inverted series, or `app/Graphs/Device/ProcessorGraph.php` for one
