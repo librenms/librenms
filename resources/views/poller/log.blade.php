@@ -37,11 +37,10 @@
         post: function ()
         {
             return {
-                id: "poll-log",
                 type: "{{ $filter }}"
             };
         },
-        url: "ajax_table.php"
+        url: "{{ route('table.poll-log') }}"
     });
 
 </script>

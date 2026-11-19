@@ -4232,33 +4232,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/table/alertlog-stats.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/table/alertlog-stats.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function device_by_id_cache\(\)\:
-				Use DeviceCache\:\:get\(\) and the Device model instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/table/alertlog-stats.inc.php
-
-		-
-			message: '''
 				#^Call to deprecated function device_by_id_cache\(\)\:
 				Use DeviceCache\:\:get\(\) and the Device model instead$#
 			'''
@@ -4328,24 +4301,6 @@ parameters:
 			identifier: function.deprecated
 			count: 2
 			path: includes/html/table/ix-peers.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchCell\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/table/poll-log.inc.php
-
-		-
-			message: '''
-				#^Call to deprecated function dbFetchRows\(\)\:
-				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/html/table/poll-log.inc.php
 
 		-
 			message: '''
