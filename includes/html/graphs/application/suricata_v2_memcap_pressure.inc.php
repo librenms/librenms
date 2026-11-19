@@ -8,12 +8,14 @@ $printtotal = 1;
 $addarea = 0;
 $transparency = 15;
 
-if (isset($vars['sinstance'])) {
-    $memcap_pressure_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___memcap_pressure']);
-    $memcap_pressure_max_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___memcap_pressure_max']);
-} else {
-    $memcap_pressure_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___memcap_pressure']);
-    $memcap_pressure_max_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___memcap_pressure_max']);
+$rrd_prefix = isset($vars['sinstance']) ? 'instance_' . $vars['sinstance'] . '___' : 'totals___';
+
+// Suricata 8.0 renamed memcap_pressure to memcap.pressure
+$memcap_pressure_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $rrd_prefix . 'memcap__pressure']);
+$memcap_pressure_max_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $rrd_prefix . 'memcap__pressure_max']);
+if (! Rrd::checkRrdExists($memcap_pressure_rrd_filename)) {
+    $memcap_pressure_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $rrd_prefix . 'memcap_pressure']);
+    $memcap_pressure_max_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $rrd_prefix . 'memcap_pressure_max']);
 }
 
 $rrd_list = [];

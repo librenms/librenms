@@ -7,33 +7,33 @@ $dostack = 0;
 $printtotal = 1;
 $addarea = 0;
 $transparency = 15;
+$descr_len = 16;
 
-if (isset($vars['sinstance'])) {
-    $capture__kernel_ifdrops_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___capture__kernel_ifdrops']);
-    $capture__kernel_drops_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'instance_' . $vars['sinstance'] . '___capture__kernel_drops']);
-} else {
-    $capture__kernel_ifdrops_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___capture__kernel_ifdrops']);
-    $capture__kernel_drops_rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, 'totals___capture__kernel_drops']);
-}
+$rrd_prefix = isset($vars['sinstance']) ? 'instance_' . $vars['sinstance'] . '___' : 'totals___';
+
+// capture__kernel_drops_any is the extend's sum of all unwanted drops, including
+// IPS error and memcap drop reasons, and only exists for totals
+$drop_stats = [
+    'capture__kernel_drops_any' => 'All Unwanted',
+    'capture__kernel_drops' => 'Kernel Drops',
+    'capture__kernel_ifdrops' => 'Kernel IF Drops',
+    'capture__dag_drops' => 'DAG Drops',
+    'capture__dpdk__imissed' => 'DPDK Missed',
+    'capture__dpdk__no_mbufs' => 'DPDK No Mbufs',
+];
 
 $rrd_list = [];
-if (Rrd::checkRrdExists($capture__kernel_ifdrops_rrd_filename)) {
-    $rrd_list[] = [
-        'filename' => $capture__kernel_ifdrops_rrd_filename,
-        'descr' => 'Kernel IF Drops',
-        'ds' => 'data',
-    ];
-} else {
-    d_echo('RRD "' . $capture__kernel_ifdrops_rrd_filename . '" not found');
-}
-if (Rrd::checkRrdExists($capture__kernel_drops_rrd_filename)) {
-    $rrd_list[] = [
-        'filename' => $capture__kernel_drops_rrd_filename,
-        'descr' => 'Kernel Drops',
-        'ds' => 'data',
-    ];
-} else {
-    d_echo('RRD "' . $capture__kernel_drops_rrd_filename . '" not found');
+foreach ($drop_stats as $drop_stat => $drop_descr) {
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app->app_id, $rrd_prefix . $drop_stat]);
+    if (Rrd::checkRrdExists($rrd_filename)) {
+        $rrd_list[] = [
+            'filename' => $rrd_filename,
+            'descr' => $drop_descr,
+            'ds' => 'data',
+        ];
+    } else {
+        d_echo('RRD "' . $rrd_filename . '" not found');
+    }
 }
 
 require 'includes/html/graphs/generic_multi_line.inc.php';

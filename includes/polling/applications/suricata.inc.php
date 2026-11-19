@@ -194,7 +194,7 @@ if ($suricata['version'] == 1) {
 
     foreach ($suricata['data']['totals'] as $stat => $value) {
         // If this is defined, it not something we understand.
-        if (isset($suricata_stat_keys[$stat])) {
+        if (isset($suricata_stat_keys[$stat]) || preg_match($suricata_counter_prefix_regex, $stat)) {
             $rrd_name = ['app', $name, $app->app_id, 'totals___' . $stat];
             $fields = ['data' => $value];
 
@@ -216,7 +216,7 @@ if ($suricata['version'] == 1) {
 
         foreach ($instance_stats as $stat => $value) {
             // If this is defined, it not something we understand.
-            if (isset($suricata_stat_keys[$stat])) {
+            if (isset($suricata_stat_keys[$stat]) || preg_match($suricata_counter_prefix_regex, $stat)) {
                 $rrd_name = ['app', $name, $app->app_id, 'instance_' . $instance . '___' . $stat];
                 $fields = ['data' => $value];
 
@@ -247,10 +247,9 @@ $new_data['instances'] = $instances;
 
 // if we have any source instances, save and log
 if (count($added_instances) > 0 || count($removed_instances) > 0) {
-    $app->data = ['instances' => $instances];
     $log_message = 'Suricata Instance Change:';
     $log_message .= count($added_instances) > 0 ? ' Added ' . implode(',', $added_instances) : '';
-    $log_message .= count($removed_instances) > 0 ? ' Removed ' . implode(',', $added_instances) : '';
+    $log_message .= count($removed_instances) > 0 ? ' Removed ' . implode(',', $removed_instances) : '';
     Eventlog::log($log_message, $device['device_id'], 'application');
 }
 
