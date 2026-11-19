@@ -20,6 +20,24 @@
         },
         "poller": "matches discovery"
     },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.1991.1.1.2.1.52.0",
+                    "processor_index": "0",
+                    "processor_type": "foundryos",
+                    "processor_usage": 0,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
     "mempools": {
         "discovery": {
             "mempools": [
@@ -57,7 +75,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.1991.1.1.1.3.1.1.3.1",
                     "sensor_index": "snChasFanOperStatus.1",
                     "sensor_type": "snChasFanOperStatus",
-                    "sensor_descr": "Bottom Fan Tray",
+                    "sensor_descr": "Fan 1 Bottom Fan Tray",
                     "group": "Fan Status",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -82,7 +100,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.1991.1.1.1.3.1.1.3.13",
                     "sensor_index": "snChasFanOperStatus.13",
                     "sensor_type": "snChasFanOperStatus",
-                    "sensor_descr": "Back Fan B",
+                    "sensor_descr": "Fan 13 Back Fan B",
                     "group": "Fan Status",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -107,7 +125,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.1991.1.1.1.3.1.1.3.2",
                     "sensor_index": "snChasFanOperStatus.2",
                     "sensor_type": "snChasFanOperStatus",
-                    "sensor_descr": "Bottom Fan Tray",
+                    "sensor_descr": "Fan 2 Bottom Fan Tray",
                     "group": "Fan Status",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -132,7 +150,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.1991.1.1.1.3.1.1.3.3",
                     "sensor_index": "snChasFanOperStatus.3",
                     "sensor_type": "snChasFanOperStatus",
-                    "sensor_descr": "Bottom Fan Tray",
+                    "sensor_descr": "Fan 3 Bottom Fan Tray",
                     "group": "Fan Status",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -157,7 +175,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.1991.1.1.1.3.1.1.3.4",
                     "sensor_index": "snChasFanOperStatus.4",
                     "sensor_type": "snChasFanOperStatus",
-                    "sensor_descr": "Bottom Fan Tray",
+                    "sensor_descr": "Fan 4 Bottom Fan Tray",
                     "group": "Fan Status",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -182,7 +200,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.1991.1.1.1.3.1.1.3.5",
                     "sensor_index": "snChasFanOperStatus.5",
                     "sensor_type": "snChasFanOperStatus",
-                    "sensor_descr": "Bottom Fan Tray",
+                    "sensor_descr": "Fan 5 Bottom Fan Tray",
                     "group": "Fan Status",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -207,7 +225,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.1991.1.1.1.3.1.1.3.6",
                     "sensor_index": "snChasFanOperStatus.6",
                     "sensor_type": "snChasFanOperStatus",
-                    "sensor_descr": "Bottom Fan Tray",
+                    "sensor_descr": "Fan 6 Bottom Fan Tray",
                     "group": "Fan Status",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
@@ -232,7 +250,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.1991.1.1.1.3.1.1.3.7",
                     "sensor_index": "snChasFanOperStatus.7",
                     "sensor_type": "snChasFanOperStatus",
-                    "sensor_descr": "Back Fan A",
+                    "sensor_descr": "Fan 7 Back Fan A",
                     "group": "Fan Status",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,

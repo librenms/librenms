@@ -30,6 +30,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.1991.1.1.2.13.1.1.4.{{ $index }}'
                     descr: FOUNDRY-SN-AGENT-MIB::snAgentTempSensorDescr
                     index: 'snAgentTempValue.{{ $index }}'
+                    skip_values: 0
                     group: 'Module Temperatures'
                 -
                     oid: FOUNDRY-SN-AGENT-MIB::snChasActualTemperature
@@ -47,6 +48,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.1991.1.1.1.2.1.1.3.{{ $index }}'
                     descr: 'Power Supply {{ $index }}'
                     index: 'snChasPwrSupplyOperStatus.{{ $index }}'
+                    skip_values: 1
                     group: 'Power Supply Status'
                     state_name: snChasPwrSupplyOperStatus
                     states:
@@ -57,7 +59,7 @@ modules:
                     oid: FOUNDRY-SN-AGENT-MIB::snChasFanTable
                     value: FOUNDRY-SN-AGENT-MIB::snChasFanOperStatus
                     num_oid: '.1.3.6.1.4.1.1991.1.1.1.3.1.1.3.{{ $index }}'
-                    descr: '{{ FOUNDRY-SN-AGENT-MIB::snChasFanDescription }}'
+                    descr: 'Fan {{ $index }} {{ FOUNDRY-SN-AGENT-MIB::snChasFanDescription }}'
                     index: 'snChasFanOperStatus.{{ $index }}'
                     group: 'Fan Status'
                     state_name: snChasFanOperStatus
