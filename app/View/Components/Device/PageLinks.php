@@ -152,21 +152,10 @@ class PageLinks extends Component
         return $device_links;
     }
 
-    /**
-     * The edit page for a device tab, migrated pages have a route, legacy pages a file
-     */
     private function editTabUrl(Device $device, string $tab): ?string
     {
-        if ($tab === '') {
-            return null;
-        }
-
         if (Route::has("device.edit.$tab")) {
             return route("device.edit.$tab", $device->device_id);
-        }
-
-        if (is_file(base_path("includes/html/pages/device/edit/$tab.inc.php"))) {
-            return route('device', [$device->device_id, "edit/section=$tab"]);
         }
 
         return null;

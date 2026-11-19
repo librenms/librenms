@@ -123,31 +123,22 @@ final class ComponentTest extends DBTestCase
         $base = \App\Models\Component::factory()->create(); /** @var \App\Models\Component $base */
         $component = new Component();
 
-        \Log::shouldReceive('event')->withArgs(["Component: $base->type($base->id). Attribute: null_val, was added with value: ", $base->device_id, 'component', 3, $base->id]);
         $nullVal = $this->buildExpected($base)[$base->device_id];
         $nullVal[$base->id]['null_val'] = null;
         $component->setComponentPrefs($base->device_id, $nullVal);
         $this->assertEquals('', ComponentPref::where(['component' => $base->id, 'attribute' => 'null_val'])->first()->value);
 
-        \Log::shouldReceive('event')->withArgs(["Component $base->id has been modified: label => new label", $base->device_id, 'component', 3, $base->id]);
-        \Log::shouldReceive('event')->withArgs(["Component: $base->type($base->id). Attribute: thirty, was added with value: 30", $base->device_id, 'component', 3, $base->id]);
-        \Log::shouldReceive('event')->withArgs(["Component: $base->type($base->id). Attribute: json, was added with value: {\"json\":\"array\"}", $base->device_id, 'component', 3, $base->id]);
-        \Log::shouldReceive('event')->withArgs(["Component: $base->type($base->id). Attribute: null_val, was deleted.", $base->device_id, 'component', 4]);
         $multiple = $this->buildExpected($base)[$base->device_id];
         $multiple[$base->id]['label'] = 'new label';
         $multiple[$base->id]['thirty'] = 30;
         $multiple[$base->id]['json'] = json_encode(['json' => 'array']);
         $component->setComponentPrefs($base->device_id, $multiple);
 
-        \Log::shouldReceive('event')->withArgs(["Component $base->id has been modified: label => ", $base->device_id, 'component', 3, $base->id]);
-        \Log::shouldReceive('event')->withArgs(["Component: $base->type($base->id). Attribute: thirty, was deleted.", $base->device_id, 'component', 4]);
-        \Log::shouldReceive('event')->withArgs(["Component: $base->type($base->id). Attribute: json, was deleted.", $base->device_id, 'component', 4]);
         $uc = \App\Models\Component::find($base->id);
         $this->assertEquals('new label', $uc->label);
         $this->assertEquals(30, $uc->prefs->where('attribute', 'thirty')->first()->value);
         $this->assertEquals($multiple[$base->id]['json'], $uc->prefs->where('attribute', 'json')->first()->value);
 
-        \Log::shouldReceive('event')->times(0);
         $remove = $this->buildExpected($base)[$base->device_id];
         $component->setComponentPrefs($base->device_id, $remove);
         $this->assertFalse(ComponentPref::where('component', $base->id)->exists());

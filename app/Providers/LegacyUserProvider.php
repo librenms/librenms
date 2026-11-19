@@ -32,14 +32,12 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\DB;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Authentication\MysqlAuthorizer;
 use LibreNMS\Exceptions\AuthenticationException;
 use LibreNMS\Util\Debug;
 use Log;
 use Request;
-use Session;
 
 class LegacyUserProvider implements UserProvider
 {
@@ -142,14 +140,12 @@ class LegacyUserProvider implements UserProvider
             return true;
         } catch (AuthenticationException $ae) {
             $auth_message = $ae->getMessage();
+            // the auth log only records that the credentials were rejected, keep the reason for diagnosis
+            Log::warning("Auth Error: [{$credentials['username']}] $auth_message from " . Request::ip());
             if (Debug::isEnabled()) {
                 $auth_message .= '<br /> ' . $ae->getFile() . ': ' . $ae->getLine();
             }
             toast()->error($auth_message);
-
-            $username = Session::get('username', $credentials['username']);
-
-            DB::table('authlog')->insert(['user' => $username, 'address' => Request::ip(), 'result' => $auth_message]);
         }
 
         return false;
