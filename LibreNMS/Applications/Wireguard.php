@@ -101,7 +101,7 @@ class Wireguard extends ApplicationDefinition
                 $rows[] = [
                     $this->deviceReference($name, $peer['hostname'] ?? null),
                     $interfaceLink,
-                    view('apps.peer-link', ['label' => $peer['pubkey'] ?? '*hidden*', 'url' => $page->link(['interface' => $interface, 'client' => $name])]),
+                    view('apps.peer-link', ['label' => $peer['pubkey'] ?? '*hidden*', 'url' => $application->deviceAppsUrl(['interface' => $interface, 'client' => $name])]),
                     $peer['bytes_rcvd'] ?? '',
                     $peer['bytes_sent'] ?? '',
                     $this->addressReference($peer['endpoint_host'] ?? ''),

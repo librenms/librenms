@@ -26,8 +26,7 @@ class Pwrstatd extends ApplicationDefinition
     {
         $choices = $this->rrdResources($application);
         sort($choices);
-        $selected = $page->option('sn');
-        $page->addFilter('PSUs', 'sn', ['' => 'All PSUs'] + array_combine($choices, $choices), $selected);
+        $selected = $page->addResourceFilter('PSUs', 'sn', $choices, 'All PSUs');
         $page->addGraphs(self::GRAPHS, ['sn' => $selected]);
     }
 }

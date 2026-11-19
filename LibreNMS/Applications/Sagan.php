@@ -49,8 +49,7 @@ class Sagan extends ApplicationDefinition
     {
         $choices = $application->data['instances'] ?? [];
         sort($choices);
-        $selected = $page->option('sinstance');
-        $page->addFilter('Instances', 'sinstance', ['' => 'Totals'] + array_combine($choices, $choices), $selected);
+        $selected = $page->addResourceFilter('Instances', 'sinstance', $choices, 'Totals');
         $page->addGraphs(self::GRAPHS, ['instance' => $selected]);
     }
 }

@@ -21,8 +21,7 @@ class Portactivity extends ApplicationDefinition
     {
         $ports = $application->data['ports'] ?? [];
         sort($ports);
-        $port = $page->option('port');
-        $page->addFilter('Ports', 'port', array_combine($ports, $ports), $port);
+        $port = $page->addResourceFilter('Ports', 'port', $ports);
         if ($port === null) {
             $page->notice = 'Please select a port.';
 

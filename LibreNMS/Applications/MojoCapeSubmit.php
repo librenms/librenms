@@ -42,8 +42,7 @@ class MojoCapeSubmit extends ApplicationDefinition
     protected function buildDevicePage(ApplicationPage $page, Application $application): void
     {
         $slugs = array_keys($application->data['slugs'] ?? []);
-        $slug = $page->option('slug');
-        $page->addFilter('Slugs', 'slug', ['' => 'General'] + array_combine($slugs, $slugs), $slug);
+        $slug = $page->addResourceFilter('Slugs', 'slug', $slugs, 'General');
         $graphs = $slug === null ? self::GRAPHS : array_diff_key(self::GRAPHS, ['subs_top12' => true]);
         $page->addGraphs($graphs, ['slug' => $slug]);
     }

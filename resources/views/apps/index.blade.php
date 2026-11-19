@@ -19,11 +19,13 @@
         </x-slot:heading>
     </x-panel>
 
-    @if($definition)
+    @if($content)
+        {{ $content }}
+    @elseif($type !== null)
         @if($instances)
             <x-option-bar :name="__('Instance')" :options="$instances" :selected="$instance ?? ''" />
         @endif
-        @include($definition->fleetView())
+        @include('apps.instances')
     @else
         @forelse($groups as $appType => $group)
             <x-panel>
@@ -34,7 +36,6 @@
                 </x-slot:heading>
                 <div class="tw:flex tw:flex-wrap tw:gap-4">
                     @foreach($group as $application)
-                        @php($graphType = $application->definition()->overviewGraphs($application)[0] ?? null)
                         <div class="tw:max-w-full">
                             <a class="tw:block tw:font-semibold" href="{{ $application->deviceAppsUrl() }}">
                                 <x-apps.state :state="$application->app_state" />
@@ -43,8 +44,8 @@
                                     ({{ $application->app_instance }})
                                 @endif
                             </a>
-                            @if($graphType)
-                                <x-graph :type="$graphType" :vars="['id' => $application->app_id]" width="218" height="100"
+                            @if($previewGraphs[$appType])
+                                <x-graph :type="$previewGraphs[$appType]" :vars="['id' => $application->app_id]" width="218" height="100"
                                     loading="lazy" popup :link="$application->deviceAppsUrl()" />
                             @endif
                         </div>

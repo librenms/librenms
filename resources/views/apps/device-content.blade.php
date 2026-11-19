@@ -41,9 +41,7 @@
     </x-panel>
 @endforeach
 
-@if($page->view)
-    @include($page->view, $page->viewData)
-@endif
+{{ $page->content }}
 
 @foreach($page->graphs as $graph)
     <x-panel :title="$graph['title']" :id="$graph['anchor']">
@@ -54,6 +52,6 @@
 
 @if($page->notice)
     <p class="text-muted">{{ $page->notice }}</p>
-@elseif(! $page->graphs && ! $page->tables && ! $page->view && ! $page->details && ! $page->text)
+@elseif(! $page->hasContent())
     <p class="text-muted">{{ __('No graphs available for this application.') }}</p>
 @endif

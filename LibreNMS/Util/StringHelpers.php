@@ -26,8 +26,6 @@
 
 namespace LibreNMS\Util;
 
-use LibreNMS\Applications\ApplicationDefinition;
-
 class StringHelpers
 {
     public static function isValidUtf8(string $string): bool
@@ -35,9 +33,9 @@ class StringHelpers
         return preg_match('//u', $string) === 1;
     }
 
-    public static function niceCase($string)
+    public static function niceCase(string $string): string
     {
-        return $string === 'dbm' ? 'dBm' : ApplicationDefinition::forType((string) $string)->displayName();
+        return $string === 'dbm' ? 'dBm' : ucwords(str_replace(['_', '-'], ' ', $string));
     }
 
     /**

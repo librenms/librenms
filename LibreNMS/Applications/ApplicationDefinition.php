@@ -4,8 +4,9 @@ namespace LibreNMS\Applications;
 
 use App\Facades\Rrd;
 use App\Models\Application;
-use Illuminate\Http\Request;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\Str;
+use LibreNMS\Util\StringHelpers;
 
 class ApplicationDefinition
 {
@@ -35,7 +36,7 @@ class ApplicationDefinition
 
     public function displayName(): string
     {
-        return static::NAME ?? ucwords(str_replace(['_', '-'], ' ', $this->type));
+        return static::NAME ?? StringHelpers::niceCase($this->type);
     }
 
     public function graphType(string $suffix): string
@@ -44,14 +45,15 @@ class ApplicationDefinition
     }
 
     /** @return list<string> */
-    public function overviewGraphs(Application $application): array
+    public function fleetGraphs(): array
     {
         return array_map($this->graphType(...), static::OVERVIEW ?? array_keys(static::GRAPHS));
     }
 
-    public function devicePage(Application $application, Request $request): ApplicationPage
+    /** @param  array<string, mixed>  $options */
+    final public function devicePage(Application $application, array $options): ApplicationPage
     {
-        $page = new ApplicationPage($this, $application, $request);
+        $page = new ApplicationPage($this, $application, $options);
         $this->buildDevicePage($page, $application);
 
         return $page;
@@ -70,13 +72,9 @@ class ApplicationDefinition
         return $device ? Rrd::getRrdApplicationArrays(['hostname' => $device->hostname], $application->app_id, static::TYPE, $category) : [];
     }
 
-    public function fleetView(): string
+    /** @param  array<string, string>  $options */
+    public function fleetContent(array $options): ?Htmlable
     {
-        return 'apps.instances';
-    }
-
-    public function fleetData(Request $request): array
-    {
-        return [];
+        return null;
     }
 }

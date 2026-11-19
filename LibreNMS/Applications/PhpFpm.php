@@ -42,8 +42,7 @@ class PhpFpm extends ApplicationDefinition
 
         $pools = $application->data['pools'] ?? [];
         sort($pools);
-        $pool = $page->option('phpfpm_pool');
-        $page->addFilter('Pools', 'phpfpm_pool', ['' => 'Totals'] + array_combine($pools, $pools), $pool);
+        $pool = $page->addResourceFilter('Pools', 'phpfpm_pool', $pools, 'Totals');
         $page->addGraphs(self::GRAPHS, ['phpfpm_pool' => $pool]);
     }
 }

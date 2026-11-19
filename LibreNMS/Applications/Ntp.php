@@ -15,7 +15,7 @@
 namespace LibreNMS\Applications;
 
 use App\Models\Application;
-use Illuminate\Http\Request;
+use Illuminate\Contracts\Support\Htmlable;
 use LibreNMS\Component;
 
 class Ntp extends ApplicationDefinition
@@ -50,33 +50,29 @@ class Ntp extends ApplicationDefinition
 
     protected function buildDevicePage(ApplicationPage $page, Application $application): void
     {
-        $page->view = 'apps.ntp-peers';
-        $page->viewData = ['peers' => self::peers($application->device_id)[$application->device_id] ?? []];
+        $page->content = view('apps.ntp-peers', [
+            'peers' => self::peers($application->device_id)[$application->device_id] ?? [],
+        ]);
 
         foreach (self::PEER_GRAPHS as $key => $title) {
             $page->addGraph($key === 'stratum' ? 'NTP Stratum' : $title, self::peerGraphType($key), ['device' => $application->device_id], $key);
         }
     }
 
-    public function fleetView(): string
+    public function fleetContent(array $options): ?Htmlable
     {
-        return 'apps.ntp-fleet';
-    }
-
-    public function fleetData(Request $request): array
-    {
-        $peerView = $request->query('view', 'all');
-        $peerGraph = $request->query('graph', 'none');
+        $peerView = $options['view'] ?? 'all';
+        $peerGraph = $options['graph'] ?? 'none';
         $graphs = ['none' => 'No Graphs'] + self::PEER_GRAPHS;
         $peerView = isset(self::PEER_VIEWS[$peerView]) ? $peerView : 'all';
         $peerGraph = isset($graphs[$peerGraph]) ? $peerGraph : 'none';
 
-        return [
+        return view('apps.ntp-fleet', [
             'peerView' => $peerView,
             'peerGraph' => $peerGraph,
             'peerViewOptions' => $this->fleetOptions('view', self::PEER_VIEWS, ['graph' => $peerGraph]),
             'peerGraphOptions' => $this->fleetOptions('graph', $graphs, ['view' => $peerView]),
-        ];
+        ]);
     }
 
     private function fleetOptions(string $key, array $options, array $context): array

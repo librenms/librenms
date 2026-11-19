@@ -9,9 +9,9 @@
             </h3>
             <small class="text-muted">{{ $application->app_instance }} {{ $application->app_status }}</small>
         </x-slot:heading>
-        @if($graphs = $definition->overviewGraphs($application))
+        @if($graphTypes)
             <div class="tw:flex tw:flex-wrap tw:gap-2">
-                @foreach($graphs as $graphType)
+                @foreach($graphTypes as $graphType)
                     <x-graph :type="$graphType" :vars="['id' => $application->app_id]" width="220" height="100"
                         loading="lazy" popup :link="$application->deviceAppsUrl()" />
                 @endforeach

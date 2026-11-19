@@ -48,15 +48,14 @@ class Logsize extends ApplicationDefinition
     {
         $sets = $application->data['sets'] ?? [];
         ksort($sets, SORT_NATURAL | SORT_FLAG_CASE);
-        $set = $page->option('log_set');
+        $set = $page->addResourceFilter('Sets', 'log_set', array_keys($sets), 'Basics');
         $file = $page->option('log_file');
-        $page->addFilter('Sets', 'log_set', ['' => 'Basics'] + array_combine(array_keys($sets), array_keys($sets)), $set);
 
         if ($set !== null && isset($sets[$set])) {
             $files = $sets[$set]['files'] ?? [];
             sort($files);
             $page->details['Files Count'] = count($files);
-            $page->addFilter('Files', 'log_file', ['' => 'All Files'] + array_combine($files, $files), $file, ['log_set' => $set]);
+            $page->addResourceFilter('Files', 'log_file', $files, 'All Files', ['log_set' => $set]);
         }
         $graphs = match (true) {
             $set !== null && $file !== null => self::FILE_GRAPHS,

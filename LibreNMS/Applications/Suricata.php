@@ -196,218 +196,6 @@ class Suricata extends ApplicationDefinition
             'v2_app_layer__flows' => 'Application Layer Flows',
             'v2_app_layer__tx' => 'Application Layer Packets',
         ],
-        'applayer_tx' => [
-            'v2_app_layer__tx__bittorrent-dht' => 'Bittorrent-DHT, packets/second',
-            'v2_app_layer__tx__dcerpc_tcp' => 'DCE RPC TCP, packets/second',
-            'v2_app_layer__tx__dcerpc_udp' => 'DCE RPC UDP, packets/second',
-            'v2_app_layer__tx__dhcp' => 'DHCP, packets/second',
-            'v2_app_layer__tx__dnp3' => 'DNP3, packets/second',
-            'v2_app_layer__tx__dns_tcp' => 'DNS TCP, packets/second',
-            'v2_app_layer__tx__dns_udp' => 'DNS UDP, packets/second',
-            'v2_app_layer__tx__enip_tcp' => 'ENIP TCP, packets/second',
-            'v2_app_layer__tx__enip_udp' => 'ENIP UDP, packets/second',
-            'v2_app_layer__tx__ftp' => 'FTP, packets/second',
-            'v2_app_layer__tx__ftp-data' => 'FTP-DATA, packets/second',
-            'v2_app_layer__tx__http' => 'HTTP, packets/second',
-            'v2_app_layer__tx__http2' => 'HTTP2, packets/second',
-            'v2_app_layer__tx__ike' => 'IKE, packets/second',
-            'v2_app_layer__tx__imap' => 'IMAP, packets/second',
-            'v2_app_layer__tx__krb5_tcp' => 'KRB5 TCP, packets/second',
-            'v2_app_layer__tx__krb5_udp' => 'KRB5 UDP, packets/second',
-            'v2_app_layer__tx__modbus' => 'ModBus, packets/second',
-            'v2_app_layer__tx__mqtt' => 'MQTT, packets/second',
-            'v2_app_layer__tx__nfs_tcp' => 'NFS TCP, packets/second',
-            'v2_app_layer__tx__nfs_udp' => 'NFS UDP, packets/second',
-            'v2_app_layer__tx__ntp' => 'NTP, packets/second',
-            'v2_app_layer__tx__pgsql' => 'Pgsql, packets/second',
-            'v2_app_layer__tx__quic' => 'QUIC, packets/second',
-            'v2_app_layer__tx__rdp' => 'RDP, packets/second',
-            'v2_app_layer__tx__rfb' => 'RFB, packets/second',
-            'v2_app_layer__tx__sip' => 'SIP, packets/second',
-            'v2_app_layer__tx__smb' => 'SMB, packets/second',
-            'v2_app_layer__tx__smtp' => 'SMTP, packets/second',
-            'v2_app_layer__tx__snmp' => 'SNMP, packets/second',
-            'v2_app_layer__tx__ssh' => 'SSH, packets/second',
-            'v2_app_layer__tx__telnet' => 'Telnet, packets/second',
-            'v2_app_layer__tx__tftp' => 'TFTP, packets/second',
-            'v2_app_layer__tx__tls' => 'TLS, packets/second',
-        ],
-        'applayer_flows' => [
-            'v2_app_layer__flow__bittorrent-dht' => 'Bittorrent-DHT, flows/second',
-            'v2_app_layer__flow__dcerpc_tcp' => 'DCE RPC TCP, flows/second',
-            'v2_app_layer__flow__dcerpc_udp' => 'DCE RPC UDP, flows/second',
-            'v2_app_layer__flow__dhcp' => 'DHCP, flows/second',
-            'v2_app_layer__flow__dnp3' => 'DNP3, flows/second',
-            'v2_app_layer__flow__dns_tcp' => 'DNS TCP, flows/second',
-            'v2_app_layer__flow__dns_udp' => 'DNS UDP, flows/second',
-            'v2_app_layer__flow__enip_tcp' => 'ENIP TCP, flows/second',
-            'v2_app_layer__flow__enip_udp' => 'ENIP UDP, flows/second',
-            'v2_app_layer__flow__ftp' => 'FTP, flows/second',
-            'v2_app_layer__flow__ftp-data' => 'FTP-DATA, flows/second',
-            'v2_app_layer__flow__http' => 'HTTP, flows/second',
-            'v2_app_layer__flow__http2' => 'HTTP2, flows/second',
-            'v2_app_layer__flow__ike' => 'IKE, flows/second',
-            'v2_app_layer__flow__imap' => 'IMAP, flows/second',
-            'v2_app_layer__flow__krb5_tcp' => 'KRB5 TCP, flows/second',
-            'v2_app_layer__flow__krb5_udp' => 'KRB5 UDP, flows/second',
-            'v2_app_layer__flow__modbus' => 'ModBus, flows/second',
-            'v2_app_layer__flow__mqtt' => 'MQTT, flows/second',
-            'v2_app_layer__flow__nfs_tcp' => 'NFS TCP, flows/second',
-            'v2_app_layer__flow__nfs_udp' => 'NFS UDP, flows/second',
-            'v2_app_layer__flow__ntp' => 'NTP, flows/second',
-            'v2_app_layer__flow__pgsql' => 'Pgsql, flows/second',
-            'v2_app_layer__flow__quic' => 'QUIC, flows/second',
-            'v2_app_layer__flow__rdp' => 'RDP, flows/second',
-            'v2_app_layer__flow__rfb' => 'RFB, flows/second',
-            'v2_app_layer__flow__sip' => 'SIP, flows/second',
-            'v2_app_layer__flow__smb' => 'SMB, flows/second',
-            'v2_app_layer__flow__smtp' => 'SMTP, flows/second',
-            'v2_app_layer__flow__snmp' => 'SNMP, flows/second',
-            'v2_app_layer__flow__ssh' => 'SSH, flows/second',
-            'v2_app_layer__flow__telnet' => 'Telnet, flows/second',
-            'v2_app_layer__flow__tftp' => 'TFTP, flows/second',
-            'v2_app_layer__flow__tls' => 'TLS, flows/second',
-        ],
-        'errors_alloc' => [
-            'v2_app_layer__error__bittorrent-dht__alloc' => 'Bittorrent-DHT, alloc errors/second',
-            'v2_app_layer__error__dcerpc_tcp__alloc' => 'DCE RPC TCP, alloc errors/second',
-            'v2_app_layer__error__dcerpc_udp__alloc' => 'DCE RPC UDP, alloc errors/second',
-            'v2_app_layer__error__dhcp__alloc' => 'DHCP, alloc errors/second',
-            'v2_app_layer__error__dnp3__alloc' => 'DNP3, alloc errors/second',
-            'v2_app_layer__error__dns_tcp__alloc' => 'DNS TCP, alloc errors/second',
-            'v2_app_layer__error__dns_udp__alloc' => 'DNS UDP, alloc errors/second',
-            'v2_app_layer__error__enip_tcp__alloc' => 'ENIP TCP, alloc errors/second',
-            'v2_app_layer__error__enip_udp__alloc' => 'ENIP UDP, alloc errors/second',
-            'v2_app_layer__error__ftp__alloc' => 'FTP, alloc errors/second',
-            'v2_app_layer__error__ftp-data__alloc' => 'FTP-DATA, alloc errors/second',
-            'v2_app_layer__error__http__alloc' => 'HTTP, alloc errors/second',
-            'v2_app_layer__error__http2__alloc' => 'HTTP2, alloc errors/second',
-            'v2_app_layer__error__ike__alloc' => 'IKE, alloc errors/second',
-            'v2_app_layer__error__imap__alloc' => 'IMAP, alloc errors/second',
-            'v2_app_layer__error__krb5_tcp__alloc' => 'KRB5 TCP, alloc errors/second',
-            'v2_app_layer__error__krb5_udp__alloc' => 'KRB5 UDP, alloc errors/second',
-            'v2_app_layer__error__modbus__alloc' => 'ModBus, alloc errors/second',
-            'v2_app_layer__error__mqtt__alloc' => 'MQTT, alloc errors/second',
-            'v2_app_layer__error__nfs_tcp__alloc' => 'NFS TCP, alloc errors/second',
-            'v2_app_layer__error__nfs_udp__alloc' => 'NFS UDP, alloc errors/second',
-            'v2_app_layer__error__ntp__alloc' => 'NTP, alloc errors/second',
-            'v2_app_layer__error__pgsql__alloc' => 'Pgsql, alloc errors/second',
-            'v2_app_layer__error__quic__alloc' => 'QUIC, alloc errors/second',
-            'v2_app_layer__error__rdp__alloc' => 'RDP, alloc errors/second',
-            'v2_app_layer__error__rfb__alloc' => 'RFB, alloc errors/second',
-            'v2_app_layer__error__sip__alloc' => 'SIP, alloc errors/second',
-            'v2_app_layer__error__smb__alloc' => 'SMB, alloc errors/second',
-            'v2_app_layer__error__smtp__alloc' => 'SMTP, alloc errors/second',
-            'v2_app_layer__error__snmp__alloc' => 'SNMP, alloc errors/second',
-            'v2_app_layer__error__ssh__alloc' => 'SSH, alloc errors/second',
-            'v2_app_layer__error__telnet__alloc' => 'Telnet, alloc errors/second',
-            'v2_app_layer__error__tftp__alloc' => 'TFTP, alloc errors/second',
-            'v2_app_layer__error__tls__alloc' => 'TLS, alloc errors/second',
-        ],
-        'errors_gap' => [
-            'v2_app_layer__error__bittorrent-dht__gap' => 'Bittorrent-DHT, gap errors/second',
-            'v2_app_layer__error__dcerpc_tcp__gap' => 'DCE RPC TCP, gap errors/second',
-            'v2_app_layer__error__dhcp__gap' => 'DHCP, gap errors/second',
-            'v2_app_layer__error__dnp3__gap' => 'DNP3, gap errors/second',
-            'v2_app_layer__error__dns_tcp__gap' => 'DNS TCP, gap errors/second',
-            'v2_app_layer__error__enip_tcp__gap' => 'ENIP TCP, gap errors/second',
-            'v2_app_layer__error__ftp__gap' => 'FTP, gap errors/second',
-            'v2_app_layer__error__ftp-data__gap' => 'FTP-DATA, gap errors/second',
-            'v2_app_layer__error__http__gap' => 'HTTP, gap errors/second',
-            'v2_app_layer__error__http2__gap' => 'HTTP2, gap errors/second',
-            'v2_app_layer__error__ike__gap' => 'IKE, gap errors/second',
-            'v2_app_layer__error__imap__gap' => 'IMAP, gap errors/second',
-            'v2_app_layer__error__krb5_tcp__gap' => 'KRB5 TCP, gap errors/second',
-            'v2_app_layer__error__modbus__gap' => 'ModBus, gap errors/second',
-            'v2_app_layer__error__mqtt__gap' => 'MQTT, gap errors/second',
-            'v2_app_layer__error__nfs_tcp__gap' => 'NFS TCP, gap errors/second',
-            'v2_app_layer__error__ntp__gap' => 'NTP, gap errors/second',
-            'v2_app_layer__error__pgsql__gap' => 'Pgsql, gap errors/second',
-            'v2_app_layer__error__quic__gap' => 'QUIC, gap errors/second',
-            'v2_app_layer__error__rdp__gap' => 'RDP, gap errors/second',
-            'v2_app_layer__error__rfb__gap' => 'RFB, gap errors/second',
-            'v2_app_layer__error__sip__gap' => 'SIP, gap errors/second',
-            'v2_app_layer__error__smb__gap' => 'SMB, gap errors/second',
-            'v2_app_layer__error__smtp__gap' => 'SMTP, gap errors/second',
-            'v2_app_layer__error__snmp__gap' => 'SNMP, gap errors/second',
-            'v2_app_layer__error__ssh__gap' => 'SSH, gap errors/second',
-            'v2_app_layer__error__telnet__gap' => 'Telnet, gap errors/second',
-            'v2_app_layer__error__tftp__gap' => 'TFTP, gap errors/second',
-            'v2_app_layer__error__tls__gap' => 'TLS, gap errors/second',
-            'v2_tcp__reassembly_gap' => 'TCP Reassembly, gap errors/second',
-        ],
-        'errors_internal' => [
-            'v2_app_layer__error__bittorrent-dht__internal' => 'Bittorrent-DHT, internal errors/second',
-            'v2_app_layer__error__dcerpc_tcp__internal' => 'DCE RPC TCP, internal errors/second',
-            'v2_app_layer__error__dcerpc_udp__internal' => 'DCE RPC UDP, internal errors/second',
-            'v2_app_layer__error__dhcp__internal' => 'DHCP, internal errors/second',
-            'v2_app_layer__error__dnp3__internal' => 'DNP3, internal errors/second',
-            'v2_app_layer__error__dns_tcp__internal' => 'DNS TCP, internal errors/second',
-            'v2_app_layer__error__dns_udp__internal' => 'DNS UDP, internal errors/second',
-            'v2_app_layer__error__enip_tcp__internal' => 'ENIP TCP, internal errors/second',
-            'v2_app_layer__error__enip_udp__internal' => 'ENIP UDP, internal errors/second',
-            'v2_app_layer__error__ftp__internal' => 'FTP, internal errors/second',
-            'v2_app_layer__error__ftp-data__internal' => 'FTP-DATA, internal errors/second',
-            'v2_app_layer__error__http__internal' => 'HTTP, internal errors/second',
-            'v2_app_layer__error__http2__internal' => 'HTTP2, internal errors/second',
-            'v2_app_layer__error__ike__internal' => 'IKE, internal errors/second',
-            'v2_app_layer__error__imap__internal' => 'IMAP, internal errors/second',
-            'v2_app_layer__error__krb5_tcp__internal' => 'KRB5 TCP, internal errors/second',
-            'v2_app_layer__error__krb5_udp__internal' => 'KRB5 UDP, internal errors/second',
-            'v2_app_layer__error__modbus__internal' => 'ModBus, internal errors/second',
-            'v2_app_layer__error__mqtt__internal' => 'MQTT, internal errors/second',
-            'v2_app_layer__error__nfs_tcp__internal' => 'NFS TCP, internal errors/second',
-            'v2_app_layer__error__nfs_udp__internal' => 'NFS UDP, internal errors/second',
-            'v2_app_layer__error__ntp__internal' => 'NTP, internal errors/second',
-            'v2_app_layer__error__pgsql__internal' => 'Pgsql, internal errors/second',
-            'v2_app_layer__error__quic__internal' => 'QUIC, internal errors/second',
-            'v2_app_layer__error__rdp__internal' => 'RDP, internal errors/second',
-            'v2_app_layer__error__rfb__internal' => 'RFB, internal errors/second',
-            'v2_app_layer__error__sip__internal' => 'SIP, internal errors/second',
-            'v2_app_layer__error__smb__internal' => 'SMB, internal errors/second',
-            'v2_app_layer__error__smtp__internal' => 'SMTP, internal errors/second',
-            'v2_app_layer__error__snmp__internal' => 'SNMP, internal errors/second',
-            'v2_app_layer__error__ssh__internal' => 'SSH, internal errors/second',
-            'v2_app_layer__error__telnet__internal' => 'Telnet, internal errors/second',
-            'v2_app_layer__error__tftp__internal' => 'TFTP, internal errors/second',
-            'v2_app_layer__error__tls__internal' => 'TLS, internal errors/second',
-        ],
-        'errors_parser' => [
-            'v2_app_layer__error__bittorrent-dht__parser' => 'Bittorrent-DHT, parser errors/second',
-            'v2_app_layer__error__dcerpc_tcp__parser' => 'DCE RPC TCP, parser errors/second',
-            'v2_app_layer__error__dcerpc_udp__parser' => 'DCE RPC UDP, parser errors/second',
-            'v2_app_layer__error__dhcp__parser' => 'DHCP, parser errors/second',
-            'v2_app_layer__error__dnp3__parser' => 'DNP3, parser errors/second',
-            'v2_app_layer__error__dns_tcp__parser' => 'DNS TCP, parser errors/second',
-            'v2_app_layer__error__dns_udp__parser' => 'DNS UDP, parser errors/second',
-            'v2_app_layer__error__enip_tcp__parser' => 'ENIP TCP, parser errors/second',
-            'v2_app_layer__error__enip_udp__parser' => 'ENIP UDP, parser errors/second',
-            'v2_app_layer__error__ftp__parser' => 'FTP, parser errors/second',
-            'v2_app_layer__error__ftp-data__parser' => 'FTP-DATA, parser errors/second',
-            'v2_app_layer__error__http__parser' => 'HTTP, parser errors/second',
-            'v2_app_layer__error__http2__parser' => 'HTTP2, parser errors/second',
-            'v2_app_layer__error__ike__parser' => 'IKE, parser errors/second',
-            'v2_app_layer__error__imap__parser' => 'IMAP, parser errors/second',
-            'v2_app_layer__error__krb5_tcp__parser' => 'KRB5 TCP, parser errors/second',
-            'v2_app_layer__error__krb5_udp__parser' => 'KRB5 UDP, parser errors/second',
-            'v2_app_layer__error__modbus__parser' => 'ModBus, parser errors/second',
-            'v2_app_layer__error__mqtt__parser' => 'MQTT, parser errors/second',
-            'v2_app_layer__error__nfs_tcp__parser' => 'NFS TCP, parser errors/second',
-            'v2_app_layer__error__nfs_udp__parser' => 'NFS UDP, parser errors/second',
-            'v2_app_layer__error__ntp__parser' => 'NTP, parser errors/second',
-            'v2_app_layer__error__pgsql__parser' => 'Pgsql, parser errors/second',
-            'v2_app_layer__error__quic__parser' => 'QUIC, parser errors/second',
-            'v2_app_layer__error__rdp__parser' => 'RDP, parser errors/second',
-            'v2_app_layer__error__rfb__parser' => 'RFB, parser errors/second',
-            'v2_app_layer__error__sip__parser' => 'SIP, parser errors/second',
-            'v2_app_layer__error__smb__parser' => 'SMB, parser errors/second',
-            'v2_app_layer__error__smtp__parser' => 'SMTP, parser errors/second',
-            'v2_app_layer__error__snmp__parser' => 'SNMP, parser errors/second',
-            'v2_app_layer__error__ssh__parser' => 'SSH, parser errors/second',
-            'v2_app_layer__error__telnet__parser' => 'Telnet, parser errors/second',
-            'v2_app_layer__error__tftp__parser' => 'TFTP, parser errors/second',
-            'v2_app_layer__error__tls__parser' => 'TLS, parser errors/second',
-        ],
         'decoder_erspan' => [
             'v2_decoder__event__erspan__header_too_small' => 'ERSPAN Header Too Small, packets/second',
             'v2_decoder__event__erspan__too_many_vlan_layers' => 'ERSPAN Too Many VLAN Layers, packets/second',
@@ -568,57 +356,105 @@ class Suricata extends ApplicationDefinition
         'v2_uptime' => 'Uptime',
     ];
 
-    protected const array OPTIONAL_RRDS = [
-        'v2_app_layer__tx__dnp3' => 'totals___app_layer__tx__dnp3',
-        'v2_app_layer__tx__enip_tcp' => 'totals___app_layer__tx__enip_tcp',
-        'v2_app_layer__tx__enip_udp' => 'totals___app_layer__tx__enip_udp',
-        'v2_app_layer__tx__modbus' => 'totals___app_layer__tx__modbus',
-        'v2_app_layer__flow__dnp3' => 'totals___app_layer__flow__dnp3',
-        'v2_app_layer__flow__enip_tcp' => 'totals___app_layer__flow__enip_tcp',
-        'v2_app_layer__flow__enip_udp' => 'totals___app_layer__flow__enip_udp',
-        'v2_app_layer__flow__modbus' => 'totals___app_layer__flow__modbus',
-        'v2_app_layer__error__dnp3__alloc' => 'totals___app_layer__error__dnp3__alloc',
-        'v2_app_layer__error__enip_tcp__alloc' => 'totals___app_layer__error__enip_tcp__alloc',
-        'v2_app_layer__error__enip_udp__alloc' => 'totals___app_layer__error__enip_udp__alloc',
-        'v2_app_layer__error__modbus__alloc' => 'totals___app_layer__error__modbus__alloc',
-        'v2_app_layer__error__dnp3__gap' => 'totals___app_layer__error__dnp3__gap',
-        'v2_app_layer__error__enip_tcp__gap' => 'totals___app_layer__error__enip_tcp__gap',
-        'v2_app_layer__error__modbus__gap' => 'totals___app_layer__error__modbus__gap',
-        'v2_app_layer__error__dnp3__internal' => 'totals___app_layer__error__dnp3__internal',
-        'v2_app_layer__error__enip_tcp__internal' => 'totals___app_layer__error__enip_tcp__internal',
-        'v2_app_layer__error__enip_udp__internal' => 'totals___app_layer__error__enip_udp__internal',
-        'v2_app_layer__error__modbus__internal' => 'totals___app_layer__error__modbus__internal',
-        'v2_app_layer__error__dnp3__parser' => 'totals___app_layer__error__dnp3__parser',
-        'v2_app_layer__error__enip_tcp__parser' => 'totals___app_layer__error__enip_tcp__parser',
-        'v2_app_layer__error__enip_udp__parser' => 'totals___app_layer__error__enip_udp__parser',
-        'v2_app_layer__error__modbus__parser' => 'totals___app_layer__error__modbus__parser',
+    private const array APP_LAYER_METRICS = [
+        'applayer_tx' => ['tx', 'packets/second'],
+        'applayer_flows' => ['flow', 'flows/second'],
+        'errors_alloc' => ['alloc', 'alloc errors/second'],
+        'errors_gap' => ['gap', 'gap errors/second'],
+        'errors_internal' => ['internal', 'internal errors/second'],
+        'errors_parser' => ['parser', 'parser errors/second'],
     ];
+
+    private const array PROTOCOLS = [
+        'bittorrent-dht' => 'Bittorrent-DHT',
+        'dcerpc_tcp' => 'DCE RPC TCP',
+        'dcerpc_udp' => 'DCE RPC UDP',
+        'dhcp' => 'DHCP',
+        'dnp3' => 'DNP3',
+        'dns_tcp' => 'DNS TCP',
+        'dns_udp' => 'DNS UDP',
+        'enip_tcp' => 'ENIP TCP',
+        'enip_udp' => 'ENIP UDP',
+        'ftp' => 'FTP',
+        'ftp-data' => 'FTP-DATA',
+        'http' => 'HTTP',
+        'http2' => 'HTTP2',
+        'ike' => 'IKE',
+        'imap' => 'IMAP',
+        'krb5_tcp' => 'KRB5 TCP',
+        'krb5_udp' => 'KRB5 UDP',
+        'modbus' => 'ModBus',
+        'mqtt' => 'MQTT',
+        'nfs_tcp' => 'NFS TCP',
+        'nfs_udp' => 'NFS UDP',
+        'ntp' => 'NTP',
+        'pgsql' => 'Pgsql',
+        'quic' => 'QUIC',
+        'rdp' => 'RDP',
+        'rfb' => 'RFB',
+        'sip' => 'SIP',
+        'smb' => 'SMB',
+        'smtp' => 'SMTP',
+        'snmp' => 'SNMP',
+        'ssh' => 'SSH',
+        'telnet' => 'Telnet',
+        'tftp' => 'TFTP',
+        'tls' => 'TLS',
+    ];
+
+    private const array OPTIONAL_PROTOCOLS = ['dnp3', 'enip_tcp', 'enip_udp', 'modbus'];
+    private const array PROTOCOLS_WITHOUT_GAP_COUNTERS = ['dcerpc_udp', 'dns_udp', 'enip_udp', 'krb5_udp', 'nfs_udp'];
 
     protected function buildDevicePage(ApplicationPage $page, Application $application): void
     {
         $data = $application->data ?? [];
         $instances = $data['instances'] ?? [];
         sort($instances);
-        $instance = $page->option('sinstance');
         $section = $page->option('suricata_graph_set');
         if ($section === null || ! isset(self::SECTIONS[$section])) {
             $section = 'general';
         }
-        $page->addFilter('Instances', 'sinstance', ['' => 'Totals'] + array_combine($instances, $instances), $instance, ['suricata_graph_set' => $section]);
+        $instance = $page->addResourceFilter('Instances', 'sinstance', $instances, 'Totals', ['suricata_graph_set' => $section]);
 
         $graphs = [];
         if (($data['version'] ?? null) == 2) {
             $page->addFilter('Pages', 'suricata_graph_set', self::SECTIONS, $section, ['sinstance' => $instance]);
-            $graphs = $section === 'general' && $instance !== null ? self::GENERAL_INSTANCE_GRAPHS : self::GRAPH_SETS[$section];
+            $graphs = match (true) {
+                isset(self::APP_LAYER_METRICS[$section]) => $this->appLayerGraphs($application, $section),
+                $section === 'general' && $instance !== null => self::GENERAL_INSTANCE_GRAPHS,
+                default => self::GRAPH_SETS[$section],
+            };
         } elseif (($data['version'] ?? null) == 1) {
             $graphs = self::GRAPHS;
         }
-        foreach (array_intersect_key(self::OPTIONAL_RRDS, $graphs) as $suffix => $filename) {
-            $rrd = Rrd::name($application->device->hostname, ['app', self::TYPE, $application->app_id, $filename]);
-            if (! Rrd::checkRrdExists($rrd)) {
-                unset($graphs[$suffix]);
-            }
-        }
         $page->addGraphs($graphs, ['sinstance' => $instance]);
+    }
+
+    private function appLayerGraphs(Application $application, string $section): array
+    {
+        [$metric, $unit] = self::APP_LAYER_METRICS[$section];
+        $graphs = [];
+        foreach (self::PROTOCOLS as $protocol => $label) {
+            if ($metric === 'gap' && in_array($protocol, self::PROTOCOLS_WITHOUT_GAP_COUNTERS, true)) {
+                continue;
+            }
+
+            $stat = match ($metric) {
+                'tx', 'flow' => "app_layer__{$metric}__{$protocol}",
+                default => "app_layer__error__{$protocol}__{$metric}",
+            };
+            if (in_array($protocol, self::OPTIONAL_PROTOCOLS, true)) {
+                $rrd = Rrd::name($application->device->hostname, ['app', self::TYPE, $application->app_id, "totals___$stat"]);
+                if (! Rrd::checkRrdExists($rrd)) {
+                    continue;
+                }
+            }
+            $graphs["v2_$stat"] = "$label, $unit";
+        }
+        if ($metric === 'gap') {
+            $graphs['v2_tcp__reassembly_gap'] = 'TCP Reassembly, gap errors/second';
+        }
+
+        return $graphs;
     }
 }

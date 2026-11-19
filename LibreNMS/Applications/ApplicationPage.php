@@ -4,9 +4,8 @@ namespace LibreNMS\Applications;
 
 use App\Models\Application;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Http\Request;
 
-class ApplicationPage
+final class ApplicationPage
 {
     /** @var list<array{title: string, type: string, vars: array<string, mixed>, anchor: ?string}> */
     public array $graphs = [];
@@ -24,17 +23,18 @@ class ApplicationPage
     public array $tables = [];
 
     public ?string $notice = null;
-    public ?string $view = null;
-    public array $viewData = [];
+    public ?Htmlable $content = null;
 
+    /** @var array<string, string> */
     private readonly array $options;
 
+    /** @param  array<string, mixed>  $options */
     public function __construct(
         private readonly ApplicationDefinition $definition,
         private readonly Application $application,
-        Request $request,
+        array $options,
     ) {
-        $this->options = array_filter($request->query(), 'is_string');
+        $this->options = array_filter($options, 'is_string');
     }
 
     public function option(string $key): ?string
@@ -65,7 +65,7 @@ class ApplicationPage
         foreach ($choices as $value => $text) {
             $options[] = [
                 'text' => (string) $text,
-                'link' => $this->link([$key => (string) $value === '' ? null : $value] + $context),
+                'link' => $this->application->deviceAppsUrl([$key => (string) $value === '' ? null : $value] + $context),
                 'selected' => (string) $value === ($selected ?? ''),
             ];
         }
@@ -73,6 +73,18 @@ class ApplicationPage
         if ($options !== []) {
             $this->filters[] = ['label' => $label, 'options' => $options];
         }
+    }
+
+    public function addResourceFilter(string $label, string $key, array $values, ?string $defaultLabel = null, array $context = []): ?string
+    {
+        $selected = $this->option($key);
+        $choices = array_combine($values, $values);
+        if ($defaultLabel !== null) {
+            $choices = ['' => $defaultLabel] + $choices;
+        }
+        $this->addFilter($label, $key, $choices, $selected, $context);
+
+        return $selected;
     }
 
     public function addTable(string $title, array $headers, array $rows): void
@@ -84,8 +96,8 @@ class ApplicationPage
         ];
     }
 
-    public function link(array $options = []): string
+    public function hasContent(): bool
     {
-        return $this->application->deviceAppsUrl($options);
+        return $this->graphs || $this->tables || $this->content || $this->details || $this->text;
     }
 }

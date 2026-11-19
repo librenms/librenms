@@ -67,17 +67,17 @@ class AppsController extends Controller implements DeviceTab
         $this->authorize('view', $device);
         $this->authorize('viewAny', Application::class);
 
-        $request->validate([
+        $selection = $request->validate([
             'app' => 'nullable|string',
             'instance' => 'nullable|integer',
         ]);
 
-        $type = $request->query('app');
-        $instance = $request->query('instance');
+        $type = $selection['app'] ?? null;
+        $instance = isset($selection['instance']) ? (int) $selection['instance'] : null;
         $applications = $device->applications()->orderBy('app_id')->get()
             ->sortBy('show_name', SORT_NATURAL | SORT_FLAG_CASE);
         $selected = $applications->first(fn (Application $application) => ($type === null || $application->app_type === $type)
-            && ($instance === null || $application->app_id === (int) $instance));
+            && ($instance === null || $application->app_id === $instance));
         abort_if($selected === null && ($type !== null || $instance !== null), 404);
         $selected?->setRelation('device', $device);
 
@@ -87,7 +87,7 @@ class AppsController extends Controller implements DeviceTab
             'device' => $device,
             'applications' => $applications,
             'selected' => $selected,
-            'page' => $selected?->definition()->devicePage($selected, $request),
+            'page' => $selected?->definition()->devicePage($selected, $request->query()),
             'periods' => array_map(fn (string $period) => [
                 'from' => LibrenmsConfig::get("time.$period"),
                 'to' => LibrenmsConfig::get('time.now'),

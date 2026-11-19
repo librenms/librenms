@@ -46,8 +46,7 @@ class SyslogNg extends ApplicationDefinition
         $data = $application->data ?? [];
         $sources = array_keys($data['sources'] ?? []);
         sort($sources);
-        $source = $page->option('syslog_ng_source');
-        $page->addFilter('Sources', 'syslog_ng_source', ['' => 'Global'] + array_combine($sources, $sources), $source);
+        $source = $page->addResourceFilter('Sources', 'syslog_ng_source', $sources, 'Global');
 
         if ($source === null) {
             $page->addGraphs(['center' => 'Center (Queued / Received)']);

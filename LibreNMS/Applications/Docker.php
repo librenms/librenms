@@ -31,8 +31,7 @@ class Docker extends ApplicationDefinition
     {
         $containers = $application->data['containers'] ?? [];
         sort($containers);
-        $container = $page->option('container');
-        $page->addFilter('Containers', 'container', ['' => 'All Containers'] + array_combine($containers, $containers), $container);
+        $container = $page->addResourceFilter('Containers', 'container', $containers, 'All Containers');
 
         if ($container === null) {
             $page->addGraphs(['totals' => 'Totals status']);

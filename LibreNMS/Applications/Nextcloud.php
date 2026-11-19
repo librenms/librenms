@@ -39,8 +39,7 @@ class Nextcloud extends ApplicationDefinition
         $data = $application->data ?? [];
         $users = $data['users'] ?? [];
         sort($users);
-        $user = $page->option('nextcloud_user');
-        $page->addFilter('Users', 'nextcloud_user', ['' => 'Basics'] + array_combine($users, $users), $user);
+        $user = $page->addResourceFilter('Users', 'nextcloud_user', $users, 'Basics');
 
         if ($user !== null) {
             $lastSeen = $data['user_last_seen'][$user] ?? null;

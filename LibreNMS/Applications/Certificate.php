@@ -17,8 +17,7 @@ class Certificate extends ApplicationDefinition
     {
         $choices = $this->rrdResources($application);
         sort($choices);
-        $selected = $page->option('cert_name');
-        $page->addFilter('Certificates', 'cert_name', ['' => 'All Certificates'] + array_combine($choices, $choices), $selected);
+        $selected = $page->addResourceFilter('Certificates', 'cert_name', $choices, 'All Certificates');
         $page->addGraphs(self::GRAPHS, ['cert_name' => $selected]);
     }
 }

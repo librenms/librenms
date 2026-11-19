@@ -22,8 +22,7 @@ class Mdadm extends ApplicationDefinition
     {
         $choices = $this->rrdResources($application);
         sort($choices);
-        $selected = $page->option('array');
-        $page->addFilter('RAID Arrays', 'array', ['' => 'All RAID Arrays'] + array_combine($choices, $choices), $selected);
+        $selected = $page->addResourceFilter('RAID Arrays', 'array', $choices, 'All RAID Arrays');
         $page->addGraphs(self::GRAPHS, ['array' => $selected]);
     }
 }

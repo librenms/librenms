@@ -31,8 +31,7 @@ class Chronyd extends ApplicationDefinition
     {
         $sources = $application->data['sources'] ?? [];
         sort($sources);
-        $source = $page->option('source');
-        $page->addFilter('Sources', 'source', ['' => 'Tracking'] + array_combine($sources, $sources), $source);
+        $source = $page->addResourceFilter('Sources', 'source', $sources, 'Tracking');
         $page->addGraphs($source === null ? self::GRAPHS : self::SOURCE_GRAPHS, ['source' => $source]);
     }
 }

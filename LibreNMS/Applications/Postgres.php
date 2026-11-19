@@ -21,8 +21,7 @@ class Postgres extends ApplicationDefinition
     {
         $choices = $application->data['databases'] ?? [];
         sort($choices);
-        $selected = $page->option('database');
-        $page->addFilter('Databases', 'database', ['' => 'Total'] + array_combine($choices, $choices), $selected);
+        $selected = $page->addResourceFilter('Databases', 'database', $choices, 'Total');
         $page->addGraphs(self::GRAPHS, ['database' => $selected]);
     }
 }

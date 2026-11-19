@@ -142,6 +142,7 @@ final class AppsPagesTest extends TestCase
         $this->get(route('apps.index', ['app' => 'ntp', 'view' => 'error', 'graph' => 'delay']))
             ->assertOk()
             ->assertSee('ntp-table', false)
-            ->assertViewHasAll(['peerView' => 'error', 'peerGraph' => 'delay']);
+            ->assertSee("view: 'error'", false)
+            ->assertSee("graph: 'delay'", false);
     }
 }

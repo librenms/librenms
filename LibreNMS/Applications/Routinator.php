@@ -37,8 +37,7 @@ class Routinator extends ApplicationDefinition
     {
         $clients = $application->data['clients'] ?? [];
         sort($clients);
-        $client = $page->option('client');
-        $page->addFilter('RTR Clients', 'client', ['' => 'All RTR Clients'] + array_combine($clients, $clients), $client);
+        $client = $page->addResourceFilter('RTR Clients', 'client', $clients, 'All RTR Clients');
 
         if ($client === null) {
             $page->addGraphs(self::GRAPHS);
