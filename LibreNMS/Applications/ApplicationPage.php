@@ -19,7 +19,7 @@ final class ApplicationPage
     /** @var array<string, string> */
     public array $text = [];
 
-    /** @var list<array{title: string, headers: list<string>, rows: array}> */
+    /** @var list<array{title: string, headers: list<string>, rows: list<list<mixed>>}> */
     public array $tables = [];
 
     public ?string $notice = null;
@@ -42,6 +42,10 @@ final class ApplicationPage
         return $this->options[$key] ?? null;
     }
 
+    /**
+     * @param  array<string, string>  $graphs  graph suffixes and titles
+     * @param  array<string, mixed>  $vars
+     */
     public function addGraphs(array $graphs, array $vars = []): void
     {
         foreach ($graphs as $suffix => $title) {
@@ -49,6 +53,7 @@ final class ApplicationPage
         }
     }
 
+    /** @param  array<string, mixed>  $vars */
     public function addGraph(string $title, string $type, array $vars, ?string $anchor = null): void
     {
         $this->graphs[] = [
@@ -59,6 +64,11 @@ final class ApplicationPage
         ];
     }
 
+    /**
+     * @param  array<array-key, string>  $choices  option values and display text
+     * @param  string|false|null  $selected  false selects no option, null selects the '' option
+     * @param  array<string, mixed>  $context  extra query options kept on each link
+     */
     public function addFilter(string $label, string $key, array $choices, string|false|null $selected, array $context = []): void
     {
         $options = [];
@@ -75,6 +85,10 @@ final class ApplicationPage
         }
     }
 
+    /**
+     * @param  list<string>  $values
+     * @param  array<string, mixed>  $context  extra query options kept on each link
+     */
     public function addResourceFilter(string $label, string $key, array $values, ?string $defaultLabel = null, array $context = []): ?string
     {
         $selected = $this->option($key);
@@ -87,12 +101,16 @@ final class ApplicationPage
         return $selected;
     }
 
+    /**
+     * @param  list<string>  $headers
+     * @param  array<list<mixed>>  $rows
+     */
     public function addTable(string $title, array $headers, array $rows): void
     {
         $this->tables[] = [
             'title' => $title,
             'headers' => $headers,
-            'rows' => array_map(fn (array $row) => array_map(fn ($value) => ['data' => $value], $row), $rows),
+            'rows' => array_values($rows),
         ];
     }
 

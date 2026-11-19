@@ -4,23 +4,11 @@
 
 @section('content')
 <div class="container-fluid">
-    <x-panel>
-        <x-slot:heading class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-4 tw:gap-y-2">
-            <strong>{{ __('Apps') }}</strong>
-            <a href="{{ route('apps.index') }}" @if($type === null) class="pagemenu-selected" aria-current="page" @endif>{{ __('Overview') }}</a>
-            @foreach($apps as $appType => $group)
-                <a href="{{ route('apps.index', ['app' => $appType]) }}"
-                    @class(['pagemenu-selected' => $type === $appType])
-                    @if($type === $appType && $instance === null) aria-current="page" @endif>
-                    <x-apps.state :state="$group->first()->app_state" />
-                    {{ $group->first()->displayName() }}
-                </a>
-            @endforeach
-        </x-slot:heading>
-    </x-panel>
+    <x-option-bar :name="__('Apps')" :options="$appOptions" :selected="$type ?? ''" />
 
     @if($content)
-        {{ $content }}
+        {{-- a View in view data arrives here already rendered to a string, so it must not be escaped again --}}
+        {!! $content !!}
     @elseif($type !== null)
         @if($instances)
             <x-option-bar :name="__('Instance')" :options="$instances" :selected="$instance ?? ''" />
@@ -53,7 +41,7 @@
                 </div>
             </x-panel>
         @empty
-            <p class="text-muted">{{ __('No applications found.') }}</p>
+            <x-panel><em>{{ __('No applications found.') }}</em></x-panel>
         @endforelse
     @endif
 </div>

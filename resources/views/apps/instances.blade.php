@@ -19,5 +19,5 @@
         @endif
     </x-panel>
 @empty
-    <p class="text-muted">{{ __('No applications found.') }}</p>
+    <x-panel><em>{{ __('No applications found.') }}</em></x-panel>
 @endforelse

@@ -109,6 +109,29 @@ final class AppsPagesTest extends TestCase
             ->assertSee('source=clock%2F1%20%26%202', false);
     }
 
+    public function testOptionBarsShowAppStateAndSelectedFilter(): void
+    {
+        $application = Application::factory()->create([
+            'app_type' => 'chronyd',
+            'app_state' => 'ERROR',
+            'data' => ['sources' => ['clock-a', 'clock-b']],
+        ]);
+        $this->actingAs(User::factory()->admin()->create(['enabled' => 1]));
+
+        $content = $this->get($application->deviceAppsUrl(['source' => 'clock-b']))
+            ->assertOk()
+            ->assertSee('title="Error"', false)
+            ->assertSee('fa-close text-danger', false)
+            ->getContent();
+
+        $this->assertMatchesRegularExpression('#class="pagemenu-selected">\s*<a [^>]*>clock-b</a>#', $content);
+        $this->assertDoesNotMatchRegularExpression('#class="pagemenu-selected">\s*<a [^>]*>(Tracking|clock-a)</a>#', $content);
+
+        $this->get(route('apps.index'))
+            ->assertOk()
+            ->assertSee('fa-close text-danger', false);
+    }
+
     public function testLegacyNfsDataStillRendersTheMountTable(): void
     {
         $application = Application::factory()->create([
@@ -130,8 +153,8 @@ final class AppsPagesTest extends TestCase
     public function testNtpKeepsItsFleetAndDevicePeerViews(): void
     {
         $application = Application::factory()->create(['app_type' => 'ntp']);
-        $component = Component::factory()->create(['device_id' => $application->device_id, 'type' => 'ntp']);
-        ComponentPref::create(['component' => $component->id, 'attribute' => 'peer', 'value' => '192.0.2.1']);
+        $this->ntpPeer($application->device_id, '192.0.2.1');
+        $this->ntpPeer($application->device_id, '192.0.2.9', 'unreachable');
         $this->actingAs(User::factory()->admin()->create(['enabled' => 1]));
 
         $this->get($application->deviceAppsUrl())
@@ -141,8 +164,37 @@ final class AppsPagesTest extends TestCase
 
         $this->get(route('apps.index', ['app' => 'ntp', 'view' => 'error', 'graph' => 'delay']))
             ->assertOk()
-            ->assertSee('ntp-table', false)
-            ->assertSee("view: 'error'", false)
-            ->assertSee("graph: 'delay'", false);
+            ->assertSee('192.0.2.9')
+            ->assertSee('unreachable')
+            ->assertDontSee('192.0.2.1')
+            ->assertSee('type=device_ntp_delay', false)
+            ->assertSee('href="' . route('device.apps', ['device' => $application->device_id, 'app' => 'ntp']) . '"', false)
+            ->assertDontSee('&lt;table', false);
+    }
+
+    public function testNtpFleetOnlyListsAccessibleDevices(): void
+    {
+        $accessible = Device::factory()->create();
+        $this->ntpPeer($accessible->device_id, '192.0.2.1');
+        $this->ntpPeer(Device::factory()->create()->device_id, '192.0.2.2');
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->givePermissionTo(Permission::findOrCreate('device.view'), Permission::findOrCreate('application.view'));
+        $user->devicesOwned()->attach($accessible->device_id);
+
+        $this->actingAs($user)
+            ->get(route('apps.index', ['app' => 'ntp']))
+            ->assertOk()
+            ->assertSee('192.0.2.1')
+            ->assertDontSee('192.0.2.2')
+            ->assertSee('href="' . route('device', $accessible->device_id) . '"', false)
+            ->assertDontSee(route('device.apps', ['device' => $accessible->device_id]));
+    }
+
+    private function ntpPeer(int $deviceId, string $peer, ?string $error = null): void
+    {
+        $component = Component::factory()->create(['device_id' => $deviceId, 'type' => 'ntp', 'label' => $peer, 'status' => $error === null ? 0 : 2, 'error' => $error ?? '']);
+        foreach (['peer' => $peer, 'stratum' => '2'] as $attribute => $value) {
+            ComponentPref::create(['component' => $component->id, 'attribute' => $attribute, 'value' => $value]);
+        }
     }
 }

@@ -34,6 +34,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use LibreNMS\Util\Html;
 
 class AppsController extends Controller implements DeviceTab
 {
@@ -85,7 +86,7 @@ class AppsController extends Controller implements DeviceTab
 
         return view('device.tabs.apps', [
             'device' => $device,
-            'applications' => $applications,
+            'appOptions' => $applications->mapWithKeys(fn (Application $application) => [$application->app_id => $this->appOption($application)])->all(),
             'selected' => $selected,
             'page' => $selected?->definition()->devicePage($selected, $request->query()),
             'periods' => array_map(fn (string $period) => [
@@ -93,5 +94,20 @@ class AppsController extends Controller implements DeviceTab
                 'to' => LibrenmsConfig::get('time.now'),
             ], $periods),
         ]);
+    }
+
+    /**
+     * @return array{text: string, link: string, icon: ?string, title: string}
+     */
+    private function appOption(Application $application): array
+    {
+        $state = Html::appStateIcon($application->app_state);
+
+        return [
+            'text' => $application->displayName() . (filled($application->app_instance) ? " ($application->app_instance)" : ''),
+            'link' => $application->deviceAppsUrl(),
+            'icon' => $state['icon'] ? $state['icon'] . ' fa-fw' : null,
+            'title' => __($state['hover_text']),
+        ];
     }
 }

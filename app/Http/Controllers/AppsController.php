@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\View\View;
 use LibreNMS\Applications\ApplicationDefinition;
+use LibreNMS\Util\Html;
 use LibreNMS\Util\ObjectCache;
 use LibreNMS\Util\Url;
 
@@ -48,9 +49,12 @@ class AppsController extends Controller
             'link' => route('apps.index', ['app' => $type, 'instance' => $name]),
         ]])->all();
 
+        $appOptions = ['' => ['text' => __('Overview'), 'link' => route('apps.index')]]
+            + $apps->mapWithKeys(fn ($group, $appType) => [$appType => $this->appOption($group->first())])->all();
+
         return view('apps.index', [
             'groups' => $groups,
-            'apps' => $apps,
+            'appOptions' => $appOptions,
             'instances' => $instances,
             'applications' => $applications,
             'type' => $type,
@@ -59,6 +63,21 @@ class AppsController extends Controller
             'graphTypes' => $definition?->fleetGraphs() ?? [],
             'previewGraphs' => $groups->map(fn ($group) => $group->first()->definition()->fleetGraphs()[0] ?? null),
         ]);
+    }
+
+    /**
+     * @return array{text: string, link: string, icon: ?string, title: string}
+     */
+    private function appOption(Application $application): array
+    {
+        $state = Html::appStateIcon($application->app_state);
+
+        return [
+            'text' => $application->displayName(),
+            'link' => route('apps.index', ['app' => $application->app_type]),
+            'icon' => $state['icon'] ? $state['icon'] . ' fa-fw' : null,
+            'title' => __($state['hover_text']),
+        ];
     }
 
     public function legacy(): RedirectResponse

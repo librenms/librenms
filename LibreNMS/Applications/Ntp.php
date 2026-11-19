@@ -14,8 +14,10 @@
 
 namespace LibreNMS\Applications;
 
+use App\Facades\DeviceCache;
 use App\Models\Application;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Facades\Gate;
 use LibreNMS\Component;
 
 class Ntp extends ApplicationDefinition
@@ -35,6 +37,9 @@ class Ntp extends ApplicationDefinition
         'error' => 'Error',
     ];
 
+    /**
+     * @return array<int, array<int, array<string, mixed>>> peers grouped by device id and keyed by component id
+     */
     public static function peers(?int $deviceId = null): array
     {
         return (new Component)->getComponents($deviceId, [
@@ -51,7 +56,10 @@ class Ntp extends ApplicationDefinition
     protected function buildDevicePage(ApplicationPage $page, Application $application): void
     {
         $page->content = view('apps.ntp-peers', [
-            'peers' => self::peers($application->device_id)[$application->device_id] ?? [],
+            'peers' => array_filter([$application->device_id => self::peers($application->device_id)[$application->device_id] ?? []]),
+            'showDevice' => false,
+            'appDeviceIds' => [],
+            'graphType' => null,
         ]);
 
         foreach (self::PEER_GRAPHS as $key => $title) {
@@ -67,7 +75,24 @@ class Ntp extends ApplicationDefinition
         $peerView = isset(self::PEER_VIEWS[$peerView]) ? $peerView : 'all';
         $peerGraph = isset($graphs[$peerGraph]) ? $peerGraph : 'none';
 
+        $peers = [];
+        foreach (self::peers() as $deviceId => $devicePeers) {
+            if (Gate::denies('view', DeviceCache::get($deviceId))) {
+                continue;
+            }
+            if ($peerView === 'error') {
+                $devicePeers = array_filter($devicePeers, fn (array $peer) => ($peer['status'] ?? null) == 2);
+            }
+            if ($devicePeers) {
+                $peers[$deviceId] = $devicePeers;
+            }
+        }
+
         return view('apps.ntp-fleet', [
+            'peers' => $peers,
+            'appDeviceIds' => Application::query()->where('app_type', self::TYPE)
+                ->whereIn('device_id', array_keys($peers))->pluck('device_id')->flip()->all(),
+            'graphType' => self::peerGraphType($peerGraph),
             'peerView' => $peerView,
             'peerGraph' => $peerGraph,
             'peerViewOptions' => $this->fleetOptions('view', self::PEER_VIEWS, ['graph' => $peerGraph]),
