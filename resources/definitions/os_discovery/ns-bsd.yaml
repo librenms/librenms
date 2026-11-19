@@ -43,8 +43,7 @@ modules:
           state_name: snsDiskEntrySmartResult
           states:
             - { descr: 'SMART Warning', value: -0, generic: 2 }
-            - { descr: 'PASSED',        value: 1,  generic: 0 }
-            - { descr: 'unknown',       value: 0,  generic: 2 }
+            - { descr: 'PASSED',        value:  1, generic: 0 }
         -
           oid: STORMSHIELD-HEALTH-MONITOR-MIB::snsFirewallHealthTable
           value: STORMSHIELD-HEALTH-MONITOR-MIB::snsHaModeHealth
