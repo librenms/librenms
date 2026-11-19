@@ -254,6 +254,8 @@ modules:
                     index: upsOutputPowerFactor
                     descr: 'Output'
                     divisor: 100
+                    low_limit: -1.01
+                    high_limit: 1.01
         charge:
             data:
                 -
