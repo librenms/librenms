@@ -23,14 +23,10 @@ class RrdTrafficDefinition
     /** @var array<string, list<string>> */
     private array $totals = [];
 
-    /**
-     * @param  bool  $overlaid  inverted series are drawn above the axis, over the others
-     */
     public function __construct(
         private readonly TrafficOptions $options,
         private readonly GraphParameters $params,
         private readonly GraphTheme $theme,
-        private readonly bool $overlaid,
     ) {
     }
 
@@ -39,9 +35,9 @@ class RrdTrafficDefinition
      * @param  Closure(string $period, string $suffix, string $cf, string $range, int $shift): list<string>  $periodValueDefs  defines the value of
      *                                                                                                                         the series for $id$period$suffix
      */
-    public function addSeries(string $id, DataSeries|SeriesSum $series, float $drawScale, ?string $color, Closure $periodValueDefs): void
+    public function addSeries(string $id, DataSeries|SeriesSum $series, float $drawFactor, ?string $color, Closure $periodValueDefs): void
     {
-        $factor = RrdSeriesDefinition::number($drawScale * ($series->style->invert && ! $this->overlaid ? -1 : 1));
+        $factor = RrdSeriesDefinition::number($drawFactor);
         $this->summarize($id, $series, $factor);
 
         if ($this->params->to > time()) {

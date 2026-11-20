@@ -64,11 +64,9 @@ class ResolvedStyleTest extends TestCase
     {
         $series = ['out' => $this->series(new SeriesStyle(invert: true))];
 
-        LibrenmsConfig::set('webui.graph_stacked', false);
         $this->assertTrue(ResolvedStyle::resolve($series, new GraphTheme(false))['out']->invert);
 
-        LibrenmsConfig::set('webui.graph_stacked', true);
-        $this->assertFalse(ResolvedStyle::resolve($series, new GraphTheme(false))['out']->invert);
+        $this->assertFalse(ResolvedStyle::resolve($series, new GraphTheme(false), inverts: false)['out']->invert);
     }
 
     private function series(SeriesStyle $style = new SeriesStyle): DataSeries

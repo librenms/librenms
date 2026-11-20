@@ -55,8 +55,6 @@ Alpine.data("settingArrayDynamic", settingArrayDynamic);
 
 window.Alpine = Alpine;
 
-window.LibreNMS.loadTimeSeriesChart = () => import("./timeSeriesChart.js");
-
 if (document.querySelector('[data-config-backups]')) {
     window.LibreNMS.loadConfigHighlight = () => import("./configHighlight.js");
 }

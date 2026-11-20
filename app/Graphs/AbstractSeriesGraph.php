@@ -7,7 +7,6 @@ use App\Data\Graphing\GraphData;
 use App\Data\Graphing\GraphDataSeries;
 use App\Data\Graphing\GraphImage;
 use App\Data\Graphing\GraphOptions;
-use App\Data\Graphing\ResolvedStyle;
 use App\Data\Graphing\SeriesSum;
 use App\Data\Graphing\Threshold;
 use App\Facades\LibrenmsConfig;
@@ -73,28 +72,7 @@ abstract class AbstractSeriesGraph extends AbstractGraph
             $options = $this->options();
             // the browser makes overlapping series see through itself
             $theme = new GraphTheme($this->params->isDark(), $options->palette);
-            $styles = ResolvedStyle::resolve(array_intersect_key($series, $data->series), $theme);
-            $css = fn (?string $hex) => $hex === null ? null : "#$hex";
-
-            $drawn = [];
-            foreach ($styles as $key => $style) {
-                $drawn[] = new GraphDataSeries(
-                    key: $key,
-                    label: $series[$key]->description,
-                    unit: $series[$key]->unit,
-                    color: $css($style->color),
-                    fillColor: $css($style->fillColor),
-                    maxFillColor: $css($style->maxFillColor),
-                    rangeColor: $css($style->rangeColor),
-                    legendOnly: $style->legendOnly,
-                    stacked: $style->stacked,
-                    invert: $style->invert,
-                    drawScale: $style->drawScale,
-                    avg: $data->series[$key]['avg'],
-                    min: $data->series[$key]['min'],
-                    max: $data->series[$key]['max'],
-                );
-            }
+            $invert = ! LibrenmsConfig::get('webui.graph_stacked');
 
             return new GraphData(
                 timestamps: $data->timestamps,
@@ -105,15 +83,15 @@ abstract class AbstractSeriesGraph extends AbstractGraph
                     'base' => $options->base ?? 1000,
                     'margin' => $options->scaleMargin,
                 ],
-                series: $drawn,
+                series: GraphDataSeries::fromReadings($series, $data, $theme, $invert),
                 thresholds: array_map(fn (Threshold $threshold) => [
                     'value' => $threshold->value,
                     'label' => $threshold->label,
                     'color' => '#' . $theme->color($threshold->role),
                     'shown' => $threshold->shown,
                     // as series marked invert, which stacked graphs draw above the axis
-                    'invert' => $threshold->invert && ! LibrenmsConfig::get('webui.graph_stacked'),
-                    'mirror' => $threshold->mirror && ! LibrenmsConfig::get('webui.graph_stacked'),
+                    'invert' => $threshold->invert && $invert,
+                    'mirror' => $threshold->mirror && $invert,
                 ], $options->thresholds),
             );
         });

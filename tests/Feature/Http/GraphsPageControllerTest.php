@@ -241,12 +241,14 @@ class GraphsPageControllerTest extends TestCase
         $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip&from=1700000000&to=1700003600&showcommand=yes");
 
         $response->assertOk();
-        $src = Js::from(route('graph.data', ['device' => $device->device_id, 'type' => 'device_netstat_ip', 'showcommand' => 'yes']));
-        $range = Js::from(['from' => 1700000000, 'to' => 1700003600]);
-        $options = Js::from(new GraphViewOptions);
-        $response->assertSee('x-data="timeSeriesGraph(' . $src . ', ' . $range . ', ' . $options . ', ' . Js::from(['compare' => null, 'trend' => false]) . ')"', false);
-        $view = Js::from(['compare' => null, 'trend' => false]);
-        $response->assertSee('x-data="graphsPage(' . $range . ', ' . $options . ', true, ' . $view . ')"', false);
+        $page = $response->viewData('graphPage');
+        $this->assertTrue($page['interactive']);
+        $this->assertSame(['from' => 1700000000, 'to' => 1700003600], $page['range']);
+        $this->assertEquals(new GraphViewOptions, $page['options']);
+        $this->assertSame(['compare' => null, 'trend' => false], $page['view']);
+        $this->assertSame(route('graph.data', ['device' => $device->device_id, 'type' => 'device_netstat_ip', 'showcommand' => 'yes']), $page['dataUrl']);
+        $response->assertSee('x-data="graphsPage(' . Js::from($page) . ')"', false);
+        $response->assertSee('x-data="timeSeriesGraph(', false);
         $response->assertSee('data-reload="false"', false);
         $response->assertSee(__('graph.help.title'));
         $response->assertSee(__('graph.help.zoom_range'));
@@ -261,7 +263,8 @@ class GraphsPageControllerTest extends TestCase
         $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_renderer', 'value' => 'default'])->assertOk();
         $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip");
         $response->assertDontSee('x-data="timeSeriesGraph', false);
-        $response->assertSee('x-data="graphsPage(' . Js::from(['last' => 86400]) . ', ' . Js::from(new GraphViewOptions) . ', false, ', false);
+        $this->assertFalse($response->viewData('graphPage')['interactive']);
+        $this->assertSame(['last' => 86400], $response->viewData('graphPage')['range']);
         $response->assertSee('data-reload="true"', false);
         // the image graph has the same toolbar, its data can still be downloaded
         $response->assertSee(__('graph.zoom_in'));
@@ -279,8 +282,7 @@ class GraphsPageControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('x-data="timeSeriesGraph(', false);
-        $response->assertSee(', ' . Js::from(['last' => 172800]) . ', ', false);
-        $response->assertSee('x-data="graphsPage(' . Js::from(['last' => 172800]) . ',', false);
+        $this->assertSame(['last' => 172800], $response->viewData('graphPage')['range']);
         $response->assertSee('showPeriod(172800, $event)', false);
     }
 
@@ -328,7 +330,7 @@ class GraphsPageControllerTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('x-data="timeSeriesGraph(', false);
-        $response->assertSee(', ' . Js::from(new GraphViewOptions(...$saved)) . ', ', false);
+        $this->assertEquals(new GraphViewOptions(...$saved), $response->viewData('graphPage')['options']);
         $response->assertSee('style="width: 50%; height: 400px; min-height: 0; max-height: none; aspect-ratio: auto"', false);
 
         $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_options', 'value' => [...$saved, 'width' => null, 'height' => null]])->assertOk();
@@ -348,13 +350,13 @@ class GraphsPageControllerTest extends TestCase
         $response->assertOk();
         // the address names only overlay, the rest of the drawing is the default, the legend stays the viewer's
         $shared = new GraphViewOptions(stacking: 'overlay', columns: ['avg']);
-        $response->assertSee(Js::from($shared) . ', true, ' . Js::from(['compare' => 'week', 'trend' => true]) . ')"', false);
-        // the data is the same whatever the view
-        $src = Js::from(route('graph.data', ['device' => $device->device_id, 'type' => 'device_netstat_ip']));
-        $response->assertSee('x-data="timeSeriesGraph(' . $src . ',', false);
+        $page = $response->viewData('graphPage');
+        $this->assertEquals($shared, $page['options']);
+        $this->assertSame(['compare' => 'week', 'trend' => true], $page['view']);
+        $this->assertSame(route('graph.data', ['device' => $device->device_id, 'type' => 'device_netstat_ip']), $page['dataUrl']);
 
-        $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip")
-            ->assertSee(Js::from(new GraphViewOptions(scale: 'log', columns: ['avg'])) . ', true, ', false);
+        $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip");
+        $this->assertEquals(new GraphViewOptions(scale: 'log', columns: ['avg']), $response->viewData('graphPage')['options']);
     }
 
     public function testViewParametersMustBeKnownValues(): void

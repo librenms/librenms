@@ -25,6 +25,7 @@
     @auth
         <script src="{{ route('js.routes') }}"></script>
     @endauth
+    @stack('before-app')
     @vite(['resources/js/app.js'])
     <link href="{{ asset('css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/bootstrap-switch.min.css') }}" rel="stylesheet">

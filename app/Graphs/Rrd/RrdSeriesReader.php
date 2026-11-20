@@ -43,15 +43,21 @@ class RrdSeriesReader
         $ids = [];
 
         foreach ($series as $key => $item) {
+            $id = 'ds' . count($ids);
             if ($item instanceof SeriesSum) {
-                $members = array_values(array_intersect_key($ids, array_flip($item->series)));
+                $members = [];
+                foreach ($item->series as $member) {
+                    if (isset($ids[$member])) {
+                        $members[] = $ids[$member] . 'avg';
+                    }
+                }
                 if ($members === []) {
                     continue;
                 }
 
-                $ids[$key] = $id = 'ds' . count($ids);
-                $values = array_map(fn (string $member) => $member . 'avg', $members);
-                array_push($definition, "CDEF:{$id}avg=" . implode(',', $values) . str_repeat(',ADDNAN', count($values) - 1), "XPORT:{$id}avg:{$id}avg");
+                $ids[$key] = $id;
+                $definition[] = RrdSeriesDefinition::sumDef($id . 'avg', $members);
+                $definition[] = "XPORT:{$id}avg:{$id}avg";
                 continue;
             }
 
@@ -60,7 +66,7 @@ class RrdSeriesReader
                 continue;
             }
 
-            $ids[$key] = $id = 'ds' . count($ids);
+            $ids[$key] = $id;
             $consolidations = $item->field instanceof Formula ? ['avg' => 'AVERAGE'] : self::CONSOLIDATIONS;
             foreach ($consolidations as $name => $cf) {
                 array_push($definition, ...RrdSeriesDefinition::valueDefs($id . $name, $filename, $item, $cf));

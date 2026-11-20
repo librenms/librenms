@@ -36,10 +36,9 @@ class GraphsPageController extends Controller
         $device = $context->device;
         $port = $context->port;
         $fullType = "{$params->type}_$params->subtype";
-        $showCommand = $request->input('showcommand') === 'yes';
         $canDrawInBrowser = $request->graph() instanceof AbstractSeriesGraph;
         $drawInBrowser = $canDrawInBrowser && UserPref::getPref($request->user(), self::RENDERER_PREFERENCE) === 'js';
-        $showCommand = $showCommand && ! $drawInBrowser;
+        $showCommand = ! $drawInBrowser && $request->input('showcommand') === 'yes';
         $isDynamicGraph = ! $drawInBrowser && LibrenmsConfig::get('webui.dynamic_graphs', false) === true;
 
         $this->handleWidescreenPreference($request);
@@ -48,16 +47,18 @@ class GraphsPageController extends Controller
 
         [$subtypeOptions, $subtypeSelected] = $this->subtypeNavigationOptions($request);
 
-        ['width' => $graphWidth, 'height' => $graphHeight, 'thumbWidth' => $thumbWidth] = $this->graphDimensions($request);
-        $width = $graphWidth;
-        $height = $graphHeight;
+        ['width' => $width, 'height' => $height, 'thumbWidth' => $thumbWidth] = $this->graphDimensions($request);
         $mainGraphVars = $request->toVars(['height' => $height, 'width' => $width]);
+        $entityTitle = $this->entityTitle($device, $port);
+        $dataUrl = $canDrawInBrowser
+            ? route('graph.data', $request->toVars(array_fill_keys(['width', 'height', 'from', 'to', ...self::VIEW_PARAMETERS], null)))
+            : null;
 
         return view('graphs.show', [
             'device' => $device,
             'port' => $port,
             'subtitle' => $subtitle,
-            'pageTitle' => $this->entityTitle($device, $port) . $subtitle,
+            'pageTitle' => $entityTitle . $subtitle,
             'subtypeOptions' => $subtypeOptions,
             'subtypeSelected' => $subtypeSelected,
             'periodThumbs' => $this->periodThumbnails($request, $thumbWidth),
@@ -65,16 +66,23 @@ class GraphsPageController extends Controller
             'trendHint' => ! $drawInBrowser && ($fullType === 'port_bits' || str_contains($fullType, 'sensor_')),
             'canDrawInBrowser' => $canDrawInBrowser,
             'drawInBrowser' => $drawInBrowser,
-            'rendererPreference' => self::RENDERER_PREFERENCE,
-            'optionsPreference' => self::OPTIONS_PREFERENCE,
-            'graphOptions' => GraphViewOptions::fromPreference(UserPref::getPref($request->user(), self::OPTIONS_PREFERENCE))->withAddress($request->query()),
-            'graphView' => [
-                'compare' => self::COMPARE[$request->input('previous')] ?? null,
-                'trend' => $request->boolean('trend'),
+            'graphPage' => [
+                'interactive' => $drawInBrowser,
+                'range' => $params->ends_now ? ['last' => $params->period] : ['from' => $params->from, 'to' => $params->to],
+                'options' => GraphViewOptions::fromPreference(UserPref::getPref($request->user(), self::OPTIONS_PREFERENCE))->withAddress($request->query()),
+                'view' => [
+                    'compare' => self::COMPARE[$request->input('previous')] ?? null,
+                    'trend' => $request->boolean('trend'),
+                ],
+                'fileName' => Str::slug(str_replace('.', ' ', "$entityTitle $fullType")) ?: 'graph',
+                'dataUrl' => $dataUrl,
+                'preferencesUrl' => route('preferences.store'),
+                'rendererPreference' => self::RENDERER_PREFERENCE,
+                'optionsPreference' => self::OPTIONS_PREFERENCE,
+                'defaults' => new GraphViewOptions,
+                'addressKeys' => GraphViewOptions::ADDRESS,
+                'columns' => GraphViewOptions::COLUMNS,
             ],
-            'fileName' => Str::slug(str_replace('.', ' ', $this->entityTitle($device, $port) . ' ' . $fullType)) ?: 'graph',
-            'graphDataUrl' => $canDrawInBrowser ? route('graph.data', $request->toVars(['width' => null, 'height' => null, 'from' => null, 'to' => null, ...array_fill_keys(self::VIEW_PARAMETERS, null)])) : null,
-            'graphRange' => $params->ends_now ? ['last' => $params->period] : ['from' => $params->from, 'to' => $params->to],
             'graphFrom' => $request->input('from') ?? '-1d',
             'graphTo' => $request->input('to'),
             'mainGraphVars' => $mainGraphVars,
@@ -82,7 +90,6 @@ class GraphsPageController extends Controller
             'showCommand' => $showCommand,
             'rrdCommand' => $showCommand ? $this->renderRrdCommand($mainGraphVars) : null,
             'isDynamicGraph' => $isDynamicGraph,
-            'dynamicGraphWidth' => $isDynamicGraph ? $width : 0,
             'dynamicGraphSrcTemplate' => $isDynamicGraph ? $this->dynamicGraphSrcTemplate($mainGraphVars) : null,
             'refresh' => LibrenmsConfig::get('page_refresh'),
         ]);

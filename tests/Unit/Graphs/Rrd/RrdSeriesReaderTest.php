@@ -98,22 +98,22 @@ class RrdSeriesReaderTest extends TestCase
     public function test_a_sum_adds_up_the_averages_of_its_series_that_have_data(): void
     {
         $this->backend->shouldReceive('xport')->once()->with(Mockery::on(fn (array $options) => array_slice($options, -2) === [
-            'CDEF:ds2avg=ds0avg,ds1avg,ADDNAN', 'XPORT:ds2avg:ds2avg',
+            'CDEF:ds2avg=ds1avg,ds0avg,ds1avg,ADDNAN,ADDNAN', 'XPORT:ds2avg:ds2avg',
         ]))->andReturn([
             'ds0avg' => [1200 => 1.0], 'ds0min' => [1200 => 1.0], 'ds0max' => [1200 => 1.0],
             'ds1avg' => [1200 => 2.0], 'ds1min' => [1200 => 2.0], 'ds1max' => [1200 => 2.0],
-            'ds2avg' => [1200 => 3.0],
+            'ds2avg' => [1200 => 5.0],
         ]);
 
         $data = $this->reader()->read([
             'in' => new DataSeries($this->metric, 'in', 'In'),
             'gone' => new DataSeries($this->missing, 'in', 'Gone'),
             'out' => new DataSeries($this->metric, 'out', 'Out'),
-            'total' => new SeriesSum(['in', 'gone', 'out'], 'Total'),
+            'total' => new SeriesSum(['out', 'gone', 'in', 'out'], 'Total'),
             'nothing' => new SeriesSum(['gone'], 'Nothing'),
         ], 1000, 1900, 500);
 
-        $this->assertSame(['avg' => [3.0], 'min' => null, 'max' => null], $data->series['total']);
+        $this->assertSame(['avg' => [5.0], 'min' => null, 'max' => null], $data->series['total']);
         $this->assertArrayNotHasKey('nothing', $data->series, 'a sum without any series with data is left out');
     }
 

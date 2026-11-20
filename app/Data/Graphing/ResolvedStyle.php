@@ -2,7 +2,6 @@
 
 namespace App\Data\Graphing;
 
-use App\Facades\LibrenmsConfig;
 use App\Graphs\Rrd\GraphTheme;
 
 /**
@@ -38,9 +37,8 @@ readonly class ResolvedStyle
      * @param  array<string, DataSeries|SeriesSum>  $series  the series that are drawn
      * @return array<string, self>
      */
-    public static function resolve(array $series, GraphTheme $theme): array
+    public static function resolve(array $series, GraphTheme $theme, bool $inverts = true): array
     {
-        $inverts = ! LibrenmsConfig::get('webui.graph_stacked');
         $averaged = count(array_filter($series, fn (DataSeries|SeriesSum $item) => $item->style->stackAverage));
 
         return array_map(function (DataSeries|SeriesSum $item) use ($theme, $inverts, $averaged): self {

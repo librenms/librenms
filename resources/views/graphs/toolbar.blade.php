@@ -38,7 +38,7 @@
 @endphp
 <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-center tw:gap-2 tw:mt-3 tw:mb-2">
     <div class="tw:w-full tw:sm:w-[40ch]">
-        <x-date-range-picker :start="$graphFrom" :end="$graphTo" :reload="! $drawInBrowser"
+        <x-date-range-picker data-graph-picker :start="$graphFrom" :end="$graphTo" :reload="! $drawInBrowser"
                              class="tw:w-full tw:text-center tw:px-3 tw:py-1.5 tw:border tw:border-gray-300 tw:rounded-md tw:bg-gray-100! tw:hover:bg-gray-200! tw:dark:bg-white! tw:dark:hover:bg-gray-200!"></x-date-range-picker>
     </div>
 
@@ -73,7 +73,7 @@
                 <button type="button" class="{{ $menuItem }}" x-on:click="exportImage()">
                     <i class="fa-regular fa-image tw:w-4" aria-hidden="true"></i> {{ __('graph.export_image') }}
                 </button>
-                @if ($graphDataUrl)
+                @if ($graphPage['dataUrl'])
                     <button type="button" class="{{ $menuItem }}" x-on:click="exportCsv()">
                         <i class="fa-solid fa-file-csv tw:w-4" aria-hidden="true"></i> {{ __('graph.export_csv') }}
                     </button>

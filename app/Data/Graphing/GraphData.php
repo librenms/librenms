@@ -4,7 +4,7 @@ namespace App\Data\Graphing;
 
 /**
  * A graph for the browser to draw, sent as JSON with these property names.
- * Keep in step with the GraphData typedef in resources/js/timeSeriesChart.js.
+ * Keep in step with the GraphData typedef in resources/js/graphs/seriesData.js.
  */
 readonly class GraphData
 {
