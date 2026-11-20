@@ -6,6 +6,7 @@ use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphImage;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\SeriesSum;
 use App\Facades\LibrenmsConfig;
 use Closure;
 use LibreNMS\Exceptions\GraphException;
@@ -25,7 +26,7 @@ class RrdGraphRenderer
     }
 
     /**
-     * @param  array<string, DataSeries>  $series
+     * @param  array<string, DataSeries|SeriesSum>  $series
      *
      * @throws GraphException
      */
@@ -35,7 +36,7 @@ class RrdGraphRenderer
     }
 
     /**
-     * @param  array<string, DataSeries>  $series
+     * @param  array<string, DataSeries|SeriesSum>  $series
      *
      * @throws GraphException
      */
@@ -45,7 +46,7 @@ class RrdGraphRenderer
     }
 
     /**
-     * @param  array<string, DataSeries>  $series
+     * @param  array<string, DataSeries|SeriesSum>  $series
      * @return array<int, string>
      *
      * @throws GraphException

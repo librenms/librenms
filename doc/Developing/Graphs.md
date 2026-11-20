@@ -210,9 +210,10 @@ Set these named arguments on `SeriesStyle` to control an individual series:
 | `stackAverage: true` | Divides the drawing by the number of drawn series with this set, so a stack of percentages shows their average. |
 | `maxFillColor: 'e0e0ff'` | Fills the area below the highest value of each interval, behind the other fills. |
 | `rangeColor: 'cccccc'` | Fills the area between the lowest and highest value of each interval, behind the other fills. |
+| `legendOnly: true` | Shows the series in the legend without drawing it. |
 
-Inverted stacked series start their own stack below the axis, so list them
-after the series stacked above it.
+Inverted stacked series stack separately below the axis. Stacked series may be
+listed in any order, such as the in and out series of each port together.
 
 A color that needs a different variation in the light and dark site styles is
 a `ThemeColor`: `new ThemeColor(light: '272B30', dark: 'F2F2F2')`. The renderer
@@ -240,6 +241,17 @@ new DataSeries($metric, new Formula('xmt', 'rcv', '-', 'xmt', '/', 100, '*'), 'L
 
 The lowest and highest values of a formula are those of its averages.
 Datastores that cannot calculate it themselves use `Formula::evaluate()`.
+
+To add up series of the graph, such as the traffic of every port of a device,
+add a `SeriesSum` with the keys of those series. It may only use series listed
+before it, including other sums. A series without a value at a time counts as
+zero, and series without stored data are left out:
+
+```php
+$series['in'] = new SeriesSum(['in_1', 'in_2'], 'Total In', 'bps', new SeriesStyle(legendOnly: true));
+```
+
+Like a formula, the lowest and highest values of a sum are those of its averages.
 
 ### Graph options
 
@@ -309,6 +321,9 @@ and maximum fills. It extends `PortGraph`, which checks permission to view the
 port and supplies its page context and title. Its `GraphOptions::traffic`
 uses `TrafficOptions` to add percentiles, transferred-byte totals, previous
 period comparisons, future trend lines, and port speed references.
+`TrafficOptions::series` limits these to some of the series:
+`app/Graphs/Device/BitsGraph.php` stacks the traffic of each port and only
+summarizes the device totals.
 
 For graph types outside device graphs, extend `AbstractSeriesGraph` and
 implement `isAuthorized()` for the entities being displayed, using `canView()`

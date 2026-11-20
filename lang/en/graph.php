@@ -29,6 +29,9 @@ return [
     'series' => [
         'in' => 'In',
         'out' => 'Out',
+        'total_in' => 'Total In',
+        'total_out' => 'Total Out',
+        'aggregate' => 'Aggregate',
         'read' => 'Read',
         'write' => 'Write',
         'used' => 'Used',

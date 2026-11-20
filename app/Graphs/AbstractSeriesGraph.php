@@ -5,6 +5,7 @@ namespace App\Graphs;
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphImage;
 use App\Data\Graphing\GraphOptions;
+use App\Data\Graphing\SeriesSum;
 use App\Graphs\Rrd\RrdGraphRenderer;
 use LibreNMS\Exceptions\GraphException;
 use LibreNMS\Exceptions\NoGraphData;
@@ -20,9 +21,10 @@ abstract class AbstractSeriesGraph extends AbstractGraph
     }
 
     /**
-     * The series of the graph, independent of the datastore so the raw data can be fetched without drawing
+     * The series of the graph, independent of the datastore so the raw data can be fetched without drawing.
+     * Sums add up series listed before them.
      *
-     * @return array<string, DataSeries>
+     * @return array<string, DataSeries|SeriesSum>
      */
     abstract public function getSeries(): array;
 
@@ -47,7 +49,7 @@ abstract class AbstractSeriesGraph extends AbstractGraph
     }
 
     /**
-     * @return array<string, DataSeries>
+     * @return array<string, DataSeries|SeriesSum>
      *
      * @throws GraphException
      */

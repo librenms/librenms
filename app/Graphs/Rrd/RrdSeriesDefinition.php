@@ -6,6 +6,7 @@ use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\Formula;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\SeriesSum;
 use App\Data\Graphing\ThemeColor;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Store\Rrd;
@@ -35,8 +36,14 @@ class RrdSeriesDefinition
 
     private int $colorIndex = 0;
 
+    /** @var array<string, string> rrd file of each data series that has one */
+    private array $files = [];
+
+    /** @var array<string, string> value id of each series that is drawn */
+    private array $ids = [];
+
     /**
-     * @param  array<string, DataSeries>  $series
+     * @param  array<string, DataSeries|SeriesSum>  $series
      */
     public function __construct(
         private readonly array $series,
@@ -46,7 +53,7 @@ class RrdSeriesDefinition
     }
 
     /**
-     * Series without an rrd file are left out
+     * Series without an rrd file are left out, as are sums without any of their series
      *
      * @return array<int, string>
      *
@@ -60,81 +67,108 @@ class RrdSeriesDefinition
         $fills = [];
         $drawing = [];
         $previousValues = [];
-        $stacking = [];
+        /** @var array<string, array{top: string|null, pending: list<string>}> $stacks the drawn values of each stack not yet added to its top */
+        $stacks = [];
+        $lastStack = null;
         $inverted = false;
         $traffic = $this->options->traffic === null ? null : new RrdTrafficDefinition($this->options->traffic, $params);
 
-        $files = [];
+        $this->files = [];
+        $this->ids = [];
         foreach ($this->series as $key => $series) {
-            $filename = $this->rrdFiles->pathFor($series->metric);
+            $filename = $series instanceof DataSeries ? $this->rrdFiles->pathFor($series->metric) : null;
 
             if ($filename !== null) {
-                $files[$key] = $filename;
+                $this->files[$key] = $filename;
             }
         }
 
-        if ($files === []) {
+        if ($this->files === []) {
             throw new NoGraphData(__('graph.errors.no_data_files'));
         }
 
         $dark = $params->isDark();
-        $averaged = count(array_filter(array_keys($files), fn ($key) => $this->series[$key]->style->stackAverage));
+        $averaged = count(array_filter(array_keys($this->files), fn ($key) => $this->series[$key]->style->stackAverage));
 
         $i = 0;
-        foreach ($files as $key => $filename) {
-            $series = $this->series[$key];
+        foreach ($this->series as $key => $series) {
+            if (! $this->isDrawable($key)) {
+                continue;
+            }
+
             $id = 'ds' . $i++;
+            $this->ids[$key] = $id;
             $style = $series->style;
             $drawScale = $style->stackAverage ? $style->drawScale / $averaged : $style->drawScale;
-            $color = $this->hex($style->color, $dark) ?? $this->nextColor();
             $label = Rrd::fixedSafeDescr($series->description, self::LABEL_WIDTH);
-            $inverted = $inverted || $style->invert;
+            $summarized = $traffic !== null && $this->options->traffic?->summarizes($key);
 
             foreach (['' => 'AVERAGE', 'min' => 'MIN', 'max' => 'MAX'] as $suffix => $cf) {
-                array_push($defs, ...self::valueDefs($id . $suffix, $filename, $series, $cf));
+                array_push($defs, ...$this->periodValueDefs($key, '', $suffix, $cf));
             }
-            $drawnId = $this->drawnValue($id, $drawScale, $style->invert, $defs);
 
-            if ($style->stacked) {
-                // series drawn below the axis stack separately
-                $direction = $this->drawnDirection($drawScale, $style->invert);
-                $drawing[] = "AREA:$drawnId#$color:$label" . (isset($stacking[$direction]) ? ':STACK' : '');
-                $stacking[$direction] = true;
-
-                if ($params->visible('previous')) {
-                    array_push($defs, ...self::valueDefs("{$id}prev", $filename, $series, 'AVERAGE', ":start=$params->prev_from:end=$params->from", $params->period));
-                    $previousValues[$direction][] = "{$id}prev,UN,0,{$id}prev,IF" . $this->scaleRpn($this->drawnFactor($drawScale, $style->invert));
-                }
+            if ($style->legendOnly) {
+                // a legend entry that draws nothing
+                $drawing[] = "HRULE:0#00000000:$label";
+                $lastStack = null;
             } else {
-                $drawing[] = "LINE1.25:$drawnId#$color:$label";
-                if ($style->fill) {
-                    $fills[] = "AREA:$drawnId#" . ($this->hex($style->fillColor, $dark) ?? $color . '20');
-                }
-                if ($style->maxFillColor !== null) {
-                    $maxFills[] = 'AREA:' . $this->drawnValue("{$id}max", $drawScale, $style->invert, $defs) . '#' . $this->hex($style->maxFillColor, $dark);
-                }
-                if ($this->options->scaleMargin > 0) {
-                    // invisible lines that only widen the autoscaled axis
-                    $margin = self::number($this->options->scaleMargin);
-                    // drawn below the axis, the minimum is the highest drawn value
-                    [$top, $bottom] = $this->drawnFactor($drawScale, $style->invert) < 0 ? ['min', 'max'] : ['max', 'min'];
-                    foreach (['above' => [$top, '+'], 'below' => [$bottom, '-']] as $name => [$suffix, $operator]) {
-                        $value = $this->drawnValue($id . $suffix, $drawScale, $style->invert, $defs);
-                        $defs[] = "CDEF:$id$name=$value,$value,ABS,$margin,*,$operator";
-                        $margins[] = "LINE:$id$name#00000000";
+                $color = $this->hex($style->color, $dark) ?? $this->nextColor();
+                $inverted = $inverted || $style->invert;
+                $drawnId = $this->drawnValue($id, $drawScale, $style->invert, $defs);
+
+                if ($style->stacked) {
+                    // series drawn below the axis stack separately
+                    $direction = $this->drawnDirection($drawScale, $style->invert);
+
+                    if (! isset($stacks[$direction])) {
+                        $drawing[] = "AREA:$drawnId#$color:$label";
+                        $stacks[$direction] = ['top' => null, 'pending' => []];
+                    } else {
+                        if ($lastStack !== $direction) {
+                            // rrdtool stacks on the previous element, rest on the top of this stack instead
+                            $drawing[] = 'LINE:' . $this->stackTop($id, $stacks[$direction], $defs) . '#00000000';
+                        }
+                        $drawing[] = "AREA:$drawnId#$color:$label:STACK";
+                    }
+                    $stacks[$direction]['pending'][] = $drawnId;
+                    $lastStack = $direction;
+
+                    if ($params->visible('previous')) {
+                        array_push($defs, ...$this->periodValueDefs($key, 'prev', '', 'AVERAGE', ":start=$params->prev_from:end=$params->from", $params->period));
+                        $previousValues[$direction][] = "{$id}prev,UN,0,{$id}prev,IF" . $this->scaleRpn($this->drawnFactor($drawScale, $style->invert));
+                    }
+                } else {
+                    $lastStack = null;
+                    $drawing[] = "LINE1.25:$drawnId#$color:$label";
+                    if ($style->fill) {
+                        $fills[] = "AREA:$drawnId#" . ($this->hex($style->fillColor, $dark) ?? $color . '20');
+                    }
+                    if ($style->maxFillColor !== null) {
+                        $maxFills[] = 'AREA:' . $this->drawnValue("{$id}max", $drawScale, $style->invert, $defs) . '#' . $this->hex($style->maxFillColor, $dark);
+                    }
+                    if ($this->options->scaleMargin > 0) {
+                        // invisible lines that only widen the autoscaled axis
+                        $margin = self::number($this->options->scaleMargin);
+                        // drawn below the axis, the minimum is the highest drawn value
+                        [$top, $bottom] = $this->drawnFactor($drawScale, $style->invert) < 0 ? ['min', 'max'] : ['max', 'min'];
+                        foreach (['above' => [$top, '+'], 'below' => [$bottom, '-']] as $name => [$suffix, $operator]) {
+                            $value = $this->drawnValue($id . $suffix, $drawScale, $style->invert, $defs);
+                            $defs[] = "CDEF:$id$name=$value,$value,ABS,$margin,*,$operator";
+                            $margins[] = "LINE:$id$name#00000000";
+                        }
+                    }
+                    if ($style->rangeColor !== null) {
+                        // an invisible line at the minimum, the range stacked on it
+                        $min = $this->drawnValue("{$id}min", $drawScale, $style->invert, $defs);
+                        $defs[] = "CDEF:{$id}range=" . $this->drawnValue("{$id}max", $drawScale, $style->invert, $defs) . ",$min,-";
+                        array_push($maxFills, "LINE:$min#00000000", "AREA:{$id}range#" . $this->hex($style->rangeColor, $dark) . '::STACK');
                     }
                 }
-                if ($style->rangeColor !== null) {
-                    // an invisible line at the minimum, the range stacked on it
-                    $min = $this->drawnValue("{$id}min", $drawScale, $style->invert, $defs);
-                    $defs[] = "CDEF:{$id}range=" . $this->drawnValue("{$id}max", $drawScale, $style->invert, $defs) . ",$min,-";
-                    array_push($maxFills, "LINE:$min#00000000", "AREA:{$id}range#" . $this->hex($style->rangeColor, $dark) . '::STACK');
-                }
             }
 
-            array_push($drawing, ...$this->legendValues($id, $series->unit));
-            if ($traffic !== null) {
-                $traffic->addSeries($key, $id, $filename, $series, $drawScale);
+            array_push($drawing, ...$this->legendValues($id, $series->unit, $summarized));
+            if ($summarized) {
+                $traffic->addSeries($key, $id, $series, $drawScale, fn (string $period, string $suffix, string $cf, string $range, int $shift) => $this->periodValueDefs($key, $period, $suffix, $cf, $range, $shift));
             }
         }
 
@@ -157,8 +191,71 @@ class RrdSeriesDefinition
             }
         }
 
+        // a value used by several series is defined once
+        $defs = array_values(array_unique([...$defs, ...($traffic?->definitions() ?? [])]));
+
         // fills go below all lines, so they do not hide lines of other series
-        return [$this->legendHeader(), ...$defs, ...($traffic?->definitions() ?? []), ...$margins, ...$maxFills, ...$fills, ...$drawing, ...($traffic?->drawing() ?? [])];
+        return [$this->legendHeader(), ...$defs, ...$margins, ...$maxFills, ...$fills, ...$drawing, ...($traffic?->drawing() ?? [])];
+    }
+
+    /**
+     * Whether the series has data to draw: an rrd file, or for a sum a drawable series listed before it
+     */
+    private function isDrawable(string $key): bool
+    {
+        $series = $this->series[$key];
+
+        return $series instanceof SeriesSum
+            ? array_any($series->series, fn ($member) => isset($this->ids[$member]))
+            : isset($this->files[$key]);
+    }
+
+    /**
+     * Define the value of a drawn series as its id followed by $period and $suffix, a sum from the values of its series
+     *
+     * @param  string  $period  names the period, empty for the period of the graph
+     * @param  string  $cf  AVERAGE, MIN or MAX, the lowest and highest of a sum are those of its averages
+     * @param  string  $range  read options appended to each DEF, such as the start and end of the previous period
+     * @param  int|null  $shift  move the values later by this many seconds
+     * @return list<string>
+     */
+    private function periodValueDefs(string $key, string $period, string $suffix, string $cf, string $range = '', ?int $shift = null): array
+    {
+        $series = $this->series[$key];
+        $id = $this->ids[$key] . $period . $suffix;
+
+        if ($series instanceof DataSeries) {
+            return self::valueDefs($id, $this->files[$key], $series, $cf, $range, $shift);
+        }
+
+        $defs = [];
+        $values = [];
+        foreach ($series->series as $member) {
+            if (isset($this->ids[$member])) {
+                array_push($defs, ...$this->periodValueDefs($member, $period, '', 'AVERAGE', $range, $shift));
+                $values[] = $this->ids[$member] . $period;
+            }
+        }
+        $defs[] = "CDEF:$id=" . implode(',', $values) . str_repeat(',ADDNAN', count($values) - 1);
+
+        return $defs;
+    }
+
+    /**
+     * Define the top of a stack, where the next series of the stack starts
+     *
+     * @param  array{top: string|null, pending: list<string>}  $stack  the drawn values not yet added to the top, which this adds
+     * @param  array<int, string>  $defs  receives the definition
+     * @return string the id of the top
+     */
+    private function stackTop(string $id, array &$stack, array &$defs): string
+    {
+        // unknown values add nothing to the stack, as when rrdtool stacks them
+        $values = [$stack['top'] ?? '0', ...$stack['pending']];
+        $defs[] = "CDEF:{$id}base=" . implode(',', $values) . str_repeat(',ADDNAN', count($values) - 1);
+        $stack = ['top' => "{$id}base", 'pending' => []];
+
+        return "{$id}base";
     }
 
     /**
@@ -298,7 +395,7 @@ class RrdSeriesDefinition
      */
     private function legendHeader(): string
     {
-        $unitWidth = max([0, ...array_map(fn (DataSeries $series) => strlen($series->unit), $this->series)]);
+        $unitWidth = max([0, ...array_map(fn (DataSeries|SeriesSum $series) => strlen($series->unit), $this->series)]);
         $columnWidth = self::LEGEND_VALUE_WIDTH + $unitWidth + self::LEGEND_COLUMN_GAP;
 
         $header = Rrd::fixedSafeDescr($this->options->legendTitle, self::LABEL_WIDTH);
@@ -321,7 +418,7 @@ class RrdSeriesDefinition
      *
      * @return array<int, string>
      */
-    private function legendValues(string $id, string $unit): array
+    private function legendValues(string $id, string $unit, bool $summarized): array
     {
         $unit = str_replace(['%', ':'], ['%%', '\\:'], $unit);
         // the space takes the place of the prefix, so the columns line up either way
@@ -332,7 +429,7 @@ class RrdSeriesDefinition
             $values[] = "GPRINT:$id{$column['suffix']}:{$column['cf']}:$format";
         }
 
-        if ($this->options->traffic !== null) {
+        if ($summarized) {
             $values[] = "GPRINT:{$id}pct:$format";
         }
 

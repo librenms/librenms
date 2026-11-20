@@ -7,8 +7,10 @@ use App\Data\Graphing\Formula;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
 use App\Data\Graphing\SeriesStyle;
+use App\Data\Graphing\SeriesSum;
 use App\Data\Graphing\ThemeColor;
 use App\Data\Graphing\Threshold;
+use App\Data\Graphing\TrafficOptions;
 use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Graphs\Rrd\RrdFileResolver;
@@ -197,6 +199,85 @@ class RrdSeriesDefinitionTest extends TestCase
         ], array_values(preg_grep('/^AREA/', $definition)));
     }
 
+    public function test_stacked_series_may_be_listed_in_any_order(): void
+    {
+        $definition = $this->build([
+            'in_a' => new DataSeries($this->metric, 'a', 'A', style: new SeriesStyle(stacked: true)),
+            'out_a' => new DataSeries($this->metric, 'c', 'C', style: new SeriesStyle(stacked: true, invert: true)),
+            'in_b' => new DataSeries($this->metric, 'b', 'B', style: new SeriesStyle(stacked: true)),
+            'in_c' => new DataSeries($this->metric, 'b', 'BB', style: new SeriesStyle(stacked: true)),
+            'out_b' => new DataSeries($this->metric, 'd', 'D', style: new SeriesStyle(stacked: true, invert: true)),
+            'line' => new DataSeries($this->metric, 'e', 'E'),
+            'out_c' => new DataSeries($this->metric, 'd', 'DD', style: new SeriesStyle(stacked: true, invert: true)),
+        ]);
+
+        // each series rests on the top of its own stack, unknown values add nothing
+        $this->assertContains('CDEF:ds2base=0,ds0,ADDNAN', $definition);
+        $this->assertContains('CDEF:ds4base=0,ds1drawn,ADDNAN', $definition);
+        $this->assertContains('CDEF:ds6base=ds4base,ds4drawn,ADDNAN', $definition);
+        $this->assertSame([
+            'AREA:ds0#FF0000:A                ',
+            'AREA:ds1drawn#FF0000:C                ',
+            'LINE:ds2base#00000000',
+            'AREA:ds2#FF0000:B                :STACK',
+            'AREA:ds3#FF0000:BB               :STACK',
+            'LINE:ds4base#00000000',
+            'AREA:ds4drawn#FF0000:D                :STACK',
+            'LINE1.25:ds5#FF0000:E                ',
+            'LINE:ds6base#00000000',
+            'AREA:ds6drawn#FF0000:DD               :STACK',
+        ], array_values(preg_grep('/^(AREA|LINE)/', $definition)));
+    }
+
+    public function test_sums_add_up_series_listed_before_them(): void
+    {
+        $missing = new MetricIdentity('missing', ['hostname' => 'localhost']);
+        $this->rrdFiles->shouldReceive('pathFor')->with($missing)->andReturn(null);
+
+        $definition = $this->build([
+            'a' => new DataSeries($this->metric, 'a', 'A', scale: 8),
+            'gone' => new DataSeries($missing, 'g', 'Gone'),
+            'b' => new DataSeries($this->metric, 'b', 'B'),
+            'sum' => new SeriesSum(['a', 'gone', 'b'], 'Sum', 'bps'),
+            'nested' => new SeriesSum(['sum', 'a'], 'Nested', style: new SeriesStyle(legendOnly: true)),
+            'empty' => new SeriesSum(['gone'], 'Empty'),
+            'later' => new SeriesSum(['after'], 'Later'),
+            'after' => new DataSeries($this->metric, 'c', 'After'),
+        ]);
+
+        $this->assertContains('CDEF:ds2=ds0,ds1,ADDNAN', $definition);
+        // the lowest and highest of a sum are those of its averages
+        $this->assertContains('CDEF:ds2min=ds0,ds1,ADDNAN', $definition);
+        $this->assertContains('CDEF:ds2max=ds0,ds1,ADDNAN', $definition);
+        $this->assertContains('LINE1.25:ds2#FF0000:Sum              ', $definition);
+        $this->assertContains('GPRINT:ds2max:MAX:%5.2lf%sbps', $definition);
+        $this->assertContains('CDEF:ds3=ds2,ds0,ADDNAN', $definition);
+        $this->assertContains('HRULE:0#00000000:Nested           ', $definition);
+        $this->assertEmpty(preg_grep('/^(AREA|LINE).*ds3/', $definition));
+        $this->assertEmpty(preg_grep('/Empty|Later/', $definition));
+        $this->assertContains('DEF:ds4=host/test.rrd:c:AVERAGE', $definition);
+        $this->assertSame(array_unique($definition), $definition);
+    }
+
+    public function test_traffic_summarizes_the_selected_series_and_the_previous_period_of_sums(): void
+    {
+        $definition = $this->build([
+            'in_a' => new DataSeries($this->metric, 'a', 'A', style: new SeriesStyle(stacked: true)),
+            'in_b' => new DataSeries($this->metric, 'b', 'B', style: new SeriesStyle(stacked: true)),
+            'in' => new SeriesSum(['in_a', 'in_b'], 'In', style: new SeriesStyle(legendOnly: true)),
+        ], new GraphOptions(traffic: new TrafficOptions(series: ['in'])), ['from' => 100, 'to' => 200, 'previous' => 'yes']);
+
+        $this->assertContains('VDEF:ds2pct=ds2,95,PERCENT', $definition);
+        $this->assertEmpty(preg_grep('/ds[01]pct/', $definition));
+        $this->assertContains('GPRINT:ds2pct:%5.2lf%s\n', $definition);
+        $this->assertContains('GPRINT:ds1:AVERAGE:%5.2lf%s\n', $definition);
+        // the previous period of the sum is the sum of the previous period of its series, defined once
+        $this->assertContains('CDEF:ds2prev=ds0prev,ds1prev,ADDNAN', $definition);
+        $this->assertContains('CDEF:ds2prevmax=ds0prev,ds1prev,ADDNAN', $definition);
+        $this->assertCount(1, preg_grep('/^DEF:ds0prev=/', $definition));
+        $this->assertSame(array_unique($definition), $definition);
+    }
+
     public function test_thresholds_are_dashed_lines(): void
     {
         $definition = $this->build(['a' => new DataSeries($this->metric, 'a', 'A')], new GraphOptions(thresholds: [
@@ -324,7 +405,7 @@ class RrdSeriesDefinitionTest extends TestCase
     }
 
     /**
-     * @param  array<string, DataSeries>  $series
+     * @param  array<string, DataSeries|SeriesSum>  $series
      * @param  array<string, mixed>  $params
      * @return array<int, string>
      */
