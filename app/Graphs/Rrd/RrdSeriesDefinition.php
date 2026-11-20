@@ -103,7 +103,7 @@ class RrdSeriesDefinition
 
                 if ($params->visible('previous')) {
                     array_push($defs, ...self::valueDefs("{$id}prev", $filename, $series, 'AVERAGE', ":start=$params->prev_from:end=$params->from", $params->period));
-                    $previousValues[] = "{$id}prev,UN,0,{$id}prev,IF" . $this->scaleRpn($drawScale);
+                    $previousValues[$direction][] = "{$id}prev,UN,0,{$id}prev,IF" . $this->scaleRpn($this->drawnFactor($drawScale, $style->invert));
                 }
             } else {
                 $drawing[] = "LINE1.25:$drawnId#$color:$label";
@@ -116,7 +116,9 @@ class RrdSeriesDefinition
                 if ($this->options->scaleMargin > 0) {
                     // invisible lines that only widen the autoscaled axis
                     $margin = self::number($this->options->scaleMargin);
-                    foreach (['above' => ['max', '+'], 'below' => ['min', '-']] as $name => [$suffix, $operator]) {
+                    // drawn below the axis, the minimum is the highest drawn value
+                    [$top, $bottom] = $this->drawnFactor($drawScale, $style->invert) < 0 ? ['min', 'max'] : ['max', 'min'];
+                    foreach (['above' => [$top, '+'], 'below' => [$bottom, '-']] as $name => [$suffix, $operator]) {
                         $value = $this->drawnValue($id . $suffix, $drawScale, $style->invert, $defs);
                         $defs[] = "CDEF:$id$name=$value,$value,ABS,$margin,*,$operator";
                         $margins[] = "LINE:$id$name#00000000";
@@ -136,9 +138,11 @@ class RrdSeriesDefinition
             }
         }
 
-        if ($previousValues) {
-            $defs[] = 'CDEF:previous=' . implode(',', $previousValues) . str_repeat(',+', count($previousValues) - 1);
-            array_push($drawing, 'AREA:previous#99999999:', 'LINE1.25:previous#666666:');
+        // the previous period of each stack, below the axis for series drawn below it
+        foreach ($previousValues as $direction => $values) {
+            $previous = $direction === 'up' ? 'previous' : "previous$direction";
+            $defs[] = "CDEF:$previous=" . implode(',', $values) . str_repeat(',+', count($values) - 1);
+            array_push($drawing, "AREA:$previous#99999999:", "LINE1.25:$previous#666666:");
         }
 
         if ($inverted) {
@@ -213,7 +217,7 @@ class RrdSeriesDefinition
      */
     private function drawnValue(string $id, float $drawScale, bool $invert, array &$defs): string
     {
-        $scale = $this->scaleRpn($drawScale * ($invert && ! LibrenmsConfig::get('webui.graph_stacked') ? -1 : 1));
+        $scale = $this->scaleRpn($this->drawnFactor($drawScale, $invert));
 
         if ($scale === '') {
             return $id;
@@ -232,7 +236,15 @@ class RrdSeriesDefinition
      */
     private function drawnDirection(float $drawScale, bool $invert): string
     {
-        return ($drawScale * ($invert && ! LibrenmsConfig::get('webui.graph_stacked') ? -1 : 1)) < 0 ? 'down' : 'up';
+        return $this->drawnFactor($drawScale, $invert) < 0 ? 'down' : 'up';
+    }
+
+    /**
+     * What drawing multiplies a value by, negative below the axis
+     */
+    private function drawnFactor(float $drawScale, bool $invert): float
+    {
+        return $drawScale * ($invert && ! LibrenmsConfig::get('webui.graph_stacked') ? -1 : 1);
     }
 
     /**

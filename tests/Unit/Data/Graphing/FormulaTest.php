@@ -21,6 +21,7 @@ class FormulaTest extends TestCase
         $this->assertSame(25.0, $loss->evaluate(['xmt' => 4, 'rcv' => 3]));
         $this->assertNull($loss->evaluate(['xmt' => 0, 'rcv' => 0]));
         $this->assertNull($loss->evaluate(['xmt' => 4, 'rcv' => null]));
+        $this->assertNull(new Formula('a', 'b', '-')->evaluate(['a' => INF, 'b' => INF]));
     }
 
     /**

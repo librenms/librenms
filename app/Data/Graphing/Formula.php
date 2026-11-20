@@ -72,7 +72,7 @@ final readonly class Formula
             };
         }
 
-        return $stack[0];
+        return is_nan($stack[0]) ? null : $stack[0];
     }
 
     /**

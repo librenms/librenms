@@ -237,6 +237,27 @@ class RrdSeriesDefinitionTest extends TestCase
         $this->assertContains('AREA:ds0range#3E444C::STACK', $dark);
     }
 
+    public function test_the_previous_period_of_inverted_stacks_is_drawn_below_the_axis(): void
+    {
+        $definition = $this->build([
+            'in' => new DataSeries($this->metric, 'a', 'In', style: new SeriesStyle(stacked: true)),
+            'out' => new DataSeries($this->metric, 'b', 'Out', style: new SeriesStyle(stacked: true, invert: true)),
+        ], params: ['from' => 100, 'to' => 200, 'previous' => 'yes']);
+
+        $this->assertContains('CDEF:previous=ds0prev,UN,0,ds0prev,IF', $definition);
+        $this->assertContains('CDEF:previousdown=ds1prev,UN,0,ds1prev,IF,-1,*', $definition);
+        $this->assertContains('AREA:previous#99999999:', $definition);
+        $this->assertContains('AREA:previousdown#99999999:', $definition);
+    }
+
+    public function test_scale_margin_of_an_inverted_line_widens_both_ends_of_the_drawing(): void
+    {
+        $definition = $this->build(['a' => new DataSeries($this->metric, 'a', 'A', style: new SeriesStyle(invert: true))], new GraphOptions(scaleMargin: 0.01));
+
+        $this->assertContains('CDEF:ds0above=ds0mindrawn,ds0mindrawn,ABS,0.01,*,+', $definition);
+        $this->assertContains('CDEF:ds0below=ds0maxdrawn,ds0maxdrawn,ABS,0.01,*,-', $definition);
+    }
+
     public function test_lines_do_not_draw_the_previous_period(): void
     {
         $definition = $this->build(['a' => new DataSeries($this->metric, 'a', 'A')], params: ['from' => 100, 'to' => 200, 'previous' => 'yes']);
