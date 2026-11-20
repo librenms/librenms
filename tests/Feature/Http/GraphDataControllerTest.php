@@ -104,7 +104,7 @@ class GraphDataControllerTest extends TestCase
         $response->assertJsonPath('series.0.color', '#F2F2F2');
         $response->assertJsonPath('series.0.rangeColor', '#3E444C');
         $response->assertJsonPath('axis.margin', 0.01);
-        $response->assertJsonFragment(['value' => 176, 'color' => '#FF0000']); // in the unit of the series
+        $response->assertJsonFragment(['value' => 176, 'color' => '#FF0000', 'shown' => true]); // in the unit of the series
     }
 
     public function testGraphsWithoutDataFilesHaveNoData(): void

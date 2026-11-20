@@ -289,7 +289,41 @@ class RrdSeriesDefinitionTest extends TestCase
         $this->assertContains('LINE1.5:80#FF0000:high\: 80 °C\l:dashes', $definition);
     }
 
-    public function test_scale_margin_widens_the_axis_with_invisible_lines(): void
+    public function test_shown_thresholds_are_kept_inside_the_axis_and_hidden_ones_are_not_drawn(): void
+    {
+        $definition = $this->build(['a' => new DataSeries($this->metric, 'a', 'A')], new GraphOptions(thresholds: [
+            new Threshold(10, 'low', SeriesRole::LowLimit),
+            new Threshold(50, 'high', SeriesRole::HighLimit),
+            new Threshold(500, 'far', SeriesRole::HighWarning, shown: false),
+        ]));
+
+        $this->assertContains('LINE:8#00000000', $definition);
+        $this->assertContains('LINE:52#00000000', $definition);
+        $this->assertContains('LINE1.5:50#FF0000:high\\l:dashes', $definition, 'the last shown threshold ends the legend line');
+        $this->assertEmpty(preg_grep('/far|500/', $definition));
+    }
+
+    public function test_inverted_and_mirrored_thresholds_are_drawn_below_the_axis_with_inverted_series(): void
+    {
+        $series = ['out' => new DataSeries($this->metric, 'a', 'Out', style: new SeriesStyle(invert: true))];
+        $options = new GraphOptions(thresholds: [
+            new Threshold(10, 'out', SeriesRole::PortSpeed, invert: true),
+            new Threshold(20, 'both', SeriesRole::PortSpeed, mirror: true),
+        ]);
+
+        $definition = $this->build($series, $options);
+        $this->assertContains('LINE1.5:-10#000000:out:dashes', $definition);
+        $this->assertContains('LINE1.5:20#000000:both\\l:dashes', $definition);
+        $this->assertContains('LINE1.5:-20#000000::dashes', $definition, 'the mirrored line is in the legend once');
+        $this->assertContains('LINE:-22#00000000', $definition);
+
+        LibrenmsConfig::shouldReceive('get')->with('webui.graph_stacked')->andReturn(true);
+        $stacked = $this->build($series, $options);
+        $this->assertContains('LINE1.5:10#000000:out:dashes', $stacked, 'drawn above the axis with the series');
+        $this->assertEmpty(preg_grep('/^LINE1.5:-/', $stacked));
+    }
+
+        public function test_scale_margin_widens_the_axis_with_invisible_lines(): void
     {
         $definition = $this->build(['a' => new DataSeries($this->metric, 'a', 'A')], new GraphOptions(scaleMargin: 0.01));
 

@@ -10,6 +10,8 @@ use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\ResolvedStyle;
 use App\Data\Graphing\SeriesSum;
 use App\Data\Graphing\Threshold;
+use App\Facades\LibrenmsConfig;
+use App\Graphs\Rrd\GraphTheme;
 use App\Graphs\Rrd\RrdGraphRenderer;
 use App\Graphs\Rrd\RrdSeriesReader;
 use LibreNMS\Exceptions\GraphException;
@@ -69,7 +71,9 @@ abstract class AbstractSeriesGraph extends AbstractGraph
             }
 
             $options = $this->options();
-            $styles = ResolvedStyle::resolve(array_intersect_key($series, $data->series), $options->palette, $this->params->isDark());
+            // the browser makes overlapping series see through itself
+            $theme = new GraphTheme($this->params->isDark(), $options->palette);
+            $styles = ResolvedStyle::resolve(array_intersect_key($series, $data->series), $theme);
             $css = fn (?string $hex) => $hex === null ? null : "#$hex";
 
             $drawn = [];
@@ -105,7 +109,11 @@ abstract class AbstractSeriesGraph extends AbstractGraph
                 thresholds: array_map(fn (Threshold $threshold) => [
                     'value' => $threshold->value,
                     'label' => $threshold->label,
-                    'color' => "#$threshold->color",
+                    'color' => '#' . $theme->color($threshold->role),
+                    'shown' => $threshold->shown,
+                    // as series marked invert, which stacked graphs draw above the axis
+                    'invert' => $threshold->invert && ! LibrenmsConfig::get('webui.graph_stacked'),
+                    'mirror' => $threshold->mirror && ! LibrenmsConfig::get('webui.graph_stacked'),
                 ], $options->thresholds),
             );
         });

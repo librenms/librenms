@@ -96,8 +96,7 @@ class RrdSeriesDefinition
             throw new NoGraphData(__('graph.errors.no_data_files'));
         }
 
-        // stacked graphs and graphs zoomed to the port speed draw inverted series above the axis, over the others
-        $this->overlaid = LibrenmsConfig::get('webui.graph_stacked') || ($this->options->traffic?->speedZoom && array_filter($this->options->traffic->speeds));
+        $this->overlaid = self::overlaid($this->options);
         $theme = new GraphTheme($params->isDark(), $this->options->palette, $this->overlaid && $inverted);
         $traffic = $this->options->traffic === null ? null : new RrdTrafficDefinition($this->options->traffic, $params, $theme, $this->overlaid);
         $averaged = count(array_filter(array_keys($this->files), fn ($key) => $this->series[$key]->style->stackAverage));
@@ -191,11 +190,20 @@ class RrdSeriesDefinition
             $drawing[] = 'HRULE:0#' . $theme->axis();
         }
 
-        if ($this->options->thresholds) {
-            $last = array_key_last($this->options->thresholds);
-            foreach ($this->options->thresholds as $index => $threshold) {
+        $thresholds = $this->options->shownThresholds();
+        if ($thresholds) {
+            // invisible lines that keep the thresholds inside an autoscaled axis, away from its edges
+            foreach ($this->options->thresholdBounds(! $this->overlaid) ?? [] as $bound) {
+                $margins[] = 'LINE:' . self::number($bound) . '#00000000';
+            }
+
+            $last = array_key_last($thresholds);
+            foreach ($thresholds as $index => $threshold) {
                 $label = str_replace(':', '\\:', $threshold->label) . ($index === $last ? '\\l' : '');
-                $drawing[] = 'LINE1.5:' . self::number($threshold->value) . '#' . $theme->color($threshold->role) . ":$label:dashes";
+                // a mirrored line is in the legend once
+                foreach ($threshold->drawnValues(! $this->overlaid) as $line => $value) {
+                    $drawing[] = 'LINE1.5:' . self::number($value) . '#' . $theme->color($threshold->role) . ':' . ($line === 0 ? $label : '') . ':dashes';
+                }
             }
         }
 
@@ -346,6 +354,14 @@ class RrdSeriesDefinition
     private function scaleRpn(float $scale): string
     {
         return $scale == 1 ? '' : ',' . self::number($scale) . ',*';
+    }
+
+    /**
+     * Stacked graphs and graphs zoomed to the port speed draw series marked invert above the axis, over the others
+     */
+    public static function overlaid(GraphOptions $options): bool
+    {
+        return LibrenmsConfig::get('webui.graph_stacked') || ($options->traffic->speedZoom ?? false);
     }
 
     /**

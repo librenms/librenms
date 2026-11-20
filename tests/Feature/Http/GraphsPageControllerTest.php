@@ -248,14 +248,14 @@ class GraphsPageControllerTest extends TestCase
         $view = Js::from(['compare' => null, 'trend' => false]);
         $response->assertSee('x-data="graphsPage(' . $range . ', ' . $options . ', true, ' . $view . ')"', false);
         $response->assertSee('data-reload="false"', false);
-        $response->assertSee(__('graphs.help.title'));
-        $response->assertSee(__('graphs.help.zoom_range'));
-        $response->assertDontSee('graphs.help.'); // every help text is translated
-        $response->assertDontSee('graphs.options.');
-        $response->assertSee(__('graphs.options.scale_log'));
-        $response->assertSee(__('graphs.options.mirror'));
-        $response->assertSee(__('graphs.options.stacking_stack'));
-        $response->assertDontSee(__('graphs.options.command'));
+        $response->assertSee(__('graph.help.title'));
+        $response->assertSee(__('graph.help.zoom_range'));
+        $response->assertDontSee('graph.help.'); // every help text is translated
+        $response->assertDontSee('graph.options.');
+        $response->assertSee(__('graph.options.scale_log'));
+        $response->assertSee(__('graph.options.mirror'));
+        $response->assertSee(__('graph.options.stacking_stack'));
+        $response->assertDontSee(__('graph.options.command'));
         $this->assertNoPhpWarningOutput($response->getContent());
 
         $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_renderer', 'value' => 'default'])->assertOk();
@@ -264,9 +264,9 @@ class GraphsPageControllerTest extends TestCase
         $response->assertSee('x-data="graphsPage(' . Js::from(['last' => 86400]) . ', ' . Js::from(new GraphViewOptions) . ', false, ', false);
         $response->assertSee('data-reload="true"', false);
         // the image graph has the same toolbar, its data can still be downloaded
-        $response->assertSee(__('graphs.zoom_in'));
-        $response->assertSee(__('graphs.export_csv'));
-        $response->assertDontSee(__('graphs.options.scale_log'));
+        $response->assertSee(__('graph.zoom_in'));
+        $response->assertSee(__('graph.export_csv'));
+        $response->assertDontSee(__('graph.options.scale_log'));
     }
 
     public function testGraphDrawnInTheBrowserStartsWithThePeriodUpToNow(): void
@@ -311,8 +311,8 @@ class GraphsPageControllerTest extends TestCase
         $response->assertOk();
         $response->assertDontSee('Interactive graph');
         $response->assertDontSee('x-data="timeSeriesGraph', false);
-        $response->assertSee(__('graphs.options.command'));
-        $response->assertDontSee(__('graphs.export_csv'));
+        $response->assertSee(__('graph.options.command'));
+        $response->assertDontSee(__('graph.export_csv'));
         $this->assertMatchesRegularExpression('/src="[^"]*type=device_poller_perf[^"]*"\s+fetchpriority="high"/', $response->getContent(), 'the main graph is an image');
     }
 
@@ -406,10 +406,10 @@ class GraphsPageControllerTest extends TestCase
                 return $query;
             };
 
-            return $byLabel[__('graphs.options.legend')]['checked'] && $query(__('graphs.options.legend'))['legend'] === 'no'
-                && $byLabel[__('graphs.options.previous')]['checked'] && ! isset($query(__('graphs.options.previous'))['previous'])
-                && ! $byLabel[__('graphs.options.command')]['checked'] && $query(__('graphs.options.command'))['showcommand'] === 'yes'
-                && isset($query(__('graphs.options.port_speed'))['port_speed_zoom']);
+            return $byLabel[__('graph.options.legend')]['checked'] && $query(__('graph.options.legend'))['legend'] === 'no'
+                && $byLabel[__('graph.options.previous')]['checked'] && ! isset($query(__('graph.options.previous'))['previous'])
+                && ! $byLabel[__('graph.options.command')]['checked'] && $query(__('graph.options.command'))['showcommand'] === 'yes'
+                && isset($query(__('graph.options.port_speed'))['port_speed_zoom']);
         });
     }
 

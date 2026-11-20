@@ -92,11 +92,6 @@ class GraphTheme
         return $this->pick('666666', 'AAAAAA');
     }
 
-    public function portSpeed(): string
-    {
-        return $this->pick('000000', 'F2F2F2');
-    }
-
     public function previousStackArea(): string
     {
         return $this->pick('99999999', '77777799');
@@ -138,6 +133,7 @@ class GraphTheme
             SeriesRole::LowWarning => ['lines' => [$this->pick('005BDF', '4DA3FF')]],
             SeriesRole::HighWarning => ['lines' => ['FFA420']],
             SeriesRole::HighLimit => ['lines' => ['FF0000']],
+            SeriesRole::PortSpeed => ['lines' => [$this->pick('000000', 'F2F2F2')]],
         };
 
         return [

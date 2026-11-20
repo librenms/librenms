@@ -10,7 +10,7 @@
     and graph-resized with {width, height} once dragged, nulls when back to the automatic size.
 --}}
 @php
-    $columns = collect(App\Data\Graphing\GraphViewOptions::COLUMNS)->mapWithKeys(fn (string $column) => [$column => __("graphs.legend.$column")]);
+    $columns = collect(App\Data\Graphing\GraphViewOptions::COLUMNS)->mapWithKeys(fn (string $column) => [$column => __("graph.legend.$column")]);
     $sortButton = 'tw:inline-flex tw:items-center tw:gap-1 tw:p-0 tw:border-0 tw:bg-transparent tw:font-semibold tw:text-inherit tw:cursor-pointer tw:whitespace-nowrap';
     $handle = 'tw:absolute tw:bottom-0 tw:z-10 tw:w-4 tw:h-4 tw:touch-none tw:opacity-30 tw:group-hover:opacity-100 tw:transition-opacity
                tw:after:absolute tw:after:bottom-0.5 tw:after:w-2.5 tw:after:h-2.5 tw:after:border-b-2 tw:after:border-gray-500 tw:dark:after:border-gray-400';
@@ -27,7 +27,7 @@
 
         <div x-show="loading" class="tw:absolute tw:inset-0 tw:flex tw:items-center tw:justify-center">
             <i class="fa-solid fa-spinner fa-spin fa-2x" aria-hidden="true"></i>
-            <span class="tw:sr-only">{{ __('graphs.loading') }}</span>
+            <span class="tw:sr-only">{{ __('graph.loading') }}</span>
         </div>
 
         <div x-show="error" x-cloak x-text="error" role="alert"
@@ -43,16 +43,16 @@
                     <span class="tw:grow tw:min-w-0 tw:max-w-64 tw:truncate" x-text="row.label"></span>
                     <span class="tw:font-mono tw:tabular-nums tw:pl-2 tw:shrink-0" x-text="row.value"></span>
                     <span x-show="row.previous !== null" class="tw:font-mono tw:tabular-nums tw:shrink-0 tw:text-gray-500 tw:dark:text-gray-400"
-                          :title="@js(__('graphs.previous'))" x-text="`(${row.previous})`"></span>
+                          :title="@js(__('graph.previous'))" x-text="`(${row.previous})`"></span>
                 </div>
             </template>
-            <div x-show="tooltip?.more" class="tw:text-gray-500 tw:dark:text-gray-400">+<span x-text="tooltip?.more"></span> {{ __('graphs.more') }}</div>
+            <div x-show="tooltip?.more" class="tw:text-gray-500 tw:dark:text-gray-400">+<span x-text="tooltip?.more"></span> {{ __('graph.more') }}</div>
         </div>
 
         <div class="{{ $handle }} tw:right-0 tw:cursor-nwse-resize tw:after:right-0.5 tw:after:border-r-2"
-             title="{{ __('graphs.resize') }}" x-on:pointerdown="startResize($event, 1)" x-on:dblclick="autoSize()"></div>
+             title="{{ __('graph.resize') }}" x-on:pointerdown="startResize($event, 1)" x-on:dblclick="autoSize()"></div>
         <div class="{{ $handle }} tw:left-0 tw:cursor-nesw-resize tw:after:left-0.5 tw:after:border-l-2"
-             title="{{ __('graphs.resize') }}" x-on:pointerdown="startResize($event, -1)" x-on:dblclick="autoSize()"></div>
+             title="{{ __('graph.resize') }}" x-on:pointerdown="startResize($event, -1)" x-on:dblclick="autoSize()"></div>
     </div>
 
     <div class="tw:overflow-x-auto tw:mt-2" x-show="legend.length" x-cloak>
@@ -61,7 +61,7 @@
                 <tr class="tw:text-gray-500 tw:dark:text-gray-400">
                     <th class="tw:text-left tw:font-semibold" :aria-sort="sort?.column === 'label' ? (sort.descending ? 'descending' : 'ascending') : 'none'">
                         <button type="button" class="{{ $sortButton }}" x-on:click="sortBy('label')">
-                            {{ __('graphs.legend.series') }} <i class="fa-solid tw:text-xs" :class="sortIcon('label')" aria-hidden="true"></i>
+                            {{ __('graph.legend.series') }} <i class="fa-solid tw:text-xs" :class="sortIcon('label')" aria-hidden="true"></i>
                         </button>
                     </th>
                     <template x-for="column in options.columns" :key="column">
@@ -95,11 +95,13 @@
             </tbody>
         </table>
         <div class="tw:flex tw:flex-wrap tw:justify-center tw:gap-x-6 tw:gap-y-1 tw:mt-1 tw:text-xs tw:sm:text-sm" x-show="thresholds.length">
-            <template x-for="threshold in thresholds" :key="threshold.label">
-                <span class="tw:flex tw:items-center tw:gap-2">
+            <template x-for="(threshold, index) in thresholds" :key="index">
+                <button type="button" :aria-pressed="thresholdShown(index)" x-on:click="toggleThreshold(index)"
+                        class="tw:flex tw:items-center tw:gap-2 tw:p-0 tw:border-0 tw:bg-transparent tw:text-inherit tw:cursor-pointer tw:select-none"
+                        :class="! thresholdShown(index) && 'tw:opacity-40'">
                     <span class="tw:inline-block tw:w-4 tw:border-t-2 tw:border-dashed" :style="{ borderColor: threshold.color }"></span>
                     <span x-text="threshold.label"></span>
-                </span>
+                </button>
             </template>
         </div>
     </div>
@@ -154,6 +156,7 @@
                 error: null,
                 legend: [],
                 thresholds: [],
+                toggledThresholds: [], // indexes the viewer turned on or off
                 hidden: [],
                 tooltip: null,
                 zoomed: false,
@@ -393,10 +396,24 @@
                         compact: ! WIDE_SCREEN.matches,
                         draw: Object.fromEntries(DRAWN_OPTIONS.map((key) => [key, this.options[key]])),
                         previous: earlier,
+                        thresholds: graph.thresholds.filter((threshold, index) => this.thresholdShown(index)),
                         onView: (next, moving) => this.show(next, moving),
                         onReset: () => this.reset(),
                         onHover: (position) => this.hover(position),
                     });
+                },
+
+                // as the graph sets it, unless the viewer turned it on or off
+                thresholdShown(index) {
+                    return graph?.thresholds[index]?.shown !== this.toggledThresholds.includes(index);
+                },
+
+                toggleThreshold(index) {
+                    this.toggledThresholds = this.toggledThresholds.includes(index)
+                        ? this.toggledThresholds.filter((other) => other !== index)
+                        : [...this.toggledThresholds, index];
+
+                    this.draw();
                 },
 
                 // of what is shown, not the margins

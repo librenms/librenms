@@ -7,6 +7,9 @@ namespace App\Data\Graphing;
  */
 readonly class GraphOptions
 {
+    // of the spread of the thresholds, between them and the edge of the axis
+    private const float THRESHOLD_ROOM = 0.05;
+
     /**
      * @param  bool|null  $scaleRigid  defaults to rigid when neither scaleMin nor scaleMax is set
      * @param  string  $legendTitle  heading above the series labels
@@ -16,7 +19,7 @@ readonly class GraphOptions
      * @param  string|null  $rightAxisLabel  shows a right axis with the same scale as the left one
      * @param  string|null  $axisUnit  shown after the axis values, which are then shown without SI prefixes
      * @param  string  $palette  the graph_colours palette for series without a color
-     * @param  list<Threshold>  $thresholds  reference lines, such as alert limits
+     * @param  list<Threshold>  $thresholds  reference lines, such as alert limits, those shown are always inside the value axis
      * @param  float  $scaleMargin  keep this fraction of the highest and lowest values of each line between them and the edge of an
      *                              autoscaled axis, so values that barely change still get a range with labels
      */
@@ -40,5 +43,40 @@ readonly class GraphOptions
         public float $scaleMargin = 0,
         public ?string $axisUnit = null,
     ) {
+    }
+
+    /**
+     * The lowest and highest values the value axis has to show so every shown threshold is inside it, away from its edges.
+     * Room is a share of the spread of the thresholds and does not cross zero, except around a threshold at zero.
+     * The browser applies the same rule to the thresholds the viewer shows, see thresholdBounds in resources/js/timeSeriesChart.js.
+     *
+     * @param  bool  $inverted  series marked invert, and their thresholds, are drawn below the axis
+     * @return array{float, float}|null null without shown thresholds
+     */
+    public function thresholdBounds(bool $inverted = true): ?array
+    {
+        $values = array_merge(...array_map(fn (Threshold $threshold) => $threshold->drawnValues($inverted), $this->shownThresholds()));
+        if ($values === []) {
+            return null;
+        }
+
+        $low = min($values);
+        $high = max($values);
+        $room = (($high - $low) ?: abs($high) ?: 1) * self::THRESHOLD_ROOM;
+
+        return [
+            $low > 0 && $low - $room < 0 ? 0.0 : $low - $room,
+            $high < 0 && $high + $room > 0 ? 0.0 : $high + $room,
+        ];
+    }
+
+    /**
+     * The thresholds drawn unless the viewer chooses otherwise
+     *
+     * @return list<Threshold>
+     */
+    public function shownThresholds(): array
+    {
+        return array_values(array_filter($this->thresholds, fn (Threshold $threshold) => $threshold->shown));
     }
 }

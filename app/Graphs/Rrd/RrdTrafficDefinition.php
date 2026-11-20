@@ -8,10 +8,9 @@ use App\Data\Graphing\SeriesSum;
 use App\Data\Graphing\TrafficOptions;
 use Closure;
 use LibreNMS\Data\Store\Rrd;
-use LibreNMS\Util\Number;
 
 /**
- * Adds traffic percentiles, transferred bytes, comparison lines and port speeds to a series definition.
+ * Adds traffic percentiles, transferred bytes and comparison lines to a series definition.
  */
 class RrdTrafficDefinition
 {
@@ -120,17 +119,6 @@ class RrdTrafficDefinition
                 array_push($drawing, ...$totals);
                 $drawing[array_key_last($drawing)] .= '\\l';
             }
-        }
-
-        $speeds = array_filter($this->options->speeds);
-        if (count(array_unique($speeds)) === 1) {
-            $speeds = ['' => reset($speeds)];
-        }
-        foreach ($speeds as $key => $speed) {
-            $value = $key === 'out' && ! $this->overlaid ? -$speed : $speed;
-            $type = $this->options->speedZoom ? 'LINE2' : 'HRULE';
-            $label = __($key === '' ? 'graph.legend.port_speed' : "graph.legend.port_speed_$key", ['speed' => Number::formatSi($speed, 2, 0, 'bps')]);
-            $drawing[] = "$type:$value#{$this->theme->portSpeed()}:" . Rrd::safeDescr($label) . '\\n';
         }
 
         return $drawing;

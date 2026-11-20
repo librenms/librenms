@@ -13,7 +13,8 @@ readonly class GraphData
      * @param  array{label: string, min: float|null, max: float|null, base: int, margin: float}  $axis  the value axis, min and max are limits when set.
      *                                                                                                  Without limits, margin is the fraction of the data range kept free above and below it.
      * @param  list<GraphDataSeries>  $series
-     * @param  list<array{value: float, label: string, color: string}>  $thresholds  reference lines, such as alert limits, colors are CSS hex colors
+     * @param  list<array{value: float, label: string, color: string, shown: bool, invert: bool, mirror: bool}>  $thresholds  reference lines, such as alert limits, colors are CSS hex colors.
+     *                                                                                                                        Shown ones are drawn until the viewer hides them, the others until the viewer shows them.
      */
     public function __construct(
         public array $timestamps,

@@ -167,14 +167,14 @@ class GraphsPageController extends Controller
         $legend = $request->input('legend') !== 'no';
         $previous = $request->input('previous') === 'yes';
         $options = [
-            ['label' => __('graphs.options.legend'), 'checked' => $legend, 'link' => $this->graphUrl($request, ['legend' => $legend ? 'no' : null])],
-            ['label' => __('graphs.options.previous'), 'checked' => $previous, 'link' => $this->graphUrl($request, ['previous' => $previous ? null : 'yes'])],
-            ['label' => __('graphs.options.command'), 'checked' => $showCommand, 'link' => $this->graphUrl($request, ['showcommand' => $showCommand ? null : 'yes'])],
+            ['label' => __('graph.options.legend'), 'checked' => $legend, 'link' => $this->graphUrl($request, ['legend' => $legend ? 'no' : null])],
+            ['label' => __('graph.options.previous'), 'checked' => $previous, 'link' => $this->graphUrl($request, ['previous' => $previous ? null : 'yes'])],
+            ['label' => __('graph.options.command'), 'checked' => $showCommand, 'link' => $this->graphUrl($request, ['showcommand' => $showCommand ? null : 'yes'])],
         ];
 
         if ($fullType === 'port_bits') {
             $speedZoom = $request->boolean('port_speed_zoom', (bool) LibrenmsConfig::get('graphs.port_speed_zoom'));
-            $options[] = ['label' => __('graphs.options.port_speed'), 'checked' => $speedZoom, 'link' => $this->graphUrl($request, ['port_speed_zoom' => $speedZoom ? 0 : 1])];
+            $options[] = ['label' => __('graph.options.port_speed'), 'checked' => $speedZoom, 'link' => $this->graphUrl($request, ['port_speed_zoom' => $speedZoom ? 0 : 1])];
         }
 
         return $options;

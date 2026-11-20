@@ -17,7 +17,7 @@ class GraphDataController extends Controller
         $graph = $request->graph();
 
         if (! $graph instanceof AbstractSeriesGraph) {
-            return response()->json(['message' => __('graphs.image_only')], 404);
+            return response()->json(['message' => __('graph.image_only')], 404);
         }
 
         try {

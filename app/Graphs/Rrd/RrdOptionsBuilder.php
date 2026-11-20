@@ -85,7 +85,7 @@ class RrdOptionsBuilder
     }
 
     /**
-     * The requested scale is used when the graph does not set one
+     * The requested scale is used when the graph does not set one, both widen to show every threshold
      *
      * @return array<int, string|int|float>
      */
@@ -95,6 +95,13 @@ class RrdOptionsBuilder
         $min = $graph->scaleMin ?? $this->params->scale_min;
         $max = $graph->scaleMax ?? $this->params->scale_max;
         $rigid = $graph->scaleRigid ?? $this->params->scale_rigid;
+        $bounds = $graph->thresholdBounds(! RrdSeriesDefinition::overlaid($graph));
+
+        // limits leave no threshold out
+        if ($bounds !== null) {
+            $min = $min === null ? null : min($min, $bounds[0]);
+            $max = $max === null ? null : max($max, $bounds[1]);
+        }
 
         if ($min === null && $max === null) {
             $options[] = '--alt-autoscale-max';

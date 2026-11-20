@@ -6,7 +6,7 @@
  * @property {{label: string, min: ?number, max: ?number, base: number, margin: number}} axis min and max are limits when set,
  *     without them a margin above zero asks to fit the axis to the data
  * @property {GraphSeries[]} series
- * @property {Threshold[]} thresholds reference lines, such as alert limits
+ * @property {Threshold[]} thresholds reference lines, such as alert limits, shown ones are drawn until the viewer hides them
  */
 
 /**
@@ -27,7 +27,15 @@
  * @property {?Array<?number>} max null when the same as avg
  */
 
-/** @typedef {{value: number, label: string, color: string}} Threshold */
+/**
+ * @typedef {object} Threshold
+ * @property {number} value
+ * @property {string} label
+ * @property {string} color
+ * @property {boolean} shown drawn until the viewer hides it
+ * @property {boolean} invert a limit of the series drawn below the axis, drawn below it too when they are
+ * @property {boolean} mirror a limit of the series on both sides of the axis, also drawn below it when series are
+ */
 
 /** @typedef {{from: number, to: number}} View unix times */
 
@@ -47,6 +55,7 @@
  * @property {boolean} compact for small screens
  * @property {DrawOptions} draw
  * @property {?GraphData} previous an earlier time moved to line up with the graph, drawn as dashed lines
+ * @property {Threshold[]} thresholds the ones to draw, always inside the value axis
  * @property {(view: View, moving: boolean) => void} onView zoomed or panned, moving while more is likely to follow
  * @property {() => void} onReset
  * @property {(position: ?{index: number, time: number, left: number, previous: Object<string, ?number>}) => void} onHover
@@ -287,7 +296,7 @@ function trendOf(timestamps, values, { from, to }) {
 // A range is two layers, its top and its bottom, the fill is between them.
 // Values get the drawn data {series, totals} of now and of the previous time, null without it.
 // A constant layer has the same value at every time.
-function layersFor(series, thresholds, { range: showRange, trend }, comparing) {
+function layersFor(series, thresholds, { range: showRange, trend, mirror }, comparing) {
     const stacked = series.filter((item) => item.stacked);
     const lines = series.filter((item) => ! item.stacked);
     const average = (item) => ({ series: data }) => drawnValues(data[item.key], data[item.key].avg);
@@ -322,7 +331,9 @@ function layersFor(series, thresholds, { range: showRange, trend }, comparing) {
             values: ({ totals }) => totals[item.key],
         })).reverse(),
         ...lines.map((item) => ({ stroke: item.color, values: average(item) })),
-        ...thresholds.map((threshold) => ({ stroke: threshold.color, dash: THRESHOLD_DASH, constant: threshold.value, values: () => null })),
+        ...thresholds.flatMap((threshold) => thresholdLines(threshold, mirror).map((value) => ({
+            stroke: threshold.color, dash: THRESHOLD_DASH, constant: value, values: () => null,
+        }))),
         ...(comparing ? series : []).map((item) => ({
             stroke: `${item.color}b3`,
             dash: PREVIOUS_DASH,
@@ -352,6 +363,60 @@ function valueRange(axis) {
         const room = (max - min || 1) * 0.05;
 
         return [min < floor ? min - room : min, max === axis.max ? max : max + room];
+    };
+}
+
+const THRESHOLD_ROOM = 0.05; // of the spread of the thresholds, between them and the edge of the axis
+
+/**
+ * Where the line of a threshold is drawn, as Threshold::drawnValues() for the image graphs
+ *
+ * @param {Threshold} threshold
+ * @param {boolean} mirror series marked invert are drawn below the axis
+ * @returns {number[]}
+ */
+function thresholdLines({ value, invert, mirror: both }, mirror) {
+    if (! mirror) {
+        return [value];
+    }
+
+    return both ? [value, -value] : [invert ? -value : value];
+}
+
+/**
+ * The lowest and highest values the axis has to show so every threshold is inside it, away from its edges.
+ * The same rule as GraphOptions::thresholdBounds() for the image graphs.
+ *
+ * @param {Threshold[]} thresholds
+ * @param {boolean} mirror series marked invert are drawn below the axis
+ * @returns {?number[]} null without thresholds
+ */
+function thresholdBounds(thresholds, mirror) {
+    if (thresholds.length === 0) {
+        return null;
+    }
+
+    const values = thresholds.flatMap((threshold) => thresholdLines(threshold, mirror));
+    const low = Math.min(...values);
+    const high = Math.max(...values);
+    const room = (high - low || Math.abs(high) || 1) * THRESHOLD_ROOM;
+
+    return [
+        low > 0 && low - room < 0 ? 0 : low - room,
+        high < 0 && high + room > 0 ? 0 : high + room,
+    ];
+}
+
+// a range that also reaches the bounds
+function including(range, bounds) {
+    if (bounds === null) {
+        return range;
+    }
+
+    return (plot, dataMin, dataMax) => {
+        const [min, max] = range(plot, dataMin, dataMax);
+
+        return [Math.min(min, bounds[0]), Math.max(max, bounds[1])];
     };
 }
 
@@ -434,13 +499,15 @@ function commonUnit(series) {
  * @param {ChartOptions} options
  * @returns {Chart}
  */
-export default function createChart(element, graph, { view, hidden, compact, draw, previous, onView, onReset, onHover }) {
+export default function createChart(element, graph, { view, hidden, compact, draw, previous, thresholds, onView, onReset, onHover }) {
     const label = compact ? '' : graph.axis.label;
     const shownSeries = graph.series.filter((item) => ! hidden.has(item.key) && ! item.legendOnly);
     const visible = shownSeries.map((item) => restyled(item, draw));
     const comparing = previous !== null;
-    const layers = layersFor(visible, graph.thresholds, draw, comparing);
+    const layers = layersFor(visible, thresholds, draw, comparing);
     const log = draw.scale === 'log';
+    const logBase = graph.axis.base === 1024 ? 2 : 10;
+    const bounds = thresholdBounds(thresholds, draw.mirror);
     const unit = commonUnit(graph.series);
     const zone = LibreNMSDate.zone();
     // read per draw, the site style can change
@@ -608,8 +675,8 @@ export default function createChart(element, graph, { view, hidden, compact, dra
             x: { auto: false, range: () => [shown.from, shown.to] },
             // asinh is logarithmic away from zero and also draws values at or below it
             y: log
-                ? { distr: 4, log: graph.axis.base === 1024 ? 2 : 10 }
-                : { range: draw.scale === 'fit' ? fittedRange : valueRange(graph.axis) },
+                ? { distr: 4, log: logBase, range: bounds === null ? undefined : (plot, min, max) => uPlot.rangeAsinh(Math.min(min ?? bounds[0], bounds[0]), Math.max(max ?? bounds[1], bounds[1]), logBase, false) }
+                : { range: including(draw.scale === 'fit' ? fittedRange : valueRange(graph.axis), bounds) },
         },
         axes: [
             { stroke: text, grid: { stroke: GRID }, ticks: { stroke: GRID }, values: TIME_AXIS },
