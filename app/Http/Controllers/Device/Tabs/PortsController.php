@@ -44,7 +44,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
 use LibreNMS\Interfaces\UI\DeviceTab;
-use LibreNMS\Util\Url;
 
 class PortsController implements DeviceTab
 {
@@ -447,14 +446,13 @@ class PortsController implements DeviceTab
     }
 
     /**
-     * get the ports sub tab name including handling legacy urls
+     * get the ports sub tab name
      */
     private function parseTab(Request $request): string
     {
-        $path = $request->route('view') ?? $request->route('vars', LibrenmsConfig::get('ports_page_default'));
         $view = $request->query('view');
         if (! is_string($view) || $view === '') {
-            $view = Url::parseLegacyPath($path)->get('view', $path);
+            $view = $request->route('view') ?? LibrenmsConfig::get('ports_page_default');
         }
 
         return $view === 'neighbours' ? 'links' : $view;

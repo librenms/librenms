@@ -558,10 +558,7 @@ class Url
             } else {
                 [$name, $value] = array_pad(explode('=', $segment), 2, null);
                 if ($value === null) {
-                    if ($vars['page'] == 'device' && $pos < 3) {
-                        // translate laravel device routes properly
-                        $vars[$pos === 1 ? 'device' : 'tab'] = $name;
-                    } elseif ($name) {
+                    if ($name) {
                         $vars[$name] = 'yes';
                     }
                 } else {

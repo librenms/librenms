@@ -26,7 +26,6 @@ parameters:
         - alerts.php
         - billing-calculate.php
         - check-services.php
-        - config_to_json.php
         - daily.php
         - delhost.php
         - discovery.php

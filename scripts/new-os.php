@@ -5,7 +5,6 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Modules\Core;
 use LibreNMS\Util\Debug;
 
-$init_modules = [''];
 require __DIR__ . '/../includes/init.php';
 
 $options = getopt('h:o:t:v:d::');

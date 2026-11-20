@@ -67,7 +67,7 @@ class VlansController implements DeviceTab
         $searchVlanNumber = $request->query->get('searchVlanNumber');
         $searchVlanName = $request->query->get('searchVlanName');
 
-        $view = $request->query('view', $request->route('vars', ''));
+        $view = $request->query('view', '');
 
         return [
             'view' => in_array($view, ['bits', 'upkts', 'nupkts', 'errors'], true) ? $view : '',

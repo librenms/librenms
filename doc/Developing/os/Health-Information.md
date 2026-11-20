@@ -408,8 +408,6 @@ Add code for your new sensor class to these existing files:
 are guessable when a SNMP-retrievable threshold is not available, add a case for the sensor class
 to the sensor_limit() and/or sensor_low_limit() functions.
 - `LibreNMS/Util/ObjectCache.php`: optional - choose menu grouping for the sensor class.
-- `includes/html/pages/device/overview.inc.php`: add `require 'overview/sensors/$class.inc.php'`
-in the desired order for the device overview page.
 - `lang/en/sensors.php`: add human-readable names and units for the sensor class
 in English. You can also add other languages.
 
@@ -417,21 +415,8 @@ Create and populate new files for the sensor class in the following places:
 
 - `includes/discovery/sensors/$class/`: create the folder where advanced php-based discovery
 files are stored. Not used for yaml discovery.
-=======
-- `includes/html/pages/device/overview.inc.php`: add `require 'overview/sensors/$class.inc.php'` in the desired
-order for the device overview page.
-- `lang/en/sensors.php`: add human-readable names and units for the sensor class in English, feel
-You can also add other languages.
-
-Create and populate new files for the sensor class in the following places:
-
-- `includes/discovery/sensors/$class/`: create the folder where advanced php-based discovery files
-are stored. Not used for yaml discovery.
 - `includes/html/graphs/device/$class.inc.php`: define unit names used in RRDtool graphs.
 - `includes/html/graphs/sensor/$class.inc.php`: define various [parameters](https://oss.oetiker.ch/rrdtool/doc/rrdgraph_graph.en.html) for RRDtool graphs.
-- `includes/html/pages/device/health/$class.inc.php`
-- `includes/html/pages/device/overview/sensors/$class.inc.php`
-- `includes/html/pages/health/$class.inc.php`
 
 #### Advanced health sensor example
 

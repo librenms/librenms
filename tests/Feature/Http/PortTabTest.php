@@ -143,7 +143,7 @@ final class PortTabTest extends TestCase
         $port = $this->port();
 
         $this->actingAs(User::factory()->create(['enabled' => 1]))
-            ->get(route('device', ['device' => $port->device_id, 'tab' => 'port', 'vars' => "port=$port->port_id/view=notes"]))
+            ->get(route('device.legacy', ['device' => $port->device_id, 'tab' => 'port', 'vars' => "port=$port->port_id/view=notes"]))
             ->assertForbidden();
     }
 
@@ -161,7 +161,7 @@ final class PortTabTest extends TestCase
         $port = $this->port();
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $port->device_id, 'tab' => 'port', 'port' => $port->port_id]))
+            ->get(route('device.legacy', ['device' => $port->device_id, 'tab' => 'port', 'port' => $port->port_id]))
             ->assertNotFound();
     }
 

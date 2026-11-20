@@ -201,18 +201,62 @@ Set these named arguments on `SeriesStyle` to control an individual series:
 
 | Option | Effect |
 | --- | --- |
-| `color: '0000cc'` | Sets a hex line or area color, without `#`. Otherwise, uses the graph palette. |
+| `role: SeriesRole::In` | Says what the series shows, which sets its colors. Otherwise, uses the graph palette. |
 | `fill: true` | Fills the area beneath a line. |
-| `fillColor: '9999cc'` | Sets the fill color; the default is a transparent version of the line color. |
 | `stacked: true` | Draws an area above the preceding stacked series. |
 | `invert: true` | Draws below zero, unless `webui.graph_stacked` is enabled. |
 | `drawScale: 0.5` | Scales only the drawing; legend values retain the series value. |
 | `stackAverage: true` | Divides the drawing by the number of drawn series with this set, so a stack of percentages shows their average. |
+| `maxFill: true` | Fills the area below the highest value of each interval, behind the other fills. |
+| `range: true` | Fills the area between the lowest and highest value of each interval, behind the other fills. |
+| `legendOnly: true` | Shows the series in the legend without drawing it. |
+
+Inverted stacked series stack separately below the axis. Stacked series may be
+listed in any order, such as the in and out series of each port together.
+
+Graphs never set colors. A `SeriesRole` says what a series shows, such as
+`In`, `Out`, `Error`, `Value` (the measured value, in the color of the legend
+text), `Muted` (free space) or `SeriesRole::usage($percent, $warn)` for used
+capacity, and the renderer picks colors that suit the light or dark site style.
+Drawn series that share a role get different shades, so stacked ports each get
+their own color. Stacked `In` and `Out` series take their shades from the
+`graph_colours.greens` and `graph_colours.purples` palettes, so a site that
+changes those palettes changes these graphs too. When `webui.graph_stacked`
+draws inverted series above the axis, the renderer makes areas and fills
+translucent so the series behind them stay visible.
 
 To convert the values themselves, use `scale` on `DataSeries`. For example,
 `scale: 8, unit: 'bps'` converts a stored bytes-per-second field to bits per
 second, including the legend values. Setting `unit` alone only adds a suffix;
-it does not convert values.
+it does not convert values. `offset` is added after the scale: `scale: 1.8,
+offset: 32` converts celsius to fahrenheit.
+
+The lowest and highest value of each interval come from the stored minimum and
+maximum of `field`. When they are stored in fields of their own, name them with
+`minField` and `maxField`.
+
+To show a value calculated from several fields of the metric, pass a `Formula`
+as the field. It is written in reverse polish notation with field names,
+numbers and the operators `+ - * /`:
+
+```php
+// percent of pings lost
+new DataSeries($metric, new Formula('xmt', 'rcv', '-', 'xmt', '/', 100, '*'), 'Loss', '%');
+```
+
+The lowest and highest values of a formula are those of its averages.
+Datastores that cannot calculate it themselves use `Formula::evaluate()`.
+
+To add up series of the graph, such as the traffic of every port of a device,
+add a `SeriesSum` with the keys of those series. It may only use series listed
+before it, including other sums. A series without a value at a time counts as
+zero, and series without stored data are left out:
+
+```php
+$series['in'] = new SeriesSum(['in_1', 'in_2'], 'Total In', 'bps', new SeriesStyle(legendOnly: true));
+```
+
+Like a formula, the lowest and highest values of a sum are those of its averages.
 
 ### Graph options
 
@@ -227,7 +271,15 @@ Common named arguments on `GraphOptions` are:
 | `labelWidth` | Pads or cuts the series labels and legend title to this many characters; defaults to `16`. |
 | `palette` | Selects a palette from `graph_colours`; defaults to `mixed`. |
 | `base` | Sets the scaling base, such as `1024` for binary units. |
-| `unitsExponent` | Controls the axis unit exponent; `0` uses unprefixed units. |
+| `unitsExponent` | Controls the axis unit exponent; `0` shows axis and legend values without SI prefixes, for units such as days or milliseconds. |
+| `thresholds` | Draws a dashed `Threshold` line for each value, such as alert limits, in the units of the series. Its role, such as `SeriesRole::HighLimit`, sets its color. |
+| `scaleMargin` | Widens an autoscaled axis by this fraction of the values, so values that barely change still get axis labels. |
+| `axisUnit` | Shows a unit after the axis values, which are then shown without SI prefixes. |
+| `rightAxisLabel` | Adds a right axis with the same scale as the left one. |
+
+Describe what the graph should show rather than how rrdtool draws it.
+`leftAxisFormat` and `rightAxis` take rrdtool syntax and only exist for the
+legacy graphs; graphs drawn from other datastores ignore them.
 
 For example, a percentage graph can use `scaleMin: 0, scaleMax: 100,
 scaleRigid: true`. See `app/Data/Graphing/GraphOptions.php` for all options.
@@ -284,6 +336,17 @@ name. LibreNMS prefers a matching graph class over a legacy
 `includes/html/graphs/<type>/<subtype>.inc.php` file. If no class matches, it
 falls back to the legacy include.
 
+A graph type may have a `GenericGraph` class that draws every subtype without
+a class or legacy include of its own. For example, `App\Graphs\Sensor\GenericGraph`
+draws `sensor_temperature`, `sensor_voltage` and the other sensor classes.
+
+The metric identity is authoritative: datastores store and read the metric by
+it, so choose clean measurement and tag names rather than copying how the data
+happens to be stored now. If existing data is stored under other names, such
+as the `icmp-perf` measurement of `ping` or `mempool_type` instead of `type`,
+add those names to `LibreNMS\Data\Store\MetricNames`. Every datastore then
+finds the existing data by the clean identity.
+
 Replace legacy RRD filename and dataset variables with `MetricIdentity` and
 `DataSeries`, and move presentation settings into `SeriesStyle` and
 `GraphOptions`. Compare the resulting graph and legend before removing the
@@ -299,6 +362,9 @@ and maximum fills. It extends `PortGraph`, which checks permission to view the
 port and supplies its page context and title. Its `GraphOptions::traffic`
 uses `TrafficOptions` to add percentiles, transferred-byte totals, previous
 period comparisons, future trend lines, and port speed references.
+`TrafficOptions::series` limits these to some of the series:
+`app/Graphs/Device/BitsGraph.php` stacks the traffic of each port and only
+summarizes the device totals.
 
 For application graphs, extend `App\Graphs\Application\ApplicationGraph`.
 `$this->metric()` reads the `app-<app_type>-<app_id>.rrd` file the

@@ -126,21 +126,25 @@ class RrdOptionsBuilder
         if ($graph->base !== null) {
             array_push($options, '--base', $graph->base);
         }
-        if ($graph->unitsExponent !== null) {
-            array_push($options, '--units-exponent', $graph->unitsExponent);
+        // rrdtool axis formats have no SI prefix, so axes with a unit show plain values
+        $unitsExponent = $graph->unitsExponent ?? ($graph->axisUnit === null ? null : 0);
+        if ($unitsExponent !== null) {
+            array_push($options, '--units-exponent', $unitsExponent);
         }
         if ($graph->logarithmic) {
             $options[] = '--logarithmic';
         }
 
-        if ($graph->rightAxis !== null) {
-            array_push($options, '--right-axis', $this->escape($graph->rightAxis));
+        $rightAxis = $graph->rightAxis ?? ($graph->rightAxisLabel === null ? null : '1:0');
+        if ($rightAxis !== null) {
+            array_push($options, '--right-axis', $this->escape($rightAxis));
         }
         if ($graph->rightAxisLabel !== null) {
             array_push($options, '--right-axis-label', $this->escape($graph->rightAxisLabel));
         }
-        if ($graph->leftAxisFormat !== null) {
-            array_push($options, '--left-axis-format', $this->escape($graph->leftAxisFormat));
+        $leftAxisFormat = $graph->leftAxisFormat ?? ($graph->axisUnit === null ? null : '%lg ' . str_replace('%', '%%', $graph->axisUnit));
+        if ($leftAxisFormat !== null) {
+            array_push($options, '--left-axis-format', $this->escape($leftAxisFormat));
         }
         if ($graph->unitsLength !== null) {
             array_push($options, '--units-length', $graph->unitsLength);
@@ -157,9 +161,9 @@ class RrdOptionsBuilder
      */
     private function colors(): array
     {
-        $style = $this->params->style ?: session('applied_site_style');
-        $defaults = LibrenmsConfig::get($style == 'dark' ? 'rrdgraph_def_text_dark' : 'rrdgraph_def_text');
-        $font = ltrim(LibrenmsConfig::get($style == 'dark' ? 'rrdgraph_def_text_color_dark' : 'rrdgraph_def_text_color'), '#');
+        $dark = $this->params->isDark();
+        $defaults = LibrenmsConfig::get($dark ? 'rrdgraph_def_text_dark' : 'rrdgraph_def_text');
+        $font = ltrim(LibrenmsConfig::get($dark ? 'rrdgraph_def_text_color_dark' : 'rrdgraph_def_text_color'), '#');
 
         preg_match_all('/-c ([A-Z]+)#([0-9A-Fa-f]{6,8})/', $defaults, $matches);
         $colors = ['FONT' => $font];
