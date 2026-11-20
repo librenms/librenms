@@ -31,12 +31,15 @@ use App\Observers\PackageObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Models\Keyable;
 
 #[ObservedBy([PackageObserver::class])]
 class Package extends DeviceRelatedModel implements Keyable
 {
     use Filterable;
+
+    /** @use HasFactory<\Database\Factories\PackageFactory> */
     use HasFactory;
 
     public $timestamps = false;
@@ -44,7 +47,7 @@ class Package extends DeviceRelatedModel implements Keyable
     protected $fillable = [
         'name',
         'manager',
-        'status',
+        'polling_method',
         'version',
         'build',
         'arch',
@@ -62,33 +65,13 @@ class Package extends DeviceRelatedModel implements Keyable
     ];
 
     /**
-     * Sync the device's packages against a full list of installed packages from one polling source.
-     * Installed packages are created or updated, packages no longer reported are removed.
-     *
-     * @param  iterable<Package>  $installed
+     * @return array<string, string>
      */
-    public static function sync(Device $device, iterable $installed): void
+    protected function casts(): array
     {
-        // mark all existing packages as removed, then flag the ones still installed
-        $packages = $device->packages->each(function (Package $package): void {
-            $package->status = false;
-        })->keyBy->getCompositeKey();
-
-        foreach ($installed as $package) {
-            if (! $package->isValid()) {
-                continue; // failed to parse
-            }
-
-            $package_key = $package->getCompositeKey();
-            if ($existing = $packages->get($package_key)) {
-                $existing->fill($package->attributesToArray());
-            } else {
-                $packages->put($package_key, $package);
-            }
-        }
-
-        $device->packages()->saveMany($packages->where('status', true));
-        $packages->where('status', false)->each->delete();
+        return [
+            'polling_method' => PollingMethodType::class,
+        ];
     }
 
     /**

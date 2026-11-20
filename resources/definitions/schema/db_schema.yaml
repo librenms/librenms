@@ -1652,9 +1652,9 @@ packages:
   Columns:
     - { Field: pkg_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: polling_method, Type: varchar(32), 'Null': false, Extra: '', Default: snmp }
     - { Field: name, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: manager, Type: varchar(16), 'Null': false, Extra: '', Default: '1' }
-    - { Field: status, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: version, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: build, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: arch, Type: varchar(16), 'Null': false, Extra: '' }
