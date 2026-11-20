@@ -1,0 +1,2921 @@
+-- Toshiba MIB
+-- UPS MIB for Toshiba 4400 Uninterruptible Power Systems with RemotEye 5
+--
+-- {iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) toshiba(186) equ(1) equUPS(19) ticUPS(2) rmti5(6) ups4400(6)}
+-- ===========================================================================
+
+TIC-RMTI5-4400-MIB DEFINITIONS ::= BEGIN
+
+--=============================================================================
+-- Update  : June 3, 2024
+-- By:     : Shivam Mistry, Toshiba International Corp.
+-- Revised : RemotEye 5 4400 First Draft MIB for RemotEye 5
+--=============================================================================
+--=============================================================================
+-- Update  : June 28, 2024
+-- By:     : Elijah Ochoa, Toshiba International Corp.
+-- Revised : - Changed upsOutputRatedFrequency, upsOutputRatedActivePower, upsOutputRatedApparentPower, from read write to read only
+--           - Changed upsBypass group objects to be read-only
+--=============================================================================
+--=============================================================================
+-- Update  : September 23, 2024
+-- By:     : Elijah Ochoa, Toshiba International Corp.
+-- Revised : - Change upsIdentInstallationDate to be of format MMDDYYYY
+--           - Change upsBatteryChargerStatus to include enum in the description
+--           - Change upsBatteryEnableEqualizeCharge  to be of type enum
+--           - Change upsBatteryManualEqualizeCharge to be of type enum
+--           - Change upsBatteryAutoTest to be of type enum
+--           - Remove upsPassword group
+--           - Remove upsConfigChangeSecurityLevel
+--           - Remove upsConfigBypassEnable 
+--           - Remove upsConfigManageADMINPWD
+--=============================================================================
+--=============================================================================
+-- Update  : October 14, 2024
+-- By:     : Elijah Ochoa, Toshiba International Corp.
+-- Revised : - upsBatteryAutoTest enum to start at 1
+--           - Change upsBatteryEnableEqualizeCharge enum to start at 1
+--           - Change upsBatteryManualEqualizeCharge enum to start at 1
+--=============================================================================
+--=============================================================================
+-- Update  : December 16, 2024
+-- By:     : Elijah Ochoa, Toshiba International Corp.
+-- Revised : - upsBatteryAutoTest enum to start at 1
+--           - Change upsIdentInstallationDate to be fromat MM/DD/YYYY to be standard with other models
+--           - Change upsBatteryInstallationDate to be format MM/DD/YYYY
+--           - Remove upsDisplayRMTIInstallationDate because we are moving it to the System MIB
+--=============================================================================
+--==============================================================================
+-- Update : December 20, 2024
+-- By     : Elijah Ochoa, Toshiba International Corp.
+-- Revised: Create upsBatteryNumberOfDischarges object
+--==============================================================================
+--==============================================================================
+-- Update  : Feb 14, 2024
+-- By      : David Zhao, Toshiba International Corp.
+-- Revised : Replace OverCurrent with Overcurrent, OverVolt with Overvolt, UnderVolt with Undervolt
+--==============================================================================
+--==============================================================================
+-- Update  : Feb 19, 2024
+-- By      : Elijah Ochoa, Toshiba International Corp.
+-- Revised : - Change SYNTAX of upsAlarmsPresent to be Integer
+--           - Change SYNTAX of upsAlarmDescr to be DisplayString
+--           - Change SYNTAX of upsAlarmTime to be DisplayString
+--==============================================================================
+--==============================================================================
+-- Update  : Dec 9, 2025
+-- By      : Elijah Ochoa, Toshiba International Corp.
+-- Revised : - Add upsTestObjects group to the upsBattery group
+--           - Add upsTestBattery, upsTestBatteryResult, upsTestStartTime, upsTestElapsedTime objects into the upsTestObjects group
+--==============================================================================
+IMPORTS
+    DisplayString
+        FROM SNMPv2-TC
+    enterprises
+        FROM RFC1155-SMI
+    OBJECT-TYPE
+        FROM RFC-1212
+    TRAP-TYPE
+        FROM RFC-1215;
+
+toshiba         OBJECT IDENTIFIER ::= { enterprises 186 }
+equ             OBJECT IDENTIFIER ::= { toshiba 1 }
+equUPS          OBJECT IDENTIFIER ::= { equ 19 }
+ticUPS          OBJECT IDENTIFIER ::= { equUPS 2 }
+rmti5           OBJECT IDENTIFIER ::= { ticUPS 6 }
+ups4400         OBJECT IDENTIFIER ::= { rmti5 6 }
+
+upsIdent        OBJECT IDENTIFIER ::= { ups4400 1 }
+upsInput        OBJECT IDENTIFIER ::= { ups4400 2 }
+upsOutput       OBJECT IDENTIFIER ::= { ups4400 3 }
+upsBypass       OBJECT IDENTIFIER ::= { ups4400 4 }
+upsDCBus        OBJECT IDENTIFIER ::= { ups4400 5 }
+upsDisplay      OBJECT IDENTIFIER ::= { ups4400 6 }
+upsBattery      OBJECT IDENTIFIER ::= { ups4400 7 }
+upsAlarm        OBJECT IDENTIFIER ::= { ups4400 8 }
+upsConfig       OBJECT IDENTIFIER ::= { ups4400 9 }
+upsTime         OBJECT IDENTIFIER ::= { ups4400 10 }
+upsHistory      OBJECT IDENTIFIER ::= { ups4400 11 }
+upsTrap         OBJECT IDENTIFIER ::= { ups4400 12 }
+
+--=============================================================================
+-- UPS Ident - ups4400 Group 1
+--=============================================================================
+
+upsIdentModelNumber OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..16))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The UPS model number."
+    ::= { upsIdent 1 }
+
+upsIdentSerialNumber OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..16))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The UPS serial number."
+    ::= { upsIdent 2 }
+
+upsIdentSysName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..15))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "T A string identifying the UPS. This object should be set by the administrator."
+    ::= { upsIdent 3 }
+
+upsIdentAttachedDevices OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..15))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "A string identifying the devices attached to the output(s) of the UPS.  This object should be set by the administrator."
+    ::= { upsIdent 4 }
+
+upsIdentInstallationDate OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (10))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The UPS installation date in MM/DD/YYYY"
+    ::= { upsIdent 5 }
+
+--=============================================================================
+-- UPS Input - ups4400 Group 2
+-- The UPS Input Rated Group 2.1    
+--=============================================================================
+upsInputRatedObjects OBJECT IDENTIFIER ::= { upsInput 1 }
+
+upsInputRatedLLVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Volts"
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the nominal input line-to-line voltage."
+    ::= { upsInputRatedObjects 1 }
+
+upsInputRatedLNVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Volts"
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the nominal input line-to-neutral voltage."
+    ::= { upsInputRatedObjects 2 }
+
+upsInputRatedCurrent OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Amps"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of nominal input current."
+    ::= { upsInputRatedObjects 3 }
+
+upsInputRatedFrequency OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Hz"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the nominal input frequency."
+    ::= { upsInputRatedObjects 4 }
+
+upsInputRatedActivePower OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Watts"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the nominal input real power."
+    ::= { upsInputRatedObjects 5 }
+
+upsInputRatedApparentPower OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "VA"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the nominal input power in Volt-Amp."
+    ::= { upsInputRatedObjects 6 }
+
+--=============================================================================
+-- UPS Input - ups4400 Group 2.2
+-- The UPS Input Group 2.2
+--=============================================================================
+upsInputObjects OBJECT IDENTIFIER ::= { upsInput 2 }
+
+upsInputLLVoltageAB OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present input line-to-line voltage for phase AB."
+    ::= { upsInputObjects 1 }
+
+upsInputLLVoltageBC OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present input line-to-line voltage for phase BC."
+    ::= { upsInputObjects 2 }
+
+upsInputLLVoltageCA OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present input line-to-line voltage for phase CA."
+    ::= { upsInputObjects 3 }
+
+upsInputLNVoltageAN OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present input line-to-neutral voltage for phase AN."
+    ::= { upsInputObjects 4 }
+
+upsInputLNVoltageBN OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present input line-to-neutral voltage for phase BN."
+    ::= { upsInputObjects 5 }
+
+upsInputLNVoltageCN OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present input line-to-neutral voltage for phase CN."
+    ::= { upsInputObjects 6 }
+
+upsInputVoltagePercentA OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present input voltage percentage for phase A."
+    ::= { upsInputObjects 7 }
+
+upsInputVoltagePercentB OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present input voltage percentage for phase B."
+    ::= { upsInputObjects 8 }
+
+upsInputVoltagePercentC OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present input voltage percentage for phase C."
+    ::= { upsInputObjects 9 }
+
+upsInputCurrentPhaseA OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1A"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present input current for phase A."
+    ::= { upsInputObjects 10 }
+
+upsInputCurrentPhaseB OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1A"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present input current for phase B."
+    ::= { upsInputObjects 11 }
+
+upsInputCurrentPhaseC OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1A"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present input current for phase C."
+    ::= { upsInputObjects 12 }
+
+upsInputCurrentPercentPhaseA OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present input current percentage for phase A."
+    ::= { upsInputObjects 13 }
+
+upsInputCurrentPercentPhaseB OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present input current percentage for phase B."
+    ::= { upsInputObjects 14 }
+
+upsInputCurrentPercentPhaseC OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present input current percentage for phase C."
+    ::= { upsInputObjects 15 }
+
+upsInputFrequency OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Hz"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present input frequency."
+    ::= { upsInputObjects 16 }
+
+--=============================================================================
+-- UPS Output - ups4400 Group 3
+-- The UPS Output Rated Group 3.1
+--=============================================================================
+upsOutputRatedObjects OBJECT IDENTIFIER ::= { upsOutput 1 }
+
+upsOutputRatedLLVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Volts"
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the nominal output line-to-line voltage."
+    ::= { upsOutputRatedObjects 1 }
+
+upsOutputRatedLNVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Volts"
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the nominal output line-to-neutral voltage."
+    ::= { upsOutputRatedObjects 2 }
+
+upsOutputRatedFrequency OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Hz"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the nominal output frequency."
+    ::= { upsOutputRatedObjects 3 }
+
+upsOutputRatedActivePower OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Watts"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the nominal output real power."
+    ::= { upsOutputRatedObjects 4 }
+
+upsOutputRatedApparentPower OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "KVA"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the nominal output Volt-Amp rating."
+    ::= { upsOutputRatedObjects 5 }
+
+upsOutputRatedPowerFactor OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.01"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The UPS output rated power factor."
+    ::= { upsOutputRatedObjects 6 }
+
+--============================================================================
+-- UPS Output - ups4400 Group 3.2
+-- The UPS Output Group 3.2
+--============================================================================
+upsOutputObjects OBJECT IDENTIFIER ::= { upsOutput 2 }
+
+upsOutputSource OBJECT-TYPE
+    SYNTAX  INTEGER {
+        other(1),
+        shutdown(2),
+        normal(3),
+        bypass(4),
+        battery(5),
+        batteryTest(6),
+        preCharge(7),
+        gateCheck(8)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The present source of output power. The enumeration shutdown(2) indicates that there is no source of output power (and therefore no output power), for example, the system has opened the output breaker."
+    ::= { upsOutputObjects 1 }
+
+upsOutputLLVoltageAB OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present line-to-line output voltage for phase AB."
+    ::= { upsOutputObjects 2 }
+
+upsOutputLLVoltageBC OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present line-to-line output voltage for phase BC."
+    ::= { upsOutputObjects 3 }
+
+upsOutputLLVoltageCA OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present line-to-line output voltage for phase CA."
+    ::= { upsOutputObjects 4 }
+
+upsOutputLNVoltageAN OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present line-to-neutral output voltage for phase AN."
+    ::= { upsOutputObjects 5 }
+
+upsOutputLNVoltageBN OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present line-to-neutral output voltage for phase BN."
+    ::= { upsOutputObjects 6 }
+
+upsOutputLNVoltageCN OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present line-to-neutral output voltage for phase CN."
+    ::= { upsOutputObjects 7 }
+
+upsOutputVoltagePercentA OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present output voltage percentage for phase A."
+    ::= { upsOutputObjects 8 }
+
+upsOutputVoltagePercentB OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present output voltage percentage for phase B."
+    ::= { upsOutputObjects 9 }
+
+upsOutputVoltagePercentC OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present output voltage percentage for phase C."
+    ::= { upsOutputObjects 10 }
+
+upsOutputCurrentPhaseA OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1A"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present output current for phase A."
+    ::= { upsOutputObjects 11 }
+
+upsOutputCurrentPhaseB OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1A"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present output current for phase B."
+    ::= { upsOutputObjects 12 }
+
+upsOutputCurrentPhaseC OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1A"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present output current for phase C."
+    ::= { upsOutputObjects 13 }
+
+upsOutputCurrentPercentPhaseA OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present output current percentage for phase A."
+    ::= { upsOutputObjects 14 }
+
+upsOutputCurrentPercentPhaseB OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present output current percentage for phase B."
+    ::= { upsOutputObjects 15 }
+
+upsOutputCurrentPercentPhaseC OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present output current percentage for phase C."
+    ::= { upsOutputObjects 16 }
+
+upsOutputFrequency OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Hz"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present output frequency."
+    ::= { upsOutputObjects 17 }
+
+upsOutputTotalActivePower OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1KW"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the real power delivered at the current load."
+    ::= { upsOutputObjects 18 }
+
+upsOutputTotalActivePowerPercent OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the real power delivered at the current load in percent."
+    ::= { upsOutputObjects 19 }
+
+upsOutputPowerFactor OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.01"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The UPS output power factor."
+    ::= { upsOutputObjects 20 }
+
+upsOutputUndervoltageDetectLevel OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This parameter displays the minimum allowable voltage before it falls into the under voltage range."
+    ::= { upsOutputObjects 21 }
+
+upsOutputOvervoltageDetectLevel OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This parameter displays the maximum limit of the output voltage before the UPS enters the over voltage state."
+    ::= { upsOutputObjects 22 }
+
+upsOutputVoltageAdjust OBJECT-TYPE
+    SYNTAX  INTEGER(-5..5)
+    UNITS   "0.1%"
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This parameter allows the UPS to be configured to have adjustable voltages. This is set by the administrator."
+    ::= { upsOutputObjects 23 }
+
+--=============================================================================
+-- UPS Bypass - ups4400 Group 4
+-- The UPS Bypass Rated Group 4.1
+--=============================================================================
+upsBypassRatedObjects OBJECT IDENTIFIER ::= { upsBypass 1 }
+
+upsBypassRatedLLVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Volts"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the nominal line-to-line bypass voltage."
+    ::= { upsBypassRatedObjects 1 }
+
+upsBypassRatedLNVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Volts"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the nominal line-to-neutral bypass voltage."
+    ::= { upsBypassRatedObjects 2 }
+
+--=============================================================================
+-- UPS Bypass - ups4400 Group 4.2
+-- The UPS Bypass Group 4.2
+--=============================================================================
+upsBypassObjects OBJECT IDENTIFIER ::= { upsBypass 2 }
+
+upsBypassLLVoltageAB OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present line-to-line bypass voltage for phase AB."
+    ::= { upsBypassObjects 1 }
+
+upsBypassLLVoltageBC OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present line-to-line bypass voltage for phase BC."
+    ::= { upsBypassObjects 2 }
+
+upsBypassLLVoltageCA OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present line-to-line bypass voltage for phase CA."
+    ::= { upsBypassObjects 3 }
+
+upsBypassLNVoltageAN OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present line-to-neutral bypass voltage for phase AN."
+    ::= { upsBypassObjects 4 }
+
+upsBypassLNVoltageBN OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present line-to-neutral bypass voltage for phase BN."
+    ::= { upsBypassObjects 5 }
+
+upsBypassLNVoltageCN OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vrms"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present line-to-neutral bypass voltage for phase CN."
+    ::= { upsBypassObjects 6 }
+
+upsBypassVoltagePercentA OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present bypass voltage percentage for phase A."
+    ::= { upsBypassObjects 7 }
+
+upsBypassVoltagePercentB OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present bypass voltage percentage for phase B."
+    ::= { upsBypassObjects 8 }
+
+upsBypassVoltagePercentC OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present bypass voltage percentage for phase C."
+    ::= { upsBypassObjects 9 }
+
+upsBypassCurrentPhaseA OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1A"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present bypass current for phase A."
+    ::= { upsBypassObjects 10 }
+
+upsBypassCurrentPhaseB OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1A"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present bypass current for phase B."
+    ::= { upsBypassObjects 11 }
+
+upsBypassCurrentPhaseC OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1A"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present bypass current for phase C."
+    ::= { upsBypassObjects 12 }
+
+upsBypassFrequency OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Hz"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present bypass frequency."
+    ::= { upsBypassObjects 13 }
+
+upsBypassUndervoltageDetectLevel OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This parameter displays the minimum allowable voltage before it falls into under voltage range."
+    ::= { upsBypassObjects 14 }
+
+upsBypassOvervoltageDetectLevel OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This is the maximum limit of the output voltage before the UPS enters the over voltage state."
+    ::= { upsBypassObjects 15 }
+
+--=============================================================================
+-- UPS DC Bus - ups4400 Group 5
+-- The UPS DC Bus Rated Group 5.1
+--=============================================================================
+
+upsDCBUSTotalVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Volts"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present dc bus total voltage."
+    ::= { upsDCBus 1 }
+
+upsDCBusPositiveVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Volts"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present dc bus positive voltage."
+    ::= { upsDCBus 2 }
+
+upsDCBusNegativeVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Volts"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present dc bus negative voltage."
+    ::= { upsDCBus 3 }
+
+--=============================================================================
+-- UPS Display - ups4400 Group 6
+-- The UPS Display Group 6
+--=============================================================================
+
+upsDisplayFirmwareVersion OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..15))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The firmware version of the display."
+    ::= { upsDisplay 1 }
+
+upsDisplayFirmwareBuildDate OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..15))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The firmware build date of the display."
+    ::= { upsDisplay 2 }
+
+upsDisplayFirmwareBuiltTime OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..15))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The firmware build time of the display."
+    ::= { upsDisplay 3 }
+
+
+--=============================================================================
+-- UPS Battery - ups4400 Group 7
+-- The UPS Battery Rated Group 7.1
+--=============================================================================
+upsBatteryRatedObjects OBJECT IDENTIFIER ::= { upsBattery 1 }
+
+upsBatteryRatedVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vdc"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The rated voltage of a single battery."
+    ::= { upsBatteryRatedObjects 1 }
+
+upsBatteryRatedAmpereHour OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Amperes-Hour"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The battery capacity in Amp-Hour."
+    ::= { upsBatteryRatedObjects 2 }
+
+upsBatteryRatedDischargeCurrent OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Adc"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The rated battery discharge current in 1/10 DC Amp."
+    ::= { upsBatteryRatedObjects 3 }
+
+upsBatteryRatedBackupTime OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "minutes"
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The Battery rated holding time in minutes."
+    ::= { upsBatteryRatedObjects 4 }
+
+upsBatteryRatedShutdownVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vdc"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The shutdown voltage of the UPS."
+    ::= { upsBatteryRatedObjects 5 }
+
+upsBatteryRatedLowBattLevel OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vdc"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The low battery voltage of the UPS."
+    ::= { upsBatteryRatedObjects 6 }
+
+upsBatteryRatedPreventativeChargeVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vdc"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The preventative charge voltage."
+    ::= { upsBatteryRatedObjects 7 }
+
+upsBatteryRatedEqualizeChargeVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "0.1Vdc"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The equalize charge voltage."
+    ::= { upsBatteryRatedObjects 8 }
+
+--=============================================================================
+-- UPS Battery - ups4400 Group 7.2
+-- The UPS Battery Group 7.2
+--=============================================================================
+upsBatteryObjects OBJECT IDENTIFIER ::= { upsBattery 2 }
+
+upsBatteryStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        unknown(1),
+        batteryNormal(2),
+        batteryLow(3),
+        batteryDepleted(4),
+        batteryDischarging(5),
+        batteryTestFailure(6)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The indication of the capacity remaining in the UPS system's batteries. 
+        A value of batteryNormal indicates that the remaining run-time is sufficient 
+        to handle the load. A value of batteryLow indicates the battery level is low. 
+        Continued operation in battery mode will deplete batteries. 
+        A value of batteryDepleted indicates that the UPS will be unable to sustain 
+        the present load when and if the utility power is lost (including the 
+        possibility that the utility power is currently absent and the UPS is unable 
+        to sustain the output). A value of batteryDischarging indicates UPS system 
+        is on battery power."
+    ::= { upsBatteryObjects 1 }
+
+upsBatteryChargerStatus OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The current status of the battery charger. 1:Charging, 4:Equalize, 8:Protective, 16:Discharging, 32:Stopped, Other:Stopped"
+    ::= { upsBatteryObjects 2 }
+
+upsBatteryInstallationDate OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(10))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The battery installation date in MM/DD/YYYY format."
+    ::= { upsBatteryObjects 3 }
+
+upsBatteryEstimatedRuntime OBJECT-TYPE
+    SYNTAX  Counter64
+    UNITS   "Minutes"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "An estimate of the time to battery charge depletion under the present 
+        load conditions if the utility power is off and remains off, or if it 
+        were to be lost and remain off."
+    ::= { upsBatteryObjects 4 }
+
+upsBatteryElapsedTimeOnBatteryPower OBJECT-TYPE
+    SYNTAX  Counter64
+    UNITS   "Seconds"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "If the unit is on battery power, the elapsed time since the UPS on battery power, 
+        or the time since the network management subsystem was last restarted, whichever 
+        is less. Zero shall be returned if the unit is not on battery power."
+    ::= { upsBatteryObjects 5 }
+
+upsBatteryVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Vdc"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The magnitude of the present battery voltage in DC Volt."
+    ::= { upsBatteryObjects 6 }
+
+upsBatteryCapacity OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "%"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The UPS battery capacity in percent."
+    ::= { upsBatteryObjects 7 }
+
+upsBatteryCurrent OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Adc"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The present battery current in Amps."
+    ::= { upsBatteryObjects 8 }
+
+upsBatteryEqualizeChargeTime OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Hours"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The amount of charging time to equalize the batteries."
+    ::= { upsBatteryObjects 9 }
+
+upsBatteryPwrFailEqualizeDuration OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Minutes"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The time the batteries take to equalize charge after failure."
+    ::= { upsBatteryObjects 10 }
+
+upsBatteryAutoTestInterval OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "Hours"
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The frequency, in hours, in which the battery will begin test automatically."
+    ::= { upsBatteryObjects 11 }
+
+upsBatteryEnableEqualizeCharge OBJECT-TYPE
+    SYNTAX  INTEGER{
+        disable(1),
+        enable(2)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Equalize charge mode enabled."
+    ::= { upsBatteryObjects 12 }
+
+upsBatteryManualEqualizeCharge OBJECT-TYPE
+    SYNTAX  INTEGER{
+        stop(1),
+        start(2)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Manually initiate Equalize Charge Mode."
+    ::= { upsBatteryObjects 13 }
+
+upsBatteryAutoTest OBJECT-TYPE
+    SYNTAX  INTEGER{
+        disable(1),
+        enable(2)
+    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Enable auto battery test."
+    ::= { upsBatteryObjects 14 }
+
+upsBatteryinSeries OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The number of batteries in each string connected in series."
+    ::= { upsBatteryObjects 15 }
+
+upsBatteryinParallel OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The number of parallel battery strings."
+    ::= { upsBatteryObjects 16 }
+
+upsBatteryNumberOfDischarges OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Counter for upsAlarmOnBattery operations saved in memory"
+    ::={upsBatteryObjects 17}
+
+upsTestObjects OBJECT IDENTIFIER ::= {upsBattery 3}
+
+upsTestBattery OBJECT-TYPE
+    SYNTAX INTEGER {
+        initiate(1)
+    }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Set to 1 to initiate a battery test."
+    ::= { upsTestObjects 1 }
+
+upsTestBatteryResult OBJECT-TYPE
+    SYNTAX INTEGER {
+        pass(1),
+        failed(2),
+        inProgress(3),
+        none(4)
+    }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The result of the most recent battery test."
+    ::= { upsTestObjects 2 }
+
+upsTestStartTime OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The start date and time of the most recent test in the format of MM/DD/YYYY HH:MM."
+    ::= { upsTestObjects 3 }
+
+upsTestElapsedTime OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The total duration in seconds of the most recent test."
+    ::= { upsTestObjects 4 }
+
+--=============================================================================
+-- UPS Alarms - ups4400 Group 8
+-- The UPS Alarms Group 8
+--=============================================================================
+upsAlarmsPresent OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+       "The present number of active alarm conditions."
+    ::= { upsAlarm 1 }
+
+upsAlarmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF UpsAlarmEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A list of alarm table entries.  The table contains
+        zero, one, or many rows at any moment, depending upon
+        the number of alarm conditions in effect.  The table
+        is initially empty at agent startup.  The agent
+        creates a row in the table each time a condition is
+        detected and deletes that row when that condition no
+        longer pertains.  The agent creates the first row with
+        upsAlarmId equal to 1, and increments the value of
+        upsAlarmId each time a new row is created, wrapping to
+        the first free value greater than or equal to 1 when
+        the maximum value of upsAlarmId would otherwise be
+        exceeded.  Consequently, after multiple operations,
+        the table may become sparse, e.g., containing entries
+        for rows 95, 100, 101, and 203 and the entries should
+        not be assumed to be in chronological order because
+        upsAlarmId might have wrapped.
+        Alarms are named by an AutonomousType (OBJECT
+        IDENTIFIER), upsAlarmDescr, to allow a single table to
+        reflect well known alarms plus alarms defined by a
+        particular implementation, i.e., as documented in the
+        private enterprise MIB definition for the device.  No
+        two rows will have the same value of upsAlarmDescr,
+        since alarms define conditions.  In order to meet this
+        requirement, care should be taken in the definition of
+        alarm conditions to insure that a system cannot enter
+        the same condition multiple times simultaneously.
+        The number of rows in the table at any given time is
+        reflected by the value of upsAlarmsPresent."
+    ::= { upsAlarm 2 }
+
+    upsAlarmEntry OBJECT-TYPE
+        SYNTAX UpsAlarmEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "Information about a single alarm condition."
+        INDEX { upsAlarmId }
+        ::= { upsAlarmTable 1 }
+
+    UpsAlarmEntry ::= SEQUENCE {
+        upsAlarmId          INTEGER,
+        upsAlarmDescr       DisplayString,
+        upsAlarmTime        DisplayString
+    }
+
+--==============================================================================
+--upsAlarmTable/upsAlarmEntry/upsAlarmId
+--==============================================================================
+
+upsAlarmId  OBJECT-TYPE
+    SYNTAX INTEGER(0..2147483647)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A unique identifier for an alarm condition. This
+        value must remain constant."
+    ::= { upsAlarmEntry 1 }
+
+upsAlarmDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A reference to an alarm description object.  The
+        object referenced should not be accessible, but rather
+        be used to provide a unique description of the alarm
+        condition."
+    ::= { upsAlarmEntry 2 }
+
+upsAlarmTime OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of sysUpTime when the alarm condition was
+        detected.  If the alarm condition was detected at the
+        time of agent startup and presumably existed before
+        agent startup, the value of upsAlarmTime shall equal
+        0."
+    ::= { upsAlarmEntry 3 }
+
+--==============================================================================
+-- UPS Alarm - upsedgeSP Group 8.3
+-- The UPS Alarm Group for Well Known Alarms
+--==============================================================================
+upsWellKnownAlarms OBJECT IDENTIFIER ::= { upsAlarm 3 }
+
+upsAlarmFault OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, A UPS fault/Alarm condition exists. (FLT)"
+    ::= { upsWellKnownAlarms 1 }
+
+upsAlarmEPO OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, The emergency stop has tripped. (EPOTR)"
+    ::= { upsWellKnownAlarms 2 }
+
+upsAlarmCurrentLimitFault OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, Input Over Current reported. (IOC)"
+    ::= { upsWellKnownAlarms 3 }
+
+upsAlarmDCBusAbnormal OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, DC bus abnormality occurred. (DBUSAB)"
+    ::= { upsWellKnownAlarms 4 }
+
+upsAlarmDCBusOvervoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, A DC bus overvoltage reported. (DCOV)"
+    ::= { upsWellKnownAlarms 5 }
+
+upsAlarmDCBusImbalance OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, A DC bus imbalance reported. (DCOV)"
+    ::= { upsWellKnownAlarms 6 }
+
+upsAlarmInverterOvervoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, An inverter overvoltage reported. (INVOV)"
+    ::= { upsWellKnownAlarms 7 }
+
+upsAlarmInverterUndervoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, An inverter undervoltage reported. (INVUV)"
+    ::= { upsWellKnownAlarms 8 }
+
+upsAlarmUPSOverheat OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, Device overheat reported. (DOH)"
+    ::= { upsWellKnownAlarms 9 }
+
+upsAlarmLoadAbnormal OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, An output overload has occurred frequently. (LDABNL)"
+    ::= { upsWellKnownAlarms 10 }
+
+upsAlarmChopperOvercurrent OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, Chopper overcurrent reported. (COC)"
+    ::= { upsWellKnownAlarms 11 }
+
+upsAlarmInverterOvercurrent OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, Inverter overcurrent reported. (INVOC)"
+    ::= { upsWellKnownAlarms 12 }
+
+upsAlarmPreChargeError OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, Precharge Error reported. (PCHGER)"
+    ::= { upsWellKnownAlarms 13 }
+
+upsAlarmDCBusUndervoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, A DC bus undervoltage reported. (DCUV)"
+    ::= { upsWellKnownAlarms 14 }
+
+upsAlarmBypassOverheat OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, A bypass Overheat reported. (BYPOH)"
+    ::= { upsWellKnownAlarms 15 }
+
+upsAlarmPCBAbnormal OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, An abnormality has occurred with the PCB. (PCBER)"
+    ::= { upsWellKnownAlarms 16 }
+
+upsAlarmInputPhaseRotationError OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, Input Phase Rotation Error. (PHIRER)"
+    ::= { upsWellKnownAlarms 17 }
+
+upsAlarmBypassPhaseRotationError OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, Bypass Phase Rotation Error. (PHBRER)"
+    ::= { upsWellKnownAlarms 18 }
+
+upsAlarmInputAbnormal OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, An abnormality with input circuit occurred with the PCB. (INABNL)"
+    ::= { upsWellKnownAlarms 19 }
+
+upsAlarmPowerSupplyOutofRange OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, An abnormality with power supply for control PCB detected. (PWRERR)"
+    ::= { upsWellKnownAlarms 20 }
+
+upsAlarmInverterVoltageAbnormal OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, An inverter voltage out of spec reported. (INVABN)"
+    ::= { upsWellKnownAlarms 21 }
+
+upsAlarmOutputVoltageAbnormal OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, An output voltage out of spec reported. (OVABNL)"
+    ::= { upsWellKnownAlarms 22 }
+
+upsAlarmOutputUndervoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, An output under voltage reported. (VOUV)"
+    ::= { upsWellKnownAlarms 23 }
+
+upsAlarmCurrentAbnormal OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, Current Abnormality reported. (OCERR)"
+    ::= { upsWellKnownAlarms 24 }
+
+upsAlarmInverterOutputVoltageAbnormal OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, An inverter output voltage out of spec reported. (INVERR)"
+    ::= { upsWellKnownAlarms 25 }
+
+upsAlarmGateVoltageLost OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, Gate Voltage lost reported. (GVERR)"
+    ::= { upsWellKnownAlarms 26 }
+
+upsAlarmInverterCurrentError OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, Inverter current error reported. (INVCER)"
+    ::= { upsWellKnownAlarms 27 }
+
+upsAlarmInverterBypassVoltageMismatch OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, An inverter and bypass voltage out of spec reported. (INVBYP)"
+    ::= { upsWellKnownAlarms 28 }
+
+upsAlarmNoControlConnection OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Fault, Control PCB is disconnected. (NOCONN)"
+    ::= { upsWellKnownAlarms 29 }
+
+upsAlarmInputVoltageError OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, An input voltage error reported. (VIERR)"
+    ::= { upsWellKnownAlarms 30 }
+
+upsAlarmBattVoltExceed OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Battery voltage exceeded. (BTBKON)"
+    ::= { upsWellKnownAlarms 31 }
+
+upsAlarmBypassFrequencyError OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Bypass frequency error reported. (FBYER)"
+    ::= { upsWellKnownAlarms 32 }
+
+upsAlarmInputFrequencyError OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, An input frequency error reported. (FIERR)"
+    ::= { upsWellKnownAlarms 33 }
+
+upsAlarmBypassError OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Bypass voltage out of spec reported. (VBYERR)"
+    ::= { upsWellKnownAlarms 34 }
+
+upsAlarmEEtoRAMError OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, An error occurred when writing from EEPROM to SRAM. (WRN05)"
+    ::= { upsWellKnownAlarms 35 }
+
+upsAlarmBatteryTestFailed OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, A battery test failed event reported. (BTFAIL)"
+    ::= { upsWellKnownAlarms 36 }
+
+upsAlarmBatteryAbnormal OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, A battery abnormality reported. (BTABNL)"
+    ::= { upsWellKnownAlarms 37 }
+
+upsAlarmBatteryLow OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Battery voltage reached Low Battery level. (VBLO)"
+    ::= { upsWellKnownAlarms 38 }
+
+upsAlarmBatteryDepleted OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, A Battery shutdown voltage level reached. (VBSD)"
+    ::= { upsWellKnownAlarms 39 }
+
+upsAlarmBatteryVoltageBelowShutdown OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Battery shutdown voltage lower than shutdown level. (VBBSD)"
+    ::= { upsWellKnownAlarms 40 }
+
+upsAlarmMCCBOff OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Battery contact open. (BMCCBO)"
+    ::= { upsWellKnownAlarms 41 }
+
+upsAlarmOutputCurrentExceeded OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Output current exceeded. (OCWRN)"
+    ::= { upsWellKnownAlarms 42 }
+
+upsAlarmChargerVoltageAbnormal OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Charger voltage abnormal reported. (CVABL)"
+    ::= { upsWellKnownAlarms 43 }
+
+upsAlarmBattOverheatBattBreakerOpen OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Battery overheat/battery breaker open. (BOH)"
+    ::= { upsWellKnownAlarms 44 }
+
+upsAlarmOutputOverloadWarning OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Output load exceed 110%. (OL110)"
+    ::= { upsWellKnownAlarms 45 }
+
+upsAlarmInverterOverloadWarning OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Inverter Overload reported. (INVOL)"
+    ::= { upsWellKnownAlarms 46 }
+
+upsAlarmOutputLoadExceeded OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Output load exceed detection threshold. (OOL)"
+    ::= { upsWellKnownAlarms 47 }
+
+upsAlarmCurrentLimitWarning OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, A current limit reported. (CL)"
+    ::= { upsWellKnownAlarms 48 }
+
+upsAlarmAsyncOperation OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Inverter and bypass are Asynchronous. (ASYN)"
+    ::= { upsWellKnownAlarms 49 }
+
+upsAlarmRemotEyeCommError OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Communication error between the RemotEye 5 and the UPS."
+    ::= { upsWellKnownAlarms 50 }
+
+upsAlarmOutputOverload OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Output overload within specified time. (UPSOL)"
+    ::= { upsWellKnownAlarms 51 }
+
+upsAlarmUserDefinedOverload110 OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, The inverter output load % is greater than the user defined overload set point (default: 110%)."
+    ::= { upsWellKnownAlarms 52 }
+
+upsAlarmCoolingFanAbnormal OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Cooling Fan Abnormal reported. (FNABNL)"
+    ::= { upsWellKnownAlarms 53 }
+
+upsAlarmVoltDeviationExceedBattVolt OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Voltage Deviation across battery breaker exceeded. (VDABNL)"
+    ::= { upsWellKnownAlarms 54 }
+
+upsAlarmInverterOutputVoltOutofSpec OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Input Voltage and Output voltage out of spec. (INVWRN)"
+    ::= { upsWellKnownAlarms 55 }
+
+upsAlarmLocalButtonAbnormal OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Local button abnormal reported. (LBABNL)"
+    ::= { upsWellKnownAlarms 56 }
+
+upsAlarmBatteryOverTemperature OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Battery OverTemperature occurs for more than 2 hrs. (BOH2HR)"
+    ::= { upsWellKnownAlarms 57 }
+
+upsAlarmDischargeWarning OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Discharge warning reported. (DCHWRN)"
+    ::= { upsWellKnownAlarms 58 }
+
+upsAlarmBypPCBNoComm OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Communication lost with Bypass PCB. (BYPPCB)"
+    ::= { upsWellKnownAlarms 59 }
+
+upsAlarmAutoTransferDisabled OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Auto Transfer Disabled. (XDIS)"
+    ::= { upsWellKnownAlarms 60 }
+
+upsAlarmControlPCBSupplyError OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, Control PCB power supply error reported. (INVSPY)"
+    ::= { upsWellKnownAlarms 61 }
+
+upsAlarmROMtoEEError OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, An error occurred when writing from ROM to EEPROM. (WRN31)"
+    ::= { upsWellKnownAlarms 62 }
+
+upsAlarmOnBypass OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Warning, The UPS is in Bypass mode. (BYP)"
+    ::= { upsWellKnownAlarms 63 }
+
+upsAlarmPowerFailure OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Info, A power failure reported. (PFAIL)"
+    ::= { upsWellKnownAlarms 64 }
+
+upsAlarmRemoteSwitchEnable OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Info, Remote switch control enabled. (RMTSWEN)"
+    ::= { upsWellKnownAlarms 65 }
+
+upsAlarmAutoTransferEnable OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Info, Auto re-transfer enabled. (ARTEN)"
+    ::= { upsWellKnownAlarms 66 }
+
+upsAlarmProtectiveCharging OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Info, Protective Charging is set. (PRCHRG)"
+    ::= { upsWellKnownAlarms 67 }
+
+upsAlarmEqualizedCharging OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Info, Equalized Charging enabled. (EQCHRG)"
+    ::= { upsWellKnownAlarms 68 }
+
+upsAlarmManualMode OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Info, Manual mode is selected. (MANUAL)"
+    ::= { upsWellKnownAlarms 69 }
+
+upsAlarmOutputFrequency50Hz OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Info, Output Frequency is selected to 50Hz. (OUT50HZ)"
+    ::= { upsWellKnownAlarms 70 }
+
+upsAlarmBatteryTestInProgress OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Info, A battery test in progress reported. (BTING)"
+    ::= { upsWellKnownAlarms 71 }
+
+upsAlarmForcedBypass OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Info, UPS has been forced to bypass mode. (FRCDBYP)"
+    ::= { upsWellKnownAlarms 72 }
+
+upsAlarmEE1ST OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Info, EEPROM value are the first time. (EE1ST)"
+    ::= { upsWellKnownAlarms 73 }
+
+upsAlarmBatteryTestDisable OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Info, Battery Test Disabled. (BTDIS)"
+    ::= { upsWellKnownAlarms 74 }
+
+upsAlarmShutdownPending OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Info, An output shutdown in progress reported. Output will turn off after delay. (TIMEDSD)"
+    ::= { upsWellKnownAlarms 75 }
+
+upsAlarmOutputOff OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Info, An output off reported."
+    ::= { upsWellKnownAlarms 76 }
+
+upsAlarmOnBattery OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Info, The UPS is on Battery mode; it is supplying output power from its batteries."
+    ::= { upsWellKnownAlarms 77 }
+
+upsAlarmLogInError OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Info, UPS Password is incorrect."
+    ::= { upsWellKnownAlarms 78 }
+
+--==============================================================================
+-- UPS Config - ups4400 Group 9
+-- The UPS Configuration Group 9
+--==============================================================================
+
+upsConfigUserDefinedOverloadSetPoint OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The maximum output load % defined by the user."
+    ::= { upsConfig 1 }
+
+
+--==============================================================================
+-- UPS Time - ups4400 Group 10
+-- The UPS Time Group 10
+--==============================================================================
+
+upsTimeRealDate OBJECT-TYPE
+    SYNTAX  DisplayString(SIZE(8))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The present date of the UPS. This is configurable by Administrator. DDmmddyy, for example set 04071615 is Thursday July 16, 2015 (Note:DD 00 - Sunday)."
+    ::= { upsTime 1 }
+
+upsTimeRealTime OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(6))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The present time of the UPS. This is configurable by Administrator. 24 Hour Format:HHMMSS. For example, 140600 is 02:06PM "
+    ::= { upsTime 2 }
+
+--==============================================================================
+-- UPS History - ups4400 Group 11
+-- The UPS History Group 11
+--==============================================================================
+
+upsHistorySysOperationTime OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "minutes"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The amount of time the UPS has been on."
+    ::= { upsHistory 1 }
+
+upsHistoryInverterOperationTime OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "minutes"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The amount of time the UPS has been in On-Line Mode."
+    ::= { upsHistory 2 }
+
+upsHistoryBackupOperationTime OBJECT-TYPE
+    SYNTAX  INTEGER
+    UNITS   "minutes"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The amount of time the UPS has been in BackUp Mode."
+    ::= { upsHistory 3 }
+
+upsHistoryTotalNumBackup OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Total number of times the UPS has been in Back-Up mode."
+    ::= { upsHistory 4 }
+
+
+upsHistoryTotalNumFaults OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Total number of faults that has occurred on the UPS."
+    ::= { upsHistory 5 }
+
+upsHistoryTotalNumOperationModeChange OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The number of mode changes that has occurred."
+    ::= { upsHistory 6 }
+
+--==============================================================================
+-- UPS Traps - ups4400 Group 12
+-- The UPS Traps Group 12
+--==============================================================================
+
+upsTrapFault TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, A UPS fault/Alarm condition exists. (FLT)"
+    ::= 1
+
+upsTrapFaultClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: A UPS fault/Alarm condition exists. (FLT)"
+    ::= 2
+
+upsTrapEPO TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, The emergency stop has tripped. (EPOTR)"
+    ::= 3
+
+upsTrapEPOClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: The emergency stop has tripped. (EPOTR)"
+    ::= 4
+
+upsTrapCurrentLimitFault TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, Input Over Current reported. (IOC)"
+    ::= 5
+
+upsTrapCurrentLimitFaultClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Input Over Current reported. (IOC)"
+    ::= 6
+
+upsTrapDCBusAbnormal TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, DC bus abnormality occurred. (DBUSAB)"
+    ::= 7
+
+upsTrapDCBusAbnormalClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: DC bus abnormality occurred. (DBUSAB)"
+    ::= 8
+
+upsTrapDCBusOvervoltage TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, A DC bus overvoltage repoprted. (DCOV)"
+    ::= 9
+
+upsTrapDCBusOvervoltageClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: A DC bus overvoltage repoprted. (DCOV)"
+    ::= 10
+
+upsTrapDCBusImbalance TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, A DC bus imbalance reported. (DCOV)"
+    ::= 11
+
+upsTrapDCBusImbalanceClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: A DC bus imbalance reported. (DCOV)"
+    ::= 12
+
+upsTrapInverterOvervoltage TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, An inverter overvoltage reported. (INVOV)"
+    ::= 13
+
+upsTrapInverterOvervoltageClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: An inverter overvoltage reported. (INVOV)"
+    ::= 14
+
+upsTrapInverterUndervoltage TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, An inverter undervoltage reported. (INVUV)"
+    ::= 15
+
+upsTrapInverterUndervoltageClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: An inverter undervoltage reported. (INVUV)."
+    ::= 16
+
+upsTrapUPSOverheat TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, Device overheat reported. (DOH)"
+    ::= 17
+
+upsTrapUPSOverheatClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Device overheat reported. (DOH)"
+    ::= 18
+
+upsTrapLoadAbnormal TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, An output overload has occurred frequently. (LDABNL)"
+    ::= 19
+
+upsTrapLoadAbnormalClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: An output overload has occurred frequently. (LDABNL)"
+    ::= 20
+
+upsTrapChopperOvercurrent TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, Chopper overcurrent reported. (COC)"
+    ::= 21
+
+upsTrapChopperOvercurrentClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Chopper overcurrent reported. (COC)"
+    ::= 22
+
+upsTrapInverterOvercurrent TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, Inverter overcurrent reported. (INVOC)"
+    ::= 23
+
+upsTrapInverterOvercurrentClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Inverter overcurrent reported. (INVOC)"
+    ::= 24
+
+upsTrapPreChargeError TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, Precharge Error reported. (PCHGER)"
+    ::= 25
+
+upsTrapPreChargeErrorClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Precharge Error reported. (PCHGER)"
+    ::= 26
+
+upsTrapDCBusUndervoltage TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, A DC bus undervoltage reported. (DCUV)"
+    ::= 27
+
+upsTrapDCBusUndervoltageClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: A DC bus undervoltage reported. (DCUV)"
+    ::= 28
+
+upsTrapBypassOverheat TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, A bypass Overheat reported. (BYPOH)"
+    ::= 29
+
+upsTrapBypassOverheatClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: A bypass Overheat reported. (BYPOH)"
+    ::= 30
+
+upsTrapPCBAbnormal TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, An abnormality has occurred with the PCB. (PCBER)"
+    ::= 31
+
+upsTrapPCBAbnormalClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: An abnormality has occurred with the PCB. (PCBER)"
+    ::= 32
+
+upsTrapInputPhaseRotationError TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, Input Phase Rotation Error. (PHIRER)"
+    ::= 33
+
+upsTrapInputPhaseRotationErrorClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Input Phase Rotation Error. (PHIRER)"
+    ::= 34
+
+upsTrapBypassPhaseRotationError TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, Bypass Phase Rotation Error. (PHBRER)"
+    ::= 35
+
+upsTrapBypassPhaseRotationErrorClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Bypass Phase Rotation Error. (PHBRER)"
+    ::= 36
+
+upsTrapInputAbnormal TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, An abnormality with input circuit occurred with the PCB. (INABNL)"
+    ::= 37
+
+upsTrapInputAbnormalClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: An abnormality with input circuit occurred with the PCB. (INABNL)"
+    ::= 38
+
+upsTrapPowerSupplyOutofRange TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, An abnormality with power supply for control PCB detected. (PWRERR)"
+    ::= 39
+
+upsTrapPowerSupplyOutofRangeClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: An abnormality with power supply for control PCB detected. (PWRERR)"
+    ::= 40
+
+upsTrapInverterVoltageAbnormal TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, An inverter voltage out of spec reported. (INVABN)"
+    ::= 41
+
+upsTrapInverterVoltageAbnormalClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: An inverter voltage out of spec reported. (INVABN)"
+    ::= 42
+
+upsTrapOutputVoltageAbnormal TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, An output voltage out of spec reported. (OVABNL)"
+    ::= 43
+
+upsTrapOutputVoltageAbnormalClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: An output voltage out of spec reported. (OVABNL)"
+    ::= 44
+
+upsTrapOutputUndervoltage TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, An output under voltage reported. (VOUV)"
+    ::= 45
+
+upsTrapOutputUndervoltageClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: An output under voltage reported. (VOUV)"
+    ::= 46
+
+upsTrapCurrentAbnormal TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, Current Abnormality reported. (OCERR)"
+    ::= 47
+
+upsTrapCurrentAbnormalClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Current Abnormality reported. (OCERR)"
+    ::= 48
+
+upsTrapInverterOutputVoltageAbnormal TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, An inverter output voltage out of spec reported. (INVERR)"
+    ::= 49
+
+upsTrapInverterOutputVoltageAbnormalClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: An inverter output voltage out of spec reported. (INVERR)"
+    ::= 50
+
+upsTrapGateVoltageLost TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, Gate Voltage lost reported. (GVERR)"
+    ::= 51
+
+upsTrapGateVoltageLostClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Gate Voltage lost reported. (GVERR)"
+    ::= 52
+
+upsTrapInverterCurrentError TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, Inverter current error reported. (INVCER)"
+    ::= 53
+
+upsTrapInverterCurrentErrorClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Inverter current error reported. (INVCER)"
+    ::= 54
+
+upsTrapInverterBypassVoltageMismatch TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, An inverter and bypass voltage out of spec reported. (INVBYP)"
+    ::= 55
+
+upsTrapInverterBypassVoltageMismatchClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: An inverter and bypass voltage out of spec reported. (INVBYP)"
+    ::= 56
+
+upsTrapNoControlConnection TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Fault, Control PCB is disconnected. (NOCONN)"
+    ::= 57
+
+upsTrapNoControlConnectionClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Control PCB is disconnected. (NOCONN)"
+    ::= 58
+
+upsTrapInputVoltageError TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, An input voltage error reported. (VIERR)"
+    ::= 59
+
+upsTrapInputVoltageErrorClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: An input voltage error reported. (VIERR)"
+    ::= 60
+
+upsTrapBattVoltExceed TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Battery voltage exceeded. (BTBKON)"
+    ::= 61
+
+upsTrapBattVoltExceedClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Battery voltage exceeded. (BTBKON)"
+    ::= 62
+
+upsTrapBypassFrequencyError TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Bypass frequency error reported. (FBYER)"
+    ::= 63
+
+upsTrapBypassFrequencyErrorClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Bypass frequency error reported. (FBYER)"
+    ::= 64
+
+upsTrapInputFrequencyError TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, An input frequency error reported. (FIERR)"
+    ::= 65
+
+upsTrapInputFrequencyErrorClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: An input frequency error reported. (FIERR)"
+    ::= 66
+
+upsTrapBypassError TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Bypass voltage out of spec reported. (VBYERR)"
+    ::= 67
+
+upsTrapBypassErrorClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Bypass voltage out of spec reported. (VBYERR)"
+    ::= 68
+
+upsTrapEEtoRAMError TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, An error occurred when writing from EEPROM to SRAM. (WRN05)"
+    ::= 69
+
+upsTrapEEtoRAMErrorClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: An error occurred when writing from EEPROM to SRAM. (WRN05)"
+    ::= 70
+
+upsTrapBatteryTestFailed TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, A battery test failed event reported. (BTFAIL)"
+    ::= 71
+
+upsTrapBatteryTestFailedClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: A battery test failed event reported. (BTFAIL)"
+    ::= 72
+
+upsTrapBatteryAbnormal TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, A battery abnormality reported. (BTABNL)"
+    ::= 73
+
+upsTrapBatteryAbnormalClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: A battery abnormality reported. (BTABNL)"
+    ::= 74
+
+upsTrapBatteryLow TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Battery voltage reached Low Battery level. (VBLO)"
+    ::= 75
+
+upsTrapBatteryLowClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Battery voltage reached Low Battery level. (VBLO)"
+    ::= 76
+
+upsTrapBatteryDepleted TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, A Battery shutdown voltage level reached. (VBSD)"
+    ::= 77
+
+upsTrapBatteryDepletedClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: A Battery shutdown voltage level reached. (VBSD)"
+    ::= 78
+
+upsTrapBatteryVoltageBelowShutdown TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Battery shutdown voltage lower than shutdown level. (VBBSD)"
+    ::= 79
+
+upsTrapBatteryVoltageBelowShutdownClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Battery shutdown voltage lower than shutdown level. (VBBSD)"
+    ::= 80
+
+upsTrapMCCBOff TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Battery contact open. (BMCCBO)"
+    ::= 81
+
+upsTrapMCCBOffClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Battery contact open. (BMCCBO)"
+    ::= 82
+
+upsTrapOutputCurrentExceeded TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Output current exceeded. (OCWRN)"
+    ::= 83
+
+upsTrapOutputCurrentExceededClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Output current exceeded. (OCWRN)"
+    ::= 84
+
+upsTrapChargerVoltageAbnormal TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Charger voltage abnormal reported. (CVABL)"
+    ::= 85
+
+upsTrapChargerVoltageAbnormalClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Charger voltage abnormal reported. (CVABL)"
+    ::= 86
+
+upsTrapBattOverheatBattBreakerOpen TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Battery overheat/battery breaker open. (BOH)"
+    ::= 87
+
+upsTrapBattOverheatBattBreakerOpenClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Battery overheat/battery breaker open. (BOH)"
+    ::= 88
+
+upsTrapOutputOverloadWarning TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Output load exceed 110%. (OL110)"
+    ::= 89
+
+upsTrapOutputOverloadWarningClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Output load exceed 110%. (OL110)"
+    ::= 90
+
+upsTrapInverterOverloadWarning TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Inverter Overload reported. (INVOL)"
+    ::= 91
+
+upsTrapInverterOverloadWarningClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Inverter Overload reported. (INVOL)"
+    ::= 92
+
+upsTrapOutputLoadExceeded TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Output load exceed detection threshold. (OOL)"
+    ::= 93
+
+upsTrapOutputLoadExceededClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Output load exceed detection threshold. (OOL)"
+    ::= 94
+
+upsTrapCurrentLimitWarning TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, A current limit reported. (CL)"
+    ::= 95
+
+upsTrapCurrentLimitWarningClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: A current limit reported. (CL)"
+    ::= 96
+
+upsTrapAsyncOperation TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Inverter and bypass are Asynchronous. (ASYN)"
+    ::= 97
+
+upsTrapAsyncOperationClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Inverter and bypass are Asynchronous. (ASYN)"
+    ::= 98
+
+upsTrapRemotEyeCommError TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Communication error between the RemotEye 5 and the UPS."
+    ::= 99
+
+upsTrapRemotEyeCommErrorClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Communication error between the RemotEye 5 and the UPS."
+    ::= 100
+
+upsTrapOutputOverload TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Output overload within specified time. (UPSOL)"
+    ::= 101
+
+upsTrapOutputOverloadClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Output overload within specified time. (UPSOL)"
+    ::= 102
+
+upsTrapUserDefinedOverload110 TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, The inverter output load % is greater than the user defined overload set point (default: 110%)."
+    ::= 103
+
+upsTrapUserDefinedOverload110Clear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: The inverter output load % is greater than the user defined overload set point (default: 110%)."
+    ::= 104
+
+upsTrapCoolingFanAbnormal TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Cooling Fan Abnormal reported. (FNABNL)"
+    ::= 105
+
+upsTrapCoolingFanAbnormalClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Cooling Fan Abnormal reported. (FNABNL)"
+    ::= 106
+
+upsTrapVoltDeviationExceedBattVolt TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Voltage Deviation across battery breaker exceeded. (VDABNL)"
+    ::= 107
+
+upsTrapVoltDeviationExceedBattVoltClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Voltage Deviation across battery breaker exceeded. (VDABNL)"
+    ::= 108
+
+upsTrapInverterOutputVoltOutofSpec TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Input Voltage and Output voltage out of spec. (INVWRN)"
+    ::= 109
+
+upsTrapInverterOutputVoltOutofSpecClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Input Voltage and Output voltage out of spec. (INVWRN)"
+    ::= 110
+
+upsTrapLocalButtonAbnormal TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Local button abnormal reported. (LBABNL)"
+    ::= 111
+
+upsTrapLocalButtonAbnormalClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Local button abnormal reported. (LBABNL)"
+    ::= 112
+
+upsTrapBatteryOverTemperature TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Battery OverTemperature occurs for more than 2 hrs. (BOH2HR)"
+    ::= 113
+
+upsTrapBatteryOverTemperatureClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Battery OverTemperature occurs for more than 2 hrs. (BOH2HR)"
+    ::= 114
+
+upsTrapDischargeWarning TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Discharge warning reported. (DCHWRN)"
+    ::= 115
+
+upsTrapDischargeWarningClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Discharge warning reported. (DCHWRN)"
+    ::= 116
+
+upsTrapBypPCBNoComm TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Communication lost with Bypass PCB. (BYPPCB)"
+    ::= 117
+
+upsTrapBypPCBNoCommClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Communication lost with Bypass PCB. (BYPPCB)"
+    ::= 118
+
+upsTrapAutoTransferDisabled TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Auto Transfer Disabled. (XDIS)"
+    ::= 119
+
+upsTrapAutoTransferDisabledClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Auto Transfer Disabled. (XDIS)"
+    ::= 120
+
+upsTrapControlPCBSupplyError TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, Control PCB power supply error reported. (INVSPY)"
+    ::= 121
+
+upsTrapControlPCBSupplyErrorClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Control PCB power supply error reported. (INVSPY)"
+    ::= 122
+
+upsTrapROMtoEEError TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, An error occurred when writing from ROM to EEPROM. (WRN31)"
+    ::= 123
+
+upsTrapROMtoEEErrorClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: An error occurred when writing from ROM to EEPROM. (WRN31)"
+    ::= 124
+
+upsTrapOnBypass TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Warning, The UPS is in Bypass mode. (BYP)"
+    ::= 125
+
+upsTrapOnBypassClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: The UPS is in Bypass mode. (BYP)"
+    ::= 126
+
+upsTrapPowerFailure TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, A power failure reported. (PFAIL)"
+    ::= 127
+
+upsTrapPowerFailureClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: A power failure reported. (PFAIL)"
+    ::= 128
+
+upsTrapRemoteSwitchEnable TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, Remote switch control enabled. (RMTSWEN)"
+    ::= 129
+
+upsTrapRemoteSwitchEnableClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Remote switch control enabled. (RMTSWEN)"
+    ::= 130
+
+upsTrapAutoTransferEnable TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, Auto re-transfer enabled. (ARTEN)"
+    ::= 131
+
+upsTrapAutoTransferEnableClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Auto re-transfer enabled. (ARTEN)"
+    ::= 132
+
+upsTrapProtectiveCharging TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, Protective Charging is set. (PRCHRG)"
+    ::= 133
+
+upsTrapProtectiveChargingClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Protective Charging is set. (PRCHRG)"
+    ::= 134
+
+upsTrapEqualizedCharging TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, Equalized Charging enabled. (EQCHRG)"
+    ::= 135
+
+upsTrapEqualizedChargingClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Equalized Charging enabled. (EQCHRG)"
+    ::= 136
+
+upsTrapManualMode TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, Manual mode is selected. (MANUAL)"
+    ::= 137
+
+upsTrapManualModeClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Manual mode is selected. (MANUAL)"
+    ::= 138
+
+upsTrapOutputFrequency50Hz TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, Output Frequency is selected to 50Hz. (OUT50HZ)"
+    ::= 139
+
+upsTrapOutputFrequency50HzClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Output Frequency is selected to 50Hz. (OUT50HZ)"
+    ::= 140
+
+upsTrapBatteryTestInProgress TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, A battery test in progress reported. (BTING)"
+    ::= 141
+
+upsTrapBatteryTestInProgressClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: A battery test in progress reported. (BTING)"
+    ::= 142
+
+upsTrapForcedBypass TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, UPS has been forced to bypass mode. (FRCDBYP)"
+    ::= 143
+
+upsTrapForcedBypassClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: UPS has been forced to bypass mode. (FRCDBYP)"
+    ::= 144
+
+upsTrapEE1ST TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, EEPROM value are the first time. (EE1ST)"
+    ::= 145
+
+upsTrapEE1STClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: EEPROM value are the first time. (EE1ST)"
+    ::= 146
+
+upsTrapBatteryTestDisable TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, Battery Test Disabled. (BTDIS)"
+    ::= 147
+
+upsTrapBatteryTestDisableClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: Battery Test Disabled. (BTDIS)"
+    ::= 148
+
+upsTrapShutdownPending TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, An output shutdown in progress reported. Output will turn off after delay. (TIMEDSD)"
+    ::= 149
+
+upsTrapShutdownPendingClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: An output shutdown in progress reported. Output will turn off after delay. (TIMEDSD)"
+    ::= 150
+
+upsTrapOutputOff TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, An output off reported."
+    ::= 151
+
+upsTrapOutputOffClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: An output off reported."
+    ::= 152
+
+upsTrapOnBattery TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, The UPS is on Battery mode; it is supplying output power from its batteries."
+    ::= 153
+
+upsTrapOnBatteryClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: The UPS is on Battery mode; it is supplying output power from its batteries."
+    ::= 154
+
+upsTrapLogInError TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, UPS Password is incorrect."
+    ::= 155
+
+upsTrapLogInErrorClear TRAP-TYPE
+    ENTERPRISE upsTrap
+    DESCRIPTION
+        "Info, CLEARED: UPS Password is incorrect."
+    ::= 156
+
+END
