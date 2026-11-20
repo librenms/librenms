@@ -30,6 +30,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\StringHelpers;
 
 class Application extends DeviceRelatedModel
@@ -70,13 +71,29 @@ class Application extends DeviceRelatedModel
      */
     public static function purgeTrashed(int $days): array
     {
-        $cutoff = Carbon::now()->subDays($days);
-        $appIds = static::onlyTrashed()->where('deleted_at', '<=', $cutoff)->pluck('app_id');
+        return DB::transaction(function () use ($days): array {
+            $cutoff = Carbon::now()->subDays($days);
 
-        $metrics = $appIds->isEmpty() ? 0 : ApplicationMetric::whereIn('app_id', $appIds)->delete();
-        $applications = static::onlyTrashed()->where('deleted_at', '<=', $cutoff)->forceDelete();
+            $appIds = static::onlyTrashed()->where('deleted_at', '<=', $cutoff)->pluck('app_id');
 
-        return ['applications' => $applications, 'metrics' => $metrics];
+            if ($appIds->isEmpty()) {
+                return ['applications' => 0, 'metrics' => 0];
+            }
+
+            // Re-evaluate the trashed set at delete time so an application restored
+            // since the selection never loses its metrics.
+            $metrics = ApplicationMetric::whereIn(
+                'app_id',
+                static::onlyTrashed()->where('deleted_at', '<=', $cutoff)->select('app_id'),
+            )->delete();
+
+            $applications = static::onlyTrashed()
+                ->where('deleted_at', '<=', $cutoff)
+                ->whereIn('app_id', $appIds)
+                ->forceDelete();
+
+            return ['applications' => $applications, 'metrics' => $metrics];
+        });
     }
 
     // ---- Define Relationships ----
