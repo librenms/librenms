@@ -30,6 +30,7 @@ class RrdTrafficDefinition
 
     public function addSeries(string $key, string $id, string $filename, DataSeries $series, float $drawScale): void
     {
+        $color = $series->style->color instanceof ThemeColor ? $series->style->color->for($this->params->isDark()) : $series->style->color;
         $factor = RrdSeriesDefinition::number($drawScale * ($series->style->invert && ! LibrenmsConfig::get('webui.graph_stacked') ? -1 : 1));
         $this->summarize($id, $series, $factor);
 
@@ -39,7 +40,7 @@ class RrdTrafficDefinition
                 "VDEF:{$id}intercept={$id}max,LSLINT",
                 "CDEF:{$id}trend={$id}max,POP,{$id}slope,COUNT,*,{$id}intercept,+,$factor,*",
             );
-            $this->drawing[] = "LINE2:{$id}trend#" . (ThemeColor::resolve($series->style->color, $this->params) ?? '666666') . ':' . Rrd::safeDescr(__('graph.legend.prediction', ['series' => $series->description])) . '\\n:dashes=8';
+            $this->drawing[] = "LINE2:{$id}trend#" . ($color ?? '666666') . ':' . Rrd::safeDescr(__('graph.legend.prediction', ['series' => $series->description])) . '\\n:dashes=8';
         }
 
         if ($this->params->visible('previous')) {

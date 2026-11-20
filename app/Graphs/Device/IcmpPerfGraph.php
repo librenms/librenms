@@ -24,7 +24,7 @@ class IcmpPerfGraph extends DeviceGraph
 
         return [
             'rtt' => new DataSeries($metric, 'avg', __('graph.device.icmp_perf.rtt'), 'ms', minField: 'min', maxField: 'max',
-                style: new SeriesStyle(color: ThemeColor::text(), rangeColor: ThemeColor::subtle())),
+                style: new SeriesStyle(color: new ThemeColor('272B30', 'F2F2F2'), rangeColor: new ThemeColor('D0D0D0', '3E444C'))),
             'loss' => new DataSeries($metric, new Formula('xmt', 'rcv', '-', 'xmt', '/', 100, '*'), __('graph.device.icmp_perf.loss'), '%',
                 style: new SeriesStyle(color: 'D42E08', fill: true, fillColor: 'D42E08')),
         ];

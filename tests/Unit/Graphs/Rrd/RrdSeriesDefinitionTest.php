@@ -226,7 +226,7 @@ class RrdSeriesDefinitionTest extends TestCase
 
     public function test_theme_colors_use_the_variation_of_the_style_of_the_request(): void
     {
-        $series = ['a' => new DataSeries($this->metric, 'a', 'A', style: new SeriesStyle(color: new ThemeColor('272B30', 'F2F2F2'), rangeColor: ThemeColor::subtle()))];
+        $series = ['a' => new DataSeries($this->metric, 'a', 'A', style: new SeriesStyle(color: new ThemeColor('272B30', 'F2F2F2'), rangeColor: new ThemeColor('D0D0D0', '3E444C')))];
 
         $light = $this->build($series, params: ['from' => 100, 'to' => 200, 'style' => 'light']);
         $this->assertContains('LINE1.25:ds0#272B30:A                ', $light);
@@ -235,16 +235,6 @@ class RrdSeriesDefinitionTest extends TestCase
         $dark = $this->build($series, params: ['from' => 100, 'to' => 200, 'style' => 'dark']);
         $this->assertContains('LINE1.25:ds0#F2F2F2:A                ', $dark);
         $this->assertContains('AREA:ds0range#3E444C::STACK', $dark);
-    }
-
-    public function test_lines_in_the_text_color_follow_the_requested_text_color(): void
-    {
-        LibrenmsConfig::shouldReceive('get')->with('rrdgraph_def_text_color')->andReturn('#000000');
-        LibrenmsConfig::shouldReceive('get')->with('rrdgraph_def_text_color_dark')->andReturn('f8f9f9');
-        $series = ['a' => new DataSeries($this->metric, 'a', 'A', style: new SeriesStyle(color: ThemeColor::text()))];
-
-        $this->assertContains('LINE1.25:ds0#f8f9f9:A                ', $this->build($series, params: ['from' => 100, 'to' => 200, 'style' => 'dark']));
-        $this->assertContains('LINE1.25:ds0#123456:A                ', $this->build($series, params: ['from' => 100, 'to' => 200, 'style' => 'dark', 'font' => '123456']));
     }
 
     public function test_lines_do_not_draw_the_previous_period(): void

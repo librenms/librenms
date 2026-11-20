@@ -77,6 +77,7 @@ class RrdSeriesDefinition
             throw new NoGraphData(__('graph.errors.no_data_files'));
         }
 
+        $dark = $params->isDark();
         $averaged = count(array_filter(array_keys($files), fn ($key) => $this->series[$key]->style->stackAverage));
 
         $i = 0;
@@ -85,7 +86,7 @@ class RrdSeriesDefinition
             $id = 'ds' . $i++;
             $style = $series->style;
             $drawScale = $style->stackAverage ? $style->drawScale / $averaged : $style->drawScale;
-            $color = ThemeColor::resolve($style->color, $params) ?? $this->nextColor();
+            $color = $this->hex($style->color, $dark) ?? $this->nextColor();
             $label = Rrd::fixedSafeDescr($series->description, self::LABEL_WIDTH);
             $inverted = $inverted || $style->invert;
 
@@ -107,10 +108,10 @@ class RrdSeriesDefinition
             } else {
                 $drawing[] = "LINE1.25:$drawnId#$color:$label";
                 if ($style->fill) {
-                    $fills[] = "AREA:$drawnId#" . (ThemeColor::resolve($style->fillColor, $params) ?? $color . '20');
+                    $fills[] = "AREA:$drawnId#" . ($this->hex($style->fillColor, $dark) ?? $color . '20');
                 }
                 if ($style->maxFillColor !== null) {
-                    $maxFills[] = 'AREA:' . $this->drawnValue("{$id}max", $drawScale, $style->invert, $defs) . '#' . ThemeColor::resolve($style->maxFillColor, $params);
+                    $maxFills[] = 'AREA:' . $this->drawnValue("{$id}max", $drawScale, $style->invert, $defs) . '#' . $this->hex($style->maxFillColor, $dark);
                 }
                 if ($this->options->scaleMargin > 0) {
                     // invisible lines that only widen the autoscaled axis
@@ -125,7 +126,7 @@ class RrdSeriesDefinition
                     // an invisible line at the minimum, the range stacked on it
                     $min = $this->drawnValue("{$id}min", $drawScale, $style->invert, $defs);
                     $defs[] = "CDEF:{$id}range=" . $this->drawnValue("{$id}max", $drawScale, $style->invert, $defs) . ",$min,-";
-                    array_push($maxFills, "LINE:$min#00000000", "AREA:{$id}range#" . ThemeColor::resolve($style->rangeColor, $params) . '::STACK');
+                    array_push($maxFills, "LINE:$min#00000000", "AREA:{$id}range#" . $this->hex($style->rangeColor, $dark) . '::STACK');
                 }
             }
 
@@ -240,6 +241,16 @@ class RrdSeriesDefinition
     private function scaleRpn(float $scale): string
     {
         return $scale == 1 ? '' : ',' . self::number($scale) . ',*';
+    }
+
+    /**
+     * The hex of a color, of a theme color the variation for the style
+     *
+     * @return ($color is null ? null : string)
+     */
+    private function hex(string|ThemeColor|null $color, bool $dark): ?string
+    {
+        return $color instanceof ThemeColor ? $color->for($dark) : $color;
     }
 
     private function nextColor(): string

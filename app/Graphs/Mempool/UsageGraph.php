@@ -55,7 +55,7 @@ class UsageGraph extends AbstractSeriesGraph
             'used' => new DataSeries($metric, 'used', __('graph.series.used'), $unit,
                 style: new SeriesStyle(color: Color::percentage($mempool->mempool_perc ?? 0, $mempool->mempool_perc_warn)['middle'], stacked: true)),
             'free' => new DataSeries($metric, 'free', __('graph.series.free'), $unit,
-                style: new SeriesStyle(color: ThemeColor::subtle(), stacked: true)),
+                style: new SeriesStyle(color: new ThemeColor('D0D0D0', '3E444C'), stacked: true)),
         ];
     }
 

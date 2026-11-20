@@ -217,10 +217,7 @@ after the series stacked above it.
 A color that needs a different variation in the light and dark site styles is
 a `ThemeColor`: `new ThemeColor(light: '272B30', dark: 'F2F2F2')`. The renderer
 uses the variation of the style it draws in, so graphs never check the site
-style themselves. `ThemeColor::text()` is the configured text color, for lines
-that should stand out like text; it also follows a text color set in the graph
-request. `ThemeColor::subtle()` barely stands out from the background, for
-areas behind the data such as ranges or free space.
+style themselves.
 
 To convert the values themselves, use `scale` on `DataSeries`. For example,
 `scale: 8, unit: 'bps'` converts a stored bytes-per-second field to bits per

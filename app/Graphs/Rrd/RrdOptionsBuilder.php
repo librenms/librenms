@@ -4,7 +4,6 @@ namespace App\Graphs\Rrd;
 
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
-use App\Data\Graphing\ThemeColor;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\ImageFormat;
 
@@ -162,19 +161,30 @@ class RrdOptionsBuilder
      */
     private function colors(): array
     {
-        $defaults = LibrenmsConfig::get($this->params->isDark() ? 'rrdgraph_def_text_dark' : 'rrdgraph_def_text');
+        $dark = $this->params->isDark();
+        $defaults = LibrenmsConfig::get($dark ? 'rrdgraph_def_text_dark' : 'rrdgraph_def_text');
+        $font = ltrim(LibrenmsConfig::get($dark ? 'rrdgraph_def_text_color_dark' : 'rrdgraph_def_text_color'), '#');
 
         preg_match_all('/-c ([A-Z]+)#([0-9A-Fa-f]{6,8})/', $defaults, $matches);
-        $colors = ['FONT' => ThemeColor::text()->for($this->params)];
+        $colors = ['FONT' => $font];
         foreach ($matches[1] as $index => $key) {
             $colors[$key] = $matches[2][$index];
         }
 
-        // the colors the request may override
-        $colors['CANVAS'] = ThemeColor::canvas()->for($this->params);
-        $colors['BACK'] = ThemeColor::background()->for($this->params);
+        // user overrides
+        if ($this->params->font_color) {
+            $colors['FONT'] = $this->params->font_color;
+        }
 
-        return array_filter($colors, fn (?string $color) => $color !== null && $color !== '');
+        if ($this->params->canvas) {
+            $colors['CANVAS'] = $this->params->canvas;
+        }
+
+        if ($this->params->background) {
+            $colors['BACK'] = $this->params->background;
+        }
+
+        return $colors;
     }
 
     private function fitTitle(string $title): string

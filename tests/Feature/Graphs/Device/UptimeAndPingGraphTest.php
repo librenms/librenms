@@ -62,6 +62,6 @@ class UptimeAndPingGraphTest extends TestCase
     {
         $command = new IcmpPerfGraph(new GraphParameters(['type' => 'device_icmp_perf', 'device' => $this->device->device_id, 'style' => 'dark']))->getDebugCommand();
 
-        $this->assertStringContainsString('LINE1.25:ds0#f8f9f9:RTT', $command);
+        $this->assertStringContainsString('LINE1.25:ds0#F2F2F2:RTT', $command);
     }
 }

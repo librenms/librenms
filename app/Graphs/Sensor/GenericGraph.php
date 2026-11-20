@@ -60,7 +60,7 @@ class GenericGraph extends AbstractSeriesGraph
 
         return [
             'sensor' => new DataSeries($sensor->metricIdentity('sensor'), 'sensor', (string) $sensor->sensor_descr, $sensor->unit(), $scale,
-                new SeriesStyle(color: ThemeColor::text(), rangeColor: ThemeColor::subtle()), $offset),
+                new SeriesStyle(color: new ThemeColor('272B30', 'F2F2F2'), rangeColor: new ThemeColor('D0D0D0', '3E444C')), $offset),
         ];
     }
 
