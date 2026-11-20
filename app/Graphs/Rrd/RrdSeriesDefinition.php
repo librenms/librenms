@@ -6,8 +6,8 @@ use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\Formula;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\SeriesRole;
 use App\Data\Graphing\SeriesSum;
-use App\Data\Graphing\ThemeColor;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Exceptions\NoGraphData;
@@ -34,7 +34,8 @@ class RrdSeriesDefinition
     // series labels start further right than the heading because of the color box
     private const int LEGEND_COLOR_BOX_WIDTH = 2;
 
-    private int $colorIndex = 0;
+    /** series overlap instead of drawing inverted ones below the axis */
+    private bool $overlaid = false;
 
     /** @var array<string, string> rrd file of each data series that has one */
     private array $files = [];
@@ -71,31 +72,38 @@ class RrdSeriesDefinition
         $stacks = [];
         $lastStack = null;
         $inverted = false;
-        $traffic = $this->options->traffic === null ? null : new RrdTrafficDefinition($this->options->traffic, $params);
+        $drawable = [];
 
         $this->files = [];
         $this->ids = [];
         foreach ($this->series as $key => $series) {
-            $filename = $series instanceof DataSeries ? $this->rrdFiles->pathFor($series->metric) : null;
+            if ($series instanceof DataSeries) {
+                $filename = $this->rrdFiles->pathFor($series->metric);
+                if ($filename === null) {
+                    continue;
+                }
 
-            if ($filename !== null) {
                 $this->files[$key] = $filename;
+            } elseif (! array_any($series->series, fn ($member) => isset($drawable[$member]))) {
+                continue;
             }
+
+            $drawable[$key] = $series;
+            $inverted = $inverted || ($series->style->invert && ! $series->style->legendOnly);
         }
 
         if ($this->files === []) {
             throw new NoGraphData(__('graph.errors.no_data_files'));
         }
 
-        $dark = $params->isDark();
+        // stacked graphs and graphs zoomed to the port speed draw inverted series above the axis, over the others
+        $this->overlaid = LibrenmsConfig::get('webui.graph_stacked') || ($this->options->traffic?->speedZoom && array_filter($this->options->traffic->speeds));
+        $theme = new GraphTheme($params->isDark(), $this->options->palette, $this->overlaid && $inverted);
+        $traffic = $this->options->traffic === null ? null : new RrdTrafficDefinition($this->options->traffic, $params, $theme, $this->overlaid);
         $averaged = count(array_filter(array_keys($this->files), fn ($key) => $this->series[$key]->style->stackAverage));
 
         $i = 0;
-        foreach ($this->series as $key => $series) {
-            if (! $this->isDrawable($key)) {
-                continue;
-            }
-
+        foreach ($drawable as $key => $series) {
             $id = 'ds' . $i++;
             $this->ids[$key] = $id;
             $style = $series->style;
@@ -107,13 +115,13 @@ class RrdSeriesDefinition
                 array_push($defs, ...$this->periodValueDefs($key, '', $suffix, $cf));
             }
 
+            $color = null;
             if ($style->legendOnly) {
                 // a legend entry that draws nothing
                 $drawing[] = "HRULE:0#00000000:$label";
                 $lastStack = null;
             } else {
-                $color = $this->hex($style->color, $dark) ?? $this->nextColor();
-                $inverted = $inverted || $style->invert;
+                $color = $theme->next($style->role, $style->stacked);
                 $drawnId = $this->drawnValue($id, $drawScale, $style->invert, $defs);
 
                 if ($style->stacked) {
@@ -141,10 +149,10 @@ class RrdSeriesDefinition
                     $lastStack = null;
                     $drawing[] = "LINE1.25:$drawnId#$color:$label";
                     if ($style->fill) {
-                        $fills[] = "AREA:$drawnId#" . ($this->hex($style->fillColor, $dark) ?? $color . '20');
+                        $fills[] = "AREA:$drawnId#" . $theme->fill($style->role, $color);
                     }
-                    if ($style->maxFillColor !== null) {
-                        $maxFills[] = 'AREA:' . $this->drawnValue("{$id}max", $drawScale, $style->invert, $defs) . '#' . $this->hex($style->maxFillColor, $dark);
+                    if ($style->maxFill) {
+                        $maxFills[] = 'AREA:' . $this->drawnValue("{$id}max", $drawScale, $style->invert, $defs) . '#' . $theme->maxFill($style->role, $color);
                     }
                     if ($this->options->scaleMargin > 0) {
                         // invisible lines that only widen the autoscaled axis
@@ -157,18 +165,18 @@ class RrdSeriesDefinition
                             $margins[] = "LINE:$id$name#00000000";
                         }
                     }
-                    if ($style->rangeColor !== null) {
+                    if ($style->range) {
                         // an invisible line at the minimum, the range stacked on it
                         $min = $this->drawnValue("{$id}min", $drawScale, $style->invert, $defs);
                         $defs[] = "CDEF:{$id}range=" . $this->drawnValue("{$id}max", $drawScale, $style->invert, $defs) . ",$min,-";
-                        array_push($maxFills, "LINE:$min#00000000", "AREA:{$id}range#" . $this->hex($style->rangeColor, $dark) . '::STACK');
+                        array_push($maxFills, "LINE:$min#00000000", "AREA:{$id}range#" . $theme->color(SeriesRole::Muted) . '::STACK');
                     }
                 }
             }
 
             array_push($drawing, ...$this->legendValues($id, $series->unit, $summarized));
             if ($summarized) {
-                $traffic->addSeries($key, $id, $series, $drawScale, fn (string $period, string $suffix, string $cf, string $range, int $shift) => $this->periodValueDefs($key, $period, $suffix, $cf, $range, $shift));
+                $traffic->addSeries($id, $series, $drawScale, $color, fn (string $period, string $suffix, string $cf, string $range, int $shift) => $this->periodValueDefs($key, $period, $suffix, $cf, $range, $shift));
             }
         }
 
@@ -176,18 +184,18 @@ class RrdSeriesDefinition
         foreach ($previousValues as $direction => $values) {
             $previous = $direction === 'up' ? 'previous' : "previous$direction";
             $defs[] = "CDEF:$previous=" . implode(',', $values) . str_repeat(',+', count($values) - 1);
-            array_push($drawing, "AREA:$previous#99999999:", "LINE1.25:$previous#666666:");
+            array_push($drawing, "AREA:$previous#{$theme->previousStackArea()}:", "LINE1.25:$previous#{$theme->previousStackLine()}:");
         }
 
         if ($inverted) {
-            $drawing[] = 'HRULE:0#555555';
+            $drawing[] = 'HRULE:0#' . $theme->axis();
         }
 
         if ($this->options->thresholds) {
             $last = array_key_last($this->options->thresholds);
             foreach ($this->options->thresholds as $index => $threshold) {
                 $label = str_replace(':', '\\:', $threshold->label) . ($index === $last ? '\\l' : '');
-                $drawing[] = 'LINE1.5:' . self::number($threshold->value) . "#$threshold->color:$label:dashes";
+                $drawing[] = 'LINE1.5:' . self::number($threshold->value) . '#' . $theme->color($threshold->role) . ":$label:dashes";
             }
         }
 
@@ -196,18 +204,6 @@ class RrdSeriesDefinition
 
         // fills go below all lines, so they do not hide lines of other series
         return [$this->legendHeader(), ...$defs, ...$margins, ...$maxFills, ...$fills, ...$drawing, ...($traffic?->drawing() ?? [])];
-    }
-
-    /**
-     * Whether the series has data to draw: an rrd file, or for a sum a drawable series listed before it
-     */
-    private function isDrawable(string $key): bool
-    {
-        $series = $this->series[$key];
-
-        return $series instanceof SeriesSum
-            ? array_any($series->series, fn ($member) => isset($this->ids[$member]))
-            : isset($this->files[$key]);
     }
 
     /**
@@ -341,7 +337,7 @@ class RrdSeriesDefinition
      */
     private function drawnFactor(float $drawScale, bool $invert): float
     {
-        return $drawScale * ($invert && ! LibrenmsConfig::get('webui.graph_stacked') ? -1 : 1);
+        return $drawScale * ($invert && ! $this->overlaid ? -1 : 1);
     }
 
     /**
@@ -350,27 +346,6 @@ class RrdSeriesDefinition
     private function scaleRpn(float $scale): string
     {
         return $scale == 1 ? '' : ',' . self::number($scale) . ',*';
-    }
-
-    /**
-     * The hex of a color, of a theme color the variation for the style
-     *
-     * @return ($color is null ? null : string)
-     */
-    private function hex(string|ThemeColor|null $color, bool $dark): ?string
-    {
-        return $color instanceof ThemeColor ? $color->for($dark) : $color;
-    }
-
-    private function nextColor(): string
-    {
-        $palette = $this->options->palette;
-
-        if (! LibrenmsConfig::has("graph_colours.$palette.$this->colorIndex")) {
-            $this->colorIndex = 0;
-        }
-
-        return LibrenmsConfig::get("graph_colours.$palette." . $this->colorIndex++);
     }
 
     /**

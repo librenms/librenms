@@ -5,8 +5,8 @@ namespace App\Graphs\Sensor;
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphPageContext;
+use App\Data\Graphing\SeriesRole;
 use App\Data\Graphing\SeriesStyle;
-use App\Data\Graphing\ThemeColor;
 use App\Data\Graphing\Threshold;
 use App\Graphs\AbstractSeriesGraph;
 use App\Models\Sensor;
@@ -17,12 +17,12 @@ use LibreNMS\Exceptions\NoGraphData;
  */
 class GenericGraph extends AbstractSeriesGraph
 {
-    /** @var array<string, array{string, string}> threshold field to label translation and color */
+    /** @var array<string, array{string, SeriesRole}> threshold field to label translation and role */
     private const array THRESHOLDS = [
-        'sensor_limit_low' => ['graph.sensor.thresholds.low', '00008B'],
-        'sensor_limit_low_warn' => ['graph.sensor.thresholds.low_warn', '005BDF'],
-        'sensor_limit_warn' => ['graph.sensor.thresholds.high_warn', 'FFA420'],
-        'sensor_limit' => ['graph.sensor.thresholds.high', 'FF0000'],
+        'sensor_limit_low' => ['graph.sensor.thresholds.low', SeriesRole::LowLimit],
+        'sensor_limit_low_warn' => ['graph.sensor.thresholds.low_warn', SeriesRole::LowWarning],
+        'sensor_limit_warn' => ['graph.sensor.thresholds.high_warn', SeriesRole::HighWarning],
+        'sensor_limit' => ['graph.sensor.thresholds.high', SeriesRole::HighLimit],
     ];
 
     private ?Sensor $sensor = null;
@@ -60,7 +60,7 @@ class GenericGraph extends AbstractSeriesGraph
 
         return [
             'sensor' => new DataSeries($sensor->metricIdentity('sensor'), 'sensor', (string) $sensor->sensor_descr, $sensor->unit(), $scale,
-                new SeriesStyle(color: new ThemeColor('272B30', 'F2F2F2'), rangeColor: new ThemeColor('D0D0D0', '3E444C')), $offset),
+                new SeriesStyle(SeriesRole::Value, range: true), $offset),
         ];
     }
 
@@ -70,9 +70,9 @@ class GenericGraph extends AbstractSeriesGraph
         [$scale, $offset] = $this->conversion();
 
         $thresholds = [];
-        foreach (self::THRESHOLDS as $field => [$label, $color]) {
+        foreach (self::THRESHOLDS as $field => [$label, $role]) {
             if ($sensor->$field !== null) {
-                $thresholds[] = new Threshold($sensor->$field * $scale + $offset, __($label, ['value' => $sensor->formatValue($field)]), $color);
+                $thresholds[] = new Threshold($sensor->$field * $scale + $offset, __($label, ['value' => $sensor->formatValue($field)]), $role);
             }
         }
 

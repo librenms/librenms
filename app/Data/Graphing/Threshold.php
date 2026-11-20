@@ -8,12 +8,12 @@ namespace App\Data\Graphing;
 final readonly class Threshold
 {
     /**
-     * @param  string  $color  hex without a leading #
+     * @param  SeriesRole  $role  what the line marks, such as SeriesRole::HighLimit
      */
     public function __construct(
         public float $value,
         public string $label,
-        public string $color,
+        public SeriesRole $role,
     ) {
     }
 }

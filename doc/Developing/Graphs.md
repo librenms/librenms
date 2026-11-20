@@ -201,24 +201,29 @@ Set these named arguments on `SeriesStyle` to control an individual series:
 
 | Option | Effect |
 | --- | --- |
-| `color: '0000cc'` | Sets a hex line or area color, without `#`. Otherwise, uses the graph palette. |
+| `role: SeriesRole::In` | Says what the series shows, which sets its colors. Otherwise, uses the graph palette. |
 | `fill: true` | Fills the area beneath a line. |
-| `fillColor: '9999cc'` | Sets the fill color; the default is a transparent version of the line color. |
 | `stacked: true` | Draws an area above the preceding stacked series. |
 | `invert: true` | Draws below zero, unless `webui.graph_stacked` is enabled. |
 | `drawScale: 0.5` | Scales only the drawing; legend values retain the series value. |
 | `stackAverage: true` | Divides the drawing by the number of drawn series with this set, so a stack of percentages shows their average. |
-| `maxFillColor: 'e0e0ff'` | Fills the area below the highest value of each interval, behind the other fills. |
-| `rangeColor: 'cccccc'` | Fills the area between the lowest and highest value of each interval, behind the other fills. |
+| `maxFill: true` | Fills the area below the highest value of each interval, behind the other fills. |
+| `range: true` | Fills the area between the lowest and highest value of each interval, behind the other fills. |
 | `legendOnly: true` | Shows the series in the legend without drawing it. |
 
 Inverted stacked series stack separately below the axis. Stacked series may be
 listed in any order, such as the in and out series of each port together.
 
-A color that needs a different variation in the light and dark site styles is
-a `ThemeColor`: `new ThemeColor(light: '272B30', dark: 'F2F2F2')`. The renderer
-uses the variation of the style it draws in, so graphs never check the site
-style themselves.
+Graphs never set colors. A `SeriesRole` says what a series shows, such as
+`In`, `Out`, `Error`, `Value` (the measured value, in the color of the legend
+text), `Muted` (free space) or `SeriesRole::usage($percent, $warn)` for used
+capacity, and the renderer picks colors that suit the light or dark site style.
+Drawn series that share a role get different shades, so stacked ports each get
+their own color. Stacked `In` and `Out` series take their shades from the
+`graph_colours.greens` and `graph_colours.purples` palettes, so a site that
+changes those palettes changes these graphs too. When `webui.graph_stacked`
+draws inverted series above the axis, the renderer makes areas and fills
+translucent so the series behind them stay visible.
 
 To convert the values themselves, use `scale` on `DataSeries`. For example,
 `scale: 8, unit: 'bps'` converts a stored bytes-per-second field to bits per
@@ -266,7 +271,7 @@ Common named arguments on `GraphOptions` are:
 | `palette` | Selects a palette from `graph_colours`; defaults to `mixed`. |
 | `base` | Sets the scaling base, such as `1024` for binary units. |
 | `unitsExponent` | Controls the axis unit exponent; `0` shows axis and legend values without SI prefixes, for units such as days or milliseconds. |
-| `thresholds` | Draws a dashed `Threshold` line for each value, such as alert limits, in the units of the series. |
+| `thresholds` | Draws a dashed `Threshold` line for each value, such as alert limits, in the units of the series. Its role, such as `SeriesRole::HighLimit`, sets its color. |
 | `scaleMargin` | Widens an autoscaled axis by this fraction of the values, so values that barely change still get axis labels. |
 | `axisUnit` | Shows a unit after the axis values, which are then shown without SI prefixes. |
 | `rightAxisLabel` | Adds a right axis with the same scale as the left one. |

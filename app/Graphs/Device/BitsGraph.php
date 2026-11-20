@@ -4,6 +4,7 @@ namespace App\Graphs\Device;
 
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
+use App\Data\Graphing\SeriesRole;
 use App\Data\Graphing\SeriesStyle;
 use App\Data\Graphing\SeriesSum;
 use App\Data\Graphing\TrafficOptions;
@@ -23,20 +24,14 @@ class BitsGraph extends DeviceGraph
     public function getSeries(): array
     {
         $device = $this->device();
-        $alpha = LibrenmsConfig::get('webui.graph_stacked') ? '88' : '';
 
         $series = [];
         $in = [];
         $out = [];
-        $color = 0;
         foreach ($device->ports()->isNotDeleted()->where('disabled', 0)->orderBy('ifIndex')->get() as $port) {
             $port->setRelation('device', $device);
             if (! $this->isTraffic($port)) {
                 continue;
-            }
-
-            if (! LibrenmsConfig::has("graph_colours.greens.$color") || ! LibrenmsConfig::has("graph_colours.purples.$color")) {
-                $color = 0;
             }
 
             $metric = $port->metricIdentity('port');
@@ -44,10 +39,9 @@ class BitsGraph extends DeviceGraph
             $in[] = "in_$port->port_id";
             $out[] = "out_$port->port_id";
             $series["in_$port->port_id"] = new DataSeries($metric, 'INOCTETS', $label . ' ' . __('graph.series.in'), 'bps', 8,
-                new SeriesStyle(color: LibrenmsConfig::get("graph_colours.greens.$color") . $alpha, stacked: true));
+                new SeriesStyle(SeriesRole::In, stacked: true));
             $series["out_$port->port_id"] = new DataSeries($metric, 'OUTOCTETS', $label . ' ' . __('graph.series.out'), 'bps', 8,
-                new SeriesStyle(color: LibrenmsConfig::get("graph_colours.purples.$color") . $alpha, stacked: true, invert: true));
-            $color++;
+                new SeriesStyle(SeriesRole::Out, stacked: true, invert: true));
         }
 
         if ($series === []) {
