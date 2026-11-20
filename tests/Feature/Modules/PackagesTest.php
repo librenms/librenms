@@ -39,6 +39,41 @@ final class PackagesTest extends InMemoryDbTestCase
         $this->assertTrue($packages->every(fn (Package $package): bool => $package->size === null && $package->build === '' && (bool) $package->status));
     }
 
+    public function testPollsRedHatNamedPackages(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Snmp]);
+        $this->fakeSnmpInstalledPackages([
+            ['index' => 869, 'name' => 'libsndfile-1.0.31-10.el9'],
+            ['index' => 1110, 'name' => 'bubblewrap-0.6.3-1.el9_9.1'],
+            ['index' => 1210, 'name' => 'qt5-qt3d-5.15.9-3.el9_9.1'],
+        ]);
+
+        $module = new Packages;
+        $this->assertTrue($module->shouldPoll($os));
+        $module->poll($os, $this->datastore());
+
+        $packages = Package::where('device_id', $os->getDeviceId())->orderBy('name')->get();
+        $this->assertSame(['bubblewrap', 'libsndfile', 'qt5-qt3d'], $packages->pluck('name')->all());
+        $this->assertSame(['0.6.3', '1.0.31', '5.15.9'], $packages->pluck('version')->all());
+        $this->assertSame(['1.el9_9.1', '10.el9', '3.el9_9.1'], $packages->pluck('build')->all());
+        $this->assertSame(['unknown', 'unknown', 'unknown'], $packages->pluck('arch')->all());
+    }
+
+    public function testSplitsTheRpmEpochFromTheVersion(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Snmp]);
+        $this->fakeSnmpInstalledPackages([
+            ['index' => 1, 'name' => '1:bash-5.1.8-6.el9'],
+        ]);
+
+        (new Packages)->poll($os, $this->datastore());
+
+        $package = Package::where('device_id', $os->getDeviceId())->sole();
+        $this->assertSame('bash', $package->name);
+        $this->assertSame('1:5.1.8', $package->version);
+        $this->assertSame('6.el9', $package->build);
+    }
+
     public function testNameWithoutVersionFallsBackToTheModificationDate(): void
     {
         $os = $this->makeOs([PollingMethodType::Snmp]);
