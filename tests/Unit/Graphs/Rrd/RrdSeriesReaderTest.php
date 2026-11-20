@@ -3,6 +3,8 @@
 namespace LibreNMS\Tests\Unit\Graphs\Rrd;
 
 use App\Data\Graphing\DataSeries;
+use App\Data\Graphing\Formula;
+use App\Data\Graphing\SeriesSum;
 use App\Data\TimeSeries\MetricIdentity;
 use App\Graphs\Rrd\RrdFileResolver;
 use App\Graphs\Rrd\RrdSeriesReader;
@@ -57,17 +59,15 @@ class RrdSeriesReaderTest extends TestCase
         $this->assertSame([20.0, null, 40.0], $data->series['out']['avg']);
     }
 
-    public function test_values_are_scaled_to_the_value_of_the_series(): void
+    public function test_rrdtool_converts_values_to_the_units_of_the_series(): void
     {
-        $this->backend->shouldReceive('xport')->andReturn([
-            'ds0avg' => [1200 => 2.0, 1500 => null], 'ds0min' => [1200 => 1.0, 1500 => null], 'ds0max' => [1200 => 3.0, 1500 => null],
-        ]);
+        $this->backend->shouldReceive('xport')->once()->with(Mockery::on(fn (array $options) => array_slice($options, 6) === [
+            'DEF:ds0avgraw=localhost/traffic.rrd:bytes:AVERAGE', 'CDEF:ds0avg=ds0avgraw,8,*', 'XPORT:ds0avg:ds0avg',
+            'DEF:ds0minraw=localhost/traffic.rrd:low:MIN', 'CDEF:ds0min=ds0minraw,8,*', 'XPORT:ds0min:ds0min',
+            'DEF:ds0maxraw=localhost/traffic.rrd:bytes:MAX', 'CDEF:ds0max=ds0maxraw,8,*', 'XPORT:ds0max:ds0max',
+        ]))->andReturn([]);
 
-        $data = $this->reader()->read(['bits' => new DataSeries($this->metric, 'bytes', 'Traffic', 'bps', 8)], 1000, 1900, 500);
-
-        $this->assertSame([16.0, null], $data->series['bits']['avg']);
-        $this->assertSame([8.0, null], $data->series['bits']['min']);
-        $this->assertSame([24.0, null], $data->series['bits']['max']);
+        $this->reader()->read(['bits' => new DataSeries($this->metric, 'bytes', 'Traffic', 'bps', 8, minField: 'low')], 1000, 1900, 500);
     }
 
     public function test_min_and_max_are_left_out_when_they_are_the_average(): void
@@ -76,11 +76,45 @@ class RrdSeriesReaderTest extends TestCase
             'ds0avg' => [1200 => 2.0, 1500 => null], 'ds0min' => [1200 => 2.0, 1500 => null], 'ds0max' => [1200 => 3.0, 1500 => null],
         ]);
 
-        $data = $this->reader()->read(['in' => new DataSeries($this->metric, 'in', 'In', scale: 8)], 1000, 1900, 500);
+        $data = $this->reader()->read(['in' => new DataSeries($this->metric, 'in', 'In')], 1000, 1900, 500);
 
-        $this->assertSame([16.0, null], $data->series['in']['avg']);
+        $this->assertSame([2.0, null], $data->series['in']['avg']);
         $this->assertNull($data->series['in']['min']);
-        $this->assertSame([24.0, null], $data->series['in']['max']);
+        $this->assertSame([3.0, null], $data->series['in']['max']);
+    }
+
+    public function test_a_formula_has_only_its_average(): void
+    {
+        $this->backend->shouldReceive('xport')->once()->with(Mockery::on(fn (array $options) => array_slice($options, 6) === [
+            'DEF:ds0avg0f=localhost/traffic.rrd:xmt:AVERAGE', 'DEF:ds0avg1f=localhost/traffic.rrd:rcv:AVERAGE',
+            'CDEF:ds0avg=ds0avg0f,ds0avg1f,-', 'XPORT:ds0avg:ds0avg',
+        ]))->andReturn(['ds0avg' => [1200 => 1.0]]);
+
+        $data = $this->reader()->read(['lost' => new DataSeries($this->metric, new Formula('xmt', 'rcv', '-'), 'Lost')], 1000, 1900, 500);
+
+        $this->assertSame(['avg' => [1.0], 'min' => null, 'max' => null], $data->series['lost']);
+    }
+
+    public function test_a_sum_adds_up_the_averages_of_its_series_that_have_data(): void
+    {
+        $this->backend->shouldReceive('xport')->once()->with(Mockery::on(fn (array $options) => array_slice($options, -2) === [
+            'CDEF:ds2avg=ds0avg,ds1avg,ADDNAN', 'XPORT:ds2avg:ds2avg',
+        ]))->andReturn([
+            'ds0avg' => [1200 => 1.0], 'ds0min' => [1200 => 1.0], 'ds0max' => [1200 => 1.0],
+            'ds1avg' => [1200 => 2.0], 'ds1min' => [1200 => 2.0], 'ds1max' => [1200 => 2.0],
+            'ds2avg' => [1200 => 3.0],
+        ]);
+
+        $data = $this->reader()->read([
+            'in' => new DataSeries($this->metric, 'in', 'In'),
+            'gone' => new DataSeries($this->missing, 'in', 'Gone'),
+            'out' => new DataSeries($this->metric, 'out', 'Out'),
+            'total' => new SeriesSum(['in', 'gone', 'out'], 'Total'),
+            'nothing' => new SeriesSum(['gone'], 'Nothing'),
+        ], 1000, 1900, 500);
+
+        $this->assertSame(['avg' => [3.0], 'min' => null, 'max' => null], $data->series['total']);
+        $this->assertArrayNotHasKey('nothing', $data->series, 'a sum without any series with data is left out');
     }
 
     public function test_rrdtool_is_asked_for_at_least_its_minimum_of_rows(): void

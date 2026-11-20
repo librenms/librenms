@@ -3,6 +3,8 @@
 namespace App\Graphs\Rrd;
 
 use App\Data\Graphing\DataSeries;
+use App\Data\Graphing\Formula;
+use App\Data\Graphing\SeriesSum;
 use App\Data\TimeSeries\SeriesData;
 use Illuminate\Support\Arr;
 use LibreNMS\Exceptions\RrdException;
@@ -26,7 +28,9 @@ class RrdSeriesReader
     }
 
     /**
-     * @param  array<string, DataSeries>  $series
+     * Values are in the units of the series. The lowest and highest of formulas and sums are those of their averages, so they are left out.
+     *
+     * @param  array<string, DataSeries|SeriesSum>  $series  sums add up series listed before them
      * @param  int  $from  unix time
      * @param  int  $to  unix time
      * @param  int  $points  longer ranges are consolidated to about this many
@@ -39,14 +43,28 @@ class RrdSeriesReader
         $ids = [];
 
         foreach ($series as $key => $item) {
+            if ($item instanceof SeriesSum) {
+                $members = array_values(array_intersect_key($ids, array_flip($item->series)));
+                if ($members === []) {
+                    continue;
+                }
+
+                $ids[$key] = $id = 'ds' . count($ids);
+                $values = array_map(fn (string $member) => $member . 'avg', $members);
+                array_push($definition, "CDEF:{$id}avg=" . implode(',', $values) . str_repeat(',ADDNAN', count($values) - 1), "XPORT:{$id}avg:{$id}avg");
+                continue;
+            }
+
             $filename = $this->rrdFiles->pathFor($item->metric);
             if ($filename === null) {
                 continue;
             }
 
             $ids[$key] = $id = 'ds' . count($ids);
-            foreach (self::CONSOLIDATIONS as $name => $cf) {
-                array_push($definition, "DEF:$id$name=$filename:$item->field:$cf", "XPORT:$id$name:$id$name");
+            $consolidations = $item->field instanceof Formula ? ['avg' => 'AVERAGE'] : self::CONSOLIDATIONS;
+            foreach ($consolidations as $name => $cf) {
+                array_push($definition, ...RrdSeriesDefinition::valueDefs($id . $name, $filename, $item, $cf));
+                $definition[] = "XPORT:$id$name:$id$name";
             }
         }
 
@@ -58,31 +76,18 @@ class RrdSeriesReader
 
         $values = [];
         foreach ($ids as $key => $id) {
-            $read = fn (string $name) => array_values($export[$id . $name] ?? []);
-            $avg = $read('avg');
+            $read = fn (string $name) => isset($export[$id . $name]) ? array_values($export[$id . $name]) : null;
+            $avg = $read('avg') ?? [];
             $min = $read('min');
             $max = $read('max');
 
             $values[$key] = [
-                'avg' => $this->scale($avg, $series[$key]->scale),
-                'min' => $min === $avg ? null : $this->scale($min, $series[$key]->scale),
-                'max' => $max === $avg ? null : $this->scale($max, $series[$key]->scale),
+                'avg' => $avg,
+                'min' => $min === $avg ? null : $min,
+                'max' => $max === $avg ? null : $max,
             ];
         }
 
         return new SeriesData(array_keys(Arr::first($export) ?? []), $values);
-    }
-
-    /**
-     * @param  list<float|null>  $values
-     * @return list<float|null>
-     */
-    private function scale(array $values, float $scale): array
-    {
-        if ($scale == 1) {
-            return $values;
-        }
-
-        return array_map(fn (?float $value) => $value === null ? null : $value * $scale, $values);
     }
 }

@@ -3,8 +3,10 @@
 /**
  * @typedef {object} GraphData App\Data\Graphing\GraphData
  * @property {number[]} timestamps unix time each point's interval ends
- * @property {{label: string, min: ?number, max: ?number, base: number}} axis min and max are limits when set
+ * @property {{label: string, min: ?number, max: ?number, base: number, margin: number}} axis min and max are limits when set,
+ *     without them a margin above zero asks to fit the axis to the data
  * @property {GraphSeries[]} series
+ * @property {Threshold[]} thresholds reference lines, such as alert limits
  */
 
 /**
@@ -12,9 +14,11 @@
  * @property {string} key
  * @property {string} label
  * @property {string} unit
- * @property {string} color
+ * @property {?string} color null for a legend only series without one
  * @property {?string} fillColor the area below the line, or the stacked area
  * @property {?string} maxFillColor the area below the maximum of a line
+ * @property {?string} rangeColor the area between the min and max of a line
+ * @property {boolean} legendOnly in the legend, not drawn
  * @property {boolean} stacked
  * @property {boolean} invert drawn below the axis
  * @property {number} drawScale multiplies the drawn value
@@ -23,6 +27,8 @@
  * @property {?Array<?number>} max null when the same as avg
  */
 
+/** @typedef {{value: number, label: string, color: string}} Threshold */
+
 /** @typedef {{from: number, to: number}} View unix times */
 
 /**
@@ -30,7 +36,7 @@
  * @property {boolean} range shade between the min and max of each line
  * @property {boolean} mirror inverted series below the axis, else above it with the rest
  * @property {'graph'|'stack'|'overlay'} stacking as the graph defines, all on a side of the axis, or none
- * @property {'zero'|'fit'|'log'} scale
+ * @property {'graph'|'fit'|'log'} scale as the graph defines, fitted to the data, or logarithmic
  * @property {boolean} trend a straight line fitted to what is shown of each series
  */
 
@@ -71,6 +77,7 @@ const DOUBLE_TAP_MS = 350;
 const LOG_TICK_PIXELS = 28;
 const PREVIOUS_DASH = [6, 4];
 const TREND_DASH = [2, 4];
+const THRESHOLD_DASH = [8, 4];
 const MAX_TREND_POINTS = 1000; // past the data, to the end of the view
 const BINARY_INCREMENTS = Array.from({ length: 70 }, (unused, power) => 2 ** power);
 
@@ -275,11 +282,12 @@ function trendOf(timestamps, values, { from, to }) {
     return (time) => start + slope * (time - from);
 }
 
-// Back to front: min to max ranges, fills, stacked areas from the top down, lines, earlier lines, trends.
+// Back to front: min to max ranges, fills, stacked areas from the top down, lines, thresholds, earlier lines, trends.
 // Layers depend only on which series there are and what is drawn, so new data can replace the old.
 // A range is two layers, its top and its bottom, the fill is between them.
 // Values get the drawn data {series, totals} of now and of the previous time, null without it.
-function layersFor(series, { range: showRange, trend }, comparing) {
+// A constant layer has the same value at every time.
+function layersFor(series, thresholds, { range: showRange, trend }, comparing) {
     const stacked = series.filter((item) => item.stacked);
     const lines = series.filter((item) => ! item.stacked);
     const average = (item) => ({ series: data }) => drawnValues(data[item.key], data[item.key].avg);
@@ -304,7 +312,7 @@ function layersFor(series, { range: showRange, trend }, comparing) {
     return [
         // points that cover more than one stored value show their range
         ...(showRange ? lines : []).flatMap((item) => [
-            { range: item.maxFillColor ?? `${item.color}26`, values: edge(item, true) },
+            { range: item.rangeColor ?? item.maxFillColor ?? `${item.color}26`, values: edge(item, true) },
             { values: edge(item, false) },
         ]),
         ...lines.filter((item) => item.fillColor).map((item) => ({ fill: item.fillColor, values: average(item) })),
@@ -314,6 +322,7 @@ function layersFor(series, { range: showRange, trend }, comparing) {
             values: ({ totals }) => totals[item.key],
         })).reverse(),
         ...lines.map((item) => ({ stroke: item.color, values: average(item) })),
+        ...thresholds.map((threshold) => ({ stroke: threshold.color, dash: THRESHOLD_DASH, constant: threshold.value, values: () => null })),
         ...(comparing ? series : []).map((item) => ({
             stroke: `${item.color}b3`,
             dash: PREVIOUS_DASH,
@@ -324,8 +333,12 @@ function layersFor(series, { range: showRange, trend }, comparing) {
     ];
 }
 
-// from zero unless the graph sets a limit, like the image graphs, with room where the data sets it
+// from zero unless the graph sets a limit or a margin, like the image graphs, with room where the data sets it
 function valueRange(axis) {
+    if (axis.margin > 0 && axis.min === null && axis.max === null) {
+        return fittedRange;
+    }
+
     const floor = axis.min ?? 0;
 
     return (plot, dataMin, dataMax) => {
@@ -388,7 +401,7 @@ function restyled(item, { mirror, stacking }) {
         ...(mirror ? {} : { invert: false }),
         ...(stacking === 'stack' ? { stacked: true, fillColor: item.fillColor ?? item.color } : {}),
         // the range too, its default color is see through
-        ...(stacking === 'overlay' ? { stacked: false, fillColor: filled ? `${item.color}26` : null, maxFillColor: null } : {}),
+        ...(stacking === 'overlay' ? { stacked: false, fillColor: filled ? `${item.color}26` : null, maxFillColor: null, rangeColor: null } : {}),
     };
 
     return Object.keys(changes).length === 0 ? item : { ...item, ...changes };
@@ -423,10 +436,10 @@ function commonUnit(series) {
  */
 export default function createChart(element, graph, { view, hidden, compact, draw, previous, onView, onReset, onHover }) {
     const label = compact ? '' : graph.axis.label;
-    const shownSeries = graph.series.filter((item) => ! hidden.has(item.key));
+    const shownSeries = graph.series.filter((item) => ! hidden.has(item.key) && ! item.legendOnly);
     const visible = shownSeries.map((item) => restyled(item, draw));
     const comparing = previous !== null;
-    const layers = layersFor(visible, draw, comparing);
+    const layers = layersFor(visible, graph.thresholds, draw, comparing);
     const log = draw.scale === 'log';
     const unit = commonUnit(graph.series);
     const zone = LibreNMSDate.zone();
@@ -469,6 +482,9 @@ export default function createChart(element, graph, { view, hidden, compact, dra
         ]));
 
         return [times, ...layers.map((layer) => {
+            if (layer.constant !== undefined) {
+                return times.map(() => layer.constant);
+            }
             const values = layer.values(now, then);
             if (values === null) {
                 return empty;
@@ -619,10 +635,10 @@ export default function createChart(element, graph, { view, hidden, compact, dra
                 stroke: layer.stroke ?? 'transparent',
                 fill: layer.fill,
                 fillTo: 0,
-                width: layer.stroke ? 1.25 : 0,
+                width: layer.stroke ? (layer.constant === undefined ? 1.25 : 1.5) : 0,
                 dash: layer.dash,
-                // a trend is straight, not drawn level for each interval
-                paths: layer.trend ? undefined : INTERVALS,
+                // trends and constants are straight, not drawn level for each interval
+                paths: layer.trend || layer.constant !== undefined ? undefined : INTERVALS,
                 points: { show: false },
             })),
         ],
@@ -630,7 +646,7 @@ export default function createChart(element, graph, { view, hidden, compact, dra
         bands: layers.flatMap((layer, index) => (layer.range ? [{ series: [index + 1, index + 2], fill: layer.range }] : [])),
         cursor: {
             y: false,
-            points: { size: (self, index) => (layers[index - 1]?.stroke ? 7 : 0) },
+            points: { size: (self, index) => (layers[index - 1]?.stroke && layers[index - 1].constant === undefined ? 7 : 0) },
             dataIdx: (self, seriesIndex, closest, time) => intervalIndex(self, closest, time),
             // the page zooms to a selection, not uPlot
             drag: { x: true, y: false, setScale: false, dist: MIN_ZOOM_PIXELS },

@@ -9,6 +9,9 @@ namespace App\Data\Graphing;
 readonly class GraphDataSeries
 {
     /**
+     * @param  string|null  $color  null for a legend only series without a color
+     * @param  string|null  $rangeColor  the area between the min and max of a line
+     * @param  bool  $legendOnly  shown in the legend, not drawn
      * @param  list<float|null>  $avg  null where there is no data
      * @param  list<float|null>|null  $min  null when the same as avg, as it is when each point is a single stored value
      * @param  list<float|null>|null  $max  null when the same as avg
@@ -17,9 +20,11 @@ readonly class GraphDataSeries
         public string $key,
         public string $label,
         public string $unit,
-        public string $color,
+        public ?string $color,
         public ?string $fillColor,
         public ?string $maxFillColor,
+        public ?string $rangeColor,
+        public bool $legendOnly,
         public bool $stacked,
         public bool $invert,
         public float $drawScale,

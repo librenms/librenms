@@ -6,7 +6,9 @@ use App\Facades\LibrenmsConfig;
 use App\Graphs\Rrd\RrdFileResolver;
 use App\Models\Device;
 use App\Models\Processor;
+use App\Models\Sensor;
 use App\Models\User;
+use App\Models\UserPref;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use LibreNMS\Exceptions\RrdUnknownException;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
@@ -85,6 +87,24 @@ class GraphDataControllerTest extends TestCase
         $response->assertJsonPath('series.0.avg', [50]);
         $response->assertJsonPath('axis.max', 100);
         $response->assertJsonPath('axis.label', 'Load %');
+    }
+
+    public function testThresholdsThemeColorsAndConvertedValuesAreSent(): void
+    {
+        $sensor = Sensor::factory()->for(Device::factory())->create(['sensor_class' => 'temperature', 'sensor_limit' => 80]);
+        UserPref::setPref($user = $this->adminUser(), 'temp_units', 'f');
+        $this->fakeRrdFiles('localhost/sensor.rrd')->shouldReceive('xport')
+            ->with(Mockery::on(fn (array $options) => in_array('CDEF:ds0avg=ds0avgraw,1.8,*,32,+', $options, true)))
+            ->andReturnUsing(fn (array $options) => $this->export($options, [212.0]));
+
+        $response = $this->actingAs($user)->withSession(['applied_site_style' => 'dark'])->getJson("/graph-data?type=sensor_temperature&id=$sensor->sensor_id");
+
+        $response->assertOk();
+        $response->assertJsonPath('series.0.avg', [212]);
+        $response->assertJsonPath('series.0.color', '#F2F2F2');
+        $response->assertJsonPath('series.0.rangeColor', '#3E444C');
+        $response->assertJsonPath('axis.margin', 0.01);
+        $response->assertJsonFragment(['value' => 176, 'color' => '#FF0000']); // in the unit of the series
     }
 
     public function testGraphsWithoutDataFilesHaveNoData(): void

@@ -5,6 +5,8 @@ namespace LibreNMS\Tests\Unit\Data\Graphing;
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\ResolvedStyle;
 use App\Data\Graphing\SeriesStyle;
+use App\Data\Graphing\SeriesSum;
+use App\Data\Graphing\ThemeColor;
 use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Tests\TestCase;
@@ -60,6 +62,35 @@ class ResolvedStyleTest extends TestCase
 
         LibrenmsConfig::set('webui.graph_stacked', true);
         $this->assertFalse(ResolvedStyle::resolve($series, 'mixed')['out']->invert);
+    }
+
+    public function test_theme_colors_follow_the_site_style(): void
+    {
+        $series = ['a' => $this->series(new SeriesStyle(color: new ThemeColor('111111', 'eeeeee'), rangeColor: new ThemeColor('222222', 'dddddd')))];
+
+        $light = ResolvedStyle::resolve($series, 'mixed')['a'];
+        $this->assertSame('111111', $light->color);
+        $this->assertSame('222222', $light->rangeColor);
+
+        $dark = ResolvedStyle::resolve($series, 'mixed', dark: true)['a'];
+        $this->assertSame('eeeeee', $dark->color);
+        $this->assertSame('dddddd', $dark->rangeColor);
+    }
+
+    public function test_legend_only_series_are_not_drawn_and_take_no_palette_color(): void
+    {
+        LibrenmsConfig::set('graph_colours.test', ['aa0000', 'bb0000']);
+
+        $styles = ResolvedStyle::resolve([
+            'a' => $this->series(),
+            'total' => new SeriesSum(['a'], 'Total', style: new SeriesStyle(stacked: true, invert: true, legendOnly: true)),
+            'b' => $this->series(),
+        ], 'test');
+
+        $this->assertTrue($styles['total']->legendOnly);
+        $this->assertNull($styles['total']->color);
+        $this->assertFalse($styles['total']->stacked);
+        $this->assertSame('bb0000', $styles['b']->color);
     }
 
     private function series(SeriesStyle $style = new SeriesStyle): DataSeries

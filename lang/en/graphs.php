@@ -29,7 +29,7 @@ return [
         'stacking_stack' => 'Stacked',
         'stacking_overlay' => 'Overlaid',
         'scale' => 'Scale',
-        'scale_zero' => 'From zero',
+        'scale_graph' => 'Default',
         'scale_fit' => 'Fit data',
         'scale_log' => 'Logarithmic',
         'columns' => 'Legend columns',

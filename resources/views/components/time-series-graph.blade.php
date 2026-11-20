@@ -94,6 +94,14 @@
                 </template>
             </tbody>
         </table>
+        <div class="tw:flex tw:flex-wrap tw:justify-center tw:gap-x-6 tw:gap-y-1 tw:mt-1 tw:text-xs tw:sm:text-sm" x-show="thresholds.length">
+            <template x-for="threshold in thresholds" :key="threshold.label">
+                <span class="tw:flex tw:items-center tw:gap-2">
+                    <span class="tw:inline-block tw:w-4 tw:border-t-2 tw:border-dashed" :style="{ borderColor: threshold.color }"></span>
+                    <span x-text="threshold.label"></span>
+                </span>
+            </template>
+        </div>
     </div>
 
 </div>
@@ -145,6 +153,7 @@
                 refreshing: false,
                 error: null,
                 legend: [],
+                thresholds: [],
                 hidden: [],
                 tooltip: null,
                 zoomed: false,
@@ -398,6 +407,7 @@
 
                     const [start, end] = charts.shownPoints(graph.timestamps, shown());
 
+                    this.thresholds = graph.thresholds;
                     this.legend = graph.series.map((series) => {
                         const format = (value) => charts.formatValue(value, series.unit, graph.axis.base);
                         const summary = charts.summarize(series, start, end);

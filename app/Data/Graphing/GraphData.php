@@ -10,13 +10,16 @@ readonly class GraphData
 {
     /**
      * @param  list<int>  $timestamps  unix time each point's interval ends
-     * @param  array{label: string, min: float|null, max: float|null, base: int}  $axis  the value axis, min and max are limits when set
+     * @param  array{label: string, min: float|null, max: float|null, base: int, margin: float}  $axis  the value axis, min and max are limits when set.
+     *                                                                                                  Without limits, margin is the fraction of the data range kept free above and below it.
      * @param  list<GraphDataSeries>  $series
+     * @param  list<array{value: float, label: string, color: string}>  $thresholds  reference lines, such as alert limits, colors are CSS hex colors
      */
     public function __construct(
         public array $timestamps,
         public array $axis,
         public array $series,
+        public array $thresholds = [],
     ) {
     }
 }

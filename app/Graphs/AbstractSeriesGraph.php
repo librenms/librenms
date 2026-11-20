@@ -7,9 +7,9 @@ use App\Data\Graphing\GraphData;
 use App\Data\Graphing\GraphDataSeries;
 use App\Data\Graphing\GraphImage;
 use App\Data\Graphing\GraphOptions;
-use App\Data\Graphing\SeriesSum;
-use App\Data\TimeSeries\SeriesData;
 use App\Data\Graphing\ResolvedStyle;
+use App\Data\Graphing\SeriesSum;
+use App\Data\Graphing\Threshold;
 use App\Graphs\Rrd\RrdGraphRenderer;
 use App\Graphs\Rrd\RrdSeriesReader;
 use LibreNMS\Exceptions\GraphException;
@@ -65,11 +65,11 @@ abstract class AbstractSeriesGraph extends AbstractGraph
             $data = app(RrdSeriesReader::class)->read($series, $this->params->from, $this->params->to, $this->params->width);
 
             if ($data->series === []) {
-                throw new NoGraphData('No Data files');
+                throw new NoGraphData(__('graph.errors.no_data_files'));
             }
 
             $options = $this->options();
-            $styles = ResolvedStyle::resolve(array_intersect_key($series, $data->series), $options->palette);
+            $styles = ResolvedStyle::resolve(array_intersect_key($series, $data->series), $options->palette, $this->params->isDark());
             $css = fn (?string $hex) => $hex === null ? null : "#$hex";
 
             $drawn = [];
@@ -78,9 +78,11 @@ abstract class AbstractSeriesGraph extends AbstractGraph
                     key: $key,
                     label: $series[$key]->description,
                     unit: $series[$key]->unit,
-                    color: "#$style->color",
+                    color: $css($style->color),
                     fillColor: $css($style->fillColor),
                     maxFillColor: $css($style->maxFillColor),
+                    rangeColor: $css($style->rangeColor),
+                    legendOnly: $style->legendOnly,
                     stacked: $style->stacked,
                     invert: $style->invert,
                     drawScale: $style->drawScale,
@@ -97,8 +99,14 @@ abstract class AbstractSeriesGraph extends AbstractGraph
                     'min' => $options->scaleMin ?? $this->params->scale_min,
                     'max' => $options->scaleMax ?? $this->params->scale_max,
                     'base' => $options->base ?? 1000,
+                    'margin' => $options->scaleMargin,
                 ],
                 series: $drawn,
+                thresholds: array_map(fn (Threshold $threshold) => [
+                    'value' => $threshold->value,
+                    'label' => $threshold->label,
+                    'color' => "#$threshold->color",
+                ], $options->thresholds),
             );
         });
     }
