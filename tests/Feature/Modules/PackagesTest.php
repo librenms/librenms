@@ -80,14 +80,16 @@ final class PackagesTest extends InMemoryDbTestCase
         $this->fakeSnmpInstalledPackages([
             ['index' => 1, 'name' => '74 65 78 6C 69 76 65 2D 63 6F 6C 6C 65 63 74 69 6F 6E 2D 64 6F 63 75 6D 65 6E 74 61 74 69 6F 6E 2D 62 61 73 65 2D 73 76 6E 31 00 00 00 00 00 00 00 00 00 00 00 00', 'date' => '2026-11-12,6:6:22.0,+1:0'],
             ['index' => 2, 'name' => '6c 69 62 73 6e 64 66 69 6c 65 2d 31 2e 30 2e 33 31 2d 31 30 2e 65 6c 39'],
+            ['index' => 3, 'name' => '70 79 74 68 6F 6E 32 2D 73 65 74 75 70 74 6F 6F 6C 73 2D 77 68 65 65 6C 2D 33 39 2E 30 2E 31 2D 31 34 2E 6D 6F 64 75 6C 65 5F 00 00 00 00 00 00'],
         ]);
 
         (new Packages)->poll($os, $this->datastore());
 
         $packages = Package::where('device_id', $os->getDeviceId())->orderBy('name')->get();
-        $this->assertSame(['libsndfile', 'texlive-collection-documentation-base-svn1'], $packages->pluck('name')->all());
-        $this->assertSame(['1.0.31', '2026-11-12 06:06:22'], $packages->pluck('version')->all());
-        $this->assertSame(['10.el9', ''], $packages->pluck('build')->all());
+        $this->assertSame(['libsndfile', 'python2-setuptools-wheel', 'texlive-collection-documentation-base-svn1'], $packages->pluck('name')->all());
+        $this->assertSame(['1.0.31', '39.0.1', '2026-11-12 06:06:22'], $packages->pluck('version')->all());
+        $this->assertSame(['10.el9', '14.module_', ''], $packages->pluck('build')->all());
+        $this->assertSame(['unknown', 'unknown', 'unknown'], $packages->pluck('arch')->all());
     }
 
     public function testNameWithoutVersionFallsBackToTheModificationDate(): void
