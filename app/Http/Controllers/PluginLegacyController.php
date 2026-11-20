@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Plugin;
 use Illuminate\Http\Request;
+use LibreNMS\Util\Url;
 
 class PluginLegacyController extends Controller
 {
@@ -20,14 +21,14 @@ class PluginLegacyController extends Controller
         return redirect()->route('plugin.admin');
     }
 
-    public function __invoke(?Plugin $plugin): \Illuminate\Contracts\View\View
+    public function __invoke(Request $request, ?Plugin $plugin): \Illuminate\Contracts\View\View
     {
         if (! empty($plugin)) {
             $plugin_path = \App\Facades\LibrenmsConfig::get('plugin_dir') . '/' . $plugin->plugin_name . '/' . $plugin->plugin_name . '.inc.php';
 
             if (is_file($plugin_path)) {
-                $init_modules = ['web'];
                 require base_path('/includes/init.php');
+                $vars = $this->pluginVars($request); // v1 plugins read request options from $vars
 
                 chdir(base_path('html'));
                 ob_start();
@@ -42,5 +43,25 @@ class PluginLegacyController extends Controller
             'title' => $plugin->plugin_name ?? trans('plugins.errors.not_exist'),
             'content' => $output ?? 'This plugin is either disabled or not available.',
         ]);
+    }
+
+    /**
+     * Legacy path options (/key=value/) plus query and post input, without credentials
+     */
+    private function pluginVars(Request $request): array
+    {
+        $vars = Url::parseLegacyPathVars($request->getRequestUri());
+
+        foreach ($request->query() as $name => $value) {
+            if (is_scalar($value)) {
+                $vars[$name] = strip_tags((string) $value);
+            }
+        }
+
+        $vars = array_replace($vars, $request->post());
+
+        unset($vars['username'], $vars['password'], $vars['_token']);
+
+        return $vars;
     }
 }
