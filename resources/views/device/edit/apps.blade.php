@@ -16,16 +16,21 @@
             }
         }">
             <x-panel>
-                <div class="tw:grid tw:grid-cols-1 tw:sm:grid-cols-2 tw:lg:grid-cols-3 tw:gap-2">
+                <div class="tw:grid tw:grid-cols-1 tw:gap-2">
                     @foreach($applications as $app)
-                        <x-toggle :checked="$app['enabled']"
-                                  :disabled="$app['discovered'] || ! $canUpdate"
-                                  x-on:change="toggle($event, {{ Js::from($app['type']) }})">
-                            {{ $app['name'] }}
-                            @if($app['discovered'])
-                                <span class="text-success">({{ __('Discovered') }})</span>
+                        <div class="tw:flex tw:items-center tw:gap-3">
+                            <x-toggle :checked="$app['enabled']"
+                                      :disabled="$app['discovered'] || ! $canUpdate"
+                                      x-on:change="toggle($event, {{ Js::from($app['type']) }})">
+                                {{ $app['name'] }}
+                                @if($app['discovered'])
+                                    <span class="text-success">({{ __('Discovered') }})</span>
+                                @endif
+                            </x-toggle>
+                            @if($app['docs'])
+                                <a target="_blank" href="{{ $app['docs'] }}" class="tw:ml-auto tw:shrink-0">{{ __('Docs') }} <i class="fa fa-book"></i></a>
                             @endif
-                        </x-toggle>
+                        </div>
                     @endforeach
                 </div>
             </x-panel>
