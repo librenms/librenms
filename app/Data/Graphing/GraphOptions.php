@@ -10,7 +10,11 @@ readonly class GraphOptions
     /**
      * @param  bool|null  $scaleRigid  defaults to rigid when neither scaleMin nor scaleMax is set
      * @param  string  $legendTitle  heading above the series labels
+     * @param  int|null  $unitsExponent  0 shows axis and legend values without SI prefixes, such as m or k
      * @param  string  $palette  the graph_colours palette for series without a color
+     * @param  list<Threshold>  $thresholds  reference lines, such as alert limits
+     * @param  float  $scaleMargin  keep this fraction of the highest and lowest values of each line between them and the edge of an
+     *                              autoscaled axis, so values that barely change still get a range with labels
      */
     public function __construct(
         public ?float $scaleMin = null,
@@ -28,6 +32,8 @@ readonly class GraphOptions
         public string $legendTitle = '',
         public string $palette = 'mixed',
         public ?TrafficOptions $traffic = null,
+        public array $thresholds = [],
+        public float $scaleMargin = 0,
     ) {
     }
 }

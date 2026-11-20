@@ -157,9 +157,9 @@ class RrdOptionsBuilder
      */
     private function colors(): array
     {
-        $style = $this->params->style ?: session('applied_site_style');
-        $defaults = LibrenmsConfig::get($style == 'dark' ? 'rrdgraph_def_text_dark' : 'rrdgraph_def_text');
-        $font = ltrim(LibrenmsConfig::get($style == 'dark' ? 'rrdgraph_def_text_color_dark' : 'rrdgraph_def_text_color'), '#');
+        $dark = $this->params->isDark();
+        $defaults = LibrenmsConfig::get($dark ? 'rrdgraph_def_text_dark' : 'rrdgraph_def_text');
+        $font = ltrim(LibrenmsConfig::get($dark ? 'rrdgraph_def_text_color_dark' : 'rrdgraph_def_text_color'), '#');
 
         preg_match_all('/-c ([A-Z]+)#([0-9A-Fa-f]{6,8})/', $defaults, $matches);
         $colors = ['FONT' => $font];

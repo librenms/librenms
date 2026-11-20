@@ -68,7 +68,7 @@ class RrdGraphRenderer
     public function commandOptions(string $title, GraphOptions $options, array $definition): array
     {
         if (empty($definition)) {
-            throw new GraphException('Graph Definition Error', 'Def Error');
+            throw new GraphException(__('graph.errors.definition'), __('graph.errors.definition_short'));
         }
 
         return [
@@ -108,10 +108,10 @@ class RrdGraphRenderer
             return new GraphImage($this->params->imageFormat, $title, $image);
         } catch (RrdGraphException $e) {
             if ($dataFilesMissing !== null && $dataFilesMissing()) {
-                throw new NoGraphData('No Data files', $e);
+                throw new NoGraphData(__('graph.errors.no_data_files'), $e);
             }
 
-            throw new RrdGraphException('Error: ' . $e->getMessage(), 'Draw Error', $e);
+            throw new RrdGraphException(__('graph.errors.draw', ['message' => $e->getMessage()]), __('graph.errors.draw_short'), $e);
         }
     }
 }

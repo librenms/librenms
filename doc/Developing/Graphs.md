@@ -208,11 +208,32 @@ Set these named arguments on `SeriesStyle` to control an individual series:
 | `invert: true` | Draws below zero, unless `webui.graph_stacked` is enabled. |
 | `drawScale: 0.5` | Scales only the drawing; legend values retain the series value. |
 | `stackAverage: true` | Divides the drawing by the number of drawn series with this set, so a stack of percentages shows their average. |
+| `maxFillColor: 'e0e0ff'` | Fills the area below the highest value of each interval, behind the other fills. |
+| `rangeColor: 'cccccc'` | Fills the area between the lowest and highest value of each interval, behind the other fills. |
+
+Inverted stacked series start their own stack below the axis, so list them
+after the series stacked above it.
 
 To convert the values themselves, use `scale` on `DataSeries`. For example,
 `scale: 8, unit: 'bps'` converts a stored bytes-per-second field to bits per
 second, including the legend values. Setting `unit` alone only adds a suffix;
-it does not convert values.
+it does not convert values. `offset` is added after the scale: `scale: 1.8,
+offset: 32` converts celsius to fahrenheit.
+
+The lowest and highest value of each interval come from the stored minimum and
+maximum of `field`. When they are stored in fields of their own, name them with
+`minField` and `maxField`.
+
+To show a value calculated from several fields of the metric, pass a `Formula`
+as the field. It is written in reverse polish notation with field names,
+numbers and the operators `+ - * /`:
+
+```php
+// percent of pings lost
+new DataSeries($metric, new Formula('xmt', 'rcv', '-', 'xmt', '/', 100, '*'), 'Loss', '%');
+```
+
+The lowest and highest values of a formula are those of its averages.
 
 ### Graph options
 
@@ -226,7 +247,9 @@ Common named arguments on `GraphOptions` are:
 | `legendTitle` | Adds a heading above the series labels. |
 | `palette` | Selects a palette from `graph_colours`; defaults to `mixed`. |
 | `base` | Sets the scaling base, such as `1024` for binary units. |
-| `unitsExponent` | Controls the axis unit exponent; `0` uses unprefixed units. |
+| `unitsExponent` | Controls the axis unit exponent; `0` shows axis and legend values without SI prefixes, for units such as days or milliseconds. |
+| `thresholds` | Draws a dashed `Threshold` line for each value, such as alert limits, in the units of the series. |
+| `scaleMargin` | Widens an autoscaled axis by this fraction of the values, so values that barely change still get axis labels. |
 
 For example, a percentage graph can use `scaleMin: 0, scaleMax: 100,
 scaleRigid: true`. See `app/Data/Graphing/GraphOptions.php` for all options.
@@ -247,6 +270,10 @@ Create the class using the existing graph name so callers can keep using that
 name. LibreNMS prefers a matching graph class over a legacy
 `includes/html/graphs/<type>/<subtype>.inc.php` file. If no class matches, it
 falls back to the legacy include.
+
+A graph type may have a `GenericGraph` class that draws every subtype without
+a class or legacy include of its own. For example, `App\Graphs\Sensor\GenericGraph`
+draws `sensor_temperature`, `sensor_voltage` and the other sensor classes.
 
 Replace legacy RRD filename and dataset variables with `MetricIdentity` and
 `DataSeries`, and move presentation settings into `SeriesStyle` and
