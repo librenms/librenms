@@ -94,6 +94,22 @@ final class PackagesTest extends InMemoryDbTestCase
         $this->assertSame(['unknown', 'unknown', 'unknown'], $packages->pluck('arch')->all());
     }
 
+    public function testDecodesHexEncodedNamesWrappedAcrossLines(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Snmp]);
+        // snmpwalk wraps long values across lines (a newline after every 16 bytes)
+        $this->fakeSnmpInstalledPackages([
+            ['index' => 1, 'name' => "74 65 78 6C 69 76 65 2D 63 6F 6C 6C 65 63 74 69 \n6F 6E 2D 66 6F 6E 74 73 72 65 63 6F 6D 6D 65 6E \n64 65 64 2D 73 76 6E 32 38 30", 'date' => '2020-05-26,6:13:7.0,+2:0'],
+        ]);
+
+        (new Packages)->poll($os, $this->datastore());
+
+        $package = Package::where('device_id', $os->getDeviceId())->sole();
+        $this->assertSame('texlive-collection-fontsrecommended-svn280', $package->name);
+        $this->assertSame('2020-05-26 06:13:07', $package->version);
+        $this->assertSame('unknown', $package->arch);
+    }
+
     public function testNameWithoutVersionFallsBackToTheModificationDate(): void
     {
         $os = $this->makeOs([PollingMethodType::Snmp]);

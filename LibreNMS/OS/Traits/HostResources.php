@@ -338,8 +338,10 @@ trait HostResources
             return null;
         }
 
-        // snmpwalk renders names carrying non-printable characters (e.g. NUL padding) as hex
-        if (preg_match('/^[0-9a-f]{2}( [0-9a-f]{2})*$/i', $raw)) {
+        // snmpwalk renders names carrying non-printable characters (e.g. NUL padding) as
+        // hex, wrapped across lines, so the bytes are separated by whitespace (spaces and
+        // newlines)
+        if (preg_match('/^[0-9a-f]{2}(\s+[0-9a-f]{2})*$/i', $raw)) {
             $raw = $this->decodeHostResourceHex($raw);
 
             if ($raw === '') {
@@ -504,8 +506,11 @@ trait HostResources
      */
     private function decodeHostResourceHex(string $raw): string
     {
+        // snmpwalk wraps long values across lines, so drop all whitespace before decoding
+        $hex = preg_replace('/\s+/', '', $raw);
+
         $decoded = '';
-        foreach (explode(' ', $raw) as $byte) {
+        foreach (str_split($hex, 2) as $byte) {
             $decoded .= chr((int) hexdec($byte));
         }
 
