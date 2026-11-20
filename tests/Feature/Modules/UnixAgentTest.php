@@ -28,6 +28,7 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
+use App\Models\Package;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
@@ -159,5 +160,61 @@ final class UnixAgentTest extends InMemoryDbTestCase
         $module->poll($os, $datastore);
 
         $this->assertSame(1, $agent->probes); // the module did not connect again
+    }
+
+    public function testPollSyncsPackagesFromTheAgentOutput(): void
+    {
+        $device = Device::factory()->create(['os' => 'linux']);
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::UnixAgent,
+            'affects_availability' => false,
+        ]);
+        DeviceCache::setPrimary($device->device_id);
+        $deviceArray = DeviceCache::refresh($device->device_id)->toArray();
+        $os = OS::make($deviceArray);
+
+        $agent = new class extends PollingMethod
+        {
+            public function probe(Device $device, PollingMethodConfig $config): ProbeResult
+            {
+                return ProbeResult::success(['output' => "<<<rpm>>>\nbash 5.2.0 3 x86_64 12345\nkernel 6.8.0 1 x86_64 67890\n", 'time' => 15]);
+            }
+
+            public function definition(): UnixAgentDefinition
+            {
+                return new UnixAgentDefinition;
+            }
+
+            public function defaultAffectsAvailability(): bool
+            {
+                return false;
+            }
+
+            public function defaults(?Device $device = null): array
+            {
+                return [];
+            }
+
+            public function config(Device $device, ?DevicePollingMethod $deviceMethod = null): UnixAgentConfig
+            {
+                return new UnixAgentConfig(port: 6556, timeout: 1);
+            }
+        };
+        $this->app->instance(UnixAgentPollingMethod::class, $agent);
+
+        $datastore = Mockery::mock(DataStorageInterface::class);
+        $datastore->shouldReceive('put')->zeroOrMoreTimes();
+
+        (new UnixAgent)->poll($os, $datastore);
+
+        $packages = Package::where('device_id', $device->device_id)->orderBy('name')->get();
+        $this->assertSame(['bash', 'kernel'], $packages->pluck('name')->all());
+        $bash = $packages->firstWhere('name', 'bash');
+        $this->assertSame('5.2.0', $bash->version);
+        $this->assertSame('3', (string) $bash->build);
+        $this->assertSame('x86_64', $bash->arch);
+        $this->assertSame('rpm', $bash->manager);
+        $this->assertSame(12345, (int) $bash->size);
     }
 }
