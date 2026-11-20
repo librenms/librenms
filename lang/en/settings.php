@@ -1750,6 +1750,9 @@ return [
             'unix-agent' => [
                 'description' => 'Unix Agent',
             ],
+            'packages' => [
+                'description' => 'Packages',
+            ],
             'os' => [
                 'description' => 'OS',
             ],
