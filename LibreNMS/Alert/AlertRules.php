@@ -340,8 +340,20 @@ readonly class AlertRules
                 }
                 $alertRow->timestamp = Carbon::now();
             }
-            if ($newState === AlertState::RECOVERED) {
+            if ($newState === AlertState::RECOVERED || $newState === AlertState::ACTIVE) {
                 $alertRow->note = '';
+            } elseif ($newState === AlertState::ACKNOWLEDGED) {
+                $notes = AlertFault::query()
+                    ->where('rule_id', $rule->id)
+                    ->where('device_id', $this->device->device_id)
+                    ->where('open', 1)
+                    ->where('state', '!=', AlertState::RECOVERED)
+                    ->whereNotNull('note')
+                    ->where('note', '!=', '')
+                    ->pluck('note')
+                    ->unique()
+                    ->all();
+                $alertRow->note = $notes !== [] ? implode(PHP_EOL, $notes) : '';
             }
             $alertRow->save();
         } else {
@@ -353,6 +365,19 @@ readonly class AlertRules
             $alertRow->open = $activeCount > 0 ? 1 : 0;
             $alertRow->alerted = 0;
             $alertRow->info = ['open_fault_count' => $activeCount];
+            if ($newState === AlertState::ACKNOWLEDGED) {
+                $notes = AlertFault::query()
+                    ->where('rule_id', $rule->id)
+                    ->where('device_id', $this->device->device_id)
+                    ->where('open', 1)
+                    ->where('state', '!=', AlertState::RECOVERED)
+                    ->whereNotNull('note')
+                    ->where('note', '!=', '')
+                    ->pluck('note')
+                    ->unique()
+                    ->all();
+                $alertRow->note = $notes !== [] ? implode(PHP_EOL, $notes) : '';
+            }
             $alertRow->save();
         }
 

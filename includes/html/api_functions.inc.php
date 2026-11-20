@@ -2060,7 +2060,7 @@ function unmute_alert(Illuminate\Http\Request $request)
         if (! empty($note)) {
             $note .= PHP_EOL;
         }
-        $note .= date(LibrenmsConfig::get('dateformat.long')) . ' - Ack (' . Auth::user()->username . ") {$data['note']}";
+        $note .= date(LibrenmsConfig::get('dateformat.long')) . ' - UnAck (' . Auth::user()->username . ") {$data['note']}";
 
         $target->state = AlertState::ACTIVE;
         $target->note = $note;
