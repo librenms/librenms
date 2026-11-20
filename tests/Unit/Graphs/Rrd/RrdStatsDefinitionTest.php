@@ -123,6 +123,30 @@ class RrdStatsDefinitionTest extends TestCase
         $this->assertContains('VDEF:ds0p0=ds0,25,PERCENTNAN', $definition);
     }
 
+    public function test_percent_in_the_unit_is_escaped(): void
+    {
+        $definition = $this->build(['a' => new DataSeries($this->metric, 'a', 'A', '%')]);
+
+        foreach (['ds0hourly', 'ds0hourlymin', 'ds0hourlymax'] as $vname) {
+            $this->assertContains("GPRINT:$vname:LAST:%5.2lf%s%%", $definition);
+            $this->assertContains("GPRINT:$vname:MIN:%5.2lf%s%%", $definition);
+            $this->assertContains("GPRINT:$vname:MAX:%5.2lf%s%%", $definition);
+            $this->assertContains("GPRINT:$vname:AVERAGE:%5.2lf%s%%\\n", $definition);
+        }
+        $this->assertContains('GPRINT:ds0p0:%5.2lf%s%%\n', $definition);
+    }
+
+    public function test_colon_in_the_unit_is_escaped(): void
+    {
+        $definition = $this->build(['a' => new DataSeries($this->metric, 'a', 'A', 'a:b')]);
+
+        foreach (['ds0hourly', 'ds0hourlymin', 'ds0hourlymax'] as $vname) {
+            $this->assertContains("GPRINT:$vname:LAST:%5.2lf%sa\\:b", $definition);
+            $this->assertContains("GPRINT:$vname:AVERAGE:%5.2lf%sa\\:b\\n", $definition);
+        }
+        $this->assertContains('GPRINT:ds0p0:%5.2lf%sa\:b\n', $definition);
+    }
+
     public function test_drawn_lines_follow_invert_and_draw_scale(): void
     {
         $definition = $this->build(['a' => new DataSeries($this->metric, 'a', 'A', style: new SeriesStyle(invert: true, drawScale: 2))]);

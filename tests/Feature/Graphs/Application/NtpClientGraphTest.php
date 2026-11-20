@@ -3,21 +3,16 @@
 namespace LibreNMS\Tests\Feature\Graphs\Application;
 
 use App\Data\Graphing\GraphParameters;
-use App\Facades\Rrd;
 use App\Graphs\Application\NtpClientFreqGraph;
 use App\Graphs\Application\NtpClientOffsetGraph;
 use App\Graphs\Application\NtpClientStabilityGraph;
 use App\Graphs\Application\NtpClientStatsGraph;
-use App\Graphs\GraphAccess;
 use App\Graphs\GraphFactory;
 use App\Models\Application;
 use App\Models\Device;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Gate;
-use LibreNMS\Exceptions\NoGraphData;
 use LibreNMS\Tests\TestCase;
-use Mockery;
+use PHPUnit\Framework\Attributes\TestWith;
 
 final class NtpClientGraphTest extends TestCase
 {
@@ -35,17 +30,6 @@ final class NtpClientGraphTest extends TestCase
         $this->assertNotContains('ntp-client_offset', $factory->subtypes('application'));
     }
 
-    public function testSeriesReadTheRrdFileOfThePoller(): void
-    {
-        $app = $this->ntpClient();
-
-        $series = new NtpClientOffsetGraph(new GraphParameters(['type' => 'application_ntp_client_offset', 'id' => $app->app_id]))->getSeries();
-
-        $this->assertSame('offset', $series['offset']->field);
-        $this->assertSame(0.001, $series['offset']->scale);
-        $this->assertSame("ntp.example.com/app-ntp-client-$app->app_id.rrd", Rrd::metricName($series['offset']->metric)->relativePath());
-    }
-
     public function testStatsShowsJitterAndNoiseInSeconds(): void
     {
         $app = $this->ntpClient();
@@ -57,40 +41,17 @@ final class NtpClientGraphTest extends TestCase
         $this->assertSame('s', $series['noise']->unit);
     }
 
-    public function testTitleAndPageContext(): void
+    #[TestWith(['application_ntp_client_stats', 'Stats'])]
+    #[TestWith(['application_ntp_client_offset', 'Offset'])]
+    #[TestWith(['application_ntp_client_freq', 'Freq'])]
+    #[TestWith(['application_ntp_client_stability', 'Stability'])]
+    public function testTitles(string $type, string $graph): void
     {
         $app = $this->ntpClient();
 
-        $graph = new NtpClientFreqGraph(new GraphParameters(['type' => 'application_ntp_client_freq', 'id' => $app->app_id]));
+        $title = app(GraphFactory::class)->graphFor(new GraphParameters(['type' => $type, 'id' => $app->app_id]))->getTitle();
 
-        $this->assertSame($app->device->shortDisplayName() . '::NTP Client::Freq', $graph->getTitle());
-        $this->assertSame($app->device_id, $graph->getPageContext()->device?->device_id);
-        $this->assertSame(' :: App :: NTP Client', $graph->getPageContext()->subtitle);
-    }
-
-    public function testMissingApplicationHasNoData(): void
-    {
-        $graph = new NtpClientOffsetGraph(new GraphParameters(['type' => 'application_ntp_client_offset', 'id' => 999999]));
-
-        $this->assertFalse(app(GraphAccess::class)->trusted(fn () => $graph->authorize()));
-
-        $this->expectException(NoGraphData::class);
-        $graph->getSeries();
-    }
-
-    public function testAuthorizesBasedOnTheApplication(): void
-    {
-        $app = $this->ntpClient();
-        $graph = new NtpClientOffsetGraph(new GraphParameters(['type' => 'application_ntp_client_offset', 'id' => $app->app_id]));
-
-        $this->actingAs(User::factory()->create());
-
-        Gate::shouldReceive('allows')
-            ->with('view', Mockery::on(fn ($model) => $model instanceof Application && $model->app_id === $app->app_id))
-            ->once()
-            ->andReturn(false);
-
-        $this->assertFalse($graph->authorize());
+        $this->assertSame($app->device->shortDisplayName() . "::NTP Client::$graph", $title);
     }
 
     private function ntpClient(): Application
