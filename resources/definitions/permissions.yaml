@@ -99,6 +99,7 @@ groups:
     eventlog:
         - eventlog.viewAll
         - eventlog.view
+        - eventlog.create
 
     inventory:
         - inventory.viewAll
