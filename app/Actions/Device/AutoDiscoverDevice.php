@@ -32,6 +32,7 @@ use App\Models\Eventlog;
 use App\Models\Port;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\DeviceAddOutcome;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Validate;
@@ -110,7 +111,7 @@ class AutoDiscoverDevice
             'poller_group' => $source->poller_group,
         ]);
 
-        $result = $this->addFoundDevice->execute($device);
+        $result = $this->addFoundDevice->execute($device, uncheckedMethods: [PollingMethodType::Mtu]);
 
         if ($result->added()) {
             Log::info("+[$device->hostname($device->device_id)]");

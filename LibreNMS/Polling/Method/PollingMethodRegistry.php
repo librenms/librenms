@@ -6,6 +6,7 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
+use LibreNMS\Polling\Method\Methods\MtuPollingMethod;
 use LibreNMS\Polling\Method\Methods\PollingMethod;
 use LibreNMS\Polling\Method\Methods\ProxmoxApiPollingMethod;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
@@ -25,6 +26,7 @@ class PollingMethodRegistry
         return resolve(match ($type) {
             PollingMethodType::Icmp => IcmpPollingMethod::class,
             PollingMethodType::Ipmi => IpmiPollingMethod::class,
+            PollingMethodType::Mtu => MtuPollingMethod::class,
             PollingMethodType::ProxmoxApi => ProxmoxApiPollingMethod::class,
             PollingMethodType::Snmp => SnmpPollingMethod::class,
             PollingMethodType::UnixAgent => UnixAgentPollingMethod::class,
