@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\GraphViewOptions;
 use App\Graphs\GraphFactory;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Validator;
@@ -41,7 +42,14 @@ class GraphRequest extends FormRequest
             'to' => ['nullable', 'string', 'regex:/^[-a-zA-Z0-9_ :]+$/'],
             'widescreen' => ['nullable', 'string', 'in:yes,no'],
             'legend' => ['nullable', 'string', 'in:yes,no'],
-            'previous' => ['nullable', 'string', 'in:yes,no'],
+            // yes for the previous period, day and week only for graphs drawn in the browser
+            'previous' => ['nullable', 'string', 'in:yes,no,day,week'],
+            // how a graph drawn in the browser is drawn, App\Data\Graphing\GraphViewOptions
+            'range' => ['nullable', 'in:0,1'],
+            'mirror' => ['nullable', 'in:0,1'],
+            'stacking' => ['nullable', 'in:' . implode(',', GraphViewOptions::STACKING)],
+            'scale' => ['nullable', 'in:' . implode(',', GraphViewOptions::SCALES)],
+            'trend' => ['nullable', 'in:0,1'],
             'showcommand' => ['nullable', 'string', 'in:yes,no'],
             'port_speed_zoom' => ['nullable', 'in:0,1'],
             'device' => ['nullable', 'integer'],

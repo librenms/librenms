@@ -26,20 +26,34 @@
 /** @typedef {{from: number, to: number}} View unix times */
 
 /**
+ * @typedef {object} DrawOptions App\Data\Graphing\GraphViewOptions
+ * @property {boolean} range shade between the min and max of each line
+ * @property {boolean} mirror inverted series below the axis, else above it with the rest
+ * @property {'graph'|'stack'|'overlay'} stacking as the graph defines, all on a side of the axis, or none
+ * @property {'zero'|'fit'|'log'} scale
+ * @property {boolean} trend a straight line fitted to what is shown of each series
+ */
+
+/**
  * @typedef {object} ChartOptions
  * @property {View} view
  * @property {Set<string>} hidden keys of series not drawn
  * @property {boolean} compact for small screens
+ * @property {DrawOptions} draw
+ * @property {?GraphData} previous an earlier time moved to line up with the graph, drawn as dashed lines
  * @property {(view: View, moving: boolean) => void} onView zoomed or panned, moving while more is likely to follow
  * @property {() => void} onReset
- * @property {(position: ?{index: number, left: number}) => void} onHover the point whose interval the cursor is in
+ * @property {(position: ?{index: number, time: number, left: number, previous: Object<string, ?number>}) => void} onHover
+ *     the point whose interval the cursor is in, and the earlier values there. Past the data, only earlier values and trends are drawn.
  */
 
 /**
  * @typedef {object} Chart
- * @property {(graph: GraphData) => void} update new data for the same series
+ * @property {(graph: GraphData, previous: ?GraphData) => void} update new data for the same series, previous when it has it
  * @property {(view: View) => void} setView
  * @property {() => void} resize to the element
+ * @property {() => Promise<Blob>} image a PNG of the plot
+ * @property {boolean} comparing drawn with previous data
  * @property {() => void} destroy
  */
 
@@ -54,6 +68,10 @@ const MIN_ZOOM_PIXELS = 5;
 const WHEEL_ZOOM = 0.8;
 const TAP_PIXELS = 10;
 const DOUBLE_TAP_MS = 350;
+const LOG_TICK_PIXELS = 28;
+const PREVIOUS_DASH = [6, 4];
+const TREND_DASH = [2, 4];
+const MAX_TREND_POINTS = 1000; // past the data, to the end of the view
 const BINARY_INCREMENTS = Array.from({ length: 70 }, (unused, power) => 2 ** power);
 
 // [increment, default, year, month, day, hour, minute, second rollover, mode]
@@ -83,19 +101,48 @@ export function formatValue(value, unit = '', base = 1000) {
     return format(value, 2, 0, unit).trim();
 }
 
+// the first index whose timestamp is after the time
+function firstAfter(timestamps, time) {
+    let low = 0;
+    let high = timestamps.length;
+    while (low < high) {
+        const middle = (low + high) >> 1;
+        if (timestamps[middle] > time) {
+            high = middle;
+        } else {
+            low = middle + 1;
+        }
+    }
+
+    return low;
+}
+
+/**
+ * The points of a view, start to end (exclusive). A point covers the interval up to its time,
+ * so the last one may end after the view (times are whole seconds).
+ *
+ * @param {number[]} timestamps
+ * @param {View} view
+ * @returns {[number, number]}
+ */
+export function shownPoints(timestamps, { from, to }) {
+    return [firstAfter(timestamps, from), Math.min(firstAfter(timestamps, to - 1) + 1, timestamps.length)];
+}
+
 /**
  * Legend values of points start to end (exclusive). Min and max use those of each point, keeping consolidated peaks.
+ * The 95th percentile is of the averages, like the image graphs.
  *
  * @param {GraphSeries} series
  */
 export function summarize(series, start, end) {
     const mins = series.min ?? series.avg;
     const maxes = series.max ?? series.avg;
+    const values = [];
     let now = null;
     let min = Infinity;
     let max = -Infinity;
     let sum = 0;
-    let count = 0;
 
     for (let index = start; index < end; index++) {
         const value = series.avg[index];
@@ -104,13 +151,39 @@ export function summarize(series, start, end) {
             min = Math.min(min, mins[index] ?? value);
             max = Math.max(max, maxes[index] ?? value);
             sum += value;
-            count++;
+            values.push(value);
         }
     }
 
-    return count === 0
-        ? { now: null, min: null, max: null, avg: null }
-        : { now, min, max, avg: sum / count };
+    if (values.length === 0) {
+        return { now: null, min: null, max: null, avg: null, p95: null };
+    }
+
+    values.sort((a, b) => a - b);
+
+    return { now, min, max, avg: sum / values.length, p95: values[Math.ceil(values.length * 0.95) - 1] };
+}
+
+/**
+ * The averages of the points of a view, a column for each series.
+ *
+ * @param {GraphData} graph
+ * @param {View} view
+ * @param {Set<string>} hidden keys of series left out
+ */
+export function toCsv(graph, view, hidden = new Set()) {
+    // a spreadsheet would run text that starts like a formula
+    const cell = (text) => `"${String(text).replace(/^[=+\-@\t\r]/, "'$&").replaceAll('"', '""')}"`;
+    const series = graph.series.filter((item) => ! hidden.has(item.key));
+    const [start, end] = shownPoints(graph.timestamps, view);
+    const lines = [['time', ...series.map((item) => (item.unit ? `${item.label} (${item.unit})` : item.label))].map(cell).join(',')];
+
+    for (let index = start; index < end; index++) {
+        const time = new Date(graph.timestamps[index] * 1000).toISOString();
+        lines.push([time, ...series.map((item) => item.avg[index] ?? '')].join(','));
+    }
+
+    return `${lines.join('\n')}\n`;
 }
 
 function drawnValues(series, values) {
@@ -132,7 +205,20 @@ function withFirstInterval(values) {
     return extended;
 }
 
-// a gap in every series stays a gap
+// a gap in every series stays a gap, each side of the axis has its own stack
+function stackBySide(stacked) {
+    const totals = {};
+
+    for (const invert of [false, true]) {
+        const side = stacked.filter((item) => item.invert === invert);
+        stack(side.map((item) => drawnValues(item, item.avg))).forEach((values, index) => {
+            totals[side[index].key] = values;
+        });
+    }
+
+    return totals;
+}
+
 function stack(lists) {
     const totals = [];
 
@@ -145,26 +231,96 @@ function stack(lists) {
     }));
 }
 
-// Back to front: max ranges, fills, stacked areas from the top down, lines.
-// Layers depend only on which series there are, so new data can replace the old.
-function layersFor(series) {
+/**
+ * The values of each point of the other times, null where they have none.
+ * A point is the one whose interval covers the time.
+ */
+function alignedTo(timestamps, others, values) {
+    const step = others.length > 1 ? others[1] - others[0] : Infinity;
+
+    return timestamps.map((time) => {
+        const index = firstAfter(others, time - 1);
+
+        return index < others.length && others[index] - time < step ? values[index] : null;
+    });
+}
+
+// a straight line through the points shown, least squares
+function trendOf(timestamps, values, { from, to }) {
+    let count = 0;
+    let sumTime = 0;
+    let sumValue = 0;
+    let sumTimeValue = 0;
+    let sumTimeSquared = 0;
+
+    values.forEach((value, index) => {
+        const time = timestamps[index] - from; // small numbers keep the precision
+        if (value !== null && timestamps[index] > from && timestamps[index] <= to) {
+            count++;
+            sumTime += time;
+            sumValue += value;
+            sumTimeValue += time * value;
+            sumTimeSquared += time * time;
+        }
+    });
+
+    const spread = count * sumTimeSquared - sumTime * sumTime;
+    if (count < 2 || spread === 0) {
+        return null;
+    }
+
+    const slope = (count * sumTimeValue - sumTime * sumValue) / spread;
+    const start = (sumValue - slope * sumTime) / count;
+
+    return (time) => start + slope * (time - from);
+}
+
+// Back to front: min to max ranges, fills, stacked areas from the top down, lines, earlier lines, trends.
+// Layers depend only on which series there are and what is drawn, so new data can replace the old.
+// A range is two layers, its top and its bottom, the fill is between them.
+// Values get the drawn data {series, totals} of now and of the previous time, null without it.
+function layersFor(series, { range: showRange, trend }, comparing) {
     const stacked = series.filter((item) => item.stacked);
     const lines = series.filter((item) => ! item.stacked);
-    const average = (item) => (data) => drawnValues(data[item.key], data[item.key].avg);
+    const average = (item) => ({ series: data }) => drawnValues(data[item.key], data[item.key].avg);
+    // a stacked series is drawn at its total
+    const drawn = (item, { series: data, totals }) => {
+        if (data[item.key] === undefined) {
+            return null; // not in the earlier data
+        }
+
+        return item.stacked ? totals[item.key] ?? null : drawnValues(data[item.key], data[item.key].avg);
+    };
+    // inverted, the min is drawn above the max
+    const edge = (item, top) => ({ series: data }) => {
+        const values = data[item.key];
+        if (values.max === null) {
+            return null;
+        }
+
+        return drawnValues(values, top !== values.invert ? values.max : (values.min ?? values.avg));
+    };
 
     return [
         // points that cover more than one stored value show their range
-        ...lines.map((item) => ({
-            fill: item.maxFillColor ?? `${item.color}26`,
-            values: (data) => (data[item.key].max === null ? null : drawnValues(data[item.key], data[item.key].max)),
-        })),
+        ...(showRange ? lines : []).flatMap((item) => [
+            { range: item.maxFillColor ?? `${item.color}26`, values: edge(item, true) },
+            { values: edge(item, false) },
+        ]),
         ...lines.filter((item) => item.fillColor).map((item) => ({ fill: item.fillColor, values: average(item) })),
         ...stacked.map((item) => ({
             fill: item.fillColor,
             stroke: item.color,
-            values: (data, totals) => totals[item.key],
+            values: ({ totals }) => totals[item.key],
         })).reverse(),
         ...lines.map((item) => ({ stroke: item.color, values: average(item) })),
+        ...(comparing ? series : []).map((item) => ({
+            stroke: `${item.color}b3`,
+            dash: PREVIOUS_DASH,
+            previous: true,
+            values: (now, previous) => (previous === null ? null : drawn(item, previous)),
+        })),
+        ...(trend ? series : []).map((item) => ({ stroke: item.color, dash: TREND_DASH, trend: true, values: (now) => drawn(item, now) })),
     ];
 }
 
@@ -186,6 +342,70 @@ function valueRange(axis) {
     };
 }
 
+// only the data, the limits of the graph are left out
+function fittedRange(plot, dataMin, dataMax) {
+    if (dataMin === null || dataMax === null) {
+        return [0, 1];
+    }
+
+    const room = (dataMax - dataMin || Math.abs(dataMax) || 1) * 0.05;
+    // no room below zero when there is nothing there
+    const min = dataMin >= 0 && dataMin - room < 0 ? 0 : dataMin - room;
+
+    return [min, dataMax + room];
+}
+
+// Powers of ten on both sides of zero, as many as fit. Asinh draws the values between -1 and 1 in a line, so from 1 up.
+function logSplits(plot, axisIndex, min, max) {
+    const top = Math.max(Math.abs(min), Math.abs(max));
+    if (top < 1) {
+        return [0];
+    }
+
+    const highest = Math.ceil(Math.log10(top));
+    const sides = (min < 0 ? 1 : 0) + (max > 0 ? 1 : 0);
+    const fit = Math.max(2, Math.floor(plot.bbox.height / devicePixelRatio / LOG_TICK_PIXELS));
+    const every = Math.ceil((highest + 1) * sides / fit);
+    const powers = [];
+    for (let power = highest; power >= 0; power -= every) {
+        powers.unshift(10 ** power);
+    }
+
+    return [...powers.map((value) => -value).reverse(), 0, ...powers].filter((value) => value >= min && value <= max);
+}
+
+/**
+ * The series as the options draw them.
+ * The image graphs draw areas solid, overlaid they need to show what is behind them.
+ *
+ * @param {GraphSeries} item
+ * @param {DrawOptions} draw
+ * @returns {GraphSeries}
+ */
+function restyled(item, { mirror, stacking }) {
+    const filled = item.stacked || item.fillColor !== null;
+    const changes = {
+        ...(mirror ? {} : { invert: false }),
+        ...(stacking === 'stack' ? { stacked: true, fillColor: item.fillColor ?? item.color } : {}),
+        // the range too, its default color is see through
+        ...(stacking === 'overlay' ? { stacked: false, fillColor: filled ? `${item.color}26` : null, maxFillColor: null } : {}),
+    };
+
+    return Object.keys(changes).length === 0 ? item : { ...item, ...changes };
+}
+
+// the first color behind the element that is not see through
+function backgroundOf(element) {
+    for (let current = element; current; current = current.parentElement) {
+        const color = getComputedStyle(current).backgroundColor;
+        if (color && color !== 'transparent' && ! /rgba\(.*,\s*0\)$/.test(color)) {
+            return color;
+        }
+    }
+
+    return '#fff';
+}
+
 function commonUnit(series) {
     const units = new Set(series.map((item) => item.unit));
 
@@ -201,25 +421,69 @@ function commonUnit(series) {
  * @param {ChartOptions} options
  * @returns {Chart}
  */
-export default function createChart(element, graph, { view, hidden, compact, onView, onReset, onHover }) {
+export default function createChart(element, graph, { view, hidden, compact, draw, previous, onView, onReset, onHover }) {
     const label = compact ? '' : graph.axis.label;
-    const visible = graph.series.filter((item) => ! hidden.has(item.key));
-    const layers = layersFor(visible);
+    const shownSeries = graph.series.filter((item) => ! hidden.has(item.key));
+    const visible = shownSeries.map((item) => restyled(item, draw));
+    const comparing = previous !== null;
+    const layers = layersFor(visible, draw, comparing);
+    const log = draw.scale === 'log';
     const unit = commonUnit(graph.series);
     const zone = LibreNMSDate.zone();
     // read per draw, the site style can change
     const text = () => getComputedStyle(element).color;
     const size = () => ({ width: element.clientWidth, height: element.clientHeight });
     let shown = view;
+    let current = { graph, previous };
+    // the values of the previous time at each point, for hovering
+    let earlier = {};
 
-    const dataFor = (source) => {
-        const byKey = Object.fromEntries(source.series.map((item) => [item.key, item]));
-        const stacked = visible.filter((item) => item.stacked).map((item) => byKey[item.key]);
-        const totals = stack(stacked.map((item) => drawnValues(item, item.avg)));
-        const totalsByKey = Object.fromEntries(stacked.map((item, index) => [item.key, totals[index]]));
-        const empty = source.timestamps.map(() => null);
+    const drawnData = (source) => {
+        const series = Object.fromEntries(source.series.map((item) => [item.key, restyled(item, draw)]));
 
-        return [source.timestamps, ...layers.map((layer) => withFirstInterval(layer.values(byKey, totalsByKey) ?? empty))];
+        return { series, totals: stackBySide(visible.filter((item) => item.stacked).map((item) => series[item.key])) };
+    };
+
+    // Trends and the earlier time reach the end of the view, past the data.
+    const timesFor = (timestamps) => {
+        const last = timestamps.at(-1);
+        const step = timestamps.length > 1 ? last - timestamps.at(-2) : 0;
+        if (! (draw.trend || comparing) || step <= 0 || shown.to <= last) {
+            return timestamps;
+        }
+
+        const count = Math.min(Math.ceil((shown.to - last) / step), MAX_TREND_POINTS);
+
+        return [...timestamps, ...Array.from({ length: count }, (unused, index) => last + step * (index + 1))];
+    };
+
+    const dataFor = (source, before) => {
+        const now = drawnData(source);
+        const then = before === null ? null : drawnData(before);
+        const times = timesFor(source.timestamps);
+        const empty = times.map(() => null);
+        const lined = (values) => [...values, ...empty.slice(values.length)];
+
+        earlier = before === null ? {} : Object.fromEntries(before.series.map((item) => [
+            item.key, alignedTo(times, before.timestamps, item.avg),
+        ]));
+
+        return [times, ...layers.map((layer) => {
+            const values = layer.values(now, then);
+            if (values === null) {
+                return empty;
+            }
+            if (layer.previous) {
+                return withFirstInterval(alignedTo(times, before.timestamps, values));
+            }
+            if (layer.trend) {
+                const line = trendOf(source.timestamps, values, shown);
+
+                return line === null ? empty : times.map((time) => line(time));
+            }
+
+            return lined(withFirstInterval(values));
+        })];
     };
 
     // the first point ending at or after the time
@@ -326,7 +590,10 @@ export default function createChart(element, graph, { view, hidden, compact, onV
         scales: {
             // set by the page, not the data
             x: { auto: false, range: () => [shown.from, shown.to] },
-            y: { range: valueRange(graph.axis) },
+            // asinh is logarithmic away from zero and also draws values at or below it
+            y: log
+                ? { distr: 4, log: graph.axis.base === 1024 ? 2 : 10 }
+                : { range: draw.scale === 'fit' ? fittedRange : valueRange(graph.axis) },
         },
         axes: [
             { stroke: text, grid: { stroke: GRID }, ticks: { stroke: GRID }, values: TIME_AXIS },
@@ -339,20 +606,28 @@ export default function createChart(element, graph, { view, hidden, compact, onV
                 values: (self, ticks) => ticks.map((value) => formatValue(Math.abs(value), unit, graph.axis.base)),
                 size: (self, values) => Math.max(...(values ?? ['']).map((value) => value.length)) * 7 + (label ? 40 : 16),
                 // ticks at 4 GiB, not 3.73 GiB
-                incrs: graph.axis.base === 1024 ? BINARY_INCREMENTS : undefined,
+                incrs: graph.axis.base === 1024 && ! log ? BINARY_INCREMENTS : undefined,
+                splits: log ? logSplits : undefined,
+                // the ticks are already few, the log default would leave some out
+                filter: log ? (self, splits) => splits : undefined,
             },
         ],
         series: [
             {},
             ...layers.map((layer) => ({
-                stroke: layer.stroke,
+                // uPlot strokes in black by default
+                stroke: layer.stroke ?? 'transparent',
                 fill: layer.fill,
                 fillTo: 0,
                 width: layer.stroke ? 1.25 : 0,
-                paths: INTERVALS,
+                dash: layer.dash,
+                // a trend is straight, not drawn level for each interval
+                paths: layer.trend ? undefined : INTERVALS,
                 points: { show: false },
             })),
         ],
+        // the top layer of a range is filled down to the bottom one
+        bands: layers.flatMap((layer, index) => (layer.range ? [{ series: [index + 1, index + 2], fill: layer.range }] : [])),
         cursor: {
             y: false,
             points: { size: (self, index) => (layers[index - 1]?.stroke ? 7 : 0) },
@@ -384,12 +659,20 @@ export default function createChart(element, graph, { view, hidden, compact, onV
             }],
             setCursor: [(self) => {
                 const { idx, left } = self.cursor;
-                onHover(idx === null || idx === undefined || left < 0
+                const index = idx === null || idx === undefined || left < 0 ? null : intervalIndex(self, idx, self.posToVal(left, 'x'));
+                // past the data there are only trends and earlier values
+                const past = index !== null && index >= current.graph.timestamps.length;
+                onHover(index === null || (past && ! comparing)
                     ? null
-                    : { index: intervalIndex(self, idx, self.posToVal(left, 'x')), left: self.over.offsetLeft + left });
+                    : {
+                        index,
+                        time: self.data[0][index],
+                        left: self.over.offsetLeft + left,
+                        previous: Object.fromEntries(Object.entries(earlier).map(([key, values]) => [key, values[index]])),
+                    });
             }],
         },
-    }, dataFor(graph), element);
+    }, dataFor(graph, previous), element);
 
     plot.over.style.cursor = 'grab';
     plot.over.style.touchAction = 'pan-y';
@@ -407,12 +690,33 @@ export default function createChart(element, graph, { view, hidden, compact, onV
     style.observe(document.documentElement, { attributeFilter: ['class'] });
 
     return {
-        update: (next) => plot.setData(dataFor(next)),
+        comparing,
+        update: (next, before) => {
+            current = { graph: next, previous: before };
+            plot.setData(dataFor(next, before));
+        },
         setView: (next) => {
             shown = next;
+            // a trend is of what is shown
+            if (draw.trend) {
+                plot.setData(dataFor(current.graph, current.previous));
+            }
             plot.setScale('x', { min: shown.from, max: shown.to });
         },
         resize: () => plot.setSize(size()),
+        image: () => {
+            const source = plot.ctx.canvas;
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+
+            canvas.width = source.width;
+            canvas.height = source.height;
+            context.fillStyle = backgroundOf(element);
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(source, 0, 0);
+
+            return new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+        },
         destroy: () => {
             style.disconnect();
             plot.destroy();

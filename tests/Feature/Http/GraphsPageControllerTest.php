@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Tests\Feature\Http;
 
+use App\Data\Graphing\GraphViewOptions;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Http\Requests\GraphRequest;
@@ -241,20 +242,31 @@ class GraphsPageControllerTest extends TestCase
 
         $response->assertOk();
         $src = Js::from(route('graph.data', ['device' => $device->device_id, 'type' => 'device_netstat_ip', 'showcommand' => 'yes']));
-        $response->assertSee('x-data="timeSeriesGraph(' . $src . ', ' . Js::from(['from' => 1700000000, 'to' => 1700003600]) . ')"', false);
-        $response->assertSee('x-data="graphsPage(null)"', false);
+        $range = Js::from(['from' => 1700000000, 'to' => 1700003600]);
+        $options = Js::from(new GraphViewOptions);
+        $response->assertSee('x-data="timeSeriesGraph(' . $src . ', ' . $range . ', ' . $options . ', ' . Js::from(['compare' => null, 'trend' => false]) . ')"', false);
+        $view = Js::from(['compare' => null, 'trend' => false]);
+        $response->assertSee('x-data="graphsPage(' . $range . ', ' . $options . ', true, ' . $view . ')"', false);
         $response->assertSee('data-reload="false"', false);
         $response->assertSee(__('graphs.help.title'));
         $response->assertSee(__('graphs.help.zoom_range'));
         $response->assertDontSee('graphs.help.'); // every help text is translated
-        $response->assertDontSee('RRD Command');
+        $response->assertDontSee('graphs.options.');
+        $response->assertSee(__('graphs.options.scale_log'));
+        $response->assertSee(__('graphs.options.mirror'));
+        $response->assertSee(__('graphs.options.stacking_stack'));
+        $response->assertDontSee(__('graphs.options.command'));
         $this->assertNoPhpWarningOutput($response->getContent());
 
         $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_renderer', 'value' => 'default'])->assertOk();
         $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip");
         $response->assertDontSee('x-data="timeSeriesGraph', false);
-        $response->assertDontSee('x-data="graphsPage', false);
+        $response->assertSee('x-data="graphsPage(' . Js::from(['last' => 86400]) . ', ' . Js::from(new GraphViewOptions) . ', false, ', false);
         $response->assertSee('data-reload="true"', false);
+        // the image graph has the same toolbar, its data can still be downloaded
+        $response->assertSee(__('graphs.zoom_in'));
+        $response->assertSee(__('graphs.export_csv'));
+        $response->assertDontSee(__('graphs.options.scale_log'));
     }
 
     public function testGraphDrawnInTheBrowserStartsWithThePeriodUpToNow(): void
@@ -266,8 +278,9 @@ class GraphsPageControllerTest extends TestCase
         $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip&from=-2d");
 
         $response->assertOk();
-        $response->assertSee(', ' . Js::from(['last' => 172800]) . ')"', false);
-        $response->assertSee('x-data="graphsPage(172800)"', false);
+        $response->assertSee('x-data="timeSeriesGraph(', false);
+        $response->assertSee(', ' . Js::from(['last' => 172800]) . ', ', false);
+        $response->assertSee('x-data="graphsPage(' . Js::from(['last' => 172800]) . ',', false);
         $response->assertSee('showPeriod(172800, $event)', false);
     }
 
@@ -298,8 +311,106 @@ class GraphsPageControllerTest extends TestCase
         $response->assertOk();
         $response->assertDontSee('Interactive graph');
         $response->assertDontSee('x-data="timeSeriesGraph', false);
-        $response->assertSee('Show RRD Command');
+        $response->assertSee(__('graphs.options.command'));
+        $response->assertDontSee(__('graphs.export_csv'));
         $this->assertMatchesRegularExpression('/src="[^"]*type=device_poller_perf[^"]*"\s+fetchpriority="high"/', $response->getContent(), 'the main graph is an image');
+    }
+
+    public function testGraphOptionsAreSavedAndShapeTheGraph(): void
+    {
+        $device = Device::factory()->create();
+        $user = $this->adminUser();
+        $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_renderer', 'value' => 'js'])->assertOk();
+        $saved = ['range' => false, 'mirror' => false, 'stacking' => 'stack', 'scale' => 'log', 'columns' => ['avg', 'p95'], 'width' => 0.5, 'height' => 400];
+
+        $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_options', 'value' => $saved])->assertOk();
+        $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip");
+
+        $response->assertOk();
+        $response->assertSee('x-data="timeSeriesGraph(', false);
+        $response->assertSee(', ' . Js::from(new GraphViewOptions(...$saved)) . ', ', false);
+        $response->assertSee('style="width: 50%; height: 400px; min-height: 0; max-height: none; aspect-ratio: auto"', false);
+
+        $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_options', 'value' => [...$saved, 'width' => null, 'height' => null]])->assertOk();
+        $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip")
+            ->assertDontSee('aspect-ratio: auto"', false);
+    }
+
+    public function testAnAddressShowsTheGraphAsItWasShared(): void
+    {
+        $device = Device::factory()->create();
+        $user = $this->adminUser();
+        $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_renderer', 'value' => 'js'])->assertOk();
+        $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_options', 'value' => ['scale' => 'log', 'columns' => ['avg']]])->assertOk();
+
+        $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip&stacking=overlay&previous=week&trend=1");
+
+        $response->assertOk();
+        // the address names only overlay, the rest of the drawing is the default, the legend stays the viewer's
+        $shared = new GraphViewOptions(stacking: 'overlay', columns: ['avg']);
+        $response->assertSee(Js::from($shared) . ', true, ' . Js::from(['compare' => 'week', 'trend' => true]) . ')"', false);
+        // the data is the same whatever the view
+        $src = Js::from(route('graph.data', ['device' => $device->device_id, 'type' => 'device_netstat_ip']));
+        $response->assertSee('x-data="timeSeriesGraph(' . $src . ',', false);
+
+        $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip")
+            ->assertSee(Js::from(new GraphViewOptions(scale: 'log', columns: ['avg'])) . ', true, ', false);
+    }
+
+    public function testViewParametersMustBeKnownValues(): void
+    {
+        $device = Device::factory()->create();
+        $user = $this->adminUser();
+
+        foreach (['previous=month', 'scale=cubic', 'stacking=sideways', 'mirror=2', 'trend=yes', 'range=on'] as $query) {
+            [$key] = explode('=', $query);
+            $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip&$query")
+                ->assertSessionHasErrors($key);
+        }
+        $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip&previous=day&scale=fit&mirror=0&trend=1")
+            ->assertOk();
+    }
+
+    public function testGraphOptionsMustBeKnownValues(): void
+    {
+        $user = $this->adminUser();
+
+        foreach ([
+            'not an array',
+            ['unknown' => true],
+            ['scale' => 'cubic'],
+            ['stacking' => 'sideways'],
+            ['mirror' => 'below'],
+            ['columns' => ['median']],
+            ['height' => 50],
+            ['width' => 1.5, 'height' => 400],
+        ] as $value) {
+            $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_options', 'value' => $value])
+                ->assertUnprocessable();
+        }
+    }
+
+    public function testImageGraphOptionsChangeTheAddress(): void
+    {
+        $port = Port::factory()->for(Device::factory())->create();
+
+        $response = $this->actingAs($this->adminUser())
+            ->get("/graphs?type=port_bits&id={$port->port_id}&previous=yes");
+
+        $response->assertOk();
+        $response->assertViewHas('imageOptions', function (array $options): bool {
+            $byLabel = array_column($options, null, 'label');
+            $query = function (string $label) use ($byLabel): array {
+                parse_str((string) parse_url($byLabel[$label]['link'], PHP_URL_QUERY), $query);
+
+                return $query;
+            };
+
+            return $byLabel[__('graphs.options.legend')]['checked'] && $query(__('graphs.options.legend'))['legend'] === 'no'
+                && $byLabel[__('graphs.options.previous')]['checked'] && ! isset($query(__('graphs.options.previous'))['previous'])
+                && ! $byLabel[__('graphs.options.command')]['checked'] && $query(__('graphs.options.command'))['showcommand'] === 'yes'
+                && isset($query(__('graphs.options.port_speed'))['port_speed_zoom']);
+        });
     }
 
     public function testSensorGraphPageUsesSubtitleFromAuthFile(): void
