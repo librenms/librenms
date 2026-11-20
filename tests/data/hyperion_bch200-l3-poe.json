@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.19829.1",
+                    "sysDescr": "Hyperion-200 GigaBit Ethernet Switch",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": "Hyperion-200 GigaBit Ethernet Switch",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "hyperion",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "bitstream.png"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
