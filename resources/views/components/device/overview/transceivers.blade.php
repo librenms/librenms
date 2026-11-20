@@ -1,6 +1,6 @@
 @if($device->transceivers->isNotEmpty())
     <x-device.overview.panel :title="__('port.tabs.transceivers')" icon="fa fa-exchange-alt"
-        :href="route('device', ['device' => $device->device_id, 'tab' => 'ports', 'vars' => 'transceivers'])">
+        :href="route('device.ports', ['device' => $device->device_id, 'view' => 'transceivers'])">
         <div class="tw:divide-y tw:divide-gray-300 tw:dark:divide-zinc-800">
             @foreach($device->transceivers as $transceiver)
                 <div>

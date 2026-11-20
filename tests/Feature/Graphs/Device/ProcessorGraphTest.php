@@ -70,7 +70,7 @@ class ProcessorGraphTest extends TestCase
         $graph = new ProcessorGraph(new GraphParameters(['type' => 'device_processor', 'device' => $device->device_id]));
 
         $this->expectException(NoGraphData::class);
-        $this->expectExceptionMessage('No Data');
+        $this->expectExceptionMessageIsOrContains('No Data');
 
         app(GraphAccess::class)->trusted(fn () => $graph->getDebugCommand());
     }

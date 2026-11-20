@@ -283,7 +283,7 @@ class ConfigBackupDesignContractTest extends TestCase
         ]);
 
         $view = $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'config']))
+            ->get(route('device.config', ['device' => $device]))
             ->assertOk();
 
         // Alpine & Viewer Components

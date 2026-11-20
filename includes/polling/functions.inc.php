@@ -143,7 +143,10 @@ function record_sensor_data($device, $all_sensors)
 
         if (isset($sensor['user_func'])) {
             if (is_callable($sensor['user_func'])) {
-                $sensor_value = $sensor['user_func']($sensor_value);
+                // OS methods (Class::method) also get the raw value and the sensor, plain functions only take the value
+                $sensor_value = str_contains((string) $sensor['user_func'], '::')
+                    ? $sensor['user_func']($sensor_value, (string) $sensor['new_value'], $sensor)
+                    : $sensor['user_func']($sensor_value);
             } else {
                 $sensor_value = new UserFuncHelper($sensor_value, $sensor['new_value'], $sensor)->{$sensor['user_func']}();
             }

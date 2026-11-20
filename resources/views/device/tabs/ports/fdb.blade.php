@@ -41,6 +41,6 @@
                 return "<span title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
             },
         },
-        url: "{{ url('/ajax/table/fdb-tables') }}"
+        url: "{{ route('table.fdb-tables') }}"
     });
 </script>

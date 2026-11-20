@@ -212,12 +212,12 @@ final readonly class LegacyGraphScript
         } catch (GraphException $e) {
             throw $e;
         } catch (RrdNotFoundException $e) {
-            throw new NoGraphData('No Data file', $e);
+            throw new NoGraphData(__('graph.errors.no_data_files'), $e);
         } catch (Throwable $e) {
             // legacy scripts fail with warnings and errors on unexpected input, keep the details out of the image
             report($e);
 
-            throw new GraphException('Graph Error', 'Error', $e);
+            throw new GraphException(__('graph.errors.graph'), __('graph.errors.graph_short'), $e);
         } finally {
             if ($previousCwd !== false) {
                 chdir($previousCwd);

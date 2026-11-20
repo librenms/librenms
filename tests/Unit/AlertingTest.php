@@ -26,9 +26,10 @@
 
 namespace LibreNMS\Tests\Unit;
 
-use LibreNMS\Tests\TestCase;
 use App\Models\AlertRule;
 use LibreNMS\Alert\AlertUtil;
+use LibreNMS\Alerting\AlertRuleDefinitions;
+use LibreNMS\Tests\TestCase;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
@@ -37,7 +38,7 @@ final class AlertingTest extends TestCase
 {
     public function testJsonAlertCollection(): void
     {
-        $rules = get_rules_from_json();
+        $rules = AlertRuleDefinitions::all();
         $this->assertIsArray($rules);
         foreach ($rules as $rule) {
             $this->assertIsArray($rule);

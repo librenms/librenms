@@ -77,7 +77,7 @@ class EditTabs extends Component
 
         $this->tabs['alert-rules'] = [
             'text' => __('Alert Rules'),
-            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=alert-rules/'),
+            'link' => route('device.edit.alert-rules', $this->device->device_id),
         ];
 
         $this->tabs['modules'] = [
@@ -88,7 +88,7 @@ class EditTabs extends Component
         if (LibrenmsConfig::get('show_services')) {
             $this->tabs['services'] = [
                 'text' => __('Services'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=services/'),
+                'link' => route('device.edit.services', $this->device->device_id),
             ];
         }
 

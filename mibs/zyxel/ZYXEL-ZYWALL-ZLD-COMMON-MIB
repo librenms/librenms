@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (SEQUENCE OF type case)
 ZYXEL-ZYWALL-ZLD-COMMON-MIB DEFINITIONS ::= BEGIN
 	IMPORTS
 		enterprises
@@ -141,7 +142,7 @@ ZYXEL-ZYWALL-ZLD-COMMON-MIB DEFINITIONS ::= BEGIN
 		::= { zldIpSecVPN 3 }
 
 	vpnStatus OBJECT-TYPE
-		SYNTAX  SEQUENCE OF vpnStatusEntry
+		SYNTAX  SEQUENCE OF VPNStatusEntry
 		MAX-ACCESS  not-accessible
 		STATUS  current
 		DESCRIPTION

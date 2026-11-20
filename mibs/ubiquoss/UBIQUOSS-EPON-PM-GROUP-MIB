@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP; trailing comma before })
 -- *****************************************************************
 -- UBIQUOSS-EPON-PM-GROUP-MIB.my
 --
@@ -2255,7 +2256,7 @@
 				pmOltQueueStatsDroppedBytes
 					Counter64,
 				pmOltQueueStatsDroppedFrames
-					Counter64,
+					Counter64
 			 }      
 			 
 		pmOltQueueStatsRxOctets OBJECT-TYPE
@@ -3032,23 +3033,9 @@
        ::= { ubiPmMIBCompliances 1 }
 	                            
 -- compliance statements
-   	ubiPmMIBGroup  OBJECT-GROUP
-		OBJECTS {     
-			-- TODO 
-               }
-        STATUS  current
-        DESCRIPTION
-                "ubiquoss pm information MIB"
-        ::= { ubiPmMIBGroups 1 }
+   	ubiPmMIBGroup  OBJECT IDENTIFIER ::= { ubiPmMIBGroups 1 }
      
-     ubiPmMIBNotificationGroup    OBJECT-GROUP
-      	OBJECTS {     
-			-- TODO 
-               }
-        STATUS  current
-        DESCRIPTION
-                "ubiquoss pm information Notifications"
-        ::= { ubiPmMIBGroups 2 }
+     ubiPmMIBNotificationGroup    OBJECT IDENTIFIER ::= { ubiPmMIBGroups 2 }
 	
 	END
 

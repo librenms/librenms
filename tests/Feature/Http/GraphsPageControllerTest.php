@@ -131,7 +131,7 @@ class GraphsPageControllerTest extends TestCase
 
         try {
             $response = $this->actingAs($this->adminUser())
-                ->get("/graphs?id={$port->port_id}&type=port_upkts&showcommand=yes");
+                ->get("/graphs?id={$port->port_id}&type=port_nupkts&showcommand=yes");
 
             $response->assertOk();
             $response->assertSee('RRDTool Command');

@@ -2,7 +2,7 @@
 <x-panel :title="$title ?? null">
     <x-slot:table>
         <div class="table-responsive">
-            <table id="alertlog" class="table table-hover table-condensed table-striped" data-url="{{ route('table.alertlog') }}">
+            <table id="alertlog" class="table table-hover table-condensed table-striped" data-url="{{ route('table.alertlog') }}" data-export-url="{{ route('table.alertlog.export') }}">
                 <thead>
                 <tr>
                     <th data-column-id="status">{{ __('State') }}</th>

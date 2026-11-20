@@ -19,11 +19,10 @@
                 'rowKey' => 'port_id',
                 'sort' => 'ifIndex',
                 'listUrl' => route('device.edit.ports.list', $device),
-                'updateUrl' => route('device.edit.ports.update', [$device, '__port__']),
+                'deviceId' => $device->device_id,
                 'settingsUrl' => route('device.edit.ports.settings', $device),
                 'bulkUrl' => route('device.edit.ports.bulk', $device),
                 'resetStateUrl' => route('device.edit.ports.reset-state', $device),
-                'portUrl' => url('port'),
                 'portGroupStoreUrl' => route('port-groups.store'),
                 'lang' => [
                     'no_group' => __('No Group'),
@@ -438,7 +437,7 @@
                         return Promise.resolve();
                     }
 
-                    return this.request(key, 'PATCH', config.updateUrl.replace('__port__', port.port_id), data)
+                    return this.request(key, 'PATCH', route('device.edit.ports.update', {device: config.deviceId, port: port.port_id}), data)
                         .then((response) => {
                             Object.assign(port, response.port);
                             this.summary = response.summary;
@@ -580,7 +579,7 @@
                         return;
                     }
 
-                    this.request('speed', 'PATCH', config.updateUrl.replace('__port__', port.port_id), data)
+                    this.request('speed', 'PATCH', route('device.edit.ports.update', {device: config.deviceId, port: port.port_id}), data)
                         .then((response) => {
                             Object.assign(port, response.port);
                             this.summary = response.summary;
@@ -649,7 +648,7 @@
                 },
 
                 saveGroups(port, groups) {
-                    return this.request('groups' + port.port_id, 'PUT', config.portUrl + '/' + port.port_id, {groups: groups.map((group) => group.id)})
+                    return this.request('groups' + port.port_id, 'PUT', route('port.update', {port: port.port_id}), {groups: groups.map((group) => group.id)})
                         .then(() => port.groups = groups.map((group) => ({id: Number(group.id), text: group.text})));
                 },
 

@@ -424,7 +424,7 @@ class EditPortsController
             'ifIndex' => $port->ifIndex,
             'label' => $port->getLabel(),
             'ifDescr' => $port->ifDescr,
-            'url' => Url::portUrl($port),
+            'url' => route('device.port', ['device' => $port->device_id, 'port' => $port]),
             'link_class' => Url::portLinkDisplayClass($port),
             'ifAdminStatus' => $port->ifAdminStatus?->value,
             'ifOperStatus' => $port->ifOperStatus?->value,

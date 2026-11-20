@@ -1,10 +1,11 @@
+-- LibreNMS: fix syntax error (trailing comma in IMPORTS)
 HPOV-NNM-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, 
     NOTIFICATION-TYPE, enterprises
         FROM SNMPv2-SMI
-    DisplayString, 
+    DisplayString 
         FROM SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
         FROM SNMPv2-CONF;

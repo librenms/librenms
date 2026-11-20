@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Observers\SensorObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -111,8 +112,8 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
             return $field == 'sensor_current' ? 'NaN' : '-';
         }
 
-        if (in_array($this->rrd_type, ['COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE'])) {
-            //compute and display an approx rate for this sensor
+        if ($field == 'sensor_current' && in_array($this->rrd_type, ['COUNTER', 'DERIVE', 'DCOUNTER', 'DDERIVE'])) {
+            //compute and display an approx rate for this sensor, limits are configured as values and shown as is
             $value = Number::formatSi(max(0, $value - $this->sensor_prev) / LibrenmsConfig::get('rrd.step', 300), 2, 3, '');
         }
 
@@ -239,6 +240,22 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
     public function scopeIsDisabled($query)
     {
         return $query->where('sensor_alert', 0);
+    }
+
+    /**
+     * Identity used when storing and reading a measurement of this sensor.
+     * Sensors without a stable index, such as ipmi sensors, are told apart by their description.
+     */
+    public function metricIdentity(string $measurement): MetricIdentity
+    {
+        $byDescr = $this->poller_type == 'ipmi' || LibrenmsConfig::getOsSetting($this->device?->os, 'sensor_descr');
+
+        return new MetricIdentity($measurement, [
+            'hostname' => (string) $this->device?->hostname,
+            'class' => $this->sensor_class,
+            'type' => $this->sensor_type,
+            $byDescr ? 'descr' : 'index' => $byDescr ? $this->sensor_descr : $this->sensor_index,
+        ]);
     }
 
     public function labels(): array

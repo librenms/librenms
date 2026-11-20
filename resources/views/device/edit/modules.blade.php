@@ -6,8 +6,7 @@
 
         <div x-data="deviceModules(@js([
                 'modules' => $modules,
-                'updateUrl' => route('device.edit.modules.update', [$device, '__module__']),
-                'deleteUrl' => route('device.edit.modules.delete', [$device, '__module__']),
+                'deviceId' => $device->device_id,
             ]))">
             <x-panel class="tw:mb-0 tw:max-w-5xl tw:mx-auto">
                 <x-slot name="heading" class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3">
@@ -174,7 +173,7 @@
                         return;
                     }
 
-                    this.request(key, 'PUT', config.updateUrl.replace('__module__', module.module), {[type]: enabled ? 'true' : 'false'})
+                    this.request(key, 'PUT', route('device.edit.modules.update', {device: config.deviceId, module: module.module}), {[type]: enabled ? 'true' : 'false'})
                         .then(() => module[type].device = enabled)
                         .catch(() => input.checked = ! enabled);
                 },
@@ -183,7 +182,7 @@
                     const key = module.module + '.' + type;
                     if (this.isPending(key)) return;
 
-                    this.request(key, 'PUT', config.updateUrl.replace('__module__', module.module), {[type]: 'clear'})
+                    this.request(key, 'PUT', route('device.edit.modules.update', {device: config.deviceId, module: module.module}), {[type]: 'clear'})
                         .then(() => module[type].device = null)
                         .catch(() => {});
                 },
@@ -192,7 +191,7 @@
                     const module = this.deleteTarget;
                     if (this.isPending('delete')) return;
 
-                    this.request('delete', 'DELETE', config.deleteUrl.replace('__module__', module.module))
+                    this.request('delete', 'DELETE', route('device.edit.modules.delete', {device: config.deviceId, module: module.module}))
                         .then(() => {
                             module.has_data = false;
                             this.deleteTarget = null;

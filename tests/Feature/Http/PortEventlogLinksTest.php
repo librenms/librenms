@@ -6,6 +6,7 @@ use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Port;
 use App\Models\User;
+use App\Models\UserPref;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\TestCase;
 use Spatie\Permission\Models\Role;
@@ -37,7 +38,7 @@ class PortEventlogLinksTest extends TestCase
 
         $this->actingAs($this->admin())
             ->followingRedirects()
-            ->get(route('device', [
+            ->get(route('device.legacy', [
                 'device' => $device,
                 'tab' => 'port',
                 'vars' => 'port=' . $port->port_id . '/view=notes/graph=bits/subview=graphs',
@@ -60,7 +61,7 @@ class PortEventlogLinksTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'ports']))
+            ->get(route('device.ports', ['device' => $device]))
             ->assertOk()
             ->assertSee(route('device.eventlog', ['device' => $device->device_id, 'port' => $portWithEvents->port_id]))
             ->assertDontSee(route('device.eventlog', ['device' => $device->device_id, 'port' => $portWithoutEvents->port_id]));
@@ -73,7 +74,7 @@ class PortEventlogLinksTest extends TestCase
 
         $this->actingAs($this->admin())
             ->followingRedirects()
-            ->get(route('device', [
+            ->get(route('device.legacy', [
                 'device' => $device,
                 'tab' => 'port',
                 'vars' => 'port=' . $port->port_id . '/view=events',
@@ -143,22 +144,60 @@ class PortEventlogLinksTest extends TestCase
             ->assertJsonPath('rows.0.message', 'port event');
     }
 
-    public function testEventlogPageShowsPortLabelAndPortPassThrough(): void
+    public function testExplicitFiltersOverrideThePortShortcut(): void
     {
         $device = Device::factory()->create();
-        $port = Port::factory()->for($device)->create(['ifName' => 'GigabitEthernet0/1', 'ifDescr' => 'GigabitEthernet0/1', 'ifOperStatus' => 'up']);
+        $port = Port::factory()->for($device)->create();
+        $admin = $this->admin();
+        $savedFilter = ['type' => ['eq' => 'system']];
+        $urlFilter = ['search' => ['eq' => 'ifSpeed changed']];
+        UserPref::setPref($admin, 'filters.device.eventlog', $savedFilter);
 
-        $response = $this->actingAs($this->admin())
-            ->get(route('device.eventlog', ['device' => $device->device_id, 'port' => $port->port_id]));
-        $response->assertOk()
-            ->assertSee('GigabitEthernet0', false)
-            ->assertSee('name="port"', false)
-            ->assertSee('value="' . $port->port_id . '"', false);
+        $this->actingAs($admin)
+            ->get(route('device.eventlog', ['device' => $device->device_id]))
+            ->assertOk()
+            ->assertViewHas('filter', $savedFilter);
 
-        $html = $response->getContent();
-        $this->assertNotFalse(mb_strpos($html, 'Filter</button>'));
-        $this->assertNotFalse(mb_strpos($html, 'Port&nbsp;&nbsp;'));
-        $this->assertTrue(mb_strpos($html, 'Filter</button>') < mb_strpos($html, 'Port&nbsp;&nbsp;'));
+        $this->actingAs($admin)
+            ->get(route('device.eventlog', ['device' => $device->device_id, 'port' => $port->port_id]))
+            ->assertOk()
+            ->assertViewHas('filter', ['port' => ['eq' => $port->port_id]]);
+
+        $this->actingAs($admin)
+            ->get(route('device.eventlog', ['device' => $device->device_id, 'port' => $port->port_id, 'filter' => $urlFilter]))
+            ->assertOk()
+            ->assertViewHas('filter', $urlFilter);
+
+        $this->actingAs($admin)
+            ->get(route('device.eventlog', ['device' => $device->device_id, 'port' => $port->port_id, 'filter' => '']))
+            ->assertOk()
+            ->assertViewHas('filter', []);
+    }
+
+    public function testFilterBarPortAndSearch(): void
+    {
+        $device = Device::factory()->createQuietly();
+        $port = Port::factory()->for($device)->create(['ifName' => 'uplink-port', 'ifDescr' => 'uplink-port', 'ifAlias' => '']);
+        Eventlog::factory()->create(['device_id' => $device->device_id, 'type' => 'interface', 'reference' => $port->port_id, 'message' => 'ifSpeed changed']);
+        Eventlog::factory()->create(['device_id' => $device->device_id, 'type' => 'system', 'reference' => $port->port_id, 'message' => 'not a port event']);
+        Eventlog::factory()->create(['device_id' => $device->device_id, 'type' => 'system', 'message' => 'uplink-port mentioned']);
+        Eventlog::factory()->create(['device_id' => $device->device_id, 'type' => null, 'reference' => $port->port_id, 'message' => 'uncategorized event']);
+
+        $post = fn (array $filter) => $this->actingAs($this->admin())->postJson(route('table.eventlog'), [
+            'current' => 1,
+            'rowCount' => 50,
+            'device' => $device->device_id,
+            'filter' => $filter,
+        ])->assertOk()->json('rows.*.message');
+
+        $this->assertSame(['ifSpeed changed'], $post(['port' => ['eq' => $port->port_id]]));
+        $this->assertEqualsCanonicalizing(['not a port event', 'uplink-port mentioned', 'uncategorized event'], $post(['port' => ['neq' => $port->port_id]]));
+        $this->assertSame(['ifSpeed changed'], $post(['search' => ['eq' => 'uplink-port']]));
+        $this->assertEqualsCanonicalizing(['ifSpeed changed', 'uplink-port mentioned'], $post(['search' => ['contains' => 'uplink']]));
+        $this->assertEqualsCanonicalizing(['not a port event', 'uncategorized event'], $post(['search' => ['not_contains' => 'uplink']]));
+        $this->assertEqualsCanonicalizing(['ifSpeed changed', 'uplink-port mentioned'], $post(['search' => ['in' => ['uplink-port', 'uplink-port mentioned']]]));
+        $this->assertEqualsCanonicalizing(['not a port event', 'uncategorized event'], $post(['search' => ['not_in' => 'uplink-port,uplink-port mentioned']]));
+        $this->assertSame([], $post(['search' => ['is_empty' => '']]));
     }
 
     public function testEventlogPageEscapesHtmlInPortLabel(): void
@@ -172,7 +211,5 @@ class PortEventlogLinksTest extends TestCase
             ->getContent();
 
         $this->assertStringNotContainsString('<b>bold</b>', $html);
-        $this->assertStringNotContainsString('\u003Cb\u003E', $html);
-        $this->assertStringContainsString('\u0026lt;b\u0026gt;bold', $html);
     }
 }

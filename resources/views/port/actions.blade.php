@@ -1,8 +1,8 @@
 <div class="container-fluid">
     <div class="row">
-        @if(request('deleted') === 'yes')
-            @can('delete', \App\Models\Port::class)
-            <div class="col-xs-1"><a href="ports/deleted=1/purge={{ $port->port_id }}" title="Delete port"><i class="fa fa-times fa-lg icon-theme"></i></a></div>
+        @if($port->deleted)
+            @can('delete', $port)
+            <div class="col-xs-1" x-data="portPurge()"><a href="#" @click.prevent="purge({{ $port->port_id }})" title="{{ __('port.purge_port') }}"><i class="fa fa-lg icon-theme" :class="loading ? 'fa-refresh fa-spin' : 'fa-times'" aria-hidden="true"></i></a></div>
             @endcan
         @elseif($port->device)
             <div class="col-xs-1"><a href="{{ route('device.faults', $port->device_id) }}" title="View alerts"><i class="fa fa-exclamation-circle fa-lg icon-theme" aria-hidden="true"></i></a></div>

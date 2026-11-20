@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing imports)
 ECS4110-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -22,7 +23,9 @@ IMPORTS
         dot1vProtocolPortEntry
                 FROM Q-BRIDGE-MIB
         dot1xAuthConfigEntry
-                FROM IEEE8021-PAE-MIB;
+                FROM IEEE8021-PAE-MIB
+    pethMainPseEntry, pethPsePortEntry
+        FROM POWER-ETHERNET-MIB;
 
 accton              OBJECT IDENTIFIER ::= { enterprises 259 }
 edgecoreNetworks    OBJECT IDENTIFIER ::= { accton 10 }

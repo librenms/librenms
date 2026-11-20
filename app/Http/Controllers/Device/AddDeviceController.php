@@ -227,7 +227,7 @@ class AddDeviceController
         return response()->json([
             'status' => 'ok',
             'message' => __('Device added successfully'),
-            'redirect' => route('device', ['device' => $device->device_id ?? 0]),
+            'redirect' => route('device.overview', ['device' => $device->device_id ?? 0]),
         ]);
     }
 }

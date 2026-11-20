@@ -65,7 +65,7 @@ class DeviceDiscoveryStatusTest extends TestCase
         $device = Device::factory()->create(['last_discovered' => null]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'notes']))
+            ->get(route('device.notes', ['device' => $device]))
             ->assertOk()
             ->assertSee(__('device.awaiting_discovery'))
             ->assertSee(route('device.discovery-status', $device->device_id), false)
@@ -91,7 +91,7 @@ class DeviceDiscoveryStatusTest extends TestCase
         $device = Device::factory()->create(['last_discovered' => now()]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'notes']))
+            ->get(route('device.notes', ['device' => $device]))
             ->assertOk()
             ->assertDontSee(__('device.awaiting_discovery'));
     }
@@ -134,7 +134,7 @@ class DeviceDiscoveryStatusTest extends TestCase
         $device = Device::factory()->create(['last_discovered' => null, 'disabled' => 1]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'notes']))
+            ->get(route('device.notes', ['device' => $device]))
             ->assertOk()
             ->assertDontSee(__('device.awaiting_discovery'));
     }

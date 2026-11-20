@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP; trailing comma before })
 -- *****************************************************************
 -- UBIQUOSS-EPON-SOFTWARE-MANAGEMENT-GROUP-MIB.my
 --
@@ -280,7 +281,7 @@
 			SYNTAX INTEGER
 				{
 				normal(0),
-				operate(1),
+				operate(1)
 				}
 			MAX-ACCESS read-write
 			STATUS current
@@ -574,14 +575,7 @@
                 "ubiquoss software information MIB"
         ::= { ubiSoftwareMIBGroups 1 }
      
-     ubiSoftwareMIBNotificationGroup    OBJECT-GROUP
-      	OBJECTS {     
-			-- TODO 
-               }
-        STATUS  current
-        DESCRIPTION
-                "ubiquoss software information Notifications"
-        ::= { ubiSoftwareMIBGroups 2 }
+     ubiSoftwareMIBNotificationGroup    OBJECT IDENTIFIER ::= { ubiSoftwareMIBGroups 2 }
 	 	
 	END
 

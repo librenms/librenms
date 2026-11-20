@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (dashes in comment lines)
 -- *****************************************************************
 -- DLINKSW-POE-MIB.mib : D-Link extensions to POWER-ETHERNET-MIB (PoE)
 --
@@ -399,9 +400,9 @@ DLINKSW-POE-MIB DEFINITIONS ::= BEGIN
              "This object indicates consumption power of port in milliwatts."
         ::= { dPoeIfMeasurementEntry 4 }  
 
----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
 -- Add a new table for SNR-20170223-001(ASV2.1)(PD alive check)
----------------------------------------------------------------------------------
+----------------------------------------------------------------------------------
    dPoeIfPdAliveCfgTable OBJECT-TYPE
         SYNTAX        SEQUENCE OF DPoeIfPdAliveCfgEntry
         MAX-ACCESS    not-accessible

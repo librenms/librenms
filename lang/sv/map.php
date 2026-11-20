@@ -4,7 +4,6 @@ return [
     'custom' => [
         'title' => [
             'edit_dialog' => 'Välj anpassad karta att redigera',
-            'create' => 'Skapa ny anpassad karta',
             'view' => ':name | Anpassad karta',
             'edit' => 'Redigera anpassad karta',
             'manage' => 'Hantera anpassade kartor',
