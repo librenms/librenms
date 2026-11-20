@@ -1,6 +1,7 @@
 <?php
 
 use App\Console\Commands\MaintenanceCachePeeringdb;
+use App\Console\Commands\MaintenanceCleanupApplications;
 use App\Console\Commands\MaintenanceCleanupNetworks;
 use App\Console\Commands\MaintenanceCleanupSyslog;
 use App\Console\Commands\MaintenanceDiscoverSslCertificates;
@@ -101,6 +102,13 @@ Schedule::command(MaintenanceCachePeeringdb::class)
     ->appendOutputTo($maintenance_log_file)
     ->when(fn () => LibrenmsConfig::get('peeringdb.enabled'))
     ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:cache-peeringdb failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));
+
+Schedule::command(MaintenanceCleanupApplications::class)
+    ->weeklyOn(0, Time::pseudoRandomBetween('08:00', '08:59'))
+    ->onOneServer()
+    ->withoutOverlapping()
+    ->appendOutputTo($maintenance_log_file)
+    ->onFailure(fn () => Eventlog::log('The scheduled command maintenance:cleanup-applications failed to run. Check the maintenance.log for details.', null, 'maintenance', Severity::Error));
 
 Schedule::command('queue:prune-failed', ['--hours' => 72])
     ->dailyAt(Time::pseudoRandomBetween('07:00', '07:59'))

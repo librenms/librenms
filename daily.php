@@ -8,7 +8,6 @@
 
 use App\Facades\LibrenmsConfig;
 use App\Models\AlertRule;
-use App\Models\Application;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Collection;
@@ -132,20 +131,6 @@ if ($options['f'] === 'ports_purge') {
                 }
             });
             echo "All deleted ports now purged\n";
-            $lock->release();
-        }
-    }
-}
-
-if ($options['f'] === 'applications_purge') {
-    $applications_purge = LibrenmsConfig::get('applications_purge');
-    if (is_numeric($applications_purge) && $applications_purge > 0) {
-        $lock = Cache::lock('applications_purge', 86000);
-        if ($lock->get()) {
-            $purged = Application::purgeTrashed((int) $applications_purge);
-            if ($purged['applications'] > 0) {
-                echo "Purged {$purged['applications']} deleted applications ({$purged['metrics']} metrics, older than {$applications_purge} days)\n";
-            }
             $lock->release();
         }
     }
