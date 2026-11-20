@@ -1,0 +1,13 @@
+os: unifi-gateway
+text: 'Ubiquiti UniFi Gateway'
+type: network
+group: unix
+icon: ubiquiti
+ifname: true
+ifXmcbc: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysDescr_regex: '/^Ubiquiti UniFi UCG-Ultra(?:\s|$)/'
