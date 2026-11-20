@@ -13,12 +13,12 @@ class NtpClientOffsetGraph extends ApplicationGraph
     {
         // stored in milliseconds
         return [
-            'offset' => new DataSeries($this->metric(), 'offset', 'Offset', 's', 0.001, style: new SeriesStyle(fill: true)),
+            'offset' => new DataSeries($this->metric(), 'offset', __('graphs.ntp-client.offset'), 's', 0.001, style: new SeriesStyle(fill: true)),
         ];
     }
 
     protected function options(): GraphOptions
     {
-        return new GraphOptions(verticalLabel: 'Seconds', legendTitle: 'Seconds', palette: 'rainbow_stats_purple', stats: new StatsOptions);
+        return new GraphOptions(verticalLabel: __('graphs.units.seconds'), legendTitle: __('graphs.units.seconds'), palette: 'rainbow_stats_purple', stats: new StatsOptions);
     }
 }

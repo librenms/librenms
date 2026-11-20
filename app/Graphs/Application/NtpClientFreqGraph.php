@@ -12,7 +12,7 @@ class NtpClientFreqGraph extends ApplicationGraph
     public function getSeries(): array
     {
         return [
-            'frequency' => new DataSeries($this->metric(), 'frequency', 'Frequency', style: new SeriesStyle(fill: true)),
+            'frequency' => new DataSeries($this->metric(), 'frequency', __('graphs.ntp-client.frequency'), style: new SeriesStyle(fill: true)),
         ];
     }
 

@@ -17,11 +17,11 @@ class RrdStatsDefinition
     /** graphs this short or shorter have no room for the extra lines */
     private const int MIN_HEIGHT = 25;
 
-    /** @var array<string, array{label: string, step: int, minRange: int}> shown when the graph covers at least minRange seconds, a shorter range only shows NaN */
+    /** @var array<string, array{label: string, step: int, minRange: int}> label is a translation key, shown when the graph covers at least minRange seconds, a shorter range only shows NaN */
     private const array PERIODS = [
-        'hourly' => ['label' => '1 hour', 'step' => 3600, 'minRange' => 0],
-        'daily' => ['label' => '1 day', 'step' => 86400, 'minRange' => 129600],
-        'weekly' => ['label' => '1 week', 'step' => 604800, 'minRange' => 691200],
+        'hourly' => ['label' => 'graphs.stats.hour', 'step' => 3600, 'minRange' => 0],
+        'daily' => ['label' => 'graphs.stats.day', 'step' => 86400, 'minRange' => 129600],
+        'weekly' => ['label' => 'graphs.stats.week', 'step' => 604800, 'minRange' => 691200],
     ];
 
     /** @var list<string> */
@@ -60,11 +60,12 @@ class RrdStatsDefinition
         // colors are taken even for lines that are not drawn, so each line keeps its color at any range
         $percentileColors = array_map(fn () => ($this->nextColor)(), $this->options->percentiles);
 
-        foreach (self::PERIODS as $period => ['label' => $label, 'step' => $step, 'minRange' => $minRange]) {
+        foreach (self::PERIODS as $period => ['label' => $labelKey, 'step' => $step, 'minRange' => $minRange]) {
             $color = ($this->nextColor)();
             if (! $this->options->$period || $range < $minRange) {
                 continue;
             }
+            $label = __($labelKey);
 
             $periodId = $id . $period;
             foreach (['' => 'AVERAGE', 'min' => 'MIN', 'max' => 'MAX'] as $suffix => $cf) {
@@ -83,11 +84,11 @@ class RrdStatsDefinition
             }
 
             // only the average is drawn, min and max are legend rows
-            $this->drawing[] = "LINE1.25:$drawnId#$color:" . Rrd::fixedSafeDescr("$prefix$label avg", $this->labelWidth);
+            $this->drawing[] = "LINE1.25:$drawnId#$color:" . Rrd::fixedSafeDescr($prefix . __('graphs.stats.avg', ['period' => $label]), $this->labelWidth);
             array_push($this->drawing, ...$this->legendRow($periodId, $unit));
             foreach (['min', 'max'] as $suffix) {
                 // two spaces take the place of the color box, aligning the label with the others
-                $this->drawing[] = 'COMMENT:  ' . Rrd::fixedSafeDescr("$prefix$label $suffix", $this->labelWidth);
+                $this->drawing[] = 'COMMENT:  ' . Rrd::fixedSafeDescr($prefix . __("graphs.stats.$suffix", ['period' => $label]), $this->labelWidth);
                 array_push($this->drawing, ...$this->legendRow($periodId . $suffix, $unit));
             }
         }
@@ -108,7 +109,7 @@ class RrdStatsDefinition
                 array_push($this->definitions, "CDEF:{$lineId}line=$id,POP,$percentileId,$factor,*", "VDEF:$lineId={$lineId}line,FIRST");
             }
 
-            $this->drawing[] = "HRULE:$lineId#$percentileColors[$index]:" . Rrd::fixedSafeDescr("$prefix{$percentile}th Percentile", $this->labelWidth);
+            $this->drawing[] = "HRULE:$lineId#$percentileColors[$index]:" . Rrd::fixedSafeDescr($prefix . __('graphs.stats.percentile', ['percentile' => $percentile]), $this->labelWidth);
             $this->drawing[] = "GPRINT:$percentileId:%5." . RrdSeriesDefinition::PRECISION . "lf%s$unit\\n";
         }
     }

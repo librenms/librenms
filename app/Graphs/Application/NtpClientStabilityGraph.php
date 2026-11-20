@@ -12,7 +12,7 @@ class NtpClientStabilityGraph extends ApplicationGraph
     public function getSeries(): array
     {
         return [
-            'stability' => new DataSeries($this->metric(), 'stability', 'Stability', style: new SeriesStyle(fill: true)),
+            'stability' => new DataSeries($this->metric(), 'stability', __('graphs.ntp-client.stability'), style: new SeriesStyle(fill: true)),
         ];
     }
 

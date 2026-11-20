@@ -13,13 +13,13 @@ class NtpClientStatsGraph extends ApplicationGraph
 
         // stored in milliseconds
         return [
-            'jitter' => new DataSeries($metric, 'jitter', 'Jitter', 's', 0.001),
-            'noise' => new DataSeries($metric, 'noise', 'Noise', 's', 0.001),
+            'jitter' => new DataSeries($metric, 'jitter', __('graphs.ntp-client.jitter'), 's', 0.001),
+            'noise' => new DataSeries($metric, 'noise', __('graphs.ntp-client.noise'), 's', 0.001),
         ];
     }
 
     protected function options(): GraphOptions
     {
-        return new GraphOptions(verticalLabel: 'Seconds', legendTitle: 'Seconds');
+        return new GraphOptions(verticalLabel: __('graphs.units.seconds'), legendTitle: __('graphs.units.seconds'));
     }
 }
