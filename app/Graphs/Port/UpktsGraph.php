@@ -4,6 +4,7 @@ namespace App\Graphs\Port;
 
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
+use App\Data\Graphing\SeriesRole;
 use App\Data\Graphing\SeriesStyle;
 
 /**
@@ -14,14 +15,13 @@ class UpktsGraph extends PortGraph
     public function getSeries(): array
     {
         $metric = $this->port()->metricIdentity('port');
-        $alpha = $this->stacked() ? '88' : '';
         [$in, $out] = $this->directions('INUCASTPKTS', 'OUTUCASTPKTS');
 
         return [
             'in' => new DataSeries($metric, $in, __('graph.series.in'), 'pps',
-                style: new SeriesStyle(color: '330033', fill: true, fillColor: 'AA66AA' . $alpha, maxFillColor: 'CC88CC' . $alpha)),
+                style: new SeriesStyle(SeriesRole::PacketsIn, fill: true, maxFill: true)),
             'out' => new DataSeries($metric, $out, __('graph.series.out'), 'pps',
-                style: new SeriesStyle(color: 'FF6600', fill: true, fillColor: 'FFDD88' . $alpha, maxFillColor: 'FFEFAA' . $alpha, invert: true)),
+                style: new SeriesStyle(SeriesRole::PacketsOut, fill: true, maxFill: true, invert: true)),
         ];
     }
 

@@ -5,12 +5,11 @@ namespace App\Graphs\Mempool;
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphPageContext;
+use App\Data\Graphing\SeriesRole;
 use App\Data\Graphing\SeriesStyle;
-use App\Data\Graphing\ThemeColor;
 use App\Graphs\AbstractSeriesGraph;
 use App\Models\Mempool;
 use LibreNMS\Exceptions\NoGraphData;
-use LibreNMS\Util\Color;
 
 /**
  * Used and free memory stacked up to the size of the memory pool
@@ -53,9 +52,9 @@ class UsageGraph extends AbstractSeriesGraph
 
         return [
             'used' => new DataSeries($metric, 'used', __('graph.series.used'), $unit,
-                style: new SeriesStyle(color: Color::percentage($mempool->mempool_perc ?? 0, $mempool->mempool_perc_warn)['middle'], stacked: true)),
+                style: new SeriesStyle(SeriesRole::usage($mempool->mempool_perc ?? 0, $mempool->mempool_perc_warn), stacked: true)),
             'free' => new DataSeries($metric, 'free', __('graph.series.free'), $unit,
-                style: new SeriesStyle(color: new ThemeColor('D0D0D0', '3E444C'), stacked: true)),
+                style: new SeriesStyle(SeriesRole::Muted, stacked: true)),
         ];
     }
 

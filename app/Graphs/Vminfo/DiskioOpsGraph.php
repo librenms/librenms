@@ -4,6 +4,7 @@ namespace App\Graphs\Vminfo;
 
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
+use App\Data\Graphing\SeriesRole;
 use App\Data\Graphing\SeriesStyle;
 
 class DiskioOpsGraph extends VminfoGraph
@@ -13,8 +14,8 @@ class DiskioOpsGraph extends VminfoGraph
         $metric = $this->metric('vm.diskops');
 
         return [
-            'read' => new DataSeries($metric, 'read_ops', __('graph.series.read'), style: new SeriesStyle(color: '75BA30', fill: true, fillColor: 'CAE853')),
-            'write' => new DataSeries($metric, 'write_ops', __('graph.series.write'), style: new SeriesStyle(color: '6A6AB7', fill: true, fillColor: 'A9A9F2', invert: true)),
+            'read' => new DataSeries($metric, 'read_ops', __('graph.series.read'), style: new SeriesStyle(SeriesRole::In, fill: true)),
+            'write' => new DataSeries($metric, 'write_ops', __('graph.series.write'), style: new SeriesStyle(SeriesRole::Out, fill: true, invert: true)),
         ];
     }
 

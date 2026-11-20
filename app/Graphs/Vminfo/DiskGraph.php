@@ -4,6 +4,7 @@ namespace App\Graphs\Vminfo;
 
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
+use App\Data\Graphing\SeriesRole;
 use App\Data\Graphing\SeriesStyle;
 
 class DiskGraph extends VminfoGraph
@@ -13,8 +14,8 @@ class DiskGraph extends VminfoGraph
         $metric = $this->metric('vm.disk');
 
         return [
-            'used' => new DataSeries($metric, 'used', __('graph.vminfo.used_disk'), 'B', style: new SeriesStyle(color: 'CC0000', fill: true)),
-            'total' => new DataSeries($metric, 'total', __('graph.vminfo.total_disk'), 'B', style: new SeriesStyle(color: '708090')),
+            'used' => new DataSeries($metric, 'used', __('graph.vminfo.used_disk'), 'B', style: new SeriesStyle(SeriesRole::Used, fill: true)),
+            'total' => new DataSeries($metric, 'total', __('graph.vminfo.total_disk'), 'B', style: new SeriesStyle(SeriesRole::Total)),
         ];
     }
 

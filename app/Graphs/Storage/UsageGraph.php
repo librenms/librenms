@@ -5,12 +5,11 @@ namespace App\Graphs\Storage;
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphPageContext;
+use App\Data\Graphing\SeriesRole;
 use App\Data\Graphing\SeriesStyle;
-use App\Data\Graphing\ThemeColor;
 use App\Graphs\AbstractSeriesGraph;
 use App\Models\Storage;
 use LibreNMS\Exceptions\NoGraphData;
-use LibreNMS\Util\Color;
 
 /**
  * Used and free space stacked up to the size of the storage
@@ -54,9 +53,9 @@ class UsageGraph extends AbstractSeriesGraph
 
         return [
             'used' => new DataSeries($metric, 'used', __('graph.series.used'), $unit, $scale,
-                new SeriesStyle(color: Color::percentage($storage->storage_perc ?? 0, $storage->storage_perc_warn)['middle'], stacked: true)),
+                new SeriesStyle(SeriesRole::usage($storage->storage_perc ?? 0, $storage->storage_perc_warn), stacked: true)),
             'free' => new DataSeries($metric, 'free', __('graph.series.free'), $unit, $scale,
-                new SeriesStyle(color: new ThemeColor('D0D0D0', '3E444C'), stacked: true)),
+                new SeriesStyle(SeriesRole::Muted, stacked: true)),
         ];
     }
 

@@ -41,7 +41,7 @@ class UsageGraphsTest extends TestCase
 
         $command = $graph->getDebugCommand();
         $this->assertStringContainsString("'--base' '1024'", $command);
-        $this->assertStringContainsString("'AREA:ds0#c75862:Used             '", $command);
+        $this->assertStringContainsString("'AREA:ds0#C75862:Used             '", $command);
         $this->assertStringContainsString("'AREA:ds1#D0D0D0:Free             :STACK'", $command);
         $this->assertStringContainsString('GPRINT:ds1:LAST:%5.2lf%sB', $command);
     }

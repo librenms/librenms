@@ -94,7 +94,7 @@ class BitsGraphTest extends TestCase
 
         $this->assertStringContainsString('VDEF:ds0pct=ds0,99,PERCENT', $command);
         $this->assertStringContainsString('CDEF:ds1pctdrawn=ds1,POP,ds1pct,-1,*', $command);
-        $this->assertStringContainsString('HRULE:ds1pctline#aa0000', $command);
+        $this->assertStringContainsString('HRULE:ds1pctline#AA0000', $command);
         $this->assertStringContainsString('CDEF:ds0bytes=ds0,0.125,*', $command);
         $this->assertStringContainsString('VDEF:ds0total=ds0bytes,TOTAL', $command);
         $this->assertStringContainsString('GPRINT:trafficbytes:Total %6.2lf%sB', $command);
@@ -116,7 +116,9 @@ class BitsGraphTest extends TestCase
     public function test_stacking_and_speed_zoom_draw_both_directions_above_zero(): void
     {
         LibrenmsConfig::set('webui.graph_stacked', true);
-        $this->assertFalse($this->graph()->getSeries()['out']->style->invert);
+        $stacked = $this->command();
+        $this->assertStringNotContainsString('CDEF:ds1drawn=', $stacked);
+        $this->assertStringContainsString('AREA:ds1#8080C088', $stacked);
         LibrenmsConfig::set('webui.graph_stacked', false);
 
         $command = $this->command(['port_speed_zoom' => true]);
