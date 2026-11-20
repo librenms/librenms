@@ -95,15 +95,14 @@ class RrdSeriesDefinition
             throw new NoGraphData(__('graph.errors.no_data_files'));
         }
 
-
-        $stats = $this->options->stats === null ? null : new RrdStatsDefinition($this->options->stats, $params, $this->nextColor(...), count($files) > 1, $this->options->labelWidth);
-
         // stacked graphs and graphs zoomed to the port speed draw inverted series above the axis, over the others
         $this->overlaid = LibrenmsConfig::get('webui.graph_stacked') || ($this->options->traffic?->speedZoom && array_filter($this->options->traffic->speeds));
         $theme = new GraphTheme($params->isDark(), $this->options->palette, $this->overlaid && $inverted);
         $traffic = $this->options->traffic === null ? null : new RrdTrafficDefinition($this->options->traffic, $params, $theme, $this->overlaid);
+        // with several drawn series, stats lines are named after their series so they can be told apart
+        $stats = $this->options->stats === null ? null : new RrdStatsDefinition($this->options->stats, $params, $theme, $this->overlaid,
+            count(array_filter($drawable, fn ($series) => ! $series->style->legendOnly)) > 1, $this->options->labelWidth);
         $averaged = count(array_filter(array_keys($this->files), fn ($key) => $this->series[$key]->style->stackAverage));
-
 
         $i = 0;
         foreach ($drawable as $key => $series) {
@@ -111,10 +110,7 @@ class RrdSeriesDefinition
             $this->ids[$key] = $id;
             $style = $series->style;
             $drawScale = $style->stackAverage ? $style->drawScale / $averaged : $style->drawScale;
-            $color = $style->color ?? $this->nextColor();
             $label = Rrd::fixedSafeDescr($series->description, $this->options->labelWidth);
-            $inverted = $inverted || $style->invert;
-            $label = Rrd::fixedSafeDescr($series->description, self::LABEL_WIDTH);
             $summarized = $traffic !== null && $this->options->traffic?->summarizes($key);
 
             foreach (['' => 'AVERAGE', 'min' => 'MIN', 'max' => 'MAX'] as $suffix => $cf) {
@@ -184,7 +180,9 @@ class RrdSeriesDefinition
             if ($summarized) {
                 $traffic->addSeries($id, $series, $drawScale, $color, fn (string $period, string $suffix, string $cf, string $range, int $shift) => $this->periodValueDefs($key, $period, $suffix, $cf, $range, $shift));
             }
-            $stats?->addSeries($id, $filename, $series, $drawScale);
+            if (! $style->legendOnly) {
+                $stats?->addSeries($id, $series, $drawScale, fn (string $period, string $suffix, string $cf, string $range) => $this->periodValueDefs($key, $period, $suffix, $cf, $range));
+            }
         }
 
         // the previous period of each stack, below the axis for series drawn below it
@@ -207,11 +205,10 @@ class RrdSeriesDefinition
         }
 
         // a value used by several series is defined once
-        $defs = array_values(array_unique([...$defs, ...($traffic?->definitions() ?? [])]));
+        $defs = array_values(array_unique([...$defs, ...($stats->definitions ?? []), ...($traffic?->definitions() ?? [])]));
 
         // fills go below all lines, so they do not hide lines of other series
-
-        return [$this->legendHeader(), ...$defs, ...($stats->definitions ?? []), ...($traffic?->definitions() ?? []), ...$maxFills, ...$fills, ...$drawing, ...($stats->drawing ?? []), ...($traffic?->drawing() ?? [])];
+        return [$this->legendHeader(), ...$defs, ...$margins, ...$maxFills, ...$fills, ...$drawing, ...($stats->drawing ?? []), ...($traffic?->drawing() ?? [])];
     }
 
     /**

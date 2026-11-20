@@ -4,6 +4,7 @@ namespace App\Graphs\Rrd;
 
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\SeriesSum;
 use App\Data\Graphing\StatsOptions;
 use App\Facades\LibrenmsConfig;
 use Closure;
@@ -30,14 +31,16 @@ class RrdStatsDefinition
     public private(set) array $drawing = [];
 
     /**
-     * @param  Closure(): string  $nextColor  the next color of the graph palette
+     * @param  GraphTheme  $theme  gives each line the next color of the graph palette
+     * @param  bool  $overlaid  inverted series are drawn above the axis, over the others
      * @param  bool  $nameSeries  start each label with the series description, so the lines of several series can be told apart
      * @param  int  $labelWidth  characters each label is padded or cut to
      */
     public function __construct(
         private readonly StatsOptions $options,
         private readonly GraphParameters $params,
-        private readonly Closure $nextColor,
+        private readonly GraphTheme $theme,
+        private readonly bool $overlaid,
         private readonly bool $nameSeries,
         private readonly int $labelWidth,
     ) {
@@ -46,22 +49,25 @@ class RrdStatsDefinition
     /**
      * @param  string  $id  the series values, defined by RrdSeriesDefinition as $id, {$id}min and {$id}max
      * @param  float  $drawScale  the draw only scale of the series, applied to the lines but not the legend values
+     * @param  Closure(string $period, string $suffix, string $cf, string $range): list<string>  $periodValueDefs  defines the value of the series
+     *                                                                                                     for $id$period$suffix, such as ds0hourlymax
      */
-    public function addSeries(string $id, string $filename, DataSeries $series, float $drawScale): void
+    public function addSeries(string $id, DataSeries|SeriesSum $series, float $drawScale, Closure $periodValueDefs): void
     {
         if ($this->params->height <= self::MIN_HEIGHT) {
             return;
         }
 
-        $factor = $drawScale * ($series->style->invert && ! LibrenmsConfig::get('webui.graph_stacked') ? -1 : 1);
+        $factor = $drawScale * ($series->style->invert && ! $this->overlaid ? -1 : 1);
+        $factorRpn = RrdSeriesDefinition::number($factor);
         $unit = str_replace(['%', ':'], ['%%', '\\:'], $series->unit);
         $prefix = $this->nameSeries ? $series->description . ' ' : '';
         $range = $this->params->to - $this->params->from;
         // colors are taken even for lines that are not drawn, so each line keeps its color at any range
-        $percentileColors = array_map(fn () => ($this->nextColor)(), $this->options->percentiles);
+        $percentileColors = array_map(fn () => $this->theme->next(null), $this->options->percentiles);
 
         foreach (self::PERIODS as $period => ['label' => $labelKey, 'step' => $step, 'minRange' => $minRange]) {
-            $color = ($this->nextColor)();
+            $color = $this->theme->next(null);
             if (! $this->options->$period || $range < $minRange) {
                 continue;
             }
@@ -69,18 +75,14 @@ class RrdStatsDefinition
 
             $periodId = $id . $period;
             foreach (['' => 'AVERAGE', 'min' => 'MIN', 'max' => 'MAX'] as $suffix => $cf) {
-                $source = "$filename:$series->field:$cf:step=$step";
-                if ($series->scale == 1) {
-                    $this->definitions[] = "DEF:$periodId$suffix=$source";
-                } else {
-                    array_push($this->definitions, "DEF:{$periodId}raw$suffix=$source", "CDEF:$periodId$suffix={$periodId}raw$suffix,$series->scale,*");
-                }
+                // defined like the series values, so scale, offset, formulas, sums and min and max fields apply the same
+                array_push($this->definitions, ...$periodValueDefs($period, $suffix, $cf, ":step=$step"));
             }
 
             $drawnId = $periodId;
             if ($factor != 1) {
                 $drawnId = $periodId . 'drawn';
-                $this->definitions[] = "CDEF:$drawnId=$periodId,$factor,*";
+                $this->definitions[] = "CDEF:$drawnId=$periodId,$factorRpn,*";
             }
 
             // only the average is drawn, min and max are legend rows
@@ -106,7 +108,7 @@ class RrdStatsDefinition
             $lineId = $percentileId;
             if ($factor != 1) {
                 $lineId = $percentileId . 'drawn';
-                array_push($this->definitions, "CDEF:{$lineId}line=$id,POP,$percentileId,$factor,*", "VDEF:$lineId={$lineId}line,FIRST");
+                array_push($this->definitions, "CDEF:{$lineId}line=$id,POP,$percentileId,$factorRpn,*", "VDEF:$lineId={$lineId}line,FIRST");
             }
 
             $this->drawing[] = "HRULE:$lineId#$percentileColors[$index]:" . Rrd::fixedSafeDescr($prefix . __('graphs.stats.percentile', ['percentile' => $percentile]), $this->labelWidth);

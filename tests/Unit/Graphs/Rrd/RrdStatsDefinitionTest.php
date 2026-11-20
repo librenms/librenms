@@ -27,9 +27,9 @@ class RrdStatsDefinitionTest extends TestCase
         $this->metric = new MetricIdentity('test-metric', ['hostname' => 'localhost']);
         LibrenmsConfig::shouldReceive('get')->byDefault()->andReturn(null);
         LibrenmsConfig::shouldReceive('has')->byDefault()->andReturn(true);
-        // graph_colours.mixed.3 is 000003, so the tests show which color each line takes
+        // the fourth color of the palette is 000003, so the tests show which color each line takes
         LibrenmsConfig::shouldReceive('get')->with(Mockery::pattern('/^graph_colours\./'))->byDefault()
-            ->andReturnUsing(fn (string $key) => sprintf('%06d', substr($key, strrpos($key, '.') + 1)));
+            ->andReturn(array_map(fn (int $index) => sprintf('%06d', $index), range(0, 9)));
     }
 
     public function test_it_adds_hourly_lines_and_percentiles(): void
@@ -118,8 +118,8 @@ class RrdStatsDefinitionTest extends TestCase
     {
         $definition = $this->build(['a' => new DataSeries($this->metric, 'offset', 'Offset', scale: 0.001)]);
 
-        $this->assertContains('DEF:ds0hourlyrawmax=host/test.rrd:offset:MAX:step=3600', $definition);
-        $this->assertContains('CDEF:ds0hourlymax=ds0hourlyrawmax,0.001,*', $definition);
+        $this->assertContains('DEF:ds0hourlymaxraw=host/test.rrd:offset:MAX:step=3600', $definition);
+        $this->assertContains('CDEF:ds0hourlymax=ds0hourlymaxraw,0.001,*', $definition);
         $this->assertContains('VDEF:ds0p0=ds0,25,PERCENTNAN', $definition);
     }
 
