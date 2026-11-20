@@ -4,9 +4,11 @@ namespace App\Graphs\Rrd;
 
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\SeriesSum;
 use App\Data\Graphing\ThemeColor;
 use App\Data\Graphing\TrafficOptions;
 use App\Facades\LibrenmsConfig;
+use Closure;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Util\Number;
 
@@ -28,7 +30,11 @@ class RrdTrafficDefinition
     {
     }
 
-    public function addSeries(string $key, string $id, string $filename, DataSeries $series, float $drawScale): void
+    /**
+     * @param  Closure(string $period, string $suffix, string $cf, string $range, int $shift): list<string>  $periodValueDefs  defines the value of
+     *                                                                                                                         the series for $id$period$suffix
+     */
+    public function addSeries(string $key, string $id, DataSeries|SeriesSum $series, float $drawScale, Closure $periodValueDefs): void
     {
         $color = $series->style->color instanceof ThemeColor ? $series->style->color->for($this->params->isDark()) : $series->style->color;
         $factor = RrdSeriesDefinition::number($drawScale * ($series->style->invert && ! LibrenmsConfig::get('webui.graph_stacked') ? -1 : 1));
@@ -47,7 +53,7 @@ class RrdTrafficDefinition
             $previous = $id . 'prev';
             $range = ":start={$this->params->prev_from}:end={$this->params->from}";
             foreach (['' => 'AVERAGE', 'min' => 'MIN', 'max' => 'MAX'] as $suffix => $cf) {
-                array_push($this->defs, ...RrdSeriesDefinition::valueDefs($previous . $suffix, $filename, $series, $cf, $range, $this->params->period));
+                array_push($this->defs, ...$periodValueDefs('prev', $suffix, $cf, $range, $this->params->period));
             }
             $this->defs[] = "CDEF:{$previous}drawn=$previous,$factor,*";
             $this->drawing[] = "LINE1.25:{$previous}drawn#" . ($key === 'in' ? '333300' : '000099') . ':' . Rrd::fixedSafeDescr(__('graph.legend.previous', ['series' => $series->description]), 16);
@@ -63,7 +69,7 @@ class RrdTrafficDefinition
         }
     }
 
-    private function summarize(string $id, DataSeries $series, string $factor, string $period = ''): void
+    private function summarize(string $id, DataSeries|SeriesSum $series, string $factor, string $period = ''): void
     {
         $percentile = $this->options->percentile;
         $scale = $this->options->totalScale;
