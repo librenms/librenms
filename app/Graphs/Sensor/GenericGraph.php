@@ -6,11 +6,11 @@ use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphPageContext;
 use App\Data\Graphing\SeriesStyle;
+use App\Data\Graphing\ThemeColor;
 use App\Data\Graphing\Threshold;
 use App\Graphs\AbstractSeriesGraph;
 use App\Models\Sensor;
 use LibreNMS\Exceptions\NoGraphData;
-use LibreNMS\Util\Number;
 
 /**
  * One sensor with the range of each interval and its alert thresholds, for sensor classes without a graph of their own
@@ -57,11 +57,10 @@ class GenericGraph extends AbstractSeriesGraph
     {
         $sensor = $this->sensor();
         [$scale, $offset] = $this->conversion();
-        $dark = $this->params->isDark();
 
         return [
             'sensor' => new DataSeries($sensor->metricIdentity('sensor'), 'sensor', (string) $sensor->sensor_descr, $sensor->unit(), $scale,
-                new SeriesStyle(color: $dark ? 'F2F2F2' : '272B30', rangeColor: $dark ? '3E444C' : 'C5C5C5'), $offset),
+                new SeriesStyle(color: ThemeColor::text(), rangeColor: ThemeColor::subtle()), $offset),
         ];
     }
 
@@ -77,12 +76,9 @@ class GenericGraph extends AbstractSeriesGraph
             }
         }
 
-        // rrdtool axis formats have no SI prefix, use the prefix of the current value
-        $prefix = trim(substr(Number::formatSi($sensor->sensor_current ?? 0, 0, 0, ''), -1));
-
         return new GraphOptions(
             verticalLabel: $sensor->classDescr(),
-            leftAxisFormat: '%5.1lf' . str_replace('%', '%%', $prefix . $sensor->unit()),
+            axisUnit: $sensor->unit(),
             thresholds: $thresholds,
             scaleMargin: 0.01,
         );

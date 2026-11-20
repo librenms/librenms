@@ -4,6 +4,8 @@ namespace App\Data\TimeSeries;
 
 /**
  * Identifies a stored metric independently of the datastore: a measurement and the tags of one series of it.
+ * The identity is authoritative: datastores store and read a metric by it. Names a metric had before its identity
+ * was cleaned up are kept in MetricNames, only for finding data that is still stored under them.
  * What a series belongs to is a tag like any other, usually hostname.
  * Only tags that tell series apart belong here, a tag that may change (a description) would start a new series.
  */

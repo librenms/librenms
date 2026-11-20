@@ -6,6 +6,7 @@ use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphPageContext;
 use App\Data\Graphing\SeriesStyle;
+use App\Data\Graphing\ThemeColor;
 use App\Graphs\AbstractSeriesGraph;
 use App\Models\Mempool;
 use LibreNMS\Exceptions\NoGraphData;
@@ -54,7 +55,7 @@ class UsageGraph extends AbstractSeriesGraph
             'used' => new DataSeries($metric, 'used', __('graph.series.used'), $unit,
                 style: new SeriesStyle(color: Color::percentage($mempool->mempool_perc ?? 0, $mempool->mempool_perc_warn)['middle'], stacked: true)),
             'free' => new DataSeries($metric, 'free', __('graph.series.free'), $unit,
-                style: new SeriesStyle(color: $this->params->isDark() ? '3E444C' : 'EAEAEA', stacked: true)),
+                style: new SeriesStyle(color: ThemeColor::subtle(), stacked: true)),
         ];
     }
 

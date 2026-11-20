@@ -214,6 +214,14 @@ Set these named arguments on `SeriesStyle` to control an individual series:
 Inverted stacked series start their own stack below the axis, so list them
 after the series stacked above it.
 
+A color that needs a different variation in the light and dark site styles is
+a `ThemeColor`: `new ThemeColor(light: '272B30', dark: 'F2F2F2')`. The renderer
+uses the variation of the style it draws in, so graphs never check the site
+style themselves. `ThemeColor::text()` is the configured text color, for lines
+that should stand out like text; it also follows a text color set in the graph
+request. `ThemeColor::subtle()` barely stands out from the background, for
+areas behind the data such as ranges or free space.
+
 To convert the values themselves, use `scale` on `DataSeries`. For example,
 `scale: 8, unit: 'bps'` converts a stored bytes-per-second field to bits per
 second, including the legend values. Setting `unit` alone only adds a suffix;
@@ -234,6 +242,7 @@ new DataSeries($metric, new Formula('xmt', 'rcv', '-', 'xmt', '/', 100, '*'), 'L
 ```
 
 The lowest and highest values of a formula are those of its averages.
+Datastores that cannot calculate it themselves use `Formula::evaluate()`.
 
 ### Graph options
 
@@ -250,6 +259,12 @@ Common named arguments on `GraphOptions` are:
 | `unitsExponent` | Controls the axis unit exponent; `0` shows axis and legend values without SI prefixes, for units such as days or milliseconds. |
 | `thresholds` | Draws a dashed `Threshold` line for each value, such as alert limits, in the units of the series. |
 | `scaleMargin` | Widens an autoscaled axis by this fraction of the values, so values that barely change still get axis labels. |
+| `axisUnit` | Shows a unit after the axis values, which are then shown without SI prefixes. |
+| `rightAxisLabel` | Adds a right axis with the same scale as the left one. |
+
+Describe what the graph should show rather than how rrdtool draws it.
+`leftAxisFormat` and `rightAxis` take rrdtool syntax and only exist for the
+legacy graphs; graphs drawn from other datastores ignore them.
 
 For example, a percentage graph can use `scaleMin: 0, scaleMax: 100,
 scaleRigid: true`. See `app/Data/Graphing/GraphOptions.php` for all options.
@@ -274,6 +289,13 @@ falls back to the legacy include.
 A graph type may have a `GenericGraph` class that draws every subtype without
 a class or legacy include of its own. For example, `App\Graphs\Sensor\GenericGraph`
 draws `sensor_temperature`, `sensor_voltage` and the other sensor classes.
+
+The metric identity is authoritative: datastores store and read the metric by
+it, so choose clean measurement and tag names rather than copying how the data
+happens to be stored now. If existing data is stored under other names, such
+as the `icmp-perf` measurement of `ping` or `mempool_type` instead of `type`,
+add those names to `LibreNMS\Data\Store\MetricNames`. Every datastore then
+finds the existing data by the clean identity.
 
 Replace legacy RRD filename and dataset variables with `MetricIdentity` and
 `DataSeries`, and move presentation settings into `SeriesStyle` and

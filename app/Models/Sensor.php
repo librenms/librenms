@@ -244,7 +244,7 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
 
     /**
      * Identity used when storing and reading a measurement of this sensor.
-     * Sensors without a stable index are told apart by their description.
+     * Sensors without a stable index, such as ipmi sensors, are told apart by their description.
      */
     public function metricIdentity(string $measurement): MetricIdentity
     {

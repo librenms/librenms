@@ -35,6 +35,47 @@ final readonly class Formula
     }
 
     /**
+     * Calculate the value from the values of the fields, for datastores that do not calculate it themselves
+     *
+     * @param  array<string, float|int|null>  $fields  values by field name
+     * @return float|null null when a field has no value or the result is not a number, such as after dividing by zero
+     */
+    public function evaluate(array $fields): ?float
+    {
+        $stack = [];
+        foreach ($this->tokens as $token) {
+            if (! is_string($token)) {
+                $stack[] = (float) $token;
+                continue;
+            }
+
+            if (! in_array($token, self::OPERATORS, true)) {
+                $value = $fields[$token] ?? null;
+                if ($value === null) {
+                    return null;
+                }
+                $stack[] = (float) $value;
+                continue;
+            }
+
+            $right = array_pop($stack);
+            $left = array_pop($stack);
+            if ($token === '/' && $right == 0) {
+                return null;
+            }
+
+            $stack[] = match ($token) {
+                '+' => $left + $right,
+                '-' => $left - $right,
+                '*' => $left * $right,
+                '/' => $left / $right,
+            };
+        }
+
+        return $stack[0];
+    }
+
+    /**
      * The fields the formula reads, each once
      *
      * @return list<string>

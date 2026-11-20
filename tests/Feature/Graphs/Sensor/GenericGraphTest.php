@@ -59,12 +59,12 @@ class GenericGraphTest extends TestCase
         $command = $graph->getDebugCommand();
 
         $this->assertSame(' :: Sensor :: Rx Power', $graph->getPageContext()->subtitle);
-        $this->assertStringContainsString('AREA:ds0range#C5C5C5::STACK', $command);
+        $this->assertStringContainsString('AREA:ds0range#D0D0D0::STACK', $command);
         $this->assertStringContainsString('LINE1.5:-15#00008B:low = -15 dBm:dashes', $command);
         $this->assertStringContainsString('LINE1.5:-12.5#005BDF:low_warn = -12.5 dBm:dashes', $command);
         $this->assertStringContainsString('LINE1.5:2.5#FF0000:high = 2.5 dBm\\l:dashes', $command);
         $this->assertStringNotContainsString('high_warn', $command);
-        $this->assertStringContainsString("'--left-axis-format' '%5.1lfdBm'", $command);
+        $this->assertStringContainsString("'--left-axis-format' '%lg dBm'", $command);
     }
 
     public function test_temperatures_follow_the_unit_the_user_prefers(): void

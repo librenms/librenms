@@ -4,6 +4,7 @@ namespace App\Graphs\Rrd;
 
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\ThemeColor;
 use App\Data\Graphing\TrafficOptions;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Store\Rrd;
@@ -38,7 +39,7 @@ class RrdTrafficDefinition
                 "VDEF:{$id}intercept={$id}max,LSLINT",
                 "CDEF:{$id}trend={$id}max,POP,{$id}slope,COUNT,*,{$id}intercept,+,$factor,*",
             );
-            $this->drawing[] = "LINE2:{$id}trend#" . ($series->style->color ?? '666666') . ':' . Rrd::safeDescr(__('graph.legend.prediction', ['series' => $series->description])) . '\\n:dashes=8';
+            $this->drawing[] = "LINE2:{$id}trend#" . (ThemeColor::resolve($series->style->color, $this->params) ?? '666666') . ':' . Rrd::safeDescr(__('graph.legend.prediction', ['series' => $series->description])) . '\\n:dashes=8';
         }
 
         if ($this->params->visible('previous')) {

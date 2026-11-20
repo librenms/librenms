@@ -6,6 +6,7 @@ use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\Formula;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\ThemeColor;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Exceptions\NoGraphData;
@@ -84,7 +85,7 @@ class RrdSeriesDefinition
             $id = 'ds' . $i++;
             $style = $series->style;
             $drawScale = $style->stackAverage ? $style->drawScale / $averaged : $style->drawScale;
-            $color = $style->color ?? $this->nextColor();
+            $color = ThemeColor::resolve($style->color, $params) ?? $this->nextColor();
             $label = Rrd::fixedSafeDescr($series->description, self::LABEL_WIDTH);
             $inverted = $inverted || $style->invert;
 
@@ -106,10 +107,10 @@ class RrdSeriesDefinition
             } else {
                 $drawing[] = "LINE1.25:$drawnId#$color:$label";
                 if ($style->fill) {
-                    $fills[] = "AREA:$drawnId#" . ($style->fillColor ?? $color . '20');
+                    $fills[] = "AREA:$drawnId#" . (ThemeColor::resolve($style->fillColor, $params) ?? $color . '20');
                 }
                 if ($style->maxFillColor !== null) {
-                    $maxFills[] = 'AREA:' . $this->drawnValue("{$id}max", $drawScale, $style->invert, $defs) . "#$style->maxFillColor";
+                    $maxFills[] = 'AREA:' . $this->drawnValue("{$id}max", $drawScale, $style->invert, $defs) . '#' . ThemeColor::resolve($style->maxFillColor, $params);
                 }
                 if ($this->options->scaleMargin > 0) {
                     // invisible lines that only widen the autoscaled axis
@@ -124,7 +125,7 @@ class RrdSeriesDefinition
                     // an invisible line at the minimum, the range stacked on it
                     $min = $this->drawnValue("{$id}min", $drawScale, $style->invert, $defs);
                     $defs[] = "CDEF:{$id}range=" . $this->drawnValue("{$id}max", $drawScale, $style->invert, $defs) . ",$min,-";
-                    array_push($maxFills, "LINE:$min#00000000", "AREA:{$id}range#$style->rangeColor::STACK");
+                    array_push($maxFills, "LINE:$min#00000000", "AREA:{$id}range#" . ThemeColor::resolve($style->rangeColor, $params) . '::STACK');
                 }
             }
 
@@ -241,6 +242,17 @@ class RrdSeriesDefinition
         return $scale == 1 ? '' : ',' . self::number($scale) . ',*';
     }
 
+    private function nextColor(): string
+    {
+        $palette = $this->options->palette;
+
+        if (! LibrenmsConfig::has("graph_colours.$palette.$this->colorIndex")) {
+            $this->colorIndex = 0;
+        }
+
+        return LibrenmsConfig::get("graph_colours.$palette." . $this->colorIndex++);
+    }
+
     /**
      * A number for rrdtool, which does not read exponents such as 1.2E-5
      */
@@ -256,17 +268,6 @@ class RrdSeriesDefinition
         $fixed = sprintf("%.{$decimals}F", $number);
 
         return $decimals === 0 ? $fixed : rtrim(rtrim($fixed, '0'), '.');
-    }
-
-    private function nextColor(): string
-    {
-        $palette = $this->options->palette;
-
-        if (! LibrenmsConfig::has("graph_colours.$palette.$this->colorIndex")) {
-            $this->colorIndex = 0;
-        }
-
-        return LibrenmsConfig::get("graph_colours.$palette." . $this->colorIndex++);
     }
 
     /**

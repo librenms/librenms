@@ -4,6 +4,7 @@ namespace App\Graphs\Rrd;
 
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\ThemeColor;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Enum\ImageFormat;
 
@@ -126,21 +127,25 @@ class RrdOptionsBuilder
         if ($graph->base !== null) {
             array_push($options, '--base', $graph->base);
         }
-        if ($graph->unitsExponent !== null) {
-            array_push($options, '--units-exponent', $graph->unitsExponent);
+        // rrdtool axis formats have no SI prefix, so axes with a unit show plain values
+        $unitsExponent = $graph->unitsExponent ?? ($graph->axisUnit === null ? null : 0);
+        if ($unitsExponent !== null) {
+            array_push($options, '--units-exponent', $unitsExponent);
         }
         if ($graph->logarithmic) {
             $options[] = '--logarithmic';
         }
 
-        if ($graph->rightAxis !== null) {
-            array_push($options, '--right-axis', $this->escape($graph->rightAxis));
+        $rightAxis = $graph->rightAxis ?? ($graph->rightAxisLabel === null ? null : '1:0');
+        if ($rightAxis !== null) {
+            array_push($options, '--right-axis', $this->escape($rightAxis));
         }
         if ($graph->rightAxisLabel !== null) {
             array_push($options, '--right-axis-label', $this->escape($graph->rightAxisLabel));
         }
-        if ($graph->leftAxisFormat !== null) {
-            array_push($options, '--left-axis-format', $this->escape($graph->leftAxisFormat));
+        $leftAxisFormat = $graph->leftAxisFormat ?? ($graph->axisUnit === null ? null : '%lg ' . str_replace('%', '%%', $graph->axisUnit));
+        if ($leftAxisFormat !== null) {
+            array_push($options, '--left-axis-format', $this->escape($leftAxisFormat));
         }
         if ($graph->unitsLength !== null) {
             array_push($options, '--units-length', $graph->unitsLength);
@@ -157,30 +162,19 @@ class RrdOptionsBuilder
      */
     private function colors(): array
     {
-        $dark = $this->params->isDark();
-        $defaults = LibrenmsConfig::get($dark ? 'rrdgraph_def_text_dark' : 'rrdgraph_def_text');
-        $font = ltrim(LibrenmsConfig::get($dark ? 'rrdgraph_def_text_color_dark' : 'rrdgraph_def_text_color'), '#');
+        $defaults = LibrenmsConfig::get($this->params->isDark() ? 'rrdgraph_def_text_dark' : 'rrdgraph_def_text');
 
         preg_match_all('/-c ([A-Z]+)#([0-9A-Fa-f]{6,8})/', $defaults, $matches);
-        $colors = ['FONT' => $font];
+        $colors = ['FONT' => ThemeColor::text()->for($this->params)];
         foreach ($matches[1] as $index => $key) {
             $colors[$key] = $matches[2][$index];
         }
 
-        // user overrides
-        if ($this->params->font_color) {
-            $colors['FONT'] = $this->params->font_color;
-        }
+        // the colors the request may override
+        $colors['CANVAS'] = ThemeColor::canvas()->for($this->params);
+        $colors['BACK'] = ThemeColor::background()->for($this->params);
 
-        if ($this->params->canvas) {
-            $colors['CANVAS'] = $this->params->canvas;
-        }
-
-        if ($this->params->background) {
-            $colors['BACK'] = $this->params->background;
-        }
-
-        return $colors;
+        return array_filter($colors, fn (?string $color) => $color !== null && $color !== '');
     }
 
     private function fitTitle(string $title): string

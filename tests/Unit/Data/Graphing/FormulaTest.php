@@ -14,6 +14,15 @@ class FormulaTest extends TestCase
         $this->assertSame(['xmt', 'rcv'], new Formula('xmt', 'rcv', '-', 'xmt', '/', 100, '*')->fields());
     }
 
+    public function test_it_evaluates_with_field_values(): void
+    {
+        $loss = new Formula('xmt', 'rcv', '-', 'xmt', '/', 100, '*');
+
+        $this->assertSame(25.0, $loss->evaluate(['xmt' => 4, 'rcv' => 3]));
+        $this->assertNull($loss->evaluate(['xmt' => 0, 'rcv' => 0]));
+        $this->assertNull($loss->evaluate(['xmt' => 4, 'rcv' => null]));
+    }
+
     /**
      * @param  list<string|int|float>  $tokens
      */

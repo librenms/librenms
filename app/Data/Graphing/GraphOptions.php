@@ -11,6 +11,10 @@ readonly class GraphOptions
      * @param  bool|null  $scaleRigid  defaults to rigid when neither scaleMin nor scaleMax is set
      * @param  string  $legendTitle  heading above the series labels
      * @param  int|null  $unitsExponent  0 shows axis and legend values without SI prefixes, such as m or k
+     * @param  string|null  $leftAxisFormat  rrdtool only, prefer $axisUnit
+     * @param  string|null  $rightAxis  rrdtool only, a right axis with $rightAxisLabel mirrors the left one
+     * @param  string|null  $rightAxisLabel  shows a right axis with the same scale as the left one
+     * @param  string|null  $axisUnit  shown after the axis values, which are then shown without SI prefixes
      * @param  string  $palette  the graph_colours palette for series without a color
      * @param  list<Threshold>  $thresholds  reference lines, such as alert limits
      * @param  float  $scaleMargin  keep this fraction of the highest and lowest values of each line between them and the edge of an
@@ -34,6 +38,7 @@ readonly class GraphOptions
         public ?TrafficOptions $traffic = null,
         public array $thresholds = [],
         public float $scaleMargin = 0,
+        public ?string $axisUnit = null,
     ) {
     }
 }

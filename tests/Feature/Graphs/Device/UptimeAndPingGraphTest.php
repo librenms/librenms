@@ -46,13 +46,13 @@ class UptimeAndPingGraphTest extends TestCase
         $this->assertInstanceOf(IcmpPerfGraph::class, $graph);
 
         $series = $graph->getSeries();
-        $this->assertSame('icmp-perf', $series['rtt']->metric->measurement);
+        $this->assertSame('ping', $series['rtt']->metric->measurement);
         $this->assertInstanceOf(Formula::class, $series['loss']->field);
 
         $command = $graph->getDebugCommand();
-        $this->assertStringContainsString('DEF:ds0min=host/icmp-perf.rrd:min:MIN', $command);
-        $this->assertStringContainsString('DEF:ds0max=host/icmp-perf.rrd:max:MAX', $command);
-        $this->assertStringContainsString('AREA:ds0range#CCD2DECC::STACK', $command);
+        $this->assertStringContainsString('DEF:ds0min=host/ping.rrd:min:MIN', $command);
+        $this->assertStringContainsString('DEF:ds0max=host/ping.rrd:max:MAX', $command);
+        $this->assertStringContainsString('AREA:ds0range#D0D0D0::STACK', $command);
         $this->assertStringContainsString('CDEF:ds1=ds10f,ds11f,-,ds10f,/,100,*', $command);
         $this->assertStringContainsString("'--right-axis' '1:0'", $command);
         $this->assertStringContainsString('GPRINT:ds1:LAST:%5.2lf %%', $command);
@@ -62,6 +62,6 @@ class UptimeAndPingGraphTest extends TestCase
     {
         $command = new IcmpPerfGraph(new GraphParameters(['type' => 'device_icmp_perf', 'device' => $this->device->device_id, 'style' => 'dark']))->getDebugCommand();
 
-        $this->assertStringContainsString('LINE1.25:ds0#D1D9EB:RTT', $command);
+        $this->assertStringContainsString('LINE1.25:ds0#f8f9f9:RTT', $command);
     }
 }

@@ -13,6 +13,8 @@ use App\Facades\LibrenmsConfig;
  */
 class MetricNames
 {
+    private const array SENSOR_TAGS = ['class' => 'sensor_class', 'type' => 'sensor_type', 'index' => 'sensor_index', 'descr' => 'sensor_descr'];
+
     public function isCanonical(): bool
     {
         return (bool) LibrenmsConfig::get('datastore.canonical_metrics', false);
@@ -34,6 +36,10 @@ class MetricNames
         return match ($metric->measurement) {
             'port' => new LegacyMetric('ports', rrdName: ['port', 'id{id}']),
             'processor' => new LegacyMetric('processors', ['type' => 'processor_type', 'index' => 'processor_index'], ['processor', '{type}', '{index}']),
+            'mempool' => new LegacyMetric('mempool', ['type' => 'mempool_type', 'class' => 'mempool_class', 'index' => 'mempool_index'], ['mempool', '{type}', '{class}', '{index}']),
+            // ipmi sensors were a measurement of their own, except in rrd files
+            'sensor' => new LegacyMetric(($metric->tags['type'] ?? null) === 'ipmi' ? 'ipmi' : 'sensor', self::SENSOR_TAGS, ['sensor', ...array_map(fn ($tag) => '{' . $tag . '}', array_keys($metric->tagsInGroup()))]),
+            'ping' => new LegacyMetric('icmp-perf'),
             default => null,
         };
     }
