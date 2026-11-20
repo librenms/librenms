@@ -41,7 +41,6 @@ if ($options['f'] === 'composer_get_plugins') {
 /**
  * Scripts with dependencies
  */
-$init_modules = ['alerts'];
 require __DIR__ . '/includes/init.php';
 
 if (isset($options['d'])) {

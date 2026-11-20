@@ -31,7 +31,6 @@ use App\Http\Controllers\FirstRunController;
 use App\Http\Controllers\GraphController;
 use App\Http\Controllers\GraphsPageController;
 use App\Http\Controllers\Install;
-use App\Http\Controllers\LegacyController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\LogController;
 use App\Http\Controllers\Maps;
@@ -388,14 +387,8 @@ Route::middleware(['auth'])->group(function (): void {
         Route::get('debug/alerts', Device\Debug\DebugAlertsController::class)->name('debug.alerts');
     });
 
-    // fallback device routes
-    Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', [DeviceController::class, 'index'])
-        ->middleware([
-            'saved-filter:device.packages,*/packages',
-            'saved-filter:device.port-security,*/ports/portsecurity',
-            'saved-filter:device.ports,*/ports|*/ports/basic|*/ports/detail',
-        ])
-        ->name('device')->where('vars', '.*');
+    // legacy device urls (/device/device=1/tab=ports/, /device/hostname, /device/1/ports/detail)
+    Route::get('device/{device}/{tab?}/{vars?}', [DeviceController::class, 'legacy'])->where('vars', '.*')->name('device.legacy');
 
     // Maps
     Route::get('fullscreenmap', [Maps\FullscreenMapController::class, 'fullscreenMap'])->name('maps.fullscreen');
@@ -680,14 +673,4 @@ Route::prefix('install')->group(function (): void {
     Route::post('/database/test', [Install\DatabaseController::class, 'test'])->name('install.acton.test-database');
     Route::get('/ajax/database/migrate', [Install\DatabaseController::class, 'migrate'])->name('install.action.migrate');
     Route::get('/ajax/steps', [Install\InstallationController::class, 'stepsCompleted'])->name('install.action.steps');
-    Route::any('{path?}', [Install\InstallationController::class, 'invalid'])->where('path', '.*'); // 404
 });
-
-// Legacy routes
-Route::any('/dummy_legacy_auth/{path?}', [LegacyController::class, 'dummy'])->middleware('auth');
-Route::any('/dummy_legacy_unauth/{path?}', [LegacyController::class, 'dummy']);
-// api/v1 is excluded so those URLs 404 when the v1 API is disabled instead
-// of falling through to the legacy page handler.
-Route::any('/{path?}', [LegacyController::class, 'index'])
-    ->where('path', '^(?!api/v1($|/))((?!_debugbar).)*')
-    ->middleware('auth');

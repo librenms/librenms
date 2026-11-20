@@ -20,7 +20,6 @@ use LibreNMS\Billing;
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Util\Debug;
 
-$init_modules = [];
 require __DIR__ . '/includes/init.php';
 
 if (isset($argv[1]) && is_numeric($argv[1])) {

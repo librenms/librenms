@@ -37,7 +37,7 @@ class TnmsneTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'tnmsne']))
+            ->get(route('device.tnmsne', ['device' => $device]))
             ->assertOk()
             ->assertSee('Coriant NE Hardware')
             ->assertSee('tnmsne')
@@ -53,7 +53,7 @@ class TnmsneTabTest extends TestCase
         $user->assignRole('user');
 
         $this->actingAs($user)
-            ->get(route('device', ['device' => $device, 'tab' => 'tnmsne']))
+            ->get(route('device.tnmsne', ['device' => $device]))
             ->assertForbidden();
     }
 }

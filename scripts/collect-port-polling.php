@@ -11,7 +11,6 @@ use LibreNMS\Util\Number;
 $install_dir = realpath(__DIR__ . '/..');
 chdir($install_dir);
 
-$init_modules = [];
 require $install_dir . '/includes/init.php';
 $options = getopt('dh:e:', ['help']);
 

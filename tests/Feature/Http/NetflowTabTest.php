@@ -105,7 +105,7 @@ final class NetflowTabTest extends TestCase
         $device = Device::factory()->create(['hostname' => 'router.example.com']);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'netflow', 'vars' => 'nfsen=channel/channel=upstream', 'topN' => 20]))
+            ->get(route('device.legacy', ['device' => $device, 'tab' => 'netflow', 'vars' => 'nfsen=channel/channel=upstream', 'topN' => 20]))
             ->assertRedirect(route('device.netflow', ['device' => $device, 'topN' => 20, 'nfsen' => 'channel', 'channel' => 'upstream']));
     }
 

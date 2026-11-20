@@ -29,7 +29,6 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 chdir(dirname($argv[0]));
 
-$init_modules = [];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 $opt = getopt('p:f:');

@@ -31,7 +31,7 @@ final class LoadBalancerTabTest extends TestCase
         $tabLink = 'href="' . route('device.loadbalancer', ['device' => $device]) . '"';
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'notes']))
+            ->get(route('device.notes', ['device' => $device]))
             ->assertOk()
             ->assertDontSee($tabLink, false);
 
@@ -39,7 +39,7 @@ final class LoadBalancerTabTest extends TestCase
         $this->app->forgetScopedInstances(); // a new request, the controller is scoped
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'notes']))
+            ->get(route('device.notes', ['device' => $device]))
             ->assertOk()
             ->assertSee($tabLink, false);
     }

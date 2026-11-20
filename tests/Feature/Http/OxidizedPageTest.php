@@ -79,7 +79,7 @@ final class OxidizedPageTest extends TestCase
             ->postJson(route('oxidized.search'), ['search' => 'password'])
             ->assertOk()
             ->assertExactJson(['results' => [
-                ['name' => $visible->display, 'url' => route('device', ['device' => $visible->device_id, 'tab' => 'config'])],
+                ['name' => $visible->display, 'url' => route('device.config', ['device' => $visible->device_id])],
                 ['name' => 'core/other', 'url' => null],
             ]]);
 

@@ -112,24 +112,6 @@ This file holds most of the functions of the standard web interface.
 This directory holds the global graph definitions and the OS specific
 graph definitions.
 
-### includes/html/reports/
-
-These files generate the PDF reports for the user. `html/pdf.php` calls
-the correct file for the report of the request.
-
-### includes/html/table/
-
-This directory holds the ajax calls of the data tables. Most tables use
-this method. Put the backend data calls of a new data table in this
-directory.
-
-### includes/html/pages/
-
-This directory holds the URL structure of the web interface. For
-example, `/devices/` calls `includes/html/pages/devices.inc.php`. The
-URL `/device/tab=ports/` calls
-`includes/html/pages/device/ports.inc.php`.
-
 ### logs/
 
 This directory holds the main `librenms.log` file. It can also hold
