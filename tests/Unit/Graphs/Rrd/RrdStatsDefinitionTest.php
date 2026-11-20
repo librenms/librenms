@@ -165,10 +165,13 @@ class RrdStatsDefinitionTest extends TestCase
         $definition = $this->build([
             'a' => new DataSeries($this->metric, 'a', 'Jitter'),
             'b' => new DataSeries($this->metric, 'b', 'Noise'),
-        ], labelWidth: 17);
+        ]);
 
-        $this->assertContains('LINE1.25:ds0hourly#000004:Jitter 1 hour avg ', $definition);
-        $this->assertContains('HRULE:ds1p0#000008:Noise 25th Percen ', $definition);
+        // every label is padded to the longest, Jitter 25th Percentile, so none are cut
+        $this->assertContains('LINE1.25:ds0hourly#000004:Jitter 1 hour avg      ', $definition);
+        $this->assertContains('HRULE:ds0p0#000001:Jitter 25th Percentile ', $definition);
+        $this->assertContains('HRULE:ds1p0#000008:Noise 25th Percentile  ', $definition);
+        $this->assertContains('LINE1.25:ds0#000000:Jitter                 ', $definition);
     }
 
     public function test_short_graphs_have_no_stats(): void
@@ -188,15 +191,14 @@ class RrdStatsDefinitionTest extends TestCase
     /**
      * @param  array<string, DataSeries>  $series
      * @param  int  $range  seconds covered by the graph
-     * @param  int  $labelWidth  characters each label is padded or cut to
      * @return array<int, string>
      */
-    private function build(array $series, StatsOptions $stats = new StatsOptions, int $range = 3600, int $height = 100, string $legendTitle = '', int $labelWidth = 16): array
+    private function build(array $series, StatsOptions $stats = new StatsOptions, int $range = 3600, int $height = 100, string $legendTitle = ''): array
     {
         $rrdFiles = Mockery::mock(RrdFileResolver::class);
         $rrdFiles->shouldReceive('pathFor')->andReturn('host/test.rrd');
         $params = new GraphParameters(['from' => 1000000, 'to' => 1000000 + $range, 'height' => $height]);
 
-        return new RrdSeriesDefinition($series, new GraphOptions(legendTitle: $legendTitle, labelWidth: $labelWidth, stats: $stats), $rrdFiles)->build($params);
+        return new RrdSeriesDefinition($series, new GraphOptions(legendTitle: $legendTitle, stats: $stats), $rrdFiles)->build($params);
     }
 }

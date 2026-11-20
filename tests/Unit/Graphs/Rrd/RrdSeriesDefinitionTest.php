@@ -448,6 +448,39 @@ class RrdSeriesDefinitionTest extends TestCase
         $this->assertSame("COMMENT:                            Now         Min         Max         Avg\l", $definition[0]);
     }
 
+    public function test_labels_are_padded_to_the_longest_label(): void
+    {
+        $definition = $this->build([
+            'a' => new DataSeries($this->metric, 'a', 'A'),
+            'b' => new DataSeries($this->metric, 'b', 'A Longer Description'),
+        ], new GraphOptions(legendTitle: 'Title'));
+
+        $this->assertSame("COMMENT:Title                       Now     Min     Max     Avg\l", $definition[0]);
+        $this->assertContains('LINE1.25:ds0#FF0000:A                    ', $definition);
+        $this->assertContains('LINE1.25:ds1#FF0000:A Longer Description ', $definition);
+    }
+
+    public function test_a_long_legend_title_widens_the_labels(): void
+    {
+        $definition = $this->build(['a' => new DataSeries($this->metric, 'a', 'A')], new GraphOptions(legendTitle: 'A Long Legend Title'));
+
+        $this->assertSame("COMMENT:A Long Legend Title        Now     Min     Max     Avg\l", $definition[0]);
+        $this->assertContains('LINE1.25:ds0#FF0000:A                   ', $definition);
+    }
+
+    public function test_the_previous_period_label_widens_the_labels(): void
+    {
+        $definition = $this->build(
+            ['in' => new DataSeries($this->metric, 'a', 'Total Inbound')],
+            new GraphOptions(traffic: new TrafficOptions),
+            ['from' => 100, 'to' => 200, 'previous' => 'yes'],
+        );
+
+        // Prev Total Inbound is the longest label
+        $this->assertContains('LINE1.25:ds0#FF0000:Total Inbound      ', $definition);
+        $this->assertNotEmpty(preg_grep('/^LINE1\.25:ds0prevdrawn#[0-9A-F]{6}:Prev Total Inbound $/', $definition));
+    }
+
     public function test_it_skips_series_without_an_rrd_file(): void
     {
         $missing = new MetricIdentity('missing', ['hostname' => 'localhost']);

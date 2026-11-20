@@ -36,11 +36,23 @@ class RrdTrafficDefinition
     }
 
     /**
+     * The label of the previous period line addSeries() draws for a series, before padding.
+     * RrdSeriesDefinition pads every label of the graph to the longest one, so it needs it before anything is drawn.
+     *
+     * @return string|null such as 'Prev Total In', null when the previous period is not shown
+     */
+    public function previousLabel(DataSeries|SeriesSum $series): ?string
+    {
+        return $this->params->visible('previous') ? __('graph.legend.previous', ['series' => $series->description]) : null;
+    }
+
+    /**
      * @param  string|null  $color  the color the series is drawn in, null when it is not drawn
      * @param  Closure(string $period, string $suffix, string $cf, string $range, int $shift): list<string>  $periodValueDefs  defines the value of
      *                                                                                                                         the series for $id$period$suffix
+     * @param  int  $labelWidth  characters the previous period label is padded to, the longest label of the graph
      */
-    public function addSeries(string $id, DataSeries|SeriesSum $series, float $drawScale, ?string $color, Closure $periodValueDefs): void
+    public function addSeries(string $id, DataSeries|SeriesSum $series, float $drawScale, ?string $color, Closure $periodValueDefs, int $labelWidth): void
     {
         $factor = RrdSeriesDefinition::number($drawScale * ($series->style->invert && ! $this->overlaid ? -1 : 1));
         $this->summarize($id, $series, $factor);
@@ -54,14 +66,15 @@ class RrdTrafficDefinition
             $this->drawing[] = "LINE2:{$id}trend#" . ($color ?? $this->theme->trend()) . ':' . Rrd::safeDescr(__('graph.legend.prediction', ['series' => $series->description])) . '\\n:dashes=8';
         }
 
-        if ($this->params->visible('previous')) {
+        $previousLabel = $this->previousLabel($series);
+        if ($previousLabel !== null) {
             $previous = $id . 'prev';
             $range = ":start={$this->params->prev_from}:end={$this->params->from}";
             foreach (['' => 'AVERAGE', 'min' => 'MIN', 'max' => 'MAX'] as $suffix => $cf) {
                 array_push($this->defs, ...$periodValueDefs('prev', $suffix, $cf, $range, $this->params->period));
             }
             $this->defs[] = "CDEF:{$previous}drawn=$previous,$factor,*";
-            $this->drawing[] = "LINE1.25:{$previous}drawn#" . $this->theme->previous($series->style->invert) . ':' . Rrd::fixedSafeDescr(__('graph.legend.previous', ['series' => $series->description]), 16);
+            $this->drawing[] = "LINE1.25:{$previous}drawn#" . $this->theme->previous($series->style->invert) . ':' . Rrd::fixedSafeDescr($previousLabel, $labelWidth);
             $unit = str_replace(['%', ':'], ['%%', '\\:'], $series->unit);
             array_push($this->drawing,
                 "GPRINT:$previous:LAST:%5.2lf%s$unit",
