@@ -2,7 +2,7 @@
 
 namespace LibreNMS\Tests\Unit;
 
-use LibreNMS\Util\AristaOpticalLabel;
+use LibreNMS\OS\Shared\Arista;
 use PHPUnit\Framework\TestCase;
 
 class AristaOpticalLabelTest extends TestCase
@@ -42,8 +42,8 @@ class AristaOpticalLabelTest extends TestCase
                 foreach (['RX', 'TX'] as $direction) {
                     $expected = "DOM $direction Power For Ethernet25/$suffix (optical lane " . ($lane + 1) . ')';
                     $raw = "DOM $direction Power  For Ethernet25/" . ($lane + 1);
-                    $this->assertSame($expected, AristaOpticalLabel::rewrite($raw, 300 + $lane, $entities, $ports));
-                    $this->assertSame($expected, AristaOpticalLabel::rewrite($expected, 300 + $lane, $entities, $ports));
+                    $this->assertSame($expected, Arista::rewriteOpticalLaneLabel($raw, 300 + $lane, $entities, $ports));
+                    $this->assertSame($expected, Arista::rewriteOpticalLaneLabel($expected, 300 + $lane, $entities, $ports));
                 }
             }
         }
@@ -69,7 +69,7 @@ class AristaOpticalLabelTest extends TestCase
                 case 'nested_interface': $ports[1]['ifName'] = 'Ethernet25/3/1'; break;
                 case 'duplicate_interface': $ports[1]['ifName'] = $ports[0]['ifName']; break;
             }
-            $this->assertSame($raw, AristaOpticalLabel::rewrite($raw, $index, $entities, $ports), $case);
+            $this->assertSame($raw, Arista::rewriteOpticalLaneLabel($raw, $index, $entities, $ports), $case);
         }
     }
 
@@ -77,12 +77,12 @@ class AristaOpticalLabelTest extends TestCase
     {
         [$entities, $ports] = $this->inventory();
         $raw = 'DOM RX Power For Ethernet25/2';
-        $this->assertSame($raw, AristaOpticalLabel::rewrite($raw, 301, $entities, [
+        $this->assertSame($raw, Arista::rewriteOpticalLaneLabel($raw, 301, $entities, [
             ['ifName' => 'Ethernet25/1', 'ifIndex' => 1, 'ifSpeed' => 400000000000],
         ]));
         $temperature = 'DOM Temperature For Ethernet25';
-        $this->assertSame($temperature, AristaOpticalLabel::rewrite($temperature, 100, $entities, $ports));
-        $this->assertSame('DOM RX Power For Ethernet99/2', AristaOpticalLabel::rewrite('DOM RX Power For Ethernet99/2', 301, $entities, $ports));
+        $this->assertSame($temperature, Arista::rewriteOpticalLaneLabel($temperature, 100, $entities, $ports));
+        $this->assertSame('DOM RX Power For Ethernet99/2', Arista::rewriteOpticalLaneLabel('DOM RX Power For Ethernet99/2', 301, $entities, $ports));
     }
 
     public function testAdditionalElectricalLanesDoNotChangeOpticalMapping(): void
@@ -94,7 +94,7 @@ class AristaOpticalLabelTest extends TestCase
                 'entPhysicalParentRelPos' => $lane, 'entPhysicalContainedIn' => 100,
             ];
         }
-        $this->assertSame('DOM RX Power For Ethernet25/3 (optical lane 2)', AristaOpticalLabel::rewrite('DOM RX Power For Ethernet25/2', 301, $entities, $ports));
+        $this->assertSame('DOM RX Power For Ethernet25/3 (optical lane 2)', Arista::rewriteOpticalLaneLabel('DOM RX Power For Ethernet25/2', 301, $entities, $ports));
     }
 
     public function testEightByFiftyGigabitLayoutsAreNotInferred(): void
@@ -105,8 +105,8 @@ class AristaOpticalLabelTest extends TestCase
         }
         unset($port);
         $raw = 'DOM RX Power For Ethernet25/2';
-        $this->assertSame($raw, AristaOpticalLabel::rewrite($raw, 301, $entities, $ports));
+        $this->assertSame($raw, Arista::rewriteOpticalLaneLabel($raw, 301, $entities, $ports));
         $entities[100]['entPhysicalDescr'] = '400GBASE-SR8';
-        $this->assertSame($raw, AristaOpticalLabel::rewrite($raw, 301, $entities, $ports));
+        $this->assertSame($raw, Arista::rewriteOpticalLaneLabel($raw, 301, $entities, $ports));
     }
 }

@@ -39,20 +39,6 @@ if (! empty($entity_array)) {
 }
 $progress->end();
 
-// Use the physical inventory already stored by entity discovery; no extra SNMP walks.
-$aristaOpticalEntities = [];
-$aristaOpticalPorts = [];
-if ($device['os'] === 'arista_eos') {
-    $physicalInventory = \App\Models\EntPhysical::where('device_id', $device['device_id'])
-        ->get(['entPhysicalIndex', 'entPhysicalContainedIn', 'entPhysicalParentRelPos', 'entPhysicalClass', 'entPhysicalName', 'entPhysicalDescr']);
-    if ($physicalInventory->count() === $physicalInventory->pluck('entPhysicalIndex')->unique()->count()) {
-        $aristaOpticalEntities = $physicalInventory->keyBy('entPhysicalIndex')
-            ->map(fn ($entity) => $entity->getAttributes())->all();
-        $aristaOpticalPorts = \App\Models\Port::where('device_id', $device['device_id'])->where('deleted', 0)
-            ->get(['ifName', 'ifIndex', 'ifSpeed'])->map(fn ($port) => $port->getAttributes())->all();
-    }
-}
-
 if (! empty($entity_oids)) {
     $entitysensor = [
         'voltsDC' => 'voltage',
@@ -257,7 +243,7 @@ if (! empty($entity_oids)) {
                     }
                     // End grouping sensors
                     if ($type === 'dbm') {
-                        $descr = \LibreNMS\Util\AristaOpticalLabel::rewrite((string) $descr, (int) $index, $aristaOpticalEntities, $aristaOpticalPorts);
+                        $descr = $os->getOpticalLaneLabel((string) $descr, (int) $index);
                     }
                 }
                 $descr = trim((string) $descr);
@@ -265,9 +251,5 @@ if (! empty($entity_oids)) {
             }
         }//end if
     }//end foreach
-    unset(
-        $entity_array,
-        $aristaOpticalEntities,
-        $aristaOpticalPorts
-    );
+    unset($entity_array);
 }//end if
