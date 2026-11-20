@@ -307,28 +307,7 @@ class UnixAgent implements Module
 
             Log::info("$key packages");
 
-            // mark all existing packages as removed, then flag the ones still installed
-            $packages = $device->packages->each(function (Package $package): void {
-                $package->status = false;
-            })->keyBy->getCompositeKey();
-
-            foreach (explode("\n", $agent_data[$key]) as $line) {
-                $package = $parser($line);
-
-                if (! $package->isValid()) {
-                    continue; // failed to parse
-                }
-
-                $package_key = $package->getCompositeKey();
-                if ($existing = $packages->get($package_key)) {
-                    $existing->fill($package->attributesToArray());
-                } else {
-                    $packages->put($package_key, $package);
-                }
-            }
-
-            $device->packages()->saveMany($packages->where('status', true));
-            $packages->where('status', false)->each->delete();
+            Package::sync($device, collect(explode("\n", $agent_data[$key]))->map($parser));
 
             return; // only one package manager per device
         }

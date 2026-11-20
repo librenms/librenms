@@ -62,6 +62,36 @@ class Package extends DeviceRelatedModel implements Keyable
     ];
 
     /**
+     * Sync the device's packages against a full list of installed packages from one polling source.
+     * Installed packages are created or updated, packages no longer reported are removed.
+     *
+     * @param  iterable<Package>  $installed
+     */
+    public static function sync(Device $device, iterable $installed): void
+    {
+        // mark all existing packages as removed, then flag the ones still installed
+        $packages = $device->packages->each(function (Package $package): void {
+            $package->status = false;
+        })->keyBy->getCompositeKey();
+
+        foreach ($installed as $package) {
+            if (! $package->isValid()) {
+                continue; // failed to parse
+            }
+
+            $package_key = $package->getCompositeKey();
+            if ($existing = $packages->get($package_key)) {
+                $existing->fill($package->attributesToArray());
+            } else {
+                $packages->put($package_key, $package);
+            }
+        }
+
+        $device->packages()->saveMany($packages->where('status', true));
+        $packages->where('status', false)->each->delete();
+    }
+
+    /**
      * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[], search?: bool}>
      */
     public static function filterFieldDefinitions(User $user, ?int $deviceId = null): array
