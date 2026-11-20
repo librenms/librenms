@@ -264,8 +264,9 @@ readonly class AlertRules
         }
 
         $existing = Application::whereIn('app_id', array_keys($appIds))->pluck('app_id')->all();
+        $existingLookup = array_flip($existing);
 
-        return array_values(array_filter($rows, static fn (array $row) => ! isset($row['app_id']) || (int) $row['app_id'] <= 0 || in_array((int) $row['app_id'], $existing, true)));
+        return array_values(array_filter($rows, static fn (array $row) => ! isset($row['app_id']) || (int) $row['app_id'] <= 0 || isset($existingLookup[(int) $row['app_id']])));
     }
 
     /**
