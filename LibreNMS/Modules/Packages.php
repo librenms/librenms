@@ -138,6 +138,15 @@ class Packages implements Module
             return null;
         }
 
+        // snmpwalk renders names carrying non-printable characters (e.g. NUL padding) as hex
+        if (preg_match('/^[0-9a-f]{2}( [0-9a-f]{2})*$/i', $raw)) {
+            $raw = $this->decodeHex($raw);
+
+            if ($raw === '') {
+                return null;
+            }
+        }
+
         // the table has no version column, names without a version fall back to the last modification date
         ['name' => $name, 'version' => $version, 'build' => $build, 'arch' => $arch] = $this->parseInstalledName($raw, $this->parseDate((string) ($row['HOST-RESOURCES-MIB::hrSWInstalledDate'] ?? '')));
 
@@ -258,6 +267,20 @@ class Packages implements Module
             'build' => $build,
             'arch' => self::ARCH,
         ];
+    }
+
+    /**
+     * Decode a hex-encoded value as rendered by snmpwalk for strings with
+     * non-printable characters.
+     */
+    private function decodeHex(string $raw): string
+    {
+        $decoded = '';
+        foreach (explode(' ', $raw) as $byte) {
+            $decoded .= chr((int) hexdec($byte));
+        }
+
+        return trim(str_replace("\0", '', $decoded));
     }
 
     /**

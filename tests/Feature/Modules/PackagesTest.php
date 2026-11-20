@@ -74,6 +74,22 @@ final class PackagesTest extends InMemoryDbTestCase
         $this->assertSame('6.el9', $package->build);
     }
 
+    public function testDecodesHexEncodedPackageNames(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Snmp]);
+        $this->fakeSnmpInstalledPackages([
+            ['index' => 1, 'name' => '74 65 78 6C 69 76 65 2D 63 6F 6C 6C 65 63 74 69 6F 6E 2D 64 6F 63 75 6D 65 6E 74 61 74 69 6F 6E 2D 62 61 73 65 2D 73 76 6E 31 00 00 00 00 00 00 00 00 00 00 00 00', 'date' => '2026-11-12,6:6:22.0,+1:0'],
+            ['index' => 2, 'name' => '6c 69 62 73 6e 64 66 69 6c 65 2d 31 2e 30 2e 33 31 2d 31 30 2e 65 6c 39'],
+        ]);
+
+        (new Packages)->poll($os, $this->datastore());
+
+        $packages = Package::where('device_id', $os->getDeviceId())->orderBy('name')->get();
+        $this->assertSame(['libsndfile', 'texlive-collection-documentation-base-svn1'], $packages->pluck('name')->all());
+        $this->assertSame(['1.0.31', '2026-11-12 06:06:22'], $packages->pluck('version')->all());
+        $this->assertSame(['10.el9', ''], $packages->pluck('build')->all());
+    }
+
     public function testNameWithoutVersionFallsBackToTheModificationDate(): void
     {
         $os = $this->makeOs([PollingMethodType::Snmp]);
