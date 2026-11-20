@@ -322,3 +322,4 @@ nav:
       - Raritan: Support/Device-Notes/Raritan.md
       - RouterOS: Support/Device-Notes/Routeros.md
       - Supermicro: Extensions/Supermicro.md
+      - Unix Hardware: Support/Device-Notes/Unix-Hardware.md

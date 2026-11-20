@@ -10,11 +10,13 @@ over:
     - { graph: device_storage, text: 'Storage Usage' }
 poller_modules:
     bgp-peers: false
+    entity-state: true
     ospf: false
     stp: false
 discovery_modules:
     applications: true
     bgp-peers: false
+    entity-state: true
     stp: false
     vminfo: true
 processor_stacked: true
