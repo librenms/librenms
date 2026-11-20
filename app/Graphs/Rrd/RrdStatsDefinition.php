@@ -50,7 +50,7 @@ class RrdStatsDefinition
      * @param  string  $id  the series values, defined by RrdSeriesDefinition as $id, {$id}min and {$id}max
      * @param  float  $drawScale  the draw only scale of the series, applied to the lines but not the legend values
      * @param  Closure(string $period, string $suffix, string $cf, string $range): list<string>  $periodValueDefs  defines the value of the series
-     *                                                                                                     for $id$period$suffix, such as ds0hourlymax
+     *                                                                                                             for $id$period$suffix, such as ds0hourlymax
      */
     public function addSeries(string $id, DataSeries|SeriesSum $series, float $drawScale, Closure $periodValueDefs): void
     {
