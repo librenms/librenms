@@ -5460,18 +5460,6 @@
             "order": 0,
             "type": "boolean"
         },
-        "map.engine": {
-            "default": "leaflet",
-            "type": "select",
-            "options": {
-                "leaflet": "Leaflet",
-                "mapeal": "Mapeal"
-            }
-        },
-        "mapael.default_map": {
-            "default": "maps/world_countries.js",
-            "type": "text"
-        },
         "mib_dir": {
             "type": "directory"
         },
