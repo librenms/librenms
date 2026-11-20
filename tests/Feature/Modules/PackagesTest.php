@@ -21,8 +21,9 @@ final class PackagesTest extends InMemoryDbTestCase
     {
         $os = $this->makeOs([PollingMethodType::Snmp]);
         $this->fakeSnmpInstalledPackages([
-            ['name' => 'bash', 'version' => '5.2.37', 'descr' => 'A GNU shell'],
-            ['name' => 'kernel', 'version' => '6.8.0', 'descr' => 'The kernel'],
+            ['index' => 1002, 'name' => 'python2.7-minimal_2.7.18-13ubuntu1.5_amd64'],
+            ['index' => 1004, 'name' => 'python3-apport_2.28.3-0ubuntu0.1_all'],
+            ['index' => 1215, 'name' => 'xfonts-utils_1:7.7+6build3_amd64'],
         ]);
 
         $module = new Packages;
@@ -31,11 +32,26 @@ final class PackagesTest extends InMemoryDbTestCase
         $module->poll($os, $this->datastore());
 
         $packages = Package::where('device_id', $os->getDeviceId())->orderBy('name')->get();
-        $this->assertSame(['bash', 'kernel'], $packages->pluck('name')->all());
-        $this->assertSame(['5.2.37', '6.8.0'], $packages->pluck('version')->all());
-        $this->assertSame(['host-res', 'host-res'], $packages->pluck('manager')->all());
-        $this->assertSame(['unknown', 'unknown'], $packages->pluck('arch')->all());
+        $this->assertSame(['python2.7-minimal', 'python3-apport', 'xfonts-utils'], $packages->pluck('name')->all());
+        $this->assertSame(['2.7.18-13ubuntu1.5', '2.28.3-0ubuntu0.1', '1:7.7+6build3'], $packages->pluck('version')->all());
+        $this->assertSame(['amd64', 'all', 'amd64'], $packages->pluck('arch')->all());
+        $this->assertSame(['host-res', 'host-res', 'host-res'], $packages->pluck('manager')->all());
         $this->assertTrue($packages->every(fn (Package $package): bool => $package->size === null && $package->build === '' && (bool) $package->status));
+    }
+
+    public function testNameWithoutVersionFallsBackToTheModificationDate(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Snmp]);
+        $this->fakeSnmpInstalledPackages([
+            ['index' => 1, 'name' => 'vim', 'date' => '2025-6-18,7:36:25.0,+2:0'],
+            ['index' => 2, 'name' => 'less', 'date' => '+02:00 2026-10-21:14:38:02.0'],
+        ]);
+
+        (new Packages)->poll($os, $this->datastore());
+
+        $packages = Package::where('device_id', $os->getDeviceId())->orderBy('name')->get();
+        $this->assertSame(['2026-10-21 14:38:02', '2025-06-18 07:36:25'], $packages->pluck('version')->all());
+        $this->assertSame(['unknown', 'unknown'], $packages->pluck('arch')->all());
     }
 
     public function testUpdatesChangedVersionsAndRemovesMissingPackages(): void
@@ -45,19 +61,19 @@ final class PackagesTest extends InMemoryDbTestCase
             'device_id' => $os->getDeviceId(),
             'name' => 'bash',
             'manager' => 'host-res',
-            'arch' => 'unknown',
+            'arch' => 'amd64',
             'version' => '5.2.0',
         ]);
         Package::factory()->create([
             'device_id' => $os->getDeviceId(),
             'name' => 'removed',
             'manager' => 'host-res',
-            'arch' => 'unknown',
+            'arch' => 'amd64',
             'version' => '1.0.0',
         ]);
 
         $this->fakeSnmpInstalledPackages([
-            ['name' => 'bash', 'version' => '5.2.37', 'descr' => 'A GNU shell'],
+            ['index' => 1, 'name' => 'bash_5.2.37_amd64'],
         ]);
 
         (new Packages)->poll($os, $this->datastore());
@@ -67,18 +83,6 @@ final class PackagesTest extends InMemoryDbTestCase
         $this->assertSame('5.2.37', $packages->sole()->version);
     }
 
-    public function testAcceptsVersionValuesWithAnOidPrefix(): void
-    {
-        $os = $this->makeOs([PollingMethodType::Snmp]);
-        $this->fakeSnmpInstalledPackages([
-            ['name' => 'bash', 'version' => 'OID: 5.2.37', 'descr' => 'A GNU shell'],
-        ]);
-
-        (new Packages)->poll($os, $this->datastore());
-
-        $this->assertSame('5.2.37', Package::where('device_id', $os->getDeviceId())->sole()->version);
-    }
-
     public function testKeepsExistingPackagesWhenTheTableIsNotExposed(): void
     {
         $os = $this->makeOs([PollingMethodType::Snmp]);
@@ -86,7 +90,7 @@ final class PackagesTest extends InMemoryDbTestCase
             'device_id' => $os->getDeviceId(),
             'name' => 'bash',
             'manager' => 'host-res',
-            'arch' => 'unknown',
+            'arch' => 'amd64',
             'version' => '5.2.0',
         ]);
 
@@ -125,7 +129,7 @@ final class PackagesTest extends InMemoryDbTestCase
             'device_id' => $os->getDeviceId(),
             'name' => 'kernel',
             'manager' => 'host-res',
-            'arch' => 'unknown',
+            'arch' => 'amd64',
             'version' => '6.8.0',
         ]);
         $this->assertTrue($module->dataExists($os->getDevice()));
@@ -145,7 +149,7 @@ final class PackagesTest extends InMemoryDbTestCase
             'device_id' => $os->getDeviceId(),
             'name' => 'kernel',
             'manager' => 'host-res',
-            'arch' => 'unknown',
+            'arch' => 'amd64',
             'version' => '6.8.0',
         ]);
 
@@ -157,16 +161,20 @@ final class PackagesTest extends InMemoryDbTestCase
     /**
      * Bind an available snmp polling method whose snmp walk of hrSWInstalledTable returns these installed packages.
      *
-     * @param  list<array{name: string, version: string, descr: string}>  $packages
+     * @param  list<array{index?: int, name: string, date?: string}>  $packages
      */
     private function fakeSnmpInstalledPackages(array $packages): void
     {
         $lines = [];
-        foreach ($packages as $index => $package) {
-            $i = $index + 1;
-            $lines[] = "HOST-RESOURCES-MIB::hrSWInstalledName.$i = {$package['name']}";
-            $lines[] = "HOST-RESOURCES-MIB::hrSWInstalledVersion.$i = {$package['version']}";
-            $lines[] = "HOST-RESOURCES-MIB::hrSWInstalledDescr.$i = {$package['descr']}";
+        foreach ($packages as $package) {
+            $i = $package['index'] ?? 1;
+            $lines[] = "HOST-RESOURCES-MIB::hrSWInstalledIndex.$i = $i";
+            $lines[] = "HOST-RESOURCES-MIB::hrSWInstalledName.$i = \"{$package['name']}\"";
+            $lines[] = "HOST-RESOURCES-MIB::hrSWInstalledID.$i = 0.0";
+            $lines[] = "HOST-RESOURCES-MIB::hrSWInstalledType.$i = 4";
+            if (isset($package['date'])) {
+                $lines[] = "HOST-RESOURCES-MIB::hrSWInstalledDate.$i = \"{$package['date']}\"";
+            }
         }
 
         $backend = Mockery::mock(SnmpBackendInterface::class);
