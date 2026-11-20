@@ -55,13 +55,14 @@
                     return url.toString();
                 },
 
-                // An address shows what is drawn: drawing options that are not the defaults, and the view.
+                // Keep the line style explicit so even a fully default drawing can be shared.
                 updateAddress() {
                     const url = new URL(window.location.href);
                     for (const key of config.addressKeys) {
                         const option = this.options[key];
                         const value = typeof option === 'boolean' ? Number(option) : option;
-                        setParam(url.searchParams, key, option === config.defaults[key] ? null : value);
+                        const omitDefault = key !== 'line_style' && option === config.defaults[key];
+                        setParam(url.searchParams, key, omitDefault ? null : value);
                     }
                     setParam(url.searchParams, 'previous', COMPARE[this.options.compare]);
                     setParam(url.searchParams, 'trend', this.options.trend ? '1' : null);

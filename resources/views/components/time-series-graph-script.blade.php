@@ -10,7 +10,7 @@
         const MAX_DETAIL_CHANGE = 2; // zooming further than this from the loaded detail loads again
         const REFRESH_AFTER = 60; // seconds of newer data a view can miss before it loads again
 
-        const DRAWN_OPTIONS = ['range', 'mirror', 'stacking', 'scale', 'trend']; // the others are the legend, size and compare
+        const DRAWN_OPTIONS = ['range', 'mirror', 'stacking', 'scale', 'line_style', 'trend']; // the others are the legend, size and compare
         const COMPARE_SECONDS = { day: 86400, week: 604800 }; // a period is the span shown
 
         const clamp = (value, low, high) => Math.min(Math.max(value, low), high);

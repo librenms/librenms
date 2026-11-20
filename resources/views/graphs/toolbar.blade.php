@@ -92,6 +92,16 @@
                 @endif
 
                 @if ($drawInBrowser)
+                    <div role="group" aria-labelledby="graph-line-style">
+                        <div id="graph-line-style" class="{{ $heading }}">{{ __('graph.options.line_style') }}</div>
+                        <div class="tw:flex tw:gap-1">
+                            @foreach (App\Data\Graphing\GraphViewOptions::LINE_STYLES as $style)
+                                <button type="button" class="{{ $choice }}" :aria-pressed="options.line_style === '{{ $style }}'"
+                                        x-on:click="setOption('line_style', '{{ $style }}')">{{ __("graph.options.line_style_$style") }}</button>
+                            @endforeach
+                        </div>
+                    </div>
+
                     <x-toggle size="sm" :label="__('graph.options.range')" x-bind:checked="options.range"
                               x-on:change="setOption('range', $event.target.checked)"></x-toggle>
 

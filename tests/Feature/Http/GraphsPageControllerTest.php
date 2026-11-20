@@ -255,6 +255,7 @@ class GraphsPageControllerTest extends TestCase
         $response->assertDontSee('graph.help.'); // every help text is translated
         $response->assertDontSee('graph.options.');
         $response->assertSee(__('graph.options.scale_log'));
+        $response->assertSee(__('graph.options.line_style_linear'));
         $response->assertSee(__('graph.options.mirror'));
         $response->assertSee(__('graph.options.stacking_stack'));
         $response->assertDontSee(__('graph.options.command'));
@@ -270,6 +271,7 @@ class GraphsPageControllerTest extends TestCase
         $response->assertSee(__('graph.zoom_in'));
         $response->assertSee(__('graph.export_csv'));
         $response->assertDontSee(__('graph.options.scale_log'));
+        $response->assertDontSee(__('graph.options.line_style'));
     }
 
     public function testGraphDrawnInTheBrowserStartsWithThePeriodUpToNow(): void
@@ -323,7 +325,7 @@ class GraphsPageControllerTest extends TestCase
         $device = Device::factory()->create();
         $user = $this->adminUser();
         $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_renderer', 'value' => 'js'])->assertOk();
-        $saved = ['range' => false, 'mirror' => false, 'stacking' => 'stack', 'scale' => 'log', 'columns' => ['avg', 'p95'], 'width' => 0.5, 'height' => 400];
+        $saved = ['range' => false, 'mirror' => false, 'stacking' => 'stack', 'scale' => 'log', 'line_style' => 'smooth', 'columns' => ['avg', 'p95'], 'width' => 0.5, 'height' => 400];
 
         $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_options', 'value' => $saved])->assertOk();
         $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip");
@@ -345,11 +347,11 @@ class GraphsPageControllerTest extends TestCase
         $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_renderer', 'value' => 'js'])->assertOk();
         $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_options', 'value' => ['scale' => 'log', 'columns' => ['avg']]])->assertOk();
 
-        $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip&stacking=overlay&previous=week&trend=1");
+        $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip&stacking=overlay&line_style=linear&previous=week&trend=1");
 
         $response->assertOk();
-        // the address names only overlay, the rest of the drawing is the default, the legend stays the viewer's
-        $shared = new GraphViewOptions(stacking: 'overlay', columns: ['avg']);
+        // The address selects linear overlays. The scale takes its default and the viewer keeps their legend.
+        $shared = new GraphViewOptions(stacking: 'overlay', columns: ['avg'], line_style: 'linear');
         $page = $response->viewData('graphPage');
         $this->assertEquals($shared, $page['options']);
         $this->assertSame(['compare' => 'week', 'trend' => true], $page['view']);
@@ -364,7 +366,7 @@ class GraphsPageControllerTest extends TestCase
         $device = Device::factory()->create();
         $user = $this->adminUser();
 
-        foreach (['previous=month', 'scale=cubic', 'stacking=sideways', 'mirror=2', 'trend=yes', 'range=on'] as $query) {
+        foreach (['previous=month', 'scale=cubic', 'line_style=dashed', 'stacking=sideways', 'mirror=2', 'trend=yes', 'range=on'] as $query) {
             [$key] = explode('=', $query);
             $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip&$query")
                 ->assertSessionHasErrors($key);
@@ -381,6 +383,7 @@ class GraphsPageControllerTest extends TestCase
             'not an array',
             ['unknown' => true],
             ['scale' => 'cubic'],
+            ['line_style' => 'dashed'],
             ['stacking' => 'sideways'],
             ['mirror' => 'below'],
             ['columns' => ['median']],

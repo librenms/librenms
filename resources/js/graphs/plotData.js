@@ -9,6 +9,7 @@ import { firstAfter } from './seriesData.js';
  * @property {boolean} mirror inverted series below the axis, else above it with the rest
  * @property {'graph'|'stack'|'overlay'} stacking as the graph defines, all on a side of the axis, or none
  * @property {'graph'|'fit'|'log'} scale as the graph defines, fitted to the data, or logarithmic
+ * @property {'stepped'|'linear'|'smooth'} line_style how adjacent samples are connected
  * @property {boolean} trend a straight line fitted to what is shown of each series
  */
 
@@ -234,16 +235,14 @@ export function createPlotData(graph, { hidden, draw, thresholds, comparing }) {
             if (values === null) {
                 return empty;
             }
-            if (layer.previous) {
-                return withFirstInterval(alignedTo(times, before.timestamps, values));
-            }
             if (layer.trend) {
                 const line = trendOf(source.timestamps, values, shown);
 
                 return line === null ? empty : times.map((time) => line(time));
             }
 
-            return lined(withFirstInterval(values));
+            const samples = layer.previous ? alignedTo(times, before.timestamps, values) : lined(values);
+            return (draw.line_style ?? 'stepped') === 'stepped' ? withFirstInterval(samples) : samples;
         })];
 
         return { columns, earlier };

@@ -54,8 +54,12 @@ const TIME_AXIS = [
     [1, '{HH}:{mm}:{ss}', '\n{D} {MMM} {YYYY}', null, '\n{D} {MMM}', null, null, null, 1],
 ];
 
-// a point is the average of the interval ending at its time, drawn level like the image graphs
-const INTERVALS = uPlot.paths.stepped({ align: -1, alignGaps: -1 });
+// a point is the average of the interval ending at its time, drawn level in the stepped style
+const LINE_PATHS = {
+    stepped: uPlot.paths.stepped({ align: -1, alignGaps: -1 }),
+    linear: uPlot.paths.linear(),
+    smooth: uPlot.paths.spline(),
+};
 
 // from zero unless the graph sets a limit or a margin, like the image graphs, with room where the data sets it
 function valueRange(axis) {
@@ -181,6 +185,7 @@ export default function createChart(element, graph, { view, hidden, compact, dra
     const label = compact ? '' : graph.axis.label;
     const comparing = previous !== null;
     const { layers, dataFor } = createPlotData(graph, { hidden, draw, thresholds, comparing });
+    const lineStyle = draw.line_style ?? 'stepped';
     const log = draw.scale === 'log';
     const logBase = graph.axis.base === 1024 ? 2 : 10;
     const bounds = thresholdBounds(thresholds, draw.mirror);
@@ -194,9 +199,9 @@ export default function createChart(element, graph, { view, hidden, compact, dra
     // the values of the previous time at each point, for hovering
     let data = dataFor(graph, previous, shown);
 
-    // the first point ending at or after the time
-    const intervalIndex = (plot, closest, time) => (
-        plot.data[0][closest] < time && closest < plot.data[0].length - 1 ? closest + 1 : closest
+    // Stepped lines show the interval covering the cursor. Linear lines snap to the nearest sample.
+    const sampleIndex = (plot, closest, time) => (
+        lineStyle === 'stepped' && plot.data[0][closest] < time && closest < plot.data[0].length - 1 ? closest + 1 : closest
     );
 
     let stopPan = null;
@@ -333,7 +338,7 @@ export default function createChart(element, graph, { view, hidden, compact, dra
                 width: layer.stroke ? (layer.constant === undefined ? 1.25 : 1.5) : 0,
                 dash: layer.dash,
                 // trends and constants are straight, not drawn level for each interval
-                paths: layer.trend || layer.constant !== undefined ? undefined : INTERVALS,
+                paths: layer.trend || layer.constant !== undefined ? undefined : LINE_PATHS[lineStyle],
                 points: { show: false },
             })),
         ],
@@ -342,7 +347,7 @@ export default function createChart(element, graph, { view, hidden, compact, dra
         cursor: {
             y: false,
             points: { size: (self, index) => (layers[index - 1]?.stroke && layers[index - 1].constant === undefined ? 7 : 0) },
-            dataIdx: (self, seriesIndex, closest, time) => intervalIndex(self, closest, time),
+            dataIdx: (self, seriesIndex, closest, time) => sampleIndex(self, closest, time),
             // the page zooms to a selection, not uPlot
             drag: { x: true, y: false, setScale: false, dist: MIN_ZOOM_PIXELS },
             bind: {
@@ -370,7 +375,7 @@ export default function createChart(element, graph, { view, hidden, compact, dra
             }],
             setCursor: [(self) => {
                 const { idx, left } = self.cursor;
-                const index = idx === null || idx === undefined || left < 0 ? null : intervalIndex(self, idx, self.posToVal(left, 'x'));
+                const index = idx === null || idx === undefined || left < 0 ? null : sampleIndex(self, idx, self.posToVal(left, 'x'));
                 // past the data there are only trends and earlier values
                 const past = index !== null && index >= current.graph.timestamps.length;
                 onHover(index === null || (past && ! comparing)

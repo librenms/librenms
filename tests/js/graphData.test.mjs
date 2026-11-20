@@ -57,3 +57,14 @@ test('a stacked comparison tolerates series missing from the earlier period', ()
     assert.deepEqual(comparison, [[null, null, null], [4, 5, 6]]);
     assert.deepEqual(earlier, { out: [4, 5, 6] });
 });
+
+test('only stepped lines extend the first sample back to the start of its interval', () => {
+    const graph = { timestamps, series: [series('in', { avg: [null, 2, 3] })] };
+    for (const [line_style, expected] of [['stepped', [2, 2, 3]], ['linear', [null, 2, 3]], ['smooth', [null, 2, 3]]]) {
+        const plot = createPlotData(graph, { hidden: new Set(), draw: { line_style }, thresholds: [], comparing: true });
+        const { columns } = plot.dataFor(graph, graph, view);
+
+        assert.deepEqual(columns, [timestamps, expected, expected]);
+        assert.deepEqual(graph.series[0].avg, [null, 2, 3]);
+    }
+});

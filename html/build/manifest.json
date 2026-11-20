@@ -63,7 +63,7 @@
     ]
   },
   "resources/js/graphs.js": {
-    "file": "assets/graphs-BYSSqZo8.js",
+    "file": "assets/graphs-CSc1X_3Y.js",
     "name": "graphs",
     "src": "resources/js/graphs.js",
     "isEntry": true,
@@ -75,7 +75,7 @@
     ]
   },
   "resources/js/timeSeriesChart.js": {
-    "file": "assets/timeSeriesChart-DJLjuWCm.js",
+    "file": "assets/timeSeriesChart-Dl9wqnXI.js",
     "name": "timeSeriesChart",
     "src": "resources/js/timeSeriesChart.js",
     "isDynamicEntry": true,

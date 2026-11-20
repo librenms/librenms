@@ -48,6 +48,7 @@ class GraphRequest extends FormRequest
             'range' => ['nullable', 'in:0,1'],
             'mirror' => ['nullable', 'in:0,1'],
             'stacking' => ['nullable', 'in:' . implode(',', GraphViewOptions::STACKING)],
+            'line_style' => ['nullable', 'in:' . implode(',', GraphViewOptions::LINE_STYLES)],
             'scale' => ['nullable', 'in:' . implode(',', GraphViewOptions::SCALES)],
             'trend' => ['nullable', 'in:0,1'],
             'showcommand' => ['nullable', 'string', 'in:yes,no'],
