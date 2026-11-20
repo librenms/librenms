@@ -326,7 +326,7 @@ class Packages implements Module
     }
 
     /**
-     * @inheritDoc
+     * @return array<string, mixed>|null
      */
     public function dump(Device $device, string $type): ?array
     {
