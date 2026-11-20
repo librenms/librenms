@@ -79,8 +79,7 @@ class PageTabs extends Component
         public readonly Device $device,
         public readonly array $dropdownLinks = [],
     ) {
-        // remove tab= for legacy urls
-        $this->currentTab = str_replace('tab=', '', Request::segment(3, 'overview'));
+        $this->currentTab = Request::segment(3, 'overview');
 
         foreach (self::$tabsClasses as $tab => $class) {
             $this->tabs[$tab] = app()->make($class);

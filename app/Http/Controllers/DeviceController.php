@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Facades\DeviceCache;
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Port;
 use App\View\Components\Device\PageTabs;
@@ -14,68 +13,58 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
-use LibreNMS\Util\Debug;
 use LibreNMS\Util\Url;
 
 class DeviceController
 {
     use AuthorizesRequests;
 
-    /** Tabs with their own device.{tab} route, the legacy url only redirects to it */
-    public const array ROUTED_TABS = ['apps', 'graphs', 'health', 'loadbalancer', 'neighbours', 'netflow', 'port', 'pseudowires', 'qos', 'routing', 'slas', 'stp', 'wireless'];
-
-    public function index(Request $request, string $device): View|RedirectResponse
+    public function index(Request $request, string $device): View
     {
-        $vars = $request->route('vars', '');
-        $device = str_replace('device=', '', $device);
         $device = DeviceCache::get($device);
-        $device_id = $device->device_id;
+        abort_unless($device->exists, 404);
+        Gate::authorize('view', $device);
+        DeviceCache::setPrimary($device->device_id);
 
-        if (! $device->exists) {
-            abort(404);
-        }
+        $current_tab = $request->route('tab', 'overview');
+        $tab_controller = PageTabs::getTab($current_tab);
 
-        DeviceCache::setPrimary($device_id);
+        return view('device.tabs.' . $current_tab, [
+            'title' => $tab_controller->name(),
+            'device' => $device,
+            'device_id' => $device->device_id,
+            'data' => $tab_controller->data($device, $request),
+            'current_tab' => $current_tab,
+            'request' => $request,
+        ]);
+    }
 
-        $current_tab = str_replace('tab=', '', $request->route('tab', 'overview')) ?: 'overview';
+    /**
+     * Redirect legacy device urls to the tab's own route
+     * Handles /device/device=1/tab=ports/view=detail/, /device/{hostname} and /device/1/ports/detail
+     */
+    public function legacy(Request $request, string $device, string $tab = 'overview', string $vars = ''): RedirectResponse
+    {
+        $device = DeviceCache::get(str_replace('device=', '', $device));
+        abort_unless($device->exists, 404);
+
+        $tab = str_replace('tab=', '', $tab) ?: 'overview';
 
         $port = null;
-        if ($current_tab == 'port') {
-            $port = $device->ports()->findOrFail($this->portId((string) $vars));
+        if ($tab == 'port') {
+            $port = $device->ports()->findOrFail($this->portId($vars));
             Gate::authorize('view', $port);
         } else {
             Gate::authorize('view', $device);
         }
 
-        if (in_array($current_tab, self::ROUTED_TABS, true)) {
-            return $this->redirectToTabRoute($request, $device_id, $current_tab, (string) $vars, $port);
+        if ($tab === 'edit') {
+            return $this->redirectToEditRoute($request, $device->device_id, $vars);
         }
 
-        if ($current_tab === 'edit') {
-            return $this->redirectToEditRoute($request, $device_id, (string) $vars);
-        }
+        abort_unless(array_key_exists($tab, PageTabs::$tabsClasses), 404);
 
-        $tab_controller = PageTabs::getTab($current_tab);
-        $title = $tab_controller->name();
-        $data = $tab_controller->data($device, $request);
-
-        $data_array = [
-            'title' => $title,
-            'device' => $device,
-            'device_id' => $device_id,
-            'data' => $data,
-            'vars' => $vars,
-            'current_tab' => $current_tab,
-            'request' => $request,
-        ];
-
-        if (view()->exists('device.tabs.' . $current_tab)) {
-            return view('device.tabs.' . $current_tab, $data_array);
-        }
-
-        $data_array['tab_content'] = $this->renderLegacyTab($current_tab, $device, $data);
-
-        return view('device.tabs.legacy', $data_array);
+        return $this->redirectToTabRoute($request, $device->device_id, $tab, $vars, $port);
     }
 
     /**
@@ -106,9 +95,21 @@ class DeviceController
             }
         }
 
+        // sub views as a plain path segment: /ports/detail, /vlans/ports
+        $first = explode('/', $vars)[0];
+        if ($tab !== 'port' && $first !== '' && ! str_contains($first, '=')) {
+            $options['view'] ??= $first;
+        }
+
+        $route = "device.$tab";
+        if ($tab === 'ports' && ($options['view'] ?? null) === 'portsecurity') {
+            $route = 'device.ports.security';
+            unset($options['view']);
+        }
+
         $params = ['device' => $deviceId] + ($port ? ['port' => $port->port_id] : []);
 
-        return redirect()->route("device.$tab", $params + $request->query() + $options, 301);
+        return redirect()->route($route, $params + $request->query() + $options, 301);
     }
 
     private function redirectToEditRoute(Request $request, int $deviceId, string $vars): RedirectResponse
@@ -147,25 +148,6 @@ class DeviceController
         };
 
         return redirect()->route($route, ['device' => $deviceId] + $params, 301);
-    }
-
-    private function renderLegacyTab(string $tab, Device $device, array $data): string
-    {
-        ob_start();
-        $device = $device->toArray();
-        $device['os_group'] = LibrenmsConfig::get("os.{$device['os']}.group");
-        Debug::set(false);
-        chdir(base_path());
-        $init_modules = ['web', 'auth'];
-        require base_path('/includes/init.php');
-
-        $vars['device'] = $device['device_id'];
-        $vars['tab'] = $tab;
-
-        extract($data); // set preloaded data into variables
-        include "includes/html/pages/device/$tab.inc.php";
-
-        return ob_get_clean();
     }
 
     public function rediscover(Device $device): JsonResponse

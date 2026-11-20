@@ -58,7 +58,7 @@ class LegacyPageEscapingTest extends TestCase
             ->assertSee(self::ESCAPED, false);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'packages']))
+            ->get(route('device.packages', ['device' => $device]))
             ->assertOk()
             ->assertDontSee(self::PAYLOAD, false)
             ->assertSee(self::ESCAPED, false);

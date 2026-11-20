@@ -259,7 +259,7 @@ final class AppsPagesTest extends TestCase
             ->assertOk()
             ->assertSee('192.0.2.1')
             ->assertDontSee('192.0.2.2')
-            ->assertSee('href="' . route('device', $accessible->device_id) . '"', false)
+            ->assertSee('href="' . route('device.overview', $accessible->device_id) . '"', false)
             ->assertDontSee(route('device.apps', ['device' => $accessible->device_id]));
     }
 

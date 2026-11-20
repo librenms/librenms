@@ -26,7 +26,7 @@ class PluginLegacyController extends Controller
             $plugin_path = \App\Facades\LibrenmsConfig::get('plugin_dir') . '/' . $plugin->plugin_name . '/' . $plugin->plugin_name . '.inc.php';
 
             if (is_file($plugin_path)) {
-                $init_modules = ['web', 'auth'];
+                $init_modules = ['web'];
                 require base_path('/includes/init.php');
 
                 chdir(base_path('html'));

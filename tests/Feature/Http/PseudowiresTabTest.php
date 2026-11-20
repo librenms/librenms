@@ -122,7 +122,7 @@ class PseudowiresTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'pseudowires', 'vars' => 'view=minigraphs']))
+            ->get(route('device.legacy', ['device' => $device, 'tab' => 'pseudowires', 'vars' => 'view=minigraphs']))
             ->assertRedirect(route('device.pseudowires', ['device' => $device, 'view' => 'minigraphs']));
     }
 

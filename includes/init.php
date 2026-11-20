@@ -73,11 +73,7 @@ if (module_selected('polling', $init_modules)) {
 }
 
 // Boot Laravel
-if (module_selected('web', $init_modules)) {
-    Laravel::bootWeb(module_selected('auth', $init_modules));
-} else {
-    Laravel::bootCli();
-}
+Laravel::bootCli();
 Debug::set($debug ?? false); // override laravel configured settings (hides legacy errors too)
 
 if (! module_selected('nodb', $init_modules)) {
