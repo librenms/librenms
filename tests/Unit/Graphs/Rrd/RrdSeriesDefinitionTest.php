@@ -356,17 +356,41 @@ class RrdSeriesDefinitionTest extends TestCase
         $this->assertContains('AREA:ds2#FF330088:Errors           ', $definition);
     }
 
+    public function test_a_drawn_inverted_sum_makes_areas_translucent(): void
+    {
+        LibrenmsConfig::shouldReceive('get')->with('webui.graph_stacked')->andReturn(true);
+        LibrenmsConfig::shouldReceive('get')->with('graph_colours.greens')->andReturn(['00AA00']);
+        LibrenmsConfig::shouldReceive('get')->with('graph_colours.purples')->andReturn(['AA00AA']);
+
+        $definition = $this->build([
+            'in' => new DataSeries($this->metric, 'a', 'In', style: new SeriesStyle(SeriesRole::In, stacked: true)),
+            'out' => new DataSeries($this->metric, 'b', 'Out', style: new SeriesStyle(legendOnly: true)),
+            'total' => new SeriesSum(['out'], 'Total', style: new SeriesStyle(SeriesRole::Out, stacked: true, invert: true)),
+        ]);
+
+        $this->assertContains('AREA:ds0#00AA0088:In               ', $definition);
+        $this->assertContains('AREA:ds2#AA00AA88:Total            :STACK', $definition);
+    }
+
     public function test_areas_without_overlapping_series_are_opaque(): void
     {
         LibrenmsConfig::shouldReceive('get')->with('webui.graph_stacked')->andReturn(true);
+        $missing = new MetricIdentity('missing', ['hostname' => 'localhost']);
+        $this->rrdFiles->shouldReceive('pathFor')->with($missing)->andReturn(null);
+        $legendOnly = new SeriesStyle(invert: true, legendOnly: true);
 
         $definition = $this->build([
             'used' => new DataSeries($this->metric, 'a', 'Used', style: new SeriesStyle(SeriesRole::usage(90, 80), stacked: true)),
             'free' => new DataSeries($this->metric, 'b', 'Free', style: new SeriesStyle(SeriesRole::Muted, stacked: true)),
+            'legend' => new DataSeries($this->metric, 'c', 'Legend', style: $legendOnly),
+            'total' => new SeriesSum(['used', 'free'], 'Total', style: $legendOnly),
+            'missing' => new DataSeries($missing, 'd', 'Missing'),
+            'empty' => new SeriesSum(['missing'], 'Empty', style: new SeriesStyle(stacked: true, invert: true)),
         ]);
 
         $this->assertContains('AREA:ds0#C75862:Used             ', $definition);
         $this->assertContains('AREA:ds1#D0D0D0:Free             :STACK', $definition);
+        $this->assertEmpty(preg_grep('/Empty/', $definition));
     }
 
     public function test_the_axis_and_reference_lines_follow_the_dark_style(): void

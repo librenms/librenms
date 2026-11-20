@@ -72,15 +72,24 @@ class RrdSeriesDefinition
         $stacks = [];
         $lastStack = null;
         $inverted = false;
+        $drawable = [];
 
         $this->files = [];
         $this->ids = [];
         foreach ($this->series as $key => $series) {
-            $filename = $series instanceof DataSeries ? $this->rrdFiles->pathFor($series->metric) : null;
+            if ($series instanceof DataSeries) {
+                $filename = $this->rrdFiles->pathFor($series->metric);
+                if ($filename === null) {
+                    continue;
+                }
 
-            if ($filename !== null) {
                 $this->files[$key] = $filename;
+            } elseif (! array_any($series->series, fn ($member) => isset($drawable[$member]))) {
+                continue;
             }
+
+            $drawable[$key] = $series;
+            $inverted = $inverted || ($series->style->invert && ! $series->style->legendOnly);
         }
 
         if ($this->files === []) {
@@ -89,17 +98,12 @@ class RrdSeriesDefinition
 
         // stacked graphs and graphs zoomed to the port speed draw inverted series above the axis, over the others
         $this->overlaid = LibrenmsConfig::get('webui.graph_stacked') || ($this->options->traffic?->speedZoom && array_filter($this->options->traffic->speeds));
-        $theme = new GraphTheme($params->isDark(), $this->options->palette,
-            $this->overlaid && array_any(array_keys($this->files), fn ($key) => $this->series[$key]->style->invert));
+        $theme = new GraphTheme($params->isDark(), $this->options->palette, $this->overlaid && $inverted);
         $traffic = $this->options->traffic === null ? null : new RrdTrafficDefinition($this->options->traffic, $params, $theme, $this->overlaid);
         $averaged = count(array_filter(array_keys($this->files), fn ($key) => $this->series[$key]->style->stackAverage));
 
         $i = 0;
-        foreach ($this->series as $key => $series) {
-            if (! $this->isDrawable($key)) {
-                continue;
-            }
-
+        foreach ($drawable as $key => $series) {
             $id = 'ds' . $i++;
             $this->ids[$key] = $id;
             $style = $series->style;
@@ -118,7 +122,6 @@ class RrdSeriesDefinition
                 $lastStack = null;
             } else {
                 $color = $theme->next($style->role, $style->stacked);
-                $inverted = $inverted || $style->invert;
                 $drawnId = $this->drawnValue($id, $drawScale, $style->invert, $defs);
 
                 if ($style->stacked) {
@@ -201,18 +204,6 @@ class RrdSeriesDefinition
 
         // fills go below all lines, so they do not hide lines of other series
         return [$this->legendHeader(), ...$defs, ...$margins, ...$maxFills, ...$fills, ...$drawing, ...($traffic?->drawing() ?? [])];
-    }
-
-    /**
-     * Whether the series has data to draw: an rrd file, or for a sum a drawable series listed before it
-     */
-    private function isDrawable(string $key): bool
-    {
-        $series = $this->series[$key];
-
-        return $series instanceof SeriesSum
-            ? array_any($series->series, fn ($member) => isset($this->ids[$member]))
-            : isset($this->files[$key]);
     }
 
     /**
