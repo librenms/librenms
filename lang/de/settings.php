@@ -127,7 +127,7 @@ return [
         ],
         'alert_log_purge' => [
             'description' => 'Alarmprotokoll',
-            'help' => 'Zeitraum in Tagen. 0 deaktiviert die Bereinigung. Ältere Einträge werden durch daily.sh bereinigt',
+            'help' => 'Zeitraum in Tagen. 0 deaktiviert die Bereinigung. Ältere Einträge werden durch daily.sh bereinigt; für jeden noch aktiven Alarm wird der jüngste alte Eintrag behalten und die übrigen alten Einträge entfernt',
         ],
         'applications_purge' => [
             'description' => 'Gelöschte Anwendungen',

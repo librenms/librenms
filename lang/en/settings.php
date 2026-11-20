@@ -243,7 +243,7 @@ return [
         ],
         'alert_log_purge' => [
             'description' => 'Alert log',
-            'help' => 'Period in days. 0 disables cleanup. Older entries are cleaned up by daily.sh',
+            'help' => 'Period in days. 0 disables cleanup. Older entries are cleaned up by daily.sh; for each still-active alert the newest old entry is kept and the other old entries are removed',
         ],
         'discovery_on_reboot' => [
             'description' => 'Discovery on Reboot',
