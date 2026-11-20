@@ -3,6 +3,7 @@
 namespace App\Graphs\Port;
 
 use App\Data\Graphing\GraphPageContext;
+use App\Facades\LibrenmsConfig;
 use App\Graphs\AbstractSeriesGraph;
 use App\Models\Port;
 use LibreNMS\Exceptions\NoGraphData;
@@ -27,6 +28,24 @@ abstract class PortGraph extends AbstractSeriesGraph
     protected function port(): Port
     {
         return $this->requestedPort() ?? throw new NoGraphData;
+    }
+
+    /**
+     * The in and out fields, swapped when the graph is drawn from the other end of the link
+     *
+     * @return array{string, string}
+     */
+    protected function directions(string $in, string $out): array
+    {
+        return $this->params->inverse ? [$out, $in] : [$in, $out];
+    }
+
+    /**
+     * Out is drawn below the axis, unless both directions are stacked above it
+     */
+    protected function stacked(): bool
+    {
+        return (bool) LibrenmsConfig::get('webui.graph_stacked');
     }
 
     public function getTitle(): string

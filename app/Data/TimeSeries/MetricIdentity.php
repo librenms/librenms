@@ -4,6 +4,9 @@ namespace App\Data\TimeSeries;
 
 /**
  * Identifies a stored metric independently of the datastore: a measurement and the tags of one series of it.
+ * The identity is authoritative: it is how a metric is named, the names a metric had before its identity was cleaned up
+ * are kept in MetricNames. While datastore.canonical_metrics is false, Datastore::write stores the metric under those
+ * legacy measurement and tag names (MetricNames::storedAs), and readers also find data that is still stored under them.
  * What a series belongs to is a tag like any other, usually hostname.
  * Only tags that tell series apart belong here, a tag that may change (a description) would start a new series.
  */

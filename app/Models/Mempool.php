@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Observers\MempoolObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -150,5 +151,26 @@ class Mempool extends DeviceRelatedModel implements HasSyncProtectedAttributes, 
     public function getCompositeKey(): string
     {
         return "$this->mempool_type-$this->mempool_index";
+    }
+
+    /**
+     * Identity used when storing and reading a measurement of this memory pool
+     */
+    public function metricIdentity(string $measurement): MetricIdentity
+    {
+        return new MetricIdentity($measurement, [
+            'hostname' => (string) $this->device?->hostname,
+            'type' => $this->mempool_type,
+            'class' => $this->mempool_class,
+            'index' => $this->mempool_index,
+        ]);
+    }
+
+    /**
+     * Only the percent used is known, the stored used and free are percentages
+     */
+    public function isPercentOnly(): bool
+    {
+        return $this->mempool_total == 100;
     }
 }

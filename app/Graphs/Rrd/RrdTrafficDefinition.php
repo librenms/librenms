@@ -4,6 +4,7 @@ namespace App\Graphs\Rrd;
 
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\ThemeColor;
 use App\Data\Graphing\TrafficOptions;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Store\Rrd;
@@ -29,7 +30,8 @@ class RrdTrafficDefinition
 
     public function addSeries(string $key, string $id, string $filename, DataSeries $series, float $drawScale): void
     {
-        $factor = $drawScale * ($series->style->invert && ! LibrenmsConfig::get('webui.graph_stacked') ? -1 : 1);
+        $color = $series->style->color instanceof ThemeColor ? $series->style->color->for($this->params->isDark()) : $series->style->color;
+        $factor = RrdSeriesDefinition::number($drawScale * ($series->style->invert && ! LibrenmsConfig::get('webui.graph_stacked') ? -1 : 1));
         $this->summarize($id, $series, $factor);
 
         if ($this->params->to > time()) {
@@ -38,20 +40,17 @@ class RrdTrafficDefinition
                 "VDEF:{$id}intercept={$id}max,LSLINT",
                 "CDEF:{$id}trend={$id}max,POP,{$id}slope,COUNT,*,{$id}intercept,+,$factor,*",
             );
-            $this->drawing[] = "LINE2:{$id}trend#" . ($series->style->color ?? '666666') . ':' . Rrd::safeDescr($series->description . ' Linear Prediction') . '\\n:dashes=8';
+            $this->drawing[] = "LINE2:{$id}trend#" . ($color ?? '666666') . ':' . Rrd::safeDescr(__('graph.legend.prediction', ['series' => $series->description])) . '\\n:dashes=8';
         }
 
         if ($this->params->visible('previous')) {
             $previous = $id . 'prev';
+            $range = ":start={$this->params->prev_from}:end={$this->params->from}";
             foreach (['' => 'AVERAGE', 'min' => 'MIN', 'max' => 'MAX'] as $suffix => $cf) {
-                array_push($this->defs,
-                    "DEF:{$previous}raw$suffix=$filename:$series->field:$cf:start={$this->params->prev_from}:end={$this->params->from}",
-                    "SHIFT:{$previous}raw$suffix:{$this->params->period}",
-                    "CDEF:$previous$suffix={$previous}raw$suffix,$series->scale,*",
-                );
+                array_push($this->defs, ...RrdSeriesDefinition::valueDefs($previous . $suffix, $filename, $series, $cf, $range, $this->params->period));
             }
             $this->defs[] = "CDEF:{$previous}drawn=$previous,$factor,*";
-            $this->drawing[] = "LINE1.25:{$previous}drawn#" . ($key === 'in' ? '333300' : '000099') . ':' . Rrd::fixedSafeDescr('Prev ' . $series->description, 16);
+            $this->drawing[] = "LINE1.25:{$previous}drawn#" . ($key === 'in' ? '333300' : '000099') . ':' . Rrd::fixedSafeDescr(__('graph.legend.previous', ['series' => $series->description]), 16);
             $unit = str_replace(['%', ':'], ['%%', '\\:'], $series->unit);
             array_push($this->drawing,
                 "GPRINT:$previous:LAST:%5.2lf%s$unit",
@@ -64,7 +63,7 @@ class RrdTrafficDefinition
         }
     }
 
-    private function summarize(string $id, DataSeries $series, float $factor, string $period = ''): void
+    private function summarize(string $id, DataSeries $series, string $factor, string $period = ''): void
     {
         $percentile = $this->options->percentile;
         $scale = $this->options->totalScale;
@@ -102,11 +101,11 @@ class RrdTrafficDefinition
         $drawing = $this->drawing;
         foreach ($this->totals as $period => $totals) {
             if ($this->options->highestPercentile) {
-                $drawing[] = "HRULE:traffic{$period}pct#FF0000:" . ($period === '' ? 'Highest' : 'Prev Highest');
+                $drawing[] = "HRULE:traffic{$period}pct#FF0000:" . __($period === '' ? 'graph.legend.highest' : 'graph.legend.previous_highest');
                 $drawing[] = "GPRINT:traffic{$period}pct:%6.2lf%s\\n";
             }
             if ($this->params->visible('total')) {
-                $drawing[] = "GPRINT:traffic{$period}bytes:" . ($period === '' ? 'Total' : 'Prev Total') . " %6.2lf%s{$this->options->totalUnit}";
+                $drawing[] = "GPRINT:traffic{$period}bytes:" . __($period === '' ? 'graph.legend.total' : 'graph.legend.previous_total') . " %6.2lf%s{$this->options->totalUnit}";
                 array_push($drawing, ...$totals);
                 $drawing[array_key_last($drawing)] .= '\\l';
             }
@@ -119,7 +118,7 @@ class RrdTrafficDefinition
         foreach ($speeds as $key => $speed) {
             $value = $key === 'out' && ! LibrenmsConfig::get('webui.graph_stacked') && ! $this->options->speedZoom ? -$speed : $speed;
             $type = $this->options->speedZoom ? 'LINE2' : 'HRULE';
-            $label = ($key === '' ? '' : ucfirst($key) . ' ') . 'Port Speed ' . Number::formatSi($speed, 2, 0, 'bps');
+            $label = __($key === '' ? 'graph.legend.port_speed' : "graph.legend.port_speed_$key", ['speed' => Number::formatSi($speed, 2, 0, 'bps')]);
             $drawing[] = "$type:$value#000000:" . Rrd::safeDescr($label) . '\\n';
         }
 
