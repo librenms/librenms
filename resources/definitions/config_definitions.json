@@ -332,6 +332,7 @@
         },
         "alert_log_purge": {
             "default": 365,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 3,
@@ -650,6 +651,7 @@
         },
         "applications_purge": {
             "default": 14,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 7,
@@ -1102,6 +1104,7 @@
         },
         "authlog_purge": {
             "default": 30,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 4,
@@ -2497,6 +2500,7 @@
         },
         "eventlog_purge": {
             "default": 30,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 0,
@@ -6491,6 +6495,7 @@
         },
         "ports_fdb_purge": {
             "default": 10,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 5,
@@ -6498,6 +6503,7 @@
         },
         "ports_nac_purge": {
             "default": 10,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 6,
@@ -6709,6 +6715,7 @@
         },
         "route_purge": {
             "default": 10,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 2,
@@ -6750,6 +6757,7 @@
             "section": "cleanup",
             "order": 8,
             "default": 0,
+            "units": "days",
             "type": "integer"
         },
         "rrd_rra": {
@@ -7317,6 +7325,7 @@
         },
         "syslog_purge": {
             "default": 30,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 1,
