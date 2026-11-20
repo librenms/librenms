@@ -101,7 +101,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 // Auth
-AuthFacade::routes(['register' => false, 'reset' => false, 'verify' => false]);
+AuthFacade::routes(['register' => false, 'reset' => false, 'verify' => false, 'confirm' => false]);
 
 // Socialite
 Route::prefix('auth')->name('socialite.')->group(function (): void {

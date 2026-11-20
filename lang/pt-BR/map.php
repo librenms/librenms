@@ -4,7 +4,6 @@ return [
     'custom' => [
         'title' => [
             'edit_dialog' => 'Selecione um Mapa Personalizado para Editar',
-            'create' => 'Criar Novo Mapa Personalizado',
             'view' => ':name | Mapa Personalizado',
             'edit' => 'Editar Mapa Personalizado',
             'manage' => 'Gerenciar Mapas Personalizados',
