@@ -9,6 +9,7 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Modules\Packages;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
+use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Tests\InMemoryDbTestCase;
 use LibreNMS\Tests\Traits\FakesPollingMethods;
 use Mockery;
@@ -36,7 +37,8 @@ final class PackagesTest extends InMemoryDbTestCase
         $this->assertSame(['2.7.18-13ubuntu1.5', '2.28.3-0ubuntu0.1', '1:7.7+6build3'], $packages->pluck('version')->all());
         $this->assertSame(['amd64', 'all', 'amd64'], $packages->pluck('arch')->all());
         $this->assertSame(['host-res', 'host-res', 'host-res'], $packages->pluck('manager')->all());
-        $this->assertTrue($packages->every(fn (Package $package): bool => $package->size === null && $package->build === '' && (bool) $package->status));
+        $this->assertSame([PollingMethodType::Snmp, PollingMethodType::Snmp, PollingMethodType::Snmp], $packages->pluck('polling_method')->all());
+        $this->assertTrue($packages->every(fn (Package $package): bool => $package->size === null && $package->build === ''));
     }
 
     public function testPollsRedHatNamedPackages(): void
@@ -116,6 +118,7 @@ final class PackagesTest extends InMemoryDbTestCase
             'manager' => 'host-res',
             'arch' => 'amd64',
             'version' => '5.2.0',
+            'polling_method' => PollingMethodType::Snmp,
         ]);
         Package::factory()->create([
             'device_id' => $os->getDeviceId(),
@@ -123,6 +126,7 @@ final class PackagesTest extends InMemoryDbTestCase
             'manager' => 'host-res',
             'arch' => 'amd64',
             'version' => '1.0.0',
+            'polling_method' => PollingMethodType::Snmp,
         ]);
 
         $this->fakeSnmpInstalledPackages([
@@ -145,6 +149,7 @@ final class PackagesTest extends InMemoryDbTestCase
             'manager' => 'host-res',
             'arch' => 'amd64',
             'version' => '5.2.0',
+            'polling_method' => PollingMethodType::Snmp,
         ]);
 
         $this->fakeSnmpInstalledPackages([]);
@@ -154,15 +159,55 @@ final class PackagesTest extends InMemoryDbTestCase
         $this->assertSame(1, Package::where('device_id', $os->getDeviceId())->count());
     }
 
-    public function testIsNotPolledWhenTheUnixAgentIsEnabled(): void
+    public function testPollsPackagesFromTheAgentOutput(): void
     {
-        $os = $this->makeOs([PollingMethodType::Snmp, PollingMethodType::UnixAgent]);
-        $this->fakeSnmpMethodAvailable();
+        $os = $this->makeOs([PollingMethodType::UnixAgent]);
+        $this->fakeMethod(UnixAgentPollingMethod::class, true, [
+            'output' => "<<<rpm>>>\nbash 5.2.0 3 x86_64 12345\nkernel 6.8.0 1 x86_64 67890\n",
+            'time' => 15,
+        ]);
 
-        $this->assertFalse((new Packages)->shouldPoll($os));
+        $module = new Packages;
+        $this->assertTrue($module->shouldPoll($os));
+        $module->poll($os, $this->datastore());
+
+        $packages = Package::where('device_id', $os->getDeviceId())->orderBy('name')->get();
+        $this->assertSame(['bash', 'kernel'], $packages->pluck('name')->all());
+        $bash = $packages->firstWhere('name', 'bash');
+        $this->assertSame('5.2.0', $bash->version);
+        $this->assertSame('3', (string) $bash->build);
+        $this->assertSame('x86_64', $bash->arch);
+        $this->assertSame('rpm', $bash->manager);
+        $this->assertSame(12345, (int) $bash->size);
+        $this->assertSame(PollingMethodType::UnixAgent, $bash->polling_method);
     }
 
-    public function testDataExistsOnlyForHostResourcesPackages(): void
+    public function testAgentPackagesReplaceSnmpPackages(): void
+    {
+        $os = $this->makeOs([PollingMethodType::UnixAgent]);
+        // a package collected earlier by snmp
+        Package::factory()->create([
+            'device_id' => $os->getDeviceId(),
+            'name' => 'bash',
+            'manager' => 'host-res',
+            'arch' => 'amd64',
+            'version' => '5.2.0',
+            'polling_method' => PollingMethodType::Snmp,
+        ]);
+        $this->fakeMethod(UnixAgentPollingMethod::class, true, [
+            'output' => "<<<rpm>>>\nbash 5.2.0 3 x86_64 12345\n",
+            'time' => 15,
+        ]);
+
+        (new Packages)->poll($os, $this->datastore());
+
+        $packages = Package::where('device_id', $os->getDeviceId())->get();
+        $this->assertSame(['bash'], $packages->pluck('name')->all());
+        $this->assertSame('rpm', $packages->sole()->manager);
+        $this->assertSame(PollingMethodType::UnixAgent, $packages->sole()->polling_method);
+    }
+
+    public function testDataExists(): void
     {
         $os = $this->makeOs([PollingMethodType::Snmp]);
         $module = new Packages;
@@ -175,40 +220,61 @@ final class PackagesTest extends InMemoryDbTestCase
             'manager' => 'deb',
             'arch' => 'amd64',
             'version' => '5.2.0',
-        ]);
-        $this->assertFalse($module->dataExists($os->getDevice()));
-
-        Package::factory()->create([
-            'device_id' => $os->getDeviceId(),
-            'name' => 'kernel',
-            'manager' => 'host-res',
-            'arch' => 'amd64',
-            'version' => '6.8.0',
+            'polling_method' => PollingMethodType::UnixAgent,
         ]);
         $this->assertTrue($module->dataExists($os->getDevice()));
     }
 
-    public function testCleanupRemovesOnlyHostResourcesPackages(): void
+    public function testRemoveMethodData(): void
     {
-        $os = $this->makeOs([PollingMethodType::Snmp]);
+        $os = $this->makeOs([PollingMethodType::Snmp, PollingMethodType::UnixAgent]);
         Package::factory()->create([
             'device_id' => $os->getDeviceId(),
-            'name' => 'bash',
-            'manager' => 'deb',
-            'arch' => 'amd64',
-            'version' => '5.2.0',
-        ]);
-        Package::factory()->create([
-            'device_id' => $os->getDeviceId(),
-            'name' => 'kernel',
+            'name' => 'snmp-pkg',
             'manager' => 'host-res',
             'arch' => 'amd64',
-            'version' => '6.8.0',
+            'version' => '1.0.0',
+            'polling_method' => PollingMethodType::Snmp,
+        ]);
+        Package::factory()->create([
+            'device_id' => $os->getDeviceId(),
+            'name' => 'agent-pkg',
+            'manager' => 'rpm',
+            'arch' => 'amd64',
+            'version' => '2.0.0',
+            'polling_method' => PollingMethodType::UnixAgent,
         ]);
 
-        $this->assertSame(1, (new Packages)->cleanup($os->getDevice()));
+        (new Packages)->removeMethodData($os->getDevice(), PollingMethodType::UnixAgent);
 
-        $this->assertSame(['bash'], Package::where('device_id', $os->getDeviceId())->pluck('name')->all());
+        $packages = Package::where('device_id', $os->getDeviceId())->get();
+        $this->assertSame(['snmp-pkg'], $packages->pluck('name')->all());
+        $this->assertSame(PollingMethodType::Snmp, $packages->sole()->polling_method);
+    }
+
+    public function testCleanupRemovesAllPackages(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Snmp, PollingMethodType::UnixAgent]);
+        Package::factory()->create([
+            'device_id' => $os->getDeviceId(),
+            'name' => 'snmp-pkg',
+            'manager' => 'host-res',
+            'arch' => 'amd64',
+            'version' => '1.0.0',
+            'polling_method' => PollingMethodType::Snmp,
+        ]);
+        Package::factory()->create([
+            'device_id' => $os->getDeviceId(),
+            'name' => 'agent-pkg',
+            'manager' => 'rpm',
+            'arch' => 'amd64',
+            'version' => '2.0.0',
+            'polling_method' => PollingMethodType::UnixAgent,
+        ]);
+
+        $this->assertSame(2, (new Packages)->cleanup($os->getDevice()));
+
+        $this->assertSame(0, Package::where('device_id', $os->getDeviceId())->count());
     }
 
     /**
@@ -236,18 +302,6 @@ final class PackagesTest extends InMemoryDbTestCase
             ->once()
             ->withArgs(fn (string $target, string $oid): bool => $oid === 'HOST-RESOURCES-MIB::hrSWInstalledTable')
             ->andReturn(new RawSnmpResponse(implode("\n", $lines), '', 0));
-
-        $this->app->instance(SnmpBackendInterface::class, $backend);
-        $this->app->instance(SnmpPollingMethod::class, new SnmpPollingMethod($backend));
-    }
-
-    /**
-     * Bind an available snmp polling method without any hrSWInstalledTable data.
-     */
-    private function fakeSnmpMethodAvailable(): void
-    {
-        $backend = Mockery::mock(SnmpBackendInterface::class);
-        $backend->shouldReceive('get')->zeroOrMoreTimes()->andReturnUsing(fn (): RawSnmpResponse => $this->snmpProbeResponse());
 
         $this->app->instance(SnmpBackendInterface::class, $backend);
         $this->app->instance(SnmpPollingMethod::class, new SnmpPollingMethod($backend));
