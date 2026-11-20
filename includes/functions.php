@@ -245,7 +245,7 @@ function lock_and_purge($table, $sql)
         $purge_days = LibrenmsConfig::get($purge_name);
 
         $name = str_replace('_', ' ', ucfirst($table));
-        if (is_numeric($purge_days)) {
+        if (is_numeric($purge_days) && $purge_days > 0) {
             if (\Illuminate\Support\Facades\DB::table($table)->whereRaw($sql, [$purge_days])->delete()) {
                 echo "$name cleared for entries over $purge_days days\n";
             }

@@ -242,8 +242,8 @@ return [
             ],
         ],
         'alert_log_purge' => [
-            'description' => 'Alert log entries older than',
-            'help' => 'Cleanup done by daily.sh',
+            'description' => 'Alert log',
+            'help' => 'Period in days. 0 disables cleanup. Older entries are cleaned up by daily.sh',
         ],
         'discovery_on_reboot' => [
             'description' => 'Discovery on Reboot',
@@ -298,6 +298,10 @@ return [
                     'help' => 'Opt in to the new v1 REST API. When disabled, all /api/v1 endpoints return 404 and the web UI hides v1 token management.',
                 ],
             ],
+        ],
+        'applications_purge' => [
+            'description' => 'Deleted applications',
+            'help' => 'Period in days. 0 disables cleanup. Deleted applications older than this period are cleaned up by daily.sh',
         ],
         'apps' => [
             'powerdns-recursor' => [
@@ -592,8 +596,8 @@ return [
             'help' => 'Number of days to keep a user logged in when the user selects the remember me checkbox.',
         ],
         'authlog_purge' => [
-            'description' => 'Auth log entries older than',
-            'help' => 'Cleanup done by daily.sh',
+            'description' => 'Auth log',
+            'help' => 'Period in days. 0 disables cleanup. Older entries are cleaned up by daily.sh',
         ],
         'availablity' => [
             'threshold_ok' => [
@@ -999,8 +1003,8 @@ return [
             'help' => 'Shows syslog in the web interface.',
         ],
         'eventlog_purge' => [
-            'description' => 'Event log entries older than',
-            'help' => 'Cleanup done by daily.sh',
+            'description' => 'Event log',
+            'help' => 'Period in days. 0 disables cleanup. Older entries are cleaned up by daily.sh',
         ],
         'favicon' => [
             'description' => 'Favicon',
@@ -1920,28 +1924,28 @@ return [
             ],
         ],
         'ports_fdb_purge' => [
-            'description' => 'Port FDB entries older than',
-            'help' => 'Cleanup done by daily.sh',
+            'description' => 'Port FDB',
+            'help' => 'Period in days. 0 disables cleanup. Older entries are cleaned up by daily.sh',
         ],
         'ports_ipv4_neighbours' => [
             'description' => 'Port IPv4 neighbour lookup method',
             'help' => 'Method to look up IPv4 neighbors when you view port details. ARP uses the ARP table to find devices with matching IP and MAC addresses. Subnet finds devices with IP addresses in the same subnet.',
         ],
         'ports_nac_purge' => [
-            'description' => 'Port NAC entries older than',
-            'help' => 'Cleanup done by daily.sh',
+            'description' => 'Port NAC',
+            'help' => 'Period in days. 0 disables cleanup. Older entries are cleaned up by daily.sh',
         ],
         'ports_page_default' => [
             'description' => 'Default ports tab',
             'help' => 'Default tab to open when you view ports on the device page',
         ],
         'ports_purge' => [
-            'description' => 'Purge ports deleted',
-            'help' => 'Cleanup done by daily.sh',
+            'description' => 'Deleted ports',
+            'help' => 'Deleted ports are cleaned up by daily.sh',
         ],
         'networks_purge' => [
-            'description' => 'Purge unused networks',
-            'help' => 'Remove networks that no longer have any IP addresses',
+            'description' => 'Unused networks',
+            'help' => 'Networks without IP addresses are cleaned up weekly',
         ],
         'processor' => [
             'default_perc_warn' => [
@@ -2082,8 +2086,8 @@ return [
             'help' => 'Replace the parts of ifDescr that match these regular expressions with the given text. The match ignores case.',
         ],
         'route_purge' => [
-            'description' => 'Route entries older than',
-            'help' => 'Cleanup done by daily.sh',
+            'description' => 'Route',
+            'help' => 'Period in days. 0 disables cleanup. Older entries are cleaned up by daily.sh',
         ],
         'rrd' => [
             'backend' => [
@@ -2103,8 +2107,8 @@ return [
             'help' => 'Location of rrd files. The default is rrd inside the LibreNMS directory. A change to this setting does not move the rrd files.',
         ],
         'rrd_purge' => [
-            'description' => 'RRD Files entries older than',
-            'help' => 'Cleanup done by daily.sh',
+            'description' => 'RRD graphs',
+            'help' => 'Period in days. 0 disables cleanup. Older graphs are cleaned up by daily.sh',
         ],
         'rrd_rra' => [
             'description' => 'RRD Format Settings',
@@ -2427,8 +2431,8 @@ return [
             'description' => 'Filter syslog messages containing',
         ],
         'syslog_purge' => [
-            'description' => 'Syslog entries older than',
-            'help' => 'Cleanup done by daily.sh',
+            'description' => 'Syslog',
+            'help' => 'Period in days. 0 disables cleanup. Older entries are cleaned up hourly',
         ],
         'title_image' => [
             'description' => 'Title Image',

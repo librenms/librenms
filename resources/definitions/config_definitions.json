@@ -649,6 +649,14 @@
             "section": "sneck",
             "order": 0
         },
+        "applications_purge": {
+            "default": 14,
+            "units": "days",
+            "group": "system",
+            "section": "cleanup",
+            "order": 7,
+            "type": "integer"
+        },
         "astext": {
             "default": {
                 "65332": "Cymru FullBogon Feed",
