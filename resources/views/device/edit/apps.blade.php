@@ -16,9 +16,9 @@
             }
         }">
             <x-panel>
-                <div class="tw:grid tw:grid-cols-1 tw:gap-2">
+                <div class="tw:columns-1 tw:gap-2 tw:sm:columns-2 tw:lg:columns-3">
                     @foreach($applications as $app)
-                        <div class="tw:flex tw:items-center tw:gap-3">
+                        <div class="tw:mb-2 tw:flex tw:items-center tw:gap-3 tw:break-inside-avoid">
                             <x-toggle :checked="$app['enabled']"
                                       :disabled="$app['discovered'] || ! $canUpdate"
                                       x-on:change="toggle($event, {{ Js::from($app['type']) }})">
