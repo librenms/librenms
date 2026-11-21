@@ -59,6 +59,8 @@
                     <span class="tw:font-mono tw:tabular-nums tw:pl-2 tw:shrink-0" x-text="row.value"></span>
                     <span x-show="row.previous !== null" class="tw:font-mono tw:tabular-nums tw:shrink-0 tw:text-gray-500 tw:dark:text-gray-400"
                           :title="@js(__('graph.previous'))" x-text="`(${row.previous})`"></span>
+                    <span x-show="row.trend !== null" class="tw:font-mono tw:tabular-nums tw:shrink-0 tw:text-gray-500 tw:dark:text-gray-400"
+                          :title="@js(__('graph.trend'))" x-text="`~${row.trend}`"></span>
                 </div>
             </template>
             <div x-show="tooltip?.more" class="tw:text-gray-500 tw:dark:text-gray-400">+<span x-text="tooltip?.more"></span> {{ __('graph.more') }}</div>

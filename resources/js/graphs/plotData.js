@@ -1,4 +1,4 @@
-import { firstAfter } from './seriesData.js';
+import {firstAfter} from './seriesData.js';
 
 /** @typedef {import('./seriesData.js').GraphSeries} GraphSeries */
 /** @typedef {import('./seriesData.js').Threshold} Threshold */
@@ -84,7 +84,7 @@ function trendOf(timestamps, values, { from, to }) {
 // Layers depend only on which series there are and what is drawn, so new data can replace the old.
 // A range is two layers, its top and its bottom, the fill is between them.
 // Values get the drawn data {series, totals} of now and of the previous time, null without it.
-// A constant layer has the same value at every time.
+// A constant layer has the same value at every time. A trend layer has the key of its series.
 function layersFor(series, thresholds, { range: showRange, trend, mirror }, comparing) {
     const stacked = series.filter((item) => item.stacked);
     const lines = series.filter((item) => ! item.stacked);
@@ -131,7 +131,7 @@ function layersFor(series, thresholds, { range: showRange, trend, mirror }, comp
             previous: true,
             values: (now, previous) => (previous === null ? null : drawn(item, previous)),
         })),
-        ...(trend ? series : []).map((item) => ({ stroke: item.color, dash: TREND_DASH, trend: true, values: (now) => drawn(item, now) })),
+        ...(trend ? series : []).map((item) => ({ stroke: item.color, dash: TREND_DASH, trend: item.key, values: (now) => drawn(item, now) })),
     ];
 }
 
@@ -227,6 +227,13 @@ export function createPlotData(graph, { hidden, draw, thresholds, comparing }) {
             item.key, alignedTo(times, before.timestamps, item.avg),
         ]));
 
+        // in the units of each series, a stacked one its own share of the total its line is drawn at
+        const trends = Object.fromEntries(layers.filter((layer) => layer.trend !== undefined).map((layer) => {
+            const line = trendOf(source.timestamps, now.series[layer.trend]?.avg ?? [], shown);
+
+            return [layer.trend, line === null ? empty : times.map((time) => line(time))];
+        }));
+
         const columns = [times, ...layers.map((layer) => {
             if (layer.constant !== undefined) {
                 return times.map(() => layer.constant);
@@ -235,7 +242,7 @@ export function createPlotData(graph, { hidden, draw, thresholds, comparing }) {
             if (values === null) {
                 return empty;
             }
-            if (layer.trend) {
+            if (layer.trend !== undefined) {
                 const line = trendOf(source.timestamps, values, shown);
 
                 return line === null ? empty : times.map((time) => line(time));
@@ -245,7 +252,7 @@ export function createPlotData(graph, { hidden, draw, thresholds, comparing }) {
             return (draw.line_style ?? 'stepped') === 'stepped' ? withFirstInterval(samples) : samples;
         })];
 
-        return { columns, earlier };
+        return { columns, earlier, trends };
     }
 
     return { layers, dataFor };

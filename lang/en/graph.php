@@ -12,6 +12,7 @@ return [
     'reset_title' => 'Back to the selected time range, the settings of this view and the automatic size',
     'more' => 'more',
     'previous' => 'Earlier',
+    'trend' => 'Trend',
     'resize' => 'Drag to resize, double-click for the automatic size',
     'share' => 'Share',
     'copy_link' => 'Copy link',
