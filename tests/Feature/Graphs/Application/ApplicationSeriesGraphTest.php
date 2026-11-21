@@ -52,9 +52,9 @@ final class ApplicationSeriesGraphTest extends TestCase
     {
         $command = $this->command();
 
-        // labels are padded to the default width of 16 and followed by a space
-        $this->assertMatchesRegularExpression("/'LINE1\\.25:ds0#[0-9A-Fa-f]{6}:Jitter {11}'/", $command);
-        $this->assertMatchesRegularExpression("/'LINE1\\.25:ds1#[0-9A-Fa-f]{6}:Noise {12}'/", $command);
+        // labels are padded to the default width of 20 and followed by a space
+        $this->assertMatchesRegularExpression("/'LINE1\\.25:ds0#[0-9A-Fa-f]{6}:Jitter {15}'/", $command);
+        $this->assertMatchesRegularExpression("/'LINE1\\.25:ds1#[0-9A-Fa-f]{6}:Noise {16}'/", $command);
     }
 
     public function testScaleAndUnitReachTheLegend(): void

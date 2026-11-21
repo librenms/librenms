@@ -42,8 +42,8 @@ final class ApplicationStatsGraphTest extends TestCase
 
         $this->assertStringContainsString('DEF:ds0hourly', $command);
         $this->assertMatchesRegularExpression("/'LINE1\\.25:ds0hourly#[0-9A-Fa-f]{6}:1 hour avg {7}'/", $command);
-        $this->assertStringContainsString("'COMMENT:  1 hour min       '", $command);
-        $this->assertStringContainsString("'COMMENT:  1 hour max       '", $command);
+        $this->assertStringContainsString("'COMMENT:  1 hour min           '", $command);
+        $this->assertStringContainsString("'COMMENT:  1 hour max           '", $command);
         foreach ([0 => 25, 1 => 50, 2 => 75] as $index => $percentile) {
             $this->assertStringContainsString("VDEF:ds0p$index=ds0,$percentile,PERCENTNAN", $command);
             $this->assertMatchesRegularExpression("/'HRULE:ds0p$index#[0-9A-Fa-f]{6}:{$percentile}th Percentile  '/", $command);

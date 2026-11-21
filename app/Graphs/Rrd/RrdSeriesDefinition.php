@@ -11,14 +11,14 @@ use App\Data\Graphing\SeriesSum;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Exceptions\NoGraphData;
-use LibreNMS\Util\Rewrite;
 
 /**
  * Turns data series into the rrdtool graph elements that draw them and show their legend
  */
 class RrdSeriesDefinition
 {
-    public const int PRECISION = 2;
+    public const int LABEL_WIDTH = 20;
+    private const int PRECISION = 2;
 
     /** @var array<string, array{suffix: string, cf: string}> legend columns and the value each one shows */
     private const array LEGEND_COLUMNS = [
@@ -33,17 +33,12 @@ class RrdSeriesDefinition
     private const int LEGEND_COLUMN_GAP = 2;
     // series labels start further right than the heading because of the color box
     private const int LEGEND_COLOR_BOX_WIDTH = 2;
-    // labels are padded to the longest label of the graph, but never narrower than this
-    private const int MIN_LABEL_WIDTH = 16;
 
     /** @var array<string, string> rrd file of each data series that has one */
     private array $files = [];
 
     /** @var array<string, string> value id of each series that is drawn */
     private array $ids = [];
-
-    /** characters every label of the graph is padded to, set by build() */
-    private int $labelWidth = self::MIN_LABEL_WIDTH;
 
     /**
      * @param  array<string, DataSeries|SeriesSum>  $series
@@ -101,25 +96,10 @@ class RrdSeriesDefinition
         $overlaid = self::overlaid($this->options);
         $theme = new GraphTheme($params->isDark(), $this->options->palette, $overlaid && $inverted);
         $traffic = $this->options->traffic === null ? null : new RrdTrafficDefinition($this->options->traffic, $params, $theme);
+        // with several drawn series, stats lines are named after their series so they can be told apart
+        $stats = $this->options->stats === null ? null : new RrdStatsDefinition($this->options->stats, $params, $theme,
+            count(array_filter($drawable, fn ($series) => ! $series->style->legendOnly)) > 1);
         $averaged = count(array_filter(array_keys($this->files), fn ($key) => $this->series[$key]->style->stackAverage));
-
-        // every label is padded to the longest one, so the legend columns line up without cutting any of them
-        $labels = [$this->options->legendTitle];
-        foreach ($drawable as $key => $series) {
-            $labels[] = $series->description;
-            if ($stats !== null && ! $series->style->legendOnly) {
-                $statsLabels = $stats->labels($series);
-                foreach ($statsLabels['periods'] as $rows) {
-                    array_push($labels, ...array_values($rows));
-                }
-                array_push($labels, ...array_values($statsLabels['percentiles']));
-            }
-            if ($traffic !== null && $this->options->traffic?->summarizes($key)) {
-                $labels[] = $traffic->previousLabel($series) ?? '';
-            }
-        }
-        // measured the way Rrd::fixedSafeDescr() pads: interface names shortened, quotes and newlines removed, in bytes
-        $this->labelWidth = max(self::MIN_LABEL_WIDTH, ...array_map(fn (string $label) => strlen(str_replace(["'", '"', "\n", "\r"], '', Rewrite::shortenIfName($label))), $labels));
 
         $i = 0;
         foreach ($drawable as $key => $series) {
@@ -197,6 +177,9 @@ class RrdSeriesDefinition
             array_push($drawing, ...$this->legendValues($id, $series->unit, $summarized));
             if ($summarized) {
                 $traffic->addSeries($id, $series, $factor, $color, fn (string $period, string $suffix, string $cf, string $range, int $shift) => $this->periodValueDefs($key, $period, $suffix, $cf, $range, $shift));
+            }
+            if (! $style->legendOnly) {
+                $stats?->addSeries($id, $series, $factor, fn (string $period, string $suffix, string $cf, string $range) => $this->periodValueDefs($key, $period, $suffix, $cf, $range));
             }
         }
 
@@ -403,7 +386,7 @@ class RrdSeriesDefinition
         $unitWidth = max([0, ...array_map(fn (DataSeries|SeriesSum $series) => strlen($series->unit), $this->series)]);
         $columnWidth = self::LEGEND_VALUE_WIDTH + $unitWidth + self::LEGEND_COLUMN_GAP;
 
-        $header = Rrd::fixedSafeDescr($this->options->legendTitle, $this->labelWidth);
+        $header = Rrd::fixedSafeDescr($this->options->legendTitle, self::LABEL_WIDTH);
         $width = $columnWidth + self::LEGEND_COLOR_BOX_WIDTH;
 
         foreach (array_keys(self::LEGEND_COLUMNS) as $column) {

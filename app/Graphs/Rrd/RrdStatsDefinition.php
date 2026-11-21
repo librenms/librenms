@@ -32,78 +32,40 @@ class RrdStatsDefinition
 
     /**
      * @param  GraphTheme  $theme  gives each line the next color of the graph palette
-     * @param  bool  $overlaid  inverted series are drawn above the axis, over the others
      * @param  bool  $nameSeries  start each label with the series description, so the lines of several series can be told apart
      */
     public function __construct(
         private readonly StatsOptions $options,
         private readonly GraphParameters $params,
         private readonly GraphTheme $theme,
-        private readonly bool $overlaid,
         private readonly bool $nameSeries,
     ) {
     }
 
     /**
-     * The labels of the lines and legend rows addSeries() adds for a series, before padding.
-     * RrdSeriesDefinition pads every label of the graph to the longest one, so it needs them before anything is drawn.
-     * The periods shown at this range are keyed like PERIODS, the percentiles by their index in StatsOptions::percentiles,
-     * such as ['periods' => ['hourly' => ['avg' => '1 hour avg', 'min' => '1 hour min', 'max' => '1 hour max']], 'percentiles' => [0 => '25th Percentile']].
-     * With several series each label starts with the series description, such as 'Jitter 1 hour avg'.
+     * Labels start with the series description when nameSeries is set, such as 'Jitter 1 hour avg'.
      *
-     * @return array{periods: array<string, array{avg: string, min: string, max: string}>, percentiles: array<int, string>}
-     */
-    public function labels(DataSeries|SeriesSum $series): array
-    {
-        $labels = ['periods' => [], 'percentiles' => []];
-        if ($this->params->height <= self::MIN_HEIGHT) {
-            return $labels;
-        }
-
-        $prefix = $this->nameSeries ? $series->description . ' ' : '';
-        $range = $this->params->to - $this->params->from;
-        foreach (self::PERIODS as $period => ['label' => $labelKey, 'minRange' => $minRange]) {
-            if ($this->options->$period && $range >= $minRange) {
-                $periodLabel = __($labelKey);
-                foreach (['avg', 'min', 'max'] as $row) {
-                    $labels['periods'][$period][$row] = $prefix . __("graphs.stats.$row", ['period' => $periodLabel]);
-                }
-            }
-        }
-
-        if (! LibrenmsConfig::get('graph_stat_percentile_disable')) {
-            foreach ($this->options->percentiles as $index => $percentile) {
-                $labels['percentiles'][$index] = $prefix . __('graphs.stats.percentile', ['percentile' => $percentile]);
-            }
-        }
-
-        return $labels;
-    }
-
-    /**
      * @param  string  $id  the series values, defined by RrdSeriesDefinition as $id, {$id}min and {$id}max
-     * @param  float  $drawScale  the draw only scale of the series, applied to the lines but not the legend values
+     * @param  float  $drawFactor  what drawing multiplies the values by, negative below the axis, applied to the lines but not the legend values
      * @param  Closure(string $period, string $suffix, string $cf, string $range): list<string>  $periodValueDefs  defines the value of the series
      *                                                                                                             for $id$period$suffix, such as ds0hourlymax
-     * @param  int  $labelWidth  characters each label is padded to, the longest label of the graph
      */
-    public function addSeries(string $id, DataSeries|SeriesSum $series, float $drawScale, Closure $periodValueDefs, int $labelWidth): void
+    public function addSeries(string $id, DataSeries|SeriesSum $series, float $drawFactor, Closure $periodValueDefs): void
     {
         if ($this->params->height <= self::MIN_HEIGHT) {
             return;
         }
 
-        $factor = $drawScale * ($series->style->invert && ! $this->overlaid ? -1 : 1);
-        $factorRpn = RrdSeriesDefinition::number($factor);
+        $factorRpn = RrdSeriesDefinition::number($drawFactor);
         $unit = str_replace(['%', ':'], ['%%', '\\:'], $series->unit);
-        $labels = $this->labels($series);
+        $prefix = $this->nameSeries ? $series->description . ' ' : '';
+        $range = $this->params->to - $this->params->from;
         // colors are taken even for lines that are not drawn, so each line keeps its color at any range
         $percentileColors = array_map(fn () => $this->theme->next(null), $this->options->percentiles);
 
-        foreach (self::PERIODS as $period => ['step' => $step]) {
+        foreach (self::PERIODS as $period => ['label' => $labelKey, 'step' => $step, 'minRange' => $minRange]) {
             $color = $this->theme->next(null);
-            $rows = $labels['periods'][$period] ?? null;
-            if ($rows === null) {
+            if (! $this->options->$period || $range < $minRange) {
                 continue;
             }
 
@@ -114,36 +76,39 @@ class RrdStatsDefinition
             }
 
             $drawnId = $periodId;
-            if ($factor != 1) {
+            if ($drawFactor != 1) {
                 $drawnId = $periodId . 'drawn';
                 $this->definitions[] = "CDEF:$drawnId=$periodId,$factorRpn,*";
             }
 
             // only the average is drawn, min and max are legend rows
-            $this->drawing[] = "LINE1.25:$drawnId#$color:" . Rrd::fixedSafeDescr($rows['avg'], $labelWidth);
+            $periodLabel = __($labelKey);
+            $this->drawing[] = "LINE1.25:$drawnId#$color:" . Rrd::fixedSafeDescr($prefix . __('graphs.stats.avg', ['period' => $periodLabel]), RrdSeriesDefinition::LABEL_WIDTH);
             array_push($this->drawing, ...$this->legendRow($periodId, $unit));
             foreach (['min', 'max'] as $suffix) {
                 // two spaces take the place of the color box, aligning the label with the others
-                $this->drawing[] = 'COMMENT:  ' . Rrd::fixedSafeDescr($rows[$suffix], $labelWidth);
+                $this->drawing[] = 'COMMENT:  ' . Rrd::fixedSafeDescr($prefix . __("graphs.stats.$suffix", ['period' => $periodLabel]), RrdSeriesDefinition::LABEL_WIDTH);
                 array_push($this->drawing, ...$this->legendRow($periodId . $suffix, $unit));
             }
         }
 
-        // empty when graph_stat_percentile_disable is set
-        foreach ($labels['percentiles'] as $index => $label) {
-            $percentile = $this->options->percentiles[$index];
+        if (LibrenmsConfig::get('graph_stat_percentile_disable')) {
+            return;
+        }
+
+        foreach ($this->options->percentiles as $index => $percentile) {
             // indexed, a percentile such as 99.9 is not a valid name
             $percentileId = "{$id}p$index";
             $this->definitions[] = "VDEF:$percentileId=$id,$percentile,PERCENTNAN";
 
             // a VDEF can not be multiplied, so scale a line holding the value instead
             $lineId = $percentileId;
-            if ($factor != 1) {
+            if ($drawFactor != 1) {
                 $lineId = $percentileId . 'drawn';
                 array_push($this->definitions, "CDEF:{$lineId}line=$id,POP,$percentileId,$factorRpn,*", "VDEF:$lineId={$lineId}line,FIRST");
             }
 
-            $this->drawing[] = "HRULE:$lineId#$percentileColors[$index]:" . Rrd::fixedSafeDescr($label, $labelWidth);
+            $this->drawing[] = "HRULE:$lineId#$percentileColors[$index]:" . Rrd::fixedSafeDescr($prefix . __('graphs.stats.percentile', ['percentile' => $percentile]), RrdSeriesDefinition::LABEL_WIDTH);
             $this->drawing[] = "GPRINT:$percentileId:%5." . RrdSeriesDefinition::PRECISION . "lf%s$unit\\n";
         }
     }

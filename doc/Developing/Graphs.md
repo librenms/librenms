@@ -348,8 +348,8 @@ finds the existing data by the clean identity.
 Replace legacy RRD filename and dataset variables with `MetricIdentity` and
 `DataSeries`, and move presentation settings into `SeriesStyle` and
 `GraphOptions`. Compare the resulting graph and legend before removing the
-old include. A legacy `$descr_len` is not needed: labels are padded to the
-longest one, at least 16 characters, so they are never cut.
+old include. A legacy `$descr_len` is not needed: labels are padded or cut
+to 20 characters.
 
 For working examples, read `app/Graphs/Device/NetstatIpGraph.php` for multiple
 fields and inverted series, or `app/Graphs/Device/ProcessorGraph.php` for one
