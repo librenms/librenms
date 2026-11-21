@@ -36,7 +36,7 @@ final class InfluxDBv2StoreTest extends TestCase
         $writeApi = \Mockery::mock(WriteApi::class);
         $writeApi->shouldReceive('close');
         $influx = new InfluxDBv2;
-        (new \ReflectionProperty($influx, 'client'))->setValue($influx, $writeApi);
+        new \ReflectionProperty($influx, 'client')->setValue($influx, $writeApi);
 
         $tags = ['ifIndex' => 0, 'sensor_index' => '0', 'ifAlias' => null, 'ifName' => ''];
 
