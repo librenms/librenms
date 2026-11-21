@@ -346,7 +346,7 @@ return [
         'arguments' => [
             'days' => 'Number of days to keep deleted applications before purging (default: applications_purge configured value)',
         ],
-        'bad_days_input' => 'Days must be numeric',
+        'bad_days_input' => 'Days must be a whole number',
         'bad_days_setting' => 'Deleted applications cleanup is disabled because the applications_purge setting is invalid',
         'purged' => 'Purged :applications deleted applications (:metrics metrics, older than :days days)',
         'disabled' => 'Deleted applications cleanup is disabled, because days <= 0',

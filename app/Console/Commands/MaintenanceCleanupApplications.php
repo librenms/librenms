@@ -25,16 +25,19 @@ class MaintenanceCleanupApplications extends LnmsCommand
     public function handle(): int
     {
         $days = $this->argument('days');
+        $fromConfig = $days === null;
 
-        if ($days === null) {
+        if ($fromConfig) {
             $days = LibrenmsConfig::get('applications_purge');
+        }
 
-            if (! is_numeric($days)) {
+        if (filter_var($days, FILTER_VALIDATE_INT) === false) {
+            if ($fromConfig) {
                 $this->warn(__('commands.maintenance:cleanup-applications.bad_days_setting'));
 
                 return 0;
             }
-        } elseif (! is_numeric($days)) {
+
             $this->error(__('commands.maintenance:cleanup-applications.bad_days_input'));
 
             return 1;

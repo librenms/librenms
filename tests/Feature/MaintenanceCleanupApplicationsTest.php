@@ -55,4 +55,23 @@ final class MaintenanceCleanupApplicationsTest extends InMemoryDbTestCase
 
         $this->assertFalse(Application::withTrashed()->where('app_id', $application->app_id)->exists());
     }
+
+    public function testRejectsFractionalDaysArgument(): void
+    {
+        $application = $this->makeOldTrashedApplication();
+
+        $this->artisan('maintenance:cleanup-applications', ['days' => '0.5'])->assertExitCode(1);
+
+        $this->assertTrue(Application::withTrashed()->where('app_id', $application->app_id)->exists());
+    }
+
+    public function testRejectsFractionalConfiguredDays(): void
+    {
+        $application = $this->makeOldTrashedApplication();
+        LibrenmsConfig::set('applications_purge', 0.5);
+
+        $this->artisan('maintenance:cleanup-applications')->assertExitCode(0);
+
+        $this->assertTrue(Application::withTrashed()->where('app_id', $application->app_id)->exists());
+    }
 }

@@ -21,15 +21,29 @@ class DeletedApplicationAlertsTest extends InMemoryDbTestCase
             'app_state' => 'UNKNOWN',
         ]);
         $rule = AlertRule::factory()->create([
-            'query' => 'SELECT app_id, app_type, app_state FROM applications WHERE device_id = ? AND app_state != "OK"',
+            'query' => '',
+            'builder' => [
+                'condition' => 'AND',
+                'valid' => true,
+                'rules' => [
+                    [
+                        'id' => 'applications.app_state',
+                        'field' => 'applications.app_state',
+                        'type' => 'string',
+                        'input' => 'text',
+                        'operator' => 'not_equal',
+                        'value' => 'OK',
+                    ],
+                ],
+            ],
         ]);
 
         new AlertRules($device)->run();
 
         $this->assertFaultState($device, $rule, AlertState::ACTIVE);
 
-        // GUI deletion is a soft delete, so the raw rule query still matches the row.
-        // The engine must not keep the fault alive for a deleted application.
+        // GUI deletion is a soft delete; the rule query must exclude soft-deleted
+        // applications, so the fault must not stay alive for a deleted application.
         $application->delete();
 
         new AlertRules($device)->run();
@@ -46,7 +60,21 @@ class DeletedApplicationAlertsTest extends InMemoryDbTestCase
             'app_state' => 'UNKNOWN',
         ]);
         $rule = AlertRule::factory()->create([
-            'query' => 'SELECT app_id, app_type, app_state FROM applications WHERE device_id = ? AND app_state != "OK"',
+            'query' => '',
+            'builder' => [
+                'condition' => 'AND',
+                'valid' => true,
+                'rules' => [
+                    [
+                        'id' => 'applications.app_state',
+                        'field' => 'applications.app_state',
+                        'type' => 'string',
+                        'input' => 'text',
+                        'operator' => 'not_equal',
+                        'value' => 'OK',
+                    ],
+                ],
+            ],
         ]);
 
         new AlertRules($device)->run();

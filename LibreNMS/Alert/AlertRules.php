@@ -37,7 +37,6 @@ use App\Models\Alert;
 use App\Models\AlertLog;
 use App\Models\AlertFault;
 use App\Models\AlertRule;
-use App\Models\Application;
 use App\Models\Device;
 use App\Models\Eventlog;
 use Carbon\Carbon;
@@ -131,8 +130,6 @@ readonly class AlertRules
 
             return $row;
         }, $rows);
-
-        $rows = $this->filterDeletedApplications($rows);
 
         $do_alert = ! empty($rows) !== $invert;
         $now = Carbon::now();
@@ -238,35 +235,6 @@ readonly class AlertRules
         }
 
         $this->syncAlertState($rule, logStateChange: true, entitiesReplaced: $added > 0 && $removed > 0);
-    }
-
-    /**
-     * Drop rows that reference applications which no longer exist.
-     *
-     * Rule queries are raw SQL and cannot filter on applications.deleted_at, so an
-     * application deleted after the query was generated is still returned. Without
-     * this filter the fault would keep re-triggering for a deleted application.
-     *
-     * @param  array<int, array<string, mixed>>  $rows
-     * @return array<int, array<string, mixed>>
-     */
-    private function filterDeletedApplications(array $rows): array
-    {
-        $appIds = [];
-        foreach ($rows as $row) {
-            if (isset($row['app_id']) && (int) $row['app_id'] > 0) {
-                $appIds[(int) $row['app_id']] = true;
-            }
-        }
-
-        if (empty($appIds)) {
-            return $rows;
-        }
-
-        $existing = Application::whereIn('app_id', array_keys($appIds))->pluck('app_id')->all();
-        $existingLookup = array_flip($existing);
-
-        return array_values(array_filter($rows, static fn (array $row) => ! isset($row['app_id']) || (int) $row['app_id'] <= 0 || isset($existingLookup[(int) $row['app_id']])));
     }
 
     /**

@@ -297,6 +297,12 @@ class QueryBuilderParser implements \JsonSerializable
             }
         }
 
+        // Rule queries are raw SQL and do not get Eloquent's soft-delete scope, so
+        // exclude soft-deleted applications or a deleted app keeps matching the rule.
+        if (in_array('applications', $tables, true)) {
+            $glue[] = 'applications.deleted_at IS NULL';
+        }
+
         // remove duplicates
         return array_unique($glue);
     }
