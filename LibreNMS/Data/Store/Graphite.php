@@ -88,7 +88,7 @@ class Graphite extends BaseDatastore
         }
 
         $identity = $this->canonicalMetric($meta);
-        $hostname = $identity !== null ? $identity->group() : $this->getDevice($meta)->hostname;
+        $hostname = $identity?->group() ?? $this->getDevice($meta)->hostname;
 
         // metrics will be built as prefix.hostname.measurement.field value timestamp
         // metric fields can not contain . as this is used by graphite as a field separator
