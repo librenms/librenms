@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\UncorrectableNegativeException;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
 trait HostResources
@@ -320,7 +321,7 @@ trait HostResources
     {
         $response = SnmpQuery::walk('HOST-RESOURCES-MIB::hrSWInstalledTable');
 
-        if (! $response->isValid(true)) {
+        if (! $response->isValid()) {
             return new Collection;
         }
 
@@ -338,11 +339,13 @@ trait HostResources
             return null;
         }
 
-        // snmpwalk renders names carrying non-printable characters (e.g. NUL padding) as
-        // hex, wrapped across lines, so the bytes are separated by whitespace (spaces and
-        // newlines)
-        if (preg_match('/^[0-9a-f]{2}(\s+[0-9a-f]{2})*$/i', $raw)) {
-            $raw = $this->decodeHostResourceHex($raw);
+        // snmpwalk renders names carrying non-printable characters (e.g. NUL padding) as a
+        // whitespace-separated hex byte list, wrapped across lines. Require a multi-byte list
+        // so a lone two-digit token like "bc" stays a plain name instead of one hex byte.
+        $normalized = preg_replace('/\s+/', ' ', $raw);
+
+        if (StringHelpers::isHex($normalized, ' ') && str_contains($normalized, ' ')) {
+            $raw = StringHelpers::decodeSnmpHexText($raw);
 
             if ($raw === '') {
                 return null;
@@ -501,30 +504,13 @@ trait HostResources
     }
 
     /**
-     * Decode a hex-encoded value as rendered by snmpwalk for strings with
-     * non-printable characters.
-     */
-    private function decodeHostResourceHex(string $raw): string
-    {
-        // snmpwalk wraps long values across lines, so drop all whitespace before decoding
-        $hex = preg_replace('/\s+/', '', $raw);
-
-        $decoded = '';
-        foreach (str_split($hex, 2) as $byte) {
-            $decoded .= chr((int) hexdec($byte));
-        }
-
-        return trim(str_replace("\0", '', $decoded));
-    }
-
-    /**
      * Parse a DateAndTime value into "Y-m-d H:i:s".
      * Handles the hostres rendering "2025-6-18,7:36:25.0,+2:0" and the standard
      * net-snmp rendering "+02:00 2025-06-18:07:36:25.0".
      */
     private function parseHostResourceDate(string $value): string
     {
-        if (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2}),(\d{1,2}):(\d{1,2}):(\d{1,2})\.\d+,[+-]\d{1,2}:\d{1,2}$/', $value, $matches)) {
+        if (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2}),(\d{1,2}):(\d{1,2}):(\d{1,2})\.\d+([,][+-]\d{1,2}:\d{1,2})?$/', $value, $matches)) {
             return $this->formatHostResourceDate($matches);
         }
 

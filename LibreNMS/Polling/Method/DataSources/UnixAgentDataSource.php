@@ -56,7 +56,10 @@ final readonly class UnixAgentDataSource implements MempoolsDiscovery, MempoolsP
         }
 
         $this->meminfo = $meminfo;
-        $this->packages = $this->parsePackages($agent_data);
+
+        // a timed-out fetch truncates the package list, so a partial output would delete the
+        // packages it did not reach; keep the existing set until a complete fetch succeeds
+        $this->packages = $result->stat('timed_out') ? new Collection : $this->parsePackages($agent_data);
     }
 
     /**

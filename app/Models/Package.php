@@ -180,7 +180,9 @@ class Package extends DeviceRelatedModel implements Keyable
 
     public function getCompositeKey(): string
     {
-        return "$this->manager-$this->name-$this->arch";
+        // version and build are part of the identity so simultaneously installed
+        // versions of a package are not collapsed by keyBy()/synchronization deletion
+        return "$this->manager-$this->name-$this->arch-$this->version-$this->build";
     }
 
     public function __toString(): string
