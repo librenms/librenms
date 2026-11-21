@@ -286,15 +286,24 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         $fetched_data_string .= '(Full ports polling): ';
         // For devices that are on the bad_ifXentry list, try fetching ifAlias to have nice interface descriptions.
 
-        if (! in_array(strtolower($device['hardware'] ?? ''), array_map(strtolower(...), (array) LibrenmsConfig::getOsSetting($device['os'], 'bad_ifXEntry', [])))) {
+        $bad_if_x_entry = in_array(strtolower($device['hardware'] ?? ''), array_map(strtolower(...), (array) LibrenmsConfig::getOsSetting($device['os'], 'bad_ifXEntry', [])));
+        if (! $bad_if_x_entry) {
             $port_stats = snmpwalk_cache_oid($device, 'ifXEntry', $port_stats, 'IF-MIB');
         } else {
             $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB', null, '-OQUst');
             $port_stats = snmpwalk_cache_oid($device, 'ifName', $port_stats, 'IF-MIB', null, '-OQUst');
         }
         $hc_test = array_slice($port_stats, 0, 1);
-        // If the device doesn't have ifXentry data, fetch ifEntry instead.
-        if (! is_numeric($hc_test[0]['ifHCInOctets'] ?? null) || ! is_numeric($hc_test[0]['ifHighSpeed'] ?? null)) {
+        $if_x_unavailable = ! is_numeric($hc_test[0]['ifHCInOctets'] ?? null)
+            || ! is_numeric($hc_test[0]['ifHighSpeed'] ?? null);
+        $nt24k_if_x_incomplete = is_ntron_nt24k_v223($device) && ! has_complete_if_x_entry($port_stats, $ports);
+
+        if ($bad_if_x_entry || $if_x_unavailable || $nt24k_if_x_incomplete) {
+            if (! $bad_if_x_entry && $nt24k_if_x_incomplete) {
+                // Discard partial IF-X rows before falling back for affected NT24K firmware.
+                $port_stats = [];
+            }
+
             $ifEntrySnmpFlags = ['-OQUst'];
             if ($device['os'] == 'bintec-beip-plus') {
                 $ifEntrySnmpFlags = ['-OQUst', '-Cc'];
