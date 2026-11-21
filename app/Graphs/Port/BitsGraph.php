@@ -4,6 +4,7 @@ namespace App\Graphs\Port;
 
 use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
+use App\Data\Graphing\SeriesRole;
 use App\Data\Graphing\SeriesStyle;
 use App\Data\Graphing\TrafficOptions;
 use App\Facades\LibrenmsConfig;
@@ -13,25 +14,24 @@ class BitsGraph extends PortGraph
     public function getSeries(): array
     {
         $metric = $this->port()->metricIdentity('port');
-        $stacked = LibrenmsConfig::get('webui.graph_stacked') || ($this->speedZoom() && array_filter($this->port()->getSpeeds()));
-        $alpha = $stacked ? '88' : '';
+        [$in, $out] = $this->directions('INOCTETS', 'OUTOCTETS');
 
         return [
             'in' => new DataSeries(
                 metric: $metric,
-                field: $this->params->inverse ? 'OUTOCTETS' : 'INOCTETS',
-                description: 'In',
+                field: $in,
+                description: __('graph.series.in'),
                 unit: 'bps',
                 scale: 8,
-                style: new SeriesStyle(color: '608720', fill: true, fillColor: '90B040' . $alpha, maxFillColor: 'D7FFC7' . $alpha),
+                style: new SeriesStyle(SeriesRole::In, fill: true, maxFill: true),
             ),
             'out' => new DataSeries(
                 metric: $metric,
-                field: $this->params->inverse ? 'INOCTETS' : 'OUTOCTETS',
-                description: 'Out',
+                field: $out,
+                description: __('graph.series.out'),
                 unit: 'bps',
                 scale: 8,
-                style: new SeriesStyle(color: '606090', fill: true, fillColor: '8080C0' . $alpha, maxFillColor: 'E0E0FF' . $alpha, invert: ! $stacked),
+                style: new SeriesStyle(SeriesRole::Out, fill: true, maxFill: true, invert: true),
             ),
         ];
     }

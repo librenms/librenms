@@ -104,7 +104,7 @@ abstract class AbstractGraph implements GraphInterface
             // drawing libraries and queries fail with their own exceptions, keep the details out of the image
             report($e);
 
-            $error = new GraphException('Graph Error', 'Error', $e);
+            $error = new GraphException(__('graph.errors.graph'), __('graph.errors.graph_short'), $e);
             $error->graphTitle = $title;
 
             throw $error;

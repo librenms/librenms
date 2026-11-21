@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Observers\StorageObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -102,5 +103,21 @@ class Storage extends DeviceRelatedModel implements HasSyncProtectedAttributes, 
         }
 
         return true;
+    }
+
+    /**
+     * Identity used when storing and reading a measurement of this storage
+     */
+    public function metricIdentity(string $measurement): MetricIdentity
+    {
+        return new MetricIdentity($measurement, ['hostname' => (string) $this->device?->hostname, 'type' => $this->type, 'descr' => $this->storage_descr]);
+    }
+
+    /**
+     * Only the percent used is known, the stored used and free add up to 100 times the storage units
+     */
+    public function isPercentOnly(): bool
+    {
+        return $this->storage_size == 100 * ($this->storage_units ?: 1);
     }
 }

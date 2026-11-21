@@ -2116,9 +2116,9 @@ pseudowires:
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: peer_device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: peer_ldp_id, Type: int, 'Null': false, Extra: '' }
+    - { Field: peer_ldp_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: cpwVcID, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: cpwOid, Type: int, 'Null': false, Extra: '' }
+    - { Field: cpwOid, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: pw_type, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: pw_psntype, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: pw_local_mtu, Type: int, 'Null': false, Extra: '' }

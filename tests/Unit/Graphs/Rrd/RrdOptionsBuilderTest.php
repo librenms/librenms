@@ -77,6 +77,14 @@ class RrdOptionsBuilderTest extends TestCase
         ], $this->scaleOptions($options, []));
     }
 
+    public function test_an_axis_unit_shows_plain_values_and_a_right_axis_label_mirrors_the_left_axis(): void
+    {
+        $this->assertSame([
+            '-l', '0', '--slope-mode', '--units-exponent', '0',
+            '--right-axis', '1:0', '--right-axis-label', 'Loss %', '--left-axis-format', '%lg 100%%',
+        ], $this->scaleOptions(new GraphOptions(scaleMin: 0, rightAxisLabel: 'Loss %', axisUnit: '100%'), []));
+    }
+
     public function test_it_shortens_long_titles_to_fit_the_width(): void
     {
         $options = new RrdOptionsBuilder(new GraphParameters(['width' => 400, 'title' => 'yes']))->build(str_repeat('x', 100), new GraphOptions);
