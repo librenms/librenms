@@ -220,7 +220,6 @@ export default function createChart(element, graph, { view, hidden, compact, dra
             stopPan = null;
         };
 
-        event.preventDefault();
         plot.over.style.cursor = 'grabbing';
         document.addEventListener('mousemove', move);
         document.addEventListener('mouseup', stopPan);

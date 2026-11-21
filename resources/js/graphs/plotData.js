@@ -38,15 +38,15 @@ function withFirstInterval(values) {
 
 /**
  * The values of each point of the other times, null where they have none.
- * A point is the one whose interval covers the time.
+ * A point is the one whose interval covers the time, from the point before it, the first as long as the second.
  */
 function alignedTo(timestamps, others, values) {
-    const step = others.length > 1 ? others[1] - others[0] : Infinity;
+    const interval = (index) => (index > 0 ? others[index] - others[index - 1] : (others[1] ?? Infinity) - others[0]);
 
     return timestamps.map((time) => {
         const index = firstAfter(others, time - 1);
 
-        return index < others.length && others[index] - time < step ? values[index] : null;
+        return index < others.length && others[index] - time < interval(index) ? values[index] : null;
     });
 }
 
