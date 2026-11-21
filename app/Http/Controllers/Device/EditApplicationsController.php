@@ -81,6 +81,6 @@ class EditApplicationsController
      */
     private function docsUrls(): array
     {
-        return json_decode(file_get_contents(base_path('resources/definitions/applications.json')), true) ?? [];
+        return require base_path('resources/definitions/applications.php');
     }
 }

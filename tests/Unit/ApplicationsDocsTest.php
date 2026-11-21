@@ -9,7 +9,7 @@ class ApplicationsDocsTest extends TestCase
     /** @return array<string, string> */
     private function docs(): array
     {
-        return json_decode(file_get_contents(base_path('resources/definitions/applications.json')), true) ?? [];
+        return require base_path('resources/definitions/applications.php');
     }
 
     /** @return list<string> */
@@ -22,12 +22,12 @@ class ApplicationsDocsTest extends TestCase
     {
         $docs = $this->docs();
 
-        $this->assertNotCount(0, $docs, 'resources/definitions/applications.json must not be empty');
+        $this->assertNotCount(0, $docs, 'resources/definitions/applications.php must not be empty');
 
         $types = $this->types();
 
         foreach ($docs as $type => $url) {
-            $this->assertContains($type, $types, "applications.json references unknown application type: $type");
+            $this->assertContains($type, $types, "applications.php references unknown application type: $type");
         }
     }
 
