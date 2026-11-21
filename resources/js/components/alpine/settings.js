@@ -1,5 +1,6 @@
 import debounce from "lodash/debounce";
 import isEqual from "lodash/isEqual";
+import LibreNMSClipboard from "../../clipboard.js";
 
 const clone = (value) => (value === undefined ? undefined : JSON.parse(JSON.stringify(value)));
 
@@ -74,29 +75,7 @@ export function settingsPage({ prefix, tab, section, setting, groups, settings, 
         },
 
         copySettingLink(name) {
-            const url = this.settingLink(name);
-            const copied = () => toastr.success(this.lang.copied ?? "Copied");
-            const failed = () => toastr.error(url, this.lang.copyFailed ?? "Copy failed");
-
-            // the clipboard api is only available on https
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(url).then(copied, failed);
-                return;
-            }
-
-            const textarea = document.createElement("textarea");
-            textarea.value = url;
-            textarea.setAttribute("readonly", "");
-            textarea.style.position = "fixed";
-            textarea.style.opacity = "0";
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand("copy") ? copied() : failed();
-            } catch {
-                failed();
-            }
-            textarea.remove();
+            LibreNMSClipboard.copyLink(this.settingLink(name), { copied: this.lang.copied, failed: this.lang.copyFailed });
         },
 
         changeTab(tab) {

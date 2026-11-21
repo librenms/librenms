@@ -15,11 +15,25 @@
 
         const clamp = (value, low, high) => Math.min(Math.max(value, low), high);
 
+        // What the graph does when its options are left as the graph defines: stacking of the drawn series all, none
+        // or some of them, null for a single one; the scale fit to the data, from zero or between limits.
+        function ownDrawing({ axis, series }) {
+            const drawn = series.filter((item) => ! item.legendOnly);
+            const stacked = drawn.filter((item) => item.stacked).length;
+            const fits = axis.margin > 0 && axis.min === null && axis.max === null;
+
+            return {
+                mirror: drawn.some((item) => item.invert),
+                stacking: drawn.length < 2 ? null : (stacked === drawn.length ? 'all' : (stacked === 0 ? 'none' : 'some')),
+                scale: fits ? 'fit' : ((axis.min ?? 0) === 0 && axis.max === null ? 'zero' : 'limits'),
+            };
+        }
+
         function graphDefinition({ axis, thresholds, series }) {
             return JSON.stringify([axis, thresholds, series.map(({ avg, min, max, ...definition }) => definition)]);
         }
 
-        window.Alpine.data('timeSeriesGraph', ({ src, range, options, minWidth, minHeight, maxHeight }) => {
+        window.Alpine.data('timeSeriesGraph', ({ src, range, options, columns, minWidth, minHeight, maxHeight }) => {
             // Keep the plot and its sample arrays outside Alpine reactivity.
             let createChart;
             let chart = null;
@@ -45,11 +59,14 @@
                 tooltip: null,
                 zoomed: false,
                 caption: '',
-                // which options change this graph
-                features: { mirror: false, stacking: false },
+                // what this graph draws by itself, null until loaded
+                features: null,
                 options,
                 // column and direction, null for the order of the graph
                 sort: null,
+                // the legend columns there are, in their order
+                allColumns: columns,
+                columnsMenuStyle: {},
 
                 init() {
                     this.$root.timeSeriesGraph = {
@@ -254,7 +271,7 @@
                         && graphDefinition(graph) === graphDefinition(next);
                     graph = next;
                     this.caption = graph.axis.label;
-                    this.features = { mirror: graph.series.some((series) => series.invert), stacking: graph.series.length > 1 };
+                    this.features = ownDrawing(graph);
                     if (canUpdate) {
                         chart.update(graph, earlier);
                     } else {
@@ -339,6 +356,33 @@
 
                         return descending ? -order : order;
                     });
+                },
+
+                // the legend columns keep their order, sorting by a hidden one stops
+                toggleColumn(column) {
+                    const shown = this.options.columns.includes(column)
+                        ? this.options.columns.filter((other) => other !== column)
+                        : columns.filter((other) => other === column || this.options.columns.includes(other));
+
+                    this.options.columns = shown;
+                    if (this.sort !== null && this.sort.column !== 'label' && ! shown.includes(this.sort.column)) {
+                        this.sort = null;
+                    }
+                    this.$dispatch('graph-columns-changed', { columns: shown });
+                },
+
+                // below the button, its right edges lined up
+                placeColumnsMenu() {
+                    const button = this.$refs.columnsButton.getBoundingClientRect();
+
+                    this.columnsMenuStyle = { top: `${button.bottom + 4}px`, right: `${document.documentElement.clientWidth - button.right}px` };
+                },
+
+                // it would stay put while the button moves
+                closeColumnsMenu() {
+                    if (this.$refs.columnsMenu.matches(':popover-open')) {
+                        this.$refs.columnsMenu.hidePopover();
+                    }
                 },
 
                 // labels first a to z, values first the highest, then the other way, then the order of the graph

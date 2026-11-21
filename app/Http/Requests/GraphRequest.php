@@ -44,11 +44,9 @@ class GraphRequest extends FormRequest
             'legend' => ['nullable', 'string', 'in:yes,no'],
             // yes for the previous period, day and week only for graphs drawn in the browser
             'previous' => ['nullable', 'string', 'in:yes,no,day,week'],
-            // how a graph drawn in the browser is drawn, App\Data\Graphing\GraphViewOptions
-            'range' => ['nullable', 'in:0,1'],
+            // how a graph drawn in the browser is shown, App\Data\Graphing\GraphViewOptions::ADDRESS
             'mirror' => ['nullable', 'in:0,1'],
             'stacking' => ['nullable', 'in:' . implode(',', GraphViewOptions::STACKING)],
-            'line_style' => ['nullable', 'in:' . implode(',', GraphViewOptions::LINE_STYLES)],
             'scale' => ['nullable', 'in:' . implode(',', GraphViewOptions::SCALES)],
             'trend' => ['nullable', 'in:0,1'],
             'showcommand' => ['nullable', 'string', 'in:yes,no'],

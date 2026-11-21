@@ -3,6 +3,24 @@
         const { limitRange, now, panRange, resolveRange, zoomRange, toCsv } = window.LibreNMS.Graphs;
         const SAVE_DELAY = 500;
         const COMPARE = { period: 'yes', day: 'day', week: 'week' };
+        const PREFERENCES_OPEN = 'graph-settings-preferences-open'; // remembered in this browser
+
+        // Storage can be blocked, the section is then closed.
+        function remembered(key) {
+            try {
+                return window.localStorage.getItem(key) === '1';
+            } catch {
+                return false;
+            }
+        }
+
+        function remember(key, on) {
+            try {
+                window.localStorage.setItem(key, on ? '1' : '0');
+            } catch {
+                // kept for this page only
+            }
+        }
 
         function download(blob, name) {
             const link = document.createElement('a');
@@ -11,6 +29,8 @@
             link.click();
             setTimeout(() => URL.revokeObjectURL(link.href), 0);
         }
+
+        const same = (first, second) => JSON.stringify(first) === JSON.stringify(second);
 
         // A missing value removes a parameter so shared URLs can follow the graph defaults.
         function setParam(params, key, value) {
@@ -30,9 +50,11 @@
                 // seconds up to now, null for a fixed range
                 last: range.last ?? null,
                 options: { ...options, ...view },
-                // features: the options that change the graph shown
-                state: { loading: interactive, refreshing: false, zoomed: false, features: { mirror: false, stacking: false } },
+                // features: what the graph draws by itself, null until loaded
+                state: { loading: interactive, refreshing: false, zoomed: false, features: null },
                 showHelp: false,
+                // the settings for all graphs are set once, so they start closed
+                preferencesOpen: remembered(PREFERENCES_OPEN),
                 // the picker is being set to what the graph shows
                 syncing: false,
 
@@ -55,14 +77,13 @@
                     return url.toString();
                 },
 
-                // Keep the line style explicit so even a fully default drawing can be shared.
+                // The settings of this graph, left out at their defaults. The preferences are each viewer's own.
                 updateAddress() {
                     const url = new URL(window.location.href);
-                    for (const key of config.addressKeys) {
+                    for (const key of ['mirror', 'stacking', 'scale']) {
                         const option = this.options[key];
                         const value = typeof option === 'boolean' ? Number(option) : option;
-                        const omitDefault = key !== 'line_style' && option === config.defaults[key];
-                        setParam(url.searchParams, key, omitDefault ? null : value);
+                        setParam(url.searchParams, key, option === config.viewDefaults[key] ? null : value);
                     }
                     setParam(url.searchParams, 'previous', COMPARE[this.options.compare]);
                     setParam(url.searchParams, 'trend', this.options.trend ? '1' : null);
@@ -106,8 +127,51 @@
                     this.navigate(panRange(resolveRange(range), steps));
                 },
 
+                // the settings of this graph differ from its defaults
+                viewChanged() {
+                    return Object.entries(config.viewDefaults).some(([key, value]) => this.options[key] !== value);
+                },
+
+                preferencesChanged() {
+                    return Object.entries(config.preferenceDefaults).some(([key, value]) => ! same(this.options[key], value));
+                },
+
+                // zoomed or panned, the settings of this view changed, or the graph resized
+                resettable() {
+                    return this.state.zoomed || this.viewChanged() || this.options.height !== null;
+                },
+
+                // Back to the selected time range, the settings of this graph as it defines them, and the automatic size.
+                // The size is saved like a resize, the other preferences are the viewer's taste and stay.
                 reset() {
                     this.graph()?.reset();
+                    if (this.viewChanged()) {
+                        this.setOptions(config.viewDefaults);
+                    }
+                    if (this.options.height !== null) {
+                        this.setOptions({ width: null, height: null });
+                        this.saveOptions();
+                    }
+                },
+
+                // What the graph does by itself as one of the choices, picking it is the default. null when the default is a choice of its own.
+                ownChoice(key) {
+                    const features = this.state.features ?? {};
+                    const own = key === 'stacking'
+                        ? { all: 'stack', none: 'overlay' }[features.stacking]
+                        : (features.scale === 'fit' ? 'fit' : undefined);
+
+                    return own ?? null;
+                },
+
+                isChosen(key, value) {
+                    const chosen = this.options[key] === 'graph' ? this.ownChoice(key) ?? 'graph' : this.options[key];
+
+                    return chosen === value;
+                },
+
+                choose(key, value) {
+                    this.setOption(key, value === this.ownChoice(key) ? 'graph' : value);
                 },
 
                 keydown(event) {
@@ -137,30 +201,39 @@
                         .then(() => window.location.reload());
                 },
 
-                // kept for the next graph, saved once changes pause
+                // the preferences, for all graphs, saved once changes pause
                 saveOptions() {
                     clearTimeout(saving);
                     saving = setTimeout(() => {
-                        const saved = Object.fromEntries(Object.keys(config.defaults).map((key) => [key, this.options[key]]));
-                        window.axios.post(config.preferencesUrl, { pref: config.optionsPreference, value: saved })
+                        const saved = Object.fromEntries(Object.keys(config.preferenceDefaults).map((key) => [key, this.options[key]]));
+                        const value = this.preferencesChanged() ? saved : 'default';
+                        window.axios.post(config.preferencesUrl, { pref: config.optionsPreference, value })
                             .catch((error) => toastr.error(error.response?.data?.message ?? error.message));
                     }, SAVE_DELAY);
                 },
 
-                setOption(key, value) {
-                    this.options[key] = value;
-                    this.graph()?.setOptions({ [key]: value });
+                setOptions(next) {
+                    Object.assign(this.options, next);
+                    this.graph()?.setOptions(next);
                     this.updateAddress();
-                    if (key in config.defaults) {
+                },
+
+                setOption(key, value) {
+                    this.setOptions({ [key]: value });
+                    if (key in config.preferenceDefaults) {
                         this.saveOptions();
                     }
                 },
 
-                toggleColumn(column) {
-                    const columns = this.options.columns.includes(column)
-                        ? this.options.columns.filter((other) => other !== column)
-                        : config.columns.filter((other) => other === column || this.options.columns.includes(other));
-                    this.setOption('columns', columns);
+                togglePreferences() {
+                    this.preferencesOpen = ! this.preferencesOpen;
+                    remember(PREFERENCES_OPEN, this.preferencesOpen);
+                },
+
+                // chosen in the legend
+                columnsChanged({ columns }) {
+                    this.options.columns = columns;
+                    this.saveOptions();
                 },
 
                 resized({ width, height }) {
@@ -169,9 +242,9 @@
                     this.saveOptions();
                 },
 
-                autoSize() {
-                    this.graph()?.setOptions({ width: null, height: null });
-                    this.resized({ width: null, height: null });
+                // as shown: the address follows the range and the settings of this view
+                copyLink() {
+                    LibreNMS.Clipboard.copyLink(window.location.href, config.lang);
                 },
 
                 async exportImage() {

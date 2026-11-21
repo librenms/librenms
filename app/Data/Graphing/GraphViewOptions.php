@@ -3,7 +3,8 @@
 namespace App\Data\Graphing;
 
 /**
- * How a user likes graphs drawn in the browser, kept as a user preference.
+ * How graphs drawn in the browser are drawn. The preferences are the viewer's taste and saved for all of their graphs,
+ * the rest is how one graph is being looked at and kept in its address only.
  */
 readonly class GraphViewOptions
 {
@@ -15,18 +16,20 @@ readonly class GraphViewOptions
     public const int MIN_HEIGHT = 120;
     public const int MAX_HEIGHT = 2000;
     public const float MIN_WIDTH = 0.2;
-    /** shared in the address of a graph */
-    public const array ADDRESS = ['range', 'mirror', 'stacking', 'scale', 'line_style'];
+    /** of one graph, shared in its address and never saved */
+    public const array ADDRESS = ['mirror', 'stacking', 'scale'];
+    /** saved for all the graphs of a user */
+    public const array PREFERENCES = ['range', 'line_style', 'columns', 'width', 'height'];
 
     /**
      * @param  bool  $range  shade between the min and max of each line
      * @param  bool  $mirror  draw inverted series below the axis, as the graph defines
      * @param  string  $stacking  graph: as the graph defines, stack: everything on a side of the axis, overlay: nothing
      * @param  string  $scale  graph: as the graph defines, fit: to the data, log: logarithmic
-     * @param  string  $line_style  how adjacent samples are connected
      * @param  list<string>  $columns  legend columns
      * @param  ?float  $width  of the space for the graph, null to fill it
      * @param  ?int  $height  in pixels, null to follow the width
+     * @param  string  $line_style  how adjacent samples are connected
      */
     public function __construct(
         public bool $range = true,
@@ -41,7 +44,7 @@ readonly class GraphViewOptions
     }
 
     /**
-     * Unknown or missing values are the defaults.
+     * The saved preferences, unknown or missing values are the defaults. What only the address holds is the default.
      */
     public static function fromPreference(mixed $value): self
     {
@@ -58,9 +61,6 @@ readonly class GraphViewOptions
 
         return new self(
             range: is_bool($value['range'] ?? null) ? $value['range'] : true,
-            mirror: is_bool($value['mirror'] ?? null) ? $value['mirror'] : true,
-            stacking: in_array($value['stacking'] ?? null, self::STACKING, true) ? $value['stacking'] : 'graph',
-            scale: in_array($value['scale'] ?? null, self::SCALES, true) ? $value['scale'] : 'graph',
             line_style: in_array($value['line_style'] ?? null, self::LINE_STYLES, true) ? $value['line_style'] : 'stepped',
             columns: $columns,
             width: $sized && $width !== null ? max(self::MIN_WIDTH, min($width, 1.0)) : null,
@@ -69,29 +69,38 @@ readonly class GraphViewOptions
     }
 
     /**
-     * The drawing options in an address describe the whole drawing, so a shared address looks the same to everyone:
-     * what it leaves out is the default, not the viewer's preference. The legend and size stay the viewer's.
+     * How the address shows this graph, so a shared address looks the same to everyone. What it leaves out is the default.
      *
      * @param  array<string, mixed>  $query
      */
     public function withAddress(array $query): self
     {
-        if (array_intersect_key($query, array_flip(self::ADDRESS)) === []) {
-            return $this;
-        }
+        return new self(
+            range: $this->range,
+            mirror: ! in_array($query['mirror'] ?? '1', ['0', 'no', 'false'], true),
+            stacking: in_array($query['stacking'] ?? null, self::STACKING, true) ? $query['stacking'] : 'graph',
+            scale: in_array($query['scale'] ?? null, self::SCALES, true) ? $query['scale'] : 'graph',
+            columns: $this->columns,
+            width: $this->width,
+            height: $this->height,
+            line_style: $this->line_style,
+        );
+    }
 
-        $flag = fn (string $key): bool => ! in_array($query[$key] ?? '1', ['0', 'no', 'false'], true);
+    /**
+     * @return array<string, mixed> the options of one graph as they are when its address has none
+     */
+    public static function addressDefaults(): array
+    {
+        return array_intersect_key(get_object_vars(new self), array_flip(self::ADDRESS));
+    }
 
-        return self::fromPreference([
-            'range' => $flag('range'),
-            'mirror' => $flag('mirror'),
-            'stacking' => $query['stacking'] ?? null,
-            'scale' => $query['scale'] ?? null,
-            'line_style' => $query['line_style'] ?? null,
-            'columns' => $this->columns,
-            'width' => $this->width,
-            'height' => $this->height,
-        ]);
+    /**
+     * @return array<string, mixed> the preferences of a user who saved none
+     */
+    public static function preferenceDefaults(): array
+    {
+        return array_intersect_key(get_object_vars(new self), array_flip(self::PREFERENCES));
     }
 
     /**
@@ -103,10 +112,7 @@ readonly class GraphViewOptions
     {
         return [
             "$prefix.range" => 'sometimes|boolean',
-            "$prefix.mirror" => 'sometimes|boolean',
-            "$prefix.stacking" => 'sometimes|in:' . implode(',', self::STACKING),
             "$prefix.line_style" => 'sometimes|in:' . implode(',', self::LINE_STYLES),
-            "$prefix.scale" => 'sometimes|in:' . implode(',', self::SCALES),
             "$prefix.columns" => 'sometimes|array',
             "$prefix.columns.*" => 'in:' . implode(',', self::COLUMNS),
             "$prefix.width" => 'nullable|numeric|between:' . self::MIN_WIDTH . ',1',

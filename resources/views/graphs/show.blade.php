@@ -12,6 +12,7 @@
      @if ($drawInBrowser)
          x-on:graph-range-changed="rangeChanged($event.detail)" x-on:date-range-changed="picked($event.detail)"
          x-on:graph-state-changed="state = $event.detail" x-on:graph-resized="resized($event.detail)"
+         x-on:graph-columns-changed="columnsChanged($event.detail)"
      @endif>
 <div class="row">
 <div class="col-md-12">

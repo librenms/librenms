@@ -10,7 +10,10 @@
     view: compare with an earlier time (period, day or week, null for none), and trend lines.
     Use it with $el.timeSeriesGraph: setRange(range), refresh(), zoom(steps), pan(steps), reset(), setOptions(options),
     image() for a PNG Blob and csv() for the data shown.
+    The legend columns are chosen from the legend, which dispatches graph-columns-changed with {columns}.
     Dispatches graph-range-changed with what is shown, graph-state-changed with {loading, refreshing, zoomed, features},
+    features is what the graph draws by itself: {mirror: has inverted series, stacking: all, none or some stacked, null for one series,
+    scale: fit, zero or limits}, null until loaded.
     and graph-resized with {width, height} once dragged, nulls when back to the automatic size.
 --}}
 @php
@@ -19,6 +22,7 @@
         'src' => $src,
         'range' => $range,
         'options' => [...get_object_vars($options), ...$view],
+        'columns' => App\Data\Graphing\GraphViewOptions::COLUMNS,
         'minWidth' => App\Data\Graphing\GraphViewOptions::MIN_WIDTH,
         'minHeight' => App\Data\Graphing\GraphViewOptions::MIN_HEIGHT,
         'maxHeight' => App\Data\Graphing\GraphViewOptions::MAX_HEIGHT,
@@ -84,6 +88,27 @@
                             </button>
                         </th>
                     </template>
+                    <th class="tw:w-6 tw:pl-1">
+                        {{-- a popover is not clipped by the scrolling legend --}}
+                        <button type="button" x-ref="columnsButton" popovertarget="graph-legend-columns-{{ $attributes->get('id', 'graph') }}"
+                                title="{{ __('graph.options.columns') }}" aria-label="{{ __('graph.options.columns') }}"
+                                class="tw:inline-flex tw:items-center tw:justify-center tw:w-6 tw:h-6 tw:p-0 tw:rounded tw:border-0 tw:bg-transparent tw:text-gray-500 tw:dark:text-gray-400 tw:hover:bg-gray-100 tw:dark:hover:bg-dark-gray-300">
+                            <i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i>
+                        </button>
+                        <div popover id="graph-legend-columns-{{ $attributes->get('id', 'graph') }}" x-ref="columnsMenu" role="menu"
+                             x-on:beforetoggle="$event.newState === 'open' && placeColumnsMenu()" x-on:scroll.window="closeColumnsMenu()"
+                             :style="columnsMenuStyle"
+                             class="tw:m-0 tw:inset-auto tw:px-0 tw:py-1 tw:rounded-md tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:bg-white tw:dark:bg-dark-gray-400 tw:shadow-lg tw:text-left tw:font-normal tw:text-sm tw:text-gray-700 tw:dark:text-gray-200">
+                            <div class="tw:px-3 tw:pt-1 tw:pb-1.5 tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('graph.options.columns') }}</div>
+                            <template x-for="column in allColumns" :key="column">
+                                <button type="button" role="menuitemcheckbox" :aria-checked="options.columns.includes(column)" x-on:click="toggleColumn(column)"
+                                        class="tw:flex tw:w-full tw:items-center tw:gap-2 tw:px-3 tw:py-1.5 tw:border-0 tw:bg-transparent tw:hover:bg-gray-100 tw:dark:hover:bg-dark-gray-300 tw:whitespace-nowrap">
+                                    <i class="fa-solid fa-check tw:w-4" :class="! options.columns.includes(column) && 'tw:invisible'" aria-hidden="true"></i>
+                                    <span x-text="@js($columns)[column]"></span>
+                                </button>
+                            </template>
+                        </div>
+                    </th>
                 </tr>
             </thead>
             <tbody>
