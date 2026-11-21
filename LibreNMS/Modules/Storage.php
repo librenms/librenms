@@ -33,7 +33,7 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\UncorrectableNegativeException;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\StoragePolling;
 use LibreNMS\OS;
@@ -73,7 +73,7 @@ class Storage implements Module
     /**
      * @inheritDoc
      */
-    public function poll(OS $os, DataStorageInterface $datastore): void
+    public function poll(OS $os, WriteInterface $datastore): void
     {
         $storages = $os->getDevice()->storage;
 
@@ -94,16 +94,15 @@ class Storage implements Module
         foreach ($storages as $storage) {
             $this->printStorage($storage);
 
-            $datastore->put($os->getDeviceArray(), 'storage', [
-                'type' => $storage->type,
-                'descr' => $storage->storage_descr,
-                'rrd_name' => ['storage', $storage->type, $storage->storage_descr],
+            $metric = $storage->setRelation('device', $os->getDevice())->metricIdentity('storage');
+            $datastore->write($metric->measurement, [
+                'used' => $storage->storage_used,
+                'free' => $storage->storage_free,
+            ], $metric->tags, [
+                'metric' => $metric,
                 'rrd_def' => RrdDefinition::make()
                     ->addDataset('used', 'GAUGE', 0)
                     ->addDataset('free', 'GAUGE', 0),
-            ], [
-                'used' => $storage->storage_used,
-                'free' => $storage->storage_free,
             ]);
         }
     }
