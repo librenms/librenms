@@ -8,6 +8,7 @@ use App\Models\Port;
 class DhcpStats extends ApplicationDefinition
 {
     public const string TYPE = 'dhcp-stats';
+    protected const ?string DOCS = 'ISC DHCP Stats';
     protected const ?string NAME = 'DHCP Stats';
 
     protected const array GRAPHS = [

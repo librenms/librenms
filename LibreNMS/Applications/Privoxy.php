@@ -7,6 +7,7 @@ use App\Models\Application;
 class Privoxy extends ApplicationDefinition
 {
     public const string TYPE = 'privoxy';
+    protected const ?string DOCS = 'Privoxy';
 
     protected const ?array OVERVIEW = [
         'client_requests',

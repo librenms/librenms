@@ -5,6 +5,7 @@ namespace LibreNMS\Applications;
 class SuricataExtract extends ApplicationDefinition
 {
     public const string TYPE = 'suricata_extract';
+    protected const ?string DOCS = 'Suricata Extract';
 
     protected const ?array OVERVIEW = [
         'errors',

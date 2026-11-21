@@ -7,6 +7,7 @@ use App\Models\Application;
 class Chronyd extends ApplicationDefinition
 {
     public const string TYPE = 'chronyd';
+    protected const ?string DOCS = 'Chronyd';
 
     protected const ?array OVERVIEW = [
         'time',

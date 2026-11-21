@@ -7,6 +7,7 @@ use App\Models\Application;
 class Mdadm extends ApplicationDefinition
 {
     public const string TYPE = 'mdadm';
+    protected const ?string DOCS = 'Mdadm';
 
     protected const array GRAPHS = [
         'level' => 'RAID level',

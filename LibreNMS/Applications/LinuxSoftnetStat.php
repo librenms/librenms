@@ -7,6 +7,7 @@ use App\Models\Application;
 class LinuxSoftnetStat extends ApplicationDefinition
 {
     public const string TYPE = 'linux_softnet_stat';
+    protected const ?string DOCS = 'Linux Softnet Stat';
 
     protected const array GRAPHS = [
         'packets' => 'Packets Per Second',

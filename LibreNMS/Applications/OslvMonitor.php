@@ -11,6 +11,7 @@ use App\Models\Port;
 class OslvMonitor extends ApplicationDefinition
 {
     public const string TYPE = 'oslv_monitor';
+    protected const ?string DOCS = 'OS Level Virtualization Monitoring';
     protected const ?string NAME = 'OS Level Virtualization';
 
     protected const ?array OVERVIEW = [

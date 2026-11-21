@@ -5,6 +5,7 @@ namespace LibreNMS\Applications;
 class Powerdns extends ApplicationDefinition
 {
     public const string TYPE = 'powerdns';
+    protected const ?string DOCS = 'PowerDNS';
     protected const ?string NAME = 'PowerDNS';
 
     protected const array GRAPHS = [

@@ -7,6 +7,7 @@ use App\Models\Application;
 class Nextcloud extends ApplicationDefinition
 {
     public const string TYPE = 'nextcloud';
+    protected const ?string DOCS = 'Nextcloud';
 
     protected const ?array OVERVIEW = [
         'used',

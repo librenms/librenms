@@ -7,6 +7,7 @@ use App\Models\Application;
 class Sneck extends ApplicationDefinition
 {
     public const string TYPE = 'sneck';
+    protected const ?string DOCS = 'Sneck';
 
     protected const ?array OVERVIEW = [
         'results',

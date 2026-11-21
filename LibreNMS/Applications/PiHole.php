@@ -19,6 +19,7 @@ namespace LibreNMS\Applications;
 class PiHole extends ApplicationDefinition
 {
     public const string TYPE = 'pi-hole';
+    protected const ?string DOCS = 'Pi-hole';
     protected const ?string NAME = 'Pi-hole';
 
     protected const array GRAPHS = [

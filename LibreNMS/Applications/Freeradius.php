@@ -5,6 +5,7 @@ namespace LibreNMS\Applications;
 class Freeradius extends ApplicationDefinition
 {
     public const string TYPE = 'freeradius';
+    protected const ?string DOCS = 'FreeRADIUS';
     protected const ?string NAME = 'FreeRADIUS';
 
     protected const array GRAPHS = [

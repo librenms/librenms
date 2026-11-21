@@ -7,6 +7,7 @@ use App\Models\Application;
 class Systemd extends ApplicationDefinition
 {
     public const string TYPE = 'systemd';
+    protected const ?string DOCS = 'Systemd';
 
     protected const ?array OVERVIEW = [
         'all',

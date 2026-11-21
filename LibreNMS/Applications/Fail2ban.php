@@ -7,6 +7,7 @@ use App\Models\Application;
 class Fail2ban extends ApplicationDefinition
 {
     public const string TYPE = 'fail2ban';
+    protected const ?string DOCS = 'Fail2ban';
 
     protected const array GRAPHS = [
         'banned' => 'Total Banned',

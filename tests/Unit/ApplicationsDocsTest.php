@@ -2,39 +2,32 @@
 
 namespace LibreNMS\Tests\Unit;
 
+use LibreNMS\Applications\ApplicationDefinition;
 use LibreNMS\Tests\TestCase;
 
 class ApplicationsDocsTest extends TestCase
 {
-    /** @return array<string, string> */
-    private function docs(): array
-    {
-        return require base_path('resources/definitions/applications.php');
-    }
-
     /** @return list<string> */
     private function types(): array
     {
         return array_map(fn (string $file) => basename($file, '.inc.php'), glob(base_path('includes/polling/applications/*.inc.php')) ?: []);
     }
 
-    public function testDocsMapOnlyReferencesExistingApplicationTypes(): void
+    public function testDocUrlsUseTheApplicationsDocsBase(): void
     {
-        $docs = $this->docs();
+        $withDocs = 0;
 
-        $this->assertNotCount(0, $docs, 'resources/definitions/applications.php must not be empty');
+        foreach ($this->types() as $type) {
+            $url = ApplicationDefinition::forType($type)->docsUrl();
 
-        $types = $this->types();
+            if ($url === null) {
+                continue;
+            }
 
-        foreach ($docs as $type => $url) {
-            $this->assertContains($type, $types, "applications.php references unknown application type: $type");
-        }
-    }
-
-    public function testDocsUrlsUseTheApplicationsDocsBase(): void
-    {
-        foreach ($this->docs() as $type => $url) {
+            $withDocs++;
             $this->assertMatchesRegularExpression('#^https://docs\.librenms\.org/Extensions/Applications/.+/$#', $url, "Invalid docs URL for $type: $url");
         }
+
+        $this->assertGreaterThanOrEqual(80, $withDocs, 'Expected the application docs coverage to remain substantial');
     }
 }

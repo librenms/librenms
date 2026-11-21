@@ -23,18 +23,21 @@ class EditApplicationsController
 
         $enabled = $device->applications()->pluck('discovered', 'app_type');
         $autoDiscovery = $device->getAttrib('poll_applications') || LibrenmsConfig::getOsSetting($device->os, 'poller_modules.applications');
-        $docs = $this->docsUrls();
 
         return view('device.edit.apps', [
             'device' => $device,
             'canUpdate' => auth()->user()->can('update', Application::class),
-            'applications' => collect($this->types())->map(fn (string $type) => [
-                'type' => $type,
-                'name' => ApplicationDefinition::forType($type)->displayName(),
-                'enabled' => $enabled->has($type),
-                'discovered' => $autoDiscovery && $enabled->get($type),
-                'docs' => $docs[$type] ?? null,
-            ])->all(),
+            'applications' => collect($this->types())->map(function (string $type) use ($enabled, $autoDiscovery) {
+                $definition = ApplicationDefinition::forType($type);
+
+                return [
+                    'type' => $type,
+                    'name' => $definition->displayName(),
+                    'enabled' => $enabled->has($type),
+                    'discovered' => $autoDiscovery && $enabled->get($type),
+                    'docs' => $definition->docsUrl(),
+                ];
+            })->all(),
         ]);
     }
 
@@ -72,15 +75,5 @@ class EditApplicationsController
     private function types(): array
     {
         return array_map(fn ($file) => basename($file, '.inc.php'), glob(base_path('includes/polling/applications/*.inc.php')) ?: []);
-    }
-
-    /**
-     * Documentation URLs for application types
-     *
-     * @return array<string, string>
-     */
-    private function docsUrls(): array
-    {
-        return require base_path('resources/definitions/applications.php');
     }
 }

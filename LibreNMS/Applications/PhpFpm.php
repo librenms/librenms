@@ -7,6 +7,7 @@ use App\Models\Application;
 class PhpFpm extends ApplicationDefinition
 {
     public const string TYPE = 'php-fpm';
+    protected const ?string DOCS = 'PHP-FPM';
     protected const ?string NAME = 'PHP-FPM';
 
     protected const ?array OVERVIEW = [

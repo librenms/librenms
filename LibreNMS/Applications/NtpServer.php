@@ -5,6 +5,7 @@ namespace LibreNMS\Applications;
 class NtpServer extends ApplicationDefinition
 {
     public const string TYPE = 'ntp-server';
+    protected const ?string DOCS = 'NTP Server';
     protected const ?string NAME = 'NTP Server';
 
     protected const ?array OVERVIEW = [

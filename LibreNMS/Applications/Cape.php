@@ -7,6 +7,7 @@ use App\Models\Application;
 class Cape extends ApplicationDefinition
 {
     public const string TYPE = 'cape';
+    protected const ?string DOCS = 'C.H.I.P';
     protected const ?string NAME = 'CAPEv2';
 
     protected const ?array OVERVIEW = [

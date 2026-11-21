@@ -7,6 +7,7 @@ use App\Models\Application;
 class MojoCapeSubmit extends ApplicationDefinition
 {
     public const string TYPE = 'mojo_cape_submit';
+    protected const ?string DOCS = 'Mojo CAPE Submit';
     protected const ?string NAME = 'Mojo CAPE Submit';
 
     protected const ?array OVERVIEW = [

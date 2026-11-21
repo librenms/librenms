@@ -5,6 +5,7 @@ namespace LibreNMS\Applications;
 class Redis extends ApplicationDefinition
 {
     public const string TYPE = 'redis';
+    protected const ?string DOCS = 'Redis';
 
     protected const ?array OVERVIEW = [
         'clients',

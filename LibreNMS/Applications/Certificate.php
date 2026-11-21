@@ -7,6 +7,7 @@ use App\Models\Application;
 class Certificate extends ApplicationDefinition
 {
     public const string TYPE = 'certificate';
+    protected const ?string DOCS = 'Certificate';
 
     protected const array GRAPHS = [
         'age' => 'Age',

@@ -7,6 +7,7 @@ use App\Models\Application;
 class Portactivity extends ApplicationDefinition
 {
     public const string TYPE = 'portactivity';
+    protected const ?string DOCS = 'Portactivity';
 
     protected const ?array OVERVIEW = ['ports'];
 

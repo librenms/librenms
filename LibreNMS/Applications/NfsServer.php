@@ -22,6 +22,7 @@ use App\Models\Application;
 class NfsServer extends ApplicationDefinition
 {
     public const string TYPE = 'nfs-server';
+    protected const ?string DOCS = 'NFS Linux Server';
     protected const ?string NAME = 'NFS Server';
 
     protected const ?array OVERVIEW = [

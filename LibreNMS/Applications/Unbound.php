@@ -5,6 +5,7 @@ namespace LibreNMS\Applications;
 class Unbound extends ApplicationDefinition
 {
     public const string TYPE = 'unbound';
+    protected const ?string DOCS = 'Unbound';
 
     protected const ?array OVERVIEW = [
         'queries',

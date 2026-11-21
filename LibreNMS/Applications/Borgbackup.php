@@ -7,6 +7,7 @@ use App\Models\Application;
 class Borgbackup extends ApplicationDefinition
 {
     public const string TYPE = 'borgbackup';
+    protected const ?string DOCS = 'BorgBackup';
 
     protected const array GRAPHS = [
         'unique_csize' => 'Deduplicated Size',
