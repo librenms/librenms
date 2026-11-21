@@ -81,8 +81,7 @@ class Graph
      */
     public static function errorImage(GraphParameters $params, GraphException $e): GraphImage
     {
-        $style = $params->style ?: session('applied_site_style');
-        $foreground = $style === 'dark' ? [255, 255, 255] : [0, 0, 0];
+        $foreground = $params->isDark() ? [255, 255, 255] : [0, 0, 0];
         $color = $e instanceof NoGraphData ? $foreground : [128, 0, 0];
         $title = $params->visible('title') ? ($params->user_title ?? $e->graphTitle) : null;
 

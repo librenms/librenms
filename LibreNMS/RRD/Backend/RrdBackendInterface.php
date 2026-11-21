@@ -109,6 +109,16 @@ interface RrdBackendInterface
     public function graph(array $options, ?string $timezone = null): string;
 
     /**
+     * Export the values a graph would draw
+     *
+     * @param  string[]  $options  rrdtool xport options, each XPORT needs a unique legend
+     * @return array<string, array<int, float|null>> the values by legend and unix time, null where there is no data
+     *
+     * @throws RrdException
+     */
+    public function xport(array $options): array;
+
+    /**
      * Whether rrdcached is on another host, so the files may not be local.
      * librrd treats unix: and bare paths as unix sockets and resolves file names locally for them.
      */

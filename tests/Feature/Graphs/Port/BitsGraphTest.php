@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Tests\Feature\Graphs\Port;
 
+use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
 use App\Facades\LibrenmsConfig;
 use App\Graphs\GraphAccess;
@@ -40,6 +41,14 @@ class BitsGraphTest extends TestCase
     private function graph(array $params = []): BitsGraph
     {
         return new BitsGraph(new GraphParameters(['type' => 'port_bits', 'id' => $this->port->port_id, ...$params]));
+    }
+
+    /** @param array<string, mixed> $params */
+    private function graphOptions(array $params = []): GraphOptions
+    {
+        $graph = $this->graph($params);
+
+        return (fn (): GraphOptions => $this->options())->call($graph);
     }
 
     /** @param array<string, mixed> $params */
@@ -94,12 +103,12 @@ class BitsGraphTest extends TestCase
 
         $this->assertStringContainsString('VDEF:ds0pct=ds0,99,PERCENT', $command);
         $this->assertStringContainsString('CDEF:ds1pctdrawn=ds1,POP,ds1pct,-1,*', $command);
-        $this->assertStringContainsString('HRULE:ds1pctline#aa0000', $command);
+        $this->assertStringContainsString('HRULE:ds1pctline#AA0000', $command);
         $this->assertStringContainsString('CDEF:ds0bytes=ds0,0.125,*', $command);
         $this->assertStringContainsString('VDEF:ds0total=ds0bytes,TOTAL', $command);
         $this->assertStringContainsString('GPRINT:trafficbytes:Total %6.2lf%sB', $command);
         $this->assertStringContainsString('VDEF:trafficpct=traffichigh,99,PERCENT', $command);
-        $this->assertStringContainsString('HRULE:1000000000#000000:Port Speed 1 Gbps', $command);
+        $this->assertStringNotContainsString('Port Speed', $command, 'shown when zoomed to it');
     }
 
     public function test_previous_period_is_shifted_scaled_and_summarized(): void
@@ -116,14 +125,18 @@ class BitsGraphTest extends TestCase
     public function test_stacking_and_speed_zoom_draw_both_directions_above_zero(): void
     {
         LibrenmsConfig::set('webui.graph_stacked', true);
-        $this->assertFalse($this->graph()->getSeries()['out']->style->invert);
+        $stacked = $this->command();
+        $this->assertStringNotContainsString('CDEF:ds1drawn=', $stacked);
+        $this->assertStringContainsString('AREA:ds1#8080C088', $stacked);
         LibrenmsConfig::set('webui.graph_stacked', false);
 
         $command = $this->command(['port_speed_zoom' => true]);
 
         $this->assertStringNotContainsString('CDEF:ds1drawn=', $command);
         $this->assertStringContainsString('AREA:ds1#8080C088', $command);
-        $this->assertStringContainsString('LINE2:1000000000#000000:Port Speed', $command);
+        $this->assertStringContainsString('LINE1.5:1000000000#000000:Port Speed 1 Gbps\\l:dashes', $command);
+        $this->assertStringNotContainsString('LINE1.5:-1000000000', $command, 'one line when in and out overlap');
+        $this->assertStringContainsString('LINE:1050000000#00000000', $command, 'the axis reaches past the port speed');
     }
 
     public function test_future_ranges_include_linear_prediction(): void
@@ -137,13 +150,35 @@ class BitsGraphTest extends TestCase
     public function test_asymmetric_circuit_speeds_follow_inverse_mode(): void
     {
         $this->port->update(['port_descr_speed' => '100M/20M']);
-        $command = $this->command();
+        $command = $this->command(['port_speed_zoom' => true]);
 
-        $this->assertStringContainsString('HRULE:20000000#000000:In Port Speed', $command);
-        $this->assertStringContainsString('HRULE:-100000000#000000:Out Port Speed', $command);
-        $inverse = $this->command(['inverse' => true]);
-        $this->assertStringContainsString('HRULE:100000000#000000:In Port Speed', $inverse);
-        $this->assertStringContainsString('HRULE:-20000000#000000:Out Port Speed', $inverse);
+        $this->assertStringContainsString('LINE1.5:20000000#000000:In Port Speed 20 Mbps:dashes', $command);
+        $this->assertStringContainsString('LINE1.5:100000000#000000:Out Port Speed 100 Mbps\\l:dashes', $command);
+        $inverse = $this->command(['inverse' => true, 'port_speed_zoom' => true]);
+        $this->assertStringContainsString('LINE1.5:100000000#000000:In Port Speed', $inverse);
+        $this->assertStringContainsString('LINE1.5:20000000#000000:Out Port Speed', $inverse);
+    }
+
+    public function test_port_speeds_are_thresholds_shown_when_zoomed_to_them(): void
+    {
+        $this->port->update(['port_descr_speed' => '100M/20M']);
+
+        $hidden = $this->graphOptions()->thresholds;
+        $this->assertSame([20000000.0, 100000000.0], array_map(fn ($threshold) => $threshold->value, $hidden));
+        $this->assertSame([false, false], array_map(fn ($threshold) => $threshold->shown, $hidden));
+        $this->assertSame([false, true], array_map(fn ($threshold) => $threshold->invert, $hidden), 'the out speed is a limit of the inverted series');
+
+        LibrenmsConfig::set('graphs.port_speed_zoom', true);
+        $this->assertSame([true, true], array_map(fn ($threshold) => $threshold->shown, $this->graphOptions()->thresholds));
+    }
+
+    public function test_one_port_speed_is_a_mirrored_threshold(): void
+    {
+        $thresholds = $this->graphOptions()->thresholds;
+
+        $this->assertCount(1, $thresholds);
+        $this->assertSame(1000000000.0, $thresholds[0]->value);
+        $this->assertTrue($thresholds[0]->mirror, 'a limit of both directions');
     }
 
     public function test_request_can_disable_configured_speed_zoom(): void
@@ -152,7 +187,7 @@ class BitsGraphTest extends TestCase
         $command = $this->command(['port_speed_zoom' => false, 'nototal' => true]);
 
         $this->assertStringContainsString('CDEF:ds1drawn=ds1,-1,*', $command);
-        $this->assertStringContainsString('HRULE:1000000000#000000:Port Speed', $command);
+        $this->assertStringNotContainsString('Port Speed', $command);
         $this->assertStringNotContainsString('GPRINT:trafficbytes:', $command);
     }
 

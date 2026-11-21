@@ -3,13 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\GraphViewOptions;
 use App\Facades\LibrenmsConfig;
+use App\Graphs\AbstractSeriesGraph;
 use App\Graphs\GraphFactory;
 use App\Http\Requests\GraphRequest;
 use App\Models\Device;
 use App\Models\Port;
+use App\Models\UserPref;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use LibreNMS\Applications\ApplicationDefinition;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\StringHelpers;
@@ -17,6 +21,14 @@ use LibreNMS\Util\Time;
 
 class GraphsPageController extends Controller
 {
+    /** js draws in the browser, anything else is an image */
+    private const string RENDERER_PREFERENCE = 'graph_renderer';
+    private const string OPTIONS_PREFERENCE = 'graph_options';
+    /** the previous parameter: what the graph drawn in the browser compares with */
+    private const array COMPARE = ['yes' => 'period', 'day' => 'day', 'week' => 'week'];
+    /** how a graph drawn in the browser is viewed, not what it shows */
+    private const array VIEW_PARAMETERS = [...GraphViewOptions::ADDRESS, 'previous', 'trend'];
+
     public function __invoke(GraphRequest $request): View
     {
         $params = $request->graphParams();
@@ -24,8 +36,10 @@ class GraphsPageController extends Controller
         $device = $context->device;
         $port = $context->port;
         $fullType = "{$params->type}_$params->subtype";
-        $showCommand = $request->input('showcommand') === 'yes';
-        $isDynamicGraph = LibrenmsConfig::get('webui.dynamic_graphs', false) === true;
+        $canDrawInBrowser = $request->graph() instanceof AbstractSeriesGraph;
+        $drawInBrowser = $canDrawInBrowser && UserPref::getPref($request->user(), self::RENDERER_PREFERENCE) === 'js';
+        $showCommand = ! $drawInBrowser && $request->input('showcommand') === 'yes';
+        $isDynamicGraph = ! $drawInBrowser && LibrenmsConfig::get('webui.dynamic_graphs', false) === true;
 
         $this->handleWidescreenPreference($request);
 
@@ -33,21 +47,42 @@ class GraphsPageController extends Controller
 
         [$subtypeOptions, $subtypeSelected] = $this->subtypeNavigationOptions($request);
 
-        ['width' => $graphWidth, 'height' => $graphHeight, 'thumbWidth' => $thumbWidth] = $this->graphDimensions($request);
-        $width = $graphWidth;
-        $height = $graphHeight;
+        ['width' => $width, 'height' => $height, 'thumbWidth' => $thumbWidth] = $this->graphDimensions($request);
         $mainGraphVars = $request->toVars(['height' => $height, 'width' => $width]);
+        $entityTitle = $this->entityTitle($device, $port);
+        $dataUrl = $canDrawInBrowser
+            ? route('graph.data', $request->toVars(array_fill_keys(['width', 'height', 'from', 'to', ...self::VIEW_PARAMETERS], null)))
+            : null;
 
         return view('graphs.show', [
             'device' => $device,
             'port' => $port,
             'subtitle' => $subtitle,
-            'pageTitle' => $this->entityTitle($device, $port) . $subtitle,
+            'pageTitle' => $entityTitle . $subtitle,
             'subtypeOptions' => $subtypeOptions,
             'subtypeSelected' => $subtypeSelected,
             'periodThumbs' => $this->periodThumbnails($request, $thumbWidth),
-            'toggles' => $this->controlToggles($request, $fullType, $showCommand),
-            'trendHint' => $fullType === 'port_bits' || str_contains($fullType, 'sensor_'),
+            'imageOptions' => $drawInBrowser ? [] : $this->imageOptions($request, $fullType, $showCommand),
+            'trendHint' => ! $drawInBrowser && ($fullType === 'port_bits' || str_contains($fullType, 'sensor_')),
+            'canDrawInBrowser' => $canDrawInBrowser,
+            'drawInBrowser' => $drawInBrowser,
+            'graphPage' => [
+                'interactive' => $drawInBrowser,
+                'range' => $params->ends_now ? ['last' => $params->period] : ['from' => $params->from, 'to' => $params->to],
+                'options' => GraphViewOptions::fromPreference(UserPref::getPref($request->user(), self::OPTIONS_PREFERENCE))->withAddress($request->query()),
+                'view' => [
+                    'compare' => self::COMPARE[$request->input('previous')] ?? null,
+                    'trend' => $request->boolean('trend'),
+                ],
+                'fileName' => Str::slug(str_replace('.', ' ', "$entityTitle $fullType")) ?: 'graph',
+                'dataUrl' => $dataUrl,
+                'preferencesUrl' => route('preferences.store'),
+                'rendererPreference' => self::RENDERER_PREFERENCE,
+                'optionsPreference' => self::OPTIONS_PREFERENCE,
+                'viewDefaults' => [...GraphViewOptions::addressDefaults(), 'compare' => null, 'trend' => false],
+                'preferenceDefaults' => GraphViewOptions::preferenceDefaults(),
+                'lang' => ['copied' => __('graph.link_copied'), 'failed' => __('graph.link_not_copied')],
+            ],
             'graphFrom' => $request->input('from') ?? '-1d',
             'graphTo' => $request->input('to'),
             'mainGraphVars' => $mainGraphVars,
@@ -55,7 +90,6 @@ class GraphsPageController extends Controller
             'showCommand' => $showCommand,
             'rrdCommand' => $showCommand ? $this->renderRrdCommand($mainGraphVars) : null,
             'isDynamicGraph' => $isDynamicGraph,
-            'dynamicGraphWidth' => $isDynamicGraph ? $width : 0,
             'dynamicGraphSrcTemplate' => $isDynamicGraph ? $this->dynamicGraphSrcTemplate($mainGraphVars) : null,
             'refresh' => LibrenmsConfig::get('page_refresh'),
         ]);
@@ -113,6 +147,7 @@ class GraphsPageController extends Controller
             $periodDuration = $now - $periodFrom;
             $periodThumbs[] = [
                 'text' => __("settings.settings.graphs.row.normal.options.$period"),
+                'period' => $periodDuration,
                 'active' => $params->ends_now && $periodDuration > 0 && abs($currentDuration - $periodDuration) <= 0.05 * $periodDuration,
                 'link' => $this->graphUrl($request, ['from' => Time::toRelativeOffset($periodDuration), 'to' => null]),
                 'vars' => $request->toVars([
@@ -121,6 +156,7 @@ class GraphsPageController extends Controller
                     'legend' => 'no',
                     'absolute' => 1,
                     'from' => $periodFrom,
+                    'to' => null, // a period is up to now, whatever range is shown
                 ]),
             ];
         }
@@ -129,31 +165,26 @@ class GraphsPageController extends Controller
     }
 
     /**
-     * Build the toggles array for legend / command / zoom actions.
+     * Options of the image graph, each changes the address and draws it again.
      *
-     * @return array<int, array{text: string, link: string}>
+     * @return array<int, array{label: string, checked: bool, link: string}>
      */
-    private function controlToggles(GraphRequest $request, string $fullType, bool $showCommand): array
+    private function imageOptions(GraphRequest $request, string $fullType, bool $showCommand): array
     {
-        $toggles = [
-            $request->input('legend') === 'no'
-                ? ['text' => 'Show Legend', 'link' => $this->graphUrl($request, ['legend' => null])]
-                : ['text' => 'Hide Legend', 'link' => $this->graphUrl($request, ['legend' => 'no'])],
-            $request->input('previous') === 'yes'
-                ? ['text' => 'Hide Previous', 'link' => $this->graphUrl($request, ['previous' => null])]
-                : ['text' => 'Show Previous', 'link' => $this->graphUrl($request, ['previous' => 'yes'])],
-            $showCommand
-                ? ['text' => 'Hide RRD Command', 'link' => $this->graphUrl($request, ['showcommand' => null])]
-                : ['text' => 'Show RRD Command', 'link' => $this->graphUrl($request, ['showcommand' => 'yes'])],
+        $legend = $request->input('legend') !== 'no';
+        $previous = $request->input('previous') === 'yes';
+        $options = [
+            ['label' => __('graph.options.legend'), 'checked' => $legend, 'link' => $this->graphUrl($request, ['legend' => $legend ? 'no' : null])],
+            ['label' => __('graph.options.previous'), 'checked' => $previous, 'link' => $this->graphUrl($request, ['previous' => $previous ? null : 'yes'])],
+            ['label' => __('graph.options.command'), 'checked' => $showCommand, 'link' => $this->graphUrl($request, ['showcommand' => $showCommand ? null : 'yes'])],
         ];
 
         if ($fullType === 'port_bits') {
-            $toggles[] = $request->boolean('port_speed_zoom', (bool) LibrenmsConfig::get('graphs.port_speed_zoom'))
-                ? ['text' => 'Zoom to Traffic', 'link' => $this->graphUrl($request, ['port_speed_zoom' => 0])]
-                : ['text' => 'Zoom to Port Speed', 'link' => $this->graphUrl($request, ['port_speed_zoom' => 1])];
+            $speedZoom = $request->boolean('port_speed_zoom', (bool) LibrenmsConfig::get('graphs.port_speed_zoom'));
+            $options[] = ['label' => __('graph.options.port_speed'), 'checked' => $speedZoom, 'link' => $this->graphUrl($request, ['port_speed_zoom' => $speedZoom ? 0 : 1])];
         }
 
-        return $toggles;
+        return $options;
     }
 
     /**

@@ -2116,9 +2116,9 @@ pseudowires:
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: peer_device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: peer_ldp_id, Type: int, 'Null': false, Extra: '' }
+    - { Field: peer_ldp_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: cpwVcID, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: cpwOid, Type: int, 'Null': false, Extra: '' }
+    - { Field: cpwOid, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: pw_type, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: pw_psntype, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: pw_local_mtu, Type: int, 'Null': false, Extra: '' }
@@ -2587,7 +2587,7 @@ users_prefs:
   Columns:
     - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: pref, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: value, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: value, Type: text, 'Null': false, Extra: '' }
   Indexes:
     users_prefs_user_id_pref_unique: { Name: users_prefs_user_id_pref_unique, Columns: [user_id, pref], Unique: true, Type: BTREE }
 users_widgets:

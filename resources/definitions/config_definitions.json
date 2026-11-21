@@ -5735,10 +5735,6 @@
             "default": "misc/notifications.rss",
             "type": "text"
         },
-        "old_graphs": {
-            "default": true,
-            "type": "boolean"
-        },
         "opentsdb.co": {
             "type": "boolean",
             "group": "poller",

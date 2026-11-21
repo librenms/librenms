@@ -1,4 +1,12 @@
 {
+  "_datetime-C5yIJ4X1.js": {
+    "file": "assets/datetime-C5yIJ4X1.js",
+    "name": "datetime"
+  },
+  "_preload-helper-wENDdwkT.js": {
+    "file": "assets/preload-helper-wENDdwkT.js",
+    "name": "preload-helper"
+  },
   "html/fonts/glyphicons-halflings-regular.eot": {
     "file": "assets/glyphicons-halflings-regular-BUJKDMgK.eot",
     "src": "html/fonts/glyphicons-halflings-regular.eot"
@@ -24,6 +32,10 @@
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
+    "imports": [
+      "_datetime-C5yIJ4X1.js",
+      "_preload-helper-wENDdwkT.js"
+    ],
     "dynamicImports": [
       "resources/js/configHighlight.js"
     ],
@@ -48,6 +60,31 @@
     ],
     "assets": [
       "assets/configHighlight.worker-D3U8Hr8D.js"
+    ]
+  },
+  "resources/js/graphs.js": {
+    "file": "assets/graphs-CSc1X_3Y.js",
+    "name": "graphs",
+    "src": "resources/js/graphs.js",
+    "isEntry": true,
+    "imports": [
+      "_preload-helper-wENDdwkT.js"
+    ],
+    "dynamicImports": [
+      "resources/js/timeSeriesChart.js"
+    ]
+  },
+  "resources/js/timeSeriesChart.js": {
+    "file": "assets/timeSeriesChart-Dl9wqnXI.js",
+    "name": "timeSeriesChart",
+    "src": "resources/js/timeSeriesChart.js",
+    "isDynamicEntry": true,
+    "imports": [
+      "_datetime-C5yIJ4X1.js",
+      "resources/js/graphs.js"
+    ],
+    "css": [
+      "assets/timeSeriesChart-CnsZ1jie.css"
     ]
   }
 }
