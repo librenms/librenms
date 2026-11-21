@@ -242,13 +242,14 @@ if (! empty($entity_oids)) {
                         $descr = Str::replaceLast('temp sensor', '', $descr);
                     }
                     // End grouping sensors
+                    if ($type === 'dbm') {
+                        $descr = $os->getOpticalLaneLabel((string) $descr, (int) $index);
+                    }
                 }
                 $descr = trim((string) $descr);
                 discover_sensor(null, $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'] ?? null, null, $group);
             }
         }//end if
     }//end foreach
-    unset(
-        $entity_array
-    );
+    unset($entity_array);
 }//end if
