@@ -46,7 +46,7 @@
     ]);
 @endphp
 <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-center tw:gap-2 tw:mt-3 tw:mb-2">
-    <div class="tw:w-full tw:sm:w-[40ch]">
+    <div x-ref="graphPickerGroup" class="tw:w-full tw:sm:w-[40ch]">
         <x-date-range-picker data-graph-picker :start="$graphFrom" :end="$graphTo" :reload="! $drawInBrowser"
                              class="tw:w-full tw:text-center tw:px-3 tw:py-1.5 tw:border tw:border-gray-300 tw:rounded-md tw:bg-gray-100! tw:hover:bg-gray-200! tw:dark:bg-white! tw:dark:hover:bg-gray-200!"></x-date-range-picker>
     </div>
@@ -73,7 +73,7 @@
         @endif
     </div>
 
-    <div class="tw:flex tw:items-center tw:gap-1">
+    <div x-ref="graphActions" class="tw:flex tw:items-center tw:gap-1">
         <div class="tw:relative" x-data="{ open: false }" x-on:click.outside="open = false" x-on:keydown.escape="open = false">
             <button type="button" class="{{ $button }}" x-on:click="open = ! open" :aria-expanded="open" title="{{ __('graph.share') }}" aria-label="{{ __('graph.share') }}">
                 <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
@@ -94,14 +94,15 @@
             </div>
         </div>
 
-        <div class="tw:relative" x-data="{ open: false }" x-on:click.outside="open = false" x-on:keydown.escape="open = false">
+        <div class="tw:relative" x-data="graphSettingsMenu" x-effect="open && placeMenu()"
+             x-on:resize.window="open && placeMenu()" x-on:click.outside="open = false" x-on:keydown.escape="open = false">
             <button type="button" class="{{ $button }} tw:relative" x-on:click="open = ! open" :aria-expanded="open" title="{{ __('graph.settings') }}" aria-label="{{ __('graph.settings') }}">
                 <i class="fa-solid fa-gear" aria-hidden="true"></i>
                 @if ($drawInBrowser)
                     <span x-show="viewChanged()" x-cloak class="tw:absolute tw:-top-1 tw:-right-1 tw:w-2.5 tw:h-2.5 tw:rounded-full tw:bg-blue-600 tw:ring-2 tw:ring-white tw:dark:ring-dark-gray-500"></span>
                 @endif
             </button>
-            <div x-show="open" x-cloak class="{{ $menu }} tw:w-80 tw:max-w-[calc(100vw-2rem)] tw:max-h-[calc(100vh-10rem)] tw:overflow-y-auto tw:divide-y tw:divide-gray-200 tw:dark:divide-dark-gray-100">
+            <div x-show="open" x-cloak :style="menuStyle" class="{{ $menu }} tw:w-80 tw:max-w-[calc(100vw-2rem)] tw:max-h-[calc(100vh-10rem)] tw:overflow-y-auto tw:divide-y tw:divide-gray-200 tw:dark:divide-dark-gray-100">
                 <section class="{{ $section }}" aria-labelledby="graph-settings-view">
                     <div id="graph-settings-view" class="{{ $sectionTitle }}">{{ __('graph.settings_view') }}</div>
 
