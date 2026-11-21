@@ -80,7 +80,7 @@ class GraphViewOptionsTest extends TestCase
 
     public function test_an_address_without_view_options_is_the_graph_as_it_defines(): void
     {
-        $options = (new GraphViewOptions(columns: ['avg']))->withAddress(['type' => 'port_bits', 'scale' => 'cubic']);
+        $options = new GraphViewOptions(columns: ['avg'])->withAddress(['type' => 'port_bits', 'scale' => 'cubic']);
 
         $this->assertEquals(new GraphViewOptions(columns: ['avg']), $options);
     }
