@@ -4,6 +4,8 @@
     'label' => null,
     'size' => 'md',
     'bordered' => false,
+    // the label on the left and the switch at the far right, for rows of settings
+    'labelFirst' => false,
 ])
 
 @php
@@ -14,8 +16,10 @@
 @endphp
 
 <label @class([
-    'tw:inline-flex tw:items-center tw:gap-3 tw:cursor-pointer tw:mb-0 tw:font-normal',
+    'tw:items-center tw:gap-3 tw:cursor-pointer tw:mb-0 tw:font-normal',
+    'tw:inline-flex' => ! $labelFirst,
     'tw:w-full tw:px-4 tw:py-3 tw:rounded-lg tw:border tw:border-gray-200 tw:dark:border-dark-gray-400 tw:bg-white tw:dark:bg-dark-gray-500' => $bordered,
+    'tw:flex tw:w-full tw:flex-row-reverse tw:justify-between' => $labelFirst,
 ])>
     <span class="tw:relative tw:inline-block tw:shrink-0">
         @if ($name)

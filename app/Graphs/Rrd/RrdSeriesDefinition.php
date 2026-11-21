@@ -34,9 +34,6 @@ class RrdSeriesDefinition
     // series labels start further right than the heading because of the color box
     private const int LEGEND_COLOR_BOX_WIDTH = 2;
 
-    /** series overlap instead of drawing inverted ones below the axis */
-    private bool $overlaid = false;
-
     /** @var array<string, string> rrd file of each data series that has one */
     private array $files = [];
 
@@ -96,10 +93,9 @@ class RrdSeriesDefinition
             throw new NoGraphData(__('graph.errors.no_data_files'));
         }
 
-        // stacked graphs and graphs zoomed to the port speed draw inverted series above the axis, over the others
-        $this->overlaid = LibrenmsConfig::get('webui.graph_stacked') || ($this->options->traffic?->speedZoom && array_filter($this->options->traffic->speeds));
-        $theme = new GraphTheme($params->isDark(), $this->options->palette, $this->overlaid && $inverted);
-        $traffic = $this->options->traffic === null ? null : new RrdTrafficDefinition($this->options->traffic, $params, $theme, $this->overlaid);
+        $overlaid = self::overlaid($this->options);
+        $theme = new GraphTheme($params->isDark(), $this->options->palette, $overlaid && $inverted);
+        $traffic = $this->options->traffic === null ? null : new RrdTrafficDefinition($this->options->traffic, $params, $theme);
         $averaged = count(array_filter(array_keys($this->files), fn ($key) => $this->series[$key]->style->stackAverage));
 
         $i = 0;
@@ -108,6 +104,7 @@ class RrdSeriesDefinition
             $this->ids[$key] = $id;
             $style = $series->style;
             $drawScale = $style->stackAverage ? $style->drawScale / $averaged : $style->drawScale;
+            $factor = $style->invert && ! $overlaid ? -$drawScale : $drawScale;
             $label = Rrd::fixedSafeDescr($series->description, self::LABEL_WIDTH);
             $summarized = $traffic !== null && $this->options->traffic?->summarizes($key);
 
@@ -122,11 +119,11 @@ class RrdSeriesDefinition
                 $lastStack = null;
             } else {
                 $color = $theme->next($style->role, $style->stacked);
-                $drawnId = $this->drawnValue($id, $drawScale, $style->invert, $defs);
+                $drawnId = $this->drawnValue($id, $factor, $defs);
 
                 if ($style->stacked) {
                     // series drawn below the axis stack separately
-                    $direction = $this->drawnDirection($drawScale, $style->invert);
+                    $direction = $factor < 0 ? 'down' : 'up';
 
                     if (! isset($stacks[$direction])) {
                         $drawing[] = "AREA:$drawnId#$color:$label";
@@ -143,7 +140,7 @@ class RrdSeriesDefinition
 
                     if ($params->visible('previous')) {
                         array_push($defs, ...$this->periodValueDefs($key, 'prev', '', 'AVERAGE', ":start=$params->prev_from:end=$params->from", $params->period));
-                        $previousValues[$direction][] = "{$id}prev,UN,0,{$id}prev,IF" . $this->scaleRpn($this->drawnFactor($drawScale, $style->invert));
+                        $previousValues[$direction][] = "{$id}prev,UN,0,{$id}prev,IF" . $this->scaleRpn($factor);
                     }
                 } else {
                     $lastStack = null;
@@ -152,23 +149,23 @@ class RrdSeriesDefinition
                         $fills[] = "AREA:$drawnId#" . $theme->fill($style->role, $color);
                     }
                     if ($style->maxFill) {
-                        $maxFills[] = 'AREA:' . $this->drawnValue("{$id}max", $drawScale, $style->invert, $defs) . '#' . $theme->maxFill($style->role, $color);
+                        $maxFills[] = 'AREA:' . $this->drawnValue("{$id}max", $factor, $defs) . '#' . $theme->maxFill($style->role, $color);
                     }
                     if ($this->options->scaleMargin > 0) {
                         // invisible lines that only widen the autoscaled axis
                         $margin = self::number($this->options->scaleMargin);
                         // drawn below the axis, the minimum is the highest drawn value
-                        [$top, $bottom] = $this->drawnFactor($drawScale, $style->invert) < 0 ? ['min', 'max'] : ['max', 'min'];
+                        [$top, $bottom] = $factor < 0 ? ['min', 'max'] : ['max', 'min'];
                         foreach (['above' => [$top, '+'], 'below' => [$bottom, '-']] as $name => [$suffix, $operator]) {
-                            $value = $this->drawnValue($id . $suffix, $drawScale, $style->invert, $defs);
+                            $value = $this->drawnValue($id . $suffix, $factor, $defs);
                             $defs[] = "CDEF:$id$name=$value,$value,ABS,$margin,*,$operator";
                             $margins[] = "LINE:$id$name#00000000";
                         }
                     }
                     if ($style->range) {
                         // an invisible line at the minimum, the range stacked on it
-                        $min = $this->drawnValue("{$id}min", $drawScale, $style->invert, $defs);
-                        $defs[] = "CDEF:{$id}range=" . $this->drawnValue("{$id}max", $drawScale, $style->invert, $defs) . ",$min,-";
+                        $min = $this->drawnValue("{$id}min", $factor, $defs);
+                        $defs[] = "CDEF:{$id}range=" . $this->drawnValue("{$id}max", $factor, $defs) . ",$min,-";
                         array_push($maxFills, "LINE:$min#00000000", "AREA:{$id}range#" . $theme->color(SeriesRole::Muted) . '::STACK');
                     }
                 }
@@ -176,7 +173,7 @@ class RrdSeriesDefinition
 
             array_push($drawing, ...$this->legendValues($id, $series->unit, $summarized));
             if ($summarized) {
-                $traffic->addSeries($id, $series, $drawScale, $color, fn (string $period, string $suffix, string $cf, string $range, int $shift) => $this->periodValueDefs($key, $period, $suffix, $cf, $range, $shift));
+                $traffic->addSeries($id, $series, $factor, $color, fn (string $period, string $suffix, string $cf, string $range, int $shift) => $this->periodValueDefs($key, $period, $suffix, $cf, $range, $shift));
             }
         }
 
@@ -191,11 +188,20 @@ class RrdSeriesDefinition
             $drawing[] = 'HRULE:0#' . $theme->axis();
         }
 
-        if ($this->options->thresholds) {
-            $last = array_key_last($this->options->thresholds);
-            foreach ($this->options->thresholds as $index => $threshold) {
+        $thresholds = $this->options->shownThresholds();
+        if ($thresholds) {
+            // invisible lines that keep the thresholds inside an autoscaled axis, away from its edges
+            foreach ($this->options->thresholdBounds(! $overlaid) ?? [] as $bound) {
+                $margins[] = 'LINE:' . self::number($bound) . '#00000000';
+            }
+
+            $last = array_key_last($thresholds);
+            foreach ($thresholds as $index => $threshold) {
                 $label = str_replace(':', '\\:', $threshold->label) . ($index === $last ? '\\l' : '');
-                $drawing[] = 'LINE1.5:' . self::number($threshold->value) . '#' . $theme->color($threshold->role) . ":$label:dashes";
+                // a mirrored line is in the legend once
+                foreach ($threshold->drawnValues(! $overlaid) as $line => $value) {
+                    $drawing[] = 'LINE1.5:' . self::number($value) . '#' . $theme->color($threshold->role) . ':' . ($line === 0 ? $label : '') . ':dashes';
+                }
             }
         }
 
@@ -232,7 +238,7 @@ class RrdSeriesDefinition
                 $values[] = $this->ids[$member] . $period;
             }
         }
-        $defs[] = "CDEF:$id=" . implode(',', $values) . str_repeat(',ADDNAN', count($values) - 1);
+        $defs[] = self::sumDef($id, $values);
 
         return $defs;
     }
@@ -248,10 +254,20 @@ class RrdSeriesDefinition
     {
         // unknown values add nothing to the stack, as when rrdtool stacks them
         $values = [$stack['top'] ?? '0', ...$stack['pending']];
-        $defs[] = "CDEF:{$id}base=" . implode(',', $values) . str_repeat(',ADDNAN', count($values) - 1);
+        $defs[] = self::sumDef($id . 'base', $values);
         $stack = ['top' => "{$id}base", 'pending' => []];
 
         return "{$id}base";
+    }
+
+    /**
+     * Sum the available members at each timestamp. A completely missing sample stays unknown.
+     *
+     * @param  list<string>  $members
+     */
+    public static function sumDef(string $id, array $members): string
+    {
+        return "CDEF:$id=" . implode(',', $members) . str_repeat(',ADDNAN', count($members) - 1);
     }
 
     /**
@@ -288,15 +304,14 @@ class RrdSeriesDefinition
             default => null,
         } ?? $series->field;
 
-        if ($transform === '') {
-            return $shift === null ? ["DEF:$id=$filename:$field:$cf$range"] : ["DEF:$id=$filename:$field:$cf$range", "SHIFT:$id:$shift"];
-        }
-
-        $defs = ["DEF:{$id}raw=$filename:$field:$cf$range"];
+        $source = $transform === '' ? $id : $id . 'raw';
+        $defs = ["DEF:$source=$filename:$field:$cf$range"];
         if ($shift !== null) {
-            $defs[] = "SHIFT:{$id}raw:$shift";
+            $defs[] = "SHIFT:$source:$shift";
         }
-        $defs[] = "CDEF:$id={$id}raw$transform";
+        if ($transform !== '') {
+            $defs[] = "CDEF:$id=$source$transform";
+        }
 
         return $defs;
     }
@@ -308,9 +323,9 @@ class RrdSeriesDefinition
      * @param  array<int, string>  $defs  receives the definition, if one is needed and not there yet
      * @return string the id to draw
      */
-    private function drawnValue(string $id, float $drawScale, bool $invert, array &$defs): string
+    private function drawnValue(string $id, float $factor, array &$defs): string
     {
-        $scale = $this->scaleRpn($this->drawnFactor($drawScale, $invert));
+        $scale = $this->scaleRpn($factor);
 
         if ($scale === '') {
             return $id;
@@ -325,27 +340,19 @@ class RrdSeriesDefinition
     }
 
     /**
-     * Whether a drawn value with these transformations is above or below the axis
-     */
-    private function drawnDirection(float $drawScale, bool $invert): string
-    {
-        return $this->drawnFactor($drawScale, $invert) < 0 ? 'down' : 'up';
-    }
-
-    /**
-     * What drawing multiplies a value by, negative below the axis
-     */
-    private function drawnFactor(float $drawScale, bool $invert): float
-    {
-        return $drawScale * ($invert && ! $this->overlaid ? -1 : 1);
-    }
-
-    /**
      * RPN suffix multiplying by the scale, empty when there is nothing to do
      */
     private function scaleRpn(float $scale): string
     {
         return $scale == 1 ? '' : ',' . self::number($scale) . ',*';
+    }
+
+    /**
+     * Stacked graphs and graphs zoomed to the port speed draw series marked invert above the axis, over the others
+     */
+    public static function overlaid(GraphOptions $options): bool
+    {
+        return LibrenmsConfig::get('webui.graph_stacked') || ($options->traffic->speedZoom ?? false);
     }
 
     /**

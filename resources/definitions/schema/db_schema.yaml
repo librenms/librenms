@@ -2587,7 +2587,7 @@ users_prefs:
   Columns:
     - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: pref, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: value, Type: varchar(128), 'Null': false, Extra: '' }
+    - { Field: value, Type: text, 'Null': false, Extra: '' }
   Indexes:
     users_prefs_user_id_pref_unique: { Name: users_prefs_user_id_pref_unique, Columns: [user_id, pref], Unique: true, Type: BTREE }
 users_widgets:

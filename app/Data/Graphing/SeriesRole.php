@@ -33,6 +33,7 @@ enum SeriesRole
     case LowWarning;
     case HighWarning;
     case HighLimit;
+    case PortSpeed;
 
     /**
      * The usage role for a used percentage, critical above the warning percentage
