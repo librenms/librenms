@@ -285,37 +285,30 @@ scaleRigid: true`. See `app/Data/Graphing/GraphOptions.php` for all options.
 
 ### Statistics
 
-To add rolling averages and percentile lines to each series, as the legacy
-`generic_stats` graphs do, pass `StatsOptions` in the graph's `options()`:
+To draw a series like the legacy `generic_stats` graphs, set
+`rollingAverages` and `percentiles` in its `SeriesStyle`:
 
 ```php
-use App\Data\Graphing\StatsOptions;
-
-protected function options(): GraphOptions
-{
-    return new GraphOptions(
-        verticalLabel: 'Seconds',
-        palette: 'rainbow_stats_purple',
-        stats: new StatsOptions,
-    );
-}
+new DataSeries($metric, 'offset', 'Offset', 's', style: new SeriesStyle(
+    fill: true,
+    rollingAverages: true,
+    percentiles: [25, 50, 75],
+));
 ```
 
-Each series then gets these extra lines and legend rows:
+`rollingAverages` adds 1 hour, 1 day and 1 week average lines. The daily
+lines need a graph covering at least 36 hours and the weekly lines at least 8
+days. `percentiles` adds a horizontal line at each percentile of the series,
+hidden when `graph_stat_percentile_disable` is set. The lines take the next
+colors of the palette; `rainbow_stats_purple` matches the legacy graphs. The
+labels do not name the series, so use them on graphs of one series.
+`App\Data\Graphing\SeriesStats` decides which lines a series gets.
 
-- hourly :: 1 hour average line, with its min and max in the legend
-- daily :: the same for 1 day, shown when the graph covers at least 36 hours
-- weekly :: the same for 1 week, shown when the graph covers at least 8 days
-- percentiles :: horizontal lines, `[25, 50, 75]` by default, hidden when
-  `graph_stat_percentile_disable` is set
-
-Turn parts off with named arguments, for example
-`new StatsOptions(weekly: false, percentiles: [50])`. Graphs 25 pixels tall
-or less leave them all out. The lines take the next colors of the palette;
-`rainbow_stats_purple` matches the legacy graphs.
-
-With several series, each label starts with the series description, such as
-`Jitter 1 hour avg`.
+The image graphs also list the min and max of each period in the legend, and
+leave the lines out of graphs 25 pixels tall or less. The browser chart
+computes the lines from the points it loads, so its percentiles follow the
+resolution of the chart, and a period that starts before the view averages
+only the part inside it.
 
 ## Troubleshooting
 
@@ -348,8 +341,7 @@ finds the existing data by the clean identity.
 Replace legacy RRD filename and dataset variables with `MetricIdentity` and
 `DataSeries`, and move presentation settings into `SeriesStyle` and
 `GraphOptions`. Compare the resulting graph and legend before removing the
-old include. A legacy `$descr_len` is not needed: labels are padded or cut
-to 20 characters.
+old include.
 
 For working examples, read `app/Graphs/Device/NetstatIpGraph.php` for multiple
 fields and inverted series, or `app/Graphs/Device/ProcessorGraph.php` for one
@@ -365,18 +357,12 @@ period comparisons, future trend lines, and port speed references.
 `app/Graphs/Device/BitsGraph.php` stacks the traffic of each port and only
 summarizes the device totals.
 
-For application graphs, extend `App\Graphs\Application\ApplicationGraph`.
-`$this->metric()` reads the `app-<app_type>-<app_id>.rrd` file the
-application poller writes. For an app with more files, pass the parts that
-follow the app id as tags, in order:
-`$this->metric(['category' => 'overview'])` reads
-`app-backupninja-<app_id>-overview.rrd`.
-A file with a part before the app id, such as `app-asterisk-stats-<app_id>.rrd`,
-needs its own `MetricIdentity` with the tags in that order.
-`app/Graphs/Application/NtpClientOffsetGraph.php` is an example that uses
-`StatsOptions`. Graph names for this can not contain hyphens, so
-the graphs of an app such as `ntp-client` are need to be named like
-`application_ntp_client_*`.
+For application graphs, extend `App\Graphs\Application\ApplicationGraph`;
+`$this->metric()` reads the `app-<app_type>-<app_id>.rrd` file the application
+poller writes. Graph class names can not contain hyphens, so an app such as
+`ntp-client` sets `GRAPH_PREFIX` in its `ApplicationDefinition` to name its
+graphs `application_ntp_client_*`. See
+`app/Graphs/Application/NtpClientOffsetGraph.php`.
 
 For graph types outside device graphs, extend `AbstractSeriesGraph` and
 implement `isAuthorized()` for the entities being displayed, using `canView()`

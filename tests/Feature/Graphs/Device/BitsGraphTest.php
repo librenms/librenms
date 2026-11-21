@@ -118,7 +118,7 @@ class BitsGraphTest extends TestCase
         $this->assertStringContainsString("'CDEF:ds4=ds0,ds2,ADDNAN'", $command);
         $this->assertStringContainsString("'CDEF:ds5=ds1,ds3,ADDNAN'", $command);
         $this->assertStringContainsString("'CDEF:ds6=ds4,ds5,ADDNAN'", $command);
-        $this->assertStringContainsString("'HRULE:0#00000000:Total In             '", $command);
+        $this->assertStringContainsString("'HRULE:0#00000000:Total In         '", $command);
         $this->assertStringContainsString("'VDEF:ds4pct=ds4,95,PERCENT'", $command);
         $this->assertStringContainsString("'VDEF:ds5pct=ds5,95,PERCENT'", $command);
         $this->assertStringNotContainsString('ds0pct', $command);

@@ -173,6 +173,7 @@ return [
         ],
     ],
     'application' => [
+        'subtitle' => ' :: App :: :name',
         'ntp_client' => [
             'frequency' => 'Frequency',
             'offset' => 'Offset',

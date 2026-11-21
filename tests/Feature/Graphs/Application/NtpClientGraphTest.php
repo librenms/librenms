@@ -3,11 +3,14 @@
 namespace LibreNMS\Tests\Feature\Graphs\Application;
 
 use App\Data\Graphing\GraphParameters;
+use App\Facades\LibrenmsConfig;
+use App\Facades\Rrd;
 use App\Graphs\Application\NtpClientFreqGraph;
 use App\Graphs\Application\NtpClientOffsetGraph;
 use App\Graphs\Application\NtpClientStabilityGraph;
 use App\Graphs\Application\NtpClientStatsGraph;
 use App\Graphs\GraphFactory;
+use App\Graphs\Rrd\RrdFileResolver;
 use App\Models\Application;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -18,46 +21,66 @@ final class NtpClientGraphTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testGraphTypesResolveToClasses(): void
-    {
-        $factory = app(GraphFactory::class);
+    private Application $application;
 
-        $this->assertInstanceOf(NtpClientStatsGraph::class, $factory->graphFor(new GraphParameters(['type' => 'application_ntp_client_stats', 'id' => 1])));
-        $this->assertInstanceOf(NtpClientOffsetGraph::class, $factory->graphFor(new GraphParameters(['type' => 'application_ntp_client_offset', 'id' => 1])));
-        $this->assertInstanceOf(NtpClientFreqGraph::class, $factory->graphFor(new GraphParameters(['type' => 'application_ntp_client_freq', 'id' => 1])));
-        $this->assertInstanceOf(NtpClientStabilityGraph::class, $factory->graphFor(new GraphParameters(['type' => 'application_ntp_client_stability', 'id' => 1])));
-        $this->assertContains('ntp_client_offset', $factory->subtypes('application'));
-        $this->assertNotContains('ntp-client_offset', $factory->subtypes('application'));
+    protected function setUp(): void
+    {
+        parent::setUp();
+        LibrenmsConfig::set('allow_unauth_graphs', true);
+        $device = Device::factory()->create(['hostname' => 'ntp.example.com']);
+        $this->application = Application::factory()->for($device)->create(['app_type' => 'ntp-client']);
+    }
+
+    #[TestWith(['application_ntp_client_stats', NtpClientStatsGraph::class])]
+    #[TestWith(['application_ntp_client_offset', NtpClientOffsetGraph::class])]
+    #[TestWith(['application_ntp_client_freq', NtpClientFreqGraph::class])]
+    #[TestWith(['application_ntp_client_stability', NtpClientStabilityGraph::class])]
+    public function testGraphTypesResolveToClasses(string $type, string $class): void
+    {
+        $this->assertInstanceOf($class, app(GraphFactory::class)->graphFor($this->params($type)));
     }
 
     public function testStatsShowsJitterAndNoiseInSeconds(): void
     {
-        $app = $this->ntpClient();
-
-        $series = new NtpClientStatsGraph(new GraphParameters(['type' => 'application_ntp_client_stats', 'id' => $app->app_id]))->getSeries();
+        $series = new NtpClientStatsGraph($this->params('application_ntp_client_stats'))->getSeries();
 
         $this->assertSame(['jitter', 'noise'], array_keys($series));
+        $this->assertSame("ntp.example.com/app-ntp-client-{$this->application->app_id}.rrd", Rrd::metricName($series['jitter']->metric)->relativePath());
         $this->assertSame(0.001, $series['noise']->scale);
         $this->assertSame('s', $series['noise']->unit);
+        $this->assertStringNotContainsString('PERCENTNAN', $this->command('application_ntp_client_stats'));
     }
 
-    #[TestWith(['application_ntp_client_stats', 'Stats'])]
-    #[TestWith(['application_ntp_client_offset', 'Offset'])]
-    #[TestWith(['application_ntp_client_freq', 'Freq'])]
-    #[TestWith(['application_ntp_client_stability', 'Stability'])]
-    public function testTitles(string $type, string $graph): void
+    #[TestWith(['application_ntp_client_offset'])]
+    #[TestWith(['application_ntp_client_freq'])]
+    #[TestWith(['application_ntp_client_stability'])]
+    public function testSingleSeriesGraphsDrawStats(string $type): void
     {
-        $app = $this->ntpClient();
+        LibrenmsConfig::set('graph_stat_percentile_disable', false);
 
-        $title = app(GraphFactory::class)->graphFor(new GraphParameters(['type' => $type, 'id' => $app->app_id]))->getTitle();
+        $command = $this->command($type, 691200);
 
-        $this->assertSame($app->device->shortDisplayName() . "::NTP Client::$graph", $title);
+        $this->assertStringContainsString('LINE1.25:ds0hourly#', $command);
+        $this->assertStringContainsString('LINE1.25:ds0daily#', $command);
+        $this->assertStringContainsString('LINE1.25:ds0weekly#', $command);
+        $this->assertStringContainsString('VDEF:ds0p1=ds0,50,PERCENTNAN', $command);
     }
 
-    private function ntpClient(): Application
+    /**
+     * @param  int  $range  seconds covered by the graph
+     */
+    private function command(string $type, int $range = 3600): string
     {
-        $device = Device::factory()->create(['hostname' => 'ntp.example.com']);
+        $this->mock(RrdFileResolver::class)->shouldReceive('pathFor')->andReturn('ntp.example.com/app-ntp-client.rrd');
 
-        return Application::factory()->for($device)->create(['app_type' => 'ntp-client']);
+        return (string) app(GraphFactory::class)->graphFor($this->params($type, ['from' => 1000000, 'to' => 1000000 + $range]))->getDebugCommand();
+    }
+
+    /**
+     * @param  array<string, mixed>  $vars  extra graph parameters, such as from and to
+     */
+    private function params(string $type, array $vars = []): GraphParameters
+    {
+        return new GraphParameters(['type' => $type, 'id' => $this->application->app_id, ...$vars]);
     }
 }

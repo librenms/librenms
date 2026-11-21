@@ -83,7 +83,7 @@ abstract class AbstractSeriesGraph extends AbstractGraph
                     'base' => $options->base ?? 1000,
                     'margin' => $options->scaleMargin,
                 ],
-                series: GraphDataSeries::fromReadings($series, $data, $theme, $invert),
+                series: GraphDataSeries::fromReadings($series, $data, $theme, $invert, $this->params->to - $this->params->from),
                 thresholds: array_map(fn (Threshold $threshold) => [
                     'value' => $threshold->value,
                     'label' => $threshold->label,
