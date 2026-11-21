@@ -48,7 +48,8 @@ STORMSHIELD-VPNSA-MIB DEFINITIONS ::= BEGIN
       snsVPNSAPacketsOut   Counter64,
       snsVPNSALifetime     Counter64,
       snsVPNSAMaxLifetime  Counter64,
-      snsVPNSAGlobal       INTEGER
+      snsVPNSAGlobal       INTEGER,
+      snsVPNSAKem          DisplayString
    }
 
    snsVPNSAIndex OBJECT-TYPE
@@ -270,5 +271,13 @@ STORMSHIELD-VPNSA-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "Global"
       ::= { snsVPNSAEntry 25 }
+
+   snsVPNSAKem OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Post Quantum Algorithm"
+      ::= { snsVPNSAEntry 26 }
 
 END

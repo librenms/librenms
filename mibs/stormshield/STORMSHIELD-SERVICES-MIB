@@ -7,7 +7,7 @@ STORMSHIELD-SERVICES-MIB DEFINITIONS ::= BEGIN
       stormshieldMIB                            FROM STORMSHIELD-SMI-MIB;
 
    snsServices MODULE-IDENTITY
-      LAST-UPDATED  "201702200000Z"
+      LAST-UPDATED  "202505120000Z"
       ORGANIZATION  "Stormshield"
       CONTACT-INFO
          "Customer Support
@@ -20,6 +20,8 @@ STORMSHIELD-SERVICES-MIB DEFINITIONS ::= BEGIN
          E-mail: support@stormshield.eu
          http://www.stormshield.eu"
       DESCRIPTION   "stormshield services"
+      REVISION      "202505120000Z"
+      DESCRIPTION   "uptime in TimeTicks"
       REVISION      "201702200000Z"
       DESCRIPTION   "Initial"
       ::= { stormshieldMIB 7 }
@@ -80,7 +82,16 @@ STORMSHIELD-SERVICES-MIB DEFINITIONS ::= BEGIN
       MAX-ACCESS read-only
       STATUS current
       DESCRIPTION
-         "Uptime"
+         "Uptime
+         Deprecated, replaced by snsServicesSysUptime"
    ::= { snsServicesEntry 4 }
+
+   snsServicesSysUptime OBJECT-TYPE
+      SYNTAX TimeTicks
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Uptime (in hundredths of a second)"
+   ::= { snsServicesEntry 5 }
 
 END

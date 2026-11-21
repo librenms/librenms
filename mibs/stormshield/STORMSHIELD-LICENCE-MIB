@@ -1,0 +1,77 @@
+STORMSHIELD-LICENCE-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32   FROM SNMPv2-SMI
+      DisplayString                             FROM RFC1213-MIB
+      SnmpAdminString                           FROM SNMP-FRAMEWORK-MIB
+      stormshieldMIB                            FROM STORMSHIELD-SMI-MIB;
+
+   snsLicence MODULE-IDENTITY
+      LAST-UPDATED  "202507160000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+         "Customer Support
+
+         22 rue du Gouverneur General Eboue
+         92130 Issy-les-Moulineaux
+         FRANCE
+
+         Tel: +33 (0)9 69 32 96 29
+         E-mail: support@stormshield.eu
+         http://www.stormshield.eu"
+      DESCRIPTION   "stormshield licence"
+      REVISION      "202507160000Z"
+      DESCRIPTION   "Initial"
+      ::= { stormshieldMIB 21 }
+
+   snsLicenceOptionsTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF snsLicenceOptionEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+         "List of Licences options"
+      ::= { snsLicence 1 }
+
+   snsLicenceOptionEntry OBJECT-TYPE
+      SYNTAX SnsLicenceOptionEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+         "Each entry in the snsLicenceOptionsTable holds a set of option informations
+         (expiration date)."
+      INDEX { snsLicenceOptionIndex }
+      ::= { snsLicenceOptionsTable 1 }
+
+   SnsLicenceOptionEntry ::= SEQUENCE {
+      snsLicenceOptionIndex        INTEGER,
+      snsLicenceOptionName         OCTET STRING,
+      snsLicenceExpirationDate     OCTET STRING,
+   }
+
+   snsLicenceOptionIndex OBJECT-TYPE
+      SYNTAX INTEGER (1..65535)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "A unique value for the table. Its value
+         ranges between 1 and 65535 and may not be contigous.
+         the index has no other meaning but a pure index"
+      ::= { snsLicenceOptionEntry 1 }
+
+   snsLicenceOptionName OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "option name"
+      ::= { snsLicenceOptionEntry 2 }
+
+   snsLicenceExpirationDate OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "expiration date"
+      ::= { snsLicenceOptionEntry 3 }
+
+END
