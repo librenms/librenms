@@ -1,0 +1,38 @@
+{
+    "subscribers": {
+        "discovery": {
+            "subscriber_counts": [
+                {
+                    "ifIndex": null,
+                    "session_type": "total",
+                    "sessions": 162
+                }
+            ],
+            "radius_servers": [
+                {
+                    "address": "192.0.2.20",
+                    "port": 1812,
+                    "state": "up",
+                    "dead_count": 321,
+                    "requests": 1397151,
+                    "accepts": null,
+                    "rejects": null,
+                    "timeouts": 47009,
+                    "round_trip_time": 990
+                },
+                {
+                    "address": "192.0.2.21",
+                    "port": 1812,
+                    "state": "up",
+                    "dead_count": 290,
+                    "requests": 26222,
+                    "accepts": null,
+                    "rejects": null,
+                    "timeouts": 25325,
+                    "round_trip_time": 840
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

@@ -1,0 +1,677 @@
+-- *****************************************************************
+-- CISCO-SUBSCRIBER-IDENTITY-TC-MIB
+-- Definitions of textual conventions describing
+-- subscriber identities.
+--   
+-- September 2007, Patrick R. Gili
+--   
+-- Copyright (c) 2007, 2011-2012 by Cisco Systems Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+CISCO-SUBSCRIBER-IDENTITY-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoSubscriberIdentityTcMIB MODULE-IDENTITY
+    LAST-UPDATED    "201112230000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA 95134
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-snmp@cisco.com"
+    DESCRIPTION
+        "This MIB module defines textual conventions describing
+        subscriber session identities.  A subscriber session identity
+        consists of data associated with a subscriber session serving as
+        credentials used to determine authority, status, rights, or
+        entitlement to privileges."
+    REVISION        "201112230000Z"
+    DESCRIPTION
+        "The initial version of the MIB module."
+    ::= { ciscoMgmt 782 }
+
+
+
+SubSessionIdentity ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "An enumerated integer-value describing a subscriber session
+        identity:
+
+            'other'
+                The implementation of the MIB module using this textual
+                convention does not recognize the subscriber session
+                identity.
+
+            'ifIndex'
+                The ifIndex assigned to the interface representing the
+                subscriber session.
+
+            'subscriberLabel'
+                The arbitrary integer-value assigned by the system
+                to uniquely identify the subscriber session within the
+                scope of the system.
+
+            'macAddress'
+                The subscriber's MAC address.
+
+            'nativeVrf'
+                The name of the VRF on which the subscriber session
+                originates.
+
+            'nativeIpAddress'
+                The IP address assigned to the subscriber session on
+        the
+                customer-facing side of the system.
+
+            'domainVrf'
+                The name of the VRF to which the system transfers the
+                subscriber session traffic.
+
+            'domainIpAddress'
+                The IP address assigned to the subscriber session on
+        the
+                service-facing side of the system.
+
+            'pbhk'
+                The Port-Bundle Host Key (PBHK) uniquely identifying
+        the
+                subscriber session.  A PBHK consists of a source IP
+                address and a TCP port number.
+
+            'remoteId'
+                The name identifying the 'calling station', access
+                multiplexor, or access switch providing access to the
+                subscriber.
+
+            'circuitId'
+                The name identifying the circuit on the 'calling
+                station', access multiplexor, or access switch that
+                provides access to the subscriber.
+
+            'nasPort'
+                An octet string identifying the port on the Network
+                Access Server (NAS) that provides access to the
+                subscriber.
+
+            'domain'
+                The subscriber's domain name.
+
+            'username'
+                The subscriber's username.
+
+            'acctSessionId'
+                The subscriber's accounting session identifier.
+
+            'dnis'
+                The Dialed Number Identification Service (DNIS) number
+                (or called-party number) dialed by the subscriber.
+
+            'media'
+                The type of media providing access to the subscriber.
+
+            'mlpNegotiated'
+                Indicates whether the subscriber session was
+        established
+                using multi-link PPP negotiation.
+
+            'protocol'
+                The type of protocol providing access to the
+        subscriber.
+
+            'dhcpClass'
+                The name of the class matching the DHCP DISCOVER
+        message
+                received from the subscriber.
+
+            'serviceName'
+                The name identifying the service associated with the
+                subscriber.
+             'tunnelName'
+                 The name of the VPDN used to carry the subscriber
+                 session."
+    SYNTAX          INTEGER  {
+                        other(1),
+                        ifIndex(2),
+                        subscriberLabel(3),
+                        macAddress(4),
+                        nativeVrf(5),
+                        nativeIpAddress(6),
+                        domainVrf(7),
+                        domainIpAddress(8),
+                        pbhk(9),
+                        remoteId(10),
+                        circuitId(11),
+                        nasPort(12),
+                        domain(13),
+                        username(14),
+                        acctSessionId(15),
+                        dnis(16),
+                        media(17),
+                        mlpNegotiated(18),
+                        protocol(19),
+                        serviceName(20),
+                        dhcpClass(21),
+                        tunnelName(22)
+                    }
+
+SubSessionIdentities ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A bit string describing a set of subscriber session identities:
+
+        'ifIndex'
+            The ifIndex assigned to the interface representing the
+            subscriber session.
+
+        'subscriberLabel'
+            The arbitrary integer-value assigned by the system
+            to uniquely identify the subscriber session within the
+            scope of the system.
+
+        'macAddress'
+            The subscriber's MAC address.
+
+        'nativeVrf'
+            The name of the VRF on which the subscriber session
+            originates.
+
+        'nativeIpAddress'
+            The IP address assigned to the subscriber session on the
+            customer-facing side of the system.
+
+        'domainVrf'
+            The name of the VRF to which the system transfers the
+            subscriber session traffic.
+
+        'domainIpAddress'
+            The IP address assigned to the subscriber session on the
+            service-facing side of the system.
+
+        'pbhk'
+            The Port-Bundle Host Key (PBHK) uniquely identifying the
+            subscriber session.  A PBHK consists of a source IP
+            address and a TCP port number.
+
+        'remoteId'
+            The name identifying the 'calling station' or access
+            multiplexor providing access to the subscriber.
+
+        'circuitId'
+            The name identifying the circuit on the 'calling
+            station', access multiplexor, or access switch that
+            provides access to the subscriber.
+
+        'nasPort'
+            An octet string identifying the port on the Network
+            Access Server (NAS) that provides access to the
+            subscriber.
+
+        'domain'
+            The subscriber's domain name.
+
+        'username'
+            The subscriber's username.
+
+        'dnis'
+            The Dialed Number Identification Service (DNIS) number
+            (or called-party number) dialed by the subscriber.
+
+        'acctSessionId'
+            The subscriber's accounting session identifier.
+
+        'media'
+            The type of media providing access to the subscriber.
+
+        'mlpNegotiated'
+            Indicates whether the subscriber session was established
+            using multi-link PPP negotiation.
+
+        'protocol'
+            The type of protocol providing access to the subscriber.
+
+        'serviceName'
+            The name identifying the service associated with the
+            subscriber.
+
+        'dhcpClass'
+            The name of the class matching the DHCP DISCOVER message
+            received from the subscriber.
+
+        'tunnelName'
+            The name of the VPDN used to carry the subscriber
+            session."
+    SYNTAX          BITS {
+                        ifIndex(0),
+                        subscriberLabel(1),
+                        macAddress(2),
+                        nativeVrf(3),
+                        nativeIpAddress(4),
+                        domainVrf(5),
+                        domainIpAddress(6),
+                        pbhk(7),
+                        remoteId(8),
+                        circuitId(9),
+                        nasPort(10),
+                        domain(11),
+                        username(12),
+                        acctSessionId(13),
+                        dnis(14),
+                        media(15),
+                        mlpNegotiated(16),
+                        protocol(17),
+                        serviceName(18),
+                        dhcpClass(19),
+                        tunnelName(20)
+                    }
+
+SubscriberLabel ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "x"
+    STATUS          current
+    DESCRIPTION
+        "A positive integer-value uniquely identifying a subscriber
+        session within the scope of a system.
+
+        The value '0' is not a valid value.  However, it serves as a
+        convenient value when an instance of an object using this
+        textual convention is not valid."
+    SYNTAX          Unsigned32 (0..4294967295)
+
+SubscriberVRF ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "255a"
+    STATUS          current
+    DESCRIPTION
+        "A string-value identifying a VRF associated with a subscriber.
+
+        The semantics of the string-value are the same those specified
+        by the SnmpAdminString textual convention defined by the
+        SNMP-FRAMEWORK-MIB (RFC-3411).
+
+        The null string is not a valid value.  However, it serves as a
+        convenient value when an instance of an object using this
+        textual convention is not valid."
+
+    REFERENCE
+        "D. Harrington, R. Resuhn, B. Wijnen, 'An Architecture for
+        Describing Simple Network Management Protocol (SNMP)
+        Management Frameworks', RFC-3411, December 2002."
+    SYNTAX          OCTET STRING (SIZE (0..255))
+
+SubscriberPbhk ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1x:"
+    STATUS          current
+    DESCRIPTION
+        "An octet string specifying a Port-Bundle Host Key (PBHK)
+        identifying a subscriber.  The octet string has the following
+        format:
+
+            Octets  Field
+            ------------------------------
+            1-4     subscriber IP address
+            5-6     TCP port number
+
+        Observe that the subscriber IP address is always an IPv4
+        address.
+
+        The value '000000'H is not a valid value.  However, it serves as
+        a convenient value when an instance of an object using this
+        textual convention is not valid."
+    SYNTAX          OCTET STRING (SIZE (6))
+
+SubscriberRemoteId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "255a"
+    STATUS          current
+    DESCRIPTION
+        "A string-value identifying the 'calling station', access
+        multiplexor, or access switch providing access to a subscriber.
+
+        The semantics of the string-value are the same those specified
+        by the SnmpAdminString textual convention defined by the
+        SNMP-FRAMEWORK-MIB (RFC-3411).
+
+        The null string is not a valid value.  However, it serves as a
+        convenient value when an instance of an object using this
+        textual convention is not valid."
+
+    REFERENCE
+        "D. Harrington, R. Resuhn, B. Wijnen, 'An Architecture for
+        Describing Simple Network Management Protocol (SNMP)
+        Management Frameworks', RFC-3411, December 2002."
+    SYNTAX          OCTET STRING (SIZE (0..255))
+
+SubscriberCircuitId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "255a"
+    STATUS          current
+    DESCRIPTION
+        "A string-value identifying the circuit on the 'calling
+        station', access multiplexor, or access switch that provides
+        access to the subscriber.
+
+        The semantics of the string-value are the same those specified
+        by the SnmpAdminString textual convention defined by the
+        SNMP-FRAMEWORK-MIB (RFC-3411).
+
+        The null string is not a valid value.  However, it serves as a
+        convenient value when an instance of an object using this
+        textual convention is not valid."
+
+    REFERENCE
+        "D. Harrington, R. Resuhn, B. Wijnen, 'An Architecture for
+        Describing Simple Network Management Protocol (SNMP)
+        Management Frameworks', RFC-3411, December 2002."
+    SYNTAX          OCTET STRING (SIZE (0..255))
+
+SubscriberNasPort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1x:"
+    STATUS          current
+    DESCRIPTION
+        "An octet string identifying port on the Network Access Server
+        (NAS) that provides access to the subscriber.
+
+        The value '000000'H is not a valid value.  However, it serves as a
+        convenient value when an instance of an object using this
+        textual convention is not valid."
+    SYNTAX          OCTET STRING (SIZE (0..64))
+
+SubscriberDomain ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "255a"
+    STATUS          current
+    DESCRIPTION
+        "A string-value specifying the domain associated with a
+        subscriber.
+
+        The semantics of the string-value are the same those specified
+        by the SnmpAdminString textual convention defined by the
+        SNMP-FRAMEWORK-MIB (RFC-3411).
+
+        The null string is not a valid value.  However, it serves as a
+        convenient value when an instance of an object using this
+        textual convention is not valid."
+
+    REFERENCE
+        "D. Harrington, R. Resuhn, B. Wijnen, 'An Architecture for
+        Describing Simple Network Management Protocol (SNMP)
+        Management Frameworks', RFC-3411, December 2002."
+    SYNTAX          OCTET STRING (SIZE (0..255))
+
+SubscriberUsername ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "255a"
+    STATUS          current
+    DESCRIPTION
+        "A string-value specifying the username identifying a
+        subscriber.
+
+        The semantics of the string-value are the same those specified
+        by the SnmpAdminString textual convention defined by the
+        SNMP-FRAMEWORK-MIB (RFC-3411).
+
+        The null string is not a valid value.  However, it serves as a
+        convenient value when an instance of an object using this
+        textual convention is not valid."
+
+    REFERENCE
+        "D. Harrington, R. Resuhn, B. Wijnen, 'An Architecture for
+        Describing Simple Network Management Protocol (SNMP)
+        Management Frameworks', RFC-3411, December 2002."
+    SYNTAX          OCTET STRING (SIZE (0..255))
+
+SubscriberAcctSessionId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "x"
+    STATUS          current
+    DESCRIPTION
+        "An positive, integer-value specifying the accounting session ID
+        assigned to a subscriber.
+
+        The value '0' is not a valid value.  However, it serves as a
+        convenient value when an instance of an object using this
+        textual convention is not valid."
+    SYNTAX          Unsigned32 (0..4294967295)
+
+SubscriberDnis ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "255a"
+    STATUS          current
+    DESCRIPTION
+        "A string-value specifying the Dialed Number Identification
+        Service (DNIS) number (or called-party number) dialed by a
+        subscriber.
+
+        The semantics of the string-value are the same those specified
+        by the SnmpAdminString textual convention defined by the
+        SNMP-FRAMEWORK-MIB (RFC-3411).
+
+        The null string is not a valid value.  However, it serves as a
+        convenient value when an instance of an object using this
+        textual convention is not valid."
+
+    REFERENCE
+        "D. Harrington, R. Resuhn, B. Wijnen, 'An Architecture for
+        Describing Simple Network Management Protocol (SNMP)
+        Management Frameworks', RFC-3411, December 2002."
+    SYNTAX          OCTET STRING (SIZE (0..255))
+
+SubscriberMediaType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "An enumerated integer-value describing the type of media
+        providing access to the subscriber:
+
+            'other'
+                The implementation of the MIB module using this textual
+                convention does not recognize the type of media
+                providing access to the subscriber.
+
+            'async'
+                An asynchronous serial line provides access to the
+                subscriber.
+
+            'atm'
+                An ATM network provides access to the subscriber.
+
+            'ethernet'
+                An Ethernet-based network provides access to the
+                subscriber.
+
+            'ip'
+                An IP network provides access to the subscriber.
+
+            'isdn'
+                An ISDN line provides access to the subscriber.
+
+            'mpls'
+                An MPLS network provides access to the subscriber.
+
+            'sync'
+                A synchronous serial line provides access to the
+                subscriber.
+
+        The value 'other' cannot be written to an instance of an object.
+        However, it serves as a convenient value when an instance of an
+        object using this textual convention is not valid."
+    SYNTAX          INTEGER  {
+                        other(1),
+                        async(2),
+                        atm(3),
+                        ethernet(4),
+                        ip(5),
+                        isdn(6),
+                        mpls(7),
+                        sync(8)
+                    }
+
+SubscriberProtocolType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "An enumerated integer-value describing the type of protocol
+        providing access to the subscriber:
+
+            'other'
+                The implementation of the MIB module using this textual
+                convention does not recognize the type of protocol
+                providing access to the subscriber.
+
+            'atom'
+                Any Transport over MPLS (AToM) provides access to the
+                subscriber.
+
+            'ip'
+                The Internet Protocol (IP) provides access to the
+                subscriber.
+
+            'psdn'
+                A Public Switched Data Network (PSDN) provides access to
+                the subscriber.
+
+            'ppp'
+                The Point-to-Point Protocol (PPP) provides access to the
+                subscriber.
+
+            'vpdn'
+                A Virtual Private Data Network (VPDN) provides access to
+                the subscriber.
+
+        The value 'other' cannot be written to an instance of an object.
+        However, it serves as a convenient value when an instance of an
+        object using this textual convention is not valid."
+    SYNTAX          INTEGER  {
+                        other(1),
+                        atom(2),
+                        ip(3),
+                        psdn(4),
+                        ppp(5),
+                        vpdn(6)
+                    }
+
+SubscriberDhcpClass ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "255a"
+    STATUS          current
+    DESCRIPTION
+        "A string-value specifying the name of the class matching the
+        DHCP DISCOVER message received from the subscriber.
+
+        The semantics of the string-value are the same those specified
+        by the SnmpAdminString textual convention defined by the
+        SNMP-FRAMEWORK-MIB (RFC-3411).
+
+        The null string is not a valid value.  However, it serves as a
+        convenient value when an instance of an object using this
+        textual convention is not valid."
+
+    REFERENCE
+        "D. Harrington, R. Resuhn, B. Wijnen, 'An Architecture for
+        Describing Simple Network Management Protocol (SNMP)
+        Management Frameworks', RFC-3411, December 2002."
+    SYNTAX          OCTET STRING (SIZE (0..255))
+
+SubscriberTunnelName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "255a"
+    STATUS          current
+    DESCRIPTION
+        "A string-value specifying the name of the VPDN used to carry
+        a subscriber's session.
+
+        The semantics of the string-value are the same those specified
+        by the SnmpAdminString textual convention defined by the
+        SNMP-FRAMEWORK-MIB (RFC-3411).
+
+        The null string is not a valid value.  However, it serves as a
+        convenient value when an instance of an object using this
+        textual convention is not valid."
+
+    REFERENCE
+        "D. Harrington, R. Resuhn, B. Wijnen, 'An Architecture for
+        Describing Simple Network Management Protocol (SNMP)
+        Management Frameworks', RFC-3411, December 2002."
+    SYNTAX          OCTET STRING (SIZE (0..255))
+
+SubscriberLocationName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "255a"
+    STATUS          current
+    DESCRIPTION
+        "A string-value specifying the location associated with a
+        subscriber.
+
+        The semantics of the string-value are the same those specified
+        by the SnmpAdminString textual convention defined by the
+        SNMP-FRAMEWORK-MIB (RFC-3411).
+
+        The null string is not a valid value.  However, it serves as a
+        convenient value when an instance of an object using this
+        textual convention is not valid."
+
+    REFERENCE
+        "D. Harrington, R. Resuhn, B. Wijnen, 'An Architecture for
+        Describing Simple Network Management Protocol (SNMP)
+        Management Frameworks', RFC-3411, December 2002."
+    SYNTAX          OCTET STRING (SIZE (0..255))
+
+SubscriberServiceName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "255a"
+    STATUS          current
+    DESCRIPTION
+        "A string-value specifying the subscriber service associated
+        with a subscriber.
+
+        The semantics of the string-value are the same those specified
+        by the SnmpAdminString textual convention defined by the
+        SNMP-FRAMEWORK-MIB (RFC-3411).
+
+        The null string is not a valid value.  However, it serves as a
+        convenient value when an instance of an object using this
+        textual convention is not valid."
+
+    REFERENCE
+        "D. Harrington, R. Resuhn, B. Wijnen, 'An Architecture for
+        Describing Simple Network Management Protocol (SNMP)
+        Management Frameworks', RFC-3411, December 2002."
+    SYNTAX          OCTET STRING (SIZE (0..255))
+
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
