@@ -3,8 +3,8 @@
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
+use LibreNMS\Data\Store\MetricDefinitions;
 use LibreNMS\Enum\Severity;
-use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Number;
@@ -854,23 +854,6 @@ foreach ($ports as $port) {
             // Update data stores
             $rrd_name = Rrd::portName($port_id, '');
             $rrdfile = Rrd::name($device['hostname'], $rrd_name);
-            $rrd_def = RrdDefinition::make()
-                ->addDataset('INOCTETS', 'DERIVE', 0, 12500000000)
-                ->addDataset('OUTOCTETS', 'DERIVE', 0, 12500000000)
-                ->addDataset('INERRORS', 'DERIVE', 0, 12500000000)
-                ->addDataset('OUTERRORS', 'DERIVE', 0, 12500000000)
-                ->addDataset('INUCASTPKTS', 'DERIVE', 0, 12500000000)
-                ->addDataset('OUTUCASTPKTS', 'DERIVE', 0, 12500000000)
-                ->addDataset('INNUCASTPKTS', 'DERIVE', 0, 12500000000)
-                ->addDataset('OUTNUCASTPKTS', 'DERIVE', 0, 12500000000)
-                ->addDataset('INDISCARDS', 'DERIVE', 0, 12500000000)
-                ->addDataset('OUTDISCARDS', 'DERIVE', 0, 12500000000)
-                ->addDataset('INUNKNOWNPROTOS', 'DERIVE', 0, 12500000000)
-                ->addDataset('INBROADCASTPKTS', 'DERIVE', 0, 12500000000)
-                ->addDataset('OUTBROADCASTPKTS', 'DERIVE', 0, 12500000000)
-                ->addDataset('INMULTICASTPKTS', 'DERIVE', 0, 12500000000)
-                ->addDataset('OUTMULTICASTPKTS', 'DERIVE', 0, 12500000000);
-
             $fields = [
                 'INOCTETS' => $this_port['ifInOctets'] ?? null,
                 'OUTOCTETS' => $this_port['ifOutOctets'] ?? null,
@@ -910,10 +893,9 @@ foreach ($ports as $port) {
                 'ifAlias' => $port['ifAlias'],
                 'ifIndex' => $port['ifIndex'],
                 'port_descr_type' => $port['port_descr_type'],
-                'rrd_name' => $rrd_name,
-                'rrd_def' => $rrd_def,
             ];
-            app('Datastore')->put($device, 'ports', $tags, $fields);
+            // the fields of the port metric, stored under the legacy names (ports measurement and port-id rrd file)
+            app('Datastore')->write('ports', $fields, $tags, ['rrd_name' => $rrd_name, 'definition' => app(MetricDefinitions::class)->of('port')]);
 
             // End Update IF-MIB
             // Update PAgP

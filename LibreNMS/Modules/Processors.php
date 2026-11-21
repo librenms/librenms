@@ -13,7 +13,6 @@ use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\OS;
-use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Traits\RequiresPollingMethod;
 use SnmpQuery;
 
@@ -83,13 +82,12 @@ class Processors implements Module
         }
 
         // update
-        $rrd_def = RrdDefinition::make()->addDataset('usage', 'GAUGE', -273, 1000);
         foreach ($processors as $processor) {
             $usage = $processor->processor_usage === null ? null : round($processor->processor_usage, 2);
             Log::info("$processor->processor_descr: $usage%");
 
             $metric = $processor->setRelation('device', $os->getDevice())->metricIdentity('processor');
-            $datastore->write($metric->measurement, ['usage' => $usage], $metric->tags, ['metric' => $metric, 'rrd_def' => $rrd_def]);
+            $datastore->write($metric->measurement, ['usage' => $usage], $metric->tags, ['metric' => $metric]);
 
             // store null usage when polling fails so a stale value is not shown
             $processor->save();
