@@ -3,12 +3,15 @@
 namespace LibreNMS\Tests\Feature\Graphing;
 
 use App\Data\Graphing\DataSeries;
+use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
 use App\Data\Graphing\SeriesStyle;
+use App\Data\Graphing\StatsOptions;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
 use App\Graphs\Device\DeviceGraph;
 use App\Graphs\GraphFactory;
+use App\Models\Application;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\Processor;
@@ -124,6 +127,44 @@ class RrdGraphRenderingTest extends TestCase
                 return ['bits' => new DataSeries($this->metric('traffic'), 'bytes', 'Traffic', 'bps', 8, new SeriesStyle(fill: true, invert: true))];
             }
         };
+
+        $this->assertStringStartsWith(self::PNG_HEADER, $graph->render()->data);
+    }
+
+    public function test_it_draws_rolling_stats_and_percentiles(): void
+    {
+        $device = Device::factory()->create();
+        $this->createRrd($device, 'offset.rrd', ['offset']);
+        // long enough for the daily and weekly lines
+        $params = new GraphParameters(['type' => 'device_offset', 'device' => $device->device_id, 'graph_type' => 'png', 'from' => time() - 800000, 'to' => time()]);
+
+        $graph = new class($params) extends DeviceGraph
+        {
+            public function getSeries(): array
+            {
+                return ['offset' => new DataSeries($this->metric('offset'), 'offset', 'Offset', 's', 0.001, new SeriesStyle(fill: true, invert: true))];
+            }
+
+            protected function options(): GraphOptions
+            {
+                return new GraphOptions(palette: 'rainbow_stats_purple', stats: new StatsOptions);
+            }
+        };
+
+        $this->assertStringStartsWith(self::PNG_HEADER, $graph->render()->data);
+    }
+
+    #[TestWith(['application_ntp_client_stats'])]
+    #[TestWith(['application_ntp_client_offset'])]
+    #[TestWith(['application_ntp_client_freq'])]
+    #[TestWith(['application_ntp_client_stability'])]
+    public function test_it_draws_ntp_client_graphs(string $type): void
+    {
+        $device = Device::factory()->create();
+        $app = Application::factory()->for($device)->create(['app_type' => 'ntp-client']);
+        $this->createRrd($device, "app-ntp-client-$app->app_id.rrd", ['offset', 'frequency', 'jitter', 'noise', 'stability']);
+
+        $graph = (new GraphFactory)->graphFor(new GraphParameters(['type' => $type, 'id' => $app->app_id, 'graph_type' => 'png', 'from' => time() - 800000]));
 
         $this->assertStringStartsWith(self::PNG_HEADER, $graph->render()->data);
     }

@@ -56,7 +56,7 @@ class RrdTrafficDefinition
                 array_push($this->defs, ...$periodValueDefs('prev', $suffix, $cf, $range, $this->params->period));
             }
             $this->defs[] = "CDEF:{$previous}drawn=$previous,$factor,*";
-            $this->drawing[] = "LINE1.25:{$previous}drawn#" . $this->theme->previous($series->style->invert) . ':' . Rrd::fixedSafeDescr(__('graph.legend.previous', ['series' => $series->description]), 16);
+            $this->drawing[] = "LINE1.25:{$previous}drawn#" . $this->theme->previous($series->style->invert) . ':' . Rrd::fixedSafeDescr(__('graph.legend.previous', ['series' => $series->description]), RrdSeriesDefinition::LABEL_WIDTH);
             $unit = str_replace(['%', ':'], ['%%', '\\:'], $series->unit);
             array_push($this->drawing,
                 "GPRINT:$previous:LAST:%5.2lf%s$unit",

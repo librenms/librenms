@@ -56,10 +56,10 @@ class PacketGraphsTest extends TestCase
 
         $command = $graph->getDebugCommand();
 
-        $this->assertStringContainsString("'AREA:ds0#FF3300:Errors In        '", $command);
-        $this->assertStringContainsString("'AREA:ds1#805080:Discards In      :STACK'", $command);
-        $this->assertStringContainsString("'AREA:ds2drawn#FF6633:Errors Out       '", $command);
-        $this->assertStringContainsString("'AREA:ds3drawn#C0A060:Discards Out     :STACK'", $command);
+        $this->assertStringContainsString("'AREA:ds0#FF3300:Errors In            '", $command);
+        $this->assertStringContainsString("'AREA:ds1#805080:Discards In          :STACK'", $command);
+        $this->assertStringContainsString("'AREA:ds2drawn#FF6633:Errors Out           '", $command);
+        $this->assertStringContainsString("'AREA:ds3drawn#C0A060:Discards Out         :STACK'", $command);
     }
 
     public function test_stacked_graphs_draw_everything_above_the_axis(): void
@@ -69,6 +69,6 @@ class PacketGraphsTest extends TestCase
         $command = new ErrorsGraph(new GraphParameters(['type' => 'port_errors', 'id' => $this->port->port_id]))->getDebugCommand();
 
         $this->assertStringNotContainsString('drawn', $command);
-        $this->assertStringContainsString("'AREA:ds2#FF663388:Errors Out       :STACK'", $command);
+        $this->assertStringContainsString("'AREA:ds2#FF663388:Errors Out           :STACK'", $command);
     }
 }

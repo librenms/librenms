@@ -17,7 +17,7 @@ use LibreNMS\Exceptions\NoGraphData;
  */
 class RrdSeriesDefinition
 {
-    private const int LABEL_WIDTH = 16;
+    public const int LABEL_WIDTH = 20;
     private const int PRECISION = 2;
 
     /** @var array<string, array{suffix: string, cf: string}> legend columns and the value each one shows */
@@ -96,6 +96,9 @@ class RrdSeriesDefinition
         $overlaid = self::overlaid($this->options);
         $theme = new GraphTheme($params->isDark(), $this->options->palette, $overlaid && $inverted);
         $traffic = $this->options->traffic === null ? null : new RrdTrafficDefinition($this->options->traffic, $params, $theme);
+        // with several drawn series, stats lines are named after their series so they can be told apart
+        $stats = $this->options->stats === null ? null : new RrdStatsDefinition($this->options->stats, $params, $theme,
+            count(array_filter($drawable, fn ($series) => ! $series->style->legendOnly)) > 1);
         $averaged = count(array_filter(array_keys($this->files), fn ($key) => $this->series[$key]->style->stackAverage));
 
         $i = 0;
@@ -175,6 +178,9 @@ class RrdSeriesDefinition
             if ($summarized) {
                 $traffic->addSeries($id, $series, $factor, $color, fn (string $period, string $suffix, string $cf, string $range, int $shift) => $this->periodValueDefs($key, $period, $suffix, $cf, $range, $shift));
             }
+            if (! $style->legendOnly) {
+                $stats?->addSeries($id, $series, $factor, fn (string $period, string $suffix, string $cf, string $range) => $this->periodValueDefs($key, $period, $suffix, $cf, $range));
+            }
         }
 
         // the previous period of each stack, below the axis for series drawn below it
@@ -206,10 +212,10 @@ class RrdSeriesDefinition
         }
 
         // a value used by several series is defined once
-        $defs = array_values(array_unique([...$defs, ...($traffic?->definitions() ?? [])]));
+        $defs = array_values(array_unique([...$defs, ...($stats->definitions ?? []), ...($traffic?->definitions() ?? [])]));
 
         // fills go below all lines, so they do not hide lines of other series
-        return [$this->legendHeader(), ...$defs, ...$margins, ...$maxFills, ...$fills, ...$drawing, ...($traffic?->drawing() ?? [])];
+        return [$this->legendHeader(), ...$defs, ...$margins, ...$maxFills, ...$fills, ...$drawing, ...($stats->drawing ?? []), ...($traffic?->drawing() ?? [])];
     }
 
     /**
