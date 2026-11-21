@@ -27,7 +27,6 @@
 
 namespace LibreNMS\Data\Store;
 
-use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
 use Illuminate\Http\Client\ConnectionException;
@@ -109,8 +108,7 @@ class Prometheus extends BaseDatastore
         }
 
         // the instance is what the series belongs to
-        $metric = $meta['metric'] ?? null;
-        $instance = $metric instanceof MetricIdentity ? $metric->group() : $device->hostname;
+        $instance = $this->canonicalMetric($meta)?->group() ?? $device->hostname;
         $promurl = $instance . $promtags;
         $promurl = str_replace(' ', '-', $promurl); // Prometheus doesn't handle tags with spaces in url
 

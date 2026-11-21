@@ -13,6 +13,8 @@ interface WriteInterface
      *                                                      under the names it had before when datastore.canonical_metrics is off.
      *                                                      Stores find its fields with MetricDefinitions and the names it is stored under with MetricNames.
      *                                                      Tags other than those of the identity are stored as given.
+     *                                                      Under the names it had before, stores other than rrd write it as they did without an identity
+     *                                                      (BaseDatastore::canonicalMetric() is null), by measurement, tags and rrd_name.
      *   rrd_def     RrdDefinition: overrides the one built from the metric definition
      *   rrd_name    array|string: the rrd filename, will be processed with rrd_name()
      *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()

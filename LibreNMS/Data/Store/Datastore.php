@@ -148,6 +148,10 @@ class Datastore implements WriteInterface, DataStorageInterface
             // tags the caller adds to those of the identity keep their name
             $tags = [...$legacy->tagsOf($metric), ...array_diff_key($tags, $metric->tags)];
             $fields = $legacy->fieldsOf($fields);
+
+            if ($rrdName = $legacy->rrdNameOf($metric)) {
+                $meta['rrd_name'] = $rrdName; // graphite names series after it
+            }
         }
 
         foreach ($this->stores as $store) {

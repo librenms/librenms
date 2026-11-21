@@ -76,11 +76,24 @@ abstract class BaseDatastore implements DatastoreContract
      */
     protected function seriesTags(array $tags, array $meta): array
     {
-        if (($meta['metric'] ?? null) instanceof MetricIdentity) {
+        if ($this->canonicalMetric($meta) !== null) {
             return $tags;
         }
 
         return ['hostname' => $this->getDevice($meta)->hostname, ...$tags];
+    }
+
+    /**
+     * The identity of a metric that is stored as identified.
+     * A metric still stored under the names it had before is written as before, by measurement, tags and rrd_name.
+     *
+     * @param  array<string, mixed>  $meta
+     */
+    protected function canonicalMetric(array $meta): ?MetricIdentity
+    {
+        $metric = $meta['metric'] ?? null;
+
+        return $metric instanceof MetricIdentity && app(MetricNames::class)->storedAs($metric) === null ? $metric : null;
     }
 
     public function __destruct()

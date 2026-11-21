@@ -59,7 +59,7 @@ class MetricNames
     public function legacyOf(MetricIdentity $metric): ?LegacyMetric
     {
         return match ($metric->measurement) {
-            'port' => new LegacyMetric('ports', rrdName: ['port', 'id{id}'], fields: self::PORT_FIELDS),
+            'port' => new LegacyMetric('ports', rrdName: ['port-id{id}'], fields: self::PORT_FIELDS),
             'processor' => new LegacyMetric('processors', ['type' => 'processor_type', 'index' => 'processor_index'], ['processor', '{type}', '{index}']),
             'mempool' => new LegacyMetric('mempool', ['type' => 'mempool_type', 'class' => 'mempool_class', 'index' => 'mempool_index'], ['mempool', '{type}', '{class}', '{index}']),
             // ipmi sensors were a measurement of their own, except in rrd files

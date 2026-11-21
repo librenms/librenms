@@ -27,7 +27,6 @@
 
 namespace LibreNMS\Data\Store;
 
-use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Polling\Measure\Measurement;
 use Carbon\Carbon;
@@ -88,8 +87,8 @@ class Graphite extends BaseDatastore
             $measurement = 'ports|' . $tags['ifName'];
         }
 
-        $identity = $meta['metric'] ?? null;
-        $hostname = $identity instanceof MetricIdentity ? $identity->group() : $this->getDevice($meta)->hostname;
+        $identity = $this->canonicalMetric($meta);
+        $hostname = $identity !== null ? $identity->group() : $this->getDevice($meta)->hostname;
 
         // metrics will be built as prefix.hostname.measurement.field value timestamp
         // metric fields can not contain . as this is used by graphite as a field separator
@@ -97,7 +96,7 @@ class Graphite extends BaseDatastore
         $measurement = preg_replace(['/\./', '/\//'], '_', $measurement);
         $measurement = preg_replace('/\|/', '.', (string) $measurement);
 
-        $measurement_name = preg_replace('/\./', '_', $identity instanceof MetricIdentity ? array_values($identity->tagsInGroup()) : ($meta['rrd_name'] ?? '')); // FIXME don't use rrd_name
+        $measurement_name = preg_replace('/\./', '_', $identity !== null ? array_values($identity->tagsInGroup()) : ($meta['rrd_name'] ?? '')); // FIXME don't use rrd_name
         $ms_name = is_array($measurement_name) ? implode('.', $measurement_name) : $measurement_name;
         // remove the port-id tags from the metric
         if (preg_match('/^port-id\d+/', (string) $ms_name)) {

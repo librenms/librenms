@@ -111,7 +111,7 @@ final class DatastoreTest extends TestCase
         $metric = new MetricIdentity('processor', ['hostname' => 'localhost', 'type' => 'hr', 'index' => 1]);
         $store = Mockery::mock(DatastoreContract::class);
         $store->shouldReceive('write')->once()
-            ->with('processors', ['usage' => 5], ['processor_type' => 'hr', 'processor_index' => 1], ['metric' => $metric, 'rrd_def' => 'def']);
+            ->with('processors', ['usage' => 5], ['processor_type' => 'hr', 'processor_index' => 1], ['metric' => $metric, 'rrd_def' => 'def', 'rrd_name' => ['processor', 'hr', '1']]);
 
         new Datastore([$store])->write($metric->measurement, ['usage' => 5], $metric->tags, ['metric' => $metric, 'rrd_def' => 'def']);
     }
@@ -122,7 +122,7 @@ final class DatastoreTest extends TestCase
         $portTags = ['ifName' => 'eth0', 'ifAlias' => 'uplink', 'ifIndex' => 2, 'port_descr_type' => 'core'];
         $store = Mockery::mock(DatastoreContract::class);
         $store->shouldReceive('write')->once()
-            ->with('ports', ['INOCTETS' => 5, 'OUTOCTETS' => 6, 'ifInOctets_rate' => 1], $portTags, ['metric' => $metric]);
+            ->with('ports', ['INOCTETS' => 5, 'OUTOCTETS' => 6, 'ifInOctets_rate' => 1], $portTags, ['metric' => $metric, 'rrd_name' => ['port-id12']]);
 
         // fields that are not in the definition and tags that are not in the identity keep their names
         new Datastore([$store])->write($metric->measurement, ['in_octets' => 5, 'out_octets' => 6, 'ifInOctets_rate' => 1], [...$metric->tags, ...$portTags], ['metric' => $metric]);
