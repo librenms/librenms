@@ -296,8 +296,8 @@ final class PackagesTest extends InMemoryDbTestCase
 
     public function testKeepsExistingPackagesWhenTheAgentTimesOut(): void
     {
-        $os = $this->makeOs([PollingMethodType::UnixAgent]);
-        // packages collected by a previous complete fetch
+        $os = $this->makeOs([PollingMethodType::UnixAgent, PollingMethodType::Snmp]);
+        // packages collected by a previous complete agent fetch
         Package::factory()->create([
             'device_id' => $os->getDeviceId(),
             'name' => 'bash',
@@ -321,11 +321,40 @@ final class PackagesTest extends InMemoryDbTestCase
             'time' => 15,
             'timed_out' => true,
         ]);
+        // snmp has a nonempty subset, which must not replace the agent inventory after a timeout
+        $backend = Mockery::mock(SnmpBackendInterface::class);
+        $backend->shouldReceive('get')->zeroOrMoreTimes()->andReturnUsing(fn (): RawSnmpResponse => $this->snmpProbeResponse());
+        $backend->shouldReceive('walk')->zeroOrMoreTimes()->andReturn(new RawSnmpResponse(
+            "HOST-RESOURCES-MIB::hrSWInstalledIndex.1 = 1\nHOST-RESOURCES-MIB::hrSWInstalledName.1 = \"host-res-pkg_1.0.0_amd64\"\nHOST-RESOURCES-MIB::hrSWInstalledID.1 = 0.0\nHOST-RESOURCES-MIB::hrSWInstalledType.1 = 4",
+            '', 0
+        ));
+        $this->app->instance(SnmpBackendInterface::class, $backend);
+        $this->app->instance(SnmpPollingMethod::class, new SnmpPollingMethod($backend));
 
         (new Packages)->poll($os, $this->datastore());
 
         $packages = Package::where('device_id', $os->getDeviceId())->orderBy('name')->get();
         $this->assertSame(['bash', 'kernel'], $packages->pluck('name')->all());
+        $this->assertSame([PollingMethodType::UnixAgent, PollingMethodType::UnixAgent], $packages->pluck('polling_method')->all());
+    }
+
+    public function testFallsBackToSnmpWhenTheAgentHasNoPackages(): void
+    {
+        $os = $this->makeOs([PollingMethodType::UnixAgent, PollingMethodType::Snmp]);
+        // the agent is reachable and complete, but it has no package section
+        $this->fakeMethod(UnixAgentPollingMethod::class, true, [
+            'output' => "<<<mem>>>\nMemTotal: 1000 kB\n",
+            'time' => 15,
+        ]);
+        $this->fakeSnmpInstalledPackages([
+            ['index' => 1, 'name' => 'bash_5.2.0_amd64'],
+        ]);
+
+        (new Packages)->poll($os, $this->datastore());
+
+        $package = Package::where('device_id', $os->getDeviceId())->sole();
+        $this->assertSame('bash', $package->name);
+        $this->assertSame(PollingMethodType::Snmp, $package->polling_method);
     }
 
     public function testDataExists(): void
