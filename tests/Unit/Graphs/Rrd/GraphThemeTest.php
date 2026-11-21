@@ -35,8 +35,8 @@ class GraphThemeTest extends TestCase
     {
         $this->assertSame('272B30', new GraphTheme(dark: false)->next(SeriesRole::Value));
         $this->assertSame('F2F2F2', new GraphTheme(dark: true)->next(SeriesRole::Value));
-        $this->assertSame('000000', new GraphTheme(dark: false)->portSpeed());
-        $this->assertSame('F2F2F2', new GraphTheme(dark: true)->portSpeed());
+        $this->assertSame('000000', new GraphTheme(dark: false)->color(SeriesRole::PortSpeed));
+        $this->assertSame('F2F2F2', new GraphTheme(dark: true)->color(SeriesRole::PortSpeed));
     }
 
     public function test_translucent_themes_only_change_areas_and_fills(): void

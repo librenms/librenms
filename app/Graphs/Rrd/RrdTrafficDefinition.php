@@ -8,10 +8,9 @@ use App\Data\Graphing\SeriesSum;
 use App\Data\Graphing\TrafficOptions;
 use Closure;
 use LibreNMS\Data\Store\Rrd;
-use LibreNMS\Util\Number;
 
 /**
- * Adds traffic percentiles, transferred bytes, comparison lines and port speeds to a series definition.
+ * Adds traffic percentiles, transferred bytes and comparison lines to a series definition.
  */
 class RrdTrafficDefinition
 {
@@ -24,14 +23,10 @@ class RrdTrafficDefinition
     /** @var array<string, list<string>> */
     private array $totals = [];
 
-    /**
-     * @param  bool  $overlaid  inverted series are drawn above the axis, over the others
-     */
     public function __construct(
         private readonly TrafficOptions $options,
         private readonly GraphParameters $params,
         private readonly GraphTheme $theme,
-        private readonly bool $overlaid,
     ) {
     }
 
@@ -52,9 +47,9 @@ class RrdTrafficDefinition
      *                                                                                                                         the series for $id$period$suffix
      * @param  int  $labelWidth  characters the previous period label is padded to, the longest label of the graph
      */
-    public function addSeries(string $id, DataSeries|SeriesSum $series, float $drawScale, ?string $color, Closure $periodValueDefs, int $labelWidth): void
+    public function addSeries(string $id, DataSeries|SeriesSum $series, float $drawFactor, ?string $color, Closure $periodValueDefs): void
     {
-        $factor = RrdSeriesDefinition::number($drawScale * ($series->style->invert && ! $this->overlaid ? -1 : 1));
+        $factor = RrdSeriesDefinition::number($drawFactor);
         $this->summarize($id, $series, $factor);
 
         if ($this->params->to > time()) {
@@ -133,17 +128,6 @@ class RrdTrafficDefinition
                 array_push($drawing, ...$totals);
                 $drawing[array_key_last($drawing)] .= '\\l';
             }
-        }
-
-        $speeds = array_filter($this->options->speeds);
-        if (count(array_unique($speeds)) === 1) {
-            $speeds = ['' => reset($speeds)];
-        }
-        foreach ($speeds as $key => $speed) {
-            $value = $key === 'out' && ! $this->overlaid ? -$speed : $speed;
-            $type = $this->options->speedZoom ? 'LINE2' : 'HRULE';
-            $label = __($key === '' ? 'graph.legend.port_speed' : "graph.legend.port_speed_$key", ['speed' => Number::formatSi($speed, 2, 0, 'bps')]);
-            $drawing[] = "$type:$value#{$this->theme->portSpeed()}:" . Rrd::safeDescr($label) . '\\n';
         }
 
         return $drawing;

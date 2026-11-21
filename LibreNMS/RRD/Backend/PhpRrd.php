@@ -168,6 +168,35 @@ class PhpRrd extends Rrdtool
     }
 
     /**
+     * @param  string[]  $options
+     * @return array<string, array<int, float|null>>
+     *
+     * @throws RrdException
+     */
+    public function xport(array $options): array
+    {
+        $options = [...$this->daemon(), ...$options];
+        Log::debug('PHPRRD[%gxport ' . implode(' ', $options) . '%n]', ['color' => true]);
+
+        // php-rrd prints a message on failure
+        ob_start();
+        try {
+            $export = $this->inRrdDir(fn () => rrd_xport($options));
+        } finally {
+            ob_end_clean();
+        }
+
+        if (! is_array($export)) {
+            throw RrdException::parse(rrd_error());
+        }
+
+        return array_map(
+            fn (array $values) => array_map(fn (float $value) => is_finite($value) ? $value : null, $values),
+            array_column($export['data'], 'data', 'legend'),
+        );
+    }
+
+    /**
      * The file name to give librrd, a remote rrdcached resolves relative names against its base directory
      */
     private function file(RrdPath $rrd): string

@@ -6,8 +6,10 @@ use App\Data\Graphing\DataSeries;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\SeriesRole;
 use App\Data\Graphing\SeriesStyle;
+use App\Data\Graphing\Threshold;
 use App\Data\Graphing\TrafficOptions;
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Util\Number;
 
 class BitsGraph extends PortGraph
 {
@@ -42,16 +44,42 @@ class BitsGraph extends PortGraph
         if ($this->params->inverse) {
             [$in, $out] = [$out, $in];
         }
+        $shown = $this->showsPortSpeed();
 
-        return new GraphOptions(legendTitle: 'bps', traffic: new TrafficOptions(
-            percentile: (float) LibrenmsConfig::get('percentile_value', 95),
-            highestPercentile: (bool) LibrenmsConfig::get('rrdgraph_real_percentile'),
-            speeds: ['in' => $in, 'out' => $out],
-            speedZoom: $this->speedZoom(),
-        ));
+        return new GraphOptions(
+            legendTitle: 'bps',
+            traffic: new TrafficOptions(
+                percentile: (float) LibrenmsConfig::get('percentile_value', 95),
+                highestPercentile: (bool) LibrenmsConfig::get('rrdgraph_real_percentile'),
+                speedZoom: $shown && ($in || $out),
+            ),
+            thresholds: $this->portSpeeds($in, $out, $shown),
+        );
     }
 
-    private function speedZoom(): bool
+    /**
+     * One line for both directions at the same speed, otherwise a line for each that has one
+     *
+     * @return list<Threshold>
+     */
+    private function portSpeeds(int $in, int $out, bool $shown): array
+    {
+        $label = fn (string $key, int $speed) => __($key, ['speed' => Number::formatSi($speed, 2, 0, 'bps')]);
+
+        if ($in === $out) {
+            return $in ? [new Threshold($in, $label('graph.legend.port_speed', $in), SeriesRole::PortSpeed, $shown, mirror: true)] : [];
+        }
+
+        return array_values(array_filter([
+            $in ? new Threshold($in, $label('graph.legend.port_speed_in', $in), SeriesRole::PortSpeed, $shown) : null,
+            $out ? new Threshold($out, $label('graph.legend.port_speed_out', $out), SeriesRole::PortSpeed, $shown, invert: true) : null,
+        ]));
+    }
+
+    /**
+     * Shown when zoomed to the port speed, as the request or the site sets it
+     */
+    private function showsPortSpeed(): bool
     {
         return $this->params->input->bool('port_speed_zoom') ?? (bool) LibrenmsConfig::get('graphs.port_speed_zoom');
     }
