@@ -117,6 +117,42 @@ modules:
                             device: hardware
                             op: starts
                             value: SG300
+                        -
+                            device: hardware
+                            op: starts
+                            value: SF300
+                        -
+                            device: hardware
+                            op: starts
+                            value: SG300
+                        -
+                            device: hardware
+                            op: starts
+                            value: SF300
+                        -
+                            device: hardware
+                            op: starts
+                            value: SG200
+                        -
+                            device: hardware
+                            op: starts
+                            value: SF200
+                        -
+                            device: hardware
+                            op: starts
+                            value: SG220
+                        -
+                            device: hardware
+                            op: starts
+                            value: SF220
+                        -
+                            device: hardware
+                            op: starts
+                            value: SG250
+                        -
+                            device: hardware
+                            op: starts
+                            value: SF250
         fanspeed:
             data:
                 -
