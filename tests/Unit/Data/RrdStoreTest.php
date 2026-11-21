@@ -2,6 +2,8 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use App\Data\TimeSeries\MetricDefinition;
+use App\Data\TimeSeries\MetricField;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
@@ -46,6 +48,25 @@ final class RrdStoreTest extends TestCase
         $this->backend->shouldReceive('update')->once()->with(Mockery::any(), [10, 20, null], null);
 
         (new Rrd)->write('test', ['out' => 20, 'in' => 10], [], ['device' => $this->device, 'rrd_def' => $definition]);
+    }
+
+    public function testCreatesTheFileFromTheMetricDefinition(): void
+    {
+        $definition = new MetricDefinition(MetricField::derive('in', 0, 100), MetricField::gauge('speed'));
+        $expected = RrdDefinition::make()->addDataset('in', 'DERIVE', 0, 100)->addDataset('speed', 'GAUGE');
+        $this->backend->shouldReceive('update')->once()->andThrow(new RrdNotFoundException('No such file'));
+        $this->backend->shouldReceive('create')->once()->withArgs(fn ($rrd, RrdDefinition $def) => $def->getCreateArguments() === $expected->getCreateArguments());
+        $this->backend->shouldReceive('update')->once()->with(Mockery::any(), [10, 1000], null);
+
+        (new Rrd)->write('test', ['speed' => 1000, 'in' => 10], [], ['device' => $this->device, 'definition' => $definition]);
+    }
+
+    public function testAGivenRrdDefinitionOverridesTheMetricDefinition(): void
+    {
+        $definition = RrdDefinition::make()->addDataset('out', 'GAUGE')->addDataset('in', 'GAUGE');
+        $this->backend->shouldReceive('update')->once()->with(Mockery::any(), [20, 10], null);
+
+        (new Rrd)->write('test', ['in' => 10, 'out' => 20], [], ['device' => $this->device, 'rrd_def' => $definition, 'definition' => new MetricDefinition(MetricField::gauge('in'))]);
     }
 
     public function testOnlyConsecutiveStoreErrorsDisable(): void

@@ -26,6 +26,8 @@
 
 namespace LibreNMS\RRD;
 
+use App\Data\TimeSeries\FieldKind;
+use App\Data\TimeSeries\MetricDefinition;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\InvalidRrdTypeException;
 
@@ -44,6 +46,24 @@ class RrdDefinition implements \Stringable
     public static function make()
     {
         return new self();
+    }
+
+    /**
+     * A data source for each field of the metric, in the order of its fields
+     */
+    public static function fromMetric(MetricDefinition $metric): self
+    {
+        $definition = new self();
+        foreach ($metric->fields as $field) {
+            $type = match ($field->kind) {
+                FieldKind::Gauge => 'GAUGE',
+                FieldKind::Derive => 'DERIVE',
+                FieldKind::Counter => 'COUNTER',
+            };
+            $definition->addDataset($field->name, $type, $field->min, $field->max);
+        }
+
+        return $definition;
     }
 
     /**

@@ -11,7 +11,8 @@ interface WriteInterface
      *   device      App\Models\Device  non-primary device to write statistics for
      *   metric      App\Data\TimeSeries\MetricIdentity: the identity of a metric, it decides where datastores keep it,
      *                                                      under the names it had before when datastore.canonical_metrics is off
-     *   rrd_def     RrdDefinition
+     *   definition  App\Data\TimeSeries\MetricDefinition: the fields of the metric, found from the metric when not given (see MetricDefinitions)
+     *   rrd_def     RrdDefinition: overrides the one built from the definition
      *   rrd_name    array|string: the rrd filename, will be processed with rrd_name()
      *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
      *   rrd_step             int: rrd step, defaults to 300

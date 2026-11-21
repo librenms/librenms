@@ -68,8 +68,11 @@ class Datastore implements WriteInterface, DataStorageInterface
      *
      * @param  DatastoreContract[]  $stores
      */
-    public function __construct(protected array $stores, private readonly MetricNames $metricNames = new MetricNames)
-    {
+    public function __construct(
+        protected array $stores,
+        private readonly MetricNames $metricNames = new MetricNames,
+        private readonly MetricDefinitions $definitions = new MetricDefinitions,
+    ) {
     }
 
     public function terminate(): void
@@ -140,6 +143,10 @@ class Datastore implements WriteInterface, DataStorageInterface
     public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
         $metric = $meta['metric'] ?? null;
+        if ($metric instanceof MetricIdentity && ! isset($meta['definition']) && $definition = $this->definitions->of($metric)) {
+            $meta['definition'] = $definition;
+        }
+
         $legacy = $metric instanceof MetricIdentity ? $this->metricNames->storedAs($metric) : null;
 
         if ($legacy !== null) {

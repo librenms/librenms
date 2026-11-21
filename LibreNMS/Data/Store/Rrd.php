@@ -37,6 +37,7 @@ use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\Exceptions\RrdStoreException;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
+use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\Util\Rewrite;
 use Log;
@@ -93,6 +94,10 @@ class Rrd extends BaseDatastore
             $rrd = $this->metricName($metric);
         } else {
             $rrd = RrdPath::make($device_model->hostname, self::filenameString($rrd_name) . '.rrd');
+        }
+
+        if (! isset($meta['rrd_def']) && isset($meta['definition'])) {
+            $meta['rrd_def'] = RrdDefinition::fromMetric($meta['definition']);
         }
 
         if (isset($meta['rrd_def'])) {
