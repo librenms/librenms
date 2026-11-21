@@ -1,6 +1,6 @@
 <script>
     document.addEventListener('alpine:init', () => {
-        const { limitRange, now, panRange, resolveRange, zoomRange, formatValue, shownPoints, summarize, toCsv, loadChart } = window.LibreNMS.Graphs;
+        const { limitRange, now, panRange, resolveRange, zoomRange, formatValue, joinGraph, shownPoints, sliceGraph, summarize, toCsv, loadChart } = window.LibreNMS.Graphs;
         const MAX_TOOLTIP_ROWS = 12;
         const TOOLTIP_GAP = 32; // from the cursor
         const TOOLTIP_MARGIN = 8; // from the window edges
@@ -9,6 +9,7 @@
         const MAX_DETAIL_CHANGE = 2; // zooming further than this from the loaded detail loads again
         const REFRESH_AFTER = 60; // seconds of newer data a view can miss before it loads again
         const MIN_POINTS = 10; // the fewest the server gives
+        const KEPT_SPANS = 2; // of the view, the loaded data kept on each side of it
 
         const DRAWN_OPTIONS = ['range', 'mirror', 'stacking', 'scale', 'line_style', 'trend']; // the others are the legend, size and compare
         const COMPARE_SECONDS = { day: 86400, week: 604800 }; // a period is the span shown
@@ -70,7 +71,7 @@
                 init() {
                     this.$root.timeSeriesGraph = {
                         setRange: (next) => this.setRange(next),
-                        refresh: () => this.load(),
+                        refresh: () => this.load(true),
                         zoom: (steps) => this.zoom(steps),
                         pan: (steps) => this.pan(steps),
                         reset: () => this.reset(),
@@ -217,16 +218,46 @@
                         || this.compareSeconds() !== loaded.offset;
                 },
 
-                async load() {
+                // The part of the view to join to the loaded data: before it, after its last values, which may still be filled in, or both.
+                // null when the view needs new data, it is at another detail or apart from the loaded data.
+                missingPart() {
+                    const { from, to } = shown();
+                    const detail = (to - from) / this.plotWidth();
+                    if (loaded === null || graph === null
+                        || detail > loaded.detail * MAX_DETAIL_CHANGE
+                        || detail < loaded.detail / MAX_DETAIL_CHANGE
+                        || this.compareSeconds() !== loaded.offset
+                        || to < loaded.from || from > loaded.to) {
+                        return null;
+                    }
+
+                    const valued = graph.timestamps.findLastIndex((time, index) => graph.series.some((series) => series.avg[index] !== null));
+                    const lastValue = valued === -1 ? loaded.from : graph.timestamps[valued];
+                    const before = from < loaded.from;
+                    const after = Math.min(to, now()) > loaded.fresh + REFRESH_AFTER;
+                    if (! before && ! after) {
+                        return null;
+                    }
+
+                    return {
+                        from: before ? from : Math.max(from, Math.min(lastValue, loaded.fresh)),
+                        to: after ? to : Math.min(to, loaded.from),
+                    };
+                },
+
+                // all of the view, or the part it is missing at the detail of the loaded data
+                async load(all = false) {
                     // a hidden tab or panel has no width to fit the data to yet
                     unsized = this.$refs.plot.clientWidth === 0;
                     if (unsized) {
                         return;
                     }
 
-                    const { from, to } = shown();
+                    const part = all ? null : this.missingPart();
+                    const { from, to } = part ?? shown();
                     const requestedAt = now();
-                    const params = { from, to, width: Math.max(MIN_POINTS, this.plotWidth()) };
+                    const width = part === null ? this.plotWidth() : Math.round((to - from) / loaded.detail);
+                    const params = { from, to, width: Math.max(MIN_POINTS, width) };
 
                     const offset = this.compareSeconds();
 
@@ -249,9 +280,25 @@
                             return;
                         }
                         createChart = module.default;
-                        earlier = before && { ...before.data, timestamps: before.data.timestamps.map((time) => time + offset) };
-                        this.updateGraph(response.data);
-                        loaded = { from: params.from, to: params.to, fresh: Math.min(params.to, requestedAt), detail: (params.to - params.from) / params.width, offset };
+                        const moved = before && { ...before.data, timestamps: before.data.timestamps.map((time) => time + offset) };
+                        const range = { from: params.from, to: params.to, fresh: Math.min(params.to, requestedAt) };
+                        if (part !== null && graphDefinition(graph) !== graphDefinition(response.data)) {
+                            return this.load(true); // the graph changed, a part of it does not join
+                        }
+                        if (part !== null) {
+                            earlier = earlier && moved ? joinGraph(earlier, moved) : (earlier ?? moved);
+                            loaded = {
+                                ...loaded,
+                                from: Math.min(loaded.from, range.from),
+                                to: Math.max(loaded.to, range.to),
+                                fresh: Math.max(loaded.fresh, range.fresh),
+                            };
+                            this.updateGraph(this.kept(joinGraph(graph, response.data)));
+                        } else {
+                            earlier = moved;
+                            loaded = { ...range, detail: (params.to - params.from) / params.width, offset };
+                            this.updateGraph(response.data);
+                        }
                         this.error = null;
                     } catch (error) {
                         if (current.signal.aborted) {
@@ -266,6 +313,18 @@
 
                     this.loading = false;
                     this.refreshing = false;
+                },
+
+                // the loaded data near the view, the rest is dropped
+                kept(next) {
+                    const { from, to } = shown();
+                    const span = to - from;
+                    const near = { from: Math.max(loaded.from, from - span * KEPT_SPANS), to: Math.min(loaded.to, to + span * KEPT_SPANS) };
+
+                    loaded = { ...loaded, ...near, fresh: Math.min(loaded.fresh, near.to) };
+                    earlier = earlier && sliceGraph(earlier, near);
+
+                    return sliceGraph(next, near);
                 },
 
                 updateGraph(next) {

@@ -137,3 +137,49 @@ export function toCsv(graph, view, hidden = new Set()) {
 
     return `${lines.join('\n')}\n`;
 }
+
+// the values of the series at the points start to end (exclusive), a min or max that is the average stays null
+function slicedSeries(series, start, end) {
+    const slice = (values) => (values === null ? null : values.slice(start, end));
+
+    return { ...series, avg: slice(series.avg), min: slice(series.min), max: slice(series.max) };
+}
+
+/**
+ * The points of next replace those of the graph from its first time to its last, the others are kept.
+ * Both have the same series.
+ *
+ * @param {GraphData} graph
+ * @param {GraphData} next
+ * @returns {GraphData}
+ */
+export function joinGraph(graph, next) {
+    if (next.timestamps.length === 0) {
+        return graph;
+    }
+
+    const start = firstAfter(graph.timestamps, next.timestamps[0] - 1);
+    const end = firstAfter(graph.timestamps, next.timestamps.at(-1));
+    const join = (values, added) => [...values.slice(0, start), ...added, ...values.slice(end)];
+    const series = next.series.map((item) => {
+        const old = graph.series.find((other) => other.key === item.key);
+        const bound = (name) => (old[name] === null && item[name] === null ? null : join(old[name] ?? old.avg, item[name] ?? item.avg));
+
+        return { ...item, avg: join(old.avg, item.avg), min: bound('min'), max: bound('max') };
+    });
+
+    return { ...next, timestamps: join(graph.timestamps, next.timestamps), series };
+}
+
+/**
+ * The points of the graph in a time
+ *
+ * @param {GraphData} graph
+ * @param {View} view
+ * @returns {GraphData}
+ */
+export function sliceGraph(graph, { from, to }) {
+    const [start, end] = shownPoints(graph.timestamps, { from, to });
+
+    return { ...graph, timestamps: graph.timestamps.slice(start, end), series: graph.series.map((item) => slicedSeries(item, start, end)) };
+}
