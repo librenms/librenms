@@ -38,9 +38,9 @@ class BitsGraph extends DeviceGraph
             $label = $port->getShortLabel();
             $in[] = "in_$port->port_id";
             $out[] = "out_$port->port_id";
-            $series["in_$port->port_id"] = new DataSeries($metric, 'INOCTETS', $label . ' ' . __('graph.series.in'), 'bps', 8,
+            $series["in_$port->port_id"] = new DataSeries($metric, 'in_octets', $label . ' ' . __('graph.series.in'), 'bps', 8,
                 new SeriesStyle(SeriesRole::In, stacked: true));
-            $series["out_$port->port_id"] = new DataSeries($metric, 'OUTOCTETS', $label . ' ' . __('graph.series.out'), 'bps', 8,
+            $series["out_$port->port_id"] = new DataSeries($metric, 'out_octets', $label . ' ' . __('graph.series.out'), 'bps', 8,
                 new SeriesStyle(SeriesRole::Out, stacked: true, invert: true));
         }
 

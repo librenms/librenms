@@ -41,12 +41,22 @@ class PacketGraphsTest extends TestCase
         $this->assertStringContainsString('GPRINT:ds1:LAST:%5.2lf%spps', $command);
     }
 
+    public function test_canonical_metrics_read_the_fields_by_their_names(): void
+    {
+        LibrenmsConfig::set('datastore.canonical_metrics', true);
+
+        $command = (new GraphFactory)->graphFor(new GraphParameters(['type' => 'port_upkts', 'id' => $this->port->port_id]))->getDebugCommand();
+
+        $this->assertStringContainsString('DEF:ds0=host/port-id1.rrd:in_ucast_pkts:AVERAGE', $command);
+        $this->assertStringContainsString('DEF:ds1=host/port-id1.rrd:out_ucast_pkts:AVERAGE', $command);
+    }
+
     public function test_inverse_swaps_directions(): void
     {
         $series = new UpktsGraph(new GraphParameters(['type' => 'port_upkts', 'id' => $this->port->port_id, 'inverse' => true]))->getSeries();
 
-        $this->assertSame('OUTUCASTPKTS', $series['in']->field);
-        $this->assertSame('INUCASTPKTS', $series['out']->field);
+        $this->assertSame('out_ucast_pkts', $series['in']->field);
+        $this->assertSame('in_ucast_pkts', $series['out']->field);
     }
 
     public function test_errors_and_discards_stack_in_each_direction(): void

@@ -68,11 +68,8 @@ class Datastore implements WriteInterface, DataStorageInterface
      *
      * @param  DatastoreContract[]  $stores
      */
-    public function __construct(
-        protected array $stores,
-        private readonly MetricNames $metricNames = new MetricNames,
-        private readonly MetricDefinitions $definitions = new MetricDefinitions,
-    ) {
+    public function __construct(protected array $stores, private readonly MetricNames $metricNames = new MetricNames)
+    {
     }
 
     public function terminate(): void
@@ -143,22 +140,15 @@ class Datastore implements WriteInterface, DataStorageInterface
     public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
         $metric = $meta['metric'] ?? null;
-        if ($metric instanceof MetricIdentity && ! isset($meta['definition']) && $definition = $this->definitions->of($metric)) {
-            $meta['definition'] = $definition;
-        }
-
         $legacy = $metric instanceof MetricIdentity ? $this->metricNames->storedAs($metric) : null;
 
         if ($legacy !== null) {
-            // stored under the names it always had
+            // stored under the names it always had, stores that know the metric (rrd) find them from it
             $measurement = $legacy->measurement;
-            $tags = $legacy->tagsOf($metric);
-            unset($meta['metric']);
-
-            if ($rrdName = $legacy->rrdNameOf($metric)) {
-                $meta['rrd_name'] = $rrdName;
-            }
+            $tags = [...$legacy->tagsOf($metric), ...$meta['legacy_tags'] ?? []];
+            $fields = $legacy->fieldsOf($fields);
         }
+        unset($meta['legacy_tags']);
 
         foreach ($this->stores as $store) {
             $store->write($measurement, $fields, $tags, $meta);

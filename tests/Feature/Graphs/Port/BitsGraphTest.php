@@ -76,8 +76,8 @@ class BitsGraphTest extends TestCase
         $this->assertSame(['in', 'out'], array_keys($series));
         $this->assertSame('port', $series['in']->metric->measurement);
         $this->assertSame(['hostname' => $this->port->device->hostname, 'id' => $this->port->port_id], $series['in']->metric->tags);
-        $this->assertSame('INOCTETS', $series['in']->field);
-        $this->assertSame('OUTOCTETS', $series['out']->field);
+        $this->assertSame('in_octets', $series['in']->field);
+        $this->assertSame('out_octets', $series['out']->field);
         $this->assertSame(8.0, $series['out']->scale);
         $command = $this->command();
         $this->assertStringContainsString('CDEF:ds0=ds0raw,8,*', $command);
@@ -90,8 +90,8 @@ class BitsGraphTest extends TestCase
     {
         $series = $this->graph(['inverse' => true])->getSeries();
 
-        $this->assertSame('OUTOCTETS', $series['in']->field);
-        $this->assertSame('INOCTETS', $series['out']->field);
+        $this->assertSame('out_octets', $series['in']->field);
+        $this->assertSame('in_octets', $series['out']->field);
         $this->assertTrue($series['out']->style->invert);
     }
 

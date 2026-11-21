@@ -26,13 +26,10 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
-use App\Data\TimeSeries\MetricDefinition;
-use App\Data\TimeSeries\MetricField;
 use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Providers\DatastoreServiceProvider;
 use LibreNMS\Data\Store\Datastore;
-use LibreNMS\Data\Store\MetricDefinitions;
 use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 use LibreNMS\Tests\TestCase;
 use Mockery;
@@ -114,19 +111,29 @@ final class DatastoreTest extends TestCase
         $metric = new MetricIdentity('processor', ['hostname' => 'localhost', 'type' => 'hr', 'index' => 1]);
         $store = Mockery::mock(DatastoreContract::class);
         $store->shouldReceive('write')->once()
-            ->with('processors', ['usage' => 5], ['processor_type' => 'hr', 'processor_index' => 1], ['rrd_def' => 'def', 'definition' => new MetricDefinitions()->of('processor'), 'rrd_name' => ['processor', 'hr', '1']]);
+            ->with('processors', ['usage' => 5], ['processor_type' => 'hr', 'processor_index' => 1], ['metric' => $metric, 'rrd_def' => 'def']);
 
         new Datastore([$store])->write($metric->measurement, ['usage' => 5], $metric->tags, ['metric' => $metric, 'rrd_def' => 'def']);
+    }
+
+    public function testCleanedUpFieldsAndLegacyTagsAreWrittenUnderTheNamesTheyHad(): void
+    {
+        $metric = new MetricIdentity('port', ['hostname' => 'localhost', 'id' => 12]);
+        $store = Mockery::mock(DatastoreContract::class);
+        $store->shouldReceive('write')->once()
+            ->with('ports', ['INOCTETS' => 5, 'OUTOCTETS' => 6], ['ifName' => 'eth0'], ['metric' => $metric]);
+
+        new Datastore([$store])->write($metric->measurement, ['in_octets' => 5, 'out_octets' => 6], $metric->tags, ['metric' => $metric, 'legacy_tags' => ['ifName' => 'eth0']]);
     }
 
     public function testCanonicalMetricsAreWrittenAsIdentified(): void
     {
         LibrenmsConfig::set('datastore.canonical_metrics', true);
-        $metric = new MetricIdentity('processor', ['hostname' => 'localhost', 'type' => 'hr', 'index' => 1]);
+        $metric = new MetricIdentity('port', ['hostname' => 'localhost', 'id' => 12]);
         $store = Mockery::mock(DatastoreContract::class);
-        $store->shouldReceive('write')->once()->with('processor', ['usage' => 5], $metric->tags, ['metric' => $metric, 'definition' => new MetricDefinitions()->of('processor')]);
+        $store->shouldReceive('write')->once()->with('port', ['in_octets' => 5], $metric->tags, ['metric' => $metric]);
 
-        new Datastore([$store])->write($metric->measurement, ['usage' => 5], $metric->tags, ['metric' => $metric]);
+        new Datastore([$store])->write($metric->measurement, ['in_octets' => 5], $metric->tags, ['metric' => $metric, 'legacy_tags' => ['ifName' => 'eth0']]);
     }
 
     public function testMetricsThatWereAlwaysCleanAreWrittenAsIdentified(): void
@@ -136,15 +143,5 @@ final class DatastoreTest extends TestCase
         $store->shouldReceive('write')->once()->with('vm.cpu', ['usage' => 5], $metric->tags, ['metric' => $metric]);
 
         new Datastore([$store])->write($metric->measurement, ['usage' => 5], $metric->tags, ['metric' => $metric]);
-    }
-
-    public function testAGivenDefinitionIsKept(): void
-    {
-        $metric = new MetricIdentity('vm.cpu', ['cluster' => 'proxmox-abc', 'id' => 100]);
-        $definition = new MetricDefinition(MetricField::gauge('usage', 0));
-        $store = Mockery::mock(DatastoreContract::class);
-        $store->shouldReceive('write')->once()->with('vm.cpu', ['usage' => 5], $metric->tags, ['metric' => $metric, 'definition' => $definition]);
-
-        new Datastore([$store])->write($metric->measurement, ['usage' => 5], $metric->tags, ['metric' => $metric, 'definition' => $definition]);
     }
 }

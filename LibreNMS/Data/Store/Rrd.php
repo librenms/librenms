@@ -91,13 +91,10 @@ class Rrd extends BaseDatastore
         $metric = $meta['metric'] ?? null;
         if ($metric instanceof MetricIdentity) {
             self::checkDirExists(RrdPath::make($metric->group())); // not always a device, those are created when polling starts
-            $rrd = $this->metricName($metric);
+            $rrd = $this->metricNames($metric)[0] ?? $this->metricName($metric);
+            $meta['rrd_def'] ??= $this->metricDefinition($metric);
         } else {
             $rrd = RrdPath::make($device_model->hostname, self::filenameString($rrd_name) . '.rrd');
-        }
-
-        if (! isset($meta['rrd_def']) && isset($meta['definition'])) {
-            $meta['rrd_def'] = RrdDefinition::fromMetric($meta['definition']);
         }
 
         if (isset($meta['rrd_def'])) {
@@ -136,6 +133,16 @@ class Rrd extends BaseDatastore
         } catch (RrdException $e) {
             Log::error('RRD Error %r' . $e->getMessage() . '%n', ['color' => true]);
         }
+    }
+
+    /**
+     * A data source for each field of the metric, named as the fields are stored
+     */
+    private function metricDefinition(MetricIdentity $metric): ?RrdDefinition
+    {
+        $definition = app(MetricDefinitions::class)->of($metric);
+
+        return $definition === null ? null : RrdDefinition::fromMetric($definition, app(MetricNames::class)->storedAs($metric));
     }
 
     /**

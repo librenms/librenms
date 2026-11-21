@@ -14,6 +14,23 @@ use App\Facades\LibrenmsConfig;
 class MetricNames
 {
     private const array SENSOR_TAGS = ['class' => 'sensor_class', 'type' => 'sensor_type', 'index' => 'sensor_index', 'descr' => 'sensor_descr'];
+    private const array PORT_FIELDS = [
+        'in_octets' => 'INOCTETS',
+        'out_octets' => 'OUTOCTETS',
+        'in_errors' => 'INERRORS',
+        'out_errors' => 'OUTERRORS',
+        'in_ucast_pkts' => 'INUCASTPKTS',
+        'out_ucast_pkts' => 'OUTUCASTPKTS',
+        'in_nucast_pkts' => 'INNUCASTPKTS',
+        'out_nucast_pkts' => 'OUTNUCASTPKTS',
+        'in_discards' => 'INDISCARDS',
+        'out_discards' => 'OUTDISCARDS',
+        'in_unknown_protos' => 'INUNKNOWNPROTOS',
+        'in_broadcast_pkts' => 'INBROADCASTPKTS',
+        'out_broadcast_pkts' => 'OUTBROADCASTPKTS',
+        'in_multicast_pkts' => 'INMULTICASTPKTS',
+        'out_multicast_pkts' => 'OUTMULTICASTPKTS',
+    ];
 
     public function isCanonical(): bool
     {
@@ -29,12 +46,20 @@ class MetricNames
     }
 
     /**
+     * The name a field of the metric is stored under
+     */
+    public function storedField(MetricIdentity $metric, string $field): string
+    {
+        return $this->storedAs($metric)?->fieldName($field) ?? $field;
+    }
+
+    /**
      * The names the metric had before its identity was cleaned up, null when it was always stored as identified
      */
     public function legacyOf(MetricIdentity $metric): ?LegacyMetric
     {
         return match ($metric->measurement) {
-            'port' => new LegacyMetric('ports', rrdName: ['port', 'id{id}']),
+            'port' => new LegacyMetric('ports', rrdName: ['port', 'id{id}'], fields: self::PORT_FIELDS),
             'processor' => new LegacyMetric('processors', ['type' => 'processor_type', 'index' => 'processor_index'], ['processor', '{type}', '{index}']),
             'mempool' => new LegacyMetric('mempool', ['type' => 'mempool_type', 'class' => 'mempool_class', 'index' => 'mempool_index'], ['mempool', '{type}', '{class}', '{index}']),
             // ipmi sensors were a measurement of their own, except in rrd files

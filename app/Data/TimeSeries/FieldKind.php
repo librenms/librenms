@@ -10,10 +10,10 @@ enum FieldKind
 {
     // a value as it is at the time of polling
     case Gauge;
-    // a counter that only grows, a value lower than the last one is a reset, not a wrap
+    // a counter that only grows, a value lower than the last one is a reset (rrd DERIVE)
     case Derive;
-    // a counter that wraps at 32 or 64 bits
-    case Counter;
+    // a counter that wraps around at 32 or 64 bits, a value lower than the last one is a wrap (rrd COUNTER)
+    case Wrapping;
 
     public function isCounter(): bool
     {

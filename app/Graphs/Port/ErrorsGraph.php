@@ -15,8 +15,8 @@ class ErrorsGraph extends PortGraph
     public function getSeries(): array
     {
         $metric = $this->port()->metricIdentity('port');
-        [$inErrors, $outErrors] = $this->directions('INERRORS', 'OUTERRORS');
-        [$inDiscards, $outDiscards] = $this->directions('INDISCARDS', 'OUTDISCARDS');
+        [$inErrors, $outErrors] = $this->directions('in_errors', 'out_errors');
+        [$inDiscards, $outDiscards] = $this->directions('in_discards', 'out_discards');
 
         // inverted series stack separately, after the others
         return [

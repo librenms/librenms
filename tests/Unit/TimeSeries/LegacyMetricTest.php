@@ -27,4 +27,13 @@ class LegacyMetricTest extends TestCase
 
         $this->assertSame(['thing', 'id7'], $legacy->rrdNameOf(new MetricIdentity('thing', ['hostname' => 'localhost', 'index' => 7])));
     }
+
+    public function test_fields_are_stored_under_the_names_they_had(): void
+    {
+        $legacy = new LegacyMetric('things', fields: ['in_octets' => 'INOCTETS']);
+
+        $this->assertSame('INOCTETS', $legacy->fieldName('in_octets'));
+        $this->assertSame('usage', $legacy->fieldName('usage'), 'fields that are not listed kept their name');
+        $this->assertSame(['INOCTETS' => 5, 'usage' => 1], $legacy->fieldsOf(['in_octets' => 5, 'usage' => 1]));
+    }
 }

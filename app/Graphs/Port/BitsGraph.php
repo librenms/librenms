@@ -16,7 +16,7 @@ class BitsGraph extends PortGraph
     public function getSeries(): array
     {
         $metric = $this->port()->metricIdentity('port');
-        [$in, $out] = $this->directions('INOCTETS', 'OUTOCTETS');
+        [$in, $out] = $this->directions('in_octets', 'out_octets');
 
         return [
             'in' => new DataSeries(

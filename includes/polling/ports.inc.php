@@ -3,8 +3,9 @@
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
-use LibreNMS\Data\Store\MetricDefinitions;
+use App\Models\Port;
 use LibreNMS\Enum\Severity;
+use LibreNMS\RRD\PortRrd;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mac;
 use LibreNMS\Util\Number;
@@ -852,38 +853,37 @@ foreach ($ports as $port) {
             $port_info_string .= 'pkts(' . Number::formatSi($current_port_stats['ifInUcastPkts_rate'] ?? 0, 2, 3, 'pps') . '/' . Number::formatSi($current_port_stats['ifOutUcastPkts_rate'] ?? 0, 2, 0, 'pps') . ') ';
 
             // Update data stores
-            $rrd_name = Rrd::portName($port_id, '');
-            $rrdfile = Rrd::name($device['hostname'], $rrd_name);
+            $metric = (new Port)->forceFill(['port_id' => $port_id])->setRelation('device', DeviceCache::getPrimary())->metricIdentity('port');
             $fields = [
-                'INOCTETS' => $this_port['ifInOctets'] ?? null,
-                'OUTOCTETS' => $this_port['ifOutOctets'] ?? null,
-                'INERRORS' => $this_port['ifInErrors'] ?? null,
-                'OUTERRORS' => $this_port['ifOutErrors'] ?? null,
-                'INUCASTPKTS' => $this_port['ifInUcastPkts'] ?? null,
-                'OUTUCASTPKTS' => $this_port['ifOutUcastPkts'] ?? null,
-                'INNUCASTPKTS' => $this_port['ifInNUcastPkts'] ?? null,
-                'OUTNUCASTPKTS' => $this_port['ifOutNUcastPkts'] ?? null,
-                'INDISCARDS' => $this_port['ifInDiscards'] ?? null,
-                'OUTDISCARDS' => $this_port['ifOutDiscards'] ?? null,
-                'INUNKNOWNPROTOS' => $this_port['ifInUnknownProtos'] ?? null,
-                'INBROADCASTPKTS' => $this_port['ifInBroadcastPkts'] ?? null,
-                'OUTBROADCASTPKTS' => $this_port['ifOutBroadcastPkts'] ?? null,
-                'INMULTICASTPKTS' => $this_port['ifInMulticastPkts'] ?? null,
-                'OUTMULTICASTPKTS' => $this_port['ifOutMulticastPkts'] ?? null,
+                'in_octets' => $this_port['ifInOctets'] ?? null,
+                'out_octets' => $this_port['ifOutOctets'] ?? null,
+                'in_errors' => $this_port['ifInErrors'] ?? null,
+                'out_errors' => $this_port['ifOutErrors'] ?? null,
+                'in_ucast_pkts' => $this_port['ifInUcastPkts'] ?? null,
+                'out_ucast_pkts' => $this_port['ifOutUcastPkts'] ?? null,
+                'in_nucast_pkts' => $this_port['ifInNUcastPkts'] ?? null,
+                'out_nucast_pkts' => $this_port['ifOutNUcastPkts'] ?? null,
+                'in_discards' => $this_port['ifInDiscards'] ?? null,
+                'out_discards' => $this_port['ifOutDiscards'] ?? null,
+                'in_unknown_protos' => $this_port['ifInUnknownProtos'] ?? null,
+                'in_broadcast_pkts' => $this_port['ifInBroadcastPkts'] ?? null,
+                'out_broadcast_pkts' => $this_port['ifOutBroadcastPkts'] ?? null,
+                'in_multicast_pkts' => $this_port['ifInMulticastPkts'] ?? null,
+                'out_multicast_pkts' => $this_port['ifOutMulticastPkts'] ?? null,
             ];
 
             if ($tune_port === true) {
-                Rrd::tune($rrdfile, \LibreNMS\RRD\PortRrd::tuneLimits((int) $this_port['ifSpeed']));
+                Rrd::tune(Rrd::metricNames($metric)[0], PortRrd::tuneLimits($metric, (int) $this_port['ifSpeed']));
             }
 
-            $tags = [
+            // the identity of a port does not have these tags, they are kept while ports are stored under the legacy names
+            $legacy_tags = [
                 'ifName' => $port['ifName'],
                 'ifAlias' => $port['ifAlias'],
                 'ifIndex' => $port['ifIndex'],
                 'port_descr_type' => $port['port_descr_type'],
             ];
-            // the fields of the port metric, stored under the legacy names (ports measurement and port-id rrd file)
-            app('Datastore')->write('ports', $fields, $tags, ['rrd_name' => $rrd_name, 'definition' => app(MetricDefinitions::class)->of('port')]);
+            app('Datastore')->write($metric->measurement, $fields, $metric->tags, ['metric' => $metric, 'legacy_tags' => $legacy_tags]);
 
             // End Update IF-MIB
             // Update PAgP

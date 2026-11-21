@@ -15,7 +15,7 @@ class UpktsGraph extends PortGraph
     public function getSeries(): array
     {
         $metric = $this->port()->metricIdentity('port');
-        [$in, $out] = $this->directions('INUCASTPKTS', 'OUTUCASTPKTS');
+        [$in, $out] = $this->directions('in_ucast_pkts', 'out_ucast_pkts');
 
         return [
             'in' => new DataSeries($metric, $in, __('graph.series.in'), 'pps',

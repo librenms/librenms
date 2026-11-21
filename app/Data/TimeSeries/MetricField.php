@@ -26,21 +26,13 @@ final readonly class MetricField
         return new self($name, FieldKind::Derive, $min, $max);
     }
 
-    public static function counter(string $name, int|float|null $min = null, int|float|null $max = null): self
+    public static function wrapping(string $name, int|float|null $min = null, int|float|null $max = null): self
     {
-        return new self($name, FieldKind::Counter, $min, $max);
+        return new self($name, FieldKind::Wrapping, $min, $max);
     }
 
     public function isCounter(): bool
     {
         return $this->kind->isCounter();
-    }
-
-    /**
-     * Whether a value (the rate of a counter) is within the limits of this field
-     */
-    public function accepts(int|float $value): bool
-    {
-        return ($this->min === null || $value >= $this->min) && ($this->max === null || $value <= $this->max);
     }
 }

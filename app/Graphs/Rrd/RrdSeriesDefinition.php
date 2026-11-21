@@ -9,6 +9,7 @@ use App\Data\Graphing\GraphParameters;
 use App\Data\Graphing\SeriesRole;
 use App\Data\Graphing\SeriesSum;
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Data\Store\MetricNames;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Exceptions\NoGraphData;
 
@@ -280,6 +281,8 @@ class RrdSeriesDefinition
      */
     public static function valueDefs(string $id, string $filename, DataSeries $series, string $cf, string $range = '', ?int $shift = null): array
     {
+        // fields are named as the metric is stored, the name rrd files have
+        $metricNames = app(MetricNames::class);
         $transform = ($series->scale == 1 ? '' : ',' . self::number($series->scale) . ',*') . ($series->offset == 0 ? '' : ',' . self::number($series->offset) . ',+');
 
         if ($series->field instanceof Formula) {
@@ -288,7 +291,7 @@ class RrdSeriesDefinition
             $names = [];
             foreach ($series->field->fields() as $index => $field) {
                 $names[$field] = "$id{$index}f";
-                $defs[] = "DEF:{$names[$field]}=$filename:$field:AVERAGE$range";
+                $defs[] = "DEF:{$names[$field]}=$filename:" . $metricNames->storedField($series->metric, $field) . ":AVERAGE$range";
                 if ($shift !== null) {
                     $defs[] = "SHIFT:{$names[$field]}:$shift";
                 }
@@ -303,6 +306,7 @@ class RrdSeriesDefinition
             'MAX' => $series->maxField,
             default => null,
         } ?? $series->field;
+        $field = $metricNames->storedField($series->metric, $field);
 
         $source = $transform === '' ? $id : $id . 'raw';
         $defs = ["DEF:$source=$filename:$field:$cf$range"];

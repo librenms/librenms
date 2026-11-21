@@ -10,9 +10,10 @@ interface WriteInterface
      * metadata known keys:
      *   device      App\Models\Device  non-primary device to write statistics for
      *   metric      App\Data\TimeSeries\MetricIdentity: the identity of a metric, it decides where datastores keep it,
-     *                                                      under the names it had before when datastore.canonical_metrics is off
-     *   definition  App\Data\TimeSeries\MetricDefinition: the fields of the metric, found from the metric when not given (see MetricDefinitions)
-     *   rrd_def     RrdDefinition: overrides the one built from the definition
+     *                                                      under the names it had before when datastore.canonical_metrics is off.
+     *                                                      Stores find its fields with MetricDefinitions and the names it is stored under with MetricNames.
+     *   legacy_tags array<string, scalar>: tags that are only stored under the names the metric had before, the identity does not have them
+     *   rrd_def     RrdDefinition: overrides the one built from the metric definition
      *   rrd_name    array|string: the rrd filename, will be processed with rrd_name()
      *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
      *   rrd_step             int: rrd step, defaults to 300

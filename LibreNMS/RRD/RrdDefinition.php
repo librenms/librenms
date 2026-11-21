@@ -27,6 +27,7 @@
 namespace LibreNMS\RRD;
 
 use App\Data\TimeSeries\FieldKind;
+use App\Data\TimeSeries\LegacyMetric;
 use App\Data\TimeSeries\MetricDefinition;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\InvalidRrdTypeException;
@@ -50,17 +51,19 @@ class RrdDefinition implements \Stringable
 
     /**
      * A data source for each field of the metric, in the order of its fields
+     *
+     * @param  LegacyMetric|null  $storedAs  the data sources are named as the fields were stored before
      */
-    public static function fromMetric(MetricDefinition $metric): self
+    public static function fromMetric(MetricDefinition $metric, ?LegacyMetric $storedAs = null): self
     {
         $definition = new self();
         foreach ($metric->fields as $field) {
             $type = match ($field->kind) {
                 FieldKind::Gauge => 'GAUGE',
                 FieldKind::Derive => 'DERIVE',
-                FieldKind::Counter => 'COUNTER',
+                FieldKind::Wrapping => 'COUNTER',
             };
-            $definition->addDataset($field->name, $type, $field->min, $field->max);
+            $definition->addDataset($storedAs?->fieldName($field->name) ?? $field->name, $type, $field->min, $field->max);
         }
 
         return $definition;

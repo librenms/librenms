@@ -47,7 +47,7 @@ class PortTune extends LnmsCommand
             foreach ($ports as $port) {
                 $this->line(' ' . __('commands.port:tune.port', ['port' => $port->ifName]));
                 $rrdfile = Rrd::name($device->hostname, Rrd::portName($port->port_id));
-                Rrd::tune($rrdfile, PortRrd::tuneLimits((int) $port->ifSpeed));
+                Rrd::tune($rrdfile, PortRrd::tuneLimits($port->setRelation('device', $device)->metricIdentity('port'), (int) $port->ifSpeed));
             }
         }
 

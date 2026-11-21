@@ -9,7 +9,7 @@ use App\Data\TimeSeries\MetricIdentity;
 /**
  * The fields of each measurement, by the measurement of its identity.
  * Datastores use them to store a metric (the rrd data sources), readers to know which fields are counters and their limits.
- * Fields are named as they are stored.
+ * Fields have clean names, the names they were stored under before are kept in MetricNames.
  */
 class MetricDefinitions
 {
@@ -17,21 +17,21 @@ class MetricDefinitions
     {
         return match ($metric instanceof MetricIdentity ? $metric->measurement : $metric) {
             'port' => new MetricDefinition(...array_map(fn (string $name): MetricField => MetricField::derive($name, 0, 12500000000), [
-                'INOCTETS',
-                'OUTOCTETS',
-                'INERRORS',
-                'OUTERRORS',
-                'INUCASTPKTS',
-                'OUTUCASTPKTS',
-                'INNUCASTPKTS',
-                'OUTNUCASTPKTS',
-                'INDISCARDS',
-                'OUTDISCARDS',
-                'INUNKNOWNPROTOS',
-                'INBROADCASTPKTS',
-                'OUTBROADCASTPKTS',
-                'INMULTICASTPKTS',
-                'OUTMULTICASTPKTS',
+                'in_octets',
+                'out_octets',
+                'in_errors',
+                'out_errors',
+                'in_ucast_pkts',
+                'out_ucast_pkts',
+                'in_nucast_pkts',
+                'out_nucast_pkts',
+                'in_discards',
+                'out_discards',
+                'in_unknown_protos',
+                'in_broadcast_pkts',
+                'out_broadcast_pkts',
+                'in_multicast_pkts',
+                'out_multicast_pkts',
             ])),
             'processor' => new MetricDefinition(MetricField::gauge('usage', -273, 1000)),
             default => null,

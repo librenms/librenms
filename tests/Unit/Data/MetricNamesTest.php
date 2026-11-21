@@ -63,4 +63,15 @@ final class MetricNamesTest extends TestCase
     {
         $this->assertNull(new MetricNames()->storedAs(new MetricIdentity('vm.cpu', ['cluster' => 'proxmox-abc', 'id' => 100])));
     }
+
+    public function testFieldsAreStoredUnderTheNamesTheyHadUntilCanonical(): void
+    {
+        $port = new MetricIdentity('port', ['hostname' => 'localhost', 'id' => 12]);
+
+        $this->assertSame('INOCTETS', new MetricNames()->storedField($port, 'in_octets'));
+        $this->assertSame('usage', new MetricNames()->storedField($this->processor(), 'usage'));
+
+        LibrenmsConfig::set('datastore.canonical_metrics', true);
+        $this->assertSame('in_octets', new MetricNames()->storedField($port, 'in_octets'));
+    }
 }

@@ -59,13 +59,13 @@ class BitsGraphTest extends TestCase
         $this->assertSame(["in_$eth0->port_id", "out_$eth0->port_id", "in_$eth1->port_id", "out_$eth1->port_id", 'in', 'out', 'aggregate'], array_keys($series));
         $in = $series["in_$eth1->port_id"];
         $this->assertSame(['hostname' => $this->device->hostname, 'id' => $eth1->port_id], $in->metric->tags);
-        $this->assertSame('INOCTETS', $in->field);
+        $this->assertSame('in_octets', $in->field);
         $this->assertSame(8.0, $in->scale);
         $this->assertSame('eth1 In', $in->description);
         $this->assertTrue($in->style->stacked);
         $this->assertFalse($in->style->invert);
         $out = $series["out_$eth1->port_id"];
-        $this->assertSame('OUTOCTETS', $out->field);
+        $this->assertSame('out_octets', $out->field);
         $this->assertTrue($out->style->stacked);
         $this->assertTrue($out->style->invert);
     }

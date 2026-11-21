@@ -2,11 +2,12 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
-use App\Data\TimeSeries\MetricDefinition;
-use App\Data\TimeSeries\MetricField;
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Eventlog;
+use LibreNMS\Data\Store\MetricDefinitions;
+use LibreNMS\Data\Store\MetricNames;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Exceptions\RrdCachedConnectionException;
 use LibreNMS\Exceptions\RrdNotFoundException;
@@ -50,23 +51,62 @@ final class RrdStoreTest extends TestCase
         (new Rrd)->write('test', ['out' => 20, 'in' => 10], [], ['device' => $this->device, 'rrd_def' => $definition]);
     }
 
-    public function testCreatesTheFileFromTheMetricDefinition(): void
+    public function testAMetricIsCreatedFromItsDefinitionUnderTheNamesItHad(): void
     {
-        $definition = new MetricDefinition(MetricField::derive('in', 0, 100), MetricField::gauge('speed'));
-        $expected = RrdDefinition::make()->addDataset('in', 'DERIVE', 0, 100)->addDataset('speed', 'GAUGE');
-        $this->backend->shouldReceive('update')->once()->andThrow(new RrdNotFoundException('No such file'));
-        $this->backend->shouldReceive('create')->once()->withArgs(fn ($rrd, RrdDefinition $def) => $def->getCreateArguments() === $expected->getCreateArguments());
-        $this->backend->shouldReceive('update')->once()->with(Mockery::any(), [10, 1000], null);
+        $this->withRrdDir(function (): void {
+            $metric = new MetricIdentity('port', ['hostname' => 'rrd-store-test', 'id' => 12]);
+            $expected = RrdDefinition::fromMetric(new MetricDefinitions()->of('port'), new MetricNames()->legacyOf($metric));
+            $this->backend->shouldReceive('update')->once()->andThrow(new RrdNotFoundException('No such file'));
+            $this->backend->shouldReceive('create')->once()->withArgs(fn ($rrd, RrdDefinition $def) => $rrd->relativePath() === 'rrd-store-test/port-id12.rrd'
+                && $def->getCreateArguments() === $expected->getCreateArguments()
+                && str_starts_with($def->getArguments()[0], 'DS:INOCTETS:DERIVE:'));
+            $this->backend->shouldReceive('update')->once()->with(Mockery::any(), [1, 2, ...array_fill(0, 13, null)], null);
 
-        (new Rrd)->write('test', ['speed' => 1000, 'in' => 10], [], ['device' => $this->device, 'definition' => $definition]);
+            // the datastore passes the fields under the names they are stored under
+            (new Rrd)->write('ports', ['OUTOCTETS' => 2, 'INOCTETS' => 1], [], ['metric' => $metric]);
+        });
+    }
+
+    public function testACanonicalMetricIsCreatedFromItsDefinition(): void
+    {
+        LibrenmsConfig::set('datastore.canonical_metrics', true);
+        $this->withRrdDir(function (): void {
+            $metric = new MetricIdentity('port', ['hostname' => 'rrd-store-test', 'id' => 12]);
+            $this->backend->shouldReceive('update')->once()->andThrow(new RrdNotFoundException('No such file'));
+            $this->backend->shouldReceive('create')->once()->withArgs(fn ($rrd, RrdDefinition $def) => $rrd->relativePath() === 'rrd-store-test/port-12.rrd'
+                && str_starts_with($def->getArguments()[0], 'DS:in_octets:DERIVE:'));
+            $this->backend->shouldReceive('update')->once()->with(Mockery::any(), [1, 2, ...array_fill(0, 13, null)], null);
+
+            (new Rrd)->write('port', ['out_octets' => 2, 'in_octets' => 1], [], ['metric' => $metric]);
+        });
     }
 
     public function testAGivenRrdDefinitionOverridesTheMetricDefinition(): void
     {
-        $definition = RrdDefinition::make()->addDataset('out', 'GAUGE')->addDataset('in', 'GAUGE');
-        $this->backend->shouldReceive('update')->once()->with(Mockery::any(), [20, 10], null);
+        $this->withRrdDir(function (): void {
+            $metric = new MetricIdentity('processor', ['hostname' => 'rrd-store-test', 'type' => 'hr', 'index' => 1]);
+            $definition = RrdDefinition::make()->addDataset('other', 'GAUGE')->addDataset('usage', 'GAUGE');
+            $this->backend->shouldReceive('update')->once()->with(Mockery::any(), [20, 10], null);
 
-        (new Rrd)->write('test', ['in' => 10, 'out' => 20], [], ['device' => $this->device, 'rrd_def' => $definition, 'definition' => new MetricDefinition(MetricField::gauge('in'))]);
+            (new Rrd)->write('processors', ['usage' => 10, 'other' => 20], [], ['metric' => $metric, 'rrd_def' => $definition]);
+        });
+    }
+
+    /**
+     * Metrics make sure their directory exists, keep it out of the real rrd directory
+     */
+    private function withRrdDir(callable $test): void
+    {
+        $dir = sys_get_temp_dir() . DIRECTORY_SEPARATOR . uniqid('rrd-store-test-');
+        mkdir($dir . DIRECTORY_SEPARATOR . 'rrd-store-test', 0775, true);
+        LibrenmsConfig::set('rrd_dir', $dir);
+
+        try {
+            $test();
+        } finally {
+            rmdir($dir . DIRECTORY_SEPARATOR . 'rrd-store-test');
+            rmdir($dir);
+        }
     }
 
     public function testOnlyConsecutiveStoreErrorsDisable(): void

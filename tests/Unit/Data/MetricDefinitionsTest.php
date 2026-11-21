@@ -10,6 +10,7 @@ use App\Models\Device;
 use App\Models\Port;
 use App\Models\Processor;
 use LibreNMS\Data\Store\MetricDefinitions;
+use LibreNMS\Data\Store\MetricNames;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\Group;
@@ -33,14 +34,13 @@ final class MetricDefinitionsTest extends TestCase
         $port->port_id = 12;
         $port->setRelation('device', new Device(['hostname' => 'localhost']));
 
-        $field = new MetricDefinitions()->field($port->metricIdentity('port'), 'INOCTETS');
+        $field = new MetricDefinitions()->field($port->metricIdentity('port'), 'in_octets');
 
         $this->assertNotNull($field);
         $this->assertTrue($field->isCounter());
         $this->assertSame(FieldKind::Derive, $field->kind);
         $this->assertSame(0, $field->min);
         $this->assertSame(12500000000, $field->max);
-        $this->assertFalse($field->accepts(-1), 'a counter reset gives a negative rate, which is not a value');
     }
 
     public function testAReaderKnowsProcessorUsageIsAGauge(): void
@@ -61,7 +61,7 @@ final class MetricDefinitionsTest extends TestCase
         $definition = RrdDefinition::fromMetric(new MetricDefinition(
             MetricField::gauge('value', -1, 1),
             MetricField::derive('derived', 0),
-            MetricField::counter('counted'),
+            MetricField::wrapping('counted'),
         ));
 
         $this->assertSame(
@@ -92,9 +92,10 @@ final class MetricDefinitionsTest extends TestCase
             ->addDataset('INMULTICASTPKTS', 'DERIVE', 0, 12500000000)
             ->addDataset('OUTMULTICASTPKTS', 'DERIVE', 0, 12500000000);
 
-        $definition = new MetricDefinitions()->of('port');
+        $metric = new MetricIdentity('port', ['hostname' => 'localhost', 'id' => 12]);
+        $definition = new MetricDefinitions()->of($metric);
         $this->assertNotNull($definition);
-        $this->assertSame($handBuilt->getCreateArguments(), RrdDefinition::fromMetric($definition)->getCreateArguments());
+        $this->assertSame($handBuilt->getCreateArguments(), RrdDefinition::fromMetric($definition, new MetricNames()->legacyOf($metric))->getCreateArguments());
     }
 
     /**
@@ -104,8 +105,29 @@ final class MetricDefinitionsTest extends TestCase
     {
         $handBuilt = RrdDefinition::make()->addDataset('usage', 'GAUGE', -273, 1000);
 
-        $definition = new MetricDefinitions()->of('processor');
+        $metric = new MetricIdentity('processor', ['hostname' => 'localhost', 'type' => 'hr', 'index' => 1]);
+        $definition = new MetricDefinitions()->of($metric);
         $this->assertNotNull($definition);
-        $this->assertSame($handBuilt->getCreateArguments(), RrdDefinition::fromMetric($definition)->getCreateArguments());
+        $this->assertSame($handBuilt->getCreateArguments(), RrdDefinition::fromMetric($definition, new MetricNames()->legacyOf($metric))->getCreateArguments());
+        $this->assertSame($handBuilt->getCreateArguments(), RrdDefinition::fromMetric($definition)->getCreateArguments(), 'processor fields kept their names');
+    }
+
+    public function testCanonicalPortFilesNameTheirDataSourcesAfterTheFields(): void
+    {
+        $definition = new MetricDefinitions()->of('port');
+        $this->assertNotNull($definition);
+
+        $this->assertStringStartsWith('DS:in_octets:DERIVE:', RrdDefinition::fromMetric($definition)->getArguments()[0]);
+    }
+
+    public function testEveryPortFieldHasTheNameItWasStoredUnder(): void
+    {
+        $metric = new MetricIdentity('port', ['hostname' => 'localhost', 'id' => 12]);
+        $legacy = new MetricNames()->legacyOf($metric);
+        $definition = new MetricDefinitions()->of($metric);
+        $this->assertNotNull($legacy);
+        $this->assertNotNull($definition);
+
+        $this->assertSame(array_keys($definition->fields), array_keys($legacy->fields));
     }
 }
