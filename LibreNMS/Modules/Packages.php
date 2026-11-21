@@ -62,7 +62,8 @@ class Packages implements Module, RemovesMethodData
      * Packages come from one method: the most preferred enabled method that has packages for this device.
      * Its packages replace those of other methods, so a device polled by several methods has no duplicates.
      * Methods after one that is down are not tried, so packages do not move to another method while it is down.
-     * When no method has packages, the existing ones are kept, so an incomplete agent output does not remove them.
+     * A timed-out fetch is incomplete, so it is not replaced by the next method's packages; when no method has
+     * packages the existing ones are kept.
      */
     public function poll(OS $os, DataStorageInterface $datastore): void
     {
@@ -81,6 +82,11 @@ class Packages implements Module, RemovesMethodData
                 Log::info("{$type->value}: {$packages->count()} packages");
 
                 return;
+            }
+
+            // a timed-out fetch is incomplete, so do not fall back to the next method — keep the existing inventory
+            if ((bool) $os->getMethodResults()->result($type)?->stat('timed_out')) {
+                break;
             }
         }
 
