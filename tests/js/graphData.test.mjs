@@ -178,3 +178,15 @@ test('only stepped lines extend the first sample back to the start of its interv
         assert.deepEqual(graph.series[0].avg, [null, 2, 3]);
     }
 });
+
+test('trends are given in the units of each series for hovering, also past the data', () => {
+    const graph = { timestamps, series: [series('in', { avg: [2, 4, 6], drawScale: 2 }), series('out', { invert: true, stacked: true })] };
+    const draw = { trend: true, mirror: true };
+    const plot = createPlotData(graph, { hidden: new Set(), draw, thresholds: [], comparing: false });
+    const { columns, trends } = plot.dataFor(graph, null, { from: 0, to: 400 });
+
+    assert.deepEqual(columns[0], [100, 200, 300, 400]);
+    assert.deepEqual(trends, { in: [2, 4, 6, 8], out: [1, 2, 3, 4] });
+    // drawn scaled and below the axis
+    assert.deepEqual(columns.slice(-2), [[4, 8, 12, 16], [-1, -2, -3, -4]]);
+});

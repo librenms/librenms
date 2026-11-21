@@ -15,8 +15,8 @@
  * @property {Threshold[]} thresholds the ones to draw, always inside the value axis
  * @property {(view: View, moving: boolean) => void} onView zoomed or panned, moving while more is likely to follow
  * @property {() => void} onReset
- * @property {(position: ?{index: number, time: number, left: number, previous: Object<string, ?number>}) => void} onHover
- *     the point whose interval the cursor is in, and the earlier values there. Past the data, only earlier values and trends are drawn.
+ * @property {(position: ?{index: number, time: number, left: number, previous: Object<string, ?number>, trends: Object<string, ?number>}) => void} onHover
+ *     the point whose interval the cursor is in, and the earlier values and trends there. Past the data, only earlier values and trends are drawn.
  */
 
 /**
@@ -32,8 +32,8 @@
 import uPlot from 'uplot';
 import 'uplot/dist/uPlot.min.css';
 import LibreNMSDate from './datetime.js';
-import { createPlotData, thresholdLines } from './graphs/plotData.js';
-import { formatValue } from './graphs/seriesData.js';
+import {createPlotData, thresholdLines} from './graphs/plotData.js';
+import {formatValue} from './graphs/seriesData.js';
 
 const GRID = 'rgba(128, 128, 128, 0.2)';
 const SELECTION = 'rgba(128, 128, 128, 0.3)';
@@ -338,7 +338,7 @@ export default function createChart(element, graph, { view, hidden, compact, dra
                 width: layer.stroke ? (layer.constant === undefined ? 1.25 : 1.5) : 0,
                 dash: layer.dash,
                 // trends and constants are straight, not drawn level for each interval
-                paths: layer.trend || layer.constant !== undefined ? undefined : LINE_PATHS[lineStyle],
+                paths: layer.trend !== undefined || layer.constant !== undefined ? undefined : LINE_PATHS[lineStyle],
                 points: { show: false },
             })),
         ],
@@ -378,13 +378,15 @@ export default function createChart(element, graph, { view, hidden, compact, dra
                 const index = idx === null || idx === undefined || left < 0 ? null : sampleIndex(self, idx, self.posToVal(left, 'x'));
                 // past the data there are only trends and earlier values
                 const past = index !== null && index >= current.graph.timestamps.length;
-                onHover(index === null || (past && ! comparing)
+                const at = (columns) => Object.fromEntries(Object.entries(columns).map(([key, values]) => [key, values[index]]));
+                onHover(index === null || (past && ! comparing && ! draw.trend)
                     ? null
                     : {
                         index,
                         time: self.data[0][index],
                         left: self.over.offsetLeft + left,
-                        previous: Object.fromEntries(Object.entries(data.earlier).map(([key, values]) => [key, values[index]])),
+                        previous: at(data.earlier),
+                        trends: at(data.trends),
                     });
             }],
         },

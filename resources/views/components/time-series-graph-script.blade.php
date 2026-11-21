@@ -446,15 +446,21 @@
                     const format = (series, value) => formatValue(value, series.unit, graph.axis.base);
                     const rows = graph.series
                         .filter((series) => ! this.hidden.includes(series.key))
-                        .map((series) => ({ series, now: series.avg[position.index] ?? null, before: position.previous[series.key] ?? null }))
-                        .filter(({ now, before }) => now !== null || before !== null)
-                        .map(({ series, now, before }) => ({
+                        .map((series) => ({
+                            series,
+                            now: series.avg[position.index] ?? null,
+                            before: position.previous[series.key] ?? null,
+                            trend: position.trends[series.key] ?? null,
+                        }))
+                        .filter(({ now, before, trend }) => now !== null || before !== null || trend !== null)
+                        .map(({ series, now, before, trend }) => ({
                             key: series.key,
                             label: series.label,
                             color: series.color,
-                            amount: now ?? before,
+                            amount: now ?? before ?? trend,
                             value: format(series, now),
                             previous: before === null ? null : format(series, before),
+                            trend: trend === null ? null : format(series, trend),
                         }));
 
                     // the busiest ones
