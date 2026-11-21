@@ -6065,6 +6065,13 @@
             "default": false,
             "type": "boolean"
         },
+        "poller_modules.packages": {
+            "order": 425,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "poller_modules.core": {
             "default": true,
             "type": "boolean",

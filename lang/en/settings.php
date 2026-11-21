@@ -1750,6 +1750,10 @@ return [
             'unix-agent' => [
                 'description' => 'Unix Agent',
             ],
+            'packages' => [
+                'description' => 'Packages',
+                'help' => 'Collects installed software packages via SNMP from the HOST-RESOURCES-MIB (hrSWInstalledTable). The unix agent takes precedence when enabled.',
+            ],
             'os' => [
                 'description' => 'OS',
             ],
