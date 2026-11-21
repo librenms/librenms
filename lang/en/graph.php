@@ -111,6 +111,18 @@ return [
         'p95' => '95th',
         'series' => 'Series',
     ],
+    'stats' => [
+        'hour' => '1 hour',
+        'day' => '1 day',
+        'week' => '1 week',
+        'avg' => ':period avg',
+        'min' => ':period min',
+        'max' => ':period max',
+        'percentile' => ':percentileth Percentile',
+    ],
+    'units' => [
+        'seconds' => 'Seconds',
+    ],
     'series' => [
         'in' => 'In',
         'out' => 'Out',
@@ -158,6 +170,15 @@ return [
             'uptime' => 'Uptime',
             'days' => 'Days',
             'unit' => 'days',
+        ],
+    ],
+    'application' => [
+        'ntp_client' => [
+            'frequency' => 'Frequency',
+            'offset' => 'Offset',
+            'stability' => 'Stability',
+            'jitter' => 'Jitter',
+            'noise' => 'Noise',
         ],
     ],
     'mempool' => [

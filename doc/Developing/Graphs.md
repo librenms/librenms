@@ -283,6 +283,40 @@ legacy graphs; graphs drawn from other datastores ignore them.
 For example, a percentage graph can use `scaleMin: 0, scaleMax: 100,
 scaleRigid: true`. See `app/Data/Graphing/GraphOptions.php` for all options.
 
+### Statistics
+
+To add rolling averages and percentile lines to each series, as the legacy
+`generic_stats` graphs do, pass `StatsOptions` in the graph's `options()`:
+
+```php
+use App\Data\Graphing\StatsOptions;
+
+protected function options(): GraphOptions
+{
+    return new GraphOptions(
+        verticalLabel: 'Seconds',
+        palette: 'rainbow_stats_purple',
+        stats: new StatsOptions,
+    );
+}
+```
+
+Each series then gets these extra lines and legend rows:
+
+- hourly :: 1 hour average line, with its min and max in the legend
+- daily :: the same for 1 day, shown when the graph covers at least 36 hours
+- weekly :: the same for 1 week, shown when the graph covers at least 8 days
+- percentiles :: horizontal lines, `[25, 50, 75]` by default, hidden when
+  `graph_stat_percentile_disable` is set
+
+Turn parts off with named arguments, for example
+`new StatsOptions(weekly: false, percentiles: [50])`. Graphs 25 pixels tall
+or less leave them all out. The lines take the next colors of the palette;
+`rainbow_stats_purple` matches the legacy graphs.
+
+With several series, each label starts with the series description, such as
+`Jitter 1 hour avg`.
+
 ## Troubleshooting
 
 | Symptom | What to check |
@@ -314,7 +348,8 @@ finds the existing data by the clean identity.
 Replace legacy RRD filename and dataset variables with `MetricIdentity` and
 `DataSeries`, and move presentation settings into `SeriesStyle` and
 `GraphOptions`. Compare the resulting graph and legend before removing the
-old include.
+old include. A legacy `$descr_len` is not needed: labels are padded or cut
+to 20 characters.
 
 For working examples, read `app/Graphs/Device/NetstatIpGraph.php` for multiple
 fields and inverted series, or `app/Graphs/Device/ProcessorGraph.php` for one
@@ -329,6 +364,19 @@ period comparisons, future trend lines, and port speed references.
 `TrafficOptions::series` limits these to some of the series:
 `app/Graphs/Device/BitsGraph.php` stacks the traffic of each port and only
 summarizes the device totals.
+
+For application graphs, extend `App\Graphs\Application\ApplicationGraph`.
+`$this->metric()` reads the `app-<app_type>-<app_id>.rrd` file the
+application poller writes. For an app with more files, pass the parts that
+follow the app id as tags, in order:
+`$this->metric(['category' => 'overview'])` reads
+`app-backupninja-<app_id>-overview.rrd`.
+A file with a part before the app id, such as `app-asterisk-stats-<app_id>.rrd`,
+needs its own `MetricIdentity` with the tags in that order.
+`app/Graphs/Application/NtpClientOffsetGraph.php` is an example that uses
+`StatsOptions`. Graph names for this can not contain hyphens, so
+the graphs of an app such as `ntp-client` are need to be named like
+`application_ntp_client_*`.
 
 For graph types outside device graphs, extend `AbstractSeriesGraph` and
 implement `isAuthorized()` for the entities being displayed, using `canView()`

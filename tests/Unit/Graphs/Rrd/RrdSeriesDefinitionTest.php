@@ -38,7 +38,7 @@ class RrdSeriesDefinitionTest extends TestCase
     public function test_it_draws_lines_with_fill_and_invert(): void
     {
         $this->assertSame([
-            "COMMENT:Traffic                    Now        Min        Max        Avg\l",
+            "COMMENT:Traffic                        Now        Min        Max        Avg\l",
             'DEF:ds0=host/test.rrd:in:AVERAGE',
             'DEF:ds0min=host/test.rrd:in:MIN',
             'DEF:ds0max=host/test.rrd:in:MAX',
@@ -48,12 +48,12 @@ class RrdSeriesDefinitionTest extends TestCase
             'CDEF:ds1drawn=ds1,-1,*',
             'AREA:ds0#FF000020',
             'AREA:ds1drawn#D42E08',
-            'LINE1.25:ds0#FF0000:In               ',
+            'LINE1.25:ds0#FF0000:In                   ',
             'GPRINT:ds0:LAST:%5.2lf%sbps',
             'GPRINT:ds0min:MIN:%5.2lf%sbps',
             'GPRINT:ds0max:MAX:%5.2lf%sbps',
             'GPRINT:ds0:AVERAGE:%5.2lf%sbps\n',
-            'LINE1.25:ds1drawn#D42E08:Out              ',
+            'LINE1.25:ds1drawn#D42E08:Out                  ',
             'GPRINT:ds1:LAST:%5.2lf%sbps',
             'GPRINT:ds1min:MIN:%5.2lf%sbps',
             'GPRINT:ds1max:MAX:%5.2lf%sbps',
@@ -78,15 +78,15 @@ class RrdSeriesDefinitionTest extends TestCase
             'AREA:ds0max#D7FFC7',
             'AREA:ds1maxdrawn#E0E0FF',
             'AREA:ds0#90B040',
-            'LINE1.25:ds0#608720:In               ',
-            'LINE1.25:ds1drawn#606090:Out              ',
+            'LINE1.25:ds0#608720:In                   ',
+            'LINE1.25:ds1drawn#606090:Out                  ',
         ], $drawing);
     }
 
     public function test_draw_scale_only_changes_the_drawing(): void
     {
         $this->assertSame([
-            "COMMENT:Load %                  Now     Min     Max     Avg\l",
+            "COMMENT:Load %                      Now     Min     Max     Avg\l",
             'DEF:ds0=host/test.rrd:usage:AVERAGE',
             'DEF:ds0min=host/test.rrd:usage:MIN',
             'DEF:ds0max=host/test.rrd:usage:MAX',
@@ -95,12 +95,12 @@ class RrdSeriesDefinitionTest extends TestCase
             'DEF:ds1min=host/test.rrd:usage:MIN',
             'DEF:ds1max=host/test.rrd:usage:MAX',
             'CDEF:ds1drawn=ds1,0.5,*',
-            'AREA:ds0drawn#FF0000:A                ',
+            'AREA:ds0drawn#FF0000:A                    ',
             'GPRINT:ds0:LAST:%5.2lf%s',
             'GPRINT:ds0min:MIN:%5.2lf%s',
             'GPRINT:ds0max:MAX:%5.2lf%s',
             'GPRINT:ds0:AVERAGE:%5.2lf%s\n',
-            'AREA:ds1drawn#FF0000:B                :STACK',
+            'AREA:ds1drawn#FF0000:B                    :STACK',
             'GPRINT:ds1:LAST:%5.2lf%s',
             'GPRINT:ds1min:MIN:%5.2lf%s',
             'GPRINT:ds1max:MAX:%5.2lf%s',
@@ -114,14 +114,14 @@ class RrdSeriesDefinitionTest extends TestCase
     public function test_series_scale_changes_the_value_everywhere(): void
     {
         $this->assertSame([
-            "COMMENT:                        Now     Min     Max     Avg\l",
+            "COMMENT:                            Now     Min     Max     Avg\l",
             'DEF:ds0raw=host/test.rrd:bytes:AVERAGE',
             'CDEF:ds0=ds0raw,8,*',
             'DEF:ds0minraw=host/test.rrd:bytes:MIN',
             'CDEF:ds0min=ds0minraw,8,*',
             'DEF:ds0maxraw=host/test.rrd:bytes:MAX',
             'CDEF:ds0max=ds0maxraw,8,*',
-            'LINE1.25:ds0#FF0000:Bits             ',
+            'LINE1.25:ds0#FF0000:Bits                 ',
             'GPRINT:ds0:LAST:%5.2lf%s',
             'GPRINT:ds0min:MIN:%5.2lf%s',
             'GPRINT:ds0max:MAX:%5.2lf%s',
@@ -179,7 +179,7 @@ class RrdSeriesDefinitionTest extends TestCase
         $this->assertContains('DEF:ds0max=host/test.rrd:max:MAX', $definition);
         $this->assertContains('CDEF:ds0range=ds0maxdrawn,ds0mindrawn,-', $definition);
         $drawing = array_values(preg_grep('/^(AREA|LINE)/', $definition));
-        $this->assertSame(['LINE:ds0mindrawn#00000000', 'AREA:ds0range#D0D0D0::STACK', 'LINE1.25:ds0drawn#272B30:RTT              '], $drawing);
+        $this->assertSame(['LINE:ds0mindrawn#00000000', 'AREA:ds0range#D0D0D0::STACK', 'LINE1.25:ds0drawn#272B30:RTT                  '], $drawing);
     }
 
     public function test_inverted_stacked_series_start_their_own_stack(): void
@@ -192,10 +192,10 @@ class RrdSeriesDefinitionTest extends TestCase
         ]);
 
         $this->assertSame([
-            'AREA:ds0#FF0000:A                ',
-            'AREA:ds1#FF0000:B                :STACK',
-            'AREA:ds2drawn#FF0000:C                ',
-            'AREA:ds3drawn#FF0000:D                :STACK',
+            'AREA:ds0#FF0000:A                    ',
+            'AREA:ds1#FF0000:B                    :STACK',
+            'AREA:ds2drawn#FF0000:C                    ',
+            'AREA:ds3drawn#FF0000:D                    :STACK',
         ], array_values(preg_grep('/^AREA/', $definition)));
     }
 
@@ -216,16 +216,16 @@ class RrdSeriesDefinitionTest extends TestCase
         $this->assertContains('CDEF:ds4base=0,ds1drawn,ADDNAN', $definition);
         $this->assertContains('CDEF:ds6base=ds4base,ds4drawn,ADDNAN', $definition);
         $this->assertSame([
-            'AREA:ds0#FF0000:A                ',
-            'AREA:ds1drawn#FF0000:C                ',
+            'AREA:ds0#FF0000:A                    ',
+            'AREA:ds1drawn#FF0000:C                    ',
             'LINE:ds2base#00000000',
-            'AREA:ds2#FF0000:B                :STACK',
-            'AREA:ds3#FF0000:BB               :STACK',
+            'AREA:ds2#FF0000:B                    :STACK',
+            'AREA:ds3#FF0000:BB                   :STACK',
             'LINE:ds4base#00000000',
-            'AREA:ds4drawn#FF0000:D                :STACK',
-            'LINE1.25:ds5#FF0000:E                ',
+            'AREA:ds4drawn#FF0000:D                    :STACK',
+            'LINE1.25:ds5#FF0000:E                    ',
             'LINE:ds6base#00000000',
-            'AREA:ds6drawn#FF0000:DD               :STACK',
+            'AREA:ds6drawn#FF0000:DD                   :STACK',
         ], array_values(preg_grep('/^(AREA|LINE)/', $definition)));
     }
 
@@ -249,10 +249,10 @@ class RrdSeriesDefinitionTest extends TestCase
         // the lowest and highest of a sum are those of its averages
         $this->assertContains('CDEF:ds2min=ds0,ds1,ADDNAN', $definition);
         $this->assertContains('CDEF:ds2max=ds0,ds1,ADDNAN', $definition);
-        $this->assertContains('LINE1.25:ds2#FF0000:Sum              ', $definition);
+        $this->assertContains('LINE1.25:ds2#FF0000:Sum                  ', $definition);
         $this->assertContains('GPRINT:ds2max:MAX:%5.2lf%sbps', $definition);
         $this->assertContains('CDEF:ds3=ds2,ds0,ADDNAN', $definition);
-        $this->assertContains('HRULE:0#00000000:Nested           ', $definition);
+        $this->assertContains('HRULE:0#00000000:Nested               ', $definition);
         $this->assertEmpty(preg_grep('/^(AREA|LINE).*ds3/', $definition));
         $this->assertEmpty(preg_grep('/Empty|Later/', $definition));
         $this->assertContains('DEF:ds4=host/test.rrd:c:AVERAGE', $definition);
@@ -329,7 +329,7 @@ class RrdSeriesDefinitionTest extends TestCase
 
         $this->assertContains('CDEF:ds0above=ds0max,ds0max,ABS,0.01,*,+', $definition);
         $this->assertContains('CDEF:ds0below=ds0min,ds0min,ABS,0.01,*,-', $definition);
-        $this->assertSame(['LINE:ds0above#00000000', 'LINE:ds0below#00000000', 'LINE1.25:ds0#FF0000:A                '], array_values(preg_grep('/^LINE/', $definition)));
+        $this->assertSame(['LINE:ds0above#00000000', 'LINE:ds0below#00000000', 'LINE1.25:ds0#FF0000:A                    '], array_values(preg_grep('/^LINE/', $definition)));
     }
 
     public function test_units_exponent_zero_shows_legend_values_without_prefixes(): void
@@ -344,11 +344,11 @@ class RrdSeriesDefinitionTest extends TestCase
         $series = ['a' => new DataSeries($this->metric, 'a', 'A', style: new SeriesStyle(SeriesRole::Value, range: true))];
 
         $light = $this->build($series, params: ['from' => 100, 'to' => 200, 'style' => 'light']);
-        $this->assertContains('LINE1.25:ds0#272B30:A                ', $light);
+        $this->assertContains('LINE1.25:ds0#272B30:A                    ', $light);
         $this->assertContains('AREA:ds0range#D0D0D0::STACK', $light);
 
         $dark = $this->build($series, params: ['from' => 100, 'to' => 200, 'style' => 'dark']);
-        $this->assertContains('LINE1.25:ds0#F2F2F2:A                ', $dark);
+        $this->assertContains('LINE1.25:ds0#F2F2F2:A                    ', $dark);
         $this->assertContains('AREA:ds0range#3E444C::STACK', $dark);
     }
 
@@ -386,8 +386,8 @@ class RrdSeriesDefinitionTest extends TestCase
         $this->assertContains('AREA:ds0max#D7FFC788', $definition);
         $this->assertContains('AREA:ds0#90B04088', $definition);
         $this->assertContains('AREA:ds1#8080C088', $definition);
-        $this->assertContains('LINE1.25:ds1#606090:Out              ', $definition);
-        $this->assertContains('AREA:ds2#FF330088:Errors           ', $definition);
+        $this->assertContains('LINE1.25:ds1#606090:Out                  ', $definition);
+        $this->assertContains('AREA:ds2#FF330088:Errors               ', $definition);
     }
 
     public function test_a_drawn_inverted_sum_makes_areas_translucent(): void
@@ -402,8 +402,8 @@ class RrdSeriesDefinitionTest extends TestCase
             'total' => new SeriesSum(['out'], 'Total', style: new SeriesStyle(SeriesRole::Out, stacked: true, invert: true)),
         ]);
 
-        $this->assertContains('AREA:ds0#00AA0088:In               ', $definition);
-        $this->assertContains('AREA:ds2#AA00AA88:Total            :STACK', $definition);
+        $this->assertContains('AREA:ds0#00AA0088:In                   ', $definition);
+        $this->assertContains('AREA:ds2#AA00AA88:Total                :STACK', $definition);
     }
 
     public function test_areas_without_overlapping_series_are_opaque(): void
@@ -422,8 +422,8 @@ class RrdSeriesDefinitionTest extends TestCase
             'empty' => new SeriesSum(['missing'], 'Empty', style: new SeriesStyle(stacked: true, invert: true)),
         ]);
 
-        $this->assertContains('AREA:ds0#C75862:Used             ', $definition);
-        $this->assertContains('AREA:ds1#D0D0D0:Free             :STACK', $definition);
+        $this->assertContains('AREA:ds0#C75862:Used                 ', $definition);
+        $this->assertContains('AREA:ds1#D0D0D0:Free                 :STACK', $definition);
         $this->assertEmpty(preg_grep('/Empty/', $definition));
     }
 
@@ -471,7 +471,7 @@ class RrdSeriesDefinitionTest extends TestCase
 
         $definition = $this->build(['a' => new DataSeries($this->metric, 'a', 'A')], new GraphOptions(palette: 'oranges'));
 
-        $this->assertContains('LINE1.25:ds0#EE7700:A                ', $definition);
+        $this->assertContains('LINE1.25:ds0#EE7700:A                    ', $definition);
     }
 
     public function test_it_escapes_units_in_value_formats_and_widens_the_columns(): void
@@ -479,7 +479,7 @@ class RrdSeriesDefinitionTest extends TestCase
         $definition = $this->build(['a' => new DataSeries($this->metric, 'a', 'A', 'a%:b')]);
 
         $this->assertContains('GPRINT:ds0:LAST:%5.2lf%sa%%\:b', $definition);
-        $this->assertSame("COMMENT:                            Now         Min         Max         Avg\l", $definition[0]);
+        $this->assertSame("COMMENT:                                Now         Min         Max         Avg\l", $definition[0]);
     }
 
     public function test_it_skips_series_without_an_rrd_file(): void

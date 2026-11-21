@@ -39,6 +39,7 @@ readonly class GraphOptions
         public string $legendTitle = '',
         public string $palette = 'mixed',
         public ?TrafficOptions $traffic = null,
+        public ?StatsOptions $stats = null,
         public array $thresholds = [],
         public float $scaleMargin = 0,
         public ?string $axisUnit = null,
