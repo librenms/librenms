@@ -872,18 +872,6 @@ foreach ($ports as $port) {
                 'OUTMULTICASTPKTS' => $this_port['ifOutMulticastPkts'] ?? null,
             ];
 
-            // non rrd stats (will be filtered)
-            $fields['ifInUcastPkts_rate'] = $port['ifInUcastPkts_rate'];
-            $fields['ifOutUcastPkts_rate'] = $port['ifOutUcastPkts_rate'];
-            $fields['ifInErrors_rate'] = $port['ifInErrors_rate'];
-            $fields['ifOutErrors_rate'] = $port['ifOutErrors_rate'];
-            $fields['ifInOctets_rate'] = $port['ifInOctets_rate'];
-            $fields['ifOutOctets_rate'] = $port['ifOutOctets_rate'];
-
-            // Add delta rate between current poll and last poll.
-            $fields['ifInBits_rate'] = $current_port_stats['ifInBits_rate'];
-            $fields['ifOutBits_rate'] = $current_port_stats['ifOutBits_rate'];
-
             if ($tune_port === true) {
                 Rrd::tune($rrdfile, \LibreNMS\RRD\PortRrd::tuneLimits((int) $this_port['ifSpeed']));
             }
