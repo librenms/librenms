@@ -81,7 +81,7 @@ final class PackagesTest extends InMemoryDbTestCase
         $os = $this->makeOs([PollingMethodType::Snmp]);
         $this->fakeSnmpInstalledPackages([
             ['index' => 1, 'name' => '74 65 78 6C 69 76 65 2D 63 6F 6C 6C 65 63 74 69 6F 6E 2D 64 6F 63 75 6D 65 6E 74 61 74 69 6F 6E 2D 62 61 73 65 2D 73 76 6E 31 00 00 00 00 00 00 00 00 00 00 00 00', 'date' => '2026-11-12,6:6:22.0,+1:0'],
-            ['index' => 2, 'name' => '6c 69 62 73 6e 64 66 69 6c 65 2d 31 2e 30 2e 33 31 2d 31 30 2e 65 6c 39'],
+            ['index' => 2, 'name' => '6c 69 62 73 6e 64 66 69 6c 65 2d 31 2e 30 2e 33 31 2d 31 30 2e 65 6c 39 00 00 00 00 00 00'],
             ['index' => 3, 'name' => '70 79 74 68 6F 6E 32 2D 73 65 74 75 70 74 6F 6F 6C 73 2D 77 68 65 65 6C 2D 33 39 2E 30 2E 31 2D 31 34 2E 6D 6F 64 75 6C 65 5F 00 00 00 00 00 00'],
         ]);
 
@@ -99,7 +99,7 @@ final class PackagesTest extends InMemoryDbTestCase
         $os = $this->makeOs([PollingMethodType::Snmp]);
         // snmpwalk wraps long values across lines (a newline after every 16 bytes)
         $this->fakeSnmpInstalledPackages([
-            ['index' => 1, 'name' => "74 65 78 6C 69 76 65 2D 63 6F 6C 6C 65 63 74 69 \n6F 6E 2D 66 6F 6E 74 73 72 65 63 6F 6D 6D 65 6E \n64 65 64 2D 73 76 6E 32 38 30", 'date' => '2020-05-26,6:13:7.0,+2:0'],
+            ['index' => 1, 'name' => "74 65 78 6C 69 76 65 2D 63 6F 6C 6C 65 63 74 69 \n6F 6E 2D 66 6F 6E 74 73 72 65 63 6F 6D 6D 65 6E \n64 65 64 2D 73 76 6E 32 38 30 00 00 00 00 00 00", 'date' => '2020-05-26,6:13:7.0,+2:0'],
         ]);
 
         (new Packages)->poll($os, $this->datastore());
@@ -110,19 +110,36 @@ final class PackagesTest extends InMemoryDbTestCase
         $this->assertSame('unknown', $package->arch);
     }
 
+    public function testKeepsALoneTwoDigitPackageNameAsPlainText(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Snmp]);
+        // "bc" is a plain two-character name, not a single hex byte
+        $this->fakeSnmpInstalledPackages([
+            ['index' => 1, 'name' => 'bc', 'date' => '2025-6-18,7:36:25.0,+2:0'],
+        ]);
+
+        (new Packages)->poll($os, $this->datastore());
+
+        $package = Package::where('device_id', $os->getDeviceId())->sole();
+        $this->assertSame('bc', $package->name);
+        $this->assertSame('2025-06-18 07:36:25', $package->version);
+        $this->assertSame('unknown', $package->arch);
+    }
+
     public function testNameWithoutVersionFallsBackToTheModificationDate(): void
     {
         $os = $this->makeOs([PollingMethodType::Snmp]);
         $this->fakeSnmpInstalledPackages([
             ['index' => 1, 'name' => 'vim', 'date' => '2025-6-18,7:36:25.0,+2:0'],
             ['index' => 2, 'name' => 'less', 'date' => '+02:00 2026-10-21:14:38:02.0'],
+            ['index' => 3, 'name' => 'grep', 'date' => '2024-1-5,3:2:1.0'],
         ]);
 
         (new Packages)->poll($os, $this->datastore());
 
         $packages = Package::where('device_id', $os->getDeviceId())->orderBy('name')->get();
-        $this->assertSame(['2026-10-21 14:38:02', '2025-06-18 07:36:25'], $packages->pluck('version')->all());
-        $this->assertSame(['unknown', 'unknown'], $packages->pluck('arch')->all());
+        $this->assertSame(['2024-01-05 03:02:01', '2026-10-21 14:38:02', '2025-06-18 07:36:25'], $packages->pluck('version')->all());
+        $this->assertSame(['unknown', 'unknown', 'unknown'], $packages->pluck('arch')->all());
     }
 
     public function testUpdatesChangedVersionsAndRemovesMissingPackages(): void
@@ -156,6 +173,22 @@ final class PackagesTest extends InMemoryDbTestCase
         $this->assertSame('5.2.37', $packages->sole()->version);
     }
 
+    public function testKeepsBothVersionsOfTheSamePackageInstalled(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Snmp]);
+        $this->fakeSnmpInstalledPackages([
+            ['index' => 1, 'name' => 'bash_5.1.0_amd64'],
+            ['index' => 2, 'name' => 'bash_5.2.0_amd64'],
+        ]);
+
+        (new Packages)->poll($os, $this->datastore());
+
+        $packages = Package::where('device_id', $os->getDeviceId())->orderBy('version')->get();
+        $this->assertSame(['bash', 'bash'], $packages->pluck('name')->all());
+        $this->assertSame(['5.1.0', '5.2.0'], $packages->pluck('version')->all());
+        $this->assertSame(['amd64', 'amd64'], $packages->pluck('arch')->all());
+    }
+
     public function testKeepsExistingPackagesWhenTheTableIsNotExposed(): void
     {
         $os = $this->makeOs([PollingMethodType::Snmp]);
@@ -173,6 +206,44 @@ final class PackagesTest extends InMemoryDbTestCase
         (new Packages)->poll($os, $this->datastore());
 
         $this->assertSame(1, Package::where('device_id', $os->getDeviceId())->count());
+    }
+
+    public function testKeepsExistingPackagesWhenTheWalkTimesOut(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Snmp]);
+        Package::factory()->create([
+            'device_id' => $os->getDeviceId(),
+            'name' => 'bash',
+            'manager' => 'host-res',
+            'arch' => 'amd64',
+            'version' => '5.2.0',
+            'polling_method' => PollingMethodType::Snmp,
+        ]);
+        Package::factory()->create([
+            'device_id' => $os->getDeviceId(),
+            'name' => 'vim',
+            'manager' => 'host-res',
+            'arch' => 'amd64',
+            'version' => '9.0.0',
+            'polling_method' => PollingMethodType::Snmp,
+        ]);
+
+        // the walk returned only part of the table before the device timed out
+        $partial = "HOST-RESOURCES-MIB::hrSWInstalledIndex.1 = 1\nHOST-RESOURCES-MIB::hrSWInstalledName.1 = \"bash_5.2.0_amd64\"\nHOST-RESOURCES-MIB::hrSWInstalledID.1 = 0.0\nHOST-RESOURCES-MIB::hrSWInstalledType.1 = 4";
+        $backend = Mockery::mock(SnmpBackendInterface::class);
+        $backend->shouldReceive('get')->zeroOrMoreTimes()->andReturnUsing(fn (): RawSnmpResponse => $this->snmpProbeResponse());
+        $backend->shouldReceive('walk')
+            ->once()
+            ->withArgs(fn (string $target, string $oid): bool => $oid === 'HOST-RESOURCES-MIB::hrSWInstalledTable')
+            ->andReturn(new RawSnmpResponse($partial, 'Timeout: No Response from 10.0.0.1: 1 (No answer from 10.0.0.1)', 1));
+
+        $this->app->instance(SnmpBackendInterface::class, $backend);
+        $this->app->instance(SnmpPollingMethod::class, new SnmpPollingMethod($backend));
+
+        (new Packages)->poll($os, $this->datastore());
+
+        $packages = Package::where('device_id', $os->getDeviceId())->orderBy('name')->get();
+        $this->assertSame(['bash', 'vim'], $packages->pluck('name')->all());
     }
 
     public function testPollsPackagesFromTheAgentOutput(): void
@@ -221,6 +292,40 @@ final class PackagesTest extends InMemoryDbTestCase
         $this->assertSame(['bash'], $packages->pluck('name')->all());
         $this->assertSame('rpm', $packages->sole()->manager);
         $this->assertSame(PollingMethodType::UnixAgent, $packages->sole()->polling_method);
+    }
+
+    public function testKeepsExistingPackagesWhenTheAgentTimesOut(): void
+    {
+        $os = $this->makeOs([PollingMethodType::UnixAgent]);
+        // packages collected by a previous complete fetch
+        Package::factory()->create([
+            'device_id' => $os->getDeviceId(),
+            'name' => 'bash',
+            'manager' => 'rpm',
+            'arch' => 'x86_64',
+            'version' => '5.2.0',
+            'polling_method' => PollingMethodType::UnixAgent,
+        ]);
+        Package::factory()->create([
+            'device_id' => $os->getDeviceId(),
+            'name' => 'kernel',
+            'manager' => 'rpm',
+            'arch' => 'x86_64',
+            'version' => '6.8.0',
+            'polling_method' => PollingMethodType::UnixAgent,
+        ]);
+
+        // the fetch returned a partial list and then timed out
+        $this->fakeMethod(UnixAgentPollingMethod::class, true, [
+            'output' => "<<<rpm>>>\nbash 5.2.0 3 x86_64 12345\n",
+            'time' => 15,
+            'timed_out' => true,
+        ]);
+
+        (new Packages)->poll($os, $this->datastore());
+
+        $packages = Package::where('device_id', $os->getDeviceId())->orderBy('name')->get();
+        $this->assertSame(['bash', 'kernel'], $packages->pluck('name')->all());
     }
 
     public function testDataExists(): void
