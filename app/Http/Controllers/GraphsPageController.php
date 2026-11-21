@@ -79,7 +79,6 @@ class GraphsPageController extends Controller
                 'preferencesUrl' => route('preferences.store'),
                 'rendererPreference' => self::RENDERER_PREFERENCE,
                 'optionsPreference' => self::OPTIONS_PREFERENCE,
-                // what reset and restore go back to
                 'viewDefaults' => [...GraphViewOptions::addressDefaults(), 'compare' => null, 'trend' => false],
                 'preferenceDefaults' => GraphViewOptions::preferenceDefaults(),
                 'lang' => ['copied' => __('graph.link_copied'), 'failed' => __('graph.link_not_copied')],

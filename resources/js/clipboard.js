@@ -16,11 +16,11 @@ function copy(text) {
     textarea.style.opacity = "0";
     document.body.appendChild(textarea);
     textarea.select();
-    let copied = false;
+    let copied;
     try {
         copied = document.execCommand("copy");
     } catch {
-        // copied stays false
+        copied = false;
     }
     textarea.remove();
 

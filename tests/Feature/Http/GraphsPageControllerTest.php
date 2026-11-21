@@ -261,7 +261,7 @@ class GraphsPageControllerTest extends TestCase
         $response->assertSee("setOption('line_style', 'linear')", false);
         $response->assertSee(__('graph.options.mirror'));
         $response->assertSee("choose('stacking', 'stack')", false);
-        $response->assertSee(':disabled="! resettable()"', false); // the one reset, also for a resized graph
+        $response->assertSee(':disabled="! resettable()"', false);
         $response->assertSee(__('graph.copy_link'));
         $this->assertSame(['copied' => __('graph.link_copied'), 'failed' => __('graph.link_not_copied')], $page['lang']);
         $response->assertSee('popovertarget="graph-legend-columns-page-graph"', false); // the legend columns are chosen in the legend

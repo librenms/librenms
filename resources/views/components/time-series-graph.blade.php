@@ -6,15 +6,14 @@
 
 {{--
     range: ['last' => seconds] up to now, or ['from' => time, 'to' => time].
-    options: App\Data\Graphing\GraphViewOptions, the size is set by dragging the bottom corners.
+    options: App\Data\Graphing\GraphViewOptions.
     view: compare with an earlier time (period, day or week, null for none), and trend lines.
     Use it with $el.timeSeriesGraph: setRange(range), refresh(), zoom(steps), pan(steps), reset(), setOptions(options),
     image() for a PNG Blob and csv() for the data shown.
-    The legend columns are chosen from the legend, which dispatches graph-columns-changed with {columns}.
     Dispatches graph-range-changed with what is shown, graph-state-changed with {loading, refreshing, zoomed, features},
-    features is what the graph draws by itself: {mirror: has inverted series, stacking: all, none or some stacked, null for one series,
-    scale: fit, zero or limits}, null until loaded.
-    and graph-resized with {width, height} once dragged, nulls when back to the automatic size.
+    graph-resized with {width, height} once dragged, nulls for the automatic size, and graph-columns-changed with {columns}.
+    features is what the graph draws by itself, null until loaded: {mirror: has inverted series,
+    stacking: all, none or some stacked, null for one series, scale: fit, zero or limits}.
 --}}
 @php
     $columns = collect(App\Data\Graphing\GraphViewOptions::COLUMNS)->mapWithKeys(fn (string $column) => [$column => __("graph.legend.$column")]);

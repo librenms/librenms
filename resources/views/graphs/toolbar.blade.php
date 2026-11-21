@@ -4,7 +4,6 @@
     $menu = 'tw:absolute tw:right-0 tw:top-full tw:mt-1 tw:z-20 tw:rounded-md tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:bg-white tw:dark:bg-dark-gray-400 tw:shadow-lg tw:text-left';
     $menuItem = 'tw:flex tw:w-full tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:border-0 tw:bg-transparent tw:text-gray-700 tw:dark:text-gray-200 tw:hover:bg-gray-100 tw:dark:hover:bg-dark-gray-300 tw:whitespace-nowrap';
     $heading = 'tw:mb-1 tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400';
-    // a row of joined choices, one is pressed
     $segments = 'tw:inline-flex tw:shrink-0 tw:rounded tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:overflow-hidden';
     $segment = 'tw:px-2 tw:py-0.5 tw:text-sm tw:border-0 tw:not-first:border-l tw:border-gray-300 tw:dark:border-dark-gray-100 tw:bg-transparent tw:text-gray-700 tw:dark:text-gray-200 tw:hover:bg-gray-100 tw:dark:hover:bg-dark-gray-300 tw:aria-pressed:bg-blue-600 tw:aria-pressed:text-white tw:aria-pressed:hover:bg-blue-600 tw:whitespace-nowrap';
     $row = 'tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-x-3 tw:gap-y-1';
@@ -80,7 +79,6 @@
                 <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
             </button>
             <div x-show="open" x-cloak class="{{ $menu }} tw:py-1" x-on:click="open = false">
-                {{-- the address follows the range and the settings of this view --}}
                 <button type="button" class="{{ $menuItem }}" x-on:click="copyLink()">
                     <i class="fa-solid fa-link tw:w-4" aria-hidden="true"></i> {{ __('graph.copy_link') }}
                 </button>
@@ -100,7 +98,6 @@
             <button type="button" class="{{ $button }} tw:relative" x-on:click="open = ! open" :aria-expanded="open" title="{{ __('graph.settings') }}" aria-label="{{ __('graph.settings') }}">
                 <i class="fa-solid fa-gear" aria-hidden="true"></i>
                 @if ($drawInBrowser)
-                    {{-- this graph is not shown as it defines --}}
                     <span x-show="viewChanged()" x-cloak class="tw:absolute tw:-top-1 tw:-right-1 tw:w-2.5 tw:h-2.5 tw:rounded-full tw:bg-blue-600 tw:ring-2 tw:ring-white tw:dark:ring-dark-gray-500"></span>
                 @endif
             </button>
@@ -160,7 +157,6 @@
                 </section>
 
                 @if ($drawInBrowser)
-                    {{-- set once, so out of the way until opened --}}
                     <section aria-labelledby="graph-settings-preferences">
                         <button type="button" class="tw:flex tw:w-full tw:items-center tw:justify-between tw:gap-2 tw:p-3 tw:border-0 tw:bg-transparent tw:text-left tw:hover:bg-gray-50 tw:dark:hover:bg-dark-gray-300"
                                 x-on:click="togglePreferences()" :aria-expanded="preferencesOpen" aria-controls="graph-settings-preferences-body">

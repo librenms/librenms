@@ -3,7 +3,7 @@
         const { limitRange, now, panRange, resolveRange, zoomRange, toCsv } = window.LibreNMS.Graphs;
         const SAVE_DELAY = 500;
         const COMPARE = { period: 'yes', day: 'day', week: 'week' };
-        const PREFERENCES_OPEN = 'graph-settings-preferences-open'; // remembered in this browser
+        const PREFERENCES_OPEN = 'graph-settings-preferences-open';
 
         // Storage can be blocked, the section is then closed.
         function remembered(key) {
@@ -50,7 +50,6 @@
                 // seconds up to now, null for a fixed range
                 last: range.last ?? null,
                 options: { ...options, ...view },
-                // features: what the graph draws by itself, null until loaded
                 state: { loading: interactive, refreshing: false, zoomed: false, features: null },
                 showHelp: false,
                 // the settings for all graphs are set once, so they start closed
@@ -127,7 +126,6 @@
                     this.navigate(panRange(resolveRange(range), steps));
                 },
 
-                // the settings of this graph differ from its defaults
                 viewChanged() {
                     return Object.entries(config.viewDefaults).some(([key, value]) => this.options[key] !== value);
                 },
@@ -136,13 +134,11 @@
                     return Object.entries(config.preferenceDefaults).some(([key, value]) => ! same(this.options[key], value));
                 },
 
-                // zoomed or panned, the settings of this view changed, or the graph resized
                 resettable() {
                     return this.state.zoomed || this.viewChanged() || this.options.height !== null;
                 },
 
-                // Back to the selected time range, the settings of this graph as it defines them, and the automatic size.
-                // The size is saved like a resize, the other preferences are the viewer's taste and stay.
+                // The automatic size is saved like a resize, the other preferences are the viewer's taste and stay.
                 reset() {
                     this.graph()?.reset();
                     if (this.viewChanged()) {
@@ -201,7 +197,6 @@
                         .then(() => window.location.reload());
                 },
 
-                // the preferences, for all graphs, saved once changes pause
                 saveOptions() {
                     clearTimeout(saving);
                     saving = setTimeout(() => {
@@ -230,7 +225,6 @@
                     remember(PREFERENCES_OPEN, this.preferencesOpen);
                 },
 
-                // chosen in the legend
                 columnsChanged({ columns }) {
                     this.options.columns = columns;
                     this.saveOptions();
@@ -242,7 +236,7 @@
                     this.saveOptions();
                 },
 
-                // as shown: the address follows the range and the settings of this view
+                // the address follows the range and the settings of this view
                 copyLink() {
                     LibreNMS.Clipboard.copyLink(window.location.href, config.lang);
                 },

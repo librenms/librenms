@@ -59,12 +59,10 @@
                 tooltip: null,
                 zoomed: false,
                 caption: '',
-                // what this graph draws by itself, null until loaded
                 features: null,
                 options,
                 // column and direction, null for the order of the graph
                 sort: null,
-                // the legend columns there are, in their order
                 allColumns: columns,
                 columnsMenuStyle: {},
 
@@ -371,7 +369,6 @@
                     this.$dispatch('graph-columns-changed', { columns: shown });
                 },
 
-                // below the button, its right edges lined up
                 placeColumnsMenu() {
                     const button = this.$refs.columnsButton.getBoundingClientRect();
 
