@@ -12,7 +12,7 @@ interface WriteInterface
      *   metric      App\Data\TimeSeries\MetricIdentity: the identity of a metric, it decides where datastores keep it,
      *                                                      under the names it had before when datastore.canonical_metrics is off.
      *                                                      Stores find its fields with MetricDefinitions and the names it is stored under with MetricNames.
-     *   legacy_tags array<string, scalar>: tags that are only stored under the names the metric had before, the identity does not have them
+     *                                                      Tags other than those of the identity are stored as given.
      *   rrd_def     RrdDefinition: overrides the one built from the metric definition
      *   rrd_name    array|string: the rrd filename, will be processed with rrd_name()
      *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()

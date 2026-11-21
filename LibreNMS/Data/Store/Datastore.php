@@ -145,10 +145,10 @@ class Datastore implements WriteInterface, DataStorageInterface
         if ($legacy !== null) {
             // stored under the names it always had, stores that know the metric (rrd) find them from it
             $measurement = $legacy->measurement;
-            $tags = [...$legacy->tagsOf($metric), ...$meta['legacy_tags'] ?? []];
+            // tags the caller adds to those of the identity keep their name
+            $tags = [...$legacy->tagsOf($metric), ...array_diff_key($tags, $metric->tags)];
             $fields = $legacy->fieldsOf($fields);
         }
-        unset($meta['legacy_tags']);
 
         foreach ($this->stores as $store) {
             $store->write($measurement, $fields, $tags, $meta);

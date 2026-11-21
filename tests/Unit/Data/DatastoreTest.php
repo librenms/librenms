@@ -116,15 +116,16 @@ final class DatastoreTest extends TestCase
         new Datastore([$store])->write($metric->measurement, ['usage' => 5], $metric->tags, ['metric' => $metric, 'rrd_def' => 'def']);
     }
 
-    public function testCleanedUpFieldsAndLegacyTagsAreWrittenUnderTheNamesTheyHad(): void
+    public function testCleanedUpFieldsAreWrittenUnderTheNamesTheyHadWithTheOtherTags(): void
     {
         $metric = new MetricIdentity('port', ['hostname' => 'localhost', 'id' => 12]);
+        $portTags = ['ifName' => 'eth0', 'ifAlias' => 'uplink', 'ifIndex' => 2, 'port_descr_type' => 'core'];
         $store = Mockery::mock(DatastoreContract::class);
         $store->shouldReceive('write')->once()
-            ->with('ports', ['INOCTETS' => 5, 'OUTOCTETS' => 6, 'ifInOctets_rate' => 1], ['ifName' => 'eth0'], ['metric' => $metric]);
+            ->with('ports', ['INOCTETS' => 5, 'OUTOCTETS' => 6, 'ifInOctets_rate' => 1], $portTags, ['metric' => $metric]);
 
-        // fields that are not in the definition keep their name
-        new Datastore([$store])->write($metric->measurement, ['in_octets' => 5, 'out_octets' => 6, 'ifInOctets_rate' => 1], $metric->tags, ['metric' => $metric, 'legacy_tags' => ['ifName' => 'eth0']]);
+        // fields that are not in the definition and tags that are not in the identity keep their names
+        new Datastore([$store])->write($metric->measurement, ['in_octets' => 5, 'out_octets' => 6, 'ifInOctets_rate' => 1], [...$metric->tags, ...$portTags], ['metric' => $metric]);
     }
 
     public function testCanonicalMetricsAreWrittenAsIdentified(): void
@@ -134,7 +135,7 @@ final class DatastoreTest extends TestCase
         $store = Mockery::mock(DatastoreContract::class);
         $store->shouldReceive('write')->once()->with('port', ['in_octets' => 5], $metric->tags, ['metric' => $metric]);
 
-        new Datastore([$store])->write($metric->measurement, ['in_octets' => 5], $metric->tags, ['metric' => $metric, 'legacy_tags' => ['ifName' => 'eth0']]);
+        new Datastore([$store])->write($metric->measurement, ['in_octets' => 5], $metric->tags, ['metric' => $metric]);
     }
 
     public function testMetricsThatWereAlwaysCleanAreWrittenAsIdentified(): void

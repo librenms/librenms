@@ -873,7 +873,16 @@ foreach ($ports as $port) {
                 'out_multicast_pkts' => $this_port['ifOutMulticastPkts'] ?? null,
             ];
 
+            $tags = $metric->tags;
             if (! app(MetricNames::class)->isCanonical()) {
+                // tags the identity of a port does not have
+                $tags += [
+                    'ifName' => $port['ifName'],
+                    'ifAlias' => $port['ifAlias'],
+                    'ifIndex' => $port['ifIndex'],
+                    'port_descr_type' => $port['port_descr_type'],
+                ];
+
                 // rates for datastores other than rrd (not rrd data sources), readers of the canonical layout compute them from the counters
                 $fields['ifInUcastPkts_rate'] = $port['ifInUcastPkts_rate'];
                 $fields['ifOutUcastPkts_rate'] = $port['ifOutUcastPkts_rate'];
@@ -889,14 +898,7 @@ foreach ($ports as $port) {
                 Rrd::tune(Rrd::metricNames($metric)[0], PortRrd::tuneLimits($metric, (int) $this_port['ifSpeed']));
             }
 
-            // the identity of a port does not have these tags, they are kept while ports are stored under the legacy names
-            $legacy_tags = [
-                'ifName' => $port['ifName'],
-                'ifAlias' => $port['ifAlias'],
-                'ifIndex' => $port['ifIndex'],
-                'port_descr_type' => $port['port_descr_type'],
-            ];
-            app('Datastore')->write($metric->measurement, $fields, $metric->tags, ['metric' => $metric, 'legacy_tags' => $legacy_tags]);
+            app('Datastore')->write($metric->measurement, $fields, $tags, ['metric' => $metric]);
 
             // End Update IF-MIB
             // Update PAgP
