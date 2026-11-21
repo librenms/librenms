@@ -9,6 +9,7 @@
         const MAX_SPAN = 10 * 365 * 86400;
         const MAX_DETAIL_CHANGE = 2; // zooming further than this from the loaded detail loads again
         const REFRESH_AFTER = 60; // seconds of newer data a view can miss before it loads again
+        const MIN_POINTS = 10; // the fewest the server gives
 
         const DRAWN_OPTIONS = ['range', 'mirror', 'stacking', 'scale', 'line_style', 'trend']; // the others are the legend, size and compare
         const COMPARE_SECONDS = { day: 86400, week: 604800 }; // a period is the span shown
@@ -45,6 +46,7 @@
             let timer = null;
             let legendFrame = null;
             let resizes = null;
+            let unsized = false; // a load waits for the plot to be laid out
 
             const shown = () => view ?? resolveRange(range);
 
@@ -77,7 +79,12 @@
                         image: () => chart?.image() ?? Promise.resolve(null),
                         csv: () => (graph === null ? null : toCsv(graph, shown(), new Set(this.hidden))),
                     };
-                    resizes = new ResizeObserver(() => chart?.resize());
+                    resizes = new ResizeObserver(() => {
+                        if (unsized && this.$refs.plot.clientWidth > 0) {
+                            this.load();
+                        }
+                        chart?.resize();
+                    });
                     resizes.observe(this.$refs.plot);
                     this.load();
                 },
@@ -212,6 +219,12 @@
                 },
 
                 async load() {
+                    // a hidden tab or panel has no width to fit the data to yet
+                    unsized = this.$refs.plot.clientWidth === 0;
+                    if (unsized) {
+                        return;
+                    }
+
                     const { from, to } = shown();
                     const requestedAt = now();
                     const margin = Math.round((to - from) * MARGIN);
@@ -220,7 +233,7 @@
                         from: from - margin,
                         to: until,
                         // the same detail as the view alone
-                        width: Math.round(this.plotWidth() * (until - from + margin) / (to - from)),
+                        width: Math.max(MIN_POINTS, Math.round(this.plotWidth() * (until - from + margin) / (to - from))),
                     };
 
                     const offset = this.compareSeconds();
