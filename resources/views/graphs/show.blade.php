@@ -116,7 +116,7 @@
     @if ($isDynamicGraph)
         q.ready(function(){
             q('.graph').forEach(function(item){
-                q(item).rrdGraphPng({
+                item.legacyGraph = q(item).rrdGraphPng({
                     canvasPadding: 120,
                     initialStart: {{ is_numeric($mainGraphVars['from']) ? $mainGraphVars['from'] : '(new Date()).getTime() / 1000 - 24*3600' }},
                     initialRange: {{ isset($mainGraphVars['to']) ? $mainGraphVars['to'] - $mainGraphVars['from'] : time() - $mainGraphVars['from'] }}

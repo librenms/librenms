@@ -188,8 +188,13 @@
                 async exportCsv() {
                     let csv = this.graph()?.csv();
                     if (! interactive) {
-                        const view = resolveRange(range);
-                        const width = root.querySelector('[data-graph-image]').clientWidth || window.innerWidth;
+                        const image = root.querySelector('[data-graph-image]');
+                        // a dynamic image graph pans and zooms by itself
+                        const legacy = image.legacyGraph;
+                        const view = legacy
+                            ? { from: Math.round(legacy.getStart()), to: Math.round(legacy.getStart() + legacy.getRange()) }
+                            : resolveRange(range);
+                        const width = image.clientWidth || window.innerWidth;
                         const response = await window.axios.get(config.dataUrl, { params: { ...view, width } });
                         csv = toCsv(response.data, view);
                     }

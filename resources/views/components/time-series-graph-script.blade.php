@@ -26,7 +26,7 @@
             let graph = null;
             let view = null; // {from, to} zoomed or panned to
             let earlier = null; // the data of the time compared with, moved to line up with the graph
-            let loaded = null; // {from, to, detail, offset} of the data, detail in seconds per pixel, offset back to the earlier data
+            let loaded = null; // {from, to, fresh, detail, offset} of the data, detail in seconds per pixel, fresh is the newest time it can hold, offset back to the earlier data
             let request = null;
             let timer = null;
             let legendFrame = null;
@@ -190,7 +190,7 @@
 
                     return loaded === null
                         || from < loaded.from
-                        || Math.min(to, now()) > loaded.to + REFRESH_AFTER
+                        || Math.min(to, now()) > loaded.fresh + REFRESH_AFTER
                         || detail > loaded.detail * MAX_DETAIL_CHANGE
                         || detail < loaded.detail / MAX_DETAIL_CHANGE
                         || this.compareSeconds() !== loaded.offset;
@@ -198,8 +198,9 @@
 
                 async load() {
                     const { from, to } = shown();
+                    const requestedAt = now();
                     const margin = Math.round((to - from) * MARGIN);
-                    const until = Math.max(to, Math.min(to + margin, now()));
+                    const until = Math.max(to, Math.min(to + margin, requestedAt));
                     const params = {
                         from: from - margin,
                         to: until,
@@ -230,7 +231,7 @@
                         createChart = module.default;
                         earlier = before && { ...before.data, timestamps: before.data.timestamps.map((time) => time + offset) };
                         this.updateGraph(response.data);
-                        loaded = { from: params.from, to: params.to, detail: (params.to - params.from) / params.width, offset };
+                        loaded = { from: params.from, to: params.to, fresh: Math.min(params.to, requestedAt), detail: (params.to - params.from) / params.width, offset };
                         this.error = null;
                     } catch (error) {
                         if (current.signal.aborted) {
