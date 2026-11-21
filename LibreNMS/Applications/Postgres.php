@@ -7,6 +7,7 @@ use App\Models\Application;
 class Postgres extends ApplicationDefinition
 {
     public const string TYPE = 'postgres';
+    protected const ?string DOCS = 'Postgres';
 
     protected const array GRAPHS = [
         'backends' => 'Backends',

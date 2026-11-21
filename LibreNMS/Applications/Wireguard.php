@@ -10,6 +10,7 @@ use Illuminate\Contracts\Support\Htmlable;
 class Wireguard extends ApplicationDefinition
 {
     public const string TYPE = 'wireguard';
+    protected const ?string DOCS = 'Wireguard';
 
     protected const ?array OVERVIEW = ['traffic', 'time'];
 

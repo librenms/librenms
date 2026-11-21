@@ -7,6 +7,7 @@ use App\Models\Application;
 class Logsize extends ApplicationDefinition
 {
     public const string TYPE = 'logsize';
+    protected const ?string DOCS = 'Logsize';
 
     protected const ?array OVERVIEW = [
         'size',

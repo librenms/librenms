@@ -25,6 +25,7 @@ namespace LibreNMS\Applications;
 class Sdfsinfo extends ApplicationDefinition
 {
     public const string TYPE = 'sdfsinfo';
+    protected const ?string DOCS = 'SDFS info';
     protected const ?string NAME = 'SDFS info';
 
     protected const array GRAPHS = [

@@ -5,6 +5,7 @@ namespace LibreNMS\Applications;
 class Memcached extends ApplicationDefinition
 {
     public const string TYPE = 'memcached';
+    protected const ?string DOCS = 'Memcached';
 
     protected const ?array OVERVIEW = [
         'bits',

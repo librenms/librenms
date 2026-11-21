@@ -7,6 +7,7 @@ use App\Models\Application;
 class HttpAccessLogCombined extends ApplicationDefinition
 {
     public const string TYPE = 'http_access_log_combined';
+    protected const ?string DOCS = 'HTTP Access Log Combined';
     protected const ?string NAME = 'HTTP Access Log Combined';
 
     protected const ?array OVERVIEW = [

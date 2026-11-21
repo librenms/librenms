@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Gate;
 class Nfs extends ApplicationDefinition
 {
     public const string TYPE = 'nfs';
+    protected const ?string DOCS = 'NFS';
     protected const ?string NAME = 'NFS';
 
     protected const ?array OVERVIEW = ['server_rpc', 'server_cache', 'client_rpc', 'client_cache'];

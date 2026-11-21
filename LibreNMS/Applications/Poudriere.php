@@ -7,6 +7,7 @@ use App\Models\Application;
 class Poudriere extends ApplicationDefinition
 {
     public const string TYPE = 'poudriere';
+    protected const ?string DOCS = 'Poudriere';
 
     protected const ?array OVERVIEW = [
         'status',

@@ -29,6 +29,7 @@ namespace LibreNMS\Applications;
 class Rrdcached extends ApplicationDefinition
 {
     public const string TYPE = 'rrdcached';
+    protected const ?string DOCS = 'RRDCached';
     protected const ?string NAME = 'RRDCached';
 
     protected const array GRAPHS = [

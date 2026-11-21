@@ -27,12 +27,17 @@ class EditApplicationsController
         return view('device.edit.apps', [
             'device' => $device,
             'canUpdate' => auth()->user()->can('update', Application::class),
-            'applications' => collect($this->types())->map(fn (string $type) => [
-                'type' => $type,
-                'name' => ApplicationDefinition::forType($type)->displayName(),
-                'enabled' => $enabled->has($type),
-                'discovered' => $autoDiscovery && $enabled->get($type),
-            ])->all(),
+            'applications' => collect($this->types())->map(function (string $type) use ($enabled, $autoDiscovery) {
+                $definition = ApplicationDefinition::forType($type);
+
+                return [
+                    'type' => $type,
+                    'name' => $definition->displayName(),
+                    'enabled' => $enabled->has($type),
+                    'discovered' => $autoDiscovery && $enabled->get($type),
+                    'docs' => $definition->docsUrl(),
+                ];
+            })->all(),
         ]);
     }
 
