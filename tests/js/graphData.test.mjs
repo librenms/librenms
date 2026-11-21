@@ -16,13 +16,15 @@ function series(key, values = {}) {
     };
 }
 
-function graphComponent(viewPath, name) {
+function graphComponent(viewPath, name, globals = {}) {
     const script = readFileSync(new URL('../../resources/views/' + viewPath, import.meta.url), 'utf8');
     let component;
     runInNewContext(script.trim().slice('<script>'.length, -'</script>'.length), {
+        AbortController,
         document: { addEventListener: (_event, initialize) => initialize() },
         window: {
-            LibreNMS: { Graphs: { resolveRange, formatValue, shownPoints, summarize } },
+            LibreNMS: { Graphs: { resolveRange, formatValue, shownPoints, summarize, ...globals.Graphs } },
+            axios: globals.axios,
             Alpine: {
                 data: (registered, create) => {
                     if (registered === name) {
@@ -189,4 +191,19 @@ test('trends are given in the units of each series for hovering, also past the d
     assert.deepEqual(trends, { in: [2, 4, 6, 8], out: [1, 2, 3, 4] });
     // drawn scaled and below the axis
     assert.deepEqual(columns.slice(-2), [[4, 8, 12, 16], [-1, -2, -3, -4]]);
+});
+
+test('data is loaded for the view only, older data may be kept at a lower resolution', async () => {
+    const requests = [];
+    const component = graphComponent('components/time-series-graph-script.blade.php', 'timeSeriesGraph', {
+        Graphs: { now: () => 1000, loadChart: async () => ({ default: () => ({}) }) },
+        axios: { get: async (url, { params }) => requests.push(params) && { data: {} } },
+    });
+    component.$refs = { plot: { clientWidth: 200 } };
+    component.compareSeconds = () => 0;
+    component.updateGraph = () => {};
+
+    await component.load();
+
+    assert.deepEqual(requests.map((params) => ({ ...params })), [{ from: 100, to: 300, width: 200 }]);
 });

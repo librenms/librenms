@@ -5,7 +5,6 @@
         const TOOLTIP_GAP = 32; // from the cursor
         const TOOLTIP_MARGIN = 8; // from the window edges
         const SETTLE_DELAY = 200; // a move loads data once it pauses
-        const MARGIN = 0.5; // of the view, loaded past both ends
         const MAX_SPAN = 10 * 365 * 86400;
         const MAX_DETAIL_CHANGE = 2; // zooming further than this from the loaded detail loads again
         const REFRESH_AFTER = 60; // seconds of newer data a view can miss before it loads again
@@ -227,14 +226,7 @@
 
                     const { from, to } = shown();
                     const requestedAt = now();
-                    const margin = Math.round((to - from) * MARGIN);
-                    const until = Math.max(to, Math.min(to + margin, requestedAt));
-                    const params = {
-                        from: from - margin,
-                        to: until,
-                        // the same detail as the view alone
-                        width: Math.max(MIN_POINTS, Math.round(this.plotWidth() * (until - from + margin) / (to - from))),
-                    };
+                    const params = { from, to, width: Math.max(MIN_POINTS, this.plotWidth()) };
 
                     const offset = this.compareSeconds();
 
@@ -324,7 +316,7 @@
                     this.draw();
                 },
 
-                // of what is shown, not the margins
+                // of what is shown, the loaded data can reach past it
                 updateLegend() {
                     if (graph === null) {
                         return;
