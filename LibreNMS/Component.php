@@ -217,14 +217,19 @@ class Component
         return \App\Models\Component::destroy($id);
     }
 
-    public function setComponentPrefs($device_id, $updated)
+    /**
+     * @param  int  $device_id
+     * @param  array  $updated  component arrays keyed by component id
+     * @param  bool  $log  write the changes to the eventlog, turn off for values that change on every poll
+     */
+    public function setComponentPrefs($device_id, $updated, bool $log = true)
     {
         $updated = Arr::wrap($updated);
         \App\Models\Component::where('device_id', $device_id)
             ->whereIntegerInRaw('id', array_keys($updated))
             ->with('prefs')
             ->get()
-            ->each(function (\App\Models\Component $component) use ($device_id, $updated): void {
+            ->each(function (\App\Models\Component $component) use ($device_id, $updated, $log): void {
                 $update = $updated[$component->id];
                 unset($update['type'], $update['device_id']);  // can't change type or device
 
@@ -242,7 +247,9 @@ class Component
                     }
                     $component->save();
 
-                    Eventlog::log($message, $component->device_id, 'component', Severity::Notice, $component->id);
+                    if ($log) {
+                        Eventlog::log($message, $component->device_id, 'component', Severity::Notice, $component->id);
+                    }
                 }
 
                 // update preferences
@@ -256,18 +263,24 @@ class Component
                         $invalid->forget($existing->id);
                         $existing->fill(['value' => $value]);
                         if ($existing->isDirty()) {
-                            Eventlog::log("Component: $component->type($component->id). Attribute: $attribute, was modified from: " . $existing->getOriginal('value') . ", to: $value", $device_id, 'component', Severity::Notice, $component->id);
+                            if ($log) {
+                                Eventlog::log("Component: $component->type($component->id). Attribute: $attribute, was modified from: " . $existing->getOriginal('value') . ", to: $value", $device_id, 'component', Severity::Notice, $component->id);
+                            }
                             $existing->save();
                         }
                     } else {
                         $component->prefs()->save(new ComponentPref(['attribute' => $attribute, 'value' => $value]));
-                        Eventlog::log("Component: $component->type($component->id). Attribute: $attribute, was added with value: $value", $component->device_id, 'component', Severity::Notice, $component->id);
+                        if ($log) {
+                            Eventlog::log("Component: $component->type($component->id). Attribute: $attribute, was added with value: $value", $component->device_id, 'component', Severity::Notice, $component->id);
+                        }
                     }
                 }
 
                 foreach ($invalid as $pref) {
                     $pref->delete();
-                    Eventlog::log("Component: $component->type($component->id). Attribute: $pref->attribute, was deleted.", $component->device_id, 'component', Severity::Warning);
+                    if ($log) {
+                        Eventlog::log("Component: $component->type($component->id). Attribute: $pref->attribute, was deleted.", $component->device_id, 'component', Severity::Warning);
+                    }
                 }
             });
 
