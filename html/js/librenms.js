@@ -142,6 +142,23 @@ $(document).ready(function () {
     }, 300000);
 });
 
+// Remember the last request each bootgrid table sent (after its post() and requestHandler),
+// so the export downloads exactly the data the table shows.
+$(document).on('initialize.rs.jquery.bootgrid', function (e) {
+    var grid = $(e.target);
+    var bootgrid = grid.data('.rs.jquery.bootgrid');
+    if (!bootgrid || grid.data('export-request-wrapped')) {
+        return;
+    }
+    var requestHandler = bootgrid.options.requestHandler;
+    bootgrid.options.requestHandler = function (request) {
+        var result = typeof requestHandler === 'function' ? requestHandler.apply(this, arguments) : request;
+        grid.data('last-request', $.extend(true, {}, result));
+        return result;
+    };
+    grid.data('export-request-wrapped', true);
+});
+
 // Add export button to bootgrid tables
 $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
     var grid = $(e.target);
@@ -183,6 +200,20 @@ $(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
                     var grid = $('#' + gridId);
                     var currentUrl = $(this).attr('href');
                     var urlParams = [];
+
+                    // Same request as the table (sort, search, post() and requestHandler changes included);
+                    // only the paging is dropped when exporting all results.
+                    var lastRequest = grid.data('last-request');
+                    if (lastRequest) {
+                        var request = $.extend(true, {}, lastRequest);
+                        if (exportType !== 'visible') {
+                            delete request.current;
+                            delete request.rowCount;
+                        }
+                        var query = $.param(request);
+                        window.open(currentUrl + (query ? (currentUrl.indexOf('?') > -1 ? '&' : '?') + query : ''), '_blank');
+                        return;
+                    }
 
                     var searchPhrase = $('.search-field').val();
                     if (searchPhrase) {
