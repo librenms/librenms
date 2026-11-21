@@ -273,7 +273,7 @@
                     if (canUpdate) {
                         chart.update(graph, earlier);
                     } else {
-                        this.hidden = this.hidden.filter((key) => graph.series.some((series) => series.key === key));
+                        this.hidden = this.hidden.filter((key) => graph.series.some((series) => series.key === key && ! series.legendOnly));
                         this.draw();
                     }
                     this.updateLegend();
@@ -326,6 +326,7 @@
                             key: series.key,
                             label: series.label,
                             color: series.color,
+                            legendOnly: series.legendOnly,
                             now: format(summary.now),
                             min: format(summary.min),
                             max: format(summary.max),
@@ -405,11 +406,15 @@
 
                 // Only this series, or all again. With ctrl or shift, show or hide this one.
                 toggle(key, event) {
-                    const others = graph.series.map((series) => series.key).filter((other) => other !== key);
+                    const drawn = graph.series.filter((series) => ! series.legendOnly).map((series) => series.key);
+                    if (! drawn.includes(key)) {
+                        return;
+                    }
 
                     if (event.ctrlKey || event.metaKey || event.shiftKey) {
                         this.hidden = this.hidden.includes(key) ? this.hidden.filter((other) => other !== key) : [...this.hidden, key];
                     } else {
+                        const others = drawn.filter((other) => other !== key);
                         const alone = ! this.hidden.includes(key) && others.every((other) => this.hidden.includes(other));
                         this.hidden = alone ? [] : others;
                     }

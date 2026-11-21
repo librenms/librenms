@@ -112,16 +112,22 @@
             </thead>
             <tbody>
                 <template x-for="item in sortedLegend()" :key="item.key">
-                    <tr class="tw:cursor-pointer tw:select-none tw:hover:bg-gray-100 tw:dark:hover:bg-dark-gray-300"
-                        :class="hidden.includes(item.key) && 'tw:opacity-40'"
+                    <tr :class="{
+                            'tw:cursor-pointer tw:select-none tw:hover:bg-gray-100 tw:dark:hover:bg-dark-gray-300': ! item.legendOnly,
+                            'tw:opacity-40': hidden.includes(item.key),
+                        }"
                         x-on:click="toggle(item.key, $event)">
                         <td class="tw:pr-2 tw:sm:pr-6 tw:py-1.5 tw:sm:py-0.5">
-                            {{-- the click reaches the row --}}
-                            <button type="button" :aria-pressed="! hidden.includes(item.key)"
-                                    class="tw:flex tw:items-center tw:gap-2 tw:p-0 tw:border-0 tw:bg-transparent tw:text-inherit tw:text-left tw:cursor-pointer">
-                                <span class="tw:inline-block tw:w-3 tw:h-3 tw:rounded-sm tw:shrink-0" :style="{ backgroundColor: item.color }"></span>
-                                <span class="tw:max-w-[30vw] tw:sm:max-w-none tw:truncate" x-text="item.label"></span>
-                            </button>
+                            <template x-if="! item.legendOnly">
+                                <button type="button" :aria-pressed="! hidden.includes(item.key)"
+                                        class="tw:flex tw:items-center tw:gap-2 tw:p-0 tw:border-0 tw:bg-transparent tw:text-inherit tw:text-left tw:cursor-pointer">
+                                    <span class="tw:inline-block tw:w-3 tw:h-3 tw:rounded-sm tw:shrink-0" :style="{ backgroundColor: item.color }"></span>
+                                    <span class="tw:max-w-[30vw] tw:sm:max-w-none tw:truncate" x-text="item.label"></span>
+                                </button>
+                            </template>
+                            <template x-if="item.legendOnly">
+                                <span class="tw:block tw:pl-5 tw:max-w-[30vw] tw:sm:max-w-none tw:truncate" x-text="item.label"></span>
+                            </template>
                         </td>
                         <template x-for="column in options.columns" :key="column">
                             <td class="tw:text-right tw:font-mono tw:tabular-nums tw:whitespace-nowrap tw:px-1.5 tw:sm:px-3" x-text="item[column]"></td>
