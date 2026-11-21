@@ -11,6 +11,7 @@
 @php
     [$trackClass, $knobClass, $translateClass] = match ($size) {
         'sm' => ['tw:w-9 tw:h-5', 'tw:w-4 tw:h-4', 'tw:peer-checked:translate-x-4'],
+        'compact' => ['tw:w-10 tw:h-6', 'tw:w-5 tw:h-5', 'tw:peer-checked:translate-x-4'],
         default => ['tw:w-12 tw:h-7', 'tw:w-6 tw:h-6', 'tw:peer-checked:translate-x-5'],
     };
 @endphp

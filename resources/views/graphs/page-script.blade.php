@@ -41,6 +41,26 @@
             }
         }
 
+        window.Alpine.data('graphSettingsMenu', () => ({
+            open: false,
+            menuStyle: {},
+
+            placeMenu() {
+                const picker = this.$refs.graphPickerGroup.getBoundingClientRect();
+                const actions = this.$refs.graphActions.getBoundingClientRect();
+                const wrapped = actions.top >= picker.bottom;
+
+                this.menuStyle = wrapped ? {
+                    position: 'fixed',
+                    inset: '0',
+                    margin: 'auto',
+                    height: 'max-content',
+                    maxHeight: 'calc(100dvh - 2rem)',
+                    zIndex: '1101', // above the sticky navbar
+                } : {};
+            },
+        }));
+
         window.Alpine.data('graphsPage', ({ range, options, interactive, view, ...config }) => {
             let saving = null;
             // the menus have their own data, where $root and $refs are theirs

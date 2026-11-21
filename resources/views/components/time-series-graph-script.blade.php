@@ -18,8 +18,7 @@
 
         // What the graph does when its options are left as the graph defines: stacking of the drawn series all, none
         // or some of them, null for a single one; the scale fit to the data, from zero or between limits.
-        function ownDrawing({ axis, series }) {
-            const drawn = series.filter((item) => ! item.legendOnly);
+        function ownDrawing(axis, drawn) {
             const stacked = drawn.filter((item) => item.stacked).length;
             const fits = axis.margin > 0 && axis.min === null && axis.max === null;
 
@@ -39,6 +38,7 @@
             let createChart;
             let chart = null;
             let graph = null;
+            let drawnKeys = [];
             let view = null; // {from, to} zoomed or panned to
             let earlier = null; // the data of the time compared with, moved to line up with the graph
             let loaded = null; // {from, to, fresh, detail, offset} of the data, detail in seconds per pixel, fresh is the newest time it can hold, offset back to the earlier data
@@ -281,12 +281,14 @@
                     const canUpdate = chart && chart.comparing === (earlier !== null)
                         && graphDefinition(graph) === graphDefinition(next);
                     graph = next;
+                    const drawn = graph.series.filter((series) => ! series.legendOnly);
+                    drawnKeys = drawn.map((series) => series.key);
                     this.caption = graph.axis.label;
-                    this.features = ownDrawing(graph);
+                    this.features = ownDrawing(graph.axis, drawn);
                     if (canUpdate) {
                         chart.update(graph, earlier);
                     } else {
-                        this.hidden = this.hidden.filter((key) => graph.series.some((series) => series.key === key));
+                        this.hidden = drawnKeys.length < 2 ? [] : this.hidden.filter((key) => drawnKeys.includes(key));
                         this.draw();
                     }
                     this.updateLegend();
@@ -339,6 +341,7 @@
                             key: series.key,
                             label: series.label,
                             color: series.color,
+                            toggleable: drawnKeys.length > 1 && ! series.legendOnly,
                             now: format(summary.now),
                             min: format(summary.min),
                             max: format(summary.max),
@@ -418,11 +421,14 @@
 
                 // Only this series, or all again. With ctrl or shift, show or hide this one.
                 toggle(key, event) {
-                    const others = graph.series.map((series) => series.key).filter((other) => other !== key);
+                    if (drawnKeys.length < 2 || ! drawnKeys.includes(key)) {
+                        return;
+                    }
 
                     if (event.ctrlKey || event.metaKey || event.shiftKey) {
                         this.hidden = this.hidden.includes(key) ? this.hidden.filter((other) => other !== key) : [...this.hidden, key];
                     } else {
+                        const others = drawnKeys.filter((other) => other !== key);
                         const alone = ! this.hidden.includes(key) && others.every((other) => this.hidden.includes(other));
                         this.hidden = alone ? [] : others;
                     }

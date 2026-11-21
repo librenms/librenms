@@ -1,14 +1,14 @@
 {{-- The controls of the graph page, the same for an image graph and one drawn in the browser. An image changes by loading the page again. --}}
 @php
-    $button = 'tw:h-8 tw:min-w-8 tw:px-2 tw:inline-flex tw:items-center tw:justify-center tw:gap-1 tw:rounded tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:bg-transparent tw:text-gray-700 tw:dark:text-gray-200 tw:hover:bg-gray-100 tw:dark:hover:bg-dark-gray-300 tw:disabled:opacity-40 tw:disabled:pointer-events-none';
+    $button = 'tw:h-10 tw:min-w-10 tw:px-2 tw:inline-flex tw:items-center tw:justify-center tw:gap-1 tw:rounded tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:bg-transparent tw:text-lg tw:text-gray-700 tw:dark:text-gray-200 tw:hover:bg-gray-100 tw:dark:hover:bg-dark-gray-300 tw:disabled:opacity-40 tw:disabled:pointer-events-none';
     $menu = 'tw:absolute tw:right-0 tw:top-full tw:mt-1 tw:z-20 tw:rounded-md tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:bg-white tw:dark:bg-dark-gray-400 tw:shadow-lg tw:text-left';
     $menuItem = 'tw:flex tw:w-full tw:items-center tw:gap-2 tw:px-3 tw:py-2 tw:border-0 tw:bg-transparent tw:text-gray-700 tw:dark:text-gray-200 tw:hover:bg-gray-100 tw:dark:hover:bg-dark-gray-300 tw:whitespace-nowrap';
     $heading = 'tw:mb-1 tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400';
-    $segments = 'tw:inline-flex tw:shrink-0 tw:rounded tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:overflow-hidden';
-    $segment = 'tw:px-2 tw:py-0.5 tw:text-sm tw:border-0 tw:not-first:border-l tw:border-gray-300 tw:dark:border-dark-gray-100 tw:bg-transparent tw:text-gray-700 tw:dark:text-gray-200 tw:hover:bg-gray-100 tw:dark:hover:bg-dark-gray-300 tw:aria-pressed:bg-blue-600 tw:aria-pressed:text-white tw:aria-pressed:hover:bg-blue-600 tw:whitespace-nowrap';
+    $segments = 'tw:inline-flex tw:max-w-full tw:shrink-0 tw:rounded tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:overflow-hidden';
+    $segment = 'tw:min-h-8 tw:min-w-8 tw:px-2.5 tw:py-1 tw:text-sm tw:border-0 tw:not-first:border-l tw:border-gray-300 tw:dark:border-dark-gray-100 tw:bg-transparent tw:text-gray-700 tw:dark:text-gray-200 tw:hover:bg-gray-100 tw:dark:hover:bg-dark-gray-300 tw:aria-pressed:bg-blue-600 tw:aria-pressed:text-white tw:aria-pressed:hover:bg-blue-600';
     $row = 'tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-x-3 tw:gap-y-1';
     $rowLabel = 'tw:font-medium tw:text-gray-700 tw:dark:text-dark-white-200';
-    $selectBox = 'tw:py-0.5 tw:px-1 tw:text-sm tw:bg-gray-50 tw:border tw:border-gray-300 tw:text-gray-900 tw:rounded tw:dark:bg-gray-700 tw:dark:border-gray-600 tw:dark:text-white';
+    $selectBox = 'tw:min-h-8 tw:max-w-full tw:px-2 tw:py-1 tw:text-sm tw:bg-gray-50 tw:border tw:border-gray-300 tw:text-gray-900 tw:rounded tw:dark:bg-gray-700 tw:dark:border-gray-600 tw:dark:text-white';
     $section = 'tw:p-3 tw:flex tw:flex-col tw:gap-2.5';
     $sectionTitle = 'tw:text-sm tw:font-semibold tw:text-gray-800 tw:dark:text-dark-white-100';
     $kbd = 'tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-gray-800 tw:dark:text-dark-white-100 tw:bg-white tw:dark:bg-dark-gray-300 tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:rounded tw:shadow-2xs';
@@ -46,12 +46,12 @@
     ]);
 @endphp
 <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-center tw:gap-2 tw:mt-3 tw:mb-2">
-    <div class="tw:w-full tw:sm:w-[40ch]">
+    <div x-ref="graphPickerGroup" class="tw:w-full tw:sm:w-[40ch]">
         <x-date-range-picker data-graph-picker :start="$graphFrom" :end="$graphTo" :reload="! $drawInBrowser"
                              class="tw:w-full tw:text-center tw:px-3 tw:py-1.5 tw:border tw:border-gray-300 tw:rounded-md tw:bg-gray-100! tw:hover:bg-gray-200! tw:dark:bg-white! tw:dark:hover:bg-gray-200!"></x-date-range-picker>
     </div>
 
-    <div class="tw:flex tw:items-center tw:gap-1">
+    <div class="tw:flex tw:max-w-full tw:flex-wrap tw:items-center tw:justify-center tw:gap-1">
         <i x-show="state.refreshing && ! state.loading" x-cloak class="fa-solid fa-spinner fa-spin tw:mr-1 tw:text-gray-500 tw:dark:text-gray-400" aria-hidden="true"></i>
         <button type="button" class="{{ $button }}" x-on:click="zoom(-1)" :disabled="state.loading" title="{{ __('graph.zoom_out') }}" aria-label="{{ __('graph.zoom_out') }}">
             <i class="fa-solid fa-magnifying-glass-minus" aria-hidden="true"></i>
@@ -73,7 +73,7 @@
         @endif
     </div>
 
-    <div class="tw:flex tw:items-center tw:gap-1">
+    <div x-ref="graphActions" class="tw:flex tw:items-center tw:gap-1">
         <div class="tw:relative" x-data="{ open: false }" x-on:click.outside="open = false" x-on:keydown.escape="open = false">
             <button type="button" class="{{ $button }}" x-on:click="open = ! open" :aria-expanded="open" title="{{ __('graph.share') }}" aria-label="{{ __('graph.share') }}">
                 <i class="fa-solid fa-share-nodes" aria-hidden="true"></i>
@@ -94,14 +94,15 @@
             </div>
         </div>
 
-        <div class="tw:relative" x-data="{ open: false }" x-on:click.outside="open = false" x-on:keydown.escape="open = false">
+        <div class="tw:relative" x-data="graphSettingsMenu" x-effect="open && placeMenu()"
+             x-on:resize.window="open && placeMenu()" x-on:click.outside="open = false" x-on:keydown.escape="open = false">
             <button type="button" class="{{ $button }} tw:relative" x-on:click="open = ! open" :aria-expanded="open" title="{{ __('graph.settings') }}" aria-label="{{ __('graph.settings') }}">
                 <i class="fa-solid fa-gear" aria-hidden="true"></i>
                 @if ($drawInBrowser)
                     <span x-show="viewChanged()" x-cloak class="tw:absolute tw:-top-1 tw:-right-1 tw:w-2.5 tw:h-2.5 tw:rounded-full tw:bg-blue-600 tw:ring-2 tw:ring-white tw:dark:ring-dark-gray-500"></span>
                 @endif
             </button>
-            <div x-show="open" x-cloak class="{{ $menu }} tw:w-80 tw:max-w-[calc(100vw-2rem)] tw:max-h-[calc(100vh-10rem)] tw:overflow-y-auto tw:divide-y tw:divide-gray-200 tw:dark:divide-dark-gray-100">
+            <div x-show="open" x-cloak :style="menuStyle" class="{{ $menu }} tw:w-80 tw:max-w-[calc(100vw-2rem)] tw:max-h-[calc(100vh-10rem)] tw:overflow-y-auto tw:divide-y tw:divide-gray-200 tw:dark:divide-dark-gray-100">
                 <section class="{{ $section }}" aria-labelledby="graph-settings-view">
                     <div id="graph-settings-view" class="{{ $sectionTitle }}">{{ __('graph.settings_view') }}</div>
 
@@ -115,7 +116,7 @@
                             </select>
                         </div>
 
-                        <x-toggle size="sm" label-first :label="__('graph.options.trend')" x-bind:checked="options.trend"
+                        <x-toggle size="compact" label-first :label="__('graph.options.trend')" x-bind:checked="options.trend"
                                   x-on:change="setOption('trend', $event.target.checked)"></x-toggle>
 
                         {{-- What the graph does by itself is one of the choices, so every choice changes something --}}
@@ -145,12 +146,12 @@
                         </div>
 
                         <div x-show="state.features?.mirror" x-cloak>
-                            <x-toggle size="sm" label-first :label="__('graph.options.mirror')" x-bind:checked="options.mirror"
+                            <x-toggle size="compact" label-first :label="__('graph.options.mirror')" x-bind:checked="options.mirror"
                                       x-on:change="setOption('mirror', $event.target.checked)"></x-toggle>
                         </div>
                     @else
                         @foreach ($imageOptions as $option)
-                            <x-toggle size="sm" label-first :label="$option['label']" :checked="$option['checked']"
+                            <x-toggle size="compact" label-first :label="$option['label']" :checked="$option['checked']"
                                       x-on:change="window.location = withShownRange({{ Js::from($option['link']) }})"></x-toggle>
                         @endforeach
                     @endif
@@ -165,7 +166,7 @@
                         </button>
                         <div id="graph-settings-preferences-body" x-show="preferencesOpen" x-collapse x-cloak>
                             <div class="{{ $section }} tw:pt-0">
-                                <x-toggle size="sm" label-first :label="__('graph.interactive')" :checked="true"
+                                <x-toggle size="compact" label-first :label="__('graph.interactive')" :checked="true"
                                           x-on:change="saveRenderer($event.target.checked)"></x-toggle>
 
                                 <div class="{{ $row }}">
@@ -178,7 +179,7 @@
                                     </div>
                                 </div>
 
-                                <x-toggle size="sm" label-first :label="__('graph.options.range')" x-bind:checked="options.range"
+                                <x-toggle size="compact" label-first :label="__('graph.options.range')" x-bind:checked="options.range"
                                           x-on:change="setOption('range', $event.target.checked)"></x-toggle>
                             </div>
                         </div>
@@ -186,7 +187,7 @@
                 @elseif ($canDrawInBrowser)
                     <section class="{{ $section }}" aria-labelledby="graph-settings-preferences">
                         <div id="graph-settings-preferences" class="{{ $sectionTitle }}">{{ __('graph.settings_preferences') }}</div>
-                        <x-toggle size="sm" label-first :label="__('graph.interactive')" :checked="false"
+                        <x-toggle size="compact" label-first :label="__('graph.interactive')" :checked="false"
                                   x-on:change="saveRenderer($event.target.checked)"></x-toggle>
                     </section>
                 @endif
@@ -194,7 +195,7 @@
         </div>
 
         <button type="button" x-on:click="showHelp = true" title="{{ __('graph.help.title') }}" aria-label="{{ __('graph.help.title') }}"
-                class="tw:h-8 tw:w-8 tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:border-0 tw:bg-transparent tw:text-gray-500 tw:dark:text-gray-400 tw:hover:text-gray-800 tw:dark:hover:text-gray-100">
+                class="tw:h-10 tw:w-10 tw:inline-flex tw:items-center tw:justify-center tw:rounded-full tw:border-0 tw:bg-transparent tw:text-gray-500 tw:dark:text-gray-400 tw:hover:text-gray-800 tw:dark:hover:text-gray-100">
             <i class="fa-regular fa-circle-question fa-xl" aria-hidden="true"></i>
         </button>
     </div>
