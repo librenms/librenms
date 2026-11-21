@@ -33,7 +33,7 @@ use App\Models\Sensor;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Source\Ipmitool;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
@@ -119,7 +119,7 @@ class Ipmi implements Module
     /**
      * @inheritDoc
      */
-    public function poll(OS $os, DataStorageInterface $datastore): void
+    public function poll(OS $os, WriteInterface $datastore): void
     {
         $device = $os->getDevice();
         $ipmiSensors = $device->sensors()->where('poller_type', 'ipmi')
@@ -149,15 +149,10 @@ class Ipmi implements Module
 
             Log::info("  $descr: $value $unit");
 
-            $datastore->put($os->getDeviceArray(), 'ipmi', [
-                'sensor_class' => $sensor->sensor_class,
-                'sensor_type' => $sensor->sensor_type,
-                'sensor_descr' => $sensor->sensor_descr,
-                'sensor_index' => $sensor->sensor_index,
-                'rrd_name' => ['sensor', ...array_values($sensor->labels())],
+            $metric = $sensor->setRelation('device', $device)->metricIdentity('sensor');
+            $datastore->write($metric->measurement, ['sensor' => $value], $metric->tags, [
+                'metric' => $metric,
                 'rrd_def' => RrdDefinition::make()->addDataset('sensor', 'GAUGE', -20000, 20000),
-            ], [
-                'sensor' => $value,
             ]);
         }
     }
