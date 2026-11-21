@@ -62,8 +62,8 @@ final class RrdStoreTest extends TestCase
                 && str_starts_with($def->getArguments()[0], 'DS:INOCTETS:DERIVE:'));
             $this->backend->shouldReceive('update')->once()->with(Mockery::any(), [1, 2, ...array_fill(0, 13, null)], null);
 
-            // the datastore passes the fields under the names they are stored under
-            (new Rrd)->write('ports', ['OUTOCTETS' => 2, 'INOCTETS' => 1], [], ['metric' => $metric]);
+            // the datastore passes the fields under the names they are stored under, fields without a data source are left out
+            (new Rrd)->write('ports', ['OUTOCTETS' => 2, 'INOCTETS' => 1, 'ifInOctets_rate' => 5], [], ['metric' => $metric]);
         });
     }
 

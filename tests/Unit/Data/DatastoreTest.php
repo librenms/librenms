@@ -121,9 +121,10 @@ final class DatastoreTest extends TestCase
         $metric = new MetricIdentity('port', ['hostname' => 'localhost', 'id' => 12]);
         $store = Mockery::mock(DatastoreContract::class);
         $store->shouldReceive('write')->once()
-            ->with('ports', ['INOCTETS' => 5, 'OUTOCTETS' => 6], ['ifName' => 'eth0'], ['metric' => $metric]);
+            ->with('ports', ['INOCTETS' => 5, 'OUTOCTETS' => 6, 'ifInOctets_rate' => 1], ['ifName' => 'eth0'], ['metric' => $metric]);
 
-        new Datastore([$store])->write($metric->measurement, ['in_octets' => 5, 'out_octets' => 6], $metric->tags, ['metric' => $metric, 'legacy_tags' => ['ifName' => 'eth0']]);
+        // fields that are not in the definition keep their name
+        new Datastore([$store])->write($metric->measurement, ['in_octets' => 5, 'out_octets' => 6, 'ifInOctets_rate' => 1], $metric->tags, ['metric' => $metric, 'legacy_tags' => ['ifName' => 'eth0']]);
     }
 
     public function testCanonicalMetricsAreWrittenAsIdentified(): void

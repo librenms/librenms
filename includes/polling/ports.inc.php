@@ -4,6 +4,7 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use App\Models\Port;
+use LibreNMS\Data\Store\MetricNames;
 use LibreNMS\Enum\Severity;
 use LibreNMS\RRD\PortRrd;
 use LibreNMS\Util\Debug;
@@ -871,6 +872,18 @@ foreach ($ports as $port) {
                 'in_multicast_pkts' => $this_port['ifInMulticastPkts'] ?? null,
                 'out_multicast_pkts' => $this_port['ifOutMulticastPkts'] ?? null,
             ];
+
+            if (! app(MetricNames::class)->isCanonical()) {
+                // rates for datastores other than rrd (not rrd data sources), readers of the canonical layout compute them from the counters
+                $fields['ifInUcastPkts_rate'] = $port['ifInUcastPkts_rate'];
+                $fields['ifOutUcastPkts_rate'] = $port['ifOutUcastPkts_rate'];
+                $fields['ifInErrors_rate'] = $port['ifInErrors_rate'];
+                $fields['ifOutErrors_rate'] = $port['ifOutErrors_rate'];
+                $fields['ifInOctets_rate'] = $port['ifInOctets_rate'];
+                $fields['ifOutOctets_rate'] = $port['ifOutOctets_rate'];
+                $fields['ifInBits_rate'] = $current_port_stats['ifInBits_rate'];
+                $fields['ifOutBits_rate'] = $current_port_stats['ifOutBits_rate'];
+            }
 
             if ($tune_port === true) {
                 Rrd::tune(Rrd::metricNames($metric)[0], PortRrd::tuneLimits($metric, (int) $this_port['ifSpeed']));
