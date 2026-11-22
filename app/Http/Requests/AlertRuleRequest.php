@@ -168,7 +168,7 @@ class AlertRuleRequest extends FormRequest
     private function validateBuilder(Validator $validator): void
     {
         $builder = json_decode((string) $this->input('builder_json', '[]'), true);
-        if (is_array($builder) && $this->validBuilderGroup($builder)) {
+        if (is_array($builder) && QueryBuilderParser::fromJson($builder)->isValid()) {
             $this->builder = $builder;
         }
 
@@ -187,28 +187,6 @@ class AlertRuleRequest extends FormRequest
         if ($this->ruleQuery === null) {
             $validator->errors()->add('builder_json', __('The alert rule builder must contain valid rules'));
         }
-    }
-
-    /** @param array<string, mixed> $group */
-    private function validBuilderGroup(array $group): bool
-    {
-        if (! in_array($group['condition'] ?? null, ['AND', 'OR'], true) || ! is_array($group['rules'] ?? null) || $group['rules'] === []) {
-            return false;
-        }
-
-        foreach ($group['rules'] as $rule) {
-            if (! is_array($rule)) {
-                return false;
-            }
-            $valid = array_key_exists('rules', $rule)
-                ? $this->validBuilderGroup($rule)
-                : is_string($rule['field'] ?? null) && $rule['field'] !== '' && is_string($rule['operator'] ?? null) && array_key_exists('value', $rule);
-            if (! $valid) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     private function validateMaps(Validator $validator): void

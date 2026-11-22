@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Alerts\ClearAlertRuleAlerts;
 use App\Actions\Alerts\SaveAlertRule;
 use App\Http\Interfaces\ToastInterface;
 use App\Http\Requests\AlertRuleRequest;
 use App\Http\Resources\AlertRuleEditor;
 use App\Models\Alert;
-use App\Models\AlertFault;
 use App\Models\AlertOperation;
 use App\Models\AlertRule;
 use App\Models\Device;
@@ -254,7 +254,7 @@ class AlertRuleController extends Controller
         return redirect($this->rulesUrl($device));
     }
 
-    public function toggle(Request $request, AlertRule $alertRule): JsonResponse
+    public function toggle(Request $request, AlertRule $alertRule, ClearAlertRuleAlerts $clearAlerts): JsonResponse
     {
         $this->authorize('update', $alertRule);
 
@@ -262,18 +262,7 @@ class AlertRuleController extends Controller
         $success = $alertRule->save();
 
         if ($success && $alertRule->disabled) {
-            AlertFault::where('rule_id', $alertRule->id)->where('open', 1)
-                ->update(['open' => 0, 'state' => AlertState::RECOVERED]);
-            Alert::where('rule_id', $alertRule->id)->get()->each(function (Alert $alert): void {
-                $info = is_array($alert->info) ? $alert->info : [];
-                unset($info['open_fault_count']);
-                $alert->info = $info;
-                $alert->update([
-                    'state' => AlertState::CLEAR,
-                    'open' => 0,
-                    'alerted' => 0,
-                ]);
-            });
+            $clearAlerts->execute($alertRule);
         }
 
         return response()->json(['status' => $success ? 200 : 422], $success ? 200 : 422);

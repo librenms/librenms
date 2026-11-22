@@ -140,6 +140,65 @@ class QueryBuilderParser implements \JsonSerializable
     }
 
     /**
+     * Check the builder is a non-empty group of complete rules this parser can convert to SQL.
+     */
+    public function isValid(): bool
+    {
+        return $this->isValidGroup($this->builder);
+    }
+
+    /**
+     * Any entry with a condition or rules is a group, the same as parseGroup() reads it.
+     *
+     * @param  array<mixed>  $group
+     */
+    private function isValidGroup(array $group): bool
+    {
+        if (! in_array($group['condition'] ?? null, ['AND', 'OR'], true) || ! is_array($group['rules'] ?? null) || $group['rules'] === []) {
+            return false;
+        }
+
+        foreach ($group['rules'] as $rule) {
+            if (! is_array($rule)) {
+                return false;
+            }
+            $valid = array_key_exists('condition', $rule) || array_key_exists('rules', $rule)
+                ? $this->isValidGroup($rule)
+                : $this->isValidRule($rule);
+            if (! $valid) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * The field is a table.column (or macros.name), a between rule has a pair of values and
+     * every other rule a single value. Values are quoted, not escaped, so they cannot contain
+     * a double quote. in and not_in are not supported by parseRule().
+     *
+     * @param  array<mixed>  $rule
+     */
+    private function isValidRule(array $rule): bool
+    {
+        if (! is_string($rule['field'] ?? null) || ! preg_match('/^\w+\.\w+$/', $rule['field'])
+            || ! is_string($rule['operator'] ?? null) || ! array_key_exists($rule['operator'], self::$operators)
+            || in_array($rule['operator'], ['in', 'not_in'], true)
+            || ! array_key_exists('value', $rule)) {
+            return false;
+        }
+
+        $isPair = in_array($rule['operator'], ['between', 'not_between'], true);
+        $values = $isPair ? $rule['value'] : [$rule['value']];
+        if (! is_array($values) || ! array_is_list($values) || count($values) !== ($isPair ? 2 : 1)) {
+            return false;
+        }
+
+        return array_all($values, fn (mixed $value): bool => ($value === null || is_scalar($value)) && ! str_contains((string) $value, '"'));
+    }
+
+    /**
      * Get the SQL for this rule, ready to execute with device_id supplied as the parameter
      * If $expand is false, this will return a more readable representation of the rule, but not executable.
      *

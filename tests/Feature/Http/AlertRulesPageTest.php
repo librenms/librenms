@@ -352,6 +352,20 @@ final class AlertRulesPageTest extends TestCase
         $this->putJson(route('alert-rule.update', $rule), [])->assertForbidden();
     }
 
+    public function testToggleOffClearsAlerts(): void
+    {
+        $rule = AlertRule::factory()->create(['disabled' => 0]);
+        $device = Device::factory()->create();
+        $alert = Alert::factory()->create(['rule_id' => $rule->id, 'device_id' => $device->device_id, 'state' => AlertState::ACTIVE, 'open' => 1]);
+
+        $this->actingAs($this->admin())->putJson(route('alert-rule.toggle', $rule), ['state' => false])->assertOk();
+
+        $this->assertSame(1, (int) $rule->fresh()->disabled);
+        $alert->refresh();
+        $this->assertSame(AlertState::CLEAR, (int) $alert->state);
+        $this->assertSame(0, (int) $alert->open);
+    }
+
     private function admin(): User
     {
         $admin = User::factory()->create(['enabled' => 1]);
