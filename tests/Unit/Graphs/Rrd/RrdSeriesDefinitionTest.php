@@ -264,13 +264,16 @@ class RrdSeriesDefinitionTest extends TestCase
         $definition = $this->build([
             'in_a' => new DataSeries($this->metric, 'a', 'A', style: new SeriesStyle(stacked: true)),
             'in_b' => new DataSeries($this->metric, 'b', 'B', style: new SeriesStyle(stacked: true)),
-            'in' => new SeriesSum(['in_a', 'in_b'], 'In', style: new SeriesStyle(legendOnly: true)),
-        ], new GraphOptions(traffic: new TrafficOptions(series: ['in'])), ['from' => 100, 'to' => 200, 'previous' => 'yes']);
+            'in' => new SeriesSum(['in_a', 'in_b'], 'In', style: new SeriesStyle(legendOnly: true, percentileLines: true)),
+        ], new GraphOptions(traffic: new TrafficOptions(series: ['in']), percentiles: [95]), ['from' => 100, 'to' => 200, 'previous' => 'yes']);
 
-        $this->assertContains('VDEF:ds2pct=ds2,95,PERCENT', $definition);
-        $this->assertEmpty(preg_grep('/ds[01]pct/', $definition));
-        $this->assertContains('GPRINT:ds2pct:%5.2lf%s\n', $definition);
-        $this->assertContains('GPRINT:ds1:AVERAGE:%5.2lf%s\n', $definition);
+        $this->assertContains('VDEF:ds2p0=ds2,95,PERCENTNAN', $definition);
+        // every row has the percentile column, the previous period too
+        $this->assertContains('GPRINT:ds1p0:%5.2lf%s\n', $definition);
+        $this->assertContains('GPRINT:ds2p0:%5.2lf%s\n', $definition);
+        $this->assertContains('GPRINT:ds2prevp0:%5.2lf%s\n', $definition);
+        // only the sum draws its percentile, and that of its previous period in the color of the previous period
+        $this->assertSame(['HRULE:ds2p0#AA0000::dashes', 'HRULE:ds2prevp0#333300::dashes'], array_values(preg_grep('/dashes$/', $definition)));
         // the previous period of the sum is the sum of the previous period of its series, defined once
         $this->assertContains('CDEF:ds2prev=ds0prev,ds1prev,ADDNAN', $definition);
         $this->assertContains('CDEF:ds2prevmax=ds0prev,ds1prev,ADDNAN', $definition);

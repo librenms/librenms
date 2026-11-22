@@ -12,12 +12,17 @@ class NtpClientFreqGraph extends ApplicationGraph
     {
         return [
             'frequency' => new DataSeries($this->metric(), 'frequency', __('graph.application.ntp_client.frequency'),
-                style: new SeriesStyle(fill: true, rollingAverages: true, percentiles: [25, 50, 75])),
+                style: new SeriesStyle(fill: true, rollingAverages: true, percentileLines: true)),
         ];
     }
 
     protected function options(): GraphOptions
     {
-        return new GraphOptions(verticalLabel: 'PPM', legendTitle: 'PPM', palette: 'rainbow_stats_purple');
+        return new GraphOptions(
+            verticalLabel: 'PPM',
+            legendTitle: 'PPM',
+            palette: 'stats',
+            percentiles: GraphOptions::statsPercentiles(),
+        );
     }
 }

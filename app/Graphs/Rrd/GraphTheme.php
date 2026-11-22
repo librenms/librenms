@@ -77,9 +77,12 @@ class GraphTheme
         return $below ? $this->pick('000099', '7A7AFF') : $this->pick('333300', 'C8C870');
     }
 
-    public function percentile(bool $previous): string
+    /**
+     * The percentile lines of a series drawn without a color of its own, such as a legend only total
+     */
+    public function percentile(): string
     {
-        return $previous ? '00AAAA' : $this->pick('AA0000', 'FF5050');
+        return $this->pick('AA0000', 'FF5050');
     }
 
     public function highestPercentile(): string

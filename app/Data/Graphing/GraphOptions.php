@@ -2,6 +2,8 @@
 
 namespace App\Data\Graphing;
 
+use App\Facades\LibrenmsConfig;
+
 /**
  * Presentation options chosen by the graph (scale and axis), as opposed to GraphParameters which come from the request
  */
@@ -19,6 +21,7 @@ readonly class GraphOptions
      * @param  string|null  $rightAxisLabel  shows a right axis with the same scale as the left one
      * @param  string|null  $axisUnit  shown after the axis values, which are then shown without SI prefixes
      * @param  string  $palette  the graph_colours palette for series without a color
+     * @param  list<int|float>  $percentiles  a legend column of each percentile for every series, series with SeriesStyle::$percentileLines also draw them
      * @param  list<Threshold>  $thresholds  reference lines, such as alert limits, those shown are always inside the value axis
      * @param  float  $scaleMargin  keep this fraction of the highest and lowest values of each line between them and the edge of an
      *                              autoscaled axis, so values that barely change still get a range with labels
@@ -39,10 +42,21 @@ readonly class GraphOptions
         public string $legendTitle = '',
         public string $palette = 'mixed',
         public ?TrafficOptions $traffic = null,
+        public array $percentiles = [],
         public array $thresholds = [],
         public float $scaleMargin = 0,
         public ?string $axisUnit = null,
     ) {
+    }
+
+    /**
+     * The percentiles of the legacy generic_stats graphs, none when graph_stat_percentile_disable is set
+     *
+     * @return list<int>
+     */
+    public static function statsPercentiles(): array
+    {
+        return LibrenmsConfig::get('graph_stat_percentile_disable') ? [] : [25, 50, 75];
     }
 
     /**

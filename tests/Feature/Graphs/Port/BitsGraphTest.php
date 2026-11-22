@@ -101,13 +101,13 @@ class BitsGraphTest extends TestCase
         LibrenmsConfig::set('rrdgraph_real_percentile', true);
         $command = $this->command();
 
-        $this->assertStringContainsString('VDEF:ds0pct=ds0,99,PERCENT', $command);
-        $this->assertStringContainsString('CDEF:ds1pctdrawn=ds1,POP,ds1pct,-1,*', $command);
-        $this->assertStringContainsString('HRULE:ds1pctline#AA0000', $command);
+        $this->assertStringContainsString('VDEF:ds0p0=ds0,99,PERCENTNAN', $command);
+        $this->assertStringContainsString('CDEF:ds1p0drawn=ds1,POP,ds1p0,-1,*', $command);
+        $this->assertMatchesRegularExpression('/HRULE:ds1p0line#[0-9A-F]{6}::dashes/', $command);
         $this->assertStringContainsString('CDEF:ds0bytes=ds0,0.125,*', $command);
         $this->assertStringContainsString('VDEF:ds0total=ds0bytes,TOTAL', $command);
         $this->assertStringContainsString('GPRINT:trafficbytes:Total %6.2lf%sB', $command);
-        $this->assertStringContainsString('VDEF:trafficpct=traffichigh,99,PERCENT', $command);
+        $this->assertStringContainsString('VDEF:trafficpct=traffichigh,99,PERCENTNAN', $command);
         $this->assertStringNotContainsString('Port Speed', $command, 'shown when zoomed to it');
     }
 

@@ -93,6 +93,7 @@ abstract class AbstractSeriesGraph extends AbstractGraph
                     'invert' => $threshold->invert && $invert,
                     'mirror' => $threshold->mirror && $invert,
                 ], $options->thresholds),
+                percentiles: $options->percentiles,
             );
         });
     }

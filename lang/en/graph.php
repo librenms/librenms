@@ -50,6 +50,7 @@ return [
         'compare_day' => 'Day before',
         'compare_week' => 'Week before',
         'trend' => 'Trend line',
+        'percentile_lines' => 'Percentile lines',
     ],
     'help' => [
         'title' => 'Help & Shortcuts',
@@ -98,7 +99,7 @@ return [
         'min' => 'Min',
         'max' => 'Max',
         'avg' => 'Avg',
-        'percentile' => ':percentileth %',
+        'percentile' => ':percentileth',
         'total' => 'Total',
         'previous' => 'Prev :series',
         'previous_total' => 'Prev Total',
@@ -116,9 +117,6 @@ return [
         'day' => '1 day',
         'week' => '1 week',
         'avg' => ':period avg',
-        'min' => ':period min',
-        'max' => ':period max',
-        'percentile' => ':percentileth Percentile',
     ],
     'units' => [
         'seconds' => 'Seconds',

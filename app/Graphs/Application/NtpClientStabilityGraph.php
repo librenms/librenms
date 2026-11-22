@@ -12,12 +12,17 @@ class NtpClientStabilityGraph extends ApplicationGraph
     {
         return [
             'stability' => new DataSeries($this->metric(), 'stability', __('graph.application.ntp_client.stability'),
-                style: new SeriesStyle(fill: true, rollingAverages: true, percentiles: [25, 50, 75])),
+                style: new SeriesStyle(fill: true, rollingAverages: true, percentileLines: true)),
         ];
     }
 
     protected function options(): GraphOptions
     {
-        return new GraphOptions(verticalLabel: 'PPM', legendTitle: 'PPM', palette: 'rainbow_stats_purple');
+        return new GraphOptions(
+            verticalLabel: 'PPM',
+            legendTitle: 'PPM',
+            palette: 'stats',
+            percentiles: GraphOptions::statsPercentiles(),
+        );
     }
 }

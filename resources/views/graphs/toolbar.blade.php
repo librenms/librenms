@@ -119,6 +119,11 @@
                         <x-toggle size="compact" label-first :label="__('graph.options.trend')" x-bind:checked="options.trend"
                                   x-on:change="setOption('trend', $event.target.checked)"></x-toggle>
 
+                        <div x-show="state.features?.percentileLines" x-cloak>
+                            <x-toggle size="compact" label-first :label="__('graph.options.percentile_lines')" x-bind:checked="options.percentile_lines"
+                                      x-on:change="setOption('percentile_lines', $event.target.checked)"></x-toggle>
+                        </div>
+
                         {{-- What the graph does by itself is one of the choices, so every choice changes something --}}
                         <div class="{{ $row }}" x-show="state.features" x-cloak>
                             <span id="graph-scale" class="{{ $rowLabel }}">{{ __('graph.options.scale') }}</span>

@@ -7,7 +7,7 @@ use App\Data\Graphing\Formula;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
 use App\Data\Graphing\SeriesRole;
-use App\Data\Graphing\SeriesStats;
+use App\Data\Graphing\RollingAverage;
 use App\Data\Graphing\SeriesSum;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Store\Rrd;
@@ -34,14 +34,17 @@ class RrdSeriesDefinition
     private const int LEGEND_COLUMN_GAP = 2;
     // series labels start further right than the heading because of the color box
     private const int LEGEND_COLOR_BOX_WIDTH = 2;
-    // graphs this short or shorter have no room for rolling averages and percentiles
-    private const int STATS_MIN_HEIGHT = 25;
+    // graphs this short or shorter have no room for rolling average and percentile lines
+    private const int EXTRA_LINES_MIN_HEIGHT = 25;
 
     /** @var array<string, string> rrd file of each data series that has one */
     private array $files = [];
 
     /** @var array<string, string> value id of each series that is drawn */
     private array $ids = [];
+
+    /** @var list<string> the percentiles of legend rows and lines, defined after all the values they are of */
+    private array $percentileDefs = [];
 
     /**
      * @param  array<string, DataSeries|SeriesSum>  $series
@@ -76,6 +79,7 @@ class RrdSeriesDefinition
 
         $this->files = [];
         $this->ids = [];
+        $this->percentileDefs = [];
         foreach ($this->series as $key => $series) {
             if ($series instanceof DataSeries) {
                 $filename = $this->rrdFiles->pathFor($series->metric);
@@ -98,7 +102,9 @@ class RrdSeriesDefinition
 
         $overlaid = self::overlaid($this->options);
         $theme = new GraphTheme($params->isDark(), $this->options->palette, $overlaid && $inverted);
-        $traffic = $this->options->traffic === null ? null : new RrdTrafficDefinition($this->options->traffic, $params, $theme);
+        $extraLines = $params->height > self::EXTRA_LINES_MIN_HEIGHT;
+        $traffic = $this->options->traffic === null ? null : new RrdTrafficDefinition($this->options->traffic, $params, $theme,
+            $this->legendValues(...), fn (string $id, float $factor, string $color) => $extraLines ? $this->percentileLines($id, $factor, $color) : []);
         $averaged = count(array_filter(array_keys($this->files), fn ($key) => $this->series[$key]->style->stackAverage));
 
         $i = 0;
@@ -174,13 +180,16 @@ class RrdSeriesDefinition
                 }
             }
 
-            array_push($drawing, ...$this->legendValues($id, $series->unit, $summarized));
+            array_push($drawing, ...$this->legendValues($id, $series->unit));
+            if ($extraLines && $style->percentileLines) {
+                array_push($drawing, ...$this->percentileLines($id, $factor, $color ?? $theme->percentile()));
+            }
             if ($summarized) {
                 $traffic->addSeries($id, $series, $factor, $color, fn (string $period, string $suffix, string $cf, string $range, int $shift) => $this->periodValueDefs($key, $period, $suffix, $cf, $range, $shift));
             }
-            if (! $style->legendOnly && $params->height > self::STATS_MIN_HEIGHT) {
-                $stats = SeriesStats::of($style, $theme, $params->to - $params->from);
-                array_push($drawing, ...$this->statsLines($key, $id, $factor, $stats, $defs));
+            if ($extraLines && ! $style->legendOnly) {
+                $averages = RollingAverage::forStyle($style, $theme, $params->to - $params->from);
+                array_push($drawing, ...$this->rollingAverageLines($key, $id, $factor, $averages, $defs));
             }
         }
 
@@ -213,59 +222,72 @@ class RrdSeriesDefinition
         }
 
         // a value used by several series is defined once
-        $defs = array_values(array_unique([...$defs, ...($traffic?->definitions() ?? [])]));
+        $defs = array_values(array_unique([...$defs, ...($traffic?->definitions() ?? []), ...$this->percentileDefs]));
 
         // fills go below all lines, so they do not hide lines of other series
         return [$this->legendHeader(), ...$defs, ...$margins, ...$maxFills, ...$fills, ...$drawing, ...($traffic?->drawing() ?? [])];
     }
 
     /**
-     * The rolling average and percentile lines of a series and their legend rows, like the legacy generic_stats graphs
+     * The rolling average lines of a series, each with a legend row summarizing its own values
      *
+     * @param  list<RollingAverage>  $averages
      * @param  float  $factor  what drawing multiplies the series by
      * @param  array<int, string>  $defs  receives the definitions
      * @return list<string>
      */
-    private function statsLines(string $key, string $id, float $factor, SeriesStats $stats, array &$defs): array
+    private function rollingAverageLines(string $key, string $id, float $factor, array $averages, array &$defs): array
     {
-        $unit = $this->series[$key]->unit;
         $drawing = [];
+        foreach ($averages as $average) {
+            $averageId = $id . $average->name;
+            array_push($defs, ...$this->periodValueDefs($key, $average->name, '', 'AVERAGE', ":step=$average->step"));
 
-        foreach ($stats->averages as $name => $average) {
-            $averageId = $id . $name;
-            foreach (['' => 'AVERAGE', 'min' => 'MIN', 'max' => 'MAX'] as $suffix => $cf) {
-                array_push($defs, ...$this->periodValueDefs($key, $name, $suffix, $cf, ":step={$average['step']}"));
-            }
-
-            // only the average is drawn, the min and max are legend rows, every column of a row summarizes its value
             $lineId = $this->drawnValue($averageId, $factor, $defs);
-            $drawing[] = "LINE1.25:$lineId#{$average['color']}:" . Rrd::fixedSafeDescr($average['label'], self::LABEL_WIDTH);
-            array_push($drawing, ...$this->legendValues($averageId, $unit, sameValue: true));
-            foreach (['min', 'max'] as $suffix) {
-                // two spaces take the place of the color box, aligning the label with the others
-                $label = __("graph.stats.$suffix", ['period' => $average['period']]);
-                $drawing[] = 'COMMENT:  ' . Rrd::fixedSafeDescr($label, self::LABEL_WIDTH);
-                array_push($drawing, ...$this->legendValues($averageId . $suffix, $unit, sameValue: true));
-            }
+            $drawing[] = "LINE1.25:$lineId#$average->color:" . Rrd::fixedSafeDescr($average->label, self::LABEL_WIDTH);
+            array_push($drawing, ...$this->legendValues($averageId, $this->series[$key]->unit, sameValue: true));
         }
 
-        foreach ($stats->percentiles as $index => ['percentile' => $percentile, 'label' => $label, 'color' => $color]) {
-            // indexed, a percentile such as 99.9 is not a valid name
-            $percentileId = "{$id}p$index";
-            $defs[] = "VDEF:$percentileId=$id," . self::number($percentile) . ',PERCENTNAN';
+        return $drawing;
+    }
 
+    /**
+     * Dashed lines at the percentiles of the graph, their values are legend columns
+     *
+     * @param  string  $id  the value the percentiles are of
+     * @param  float  $factor  what drawing multiplies the value by
+     * @return list<string>
+     */
+    private function percentileLines(string $id, float $factor, string $color): array
+    {
+        $drawing = [];
+        foreach ($this->options->percentiles as $index => $percentile) {
+            $percentileId = $this->percentileDef($id, $index, $percentile);
             $lineId = $percentileId;
             if ($factor != 1) {
                 // a VDEF can not be scaled, scale a line holding its value instead
                 $lineId = "{$percentileId}line";
-                array_push($defs, "CDEF:{$percentileId}drawn=$id,POP,$percentileId" . $this->scaleRpn($factor), "VDEF:$lineId={$percentileId}drawn,FIRST");
+                array_push($this->percentileDefs, "CDEF:{$percentileId}drawn=$id,POP,$percentileId" . $this->scaleRpn($factor), "VDEF:$lineId={$percentileId}drawn,FIRST");
             }
 
-            $drawing[] = "HRULE:$lineId#$color:" . Rrd::fixedSafeDescr($label, self::LABEL_WIDTH);
-            $drawing[] = "GPRINT:$percentileId:{$this->valueFormat($unit)}\\n";
+            $drawing[] = "HRULE:$lineId#$color::dashes";
         }
 
         return $drawing;
+    }
+
+    /**
+     * Define a percentile of a value, unknown values are left out
+     *
+     * @return string the id of the percentile
+     */
+    private function percentileDef(string $id, int $index, int|float $percentile): string
+    {
+        // indexed, a percentile such as 99.9 is not a valid name
+        $percentileId = "{$id}p$index";
+        $this->percentileDefs[] = "VDEF:$percentileId=$id," . self::number($percentile) . ',PERCENTNAN';
+
+        return $percentileId;
     }
 
     /**
@@ -444,20 +466,20 @@ class RrdSeriesDefinition
             $width = $columnWidth;
         }
 
-        if ($this->options->traffic !== null) {
-            $header .= mb_str_pad(__('graph.legend.percentile', ['percentile' => $this->options->traffic->percentile]), $columnWidth, ' ', STR_PAD_LEFT);
+        foreach ($this->options->percentiles as $percentile) {
+            $header .= mb_str_pad(__('graph.legend.percentile', ['percentile' => $percentile]), $columnWidth, ' ', STR_PAD_LEFT);
         }
 
         return "COMMENT:$header\\l";
     }
 
     /**
-     * The legend values of a series, ending the legend line
+     * The legend values of a series, a column for each percentile of the graph after Now, Min, Max and Avg, ending the legend line
      *
      * @param  bool  $sameValue  every column summarizes $id, instead of the min and max columns showing {$id}min and {$id}max
-     * @return array<int, string>
+     * @return list<string>
      */
-    private function legendValues(string $id, string $unit, bool $summarized = false, bool $sameValue = false): array
+    private function legendValues(string $id, string $unit, bool $sameValue = false): array
     {
         $format = $this->valueFormat($unit);
         $values = [];
@@ -466,8 +488,8 @@ class RrdSeriesDefinition
             $values[] = 'GPRINT:' . $id . ($sameValue ? '' : $column['suffix']) . ":{$column['cf']}:$format";
         }
 
-        if ($summarized) {
-            $values[] = "GPRINT:{$id}pct:$format";
+        foreach ($this->options->percentiles as $index => $percentile) {
+            $values[] = 'GPRINT:' . $this->percentileDef($id, $index, $percentile) . ":$format";
         }
 
         $values[array_key_last($values)] .= '\\n';
