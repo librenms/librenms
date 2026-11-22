@@ -26,9 +26,11 @@
 
 namespace LibreNMS;
 
+use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\Util\Laravel;
+use LibreNMS\Util\SystemUser;
 use ReflectionClass;
 use ReflectionException;
 
@@ -38,8 +40,6 @@ class Validator
     private array $validation_groups = [];
     /** @var array<string, ValidationResult[]> */
     private array $results = [];
-
-    private ?string $username = null;
 
     /**
      * Validator constructor.
@@ -271,29 +271,23 @@ class Validator
      */
     public function execAsUser(string $command, ?array &$output = null, ?int &$code = null): void
     {
-        if (self::getUsername() === 'root') {
+        if (SystemUser::isRoot()) {
             $command = 'su ' . \config('librenms.user') . ' -s /bin/sh -c "' . $command . '"';
         }
         exec($command, $output, $code);
     }
 
     /**
-     * Get the username of the user running this and cache it for future requests.
+     * Get the base url for this LibreNMS install, this will only work from web pages.
+     * (unless base_url is set)
      *
-     * @return string
+     * @return string the base url without a trailing /
      */
-    public function getUsername(): string
+    public function getBaseURL(): string
     {
-        if (! isset($this->username)) {
-            if (function_exists('posix_getpwuid')) {
-                $userinfo = posix_getpwuid(posix_geteuid());
-                $this->username = $userinfo['name'];
-            } else {
-                $this->username = getenv('USERNAME') ?: getenv('USER');
-            }
-        }
+        $url = function_exists('get_url') ? get_url() : LibrenmsConfig::get('base_url');
 
-        return $this->username;
+        return rtrim(str_replace('validate', '', $url), '/');  // get base_url from current url
     }
 
     public function getBaseDir(): string
