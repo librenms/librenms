@@ -8,12 +8,12 @@ namespace App\Data\Graphing;
 final readonly class TrafficOptions
 {
     /**
+     * @param  float|null  $highestPercentile  also show this percentile of the highest of the summarized series at each time, null for none
      * @param  bool  $speedZoom  zoomed to the port speed: series marked invert are drawn above the axis, over the others
      * @param  list<string>|null  $series  keys of the series to summarize, all series when null
      */
     public function __construct(
-        public float $percentile = 95,
-        public bool $highestPercentile = false,
+        public ?float $highestPercentile = null,
         public float $totalScale = 0.125,
         public string $totalUnit = 'B',
         public bool $speedZoom = false,

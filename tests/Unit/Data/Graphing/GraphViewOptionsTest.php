@@ -19,6 +19,7 @@ class GraphViewOptionsTest extends TestCase
             'range' => false,
             'line_style' => 'smooth',
             'columns' => ['p95', 'avg'],
+            'hidden_percentiles' => [50, '75'],
             'width' => 0.5,
             'height' => 400,
         ]);
@@ -26,6 +27,7 @@ class GraphViewOptionsTest extends TestCase
         $this->assertFalse($options->range);
         $this->assertSame('smooth', $options->line_style);
         $this->assertSame(['avg', 'p95'], $options->columns, 'in legend order');
+        $this->assertSame([50.0, 75.0], $options->hidden_percentiles);
         $this->assertSame(0.5, $options->width);
         $this->assertSame(400, $options->height);
     }
@@ -45,11 +47,13 @@ class GraphViewOptionsTest extends TestCase
             'range' => 'yes',
             'line_style' => 'dashed',
             'columns' => ['median', 'max'],
+            'hidden_percentiles' => [50, 'median', 150],
         ]);
 
         $this->assertTrue($options->range);
         $this->assertSame('stepped', $options->line_style);
         $this->assertSame(['max'], $options->columns);
+        $this->assertSame([50.0], $options->hidden_percentiles);
     }
 
     public function test_a_size_needs_a_usable_height(): void
@@ -65,7 +69,7 @@ class GraphViewOptionsTest extends TestCase
 
     public function test_the_address_shows_one_graph_with_the_viewer_preferences(): void
     {
-        $saved = new GraphViewOptions(range: false, columns: ['avg'], width: 0.5, height: 300, line_style: 'linear');
+        $saved = new GraphViewOptions(range: false, columns: ['avg'], hidden_percentiles: [50.0], width: 0.5, height: 300, line_style: 'linear');
 
         $shared = $saved->withAddress(['mirror' => '0', 'stacking' => 'stack', 'line_style' => 'smooth', 'range' => '1']);
 
@@ -75,6 +79,7 @@ class GraphViewOptionsTest extends TestCase
         $this->assertFalse($shared->range, 'the shading is the viewer\'s');
         $this->assertSame('linear', $shared->line_style, 'the line style is the viewer\'s');
         $this->assertSame(['avg'], $shared->columns, 'the legend is the viewer\'s');
+        $this->assertSame([50.0], $shared->hidden_percentiles, 'the legend is the viewer\'s');
         $this->assertSame(300, $shared->height, 'the size is the viewer\'s');
     }
 

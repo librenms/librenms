@@ -7,6 +7,7 @@ import LibreNMSNumber from '../number.js';
  *     without them a margin above zero asks to fit the axis to the data
  * @property {GraphSeries[]} series
  * @property {Threshold[]} thresholds reference lines, such as alert limits, shown ones are drawn until the viewer hides them
+ * @property {number[]} percentiles a legend column of each for every series, series with a percentileColor also draw them
  */
 
 /**
@@ -25,6 +26,7 @@ import LibreNMSNumber from '../number.js';
  * @property {Array<?number>} avg null where there is no data
  * @property {?Array<?number>} min null when the same as avg, as it is when each point is a single stored value
  * @property {?Array<?number>} max null when the same as avg
+ * @property {?string} percentileColor the percentile lines of the graph are drawn for this series in this color, none when null
  */
 
 /**
@@ -82,12 +84,73 @@ export function shownPoints(timestamps, { from, to }) {
 }
 
 /**
- * Legend values of points start to end (exclusive). Min and max use those of each point, keeping consolidated peaks.
- * The 95th percentile is of the averages, like the image graphs.
+ * The nearest rank percentile of sorted values, null without values
+ *
+ * @param {number[]} sorted lowest first
+ * @param {number} percentile 0 to 100
+ * @returns {?number}
+ */
+export function percentileOf(sorted, percentile) {
+    return sorted.length === 0 ? null : sorted[Math.max(0, Math.ceil(sorted.length * percentile / 100) - 1)];
+}
+
+/**
+ * The averages of points start to end (exclusive) that have data, lowest first
  *
  * @param {GraphSeries} series
+ * @returns {number[]}
  */
-export function summarize(series, start, end) {
+export function sortedAverages(series, start, end) {
+    return series.avg.slice(start, end).filter((value) => value !== null).sort((a, b) => a - b);
+}
+
+/**
+ * The percentile of a legend column, such as 95 for p95, null for a column of another value
+ *
+ * @param {string} column
+ * @returns {?number}
+ */
+export function columnPercentile(column) {
+    return /^p\d/.test(column) ? Number(column.slice(1)) : null;
+}
+
+/**
+ * The legend columns the viewer can show, in order: the columns of every graph, then a column of each percentile it offers
+ * or the graph has, lowest first.
+ *
+ * @param {string[]} columns of every graph, such as now and p95
+ * @param {number[]} percentiles of the graph
+ * @returns {string[]}
+ */
+export function columnChoices(columns, percentiles) {
+    const offered = columns.map(columnPercentile).filter((percentile) => percentile !== null);
+    const all = [...new Set([...offered, ...percentiles])].sort((a, b) => a - b);
+
+    return [...columns.filter((column) => columnPercentile(column) === null), ...all.map((percentile) => `p${percentile}`)];
+}
+
+/**
+ * Whether a legend column is shown: a percentile of the graph unless the viewer hid it, any other when the viewer chose it
+ *
+ * @param {string} column
+ * @param {string[]} chosen columns the viewer chose
+ * @param {number[]} percentiles of the graph
+ * @param {number[]} hidden percentiles of graphs the viewer hid
+ */
+export function columnShown(column, chosen, percentiles, hidden) {
+    const percentile = columnPercentile(column);
+
+    return percentile !== null && percentiles.includes(percentile) ? ! hidden.includes(percentile) : chosen.includes(column);
+}
+
+/**
+ * Legend values of points start to end (exclusive). Min and max use those of each point, keeping consolidated peaks.
+ * Percentiles are of the averages, like the image graphs, keyed by their column, such as p95.
+ *
+ * @param {GraphSeries} series
+ * @param {number[]} percentiles
+ */
+export function summarize(series, start, end, percentiles = []) {
     const mins = series.min ?? series.avg;
     const maxes = series.max ?? series.avg;
     const values = [];
@@ -107,13 +170,14 @@ export function summarize(series, start, end) {
         }
     }
 
+    values.sort((a, b) => a - b);
+    const columns = Object.fromEntries(percentiles.map((percentile) => [`p${percentile}`, percentileOf(values, percentile)]));
+
     if (values.length === 0) {
-        return { now: null, min: null, max: null, avg: null, p95: null };
+        return { now: null, min: null, max: null, avg: null, ...columns };
     }
 
-    values.sort((a, b) => a - b);
-
-    return { now, min, max, avg: sum / values.length, p95: values[Math.ceil(values.length * 0.95) - 1] };
+    return { now, min, max, avg: sum / values.length, ...columns };
 }
 
 /**

@@ -49,6 +49,7 @@ class GraphRequest extends FormRequest
             'stacking' => ['nullable', 'in:' . implode(',', GraphViewOptions::STACKING)],
             'scale' => ['nullable', 'in:' . implode(',', GraphViewOptions::SCALES)],
             'trend' => ['nullable', 'in:0,1'],
+            'percentile_lines' => ['nullable', 'in:0,1'],
             'showcommand' => ['nullable', 'string', 'in:yes,no'],
             'port_speed_zoom' => ['nullable', 'in:0,1'],
             'device' => ['nullable', 'integer'],

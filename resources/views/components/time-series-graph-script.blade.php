@@ -1,6 +1,6 @@
 <script>
     document.addEventListener('alpine:init', () => {
-        const { limitRange, now, panRange, resolveRange, zoomRange, formatValue, joinGraph, shownPoints, sliceGraph, summarize, toCsv, loadChart } = window.LibreNMS.Graphs;
+        const { limitRange, now, panRange, resolveRange, zoomRange, columnChoices, columnPercentile, columnShown, formatValue, joinGraph, shownPoints, sliceGraph, summarize, toCsv, loadChart } = window.LibreNMS.Graphs;
         const MAX_TOOLTIP_ROWS = 12;
         const TOOLTIP_GAP = 32; // from the cursor
         const TOOLTIP_MARGIN = 8; // from the window edges
@@ -11,14 +11,14 @@
         const MIN_POINTS = 10; // the fewest the server gives
         const KEPT_SPANS = 2; // of the view, the loaded data kept on each side of it
 
-        const DRAWN_OPTIONS = ['range', 'mirror', 'stacking', 'scale', 'line_style', 'trend']; // the others are the legend, size and compare
+        const DRAWN_OPTIONS = ['range', 'mirror', 'stacking', 'scale', 'line_style', 'trend', 'percentile_lines', 'hidden_percentiles']; // the others are the legend, size and compare
         const COMPARE_SECONDS = { day: 86400, week: 604800 }; // a period is the span shown
 
         const clamp = (value, low, high) => Math.min(Math.max(value, low), high);
 
         // What the graph does when its options are left as the graph defines: stacking of the drawn series all, none
-        // or some of them, null for a single one; the scale fit to the data, from zero or between limits.
-        function ownDrawing(axis, drawn) {
+        // or some of them, null for a single one; the scale fit to the data, from zero or between limits; percentile lines.
+        function ownDrawing({ axis, percentiles, series }, drawn) {
             const stacked = drawn.filter((item) => item.stacked).length;
             const fits = axis.margin > 0 && axis.min === null && axis.max === null;
 
@@ -26,14 +26,15 @@
                 mirror: drawn.some((item) => item.invert),
                 stacking: drawn.length < 2 ? null : (stacked === drawn.length ? 'all' : (stacked === 0 ? 'none' : 'some')),
                 scale: fits ? 'fit' : ((axis.min ?? 0) === 0 && axis.max === null ? 'zero' : 'limits'),
+                percentileLines: percentiles.length > 0 && series.some((item) => item.percentileColor),
             };
         }
 
-        function graphDefinition({ axis, thresholds, series }) {
-            return JSON.stringify([axis, thresholds, series.map(({ avg, min, max, ...definition }) => definition)]);
+        function graphDefinition({ axis, thresholds, percentiles, series }) {
+            return JSON.stringify([axis, thresholds, percentiles, series.map(({ avg, min, max, ...definition }) => definition)]);
         }
 
-        window.Alpine.data('timeSeriesGraph', ({ src, range, options, columns, minWidth, minHeight, maxHeight }) => {
+        window.Alpine.data('timeSeriesGraph', ({ src, range, options, columns, columnLabels, percentileLabel, minWidth, minHeight, maxHeight }) => {
             // Keep the plot and its sample arrays outside Alpine reactivity.
             let createChart;
             let chart = null;
@@ -55,6 +56,7 @@
                 refreshing: false,
                 error: null,
                 legend: [],
+                percentiles: [], // of the graph, each a legend column
                 thresholds: [],
                 toggledThresholds: [], // indexes the viewer turned on or off
                 hidden: [],
@@ -65,7 +67,6 @@
                 options,
                 // column and direction, null for the order of the graph
                 sort: null,
-                allColumns: columns,
                 columnsMenuStyle: {},
 
                 init() {
@@ -335,7 +336,7 @@
                     const drawn = graph.series.filter((series) => ! series.legendOnly);
                     drawnKeys = drawn.map((series) => series.key);
                     this.caption = graph.axis.label;
-                    this.features = ownDrawing(graph.axis, drawn);
+                    this.features = ownDrawing(graph, drawn);
                     if (canUpdate) {
                         chart.update(graph, earlier);
                     } else {
@@ -384,23 +385,40 @@
                     const [start, end] = shownPoints(graph.timestamps, shown());
 
                     this.thresholds = graph.thresholds;
+                    this.percentiles = graph.percentiles;
+                    // every percentile column the viewer can show
+                    const percentiles = this.menuColumns().map(columnPercentile).filter((percentile) => percentile !== null);
                     this.legend = graph.series.map((series) => {
                         const format = (value) => formatValue(value, series.unit, graph.axis.base);
-                        const summary = summarize(series, start, end);
+                        const summary = summarize(series, start, end, percentiles);
 
                         return {
                             key: series.key,
                             label: series.label,
                             color: series.color,
                             toggleable: drawnKeys.length > 1 && ! series.legendOnly,
-                            now: format(summary.now),
-                            min: format(summary.min),
-                            max: format(summary.max),
-                            avg: format(summary.avg),
-                            p95: format(summary.p95),
+                            ...Object.fromEntries(Object.entries(summary).map(([column, value]) => [column, format(value)])),
                             values: summary, // to sort by
                         };
                     });
+                },
+
+                // the columns the viewer can show or hide
+                menuColumns() {
+                    return columnChoices(columns, this.percentiles);
+                },
+
+                isColumnShown(column) {
+                    return columnShown(column, this.options.columns, this.percentiles, this.options.hidden_percentiles);
+                },
+
+                shownColumns() {
+                    return this.menuColumns().filter((column) => this.isColumnShown(column));
+                },
+
+                // the header of a column, a percentile such as 25th
+                columnLabel(column) {
+                    return columnLabels[column] ?? percentileLabel.replace('%p', column.slice(1));
                 },
 
                 // in the order of the graph unless sorted, series without a value last
@@ -423,17 +441,23 @@
                     });
                 },
 
-                // the legend columns keep their order, sorting by a hidden one stops
+                // A percentile of the graph is hidden or shown again, other columns are chosen keeping their order. Sorting by a hidden one stops.
                 toggleColumn(column) {
-                    const shown = this.options.columns.includes(column)
-                        ? this.options.columns.filter((other) => other !== column)
-                        : columns.filter((other) => other === column || this.options.columns.includes(other));
+                    const percentile = columnPercentile(column);
+                    if (percentile !== null && this.percentiles.includes(percentile)) {
+                        const hidden = this.options.hidden_percentiles;
+                        // its line goes with it
+                        this.setOptions({ hidden_percentiles: hidden.includes(percentile) ? hidden.filter((other) => other !== percentile) : [...hidden, percentile] });
+                    } else {
+                        this.options.columns = this.options.columns.includes(column)
+                            ? this.options.columns.filter((other) => other !== column)
+                            : columns.filter((other) => other === column || this.options.columns.includes(other));
+                    }
 
-                    this.options.columns = shown;
-                    if (this.sort !== null && this.sort.column !== 'label' && ! shown.includes(this.sort.column)) {
+                    if (this.sort !== null && this.sort.column !== 'label' && ! this.isColumnShown(this.sort.column)) {
                         this.sort = null;
                     }
-                    this.$dispatch('graph-columns-changed', { columns: shown });
+                    this.$dispatch('graph-columns-changed', { columns: this.options.columns, hidden_percentiles: this.options.hidden_percentiles });
                 },
 
                 placeColumnsMenu() {

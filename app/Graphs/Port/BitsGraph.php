@@ -25,7 +25,7 @@ class BitsGraph extends PortGraph
                 description: __('graph.series.in'),
                 unit: 'bps',
                 scale: 8,
-                style: new SeriesStyle(SeriesRole::In, fill: true, maxFill: true),
+                style: new SeriesStyle(SeriesRole::In, fill: true, maxFill: true, percentileLines: true),
             ),
             'out' => new DataSeries(
                 metric: $metric,
@@ -33,7 +33,7 @@ class BitsGraph extends PortGraph
                 description: __('graph.series.out'),
                 unit: 'bps',
                 scale: 8,
-                style: new SeriesStyle(SeriesRole::Out, fill: true, maxFill: true, invert: true),
+                style: new SeriesStyle(SeriesRole::Out, fill: true, maxFill: true, invert: true, percentileLines: true),
             ),
         ];
     }
@@ -46,13 +46,15 @@ class BitsGraph extends PortGraph
         }
         $shown = $this->showsPortSpeed();
 
+        $percentile = (float) LibrenmsConfig::get('percentile_value', 95);
+
         return new GraphOptions(
             legendTitle: 'bps',
             traffic: new TrafficOptions(
-                percentile: (float) LibrenmsConfig::get('percentile_value', 95),
-                highestPercentile: (bool) LibrenmsConfig::get('rrdgraph_real_percentile'),
+                highestPercentile: LibrenmsConfig::get('rrdgraph_real_percentile') ? $percentile : null,
                 speedZoom: $shown && ($in || $out),
             ),
+            percentiles: [$percentile],
             thresholds: $this->portSpeeds($in, $out, $shown),
         );
     }

@@ -18,6 +18,7 @@ readonly class ResolvedStyle
      * @param  bool  $invert  drawn below the axis
      * @param  float  $drawScale  multiplies the drawn value
      * @param  bool  $legendOnly  shown in the legend, not drawn
+     * @param  string|null  $percentileColor  hex of the percentile lines, null when the series draws none
      */
     public function __construct(
         public ?string $color,
@@ -28,6 +29,7 @@ readonly class ResolvedStyle
         public bool $invert,
         public float $drawScale,
         public bool $legendOnly = false,
+        public ?string $percentileColor = null,
     ) {
     }
 
@@ -45,7 +47,8 @@ readonly class ResolvedStyle
             $style = $item->style;
 
             if ($style->legendOnly) {
-                return new self(null, null, null, null, false, false, 1, legendOnly: true);
+                return new self(null, null, null, null, false, $style->invert && $inverts, 1, legendOnly: true,
+                    percentileColor: $style->percentileLines ? $theme->percentile() : null);
             }
 
             $color = $theme->next($style->role, $style->stacked);
@@ -58,6 +61,7 @@ readonly class ResolvedStyle
                 stacked: $style->stacked,
                 invert: $style->invert && $inverts,
                 drawScale: $style->stackAverage ? $style->drawScale / $averaged : $style->drawScale,
+                percentileColor: $style->percentileLines ? $color : null,
             );
         }, $series);
     }

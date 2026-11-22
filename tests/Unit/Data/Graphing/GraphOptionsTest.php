@@ -5,6 +5,7 @@ namespace LibreNMS\Tests\Unit\Data\Graphing;
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\SeriesRole;
 use App\Data\Graphing\Threshold;
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Tests\TestCase;
 
 class GraphOptionsTest extends TestCase
@@ -37,5 +38,14 @@ class GraphOptionsTest extends TestCase
     {
         $this->assertNull(new GraphOptions()->thresholdBounds());
         $this->assertNull(new GraphOptions(thresholds: [new Threshold(40, 'high', SeriesRole::HighLimit, shown: false)])->thresholdBounds());
+    }
+
+    public function test_stats_percentiles_follow_the_config(): void
+    {
+        LibrenmsConfig::set('graph_stat_percentile_disable', false);
+        $this->assertSame([25, 50, 75], GraphOptions::statsPercentiles());
+
+        LibrenmsConfig::set('graph_stat_percentile_disable', true);
+        $this->assertSame([], GraphOptions::statsPercentiles());
     }
 }

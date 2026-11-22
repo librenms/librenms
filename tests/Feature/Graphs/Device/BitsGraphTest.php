@@ -106,7 +106,7 @@ class BitsGraphTest extends TestCase
         $this->assertSame(["in_$inside->port_id", "out_$inside->port_id", 'in', 'out', 'aggregate'], array_keys($this->graph()->getSeries()));
     }
 
-    public function test_each_port_shows_in_and_out_together_and_the_totals_get_percentiles(): void
+    public function test_each_port_shows_in_and_out_together_and_the_totals_draw_percentiles(): void
     {
         $this->port();
         $this->port(['ifIndex' => 2, 'ifDescr' => 'eth1', 'ifName' => 'eth1']);
@@ -119,10 +119,13 @@ class BitsGraphTest extends TestCase
         $this->assertStringContainsString("'CDEF:ds5=ds1,ds3,ADDNAN'", $command);
         $this->assertStringContainsString("'CDEF:ds6=ds4,ds5,ADDNAN'", $command);
         $this->assertStringContainsString("'HRULE:0#00000000:Total In         '", $command);
-        $this->assertStringContainsString("'VDEF:ds4pct=ds4,95,PERCENT'", $command);
-        $this->assertStringContainsString("'VDEF:ds5pct=ds5,95,PERCENT'", $command);
-        $this->assertStringNotContainsString('ds0pct', $command);
-        $this->assertStringNotContainsString('ds6pct', $command);
+        // every row has the 95th, only the totals of in and out draw it
+        $this->assertStringContainsString("'GPRINT:ds0p0: %7.2lf%sbps\\n'", $command);
+        $this->assertStringContainsString("'VDEF:ds4p0=ds4,95,PERCENTNAN'", $command);
+        $this->assertStringContainsString("'HRULE:ds4p0#AA0000::dashes'", $command);
+        $this->assertStringContainsString("'HRULE:ds5p0line#AA0000::dashes'", $command);
+        $this->assertStringNotContainsString('HRULE:ds0p0', $command);
+        $this->assertStringNotContainsString('HRULE:ds6p0', $command);
     }
 
     public function test_it_reports_devices_without_ports(): void

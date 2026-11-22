@@ -26,6 +26,7 @@
 
 namespace App\Models;
 
+use App\Data\TimeSeries\MetricIdentity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -50,6 +51,14 @@ class Application extends DeviceRelatedModel
     }
 
     // ---- Helper Functions ----
+
+    /**
+     * The metric of the application poller, kept in app-<app_type>-<app_id>.rrd by rrd
+     */
+    public function metricIdentity(): MetricIdentity
+    {
+        return new MetricIdentity('app', ['hostname' => (string) $this->device?->hostname, 'name' => $this->app_type, 'app_id' => $this->app_id]);
+    }
 
     public function definition(): ApplicationDefinition
     {

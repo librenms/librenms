@@ -43,7 +43,7 @@ class UsageGraphsTest extends TestCase
         $this->assertStringContainsString("'--base' '1024'", $command);
         $this->assertStringContainsString("'AREA:ds0#C75862:Used             '", $command);
         $this->assertStringContainsString("'AREA:ds1#D0D0D0:Free             :STACK'", $command);
-        $this->assertStringContainsString('GPRINT:ds1:LAST:%5.2lf%sB', $command);
+        $this->assertStringContainsString('GPRINT:ds1:LAST: %7.2lf%sB\g', $command);
     }
 
     public function test_storage_with_only_a_percentage_stacks_to_100_percent(): void
@@ -55,7 +55,7 @@ class UsageGraphsTest extends TestCase
         $this->assertStringContainsString('CDEF:ds0=ds0raw,0.1,*', $command);
         $this->assertStringContainsString("'-u' '100'", $command);
         $this->assertStringNotContainsString("'--base'", $command);
-        $this->assertStringContainsString('GPRINT:ds0:LAST:%5.2lf%s%%', $command);
+        $this->assertStringContainsString('GPRINT:ds0:LAST: %7.2lf%s%%\g', $command);
     }
 
     public function test_mempool_stacks_used_and_free(): void
@@ -68,7 +68,7 @@ class UsageGraphsTest extends TestCase
 
         $command = $graph->getDebugCommand();
         $this->assertStringContainsString("'--base' '1024'", $command);
-        $this->assertStringContainsString('GPRINT:ds0:LAST:%5.2lf%sB', $command);
+        $this->assertStringContainsString('GPRINT:ds0:LAST: %7.2lf%sB\g', $command);
     }
 
     public function test_mempool_with_only_a_percentage_stacks_to_100_percent(): void
@@ -78,7 +78,7 @@ class UsageGraphsTest extends TestCase
         $command = new MempoolUsageGraph(new GraphParameters(['type' => 'mempool_usage', 'id' => $mempool->mempool_id]))->getDebugCommand();
 
         $this->assertStringContainsString("'-u' '100'", $command);
-        $this->assertStringContainsString('GPRINT:ds0:LAST:%5.2lf%s%%', $command);
+        $this->assertStringContainsString('GPRINT:ds0:LAST: %7.2lf%s%%\g', $command);
     }
 
     public function test_users_need_permission_to_the_storage(): void

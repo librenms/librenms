@@ -2866,6 +2866,19 @@
             ],
             "type": "array"
         },
+        "graph_colours.stats": {
+            "default": [
+                "663399",
+                "3366BB",
+                "AA3355",
+                "881177",
+                "CC6666",
+                "EEDD00",
+                "44DD88",
+                "99DD55"
+            ],
+            "type": "array"
+        },
         "graph_colours.varied": {
             "default": [
                 "CC0000",

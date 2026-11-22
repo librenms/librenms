@@ -38,7 +38,8 @@ class RrdSeriesDefinitionTest extends TestCase
     public function test_it_draws_lines_with_fill_and_invert(): void
     {
         $this->assertSame([
-            "COMMENT:Traffic                    Now        Min        Max        Avg\l",
+            'COMMENT:Traffic            ',
+            "COMMENT:         Now         Min         Max         Avg\l",
             'DEF:ds0=host/test.rrd:in:AVERAGE',
             'DEF:ds0min=host/test.rrd:in:MIN',
             'DEF:ds0max=host/test.rrd:in:MAX',
@@ -49,15 +50,15 @@ class RrdSeriesDefinitionTest extends TestCase
             'AREA:ds0#FF000020',
             'AREA:ds1drawn#D42E08',
             'LINE1.25:ds0#FF0000:In               ',
-            'GPRINT:ds0:LAST:%5.2lf%sbps',
-            'GPRINT:ds0min:MIN:%5.2lf%sbps',
-            'GPRINT:ds0max:MAX:%5.2lf%sbps',
-            'GPRINT:ds0:AVERAGE:%5.2lf%sbps\n',
+            'GPRINT:ds0:LAST: %7.2lf%sbps\g',
+            'GPRINT:ds0min:MIN: %7.2lf%sbps\g',
+            'GPRINT:ds0max:MAX: %7.2lf%sbps\g',
+            'GPRINT:ds0:AVERAGE: %7.2lf%sbps\n',
             'LINE1.25:ds1drawn#D42E08:Out              ',
-            'GPRINT:ds1:LAST:%5.2lf%sbps',
-            'GPRINT:ds1min:MIN:%5.2lf%sbps',
-            'GPRINT:ds1max:MAX:%5.2lf%sbps',
-            'GPRINT:ds1:AVERAGE:%5.2lf%sbps\n',
+            'GPRINT:ds1:LAST: %7.2lf%sbps\g',
+            'GPRINT:ds1min:MIN: %7.2lf%sbps\g',
+            'GPRINT:ds1max:MAX: %7.2lf%sbps\g',
+            'GPRINT:ds1:AVERAGE: %7.2lf%sbps\n',
             'HRULE:0#555555',
         ], $this->build([
             'in' => new DataSeries($this->metric, 'in', 'In', 'bps', style: new SeriesStyle(fill: true)),
@@ -86,7 +87,8 @@ class RrdSeriesDefinitionTest extends TestCase
     public function test_draw_scale_only_changes_the_drawing(): void
     {
         $this->assertSame([
-            "COMMENT:Load %                  Now     Min     Max     Avg\l",
+            'COMMENT:Load %             ',
+            "COMMENT:      Now      Min      Max      Avg\l",
             'DEF:ds0=host/test.rrd:usage:AVERAGE',
             'DEF:ds0min=host/test.rrd:usage:MIN',
             'DEF:ds0max=host/test.rrd:usage:MAX',
@@ -96,15 +98,15 @@ class RrdSeriesDefinitionTest extends TestCase
             'DEF:ds1max=host/test.rrd:usage:MAX',
             'CDEF:ds1drawn=ds1,0.5,*',
             'AREA:ds0drawn#FF0000:A                ',
-            'GPRINT:ds0:LAST:%5.2lf%s',
-            'GPRINT:ds0min:MIN:%5.2lf%s',
-            'GPRINT:ds0max:MAX:%5.2lf%s',
-            'GPRINT:ds0:AVERAGE:%5.2lf%s\n',
+            'GPRINT:ds0:LAST: %7.2lf%s\g',
+            'GPRINT:ds0min:MIN: %7.2lf%s\g',
+            'GPRINT:ds0max:MAX: %7.2lf%s\g',
+            'GPRINT:ds0:AVERAGE: %7.2lf%s\n',
             'AREA:ds1drawn#FF0000:B                :STACK',
-            'GPRINT:ds1:LAST:%5.2lf%s',
-            'GPRINT:ds1min:MIN:%5.2lf%s',
-            'GPRINT:ds1max:MAX:%5.2lf%s',
-            'GPRINT:ds1:AVERAGE:%5.2lf%s\n',
+            'GPRINT:ds1:LAST: %7.2lf%s\g',
+            'GPRINT:ds1min:MIN: %7.2lf%s\g',
+            'GPRINT:ds1max:MAX: %7.2lf%s\g',
+            'GPRINT:ds1:AVERAGE: %7.2lf%s\n',
         ], $this->build([
             'a' => new DataSeries($this->metric, 'usage', 'A', style: new SeriesStyle(stacked: true, drawScale: 0.5)),
             'b' => new DataSeries($this->metric, 'usage', 'B', style: new SeriesStyle(stacked: true, drawScale: 0.5)),
@@ -114,7 +116,8 @@ class RrdSeriesDefinitionTest extends TestCase
     public function test_series_scale_changes_the_value_everywhere(): void
     {
         $this->assertSame([
-            "COMMENT:                        Now     Min     Max     Avg\l",
+            'COMMENT:                   ',
+            "COMMENT:      Now      Min      Max      Avg\l",
             'DEF:ds0raw=host/test.rrd:bytes:AVERAGE',
             'CDEF:ds0=ds0raw,8,*',
             'DEF:ds0minraw=host/test.rrd:bytes:MIN',
@@ -122,10 +125,10 @@ class RrdSeriesDefinitionTest extends TestCase
             'DEF:ds0maxraw=host/test.rrd:bytes:MAX',
             'CDEF:ds0max=ds0maxraw,8,*',
             'LINE1.25:ds0#FF0000:Bits             ',
-            'GPRINT:ds0:LAST:%5.2lf%s',
-            'GPRINT:ds0min:MIN:%5.2lf%s',
-            'GPRINT:ds0max:MAX:%5.2lf%s',
-            'GPRINT:ds0:AVERAGE:%5.2lf%s\n',
+            'GPRINT:ds0:LAST: %7.2lf%s\g',
+            'GPRINT:ds0min:MIN: %7.2lf%s\g',
+            'GPRINT:ds0max:MAX: %7.2lf%s\g',
+            'GPRINT:ds0:AVERAGE: %7.2lf%s\n',
         ], $this->build(['a' => new DataSeries($this->metric, 'bytes', 'Bits', scale: 8)]));
     }
 
@@ -156,8 +159,8 @@ class RrdSeriesDefinitionTest extends TestCase
             'DEF:ds0min0f=host/test.rrd:xmt:AVERAGE',
             'DEF:ds0min1f=host/test.rrd:rcv:AVERAGE',
             'CDEF:ds0min=ds0min0f,ds0min1f,-,ds0min0f,/,100,*',
-        ], array_slice($definition, 1, 6));
-        $this->assertContains('GPRINT:ds0min:MIN:%5.2lf%s%%', $definition);
+        ], array_slice($definition, 2, 6));
+        $this->assertContains('GPRINT:ds0min:MIN: %7.2lf%s%%\g', $definition);
     }
 
     public function test_offset_is_added_after_the_scale(): void
@@ -250,7 +253,7 @@ class RrdSeriesDefinitionTest extends TestCase
         $this->assertContains('CDEF:ds2min=ds0,ds1,ADDNAN', $definition);
         $this->assertContains('CDEF:ds2max=ds0,ds1,ADDNAN', $definition);
         $this->assertContains('LINE1.25:ds2#FF0000:Sum              ', $definition);
-        $this->assertContains('GPRINT:ds2max:MAX:%5.2lf%sbps', $definition);
+        $this->assertContains('GPRINT:ds2max:MAX: %7.2lf%sbps\g', $definition);
         $this->assertContains('CDEF:ds3=ds2,ds0,ADDNAN', $definition);
         $this->assertContains('HRULE:0#00000000:Nested           ', $definition);
         $this->assertEmpty(preg_grep('/^(AREA|LINE).*ds3/', $definition));
@@ -264,13 +267,16 @@ class RrdSeriesDefinitionTest extends TestCase
         $definition = $this->build([
             'in_a' => new DataSeries($this->metric, 'a', 'A', style: new SeriesStyle(stacked: true)),
             'in_b' => new DataSeries($this->metric, 'b', 'B', style: new SeriesStyle(stacked: true)),
-            'in' => new SeriesSum(['in_a', 'in_b'], 'In', style: new SeriesStyle(legendOnly: true)),
-        ], new GraphOptions(traffic: new TrafficOptions(series: ['in'])), ['from' => 100, 'to' => 200, 'previous' => 'yes']);
+            'in' => new SeriesSum(['in_a', 'in_b'], 'In', style: new SeriesStyle(legendOnly: true, percentileLines: true)),
+        ], new GraphOptions(traffic: new TrafficOptions(series: ['in']), percentiles: [95]), ['from' => 100, 'to' => 200, 'previous' => 'yes']);
 
-        $this->assertContains('VDEF:ds2pct=ds2,95,PERCENT', $definition);
-        $this->assertEmpty(preg_grep('/ds[01]pct/', $definition));
-        $this->assertContains('GPRINT:ds2pct:%5.2lf%s\n', $definition);
-        $this->assertContains('GPRINT:ds1:AVERAGE:%5.2lf%s\n', $definition);
+        $this->assertContains('VDEF:ds2p0=ds2,95,PERCENTNAN', $definition);
+        // every row has the percentile column, the previous period too
+        $this->assertContains('GPRINT:ds1p0: %7.2lf%s\n', $definition);
+        $this->assertContains('GPRINT:ds2p0: %7.2lf%s\n', $definition);
+        $this->assertContains('GPRINT:ds2prevp0: %7.2lf%s\n', $definition);
+        // only the sum draws its percentile, and that of its previous period in the color of the previous period
+        $this->assertSame(['HRULE:ds2p0#AA0000::dashes', 'HRULE:ds2prevp0#333300::dashes'], array_values(preg_grep('/dashes$/', $definition)));
         // the previous period of the sum is the sum of the previous period of its series, defined once
         $this->assertContains('CDEF:ds2prev=ds0prev,ds1prev,ADDNAN', $definition);
         $this->assertContains('CDEF:ds2prevmax=ds0prev,ds1prev,ADDNAN', $definition);
@@ -336,7 +342,7 @@ class RrdSeriesDefinitionTest extends TestCase
     {
         $definition = $this->build(['a' => new DataSeries($this->metric, 'a', 'A', 'ms')], new GraphOptions(unitsExponent: 0));
 
-        $this->assertContains('GPRINT:ds0:LAST:%5.2lf ms', $definition);
+        $this->assertContains('GPRINT:ds0:LAST: %7.2lf ms\g', $definition);
     }
 
     public function test_roles_use_the_colors_of_the_style_of_the_request(): void
@@ -478,8 +484,8 @@ class RrdSeriesDefinitionTest extends TestCase
     {
         $definition = $this->build(['a' => new DataSeries($this->metric, 'a', 'A', 'a%:b')]);
 
-        $this->assertContains('GPRINT:ds0:LAST:%5.2lf%sa%%\:b', $definition);
-        $this->assertSame("COMMENT:                            Now         Min         Max         Avg\l", $definition[0]);
+        $this->assertContains('GPRINT:ds0:LAST: %7.2lf%sa%%\:b\g', $definition);
+        $this->assertSame("COMMENT:          Now          Min          Max          Avg\l", $definition[1]);
     }
 
     public function test_it_skips_series_without_an_rrd_file(): void

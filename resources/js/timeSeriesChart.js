@@ -55,6 +55,9 @@ const TIME_AXIS = [
 ];
 
 // a point is the average of the interval ending at its time, drawn level in the stepped style
+// thresholds and percentiles are level lines, drawn at one value
+const level = (layer) => layer.constant !== undefined || layer.percentile !== undefined;
+
 const LINE_PATHS = {
     stepped: uPlot.paths.stepped({ align: -1, alignGaps: -1 }),
     linear: uPlot.paths.linear(),
@@ -185,6 +188,7 @@ export default function createChart(element, graph, { view, hidden, compact, dra
     const label = compact ? '' : graph.axis.label;
     const comparing = previous !== null;
     const { layers, dataFor } = createPlotData(graph, { hidden, draw, thresholds, comparing });
+    const followsView = draw.trend || layers.some((layer) => layer.percentile !== undefined);
     const lineStyle = draw.line_style ?? 'stepped';
     const log = draw.scale === 'log';
     const logBase = graph.axis.base === 1024 ? 2 : 10;
@@ -336,8 +340,8 @@ export default function createChart(element, graph, { view, hidden, compact, dra
                 fillTo: 0,
                 width: layer.stroke ? (layer.constant === undefined ? 1.25 : 1.5) : 0,
                 dash: layer.dash,
-                // trends and constants are straight, not drawn level for each interval
-                paths: layer.trend !== undefined || layer.constant !== undefined ? undefined : LINE_PATHS[lineStyle],
+                // trends and level lines are straight, not drawn level for each interval
+                paths: layer.trend !== undefined || level(layer) ? undefined : LINE_PATHS[lineStyle],
                 points: { show: false },
             })),
         ],
@@ -345,7 +349,8 @@ export default function createChart(element, graph, { view, hidden, compact, dra
         bands: layers.flatMap((layer, index) => (layer.range ? [{ series: [index + 1, index + 2], fill: layer.range }] : [])),
         cursor: {
             y: false,
-            points: { size: (self, index) => (layers[index - 1]?.stroke && layers[index - 1].constant === undefined ? 7 : 0) },
+            // lines that follow the data get a point at the cursor, level lines do not
+            points: { size: (self, index) => (layers[index - 1]?.stroke && ! level(layers[index - 1]) ? 7 : 0) },
             dataIdx: (self, seriesIndex, closest, time) => sampleIndex(self, closest, time),
             // the page zooms to a selection, not uPlot
             drag: { x: true, y: false, setScale: false, dist: MIN_ZOOM_PIXELS },
@@ -415,8 +420,8 @@ export default function createChart(element, graph, { view, hidden, compact, dra
         },
         setView: (next) => {
             shown = next;
-            // a trend is of what is shown
-            if (draw.trend) {
+            // trends and percentiles are of what is shown
+            if (followsView) {
                 data = dataFor(current.graph, current.previous, shown);
                 plot.setData(data.columns);
             }

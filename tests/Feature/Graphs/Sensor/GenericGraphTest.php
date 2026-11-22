@@ -78,7 +78,7 @@ class GenericGraphTest extends TestCase
         $command = new GenericGraph(new GraphParameters(['type' => 'sensor_temperature', 'id' => $sensor->sensor_id]))->getDebugCommand();
 
         $this->assertStringContainsString('CDEF:ds0=ds0raw,1.8,*,32,+', $command);
-        $this->assertStringContainsString('GPRINT:ds0:LAST:%5.2lf%s°F', $command);
+        $this->assertStringContainsString('GPRINT:ds0:LAST: %7.2lf%s°F\g', $command);
         $this->assertStringContainsString('LINE1.5:212#FF0000:high = 212 °F\\l:dashes', $command);
     }
 }

@@ -27,7 +27,7 @@ class GraphsPageController extends Controller
     /** the previous parameter: what the graph drawn in the browser compares with */
     private const array COMPARE = ['yes' => 'period', 'day' => 'day', 'week' => 'week'];
     /** how a graph drawn in the browser is viewed, not what it shows */
-    private const array VIEW_PARAMETERS = [...GraphViewOptions::ADDRESS, 'previous', 'trend'];
+    private const array VIEW_PARAMETERS = [...GraphViewOptions::ADDRESS, 'previous', 'trend', 'percentile_lines'];
 
     public function __invoke(GraphRequest $request): View
     {
@@ -73,13 +73,14 @@ class GraphsPageController extends Controller
                 'view' => [
                     'compare' => self::COMPARE[$request->input('previous')] ?? null,
                     'trend' => $request->boolean('trend'),
+                    'percentile_lines' => $request->boolean('percentile_lines', true),
                 ],
                 'fileName' => Str::slug(str_replace('.', ' ', "$entityTitle $fullType")) ?: 'graph',
                 'dataUrl' => $dataUrl,
                 'preferencesUrl' => route('preferences.store'),
                 'rendererPreference' => self::RENDERER_PREFERENCE,
                 'optionsPreference' => self::OPTIONS_PREFERENCE,
-                'viewDefaults' => [...GraphViewOptions::addressDefaults(), 'compare' => null, 'trend' => false],
+                'viewDefaults' => [...GraphViewOptions::addressDefaults(), 'compare' => null, 'trend' => false, 'percentile_lines' => true],
                 'preferenceDefaults' => GraphViewOptions::preferenceDefaults(),
                 'lang' => ['copied' => __('graph.link_copied'), 'failed' => __('graph.link_not_copied')],
             ],
