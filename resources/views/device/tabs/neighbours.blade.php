@@ -101,7 +101,7 @@ var network = new vis.Network(container, data, options);
 visPopups.attach(network, {ports: true});
 network.on('click', function (properties) {
     if (properties.nodes > 0) {
-       window.location.href = {{ \Illuminate\Support\Js::from(route('device.neighbours', ['device' => '__DEVICE__', 'selection' => 'map'])) }}.replace('__DEVICE__', properties.nodes);
+       window.location.href = route('device.neighbours', {device: properties.nodes[0], selection: 'map'});
     }
 });
 </script>
@@ -112,7 +112,7 @@ network.on('click', function (properties) {
 
 @section('javascript')
 @if($selection == 'map')
-    <script src="{{ url('js/vis-network.min.js') }}"></script>
-    <script src="{{ url('js/vis-data.min.js') }}"></script>
+    <script src="{{ asset('js/vis-network.min.js') }}"></script>
+    <script src="{{ asset('js/vis-data.min.js') }}"></script>
 @endif
 @endsection

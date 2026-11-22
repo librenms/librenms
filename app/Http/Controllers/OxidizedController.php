@@ -59,7 +59,7 @@ class OxidizedController extends Controller
                 $device = $devices->get($result['node'] ?? '');
 
                 return $device
-                    ? ['name' => $device->display, 'url' => route('device', ['device' => $device->device_id, 'tab' => 'config'])]
+                    ? ['name' => $device->display, 'url' => route('device.config', ['device' => $device->device_id])]
                     : ['name' => $result['full_name'] ?? $result['node'] ?? '', 'url' => null];
             }, array_values($results)),
         ]);

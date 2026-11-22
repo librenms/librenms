@@ -1319,16 +1319,6 @@
             "default": 1000,
             "type": "integer"
         },
-        "branding": {
-            "default": {
-                "default": {}
-            },
-            "type": "array",
-            "validate": {
-                "value": "array",
-                "value.*": "array"
-            }
-        },
         "callback_clear": {
             "default": "https://stats.librenms.org/clear.php",
             "type": "text"
@@ -2866,6 +2856,19 @@
                 "22CCBB",
                 "00BBCC",
                 "0099CC",
+                "3366BB",
+                "AA3355",
+                "881177",
+                "CC6666",
+                "EEDD00",
+                "44DD88",
+                "99DD55"
+            ],
+            "type": "array"
+        },
+        "graph_colours.stats": {
+            "default": [
+                "663399",
                 "3366BB",
                 "AA3355",
                 "881177",
@@ -5470,18 +5473,6 @@
             "order": 0,
             "type": "boolean"
         },
-        "map.engine": {
-            "default": "leaflet",
-            "type": "select",
-            "options": {
-                "leaflet": "Leaflet",
-                "mapeal": "Mapeal"
-            }
-        },
-        "mapael.default_map": {
-            "default": "maps/world_countries.js",
-            "type": "text"
-        },
         "mib_dir": {
             "type": "directory"
         },
@@ -5757,10 +5748,6 @@
             "default": "misc/notifications.rss",
             "type": "text"
         },
-        "old_graphs": {
-            "default": true,
-            "type": "boolean"
-        },
         "opentsdb.co": {
             "type": "boolean",
             "group": "poller",
@@ -6007,10 +5994,6 @@
             "type": "integer",
             "units": "seconds",
             "order": 3
-        },
-        "page_title_prefix": {
-            "default": "",
-            "type": "text"
         },
         "page_title_suffix": {
             "type": "text"

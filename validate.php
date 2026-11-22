@@ -116,7 +116,6 @@ if ($pre_checks_failed) {
     exit(1);
 }
 
-$init_modules = ['nodb'];
 require 'includes/init.php';
 
 // make sure install_dir is set correctly, or the next includes will fail

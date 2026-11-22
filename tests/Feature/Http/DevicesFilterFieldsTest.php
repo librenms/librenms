@@ -30,6 +30,18 @@ final class DevicesFilterFieldsTest extends InMemoryDbTestCase
         $this->assertContains('disabled', $keys);
     }
 
+    public function testBootgridHasDataAndExportUrls(): void
+    {
+        Role::findOrCreate('admin');
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+
+        $this->actingAs($admin)
+            ->get(route('devices'))
+            ->assertSee('data-url="' . route('table.device') . '"', false)
+            ->assertSee('data-export-url="' . route('table.device.export') . '"', false);
+    }
+
     /**
      * @return string[]
      */

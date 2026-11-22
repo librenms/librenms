@@ -7,7 +7,7 @@ export default function deviceLink(options = {}) {
     }
 
     options.showDelay = options.showDelay || 300;
-    const popupUrl = `${window.location.origin}/device/${options.device_id}/popup`;
+    const popupUrl = route('device.popup', {device: options.device_id});
 
     // params are handled by the popup component
     // Return the popup component with the constructed URL

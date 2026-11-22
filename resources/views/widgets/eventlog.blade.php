@@ -29,7 +29,7 @@
                     eventtype: @json($eventtype)
                 };
             },
-            url: "{{ url('/ajax/table/eventlog') }}"
+            url: "{{ route('table.eventlog') }}"
         });
 
         $('#eventlog_container-{{ $id }}').on('refresh', function (event) {

@@ -108,7 +108,7 @@ final class VmInfoTabTest extends TestCase
         $user->givePermissionTo(Permission::findOrCreate('device.viewAll'));
 
         $this->actingAs($user)
-            ->get(route('device', ['device' => $vm->device_id, 'tab' => 'vm', 'graph' => 'cpu']))
+            ->get(route('device.vm', ['device' => $vm->device_id, 'graph' => 'cpu']))
             ->assertForbidden();
     }
 
@@ -165,7 +165,7 @@ final class VmInfoTabTest extends TestCase
             $this->recordMetric($other, 'vm.net');
 
             $this->actingAs($this->admin())
-                ->get(route('device', ['device' => $device, 'tab' => 'vm', 'graph' => 'net']))
+                ->get(route('device.vm', ['device' => $device, 'graph' => 'net']))
                 ->assertOk()
                 ->assertSee('vminfo_net')
                 ->assertSee(route('device.vm.show', ['device' => $device, 'vminfo' => $local->id]))
@@ -207,7 +207,7 @@ final class VmInfoTabTest extends TestCase
         $container = Vminfo::factory()->for($device)->create(['vm_type' => 'proxmox-lxc']);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'vm', 'graph' => 'diskio_ops']))
+            ->get(route('device.vm', ['device' => $device, 'graph' => 'diskio_ops']))
             ->assertOk()
             ->assertSee(route('device.vm.show', ['device' => $device, 'vminfo' => $vm->id]))
             ->assertDontSee(route('device.vm.show', ['device' => $device, 'vminfo' => $container->id]));

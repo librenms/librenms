@@ -13,7 +13,7 @@
                     [__('Down'), $device->ports_down_count, 'lnms-btn-danger', ['state' => ['eq' => 'down'], 'ignore' => ['eq' => 0], 'disabled' => ['eq' => 0], 'deleted' => ['eq' => 0]]],
                     [__('Disabled'), $device->ports_disabled_count, 'lnms-btn-primary', ['disabled' => ['eq' => 1]]],
                 ] as [$label, $count, $class, $filter])
-                    <a class="lnms-btn {{ $class }}" role="button" href="{{ route('device', ['device' => $device->device_id, 'tab' => 'ports', 'filter' => $filter]) }}">
+                    <a class="lnms-btn {{ $class }}" role="button" href="{{ route('device.ports', ['device' => $device->device_id, 'filter' => $filter]) }}">
                         {{ $label }}: <span class="lnms-btn-badge">{{ $count }}</span>
                     </a>
                 @endforeach

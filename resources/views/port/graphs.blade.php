@@ -10,7 +10,7 @@
                 /** @var \App\Models\Port $port */
                 $graph_array = $graphTemplate;
                 $graph_array['id'] = $port->port_id;
-                $link = \LibreNMS\Util\Url::graphPageUrl($graph_array['type'], Arr::except($graph_array, ['height', 'width', 'legend', 'title']));
+                $link = route('graphs', Arr::except($graph_array, ['height', 'width', 'legend', 'title']));
                 $graphTag = \LibreNMS\Util\Url::lazyGraphTag($graph_array, 'tw:w-full tw:h-auto');
                 $portLinkOptions = ['port_id' => $port->port_id, 'params' => ['type' => $graph_array['type']]];
             @endphp

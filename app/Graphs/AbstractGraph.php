@@ -9,6 +9,7 @@ use App\Facades\DeviceCache;
 use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Port;
+use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -90,30 +91,46 @@ abstract class AbstractGraph implements GraphInterface
 
     public function render(): GraphImage
     {
-        $title = null;
-
-        try {
-            $this->checkRenderable();
-            $title = $this->params->visible('title') ? ($this->params->user_title ?? $this->getTitle()) : null;
-            $image = $this->draw();
-        } catch (GraphException $e) {
-            $e->graphTitle ??= $title;
-
-            throw $e;
-        } catch (Throwable $e) {
-            // drawing libraries and queries fail with their own exceptions, keep the details out of the image
-            report($e);
-
-            $error = new GraphException('Graph Error', 'Error', $e);
-            $error->graphTitle = $title;
-
-            throw $error;
-        }
+        $image = $this->attempt($this->draw(...));
 
         // the image is named after the title the user set
         return $this->params->user_title === null
             ? $image
             : new GraphImage($image->format, $this->params->user_title, $image->data);
+    }
+
+    /**
+     * Validates and authorizes before the callback, failures become graph exceptions with the title.
+     *
+     * @template T
+     *
+     * @param  Closure(): T  $callback
+     * @return T
+     *
+     * @throws GraphException
+     */
+    protected function attempt(Closure $callback): mixed
+    {
+        $title = null;
+
+        try {
+            $this->checkRenderable();
+            $title = $this->params->visible('title') ? ($this->params->user_title ?? $this->getTitle()) : null;
+
+            return $callback();
+        } catch (GraphException $e) {
+            $e->graphTitle ??= $title;
+
+            throw $e;
+        } catch (Throwable $e) {
+            // drawing libraries and queries fail with their own exceptions, keep the details out of the response
+            report($e);
+
+            $error = new GraphException(__('graph.errors.graph'), __('graph.errors.graph_short'), $e);
+            $error->graphTitle = $title;
+
+            throw $error;
+        }
     }
 
     /**

@@ -59,7 +59,7 @@ final class NeighboursTabTest extends TestCase
         $device = $this->device();
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'neighbours', 'vars' => 'selection=map']))
+            ->get(route('device.legacy', ['device' => $device, 'tab' => 'neighbours', 'vars' => 'selection=map']))
             ->assertRedirect(route('device.neighbours', ['device' => $device, 'selection' => 'map']));
     }
 

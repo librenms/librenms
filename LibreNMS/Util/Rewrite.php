@@ -88,29 +88,6 @@ class Rewrite
         return $rewrite_iftype[$type] ?? $type;
     }
 
-    public static function shortenIfType($type)
-    {
-        return str_ireplace(
-            [
-                'FastEthernet',
-                'TenGigabitEthernet',
-                'GigabitEthernet',
-                'Port-Channel',
-                'Ethernet',
-                'Bundle-Ether',
-            ],
-            [
-                'Fa',
-                'Te',
-                'Gi',
-                'Po',
-                'Eth',
-                'BE',
-            ],
-            $type
-        );
-    }
-
     public static function normalizeIfName($name)
     {
         $rewrite_ifname = [

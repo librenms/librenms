@@ -7,7 +7,7 @@
         <div x-data="{
             toggle(event, type) {
                 const enabled = event.target.checked;
-                axios.put(@js(route('device.edit.apps.update', [$device, '__type__'])).replace('__type__', type), {enabled})
+                axios.put(route('device.edit.apps.update', {device: @js($device->device_id), type}), {enabled})
                     .then((response) => toastr.success(response.data.message))
                     .catch((error) => {
                         event.target.checked = ! enabled;

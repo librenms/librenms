@@ -29,6 +29,16 @@ abstract class PortGraph extends AbstractSeriesGraph
         return $this->requestedPort() ?? throw new NoGraphData;
     }
 
+    /**
+     * The in and out fields, swapped when the graph is drawn from the other end of the link
+     *
+     * @return array{string, string}
+     */
+    protected function directions(string $in, string $out): array
+    {
+        return $this->params->inverse ? [$out, $in] : [$in, $out];
+    }
+
     public function getTitle(): string
     {
         $port = $this->port();

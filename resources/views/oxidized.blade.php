@@ -126,9 +126,6 @@
         return $('<div>').text(value == null ? '' : String(value)).html().replace(/"/g, '&quot;').replace(/'/g, '&#039;');
     }
 
-    const deviceUrl = @js(route('device', ['device' => '__id__']));
-    const configUrl = @js(route('device', ['device' => '__id__', 'tab' => 'config']));
-    const refreshUrl = @js(route('device.config.refresh', ['device' => '__id__']));
 
     $("#oxidized-nodes").bootgrid({
         rowCount: [50, 100, 250, -1],
@@ -142,7 +139,7 @@
         formatters: {
             hostname: function (column, row) {
                 return row.device_id
-                    ? '<a href="' + deviceUrl.replace('__id__', encodeURIComponent(row.device_id)) + '">' + escapeOxidizedHtml(row.hostname) + '</a>'
+                    ? '<a href="' + route('device.overview', {device: row.device_id}) + '">' + escapeOxidizedHtml(row.hostname) + '</a>'
                     : escapeOxidizedHtml(row.hostname);
             },
             actions: function (column, row) {
@@ -150,8 +147,8 @@
                     return '';
                 }
                 const id = encodeURIComponent(row.device_id);
-                return @can('config-backup.refresh') '<button type="button" class="btn btn-default btn-sm oxidized-refresh" data-url="' + refreshUrl.replace('__id__', id) + '" title="' + @js(__('Refetch config')) + '"><i class="fa fa-refresh"></i></button> ' + @endcan
-                    '<a href="' + configUrl.replace('__id__', id) + '" title="' + @js(__('View config')) + '"><i class="fa fa-align-justify fa-lg icon-theme"></i></a>';
+                return @can('config-backup.refresh') '<button type="button" class="btn btn-default btn-sm oxidized-refresh" data-url="' + route('device.config.refresh', {device: id}) + '" title="' + @js(__('Refetch config')) + '"><i class="fa fa-refresh"></i></button> ' + @endcan
+                    '<a href="' + route('device.config', {device: id}) + '" title="' + @js(__('View config')) + '"><i class="fa fa-align-justify fa-lg icon-theme"></i></a>';
             },
             status: function (column, row) {
                 const color = row.last_status === 'success' ? 'success' : 'danger';
