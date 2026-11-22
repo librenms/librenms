@@ -78,6 +78,8 @@ class Rrdtool implements RrdBackendInterface
             }
         } catch (RrdFileExistsException) {
             Log::debug("RRD[%g$rrd already exists%n]", ['color' => true]);
+        } catch (RrdNotFoundException $e) {
+            throw $this->remoteFallbackError($e, $rrd);
         }
     }
 
@@ -144,12 +146,7 @@ class Rrdtool implements RrdBackendInterface
         try {
             $output = $this->run('last', $rrd->relativePath());
         } catch (RrdNotFoundException $e) {
-            // RRDtool falls back to a local read if it cannot connect to the daemon.
-            if ($this->remote() && ! str_starts_with($e->getMessage(), 'rrdcached@')) {
-                throw new RrdCachedConnectionException('Unable to query rrdcached for ' . $rrd, previous: $e);
-            }
-
-            throw $e;
+            throw $this->remoteFallbackError($e, $rrd);
         }
 
         if (! ctype_digit($output)) {
@@ -157,6 +154,19 @@ class Rrdtool implements RrdBackendInterface
         }
 
         return (int) $output;
+    }
+
+    /**
+     * RRDtool falls back to local files if it cannot connect to the daemon,
+     * so a missing file that rrdcached didn't report means the daemon is unreachable.
+     */
+    private function remoteFallbackError(RrdNotFoundException $e, RrdPath $rrd): RrdException
+    {
+        if ($this->remote() && ! str_starts_with($e->getMessage(), 'rrdcached@')) {
+            return new RrdCachedConnectionException('Unable to reach rrdcached for ' . $rrd, previous: $e);
+        }
+
+        return $e;
     }
 
     /**

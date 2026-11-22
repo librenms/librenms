@@ -310,7 +310,7 @@ abstract class BackendContractTestCase extends TestCase
         $this->fail('rrdcached did not start: ' . $this->daemon->getErrorOutput());
     }
 
-    private function freePort(): int
+    protected function freePort(): int
     {
         $server = stream_socket_server('tcp://127.0.0.1:0');
         $port = (int) substr(strrchr((string) stream_socket_get_name($server, false), ':'), 1);

@@ -109,6 +109,32 @@ final class RrdStoreTest extends TestCase
         (new Rrd)->write('test', ['a' => 5], [], $meta);
     }
 
+    #[DataProvider('remoteProbeStages')]
+    public function testRrdcachedTransportErrorsSuspendWrites(bool $checkRename): void
+    {
+        $eventlog = Mockery::mock(Eventlog::class);
+        $eventlog->shouldReceive('_log')->once();
+        $this->app->instance(Eventlog::class, $eventlog);
+
+        $error = RrdException::parse('ERROR: request: socket error (32) while talking to rrdcached');
+        $meta = ['device' => $this->device];
+        if ($checkRename) {
+            LibrenmsConfig::set('rrdcached', 'rrdcached:42217');
+            LibrenmsConfig::set('rrd_dir', sys_get_temp_dir() . '/librenms-rrd-test-' . uniqid());
+            $meta['rrd_oldname'] = 'legacy';
+            $this->backend->shouldReceive('remote')->andReturnTrue();
+            $this->backend->shouldReceive('last')->times(3)->andThrow($error);
+            $this->backend->shouldReceive('update')->never();
+        } else {
+            $this->backend->shouldReceive('update')->times(3)->andThrow($error);
+        }
+
+        $rrd = new Rrd;
+        foreach (range(1, 4) as $ignored) {
+            $rrd->write('test', ['a' => 1], [], $meta); // the 4th write is skipped
+        }
+    }
+
     public function testOnlyConsecutiveStoreErrorsDisable(): void
     {
         $eventlog = Mockery::mock(Eventlog::class);
