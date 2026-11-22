@@ -52,7 +52,7 @@
      *
      *   [
      *     'key'         => string,
-     *     'type'        => string,   // select|password|number|text
+     *     'type'        => string,   // select|password|number|text|checkbox
      *     'label'       => string,
      *     'options'     => array,    // [value => label, ...]
      *     'visible_if'  => string|null,   // Alpine x-show expression
@@ -202,6 +202,15 @@
                     </span>
                 </div>
             @endif
+
+        @elseif($type === 'checkbox')
+            <div class="tw:flex tw:h-9 tw:items-center">
+                <x-toggle :name="$name"
+                          :model="$modelPrefix ? $modelPrefix . '[' . json_encode($key) . ']' : null"
+                          :id="$id"
+                          :checked="filter_var($value, FILTER_VALIDATE_BOOLEAN)"
+                          :required="$field['required']" />
+            </div>
 
         @elseif($type === 'number')
             <input type="number"

@@ -62,6 +62,7 @@ final class UnixAgentPollingMethod extends PollingMethod
         return new UnixAgentConfig(
             port: $settings['port'],
             timeout: $settings['timeout'],
+            useLocalhost: $settings['use_localhost'] ?? false,
         );
     }
 
@@ -89,9 +90,10 @@ final class UnixAgentPollingMethod extends PollingMethod
         }
 
         $start = microtime(true);
+        $hostname = $config->useLocalhost ? '127.0.0.1' : $device->pollerTarget();
 
         try {
-            $socket = @fsockopen(Rewrite::addIpv6Brackets($device->pollerTarget()), $config->port, $errno, $errstr, $config->timeout);
+            $socket = @fsockopen(Rewrite::addIpv6Brackets($hostname), $config->port, $errno, $errstr, $config->timeout);
         } catch (\ErrorException $e) {
             return ProbeResult::failure($stats, $e->getMessage()); // usually connection timed out
         }
