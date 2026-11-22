@@ -61,18 +61,26 @@ readonly class GraphViewOptions
         $width = is_numeric($value['width'] ?? null) ? (float) $value['width'] : null;
         $sized = $height !== null && $height >= self::MIN_HEIGHT && $height <= self::MAX_HEIGHT;
 
-        $hiddenPercentiles = is_array($value['hidden_percentiles'] ?? null)
-            ? array_values(array_unique(array_map(floatval(...), array_filter($value['hidden_percentiles'], fn ($percentile) => is_numeric($percentile) && $percentile >= 0 && $percentile <= 100))))
-            : [];
-
         return new self(
             range: is_bool($value['range'] ?? null) ? $value['range'] : true,
             line_style: in_array($value['line_style'] ?? null, self::LINE_STYLES, true) ? $value['line_style'] : 'stepped',
             columns: $columns,
-            hidden_percentiles: $hiddenPercentiles,
+            hidden_percentiles: self::percentiles($value['hidden_percentiles'] ?? null),
             width: $sized && $width !== null ? max(self::MIN_WIDTH, min($width, 1.0)) : null,
             height: $sized ? $height : null,
         );
+    }
+
+    /**
+     * The percentiles of a stored list, those that are not percentiles are left out
+     *
+     * @return list<float>
+     */
+    private static function percentiles(mixed $value): array
+    {
+        $percentiles = array_filter(is_array($value) ? $value : [], fn ($percentile) => is_numeric($percentile) && $percentile >= 0 && $percentile <= 100);
+
+        return array_values(array_unique(array_map(floatval(...), $percentiles)));
     }
 
     /**

@@ -16,14 +16,13 @@
     stacking: all, none or some stacked, null for one series, scale: fit, zero or limits, percentileLines: draws percentile lines}.
 --}}
 @php
-    $columns = collect(App\Data\Graphing\GraphViewOptions::COLUMNS)->mapWithKeys(fn (string $column) => [$column => __("graph.legend.$column")]);
-
+    $columnLabels = collect(App\Data\Graphing\GraphViewOptions::COLUMNS)->mapWithKeys(fn (string $column) => [$column => __("graph.legend.$column")]);
     $chart = [
         'src' => $src,
         'range' => $range,
         'options' => [...get_object_vars($options), ...$view],
         'columns' => App\Data\Graphing\GraphViewOptions::COLUMNS,
-        'columnLabels' => $columns,
+        'columnLabels' => $columnLabels,
         // the header of a percentile column of the graph, such as 25th
         'percentileLabel' => __('graph.legend.percentile', ['percentile' => '%p']),
         'minWidth' => App\Data\Graphing\GraphViewOptions::MIN_WIDTH,
@@ -105,10 +104,10 @@
                              :style="columnsMenuStyle"
                              class="tw:m-0 tw:inset-auto tw:px-0 tw:py-1 tw:rounded-md tw:border tw:border-gray-300 tw:dark:border-dark-gray-100 tw:bg-white tw:dark:bg-dark-gray-400 tw:shadow-lg tw:text-left tw:font-normal tw:text-sm tw:text-gray-700 tw:dark:text-gray-200">
                             <div class="tw:px-3 tw:pt-1 tw:pb-1.5 tw:text-xs tw:font-semibold tw:uppercase tw:tracking-wider tw:text-gray-500 tw:dark:text-dark-white-400">{{ __('graph.options.columns') }}</div>
-                            <template x-for="column in columnChoices()" :key="column">
-                                <button type="button" role="menuitemcheckbox" :aria-checked="columnShown(column)" x-on:click="toggleColumn(column)"
+                            <template x-for="column in menuColumns()" :key="column">
+                                <button type="button" role="menuitemcheckbox" :aria-checked="isColumnShown(column)" x-on:click="toggleColumn(column)"
                                         class="tw:flex tw:w-full tw:items-center tw:gap-2 tw:px-3 tw:py-1.5 tw:border-0 tw:bg-transparent tw:hover:bg-gray-100 tw:dark:hover:bg-dark-gray-300 tw:whitespace-nowrap">
-                                    <i class="fa-solid fa-check tw:w-4" :class="! columnShown(column) && 'tw:invisible'" aria-hidden="true"></i>
+                                    <i class="fa-solid fa-check tw:w-4" :class="! isColumnShown(column) && 'tw:invisible'" aria-hidden="true"></i>
                                     <span x-text="columnLabel(column)"></span>
                                 </button>
                             </template>

@@ -20,8 +20,13 @@ const TREND_DASH = [2, 4];
 const THRESHOLD_DASH = [8, 4];
 const PERCENTILE_DASH = [3, 3];
 const MAX_TREND_POINTS = 1000; // past the data, to the end of the view
+// what drawing multiplies the values of a series by
+function drawFactor(series) {
+    return series.drawScale * (series.invert ? -1 : 1);
+}
+
 function drawnValues(series, values) {
-    const factor = series.drawScale * (series.invert ? -1 : 1);
+    const factor = drawFactor(series);
 
     return factor === 1 ? values : values.map((value) => (value === null ? null : value * factor));
 }
@@ -186,7 +191,7 @@ export function createPlotData(graph, { hidden, draw, thresholds, comparing }) {
     const percentileSeries = draw.percentile_lines === false ? [] : graph.series
         .filter((item) => item.percentileColor && ! hidden.has(item.key))
         .map((item) => restyled(item, draw));
-    const percentiles = (graph.percentiles ?? []).filter((percentile) => ! (draw.hidden_percentiles ?? []).includes(percentile));
+    const percentiles = graph.percentiles.filter((percentile) => ! draw.hidden_percentiles.includes(percentile));
     const layers = layersFor(visible, percentileSeries, percentiles, thresholds, draw, comparing);
     const stackedKeys = visible.filter((item) => item.stacked).map((item) => item.key);
 
@@ -255,7 +260,7 @@ export function createPlotData(graph, { hidden, draw, thresholds, comparing }) {
                 const item = now.series[layer.percentile.key];
                 const value = item === undefined ? null : percentileOf(sortedAverages(item, start, end), layer.percentile.percentile);
 
-                return value === null ? empty : times.map(() => drawnValues(item, [value])[0]);
+                return value === null ? empty : times.map(() => value * drawFactor(item));
             }
             const values = layer.values(now, then);
             if (values === null) {

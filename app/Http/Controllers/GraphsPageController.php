@@ -73,7 +73,7 @@ class GraphsPageController extends Controller
                 'view' => [
                     'compare' => self::COMPARE[$request->input('previous')] ?? null,
                     'trend' => $request->boolean('trend'),
-                    'percentile_lines' => $request->input('percentile_lines') !== '0',
+                    'percentile_lines' => $request->boolean('percentile_lines', true),
                 ],
                 'fileName' => Str::slug(str_replace('.', ' ', "$entityTitle $fullType")) ?: 'graph',
                 'dataUrl' => $dataUrl,

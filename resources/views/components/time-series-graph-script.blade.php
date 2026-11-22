@@ -385,9 +385,9 @@
                     const [start, end] = shownPoints(graph.timestamps, shown());
 
                     this.thresholds = graph.thresholds;
-                    this.percentiles = graph.percentiles ?? [];
-                    // the 95th is a column the viewer can always show
-                    const percentiles = [...new Set([95, ...this.percentiles])];
+                    this.percentiles = graph.percentiles;
+                    // every percentile column the viewer can show
+                    const percentiles = this.menuColumns().map(columnPercentile).filter((percentile) => percentile !== null);
                     this.legend = graph.series.map((series) => {
                         const format = (value) => formatValue(value, series.unit, graph.axis.base);
                         const summary = summarize(series, start, end, percentiles);
@@ -397,26 +397,23 @@
                             label: series.label,
                             color: series.color,
                             toggleable: drawnKeys.length > 1 && ! series.legendOnly,
-                            now: format(summary.now),
-                            min: format(summary.min),
-                            max: format(summary.max),
-                            avg: format(summary.avg),
-                            ...Object.fromEntries(percentiles.map((percentile) => [`p${percentile}`, format(summary[`p${percentile}`])])),
+                            ...Object.fromEntries(Object.entries(summary).map(([column, value]) => [column, format(value)])),
                             values: summary, // to sort by
                         };
                     });
                 },
 
-                columnChoices() {
+                // the columns the viewer can show or hide
+                menuColumns() {
                     return columnChoices(columns, this.percentiles);
                 },
 
-                columnShown(column) {
+                isColumnShown(column) {
                     return columnShown(column, this.options.columns, this.percentiles, this.options.hidden_percentiles);
                 },
 
                 shownColumns() {
-                    return this.columnChoices().filter((column) => this.columnShown(column));
+                    return this.menuColumns().filter((column) => this.isColumnShown(column));
                 },
 
                 // the header of a column, a percentile such as 25th
@@ -447,8 +444,8 @@
                 // A percentile of the graph is hidden or shown again, other columns are chosen keeping their order. Sorting by a hidden one stops.
                 toggleColumn(column) {
                     const percentile = columnPercentile(column);
-                    const hidden = this.options.hidden_percentiles;
                     if (percentile !== null && this.percentiles.includes(percentile)) {
+                        const hidden = this.options.hidden_percentiles;
                         // its line goes with it
                         this.setOptions({ hidden_percentiles: hidden.includes(percentile) ? hidden.filter((other) => other !== percentile) : [...hidden, percentile] });
                     } else {
@@ -457,7 +454,7 @@
                             : columns.filter((other) => other === column || this.options.columns.includes(other));
                     }
 
-                    if (this.sort !== null && this.sort.column !== 'label' && ! this.columnShown(this.sort.column)) {
+                    if (this.sort !== null && this.sort.column !== 'label' && ! this.isColumnShown(this.sort.column)) {
                         this.sort = null;
                     }
                     this.$dispatch('graph-columns-changed', { columns: this.options.columns, hidden_percentiles: this.options.hidden_percentiles });
