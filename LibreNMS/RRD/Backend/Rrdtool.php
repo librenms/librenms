@@ -162,7 +162,7 @@ class Rrdtool implements RrdBackendInterface
      */
     private function remoteFallbackError(RrdNotFoundException $e, RrdPath $rrd): RrdException
     {
-        if ($this->remote() && ! str_starts_with($e->getMessage(), 'rrdcached@')) {
+        if ($this->remote() && ! preg_match('/^rrdcached[@:]/', $e->getMessage())) {
             return new RrdCachedConnectionException('Unable to reach rrdcached for ' . $rrd, previous: $e);
         }
 
