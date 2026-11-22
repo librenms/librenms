@@ -42,10 +42,12 @@ use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Tests\InMemoryDbTestCase;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class UnixAgentTest extends InMemoryDbTestCase
 {
-    public function testCheckUsesThePollingMethodPort(): void
+    #[DataProvider('agentAddressProvider')]
+    public function testCheckConnectsToTheConfiguredAddressAndPort(string $target, array $settings): void
     {
         $server = stream_socket_server('tcp://127.0.0.1:0');
         $this->assertNotFalse($server);
@@ -54,11 +56,11 @@ final class UnixAgentTest extends InMemoryDbTestCase
         LibrenmsConfig::set('unix-agent.port', 1); // nothing listens here
         LibrenmsConfig::set('unix-agent.read-timeout', 1);
 
-        $device = new Device(['hostname' => '127.0.0.1']);
+        $device = new Device(['hostname' => 'example.test', 'overwrite_ip' => $target]);
         $device->setRelation('pollingMethods', collect([new DevicePollingMethod([
             'method_type' => PollingMethodType::UnixAgent,
             'enabled' => true,
-            'settings' => ['port' => $port, 'timeout' => 2],
+            'settings' => ['port' => $port, 'timeout' => 2] + $settings,
         ])]));
 
         $log = Log::spy();
@@ -71,6 +73,17 @@ final class UnixAgentTest extends InMemoryDbTestCase
         $log->shouldHaveReceived('error')->with("Connection to UNIX agent timed out during fetch on port $port")->once();
 
         fclose($server);
+    }
+
+    /**
+     * @return array<string, array{string, array{use_localhost?: bool}}>
+     */
+    public static function agentAddressProvider(): array
+    {
+        return [
+            'device polling address' => ['127.0.0.1', []],
+            'local agent override' => ['127.0.0.2', ['use_localhost' => true]],
+        ];
     }
 
     public function testParseKeysMemcachedAndDrbdByInstance(): void
