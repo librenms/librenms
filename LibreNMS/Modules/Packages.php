@@ -42,30 +42,15 @@ class Packages implements Module, RemovesMethodData
 
     public function shouldDiscover(OS $os): bool
     {
-        return false; // the package list is kept fresh while polling
-    }
-
-    public function discover(OS $os): void
-    {
-        // no discovery
-    }
-
-    /**
-     * The package list is collected while polling, so run when one of the methods is available.
-     */
-    public function shouldPoll(OS $os): bool
-    {
         return $os->getMethodResults()->anyAvailable($this->enabledMethods($os->getDevice()));
     }
 
     /**
      * Packages come from one method: the most preferred enabled method that has packages for this device.
-     * Its packages replace those of other methods, so a device polled by several methods has no duplicates.
-     * Methods after one that is down are not tried, so packages do not move to another method while it is down.
-     * A timed-out fetch is incomplete, so it is not replaced by the next method's packages; when no method has
-     * packages the existing ones are kept.
+     * Its packages replace those of other methods, so a device using several methods has no duplicates.
+     * If a method is down or times out, keep the existing inventory.
      */
-    public function poll(OS $os, DataStorageInterface $datastore): void
+    public function discover(OS $os): void
     {
         $device = $os->getDevice();
 
@@ -85,12 +70,22 @@ class Packages implements Module, RemovesMethodData
             }
 
             // a timed-out fetch is incomplete, so do not fall back to the next method — keep the existing inventory
-            if ((bool) $os->getMethodResults()->result($type)?->stat('timed_out')) {
+            if ($os->getMethodResults()->result($type)?->stat('timed_out')) {
                 break;
             }
         }
 
         Log::info('No packages found, keeping existing packages');
+    }
+
+    public function shouldPoll(OS $os): bool
+    {
+        return $this->shouldDiscover($os);
+    }
+
+    public function poll(OS $os, DataStorageInterface $datastore): void
+    {
+        $this->discover($os);
     }
 
     /**
@@ -121,10 +116,6 @@ class Packages implements Module, RemovesMethodData
      */
     public function dump(Device $device, string $type): ?array
     {
-        if ($type === 'discovery') {
-            return null;
-        }
-
         return [
             'packages' => $device->packages()->orderBy('name')->orderBy('version')->orderBy('build')
                 ->get()->map->makeHidden(['pkg_id', 'device_id', 'polling_method']),

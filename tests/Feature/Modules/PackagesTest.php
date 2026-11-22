@@ -6,19 +6,21 @@ use App\Models\Package;
 use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\ProcessType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Modules\Packages;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Tests\InMemoryDbTestCase;
 use LibreNMS\Tests\Traits\FakesPollingMethods;
+use LibreNMS\Util\ModuleList;
 use Mockery;
 
 final class PackagesTest extends InMemoryDbTestCase
 {
     use FakesPollingMethods;
 
-    public function testPollsHostResourcesInstalledPackages(): void
+    public function testDiscoversHostResourcesInstalledPackages(): void
     {
         $os = $this->makeOs([PollingMethodType::Snmp]);
         $this->fakeSnmpInstalledPackages([
@@ -28,9 +30,8 @@ final class PackagesTest extends InMemoryDbTestCase
         ]);
 
         $module = new Packages;
-        $this->assertFalse($module->shouldDiscover($os));
-        $this->assertTrue($module->shouldPoll($os));
-        $module->poll($os, $this->datastore());
+        $this->assertTrue($module->shouldDiscover($os));
+        $module->discover($os);
 
         $packages = Package::where('device_id', $os->getDeviceId())->orderBy('name')->get();
         $this->assertSame(['python2.7-minimal', 'python3-apport', 'xfonts-utils'], $packages->pluck('name')->all());
@@ -246,7 +247,7 @@ final class PackagesTest extends InMemoryDbTestCase
         $this->assertSame(['bash', 'vim'], $packages->pluck('name')->all());
     }
 
-    public function testPollsPackagesFromTheAgentOutput(): void
+    public function testDiscoversPackagesFromTheAgentOutput(): void
     {
         $os = $this->makeOs([PollingMethodType::UnixAgent]);
         $this->fakeMethod(UnixAgentPollingMethod::class, true, [
@@ -255,8 +256,8 @@ final class PackagesTest extends InMemoryDbTestCase
         ]);
 
         $module = new Packages;
-        $this->assertTrue($module->shouldPoll($os));
-        $module->poll($os, $this->datastore());
+        $this->assertTrue($module->shouldDiscover($os));
+        $module->discover($os);
 
         $packages = Package::where('device_id', $os->getDeviceId())->orderBy('name')->get();
         $this->assertSame(['bash', 'kernel'], $packages->pluck('name')->all());
@@ -267,6 +268,18 @@ final class PackagesTest extends InMemoryDbTestCase
         $this->assertSame('rpm', $bash->manager);
         $this->assertSame(12345, (int) $bash->size);
         $this->assertSame(PollingMethodType::UnixAgent, $bash->polling_method);
+    }
+
+    public function testUnixAgentPackagesAreDiscoveredByDefaultAndPollingRequiresOptIn(): void
+    {
+        $device = $this->makeOs([PollingMethodType::UnixAgent])->getDevice();
+        $modules = new ModuleList;
+
+        $this->assertTrue($modules->modulesWithStatus(ProcessType::Discovery, $device)['packages']->isEnabled());
+        $this->assertFalse($modules->modulesWithStatus(ProcessType::Poller, $device)['packages']->isEnabled());
+
+        $device->setAttrib('poll_packages', true);
+        $this->assertTrue($modules->modulesWithStatus(ProcessType::Poller, $device)['packages']->isEnabled());
     }
 
     public function testAgentPackagesReplaceSnmpPackages(): void
