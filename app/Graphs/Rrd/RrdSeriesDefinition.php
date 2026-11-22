@@ -28,11 +28,13 @@ class RrdSeriesDefinition
         'max' => ['suffix' => 'max', 'cf' => 'MAX'],
         'avg' => ['suffix' => '', 'cf' => 'AVERAGE'],
     ];
-    // a value is 5 digits and an SI prefix
-    private const int LEGEND_VALUE_WIDTH = 6;
-    // rrdtool separates legend items with 2 spaces
-    private const int LEGEND_COLUMN_GAP = 2;
-    // series labels start further right than the heading because of the color box
+    // a sign, three digits and a point, then the decimals: SI prefixes keep values between -999.99 and 999.99
+    private const int LEGEND_NUMBER_WIDTH = 5 + self::PRECISION;
+    // the number and its SI prefix, every value is as wide so the columns line up
+    private const int LEGEND_VALUE_WIDTH = self::LEGEND_NUMBER_WIDTH + 1;
+    // a space before each legend value, the values are glued so their columns are counted in characters
+    private const int LEGEND_COLUMN_GAP = 1;
+    // series labels start further right than the legend title because of the color box
     private const int LEGEND_COLOR_BOX_WIDTH = 2;
     // graphs this short or shorter have no room for rolling average and percentile lines
     private const int EXTRA_LINES_MIN_HEIGHT = 25;
@@ -46,6 +48,9 @@ class RrdSeriesDefinition
     /** @var list<string> the percentiles of legend rows and lines, defined after all the values they are of */
     private array $percentileDefs = [];
 
+    /** the widest unit, the units of all legend values are padded to it */
+    private readonly int $unitWidth;
+
     /**
      * @param  array<string, DataSeries|SeriesSum>  $series
      */
@@ -54,6 +59,7 @@ class RrdSeriesDefinition
         private readonly GraphOptions $options,
         private readonly RrdFileResolver $rrdFiles,
     ) {
+        $this->unitWidth = max([0, ...array_map(fn (DataSeries|SeriesSum $series) => mb_strlen($series->unit), $series)]);
     }
 
     /**
@@ -114,7 +120,7 @@ class RrdSeriesDefinition
             $style = $series->style;
             $drawScale = $style->stackAverage ? $style->drawScale / $averaged : $style->drawScale;
             $factor = $style->invert && ! $overlaid ? -$drawScale : $drawScale;
-            $label = Rrd::fixedSafeDescr($series->description, self::LABEL_WIDTH);
+            $label = self::legendLabel($series->description);
             $summarized = $traffic !== null && $this->options->traffic?->summarizes($key);
 
             foreach (['' => 'AVERAGE', 'min' => 'MIN', 'max' => 'MAX'] as $suffix => $cf) {
@@ -225,7 +231,7 @@ class RrdSeriesDefinition
         $defs = array_values(array_unique([...$defs, ...($traffic?->definitions() ?? []), ...$this->percentileDefs]));
 
         // fills go below all lines, so they do not hide lines of other series
-        return [$this->legendHeader(), ...$defs, ...$margins, ...$maxFills, ...$fills, ...$drawing, ...($traffic?->drawing() ?? [])];
+        return [...$this->legendHeader(), ...$defs, ...$margins, ...$maxFills, ...$fills, ...$drawing, ...($traffic?->drawing() ?? [])];
     }
 
     /**
@@ -244,7 +250,7 @@ class RrdSeriesDefinition
             array_push($defs, ...$this->periodValueDefs($key, $average->name, '', 'AVERAGE', ":step=$average->step"));
 
             $lineId = $this->drawnValue($averageId, $factor, $defs);
-            $drawing[] = "LINE1.25:$lineId#$average->color:" . Rrd::fixedSafeDescr($average->label, self::LABEL_WIDTH);
+            $drawing[] = "LINE1.25:$lineId#$average->color:" . self::legendLabel($average->label);
             array_push($drawing, ...$this->legendValues($averageId, $this->series[$key]->unit, sameValue: true));
         }
 
@@ -451,58 +457,64 @@ class RrdSeriesDefinition
     }
 
     /**
-     * The legend title and a label above each column of values, aligned with the values
+     * The legend title as wide as the color box and label of a row, then a heading above each column of values, aligned with the values.
+     * Like a row, the title is followed by the space rrdtool leaves between legend items.
+     *
+     * @return list<string>
      */
-    private function legendHeader(): string
+    private function legendHeader(): array
     {
-        $unitWidth = max([0, ...array_map(fn (DataSeries|SeriesSum $series) => strlen($series->unit), $this->series)]);
-        $columnWidth = self::LEGEND_VALUE_WIDTH + $unitWidth + self::LEGEND_COLUMN_GAP;
+        $columnWidth = self::LEGEND_COLUMN_GAP + self::LEGEND_VALUE_WIDTH + $this->unitWidth;
+        $headings = [
+            ...array_map(fn (string $column) => __("graph.legend.$column"), array_keys(self::LEGEND_COLUMNS)),
+            ...array_map(fn (int|float $percentile) => __('graph.legend.percentile', ['percentile' => $percentile]), $this->options->percentiles),
+        ];
 
-        $header = Rrd::fixedSafeDescr($this->options->legendTitle, self::LABEL_WIDTH);
-        $width = $columnWidth + self::LEGEND_COLOR_BOX_WIDTH;
-
-        foreach (array_keys(self::LEGEND_COLUMNS) as $column) {
-            $header .= mb_str_pad(__("graph.legend.$column"), $width, ' ', STR_PAD_LEFT);
-            $width = $columnWidth;
-        }
-
-        foreach ($this->options->percentiles as $percentile) {
-            $header .= mb_str_pad(__('graph.legend.percentile', ['percentile' => $percentile]), $columnWidth, ' ', STR_PAD_LEFT);
-        }
-
-        return "COMMENT:$header\\l";
+        return [
+            'COMMENT:' . Rrd::fixedSafeDescr($this->options->legendTitle, self::LEGEND_COLOR_BOX_WIDTH + self::LABEL_WIDTH),
+            'COMMENT:' . implode('', array_map(fn (string $heading) => mb_str_pad($heading, $columnWidth, ' ', STR_PAD_LEFT), $headings)) . '\\l',
+        ];
     }
 
     /**
-     * The legend values of a series, a column for each percentile of the graph after Now, Min, Max and Avg, ending the legend line
+     * The label of a legend row, as wide as the others. rrdtool leaves the same space after every label, so the values line up.
+     */
+    public static function legendLabel(string $text): string
+    {
+        return Rrd::fixedSafeDescr($text, self::LABEL_WIDTH);
+    }
+
+    /**
+     * The legend values of a series, a column for each percentile of the graph after Now, Min, Max and Avg, ending the legend line.
+     * The values are glued and spaced by characters, rrdtool would space them by a width that does not line up with the headings.
      *
      * @param  bool  $sameValue  every column summarizes $id, instead of the min and max columns showing {$id}min and {$id}max
      * @return list<string>
      */
     private function legendValues(string $id, string $unit, bool $sameValue = false): array
     {
-        $format = $this->valueFormat($unit);
         $values = [];
-
         foreach (self::LEGEND_COLUMNS as $column) {
-            $values[] = 'GPRINT:' . $id . ($sameValue ? '' : $column['suffix']) . ":{$column['cf']}:$format";
+            $values[] = $id . ($sameValue ? '' : $column['suffix']) . ":{$column['cf']}";
         }
-
         foreach ($this->options->percentiles as $index => $percentile) {
-            $values[] = 'GPRINT:' . $this->percentileDef($id, $index, $percentile) . ":$format";
+            $values[] = $this->percentileDef($id, $index, $percentile);
         }
 
-        $values[array_key_last($values)] .= '\\n';
+        $format = str_repeat(' ', self::LEGEND_COLUMN_GAP) . $this->valueFormat($unit);
+        $last = array_key_last($values);
 
-        return $values;
+        return array_map(fn (string $value, int $index) => "GPRINT:$value:$format" . ($index === $last ? '\\n' : '\\g'), $values, array_keys($values));
     }
 
     /**
-     * The format of a legend value, with its unit escaped
+     * The format of a legend value, as wide as the others. A shorter unit is made up for in front, rrdtool removes trailing spaces of glued text.
      */
     private function valueFormat(string $unit): string
     {
+        $padding = str_repeat(' ', $this->unitWidth - mb_strlen($unit));
+
         // the space takes the place of the prefix, so the columns line up either way
-        return '%5.' . self::PRECISION . 'lf' . ($this->options->unitsExponent === 0 ? ' ' : '%s') . str_replace(['%', ':'], ['%%', '\\:'], $unit);
+        return $padding . '%' . self::LEGEND_NUMBER_WIDTH . '.' . self::PRECISION . 'lf' . ($this->options->unitsExponent === 0 ? ' ' : '%s') . str_replace(['%', ':'], ['%%', '\\:'], $unit);
     }
 }

@@ -63,7 +63,7 @@ class RrdTrafficDefinition
             }
             $previousColor = $this->theme->previous($series->style->invert);
             $this->defs[] = "CDEF:{$previous}drawn=$previous,$factor,*";
-            $this->drawing[] = "LINE1.25:{$previous}drawn#$previousColor:" . Rrd::fixedSafeDescr(__('graph.legend.previous', ['series' => $series->description]), 16);
+            $this->drawing[] = "LINE1.25:{$previous}drawn#$previousColor:" . RrdSeriesDefinition::legendLabel(__('graph.legend.previous', ['series' => $series->description]));
             array_push($this->drawing, ...($this->legendValues)($previous, $series->unit));
             if ($series->style->percentileLines) {
                 array_push($this->drawing, ...($this->percentileLines)($previous, $drawFactor, $previousColor));

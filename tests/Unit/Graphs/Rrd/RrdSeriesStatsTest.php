@@ -37,7 +37,8 @@ class RrdSeriesStatsTest extends TestCase
     public function test_percentiles_are_legend_columns_and_dashed_lines(): void
     {
         $this->assertSame([
-            "COMMENT:Offset                   Now      Min      Max      Avg     25th     50th     75th\l",
+            'COMMENT:Offset             ',
+            "COMMENT:       Now       Min       Max       Avg      25th      50th      75th\l",
             'DEF:ds0=host/test.rrd:offset:AVERAGE',
             'DEF:ds0min=host/test.rrd:offset:MIN',
             'DEF:ds0max=host/test.rrd:offset:MAX',
@@ -50,24 +51,24 @@ class RrdSeriesStatsTest extends TestCase
             'VDEF:ds0hourlyp2=ds0hourly,75,PERCENTNAN',
             'AREA:ds0#00000020',
             'LINE1.25:ds0#000000:Offset           ',
-            'GPRINT:ds0:LAST:%5.2lf%ss',
-            'GPRINT:ds0min:MIN:%5.2lf%ss',
-            'GPRINT:ds0max:MAX:%5.2lf%ss',
-            'GPRINT:ds0:AVERAGE:%5.2lf%ss',
-            'GPRINT:ds0p0:%5.2lf%ss',
-            'GPRINT:ds0p1:%5.2lf%ss',
-            'GPRINT:ds0p2:%5.2lf%ss\n',
+            'GPRINT:ds0:LAST: %7.2lf%ss\g',
+            'GPRINT:ds0min:MIN: %7.2lf%ss\g',
+            'GPRINT:ds0max:MAX: %7.2lf%ss\g',
+            'GPRINT:ds0:AVERAGE: %7.2lf%ss\g',
+            'GPRINT:ds0p0: %7.2lf%ss\g',
+            'GPRINT:ds0p1: %7.2lf%ss\g',
+            'GPRINT:ds0p2: %7.2lf%ss\n',
             'HRULE:ds0p0#000000::dashes',
             'HRULE:ds0p1#000000::dashes',
             'HRULE:ds0p2#000000::dashes',
             'LINE1.25:ds0hourly#000001:1 hour avg       ',
-            'GPRINT:ds0hourly:LAST:%5.2lf%ss',
-            'GPRINT:ds0hourly:MIN:%5.2lf%ss',
-            'GPRINT:ds0hourly:MAX:%5.2lf%ss',
-            'GPRINT:ds0hourly:AVERAGE:%5.2lf%ss',
-            'GPRINT:ds0hourlyp0:%5.2lf%ss',
-            'GPRINT:ds0hourlyp1:%5.2lf%ss',
-            'GPRINT:ds0hourlyp2:%5.2lf%ss\n',
+            'GPRINT:ds0hourly:LAST: %7.2lf%ss\g',
+            'GPRINT:ds0hourly:MIN: %7.2lf%ss\g',
+            'GPRINT:ds0hourly:MAX: %7.2lf%ss\g',
+            'GPRINT:ds0hourly:AVERAGE: %7.2lf%ss\g',
+            'GPRINT:ds0hourlyp0: %7.2lf%ss\g',
+            'GPRINT:ds0hourlyp1: %7.2lf%ss\g',
+            'GPRINT:ds0hourlyp2: %7.2lf%ss\n',
         ], $this->build(['offset' => new DataSeries($this->metric, 'offset', 'Offset', 's', style: $this->stats(fill: true))], legendTitle: 'Offset'));
     }
 
@@ -78,8 +79,8 @@ class RrdSeriesStatsTest extends TestCase
             'b' => new DataSeries($this->metric, 'b', 'B', style: new SeriesStyle(percentileLines: true)),
         ], percentiles: [95]);
 
-        $this->assertContains('GPRINT:ds0p0:%5.2lf%s\n', $definition);
-        $this->assertContains('GPRINT:ds1p0:%5.2lf%s\n', $definition);
+        $this->assertContains('GPRINT:ds0p0: %7.2lf%s\n', $definition);
+        $this->assertContains('GPRINT:ds1p0: %7.2lf%s\n', $definition);
         $this->assertSame(['HRULE:ds1p0#000001::dashes'], array_values(preg_grep('/^HRULE/', $definition)));
     }
 
@@ -103,8 +104,8 @@ class RrdSeriesStatsTest extends TestCase
 
     public function test_units_are_escaped_in_the_percentile_columns(): void
     {
-        $this->assertContains('GPRINT:ds0p2:%5.2lf%s%%\n', $this->build(['a' => new DataSeries($this->metric, 'a', 'A', '%', style: $this->stats())]));
-        $this->assertContains('GPRINT:ds0p2:%5.2lf%sa\:b\n', $this->build(['a' => new DataSeries($this->metric, 'a', 'A', 'a:b', style: $this->stats())]));
+        $this->assertContains('GPRINT:ds0p2: %7.2lf%s%%\n', $this->build(['a' => new DataSeries($this->metric, 'a', 'A', '%', style: $this->stats())]));
+        $this->assertContains('GPRINT:ds0p2: %7.2lf%sa\:b\n', $this->build(['a' => new DataSeries($this->metric, 'a', 'A', 'a:b', style: $this->stats())]));
     }
 
     public function test_fractional_percentiles_get_an_indexed_name(): void
@@ -112,7 +113,7 @@ class RrdSeriesStatsTest extends TestCase
         $definition = $this->build($this->series(), percentiles: [99.9]);
 
         $this->assertContains('VDEF:ds0p0=ds0,99.9,PERCENTNAN', $definition);
-        $this->assertStringContainsString('99.9th', $definition[0]);
+        $this->assertStringContainsString('99.9th', $definition[1]);
     }
 
     public function test_drawn_lines_follow_invert_and_draw_scale(): void
@@ -125,7 +126,7 @@ class RrdSeriesStatsTest extends TestCase
         $this->assertContains('VDEF:ds0p0line=ds0p0drawn,FIRST', $definition);
         $this->assertContains('HRULE:ds0p0line#000000::dashes', $definition);
         // the legend shows the value of the series
-        $this->assertContains('GPRINT:ds0p0:%5.2lf%s\n', $definition);
+        $this->assertContains('GPRINT:ds0p0: %7.2lf%s\n', $definition);
     }
 
     public function test_legend_only_series_draw_percentiles_in_the_percentile_color(): void
@@ -143,7 +144,7 @@ class RrdSeriesStatsTest extends TestCase
         $definition = $this->build($this->series(), height: 25);
 
         $this->assertEmpty(preg_grep('/hourly|HRULE/', $definition));
-        $this->assertContains('GPRINT:ds0p0:%5.2lf%s', $definition);
+        $this->assertContains('GPRINT:ds0p0: %7.2lf%s\g', $definition);
         $this->assertNotEmpty(preg_grep('/hourly/', $this->build($this->series(), height: 26)));
     }
 

@@ -120,7 +120,7 @@ class BitsGraphTest extends TestCase
         $this->assertStringContainsString("'CDEF:ds6=ds4,ds5,ADDNAN'", $command);
         $this->assertStringContainsString("'HRULE:0#00000000:Total In         '", $command);
         // every row has the 95th, only the totals of in and out draw it
-        $this->assertStringContainsString("'GPRINT:ds0p0:%5.2lf%sbps\\n'", $command);
+        $this->assertStringContainsString("'GPRINT:ds0p0: %7.2lf%sbps\\n'", $command);
         $this->assertStringContainsString("'VDEF:ds4p0=ds4,95,PERCENTNAN'", $command);
         $this->assertStringContainsString("'HRULE:ds4p0#AA0000::dashes'", $command);
         $this->assertStringContainsString("'HRULE:ds5p0line#AA0000::dashes'", $command);

@@ -37,7 +37,7 @@ class UptimeAndPingGraphTest extends TestCase
         $this->assertStringContainsString('DEF:ds0raw=host/uptime.rrd:uptime:AVERAGE', $command);
         $this->assertStringContainsString('CDEF:ds0=ds0raw,0.0000115740740740741,*', $command);
         $this->assertStringContainsString("'--units-exponent' '0'", $command);
-        $this->assertStringContainsString('GPRINT:ds0:LAST:%5.2lf days', $command);
+        $this->assertStringContainsString('GPRINT:ds0:LAST: %7.2lf days\g', $command);
     }
 
     public function test_ping_draws_the_rtt_range_and_calculated_loss(): void
@@ -55,7 +55,8 @@ class UptimeAndPingGraphTest extends TestCase
         $this->assertStringContainsString('AREA:ds0range#D0D0D0::STACK', $command);
         $this->assertStringContainsString('CDEF:ds1=ds10f,ds11f,-,ds10f,/,100,*', $command);
         $this->assertStringContainsString("'--right-axis' '1:0'", $command);
-        $this->assertStringContainsString('GPRINT:ds1:LAST:%5.2lf %%', $command);
+        // the shorter unit is made up for in front, so the columns line up with those of ms
+        $this->assertStringContainsString('GPRINT:ds1:LAST:  %7.2lf %%\g', $command);
     }
 
     public function test_ping_follows_the_dark_style(): void
