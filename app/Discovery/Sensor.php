@@ -65,6 +65,10 @@ class Sensor
         }
         $sensor->device_id ??= \DeviceCache::getPrimary()->device_id;
         $this->models->push($sensor);
+
+        if ($sensor->sensor_class == 'state' && $sensor->relationLoaded('translations')) {
+            $this->withStateTranslations($sensor->sensor_type, $sensor->translations);
+        }
         $this->discovered[$sensor->syncGroup()] = false;
 
         Log::debug("Discovered Sensor: $sensor");
@@ -82,6 +86,14 @@ class Sensor
         $this->states[$stateName] = new Collection($states);
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, StateTranslation>|null
+     */
+    public function getStateTranslations(string $stateName): ?Collection
+    {
+        return $this->states[$stateName] ?? null;
     }
 
     public function isDiscovered(string $type): bool

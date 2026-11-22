@@ -27,10 +27,14 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use Illuminate\Support\Collection;
 use LibreNMS\OS\Traits\ServerHardware;
+use LibreNMS\OS\Traits\SupermicroHealthMib;
 
 class Windows extends \LibreNMS\OS
 {
+    use SupermicroHealthMib;
+
     use ServerHardware;
 
     public function discoverOS(Device $device): void
@@ -153,5 +157,11 @@ class Windows extends \LibreNMS\OS
         ];
 
         return $builds[$build] ?? null;
+    }
+
+
+    protected function discoverOsSensors(): Collection
+    {
+        return parent::discoverOsSensors()->merge($this->discoverSupermicroSensors(voltages: false));
     }
 }

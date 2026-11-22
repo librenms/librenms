@@ -30,10 +30,13 @@ use App\Data\TimeSeries\MetricCollector;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
+use LibreNMS\OS\Traits\NetSnmpSensors;
 use LibreNMS\OS\Traits\VminfoVmware;
 
 class VmwareEsxi extends \LibreNMS\OS implements VminfoDiscovery, VminfoPolling
 {
+    use NetSnmpSensors;
+
     use VminfoVmware;
 
     /**
@@ -55,5 +58,11 @@ class VmwareEsxi extends \LibreNMS\OS implements VminfoDiscovery, VminfoPolling
         $polled = $this->discoverVmInfo();
 
         return $polled->isEmpty() ? $vms : $polled;
+    }
+
+
+    protected function discoverOsSensors(): Collection
+    {
+        return parent::discoverOsSensors()->merge($this->discoverNetSnmpSensors());
     }
 }
