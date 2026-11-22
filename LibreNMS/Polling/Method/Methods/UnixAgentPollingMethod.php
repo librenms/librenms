@@ -45,11 +45,12 @@ final class UnixAgentPollingMethod extends PollingMethod
     }
 
     /**
-     * @return array{port: int, timeout: int}
+     * @return array{use_localhost: bool, port: int, timeout: int}
      */
     public function defaults(?Device $device = null): array
     {
         return [
+            'use_localhost' => false,
             'port' => (int) LibrenmsConfig::get('unix-agent.port', 6556),
             'timeout' => (int) LibrenmsConfig::get('unix-agent.connection-timeout', 10),
         ];
@@ -62,7 +63,7 @@ final class UnixAgentPollingMethod extends PollingMethod
         return new UnixAgentConfig(
             port: $settings['port'],
             timeout: $settings['timeout'],
-            useLocalhost: $settings['use_localhost'] ?? false,
+            useLocalhost: $settings['use_localhost'],
         );
     }
 
