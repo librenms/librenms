@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2015 Hangzhou H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: description of entity extend properties.
 -- Reference:
--- History V3.2
+-- History V3.5
 -- V1.0 Created by weixinzhe, Thursday, April 22, 2004 at 18:26:02
 -- V1.1 modified by yelinhui, add hh3cEntityExtMacAddress
 -- V1.2 modified by panxidong, add hh3cEntityExtErrorStatus
@@ -79,6 +79,13 @@
 --      hh3cEntityExtVoltageTooHigh by fangliwen 08502.
 -- V3.2 2015-01-12
 --      Added trap nodes hh3cEntityExtSFPAlarmOnEx, hh3cEntityExtSFPAlarmOffEx by fangliwen 08502.
+-- V3.3 2021-06-05
+--      Added trap nodes hh3cEntityExtRasTraps  by duyanbing 04404.
+-- V3.4 2021-10-12
+--      Added the item nearThresholdError to hh3cEntityExtErrorStatus by hezheng 22749
+-- V3.5 2022-11-23
+--      Added error status sfpRecvExceedUpperLimit(34), sfpRecvBelowLowerLimit(35),
+--      sfpSendExceedUpperLimit(36), sfpSendBelowLowerLimit(37) to hh3cEntityExtErrorStatus by hezheng 22749
 -- =================================================================
 HH3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
 
@@ -100,14 +107,28 @@ HH3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
             FROM HCNUM-TC;
 
     hh3cEntityExtend MODULE-IDENTITY
-        LAST-UPDATED "201501120000Z"
+        LAST-UPDATED "202211230000Z"
         ORGANIZATION
-            "Hangzhou H3C Technologies Co., Ltd."
+            "New H3C Technologies Co., Ltd."
         CONTACT-INFO
-            "Platform Team H3C Technologies Co., Ltd.
+            "Platform Team New H3C Technologies Co., Ltd.
              Hai-Dian District Beijing P.R. China
              http://www.h3c.com
              Zip: 100085"
+        DESCRIPTION
+            "The private MIB file includes the general extent
+            information of the device."
+        REVISION "202211230000Z"
+        DESCRIPTION
+            "Added error status sfpRecvExceedUpperLimit(34), sfpRecvBelowLowerLimit(35),
+             sfpSendExceedUpperLimit(36), sfpSendBelowLowerLimit(37) to hh3cEntityExtErrorStatus."
+        REVISION "202110120000Z"
+        DESCRIPTION
+            "Added the item nearThresholdError to hh3cEntityExtErrorStatus."
+        REVISION "202106050000Z"
+        DESCRIPTION
+            "Added trap nodes hh3cEntityExtRasTraps."
+        REVISION "200404220000Z"
         DESCRIPTION
             "The private MIB file includes the general extent
             information of the device."
@@ -492,6 +513,7 @@ HH3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
             normal(2),
             postFailure(3),
             entityAbsent(4),
+            nearThresholdError(5),
             poeError(11),
             stackError(21),
             stackPortBlocked(22),
@@ -499,6 +521,10 @@ HH3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
             sfpRecvError(31),
             sfpSendError(32),
             sfpBothError(33),
+            sfpRecvExceedUpperLimit(34),
+            sfpRecvBelowLowerLimit(35),
+            sfpSendExceedUpperLimit(36),
+            sfpSendBelowLowerLimit(37),
             fanError (41),
             psuError(51),
             rpsError(61),
@@ -521,6 +547,7 @@ HH3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
             their states are normal.
             postFailure(3)  means the entity fails to POST.
             entityAbsent(4) means the entity is absent now.
+            nearThresholdError(5) means the transceiver power reaches 3dB to the threshold.
 
 
             The following values is depended on the entity.
@@ -548,6 +575,10 @@ HH3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
             will be sfpRecvError(31), if it fail to send, the value is
             sfpSendError(32), if it fail to send and receive, the value is
             sfpBothError(33), otherwise it will be normal(2).
+            If the power that sfp received exceeded the upper limit, the value is sfpRecvExceedUpperLimit(34).
+            If the power that sfp received exceeded the lower limit, the value is sfpRecvBelowLowerLimit(35).
+            If the power that sfp sent exceeded the upper limit, the value is sfpSendExceedUpperLimit(36).
+            If the power that sfp sent exceeded the lower limit, the value is sfpSendBelowLowerLimit(37).
 
             fanError(41) means that the fan stops working.
 
@@ -1843,5 +1874,874 @@ HH3C-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "Standard Entity Power Information group."
         ::= { hh3cEntityExtGroups 4 }
+
+    hh3cEntityExtRasTraps OBJECT IDENTIFIER ::= { hh3cEntityExtend 4 }
+
+    hh3cEntityExtRasTrapsPrefix OBJECT IDENTIFIER ::= { hh3cEntityExtRasTraps 0 }
+    hh3cEntityExtRasTrapsInfor OBJECT IDENTIFIER ::= { hh3cEntityExtRasTraps 1 }
+
+    hh3cEntityExtSystemFatalAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a system fatal alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 1 }
+
+    hh3cEntityExtSystemFatalAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a system fatal alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 2 }
+
+    hh3cEntityExtSystemAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a system alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 3 }
+
+    hh3cEntityExtSystemAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a system alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 4 }
+
+    hh3cEntityExtSystemWarningOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a system warning occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 5 }
+
+    hh3cEntityExtSystemWarningClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a system warning cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 6 }
+
+    hh3cEntityExtBoardFatalAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a board fatal alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 7 }
+
+    hh3cEntityExtBoardFatalAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a board fatal alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 8 }
+
+    hh3cEntityExtBoardAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a board alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 9 }
+
+    hh3cEntityExtBoardAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a board alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 10 }
+
+    hh3cEntityExtBoardWarningOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a board warning occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 11 }
+
+    hh3cEntityExtBoardWarningClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a board warning cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 12 }
+
+    hh3cEntityExtPowerFatalAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a power fatal alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 13 }
+
+    hh3cEntityExtPowerFatalAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a power fatal alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 14 }
+
+    hh3cEntityExtPowerAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a power alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 15 }
+
+    hh3cEntityExtPowerAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a power alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 16 }
+
+    hh3cEntityExtPowerWarningOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a power warning occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 17 }
+
+    hh3cEntityExtPowerWarningClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a power warning cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 18 }
+
+    hh3cEntityExtFanFatalAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a fan fatal alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 19 }
+
+    hh3cEntityExtFanFatalAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a fan fatal alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 20 }
+
+    hh3cEntityExtFanAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a fan alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 21 }
+
+    hh3cEntityExtFanAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a fan alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 22 }
+
+    hh3cEntityExtFanWarningOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a fan warning occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 23 }
+
+    hh3cEntityExtFanWarningClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a fan warning cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 24 }
+
+    hh3cEntityExtVoltageFatalAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason,
+            hh3cEntityExtThresholdType,
+            hh3cEntityExtThresholdVal,
+            hh3cEntityExtCurrentVal
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a voltage fatal alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 25 }
+
+    hh3cEntityExtVoltageFatalAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason,
+            hh3cEntityExtThresholdType,
+            hh3cEntityExtThresholdVal,
+            hh3cEntityExtCurrentVal
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a voltage fatal alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 26 }
+
+    hh3cEntityExtVoltageAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason,
+            hh3cEntityExtThresholdType,
+            hh3cEntityExtThresholdVal,
+            hh3cEntityExtCurrentVal
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a voltage alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 27 }
+
+    hh3cEntityExtVoltageAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason,
+            hh3cEntityExtThresholdType,
+            hh3cEntityExtThresholdVal,
+            hh3cEntityExtCurrentVal
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a voltage alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 28 }
+
+    hh3cEntityExtVoltageWarningOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason,
+            hh3cEntityExtThresholdType,
+            hh3cEntityExtThresholdVal,
+            hh3cEntityExtCurrentVal
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a voltage warning occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 29 }
+
+    hh3cEntityExtVoltageWarningClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason,
+            hh3cEntityExtThresholdType,
+            hh3cEntityExtThresholdVal,
+            hh3cEntityExtCurrentVal
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a voltage warning cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 30 }
+
+    hh3cEntityExtTemperatureFatalAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason,
+            hh3cEntityExtThresholdType,
+            hh3cEntityExtThresholdVal,
+            hh3cEntityExtCurrentVal
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a temperature fatal alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 31 }
+
+    hh3cEntityExtTemperatureFatalAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason,
+            hh3cEntityExtThresholdType,
+            hh3cEntityExtThresholdVal,
+            hh3cEntityExtCurrentVal
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a temperature fatal alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 32 }
+
+    hh3cEntityExtTemperatureAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason,
+            hh3cEntityExtThresholdType,
+            hh3cEntityExtThresholdVal,
+            hh3cEntityExtCurrentVal
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a temperature alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 33 }
+
+    hh3cEntityExtTemperatureAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason,
+            hh3cEntityExtThresholdType,
+            hh3cEntityExtThresholdVal,
+            hh3cEntityExtCurrentVal
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a temperature alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 34 }
+
+    hh3cEntityExtTemperatureWarningOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason,
+            hh3cEntityExtThresholdType,
+            hh3cEntityExtThresholdVal,
+            hh3cEntityExtCurrentVal
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a temperature warning occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 35 }
+
+    hh3cEntityExtTemperatureWarningClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason,
+            hh3cEntityExtThresholdType,
+            hh3cEntityExtThresholdVal,
+            hh3cEntityExtCurrentVal
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a temperature warning cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 36 }
+
+    hh3cEntityExtClockFatalAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a clock fatal alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 37 }
+
+    hh3cEntityExtClockFatalAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a clock fatal alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 38 }
+
+    hh3cEntityExtClockAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a clock alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 39 }
+
+    hh3cEntityExtClockAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a clock alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 40 }
+
+    hh3cEntityExtClockWarningOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a clock warning occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 41 }
+
+    hh3cEntityExtClockWarningClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a clock warning cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 42 }
+
+    hh3cEntityExtDiskFatalAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a disk fatal alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 43 }
+
+    hh3cEntityExtDiskFatalAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a disk fatal alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 44 }
+
+    hh3cEntityExtDiskAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a disk alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 45 }
+
+    hh3cEntityExtDiskAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a disk alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 46 }
+
+    hh3cEntityExtDiskWarningOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a disk warning occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 47 }
+
+    hh3cEntityExtDiskWarningClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when a disk warning cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 48 }
+
+    hh3cEntityExtOpticalFatalAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when an optical fatal alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 49 }
+
+    hh3cEntityExtOpticalFatalAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when an optical fatal alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 50 }
+
+    hh3cEntityExtOpticalAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when an optical alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 51 }
+
+    hh3cEntityExtOpticalAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when an optical alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 52 }
+
+    hh3cEntityExtOpticalWarningOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when an optical warning occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 53 }
+
+    hh3cEntityExtOpticalWarningClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when an optical warning cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 54 }
+
+    hh3cEntityExtInternalLinkFatalAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when an internal link fatal alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 55 }
+
+    hh3cEntityExtInternalLinkFatalAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when an internal link fatal alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 56 }
+
+    hh3cEntityExtInternalLinkAlarmOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when an internal link alarm occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 57 }
+
+    hh3cEntityExtInternalLinkAlarmClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when an internal link alarm cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 58 }
+
+    hh3cEntityExtInternalLinkWarningOccur NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when an internal link warning occurred."
+        ::= { hh3cEntityExtRasTrapsPrefix 59 }
+
+    hh3cEntityExtInternalLinkWarningClear NOTIFICATION-TYPE
+        OBJECTS {
+            hh3cEntityExtPhysicalIndex,
+            entPhysicalName,
+            hh3cEntityExtRelativeResource,
+            hh3cEntityExtErrorCode,
+            hh3cEntityExtReason
+            }
+        STATUS current
+        DESCRIPTION
+            "The trap is generated when an internal link warning cleared."
+        ::= { hh3cEntityExtRasTrapsPrefix 60 }
+
+    hh3cEntityExtRelativeResource OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE (0..255))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The relative resource of RAS trap."
+        ::= { hh3cEntityExtRasTrapsInfor 1 }
+
+    hh3cEntityExtErrorCode OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The error code of RAS trap."
+        ::= { hh3cEntityExtRasTrapsInfor 2 }
+
+    hh3cEntityExtReason OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE (0..255))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The reason of RAS trap."
+        ::= { hh3cEntityExtRasTrapsInfor 3 }
+
+    hh3cEntityExtThresholdType OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE (0..63))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The threshold type of RAS trap."
+        ::= { hh3cEntityExtRasTrapsInfor 4 }
+
+    hh3cEntityExtThresholdVal OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE (0..63))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The threshold value with unit of RAS trap."
+        ::= { hh3cEntityExtRasTrapsInfor 5 }
+
+    hh3cEntityExtCurrentVal OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE (0..63))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The current value with unit of RAS trap."
+        ::= { hh3cEntityExtRasTrapsInfor 6 }
 
     END

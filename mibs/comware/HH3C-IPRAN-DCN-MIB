@@ -1,14 +1,17 @@
 -- =================================================================
--- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd.  All rights reserved.
 -- Description: Ipran Data Communication Network(DCN) MIB.
 -- Reference:
--- Version:     V1.1
+-- Version:     V1.2
 -- V1.0  2011-09-30 The initial version, created by Longgang
 --       2014-03-10 updated by wangguanglun
 --       Changed the format
 -- V1.1  2015-01-27 updated by fengxiaodong
 --       Added hh3cIpRanDcnMAC and hh3cIpRanDcnVendor nodes to hh3cIpRanDcnInfoObject
 --       Added hh3cIpRanDcnNeInfoMAC and hh3cIpRanDcnNeInfoVendor nodes to hh3cIpRanDcnNeInfoTable
+-- V1.2  2022-07-12 updated by pengqing
+--       Added hh3cIpRanDcnNeIdConflict, hh3cIpRanDcnNeIdConflictClear
+--       Added hh3cIpRanDcnNeIpConflict, hh3cIpRanDcnNeIpConflictClear
 -- ==================================================================
 HH3C-IPRAN-DCN-MIB DEFINITIONS ::= BEGIN
 
@@ -23,7 +26,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 hh3cIpRanDcn MODULE-IDENTITY
-    LAST-UPDATED "201501300000Z"
+    LAST-UPDATED "202207121654Z"
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -32,6 +35,10 @@ hh3cIpRanDcn MODULE-IDENTITY
         http://www.h3c.com
         Zip:100085
         "
+    DESCRIPTION
+        "Added hh3cIpRanDcnNeIdConflict, hh3cIpRanDcnNeIdConflictClear,
+        Added hh3cIpRanDcnNeIpConflict, hh3cIpRanDcnNeIpConflictClear."
+    REVISION "202207121654Z"
     DESCRIPTION
         "This MIB provides mechanisms to monitor all network elements(NE)
         in Ipran Data Communication Network."
@@ -268,5 +275,45 @@ hh3cIpRanDcnNeOffline NOTIFICATION-TYPE
     DESCRIPTION
         "The trap is generated when a network element is offline."
     ::= { hh3cIpRanDcnTrapsPrefix 2 }
+
+hh3cIpRanDcnNeIdConflict NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIpRanDcnNeInfoNeId
+        }
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when NE ID conflicted."
+    ::= { hh3cIpRanDcnTrapsPrefix 3 }
+
+hh3cIpRanDcnNeIdConflictClear NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIpRanDcnNeInfoNeId
+        }
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when NE ID confliction is cleared."
+    ::= { hh3cIpRanDcnTrapsPrefix 4 }
+
+hh3cIpRanDcnNeIpConflict NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIpRanDcnNeInfoNeIp
+        }
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when NE IP addresses conflicted."
+    ::= { hh3cIpRanDcnTrapsPrefix 5 }
+
+hh3cIpRanDcnNeIpConflictClear NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cIpRanDcnNeInfoNeIp
+        }
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when NE IP confliction is cleared."
+    ::= { hh3cIpRanDcnTrapsPrefix 6 }
 
 END

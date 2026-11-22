@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('permissions', function (Blueprint $table) {
+        Schema::table('permissions', function (Blueprint $table): void {
             $table->rename('bouncer_permissions');
         });
-        Schema::table('roles', function (Blueprint $table) {
+        Schema::table('roles', function (Blueprint $table): void {
             $table->rename('bouncer_roles');
         });
     }
@@ -24,10 +24,10 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('bouncer_permissions', function (Blueprint $table) {
+        Schema::table('bouncer_permissions', function (Blueprint $table): void {
             $table->rename('permissions');
         });
-        Schema::table('bouncer_roles', function (Blueprint $table) {
+        Schema::table('bouncer_roles', function (Blueprint $table): void {
             $table->rename('roles');
         });
     }

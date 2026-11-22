@@ -129,13 +129,12 @@ final class LocationTest extends TestCase
         $example = 'SW1A2AA.find.me.uk';
         $expected = ['lat' => 51.50354111111111, 'lng' => -0.12766972222222223];
 
-        $this->mock(\Net_DNS2_Resolver::class, function (MockInterface $mock) use ($example, $expected): void {
-            $loc = new \Net_DNS2_RR_LOC();
-            $loc->name = $example;
+        // NetDNS2\Resolver is final and cannot be mocked, mock the record lookup instead
+        $this->partialMock(Dns::class, function (MockInterface $mock) use ($example, $expected): void {
+            $loc = new \NetDNS2\RR\LOC();
             $loc->latitude = $expected['lat'];
             $loc->longitude = $expected['lng'];
-            $answer = (object) ['answer' => [$loc]];
-            $mock->shouldReceive('query')->with($example, 'LOC')->once()->andReturn($answer);
+            $mock->shouldReceive('getRecord')->with($example, 'LOC')->once()->andReturn([$loc]);
         });
 
         $result = $this->app->make(Dns::class)->getCoordinates($example);

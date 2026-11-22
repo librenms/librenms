@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('devices_attribs', function (Blueprint $table) {
+        Schema::table('devices_attribs', function (Blueprint $table): void {
             $table->string('attrib_type', 64)->change();
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('devices_attribs', function (Blueprint $table) {
+        Schema::table('devices_attribs', function (Blueprint $table): void {
             $table->string('attrib_type', 32)->change();
         });
     }

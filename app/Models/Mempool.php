@@ -2,18 +2,21 @@
 
 namespace App\Models;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Observers\MempoolObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InsufficientDataException;
 use LibreNMS\Exceptions\UncorrectableNegativeException;
+use LibreNMS\Interfaces\Models\HasSyncProtectedAttributes;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
 
 #[ObservedBy([MempoolObserver::class])]
-class Mempool extends DeviceRelatedModel implements Keyable
+class Mempool extends DeviceRelatedModel implements HasSyncProtectedAttributes, Keyable
 {
     use HasFactory;
 
@@ -38,18 +41,20 @@ class Mempool extends DeviceRelatedModel implements Keyable
         'mempool_total_oid',
         'mempool_largestfree',
         'mempool_lowestfree',
+        'polling_method',
     ];
     protected $attributes = [
         'mempool_precision' => 1,
     ];
 
-    public function __construct(array $attributes = [])
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
     {
-        parent::__construct($attributes);
-        if (! $this->exists) {
-            // only allow mempool_perc_warn to be filled for new mempools
-            unset($this->fillable[array_search('mempool_perc_warn', $this->fillable)]);
-        }
+        return [
+            'polling_method' => PollingMethodType::class,
+        ];
     }
 
     public function isValid(): bool
@@ -133,8 +138,39 @@ class Mempool extends DeviceRelatedModel implements Keyable
         $this->attributes['mempool_perc'] = is_numeric($percent) ? round($percent) : null;
     }
 
+    /**
+     * Warn threshold is only set from discovery on create so users can override it
+     *
+     * @return string[]
+     */
+    public function getSyncProtectedAttributes(): array
+    {
+        return ['mempool_perc_warn'];
+    }
+
     public function getCompositeKey(): string
     {
         return "$this->mempool_type-$this->mempool_index";
+    }
+
+    /**
+     * Identity used when storing and reading a measurement of this memory pool
+     */
+    public function metricIdentity(string $measurement): MetricIdentity
+    {
+        return new MetricIdentity($measurement, [
+            'hostname' => (string) $this->device?->hostname,
+            'type' => $this->mempool_type,
+            'class' => $this->mempool_class,
+            'index' => $this->mempool_index,
+        ]);
+    }
+
+    /**
+     * Only the percent used is known, the stored used and free are percentages
+     */
+    public function isPercentOnly(): bool
+    {
+        return $this->mempool_total == 100;
     }
 }

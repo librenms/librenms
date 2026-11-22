@@ -26,13 +26,44 @@
 
 namespace LibreNMS\Util;
 
-use App\Models\BgpPeer;
-use App\Models\Device;
-use App\Models\Port;
-use LibreNMS\Enum\IfOperStatus;
-
 class Color
 {
+    public static function toner(string $descr, int $percent): array
+    {
+        $color = self::percentage(100 - $percent, null);
+
+        if (str_ends_with($descr, 'C')
+            || stripos($descr, 'cyan') !== false) {
+            $color['left'] = '55D6D3';
+            $color['right'] = '33B4B1';
+        }
+
+        if (str_ends_with($descr, 'M')
+            || stripos($descr, 'magenta') !== false) {
+            $color['left'] = 'F24AC8';
+            $color['right'] = 'D028A6';
+        }
+
+        if (str_ends_with($descr, 'Y')
+            || stripos($descr, 'yellow') !== false
+            || stripos($descr, 'giallo') !== false
+            || stripos($descr, 'gul') !== false
+        ) {
+            $color['left'] = 'FFF200';
+            $color['right'] = 'DDD000';
+        }
+
+        if (str_ends_with($descr, 'K')
+            || stripos($descr, 'black') !== false
+            || stripos($descr, 'nero') !== false
+        ) {
+            $color['left'] = '000000';
+            $color['right'] = '222222';
+        }
+
+        return $color;
+    }
+
     /**
      * Get colors for a percentage bar based on current percentage
      *
@@ -94,69 +125,5 @@ class Color
         $b = max(0, 255 - (5 * ($percent + 25)));
 
         return sprintf('#%02x%02x%02x', $r, $b, $b);
-    }
-
-    /**
-     * Get highlight color based on device status
-     */
-    public static function forDeviceStatus(Device $device): string
-    {
-        if ($device->disabled) {
-            return '#808080';
-        }
-
-        if ($device->ignore) {
-            return '#000000';
-        }
-
-        return $device->status ? '#008000' : '#ff0000';
-    }
-
-    /**
-     * Get highlight color based on Port status
-     */
-    public static function forPortStatus(Port $port): string
-    {
-        // Ignored ports
-        if ($port->ignore) {
-            return '#000000';
-        }
-
-        // Shutdown ports
-        if ($port->ifAdminStatus == IfOperStatus::Down) {
-            return '#808080';
-        }
-
-        // Down Ports
-        if ($port->ifOperStatus != IfOperStatus::Up) {
-            return '#ff0000';
-        }
-
-        // Errored ports
-        if ($port->ifInErrors_delta > 0 || $port->ifOutErrors_delta > 0) {
-            return '#ffa500';
-        }
-
-        // Up ports
-        return '#008000';
-    }
-
-    /**
-     * Get highlight color based on BgpPeer status
-     */
-    public static function forBgpPeerStatus(BgpPeer $peer): string
-    {
-        // Session inactive
-        if ($peer->bgpPeerAdminStatus !== 'start') {
-            return '#000000';
-        }
-
-        // Session active but errored
-        if ($peer->bgpPeerState !== 'established') {
-            return '#ffa500';
-        }
-
-        // Session Up
-        return '#008000';
     }
 }

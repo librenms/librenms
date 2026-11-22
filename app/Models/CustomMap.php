@@ -64,7 +64,7 @@ class CustomMap extends BaseModel
     ];
 
     /**
-     * @return array{options: 'array', legend_colours: 'array', newnodeconfig: 'array', newedgeconfig: 'array', background_data: 'array'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -86,7 +86,7 @@ class CustomMap extends BaseModel
         $config['engine'] = \App\Facades\LibrenmsConfig::get('geoloc.engine');
         $config['api_key'] = \App\Facades\LibrenmsConfig::get('geoloc.api_key');
         $config['tile_url'] = \App\Facades\LibrenmsConfig::get('leaflet.tile_url');
-        $config['image_url'] = route('maps.custom.background', ['map' => $this->custom_map_id]) . '?version=' . ($config['version'] ?? 0);
+        $config['image_url'] = route('maps.custom.background', ['map' => $this->custom_map_id, 'version' => $config['version'] ?? 0]);
 
         return $config;
     }

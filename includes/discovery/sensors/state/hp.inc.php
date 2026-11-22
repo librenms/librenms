@@ -25,6 +25,8 @@
  * @author     Rudy Broersma <r.broersma@ctnet.nl>
  */
 
+use LibreNMS\Enum\SensorType;
+
 // One could add more entries from deviceGroup, but this will do as a start
 $tables = [
     ['cpqDaPhyDrvStatus', '.1.3.6.1.4.1.232.3.2.5.1.1.6.', 'Status', 'CPQIDA-MIB', [
@@ -38,6 +40,7 @@ $tables = [
         ['value' => 7, 'generic' => 1, 'descr' => 'eraseQueued'],
         ['value' => 8, 'generic' => 2, 'descr' => 'ssdWearOut'],
         ['value' => 9, 'generic' => 3, 'descr' => 'notAuthenticated'],
+        ['value' => 10, 'generic' => 0, 'descr' => 'hotSpare'],
     ]],
     ['cpqDaPhyDrvSmartStatus', '.1.3.6.1.4.1.232.3.2.5.1.1.57.', 'S.M.A.R.T.', 'CPQIDA-MIB', [
         ['value' => 1, 'generic' => 3, 'descr' => 'other'],
@@ -62,7 +65,7 @@ foreach ($tables as $tablevalue) {
             //Discover Sensors
             discover_sensor(
                 null,
-                'state',
+                SensorType::State,
                 $device,
                 $num_oid . $index,
                 $index,

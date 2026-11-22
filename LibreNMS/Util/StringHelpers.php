@@ -33,54 +33,9 @@ class StringHelpers
         return preg_match('//u', $string) === 1;
     }
 
-    public static function niceCase($string)
+    public static function niceCase(string $string): string
     {
-        $replacements = [
-            'bind' => 'BIND',
-            'cape' => 'CAPEv2',
-            'dbm' => 'dBm',
-            'dhcp-stats' => 'DHCP Stats',
-            'entropy' => 'Random entropy',
-            'exim-stats' => 'EXIM Stats',
-            'fbsd-nfs-client' => 'FreeBSD NFS Client',
-            'fbsd-nfs-server' => 'FreeBSD NFS Server',
-            'freeradius' => 'FreeRADIUS',
-            'gpsd' => 'GPSD',
-            'hv-monitor' => 'HV Monitor',
-            'http_access_log_combined' => 'HTTP Access Log Combined',
-            'i2pd' => 'I2PD Router',
-            'mojo_cape_submit' => 'Mojo CAPE Submit',
-            'mailcow-postfix' => 'mailcow-dockerized postfix',
-            'mysql' => 'MySQL',
-            'nfs' => 'NFS',
-            'nfs-server' => 'NFS Server',
-            'nfs-stats' => 'NFS Stats',
-            'nfs-v3-stats' => 'NFS v3 Stats',
-            'ntp' => 'NTP',
-            'ntp-client' => 'NTP Client',
-            'ntp-server' => 'NTP Server',
-            'opengridscheduler' => 'Open Grid Scheduler',
-            'opensearch' => 'Elasticsearch\Opensearch',
-            'oslv_monitor' => 'OS Level Virtualization',
-            'os-updates' => 'OS Updates',
-            'php-fpm' => 'PHP-FPM',
-            'pi-hole' => 'Pi-hole',
-            'powerdns' => 'PowerDNS',
-            'powerdns-dnsdist' => 'PowerDNS dnsdist',
-            'powerdns-recursor' => 'PowerDNS Recursor',
-            'powermon' => 'PowerMon',
-            'pureftpd' => 'PureFTPd',
-            'rrdcached' => 'RRDCached',
-            'sdfsinfo' => 'SDFS info',
-            'smart' => 'SMART',
-            'ss' => 'Socket Statistics',
-            'syslog-ng' => 'Syslog-NG',
-            'ups-apcups' => 'UPS apcups',
-            'ups-nut' => 'UPS nut',
-            'zfs' => 'ZFS',
-        ];
-
-        return $replacements[$string] ?? ucwords(str_replace(['_', '-'], ' ', $string));
+        return $string === 'dbm' ? 'dBm' : ucwords(str_replace(['_', '-'], ' ', $string));
     }
 
     /**
@@ -201,6 +156,33 @@ class StringHelpers
         return hex2bin($hex);
     }
 
+    /**
+     * Decode an SNMP text value that net-snmp output as hex (ex: "41 42 43 00") because it
+     * contained non-printable bytes. Common causes are a trailing null byte from devices that send
+     * an off by one string length or non-ASCII text (UTF-8, GBK, etc) in an OCTET STRING.
+     * Trailing null bytes are removed and the encoding is inferred.
+     *
+     * Only use for values known to be text, binary values (MACs, IPs, bitmaps) will be mangled.
+     * Values that are not hex or decode to only printable ASCII are returned unchanged,
+     * because net-snmp would not have output those as hex.
+     */
+    public static function decodeSnmpHexText(string $value): string
+    {
+        $hex = trim((string) preg_replace('/\s+/', ' ', $value));
+
+        if (! self::isHex($hex, ' ')) {
+            return $value;
+        }
+
+        $bytes = (string) hex2bin(str_replace(' ', '', $hex));
+
+        if (preg_match('/^[\x20-\x7E]*$/', $bytes)) {
+            return $value;
+        }
+
+        return (string) self::inferEncoding(rtrim($bytes, "\0"));
+    }
+
     public static function trimHexGarbage(string $string): string
     {
         $regex = '/((\.{2,}.{1,2})?\.+)?([0-9a-f]{2} )*([0-9a-f]{2})?$/';
@@ -213,7 +195,7 @@ class StringHelpers
      */
     public static function hasNumber(string $string): bool
     {
-        return (bool) preg_match('/^\s*-?\d+(\.\d+)?/', $string);
+        return (bool) preg_match('/^\s*-?(\d+(\.\d*)?|\.\d+)/', $string);
     }
 
     public static function isHex(string $string, string $delimiter = ''): bool

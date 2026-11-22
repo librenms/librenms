@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bill_history', function (Blueprint $table) {
+        Schema::create('bill_history', function (Blueprint $table): void {
             $table->increments('bill_hist_id');
             $table->unsignedInteger('bill_id')->index();
             $table->timestamp('updated')->useCurrent();

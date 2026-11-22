@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('alert_schedule', function (Blueprint $table) {
+        Schema::table('alert_schedule', function (Blueprint $table): void {
             $table->integer('behavior')->default(
                 MaintenanceBehavior::SkipAlerts->value
             );
@@ -24,7 +24,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('alert_schedule', function (Blueprint $table) {
+        Schema::table('alert_schedule', function (Blueprint $table): void {
             $table->dropColumn('behavior');
         });
     }

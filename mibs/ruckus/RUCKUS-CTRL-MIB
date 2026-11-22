@@ -1703,7 +1703,7 @@ ruckusCtrlApRadioIndex OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-    "0:2.4G 1:5G"
+    "0:2.4G 1:5G 2:6G"
     ::= { ruckusCTRLApRadioEntry 2 }
 
 ruckusCtrlApRadioNumWlans OBJECT-TYPE
@@ -1719,7 +1719,7 @@ ruckusCtrlApRadioType OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-    "0:radio11bg 1:radio11a 2:radio11ng 3:radio11na 4:radio11ac"
+    "1:radio11b 2:radio11g 3:auto 4:radio11a 5:radio11ng 6:radio11na 7:radio11ac 8:radio11ax"
     ::= { ruckusCTRLApRadioEntry 8 }
 
 ruckusCtrlApRadioChannelWidth OBJECT-TYPE
@@ -1727,7 +1727,7 @@ ruckusCtrlApRadioChannelWidth OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-    "10/20/2040/40/80"
+    "10/20/2040/40/80/160"
     ::= { ruckusCTRLApRadioEntry 9 }
 
 ruckusCtrlApRadioChannel OBJECT-TYPE

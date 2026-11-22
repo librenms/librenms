@@ -15634,7 +15634,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.2272.1.85.10.1.1.3.1",
                     "processor_index": "1",
@@ -15645,7 +15644,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.2272.1.85.10.1.1.3.2",
                     "processor_index": "2",
@@ -15656,7 +15654,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.2272.1.85.10.1.1.3.3",
                     "processor_index": "3",
@@ -15667,7 +15664,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.2272.1.85.10.1.1.3.4",
                     "processor_index": "4",
@@ -15678,7 +15674,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.2272.1.85.10.1.1.3.6",
                     "processor_index": "6",
@@ -15689,7 +15684,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.2272.1.85.10.1.1.3.21",
                     "processor_index": "21",
@@ -15700,7 +15694,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.2272.1.85.10.1.1.3.22",
                     "processor_index": "22",
@@ -15711,7 +15704,6 @@
                     "processor_perc_warn": 75
                 },
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
                     "processor_oid": ".1.3.6.1.4.1.2272.1.85.10.1.1.3.23",
                     "processor_index": "23",
@@ -15764,6 +15756,7 @@
                     "sensor_type": "rcChasPowerSupplyOperStatus",
                     "sensor_descr": "VOSS Power Supply 1",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,
@@ -15789,6 +15782,7 @@
                     "sensor_type": "rcChasPowerSupplyOperStatus",
                     "sensor_descr": "VOSS Power Supply 2",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,
@@ -15814,6 +15808,7 @@
                     "sensor_type": "rcChasPowerSupplyOperStatus",
                     "sensor_descr": "VOSS Power Supply 3",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,
@@ -15839,6 +15834,7 @@
                     "sensor_type": "rcChasPowerSupplyOperStatus",
                     "sensor_descr": "VOSS Power Supply 4",
                     "group": null,
+                    "category": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,
@@ -22140,7 +22136,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "cdc.can1",
-                    "remote_port": "2/16 (646a52c19c00)",
+                    "remote_port": "2/16",
                     "remote_platform": null,
                     "remote_version": "VSP-8404 (6.1.3.0)",
                     "ifAlias": "cdc.can1.nni",
@@ -22151,7 +22147,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "cdc.d1.8k",
-                    "remote_port": "2/18 (646a52dd3400)",
+                    "remote_port": "2/18",
                     "remote_platform": null,
                     "remote_version": "VSP-8404C (7.1.0.0)",
                     "ifAlias": "cdc.d1.8k.nni",
@@ -22162,7 +22158,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "cdc.i1.8k",
-                    "remote_port": "64 6A 52 D0 BC 0E (646a52d0bc0e)",
+                    "remote_port": "64:6a:52:d0:bc:0e",
                     "remote_platform": null,
                     "remote_version": "VSP-8404C (6.1.0.0)",
                     "ifAlias": "cdc.i1.nni",
@@ -22173,7 +22169,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "cdc.i1.8k",
-                    "remote_port": "64 6A 52 D0 BC 2E (646a52d0bc2e)",
+                    "remote_port": "64:6a:52:d0:bc:2e",
                     "remote_platform": null,
                     "remote_version": "VSP-8404C (6.1.0.0)",
                     "ifAlias": "cdc.i1.nni",
@@ -22184,7 +22180,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "cdc.s1.8k",
-                    "remote_port": "2/2 (b42d56979000)",
+                    "remote_port": "2/2",
                     "remote_platform": null,
                     "remote_version": "VSP-8608 (6.2.0.2)",
                     "ifAlias": "cdc.sx.nni",
@@ -22195,7 +22191,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "cdc.s2.8k",
-                    "remote_port": "2/2 (b42d5695f000)",
+                    "remote_port": "2/2",
                     "remote_platform": null,
                     "remote_version": "VSP-8608 (6.2.0.2)",
                     "ifAlias": "cdc.sx.nni",
@@ -22206,7 +22202,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "cdc.u1.8400",
-                    "remote_port": "1/24 (646a52a24800)",
+                    "remote_port": "1/24",
                     "remote_platform": null,
                     "remote_version": "VSP-8404 (6.1.4.0)",
                     "ifAlias": "cdc.u1.nni",
@@ -22217,7 +22213,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "chr.can1",
-                    "remote_port": "2/16 (646a52c18000)",
+                    "remote_port": "2/16",
                     "remote_platform": null,
                     "remote_version": "VSP-8404 (6.1.3.0)",
                     "ifAlias": "chr.can1.nni",
@@ -22228,7 +22224,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "adc.a1.8k",
-                    "remote_port": "3/1 (b42d56954000)",
+                    "remote_port": "3/1",
                     "remote_platform": null,
                     "remote_version": "VSP-8608 (6.2.0.2)",
                     "ifAlias": "core: c1.8k->a1.8k",
@@ -22239,7 +22235,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "ppark.c2.8k",
-                    "remote_port": "2/1 (b42d5696f000)",
+                    "remote_port": "2/1",
                     "remote_platform": null,
                     "remote_version": "VSP-8608 (6.2.0.2)",
                     "ifAlias": "cx.nni",
@@ -22250,7 +22246,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "ppark.c2.8k",
-                    "remote_port": "6/1 (b42d5696f000)",
+                    "remote_port": "6/1",
                     "remote_platform": null,
                     "remote_version": "VSP-8608 (6.2.0.2)",
                     "ifAlias": "cx.nni",
@@ -22261,7 +22257,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "kews.u2.8400",
-                    "remote_port": "1/23 (646a529f5800)",
+                    "remote_port": "1/23",
                     "remote_platform": null,
                     "remote_version": "VSP-8404 (6.1.4.0)",
                     "ifAlias": "kews.u2.nni",
@@ -22272,7 +22268,7 @@
                     "active": 1,
                     "protocol": "lldp",
                     "remote_hostname": "ppark.d2.8k",
-                    "remote_port": "1/18 (646a52dd1800)",
+                    "remote_port": "1/18",
                     "remote_platform": null,
                     "remote_version": "VSP-8404C (7.1.0.0)",
                     "ifAlias": "ppark.d2.nni",

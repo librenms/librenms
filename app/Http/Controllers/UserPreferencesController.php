@@ -26,11 +26,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\Graphing\GraphViewOptions;
 use App\Facades\LibrenmsConfig;
 use App\Models\Dashboard;
 use App\Models\Device;
 use App\Models\UserPref;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -39,13 +41,15 @@ use LibreNMS\Authentication\TwoFactor;
 use LibreNMS\Util\DynamicConfig;
 use Session;
 
-class UserPreferencesController extends Controller
+class UserPreferencesController extends Controller implements HasMiddleware
 {
     private $cachedPreferences = ['locale', 'site_style', 'timezone'];
 
-    public function __construct()
+    public static function middleware(): array
     {
-        $this->middleware('deny-demo');
+        return [
+            'deny-demo',
+        ];
     }
 
     /**
@@ -120,11 +124,16 @@ class UserPreferencesController extends Controller
             ],
             'temp_units' => 'required|in:default,f',
             'hide_dashboard_editor' => 'required|integer',
+            'network_search_mac_format' => 'required|in:default,colon,dash,dot,bare',
+            'graph_renderer' => 'required|in:default,js',
+            // default forgets them
+            'graph_options' => $request->value === 'default' ? 'required' : 'required|array:' . implode(',', GraphViewOptions::PREFERENCES),
         ];
 
         $this->validate($request, [
             'pref' => ['required', Rule::in(array_keys($valid_prefs))],
             'value' => $valid_prefs[$request->pref] ?? 'required|integer',
+            ...($request->pref === 'graph_options' && is_array($request->value) ? GraphViewOptions::rules('value') : []),
         ]);
 
         $this->updatePreference($request->pref, $request->value);

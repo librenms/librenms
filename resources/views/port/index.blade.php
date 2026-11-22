@@ -11,7 +11,7 @@
                         <x-option-bar :options="$nav" name="{{ __('Ports') }}" :selected="$view" linkClass="sync-filter-url" border="none" class="tw:inline-block tw:p-1"></x-option-bar>
                         <x-option-bar :options="$graphNav" name="{{ __('Graphs') }}" :selected="$graph" linkClass="sync-filter-url" border="none" class="tw:inline-block tw:p-1"></x-option-bar>
                         <span id="group-graph-link" x-data="{ group: @js($group) }"  x-show="group" x-init="window.addEventListener('filter:apply', (e) => $data.group = e.detail.filters['groups.id']?.eq);">
-                            | <a :href="'{{ route('portgroup.graph', [":group"]) }}'.replace(':group', group)" title="{{ __('port.groups.graph') }}">{{ __('port.groups.combined') }}</a>
+                            | <a :href="group ? route('portgroup.graph', group) : '#'" title="{{ __('port.groups.graph') }}">{{ __('port.groups.combined') }}</a>
                         </span>
                     </div>
                     <div class="btn-group pull-right" role="group">
@@ -23,7 +23,7 @@
                                 <li><a href="{{ $hideFilterLink }}"><i class="fa fa-regular @if($hideFilter) fa-square @else fa-square-check @endif fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ __('port.show_filter') }}</a></li>
                                 <li><a href="{{ $bareLink }}"><i class="fa fa-regular @if($bare) fa-square @else fa-square-check @endif fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ __('port.show_header') }}</a></li>
                                 @can('port.delete')
-                                <li><a href="#" @click.prevent="purgeDeleted()">
+                                <li><a href="#" @click.prevent="purge('all')">
                                     <i x-show="!loading" class="fa fa-trash fa-lg fa-fw icon-theme" aria-hidden="true"></i>
                                     <i x-show="loading" class="fa fa-refresh fa-spin fa-lg fa-fw icon-theme" aria-hidden="true"></i>
                                     <span x-text="loading ? '{{ __('port.processing') }}' : '{{ __('port.purge') }}'"></span>
@@ -49,7 +49,7 @@
         function portPurge() {
             return {
                 loading: false,
-                async purgeDeleted() {
+                async purge(target) {
                     if (this.loading) return; // Prevent double-clicks
                     this.loading = true;
 
@@ -59,7 +59,7 @@
                     try {
                         const response = await fetch(url, {
                             method: 'DELETE',
-                            body: JSON.stringify({ purge: 'all' }),
+                            body: JSON.stringify({ purge: target }),
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': token,
@@ -68,7 +68,8 @@
                         });
 
                         if (response.ok) {
-                            toastr.success(@js(__('port.purged_message')), @js(__('port.purged')));
+                            toastr.success(target === 'all' ? @js(__('port.purged_message')) : @js(__('port.purged_port_message')), @js(__('port.purged')));
+                            $('#ports').bootgrid('reload');
                         } else {
                             toastr.error(@js(__('port.server_error')), @js(__('port.purge_failed')));
                         }

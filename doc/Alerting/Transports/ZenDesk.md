@@ -67,7 +67,7 @@ For example:
             "link_text": "{{ $alert->hostname }}"
         },
         {
-            "link_url": "{{ route('device', ['device' => $alert->device_id ?? 1, 'tab' => 'alerts']) }}",
+            "link_url": "{{ route('device.faults', $alert->device_id ?? 1) }}",
             "link_text": "{{ $alert->hostname }} - Alerts"
         }
     ]
@@ -92,7 +92,7 @@ output for each transport. Use this method:
       "link_text": "{{ $alert->hostname }}"
     },
     {
-      "link_url": "{{ route('device', ['device' => $alert->device_id ?? 1, 'tab' => 'alerts']) }}",
+      "link_url": "{{ route('device.faults', $alert->device_id ?? 1) }}",
       "link_text": "{{ $alert->hostname }} - Alerts"
     }
   ]

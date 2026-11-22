@@ -36,10 +36,8 @@ class BaseApi
 
     protected function getClient(): \Illuminate\Http\Client\PendingRequest
     {
-        if (is_null($this->client)) {
-            $this->client = Http::client()->baseUrl($this->base_uri)
-            ->timeout($this->timeout);
-        }
+        $this->client ??= Http::client()->baseUrl($this->base_uri)
+        ->timeout($this->timeout);
 
         return $this->client;
     }

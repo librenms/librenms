@@ -22,6 +22,10 @@
     <meta name="msapplication-config" content="{{ asset('images/browserconfig.xml') }}">
     <meta name="theme-color" content="#ffffff">
 
+    @auth
+        <script src="{{ route('js.routes') }}"></script>
+    @endauth
+    @stack('before-app')
     @vite(['resources/js/app.js'])
     <link href="{{ asset('css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/bootstrap-switch.min.css') }}" rel="stylesheet">
@@ -39,8 +43,8 @@
     <link href="{{ asset('css/select2.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/select2-bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/query-builder.default.min.css') }}" rel="stylesheet">
-    <link href="{{ asset(LibrenmsConfig::get('stylesheet', 'css/styles.css')) }}?ver=05282026" rel="stylesheet">
-    <link href="{{ asset('css/tw_dark.css?ver=19112025') }}" rel="stylesheet">
+    <link href="{{ asset(LibrenmsConfig::get('stylesheet', 'css/styles.css')) }}?ver=10022026" rel="stylesheet">
+    <link href="{{ asset('css/tw_dark.css?ver=05102026') }}" rel="stylesheet">
     @if(!in_array(session('applied_site_style', 'light'), ['light', 'dark']))
     <link href="{{ asset('css/' . session('applied_site_style') . '.css?ver=732417643') }}" rel="stylesheet">
     @endif
@@ -70,12 +74,14 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
-        var ajax_url = "{{ url('/ajax') }}";
+        var timezoneUrl = @js(route('ajax.set-timezone'));
+        var resolutionUrl = @js(route('ajax.set-resolution'));
+        var siteStyleUrl = @js(route('ajax.set-style'));
     </script>
-    <script src="{{ asset('js/librenms.js?ver=14092026') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=18112026') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
-    <script type="text/javascript" src="{{ asset('js/boot.js?ver=10272021') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/boot.js?ver=10152026') }}"></script>
     <script>
         window.siteStyle = '{{ session('applied_site_style') }}';
         window.siteStylePreference = '{{ session('preferences.site_style') ?? session('applied_site_style', 'device') }}';
@@ -102,7 +108,7 @@
             window.tz = '{{ session('preferences.timezone') }}';
         @endif
         </script>
-        <script src="{{ asset('js/register-service-worker.js') }}" defer></script>
+        <script src="{{ asset('js/register-service-worker.js?ver=18112026') }}" defer></script>
     @endauth
     @yield('javascript')
 </head>

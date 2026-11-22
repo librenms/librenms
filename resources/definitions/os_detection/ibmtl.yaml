@@ -11,6 +11,15 @@ discovery:
         snmpget:
             oid: 'SML-MIB::product-Name.0'
             value: 'IBM System Storage TS3500 Tape Library'
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.2.6.210
     - sysDescr_regex:
         - '/IBM (.*) UltraScaleable Tape Library/'
+    -
+        sysObjectID_regex:
+            - '/^$/'
+        snmpget:
+            oid: 'SNIA-SML-MIB::storageLibrary-Description.0'
+            value: 'IBM TS4300'
 

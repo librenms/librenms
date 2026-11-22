@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('notifications_attribs', function (Blueprint $table) {
+        Schema::table('notifications_attribs', function (Blueprint $table): void {
             $table->index(['notifications_id', 'user_id']);
         });
     }
@@ -24,7 +24,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('notifications_attribs', function (Blueprint $table) {
+        Schema::table('notifications_attribs', function (Blueprint $table): void {
             $table->dropIndex(['notifications_id', 'user_id']);
         });
     }

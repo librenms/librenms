@@ -224,7 +224,7 @@ Output:
             "ports_fdb_id": 10,
             "port_id": 10000,
             "mac_address": "1aaa2bbb3ccc",
-            "vlan_id": 20000,
+            "vlan": 200,
             "device_id": 1,
             "created_at": "2019-01-1 01:01:01",
             "updated_at": "2019-01-1 01:01:01"

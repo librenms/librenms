@@ -1,9 +1,9 @@
 -- ============================================================================
--- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: Interface QoS Management Information Base.
 -- Reference: RFC 3291
--- Version: 1.12
+-- Version: 2.0
 -- History:
 -- V1.0 created by tangshun.
 -- V1.1 2006/02/24 modified by changhuifeng
@@ -59,13 +59,56 @@
 -- V1.12 2019/06/20 modified by wangqian
 --  2019/06/20 modified by wangqian
 --  Add the hh3cIfQoSPeakPassPPS and hh3cIfQoSPeakPassBPS in hh3cIfQoSHardwareQueueRunInfoEntry
+-- V1.13 2021/10/06 modified by gaomengfei
+--  Add hh3cIfQoS8QueueResouceOverAlarm
+--  Add hh3cIfQoS8QueueResouceOverRecover
+--  Add hh3cIfQoS8QueueResoucePreAlarm
+--  Add hh3cIfQoS8QueueResoucePreRecover
+--  Add hh3cIfQoSBufferOverAlarm
+--  Add hh3cIfQoSBufferOverRecover
+--  Add hh3cIfQoSModeChannelOverPortShapAlarm
+--  Add hh3cIfQoSModeChannelOverPortShapRecover
+--  Add hh3cIfQoSExclusiveBandApplyFailAlarm
+--  Add hh3cIfQoSExclusiveBandApplyFailRecover
+--  Add hh3cIfQoSExclusiveBandOverAlarm
+--  Add hh3cIfQoSExclusiveBandOverRecover
+-- V1.14 2022/06/09 modified by lizhaocheng
+--  Add hh3cIfQoSLRDiscardAlarm
+--  Add hh3cIfQoSLRDiscardAlarmRecover
+--  Add hh3cIfQoSCarDiscardAlarm
+--  Add hh3cIfQoSCarDiscardAlarmRecover
+-- V1.15 2022/08/05 modified by lizhaocheng
+--  Add hh3cIfQoSCoppDropPktAlarm
+--  Add hh3cIfQoSCoppDropPktAlarmRecover
+--  Add hh3cIfQoSQueExcpAlarm
+--  Add hh3cIfQoSQueExcpAlarmRecover
+--  Add hh3cIfQoSBoardL3AclResLack
+--  Add hh3cIfQoSAclResAlarm
+--  Add hh3cIfQoSAclResAlarmRecover
+--  Add hh3cIfQoSAclMemFullAlarm
+--  Add hh3cIfQoSAclMemFullAlarmRecover
+-- V2.0 2022/11/18 modified by zhangxiaowei
+--  Add hh3cIfQoSBufferAlarm
+--  Add hh3cIfQoSBufferAlarmRecover
+--  Add hh3cIfQoSQueBufferOverrunAlarm
+--  Add hh3cIfQoSQueBufferOverrunRecover
+--  Add hh3cIfQoSFCoEPriorityAlarm
+--  Add hh3cIfQoSFCoEPriorityRecover
+--  Add hh3cIfQoSRcyPortPktsDropAlarm
+--  Add hh3cIfQoSRcyPortPktsDropRecover
+--  Add hh3cIfQoSStormSuppressAlarm
+--  Add hh3cIfQoSStormSuppressRecover
+--  Add hh3cIfQoSUniPktsDiscardAlarm
+--  Add hh3cIfQoSUniPktsDiscardRecover
+--  Add hh3cIfQoSIngressDiscardAlarm
+--  Add hh3cIfQoSIngressDiscardRecover
 -- ============================================================================
 HH3C-IFQOS2-MIB DEFINITIONS ::= BEGIN
 
         IMPORTS
             hh3cCommon
                 FROM HH3C-OID-MIB
-            OBJECT-TYPE, MODULE-IDENTITY, Integer32, Counter64, Unsigned32, IpAddress
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32, Counter64, Unsigned32, IpAddress
                 FROM SNMPv2-SMI
             ifIndex
                 FROM IF-MIB
@@ -78,7 +121,7 @@ HH3C-IFQOS2-MIB DEFINITIONS ::= BEGIN
 --
 
         hh3cIfQos2 MODULE-IDENTITY
-            LAST-UPDATED "201906200000Z"
+            LAST-UPDATED "202211180000Z"
             ORGANIZATION
                 "New H3C Technologies Co., Ltd."
             CONTACT-INFO
@@ -87,6 +130,44 @@ HH3C-IFQOS2-MIB DEFINITIONS ::= BEGIN
                 http://www.h3c.com
                 Zip:100085
                 "
+            DESCRIPTION
+                "The MIB contains objects to manage configuration and
+                 monitor running state for Interface Based QoS feature.
+                "
+            REVISION "202211180000Z"        --November 18, 2022 at 00:00 GMT
+            DESCRIPTION
+                "Add hh3cIfQoSBufferAlarm.
+                 Add hh3cIfQoSBufferAlarmRecover.
+                 Add hh3cIfQoSQueBufferOverrunAlarm.
+                 Add hh3cIfQoSQueBufferOverrunRecover.
+                 Add hh3cIfQoSFCoEPriorityAlarm.
+                 Add hh3cIfQoSFCoEPriorityRecover.
+                 Add hh3cIfQoSRcyPortPktsDropAlarm.
+                 Add hh3cIfQoSRcyPortPktsDropRecover.
+                 Add hh3cIfQoSStormSuppressAlarm.
+                 Add hh3cIfQoSStormSuppressRecover.
+                 Add hh3cIfQoSUniPktsDiscardAlarm.
+                 Add hh3cIfQoSUniPktsDiscardRecover.
+                 Add hh3cIfQoSIngressDiscardAlarm.
+                 Add hh3cIfQoSIngressDiscardRecover."
+            REVISION "202208050000Z"        --August 5, 2022 at 00:00 GMT
+            DESCRIPTION
+                "Add hh3cIfQoSCoppDropPktAlarm.
+                 Add hh3cIfQoSCoppDropPktAlarmRecover.
+                 Add hh3cIfQoSQueExcpAlarm.
+                 Add hh3cIfQoSQueExcpAlarmRecover.
+                 Add hh3cIfQoSBoardL3AclResLack.
+                 Add hh3cIfQoSAclResAlarm.
+                 Add hh3cIfQoSAclResAlarmRecover.
+                 Add hh3cIfQoSAclMemFullAlarm.
+                 Add hh3cIfQoSAclMemFullAlarmRecover."
+            REVISION "202206090000Z"        --June 9, 2022 at 00:00 GMT
+            DESCRIPTION
+                "Add hh3cIfQoSLRDiscardAlarm.
+                 Add hh3cIfQoSLRDiscardAlarmRecover.
+                 Add hh3cIfQoSCarDiscardAlarm.
+                 Add hh3cIfQoSCarDiscardAlarmRecover."
+            REVISION "202110060000Z"        --October 06, 2021 at 00:00 GMT
             DESCRIPTION
                 "Add the hh3cIfQoSPeakPassPPS and hh3cIfQoSPeakPassBPS in hh3cIfQoSHardwareQueueRunInfoEntry."
             REVISION "201906200000Z"        --June 20, 2019 at 00:00 GMT
@@ -5170,5 +5251,657 @@ HH3C-IFQOS2-MIB DEFINITIONS ::= BEGIN
             DESCRIPTION
                 "The number of dropped bytes."
             ::= { hh3cIfQoSCoppFlowStatEntry 7 }
+
+--
+-- Nodes of hh3cIfQoSNotificationsBindings
+--
+
+    hh3cIfQoSNotificationsBindings OBJECT IDENTIFIER ::= { hh3cIfQos2 15 }
+
+    hh3cIfQoSChassis OBJECT-TYPE
+        SYNTAX Integer32   (0..65534)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The chassis number."
+        ::= { hh3cIfQoSNotificationsBindings 1 }
+
+    hh3cIfQoSSlot OBJECT-TYPE
+        SYNTAX Integer32   (0..65534)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The slot number."
+        ::= { hh3cIfQoSNotificationsBindings 2 }
+
+    hh3cIfQoSCPU OBJECT-TYPE
+        SYNTAX Integer32   (0..65534)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The CPU number."
+        ::= { hh3cIfQoSNotificationsBindings 3 }
+
+    hh3cIfQoSChip OBJECT-TYPE
+        SYNTAX Integer32   (0..65534)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The chip number."
+        ::= { hh3cIfQoSNotificationsBindings 4 }
+
+    hh3cIfQoSIfName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..47))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The interface name."
+        ::= { hh3cIfQoSNotificationsBindings 5 }
+
+    hh3cIfQoSDirection OBJECT-TYPE
+        SYNTAX Direction
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Inbound or outbound."
+        ::= { hh3cIfQoSNotificationsBindings 6 }
+
+    hh3cIfQoSPassPacketRate OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Rate of outgoing traffic on an interface."
+        ::= { hh3cIfQoSNotificationsBindings 7 }
+
+    hh3cIfQoSCoppProtocol OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..31))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The protocol name of packets sent to CPU."
+        ::= { hh3cIfQoSNotificationsBindings 8 }
+
+    hh3cIfQoSBandwidth OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Bandwidth. Unit: kbps or pps"
+        ::= { hh3cIfQoSNotificationsBindings 9 }
+
+    hh3cIfQoSServiceName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..63))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Name of the service."
+        ::= { hh3cIfQoSNotificationsBindings 10 }
+
+    hh3cIfQoSApplyObject OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..127))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Name of the applying object."
+        ::= { hh3cIfQoSNotificationsBindings 11 }
+
+    hh3cIfQoSFailReason OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..127))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Failure cause."
+        ::= { hh3cIfQoSNotificationsBindings 12 }
+
+    hh3cIfQoSBandwidthUnit OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            unitUnavailable(0),
+            unitAbsolute(1),
+            unitPercent(2),
+            unitRemainPercent(3),
+            unitAbsolutePPS(4)
+        }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The measurement unit for bandwidth.
+             Absolute, Unit : Kbps(Kilobits per second)
+             Percent, Unit : %
+             RemainPercent, Unit : %
+             AbsolutePPS, Unit : pps(Packets per sedond)"
+        ::= { hh3cIfQoSNotificationsBindings 13 }
+
+        hh3cIfQoSQueBufferQueID OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Queue ID."
+        ::= { hh3cIfQoSNotificationsBindings 14 }
+
+        hh3cIfQoSQueBufferUsedCell OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Buffer value."
+        ::= { hh3cIfQoSNotificationsBindings 15 }
+
+        hh3cIfQoSQueBufferUsedLength OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Buffer length."
+        ::= { hh3cIfQoSNotificationsBindings 16 }
+
+        hh3cIfQoSQueBufferDiscard OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The number of dropped bytes."
+        ::= { hh3cIfQoSNotificationsBindings 17 }
+
+        hh3cIfQoSPortID OBJECT-TYPE
+        SYNTAX Integer32   (0..65535)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Port ID."
+        ::= { hh3cIfQoSNotificationsBindings 18 }
+
+    --
+    -- Nodes of hh3cIfQoSNotifications
+    --
+
+    hh3cIfQoSNotifications OBJECT IDENTIFIER ::= { hh3cIfQos2 16 }
+
+    hh3cIfQoSNotificationsPrefix OBJECT IDENTIFIER ::= { hh3cIfQoSNotifications 0 }
+
+    hh3cIfQoS8QueueResouceOverAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSCPU,
+            hh3cIfQoSChip,
+            hh3cIfQoSDirection
+        }
+        STATUS current
+        DESCRIPTION
+            "The number of 8-queue user-queues exceeded the specification of the forwarding engine resources."
+        ::= { hh3cIfQoSNotificationsPrefix 1 }
+
+    hh3cIfQoS8QueueResouceOverRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSCPU,
+            hh3cIfQoSChip,
+            hh3cIfQoSDirection
+        }
+        STATUS current
+        DESCRIPTION
+            "The number of 8-queue user-queues dropped below the specification of the forwarding engine resources."
+        ::= { hh3cIfQoSNotificationsPrefix 2 }
+
+
+    hh3cIfQoS8QueueResoucePreAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSCPU,
+            hh3cIfQoSChip,
+            hh3cIfQoSDirection
+        }
+        STATUS current
+        DESCRIPTION
+            "The number of 8-queue user-queues exceeded 90 percent of the specification of the forwarding engine resources."
+        ::= { hh3cIfQoSNotificationsPrefix 3 }
+
+    hh3cIfQoS8QueueResoucePreRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSCPU,
+            hh3cIfQoSChip,
+            hh3cIfQoSDirection
+        }
+        STATUS current
+        DESCRIPTION
+            "The number of 8-queue user-queues dropped below 90 percent of the specification of the forwarding engine resources."
+        ::= { hh3cIfQoSNotificationsPrefix 4 }
+
+    hh3cIfQoSBufferOverAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSCPU,
+            hh3cIfQoSChip,
+            hh3cIfQoSDirection
+        }
+        STATUS current
+        DESCRIPTION
+            "The buffer size has been reached."
+        ::= { hh3cIfQoSNotificationsPrefix 5 }
+
+    hh3cIfQoSBufferOverRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSCPU,
+            hh3cIfQoSChip,
+            hh3cIfQoSDirection
+        }
+        STATUS current
+        DESCRIPTION
+            "The queue buffer alarm is cleared."
+        ::= { hh3cIfQoSNotificationsPrefix 6 }
+
+    hh3cIfQoSModeChannelOverPortShapAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSCPU,
+            hh3cIfQoSIfName
+        }
+        STATUS current
+        DESCRIPTION
+            "The channelization bandwidth configured on the interface exceeds the port shaping value."
+        ::= { hh3cIfQoSNotificationsPrefix 7 }
+
+    hh3cIfQoSModeChannelOverPortShapRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSCPU,
+            hh3cIfQoSIfName
+        }
+        STATUS current
+        DESCRIPTION
+            "The alarm generated when the channelization bandwidth configured on the interface exceeds the port shaping value is cleared."
+        ::= { hh3cIfQoSNotificationsPrefix 8 }
+
+     hh3cIfQoSExclusiveBandApplyFailAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSCPU,
+            hh3cIfQoSIfName
+        }
+        STATUS current
+        DESCRIPTION
+            "The exclusive bandwidth configured on the interface does not take effect."
+        ::= { hh3cIfQoSNotificationsPrefix 9 }
+
+    hh3cIfQoSExclusiveBandApplyFailRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSCPU,
+            hh3cIfQoSIfName
+        }
+        STATUS current
+        DESCRIPTION
+            "The exclusive bandwidth service alarm on interface has cleared."
+        ::= { hh3cIfQoSNotificationsPrefix 10 }
+
+    hh3cIfQoSExclusiveBandOverAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSCPU,
+            hh3cIfQoSIfName
+        }
+        STATUS current
+        DESCRIPTION
+            "The exclusive bandwidth configured on the interface exceeds the port bandwidth or port shaping value."
+        ::= { hh3cIfQoSNotificationsPrefix 11 }
+
+    hh3cIfQoSExclusiveBandOverRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSCPU,
+            hh3cIfQoSIfName
+        }
+        STATUS current
+        DESCRIPTION
+            "The alarm generated when the exclusive bandwidth configured on the interface exceeds the port bandwidth or port shaping value is cleared."
+        ::= { hh3cIfQoSNotificationsPrefix 12 }
+
+    hh3cIfQoSLRDiscardAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSIfName,
+            hh3cIfQoSLRCir,
+            hh3cIfQoSPassPacketRate
+        }
+        STATUS current
+        DESCRIPTION
+            "The outgoing traffic on the interface exceeds the CIR of the interface."
+        ::= { hh3cIfQoSNotificationsPrefix 13 }
+
+    hh3cIfQoSLRDiscardAlarmRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSIfName,
+            hh3cIfQoSLRCir,
+            hh3cIfQoSPassPacketRate
+        }
+        STATUS current
+        DESCRIPTION
+            "The outgoing traffic on the interface recovered from congestion."
+        ::= { hh3cIfQoSNotificationsPrefix 14 }
+
+    hh3cIfQoSCarDiscardAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSIfName,
+            hh3cIfQoSDirection
+        }
+        STATUS current
+        DESCRIPTION
+            "Packet loss occurs on the interface due to CAR."
+        ::= { hh3cIfQoSNotificationsPrefix 15 }
+
+    hh3cIfQoSCarDiscardAlarmRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSIfName,
+            hh3cIfQoSDirection
+        }
+        STATUS current
+        DESCRIPTION
+            "The interface recovers from the packet loss caused by CAR."
+        ::= { hh3cIfQoSNotificationsPrefix 16 }
+
+    hh3cIfQoSCoppDropPktAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSCoppProtocol,
+            hh3cIfQoSBandwidth,
+            hh3cIfQoSBandwidthUnit
+        }
+        STATUS current
+        DESCRIPTION
+            "Rate of packets to cpu exceeded the control-plane CAR limit."
+        ::= { hh3cIfQoSNotificationsPrefix 17 }
+
+    hh3cIfQoSCoppDropPktAlarmRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSCoppProtocol,
+            hh3cIfQoSBandwidth,
+            hh3cIfQoSBandwidthUnit
+        }
+        STATUS current
+        DESCRIPTION
+            "Rate of packets to cpu lowered the control-plane CAR limit."
+        ::= { hh3cIfQoSNotificationsPrefix 18 }
+
+    hh3cIfQoSQueExcpAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSCoppProtocol
+        }
+        STATUS current
+        DESCRIPTION
+            "Failed to forward packets due to an abnormal queue in the specified
+             slot."
+        ::= { hh3cIfQoSNotificationsPrefix 19 }
+
+    hh3cIfQoSQueExcpAlarmRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSCoppProtocol
+        }
+        STATUS current
+        DESCRIPTION
+            "The forwarding failure caused by an abnormal queue in the specified
+             slot is cleared."
+        ::= { hh3cIfQoSNotificationsPrefix 20 }
+
+    hh3cIfQoSBoardL3AclResLack NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSServiceName,
+            hh3cIfQoSFailReason
+        }
+        STATUS current
+        DESCRIPTION
+            "Layer 3 service failed because of insufficient ACL resources."
+        ::= { hh3cIfQoSNotificationsPrefix 21 }
+
+    hh3cIfQoSAclResAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSServiceName,
+            hh3cIfQoSApplyObject,
+            hh3cIfQoSDirection,
+            hh3cIfQoSFailReason
+        }
+        STATUS current
+        DESCRIPTION
+            "The service failed to be delivered because ACL resources were
+             insufficient."
+        ::= { hh3cIfQoSNotificationsPrefix 22 }
+
+    hh3cIfQoSAclResAlarmRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot,
+            hh3cIfQoSServiceName,
+            hh3cIfQoSApplyObject,
+            hh3cIfQoSDirection,
+            hh3cIfQoSFailReason
+        }
+        STATUS current
+        DESCRIPTION
+            "ACL resources are sufficient."
+        ::= { hh3cIfQoSNotificationsPrefix 23 }
+
+    hh3cIfQoSAclMemFullAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot
+        }
+        STATUS current
+        DESCRIPTION
+            "The ACL memory usage exceeds the specification of the forwarding
+             engine in a specified slot."
+        ::= { hh3cIfQoSNotificationsPrefix 24 }
+
+    hh3cIfQoSAclMemFullAlarmRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSChassis,
+            hh3cIfQoSSlot
+        }
+        STATUS current
+        DESCRIPTION
+            "The ACL memory usage of the forwarding engine is recovered in a
+             specified slot."
+        ::= { hh3cIfQoSNotificationsPrefix 25 }
+
+        hh3cIfQoSBufferAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSSlot,
+            hh3cIfQoSChip
+        }
+        STATUS current
+        DESCRIPTION
+            "Queue buffer alarm on slot."
+        ::= { hh3cIfQoSNotificationsPrefix 26 }
+
+        hh3cIfQoSBufferAlarmRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSSlot,
+            hh3cIfQoSChip
+        }
+        STATUS current
+        DESCRIPTION
+            "Queue buffer alarm recovered on slot."
+        ::= { hh3cIfQoSNotificationsPrefix 27 }
+
+        hh3cIfQoSQueBufferOverrunAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSQueBufferQueID,
+            hh3cIfQoSIfName,
+            hh3cIfQoSSlot,
+            hh3cIfQoSQueBufferUsedCell,
+            hh3cIfQoSQueBufferUsedLength,
+            hh3cIfQoSQueBufferDiscard
+        }
+        STATUS current
+        DESCRIPTION
+            "Interface queue buffer threshold alarm."
+        ::= { hh3cIfQoSNotificationsPrefix 28 }
+
+        hh3cIfQoSQueBufferOverrunRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSQueBufferQueID,
+            hh3cIfQoSIfName,
+            hh3cIfQoSSlot,
+            hh3cIfQoSQueBufferUsedCell,
+            hh3cIfQoSQueBufferUsedLength,
+            hh3cIfQoSQueBufferDiscard
+        }
+        STATUS current
+        DESCRIPTION
+            "Interface queue buffer threshold alarm recovery."
+        ::= { hh3cIfQoSNotificationsPrefix 29 }
+
+        hh3cIfQoSFCoEPriorityAlarm NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "Priority mapping alarm."
+        ::= { hh3cIfQoSNotificationsPrefix 30 }
+
+        hh3cIfQoSFCoEPriorityRecover NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "Priority mapping alarm recovery."
+        ::= { hh3cIfQoSNotificationsPrefix 31 }
+
+        hh3cIfQoSRcyPortPktsDropAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSPortID,
+            hh3cIfQoSSlot,
+            hh3cIfQoSChip
+        }
+        STATUS current
+        DESCRIPTION
+            "Packet loss alarm of loopback port."
+        ::= { hh3cIfQoSNotificationsPrefix 32 }
+
+        hh3cIfQoSRcyPortPktsDropRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSPortID,
+            hh3cIfQoSSlot,
+            hh3cIfQoSChip
+        }
+        STATUS current
+        DESCRIPTION
+            "Packet loss recovery of loopback port."
+        ::= { hh3cIfQoSNotificationsPrefix 33 }
+
+        hh3cIfQoSStormSuppressAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSSlot
+        }
+        STATUS current
+        DESCRIPTION
+            "QoS storm suppression alarm."
+        ::= { hh3cIfQoSNotificationsPrefix 34}
+
+        hh3cIfQoSStormSuppressRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSSlot
+        }
+        STATUS current
+        DESCRIPTION
+            "QoS storm suppression recovery."
+        ::= { hh3cIfQoSNotificationsPrefix 35 }
+
+        hh3cIfQoSUniPktsDiscardAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSSlot
+        }
+        STATUS current
+        DESCRIPTION
+            "Unicast packet loss."
+        ::= { hh3cIfQoSNotificationsPrefix 36 }
+
+        hh3cIfQoSUniPktsDiscardRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSSlot
+        }
+        STATUS current
+        DESCRIPTION
+            "Unicast packet loss recovery."
+        ::= { hh3cIfQoSNotificationsPrefix 37 }
+
+        hh3cIfQoSIngressDiscardAlarm NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSSlot
+        }
+        STATUS current
+        DESCRIPTION
+            "Incoming direction message dispatching failure."
+        ::= { hh3cIfQoSNotificationsPrefix 38 }
+
+        hh3cIfQoSIngressDiscardRecover NOTIFICATION-TYPE
+        OBJECTS
+        {
+            hh3cIfQoSSlot
+        }
+        STATUS current
+        DESCRIPTION
+            "Incoming direction message dispatching recovery."
+        ::= { hh3cIfQoSNotificationsPrefix 39 }
 
 END

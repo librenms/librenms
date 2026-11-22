@@ -1,0 +1,130 @@
+-- Traps for use by AlaxalA networks AX7700R
+
+-- Traps are defined using the conventions in RFC 1215.
+AX7700R-TRAP DEFINITIONS ::= BEGIN
+IMPORTS
+TRAP-TYPE
+    FROM RFC-1215
+ifIndex
+    FROM RFC1213-MIB
+ax7700r, ax7700rSystemMsgType, ax7700rSystemMsgTimeStamp, ax7700rSystemMsgLevel, ax7700rSystemMsgEventPoint,
+ax7700rSystemMsgEventInterfaceID, ax7700rSystemMsgEventCode, ax7700rSystemMsgAdditionalCode, ax7700rSystemMsgText,
+ax7700rChassisIndex, ax7700rBcuBoardIndex, ax7700rTemperatureStatusIndex, ax7700rTemperatureStatusDescr, 
+ax7700rTemperatureStatusValue, ax7700rTemperatureState,
+axrLoginName, axrLoginTime, axrLoginLocation, axrLoginLine, axrLoginFailureTime, axrLogoutTime, axrLogoutStatus
+    FROM AX7800R
+;
+
+ax7700rSystemMsgTrap TRAP-TYPE
+	ENTERPRISE      ax7700r
+	VARIABLES       { ax7700rSystemMsgType, ax7700rSystemMsgTimeStamp,
+                          ax7700rSystemMsgLevel, ax7700rSystemMsgEventPoint,
+                          ax7700rSystemMsgEventInterfaceID, ax7700rSystemMsgEventCode,
+                          ax7700rSystemMsgAdditionalCode, ax7700rSystemMsgText }
+	DESCRIPTION
+		"System message is displayed."
+	::= 1
+
+ax7700rStandbySystemUpTrap TRAP-TYPE
+	ENTERPRISE      ax7700r
+	VARIABLES       { ax7700rChassisIndex, ax7700rBcuBoardIndex }
+	DESCRIPTION
+		"Standby system is restarted."
+	::= 2
+
+ax7700rStandbySystemDownTrap TRAP-TYPE
+	ENTERPRISE      ax7700r
+	VARIABLES       { ax7700rChassisIndex, ax7700rBcuBoardIndex }
+	DESCRIPTION
+		"Standby system is failed."
+	::= 3
+
+ax7700rTemperatureTrap TRAP-TYPE
+	ENTERPRISE ax7700r
+	VARIABLES {
+		ax7700rChassisIndex,
+		ax7700rBcuBoardIndex,
+		ax7700rTemperatureStatusIndex,
+		ax7700rTemperatureStatusDescr, 
+		ax7700rTemperatureStatusValue, 
+		ax7700rTemperatureState }
+	DESCRIPTION
+		"A ax7700rTemperatureTrap is sent if the 
+		temperature measured at a given testpoint is outside 
+		the normal range for the testpoint (i.e. is at the warning, 
+		critical, or shutdown stage)."
+	::= 4
+
+ax7700rAirFanStopTrap TRAP-TYPE
+	ENTERPRISE      ax7700r
+	DESCRIPTION
+             "This trap indicates a fan failure." 
+	::= 8 
+
+ax7700rPowerSupplyFailureTrap TRAP-TYPE
+	ENTERPRISE      ax7700r
+	DESCRIPTION
+             "This trap indicates one ( or more ) of power supplies failure." 
+	::= 9 
+
+ax7700rLoginSuccessTrap TRAP-TYPE
+	ENTERPRISE      ax7700r
+	VARIABLES       { axrLoginName, axrLoginTime, axrLoginLocation, axrLoginLine }
+	DESCRIPTION
+             "This trap indicates success of user log in." 
+	::= 10 
+
+ax7700rLoginFailureTrap TRAP-TYPE
+	ENTERPRISE      ax7700r
+	VARIABLES       { axrLoginName, axrLoginFailureTime, 
+                          axrLoginLocation, axrLoginLine }
+	DESCRIPTION
+             "This trap indicates failure of user log in." 
+	::= 11
+
+ax7700rLogoutTrap TRAP-TYPE
+	ENTERPRISE      ax7700r
+	VARIABLES       { axrLoginName, axrLoginTime, axrLogoutTime, 
+                          axrLoginLocation, axrLoginLocation, axrLoginLine, 
+                          axrLogoutStatus }
+	DESCRIPTION
+             "This trap indicates success of following log out.
+	       'logout' command, 'exit' command, 'quit' command."
+	::= 12
+
+ax7700rMemoryUsageTrap  TRAP-TYPE
+	ENTERPRISE      ax7700r
+	DESCRIPTION
+             "This indicates available memory is fewer than lower limit." 
+	::= 13
+
+ax7700rFrameErrorReceiveTrap  TRAP-TYPE
+	ENTERPRISE      ax7700r
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "This indicates frame receive error." 
+	::= 18
+
+ax7700rFrameErrorSendTrap  TRAP-TYPE
+	ENTERPRISE      ax7700r
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "This indicates frame send error." 
+	::= 19
+
+-- axrEfmoamUdldPortInactivateTrap TRAP-TYPE
+ax7700rEfmoamUdldPortInactivateTrap TRAP-TYPE
+	ENTERPRISE      ax7700r
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "Efmoam udld port inactivate trap."
+	::= 29
+-- axrEfmoamLoopDetectPortInactivateTrap TRAP-TYPE
+ax7700rEfmoamLoopDetectPortInactivateTrap TRAP-TYPE
+	ENTERPRISE      ax7700r
+	VARIABLES       { ifIndex }
+	DESCRIPTION
+             "Efmoam loop detect port inactivate trap."
+	::= 30
+END
+

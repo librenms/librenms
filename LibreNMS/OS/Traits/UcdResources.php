@@ -27,34 +27,41 @@
 namespace LibreNMS\OS\Traits;
 
 use App\Models\Mempool;
+use App\Models\Processor;
 use App\Models\Storage;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use LibreNMS\Device\Processor;
 use LibreNMS\Util\Number;
+use SnmpQuery;
 
 trait UcdResources
 {
     /**
      * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
+     * Returns a Collection of Processor models that have been discovered
      *
-     * @return array Processors
+     * @return Collection<Processor>
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): Collection
     {
         Log::info('UCD Resources: ');
 
-        return [
-            Processor::discover(
-                'ucd-old',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.2021.11.11.0',
-                0,
-                'CPU',
-                -1
-            ),
-        ];
+        $value = SnmpQuery::get('.1.3.6.1.4.1.2021.11.11.0')->value();
+
+        if (! is_numeric($value)) {
+            return new Collection;
+        }
+
+        return collect([
+            new Processor([
+                'processor_type' => 'ucd-old',
+                'processor_oid' => '.1.3.6.1.4.1.2021.11.11.0',
+                'processor_index' => 0,
+                'processor_descr' => 'CPU',
+                'processor_precision' => -1,
+                'processor_usage' => $value,
+            ]),
+        ]);
     }
 
     public function discoverMempools()
@@ -71,58 +78,58 @@ trait UcdResources
         ], '-OQUs', 'UCD-SNMP-MIB');
 
         if ($this->oidValid($data, 'memTotalReal') && $this->oidValid($data, 'memAvailReal')) {
-            $mempools->push((new Mempool([
+            $mempools->push(new Mempool([
                 'mempool_index' => 1,
                 'mempool_type' => 'ucd',
                 'mempool_class' => 'system',
                 'mempool_precision' => 1024,
                 'mempool_descr' => 'Physical memory',
                 'mempool_free_oid' => '.1.3.6.1.4.1.2021.4.6.0',
-            ]))->fillUsage(null, $data[0]['memTotalReal'] ?? null, $data[0]['memAvailReal']));
+            ])->fillUsage(null, $data[0]['memTotalReal'] ?? null, $data[0]['memAvailReal']));
         }
 
         if ($this->oidValid($data, 'memTotalSwap') && $this->oidValid($data, 'memAvailSwap')) {
-            $mempools->push((new Mempool([
+            $mempools->push(new Mempool([
                 'mempool_index' => 2,
                 'mempool_type' => 'ucd',
                 'mempool_class' => 'swap',
                 'mempool_precision' => 1024,
                 'mempool_descr' => 'Swap space',
                 'mempool_free_oid' => '.1.3.6.1.4.1.2021.4.4.0',
-            ]))->fillUsage(null, $data[0]['memTotalSwap'], $data[0]['memAvailSwap']));
+            ])->fillUsage(null, $data[0]['memTotalSwap'], $data[0]['memAvailSwap']));
         }
 
         if ($this->oidValid($data, 'memBuffer')) {
-            $mempools->push((new Mempool([
+            $mempools->push(new Mempool([
                 'mempool_index' => 3,
                 'mempool_type' => 'ucd',
                 'mempool_class' => 'buffers',
                 'mempool_precision' => 1024,
                 'mempool_descr' => 'Memory buffers',
                 'mempool_used_oid' => '.1.3.6.1.4.1.2021.4.14.0',
-            ]))->fillUsage($data[0]['memBuffer'], $data[0]['memTotalReal']));
+            ])->fillUsage($data[0]['memBuffer'], $data[0]['memTotalReal']));
         }
 
         if ($this->oidValid($data, 'memCached')) {
-            $mempools->push((new Mempool([
+            $mempools->push(new Mempool([
                 'mempool_index' => 4,
                 'mempool_type' => 'ucd',
                 'mempool_class' => 'cached',
                 'mempool_precision' => 1024,
                 'mempool_descr' => 'Cached memory',
                 'mempool_used_oid' => '.1.3.6.1.4.1.2021.4.15.0',
-            ]))->fillUsage($data[0]['memCached'], $data[0]['memTotalReal']));
+            ])->fillUsage($data[0]['memCached'], $data[0]['memTotalReal']));
         }
 
         if ($this->oidValid($data, 'memSysAvail')) {
-            $mempools->push((new Mempool([
+            $mempools->push(new Mempool([
                 'mempool_index' => 5,
                 'mempool_type' => 'ucd',
                 'mempool_class' => 'available',
                 'mempool_precision' => 1024,
                 'mempool_descr' => 'Available memory',
                 'mempool_free_oid' => '.1.3.6.1.4.1.2021.4.27.0',
-            ]))->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memSysAvail']));
+            ])->fillUsage(null, $data[0]['memTotalReal'], $data[0]['memSysAvail']));
         }
 
         return $mempools;

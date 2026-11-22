@@ -42,7 +42,7 @@ class InventoryTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'inventory']))
+            ->get(route('device.inventory', ['device' => $device]))
             ->assertOk()
             ->assertSee('Chassis 1')
             ->assertSee('Catalyst 3850');
@@ -66,7 +66,7 @@ class InventoryTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'inventory']))
+            ->get(route('device.inventory', ['device' => $device]))
             ->assertOk()
             ->assertSee('Temperature Sensor 1')
             ->assertSee(route('graphs', ['type' => 'sensor_temperature', 'id' => $sensor->sensor_id]))
@@ -98,12 +98,12 @@ class InventoryTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'inventory']))
+            ->get(route('device.inventory', ['device' => $device]))
             ->assertOk()
             ->assertSee('Power Supply 1')
             ->assertSee(__('Sensors') . ':')
-            ->assertSee('Voltage voltage')
-            ->assertSee('Current current')
+            ->assertSee('Voltage Voltage')
+            ->assertSee('Current Current')
             ->assertSee(route('graphs', ['type' => 'sensor_voltage', 'id' => $sensor1->sensor_id]))
             ->assertSee(route('graphs', ['type' => 'sensor_current', 'id' => $sensor2->sensor_id]));
     }
@@ -125,7 +125,7 @@ class InventoryTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'inventory']))
+            ->get(route('device.inventory', ['device' => $device]))
             ->assertOk()
             ->assertSee('Intel Xeon CPU E5-2680')
             ->assertSee('hrDeviceProcessor')
@@ -147,7 +147,7 @@ class InventoryTabTest extends TestCase
         $user->assignRole('user');
 
         $this->actingAs($user)
-            ->get(route('device', ['device' => $device, 'tab' => 'inventory']))
+            ->get(route('device.inventory', ['device' => $device]))
             ->assertForbidden();
     }
 }

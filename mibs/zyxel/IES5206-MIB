@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing comma; AUGMENTS targets not imported; trailing comma before })
 ------------------------------------------------------------
 -- $$Version 1.00 (Change History)
 -- 1.00 (2014/8/8)
@@ -23,8 +24,13 @@ IES5206-MIB DEFINITIONS ::= BEGIN
 	InetAddressType, InetAddress, InetAddressIPv6
 		FROM INET-ADDRESS-MIB		-- RFC2851
 	Xdsl2Unit
-		FROM VDSL2-LINE-TC-MIB			-- RFC5650
-	GBondScheme
+		FROM VDSL2-LINE-TC-MIB
+	xdsl2LineConfProfEntry, xdsl2LineBandEntry, xdsl2ChannelStatusEntry, xdsl2PMLineCurrEntry,
+	xdsl2PMLineInitCurrEntry, xdsl2PMChCurrEntry, xdsl2LineAlarmConfProfileEntry
+		FROM VDSL2-LINE-MIB
+	ifXEntry
+		FROM IF-MIB			-- RFC5650
+	GBondScheme, gBondPortStatEntry
 		FROM GBOND-MIB
 	EnabledStatus
 		FROM  P-BRIDGE-MIB
@@ -14567,7 +14573,7 @@ aclEgressProfileTable OBJECT-TYPE
           icmp(0),
           telnet(1),
           ftp(2),
-          snmp(3)
+          snmp(3),
           web(4),
           https(5),
           ssh(6)
@@ -17920,7 +17926,7 @@ tacacsplusAuthor		OBJECT IDENTIFIER ::= { tacacsplus 3 }
 
 		Vdsl2TemplateConfProfileExEntry ::=
         	SEQUENCE {
-			vdsl2TemplateConfProfileInmProf DisplayString,
+			vdsl2TemplateConfProfileInmProf DisplayString
            	}
 
      vdsl2TemplateConfProfileInmProf OBJECT-TYPE
@@ -22873,7 +22879,7 @@ tacacsplusAuthor		OBJECT IDENTIFIER ::= { tacacsplus 3 }
 	    tmplateAction OBJECT-TYPE
 	        SYNTAX      INTEGER {
 	            templateDisable(0),
-	            templateEnable(1),
+	            templateEnable(1)
 	        }
 	        MAX-ACCESS  read-write
 	        STATUS      current
@@ -25467,7 +25473,7 @@ tacacsplusAuthor		OBJECT IDENTIFIER ::= { tacacsplus 3 }
 			bwProfileAir        INTEGER,
 			bwProfilePir        INTEGER,
 			bwProfileRowStatus  RowStatus,
-			bwProfileUstype     INTEGER,
+			bwProfileUstype     INTEGER
 		}
 
 		bwProfileName OBJECT-TYPE
@@ -28611,7 +28617,7 @@ tacacsplusAuthor		OBJECT IDENTIFIER ::= { tacacsplus 3 }
 			ontDdmiHistLast15RxPower                  DisplayString,
 			ontDdmiHistLast15TxPower                  DisplayString,
 			ontDdmiHistLast15LaserCurrent	         DisplayString,
-			ontDdmiHistLast15Temperature           DisplayString,
+			ontDdmiHistLast15Temperature           DisplayString
 		}
 
 		ontDdmiHistLast15Voltage OBJECT-TYPE
@@ -30924,7 +30930,7 @@ tacacsplusAuthor		OBJECT IDENTIFIER ::= { tacacsplus 3 }
       	  errdisStatusReason       INTEGER,
           errdisStatusDetectMode    INTEGER,
           errdisStatusDetectTime    DisplayString,
-          errdisStatusRecoveryTimeleft    INTEGER,
+          errdisStatusRecoveryTimeleft    INTEGER
          }
 
         errdisStatusIfindex OBJECT-TYPE
@@ -30947,7 +30953,7 @@ tacacsplusAuthor		OBJECT IDENTIFIER ::= { tacacsplus 3 }
         errdisStatusDetectMode OBJECT-TYPE
         SYNTAX  INTEGER{
         	None(0),
-        	Detected(1),
+        	Detected(1)
         }
         ACCESS  read-only
         STATUS  current
@@ -31192,7 +31198,7 @@ tacacsplusAuthor		OBJECT IDENTIFIER ::= { tacacsplus 3 }
 			activePortBandwidth				DisplayString,
 			backupPortBandwidth				DisplayString,
 			activePortTrunkingMember		PortList,
-			backupPortTrunkingMember		PortList,
+			backupPortTrunkingMember		PortList
 		}
 
 	groupId OBJECT-TYPE

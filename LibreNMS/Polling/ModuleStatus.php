@@ -26,8 +26,6 @@
 
 namespace LibreNMS\Polling;
 
-use App\Models\Device;
-
 class ModuleStatus implements \Stringable
 {
     public function __construct(
@@ -36,6 +34,7 @@ class ModuleStatus implements \Stringable
         public ?bool $device = null,
         public ?bool $manual = null,
         public ?array $submodules = null,
+        public ?bool $method = null, // set by the device's polling methods
     ) {
     }
 
@@ -51,6 +50,10 @@ class ModuleStatus implements \Stringable
 
         if ($this->device !== null) {
             return $this->device;
+        }
+
+        if ($this->method !== null) {
+            return $this->method;
         }
 
         if ($this->os !== null) {
@@ -70,21 +73,15 @@ class ModuleStatus implements \Stringable
             return 'by device';
         }
 
+        if ($this->method !== null) {
+            return 'by polling method';
+        }
+
         if ($this->os !== null) {
             return 'by OS';
         }
 
         return 'globally';
-    }
-
-    public function isEnabledAndDeviceUp(Device $device, bool $check_snmp = true): bool
-    {
-        $connectivity = new ConnectivityHelper($device);
-        if ($check_snmp && ! $connectivity->snmpIsAvailable()) {
-            return false;
-        }
-
-        return $this->isEnabled() && $connectivity->isAvailable();
     }
 
     public function hasSubModules(): bool
@@ -94,10 +91,11 @@ class ModuleStatus implements \Stringable
 
     public function __toString(): string
     {
-        return sprintf('Module %s: Global %s | OS %s | Device %s | Manual %s',
+        return sprintf('Module %s: Global %s | OS %s | Method %s | Device %s | Manual %s',
             $this->isEnabled() ? 'enabled' : 'disabled',
             $this->global ? '+' : '-',
             $this->os === null ? ' ' : ($this->os ? '+' : '-'),
+            $this->method === null ? ' ' : ($this->method ? '+' : '-'),
             $this->device === null ? ' ' : ($this->device ? '+' : '-'),
             $this->manual === null ? ' ' : ($this->manual ? '+' : '-'),
         );

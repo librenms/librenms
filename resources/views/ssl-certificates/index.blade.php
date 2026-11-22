@@ -43,11 +43,8 @@
 
 @section('javascript')
 <script>
-var sslCertUpdateUrl = "{{ route('ssl-certificates.update', ['ssl_certificate' => '__ID__']) }}".replace('__ID__', '');
-var sslCertDestroyUrl = "{{ route('ssl-certificates.destroy', ['ssl_certificate' => '__ID__']) }}".replace('__ID__', '');
-
 function sslCertPause(id) {
-    var url = sslCertUpdateUrl + id;
+    var url = route('ssl-certificates.update', {ssl_certificate: id});
     $.ajax({
         method: 'PUT',
         url: url,
@@ -62,7 +59,7 @@ function sslCertPause(id) {
 }
 
 function sslCertEnable(id) {
-    var url = sslCertUpdateUrl + id;
+    var url = route('ssl-certificates.update', {ssl_certificate: id});
     $.ajax({
         method: 'PUT',
         url: url,
@@ -80,7 +77,7 @@ function sslCertDelete(id) {
     if (!confirm("{{ __('Delete this certificate?') }}")) {
         return;
     }
-    var url = sslCertDestroyUrl + id;
+    var url = route('ssl-certificates.destroy', {ssl_certificate: id});
     $.ajax({
         method: 'DELETE',
         url: url,
@@ -101,7 +98,7 @@ $(document).ready(function () {
         formatters: {
             "actions": function (column, row) {
                 var html = '<div class="ssl-cert-actions" style="white-space:nowrap">';
-                html += '<a href="{{ url('ssl-certificates') }}/' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-eye fa-fw"></i> {{ __('View') }}</a> ';
+                html += '<a href="' + route('ssl-certificates.show', {ssl_certificate: row.id}) + '" class="btn btn-xs btn-info"><i class="fa fa-eye fa-fw"></i> {{ __('View') }}</a> ';
                 @can('ssl-certificate.update')
                 if (row.disabled) {
                     html += '<button type="button" class="btn btn-xs btn-success" onclick="sslCertEnable(' + row.id + ')"><i class="fa fa-play fa-fw"></i> {{ __('Enable') }}</button> ';

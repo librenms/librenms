@@ -1,14 +1,14 @@
 -- =============================================================================
--- Copyright (C) 2002-2003 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (C) 2002-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
--- Description:MPLS-BGP-VPN-MIB 
--- Reference:This MIB was extracted from Draft-ietf-mpls-ldp-mib-01
--- Version: V1.6
+-- Description:Multiprotocol Label Switching Label Distribution Protocol MIB
+-- Reference:
+-- Version: V1.7
 -- History:
 --  VERSION    AUTHOR/          Change Description
 --  OLD/NEW     DATE
---                                                  
---  #/1.1     Lingesh M        + Initial create. 
+--
+--  #/1.1     Lingesh M        + Initial create.
 --             27/08/99
 --  #/1.2     27/09/99         + Replaced the MIB objects
 --                                  - hh3cMplsLdpLsrMaxIngressCrlspTnls
@@ -20,24 +20,24 @@
 --                               Table, modified Cr-lsp Tnl index of type
 --                               read-create to not-accessible.
 --                             + Removed hh3cMplsLdpSessionRowStatus mib-object.
---  
+--
 --   1.1      03/01/2k         + MPLS Release 1.0.0.0
---             Naren             
--- 
+--             Naren
+--
 --   1.2      27/01/2k         + Modified for MPLS Implementation
 --             Naren             Following objects are added in the Incarnation table
---                                 hh3cMplsLdpLsrMaxVcmCapability                  
---                                 hh3cMplsLdpLsrVcmPathVecInAllLblMapPresent      
---                                 hh3cMplsLdpLsrRequestRetrytimerValue            
---                                 hh3cMplsLdpLsrNumOfRequestRetryAttempts         
+--                                 hh3cMplsLdpLsrMaxVcmCapability
+--                                 hh3cMplsLdpLsrVcmPathVecInAllLblMapPresent
+--                                 hh3cMplsLdpLsrRequestRetrytimerValue
+--                                 hh3cMplsLdpLsrNumOfRequestRetryAttempts
 --                               Following Notifications are added
 --                                 hh3cMplsLdpIncarnUpEventFailure
 --                                 hh3cMplsLdpIncarnDownEventFailure
 --                                 hh3cMplsLdpEntityUpEventFailure
 --                                 hh3cMplsLdpEntityDownEventFailure
--- 
---   1.3      03/04/2k         + Changed FS related identification to hh3c 
---             David             related identification.	
+--
+--   1.3      03/04/2k         + Changed FS related identification to hh3c
+--             David             related identification.
 --   1.4      03/14/2003       add hh3cMplsLdpSessionUpEventFailure and hh3cMplsLdpSessionDownEventFailure
 --   V1.5 2004-10-12 updated by gaolong
 --        Change SYNTAX clause value from INTEGER to Unsigned because the value range is (1..4294967295).
@@ -45,6 +45,7 @@
 --        because this index node is used when sending notification.
 --   V1.6 2004-11-5  updated by liuxiaolong
 --        Change DEFVAL clause value of hh3cMplsLdpLsrHopCountLimit to 32.
+--   V1.7 2022-08-11 Modified by Zhou wan, Modified hh3cMplsLdpNotifications
 -- ====================================================================================
 --
 -- Full Copyright Notice of the MIB that was extracted from Draft-ietf-mpls-ldp-mib-01 as follows:
@@ -79,19 +80,17 @@
 --   MPLS Label Distribution Protocol MIB Definitions
 HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
 
-     IMPORTS                  
+     IMPORTS
          hh3cMpls
              FROM HH3C-OID-MIB
          OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE,
-         Integer32, Counter32, Unsigned32,IpAddress
+         Counter32, Unsigned32,IpAddress
              FROM SNMPv2-SMI
-         MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
-             FROM SNMPv2-CONF
          TEXTUAL-CONVENTION, TruthValue, RowStatus, TimeInterval
              FROM SNMPv2-TC;
-             
+
      hh3cMplsLdp MODULE-IDENTITY
-         LAST-UPDATED "9906301200Z"     -- June 30, 1999 at 12:00 GMT
+         LAST-UPDATED "202208111100Z"     -- August 11, 2022 at 11:00 GMT
          ORGANIZATION
              "New H3C Tech. Co., Ltd."
          CONTACT-INFO
@@ -101,9 +100,13 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              Zip:100085
              "
          DESCRIPTION  "All rights reserved"
+         REVISION
+             "202208111100Z"   -- August 11, 2022 at 11:00 GMT
+         DESCRIPTION
+             "Modified hh3cMplsLdpNotifications."
          REVISION     "9611082155Z"
          DESCRIPTION  "The MIB for MPLS LDP module.
-                       This MIB has been derived from the MPLS Working 
+                       This MIB has been derived from the MPLS Working
                        group LDP MIB <drst-ietf-mpls-ldp-mib-01.txt> and
                        MPLS Working group TE MIB <draft-ietf-mpls-te-mib
                        -01.txt>."
@@ -130,11 +133,11 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
           -- For example, an ethernet address would be represented as
           -- a string of 6 octets.
 
-	BitRate ::= INTEGER
-	
-	BurstSize ::= INTEGER
-	
-	
+  BitRate ::= INTEGER
+
+  BurstSize ::= INTEGER
+
+
      MplsLsrIdentifier ::= TEXTUAL-CONVENTION
          STATUS      current
          DESCRIPTION
@@ -235,15 +238,17 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
             2.  Use  of  Label Switching on Frame Relay Networks,
              Conta et al, draft-ietf-mpls-fr-03.txt, Nov. 1998."
         SYNTAX INTEGER
-     
+
      MplsTunnelIndex ::= TEXTUAL-CONVENTION
         STATUS        current
         DESCRIPTION
             "Index into mplsTunnelTable."
         SYNTAX        INTEGER (0..65535)
-     
+
      hh3cMplsLdpObjects       OBJECT IDENTIFIER ::= { hh3cMplsLdp 1 }
      hh3cMplsLdpNotifications OBJECT IDENTIFIER ::= { hh3cMplsLdp 2 }
+     hh3cMplsLdpScalarGroup   OBJECT IDENTIFIER ::= { hh3cMplsLdp 3 }
+
 
      --****************************************************************
      -- MPLS LDP Objects
@@ -264,7 +269,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          MAX-ACCESS  not-accessible
          STATUS      current
          DESCRIPTION
-             "MPLS provides support for multiple incarnations of the 
+             "MPLS provides support for multiple incarnations of the
               MPLS Stack in a target. The LSR defined in the standard <IETF
               DRAFT> MIB is treated as an incarnation in this MIB. Using a
               local policy the Network administrator must group the LDP Entities
@@ -277,14 +282,14 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          STATUS      current
          DESCRIPTION
              "An entry in this table represents an LSR incarnation.
-              All the entries in this table are created initially when the 
-              LDP is initiated. The row status of each entry will be in 
+              All the entries in this table are created initially when the
+              LDP is initiated. The row status of each entry will be in
               'notInService' state initially. The row status must be set to
               'active' after the necessary configurations are complete with
               respect to an incarnation.
 
               Currenlty the LSR ID of the incarnation is the only mandatory
-              parameter that must be set before the rowStatus is set to 
+              parameter that must be set before the rowStatus is set to
               'active'.
 
               An LSR Incarnation Entity is uniquely indexed by its Incarnation
@@ -310,7 +315,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          hh3cMplsLdpLsrMaxCrlspTnls                      INTEGER,
          hh3cMplsLdpLsrMaxErhopPerCrlspTnl               INTEGER,
          hh3cMplsLdpLsrRowStatus                         RowStatus,
-         hh3cMplsLdpLsrMaxVcmCapability                  INTEGER,  
+         hh3cMplsLdpLsrMaxVcmCapability                  INTEGER,
          hh3cMplsLdpLsrVcmPathVecInAllLblMapPresent      TruthValue,
          hh3cMplsLdpLsrRequestRetrytimerValue            INTEGER,
          hh3cMplsLdpLsrNumOfRequestRetryAttempts         INTEGER
@@ -318,7 +323,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
 
      hh3cMplsLdpLsrID OBJECT-TYPE
          SYNTAX      MplsLsrIdentifier
-         MAX-ACCESS  read-write   
+         MAX-ACCESS  read-write
          STATUS      current
          DESCRIPTION
              "The LSR's Identifier."
@@ -329,8 +334,8 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          MAX-ACCESS  read-only
          STATUS      current
          DESCRIPTION
-             "A indication of whether this LSR supports loop detection.  A 
-             value of 'true' indicates this LSR does support loop detection.  
+             "A indication of whether this LSR supports loop detection.  A
+             value of 'true' indicates this LSR does support loop detection.
              A value of 'false' indicates this LSR does not support
              loop detection."
          DEFVAL  { true }
@@ -344,8 +349,8 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          MAX-ACCESS  read-write
          STATUS      current
          DESCRIPTION
-             "To enable loop detection the value of this object should be 
-             'enabled(1)'.  Otherwise, to turn off loop detection, set this 
+             "To enable loop detection the value of this object should be
+             'enabled(1)'.  Otherwise, to turn off loop detection, set this
              value to 'disabled(2)'."
          DEFVAL  { enabled }
          ::= { hh3cMplsLdpLsrIncarnEntry 3 }
@@ -355,7 +360,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          MAX-ACCESS  read-write
          STATUS      current
          DESCRIPTION
-             "This object only has meaning if hh3cMplsLdpLsrLoopDetectionPresent 
+             "This object only has meaning if hh3cMplsLdpLsrLoopDetectionPresent
              has the value of 'true'.
 
              The value of this object represents the limit of path vectors which
@@ -368,11 +373,11 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          MAX-ACCESS  read-write
          STATUS      current
          DESCRIPTION
-             "This object only has meaning if hh3cMplsLdpLsrLoopDetectionPresent 
+             "This object only has meaning if hh3cMplsLdpLsrLoopDetectionPresent
              has the value of 'true'.
 
-             The value of this object represents the limit on the Hop Count 
-             which this LSR uses to treat the message as if it had traversed a 
+             The value of this object represents the limit on the Hop Count
+             which this LSR uses to treat the message as if it had traversed a
              loop."
          DEFVAL  { 32 }
          ::= { hh3cMplsLdpLsrIncarnEntry 5 }
@@ -382,9 +387,9 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          MAX-ACCESS  read-only
          STATUS      current
          DESCRIPTION
-             "A indication of whether this LSR supports loop prevention.  A 
-             value of 'true' indicates this LSR does support loop prevention.  
-             A value of 'false' indicates this LSR does not support loop 
+             "A indication of whether this LSR supports loop prevention.  A
+             value of 'true' indicates this LSR does support loop prevention.
+             A value of 'false' indicates this LSR does not support loop
              prevention.
 
              Current release of MPLS does not provide support to assign
@@ -400,8 +405,8 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          MAX-ACCESS  read-write
          STATUS      current
          DESCRIPTION
-             "To enable loop prevention the value of this object should be 
-             'enabled(1)'.  Otherwise, to turn off loop prevention, set this 
+             "To enable loop prevention the value of this object should be
+             'enabled(1)'.  Otherwise, to turn off loop prevention, set this
              value to 'disabled(2)'.
 
              Current release of MPLS does not provide support to assign
@@ -417,13 +422,13 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          MAX-ACCESS  read-write
          STATUS      current
          DESCRIPTION
-             "The LSR can be configured to use either conservative or liberal 
+             "The LSR can be configured to use either conservative or liberal
               label retention mode.
 
-             If the value of this object is conservative(1) then advertized 
-             label mappings are retained only if they will be used to forward 
+             If the value of this object is conservative(1) then advertized
+             label mappings are retained only if they will be used to forward
              packets, i.e. if label came from a valid next hop.  If the value of
-             this object is liberal(2) then all advertized label mappings are 
+             this object is liberal(2) then all advertized label mappings are
              retained whether they are from a valid next hop or not.
 
              Current release of MPLS does not provide support to assign
@@ -435,11 +440,11 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          SYNTAX     INTEGER
          MAX-ACCESS read-only
          STATUS     current
-         DESCRIPTION 
+         DESCRIPTION
              "The incarnation acts as index to all the elements in this
               table."
          ::= { hh3cMplsLdpLsrIncarnEntry  9 }
- 
+
      hh3cMplsLdpLsrMaxLdpEntities OBJECT-TYPE
          SYNTAX      INTEGER (1..1024)
          MAX-ACCESS  read-write
@@ -454,7 +459,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          MAX-ACCESS  read-write
          STATUS      current
          DESCRIPTION
-             "The maximum number of Local LDP peers that can be supported by 
+             "The maximum number of Local LDP peers that can be supported by
               this Incarnation."
          ::= { hh3cMplsLdpLsrIncarnEntry 11 }
 
@@ -463,7 +468,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          MAX-ACCESS  read-write
          STATUS      current
          DESCRIPTION
-             "The maximum number of Remote LDP peers that can be supported by 
+             "The maximum number of Remote LDP peers that can be supported by
               this Incarnation."
          ::= { hh3cMplsLdpLsrIncarnEntry 12 }
 
@@ -472,7 +477,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          MAX-ACCESS  read-write
          STATUS      current
          DESCRIPTION
-             "The maximum number of Label enabled Interfaces that can be 
+             "The maximum number of Label enabled Interfaces that can be
               supported by this Incarnation."
          ::= { hh3cMplsLdpLsrIncarnEntry 13 }
 
@@ -481,7 +486,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          MAX-ACCESS  read-write
          STATUS      current
          DESCRIPTION
-             "The maximum number of Label Switched Paths that can be 
+             "The maximum number of Label Switched Paths that can be
               supported by this Incarnation."
          ::= { hh3cMplsLdpLsrIncarnEntry 14 }
 
@@ -500,7 +505,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          MAX-ACCESS  read-write
          STATUS      current
          DESCRIPTION
-             " The maximum number of ER-Hops that can be supported in a 
+             " The maximum number of ER-Hops that can be supported in a
               CRLSP tunnel."
          ::= { hh3cMplsLdpLsrIncarnEntry 16 }
 
@@ -755,7 +760,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          DESCRIPTION
              "For any given LDP session, the method of
              label distribution must be specified.
- 
+
              Current release of MPLS does not provide support for
              'downstreamUnsolicited'."
          REFERENCE
@@ -785,7 +790,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              "The two octet value which is the proposed hello hold
              timer for this LDP Entity."
          ::= { hh3cMplsLdpEntityEntry 15 }
-     
+
      hh3cMplsLdpEntityRowStatus OBJECT-TYPE
          SYNTAX      RowStatus
          MAX-ACCESS  read-create
@@ -809,7 +814,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              interfaces that are associated with an LDP Entity.
              There should be atleast one interface associated with
              each LDP Entity. If the LDP Entity supports 'per interface
-             based label space' label type then, atmost one interface can be 
+             based label space' label type then, atmost one interface can be
              associated with the LDP entity. If the LDP Entity supports
              'per platform based label space' label type then, more than one
              interface can be associated with the LDP Entity."
@@ -826,8 +831,8 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              An entry can be created by a network administrator
              or by an SNMP agent as instructed by LDP.
 
-             An interface (row in this table) can be created/deleted only when 
-             the associted LDP Entity row status has the value notInService 
+             An interface (row in this table) can be created/deleted only when
+             the associted LDP Entity row status has the value notInService
              or notReady."
          INDEX       {   hh3cMplsLdpLsrIncarnID, hh3cMplsLdpEntityIfIndex }
          ::= { hh3cMplsLdpEntityIfTable 1 }
@@ -843,9 +848,9 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          MAX-ACCESS  not-accessible
          STATUS      current
          DESCRIPTION
-             "Identifier that uniquely identifies the Interface with 
+             "Identifier that uniquely identifies the Interface with
              respect to an LDP Entity.
-             
+
              The ifIndex value corresponds to the IfIndex value of the
              MIB-II"
          ::= { hh3cMplsLdpEntityIfEntry 1 }
@@ -1124,8 +1129,8 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
          STATUS      current
          DESCRIPTION
              "Indicates whether a peer is a local peer or a remote peer"
-         ::= { hh3cMplsLdpPeerEntry 8 } 
-     
+         ::= { hh3cMplsLdpPeerEntry 8 }
+
      hh3cMplsLdpPeerRowStatus OBJECT-TYPE
          SYNTAX      RowStatus
          MAX-ACCESS  read-create
@@ -1210,7 +1215,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
 
      hh3cMplsLdpPeerConfAtmLabelRangeUpperBoundVPI OBJECT-TYPE
          SYNTAX AtmVpIdentifier
-         MAX-ACCESS read-only  
+         MAX-ACCESS read-only
          STATUS current
          DESCRIPTION
              "The maximum VPI number configured for this range."
@@ -1218,7 +1223,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
 
      hh3cMplsLdpPeerConfAtmLabelRangeUpperBoundVCI OBJECT-TYPE
          SYNTAX AtmVcIdentifier
-         MAX-ACCESS read-only  
+         MAX-ACCESS read-only
          STATUS current
          DESCRIPTION
              "The maximum VCI number configured for this range."
@@ -1383,7 +1388,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              "Each row represents a single LDP Hello Adjacency.
              An LDP Session can have one or more Hello adjacencies."
          INDEX       { hh3cMplsLdpLsrIncarnID,
-                       hh3cMplsLdpEntityIfIndex, 
+                       hh3cMplsLdpEntityIfIndex,
                        hh3cMplsLdpPeerIndex,
                        hh3cMplsLdpSessionIndex,
                        hh3cMplsLdpHelloAdjacencyIndex }
@@ -1423,7 +1428,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              to be created. The ER hops associated with a CRLSP tunnel
              are to be configured using the hh3cMplsLdpCrlspErHopTable."
         ::= { hh3cMplsLdpCrlspTnlObjects 1 }
-     
+
      hh3cMplsLdpCrlspTnlEntry OBJECT-TYPE
         SYNTAX        Hh3cMplsLdpCrlspTnlEntry
         MAX-ACCESS    not-accessible
@@ -1433,7 +1438,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              An  entry  can be created by a network administrator."
         INDEX  {  hh3cMplsLdpLsrIncarnID,  hh3cMplsLdpCrlspTnlIndex  }
            ::= { hh3cMplsLdpCrlspTnlTable 1 }
-     
+
      Hh3cMplsLdpCrlspTnlEntry ::= SEQUENCE {
            hh3cMplsLdpCrlspTnlIndex                 MplsTunnelIndex,
            hh3cMplsLdpCrlspTnlName                  DisplayString,
@@ -1451,7 +1456,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
            hh3cMplsLdpCrlspTnlWeight                INTEGER,
            hh3cMplsLdpCrlspTnlRowStatus             RowStatus
         }
-     
+
      hh3cMplsLdpCrlspTnlIndex OBJECT-TYPE
         SYNTAX        MplsTunnelIndex
         MAX-ACCESS    accessible-for-notify
@@ -1459,7 +1464,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "Uniquely identifies this row."
         ::= { hh3cMplsLdpCrlspTnlEntry 1 }
-     
+
      hh3cMplsLdpCrlspTnlName OBJECT-TYPE
         SYNTAX        DisplayString
         MAX-ACCESS    read-create
@@ -1468,8 +1473,8 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
             "The 'canonical' name assigned to the tunnel that can
              be  used  to refer to it on the 'console' port."
         ::= { hh3cMplsLdpCrlspTnlEntry 2 }
-     
-     
+
+
      hh3cMplsLdpCrlspTnlDirection OBJECT-TYPE
         SYNTAX        INTEGER { in(1), out(2), inOut(3) }
         MAX-ACCESS    read-create
@@ -1478,8 +1483,8 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
             "Whether   this  tunnel  is  unidirectional-incoming,
              unidirectional-outgoing, or bidirectional."
         ::= { hh3cMplsLdpCrlspTnlEntry 3 }
-     
-     
+
+
      hh3cMplsLdpCrlspTnlSignallingProto OBJECT-TYPE
         SYNTAX        INTEGER { none(1), ldp(2), rsvp(3) }
         MAX-ACCESS    read-create
@@ -1489,7 +1494,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              tunnel."
         DEFVAL        { none }
         ::= { hh3cMplsLdpCrlspTnlEntry 4 }
-     
+
      hh3cMplsLdpCrlspTnlSetupPrio OBJECT-TYPE
         SYNTAX        INTEGER (0..7)
         MAX-ACCESS    read-create
@@ -1503,7 +1508,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              Jamoussi,  Internet  Draft  <draft-ietf-mpls-cr-ldp-
              01.txt>, Feb. 1999."
         ::= { hh3cMplsLdpCrlspTnlEntry 5 }
-     
+
      hh3cMplsLdpCrlspTnlHoldingPrio OBJECT-TYPE
         SYNTAX        INTEGER (0..7)
         MAX-ACCESS    read-create
@@ -1517,7 +1522,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              Jamoussi,  Internet  Draft  <draft-ietf-mpls-cr-ldp-
              01.txt>, Feb. 1999."
         ::= { hh3cMplsLdpCrlspTnlEntry 6 }
-     
+
      hh3cMplsLdpCrlspTnlPeakDataRate OBJECT-TYPE
         SYNTAX        BitRate
         UNITS         "bits per second"
@@ -1531,21 +1536,21 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              al, <draft-ietf-mpls-crldp-02.txt>, August 1999."
         DEFVAL        { 0 }
         ::= { hh3cMplsLdpCrlspTnlEntry 7 }
-     
+
      hh3cMplsLdpCrlspTnlPeakBurstSize OBJECT-TYPE
         SYNTAX        BurstSize
         UNITS         "bytes"
         MAX-ACCESS    read-create
         STATUS        current
         DESCRIPTION
-            "The peak burst size - the maximum burst size of the traffic that can 
+            "The peak burst size - the maximum burst size of the traffic that can
              occur in the established CRLSP."
         REFERENCE
             "Section 4.3, Constraint-Based LSP Setup using LDP, Jamoussi, et.
              al, <draft-ietf-mpls-crldp-02.txt>, August 1999."
         DEFVAL        { 0 }
         ::= { hh3cMplsLdpCrlspTnlEntry 8 }
-     
+
      hh3cMplsLdpCrlspTnlCommittedDataRate OBJECT-TYPE
         SYNTAX        BitRate
         UNITS         "bits per second"
@@ -1559,21 +1564,21 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              al, <draft-ietf-mpls-crldp-02.txt>, August 1999."
         DEFVAL        { 0 }
         ::= { hh3cMplsLdpCrlspTnlEntry 9 }
-     
+
      hh3cMplsLdpCrlspTnlCommittedBurstSize OBJECT-TYPE
         SYNTAX        BurstSize
         UNITS         "bytes"
         MAX-ACCESS    read-create
         STATUS        current
         DESCRIPTION
-            "The committed burst size - the committed burst size of the traffic 
+            "The committed burst size - the committed burst size of the traffic
              that will be handled in the established CRLSP."
         REFERENCE
             "Section 4.3, Constraint-Based LSP Setup using LDP, Jamoussi, et.
              al, <draft-ietf-mpls-crldp-02.txt>, August 1999."
         DEFVAL        { 0 }
         ::= { hh3cMplsLdpCrlspTnlEntry 10 }
-     
+
      hh3cMplsLdpCrlspTnlExcessBurstSize OBJECT-TYPE
         SYNTAX        BurstSize
         UNITS         "bytes"
@@ -1587,7 +1592,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              al, <draft-ietf-mpls-crldp-02.txt>, August 1999."
         DEFVAL        { 0 }
         ::= { hh3cMplsLdpCrlspTnlEntry 11 }
-     
+
      hh3cMplsLdpCrlspTnlIsPinned OBJECT-TYPE
         SYNTAX        TruthValue
         MAX-ACCESS    read-create
@@ -1597,7 +1602,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              tunnel are to be pinned."
         DEFVAL        { false }
         ::= { hh3cMplsLdpCrlspTnlEntry 12 }
-     
+
      hh3cMplsLdpCrlspTnlFrequency OBJECT-TYPE
         SYNTAX        INTEGER (0..2)
         MAX-ACCESS    read-create
@@ -1608,7 +1613,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
             "Section 4.3.1.1, Constraint-Based LSP Setup using LDP, Jamoussi, et.
              al, <draft-ietf-mpls-crldp-02.txt>, August 1999."
         ::= { hh3cMplsLdpCrlspTnlEntry 13 }
-     
+
      hh3cMplsLdpCrlspTnlWeight OBJECT-TYPE
         SYNTAX        INTEGER (0..255)
         MAX-ACCESS    read-create
@@ -1619,7 +1624,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
             "Section 4.3, Constraint-Based LSP Setup using LDP, Jamoussi, et.
              al, <draft-ietf-mpls-crldp-02.txt>, August 1999."
         ::= { hh3cMplsLdpCrlspTnlEntry 14 }
-     
+
      hh3cMplsLdpCrlspTnlRowStatus OBJECT-TYPE
         SYNTAX        RowStatus
         MAX-ACCESS    read-create
@@ -1631,7 +1636,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              tunnel."
         ::= { hh3cMplsLdpCrlspTnlEntry 15 }
 
-    -- 
+    --
     -- Er-Hop Table
     --
 
@@ -1642,15 +1647,15 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "The hh3cMplsLdpCrlspErHopTable is used to indicate the hops,
              strict  or  loose,  for an MPLS  CRLSP tunnel  defined  in
-             hh3cMplsLdpCrlspTnlTable. 
-     
-             There must be atleast one entry in this table for each CRLSP tunnel 
+             hh3cMplsLdpCrlspTnlTable.
+
+             There must be atleast one entry in this table for each CRLSP tunnel
              that is supported in the hh3cMplsLdpCrlspTnlTable.
-             
+
              The first row in the table  is  the
              first hop after the origination point of the tunnel."
         ::= { hh3cMplsLdpCrlspTnlObjects 2 }
-     
+
      hh3cMplsLdpCrlspErHopEntry  OBJECT-TYPE
         SYNTAX        Hh3cMplsLdpCrlspErHopEntry
         MAX-ACCESS    not-accessible
@@ -1659,10 +1664,10 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
             "An  entry in this table represents a tunnel hop.  An
              entry  is  created  by a network  administrator  for
              signalled ERLSP set up by LDP or RSVP."
-        INDEX  {  hh3cMplsLdpLsrIncarnID, 
+        INDEX  {  hh3cMplsLdpLsrIncarnID,
                   hh3cMplsLdpCrlspTnlIndex, hh3cMplsLdpCrlspErHopIndex  }
            ::= { hh3cMplsLdpCrlspErHopTable 1 }
-     
+
      Hh3cMplsLdpCrlspErHopEntry ::= SEQUENCE {
            hh3cMplsLdpCrlspErHopIndex              INTEGER,
            hh3cMplsLdpCrlspErHopAddrType           INTEGER,
@@ -1671,7 +1676,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
            hh3cMplsLdpCrlspErHopStrictOrLoose      INTEGER,
            hh3cMplsLdpCrlspErHopRowStatus          RowStatus
         }
-     
+
      hh3cMplsLdpCrlspErHopIndex OBJECT-TYPE
         SYNTAX        INTEGER
         MAX-ACCESS    not-accessible
@@ -1680,7 +1685,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
             "Secondary  index  into  this table  identifying  the
              particular hop."
         ::= { hh3cMplsLdpCrlspErHopEntry 1 }
-     
+
      hh3cMplsLdpCrlspErHopAddrType OBJECT-TYPE
         SYNTAX        INTEGER { ipV4(1) }
         MAX-ACCESS    read-create
@@ -1689,7 +1694,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
             "Address type of this hop."
         DEFVAL        { ipV4 }
         ::= { hh3cMplsLdpCrlspErHopEntry 2 }
-     
+
      hh3cMplsLdpCrlspErHopIpv4Addr OBJECT-TYPE
         SYNTAX        IpAddress
         MAX-ACCESS    read-create
@@ -1699,7 +1704,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              this  hop.  This object is not significant otherwise
              and should return a value of 0."
         ::= { hh3cMplsLdpCrlspErHopEntry 3 }
-     
+
      hh3cMplsLdpCrlspErHopIpv4PrefixLen OBJECT-TYPE
         SYNTAX        INTEGER (1..32)
         MAX-ACCESS    read-create
@@ -1710,7 +1715,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              significant otherwise and should return a  value  of
              0."
         ::= { hh3cMplsLdpCrlspErHopEntry 4 }
-     
+
      hh3cMplsLdpCrlspErHopStrictOrLoose OBJECT-TYPE
         SYNTAX        INTEGER { strict(1), loose(2) }
         MAX-ACCESS    read-create
@@ -1718,7 +1723,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "Whether this is a strict or loose hop."
         ::= { hh3cMplsLdpCrlspErHopEntry 5 }
-     
+
      hh3cMplsLdpCrlspErHopRowStatus OBJECT-TYPE
         SYNTAX        RowStatus
         MAX-ACCESS    read-create
@@ -1726,6 +1731,29 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "For creating, modifying and deleting this row."
         ::= { hh3cMplsLdpCrlspErHopEntry 6 }
+
+     ---
+     --- hh3cMplsLdpScalarGroup
+     ---
+
+     hh3cMplsLdpCfgInfo    OBJECT-TYPE
+      SYNTAX      OCTET STRING (SIZE (1..127))
+      MAX-ACCESS  accessible-for-notify
+      STATUS      current
+      DESCRIPTION
+          "The information of MPLS(Multiprotocol Label Switching)
+           LDP(Label Distribution Protocol) configuration."
+      ::= { hh3cMplsLdpScalarGroup 1 }
+
+     hh3cMplsLdpSessInfo    OBJECT-TYPE
+      SYNTAX      OCTET STRING (SIZE (1..127))
+      MAX-ACCESS  accessible-for-notify
+      STATUS      current
+      DESCRIPTION
+          "The information of MPLS(Multiprotocol Label Switching)
+          LDP(Label Distribution Protocol) session."
+      ::= { hh3cMplsLdpScalarGroup 2 }
+
 
      ---
      --- Notifications
@@ -1736,7 +1764,7 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
 
      hh3cMplsLdpFailedInitSessionThresholdExceeded NOTIFICATION-TYPE
      OBJECTS     {
-			hh3cMplsLdpLsrIncarnID, hh3cMplsLdpEntityID,
+      hh3cMplsLdpLsrIncarnID, hh3cMplsLdpEntityID,
                         hh3cMplsLdpEntityFailedInitSessionThreshold
                  }
      STATUS      current
@@ -1757,8 +1785,8 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
 
      hh3cMplsLdpCrlspTunnelUp NOTIFICATION-TYPE
      OBJECTS     {
-			hh3cMplsLdpLsrIncarnID, hh3cMplsLdpEntityID,
-                  hh3cMplsLdpCrlspTnlIndex 
+      hh3cMplsLdpLsrIncarnID, hh3cMplsLdpEntityID,
+                  hh3cMplsLdpCrlspTnlIndex
                  }
         STATUS      current
         DESCRIPTION
@@ -1766,17 +1794,17 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              on the receipt of Label mapping message from the downstream LSR for
              the LAbel request sent for the CRLSP tunnel."
         ::= { hh3cMplsLdpNotificationPrefix 2 }
-  
+
      hh3cMplsLdpCrlspTunnelDown NOTIFICATION-TYPE
      OBJECTS     {
-		hh3cMplsLdpLsrIncarnID, hh3cMplsLdpEntityID,
+    hh3cMplsLdpLsrIncarnID, hh3cMplsLdpEntityID,
                   hh3cMplsLdpCrlspTnlIndex }
         STATUS      current
         DESCRIPTION
             "This notification is generated when a CRLSP Row status is modified
              to destroy the CRLSP tunnel.  - due to pre-emption etc.,"
         ::= { hh3cMplsLdpNotificationPrefix 3 }
-     
+
      hh3cMplsLdpCrlspTunnelSetupFailure NOTIFICATION-TYPE
      OBJECTS     { hh3cMplsLdpLsrIncarnID, hh3cMplsLdpEntityID,
                   hh3cMplsLdpCrlspTnlIndex }
@@ -1787,30 +1815,30 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
              the Label request sent for the CRLSP tunnel. This can occur due to
              improper ER hop values being set, or Traffic resources not available
              etc.,"
-        ::=  { hh3cMplsLdpNotificationPrefix 4 } 
+        ::=  { hh3cMplsLdpNotificationPrefix 4 }
 
 
      hh3cMplsLdpIncarnUpEventFailure  NOTIFICATION-TYPE
      OBJECTS     { hh3cMplsLdpLsrIncarnID}
         STATUS      current
         DESCRIPTION
-            "This notification is generated by LDP to notify 
+            "This notification is generated by LDP to notify
              the Incarnation UP Event failure"
-        ::= { hh3cMplsLdpNotificationPrefix 11 } 
+        ::= { hh3cMplsLdpNotificationPrefix 11 }
 
      hh3cMplsLdpIncarnDownEventFailure NOTIFICATION-TYPE
      OBJECTS     { hh3cMplsLdpLsrIncarnID }
         STATUS      current
         DESCRIPTION
-            "This notification is generated by LDP to notify 
+            "This notification is generated by LDP to notify
              the Incarnation DOWN Event failure"
-        ::= { hh3cMplsLdpNotificationPrefix 12 } 
+        ::= { hh3cMplsLdpNotificationPrefix 12 }
 
      hh3cMplsLdpEntityUpEventFailure NOTIFICATION-TYPE
      OBJECTS     { hh3cMplsLdpLsrIncarnID, hh3cMplsLdpEntityID}
         STATUS      current
         DESCRIPTION
-            "This notification is generated by LDP to notify 
+            "This notification is generated by LDP to notify
              the ENTITY UP Event failure"
         ::= { hh3cMplsLdpNotificationPrefix 13 }
 
@@ -1819,26 +1847,42 @@ HH3C-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
      OBJECTS     { hh3cMplsLdpLsrIncarnID, hh3cMplsLdpEntityID }
         STATUS      current
         DESCRIPTION
-            "This notification is generated by LDP to notify 
+            "This notification is generated by LDP to notify
              the ENTITY  DOWN Event failure"
         ::= { hh3cMplsLdpNotificationPrefix 14 }
         hh3cMplsLdpSessionUpEventFailure NOTIFICATION-TYPE
      OBJECTS     { hh3cMplsLdpSessionID, hh3cMplsLdpSessionState }
         STATUS      current
         DESCRIPTION
-            "Generation of this trap occurs when the 
+            "Generation of this trap occurs when the
             value of 'hh3cMplsLdpSessionState' enters
              the 'operational(5)' state."
-        ::= { hh3cMplsLdpNotificationPrefix 15 }  
-        
+        ::= { hh3cMplsLdpNotificationPrefix 15 }
+
      hh3cMplsLdpSessionDownEventFailure NOTIFICATION-TYPE
      OBJECTS     { hh3cMplsLdpSessionID, hh3cMplsLdpSessionState }
         STATUS      current
         DESCRIPTION
-            "Generation of this trap occurs when the 
-            value of 'hh3cMplsLdpSessionState' leaves 
+            "Generation of this trap occurs when the
+            value of 'hh3cMplsLdpSessionState' leaves
             the 'operational(5)' state."
-        ::= { hh3cMplsLdpNotificationPrefix 16 }      
+        ::= { hh3cMplsLdpNotificationPrefix 16 }
+
+     hh3cMplsLdpMulLinkCfgInc NOTIFICATION-TYPE
+     OBJECTS     { hh3cMplsLdpCfgInfo, hh3cMplsLdpSessInfo }
+        STATUS      current
+        DESCRIPTION
+            "This notification is generated when the
+            multi-link configurations were inconsistent"
+        ::= { hh3cMplsLdpNotificationPrefix 17 }
+
+     hh3cMplsLdpMulLinkCfgIncClear NOTIFICATION-TYPE
+     OBJECTS     { hh3cMplsLdpCfgInfo, hh3cMplsLdpSessInfo }
+        STATUS      current
+        DESCRIPTION
+            "This notification is generated when the
+            multi-link configurations changed to consistent"
+        ::= { hh3cMplsLdpNotificationPrefix 18 }
 
 -- End of notifications.
 END

@@ -16,6 +16,11 @@ class EventlogPolicy
             || $this->hasGlobalPermission($user, 'viewAll');
     }
 
+    public function viewAll(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'viewAll');
+    }
+
     public function view(User $user, Eventlog $eventLog): bool
     {
         if ($this->hasGlobalPermission($user, 'viewAll')) {
@@ -24,5 +29,10 @@ class EventlogPolicy
 
         return $this->hasGlobalPermission($user, 'view', true)
             && Permissions::canAccessDevice($eventLog->device_id, $user);
+    }
+
+    public function create(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'create');
     }
 }

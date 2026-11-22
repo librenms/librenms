@@ -67,8 +67,6 @@ Om villkoret `devices.ignore = 0` eller `macros.device = 1` är inställt och ig
         'ignore_device_status' => 'Ignorera enhetsstatus',
         'ignore_device_status_title' => 'Tagga enheten för att ignorera Status. Det kommer alltid att visas som online.',
         'save' => 'Spara',
-        'size_on_disk' => 'Storlek på disk',
-        'rrd_files' => 'RRD-filer',
         'last_polled' => 'Senast tillfrågad',
         'last_discovered' => 'Senast upptäckt',
         'rediscover_error' => 'Ett fel uppstod när den här enheten skulle återupptäckas',

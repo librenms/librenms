@@ -32,6 +32,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class RutosOtd extends OS implements
     WirelessRssiDiscovery,
@@ -86,15 +87,15 @@ class RutosOtd extends OS implements
     private function buildModemSensors(WirelessSensorType $type, string $oidLeaf, string $label, string $field): array
     {
         $sensors = [];
-        foreach ($this->getCacheTable('TELTONIKA-OTD-MIB::modemTable') as $index => $entry) {
+        foreach (SnmpQuery::cache()->walk('TELTONIKA-OTD-MIB::modemTable')->table(1) as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 $type,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.48690.2.2.1.' . $oidLeaf . '.' . $index,
                 'rutos-otd',
                 $index,
-                'Modem ' . ($entry['mIndex'] ?? null) . ' ' . $label,
-                $entry[$field] ?? null
+                'Modem ' . ($entry['TELTONIKA-OTD-MIB::mIndex'] ?? null) . ' ' . $label,
+                $entry['TELTONIKA-OTD-MIB::' . $field] ?? null
             );
         }
 

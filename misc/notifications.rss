@@ -32,5 +32,10 @@
     <description>As part of the continued effort to improve LibreNMS, it's code base and associated files, we will be migrating the yaml files used for OS detection and support. Please see https://community.librenms.org/t/os-definitions-and-discovery-file-relocation/27646 for further information.</description>
     <pubDate>Wed, 16 Apr 2025 22:00:00 +0000</pubDate>
   </item>
+  <item>
+    <title>Important: Back up your APP_KEY</title>
+    <description>LibreNMS encrypts stored credentials (SNMP, IPMI, and other secrets) using the APP_KEY in your .env file.&lt;br&gt;&lt;br&gt;If APP_KEY is lost or changed, these credentials cannot be recovered, not even from a database backup.&lt;br&gt;&lt;br&gt;Save a copy of your .env file (or at least the APP_KEY value) somewhere safe, away from this server. Every server that shares this database must use the same APP_KEY.</description>
+    <pubDate>Mon, 19 Oct 2026 12:00:00 +0000</pubDate>
+  </item>
 </channel>
 </rss>

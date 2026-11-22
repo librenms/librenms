@@ -82,12 +82,11 @@ the same name.
 Below are the default settings used with nfdump for stats.
 
 For more defaulted information on that, please see nfdump(1).  
-The default location for nfdump is `/usr/bin/nfdump`. If nfdump
-is located elsewhere, set it with
+LibreNMS finds nfdump in the `PATH` or the standard bin directories.
+If nfdump is located elsewhere, set its full path in `.env`:
 
-!!! setting "external/binaries"
-    ```bash
-    lnms config:set nfdump /usr/local/bin/nfdump
+```bash
+NFDUMP_PATH=/opt/nfdump/bin/nfdump
 ```
 
 !!! setting "external/nfsen"

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Eventlog;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\Exceptions\JsonAppParsingFailedException;
@@ -57,25 +58,17 @@ try {
         }
     }
 } catch (JsonAppException $e) {
-    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    Log::info($name . ':' . $e->getCode() . ':' . $e->getMessage());
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
 
     return;
 }
 
 $old_data = $app->data;
-if (! isset($old_data['disks_with_failed_tests'])) {
-    $old_data['disks_with_failed_tests'] = [];
-}
-if (! isset($old_data['disks_with_failed_health'])) {
-    $old_data['disks_with_failed_health'] = [];
-}
-if (! isset($old_data['disks_with_over_temp'])) {
-    $old_data['disks_with_over_temp'] = [];
-}
-if (! isset($old_data['disks_with_dev_error'])) {
-    $old_data['disks_with_dev_error'] = [];
-}
+$old_data['disks_with_failed_tests'] ??= [];
+$old_data['disks_with_failed_health'] ??= [];
+$old_data['disks_with_over_temp'] ??= [];
+$old_data['disks_with_dev_error'] ??= [];
 
 $rrd_name = ['app', $name, $app->app_id];
 $rrd_def = RrdDefinition::make()

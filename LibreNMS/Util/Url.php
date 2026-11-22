@@ -29,8 +29,10 @@ namespace LibreNMS\Util;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Port;
+use App\Models\Sensor;
 use Carbon\Carbon;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Str;
@@ -57,7 +59,7 @@ class Url
         };
 
         return sprintf('<a href="%s" class="%s" x-data="deviceLink({device_id: %d})">%s</a>%s',
-            self::deviceUrl($device),
+            route('device.overview', ['device' => $device->device_id]),
             $class,
             $device->device_id,
             e($text ?: $device->display),
@@ -75,7 +77,7 @@ class Url
         $text = $text ?: $label;
 
         return sprintf('<a href="%s" class="%s" x-data="portLink({port_id: %d})">%s</a>%s',
-            self::portUrl($port),
+            route('device.port', ['device' => $port->device_id, 'port' => $port->port_id]),
             self::portLinkDisplayClass($port),
             $port->port_id,
             e($text),
@@ -85,14 +87,9 @@ class Url
 
     /**
      * @param  Device|null  $device
-     * @param  string|null  $text
-     * @param  array  $vars
-     * @param  int  $start
-     * @param  int  $end
-     * @param  int  $overlib
-     * @return string
+     * @param  string|null  $url  link target, defaults to the device overview
      */
-    public static function deviceLink(mixed $device, Htmlable|string|null $text = '', array $vars = [], int $start = 0, int $end = 0, bool|int $overlib = 1): string
+    public static function deviceLink(mixed $device, Htmlable|string|null $text = '', ?string $url = null, int $start = 0, int $end = 0, bool|int $overlib = 1): string
     {
         if (! $device instanceof Device || ! $device->hostname) {
             return e($text);
@@ -118,7 +115,7 @@ class Url
 
         $class = self::deviceLinkDisplayClass($device);
         $graphs = Graph::getOverviewGraphsForDevice($device);
-        $url = Url::deviceUrl($device, $vars);
+        $url ??= route('device.overview', ['device' => $device->device_id]);
 
         // beginning of overlib box contains large hostname followed by hardware & OS details
         // because we are injecting this into javascript htmlentities alone won't work, so strip_tags too
@@ -215,21 +212,13 @@ class Url
         if (! $overlib) {
             return $content;
         } elseif (Gate::allows('view', $port)) {
-            return self::overlibLink($url ?? self::portUrl($port), $text, $content, self::portLinkDisplayClass($port));
+            return self::overlibLink($url ?? route('device.port', ['device' => $port->device_id, 'port' => $port->port_id]), $text, $content, self::portLinkDisplayClass($port));
         }
 
         return Rewrite::normalizeIfName($text);
     }
 
-    /**
-     * @param  \App\Models\Sensor  $sensor
-     * @param  string  $text
-     * @param  string  $type
-     * @param  bool  $overlib
-     * @param  bool  $single_graph
-     * @return string
-     */
-    public static function sensorLink(mixed $sensor, Htmlable|string|null $text = null, ?string $type = null, bool $overlib = true, bool $single_graph = false): string
+    public static function sensorLink(Sensor $sensor, Htmlable|string|null $text = null, ?string $type = null, bool $overlib = true, bool $single_graph = false): string
     {
         $label = $sensor->sensor_descr;
         if (! $text) {
@@ -242,7 +231,7 @@ class Url
 
         $content .= "<div style=\'width: 850px\'>";
         $graph_array = [
-            'type' => $type ?: 'sensor_' . $sensor->sensor_class,
+            'type' => $type ?: $sensor->getGraphType(),
             'legend' => 'yes',
             'height' => 100,
             'width' => 340,
@@ -267,63 +256,7 @@ class Url
             return $content;
         }
 
-        return self::overlibLink(self::sensorUrl($sensor), $text, $content, self::sensorLinkDisplayClass($sensor));
-    }
-
-    /**
-     * @param  int|Device  $device
-     * @param  array  $vars
-     * @return string
-     */
-    public static function deviceUrl($device, $vars = [])
-    {
-        $routeParams = [($device instanceof Device) ? $device->device_id : (int) $device];
-        if (isset($vars['tab'])) {
-            $routeParams[] = $vars['tab'];
-            unset($vars['tab']);
-        }
-
-        return route('device', $routeParams) . self::urlParams($vars);
-    }
-
-    public static function portUrl($port, $vars = [])
-    {
-        return self::generate(['page' => 'device', 'device' => $port->device_id, 'tab' => 'port', 'port' => $port->port_id], $vars);
-    }
-
-    public static function sensorUrl($sensor, $vars = [])
-    {
-        return self::generate(['page' => 'device', 'device' => $sensor->device_id, 'tab' => 'health', 'metric' => $sensor->sensor_class], $vars);
-    }
-
-    public static function generate($vars, $new_vars = [])
-    {
-        $vars = array_merge($vars, $new_vars);
-
-        $url = url(LibrenmsConfig::get('base_url', true) . $vars['page'] . '');
-        unset($vars['page']);
-
-        return $url . self::urlParams($vars);
-    }
-
-    /**
-     * Generate url parameters to append to url
-     * $prefix will only be prepended if there are parameters
-     *
-     * @param  array  $vars
-     * @param  string  $prefix
-     * @return string
-     */
-    private static function urlParams($vars, $prefix = '/')
-    {
-        $url = empty($vars) ? '' : $prefix;
-        foreach ($vars as $var => $value) {
-            if ($value == '0' || $value != '' && ! Str::contains($var, 'opt') && ! is_numeric($var)) {
-                $url .= urlencode((string) $var) . '=' . urlencode((string) $value) . '/';
-            }
-        }
-
-        return $url;
+        return self::overlibLink(route('device.health', ['device' => $sensor->device_id, 'metric' => $sensor->sensor_class]), $text, $content, self::sensorLinkDisplayClass($sensor));
     }
 
     /**
@@ -338,11 +271,6 @@ class Url
         }
 
         return LaravelUrl::signedRoute('graph', $args);
-    }
-
-    public static function graphPageUrl(string $type, array $args = []): string
-    {
-        return url()->query('graphs', ['type' => $type, ...$args]);
     }
 
     /**
@@ -377,9 +305,9 @@ class Url
 
         $args['from'] = $original_from;
 
-        $args['link'] = $link ?: self::generate($args, ['page' => 'graphs', 'height' => null, 'width' => null, 'bg' => null]);
+        $link = $link ?: route('graphs', Arr::except($args, ['height', 'width', 'bg', 'popup_title', 'page']));
 
-        return self::overlibLink($args['link'], $graph, $popup);
+        return self::overlibLink($link, $graph, $popup);
     }
 
     public static function lazyGraphTag($args, string $class = 'img-responsive'): string
@@ -405,7 +333,8 @@ class Url
 
         if (LibrenmsConfig::get('web_mouseover', true)) {
             $defaults = LibrenmsConfig::get('overlib_defaults', ",FGCOLOR,'#ffffff', BGCOLOR, '#e5e5e5', BORDER, 5, CELLPAD, 4, CAPCOLOR, '#555555', TEXTCOLOR, '#3e3e3e'");
-            $output .= " onmouseover=\"return overlib('$contents'$defaults,WRAP,HAUTO,VAUTO); \" onmouseout=\"return nd();\">";
+            // encode for the html attribute so entities in $contents are not decoded into markup before reaching javascript
+            $output .= ' onmouseover="' . htmlspecialchars("return overlib('$contents'$defaults,WRAP,HAUTO,VAUTO); ", ENT_QUOTES) . '" onmouseout="return nd();">';
         } else {
             $output .= '>';
         }
@@ -417,7 +346,7 @@ class Url
 
     public static function overlibContent($graph_array, $text)
     {
-        $overlib_content = '<div class=overlib><span class=overlib-text>' . $text . '</span><br />';
+        $overlib_content = '<div class=overlib><span class=overlib-text>' . addslashes(e($text)) . '</span><br />';
 
         $now = Carbon::now();
 
@@ -629,10 +558,7 @@ class Url
             } else {
                 [$name, $value] = array_pad(explode('=', $segment), 2, null);
                 if ($value === null) {
-                    if ($vars['page'] == 'device' && $pos < 3) {
-                        // translate laravel device routes properly
-                        $vars[$pos === 1 ? 'device' : 'tab'] = $name;
-                    } elseif ($name) {
+                    if ($name) {
                         $vars[$name] = 'yes';
                     }
                 } else {

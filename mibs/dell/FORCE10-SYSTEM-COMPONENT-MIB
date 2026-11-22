@@ -2,7 +2,7 @@
 -- FORCE10-SYSTEM-COMPONENT-MIB
 --
 --
--- Copyright (c) 2003-2005 by Force10 Networks, Inc.
+-- Copyright (c) 2003-2014 by Dell Inc. All Rights Reserved.
 -- All rights reserved.
 -- *****************************************************************
 --
@@ -25,18 +25,14 @@ IMPORTS
         ;
  
 f10SysComponentMib   MODULE-IDENTITY
-        LAST-UPDATED    "200510050000Z"
-        ORGANIZATION    "Force10 Networks, Inc."
+        LAST-UPDATED    "201108020000Z"
+        ORGANIZATION    "Dell Inc"
         CONTACT-INFO
-            "Force10 Networks, Inc
-            1440 McCarthy Blvd
-            Milpitas, CA 95035
-            (408) 571-3500
-            support@force10networks.com
-            http://www.force10networks.com"
+            "http://www.force10networks.com/support"        
+
         DESCRIPTION
-            "Force10 System component MIB.
-            Force10 System component allow user to view the SW information 
+            "Dell Networking OS System component MIB.
+            Dell Networking OS System component allow user to view the SW information 
             of a component in the system. 
 
             Currently, the available component information that are avaibale 
@@ -45,6 +41,7 @@ f10SysComponentMib   MODULE-IDENTITY
                   - Overall system CAM usage table
 		  - L2 Ingress or Egress CAM Usage 
 		  - L3 Ingress or Egress CAM Usage 
+		  - L3Ext Table CAM Usage (Specific to S-series L3 tables-Broadcom pltforms) 
 
             "
         ::= { f10Mgmt 7 }   
@@ -496,6 +493,110 @@ camUsageL3EgrAclUsed OBJECT-TYPE
     ::= { camUsageL3Entry 18 }
 
     --
+    -- ##camUsageL3ExtTable - Table for S-series or BCM specific 
+    -- CAM/Table usage info
+    --
+
+camUsageL3ExtTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CamUsageL3ExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of Layer 3 or router layer CAM usages table based on BCM pltform."
+    ::= { f10CamEntries 4 }
+
+camUsageL3ExtEntry OBJECT-TYPE
+    SYNTAX CamUsageL3ExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table of Layer 3 (router layer ) CAM usage table.
+         The table show the different partition of CAM/Table based on BCM 
+         architecture.
+        "
+    INDEX { camUsageL3ExtSlot, camUsageL3ExtPipeId }
+    ::= { camUsageL3ExtTable 1 }
+
+CamUsageL3ExtEntry ::= SEQUENCE {
+
+    camUsageL3ExtSlot 		Integer32,
+    camUsageL3ExtPipeId 	Integer32,
+    camUsageL3ExtHostTotal 	Integer32,
+    camUsageL3ExtHostUsed       Integer32,
+    camUsageL3ExtLPMTotal    	Integer32,
+    camUsageL3ExtLPMUsed 	Integer32
+    }
+
+camUsageL3ExtSlot OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        The slot number of linecard where the CAM is located
+        "
+    ::= { camUsageL3ExtEntry 1 }
+
+camUsageL3ExtPipeId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+        The port pipe number on the linecard where the CAM is located
+        "
+    ::= { camUsageL3ExtEntry 2 }
+
+camUsageL3ExtHostTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam size allocated to layer 3 Host table. Host table is shared by
+        IPv4,IPv6 unicast host route entries (ARP) and IPv4,IPv6 Multicast entries. 
+        The usage reflects sum of all these entries
+        "
+    ::= { camUsageL3ExtEntry 3 }
+
+camUsageL3ExtHostUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam used in layer 3 Host table. As Host table is shared by 
+        IPv4,Ipv6 unicast host route entries and IPv4,IPv6 Multicast entries. 
+        The usage reflects sum of all these entries. 
+        "
+    ::= { camUsageL3ExtEntry 4 }
+
+camUsageL3ExtLPMTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam size allocated to layer 3 Longest Prefix Match table. The
+        LPM table is shared by IPv4,IPv6 unicast route entries.        
+        "
+    ::= { camUsageL3ExtEntry 5 }
+
+camUsageL3ExtLPMUsed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS    read-only
+    STATUS current
+    DESCRIPTION
+        "
+        The total cam size used in layer 3 Longest Prefix Match table. The
+        LPM table is shared by IPv4,Ipv6 unicast route entries.The usage 
+        reflects sum of IPv4 and v6 unicast route entries. 
+        "
+    ::= { camUsageL3ExtEntry 6 }
+
+-- End of camUsageL3ExtEntry
+
+    --
     -- ## Alarm Group or Traps
     --
 
@@ -577,5 +678,18 @@ camUsageL3EgrAclUsed OBJECT-TYPE
             "The agent generate this trap when the
              cam is fully used."
         ::= { sysCompAlarmMibNotifications 2 }
+
+    camAuditError  NOTIFICATION-TYPE
+        OBJECTS              {   sysCompAlarmLevel,
+                                 sysCompAlarmVarString,
+								 sysCompSlotId,
+								 sysCompPortPipe,
+								 sysCompCamPartId
+                             }
+        STATUS          current
+        DESCRIPTION
+            "The agent generate this trap when a
+             cam entry mismatches with the Software entry."
+        ::= { sysCompAlarmMibNotifications 3 }
 
 END

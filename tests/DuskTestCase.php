@@ -2,12 +2,15 @@
 
 namespace LibreNMS\Tests;
 
+use App\Models\User;
+use App\Models\UserPref;
 use Facebook\WebDriver\Chrome\ChromeOptions;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Illuminate\Support\Collection;
 use Laravel\Dusk\TestCase as BaseTestCase;
 use PHPUnit\Framework\Attributes\BeforeClass;
+use Spatie\Permission\Models\Role;
 
 abstract class DuskTestCase extends BaseTestCase
 {
@@ -42,5 +45,23 @@ abstract class DuskTestCase extends BaseTestCase
                 ChromeOptions::CAPABILITY, $options
             )
         );
+    }
+
+    /**
+     * Create an enabled user to log in with.
+     * The user has a fixed timezone, otherwise the first page of each new session posts the
+     * browser timezone and reloads itself, racing whatever the test does next on that page.
+     */
+    protected function browserUser(?string $role = null): User
+    {
+        $user = User::factory()->create(['enabled' => 1]);
+        UserPref::setPref($user, 'timezone', 'UTC');
+
+        if ($role !== null) {
+            Role::findOrCreate($role);
+            $user->assignRole($role);
+        }
+
+        return $user;
     }
 }

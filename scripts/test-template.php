@@ -1,7 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-$init_modules = ['alerts', 'laravel'];
 require __DIR__ . '/../includes/init.php';
 
 use LibreNMS\Alert\AlertData;
@@ -16,10 +15,14 @@ if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
     $runAlerts = new RunAlerts();
 
     $template_id = $options['t'];
-    $device_id = ctype_digit($options['h']) ? $options['h'] : getidbyname($options['h']);
+    $device = DeviceCache::get($options['h']);
+    if (! $device->exists) {
+        echo "Device {$options['h']} not found\n";
+        exit(1);
+    }
     $rule_id = (int) $options['r'];
 
-    $where = 'alerts.device_id=' . $device_id . ' && alerts.rule_id=' . $rule_id;
+    $where = 'alerts.device_id=' . $device->device_id . ' && alerts.rule_id=' . $rule_id;
     if (isset($options['s'])) {
         $where .= ' && alerts.state=' . (int) $options['s'];
     }

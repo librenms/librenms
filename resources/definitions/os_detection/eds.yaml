@@ -1,6 +1,6 @@
 os: eds
 text: 'EDS'
-type: appliance
+type: environment
 icon: eds
 group: eds
 mib_dir: eds
@@ -10,7 +10,6 @@ poller_modules:
     wireless: false
 discovery_modules:
     bgp-peers: false
-    cisco-vrf-lite: false
     stp: false
     wireless: false
 discovery:

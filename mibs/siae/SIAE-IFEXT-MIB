@@ -27,7 +27,7 @@ SIAE-IFEXT-MIB
         FROM SIAE-ALARM-MIB;
 
     ifext MODULE-IDENTITY
-        LAST-UPDATED "201604180000Z"
+        LAST-UPDATED "201611020000Z"
         ORGANIZATION "SIAE MICROELETTRONICA spa"
         CONTACT-INFO
             "SIAE MICROELETTONICA s.p.a.
@@ -35,10 +35,34 @@ SIAE-IFEXT-MIB
              20093 - Cologno Monzese
              Milano - ITALY
              Phone :  +39-02-27325-1
-             E-mail: tbd@siaemic.com
+             E-mail: help@siaemic.com
             "
         DESCRIPTION
             "SIAE's Interface Extension MIB.
+            "
+        REVISION "201905290000Z"
+        DESCRIPTION
+            "MIB version 01.00.02
+             Added loopbackExternal and enableExt.
+            "
+        REVISION "201611020000Z"
+        DESCRIPTION
+            "MIB version 01.00.01
+             Added ifextRmonTable.
+            "
+        REVISION "201609140000Z"
+        DESCRIPTION
+            "Added ifextCapabilityFixedSpeed and ifextCapabilityPortProtection
+             to ifextCapabilities.
+            "
+        REVISION "201608050000Z"
+        DESCRIPTION
+            "Added ifextCapabilityHRLmember  to ifextCapabilities.
+             Added ifextCapabilityHRLcarrier to ifextCapabilities.
+            "
+        REVISION "201607130000Z"
+        DESCRIPTION
+            "Added ifextCapabilityIeee1588 to ifextCapabilities.
             "
         REVISION "201604180000Z"
         DESCRIPTION
@@ -76,7 +100,7 @@ SIAE-IFEXT-MIB
       ::= { siaeMib 73 }
 
 ----------------------------------------------------------------------------------
---  ifex GROUP
+--  ifext GROUP
 ----------------------------------------------------------------------------------
 --
 -- This group is used to extend IF MIB with proprietary info
@@ -153,10 +177,11 @@ SIAE-IFEXT-MIB
 
     ifextAdminStatus    OBJECT-TYPE
         SYNTAX      INTEGER {
-                       up(1),        -- ready to pass packets
-                       down(2),
-                       testing(3),   -- in some test mode
-                       loopback(4)   -- loopback mode
+                       up               (1),   -- ready to pass packets
+                       down             (2),
+                       testing          (3),   -- in some test mode
+                       loopback         (4),   -- loopback mode
+                       loopbackExternal (5)    -- external loopback mode
                     }
         MAX-ACCESS  read-only
         STATUS      current
@@ -185,13 +210,13 @@ SIAE-IFEXT-MIB
 
     ifextPortUsage  OBJECT-TYPE
         SYNTAX      INTEGER {
-                       unused(0),
-                       lan(1),
-                       radio(2),
-                       mgmt(3),
-                       stack(4),
-                       aux(5),
-                       pwe3(6)
+                       unused (0),
+                       lan    (1),
+                       radio  (2),
+                       mgmt   (3),
+                       stack  (4),
+                       aux    (5),
+                       pwe3   (6)
                     }
         MAX-ACCESS  read-only
         STATUS      current
@@ -204,10 +229,10 @@ SIAE-IFEXT-MIB
 
     ifextMediumType  OBJECT-TYPE
         SYNTAX      INTEGER {
-                       copper(1),
-                       fiber(2),
-                       combo(3),
-                       other(4)
+                       copper (1),
+                       fiber  (2),
+                       combo  (3),
+                       other  (4)
                     }
         MAX-ACCESS  read-only
         STATUS      current
@@ -218,9 +243,9 @@ SIAE-IFEXT-MIB
 
     ifextMediumSelection  OBJECT-TYPE
         SYNTAX      INTEGER {
-                       none(0),
-                       copper(1),
-                       fiber(2)
+                       none   (0),
+                       copper (1),
+                       fiber  (2)
                     }
         MAX-ACCESS  read-only
         STATUS      current
@@ -232,8 +257,8 @@ SIAE-IFEXT-MIB
 
     ifextAlarmReportEnable  OBJECT-TYPE
         SYNTAX      INTEGER {
-                       disable(1),
-                       enable(2)
+                       disable (1),
+                       enable  (2)
                     }
         MAX-ACCESS  read-create
         STATUS      current
@@ -254,11 +279,16 @@ SIAE-IFEXT-MIB
 
     ifextCapabilities OBJECT-TYPE
         SYNTAX        BITS {
-            ifextCapabilityLoop(0),      -- Line Loop is supported
-            ifextCapability2g5Bps(1),    -- speed 2.5 Gbps is supported
-            ifextCapabilityMabSensor(2), -- MAB sensor is supported
-            ifextCapabilityEncrypt(3),   -- Radio encryption is supported
-            ifextCapability10gBps(4)     -- speed 10 Gbps is supported
+            ifextCapabilityLoop      (0),  -- Line Loop is supported
+            ifextCapability2g5Bps    (1),  -- speed 2.5 Gbps is supported
+            ifextCapabilityMabSensor (2),  -- MAB sensor is supported
+            ifextCapabilityEncrypt   (3),  -- Radio encryption is supported
+            ifextCapability10gBps    (4),  -- speed 10 Gbps is supported
+            ifextCapabilityIeee1588  (5),     -- IEEE 1588 is supported
+            ifextCapabilityHRLmember (6),     -- eligible as member of an hybrid radio lag 
+            ifextCapabilityHRLcarrier(7),     -- hybrid radio lag can be carried
+            ifextCapabilityFixedSpeed(8),     -- Speed can't be modified
+            ifextCapabilityPortProtection(9)  -- Ethernet port protection is supported
         }
         MAX-ACCESS    read-only
         STATUS        current
@@ -293,7 +323,7 @@ SIAE-IFEXT-MIB
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION
-            "Table with object used to maintain Interfaces described in 
+            "Table with objects used to maintain Interfaces described in 
              ifextTable"
     ::= {ifext 3}
 
@@ -313,18 +343,73 @@ SIAE-IFEXT-MIB
 
     ifextLineLoop  OBJECT-TYPE
         SYNTAX      INTEGER {
-                             disable  (1),
-                             enable   (2)
+                             disable   (1),
+                             enable    (2),
+                             enableExt (3)
                             }
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
             "This object is set from admin status of an interface 
-             to enable/disable line loop."
+             to enable/disable line loop or external loop."
     ::= {ifextMaintTableEntry 1}
 
 --
 -------  End of ifextMaintTable
+
+
+-------  Begin of ifextRmonTable
+--
+    ifextRmonTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     InterfaceExtensionRmonEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with objects used to extend RMON per port parameters."
+    ::= {ifext 4}
+
+    ifextRmonTableEntry  OBJECT-TYPE
+        SYNTAX      InterfaceExtensionRmonEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "SIAE's RMON extension record."
+        INDEX {ifextIfIndex}
+    ::= {ifextRmonTable 1}
+
+    InterfaceExtensionRmonEntry  ::=
+        SEQUENCE {
+            ifextRmonPortSpeedMode   INTEGER,
+            ifextRmonPortSpeedValue  Integer32
+         }
+
+    ifextRmonPortSpeedMode  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             rmonSpeedCurrent      (1),
+                             rmonSpeedConfigured   (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object select the current port speed or the configured port
+             speed (in ifextRmonPortSpeedValue) to be used to calculate the port 
+             utilization in RMON history entries."
+        DEFVAL {rmonSpeedCurrent}
+    ::= {ifextRmonTableEntry 1}
+
+    ifextRmonPortSpeedValue  OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Mbps"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The configured speed to be used to calculate the port utilization
+             in RMON history entries."
+        DEFVAL {1000}
+    ::= {ifextRmonTableEntry 2}
+
+--
+-------  End of ifextRmonTable
 
     ifextLosAlarmSeverityCode  OBJECT-TYPE
         SYNTAX      AlarmSeverityCode

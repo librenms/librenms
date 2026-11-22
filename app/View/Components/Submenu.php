@@ -26,16 +26,30 @@ class Submenu extends Component
         if (isset($parsed_url['query']) && $parsed_url['path'] === $this->selected) {
             parse_str($parsed_url['query'], $vars);
             $request = request();
-            foreach ($vars as $key => $value) {
-                if ($request->input($key) !== $value) {
-                    return false;
-                }
-            }
 
-            return true;
+            return array_all($vars, fn ($value, $key) => ! ($request->input($key) !== $value));
         }
 
         return $url === $this->selected;
+    }
+
+    /**
+     * Build a link for a device tab's selected view.
+     */
+    public function link(string $url): string
+    {
+        $parsed_url = parse_url($url);
+        parse_str($parsed_url['query'] ?? '', $query);
+
+        $view = $parsed_url['path'] ?? '';
+        if ($this->currentTab === 'ports' && $view === 'portsecurity') {
+            return route('device.ports.security', ['device' => $this->deviceId] + $query);
+        }
+
+        return route("device.$this->currentTab", [
+            'device' => $this->deviceId,
+            'view' => $view === '' ? null : $view,
+        ] + $query);
     }
 
     /**

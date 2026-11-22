@@ -34,9 +34,9 @@ use LibreNMS\Interfaces\RefreshableConfigBackupProvider;
 class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupProvider
 {
     /** Backup id used for the single current config when versioning is disabled. */
-    private const CONFIG_ID = 'current';
+    private const string CONFIG_ID = 'current';
 
-    private const PER_PAGE = 100;
+    private const int PER_PAGE = 100;
 
     private ?string $lastError = null;
 
@@ -106,20 +106,22 @@ class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupP
             return null;
         }
 
-        $versions = $this->versions($device, $node);
-        if ($versions === null) {
+        $content = $this->fetchContent($node, self::CONFIG_ID);
+        if ($content === null) {
+            $this->lastError = $this->api->lastError() ?? self::ERROR_NO_BACKUPS;
+
             return null;
         }
 
-        $backups = $this->mapVersions($versions);
-        if ($backups === []) {
-            return null;
-        }
+        $mtime = $node['mtime'] ?? null;
 
-        $latest = $backups[0];
-        $latest['content'] = $this->fetchContent($node, $latest['id']);
-
-        return $latest;
+        return [
+            'id' => self::CONFIG_ID,
+            'date' => is_string($mtime) ? (strtotime($mtime) ?: null) : null,
+            'until' => null,
+            'type' => 'TEXT',
+            'content' => $content,
+        ];
     }
 
     public function content(Device $device, string $backupId, int $pageHint = 0): ?string
@@ -240,7 +242,7 @@ class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupP
 
     /**
      * @param  list<array<string, mixed>>  $versions
-     * @return list<array{id: string, date: ?int, until: ?int, type: string, content: ?string}>
+     * @return list<array{id: string, date: ?int, until: ?int, type: string, content: ?string, author: ?string}>
      */
     private function mapVersions(array $versions): array
     {
@@ -251,16 +253,30 @@ class OxidizedProvider implements ConfigBackupProvider, RefreshableConfigBackupP
                 'until' => null,
                 'type' => 'TEXT',
                 'content' => null,
+                'author' => null,
             ]];
         }
 
         return array_map(fn ($version) => [
             'id' => (string) ($version['oid'] ?? ''),
-            'date' => isset($version['date']) ? (strtotime((string) $version['date']) ?: null) : null,
+            'date' => strtotime((string) ($version['date'] ?? '')) ?: strtotime((string) ($version['time'] ?? '')) ?: null,
             'until' => null,
             'type' => 'TEXT',
             'content' => null,
+            'author' => $this->versionAuthor($version),
         ], $versions);
+    }
+
+    /**
+     * Oxidized commits as "Oxidized" by default (git.name), which carries no useful information.
+     *
+     * @param  array<string, mixed>  $version
+     */
+    private function versionAuthor(array $version): ?string
+    {
+        $name = $version['author']['name'] ?? null;
+
+        return $name && $name !== 'Oxidized' ? $name : null;
     }
 
     /**

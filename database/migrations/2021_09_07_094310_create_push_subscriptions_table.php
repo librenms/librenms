@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('push_subscriptions', function (Blueprint $table) {
+        Schema::create('push_subscriptions', function (Blueprint $table): void {
             $table->bigIncrements('id');
             $table->morphs('subscribable');
             $table->string('endpoint', 500)->unique();

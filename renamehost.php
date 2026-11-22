@@ -11,11 +11,12 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-$init_modules = [];
 require __DIR__ . '/includes/init.php';
 
 use App\Facades\DeviceCache;
 use LibreNMS\Exceptions\HostRenameException;
+
+c_echo('%RWarning: renamehost.php is deprecated!%n Use %9lnms device:rename%n instead.' . PHP_EOL . PHP_EOL);
 
 // Remove a host and all related data from the system
 if ($argv[1] && $argv[2]) {

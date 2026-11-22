@@ -7,9 +7,29 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
 
+/**
+ * @property int $device_id
+ * @property \Carbon\Carbon|null $ping_last_timestamp
+ * @property float|null $ping_rtt_last
+ * @property float|null $ping_rtt_prev
+ * @property float|null $ping_rtt_avg
+ * @property float|null $ping_loss_last
+ * @property float|null $ping_loss_prev
+ * @property float|null $ping_loss_avg
+ */
 class DeviceStats extends DeviceRelatedModel
 {
     use HasFactory;
+
+    /**
+     * @return array{ping_last_timestamp: 'datetime'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'ping_last_timestamp' => 'datetime',
+        ];
+    }
 
     protected $fillable = [
         'device_id',

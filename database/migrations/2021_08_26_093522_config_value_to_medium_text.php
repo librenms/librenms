@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('config', function (Blueprint $table) {
+        Schema::table('config', function (Blueprint $table): void {
             $table->mediumText('config_value')->change();
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('config', function (Blueprint $table) {
+        Schema::table('config', function (Blueprint $table): void {
             $table->string('config_value', 512)->change();
         });
     }

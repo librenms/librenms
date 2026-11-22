@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('device_perf', function (Blueprint $table) {
+        Schema::table('device_perf', function (Blueprint $table): void {
             $table->index(['device_id', 'timestamp']);
         });
     }
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('device_perf', function (Blueprint $table) {
+        Schema::table('device_perf', function (Blueprint $table): void {
             $table->dropIndex(['device_id', 'timestamp']);
         });
     }

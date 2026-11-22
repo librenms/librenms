@@ -4,7 +4,6 @@ return [
     'custom' => [
         'title' => [
             'edit_dialog' => 'Seleccionar mapa personalizado para editar',
-            'create' => 'Crear nuevo mapa personalizado',
             'view' => ':name | Mapa personalizado',
             'edit' => 'Editar mapa personalizado',
             'manage' => 'Gestionar mapas personalizados',
@@ -91,7 +90,6 @@ return [
                 ],
                 'legend_title' => 'Configuración de leyenda',
                 'legend_toggle' => 'Alternar leyenda',
-                'zoom' => 'Panorámica y zoom',
                 'dragnodes' => 'Mover nodos',
                 'physics' => 'Motor de física',
             ],

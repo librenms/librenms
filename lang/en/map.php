@@ -4,7 +4,6 @@ return [
     'custom' => [
         'title' => [
             'edit_dialog' => 'Select Custom Map To Edit',
-            'create' => 'Create New Custom Map',
             'view' => ':name | Custom Map',
             'edit' => 'Edit Custom Map',
             'manage' => 'Manage Custom Maps',
@@ -76,7 +75,6 @@ return [
                 'list' => 'Return to map list',
                 'unsavedchanges' => 'You have unsaved changes. Press confirm to discard the changes and return to the map list. Press cancel to return to the editor.',
                 'edit' => 'Edit Map Settings',
-                'rerender' => 'Re-Render Map',
                 'save' => 'Save Map',
                 'legend' => [
                     'customcolours' => 'Custom Colors',
@@ -91,7 +89,6 @@ return [
                 ],
                 'legend_title' => 'Legend Settings',
                 'legend_toggle' => 'Toggle Legend',
-                'zoom' => 'Pan and Zoom',
                 'dragnodes' => 'Move Nodes',
                 'physics' => 'Physics Engine',
             ],

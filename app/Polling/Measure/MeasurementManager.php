@@ -48,6 +48,7 @@ class MeasurementManager
         if (self::$categories === null) {
             self::$categories = new Collection;
             self::$categories->put('snmp', new MeasurementCollection());
+            self::$categories->put('snmp_backend', new MeasurementCollection());
             self::$categories->put('db', new MeasurementCollection());
             self::$categories->put('fping', new MeasurementCollection());
         }
@@ -124,6 +125,9 @@ class MeasurementManager
     {
         $this->printSummary('FPING', $this->getCategory('fping'), self::FPING_COLOR);
         $this->printSummary('SNMP', $this->getCategory('snmp'), self::SNMP_COLOR);
+        if ($this->getCategory('snmp_backend')->count() > 1) {
+            $this->printSummary('SNMP Backends', $this->getCategory('snmp_backend'), self::SNMP_COLOR);
+        }
         $this->printSummary('SQL', $this->getCategory('db'), self::DB_COLOR);
 
         app('Datastore')->getStats()->each(function (MeasurementCollection $stats, string $datastore): void {

@@ -1,9 +1,9 @@
 -- ===========================================================================================================
--- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: System Management MIB
 -- Reference:
--- Version: V2.8
+-- Version: V2.9
 -- History:
 --  revision 1.0 2002-12-20 created by xuqingwei
 --  revision 1.1 2004-4-16  added the support for XRN  by xuqingwei
@@ -41,6 +41,9 @@
 --  revision V2.7 2017-05-27 add hh3cSysLocalClockString2 by h12133
 --                2018-01-10 added 'interface' attribute for hh3cSysClockProtocol in hh3cSysClockProtocolGroup by t16382
 --  revision V2.8 2020-02-21 added 'gnss' attribute for hh3cSysClockProtocol in hh3cSysClockProtocolGroup by d04404
+--  revision V2.9 2022-07-11 added hh3cSysPatchInstallFail, hh3cSysPackageVerifyFailed, hh3cSysPatchInstallFailPkgname,
+--                hh3cSysPatchInstallFailChassis, hh3cSysPatchInstallFailSlot, hh3cSysPatchInstallFailCpu,
+--                hh3cSysPVFPhysicalName, hh3cSysPVFPackageName, and hh3cSysPVFFailReason by tkf9872
 -- ============================================================================================================
 HH3C-SYS-MAN-MIB DEFINITIONS ::= BEGIN
 
@@ -58,7 +61,7 @@ IMPORTS
 
 
 hh3cSystemMan MODULE-IDENTITY
-    LAST-UPDATED "202002210000Z"
+    LAST-UPDATED "202207110000Z"
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -71,14 +74,18 @@ hh3cSystemMan MODULE-IDENTITY
          It focuses on the display of current configure file and image
          file,and the definition of reloading image.
          Add the support for XRN."
+    REVISION     "202207110000Z"
+    DESCRIPTION  "Added hh3cSysPatchInstallFail, hh3cSysPackageVerifyFailed, hh3cSysPatchInstallFailPkgname,
+                  hh3cSysPatchInstallFailChassis, hh3cSysPatchInstallFailSlot, hh3cSysPatchInstallFailCpu,
+                  hh3cSysPVFPhysicalName, hh3cSysPVFPackageName, hh3cSysPVFFailReason."
     REVISION     "202002210000Z"
-    DESCRIPTION  "added 'gnss' attribute for hh3cSysClockProtocol in hh3cSysClockProtocolGroup."
+    DESCRIPTION  "Added 'gnss' attribute for hh3cSysClockProtocol in hh3cSysClockProtocolGroup."
     REVISION     "201801100000Z"
-    DESCRIPTION  "added 'interface' attribute for hh3cSysClockProtocol in hh3cSysClockProtocolGroup."
+    DESCRIPTION  "Added 'interface' attribute for hh3cSysClockProtocol in hh3cSysClockProtocolGroup."
     REVISION     "201706120000Z"
-    DESCRIPTION  "Add hh3cSysLocalClockString2."
+    DESCRIPTION  "Added hh3cSysLocalClockString2."
     REVISION     "201507270000Z"
-    DESCRIPTION  "Add hh3cSysClockProtocolGroup, hh3cSysClockProtocol, hh3cSysClockProtocolSrcMdc
+    DESCRIPTION  "Added hh3cSysClockProtocolGroup, hh3cSysClockProtocol, hh3cSysClockProtocolSrcMdc
 --                and hh3cSysClockProtocolSrcContext."
     REVISION "200404081345Z"        -- April 08, 2004 at 13:45 GMT
     DESCRIPTION
@@ -2290,5 +2297,91 @@ hh3cSystemBtmLoadGroup OBJECT-GROUP
     DESCRIPTION
         "A collection of objects providing system update bootrom information."
     ::= { hh3cSystemManMIBGroups 7 }
+
+hh3cSystemManTrapV2 OBJECT IDENTIFIER ::= { hh3cSystemMan 4 }
+hh3cSystemManTrapV2Prefix OBJECT IDENTIFIER ::= { hh3cSystemManTrapV2 0 }
+
+hh3cSysPatchInstallFail NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSysPatchInstallFailPkgname,
+            hh3cSysPatchInstallFailChassis,
+            hh3cSysPatchInstallFailSlot,
+            hh3cSysPatchInstallFailCpu
+        }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when the installation of a patch package fails."
+    ::= { hh3cSystemManTrapV2Prefix 1 }
+
+hh3cSysPackageVerifyFailed NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSysPVFPhysicalName,
+            hh3cSysPVFPackageName,
+            hh3cSysPVFFailReason
+        }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when a software image package fails validation."
+    ::= { hh3cSystemManTrapV2Prefix 2 }
+
+hh3cSystemManTrapInfor OBJECT IDENTIFIER ::= { hh3cSystemMan 5 }
+
+hh3cSysPatchInstallFailPkgname OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Name of the patch package that fails installation."
+    ::= { hh3cSystemManTrapInfor 1}
+
+hh3cSysPatchInstallFailChassis OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Number of the chassis that fails to install the patch package."
+    ::= { hh3cSystemManTrapInfor 2}
+
+hh3cSysPatchInstallFailSlot OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Number of the slot that fails to install the patch package."
+    ::= { hh3cSystemManTrapInfor 3}
+
+hh3cSysPatchInstallFailCpu OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Number of the CPU that fails to install the patch package."
+    ::= { hh3cSystemManTrapInfor 4}
+
+hh3cSysPVFPhysicalName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Name of the location where a software image package fails validation."
+    ::= { hh3cSystemManTrapInfor 5}
+
+hh3cSysPVFPackageName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Name of the software image package that fails validation."
+    ::= { hh3cSystemManTrapInfor 6}
+
+hh3cSysPVFFailReason OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Reason for package validation failure."
+    ::= { hh3cSystemManTrapInfor 7}
 
 END

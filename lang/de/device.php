@@ -54,8 +54,6 @@ return [
         'ignore_device_status' => 'Gerätestatus ignorieren',
         'ignore_device_status_title' => 'Gerät markieren, um den Status zu ignorieren. Es wird immer als online angezeigt.',
         'save' => 'Speichern',
-        'size_on_disk' => 'Größe auf der Festplatte',
-        'rrd_files' => 'RRD-Dateien',
         'last_polled' => 'Zuletzt abgefragt',
         'last_discovered' => 'Zuletzt erkannt',
         'rediscover_error' => 'Beim Einstellen der Neuerkennung dieses Geräts ist ein Fehler aufgetreten',

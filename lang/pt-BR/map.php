@@ -4,7 +4,6 @@ return [
     'custom' => [
         'title' => [
             'edit_dialog' => 'Selecione um Mapa Personalizado para Editar',
-            'create' => 'Criar Novo Mapa Personalizado',
             'view' => ':name | Mapa Personalizado',
             'edit' => 'Editar Mapa Personalizado',
             'manage' => 'Gerenciar Mapas Personalizados',
@@ -87,7 +86,6 @@ return [
                 ],
                 'legend_title' => 'Configurações da Legenda',
                 'legend_toggle' => 'Alternar LEgenda',
-                'zoom' => 'Pan e Zoom',
                 'dragnodes' => 'Mover Nós',
                 'physics' => 'Motor de Física',
             ],

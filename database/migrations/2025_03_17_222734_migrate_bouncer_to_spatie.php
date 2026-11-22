@@ -35,9 +35,7 @@ return new class extends Migration
             ->orderBy('roles.name')
             ->get()
             ->groupBy('user_id')
-            ->map(function ($userRoles) {
-                return $userRoles->pluck('role_name')->toArray();
-            });
+            ->map(fn ($userRoles) => $userRoles->pluck('role_name')->toArray());
 
         $newRoleIds = DB::table('roles')->pluck('id', 'name');
 

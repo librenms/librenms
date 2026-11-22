@@ -1,0 +1,6425 @@
+BOSCH DEFINITIONS ::= BEGIN
+
+IMPORTS
+   enterprises, Integer32                               FROM SNMPv2-SMI
+   MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE      FROM SNMPv2-SMI
+   DisplayString                                        FROM SNMPv2-TC
+   OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE  FROM SNMPv2-CONF;
+
+bvms MODULE-IDENTITY
+LAST-UPDATED "202310190000Z"
+ORGANIZATION "Bosch Sicherheitssysteme GmbH 2005-2023"
+CONTACT-INFO
+"This is how you can reach us: phone: +49 (0)711 400 40990, fax: +49 (0)711 400 40999, post address: Robert Bosch GmbH, Bosch Service Center, Postfach 30 02 20, 70442 Stuttgart, GERMANY"
+DESCRIPTION
+"The MIB module for BVMS entities. Copyright (C) Bosch Sicherheitssysteme GmbH 2005-2023."
+REVISION "202310190000Z"
+DESCRIPTION
+"Re-added category 'BRS/DiBos Devices' and marked the corresponding devices/states/events/traps as obsolete."
+REVISION "202310180000Z"
+DESCRIPTION
+"Marked device types 'NVR Server' and 'Vidos NVR Device' and the associated states/events/traps as obsolete."
+REVISION "202203090000Z"
+DESCRIPTION
+"Added Threat Level devices and its state."
+REVISION "202008200000Z"
+DESCRIPTION
+"Added RecordingMonitorState and SecondaryRecordingMonitorState event."
+REVISION "202008060000Z"
+DESCRIPTION
+"Added TimeSynchronizationFailed and SdCardLifespanStatus event."
+REVISION "202003260000Z"
+DESCRIPTION
+"Added Trs operation state event."
+REVISION "202001210000Z"
+DESCRIPTION
+"Added audio alarm event."
+REVISION "201912110000Z"
+DESCRIPTION
+"Added user account disabled event."
+REVISION "201910080000Z"
+DESCRIPTION
+"Added access controller relay and input devices and states."
+REVISION "201910030000Z"
+DESCRIPTION
+"Added Lpr subsystem state."
+REVISION "201909240000Z"
+DESCRIPTION
+"Added access door device and events."
+REVISION "201908220000Z"
+DESCRIPTION
+"Added 3 more access reader events (denied screening required, granted did not enter, duress event)."
+REVISION "201905230000Z"
+DESCRIPTION
+"Added SignalTooBlurry and GlobalChange event."
+REVISION "201905080000Z"
+DESCRIPTION
+"Added ONVIF video analysis states."
+REVISION "201904040000Z"
+DESCRIPTION
+"Added TRS Error event."
+REVISION "201904020000Z"
+DESCRIPTION
+"Added user action event logbook-data erased."
+REVISION "201903260000Z"
+DESCRIPTION
+"Added user action events Subject-Added/Updated/Removed/Renamed. (A 'subject' is a person in the context of face-recognition.)"
+REVISION "201812010000Z"
+DESCRIPTION
+"Added FaceRecognition event."
+REVISION "201807040000Z"
+DESCRIPTION
+"Made this MIB module more compliant with standards."
+REVISION "201803230000Z"
+DESCRIPTION
+"Added user action events (UserActionAccessGranted, UserActionAccessDenied)"
+REVISION "201802050000Z"
+DESCRIPTION
+"Added access device and events"
+REVISION "201712110000Z"
+DESCRIPTION
+"Added task activity monitor events ('BVMS tasks')"
+REVISION "201701160000Z"
+DESCRIPTION
+"Fixed index numbers on Camera Visibility events"
+REVISION "201701120000Z"
+DESCRIPTION
+"Added CameraVisibility to Allegiant, Dibos, DVR and ONVIF camera types"
+REVISION "201612300000Z"
+DESCRIPTION
+"Added VcsDevice event (Visibility)."
+REVISION "201605310000Z"
+DESCRIPTION
+"Added user action events (Restrict/Unrestrict)."
+REVISION "201602260000Z"
+DESCRIPTION
+"Added FireOrSmoke (VcsDevice)."
+REVISION "201602240000Z"
+DESCRIPTION
+"Added VideoAuthenticityChecked event."
+REVISION "201602120000Z"
+DESCRIPTION
+"Added 3 Onvif peak events (OnvifGenericEvent)."
+REVISION "201601280000Z"
+DESCRIPTION
+"Added ExternalData event."
+REVISION "201509290000Z"
+DESCRIPTION
+"Added user action events (PointBypassed, PointUnbypassed)."
+REVISION "201509281003Z"
+DESCRIPTION
+"Added Onvif state events (SignalPresence, SignalTooBright-Dark-Noisy, Adjustment)."
+REVISION "201508280000Z"
+DESCRIPTION
+"Added user action events (DoorLocked, DoorUnlocked, DoorSecured, DoorUnsecured, DoorCycled)."
+REVISION "201508250000Z"
+DESCRIPTION
+"Added IntrusionPanel door and events."
+REVISION "201505210000Z"
+DESCRIPTION
+"Added IntrusionPanel output and events."
+REVISION "201505150000Z"
+DESCRIPTION
+"Added user action events (AreaBellsSilenced)."
+REVISION "201501220000Z"
+DESCRIPTION
+"Added user action events (AreaArmed, AreaDisarmed, AreaForceArmed)."
+REVISION "201409170000Z"
+DESCRIPTION
+"Added IntrusionPanel device and events."
+REVISION "201401130000Z"
+DESCRIPTION
+"The initial revision of BVMS MIB module."
+::= { enterprises bosch(5318) boschBvms(2505) 1 }
+
+eventTables OBJECT IDENTIFIER ::= { bvms 1 }
+trapsDefinitions OBJECT IDENTIFIER ::= { bvms 2 }
+bvmsConformance OBJECT IDENTIFIER ::= { bvms 3 }
+
+brsDibosDevices OBJECT IDENTIFIER ::= { eventTables 1 }
+
+brsDibosInput OBJECT IDENTIFIER ::= { brsDibosDevices 1 }
+
+brsDibosInputTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF BrsDibosInputEntry
+MAX-ACCESS  not-accessible
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosInput 1 }
+
+BrsDibosInputEntry ::= SEQUENCE
+{
+    brsDibosInputIndex Integer32,
+    brsDibosInputName DisplayString,
+    brsDibosInputNetworkAddress DisplayString,
+    brsDibosInputInputState Integer32
+}
+
+brsDibosInputEntry OBJECT-TYPE
+SYNTAX      BrsDibosInputEntry
+MAX-ACCESS  not-accessible
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+INDEX       { brsDibosInputIndex }
+::= { brsDibosInputTable 1 }
+
+brsDibosInputIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosInputEntry 1 }
+
+brsDibosInputName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosInputEntry 2 }
+
+brsDibosInputNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosInputEntry 3 }
+
+brsDibosInputInputState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosInputEntry 10 }
+
+brsDibosRelay OBJECT IDENTIFIER ::= { brsDibosDevices 2 }
+
+brsDibosRelayTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF BrsDibosRelayEntry
+MAX-ACCESS  not-accessible
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosRelay 1 }
+
+BrsDibosRelayEntry ::= SEQUENCE
+{
+    brsDibosRelayIndex Integer32,
+    brsDibosRelayName DisplayString,
+    brsDibosRelayNetworkAddress DisplayString,
+    brsDibosRelayRelayState Integer32
+}
+
+brsDibosRelayEntry OBJECT-TYPE
+SYNTAX      BrsDibosRelayEntry
+MAX-ACCESS  not-accessible
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+INDEX       { brsDibosRelayIndex }
+::= { brsDibosRelayTable 1 }
+
+brsDibosRelayIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosRelayEntry 1 }
+
+brsDibosRelayName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosRelayEntry 2 }
+
+brsDibosRelayNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosRelayEntry 3 }
+
+brsDibosRelayRelayState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosRelayEntry 10 }
+
+brsDibosServer OBJECT IDENTIFIER ::= { brsDibosDevices 3 }
+
+brsDibosServerTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF BrsDibosServerEntry
+MAX-ACCESS  not-accessible
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosServer 1 }
+
+BrsDibosServerEntry ::= SEQUENCE
+{
+    brsDibosServerIndex Integer32,
+    brsDibosServerName DisplayString,
+    brsDibosServerNetworkAddress DisplayString,
+    brsDibosServerConnectionState Integer32
+}
+
+brsDibosServerEntry OBJECT-TYPE
+SYNTAX      BrsDibosServerEntry
+MAX-ACCESS  not-accessible
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+INDEX       { brsDibosServerIndex }
+::= { brsDibosServerTable 1 }
+
+brsDibosServerIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosServerEntry 1 }
+
+brsDibosServerName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosServerEntry 2 }
+
+brsDibosServerNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosServerEntry 3 }
+
+brsDibosServerConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosServerEntry 10 }
+
+brsDibosVideoCamera OBJECT IDENTIFIER ::= { brsDibosDevices 4 }
+
+brsDibosVideoCameraTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF BrsDibosVideoCameraEntry
+MAX-ACCESS  not-accessible
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosVideoCamera 1 }
+
+BrsDibosVideoCameraEntry ::= SEQUENCE
+{
+    brsDibosVideoCameraIndex Integer32,
+    brsDibosVideoCameraName DisplayString,
+    brsDibosVideoCameraNetworkAddress DisplayString,
+    brsDibosVideoCameraReferenceImageCheck Integer32,
+    brsDibosVideoCameraMotionDetection Integer32,
+    brsDibosVideoCameraRecordingMode Integer32,
+    brsDibosVideoCameraVideoLoss Integer32,
+    brsDibosVideoCameraVideoSignalTooBright Integer32,
+    brsDibosVideoCameraVideoSignalTooDark Integer32,
+    brsDibosVideoCameraVideoSignalTooNoisy Integer32,
+    brsDibosVideoCameraVisibility Integer32
+}
+
+brsDibosVideoCameraEntry OBJECT-TYPE
+SYNTAX      BrsDibosVideoCameraEntry
+MAX-ACCESS  not-accessible
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+INDEX       { brsDibosVideoCameraIndex }
+::= { brsDibosVideoCameraTable 1 }
+
+brsDibosVideoCameraIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosVideoCameraEntry 1 }
+
+brsDibosVideoCameraName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosVideoCameraEntry 2 }
+
+brsDibosVideoCameraNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosVideoCameraEntry 3 }
+
+brsDibosVideoCameraReferenceImageCheck OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosVideoCameraEntry 10 }
+
+brsDibosVideoCameraMotionDetection OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosVideoCameraEntry 11 }
+
+brsDibosVideoCameraRecordingMode OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosVideoCameraEntry 12 }
+
+brsDibosVideoCameraVideoLoss OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosVideoCameraEntry 13 }
+
+brsDibosVideoCameraVideoSignalTooBright OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosVideoCameraEntry 14 }
+
+brsDibosVideoCameraVideoSignalTooDark OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosVideoCameraEntry 15 }
+
+brsDibosVideoCameraVideoSignalTooNoisy OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosVideoCameraEntry 16 }
+
+brsDibosVideoCameraVisibility OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { brsDibosVideoCameraEntry 17 }
+
+dvrDevices OBJECT IDENTIFIER ::= { eventTables 2 }
+
+dvrInput OBJECT IDENTIFIER ::= { dvrDevices 1 }
+
+dvrInputTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF DvrInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrInput 1 }
+
+DvrInputEntry ::= SEQUENCE
+{
+    dvrInputIndex Integer32,
+    dvrInputName DisplayString,
+    dvrInputNetworkAddress DisplayString,
+    dvrInputInputState Integer32
+}
+
+dvrInputEntry OBJECT-TYPE
+SYNTAX      DvrInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { dvrInputIndex }
+::= { dvrInputTable 1 }
+
+dvrInputIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrInputEntry 1 }
+
+dvrInputName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrInputEntry 2 }
+
+dvrInputNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrInputEntry 3 }
+
+dvrInputInputState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrInputEntry 10 }
+
+dvrRelay OBJECT IDENTIFIER ::= { dvrDevices 2 }
+
+dvrRelayTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF DvrRelayEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrRelay 1 }
+
+DvrRelayEntry ::= SEQUENCE
+{
+    dvrRelayIndex Integer32,
+    dvrRelayName DisplayString,
+    dvrRelayNetworkAddress DisplayString,
+    dvrRelayRelayState Integer32
+}
+
+dvrRelayEntry OBJECT-TYPE
+SYNTAX      DvrRelayEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { dvrRelayIndex }
+::= { dvrRelayTable 1 }
+
+dvrRelayIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrRelayEntry 1 }
+
+dvrRelayName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrRelayEntry 2 }
+
+dvrRelayNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrRelayEntry 3 }
+
+dvrRelayRelayState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrRelayEntry 10 }
+
+dvrServer OBJECT IDENTIFIER ::= { dvrDevices 3 }
+
+dvrServerTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF DvrServerEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrServer 1 }
+
+DvrServerEntry ::= SEQUENCE
+{
+    dvrServerIndex Integer32,
+    dvrServerName DisplayString,
+    dvrServerNetworkAddress DisplayString,
+    dvrServerConnectionState Integer32,
+    dvrServerDiskFailed Integer32,
+    dvrServerDiskFull Integer32,
+    dvrServerFanFailed Integer32,
+    dvrServerTemperatureAboveLimit Integer32,
+    dvrServerSystemAlarm Integer32,
+    dvrServerSoftwareIncompatibility Integer32
+}
+
+dvrServerEntry OBJECT-TYPE
+SYNTAX      DvrServerEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { dvrServerIndex }
+::= { dvrServerTable 1 }
+
+dvrServerIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrServerEntry 1 }
+
+dvrServerName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrServerEntry 2 }
+
+dvrServerNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrServerEntry 3 }
+
+dvrServerConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrServerEntry 10 }
+
+dvrServerDiskFailed OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrServerEntry 11 }
+
+dvrServerDiskFull OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrServerEntry 12 }
+
+dvrServerFanFailed OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrServerEntry 13 }
+
+dvrServerTemperatureAboveLimit OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrServerEntry 14 }
+
+dvrServerSystemAlarm OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrServerEntry 15 }
+
+dvrServerSoftwareIncompatibility OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrServerEntry 16 }
+
+dvrVideoCamera OBJECT IDENTIFIER ::= { dvrDevices 4 }
+
+dvrVideoCameraTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF DvrVideoCameraEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrVideoCamera 1 }
+
+DvrVideoCameraEntry ::= SEQUENCE
+{
+    dvrVideoCameraIndex Integer32,
+    dvrVideoCameraName DisplayString,
+    dvrVideoCameraNetworkAddress DisplayString,
+    dvrVideoCameraMotionDetection Integer32,
+    dvrVideoCameraVideoLoss Integer32,
+    dvrVideoCameraVisibility Integer32
+}
+
+dvrVideoCameraEntry OBJECT-TYPE
+SYNTAX      DvrVideoCameraEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { dvrVideoCameraIndex }
+::= { dvrVideoCameraTable 1 }
+
+dvrVideoCameraIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrVideoCameraEntry 1 }
+
+dvrVideoCameraName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrVideoCameraEntry 2 }
+
+dvrVideoCameraNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrVideoCameraEntry 3 }
+
+dvrVideoCameraMotionDetection OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrVideoCameraEntry 10 }
+
+dvrVideoCameraVideoLoss OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrVideoCameraEntry 11 }
+
+dvrVideoCameraVisibility OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dvrVideoCameraEntry 12 }
+
+nvrDevices OBJECT IDENTIFIER ::= { eventTables 3 }
+
+nvrServer OBJECT IDENTIFIER ::= { nvrDevices 1 }
+
+nvrServerTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF NvrServerEntry
+MAX-ACCESS  not-accessible
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { nvrServer 1 }
+
+NvrServerEntry ::= SEQUENCE
+{
+    nvrServerIndex Integer32,
+    nvrServerName DisplayString,
+    nvrServerNetworkAddress DisplayString,
+    nvrServerConnectionState Integer32,
+    nvrServerFailoverNvrState Integer32
+}
+
+nvrServerEntry OBJECT-TYPE
+SYNTAX      NvrServerEntry
+MAX-ACCESS  not-accessible
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+INDEX       { nvrServerIndex }
+::= { nvrServerTable 1 }
+
+nvrServerIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { nvrServerEntry 1 }
+
+nvrServerName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { nvrServerEntry 2 }
+
+nvrServerNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { nvrServerEntry 3 }
+
+nvrServerConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { nvrServerEntry 10 }
+
+nvrServerFailoverNvrState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { nvrServerEntry 11 }
+
+vidosNvrDevice OBJECT IDENTIFIER ::= { nvrDevices 2 }
+
+vidosNvrDeviceTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF VidosNvrDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { vidosNvrDevice 1 }
+
+VidosNvrDeviceEntry ::= SEQUENCE
+{
+    vidosNvrDeviceIndex Integer32,
+    vidosNvrDeviceName DisplayString,
+    vidosNvrDeviceNetworkAddress DisplayString,
+    vidosNvrDeviceConnectionState Integer32
+}
+
+vidosNvrDeviceEntry OBJECT-TYPE
+SYNTAX      VidosNvrDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+INDEX       { vidosNvrDeviceIndex }
+::= { vidosNvrDeviceTable 1 }
+
+vidosNvrDeviceIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { vidosNvrDeviceEntry 1 }
+
+vidosNvrDeviceName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { vidosNvrDeviceEntry 2 }
+
+vidosNvrDeviceNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { vidosNvrDeviceEntry 3 }
+
+vidosNvrDeviceConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { vidosNvrDeviceEntry 10 }
+
+encodersDecoders OBJECT IDENTIFIER ::= { eventTables 4 }
+
+decoder OBJECT IDENTIFIER ::= { encodersDecoders 1 }
+
+decoderTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF DecoderEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { decoder 1 }
+
+DecoderEntry ::= SEQUENCE
+{
+    decoderIndex Integer32,
+    decoderName DisplayString,
+    decoderNetworkAddress DisplayString,
+    decoderConnectionState Integer32
+}
+
+decoderEntry OBJECT-TYPE
+SYNTAX      DecoderEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { decoderIndex }
+::= { decoderTable 1 }
+
+decoderIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { decoderEntry 1 }
+
+decoderName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { decoderEntry 2 }
+
+decoderNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { decoderEntry 3 }
+
+decoderConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { decoderEntry 10 }
+
+decoderInput OBJECT IDENTIFIER ::= { encodersDecoders 2 }
+
+decoderInputTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF DecoderInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { decoderInput 1 }
+
+DecoderInputEntry ::= SEQUENCE
+{
+    decoderInputIndex Integer32,
+    decoderInputName DisplayString,
+    decoderInputNetworkAddress DisplayString,
+    decoderInputConnectionState Integer32,
+    decoderInputInputState Integer32
+}
+
+decoderInputEntry OBJECT-TYPE
+SYNTAX      DecoderInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { decoderInputIndex }
+::= { decoderInputTable 1 }
+
+decoderInputIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { decoderInputEntry 1 }
+
+decoderInputName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { decoderInputEntry 2 }
+
+decoderInputNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { decoderInputEntry 3 }
+
+decoderInputConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { decoderInputEntry 10 }
+
+decoderInputInputState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { decoderInputEntry 11 }
+
+decoderRelay OBJECT IDENTIFIER ::= { encodersDecoders 3 }
+
+decoderRelayTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF DecoderRelayEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { decoderRelay 1 }
+
+DecoderRelayEntry ::= SEQUENCE
+{
+    decoderRelayIndex Integer32,
+    decoderRelayName DisplayString,
+    decoderRelayNetworkAddress DisplayString,
+    decoderRelayConnectionState Integer32,
+    decoderRelayRelayState Integer32
+}
+
+decoderRelayEntry OBJECT-TYPE
+SYNTAX      DecoderRelayEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { decoderRelayIndex }
+::= { decoderRelayTable 1 }
+
+decoderRelayIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { decoderRelayEntry 1 }
+
+decoderRelayName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { decoderRelayEntry 2 }
+
+decoderRelayNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { decoderRelayEntry 3 }
+
+decoderRelayConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { decoderRelayEntry 10 }
+
+decoderRelayRelayState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { decoderRelayEntry 11 }
+
+encoder OBJECT IDENTIFIER ::= { encodersDecoders 4 }
+
+encoderTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF EncoderEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { encoder 1 }
+
+EncoderEntry ::= SEQUENCE
+{
+    encoderIndex Integer32,
+    encoderName DisplayString,
+    encoderNetworkAddress DisplayString,
+    encoderConnectionState Integer32
+}
+
+encoderEntry OBJECT-TYPE
+SYNTAX      EncoderEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { encoderIndex }
+::= { encoderTable 1 }
+
+encoderIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { encoderEntry 1 }
+
+encoderName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { encoderEntry 2 }
+
+encoderNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { encoderEntry 3 }
+
+encoderConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { encoderEntry 10 }
+
+encoderInput OBJECT IDENTIFIER ::= { encodersDecoders 5 }
+
+encoderInputTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF EncoderInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { encoderInput 1 }
+
+EncoderInputEntry ::= SEQUENCE
+{
+    encoderInputIndex Integer32,
+    encoderInputName DisplayString,
+    encoderInputNetworkAddress DisplayString,
+    encoderInputConnectionState Integer32,
+    encoderInputInputState Integer32
+}
+
+encoderInputEntry OBJECT-TYPE
+SYNTAX      EncoderInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { encoderInputIndex }
+::= { encoderInputTable 1 }
+
+encoderInputIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { encoderInputEntry 1 }
+
+encoderInputName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { encoderInputEntry 2 }
+
+encoderInputNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { encoderInputEntry 3 }
+
+encoderInputConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { encoderInputEntry 10 }
+
+encoderInputInputState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { encoderInputEntry 11 }
+
+encoderRelay OBJECT IDENTIFIER ::= { encodersDecoders 6 }
+
+encoderRelayTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF EncoderRelayEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { encoderRelay 1 }
+
+EncoderRelayEntry ::= SEQUENCE
+{
+    encoderRelayIndex Integer32,
+    encoderRelayName DisplayString,
+    encoderRelayNetworkAddress DisplayString,
+    encoderRelayConnectionState Integer32,
+    encoderRelayRelayState Integer32
+}
+
+encoderRelayEntry OBJECT-TYPE
+SYNTAX      EncoderRelayEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { encoderRelayIndex }
+::= { encoderRelayTable 1 }
+
+encoderRelayIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { encoderRelayEntry 1 }
+
+encoderRelayName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { encoderRelayEntry 2 }
+
+encoderRelayNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { encoderRelayEntry 3 }
+
+encoderRelayConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { encoderRelayEntry 10 }
+
+encoderRelayRelayState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { encoderRelayEntry 11 }
+
+camera OBJECT IDENTIFIER ::= { encodersDecoders 7 }
+
+cameraTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF CameraEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { camera 1 }
+
+CameraEntry ::= SEQUENCE
+{
+    cameraIndex Integer32,
+    cameraName DisplayString,
+    cameraNetworkAddress DisplayString,
+    cameraReferenceImageCheck Integer32,
+    cameraConnectionState Integer32,
+    cameraMotionDetection Integer32,
+    cameraRecordingMode Integer32,
+    cameraVideoLoss Integer32,
+    cameraVideoSignalTooBright Integer32,
+    cameraVideoSignalTooDark Integer32,
+    cameraVideoSignalTooNoisy Integer32,
+    cameraVideoAnalysis01 Integer32,
+    cameraVideoAnalysis02 Integer32,
+    cameraVideoAnalysis03 Integer32,
+    cameraVideoAnalysis04 Integer32,
+    cameraVideoAnalysis05 Integer32,
+    cameraVideoAnalysis06 Integer32,
+    cameraVideoAnalysis07 Integer32,
+    cameraVideoAnalysis08 Integer32,
+    cameraVideoAnalysis09 Integer32,
+    cameraVideoAnalysis10 Integer32,
+    cameraVideoAnalysis11 Integer32,
+    cameraVideoAnalysis12 Integer32,
+    cameraVideoAnalysis13 Integer32,
+    cameraVideoAnalysis14 Integer32,
+    cameraVideoAnalysis15 Integer32,
+    cameraVideoAnalysis16 Integer32,
+    cameraStorageState Integer32,
+    cameraBufferStorageState Integer32,
+    cameraSecondaryRecordingMode Integer32,
+    cameraSecondaryStorageState Integer32,
+    cameraFireOrSmokeState Integer32,
+    cameraVisibility Integer32,
+    cameraVideoSignalTooBlurry Integer32,
+    cameraGlobalSceneChange Integer32,
+    cameraRecordingMonitorState Integer32,
+    cameraSecondaryRecordingMonitorState Integer32
+}
+
+cameraEntry OBJECT-TYPE
+SYNTAX      CameraEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { cameraIndex }
+::= { cameraTable 1 }
+
+cameraIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 1 }
+
+cameraName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 2 }
+
+cameraNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 3 }
+
+cameraReferenceImageCheck OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 10 }
+
+cameraConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 11 }
+
+cameraMotionDetection OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 12 }
+
+cameraRecordingMode OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 13 }
+
+cameraVideoLoss OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 14 }
+
+cameraVideoSignalTooBright OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 15 }
+
+cameraVideoSignalTooDark OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 16 }
+
+cameraVideoSignalTooNoisy OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 17 }
+
+cameraVideoAnalysis01 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 18 }
+
+cameraVideoAnalysis02 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 19 }
+
+cameraVideoAnalysis03 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 20 }
+
+cameraVideoAnalysis04 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 21 }
+
+cameraVideoAnalysis05 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 22 }
+
+cameraVideoAnalysis06 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 23 }
+
+cameraVideoAnalysis07 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 24 }
+
+cameraVideoAnalysis08 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 25 }
+
+cameraVideoAnalysis09 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 26 }
+
+cameraVideoAnalysis10 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 27 }
+
+cameraVideoAnalysis11 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 28 }
+
+cameraVideoAnalysis12 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 29 }
+
+cameraVideoAnalysis13 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 30 }
+
+cameraVideoAnalysis14 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 31 }
+
+cameraVideoAnalysis15 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 32 }
+
+cameraVideoAnalysis16 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 33 }
+
+cameraStorageState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 34 }
+
+cameraBufferStorageState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 35 }
+
+cameraSecondaryRecordingMode OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 36 }
+
+cameraSecondaryStorageState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 37 }
+
+cameraFireOrSmokeState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 38 }
+
+cameraVisibility OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 39 }
+
+cameraVideoSignalTooBlurry OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 40 }
+
+cameraGlobalSceneChange OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 41 }
+
+cameraRecordingMonitorState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 43 }
+
+cameraSecondaryRecordingMonitorState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 44 }
+
+vrmDevices OBJECT IDENTIFIER ::= { eventTables 5 }
+
+vrmServer OBJECT IDENTIFIER ::= { vrmDevices 1 }
+
+vrmServerTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF VrmServerEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { vrmServer 1 }
+
+VrmServerEntry ::= SEQUENCE
+{
+    vrmServerIndex Integer32,
+    vrmServerName DisplayString,
+    vrmServerNetworkAddress DisplayString,
+    vrmServerConnectionState Integer32,
+    vrmServerFailoverState Integer32,
+    vrmServerLicenseState Integer32,
+    vrmServerVrmType Integer32
+}
+
+vrmServerEntry OBJECT-TYPE
+SYNTAX      VrmServerEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { vrmServerIndex }
+::= { vrmServerTable 1 }
+
+vrmServerIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { vrmServerEntry 1 }
+
+vrmServerName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { vrmServerEntry 2 }
+
+vrmServerNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { vrmServerEntry 3 }
+
+vrmServerConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { vrmServerEntry 10 }
+
+vrmServerFailoverState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { vrmServerEntry 11 }
+
+vrmServerLicenseState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { vrmServerEntry 12 }
+
+vrmServerVrmType OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { vrmServerEntry 13 }
+
+lun OBJECT IDENTIFIER ::= { vrmDevices 2 }
+
+lunTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF LunEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { lun 1 }
+
+LunEntry ::= SEQUENCE
+{
+    lunIndex Integer32,
+    lunName DisplayString,
+    lunFormattingState Integer32
+}
+
+lunEntry OBJECT-TYPE
+SYNTAX      LunEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { lunIndex }
+::= { lunTable 1 }
+
+lunIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { lunEntry 1 }
+
+lunName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { lunEntry 2 }
+
+lunFormattingState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { lunEntry 10 }
+
+iscsiDevice OBJECT IDENTIFIER ::= { vrmDevices 3 }
+
+iscsiDeviceTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF IscsiDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { iscsiDevice 1 }
+
+IscsiDeviceEntry ::= SEQUENCE
+{
+    iscsiDeviceIndex Integer32,
+    iscsiDeviceName DisplayString,
+    iscsiDeviceNetworkAddress DisplayString,
+    iscsiDeviceConnectionState Integer32
+}
+
+iscsiDeviceEntry OBJECT-TYPE
+SYNTAX      IscsiDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { iscsiDeviceIndex }
+::= { iscsiDeviceTable 1 }
+
+iscsiDeviceIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { iscsiDeviceEntry 1 }
+
+iscsiDeviceName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { iscsiDeviceEntry 2 }
+
+iscsiDeviceNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { iscsiDeviceEntry 3 }
+
+iscsiDeviceConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { iscsiDeviceEntry 10 }
+
+streamingGatewayDevice OBJECT IDENTIFIER ::= { vrmDevices 4 }
+
+streamingGatewayDeviceTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF StreamingGatewayDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { streamingGatewayDevice 1 }
+
+StreamingGatewayDeviceEntry ::= SEQUENCE
+{
+    streamingGatewayDeviceIndex Integer32,
+    streamingGatewayDeviceName DisplayString,
+    streamingGatewayDeviceNetworkAddress DisplayString,
+    streamingGatewayDeviceConnectionState Integer32
+}
+
+streamingGatewayDeviceEntry OBJECT-TYPE
+SYNTAX      StreamingGatewayDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { streamingGatewayDeviceIndex }
+::= { streamingGatewayDeviceTable 1 }
+
+streamingGatewayDeviceIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { streamingGatewayDeviceEntry 1 }
+
+streamingGatewayDeviceName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { streamingGatewayDeviceEntry 2 }
+
+streamingGatewayDeviceNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { streamingGatewayDeviceEntry 3 }
+
+streamingGatewayDeviceConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { streamingGatewayDeviceEntry 10 }
+
+allegiantDevices OBJECT IDENTIFIER ::= { eventTables 6 }
+
+allegiantInput OBJECT IDENTIFIER ::= { allegiantDevices 1 }
+
+allegiantInputTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF AllegiantInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { allegiantInput 1 }
+
+AllegiantInputEntry ::= SEQUENCE
+{
+    allegiantInputIndex Integer32,
+    allegiantInputName DisplayString,
+    allegiantInputInputState Integer32
+}
+
+allegiantInputEntry OBJECT-TYPE
+SYNTAX      AllegiantInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { allegiantInputIndex }
+::= { allegiantInputTable 1 }
+
+allegiantInputIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { allegiantInputEntry 1 }
+
+allegiantInputName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { allegiantInputEntry 2 }
+
+allegiantInputInputState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { allegiantInputEntry 10 }
+
+allegiantCamera OBJECT IDENTIFIER ::= { allegiantDevices 2 }
+
+allegiantCameraTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF AllegiantCameraEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { allegiantCamera 1 }
+
+AllegiantCameraEntry ::= SEQUENCE
+{
+    allegiantCameraIndex Integer32,
+    allegiantCameraName DisplayString,
+    allegiantCameraNetworkAddress DisplayString,
+    allegiantCameraVideoLoss Integer32,
+    allegiantCameraVisibility Integer32
+}
+
+allegiantCameraEntry OBJECT-TYPE
+SYNTAX      AllegiantCameraEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { allegiantCameraIndex }
+::= { allegiantCameraTable 1 }
+
+allegiantCameraIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { allegiantCameraEntry 1 }
+
+allegiantCameraName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { allegiantCameraEntry 2 }
+
+allegiantCameraNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { allegiantCameraEntry 3 }
+
+allegiantCameraVideoLoss OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { allegiantCameraEntry 10 }
+
+allegiantCameraVisibility OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { allegiantCameraEntry 11 }
+
+allegiantDevice OBJECT IDENTIFIER ::= { allegiantDevices 3 }
+
+allegiantDeviceTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF AllegiantDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { allegiantDevice 1 }
+
+AllegiantDeviceEntry ::= SEQUENCE
+{
+    allegiantDeviceIndex Integer32,
+    allegiantDeviceName DisplayString,
+    allegiantDeviceConnectionState Integer32
+}
+
+allegiantDeviceEntry OBJECT-TYPE
+SYNTAX      AllegiantDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { allegiantDeviceIndex }
+::= { allegiantDeviceTable 1 }
+
+allegiantDeviceIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { allegiantDeviceEntry 1 }
+
+allegiantDeviceName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { allegiantDeviceEntry 2 }
+
+allegiantDeviceConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { allegiantDeviceEntry 10 }
+
+systemDevices OBJECT IDENTIFIER ::= { eventTables 7 }
+
+compoundEvents OBJECT IDENTIFIER ::= { systemDevices 1 }
+
+compoundEventsTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF CompoundEventsEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { compoundEvents 1 }
+
+CompoundEventsEntry ::= SEQUENCE
+{
+    compoundEventsIndex Integer32,
+    compoundEventsName DisplayString,
+    compoundEventsCompoundEventState Integer32
+}
+
+compoundEventsEntry OBJECT-TYPE
+SYNTAX      CompoundEventsEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { compoundEventsIndex }
+::= { compoundEventsTable 1 }
+
+compoundEventsIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { compoundEventsEntry 1 }
+
+compoundEventsName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { compoundEventsEntry 2 }
+
+compoundEventsCompoundEventState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { compoundEventsEntry 10 }
+
+schedules OBJECT IDENTIFIER ::= { systemDevices 2 }
+
+schedulesTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF SchedulesEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { schedules 1 }
+
+SchedulesEntry ::= SEQUENCE
+{
+    schedulesIndex Integer32,
+    schedulesName DisplayString,
+    schedulesActivation Integer32
+}
+
+schedulesEntry OBJECT-TYPE
+SYNTAX      SchedulesEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { schedulesIndex }
+::= { schedulesTable 1 }
+
+schedulesIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { schedulesEntry 1 }
+
+schedulesName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { schedulesEntry 2 }
+
+schedulesActivation OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { schedulesEntry 10 }
+
+virtualInputs OBJECT IDENTIFIER ::= { systemDevices 3 }
+
+virtualInputsTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF VirtualInputsEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { virtualInputs 1 }
+
+VirtualInputsEntry ::= SEQUENCE
+{
+    virtualInputsIndex Integer32,
+    virtualInputsName DisplayString,
+    virtualInputsInputState Integer32
+}
+
+virtualInputsEntry OBJECT-TYPE
+SYNTAX      VirtualInputsEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { virtualInputsIndex }
+::= { virtualInputsTable 1 }
+
+virtualInputsIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { virtualInputsEntry 1 }
+
+virtualInputsName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { virtualInputsEntry 2 }
+
+virtualInputsInputState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { virtualInputsEntry 10 }
+
+backupVideoData OBJECT IDENTIFIER ::= { systemDevices 4 }
+
+backupVideoDataTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF BackupVideoDataEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { backupVideoData 1 }
+
+BackupVideoDataEntry ::= SEQUENCE
+{
+    backupVideoDataIndex Integer32,
+    backupVideoDataName DisplayString
+}
+
+backupVideoDataEntry OBJECT-TYPE
+SYNTAX      BackupVideoDataEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { backupVideoDataIndex }
+::= { backupVideoDataTable 1 }
+
+backupVideoDataIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { backupVideoDataEntry 1 }
+
+backupVideoDataName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { backupVideoDataEntry 2 }
+
+alarmState OBJECT IDENTIFIER ::= { systemDevices 5 }
+
+alarmStateTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF AlarmStateEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { alarmState 1 }
+
+AlarmStateEntry ::= SEQUENCE
+{
+    alarmStateIndex Integer32,
+    alarmStateName DisplayString
+}
+
+alarmStateEntry OBJECT-TYPE
+SYNTAX      AlarmStateEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { alarmStateIndex }
+::= { alarmStateTable 1 }
+
+alarmStateIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { alarmStateEntry 1 }
+
+alarmStateName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { alarmStateEntry 2 }
+
+authentication OBJECT IDENTIFIER ::= { systemDevices 6 }
+
+authenticationTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF AuthenticationEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { authentication 1 }
+
+AuthenticationEntry ::= SEQUENCE
+{
+    authenticationIndex Integer32,
+    authenticationName DisplayString
+}
+
+authenticationEntry OBJECT-TYPE
+SYNTAX      AuthenticationEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { authenticationIndex }
+::= { authenticationTable 1 }
+
+authenticationIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { authenticationEntry 1 }
+
+authenticationName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { authenticationEntry 2 }
+
+operatorClientEventButtons OBJECT IDENTIFIER ::= { systemDevices 7 }
+
+operatorClientEventButtonsTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF OperatorClientEventButtonsEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { operatorClientEventButtons 1 }
+
+OperatorClientEventButtonsEntry ::= SEQUENCE
+{
+    operatorClientEventButtonsIndex Integer32,
+    operatorClientEventButtonsName DisplayString
+}
+
+operatorClientEventButtonsEntry OBJECT-TYPE
+SYNTAX      OperatorClientEventButtonsEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { operatorClientEventButtonsIndex }
+::= { operatorClientEventButtonsTable 1 }
+
+operatorClientEventButtonsIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { operatorClientEventButtonsEntry 1 }
+
+operatorClientEventButtonsName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { operatorClientEventButtonsEntry 2 }
+
+userActions OBJECT IDENTIFIER ::= { systemDevices 8 }
+
+userActionsTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF UserActionsEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { userActions 1 }
+
+UserActionsEntry ::= SEQUENCE
+{
+    userActionsIndex Integer32,
+    userActionsName DisplayString
+}
+
+userActionsEntry OBJECT-TYPE
+SYNTAX      UserActionsEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { userActionsIndex }
+::= { userActionsTable 1 }
+
+userActionsIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { userActionsEntry 1 }
+
+userActionsName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { userActionsEntry 2 }
+
+scriptMessages OBJECT IDENTIFIER ::= { systemDevices 9 }
+
+scriptMessagesTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF ScriptMessagesEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { scriptMessages 1 }
+
+ScriptMessagesEntry ::= SEQUENCE
+{
+    scriptMessagesIndex Integer32,
+    scriptMessagesName DisplayString
+}
+
+scriptMessagesEntry OBJECT-TYPE
+SYNTAX      ScriptMessagesEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { scriptMessagesIndex }
+::= { scriptMessagesTable 1 }
+
+scriptMessagesIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { scriptMessagesEntry 1 }
+
+scriptMessagesName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { scriptMessagesEntry 2 }
+
+systemEvents OBJECT IDENTIFIER ::= { systemDevices 10 }
+
+systemEventsTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF SystemEventsEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { systemEvents 1 }
+
+SystemEventsEntry ::= SEQUENCE
+{
+    systemEventsIndex Integer32,
+    systemEventsName DisplayString
+}
+
+systemEventsEntry OBJECT-TYPE
+SYNTAX      SystemEventsEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { systemEventsIndex }
+::= { systemEventsTable 1 }
+
+systemEventsIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { systemEventsEntry 1 }
+
+systemEventsName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { systemEventsEntry 2 }
+
+bvmsTasks OBJECT IDENTIFIER ::= { systemDevices 11 }
+
+bvmsTasksTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF BvmsTasksEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { bvmsTasks 1 }
+
+BvmsTasksEntry ::= SEQUENCE
+{
+    bvmsTasksIndex Integer32,
+    bvmsTasksName DisplayString,
+    bvmsTasksStateOfTheSystemTask Integer32
+}
+
+bvmsTasksEntry OBJECT-TYPE
+SYNTAX      BvmsTasksEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { bvmsTasksIndex }
+::= { bvmsTasksTable 1 }
+
+bvmsTasksIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { bvmsTasksEntry 1 }
+
+bvmsTasksName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { bvmsTasksEntry 2 }
+
+bvmsTasksStateOfTheSystemTask OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { bvmsTasksEntry 10 }
+
+threatLevels OBJECT IDENTIFIER ::= { systemDevices 12 }
+
+threatLevelsTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF ThreatLevelsEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { threatLevels 1 }
+
+ThreatLevelsEntry ::= SEQUENCE
+{
+    threatLevelsIndex Integer32,
+    threatLevelsName DisplayString,
+    threatLevelsThreatLevelState Integer32
+}
+
+threatLevelsEntry OBJECT-TYPE
+SYNTAX      ThreatLevelsEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { threatLevelsIndex }
+::= { threatLevelsTable 1 }
+
+threatLevelsIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { threatLevelsEntry 1 }
+
+threatLevelsName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { threatLevelsEntry 2 }
+
+threatLevelsThreatLevelState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { threatLevelsEntry 10 }
+
+atmPosDevices OBJECT IDENTIFIER ::= { eventTables 8 }
+
+posBridge OBJECT IDENTIFIER ::= { atmPosDevices 1 }
+
+posBridgeTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF PosBridgeEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { posBridge 1 }
+
+PosBridgeEntry ::= SEQUENCE
+{
+    posBridgeIndex Integer32,
+    posBridgeName DisplayString,
+    posBridgeNetworkAddress DisplayString,
+    posBridgeConnectionState Integer32
+}
+
+posBridgeEntry OBJECT-TYPE
+SYNTAX      PosBridgeEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { posBridgeIndex }
+::= { posBridgeTable 1 }
+
+posBridgeIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { posBridgeEntry 1 }
+
+posBridgeName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { posBridgeEntry 2 }
+
+posBridgeNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { posBridgeEntry 3 }
+
+posBridgeConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { posBridgeEntry 10 }
+
+posBridgeInput OBJECT IDENTIFIER ::= { atmPosDevices 2 }
+
+posBridgeInputTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF PosBridgeInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { posBridgeInput 1 }
+
+PosBridgeInputEntry ::= SEQUENCE
+{
+    posBridgeInputIndex Integer32,
+    posBridgeInputName DisplayString,
+    posBridgeInputNetworkAddress DisplayString
+}
+
+posBridgeInputEntry OBJECT-TYPE
+SYNTAX      PosBridgeInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { posBridgeInputIndex }
+::= { posBridgeInputTable 1 }
+
+posBridgeInputIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { posBridgeInputEntry 1 }
+
+posBridgeInputName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { posBridgeInputEntry 2 }
+
+posBridgeInputNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { posBridgeInputEntry 3 }
+
+dtpDevice OBJECT IDENTIFIER ::= { atmPosDevices 3 }
+
+dtpDeviceTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF DtpDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dtpDevice 1 }
+
+DtpDeviceEntry ::= SEQUENCE
+{
+    dtpDeviceIndex Integer32,
+    dtpDeviceName DisplayString,
+    dtpDeviceConnectionState Integer32
+}
+
+dtpDeviceEntry OBJECT-TYPE
+SYNTAX      DtpDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { dtpDeviceIndex }
+::= { dtpDeviceTable 1 }
+
+dtpDeviceIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dtpDeviceEntry 1 }
+
+dtpDeviceName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dtpDeviceEntry 2 }
+
+dtpDeviceConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { dtpDeviceEntry 10 }
+
+atmDevice OBJECT IDENTIFIER ::= { atmPosDevices 4 }
+
+atmDeviceTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF AtmDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { atmDevice 1 }
+
+AtmDeviceEntry ::= SEQUENCE
+{
+    atmDeviceIndex Integer32,
+    atmDeviceName DisplayString,
+    atmDeviceConnectionState Integer32
+}
+
+atmDeviceEntry OBJECT-TYPE
+SYNTAX      AtmDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { atmDeviceIndex }
+::= { atmDeviceTable 1 }
+
+atmDeviceIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { atmDeviceEntry 1 }
+
+atmDeviceName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { atmDeviceEntry 2 }
+
+atmDeviceConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { atmDeviceEntry 10 }
+
+atmInput OBJECT IDENTIFIER ::= { atmPosDevices 5 }
+
+atmInputTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF AtmInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { atmInput 1 }
+
+AtmInputEntry ::= SEQUENCE
+{
+    atmInputIndex Integer32,
+    atmInputName DisplayString
+}
+
+atmInputEntry OBJECT-TYPE
+SYNTAX      AtmInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { atmInputIndex }
+::= { atmInputTable 1 }
+
+atmInputIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { atmInputEntry 1 }
+
+atmInputName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { atmInputEntry 2 }
+
+networkDevices OBJECT IDENTIFIER ::= { eventTables 9 }
+
+snmpReceiver OBJECT IDENTIFIER ::= { networkDevices 1 }
+
+snmpReceiverTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF SnmpReceiverEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { snmpReceiver 1 }
+
+SnmpReceiverEntry ::= SEQUENCE
+{
+    snmpReceiverIndex Integer32,
+    snmpReceiverName DisplayString,
+    snmpReceiverNetworkAddress DisplayString
+}
+
+snmpReceiverEntry OBJECT-TYPE
+SYNTAX      SnmpReceiverEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { snmpReceiverIndex }
+::= { snmpReceiverTable 1 }
+
+snmpReceiverIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { snmpReceiverEntry 1 }
+
+snmpReceiverName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { snmpReceiverEntry 2 }
+
+snmpReceiverNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { snmpReceiverEntry 3 }
+
+adamDevice OBJECT IDENTIFIER ::= { networkDevices 2 }
+
+adamDeviceTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF AdamDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { adamDevice 1 }
+
+AdamDeviceEntry ::= SEQUENCE
+{
+    adamDeviceIndex Integer32,
+    adamDeviceName DisplayString,
+    adamDeviceNetworkAddress DisplayString,
+    adamDeviceConnectionState Integer32
+}
+
+adamDeviceEntry OBJECT-TYPE
+SYNTAX      AdamDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { adamDeviceIndex }
+::= { adamDeviceTable 1 }
+
+adamDeviceIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { adamDeviceEntry 1 }
+
+adamDeviceName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { adamDeviceEntry 2 }
+
+adamDeviceNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { adamDeviceEntry 3 }
+
+adamDeviceConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { adamDeviceEntry 10 }
+
+adamInput OBJECT IDENTIFIER ::= { networkDevices 3 }
+
+adamInputTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF AdamInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { adamInput 1 }
+
+AdamInputEntry ::= SEQUENCE
+{
+    adamInputIndex Integer32,
+    adamInputName DisplayString,
+    adamInputNetworkAddress DisplayString,
+    adamInputInputState Integer32,
+    adamInputConnectionState Integer32
+}
+
+adamInputEntry OBJECT-TYPE
+SYNTAX      AdamInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { adamInputIndex }
+::= { adamInputTable 1 }
+
+adamInputIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { adamInputEntry 1 }
+
+adamInputName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { adamInputEntry 2 }
+
+adamInputNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { adamInputEntry 3 }
+
+adamInputInputState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { adamInputEntry 10 }
+
+adamInputConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { adamInputEntry 11 }
+
+adamRelay OBJECT IDENTIFIER ::= { networkDevices 4 }
+
+adamRelayTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF AdamRelayEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { adamRelay 1 }
+
+AdamRelayEntry ::= SEQUENCE
+{
+    adamRelayIndex Integer32,
+    adamRelayName DisplayString,
+    adamRelayNetworkAddress DisplayString,
+    adamRelayRelayState Integer32,
+    adamRelayConnectionState Integer32
+}
+
+adamRelayEntry OBJECT-TYPE
+SYNTAX      AdamRelayEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { adamRelayIndex }
+::= { adamRelayTable 1 }
+
+adamRelayIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { adamRelayEntry 1 }
+
+adamRelayName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { adamRelayEntry 2 }
+
+adamRelayNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { adamRelayEntry 3 }
+
+adamRelayRelayState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { adamRelayEntry 10 }
+
+adamRelayConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { adamRelayEntry 11 }
+
+mobileVideoServiceDevice OBJECT IDENTIFIER ::= { networkDevices 5 }
+
+mobileVideoServiceDeviceTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF MobileVideoServiceDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { mobileVideoServiceDevice 1 }
+
+MobileVideoServiceDeviceEntry ::= SEQUENCE
+{
+    mobileVideoServiceDeviceIndex Integer32,
+    mobileVideoServiceDeviceName DisplayString
+}
+
+mobileVideoServiceDeviceEntry OBJECT-TYPE
+SYNTAX      MobileVideoServiceDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { mobileVideoServiceDeviceIndex }
+::= { mobileVideoServiceDeviceTable 1 }
+
+mobileVideoServiceDeviceIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { mobileVideoServiceDeviceEntry 1 }
+
+mobileVideoServiceDeviceName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { mobileVideoServiceDeviceEntry 2 }
+
+foyerCardReaderDevices OBJECT IDENTIFIER ::= { eventTables 10 }
+
+foyerCardReader OBJECT IDENTIFIER ::= { foyerCardReaderDevices 1 }
+
+foyerCardReaderTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF FoyerCardReaderEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { foyerCardReader 1 }
+
+FoyerCardReaderEntry ::= SEQUENCE
+{
+    foyerCardReaderIndex Integer32,
+    foyerCardReaderName DisplayString,
+    foyerCardReaderConnectionState Integer32,
+    foyerCardReaderFaultIndication Integer32,
+    foyerCardReaderSkimmingDetection Integer32,
+    foyerCardReaderAntiSkimmingSabotage Integer32
+}
+
+foyerCardReaderEntry OBJECT-TYPE
+SYNTAX      FoyerCardReaderEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { foyerCardReaderIndex }
+::= { foyerCardReaderTable 1 }
+
+foyerCardReaderIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { foyerCardReaderEntry 1 }
+
+foyerCardReaderName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { foyerCardReaderEntry 2 }
+
+foyerCardReaderConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { foyerCardReaderEntry 10 }
+
+foyerCardReaderFaultIndication OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { foyerCardReaderEntry 12 }
+
+foyerCardReaderSkimmingDetection OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { foyerCardReaderEntry 13 }
+
+foyerCardReaderAntiSkimmingSabotage OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { foyerCardReaderEntry 14 }
+
+onvifEncoders OBJECT IDENTIFIER ::= { eventTables 11 }
+
+onvifEncoder OBJECT IDENTIFIER ::= { onvifEncoders 1 }
+
+onvifEncoderTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF OnvifEncoderEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifEncoder 1 }
+
+OnvifEncoderEntry ::= SEQUENCE
+{
+    onvifEncoderIndex Integer32,
+    onvifEncoderName DisplayString,
+    onvifEncoderNetworkAddress DisplayString,
+    onvifEncoderConnectionState Integer32
+}
+
+onvifEncoderEntry OBJECT-TYPE
+SYNTAX      OnvifEncoderEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { onvifEncoderIndex }
+::= { onvifEncoderTable 1 }
+
+onvifEncoderIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifEncoderEntry 1 }
+
+onvifEncoderName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifEncoderEntry 2 }
+
+onvifEncoderNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifEncoderEntry 3 }
+
+onvifEncoderConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifEncoderEntry 10 }
+
+onvifCamera OBJECT IDENTIFIER ::= { onvifEncoders 2 }
+
+onvifCameraTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF OnvifCameraEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCamera 1 }
+
+OnvifCameraEntry ::= SEQUENCE
+{
+    onvifCameraIndex Integer32,
+    onvifCameraName DisplayString,
+    onvifCameraNetworkAddress DisplayString,
+    onvifCameraConnectionState Integer32,
+    onvifCameraRecordingMode Integer32,
+    onvifCameraStorageState Integer32,
+    onvifCameraMotionDetection Integer32,
+    onvifCameraVideoLoss Integer32,
+    onvifCameraVideoSignalTooBright Integer32,
+    onvifCameraVideoSignalTooDark Integer32,
+    onvifCameraVideoSignalTooNoisy Integer32,
+    onvifCameraReferenceImageCheck Integer32,
+    onvifCameraVisibility Integer32,
+    onvifCameraVideoAnalysis01 Integer32,
+    onvifCameraVideoAnalysis02 Integer32,
+    onvifCameraVideoAnalysis03 Integer32,
+    onvifCameraVideoAnalysis04 Integer32,
+    onvifCameraVideoAnalysis05 Integer32,
+    onvifCameraVideoAnalysis06 Integer32,
+    onvifCameraVideoAnalysis07 Integer32,
+    onvifCameraVideoAnalysis08 Integer32,
+    onvifCameraVideoAnalysis09 Integer32,
+    onvifCameraVideoAnalysis10 Integer32,
+    onvifCameraVideoAnalysis11 Integer32,
+    onvifCameraVideoAnalysis12 Integer32,
+    onvifCameraVideoAnalysis13 Integer32,
+    onvifCameraVideoAnalysis14 Integer32,
+    onvifCameraVideoAnalysis15 Integer32,
+    onvifCameraVideoAnalysis16 Integer32,
+    onvifCameraVideoSignalTooBlurry Integer32,
+    onvifCameraGlobalSceneChange Integer32
+}
+
+onvifCameraEntry OBJECT-TYPE
+SYNTAX      OnvifCameraEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { onvifCameraIndex }
+::= { onvifCameraTable 1 }
+
+onvifCameraIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 1 }
+
+onvifCameraName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 2 }
+
+onvifCameraNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 3 }
+
+onvifCameraConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 10 }
+
+onvifCameraRecordingMode OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 11 }
+
+onvifCameraStorageState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 12 }
+
+onvifCameraMotionDetection OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 13 }
+
+onvifCameraVideoLoss OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 14 }
+
+onvifCameraVideoSignalTooBright OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 15 }
+
+onvifCameraVideoSignalTooDark OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 16 }
+
+onvifCameraVideoSignalTooNoisy OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 17 }
+
+onvifCameraReferenceImageCheck OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 18 }
+
+onvifCameraVisibility OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 19 }
+
+onvifCameraVideoAnalysis01 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 20 }
+
+onvifCameraVideoAnalysis02 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 21 }
+
+onvifCameraVideoAnalysis03 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 22 }
+
+onvifCameraVideoAnalysis04 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 23 }
+
+onvifCameraVideoAnalysis05 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 24 }
+
+onvifCameraVideoAnalysis06 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 25 }
+
+onvifCameraVideoAnalysis07 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 26 }
+
+onvifCameraVideoAnalysis08 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 27 }
+
+onvifCameraVideoAnalysis09 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 28 }
+
+onvifCameraVideoAnalysis10 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 29 }
+
+onvifCameraVideoAnalysis11 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 30 }
+
+onvifCameraVideoAnalysis12 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 31 }
+
+onvifCameraVideoAnalysis13 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 32 }
+
+onvifCameraVideoAnalysis14 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 33 }
+
+onvifCameraVideoAnalysis15 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 34 }
+
+onvifCameraVideoAnalysis16 OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 35 }
+
+onvifCameraVideoSignalTooBlurry OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 36 }
+
+onvifCameraGlobalSceneChange OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifCameraEntry 37 }
+
+onvifEncoderInput OBJECT IDENTIFIER ::= { onvifEncoders 3 }
+
+onvifEncoderInputTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF OnvifEncoderInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifEncoderInput 1 }
+
+OnvifEncoderInputEntry ::= SEQUENCE
+{
+    onvifEncoderInputIndex Integer32,
+    onvifEncoderInputName DisplayString,
+    onvifEncoderInputNetworkAddress DisplayString,
+    onvifEncoderInputConnectionState Integer32,
+    onvifEncoderInputInputState Integer32
+}
+
+onvifEncoderInputEntry OBJECT-TYPE
+SYNTAX      OnvifEncoderInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { onvifEncoderInputIndex }
+::= { onvifEncoderInputTable 1 }
+
+onvifEncoderInputIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifEncoderInputEntry 1 }
+
+onvifEncoderInputName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifEncoderInputEntry 2 }
+
+onvifEncoderInputNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifEncoderInputEntry 3 }
+
+onvifEncoderInputConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifEncoderInputEntry 11 }
+
+onvifEncoderInputInputState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifEncoderInputEntry 10 }
+
+onvifEncoderRelay OBJECT IDENTIFIER ::= { onvifEncoders 4 }
+
+onvifEncoderRelayTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF OnvifEncoderRelayEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifEncoderRelay 1 }
+
+OnvifEncoderRelayEntry ::= SEQUENCE
+{
+    onvifEncoderRelayIndex Integer32,
+    onvifEncoderRelayName DisplayString,
+    onvifEncoderRelayNetworkAddress DisplayString,
+    onvifEncoderRelayConnectionState Integer32,
+    onvifEncoderRelayRelayState Integer32
+}
+
+onvifEncoderRelayEntry OBJECT-TYPE
+SYNTAX      OnvifEncoderRelayEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { onvifEncoderRelayIndex }
+::= { onvifEncoderRelayTable 1 }
+
+onvifEncoderRelayIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifEncoderRelayEntry 1 }
+
+onvifEncoderRelayName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifEncoderRelayEntry 2 }
+
+onvifEncoderRelayNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifEncoderRelayEntry 3 }
+
+onvifEncoderRelayConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifEncoderRelayEntry 11 }
+
+onvifEncoderRelayRelayState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { onvifEncoderRelayEntry 10 }
+
+rtspJpegDevices OBJECT IDENTIFIER ::= { eventTables 12 }
+
+rtspJpegCamera OBJECT IDENTIFIER ::= { rtspJpegDevices 2 }
+
+rtspJpegCameraTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF RtspJpegCameraEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { rtspJpegCamera 1 }
+
+RtspJpegCameraEntry ::= SEQUENCE
+{
+    rtspJpegCameraIndex Integer32,
+    rtspJpegCameraName DisplayString,
+    rtspJpegCameraNetworkAddress DisplayString,
+    rtspJpegCameraRecordingMode Integer32,
+    rtspJpegCameraStorageState Integer32,
+    rtspJpegCameraConnectionState Integer32
+}
+
+rtspJpegCameraEntry OBJECT-TYPE
+SYNTAX      RtspJpegCameraEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { rtspJpegCameraIndex }
+::= { rtspJpegCameraTable 1 }
+
+rtspJpegCameraIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { rtspJpegCameraEntry 1 }
+
+rtspJpegCameraName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { rtspJpegCameraEntry 2 }
+
+rtspJpegCameraNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { rtspJpegCameraEntry 3 }
+
+rtspJpegCameraRecordingMode OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { rtspJpegCameraEntry 10 }
+
+rtspJpegCameraStorageState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { rtspJpegCameraEntry 11 }
+
+rtspJpegCameraConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { rtspJpegCameraEntry 12 }
+
+intrusionPanelDevices OBJECT IDENTIFIER ::= { eventTables 13 }
+
+intrusionPanel OBJECT IDENTIFIER ::= { intrusionPanelDevices 1 }
+
+intrusionPanelTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF IntrusionPanelEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanel 1 }
+
+IntrusionPanelEntry ::= SEQUENCE
+{
+    intrusionPanelIndex Integer32,
+    intrusionPanelName DisplayString,
+    intrusionPanelNetworkAddress DisplayString,
+    intrusionPanelConnectionState Integer32
+}
+
+intrusionPanelEntry OBJECT-TYPE
+SYNTAX      IntrusionPanelEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { intrusionPanelIndex }
+::= { intrusionPanelTable 1 }
+
+intrusionPanelIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelEntry 1 }
+
+intrusionPanelName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelEntry 2 }
+
+intrusionPanelNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelEntry 3 }
+
+intrusionPanelConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelEntry 10 }
+
+intrusionPanelArea OBJECT IDENTIFIER ::= { intrusionPanelDevices 2 }
+
+intrusionPanelAreaTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF IntrusionPanelAreaEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelArea 1 }
+
+IntrusionPanelAreaEntry ::= SEQUENCE
+{
+    intrusionPanelAreaIndex Integer32,
+    intrusionPanelAreaName DisplayString,
+    intrusionPanelAreaAreaState Integer32
+}
+
+intrusionPanelAreaEntry OBJECT-TYPE
+SYNTAX      IntrusionPanelAreaEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { intrusionPanelAreaIndex }
+::= { intrusionPanelAreaTable 1 }
+
+intrusionPanelAreaIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelAreaEntry 1 }
+
+intrusionPanelAreaName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelAreaEntry 2 }
+
+intrusionPanelAreaAreaState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelAreaEntry 12 }
+
+intrusionPanelPoint OBJECT IDENTIFIER ::= { intrusionPanelDevices 3 }
+
+intrusionPanelPointTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF IntrusionPanelPointEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelPoint 1 }
+
+IntrusionPanelPointEntry ::= SEQUENCE
+{
+    intrusionPanelPointIndex Integer32,
+    intrusionPanelPointName DisplayString,
+    intrusionPanelPointAlarm Integer32,
+    intrusionPanelPointDoorLeftOpened Integer32,
+    intrusionPanelPointKeypadPanicAlarm Integer32,
+    intrusionPanelPointFireAlarm Integer32,
+    intrusionPanelPointFireSupervision Integer32,
+    intrusionPanelPointGasAlarm Integer32,
+    intrusionPanelPointMedicalAlarm Integer32
+}
+
+intrusionPanelPointEntry OBJECT-TYPE
+SYNTAX      IntrusionPanelPointEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { intrusionPanelPointIndex }
+::= { intrusionPanelPointTable 1 }
+
+intrusionPanelPointIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelPointEntry 1 }
+
+intrusionPanelPointName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelPointEntry 2 }
+
+intrusionPanelPointAlarm OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelPointEntry 12 }
+
+intrusionPanelPointDoorLeftOpened OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelPointEntry 13 }
+
+intrusionPanelPointKeypadPanicAlarm OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelPointEntry 14 }
+
+intrusionPanelPointFireAlarm OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelPointEntry 15 }
+
+intrusionPanelPointFireSupervision OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelPointEntry 16 }
+
+intrusionPanelPointGasAlarm OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelPointEntry 17 }
+
+intrusionPanelPointMedicalAlarm OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelPointEntry 18 }
+
+intrusionPanelRelay OBJECT IDENTIFIER ::= { intrusionPanelDevices 4 }
+
+intrusionPanelRelayTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF IntrusionPanelRelayEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelRelay 1 }
+
+IntrusionPanelRelayEntry ::= SEQUENCE
+{
+    intrusionPanelRelayIndex Integer32,
+    intrusionPanelRelayName DisplayString,
+    intrusionPanelRelayRelayState Integer32
+}
+
+intrusionPanelRelayEntry OBJECT-TYPE
+SYNTAX      IntrusionPanelRelayEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { intrusionPanelRelayIndex }
+::= { intrusionPanelRelayTable 1 }
+
+intrusionPanelRelayIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelRelayEntry 1 }
+
+intrusionPanelRelayName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelRelayEntry 2 }
+
+intrusionPanelRelayRelayState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelRelayEntry 10 }
+
+intrusionPanelDoor OBJECT IDENTIFIER ::= { intrusionPanelDevices 5 }
+
+intrusionPanelDoorTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF IntrusionPanelDoorEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelDoor 1 }
+
+IntrusionPanelDoorEntry ::= SEQUENCE
+{
+    intrusionPanelDoorIndex Integer32,
+    intrusionPanelDoorName DisplayString,
+    intrusionPanelDoorDoorState Integer32
+}
+
+intrusionPanelDoorEntry OBJECT-TYPE
+SYNTAX      IntrusionPanelDoorEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { intrusionPanelDoorIndex }
+::= { intrusionPanelDoorTable 1 }
+
+intrusionPanelDoorIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelDoorEntry 1 }
+
+intrusionPanelDoorName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelDoorEntry 2 }
+
+intrusionPanelDoorDoorState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { intrusionPanelDoorEntry 10 }
+
+accessControlSystems OBJECT IDENTIFIER ::= { eventTables 14 }
+
+accessControlSystem OBJECT IDENTIFIER ::= { accessControlSystems 1 }
+
+accessControlSystemTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF AccessControlSystemEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControlSystem 1 }
+
+AccessControlSystemEntry ::= SEQUENCE
+{
+    accessControlSystemIndex Integer32,
+    accessControlSystemName DisplayString,
+    accessControlSystemNetworkAddress DisplayString,
+    accessControlSystemConnectionState Integer32
+}
+
+accessControlSystemEntry OBJECT-TYPE
+SYNTAX      AccessControlSystemEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { accessControlSystemIndex }
+::= { accessControlSystemTable 1 }
+
+accessControlSystemIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControlSystemEntry 1 }
+
+accessControlSystemName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControlSystemEntry 2 }
+
+accessControlSystemNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControlSystemEntry 3 }
+
+accessControlSystemConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControlSystemEntry 10 }
+
+accessController OBJECT IDENTIFIER ::= { accessControlSystems 2 }
+
+accessControllerTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF AccessControllerEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessController 1 }
+
+AccessControllerEntry ::= SEQUENCE
+{
+    accessControllerIndex Integer32,
+    accessControllerName DisplayString,
+    accessControllerConnectionState Integer32
+}
+
+accessControllerEntry OBJECT-TYPE
+SYNTAX      AccessControllerEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { accessControllerIndex }
+::= { accessControllerTable 1 }
+
+accessControllerIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControllerEntry 1 }
+
+accessControllerName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControllerEntry 2 }
+
+accessControllerConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControllerEntry 10 }
+
+accessCredentialReader OBJECT IDENTIFIER ::= { accessControlSystems 3 }
+
+accessCredentialReaderTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF AccessCredentialReaderEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessCredentialReader 1 }
+
+AccessCredentialReaderEntry ::= SEQUENCE
+{
+    accessCredentialReaderIndex Integer32,
+    accessCredentialReaderName DisplayString,
+    accessCredentialReaderConnectionState Integer32
+}
+
+accessCredentialReaderEntry OBJECT-TYPE
+SYNTAX      AccessCredentialReaderEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { accessCredentialReaderIndex }
+::= { accessCredentialReaderTable 1 }
+
+accessCredentialReaderIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessCredentialReaderEntry 1 }
+
+accessCredentialReaderName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessCredentialReaderEntry 2 }
+
+accessCredentialReaderConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessCredentialReaderEntry 10 }
+
+accessDoor OBJECT IDENTIFIER ::= { accessControlSystems 4 }
+
+accessDoorTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF AccessDoorEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessDoor 1 }
+
+AccessDoorEntry ::= SEQUENCE
+{
+    accessDoorIndex Integer32,
+    accessDoorName DisplayString,
+    accessDoorConnectionState Integer32,
+    accessDoorDoorState Integer32,
+    accessDoorDoorContactState Integer32,
+    accessDoorDoorOperationMode Integer32
+}
+
+accessDoorEntry OBJECT-TYPE
+SYNTAX      AccessDoorEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { accessDoorIndex }
+::= { accessDoorTable 1 }
+
+accessDoorIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessDoorEntry 1 }
+
+accessDoorName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessDoorEntry 2 }
+
+accessDoorConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessDoorEntry 10 }
+
+accessDoorDoorState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessDoorEntry 13 }
+
+accessDoorDoorContactState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessDoorEntry 14 }
+
+accessDoorDoorOperationMode OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessDoorEntry 15 }
+
+accessControllerRelay OBJECT IDENTIFIER ::= { accessControlSystems 5 }
+
+accessControllerRelayTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF AccessControllerRelayEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControllerRelay 1 }
+
+AccessControllerRelayEntry ::= SEQUENCE
+{
+    accessControllerRelayIndex Integer32,
+    accessControllerRelayName DisplayString,
+    accessControllerRelayConnectionState Integer32,
+    accessControllerRelayRelayState Integer32
+}
+
+accessControllerRelayEntry OBJECT-TYPE
+SYNTAX      AccessControllerRelayEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { accessControllerRelayIndex }
+::= { accessControllerRelayTable 1 }
+
+accessControllerRelayIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControllerRelayEntry 1 }
+
+accessControllerRelayName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControllerRelayEntry 2 }
+
+accessControllerRelayConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControllerRelayEntry 10 }
+
+accessControllerRelayRelayState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControllerRelayEntry 15 }
+
+accessControllerInput OBJECT IDENTIFIER ::= { accessControlSystems 6 }
+
+accessControllerInputTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF AccessControllerInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControllerInput 1 }
+
+AccessControllerInputEntry ::= SEQUENCE
+{
+    accessControllerInputIndex Integer32,
+    accessControllerInputName DisplayString,
+    accessControllerInputConnectionState Integer32,
+    accessControllerInputInputState Integer32
+}
+
+accessControllerInputEntry OBJECT-TYPE
+SYNTAX      AccessControllerInputEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { accessControllerInputIndex }
+::= { accessControllerInputTable 1 }
+
+accessControllerInputIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControllerInputEntry 1 }
+
+accessControllerInputName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControllerInputEntry 2 }
+
+accessControllerInputConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControllerInputEntry 10 }
+
+accessControllerInputInputState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { accessControllerInputEntry 15 }
+
+videoAnalytics OBJECT IDENTIFIER ::= { eventTables 15 }
+
+personIdentificationDevice OBJECT IDENTIFIER ::= { videoAnalytics 1 }
+
+personIdentificationDeviceTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF PersonIdentificationDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { personIdentificationDevice 1 }
+
+PersonIdentificationDeviceEntry ::= SEQUENCE
+{
+    personIdentificationDeviceIndex Integer32,
+    personIdentificationDeviceName DisplayString,
+    personIdentificationDeviceNetworkAddress DisplayString,
+    personIdentificationDeviceConnectionState Integer32,
+    personIdentificationDeviceOperationState Integer32
+}
+
+personIdentificationDeviceEntry OBJECT-TYPE
+SYNTAX      PersonIdentificationDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { personIdentificationDeviceIndex }
+::= { personIdentificationDeviceTable 1 }
+
+personIdentificationDeviceIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { personIdentificationDeviceEntry 1 }
+
+personIdentificationDeviceName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { personIdentificationDeviceEntry 2 }
+
+personIdentificationDeviceNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { personIdentificationDeviceEntry 3 }
+
+personIdentificationDeviceConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { personIdentificationDeviceEntry 10 }
+
+personIdentificationDeviceOperationState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { personIdentificationDeviceEntry 11 }
+
+camera OBJECT IDENTIFIER ::= { videoAnalytics 2 }
+
+cameraTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF CameraEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { camera 1 }
+
+CameraEntry ::= SEQUENCE
+{
+    cameraIndex Integer32,
+    cameraName DisplayString,
+    cameraOperationState Integer32
+}
+
+cameraEntry OBJECT-TYPE
+SYNTAX      CameraEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { cameraIndex }
+::= { cameraTable 1 }
+
+cameraIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 1 }
+
+cameraName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 2 }
+
+cameraOperationState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { cameraEntry 11 }
+
+videoAnalytics OBJECT IDENTIFIER ::= { eventTables 16 }
+
+lprDevice OBJECT IDENTIFIER ::= { videoAnalytics 1 }
+
+lprDeviceTable OBJECT-TYPE
+SYNTAX      SEQUENCE OF LprDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { lprDevice 1 }
+
+LprDeviceEntry ::= SEQUENCE
+{
+    lprDeviceIndex Integer32,
+    lprDeviceName DisplayString,
+    lprDeviceNetworkAddress DisplayString,
+    lprDeviceConnectionState Integer32
+}
+
+lprDeviceEntry OBJECT-TYPE
+SYNTAX      LprDeviceEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+INDEX       { lprDeviceIndex }
+::= { lprDeviceTable 1 }
+
+lprDeviceIndex OBJECT-TYPE
+SYNTAX      Integer32 (1..2147483647)
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { lprDeviceEntry 1 }
+
+lprDeviceName OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { lprDeviceEntry 2 }
+
+lprDeviceNetworkAddress OBJECT-TYPE
+SYNTAX      DisplayString
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { lprDeviceEntry 3 }
+
+lprDeviceConnectionState OBJECT-TYPE
+SYNTAX      Integer32
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION "See documentation of BVMS"
+::= { lprDeviceEntry 10 }
+
+
+
+brsDibosInputDataInputRaised NOTIFICATION-TYPE
+OBJECTS { brsDibosInputIndex, brsDibosInputName, brsDibosInputNetworkAddress }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 1 }
+
+brsDibosInputInputStateChanged NOTIFICATION-TYPE
+OBJECTS { brsDibosInputIndex, brsDibosInputName, brsDibosInputNetworkAddress, brsDibosInputInputState }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 2 }
+
+brsDibosRelayRelayStateChanged NOTIFICATION-TYPE
+OBJECTS { brsDibosRelayIndex, brsDibosRelayName, brsDibosRelayNetworkAddress, brsDibosRelayRelayState }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 3 }
+
+brsDibosServerServerResetRaised NOTIFICATION-TYPE
+OBJECTS { brsDibosServerIndex, brsDibosServerName, brsDibosServerNetworkAddress }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 4 }
+
+brsDibosServerDiskFailedRaised NOTIFICATION-TYPE
+OBJECTS { brsDibosServerIndex, brsDibosServerName, brsDibosServerNetworkAddress }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 5 }
+
+brsDibosServerConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { brsDibosServerIndex, brsDibosServerName, brsDibosServerNetworkAddress, brsDibosServerConnectionState }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 6 }
+
+brsDibosVideoCameraReferenceImageCheckChanged NOTIFICATION-TYPE
+OBJECTS { brsDibosVideoCameraIndex, brsDibosVideoCameraName, brsDibosVideoCameraNetworkAddress, brsDibosVideoCameraReferenceImageCheck }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 7 }
+
+brsDibosVideoCameraMotionDetectionChanged NOTIFICATION-TYPE
+OBJECTS { brsDibosVideoCameraIndex, brsDibosVideoCameraName, brsDibosVideoCameraNetworkAddress, brsDibosVideoCameraMotionDetection }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 8 }
+
+brsDibosVideoCameraRecordingModeChanged NOTIFICATION-TYPE
+OBJECTS { brsDibosVideoCameraIndex, brsDibosVideoCameraName, brsDibosVideoCameraNetworkAddress, brsDibosVideoCameraRecordingMode }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 9 }
+
+brsDibosVideoCameraVideoLossChanged NOTIFICATION-TYPE
+OBJECTS { brsDibosVideoCameraIndex, brsDibosVideoCameraName, brsDibosVideoCameraNetworkAddress, brsDibosVideoCameraVideoLoss }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 10 }
+
+brsDibosVideoCameraVideoSignalTooBrightChanged NOTIFICATION-TYPE
+OBJECTS { brsDibosVideoCameraIndex, brsDibosVideoCameraName, brsDibosVideoCameraNetworkAddress, brsDibosVideoCameraVideoSignalTooBright }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 11 }
+
+brsDibosVideoCameraVideoSignalTooDarkChanged NOTIFICATION-TYPE
+OBJECTS { brsDibosVideoCameraIndex, brsDibosVideoCameraName, brsDibosVideoCameraNetworkAddress, brsDibosVideoCameraVideoSignalTooDark }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 12 }
+
+brsDibosVideoCameraVideoSignalTooNoisyChanged NOTIFICATION-TYPE
+OBJECTS { brsDibosVideoCameraIndex, brsDibosVideoCameraName, brsDibosVideoCameraNetworkAddress, brsDibosVideoCameraVideoSignalTooNoisy }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 13 }
+
+brsDibosVideoCameraVisibilityChanged NOTIFICATION-TYPE
+OBJECTS { brsDibosVideoCameraIndex, brsDibosVideoCameraName, brsDibosVideoCameraNetworkAddress, brsDibosVideoCameraVisibility }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 206 }
+
+dvrInputDataInputRaised NOTIFICATION-TYPE
+OBJECTS { dvrInputIndex, dvrInputName, dvrInputNetworkAddress }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 14 }
+
+dvrInputInputStateChanged NOTIFICATION-TYPE
+OBJECTS { dvrInputIndex, dvrInputName, dvrInputNetworkAddress, dvrInputInputState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 15 }
+
+dvrRelayRelayStateChanged NOTIFICATION-TYPE
+OBJECTS { dvrRelayIndex, dvrRelayName, dvrRelayNetworkAddress, dvrRelayRelayState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 16 }
+
+dvrServerConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { dvrServerIndex, dvrServerName, dvrServerNetworkAddress, dvrServerConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 17 }
+
+dvrServerDiskFailedChanged NOTIFICATION-TYPE
+OBJECTS { dvrServerIndex, dvrServerName, dvrServerNetworkAddress, dvrServerDiskFailed }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 18 }
+
+dvrServerDiskFullChanged NOTIFICATION-TYPE
+OBJECTS { dvrServerIndex, dvrServerName, dvrServerNetworkAddress, dvrServerDiskFull }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 19 }
+
+dvrServerFanFailedChanged NOTIFICATION-TYPE
+OBJECTS { dvrServerIndex, dvrServerName, dvrServerNetworkAddress, dvrServerFanFailed }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 20 }
+
+dvrServerTemperatureAboveLimitChanged NOTIFICATION-TYPE
+OBJECTS { dvrServerIndex, dvrServerName, dvrServerNetworkAddress, dvrServerTemperatureAboveLimit }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 21 }
+
+dvrServerSystemAlarmChanged NOTIFICATION-TYPE
+OBJECTS { dvrServerIndex, dvrServerName, dvrServerNetworkAddress, dvrServerSystemAlarm }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 22 }
+
+dvrServerSoftwareIncompatibilityChanged NOTIFICATION-TYPE
+OBJECTS { dvrServerIndex, dvrServerName, dvrServerNetworkAddress, dvrServerSoftwareIncompatibility }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 23 }
+
+dvrVideoCameraMotionDetectionChanged NOTIFICATION-TYPE
+OBJECTS { dvrVideoCameraIndex, dvrVideoCameraName, dvrVideoCameraNetworkAddress, dvrVideoCameraMotionDetection }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 24 }
+
+dvrVideoCameraVideoLossChanged NOTIFICATION-TYPE
+OBJECTS { dvrVideoCameraIndex, dvrVideoCameraName, dvrVideoCameraNetworkAddress, dvrVideoCameraVideoLoss }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 25 }
+
+dvrVideoCameraVisibilityChanged NOTIFICATION-TYPE
+OBJECTS { dvrVideoCameraIndex, dvrVideoCameraName, dvrVideoCameraNetworkAddress, dvrVideoCameraVisibility }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 207 }
+
+nvrServerBackupStartedRaised NOTIFICATION-TYPE
+OBJECTS { nvrServerIndex, nvrServerName, nvrServerNetworkAddress }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 26 }
+
+nvrServerBackupFinishedRaised NOTIFICATION-TYPE
+OBJECTS { nvrServerIndex, nvrServerName, nvrServerNetworkAddress }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 27 }
+
+nvrServerBackupFailedRaised NOTIFICATION-TYPE
+OBJECTS { nvrServerIndex, nvrServerName, nvrServerNetworkAddress }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 28 }
+
+nvrServerFailedToObtainCameraRaised NOTIFICATION-TYPE
+OBJECTS { nvrServerIndex, nvrServerName, nvrServerNetworkAddress }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 29 }
+
+nvrServerSevereDatabaseErrorRaised NOTIFICATION-TYPE
+OBJECTS { nvrServerIndex, nvrServerName, nvrServerNetworkAddress }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 30 }
+
+nvrServerDiskFailedRaised NOTIFICATION-TYPE
+OBJECTS { nvrServerIndex, nvrServerName, nvrServerNetworkAddress }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 31 }
+
+nvrServerDiskFullRaised NOTIFICATION-TYPE
+OBJECTS { nvrServerIndex, nvrServerName, nvrServerNetworkAddress }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 32 }
+
+nvrServerDiskNotFullRaised NOTIFICATION-TYPE
+OBJECTS { nvrServerIndex, nvrServerName, nvrServerNetworkAddress }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 33 }
+
+nvrServerDiskSpaceCriticalRaised NOTIFICATION-TYPE
+OBJECTS { nvrServerIndex, nvrServerName, nvrServerNetworkAddress }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 34 }
+
+nvrServerDiskSpaceOkayRaised NOTIFICATION-TYPE
+OBJECTS { nvrServerIndex, nvrServerName, nvrServerNetworkAddress }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 35 }
+
+nvrServerRecordingDeactivatedRaised NOTIFICATION-TYPE
+OBJECTS { nvrServerIndex, nvrServerName, nvrServerNetworkAddress }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 36 }
+
+nvrServerServerResetRaised NOTIFICATION-TYPE
+OBJECTS { nvrServerIndex, nvrServerName, nvrServerNetworkAddress }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 37 }
+
+nvrServerConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { nvrServerIndex, nvrServerName, nvrServerNetworkAddress, nvrServerConnectionState }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 38 }
+
+nvrServerFailoverNvrStateChanged NOTIFICATION-TYPE
+OBJECTS { nvrServerIndex, nvrServerName, nvrServerNetworkAddress, nvrServerFailoverNvrState }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 39 }
+
+vidosNvrDeviceConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { vidosNvrDeviceIndex, vidosNvrDeviceName, vidosNvrDeviceNetworkAddress, vidosNvrDeviceConnectionState }
+STATUS obsolete
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 40 }
+
+decoderConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { decoderIndex, decoderName, decoderNetworkAddress, decoderConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 41 }
+
+decoderInputConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { decoderInputIndex, decoderInputName, decoderInputNetworkAddress, decoderInputConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 42 }
+
+decoderInputInputStateChanged NOTIFICATION-TYPE
+OBJECTS { decoderInputIndex, decoderInputName, decoderInputNetworkAddress, decoderInputInputState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 43 }
+
+decoderRelayConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { decoderRelayIndex, decoderRelayName, decoderRelayNetworkAddress, decoderRelayConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 44 }
+
+decoderRelayRelayStateChanged NOTIFICATION-TYPE
+OBJECTS { decoderRelayIndex, decoderRelayName, decoderRelayNetworkAddress, decoderRelayRelayState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 45 }
+
+encoderConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { encoderIndex, encoderName, encoderNetworkAddress, encoderConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 46 }
+
+encoderSdCardLifeSpanStatusRaised NOTIFICATION-TYPE
+OBJECTS { encoderIndex, encoderName, encoderNetworkAddress }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 269 }
+
+encoderTimeSynchronizationFailedRaised NOTIFICATION-TYPE
+OBJECTS { encoderIndex, encoderName, encoderNetworkAddress }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 270 }
+
+encoderInputConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { encoderInputIndex, encoderInputName, encoderInputNetworkAddress, encoderInputConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 47 }
+
+encoderInputInputStateChanged NOTIFICATION-TYPE
+OBJECTS { encoderInputIndex, encoderInputName, encoderInputNetworkAddress, encoderInputInputState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 48 }
+
+encoderRelayConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { encoderRelayIndex, encoderRelayName, encoderRelayNetworkAddress, encoderRelayConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 49 }
+
+encoderRelayRelayStateChanged NOTIFICATION-TYPE
+OBJECTS { encoderRelayIndex, encoderRelayName, encoderRelayNetworkAddress, encoderRelayRelayState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 50 }
+
+cameraBufferStorageOverflowRaised NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 51 }
+
+cameraReferenceImageCheckChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraReferenceImageCheck }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 52 }
+
+cameraConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 53 }
+
+cameraMotionDetectionChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraMotionDetection }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 54 }
+
+cameraRecordingModeChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraRecordingMode }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 55 }
+
+cameraVideoLossChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoLoss }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 56 }
+
+cameraVideoSignalTooBrightChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoSignalTooBright }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 57 }
+
+cameraVideoSignalTooDarkChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoSignalTooDark }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 58 }
+
+cameraVideoSignalTooNoisyChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoSignalTooNoisy }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 59 }
+
+cameraVideoAnalysis01Changed NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoAnalysis01 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 60 }
+
+cameraVideoAnalysis02Changed NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoAnalysis02 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 61 }
+
+cameraVideoAnalysis03Changed NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoAnalysis03 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 62 }
+
+cameraVideoAnalysis04Changed NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoAnalysis04 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 63 }
+
+cameraVideoAnalysis05Changed NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoAnalysis05 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 64 }
+
+cameraVideoAnalysis06Changed NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoAnalysis06 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 65 }
+
+cameraVideoAnalysis07Changed NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoAnalysis07 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 66 }
+
+cameraVideoAnalysis08Changed NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoAnalysis08 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 67 }
+
+cameraVideoAnalysis09Changed NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoAnalysis09 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 68 }
+
+cameraVideoAnalysis10Changed NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoAnalysis10 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 69 }
+
+cameraVideoAnalysis11Changed NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoAnalysis11 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 70 }
+
+cameraVideoAnalysis12Changed NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoAnalysis12 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 71 }
+
+cameraVideoAnalysis13Changed NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoAnalysis13 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 72 }
+
+cameraVideoAnalysis14Changed NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoAnalysis14 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 73 }
+
+cameraVideoAnalysis15Changed NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoAnalysis15 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 74 }
+
+cameraVideoAnalysis16Changed NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoAnalysis16 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 75 }
+
+cameraStorageStateChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraStorageState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 76 }
+
+cameraBufferStorageStateChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraBufferStorageState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 77 }
+
+cameraSecondaryRecordingModeChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraSecondaryRecordingMode }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 144 }
+
+cameraSecondaryStorageStateChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraSecondaryStorageState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 145 }
+
+cameraExternalDataRaised NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 199 }
+
+cameraFireOrSmokeStateChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraFireOrSmokeState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 200 }
+
+cameraVisibilityChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVisibility }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 204 }
+
+cameraVideoSignalTooBlurryChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraVideoSignalTooBlurry }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 244 }
+
+cameraGlobalSceneChangeChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraGlobalSceneChange }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 245 }
+
+cameraAudioAlarmRaised NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 266 }
+
+cameraRecordingMonitorStateChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraRecordingMonitorState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 271 }
+
+cameraSecondaryRecordingMonitorStateChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraNetworkAddress, cameraSecondaryRecordingMonitorState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 272 }
+
+vrmServerConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { vrmServerIndex, vrmServerName, vrmServerNetworkAddress, vrmServerConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 80 }
+
+vrmServerFailoverStateChanged NOTIFICATION-TYPE
+OBJECTS { vrmServerIndex, vrmServerName, vrmServerNetworkAddress, vrmServerFailoverState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 142 }
+
+vrmServerLicenseStateChanged NOTIFICATION-TYPE
+OBJECTS { vrmServerIndex, vrmServerName, vrmServerNetworkAddress, vrmServerLicenseState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 143 }
+
+vrmServerVrmTypeChanged NOTIFICATION-TYPE
+OBJECTS { vrmServerIndex, vrmServerName, vrmServerNetworkAddress, vrmServerVrmType }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 148 }
+
+lunFormattingStateChanged NOTIFICATION-TYPE
+OBJECTS { lunIndex, lunName, lunFormattingState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 149 }
+
+iscsiDeviceConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { iscsiDeviceIndex, iscsiDeviceName, iscsiDeviceNetworkAddress, iscsiDeviceConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 82 }
+
+streamingGatewayDeviceConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { streamingGatewayDeviceIndex, streamingGatewayDeviceName, streamingGatewayDeviceNetworkAddress, streamingGatewayDeviceConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 83 }
+
+allegiantInputInputStateChanged NOTIFICATION-TYPE
+OBJECTS { allegiantInputIndex, allegiantInputName, allegiantInputInputState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 84 }
+
+allegiantCameraVideoLossChanged NOTIFICATION-TYPE
+OBJECTS { allegiantCameraIndex, allegiantCameraName, allegiantCameraNetworkAddress, allegiantCameraVideoLoss }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 85 }
+
+allegiantCameraVisibilityChanged NOTIFICATION-TYPE
+OBJECTS { allegiantCameraIndex, allegiantCameraName, allegiantCameraNetworkAddress, allegiantCameraVisibility }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 205 }
+
+allegiantDeviceConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { allegiantDeviceIndex, allegiantDeviceName, allegiantDeviceConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 86 }
+
+compoundEventsCompoundEventStateChanged NOTIFICATION-TYPE
+OBJECTS { compoundEventsIndex, compoundEventsName, compoundEventsCompoundEventState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 87 }
+
+schedulesActivationChanged NOTIFICATION-TYPE
+OBJECTS { schedulesIndex, schedulesName, schedulesActivation }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 88 }
+
+virtualInputsVirtualInputDataRaised NOTIFICATION-TYPE
+OBJECTS { virtualInputsIndex, virtualInputsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 89 }
+
+virtualInputsInputStateChanged NOTIFICATION-TYPE
+OBJECTS { virtualInputsIndex, virtualInputsName, virtualInputsInputState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 90 }
+
+backupVideoDataBackupStartedRaised NOTIFICATION-TYPE
+OBJECTS { backupVideoDataIndex, backupVideoDataName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 91 }
+
+backupVideoDataBackupFinishedRaised NOTIFICATION-TYPE
+OBJECTS { backupVideoDataIndex, backupVideoDataName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 92 }
+
+backupVideoDataBackupFailedRaised NOTIFICATION-TYPE
+OBJECTS { backupVideoDataIndex, backupVideoDataName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 93 }
+
+backupVideoDataFailedToObtainCameraRaised NOTIFICATION-TYPE
+OBJECTS { backupVideoDataIndex, backupVideoDataName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 94 }
+
+alarmStateAlarmAcceptedRaised NOTIFICATION-TYPE
+OBJECTS { alarmStateIndex, alarmStateName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 95 }
+
+alarmStateAlarmActivatedRaised NOTIFICATION-TYPE
+OBJECTS { alarmStateIndex, alarmStateName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 96 }
+
+alarmStateAlarmClearedRaised NOTIFICATION-TYPE
+OBJECTS { alarmStateIndex, alarmStateName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 97 }
+
+alarmStateAlarmUnacceptedRaised NOTIFICATION-TYPE
+OBJECTS { alarmStateIndex, alarmStateName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 98 }
+
+alarmStateAlarmWorkflowInitiatedRaised NOTIFICATION-TYPE
+OBJECTS { alarmStateIndex, alarmStateName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 99 }
+
+authenticationOperatorAuthenticationRejectedRaised NOTIFICATION-TYPE
+OBJECTS { authenticationIndex, authenticationName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 100 }
+
+authenticationUserAccountDisabledRaised NOTIFICATION-TYPE
+OBJECTS { authenticationIndex, authenticationName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 265 }
+
+operatorClientEventButtonsEventButtonPressedRaised NOTIFICATION-TYPE
+OBJECTS { operatorClientEventButtonsIndex, operatorClientEventButtonsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 101 }
+
+userActionsVideoDataExportedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 102 }
+
+userActionsCameraCalledUpRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 103 }
+
+userActionsCameraClosedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 104 }
+
+userActionsSetReferenceImageRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 105 }
+
+userActionsPtzActionRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 106 }
+
+userActionsSavePredefinedPositionRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 107 }
+
+userActionsRecordingDeletedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 108 }
+
+userActionsRecordingProtectedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 109 }
+
+userActionsRecordingUnprotectedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 110 }
+
+userActionsManualRecordingStartedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 111 }
+
+userActionsManualRecordingStoppedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 112 }
+
+userActionsCommandScriptStartedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 113 }
+
+userActionsImagePrintedSavedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 114 }
+
+userActionsOperatorLogoffRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 115 }
+
+userActionsOperatorLogonRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 116 }
+
+userActionsEnterpriseAccountLogonRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 117 }
+
+userActionsEnterpriseAccountLogoffRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 118 }
+
+userActionsRelayOpenedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 146 }
+
+userActionsRelayClosedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 147 }
+
+userActionsOperatorClientLogoffRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 157 }
+
+userActionsOperatorClientLogonRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 158 }
+
+userActionsAreaArmedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 178 }
+
+userActionsAreaDisarmedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 179 }
+
+userActionsAreaForceArmedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 180 }
+
+userActionsAreaBellsSilencedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 181 }
+
+userActionsDoorLockedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 184 }
+
+userActionsDoorUnlockedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 185 }
+
+userActionsDoorSecuredRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 186 }
+
+userActionsDoorUnsecuredRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 187 }
+
+userActionsDoorCycledRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 188 }
+
+userActionsPointBypassedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 194 }
+
+userActionsPointUnbypassedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 195 }
+
+userActionsVideoAuthenticityCheckedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 201 }
+
+userActionsRecordingRestrictedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 202 }
+
+userActionsRecordingUnrestrictedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 203 }
+
+userActionsAccessRequestGrantedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 216 }
+
+userActionsAccessRequestDeniedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 217 }
+
+userActionsAccessGrantedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 264 }
+
+userActionsPersonAddedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 220 }
+
+userActionsPersonUpdatedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 221 }
+
+userActionsPersonRemovedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 222 }
+
+userActionsPersonRenamedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 223 }
+
+userActionsLogbookDataErasedRaised NOTIFICATION-TYPE
+OBJECTS { userActionsIndex, userActionsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 224 }
+
+scriptMessagesLogbookMessageFromScriptRaised NOTIFICATION-TYPE
+OBJECTS { scriptMessagesIndex, scriptMessagesName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 119 }
+
+systemEventsConfigurationActivatedRaised NOTIFICATION-TYPE
+OBJECTS { systemEventsIndex, systemEventsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 120 }
+
+systemEventsSystemErrorRaised NOTIFICATION-TYPE
+OBJECTS { systemEventsIndex, systemEventsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 121 }
+
+systemEventsSystemInfoRaised NOTIFICATION-TYPE
+OBJECTS { systemEventsIndex, systemEventsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 122 }
+
+systemEventsSystemWarningRaised NOTIFICATION-TYPE
+OBJECTS { systemEventsIndex, systemEventsName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 123 }
+
+bvmsTasksStateOfTheSystemTaskChanged NOTIFICATION-TYPE
+OBJECTS { bvmsTasksIndex, bvmsTasksName, bvmsTasksStateOfTheSystemTask }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 209 }
+
+threatLevelsThreatLevelStateChanged NOTIFICATION-TYPE
+OBJECTS { threatLevelsIndex, threatLevelsName, threatLevelsThreatLevelState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 275 }
+
+posBridgeConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { posBridgeIndex, posBridgeName, posBridgeNetworkAddress, posBridgeConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 124 }
+
+posBridgeInputDataInputRaised NOTIFICATION-TYPE
+OBJECTS { posBridgeInputIndex, posBridgeInputName, posBridgeInputNetworkAddress }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 125 }
+
+dtpDeviceConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { dtpDeviceIndex, dtpDeviceName, dtpDeviceConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 126 }
+
+atmDeviceConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { atmDeviceIndex, atmDeviceName, atmDeviceConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 127 }
+
+atmInputDataInputRaised NOTIFICATION-TYPE
+OBJECTS { atmInputIndex, atmInputName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 128 }
+
+snmpReceiverSnmpTrapReceivedRaised NOTIFICATION-TYPE
+OBJECTS { snmpReceiverIndex, snmpReceiverName, snmpReceiverNetworkAddress }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 129 }
+
+adamDeviceConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { adamDeviceIndex, adamDeviceName, adamDeviceNetworkAddress, adamDeviceConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 130 }
+
+adamInputInputStateChanged NOTIFICATION-TYPE
+OBJECTS { adamInputIndex, adamInputName, adamInputNetworkAddress, adamInputInputState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 131 }
+
+adamInputConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { adamInputIndex, adamInputName, adamInputNetworkAddress, adamInputConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 132 }
+
+adamRelayRelayStateChanged NOTIFICATION-TYPE
+OBJECTS { adamRelayIndex, adamRelayName, adamRelayNetworkAddress, adamRelayRelayState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 133 }
+
+adamRelayConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { adamRelayIndex, adamRelayName, adamRelayNetworkAddress, adamRelayConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 134 }
+
+foyerCardReaderCardAcceptedRaised NOTIFICATION-TYPE
+OBJECTS { foyerCardReaderIndex, foyerCardReaderName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 135 }
+
+foyerCardReaderCardRejectedRaised NOTIFICATION-TYPE
+OBJECTS { foyerCardReaderIndex, foyerCardReaderName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 136 }
+
+foyerCardReaderConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { foyerCardReaderIndex, foyerCardReaderName, foyerCardReaderConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 137 }
+
+foyerCardReaderFaultIndicationChanged NOTIFICATION-TYPE
+OBJECTS { foyerCardReaderIndex, foyerCardReaderName, foyerCardReaderFaultIndication }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 139 }
+
+foyerCardReaderSkimmingDetectionChanged NOTIFICATION-TYPE
+OBJECTS { foyerCardReaderIndex, foyerCardReaderName, foyerCardReaderSkimmingDetection }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 140 }
+
+foyerCardReaderAntiSkimmingSabotageChanged NOTIFICATION-TYPE
+OBJECTS { foyerCardReaderIndex, foyerCardReaderName, foyerCardReaderAntiSkimmingSabotage }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 141 }
+
+onvifEncoderConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { onvifEncoderIndex, onvifEncoderName, onvifEncoderNetworkAddress, onvifEncoderConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 150 }
+
+onvifCameraConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 151 }
+
+onvifCameraRecordingModeChanged NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraRecordingMode }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 154 }
+
+onvifCameraStorageStateChanged NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraStorageState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 155 }
+
+onvifCameraMotionDetectionChanged NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraMotionDetection }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 159 }
+
+onvifCameraVideoLossChanged NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoLoss }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 189 }
+
+onvifCameraVideoSignalTooBrightChanged NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoSignalTooBright }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 190 }
+
+onvifCameraVideoSignalTooDarkChanged NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoSignalTooDark }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 191 }
+
+onvifCameraVideoSignalTooNoisyChanged NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoSignalTooNoisy }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 192 }
+
+onvifCameraReferenceImageCheckChanged NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraReferenceImageCheck }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 193 }
+
+onvifCameraOnvifGenericData01Raised NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 196 }
+
+onvifCameraOnvifGenericData02Raised NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 197 }
+
+onvifCameraOnvifGenericData03Raised NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 198 }
+
+onvifCameraVisibilityChanged NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVisibility }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 208 }
+
+onvifCameraVideoAnalysis01Changed NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoAnalysis01 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 226 }
+
+onvifCameraVideoAnalysis02Changed NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoAnalysis02 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 227 }
+
+onvifCameraVideoAnalysis03Changed NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoAnalysis03 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 228 }
+
+onvifCameraVideoAnalysis04Changed NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoAnalysis04 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 229 }
+
+onvifCameraVideoAnalysis05Changed NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoAnalysis05 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 230 }
+
+onvifCameraVideoAnalysis06Changed NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoAnalysis06 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 231 }
+
+onvifCameraVideoAnalysis07Changed NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoAnalysis07 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 232 }
+
+onvifCameraVideoAnalysis08Changed NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoAnalysis08 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 233 }
+
+onvifCameraVideoAnalysis09Changed NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoAnalysis09 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 234 }
+
+onvifCameraVideoAnalysis10Changed NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoAnalysis10 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 235 }
+
+onvifCameraVideoAnalysis11Changed NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoAnalysis11 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 236 }
+
+onvifCameraVideoAnalysis12Changed NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoAnalysis12 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 237 }
+
+onvifCameraVideoAnalysis13Changed NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoAnalysis13 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 238 }
+
+onvifCameraVideoAnalysis14Changed NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoAnalysis14 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 239 }
+
+onvifCameraVideoAnalysis15Changed NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoAnalysis15 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 240 }
+
+onvifCameraVideoAnalysis16Changed NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoAnalysis16 }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 241 }
+
+onvifCameraVideoSignalTooBlurryChanged NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraVideoSignalTooBlurry }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 242 }
+
+onvifCameraGlobalSceneChangeChanged NOTIFICATION-TYPE
+OBJECTS { onvifCameraIndex, onvifCameraName, onvifCameraNetworkAddress, onvifCameraGlobalSceneChange }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 243 }
+
+onvifEncoderInputConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { onvifEncoderInputIndex, onvifEncoderInputName, onvifEncoderInputNetworkAddress, onvifEncoderInputConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 160 }
+
+onvifEncoderInputInputStateChanged NOTIFICATION-TYPE
+OBJECTS { onvifEncoderInputIndex, onvifEncoderInputName, onvifEncoderInputNetworkAddress, onvifEncoderInputInputState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 161 }
+
+onvifEncoderRelayConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { onvifEncoderRelayIndex, onvifEncoderRelayName, onvifEncoderRelayNetworkAddress, onvifEncoderRelayConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 162 }
+
+onvifEncoderRelayRelayStateChanged NOTIFICATION-TYPE
+OBJECTS { onvifEncoderRelayIndex, onvifEncoderRelayName, onvifEncoderRelayNetworkAddress, onvifEncoderRelayRelayState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 163 }
+
+rtspJpegCameraRecordingModeChanged NOTIFICATION-TYPE
+OBJECTS { rtspJpegCameraIndex, rtspJpegCameraName, rtspJpegCameraNetworkAddress, rtspJpegCameraRecordingMode }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 152 }
+
+rtspJpegCameraStorageStateChanged NOTIFICATION-TYPE
+OBJECTS { rtspJpegCameraIndex, rtspJpegCameraName, rtspJpegCameraNetworkAddress, rtspJpegCameraStorageState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 153 }
+
+rtspJpegCameraConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { rtspJpegCameraIndex, rtspJpegCameraName, rtspJpegCameraNetworkAddress, rtspJpegCameraConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 156 }
+
+intrusionPanelConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { intrusionPanelIndex, intrusionPanelName, intrusionPanelNetworkAddress, intrusionPanelConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 164 }
+
+intrusionPanelKeyfobAlarmRaised NOTIFICATION-TYPE
+OBJECTS { intrusionPanelIndex, intrusionPanelName, intrusionPanelNetworkAddress }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 165 }
+
+intrusionPanelAreaDuressRaised NOTIFICATION-TYPE
+OBJECTS { intrusionPanelAreaIndex, intrusionPanelAreaName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 167 }
+
+intrusionPanelAreaUserPasscodeTamperRaised NOTIFICATION-TYPE
+OBJECTS { intrusionPanelAreaIndex, intrusionPanelAreaName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 166 }
+
+intrusionPanelAreaAreaStateChanged NOTIFICATION-TYPE
+OBJECTS { intrusionPanelAreaIndex, intrusionPanelAreaName, intrusionPanelAreaAreaState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 168 }
+
+intrusionPanelPointAccessDeniedRaised NOTIFICATION-TYPE
+OBJECTS { intrusionPanelPointIndex, intrusionPanelPointName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 169 }
+
+intrusionPanelPointAccessGrantedRaised NOTIFICATION-TYPE
+OBJECTS { intrusionPanelPointIndex, intrusionPanelPointName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 170 }
+
+intrusionPanelPointAlarmChanged NOTIFICATION-TYPE
+OBJECTS { intrusionPanelPointIndex, intrusionPanelPointName, intrusionPanelPointAlarm }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 171 }
+
+intrusionPanelPointDoorLeftOpenedChanged NOTIFICATION-TYPE
+OBJECTS { intrusionPanelPointIndex, intrusionPanelPointName, intrusionPanelPointDoorLeftOpened }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 172 }
+
+intrusionPanelPointKeypadPanicAlarmChanged NOTIFICATION-TYPE
+OBJECTS { intrusionPanelPointIndex, intrusionPanelPointName, intrusionPanelPointKeypadPanicAlarm }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 173 }
+
+intrusionPanelPointFireAlarmChanged NOTIFICATION-TYPE
+OBJECTS { intrusionPanelPointIndex, intrusionPanelPointName, intrusionPanelPointFireAlarm }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 174 }
+
+intrusionPanelPointFireSupervisionChanged NOTIFICATION-TYPE
+OBJECTS { intrusionPanelPointIndex, intrusionPanelPointName, intrusionPanelPointFireSupervision }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 175 }
+
+intrusionPanelPointGasAlarmChanged NOTIFICATION-TYPE
+OBJECTS { intrusionPanelPointIndex, intrusionPanelPointName, intrusionPanelPointGasAlarm }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 176 }
+
+intrusionPanelPointMedicalAlarmChanged NOTIFICATION-TYPE
+OBJECTS { intrusionPanelPointIndex, intrusionPanelPointName, intrusionPanelPointMedicalAlarm }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 177 }
+
+intrusionPanelRelayRelayStateChanged NOTIFICATION-TYPE
+OBJECTS { intrusionPanelRelayIndex, intrusionPanelRelayName, intrusionPanelRelayRelayState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 182 }
+
+intrusionPanelDoorDoorStateChanged NOTIFICATION-TYPE
+OBJECTS { intrusionPanelDoorIndex, intrusionPanelDoorName, intrusionPanelDoorDoorState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 183 }
+
+accessControlSystemConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { accessControlSystemIndex, accessControlSystemName, accessControlSystemNetworkAddress, accessControlSystemConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 210 }
+
+accessControllerConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { accessControllerIndex, accessControllerName, accessControllerConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 211 }
+
+accessCredentialReaderConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { accessCredentialReaderIndex, accessCredentialReaderName, accessCredentialReaderConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 212 }
+
+accessCredentialReaderAccessRequestedRaised NOTIFICATION-TYPE
+OBJECTS { accessCredentialReaderIndex, accessCredentialReaderName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 213 }
+
+accessCredentialReaderAccessGrantedRaised NOTIFICATION-TYPE
+OBJECTS { accessCredentialReaderIndex, accessCredentialReaderName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 214 }
+
+accessCredentialReaderAccessDeniedRaised NOTIFICATION-TYPE
+OBJECTS { accessCredentialReaderIndex, accessCredentialReaderName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 215 }
+
+accessCredentialReaderDuressEventRaised NOTIFICATION-TYPE
+OBJECTS { accessCredentialReaderIndex, accessCredentialReaderName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 246 }
+
+accessCredentialReaderAuthorizedButSelectedByRandomScreeningRaised NOTIFICATION-TYPE
+OBJECTS { accessCredentialReaderIndex, accessCredentialReaderName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 247 }
+
+accessCredentialReaderPersonDidNotEnterRaised NOTIFICATION-TYPE
+OBJECTS { accessCredentialReaderIndex, accessCredentialReaderName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 248 }
+
+accessDoorConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { accessDoorIndex, accessDoorName, accessDoorConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 249 }
+
+accessDoorDoorOpenTooLongRaised NOTIFICATION-TYPE
+OBJECTS { accessDoorIndex, accessDoorName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 250 }
+
+accessDoorUnauthorizedDoorOpeningRaised NOTIFICATION-TYPE
+OBJECTS { accessDoorIndex, accessDoorName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 251 }
+
+accessDoorDoorStateChanged NOTIFICATION-TYPE
+OBJECTS { accessDoorIndex, accessDoorName, accessDoorDoorState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 252 }
+
+accessDoorDoorContactStateChanged NOTIFICATION-TYPE
+OBJECTS { accessDoorIndex, accessDoorName, accessDoorDoorContactState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 253 }
+
+accessDoorDoorOperationModeChanged NOTIFICATION-TYPE
+OBJECTS { accessDoorIndex, accessDoorName, accessDoorDoorOperationMode }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 254 }
+
+accessControllerRelayConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { accessControllerRelayIndex, accessControllerRelayName, accessControllerRelayConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 255 }
+
+accessControllerRelayRelayStateChanged NOTIFICATION-TYPE
+OBJECTS { accessControllerRelayIndex, accessControllerRelayName, accessControllerRelayRelayState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 256 }
+
+accessControllerInputConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { accessControllerInputIndex, accessControllerInputName, accessControllerInputConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 257 }
+
+accessControllerInputInputStateChanged NOTIFICATION-TYPE
+OBJECTS { accessControllerInputIndex, accessControllerInputName, accessControllerInputInputState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 258 }
+
+personIdentificationDeviceConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { personIdentificationDeviceIndex, personIdentificationDeviceName, personIdentificationDeviceNetworkAddress, personIdentificationDeviceConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 218 }
+
+personIdentificationDeviceOperationStateChanged NOTIFICATION-TYPE
+OBJECTS { personIdentificationDeviceIndex, personIdentificationDeviceName, personIdentificationDeviceNetworkAddress, personIdentificationDeviceOperationState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 267 }
+
+personIdentificationDevicePidErrorRaised NOTIFICATION-TYPE
+OBJECTS { personIdentificationDeviceIndex, personIdentificationDeviceName, personIdentificationDeviceNetworkAddress }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 225 }
+
+cameraPersonIdentifiedRaised NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 219 }
+
+cameraOperationStateChanged NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName, cameraOperationState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 268 }
+
+cameraUnknownPersonDetectedRaised NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 273 }
+
+cameraUnauthorizedPersonDetectedRaised NOTIFICATION-TYPE
+OBJECTS { cameraIndex, cameraName }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 274 }
+
+lprDeviceConnectionStateChanged NOTIFICATION-TYPE
+OBJECTS { lprDeviceIndex, lprDeviceName, lprDeviceNetworkAddress, lprDeviceConnectionState }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 261 }
+
+lprDeviceLicensePlateDetectedRaised NOTIFICATION-TYPE
+OBJECTS { lprDeviceIndex, lprDeviceName, lprDeviceNetworkAddress }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 262 }
+
+lprDeviceLicensePlateIdentifiedRaised NOTIFICATION-TYPE
+OBJECTS { lprDeviceIndex, lprDeviceName, lprDeviceNetworkAddress }
+STATUS current
+DESCRIPTION "See documentation of BVMS"
+::= { trapsDefinitions 263 }
+
+bvmsCompliances OBJECT IDENTIFIER ::= { bvmsConformance 1 }
+bvmsGroups OBJECT IDENTIFIER ::= { bvmsConformance 2 }
+
+bvmsAllObjectsGroup OBJECT-GROUP
+OBJECTS
+{
+    brsDibosInputIndex,
+    brsDibosInputName,
+    brsDibosInputNetworkAddress,
+    brsDibosInputInputState,
+    brsDibosRelayIndex,
+    brsDibosRelayName,
+    brsDibosRelayNetworkAddress,
+    brsDibosRelayRelayState,
+    brsDibosServerIndex,
+    brsDibosServerName,
+    brsDibosServerNetworkAddress,
+    brsDibosServerConnectionState,
+    brsDibosVideoCameraIndex,
+    brsDibosVideoCameraName,
+    brsDibosVideoCameraNetworkAddress,
+    brsDibosVideoCameraReferenceImageCheck,
+    brsDibosVideoCameraMotionDetection,
+    brsDibosVideoCameraRecordingMode,
+    brsDibosVideoCameraVideoLoss,
+    brsDibosVideoCameraVideoSignalTooBright,
+    brsDibosVideoCameraVideoSignalTooDark,
+    brsDibosVideoCameraVideoSignalTooNoisy,
+    brsDibosVideoCameraVisibility,
+    dvrInputIndex,
+    dvrInputName,
+    dvrInputNetworkAddress,
+    dvrInputInputState,
+    dvrRelayIndex,
+    dvrRelayName,
+    dvrRelayNetworkAddress,
+    dvrRelayRelayState,
+    dvrServerIndex,
+    dvrServerName,
+    dvrServerNetworkAddress,
+    dvrServerConnectionState,
+    dvrServerDiskFailed,
+    dvrServerDiskFull,
+    dvrServerFanFailed,
+    dvrServerTemperatureAboveLimit,
+    dvrServerSystemAlarm,
+    dvrServerSoftwareIncompatibility,
+    dvrVideoCameraIndex,
+    dvrVideoCameraName,
+    dvrVideoCameraNetworkAddress,
+    dvrVideoCameraMotionDetection,
+    dvrVideoCameraVideoLoss,
+    dvrVideoCameraVisibility,
+    nvrServerIndex,
+    nvrServerName,
+    nvrServerNetworkAddress,
+    nvrServerConnectionState,
+    nvrServerFailoverNvrState,
+    vidosNvrDeviceIndex,
+    vidosNvrDeviceName,
+    vidosNvrDeviceNetworkAddress,
+    vidosNvrDeviceConnectionState,
+    decoderIndex,
+    decoderName,
+    decoderNetworkAddress,
+    decoderConnectionState,
+    decoderInputIndex,
+    decoderInputName,
+    decoderInputNetworkAddress,
+    decoderInputConnectionState,
+    decoderInputInputState,
+    decoderRelayIndex,
+    decoderRelayName,
+    decoderRelayNetworkAddress,
+    decoderRelayConnectionState,
+    decoderRelayRelayState,
+    encoderIndex,
+    encoderName,
+    encoderNetworkAddress,
+    encoderConnectionState,
+    encoderInputIndex,
+    encoderInputName,
+    encoderInputNetworkAddress,
+    encoderInputConnectionState,
+    encoderInputInputState,
+    encoderRelayIndex,
+    encoderRelayName,
+    encoderRelayNetworkAddress,
+    encoderRelayConnectionState,
+    encoderRelayRelayState,
+    cameraIndex,
+    cameraName,
+    cameraNetworkAddress,
+    cameraReferenceImageCheck,
+    cameraConnectionState,
+    cameraMotionDetection,
+    cameraRecordingMode,
+    cameraVideoLoss,
+    cameraVideoSignalTooBright,
+    cameraVideoSignalTooDark,
+    cameraVideoSignalTooNoisy,
+    cameraVideoAnalysis01,
+    cameraVideoAnalysis02,
+    cameraVideoAnalysis03,
+    cameraVideoAnalysis04,
+    cameraVideoAnalysis05,
+    cameraVideoAnalysis06,
+    cameraVideoAnalysis07,
+    cameraVideoAnalysis08,
+    cameraVideoAnalysis09,
+    cameraVideoAnalysis10,
+    cameraVideoAnalysis11,
+    cameraVideoAnalysis12,
+    cameraVideoAnalysis13,
+    cameraVideoAnalysis14,
+    cameraVideoAnalysis15,
+    cameraVideoAnalysis16,
+    cameraStorageState,
+    cameraBufferStorageState,
+    cameraSecondaryRecordingMode,
+    cameraSecondaryStorageState,
+    cameraFireOrSmokeState,
+    cameraVisibility,
+    cameraVideoSignalTooBlurry,
+    cameraGlobalSceneChange,
+    cameraRecordingMonitorState,
+    cameraSecondaryRecordingMonitorState,
+    vrmServerIndex,
+    vrmServerName,
+    vrmServerNetworkAddress,
+    vrmServerConnectionState,
+    vrmServerFailoverState,
+    vrmServerLicenseState,
+    vrmServerVrmType,
+    lunIndex,
+    lunName,
+    lunFormattingState,
+    iscsiDeviceIndex,
+    iscsiDeviceName,
+    iscsiDeviceNetworkAddress,
+    iscsiDeviceConnectionState,
+    streamingGatewayDeviceIndex,
+    streamingGatewayDeviceName,
+    streamingGatewayDeviceNetworkAddress,
+    streamingGatewayDeviceConnectionState,
+    allegiantInputIndex,
+    allegiantInputName,
+    allegiantInputInputState,
+    allegiantCameraIndex,
+    allegiantCameraName,
+    allegiantCameraNetworkAddress,
+    allegiantCameraVideoLoss,
+    allegiantCameraVisibility,
+    allegiantDeviceIndex,
+    allegiantDeviceName,
+    allegiantDeviceConnectionState,
+    compoundEventsIndex,
+    compoundEventsName,
+    compoundEventsCompoundEventState,
+    schedulesIndex,
+    schedulesName,
+    schedulesActivation,
+    virtualInputsIndex,
+    virtualInputsName,
+    virtualInputsInputState,
+    backupVideoDataIndex,
+    backupVideoDataName,
+    alarmStateIndex,
+    alarmStateName,
+    authenticationIndex,
+    authenticationName,
+    operatorClientEventButtonsIndex,
+    operatorClientEventButtonsName,
+    userActionsIndex,
+    userActionsName,
+    scriptMessagesIndex,
+    scriptMessagesName,
+    systemEventsIndex,
+    systemEventsName,
+    bvmsTasksIndex,
+    bvmsTasksName,
+    bvmsTasksStateOfTheSystemTask,
+    threatLevelsIndex,
+    threatLevelsName,
+    threatLevelsThreatLevelState,
+    posBridgeIndex,
+    posBridgeName,
+    posBridgeNetworkAddress,
+    posBridgeConnectionState,
+    posBridgeInputIndex,
+    posBridgeInputName,
+    posBridgeInputNetworkAddress,
+    dtpDeviceIndex,
+    dtpDeviceName,
+    dtpDeviceConnectionState,
+    atmDeviceIndex,
+    atmDeviceName,
+    atmDeviceConnectionState,
+    atmInputIndex,
+    atmInputName,
+    snmpReceiverIndex,
+    snmpReceiverName,
+    snmpReceiverNetworkAddress,
+    adamDeviceIndex,
+    adamDeviceName,
+    adamDeviceNetworkAddress,
+    adamDeviceConnectionState,
+    adamInputIndex,
+    adamInputName,
+    adamInputNetworkAddress,
+    adamInputInputState,
+    adamInputConnectionState,
+    adamRelayIndex,
+    adamRelayName,
+    adamRelayNetworkAddress,
+    adamRelayRelayState,
+    adamRelayConnectionState,
+    mobileVideoServiceDeviceIndex,
+    mobileVideoServiceDeviceName,
+    foyerCardReaderIndex,
+    foyerCardReaderName,
+    foyerCardReaderConnectionState,
+    foyerCardReaderFaultIndication,
+    foyerCardReaderSkimmingDetection,
+    foyerCardReaderAntiSkimmingSabotage,
+    onvifEncoderIndex,
+    onvifEncoderName,
+    onvifEncoderNetworkAddress,
+    onvifEncoderConnectionState,
+    onvifCameraIndex,
+    onvifCameraName,
+    onvifCameraNetworkAddress,
+    onvifCameraConnectionState,
+    onvifCameraRecordingMode,
+    onvifCameraStorageState,
+    onvifCameraMotionDetection,
+    onvifCameraVideoLoss,
+    onvifCameraVideoSignalTooBright,
+    onvifCameraVideoSignalTooDark,
+    onvifCameraVideoSignalTooNoisy,
+    onvifCameraReferenceImageCheck,
+    onvifCameraVisibility,
+    onvifCameraVideoAnalysis01,
+    onvifCameraVideoAnalysis02,
+    onvifCameraVideoAnalysis03,
+    onvifCameraVideoAnalysis04,
+    onvifCameraVideoAnalysis05,
+    onvifCameraVideoAnalysis06,
+    onvifCameraVideoAnalysis07,
+    onvifCameraVideoAnalysis08,
+    onvifCameraVideoAnalysis09,
+    onvifCameraVideoAnalysis10,
+    onvifCameraVideoAnalysis11,
+    onvifCameraVideoAnalysis12,
+    onvifCameraVideoAnalysis13,
+    onvifCameraVideoAnalysis14,
+    onvifCameraVideoAnalysis15,
+    onvifCameraVideoAnalysis16,
+    onvifCameraVideoSignalTooBlurry,
+    onvifCameraGlobalSceneChange,
+    onvifEncoderInputIndex,
+    onvifEncoderInputName,
+    onvifEncoderInputNetworkAddress,
+    onvifEncoderInputConnectionState,
+    onvifEncoderInputInputState,
+    onvifEncoderRelayIndex,
+    onvifEncoderRelayName,
+    onvifEncoderRelayNetworkAddress,
+    onvifEncoderRelayConnectionState,
+    onvifEncoderRelayRelayState,
+    rtspJpegCameraIndex,
+    rtspJpegCameraName,
+    rtspJpegCameraNetworkAddress,
+    rtspJpegCameraRecordingMode,
+    rtspJpegCameraStorageState,
+    rtspJpegCameraConnectionState,
+    intrusionPanelIndex,
+    intrusionPanelName,
+    intrusionPanelNetworkAddress,
+    intrusionPanelConnectionState,
+    intrusionPanelAreaIndex,
+    intrusionPanelAreaName,
+    intrusionPanelAreaAreaState,
+    intrusionPanelPointIndex,
+    intrusionPanelPointName,
+    intrusionPanelPointAlarm,
+    intrusionPanelPointDoorLeftOpened,
+    intrusionPanelPointKeypadPanicAlarm,
+    intrusionPanelPointFireAlarm,
+    intrusionPanelPointFireSupervision,
+    intrusionPanelPointGasAlarm,
+    intrusionPanelPointMedicalAlarm,
+    intrusionPanelRelayIndex,
+    intrusionPanelRelayName,
+    intrusionPanelRelayRelayState,
+    intrusionPanelDoorIndex,
+    intrusionPanelDoorName,
+    intrusionPanelDoorDoorState,
+    accessControlSystemIndex,
+    accessControlSystemName,
+    accessControlSystemNetworkAddress,
+    accessControlSystemConnectionState,
+    accessControllerIndex,
+    accessControllerName,
+    accessControllerConnectionState,
+    accessCredentialReaderIndex,
+    accessCredentialReaderName,
+    accessCredentialReaderConnectionState,
+    accessDoorIndex,
+    accessDoorName,
+    accessDoorConnectionState,
+    accessDoorDoorState,
+    accessDoorDoorContactState,
+    accessDoorDoorOperationMode,
+    accessControllerRelayIndex,
+    accessControllerRelayName,
+    accessControllerRelayConnectionState,
+    accessControllerRelayRelayState,
+    accessControllerInputIndex,
+    accessControllerInputName,
+    accessControllerInputConnectionState,
+    accessControllerInputInputState,
+    personIdentificationDeviceIndex,
+    personIdentificationDeviceName,
+    personIdentificationDeviceNetworkAddress,
+    personIdentificationDeviceConnectionState,
+    personIdentificationDeviceOperationState,
+    cameraIndex,
+    cameraName,
+    cameraOperationState,
+    lprDeviceIndex,
+    lprDeviceName,
+    lprDeviceNetworkAddress,
+    lprDeviceConnectionState
+}
+STATUS current
+DESCRIPTION "A collection of objects supported by a BVMS system."
+::= { bvmsGroups 1 }
+
+bvmsAllNotificationsGroup NOTIFICATION-GROUP
+NOTIFICATIONS
+{
+    brsDibosInputDataInputRaised,
+    brsDibosInputInputStateChanged,
+    brsDibosRelayRelayStateChanged,
+    brsDibosServerServerResetRaised,
+    brsDibosServerDiskFailedRaised,
+    brsDibosServerConnectionStateChanged,
+    brsDibosVideoCameraReferenceImageCheckChanged,
+    brsDibosVideoCameraMotionDetectionChanged,
+    brsDibosVideoCameraRecordingModeChanged,
+    brsDibosVideoCameraVideoLossChanged,
+    brsDibosVideoCameraVideoSignalTooBrightChanged,
+    brsDibosVideoCameraVideoSignalTooDarkChanged,
+    brsDibosVideoCameraVideoSignalTooNoisyChanged,
+    brsDibosVideoCameraVisibilityChanged,
+    dvrInputDataInputRaised,
+    dvrInputInputStateChanged,
+    dvrRelayRelayStateChanged,
+    dvrServerConnectionStateChanged,
+    dvrServerDiskFailedChanged,
+    dvrServerDiskFullChanged,
+    dvrServerFanFailedChanged,
+    dvrServerTemperatureAboveLimitChanged,
+    dvrServerSystemAlarmChanged,
+    dvrServerSoftwareIncompatibilityChanged,
+    dvrVideoCameraMotionDetectionChanged,
+    dvrVideoCameraVideoLossChanged,
+    dvrVideoCameraVisibilityChanged,
+    nvrServerBackupStartedRaised,
+    nvrServerBackupFinishedRaised,
+    nvrServerBackupFailedRaised,
+    nvrServerFailedToObtainCameraRaised,
+    nvrServerSevereDatabaseErrorRaised,
+    nvrServerDiskFailedRaised,
+    nvrServerDiskFullRaised,
+    nvrServerDiskNotFullRaised,
+    nvrServerDiskSpaceCriticalRaised,
+    nvrServerDiskSpaceOkayRaised,
+    nvrServerRecordingDeactivatedRaised,
+    nvrServerServerResetRaised,
+    nvrServerConnectionStateChanged,
+    nvrServerFailoverNvrStateChanged,
+    vidosNvrDeviceConnectionStateChanged,
+    decoderConnectionStateChanged,
+    decoderInputConnectionStateChanged,
+    decoderInputInputStateChanged,
+    decoderRelayConnectionStateChanged,
+    decoderRelayRelayStateChanged,
+    encoderConnectionStateChanged,
+    encoderSdCardLifeSpanStatusRaised,
+    encoderTimeSynchronizationFailedRaised,
+    encoderInputConnectionStateChanged,
+    encoderInputInputStateChanged,
+    encoderRelayConnectionStateChanged,
+    encoderRelayRelayStateChanged,
+    cameraBufferStorageOverflowRaised,
+    cameraReferenceImageCheckChanged,
+    cameraConnectionStateChanged,
+    cameraMotionDetectionChanged,
+    cameraRecordingModeChanged,
+    cameraVideoLossChanged,
+    cameraVideoSignalTooBrightChanged,
+    cameraVideoSignalTooDarkChanged,
+    cameraVideoSignalTooNoisyChanged,
+    cameraVideoAnalysis01Changed,
+    cameraVideoAnalysis02Changed,
+    cameraVideoAnalysis03Changed,
+    cameraVideoAnalysis04Changed,
+    cameraVideoAnalysis05Changed,
+    cameraVideoAnalysis06Changed,
+    cameraVideoAnalysis07Changed,
+    cameraVideoAnalysis08Changed,
+    cameraVideoAnalysis09Changed,
+    cameraVideoAnalysis10Changed,
+    cameraVideoAnalysis11Changed,
+    cameraVideoAnalysis12Changed,
+    cameraVideoAnalysis13Changed,
+    cameraVideoAnalysis14Changed,
+    cameraVideoAnalysis15Changed,
+    cameraVideoAnalysis16Changed,
+    cameraStorageStateChanged,
+    cameraBufferStorageStateChanged,
+    cameraSecondaryRecordingModeChanged,
+    cameraSecondaryStorageStateChanged,
+    cameraExternalDataRaised,
+    cameraFireOrSmokeStateChanged,
+    cameraVisibilityChanged,
+    cameraVideoSignalTooBlurryChanged,
+    cameraGlobalSceneChangeChanged,
+    cameraAudioAlarmRaised,
+    cameraRecordingMonitorStateChanged,
+    cameraSecondaryRecordingMonitorStateChanged,
+    vrmServerConnectionStateChanged,
+    vrmServerFailoverStateChanged,
+    vrmServerLicenseStateChanged,
+    vrmServerVrmTypeChanged,
+    lunFormattingStateChanged,
+    iscsiDeviceConnectionStateChanged,
+    streamingGatewayDeviceConnectionStateChanged,
+    allegiantInputInputStateChanged,
+    allegiantCameraVideoLossChanged,
+    allegiantCameraVisibilityChanged,
+    allegiantDeviceConnectionStateChanged,
+    compoundEventsCompoundEventStateChanged,
+    schedulesActivationChanged,
+    virtualInputsVirtualInputDataRaised,
+    virtualInputsInputStateChanged,
+    backupVideoDataBackupStartedRaised,
+    backupVideoDataBackupFinishedRaised,
+    backupVideoDataBackupFailedRaised,
+    backupVideoDataFailedToObtainCameraRaised,
+    alarmStateAlarmAcceptedRaised,
+    alarmStateAlarmActivatedRaised,
+    alarmStateAlarmClearedRaised,
+    alarmStateAlarmUnacceptedRaised,
+    alarmStateAlarmWorkflowInitiatedRaised,
+    authenticationOperatorAuthenticationRejectedRaised,
+    authenticationUserAccountDisabledRaised,
+    operatorClientEventButtonsEventButtonPressedRaised,
+    userActionsVideoDataExportedRaised,
+    userActionsCameraCalledUpRaised,
+    userActionsCameraClosedRaised,
+    userActionsSetReferenceImageRaised,
+    userActionsPtzActionRaised,
+    userActionsSavePredefinedPositionRaised,
+    userActionsRecordingDeletedRaised,
+    userActionsRecordingProtectedRaised,
+    userActionsRecordingUnprotectedRaised,
+    userActionsManualRecordingStartedRaised,
+    userActionsManualRecordingStoppedRaised,
+    userActionsCommandScriptStartedRaised,
+    userActionsImagePrintedSavedRaised,
+    userActionsOperatorLogoffRaised,
+    userActionsOperatorLogonRaised,
+    userActionsEnterpriseAccountLogonRaised,
+    userActionsEnterpriseAccountLogoffRaised,
+    userActionsRelayOpenedRaised,
+    userActionsRelayClosedRaised,
+    userActionsOperatorClientLogoffRaised,
+    userActionsOperatorClientLogonRaised,
+    userActionsAreaArmedRaised,
+    userActionsAreaDisarmedRaised,
+    userActionsAreaForceArmedRaised,
+    userActionsAreaBellsSilencedRaised,
+    userActionsDoorLockedRaised,
+    userActionsDoorUnlockedRaised,
+    userActionsDoorSecuredRaised,
+    userActionsDoorUnsecuredRaised,
+    userActionsDoorCycledRaised,
+    userActionsPointBypassedRaised,
+    userActionsPointUnbypassedRaised,
+    userActionsVideoAuthenticityCheckedRaised,
+    userActionsRecordingRestrictedRaised,
+    userActionsRecordingUnrestrictedRaised,
+    userActionsAccessRequestGrantedRaised,
+    userActionsAccessRequestDeniedRaised,
+    userActionsAccessGrantedRaised,
+    userActionsPersonAddedRaised,
+    userActionsPersonUpdatedRaised,
+    userActionsPersonRemovedRaised,
+    userActionsPersonRenamedRaised,
+    userActionsLogbookDataErasedRaised,
+    scriptMessagesLogbookMessageFromScriptRaised,
+    systemEventsConfigurationActivatedRaised,
+    systemEventsSystemErrorRaised,
+    systemEventsSystemInfoRaised,
+    systemEventsSystemWarningRaised,
+    bvmsTasksStateOfTheSystemTaskChanged,
+    threatLevelsThreatLevelStateChanged,
+    posBridgeConnectionStateChanged,
+    posBridgeInputDataInputRaised,
+    dtpDeviceConnectionStateChanged,
+    atmDeviceConnectionStateChanged,
+    atmInputDataInputRaised,
+    snmpReceiverSnmpTrapReceivedRaised,
+    adamDeviceConnectionStateChanged,
+    adamInputInputStateChanged,
+    adamInputConnectionStateChanged,
+    adamRelayRelayStateChanged,
+    adamRelayConnectionStateChanged,
+    foyerCardReaderCardAcceptedRaised,
+    foyerCardReaderCardRejectedRaised,
+    foyerCardReaderConnectionStateChanged,
+    foyerCardReaderFaultIndicationChanged,
+    foyerCardReaderSkimmingDetectionChanged,
+    foyerCardReaderAntiSkimmingSabotageChanged,
+    onvifEncoderConnectionStateChanged,
+    onvifCameraConnectionStateChanged,
+    onvifCameraRecordingModeChanged,
+    onvifCameraStorageStateChanged,
+    onvifCameraMotionDetectionChanged,
+    onvifCameraVideoLossChanged,
+    onvifCameraVideoSignalTooBrightChanged,
+    onvifCameraVideoSignalTooDarkChanged,
+    onvifCameraVideoSignalTooNoisyChanged,
+    onvifCameraReferenceImageCheckChanged,
+    onvifCameraOnvifGenericData01Raised,
+    onvifCameraOnvifGenericData02Raised,
+    onvifCameraOnvifGenericData03Raised,
+    onvifCameraVisibilityChanged,
+    onvifCameraVideoAnalysis01Changed,
+    onvifCameraVideoAnalysis02Changed,
+    onvifCameraVideoAnalysis03Changed,
+    onvifCameraVideoAnalysis04Changed,
+    onvifCameraVideoAnalysis05Changed,
+    onvifCameraVideoAnalysis06Changed,
+    onvifCameraVideoAnalysis07Changed,
+    onvifCameraVideoAnalysis08Changed,
+    onvifCameraVideoAnalysis09Changed,
+    onvifCameraVideoAnalysis10Changed,
+    onvifCameraVideoAnalysis11Changed,
+    onvifCameraVideoAnalysis12Changed,
+    onvifCameraVideoAnalysis13Changed,
+    onvifCameraVideoAnalysis14Changed,
+    onvifCameraVideoAnalysis15Changed,
+    onvifCameraVideoAnalysis16Changed,
+    onvifCameraVideoSignalTooBlurryChanged,
+    onvifCameraGlobalSceneChangeChanged,
+    onvifEncoderInputConnectionStateChanged,
+    onvifEncoderInputInputStateChanged,
+    onvifEncoderRelayConnectionStateChanged,
+    onvifEncoderRelayRelayStateChanged,
+    rtspJpegCameraRecordingModeChanged,
+    rtspJpegCameraStorageStateChanged,
+    rtspJpegCameraConnectionStateChanged,
+    intrusionPanelConnectionStateChanged,
+    intrusionPanelKeyfobAlarmRaised,
+    intrusionPanelAreaDuressRaised,
+    intrusionPanelAreaUserPasscodeTamperRaised,
+    intrusionPanelAreaAreaStateChanged,
+    intrusionPanelPointAccessDeniedRaised,
+    intrusionPanelPointAccessGrantedRaised,
+    intrusionPanelPointAlarmChanged,
+    intrusionPanelPointDoorLeftOpenedChanged,
+    intrusionPanelPointKeypadPanicAlarmChanged,
+    intrusionPanelPointFireAlarmChanged,
+    intrusionPanelPointFireSupervisionChanged,
+    intrusionPanelPointGasAlarmChanged,
+    intrusionPanelPointMedicalAlarmChanged,
+    intrusionPanelRelayRelayStateChanged,
+    intrusionPanelDoorDoorStateChanged,
+    accessControlSystemConnectionStateChanged,
+    accessControllerConnectionStateChanged,
+    accessCredentialReaderConnectionStateChanged,
+    accessCredentialReaderAccessRequestedRaised,
+    accessCredentialReaderAccessGrantedRaised,
+    accessCredentialReaderAccessDeniedRaised,
+    accessCredentialReaderDuressEventRaised,
+    accessCredentialReaderAuthorizedButSelectedByRandomScreeningRaised,
+    accessCredentialReaderPersonDidNotEnterRaised,
+    accessDoorConnectionStateChanged,
+    accessDoorDoorOpenTooLongRaised,
+    accessDoorUnauthorizedDoorOpeningRaised,
+    accessDoorDoorStateChanged,
+    accessDoorDoorContactStateChanged,
+    accessDoorDoorOperationModeChanged,
+    accessControllerRelayConnectionStateChanged,
+    accessControllerRelayRelayStateChanged,
+    accessControllerInputConnectionStateChanged,
+    accessControllerInputInputStateChanged,
+    personIdentificationDeviceConnectionStateChanged,
+    personIdentificationDeviceOperationStateChanged,
+    personIdentificationDevicePidErrorRaised,
+    cameraPersonIdentifiedRaised,
+    cameraOperationStateChanged,
+    cameraUnknownPersonDetectedRaised,
+    cameraUnauthorizedPersonDetectedRaised,
+    lprDeviceConnectionStateChanged,
+    lprDeviceLicensePlateDetectedRaised,
+    lprDeviceLicensePlateIdentifiedRaised
+}
+STATUS current
+DESCRIPTION "A collection of notifications supported by a BVMS system."
+::= { bvmsGroups 2 }
+
+bvmsBasicCompliance MODULE-COMPLIANCE
+STATUS current
+DESCRIPTION "The compliance statement for entities which implement this MIB module."
+MODULE -- this module
+GROUP bvmsAllObjectsGroup
+DESCRIPTION
+"This group is optional, because it can change with every release of BVMS."
+GROUP bvmsAllNotificationsGroup
+DESCRIPTION
+"This group is optional, because it can change with every release of BVMS."
+::= { bvmsCompliances 1 }
+
+END

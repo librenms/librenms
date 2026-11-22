@@ -6336,6 +6336,8 @@
                 {
                     "vrf_oid": "1",
                     "vrf_name": "Base",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
@@ -6344,6 +6346,8 @@
                 {
                     "vrf_oid": "254",
                     "vrf_name": "****",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
@@ -6352,12 +6356,15 @@
                 {
                     "vrf_oid": "255",
                     "vrf_name": "****",
+                    "context_name": null,
+                    "context_verified": false,
                     "bgpLocalAs": null,
                     "mplsVpnVrfRouteDistinguisher": null,
                     "mplsVpnVrfDescription": "",
                     "ifIndices": null
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

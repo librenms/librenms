@@ -370,7 +370,7 @@ This saves resources. You can also tune the performance settings in `librenms.co
 
          charset utf-8;
          gzip on;
-         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+         gzip_types text/css application/javascript text/javascript application/x-javascript application/json image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
          location / {
           try_files $uri $uri/ /index.php?$query_string;
          }
@@ -408,7 +408,7 @@ This saves resources. You can also tune the performance settings in `librenms.co
 
          charset utf-8;
          gzip on;
-         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+         gzip_types text/css application/javascript text/javascript application/x-javascript application/json image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
          location / {
           try_files $uri $uri/ /index.php?$query_string;
          }
@@ -446,7 +446,7 @@ This saves resources. You can also tune the performance settings in `librenms.co
 
          charset utf-8;
          gzip on;
-         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+         gzip_types text/css application/javascript text/javascript application/x-javascript application/json image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
          location / {
           try_files $uri $uri/ /index.php?$query_string;
          }
@@ -484,7 +484,7 @@ This saves resources. You can also tune the performance settings in `librenms.co
 
          charset utf-8;
          gzip on;
-         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+         gzip_types text/css application/javascript text/javascript application/x-javascript application/json image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
          location / {
           try_files $uri $uri/ /index.php?$query_string;
          }
@@ -522,7 +522,7 @@ This saves resources. You can also tune the performance settings in `librenms.co
 
          charset utf-8;
          gzip on;
-         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+         gzip_types text/css application/javascript text/javascript application/x-javascript application/json image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
          location / {
           try_files $uri $uri/ /index.php?$query_string;
          }
@@ -714,6 +714,7 @@ systemctl restart snmpd
 
 ```
 cp /opt/librenms/dist/librenms.cron /etc/cron.d/librenms
+chmod 644 /etc/cron.d/librenms
 ```
 
 !!! note
@@ -740,6 +741,7 @@ configuration file:
 
 ```
 cp /opt/librenms/misc/librenms.logrotate /etc/logrotate.d/librenms
+chmod 644 /etc/logrotate.d/librenms
 ```
 
 ## Web installer
@@ -761,10 +763,9 @@ chown librenms:librenms /opt/librenms/config.php
 The install is complete. You can now log in at
 <http://librenms.example.com/>.
 
-!!! danger
-    Do not connect this install to the public internet before you
-    configure HTTPS. This procedure does not configure HTTPS, and the
-    install is not secure. Also harden the web server.
+!!! danger "Security and Backup Warning"
+    - Do not connect this installation to the public internet before you configure HTTPS. This procedure does not configure HTTPS, and the default installation is not secure. You must also harden the web server.
+    - **Save a backup copy of your `.env` file.** The `.env` file contains the `APP_KEY`. LibreNMS uses `APP_KEY` to encrypt secrets and credentials in the database. If you lose `APP_KEY`, you cannot recover encrypted data from backups or during server migrations.
 
 ## Add the first device
 
@@ -802,4 +803,4 @@ page](../General/Callback-Stats-and-Privacy.md).
 
 There are [many ways to help](../Support/FAQ.md#faq9) to make LibreNMS
 better. You can also [back LibreNMS on Open
-Collective](https://t.libren.ms/donations).
+Collective](https://opencollective.com/librenms).

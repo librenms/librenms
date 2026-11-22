@@ -283,13 +283,14 @@ class ConfigBackupDesignContractTest extends TestCase
         ]);
 
         $view = $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'config']))
+            ->get(route('device.config', ['device' => $device]))
             ->assertOk();
 
         // Alpine & Viewer Components
         $view->assertSee('data-config-backups', false);
         $view->assertSee('x-config-highlight="selected.content"', false);
-        $view->assertSee('class="config-highlight line-numbers', false);
+        $view->assertSee('class="config-highlight ', false);
+        $view->assertSee('x-ignore', false);
 
         // Diff Table Header Contract (Concept B)
         $view->assertSee('diffRangeSummaryText', false);

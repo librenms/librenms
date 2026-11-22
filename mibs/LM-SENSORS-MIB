@@ -17,13 +17,18 @@ IMPORTS
         FROM UCD-SNMP-MIB;
 
 lmSensorsMIB MODULE-IDENTITY
-    LAST-UPDATED "200011050000Z"
+    LAST-UPDATED "202411230000Z"
     ORGANIZATION "AdamsNames Ltd"
     CONTACT-INFO    
         "Primary Contact: M J Oldfield
          email:     m@mail.tc"
     DESCRIPTION
         "This MIB module defines objects for lm_sensor derived data."
+
+    REVISION     "202411230000Z"
+    DESCRIPTION
+        "Add the lmTempSensorsTemperature object to allow negative temperatures"
+
     REVISION     "200011050000Z"
     DESCRIPTION
         "Derived from DISKIO-MIB ex UCD."
@@ -75,10 +80,22 @@ lmTempSensorsDevice OBJECT-TYPE
 lmTempSensorsValue OBJECT-TYPE
     SYNTAX      Gauge32
     MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The temperature of this sensor in mCel.
+
+	Deprecated in favor of lmTempSensorsTemperature as temperatures can be
+	negative"
+    ::= { lmTempSensorsEntry 3 }
+
+lmTempSensorsTemperature OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "mCel"
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
-        "The temperature of this sensor in mC."
-    ::= { lmTempSensorsEntry 3 }
+        "The temperature of this sensor in mCel."
+    ::= { lmTempSensorsEntry 4 }
 --
 
 lmFanSensorsTable OBJECT-TYPE

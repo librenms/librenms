@@ -113,7 +113,7 @@ final class FileCategorizerTest extends TestCase
         $this->assertCategorized([
             'resources' => [
                 'resources/js/app.js',
-                'resources/js/components/LibrenmsSetting.vue',
+                'resources/js/components/alpine/settings.js',
                 'resources/views/layouts/librenmsv1.blade.php',
             ],
             'php' => [
@@ -213,7 +213,7 @@ final class FileCategorizerTest extends TestCase
         $files = $input ?? array_unique(Arr::flatten(Arr::except($expected, ['os']))); // os is a virtual category
         $expected = array_merge($this->getCategorySkeleton(), $expected);
 
-        $this->assertEquals($expected, (new FileCategorizer($files))->categorize(), $message);
+        $this->assertEquals($expected, new FileCategorizer($files)->categorize(), $message);
     }
 
     private function getCategorySkeleton()

@@ -1,6 +1,6 @@
 CISCOSB-CDP-MIB DEFINITIONS ::= BEGIN
 
--- Title:                CISCOSB CDP ROS
+-- Title: CISCOSB CDP ROS
 --                       This Private MIB provides the port and global information concerning CDP protocol
 -- Version:              7.47
 -- Date:                 14 Sep 2008
@@ -8,7 +8,7 @@ CISCOSB-CDP-MIB DEFINITIONS ::= BEGIN
 
 
 IMPORTS
-    switch001, rndNotifications             FROM CISCOSB-MIB
+	rndNotifications                        FROM CISCOSB-TRAPS-MIB
     rndErrorDesc, rndErrorSeverity          FROM CISCOSB-DEVICEPARAMS-MIB
     InetAddressType, InetAddress            FROM INET-ADDRESS-MIB
     OBJECT-TYPE, IpAddress, Unsigned32,
@@ -20,23 +20,23 @@ IMPORTS
     PortList                                FROM Q-BRIDGE-MIB
     VlanId                                  FROM Q-BRIDGE-MIB
     InterfaceIndexOrZero, InterfaceIndex    FROM IF-MIB
-    CiscoNetworkProtocol, 
+    CiscoNetworkProtocol,
     CiscoNetworkAddress                     FROM CISCO-TC
     cdpCacheEntry,
     cdpCacheIfIndex,
-    cdpCacheDeviceIndex                     FROM CISCO-CDP-MIB;
+    cdpCacheDeviceIndex                     FROM CISCO-CDP-MIB
+    switch001                                FROM CISCOSB-MIB;
 
 rlCdp MODULE-IDENTITY
-         LAST-UPDATED "201102150000Z"
-         ORGANIZATION "Cisco Systems, Inc."
+         LAST-UPDATED "201603300000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
 
-         CONTACT-INFO
-         "Postal: 170 West Tasman Drive
-         San Jose , CA 95134-1706
-         USA
-
-         
-         Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
          DESCRIPTION
                 "The private MIB module definition for CDP protocol."
@@ -76,16 +76,16 @@ rlCdp MODULE-IDENTITY
                 "Added rlCdpTlvPowerRequestTable.
 		 Added rlCdpSecondaryCacheAddressTable.
 		 Added rlCdpSecondaryCacheRequestedPowerTable.
-		 Added rlCdpTlvPowerConsumption, 
-		       rlCdpTlvPowerRequestedRequestId, 
-		       rlCdpTlvPowerRequestedPowerManagementId, 
-		       rlCdpTlvSparePairPoECapabilities 
+		 Added rlCdpTlvPowerConsumption,
+		       rlCdpTlvPowerRequestedRequestId,
+		       rlCdpTlvPowerRequestedPowerManagementId,
+		       rlCdpTlvSparePairPoECapabilities
 		       to rlCdpTlvEntry.
-		 Added rlCdpSecondaryCachePowerAvailable, 
+		 Added rlCdpSecondaryCachePowerAvailable,
 		       rlCdpSecondaryCachePowerConsumption,
-		       rlCdpSecondaryCacheSparePairPoECapabilities, 
+		       rlCdpSecondaryCacheSparePairPoECapabilities,
 		       rlCdpSecondaryCacheDeviceId,
-		       rlCdpSecondaryCachePortId 
+		       rlCdpSecondaryCachePortId
 		       to rlCdpSecondaryCacheEntry."
          REVISION "201603300000Z"
          DESCRIPTION
@@ -441,8 +441,8 @@ rlCdpSecondaryCachePowerAvailable OBJECT-TYPE
     STATUS     current
     DESCRIPTION
         "The remote device's available power, as reported in the
-        most recent CDP message. 
-	A value of 0xFFFFFFFF indicates that no Power Available TLV 
+        most recent CDP message.
+	A value of 0xFFFFFFFF indicates that no Power Available TLV
 	was reported in the most recently received CDP message."
     ::= { rlCdpSecondaryCacheEntry 8 }
 
@@ -452,8 +452,8 @@ rlCdpSecondaryCachePowerConsumption OBJECT-TYPE
     STATUS     current
     DESCRIPTION
         "The remote device's consumed power, as reported in the
-        most recent CDP message. 
-	A value of 0xFFFFFFFF indicates that no Power Consumption TLV 
+        most recent CDP message.
+	A value of 0xFFFFFFFF indicates that no Power Consumption TLV
 	was reported in the most recently received CDP message."
     ::= { rlCdpSecondaryCacheEntry 9 }
 
@@ -471,9 +471,9 @@ rlCdpSecondaryCacheSparePairPoECapabilities OBJECT-TYPE
             The bit 'supported(0)' indicates that the device supports Spare Pair POE.
             The bit 'detectionClassificationRequired(1)' indicates that the device requires
 	    detection/classification on the spare-pair.
-            The bit 'desiredState(2)' indicates whether the PD device desires power 
+            The bit 'desiredState(2)' indicates whether the PD device desires power
 	    on the spare pair.
-            The bit 'operationalState(3)' indicates whether the PSE device supplies power 
+            The bit 'operationalState(3)' indicates whether the PSE device supplies power
 	    on the spare pair."
     ::= { rlCdpSecondaryCacheEntry 10 }
 
@@ -503,8 +503,8 @@ rlCdpSecondaryCachePowerAvailableManagementPowerLevel OBJECT-TYPE
     STATUS     current
     DESCRIPTION
         "The remote device's Management Power Level, as reported in the
-        most recent CDP message Power Available TLV. 
-	A value of zero indicates that no Power Available TLV 
+        most recent CDP message Power Available TLV.
+	A value of zero indicates that no Power Available TLV
 	was reported in the most recently received CDP message."
     ::= { rlCdpSecondaryCacheEntry 13 }
 
@@ -514,8 +514,8 @@ rlCdpSecondaryCachePowerAvailableRequestId OBJECT-TYPE
     STATUS     current
     DESCRIPTION
         "The remote device's echoed Request ID, as reported in the
-        most recent CDP message Power Available TLV. 
-	A value of zero indicates that no Power Available TLV 
+        most recent CDP message Power Available TLV.
+	A value of zero indicates that no Power Available TLV
 	was reported in the most recently received CDP message."
     ::= { rlCdpSecondaryCacheEntry 14 }
 
@@ -525,8 +525,8 @@ rlCdpSecondaryCachePowerAvailablePowerManagementId OBJECT-TYPE
     STATUS     current
     DESCRIPTION
         "The remote device's Power Management ID, as reported in the
-        most recent CDP message Power Available TLV. 
-	A value of zero indicates that no Power Available TLV 
+        most recent CDP message Power Available TLV.
+	A value of zero indicates that no Power Available TLV
 	was reported in the most recently received CDP message."
     ::= { rlCdpSecondaryCacheEntry 15 }
 
@@ -536,8 +536,8 @@ rlCdpSecondaryCachePowerRequestedPowerManagementId OBJECT-TYPE
     STATUS     current
     DESCRIPTION
         "The remote device's echoed Power Management ID, as reported in the
-        most recent CDP message Power Requested TLV. 
-	A value of zero indicates that no Power Requested TLV 
+        most recent CDP message Power Requested TLV.
+	A value of zero indicates that no Power Requested TLV
 	was reported in the most recently received CDP message."
     ::= { rlCdpSecondaryCacheEntry 16 }
 
@@ -547,8 +547,8 @@ rlCdpSecondaryCachePowerRequestedRequestId OBJECT-TYPE
     STATUS     current
     DESCRIPTION
         "The remote device's Request ID, as reported in the
-        most recent CDP message Power Requested TLV. 
-	A value of zero indicates that no Power Requested TLV 
+        most recent CDP message Power Requested TLV.
+	A value of zero indicates that no Power Requested TLV
 	was reported in the most recently received CDP message."
     ::= { rlCdpSecondaryCacheEntry 17 }
 
@@ -923,7 +923,7 @@ rlCdpTlvPowerRequestedPowerManagementId OBJECT-TYPE
     STATUS     current
     DESCRIPTION
         "The Power Requested TLV Power-Management-ID field echoes the Management-
-         Power-ID field in the last received Power Available TLV, or to 0, 
+         Power-ID field in the last received Power Available TLV, or to 0,
 	 if no Power Available TLV has been received."
     ::= { rlCdpTlvEntry 27 }
 
@@ -941,9 +941,9 @@ rlCdpTlvSparePairPoECapabilities OBJECT-TYPE
 	The bit 'supported(0)' indicates that the device supports Spare Pair POE.
 	The bit 'detectionClassificationRequired(1)' indicates that the device requires
 	detection/classification on the spare-pair.
-	The bit 'desiredState(2)' indicates whether the PD device desires power 
+	The bit 'desiredState(2)' indicates whether the PD device desires power
 	on the spare pair.
-	The bit 'operationalState(3)' indicates whether the PSE device supplies power 
+	The bit 'operationalState(3)' indicates whether the PSE device supplies power
 	on the spare pair."
     ::= { rlCdpTlvEntry 28 }
 
@@ -1015,9 +1015,9 @@ rlCdpSecondaryCacheAddressEntry OBJECT-TYPE
     DESCRIPTION
             "An entry (conceptual row) in the rlCdpSecondaryCacheAddressTable,
             containing the list of network-layer addresses of a neighbor interface,
-	    as reported in the Address TLV of the most recently received CDP message 
-	    and stored in the secondary cache. Entries are available only when CDP is 
-	    globally enabled, for interfaces on which CDP is enabled and the interface 
+	    as reported in the Address TLV of the most recently received CDP message
+	    and stored in the secondary cache. Entries are available only when CDP is
+	    globally enabled, for interfaces on which CDP is enabled and the interface
 	    state is UP."
     INDEX      { cdpCacheIfIndex, cdpCacheDeviceIndex, rlCdpSecondaryCacheAddressIndex }
     ::= { rlCdpSecondaryCacheAddressTable 1 }
@@ -1051,8 +1051,8 @@ rlCdpSecondaryCacheAddress OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-            "A network-layer address of the device as reported in the most 
-	    recent CDP message's Address TLV. For example, if the the 
+            "A network-layer address of the device as reported in the most
+	    recent CDP message's Address TLV. For example, if the the
 	    corresponding instance of rlCdpSecondaryCacheAddressType had the
             value 'ip(1)', then this object would be an IPv4-address."
     ::= { rlCdpSecondaryCacheAddressEntry 5 }
@@ -1080,9 +1080,9 @@ rlCdpSecondaryCacheRequestedPowerEntry OBJECT-TYPE
     DESCRIPTION
             "An entry (conceptual row) in the rlCdpSecondaryCacheRequestedPowerTable,
             containing the list of requested power levels by a remote device,
-	    as reported in the Power Requested TLV of the most recently received CDP message 
-	    and stored in the secondary cache. Entries are available only when CDP is 
-	    globally enabled, for interfaces on which CDP is enabled and the interface 
+	    as reported in the Power Requested TLV of the most recently received CDP message
+	    and stored in the secondary cache. Entries are available only when CDP is
+	    globally enabled, for interfaces on which CDP is enabled and the interface
 	    state is UP."
     INDEX      { cdpCacheIfIndex, cdpCacheDeviceIndex, rlCdpSecondaryCacheRequestedPowerIndex }
     ::= { rlCdpSecondaryCacheRequestedPowerTable 1 }

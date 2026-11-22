@@ -2,8 +2,8 @@
 
 @section('content')
 <x-device.page :device="$device">
-    <x-option-bar name="Neighbours" :options="$data['selections']" :selected="$data['selection']"></x-option-bar>
-@if($data['selection'] == 'list')
+    <x-option-bar name="Neighbours" :options="$selections" :selected="$selection"></x-option-bar>
+@if($selection == 'list')
     <table class="table table-hover table-condensed" id="neighbour-table">
         <thead>
             <tr>
@@ -14,7 +14,7 @@
             </tr>
         </thead>
         <tbody>
-@foreach($data['links'] as $link)
+@foreach($links as $link)
             <tr>
                 <td>
                 @if($link->port)
@@ -44,34 +44,21 @@
 @endforeach
         </tbody>
     </table>
-@elseif($data['selection'] == 'map')
+@elseif($selection == 'map')
     <div id="netmap"></div>
 
-@push('styles')
-<style>
-    div.vis-tooltip {
-        padding: 0 !important;
-        background-color: transparent !important;
-        border: 0 !important;
-        border-radius: 0 !important;
-        box-shadow: none !important;
-    }
-    div.vis-tooltip .panel {
-        margin-bottom: 0 !important;
-    }
-</style>
-@endpush
-
 @push('scripts')
+@include('map.partials.vis-popups')
 <script>
 var network_nodes = new vis.DataSet({queue: {delay: 100}});
 var network_edges = new vis.DataSet({queue: {delay: 100}});
 
-$.post( '{{ route('maps.getdevicelinks') }}', {device: {{$device->device_id}}, link_types: @json($data['link_types'])})
+$.post( '{{ route('maps.getdevicelinks') }}', {device: {{$device->device_id}}, link_types: @json($link_types)})
     .done(function( data ) {
         var devices = [];
         $.each(data, function( link_id, link ) {
             var this_edge = link['style'];
+            this_edge['id'] = link_id;
             this_edge['from'] = link['ldev'];
             this_edge['to'] = link['rdev'];
             this_edge['label'] = link['ifnames'];
@@ -81,13 +68,10 @@ $.post( '{{ route('maps.getdevicelinks') }}', {device: {{$device->device_id}}, l
             devices[link['rdev']] = true;
         });
 
-        $.post( '{{ route('maps.getdevices') }}', {devices: Object.keys(devices), url_type: 'links'})
+        $.post( '{{ route('maps.getdevices') }}', {devices: Object.keys(devices)})
             .done(function( data ) {
                 $.each(data, function( dev_id, dev ) {
-                    let title = document.createElement("div");
-                    title.innerHTML = dev["url"];
-
-                    var this_dev = {id: dev_id, label: dev["sname"], title: title, shape: "box"};
+                    var this_dev = {id: dev_id, label: dev["sname"], shape: "box"};
                     if (dev["style"]) {
                         // Merge the style if it has been defined
                         this_dev = Object.assign(dev["style"], this_dev);
@@ -106,7 +90,7 @@ $('#netmap').height(height + 'px');
 
 // create a network
 var container = document.getElementById('netmap');
-var options = {{ Js::from($data['visoptions']) }};
+var options = {{ Js::from($visoptions) }};
 var data = {
     nodes: network_nodes,
     edges: network_edges,
@@ -114,9 +98,10 @@ var data = {
 };
 
 var network = new vis.Network(container, data, options);
+visPopups.attach(network, {ports: true});
 network.on('click', function (properties) {
     if (properties.nodes > 0) {
-       window.location.href = "{{ @url('device') }}/device="+properties.nodes+"/tab=neighbours/selection=map/"
+       window.location.href = route('device.neighbours', {device: properties.nodes[0], selection: 'map'});
     }
 });
 </script>
@@ -126,8 +111,8 @@ network.on('click', function (properties) {
 @endsection
 
 @section('javascript')
-@if($data['selection'] == 'map')
-    <script src="{{ url('js/vis-network.min.js') }}"></script>
-    <script src="{{ url('js/vis-data.min.js') }}"></script>
+@if($selection == 'map')
+    <script src="{{ asset('js/vis-network.min.js') }}"></script>
+    <script src="{{ asset('js/vis-data.min.js') }}"></script>
 @endif
 @endsection

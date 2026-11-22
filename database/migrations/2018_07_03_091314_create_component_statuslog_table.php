@@ -12,7 +12,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('component_statuslog', function (Blueprint $table) {
+        Schema::create('component_statuslog', function (Blueprint $table): void {
             $table->increments('id')->comment('ID for each log entry, unique index');
             $table->unsignedInteger('component_id')->index()->comment('id from the component table');
             $table->boolean('status')->default(0)->comment('The status that the component was changed TO');

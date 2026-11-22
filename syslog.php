@@ -8,7 +8,6 @@
  *
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
-$init_modules = [];
 require __DIR__ . '/includes/init.php';
 
 $processor = new LibreNMS\Syslog\Processor();

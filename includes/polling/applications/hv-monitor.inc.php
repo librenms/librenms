@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -7,7 +9,7 @@ $name = 'hv-monitor';
 try {
     $return_data = json_app_get($device, 'hv-monitor')['data'];
 } catch (JsonAppException $e) {
-    echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+    Log::info($name . ':' . $e->getCode() . ':' . $e->getMessage());
     update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
 
     return;
@@ -258,4 +260,8 @@ foreach ($VMs as $vm) {
 //
 $app->data = $app_data;
 unset($return_data['hv']);
-update_application($app, 'OK', data_flatten($return_data));
+$metrics = collect(Arr::dot($return_data))
+    ->reject(fn ($value) => is_array($value))
+    ->mapWithKeys(fn ($value, $key) => [str_replace('.', '_', $key) => $value])
+    ->all();
+update_application($app, 'OK', $metrics);

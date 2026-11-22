@@ -26,7 +26,9 @@ return [
         'AXIS-VIDEO-MIB::alarmNew' => LibreNMS\Snmptrap\Handlers\AxisAlarmNew::class,
         'AXIS-VIDEO-MIB::alarmSingle' => LibreNMS\Snmptrap\Handlers\AxisAlarmSingle::class,
         'BGP4-MIB::bgpBackwardTransition' => LibreNMS\Snmptrap\Handlers\BgpBackwardTransition::class,
+        'BGP4-MIB::bgpBackwardTransNotification' => LibreNMS\Snmptrap\Handlers\BgpBackwardTransition::class,
         'BGP4-MIB::bgpEstablished' => LibreNMS\Snmptrap\Handlers\BgpEstablished::class,
+        'BGP4-MIB::bgpEstablishedNotification' => LibreNMS\Snmptrap\Handlers\BgpEstablished::class,
         'BGP4-V2-MIB-JUNIPER::jnxBgpM2BackwardTransition' => LibreNMS\Snmptrap\Handlers\JnxBgpM2BackwardTransition::class,
         'BGP4-V2-MIB-JUNIPER::jnxBgpM2Established' => LibreNMS\Snmptrap\Handlers\JnxBgpM2Established::class,
         'BRIDGE-MIB::newRoot' => LibreNMS\Snmptrap\Handlers\BridgeNewRoot::class,
@@ -89,6 +91,7 @@ return [
         'ENTITY-MIB::entConfigChange' => LibreNMS\Snmptrap\Handlers\EntityDatabaseConfigChanged::class,
         'EQUIPMENT-MIB::equipStatusTrap' => LibreNMS\Snmptrap\Handlers\EquipStatusTrap::class,
         'FORTINET-FORTIGATE-MIB::fgTrapAvOversize' => LibreNMS\Snmptrap\Handlers\FgTrapAvOversize::class,
+        'FORTINET-FORTIGATE-MIB::fgTrapDhcp' => LibreNMS\Snmptrap\Handlers\FgTrapDhcp::class,
         'FORTINET-FORTIGATE-MIB::fgTrapIpsAnomaly' => LibreNMS\Snmptrap\Handlers\FgTrapIpsAnomaly::class,
         'FORTINET-FORTIGATE-MIB::fgTrapIpsPkgUpdate' => LibreNMS\Snmptrap\Handlers\FgTrapIpsPkgUpdate::class,
         'FORTINET-FORTIGATE-MIB::fgTrapIpsSignature' => LibreNMS\Snmptrap\Handlers\FgTrapIpsSignature::class,
@@ -138,6 +141,7 @@ return [
         'PowerNet-MIB::dischargeCleared' => LibreNMS\Snmptrap\Handlers\ApcDischargeCleared::class,
         'PowerNet-MIB::upsOnBattery' => LibreNMS\Snmptrap\Handlers\ApcOnBattery::class,
         'PowerNet-MIB::communicationEstablished' => LibreNMS\Snmptrap\Handlers\ApcCommunicationEstablished::class,
+        'PowerNet-MIB::communicationLost' => LibreNMS\Snmptrap\Handlers\ApcCommunicationLost::class,
         'PowerNet-MIB::powerRestored' => LibreNMS\Snmptrap\Handlers\ApcPowerRestored::class,
         'PowerNet-MIB::smartAvrReducing' => LibreNMS\Snmptrap\Handlers\ApcSmartAvrReducing::class,
         'PowerNet-MIB::smartAvrReducingOff' => LibreNMS\Snmptrap\Handlers\ApcSmartAvrReducingOff::class,
@@ -167,6 +171,12 @@ return [
         'OSPF-TRAP-MIB::ospfTxRetransmit' => LibreNMS\Snmptrap\Handlers\OspfTxRetransmit::class,
         'UPS-MIB::upsTrapOnBattery' => LibreNMS\Snmptrap\Handlers\UpsTrapOnBattery::class,
         'UPS-MIB::upsTraps.0.1' => LibreNMS\Snmptrap\Handlers\UpsTrapOnBattery::class, // apparently bad/old UPS-MIB
+        'UPS-MIB::upsTrapAlarmEntryAdded' => LibreNMS\Snmptrap\Handlers\UpsTrapAlarmEntryAdded::class,
+        'UPS-MIB::upsTraps.0.3' => LibreNMS\Snmptrap\Handlers\UpsTrapAlarmEntryAdded::class, // apparently bad/old UPS-MIB
+        'SNMPv2-SMI::mib-2.33.2.0.3' => LibreNMS\Snmptrap\Handlers\UpsTrapAlarmEntryAdded::class, // untranslated form seen from some APC NMC firmware
+        'UPS-MIB::upsTrapAlarmEntryRemoved' => LibreNMS\Snmptrap\Handlers\UpsTrapAlarmEntryRemoved::class,
+        'UPS-MIB::upsTraps.0.4' => LibreNMS\Snmptrap\Handlers\UpsTrapAlarmEntryRemoved::class, // apparently bad/old UPS-MIB
+        'SNMPv2-SMI::mib-2.33.2.0.4' => LibreNMS\Snmptrap\Handlers\UpsTrapAlarmEntryRemoved::class, // untranslated form seen from some APC NMC firmware
         'VEEAM-MIB::onBackupJobCompleted' => LibreNMS\Snmptrap\Handlers\VeeamBackupJobCompleted::class,
         'VEEAM-MIB::onVmBackupCompleted' => LibreNMS\Snmptrap\Handlers\VeeamVmBackupCompleted::class,
         'VEEAM-MIB::onLinuxFLRMountStarted' => LibreNMS\Snmptrap\Handlers\VeeamLinuxFLRMountStarted::class,

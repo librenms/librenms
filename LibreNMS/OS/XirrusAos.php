@@ -40,6 +40,7 @@ use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use SnmpQuery;
 
 class XirrusAos extends OS implements
     OSPolling,
@@ -178,7 +179,7 @@ class XirrusAos extends OS implements
 
     private function discoverSensor(WirelessSensorType $type, $oid, $oid_num_prefix)
     {
-        $names = $this->getCacheByIndex('realtimeMonitorIfaceName', 'XIRRUS-MIB');
+        $names = SnmpQuery::walk('XIRRUS-MIB::realtimeMonitorIfaceName')->pluck();
         $nf = snmpwalk_cache_oid($this->getDeviceArray(), $oid, [], 'XIRRUS-MIB');
 
         $sensors = [];
@@ -189,7 +190,7 @@ class XirrusAos extends OS implements
                 $oid_num_prefix . $index,
                 'xirrus',
                 $index,
-                $names[$index],
+                ($names[$index] ?? ''),
                 $type === WirelessSensorType::Frequency ? WirelessSensor::channelToFrequency($entry[$oid]) : $entry[$oid]
             );
         }

@@ -9,46 +9,6 @@ use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Clean;
 use LibreNMS\Util\IP;
 
-function add_service($device, $type, $desc, $ip = '', $param = '', $ignore = 0, $disabled = 0, $template_id = '', $name = '')
-{
-    // keep legacy signature, delegate to modern implementation
-    return \LibreNMS\Services::addService($device, $type, $desc, $ip, $param, $ignore, $disabled, $template_id, $name);
-}
-
-function service_get($device = null, $service = null)
-{
-    if (! is_null($service)) {
-        // Add a service filter to the SQL query.
-        $services = Service::query()->where('service_id', $service)->get();
-    } elseif (! is_null($device)) {
-        $services = Service::query()->where('device_id', $device)->get();
-    } else {
-        $services = Service::query()->get();
-    }
-
-    d_echo('Service Array: ' . print_r($services, true) . "\n");
-
-    return $services->toArray();
-}
-
-function edit_service($update = [], $service = null)
-{
-    if (! is_numeric($service)) {
-        return false;
-    }
-
-    return Service::query()->where('service_id', $service)->update($update);
-}
-
-function delete_service($service = null)
-{
-    if (! is_numeric($service)) {
-        return false;
-    }
-
-    return Service::query()->where('service_id', $service)->delete();
-}
-
 function poll_service($service)
 {
     $update = [];
@@ -147,7 +107,7 @@ function poll_service($service)
     }
 
     if (count($update) > 0) {
-        edit_service($update, $service['service_id']);
+        Service::query()->where('service_id', $service['service_id'])->update($update);
     }
 
     return true;
@@ -183,14 +143,4 @@ function check_service($command, ?callable $parser = null)
     }
 
     return [$status, $response, $metrics];
-}
-
-/**
- * List all available services from nagios plugins directory
- *
- * @return array
- */
-function list_available_services()
-{
-    return \LibreNMS\Services::list();
 }

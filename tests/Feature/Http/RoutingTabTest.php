@@ -535,6 +535,71 @@ class RoutingTabTest extends TestCase
             ->assertSee('ipv4.unicast');
     }
 
+    public function testAuthorizedUserCanRenderRoutingBgpWithInterfaceIdentifiedPeer(): void
+    {
+        // Cumulus unnumbered peers are identified by their local interface and carry the
+        // learned link-local address in bgpPeerRemoteAddr, which links the neighbour
+        $device = Device::factory()->create(['bgpLocalAs' => 65000]);
+        $peerDevice = Device::factory()->create(['hostname' => 'unnumbered-peer.local']);
+        $peerPort = \App\Models\Port::factory()->for($peerDevice)->create();
+        \App\Models\Ipv6Address::factory()->create([
+            'port_id' => $peerPort->port_id,
+            'ipv6_address' => 'fe80:0000:0000:0000:526b:4bff:fe9c:d234',
+            'ipv6_compressed' => 'fe80::526b:4bff:fe9c:d234',
+            'ipv6_prefixlen' => 64,
+        ]);
+
+        \App\Models\BgpPeer::factory()->for($device)->create([
+            'bgpPeerIdentifier' => 'swp25',
+            'bgpPeerRemoteAddr' => 'fe80::526b:4bff:fe9c:d234',
+            'bgpPeerRemoteAs' => 65025,
+            'bgpPeerState' => 'established',
+            'bgpPeerAdminStatus' => 'start',
+            'bgpPeerDescr' => 'Unnumbered-Peer',
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.routing.bgp', ['device' => $device]))
+            ->assertOk()
+            ->assertSee('swp25')
+            ->assertSee('Unnumbered-Peer')
+            ->assertSee('unnumbered-peer.local');
+    }
+
+    public function testAuthorizedUserCanRenderRoutingBgpWithAmbiguousPeerAddress(): void
+    {
+        // link-local addresses are only unique per link, so when more than one port carries
+        // the learned address the neighbour cannot be identified and no link is made
+        $device = Device::factory()->create(['bgpLocalAs' => 65000]);
+        foreach (['ambiguous-a.local', 'ambiguous-b.local'] as $hostname) {
+            $candidateDevice = Device::factory()->create(['hostname' => $hostname]);
+            $candidatePort = \App\Models\Port::factory()->for($candidateDevice)->create();
+            \App\Models\Ipv6Address::factory()->create([
+                'port_id' => $candidatePort->port_id,
+                'ipv6_address' => 'fe80:0000:0000:0000:0000:0000:0000:0001',
+                'ipv6_compressed' => 'fe80::1',
+                'ipv6_prefixlen' => 64,
+            ]);
+        }
+
+        \App\Models\BgpPeer::factory()->for($device)->create([
+            'bgpPeerIdentifier' => 'swp26',
+            'bgpPeerRemoteAddr' => 'fe80::1',
+            'bgpPeerRemoteAs' => 65026,
+            'bgpPeerState' => 'established',
+            'bgpPeerAdminStatus' => 'start',
+            'bgpPeerDescr' => 'Ambiguous-Peer',
+        ]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.routing.bgp', ['device' => $device]))
+            ->assertOk()
+            ->assertSee('swp26')
+            ->assertSee('Ambiguous-Peer')
+            ->assertDontSee('ambiguous-a.local')
+            ->assertDontSee('ambiguous-b.local');
+    }
+
     public function testAuthorizedUserCanRenderRoutingBgpWithMacAccounting(): void
     {
         $device = Device::factory()->create(['bgpLocalAs' => 65000]);
@@ -641,7 +706,7 @@ class RoutingTabTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->admin())
-            ->postJson(url('ajax/table/routes'), [
+            ->postJson(route('table.routes'), [
                 'device_id' => $device->device_id,
                 'showAllRoutes' => 'true',
                 'showProtocols' => 'all',
@@ -660,7 +725,7 @@ class RoutingTabTest extends TestCase
         \App\Models\BgpPeer::factory()->for($device)->create();
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'routing']))
+            ->get(route('device.routing', ['device' => $device]))
             ->assertRedirect(route('device.routing.bgp', ['device' => $device]));
     }
 
@@ -668,40 +733,63 @@ class RoutingTabTest extends TestCase
     {
         $device = Device::factory()->create();
 
-        $this->actingAs($this->admin())
-            ->get('/device/' . $device->device_id . '/routing/proto=ospf/')
-            ->assertRedirect(route('device.routing.ospf', ['device' => $device]));
+        $this->assertLegacyRedirect($device, '/device/' . $device->device_id . '/routing/proto=ospf/', ['proto' => 'ospf'], route('device.routing.ospf', ['device' => $device]));
     }
 
     public function testRoutingTabRedirectsWithLegacyPathAndQueryVars(): void
     {
         $device = Device::factory()->create();
 
+        $this->assertLegacyRedirect($device, '/device/' . $device->device_id . '/routing/proto=mpls/view=paths/', ['proto' => 'mpls', 'view' => 'paths'], route('device.routing.mpls', ['device' => $device, 'view' => 'paths']));
+    }
+
+    public function testRoutingTabRedirectsWithQueryProtoAndForwardsOptions(): void
+    {
+        $device = Device::factory()->create();
+
         $this->actingAs($this->admin())
-            ->get('/device/' . $device->device_id . '/routing/proto=mpls/view=paths/')
+            ->get(route('device.routing', ['device' => $device, 'proto' => 'mpls', 'view' => 'paths']))
             ->assertRedirect(route('device.routing.mpls', ['device' => $device, 'view' => 'paths']));
+    }
+
+    public function testRoutingTabQueryWinsOverLegacyPath(): void
+    {
+        $device = Device::factory()->create();
+
+        $this->assertLegacyRedirect($device, '/device/' . $device->device_id . '/routing/proto=ospf/?proto=vrf', ['proto' => 'vrf'], route('device.routing.vrf', ['device' => $device]));
     }
 
     public function testRoutingTabRedirectsWithUnderscoredProto(): void
     {
         $device = Device::factory()->create();
 
-        $this->actingAs($this->admin())
-            ->get('/device/' . $device->device_id . '/routing/proto=ipsec_tunnels/')
-            ->assertRedirect(route('device.routing.ipsec-tunnels', ['device' => $device]));
+        $this->assertLegacyRedirect($device, '/device/' . $device->device_id . '/routing/proto=ipsec_tunnels/', ['proto' => 'ipsec_tunnels'], route('device.routing.ipsec-tunnels', ['device' => $device]));
     }
 
     public function testRoutingTabRedirectsWithLegacyDeviceAndTabUrl(): void
     {
         $device = Device::factory()->create();
 
-        $this->actingAs($this->admin())
-            ->get('/device/device=' . $device->device_id . '/tab=routing/proto=cisco-otv/')
-            ->assertRedirect(route('device.routing.cisco-otv', ['device' => $device]));
+        $this->assertLegacyRedirect($device, '/device/device=' . $device->device_id . '/tab=routing/proto=cisco-otv/', ['proto' => 'cisco-otv'], route('device.routing.cisco-otv', ['device' => $device]));
+        $this->assertLegacyRedirect($device, '/device/' . $device->device_id . '/tab=routing/section=vrf/', ['section' => 'vrf'], route('device.routing.vrf', ['device' => $device]));
+    }
+
+    /**
+     * Legacy path options go to the native query url first, which then redirects to the protocol page
+     *
+     * @param  array<string, string>  $query
+     */
+    private function assertLegacyRedirect(Device $device, string $legacyUrl, array $query, string $final): void
+    {
+        $native = route('device.routing', ['device' => $device] + $query);
 
         $this->actingAs($this->admin())
-            ->get('/device/' . $device->device_id . '/tab=routing/section=vrf/')
-            ->assertRedirect(route('device.routing.vrf', ['device' => $device]));
+            ->get($legacyUrl)
+            ->assertRedirect($native);
+
+        $this->actingAs($this->admin())
+            ->get($native)
+            ->assertRedirect($final);
     }
 
     public function testUserWithoutRoutingPermissionGetsForbidden(): void

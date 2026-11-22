@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (dashes in comment lines)
   
 XXX-MIB DEFINITIONS ::= BEGIN   
 
@@ -206,7 +207,7 @@ rmtCardDesc		OBJECT-TYPE
 -- [Card Objects] --
 cardObjects		OBJECT IDENTIFIER ::= {systemMIB 4}
                   
--- --[NMU Objects] --                  
+--   [NMU Objects]                     
 nmuObjects		OBJECT IDENTIFIER ::= {cardObjects 1}
 nmuConfig		OBJECT IDENTIFIER ::= {nmuObjects 1}
 
@@ -288,7 +289,7 @@ trapHost4		OBJECT-TYPE
 				DESCRIPTION		"The fourth host's IP address used to receive trap messages"
 				::= { nmuConfig 11 }																							      
                 
--- --[MC Configuration table] --
+--   [MC Configuration table]   
 mcCmObjects		OBJECT IDENTIFIER ::= {cardObjects 2}
 
 mcCmTable		OBJECT-TYPE
@@ -639,7 +640,7 @@ mcRmtUtility	OBJECT-TYPE
 				DESCRIPTION		"Rmote cards's reset, default to factory, set to HW word, etc..."
 				::= { mcCmEntry 35 }
 
--- --[MC 1G card Specific CM table] --   
+--   [MC 1G card Specific CM table]      
 mcCm1gSpecificObjects	OBJECT IDENTIFIER ::= {mcCmObjects 2}
 
 -- -- --[MC 1G card IP table] --  
@@ -819,7 +820,7 @@ sfpVoltage		OBJECT-TYPE
 				DESCRIPTION		"SFP voltage, units of 0.1mV (one word)"
 				::= { mcCm1gSfpEntry 13 }
 
--- --[MC Performance table] --
+--   [MC Performance table]   
 mcPmObjects		OBJECT IDENTIFIER ::= {cardObjects 3}
 
 mcPmTable		OBJECT-TYPE
@@ -883,7 +884,7 @@ mcPmRest		OBJECT-TYPE
 -- ---------------------------------------------------------------------------------------------						
 -- [Trap definition] --
 
--- --[shelf alarm] -- (1~19)       
+--   [shelf alarm]    (1~19)       
 shelf-Detected	NOTIFICATION-TYPE  
 				OBJECTS  { shelfIdx }
 				STATUS  current                         
@@ -932,7 +933,7 @@ shelf-fan-Off	NOTIFICATION-TYPE
 				DESCRIPTION   "Fan A is lost"
 				::= { alarmMIB 8}  
 
--- --[card common alarm] -- (20~29)
+--   [card common alarm]    (20~29)
 card-Detected	NOTIFICATION-TYPE 
 				OBJECTS  { shelfIdx, slotIdx } 
 				STATUS  current
@@ -945,7 +946,7 @@ card-Lost		NOTIFICATION-TYPE
 				DESCRIPTION   "A card is lost"
 				::= { alarmMIB 21}
 
--- --[card specific (MC) alarm] -- (above 30)
+--   [card specific (MC) alarm]    (above 30)
 card-MC-Co-Tx-Up	NOTIFICATION-TYPE  
 				OBJECTS  { shelfIdx, slotIdx } 
 				STATUS  current

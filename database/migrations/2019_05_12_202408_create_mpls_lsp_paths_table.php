@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mpls_lsp_paths', function (Blueprint $table) {
+        Schema::create('mpls_lsp_paths', function (Blueprint $table): void {
             $table->increments('lsp_path_id');
             $table->unsignedInteger('lsp_id');
             $table->unsignedInteger('path_oid');

@@ -36,6 +36,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\View\Component;
+use LibreNMS\Enum\PollingMethodType;
 
 class PageLinks extends Component
 {
@@ -61,31 +62,26 @@ class PageLinks extends Component
         $device_links = [];
 
         if (Gate::allows('update', $device)) {
-            $suffix = 'edit';
-            $title = __('Edit');
-
             // check if metric has more specific edit page
             $path = \Request::path();
-            if (preg_match('#health/metric=(\w+)#', $path, $matches)) {
-                if ($this->editTabExists($matches[1])) {
-                    $currentTab = $matches[1];
-                } elseif ($this->editTabExists($matches[1] . 's')) {
-                    $currentTab = $matches[1] . 's';
+            $metric = request()->routeIs('device.health') ? (string) request()->query('metric') : '';
+            if ($metric !== '') {
+                if ($this->editTabUrl($device, $metric)) {
+                    $currentTab = $metric;
+                } elseif ($this->editTabUrl($device, $metric . 's')) {
+                    $currentTab = $metric . 's';
                 }
-            } elseif (preg_match('#device/\d+/ports/transceivers#', $path)) {
+            } elseif ((request()->routeIs('device.ports') && request()->query('view') === 'transceivers')
+                || preg_match('#device/\d+/ports/transceivers#', $path)) {
                 $currentTab = 'transceivers';
             }
 
-            // check if edit page exists
-            if ($this->editTabExists($currentTab)) {
-                $suffix .= "/section=$currentTab";
-                $title .= ' ' . __(ucfirst($currentTab));
-            }
+            $editUrl = $this->editTabUrl($device, $currentTab);
 
             $device_links['edit'] = [
                 'icon' => 'fa-gear',
-                'url' => route('device', [$device->device_id, $suffix]),
-                'title' => $title,
+                'url' => $editUrl ?? route('device.edit', $device->device_id),
+                'title' => $editUrl ? __('Edit') . ' ' . __(ucfirst($currentTab)) : __('Edit'),
                 'external' => false,
             ];
         }
@@ -111,10 +107,13 @@ class PageLinks extends Component
         ];
 
         // IPMI
-        if ($device->attribs->firstWhere('attrib_type', 'ipmi_hostname')) {
+        // read the hostname from the settings, the secret is not needed
+        $ipmiMethod = $device->pollingMethod(PollingMethodType::Ipmi);
+        $ipmiHostname = $ipmiMethod?->settings['hostname'] ?? $device->hostname;
+        if ($ipmiMethod?->enabled && $ipmiHostname) {
             $device_links['ipmi'] = [
                 'icon' => 'fa-microchip',
-                'url' => 'https://' . $device->attribs->firstWhere('attrib_type', 'ipmi_hostname')->attrib_value,
+                'url' => 'https://' . $ipmiHostname,
                 'title' => __('IPMI'),
                 'external' => true,
                 'onclick' => 'http_fallback(this); return false;',
@@ -145,7 +144,7 @@ class PageLinks extends Component
         if (Gate::allows('debug', \App\Models\Device::class)) {
             $device_links['capture'] = [
                 'icon' => 'fa-bug',
-                'url' => route('device', [$device->device_id, 'capture']),
+                'url' => route('device.capture', ['device' => $device]),
                 'title' => __('Capture'),
                 'external' => false,
             ];
@@ -154,11 +153,13 @@ class PageLinks extends Component
         return $device_links;
     }
 
-    private function editTabExists(string $tab): bool
+    private function editTabUrl(Device $device, string $tab): ?string
     {
-        Route::has("device.edit.$tab");
+        if (Route::has("device.edit.$tab")) {
+            return route("device.edit.$tab", $device->device_id);
+        }
 
-        return is_file(base_path("includes/html/pages/device/edit/$tab.inc.php"));
+        return null;
     }
 
     /**

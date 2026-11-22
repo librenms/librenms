@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: flash management mib
 -- Reference:
--- Version: V3.3
+-- Version: V3.5
 -- History:
 --     V1.0 initial version 2002-12-20
 --     V1.1 2004-6-15 add delete(4) to hh3cFlhOperType
@@ -55,6 +55,12 @@
 --                     and Hh3cFlashOperationStatus to support directory operation
 --                     by SongHao.
 --          2015-01-20 Added copy(8) to hh3cFlhOperType by SongHao.
+--     V3.4 2022-06-15 Added hh3cFlashTrapV2, hh3cFlashTrapV2Prefix, hh3cFlhUsageOverThreshold,
+--                     hh3cFlhUsageResume, hh3cFlashTrapInfor, hh3cFlhUsageRate,
+--                     hh3cFlhUsageRateThreshold, hh3cFlhNameForTrap by caohao.
+--     V3.5 2022-11-28 Added hh3cFlhStateSrcChassis, hh3cFlhStateSrcSlot, hh3cFlhStateSrcCpu,
+--                     hh3cFlhStateDestChassis, hh3cFlhStateDestSlot, hh3cFlhStateDestCpu,
+--                     hh3cFlhStateFailure, hh3cFlhStateResume by caohao.
 -- =================================================================
 HH3C-FLASH-MAN-MIB DEFINITIONS ::= BEGIN
 
@@ -77,7 +83,7 @@ IMPORTS
 
 
 hh3cFlash MODULE-IDENTITY
-    LAST-UPDATED "201501200808Z"
+    LAST-UPDATED "202211280000Z"
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -89,6 +95,16 @@ hh3cFlash MODULE-IDENTITY
         "This MIB contains objects to manage flash cards and flash
         card operations.
         There are no constraints on this MIB."
+    REVISION "202211280000Z"
+    DESCRIPTION
+        "Added hh3cFlhStateSrcChassis, hh3cFlhStateSrcSlot, hh3cFlhStateSrcCpu,
+        hh3cFlhStateDestChassis, hh3cFlhStateDestSlot, hh3cFlhStateDestCpu,
+        hh3cFlhStateFailure, hh3cFlhStateResume."
+    REVISION "202206150000Z"
+    DESCRIPTION
+        "Added hh3cFlashTrapV2, hh3cFlashTrapV2Prefix,hh3cFlhUsageOverThreshold,
+        hh3cFlhUsageResume, hh3cFlashTrapInfor, hh3cFlhUsageRate,
+        hh3cFlhUsageRateThreshold, hh3cFlhNameForTrap."
     REVISION "201501200808Z"
     DESCRIPTION
         "Added copy(8) to hh3cFlhOperType."
@@ -1330,6 +1346,112 @@ hh3cFlhOperNotification NOTIFICATION-TYPE
         "
     ::= { hh3cFlashNotification 1 }
 
+hh3cFlashTrapV2 OBJECT IDENTIFIER ::= { hh3cFlashManMIBObjects 4 }
+hh3cFlashTrapV2Prefix OBJECT IDENTIFIER ::= { hh3cFlashTrapV2 0 }
+
+hh3cFlhUsageOverThreshold NOTIFICATION-TYPE
+    OBJECTS { hh3cFlhUsageRate, hh3cFlhUsageRateThreshold, hh3cFlhNameForTrap }
+    STATUS current
+    DESCRIPTION
+        "The disk usage exceeded the threshold."
+    ::= { hh3cFlashTrapV2Prefix 1 }
+
+hh3cFlhUsageResume NOTIFICATION-TYPE
+    OBJECTS { hh3cFlhUsageRate, hh3cFlhUsageRateThreshold, hh3cFlhNameForTrap }
+    STATUS current
+    DESCRIPTION
+        "The disk usage dropped below the threshold."
+    ::= { hh3cFlashTrapV2Prefix 2 }
+
+hh3cFlhStateFailure NOTIFICATION-TYPE
+    OBJECTS { hh3cFlhStateSrcChassis, hh3cFlhStateSrcSlot, hh3cFlhStateSrcCpu,
+              hh3cFlhStateDestChassis, hh3cFlhStateDestSlot, hh3cFlhStateDestCpu }
+    STATUS current
+    DESCRIPTION
+        "The filesystem state is failure."
+    ::= { hh3cFlashTrapV2Prefix 3 }
+
+hh3cFlhStateResume NOTIFICATION-TYPE
+    OBJECTS { hh3cFlhStateSrcChassis, hh3cFlhStateSrcSlot, hh3cFlhStateSrcCpu,
+              hh3cFlhStateDestChassis, hh3cFlhStateDestSlot, hh3cFlhStateDestCpu }
+    STATUS current
+    DESCRIPTION
+        "The filesystem state is resume."
+    ::= { hh3cFlashTrapV2Prefix 4 }
+
+hh3cFlashTrapInfor OBJECT IDENTIFIER ::= { hh3cFlashManMIBObjects 5 }
+
+hh3cFlhUsageRate OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Disk usage"
+    ::= { hh3cFlashTrapInfor 1}
+
+hh3cFlhUsageRateThreshold OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Disk usage threshold"
+    ::= { hh3cFlashTrapInfor 2}
+
+hh3cFlhNameForTrap OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Disk name."
+    ::= { hh3cFlashTrapInfor 3}
+
+hh3cFlhStateSrcChassis OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Src chassis"
+    ::= { hh3cFlashTrapInfor 4}
+
+hh3cFlhStateSrcSlot OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Src slot"
+    ::= { hh3cFlashTrapInfor 5}
+
+hh3cFlhStateSrcCpu OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Src cpu"
+    ::= { hh3cFlashTrapInfor 6}
+
+hh3cFlhStateDestChassis OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Dest chassis"
+    ::= { hh3cFlashTrapInfor 7}
+
+hh3cFlhStateDestSlot OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Dest slot"
+    ::= { hh3cFlashTrapInfor 8}
+
+hh3cFlhStateDestCpu OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Dest cpu"
+    ::= { hh3cFlashTrapInfor 9}
 
 hh3cFlashMIBConformance OBJECT IDENTIFIER ::= { hh3cFlash 2 }
 

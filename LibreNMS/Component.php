@@ -75,6 +75,11 @@ class Component
         }
     }
 
+    /**
+     * Components with their prefs, grouped by device_id then keyed by component id
+     *
+     * @return array<int, array<int, array<string, mixed>>>
+     */
     public function getComponents($device_id = null, $options = [])
     {
         $query = \App\Models\Component::query()
@@ -215,12 +220,13 @@ class Component
     public function setComponentPrefs($device_id, $updated)
     {
         $updated = Arr::wrap($updated);
-        \App\Models\Component::whereIntegerInRaw('id', array_keys($updated))
+        \App\Models\Component::where('device_id', $device_id)
+            ->whereIntegerInRaw('id', array_keys($updated))
             ->with('prefs')
             ->get()
             ->each(function (\App\Models\Component $component) use ($device_id, $updated): void {
                 $update = $updated[$component->id];
-                unset($update['type']);  // can't change type
+                unset($update['type'], $update['device_id']);  // can't change type or device
 
                 // update component attributes
                 $component->fill($update);

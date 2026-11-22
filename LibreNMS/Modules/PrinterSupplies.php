@@ -29,14 +29,14 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\PrinterSuppliesContext;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
@@ -44,6 +44,7 @@ use SnmpQuery;
 class PrinterSupplies implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     /**
      * @inheritDoc
@@ -53,9 +54,9 @@ class PrinterSupplies implements Module
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function pollingMethods(Device $device): array
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return [PollingMethodType::Snmp];
     }
 
     /**
@@ -79,11 +80,6 @@ class PrinterSupplies implements Module
         $papers = $this->discoveryPapers($contexts);
         $this->syncModelsByGroup($device, 'printerSupplies', $papers, ['supply_type' => 'input']);
         ModuleModelObserver::done();
-    }
-
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
-    {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
     }
 
     /**
@@ -211,13 +207,8 @@ class PrinterSupplies implements Module
 
             $last_index = substr((string) $index, strrpos((string) $index, '.') + 1);
 
-            $descr = $data['prtMarkerSuppliesDescription'];
-
-            // Decode hex-encoded non-ASCII descriptions (e.g. UTF-8 CJK characters from Fujitsu/Ricoh/Kyocera printers)
-            // When using -OQUs without -a flag, net-snmp returns non-ASCII strings as hex (e.g. "E9 BB 91 E8 89 B2")
-            if (preg_match('/^([A-Fa-f\d]{2} )*[A-Fa-f\d]{2}\s*$/', (string) $descr)) {
-                $descr = (string) hex2bin(str_replace([' 00', ' '], '', (string) $descr));
-            }
+            // Decode non-ASCII descriptions net-snmp returns as hex (e.g. UTF-8 CJK characters from Fujitsu/Ricoh/Kyocera printers)
+            $descr = StringHelpers::decodeSnmpHexText((string) $data['prtMarkerSuppliesDescription']);
             $raw_capacity = $data['prtMarkerSuppliesMaxCapacity'];
             $raw_toner = $data['prtMarkerSuppliesLevel'];
             $supply_oid = ".1.3.6.1.2.1.43.11.1.1.9.$index";

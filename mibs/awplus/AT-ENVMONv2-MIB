@@ -21,7 +21,7 @@
 
 
         atEnvMonv2 MODULE-IDENTITY
-            LAST-UPDATED "201610300000Z"
+            LAST-UPDATED "201808090000Z"
             ORGANIZATION
                 "Allied Telesis, Inc"
             CONTACT-INFO
@@ -30,6 +30,11 @@
                 "The AT Environment Monitoring v2 MIB for managing and
                 reporting data relating to voltage rails, fan speeds,
                 temperature sensors and power supply units."
+            REVISION "201808090000Z"
+            DESCRIPTION
+                "Add notification for PSU bay presence changes.
+                 Add PSU presence sensors to PSB sensor table.
+                 Add associated types and states for presence sensors."
             REVISION "201610300000Z"
             DESCRIPTION
                 "Swapped external PSU status failed/good states"
@@ -93,7 +98,8 @@
                 psbSensorTypeInvalid(0),
                 fanSpeedDiscrete(1),
                 temperatureDiscrete(2),
-                voltageDiscrete(3)
+                voltageDiscrete(3),
+                presenceDiscrete(4)
                 }
 
 
@@ -290,6 +296,16 @@
                 returns to an acceptable value, having previously been in
                 critical temperature level 2 condition."
             ::= { atEnvMonv2Notifications 18 }
+
+
+        atEnvMonv2PsbPresenceChangeNotify NOTIFICATION-TYPE
+            OBJECTS { atEnvMonv2PsbSensorStackMemberId, atEnvMonv2PsbSensorBoardIndex, atEnvMonv2PsbSensorIndex, atEnvMonv2PsbSensorType, atEnvMonv2PsbSensorDescription, atEnvMonv2PsbSensorReading
+                 }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when an insertion or removal
+                 event is detected on a power supply bay device."
+            ::= { atEnvMonv2Notifications 19 }
 
 -- ---------------------------------------------------------- --
 -- The Environment Monitoring Fan Table
@@ -859,7 +875,8 @@
                 {
                 failed(1),
                 good(2),
-                notPowered(3)
+                notPowered(3),
+                notPresent(4)
                 }
             MAX-ACCESS read-only
             STATUS current
@@ -867,7 +884,10 @@
                 "An indication of whether this environmental sensor is currently
                 in an alarm condition. A value of 'failed(1)' indicates that
                 the device is in a failure condition, 'good(2)' indicates that
-                the device is functioning normally."
+                the device is functioning normally. 'notPowered(3)' indicates that
+                the PSU power input sensor for this PSU is showing no input power.
+                notPresent(4) indicates that the presence sensor for this PSU
+                indicates that the PSU is not present."
             ::= { atEnvMonv2PsbSensorEntry 6 }
 
 

@@ -4,7 +4,6 @@ return [
     'custom' => [
         'title' => [
             'edit_dialog' => '편집할 사용자 정의 맵 선택',
-            'create' => '새 사용자 정의 맵 만들기',
             'view' => ':name | 사용자 정의 맵',
             'edit' => '사용자 정의 맵 편집',
             'manage' => '사용자 정의 맵 관리',

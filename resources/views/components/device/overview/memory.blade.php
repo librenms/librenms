@@ -1,6 +1,6 @@
 @if($mempools !== [])
     <x-device.overview.panel :title="__('Memory')" icon="fas fa-memory"
-        :href="route('device', ['device' => $device->device_id, 'tab' => 'health', 'vars' => 'metric=mempool'])">
+        :href="route('device.health', ['device' => $device->device_id, 'metric' => 'mempool'])">
         <div class="tw:divide-y tw:divide-gray-300 tw:dark:divide-zinc-800">
             <div class="tw:p-2">
                 <x-graph type="device_mempool" :device="$device" aspect="wide" :columns="['md' => 2]" class="tw:w-full" img-class="tw:w-full tw:h-auto"

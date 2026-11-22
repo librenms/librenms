@@ -33,8 +33,6 @@ class AlertOperationSegment extends BaseModel
         'step_duration_seconds',
     ];
 
-    protected $casts = [];
-
     /**
      * @return BelongsTo<AlertOperation, $this>
      */

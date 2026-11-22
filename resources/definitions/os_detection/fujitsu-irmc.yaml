@@ -1,7 +1,7 @@
 os: fujitsu-irmc
 text: 'FUJITSU iRMC'
 icon: fujitsu
-type: appliance
+type: management
 mib_dir: fujitsu
 discovery:
     -

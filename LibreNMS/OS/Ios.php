@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Discovery\Neighbors\NeighborParser;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
@@ -52,6 +53,24 @@ class Ios extends Cisco implements
 {
     use CiscoCellular;
     use CiscoPortSecurity;
+
+    /**
+     * IE-3300 sends lldpLocPortId as port-<port>-<module>, module 0 is Gi1/x
+     */
+    protected function lldpLocalPortId(int $lldpPortNum): ?int
+    {
+        $portId = NeighborParser::parseText($this->lldpLocPortTable()[$lldpPortNum]['lldpLocPortId'] ?? '');
+
+        if (preg_match('/^port-(\d+)-(\d+)$/', $portId, $matches)) {
+            $port = $this->lldpLocalPorts()->byName(sprintf('Gi%d/%d', $matches[2] + 1, $matches[1]));
+
+            if ($port) {
+                return $port->port_id;
+            }
+        }
+
+        return parent::lldpLocalPortId($lldpPortNum);
+    }
 
     /**
      * @return WirelessSensor[] Sensors

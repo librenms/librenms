@@ -10,5 +10,3 @@ discovery:
     -
         sysDescr:
             - 'Versa Appliance'
-discovery_modules:
-    vrf: true

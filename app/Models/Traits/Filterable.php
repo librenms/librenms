@@ -3,6 +3,7 @@
 namespace App\Models\Traits;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -126,7 +127,9 @@ trait Filterable
     }
 
     /**
-     * @param  Builder<static>  $query
+     * @template TModel of Model
+     *
+     * @param  Builder<TModel>  $query
      * @param  string  $field
      * @param  scalar|scalar[]  $value
      * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
@@ -209,7 +212,7 @@ trait Filterable
      * @return array{
      * filter: list<string>,
      * 'filter.*': array{0: string, 1: string, 2: \Closure(string, mixed, \Closure(string): void): void},
-     * 'filter.*.*': list<string>
+     * 'filter.*.*': array{0: string, 1: string, 2: \Closure(string, mixed, \Closure(string): void): void}
      * }
      */
     public static function filterValidationRules(): array
@@ -226,7 +229,17 @@ trait Filterable
                     }
                 },
             ],
-            'filter.*.*' => ['nullable', 'max:255'],
+            'filter.*.*' => [
+                'nullable',
+                'max:255',
+                function ($attribute, $value, $fail): void {
+                    // only set operators take a list, and only a flat list of scalars
+                    $isSet = static::$operatorMap[Str::afterLast($attribute, '.')]['set'] ?? false;
+                    if (is_array($value) ? (! $isSet || ! empty(array_filter($value, fn ($v) => ! is_scalar($v)))) : ! is_scalar($value)) {
+                        $fail("The $attribute value is invalid.");
+                    }
+                },
+            ],
         ];
     }
 }

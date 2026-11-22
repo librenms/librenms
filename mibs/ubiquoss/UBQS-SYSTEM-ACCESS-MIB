@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP)
 -- *****************************************************************
 -- UBQS-SYSTEM-ACCESS-MIB
 --
@@ -523,14 +524,7 @@ ubiSystemAccessMIBCompliance MODULE-COMPLIANCE
                           
                           
 -- units of conformance
-ubiUserManagementGroup OBJECT-GROUP
-        OBJECTS {       
-    	}
-        STATUS  current
-        DESCRIPTION
-                "A collection of objects containing
-        		 information about user."
-        ::= { ubiSystemAccessMIBGroups 1 }
+ubiUserManagementGroup OBJECT IDENTIFIER ::= { ubiSystemAccessMIBGroups 1 }
           
  END
  

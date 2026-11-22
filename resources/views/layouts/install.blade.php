@@ -30,6 +30,34 @@
             font-size: 24px;
             line-height: 1.7;
             box-shadow: 2px 2px 4px grey;
+            position: relative;
+        }
+
+        @keyframes step-pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7), 2px 2px 4px grey;
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(0, 123, 255, 0), 2px 2px 4px grey;
+                transform: scale(1.08);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(0, 123, 255, 0), 2px 2px 4px grey;
+                transform: scale(1);
+            }
+        }
+
+        .btn-circle.step-next {
+            animation: step-pulse 2s infinite ease-in-out;
+            z-index: 2;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .btn-circle.step-next {
+                animation: none;
+                box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.5), 2px 2px 4px grey;
+            }
         }
 
         .card-img-top {
@@ -102,7 +130,11 @@
                         <a href="{{ route('install.' . $name) }}"
                            id="install-step-{{ $name }}"
                            class="install-step btn btn-circle
-                           @if($step === $name) btn-outline-info @else btn-info @endif
+                           @if($step === $name)
+                               @if($primary_step === $name) btn-outline-primary @else btn-outline-info @endif
+                           @else
+                               @if($primary_step === $name) btn-primary step-next @else btn-info @endif
+                           @endif
                            @if(!$controller->enabled()) disabled @endif"
                            title="{{ __("install.$name.title") }}"
                         >
@@ -139,7 +171,7 @@
             .done(function (data) {
                 var primary;
                 Object.keys(data).forEach(function (key) {
-                    var classes = 'btn btn-circle';
+                    var classes = 'install-step btn btn-circle';
                     classes += (key === step ? ' btn-outline-info' : ' btn-info');
 
                     // mark buttons enabled
@@ -157,7 +189,7 @@
                     $('#install-step-' + primary)
                         .removeClass('btn-info')
                         .removeClass('btn-outline-info')
-                        .addClass(primary === step ? 'btn-outline-primary' : 'btn-primary');
+                        .addClass(primary === step ? 'btn-outline-primary' : 'btn-primary step-next');
                 }
 
                 if (callback && typeof callback === "function") {

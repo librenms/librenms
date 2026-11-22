@@ -43,7 +43,7 @@ interface ConfigBackupProvider
     public function name(): string;
 
     /**
-     * @return array{backups: list<array{id: string, date: ?int, until: ?int, type: string, content: ?string}>, total: int, totalPages: int, page: int}|null
+     * @return array{backups: list<array{id: string, date: ?int, until: ?int, type: string, content: ?string, author?: ?string}>, total: int, totalPages: int, page: int}|null
      */
     public function backups(Device $device, int $page = 0): ?array;
 

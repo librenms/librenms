@@ -4,7 +4,6 @@ return [
     'custom' => [
         'title' => [
             'edit_dialog' => 'Välj anpassad karta att redigera',
-            'create' => 'Skapa ny anpassad karta',
             'view' => ':name | Anpassad karta',
             'edit' => 'Redigera anpassad karta',
             'manage' => 'Hantera anpassade kartor',
@@ -91,7 +90,6 @@ return [
                 ],
                 'legend_title' => 'Förklaringsinställningar',
                 'legend_toggle' => 'Visa eller dölj förklaringen',
-                'zoom' => 'Panorera och zooma',
                 'dragnodes' => 'Flytta noder',
                 'physics' => 'Fysikmotor',
             ],

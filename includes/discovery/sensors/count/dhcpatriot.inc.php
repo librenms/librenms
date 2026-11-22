@@ -7,6 +7,8 @@
  *
 */
 
+use LibreNMS\Enum\SensorType;
+
 $oids = [
     0 => [
         'type' => 'dhcpatriotDatabaseThreads',
@@ -35,7 +37,6 @@ $oids = [
     ],
 ];
 
-$class = 'count';
 $divisor = 1;
 $multiplier = 1;
 $low_limit = null;
@@ -70,7 +71,7 @@ foreach ($oids as $index => $entry) {
     if (! empty($current) && $current !== 'FULL:0') {
         discover_sensor(
             null,
-            $class,
+            SensorType::Count,
             $device,
             $oid,
             $index,
@@ -92,4 +93,4 @@ foreach ($oids as $index => $entry) {
     }
 }
 
-unset($oids, $current_time, $class, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $poller_type, $entPhysicalIndex, $entPhysicalIndex_measured, $user_func, $group, $oid, $type, $descr, $current, $epoch_time);
+unset($oids, $current_time, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $poller_type, $entPhysicalIndex, $entPhysicalIndex_measured, $user_func, $group, $oid, $type, $descr, $current, $epoch_time);

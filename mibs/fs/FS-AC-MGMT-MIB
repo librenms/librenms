@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (SIZE on INTEGER)
 -- *******************************************************************
 -- FS-AC-MGMT-MIB.mib : FS AC MGMT MIB file
 -- January 2009, huangyuanbo
@@ -3103,7 +3104,7 @@ fsApWiredPort  OBJECT-TYPE
 	::= { fsApWiredEntry 2}
 	
 fsApWiredVlanId OBJECT-TYPE
-	SYNTAX  INTEGER (SIZE (0..4094))
+	SYNTAX  INTEGER (0..4094)
     MAX-ACCESS  read-write
     STATUS  current
     DESCRIPTION

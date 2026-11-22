@@ -35,7 +35,7 @@ class Plugin extends BaseModel
     protected $fillable = ['plugin_name', 'plugin_active', 'version', 'settings'];
 
     /**
-     * @return array{plugin_active: 'bool', settings: 'array'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {

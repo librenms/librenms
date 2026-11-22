@@ -77,12 +77,17 @@ Route::prefix('v0')->group(function (): void {
         Route::post('port_groups/{port_group_id}/remove', [App\Api\Controllers\LegacyApiController::class, 'remove_port_group'])->name('remove_port_group')->middleware('can:update,App\Models\PortGroup');
     });
 
-    // Alerts
+    // Faults
     Route::middleware(['can:viewAny,App\Models\Alert'])->group(function (): void {
-        Route::get('alerts/{id}', [App\Api\Controllers\LegacyApiController::class, 'list_alerts'])->name('get_alert');
-        Route::get('alerts', [App\Api\Controllers\LegacyApiController::class, 'list_alerts'])->name('list_alerts');
-        Route::put('alerts/{id}', [App\Api\Controllers\LegacyApiController::class, 'ack_alert'])->name('ack_alert')->middleware('can:update,App\Models\Alert');
-        Route::put('alerts/unmute/{id}', [App\Api\Controllers\LegacyApiController::class, 'unmute_alert'])->name('unmute_alert')->middleware('can:update,App\Models\Alert');
+        Route::get('faults/{id}', [App\Api\Controllers\LegacyApiController::class, 'list_alerts'])->name('get_alert');
+        Route::get('faults', [App\Api\Controllers\LegacyApiController::class, 'list_alerts'])->name('list_alerts');
+        Route::put('faults/{id}', [App\Api\Controllers\LegacyApiController::class, 'ack_alert'])->name('ack_alert')->middleware('can:update,App\Models\Alert');
+        Route::put('faults/unmute/{id}', [App\Api\Controllers\LegacyApiController::class, 'unmute_alert'])->name('unmute_alert')->middleware('can:update,App\Models\Alert');
+        // Legacy aliases
+        Route::get('alerts/{id}', [App\Api\Controllers\LegacyApiController::class, 'list_alerts']);
+        Route::get('alerts', [App\Api\Controllers\LegacyApiController::class, 'list_alerts']);
+        Route::put('alerts/{id}', [App\Api\Controllers\LegacyApiController::class, 'ack_alert'])->middleware('can:update,App\Models\Alert');
+        Route::put('alerts/unmute/{id}', [App\Api\Controllers\LegacyApiController::class, 'unmute_alert'])->middleware('can:update,App\Models\Alert');
     });
 
     // Alert Rules
@@ -147,7 +152,7 @@ Route::prefix('v0')->group(function (): void {
             Route::get('{hostname}/ports/{ifname}', [App\Api\Controllers\LegacyApiController::class, 'get_port_stats_by_port_hostname'])->name('get_port_stats_by_port_hostname')->where('ifname', '.*');
             Route::get('{hostname}/ports/{ifname}/{type}', [App\Api\Controllers\LegacyApiController::class, 'get_graph_by_port_hostname'])->name('get_graph_by_port_hostname');
             Route::get('{hostname}/services/{id}/graphs/{datasource}', [App\Api\Controllers\LegacyApiController::class, 'get_graph_by_service'])->name('get_graph_by_service');
-            Route::post('{hostname}/eventlog', [App\Api\Controllers\LegacyApiController::class, 'add_eventlog'])->name('add_eventlog');
+            Route::post('{hostname}/eventlog', [App\Api\Controllers\LegacyApiController::class, 'add_eventlog'])->name('add_eventlog')->middleware('can:create,App\Models\Eventlog');
             Route::get('{hostname}/{type}', [App\Api\Controllers\LegacyApiController::class, 'get_graph_generic_by_hostname'])->name('get_graph_generic_by_hostname');
             Route::get('', [App\Api\Controllers\LegacyApiController::class, 'list_devices'])->name('list_devices');
         });
@@ -166,6 +171,10 @@ Route::prefix('v0')->group(function (): void {
             Route::post('{hostname}/maintenance', [App\Api\Controllers\LegacyApiController::class, 'maintenance_device'])->name('maintenance_device');
             Route::post('{id}/parents', [App\Api\Controllers\LegacyApiController::class, 'add_parents_to_host'])->name('add_parents_to_host');
             Route::delete('{id}/parents', [App\Api\Controllers\LegacyApiController::class, 'del_parents_from_host'])->name('del_parents_from_host');
+        });
+
+        Route::middleware('can:update,App\Models\Port')->group(function (): void {
+            Route::patch('{hostname}/port/{portid}', [App\Api\Controllers\LegacyApiController::class, 'update_device_port_notes'])->name('update_device_port_notes');
         });
 
         Route::middleware('can:create,App\Models\Component')->group(function (): void {
@@ -202,7 +211,6 @@ Route::prefix('v0')->group(function (): void {
             Route::get('{portid}/description', [App\Api\Controllers\LegacyApiController::class, 'get_port_description'])->name('get_port_description');
         });
         Route::middleware('can:update,App\Models\Port')->group(function (): void {
-            Route::patch('transceiver/metric/{metric}', [App\Api\Controllers\LegacyApiController::class, 'update_transceiver_metric_thresholds'])->name('update_transceiver_metric_thresholds');
             Route::patch('{portid}/description', [App\Api\Controllers\LegacyApiController::class, 'update_port_description'])->name('update_port_description');
         });
     });

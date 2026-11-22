@@ -13,14 +13,14 @@
                     [__('Down'), $device->ports_down_count, 'lnms-btn-danger', ['state' => ['eq' => 'down'], 'ignore' => ['eq' => 0], 'disabled' => ['eq' => 0], 'deleted' => ['eq' => 0]]],
                     [__('Disabled'), $device->ports_disabled_count, 'lnms-btn-primary', ['disabled' => ['eq' => 1]]],
                 ] as [$label, $count, $class, $filter])
-                    <a class="lnms-btn {{ $class }}" role="button" href="{{ route('device', ['device' => $device->device_id, 'tab' => 'ports', 'filter' => $filter]) }}">
+                    <a class="lnms-btn {{ $class }}" role="button" href="{{ route('device.ports', ['device' => $device->device_id, 'filter' => $filter]) }}">
                         {{ $label }}: <span class="lnms-btn-badge">{{ $count }}</span>
                     </a>
                 @endforeach
             </div>
             <div class="tw:flex tw:flex-wrap tw:gap-x-1 tw:px-2 tw:py-1 tw:bg-neutral-100 tw:dark:bg-dark-gray-200">
                 @foreach($ports as $port)
-                    <x-port-link :port="$port">{{ strtolower($port->getShortLabel()) }}</x-port-link>@if(! $loop->last),@endif
+                    {!! \LibreNMS\Util\Url::modernPortLink($port, strtolower($port->getShortLabel())) !!}@if(! $loop->last),@endif
                 @endforeach
             </div>
         </div>

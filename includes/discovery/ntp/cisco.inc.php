@@ -12,7 +12,9 @@
  * the source code distribution for details.
  */
 
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\ProgressList;
 
 $module = 'ntp';
 
@@ -37,7 +39,7 @@ $cntpPeersVarEntry = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.168.1.2.1.1',
  */
 if (is_null($cntpPeersVarEntry)) {
     // We have to error here or we will end up deleting all our components.
-    echo "Error\n";
+    Log::info('Error');
 } else {
     // No Error, lets process things.
     d_echo("Objects Found:\n");
@@ -66,6 +68,7 @@ if (is_null($cntpPeersVarEntry)) {
         $tblComponents[] = $result;
     }
 
+    $progress = ProgressList::start('NTP peers');
     /*
      * Ok, we have our 2 array's (Components and SNMP) now we need
      * to compare and see what needs to be added/updated.
@@ -87,11 +90,11 @@ if (is_null($cntpPeersVarEntry)) {
             $new_component = $component->createComponent($device['device_id'], $module);
             $component_key = key($new_component);
             $components[$component_key] = array_merge($new_component[$component_key], $array);
-            echo '+';
+            $progress->mark('+');
         } else {
             // The component does exist, merge the details in - UPDATE.
             $components[$component_key] = array_merge($components[$component_key], $array);
-            echo '.';
+            $progress->mark('.');
         }
     }
 
@@ -111,14 +114,14 @@ if (is_null($cntpPeersVarEntry)) {
 
         if ($found === false) {
             // The component has not been found. we should delete it.
-            echo '-';
+            $progress->mark('-');
             $component->deleteComponent($key);
         }
     }
 
     // Write the Components back to the DB.
     $component->setComponentPrefs($device['device_id'], $components);
-    echo "\n";
+    $progress->end();
 } // End if not error
 
 $module = strtolower($module);

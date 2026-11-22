@@ -7,6 +7,7 @@ use Closure;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdExecutableNotFoundException;
+use LibreNMS\Util\Binaries;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\Process;
@@ -15,28 +16,25 @@ class RrdProcess
 {
     const COMMAND_COMPLETE = 'OK u:';
 
-    private readonly string $rrdcached;
     private readonly string $rrd_dir;
-    private readonly InputStream $input;
+    private InputStream $input;
 
     private ?Process $process = null;
     private Closure $processFactory;
+    private float $lastUsed = 0;
 
-    public function __construct(private readonly LoggerInterface $logger, private readonly int $timeout = 300, ?Closure $processFactory = null)
+    public function __construct(private readonly LoggerInterface $logger, Binaries $binaries, private readonly int $timeout = 300, ?Closure $processFactory = null, ?string $timezone = null)
     {
-        $this->rrdcached = (string) LibrenmsConfig::get('rrdcached', '');
         $this->rrd_dir = Str::finish(LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd'), '/');
-        $this->input = new InputStream();
-
         // set up process factory
         if ($processFactory === null) {
-            $command = [LibrenmsConfig::get('rrdtool', 'rrdtool'), '-'];
+            $command = [$binaries->path('rrdtool'), '-'];
             $env = ['LC_ALL' => 'C']; // force english/standard output
             if (LibrenmsConfig::get('rrdcached', '')) {
                 $env['RRDCACHED_ADDRESS'] = LibrenmsConfig::get('rrdcached', '');
             }
-            if (session('preferences.timezone')) {
-                $env['TZ'] = session('preferences.timezone');
+            if ($timezone) {
+                $env['TZ'] = $timezone;
             }
             $this->processFactory = fn () => new Process(
                 command: $command,
@@ -50,12 +48,21 @@ class RrdProcess
 
     public function start(): void
     {
+        // the idle timeout counts time between commands, so replace a process that sat idle
+        // for half of it to leave the next command enough time before it is killed
+        if ($this->process?->isRunning() && microtime(true) - $this->lastUsed > $this->timeout / 2) {
+            $this->stop();
+        }
+
         if ($this->process === null || ! $this->process->isRunning()) {
+            // fresh input so nothing left unread by a stopped process (like quit) reaches the new one
+            $this->input = new InputStream();
             $this->process = ($this->processFactory)();
             $this->process->setInput($this->input);
             $this->process->setTimeout($this->timeout);
             $this->process->setIdleTimeout($this->timeout);
             $this->process->start();
+            $this->lastUsed = microtime(true);
         }
     }
 
@@ -112,14 +119,10 @@ class RrdProcess
     {
         $this->start();
 
-        // clean directory path when using rrdcached
-        if ($this->rrdcached) {
-            $command = str_replace($this->rrd_dir, '', $command);
-        }
-
         $this->logger->debug("RRD[%g$command%n]", ['color' => true]);
         $this->process->clearOutput();
         $this->input->write("$command\n");
+        $this->lastUsed = microtime(true);
     }
 
     public function __destruct()

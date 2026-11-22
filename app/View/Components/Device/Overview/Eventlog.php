@@ -6,7 +6,7 @@ use App\Models\Device;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
-use LibreNMS\Enum\Severity;
+use LibreNMS\Util\Html;
 
 class Eventlog extends Component
 {
@@ -26,15 +26,8 @@ class Eventlog extends Component
     ) {
         $this->rows = $eventlogs->map(fn (\App\Models\Eventlog $entry): array => [
             'entry' => $entry,
-            'severityClass' => match ($entry->severity) {
-                Severity::Ok => 'label-success',
-                Severity::Error => 'label-danger',
-                Severity::Info => 'label-info',
-                Severity::Notice => 'label-primary',
-                Severity::Warning => 'label-warning',
-                default => 'label-default',
-            },
-            'port' => $entry->type === 'interface' ? $ports->get($entry->reference) : null,
+            'severityClass' => Html::severityClass($entry->severity),
+            'port' => $entry->type === 'interface' && $entry->reference !== null ? $ports->get((int) $entry->reference) : null,
         ])->values()->all();
     }
 

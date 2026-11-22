@@ -1,0 +1,193 @@
+-- MIB module defining SNMPv2 traps for the TS4300 IBM tape library.
+IBM-TS4300-MIB DEFINITIONS ::= BEGIN
+
+
+-- Imports from other sources that are used in this MIB module.
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, enterprises, Integer32
+                FROM SNMPv2-SMI         -- RFC1902
+
+        DisplayString
+                FROM SNMPv2-TC          -- RFC1903
+
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF;       -- RFC1904
+
+
+-- Module identification.
+ibmTS4300 MODULE-IDENTITY
+        LAST-UPDATED    "201706020000Z"   -- June 02, 2017
+        ORGANIZATION    "IBM RMSS - 3584 Development"
+        CONTACT-INFO    "IBM Help"
+                        
+        DESCRIPTION     "Initial MIB release for TS4300"
+        REVISION        "201706020000Z"    -- June 02, 2017
+                
+        DESCRIPTION     "Initial revision of this module."
+
+        ::= { ibmProd 263 }
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Tree structure ID setup
+
+ibm OBJECT IDENTIFIER
+        ::= { enterprises 2 }
+
+ibmProd OBJECT IDENTIFIER
+        ::= { ibm 6 }
+
+--ibmTS4300 OBJECT IDENTIFIER
+--        ::= { ibmProd 263 }
+
+ibmTS4300MIB OBJECT IDENTIFIER
+        ::= { ibmTS4300 1 }
+
+ibmTS4300MIBTraps OBJECT IDENTIFIER
+        ::= { ibmTS4300MIB 0 }
+
+ibmTS4300MIBAdmin OBJECT IDENTIFIER
+        ::= { ibmTS4300MIB 1 }
+
+ibmTS4300MIBObjects OBJECT IDENTIFIER
+        ::= { ibmTS4300MIB 2 }
+
+ibmTS4300MIBConformance OBJECT IDENTIFIER
+        ::= { ibmTS4300MIB 3 }
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Specific trap object setup
+
+-- Machine type, model number, library serial number ID
+ibmTS4300MIBGroupMTMNLSN OBJECT IDENTIFIER
+        ::= { ibmTS4300MIBObjects 11 }
+
+-- Event code, description and type
+ibmTS4300MIBGroupEvent OBJECT IDENTIFIER
+        ::= { ibmTS4300MIBObjects 21 }
+
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Trap object definitions
+
+-- Machine type, model number, library serial number definition
+-- Size is 14 plus one space b/n MT and MN and one space b/n MN and LSN
+ibmTS4300MIBObjectsMTMNLSN OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..16))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This is the machine type associated with the trap."
+        ::= { ibmTS4300MIBGroupMTMNLSN 1 }
+
+-- Event code
+ibmTS4300MIBObjectsEventCode OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This is the event code of the event that occured."
+        ::= { ibmTS4300MIBGroupEvent 1 }
+
+-- Event description
+ibmTS4300MIBObjectsEventDescription OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This is the description of the event that occured."
+        ::= { ibmTS4300MIBGroupEvent 2 }
+
+-- Event Type
+ibmTS4300MIBObjectsEventType OBJECT-TYPE
+            SYNTAX          INTEGER { 
+                              unknown (0),
+                              error (1),
+                              warning  (2),
+                              configuration (3),
+                              information (4)
+                              }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     
+         "Event type."
+::= { ibmTS4300MIBGroupEvent 3 }
+
+-- Additional information about the event
+ibmTS4300MIBObjectsAdditionalInfo OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Additional information about the event. Parameters are reported as <param>=<value>, separated by ~"
+::= { ibmTS4300MIBGroupEvent 4 }
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Trap definitions - Library Traps
+
+-- Health Trap
+ibmTS4300HealthTrap NOTIFICATION-TYPE
+        OBJECTS         { ibmTS4300MIBObjectsMTMNLSN, ibmTS4300MIBObjectsEventCode, ibmTS4300MIBObjectsEventDescription, ibmTS4300MIBObjectsEventType, ibmTS4300MIBObjectsAdditionalInfo
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Health Trap"
+        ::=  { ibmTS4300MIBTraps 1 }
+
+
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Conformance information (mandatory)
+
+
+ibmTS4300MIBCompliances OBJECT IDENTIFIER ::= { ibmTS4300MIBConformance 1 }
+ibmTS4300MIBGroups      OBJECT IDENTIFIER ::= { ibmTS4300MIBConformance 2 }
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Compliance statements
+
+ibmTS4300MIBCompliance MODULE-COMPLIANCE
+      STATUS current
+      DESCRIPTION
+          "The compliance statement for the SNMP entities that
+          implement this MIB."
+
+      MODULE -- this module
+
+--    Unconditionally mandatory groups
+      MANDATORY-GROUPS  { ibmTS4300MIBNotificationsGroup1,
+                          ibmTS4300MIBObjectsGroup
+                        }
+      ::= { ibmTS4300MIBCompliances 1 }
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- MIB groupings
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+-- Traps used in the MIB
+ibmTS4300MIBNotificationsGroup1 NOTIFICATION-GROUP
+      NOTIFICATIONS
+         { 
+		    ibmTS4300HealthTrap
+         }
+      STATUS current
+      DESCRIPTION
+          "Mandatory notification for entities implemented in this MIB."
+      ::= { ibmTS4300MIBGroups 1 }
+
+-- Objects used in the traps
+ibmTS4300MIBObjectsGroup OBJECT-GROUP
+      OBJECTS
+         { ibmTS4300MIBObjectsMTMNLSN,
+           ibmTS4300MIBObjectsEventCode,
+           ibmTS4300MIBObjectsEventDescription,
+           ibmTS4300MIBObjectsEventType,
+           ibmTS4300MIBObjectsAdditionalInfo
+         }
+      STATUS current
+      DESCRIPTION
+          "Mandatory objects for entities implemented in this MIB."
+      ::= { ibmTS4300MIBGroups 3 }
+
+
+
+END

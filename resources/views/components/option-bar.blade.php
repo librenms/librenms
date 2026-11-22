@@ -1,7 +1,7 @@
 @props([
     'name' => null, // string display title
-    'options' => [], // array<string, array{link: string, text: string, icon?: string}>
-    'selected' => null, // string selected item matching key
+    'options' => [], // array<string, array{link: string, text: string, icon?: string, title?: string, selected?: bool}>
+    'selected' => null, // string selected item matching key, an option's own 'selected' takes precedence
     'border' => null, // bool disable boder
     'linkClass' => null, // string
 ])
@@ -12,8 +12,8 @@
         @endif
         @foreach($options as $option_name => $option)
             @if (! $loop->first) | @endif
-            <span @if($selected == $option_name)class="pagemenu-selected"@endif>
-                <a href="{{ $option['link'] }}" @class([$linkClass => $linkClass])>@isset($option['icon'])<i class="fa {{ $option['icon'] }}"></i> @endisset{{ $option['text'] }}</a></span>
+            <span @if($option['selected'] ?? ($selected == $option_name))class="pagemenu-selected"@endif>
+                <a href="{{ $option['link'] }}" @if($linkClass) class="{{ $linkClass }}" @endif @isset($option['title']) title="{{ $option['title'] }}" @endisset>@isset($option['icon'])<i class="fa {{ $option['icon'] }}" aria-hidden="true"></i> @endisset{{ $option['text'] }}</a></span>
         @endforeach
     </div>
 </div>

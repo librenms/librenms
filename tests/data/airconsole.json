@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "airconsole",
-                    "type": "network",
+                    "type": "management",
                     "serial": null,
                     "icon": "airconsole.png"
                 }

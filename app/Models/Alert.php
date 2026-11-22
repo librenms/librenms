@@ -49,7 +49,7 @@ class Alert extends DeviceRelatedModel
     ];
 
     /**
-     * @return array{info: 'array'}
+     * @return array<string, string>
      */
     protected function casts(): array
     {
@@ -109,11 +109,20 @@ class Alert extends DeviceRelatedModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo<\App\Models\AlertLog, $this>
+     * @return BelongsTo<AlertLog, $this>
      */
     public function latestLog(): BelongsTo
     {
         return $this->belongsTo(AlertLog::class, 'latest_alert_log_id', 'id');
+    }
+
+    /**
+     * @return HasMany<AlertFault, $this>
+     */
+    public function faults(): HasMany
+    {
+        return $this->hasMany(AlertFault::class, 'rule_id', 'rule_id')
+            ->where('alert_faults.device_id', $this->device_id);
     }
 
     /**

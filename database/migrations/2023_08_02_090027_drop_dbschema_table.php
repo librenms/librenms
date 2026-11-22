@@ -32,7 +32,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::create('dbSchema', function (Blueprint $table) {
+        Schema::create('dbSchema', function (Blueprint $table): void {
             $table->integer('version')->default(0)->primary();
         });
 
