@@ -43,7 +43,6 @@ class Beagleboard extends Linux implements OSDiscovery
         $device->hardware = $info['"hardware"']['nsExtendOutputFull'];
     }
 
-
     /**
      * The beagleboard extend outputs CPU, GPU, Core, DSP and IVA-HD temperatures in millidegrees
      */

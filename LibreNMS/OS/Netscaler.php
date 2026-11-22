@@ -172,7 +172,6 @@ class Netscaler extends \LibreNMS\OS implements OSPolling
         $this->enableGraph('netscaler_tcp_pkts');
     }
 
-
     /**
      * Health counters are named by their index, the name tells the type
      */

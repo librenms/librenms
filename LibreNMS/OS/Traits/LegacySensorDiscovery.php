@@ -108,7 +108,7 @@ trait LegacySensorDiscovery
 
         if ($withYaml && $this->getName() !== 'avtech') {
             $sections = [];
-            foreach ($this->getDiscovery()['modules'] ?? [] as $module => $data) {
+            foreach ($this->getDiscovery()['modules'] ?? [] as $data) {
                 foreach ($data as $key => $section) {
                     if ($key === 'data') {
                         $sections[] = ['data' => $section];

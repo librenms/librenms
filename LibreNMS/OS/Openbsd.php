@@ -123,7 +123,6 @@ class Openbsd extends Unix implements OSPolling
         $this->enableGraph("pf_$graphName");
     }
 
-
     /**
      * OPENBSD-SENSORS-MIB, values are in the units LibreNMS uses
      */

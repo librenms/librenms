@@ -31,7 +31,7 @@ class UserFuncHelper
     /**
      * Sensors store these conversions by the name of the global function they used to call
      */
-    private const LEGACY_NAMES = [
+    private const array LEGACY_NAMES = [
         'fahrenheit_to_celsius' => 'fahrenheitToCelsius',
         'kelvin_to_celsius' => 'kelvinToCelsius',
         'string_to_float' => 'stringToFloat',

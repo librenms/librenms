@@ -1106,7 +1106,6 @@ class Routeros extends OS implements
         })->values();
     }
 
-
     /**
      * Before 6.47 upsEstimatedMinutesRemaining was in seconds
      */

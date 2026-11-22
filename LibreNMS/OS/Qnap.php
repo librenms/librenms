@@ -50,7 +50,6 @@ class Qnap extends OS implements OSDiscovery
         $device->serial = $response->value('NAS-MIB::enclosureSerialNum') ?: null;
     }
 
-
     protected function discoverOsSensors(): Collection
     {
         return parent::discoverOsSensors()->merge($this->discoverNetSnmpSensors());

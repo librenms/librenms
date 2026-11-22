@@ -1404,7 +1404,6 @@ class Cisco extends OS implements
         return $families;
     }
 
-
     protected function discoverOsSensors(): Collection
     {
         return parent::discoverOsSensors()

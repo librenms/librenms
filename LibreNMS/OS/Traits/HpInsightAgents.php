@@ -33,18 +33,29 @@ use SnmpQuery;
 trait HpInsightAgents
 {
     /**
-     * HP array controller drive states (CPQIDA-MIB), when the hardware is ProLiant
+     * HP Insight Management Agents answer for the server information
+     */
+    public function hasHpInsightAgents(): bool
+    {
+        return $this->hpServerInfo('cpqSiProductName') !== '' || $this->hpServerInfo('cpqSiSysSerialNum') !== '';
+    }
+
+    /**
+     * A value from CPQSINFO-MIB
+     */
+    protected function hpServerInfo(string $name): string
+    {
+        return trim((string) SnmpQuery::cache()->mibDir('hp')->get("CPQSINFO-MIB::$name.0")->value());
+    }
+
+    /**
+     * HP array controller drive states (CPQIDA-MIB)
      *
      * @return Collection<int, Sensor>
      */
     public function discoverHpInsightSensors(): Collection
     {
         $sensors = new Collection;
-
-        if (! str_contains((string) $this->getDevice()->hardware, 'ProLiant')) {
-            return $sensors;
-        }
-
         $drives = SnmpQuery::mibDir('hp')->walk([
             'CPQIDA-MIB::cpqDaPhyDrvBay',
             'CPQIDA-MIB::cpqDaPhyDrvStatus',

@@ -34,17 +34,29 @@ use SnmpQuery;
 trait DellOpenManage
 {
     /**
-     * Dell server sensors, from MIB-Dell-10892 and StorageManagement-MIB, when the hardware is Dell
+     * Dell OpenManage Server Administrator answers for the chassis of the server
+     */
+    public function hasDellOpenManage(): bool
+    {
+        return $this->dellChassis('chassisModelName') !== '' || $this->dellChassis('chassisServiceTagName') !== '';
+    }
+
+    /**
+     * A value of the main chassis from MIB-Dell-10892::chassisInformationTable
+     */
+    protected function dellChassis(string $name): string
+    {
+        return trim((string) SnmpQuery::cache()->mibDir('dell')->get("MIB-Dell-10892::$name.1")->value());
+    }
+
+    /**
+     * Dell server sensors, from MIB-Dell-10892 and StorageManagement-MIB
      *
      * @return Collection<int, Sensor>
      */
     public function discoverDellOpenManageSensors(): Collection
     {
         $sensors = new Collection;
-
-        if (! str_contains((string) $this->getDevice()->hardware, 'Dell')) {
-            return $sensors;
-        }
 
         $probes = [
             // table, class, reading oid, column prefix, divisor, filter

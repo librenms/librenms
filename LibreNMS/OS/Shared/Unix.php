@@ -38,7 +38,6 @@ use SnmpQuery;
 class Unix extends \LibreNMS\OS implements MempoolsDiscovery
 {
     use NetSnmpSensors;
-
     use ServerHardware;
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
@@ -130,9 +129,10 @@ class Unix extends \LibreNMS\OS implements MempoolsDiscovery
         $device->serial = $serial ?: $device->serial;
     }
 
-
     protected function discoverOsSensors(): Collection
     {
-        return parent::discoverOsSensors()->merge($this->discoverNetSnmpSensors());
+        return parent::discoverOsSensors()
+            ->merge($this->discoverServerHardwareSensors())
+            ->merge($this->discoverNetSnmpSensors());
     }
 }

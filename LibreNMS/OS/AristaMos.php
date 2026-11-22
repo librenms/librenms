@@ -26,14 +26,18 @@
 
 namespace LibreNMS\OS;
 
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
+use LibreNMS\OS\Traits\NetSnmpSensors;
 
 class AristaMos extends Shared\Arista
 {
+    use NetSnmpSensors;
+
     /**
      * Early (circa 0.16.x) versions report negated fan speeds
      */
-    public function pollSensors(Collection $sensors): array
+    public function pollSensors(EloquentCollection $sensors): array
     {
         $values = parent::pollSensors($sensors);
 
@@ -45,5 +49,13 @@ class AristaMos extends Shared\Arista
         }
 
         return $values;
+    }
+
+    /**
+     * LM-SENSORS-MIB and ups-nut fan, temperature and voltage sensors of the Linux base
+     */
+    protected function discoverOsSensors(): Collection
+    {
+        return parent::discoverOsSensors()->merge($this->discoverNetSnmpSensors()->whereIn('sensor_class', ['fanspeed', 'temperature', 'voltage']));
     }
 }

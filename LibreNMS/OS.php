@@ -69,11 +69,9 @@ use LibreNMS\Interfaces\Polling\StpPortPolling;
 use LibreNMS\OS\Generic;
 use LibreNMS\OS\Traits\Bgp4Mib;
 use LibreNMS\OS\Traits\BridgeMib;
-use LibreNMS\OS\Traits\DellOpenManage;
 use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\EntitySensorMib;
 use LibreNMS\OS\Traits\HostResources;
-use LibreNMS\OS\Traits\HpInsightAgents;
 use LibreNMS\OS\Traits\LegacySensorDiscovery;
 use LibreNMS\OS\Traits\LldpMib;
 use LibreNMS\OS\Traits\MefUniEvcMib;
@@ -142,8 +140,6 @@ class OS implements
     use BridgeMib;
     use EntityMib;
     use EntitySensorMib;
-    use DellOpenManage;
-    use HpInsightAgents;
     use LldpMib;
     use MefUniEvcMib;
     use MplsVpnMib;
@@ -503,7 +499,7 @@ class OS implements
     }
 
     /**
-     * ENTITY-SENSOR-MIB and server agent sensors, then the sensors of this OS, UPS-MIB and the yaml sensors.
+     * ENTITY-SENSOR-MIB sensors, then the sensors of this OS, UPS-MIB and the yaml sensors.
      * A sensor replaces earlier sensors of the same class, type and index.
      *
      * @return Collection<int, Sensor>
@@ -511,8 +507,6 @@ class OS implements
     public function discoverSensors(): Collection
     {
         return $this->discoverEntitySensors()
-            ->merge($this->discoverDellOpenManageSensors())
-            ->merge($this->discoverHpInsightSensors())
             ->merge($this->discoverOsSensors())
             ->merge($this->discoverLegacySensors())
             ->merge($this->discoverUpsMibSensors())

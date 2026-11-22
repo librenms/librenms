@@ -124,7 +124,6 @@ class Cumulus extends \LibreNMS\OS
         return $this->bgpLocalAsFallback(parent::discoverBgpLocalAs(), 'CUMULUS-BGPVRF-MIB::bgpLocalAs');
     }
 
-
     protected function discoverOsSensors(): Collection
     {
         $sensors = parent::discoverOsSensors()->merge($this->discoverNetSnmpSensors());

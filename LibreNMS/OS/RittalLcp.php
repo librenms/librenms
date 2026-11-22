@@ -26,10 +26,9 @@
 
 namespace LibreNMS\OS;
 
-use LibreNMS\OS;
-use LibreNMS\OS\Traits\RittalCmcIiiMib;
-
-class RittalLcp extends OS
+/**
+ * The LCP uses the CMC III platform
+ */
+class RittalLcp extends RittalCmcIiiPu
 {
-    use RittalCmcIiiMib;
 }

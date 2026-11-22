@@ -34,7 +34,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
-use LibreNMS\OS\Traits\SupermicroHealthMib;
 use LibreNMS\OS\Traits\VminfoVmware;
 use LibreNMS\OS\Traits\VminfoXcpNg;
 use LibreNMS\Polling\Method\DataSources\LibvirtDataSource;
@@ -43,8 +42,6 @@ use SnmpQuery;
 
 class Linux extends Shared\Unix implements VminfoDiscovery
 {
-    use SupermicroHealthMib;
-
     // NOTE: Only Linux specific stuff should go here, most things should be in Unix
 
     use VminfoVmware, VminfoXcpNg {
@@ -175,7 +172,6 @@ class Linux extends Shared\Unix implements VminfoDiscovery
         return $string;
     }
 
-
     protected function discoverOsSensors(): Collection
     {
         return $this->discoverRpiGpioMonitorSensors()
@@ -268,9 +264,8 @@ class Linux extends Shared\Unix implements VminfoDiscovery
         ];
     }
 
-
     /**
-     * Raspberry Pi (raspberry extend), NTC CHIP (power-stat extend), HP iLO and Supermicro sensors
+     * Raspberry Pi (raspberry extend), NTC CHIP (power-stat extend) and HP iLO sensors
      *
      * @return Collection<int, Sensor>
      */
@@ -316,7 +311,12 @@ class Linux extends Shared\Unix implements VminfoDiscovery
             if (stripos($lines[$line] ?? '', 'abled') === false) {
                 break;
             }
-            $sensors->push($sensor(SensorType::State, "$raspberry.$line", $line, 'raspberry_codec', $descr, $lines[$line], ['entPhysicalIndex' => $line])->withStates([
+            $value = match (strtolower($lines[$line])) {
+                'enabled' => 2,
+                'disabled' => 3,
+                default => null,
+            };
+            $sensors->push($sensor(SensorType::State, "$raspberry.$line", $line, 'raspberry_codec', $descr, $value, ['entPhysicalIndex' => $line])->withStates([
                 ['value' => 2, 'generic' => 0, 'descr' => 'enabled'],
                 ['value' => 3, 'generic' => 3, 'descr' => 'disabled'],
             ]));
@@ -354,7 +354,7 @@ class Linux extends Shared\Unix implements VminfoDiscovery
                 if (! str_starts_with((string) $oid, '.1.3.6.1.4.1.232.6.2.6.8.1.2.1.')) {
                     continue;
                 }
-                $id = "1." . substr((string) $oid, strrpos((string) $oid, ".") + 1);
+                $id = '1.' . substr((string) $oid, strrpos((string) $oid, '.') + 1);
                 $temperature = $temperatures[".1.3.6.1.4.1.232.6.2.6.8.1.4.$id"] ?? null;
                 if (! empty($temperature)) {
                     $sensors->push($sensor(SensorType::Temperature, ".1.3.6.1.4.1.232.6.2.6.8.1.4.$id", $oid, 'hpilo', (string) ($temperatures[".1.3.6.1.4.1.232.6.2.6.8.1.3.$id"] ?? ''), $temperature, [
@@ -364,6 +364,6 @@ class Linux extends Shared\Unix implements VminfoDiscovery
             }
         }
 
-        return $sensors->merge($this->discoverSupermicroSensors());
+        return $sensors;
     }
 }

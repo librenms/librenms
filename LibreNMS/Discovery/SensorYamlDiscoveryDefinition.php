@@ -43,7 +43,7 @@ use LibreNMS\Util\UserFuncHelper;
  */
 class SensorYamlDiscoveryDefinition extends YamlDiscoveryDefinition
 {
-    private const LIMITS = [
+    private const array LIMITS = [
         'low_limit' => 'sensor_limit_low',
         'low_warn_limit' => 'sensor_limit_low_warn',
         'warn_limit' => 'sensor_limit_warn',
