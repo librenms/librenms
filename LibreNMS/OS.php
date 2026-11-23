@@ -35,9 +35,13 @@ use DeviceCache;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Discovery\YamlDiscoveryDefinition;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SnmpOidOutput;
+use LibreNMS\Enum\SnmpQuickPrint;
+use LibreNMS\Enum\SnmpStringOutput;
 use LibreNMS\Exceptions\SnmpConnectionException;
 use LibreNMS\Interfaces\Discovery\BgpPeerDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
@@ -544,7 +548,14 @@ class OS implements
             return [];
         }
 
-        $data = \SnmpQuery::options('-OUQntea')->get($oids)->throwIfConnectionError()->values();
+        $data = \SnmpQuery::options(new SnmpQueryOptions(
+            oidFormat: SnmpOidOutput::Numeric,
+            numericEnums: true,
+            numericTimeticks: true,
+            printUnits: false,
+            stringFormat: SnmpStringOutput::Ascii, // strings as ascii, some devices end numbers with a null byte
+            quickPrint: SnmpQuickPrint::Equals,
+        ))->get($oids)->throwIfConnectionError()->values();
         $values = [];
 
         foreach ($sensors as $sensor) {
