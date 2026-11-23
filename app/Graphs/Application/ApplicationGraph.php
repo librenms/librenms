@@ -35,13 +35,28 @@ abstract class ApplicationGraph extends AbstractSeriesGraph
     }
 
     /**
-     * The app-<app_type>-<app_id>.rrd file written by the application poller
+     * A metric written by the application poller. Without tags it is the app-<app_type>-<app_id>.rrd file,
+     * each tag value is appended to the name in order, so ['pool' => 'tank'] reads app-<app_type>-<app_id>-tank.rrd.
+     *
+     * @param  array<string, scalar>  $tags  the tags that tell this metric apart from the other metrics of the application
      *
      * @throws NoGraphData
      */
-    protected function metric(): MetricIdentity
+    protected function metric(array $tags = []): MetricIdentity
     {
-        return ($this->findApplication() ?? throw new NoGraphData)->metricIdentity();
+        $metric = $this->application()->metricIdentity();
+
+        return $tags === [] ? $metric : new MetricIdentity($metric->measurement, [...$metric->tags, ...$tags]);
+    }
+
+    /**
+     * The requested application, for graphs that draw a series for each item in its data
+     *
+     * @throws NoGraphData
+     */
+    protected function application(): Application
+    {
+        return $this->findApplication() ?? throw new NoGraphData;
     }
 
     private function findApplication(): ?Application
