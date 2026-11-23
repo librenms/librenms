@@ -154,7 +154,7 @@
                     ];
                 @endphp
                 @foreach($allMethods as $method)
-                    <div x-data="pollingMethodForm(@js([
+                    <div id="polling-method-{{ $method['type'] }}" x-data="pollingMethodForm(@js([
                             'type' => $method['type'],
                             'configured' => (bool) $method['configured'],
                             'enabled' => (bool) $method['enabled'],
@@ -172,7 +172,7 @@
                             'destroyUrl' => route('device.edit.polling.destroy', ['device' => $device, 'methodType' => $method['type']]),
                             'labels' => $formLabels,
                         ]))"
-                         x-show="activeTab === '{{ $method["type"] }}' && activeMethods.includes('{{ $method["type"] }}')"
+                         :hidden="activeTab !== '{{ $method["type"] }}' || !activeMethods.includes('{{ $method["type"] }}')"
                          x-cloak>
 
                         <div class="tw:flex tw:items-center tw:justify-between tw:mb-6 tw:border-b tw:pb-3 tw:dark:border-dark-gray-400">
