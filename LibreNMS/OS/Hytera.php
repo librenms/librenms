@@ -28,7 +28,6 @@ namespace LibreNMS\OS;
 
 use Illuminate\Database\Eloquent\Collection;
 use LibreNMS\OS;
-use LibreNMS\Util\StringHelpers;
 
 class Hytera extends OS
 {
@@ -41,7 +40,12 @@ class Hytera extends OS
 
         foreach ($sensors->whereIn('sensor_class', ['temperature', 'voltage']) as $sensor) {
             if (isset($values[$sensor->sensor_id])) {
-                $values[$sensor->sensor_id] = self::hexToFloat((string) $values[$sensor->sensor_id], 2);
+                $value = self::hexToFloat((string) $values[$sensor->sensor_id], 2);
+                if ($value === null) {
+                    unset($values[$sensor->sensor_id]);
+                } else {
+                    $values[$sensor->sensor_id] = $value;
+                }
             }
         }
 
@@ -49,37 +53,21 @@ class Hytera extends OS
     }
 
     /**
-     * Convert a float sent as reversed hex bytes (or 4 raw bytes) to a number with the given decimals
+     * Convert a little-endian IEEE-754 float, sent as hex bytes or as 4 raw bytes, to a number with the given decimals.
+     * Null when the input is not 4 bytes.
      */
-    public static function hexToFloat(string $number, int $decimals): string
+    public static function hexToFloat(string $number, int $decimals): ?string
     {
         $number = str_replace('"', '', $number);
-        if (strlen(str_replace(' ', '', $number)) == 4) {
-            $number = StringHelpers::asciiToHex($number, ' ');
+        $hex = str_replace(' ', '', $number);
+        if (strlen($number) == 4) {
+            $bytes = $number;
+        } elseif (strlen($hex) == 8 && ctype_xdigit($hex)) {
+            $bytes = (string) hex2bin($hex);
+        } else {
+            return null;
         }
 
-        $hex = substr(implode('', array_reverse(explode(' ', $number))), 0, -1);
-        $bits = '';
-        foreach (str_split($hex) as $digit) {
-            $bits .= sprintf('%04d', decbin(hexdec($digit)));
-        }
-
-        $exponent = bindec(substr($bits, 1, 8)) - 127;
-        $mantissa = substr($bits, 9);
-        $fraction = substr($mantissa, $exponent);
-        $integer = bindec('1' . substr($mantissa, 0, $exponent));
-
-        $point = array_reverse(str_split($fraction));
-        $length = strlen($fraction);
-        $pointNumber = min(number_format(((int) ($point[0] ?? 0)) / 2, $length, '.', ''), 1);
-        $value = '';
-        for ($i = 1; $i < $length; $i++) {
-            $value = number_format($pointNumber / 2, $length, '.', '');
-            $pointNumber = ($point[$i + 1] ?? '') . substr($value, 1);
-        }
-
-        $float = $integer + (float) $value;
-
-        return number_format(substr($bits, 0, 1) == 1 ? -$float : $float, $decimals, '.', '');
+        return number_format(unpack('g', $bytes)[1], $decimals, '.', '');
     }
 }

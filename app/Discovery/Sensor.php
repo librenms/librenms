@@ -66,7 +66,8 @@ class Sensor
         $sensor->device_id ??= \DeviceCache::getPrimary()->device_id;
         $this->models->push($sensor);
 
-        if ($sensor->sensor_class == 'state' && $sensor->relationLoaded('translations')) {
+        // an empty set would replace the translations of other sensors of this state
+        if ($sensor->sensor_class == 'state' && $sensor->relationLoaded('translations') && $sensor->translations->isNotEmpty()) {
             $this->withStateTranslations($sensor->sensor_type, $sensor->translations);
         }
         $this->discovered[$sensor->syncGroup()] = false;

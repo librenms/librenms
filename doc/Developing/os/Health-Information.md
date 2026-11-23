@@ -416,7 +416,7 @@ public function pollSensors(Collection $sensors): array
 
     // temperatures are strings, like "Temp: 45 C"
     foreach ($sensors->where('sensor_class', 'temperature') as $sensor) {
-        if (preg_match('/([0-9]+) C/', (string) ($values[$sensor->sensor_id] ?? ''), $matches)) {
+        if (preg_match('/(-?[0-9]+(?:\.[0-9]+)?) C/', (string) ($values[$sensor->sensor_id] ?? ''), $matches)) {
             $values[$sensor->sensor_id] = $matches[1];
         }
     }

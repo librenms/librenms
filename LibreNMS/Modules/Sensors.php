@@ -81,6 +81,7 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
 
     /**
      * Each available method replaces its sensors, the sensors of a method that is not available are kept.
+     * IPMI and the unix agent report no sensors when their tool is not responding, their sensors are kept then too.
      */
     public function discover(OS $os): void
     {
@@ -96,8 +97,14 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
             }
 
             Log::info($method->label() . ':');
+            $discovered = $source->discoverSensors();
+            if ($discovered->isEmpty() && $method !== PollingMethodType::Snmp) {
+                Log::info('No sensors reported, keeping the existing sensors');
+                continue;
+            }
+
             $pollerType = self::pollerType($method);
-            foreach ($source->discoverSensors() as $sensor) {
+            foreach ($discovered as $sensor) {
                 if (in_array($sensor->sensor_class, $classes)) {
                     $collector->discover($sensor->setAttribute('poller_type', $pollerType));
                 }
@@ -123,6 +130,7 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
     {
         $sensors = $this->methodSensors($os->getDevice())->with('translations')->get();
         $values = [];
+        $unread = [];
 
         foreach ($this->pollingMethods($os->getDevice()) as $method) {
             $methodSensors = $sensors->where('poller_type', self::pollerType($method));
@@ -134,7 +142,7 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
             $values += $source->pollSensors($methodSensors);
             if ($method === PollingMethodType::Snmp) {
                 // SNMP sensors that are not read are recorded as 0
-                $values += array_fill_keys($methodSensors->modelKeys(), '');
+                $unread += array_diff_key(array_flip($methodSensors->modelKeys()), $values);
             }
         }
 
@@ -143,7 +151,9 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
             foreach ($classSensors as $sensor) {
                 /** @var Sensor $sensor */
                 if (array_key_exists($sensor->sensor_id, $values)) {
-                    $this->recordValue($datastore, $sensor->setRelation('device', $os->getDevice()), $values[$sensor->sensor_id]);
+                    $this->recordValue($datastore, $sensor->setRelation('device', $os->getDevice()), $this->convertValue($sensor, $values[$sensor->sensor_id]));
+                } elseif (isset($unread[$sensor->sensor_id])) {
+                    $this->recordValue($datastore, $sensor->setRelation('device', $os->getDevice()), 0);
                 }
             }
             $progress->end();
@@ -216,9 +226,8 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
         };
     }
 
-    private function recordValue(WriteInterface $datastore, Sensor $sensor, mixed $raw): void
+    private function recordValue(WriteInterface $datastore, Sensor $sensor, int|float|string|null $value): void
     {
-        $value = $this->convertValue($sensor, $raw);
         $previous = $sensor->sensor_current;
         Log::info("$sensor->sensor_descr: $value " . SensorType::tryFrom($sensor->sensor_class)?->unit());
 

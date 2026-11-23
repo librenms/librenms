@@ -59,7 +59,7 @@ class Fortiswitch extends OS
     }
 
     /**
-     * FortiSwitch reports fan speeds in percent (tenths), not rpm
+     * FortiSwitch reports fan speeds in percent, not rpm, and the precision does not apply
      */
     protected function entitySensor(Sensor $sensor, array $entry): ?Sensor
     {
@@ -67,7 +67,7 @@ class Fortiswitch extends OS
             $sensor->fill([
                 'sensor_class' => 'percent',
                 'sensor_divisor' => 1,
-                'sensor_current' => $sensor->sensor_current * 10,
+                'sensor_current' => $entry['entPhySensorValue'] * $sensor->sensor_multiplier,
             ]);
         }
 

@@ -1420,7 +1420,7 @@ class Cisco extends OS implements
         $sensors = new Collection;
 
         foreach ([
-            ['CISCO-WAN-3G-MIB::c3gGsmNumberOfNearbyCell', '.1.3.6.1.4.1.9.9.661.1.3.2.1.6', 'Nearby cells'],
+            ['CISCO-WAN-3G-MIB::c3gGsmNumberOfNearbyCell', '.1.3.6.1.4.1.9.9.661.1.3.4.1.1.5', 'Nearby cells'],
             ['CISCO-WAN-CELL-EXT-MIB::cwceLteCurrOperatingBand', '.1.3.6.1.4.1.9.9.817.1.1.1.1.1.6', 'Cellular operating band'],
         ] as [$oid, $numOid, $descr]) {
             foreach (SnmpQuery::walk($oid)->pluck() as $index => $value) {
@@ -1462,7 +1462,7 @@ class Cisco extends OS implements
         $sensors = new Collection;
         $stack = ['CISCO-STACKWISE-MIB::cswGlobals', 'CISCO-STACKWISE-MIB::cswSwitchRole', 'CISCO-STACKWISE-MIB::cswSwitchState', 'CISCO-STACKWISE-MIB::cswStackPortOperStatus'];
         // some 15.x switches report stacking when they are not stacked
-        $notStacked = SnmpQuery::enumStrings()->get('CISCO-STACKWISE-MIB::cswRingRedundant.0')->value() == 'false'
+        $skipStack = SnmpQuery::enumStrings()->get('CISCO-STACKWISE-MIB::cswRingRedundant.0')->value() == 'false'
             && count(SnmpQuery::walk('CISCO-STACKWISE-MIB::cswSwitchRole')->values()) <= 1;
         $switchRole = 0;
         $switchState = 0;
@@ -1488,7 +1488,7 @@ class Cisco extends OS implements
             ['CISCO-STACKWISE-MIB::cswStackPortOperStatus', '.1.3.6.1.4.1.9.9.500.1.2.2.1.1', 'cswStackPortOperStatus', 'Stack Port Status - '],
             ['CISCO-RESILIENT-ETHERNET-PROTOCOL-MIB::crepSegmentComplete', '.1.3.6.1.4.1.9.9.601.1.3.1.1.4', 'crepSegmentComplete', 'REP State - Segment '],
         ] as [$oid, $numOid, $state, $descr]) {
-            if ($notStacked && in_array($oid, $stack)) {
+            if ($skipStack && in_array($oid, $stack)) {
                 continue;
             }
 
@@ -1497,9 +1497,10 @@ class Cisco extends OS implements
                 continue;
             }
 
-            // a single switch, the remaining tables are about stacking
+            // a single switch, skip this table and the stacking tables
             if (($data[0][$state] ?? null) == 'nonRedundant' || ($data[0]['cswMaxSwitchNum'] ?? null) == '1') {
-                break;
+                $skipStack = true;
+                continue;
             }
 
             // StackWise Virtual always reports false for cswRingRedundant, it has no meaning there

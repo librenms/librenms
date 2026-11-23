@@ -42,7 +42,7 @@ trait CiscoEntitySensorMib
     /**
      * @return array{int, int}
      */
-    abstract public static function entitySensorScale(?string $scale, int|string|null $precision): array;
+    abstract public static function entitySensorScale(?string $scale, int|string|null $precision): ?array;
 
     /**
      * CISCO-ENTITY-SENSOR-MIB sensors replace the ENTITY-SENSOR-MIB sensors of the same entity.
@@ -105,7 +105,12 @@ trait CiscoEntitySensorMib
 
             // a cisco bug reports this precision
             $precision = $entry['CISCO-ENTITY-SENSOR-MIB::entSensorPrecision'] ?? null;
-            [$divisor, $multiplier] = self::entitySensorScale($entry['CISCO-ENTITY-SENSOR-MIB::entSensorScale'] ?? null, $precision == 1615384784 ? null : $precision);
+            $scale = self::entitySensorScale($entry['CISCO-ENTITY-SENSOR-MIB::entSensorScale'] ?? null, $precision == 1615384784 ? null : $precision);
+            if ($scale === null) {
+                continue;
+            }
+
+            [$divisor, $multiplier] = $scale;
             $current = $value * $multiplier / $divisor;
             $measured = $entry['CISCO-ENTITY-SENSOR-MIB::entSensorMeasuredEntity'] ?? null;
             $descr = $this->ciscoEntitySensorDescr((int) $index, is_numeric($measured) ? (int) $measured : 0, $entities);
@@ -209,15 +214,15 @@ trait CiscoEntitySensorMib
             $limits[$limit] = $value * $sensor->sensor_multiplier / $sensor->sensor_divisor;
         }
 
+        // some platforms (ISR) only have the other severity, use it as the critical limit
+        if (! isset($limits['sensor_limit_low']) && ! isset($limits['sensor_limit_low_warn']) && isset($limits['other_low'])) {
+            $limits['sensor_limit_low'] = $limits['other_low'];
+        }
+
         // many temperature sensors have no low limits, a 0 low limit is not useful either
         if ($class === SensorType::Temperature) {
             $limits['sensor_limit_low_warn'] = ($limits['sensor_limit_low_warn'] ?? 0) == 0 ? -1 : $limits['sensor_limit_low_warn'];
             $limits['sensor_limit_low'] = ($limits['sensor_limit_low'] ?? 0) == 0 ? -5 : $limits['sensor_limit_low'];
-        }
-
-        // some platforms (ISR) only have the other severity, use it as the critical limit
-        if (! isset($limits['sensor_limit_low']) && ! isset($limits['sensor_limit_low_warn']) && isset($limits['other_low'])) {
-            $limits['sensor_limit_low'] = $limits['other_low'];
         }
         if (! isset($limits['sensor_limit']) && ! isset($limits['sensor_limit_warn']) && isset($limits['other'])) {
             $limits['sensor_limit'] = $limits['other'];
@@ -249,21 +254,22 @@ trait CiscoEntitySensorMib
             $class = $entities[$parent]['ENTITY-MIB::entPhysicalClass'] ?? null;
             if ($class === 'port') {
                 if (preg_match('/ifIndex[.\[](\d+)/', (string) ($entities[$parent][0]['ENTITY-MIB::entAliasMappingIdentifier'] ?? ''), $matches)) {
-                    $ifIndex = $matches[1];
+                    $ifIndex = (int) $matches[1];
                 }
                 break;
             }
 
             if ($class === 'module' && isset($ifIndexes[$entities[$parent]['ENTITY-MIB::entPhysicalName'] ?? ''])) {
-                $ifIndex = $ifIndexes[$entities[$parent]['ENTITY-MIB::entPhysicalName']];
+                $ifIndex = (int) $ifIndexes[$entities[$parent]['ENTITY-MIB::entPhysicalName']];
                 break;
             }
 
             $parent = $entities[$parent]['ENTITY-MIB::entPhysicalContainedIn'] ?? 0;
         }
 
+        // the port page finds the sensors of a port by its ifIndex
         if ($ifIndex != 0 && PortCache::getIdFromIfIndex($ifIndex, $this->getDevice())) {
-            $sensor->fill(['entPhysicalIndex' => $parent, 'entPhysicalIndex_measured' => 'ports', 'group' => 'transceiver']);
+            $sensor->fill(['entPhysicalIndex' => $ifIndex, 'entPhysicalIndex_measured' => 'ports', 'group' => 'transceiver']);
         }
     }
 }

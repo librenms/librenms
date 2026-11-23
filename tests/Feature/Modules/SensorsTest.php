@@ -156,10 +156,11 @@ EOT;
         $this->assertEquals(45, $sensor->sensor_current);
         $this->assertNull($sensor->sensor_limit_warn);
 
+        // ipmitool reports nothing when the BMC is not responding, the sensors are kept
         Process::fake(fn () => '');
         (new Sensors)->discover($this->os());
 
-        $this->assertSame(0, $this->device->sensors()->count());
+        $this->assertSame(1, $this->device->sensors()->count());
     }
 
     public function testIpmiSensorsNeedTheIpmiMethod(): void
@@ -253,6 +254,19 @@ EOT;
         $module->discover($os);
 
         $this->assertSame(1, Sensor::where('device_id', $os->getDeviceId())->count());
+    }
+
+    public function testAgentWithoutHddtempKeepsItsSensors(): void
+    {
+        $os = $this->makeOs([PollingMethodType::UnixAgent]);
+        Sensor::factory()->create(['device_id' => $os->getDeviceId(), 'poller_type' => 'agent', 'sensor_class' => 'temperature', 'sensor_index' => '1', 'sensor_type' => 'hddtemp']);
+
+        foreach (["<<<hddtemp>>>\n\n", "<<<df>>>\n/dev/sda1 100 50 50 50% /\n"] as $output) {
+            $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => $output]);
+            (new Sensors)->discover($os);
+
+            $this->assertSame(1, Sensor::where('device_id', $os->getDeviceId())->count());
+        }
     }
 
     public function testRemovingAMethodDeletesOnlyItsSensors(): void

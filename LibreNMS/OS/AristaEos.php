@@ -57,13 +57,14 @@ class AristaEos extends Shared\Arista
      */
     protected function entitySensor(Sensor $sensor, array $entry): ?Sensor
     {
-        $milliwatts = ($entry['entPhySensorScale'] ?? null) == 'milli' && ($entry['entPhySensorType'] ?? null) == 'watts';
-        $toDbm = fn ($value) => 10 * log10($value / 10000);
+        // 0.1 µW to dBm, there is no dBm value for no power
+        $toDbm = fn ($value, int $precision) => $value > 0 ? round(10 * log10($value / 10000), $precision) : null;
+        $dbm = $sensor->sensor_class == 'power' && preg_match('/DOM [RT]x Power/i', $sensor->sensor_descr);
 
-        if ($sensor->sensor_class == 'power' && preg_match('/DOM [RT]x Power/i', $sensor->sensor_descr)) {
+        if ($dbm) {
             $sensor->fill([
                 'sensor_class' => 'dbm',
-                'sensor_current' => round($toDbm($entry['entPhySensorValue']), 3),
+                'sensor_current' => $toDbm($entry['entPhySensorValue'] ?? null, 3),
                 'sensor_divisor' => 1,
                 'sensor_multiplier' => 1,
             ]);
@@ -78,8 +79,7 @@ class AristaEos extends Shared\Arista
         ] as $limit => $oid) {
             $value = $thresholds[$oid] ?? null;
             if (is_numeric($value) && abs($value) != 1000000000) {
-                $value = $milliwatts ? round($toDbm($value), 2) : $value / $sensor->sensor_divisor;
-                $sensor->$limit = is_finite($value) ? $value : null;
+                $sensor->$limit = $dbm ? $toDbm($value, 2) : $value * $sensor->sensor_multiplier / $sensor->sensor_divisor;
             }
         }
 

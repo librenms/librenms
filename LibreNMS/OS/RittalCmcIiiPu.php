@@ -32,13 +32,14 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\OS;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\UserFuncHelper;
 use SnmpQuery;
 
 /**
  * cmcIIIVarTable has a row for each variable of a sensor (value, limits, logic).
  * The variables of a sensor are consecutive rows that share the name, without the last part.
  *
- * @phpstan-type CmcSensor array{name: string, descr: string, oid?: string, value?: int|float, type?: SensorType, divisor?: string, multiplier?: string, logic?: array{string, string}, limits: array<string, mixed>}
+ * @phpstan-type CmcSensor array{name: string, descr: string, oid?: string, value?: int|float, type?: SensorType, divisor?: string, multiplier?: string, logic?: array{string, string}, user_func?: string, limits: array<string, mixed>}
  */
 class RittalCmcIiiPu extends OS
 {
@@ -117,7 +118,12 @@ class RittalCmcIiiPu extends OS
                 default => $cmcSensor['logic'] ?? null,
             };
 
-            $scale = fn ($value) => isset($cmcSensor['divisor']) ? $value / $cmcSensor['divisor'] : (isset($cmcSensor['multiplier']) ? $value * $cmcSensor['multiplier'] : $value);
+            // the same conversion as polling
+            $scale = function ($value) use ($cmcSensor) {
+                $value = $value / ($cmcSensor['divisor'] ?? 1) * ($cmcSensor['multiplier'] ?? 1);
+
+                return isset($cmcSensor['user_func']) ? UserFuncHelper::apply($cmcSensor['user_func'], $value) : $value;
+            };
             $limit = fn (string $name) => isset($cmcSensor['limits'][$name]) ? $scale($cmcSensor['limits'][$name]) : null;
 
             $sensor = new Sensor([
@@ -129,6 +135,7 @@ class RittalCmcIiiPu extends OS
                 'sensor_descr' => $cmcSensor['descr'],
                 'sensor_divisor' => $cmcSensor['divisor'] ?? 1,
                 'sensor_multiplier' => $cmcSensor['multiplier'] ?? 1,
+                'user_func' => $cmcSensor['user_func'] ?? null,
                 'sensor_current' => $scale($cmcSensor['value'] ?? 0),
                 'sensor_limit_low' => $limit('setLow'),
                 'sensor_limit_low_warn' => $limit('setWarnLow'),
@@ -139,7 +146,7 @@ class RittalCmcIiiPu extends OS
 
             $sensors->push($logic ? $sensor->withStates([
                 ['value' => 0, 'generic' => 0, 'descr' => $logic[0]],
-                ['value' => 1, 'generic' => 0, 'descr' => $logic[1]],
+                ['value' => 1, 'generic' => $cmcSensor['name'] == 'Smoke' ? 2 : 0, 'descr' => $logic[1]],
             ]) : $sensor);
         }
 
@@ -186,6 +193,10 @@ class RittalCmcIiiPu extends OS
 
             if ($divisor !== null) {
                 $sensor['divisor'] = $divisor;
+            }
+
+            if (in_array($entry['cmcIIIVarUnit'] ?? null, ['degree F', '°F'])) {
+                $sensor['user_func'] = 'fahrenheit_to_celsius';
             }
         }
     }

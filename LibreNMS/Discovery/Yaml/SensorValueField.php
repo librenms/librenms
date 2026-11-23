@@ -97,7 +97,7 @@ class SensorValueField extends OidField
             }
         }
 
-        if (preg_match('/-?\d*\.?\d+/', $value, $matches) && ! empty($matches[0])) {
+        if (preg_match('/-?\d*\.?\d+/', $value, $matches)) {
             $value = $matches[0];
         }
 

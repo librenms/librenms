@@ -37,6 +37,7 @@ use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
 use LibreNMS\OS\Traits\VminfoVmware;
 use LibreNMS\OS\Traits\VminfoXcpNg;
 use LibreNMS\Polling\Method\DataSources\LibvirtDataSource;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\StringHelpers;
 use SnmpQuery;
 
@@ -216,7 +217,7 @@ class Linux extends Shared\Unix implements VminfoDiscovery
                 'sensor_descr' => $config['descr'],
                 'sensor_divisor' => 1,
                 'sensor_multiplier' => 1,
-                'sensor_current' => (int) $line,
+                'sensor_current' => Number::extract($line), // the same as the poll conversion
                 'sensor_limit_low' => is_numeric($config['low_limit']) ? $config['low_limit'] : null,
                 'sensor_limit_low_warn' => is_numeric($config['low_warn_limit']) ? $config['low_warn_limit'] : null,
                 'sensor_limit_warn' => is_numeric($config['warn_limit']) ? $config['warn_limit'] : null,

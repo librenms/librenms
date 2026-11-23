@@ -46,7 +46,7 @@ class Iosxr extends Shared\Cisco implements OSDiscovery
             ->map(function (Sensor $sensor) {
                 $dbm = $sensor->replicate()->fill([
                     'sensor_class' => 'dbm',
-                    'sensor_multiplier' => 1000,
+                    'sensor_multiplier' => $sensor->sensor_multiplier * 1000,
                     'user_func' => 'mw_to_dbm',
                     'sensor_current' => UserFuncHelper::apply('mw_to_dbm', $sensor->sensor_current * 1000),
                 ]);

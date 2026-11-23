@@ -77,7 +77,12 @@ trait EntitySensorMib
             }
 
             $descr = Rewrite::entityDescr($this->entitySensorDescr((int) $index, $entities));
-            [$divisor, $multiplier] = self::entitySensorScale($entry['entPhySensorScale'] ?? null, $entry['entPhySensorPrecision'] ?? null);
+            $scale = self::entitySensorScale($entry['entPhySensorScale'] ?? null, $entry['entPhySensorPrecision'] ?? null);
+            if ($scale === null) {
+                continue;
+            }
+
+            [$divisor, $multiplier] = $scale;
             $current = $entry['entPhySensorValue'] * $multiplier / $divisor;
 
             if ($class === SensorType::Temperature) {
@@ -135,28 +140,40 @@ trait EntitySensorMib
     }
 
     /**
-     * The divisor and multiplier for an EntitySensorDataScale and EntitySensorPrecision
+     * The divisor and multiplier for an EntitySensorDataScale and EntitySensorPrecision,
+     * null when the database cannot store them (the divisor is a bigint, the multiplier an int)
      *
-     * @return array{int, int}
+     * @return array{int, int}|null
      */
-    public static function entitySensorScale(?string $scale, int|string|null $precision): array
+    public static function entitySensorScale(?string $scale, int|string|null $precision): ?array
     {
-        [$divisor, $multiplier] = match ($scale) {
-            'zepto' => [1000000000000000000, 1],
-            'nano' => [1000000000, 1],
-            'micro' => [1000000, 1],
-            'milli' => [1000, 1],
-            'kilo' => [1, 1000],
-            'mega' => [1, 1000000],
-            'giga' => [1, 1000000000],
-            default => [1, 1],
+        $exponent = match ($scale) {
+            'yocto' => -24,
+            'zepto' => -21,
+            'atto' => -18,
+            'femto' => -15,
+            'pico' => -12,
+            'nano' => -9,
+            'micro' => -6,
+            'milli' => -3,
+            'kilo' => 3,
+            'mega' => 6,
+            'giga' => 9,
+            'tera' => 12,
+            'exa' => 18,
+            'peta' => 15,
+            'zetta' => 21,
+            'yotta' => 24,
+            default => 0,
         };
+        $divisorExponent = max(0, -$exponent) + (is_numeric($precision) && $precision > 0 ? (int) $precision : 0);
+        $multiplierExponent = max(0, $exponent);
 
-        if (is_numeric($precision) && $precision > 0) {
-            $divisor *= 10 ** (int) $precision;
+        if ($divisorExponent > 18 || $multiplierExponent > 9) {
+            return null;
         }
 
-        return [$divisor, $multiplier];
+        return [10 ** $divisorExponent, 10 ** $multiplierExponent];
     }
 
     /**

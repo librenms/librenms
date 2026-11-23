@@ -41,7 +41,7 @@ class Dxmos extends OS
         $ber = $sensors->where('sensor_class', 'ber');
 
         if ($ber->isNotEmpty()) {
-            $data = SnmpQuery::walk(['XKL-MIB::xklWaveHostSideRxBERTable', 'XKL-MIB::xklWaveHostSideTxBERTable'])->table(1);
+            $data = SnmpQuery::walk(['XKL-MIB::xklWaveHostSideRxBERTable', 'XKL-MIB::xklWaveHostSideTxBERTable'])->valuesByIndex();
 
             foreach ($ber as $sensor) {
                 if (preg_match('/^xklWaveHostSide([RT]x)BERPreFECCurrentMantissa\.(.+)$/', (string) $sensor->sensor_index, $matches)) {
