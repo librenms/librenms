@@ -37,6 +37,7 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Exceptions\SnmpConnectionException;
 use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Interfaces\Discovery\SensorsDiscovery;
 use LibreNMS\Interfaces\Module;
@@ -81,7 +82,8 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
 
     /**
      * Each available method replaces its sensors, the sensors of a method that is not available are kept.
-     * IPMI and the unix agent report no sensors when their tool is not responding, their sensors are kept then too.
+     * IPMI and the unix agent report no sensors when their tool is not responding, their sensors are kept then too,
+     * as are SNMP sensors when the device did not answer.
      */
     public function discover(OS $os): void
     {
@@ -97,7 +99,14 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
             }
 
             Log::info($method->label() . ':');
-            $discovered = $source->discoverSensors();
+            try {
+                $discovered = $source->discoverSensors();
+            } catch (SnmpConnectionException $e) {
+                Log::warning('Device did not answer, ' . $method->label() . ' sensors were not updated: ' . $e->getMessage());
+
+                continue;
+            }
+
             if ($discovered->isEmpty() && $method !== PollingMethodType::Snmp) {
                 Log::info('No sensors reported, keeping the existing sensors');
                 continue;
@@ -124,7 +133,8 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
     }
 
     /**
-     * Sensors are polled by their method. IPMI and unix agent sensors that are not read are not recorded.
+     * Sensors are polled by their method. IPMI and unix agent sensors that are not read are not recorded,
+     * nor are the sensors of a method whose device did not answer.
      */
     public function poll(OS $os, WriteInterface $datastore): void
     {
@@ -139,7 +149,14 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
                 continue;
             }
 
-            $values += $source->pollSensors($methodSensors);
+            try {
+                $values += $source->pollSensors($methodSensors);
+            } catch (SnmpConnectionException $e) {
+                Log::warning('Device did not answer, ' . $method->label() . ' sensors were not polled: ' . $e->getMessage());
+
+                continue;
+            }
+
             if ($method === PollingMethodType::Snmp) {
                 // SNMP sensors that are not read are recorded as 0
                 $unread += array_diff_key(array_flip($methodSensors->modelKeys()), $values);

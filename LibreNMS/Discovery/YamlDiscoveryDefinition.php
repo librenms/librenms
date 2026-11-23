@@ -35,6 +35,7 @@ use LibreNMS\Data\Source\Snmp\SnmpQueryInterface;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Discovery\Yaml\YamlDiscoveryField;
 use LibreNMS\Exceptions\InvalidOidException;
+use LibreNMS\Exceptions\SnmpConnectionException;
 use LibreNMS\Util\Oid;
 use SnmpQuery;
 
@@ -161,6 +162,8 @@ class YamlDiscoveryDefinition
      * @param  iterable<array{data?: list<array<string, mixed>>}>  $sections
      * @param  string[]  $knownOids  oids other parts of the yaml walk, they may be referenced without a MIB name
      * @return array<string, array<int|string, mixed>> the walked data of each oid, by index
+     *
+     * @throws SnmpConnectionException when the device did not answer
      */
     public static function walkAll(iterable $sections, array $knownOids = []): array
     {
@@ -199,6 +202,9 @@ class YamlDiscoveryDefinition
      * @param  array<string, array<int|string, mixed>>  $walked
      * @param  array<string, mixed>  $item
      */
+    /**
+     * @throws SnmpConnectionException
+     */
     private static function walkOid(array &$walked, string $oid, array $item): void
     {
         if (array_key_exists($oid, $walked)) {
@@ -217,7 +223,7 @@ class YamlDiscoveryDefinition
         }
 
         $walked[$oid] = [];
-        SnmpQuery::cache()->options($flags)->bulk($item['snmp_bulk'] ?? true)->walk($oid)->valuesByIndex($walked[$oid]);
+        SnmpQuery::cache()->options($flags)->bulk($item['snmp_bulk'] ?? true)->walk($oid)->throwIfConnectionError()->valuesByIndex($walked[$oid]);
     }
 
     /**

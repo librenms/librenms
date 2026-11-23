@@ -28,6 +28,7 @@ namespace LibreNMS\Interfaces\Polling;
 
 use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Collection;
+use LibreNMS\Exceptions\SnmpConnectionException;
 
 interface SensorsPolling
 {
@@ -35,9 +36,12 @@ interface SensorsPolling
      * Read the raw values of sensors, as the device returns them.
      * The Sensors module converts them with the divisor, multiplier and user_func of the sensor.
      * Sensors that could not be read are left out. The Sensors module records SNMP sensors that are left out as 0, it does not record others.
+     * Call throwIfConnectionError() on the queries, so a device that did not answer is not recorded as 0.
      *
      * @param  Collection<int, Sensor>  $sensors
      * @return array<int, mixed> raw values by sensor_id
+     *
+     * @throws SnmpConnectionException when the device did not answer, the sensors are not recorded
      */
     public function pollSensors(Collection $sensors): array;
 }

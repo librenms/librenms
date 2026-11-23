@@ -31,10 +31,13 @@ use App\Models\Sensor;
 use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Process;
+use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
+use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Modules\Sensors;
 use LibreNMS\OS;
+use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Tests\InMemoryDbTestCase;
 use LibreNMS\Tests\Traits\FakesPollingMethods;
@@ -269,6 +272,31 @@ EOT;
         }
     }
 
+    public function testSnmpSensorsAreKeptWhenTheDeviceDoesNotAnswerDiscovery(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Snmp]);
+        Sensor::factory()->create(['device_id' => $os->getDeviceId(), 'poller_type' => 'snmp', 'sensor_class' => 'temperature']);
+        $this->fakeSnmpTimeout(fn (): bool => false);
+
+        (new Sensors)->discover($os);
+
+        $this->assertSame(1, Sensor::where('device_id', $os->getDeviceId())->count());
+    }
+
+    public function testSnmpSensorsAreNotRecordedWhenTheDeviceDoesNotAnswer(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Snmp]);
+        $oid = '.1.3.6.1.4.1.2021.13.16.2.1.3.1';
+        Sensor::factory()->create(['device_id' => $os->getDeviceId(), 'poller_type' => 'snmp', 'sensor_class' => 'temperature', 'sensor_oid' => $oid, 'sensor_current' => 37]);
+        $this->fakeSnmpTimeout(fn (array $oids): bool => in_array($oid, $oids));
+
+        $datastore = Mockery::mock(WriteInterface::class);
+        $datastore->shouldNotReceive('write');
+        (new Sensors)->poll($os, $datastore);
+
+        $this->assertEquals(37, Sensor::where('device_id', $os->getDeviceId())->value('sensor_current'));
+    }
+
     public function testRemovingAMethodDeletesOnlyItsSensors(): void
     {
         Sensor::factory()->create(['device_id' => $this->device->device_id, 'poller_type' => 'snmp', 'sensor_class' => 'temperature', 'sensor_index' => '1', 'sensor_type' => 'linux']);
@@ -277,6 +305,23 @@ EOT;
         (new Sensors)->removeMethodData($this->device, PollingMethodType::UnixAgent);
 
         $this->assertSame(['snmp'], $this->device->sensors()->pluck('poller_type')->all());
+    }
+
+    /**
+     * The device answers the SNMP check, then times out on walks and on the gets the callback selects
+     *
+     * @param  callable(string[]): bool  $getTimesOut
+     */
+    private function fakeSnmpTimeout(callable $getTimesOut): void
+    {
+        $timeout = new RawSnmpResponse('', 'Timeout: No Response from 192.0.2.1', 1);
+        $backend = Mockery::mock(SnmpBackendInterface::class);
+        $backend->shouldReceive('get')->andReturnUsing(fn (string $target, array $oids): RawSnmpResponse => $getTimesOut($oids)
+            ? $timeout
+            : new RawSnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1.3.6.1.1.1.1', '', 0));
+        $backend->shouldReceive('walk')->andReturn($timeout);
+        $this->app->instance(SnmpBackendInterface::class, $backend);
+        $this->app->instance(SnmpPollingMethod::class, new SnmpPollingMethod($backend));
     }
 
     private function os(): OS

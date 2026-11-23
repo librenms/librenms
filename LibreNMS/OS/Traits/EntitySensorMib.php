@@ -32,6 +32,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\SensorType;
+use LibreNMS\Exceptions\SnmpConnectionException;
 use LibreNMS\Util\Rewrite;
 use SnmpQuery;
 
@@ -43,6 +44,8 @@ trait EntitySensorMib
 {
     /**
      * @return Collection<int, Sensor>
+     *
+     * @throws SnmpConnectionException when the device did not answer
      */
     public function discoverEntitySensors(): Collection
     {
@@ -52,7 +55,7 @@ trait EntitySensorMib
         $entities = SnmpQuery::hideMib()->abortOnFailure()->walk([
             'ENTITY-MIB::entPhysicalDescr',
             'ENTITY-MIB::entPhysicalName',
-        ])->table(1);
+        ])->throwIfConnectionError()->table(1);
 
         if (empty($entities)) {
             return $sensors;
@@ -64,7 +67,7 @@ trait EntitySensorMib
             'ENTITY-SENSOR-MIB::entPhySensorPrecision',
             'ENTITY-SENSOR-MIB::entPhySensorValue',
             'ENTITY-SENSOR-MIB::entPhySensorOperStatus',
-        ])->table(1);
+        ])->throwIfConnectionError()->table(1);
 
         foreach ($data as $index => $entry) {
             if (! is_array($entry)) {

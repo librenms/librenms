@@ -38,6 +38,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Discovery\YamlDiscoveryDefinition;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Exceptions\SnmpConnectionException;
 use LibreNMS\Interfaces\Discovery\BgpPeerDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
@@ -533,6 +534,8 @@ class OS implements
 
     /**
      * Get the oids of the sensors, some devices answer for the oid with .0 appended.
+     *
+     * @throws SnmpConnectionException when the device did not answer
      */
     public function pollSensors(EloquentCollection $sensors): array
     {
@@ -541,7 +544,7 @@ class OS implements
             return [];
         }
 
-        $data = \SnmpQuery::options('-OUQntea')->get($oids)->values();
+        $data = \SnmpQuery::options('-OUQntea')->get($oids)->throwIfConnectionError()->values();
         $values = [];
 
         foreach ($sensors as $sensor) {
