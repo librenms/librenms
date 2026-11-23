@@ -50,7 +50,9 @@ class PortUi
         $switches = self::findSwitchesRange($indexedPorts, $entPhysicalData['switches']);
 
         // 5. Structure the visual layout
-        return self::buildVisualGrid($switches, $transform, $indexedPorts, $entPhysicalData['map']);
+        $grid = self::buildVisualGrid($switches, $transform, $indexedPorts, $entPhysicalData['map']);
+
+        return empty($grid['switches']) ? null : $grid;
     }
 
     /**
@@ -109,8 +111,14 @@ class PortUi
                 $start = (string) ($item['start'] ?? '');
                 $type = (string) ($item['type'] ?? 'cu');
 
+                $inverse = ! empty($item['inverse']) && $item['inverse'] !== 'false';
+                $columns = [];
+
                 for ($i = 0; $i < $count; $i++) {
                     $column = (int) floor($i / $height);
+                    $rowInCol = $i % $height;
+                    $row = $inverse ? ($height - 1 - $rowInCol) : $rowInCol;
+
                     $parts = array_reverse(explode('/', $start));
                     $ifName = $start;
 
@@ -125,7 +133,16 @@ class PortUi
                         }
                     }
 
-                    $result[$module][$block][$column][] = [$ifName => $type];
+                    $columns[$column][$row] = [$ifName => $type];
+                }
+
+                foreach ($columns as $col => $colRows) {
+                    $baseRow = isset($result[$module][$block][$col]) ? count($result[$module][$block][$col]) : 0;
+                    for ($r = 0; $r < $height; $r++) {
+                        if (isset($colRows[$r])) {
+                            $result[$module][$block][$col][$baseRow + $r] = $colRows[$r];
+                        }
+                    }
                 }
             }
         }
@@ -146,8 +163,6 @@ class PortUi
         $result = [];
         $i = 0;
         $block = 0;
-        $module = 0;
-        $switch = 1;
 
         $prevType = null;
         $prevPrefix = null;
@@ -177,19 +192,51 @@ class PortUi
             $types = self::findEntPhysicalPortType($entPhysicalMap, $ifDescr ?? $ifName);
             $currentType = $types[0] ?? 'cu';
 
+            preg_match('/^([a-z-_ ]+)/i', $ifName, $prefixMatch);
+            $prefix = $prefixMatch[1] ?? '';
+
+            $parts = explode('/', $ifName);
+            $partsCount = count($parts);
+
+            $curSwitch = 1;
+            $curModule = 0;
+            $height = 1;
+
+            switch ($partsCount) {
+                case 3:
+                    if (preg_match('/([0-9]+)/', $parts[0], $sm)) {
+                        $curSwitch = (int) $sm[1];
+                    }
+                    $curModule = (int) $parts[1];
+                    $height = $rowHeight;
+                    break;
+                case 2:
+                    $curModule = (int) $parts[0];
+                    $height = $rowHeight;
+                    break;
+                default:
+                    $curModule = 0;
+                    $height = 1;
+                    break;
+            }
+
+            if ($prevSwitch !== null && $prevSwitch !== $curSwitch) {
+                $bumpBlock = true;
+            }
+
+            if ($prevModule !== null && $prevModule !== $curModule) {
+                $bumpBlock = true;
+            }
+
+            if ($prevPartsCount !== null && $prevPartsCount !== $partsCount) {
+                $bumpBlock = true;
+            }
+
             if ($prevType !== null && $prevType !== $currentType) {
                 $bumpBlock = true;
             }
 
-            preg_match('/^([a-z-_ ]+)/i', $ifName, $prefixMatch);
-            $prefix = $prefixMatch[1] ?? '';
             if ($prevPrefix !== null && $prevPrefix !== $prefix) {
-                $bumpBlock = true;
-            }
-
-            $parts = explode('/', $ifName);
-            $partsCount = count($parts);
-            if ($prevPartsCount !== null && $prevPartsCount !== $partsCount) {
                 $bumpBlock = true;
             }
 
@@ -198,39 +245,11 @@ class PortUi
                 $i = 0;
             }
 
-            if ($prevModule !== null && $prevModule !== $module) {
-                $block = 0;
-            }
-
-            if ($prevSwitch !== null && $prevSwitch !== $switch) {
-                $block = 0;
-                // If more than 1 switch, assume stack and preserve layout
-                return $result;
-            }
-
-            switch ($partsCount) {
-                case 3:
-                    if (preg_match('/([0-9]+)/', $parts[0], $sm)) {
-                        $switch = (int) $sm[1];
-                    }
-                    $module = (int) $parts[1];
-                    $height = $rowHeight;
-                    break;
-                case 2:
-                    $module = (int) $parts[0];
-                    $height = $rowHeight;
-                    break;
-                default:
-                    $module = 0;
-                    $height = 1;
-                    break;
-            }
-
             $col = (int) floor($i / max(1, $height));
-            $result[$module][$block][$col][] = [$ifName => $currentType];
+            $result[$curModule][$block][$col][] = [$ifName => $currentType];
 
-            $prevModule = $module;
-            $prevSwitch = $switch;
+            $prevModule = $curModule;
+            $prevSwitch = $curSwitch;
             $prevPrefix = $prefix;
             $prevPartsCount = $partsCount;
             $prevType = $currentType;
@@ -458,19 +477,21 @@ class PortUi
                                         }
                                     }
 
-                                    $adminStatus = match ($port?->ifAdminStatus) {
+                                    $adminStatusVal = $port?->ifAdminStatus?->value ?? ($port->ifAdminStatus ?? null);
+                                    $adminStatus = match ($adminStatusVal) {
                                         'up' => 'up',
                                         'down' => 'down',
                                         default => 'disabled',
                                     };
-                                    $operStatus = ($port?->ifOperStatus === 'up') ? 'up' : 'down';
-                                    $vlan = $port?->ifVlan ?: ($port?->ifTrunk ?: 'Unknown');
-                                    $speed = $port?->ifSpeed ? \LibreNMS\Util\Number::formatSi($port->ifSpeed, 0, 0, 'bps') : null;
+                                    $operStatusVal = $port?->ifOperStatus?->value ?? ($port->ifOperStatus ?? null);
+                                    $operStatus = ($operStatusVal === 'up') ? 'up' : 'down';
+                                    $vlan = ($port->ifVlan ?? null) ?: (($port->ifTrunk ?? null) ?: 'Unknown');
+                                    $speed = ! empty($port->ifSpeed) ? \LibreNMS\Util\Number::formatSi($port->ifSpeed, 0, 0, 'bps') : null;
 
                                     $rows[$r][] = [
-                                        'port_id' => $port?->port_id,
+                                        'port_id' => $port->port_id ?? null,
                                         'ifName' => $portName,
-                                        'ifDescr' => $port?->ifDescr ?? $portName,
+                                        'ifDescr' => $port->ifDescr ?? $portName,
                                         'label' => $portParts[0],
                                         'type' => $phyType ?: 'cu',
                                         'adminStatus' => $adminStatus,

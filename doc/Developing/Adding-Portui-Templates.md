@@ -5,29 +5,29 @@ Examples are the Aruba CX6100 with 49-52 on the left side of the chassis, or the
 
 These files live in `resources/views/device/portui/`
 The naming is `{brand}/{modelname}.json` where brand is based on the icon name assigned in LibreNMS e.g. "ubiquiti.svg" becomes directory ubiquiti.
-The contents are a identifier based on the "Hardware" tag, containing a JSON string with interface port mapping.
+The contents are an identifier based on the "Hardware" tag, containing a JSON string with interface port mapping.
 
 # PortUI JSON file format description
 
 The JSON is based on a JSON meta array which basically reads the front of the chassis columns from left to right.
- - For multi module/blade chassis, you can add the ports into seperate "modules"
+ - For multi module/blade chassis, you can add the ports into separate "modules"
  - Group the ports as part of a "block" of ports which are most common part of a speed/interface type.
  - Blocks numbers and interface names can exist multiple times for combo cu/sfp ports
  - Each column of switch ports, each interface has $ifName as the key and a phytype as the value.
- - Supported phy types differentiated are cu, sfp, qsfp, support for parsing the 'entPhysicalVendorType' attribute is vendor dependent.
+ - Supported phy types differentiated are cu, sfp, qsfp, ac, mmsr; support for parsing the 'entPhysicalVendorType' attribute is vendor dependent.
  - The Rear of the chassis is currently not rendered
 
-The filename should look something like this, spaces are replaced with a underscore, lowercase only.
+The filename should look something like this, spaces and `/` are replaced with an underscore, lowercase only.
 
 ````6100_48g_class4_poe_4sfp+_370w_switch.json````
 
 The Meta language is as follows, for easier reading.
 
  - height, defines rowheight for each column
- - invers, ordering top to bottom
+ - inverse, ordering bottom to top (default is top to bottom when 0)
  - block number, does not require sequential, same block is combined ports
  - count, number of ports in sequence
- - type, cu, sfp, qsfp
+ - type, cu, sfp, qsfp, ac, mmsr
  - start, interface number and formatting
 
 # Example JSON
