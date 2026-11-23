@@ -90,7 +90,7 @@ final class ProxmoxApiPollingMethod extends PollingMethod
         return ProxmoxApiDataSource::class;
     }
 
-    public function dataSource(PollingMethodConfig $config, ProbeResult $result): ProxmoxApiDataSource
+    public function dataSource(Device $device, PollingMethodConfig $config, ProbeResult $result): ProxmoxApiDataSource
     {
         assert($config instanceof ProxmoxApiConfig);
 

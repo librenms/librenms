@@ -41,6 +41,7 @@ use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Interfaces\Discovery\SensorsDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\SensorsPolling;
+use LibreNMS\Interfaces\RemovesMethodData;
 use LibreNMS\Interfaces\SupportsSubmodules;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
@@ -50,10 +51,10 @@ use LibreNMS\Util\ProgressList;
 use LibreNMS\Util\UserFuncHelper;
 
 /**
- * Sensors read with SNMP (poller_type snmp), the ipmi and unix-agent modules handle their own sensors.
+ * Sensors of the SNMP, IPMI and unix agent polling methods, each method has its own sensors (poller_type).
  * Submodules are sensor classes.
  */
-class Sensors implements Module, SupportsSubmodules
+class Sensors implements Module, RemovesMethodData, SupportsSubmodules
 {
     use RequiresPollingMethod;
 
@@ -70,7 +71,7 @@ class Sensors implements Module, SupportsSubmodules
 
     public function pollingMethods(Device $device): array
     {
-        return [PollingMethodType::Snmp];
+        return [PollingMethodType::Snmp, PollingMethodType::Ipmi, PollingMethodType::UnixAgent];
     }
 
     public function setSubmodules(?array $submodules): void
@@ -78,6 +79,9 @@ class Sensors implements Module, SupportsSubmodules
         $this->types = $submodules === null ? null : array_values(array_filter(array_map(SensorType::tryFrom(...), $submodules)));
     }
 
+    /**
+     * Each available method replaces its sensors, the sensors of a method that is not available are kept.
+     */
     public function discover(OS $os): void
     {
         $device = $os->getDevice();
@@ -85,41 +89,55 @@ class Sensors implements Module, SupportsSubmodules
         $types = $this->types ?? SensorType::cases();
         $classes = array_map(fn (SensorType $type) => $type->value, $types);
 
-        $source = $os->dataSource(PollingMethodType::Snmp, SensorsDiscovery::class);
-        if ($source === null) {
-            Log::info('SNMP is not available, keeping existing sensors');
-
-            return;
-        }
-
-        foreach ($source->discoverSensors() as $sensor) {
-            if (in_array($sensor->sensor_class, $classes)) {
-                $collector->discover($sensor);
+        foreach ($this->pollingMethods($device) as $method) {
+            $source = $os->dataSource($method, SensorsDiscovery::class);
+            if ($source === null) {
+                continue;
             }
-        }
 
-        foreach ($types as $type) {
-            $progress = ProgressList::start($type->label());
-            $collector->sync(sensor_class: $type->value, poller_type: 'snmp');
-            $progress->end();
+            Log::info($method->label() . ':');
+            $pollerType = self::pollerType($method);
+            foreach ($source->discoverSensors() as $sensor) {
+                if (in_array($sensor->sensor_class, $classes)) {
+                    $collector->discover($sensor->setAttribute('poller_type', $pollerType));
+                }
+            }
+
+            foreach ($types as $type) {
+                $progress = ProgressList::start($type->label());
+                $collector->sync(sensor_class: $type->value, poller_type: $pollerType);
+                $progress->end();
+            }
         }
     }
 
     public function shouldPoll(OS $os): bool
     {
-        return $this->hasAvailableMethod($os) && $this->snmpSensors($os->getDevice())->exists();
+        return $this->hasAvailableMethod($os) && $this->methodSensors($os->getDevice())->exists();
     }
 
+    /**
+     * Sensors are polled by their method, sensors that are not read are not recorded.
+     */
     public function poll(OS $os, WriteInterface $datastore): void
     {
-        $sensors = $this->snmpSensors($os->getDevice())->with('translations')->get();
-        $values = $os->dataSource(PollingMethodType::Snmp, SensorsPolling::class)?->pollSensors($sensors) ?? [];
+        $sensors = $this->methodSensors($os->getDevice())->with('translations')->get();
+        $values = [];
+
+        foreach ($this->pollingMethods($os->getDevice()) as $method) {
+            $methodSensors = $sensors->where('poller_type', self::pollerType($method));
+            if ($methodSensors->isNotEmpty()) {
+                $values += $os->dataSource($method, SensorsPolling::class)?->pollSensors($methodSensors) ?? [];
+            }
+        }
 
         foreach ($sensors->groupBy('sensor_class') as $class => $classSensors) {
             $progress = ProgressList::start(SensorType::tryFrom($class)?->label() ?? $class);
             foreach ($classSensors as $sensor) {
                 /** @var Sensor $sensor */
-                $this->recordValue($os, $datastore, $sensor->setRelation('device', $os->getDevice()), $values[$sensor->sensor_id] ?? '');
+                if (array_key_exists($sensor->sensor_id, $values)) {
+                    $this->recordValue($datastore, $sensor->setRelation('device', $os->getDevice()), $values[$sensor->sensor_id]);
+                }
             }
             $progress->end();
         }
@@ -127,12 +145,19 @@ class Sensors implements Module, SupportsSubmodules
 
     public function dataExists(Device $device): bool
     {
-        return $this->snmpSensors($device)->exists();
+        return $this->methodSensors($device)->exists();
     }
 
     public function cleanup(Device $device): int
     {
-        return $this->snmpSensors($device)->delete();
+        return $this->methodSensors($device)->delete();
+    }
+
+    public function removeMethodData(Device $device, PollingMethodType $type): void
+    {
+        if (in_array($type, $this->pollingMethods($device), true)) {
+            $device->sensors()->where('poller_type', self::pollerType($type))->delete();
+        }
     }
 
     /**
@@ -163,15 +188,28 @@ class Sensors implements Module, SupportsSubmodules
     }
 
     /**
+     * The sensors of the polling methods, of the selected classes
+     *
      * @return HasMany<Sensor, Device>
      */
-    private function snmpSensors(Device $device): HasMany
+    private function methodSensors(Device $device): HasMany
     {
-        return $device->sensors()->where('poller_type', 'snmp')
+        return $device->sensors()->whereIn('poller_type', array_map(self::pollerType(...), $this->pollingMethods($device)))
             ->when($this->types !== null, fn ($query) => $query->whereIn('sensor_class', array_map(fn (SensorType $type) => $type->value, $this->types)));
     }
 
-    private function recordValue(OS $os, WriteInterface $datastore, Sensor $sensor, mixed $raw): void
+    /**
+     * The poller_type of the sensors of a polling method
+     */
+    private static function pollerType(PollingMethodType $method): string
+    {
+        return match ($method) {
+            PollingMethodType::UnixAgent => 'agent',
+            default => $method->value,
+        };
+    }
+
+    private function recordValue(WriteInterface $datastore, Sensor $sensor, mixed $raw): void
     {
         $value = $this->convertValue($sensor, $raw);
         $previous = $sensor->sensor_current;

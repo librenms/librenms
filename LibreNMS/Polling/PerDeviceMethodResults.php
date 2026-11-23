@@ -163,7 +163,7 @@ final class PerDeviceMethodResults
 
         $method = app(PollingMethodRegistry::class)->get($type);
 
-        return $method->dataSource($method->config($this->device, $deviceMethod), $result);
+        return $method->dataSource($this->device, $method->config($this->device, $deviceMethod), $result);
     }
 
     private function check(DevicePollingMethod $deviceMethod): ProbeResult

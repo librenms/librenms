@@ -34,7 +34,7 @@ interface SensorsPolling
     /**
      * Read the raw values of sensors, as the device returns them.
      * The Sensors module converts them with the divisor, multiplier and user_func of the sensor.
-     * Sensors that could not be read should be left out.
+     * Sensors that could not be read are left out, they are not recorded.
      *
      * @param  Collection<int, Sensor>  $sensors
      * @return array<int, mixed> raw values by sensor_id

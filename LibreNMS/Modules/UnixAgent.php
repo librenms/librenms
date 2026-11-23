@@ -26,23 +26,18 @@
 
 namespace LibreNMS\Modules;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\Application;
 use App\Models\Device;
-use App\Models\Eventlog;
 use App\Models\Process;
-use App\Models\Sensor;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Traits\RequiresPollingMethod;
-use LibreNMS\Util\ProgressList;
 
 /**
  * Parsed agent output, keyed by section name.
@@ -139,7 +134,6 @@ class UnixAgent implements Module
         Log::debug('Agent data', $agent_data);
 
         $this->pollMunin($os, $datastore, (array) ($agent_data['munin'] ?? []));
-        $this->pollHddtemp($os, $datastore, (string) ($agent_data['hddtemp'] ?? ''));
         $this->pollProcesses($device, $agent_data);
 
         $this->discoverApplications($device, $agent_data);
@@ -152,8 +146,7 @@ class UnixAgent implements Module
     public function dataExists(Device $device): bool
     {
         return $device->processes()->exists()
-            || $device->muninPlugins()->exists()
-            || $device->sensors()->where('poller_type', 'agent')->exists();
+            || $device->muninPlugins()->exists();
     }
 
     /**
@@ -165,8 +158,7 @@ class UnixAgent implements Module
         DB::table('munin_plugins_ds')->whereIn('mplug_id', $plugin_ids)->delete();
 
         return $device->processes()->delete()
-            + $device->muninPlugins()->delete()
-            + $device->sensors()->where('poller_type', 'agent')->delete();
+            + $device->muninPlugins()->delete();
     }
 
     /**
@@ -318,101 +310,6 @@ class UnixAgent implements Module
 
             // unique on mplug_id + ds_name, existing data sources are left as is
             DB::table('munin_plugins_ds')->insertOrIgnore($data_sources);
-        }
-    }
-
-    /**
-     * hddtemp format: |/dev/sda|WDC WD1003FBYX|35|C||/dev/sdb|...|
-     */
-    private function pollHddtemp(OS $os, DataStorageInterface $datastore, string $hddtemp): void
-    {
-        $hddtemp = trim($hddtemp, '|');
-        if ($hddtemp === '') {
-            return; // hddtemp not installed or not responding, leave existing sensors alone
-        }
-
-        $device = $os->getDevice();
-
-        // capture current values before sync overwrites them
-        $previous = $device->sensors()
-            ->where('sensor_class', 'temperature')
-            ->where('poller_type', 'agent')
-            ->pluck('sensor_current', 'sensor_index');
-
-        $temperatures = [];
-        $sensor_discovery = new \App\Discovery\Sensor($device);
-        foreach (explode('||', $hddtemp) as $index => $disk) {
-            [$block_device, $descr, $temperature] = array_pad(explode('|', $disk, 4), 3, '');
-            $temperature = trim(str_replace('C', '', $temperature));
-            $sensor_index = $index + 1;
-
-            $sensor = new Sensor([
-                'poller_type' => 'agent',
-                'sensor_class' => 'temperature',
-                'device_id' => $device->device_id,
-                'sensor_oid' => '',
-                'sensor_index' => $sensor_index,
-                'sensor_type' => 'hddtemp',
-                'sensor_descr' => "$block_device: $descr",
-                'sensor_divisor' => 1,
-                'sensor_multiplier' => 1,
-                'rrd_type' => 'GAUGE',
-            ]);
-
-            if (is_numeric($temperature)) {
-                $temperatures[$sensor_index] = (float) $temperature;
-                $sensor->sensor_current = (float) $temperature;
-            } elseif (! $previous->has($sensor_index)) {
-                continue; // no temperature (SLP, NA, ERR), only keep sensors that already exist
-            }
-
-            $sensor_discovery->discover($sensor);
-        }
-
-        $progress = ProgressList::start('hddtemp sensors');
-        $sensors = $sensor_discovery->sync(sensor_class: 'temperature', poller_type: 'agent');
-        $progress->end();
-
-        foreach ($sensors as $sensor) {
-            if (isset($temperatures[$sensor->sensor_index])) {
-                $this->updateSensor($os, $datastore, $sensor, $previous->get($sensor->sensor_index));
-            }
-        }
-    }
-
-    private function updateSensor(OS $os, DataStorageInterface $datastore, Sensor $sensor, ?float $previous): void
-    {
-        $value = $sensor->sensor_current;
-        Log::info("$sensor->sensor_descr: $value {$sensor->unit()}");
-
-        $rrd_key = LibrenmsConfig::getOsSetting($os->getDevice()->os, 'sensor_descr') ? $sensor->sensor_descr : $sensor->sensor_index;
-        $datastore->put($os->getDeviceArray(), 'sensor', [
-            'sensor_class' => $sensor->sensor_class,
-            'sensor_type' => $sensor->sensor_type,
-            'sensor_descr' => $sensor->sensor_descr,
-            'sensor_index' => $sensor->sensor_index,
-            'rrd_name' => ['sensor', $sensor->sensor_class, $sensor->sensor_type, $rrd_key],
-            'rrd_def' => RrdDefinition::make()->addDataset('sensor', $sensor->rrd_type),
-        ], [
-            'sensor' => $value,
-        ]);
-
-        if ($previous === null || $value == $previous) {
-            return;
-        }
-
-        $sensor->sensor_prev = $previous;
-        $sensor->save();
-
-        if ($sensor->sensor_alert) {
-            $class = $sensor->classDescr();
-            $unit = $sensor->unit();
-
-            if ($sensor->sensor_limit_low !== null && $previous > $sensor->sensor_limit_low && $value < $sensor->sensor_limit_low) {
-                Eventlog::log("$class under threshold: $value $unit (< $sensor->sensor_limit_low $unit)", $sensor->device_id, $sensor->sensor_class, Severity::Warning, $sensor->sensor_id);
-            } elseif ($sensor->sensor_limit !== null && $previous < $sensor->sensor_limit && $value > $sensor->sensor_limit) {
-                Eventlog::log("$class above threshold: $value $unit (> $sensor->sensor_limit $unit)", $sensor->device_id, $sensor->sensor_class, Severity::Warning, $sensor->sensor_id);
-            }
         }
     }
 

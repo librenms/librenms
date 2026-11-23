@@ -33,6 +33,7 @@ interface SensorsDiscovery
 {
     /**
      * Discover the sensors of every sensor class.
+     * The Sensors module sets the poller_type of the sensors to that of the polling method providing them.
      * State sensors carry their state translations, see Sensor::withStates().
      *
      * @return Collection<int, Sensor>

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * IpmiTest.php
+ * SensorsTest.php
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,13 +33,17 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Process;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\WriteInterface;
-use LibreNMS\Modules\Ipmi;
+use LibreNMS\Modules\Sensors;
 use LibreNMS\OS;
+use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Tests\InMemoryDbTestCase;
+use LibreNMS\Tests\Traits\FakesPollingMethods;
 use Mockery;
 
-final class IpmiTest extends InMemoryDbTestCase
+final class SensorsTest extends InMemoryDbTestCase
 {
+    use FakesPollingMethods;
+
     private const string SENSOR_OUTPUT = <<<'EOT'
 FAN1             | 3600.000   | RPM        | ok    | 300.000   | 500.000   | 700.000   | 25300.000 | 25400.000 | 25500.000
 CPU Temp         | 45.000     | degrees C  | ok    | na        | na        | na        | 85.000    | 90.000    | 95.000
@@ -76,9 +80,9 @@ EOT;
             : self::SENSOR_OUTPUT);
     }
 
-    public function testDiscoverAndPoll(): void
+    public function testIpmiDiscoverAndPoll(): void
     {
-        $module = new Ipmi;
+        $module = new Sensors;
         $module->discover($this->os());
 
         Process::assertRan(fn (PendingProcess $process) => ($process->environment['LC_ALL'] ?? null) === 'C');
@@ -108,14 +112,14 @@ EOT;
         $this->assertEquals([47, 225, 1.31], $this->device->sensors()->orderBy('sensor_index')->pluck('sensor_current')->all());
     }
 
-    public function testPortAndTimeoutAreLeftToIpmitoolUnlessSet(): void
+    public function testIpmiPortAndTimeoutAreLeftToIpmitoolUnlessSet(): void
     {
-        (new Ipmi)->discover($this->os());
+        (new Sensors)->discover($this->os());
 
         Process::assertRan(fn (PendingProcess $process) => ! in_array('-p', (array) $process->command) && ! in_array('-N', (array) $process->command));
 
         $this->ipmiMethod->update(['settings' => ['hostname' => 'bmc.example.com', 'type' => 'lanplus', 'port' => 6230, 'timeout' => 5]]);
-        (new Ipmi)->discover($this->os());
+        (new Sensors)->discover($this->os());
 
         Process::assertRan(function (PendingProcess $process): bool {
             $command = implode(' ', (array) $process->command);
@@ -126,7 +130,7 @@ EOT;
 
     public function testRediscoveryDoesNotUpdateUnchangedSensors(): void
     {
-        $module = new Ipmi;
+        $module = new Sensors;
         $module->discover($this->os());
         $sensor_ids = $this->device->sensors()->orderBy('sensor_index')->pluck('sensor_id')->all();
 
@@ -141,11 +145,11 @@ EOT;
         $this->assertSame($sensor_ids, $this->device->sensors()->orderBy('sensor_index')->pluck('sensor_id')->all());
     }
 
-    public function testDiscoverHandlesEmptyAndShortOutput(): void
+    public function testIpmiDiscoverHandlesEmptyAndShortOutput(): void
     {
         Process::fake(fn () => "\nCPU Temp | 45.000 | degrees C | ok\n\n");
 
-        (new Ipmi)->discover($this->os());
+        (new Sensors)->discover($this->os());
 
         $sensor = $this->device->sensors()->sole();
         $this->assertSame('CPU Temp', $sensor->sensor_descr);
@@ -153,14 +157,14 @@ EOT;
         $this->assertNull($sensor->sensor_limit_warn);
 
         Process::fake(fn () => '');
-        (new Ipmi)->discover($this->os());
+        (new Sensors)->discover($this->os());
 
         $this->assertSame(0, $this->device->sensors()->count());
     }
 
-    public function testDoesNotRunWithoutIpmiConfigured(): void
+    public function testIpmiSensorsNeedTheIpmiMethod(): void
     {
-        $module = new Ipmi;
+        $module = new Sensors;
 
         $this->assertTrue($module->shouldDiscover($this->os()));
         $this->assertFalse($module->shouldPoll($this->os())); // no sensors discovered
@@ -186,16 +190,79 @@ EOT;
 
     public function testPollUsesTheSdrFromTheIpmiCheck(): void
     {
-        $module = new Ipmi;
-        $module->discover($this->os());
+        $module = new Sensors;
+        Sensor::factory()->create(['device_id' => $this->device->device_id, 'poller_type' => 'ipmi', 'sensor_class' => 'temperature', 'sensor_index' => '0', 'sensor_type' => 'ipmi', 'sensor_descr' => 'CPU Temp']);
 
         $os = $this->os();
         $this->assertTrue($module->shouldPoll($os));
         $module->poll($os, Mockery::mock(WriteInterface::class)->shouldIgnoreMissing());
 
+        // the check reads the records, polling does not run ipmitool again
         Process::assertRanTimes(fn (PendingProcess $process) => in_array('sdr', (array) $process->command), 1);
         Process::assertDidntRun(fn (PendingProcess $process) => in_array('power', (array) $process->command));
         $this->assertEquals(47, $this->device->sensors()->where('sensor_descr', 'CPU Temp')->value('sensor_current'));
+    }
+
+    public function testAgentHddtempDiscoverAndPoll(): void
+    {
+        $os = $this->makeOs([PollingMethodType::UnixAgent]);
+        $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => "<<<hddtemp>>>\n|/dev/sda|WDC WD1003FBYX|35|C||/dev/sdb|ST4000|SLP|*|\n"]);
+        $module = new Sensors;
+
+        $module->discover($os);
+
+        $sensors = Sensor::where('device_id', $os->getDeviceId())->orderBy('sensor_index')->get();
+        $this->assertSame(['agent', 'agent'], $sensors->pluck('poller_type')->all());
+        $this->assertSame(['/dev/sda: WDC WD1003FBYX', '/dev/sdb: ST4000'], $sensors->pluck('sensor_descr')->all());
+        $this->assertEquals([35, null], $sensors->pluck('sensor_current')->all());
+
+        // a sleeping disk is not polled
+        $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => "<<<hddtemp>>>\n|/dev/sda|WDC WD1003FBYX|37|C||/dev/sdb|ST4000|SLP|*|\n"]);
+        $device = DeviceCache::refresh($os->getDeviceId())->toArray();
+        $os = OS::make($device);
+        $datastore = Mockery::mock(WriteInterface::class);
+        $datastore->shouldReceive('write')->once()->withArgs(fn ($measurement, $fields, $tags) => $tags['index'] == 1 && $fields == ['sensor' => 37]);
+
+        $this->assertTrue($module->shouldPoll($os));
+        $module->poll($os, $datastore);
+
+        $this->assertEquals([37, null], Sensor::where('device_id', $os->getDeviceId())->orderBy('sensor_index')->pluck('sensor_current')->all());
+    }
+
+    public function testEachMethodSyncsOnlyItsSensors(): void
+    {
+        $os = $this->makeOs([PollingMethodType::UnixAgent]);
+        Sensor::factory()->create(['device_id' => $os->getDeviceId(), 'poller_type' => 'snmp', 'sensor_class' => 'temperature', 'sensor_index' => '1', 'sensor_type' => 'linux']);
+        Sensor::factory()->create(['device_id' => $os->getDeviceId(), 'poller_type' => 'ipmi', 'sensor_class' => 'temperature', 'sensor_index' => '0', 'sensor_type' => 'ipmi']);
+        $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => "<<<hddtemp>>>\n|/dev/sda|WDC WD1003FBYX|35|C|\n"]);
+
+        (new Sensors)->discover($os);
+
+        // the device has no SNMP or IPMI method, their sensors are kept
+        $this->assertSame(['agent', 'ipmi', 'snmp'], Sensor::where('device_id', $os->getDeviceId())->orderBy('poller_type')->pluck('poller_type')->all());
+    }
+
+    public function testUnavailableMethodKeepsItsSensors(): void
+    {
+        $os = $this->makeOs([PollingMethodType::UnixAgent]);
+        Sensor::factory()->create(['device_id' => $os->getDeviceId(), 'poller_type' => 'agent', 'sensor_class' => 'temperature', 'sensor_index' => '1', 'sensor_type' => 'hddtemp']);
+        $this->fakeMethod(UnixAgentPollingMethod::class, false);
+
+        $module = new Sensors;
+        $this->assertFalse($module->shouldDiscover($os));
+        $module->discover($os);
+
+        $this->assertSame(1, Sensor::where('device_id', $os->getDeviceId())->count());
+    }
+
+    public function testRemovingAMethodDeletesOnlyItsSensors(): void
+    {
+        Sensor::factory()->create(['device_id' => $this->device->device_id, 'poller_type' => 'snmp', 'sensor_class' => 'temperature', 'sensor_index' => '1', 'sensor_type' => 'linux']);
+        Sensor::factory()->create(['device_id' => $this->device->device_id, 'poller_type' => 'agent', 'sensor_class' => 'temperature', 'sensor_index' => '1', 'sensor_type' => 'hddtemp']);
+
+        (new Sensors)->removeMethodData($this->device, PollingMethodType::UnixAgent);
+
+        $this->assertSame(['snmp'], $this->device->sensors()->pluck('poller_type')->all());
     }
 
     private function os(): OS

@@ -72,7 +72,7 @@ final class UnixAgentPollingMethod extends PollingMethod
         return UnixAgentDataSource::class;
     }
 
-    public function dataSource(PollingMethodConfig $config, ProbeResult $result): UnixAgentDataSource
+    public function dataSource(Device $device, PollingMethodConfig $config, ProbeResult $result): UnixAgentDataSource
     {
         return new UnixAgentDataSource($result);
     }

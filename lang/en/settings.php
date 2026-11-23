@@ -841,10 +841,6 @@ return [
                 'description' => 'Route',
             ],
 
-            'ipmi' => [
-                'description' => 'IPMI',
-            ],
-
             'sensors' => [
                 'description' => 'Sensors',
             ],
@@ -1760,9 +1756,6 @@ return [
             ],
             'os' => [
                 'description' => 'OS',
-            ],
-            'ipmi' => [
-                'description' => 'IPMI',
             ],
             'qos' => [
                 'description' => 'QoS',
