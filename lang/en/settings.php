@@ -836,6 +836,9 @@ return [
             'qos' => [
                 'description' => 'QoS',
             ],
+            'subscribers' => [
+                'description' => 'Subscribers',
+            ],
 
             'route' => [
                 'description' => 'Route',
@@ -1766,6 +1769,9 @@ return [
             ],
             'qos' => [
                 'description' => 'QoS',
+            ],
+            'subscribers' => [
+                'description' => 'Subscribers',
             ],
             'sensors' => [
                 'description' => 'Sensors',

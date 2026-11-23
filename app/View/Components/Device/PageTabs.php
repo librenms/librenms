@@ -57,6 +57,7 @@ class PageTabs extends Component
         'tnmsne' => \App\Http\Controllers\Device\Tabs\TnmsneController::class,
         'loadbalancer' => \App\Http\Controllers\Device\Tabs\LoadBalancerController::class,
         'routing' => \App\Http\Controllers\Device\Tabs\RoutingController::class,
+        'subscribers' => \App\Http\Controllers\Device\Tabs\SubscribersController::class,
         'pseudowires' => \App\Http\Controllers\Device\Tabs\PseudowiresController::class,
         'neighbours' => \App\Http\Controllers\Device\Tabs\NeighboursController::class,
         'stp' => \App\Http\Controllers\Device\Tabs\StpController::class,

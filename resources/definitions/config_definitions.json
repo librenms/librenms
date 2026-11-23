@@ -2096,6 +2096,13 @@
             "default": true,
             "type": "boolean"
         },
+        "discovery_modules.subscribers": {
+            "order": 305,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "discovery_modules.stp": {
             "order": 310,
             "group": "discovery",
@@ -6424,6 +6431,13 @@
         },
         "poller_modules.applications": {
             "order": 10,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.subscribers": {
+            "order": 375,
             "group": "poller",
             "section": "poller_modules",
             "default": true,

@@ -1,0 +1,171 @@
+-- *****************************************************************
+-- CISCO-CBP-TC-MIB
+-- Definitions of textual conventions used by MIB modules describing
+-- and using class-based policies.
+--   
+-- June 2007, Patrick R. Gili
+--   
+-- Copyright (c) 2007-2008 by Cisco Systems Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+CISCO-CBP-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoCbpTcMIB MODULE-IDENTITY
+    LAST-UPDATED    "200806240000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA 95134
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-snmp@cisco.com"
+    DESCRIPTION
+        "This MIB module defines textual conventions used by the
+        CISCO-CBP-BASE-CFG-MIB, CISCO-CBP-BASE-MON-MIB, and any MIB
+        modules extending these MIB modules."
+    REVISION        "200806240000Z"
+    DESCRIPTION
+        "The initial version of the MIB module."
+    ::= { ciscoMgmt 662 }
+
+
+
+CbpElementName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "127a"
+    STATUS          current
+    DESCRIPTION
+        "A string-value that identifies an element used to specify
+        a class-based policy.  The semantics of the string-value are
+        the same those specified by the SnmpAdminString textual
+        convention defined by the SNMP-FRAMEWORK-MIB [RFC3411].
+
+        Observe that the null string is reserved for cases when an
+        instance of an object needs to specify 'no element'."
+
+    REFERENCE
+        "D. Harrington, R. Resuhn, B. Wijnen, 'An Architecture for
+        Describing Simple Network Management Protocol (SNMP)
+        Management Frameworks', RFC-3411, December 2002."
+    SYNTAX          OCTET STRING (SIZE (0..127))
+
+CbpElementIdentifier ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A positive, non-zero integer-value that uniquely identifies
+        an element used to specify a class-based policy."
+    SYNTAX          Unsigned32 (1..4294967295)
+
+CbpElementIdentifierOrZero ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This textual convention serves as an extension of the
+        CbpElementIdentifier textual convention, which permits the value
+        '0'.  The use of the value '0' is specific to an object, thus
+        requiring the descriptive text associated with the object to
+        describe the semantics of its use."
+    SYNTAX          Unsigned32 (0..4294967295)
+
+CbpInstanceIdentifier ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A positive, non-zero integer-value that uniquely identifies
+        an instance of an element used to define a class-based policy."
+    SYNTAX          Unsigned32 (1..4294967295)
+
+CbpInstanceIdentifierOrZero ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This textual convention serves as an extension of the
+        CbpInstanceIdentifier textual convention, which permits the
+        value '0'.  The use of the value '0' is specific to an object,
+        thus requiring the descriptive text associated with the object
+        to describe the semantics of its use."
+    SYNTAX          Unsigned32 (0..4294967295)
+
+CbpExecutionPriority ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "An positive, integer-value denoting the relative priority of an
+        element, where '1' represents the highest priority and greater
+        values represent lower priorities.
+
+        The priority assigned to an element determines the order in
+        which the system processes the elements relative to like
+        elements having the same parent, where the system processes
+        elements having a greater priority first.  The system processes
+        sibling elements having the same priority in the order they were
+        created."
+    SYNTAX          Unsigned32 (1..4294967295)
+
+CbpExecutionStrategy ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "An enumerated integer-value describing how to execute an
+        ordered set of actions:
+
+            'other'
+                The implementation of the MIB using this textual
+                convention does not recognize the specified execution
+                strategy.
+
+            'doUntilSuccess'
+                The system sequentially executes the actions in the
+                set until one succeeds.
+
+            'doUntilFailure'
+                The system sequentially executes the actions in the
+                set until one fails.
+
+            'doAll'
+                The system sequentially executes all actions in the set,
+                regardless of whether they succeed or fail."
+    SYNTAX          INTEGER  {
+                        other(1),
+                        doUntilSuccess(2),
+                        doUntilFailure(3),
+                        doAll(4)
+                    }
+
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

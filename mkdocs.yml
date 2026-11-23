@@ -295,6 +295,7 @@ nav:
       - Mem/CPU Information: Developing/os/Mem-CPU-Information.md
       - Health Information: Developing/os/Health-Information.md
       - Wireless Sensors: Developing/os/Wireless-Sensors.md
+      - Subscribers: Developing/os/Subscribers.md
       - Custom Graphs: Developing/os/Custom-Graphs.md
       - Settings: Developing/os/Settings.md
       - Unit Tests: Developing/os/Test-Units.md
