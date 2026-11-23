@@ -34,6 +34,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Util\Url;
 
@@ -54,13 +55,6 @@ class InventoryController extends TableController
             'model' => 'nullable|string',
             'serial' => 'nullable|string',
             'sort' => 'sometimes|array',
-        ];
-    }
-
-    protected function filterFields(Request $request): array
-    {
-        return [
-            'device_id' => 'device',
         ];
     }
 
@@ -97,10 +91,14 @@ class InventoryController extends TableController
     {
         $this->authorize('viewAny', EntPhysical::class);
 
+        $filters = $request->array('filter');
+        $deviceFilters = Arr::only($filters, ['device_id']);
+        $legacyDeviceId = $request->input('device') === null ? null : $request->integer('device');
+
         $query = EntPhysical::query()
-            ->fromSub($this->inventoryRows($request->user()), 'entPhysical')
+            ->fromSub($this->inventoryRows($request->user(), $deviceFilters, $legacyDeviceId), 'entPhysical')
             ->with('device')
-            ->applyFilters($request->array('filter'));
+            ->applyFilters(Arr::except($filters, ['device_id']));
 
         // apply specific field filters
         $this->search($request->input('descr'), $query, ['entPhysicalDescr']);
@@ -110,22 +108,32 @@ class InventoryController extends TableController
         return $query;
     }
 
-    private function inventoryRows(User $user): QueryBuilder
+    /**
+     * Scope both sources before building match candidates so the windows only process the selected devices.
+     *
+     * @param  array<string, array<string, mixed>>  $deviceFilters
+     */
+    private function inventoryRows(User $user, array $deviceFilters, ?int $legacyDeviceId): QueryBuilder
     {
-        $physical = EntPhysical::hasAccess($user)->select([
-            'entPhysical.entPhysical_id',
-            'entPhysical.device_id',
-            'entPhysical.entPhysicalDescr',
-            'entPhysical.entPhysicalName',
-            'entPhysical.entPhysicalModelName',
-            'entPhysical.entPhysicalSerialNum',
-        ])->selectRaw('0 as inventory_source');
+        $physical = EntPhysical::hasAccess($user)
+            ->applyFilters($deviceFilters)
+            ->when($legacyDeviceId !== null, fn (Builder $query) => $query->where('entPhysical.device_id', $legacyDeviceId))
+            ->select([
+                'entPhysical.entPhysical_id',
+                'entPhysical.device_id',
+                'entPhysical.entPhysicalDescr',
+                'entPhysical.entPhysicalName',
+                'entPhysical.entPhysicalModelName',
+                'entPhysical.entPhysicalSerialNum',
+            ])->selectRaw('0 as inventory_source');
 
         if (! Gate::forUser($user)->allows('viewAny', Transceiver::class)) {
             return $physical->selectRaw("'physical' as part_type")->toBase();
         }
 
-        $transceivers = Transceiver::hasAccess($user);
+        $transceivers = Transceiver::hasAccess($user)
+            ->applyFilters($deviceFilters)
+            ->when($legacyDeviceId !== null, fn (Builder $query) => $query->where('transceivers.device_id', $legacyDeviceId));
         $matches = $this->transceiverMatches($physical, $transceivers);
 
         $physical->leftJoinSub((clone $matches)->select('entPhysical_id'), 'matched', 'matched.entPhysical_id', '=', 'entPhysical.entPhysical_id')
