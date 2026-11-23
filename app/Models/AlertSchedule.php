@@ -29,6 +29,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Date;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
@@ -185,7 +186,14 @@ class AlertSchedule extends Model
 
     // ---- Query scopes ----
 
-    public function scopeIsActive($query)
+    /**
+     * Constrain a query on alert_schedule to schedules whose downtime window is active right now
+     * (one-shot or recurring). Also usable as a plain constraint inside subqueries.
+     *
+     * @param  Builder<AlertSchedule>  $query
+     * @return Builder<AlertSchedule>
+     */
+    public static function applyActiveWindow(Builder $query): Builder
     {
         return $query->where(function ($query): void {
             $now = CarbonImmutable::now('UTC');
@@ -220,6 +228,11 @@ class AlertSchedule extends Model
                     });
                 });
         });
+    }
+
+    public function scopeIsActive($query)
+    {
+        return static::applyActiveWindow($query);
     }
 
     // ---- Define Relationships ----

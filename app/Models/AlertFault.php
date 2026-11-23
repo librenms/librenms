@@ -31,6 +31,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Enum\MaintenanceBehavior;
 
 /**
  * @property int $id
@@ -173,6 +174,27 @@ class AlertFault extends DeviceRelatedModel
     {
         return $query->whereHas('device', fn (Builder $device) => $device->where('disabled', 0))
             ->whereHas('rule', fn (Builder $rule) => $rule->enabled());
+    }
+
+    /**
+     * Faults on devices that are not currently inside a scheduled downtime (maintenance window).
+     *
+     * A device can be under maintenance directly, through one of its device groups or through
+     * its location. Schedules with the RunAlerts behavior keep normal alerting semantics and do
+     * not hide faults; SkipAlerts and MuteAlerts windows hide them while they are active.
+     *
+     * @param  Builder<AlertFault>  $query
+     * @return Builder<AlertFault>
+     */
+    protected function scopeNotUnderMaintenance(Builder $query): Builder
+    {
+        $hidesFaults = fn (Builder $schedule) => AlertSchedule::applyActiveWindow($schedule)
+            ->where(fn (Builder $q) => $q->whereNull('behavior')->orWhere('behavior', '!=', MaintenanceBehavior::RunAlerts->value));
+
+        return $query
+            ->whereDoesntHave('device.alertSchedules', $hidesFaults)
+            ->whereDoesntHave('device.groups.alertSchedules', $hidesFaults)
+            ->whereDoesntHave('device.location.alertSchedules', $hidesFaults);
     }
 
     /**

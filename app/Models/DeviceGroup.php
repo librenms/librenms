@@ -133,7 +133,7 @@ class DeviceGroup extends BaseModel
      */
     public function alertSchedules(): MorphToMany
     {
-        return $this->morphToMany(AlertSchedule::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
+        return $this->morphToMany(AlertSchedule::class, 'alert_schedulable', 'alert_schedulables', 'alert_schedulable_id', 'schedule_id');
     }
 
     /**

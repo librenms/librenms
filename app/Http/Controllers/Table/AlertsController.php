@@ -188,6 +188,7 @@ class AlertsController extends TableController
             ->select('alert_faults.*')
             ->with(['device', 'device.location', 'rule'])
             ->open()
+            ->notUnderMaintenance()
             ->onEnabledDevicesAndRules()
             ->hasAccess($request->user())
             ->when($request->array('filter'), fn (Builder $q, array $filters) => $q->applyFilters($filters));
