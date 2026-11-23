@@ -78,7 +78,7 @@
         var locations_grid = null;
 
         $(document).ready(function () {
-            locations_grid = $("#locations").bootgrid({
+            locations_grid = bootgridWithExport($("#locations"), {
                 ajax: true,
                 rowCount: [25, 50, 100, -1],
                 formatters: {

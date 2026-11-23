@@ -36,7 +36,7 @@
 <script>
     var filter = @js($data['filter']);
 
-    var grid = $("#vminfo").bootgrid({
+    var grid = bootgridWithExport($("#vminfo"), {
         ajax: true,
         rowCount: [50, 100, 250, -1],
         templates: {

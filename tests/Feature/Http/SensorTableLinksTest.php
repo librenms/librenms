@@ -42,4 +42,20 @@ final class SensorTableLinksTest extends TestCase
             $response->json('rows.0.sensor_descr')
         );
     }
+
+    public function testExportPageUsesTheDefaultSensorOrder(): void
+    {
+        $device = Device::factory()->create();
+        Sensor::factory()->for($device)->create(['sensor_class' => 'temperature', 'sensor_descr' => 'Zulu sensor']);
+        Sensor::factory()->for($device)->create(['sensor_class' => 'temperature', 'sensor_descr' => 'Alpha sensor']);
+
+        $response = $this->actingAs(User::factory()->admin()->create(['enabled' => 1]))
+            ->get(route('table.sensors.export', ['class' => 'temperature', 'current' => 1, 'rowCount' => 1]))
+            ->assertOk()
+            ->assertStreamed();
+
+        $csv = $response->streamedContent();
+        $this->assertStringContainsString('Alpha sensor', $csv);
+        $this->assertStringNotContainsString('Zulu sensor', $csv);
+    }
 }

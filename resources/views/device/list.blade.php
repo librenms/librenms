@@ -25,7 +25,7 @@
 <script>
     var filter = @js($filter);
 
-    var grid = $("#devices").bootgrid({
+    var grid = bootgridWithExport($("#devices"), {
         ajax: true,
         rowCount: [50, 100, 250, -1],
         columnSelection: true,
@@ -56,7 +56,7 @@
             },
         },
         templates: {
-            header: "<div class=\"devices-headers-table-menu\" style=\"padding:6px 6px 0px 0px;\"><p class=\"@{{css.actions}}\"></p></div><div class=\"row\"></div>",
+            header: "<div id=\"@{{ctx.id}}\" class=\"devices-headers-table-menu\" style=\"padding:6px 6px 0px 0px;\"><p class=\"@{{css.actions}}\"></p></div><div class=\"row\"></div>",
             search: "" // hide the generic search
         },
         post: function () {

@@ -142,113 +142,75 @@ $(document).ready(function () {
     }, 300000);
 });
 
-// Add export button to bootgrid tables
-$(document).on('initialized.rs.jquery.bootgrid', function (e, b) {
-    var grid = $(e.target);
-    var tableId = grid.attr('id');
-
-    if ($('#' + tableId + '-export-button').length === 0) {
-        var exportUrl = grid.data('export-url');
-
-        if (exportUrl) {
-            var actionsContainer = null;
-
-            var panel = grid.closest('div.panel');
-            if (panel.length) {
-                actionsContainer = panel.find('div.actions');
-            }
-
-            if (actionsContainer && actionsContainer.length) {
-                var exportButton = $(
-                    '<div id="' + tableId + '-export-button" class="btn-group mr-2 bootgrid-export-button">' +
-                    '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-                    '<i class="fa fa-download"></i> <span class="caret"></span>' +
-                    '</button>' +
-                    '<ul class="dropdown-menu">' +
-                    '<li><a href="' + exportUrl + '" class="export-link" data-grid-id="' + tableId + '" data-export-type="visible"><i class="fa-solid fa-fw fa-file-csv"></i> Export page</a></li>' +
-                    '<li><a href="' + exportUrl + '" class="export-link" data-grid-id="' + tableId + '" data-export-type="all"><i class="fa-solid fa-fw fa-file-csv"></i> Export all results</a></li>' +
-                    '</ul>' +
-                    '</div>'
-                );
-
-                actionsContainer.prepend(exportButton);
-
-                // onclick event for export button
-                // to handle filtering and sorting
-                exportButton.find('.export-link').on('click', function(e) {
-                    e.preventDefault();
-
-                    var gridId = $(this).data('grid-id');
-                    var exportType = $(this).data('export-type');
-                    var grid = $('#' + gridId);
-                    var currentUrl = $(this).attr('href');
-                    var urlParams = [];
-
-                    var searchPhrase = $('.search-field').val();
-                    if (searchPhrase) {
-                        urlParams.push('searchPhrase=' + encodeURIComponent(searchPhrase));
-                    }
-
-                    const currentParams = new URLSearchParams(window.location.search);
-                    currentParams.forEach((value, key) => {
-                        if (key.startsWith("filter[")) {
-                            urlParams.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
-                        }
-                    });
-
-                    // Only include pagination for visible records export
-                    if (exportType === 'visible') {
-                        var currentPage = grid.bootgrid('getCurrentPage');
-                        var rowCount = grid.bootgrid('getRowCount');
-                        urlParams.push('current=' + currentPage);
-                        urlParams.push('rowCount=' + rowCount);
-                    }
-
-                    // get all filters from the header
-                    var headerContainer = $('.' + gridId + '-headers-table-menu');
-                    if (headerContainer.length) {
-                        headerContainer.find('input[name]').each(function() {
-                            var field = $(this);
-                            var name = field.attr('name');
-                            var value = field.val();
-                            if (name === '_token') {
-                                return;
-                            }
-
-                            if (value !== null && value !== '' && value !== '1') {
-                                urlParams.push(name + '=' + encodeURIComponent(value));
-                            }
-                        });
-
-                        headerContainer.find('select[name]').each(function() {
-                            var select = $(this);
-                            var name = select.attr('name');
-                            var selectedOption = select.find(':selected');
-                            if (selectedOption.length) {
-                                urlParams.push(name + '=' + encodeURIComponent(selectedOption.val()));
-                            }
-                        });
-                    }
-
-                    var sorting = grid.bootgrid('getSortDictionary');
-                    if (sorting && Object.keys(sorting).length > 0) {
-                        for (var sortKey in sorting) {
-                            if (sorting.hasOwnProperty(sortKey)) {
-                                urlParams.push('sort[' + sortKey + ']=' + sorting[sortKey]);
-                            }
-                        }
-                    }
-
-                    if (urlParams.length > 0) {
-                        currentUrl += (currentUrl.indexOf('?') > -1 ? '&' : '?') + urlParams.join('&');
-                    }
-
-                    window.open(currentUrl, '_blank');
-                });
-            }
-        }
+function bootgridWithExport(grid, options) {
+    const exportUrl = grid.data('export-url');
+    if (!exportUrl) {
+        return grid.bootgrid(options);
     }
-});
+
+    const gridId = grid.attr('id');
+    const exportButton = $(
+        '<div class="btn-group mr-2 bootgrid-export-button">' +
+        '<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled>' +
+        '<i class="fa fa-download"></i> <span class="caret"></span>' +
+        '</button>' +
+        '<ul class="dropdown-menu">' +
+        '<li><a class="export-link" data-export-type="visible"><i class="fa-solid fa-fw fa-file-csv"></i> Export page</a></li>' +
+        '<li><a class="export-link" data-export-type="all"><i class="fa-solid fa-fw fa-file-csv"></i> Export all results</a></li>' +
+        '</ul>' +
+        '</div>'
+    ).attr('id', gridId + '-export-button');
+
+    let requestParams;
+    let responseParams;
+    let exportParams;
+
+    grid.on('loaded.rs.jquery.bootgrid', function () {
+        // Bootgrid also fires loaded after a failed request, without a response snapshot.
+        exportParams = responseParams;
+        responseParams = undefined;
+        exportButton.children('button').prop('disabled', !exportParams);
+    });
+
+    grid.bootgrid({
+        ...options,
+        requestHandler(request) {
+            const params = options.requestHandler ? options.requestHandler.call(this, request) : request;
+            requestParams = new URLSearchParams($.param(params));
+            requestParams.delete('_token');
+            return params;
+        },
+        responseHandler(response) {
+            const result = options.responseHandler ? options.responseHandler.call(this, response) : response;
+            responseParams = requestParams;
+            responseParams.set('current', result.current);
+            return result;
+        },
+    });
+
+    exportButton.find('.export-link').attr('href', exportUrl).on('click', function (event) {
+        event.preventDefault();
+        if (!exportParams) {
+            return;
+        }
+
+        const params = new URLSearchParams(exportParams);
+        if ($(this).data('export-type') === 'all') {
+            params.delete('current');
+            params.delete('rowCount');
+        }
+
+        const url = new URL(exportUrl, window.location.href);
+        if (params.size) {
+            url.search += (url.search ? '&' : '') + params.toString();
+        }
+        window.open(url.href, '_blank');
+    });
+
+    $(document.getElementById(gridId + '-header')).find('.actions').prepend(exportButton);
+
+    return grid;
+}
 
 var jsFilesAdded = [];
 var jsLoadingFiles = {};

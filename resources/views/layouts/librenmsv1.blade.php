@@ -78,7 +78,7 @@
         var resolutionUrl = @js(route('ajax.set-resolution'));
         var siteStyleUrl = @js(route('ajax.set-style'));
     </script>
-    <script src="{{ asset('js/librenms.js?ver=18112026') }}"></script>
+    <script src="{{ asset('js/librenms.js?ver=23112026') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js?ver=10152026') }}"></script>

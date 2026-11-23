@@ -35,7 +35,7 @@
         </div>
     </div>
     <script>
-        var grid = $("#storage").bootgrid({
+        var grid = bootgridWithExport($("#storage"), {
             ajax: true,
             rowCount: [50, 100, 250, -1],
             post: function ()

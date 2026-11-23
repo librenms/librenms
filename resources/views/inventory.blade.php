@@ -32,7 +32,7 @@
 
 @push('scripts')
     <script>
-        var grid = $("#inventory").bootgrid({
+        var grid = bootgridWithExport($("#inventory"), {
             ajax: true,
             rowCount: [50, 100, 250, -1],
             templates: {
