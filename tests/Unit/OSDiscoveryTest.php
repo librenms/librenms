@@ -131,6 +131,38 @@ final class OSDiscoveryTest extends TestCase
     }
 
     /**
+     * A new Dell SONiC model may use a different HwSku or sysObjectID suffix.
+     * The Dell object ID prefix plus the SONiC banner must still detect it.
+     */
+    #[TestDox('Dell SONiC detection is model independent')]
+    public function testDellSonicDetectionIsModelIndependent(): void
+    {
+        $device = new Device([
+            'sysDescr' => 'SONiC Software Version: SONiC.9.9.9-Enterprise_Standard - HwSku: DellEMC-FutureModel-C64 - Distribution: Debian 13 - Kernel: 6.12.0',
+            'sysObjectID' => '.1.3.6.1.4.1.674.10895.5000.300.1.77',
+        ]);
+
+        $detected_os = Core::detectOS($device, false);
+
+        $this->assertSame('dell-sonic', $detected_os);
+    }
+
+    /**
+     * The broad PowerConnect object ID prefix must never claim a SONiC device,
+     * even when the dell-sonic rule does not recognize its sysDescr.
+     */
+    #[TestDox('SONiC is never detected as PowerConnect')]
+    public function testSonicIsNeverPowerconnect(): void
+    {
+        $device = new Device([
+            'sysDescr' => 'Dell Enterprise SONiC 5.0 for S9999F',
+            'sysObjectID' => '.1.3.6.1.4.1.674.10895.5000.300.1.77',
+        ]);
+
+        $this->assertSame('generic', Core::detectOS($device, false));
+    }
+
+    /**
      * Test that all files have been tested (removed from self::$unchecked_files
      */
     #[Depends('testOSDetection')]
