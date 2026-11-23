@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Scheduled downtime (alert schedule) filter of the faults page.
+ * Scheduled maintenance (alert schedule) filter of the faults page.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,10 +41,10 @@ use LibreNMS\Tests\DBTestCase;
 use Spatie\Permission\Models\Role;
 
 /**
- * The scheduled_downtime fault filter hides the faults of devices inside an active
- * downtime, whether it targets the device, its location or one of its device groups.
+ * The scheduled_maintenance fault filter hides the faults of devices inside an active
+ * maintenance, whether it targets the device, its location or one of its device groups.
  */
-final class AlertFaultScheduledDowntimeTest extends DBTestCase
+final class AlertFaultScheduledMaintenanceTest extends DBTestCase
 {
     use DatabaseTransactions;
 
@@ -75,20 +75,20 @@ final class AlertFaultScheduledDowntimeTest extends DBTestCase
         parent::tearDown();
     }
 
-    public function testDevicesUnderActiveDowntimesAreFiltered(): void
+    public function testDevicesUnderActiveMaintenancesAreFiltered(): void
     {
-        // the database can hold unrelated faults and downtimes, so every assertion only looks at the devices created below
+        // the database can hold unrelated faults and maintenances, so every assertion only looks at the devices created below
         $rule = AlertRule::factory()->create();
         $location = Location::factory()->create();
-        $group = DeviceGroup::factory()->create(['name' => 'downtime group']);
+        $group = DeviceGroup::factory()->create(['name' => 'maintenance group']);
 
         $direct = Device::factory()->create();
         $inLocation = Device::factory()->create(['location_id' => $location->id]);
         $inGroup = Device::factory()->create();
-        $noDowntime = Device::factory()->create();
+        $noMaintenance = Device::factory()->create();
         $group->devices()->attach($inGroup);
 
-        foreach ([$direct, $inLocation, $inGroup, $noDowntime] as $device) {
+        foreach ([$direct, $inLocation, $inGroup, $noMaintenance] as $device) {
             $this->createFault($rule, $device);
         }
 
@@ -96,17 +96,17 @@ final class AlertFaultScheduledDowntimeTest extends DBTestCase
         $this->createSchedule(['locations' => [$location]]);
         $this->createSchedule(['groups' => [$group]]);
 
-        $created = [$direct, $inLocation, $inGroup, $noDowntime];
+        $created = [$direct, $inLocation, $inGroup, $noMaintenance];
 
         $this->assertSameDevices([$direct, $inLocation, $inGroup], $this->faultDeviceIds('eq', $created));
-        $this->assertSameDevices([$noDowntime], $this->faultDeviceIds('neq', $created));
+        $this->assertSameDevices([$noMaintenance], $this->faultDeviceIds('neq', $created));
     }
 
     public function testSchedulesOutsideTheirWindowDoNotFilter(): void
     {
         $rule = AlertRule::factory()->create();
         $location = Location::factory()->create();
-        $group = DeviceGroup::factory()->create(['name' => 'downtime group']);
+        $group = DeviceGroup::factory()->create(['name' => 'maintenance group']);
 
         $past = Device::factory()->create();
         $future = Device::factory()->create();
@@ -117,15 +117,15 @@ final class AlertFaultScheduledDowntimeTest extends DBTestCase
             $this->createFault($rule, $device);
         }
 
-        // every device is targeted below, but outside the downtime window
+        // every device is targeted below, but outside the maintenance window
         $now = CarbonImmutable::now();
         $expired = $this->createSchedule(['devices' => [$past]], $now->subDays(3), $now->subDay());
         $this->createSchedule(['locations' => [$location]], $now->subDays(3), $now->subDay());
         $this->createSchedule(['groups' => [$group]], $now->addDay(), $now->addDays(2));
         $upcoming = $this->createSchedule(['devices' => [$future]], $now->addDay(), $now->addDays(2));
 
-        $this->assertFalse(AlertSchedule::isActive()->where('schedule_id', $expired->schedule_id)->exists(), 'the expired downtime should be inactive');
-        $this->assertFalse(AlertSchedule::isActive()->where('schedule_id', $upcoming->schedule_id)->exists(), 'the upcoming downtime should not be active yet');
+        $this->assertFalse(AlertSchedule::isActive()->where('schedule_id', $expired->schedule_id)->exists(), 'the expired maintenance should be inactive');
+        $this->assertFalse(AlertSchedule::isActive()->where('schedule_id', $upcoming->schedule_id)->exists(), 'the upcoming maintenance should not be active yet');
 
         $created = [$past, $future, $inLocation, $inGroup];
 
@@ -142,12 +142,12 @@ final class AlertFaultScheduledDowntimeTest extends DBTestCase
         $this->createFault($rule, $wednesday);
 
         // every Friday and every Wednesday, 10:00 - 14:00. The frozen time is a Friday at noon,
-        // so only the Friday downtime is active.
+        // so only the Friday maintenance is active.
         $fridaySchedule = $this->createRecurringSchedule($friday, '5');
         $wednesdaySchedule = $this->createRecurringSchedule($wednesday, '3');
 
-        $this->assertTrue(AlertSchedule::isActive()->where('schedule_id', $fridaySchedule->schedule_id)->exists(), 'the Friday downtime should be active');
-        $this->assertFalse(AlertSchedule::isActive()->where('schedule_id', $wednesdaySchedule->schedule_id)->exists(), 'the Wednesday downtime should not be active yet');
+        $this->assertTrue(AlertSchedule::isActive()->where('schedule_id', $fridaySchedule->schedule_id)->exists(), 'the Friday maintenance should be active');
+        $this->assertFalse(AlertSchedule::isActive()->where('schedule_id', $wednesdaySchedule->schedule_id)->exists(), 'the Wednesday maintenance should not be active yet');
 
         $created = [$friday, $wednesday];
 
@@ -172,7 +172,7 @@ final class AlertFaultScheduledDowntimeTest extends DBTestCase
 
     public function testAlertsWidgetSettingFiltersFaults(): void
     {
-        // the alerts widget posts its flat scheduled_downtime setting to the alerts table
+        // the alerts widget posts its flat scheduled_maintenance setting to the alerts table
         $admin = $this->admin();
         $rule = AlertRule::factory()->create();
         $location = Location::factory()->create();
@@ -192,9 +192,9 @@ final class AlertFaultScheduledDowntimeTest extends DBTestCase
             $this->widgetFaultIds($admin, '', [$maintainedFault, $upFault])
         );
 
-        $this->actingAs($admin)->postJson(route('table.alerts'), ['scheduled_downtime' => 'bogus'])
+        $this->actingAs($admin)->postJson(route('table.alerts'), ['scheduled_maintenance' => 'bogus'])
             ->assertUnprocessable()
-            ->assertJsonValidationErrors('scheduled_downtime');
+            ->assertJsonValidationErrors('scheduled_maintenance');
     }
 
     private function admin(): User
@@ -206,32 +206,32 @@ final class AlertFaultScheduledDowntimeTest extends DBTestCase
         return $admin;
     }
 
-    public function testAlertsWidgetSettingsFormKeepsHiddenDowntimeSelected(): void
+    public function testAlertsWidgetSettingsFormKeepsHiddenMaintenanceSelected(): void
     {
-        $this->assertDowntimeOptionSelected('0', 'hide alerts on devices in a scheduled downtime');
+        $this->assertMaintenanceOptionSelected('0', 'hide alerts on devices in a scheduled maintenance');
     }
 
-    public function testAlertsWidgetSettingsFormKeepsShownDowntimeSelected(): void
+    public function testAlertsWidgetSettingsFormKeepsShownMaintenanceSelected(): void
     {
-        $this->assertDowntimeOptionSelected('1', 'show only alerts on devices in a scheduled downtime');
+        $this->assertMaintenanceOptionSelected('1', 'show only alerts on devices in a scheduled maintenance');
     }
 
-    public function testAlertsWidgetSendsItsDowntimeSettingToTheAlertsTable(): void
+    public function testAlertsWidgetSendsItsMaintenanceSettingToTheAlertsTable(): void
     {
-        $html = $this->renderWidget($this->admin(), ['scheduled_downtime' => '1']);
+        $html = $this->renderWidget($this->admin(), ['scheduled_maintenance' => '1']);
 
-        $this->assertStringContainsString('scheduled_downtime: "1"', $html);
+        $this->assertStringContainsString('scheduled_maintenance: "1"', $html);
     }
 
-    private function assertDowntimeOptionSelected(string $value, string $label): void
+    private function assertMaintenanceOptionSelected(string $value, string $label): void
     {
-        $html = $this->renderWidget($this->admin(), ['scheduled_downtime' => $value], settingsForm: true);
+        $html = $this->renderWidget($this->admin(), ['scheduled_maintenance' => $value], settingsForm: true);
 
         // blade puts whitespace around its if, ignore the formatting; only look at this filter's
         // select since other fields offer 0 and 1 values too
-        $select = Str::before(Str::after((string) preg_replace('/\s+/', ' ', $html), 'name="scheduled_downtime"'), '</select>');
+        $select = Str::before(Str::after((string) preg_replace('/\s+/', ' ', $html), 'name="scheduled_maintenance"'), '</select>');
 
-        $this->assertNotSame('', $select, 'the widget settings form has no scheduled downtime field');
+        $this->assertNotSame('', $select, 'the widget settings form has no scheduled maintenance field');
         $this->assertStringContainsString('<option value="' . $value . '" selected >' . $label . '</option>', $select);
         $this->assertStringNotContainsString('<option value="' . ($value === '0' ? '1' : '0') . '" selected >', $select);
     }
@@ -246,7 +246,7 @@ final class AlertFaultScheduledDowntimeTest extends DBTestCase
     {
         $dashboard = Dashboard::create([
             'user_id' => $admin->user_id,
-            'dashboard_name' => 'downtime test',
+            'dashboard_name' => 'maintenance test',
             'access' => 1,
         ]);
         $widget = UserWidget::create([
@@ -282,7 +282,7 @@ final class AlertFaultScheduledDowntimeTest extends DBTestCase
     private function widgetFaultIds(User $admin, string $setting, array $only): array
     {
         $rows = $this->actingAs($admin)
-            ->postJson(route('table.alerts'), ['scheduled_downtime' => $setting, 'rowCount' => -1])
+            ->postJson(route('table.alerts'), ['scheduled_maintenance' => $setting, 'rowCount' => -1])
             ->assertOk()
             ->json('rows') ?? [];
 
@@ -290,7 +290,7 @@ final class AlertFaultScheduledDowntimeTest extends DBTestCase
     }
 
     /**
-     * Recurring downtime on the given day of week (1 - 7), 10:00 - 14:00, from 2026 until year 9000
+     * Recurring maintenance on the given day of week (1 - 7), 10:00 - 14:00, from 2026 until year 9000
      */
     private function createRecurringSchedule(Device $device, string $dayOfWeek): AlertSchedule
     {
@@ -307,13 +307,13 @@ final class AlertFaultScheduledDowntimeTest extends DBTestCase
     }
 
     /**
-     * Create an active downtime (an hour around the frozen test time) for the given targets
+     * Create an active maintenance (an hour around the frozen test time) for the given targets
      *
      * @param  array{devices?: list<Device>, groups?: list<DeviceGroup>, locations?: list<Location>}  $targets
      */
     private function createSchedule(array $targets, ?CarbonImmutable $start = null, ?CarbonImmutable $end = null): AlertSchedule
     {
-        $schedule = new AlertSchedule(['title' => 'downtime', 'notes' => '', 'behavior' => MaintenanceBehavior::MuteAlerts]);
+        $schedule = new AlertSchedule(['title' => 'maintenance', 'notes' => '', 'behavior' => MaintenanceBehavior::MuteAlerts]);
         $schedule->start = $start ?: CarbonImmutable::now()->subHour();
         $schedule->end = $end ?: CarbonImmutable::now()->addHour();
         $schedule->save();
@@ -338,7 +338,7 @@ final class AlertFaultScheduledDowntimeTest extends DBTestCase
 
     /**
      * Devices of the faults matching the filter, limited to $only so unrelated
-     * faults and downtimes of an existing database cannot change the result
+     * faults and maintenances of an existing database cannot change the result
      *
      * @param  string  $operator  eq (is) or neq (is not)
      * @param  list<Device>  $only
@@ -347,7 +347,7 @@ final class AlertFaultScheduledDowntimeTest extends DBTestCase
     private function faultDeviceIds(string $operator, array $only): array
     {
         return AlertFault::query()
-            ->applyFilters(['scheduled_downtime' => [$operator => '1']])
+            ->applyFilters(['scheduled_maintenance' => [$operator => '1']])
             ->whereIn('alert_faults.device_id', array_map(fn (Device $device) => $device->device_id, $only))
             ->pluck('device_id')
             ->unique()

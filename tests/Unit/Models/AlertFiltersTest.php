@@ -184,23 +184,23 @@ final class AlertFiltersTest extends TestCase
         $this->assertStringContainsString('or exists (select * from `device_relationships` inner join', $reachable);
     }
 
-    public function testScheduledDowntime(): void
+    public function testScheduledMaintenance(): void
     {
         // devices scheduled directly, by their location or by one of their device groups
-        $inDowntime = AlertFault::query()->applyFilters(['scheduled_downtime' => ['eq' => '1']])->toSql();
-        $this->assertSame(3, substr_count($inDowntime, 'exists (select * from `alert_schedulables`'));
-        $this->assertStringContainsString('`alert_schedulables`.`alert_schedulable_id` = `alert_faults`.`device_id`', $inDowntime);
-        $this->assertStringContainsString('inner join `devices` as `scheduled_devices` on `scheduled_devices`.`location_id`', $inDowntime);
-        $this->assertStringContainsString('inner join `device_group_device` on `device_group_device`.`device_group_id`', $inDowntime);
+        $inMaintenance = AlertFault::query()->applyFilters(['scheduled_maintenance' => ['eq' => '1']])->toSql();
+        $this->assertSame(3, substr_count($inMaintenance, 'exists (select * from `alert_schedulables`'));
+        $this->assertStringContainsString('`alert_schedulables`.`alert_schedulable_id` = `alert_faults`.`device_id`', $inMaintenance);
+        $this->assertStringContainsString('inner join `devices` as `scheduled_devices` on `scheduled_devices`.`location_id`', $inMaintenance);
+        $this->assertStringContainsString('inner join `device_group_device` on `device_group_device`.`device_group_id`', $inMaintenance);
 
-        // "no downtime" negates all three targets together, it must not drop any of them
-        $notDowntime = AlertFault::query()->applyFilters(['scheduled_downtime' => ['eq' => '0']])->toSql();
-        $this->assertSame(3, substr_count($notDowntime, 'exists (select * from `alert_schedulables`'));
-        $this->assertStringContainsString('where not (exists (select * from `alert_schedulables`', $notDowntime);
-        $this->assertStringNotContainsString('or not exists', $notDowntime);
+        // "no maintenance" negates all three targets together, it must not drop any of them
+        $notMaintenance = AlertFault::query()->applyFilters(['scheduled_maintenance' => ['eq' => '0']])->toSql();
+        $this->assertSame(3, substr_count($notMaintenance, 'exists (select * from `alert_schedulables`'));
+        $this->assertStringContainsString('where not (exists (select * from `alert_schedulables`', $notMaintenance);
+        $this->assertStringNotContainsString('or not exists', $notMaintenance);
 
         // the active schedule subquery compares the stored morph alias and the legacy class name
-        $bindings = AlertFault::query()->applyFilters(['scheduled_downtime' => ['eq' => '1']])->getBindings();
+        $bindings = AlertFault::query()->applyFilters(['scheduled_maintenance' => ['eq' => '1']])->getBindings();
         $this->assertContains('device', $bindings);
         $this->assertContains(Device::class, $bindings);
         $this->assertContains('device_group', $bindings);

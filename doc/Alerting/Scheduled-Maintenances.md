@@ -55,7 +55,7 @@ To end a maintenance early, remove it.
 
 ## Hiding Maintained Devices From Faults
 
-The Faults page (Alert → Faults) has a *Scheduled Downtime* filter. Set it
+The Faults page (Alert → Faults) has a *Scheduled Maintenance* filter. Set it
 to *No* to hide the faults of all devices that are currently in a
 maintenance, or to *Yes* to show only those devices. A device counts as
 maintained when an active maintenance targets the device itself, its

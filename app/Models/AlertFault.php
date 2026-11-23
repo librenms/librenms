@@ -90,7 +90,7 @@ class AlertFault extends DeviceRelatedModel
         'device.location_id',
         'device.groups.id',
         'unreachable',
-        'scheduled_downtime',
+        'scheduled_maintenance',
         'note',
     ];
 
@@ -107,8 +107,8 @@ class AlertFault extends DeviceRelatedModel
                 'type' => 'boolean',
             ],
             [
-                'key' => 'scheduled_downtime',
-                'label' => __('Scheduled Downtime'),
+                'key' => 'scheduled_maintenance',
+                'label' => __('Scheduled Maintenance'),
                 'type' => 'boolean',
             ],
             [
@@ -138,9 +138,9 @@ class AlertFault extends DeviceRelatedModel
         $this->scopeUnreachable($query, (bool) $value xor ($config['not'] ?? false));
     }
 
-    public function filterScheduledDowntime(Builder $query, mixed $value, array $config): void
+    public function filterScheduledMaintenance(Builder $query, mixed $value, array $config): void
     {
-        $this->scopeScheduledDowntime($query, (bool) $value xor ($config['not'] ?? false));
+        $this->scopeScheduledMaintenance($query, (bool) $value xor ($config['not'] ?? false));
     }
 
     // ---- Query scopes ----
@@ -169,13 +169,13 @@ class AlertFault extends DeviceRelatedModel
     }
 
     /**
-     * Faults on devices inside an active scheduled downtime (alert schedule).
+     * Faults on devices inside an active scheduled maintenance (alert schedule).
      * A schedule covers the device itself, or every device of a scheduled location or device group.
      *
      * @param  Builder<AlertFault>  $query
      * @return Builder<AlertFault>
      */
-    public function scopeScheduledDowntime($query, bool $inDowntime = true): Builder
+    public function scopeScheduledMaintenance($query, bool $inMaintenance = true): Builder
     {
         // how the devices of each schedulable type are found, keyed by the class alert_schedulables refers to
         $targets = [
@@ -201,7 +201,7 @@ class AlertFault extends DeviceRelatedModel
             }
         };
 
-        return $inDowntime ? $query->where($scheduled) : $query->whereNot($scheduled);
+        return $inMaintenance ? $query->where($scheduled) : $query->whereNot($scheduled);
     }
 
     /**
