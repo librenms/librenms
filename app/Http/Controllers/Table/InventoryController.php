@@ -36,6 +36,7 @@ use Illuminate\Database\Query\JoinClause;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Gate;
+use LibreNMS\Util\StringHelpers;
 use LibreNMS\Util\Url;
 
 /**
@@ -221,11 +222,13 @@ class InventoryController extends TableController
     protected function formatExportRow(Model $entPhysical): array
     {
         return [
-            $entPhysical->device->display ?? '',
-            $entPhysical->entPhysicalDescr,
-            $entPhysical->entPhysicalName,
-            $entPhysical->entPhysicalModelName,
-            $entPhysical->entPhysicalSerialNum,
+            ...array_map(StringHelpers::neutralizeCsvFormula(...), [
+                $entPhysical->device->display ?? '',
+                $entPhysical->entPhysicalDescr,
+                $entPhysical->entPhysicalName,
+                $entPhysical->entPhysicalModelName,
+                $entPhysical->entPhysicalSerialNum,
+            ]),
             __('inventory.' . $entPhysical->getAttribute('part_type')),
         ];
     }
