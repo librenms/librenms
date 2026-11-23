@@ -28,6 +28,14 @@ namespace LibreNMS\Util;
 
 class StringHelpers
 {
+    /**
+     * Prefix device-reported text that spreadsheets could interpret as a formula.
+     */
+    public static function neutralizeCsvFormula(mixed $value): mixed
+    {
+        return is_string($value) && preg_match('/^[=+\-@\t\r]/', $value) ? "'" . $value : $value;
+    }
+
     public static function isValidUtf8(string $string): bool
     {
         return preg_match('//u', $string) === 1;
