@@ -26,6 +26,7 @@
 
 namespace LibreNMS\RRD\Backend;
 
+use LibreNMS\Exceptions\RrdCachedConnectionException;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdFileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
@@ -77,6 +78,8 @@ class Rrdtool implements RrdBackendInterface
             }
         } catch (RrdFileExistsException) {
             Log::debug("RRD[%g$rrd already exists%n]", ['color' => true]);
+        } catch (RrdNotFoundException $e) {
+            throw $this->remoteFallbackError($e, $rrd);
         }
     }
 
@@ -140,7 +143,30 @@ class Rrdtool implements RrdBackendInterface
      */
     public function last(RrdPath $rrd): int
     {
-        return (int) $this->run('last', $rrd->relativePath());
+        try {
+            $output = $this->run('last', $rrd->relativePath());
+        } catch (RrdNotFoundException $e) {
+            throw $this->remoteFallbackError($e, $rrd);
+        }
+
+        if (! ctype_digit($output)) {
+            throw new RrdUnknownException('Invalid RRD last update response for ' . $rrd);
+        }
+
+        return (int) $output;
+    }
+
+    /**
+     * RRDtool falls back to local files if it cannot connect to the daemon,
+     * so a missing file that rrdcached didn't report means the daemon is unreachable.
+     */
+    private function remoteFallbackError(RrdNotFoundException $e, RrdPath $rrd): RrdException
+    {
+        if ($this->remote() && ! preg_match('/^rrdcached[@:]/', $e->getMessage())) {
+            return new RrdCachedConnectionException('Unable to reach rrdcached for ' . $rrd, previous: $e);
+        }
+
+        return $e;
     }
 
     /**
@@ -214,7 +240,7 @@ class Rrdtool implements RrdBackendInterface
      */
     private function run(string $command, string $filename, array $arguments = []): string
     {
-        $this->process ??= app(RrdProcess::class, ['timeout' => 1200]);
+        $this->process ??= app(RrdProcess::class, ['timeout' => 1200, 'allowMissingRrdDir' => $this->remote()]);
         $output = $this->process->run(implode(' ', [$command, $filename, ...$arguments]));
 
         if (Debug::isVerbose() && $output) {
