@@ -142,7 +142,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::post('device-groups/{device_group}/rediscover', [DeviceGroupController::class, 'rediscover'])->name('device-groups.rediscover');
     Route::get('graph-data', GraphDataController::class)->name('graph.data');
     Route::get('graphs/{path?}', GraphsPageController::class)->where('path', '.*')->name('graphs');
-    Route::any('inventory', App\Http\Controllers\InventoryController::class)->name('inventory');
+    Route::any('inventory', App\Http\Controllers\InventoryController::class)->middleware('saved-filter:inventory')->name('inventory');
     Route::get('inventory/purge', [App\Http\Controllers\InventoryController::class, 'purge'])->name('inventory.purge');
     Route::get('outages', [OutagesController::class, 'index'])->name('outages');
     Route::get('oxidized', [OxidizedController::class, 'index'])->name('oxidized');
