@@ -7,7 +7,7 @@ use App\Data\Graphing\GraphOptions;
 
 class BindRrNegativeGraph extends ApplicationGraph
 {
-    private const RECORD_TYPES = [
+    private const array RECORD_TYPES = [
         'any', 'a', 'aaaa', 'cname', 'mx', 'ns', 'ptr', 'soa', 'srv', 'spf', 'afsdb', 'apl', 'caa', 'cdnskey', 'cds',
         'cert', 'dhcid', 'dlv', 'dnskey', 'ds', 'ipseckey', 'key', 'kx', 'loc', 'naptr', 'nsec', 'nsec3', 'nsec3param',
         'rrsig', 'rp', 'sig', 'sshfp', 'ta', 'tkey', 'tlsa', 'tsig', 'txt', 'uri', 'dname', 'nxdomain', 'axfr', 'ixfr',

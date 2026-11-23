@@ -10,12 +10,12 @@ class BindIncomingGraph extends ApplicationGraph
     /**
      * Common record types, stored in app-bind-<id>.rrd
      */
-    private const COMMON_TYPES = ['any', 'a', 'aaaa', 'cname', 'mx', 'ns', 'ptr', 'soa', 'srv', 'spf'];
+    private const array COMMON_TYPES = ['any', 'a', 'aaaa', 'cname', 'mx', 'ns', 'ptr', 'soa', 'srv', 'spf'];
 
     /**
      * The other record types, stored in app-bind-<id>-incoming.rrd
      */
-    private const OTHER_TYPES = [
+    private const array OTHER_TYPES = [
         'afsdb', 'apl', 'caa', 'cdnskey', 'cds', 'cert', 'dhcid', 'dlv', 'dnskey', 'ds', 'ipseckey', 'key', 'kx', 'loc',
         'naptr', 'nsec', 'nsec3', 'nsec3param', 'rrsig', 'rp', 'sig', 'sshfp', 'ta', 'tkey', 'tlsa', 'tsig', 'txt', 'uri',
         'dname', 'axfr', 'ixfr', 'opt',
