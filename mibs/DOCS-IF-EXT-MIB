@@ -1,0 +1,159 @@
+-- *****************************************************************
+-- DOCS-IF-EXT-MIB.my: Data Over Cable IF Extention MIB file
+--
+-- February 2001 Sunethra Jawahar
+--
+-- This MIB is from OSS-O-00108 ECN-O.
+--
+-- Copyright (c) 2001 by cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+DOCS-IF-EXT-MIB DEFINITIONS ::= BEGIN
+  IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE
+                 FROM SNMPv2-SMI
+        OBJECT-GROUP,
+        MODULE-COMPLIANCE
+                 FROM SNMPv2-CONF
+        TEXTUAL-CONVENTION
+                 FROM SNMPv2-TC
+        docsIfMib,
+        docsIfCmtsCmStatusEntry
+                 FROM DOCS-IF-MIB;
+
+docsIfExtMib MODULE-IDENTITY
+        LAST-UPDATED     "0011160000Z" -- November 16, 2000
+        ORGANIZATION      "IETF IPCDN Working Group"
+        CONTACT-INFO
+            " "
+        DESCRIPTION
+            "This is the extension Module to rfc2670 DOCS-IF-MIB."
+        REVISION "0010080000Z"
+        DESCRIPTION
+            "Initial Version. "
+        ::= { docsIfMib 21 }
+
+
+-- Textual Conventions
+
+DocsisVersion ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION  "Indicates the docsis version number."
+       SYNTAX       INTEGER {
+                        docsis10 (1),
+                        docsis11 (2)
+                    }
+
+docsIfDocsisCapability OBJECT-TYPE
+       SYNTAX       DocsisVersion
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "Indication of the DOCSIS capability of the device."
+       ::= { docsIfExtMib 1 }
+
+docsIfDocsisOperMode OBJECT-TYPE
+       SYNTAX       DocsisVersion
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "Indication whether the device has registered as a 1.0 or 1.1.
+            For CMTS and unregistered CM, it is always the same as 
+            docsDocsisCapability."
+       ::= { docsIfExtMib 2 }
+
+--
+-- CM status table (within CMTS).
+-- This table is implemented only at the CMTS.
+-- It contains per CM status information available in the CMTS.
+--
+
+docsIfCmtsCmStatusExtTable OBJECT-TYPE
+       SYNTAX       SEQUENCE OF DocsIfCmtsCmStatusExtEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+           "A set of objects in the CMTS, maintained for each
+            Cable Modem connected to this CMTS."
+       ::= { docsIfExtMib 3 }
+
+docsIfCmtsCmStatusExtEntry OBJECT-TYPE
+       SYNTAX       DocsIfCmtsCmStatusExtEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+           "Status information for a single Cable Modem.
+            An entry in this table exists for each Cable Modem
+            which is connected to the CMTS."
+       AUGMENTS { docsIfCmtsCmStatusEntry }
+       ::= { docsIfCmtsCmStatusExtTable 1 }
+
+DocsIfCmtsCmStatusExtEntry ::= SEQUENCE {
+            docsIfCmtsCmStatusDocsisMode DocsisVersion
+        }
+
+docsIfCmtsCmStatusDocsisMode OBJECT-TYPE
+       SYNTAX       DocsisVersion
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "Indication whether the CM has registered as a 1.0 or 1.1 modem"
+       ::= { docsIfCmtsCmStatusExtEntry 1 }
+
+
+docsIfExtConformance   OBJECT IDENTIFIER    ::= { docsIfExtMib 4 }
+docsIfExtCompliances   OBJECT IDENTIFIER    ::= { docsIfExtConformance 1 }
+docsIfExtGroups        OBJECT IDENTIFIER    ::= { docsIfExtConformance 2 }
+
+-- compliance statements
+
+docsIfExtCmCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+            "The compliance statement."
+
+MODULE -- docsIfExtMib
+
+-- unconditionally mandatory groups for CM
+MANDATORY-GROUPS {
+ docsIfDocsisVersionGroup
+        }
+        ::= { docsIfExtCompliances 1 }
+
+docsIfDocsisVersionGroup OBJECT-GROUP
+        OBJECTS {
+             docsIfDocsisCapability,
+             docsIfDocsisOperMode
+        }
+        STATUS      current
+        DESCRIPTION
+            "Object group to indicates DOCSIS version."
+        ::= { docsIfExtGroups 1 }
+
+docsIfExtCmtsCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+            "The compliance statement."
+
+MODULE -- docsIfExtMib
+
+-- unconditionally mandatory groups for CMTS
+
+MANDATORY-GROUPS {
+        docsIfExtGroup,
+        docsIfDocsisVersionGroup
+        }
+        ::= { docsIfExtCompliances 2 }
+
+docsIfExtGroup OBJECT-GROUP
+        OBJECTS {
+            docsIfCmtsCmStatusDocsisMode
+        }
+        STATUS       current
+        DESCRIPTION
+            "Mandatory implementation group for CMTS."
+        ::= { docsIfExtGroups 2 }
+
+END

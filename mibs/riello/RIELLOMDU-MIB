@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (quote in DESCRIPTION)
 -- RPS S.p.A enterprise MIB definition
 
 -- Copyright (c) RPS S.p.A.
@@ -213,7 +214,7 @@ mduOutputStatus OBJECT-TYPE
     DESCRIPTION
             "0=OFF
 			1=ON
-			2= Shutdown active (when a CS or a CR command is received but shutdown is not yet been executed and the "Imminent time" is not reached)
+			2= Shutdown active (when a CS or a CR command is received but shutdown is not yet been executed and the 'Imminent time' is not reached)
 			3= Shutdown imminent (S01 ÷ S08 code)
 			4= Restore active (when after that a CR command is received and the shutdown has been acted but the restore delay time is not expired)
 			5= Overload alarm (F01 ÷ F08 code)

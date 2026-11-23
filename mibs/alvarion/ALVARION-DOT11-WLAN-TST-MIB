@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (table without entry type; SMIv2 clauses in an SMIv1 module)
 -- Title:      BREEZECOM  Private MIB
 --             This Private MIB supports all BREEZECOM products.
 --             This File includes support for all the BreezeAccess Product Line.
@@ -19,7 +20,7 @@
 ALVARION-DOT11-WLAN-TST-MIB DEFINITIONS ::= BEGIN
 
  IMPORTS  
-    enterprises 
+    enterprises, Counter 
  FROM RFC1155-SMI
     OBJECT-TYPE
  FROM RFC1212;
@@ -270,7 +271,7 @@ ALVARION-DOT11-WLAN-TST-MIB DEFINITIONS ::= BEGIN
  
 
 	brzLighteNewVvaTable OBJECT-TYPE
-			SYNTAX SEQUENCE OF brzLighteNewVvaEntry
+			SYNTAX SEQUENCE OF BrzLighteNewVvaEntry
 			ACCESS not-accessible
 			STATUS mandatory
 			DESCRIPTION
@@ -278,13 +279,18 @@ ALVARION-DOT11-WLAN-TST-MIB DEFINITIONS ::= BEGIN
 			::= { brzLighteNewVvaParams 7 }
 
 	brzLighteNewVvaEntry  OBJECT-TYPE
-			SYNTAX brzLighteNewVvaEntry
+			SYNTAX BrzLighteNewVvaEntry
 			ACCESS not-accessible
 			STATUS mandatory
 	        DESCRIPTION
 	        "A table entry."
-			INDEX { brzLighteNewVvaEntry }
+			INDEX { brzLighteNewVvaTableIndex }
 			::= { brzLighteNewVvaTable 1 }
+
+	BrzLighteNewVvaEntry ::= SEQUENCE {
+		brzLighteNewVvaTableIndex INTEGER,
+		brzLighteNewVvaTableData INTEGER
+	}
 
 	brzLighteNewVvaTableIndex   OBJECT-TYPE
 			SYNTAX	INTEGER  
@@ -1072,9 +1078,9 @@ brzLightAuAvarageSNR OBJECT IDENTIFIER ::= { brzLightDebugParams 16  }
 
 
     brzaccVLRtsCtsFailed   OBJECT-TYPE
-            SYNTAX  Counter32  
-            MAX-ACCESS read-only
-            STATUS current
+            SYNTAX  Counter  
+            ACCESS read-only
+            STATUS mandatory
             DESCRIPTION  
             "." 
         ::= { brzLightDebugParams 17 }
@@ -1185,8 +1191,8 @@ brzLighteWCU OBJECT IDENTIFIER ::= { brzLighteningTest 9  }
 
     brzaccVLUnitHwOutputPower   OBJECT-TYPE
             SYNTAX  DisplayString  
-            MAX-ACCESS read-only
-            STATUS current
+            ACCESS read-only
+            STATUS mandatory
             DESCRIPTION  
             "Applicable to AU and SU.
              The output power to the antenna port supported by the unit"
@@ -1366,16 +1372,16 @@ brzLighteOemParams  OBJECT IDENTIFIER ::= { brzLighteWCU 16 }
 
 	brzLighteAtherosRegTable  OBJECT-TYPE
             SYNTAX SEQUENCE OF BrzLighteAtherosRegEntry
-            MAX-ACCESS not-accessible
-            STATUS current
+            ACCESS not-accessible
+            STATUS mandatory
             DESCRIPTION
             "Applicable to all units. Atheros registers Table"
             ::= {brzLighteningTest 11}
 
     brzLighteAtherosRegEntry OBJECT-TYPE
             SYNTAX BrzLighteAtherosRegEntry
-            MAX-ACCESS not-accessible
-            STATUS current
+            ACCESS not-accessible
+            STATUS mandatory
             DESCRIPTION
             "Applicable to all units. 
              AN entry in the Atheros register table"  
@@ -1389,16 +1395,16 @@ brzLighteOemParams  OBJECT IDENTIFIER ::= { brzLighteWCU 16 }
                
     brzLighteAtehrosRegValue  OBJECT-TYPE
             SYNTAX INTEGER  
-            MAX-ACCESS read-write
-            STATUS current
+            ACCESS read-write
+            STATUS mandatory
             DESCRIPTION 
             ""
            ::= { brzLighteAtherosRegEntry 1 }
 
     brzLighteAtherosRegOffsetMask   OBJECT-TYPE
             SYNTAX INTEGER  
-            MAX-ACCESS read-only
-            STATUS current
+            ACCESS read-only
+            STATUS mandatory
             DESCRIPTION 
             ""
            ::= { brzLighteAtherosRegEntry 2 }
@@ -1413,8 +1419,8 @@ brzLighteOemParams  OBJECT IDENTIFIER ::= { brzLighteWCU 16 }
 				
 	brzLighteSUPMaxMirDownlink OBJECT-TYPE
         	SYNTAX  INTEGER  
-        	MAX-ACCESS read-write
-        	STATUS current
+        	ACCESS read-write
+        	STATUS mandatory
         	DESCRIPTION 
         	"Applicable to AU only. 
          	Range for set: 128 to 53,888 (Kbps)
@@ -1424,8 +1430,8 @@ brzLighteOemParams  OBJECT IDENTIFIER ::= { brzLighteWCU 16 }
 			
 	brzLighteBNB10MHzSupport OBJECT-TYPE
         	SYNTAX  INTEGER  { nonSupported(0), supported(1) } 
-        	MAX-ACCESS read-write
-        	STATUS current
+        	ACCESS read-write
+        	STATUS mandatory
         	DESCRIPTION 
         	"Applicable to BNB only" 
 			::= { brzLighteWCU 20 }

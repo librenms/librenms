@@ -80,10 +80,10 @@ class Boss extends OS implements OSDiscovery, VlanDiscovery, VlanPortDiscovery
             return $QBridgeMibVlans;
         }
 
-        return SnmpQuery::walk('RC-VLAN-MIB::rcVlanName')
+        return SnmpQuery::walk('RAPID-CITY::rcVlanName')
             ->mapTable(fn ($vlan, $vlan_id) => new Vlan([
                 'vlan_vlan' => $vlan_id,
-                'vlan_name' => $vlan['RC-VLAN-MIB::rcVlanName'] ?? '',
+                'vlan_name' => $vlan['RAPID-CITY::rcVlanName'] ?? '',
                 'vlan_domain' => 1,
             ]));
     }
@@ -95,7 +95,7 @@ class Boss extends OS implements OSDiscovery, VlanDiscovery, VlanPortDiscovery
             return $ports;
         }
 
-        $egress_vlans = SnmpQuery::walk('RC-VLAN-MIB::rcVlanPortMembers')->pluck();
+        $egress_vlans = SnmpQuery::walk('RAPID-CITY::rcVlanPortMembers')->pluck();
 
         if (empty($egress_vlans)) {
             return $ports;
@@ -103,14 +103,14 @@ class Boss extends OS implements OSDiscovery, VlanDiscovery, VlanPortDiscovery
 
         // find default vlans (untagged or otherwise)
         $port_data = SnmpQuery::walk([
-            'RC-VLAN-MIB::rcVlanPortDefaultVlanId',
-            'RC-VLAN-MIB::rcVlanPortPerformTagging',
+            'RAPID-CITY::rcVlanPortDefaultVlanId',
+            'RAPID-CITY::rcVlanPortPerformTagging',
         ])->table(1);
         $pvid_untagged = [];
         foreach ($port_data as $rcVlanPortIndex => $data) {
-            $vlan_id = $data['RC-VLAN-MIB::rcVlanPortDefaultVlanId'] ?? '';
-            // 2 false, 4 untagPvidOnly from RC-VLAN-MIB
-            $untagged = in_array($data['RC-VLAN-MIB::rcVlanPortPerformTagging'] ?? '', ['2', '4']) ? 1 : 0;
+            $vlan_id = $data['RAPID-CITY::rcVlanPortDefaultVlanId'] ?? '';
+            // 2 false, 4 untagPvidOnly from RAPID-CITY
+            $untagged = in_array($data['RAPID-CITY::rcVlanPortPerformTagging'] ?? '', ['2', '4']) ? 1 : 0;
 
             $pvid_untagged[$vlan_id][$rcVlanPortIndex] = $untagged;
         }

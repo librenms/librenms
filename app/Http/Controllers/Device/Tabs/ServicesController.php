@@ -31,8 +31,6 @@ use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use LibreNMS\Interfaces\UI\DeviceTab;
-use LibreNMS\Services;
-use LibreNMS\Util\Time;
 
 class ServicesController implements DeviceTab
 {
@@ -68,54 +66,17 @@ class ServicesController implements DeviceTab
 
         $services = $device->services()
             ->hasAccess($request->user())
-            ->get()
-            ->map(function ($service) use ($view) {
-                $statusClass = match ((int) $service->service_status) {
-                    0 => 'label-success',
-                    1 => 'label-warning',
-                    2 => 'label-danger',
-                    default => 'label-info',
-                };
-
-                $graphs = [];
-                if ($view === 'details') {
-                    $serviceDs = htmlspecialchars_decode((string) $service->service_ds);
-                    $checkScript = Services::customCheckPath($service->service_type);
-                    if (is_file($checkScript)) {
-                        include $checkScript;
-                        if (isset($check_ds) && is_string($check_ds)) {
-                            $serviceDs = $check_ds;
-                        }
-                    }
-
-                    $decoded = json_decode($serviceDs, true);
-                    if (is_array($decoded)) {
-                        foreach ($decoded as $k => $v) {
-                            $graphTitle = isset($v['full_name']) ? (string) $v['full_name'] : (string) $k;
-                            $graphs[] = [
-                                'title' => $graphTitle,
-                                'ds' => $k,
-                            ];
-                        }
-                    }
-                }
-
-                return [
-                    'service' => $service,
-                    'status_class' => $statusClass,
-                    'last_changed' => $service->service_changed ? Time::formatInterval(time() - $service->service_changed) : __('Waiting for first check'),
-                    'graphs' => $graphs,
-                ];
-            });
+            ->ordered()
+            ->get();
 
         $options = [
             'basic' => [
                 'text' => __('Basic'),
-                'link' => route('device', ['device' => $device, 'tab' => 'services', 'view' => 'basic']),
+                'link' => route('device.services', ['device' => $device, 'view' => 'basic']),
             ],
             'details' => [
                 'text' => __('Details'),
-                'link' => route('device', ['device' => $device, 'tab' => 'services', 'view' => 'details']),
+                'link' => route('device.services', ['device' => $device, 'view' => 'details']),
             ],
         ];
 

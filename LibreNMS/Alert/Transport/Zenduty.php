@@ -70,7 +70,7 @@ class Zenduty extends Transport
             ],
             'urls' => [
                 [
-                    'link_url' => route('device', ['device' => $alert_data['device_id']]),
+                    'link_url' => route('device.overview', ['device' => $alert_data['device_id']]),
                     'link_text' => $alert_data['hostname'],
                 ],
             ],

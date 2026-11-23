@@ -27,7 +27,6 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Eventlog;
-use App\Models\Port;
 use App\Models\Sensor;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -52,32 +51,8 @@ class EventlogController extends TableController
             'eventtype' => 'nullable|string',
             'age' => 'nullable|int',
             'message' => 'nullable|string',
+            ...Eventlog::filterValidationRules(),
         ];
-    }
-
-    public function searchFields(Request $request): array
-    {
-        return ['message'];
-    }
-
-    /**
-     * Also match interface events by the label (ifName, ifAlias, ifDescr) of their port.
-     */
-    protected function search(?string $search, Builder $query, array $fields): Builder
-    {
-        if (! $search) {
-            return $query;
-        }
-
-        return $query->where(fn (Builder $query) => parent::search($search, $query, $fields)
-            ->orWhere(fn (Builder $query) => $query
-                ->where('type', 'interface')
-                ->whereIn('reference', Port::select('port_id')->where(fn (Builder $query) => $query
-                    ->where('ifName', 'like', "%$search%")
-                    ->orWhere('ifAlias', 'like', "%$search%")
-                    ->orWhere('ifDescr', 'like', "%$search%")
-                ))
-            ));
     }
 
     protected function filterFields(Request $request): array
@@ -85,9 +60,6 @@ class EventlogController extends TableController
         return [
             'device_id' => 'device',
             'type' => 'eventtype',
-            'port' => function (Builder $query, int $port_id): void {
-                $query->where('type', 'interface')->where('reference', $port_id);
-            },
         ];
     }
 
@@ -105,6 +77,9 @@ class EventlogController extends TableController
 
         return Eventlog::hasAccess($request->user())
             ->with('device')
+            ->when($request->array('filter'), fn ($query, $filters) => $query->applyFilters($filters))
+            ->when($request->input('searchPhrase'), fn ($query, $search) => $query->applyFilters(['search' => ['contains' => $search]]))
+            ->when($request->filled('port'), fn ($query) => $query->applyFilters(['port' => ['eq' => $request->integer('port')]]))
             ->when($request->device_group, function ($query) use ($request): void {
                 $query->inDeviceGroup($request->device_group);
             })

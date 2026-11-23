@@ -75,7 +75,7 @@ final class FdbTablesTest extends DBTestCase
     private function rows(array $params = []): array
     {
         return $this->actingAs(User::factory()->admin()->create(['enabled' => true]))
-            ->postJson(url('/ajax/table/fdb-tables'), $params + ['device_id' => $this->device->device_id])
+            ->postJson(route('table.fdb-tables'), $params + ['device_id' => $this->device->device_id])
             ->assertOk()
             ->json('rows');
     }

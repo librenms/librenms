@@ -110,7 +110,7 @@ final class AddDeviceControllerTest extends DBTestCase
         ], ['display_template' => '{{ $hostname }} ({{ $ip }})']);
 
         $device = Device::where('hostname', 'unchecked.example.com')->firstOrFail();
-        $response->assertOk()->assertJson(['status' => 'ok', 'redirect' => route('device', ['device' => $device->device_id])]);
+        $response->assertOk()->assertJson(['status' => 'ok', 'redirect' => route('device.overview', ['device' => $device->device_id])]);
         $this->assertSame('{{ $hostname }} ({{ $ip }})', $device->display_template);
 
         $snmp = $device->pollingMethod(PollingMethodType::Snmp);

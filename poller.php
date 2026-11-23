@@ -24,7 +24,6 @@
  * Modified 4/17/19
  * @author Heath Barnhart <hbarnhart@kanren.net>
  */
-$init_modules = ['polling', 'alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('h:rfpdvm:q');

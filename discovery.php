@@ -21,7 +21,6 @@
  *
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
-$init_modules = ['discovery', 'alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('h:m:d::v::q', ['os:', 'type:']);

@@ -26,7 +26,7 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
             FROM ARISTA-BGP4V2-TC-MIB;
 
         aristaBgp4V2 MODULE-IDENTITY
-            LAST-UPDATED "202102100000Z"
+            LAST-UPDATED "202501210000Z"
             ORGANIZATION "Arista Networks, Inc."
             CONTACT-INFO
                 "Arista Networks, Inc.
@@ -49,6 +49,31 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
                      draft-ietf-idr-bgp4-mibv2-13.txt;
                      see the draft itself for full legal notices."
 
+            REVISION "202501210000Z"
+            DESCRIPTION
+                   "Updated aristaBgp4V2PeerTable to include
+                    per-peer max prefix limits.
+
+                    Added:
+                        aristaBgp4V2PeerMaxRoutes,
+                        aristaBgp4V2PeerMaxRoutesWarnThreshold,
+                        aristaBgp4V2PeerMaxRoutesDoNotIdlePeerForever,
+                        aristaBgp4V2PeerMaxAcceptedRoutes,
+                        aristaBgp4V2PeerMaxAcceptedRoutesWarnThreshold,
+                        aristaBgp4V2PeerMaxAdvRoutes,
+                        aristaBgp4V2PeerMaxAdvRoutesWarnThreshold
+
+                    Updated aristaBgp4V2PrefixGaugesTable to include
+                    per AFI-SAFI max prefix limits.
+
+                    Added:
+                        aristaBgp4V2PrefixMaxRoutes,
+                        aristaBgp4V2PrefixMaxRoutesWarnThreshold,
+                        aristaBgp4V2PrefixMaxRoutesDoNotIdlePeerForever,
+                        aristaBgp4V2PrefixMaxAcceptedRoutes,
+                        aristaBgp4V2PrefixMaxAcceptedRoutesWarnThreshold,
+                        aristaBgp4V2PrefixMaxAdvRoutes,
+                        aristaBgp4V2PrefixMaxAdvRoutesWarnThreshold"
             REVISION "202102100000Z"
             DESCRIPTION
                "Updated aristaBgp4V2PeerTable to include
@@ -185,8 +210,24 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
             INTEGER,
         aristaBgp4V2PeerDescription
             SnmpAdminString,
-         aristaBgp4V2PeerPrevState
-            INTEGER
+        aristaBgp4V2PeerPrevState
+            INTEGER,
+
+        -- Max prefix limits
+        aristaBgp4V2PeerMaxRoutes
+            Unsigned32,
+        aristaBgp4V2PeerMaxRoutesWarnThreshold
+            Unsigned32,
+        aristaBgp4V2PeerMaxRoutesDoNotIdlePeerForever
+            INTEGER,
+        aristaBgp4V2PeerMaxAcceptedRoutes
+            Unsigned32,
+        aristaBgp4V2PeerMaxAcceptedRoutesWarnThreshold
+            Unsigned32,
+        aristaBgp4V2PeerMaxAdvRoutes
+            Unsigned32,
+        aristaBgp4V2PeerMaxAdvRoutesWarnThreshold
+            Unsigned32
     }
 
     aristaBgp4V2PeerInstance OBJECT-TYPE
@@ -379,20 +420,100 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
              instance for this peer."
         ::= { aristaBgp4V2PeerEntry 14 }
 
-   aristaBgp4V2PeerPrevState OBJECT-TYPE
-      SYNTAX     INTEGER {
-         idle(1),
-         connect(2),
-         active(3),
-         opensent(4),
-         openconfirm(5),
-         established(6)
-      }
-      MAX-ACCESS read-only
-      STATUS     current
-      DESCRIPTION
-         "The BGP peer previous connection state."
-      ::= { aristaBgp4V2PeerEntry 15 }
+    aristaBgp4V2PeerPrevState OBJECT-TYPE
+       SYNTAX     INTEGER {
+          idle(1),
+          connect(2),
+          active(3),
+          opensent(4),
+          openconfirm(5),
+          established(6)
+       }
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+          "The BGP peer previous connection state."
+       ::= { aristaBgp4V2PeerEntry 15 }
+
+    aristaBgp4V2PeerMaxRoutes OBJECT-TYPE
+       SYNTAX     Unsigned32(0..4294967294)
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+          "The maximum received prefix limit for this peer. Zero
+           means unlimited or the value hasn't become available
+           in the MIB yet."
+       ::= { aristaBgp4V2PeerEntry 16 }
+
+    aristaBgp4V2PeerMaxRoutesWarnThreshold OBJECT-TYPE
+       SYNTAX     Unsigned32(0..4294967294)
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+          "The absolute threshold value of number of prefix received
+           from this peer at which a warning is issued. Zero means
+           never warn or the value hasn't become availble in the MIB
+           yet."
+       ::= { aristaBgp4V2PeerEntry 17 }
+
+    aristaBgp4V2PeerMaxRoutesDoNotIdlePeerForever OBJECT-TYPE
+       SYNTAX     INTEGER { doNotIdlePeerForever(1), idlePeerForever(2) }
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+          "Controls the actions to take when maximum received prefix
+           limit exceeded.
+
+           doNotIdlePeerForever(1) means a syslog warning message will be
+           issued and any further updates receieved from this peer will
+           be dropped when maximum received prefix limit exceeded.
+
+           idlePeerForever(2) means a syslog warning message will be
+           issued and the BGP peering session will be brought down which
+           puts the peer into idle state forever when maximum received
+           prefix limit exceeded; or the value hasn't become availble in
+           the MIB yet."
+       ::= { aristaBgp4V2PeerEntry 18 }
+
+    aristaBgp4V2PeerMaxAcceptedRoutes OBJECT-TYPE
+       SYNTAX     Unsigned32(0..4294967294)
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+          "The maximum accepted prefix limit for this peer. Zero
+           means unlimited or the value hasn't become availble in
+           the MIB yet."
+       ::= { aristaBgp4V2PeerEntry 19 }
+
+    aristaBgp4V2PeerMaxAcceptedRoutesWarnThreshold OBJECT-TYPE
+       SYNTAX     Unsigned32(0..4294967294)
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+          "The absolute threshold value of number of accepted prefix
+           from this peer at which a warning is issued. Zero means
+           never warn or the value hasn't become availble in the MIB
+           yet."
+       ::= { aristaBgp4V2PeerEntry 20 }
+
+    aristaBgp4V2PeerMaxAdvRoutes OBJECT-TYPE
+       SYNTAX     Unsigned32(0..4294967294)
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+          "The maximum advertise prefix limit for this peer. Zero
+           means unlimited."
+       ::= { aristaBgp4V2PeerEntry 21 }
+
+    aristaBgp4V2PeerMaxAdvRoutesWarnThreshold OBJECT-TYPE
+       SYNTAX     Unsigned32(0..4294967294)
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+          "The absolute threshold value of number of prefix advertised
+           to this peer at which a warning is issued. Zero means never
+           warn or the value hasn't become availble in the MIB yet."
+       ::= { aristaBgp4V2PeerEntry 22 }
 
     --
     -- Per-peer error management information.
@@ -977,7 +1098,23 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
         aristaBgp4V2PrefixInPrefixesAccepted
             Gauge32,
         aristaBgp4V2PrefixOutPrefixes
-            Gauge32
+            Gauge32,
+
+        -- Max prefix limits
+        aristaBgp4V2PrefixMaxRoutes
+            Unsigned32,
+        aristaBgp4V2PrefixMaxRoutesWarnThreshold
+            Unsigned32,
+        aristaBgp4V2PrefixMaxRoutesDoNotIdlePeerForever
+            INTEGER,
+        aristaBgp4V2PrefixMaxAcceptedRoutes
+            Unsigned32,
+        aristaBgp4V2PrefixMaxAcceptedRoutesWarnThreshold
+            Unsigned32,
+        aristaBgp4V2PrefixMaxAdvRoutes
+            Unsigned32,
+        aristaBgp4V2PrefixMaxAdvRoutesWarnThreshold
+            Unsigned32
     }
 
     aristaBgp4V2PrefixGaugesAfi OBJECT-TYPE
@@ -1032,6 +1169,89 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
         REFERENCE
             "RFC 4271, Sections 3.2 and 9."
         ::= { aristaBgp4V2PrefixGaugesEntry 5 }
+
+    aristaBgp4V2PrefixMaxRoutes OBJECT-TYPE
+       SYNTAX     Unsigned32(0..4294967294)
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+          "The maximum received prefix limit for this address family
+           of this peer. Zero means unlimited or the value hasn't
+           become availble in the MIB yet."
+       ::= { aristaBgp4V2PrefixGaugesEntry 6 }
+
+    aristaBgp4V2PrefixMaxRoutesWarnThreshold OBJECT-TYPE
+       SYNTAX     Unsigned32(0..4294967294)
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+          "The absolute threshold value of number of prefix received
+           from this address family of this peer at which a warning
+           is issued. Zero means never warn or the value hasn't
+           become availble in the MIB yet."
+       ::= { aristaBgp4V2PrefixGaugesEntry 7 }
+
+    aristaBgp4V2PrefixMaxRoutesDoNotIdlePeerForever OBJECT-TYPE
+       SYNTAX     INTEGER { doNotIdlePeerForever(1), idlePeerForever(2) }
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+          "Controls the actions to take when maximum received prefix
+           limit exceeded.
+
+           doNotIdlePeerForever(1) means a syslog warning message will be
+           issued and any further updates receieved from address family
+           of this peer will be dropped when maximum received prefix
+           limit exceeded.
+
+           idlePeerForever(2) means a syslog warning message will be
+           issued and the BGP peering session will be brought down which
+           puts the peer into idle state forever when maximum received
+           prefix limit exceeded; or the value hasn't become availble in
+           the MIB yet."
+       ::= { aristaBgp4V2PrefixGaugesEntry 8 }
+
+    aristaBgp4V2PrefixMaxAcceptedRoutes OBJECT-TYPE
+       SYNTAX     Unsigned32(0..4294967294)
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+          "The maximum accepted prefix limit for this address family
+           of this peer. Zero means unlimited or the value hasn't
+           become availble in the MIB yet."
+       ::= { aristaBgp4V2PrefixGaugesEntry 9 }
+
+    aristaBgp4V2PrefixMaxAcceptedRoutesWarnThreshold OBJECT-TYPE
+       SYNTAX     Unsigned32(0..4294967294)
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+          "The absolute threshold value of number of accepted prefix
+           from this address family of this peer at which a warning
+           is issued. Zero means never warn or the value hasn't become
+           availble in the MIB yet."
+       ::= { aristaBgp4V2PrefixGaugesEntry 10 }
+
+    aristaBgp4V2PrefixMaxAdvRoutes OBJECT-TYPE
+       SYNTAX     Unsigned32(0..4294967294)
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+          "The maximum advertise prefix limit for this address family
+           of this peer. Zero means unlimited or the value hasn't become
+           availble in the MIB yet."
+       ::= { aristaBgp4V2PrefixGaugesEntry 11 }
+
+    aristaBgp4V2PrefixMaxAdvRoutesWarnThreshold OBJECT-TYPE
+       SYNTAX     Unsigned32(0..4294967294)
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+          "The absolute threshold value of number of prefix advertised
+           to this address family of this peer at which a warning is
+           issued. Zero means never warn or the value hasn't become
+           availble in the MIB yet."
+       ::= { aristaBgp4V2PrefixGaugesEntry 12 }
 
     --
     -- BGP NLRI
@@ -1832,7 +2052,21 @@ ARISTA-BGP4V2-MIB DEFINITIONS ::= BEGIN
             aristaBgp4V2PeerLocalIdentifier,
             aristaBgp4V2PeerRemoteIdentifier,
             aristaBgp4V2PeerDescription,
-            aristaBgp4V2PeerPrevState
+            aristaBgp4V2PeerPrevState,
+            aristaBgp4V2PeerMaxRoutes,
+            aristaBgp4V2PeerMaxRoutesWarnThreshold,
+            aristaBgp4V2PeerMaxRoutesDoNotIdlePeerForever,
+            aristaBgp4V2PeerMaxAcceptedRoutes,
+            aristaBgp4V2PeerMaxAcceptedRoutesWarnThreshold,
+            aristaBgp4V2PeerMaxAdvRoutes,
+            aristaBgp4V2PeerMaxAdvRoutesWarnThreshold,
+            aristaBgp4V2PrefixMaxRoutes,
+            aristaBgp4V2PrefixMaxRoutesWarnThreshold,
+            aristaBgp4V2PrefixMaxRoutesDoNotIdlePeerForever,
+            aristaBgp4V2PrefixMaxAcceptedRoutes,
+            aristaBgp4V2PrefixMaxAcceptedRoutesWarnThreshold,
+            aristaBgp4V2PrefixMaxAdvRoutes,
+            aristaBgp4V2PrefixMaxAdvRoutesWarnThreshold
         }
         STATUS current
         DESCRIPTION

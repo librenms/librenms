@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\ValidationGroup;
 use LibreNMS\Util\Laravel;
+use LibreNMS\Util\SystemUser;
 use ReflectionClass;
 use ReflectionException;
 
@@ -39,8 +40,6 @@ class Validator
     private array $validation_groups = [];
     /** @var array<string, ValidationResult[]> */
     private array $results = [];
-
-    private ?string $username = null;
 
     /**
      * Validator constructor.
@@ -272,29 +271,10 @@ class Validator
      */
     public function execAsUser(string $command, ?array &$output = null, ?int &$code = null): void
     {
-        if (self::getUsername() === 'root') {
+        if (SystemUser::isRoot()) {
             $command = 'su ' . \config('librenms.user') . ' -s /bin/sh -c "' . $command . '"';
         }
         exec($command, $output, $code);
-    }
-
-    /**
-     * Get the username of the user running this and cache it for future requests.
-     *
-     * @return string
-     */
-    public function getUsername(): string
-    {
-        if (! isset($this->username)) {
-            if (function_exists('posix_getpwuid')) {
-                $userinfo = posix_getpwuid(posix_geteuid());
-                $this->username = $userinfo['name'];
-            } else {
-                $this->username = getenv('USERNAME') ?: getenv('USER');
-            }
-        }
-
-        return $this->username;
     }
 
     /**

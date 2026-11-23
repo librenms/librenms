@@ -44,6 +44,7 @@ use LibreNMS\Interfaces\Discovery\MefDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\NeighborDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Discovery\PackagesDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\StorageDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
@@ -86,6 +87,7 @@ class OS implements
     OSDiscovery,
     MempoolsDiscovery,
     MempoolsPolling,
+    PackagesDiscovery,
     StpInstanceDiscovery,
     StpPortDiscovery,
     EntityPhysicalDiscovery,

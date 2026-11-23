@@ -43,7 +43,7 @@ class AlertLog extends DeviceRelatedModel
      */
     public static function filterFieldDefinitions(?int $deviceId = null): array
     {
-        return self::alertFilterFields($deviceId);
+        return self::alertFilterFields('ajax.select.alert-log-rule', $deviceId);
     }
 
     /**

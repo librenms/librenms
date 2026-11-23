@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
-use LibreNMS\Util\Url;
 
 class ArpSearchController extends GroupedSearchController
 {
@@ -101,7 +100,7 @@ class ArpSearchController extends GroupedSearchController
 
         $url = $g->kind === 'arp'
             ? route('search', ['q' => $ip])
-            : Url::deviceUrl($device, ['tab' => 'ports', 'view' => 'nd']);
+            : route('device.ports', ['device' => $device, 'view' => 'nd']);
 
         return [
             'name' => "$ip ($mac)",

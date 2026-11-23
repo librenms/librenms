@@ -9,15 +9,33 @@ IMPORTS
     TEXTUAL-CONVENTION, RowStatus, DateAndTime,
     TruthValue
         FROM SNMPv2-TC
-    viptela
+    viptela, VpnIndex
         FROM VIPTELA-GLOBAL
 ;
 
 viptela-oper-multicast MODULE-IDENTITY
-    LAST-UPDATED "202007010000Z"
+    LAST-UPDATED "202307010000Z"
     ORGANIZATION "Viptela, Inc."
     CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
     DESCRIPTION "This module defines the data model for PIM operational data"
+    REVISION "202307010000Z"
+    DESCRIPTION "Viptela Revision 20.12"
+    REVISION "202303010000Z"
+    DESCRIPTION "Viptela Revision 20.11"
+    REVISION "202212150000Z"
+    DESCRIPTION "Viptela Revision 20.10"
+    REVISION "202206010000Z"
+    DESCRIPTION "Viptela Revision 20.9"
+    REVISION "202203010000Z"
+    DESCRIPTION "Viptela Revision 20.8"
+    REVISION "202111010000Z"
+    DESCRIPTION "Viptela Revision 20.7"
+    REVISION "202107010000Z"
+    DESCRIPTION "Viptela Revision 20.6"
+    REVISION "202103010000Z"
+    DESCRIPTION "Viptela Revision 20.5"
+    REVISION "202011010000Z"
+    DESCRIPTION "Viptela Revision 20.4"
     REVISION "202007010000Z"
     DESCRIPTION "Viptela Revision 20.3"
     REVISION "202002240000Z"
@@ -245,7 +263,7 @@ MulticastRpfEntry ::=
 
 -- tagpath /multicast/rpf/vpn-id
 multicastRpfVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -385,7 +403,7 @@ MulticastTopologyEntry ::=
 
 -- tagpath /multicast/topology/vpn-id
 multicastTopologyVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -563,7 +581,7 @@ MulticastReplicatorEntry ::=
 
 -- tagpath /multicast/replicator/vpn-id
 multicastReplicatorVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -620,7 +638,7 @@ MulticastTunnelEntry ::=
 
 -- tagpath /multicast/tunnel/vpn-id
 multicastTunnelVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -681,7 +699,7 @@ PimInterfaceEntry ::=
 
 -- tagpath /pim/interface/vpn-id
 pimInterfaceVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -770,7 +788,7 @@ PimRpMappingEntry ::=
 
 -- tagpath /pim/rp-mapping/vpn-id
 pimRpMappingVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -831,7 +849,7 @@ PimNeighborEntry ::=
 
 -- tagpath /pim/neighbor/vpn-id
 pimNeighborVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -928,7 +946,7 @@ PimStatisticsEntry ::=
 
 -- tagpath /pim/statistics/vpn-id
 pimStatisticsVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -1055,7 +1073,7 @@ IgmpInterfaceEntry ::=
 
 -- tagpath /igmp/interface/vpn-id
 igmpInterfaceVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -1165,7 +1183,7 @@ IgmpGroupsEntry ::=
 
 -- tagpath /igmp/groups/vpn-id
 igmpGroupsVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -1269,7 +1287,7 @@ IgmpStatisticsEntry ::=
 
 -- tagpath /igmp/statistics/vpn-id
 igmpStatisticsVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"

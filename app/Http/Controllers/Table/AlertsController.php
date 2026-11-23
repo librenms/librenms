@@ -27,8 +27,8 @@ namespace App\Http\Controllers\Table;
 
 use App\Http\Parsers\AlertLogDetailParser;
 use App\Models\Alert;
-use App\Models\AlertLog;
 use App\Models\AlertFault;
+use App\Models\AlertLog;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
@@ -187,9 +187,8 @@ class AlertsController extends TableController
         $query = AlertFault::query()
             ->select('alert_faults.*')
             ->with(['device', 'device.location', 'rule'])
-            ->where('alert_faults.open', 1)
-            ->whereHas('device', fn (Builder $q) => $q->where('disabled', 0))
-            ->whereHas('rule', fn (Builder $q) => $q->where('disabled', 0))
+            ->open()
+            ->onEnabledDevicesAndRules()
             ->hasAccess($request->user())
             ->when($request->array('filter'), fn (Builder $q, array $filters) => $q->applyFilters($filters));
 
@@ -241,6 +240,7 @@ class AlertsController extends TableController
         $state = (int) $model->state;
         $noteClass = empty($model->note) ? 'default' : 'warning';
         $location = $model->device?->location?->location;
+        $locationId = $model->device?->location?->id;
         $entityCount = $this->entityCount($model);
         $ruleName = e((string) $model->rule?->name);
         if ($entityCount > 1) {
@@ -251,11 +251,11 @@ class AlertsController extends TableController
         $incidentId = $this->incidentId($model->id);
 
         return [
-            'rule' => '<i title="' . e(json_encode($model->rule?->builder)) . '"><a href="' . Url::generate(['page' => 'alert-rules']) . '">' . $ruleName . '</a></i>',
+            'rule' => '<i title="' . e(json_encode($model->rule?->builder)) . '"><a href="' . route('alert-rules.index') . '">' . $ruleName . '</a></i>',
             'details' => '<a class="fa-solid fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#' . $incidentId . '" data-parent="#alerts"></a>',
             'verbose_details' => $this->verboseDetailsButton($alertLogId),
             'hostname' => $this->renderHostname($model, $incidentId),
-            'location' => '<a href="' . e(Url::generate(['page' => 'devices', 'location' => $location ?? ''])) . '">' . e($location ?? 'N/A') . '</a>',
+            'location' => '<a href="' . e(route('devices', $locationId ? ['filter' => ['location_id' => ['eq' => $locationId]]] : [])) . '">' . e($location ?? 'N/A') . '</a>',
             'timestamp' => $model->timestamp ? Time::format($model->timestamp, 'compact') : 'N/A',
             'severity' => $this->severityIcon($model->rule?->severity, $state),
             'state' => $state,

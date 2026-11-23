@@ -98,7 +98,7 @@ $(document).ready(function () {
         formatters: {
             "actions": function (column, row) {
                 var html = '<div class="ssl-cert-actions" style="white-space:nowrap">';
-                html += '<a href="{{ url('ssl-certificates') }}/' + row.id + '" class="btn btn-xs btn-info"><i class="fa fa-eye fa-fw"></i> {{ __('View') }}</a> ';
+                html += '<a href="' + route('ssl-certificates.show', {ssl_certificate: row.id}) + '" class="btn btn-xs btn-info"><i class="fa fa-eye fa-fw"></i> {{ __('View') }}</a> ';
                 @can('ssl-certificate.update')
                 if (row.disabled) {
                     html += '<button type="button" class="btn btn-xs btn-success" onclick="sslCertEnable(' + row.id + ')"><i class="fa fa-play fa-fw"></i> {{ __('Enable') }}</button> ';

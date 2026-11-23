@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2018 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Configuration management mib
 -- Reference:
--- Version: V2.7
+-- Version: V3.1
 -- History:
 --     Initial version 2002-12-20
 --     V1.1 24th Feb 2004
@@ -44,6 +44,16 @@
 --                     modified description of hh3cCfgOperateFileName by SongHao.
 --          2014-11-13 Modified description of ConfigOperationType for defining 'startup' by g09715.
 --     V2.7 2018-03-06 Added hh3cCfgOperateFailCmd hh3cCfgOperateFailCmdView hh3cCfgOperateFailCmdReason by wangweihui.
+--     V2.8 2021-06-23 Modified size of hh3cCfgLogTerminalUser by Lianghuimin.
+--     V2.9 2022-06-15 Added hh3cConfigManTrapV2, hh3cConfigManTrapV2Prefix, hh3cCfgBackupToServerSuccess,
+--                     hh3cCfgBackupToServerFailed, hh3cCfgRestoreSuccess, hh3cConfigManTrapInfor,
+--                     hh3cCfgBackupToServerIP, hh3cCfgBackupToServerTransType, hh3cCfgBackupToServerFailReason,
+--                     hh3cCfgBackupToServerErrorCode, hh3cCfgRestoreType by caohao.
+--     V3.0 2022-07-08 Added hh3cCfgSaveFailNotify, hh3cCfgFileChange, hh3cCfgSaveFailNotifyErrorNumber,
+--                     hh3cCfgSaveFailNotifyDateTime, hh3cCfgSaveFailNotifySrcChassis, hh3cCfgSaveFailNotifySrcSlot,
+--                     hh3cCfgSaveFailNotifySrcCpu, hh3cCfgFileChangeUI, hh3cCfgFileChangeAction, hh3cCfgFileChangeOperater,
+--                     and hh3cCfgFileChangeOperateTime by tkf9872.
+--     V3.1 2022-08-12 Added hh3cCfgFileChangeFileType by tkf9872.
 -- =================================================================
 HH3C-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
 
@@ -57,12 +67,12 @@ IMPORTS
         FROM SNMPv2-SMI
     InetAddressType, InetAddress
         FROM INET-ADDRESS-MIB
-    DisplayString, TruthValue, RowStatus, TEXTUAL-CONVENTION
+    DisplayString, TruthValue, RowStatus, TEXTUAL-CONVENTION, DateAndTime
         FROM SNMPv2-TC;
 
 
 hh3cConfig MODULE-IDENTITY
-    LAST-UPDATED "201803060000Z"
+    LAST-UPDATED "202208120000Z"
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -75,6 +85,25 @@ hh3cConfig MODULE-IDENTITY
         model used to represent configuration data that exists elsewhere in the system and
         in peripheral devices.
         There are no constraints on this MIB."
+    REVISION "202208120000Z"
+    DESCRIPTION
+        "Added hh3cCfgFileChangeFileType."
+    REVISION "202207080000Z"
+    DESCRIPTION
+        "Added hh3cCfgSaveFailNotify, hh3cCfgFileChange, hh3cCfgSaveFailNotifyErrorNumber,
+        hh3cCfgSaveFailNotifyDateTime, hh3cCfgSaveFailNotifySrcChassis,
+        hh3cCfgSaveFailNotifySrcSlot, hh3cCfgSaveFailNotifySrcCpu, hh3cCfgFileChangeUI,
+        hh3cCfgFileChangeAction, hh3cCfgFileChangeOperater, and hh3cCfgFileChangeOperateTime."
+    REVISION "202206150000Z"
+    DESCRIPTION
+        "Added hh3cConfigManTrapV2, hh3cConfigManTrapV2Profix, hh3cCfgBackupToServerSuccess,
+        hh3cCfgBackupToServerFailed, hh3cCfgRestoreSuccess,
+        hh3cConfigManTrapInfor, hh3cCfgBackupToServerIP, hh3cCfgBackupToServerTransType,
+        hh3cCfgBackupToServerFailReason, hh3cCfgBackupToServerErrorCode,
+        hh3cCfgRestoreType."
+    REVISION "202106230000Z"
+    DESCRIPTION
+        "Modified size of hh3cCfgLogTerminalUser."
     REVISION "201803060000Z"
     DESCRIPTION
         "Added hh3cCfgOperateFailCmd hh3cCfgOperateFailCmdView hh3cCfgOperateFailCmdReason."
@@ -506,7 +535,7 @@ hh3cCfgLogTerminalType OBJECT-TYPE
     ::= { hh3cCfgLogEntry 6 }
 
 hh3cCfgLogTerminalUser OBJECT-TYPE
-    SYNTAX DisplayString (SIZE (0..64))
+    SYNTAX DisplayString (SIZE (0..255))
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1231,5 +1260,226 @@ hh3cCfgManNotificationGroup NOTIFICATION-GROUP
     DESCRIPTION
         "Collection of notification objects."
     ::= { hh3cConfigManGroups 3 }
+
+hh3cConfigManTrapV2 OBJECT IDENTIFIER ::= { hh3cConfig 4 }
+hh3cConfigManTrapV2Prefix OBJECT IDENTIFIER ::= { hh3cConfigManTrapV2 0 }
+
+hh3cCfgBackupToServerSuccess NOTIFICATION-TYPE
+      OBJECTS
+        {
+            hh3cCfgBackupToServerIPType,
+            hh3cCfgBackupToServerIP,
+            hh3cCfgBackupToServerVPNName,
+            hh3cCfgBackupToServerTransType
+        }
+      STATUS current
+      DESCRIPTION
+        "This notification is generated when configuration backup succeeds."
+      ::= { hh3cConfigManTrapV2Prefix 1 }
+
+hh3cCfgBackupToServerFailed NOTIFICATION-TYPE
+      OBJECTS
+        {
+            hh3cCfgBackupToServerIPType,
+            hh3cCfgBackupToServerIP,
+            hh3cCfgBackupToServerVPNName,
+            hh3cCfgBackupToServerTransType,
+            hh3cCfgBackupToServerFailReason,
+            hh3cCfgBackupToServerErrorCode
+        }
+      STATUS current
+      DESCRIPTION
+        "This notification is generated when configuration backup fails."
+      ::= { hh3cConfigManTrapV2Prefix 2 }
+
+hh3cCfgRestoreSuccess NOTIFICATION-TYPE
+      OBJECTS { hh3cCfgRestoreType }
+      STATUS current
+      DESCRIPTION
+        "This notification is generated when configuration restoration succeeds."
+      ::= { hh3cConfigManTrapV2Prefix 3 }
+
+hh3cCfgSaveFailNotify NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cCfgSaveFailNotifyErrorNumber,
+            hh3cCfgSaveFailNotifyDateTime,
+            hh3cCfgSaveFailNotifySrcChassis,
+            hh3cCfgSaveFailNotifySrcSlot,
+            hh3cCfgSaveFailNotifySrcCpu
+        }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when a configuration save operation fails."
+    ::= { hh3cConfigManTrapV2Prefix 4 }
+
+hh3cCfgFileChange NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cCfgFileChangeUI,
+            hh3cCfgFileChangeAction,
+            hh3cCfgFileChangeOperater,
+            hh3cCfgFileChangeOperateTime,
+            hh3cCfgFileChangeFileType
+        }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when a startup configuration file is modified."
+    ::= { hh3cConfigManTrapV2Prefix 5 }
+
+hh3cConfigManTrapInfor OBJECT IDENTIFIER ::= { hh3cConfig 5 }
+
+hh3cCfgBackupToServerIPType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "IP address type of the configuration backup server"
+    ::= { hh3cConfigManTrapInfor 1}
+
+hh3cCfgBackupToServerIP OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "IP address of the configuration backup server"
+    ::= { hh3cConfigManTrapInfor 2}
+
+hh3cCfgBackupToServerVPNName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "VPN instance to which the configuration backup server belongs"
+    ::= { hh3cConfigManTrapInfor 3}
+
+hh3cCfgBackupToServerTransType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            ftp(1),
+            tftp(2),
+            scp(3)
+        }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Protocol used for transferring the file to the backup server"
+    ::= { hh3cConfigManTrapInfor 4}
+
+hh3cCfgBackupToServerFailReason OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Configuration backup failure reason"
+    ::= { hh3cConfigManTrapInfor 5}
+
+hh3cCfgBackupToServerErrorCode  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Configuration backup failure error code.
+            Authentication failed(1),
+            Failed to save text file(2),
+            Transfer failed(3),
+            Failed to update file list(4)"
+    ::= { hh3cConfigManTrapInfor 6}
+
+hh3cCfgRestoreType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            binary(1),
+            text(2)
+        }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Type of the configuration file used for configuration restoration"
+    ::= { hh3cConfigManTrapInfor 7}
+
+hh3cCfgSaveFailNotifyErrorNumber  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Error code for a configuration save failure."
+    ::= { hh3cConfigManTrapInfor 8}
+
+hh3cCfgSaveFailNotifyDateTime OBJECT-TYPE
+    SYNTAX DateAndTime (SIZE(8))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Time when the configuration save failure occurred."
+    ::= { hh3cConfigManTrapInfor 9}
+
+hh3cCfgSaveFailNotifySrcChassis  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Number of the chassis where the configuration save failure occurred."
+    ::= { hh3cConfigManTrapInfor 10}
+
+hh3cCfgSaveFailNotifySrcSlot  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Number of the slot where the configuration save failure occurred."
+    ::= { hh3cConfigManTrapInfor 11}
+
+hh3cCfgSaveFailNotifySrcCpu  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Number of the CPU where the configuration save failure occurred."
+    ::= { hh3cConfigManTrapInfor 12}
+
+hh3cCfgFileChangeUI  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Source that triggered configuration changes."
+    ::= { hh3cConfigManTrapInfor 13}
+
+hh3cCfgFileChangeAction  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Actions that triggered the configuration changes."
+    ::= { hh3cConfigManTrapInfor 14}
+
+hh3cCfgFileChangeOperater OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Name of the operator that triggered the configuration changes."
+    ::= { hh3cConfigManTrapInfor 15}
+
+hh3cCfgFileChangeOperateTime OBJECT-TYPE
+    SYNTAX DateAndTime (SIZE(8))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Time when the configuration changes were triggered."
+    ::= { hh3cConfigManTrapInfor 16}
+
+hh3cCfgFileChangeFileType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            main(1),
+            backup(2)
+        }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "File type that triggered configuration changes."
+    ::= { hh3cConfigManTrapInfor 17}
 
 END

@@ -10,7 +10,8 @@
 JUNIPER-SRX5000-SPU-MONITORING-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, Gauge32, Unsigned32
+    MODULE-IDENTITY, OBJECT-TYPE, Gauge32, Unsigned32,
+    NOTIFICATION-TYPE
         FROM SNMPv2-SMI
     CounterBasedGauge64
         FROM HCNUM-TC
@@ -20,7 +21,7 @@ IMPORTS
         FROM JUNIPER-JS-SMI;
 
 jnxJsSPUMonitoringMIB MODULE-IDENTITY
-    LAST-UPDATED "201912090000Z" -- Dec 09 00:00:00 2019 UTC
+    LAST-UPDATED "202006100000Z" -- June 10 09 00:00:00 2020 UTC
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
@@ -39,6 +40,14 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
         "201912090000Z" -- Dec 09 00:00:00 2019 UTC
     DESCRIPTION
         "add SPU thread statistics."
+    REVISION
+        "202006100000Z" -- June 10 09 00:00:00 2020 UTC
+    DESCRIPTION
+        "add cpu utilization trap."
+    REVISION
+        "202008010000Z" -- Aug 01 09 00:00:00 2020 UTC
+    DESCRIPTION
+        "add other resource utilization trap."
 
     ::= { jnxJsSPUMonitoringRoot 1 }
 
@@ -420,5 +429,125 @@ jnxJsSPUMonitoringMIB MODULE-IDENTITY
             "Thread utilization of last day."
         ::= { jnxJsSPUMonitoringSPUThreadsEntry 4 }
 
+    -- ***************************************************************
+    --  Resource Manager Trap definition
+    -- ***************************************************************
+
+    jnxJsResManTrapVars      OBJECT IDENTIFIER ::= { jnxJsSPUMonitoringMIB 8 }
+    jnxJsResManNotifications OBJECT IDENTIFIER ::= { jnxJsSPUMonitoringMIB 9 } 
+    --
+    -- Trap variables 
+    --
+
+    jnxJsResManCPUThreadIndex OBJECT-TYPE
+	SYNTAX      Unsigned32 (0..100)
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+	    "The CPU Thread index"
+	::= { jnxJsResManTrapVars 1 }
+
+    jnxJsResManCPUUtil OBJECT-TYPE
+	SYNTAX      Unsigned32 (0..100)
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+	    "The CPU utilization in percentage."
+       ::= { jnxJsResManTrapVars 2 }
+
+    jnxJsResManResourceUtil OBJECT-TYPE
+	SYNTAX      Unsigned32 (0..100)
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+	    "The Resource utilization in percentage."
+       ::= { jnxJsResManTrapVars 3 }
+
+    jnxJsResManFPCIndex OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+                "Which FPC SPU is on."
+        ::= { jnxJsResManTrapVars 4 }
+
+    jnxJsResManSPUIndex OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+                "SPU'Index inside the FPC."
+        ::= { jnxJsResManTrapVars 5 }
+   
+   --
+   -- Trap notifications 
+   --
+
+    --
+    -- Resource Manager CPU Utilization Threshold Status 
+    -- 
+    jnxJsResManCPUThresholdStatus NOTIFICATION-TYPE
+    OBJECTS         { jnxJsResManCPUThreadIndex,
+                      jnxJsResManCPUUtil }
+        STATUS         current
+        DESCRIPTION
+             "The Resource Manager CPU untilization threshold status
+              trap signifies that the CPU load on system has bypassed a 
+	      certain percentage, or clear of that percentage.
+
+              jnxJsResManCPUThreadIndex: Thread index on an SPU, if thread 
+                                         affinity, else 0
+              jnxJsResManCPUUtil is the weighted percentage of utilization
+              of the CPU."
+        ::= { jnxJsResManNotifications 1 }       
+
+    jnxJsResManSessionThresholdStatus NOTIFICATION-TYPE
+    OBJECTS         { jnxJsResManFPCIndex,
+                      jnxJsResManSPUIndex,
+                      jnxJsResManResourceUtil }
+        STATUS         current
+        DESCRIPTION
+             "The Resource Manager Session untilization threshold status
+              trap signifies that the Session load on system has bypassed a 
+	      certain percentage
+
+              jnxJsResManFPCIndex: FPC Index 
+              jnxJsResManSPUIndex: SPU Index 
+              jnxJsResManResourceUtil is the weighted percentage of utilization
+              of the Sessions."
+        ::= { jnxJsResManNotifications 2 }
+
+    jnxJsResManServicesMemoryStatus NOTIFICATION-TYPE
+    OBJECTS         { jnxJsResManFPCIndex,
+                      jnxJsResManSPUIndex,
+                      jnxJsResManResourceUtil }
+        STATUS         current
+        DESCRIPTION
+             "The Resource Manager Services Data Objcache untilization threshold status
+              trap signifies that the Services Memory load on system has bypassed a 
+	      certain percentage
+
+              jnxJsResManFPCIndex: FPC Index 
+              jnxJsResManSPUIndex: SPU Index 
+              jnxJsResManResourceUtil is the weighted percentage of utilization
+              of the Services Memory."
+        ::= { jnxJsResManNotifications 3 }
+
+    jnxJsResManPacketMemoryStatus NOTIFICATION-TYPE
+    OBJECTS         { jnxJsResManFPCIndex,
+                      jnxJsResManSPUIndex,
+                      jnxJsResManResourceUtil }
+        STATUS         current
+        DESCRIPTION
+             "The Resource Manager Packet Memory untilization threshold status
+              trap signifies that the Packet Memory load on system has bypassed a 
+	      certain percentage
+
+              jnxJsResManFPCIndex: FPC Index 
+              jnxJsResManSPUIndex: SPU Index 
+              jnxJsResManResourceUtil is the weighted percentage of utilization
+              of the Packet Memory."
+        ::= { jnxJsResManNotifications 4 }
+     
 END
 

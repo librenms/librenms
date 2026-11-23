@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (DOS end-of-file character)
 FOUNDRY-SN-ROUTER-TRAP-MIB DEFINITIONS ::= BEGIN
 
 -- Router Trap MIB Release 1.0.0
@@ -436,4 +437,3 @@ snOspfLsdbApproachingOverflow TRAP-TYPE
 
 END
 
-

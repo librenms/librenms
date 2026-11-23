@@ -26,7 +26,6 @@
         post: function ()
         {
             return {
-                id: "arp-search",
                 device_id: "{{ $device->device_id }}",
                 port_id: @js($port->port_id ?? null),
             };
@@ -41,6 +40,6 @@
                 return "<span title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
             },
         },
-        url: "ajax_table.php"
+        url: "{{ route('table.arp-search') }}"
     });
 </script>

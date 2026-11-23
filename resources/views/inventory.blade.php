@@ -14,7 +14,7 @@
 
             <x-slot:slot class="tw:p-0!">
             <table id="inventory" class="table table-hover table-condensed table-striped"
-                data-url="{{ route('table.inventory') }}">
+                data-url="{{ route('table.inventory') }}" data-export-url="{{ route('table.inventory.export') }}">
                 <thead>
                 <tr>
                     <th data-column-id="device" data-order="asc">{{ __('Device') }}</th>

@@ -2,7 +2,7 @@
     @php
         $periods = ['1d' => [__('Day'), '-1d'], '2d' => [__('Two Day'), '-2d'], '1w' => [__('Week'), '-1w'], '1m' => [__('Month'), '-1mo'], '1y' => [__('Year'), '-1y']];
         $from = $periods[$period][1];
-        $top = fn (array $vars) => \LibreNMS\Util\Url::portUrl($port, ['view' => 'macaccounting', 'subview' => 'top10'] + $vars + ['graph' => $graph, 'sort' => $sort, 'period' => $period]);
+        $top = fn (array $vars) => route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => 'macaccounting', 'subview' => 'top10'] + $vars + ['graph' => $graph, 'sort' => $sort, 'period' => $period]);
         $graphUrl = fn (array $vars) => route('graph', $vars + ['type' => 'port_mac_acc_total', 'id' => $port->port_id, 'stat' => $graph, 'sort' => $sort, 'from' => $from, 'width' => 150, 'height' => 50]);
     @endphp
     <div class="tw:flex tw:flex-wrap tw:gap-4">

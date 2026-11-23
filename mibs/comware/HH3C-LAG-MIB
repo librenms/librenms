@@ -1,9 +1,9 @@
 -- =====================================================================
--- Copyright (c) 2004-2012 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: LACP extend MIB
 -- Reference:
--- Version: V1.7
+-- Version: V2.1
 -- History:
 --   V1.0 Initial version
 --   V1.1 2004-10-12 updated by gaolong
@@ -26,6 +26,22 @@
 --        Change value range of hh3cAggPortNotAttachedReason.
 --   V1.7 2011-10-12 updated by liyugang
 --        Change some descriptions.
+--   V1.8 2021-07-20 updated by wangmeng
+--        Add hh3cAggPartnerMisconnect and hh3cAggPartnerMisconnectResume.
+--   V1.9 2022-05-28 updated by zhengjun
+--        Add hh3cAggAllMemberDown hh3cAggLacpPartnerExpired hh3cAggPortLacpInactive
+--        hh3cAggMemberNumberChanged hh3cAggAllMemberUp hh3cAggAllMemberDownRecovery
+--        hh3cAggMemberLinkDown hh3cAggMemberLinkUp hh3cAggMemberCoutExceedThreshold
+--        and hh3cAggPortLacpNegotiateRecovery hh3cAggMemberCoutExceedRecovery
+--        hh3cAggMemberCoutExceedRecovery trap.
+--   V2.0 2022-07-18 updated by zhengjun
+--        Add hh3cAggMemberChange and hh3cAggPortLacpActive trap.
+--        2022-08-19 updated by zhengjun
+--        Add hh3cAggTotalLinkLoss, hh3cAggTotalLinkLossResume,
+--        hh3cAggPartialLinkLoss and hh3cAggPartialLinkLossResume trap.
+--   V2.1 2022-11-29 updated by zhengjun
+--        Add hh3cAggPortActiveNotification and hh3cAggPortInactiveNotification2
+--        agg port name and member port name.
 -- =====================================================================
 HH3C-LAG-MIB DEFINITIONS ::= BEGIN
 
@@ -34,7 +50,7 @@ HH3C-LAG-MIB DEFINITIONS ::= BEGIN
             FROM SNMPv2-CONF
         Integer32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
             FROM SNMPv2-SMI
-        DisplayString, RowStatus,TruthValue,TEXTUAL-CONVENTION
+        DisplayString, RowStatus,TruthValue
             FROM SNMPv2-TC
         hh3cRhw
             FROM HH3C-OID-MIB
@@ -42,7 +58,7 @@ HH3C-LAG-MIB DEFINITIONS ::= BEGIN
             FROM Q-BRIDGE-MIB;
 
     hh3cLAG MODULE-IDENTITY
-        LAST-UPDATED "200310091942Z"    -- October 09, 2003 at 19:42 GMT
+        LAST-UPDATED "202211291048Z"
         ORGANIZATION
             "New H3C Tech. Co., Ltd."
         CONTACT-INFO
@@ -53,6 +69,32 @@ HH3C-LAG-MIB DEFINITIONS ::= BEGIN
             "
         DESCRIPTION
             "LACP extend MIB."
+        REVISION
+            "202211291048Z"
+        DESCRIPTION
+            "Add hh3cAggPortActiveNotification and hh3cAggPortInactiveNotification2,
+             agg port name and member port name."
+        REVISION
+            "202208191056Z"
+        DESCRIPTION
+            "Add hh3cAggTotalLinkLoss, hh3cAggTotalLinkLossResume,
+             hh3cAggPartialLinkLoss and hh3cAggPartialLinkLossResume trap."
+        REVISION
+            "202207181051Z"
+        DESCRIPTION
+            "Add hh3cAggMemberChange and hh3cAggPortLacpActive trap."
+        REVISION
+            "202205280937Z"
+        DESCRIPTION
+            "Add hh3cAggAllMemberDown, hh3cAggLacpPartnerExpired, hh3cAggPortLacpInactive,
+             hh3cAggMemberNumberChanged, hh3cAggAllMemberUp, hh3cAggAllMemberDownRecovery,
+             hh3cAggMemberLinkDown, hh3cAggMemberLinkUp, hh3cAggMemberCoutExceedThreshold,
+             and hh3cAggPortLacpNegotiateFailed, hh3cAggPortLacpNegotiateRecovery
+             hh3cAggMemberCoutExceedRecovery trap."
+        REVISION
+            "202107201942Z"
+        DESCRIPTION
+            "Add hh3cAggPartnerMisconnect and hh3cAggPartnerMisconnectResume."
         ::= { hh3cRhw 25 }
 
 --
@@ -100,7 +142,7 @@ HH3C-LAG-MIB DEFINITIONS ::= BEGIN
          }
 
     hh3cAggLinkNumber OBJECT-TYPE
-        SYNTAX Integer32
+        SYNTAX Integer32 (1..2147483647)
         MAX-ACCESS accessible-for-notify
         STATUS current
         DESCRIPTION
@@ -306,7 +348,9 @@ HH3C-LAG-MIB DEFINITIONS ::= BEGIN
 
     hh3cAggPortInactiveNotification2 NOTIFICATION-TYPE
         OBJECTS { hh3cAggLinkNumber,
-                  hh3cAggPortIndex }
+                  hh3cAggPortIndex,
+                  hh3cAggMemberPortName,
+                  hh3cAggPortName }
         STATUS current
         DESCRIPTION
             "This event will be triggered whenever the port
@@ -316,13 +360,14 @@ HH3C-LAG-MIB DEFINITIONS ::= BEGIN
 
     hh3cAggPortActiveNotification NOTIFICATION-TYPE
         OBJECTS { hh3cAggLinkNumber,
-                  hh3cAggPortIndex }
+                  hh3cAggPortIndex,
+                  hh3cAggMemberPortName,
+                  hh3cAggPortName }
         STATUS current
         DESCRIPTION
             "This event will be triggered whenever the port
              in aggregator is made active."
         ::= { hh3cLAGMibNotifications 4 }
-
 
     hh3cLAGMibConformance OBJECT IDENTIFIER ::= { hh3cLAG 3 }
 
@@ -358,6 +403,7 @@ HH3C-LAG-MIB DEFINITIONS ::= BEGIN
         ::= { hh3cLAGMibGroup 1 }
 
 
+-- The hh3cLAGMibNotificationGroup TRAP group is forzen and can not add new trap to this group.
     hh3cLAGMibNotificationGroup NOTIFICATION-GROUP
         NOTIFICATIONS { hh3cAggSpeedChangedNotification,
                         hh3cAggPortInactiveNotification,
@@ -368,5 +414,281 @@ HH3C-LAG-MIB DEFINITIONS ::= BEGIN
             "The collection of objects which are used to
              represent notifications."
         ::= { hh3cLAGMibGroup 2 }
+
+-- All new trap are defined here.
+hh3cLAGMibNotificationsPrefix OBJECT IDENTIFIER ::= { hh3cLAG 0 }
+
+hh3cAggPartnerMisconnect NOTIFICATION-TYPE
+    OBJECTS { hh3cAggLinkNumber,
+              hh3cAggPortIndex }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered whenever the peer link of the LACP
+         member interface might be incorrectly connected.
+        "
+    ::= { hh3cLAGMibNotificationsPrefix 5 }
+
+hh3cAggPartnerMisconnectResume NOTIFICATION-TYPE
+    OBJECTS { hh3cAggLinkNumber,
+              hh3cAggPortIndex }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered whenever the peer link of the LACP
+         member interface was correctly connected.
+        "
+    ::= { hh3cLAGMibNotificationsPrefix 6 }
+
+hh3cAggAllMemberDown NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when all aggregation member ports
+        went down."
+    ::= { hh3cLAGMibNotificationsPrefix 7 }
+
+hh3cAggAllMemberDownRecovery NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when all down aggregation member
+        ports recoverd."
+    ::= { hh3cLAGMibNotificationsPrefix 8 }
+
+hh3cAggAllMemberUp NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when all aggregation member ports
+        came up."
+    ::= { hh3cLAGMibNotificationsPrefix 9 }
+
+hh3cAggMemberLinkDown NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName,
+              hh3cAggMemberPortName }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when an aggregation member link
+        went down."
+    ::= { hh3cLAGMibNotificationsPrefix 10 }
+
+hh3cAggMemberLinkUp NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName,
+              hh3cAggMemberPortName }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when an aggregation member link
+        came up."
+    ::= { hh3cLAGMibNotificationsPrefix 11 }
+
+hh3cAggMemberCoutExceedThreshold NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName,
+              hh3cAggUpThreshold }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when the number of selected aggregation
+        member ports exceeded the threshold."
+    ::= { hh3cLAGMibNotificationsPrefix 12 }
+
+hh3cAggMemberCoutExceedRecovery NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName,
+              hh3cAggUpThreshold }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when the number of selected aggregation
+        member ports dropped below the threshold."
+    ::= { hh3cLAGMibNotificationsPrefix 13 }
+
+hh3cAggMemberNumberChanged NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName,
+              hh3cAggMemberPortName,
+              hh3cAggTotalActiveNum,
+              hh3cAggReasonCode }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when the number of selected aggregation
+        member ports changed."
+    ::= { hh3cLAGMibNotificationsPrefix 14 }
+
+hh3cAggLacpPartnerExpired NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName,
+              hh3cAggMemberPortName,
+              hh3cAggLinkNumber }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when an LACP peer expired."
+    ::= { hh3cLAGMibNotificationsPrefix 15 }
+
+hh3cAggPortLacpInactive NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName,
+              hh3cAggMemberPortName,
+              hh3cAggLinkNumber,
+              hh3cAggOldPduInfo,
+              hh3cAggNewPduInfo,
+              hh3cAggPduChangeCode }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when an aggregation member port
+        was unselected after receiving a packet."
+    ::= { hh3cLAGMibNotificationsPrefix 16 }
+
+hh3cAggPortLacpNegotiateFailed NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName,
+              hh3cAggMemberPortName,
+              hh3cAggLinkNumber }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when an aggregation member port
+        failed to negotiate with the peer."
+    ::= { hh3cLAGMibNotificationsPrefix 17 }
+
+hh3cAggPortLacpNegotiateRecovery NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName,
+              hh3cAggMemberPortName,
+              hh3cAggLinkNumber }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when an aggregation member port
+        negotiated with the peer successfully."
+    ::= { hh3cLAGMibNotificationsPrefix 18 }
+
+hh3cAggMemberChange NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName,
+              hh3cAggMemberPortName,
+              hh3cAggChangeType }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when an aggregation member port changes."
+    ::= { hh3cLAGMibNotificationsPrefix 19 }
+
+hh3cAggPortLacpActive NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName,
+              hh3cAggMemberPortName,
+              hh3cAggLinkNumber }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when an aggregation member port recovers from
+         the LACP inactive state."
+    ::= { hh3cLAGMibNotificationsPrefix 20 }
+
+hh3cAggTotalLinkLoss NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName,
+              hh3cAggLinkNumber }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when the bandwidth of an aggregate
+         interface drops to zero."
+    ::= { hh3cLAGMibNotificationsPrefix 21 }
+
+hh3cAggTotalLinkLossResume NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName,
+              hh3cAggLinkNumber }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when the bandwidth of an aggregate
+         interface restores to the original value."
+    ::= { hh3cLAGMibNotificationsPrefix 22 }
+
+hh3cAggPartialLinkLoss NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName,
+              hh3cAggMemberPortName,
+              hh3cAggLinkNumber }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when the bandwidth of an aggregate
+         interface drops."
+    ::= { hh3cLAGMibNotificationsPrefix 23 }
+
+hh3cAggPartialLinkLossResume NOTIFICATION-TYPE
+    OBJECTS { hh3cAggPortName,
+              hh3cAggMemberPortName,
+              hh3cAggLinkNumber }
+    STATUS current
+    DESCRIPTION
+        "This event will be triggered when the bandwidth of an aggregate
+         interface restores to the original value."
+    ::= { hh3cLAGMibNotificationsPrefix 24 }
+
+hh3cAggTrapOjbects OBJECT IDENTIFIER ::= { hh3cLAG 4 }
+
+hh3cAggPortName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Aggregate interface name."
+    ::= { hh3cAggTrapOjbects 1 }
+
+hh3cAggMemberPortName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Aggregation member port name."
+    ::= { hh3cAggTrapOjbects 2 }
+
+hh3cAggOldPduInfo OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..512))
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "An aggregation member port's old PDU information."
+    ::= { hh3cAggTrapOjbects 3 }
+
+hh3cAggNewPduInfo OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..512))
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "An aggregation member port's new PDU information."
+    ::= { hh3cAggTrapOjbects 4 }
+
+hh3cAggPduChangeCode OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Why an aggregation member port was unselected."
+    ::= { hh3cAggTrapOjbects 5 }
+
+hh3cAggTotalActiveNum OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Number of selected member ports."
+    ::= { hh3cAggTrapOjbects 6 }
+
+hh3cAggUpThreshold OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of selected member ports."
+    ::= { hh3cAggTrapOjbects 7 }
+
+hh3cAggReasonCode OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "Aggregation member port change reason."
+    ::= { hh3cAggTrapOjbects 8 }
+
+hh3cAggChangeType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        unknown(1),
+        join(2),
+        leave(3)
+        }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The member change type.
+        unknown : The member change type is unknown.
+        join    : The member joins the group.
+        leave   : The member leaves the group.
+        "
+    ::= { hh3cAggTrapOjbects 9 }
 
 END

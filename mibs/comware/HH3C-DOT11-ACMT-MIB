@@ -1,11 +1,11 @@
 -- =============================================================================
--- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2023 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:
 --   The file defines a MIB to provide wireless switch object and CAPWAP
 --   tunnel information.
 -- Reference:
--- Version: V2.6
+-- Version: V2.8
 -- History:
 --   V1.0 created by shiyang (Richard)
 --     Initial version 2006-05-10
@@ -132,6 +132,10 @@
 --   v2.6 2018-06-04 modified by wangshujuan w13748
 --        Add new node   hh3cDot11ACTotalRebootCnt to hh3cDot11ACObject
 --        Add new node   hh3cDot11APInvalidCertificateTrap  to hh3cDot11ACMtTraps
+--   v2.7 2021-06-18 modified by liyapeng
+--        Add new object hh3cDot11ACMtTrapACMacAddress to hh3cDot11ACMtBackupSwtTrap
+--   v2.8 2023-01-06 modified by fanwenyang
+--        Add new object hh3cDot11Secretkey to hh3cDot11ACLoadInfo
 -- =============================================================================
 HH3C-DOT11-ACMT-MIB DEFINITIONS ::= BEGIN
 
@@ -144,8 +148,7 @@ IMPORTS
         IpAddress,
         Counter64,
         TimeTicks,
-        Unsigned32,
-        Gauge32
+        Unsigned32
     FROM SNMPv2-SMI
         IANAifType
     FROM IANAifType-MIB
@@ -158,7 +161,7 @@ IMPORTS
     FROM SNMPv2-TC;
 
 hh3cDot11ACMT MODULE-IDENTITY
-    LAST-UPDATED "201806041800Z"        -- Jun 04, 2018 at 18:00 GMT
+    LAST-UPDATED "202301061100Z"        -- Jan 6, 2023 at 11:00 GMT
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -208,6 +211,12 @@ hh3cDot11ACMT MODULE-IDENTITY
         The IEEE 802.11 BSS of an AP comprises of the
         stations directly associating with the AP. It will
         be identified by BSSID."
+    REVISION "202301061100Z"        -- Jan 6, 2023 at 11:00 GMT
+    DESCRIPTION
+        "Add new nodes."
+    REVISION "202106181800Z"        -- Jun 18, 2021 at 18:00 GMT
+    DESCRIPTION
+        " Modify the OBJECTS of the trap node "
     REVISION "201806041800Z"        -- Jun 04, 2018 at 18:00 GMT
     DESCRIPTION
         "Add new nodes."
@@ -607,6 +616,14 @@ hh3cDot11RemainingAPcapacity OBJECT-TYPE
     DESCRIPTION
         "Represents the remaining AP capacity of the AC."
     ::= { hh3cDot11ACLoadInfo 22 }
+
+hh3cDot11Secretkey OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Save the secret key for the SM4 algorithm."
+    ::= { hh3cDot11ACLoadInfo 33 }
 
 -- *****************************************************************************
 -- *  End of hh3cDot11ACLoad element Definition
@@ -1351,6 +1368,7 @@ hh3cDot11ACMtTunnelDownTrap NOTIFICATION-TYPE
 hh3cDot11ACMtBackupSwtTrap NOTIFICATION-TYPE
     OBJECTS
         {
+            hh3cDot11ACMtTrapACMacAddress,
             hh3cDot11ACMtTrapBackupSwitchInfo,
             hh3cDot11ACMtFirstTrapTime
         }

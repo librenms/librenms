@@ -8,7 +8,6 @@ use App\Models\PortVlan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\TestCase;
-use LibreNMS\Util\Url;
 use Spatie\Permission\Models\Role;
 
 final class PortTabTest extends TestCase
@@ -27,7 +26,7 @@ final class PortTabTest extends TestCase
         $port = $this->port();
 
         $this->actingAs($this->admin())
-            ->get(Url::portUrl($port))
+            ->get(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id]))
             ->assertOk()
             ->assertSee('Real time')
             ->assertSee('Eventlog')
@@ -39,7 +38,7 @@ final class PortTabTest extends TestCase
         $port = $this->port();
 
         $this->actingAs($this->admin())
-            ->get(Url::portUrl($port, ['view' => '../../etc']))
+            ->get(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => '../../etc']))
             ->assertOk()
             ->assertSee('<span class="pagemenu-selected">', false);
     }
@@ -51,7 +50,7 @@ final class PortTabTest extends TestCase
         $admin = $this->admin();
 
         $this->actingAs($admin)
-            ->get(Url::portUrl($port, ['view' => 'notes']))
+            ->get(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => 'notes']))
             ->assertOk()
             ->assertSee('Notes*')
             ->assertDontSee('uplink <a>', false);
@@ -71,11 +70,108 @@ final class PortTabTest extends TestCase
         PortVlan::create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'vlan' => 10, 'state' => 'forwarding', 'untagged' => 0, 'baseport' => 1, 'priority' => 0, 'cost' => 4]);
 
         $this->actingAs($this->admin())
-            ->get(Url::portUrl($port, ['view' => 'vlans']))
+            ->get(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => 'vlans']))
             ->assertOk()
             ->assertSee('Users &lt;10&gt;', false)
             ->assertSee('eth2')
             ->assertSee('(U)');
+    }
+
+    public function testMenuLinksUseQueryString(): void
+    {
+        $port = $this->port();
+
+        $this->actingAs($this->admin())
+            ->get(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id]))
+            ->assertOk()
+            ->assertSee("port/$port->port_id?view=realtime", false)
+            ->assertDontSee("/port=$port->port_id", false);
+    }
+
+    public function testRealtimeIntervalFromQuery(): void
+    {
+        $port = $this->port();
+
+        $this->actingAs($this->admin())
+            ->get(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => 'realtime', 'interval' => '60']))
+            ->assertOk()
+            ->assertSee('view=realtime&amp;interval=60', false)
+            ->assertViewHas('view', 'realtime')
+            ->assertViewHas('viewData', fn ($viewData) => $viewData['interval'] == '60');
+    }
+
+    public function testLegacyPathOptionsRedirectToQueryKeepingPortId(): void
+    {
+        $port = $this->port();
+
+        $this->actingAs($this->admin())
+            ->get('/device/device=' . $port->device_id . "/tab=port/port=$port->port_id/view=notes/")
+            ->assertRedirect(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => 'notes']));
+    }
+
+    public function testLegacyPortIdRedirectsToNativePath(): void
+    {
+        $port = $this->port();
+
+        $this->actingAs($this->admin())
+            ->get("/device/$port->device_id/port/port=$port->port_id/")
+            ->assertStatus(301)
+            ->assertRedirect(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id]));
+    }
+
+    public function testLegacyDeviceSegmentRedirects(): void
+    {
+        $port = $this->port();
+
+        $this->actingAs($this->admin())
+            ->get("/device/device=$port->device_id/port/$port->port_id")
+            ->assertRedirect(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id]));
+    }
+
+    public function testPortOfAnotherDeviceIsNotFound(): void
+    {
+        $port = $this->port();
+        $other = Device::factory()->create();
+
+        $this->actingAs($this->admin())
+            ->get("/device/$other->device_id/port/$port->port_id")
+            ->assertNotFound();
+    }
+
+    public function testLegacyPathRedirectRequiresPortAccess(): void
+    {
+        $port = $this->port();
+
+        $this->actingAs(User::factory()->create(['enabled' => 1]))
+            ->get(route('device.legacy', ['device' => $port->device_id, 'tab' => 'port', 'vars' => "port=$port->port_id/view=notes"]))
+            ->assertForbidden();
+    }
+
+    public function testInvalidQosShowIsRejected(): void
+    {
+        $port = $this->port();
+
+        $this->actingAs($this->admin())
+            ->get(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => 'qos', 'show' => 'abc']))
+            ->assertSessionHasErrors('show');
+    }
+
+    public function testPortIdIsNotReadFromQuery(): void
+    {
+        $port = $this->port();
+
+        $this->actingAs($this->admin())
+            ->get(route('device.legacy', ['device' => $port->device_id, 'tab' => 'port', 'port' => $port->port_id]))
+            ->assertNotFound();
+    }
+
+    public function testArrayOptionIsRejected(): void
+    {
+        $port = $this->port();
+
+        $this->actingAs($this->admin())
+            ->get(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => ['notes']]))
+            ->assertSessionHasErrors('view');
     }
 
     /**

@@ -1,14 +1,22 @@
 -- ==================================================================
--- Copyright (C) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (C) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: AAA MIB
 -- Reference:
--- Version: V1.1
+-- Version: V1.4
 -- History:
 -- V1.0 2019.03.11 The initial version, created by Yuhua
 -- V1.1 2020.01.13 updated by liubo
 --      Added hh3cAAATables, hh3cAAASlotStatTable, hh3cAAAChassisId,
 --      hh3cAAASlotId, and hh3cAAASlotSessionResourceNum
+-- V1.2 2021.05.19 updated by zhanghang
+--      Added hh3cAAASlotDualStackUserNum
+-- V1.3 2022.02.26 updated by liubo
+--      Added hh3cAAAUserCpu, hh3cAAAUserCpuMaxNumThreshold,
+--      hh3cAAAUserCpuMaxNum, and hh3cAAAUserCpuMaxNumResume
+-- V1.4 2022.07.08 updated by zhanghang
+--      Added hh3cAAALoginFailedTimes, hh3cAAAStatisticPeriod,
+--      hh3cAAAAdminLoginFailed, and hh3cAAAAdminLoginFailedClear
 -- ==================================================================
 HH3C-AAA-MIB DEFINITIONS ::= BEGIN
 IMPORTS
@@ -18,7 +26,7 @@ IMPORTS
         FROM SNMPv2-SMI;
 
 hh3cAAA MODULE-IDENTITY
-    LAST-UPDATED "202001130000Z"
+    LAST-UPDATED "202207080000Z"
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -31,11 +39,24 @@ hh3cAAA MODULE-IDENTITY
         "The MIB module is used for managing AAA."
 
 --  Revision history
-REVISION     "202001130000Z"          -- January 13, 2020 at 00:00 GMT
-    DESCRIPTION  "Added hh3cAAATables, hh3cAAASlotStatTable, hh3cAAAChassisId,
-             hh3cAAASlotId, and hh3cAAASlotSessionResourceNum"
+    REVISION     "202207080000Z"          -- July 08, 2022 at 00:00 GMT
+    DESCRIPTION
+        "
+        Added hh3cAAALoginFailedTimes, hh3cAAAStatisticPeriod,
+        hh3cAAAAdminLoginFailed, and hh3cAAAAdminLoginFailedClear.
+        "
 
-REVISION     "201903110000Z"
+    REVISION     "202202260000Z"          -- February 26, 2022 at 00:00 GMT
+    DESCRIPTION
+        "
+        Added hh3cAAAUserCpu, hh3cAAAUserCpuMaxNumThreshold,
+        hh3cAAAUserCpuMaxNum, and hh3cAAAUserCpuMaxNumResume.
+        "
+
+    REVISION     "202105190000Z"          -- May 19, 2021 at 00:00 GMT
+    DESCRIPTION  "hh3cAAASlotDualStackUserNum"
+
+    REVISION     "201903110000Z"
     DESCRIPTION  "The initial version."
 
 ::= { hh3cCommon 181 }
@@ -69,8 +90,41 @@ hh3cAAAUserSlotMaxNumThreshold OBJECT-TYPE
     MAX-ACCESS accessible-for-notify
     STATUS current
     DESCRIPTION
-        "Threshold about the maximum number of online users on this slot."
+        "Threshold for the maximum number of online users on this slot."
     ::= { hh3cAAATrapOidDefine 3 }
+
+hh3cAAAUserCpu OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Number of the CPU that online users access."
+    ::= { hh3cAAATrapOidDefine 4 }
+
+hh3cAAAUserCpuMaxNumThreshold OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Threshold for the maximum number of online users on this CPU."
+    ::= { hh3cAAATrapOidDefine 5 }
+
+hh3cAAALoginFailedTimes OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Number of login failures."
+    ::= { hh3cAAATrapOidDefine 6 }
+
+hh3cAAAStatisticPeriod OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "minute"
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Reference period for login failure statistics collection."
+    ::= { hh3cAAATrapOidDefine 7 }
 
 -- ----------------------------------------------------------------------
 -- hh3cAAATraps Table
@@ -98,6 +152,47 @@ hh3cAAAUserSlotMaxNumResume NOTIFICATION-TYPE
         "This trap is generated when the number of online users on the slot
          falls below 90% of the maximum user threshold."
     ::= { hh3cAAATrapsDefine 2 }
+
+hh3cAAAUserCpuMaxNum NOTIFICATION-TYPE
+    OBJECTS { hh3cAAAUserChassis,
+              hh3cAAAUserSlot,
+              hh3cAAAUserCpu,
+              hh3cAAAUserCpuMaxNumThreshold }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when the number of online users on the CPU
+         reaches the threshold.  Subsequent users are recommended to access
+         the device through another CPU."
+    ::= { hh3cAAATrapsDefine 3 }
+
+hh3cAAAUserCpuMaxNumResume NOTIFICATION-TYPE
+    OBJECTS { hh3cAAAUserChassis,
+              hh3cAAAUserSlot,
+              hh3cAAAUserCpu,
+              hh3cAAAUserCpuMaxNumThreshold }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when the number of online users on the CPU
+         falls below 90% of the threshold."
+    ::= { hh3cAAATrapsDefine 4 }
+
+hh3cAAAAdminLoginFailed NOTIFICATION-TYPE
+    OBJECTS { hh3cAAALoginFailedTimes,
+              hh3cAAAStatisticPeriod }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when an administrator user failed to
+         log in frequently."
+    ::= { hh3cAAATrapsDefine 5 }
+
+hh3cAAAAdminLoginFailedClear NOTIFICATION-TYPE
+    OBJECTS { hh3cAAALoginFailedTimes,
+              hh3cAAAStatisticPeriod }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when an administrator user failed to
+         log in but the failure does not occur frequently."
+    ::= { hh3cAAATrapsDefine 6 }
 
 -- ----------------------------------------------------------------------
 -- hh3cAAATables Definition
@@ -127,7 +222,8 @@ hh3cAAASlotStatEntry OBJECT-TYPE
 Hh3cAAASlotStatEntry ::= SEQUENCE {
     hh3cAAAChassisId           Unsigned32,
     hh3cAAASlotId              Unsigned32,
-    hh3cAAASlotSessionResourceNum      Unsigned32}
+    hh3cAAASlotSessionResourceNum      Unsigned32,
+    hh3cAAASlotDualStackUserNum        Unsigned32}
 
 hh3cAAAChassisId   OBJECT-TYPE
     SYNTAX   Unsigned32 (0..65535)
@@ -152,4 +248,13 @@ hh3cAAASlotSessionResourceNum   OBJECT-TYPE
     DESCRIPTION
         "Number of used session resource on this slot."
     ::= { hh3cAAASlotStatEntry 3 }
+
+hh3cAAASlotDualStackUserNum   OBJECT-TYPE
+    SYNTAX   Unsigned32
+    MAX-ACCESS  read-only
+    STATUS   current
+    DESCRIPTION
+        "Number of dual-stack users on this slot."
+    ::= { hh3cAAASlotStatEntry 4 }
+
 END

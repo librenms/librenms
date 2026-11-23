@@ -14,10 +14,28 @@ IMPORTS
 ;
 
 viptela-app-route MODULE-IDENTITY
-    LAST-UPDATED "202007010000Z"
+    LAST-UPDATED "202307010000Z"
     ORGANIZATION "Viptela, Inc."
     CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
     DESCRIPTION "This module defines the data model for application-aware routing operational data"
+    REVISION "202307010000Z"
+    DESCRIPTION "Viptela Revision 20.12"
+    REVISION "202303010000Z"
+    DESCRIPTION "Viptela Revision 20.11"
+    REVISION "202212150000Z"
+    DESCRIPTION "Viptela Revision 20.10"
+    REVISION "202206010000Z"
+    DESCRIPTION "Viptela Revision 20.9"
+    REVISION "202203010000Z"
+    DESCRIPTION "Viptela Revision 20.8"
+    REVISION "202111010000Z"
+    DESCRIPTION "Viptela Revision 20.7"
+    REVISION "202107010000Z"
+    DESCRIPTION "Viptela Revision 20.6"
+    REVISION "202103010000Z"
+    DESCRIPTION "Viptela Revision 20.5"
+    REVISION "202011010000Z"
+    DESCRIPTION "Viptela Revision 20.4"
     REVISION "202007010000Z"
     DESCRIPTION "Viptela Revision 20.3"
     REVISION "202002240000Z"
@@ -144,7 +162,10 @@ AppRouteStatisticsEntry ::=
         appRouteStatisticsMeanLoss UnsignedByte,
         appRouteStatisticsMeanLatency Unsigned32,
         appRouteStatisticsSlaClassIndex String,
-        appRouteStatisticsMeanJitter Unsigned32
+        appRouteStatisticsMeanJitter Unsigned32,
+        appRouteStatisticsDampSlaClassIndex String,
+        appRouteStatisticsDampMultiplierLeft String,
+        appRouteStatisticsFallbackSlaClassIndex String
     }
 
 -- tagpath /app-route/statistics/src-ip
@@ -243,6 +264,31 @@ appRouteStatisticsMeanJitter OBJECT-TYPE
     DESCRIPTION "Average jitter across all polling intervals"
     ::= { appRouteStatisticsEntry 12 }
 
+
+-- tagpath /app-route/statistics/damp-sla-class-index
+appRouteStatisticsDampSlaClassIndex OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SLA classes (indexes) where dampening is happening for this session"
+    ::= { appRouteStatisticsEntry 13 }
+
+-- tagpath /app-route/statistics/damp-multiplier-left
+appRouteStatisticsDampMultiplierLeft OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Dampening Multiplier left corresponding to damp-sla-class-index"
+    ::= { appRouteStatisticsEntry 14 }
+
+-- tagpath /app-route/statistics/fallback-sla-class-index
+appRouteStatisticsFallbackSlaClassIndex OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Fallback SLA classes (indexes) that this session satisfies"
+    ::= { appRouteStatisticsEntry 15 }
+
 -- tagpath /app-route/statistics/interval
 appRouteStatisticsIntervalTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF AppRouteStatisticsIntervalEntry
@@ -327,6 +373,147 @@ appRouteStatisticsIntervalRxDataPkts OBJECT-TYPE
     DESCRIPTION "Data packets received"
     ::= { appRouteStatisticsIntervalEntry 7 }
 
+-- tagpath /app-route/statistics/app-probe-class-list
+appRouteStatisticsAppProbeClassTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AppRouteStatisticsAppProbeClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { viptela-app-route 5 }
+
+-- tagpath /app-route/statistics/app-probe-class-list
+appRouteStatisticsAppProbeClassEntry OBJECT-TYPE
+    SYNTAX      AppRouteStatisticsAppProbeClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { appRouteStatisticsSrcIp, appRouteStatisticsDstIp, appRouteStatisticsProto, appRouteStatisticsSrcPort, appRouteStatisticsDstPort, appRouteStatisticsAppProbeClassName}
+        ::= { appRouteStatisticsAppProbeClassTable 1 }
+
+AppRouteStatisticsAppProbeClassEntry ::=
+   SEQUENCE {
+       appRouteStatisticsAppProbeClassName String,
+       appRouteStatisticsAppProbeClassMeanLoss UnsignedByte,
+       appRouteStatisticsAppProbeClassMeanLatency Unsigned32,
+       appRouteStatisticsAppProbeClassMeanJitter Unsigned32
+   }
+
+ -- tagpath /app-route/statistics/app-probe-class-list/name
+appRouteStatisticsAppProbeClassName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of app probe class list"
+    ::= { appRouteStatisticsAppProbeClassEntry 1 }
+
+-- tagpath /app-route/statistics/app-probe-class-list/mean-loss
+appRouteStatisticsAppProbeClassMeanLoss OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average loss in percentage across all the polling intervals"
+    ::= { appRouteStatisticsAppProbeClassEntry 2 }
+
+-- tagpath /app-route/statistics/app-probe-class-list/mean-latency
+appRouteStatisticsAppProbeClassMeanLatency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average latency across all the polling intervals"
+    ::= { appRouteStatisticsAppProbeClassEntry 3 }
+
+-- tagpath /app-route/statistics/app-probe-class-list/mean-jitter
+appRouteStatisticsAppProbeClassMeanJitter OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average jitter across all polling intervals"
+    ::= { appRouteStatisticsAppProbeClassEntry 4 }
+
+-- tagpath /app-route/statistics/app-probe-class-list/interval
+appRouteStatisticsAppProbeClassIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AppRouteStatisticsAppProbeClassIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { viptela-app-route 6 }
+
+-- tagpath /app-route/statistics/app-probe-class-list/interval
+appRouteStatisticsAppProbeClassIntervalEntry OBJECT-TYPE
+    SYNTAX      AppRouteStatisticsAppProbeClassIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { appRouteStatisticsSrcIp, appRouteStatisticsDstIp, appRouteStatisticsProto, appRouteStatisticsSrcPort, appRouteStatisticsDstPort, appRouteStatisticsAppProbeClassName, appRouteStatisticsIntervalIndex }
+        ::= { appRouteStatisticsAppProbeClassIntervalTable 1 }
+
+AppRouteStatisticsAppProbeClassIntervalEntry ::=
+    SEQUENCE {
+        appRouteStatisticsAppProbeClassIntervalIndex UnsignedByte,
+        appRouteStatisticsAppProbeClassIntervalTotalPackets Integer32,
+        appRouteStatisticsAppProbeClassIntervalLoss Integer32,
+        appRouteStatisticsAppProbeClassIntervalAverageLatency ConfdString,
+        appRouteStatisticsAppProbeClassIntervalAverageJitter ConfdString,
+        appRouteStatisticsAppProbeClassIntervalTxDataPkts String,
+        appRouteStatisticsAppProbeClassIntervalRxDataPkts String
+    }
+
+-- tagpath /app-route/statistics/app-probe-class-list/interval/index
+appRouteStatisticsAppProbeClassIntervalIndex OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Polling interval index"
+    ::= { appRouteStatisticsAppProbeClassIntervalEntry 1 }
+
+-- tagpath /app-route/statistics/app-probe-class-list/interval/total-packets
+appRouteStatisticsAppProbeClassIntervalTotalPackets OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total packets sent"
+    ::= { appRouteStatisticsAppProbeClassIntervalEntry 2 }
+
+-- tagpath /app-route/statistics/app-probe-class-list/interval/loss
+appRouteStatisticsAppProbeClassIntervalLoss OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Packets lost"
+    ::= { appRouteStatisticsAppProbeClassIntervalEntry 3 }
+
+-- tagpath /app-route/statistics/app-probe-class-list/interval/average-latency
+appRouteStatisticsAppProbeClassIntervalAverageLatency OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average latency"
+    ::= { appRouteStatisticsAppProbeClassIntervalEntry 4 }
+
+-- tagpath /app-route/statistics/app-probe-class-list/interval/average-jitter
+appRouteStatisticsAppProbeClassIntervalAverageJitter OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average jitter"
+    ::= { appRouteStatisticsAppProbeClassIntervalEntry 5 }
+
+-- tagpath /app-route/statistics/app-probe-class-list/interval/tx-data-pkts
+appRouteStatisticsAppProbeClassIntervalTxDataPkts OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Data packets transmitted"
+    ::= { appRouteStatisticsAppProbeClassIntervalEntry 6 }
+
+-- tagpath /app-route/statistics/app-probe-class-list/interval/rx-data-pkts
+appRouteStatisticsAppProbeClassIntervalRxDataPkts OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Data packets received"
+    ::= { appRouteStatisticsAppProbeClassIntervalEntry 7 }
+
 -- tagpath /app-route/sla-class
 appRouteSlaClassTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF AppRouteSlaClassEntry
@@ -350,7 +537,10 @@ AppRouteSlaClassEntry ::=
         appRouteSlaClassName String,
         appRouteSlaClassLoss UnsignedByte,
         appRouteSlaClassLatency Unsigned32,
-        appRouteSlaClassJitter Unsigned32
+        appRouteSlaClassJitter Unsigned32,
+        appRouteSlaClassAppProbeClassId UnsignedByte,
+        appRouteSlaClassAppProbeClass String,
+        appRouteFallbackSlaClassIndex String
     }
 
 -- tagpath /app-route/sla-class/index
@@ -392,5 +582,29 @@ appRouteSlaClassJitter OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Configured jitter, in milliseconds"
     ::= { appRouteSlaClassEntry 5 }
+
+-- tagpath /app-route/sla-class/app-probe-class-id
+appRouteSlaClassAppProbeClassId OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "App Probe Class Id"
+    ::= { appRouteSlaClassEntry 6 }
+
+-- tagpath /app-route/sla-class/app-probe-class
+appRouteSlaClassAppProbeClass OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Configured App Probe class"
+    ::= { appRouteSlaClassEntry 7 }
+
+-- tagpath /app-route/sla-class/fallback-best-tunnel
+appRouteFallbackSlaClassIndex OBJECT-TYPE
+   SYNTAX      String
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "Fallback SLA class index"
+   ::= { appRouteSlaClassEntry 8 }
 
 END

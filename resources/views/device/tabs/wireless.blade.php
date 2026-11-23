@@ -2,10 +2,10 @@
 
 @section('content')
 <x-device.page :device="$device">
-    <x-option-bar :name="__('Wireless')" :options="$data['options']" :selected="$data['metric']?->value ?? 'overview'" />
+    <x-option-bar :name="__('Wireless')" :options="$options" :selected="$metric?->value ?? 'overview'" />
 
-    @if($data['metric'])
-        @foreach($data['sensors'] as $sensor)
+    @if($metric)
+        @foreach($sensors as $sensor)
             <x-panel>
                 <x-slot:heading>
                     <h3 class="panel-title">
@@ -19,11 +19,11 @@
             </x-panel>
         @endforeach
     @else
-        @foreach($data['classes'] as $class)
+        @foreach($classes as $class)
             <x-panel>
                 <x-slot:heading>
                     <h3 class="panel-title">
-                        <a href="{{ $data['options'][$class->value]['link'] }}">
+                        <a href="{{ $options[$class->value]['link'] }}">
                             {{ __("wireless.$class->value.long") }}@if(__("wireless.$class->value.unit")) ({{ __("wireless.$class->value.unit") }})@endif
                         </a>
                     </h3>

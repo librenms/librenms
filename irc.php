@@ -20,7 +20,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  * */
 
-$init_modules = [];
 require __DIR__ . '/includes/init.php';
 error_reporting(E_ERROR);
 

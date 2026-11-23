@@ -1,0 +1,2506 @@
+-- *******************************************************************
+-- CISCO-LWAPP-WLAN-POLICY-MIB.my
+-- This MIB helps to manage the WLANs on the controller
+-- April 2016, Ambika Prasad Mohanty
+--   
+-- Copyright (c) 2017-2019, 2021, 2023 by Cisco Systems, Inc.
+-- All rights reserved.
+-- *******************************************************************
+
+CISCO-LWAPP-WLAN-POLICY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32,
+    IpAddress
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    TruthValue,
+    RowStatus
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoCapwapWlanPolicyMIB MODULE-IDENTITY
+    LAST-UPDATED    "202301230000Z"
+    ORGANIZATION    "Cisco Systems Inc."
+    CONTACT-INFO
+            "Cisco Systems,
+            Customer Service
+
+            Postal: 170 West Tasman Drive
+            San Jose, CA  95134
+            USA
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-wnbu-snmp@cisco.com"
+    DESCRIPTION
+        "This MIB is intended to be implemented on all those
+        devices operating as Central Controllers (CC)  that
+        terminate the Light Weight Access Point Protocol
+        tunnel from Cisco Light-weight LWAPP Access Points.
+
+        This MIB helps to manage the WLANs on the controller.
+
+        The relationship between CC and the LWAPP APs
+        can be depicted as follows:
+
+        +......+     +......+     +......+           +......+
+        +      +     +      +     +      +           +      +
+        +  CC  +     +  CC  +     +  CC  +           +  CC  +
+        +      +     +      +     +      +           +      +
+        +......+     +......+     +......+           +......+
+        ..            .             .                 .
+        ..            .             .                 .
+        .  .            .             .                 .
+        .    .            .             .                 .
+        .      .            .             .                 .
+        .        .            .             .                 .
+        +......+ +......+     +......+      +......+          +......+
+        +      + +      +     +      +      +      +          +      +
+        +  AP  + +  AP  +     +  AP  +      +  AP  +          +  AP  +
+        +      + +      +     +      +      +      +          +      +
+        +......+ +......+     +......+      +......+          +......+
+        .              .             .                 .
+        .  .              .             .                 .
+        .    .              .             .                 .
+        .      .              .             .                 .
+        .        .              .             .                 .
+        +......+ +......+     +......+      +......+          +......+
+        +      + +      +     +      +      +      +          +      +
+        +  MN  + +  MN  +     +  MN  +      +  MN  +          +  MN  +
+        +      + +      +     +      +      +      +          +      +
+        +......+ +......+     +......+      +......+          +......+
+
+        The LWAPP tunnel exists between the controller and
+        the APs.  The MNs communicate with the APs through
+        the protocol defined by the 802.11 standard.
+
+        LWAPP APs, upon bootup, discover and join one of the
+        controllers and the controller pushes the configuration,
+        that includes the WLAN parameters, to the LWAPP APs.
+        The APs then encapsulate all the 802.11 frames from
+        wireless clients inside LWAPP frames and forward
+        the LWAPP frames to the controller.
+
+                           GLOSSARY
+
+        Access Point ( AP )
+
+        An entity that contains an 802.11 medium access
+        control ( MAC ) and physical layer ( PHY ) interface
+        and provides access to the distribution services via
+        the wireless medium for associated clients.  
+
+        LWAPP APs encapsulate all the 802.11 frames in
+        LWAPP frames and sends it to the controller to which
+        it is logically connected to.
+
+        Central Controller ( CC )
+
+        The central entity that terminates the LWAPP protocol
+        tunnel from the LWAPP APs.  Throughout this MIB,
+        this entity also referred to as 'controller'.
+
+        Light Weight Access Point Protocol ( LWAPP ) 
+
+        This is a generic protocol that defines the
+        communication between the Access Points and the
+        controllers.
+
+        Mobile Node ( MN )
+
+        A roaming 802.11 wireless device in a wireless
+        network associated with an access point. 
+
+        Access Control List ( ACL )
+
+        A list of rules used to restrict the traffic reaching 
+        an interface or the CPU or WLAN.  Each ACL is an ordered
+        set of rules and actions.  If a rule matches then the 
+        action for that rule is applied to the packet.
+
+        802.1x
+
+        The IEEE ratified standard for enforcing port based
+        access control.  This was originally intended for
+        use on wired LANs and later extended for use in
+        802.11 WLAN environments.  This defines an
+        architecture with three main parts - a supplicant
+        (Ex. an 802.11 wireless client), an authenticator
+        (the AP) and an authentication server(a Radius
+        server).  The authenticator passes messages back
+        and forth between the supplicant and the
+        authentication server to enable the supplicant
+        get authenticated to the network.
+
+        Temporal Key Integrity Protocol ( TKIP )
+
+        A security protocol defined to enhance the limitations
+        of WEP.  Message Integrity Check and per-packet keying
+        on all WEP-encrypted frames are two significant
+        enhancements provided by TKIP to WEP.
+
+
+        Cisco Key Integrity Protocol ( CKIP )
+
+        A proprietary implementation similar to TKIP.  CKIP
+        implements key permutation for protecting the CKIP
+        key against attacks.  Other features of CKIP include
+        expansion of encryption key to 16 bytes of length for
+        key protection and MIC to ensure data integrity.
+
+
+        Wired Equivalent Privacy ( WEP )
+
+        A security method defined by 802.11. WEP uses a
+        symmetric key stream cipher called RC4 to encrypt the
+        data packets.
+
+        Wi-Fi Protected Access ( WPA )
+
+        Wi-Fi Protected Access (WPA and WPA2) are security
+        systems created in response to several serious
+        weaknesses found in Wired Equivalent Privacy (WEP).
+        WPA implements the majority of the IEEE 802.11i
+        standard, and was intended as an intermediate
+        measure to take the place of WEP while 802.11i was
+        prepared. WPA is designed to work with all wireless
+        network interface cards, but not necessarily with
+        first generation wireless access points.
+
+        WLAN Layer 2 Security
+
+        WLAN layer 2 (MAC) security defines the encryption and 
+        authentication approaches such as 802.1x, WPA, 
+        WPA2, CKIP and WEP.                
+
+        Delivery Traffic Indication Map ( DTIM )
+
+        DTIM is measured in beacon intervals and is the time 
+        period during which multicast/broadcast packets are
+        sent to clients. This helps client to go in Power Saving
+        mode and helps to save battery power.
+
+        Network Admission Control (NAC)
+
+        Cisco NAC uses the network infrastructure to enforce security
+        policy compliance on all devices that seek to access network
+        computing resources. With the Cisco NAC appliance, network
+        administrators can authenticate, authorize, evaluate, and
+        remediate wired, wireless, and remote users and their machines
+        prior to network access. The Cisco NAC appliance identifies
+        whether networked devices such as laptops, IP phones, or game
+        consoles are compliant with network security policies, and
+        repairs any vulnerabilities before it permits access to the
+        network.
+
+        Out of Band (OOB)
+
+        Out-of-band deployments require user traffic to traverse through
+        the NAC appliance only within authentication, posture
+        assessment, and remediation. When a user is authenticated and
+        passes all policy checks, the traffic is switched normally
+        through the network and bypasses the NAC server.
+
+        Band Select
+
+        The 2.4 GHz band is congested and clients have to contend with
+        numerous performance challenges. These consist of interference
+        from Bluetooth, microwave ovens, cordless phones, etc.;
+        protection mechanisms from 802.11b legacy clients; and
+        co-channel interference from other access points due to
+        802.11bg?s limit of three non-overlapping channels. Allowing
+        client Wi-Fi radios capable of dual band (2.4 and 5 GHz)
+        operation move to the less congested 5 GHz radios would improve
+        the overall performance of the network.
+        The Band Select algorithm is based on probe response suppression
+        on clients 2.4G radio. The feature is OFF by default and has to
+        be manually switched ON globally for a WLC. It can be optionally
+        over-ridden per-SSID to disallow it.
+
+        Network Access Identifier ( NAI )
+
+        In order to provide roaming services, it is necessary 
+        to have a standardized method for  identifying users. 
+        NAI is actually the user identity submitted by the client 
+        during network authentication.
+
+        KTS (Key Telephone System)
+
+        Key Telephone System is an alternative to a private branch
+        exchange (PBX) phone system. A KTS is equipped with several
+        buttons that allow a caller to directly select outgoing lines
+        or incoming calls, and use intercom and conference facilities. 
+
+        NAS-ID (Network Access Server Identifier)
+
+        NAS-ID string is sent to Radius server by WLC (as radius client)
+        via authentication request, which can be used to classify users
+        to different groups then radius server can reply a customized
+        authentication response.
+
+        Quality of Service (QoS)
+
+        The quality of service (QoS) refers to several related
+        aspects of telephony and computer networks that allow the
+        transport of traffic with special requirements. 
+        In particular, much technology has been developed to allow 
+        computer networks to become as useful as telephone networks 
+        for audio conversations, as well as supporting new applications 
+        with even stricter service demands.
+
+        Virtual LAN (VLAN)
+
+        In computer networking, virtual local area network, virtual LAN
+        or VLAN is a concept of partitioning a physical network, so
+        that distinct broadcast domains are created. This is usually
+        achieved on switch or router devices.
+
+        Application Visibility and Control (AVC)
+
+        Application visibility and control (AVC) refers to the
+        capability of a network to identify which layer 7 applications
+        are producing the flows traversing the network.
+        This information is typically presented as packet or byte
+        statistics. Netflow is used to specify which information is
+        to be collected for each flow.
+
+        Multicast Domain Name System (mDNS)
+
+        This is the underlying protocol that is used for Service
+        advertisement and discovery in technologies like Bonjour,
+        Zero Touch Configuration
+
+        REFERENCE
+
+        [1] Wireless LAN Medium Access Control ( MAC ) and
+        Physical Layer ( PHY ) Specifications.
+
+        [2] Draft-obara-capwap-lwapp-00.txt, IETF Light 
+        Weight Access Point Protocol 
+
+        [3] IEEE 802.11 - The original 1 Mbit/s and 2 Mbit/s, 
+        2.4 GHz RF and IR standard."
+    REVISION        "202301230000Z"
+    DESCRIPTION
+        "Marked as deprecated:
+        - cLWlanPolicyNacType
+        - ciscoLwappWlanPolicyConfigGroupRev4
+        created a new revision ciscoLwappWlanPolicyConfigGroupRev5"
+    REVISION        "202101200000Z"
+    DESCRIPTION
+        "Updated cLWlanPolicyIPv4AclName range"
+    REVISION        "201911200000Z"
+    DESCRIPTION
+        "Added the following objects to cLWlanPolicyConfigTable.
+        - cLWlanPolicyNacType
+        - cLWlanPolicyARPProxy
+        - cLWlanPolicyIPv6proxy
+        - cLWlanPolicyMulticastFilter
+        - cLWlanPolicyQBSSLoad"
+    REVISION        "201907230000Z"
+    DESCRIPTION
+        "Added the following tables.
+        - cLWlanPolicyCalendarProfileTable
+        Added the following objects to cLWlanPolicyConfigTable.
+        - cLWlanPolicyMdnsPolicy
+        - cLWlanPolicyHotspotAnqpServer"
+    REVISION        "201903150000Z"
+    DESCRIPTION
+        "Added the following tables.
+        - cLWlanPolicyMonitorIPv4InConfigTable
+        - cLWlanPolicyMonitorIPv4OutConfigTable
+        - cLWlanPolicyMonitorIPv6InConfigTable
+        - cLWlanPolicyMonitorIPv6OutConfigTable
+        They configure the Netflow flow monitors used for AVC."
+    REVISION        "201901180000Z"
+    DESCRIPTION
+        "Deprecated the following objects from cLWlanPolicyConfigTable.
+        - cLWlanPolicyNetflowIPv4InputMonitorName
+        - cLWlanPolicyNetflowIPv4OutputMonitorName
+        - cLWlanPolicyNetflowIPv6InputMonitorName
+        - cLWlanPolicyNetflowIPv6OutputMonitorName
+        Deprecated the following compliance group
+        - ciscoLwappWlanPolicyComplianceR01
+        Added the following compliance group
+        - ciscoLwappWlanPolicyComplianceR02."
+    REVISION        "201808200000Z"
+    DESCRIPTION
+        "Added the following objects to cLWlanPolicyConfigTable.
+        - clWlanPolicyMobilityAnchor
+        - cLWlanPolicyBroadcastTagging
+        - cLWlanPolicyWgbVlan
+        - cLWlanPolicyReanchorClassmap
+        - cLWlanUmbrellaParamMapName
+        - cLWlanPolicyAccountingList
+        - cLWlanPolicyAaaPolicyName
+        - cLWlanPolicyQosCallSnooping
+        - cLWlanPolicyDefaultSgt 
+        - cLWlanPolicyInlineTagging
+        - cLWlanPolicySgaclEnforcement
+        Addition of following new table
+        - cLWlanPolicyATFPolicyNameConfigTable
+        - cLWlanAaaPolicyConfigTable
+        deprecated the following compliance group
+        - ciscoLwappWlanPolicyCompliance
+        Added following compliance group
+        - ciscoLwappWlanPolicyComplianceR01."
+    REVISION        "201803190000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { ciscoMgmt 853 }
+
+
+ciscoLwappWlanPolicyMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoCapwapWlanPolicyMIB 0 }
+
+ciscoLwappWlanPolicyMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoCapwapWlanPolicyMIB 1 }
+
+ciscoLwappWlanPolicyConfig  OBJECT IDENTIFIER
+    ::= { ciscoLwappWlanPolicyMIBObjects 2 }
+
+ciscoLwappWlanPolicyConform  OBJECT IDENTIFIER
+    ::= { ciscoCapwapWlanPolicyMIB 3 }
+
+-- ********************************************************************
+-- WLAN POLICY configuration
+-- ********************************************************************
+
+cLWlanPolicyConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CLWlanPolicyConfigEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table represents the WLAN policy configuration sent by
+        the controller to the LWAPP APs for their operation. 
+
+        LWAPP APs exchange configuration messages with the
+        controller and get the required configuration for their
+        802.11 related operations.  As part of these messages, the
+        WLAN configuration is pushed by the controller to the
+        LWAPP APs. 
+
+        Rows are added or deleted by explicit management actions
+        initiated by the user from a network management station
+        through the cLWlanPlcyRowStatus object."
+    ::= { ciscoLwappWlanPolicyConfig 1 }
+
+cLWlanPolicyConfigEntry OBJECT-TYPE
+    SYNTAX          CLWlanPolicyConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry in this table represents the WLAN policy
+        configuration sent by the controller to LWAPP APs for use
+        during their operations. Entries can be added/deleted by 
+        explicit management actions by NMS or by user console."
+    INDEX           { cLWlanWlanPolicyName } 
+    ::= { cLWlanPolicyConfigTable 1 }
+
+CLWlanPolicyConfigEntry ::= SEQUENCE {
+        cLWlanWlanPolicyName                     SnmpAdminString,
+        cLWlanPlcyRowStatus                      RowStatus,
+        cLWlanPolicyDescription                  SnmpAdminString,
+        cLWlanPolicyInterfaceName                SnmpAdminString,
+        cLWlanPolicyCentralSwitchMode            TruthValue,
+        cLWlanPolicyCentralAuthMode              TruthValue,
+        cLWlanPolicyDhcpCentral                  TruthValue,
+        cLWlanPolicyNatPatEnabled                TruthValue,
+        cLWlanPolicyAssocCentral                 TruthValue,
+        cLWlanPolicyIPv4AclName                  SnmpAdminString,
+        cLWlanPolicyIPv6AclName                  SnmpAdminString,
+        cLWlanPolicyL2AclName                    SnmpAdminString,
+        cLWlanPolicySessionTimeout               Unsigned32,
+        cLWlanPolicyUserIdleTimeout              Unsigned32,
+        cLWlanPolicyClientExclTimeout            Unsigned32,
+        cLWlanPolicyNativeProfiling              TruthValue,
+        cLWlanPolicySubscriberPolicyName         SnmpAdminString,
+        cLWlanPolicyHttpDeviceProfiling          TruthValue,
+        cLWlanPolicyDHCPDeviceProfiling          TruthValue,
+        cLWlanPolicyNetflowIPv4InputMonitorName  SnmpAdminString,
+        cLWlanPolicyNetflowIPv4OutputMonitorName SnmpAdminString,
+        cLWlanPolicyNetflowIPv6InputMonitorName  SnmpAdminString,
+        cLWlanPolicyNetflowIPv6OutputMonitorName SnmpAdminString,
+        cLWlanPolicyQosPerSSIDInput              SnmpAdminString,
+        cLWlanPolicyQosPerSSIDOutput             SnmpAdminString,
+        cLWlanPolicyQosPerBSSIDInput             SnmpAdminString,
+        cLWlanPolicyQosPerBSSIDOutput            SnmpAdminString,
+        cLWlanPolicyBlacklistTimeout             Unsigned32,
+        cLWlanPolicyBlacklistingCapability       TruthValue,
+        cLWlanPolicyDhcpRequired                 INTEGER,
+        cLWlanPolicyDhcpServerIpAddress          IpAddress,
+        cLWlanPolicyAaaOverride                  TruthValue,
+        cLWlanPolicyNac                          TruthValue,
+        cLWlanPolicyStatus                       TruthValue,
+        cLWlanPolicyRadiusHttpProfiling          TruthValue,
+        cLWlanPolicyUserIdleThreshold            Unsigned32,
+        cLWlanPolicyQosFastlane                  INTEGER,
+        cLWlanPolicyDHCPOption82Ascii            TruthValue,
+        cLWlanPolicyDHCPOption82Rid              TruthValue,
+        cLWlanPolicyDHCPOption82Enable           TruthValue,
+        cLWlanPolicyDHCPOption82Apmac            TruthValue,
+        cLWlanPolicyDHCPOption82Apethmac         TruthValue,
+        cLWlanPolicyDHCPOption82Apname           TruthValue,
+        cLWlanPolicyDHCPOption82Policytag        TruthValue,
+        cLWlanPolicyDHCPOption82Aplocation       TruthValue,
+        cLWlanPolicyDHCPOption82Vlanid           TruthValue,
+        cLWlanPolicyDHCPOption82Ssid             TruthValue,
+        cLWlanPolicySplitMacAcl                  SnmpAdminString,
+        cLWlanPolicyVlanCentralSwitching         TruthValue,
+        cLWlanPolicyPassiveClient                TruthValue,
+        cLWlanPolicyNBARProtocolDiscovery        TruthValue,
+        cLWlanPolicyStaticIPMobility             TruthValue,
+        clWlanPolicyMobilityAnchor               TruthValue,
+        cLWlanPolicyBroadcastTagging             TruthValue,
+        cLWlanPolicyWgbVlan                      TruthValue,
+        cLWlanPolicyReanchorClassmap             SnmpAdminString,
+        cLWlanUmbrellaParamMapName               SnmpAdminString,
+        cLWlanPolicyAccountingList               SnmpAdminString,
+        cLWlanPolicyAAAPolicyName                SnmpAdminString,
+        cLWlanPolicyQosCallSnooping              TruthValue,
+        cLWlanPolicyDefaultSgt                   Unsigned32,
+        cLWlanPolicyInlineTagging                TruthValue,
+        cLWlanPolicySgaclEnforcement             TruthValue,
+        cLWlanPolicyMdnsPolicy                   SnmpAdminString,
+        cLWlanPolicyHotspotAnqpServer            SnmpAdminString,
+        cLWlanPolicyNacType                      INTEGER,
+        cLWlanPolicyARPProxy                     TruthValue,
+        cLWlanPolicyIPv6proxy                    INTEGER,
+        cLWlanPolicyMulticastFilter              TruthValue,
+        cLWlanPolicyQBSSLoad                     TruthValue,
+        cLWlanPolicyL3Access                     TruthValue
+}
+
+cLWlanWlanPolicyName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..64))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies one instance of a WLAN policy on the
+        controller." 
+    ::= { cLWlanPolicyConfigEntry 1 }
+
+cLWlanPlcyRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the status column for this row and
+        used to create, modify and delete specific instances of
+        rows in this table. 
+        This table supports modification of writable objects when
+        the  RowStatus is 'active'. 
+        The following objects are mandatory for successful
+        creation of an entry: cLWlanPolicyName." 
+    ::= { cLWlanPolicyConfigEntry 2 }
+
+cLWlanPolicyDescription OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the description associated
+        to this WLAN policy.This can be any user defined
+        string." 
+    ::= { cLWlanPolicyConfigEntry 3 }
+
+cLWlanPolicyInterfaceName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..32))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object represents the interface attached to the
+        wireless lan." 
+    ::= { cLWlanPolicyConfigEntry 4 }
+
+cLWlanPolicyCentralSwitchMode OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object allows the user to enable or disable Central
+        switching for wlan. 
+        A value of 'true' indicates Central Switching is enabled 
+        and Local Switching is disabled. 
+        A value of 'false' indicates Cental Switching is disabled 
+        and Local Switching is enabled."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 5 }
+
+cLWlanPolicyCentralAuthMode OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object allows the user to enable or disable central
+        authentication for the wlan. 
+        A value of 'true' indicates central authentication is
+        enabled. 
+        A value of 'false' indicates local authentication is
+        disabled."
+    DEFVAL          { true } 
+    ::= { cLWlanPolicyConfigEntry 6 }
+
+cLWlanPolicyDhcpCentral OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the behavior of the Access Point
+        when switching the data frames of the clients
+        associated to it through the WLAN policy identified
+        by policy profile name. 
+
+        A value of 'true' indicates dhcp central is enabled. 
+        A value of 'false' indicates dhcp central is disabled. 
+
+        Note that the value of 'true' will be effective only if
+        the WLAN is configured on a Access Point."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 7 }
+
+cLWlanPolicyNatPatEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether Network Address Translation
+        (NAT) and Port Address Translation (PAT) are enabled on
+        this WLAN. 
+        This can be enabled only when cLReapWlanDhcpCentral is set 
+        to 'true'. 
+
+        A value of 'true' indicates NATPAT is enabled. 
+        A value of 'false' indicates NATPAT is disabled. 
+
+        Note that the value of 'true' will be effective
+        only if the WLAN is configured as Locally Switched."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 9 }
+
+cLWlanPolicyAssocCentral OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the behavior of the REAP when
+        handling the (re-)association management frames from
+        associated to it through the WLAN policy identified by
+        policy profile name.
+
+        A value of 'true' indicates AssocCentral is enabled.
+        A value of 'false' indicates AssocCentral is disabled.
+
+        Note that the value of 'true' will be effective only if the
+        WLAN is configured on a REAP."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 10 }
+
+cLWlanPolicyIPv4AclName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..32))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the IPV4 ACL Name for wlan." 
+    ::= { cLWlanPolicyConfigEntry 11 }
+
+cLWlanPolicyIPv6AclName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the IPV6 ACL Name for wlan." 
+    ::= { cLWlanPolicyConfigEntry 12 }
+
+cLWlanPolicyL2AclName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the name of the L2ACL applied to this
+        WLAN. If it is required to remove the ACL name for a WLAN,
+        it should be set to 'none'."
+    DEFVAL          { "" } 
+    ::= { cLWlanPolicyConfigEntry 13 }
+
+cLWlanPolicySessionTimeout OBJECT-TYPE
+    SYNTAX          Unsigned32 (20..86400)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the session timeout to be applied on
+        client using a Policy."
+    DEFVAL          { 1800 } 
+    ::= { cLWlanPolicyConfigEntry 14 }
+
+cLWlanPolicyUserIdleTimeout OBJECT-TYPE
+    SYNTAX          Unsigned32 (15..100000)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the timeout value of user for a
+        WLAN."
+    DEFVAL          { 300 } 
+    ::= { cLWlanPolicyConfigEntry 15 }
+
+cLWlanPolicyClientExclTimeout OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..2147483647)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the client exclusiontimeout
+        value of user for a WLAN. 
+        Modifying the timeout to zero (0) means the client will be
+        excluded indefinitely until it is manually removed from the
+        exclusion list"
+    DEFVAL          { 60 } 
+    ::= { cLWlanPolicyConfigEntry 16 }
+
+cLWlanPolicyNativeProfiling OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specfies to enable or disable client device
+        classification. 
+        A value of 'true' indicates native profiling is enabled. 
+        A value of 'false' indicates native profiling is
+        disabled."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 17 }
+
+cLWlanPolicySubscriberPolicyName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies a native profiling classification
+        policy configured on the Wireless LAN Controller."
+    DEFVAL          { "" } 
+    ::= { cLWlanPolicyConfigEntry 18 }
+
+cLWlanPolicyHttpDeviceProfiling OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specfies the client local profiling on a wlan.
+
+        A value of 'true' indicates http device profiling is
+        enabled. 
+        A value of 'false' indicate http device profiling is
+        disabled." 
+    ::= { cLWlanPolicyConfigEntry 19 }
+
+cLWlanPolicyDHCPDeviceProfiling OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specfies the client dhcp  profiling on a wlan.
+
+        A value of 'true' indicates dhcp device profiling is
+        enabled.
+        A value of 'false' indicates dhcp device profiling is
+        disabled." 
+    ::= { cLWlanPolicyConfigEntry 20 }
+
+cLWlanPolicyNetflowIPv4InputMonitorName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          deprecated
+    DESCRIPTION
+        "This object specifies the input IPv4 Netflow Monitor name
+        assigned to this WLAN. 
+        An empty string specifies no flow monitor is being 
+        associated to WLAN policy profile. An empty flow monitor 
+        name should be used to de-associate the monitor from the
+        profile."
+    DEFVAL          { "" } 
+    ::= { cLWlanPolicyConfigEntry 21 }
+
+cLWlanPolicyNetflowIPv4OutputMonitorName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          deprecated
+    DESCRIPTION
+        "This object specifies the output IPv4 Netflow Monitor name
+        assigned to this WLAN.
+        An empty string specifies no flow monitor is being
+        associated to WLAN policy profile. An empty flow monitor
+        name should be used to de-associate the monitor from the
+        profile."
+    DEFVAL          { "" } 
+    ::= { cLWlanPolicyConfigEntry 22 }
+
+cLWlanPolicyNetflowIPv6InputMonitorName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          deprecated
+    DESCRIPTION
+        "This object specifies the input IPv6 Netflow Monitor name
+        assigned to this WLAN.
+        An empty string specifies no flow monitor is being 
+        associated to WLAN policy profile. 
+        An empty flow monitor name should be used to de-associate
+        the monitor from the profile."
+    DEFVAL          { "" } 
+    ::= { cLWlanPolicyConfigEntry 23 }
+
+cLWlanPolicyNetflowIPv6OutputMonitorName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          deprecated
+    DESCRIPTION
+        "This object specifies the output IPv6 Netflow Monitor name
+        assigned to this WLAN. 
+        An empty string specifies no flow monitor is being
+        associated to WLAN policy profile. 
+        An empty flow monitor name should be used to de-associate
+        the monitor from the profile."
+    DEFVAL          { "" } 
+    ::= { cLWlanPolicyConfigEntry 24 }
+
+cLWlanPolicyQosPerSSIDInput OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the per ssid ingress service name."
+    DEFVAL          { "" } 
+    ::= { cLWlanPolicyConfigEntry 25 }
+
+cLWlanPolicyQosPerSSIDOutput OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the per ssid egress service name."
+    DEFVAL          { "" } 
+    ::= { cLWlanPolicyConfigEntry 26 }
+
+cLWlanPolicyQosPerBSSIDInput OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the per client ingress service name."
+    DEFVAL          { "" } 
+    ::= { cLWlanPolicyConfigEntry 27 }
+
+cLWlanPolicyQosPerBSSIDOutput OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the per client egress service name."
+    DEFVAL          { "" } 
+    ::= { cLWlanPolicyConfigEntry 28 }
+
+cLWlanPolicyBlacklistTimeout OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..2147483647)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the timeout for blacklisted Mobile
+        Stations after which the mobile station will be
+        automatically de-authenticated. 
+        Mobile Station are blacklisted by MAC address and their 
+        status can be obtained from bsnMobileStationStatus.
+        A timeout setting of 0 indicates no blacklist timeout is 
+        set and administrative control 
+        ( bsnMobileStationDeleteAction ) is required to 
+        deauthenticate the station."
+    DEFVAL          { 60 } 
+    ::= { cLWlanPolicyConfigEntry 29 }
+
+cLWlanPolicyBlacklistingCapability OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies that one can enable or disable the
+        client backlisting feature for a WLAN. 
+
+        A value of 'true' indicates that the clients can be blacklisted 
+        by the controller in case of repetitive auth failure and other
+        reasons like it.
+        A value of 'false' indicates that the clients cannot be 
+        blacklisted by the controller. 
+
+        The blacklist timeout value will only be effective if 
+        this feature is turned on."
+    DEFVAL          { true } 
+    ::= { cLWlanPolicyConfigEntry 30 }
+
+cLWlanPolicyDhcpRequired OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        disable(0),
+                        enable(1)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the DHCP requirement for all clients
+        on this WLAN."
+    DEFVAL          { disable } 
+    ::= { cLWlanPolicyConfigEntry 31 }
+
+cLWlanPolicyDhcpServerIpAddress OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the IP Address of the DHCP Server.
+        Make it 0.0.0.0 or 0:0:0:0:0:0:0:0 to disable DHCP Relay.
+        Any value other than 0.0.0.0 or 0:0:0:0:0:0:0:0 it will be
+        assumed that DHCP Relay is turned on." 
+    ::= { cLWlanPolicyConfigEntry 32 }
+
+cLWlanPolicyAaaOverride OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies to set when aaa override is enabled.
+        A value of 'true' indicates aaa override is enabled. 
+        A value of 'false' indicates aaa override is disabled."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 33 }
+
+cLWlanPolicyNac OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies to enabling/disabling NAC."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 34 }
+
+cLWlanPolicyStatus OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether the policy profile is
+        shutdown or active.
+        A value of 'true' indicates Wlan policy is active.
+        A value of 'false' indicates Wlan policy is shutdown."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 35 }
+
+cLWlanPolicyRadiusHttpProfiling OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Radius http profiling."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 36 }
+
+cLWlanPolicyUserIdleThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..4294967295)
+    UNITS           "bytes"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies a threshold triggered timeout where if a
+        client has not sent a threshold quota of data within the
+        specified user idle timeout, the client is considered to be
+        inactive and is deauthenticated. If the data sent by the client
+        is more than the threshold quota specified within the user idle
+        timeout, the client is considered to be active and the
+        controller refreshes for another timeout period. If the 
+        threshold quota is exhausted within the timeout period, the
+        timeout period is refreshed."
+    DEFVAL          { 0 } 
+    ::= { cLWlanPolicyConfigEntry 37 }
+
+cLWlanPolicyQosFastlane OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        disable(0),
+                        enterprise(1),
+                        voice(2),
+                        guest(3),
+                        fastlane(4)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the user to enable or disable Auto
+        Qos mode in wireless policy profile. 
+        disable -  Disable of AutoQos Wireless Enterprise Policy.
+        enterprise - Enable AutoQos Wireless Enterprise Policy.
+        voice - Enabling Auto QoS Voice will enable call-snooping.
+        guest - Enable AutoQos Wireless Guest Policy.
+        fastlane - Enable AutoQos Wireless Fastlane Policy"
+    DEFVAL          { disable } 
+    ::= { cLWlanPolicyConfigEntry 38 }
+
+cLWlanPolicyDHCPOption82Ascii OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the DHCP Option82 Ascii option.
+        A value of 'true' enable DHCP 82 Ascii option. 
+        A value of 'false' disable DHCP 82 Ascii option."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 39 }
+
+cLWlanPolicyDHCPOption82Rid OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the DHCP Option82 Rid option.
+        A value of 'true' enable DHCP 82 option RID. 
+        A value of 'false' disable DHCP 82 option RID."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 40 }
+
+cLWlanPolicyDHCPOption82Enable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the DHCP Option82 state.
+        A value of 'true' enable DHCP 82 option .
+        A value of 'false' disable DHCP 82 option."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 41 }
+
+cLWlanPolicyDHCPOption82Apmac OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the DHCP Option82 format Ap mac
+        option. 
+        A value of 'true' enable DHCP 82 option based on AP radio 
+        mac.
+        A value of 'false' disable DHCP 82 option based on AP
+        radio mac."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 42 }
+
+cLWlanPolicyDHCPOption82Apethmac OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the DHCP Option82 format Ap ethmac
+        option.
+        A value of 'true' enable DHCP 82 option based on AP eth
+        mac.
+        A value of 'false' disable DHCP 82 option based on AP eth
+        mac."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 43 }
+
+cLWlanPolicyDHCPOption82Apname OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the DHCP Option82 format Ap name
+        option.
+        A value of 'true' enable DHCP 82 option based on AP name.
+        A value of 'false' disable DHCP 82 option based on AP 
+        name."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 44 }
+
+cLWlanPolicyDHCPOption82Policytag OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the DHCP Option82 format Policy tag
+        option
+        A value of 'true' enable DHCP 82 option based on policy
+        tag.
+        A value of 'false' disable DHCP 82 option based on policy
+        tag."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 45 }
+
+cLWlanPolicyDHCPOption82Aplocation OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This specifies represents the DHCP Option82 format Ap
+        location option
+        A value of 'true' enable DHCP 82 option based on Ap
+        Location. 
+        A value of 'false' disable DHCP 82 option based on Ap
+        Location."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 46 }
+
+cLWlanPolicyDHCPOption82Vlanid OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the DHCP Option82 format Vlan_id
+        option. 
+        A value of 'true' enable DHCP 82 option based on vlanid
+        A value of 'false' disable DHCP 82 option based on vlanid."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 47 }
+
+cLWlanPolicyDHCPOption82Ssid OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the DHCP Option82 format SSID option.
+        A value of 'true' enable DHCP 82 option based on ssid. 
+        A value of 'false' disable DHCP 82 option based on ssid.
+        Folowing are the combination for dhcp option82 format-
+        AP MAC alone
+        AP ethernet MAC alone
+        SSID alone
+        Policy tag alone
+        AP location alone
+        AP name and SSID together
+        AP MAC and Vlan-ID together
+        AP name and Vlan-ID together
+        Ethernet MAC and SSID together."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 48 }
+
+cLWlanPolicySplitMacAcl OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..33))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the ACL name for the split tunnel."
+    DEFVAL          { "" } 
+    ::= { cLWlanPolicyConfigEntry 49 }
+
+cLWlanPolicyVlanCentralSwitching OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether switching will be local or
+        central when the flag is set. 
+        A value of 'true' enable vlan based central switching. 
+        A value of 'false' disable vlan based central switching."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 50 }
+
+cLWlanPolicyPassiveClient OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether passive-client support
+        is enabled or not on a policy."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 54 }
+
+cLWlanPolicyNBARProtocolDiscovery OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object allows the user to enable or disable NBAR
+        Protocol discovery for a wlan. 
+        A value of 'true' indicates NBAR protocol discovery is
+        active, 
+        A value of 'false' indicates NBAR protocol discovery is 
+        disabled."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 55 }
+
+cLWlanPolicyStaticIPMobility OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether static ip mobility  support
+        is enabled or not on a policy."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 56 }
+
+clWlanPolicyMobilityAnchor OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the user to enable or disable mobility
+        anchor for a policy profile.
+        A value of 'true' indicates mobility anchor is active.
+        A Value of 'false' indicates mobility anchor is disabled."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 57 }
+
+cLWlanPolicyBroadcastTagging OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies to set when broadcast tagging is
+        enabled.
+        A value of 'true' indicates broadcast tagging is enabled.
+        A value of 'false' indicates broadcast tagging is disabled."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 58 }
+
+cLWlanPolicyWgbVlan OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies to enabling/disabling Client VLAN.
+        A value of 'true' indicates Client Vlan is enabled.
+        A value of 'false' indicates Client Vlan is disabled."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 59 }
+
+cLWlanPolicyReanchorClassmap OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the classmap containing the real-time
+        protocols, identified by AVC, to monitor to decide whether
+        a wireless client has to be reanchored to its foreign WLC."
+    DEFVAL          { "" } 
+    ::= { cLWlanPolicyConfigEntry 60 }
+
+cLWlanUmbrellaParamMapName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies a the umbrella parameter map name
+        configured on the Wireless LAN Controller." 
+    ::= { cLWlanPolicyConfigEntry 61 }
+
+cLWlanPolicyAccountingList OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Accounting List for Policy Profile." 
+    ::= { cLWlanPolicyConfigEntry 62 }
+
+cLWlanPolicyAAAPolicyName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Wireless AAA Policy Name"
+    DEFVAL          { "" } 
+    ::= { cLWlanPolicyConfigEntry 63 }
+
+cLWlanPolicyQosCallSnooping OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies if QoS call snooping is enabled
+        A value of 'true' indicates call snoop is enabled.
+        A value of 'false' indicates call snoop is disabled."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 64 }
+
+cLWlanPolicyDefaultSgt OBJECT-TYPE
+    SYNTAX          Unsigned32 (2..65519)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the default security group tag." 
+    ::= { cLWlanPolicyConfigEntry 65 }
+
+cLWlanPolicyInlineTagging OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether inline tagging flag is
+        enabled on a particular policy profile.
+        A value of 'true' indicates inline tagging  is enabled.
+        A value of 'false' indicates inline tagging is disabled."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 66 }
+
+cLWlanPolicySgaclEnforcement OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the security group access control lists
+        enforcement for a policy profile"
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 67 }
+
+cLWlanPolicyMdnsPolicy OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the mDNS service policy
+        configured under WLAN policy." 
+    ::= { cLWlanPolicyConfigEntry 68 }
+
+cLWlanPolicyHotspotAnqpServer OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..255))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the Hotspot 2.0 ANQP Server" 
+    ::= { cLWlanPolicyConfigEntry 69 }
+
+cLWlanPolicyNacType OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        radius(0),
+                        xwf(1)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          deprecated
+    DESCRIPTION
+        "This object specifies the type of NAC configured
+        radius   - Identity Service Engine NAC configured
+        xwf      - Express Wi-Fi NAC configured."
+    DEFVAL          { radius }
+    ::= { cLWlanPolicyConfigEntry 70 }
+
+cLWlanPolicyARPProxy OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether ARP proxy is enabled on a
+        particular policy profile.
+        A value of 'true' indicates ARP proxy  is enabled.
+        A value of 'false' indicates ARP proxy is disabled."
+    DEFVAL          { false } 
+    ::= { cLWlanPolicyConfigEntry 71 }
+
+cLWlanPolicyIPv6proxy OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        noproxy(1),
+                        dadproxy(2),
+                        fullproxy(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the type of IPV6 proxy mode configured
+        noproxy    - no ipv6 proxy configured
+        dadproxy   - DAD proxy is configured.
+        fullproxy  - DAD and ND proxy is configured. "
+    DEFVAL          { noproxy }
+    ::= { cLWlanPolicyConfigEntry 72 }
+
+cLWlanPolicyMulticastFilter OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether multicast filter is enabled on a
+        particular policy profile.
+        A value of 'true' indicates multicast filter is enabled.
+        A value of 'false' indicates multicast filter is disabled."
+    DEFVAL          { true } 
+    ::= { cLWlanPolicyConfigEntry 73 }
+
+cLWlanPolicyQBSSLoad OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether QBSSload is enabled on a
+        particular policy profile.
+        A value of 'true' indicates QBSSload is enabled.
+        A value of 'false' indicates QBSSload is disabled."
+    DEFVAL          { true } 
+    ::= { cLWlanPolicyConfigEntry 74 }
+
+cLWlanPolicyL3Access OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether Layer-3 access is enabled on a
+        particular policy profile.
+        A value of 'true' indicates Layer-3 Access is enabled.
+        A value of 'false' indicates Layer-3 Access is disabled."
+    DEFVAL          { false }
+    ::= { cLWlanPolicyConfigEntry 75 }
+
+-- ********************************************************************
+-- * Air Time Fairness Profile Configuration
+-- ********************************************************************
+
+cLWlanPolicyATFPolicyNameConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CLWlanPolicyATFPolicyNameConfigEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table represents the ATF policy name configuration
+        for 2.4ghz and 5ghz radio interface based on band id."
+    ::= { ciscoLwappWlanPolicyConfig 2 }
+
+cLWlanPolicyATFPolicyNameConfigEntry OBJECT-TYPE
+    SYNTAX          CLWlanPolicyATFPolicyNameConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry into the cLWlanPolicyATFPolicyNameTable represents ATF
+        policy name for 2.4ghz and 5ghz based on band id
+        corresponding to WLAN policy.
+
+        Entries can be added/deleted by explicit management
+        actions by NMS or by user console."
+    INDEX           {
+                        cLWlanWlanPolicyName,
+                        cLWlanPolicyBandId
+                    } 
+    ::= { cLWlanPolicyATFPolicyNameConfigTable 1 }
+
+CLWlanPolicyATFPolicyNameConfigEntry ::= SEQUENCE {
+        cLWlanPolicyBandId        Unsigned32,
+        cLWlanPolicyATFRowStatus  RowStatus,
+        cLWlanPolicyATFPolicyName SnmpAdminString
+}
+
+cLWlanPolicyBandId OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..1)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object uniquely identifies the ATF policy name
+        for 24ghz and 5ghz attached to the policy profile." 
+    ::= { cLWlanPolicyATFPolicyNameConfigEntry 1 }
+
+cLWlanPolicyATFRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the row Status of the
+        ATF policy map table." 
+    ::= { cLWlanPolicyATFPolicyNameConfigEntry 2 }
+
+cLWlanPolicyATFPolicyName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..32))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object represents the AirTime Fairness policy name
+        for 24ghz and 5ghz attached to the policy profile." 
+    ::= { cLWlanPolicyATFPolicyNameConfigEntry 3 }
+ 
+
+-- ********************************************************************
+-- * AAA Profile Configuration
+-- ********************************************************************
+
+cLWlanAaaPolicyConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CLWlanAaaPolicyConfigEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table represents the WLAN AAA policy configuration."
+    ::= { ciscoLwappWlanPolicyConfig 3 }
+
+cLWlanAaaPolicyConfigEntry OBJECT-TYPE
+    SYNTAX          CLWlanAaaPolicyConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry in this table represents the WLAN AAA policy
+        configuration."
+    INDEX           { cLWlanAaaPolicyName } 
+    ::= { cLWlanAaaPolicyConfigTable 1 }
+
+CLWlanAaaPolicyConfigEntry ::= SEQUENCE {
+        cLWlanAaaPolicyName      SnmpAdminString,
+        cLWlanAaaPolicyRowStatus RowStatus,
+        cLWlanAaaPolicyNasId1    INTEGER,
+        cLWlanAaaPolicyNasId2    INTEGER,
+        cLWlanAaaPolicyNasId3    INTEGER,
+        cLWlanAaaPolicyRealm     TruthValue,
+        cLWlanAAAPolicyCustomString1 SnmpAdminString,
+        cLWlanAAAPolicyCustomString2 SnmpAdminString,
+        cLWlanAAAPolicyCustomString3 SnmpAdminString,
+}
+
+cLWlanAaaPolicyName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..64))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies an AAA policy on a policy profile
+        in a controller." 
+    ::= { cLWlanAaaPolicyConfigEntry 1 }
+
+cLWlanAaaPolicyRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the status column for this row and
+        used to create, modify and delete specific instances of
+        rows in this table. 
+        This table supports modification of writable objects when
+        the  RowStatus is 'active'. 
+        The following objects are mandatory for successful
+        creation of an entry: cLWlanAaaPolicyName." 
+    ::= { cLWlanAaaPolicyConfigEntry 2 }
+
+cLWlanAaaPolicyNasId1 OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        notconfigured(0),
+                        sysname(1),
+                        sysip(2),
+                        sysmac(3),
+                        apip(4),
+                        apname(5),
+                        apmac(6),
+                        apethmac(7),
+                        appolicytag(8),
+                        apsitetag(9),
+                        ssid(10),
+                        aplocation(11),
+                        customstring(12)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the NasId option 1.
+        notconfigured - Not Configured
+        sysname       - System Name
+        sysip         - System IP Address
+        sysmac        - System MAC Address
+        apip          - AP's IP Address
+        apname        - AP's Name
+        apmac         - AP's MAC Address
+        apethmac      - AP's Ethernet MAC Address
+        appolicytag   - AP's Policy Tag
+        apsitetag     - AP's Site Tag
+        ssid          - SSID Name
+        aplocation    - AP's Location
+        customstring  - Custom String ."
+    DEFVAL          { sysname } 
+    ::= { cLWlanAaaPolicyConfigEntry 3 }
+
+cLWlanAaaPolicyNasId2 OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        notconfigured(0),
+                        sysname(1),
+                        sysip(2),
+                        sysmac(3),
+                        apip(4),
+                        apname(5),
+                        apmac(6),
+                        apethmac(7),
+                        appolicytag(8),
+                        apsitetag(9),
+                        ssid(10),
+                        aplocation(11),
+                        customstring(12)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the NasId option 2.
+        notconfigured - Not Configured
+        sysname       - System Name
+        sysip         - System IP Address
+        sysmac        - System MAC Address
+        apip          - AP's IP Address
+        apname        - AP's Name
+        apmac         - AP's MAC Address
+        apethmac      - AP's Ethernet MAC Address
+        appolicytag   - AP's Policy Tag
+        apsitetag     - AP's Site Tag
+        ssid          - SSID Name
+        aplocation    - AP's Location
+        customstring  - Custom String ."
+    DEFVAL          { notconfigured } 
+    ::= { cLWlanAaaPolicyConfigEntry 4 }
+
+cLWlanAaaPolicyNasId3 OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        notconfigured(0),
+                        sysname(1),
+                        sysip(2),
+                        sysmac(3),
+                        apip(4),
+                        apname(5),
+                        apmac(6),
+                        apethmac(7),
+                        appolicytag(8),
+                        apsitetag(9),
+                        ssid(10),
+                        aplocation(11),
+                        customstring(12)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the NasId option 3.
+        notconfigured - Not Configured
+        sysname       - System Name
+        sysip         - System IP Address
+        sysmac        - System MAC Address
+        apip          - AP's IP Address
+        apname        - AP's Name
+        apmac         - AP's MAC Address
+        apethmac      - AP's Ethernet MAC Address
+        appolicytag   - AP's Policy Tag
+        apsitetag     - AP's Site Tag
+        ssid          - SSID Name
+        aplocation    - AP's Location
+        customstring  - Custom String ."
+    DEFVAL          { notconfigured } 
+    ::= { cLWlanAaaPolicyConfigEntry 5 }
+
+cLWlanAaaPolicyRealm OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the user to enable or disable realm.
+        TRUE means realm enable
+        FALSE measn realm disable"
+    DEFVAL          { true } 
+    ::= { cLWlanAaaPolicyConfigEntry 6 }
+ 
+cLWlanAAAPolicyCustomString1 OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..224))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the custom string for nasid option1"
+    DEFVAL          { notconfigured }
+    ::= { cLWlanAaaPolicyConfigEntry 7 }
+
+cLWlanAAAPolicyCustomString2 OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..224))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the custom string for nasid option2"
+    DEFVAL          { notconfigured }
+    ::= { cLWlanAaaPolicyConfigEntry 8 }
+
+cLWlanAAAPolicyCustomString3 OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..224))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the custom string for nasid option3"
+    DEFVAL          { notconfigured }
+    ::= { cLWlanAaaPolicyConfigEntry 9 }
+
+-- ********************************************************************
+-- * AVC Netflow Flow Monitor Profile Configuration
+-- ********************************************************************
+
+cLWlanPolicyMonitorIPv4InConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CLWlanPolicyMonitorIPv4InConfigEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the list of IPv4 flow monitors
+        configured for AVC in the input (or ingress) direction.
+        Rows are added or deleted by explicit management actions
+        initiated by the user from a network management station
+        through the cLWlanMonitorIPv4InRowStatus object."
+    ::= { ciscoLwappWlanPolicyConfig 4 }
+
+cLWlanPolicyMonitorIPv4InConfigEntry OBJECT-TYPE
+    SYNTAX          CLWlanPolicyMonitorIPv4InConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry in this table represents an IPv4 input flow monitor
+        configured for AVC."
+    INDEX           {
+                        cLWlanWlanPolicyName,
+                        cLWlanMonitorIPv4InName
+                    } 
+    ::= { cLWlanPolicyMonitorIPv4InConfigTable 1 }
+
+CLWlanPolicyMonitorIPv4InConfigEntry ::= SEQUENCE {
+        cLWlanMonitorIPv4InName      SnmpAdminString,
+        cLWlanMonitorIPv4InRowStatus RowStatus
+}
+
+cLWlanMonitorIPv4InName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..32))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object represents an IPv4 input flow monitor name
+        configured for the policy profile." 
+    ::= { cLWlanPolicyMonitorIPv4InConfigEntry 1 }
+
+cLWlanMonitorIPv4InRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the status column for this row and
+        is used to create and delete specific instances of rows
+        in this table.
+        This table does not contain writable objects: once the row
+        is created, the only further actions allowed are read or
+        delete.
+        The dynamically created rows should not change across SNMP
+        agent restarts
+        The following objects are mandatory for successful creation of
+        an entry: cLWlanWlanPolicyName, cLWlanMonitorIPv4InName." 
+    ::= { cLWlanPolicyMonitorIPv4InConfigEntry 2 }
+ 
+
+
+cLWlanPolicyMonitorIPv4OutConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CLWlanPolicyMonitorIPv4OutConfigEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the list of IPv4 flow monitors
+        configured for AVC in the output (or egress) direction.
+        Rows are added or deleted by explicit management actions
+        initiated by the user from a network management station
+        through the cLWlanMonitorIPv4OutRowStatus object."
+    ::= { ciscoLwappWlanPolicyConfig 5 }
+
+cLWlanPolicyMonitorIPv4OutConfigEntry OBJECT-TYPE
+    SYNTAX          CLWlanPolicyMonitorIPv4OutConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry in this table represents an IPv4 output flow monitor
+        configured for AVC."
+    INDEX           {
+                        cLWlanWlanPolicyName,
+                        cLWlanMonitorIPv4OutName
+                    } 
+    ::= { cLWlanPolicyMonitorIPv4OutConfigTable 1 }
+
+CLWlanPolicyMonitorIPv4OutConfigEntry ::= SEQUENCE {
+        cLWlanMonitorIPv4OutName      SnmpAdminString,
+        cLWlanMonitorIPv4OutRowStatus RowStatus
+}
+
+cLWlanMonitorIPv4OutName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..32))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object represents an IPv4 output flow monitor name
+        configured for the policy profile." 
+    ::= { cLWlanPolicyMonitorIPv4OutConfigEntry 1 }
+
+cLWlanMonitorIPv4OutRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the status column for this row and
+        is used to create and delete specific instances of rows
+        in this table.
+        This table does not contain writable objects: once the row
+        is created, the only further actions allowed are read or
+        delete.
+        The dynamically created rows should not change across SNMP
+        agent restarts
+        The following objects are mandatory for successful creation of
+        an entry: cLWlanWlanPolicyName, cLWlanMonitorIPv4OutName." 
+    ::= { cLWlanPolicyMonitorIPv4OutConfigEntry 2 }
+ 
+
+
+cLWlanPolicyMonitorIPv6InConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CLWlanPolicyMonitorIPv6InConfigEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the list of IPv6 flow monitors
+        configured for AVC in the input (or ingress) direction.
+        Rows are added or deleted by explicit management actions
+        initiated by the user from a network management station
+        through the cLWlanMonitorIPv6InRowStatus object."
+    ::= { ciscoLwappWlanPolicyConfig 6 }
+
+cLWlanPolicyMonitorIPv6InConfigEntry OBJECT-TYPE
+    SYNTAX          CLWlanPolicyMonitorIPv6InConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry in this table represents an IPv6 input flow monitor
+        configured for AVC."
+    INDEX           {
+                        cLWlanWlanPolicyName,
+                        cLWlanMonitorIPv6InName
+                    } 
+    ::= { cLWlanPolicyMonitorIPv6InConfigTable 1 }
+
+CLWlanPolicyMonitorIPv6InConfigEntry ::= SEQUENCE {
+        cLWlanMonitorIPv6InName      SnmpAdminString,
+        cLWlanMonitorIPv6InRowStatus RowStatus
+}
+
+cLWlanMonitorIPv6InName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..32))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object represents an IPv6 input flow monitor name
+        configured for the policy profile." 
+    ::= { cLWlanPolicyMonitorIPv6InConfigEntry 1 }
+
+cLWlanMonitorIPv6InRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the status column for this row and
+        is used to create and delete specific instances of rows
+        in this table.
+        This table does not contain writable objects: once the row
+        is created, the only further actions allowed are read or
+        delete.
+        The dynamically created rows should not change across SNMP
+        agent restarts
+        The following objects are mandatory for successful creation of
+        an entry: cLWlanWlanPolicyName, cLWlanMonitorIPv6InName." 
+    ::= { cLWlanPolicyMonitorIPv6InConfigEntry 2 }
+ 
+
+
+cLWlanPolicyMonitorIPv6OutConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CLWlanPolicyMonitorIPv6OutConfigEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the list of IPv6 flow monitors
+        configured for AVC in the output (or egress) direction.
+        Rows are added or deleted by explicit management actions
+        initiated by the user from a network management station
+        through the cLWlanMonitorIPv6OutRowStatus object."
+    ::= { ciscoLwappWlanPolicyConfig 7 }
+
+cLWlanPolicyMonitorIPv6OutConfigEntry OBJECT-TYPE
+    SYNTAX          CLWlanPolicyMonitorIPv6OutConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry in this table represents an IPv6 output flow monitor
+        configured for AVC."
+    INDEX           {
+                        cLWlanWlanPolicyName,
+                        cLWlanMonitorIPv6OutName
+                    } 
+    ::= { cLWlanPolicyMonitorIPv6OutConfigTable 1 }
+
+CLWlanPolicyMonitorIPv6OutConfigEntry ::= SEQUENCE {
+        cLWlanMonitorIPv6OutName      SnmpAdminString,
+        cLWlanMonitorIPv6OutRowStatus RowStatus
+}
+
+cLWlanMonitorIPv6OutName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..32))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object represents an IPv6 output flow monitor name
+        configured for the policy profile." 
+    ::= { cLWlanPolicyMonitorIPv6OutConfigEntry 1 }
+
+cLWlanMonitorIPv6OutRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the status column for this row and
+        is used to create and delete specific instances of rows
+        in this table.
+        This table does not contain writable objects: once the row
+        is created, the only further actions allowed are read or
+        delete.
+        The dynamically created rows should not change across SNMP
+        agent restarts
+        The following objects are mandatory for successful creation of
+        an entry: cLWlanWlanPolicyName, cLWlanMonitorIPv6OutName." 
+    ::= { cLWlanPolicyMonitorIPv6OutConfigEntry 2 }
+ 
+
+-- ********************************************************************
+-- * Calender Profile Configuration
+-- ********************************************************************
+
+cLWlanPolicyCalendarProfileTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CLWlanPolicyCalendarProfileEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table represent calendar profile configuration under
+        WLAN policy"
+    ::= { ciscoLwappWlanPolicyConfig 8 }
+
+cLWlanPolicyCalendarProfileEntry OBJECT-TYPE
+    SYNTAX          CLWlanPolicyCalendarProfileEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry in this table represents the information
+        about action under calender profile for a given policy"
+    INDEX           {
+                        cLWlanWlanPolicyName,
+                        cLWlanPolicyCalendarProfileName
+                    } 
+    ::= { cLWlanPolicyCalendarProfileTable 1 }
+
+CLWlanPolicyCalendarProfileEntry ::= SEQUENCE {
+        cLWlanPolicyCalendarProfileName          SnmpAdminString,
+        cLWlanPolicyCalendarProfileRowStatus     RowStatus,
+        cLWlanPolicyCalendarProfileWlan          INTEGER,
+        cLWlanPolicyCalendarProfileClientSession INTEGER
+}
+
+cLWlanPolicyCalendarProfileName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..32))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies unique instance of calendar profile" 
+    ::= { cLWlanPolicyCalendarProfileEntry 1 }
+
+cLWlanPolicyCalendarProfileRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This is the status column for this row and is used to create
+        and delete specific instances of rows in this table." 
+    ::= { cLWlanPolicyCalendarProfileEntry 2 }
+
+cLWlanPolicyCalendarProfileWlan OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        invalid(0),
+                        enable(1)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object enables or disable wlan action on calender
+        profile for a given policy profile
+        invalid - No action is configured on calender profile
+        enable  - enables wlan action on calender profile." 
+    ::= { cLWlanPolicyCalendarProfileEntry 3 }
+
+cLWlanPolicyCalendarProfileClientSession OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        invalid(0),
+                        block(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object enables or disable client session on calender
+        profile.
+        invalid - No action is configured on calender profile for
+        a client sesion
+        block   - denies client association on calender profile." 
+    ::= { cLWlanPolicyCalendarProfileEntry 4 }
+ 
+
+-- ********************************************************************
+-- *    Compliance statements
+-- ********************************************************************
+
+ciscoLwappWlanPolicyCompliances  OBJECT IDENTIFIER
+    ::= { ciscoLwappWlanPolicyConform 1 }
+
+ciscoLwappWlanPolicyGroups  OBJECT IDENTIFIER
+    ::= { ciscoLwappWlanPolicyConform 2 }
+
+
+ciscoLwappWlanPolicyCompliance MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement the ciscoCapwapWlanPolicyMIB module."
+    MODULE          -- this module
+    MANDATORY-GROUPS { ciscoLwappWlanPolicyConfigGroup }
+    ::= { ciscoLwappWlanPolicyCompliances 1 }
+
+ciscoLwappWlanPolicyComplianceR01 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement the ciscoLwappWlanPolicyMIB module. This
+        deprecates ciscoLwappWlanPolicyCompliance."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoLwappWlanPolicyConfigGroupRev1,
+                        ciscoLwappWlanPolicyATFConfigGroup,
+                        ciscoLwappWlanAaaPolicyConfigGroup
+                    }
+    ::= { ciscoLwappWlanPolicyCompliances 2 }
+
+ciscoLwappWlanPolicyComplianceR02 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement the ciscoLwappWlanPolicyMIB module. This
+        deprecates ciscoLwappWlanPolicyComplianceR01."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoLwappWlanPolicyConfigGroupRev2,
+                        ciscoLwappWlanPolicyATFConfigGroup,
+                        ciscoLwappWlanAaaPolicyConfigGroup
+                    }
+    ::= { ciscoLwappWlanPolicyCompliances 3 }
+
+ciscoLwappWlanPolicyComplianceR03 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement the ciscoLwappWlanPolicyMIB module. This adds
+        ciscoLwappWlanPolicyConfigGroupFlowMonitor, and
+        deprecates ciscoLwappWlanPolicyComplianceR02."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoLwappWlanPolicyConfigGroupRev2,
+                        ciscoLwappWlanPolicyATFConfigGroup,
+                        ciscoLwappWlanAaaPolicyConfigGroup,
+                        ciscoLwappWlanPolicyConfigGroupFlowMonitor
+                    }
+    ::= { ciscoLwappWlanPolicyCompliances 4 }
+
+ciscoLwappWlanPolicyComplianceR04 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement the ciscoLwappWlanPolicyMIB module. This adds
+        ciscoLwappWlanPolicyConfigGroupRev3,
+        ciscoLwappWlanPolicyConfigGroupCalenderProfile and
+        deprecates ciscoLwappWlanPolicyComplianceR03."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoLwappWlanPolicyConfigGroupRev3,
+                        ciscoLwappWlanPolicyATFConfigGroup,
+                        ciscoLwappWlanAaaPolicyConfigGroup,
+                        ciscoLwappWlanPolicyConfigGroupFlowMonitor,
+                        ciscoLwappWlanPolicyConfigGroupCalenderProfile
+                    }
+    ::= { ciscoLwappWlanPolicyCompliances 5 }
+
+ciscoLwappWlanPolicyComplianceR05 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement the ciscoLwappWlanPolicyMIB module. This adds
+        ciscoLwappWlanPolicyConfigGroupRev4 and
+        deprecates ciscoLwappWlanPolicyComplianceR04."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoLwappWlanPolicyConfigGroupRev4,
+                        ciscoLwappWlanPolicyATFConfigGroup,
+                        ciscoLwappWlanAaaPolicyConfigGroup,
+                        ciscoLwappWlanPolicyConfigGroupFlowMonitor,
+                        ciscoLwappWlanPolicyConfigGroupCalenderProfile
+                    }
+    ::= { ciscoLwappWlanPolicyCompliances 6 }
+
+-- ********************************************************************
+-- *    Units of conformance
+-- ********************************************************************
+
+ciscoLwappWlanPolicyConfigGroup OBJECT-GROUP
+    OBJECTS         {
+                        cLWlanPlcyRowStatus,
+                        cLWlanPolicyDescription,
+                        cLWlanPolicyInterfaceName,
+                        cLWlanPolicyCentralSwitchMode,
+                        cLWlanPolicyCentralAuthMode,
+                        cLWlanPolicyDhcpCentral,
+                        cLWlanPolicyNatPatEnabled,
+                        cLWlanPolicyAssocCentral,
+                        cLWlanPolicyIPv4AclName,
+                        cLWlanPolicyIPv6AclName,
+                        cLWlanPolicyL2AclName,
+                        cLWlanPolicySessionTimeout,
+                        cLWlanPolicyUserIdleTimeout,
+                        cLWlanPolicyClientExclTimeout,
+                        cLWlanPolicyNativeProfiling,
+                        cLWlanPolicySubscriberPolicyName,
+                        cLWlanPolicyHttpDeviceProfiling,
+                        cLWlanPolicyNetflowIPv4InputMonitorName,
+                        cLWlanPolicyNetflowIPv4OutputMonitorName,
+                        cLWlanPolicyNetflowIPv6InputMonitorName,
+                        cLWlanPolicyNetflowIPv6OutputMonitorName,
+                        cLWlanPolicyQosPerSSIDInput,
+                        cLWlanPolicyQosPerSSIDOutput,
+                        cLWlanPolicyQosPerBSSIDInput,
+                        cLWlanPolicyQosPerBSSIDOutput,
+                        cLWlanPolicyBlacklistTimeout,
+                        cLWlanPolicyBlacklistingCapability,
+                        cLWlanPolicyDhcpRequired,
+                        cLWlanPolicyDhcpServerIpAddress,
+                        cLWlanPolicyAaaOverride,
+                        cLWlanPolicyNac,
+                        cLWlanPolicyStatus,
+                        cLWlanPolicyRadiusHttpProfiling,
+                        cLWlanPolicyUserIdleThreshold,
+                        cLWlanPolicyQosFastlane,
+                        cLWlanPolicyDHCPDeviceProfiling,
+                        cLWlanPolicyDHCPOption82Ascii,
+                        cLWlanPolicyDHCPOption82Rid,
+                        cLWlanPolicyDHCPOption82Enable,
+                        cLWlanPolicyDHCPOption82Apmac,
+                        cLWlanPolicyDHCPOption82Apethmac,
+                        cLWlanPolicyDHCPOption82Apname,
+                        cLWlanPolicyDHCPOption82Policytag,
+                        cLWlanPolicyDHCPOption82Aplocation,
+                        cLWlanPolicyDHCPOption82Vlanid,
+                        cLWlanPolicyDHCPOption82Ssid,
+                        cLWlanPolicySplitMacAcl,
+                        cLWlanPolicyVlanCentralSwitching,
+                        cLWlanPolicyPassiveClient,
+                        cLWlanPolicyNBARProtocolDiscovery,
+                        cLWlanPolicyStaticIPMobility
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "This collection of objects represent the Policy
+        configuration of WLAN to be passed to LWAPP AP"
+    ::= { ciscoLwappWlanPolicyGroups 1 }
+
+ciscoLwappWlanPolicyConfigGroupRev1 OBJECT-GROUP
+    OBJECTS         {
+                        cLWlanPlcyRowStatus,
+                        cLWlanPolicyDescription,
+                        cLWlanPolicyInterfaceName,
+                        cLWlanPolicyCentralSwitchMode,
+                        cLWlanPolicyCentralAuthMode,
+                        cLWlanPolicyDhcpCentral,
+                        cLWlanPolicyNatPatEnabled,
+                        cLWlanPolicyAssocCentral,
+                        cLWlanPolicyIPv4AclName,
+                        cLWlanPolicyIPv6AclName,
+                        cLWlanPolicyL2AclName,
+                        cLWlanPolicySessionTimeout,
+                        cLWlanPolicyUserIdleTimeout,
+                        cLWlanPolicyClientExclTimeout,
+                        cLWlanPolicyNativeProfiling,
+                        cLWlanPolicySubscriberPolicyName,
+                        cLWlanPolicyHttpDeviceProfiling,
+                        cLWlanPolicyNetflowIPv4InputMonitorName,
+                        cLWlanPolicyNetflowIPv4OutputMonitorName,
+                        cLWlanPolicyNetflowIPv6InputMonitorName,
+                        cLWlanPolicyNetflowIPv6OutputMonitorName,
+                        cLWlanPolicyQosPerSSIDInput,
+                        cLWlanPolicyQosPerSSIDOutput,
+                        cLWlanPolicyQosPerBSSIDInput,
+                        cLWlanPolicyQosPerBSSIDOutput,
+                        cLWlanPolicyBlacklistTimeout,
+                        cLWlanPolicyBlacklistingCapability,
+                        cLWlanPolicyDhcpRequired,
+                        cLWlanPolicyDhcpServerIpAddress,
+                        cLWlanPolicyAaaOverride,
+                        cLWlanPolicyNac,
+                        cLWlanPolicyStatus,
+                        cLWlanPolicyRadiusHttpProfiling,
+                        cLWlanPolicyUserIdleThreshold,
+                        cLWlanPolicyQosFastlane,
+                        cLWlanPolicyDHCPDeviceProfiling,
+                        cLWlanPolicyDHCPOption82Ascii,
+                        cLWlanPolicyDHCPOption82Rid,
+                        cLWlanPolicyDHCPOption82Enable,
+                        cLWlanPolicyDHCPOption82Apmac,
+                        cLWlanPolicyDHCPOption82Apethmac,
+                        cLWlanPolicyDHCPOption82Apname,
+                        cLWlanPolicyDHCPOption82Policytag,
+                        cLWlanPolicyDHCPOption82Aplocation,
+                        cLWlanPolicyDHCPOption82Vlanid,
+                        cLWlanPolicyDHCPOption82Ssid,
+                        cLWlanPolicySplitMacAcl,
+                        cLWlanPolicyVlanCentralSwitching,
+                        cLWlanPolicyPassiveClient,
+                        cLWlanPolicyNBARProtocolDiscovery,
+                        cLWlanPolicyStaticIPMobility,
+                        clWlanPolicyMobilityAnchor,
+                        cLWlanPolicyBroadcastTagging,
+                        cLWlanPolicyWgbVlan,
+                        cLWlanPolicyReanchorClassmap,
+                        cLWlanUmbrellaParamMapName,
+                        cLWlanPolicyAccountingList,
+                        cLWlanPolicyAAAPolicyName,
+                        cLWlanPolicyQosCallSnooping,
+                        cLWlanPolicyDefaultSgt,
+                        cLWlanPolicyInlineTagging,
+                        cLWlanPolicySgaclEnforcement
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "This collection of objects represent the Policy
+        configuration of WLAN to be passed to LWAPP AP"
+    ::= { ciscoLwappWlanPolicyGroups 2 }
+
+ciscoLwappWlanPolicyATFConfigGroup OBJECT-GROUP
+    OBJECTS         {
+                        cLWlanPolicyATFRowStatus,
+                        cLWlanPolicyATFPolicyName
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represent the ATF Policy
+        name for 2.4ghz and 5ghz based on band id 
+        corresponding to WLAN policy."
+    ::= { ciscoLwappWlanPolicyGroups 3 }
+
+ciscoLwappWlanAaaPolicyConfigGroup OBJECT-GROUP
+    OBJECTS         {
+                        cLWlanAaaPolicyRowStatus,
+                        cLWlanAaaPolicyNasId1,
+                        cLWlanAaaPolicyNasId2,
+                        cLWlanAaaPolicyNasId3,
+                        cLWlanAaaPolicyRealm
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represent the AAA Policy
+        configuration of WLAN."
+    ::= { ciscoLwappWlanPolicyGroups 4 }
+
+ciscoLwappWlanPolicyConfigGroupRev2 OBJECT-GROUP
+    OBJECTS         {
+                        cLWlanPlcyRowStatus,
+                        cLWlanPolicyDescription,
+                        cLWlanPolicyInterfaceName,
+                        cLWlanPolicyCentralSwitchMode,
+                        cLWlanPolicyCentralAuthMode,
+                        cLWlanPolicyDhcpCentral,
+                        cLWlanPolicyNatPatEnabled,
+                        cLWlanPolicyAssocCentral,
+                        cLWlanPolicyIPv4AclName,
+                        cLWlanPolicyIPv6AclName,
+                        cLWlanPolicyL2AclName,
+                        cLWlanPolicySessionTimeout,
+                        cLWlanPolicyUserIdleTimeout,
+                        cLWlanPolicyClientExclTimeout,
+                        cLWlanPolicyNativeProfiling,
+                        cLWlanPolicySubscriberPolicyName,
+                        cLWlanPolicyHttpDeviceProfiling,
+                        cLWlanPolicyQosPerSSIDInput,
+                        cLWlanPolicyQosPerSSIDOutput,
+                        cLWlanPolicyQosPerBSSIDInput,
+                        cLWlanPolicyQosPerBSSIDOutput,
+                        cLWlanPolicyBlacklistTimeout,
+                        cLWlanPolicyBlacklistingCapability,
+                        cLWlanPolicyDhcpRequired,
+                        cLWlanPolicyDhcpServerIpAddress,
+                        cLWlanPolicyAaaOverride,
+                        cLWlanPolicyNac,
+                        cLWlanPolicyStatus,
+                        cLWlanPolicyRadiusHttpProfiling,
+                        cLWlanPolicyUserIdleThreshold,
+                        cLWlanPolicyQosFastlane,
+                        cLWlanPolicyDHCPDeviceProfiling,
+                        cLWlanPolicyDHCPOption82Ascii,
+                        cLWlanPolicyDHCPOption82Rid,
+                        cLWlanPolicyDHCPOption82Enable,
+                        cLWlanPolicyDHCPOption82Apmac,
+                        cLWlanPolicyDHCPOption82Apethmac,
+                        cLWlanPolicyDHCPOption82Apname,
+                        cLWlanPolicyDHCPOption82Policytag,
+                        cLWlanPolicyDHCPOption82Aplocation,
+                        cLWlanPolicyDHCPOption82Vlanid,
+                        cLWlanPolicyDHCPOption82Ssid,
+                        cLWlanPolicySplitMacAcl,
+                        cLWlanPolicyVlanCentralSwitching,
+                        cLWlanPolicyPassiveClient,
+                        cLWlanPolicyNBARProtocolDiscovery,
+                        cLWlanPolicyStaticIPMobility,
+                        clWlanPolicyMobilityAnchor,
+                        cLWlanPolicyBroadcastTagging,
+                        cLWlanPolicyWgbVlan,
+                        cLWlanPolicyReanchorClassmap,
+                        cLWlanUmbrellaParamMapName,
+                        cLWlanPolicyAccountingList,
+                        cLWlanPolicyAAAPolicyName,
+                        cLWlanPolicyQosCallSnooping,
+                        cLWlanPolicyDefaultSgt,
+                        cLWlanPolicyInlineTagging,
+                        cLWlanPolicySgaclEnforcement
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "This collection of objects represents the Policy
+        configuration of WLAN to be passed to LWAPP AP. This
+        deprecates ciscoLwappWlanPolicyConfigGroupRev1"
+    ::= { ciscoLwappWlanPolicyGroups 5 }
+
+ciscoLwappWlanPolicyConfigGroupFlowMonitor OBJECT-GROUP
+    OBJECTS         {
+                        cLWlanMonitorIPv4InRowStatus,
+                        cLWlanMonitorIPv4OutRowStatus,
+                        cLWlanMonitorIPv6InRowStatus,
+                        cLWlanMonitorIPv6OutRowStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represents flow monitors
+        configured for the wireless profile policy."
+    ::= { ciscoLwappWlanPolicyGroups 6 }
+
+ciscoLwappWlanPolicyConfigGroupRev3 OBJECT-GROUP
+    OBJECTS         {
+                        cLWlanPlcyRowStatus,
+                        cLWlanPolicyDescription,
+                        cLWlanPolicyInterfaceName,
+                        cLWlanPolicyCentralSwitchMode,
+                        cLWlanPolicyCentralAuthMode,
+                        cLWlanPolicyDhcpCentral,
+                        cLWlanPolicyNatPatEnabled,
+                        cLWlanPolicyAssocCentral,
+                        cLWlanPolicyIPv4AclName,
+                        cLWlanPolicyIPv6AclName,
+                        cLWlanPolicyL2AclName,
+                        cLWlanPolicySessionTimeout,
+                        cLWlanPolicyUserIdleTimeout,
+                        cLWlanPolicyClientExclTimeout,
+                        cLWlanPolicyNativeProfiling,
+                        cLWlanPolicySubscriberPolicyName,
+                        cLWlanPolicyHttpDeviceProfiling,
+                        cLWlanPolicyQosPerSSIDInput,
+                        cLWlanPolicyQosPerSSIDOutput,
+                        cLWlanPolicyQosPerBSSIDInput,
+                        cLWlanPolicyQosPerBSSIDOutput,
+                        cLWlanPolicyBlacklistTimeout,
+                        cLWlanPolicyBlacklistingCapability,
+                        cLWlanPolicyDhcpRequired,
+                        cLWlanPolicyDhcpServerIpAddress,
+                        cLWlanPolicyAaaOverride,
+                        cLWlanPolicyNac,
+                        cLWlanPolicyStatus,
+                        cLWlanPolicyRadiusHttpProfiling,
+                        cLWlanPolicyUserIdleThreshold,
+                        cLWlanPolicyQosFastlane,
+                        cLWlanPolicyDHCPDeviceProfiling,
+                        cLWlanPolicyDHCPOption82Ascii,
+                        cLWlanPolicyDHCPOption82Rid,
+                        cLWlanPolicyDHCPOption82Enable,
+                        cLWlanPolicyDHCPOption82Apmac,
+                        cLWlanPolicyDHCPOption82Apethmac,
+                        cLWlanPolicyDHCPOption82Apname,
+                        cLWlanPolicyDHCPOption82Policytag,
+                        cLWlanPolicyDHCPOption82Aplocation,
+                        cLWlanPolicyDHCPOption82Vlanid,
+                        cLWlanPolicyDHCPOption82Ssid,
+                        cLWlanPolicySplitMacAcl,
+                        cLWlanPolicyVlanCentralSwitching,
+                        cLWlanPolicyPassiveClient,
+                        cLWlanPolicyNBARProtocolDiscovery,
+                        cLWlanPolicyStaticIPMobility,
+                        clWlanPolicyMobilityAnchor,
+                        cLWlanPolicyBroadcastTagging,
+                        cLWlanPolicyWgbVlan,
+                        cLWlanPolicyReanchorClassmap,
+                        cLWlanUmbrellaParamMapName,
+                        cLWlanPolicyAccountingList,
+                        cLWlanPolicyAAAPolicyName,
+                        cLWlanPolicyQosCallSnooping,
+                        cLWlanPolicyDefaultSgt,
+                        cLWlanPolicyInlineTagging,
+                        cLWlanPolicySgaclEnforcement,
+                        cLWlanPolicyMdnsPolicy,
+                        cLWlanPolicyHotspotAnqpServer
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "This collection of objects represents the Policy
+        configuration of WLAN to be passed to LWAPP AP. This
+        deprecates ciscoLwappWlanPolicyConfigGroupRev2"
+    ::= { ciscoLwappWlanPolicyGroups 7 }
+
+ciscoLwappWlanPolicyConfigGroupCalenderProfile OBJECT-GROUP
+    OBJECTS         {
+                        cLWlanPolicyCalendarProfileRowStatus,
+                        cLWlanPolicyCalendarProfileWlan,
+                        cLWlanPolicyCalendarProfileClientSession
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represents calender profile
+        configured for the wireless profile policy."
+    ::= { ciscoLwappWlanPolicyGroups 8 }
+
+ciscoLwappWlanPolicyConfigGroupRev4 OBJECT-GROUP
+    OBJECTS         {
+                        cLWlanPlcyRowStatus,
+                        cLWlanPolicyDescription,
+                        cLWlanPolicyInterfaceName,
+                        cLWlanPolicyCentralSwitchMode,
+                        cLWlanPolicyCentralAuthMode,
+                        cLWlanPolicyDhcpCentral,
+                        cLWlanPolicyNatPatEnabled,
+                        cLWlanPolicyAssocCentral,
+                        cLWlanPolicyIPv4AclName,
+                        cLWlanPolicyIPv6AclName,
+                        cLWlanPolicyL2AclName,
+                        cLWlanPolicySessionTimeout,
+                        cLWlanPolicyUserIdleTimeout,
+                        cLWlanPolicyClientExclTimeout,
+                        cLWlanPolicyNativeProfiling,
+                        cLWlanPolicySubscriberPolicyName,
+                        cLWlanPolicyHttpDeviceProfiling,
+                        cLWlanPolicyQosPerSSIDInput,
+                        cLWlanPolicyQosPerSSIDOutput,
+                        cLWlanPolicyQosPerBSSIDInput,
+                        cLWlanPolicyQosPerBSSIDOutput,
+                        cLWlanPolicyBlacklistTimeout,
+                        cLWlanPolicyBlacklistingCapability,
+                        cLWlanPolicyDhcpRequired,
+                        cLWlanPolicyDhcpServerIpAddress,
+                        cLWlanPolicyAaaOverride,
+                        cLWlanPolicyNac,
+                        cLWlanPolicyStatus,
+                        cLWlanPolicyRadiusHttpProfiling,
+                        cLWlanPolicyUserIdleThreshold,
+                        cLWlanPolicyQosFastlane,
+                        cLWlanPolicyDHCPDeviceProfiling,
+                        cLWlanPolicyDHCPOption82Ascii,
+                        cLWlanPolicyDHCPOption82Rid,
+                        cLWlanPolicyDHCPOption82Enable,
+                        cLWlanPolicyDHCPOption82Apmac,
+                        cLWlanPolicyDHCPOption82Apethmac,
+                        cLWlanPolicyDHCPOption82Apname,
+                        cLWlanPolicyDHCPOption82Policytag,
+                        cLWlanPolicyDHCPOption82Aplocation,
+                        cLWlanPolicyDHCPOption82Vlanid,
+                        cLWlanPolicyDHCPOption82Ssid,
+                        cLWlanPolicySplitMacAcl,
+                        cLWlanPolicyVlanCentralSwitching,
+                        cLWlanPolicyPassiveClient,
+                        cLWlanPolicyNBARProtocolDiscovery,
+                        cLWlanPolicyStaticIPMobility,
+                        clWlanPolicyMobilityAnchor,
+                        cLWlanPolicyBroadcastTagging,
+                        cLWlanPolicyWgbVlan,
+                        cLWlanPolicyReanchorClassmap,
+                        cLWlanUmbrellaParamMapName,
+                        cLWlanPolicyAccountingList,
+                        cLWlanPolicyAAAPolicyName,
+                        cLWlanPolicyQosCallSnooping,
+                        cLWlanPolicyDefaultSgt,
+                        cLWlanPolicyInlineTagging,
+                        cLWlanPolicySgaclEnforcement,
+                        cLWlanPolicyMdnsPolicy,
+                        cLWlanPolicyHotspotAnqpServer,
+                        cLWlanPolicyNacType,
+                        cLWlanPolicyARPProxy,
+                        cLWlanPolicyIPv6proxy,
+                        cLWlanPolicyMulticastFilter,
+                        cLWlanPolicyQBSSLoad
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "This collection of objects represents the Policy
+        configuration of WLAN to be passed to LWAPP AP. This
+        deprecates ciscoLwappWlanPolicyConfigGroupRev3"
+    ::= { ciscoLwappWlanPolicyGroups 9 }
+
+ciscoLwappWlanPolicyConfigGroupRev5 OBJECT-GROUP
+    OBJECTS         {
+                        cLWlanPlcyRowStatus,
+                        cLWlanPolicyDescription,
+                        cLWlanPolicyInterfaceName,
+                        cLWlanPolicyCentralSwitchMode,
+                        cLWlanPolicyCentralAuthMode,
+                        cLWlanPolicyDhcpCentral,
+                        cLWlanPolicyNatPatEnabled,
+                        cLWlanPolicyAssocCentral,
+                        cLWlanPolicyIPv4AclName,
+                        cLWlanPolicyIPv6AclName,
+                        cLWlanPolicyL2AclName,
+                        cLWlanPolicySessionTimeout,
+                        cLWlanPolicyUserIdleTimeout,
+                        cLWlanPolicyClientExclTimeout,
+                        cLWlanPolicyNativeProfiling,
+                        cLWlanPolicySubscriberPolicyName,
+                        cLWlanPolicyHttpDeviceProfiling,
+                        cLWlanPolicyQosPerSSIDInput,
+                        cLWlanPolicyQosPerSSIDOutput,
+                        cLWlanPolicyQosPerBSSIDInput,
+                        cLWlanPolicyQosPerBSSIDOutput,
+                        cLWlanPolicyBlacklistTimeout,
+                        cLWlanPolicyBlacklistingCapability,
+                        cLWlanPolicyDhcpRequired,
+                        cLWlanPolicyDhcpServerIpAddress,
+                        cLWlanPolicyAaaOverride,
+                        cLWlanPolicyNac,
+                        cLWlanPolicyStatus,
+                        cLWlanPolicyRadiusHttpProfiling,
+                        cLWlanPolicyUserIdleThreshold,
+                        cLWlanPolicyQosFastlane,
+                        cLWlanPolicyDHCPDeviceProfiling,
+                        cLWlanPolicyDHCPOption82Ascii,
+                        cLWlanPolicyDHCPOption82Rid,
+                        cLWlanPolicyDHCPOption82Enable,
+                        cLWlanPolicyDHCPOption82Apmac,
+                        cLWlanPolicyDHCPOption82Apethmac,
+                        cLWlanPolicyDHCPOption82Apname,
+                        cLWlanPolicyDHCPOption82Policytag,
+                        cLWlanPolicyDHCPOption82Aplocation,
+                        cLWlanPolicyDHCPOption82Vlanid,
+                        cLWlanPolicyDHCPOption82Ssid,
+                        cLWlanPolicySplitMacAcl,
+                        cLWlanPolicyVlanCentralSwitching,
+                        cLWlanPolicyPassiveClient,
+                        cLWlanPolicyNBARProtocolDiscovery,
+                        cLWlanPolicyStaticIPMobility,
+                        clWlanPolicyMobilityAnchor,
+                        cLWlanPolicyBroadcastTagging,
+                        cLWlanPolicyWgbVlan,
+                        cLWlanPolicyReanchorClassmap,
+                        cLWlanUmbrellaParamMapName,
+                        cLWlanPolicyAccountingList,
+                        cLWlanPolicyAAAPolicyName,
+                        cLWlanPolicyQosCallSnooping,
+                        cLWlanPolicyDefaultSgt,
+                        cLWlanPolicyInlineTagging,
+                        cLWlanPolicySgaclEnforcement,
+                        cLWlanPolicyMdnsPolicy,
+                        cLWlanPolicyHotspotAnqpServer,
+                        cLWlanPolicyARPProxy,
+                        cLWlanPolicyIPv6proxy,
+                        cLWlanPolicyMulticastFilter,
+                        cLWlanPolicyQBSSLoad
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects represents the Policy
+        configuration of WLAN to be passed to LWAPP AP. This
+        deprecates ciscoLwappWlanPolicyConfigGroupRev4"
+    ::= { ciscoLwappWlanPolicyGroups 10 }
+
+END
+

@@ -1,6 +1,6 @@
 <div id="alertlog_container-{{ $id }}" data-reload="false">
     <div class="table-responsive">
-        <table id="alertlog_{{ $id }}" class="table table-hover table-condensed alerts" data-url="{{ route('table.alertlog') }}">
+        <table id="alertlog_{{ $id }}" class="table table-hover table-condensed alerts" data-url="{{ route('table.alertlog') }}" data-export-url="{{ route('table.alertlog.export') }}">
             <thead>
             <tr>
                 <th data-column-id="status" data-sortable="false" data-visible-in-selection="false"></th>

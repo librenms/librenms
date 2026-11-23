@@ -2,7 +2,7 @@
 
 <div class="table-responsive">
     <table id="devices" class="table table-hover table-condensed table-striped"
-           data-url="{{ route('table.device') }}">
+           data-url="{{ route('table.device') }}" data-export-url="{{ route('table.device.export') }}">
         <thead>
         <tr>
             <th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false">{{ $detailed ? 'S.' : __('Status') }}</th>

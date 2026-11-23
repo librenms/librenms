@@ -12,11 +12,7 @@
  * See COPYING for more details.
  */
 
-use App\Actions\Device\AutoDiscoverDevice;
-use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
-use App\Facades\PortCache;
-use App\Models\Port;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use LibreNMS\Device\YamlDiscovery;
@@ -26,21 +22,6 @@ use LibreNMS\OS;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\ProgressList;
 use LibreNMS\Util\UserFuncHelper;
-
-/**
- * @param  string  $hostname
- * @param  array  $device
- * @param  string  $method  name of process discoverying this device
- * @param  array|Port|null  $interface  Interface this device was discovered on
- * @return false|int
- */
-function discover_new_device($hostname, $device, $method, $interface = null)
-{
-    $port = is_array($interface) ? PortCache::get($interface['port_id'] ?? null) : $interface;
-    $new_device = app(AutoDiscoverDevice::class)->execute((string) $hostname, DeviceCache::get($device['device_id']), $method, $port);
-
-    return $new_device ? $new_device->device_id : false;
-}
 
 // Discover sensors
 function discover_sensor($unused, SensorType|string $class, $device, $oid, $index, $type, $descr, $divisor = 1, $multiplier = 1, $low_limit = null, $low_warn_limit = null, $warn_limit = null, $high_limit = null, $current = null, $poller_type = 'snmp', $entPhysicalIndex = null, $entPhysicalIndex_measured = null, $user_func = null, $group = null, $rrd_type = 'GAUGE', ?SensorCategory $category = null): bool
@@ -248,9 +229,16 @@ function discovery_process($os, $sensor_class, $pre_cache)
                 $snmp_value = $snmp_data[$data['value']] ?? '';
                 if (! is_numeric($snmp_value)) {
                     if ($sensor_class === 'temperature') {
-                        // For temp sensors, try and detect fahrenheit values
-                        if (is_string($snmp_value) && Str::endsWith($snmp_value, ['f', 'F'])) {
+                        if (is_string($snmp_value)) {
+                          // Attempt to capture Celsius
+                          if (preg_match('/([0-9.-]+)[^0-9]*?[cC]/', $snmp_value, $matches)) {
+                            $snmp_value = (float) $matches[1];
+                          }
+                          // Attempt to capture Fahrenheit
+                          elseif (preg_match('/([0-9.-]+)[^0-9]*?[fF]/', $snmp_value, $matches)) {
+                            $snmp_value = (float) $matches[1];
                             $user_function = 'fahrenheit_to_celsius';
+                          }
                         }
                     }
                     if ($sensor_class === 'state' && isset($data['states'])) {

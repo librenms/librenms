@@ -1,7 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-$init_modules = [];
 require __DIR__ . '/../includes/init.php';
 
 $hostname = $argv[1];

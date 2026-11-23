@@ -1,28 +1,37 @@
 -- ============================================================================
--- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 -- Description:  This MIB file is used for configuration of L2TP(Layer 2
 --               Tunneling Protocol).
 --               include :1.L2TP statistics information
 -- Reference:
--- Version: V1.3
+-- Version: V1.6
 -- History:
 -- V1.0 2013-07-05 created by yanbotao
 -- V1.1 2019-04-12 add hh3cL2tpStatTemporarySessions and hh3cL2tpTunnelTable by zhouduan
 -- V1.2 2019-11-21 add hh3cL2tpRemoteIpAddress ,hh3cL2tpRemoteTunnelID, hh3cL2tpRemotePort
 --                 add hh3cL2tpRemoteName, hh3cL2tpTunnelState by zhouduan
 -- V1.3 2020-09-05 add hh3cL2tpStatsMaxSessions by tanjidong
+-- V1.4 2021-09-01 add hh3cL2tpProtocolVersions, hh3cL2tpVendorName, hh3cL2tpFirmwareRev
+--                 add hh3cL2tpDrainingTunnels, hh3cL2tpAdminState, hh3cL2tpGroupConfigTable
+--                 add hh3cL2tpTunnelStatsTable by wangzhenjun
+-- V1.5 2021-11-01 add hh3cL2tpTunnelUpOrDown by fengshuxiang
+--      2021-11-23 add hh3cL2tpTUpOrDownSessCount by fengshuxiang
+-- V1.6 2022-06-16 add hh3cL2tpSessionFailTrapOid
+--                 add hh3cL2tpSessionFailTrap by wangzhenjun
 -- ============================================================================
 HH3C-L2TP-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     hh3cCommon
         FROM HH3C-OID-MIB
-    Integer32, Counter32, Unsigned32, IpAddress, OBJECT-TYPE, MODULE-IDENTITY
+    Integer32, Counter32, Unsigned32, IpAddress, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Gauge32
         FROM SNMPv2-SMI
-    DisplayString
-        FROM SNMPv2-TC;
+    DisplayString, TruthValue, RowStatus
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB;
 
 hh3cL2tp MODULE-IDENTITY
-    LAST-UPDATED "202009050000Z"
+    LAST-UPDATED "202206160000Z"
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -32,8 +41,17 @@ hh3cL2tp MODULE-IDENTITY
         Zip:100085
         "
     DESCRIPTION
-        "The latest baseline."
-    REVISION "202009050000Z"
+        "Add the trap of hh3cL2tpSessionFailTrap."
+    REVISION "202206160000Z"                -- June 16th, 2022 at 00:00 GMT
+    DESCRIPTION
+        "Add the node of hh3cL2tpTUpOrDownSessCount."
+    REVISION "202111230000Z"                -- November 23, 2021 at 00:00 GMT
+    DESCRIPTION
+        "Add the trap of hh3cL2tpTunnelUpOrDown."
+    REVISION "202111030000Z"                -- November 03, 2021 at 00:00 GMT
+    DESCRIPTION
+        "The old baseline."
+    REVISION "202109010000Z"
     DESCRIPTION
         "Add the objects of hh3cL2tpStatsMaxSessions."
     REVISION "201911211452Z"                -- November 21, 2019 at 14:52 GMT
@@ -50,6 +68,7 @@ hh3cL2tp MODULE-IDENTITY
 hh3cL2tpObjects         OBJECT IDENTIFIER  ::= { hh3cL2tp 1 }
 hh3cL2tpScalar          OBJECT IDENTIFIER  ::= { hh3cL2tpObjects 1 }
 hh3cL2tpStats           OBJECT IDENTIFIER  ::= { hh3cL2tpScalar 1 }
+hh3cL2tpConfig          OBJECT IDENTIFIER  ::= { hh3cL2tpScalar 2 }
 
 --
 -- The L2TP Scalar Status and Statistics Group
@@ -94,6 +113,74 @@ hh3cL2tpStatsMaxSessions OBJECT-TYPE
     DESCRIPTION
         "The max number of sessions."
     ::= { hh3cL2tpStats 5 }
+
+hh3cL2tpProtocolVersions    OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(0..256))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Vector of supported L2TP protocol version and
+        revision numbers. Supported versions are identified
+        via a two octet pairing where the first octet indicates
+        the version and the second octet contains the revision."
+    ::= { hh3cL2tpStats 6 }
+
+hh3cL2tpVendorName          OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE(0..256))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object identifies the Vendor name of the L2TP
+        protocol stack."
+    ::= { hh3cL2tpStats 7 }
+
+hh3cL2tpFirmwareRev         OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object defines the firmware revision for the
+        L2TP protocol stack."
+    ::= { hh3cL2tpStats 8 }
+
+hh3cL2tpDrainingTunnels     OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates if the local L2TP is draining
+        off sessions from all tunnels."
+    ::= { hh3cL2tpStats 9 }
+
+--
+-- The L2TP Scalar Configuration
+--
+hh3cL2tpAdminState          OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            enabled(1),
+                            disabled(2)
+                            }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object defines the administrative state of
+        the L2TP protocol. Setting this object to
+        'disabled' causes all tunnels to be immediately
+        disconnected and no further tunnels to be either
+        initiated or accepted."
+    DEFVAL { disabled }
+    ::= { hh3cL2tpConfig 1 }
+
+hh3cL2tpAging             OBJECT-TYPE
+    SYNTAX          Integer32 (1..3600)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object defines the maximum timeout used by LAC to
+        lock the specified LNS."
+    DEFVAL { 300 }
+    ::= { hh3cL2tpConfig 2 }
 
 hh3cL2tpTunnel          OBJECT IDENTIFIER  ::= { hh3cL2tpObjects 2 }
 
@@ -219,5 +306,805 @@ hh3cL2tpTunnelState  OBJECT-TYPE
     DESCRIPTION
         "The current tunnel state, (0) idle (1) waitReply (2) established (3) stopping."
     ::= { hh3cL2tpTunnelEntry 9 }
+
+hh3cL2tpGroup          OBJECT IDENTIFIER  ::= { hh3cL2tpObjects 3 }
+
+--
+-- The hh3cL2tpGroupConfigTable table
+--
+
+hh3cL2tpGroupConfigTable   OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cL2tpGroupConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The L2TP group configuration table."
+    ::= { hh3cL2tpGroup 1 }
+
+hh3cL2tpGroupConfigEntry   OBJECT-TYPE
+    SYNTAX          Hh3cL2tpGroupConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A L2TP group configuration entry."
+    INDEX { hh3cL2tpGroupConfigGroupID }
+    ::= { hh3cL2tpGroupConfigTable 1 }
+
+Hh3cL2tpGroupConfigEntry ::= SEQUENCE {
+    hh3cL2tpGroupConfigGroupID             Integer32,
+    hh3cL2tpGroupConfigDomainId            SnmpAdminString,
+    hh3cL2tpGroupConfigHelloInterval       Integer32,
+    hh3cL2tpGroupConfigIdleTimeout         Integer32,
+    hh3cL2tpGroupConfigCtrlRWS             Integer32,
+    hh3cL2tpGroupConfigCtrlMaxRetx         Integer32,
+    hh3cL2tpGroupConfigCtrlMaxRetxTO       Integer32,
+    hh3cL2tpGroupConfigAuthentication      TruthValue,
+    hh3cL2tpGroupConfigAvpHidden           TruthValue,
+    hh3cL2tpGroupConfigLoadsharing         TruthValue,
+    hh3cL2tpGroupConfigTunnelName          DisplayString,
+    hh3cL2tpGroupConfigPassword            DisplayString,
+    hh3cL2tpGroupConfigLnsIP1              IpAddress,
+    hh3cL2tpGroupConfigLnsWeight1          Integer32,
+    hh3cL2tpGroupConfigLnsIP2              IpAddress,
+    hh3cL2tpGroupConfigLnsWeight2          Integer32,
+    hh3cL2tpGroupConfigLnsIP3              IpAddress,
+    hh3cL2tpGroupConfigLnsWeight3          Integer32,
+    hh3cL2tpGroupConfigLnsIP4              IpAddress,
+    hh3cL2tpGroupConfigLnsWeight4          Integer32,
+    hh3cL2tpGroupConfigLnsIP5              IpAddress,
+    hh3cL2tpGroupConfigLnsWeight5          Integer32,
+    hh3cL2tpGroupConfigGroupName           DisplayString,
+    hh3cL2tpGroupConfigRemoteName          DisplayString,
+    hh3cL2tpGroupConfigForceChap           TruthValue,
+    hh3cL2tpGroupConfigForceLcp            TruthValue,
+    hh3cL2tpGroupConfigVTNumber            Integer32,
+    hh3cL2tpGroupConfigMode                INTEGER,
+    hh3cL2tpGroupConfigRowStatus           RowStatus
+    }
+
+hh3cL2tpGroupConfigGroupID OBJECT-TYPE
+    SYNTAX          Integer32 (1..65535)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The identifier of the L2TP group."
+    ::= { hh3cL2tpGroupConfigEntry 1 }
+
+hh3cL2tpGroupConfigDomainId OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE (0..80))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The tunnel domain that this tunnel belongs
+        to. A LNS tunnel endpoint will typically inherit
+        this value from the endpoint domain table. A
+        LAC may be provided with this information during
+        tunnel setup. When a zero length string is returned
+        this tunnel does not belong to any particular
+        domain."
+    ::= { hh3cL2tpGroupConfigEntry 2 }
+
+hh3cL2tpGroupConfigHelloInterval OBJECT-TYPE
+    SYNTAX          Integer32  (60..1000)
+    UNITS           "seconds"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object defines the interval in which Hello
+        (or keep-alive) packets are to be sent to the
+        tunnel peer. Modifications to this
+        object have immediate effect."
+    DEFVAL { 60 }
+    ::= { hh3cL2tpGroupConfigEntry 3 }
+
+hh3cL2tpGroupConfigIdleTimeout OBJECT-TYPE
+    SYNTAX          Integer32 (-1..86400)
+    UNITS           "seconds"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object defines the period of time that an
+        established tunnel with no sessions will wait
+        before disconnecting the tunnel. A value of
+        zero indicates that the tunnel will disconnect
+        immediately after the last session disconnects.
+        A value of -1 leaves the tunnel up indefinitely.
+        Modifications to this object have immediate
+        effect."
+    DEFVAL { 0 }
+    ::= { hh3cL2tpGroupConfigEntry 4 }
+
+hh3cL2tpGroupConfigCtrlRWS OBJECT-TYPE
+    SYNTAX          Integer32 (1..5000)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object defines the control channel receive
+        window size. It specifies the maximum number of
+        packets the tunnel peer can send without waiting
+        for an acknowledgement from this peer. This object
+        cannot be modified when tunnel is in a connecting
+        or connected state."
+    DEFVAL { 1024 }
+    ::= { hh3cL2tpGroupConfigEntry 5 }
+
+hh3cL2tpGroupConfigCtrlMaxRetx OBJECT-TYPE
+    SYNTAX          Integer32 (0..32)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object defines the number of retransmissions
+        which the tunnel will attempt before assuming that
+        the peer is no longer responding. A value of zero
+        indicates that this peer will not attempt to
+        retransmit an unacknowledged control packet."
+    DEFVAL { 8 }
+    ::= { hh3cL2tpGroupConfigEntry 6 }
+
+hh3cL2tpGroupConfigCtrlMaxRetxTO OBJECT-TYPE
+    SYNTAX          Integer32 (1..32)
+    UNITS           "seconds"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object defines the maximum retransmission timeout
+        interval which the tunnel will wait before retrans-
+        mitting a control packet that has not been acknowledged."
+    DEFVAL { 16 }
+    ::= { hh3cL2tpGroupConfigEntry 7 }
+
+hh3cL2tpGroupConfigAuthentication OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The tunnel authentication is enabled when the value
+        of this object is True."
+    DEFVAL { false }
+    ::= { hh3cL2tpGroupConfigEntry 8 }
+
+hh3cL2tpGroupConfigAvpHidden OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The tunnel avp hidden is enabled when the value
+        of this object is True."
+    DEFVAL { false }
+    ::= { hh3cL2tpGroupConfigEntry 9 }
+
+hh3cL2tpGroupConfigLoadsharing OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the working mode of LAC,
+        the load sharing is enabled when the value
+        of this object is True."
+    DEFVAL { false }
+    ::= { hh3cL2tpGroupConfigEntry 10 }
+
+hh3cL2tpGroupConfigTunnelName OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (0..31))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The local name of the tunnel."
+    ::= { hh3cL2tpGroupConfigEntry 11 }
+
+hh3cL2tpGroupConfigPassword OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (0..16))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The password of authentication of the tunnel will be
+        used in the tunnel connection. when read, a zero-length
+        string will be returned."
+    ::= { hh3cL2tpGroupConfigEntry 12 }
+
+hh3cL2tpGroupConfigLnsIP1 OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The first LNS IP address for LAC to establish the tunnel,
+        this only support when the group mode is LAC."
+    ::= { hh3cL2tpGroupConfigEntry 13 }
+
+hh3cL2tpGroupConfigLnsWeight1 OBJECT-TYPE
+    SYNTAX          Integer32 (1..10)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The weight of the first LNS IP address for LAC to establish the tunnel,
+        this only support when the group mode is LAC."
+    ::= { hh3cL2tpGroupConfigEntry 14 }
+
+hh3cL2tpGroupConfigLnsIP2 OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The second LNS IP address for LAC to establish the tunnel,
+        this only support when the group mode is LAC."
+    ::= { hh3cL2tpGroupConfigEntry 15 }
+
+hh3cL2tpGroupConfigLnsWeight2 OBJECT-TYPE
+    SYNTAX          Integer32 (1..10)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The weight of the second LNS IP address for LAC to establish the tunnel,
+        this only support when the group mode is LAC."
+    ::= { hh3cL2tpGroupConfigEntry 16 }
+
+hh3cL2tpGroupConfigLnsIP3 OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The third LNS IP address for LAC to establish the tunnel,
+        this only support when the group mode is LAC."
+    ::= { hh3cL2tpGroupConfigEntry 17 }
+
+hh3cL2tpGroupConfigLnsWeight3 OBJECT-TYPE
+    SYNTAX          Integer32 (1..10)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The weight of the third LNS IP address for LAC to establish the tunnel,
+        this only support when the group mode is LAC."
+    ::= { hh3cL2tpGroupConfigEntry 18 }
+
+hh3cL2tpGroupConfigLnsIP4 OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The fourth LNS IP address for LAC to establish the tunnel,
+        this only support when the group mode is LAC."
+    ::= { hh3cL2tpGroupConfigEntry 19 }
+
+hh3cL2tpGroupConfigLnsWeight4 OBJECT-TYPE
+    SYNTAX          Integer32 (1..10)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The weight of the fourth LNS IP address for LAC to establish the tunnel,
+        this only support when the group mode is LAC."
+    ::= { hh3cL2tpGroupConfigEntry 20 }
+
+hh3cL2tpGroupConfigLnsIP5 OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The fifth LNS IP address for LAC to establish the tunnel,
+        this only support when the group mode is LAC."
+    ::= { hh3cL2tpGroupConfigEntry 21 }
+
+hh3cL2tpGroupConfigLnsWeight5 OBJECT-TYPE
+    SYNTAX          Integer32 (1..10)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The weight of the fifth LNS IP address for LAC to establish the tunnel,
+        this only support when the group mode is LAC."
+    ::= { hh3cL2tpGroupConfigEntry 22 }
+
+hh3cL2tpGroupConfigGroupName OBJECT-TYPE
+    SYNTAX          DisplayString ( SIZE (0..32) )
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The group name."
+    ::= { hh3cL2tpGroupConfigEntry 23 }
+
+hh3cL2tpGroupConfigRemoteName OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (0..31))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The remote name of the LAC, LNS will accept the tunnel connection
+        if the remote name is equal with that of LAC."
+    ::= { hh3cL2tpGroupConfigEntry 24 }
+
+hh3cL2tpGroupConfigForceChap OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The mandatory chap is enabled when the value of this object is True."
+    DEFVAL { false }
+    ::= { hh3cL2tpGroupConfigEntry 25 }
+
+hh3cL2tpGroupConfigForceLcp OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The mandatory lcp is enabled when the value of this object is True"
+    DEFVAL { false }
+    ::= { hh3cL2tpGroupConfigEntry 26 }
+
+hh3cL2tpGroupConfigVTNumber OBJECT-TYPE
+    SYNTAX          Integer32 (0..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The virtual template that the LNS used to accept the tunnel connection."
+    ::= { hh3cL2tpGroupConfigEntry 27 }
+
+hh3cL2tpGroupConfigMode OBJECT-TYPE
+    SYNTAX          INTEGER {
+                              lac(1),
+                              lns(2)
+                            }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The group mode, the lac is used as LAC group, the lns is used as LNS group."
+    ::= { hh3cL2tpGroupConfigEntry 28 }
+
+hh3cL2tpGroupConfigRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "This object manages the creation, deletion, and modification
+             of rows in the hh3cL2tpGroupConfigTable, which supports the
+             active status, createAndGo operation, and destroy operation."
+    ::= { hh3cL2tpGroupConfigEntry 29 }
+
+hh3cL2tpTunnelStats          OBJECT IDENTIFIER  ::= { hh3cL2tpObjects 4 }
+
+hh3cL2tpTunnelStatsTable    OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cL2tpTunnelStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The L2TP tunnel status and statistics table. This
+        table contains objects that can be used to describe
+        the current status and statistics of a single L2TP
+        tunnel."
+    ::= { hh3cL2tpTunnelStats 1 }
+
+hh3cL2tpTunnelStatsEntry    OBJECT-TYPE
+    SYNTAX          Hh3cL2tpTunnelStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An L2TP tunnel interface stats entry."
+    INDEX           { hh3cL2tpTStatsUpID,
+                      hh3cL2tpTStatsLocalTID }
+    ::= { hh3cL2tpTunnelStatsTable 1 }
+
+Hh3cL2tpTunnelStatsEntry ::= SEQUENCE {
+    hh3cL2tpTStatsUpID                     Integer32,
+    hh3cL2tpTStatsLocalTID                 Integer32,
+    hh3cL2tpTStatsRemoteTID                Integer32,
+    hh3cL2tpTStatsState                    INTEGER,
+    hh3cL2tpTStatsInitiated                INTEGER,
+    hh3cL2tpTStatsRemoteHostName           SnmpAdminString,
+    hh3cL2tpTStatsRemoteVendorName         SnmpAdminString,
+    hh3cL2tpTStatsRemoteFirmwareRev        Integer32,
+    hh3cL2tpTStatsRemoteProtocolVer        OCTET STRING,
+    hh3cL2tpTStatsBearerCaps               INTEGER,
+    hh3cL2tpTStatsFramingCaps              INTEGER,
+    hh3cL2tpTStatsControlRxPkts            Counter32,
+    hh3cL2tpTStatsControlRxZLB             Counter32,
+    hh3cL2tpTStatsControlTxPkts            Counter32,
+    hh3cL2tpTStatsControlTxZLB             Counter32,
+    hh3cL2tpTStatsControlAckTO             Counter32,
+    hh3cL2tpTStatsCurrentRemoteRWS         Gauge32,
+    hh3cL2tpTStatsTxSeq                    Integer32,
+    hh3cL2tpTStatsTxSeqAck                 Integer32,
+    hh3cL2tpTStatsRxSeq                    Integer32,
+    hh3cL2tpTStatsTotalSessions            Counter32,
+    hh3cL2tpTStatsFailedSessions           Counter32,
+    hh3cL2tpTStatsActiveSessions           Gauge32
+    }
+
+hh3cL2tpTStatsUpID  OBJECT-TYPE
+    SYNTAX          Integer32 (0..2047)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object of 1024 to 2047 value contains the UP(user plane) id in CU
+        (control plane and user plane) environment, the zero value indicates
+        a none CU environment, other value is not supported."
+    ::= { hh3cL2tpTunnelStatsEntry 1 }
+
+hh3cL2tpTStatsLocalTID OBJECT-TYPE
+    SYNTAX          Integer32 (1..65535)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object contains the local tunnel Identifier."
+    ::= { hh3cL2tpTunnelStatsEntry 2 }
+
+hh3cL2tpTStatsRemoteTID OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains the remote tunnel Identifier."
+    ::= { hh3cL2tpTunnelStatsEntry 3 }
+
+hh3cL2tpTStatsState    OBJECT-TYPE
+    SYNTAX          INTEGER {
+                             idle(1),
+                             connecting(2),
+                             established(3),
+                             disconnecting(4)
+                            }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This field contains the current state of the
+        control tunnel."
+    ::= { hh3cL2tpTunnelStatsEntry 4 }
+
+hh3cL2tpTStatsInitiated OBJECT-TYPE
+    SYNTAX          INTEGER {
+                               locally(1),
+                               remotely(2)
+                           }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+              "This object indicates whether the tunnel was
+               initiated locally or by the remote tunnel peer."
+    ::= { hh3cL2tpTunnelStatsEntry 5 }
+
+hh3cL2tpTStatsRemoteHostName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE(0..31))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+              "This object contains the host name as discovered
+               during the tunnel establishment phase (via the Host
+               Name AVP) of the L2TP peer. If the tunnel is idle
+               this object should maintain its value from the last
+               time it was connected."
+    ::= { hh3cL2tpTunnelStatsEntry 6 }
+
+hh3cL2tpTStatsRemoteVendorName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE(0..256))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+              "This object identifies the vendor name of the peer's
+               L2TP implementation. If the tunnel is idle this
+               object should maintain its value from the last time
+               it was connected."
+    ::= { hh3cL2tpTunnelStatsEntry 7 }
+
+hh3cL2tpTStatsRemoteFirmwareRev OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+              "This object contains the tunnel peer's firmware
+               revision number. If the tunnel is idle this object
+               should maintain its value from the last time it
+               was connected."
+    ::= { hh3cL2tpTunnelStatsEntry 8 }
+
+hh3cL2tpTStatsRemoteProtocolVer OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(2))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object describes the protocol version and
+        revision of the tunnel peers implementation. The
+        first octet contains the protocol version. The
+        second octet contains the protocol revision."
+    ::= { hh3cL2tpTunnelStatsEntry 9 }
+
+hh3cL2tpTStatsBearerCaps OBJECT-TYPE
+    SYNTAX          INTEGER {
+                               none(1),
+                               digital(2),
+                               analog(3),
+                               digitalAnalog(4)
+                           }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object describes the Bearer Capabilities of
+        the tunnel peer. If the tunnel is idle this object
+        should maintain its value from the last time it was
+        connected."
+    ::= { hh3cL2tpTunnelStatsEntry 10 }
+
+hh3cL2tpTStatsFramingCaps OBJECT-TYPE
+    SYNTAX          INTEGER {
+                               none(1),
+                               sync(2),
+                               async(3),
+                               syncAsync(4)
+                           }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object describes the Framing Capabilities of
+         the tunnel peer. If the tunnel is idle this object
+         should maintain its value from the last time it was
+         connected."
+    ::= { hh3cL2tpTunnelStatsEntry 11 }
+
+hh3cL2tpTStatsControlRxPkts OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains the number of control packets
+         received on the tunnel."
+    ::= { hh3cL2tpTunnelStatsEntry 12 }
+
+hh3cL2tpTStatsControlRxZLB OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object returns a count of the number of Zero
+         Length Body control packet acknowledgement packets
+         that were received."
+    ::= { hh3cL2tpTunnelStatsEntry 13 }
+
+hh3cL2tpTStatsControlTxPkts OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains the number of control
+         packets that were transmitted to the tunnel
+         peer."
+    ::= { hh3cL2tpTunnelStatsEntry 14 }
+
+hh3cL2tpTStatsControlTxZLB OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains the number of Zero Length
+         Body control packets transmitted to the tunnel
+         peer."
+    ::= { hh3cL2tpTunnelStatsEntry 15 }
+
+hh3cL2tpTStatsControlAckTO OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object returns a count of the number of
+         control packet timeouts due to the lack of a
+         timely acknowledgement from the tunnel peer."
+    ::= { hh3cL2tpTunnelStatsEntry 16 }
+
+hh3cL2tpTStatsCurrentRemoteRWS OBJECT-TYPE
+    SYNTAX          Gauge32 (0..65535)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains the current remote receive
+         window size as determined by the local flow
+         control mechanism employed."
+    ::= { hh3cL2tpTunnelStatsEntry 17 }
+
+hh3cL2tpTStatsTxSeq  OBJECT-TYPE
+    SYNTAX          Integer32 (0..65535)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains the next send sequence number
+         for the control channel."
+    ::= { hh3cL2tpTunnelStatsEntry 18 }
+
+hh3cL2tpTStatsTxSeqAck OBJECT-TYPE
+    SYNTAX          Integer32 (0..65535)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains the send sequence number that
+         the tunnel peer has acknowledged for the control
+         channel. The flow control state can be determined
+         by subtracting the l2tpTunnelStatsTxSeq from
+         hh3cL2tpTStatsTxSeqAck and comparing this value
+         to hh3cL2tpTStatsCurrentRemoteRWS (taking into
+         consideration sequence number wraps)."
+    ::= { hh3cL2tpTunnelStatsEntry 19 }
+
+hh3cL2tpTStatsRxSeq  OBJECT-TYPE
+    SYNTAX          Integer32 (0..65535)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains the next receive sequence
+         number expected to be received on this control
+         channel."
+    ::= { hh3cL2tpTunnelStatsEntry 20 }
+
+hh3cL2tpTStatsTotalSessions OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains the total number of sessions
+         that this tunnel has successfully connected through
+         to its tunnel peer since this tunnel was created."
+    ::= { hh3cL2tpTunnelStatsEntry 21 }
+
+hh3cL2tpTStatsFailedSessions OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains the total number of sessions
+         that were initiated but failed to reach the
+         established phase."
+    ::= { hh3cL2tpTunnelStatsEntry 22 }
+
+hh3cL2tpTStatsActiveSessions OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains the total number of sessions
+         in the established state for this tunnel."
+    ::= { hh3cL2tpTunnelStatsEntry 23 }
+
+hh3cL2tpTUpOrDownTrapOid OBJECT IDENTIFIER ::= { hh3cL2tpObjects 5 }
+
+hh3cL2tpTUpOrDownLocalTID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved local tunnel ID of trap information."
+    ::= { hh3cL2tpTUpOrDownTrapOid 1 }
+
+hh3cL2tpTUpOrDownTRemoteName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..31))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved peer name of trap information."
+    ::= { hh3cL2tpTUpOrDownTrapOid 2 }
+
+hh3cL2tpTUpOrDownTPeerIPAdd OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved peer IP address of trap information."
+    ::= { hh3cL2tpTUpOrDownTrapOid 3 }
+
+hh3cL2tpTUpOrDownTStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        established(1),
+                        stopping(2)
+                        }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved tunnel status of trap information."
+    ::= { hh3cL2tpTUpOrDownTrapOid 4 }
+
+hh3cL2tpTUpOrDownTDownReason OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..63))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved tunnel down reason of trap information."
+    ::= { hh3cL2tpTUpOrDownTrapOid 5 }
+
+hh3cL2tpTUpOrDownRemoteTID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved remote tunnel ID of trap information."
+    ::= { hh3cL2tpTUpOrDownTrapOid 6 }
+
+hh3cL2tpTUpOrDownSessCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved session count of trap information."
+    ::= { hh3cL2tpTUpOrDownTrapOid 7 }
+
+hh3cL2tpTUpOrDownTrap OBJECT IDENTIFIER  ::= { hh3cL2tpObjects 6 }
+
+hh3cL2tpTUpOrDownTrapPrefix OBJECT IDENTIFIER  ::= { hh3cL2tpTUpOrDownTrap 0 }
+
+hh3cL2tpTUpOrDown NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cL2tpTUpOrDownLocalTID,
+        hh3cL2tpTUpOrDownTRemoteName,
+        hh3cL2tpTUpOrDownTPeerIPAdd,
+        hh3cL2tpTUpOrDownTStatus,
+        hh3cL2tpTUpOrDownTDownReason,
+        hh3cL2tpTUpOrDownRemoteTID,
+        hh3cL2tpTUpOrDownSessCount
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when an L2TP tunnel becomes up or down
+         on the device."
+    ::= { hh3cL2tpTUpOrDownTrapPrefix 1 }
+
+hh3cL2tpSessionFailTrapOid OBJECT IDENTIFIER ::= { hh3cL2tpObjects 7 }
+
+hh3cL2tpSessFailChassisID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved chassis ID of trap information."
+    ::= { hh3cL2tpSessionFailTrapOid 1 }
+
+hh3cL2tpSessFailSlotID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved slot ID of trap information."
+    ::= { hh3cL2tpSessionFailTrapOid 2 }
+
+hh3cL2tpSessFailLocalTID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved local tunnel ID of trap information."
+    ::= { hh3cL2tpSessionFailTrapOid 3 }
+
+hh3cL2tpSessFailLocalSID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved local session ID of trap information."
+    ::= { hh3cL2tpSessionFailTrapOid 4 }
+
+hh3cL2tpSessFailPeerIPAdd OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved peer IP address of trap information."
+    ::= { hh3cL2tpSessionFailTrapOid 5 }
+
+hh3cL2tpSessFailLocalIPAdd OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved local IP address of trap information."
+    ::= { hh3cL2tpSessionFailTrapOid 6 }
+
+hh3cL2tpSessionFailTrap OBJECT IDENTIFIER  ::= { hh3cL2tpObjects 8 }
+
+hh3cL2tpSessionFailTrapPrefix OBJECT IDENTIFIER  ::= { hh3cL2tpSessionFailTrap 0 }
+
+hh3cL2tpSessionFail NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cL2tpSessFailChassisID,
+        hh3cL2tpSessFailSlotID,
+        hh3cL2tpSessFailLocalTID,
+        hh3cL2tpSessFailLocalSID,
+        hh3cL2tpSessFailPeerIPAdd,
+        hh3cL2tpSessFailLocalIPAdd
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when an L2TP session failed to be added
+         on the device."
+    ::= { hh3cL2tpSessionFailTrapPrefix 1 }
 
 END

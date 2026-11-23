@@ -21,24 +21,6 @@ use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
 
-function print_error($text)
-{
-    if (Laravel::isCli()) {
-        c_echo('%r' . $text . "%n\n");
-    } else {
-        echo '<div class="alert alert-danger"><i class="fa fa-fw fa-exclamation-circle" aria-hidden="true"></i> ' . $text . '</div>';
-    }
-}
-
-function print_message($text)
-{
-    if (Laravel::isCli()) {
-        c_echo('%g' . $text . "%n\n");
-    } else {
-        echo '<div class="alert alert-success"><i class="fa fa-fw fa-check-circle" aria-hidden="true"></i> ' . $text . '</div>';
-    }
-}
-
 function get_sensor_rrd_name($device, $sensor)
 {
     // For IPMI, sensors tend to change order, and there is no index, so we prefer to use the description as key here.
@@ -52,15 +34,6 @@ function get_sensor_rrd_name($device, $sensor)
 function get_port_rrdfile_path($hostname, $port_id, $suffix = '')
 {
     return Rrd::name($hostname, Rrd::portName($port_id, $suffix));
-}
-
-function ifclass($ifOperStatus, $ifAdminStatus)
-{
-    // fake a port model
-    return \LibreNMS\Util\Url::portLinkDisplayClass((object) [
-        'ifOperStatus' => $ifOperStatus instanceof \LibreNMS\Enum\IfOperStatus ? $ifOperStatus : \LibreNMS\Enum\IfOperStatus::tryFrom($ifOperStatus),
-        'ifAdminStatus' => $ifAdminStatus instanceof \LibreNMS\Enum\IfOperStatus ? $ifAdminStatus : \LibreNMS\Enum\IfOperStatus::tryFrom($ifAdminStatus),
-    ]);
 }
 
 /**
@@ -228,36 +201,6 @@ function get_port_id($ports_mapped, $port, $port_association_mode)
 }
 
 /**
- * Get alert_rules sql filter by minimal severity
- *
- * @param  string|int  $min_severity
- * @param  string  $alert_rules_name
- * @return string
- */
-function get_sql_filter_min_severity($min_severity, $alert_rules_name)
-{
-    $alert_severities = [
-        // alert_rules.status is enum('ok','warning','critical')
-        'ok' => 1,
-        'warning' => 2,
-        'critical' => 3,
-        'ok only' => 4,
-        'warning only' => 5,
-        'critical only' => 6,
-    ];
-    if (is_numeric($min_severity)) {
-        $min_severity_id = $min_severity;
-    } elseif (! empty($min_severity)) {
-        $min_severity_id = $alert_severities[$min_severity];
-    }
-    if (isset($min_severity_id)) {
-        return " AND `$alert_rules_name`.`severity` " . ($min_severity_id > 3 ? '' : '>') . '= ' . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
-    }
-
-    return '';
-}
-
-/**
  * Converts fahrenheit to celsius (with 2 decimal places)
  * if $scale is not fahrenheit, it assumes celsius and  returns the value
  *
@@ -385,15 +328,6 @@ function set_numeric($value, $default = 0)
     }
 
     return $value;
-}
-
-function get_vm_parent_id($device)
-{
-    if (empty($device['hostname'])) {
-        return false;
-    }
-
-    return dbFetchCell('SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?', [$device['hostname'], $device['hostname'] . '.' . LibrenmsConfig::get('mydomain')]);
 }
 
 /**

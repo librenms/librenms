@@ -34,19 +34,22 @@ class Submenu extends Component
     }
 
     /**
-     * Build a device tab url, moving any query string out of the vars route parameter
+     * Build a link for a device tab's selected view.
      */
     public function link(string $url): string
     {
         $parsed_url = parse_url($url);
         parse_str($parsed_url['query'] ?? '', $query);
 
-        return route('device', [
+        $view = $parsed_url['path'] ?? '';
+        if ($this->currentTab === 'ports' && $view === 'portsecurity') {
+            return route('device.ports.security', ['device' => $this->deviceId] + $query);
+        }
+
+        return route("device.$this->currentTab", [
             'device' => $this->deviceId,
-            'tab' => $this->currentTab,
-            'vars' => $parsed_url['path'] ?? '',
-            ...$query,
-        ]);
+            'view' => $view === '' ? null : $view,
+        ] + $query);
     }
 
     /**

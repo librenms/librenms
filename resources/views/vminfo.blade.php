@@ -13,7 +13,7 @@
             <x-slot:table>
                 <div class="table-responsive">
                     <table id="vminfo" class="table table-hover table-condensed table-striped"
-                           data-url="{{ route('table.vminfo') }}">
+                           data-url="{{ route('table.vminfo') }}" data-export-url="{{ route('table.vminfo.export') }}">
                         <thead>
                             <tr>
                                 <th data-column-id="deviceid" data-visible="false">{{ __('Device Id') }}</th>

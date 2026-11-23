@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (SEQUENCE OF type case)
 SIXNET-MIB DEFINITIONS ::= BEGIN
 
 --
@@ -299,7 +300,7 @@ SxRingIndex ::= TEXTUAL-CONVENTION
     SYNTAX          Integer32 (1..2147483647)
 
 sxRingTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF sxRingEntry
+    SYNTAX      SEQUENCE OF SxRingEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION

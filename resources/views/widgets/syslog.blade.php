@@ -29,7 +29,7 @@
                     level: @json($level)
                 };
             },
-            url: "{{ url('/ajax/table/syslog') }}"
+            url: "{{ route('table.syslog') }}"
         });
 
         $('#syslog_container-{{ $id }}').on('refresh', function (event) {

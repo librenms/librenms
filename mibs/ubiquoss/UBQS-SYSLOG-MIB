@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP)
 -- *****************************************************************
 -- UBQS-SYSLOG-MIB.mib:  Ubiquoss syslog MIB file
 --
@@ -333,13 +334,6 @@ ubiSyslogMIBGroups      	OBJECT IDENTIFIER ::= { ubiSyslogMIBConformance 2 }
 
  
 -- units of conformance
-	syslogMIBGroup OBJECT-GROUP
-        OBJECTS {      
-        	-- TODO  
-           		}
-    	STATUS          current
-    	DESCRIPTION
-        	"A collection of objects providing the syslog MIB."
-    	::= { ubiSyslogMIBGroups 1 }     
+	syslogMIBGroup OBJECT IDENTIFIER ::= { ubiSyslogMIBGroups 1 }     
         
 END
