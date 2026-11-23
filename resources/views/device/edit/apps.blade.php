@@ -9,7 +9,7 @@
                 'deviceId' => $device->device_id,
                 'canUpdate' => $canUpdate,
             ]))">
-            <x-panel class="tw:mb-0 tw:max-w-5xl tw:mx-auto">
+            <x-panel>
                 <x-slot name="heading" class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3">
                     <div>
                         <h3 class="panel-title">{{ __('Applications') }}</h3>
@@ -43,7 +43,9 @@
                                     <span class="text-blue-600 tw:dark:text-blue-400">({{ __('Manual') }})</span>
                                 </template>
                             </x-toggle>
-                            <a x-if="app.docs" target="_blank" :href="app.docs" title="{{ __('Docs') }}" aria-label="{{ __('Docs') }}" class="tw:ml-auto tw:shrink-0"><i class="fa fa-book"></i></a>
+                            <template x-if="app.docs">
+                                <a target="_blank" :href="app.docs" title="{{ __('Docs') }}" aria-label="{{ __('Docs') }}" class="tw:ml-auto tw:shrink-0"><i class="fa fa-book"></i></a>
+                            </template>
                         </div>
                     </template>
                 </div>
@@ -61,6 +63,7 @@
                 canUpdate: config.canUpdate,
                 search: '',
                 enabledOnly: false,
+                pending: {},
 
                 get enabledCount() {
                     return this.apps.filter((app) => app.enabled).length;
@@ -75,9 +78,20 @@
                     );
                 },
 
+                isPending(key) {
+                    return this.pending[key] === true;
+                },
+
                 toggle(event, type) {
                     const enabled = event.target.checked;
                     const app = this.apps.find((app) => app.type === type);
+                    const key = 'toggle.' + type;
+                    if (this.isPending(key)) {
+                        event.target.checked = ! enabled;
+                        return;
+                    }
+
+                    this.pending[key] = true;
 
                     axios.put(route('device.edit.apps.update', {device: config.deviceId, type}), {enabled})
                         .then((response) => {
@@ -87,7 +101,8 @@
                         .catch((error) => {
                             event.target.checked = ! enabled;
                             toastr.error(error.response?.data?.message ?? '{{ __('Failed to update application') }}');
-                        });
+                        })
+                        .finally(() => delete this.pending[key]);
                 },
             }));
         });
