@@ -196,6 +196,6 @@ class FaultsMaintenanceTest extends InMemoryDbTestCase
             ->assertOk()
             ->json('rows');
 
-        return array_map('intval', array_values(array_column((array) $rows, 'alert_id')));
+        return array_map(intval(...), array_values(array_column((array) $rows, 'alert_id')));
     }
 }
