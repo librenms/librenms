@@ -58,7 +58,11 @@ class Hytera extends OS
      */
     public static function hexToFloat(string $number, int $decimals): ?string
     {
-        $number = str_replace('"', '', $number);
+        // only surrounding quotes, raw bytes can contain a quote
+        if (strlen($number) != 4 && strlen($number) >= 2 && $number[0] == '"' && $number[-1] == '"') {
+            $number = substr($number, 1, -1);
+        }
+
         $hex = str_replace(' ', '', $number);
         if (strlen($number) == 4) {
             $bytes = $number;

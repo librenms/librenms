@@ -27,6 +27,9 @@ final class HyteraTest extends TestCase
             'zero' => ['00 00 00 00', '0.00'],
             'negative' => ['00 00 48 C1', '-12.50'],
             'raw bytes' => ["\x00\x00\xC0\x41", '24.00'],
+            'raw bytes with a quote' => ["\x00\x00\x22\x42", '40.50'],
+            'quoted raw bytes with a quote' => ["\"\x00\x00\x22\x42\"", '40.50'],
+            'raw bytes between quotes' => ["\x22\x00\x00\x22", number_format(unpack('g', "\x22\x00\x00\x22")[1], 2, '.', '')],
             'too short' => ['00 C0 41', null],
             'not hex' => ['00 00 G0 41', null],
         ];

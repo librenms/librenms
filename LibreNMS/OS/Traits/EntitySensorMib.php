@@ -169,6 +169,11 @@ trait EntitySensorMib
         $divisorExponent = max(0, -$exponent) + (is_numeric($precision) && $precision > 0 ? (int) $precision : 0);
         $multiplierExponent = max(0, $exponent);
 
+        // the same ratio with smaller factors
+        $common = min($divisorExponent, $multiplierExponent);
+        $divisorExponent -= $common;
+        $multiplierExponent -= $common;
+
         if ($divisorExponent > 18 || $multiplierExponent > 9) {
             return null;
         }
