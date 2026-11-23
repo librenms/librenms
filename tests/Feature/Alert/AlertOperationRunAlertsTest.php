@@ -35,8 +35,8 @@ use App\Models\AlertRule;
 use App\Models\AlertTransport;
 use App\Models\Device;
 use App\Models\Eventlog;
-use App\Models\Processor;
 use App\Models\Port;
+use App\Models\Processor;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -763,12 +763,12 @@ final class AlertOperationRunAlertsTest extends TestCase
         $this->assertSame(0, (int) $recovered->fresh()->open);
     }
 
-    public function testFullRecoveryDoesNotResendAfterIntervalContinue(): void
+    public function testFullRecoveryIgnoresLegacyRuleTimingAndNotifiesOnce(): void
     {
         $context = $this->makeActiveAlert([
             ['type' => 'api', 'start' => 0, 'dur' => 3600],
         ]);
-        $context['rule']->update(['extra' => ['interval' => 3600]]);
+        $context['rule']->update(['extra' => ['count' => 1, 'delay' => 3600, 'interval' => 3600]]);
 
         $fault = AlertFault::query()
             ->where('rule_id', $context['rule']->id)
@@ -780,7 +780,7 @@ final class AlertOperationRunAlertsTest extends TestCase
             'alerted' => AlertState::ACTIVE,
         ]);
 
-        $recoveredLog = AlertLog::create([
+        AlertLog::create([
             'rule_id' => $context['rule']->id,
             'device_id' => $context['device']->device_id,
             'fault_id' => $fault->id,
@@ -808,27 +808,8 @@ final class AlertOperationRunAlertsTest extends TestCase
         });
         $runAlerts->runAlerts();
 
-        $this->assertEmpty(
-            array_filter($objs, fn ($obj) => (int) $obj['state'] === AlertState::RECOVERED),
-            'Interval gate must hold the recovery in the main loop, not a second dispatcher'
-        );
-        $this->assertSame(1, (int) $fault->fresh()->open);
-        $this->assertDatabaseHas('alerts', [
-            'rule_id' => $context['rule']->id,
-            'device_id' => $context['device']->device_id,
-            'state' => AlertState::RECOVERED,
-            'open' => 1,
-            'alerted' => AlertState::ACTIVE,
-        ]);
-
-        $details = $recoveredLog->fresh()->details;
-        $details['interval'] = time() - 10000;
-        $recoveredLog->details = $details;
-        $recoveredLog->save();
-
-        $runAlerts->runAlerts();
-
-        $this->assertCount(1, array_filter($objs, fn ($obj) => (int) $obj['state'] === AlertState::RECOVERED));
+        $this->assertCount(1, $objs);
+        $this->assertSame(AlertState::RECOVERED, (int) $objs[0]['state']);
         $this->assertSame(0, (int) $fault->fresh()->open);
         $this->assertDatabaseHas('alerts', [
             'rule_id' => $context['rule']->id,
@@ -837,6 +818,9 @@ final class AlertOperationRunAlertsTest extends TestCase
             'open' => 0,
             'alerted' => AlertState::RECOVERED,
         ]);
+
+        $runAlerts->runAlerts();
+        $this->assertCount(1, $objs);
     }
 
     public function testRecoveredAlertWithZeroedAlertedStillSendsWhenFaultWasNotified(): void
