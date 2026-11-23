@@ -27,8 +27,8 @@
 namespace LibreNMS\OS;
 
 use App\Models\Sensor;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
+use LibreNMS\Util\UserFuncHelper;
 use SnmpQuery;
 
 class AristaEos extends Shared\Arista
@@ -57,16 +57,18 @@ class AristaEos extends Shared\Arista
      */
     protected function entitySensor(Sensor $sensor, array $entry): ?Sensor
     {
-        // 0.1 µW to dBm, there is no dBm value for no power
-        $toDbm = fn ($value, int $precision) => $value > 0 ? round(10 * log10($value / 10000), $precision) : null;
+        // DOM power is reported in 0.1 µW, polling converts it the same way
+        $toDbm = fn ($value) => UserFuncHelper::apply('uw_to_dbm', $value / 10);
+        $limitDbm = fn ($value) => is_numeric($dbmValue = $toDbm($value)) ? round($dbmValue, 2) : null;
         $dbm = $sensor->sensor_class == 'power' && preg_match('/DOM [RT]x Power/i', $sensor->sensor_descr);
 
         if ($dbm) {
             $sensor->fill([
                 'sensor_class' => 'dbm',
-                'sensor_current' => $toDbm($entry['entPhySensorValue'] ?? null, 3),
-                'sensor_divisor' => 1,
+                'sensor_current' => $toDbm($entry['entPhySensorValue'] ?? 0),
+                'sensor_divisor' => 10,
                 'sensor_multiplier' => 1,
+                'user_func' => 'uw_to_dbm',
             ]);
         }
 
@@ -79,7 +81,7 @@ class AristaEos extends Shared\Arista
         ] as $limit => $oid) {
             $value = $thresholds[$oid] ?? null;
             if (is_numeric($value) && abs($value) != 1000000000) {
-                $sensor->$limit = $dbm ? $toDbm($value, 2) : $value * $sensor->sensor_multiplier / $sensor->sensor_divisor;
+                $sensor->$limit = $dbm ? $limitDbm($value) : $value * $sensor->sensor_multiplier / $sensor->sensor_divisor;
             }
         }
 
@@ -100,21 +102,5 @@ class AristaEos extends Shared\Arista
         }
 
         return $sensor;
-    }
-
-    /**
-     * DOM power is reported in 0.1 µW
-     */
-    public function pollSensors(Collection $sensors): array
-    {
-        $values = parent::pollSensors($sensors);
-
-        foreach ($sensors->where('sensor_class', 'dbm') as $sensor) {
-            if (isset($values[$sensor->sensor_id]) && $values[$sensor->sensor_id] > 0) {
-                $values[$sensor->sensor_id] = round(10 * log10($values[$sensor->sensor_id] / 10000), 3);
-            }
-        }
-
-        return $values;
     }
 }
