@@ -1,0 +1,136 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "nvidia",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "nvidia",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "8",
+                    "app_instance": "",
+                    "data": "{\"gpus\":[0]}",
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "0_bar1",
+                    "value": 13,
+                    "value_prev": null,
+                    "app_type": "nvidia"
+                },
+                {
+                    "metric": "0_dbecc",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nvidia"
+                },
+                {
+                    "metric": "0_dec",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nvidia"
+                },
+                {
+                    "metric": "0_enc",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nvidia"
+                },
+                {
+                    "metric": "0_fb",
+                    "value": 531,
+                    "value_prev": null,
+                    "app_type": "nvidia"
+                },
+                {
+                    "metric": "0_mclk",
+                    "value": 405,
+                    "value_prev": null,
+                    "app_type": "nvidia"
+                },
+                {
+                    "metric": "0_mem",
+                    "value": 16,
+                    "value_prev": null,
+                    "app_type": "nvidia"
+                },
+                {
+                    "metric": "0_pci",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nvidia"
+                },
+                {
+                    "metric": "0_pclk",
+                    "value": 300,
+                    "value_prev": null,
+                    "app_type": "nvidia"
+                },
+                {
+                    "metric": "0_pviol",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nvidia"
+                },
+                {
+                    "metric": "0_pwr",
+                    "value": 12,
+                    "value_prev": null,
+                    "app_type": "nvidia"
+                },
+                {
+                    "metric": "0_rxpci",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nvidia"
+                },
+                {
+                    "metric": "0_sbecc",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nvidia"
+                },
+                {
+                    "metric": "0_sm",
+                    "value": 8,
+                    "value_prev": null,
+                    "app_type": "nvidia"
+                },
+                {
+                    "metric": "0_temp",
+                    "value": 34,
+                    "value_prev": null,
+                    "app_type": "nvidia"
+                },
+                {
+                    "metric": "0_tviol",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nvidia"
+                },
+                {
+                    "metric": "0_txpci",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "nvidia"
+                }
+            ]
+        }
+    }
+}

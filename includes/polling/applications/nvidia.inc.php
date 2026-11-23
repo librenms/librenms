@@ -75,4 +75,7 @@ foreach ($gpuArray as $index => $gpu) {
 }
 $sm_average = ($sm_total ? ($sm_total / count($gpuArray)) : 0);
 
+// the index of each GPU is the last part of its rrd name, the graphs draw these GPUs
+$app->data = ['gpus' => array_keys($metrics)];
+
 update_application($app, $gpus, $metrics, $sm_average);
