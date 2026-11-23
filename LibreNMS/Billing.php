@@ -10,6 +10,7 @@ use App\Models\BillHistory;
 use DateTime;
 use DateTimeInterface;
 use DateTimeZone;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use LibreNMS\Util\Number;
@@ -94,8 +95,10 @@ class Billing
     /**
      * Blend the current 95th-percentile rate with a trend from the previous
      * three billing cycles, weighted by complete days elapsed in this cycle.
+     *
+     * @param  Collection<int, BillHistory>|null  $history  Preloaded CDR history, ordered by end date and ID descending.
      */
-    public static function getPredictedCdrUsage(Bill $bill): float
+    public static function getPredictedCdrUsage(Bill $bill, ?Collection $history = null): float
     {
         if (! $bill->isCdr()) {
             throw new InvalidArgumentException('A CDR bill is required.');
@@ -106,13 +109,19 @@ class Billing
         $currentStart = new DateTime($from);
         $currentEnd = new DateTime($to)->modify('+1 second');
         $oldestStart = new DateTime(self::getDates($bill->bill_day, 3, $now)[0]);
-        $history = $bill->history()
-            ->whereRaw('LOWER(bill_type) = ?', ['cdr'])
-            ->where('bill_dateto', '>=', $oldestStart->format('Y-m-d H:i:s'))
-            ->where('bill_dateto', '<', min($currentStart, $now)->format('Y-m-d H:i:s'))
-            ->orderByDesc('bill_dateto')
-            ->orderByDesc('bill_hist_id')
-            ->get(['bill_dateto', 'rate_95th']);
+        $oldestEnd = $oldestStart->format('Y-m-d H:i:s');
+        $latestEnd = min($currentStart, $now)->format('Y-m-d H:i:s');
+        if ($history === null) {
+            $history = $bill->history()
+                ->whereRaw('LOWER(bill_type) = ?', ['cdr'])
+                ->where('bill_dateto', '>=', $oldestEnd)
+                ->where('bill_dateto', '<', $latestEnd)
+                ->orderByDesc('bill_dateto')
+                ->orderByDesc('bill_hist_id')
+                ->get(['bill_dateto', 'rate_95th']);
+        } else {
+            $history = $history->filter(fn (BillHistory $row) => $row->bill_dateto >= $oldestEnd && $row->bill_dateto < $latestEnd);
+        }
 
         $points = [];
         $seenCycles = [];
