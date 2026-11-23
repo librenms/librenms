@@ -99,6 +99,8 @@ return [
             ],
             'CheckRrdcachedConnectivity' => [
                 'fail_socket' => ':socket does not exist. The rrdcached connectivity test failed.',
+                'fail_socket_connect' => 'Cannot connect to rrdcached socket :socket as user :user: :error',
+                'fix_socket_connect' => 'Make sure rrdcached is running and the group :group can read and write the socket: rrdcached options "-s :group -m 0660" before -l (SOCKGROUP and SOCKMODE on Debian and Ubuntu)',
                 'fail_port' => 'Cannot connect to rrdcached server :server on port :port',
                 'ok' => 'Connected to rrdcached',
             ],

@@ -31,6 +31,24 @@ use LibreNMS\Util\CiHelper;
 
 final class CiHelperTest extends TestCase
 {
+    public function testCiReportsPhpunitIssuesWithoutStoppingOnDefects(): void
+    {
+        $this->expectOutputRegex('/^(?!.*(?:--testdox|--stop-on-defect)).*--display-all-issues/m');
+
+        $this->artisan('dev:check', ['check' => 'ci', '--commands' => true, '--full' => true])
+            ->assertExitCode(500);
+    }
+
+    public function testLocalChecksUseTestDox(): void
+    {
+        $helper = new CiHelper();
+        $helper->setFlags(['commands' => true]);
+
+        $this->expectOutputRegex('/--testdox/');
+
+        $helper->checkUnit();
+    }
+
     public function testSetFlags(): void
     {
         $helper = new CiHelper();

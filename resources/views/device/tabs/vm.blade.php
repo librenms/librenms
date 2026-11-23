@@ -11,7 +11,7 @@
                 <x-slot:table>
                     <div class="table-responsive">
                         <table id="vminfo" class="table table-hover table-condensed table-striped"
-                               data-url="{{ route('table.vminfo') }}">
+                               data-url="{{ route('table.vminfo') }}" data-export-url="{{ route('table.vminfo.export') }}">
                             <thead>
                                 <tr>
                                     <th data-column-id="vmwVmDisplayName" data-order="asc">{{ __('VM Name') }}</th>
@@ -36,7 +36,7 @@
 <script>
     var filter = @js($data['filter']);
 
-    var grid = $("#vminfo").bootgrid({
+    var grid = bootgridWithExport($("#vminfo"), {
         ajax: true,
         rowCount: [50, 100, 250, -1],
         templates: {

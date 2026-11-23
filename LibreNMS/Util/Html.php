@@ -33,42 +33,20 @@ use LibreNMS\Enum\Severity;
 class Html
 {
     /**
-     * return icon and color for application state
+     * Icon classes (including a theme text color) and hover text for an application state.
+     * The icon is empty for an OK state.
      *
-     * @param  string  $app_state
-     * @return array
+     * @return array{icon: string, hover_text: string}
      */
-    public static function appStateIcon($app_state)
+    public static function appStateIcon(?string $app_state): array
     {
-        switch ($app_state) {
-            case 'OK':
-                $icon = '';
-                $color = '';
-                $hover_text = 'OK';
-                break;
-            case 'ERROR':
-                $icon = 'fa-close';
-                $color = '#cc1122';
-                $hover_text = 'Error';
-                break;
-            case 'LEGACY':
-                $icon = 'fa-warning';
-                $color = '#eebb00';
-                $hover_text = 'legacy Agent Script';
-                break;
-            case 'UNSUPPORTED':
-                $icon = 'fa-flash';
-                $color = '#ff9900';
-                $hover_text = 'Unsupported Agent Script Version';
-                break;
-            default:
-                $icon = 'fa-question';
-                $color = '#777777';
-                $hover_text = 'Unknown State';
-                break;
-        }
-
-        return ['icon' => $icon, 'color' => $color, 'hover_text' => $hover_text];
+        return match ($app_state) {
+            'OK' => ['icon' => '', 'hover_text' => 'OK'],
+            'ERROR' => ['icon' => 'fa-close text-danger', 'hover_text' => 'Error'],
+            'LEGACY' => ['icon' => 'fa-warning text-warning', 'hover_text' => 'legacy Agent Script'],
+            'UNSUPPORTED' => ['icon' => 'fa-flash text-warning', 'hover_text' => 'Unsupported Agent Script Version'],
+            default => ['icon' => 'fa-question text-muted', 'hover_text' => 'Unknown State'],
+        };
     }
 
     /**
@@ -123,9 +101,8 @@ class Html
             $graph_array_zoom['width'] = '400';
 
             $link_array = $graph_array;
-            $link_array['page'] = 'graphs';
             unset($link_array['height'], $link_array['width']);
-            $link = Url::generate($link_array);
+            $link = route('graphs', $link_array);
 
             $full_link = Url::overlibLink($link, Url::lazyGraphTag($graph_array), Url::graphTag($graph_array_zoom));
             $graph_data[] = $full_link;

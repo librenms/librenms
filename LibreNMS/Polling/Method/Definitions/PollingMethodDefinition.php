@@ -79,10 +79,17 @@ abstract class PollingMethodDefinition implements HasFieldSchema
      */
     public function formValues(array $settings): array
     {
-        return array_map(
-            fn (mixed $value): mixed => is_bool($value) ? ($value ? '1' : '0') : $value,
-            [...array_fill_keys(array_keys($this->fields()), ''), ...$settings],
-        );
+        $fields = $this->fields();
+        $values = [...array_fill_keys(array_keys($fields), ''), ...$settings];
+        foreach ($values as $key => $value) {
+            if (($fields[$key]->type ?? null) === 'checkbox') {
+                $values[$key] = (bool) $fields[$key]->castValue($value);
+            } elseif (is_bool($value)) {
+                $values[$key] = $value ? '1' : '0';
+            }
+        }
+
+        return $values;
     }
 
     /**

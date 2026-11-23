@@ -60,7 +60,7 @@ class PortPopupController
             'device' => $port->device,
             'label' => $port->getLabel(),
             'description' => $port->getDescription(),
-            'href' => \LibreNMS\Util\Url::portUrl($port),
+            'href' => route('device.port', ['device' => $port->device_id, 'port' => $port]),
             'graphs' => $graphs,
         ]);
     }

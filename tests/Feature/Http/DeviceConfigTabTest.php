@@ -269,7 +269,7 @@ class DeviceConfigTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'config']))
+            ->get(route('device.config', ['device' => $device]))
             ->assertOk()
             ->assertSee('data-config-backups', false)
             ->assertSee('window.LibreNMS.loadConfigHighlight()', false)

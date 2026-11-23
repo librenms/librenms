@@ -20,7 +20,7 @@
                     <tr @class(['danger' => $status === 'critical', 'warning' => $status === 'warning'])>
                         <td class="tw:text-right tw:text-gray-500">{{ $index + 1 }}</td>
                         <td>
-                            <a href="{{ route('device', ['device' => $sensor->device_id]) }}" class="tw:text-inherit tw:no-underline hover:tw:underline">
+                            <a href="{{ route('device.overview', ['device' => $sensor->device_id]) }}" class="tw:text-inherit tw:no-underline hover:tw:underline">
                                 {{ $sensor->device?->display ?? __('Unknown device') }}
                             </a>
                         </td>
@@ -51,7 +51,7 @@
             @foreach ($sensors as $row)
                 @php($sensor = $row['sensor'])
                 @php($status = $row['status'] ?? 'unknown')
-                @php($deviceUrl = route('device', ['device' => $sensor->device_id]))
+                @php($deviceUrl = route('device.overview', ['device' => $sensor->device_id]))
                 @php($graphType = $sensor->getGraphType())
                 @php($graphUrl = route('graphs', ['type' => $graphType, 'id' => $sensor->sensor_id]))
                 @php($graphVars = ['id' => $sensor->sensor_id])

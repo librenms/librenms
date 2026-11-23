@@ -42,13 +42,13 @@
             </tr>
             @if($show_services)
                 <tr>
-                    <td><a href="{{ url('services') }}">{{ __('Services') }}</a></td>
-                    <td><a href="{{ url('services') }}"><span>{{ $services['total'] }}</span></a></td>
+                    <td><a href="{{ route('services.index') }}">{{ __('Services') }}</a></td>
+                    <td><a href="{{ route('services.index') }}"><span>{{ $services['total'] }}</span></a></td>
                     <td><a href="{{ route('services.index', ['state' => 'ok']) }}"><span class="green">{{ $services['ok'] }}</span></a></td>
                     <td><a href="{{ route('services.index', ['state' => 'critical']) }}"><span class="red"> {{ $services['critical'] }}</span></a></td>
-                    <td><a href="{{ url('services/ignore=1/view=details') }}"><span class="blue"> {{ $services['ignored'] }}</span></a></td>
+                    <td><a href="{{ route('services.index', ['state' => 'ignored']) }}"><span class="blue"> {{ $services['ignored'] }}</span></a></td>
                     <td><span class="grey"> -</span></td>
-                    <td><a href="{{ url('services/disabled=1/view=details') }}"><span class="black"> {{ $services['disabled'] }}</span></a></td>
+                    <td><a href="{{ route('services.index', ['state' => 'disabled']) }}"><span class="black"> {{ $services['disabled'] }}</span></a></td>
                     @if($summary_errors)
                         <td><span class="grey"> -</span></td>
                     @endif
@@ -56,12 +56,12 @@
             @endif
             @if($show_sensors)
                 <tr>
-                    <td><a href="{{ url('health') }}">{{ __('Health') }}</a></td>
-                    <td><a href="{{ url('health') }}"><span>{{ $sensors['total'] }}</span></a></td>
-                    <td><a href="{{ url('health') }}"><span class="green"> {{ $sensors['ok'] }}</span></a></td>
-                    <td><a href="{{ url('health') }}"><span class="red"> {{ $sensors['critical'] }}</span></a></td>
+                    <td><a href="{{ route('sensor.index') }}">{{ __('Health') }}</a></td>
+                    <td><a href="{{ route('sensor.index') }}"><span>{{ $sensors['total'] }}</span></a></td>
+                    <td><a href="{{ route('sensor.index') }}"><span class="green"> {{ $sensors['ok'] }}</span></a></td>
+                    <td><a href="{{ route('sensor.index') }}"><span class="red"> {{ $sensors['critical'] }}</span></a></td>
                     <td><span class="grey"> -</span></td>
-                    <td><a href="{{ url('health') }}"><span class="black"> {{ $sensors['disable_notify'] }}</span></a></td>
+                    <td><a href="{{ route('sensor.index') }}"><span class="black"> {{ $sensors['disable_notify'] }}</span></a></td>
                     <td><span class="grey"> -</span></td>
                     @if($summary_errors)
                         <td><span class="grey"> -</span></td>

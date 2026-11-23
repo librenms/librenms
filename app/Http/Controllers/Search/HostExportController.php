@@ -37,6 +37,7 @@ use App\Models\UserPref;
 use Illuminate\Support\Enumerable;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
+use LibreNMS\Util\StringHelpers;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class HostExportController extends Controller
@@ -64,7 +65,7 @@ class HostExportController extends Controller
                 $hosts = $lookup->find($page->map(fn (object $row): HostKey => $query->hostKey((array) $row))->values()->all());
                 foreach ($hosts as $host) {
                     foreach ($this->rows($host, $macFormat) as $row) {
-                        fputcsv($output, array_map($this->neutralizeFormula(...), $row), ',', '"', '\\');
+                        fputcsv($output, array_map(StringHelpers::neutralizeCsvFormula(...), $row), ',', '"', '\\');
                     }
                 }
             };
@@ -109,14 +110,6 @@ class HostExportController extends Controller
             $row->location ? '' : $this->portText($host->viaPort()),
             $row->seen?->toDateTimeString(),
         ], $host->rows());
-    }
-
-    /**
-     * Port descriptions and device names come from the devices, a spreadsheet would run one that looks like a formula
-     */
-    private function neutralizeFormula(mixed $value): mixed
-    {
-        return is_string($value) && preg_match('/^[=+\-@\t\r]/', $value) ? "'" . $value : $value;
     }
 
     private function portText(?Port $port): string

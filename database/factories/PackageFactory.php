@@ -14,7 +14,7 @@ class PackageFactory extends Factory
             'device_id' => Device::factory(),
             'name' => $this->faker->word(),
             'manager' => $this->faker->randomElement(['deb', 'rpm', 'apk', 'pacman']),
-            'status' => 1,
+            'polling_method' => 'snmp',
             'version' => $this->faker->numerify('#.#.#'),
             'build' => $this->faker->numerify('##'),
             'arch' => $this->faker->randomElement(['amd64', 'x86_64', 'arm64']),

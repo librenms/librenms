@@ -44,7 +44,7 @@
                                 <a href="{{ route('devices', ['filter' => ['serviceTemplates.id' => ['eq' => $template->id]]]) }}">{{ $template->devices_count }}</a>
                             </td>
                             <td>
-                                <a href="{{ url("/device-groups/serviceTemplates=$template->id") }}">{{ $template->groups_count }}</a>
+                                <a href="{{ route('device-groups.index', ['serviceTemplates' => $template->id]) }}">{{ $template->groups_count }}</a>
                             </td>
                             <td>{{ __(ucfirst($template->type)) }}</td>
                             <td>{{ $template->type == 'dynamic' ? $template->getDeviceParser()->toSql(false) : '' }}</td>

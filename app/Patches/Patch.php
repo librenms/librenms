@@ -39,6 +39,7 @@ class Patch
 
     /**
      * @param  list<PatchFile>  $files
+     * @param  int  $skippedFileCount  Omitted changes in a freshly downloaded patch
      */
     public function __construct(
         public readonly int $pr,
@@ -49,6 +50,7 @@ class Patch
         public readonly string $author = '',
         public string $state = self::APPLIED,
         public string $appliedAt = '',
+        public readonly int $skippedFileCount = 0,
     ) {
     }
 

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Event;
 use Laravel\Horizon\MasterSupervisor;
 use Laravel\Horizon\ProvisioningPlan;
 use LibreNMS\Tests\TestCase;
+use LibreNMS\Util\SystemUser;
 use Mockery;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
@@ -48,7 +49,7 @@ final class SupervisorsTest extends TestCase
         LibrenmsConfig::set('distributed_poller_group', '0');
         $node = PollerCluster::factory()->worker()->create(['poller_groups' => '4', 'poller_workers' => 3]);
         // CommandStartingListener also runs, it rejects users other than the LibreNMS user
-        config(['librenms.node_id' => $node->node_id, 'librenms.user' => posix_getpwuid(posix_geteuid())['name']]);
+        config(['librenms.node_id' => $node->node_id, 'librenms.user' => SystemUser::name()]);
 
         Event::dispatch(new CommandStarting('horizon:status', new ArrayInput([]), new NullOutput));
         $this->assertSame(['poll'], config('horizon.defaults.supervisor-poll.queue'), 'other commands should not configure supervisors');

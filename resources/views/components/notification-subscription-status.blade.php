@@ -33,7 +33,7 @@
                                     if (subscription) {
                                         subscription.unsubscribe().then(function(success) {
                                             if (success) {
-                                                fetch('./push/unregister', {
+                                                fetch(route('push.unregister'), {
                                                     method: 'post',
                                                     headers: {
                                                         'Content-Type': 'application/json',

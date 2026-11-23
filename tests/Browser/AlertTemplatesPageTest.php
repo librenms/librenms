@@ -4,12 +4,10 @@ namespace LibreNMS\Tests\Browser;
 
 use App\Models\AlertRule;
 use App\Models\AlertTemplate;
-use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTruncation;
 use Laravel\Dusk\Browser;
 use LibreNMS\Tests\DuskTestCase;
 use PHPUnit\Framework\Attributes\Group;
-use Spatie\Permission\Models\Role;
 
 #[Group('browser')]
 final class AlertTemplatesPageTest extends DuskTestCase
@@ -21,7 +19,7 @@ final class AlertTemplatesPageTest extends DuskTestCase
 
     public function testEditPageSavesRulesChosenInSelect2(): void
     {
-        $user = $this->admin();
+        $user = $this->browserUser('admin');
         $template = AlertTemplate::factory()->create(['name' => 'Custom Template', 'template' => 'body']);
         $rule = AlertRule::factory()->create(['name' => 'Free Rule']);
         $usedRule = AlertRule::factory()->create(['name' => 'Unavailable Rule']);
@@ -45,7 +43,7 @@ final class AlertTemplatesPageTest extends DuskTestCase
 
     public function testConvertReplacesLegacySyntaxBeforeSaving(): void
     {
-        $user = $this->admin();
+        $user = $this->browserUser('admin');
         $template = AlertTemplate::factory()->create(['template' => '{if %state}up{/if} %hostname', 'title' => '%title']);
 
         $this->browse(function (Browser $browser) use ($user, $template): void {
@@ -62,14 +60,5 @@ final class AlertTemplatesPageTest extends DuskTestCase
 
         $this->assertSame('@if ($alert->state) up @endif  {{ $alert->hostname }}', $template->refresh()->template);
         $this->assertSame('{{ $alert->title }}', $template->title);
-    }
-
-    private function admin(): User
-    {
-        Role::findOrCreate('admin');
-        $user = User::factory()->create(['enabled' => 1]);
-        $user->assignRole('admin');
-
-        return $user;
     }
 }

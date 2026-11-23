@@ -32,7 +32,7 @@ use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Process;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Modules\Ipmi;
 use LibreNMS\OS;
 use LibreNMS\Tests\InMemoryDbTestCase;
@@ -97,11 +97,11 @@ EOT;
         $this->assertEquals(0.7, $sensors[2]->sensor_limit_low_warn);
         $this->assertTrue($module->dataExists($this->device));
 
-        $datastore = Mockery::mock(DataStorageInterface::class);
-        $datastore->shouldReceive('put')->once()->withArgs(fn ($device, $measurement, $tags, $fields) => $measurement == 'ipmi'
-            && $tags['rrd_name'] == ['sensor', 'temperature', 'ipmi', 'CPU Temp'] && $fields == ['sensor' => 47]);
-        $datastore->shouldReceive('put')->once()->withArgs(fn ($device, $measurement, $tags, $fields) => $measurement == 'ipmi'
-            && $tags['rrd_name'] == ['sensor', 'fanspeed', 'ipmi', 'FAN1'] && $fields == ['sensor' => 225]);
+        $datastore = Mockery::mock(WriteInterface::class);
+        $datastore->shouldReceive('write')->once()->withArgs(fn ($measurement, $fields, $tags) => $measurement == 'sensor'
+            && $tags == ['hostname' => $this->device->hostname, 'class' => 'temperature', 'type' => 'ipmi', 'descr' => 'CPU Temp'] && $fields == ['sensor' => 47]);
+        $datastore->shouldReceive('write')->once()->withArgs(fn ($measurement, $fields, $tags) => $measurement == 'sensor'
+            && $tags == ['hostname' => $this->device->hostname, 'class' => 'fanspeed', 'type' => 'ipmi', 'descr' => 'FAN1'] && $fields == ['sensor' => 225]);
 
         $module->poll($this->os(), $datastore);
 
@@ -191,7 +191,7 @@ EOT;
 
         $os = $this->os();
         $this->assertTrue($module->shouldPoll($os));
-        $module->poll($os, Mockery::mock(DataStorageInterface::class)->shouldIgnoreMissing());
+        $module->poll($os, Mockery::mock(WriteInterface::class)->shouldIgnoreMissing());
 
         Process::assertRanTimes(fn (PendingProcess $process) => in_array('sdr', (array) $process->command), 1);
         Process::assertDidntRun(fn (PendingProcess $process) => in_array('power', (array) $process->command));

@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Data\Graphing\GraphViewOptions;
 use App\Facades\LibrenmsConfig;
 use App\Models\Dashboard;
 use App\Models\Device;
@@ -124,11 +125,15 @@ class UserPreferencesController extends Controller implements HasMiddleware
             'temp_units' => 'required|in:default,f',
             'hide_dashboard_editor' => 'required|integer',
             'network_search_mac_format' => 'required|in:default,colon,dash,dot,bare',
+            'graph_renderer' => 'required|in:default,js',
+            // default forgets them
+            'graph_options' => $request->value === 'default' ? 'required' : 'required|array:' . implode(',', GraphViewOptions::PREFERENCES),
         ];
 
         $this->validate($request, [
             'pref' => ['required', Rule::in(array_keys($valid_prefs))],
             'value' => $valid_prefs[$request->pref] ?? 'required|integer',
+            ...($request->pref === 'graph_options' && is_array($request->value) ? GraphViewOptions::rules('value') : []),
         ]);
 
         $this->updatePreference($request->pref, $request->value);

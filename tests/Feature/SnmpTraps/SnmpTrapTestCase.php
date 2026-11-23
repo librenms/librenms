@@ -58,13 +58,18 @@ abstract class SnmpTrapTestCase extends TestCase
             $trap->shouldReceive('log')->once()->with(SimpleTemplate::parse($message, $template_variables), ...$call_args);
         }
 
-        $log_spy = \Log::spy();
+        // spy on the real logger so other channels (such as the eventlog) keep working
+        $log_spy = null;
+        if (! \Log::getFacadeRoot() instanceof Mockery\MockInterface) {
+            $log_spy = Mockery::spy(\Log::getFacadeRoot());
+            \Log::swap($log_spy);
+        }
 
         /** @var \LibreNMS\Snmptrap\Trap $trap */
         $this->assertTrue(Dispatcher::handle($trap), $failureMessage);
 
         // if the test set any log expectations, log_spy will be null
-        if ($log_spy != null) {
+        if ($log_spy !== null) {
             $log_spy->shouldNotHaveReceived('error');
             $log_spy->shouldNotHaveReceived('warning');
         }

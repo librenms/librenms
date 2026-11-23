@@ -10,7 +10,7 @@ class NetstatIpGraph extends DeviceGraph
 {
     public function getTitle(): string
     {
-        return $this->device()->display . ' :: IP NetStats';
+        return __('graph.device.netstat_ip.title', ['device' => $this->device()->display]);
     }
 
     public function getSeries(): array
@@ -19,13 +19,13 @@ class NetstatIpGraph extends DeviceGraph
         $outbound = new SeriesStyle(invert: true);
 
         return [
-            'ipForwDatagrams' => new DataSeries($metric, 'ipForwDatagrams', 'Fwd Datagrams'),
-            'ipInDelivers' => new DataSeries($metric, 'ipInDelivers', 'In Delivers'),
-            'ipInReceives' => new DataSeries($metric, 'ipInReceives', 'In Receives'),
-            'ipOutRequests' => new DataSeries($metric, 'ipOutRequests', 'Out Requests', style: $outbound),
-            'ipInDiscards' => new DataSeries($metric, 'ipInDiscards', 'In Discards'),
-            'ipOutDiscards' => new DataSeries($metric, 'ipOutDiscards', 'Out Discards', style: $outbound),
-            'ipOutNoRoutes' => new DataSeries($metric, 'ipOutNoRoutes', 'Out No Routes', style: $outbound),
+            'ipForwDatagrams' => new DataSeries($metric, 'ipForwDatagrams', __('graph.device.netstat_ip.forw_datagrams')),
+            'ipInDelivers' => new DataSeries($metric, 'ipInDelivers', __('graph.device.netstat_ip.in_delivers')),
+            'ipInReceives' => new DataSeries($metric, 'ipInReceives', __('graph.device.netstat_ip.in_receives')),
+            'ipOutRequests' => new DataSeries($metric, 'ipOutRequests', __('graph.device.netstat_ip.out_requests'), style: $outbound),
+            'ipInDiscards' => new DataSeries($metric, 'ipInDiscards', __('graph.device.netstat_ip.in_discards')),
+            'ipOutDiscards' => new DataSeries($metric, 'ipOutDiscards', __('graph.device.netstat_ip.out_discards'), style: $outbound),
+            'ipOutNoRoutes' => new DataSeries($metric, 'ipOutNoRoutes', __('graph.device.netstat_ip.out_no_routes'), style: $outbound),
         ];
     }
 

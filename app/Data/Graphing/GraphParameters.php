@@ -114,6 +114,14 @@ readonly class GraphParameters
         return $this->visibleElements[$element] ?? true;
     }
 
+    /**
+     * Drawn for the dark site style: requested, or the style of the session
+     */
+    public function isDark(): bool
+    {
+        return ($this->style ?: session('applied_site_style')) === 'dark';
+    }
+
     private function size(int $pixels): int
     {
         return max(1, min(self::MAX_SIZE, $pixels));

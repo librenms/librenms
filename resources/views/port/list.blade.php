@@ -2,7 +2,7 @@
 <template id="port-filter-template"><x-filter name="ports" :fields="$filterFields" id="port-filter" :hide="$hideFilter" :initial="$filter" /></template>
 
 <div class="table-responsive">
-    <table id="ports" class="table table-condensed table-hover table-striped" data-url="{{ route('table.ports') }}">
+    <table id="ports" class="table table-condensed table-hover table-striped" data-url="{{ route('table.ports') }}" data-export-url="{{ route('table.ports.export') }}">
         <thead>
         <tr>
             <th data-column-id="hostname" data-formatter="device">Device</th>
@@ -42,7 +42,7 @@
 
     var filter = @js($filter);
 
-    var grid = $("#ports").bootgrid({
+    var grid = bootgridWithExport($("#ports"), {
         ajax: true,
         rowCount: [25, 50, 100, 250, -1],
         converters: {

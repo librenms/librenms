@@ -175,14 +175,14 @@ class PortGroupPortsController extends Controller
             'ifDescr' => $port->ifDescr,
             'ifAlias' => $port->ifAlias,
             'ifSpeed' => $port->ifSpeed,
-            'url' => Url::portUrl($port),
+            'url' => route('device.port', ['device' => $port->device_id, 'port' => $port]),
             'link_class' => Url::portLinkDisplayClass($port),
             'ifAdminStatus' => $port->ifAdminStatus?->value,
             'ifOperStatus' => $port->ifOperStatus?->value,
             'deleted' => (bool) $port->deleted,
             'device_id' => $port->device_id,
             'device' => $port->device?->display,
-            'device_url' => $port->device ? Url::deviceUrl($port->device) : null,
+            'device_url' => $port->device ? route('device.overview', ['device' => $port->device]) : null,
             'member' => $membership === 'all' ? (bool) $port->getAttribute('member') : $membership === 'members',
         ];
     }
