@@ -116,10 +116,14 @@ class FaultsMaintenanceTest extends InMemoryDbTestCase
     public function testActiveDeviceGroupScheduleHidesFaults(): void
     {
         $fault = $this->makeFault();
-        $group = DeviceGroup::factory()->create();
+
+        // Explicit, deliberately different ids so the test cannot pass if the lookup
+        // mixes up the alert_schedulable_id parent key with the schedule_id key.
+        $group = DeviceGroup::factory()->create(['id' => 501]);
         $group->devices()->attach($fault->device_id);
 
         AlertSchedule::factory()->create([
+            'schedule_id' => 901,
             'start' => Carbon::now()->subHour(),
             'end' => Carbon::now()->addHour(),
             'behavior' => MaintenanceBehavior::SkipAlerts,
