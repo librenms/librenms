@@ -26,6 +26,7 @@ class UpsApcups extends ApplicationDefinition
 {
     public const string TYPE = 'ups-apcups';
     protected const ?string NAME = 'UPS apcups';
+    protected const ?string GRAPH_PREFIX = 'ups_apcups';
 
     protected const array GRAPHS = [
         'remaining' => 'Remaining time:',

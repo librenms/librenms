@@ -20,6 +20,7 @@ class PiHole extends ApplicationDefinition
 {
     public const string TYPE = 'pi-hole';
     protected const ?string NAME = 'Pi-hole';
+    protected const ?string GRAPH_PREFIX = 'pi_hole';
 
     protected const array GRAPHS = [
         'query_types' => 'Query Types',

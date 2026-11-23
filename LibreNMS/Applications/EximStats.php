@@ -26,6 +26,7 @@ class EximStats extends ApplicationDefinition
 {
     public const string TYPE = 'exim-stats';
     protected const ?string NAME = 'EXIM Stats';
+    protected const ?string GRAPH_PREFIX = 'exim_stats';
 
     protected const array GRAPHS = [
         'frozen' => 'Frozen',

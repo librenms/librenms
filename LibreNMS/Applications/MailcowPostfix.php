@@ -26,6 +26,7 @@ class MailcowPostfix extends ApplicationDefinition
 {
     public const string TYPE = 'mailcow-postfix';
     protected const ?string NAME = 'mailcow-dockerized postfix';
+    protected const ?string GRAPH_PREFIX = 'mailcow_postfix';
 
     protected const array GRAPHS = [
         'emails' => 'E-mail(s)',
