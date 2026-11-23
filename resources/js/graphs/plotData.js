@@ -1,4 +1,4 @@
-import { firstAfter } from './seriesData.js';
+import {firstAfter, percentileOf, shownPoints, sortedAverages} from './seriesData.js';
 
 /** @typedef {import('./seriesData.js').GraphSeries} GraphSeries */
 /** @typedef {import('./seriesData.js').Threshold} Threshold */
@@ -11,14 +11,22 @@ import { firstAfter } from './seriesData.js';
  * @property {'graph'|'fit'|'log'} scale as the graph defines, fitted to the data, or logarithmic
  * @property {'stepped'|'linear'|'smooth'} line_style how adjacent samples are connected
  * @property {boolean} trend a straight line fitted to what is shown of each series
+ * @property {boolean} percentile_lines the percentiles of the graph drawn for the series that draw them
+ * @property {number[]} hidden_percentiles percentiles of the graph left out of the legend, and not drawn
  */
 
 const PREVIOUS_DASH = [6, 4];
 const TREND_DASH = [2, 4];
 const THRESHOLD_DASH = [8, 4];
+const PERCENTILE_DASH = [3, 3];
 const MAX_TREND_POINTS = 1000; // past the data, to the end of the view
+// what drawing multiplies the values of a series by
+function drawFactor(series) {
+    return series.drawScale * (series.invert ? -1 : 1);
+}
+
 function drawnValues(series, values) {
-    const factor = series.drawScale * (series.invert ? -1 : 1);
+    const factor = drawFactor(series);
 
     return factor === 1 ? values : values.map((value) => (value === null ? null : value * factor));
 }
@@ -38,15 +46,15 @@ function withFirstInterval(values) {
 
 /**
  * The values of each point of the other times, null where they have none.
- * A point is the one whose interval covers the time.
+ * A point is the one whose interval covers the time, from the point before it, the first as long as the second.
  */
 function alignedTo(timestamps, others, values) {
-    const step = others.length > 1 ? others[1] - others[0] : Infinity;
+    const interval = (index) => (index > 0 ? others[index] - others[index - 1] : (others[1] ?? Infinity) - others[0]);
 
     return timestamps.map((time) => {
         const index = firstAfter(others, time - 1);
 
-        return index < others.length && others[index] - time < step ? values[index] : null;
+        return index < others.length && others[index] - time < interval(index) ? values[index] : null;
     });
 }
 
@@ -80,12 +88,13 @@ function trendOf(timestamps, values, { from, to }) {
     return (time) => start + slope * (time - from);
 }
 
-// Back to front: min to max ranges, fills, stacked areas from the top down, lines, thresholds, earlier lines, trends.
+// Back to front: min to max ranges, fills, stacked areas from the top down, lines, percentiles, thresholds, earlier lines, trends.
 // Layers depend only on which series there are and what is drawn, so new data can replace the old.
 // A range is two layers, its top and its bottom, the fill is between them.
 // Values get the drawn data {series, totals} of now and of the previous time, null without it.
-// A constant layer has the same value at every time.
-function layersFor(series, thresholds, { range: showRange, trend, mirror }, comparing) {
+// A constant layer has the same value at every time. A trend layer has the key of its series.
+// A percentile layer has the key of its series and the percentile, drawn level at the percentile of what is shown.
+function layersFor(series, percentileSeries, percentiles, thresholds, { range: showRange, trend, mirror }, comparing) {
     const stacked = series.filter((item) => item.stacked);
     const lines = series.filter((item) => ! item.stacked);
     const average = (item) => ({ series: data }) => drawnValues(data[item.key], data[item.key].avg);
@@ -122,6 +131,9 @@ function layersFor(series, thresholds, { range: showRange, trend, mirror }, comp
             values: ({ totals }) => totals[item.key],
         })).reverse(),
         ...lines.map((item) => ({ stroke: item.color, values: average(item) })),
+        ...percentileSeries.flatMap((item) => percentiles.map((percentile) => ({
+            stroke: item.percentileColor, dash: PERCENTILE_DASH, percentile: { key: item.key, percentile }, values: () => null,
+        }))),
         ...thresholds.flatMap((threshold) => thresholdLines(threshold, mirror).map((value) => ({
             stroke: threshold.color, dash: THRESHOLD_DASH, constant: value, values: () => null,
         }))),
@@ -131,7 +143,7 @@ function layersFor(series, thresholds, { range: showRange, trend, mirror }, comp
             previous: true,
             values: (now, previous) => (previous === null ? null : drawn(item, previous)),
         })),
-        ...(trend ? series : []).map((item) => ({ stroke: item.color, dash: TREND_DASH, trend: true, values: (now) => drawn(item, now) })),
+        ...(trend ? series : []).map((item) => ({ stroke: item.color, dash: TREND_DASH, trend: item.key, values: (now) => drawn(item, now) })),
     ];
 }
 
@@ -175,7 +187,12 @@ function restyled(item, { mirror, stacking }) {
 export function createPlotData(graph, { hidden, draw, thresholds, comparing }) {
     const shownSeries = graph.series.filter((item) => ! hidden.has(item.key) && ! item.legendOnly);
     const visible = shownSeries.map((item) => restyled(item, draw));
-    const layers = layersFor(visible, thresholds, draw, comparing);
+    // legend only series, such as totals, draw their percentiles too, those of hidden legend columns are left out
+    const percentileSeries = draw.percentile_lines === false ? [] : graph.series
+        .filter((item) => item.percentileColor && ! hidden.has(item.key))
+        .map((item) => restyled(item, draw));
+    const percentiles = graph.percentiles.filter((percentile) => ! draw.hidden_percentiles.includes(percentile));
+    const layers = layersFor(visible, percentileSeries, percentiles, thresholds, draw, comparing);
     const stackedKeys = visible.filter((item) => item.stacked).map((item) => item.key);
 
     const drawnData = (source) => {
@@ -227,15 +244,29 @@ export function createPlotData(graph, { hidden, draw, thresholds, comparing }) {
             item.key, alignedTo(times, before.timestamps, item.avg),
         ]));
 
+        // in the units of each series, a stacked one its own share of the total its line is drawn at
+        const trends = Object.fromEntries(layers.filter((layer) => layer.trend !== undefined).map((layer) => {
+            const line = trendOf(source.timestamps, now.series[layer.trend]?.avg ?? [], shown);
+
+            return [layer.trend, line === null ? empty : times.map((time) => line(time))];
+        }));
+
+        const [start, end] = shownPoints(source.timestamps, shown);
         const columns = [times, ...layers.map((layer) => {
             if (layer.constant !== undefined) {
                 return times.map(() => layer.constant);
+            }
+            if (layer.percentile !== undefined) {
+                const item = now.series[layer.percentile.key];
+                const value = item === undefined ? null : percentileOf(sortedAverages(item, start, end), layer.percentile.percentile);
+
+                return value === null ? empty : times.map(() => value * drawFactor(item));
             }
             const values = layer.values(now, then);
             if (values === null) {
                 return empty;
             }
-            if (layer.trend) {
+            if (layer.trend !== undefined) {
                 const line = trendOf(source.timestamps, values, shown);
 
                 return line === null ? empty : times.map((time) => line(time));
@@ -245,7 +276,7 @@ export function createPlotData(graph, { hidden, draw, thresholds, comparing }) {
             return (draw.line_style ?? 'stepped') === 'stepped' ? withFirstInterval(samples) : samples;
         })];
 
-        return { columns, earlier };
+        return { columns, earlier, trends };
     }
 
     return { layers, dataFor };

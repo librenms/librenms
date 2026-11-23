@@ -283,6 +283,50 @@ legacy graphs; graphs drawn from other datastores ignore them.
 For example, a percentage graph can use `scaleMin: 0, scaleMax: 100,
 scaleRigid: true`. See `app/Data/Graphing/GraphOptions.php` for all options.
 
+### Percentiles and rolling averages
+
+Percentiles summarize a series, like its min, max and average.
+`GraphOptions::percentiles` adds a legend column for each one to every row.
+A series with `SeriesStyle::percentileLines` also draws them as dashed lines
+in its color; a legend only series, such as a total, uses the percentile
+color of the theme. Percentiles leave out missing samples.
+
+`SeriesStyle::rollingAverages` adds lines averaging the series over each
+hour, day and week, each with its own legend row. The daily lines need a graph
+covering at least 36 hours and the weekly lines at least 8 days. They take
+the next colors of the palette and their labels do not name the series, so
+use them on graphs of one series.
+
+The legacy `generic_stats` graphs are both, with the `stats` palette:
+
+```php
+public function getSeries(): array
+{
+    return [
+        'offset' => new DataSeries($this->metric(), 'offset', 'Offset', 's',
+            style: new SeriesStyle(fill: true, rollingAverages: true, percentileLines: true)),
+    ];
+}
+
+protected function options(): GraphOptions
+{
+    return new GraphOptions(palette: 'stats', percentiles: GraphOptions::statsPercentiles());
+}
+```
+
+`GraphOptions::statsPercentiles()` is the 25th, 50th and 75th percentile,
+or none when `graph_stat_percentile_disable` is set. Traffic graphs use
+`[LibrenmsConfig::get('percentile_value', 95)]`.
+
+Image graphs leave the lines out of graphs 25 pixels tall or less. The browser
+chart computes percentiles from the points in view, so they follow the
+resolution of the chart, and a rolling period that starts before the view
+averages only the part inside it.
+
+In the browser chart, viewers can hide a percentile column in the legend
+columns menu, which also leaves out its lines, and turn all percentile lines
+off in the graph settings.
+
 ## Troubleshooting
 
 | Symptom | What to check |
@@ -324,11 +368,18 @@ series per model and stacked drawing. Their regression tests are in
 `app/Graphs/Port/BitsGraph.php` shows a port graph with byte-to-bit conversion
 and maximum fills. It extends `PortGraph`, which checks permission to view the
 port and supplies its page context and title. Its `GraphOptions::traffic`
-uses `TrafficOptions` to add percentiles, transferred-byte totals, previous
-period comparisons, future trend lines, and port speed references.
-`TrafficOptions::series` limits these to some of the series:
-`app/Graphs/Device/BitsGraph.php` stacks the traffic of each port and only
-summarizes the device totals.
+uses `TrafficOptions` to add transferred-byte totals, previous period
+comparisons and future trend lines, and its `percentiles` the configured
+percentile. `TrafficOptions::series` limits the traffic summaries to some of
+the series: `app/Graphs/Device/BitsGraph.php` stacks the traffic of each port
+and only summarizes, and draws the percentiles of, the device totals.
+
+For application graphs, extend `App\Graphs\Application\ApplicationGraph`;
+`$this->metric()` reads the `app-<app_type>-<app_id>.rrd` file the application
+poller writes. Graph class names can not contain hyphens, so an app such as
+`ntp-client` sets `GRAPH_PREFIX` in its `ApplicationDefinition` to name its
+graphs `application_ntp_client_*`. See
+`app/Graphs/Application/NtpClientOffsetGraph.php`.
 
 For graph types outside device graphs, extend `AbstractSeriesGraph` and
 implement `isAuthorized()` for the entities being displayed, using `canView()`

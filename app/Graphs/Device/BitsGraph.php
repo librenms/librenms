@@ -49,8 +49,8 @@ class BitsGraph extends DeviceGraph
         }
 
         // the device totals, their percentiles and previous period are drawn on the side of the axis of their ports
-        $series['in'] = new SeriesSum($in, __('graph.series.total_in'), 'bps', new SeriesStyle(legendOnly: true));
-        $series['out'] = new SeriesSum($out, __('graph.series.total_out'), 'bps', new SeriesStyle(invert: true, legendOnly: true));
+        $series['in'] = new SeriesSum($in, __('graph.series.total_in'), 'bps', new SeriesStyle(legendOnly: true, percentileLines: true));
+        $series['out'] = new SeriesSum($out, __('graph.series.total_out'), 'bps', new SeriesStyle(invert: true, legendOnly: true, percentileLines: true));
         $series['aggregate'] = new SeriesSum(['in', 'out'], __('graph.series.aggregate'), 'bps', new SeriesStyle(legendOnly: true));
 
         return $series;
@@ -58,11 +58,16 @@ class BitsGraph extends DeviceGraph
 
     protected function options(): GraphOptions
     {
-        return new GraphOptions(legendTitle: 'bps', traffic: new TrafficOptions(
-            percentile: (float) LibrenmsConfig::get('percentile_value', 95),
-            highestPercentile: (bool) LibrenmsConfig::get('rrdgraph_real_percentile'),
-            series: ['in', 'out'],
-        ));
+        $percentile = (float) LibrenmsConfig::get('percentile_value', 95);
+
+        return new GraphOptions(
+            legendTitle: 'bps',
+            traffic: new TrafficOptions(
+                highestPercentile: LibrenmsConfig::get('rrdgraph_real_percentile') ? $percentile : null,
+                series: ['in', 'out'],
+            ),
+            percentiles: [$percentile],
+        );
     }
 
     /**

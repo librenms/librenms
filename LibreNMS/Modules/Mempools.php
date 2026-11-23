@@ -34,7 +34,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MempoolsPolling;
@@ -112,7 +112,7 @@ class Mempools implements Module, RemovesMethodData
     /**
      * Each mempool is polled by the method that discovered it, mempools of unavailable methods are skipped.
      */
-    public function poll(OS $os, DataStorageInterface $datastore): void
+    public function poll(OS $os, WriteInterface $datastore): void
     {
         $polled = new EloquentCollection;
 
@@ -137,20 +137,11 @@ class Mempools implements Module, RemovesMethodData
                 ->addDataset('used', 'GAUGE', 0)
                 ->addDataset('free', 'GAUGE', 0);
 
-            $tags = [
-                'mempool_type' => $mempool->mempool_type,
-                'mempool_class' => $mempool->mempool_class,
-                'mempool_index' => $mempool->mempool_index,
-                'rrd_name' => ['mempool', $mempool->mempool_type, $mempool->mempool_class, $mempool->mempool_index],
-                'rrd_oldname' => ['mempool', $mempool->mempool_type, $mempool->mempool_index],
-                'rrd_def' => $rrd_def,
-            ];
-            $fields = [
+            $metric = $mempool->setRelation('device', $os->getDevice())->metricIdentity('mempool');
+            $datastore->write($metric->measurement, [
                 'used' => $mempool->mempool_used,
                 'free' => $mempool->mempool_free,
-            ];
-
-            $datastore->put($os->getDeviceArray(), 'mempool', $tags, $fields);
+            ], $metric->tags, ['metric' => $metric, 'rrd_def' => $rrd_def]);
         });
     }
 

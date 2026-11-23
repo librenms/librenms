@@ -246,7 +246,7 @@ class GraphsPageControllerTest extends TestCase
         $this->assertTrue($page['interactive']);
         $this->assertSame(['from' => 1700000000, 'to' => 1700003600], $page['range']);
         $this->assertEquals(new GraphViewOptions, $page['options']);
-        $this->assertSame(['compare' => null, 'trend' => false], $page['view']);
+        $this->assertSame(['compare' => null, 'trend' => false, 'percentile_lines' => true], $page['view']);
         $this->assertSame(route('graph.data', ['device' => $device->device_id, 'type' => 'device_netstat_ip', 'showcommand' => 'yes']), $page['dataUrl']);
         $response->assertSee('x-data="graphsPage(' . Js::from($page) . ')"', false);
         $response->assertSee('x-data="timeSeriesGraph(', false);
@@ -348,7 +348,7 @@ class GraphsPageControllerTest extends TestCase
         $page = $response->viewData('graphPage');
         $this->assertEquals(new GraphViewOptions(...$saved), $page['options']);
         $this->assertEquals(GraphViewOptions::preferenceDefaults(), $page['preferenceDefaults'], 'what restore goes back to');
-        $this->assertSame([...GraphViewOptions::addressDefaults(), 'compare' => null, 'trend' => false], $page['viewDefaults'], 'what reset goes back to');
+        $this->assertSame([...GraphViewOptions::addressDefaults(), 'compare' => null, 'trend' => false, 'percentile_lines' => true], $page['viewDefaults'], 'what reset goes back to');
         $response->assertSee('style="width: 50%; height: 400px; min-height: 0; max-height: none; aspect-ratio: auto"', false);
 
         $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_options', 'value' => [...$saved, 'width' => null, 'height' => null]])->assertOk();
@@ -368,14 +368,14 @@ class GraphsPageControllerTest extends TestCase
         $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_renderer', 'value' => 'js'])->assertOk();
         $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_options', 'value' => ['line_style' => 'smooth', 'columns' => ['avg']]])->assertOk();
 
-        $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip&stacking=overlay&scale=log&previous=week&trend=1");
+        $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip&stacking=overlay&scale=log&previous=week&trend=1&percentile_lines=0");
 
         $response->assertOk();
         // The address shows log scaled overlays, the viewer keeps their lines and legend.
         $shared = new GraphViewOptions(stacking: 'overlay', scale: 'log', columns: ['avg'], line_style: 'smooth');
         $page = $response->viewData('graphPage');
         $this->assertEquals($shared, $page['options']);
-        $this->assertSame(['compare' => 'week', 'trend' => true], $page['view']);
+        $this->assertSame(['compare' => 'week', 'trend' => true, 'percentile_lines' => false], $page['view']);
         $this->assertSame(route('graph.data', ['device' => $device->device_id, 'type' => 'device_netstat_ip']), $page['dataUrl']);
 
         // nothing of the shared graph is kept for the next one
@@ -388,7 +388,7 @@ class GraphsPageControllerTest extends TestCase
         $device = Device::factory()->create();
         $user = $this->adminUser();
 
-        foreach (['previous=month', 'scale=cubic', 'stacking=sideways', 'mirror=2', 'trend=yes'] as $query) {
+        foreach (['previous=month', 'scale=cubic', 'stacking=sideways', 'mirror=2', 'trend=yes', 'percentile_lines=no'] as $query) {
             [$key] = explode('=', $query);
             $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip&$query")
                 ->assertSessionHasErrors($key);
@@ -412,6 +412,8 @@ class GraphsPageControllerTest extends TestCase
             ['stacking' => 'stack'],
             ['mirror' => false],
             ['columns' => ['median']],
+            ['hidden_percentiles' => [101]],
+            ['hidden_percentiles' => 'p50'],
             ['height' => 50],
             ['width' => 1.5, 'height' => 400],
         ] as $value) {

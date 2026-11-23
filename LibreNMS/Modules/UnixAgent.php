@@ -30,7 +30,6 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Application;
 use App\Models\Device;
 use App\Models\Eventlog;
-use App\Models\Package;
 use App\Models\Process;
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
@@ -43,7 +42,6 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Traits\RequiresPollingMethod;
-use LibreNMS\Util\Number;
 use LibreNMS\Util\ProgressList;
 
 /**
@@ -140,7 +138,6 @@ class UnixAgent implements Module
         $agent_data = self::parse($raw);
         Log::debug('Agent data', $agent_data);
 
-        $this->pollPackages($device, $agent_data);
         $this->pollMunin($os, $datastore, (array) ($agent_data['munin'] ?? []));
         $this->pollHddtemp($os, $datastore, (string) ($agent_data['hddtemp'] ?? ''));
         $this->pollProcesses($device, $agent_data);
@@ -155,7 +152,6 @@ class UnixAgent implements Module
     public function dataExists(Device $device): bool
     {
         return $device->processes()->exists()
-            || $device->packages()->exists()
             || $device->muninPlugins()->exists()
             || $device->sensors()->where('poller_type', 'agent')->exists();
     }
@@ -169,7 +165,6 @@ class UnixAgent implements Module
         DB::table('munin_plugins_ds')->whereIn('mplug_id', $plugin_ids)->delete();
 
         return $device->processes()->delete()
-            + $device->packages()->delete()
             + $device->muninPlugins()->delete()
             + $device->sensors()->where('poller_type', 'agent')->delete();
     }
@@ -251,87 +246,6 @@ class UnixAgent implements Module
         }
 
         return $result;
-    }
-
-    /**
-     * @param  AgentData  $agent_data
-     */
-    private function pollPackages(Device $device, array $agent_data): void
-    {
-        $managers = [
-            'rpm' => function (string $line): Package {
-                [$name, $version, $build, $arch, $size] = array_pad(explode(' ', $line), 5, '');
-
-                return new Package([
-                    'manager' => 'rpm',
-                    'name' => $name,
-                    'arch' => $arch,
-                    'version' => $version,
-                    'build' => $build,
-                    'size' => $size,
-                    'status' => true,
-                ]);
-            },
-            'dpkg' => function (string $line): Package {
-                [$name, $version, $arch, $size] = array_pad(explode(' ', $line), 4, '');
-
-                return new Package([
-                    'manager' => 'deb',
-                    'name' => $name,
-                    'arch' => $arch,
-                    'version' => $version,
-                    'build' => '',
-                    'size' => Number::cast($size) * 1024,
-                    'status' => true,
-                ]);
-            },
-            'pacman' => function (string $line): Package {
-                [$name, $version, $arch, $size] = array_pad(explode(' ', $line), 4, '');
-
-                return new Package([
-                    'manager' => 'pacman',
-                    'name' => $name,
-                    'arch' => $arch,
-                    'version' => $version,
-                    'build' => '',
-                    'size' => (int) Number::toBytes($size),
-                    'status' => true,
-                ]);
-            },
-        ];
-
-        foreach ($managers as $key => $parser) {
-            if (empty($agent_data[$key])) {
-                continue;
-            }
-
-            Log::info("$key packages");
-
-            // mark all existing packages as removed, then flag the ones still installed
-            $packages = $device->packages->each(function (Package $package): void {
-                $package->status = false;
-            })->keyBy->getCompositeKey();
-
-            foreach (explode("\n", $agent_data[$key]) as $line) {
-                $package = $parser($line);
-
-                if (! $package->isValid()) {
-                    continue; // failed to parse
-                }
-
-                $package_key = $package->getCompositeKey();
-                if ($existing = $packages->get($package_key)) {
-                    $existing->fill($package->attributesToArray());
-                } else {
-                    $packages->put($package_key, $package);
-                }
-            }
-
-            $device->packages()->saveMany($packages->where('status', true));
-            $packages->where('status', false)->each->delete();
-
-            return; // only one package manager per device
-        }
     }
 
     /**

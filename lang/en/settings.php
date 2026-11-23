@@ -789,6 +789,10 @@ return [
             'hr-device' => [
                 'description' => 'HR Device',
             ],
+            'packages' => [
+                'description' => 'Packages',
+                'help' => 'Collects installed software packages from the Unix agent or via SNMP from the HOST-RESOURCES-MIB (hrSWInstalledTable). The Unix agent takes precedence when enabled.',
+            ],
             'ipv4-addresses' => [
                 'description' => 'IPv4 Addresses',
             ],
@@ -1749,6 +1753,10 @@ return [
         'poller_modules' => [
             'unix-agent' => [
                 'description' => 'Unix Agent',
+            ],
+            'packages' => [
+                'description' => 'Packages',
+                'help' => 'Collects installed software packages via SNMP from the HOST-RESOURCES-MIB (hrSWInstalledTable). The unix agent takes precedence when enabled.',
             ],
             'os' => [
                 'description' => 'OS',

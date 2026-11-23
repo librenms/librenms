@@ -47,7 +47,7 @@ $query = Bill::with([
     'portCounters',
 ])->when($options['b'] ?? null, fn ($q, $bill_id) => $q->where('bill_id', $bill_id));
 
-$poller_group = (LibrenmsConfig::get('distributed_poller') && LibrenmsConfig::get('distributed_billing')) ? LibrenmsConfig::get('distributed_poller_group') : null;
+$poller_group = (LibrenmsConfig::get('distributed_poller') && LibrenmsConfig::get('distributed_billing')) ? explode(',', LibrenmsConfig::get('distributed_poller_group')) : null;
 
 foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
     Log::info('Bill : ' . $bill->bill_name);
@@ -64,7 +64,7 @@ foreach ($query->get(['bill_id', 'bill_name']) as $bill) {
     foreach ($bill->ports as $port) {
         $device = DeviceCache::get($port->device_id);
 
-        if ($device->disabled || ! $device->status || ($poller_group && $device->poller_group != $poller_group)) {
+        if ($device->disabled || ! $device->status || ($poller_group && !in_array($device->poller_group,$poller_group))) {
             continue;
         }
 

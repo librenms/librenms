@@ -2005,6 +2005,13 @@
             "default": true,
             "type": "boolean"
         },
+        "discovery_modules.packages": {
+            "order": 145,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "discovery_modules.discovery-protocols": {
             "order": 100,
             "group": "discovery",
@@ -2856,6 +2863,19 @@
                 "22CCBB",
                 "00BBCC",
                 "0099CC",
+                "3366BB",
+                "AA3355",
+                "881177",
+                "CC6666",
+                "EEDD00",
+                "44DD88",
+                "99DD55"
+            ],
+            "type": "array"
+        },
+        "graph_colours.stats": {
+            "default": [
+                "663399",
                 "3366BB",
                 "AA3355",
                 "881177",
@@ -6056,6 +6076,13 @@
         },
         "poller_modules.unix-agent": {
             "order": 420,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
+        "poller_modules.packages": {
+            "order": 425,
             "group": "poller",
             "section": "poller_modules",
             "default": false,

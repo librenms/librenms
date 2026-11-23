@@ -19,7 +19,7 @@ readonly class GraphViewOptions
     /** of one graph, shared in its address and never saved */
     public const array ADDRESS = ['mirror', 'stacking', 'scale'];
     /** saved for all the graphs of a user */
-    public const array PREFERENCES = ['range', 'line_style', 'columns', 'width', 'height'];
+    public const array PREFERENCES = ['range', 'line_style', 'columns', 'hidden_percentiles', 'width', 'height'];
 
     /**
      * @param  bool  $range  shade between the min and max of each line
@@ -27,6 +27,7 @@ readonly class GraphViewOptions
      * @param  string  $stacking  graph: as the graph defines, stack: everything on a side of the axis, overlay: nothing
      * @param  string  $scale  graph: as the graph defines, fit: to the data, log: logarithmic
      * @param  list<string>  $columns  legend columns
+     * @param  list<float>  $hidden_percentiles  legend columns of the percentiles of graphs the viewer hid, the others are shown
      * @param  ?float  $width  of the space for the graph, null to fill it
      * @param  ?int  $height  in pixels, null to follow the width
      * @param  string  $line_style  how adjacent samples are connected
@@ -37,6 +38,7 @@ readonly class GraphViewOptions
         public string $stacking = 'graph',
         public string $scale = 'graph',
         public array $columns = self::DEFAULT_COLUMNS,
+        public array $hidden_percentiles = [],
         public ?float $width = null,
         public ?int $height = null,
         public string $line_style = 'stepped',
@@ -63,9 +65,22 @@ readonly class GraphViewOptions
             range: is_bool($value['range'] ?? null) ? $value['range'] : true,
             line_style: in_array($value['line_style'] ?? null, self::LINE_STYLES, true) ? $value['line_style'] : 'stepped',
             columns: $columns,
+            hidden_percentiles: self::percentiles($value['hidden_percentiles'] ?? null),
             width: $sized && $width !== null ? max(self::MIN_WIDTH, min($width, 1.0)) : null,
             height: $sized ? $height : null,
         );
+    }
+
+    /**
+     * The percentiles of a stored list, those that are not percentiles are left out
+     *
+     * @return list<float>
+     */
+    private static function percentiles(mixed $value): array
+    {
+        $percentiles = array_filter(is_array($value) ? $value : [], fn ($percentile) => is_numeric($percentile) && $percentile >= 0 && $percentile <= 100);
+
+        return array_values(array_unique(array_map(floatval(...), $percentiles)));
     }
 
     /**
@@ -81,6 +96,7 @@ readonly class GraphViewOptions
             stacking: in_array($query['stacking'] ?? null, self::STACKING, true) ? $query['stacking'] : 'graph',
             scale: in_array($query['scale'] ?? null, self::SCALES, true) ? $query['scale'] : 'graph',
             columns: $this->columns,
+            hidden_percentiles: $this->hidden_percentiles,
             width: $this->width,
             height: $this->height,
             line_style: $this->line_style,
@@ -115,6 +131,8 @@ readonly class GraphViewOptions
             "$prefix.line_style" => 'sometimes|in:' . implode(',', self::LINE_STYLES),
             "$prefix.columns" => 'sometimes|array',
             "$prefix.columns.*" => 'in:' . implode(',', self::COLUMNS),
+            "$prefix.hidden_percentiles" => 'sometimes|array',
+            "$prefix.hidden_percentiles.*" => 'numeric|between:0,100',
             "$prefix.width" => 'nullable|numeric|between:' . self::MIN_WIDTH . ',1',
             "$prefix.height" => 'nullable|integer|between:' . self::MIN_HEIGHT . ',' . self::MAX_HEIGHT,
         ];

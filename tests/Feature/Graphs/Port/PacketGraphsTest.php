@@ -38,7 +38,7 @@ class PacketGraphsTest extends TestCase
         $this->assertStringContainsString('DEF:ds0=host/port-id1.rrd:INUCASTPKTS:AVERAGE', $command);
         $this->assertStringContainsString('DEF:ds1=host/port-id1.rrd:OUTUCASTPKTS:AVERAGE', $command);
         $this->assertStringContainsString('AREA:ds1maxdrawn#FFEFAA', $command);
-        $this->assertStringContainsString('GPRINT:ds1:LAST:%5.2lf%spps', $command);
+        $this->assertStringContainsString('GPRINT:ds1:LAST: %7.2lf%spps\g', $command);
     }
 
     public function test_inverse_swaps_directions(): void

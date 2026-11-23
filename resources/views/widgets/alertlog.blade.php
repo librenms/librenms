@@ -15,7 +15,7 @@
 </div>
 <script>
     (function () {
-        var grid = $("#alertlog_{{ $id }}").bootgrid({
+        var grid = bootgridWithExport($("#alertlog_{{ $id }}"), {
             ajax: true,
             rowCount: [50, 100, 250, -1],
             navigation: @json(! $hidenavigation),

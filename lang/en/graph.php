@@ -12,6 +12,7 @@ return [
     'reset_title' => 'Back to the selected time range, the settings of this view and the automatic size',
     'more' => 'more',
     'previous' => 'Earlier',
+    'trend' => 'Trend',
     'resize' => 'Drag to resize, double-click for the automatic size',
     'share' => 'Share',
     'copy_link' => 'Copy link',
@@ -49,6 +50,7 @@ return [
         'compare_day' => 'Day before',
         'compare_week' => 'Week before',
         'trend' => 'Trend line',
+        'percentile_lines' => 'Percentile lines',
     ],
     'help' => [
         'title' => 'Help & Shortcuts',
@@ -97,7 +99,7 @@ return [
         'min' => 'Min',
         'max' => 'Max',
         'avg' => 'Avg',
-        'percentile' => ':percentileth %',
+        'percentile' => ':percentileth',
         'total' => 'Total',
         'previous' => 'Prev :series',
         'previous_total' => 'Prev Total',
@@ -109,6 +111,15 @@ return [
         'port_speed_out' => 'Out Port Speed :speed',
         'p95' => '95th',
         'series' => 'Series',
+    ],
+    'stats' => [
+        'hour' => '1 hour',
+        'day' => '1 day',
+        'week' => '1 week',
+        'avg' => ':period avg',
+    ],
+    'units' => [
+        'seconds' => 'Seconds',
     ],
     'series' => [
         'in' => 'In',
@@ -157,6 +168,16 @@ return [
             'uptime' => 'Uptime',
             'days' => 'Days',
             'unit' => 'days',
+        ],
+    ],
+    'application' => [
+        'subtitle' => ' :: App :: :name',
+        'ntp_client' => [
+            'frequency' => 'Frequency',
+            'offset' => 'Offset',
+            'stability' => 'Stability',
+            'jitter' => 'Jitter',
+            'noise' => 'Noise',
         ],
     ],
     'mempool' => [

@@ -106,6 +106,7 @@
                     }
                     setParam(url.searchParams, 'previous', COMPARE[this.options.compare]);
                     setParam(url.searchParams, 'trend', this.options.trend ? '1' : null);
+                    setParam(url.searchParams, 'percentile_lines', this.options.percentile_lines ? null : '0');
 
                     window.history.replaceState(window.history.state, '', url);
                 },
@@ -245,8 +246,9 @@
                     remember(PREFERENCES_OPEN, this.preferencesOpen);
                 },
 
-                columnsChanged({ columns }) {
+                columnsChanged({ columns, hidden_percentiles }) {
                     this.options.columns = columns;
+                    this.options.hidden_percentiles = hidden_percentiles;
                     this.saveOptions();
                 },
 
