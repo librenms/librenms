@@ -184,6 +184,10 @@ final class RepositoryAuthorizationTest extends DBTestCase
         $this->assertSame('429', $this->errors($throttled)[0]['status']);
         $this->assertSame('42', $throttled->headers->get('Retry-After'));
 
+        $rendered = $middleware->handle($request, fn () => response()->json(['message' => 'Not here.'], 405, ['Allow' => 'GET, HEAD']));
+        $this->assertSame([['status' => '405', 'title' => 'Method Not Allowed', 'detail' => 'Not here.']], $this->errors($rendered));
+        $this->assertSame('GET, HEAD', $rendered->headers->get('Allow'));
+
         $thrown = $middleware->handle($request, fn () => throw new HttpException(405, 'Not here.', null, ['Allow' => 'GET']));
         $this->assertSame([['status' => '405', 'title' => 'Method Not Allowed', 'detail' => 'Not here.']], $this->errors($thrown));
         $this->assertSame('GET', $thrown->headers->get('Allow'));

@@ -20,7 +20,7 @@ class FormatJsonApiError
     /**
      * Headers a client needs to act on an error, kept when the body is replaced.
      */
-    private const array PRESERVED_HEADERS = ['Retry-After', 'WWW-Authenticate', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset'];
+    private const array PRESERVED_HEADERS = ['Allow', 'Retry-After', 'WWW-Authenticate', 'X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset'];
 
     public function handle(Request $request, Closure $next): Response
     {
