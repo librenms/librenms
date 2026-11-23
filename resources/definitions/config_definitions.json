@@ -2005,6 +2005,13 @@
             "default": true,
             "type": "boolean"
         },
+        "discovery_modules.packages": {
+            "order": 145,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "discovery_modules.discovery-protocols": {
             "order": 100,
             "group": "discovery",
@@ -6069,6 +6076,13 @@
         },
         "poller_modules.unix-agent": {
             "order": 420,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
+        "poller_modules.packages": {
+            "order": 425,
             "group": "poller",
             "section": "poller_modules",
             "default": false,

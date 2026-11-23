@@ -120,6 +120,7 @@ final class UnixAgentPollingMethod extends PollingMethod
         return ProbeResult::success($stats + [
             'output' => $output,
             'time' => round((microtime(true) - $start) * 1000),
+            'timed_out' => (bool) $info['timed_out'],
         ]);
     }
 }
