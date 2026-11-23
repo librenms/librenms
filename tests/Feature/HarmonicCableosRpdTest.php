@@ -12,8 +12,12 @@ use App\Models\Secret;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
+use LibreNMS\Data\Source\Snmp\SnmpQueryBuilder;
+use LibreNMS\Data\Source\Snmp\SnmpResponse;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Exceptions\SnmpException;
+use LibreNMS\OS;
 use LibreNMS\Tests\DBTestCase;
 use LibreNMS\Util\ModuleList;
 
@@ -98,6 +102,51 @@ final class HarmonicCableosRpdTest extends DBTestCase
         new DiscoverDevice($device->device_id, $modules)->handle();
         $this->assertSame($discovered->modelKeys(), $states->get()->modelKeys());
         $this->assertSame($discovered->pluck('sensor_oid')->all(), $states->pluck('sensor_oid')->all());
+    }
+
+    public function testRpdWalkConnectionErrorsDoNotSynchronizeStateSensors(): void
+    {
+        $device = Device::factory()->create(['os' => 'harmonic-cableos']);
+        $deviceArray = $device->toArray();
+        $os = OS::make($deviceArray);
+        $entry = '.1.3.6.1.4.1.1563.10.2.3.116.1.7.1.1';
+        $firstRpd = ["$entry.2.1" => '02 00 00 00 00 01', "$entry.3.1" => '3'];
+        $secondRpd = ["$entry.2.2" => '02 00 00 00 00 02', "$entry.3.2" => '3'];
+        $timeout = 'Timeout: No Response from udp:192.0.2.1:161';
+
+        $query = $this->mock(SnmpQueryBuilder::class);
+        $query->shouldReceive('options')->with('-OQx')->andReturnSelf();
+        $query->shouldReceive('numeric')->andReturnSelf();
+        $query->shouldReceive('displayHints')->with(false)->andReturnSelf();
+        $query->shouldReceive('walk')->with($entry)->times(4)->andReturn(
+            new SnmpResponse($firstRpd + $secondRpd),
+            new SnmpResponse([], $timeout, 1),
+            new SnmpResponse(["$entry.2.1" => $firstRpd["$entry.2.1"], "$entry.3.1" => '0'], $timeout, 1),
+            new SnmpResponse,
+        );
+
+        DeviceCache::setPrimary($device->device_id);
+        sensors(['state'], $os);
+        $states = $device->sensors()->where('sensor_class', 'state')->orderBy('sensor_index');
+        $discovered = $states->get()->toArray();
+        $this->assertCount(2, $discovered);
+
+        foreach (['empty timed-out walk', 'partially returned timed-out walk'] as $case) {
+            $this->resetDeviceScope();
+            DeviceCache::setPrimary($device->device_id);
+            try {
+                sensors(['state'], $os);
+                $this->fail("Expected a connection exception for $case");
+            } catch (SnmpException $exception) {
+                $this->assertSame($timeout, $exception->getMessage());
+            }
+            $this->assertSame($discovered, $states->get()->toArray(), $case);
+        }
+
+        $this->resetDeviceScope();
+        DeviceCache::setPrimary($device->device_id);
+        sensors(['state'], $os);
+        $this->assertSame(0, $states->count());
     }
 
     private function resetDeviceScope(): void

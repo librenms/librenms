@@ -20,7 +20,7 @@ class HarmonicCableos extends OS
 
     public function discoverRpdStates(): void
     {
-        $rows = SnmpQuery::options('-OQx')->numeric()->displayHints(false)->walk(self::RPD_ENTRY);
+        $rows = SnmpQuery::options('-OQx')->numeric()->displayHints(false)->walk(self::RPD_ENTRY)->throwIfConnectionError();
         $macs = $rows->pluck(preg_quote(self::RPD_MAC_ADDRESS, '/'));
         $states = $rows->pluck(preg_quote(self::RPD_OPER_STATUS, '/'));
         $discovery = app('sensor-discovery');
