@@ -72,7 +72,7 @@ $refresh = request()->input('refresh', 30);
         outages_grid.bootgrid('reload');
     }
 
-    var outages_grid = $("#outages").bootgrid({
+    var outages_grid = bootgridWithExport($("#outages"), {
         ajax: true,
         rowCount: [50, 100, 250, -1],
         templates: {

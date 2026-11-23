@@ -28,7 +28,7 @@
     (function () {
         var filter = @js($filter);
 
-        var grid = $("#alertlog").bootgrid({
+        var grid = bootgridWithExport($("#alertlog"), {
             ajax: true,
             rowCount: [50, 100, 250, -1],
             templates: {

@@ -42,7 +42,7 @@
 
     var filter = @js($filter);
 
-    var grid = $("#ports").bootgrid({
+    var grid = bootgridWithExport($("#ports"), {
         ajax: true,
         rowCount: [25, 50, 100, 250, -1],
         converters: {

@@ -35,7 +35,7 @@
         </div>
     </div>
     <script>
-        var grid = $("#mempool").bootgrid({
+        var grid = bootgridWithExport($("#mempool"), {
             ajax: true,
             rowCount: [50, 100, 250, -1],
             post: function ()

@@ -21,7 +21,7 @@
         </div>
         <div class="table-responsive">
             <table id="sensors" class="table table-hover table-condensed"
-                   data-url="{{ route('table.sensors') }}" data-params="class={{ $metric }}" data-export-url="{{ route('table.sensors.export', ['class' => $metric]) }}">
+                   data-url="{{ route('table.sensors') }}" data-export-url="{{ route('table.sensors.export') }}">
                 <thead>
                 <tr>
                     <th data-column-id="device_hostname">{{ __('Device') }}</th>
@@ -37,7 +37,7 @@
         </div>
     </div>
     <script>
-        var grid = $("#sensors").bootgrid({
+        var grid = bootgridWithExport($("#sensors"), {
             ajax: true,
             rowCount: [50, 100, 250, -1],
             post: function () {
