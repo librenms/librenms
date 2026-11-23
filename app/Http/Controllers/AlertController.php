@@ -6,6 +6,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Alert;
 use App\Models\AlertFault;
 use App\Models\Eventlog;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Alert\AlertUtil;
@@ -14,6 +15,46 @@ use LibreNMS\Enum\Severity;
 
 class AlertController extends Controller
 {
+    public function showNote(AlertFault $fault): JsonResponse
+    {
+        $alert = Alert::query()->where('rule_id', $fault->rule_id)->where('device_id', $fault->device_id)->first();
+        abort_unless($alert !== null, 403, __('You are not authorised to access this alert'));
+        $this->authorize('view', $alert);
+
+        return response()->json([
+            'status' => 'ok',
+            'message' => __('Alert note retrieved'),
+            'note' => (string) $fault->note,
+        ]);
+    }
+
+    public function updateNote(Request $request, AlertFault $fault): JsonResponse
+    {
+        $alert = Alert::query()->where('rule_id', $fault->rule_id)->where('device_id', $fault->device_id)->first();
+        abort_unless($alert !== null, 403, __('You are not authorised to access this alert'));
+        $this->authorize('update', $alert);
+
+        $validated = $request->validate(['note' => 'nullable|string']);
+        $note = strip_tags($validated['note'] ?? '');
+
+        $rule = $fault->rule;
+        $targets = AlertFault::query();
+        if ($rule !== null && AlertUtil::shouldNotifyPerEntity($rule, AlertUtil::openEntityCountForRuleDevice($rule->id, $fault->device_id))) {
+            $targets->whereKey($fault->id);
+        } else {
+            $targets->where('rule_id', $fault->rule_id)->where('device_id', $fault->device_id)->open();
+        }
+
+        // The database may report zero changed rows when the target notes already match.
+        abort_if($targets->update(['note' => $note]) === 0 && ! $targets->exists(), 409, __('Could not update note'));
+
+        return response()->json([
+            'status' => 'ok',
+            'message' => __('Note updated'),
+            'note' => $note,
+        ]);
+    }
+
     public function ack(Request $request, AlertFault $fault): \Illuminate\Http\JsonResponse
     {
         $alert = Alert::query()->where('rule_id', $fault->rule_id)->where('device_id', $fault->device_id)->first();

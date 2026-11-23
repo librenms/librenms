@@ -617,10 +617,10 @@
 
         $.ajax({
             type: 'POST',
-            url: ajax_url + '/dash/' + data_type,
+            url: route('widget.' + data_type),
             data: {
                 id: id,
-                dimensions: {x: $widget_body.width(), y: $widget_body.height()},
+                dimensions: {x: Math.floor($widget_body.width()), y: Math.floor($widget_body.height())},
                 settings: $widget_body.closest('.grid-stack-item').data('settings') == 1 ? 1 : 0
             },
             dataType: 'json',

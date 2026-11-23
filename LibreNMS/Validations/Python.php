@@ -27,6 +27,7 @@
 namespace LibreNMS\Validations;
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Util\SystemUser;
 use LibreNMS\Util\Version;
 use LibreNMS\Validator;
 use Symfony\Component\Process\Process;
@@ -87,7 +88,7 @@ class Python extends BaseValidation
 
         if ($process->getExitCode() !== 0) {
             $user = \config('librenms.user');
-            $user_mismatch = function_exists('posix_getpwuid') ? (posix_getpwuid(posix_geteuid())['name'] ?? null) !== $user : false;
+            $user_mismatch = function_exists('posix_getpwuid') && SystemUser::name() !== $user;
 
             if ($user_mismatch) {
                 $validator->warn(

@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP; trailing comma before })
 -- *****************************************************************
 -- UBQS-ENTITY-ALARM-MIB  : Ubiquoss Environment Monitor MIB file
 --
@@ -141,7 +142,7 @@ ubiEntityAlarmNotificationEnables  		OBJECT IDENTIFIER		::= { ubiEntityAlarmMIBO
         ubiAlarmContactSeverity             		AlarmSeverity,
         ubiAlarmContactTrigger   					INTEGER,
         ubiAlarmContactLastAlarmStatus			  	INTEGER, 
-        ubiAlarmContactLastAlarmStamp     			DisplayString,
+        ubiAlarmContactLastAlarmStamp     			DisplayString
        }
  
    	ubiAlarmContactIndex OBJECT-TYPE
@@ -282,22 +283,8 @@ ubiEntityAlarmMIBGroups  OBJECT IDENTIFIER			::= { ubiEntityAlarmMIBConformance 
 
 -- units of conformance
 
-	ubiEntityAlarmMIBContactGroup OBJECT-GROUP
-    	OBJECTS         {
-                    	}
-    	STATUS          current
-    	DESCRIPTION
-        	"The collection of objects which are used to get the
-        	operational state and redundancy state of the modules"
-    	::= { ubiEntityAlarmMIBGroups 1 }
+	ubiEntityAlarmMIBContactGroup OBJECT IDENTIFIER ::= { ubiEntityAlarmMIBGroups 1 }
 
-	ubiEntityAlarmMIBNotificationGroup OBJECT-GROUP
-    	OBJECTS         {
-                    	}
-        STATUS          current
-    	DESCRIPTION
-        	"The collection of objects which are 
-        	used to send a notification."
-    	::= { ubiEntityAlarmMIBGroups 2 }    
+	ubiEntityAlarmMIBNotificationGroup OBJECT IDENTIFIER ::= { ubiEntityAlarmMIBGroups 2 }    
 
 END

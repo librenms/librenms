@@ -1319,16 +1319,6 @@
             "default": 1000,
             "type": "integer"
         },
-        "branding": {
-            "default": {
-                "default": {}
-            },
-            "type": "array",
-            "validate": {
-                "value": "array",
-                "value.*": "array"
-            }
-        },
         "callback_clear": {
             "default": "https://stats.librenms.org/clear.php",
             "type": "text"
@@ -1582,6 +1572,10 @@
             "group": "webui",
             "section": "port-descr",
             "order": 11
+        },
+        "datastore.canonical_metrics": {
+            "default": false,
+            "type": "boolean"
         },
         "dateformat.byminute": {
             "default": "Y-m-d H:i",
@@ -1994,7 +1988,7 @@
             "order": 285,
             "group": "discovery",
             "section": "discovery_modules",
-            "default": true,
+            "default": false,
             "type": "boolean"
         },
         "discovery_modules.storage": {
@@ -2006,6 +2000,13 @@
         },
         "discovery_modules.hr-device": {
             "order": 140,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "discovery_modules.packages": {
+            "order": 145,
             "group": "discovery",
             "section": "discovery_modules",
             "default": true,
@@ -2862,6 +2863,19 @@
                 "22CCBB",
                 "00BBCC",
                 "0099CC",
+                "3366BB",
+                "AA3355",
+                "881177",
+                "CC6666",
+                "EEDD00",
+                "44DD88",
+                "99DD55"
+            ],
+            "type": "array"
+        },
+        "graph_colours.stats": {
+            "default": [
+                "663399",
                 "3366BB",
                 "AA3355",
                 "881177",
@@ -5466,18 +5480,6 @@
             "order": 0,
             "type": "boolean"
         },
-        "map.engine": {
-            "default": "leaflet",
-            "type": "select",
-            "options": {
-                "leaflet": "Leaflet",
-                "mapeal": "Mapeal"
-            }
-        },
-        "mapael.default_map": {
-            "default": "maps/world_countries.js",
-            "type": "text"
-        },
         "mib_dir": {
             "type": "directory"
         },
@@ -5753,10 +5755,6 @@
             "default": "misc/notifications.rss",
             "type": "text"
         },
-        "old_graphs": {
-            "default": true,
-            "type": "boolean"
-        },
         "opentsdb.co": {
             "type": "boolean",
             "group": "poller",
@@ -6004,10 +6002,6 @@
             "units": "seconds",
             "order": 3
         },
-        "page_title_prefix": {
-            "default": "",
-            "type": "text"
-        },
         "page_title_suffix": {
             "type": "text"
         },
@@ -6087,6 +6081,13 @@
             "default": false,
             "type": "boolean"
         },
+        "poller_modules.packages": {
+            "order": 425,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "poller_modules.core": {
             "default": true,
             "type": "boolean",
@@ -6112,7 +6113,7 @@
             "order": 210,
             "group": "poller",
             "section": "poller_modules",
-            "default": true,
+            "default": false,
             "type": "boolean"
         },
         "poller_modules.qos": {

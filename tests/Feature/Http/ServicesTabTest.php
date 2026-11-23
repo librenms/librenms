@@ -43,7 +43,7 @@ class ServicesTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'services']))
+            ->get(route('device.services', ['device' => $device]))
             ->assertOk()
             ->assertSee('HTTP Web Server Check')
             ->assertSee('192.168.1.1')
@@ -64,7 +64,7 @@ class ServicesTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'services', 'view' => 'details']))
+            ->get(route('device.services', ['device' => $device, 'view' => 'details']))
             ->assertOk()
             ->assertSee('Ping Check')
             ->assertSee('Round Trip Average');
@@ -80,8 +80,24 @@ class ServicesTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'services', 'view' => 'invalid']))
+            ->get(route('device.services', ['device' => $device, 'view' => 'invalid']))
             ->assertInvalid(['view']);
+    }
+
+    public function testLegacyDetailsLinkRendersCustomCheckGraphs(): void
+    {
+        $device = Device::factory()->create();
+        Service::factory()->for($device)->create([
+            'service_type' => 'icmp',
+            'service_ip' => null,
+            'service_ds' => '{}',
+        ]);
+
+        $this->actingAs($this->admin())
+            ->followingRedirects()
+            ->get('/device/device=' . $device->device_id . '/tab=services/view=details')
+            ->assertOk()
+            ->assertSee('ds=rta', false);
     }
 
     public function testUserWithoutServicePermissionGetsForbidden(): void
@@ -97,7 +113,7 @@ class ServicesTabTest extends TestCase
         $user->assignRole('user');
 
         $this->actingAs($user)
-            ->get(route('device', ['device' => $device, 'tab' => 'services']))
+            ->get(route('device.services', ['device' => $device]))
             ->assertForbidden();
     }
 }

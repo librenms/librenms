@@ -27,7 +27,7 @@ class AccessPointsTabTest extends TestCase
         AccessPoint::factory()->for($device)->create();
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'accesspoints']))
+            ->get(route('device.accesspoints', ['device' => $device]))
             ->assertOk()
             ->assertSee('id="access-points"', false)
             ->assertSee(route('table.access-points'), false);

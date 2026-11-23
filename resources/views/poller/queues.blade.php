@@ -78,7 +78,7 @@
     </table>
     </div>
     @can('worker.horizon')
-    <a href="{{ url(config('horizon.path')) }}" target="_blank">{{ __('Open Horizon') }} <i class="fa fa-external-link"></i></a>
+    <a href="{{ route('horizon.index') }}" target="_blank">{{ __('Open Horizon') }} <i class="fa fa-external-link"></i></a>
     @endcan
 </x-panel>
 @endif

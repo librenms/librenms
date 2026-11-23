@@ -1,7 +1,8 @@
 -- ****************************************************************************
 --  COLUBRIS-USER-SESSION-MIB definitions
 --
---  Copyright (c) 2007, Colubris Networks, Inc.
+--  (c) Copyright 2007,2010,2012-2013 Hewlett-Packard Development Company, L.P.
+--  The information contained herein is subject to change without notice.
 --  All Rights Reserved.
 --
 --  Colubris Networks User Session MIB file.
@@ -15,6 +16,8 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE,
     IpAddress, Integer32, Unsigned32, Counter32, Gauge32, Counter64
         FROM    SNMPv2-SMI
+    MacAddress
+        FROM    SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM    SNMPv2-CONF
     colubrisMgmtV2
@@ -25,7 +28,7 @@ IMPORTS
 
 
 colubrisUserSessionMIB  MODULE-IDENTITY
-    LAST-UPDATED    "200703050000Z"
+    LAST-UPDATED    "201306100000Z"
     ORGANIZATION    "Colubris Networks, Inc."
     CONTACT-INFO    "Colubris Networks
                      Postal: 200 West Street Ste 300
@@ -87,8 +90,9 @@ coUserSessionTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF CoUserSessionEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "A table containing specific information for users authenticated
-                 (AC and non-AC) by the authentication system."
+    DESCRIPTION "A table containing specific information for access-controlled 
+                 and non-access-controlled users authenticated by the 
+                 authentication system."
     ::= {  coUserSessionStGroup 1 }
 
 coUserSessionEntry OBJECT-TYPE
@@ -97,6 +101,7 @@ coUserSessionEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Information about a particular user that has been authenticated
                  by the authentication system.
+
                  coUserSessIndex - Uniquely identifies a user in the table."
     INDEX       { coUserSessIndex }
     ::= { coUserSessionTable 1 }
@@ -121,7 +126,9 @@ CoUserSessionEntry ::= SEQUENCE
     coUserSessBytesSent                  Counter64,
     coUserSessBytesReceived              Counter64,
     coUserSessPacketsSent                Counter32,
-    coUserSessPacketsReceived            Counter32
+    coUserSessPacketsReceived            Counter32,
+    coUserSessEgressVLAN                 Integer32,
+    coUserSessMacAddress                 MacAddress
 }
 
 coUserSessIndex OBJECT-TYPE
@@ -194,7 +201,10 @@ coUserSessVLAN OBJECT-TYPE
     SYNTAX      Integer32 (0..4094)
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Specifies the VLAN currently assigned to the user."
+    DESCRIPTION "For access-controlled users, this value indicates 
+                 the downstream VLAN currently assigned to the user.
+
+                 For non-access-controlled users, it indicates the user VLAN."
     ::= { coUserSessionEntry 9 }
 
 coUserSessPHYType OBJECT-TYPE
@@ -203,7 +213,9 @@ coUserSessPHYType OBJECT-TYPE
                     unknown(0),
                     ieee802dot11a(1),
                     ieee802dot11b(2),
-                    ieee802dot11g(3)
+                    ieee802dot11g(3),
+                    ieee802dot11n(4),
+                    ieee802dot11ac(5)
                 }
     MAX-ACCESS  read-only
     STATUS      current
@@ -287,6 +299,22 @@ coUserSessPacketsReceived OBJECT-TYPE
                  around and starts increasing again from zero."
     ::= { coUserSessionEntry 19 }
 
+coUserSessEgressVLAN OBJECT-TYPE
+    SYNTAX      Integer32 (0..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the egress VLAN currently assigned to the
+                 user. Always 0 for non-access-controlled clients."
+    ::= { coUserSessionEntry 20 }
+
+coUserSessMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MAC address of the client. Always 00:00:00:00:00:00
+                 for non-access-controlled clients."
+    ::= { coUserSessionEntry 21 }
+
 
 -- user session notifications
 userSessionMIBNotificationPrefix OBJECT IDENTIFIER ::= { colubrisUserSessionMIB 2 }
@@ -341,7 +369,9 @@ colubrisUserSessionStMIBGroup OBJECT-GROUP
                     coUserSessBytesSent,
                     coUserSessBytesReceived,
                     coUserSessPacketsSent,
-                    coUserSessPacketsReceived
+                    coUserSessPacketsReceived,
+                    coUserSessEgressVLAN,
+                    coUserSessMacAddress
                 }
     STATUS      current
     DESCRIPTION "A collection of objects providing the user session MIB

@@ -1,12 +1,14 @@
 -- =================================================================
--- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Smart Link MIB
 -- Reference:
--- Version: V1.0
+-- Version: V1.1
 -- History:
 --   2014-07-23 created by Lei Gongwu
 --     Initial version V1.0
+--   V1.1 2022-05-11 Add hh3cSmlkGroupStatusSwitch, hh3cSmlkInactiveLinkDown,
+--                   hh3cSmlkInactiveLinkUp trap by zhengjun
 -- =================================================================
 -- =================================================================
 --
@@ -22,12 +24,12 @@ IMPORTS
         FROM SNMPv2-TC
     Integer32, Counter64, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
-    InterfaceIndex
+    InterfaceIndex, ifDescr
         FROM IF-MIB;
 
 hh3cSmlk MODULE-IDENTITY
     LAST-UPDATED
-        "201407231503Z"
+        "202205111453Z"
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -42,6 +44,10 @@ hh3cSmlk MODULE-IDENTITY
         It provides link redundancy and fast convergence in
         a dual uplink network, allowing the backup link to take over quickly
         when the primary link fails."
+    REVISION
+        "202205111453Z"
+    DESCRIPTION
+        "Add smart link group status switchover notification."
     REVISION
         "201407231503Z"
     DESCRIPTION
@@ -158,13 +164,13 @@ hh3cSmlkInstanceListLow OBJECT-TYPE
         the second octet specifying instances 8 through 15, and so on.
         Within each octet, the most significant bit represents the
         highest numbered instance, and the least significant bit represents
-        the lowest numbered instance.  Each instance to which the
+        the lowest numbered instance. Each instance to which the
         protected VLANs of a smart link group are mapped corresponds to a
-        bit within the value of this object.  A bit with a value of '1'
+        bit within the value of this object. A bit with a value of '1'
         indicates that the VLANs mapped to the instance are protected
-        VLANs of the smart link group.  The VLANs mapped to
+        VLANs of the smart link group. The VLANs mapped to
         the instance are not protected VLANs if the corresponding bit has a
-        value of '0'.  The value of this object must be set with
+        value of '0'. The value of this object must be set with
         hh3cSmlkInstanceListHigh at the same time when a SET
         operation is performed."
     DEFVAL      { "" }
@@ -178,16 +184,16 @@ hh3cSmlkInstanceListHigh OBJECT-TYPE
         "Each octet contained in this value specifies an eight-instance
         group, with the first octet specifying instances 2048 through
         2055, the second octet specifying instances 2056 through 2063,
-        and so on.  Within each octet, the most significant bit represents
+        and so on. Within each octet, the most significant bit represents
         the highest numbered instance, and the least significant bit
-        represents the lowest numbered instance.  The most significant bit
-        of the last octet is invalid.  Each instance to which the
+        represents the lowest numbered instance. The most significant bit
+        of the last octet is invalid. Each instance to which the
         protected VLANs of a smart link group are mapped corresponds to a
-        bit within the value of this object.  A bit with a value of '1'
+        bit within the value of this object. A bit with a value of '1'
         indicates that the VLANs mapped to the instance are protected VLANs
-        of the smart link group.  The VLANs mapped to the
+        of the smart link group. The VLANs mapped to the
         instance are not protected VLANs if the corresponding bit has a
-        value of '0'.  The value of this object must be set with
+        value of '0'. The value of this object must be set with
         hh3cSmlkInstanceListLow at the same time when a SET operation
         is performed."
     DEFVAL      { "" }
@@ -199,7 +205,7 @@ hh3cSmlkGroupRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "This object is responsible for managing creation,
-        deletion, and modification of rows.  The rows support active
+        deletion, and modification of rows. The rows support active
         status, CreatAndGo, and destroy operations."
     ::={ hh3cSmlkGroupEntry 9 }
 
@@ -291,7 +297,7 @@ hh3cSmlkPortRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "This object is responsible for managing creation,
-        deletion, and modification of rows.  The rows support active
+        deletion, and modification of rows. The rows support active
         status, CreatAndGo, and destroy operations."
     ::={ hh3cSmlkPortEntry 6 }
 
@@ -339,10 +345,10 @@ hh3cSmlkControlVlanListLow OBJECT-TYPE
     DESCRIPTION
         "Specifies the control VLANs used for receiving flush messages.
         The VLAN ID range, described by bitmap, is from 1 to
-        2048.  The length of bitmap is 256 in bytes.  Each octet
+        2048. The length of bitmap is 256 in bytes. Each octet
         within this value specifies a set of eight VLANs, with
         the first octet specifying VLANs 1 through 8, the second
-        octet specifying VLANs 9 through 16, and so on.  Within each
+        octet specifying VLANs 9 through 16, and so on. Within each
         octet, the most significant bit represents the highest
         numbered VLAN, and the least significant bit represents
         the lowest numbered VLAN."
@@ -355,7 +361,7 @@ hh3cSmlkControlVlanListHigh OBJECT-TYPE
     DESCRIPTION
         "Specifies the control VLANs used for receiving flush messages.
         The VLAN ID range, described by bitmap, is from 2049 to
-        4094.  The length of bitmap is 256 in bytes.  Each octet
+        4094. The length of bitmap is 256 in bytes. Each octet
         within this value specifies a set of eight VLANs, with
         the first octet specifying VLANs 2049 through 2056, the
         second octet specifying VLANs 2057 through 2064, and so on.
@@ -377,5 +383,66 @@ hh3cSmlkGroupLinkActive NOTIFICATION-TYPE
         "A trap message is generated when the status of a port
         in a smart link group changes to active."
     ::= { hh3cSmlkTrapPrefix 1 }
+
+hh3cSmlkGroupStatusSwitch NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSmlkGroupID,
+            hh3cSmlkGroupStatus
+        }
+    STATUS      current
+    DESCRIPTION
+        "A trap message is generated upon status change of
+        a smart link group."
+    ::= { hh3cSmlkTrapPrefix 2 }
+
+hh3cSmlkInactiveLinkDown NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSmlkGroupID,
+            hh3cSmlkPortIfIndex,
+            ifDescr
+        }
+    STATUS      current
+    DESCRIPTION
+        "A trap message is generated when the status of an inactive
+        port in a smart link group changes to down."
+    ::= { hh3cSmlkTrapPrefix 3 }
+
+hh3cSmlkInactiveLinkUp NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSmlkGroupID,
+            hh3cSmlkPortIfIndex,
+            ifDescr
+        }
+    STATUS      current
+    DESCRIPTION
+        "A trap message is generated when the status of an inactive
+        port in a smart link group changes to up."
+    ::= { hh3cSmlkTrapPrefix 4 }
+
+hh3cSmlkTrapOjbects      OBJECT IDENTIFIER ::= { hh3cSmlkTrap 1 }
+
+hh3cSmlkGroupStatus OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        unknown(1),
+        allDown(2),
+        oneUp(3),
+        twoUp(4),
+        delay(5)
+        }
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The smart link group status.
+        unknown: The group status is unknown.
+        allDown: All ports in the group are down.
+        oneUp: The group has one port in up state.
+        twoUp: The group has two port in up state.
+        delay: The group is in preemption delay state.
+        "
+    ::= { hh3cSmlkTrapOjbects 1 }
 
 END

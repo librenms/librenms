@@ -55,7 +55,7 @@
                                 a.onclick = function() {
                                     var zoom = leafletMap.getZoom();
                                     var coords = leafletMap.getCenter();
-                                    window.location.href = "fullscreenmap?lat=" + coords.lat + "&lng=" + coords.lng + "&zoom=" + zoom;
+                                    window.location.href = route('maps.fullscreen', {lat: coords.lat, lng: coords.lng, zoom: zoom});
                                     return false;
                                 };
                                 fsdiv.appendChild(a);

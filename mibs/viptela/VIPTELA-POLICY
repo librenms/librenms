@@ -9,15 +9,33 @@ IMPORTS
     TEXTUAL-CONVENTION, RowStatus, DateAndTime,
     TruthValue
         FROM SNMPv2-TC
-    viptela
+    viptela, VpnIndex
         FROM VIPTELA-GLOBAL
 ;
 
 viptela-policy MODULE-IDENTITY
-    LAST-UPDATED "202007010000Z"
+    LAST-UPDATED "202307010000Z"
     ORGANIZATION "Viptela, Inc."
     CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
     DESCRIPTION "This module defines the data model for route and forwarding policy management"
+    REVISION "202307010000Z"
+    DESCRIPTION "Viptela Revision 20.12"
+    REVISION "202303010000Z"
+    DESCRIPTION "Viptela Revision 20.11"
+    REVISION "202212150000Z"
+    DESCRIPTION "Viptela Revision 20.10"
+    REVISION "202206010000Z"
+    DESCRIPTION "Viptela Revision 20.9"
+    REVISION "202203010000Z"
+    DESCRIPTION "Viptela Revision 20.8"
+    REVISION "202111010000Z"
+    DESCRIPTION "Viptela Revision 20.7"
+    REVISION "202107010000Z"
+    DESCRIPTION "Viptela Revision 20.6"
+    REVISION "202103010000Z"
+    DESCRIPTION "Viptela Revision 20.5"
+    REVISION "202011010000Z"
+    DESCRIPTION "Viptela Revision 20.4"
     REVISION "202007010000Z"
     DESCRIPTION "Viptela Revision 20.3"
     REVISION "202002240000Z"
@@ -338,6 +356,12 @@ ColorList ::= TEXTUAL-CONVENTION
     DESCRIPTION ""
     SYNTAX      OCTET STRING
 
+SlaEnumList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+
 EncapsulationList ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "1t"
     STATUS      current
@@ -348,6 +372,11 @@ LossProtectEnum ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION ""
     SYNTAX      INTEGER {fec-adaptive(1),fec-always(2),pkt-dup(3)}
+
+FnfMonitorEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {ipv4(0),ipv6(1),both(2)}
 
 -- tagpath /policy/snmp-policy
 policy OBJECT IDENTIFIER ::= { viptela-policy 4 }
@@ -1419,7 +1448,12 @@ PolicyFromVsmartSlaClassEntry ::=
         policyFromVsmartSlaClassName String,
         policyFromVsmartSlaClassLoss UnsignedByte,
         policyFromVsmartSlaClassLatency UnsignedShort,
-        policyFromVsmartSlaClassJitter  UnsignedShort
+        policyFromVsmartSlaClassJitter  UnsignedShort,
+        policyFromVsmartSlaClassAppProbeClass String,
+        policyFromVsmartSlaClassFallbackBestTunnelCriteria SlaEnumList,
+        policyFromVsmartSlaClassLossVariance UnsignedByte,
+        policyFromVsmartSlaClassLatencyVariance UnsignedShort,
+        policyFromVsmartSlaClassJitterVariance  UnsignedShort
     }
 
 -- tagpath /policy/from-vsmart/sla-class/name
@@ -1446,13 +1480,54 @@ policyFromVsmartSlaClassLatency OBJECT-TYPE
     DESCRIPTION "Latency, in milliseconds"
     ::= { policyFromVsmartSlaClassEntry 3 }
 
--- tagpath /policy/from-vsmart/sla-class/latency
+-- tagpath /policy/from-vsmart/sla-class/jitter
 policyFromVsmartSlaClassJitter OBJECT-TYPE
     SYNTAX      UnsignedShort (1 .. 1000)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "Jitter, in milliseconds"
     ::= { policyFromVsmartSlaClassEntry 4 }
+
+-- tagpath /policy/from-vsmart/sla-class/app-probe-class
+policyFromVsmartSlaClassAppProbeClass OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "App Probe Class Name"
+    ::= { policyFromVsmartSlaClassEntry 5 }
+
+-- tagpath /policy/from-vsmart/sla-class/fallback-best-tunnel/criteria
+policyFromVsmartSlaClassFallbackBestTunnelCriteria OBJECT-TYPE
+    SYNTAX      SlaEnumList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "List of fallback best tunnel criteria"
+    ::= { policyFromVsmartSlaClassEntry 6 }
+
+-- tagpath /policy/from-vsmart/sla-class/fallback-best-tunnel-criteria/loss-variance
+policyFromVsmartSlaClassLossVariance OBJECT-TYPE
+    SYNTAX      UnsignedByte (0 .. 100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Loss percentage"
+    ::= { policyFromVsmartSlaClassEntry 7 }
+
+-- tagpath /policy/from-vsmart/sla-class/fallback-best-tunnel-criteria/latency-variance
+policyFromVsmartSlaClassLatencyVariance OBJECT-TYPE
+    SYNTAX      UnsignedShort (1 .. 1000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Latency, in milliseconds"
+    ::= { policyFromVsmartSlaClassEntry 8 }
+
+-- tagpath /policy/from-vsmart/sla-class/fallback-best-tunnel-criteria/jitter-variance
+policyFromVsmartSlaClassJitterVariance OBJECT-TYPE
+    SYNTAX      UnsignedShort (1 .. 1000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Jitter, in milliseconds"
+    ::= { policyFromVsmartSlaClassEntry 9 }
+
 
 -- tagpath /policy/from-vsmart/data-policy
 policyFromVsmartDataPolicyTable OBJECT-TYPE
@@ -1584,7 +1659,17 @@ PolicyFromVsmartDataPolicyVpnListSequenceEntry ::=
         policyFromVsmartDataPolicyVpnListSequenceActionSetLocalTlocListRestrict TruthValue,
         policyFromVsmartDataPolicyVpnListSequenceActionTcpOptimization TruthValue,
         policyFromVsmartDataPolicyVpnListSequenceActionLossProtect LossProtectEnum,
-        policyFromVsmartDataPolicyVpnListSequenceActionSetNextHopIpv6 String
+        policyFromVsmartDataPolicyVpnListSequenceActionSetNextHopIpv6 String,
+        policyFromVsmartDataPolicyVpnListSequenceActionSig TruthValue,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetNextHopLoose TruthValue,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetServiceNodeGroup String,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetSvcChainSvcChainType INTEGER,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetSvcChainVpn Unsigned32,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetSvcChainTlocIp InetAddressIP,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetSvcChainTlocClr INTEGER,
+        policyFromVsmartDataPolicyVpnListSequencActionSetSvcChainTlocLst String,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetSvcChainLocal TruthValue,
+        policyFromVsmartDataPolicyVpnListSequenceActionSetSvcChainRestrict INTEGER 
     }
 
 -- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/seq-value
@@ -1702,7 +1787,7 @@ policyFromVsmartDataPolicyVpnListSequenceActionSetPolicer OBJECT-TYPE
 
 -- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/vpn
 policyFromVsmartDataPolicyVpnListSequenceActionSetVpn OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -1742,7 +1827,7 @@ policyFromVsmartDataPolicyVpnListSequenceActionSetTlocList OBJECT-TYPE
 
 -- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/service/svc-type
 policyFromVsmartDataPolicyVpnListSequenceActionSetServiceSvcType OBJECT-TYPE
-    SYNTAX      INTEGER {fW(1),iDS(2),iDP(3),netsvc1(4),netsvc2(5),netsvc3(6),netsvc4(7)}
+    SYNTAX      INTEGER {fW(1),iDS(2),iDP(3),netsvc1(4),netsvc2(5),netsvc3(6),netsvc4(7),appqoe(10)}
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "Service type"
@@ -1750,7 +1835,7 @@ policyFromVsmartDataPolicyVpnListSequenceActionSetServiceSvcType OBJECT-TYPE
 
 -- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/service/vpn
 policyFromVsmartDataPolicyVpnListSequenceActionSetServiceVpn OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -1795,6 +1880,62 @@ policyFromVsmartDataPolicyVpnListSequenceActionSetServiceRestrict OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Drop packet if local service unreachable"
     ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 30 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/service-chain/service-chain-type
+policyFromVsmartDataPolicyVpnListSequenceActionSetSvcChainSvcChainType OBJECT-TYPE
+    SYNTAX      INTEGER {sc1(1),sc2(2),sc3(3),sc4(4),sc5(5),sc6(6),sc7(7),sc8(8),sc9(9),sc10(10),sc11(11),sc12(12),sc13(13),sc14(14),sc15(15),sc16(16)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Service chain type"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 41 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/service-chain/vpn
+policyFromVsmartDataPolicyVpnListSequenceActionSetSvcChainVpn OBJECT-TYPE
+    SYNTAX      VpnIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 42 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/service-chain/tloc/ip
+policyFromVsmartDataPolicyVpnListSequenceActionSetSvcChainTlocIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 43 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/service-chain/tloc/color
+policyFromVsmartDataPolicyVpnListSequenceActionSetSvcChainTlocClr OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 44 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/service-chain/tloc-list
+policyFromVsmartDataPolicyVpnListSequencActionSetSvcChainTlocLst OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of TLOC list"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 45 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/service-chain/local
+policyFromVsmartDataPolicyVpnListSequenceActionSetSvcChainLocal OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Local service"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 46 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/service-chain/restrict-type
+policyFromVsmartDataPolicyVpnListSequenceActionSetSvcChainRestrict OBJECT-TYPE
+    SYNTAX      INTEGER {default(1), fall-back(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Drop packet if local service unreachable"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 47 }
 
 -- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/log
 policyFromVsmartDataPolicyVpnListSequenceActionLog OBJECT-TYPE
@@ -1851,6 +1992,30 @@ policyFromVsmartDataPolicyVpnListSequenceActionSetNextHopIpv6 OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Next-hop IPv6 address"
     ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 37 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/sig
+policyFromVsmartDataPolicyVpnListSequenceActionSig OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Packet redirect to SIG (Secure Internet Gateway)"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 38 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/next-hop-loose
+policyFromVsmartDataPolicyVpnListSequenceActionSetNextHopLoose OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Forward packet if next-hop is not routable"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 39 }
+
+-- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/service-node-group
+policyFromVsmartDataPolicyVpnListSequenceActionSetServiceNodeGroup OBJECT-TYPE
+    SYNTAX      String (SIZE (10 .. 12))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Service node group name"
+    ::= { policyFromVsmartDataPolicyVpnListSequenceEntry 40 }
 
 -- tagpath /policy/from-vsmart/data-policy/vpn-list/sequence/action/set/vip-tloc-pref-list
 policyFromVsmartDataPolicyVpnListSeqActSetVipTlocPrLstTable OBJECT-TYPE
@@ -1950,7 +2115,11 @@ PolicyFromVsmartCflowdTemplateEntry ::=
         policyFromVsmartCflowdTemplateFlowActiveTimeout Unsigned32,
         policyFromVsmartCflowdTemplateFlowInactiveTimeout Unsigned32,
         policyFromVsmartCflowdTemplateTemplateRefresh Unsigned32,
-        policyFromVsmartCflowdTemplateFlowSamplingInterval Unsigned32
+        policyFromVsmartCflowdTemplateFlowSamplingInterval Unsigned32,
+        policyFromVsmartCflowdTemplateProtocol FnfMonitorEnum,
+        policyFromVsmartCflowdTemplateCustomizedCollectTos TruthValue, 
+        policyFromVsmartCflowdTemplateCustomizedCollectDscpOutput TruthValue,
+        policyFromVsmartCflowdTemplateCollectTlocLoopback TruthValue
     }
 
 -- tagpath /policy/from-vsmart/cflowd-template/name
@@ -1997,6 +2166,42 @@ policyFromVsmartCflowdTemplateFlowSamplingInterval OBJECT-TYPE
     DEFVAL { 1024 }
     ::= { policyFromVsmartCflowdTemplateEntry 5 }
 
+-- tagpath /policy/from-vsmart/cflowd-template/protocol
+policyFromVsmartCflowdTemplateProtocol OBJECT-TYPE
+    SYNTAX      FnfMonitorEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Traffic type for FNF"
+    DEFVAL { ipv4 }
+    ::= { policyFromVsmartCflowdTemplateEntry 6 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/customized-ipv4-record-fields/collect-tos 
+policyFromVsmartCflowdTemplateCustomizedCollectTos OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Collect tos"
+    DEFVAL { false }
+    ::= { policyFromVsmartCflowdTemplateEntry 7 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/customized-ipv4-record-fields/collect-dscp-output 
+policyFromVsmartCflowdTemplateCustomizedCollectDscpOutput OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Collect dscp output"
+    DEFVAL { false }
+    ::= { policyFromVsmartCflowdTemplateEntry 8 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/collect-tloc-loopback 
+policyFromVsmartCflowdTemplateCollectTlocLoopback OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Collect tloc loopback interface"
+    DEFVAL { false }
+    ::= { policyFromVsmartCflowdTemplateEntry 9 }
+
 -- tagpath /policy/from-vsmart/cflowd-template/collector
 policyFromVsmartCflowdTemplateCollectorTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF PolicyFromVsmartCflowdTemplateCollectorEntry
@@ -2020,7 +2225,13 @@ PolicyFromVsmartCflowdTemplateCollectorEntry ::=
         policyFromVsmartCflowdTemplateCollectorAddress InetAddressIP,
         policyFromVsmartCflowdTemplateCollectorPort UnsignedShort,
         policyFromVsmartCflowdTemplateCollectorTransport TransportProtocol,
-        policyFromVsmartCflowdTemplateCollectorSourceInterface String
+        policyFromVsmartCflowdTemplateCollectorSourceInterface String,
+        policyFromVsmartCflowdTemplateCollectorSpread TruthValue,
+        policyFromVsmartCflowdTemplateCollectorSpreadApp Unsigned32,
+        policyFromVsmartCflowdTemplateCollectorSpreadTLoc Unsigned32,
+        policyFromVsmartCflowdTemplateCollectorSpreadOthers Unsigned32,
+        policyFromVsmartCflowdTemplateCollectorBFD TruthValue,
+        policyFromVsmartCflowdTemplateCollectorBFDExportInterval Unsigned32
     }
 
 -- tagpath /policy/from-vsmart/cflowd-template/collector/vpn
@@ -2062,6 +2273,54 @@ policyFromVsmartCflowdTemplateCollectorSourceInterface OBJECT-TYPE
     STATUS      current
     DESCRIPTION "IPFIX Source Interface"
     ::= { policyFromVsmartCflowdTemplateCollectorEntry 5 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/collector/export-spread/enable
+policyFromVsmartCflowdTemplateCollectorSpread OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Export spreading enable"
+    ::= { policyFromVsmartCflowdTemplateCollectorEntry 6 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/collector/export-spread/app-tables
+policyFromVsmartCflowdTemplateCollectorSpreadApp OBJECT-TYPE
+    SYNTAX      Unsigned32 (1 .. 86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Export spreading application"
+    ::= { policyFromVsmartCflowdTemplateCollectorEntry 7 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/collector/export-spread/tloc-tables
+policyFromVsmartCflowdTemplateCollectorSpreadTLoc OBJECT-TYPE
+    SYNTAX      Unsigned32 (1 .. 86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Export spreading tloc"
+    ::= { policyFromVsmartCflowdTemplateCollectorEntry 8 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/collector/export-spread/other-tables
+policyFromVsmartCflowdTemplateCollectorSpreadOthers OBJECT-TYPE
+    SYNTAX      Unsigned32 (1 .. 86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Export spreading others"
+    ::= { policyFromVsmartCflowdTemplateCollectorEntry 9 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/collector/bfd-metrics-export
+policyFromVsmartCflowdTemplateCollectorBFD OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Export BFD Metrics enable"
+    ::= { policyFromVsmartCflowdTemplateCollectorEntry 10 }
+
+-- tagpath /policy/from-vsmart/cflowd-template/collector/bfd-metrics-export/export-interval
+policyFromVsmartCflowdTemplateCollectorBFDExportInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (1 .. 86400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Export BFD Export Interval"
+    ::= { policyFromVsmartCflowdTemplateCollectorEntry 11 }
 
 -- tagpath /policy/from-vsmart/app-route-policy
 policyFromVsmartAppRoutePolicyTable OBJECT-TYPE
@@ -2161,7 +2420,8 @@ PolicyFromVsmartAppRoutePolicyVpnListSequenceEntry ::=
         policyFromVsmartAppRoutePolicyVpnListSequenceActionSlaClStrict TruthValue,
         policyFromVsmartAppRoutePolicyVpnListSequenceActionSlaClPrefClr ColorList,
         policyFromVsmartAppRoutePolicyVpnListSequenceActionLog TruthValue,
-        policyFromVsmartAppRoutePolicyVpnListSequenceActionBackupSlaPrefClr ColorList
+        policyFromVsmartAppRoutePolicyVpnListSequenceActionBackupSlaPrefClr ColorList,
+        policyFromVsmartAppRoutePolicyVpnListSequenceActionSlaClFallback TruthValue
     }
 
 -- tagpath /policy/from-vsmart/app-route-policy/vpn-list/sequence/seq-value
@@ -2251,6 +2511,14 @@ policyFromVsmartAppRoutePolicyVpnListSequenceActionBackupSlaPrefClr OBJECT-TYPE
     STATUS      current
     DESCRIPTION "List of preferred colors for ECMP when primary SLA is not met"
     ::= { policyFromVsmartAppRoutePolicyVpnListSequenceEntry 16 }
+
+-- tagpath /policy/from-vsmart/app-route-policy/vpn-list/sequence/action/sla-class/fallback-to-best-path
+policyFromVsmartAppRoutePolicyVpnListSequenceActionSlaClFallback OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Fallback to best path when SLA is not met"
+    ::= { policyFromVsmartAppRoutePolicyVpnListSequenceEntry 17 }
 
 -- tagpath /policy/from-vsmart/policer
 policyFromVsmartPolicerTable OBJECT-TYPE
@@ -2516,6 +2784,84 @@ policyFromVsmartListsTlocListTlocPreference OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Route preference"
     ::= { policyFromVsmartListsTlocListTlocEntry 4 }
+
+-- tagpath /policy/from-vsmart/lists/app-probe-class
+policyFromVsmartListsAppProbeClassListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartListsAppProbeClassListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of App Probe Classes"
+    ::= { policyFromVsmart 21 }
+
+-- tagpath /policy/from-vsmart/lists/app-probe-class
+policyFromVsmartListsAppProbeClassListEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartListsAppProbeClassListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED policyFromVsmartListsAppProbeClassListName }
+        ::= { policyFromVsmartListsAppProbeClassListTable 1 }
+
+PolicyFromVsmartListsAppProbeClassListEntry ::=
+    SEQUENCE {
+        policyFromVsmartListsAppProbeClassListName String,
+        policyFromVsmartListsAppProbeClassListForwardingClass String
+    }
+
+-- tagpath /policy/from-vsmart/lists/app-probe-class/name
+policyFromVsmartListsAppProbeClassListName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of app probe class list"
+    ::= { policyFromVsmartListsAppProbeClassListEntry 1 }
+
+-- tagpath /policy/from-vsmart/lists/app-probe-class/forwarding-class
+policyFromVsmartListsAppProbeClassListForwardingClass OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of forwarding class list"
+    ::= { policyFromVsmartListsAppProbeClassListEntry 2 }
+
+-- tagpath /policy/from-vsmart/lists/app-probe-class/color
+policyFromVsmartListsAppProbeClassColorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PolicyFromVsmartListsAppProbeClassColorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Color"
+    ::= { policyFromVsmart 22 }
+
+-- tagpath /policy/from-vsmart/lists/app-probe-class/color
+policyFromVsmartListsAppProbeClassColorEntry OBJECT-TYPE
+    SYNTAX      PolicyFromVsmartListsAppProbeClassColorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX {policyFromVsmartListsAppProbeClassListName, policyFromVsmartListsAppProbeClassColorName}
+        ::= { policyFromVsmartListsAppProbeClassColorTable 1 }
+
+PolicyFromVsmartListsAppProbeClassColorEntry ::=
+    SEQUENCE {
+        policyFromVsmartListsAppProbeClassColorName INTEGER,
+	      policyFromVsmartListsAppProbeClassColorDscp Unsigned32
+    }
+
+-- tagpath /policy/from-vsmart/lists/app-probe-class/color/color-name
+policyFromVsmartListsAppProbeClassColorName OBJECT-TYPE
+    SYNTAX	INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyFromVsmartListsAppProbeClassColorEntry 1 }
+
+-- tagpath /policy/from-vsmart/lists/app-probe-class/color/dscp
+policyFromVsmartListsAppProbeClassColorDscp OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 63)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { policyFromVsmartListsAppProbeClassColorEntry 2 }
 
 -- Display zone based firewall statistics
 -- tagpath /zone-based-firewall-statistics
@@ -2912,7 +3258,7 @@ zonepairInspectSessionZonepairName OBJECT-TYPE
 
 --tagpath /zonepair/inspect-session/vpn
 zonepairInspectSessionVpn OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN"
@@ -2960,7 +3306,7 @@ zonepairInspectSessionProtocol OBJECT-TYPE
 
 --tagpath /zonepair/inspect-session/source-vpn
 zonepairInspectSessionSourceVpn OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "Source VPN"
@@ -2968,7 +3314,7 @@ zonepairInspectSessionSourceVpn OBJECT-TYPE
 
 --tagpath /zonepair/inspect-session/destination-vpn
 zonepairInspectSessionDestinationVpn OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "Destination VPN"

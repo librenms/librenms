@@ -55,6 +55,24 @@ final class UnixAgentDataSourceTest extends TestCase
         $this->assertEquals(75, $mempool->mempool_perc);
     }
 
+    public function testDiscoversPackagesFromTheAgentOutput(): void
+    {
+        $packages = $this->source("<<<rpm>>>\nbash 5.2.0 3 x86_64 12345\n")->discoverPackages();
+
+        $this->assertCount(1, $packages);
+        $this->assertSame('bash', $packages->first()->name);
+    }
+
+    public function testRejectsPackagesWhenTheFetchTimedOut(): void
+    {
+        $source = new UnixAgentDataSource(ProbeResult::success([
+            'output' => "<<<rpm>>>\nbash 5.2.0 3 x86_64 12345\n",
+            'timed_out' => true,
+        ]));
+
+        $this->assertCount(0, $source->discoverPackages());
+    }
+
     private function source(string $output): UnixAgentDataSource
     {
         return new UnixAgentDataSource(ProbeResult::success(['output' => $output]));

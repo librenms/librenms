@@ -34,7 +34,7 @@ final class MetricCollectorTest extends TestCase
         {
             public function metricIdentity(string $measurement): MetricIdentity
             {
-                return new MetricIdentity('host.example.com', $measurement);
+                return new MetricIdentity($measurement, ['hostname' => 'host.example.com']);
             }
         };
     }

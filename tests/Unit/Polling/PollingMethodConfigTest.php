@@ -10,7 +10,9 @@ use App\Models\Secret;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
+use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
+use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
 use LibreNMS\Polling\Method\Methods\PollingMethod;
@@ -103,6 +105,35 @@ final class PollingMethodConfigTest extends TestCase
         $this->assertSame(3, $this->config(new SnmpPollingMethod, $this->deviceMethod(PollingMethodType::Snmp, device: $device))->maxRepeaters);
     }
 
+    public function testSnmpBulkSettingIsUsedExceptForV1(): void
+    {
+        $method = new SnmpPollingMethod;
+        $community = ['community' => 'shared'];
+        $v3 = ['authlevel' => 'noAuthNoPriv', 'authname' => 'user1'];
+
+        $this->assertTrue($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, [], $community))->bulk);
+        $this->assertFalse($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['bulk' => false], $community))->bulk);
+        $this->assertFalse($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['bulk' => false], $v3))->bulk);
+
+        // v1 has no GETBULK, whatever the setting or OS default
+        $this->assertFalse($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['version' => 'v1'], $community))->bulk);
+        $this->assertFalse($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['version' => 'v1', 'bulk' => true], $community))->bulk);
+
+        // the version setting only applies to a community, so v3 keeps bulk
+        $this->assertTrue($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['version' => 'v1'], $v3))->bulk);
+    }
+
+    public function testSnmpBulkDefaultFollowsOsSetting(): void
+    {
+        LibrenmsConfig::set('os.test-os.snmp_bulk', false);
+        $device = new Device(['hostname' => 'example.com', 'os' => 'test-os']);
+        $method = new SnmpPollingMethod;
+
+        $this->assertFalse($method->defaults($device)['bulk']);
+        $this->assertFalse($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, device: $device))->bulk);
+        $this->assertTrue($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['bulk' => true], device: $device))->bulk); // stored setting wins
+    }
+
     public function testSnmpTransportDefaultFollowsConfig(): void
     {
         LibrenmsConfig::set('snmp.transports.0', 'tcp6');
@@ -184,8 +215,12 @@ final class PollingMethodConfigTest extends TestCase
         $this->assertSame('ipv6', $device->polling()->icmp()->ipVersion);
 
         $this->assertFalse($device->polling()->isEnabled(PollingMethodType::Ipmi));
-        $this->assertSame('192.0.2.1', $device->polling()->ipmi()->hostname);
-        $this->assertSame(6556, $device->polling()->unixAgent()->port);
+        $ipmi = $device->polling()->get(PollingMethodType::Ipmi);
+        $this->assertInstanceOf(IpmiConfig::class, $ipmi);
+        $this->assertSame('192.0.2.1', $ipmi->hostname);
+        $agent = $device->polling()->get(PollingMethodType::UnixAgent);
+        $this->assertInstanceOf(UnixAgentConfig::class, $agent);
+        $this->assertSame(6556, $agent->port);
     }
 
     public function testSnmpWithoutPollingMethodsUsesTheDefaults(): void

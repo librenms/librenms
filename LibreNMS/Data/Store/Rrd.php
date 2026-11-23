@@ -36,10 +36,12 @@ use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\Exceptions\RrdStoreException;
+use LibreNMS\Exceptions\RrdUnknownException;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\Util\Rewrite;
 use Log;
+use Symfony\Component\Process\Exception\ExceptionInterface as ProcessException;
 
 class Rrd extends BaseDatastore
 {
@@ -83,13 +85,9 @@ class Rrd extends BaseDatastore
         $device_model = $this->getDevice($meta);
 
         $rrd_name = $meta['rrd_name'] ?? $measurement;
-        if (! empty($meta['rrd_oldname'])) {
-            self::renameFile($device_model, $meta['rrd_oldname'], $rrd_name);
-        }
-
         $metric = $meta['metric'] ?? null;
         if ($metric instanceof MetricIdentity) {
-            self::checkDirExists(RrdPath::make($metric->owner)); // not always a device, those are created when polling starts
+            self::checkDirExists(RrdPath::make($metric->group())); // not always a device, those are created when polling starts
             $rrd = $this->metricName($metric);
         } else {
             $rrd = RrdPath::make($device_model->hostname, self::filenameString($rrd_name) . '.rrd');
@@ -114,9 +112,22 @@ class Rrd extends BaseDatastore
         }
 
         try {
+            if (! empty($meta['rrd_oldname'])) {
+                self::renameFile($device_model, $meta['rrd_oldname'], $rrd_name);
+            }
+
             try {
                 $this->update($rrd, $values);
-            } catch (RrdNotFoundException) {
+            } catch (RrdException $e) {
+                // rrdcached can lose the stat errno while logging the failure.
+                if (! $e instanceof RrdNotFoundException && (
+                    ! isset($rrd_def)
+                    || ! preg_match('/^rrdcached@.+: stat failed with error 0\.?$/', $e->getMessage())
+                    || $this->checkRrdExists($rrd)
+                )) {
+                    throw $e;
+                }
+
                 if (isset($rrd_def)) {
                     $stat = Measurement::start('create');
                     $this->backend()->create($rrd, $rrd_def);
@@ -275,11 +286,38 @@ class Rrd extends BaseDatastore
     }
 
     /**
-     * The rrd file of a metric: in the directory of its owner, named after the measurement and tag values.
+     * The rrd file of a metric: in the directory of its group, named after the measurement and the other tag values.
      */
     public function metricName(MetricIdentity $metric): RrdPath
     {
-        return $this->name($metric->owner, [$metric->measurement, ...array_values($metric->tags)]);
+        return $this->name($metric->group(), [$metric->measurement, ...array_values($metric->tagsInGroup())]);
+    }
+
+    /**
+     * The rrd files a metric may be kept in, the one the poller writes to first.
+     * A metric whose identity was cleaned up may still be kept in the file it had before.
+     *
+     * @return list<RrdPath>
+     */
+    public function metricNames(MetricIdentity $metric): array
+    {
+        if ($metric->group() === '') {
+            return [];
+        }
+
+        $names = app(MetricNames::class);
+        $paths = [$this->metricName($metric)];
+
+        if ($legacy = $names->legacyOf($metric)) {
+            $legacyPath = $this->name($metric->group(), $legacy->rrdNameOf($metric) ?? $legacy->measurement);
+
+            // some metrics kept their file name when the identity was cleaned up
+            if ($legacyPath->relativePath() !== $paths[0]->relativePath()) {
+                $paths[] = $legacyPath;
+            }
+        }
+
+        return $names->isCanonical() ? $paths : array_reverse($paths);
     }
 
     /**
@@ -350,6 +388,8 @@ class Rrd extends BaseDatastore
 
     /**
      * Checks if the rrd file exists on the server
+     *
+     * @throws RrdException if the remote probe fails
      */
     public function checkRrdExists(RrdPath $rrdpath): bool
     {
@@ -364,6 +404,8 @@ class Rrd extends BaseDatastore
             return true;
         } catch (RrdNotFoundException) {
             return false;
+        } catch (ProcessException $e) {
+            throw new RrdUnknownException('RRD existence probe failed: ' . $e->getMessage(), previous: $e);
         } finally {
             $this->recordStatistic($stat->end());
         }

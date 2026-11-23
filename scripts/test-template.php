@@ -1,7 +1,6 @@
 #!/usr/bin/env php
 <?php
 
-$init_modules = ['alerts', 'laravel'];
 require __DIR__ . '/../includes/init.php';
 
 use LibreNMS\Alert\AlertData;

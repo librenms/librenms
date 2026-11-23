@@ -551,7 +551,6 @@ class RunAlerts
             $noacc = false;
             $updet = false;
             $rextra = json_decode((string) $alert['extra'], true);
-            $rextra['recovery'] ??= true;
 
             $alert['details']['count'] ??= 0;
 
@@ -583,7 +582,6 @@ class RunAlerts
                 }
             }
 
-            $tolerence_window = LibrenmsConfig::get('alert.tolerance_window');
             $activeState = in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED], true);
             $dueTransports = [];
 
@@ -648,51 +646,8 @@ class RunAlerts
                 }
             } elseif ($activeState) {
                 $rextra['mute'] = true;
-            } elseif (! empty($rextra['count']) && empty($rextra['interval'])) {
-                // This check below is for compat-reasons
-                if (! empty($rextra['delay']) && $alert['state'] != AlertState::RECOVERED) {
-                    if ((time() - strtotime((string) $alert['time_logged']) + $tolerence_window) < $rextra['delay'] || (! empty($alert['details']['delay']) && (time() - $alert['details']['delay'] + $tolerence_window) < $rextra['delay'])) {
-                        continue;
-                    } else {
-                        $alert['details']['delay'] = time();
-                        $updet = true;
-                    }
-                }
-
-                if ($alert['state'] == AlertState::ACTIVE && ! empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
-                    // We don't want -1 alert rule count alarms to get muted because of the current alert count
-                    if ($alert['details']['count'] < $rextra['count'] || $rextra['count'] == -1) {
-                        $noacc = true;
-                    }
-
-                    $updet = true;
-                    $noiss = false;
-                }
-            } else {
-                // This is the new way
-                if (! empty($rextra['delay']) && (time() - strtotime((string) $alert['time_logged']) + $tolerence_window) < $rextra['delay'] && $alert['state'] != AlertState::RECOVERED) {
-                    continue;
-                }
-
-                if (! empty($rextra['interval'])) {
-                    if (! empty($alert['details']['interval']) && (time() - $alert['details']['interval'] + $tolerence_window) < $rextra['interval']) {
-                        continue;
-                    } else {
-                        $alert['details']['interval'] = time();
-                        $updet = true;
-                    }
-                }
-
-                if (in_array($alert['state'], [AlertState::ACTIVE, AlertState::WORSE, AlertState::BETTER, AlertState::CHANGED]) && ! empty($rextra['count']) && ($rextra['count'] == -1 || $alert['details']['count']++ < $rextra['count'])) {
-                    // We don't want -1 alert rule count alarms to get muted because of the current alert count
-                    if ($alert['details']['count'] < $rextra['count'] || $rextra['count'] == -1) {
-                        $noacc = true;
-                    }
-
-                    $updet = true;
-                    $noiss = false;
-                }
             }
+
             if ($status_check->ignore || $status_check->disabled) {
                 $noiss = true;
                 $updet = false;

@@ -16,12 +16,12 @@
                 FROM AT-SYSINFO-MIB
             Unsigned32, OBJECT-TYPE, MODULE-IDENTITY
                 FROM SNMPv2-SMI
-            TEXTUAL-CONVENTION
+            TEXTUAL-CONVENTION, TruthValue
                 FROM SNMPv2-TC;
 
 
         atAlmMon MODULE-IDENTITY
-            LAST-UPDATED "201702080000Z"
+            LAST-UPDATED "201902120000Z"
             ORGANIZATION
                 "Allied Telesis, Inc"
             CONTACT-INFO
@@ -29,6 +29,13 @@
             DESCRIPTION
                 "The AT Alarm Monitoring MIB for managing and
                 reporting device alarms."
+            REVISION "201902120000Z"
+            DESCRIPTION
+                "Extended to support per stack member configuration."
+            REVISION "201809200000Z"
+            DESCRIPTION
+                "Added UFO alarm type.
+                 Removed AtAlmMonAlarmType zero enumeration."
             REVISION "201702080000Z"
             DESCRIPTION
                 "Added g8032 as an alarm type."
@@ -53,7 +60,6 @@
                 "Indicates the type of a monitored alarm."
             SYNTAX INTEGER
                 {
-                alarmTypeInvalid(0),
                 externalPSU(1),
                 epsr(2), 
                 contactInput(3),
@@ -62,7 +68,8 @@
                 mainPse(6),
                 portPoeFailure(7),
                 temperature(8),
-                g8032(9)
+                g8032(9),
+                ufo(10)
                 }
 
 
@@ -97,6 +104,15 @@
                 active(2)
                 }
 
+        AtAlmMonContactPosition ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "Indicates the position state for a contact input."
+            SYNTAX INTEGER
+                {
+                open(1),
+                closed(2)
+                }
 --
 -- Node definitions
 --
@@ -245,6 +261,345 @@
             DESCRIPTION
                 "Indicates the current state of this alarm monitor."
             ::= { atAlmMonActionEntry 11 }
+
+--
+-- Tables to support per stack configuration
+--
+-- ---------------------------------------------------------- --
+-- The Alarm Monitoring available alarms table
+-- ---------------------------------------------------------- --
+       atAlmMonPerStackConfiguration OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates whether to support per stack member configuration.
+
+                 A true value means that atAlmMonAvailableTable, atAlmMonOutputRelayTable,
+                 atAlmMonOutputLedTable and atAlmMonIutputContactTable are supported.
+
+                 A notTrue value means that atAlmMonActionTable is supported.
+
+                 This object should be set to a value that reflects the way that alarm
+                 monitors are actually configured or to be configured."
+
+            ::= { atAlmMon 2 }
+
+        atAlmMonAvailableTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtAlmMonAvailableEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of information listing available alarms on the device."
+            ::= { atAlmMon 3 }
+
+        atAlmMonAvailableEntry OBJECT-TYPE
+            SYNTAX AtAlmMonAvailableEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The description and configuration of each available alarm."
+            INDEX { atAlmMonAvailableAlarmId }
+            ::= { atAlmMonAvailableTable 1 }
+
+        AtAlmMonAvailableEntry ::=
+            SEQUENCE {
+                atAlmMonAvailableAlarmId
+                    Unsigned32,
+                atAlmMonAvailableType
+                    AtAlmMonAlarmType,
+                atAlmMonAvailableTypeIndex
+                    Unsigned32,
+                atAlmMonAvailableStkId
+                    Unsigned32,
+                atAlmMonAvailableIfName
+                    DisplayStringUnsized,
+               atAlmMonAvailableState
+                    AtAlmMonActionState
+             }
+
+        atAlmMonAvailableAlarmId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unique numeric identifier for this alarm."
+            ::= { atAlmMonAvailableEntry 1 }
+
+        atAlmMonAvailableType OBJECT-TYPE
+            SYNTAX AtAlmMonAlarmType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of this alarm, such as externalPSU(1), epsr(2), etc."
+            ::= { atAlmMonAvailableEntry 2 }
+
+         atAlmMonAvailableTypeIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the particular alarm type (catagorised by atAlmMonAlarmType).
+
+                 For some alarms there are multiple sources on the device (i.e. power supplies).
+                 In these cases this object indicates which source the alarm is for (i.e.
+                 power supply 1, or power supply 2).
+
+                 This object is used for externalPSU(1) and contactInput(3) alarm only."
+            ::= { atAlmMonAvailableEntry 3 }
+
+        atAlmMonAvailableStkId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The id of stack member this alarm triggers on.
+
+                This object is used for externalPSU(1), contactInput(3), portLinkDown(4),
+                portPoeFailure(7) and temperature(8) alarm only."
+            ::= { atAlmMonAvailableEntry 4 }
+
+        atAlmMonAvailableIfName OBJECT-TYPE
+            SYNTAX DisplayStringUnsized (SIZE (0..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of the specific interface that this alarm triggers on, such as 'port1.0.1.
+
+                 This object is used for portLinkDown(4) and portPoeFailure(7) alarm only."
+            ::= { atAlmMonAvailableEntry 5 }
+
+       atAlmMonAvailableState OBJECT-TYPE
+            SYNTAX AtAlmMonActionState
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the current state of this alarm."
+            ::= { atAlmMonAvailableEntry 6 }
+
+-- ---------------------------------------------------------- --
+-- The Alarm Monitoring output relay table
+-- ---------------------------------------------------------- --
+
+        atAlmMonOutputRelayTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtAlmMonOutputRelayEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table lists all associations existing on the device between output
+                 relays and alarms.
+
+                 Theoretically, an output relay on the device can be triggered by multiple
+                 alarms and an alarm can trigger multiple output relays."
+            ::= { atAlmMon 4 }
+
+        atAlmMonOutputRelayEntry OBJECT-TYPE
+            SYNTAX AtAlmMonOutputRelayEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This entry reprents an association between one ouput relay and one alarm.
+
+                 To configure an alarm to use an output relay, a user needs to create a new
+                 entry. This can be done through writing a value of used(2) to object
+                 atAlmMonOutputRelayUsage that is specified by atAlmMonOutputRelayStkId,
+                 atAlmMonOutputRelayNumber, and atAlmMonOutputRelayAlarmId.
+
+                 To reconfigure an alarm not to use an output relay, a user needs to delete
+                 the entry. This can be done by writing a value of unused(1) to object
+                 atAlmMonOutputRelayUsage."
+            INDEX { atAlmMonOutputRelayStkId, atAlmMonOutputRelayNumber, atAlmMonOutputRelayAlarmId }
+            ::= { atAlmMonOutputRelayTable 1 }
+
+        AtAlmMonOutputRelayEntry ::=
+            SEQUENCE {
+                atAlmMonOutputRelayStkId
+                    Unsigned32,
+                atAlmMonOutputRelayNumber
+                    Unsigned32,
+                atAlmMonOutputRelayAlarmId
+                    Unsigned32,
+                atAlmMonOutputRelayUsage
+                    AtAlmMonActionUseOutput
+             }
+
+        atAlmMonOutputRelayStkId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The id of stack member that the relay(s) reside on."
+            ::= { atAlmMonOutputRelayEntry 1 }
+
+        atAlmMonOutputRelayNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number (i.e. the 1 based index) of the relay."
+            ::= { atAlmMonOutputRelayEntry 2 }
+
+        atAlmMonOutputRelayAlarmId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The id of the alarm that may use this relay output."
+            ::= { atAlmMonOutputRelayEntry 3 }
+
+        atAlmMonOutputRelayUsage OBJECT-TYPE
+            SYNTAX AtAlmMonActionUseOutput
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether or not the relay output is used.
+
+                 Since there are entries only for existing associations between the output
+                 relays and the alarms, the object value should be always used(2).
+
+                 If a user sets a value of unused(1) to this object, then the whole entry
+                 will be deleted.
+
+                 If a user sets a value of used(2) to this object with new index, then
+                 a new entry should be created if stack member id, relay number and
+                 alarm id are specified properly in the index."
+            ::= { atAlmMonOutputRelayEntry 4 }
+
+-- ---------------------------------------------------------- --
+-- The Alarm Monitoring output led table
+-- ---------------------------------------------------------- --
+
+        atAlmMonOutputLedTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtAlmMonOutputLedEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table lists all associations existing on the device between output
+                 LED(s) and alarms.
+
+                 Theoretically, an output LED on the device can be triggered by multiple
+                 alarms and an alarm can trigger multiple LED(s)."
+            ::= { atAlmMon 5 }
+
+        atAlmMonOutputLedEntry OBJECT-TYPE
+            SYNTAX AtAlmMonOutputLedEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This entry reprents an association between one LED and one alarm.
+
+                 To configure an alarm to use an output LED, a user needs to create a new
+                 entry. This can be done through writing a value of used(2) to object
+                 atAlmMonOutputLedUsage that is specified by atAlmMonOutputLedStkId and
+                 atAlmMonOutputRelayAlarmId.
+
+                 To reconfigure an alarm not to use an output LED, a user needs to delete
+                 the entry. This can be done by writing a value of unused(1) to object
+                 atAlmMonOutputLedUsage."
+            INDEX { atAlmMonOutputRelayStkId, atAlmMonOutputRelayAlarmId }
+            ::= { atAlmMonOutputLedTable 1 }
+
+        AtAlmMonOutputLedEntry ::=
+            SEQUENCE {
+                atAlmMonOutputLedStkId
+                    Unsigned32,
+                atAlmMonOutputLedAlarmId
+                    Unsigned32,
+                atAlmMonOutputLedUsage
+                    AtAlmMonActionUseOutput
+             }
+
+        atAlmMonOutputLedStkId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The id of stack member that the output LED resides on."
+            ::= { atAlmMonOutputLedEntry 1 }
+
+        atAlmMonOutputLedAlarmId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The id of the alarm that may use this output LED."
+            ::= { atAlmMonOutputLedEntry 2 }
+
+        atAlmMonOutputLedUsage OBJECT-TYPE
+            SYNTAX AtAlmMonActionUseOutput
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether or not an LED is used.
+
+                 Since there are entries only for existing associations between the output
+                 LED(s) and the alarms, the object value should be always used(2).
+
+                 If a user sets a value of unused(1) to this object, then the whole entry
+                 will be deleted.
+
+                 If a user sets a value of used(2) to this object with new index, then
+                 a new entry should be created if stack member id and alarm id are
+                 specified properly in the index."
+            ::= { atAlmMonOutputLedEntry 3 }
+
+-- ---------------------------------------------------------- --
+-- The Alarm Monitoring input contact table
+-- ---------------------------------------------------------- --
+
+        atAlmMonInputContactTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtAlmMonInputContactEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table lists all input contacts on the device and their positions."
+            ::= { atAlmMon 6 }
+
+        atAlmMonInputContactEntry OBJECT-TYPE
+            SYNTAX AtAlmMonInputContactEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The information of each input contact configuration."
+            INDEX { atAlmMonInputContactStkId, atAlmMonInputContactNumber }
+            ::= { atAlmMonInputContactTable 1 }
+
+        AtAlmMonInputContactEntry ::=
+            SEQUENCE {
+                atAlmMonInputContactStkId
+                    Unsigned32,
+                atAlmMonInputContactNumber
+                    Unsigned32,
+                atAlmMonInputContactPosition
+                    AtAlmMonContactPosition
+             }
+
+        atAlmMonInputContactStkId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The id of stack member that the input contact reside on."
+            ::= { atAlmMonInputContactEntry 1 }
+
+        atAlmMonInputContactNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number (i.e. the 1 based index) of the input contact."
+            ::= { atAlmMonInputContactEntry 2 }
+
+        atAlmMonInputContactPosition OBJECT-TYPE
+            SYNTAX AtAlmMonContactPosition
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object represents the position of the input contact. It is either
+                 open or closed.
+                 A user can reconfigure the position of an input contact by setting
+                 a different value to this object."
+            ::= { atAlmMonInputContactEntry 3 }
 
     END
 

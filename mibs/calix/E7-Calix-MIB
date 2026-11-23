@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing commas; trailing comma before })
 E7-Calix-MIB DEFINITIONS ::= BEGIN
 
 --
@@ -24,8 +25,8 @@ IMPORTS
     E7SnmpVers,
     E7EtherType,
     E7Pbit,
-    E7BondedInterfaceIndex
-    E7OperStatus
+    E7BondedInterfaceIndex,
+    E7OperStatus,
     E7XdslGrpOperStatus 
                     FROM E7-TC;
 
@@ -96,7 +97,7 @@ E7CardEntry ::= SEQUENCE {
 	e7CardCleiCode				 OCTET STRING,
 	e7CardPartNumber			 OCTET STRING,
 	e7CardStartMacRange			 OCTET STRING,
-	e7CardEndMacRange            OCTET STRING,
+	e7CardEndMacRange            OCTET STRING
     }
 
 e7CardBank OBJECT-TYPE
@@ -1498,13 +1499,13 @@ e7VdslBondedInterfaceEntry OBJECT-TYPE
 
 E7VdslBondedInterfaceEntry ::= SEQUENCE {
     e7VdslBondedInterfaceIndex        E7BondedInterfaceIndex,
-    e7VdslBondedInterfaceName         DisplayString
-    e7VdslBondedInterfaceAdminStatus  E7AdminStatus 
-    e7VdslBondedInterfaceOperStatus   E7OperStatus
-    e7VdslBondedInterfaceBondState    E7XdslGrpOperStatus
-    e7VdslBondedInterfaceDSRate       Integer32
-    e7VdslBondedInterfaceUSRate       Integer32
-    e7VdslBondedInterfaceActPorts     DisplayString 
+    e7VdslBondedInterfaceName         DisplayString,
+    e7VdslBondedInterfaceAdminStatus  E7AdminStatus, 
+    e7VdslBondedInterfaceOperStatus   E7OperStatus,
+    e7VdslBondedInterfaceBondState    E7XdslGrpOperStatus,
+    e7VdslBondedInterfaceDSRate       Integer32,
+    e7VdslBondedInterfaceUSRate       Integer32,
+    e7VdslBondedInterfaceActPorts     DisplayString, 
     e7VdslBondedInterfaceInActPorts   DisplayString 
     
     }

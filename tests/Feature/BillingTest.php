@@ -364,7 +364,7 @@ class BillingTest extends DBTestCase
         $bill = Bill::factory()->create();
 
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Must supply from and to');
+        $this->expectExceptionMessageIsOrContains('Must supply from and to');
 
         Billing::getBandwidthGraphData($bill->bill_id, null, null, null, 'hour');
     }

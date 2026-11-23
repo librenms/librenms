@@ -1,9 +1,9 @@
 -- =============================================================================
--- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description:  DHCPv4 mib for server and relay
 -- Reference:
--- Version:      V1.7
+-- Version:      V1.9
 -- History:
 -- V1.0 The initial version, created by lilin, 2012.5.24
 -- V1.1 Modified the mib description by lilin, 2013.4.24
@@ -38,6 +38,15 @@
 --      hh3cDhcpServer2NetUsageOverflow,hh3cDhcpServer2NetUsageOverflowRecov,
 --      hh3cDhcpServer2NetExhaust,hh3cDhcpServer2NetExhaustRecov,
 --      by jiangzhijie, 2021.02.08
+-- V1.8 Add hh3cDhcpServer2OnlineFailReason,
+--      Add hh3cDhcpSvr2AllocIpFailed,hh3cDhcpServer2ServerDown,
+--      hh3cDhcpSvr2GpAddrExhaust,hh3cDhcpSvr2GpAddrExhaustRecov,
+--      hh3cDhcpServer2DevOdapFull,hh3cDhcpServer2OdapApplyFail,
+--      hh3cDhcpServer2OdapReleaseFail,hh3cDhcpSvr2GpUsageOverflow,
+--      hh3cDhcpSvr2GpUsageOverflowRecov
+--      by wangchao 2021-09-15
+-- V1.9 Add hh3cDhcpSvr2UserIpConflict,
+--      by wangchao 2022-07-22
 -- =============================================================================
 HH3C-DHCP4-MIB DEFINITIONS ::= BEGIN
 
@@ -62,7 +71,7 @@ IMPORTS
 -- Module identity
 -- =============================================================================
 hh3cDhcp4 MODULE-IDENTITY
-    LAST-UPDATED "202102080000Z"
+    LAST-UPDATED "202207260000Z"
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -71,6 +80,14 @@ hh3cDhcp4 MODULE-IDENTITY
          http://www.h3c.com
          Zip: 100085"
     DESCRIPTION "DHCPv4 MIB"
+    REVISION
+        "202207260000Z"
+    DESCRIPTION
+        "Modified to add new trap."
+    REVISION
+        "202109150000Z"
+    DESCRIPTION
+        "Modified to add new nodes."
     REVISION
         "202102080000Z"
     DESCRIPTION
@@ -392,6 +409,21 @@ hh3cDhcpServer2IPExcludeTotalNum OBJECT-TYPE
         "The total number of exclude addresses."
     ::= { hh3cDhcpServer2StatGroup 23 }
 
+hh3cDhcpServer2OnlineFailReason OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..511))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The reason why DHCP server fail to alloc address."
+    ::= { hh3cDhcpServer2StatGroup 24 }
+
+hh3cDhcpServer2AllocConflictIP OBJECT-TYPE
+    SYNTAX      InetAddressIPv4
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The Conflict IP."
+    ::= { hh3cDhcpServer2StatGroup 25 }
 -- =============================================================================
 -- DHCP server table definition.
 -- =============================================================================
@@ -2549,7 +2581,7 @@ hh3cDhcpServer2PoolGpRowSta OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Operation status of this table entry.  Two actions are used: createAndGo 
+        "Operation status of this table entry.  Two actions are used: createAndGo
         and destroy."
     ::= { hh3cDhcpServer2PoolGpEntry 4 }
 
@@ -3494,5 +3526,108 @@ hh3cDhcpServer2GpNetExhaustRecov NOTIFICATION-TYPE
          IP address exhaustion."
     ::= { hh3cDhcpServer2TrapNotify 11 }
 
+hh3cDhcpSvr2AllocIpFailed NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcpServer2OnlineFailReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when DHCP servers fail to alloc address."
+    ::= { hh3cDhcpServer2TrapNotify 12 }
+
+hh3cDhcpServer2ServerDown NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcpServer2OnlineFailReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the DHCP servers fail to alloc address."
+    ::= { hh3cDhcpServer2TrapNotify 13 }
+
+hh3cDhcpSvr2GpAddrExhaus NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcpServer2PoolGpName
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when all IP addresses
+         in the DHCP pool group are exhausted."
+    ::= { hh3cDhcpServer2TrapNotify 14 }
+
+hh3cDhcpSvr2GpAddrExhaustRecov NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcpServer2PoolGpName
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the DHCP pool group recovers from
+         IP address exhaustion."
+    ::= { hh3cDhcpServer2TrapNotify 15 }
+
+hh3cDhcpServer2DevOdapFull NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when all ODAP
+        address pools on vBRAS device are full."
+    ::= { hh3cDhcpServer2TrapNotify 16 }
+
+hh3cDhcpServer2OdapApplyFail NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcpServer2OnlineFailReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when DHCP servers fail to apply for subnet."
+    ::= { hh3cDhcpServer2TrapNotify 17 }
+
+hh3cDhcpServer2OdapReleaseFail NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcpServer2OnlineFailReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when DHCP servers fail to release subnet."
+    ::= { hh3cDhcpServer2TrapNotify 18 }
+
+hh3cDhcpSvr2GpUsageOverflow NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcpServer2PoolGpName
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the usage of DHCP
+         server pool group has reached or exceeded the threshold.
+         The IP address usage data is polled every 5 minutes."
+    ::= { hh3cDhcpServer2TrapNotify 19 }
+
+hh3cDhcpSvr2GpUsageOverflowRecov NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcpServer2PoolGpName
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the DHCP pool group recovers from
+         IP address exhaustion."
+    ::= { hh3cDhcpServer2TrapNotify 20 }
+
+hh3cDhcpSvr2UserIpConflict NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDhcpServer2PoolName,
+        hh3cDhcpServer2AllocConflictIP
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the DHCP Server received a decline
+        packet from the client."
+    ::= { hh3cDhcpServer2TrapNotify 21 }
 
 END

@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP)
 -- *****************************************************************
 -- UBQS-NTP-MIB:  Ubiquoss NTP MIB file
 --
@@ -191,13 +192,7 @@ ubiNtpMIBGroups      	OBJECT IDENTIFIER ::= { ubiNtpMIBConformance 2 }
 
  
 -- units of conformance
-	ubiNtpMIBGroup OBJECT-GROUP
-        OBJECTS {        
-        		        		}
-    	STATUS          current
-    	DESCRIPTION
-        	 "ubiquoss NTP."
-    	::= { ubiNtpMIBGroups 1 }     
+	ubiNtpMIBGroup OBJECT IDENTIFIER ::= { ubiNtpMIBGroups 1 }     
     
 
 END

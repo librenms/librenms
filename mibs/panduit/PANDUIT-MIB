@@ -1,5 +1,5 @@
 -- ****************************************************************************
---   Copyright(C) 2023 Panduit
+--   Copyright(C) 2025 Panduit
 --   G5 PDU SNMP MIB DEFINITIONS
 -- ****************************************************************************
 
@@ -21,7 +21,7 @@ IMPORTS
 
 
 g5 MODULE-IDENTITY
-       LAST-UPDATED "202307241200Z"  -- 24 July 2023
+       LAST-UPDATED "202502141200Z"  -- 14 February 2025
        ORGANIZATION "Panduit"
        CONTACT-INFO "Panduit
 
@@ -33,8 +33,16 @@ g5 MODULE-IDENTITY
         Tel:        +1 708 532-1800/888-506-5400
 
         E-mail:     systemsupport@panduit.com"
+        DESCRIPTION
+                  "Panduit iPDU"
+
+       REVISION "202502141200Z"  -- 14 February 2025
        DESCRIPTION
-               "SmartZone G5 iPDU"
+               "Added 8 OID's for Outletgroups feature support as a part of pdug5Outlet"
+
+       REVISION "202411141200Z"  -- 14 November 2024
+       DESCRIPTION 
+                "Updated RCM OIDs"
 
        REVISION "202307241200Z"  -- 24 July 2023
        DESCRIPTION 
@@ -343,7 +351,8 @@ Pdug5ConfigEntry ::= SEQUENCE{
         pdug5ConfigOledDispalyOrientation       INTEGER,
         pdug5ConfigEnergyReset                  INTEGER,
         pdug5ConfigNetworkManagementCardReset   INTEGER,
-        pdug5ConfigDaisyChainStatus             INTEGER
+        pdug5ConfigDaisyChainStatus             INTEGER,
+        pdug5ConfigTelnet                       INTEGER
     }
 
 pdug5ConfigIndex OBJECT-TYPE
@@ -489,6 +498,19 @@ pdug5ConfigDaisyChainStatus OBJECT-TYPE
     DESCRIPTION
         "Setting this OID will change daisychain mode. 0:QNA,1:DNA."
     ::= {pdug5ConfigEntry 11}
+    
+pdug5ConfigTelnet OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            off(0),
+            on(1)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Setting this OID to off(0) will disable the Telnet connection.
+         Setting this OID to on(1) will enable the Telnet connection. iNC reboot will be required for the settings to take effect."
+    ::= {pdug5ConfigEntry 12}
 
 -- ========== Powershare Status ===========
 pdug5PowershareTable OBJECT-TYPE
@@ -1338,7 +1360,7 @@ pdug5InputRcmThUpperCritical OBJECT-TYPE
     ::= { pdug5InputRcmEntry 4 }
 
 pdug5InputRcmThResetThld OBJECT-TYPE
-    SYNTAX Integer32 (0..16) -- Units in 0.01 A
+    SYNTAX Integer32 (1..16) -- Units in 0.01 A
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -1361,8 +1383,11 @@ pdug5InputRcmThCtrl OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "Rcm current alarm threshold control:
-         bit 0:  up critical alarm control bit,    0 -  enable, 1 -  disable
-         bit 1:  up warning alarm control bit,  0 -  enable, 1 -  disable."
+         0 - Enable UC and UW
+		 1 - Disable UC and Enable UW
+		 2 - Enable UC and Disable UW
+		 3 - Disable UC and UW
+		 4 and above - Bad input"
     DEFVAL { 0 }
     ::= { pdug5InputRcmEntry 7 }
 
@@ -1411,14 +1436,15 @@ pdug5InputRcmSelfTestEntry OBJECT-TYPE
 Pdug5InputRcmSelfTestEntry ::= SEQUENCE {
         pdug5InputRcmSelfTestEnable                 INTEGER,
         pdug5InputRcmSelfTestFreq                   INTEGER,
-    pdug5InputRcmSelfTestHour                   INTEGER,
-    pdug5InputRcmSelfTestMinute                   INTEGER,
-    pdug5InputRcmSelfTestDay                       INTEGER,
-    pdug5InputRcmSelfTestMonth                   INTEGER,
-        pdug5InputRcmSelfTestNextRunTime              DisplayString,
-        pdug5InputRcmSelfTestLastRunTime             DisplayString,
-        pdug5InputRcmSelfTestLastRunStatus          INTEGER
-        }
+        pdug5InputRcmSelfTestHour                   Integer32,
+        pdug5InputRcmSelfTestMinute                 Integer32,
+        pdug5InputRcmSelfTestDay                    Integer32,
+        pdug5InputRcmSelfTestMonth                  INTEGER,
+        pdug5InputRcmSelfTestNextRunTime            DisplayString,
+        pdug5InputRcmSelfTestLastRunTime            DisplayString,
+        pdug5InputRcmSelfTestLastRunStatus          INTEGER,
+		pdug5InputRcmSelfTest                       Integer32
+	}
 
 pdug5InputRcmSelfTestEnable OBJECT-TYPE
     SYNTAX INTEGER
@@ -1451,37 +1477,30 @@ pdug5InputRcmSelfTestFreq OBJECT-TYPE
     ::= { pdug5InputRcmSelfTestEntry 2 }
 
 pdug5InputRcmSelfTestHour OBJECT-TYPE
-    SYNTAX Integer32 (-1..23)
+    SYNTAX Integer32 (0..23)
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "Rcm module self test schedule hour setting,-1 means feature not available "
+        "Rcm module self test schedule hour setting (0 to 23 hour),-1 means feature not available "
     ::= { pdug5InputRcmSelfTestEntry 3 }
 
 pdug5InputRcmSelfTestMinute OBJECT-TYPE
-    SYNTAX Integer32 (-1..59)
+    SYNTAX Integer32 (0..59)
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "Rcm module self test schedule minute setting,-1 means feature not available "
+        "Rcm module self test schedule minute setting (0 to 59 minute),-1 means feature not available "
     ::= { pdug5InputRcmSelfTestEntry 4 }
 
 pdug5InputRcmSelfTestDay OBJECT-TYPE
-    SYNTAX INTEGER
-         {
-            featureNotAvailable(-1),
-            sunday(0),
-            monday(1),
-            tuesday(2),
-            wednesday(3),
-            thursday(4),
-            friday(5),
-            saturday(6)
-        }
+    SYNTAX Integer32 (1..31)
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "Rcm module self test schedule day setting,-1 means feature not available "
+        "Rcm module self test schedule day setting 
+		- Can be 0 to 6 when pduInputRcmSelfTestFreq is weekly(2),
+		- Can be 1 to 31 when pduInputRcmSelfTestFreq is monthly(3) or yearly(4),
+		- (-1) means feature not available "
     ::= { pdug5InputRcmSelfTestEntry 5 }
 
 pdug5InputRcmSelfTestMonth OBJECT-TYPE
@@ -1537,6 +1556,14 @@ pdug5InputRcmSelfTestLastRunStatus OBJECT-TYPE
         "Status of the lastest self test run"
     ::= { pdug5InputRcmSelfTestEntry 9 }
 
+pdug5InputRcmSelfTest OBJECT-TYPE
+    SYNTAX Integer32 (0..1)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Rcm module on demand self test, 1 to start the on demand self test"
+    ::= { pdug5InputRcmSelfTestEntry 10 }
+	
 -- ====================================================================================
 --  g5                        OBJECT IDENTIFIER       ::= { panduit 10}
 --  pdug5                     OBJECT IDENTIFIER       ::= { g5 1}
@@ -3319,6 +3346,107 @@ pdug5OutletControlCommand OBJECT-TYPE
          the pdug5OutletControlRebootOffTime OID time, and
          then perform a delayedOn command."
     ::= { pdug5OutletControlEntry 10 }
+    
+    
+-- ====================== PDU Outletgroups=====================
+
+pdug5OutletGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Pdug5OutletGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Aggregate Object with Number of outlets per Group (pdug5OutletGroupsIndex)."
+    ::= { pdug5Outlet 3 }
+
+pdug5OutletGroupEntry OBJECT-TYPE
+    SYNTAX Pdug5OutletGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Outlet Group table entry containing the count, name, member etc."
+    INDEX { pdug5IdentIndex, pdug5GroupIndex }
+    ::= { pdug5OutletGroupTable 1 }
+
+Pdug5OutletGroupEntry ::= SEQUENCE {
+        pdug5OutletGroupCount                Integer32,
+        pdug5OutletGroupName                 DisplayString,
+        pdug5OutletGroupMemberID             DisplayString,
+        pdug5OutletGroupControl              DisplayString,
+        pdug5OutletGroupActivePower          Integer32,
+        pdug5OutletGroupApparentPower        Integer32,
+}
+
+pdug5OutletGroupCount OBJECT-TYPE
+    SYNTAX Integer32 (0..256)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The numeric Switched Outlet Groups Count"
+    ::= { pdug5OutletGroupEntry 1 }
+
+pdug5OutletGroupName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(1..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        " The user-defined switched outlet Groups Name string"
+    ::= { pdug5OutletGroupEntry 2 }
+
+pdug5OutletGroupMemberID OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The user-defined switched outlet Group Members string"
+    ::= { pdug5OutletGroupEntry 3 }
+
+pdug5OutletGroupControl OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Getting this variable will return the group state.
+         If the group is on, the immediateOn (2)
+         value will be returned. If the group is off,
+         the immediateOff (1) value will be returned.
+         If the state of the group cannot be determined, the
+         outletUnknown (7) value will be returned. If the
+         outletUnknown condition should occur, all devices
+         powered by the PDU should be shut down. The PDU's
+         power should then be cycled to clear this condition.
+         Setting this variable to immediateOn (2) will immediately
+         turn the group on. Setting this variable to
+         immediateOff (1) will immediately turn the group off.
+         Setting this variable to immediateReboot (5)
+         will cause the Switched PDU to perform an immediateOff
+         command, wait the pdug5OutletControlRebootOffTime
+         OID time, and then perform an immediateOn command.
+         Setting this variable to delayedOn (4) will turn the
+         group on after the pdug5OutletControlSequenceDelay
+         OID time has elapsed. Setting this variable to
+         delayedOff (3) will turn the group off after the
+         pdug5OutletControlShutoffDelay OID time has elapsed.
+         Setting this variable to delayedReboot  (6) will cause
+         the Switched PDU to perform a delayedOff command, wait
+         the pdug5OutletControlRebootOffTime OID time, and
+         then perform a delayedOn command."
+    ::= { pdug5OutletGroupEntry 4 }
+
+pdug5OutletGroupActivePower OBJECT-TYPE
+    SYNTAX 	Integer32 -- Unit in VA
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Sum of Active power of all Grouped Outlet."
+    ::= { pdug5OutletGroupEntry 5 }
+
+pdug5OutletGroupApparentPower OBJECT-TYPE
+    SYNTAX Integer32  -- Unit in VAR
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Sum of Apparent power of all Grouped Outlet. "
+    ::= { pdug5OutletGroupEntry 6 }
 
 -- ====================================================================================
 --  g5                        OBJECT IDENTIFIER       ::= { panduit 10}

@@ -2,7 +2,7 @@
 -- FORCE10-TRAP-ALRM-MIB
 --
 --
--- Copyright (c) 2003-2005 by Force10 Networks, Inc.
+-- Copyright (c) 2003-2014 by Dell Inc. All Rights Reserved.
 -- All rights reserved.
 -- *****************************************************************
 --
@@ -12,32 +12,23 @@ FORCE10-TRAP-EVENT-MIB DEFINITIONS ::= BEGIN
 IMPORTS
 
         MODULE-IDENTITY, OBJECT-TYPE,
-        Integer32,IpAddress, TimeTicks, NOTIFICATION-TYPE
+        Integer32, TimeTicks
             FROM SNMPv2-SMI
-        TEXTUAL-CONVENTION,
-		RowStatus,DateAndTime,
-        DisplayString,RowPointer
+        DateAndTime, DisplayString, RowPointer
             FROM SNMPv2-TC
-        MODULE-COMPLIANCE,
-        OBJECT-GROUP
-            FROM SNMPv2-CONF
         f10Mgmt
             FROM FORCE10-SMI
         ;
  
 f10TrapEventMib   MODULE-IDENTITY
-        LAST-UPDATED    "200510050000Z"
-        ORGANIZATION    "Force10 Networks, Inc."
+        LAST-UPDATED    "201202210000Z"
+        ORGANIZATION    "Dell Inc"
         CONTACT-INFO
-            "Force10 Networks, Inc
-            1440 McCarthy Blvd
-            Milpitas, CA 95035
-            (408) 571-3500
-            support@force10networks.com
-            http://www.force10networks.com"
+            "http://www.force10networks.com/support"
+
         DESCRIPTION
-            "Force10 Trap Alarm MIB.
-            Force10 Trap Event MIB allows users to track or to view 
+            "Dell Networking OS Trap Alarm MIB.
+            Dell Networking OS Trap Event MIB allows users to track or to view 
             the trap events logged by the system.  There are two types
             of trap event tables, hostory trap event table and active
             trap event table.
@@ -47,6 +38,15 @@ f10TrapEventMib   MODULE-IDENTITY
             trap event table; 'Card down' trap event will go to the active
             trap event table, and the trap will be cleared as soon as
             'Card Up' event is issued. 
+            "
+        REVISION        "201202210000Z" -- Feb 21, 2012
+        DESCRIPTION
+            "Add historyTrapEventPort to f10HistoryTrapEventTable and
+             activeTrapEventPort to f10ActiveTrapEventTable.
+            "
+        REVISION        "200510050000Z"
+        DESCRIPTION
+            "The initial reversion.
             "
         ::= { f10Mgmt 6 }   
 
@@ -62,19 +62,19 @@ f10TrapVarbindEvent  OBJECT IDENTIFIER ::= { f10TrapEventObjects 3 }
 --  Descr
 
 
-f10ChassisTrapEventId OBJECT-TYPE
+f10ChassisBootupTime OBJECT-TYPE
     SYNTAX        DateAndTime
     MAX-ACCESS    read-only
     STATUS        current
     DESCRIPTION
-        "The f10ChassisTrapEventId used the timestamp as the ID
-         to uniquely identify the current trap event table.
+        "The f10ChassisBootupTime used the timestamp to uniquely
+         identify the system between system reboots.
           
-         Each time a NMS connect to F10 Chassis, it should verify
-         its f10ChassisTrapEventId.  If the ID is different, it should
+         Each time an NMS connects to a chassis, it should verify
+         its f10ChassisBootupTime. If the time is different, it should
          refresh its history and active tables. 
 
-         But, if the f10ChassisTrapEventId is the same, then it should
+         But, if the f10ChassisBootupTime is the same, then it should
          query the f10LastTrapEventSeqId and update its history and active
          tables  from its own f10LastTrapEventSeqId to the chassis
          f10LastTrapEventSeqId.
@@ -82,7 +82,7 @@ f10ChassisTrapEventId OBJECT-TYPE
     ::= { f10HistoryTrapEvent 1 }
 
 f10LastTrapEventSeqId OBJECT-TYPE
-    SYNTAX        Integer32
+    SYNTAX        Integer32 (1..2147483647)
     MAX-ACCESS    read-only
     STATUS        current
     DESCRIPTION
@@ -91,7 +91,7 @@ f10LastTrapEventSeqId OBJECT-TYPE
          traps sent by the syatem since chassis is loaded.  The same id can
          also be used as the index to the history and active tables.
             
-         Anytime, if an NMS dropped its connection with F10 Chassis, it should
+         Anytime, if an NMS dropped its connection with a chassis, it should
          sync up its history tables from its own f10LastTrapEventSeqId to
          the chassis f10LastTrapEventSeqId.
         "
@@ -102,14 +102,14 @@ f10MaxHistoryTableSize OBJECT-TYPE
     MAX-ACCESS    read-only
     STATUS        current
     DESCRIPTION
-         "
+        "
          f10MaxHistoryTableSize is the maximum rows in history table.
-		This also limits the active/varbind tables.
-		Whenever there is a chance of overflow, the oldest entry 
-		will be deleted form the history table.
-		Respective entry from active table also will be deleted 
-		and the corresponding varbind entries will be deleted 
-		from varbind table.
+         This also limits the active/varbind tables.
+         Whenever there is a chance of overflow, the oldest entry 
+         will be deleted form the history table.
+         Respective entry from active table also will be deleted 
+         and the corresponding varbind entries will be deleted 
+         from varbind table.
         "
     ::= { f10HistoryTrapEvent 3 }
 
@@ -139,13 +139,14 @@ F10HistoryTrapEventEntry ::= SEQUENCE {
     historyTrapEventType 	Integer32,
     historyTrapEventMsg 	DisplayString,
     historyTrapEventOid 	RowPointer,
-    historyTrapEventSlotPort 	Integer32,
-    historyTrapEventTimeStamp 	TimeTicks
+    historyTrapEventSlot 	Integer32,
+    historyTrapEventTimeStamp 	TimeTicks,
+    historyTrapEventPort 	Integer32
 
     }
 
 historyTrapEventSeqId OBJECT-TYPE
-    SYNTAX Integer32
+    SYNTAX Integer32 (1..2147483647)
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
@@ -195,15 +196,16 @@ historyTrapEventOid OBJECT-TYPE
         "
     ::= { f10HistoryTrapEventEntry 5 }
 
-historyTrapEventSlotPort OBJECT-TYPE
+historyTrapEventSlot OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
         "
-         The slot or port number that relate to this trap.
-         for example if card is down, this field will have the
+         Corresponsding to chAlarmVarSlot in trap definition.
+         For example if card is down, this field will have the
          card slot number.
+         The value of -1 is used for non-applicable case.
         "
     ::= { f10HistoryTrapEventEntry 6 }
 
@@ -217,7 +219,21 @@ historyTrapEventTimeStamp OBJECT-TYPE
         "
     ::= { f10HistoryTrapEventEntry 7 }
 
--- End of historyTrapEventTable
+historyTrapEventPort OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         Corresponsding to chAlarmVarPort in trap definition.
+         This field may be used for other instance depending on
+         the trap type, for example, tray number in case of fan
+         or power supply trap.
+         The value of -1 is used for non-applicable case.
+        "
+    ::= { f10HistoryTrapEventEntry 8 }
+
+-- End of f10HistoryTrapEventTable
 
 
 -- Active Trap Event table.
@@ -248,13 +264,14 @@ F10ActiveTrapEventEntry ::= SEQUENCE {
     activeTrapEventType 	Integer32,
     activeTrapEventMsg 		DisplayString,
     activeTrapEventOid 		RowPointer,
-    activeTrapEventSlotPort 	Integer32,
-    activeTrapEventTimeStamp 	TimeTicks
+    activeTrapEventSlot     	Integer32,
+    activeTrapEventTimeStamp 	TimeTicks,
+    activeTrapEventPort 	Integer32
 
     }
 
 activeTrapEventSeqId OBJECT-TYPE
-    SYNTAX Integer32
+    SYNTAX Integer32 (1..2147483647)
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
@@ -304,15 +321,16 @@ activeTrapEventOid OBJECT-TYPE
         "
     ::= { f10ActiveTrapEventEntry 5 }
 
-activeTrapEventSlotPort OBJECT-TYPE
+activeTrapEventSlot OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
         "
-         The numeric iof slot or port that relate to this trap.
-         for example if card is down, this field will have the
+         Corresponsding to chAlarmVarSlot in trap definition.
+         For example if card is down, this field will have the
          card slot number.
+         The value of -1 is used for non-applicable case.
         "
     ::= { f10ActiveTrapEventEntry 6 }
 
@@ -326,7 +344,21 @@ activeTrapEventTimeStamp OBJECT-TYPE
         "
     ::= { f10ActiveTrapEventEntry 7 }
 
--- End of ActiveTrapEventTable
+activeTrapEventPort OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+         Corresponsding to chAlarmVarPort in trap definition.
+         This field may be used for other instance depending on
+         the trap type, for example, tray number in case of fan
+         or power supply trap.
+         The value of -1 is used for non-applicable case.
+        "
+    ::= { f10ActiveTrapEventEntry 8 }
+
+-- End of f10ActiveTrapEventTable
 
 -- Trap Event varbind table.
 
@@ -358,7 +390,7 @@ F10TrapEventVarbindEntry ::= SEQUENCE {
     }
 
 trapEventVarbindSeqId OBJECT-TYPE
-    SYNTAX Integer32
+    SYNTAX Integer32 (1..2147483647)
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
@@ -369,7 +401,7 @@ trapEventVarbindSeqId OBJECT-TYPE
     ::= { f10TrapEventVarbindEntry 1 }
 
 trapEventVarbindId OBJECT-TYPE
-    SYNTAX Integer32
+    SYNTAX Integer32 (1..32)
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION

@@ -408,8 +408,6 @@ Add code for your new sensor class to these existing files:
 are guessable when a SNMP-retrievable threshold is not available, add a case for the sensor class
 to the sensor_limit() and/or sensor_low_limit() functions.
 - `LibreNMS/Util/ObjectCache.php`: optional - choose menu grouping for the sensor class.
-- `includes/html/pages/device/overview.inc.php`: add `require 'overview/sensors/$class.inc.php'`
-in the desired order for the device overview page.
 - `lang/en/sensors.php`: add human-readable names and units for the sensor class
 in English. You can also add other languages.
 
@@ -417,21 +415,8 @@ Create and populate new files for the sensor class in the following places:
 
 - `includes/discovery/sensors/$class/`: create the folder where advanced php-based discovery
 files are stored. Not used for yaml discovery.
-=======
-- `includes/html/pages/device/overview.inc.php`: add `require 'overview/sensors/$class.inc.php'` in the desired
-order for the device overview page.
-- `lang/en/sensors.php`: add human-readable names and units for the sensor class in English, feel
-You can also add other languages.
-
-Create and populate new files for the sensor class in the following places:
-
-- `includes/discovery/sensors/$class/`: create the folder where advanced php-based discovery files
-are stored. Not used for yaml discovery.
 - `includes/html/graphs/device/$class.inc.php`: define unit names used in RRDtool graphs.
 - `includes/html/graphs/sensor/$class.inc.php`: define various [parameters](https://oss.oetiker.ch/rrdtool/doc/rrdgraph_graph.en.html) for RRDtool graphs.
-- `includes/html/pages/device/health/$class.inc.php`
-- `includes/html/pages/device/overview/sensors/$class.inc.php`
-- `includes/html/pages/health/$class.inc.php`
 
 #### Advanced health sensor example
 
@@ -545,27 +530,28 @@ limit, the high limit, and the high warning limit. The Adva MIB does
 not hold these values.
 
 To test the code, run the discovery manually with
-`lnms device:discover $device_id -m sensors`. The flag `-v` shows the
-calls of the discovery. The flag `-d` shows the debug output. The
-output under `#### Load disco module sensors ####` holds a list of the
+`lnms device:discover $device_id -m sensors`. The flag `-vv` shows the
+debug output. The flag `-vvv` shows the unredacted debug output. 
+
+The output under `#### Load discovery module sensors ####` holds a list of the
 sensor types. A `+` means a new sensor. A `-` means a removed sensor. A
 `.` means no change. No character means no discovery of that sensor.
 The bottom of the output holds the changes to the database and to the
 RRD files.
 
 ```
-[librenms@nms-test ~]$ lnms device:discover 2 -m sensors
+[librenms@nms-test ~]$ lnms device:discover -v 2 -m sensors
 LibreNMS Discovery
 164.113.194.250 2 adva_fsp150
 
-#### Load disco module core ####
+#### Load discovery module core ####
 
 >> Runtime for discovery module 'core': 0.0240 seconds with 66536 bytes
 >> SNMP: [2/0.06s] MySQL: [3/0.00s] RRD: [0/0.00s]
 #### Unload disco module core ####
 
 
-#### Load disco module sensors ####
+#### Load discovery module sensors ####
 Pre-cache adva_fsp150:
  ENTITY-SENSOR: Caching OIDs: entPhysicalDescr entPhysicalName entPhySensorType entPhySensorScale entPhySensorPrecision entPhySensorValue entPhySensorOperStatus
 Airflow:
@@ -601,7 +587,7 @@ Signal_loss:
 
 >> Runtime for discovery module 'sensors': 3.9340 seconds with 190024 bytes
 >> SNMP: [16/3.89s] MySQL: [36/0.03s] RRD: [0/0.00s]
-#### Unload disco module sensors ####
+#### Unload discovery module sensors ####
 
 Discovered in 5.521 seconds
 

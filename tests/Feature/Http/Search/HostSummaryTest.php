@@ -18,7 +18,6 @@ use Illuminate\Support\Facades\URL as LaravelUrl;
 use Illuminate\Support\Js;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\IP;
-use LibreNMS\Util\Url;
 use PHPUnit\Framework\Attributes\DataProvider;
 
 class HostSummaryTest extends SearchTestCase
@@ -442,7 +441,7 @@ class HostSummaryTest extends SearchTestCase
 
         $heading = $this->results(['q' => '198.51.100.40'])->assertJsonPath('mode', 'host')->json('heading');
 
-        $this->assertStringContainsString(Url::deviceUrl($device), $heading);
+        $this->assertStringContainsString(route('device.overview', ['device' => $device->device_id]), $heading);
         $this->assertStringContainsString(e((string) $device->display), $heading);
         $this->assertStringContainsString('aria-label="' . __('search.host.monitored') . '"', $heading);
         $this->assertStringContainsString('title="This address belongs to a device monitored by LibreNMS."', $heading);
@@ -461,7 +460,7 @@ class HostSummaryTest extends SearchTestCase
         $response = $this->results(['q' => '198.51.100.43']);
 
         $this->assertStringContainsString('core-svi-123', $response->json('html'));
-        $this->assertStringNotContainsString(Url::deviceUrl($device) . '"', $response->json('html'));
+        $this->assertStringNotContainsString(route('device.overview', ['device' => $device->device_id]) . '"', $response->json('html'));
     }
 
     public function testDeviceFoundByItsIpShowsWhereItIsPluggedIn(): void
@@ -474,7 +473,7 @@ class HostSummaryTest extends SearchTestCase
 
         $response = $this->results(['q' => '198.51.100.44']);
 
-        $this->assertStringContainsString(Url::deviceUrl($device), $response->json('heading'));
+        $this->assertStringContainsString(route('device.overview', ['device' => $device->device_id]), $response->json('heading'));
         $this->assertStringContainsString(__('search.host.switch_port'), $response->json('html'));
         $this->assertStringContainsString('uplink-to-managed', $response->json('html'));
     }
@@ -487,7 +486,7 @@ class HostSummaryTest extends SearchTestCase
 
         $heading = $this->results(['q' => '198.51.100.42'])->json('heading');
 
-        $this->assertStringContainsString(Url::deviceUrl($owner), $heading);
+        $this->assertStringContainsString(route('device.overview', ['device' => $owner->device_id]), $heading);
         $this->assertStringNotContainsString((string) $other->display, $heading);
     }
 

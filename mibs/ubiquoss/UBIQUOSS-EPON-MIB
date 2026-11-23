@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP)
 -- *****************************************************************
 -- UBIQUOSS-EPON-LINE-MIB.mib:  
 -- Ubiquoss Enterprise E-PON Line Structure of Management Information
@@ -1281,13 +1282,7 @@ ubiEponMIBCompliance MODULE-COMPLIANCE
         ::= { ubiEponMIBCompliances 1 }
 
 -- ports of conformance
-ubiEponMIBGroup OBJECT-GROUP
-        OBJECTS {						   
-        }
-        STATUS  current
-        DESCRIPTION
-                "ubiquoss epon line."
-        ::= { ubiEponMIBGroups 1 }
+ubiEponMIBGroup OBJECT IDENTIFIER ::= { ubiEponMIBGroups 1 }
 
 ubiEponMIBNotifGroup NOTIFICATION-GROUP
         NOTIFICATIONS {

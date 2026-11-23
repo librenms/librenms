@@ -57,6 +57,52 @@ LIBRENMS_USER=librenms
 LIBRENMS_GROUP=librenms
 ```
 
+## Event and authentication logs
+
+The event log and the authentication log are stored in the database
+so the WebUI can show them. You can also write them to a file, or
+send them to any other log channel such as `syslog`.
+
+Set a comma separated list of channels. `event_db` and `auth_db`
+store the entries in the database, `event_file` and `auth_file`
+write them to `logs/event.log` and `logs/auth.log`.
+
+```dotenv
+LOG_EVENT_CHANNELS=event_db,event_file
+LOG_AUTH_CHANNELS=auth_db,auth_file
+```
+
+To change where the files are written:
+
+```dotenv
+LOG_EVENT_FILE=/var/log/librenms/event.log
+LOG_AUTH_FILE=/var/log/librenms/auth.log
+```
+
+> NOTE: If you remove `event_db` or `auth_db`, the WebUI and API
+> no longer show new entries.
+
+## Composer packages
+
+`lnms plugin:add` records the packages you add in `composer.plugins.json`
+in the install directory. This variable moves that file, for example to
+a persistent volume.
+
+```dotenv
+LIBRENMS_COMPOSER_PLUGINS=/data/composer.plugins.json
+```
+
+`lnms plugin:sync` installs all packages in that file again.
+
+The plugin commands also honor the `COMPOSER` and `COMPOSER_VENDOR_DIR`
+variables of Composer. Set them in the environment to leave the
+`composer.json`, `composer.lock` and `vendor` of the install directory
+unchanged. If the file in `COMPOSER` does not exist, it is created from
+the `composer.json` and `composer.lock` of the install directory.
+The directory in `COMPOSER_VENDOR_DIR` must already contain the installed
+packages, for example a copy of `vendor`. LibreNMS loads `vendor` from
+the install directory, so link it to that directory.
+
 ## Debug
 
 This variable increases the information that LibreNMS shows for an error.

@@ -14,7 +14,7 @@
                     "os": "gaia",
                     "type": "firewall",
                     "serial": "2000AB4000",
-                    "icon": "checkpoint.png"
+                    "icon": "checkpoint.svg"
                 }
             ]
         },

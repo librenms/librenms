@@ -13,15 +13,28 @@ final class CustomersTableTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function testPageRendersTable(): void
+    {
+        Role::findOrCreate('admin');
+        $admin = User::factory()->create(['enabled' => 1])->assignRole('admin');
+
+        $this->actingAs($admin)
+            ->get(route('customers'))
+            ->assertOk()
+            ->assertSee('id="customers"', false)
+            ->assertSee('data-url="' . route('table.customers') . '"', false);
+    }
+
     public function testCustomerGraphLinksUseCustomerName(): void
     {
         Role::findOrCreate('admin');
         $admin = User::factory()->create(['enabled' => 1])->assignRole('admin');
 
+        $customer = 'Example + Customer / East';
         $device = Device::factory()->create();
         Port::factory()->for($device)->create([
             'port_descr_type' => 'cust',
-            'port_descr_descr' => 'Example Customer',
+            'port_descr_descr' => $customer,
         ]);
 
         $response = $this->actingAs($admin)->postJson('/ajax/table/customers', [
@@ -31,8 +44,12 @@ final class CustomersTableTest extends TestCase
         ]);
 
         $response->assertOk();
-        $content = $response->getContent();
-        $this->assertStringContainsString('customer=Example+Customer', $content);
-        $this->assertStringNotContainsString('customer_bits/id=', $content);
+        $graph = $response->json('rows.1.port_descr_descr');
+        $this->assertSame(1, preg_match('/href="([^"]+)"/', $graph, $matches));
+        $url = html_entity_decode($matches[1]);
+        parse_str(parse_url($url, PHP_URL_QUERY), $query);
+        $this->assertSame('/graphs', parse_url($url, PHP_URL_PATH));
+        $this->assertSame('customer_bits', $query['type']);
+        $this->assertSame($customer, $query['customer']);
     }
 }

@@ -27,18 +27,37 @@
 namespace App\Http\Requests;
 
 use App\Models\AlertOperation;
+use App\Models\AlertRule;
+use App\Models\Device;
+use App\Models\DeviceGroup;
+use App\Models\Location;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Arr;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
+use LibreNMS\Alerting\AlertRuleDefinitions;
+use LibreNMS\Alerting\QueryBuilderParser;
 
 class AlertRuleRequest extends FormRequest
 {
+    /** @var array<string, mixed> */
+    private array $builder = [];
+    private ?string $ruleQuery = null;
+    /** @var array<string, mixed> */
+    private array $templateExtra = [];
+    /** @var array{devices: list<int>, groups: list<int>, locations: list<int>} */
+    private array $maps = ['devices' => [], 'groups' => [], 'locations' => []];
+
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return true; // Route is protected by can:admin middleware
+        $rule = $this->route('alert_rule');
+
+        return $rule instanceof AlertRule
+            ? $this->user()->can('update', $rule)
+            : $this->user()->can('create', AlertRule::class);
     }
 
     /**
@@ -53,8 +72,10 @@ class AlertRuleRequest extends FormRequest
             'severity' => ['required', 'string', 'max:32'],
 
             'override_query' => ['sometimes', 'boolean'],
-            'builder_json' => ['required_unless:override_query,on', 'json'],
-            'adv_query' => ['required_if:override_query,on', 'nullable', 'string'],
+            'builder_json' => ['required_unless:override_query,true', 'json'],
+            'adv_query' => ['required_if:override_query,true', 'nullable', 'string'],
+            'template_id' => ['nullable', 'integer', 'min:0'],
+            'device' => ['nullable', 'integer', 'min:1'],
 
             'invert' => ['sometimes', 'boolean'],
             'recovery' => ['sometimes', 'boolean'],
@@ -106,13 +127,117 @@ class AlertRuleRequest extends FormRequest
     public function withValidator(Validator $validator): void
     {
         $validator->after(function (Validator $v): void {
-            $invertMap = filter_var($this->input('invert_map'), FILTER_VALIDATE_BOOLEAN);
-            if ($invertMap) {
-                $maps = $this->input('maps');
-                if (empty($maps) || ! is_array($maps)) {
-                    $v->errors()->add('maps', 'Invert map is on but no selection in devices, groups and locations match list');
+            if ($v->errors()->isNotEmpty()) {
+                return;
+            }
+
+            $this->validateBuilder($v);
+            $this->validateMaps($v);
+
+            $templateId = $this->input('template_id');
+            if ($templateId !== null) {
+                $template = AlertRuleDefinitions::all()[(int) $templateId] ?? null;
+                if ($template === null) {
+                    $v->errors()->add('template_id', __('The selected alert rule template does not exist'));
+                } else {
+                    $this->templateExtra = Arr::only($template['extra'], ['count', 'delay', 'interval']);
                 }
             }
         });
+    }
+
+    /** @return array<model-property<AlertRule>, mixed> */
+    public function ruleAttributes(): array
+    {
+        return $this->safe(['severity', 'name', 'proc', 'notes', 'invert_map', 'notify_per_entity', 'max_entities', 'alert_operation_id']) + [
+            'builder' => $this->builder,
+            'query' => $this->ruleQuery,
+            'extra' => $this->templateExtra + $this->safe(['invert', 'acknowledgement', 'recovery', 'mute']) + [
+                'options' => ['override_query' => $this->boolean('override_query')],
+            ],
+            'alert_operation_id' => null,
+        ];
+    }
+
+    /** @return array{devices: list<int>, groups: list<int>, locations: list<int>} */
+    public function mappingIds(): array
+    {
+        return $this->maps;
+    }
+
+    private function validateBuilder(Validator $validator): void
+    {
+        $builder = json_decode((string) $this->input('builder_json', '[]'), true);
+        if (is_array($builder) && $this->validBuilderGroup($builder)) {
+            $this->builder = $builder;
+        }
+
+        if ($this->boolean('override_query')) {
+            $this->ruleQuery = $this->input('adv_query');
+
+            return;
+        }
+
+        try {
+            $this->ruleQuery = QueryBuilderParser::fromJson($this->builder)->toSql();
+        } catch (\Exception | \TypeError) {
+            $this->ruleQuery = null;
+        }
+
+        if ($this->ruleQuery === null) {
+            $validator->errors()->add('builder_json', __('The alert rule builder must contain valid rules'));
+        }
+    }
+
+    /** @param array<string, mixed> $group */
+    private function validBuilderGroup(array $group): bool
+    {
+        if (! in_array($group['condition'] ?? null, ['AND', 'OR'], true) || ! is_array($group['rules'] ?? null) || $group['rules'] === []) {
+            return false;
+        }
+
+        foreach ($group['rules'] as $rule) {
+            if (! is_array($rule)) {
+                return false;
+            }
+            $valid = array_key_exists('rules', $rule)
+                ? $this->validBuilderGroup($rule)
+                : is_string($rule['field'] ?? null) && $rule['field'] !== '' && is_string($rule['operator'] ?? null) && array_key_exists('value', $rule);
+            if (! $valid) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function validateMaps(Validator $validator): void
+    {
+        $maps = $this->input('maps', []);
+        if ($this->boolean('invert_map') && $maps === []) {
+            $validator->errors()->add('maps', __('Invert map is on but no selection in devices, groups and locations match list'));
+        }
+
+        foreach ($maps as $key => $target) {
+            if (! preg_match('/\A([gl]?)([1-9][0-9]*)\z/', $target, $match) || filter_var($match[2], FILTER_VALIDATE_INT) === false) {
+                $validator->errors()->add("maps.$key", __('The selected mapping is invalid'));
+
+                continue;
+            }
+
+            $type = match ($match[1]) {
+                'g' => 'groups',
+                'l' => 'locations',
+                default => 'devices',
+            };
+            $this->maps[$type][] = (int) $match[2];
+        }
+
+        foreach (['devices' => Device::class, 'groups' => DeviceGroup::class, 'locations' => Location::class] as $type => $model) {
+            $ids = array_values(array_unique($this->maps[$type]));
+            if ($ids !== [] && $model::whereKey($ids)->count() !== count($ids)) {
+                $validator->errors()->add('maps', __('A selected device, group or location no longer exists'));
+            }
+        }
     }
 }

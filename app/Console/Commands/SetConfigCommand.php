@@ -42,7 +42,7 @@ class SetConfigCommand extends LnmsCommand
         $force = $this->option('ignore-checks');
         $parent = null;
 
-        if (preg_match('/^os\.(?<os>[a-z_\-]+)\.(?<setting>.*)$/', $setting, $matches)) {
+        if (preg_match('/^os\.(?<os>[a-z0-9_\-]+)\.(?<setting>.*)$/', $setting, $matches)) {
             $os = $matches['os'];
             try {
                 if (! $force) {

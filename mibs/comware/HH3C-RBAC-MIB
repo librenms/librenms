@@ -1,12 +1,15 @@
 -- =================================================================
--- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: This MIB is to provide the definition of the RBAC
 --              (Role Based Access Control) system.
 -- Reference:
--- Version: V1.0
+-- Version: V1.1
 -- History:
 -- V1.0 2014-08-08 Initial version, created by Xu Yang
+-- V1.1 2022.07.11 Updated by zhanghang
+--      Added hh3cRbacTrap, hh3cRbacSuperTrap, hh3cRbacSuperTrapPrefix,
+--      hh3cRbacSuperChangeSuccessful, and hh3cRbacSuperChangeFailure.
 -- =================================================================
 
 HH3C-RBAC-MIB DEFINITIONS ::= BEGIN
@@ -14,13 +17,13 @@ HH3C-RBAC-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     hh3cCommon
         FROM HH3C-OID-MIB
-    Unsigned32, OBJECT-TYPE, MODULE-IDENTITY
+    Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
     TruthValue, RowStatus, StorageType, TEXTUAL-CONVENTION
         FROM SNMPv2-TC;
 
 hh3cRbac MODULE-IDENTITY
-    LAST-UPDATED "201408081547Z"
+    LAST-UPDATED "202207110000Z"
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -31,6 +34,10 @@ hh3cRbac MODULE-IDENTITY
     DESCRIPTION
         "This MIB is to provide the definition of the RBAC
         (Role Based Access Control) system."
+    REVISION "202207110000Z"
+    DESCRIPTION
+        "Added hh3cRbacTrap, hh3cRbacSuperTrap, hh3cRbacSuperTrapPrefix,
+         hh3cRbacSuperChangeSuccessful, and hh3cRbacSuperChangeFailure."
     REVISION "201408081547Z"
     DESCRIPTION
         "The initial revision of this MIB module."
@@ -602,5 +609,32 @@ hh3cRbacFeatureDescription OBJECT-TYPE
     DESCRIPTION
         "This object indicates the introduction of the feature."
     ::= { hh3cRbacFeatureEntry 2 }
+
+-- ----------------------------------------------------------------------
+-- hh3cRbacTrap Table
+-- ----------------------------------------------------------------------
+hh3cRbacTrap OBJECT IDENTIFIER ::= { hh3cRbac 2 }
+
+-- ----------------------------------------------------------------------
+-- hh3cRbacSuperTrap Table
+-- ----------------------------------------------------------------------
+hh3cRbacSuperTrap OBJECT IDENTIFIER ::= { hh3cRbacTrap 1 }
+
+-- ----------------------------------------------------------------------
+-- hh3cRbacSuperTrapPrefix
+-- ----------------------------------------------------------------------
+hh3cRbacSuperTrapPrefix OBJECT IDENTIFIER ::= { hh3cRbacSuperTrap 0 }
+
+hh3cRbacSuperChangeSuccessful NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+        "Temporary user role authorization succeeded."
+    ::= { hh3cRbacSuperTrapPrefix 1 }
+
+hh3cRbacSuperChangeFailure NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+        "Temporary user role authorization failed."
+    ::= { hh3cRbacSuperTrapPrefix 2 }
 
 END

@@ -39,7 +39,7 @@ class MuninTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'munin']))
+            ->get(route('device.munin', ['device' => $device]))
             ->assertOk()
             ->assertSee('Munin Plugins')
             ->assertSee('System')
@@ -55,7 +55,7 @@ class MuninTabTest extends TestCase
         $user->assignRole('user');
 
         $this->actingAs($user)
-            ->get(route('device', ['device' => $device, 'tab' => 'munin']))
+            ->get(route('device.munin', ['device' => $device]))
             ->assertForbidden();
     }
 }

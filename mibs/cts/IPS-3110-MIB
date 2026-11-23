@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing import)
 	IPS-3110-MIB DEFINITIONS ::= BEGIN
 
 	IMPORTS
@@ -5,7 +6,9 @@
 		                                    FROM RFC1155-SMI
 		mib-2, DisplayString                FROM RFC1213-MIB
 		TRAP-TYPE                           FROM RFC-1215
-		OBJECT-TYPE                         FROM RFC-1212;
+		OBJECT-TYPE                         FROM RFC-1212
+    Counter64
+        FROM SNMPv2-SMI;
 
 	cts OBJECT IDENTIFIER ::= { enterprises 9304 }
 

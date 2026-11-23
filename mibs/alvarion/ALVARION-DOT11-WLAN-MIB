@@ -2,8 +2,8 @@
 --             This Private MIB supports BreezeAccess_VL, BreezeACCESS_4900 and BreezeNET-B product lines.
 --
 --
--- Version:    4.5.16
--- Date:       Tuesday August 14 2007
+-- Version:    6.6.2
+-- Date:       Wednesday June 8 2011
 -- Comments:   ALVARION agents also support the following Public MIBs:
 
 -- This MIB supports BreezeACCESS VL products (AU and SU), 
@@ -16,7 +16,7 @@
 --#include "rfc1155.smi"
 --#include "rfc1212.smi"
 
-
+ 
 -- mgmt           OBJECT IDENTIFIER ::= { iso org(3) dod(6) internet(1)  mgmt(2) }
 -- mib            OBJECT IDENTIFIER ::= { mgmt 1  }
 -- directory      OBJECT IDENTIFIER ::= { internet 1  }
@@ -32,14 +32,14 @@ ALVARION-DOT11-WLAN-MIB DEFINITIONS ::= BEGIN
 
 
   IMPORTS
-       MODULE-IDENTITY, NOTIFICATION-TYPE, enterprises, IpAddress,Counter32,OBJECT-TYPE
+       MODULE-IDENTITY, NOTIFICATION-TYPE, enterprises, IpAddress,Counter32,Integer32,Unsigned32,OBJECT-TYPE
                FROM SNMPv2-SMI;
 
 alvarion        	OBJECT IDENTIFIER ::= { enterprises 12394 }
 products		    OBJECT IDENTIFIER ::= { alvarion 1 }
 
 breezeAccessVLMib	MODULE-IDENTITY
-		LAST-UPDATED	"0708141146Z"
+		LAST-UPDATED	"1009231130Z"
 		ORGANIZATION	"Alvarion Ltd."
 		CONTACT-INFO	"Alvarion Customer Service
 					     Postal: Alvarion Ltd.
@@ -48,13 +48,13 @@ breezeAccessVLMib	MODULE-IDENTITY
 					     ISRAEL
 		                 E-mail: CS_Coordinator@alvarion.com"
 		DESCRIPTION		
-		      "BreezeAccess VL, BreezeACCESS 4900 and BreezeNET-B"
-		REVISION 	     "0708141146Z"
+		      "BreezeAccess VL, BreezeACCESS 4900, BreezeNET-B and BreezeACCESS-Security"
+		REVISION 	     "1009231130Z"
+		
 		DESCRIPTION		
-		      "Version 4.5"
+		      "Version 6.6"
 		::=  {  products 1 }
 
-  		 
 MacAddress ::= OCTET STRING (SIZE(6))
 DisplayString ::= OCTET STRING 
 
@@ -81,18 +81,32 @@ brzAccessVLSU-54-BD  OBJECT IDENTIFIER ::= { brzAccessVLOID 15 }
 brzAccessVLSU-3-1D  OBJECT IDENTIFIER ::= { brzAccessVLOID 16 }
 brzAccessVLSU-3-4D  OBJECT IDENTIFIER ::= { brzAccessVLOID 17 }
 brzAccessVLSU-I		OBJECT IDENTIFIER ::= { brzAccessVLOID 18 }
+brzAccessVLSU-EZ	OBJECT IDENTIFIER ::= { brzAccessVLOID 19 }
+brzAccessVLSU-V		OBJECT IDENTIFIER ::= { brzAccessVLOID 20 }
 
 brzNetB-BU-B14     OBJECT IDENTIFIER ::= { brzAccessVLOID 21 }
 brzNetB-BU-B28     OBJECT IDENTIFIER ::= { brzAccessVLOID 22 }
 brzNetB-BU-B100    OBJECT IDENTIFIER ::= { brzAccessVLOID 23 }
+brzNetB-BU-B10	   OBJECT IDENTIFIER ::= { brzAccessVLOID 24 }
 
 brzNetB-RB-B14     OBJECT IDENTIFIER ::= { brzAccessVLOID 31 }
 brzNetB-RB-B28     OBJECT IDENTIFIER ::= { brzAccessVLOID 32 }
 brzNetB-RB-B100    OBJECT IDENTIFIER ::= { brzAccessVLOID 33 }
+brzNetB-RB-B10	   OBJECT IDENTIFIER ::= { brzAccessVLOID 34 }
 
 brzAccess4900-AU-BS OBJECT IDENTIFIER ::= { brzAccessVLOID 41 }
 brzAccess4900-AU-SA OBJECT IDENTIFIER ::= { brzAccessVLOID 42 }
 brzAccess4900-SU-BD OBJECT IDENTIFIER ::= { brzAccessVLOID 51 }
+
+brzAccessVLSU-8-BD OBJECT IDENTIFIER ::= { brzAccessVLOID 61 }
+brzAccessVLSU-1-BD  OBJECT IDENTIFIER ::= { brzAccessVLOID 62 }
+
+brzAccessVLSU-3-L  OBJECT IDENTIFIER ::= { brzAccessVLOID 63 }
+brzAccessVLSU-6-L  OBJECT IDENTIFIER ::= { brzAccessVLOID 64 }
+brzAccessVLSU-12-L  OBJECT IDENTIFIER ::= { brzAccessVLOID 65 }
+
+brzAccessVL-AU OBJECT IDENTIFIER ::= { brzAccessVLOID 70 }
+brzAccessVL-SU OBJECT IDENTIFIER ::= { brzAccessVLOID 75 }
 
 brzAccessVLProducts		OBJECT IDENTIFIER ::= {	brzAccessVLOID 3 }
 
@@ -182,7 +196,8 @@ brzaccVLSysInfo       OBJECT IDENTIFIER ::= {breezeAccessVLMib 1}
                             bu-B14(6),bu-B28(7),rb-B14(8),rb-B28(9),su-BD(10),su-54-BD (11),
                             su-3-1D(12),su-3-4D(13),ausBS(14),ausSA(15),
                             auBS4900(16),auSA4900(17),su4900(18), bu-B100(19), rb-B100(20), su-I(21), 
-                            au-E(22) }
+                            au-EZ(22),    su-EZ(23),    su-V(24),   bu-B10(25),  rb-B10(26),  su-8-BD(27), su-1-BD(28),
+                            su-3-L(29),  su-6-L(30),  su-12-L(31), au(32), su(33)  }
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION  
@@ -190,6 +205,8 @@ brzaccVLSysInfo       OBJECT IDENTIFIER ::= {breezeAccessVLMib 1}
              auBS     (1) : AU-BS (modular access unit). 
              auSA     (2) : AU-SA (stand-alone access unit).
              su-6-1D  (3) : SU-6-1D (subscriber unit supporting 6 Mbps)
+                            Starting with 5.0 this is deprecated.
+                            When a SU-6-1D is upgraded to 5.0, its type will be changed to SU-6-BD.
              su-6-BD  (4) : SU-6-BD (subscriber unit supporting 6 Mbps).
              su-24-BD (5) : SU-24-BD (subscriber unit supporting 24 Mbps).
 			 bu-B14   (6) : BU-B14 (BreezeNET Base Unit supporting 14 Mbps).
@@ -199,11 +216,14 @@ brzaccVLSysInfo       OBJECT IDENTIFIER ::= {breezeAccessVLMib 1}
 			 su-BD   (10) : SU-BD (subscriber unit).
 			 su-54-BD(11) : SU-54-BD (subscriber unit supporting 54 Mbps).
              su-3-1D (12) : SU-3-1D (subscriber unit supporting 3 Mbps).
+                            Starting with 5.0 this is deprecated.
+                            When a SU-3-1D is upgraded to 5.0, its type will be changed to SU-3-BD.
              su-3-4D (13) : SU-3-4D (subscriber unit supporting 3 Mbps).
-             ausBS   (14) : AUS-BS (modular access unit supporting maxim 8 or 25 
+                            Starting with 5.0 SW version this unit will work in BD mode
+             ausBS   (14) : AUS-BS (modular access unit supporting maxim 25 
                             (via licensing) subscribers and allowing association 
                             only with SU-3 or SU-6).
-             ausSA   (15) : AUS-SA (stand-alone access unit supporting maxim 8 or 25 
+             ausSA   (15) : AUS-SA (stand-alone access unit supporting maxim 25 
                             (via licensing) subscribers and allowing association 
                             only with SU-3 or SU-6 ).
              auBS4900(16) : AU-BS-4900 (BreezeAccess 4900 modular access unit)
@@ -212,7 +232,18 @@ brzaccVLSysInfo       OBJECT IDENTIFIER ::= {breezeAccessVLMib 1}
              bu-B100 (19) : BU-B100 (BreezeNET Base Unit unlimited throughput)
              rb-B100 (20) : BU-B100 (BreezeNET Remote Bridge unlimited throughput) 
              su-I    (21) : SU-I
-             au-E    (22) : AU-E" 
+             au-EZ   (22) : AU-EZ
+             su-EZ   (23) : SU-EZ 
+             su-V	(24)  : SU-V (subscriber unit supporting 12 Mbps downlink and 8 Mbps uplink ).
+             bu-B10(25)	  :	BU-B10 (BreezeNET Base Unit supporting 5 Mbps).
+             rb-B10  (26) : RB-B10 (BreezeNET Base Unit supporting 5 Mbps).
+             su-8-BD (27) : SU-8-BD (subscriber unit supporting 8 Mbps).
+             su-1-BD (28) : SU-1-BD (subscriber unit supporting 1 Mbps).
+             su-3-L (29) : SU-3-L (subscriber unit supporting 3 Mbps).
+             su-6-L (30) : SU-6-L (subscriber unit supporting 6 Mbps).
+             su-12-L (31) : SU-12-L (subscriber unit supporting 12 Mbps).
+             au      (32) : AU (security access unit).
+             su      (33) : SU (security subscriber unit)."
              ::= { brzaccVLSysInfo 9 }
 
     brzaccVLAssociatedAU OBJECT-TYPE
@@ -255,7 +286,7 @@ brzaccVLSysInfo       OBJECT IDENTIFIER ::= {breezeAccessVLMib 1}
             ::= { brzaccVLSysInfo 14 }
 
     brzaccVLRadioBand OBJECT-TYPE
-			SYNTAX INTEGER {band-5-8GHz (1), band-5-4GHz (2) , band-4-9GHz (3),band-5-2GHz (4),band-2-4GHz (5),band-5-3GHz (6),band-4-9GHzJapan (7)}
+            SYNTAX INTEGER {band-5-8GHz (1), band-5-4GHz (2) , band-4-9GHz (3),band-5-2GHz (4),band-2-4GHz (5),band-5-3GHz (6),band-4-9GHzJapan (7),band-900MHz(8)}
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION  
@@ -448,7 +479,8 @@ brzaccVLCountryDependentParameters   OBJECT IDENTIFIER ::= {brzaccVLSysInfo 18}
     brzaccVLMinimumHwRevision  OBJECT-TYPE
             SYNTAX INTEGER {hwRevisionA (1), hwRevisionB (2), 
                             hwRevisionC (3), hwRevisionD (4), 
-                            hwRevisionE (5), na (255)}
+                            hwRevisionE (5), hwRevisionF (6),
+                            hwRevisionG (7), na (255)}
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION 
@@ -510,6 +542,38 @@ brzaccVLCountryDependentParameters   OBJECT IDENTIFIER ::= {brzaccVLSysInfo 18}
             "Applicable to all units.  
             Serial Number of the unit" 
             ::= { brzaccVLSysInfo 21 }
+            
+    brzaccVLAUSSupportSU54 OBJECT-TYPE
+            SYNTAX INTEGER { true(1), false(2), na(255) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU only.
+             If the AU is not AUS, it will return 255.
+             If the AUS is in 900 MHz bandwidth, it will return 255
+             Indicates if the AUS has license for association of SU-54." 
+            ::= { brzaccVLSysInfo 22 }
+            
+    brzaccVLNumOfRejectionsSinceLastReset OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU/BU only.
+             The number of subscribers that were rejected because of wrong ESSID" 
+            ::= { brzaccVLSysInfo 23 }
+ 
+   brzaccVLAUSSupportSU8 OBJECT-TYPE
+            SYNTAX INTEGER { true(1), false(2), na(255) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU only.
+             If the AU is not AUS, it will return 255.
+             If the unit is AUS but not operating in 900 MHz, it will return 255.
+             Indicates if the AUS has license for association of SU-8." 
+            ::= { brzaccVLSysInfo 24 }
+          
 
 -- Unit Control
 -- ============
@@ -632,7 +696,8 @@ brzaccVLUnitPasswords     OBJECT IDENTIFIER ::= {brzaccVLUnitControl 8}
             DESCRIPTION  
             "Applicable to all units. 
              The Installer password.
-             Up to 8 printable ASCII characters."
+             Up to 8 printable ASCII characters.
+             Value read will allwais be ********* "
             ::= { brzaccVLUnitPasswords 2 }
 
     brzaccVLAdminPassword OBJECT-TYPE
@@ -641,8 +706,7 @@ brzaccVLUnitPasswords     OBJECT IDENTIFIER ::= {brzaccVLUnitControl 8}
             STATUS current
             DESCRIPTION  
             "Applicable to all units. 
-            The Administrator password. Accessible only with SNMP Write 
-            Community String (administrator password). 
+            The Administrator password. Value read will allwais be *********. 
             Up to 8 printable ASCII characters."
             ::= { brzaccVLUnitPasswords 3 }
 
@@ -705,12 +769,13 @@ brzaccVLFTPServerParams      OBJECT IDENTIFIER ::= {brzaccVLFTPParameters 1}
              The IP address of the FTP server." 
             ::= { brzaccVLFTPServerParams 4 }  
 
-    brzaccVLFTPClientMask OBJECT-TYPE
+   brzaccVLFTPClientMask OBJECT-TYPE
             SYNTAX  IpAddress  
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION  
-            "Applicable to all units.  
+            "Applicable to all units. 
+             Starting with 5.0 this parameter is not appplicable.  
              The Mask of the FTP stack in the unit." 
             ::= { brzaccVLFTPServerParams 5 }  
 
@@ -720,7 +785,8 @@ brzaccVLFTPServerParams      OBJECT IDENTIFIER ::= {brzaccVLFTPParameters 1}
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION  
-            "Applicable to all units.  
+            "Applicable to all units. 
+             Starting with 5.0 this parameter is not appplicable. 
              The FTP Gateway address"
             ::= { brzaccVLFTPServerParams 6 }  
 
@@ -889,16 +955,95 @@ brzaccVLFeatureUpgrade   OBJECT IDENTIFIER ::= {brzaccVLUnitControl 14}
              Change the unit type between BU and RB."
             ::= { brzaccVLUnitControl 15 }
 
-   brzaccLighteAPWorkingMode OBJECT-TYPE
-        	SYNTAX  INTEGER  
+   brzaccVLApWorkingMode OBJECT-TYPE
+        	SYNTAX  INTEGER  { ezMode(1), na(255) }
+        	MAX-ACCESS read-only
+        	STATUS current
+        	DESCRIPTION 
+        	"Applicable to AU-EZ only. 
+        	Starting with 5.5 it is read-only.
+         	Report unit running mode: 1 - EZ mode." 
+			::= { brzaccVLUnitControl 16 }
+
+brzaccVLLEDsettings   OBJECT IDENTIFIER ::= {brzaccVLUnitControl 17}
+
+   brzaccVLLEDmode OBJECT-TYPE
+        	SYNTAX  INTEGER  { normal(1), threshold(2) }
         	MAX-ACCESS read-write
         	STATUS current
         	DESCRIPTION 
-        	"Applicable to AU only. 
-         	Change unit running mode: 0 - VL mode 1 - Mixed cell mode" 
-			::= { brzaccVLUnitControl 16 }
+        	"Applicable to all units with SW version 6.0 and higher, except AU. 
+        	Sets the operating mode of the unit LEDS" 
+			::= { brzaccVLLEDsettings 1 }
+			
+-- LED-THRESHOLD-TABLE
+	
+    brzaccVLThresholdTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF BrzaccVLThresholdTableSettings
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units with SW version 6.0 and higher, except AU. 
+             A table with the settings for Threshold mode" 
+            ::= { brzaccVLLEDsettings 2 }
 
+    brzaccVLThresholdTableEntry  OBJECT-TYPE
+            SYNTAX BrzaccVLThresholdTableSettings
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units with SW version 6.0 and higher, except AU. 
+             An entry in the ThresholdTable." 
+            INDEX { brzaccVLThresholdLEDnum }
+            ::= { brzaccVLThresholdTable 1 }
+                                
+    BrzaccVLThresholdTableSettings ::= SEQUENCE { brzaccVLThresholdLEDnum INTEGER,
+                                                  brzaccVLThresholdLEDtype INTEGER,
+                                                  brzaccVLThresholdLEDmode INTEGER,
+                                                  brzaccVLThresholdLEDtarget INTEGER 
+                                                }
+
+    brzaccVLThresholdLEDnum OBJECT-TYPE
+            SYNTAX INTEGER ( 1..8 )
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units with SW version 6.0 and higher, except AU. 
+            The LED position and index." 
+            ::= { brzaccVLThresholdTableEntry 1 }
             
+     brzaccVLThresholdLEDtype OBJECT-TYPE
+            SYNTAX INTEGER { typeDisabled (1), typeRSSI (2), typeCRC (3), typeSNR (4), typeAverageModulation (5) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units with SW version 6.0 and higher, except AU. 
+            The type of measurement of the LED" 
+            ::= { brzaccVLThresholdTableEntry 2 }
+            
+	brzaccVLThresholdLEDmode OBJECT-TYPE
+            SYNTAX INTEGER { equalOrLower (1), equalOrHigher (2), equal (3) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units with SW version 6.0 and higher, except AU. 
+             The condition to turn the LED on."
+            ::= { brzaccVLThresholdTableEntry 3 }
+            
+	brzaccVLThresholdLEDtarget OBJECT-TYPE
+            SYNTAX INTEGER ( -108..100 )
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units with SW version 6.0 and higher, except AU. 
+            The target value, depending on LED type,
+            from brzaccVLThresholdLEDtype above."
+            ::= { brzaccVLThresholdTableEntry 4 }
+            
+            
+-- end of LED-THRESHOLD-TABLE
+
+
 -- Network Management Params
 -- =========================
    brzaccVLNwMngParameters   OBJECT IDENTIFIER ::= {breezeAccessVLMib 3}
@@ -939,7 +1084,8 @@ brzaccVLFeatureUpgrade   OBJECT IDENTIFIER ::= {brzaccVLUnitControl 14}
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-            "Applicable to all units.  
+            "Starting with version 5.0, this is deprecated. Use newMngIpFilterTable instead.
+			 Applicable to all units.  
              A Management IP Filter Table of up to 3 IP addresses 
              of devices that are authorized to access the unit 
              for management purposes." 
@@ -1012,7 +1158,8 @@ brzaccVLFeatureUpgrade   OBJECT IDENTIFIER ::= {brzaccVLUnitControl 14}
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-            "Applicable to all units.  
+            "Starting with version 5.0, this is deprecated. Use newMngTrapTable instead.
+			 Applicable to all units.  
              A Management Trap Table of up to 10 IP addresses of 
              stations to send traps to." 
             ::= { brzaccVLNwMngParameters 7 }
@@ -1087,7 +1234,8 @@ brzaccVLFeatureUpgrade   OBJECT IDENTIFIER ::= {brzaccVLUnitControl 14}
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-            "Applicable to all units.  
+			"Starting with version 5.0, this is deprecated. Use brzaccVLNewMngIpRangesTable instead.
+             Applicable to all units.  
              Table of Management IP Address Ranges" 
             ::= { brzaccVLNwMngParameters 10 }
 
@@ -1181,7 +1329,7 @@ brzaccVLFeatureUpgrade   OBJECT IDENTIFIER ::= {brzaccVLUnitControl 14}
              Deletes all entries from the Management IP Ranges Table."
             ::= { brzaccVLNwMngParameters 12 }
 
-	brzaccVLApClientIpAddress    OBJECT-TYPE
+	brzaccVLWi2IpAddress    OBJECT-TYPE
             SYNTAX  IpAddress
             MAX-ACCESS read-write
             STATUS current
@@ -1189,7 +1337,420 @@ brzaccVLFeatureUpgrade   OBJECT IDENTIFIER ::= {brzaccVLUnitControl 14}
             "Applicable to SU/RB unit only.  
              The IP Address of the WIFI WIMAX unit"
             ::= { brzaccVLNwMngParameters 13 }
-                                      
+
+   brzaccVLNewNMngSystem      OBJECT IDENTIFIER ::= {brzaccVLNwMngParameters 14}                            
+   brzaccVLErrorHandling      OBJECT IDENTIFIER ::= {brzaccVLNewNMngSystem 1}
+
+   brzaccVLErrHandlingSetNMSId   OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable to all units.  
+             The ID of the Network Management System that use Error Handling mechanism.
+             Get request will return 0."
+            ::= { brzaccVLErrorHandling 1 }
+            
+  
+   	brzaccVLErrHandlingTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF BrzaccVLErrHandlingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "" 
+            ::= { brzaccVLErrorHandling 2 }
+
+    brzaccVLErrHandlingEntry  OBJECT-TYPE
+            SYNTAX BrzaccVLErrHandlingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "" 
+            INDEX { brzaccVLErrHandlingNMSId, brzaccVLErrHandlingRequestId }
+            ::= { brzaccVLErrHandlingTable 1 }
+                                
+    BrzaccVLErrHandlingEntry ::= SEQUENCE { 
+								brzaccVLErrHandlingNMSId		Unsigned32,
+								brzaccVLErrHandlingRequestId	Unsigned32,					
+								brzaccVLErrHandlingErrorCode	INTEGER,													
+								brzaccVLErrHandlingParameter1	INTEGER,																							
+								brzaccVLErrHandlingParameter2	INTEGER,
+								brzaccVLErrHandlingParameter3	INTEGER,
+								brzaccVLErrHandlingParameter4	INTEGER,
+								brzaccVLErrHandlingParameter5	INTEGER								
+                                }
+               
+ 
+    brzaccVLErrHandlingNMSId OBJECT-TYPE
+            SYNTAX  Unsigned32(0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            ""
+            ::= { brzaccVLErrHandlingEntry 1 }
+
+    brzaccVLErrHandlingRequestId OBJECT-TYPE
+            SYNTAX  Unsigned32(0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            ""
+            ::= { brzaccVLErrHandlingEntry 2 }
+
+    brzaccVLErrHandlingErrorCode OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            ""
+            ::= { brzaccVLErrHandlingEntry 3 }
+
+    brzaccVLErrHandlingParameter1 OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            ""
+            ::= { brzaccVLErrHandlingEntry 4 }
+
+    brzaccVLErrHandlingParameter2 OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            ""
+            ::= { brzaccVLErrHandlingEntry 5 }
+
+    brzaccVLErrHandlingParameter3 OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            ""
+            ::= { brzaccVLErrHandlingEntry 6 }
+
+    brzaccVLErrHandlingParameter4 OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            ""
+            ::= { brzaccVLErrHandlingEntry 7 }
+
+    brzaccVLErrHandlingParameter5 OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            ""
+            ::= { brzaccVLErrHandlingEntry 8 }
+
+
+
+-- begin NEW section
+
+
+    newMngIpFilterTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF NewMngIpFilterEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units.  
+             A Management IP Filter Table of up to 10 IP addresses 
+             of devices that are authorized to access the unit 
+             for management purposes." 
+            ::= { brzaccVLNwMngParameters 15 }
+
+    newMngIpFilterEntry  OBJECT-TYPE
+            SYNTAX NewMngIpFilterEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units.  
+             A Management IP Filter Table entry."
+            INDEX { brzaccVLNewNwMngIpAddress }
+            ::= { newMngIpFilterTable 1 }
+
+    NewMngIpFilterEntry ::= SEQUENCE { brzaccVLNewNwMngIpAddress   IpAddress,
+                                    brzaccVLNewNwMngIpAddressCommand  INTEGER }
+   
+    brzaccVLNewNwMngIpAddress   OBJECT-TYPE
+            SYNTAX IpAddress  
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to all units.  
+             An IP address in the Management IP Filter Table."
+          ::= { newMngIpFilterEntry 1 }
+
+    brzaccVLNewNwMngIpAddressCommand   OBJECT-TYPE
+            SYNTAX INTEGER { active(1), notInService(2), notReady(3), createAndGo(4), createAndWait(5), destroy(6) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable to all units.
+			 Supports only active(1), createAndGo(4) and destroy(6).
+             A command for an entry in the Management IP Filter 
+             Table."
+         ::= { newMngIpFilterEntry 2 }
+
+
+-- end NEW section
+
+
+-- begin NEW section
+
+
+    newMngTrapTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF NewMngTrapEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units.  
+             A Management Trap Table of up to 10 IP addresses of 
+             stations to send traps to." 
+            ::= { brzaccVLNwMngParameters 16 }
+
+    newMngTrapEntry  OBJECT-TYPE
+            SYNTAX NewMngTrapEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units.  
+             A Management Trap Table entry." 
+            INDEX { brzaccVLNewNwMngTrapAddress }
+            ::= { newMngTrapTable 1 }
+                                
+    NewMngTrapEntry ::= SEQUENCE { brzaccVLNewNwMngTrapCommunity   DisplayString,
+                                brzaccVLNewNwMngTrapAddress   IpAddress,
+                                brzaccVLNewNwTrapCommand      INTEGER }
+                                
+    brzaccVLNewNwMngTrapCommunity OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..14))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units.  
+             The trap community associated with the applicable 
+             entry in the Management Trap Table.
+             Up to 14 printable case sensitive ASCII characters."
+            ::= { newMngTrapEntry 1 }
+
+    brzaccVLNewNwMngTrapAddress   OBJECT-TYPE
+            SYNTAX  IpAddress  
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units.  
+             An IP address in the Management Trap Table entry." 
+        ::= { newMngTrapEntry 2 }
+
+    brzaccVLNewNwTrapCommand   OBJECT-TYPE
+            SYNTAX  INTEGER { active(1), notInService(2), notReady(3), createAndGo(4), createAndWait(5), destroy(6) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units.
+			 Supports only active(1), createAndGo(4) and destroy(6).
+             A command for an entry in the Management Trap Table."
+        ::= { newMngTrapEntry 3 }
+
+    brzaccVLNewMngIpRangesTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF BrzaccVLNewMngIpRangeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units.  
+             Table of Management IP Address Ranges" 
+            ::= { brzaccVLNwMngParameters 17 }
+
+    brzaccVLNewMngIpRangeEntry  OBJECT-TYPE
+            SYNTAX BrzaccVLNewMngIpRangeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units.  
+             A Management IP Address Ranges Table entry" 
+            INDEX { brzaccVLNewMngIpRangeStart }
+            ::= { brzaccVLNewMngIpRangesTable 1 }
+                                
+    BrzaccVLNewMngIpRangeEntry ::= SEQUENCE {
+								brzaccVLNewMngIpRangeStart		IpAddress,
+								brzaccVLNewMngIpRangeEnd		IpAddress,
+								brzaccVLNewMngIpRangeMask		IpAddress,
+								brzaccVLNewMngIpRangeFlag		INTEGER,
+								brzaccVLNewMngIpRangeCommand		INTEGER
+                                }
+               
+ 
+    brzaccVLNewMngIpRangeStart OBJECT-TYPE
+            SYNTAX  IpAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units.  
+             Start Address of the range"
+            ::= { brzaccVLNewMngIpRangeEntry 1 }
+    
+    brzaccVLNewMngIpRangeEnd OBJECT-TYPE
+            SYNTAX  IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units.  
+             End Address of the range. 
+             Used only if brzaccVLMngIpRangeFlag is  rangeDefinedByStartEndAddr"
+            ::= { brzaccVLNewMngIpRangeEntry 2 }
+            
+	brzaccVLNewMngIpRangeMask OBJECT-TYPE
+            SYNTAX  IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+			"Applicable to all units.  
+             End Address of the range. 
+             Used only if brzaccVLMngIpRangeFlag is  rangeDefinedByStartAddrMask"
+            ::= { brzaccVLNewMngIpRangeEntry 3 } 
+
+    brzaccVLNewMngIpRangeFlag OBJECT-TYPE
+            SYNTAX  INTEGER { rangeDefinedByStartEndAddr(1), rangeDefinedByStartAddrMask(2)}  
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units.  
+             Defines the method of defining the range:
+             Using Start & End Address( rangeDefinedByStartEndAddr ),
+             or using Start Address and Mask ( rangeDefinedByStartAddrSubNetMask )."
+            ::= { brzaccVLNewMngIpRangeEntry 4 }
+
+    brzaccVLNewMngIpRangeCommand OBJECT-TYPE
+            SYNTAX  INTEGER { active(1), notInService(2), notReady(3), createAndGo(4), createAndWait(5), destroy(6) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units.  
+             Row Status in the New Management IP Address Ranges Table"
+            ::= { brzaccVLNewMngIpRangeEntry 5 }
+
+-- end NEW section
+
+
+
+   brzaccVLTrapHistory        OBJECT IDENTIFIER ::= {brzaccVLNewNMngSystem 2}
+
+   brzaccVLLastTrapSequenceNumber   OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to AU/BU only.
+            Sequence Number of Last generated Trap"
+            ::= { brzaccVLTrapHistory 1 }
+            
+  
+   	brzaccVLTrapHistoryTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF BrzaccVLTrapHistoryEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to AU/BU only.
+            This table contains the last 1024 traps generated by the unit." 
+            ::= { brzaccVLTrapHistory 2 }
+
+    brzaccVLTrapHistoryEntry  OBJECT-TYPE
+            SYNTAX BrzaccVLTrapHistoryEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to AU/BU only.
+            An entry in Trap History Table." 
+            INDEX { brzaccVLTrapHistorySequenceNumber}
+            ::= { brzaccVLTrapHistoryTable 1 }
+                                
+    BrzaccVLTrapHistoryEntry ::= SEQUENCE { 
+				brzaccVLTrapHistorySequenceNumber	INTEGER,
+				brzaccVLTrapType					INTEGER,
+				brzaccVLTrapMacAddrParam			MacAddress,
+				brzaccVLTrapIntParam1				INTEGER,
+				brzaccVLTrapIntParam2				INTEGER,
+				brzaccVLTrapIntParam3				INTEGER,
+				brzaccVLTrapStrParam				DisplayString
+                                }
+               
+ 
+    brzaccVLTrapHistorySequenceNumber OBJECT-TYPE
+            SYNTAX  INTEGER(0..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU/BU only.
+            Sequence number of the trap."
+            ::= { brzaccVLTrapHistoryEntry 1 }
+   
+    brzaccVLTrapType OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU/BU only.
+            It contains the trap type."
+            ::= { brzaccVLTrapHistoryEntry 2 }
+            
+    brzaccVLTrapMacAddrParam OBJECT-TYPE
+            SYNTAX  MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU/BU only.
+            It contains the MAC Address of the trap if the trap 
+            type requires this field, otherwise it contains the NULL 
+            MAC Address."
+            ::= { brzaccVLTrapHistoryEntry 3 }
+
+    brzaccVLTrapIntParam1 OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU/BU only.
+            It contains the first variable of integer type for the trap.
+            If from the trap definition this variable is not applicable 
+            it will be 0."
+            ::= { brzaccVLTrapHistoryEntry 4 }
+
+    brzaccVLTrapIntParam2 OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU/BU only.
+            It contains the second variable of integer type for the trap.
+            If from the trap definition this variable is not applicable 
+            it will be 0."
+            ::= { brzaccVLTrapHistoryEntry 5 }
+
+    brzaccVLTrapIntParam3 OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU/BU only.
+            It contains the third variable of integer type for the trap.
+            If from the trap definition this variable is not applicable 
+            it will be 0."
+            ::= { brzaccVLTrapHistoryEntry 6 }
+
+    brzaccVLTrapStrParam OBJECT-TYPE
+            SYNTAX  DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU/BU only.
+            It contains the string variable of the trap if this variable exists
+            for that trap, otherwise it will contain the empty string."
+            ::= { brzaccVLTrapHistoryEntry 7 }
+            
+
 -- IP Params:
 -- ===========
 brzaccVLIpParams      OBJECT IDENTIFIER ::= {breezeAccessVLMib 4}
@@ -1303,16 +1864,19 @@ brzaccVLVLANSupport       OBJECT IDENTIFIER ::= {brzaccVLBridgeParameters 1}
             ::= { brzaccVLVLANSupport 1 }
 
     brzaccVLEthernetLinkType OBJECT-TYPE
-            SYNTAX  INTEGER { accessLink (1), 
-                              trunkLink (2), 
-                              hybridLink (3),
-                              serviceProviderLink (4) } 
+            SYNTAX  INTEGER { accessLink          (1), 
+                              trunkLink           (2), 
+                              hybridLink          (3),
+                              serviceProviderLink (4),
+                              extAccessLink       (5),
+                              extTrunkLink        (6) } 
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION  
             "Applicable to all units.  
              VLAN support mode (Link Type). 
-             The Access Link option is not available for AU/BU.
+             The Access Link, Extended Access Link and Extended Trunk Link 
+             options are not available for AU/BU.
              Service Provider Link is not available for BU/RB."
             ::= { brzaccVLVLANSupport 2 }
  
@@ -1343,7 +1907,8 @@ brzaccVLVLANForwarding        OBJECT IDENTIFIER ::= {brzaccVLVLANSupport 4}
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-            "Applicable to all units.  
+            "Starting with version 5.0, this is deprecated. Use brzaccVLNewVlanForwardingTable instead.
+			 Applicable to all units.  
              A VLAN Forwarding Table of up to 20 VLAN IDs of devices 
              to which data frames are forwarded when VLAN Forwarding 
              is Enabled. (applicable in Trunk and Service Provider links only)."
@@ -1387,7 +1952,54 @@ brzaccVLVLANForwarding        OBJECT IDENTIFIER ::= {brzaccVLVLANSupport 4}
              To Add a new VLAN ID SET an entry which is currently 0.
              Range : 0 to 4094"
         ::= { brzaccVLVlanForwardingEntry 2 }
- 
+
+    brzaccVLNewVlanForwardingTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF BrzaccVLNewVlanForwardingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units.  
+             A VLAN Forwarding Table of up to 20 VLAN IDs of devices 
+             to which data frames are forwarded when VLAN Forwarding 
+             is Enabled. (applicable in Trunk and Service Provider links only)."
+            ::= { brzaccVLVLANForwarding 3 }
+
+    brzaccVLNewVlanForwardingEntry  OBJECT-TYPE
+            SYNTAX BrzaccVLNewVlanForwardingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units.  
+             A VLAN Forwarding Table entry. (applicable in Trunk and Service Provider 
+             links only)."
+            INDEX { brzaccVLNewVlanIdForwarding }
+            ::= { brzaccVLNewVlanForwardingTable 1 }
+
+    BrzaccVLNewVlanForwardingEntry ::= SEQUENCE {
+            brzaccVLNewVlanIdForwarding  INTEGER,
+            brzaccVLNewVlanForwardingCommand  INTEGER
+            }
+
+
+    brzaccVLNewVlanIdForwarding   OBJECT-TYPE
+            SYNTAX  INTEGER  (1..4094)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units.
+             The list of VLAN ID's in the VLAN ID Forwarding Table.
+             Range : 1 to 4094"
+        ::= { brzaccVLNewVlanForwardingEntry 1 }
+
+    brzaccVLNewVlanForwardingCommand   OBJECT-TYPE
+            SYNTAX  INTEGER  { active(1), notInService(2), notReady(3), createAndGo(4), createAndWait(5), destroy(6) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units.  
+             Row Status in the New VLAN Forwarding Table."
+        ::= { brzaccVLNewVlanForwardingEntry 2 }
+
 brzaccVLVlanRelaying    OBJECT IDENTIFIER ::= {brzaccVLVLANSupport 5}
 
     brzaccVLVlanRelayingSupport OBJECT-TYPE
@@ -1406,7 +2018,8 @@ brzaccVLVlanRelaying    OBJECT IDENTIFIER ::= {brzaccVLVLANSupport 5}
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-            "Applicable to AU only. 
+			"Starting with version 5.0, this is deprecated. Use brzaccVLNewVlanRelayingTable instead.
+             Applicable to AU only. 
 			 Not applicable to BreezeNET-B products.
              A VLAN Relaying Table of up to 20 VLAN IDs of devices 
              to which data frames are relayed when VLAN Relaying is 
@@ -1455,6 +2068,57 @@ brzaccVLVlanRelaying    OBJECT IDENTIFIER ::= {brzaccVLVLANSupport 5}
              Range: 0 to 4094 , 0 - remove entry."
         ::= { brzaccVLVlanRelayingEntry 2 }
 
+    brzaccVLNewVlanRelayingTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF BrzaccVLNewVlanRelayingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to AU only. 
+			 Not applicable to BreezeNET-B products.
+             A VLAN Relaying Table of up to 20 VLAN IDs of devices 
+             to which data frames are relayed when VLAN Relaying is 
+             Enabled. (applicable in Trunk and Service Provider links only)."
+            ::= { brzaccVLVlanRelaying 3 }
+
+    brzaccVLNewVlanRelayingEntry  OBJECT-TYPE
+            SYNTAX BrzaccVLNewVlanRelayingEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to AU only.
+             Not applicable to BreezeNET-B products. 
+             A VLAN Relaying Table entry. (applicable in Trunk and Service 
+             Provider links only)."
+            INDEX { brzaccVLNewVlanIdRelaying }
+            ::= { brzaccVLNewVlanRelayingTable 1 }
+
+    BrzaccVLNewVlanRelayingEntry ::= SEQUENCE {
+            brzaccVLNewVlanIdRelaying  INTEGER,
+            brzaccVLNewVlanRelayingTableCommand  INTEGER
+            }
+
+    brzaccVLNewVlanIdRelaying   OBJECT-TYPE
+            SYNTAX  INTEGER (1..4094)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU only. 
+             Not applicable to BreezeNET-B products.
+             The list of VLAN ID's in the VLAN ID Relaying Table. 
+             Range: 1 to 4094."
+        ::= { brzaccVLNewVlanRelayingEntry 1 }
+
+    brzaccVLNewVlanRelayingTableCommand   OBJECT-TYPE
+            SYNTAX  INTEGER  { active(1), notInService(2), notReady(3), createAndGo(4), createAndWait(5), destroy(6) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU only. 
+             Not applicable to BreezeNET-B products.
+			 Supports only active(1), createAndGo(4) and destroy(6).
+             A command to create or destroy a VLAN entry in the VLAN 
+             Relaying Table."
+        ::= { brzaccVLNewVlanRelayingEntry 2 }
 
 brzaccVLVLANTrafficPriority       OBJECT IDENTIFIER ::= {brzaccVLVLANSupport 6}
 
@@ -1470,13 +2134,12 @@ brzaccVLVLANTrafficPriority       OBJECT IDENTIFIER ::= {brzaccVLVLANSupport 6}
             ::= { brzaccVLVLANTrafficPriority 1 }
   
     brzaccVLVlanManagementPriority OBJECT-TYPE
-            SYNTAX  INTEGER  { na(255) }
+            SYNTAX  INTEGER  ( 0..7 )
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION  
             "Applicable to all units.  
-             Priority tagging for management frames. Applicable to 
-             Access Link and Trunk Link only.
+             Priority tagging for management frames.
              Range: 0 to 7."
             ::= { brzaccVLVLANTrafficPriority 2 }
 
@@ -1493,17 +2156,17 @@ brzaccVLVLANTrafficPriority       OBJECT IDENTIFIER ::= {brzaccVLVLANSupport 6}
              only.
              Valid values: 0-7."
             ::= { brzaccVLVLANTrafficPriority 3 }
-            
-	brzaccVLVLANQinQ	OBJECT IDENTIFIER ::= {brzaccVLVLANSupport 7}
-	
+
+brzaccVLVLANQinQ	OBJECT IDENTIFIER ::= {brzaccVLVLANSupport 7}
+
 	brzaccVLQinQEthertype   OBJECT-TYPE
-            SYNTAX	INTEGER  (33025 .. 36864|37120|37376)
+            SYNTAX	INTEGER  (33024 .. 36864|37120|37376)
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION  
             "Applicable to AU and SU. Not applicable to BreezeNET-B units. 
             The Ethernet type of the Service Provider Tag.
-            The range is  0x8101(33025) - 0x9000(36864), 0x9100(37120), 0x9200(37376)."
+            The range is  0x8100(33024) - 0x9000(36864), 0x9100(37120), 0x9200(37376)."
         ::= { brzaccVLVLANQinQ 1 }
         
 	brzaccVLQinQProviderVlanID   OBJECT-TYPE
@@ -1514,7 +2177,170 @@ brzaccVLVLANTrafficPriority       OBJECT IDENTIFIER ::= {brzaccVLVLANSupport 6}
             "Applicable to SU only.
             VLAN ID of the Service Provider Tag."
         ::= { brzaccVLVLANQinQ 2 }
-	
+
+-- VLAN Extended Access Link
+
+    brzaccVLVlanExtendedAccessRulesTable     OBJECT-TYPE
+            SYNTAX SEQUENCE OF BrzaccVLVlanExtendedAccessRulesEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Starting with version 6.0.
+             Available for SU/RB units only.
+             An 8-VLAN Rule Table for Extended Access Link." 
+            ::= { brzaccVLVLANSupport 8 }
+
+    brzaccVLVlanExtendedAccessRulesEntry     OBJECT-TYPE
+            SYNTAX  BrzaccVLVlanExtendedAccessRulesEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Starting with version 6.0.
+             Available for SU/RB units only.
+             An entry in VLAN Rule Table for Extended Access Link." 
+            INDEX { brzaccVLVlanExtendedAccessRulesTableIdx }
+            ::= { brzaccVLVlanExtendedAccessRulesTable 1 }
+
+    BrzaccVLVlanExtendedAccessRulesEntry ::= SEQUENCE {
+               brzaccVLVlanExtendedAccessRulesTableIdx             INTEGER,
+               brzaccVLVlanExtendedAccessRuleId                    INTEGER,
+               brzaccVLVlanExtendedAccessRuleVlanId                INTEGER,
+               brzaccVLVlanExtendedAccessRulePriority              INTEGER,
+               brzaccVLVlanExtendedAccessRuleMulticastAllowed      INTEGER,
+               brzaccVLVlanExtendedAccessRuleOpType                INTEGER,
+               brzaccVLVlanExtendedAccessRuleOperands              DisplayString
+            }
+
+    brzaccVLVlanExtendedAccessRulesTableIdx   OBJECT-TYPE
+            SYNTAX  INTEGER  (1..8)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Starting with version 6.0.
+             Available for SU/RB units only.
+             A table index for a VLAN Rule entry/rule in the 
+             VLAN Rule Table for Extended Access Link."
+        ::= { brzaccVLVlanExtendedAccessRulesEntry 1 }
+
+    brzaccVLVlanExtendedAccessRuleId   OBJECT-TYPE
+            SYNTAX  INTEGER {
+                noRule                (1), 
+                sourceMacAddress      (2),
+                destinationMacAddress (3),
+                sourceIpAddress       (4),
+                destinationIpAddress  (5),
+                sourceUdpPort         (6),
+                destinationUdpPort    (7),
+                sourceTcpPort         (8),
+                destinationTcpPort    (9),
+                ipProtocol           (10),
+                default              (11)   }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Starting with version 6.0.
+             Available for SU/RB units only.
+             Identifies the VLAN Rule type of an entry/rule,
+             in VLAN Rule Table for Extended Access Link."
+    ::= { brzaccVLVlanExtendedAccessRulesEntry 2 }
+
+    brzaccVLVlanExtendedAccessRuleVlanId   OBJECT-TYPE
+            SYNTAX  INTEGER  (0..4094)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Starting with version 6.0.
+             Available for SU/RB units only.
+             Identifies the data VLAN ID of an entry/rule,
+             in VLAN Rule Table for Extended Access Link.
+             Range: 1-4094. Value zero is returned if
+             no rule defined for this entry."
+    ::= { brzaccVLVlanExtendedAccessRulesEntry 3 }
+
+    brzaccVLVlanExtendedAccessRulePriority   OBJECT-TYPE
+            SYNTAX  INTEGER  ( 0..7 | 255 )
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Starting with version 6.0.
+             Applicable to SU/RB units only. 
+             Identifies the Priority tagging for data frames, for an entry/rule,
+             in VLAN Rule Table for Extended Access Link.
+             Range: 0-7. Value 255 is returned if
+             no rule defined for this entry."
+    ::= { brzaccVLVlanExtendedAccessRulesEntry 4 }
+
+    brzaccVLVlanExtendedAccessRuleMulticastAllowed    OBJECT-TYPE
+            SYNTAX  INTEGER  { allowed(1), notAllowed(2), na(255) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Starting with version 6.0.
+             Available for SU/RB units only.
+             Determine if Multicast frames are tagged and sent on wireless LAN.
+             Option for an entry/rule, in VLAN Rule Table for Extended Access Link.
+             Value 255 is returned if no rule defined for this entry."
+    ::= { brzaccVLVlanExtendedAccessRulesEntry 5 }
+
+    brzaccVLVlanExtendedAccessRuleOpType   OBJECT-TYPE
+            SYNTAX  INTEGER  {
+                value          (1),
+                range          (2),
+                mask           (3),
+                enumeration    (4),
+                na           (255)   }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Starting with version 6.0.
+             Available for SU/RB units only.
+             Identifies the VLAN Operand type of an entry/rule,
+             in VLAN Rule Table for Extended Access Link.
+             Range: 1-4. Value 255 is returned if
+             no rule or default rule defined for this entry.
+             Accepted combinations are:
+                 sourceMacAddress, destinationMacAddress    - value, range, mask;
+                 sourceIpAddress, destinationIpAddress      - value, range, mask;
+                 sourceUdpPort, destinationUdpPort          - value, range, enumeration;
+                 sourceTcpPort, destinationTcpPort          - value, range, enumeration;
+                 ipProtocol                                 - value, enumeration "
+    ::= { brzaccVLVlanExtendedAccessRulesEntry 6 }
+
+    brzaccVLVlanExtendedAccessRuleOperands   OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..63))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Starting with version 6.0.
+             Available for SU/RB units only.
+             The VLAN Operand list of an entry/rule,
+             in VLAN Rule Table for Extended Access Link.
+             Operand list may be one of the following:
+                v1-v2    : range (v1 - v2), v1 and v2 included (not applicable for IP protocols);
+                v,m      : value and mask (for MAC and IP only);
+                v0       : single value;
+                v1,v2,v3 : max 8-value enumeration (for Ports and IP protocols only). 
+             An operand may be:
+                xxxxxxxxxxxx    : 12-char hexadecimal representation of a MAC address; 
+                ddd.ddd.ddd.ddd : max 15-char decimal representation of an IP address; 
+                ddddd           : max 5-char decimal representation of a Port; 
+                ddd             : max 3-char decimal representation of an IP Protocol. 
+             Up to 63 printable ASCII characters."
+    ::= { brzaccVLVlanExtendedAccessRulesEntry 7 }
+
+-- end VLAN Extended Access Link
+
+    brzaccVLVlanExtendedTrunkVlanID   OBJECT-TYPE
+            SYNTAX  INTEGER (1..4094)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Starting with version 6.0.
+             Available for SU/RB units only.
+            Native VLAN ID value, for Extended Trunk Link."
+            ::= { brzaccVLVLANSupport 9 }
+
+
     brzaccVLBridgeAgingTime OBJECT-TYPE
             SYNTAX  INTEGER  
             MAX-ACCESS read-write
@@ -1675,7 +2501,8 @@ brzaccVLMacAddressDenyList  OBJECT IDENTIFIER ::= {brzaccVLBridgeParameters 10}
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-            "Applicable to AU only. 
+            "Starting with version 5.0, this is deprecated. Use brzaccVLNewMacAddressDenyListTable instead.
+			 Applicable to AU only. 
 			 Not applicable to BreezeNET-B units.                                   
              A list of up to 100 MAC Addresses of SUs.
              If brzaccVLMacAddressDenyListAction is set to denyList, 
@@ -1766,8 +2593,68 @@ brzaccVLMacAddressDenyListAction OBJECT-TYPE
             Define the action to be used by the Mac Address Deny List.
             allowedList(2) means that the list becomes Allow list."
             ::= { brzaccVLMacAddressDenyList 5 }
-            
-            
+
+
+-- ===========================
+-- New Allow/Deny List (begin)
+-- ===========================
+
+brzaccVLNewMacAddressDenyListTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF BrzaccVLNewMacAddressDenyListEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to AU only. 
+			 Not applicable to BreezeNET-B units.                                   
+             A list of up to 100 MAC Addresses of SUs.
+             If brzaccVLMacAddressDenyListAction is set to denyList, 
+             these are SUs that are not allowed to transfer data 
+             to the AU. 
+             If brzaccVLMacAddressDenyListAction is set to allowList, 
+             only these SUs are allowed to transfer data to the AU."
+            ::= { brzaccVLMacAddressDenyList 6 }
+
+    brzaccVLNewMacAddressDenyListEntry  OBJECT-TYPE
+            SYNTAX BrzaccVLNewMacAddressDenyListEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to AU only.
+			 Not applicable to BreezeNET-B units.                                   
+             An entry in the Mac Address Deny List Table."
+            INDEX { brzaccVLNewMacAddressDenyListId }
+            ::= { brzaccVLNewMacAddressDenyListTable 1 }
+
+    BrzaccVLNewMacAddressDenyListEntry ::= SEQUENCE {
+            brzaccVLNewMacAddressDenyListId  MacAddress,
+            brzaccVLNewMacAddressDenyListCommand INTEGER
+            }
+        
+    brzaccVLNewMacAddressDenyListId   OBJECT-TYPE
+            SYNTAX  MacAddress  
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU only.
+			 Not applicable to BreezeNET-B units.                                   
+             The list of MAC Addresses in the Mac Address Deny List Table."
+        ::= { brzaccVLNewMacAddressDenyListEntry 1 }
+
+	brzaccVLNewMacAddressDenyListCommand   OBJECT-TYPE
+			SYNTAX  INTEGER { active(1), notInService(2), notReady(3), createAndGo(4), createAndWait(5), destroy(6) }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION  
+			"Applicable to AU only.
+			Not applicable to BreezeNET-B units.
+			Supports only active(1), createAndGo(4) and destroy(6).
+			Used for add or destroy entry."
+			::= { brzaccVLNewMacAddressDenyListEntry 2 }
+
+-- =========================
+-- New Allow/Deny List (end)
+-- =========================
+
 brzAccVLPortsControl  OBJECT IDENTIFIER ::= {brzaccVLBridgeParameters 11}
 
     brzaccVLEthernetPortControl OBJECT-TYPE
@@ -1780,6 +2667,17 @@ brzAccVLPortsControl  OBJECT IDENTIFIER ::= {brzaccVLBridgeParameters 11}
              data frames are blocked. Management frames are accepted."
             ::= { brzAccVLPortsControl 1 }
 
+brzaccVLSendBroadcastsMulticastsAsUnicasts OBJECT-TYPE
+        SYNTAX INTEGER { disable(1), enable(2) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+        "Applicable to BU only.
+        When enabled the Multicast/Broadcast packets are sent by BU
+        as Unicast packets to RB.
+        When disabled the Multicast/Broadcast packets are sent by BU
+        as Broadcast packets to RB"
+::= { brzaccVLBridgeParameters 12 }
 
 -- Air Interface Params
 -- =====================
@@ -1835,6 +2733,40 @@ brzaccVLESSIDParameters      OBJECT IDENTIFIER ::= {brzaccVLAirInterface 1}
 		    ::= { brzaccVLESSIDParameters 4 }
 
 
+brzaccVLHiddenESSIDParameters      OBJECT IDENTIFIER ::= {brzaccVLESSIDParameters 5}
+ 
+	brzaccVLAUHiddenESSIDOption  OBJECT-TYPE
+            SYNTAX INTEGER { enable(1) , disable(2), na(255) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU/BU only. 
+             Enabling/disabling the use of the Hidden ESSID."
+            ::= { brzaccVLHiddenESSIDParameters 1 }
+ 
+	brzaccVLSUHiddenESSIDSupport  OBJECT-TYPE
+            SYNTAX INTEGER { enable(1) , disable(2), na(255) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to SU/RB only. 
+             Enabling/Disabling the option for an SU/RB to associate 
+             with an AU/BU that is using Hidden ESSID"
+            ::= { brzaccVLHiddenESSIDParameters 2 }
+ 
+	brzaccVLSUHiddenESSIDTimeout  OBJECT-TYPE
+            SYNTAX INTEGER (1..60)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to SU/RB only. 
+            If an AU/BU rejects the subscribers because of worng ESSID
+            the SU/RB will try again to associate with this AU/BU
+            only after this period of time.
+            The time is given in minutes"
+            ::= { brzaccVLHiddenESSIDParameters 3 }
+
+
     brzaccVLMaximumCellRadius  OBJECT-TYPE
             SYNTAX  INTEGER  
             MAX-ACCESS read-write      
@@ -1853,7 +2785,7 @@ brzaccVLESSIDParameters      OBJECT IDENTIFIER ::= {brzaccVLAirInterface 1}
             ::= { brzaccVLAirInterface 2 }
 
     brzaccVLAIFS  OBJECT-TYPE
-            SYNTAX  INTEGER { oneSlot (1), twoSlots (2) } 
+            SYNTAX  INTEGER ( 1..50 )
             MAX-ACCESS read-write      
             STATUS current       
             DESCRIPTION  
@@ -1970,6 +2902,87 @@ brzaccVLESSIDParameters      OBJECT IDENTIFIER ::= {brzaccVLAirInterface 1}
              for the applicable modulation level."
             ::= { brzaccVLTransmitPowerEntry 5 }
 
+-- NewTransmitPowerTable
+
+brzaccVLNewTransmitPowerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF BrzaccVLNewTransmitPowerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units with SW version 5.1 and higher
+             A table of transmit power parameters. " 
+            ::= { brzaccVLAirInterface 27 }
+
+    brzaccVLNewTransmitPowerEntry  OBJECT-TYPE
+            SYNTAX BrzaccVLNewTransmitPowerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units with SW version 5.1 and higher 
+             An entry in the Transmit Power Table." 
+            INDEX { brzaccVLNewModulationLevelIdx }
+            ::= { brzaccVLNewTransmitPowerTable 1 }
+                                
+    BrzaccVLNewTransmitPowerEntry ::= SEQUENCE {    brzaccVLNewModulationLevelIdx           INTEGER,
+                                                    brzaccVLNewMaximumTxPowerRange          DisplayString,
+                                                    brzaccVLNewTxPower                      DisplayString,
+                                                    brzaccVLNewCurrentTxPower               DisplayString
+                                                }
+
+    brzaccVLNewModulationLevelIdx OBJECT-TYPE
+            SYNTAX INTEGER  (1..8)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units with SW version 5.1 and higher.
+             An index ( and modulation level ) of an entry in the NewTransmitPowerTable." 
+            ::= { brzaccVLNewTransmitPowerEntry 1 }
+
+
+    brzaccVLNewMaximumTxPowerRange  OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units with SW version 5.1 and higher.
+             The allowed range for the brzaccVLNewTxPower parameter at the 
+             applicable modulation level . Range: -10 to the maximum allowed 
+             power level at the applicable modulation level , in dBm." 
+            ::= { brzaccVLNewTransmitPowerEntry 2 }
+
+
+    brzaccVLNewTxPower OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units with SW version 5.1 and higher.            
+             In AU/BU: The transmit power in dBm defined for the applicable rate.
+             In SU/RB: If ATPC is disabled, this is the transmit power in dBm 
+             defined for the applicable rate.
+             If ATPC is enabled, it serves as the initial transmit power in dBm 
+             for the ATPC algorithm. 
+             In SU/RB: The range is -10 dBm to the power value defined by 
+                       brzaccVLNewMaximumTxPower for the applicable modulation level.
+             In AU/BU: The range is -10 dBm to the power value defined by 
+                       brzaccVLNewMaximumTxPowerRange for the applicable modulation level."
+            ::= { brzaccVLNewTransmitPowerEntry 3 }
+
+
+
+    brzaccVLNewCurrentTxPower OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to SU/RB with SW version 5.1 and higher.
+             The actual transmit power in dBm for the applicable rate.
+             Range: -17 to the maximum value defined by brzaccVLNewMaximumTxPowerRange 
+             for the applicable modulation level."
+            ::= { brzaccVLNewTransmitPowerEntry 4 }
+            
+-- end of NewTransmitPowerTable
+
     brzaccVLMaximumTransmitPowerTable OBJECT-TYPE
             SYNTAX SEQUENCE OF BrzaccVLMaximumTransmitPowerEntry
             MAX-ACCESS not-accessible
@@ -2043,6 +3056,73 @@ brzaccVLESSIDParameters      OBJECT IDENTIFIER ::= {brzaccVLAirInterface 1}
 			brzaccVLDefinedMaximumTxPowerRange for the applicable modulation level."
             ::= { brzaccVLMaximumTransmitPowerEntry 4 }
 
+
+-- NewMaximumTransmitPowerTable
+
+brzaccVLNewMaximumTransmitPowerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF BrzaccVLNewMaximumTransmitPowerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to SU/RB only.
+             A table of maximum transmit power parameters. " 
+            ::= { brzaccVLAirInterface 28 }
+
+    brzaccVLNewMaximumTransmitPowerEntry  OBJECT-TYPE
+            SYNTAX BrzaccVLNewMaximumTransmitPowerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to SU/RB only. 
+             An entry in the Maximum Transmit Power Table." 
+            INDEX { brzaccVLNewMaxModulationLevelIdx }
+            ::= { brzaccVLNewMaximumTransmitPowerTable 1 }
+                                
+    BrzaccVLNewMaximumTransmitPowerEntry ::= SEQUENCE { brzaccVLNewMaxModulationLevelIdx          INTEGER,
+                                                        brzaccVLNewDefinedMaximumTxPowerRange     DisplayString,
+                                                        brzaccVLNewMaxTxPower                     DisplayString
+                                                      }
+
+    brzaccVLNewMaxModulationLevelIdx OBJECT-TYPE
+            SYNTAX INTEGER  (1..8)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to SU/RB only.
+             The applicable modulation level for an entry in the NEW Maximum Transmit Power Table.
+             This OID also represent an index of an entry in the NEW Maximum Transmit Power Table." 
+            ::= { brzaccVLNewMaximumTransmitPowerEntry 1 }
+
+
+   brzaccVLNewDefinedMaximumTxPowerRange  OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to SU/RB only.
+             The allowed range for the brzaccVLNewMaxTxPower parameter at the 
+             applicable modulation level .
+             Range: -10 to the maximum allowed power level at the applicable 
+             modulation level , in dBm." 
+            ::= { brzaccVLNewMaximumTransmitPowerEntry 2 }
+
+
+    brzaccVLNewMaxTxPower OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to SU/RB only.
+            Read-only for units with SW version 4.0 and higher.
+            The maximum value that can be configured for the brzaccVLNewTxPower 
+            parameter. This is also the maximum power level that can be reached 
+            by the ATPC algorithm.
+            The range is -10 dBm to the maximum value defined by 
+            brzaccVLNewDefinedMaximumTxPowerRange for the applicable modulation level."
+            ::= { brzaccVLNewMaximumTransmitPowerEntry 3 }
+
+-- end of NewMaximumTransmitPowerTable
+
     brzaccVLMaxNumOfAssociations OBJECT-TYPE
             SYNTAX  INTEGER  
             MAX-ACCESS read-write      
@@ -2052,7 +3132,7 @@ brzaccVLESSIDParameters      OBJECT IDENTIFIER ::= {brzaccVLAirInterface 1}
              Not applicable to BreezeNET-B products.
              Sets the upper limit for the number of SUs 
              that can be associated with the AU.
-             Range: For regular AUs (AU-BS, AU-SA) 
+             Range: For regular AUs (AU-BS, AU-SA, AU) 
              the range is from 0 to 512 if encryption is disabled
              the range id form 0 to 124 if encryption is enabled
              For AUS-BS and AUS-SA with SW version 4.0 and higher 
@@ -2133,7 +3213,8 @@ brzaccVLBestAu   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 11}
 	                            brzaccVLNeighborAuSecurityMode	        INTEGER,
 	                            brzaccVLNeighborAuAuthOption	        INTEGER,
 	                            brzaccVLNeighborAuDataEncyptOption      INTEGER,
-	                            brzaccVLNeighborAuPerSuDistanceLearning INTEGER
+	                            brzaccVLNeighborAuPerSuDistanceLearning INTEGER,
+	                            brzaccVLNeighborAuRSSI				    INTEGER
                                 }
 
     brzaccVLNeighborAuIdx OBJECT-TYPE
@@ -2171,7 +3252,8 @@ brzaccVLBestAu   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 11}
             DESCRIPTION  
             "Applicable to SU/RB only. 
              The received signal quality (SNR) in dB of an AU/BU 
-             in the Neighbor AU/BU Table."
+             in the Neighbor AU/BU Table. If the returned value is 255
+             this means that the indication is not available."
             ::= { brzaccVLNeighborAuEntry 4 }
 
     brzaccVLNeighborAuAssocLoadStatus OBJECT-TYPE
@@ -2195,7 +3277,7 @@ brzaccVLBestAu   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 11}
 
     brzaccVLNeighborAuHwRevision OBJECT-TYPE
             SYNTAX INTEGER {hwRevisionA (1), hwRevisionB (2), hwRevisionC (3),
-							hwRevisionD (4), hwRevisionE (5),na (255)}
+                            hwRevisionD(4), hwRevisionE(5), hwRevisionF(6), hwRevisionG(7), na(255)}
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION  
@@ -2313,8 +3395,8 @@ brzaccVLBestAu   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 11}
              Neighbor AU/BU data encryption option configuration 
              in the Neighbor AU/BU Table."
             ::= { brzaccVLNeighborAuEntry 20 }
-            
-	brzaccVLNeighborAuPerSuDistanceLearning		OBJECT-TYPE
+
+  brzaccVLNeighborAuPerSuDistanceLearning		OBJECT-TYPE
             SYNTAX INTEGER  {disable (1), enable (2), na (255)}
             MAX-ACCESS read-only
             STATUS current
@@ -2323,6 +3405,19 @@ brzaccVLBestAu   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 11}
              Neighbor AU per SU distance learning option configuration 
              in the Neighbor AU Table."
             ::= { brzaccVLNeighborAuEntry 21 }
+            
+  brzaccVLNeighborAuRSSI OBJECT-TYPE
+            SYNTAX INTEGER { na (255) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to SU/RB only. 
+             The Recieved Signal Strength Indication of an AU/BU 
+             in the Neighbor AU/BU Table. If the returned value 
+             is 255 this means that the indication is not available.
+             This value is given in dBm units."
+            ::= { brzaccVLNeighborAuEntry 22 }
+
 
 brzaccVLFrequencyDefinition	   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 12}
    
@@ -2354,8 +3449,8 @@ brzaccVLFrequencyDefinition	   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 12}
             ::= { brzaccVLFrequencyDefinition 2 }
 
     brzaccVLScanningStep  OBJECT-TYPE
-            SYNTAX INTEGER	{ mhz-5(1), mhz-10(2) , mhz-20(3), na(255) }
-            MAX-ACCESS read-write
+            SYNTAX INTEGER  { mhz-5(1), mhz-10(2) , mhz-20(3), khz-500(4), mhz-1(5), na(255) }
+            MAX-ACCESS read-only
             STATUS current
             DESCRIPTION  
             "Applicable to all units - For flexible Sub-Bands only.		
@@ -2432,7 +3527,7 @@ brzaccVLFrequencyDefinition	   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 12}
 
     brzaccVLFrequencySubsetFrequencyNew   OBJECT-TYPE
             SYNTAX DisplayString
-            MAX-ACCESS read-write
+            MAX-ACCESS read-only
             STATUS current
             DESCRIPTION 
             "Applicable to all units. 
@@ -2537,20 +3632,6 @@ brzaccVLFrequencyDefinition	   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 12}
 		     in the selected Sub Band."
             ::= { brzaccVLFrequencyDefinition 7 }
 
-    brzaccVLCurrentAUOperatingFrequencyNew  OBJECT-TYPE
-            SYNTAX DisplayString	
-            MAX-ACCESS read-only
-            STATUS current
-            DESCRIPTION  
-            "Applicable to AU/BU. The operating frequency in MHz. 
-             (Replaces brzaccVLCurrentAUOperatingFrequency to support 
-             a resolution of 0.5 MHz for units with HW revision C and higher). 
-             For 5.8GHz products with SW version below 2.0 the range is 
-             5740 to 5830 MHz using 10MHz resolution. 
-             For units with SW version 2.0 and up the range is as defined 
-             in the selected Sub Band."
-            ::= { brzaccVLFrequencyDefinition 13 }
-
     brzaccVLAUDefinedFrequency  OBJECT-TYPE
             SYNTAX INTEGER	
             MAX-ACCESS read-write
@@ -2568,24 +3649,6 @@ brzaccVLFrequencyDefinition	   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 12}
              For units with SW version 2.0 and up the range is as defined 
              in the selected Sub Band."            
             ::= { brzaccVLFrequencyDefinition 8 }
-
-    brzaccVLAUDefinedFrequencyNew  OBJECT-TYPE
-            SYNTAX DisplayString	
-            MAX-ACCESS read-write
-            STATUS current
-            DESCRIPTION  
-            "Applicable to AU/BU. 
-             For 5.8GHz products with SW version below 2.0 this is the 
-             frequency in MHz of the AU/BU after the next reset. 
-             For units with SW version 2.0 and up this is the 
-             frequency in MHz to use when the DFS Option is disabled. 
-             (Replaces brzaccVLAUDefinedFrequency to support a resolution 
-             of 0.5 MHz for units with HW revision C and higher). 
-             For 5.8GHz products with SW version below 2.0 the range 
-             is 5740 to 5830 MHz using 10MHz resolution. 
-             For units with SW version 2.0 and up the range is as 
-             defined in the selected Sub Band."
-            ::= { brzaccVLFrequencyDefinition 14 }
 
     brzaccVLCurrentSUOperatingFrequency  OBJECT-TYPE
             SYNTAX DisplayString	
@@ -2612,7 +3675,8 @@ brzaccVLSubBandSelect   OBJECT IDENTIFIER ::= {brzaccVLFrequencyDefinition 10}
             For units with SW version 4.0 and up it is applicable 
             only for AU/BU. For SU/RB it defines only the sub-band 
             for the Spectrum Analyzer.
-             The ID of the sub-band used by the unit."  
+            The ID of the sub-band configured in the unit.
+            Its range depends on unit's type and Country Code."  
             ::= { brzaccVLSubBandSelect 1 }
 
 
@@ -2624,7 +3688,8 @@ brzaccVLDFSParameters   OBJECT IDENTIFIER ::= {brzaccVLFrequencyDefinition 11}
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION  
-            "Applicable to AU/BU only.
+            "Applicable to AU/BU.
+             Applicable to SU/RB with SW version 5.5.20 and higher. 
              Enabling/disabling the DFS Algorithm. 
              Not applicable if DFS Option is not supported by the current Sub Band."
             ::= { brzaccVLDFSParameters 1 }
@@ -2634,8 +3699,9 @@ brzaccVLDFSParameters   OBJECT IDENTIFIER ::= {brzaccVLFrequencyDefinition 11}
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION  
-            "Applicable to AU/BU only. 
-             Defines the time the unit checks the channel for presence of 
+            "Applicable to AU/BU. 
+             Applicable to SU/RB with SW version 5.5.20 and higher. Channel Availability Check time
+             defines the time the unit checks the channel for presence of 
              radar signals and does not transmit after power up or association 
              or after moving to a new channel due to detecting radar in the used 
              channel. Range: 1 to 3600 (seconds)."
@@ -2647,7 +3713,8 @@ brzaccVLDFSParameters   OBJECT IDENTIFIER ::= {brzaccVLFrequencyDefinition 11}
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION  
-            "Applicable to AU/BU only. 
+            "Applicable to AU/BU. 
+             Applicable to SU/RB with SW version 5.5.20 and higher. 
              Defines the time after detecting radar signals in a channel of 
              avoiding using the channel or adjacent channels in 
              accordance with the bandwidth. Range: 1 to 60 (minutes)."
@@ -2671,7 +3738,7 @@ brzaccVLDFSParameters   OBJECT IDENTIFIER ::= {brzaccVLFrequencyDefinition 11}
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION  
-            "Applicable to AU/BU only. 
+            "Applicable to all units with SW version 5.5.20 and higher. 
              Clear Radar Detected and Adjacent to Radar channels after unit reset.
              Returns the unit to operate in default frequency."
             ::= { brzaccVLDFSParameters 6 }
@@ -2754,12 +3821,13 @@ brzaccVLDFSParameters   OBJECT IDENTIFIER ::= {brzaccVLFrequencyDefinition 11}
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION  
-            "Applicable to AU/BU only. 
+            "Applicable to AU/BU. 
+             Applicable to SU/RB with SW version 5.5.20 and higher. 
              Defines the minimum number of pulses to detect a radar. 
              Range: 1 - 100."
             ::= { brzaccVLDFSParameters 8 }
 
-
+	
 brzaccVLDFSChannelReuseParameters OBJECT IDENTIFIER ::= {brzaccVLDFSParameters 9}
 
     brzaccVLDFSChannelReuseOption  OBJECT-TYPE
@@ -2790,15 +3858,85 @@ brzaccVLDFSChannelReuseParameters OBJECT IDENTIFIER ::= {brzaccVLDFSParameters 9
              Range: 1 to 10 (Times)."
             ::= { brzaccVLDFSChannelReuseParameters 3 }
 
+    brzaccVLDFSDetectionAlgorithm  OBJECT-TYPE
+            SYNTAX INTEGER	{ etsi(1), fcc(2), na(255) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU/BU. 
+             Applicable to SU/RB with SW version 5.5.20 and higher. 
+             Defines the DFS Detection Algorithm."
+            ::= { brzaccVLDFSParameters 10 }
+
+    brzaccVLDFSRemoteRadarEventReports OBJECT-TYPE
+            SYNTAX INTEGER	 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU only with SW version 5.5.20 and higher. 
+             Defines the number of SU radar reports for the AU to leave channel . 
+             Range: 0 - 512."
+            ::= { brzaccVLDFSParameters 11 }
+          
+     brzaccVLDFSRemoteRadarEventMonitoringPeriod OBJECT-TYPE
+            SYNTAX INTEGER	 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU only with SW version 5.5.20 and higher. 
+             Defines the interval in minutes of accumulated SU Radar Reports for the AU to leave channel. 
+             Range: 1 - 30."
+            ::= { brzaccVLDFSParameters 12 }
+
+	brzaccVLEnhancedETSIRadarDetection OBJECT-TYPE
+            SYNTAX INTEGER { off(1), on(2) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU/BU units with software version 5.5.27.1 and higher."
+            ::= { brzaccVLDFSParameters 13 }
+
    brzaccVLCountryCodeLearningBySU OBJECT-TYPE
             SYNTAX  INTEGER  { disable(1), enable(2), na(255) }
             MAX-ACCESS read-write      
             STATUS current       
             DESCRIPTION  
             "Applicable to AU only. 
-             Starting with 4.0 it is nor applicable for BA4900 and BreezeNET B.
+             Starting with 4.0 it is not applicable for BA4900 and BreezeNET B.
              Defines whether the SUs learn the country code of the AU."
             ::= { brzaccVLFrequencyDefinition 12 }
+
+    brzaccVLCurrentAUOperatingFrequencyNew  OBJECT-TYPE
+            SYNTAX DisplayString	
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU/BU. The operating frequency in MHz. 
+             (Replaces brzaccVLCurrentAUOperatingFrequency to support 
+             a resolution of 0.5 MHz for units with HW revision C and higher). 
+             For 5.8GHz products with SW version below 2.0 the range is 
+             5740 to 5830 MHz using 10MHz resolution. 
+             For units with SW version 2.0 and up the range is as defined 
+             in the selected Sub Band."
+            ::= { brzaccVLFrequencyDefinition 13 }
+
+    brzaccVLAUDefinedFrequencyNew  OBJECT-TYPE
+            SYNTAX DisplayString	
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to AU/BU. 
+             For 5.8GHz products with SW version below 2.0 this is the 
+             frequency in MHz of the AU/BU after the next reset. 
+             For units with SW version 2.0 and up this is the 
+             frequency in MHz to use when the DFS Option is disabled. 
+             (Replaces brzaccVLAUDefinedFrequency to support a resolution 
+             of 0.5 MHz for units with HW revision C and higher). 
+             For 5.8GHz products with SW version below 2.0 the range 
+             is 5740 to 5830 MHz using 10MHz resolution. 
+             For units with SW version 2.0 and up the range is as 
+             defined in the selected Sub Band."
+            ::= { brzaccVLFrequencyDefinition 14 }
 
 
 -- AUTOMATIC SUB BAND SELECT BEGIN
@@ -2839,7 +3977,9 @@ brzaccVLDFSChannelReuseParameters OBJECT IDENTIFIER ::= {brzaccVLDFSParameters 9
             brzaccVLAutoSubBandFrequencySubsetBandIdx		INTEGER,
             brzaccVLAutoSubBandFrequencySubsetFrequencyIdx  INTEGER,
             brzaccVLAutoSubBandFrequencySubsetActive        INTEGER,
-            brzaccVLAutoSubBandFrequencySubsetFrequency     DisplayString
+            brzaccVLAutoSubBandFrequencySubsetFrequency     DisplayString,
+            brzaccVLAutoSubBandFrequencySubsetBandwidth		INTEGER,
+            brzaccVLAutoSubBandFrequencySubsetDFSStatus		INTEGER
             }
                
     brzaccVLAutoSubBandFrequencySubsetBandIdx   OBJECT-TYPE
@@ -2887,6 +4027,29 @@ brzaccVLDFSChannelReuseParameters OBJECT IDENTIFIER ::= {brzaccVLDFSParameters 9
             "Applicable to SU/RB with SW version 4.0 and higher. 
              The frequency in MHz of the entry in the Auto Sub Band Frequency Subset table."
            ::= { brzaccVLAutoSubBandFrequencySubsetEntry 4 }
+
+	brzaccVLAutoSubBandFrequencySubsetBandwidth OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to SU/RB with SW version 4.0 and higher. 
+             The bandwidth in MHz of the entry in the Auto Sub Band Frequency Subset table."
+           ::= { brzaccVLAutoSubBandFrequencySubsetEntry 5 }
+           
+    brzaccVLAutoSubBandFrequencySubsetDFSStatus OBJECT-TYPE
+            SYNTAX INTEGER  { radarFree       (1),
+			                  adjacentToRadar (2),
+			                  radarDetected   (3) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to SU/RB with SW version 4.0 and higher. 
+             The channel status of the entry in the Auto Sub Band Frequency Subset table."
+           ::= { brzaccVLAutoSubBandFrequencySubsetEntry 6 }
+           
+           
+           
 
 
 -- AUTOMATIC SUB BAND SELECT END
@@ -2954,6 +4117,17 @@ brzaccVLATPC   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 13}
              Range: 1 to 20  (dB)."
             ::= { brzaccVLATPC 6 }
 
+
+    brzaccVLAtpcOptionEZ  OBJECT-TYPE
+            SYNTAX INTEGER	{ disable (1) , enable (2) , na (255) } 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable AU only.
+             Enabling/disabling the ATPC Algorithm for EZ."
+            ::= { brzaccVLATPC 7 }
+
+
 brzaccVLCellDistanceParameters   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 15}
 
     brzaccVLCellDistanceMode  OBJECT-TYPE
@@ -2966,7 +4140,7 @@ brzaccVLCellDistanceParameters   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 15}
             ::= { brzaccVLCellDistanceParameters 1 }
 
   brzaccVLFairnessFactor  OBJECT-TYPE
-            SYNTAX INTEGER { na (255)}	 
+            SYNTAX INTEGER
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION  
@@ -2976,7 +4150,8 @@ brzaccVLCellDistanceParameters   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 15}
              account in the time slot calculation. Range: 0 to 100 
              (Percent). A value of 0 means the minimal slot size 
              (9 microseconds).
-             BreezeNET-B products with SW version below 4.0 return na."
+             BreezeNET-B products with SW version below 4.0 return na.
+             The na value is 255."
             ::= { brzaccVLCellDistanceParameters 2 }
 
     brzaccVLMeasuredCellDistance  OBJECT-TYPE
@@ -2999,9 +4174,9 @@ brzaccVLCellDistanceParameters   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 15}
 			 The MAC address of the unit with the maximum distance
 			 from the AU."
             ::= { brzaccVLCellDistanceParameters 4 }
-         
+
 	brzaccVLPerSuDistanceLearning	OBJECT-TYPE
-            SYNTAX INTEGER	{ disable (1) , enable (2) } 
+            SYNTAX INTEGER	{ disable (1) , enable (2), na(255) } 
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION  
@@ -3083,13 +4258,15 @@ brzaccVLSpectrumAnalysisParameters       OBJECT IDENTIFIER ::= {brzaccVLAirInter
             ::= { brzaccVLSpectrumAnalysisParameters 4 }
 
     brzaccVLSpectrumAnalysisStatus OBJECT-TYPE
-            SYNTAX  INTEGER  { inactive (1), currentlyActive (2)}
+            SYNTAX  INTEGER  { inactive (1), currentlyActive (2), currentlyBlocked(3) }
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION 
             "Applicable to all units.  
-             Defines weather the unit is currently under performing 
-             a spectrum analysis process."
+             Defines whether the unit is currently performing 
+             a Spectrum Analysis process.
+             Value currentlyBlocked means unit current status prohibits 
+             Spectrum Analysis activation."
             ::= { brzaccVLSpectrumAnalysisParameters 5 }
 
     brzaccVLResetSpectrumCounters OBJECT-TYPE
@@ -3126,7 +4303,12 @@ brzaccVLSpectrumAnalysisParameters       OBJECT IDENTIFIER ::= {brzaccVLAirInter
             brzaccVLSpectrumAnalysisInformationSignalCount        INTEGER,
             brzaccVLSpectrumAnalysisInformationSignalSNR          INTEGER,
             brzaccVLSpectrumAnalysisInformationSignalWidth        INTEGER,
-            brzaccVLSpectrumAnalysisInformationOFDMFrames         INTEGER
+            brzaccVLSpectrumAnalysisInformationOFDMFrames         INTEGER,
+            brzaccVLSpectrumAnalysisInformationOFDMAvgSnr		  INTEGER,
+            brzaccVLSpectrumAnalysisInformationAvgNoiseFloor	  INTEGER,
+            brzaccVLSpectrumAnalysisInformationMaxNoiseFloor	  INTEGER,
+            brzaccVLSpectrumAnalysisInformationSignalMaxSNR		  INTEGER,
+            brzaccVLSpectrumAnalysisInformationOFDMMaxSNR		  INTEGER
             }
 
          
@@ -3207,6 +4389,72 @@ brzaccVLSpectrumAnalysisParameters       OBJECT IDENTIFIER ::= {brzaccVLAirInter
              analysis performed."
         ::= { brzaccVLSpectrumAnalysisInformationEntry 6 }
 
+    brzaccVLSpectrumAnalysisInformationOFDMAvgSnr   OBJECT-TYPE
+            SYNTAX INTEGER 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units. 
+             The average SNR of the OFDM frames detected in the channel. 
+             If the unit is currently under spectrum analysis the average SNR would 
+             be of the analysis that is currently performed. 
+             If the unit is in normal mode the average SNR would be of the last 
+             analysis performed."
+        ::= { brzaccVLSpectrumAnalysisInformationEntry 7 }
+        
+    brzaccVLSpectrumAnalysisInformationAvgNoiseFloor   OBJECT-TYPE
+            SYNTAX INTEGER 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units. 
+             The average Noise Floor detected in the channel. 
+             If the unit is currently under spectrum analysis the average 
+             Noise Floor would be of the analysis that is currently performed. 
+             If the unit is in normal mode the average Noise Floor would be 
+             of the last analysis performed."
+        ::= { brzaccVLSpectrumAnalysisInformationEntry 8 }
+        
+     brzaccVLSpectrumAnalysisInformationMaxNoiseFloor   OBJECT-TYPE
+            SYNTAX INTEGER 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units. 
+             The maximum Noise Floor detected in the channel. 
+             If the unit is currently under spectrum analysis the maximum 
+             Noise Floor would be of the analysis that is currently performed. 
+             If the unit is in normal mode the maximum Noise Floor would be 
+             of the last analysis performed."
+        ::= { brzaccVLSpectrumAnalysisInformationEntry 9 }
+     
+     brzaccVLSpectrumAnalysisInformationSignalMaxSNR   OBJECT-TYPE
+            SYNTAX INTEGER 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units. 
+             The maximum SNR of the signals (excluding OFDM frames)
+             detected in the channel. 
+             If the unit is currently under spectrum analysis the maximum SNR would 
+             be of the analysis that is currently performed. 
+             If the unit is in normal mode the maximum SNR would be of the last 
+             analysis performed."
+        ::= { brzaccVLSpectrumAnalysisInformationEntry 10 }
+        
+    brzaccVLSpectrumAnalysisInformationOFDMMaxSNR   OBJECT-TYPE
+            SYNTAX INTEGER 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units. 
+             The maximum SNR of the OFDM frames detected in the channel. 
+             If the unit is currently under spectrum analysis the maximum SNR would 
+             be of the analysis that is currently performed. 
+             If the unit is in normal mode the maximum SNR would be of the last 
+             analysis performed."
+        ::= { brzaccVLSpectrumAnalysisInformationEntry 11 }
+       
     brzaccVLMaxNumOfAssociationsLimit OBJECT-TYPE
             SYNTAX  INTEGER  
             MAX-ACCESS read-only      
@@ -3216,7 +4464,7 @@ brzaccVLSpectrumAnalysisParameters       OBJECT IDENTIFIER ::= {brzaccVLAirInter
              Not applicable to BreezeNET-B products. 
              Shows the limit for the number of SUs that can be associated 
              with the AU. 
-             For AU-BS, AU-SA if Data Encryption is enabled, the upper 
+             For AU-BS, AU-SA, AU if Data Encryption is enabled, the upper 
              limit is 124, otherwise it is 512. 
              For AUS-BS, AUS-SA with SW version 4.0 and higher the upper limit 
              is 8 or 25 (via licensing).
@@ -3305,7 +4553,665 @@ brzaccVLDisassociate   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 20}
              Re-apply country code parameters."
 			::= { brzaccVLCountryCodeParameters 1 }
 
+    brzaccVLCountryCodeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF BrzaccVLCountryCodeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units. "
+            ::= {brzaccVLCountryCodeParameters 2}
             
+    brzaccVLCountryCodeEntry OBJECT-TYPE
+            SYNTAX BrzaccVLCountryCodeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units."  
+             INDEX {  brzaccVLCCNumber }
+            ::= { brzaccVLCountryCodeTable 1 }
+             
+    BrzaccVLCountryCodeEntry ::= SEQUENCE {
+				brzaccVLCCNumber							INTEGER,
+				brzaccVLCCName								DisplayString,
+				brzaccVLCCAuthenticationEncryptionSupport	INTEGER,
+				brzaccVLCCDataEncryptionSupport				INTEGER, 
+				brzaccVLCCAESEncryptionSupport				INTEGER  
+            }
+    	
+   brzaccVLCCNumber  OBJECT-TYPE
+            SYNTAX INTEGER(0..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to all units." 
+           ::= { brzaccVLCountryCodeEntry 1 }
+           
+    brzaccVLCCName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units."
+            ::= { brzaccVLCountryCodeEntry 2 }
+
+    brzaccVLCCAuthenticationEncryptionSupport OBJECT-TYPE
+            SYNTAX INTEGER  {supported(1), notSupported(2)}
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units."
+            ::= { brzaccVLCountryCodeEntry 3 }
+
+    brzaccVLCCDataEncryptionSupport OBJECT-TYPE
+            SYNTAX INTEGER  {supported(1), notSupported(2)}
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units."
+            ::= { brzaccVLCountryCodeEntry 4 }
+
+    brzaccVLCCAESEncryptionSupport OBJECT-TYPE
+            SYNTAX INTEGER  {supported(1), notSupported(2)}
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units."
+            ::= { brzaccVLCountryCodeEntry 5 }
+
+    brzaccVLCCParamsTable  OBJECT-TYPE
+            SYNTAX SEQUENCE OF BrzaccVLCCParamsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units. A table of country dependent parameters."
+            ::= {brzaccVLCountryCodeParameters 3}
+
+    brzaccVLCCParamsEntry OBJECT-TYPE
+            SYNTAX BrzaccVLCCParamsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to all units. "
+             INDEX { brzaccVLCCNumberIdx, brzaccVLCCParamsIndex }
+            ::= { brzaccVLCCParamsTable 1 }
+
+    BrzaccVLCCParamsEntry ::= SEQUENCE {
+		    brzaccVLCCNumberIdx								INTEGER,
+            brzaccVLCCParamsIndex							INTEGER,
+            brzaccVLCCParamsFrequencies						DisplayString,
+			brzaccVLCCAllowedBandwidth                      INTEGER,
+			brzaccVLCCRegulationMaxTxPowerAtAntennaPort		INTEGER,
+			brzaccVLCCRegulationMaxEIRP						INTEGER,
+			brzaccVLCCMinModulationLevel                    INTEGER,
+			brzaccVLCCMaxModulationLevel                    INTEGER,
+			brzaccVLCCBurstModeSupport                      INTEGER,
+			brzaccVLCCMaximumBurstDuration                  INTEGER,
+			brzaccVLCCDfsSupport							INTEGER,
+			brzaccVLCCMinimumHwRevision                     INTEGER
+            }
+    
+    brzaccVLCCNumberIdx  OBJECT-TYPE
+            SYNTAX INTEGER(0..2147483647) 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to all units. "
+           ::= { brzaccVLCCParamsEntry 1 }
+                 
+    brzaccVLCCParamsIndex  OBJECT-TYPE
+            SYNTAX INTEGER  (1..5)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to all units. "
+           ::= { brzaccVLCCParamsEntry 2 }
+
+    brzaccVLCCParamsFrequencies   OBJECT-TYPE
+            SYNTAX DisplayString  
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to all units. 
+             The frequencies included in the applicable sub-band entry."
+           ::= { brzaccVLCCParamsEntry 3 }
+	
+    brzaccVLCCAllowedBandwidth   OBJECT-TYPE
+            SYNTAX INTEGER  
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to all units. 
+             The bandwidth when using the applicable the sub-band."
+           ::= { brzaccVLCCParamsEntry 4 }
+
+    brzaccVLCCRegulationMaxTxPowerAtAntennaPort  OBJECT-TYPE
+            SYNTAX INTEGER  
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to all units. 
+             The maximum allowed Tx power when using the applicable sub-band.
+             A RegulationMaxTxPowerAtAntennaPort of 255, means no limit"
+           ::= { brzaccVLCCParamsEntry 5 }
+ 
+    brzaccVLCCRegulationMaxEIRP   OBJECT-TYPE
+            SYNTAX INTEGER  
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to all units.
+             The maximum Tx EIRP 
+             when using the applicable sub-band.
+             A Regulation Max EIRP of 0, means no limit."
+           ::= { brzaccVLCCParamsEntry 6 }
+
+
+    brzaccVLCCMinModulationLevel  OBJECT-TYPE
+            SYNTAX INTEGER {  level1 (1), 
+                              level2 (2), 
+                              level3 (3), 
+                              level4 (4), 
+                              level5 (5), 
+                              level6 (6), 
+                              level7 (7),
+                              level8 (8)
+                            } 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to all units. 
+             The minimum supported modulation level."
+           ::= { brzaccVLCCParamsEntry 7 }
+
+    brzaccVLCCMaxModulationLevel  OBJECT-TYPE
+            SYNTAX INTEGER {  level1 (1), 
+                              level2 (2), 
+                              level3 (3), 
+                              level4 (4), 
+                              level5 (5), 
+                              level6 (6), 
+                              level7 (7),
+                              level8 (8)
+                            } 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to all units. 
+             The maximum supported modulation level."
+           ::= { brzaccVLCCParamsEntry 8 }
+	
+    brzaccVLCCBurstModeSupport  OBJECT-TYPE
+            SYNTAX INTEGER  {supported(1), notSupported(2)}
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to all units. 
+             The supported Burst Mode Option."
+           ::= { brzaccVLCCParamsEntry 9}
+
+    brzaccVLCCMaximumBurstDuration   OBJECT-TYPE
+            SYNTAX INTEGER 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to all units. 
+             Applicable only if Burst Mode Option is supported. 
+             The maximum supported burst duration."
+           ::= { brzaccVLCCParamsEntry 10}
+
+	 
+    brzaccVLCCDfsSupport  OBJECT-TYPE
+            SYNTAX INTEGER  {supported(1), notSupported(2)}
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to AU/BU only. 
+             The supported Dfs Option."
+           ::= { brzaccVLCCParamsEntry 11}
+	
+    brzaccVLCCMinimumHwRevision  OBJECT-TYPE
+            SYNTAX INTEGER {hwRevisionA (1), hwRevisionB (2), 
+                            hwRevisionC (3), hwRevisionD (4), 
+                            hwRevisionE (5), hwRevisionF (6),
+                            hwRevisionG (7), na (255)}
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to all units. 
+             The Minimum HW Revision needed to support the country code."
+           ::= { brzaccVLCCParamsEntry 12}
+ 
+         
+   brzaccVLCountryCodeSelect OBJECT-TYPE
+	     	SYNTAX	INTEGER 
+		    MAX-ACCESS read-write
+	     	STATUS current
+		    DESCRIPTION	 
+            "Applicable to all units.
+             Configure the Country Code
+             WARNING: It is the responsibility of the wireless system operator 
+             to verify that use of the selected Country Code does not result in
+             violation of the relevant local radio regulations! 
+             For more details refer to the Selecting Country Code document"
+			::= { brzaccVLCountryCodeParameters 4 }
+   
+   
+   brzaccVLNoiseImmunityParameters   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 26}    
+
+   brzaccVLNoiseImmunityAlgorithm OBJECT-TYPE
+	     	SYNTAX	INTEGER { manual(1), automatic(2), na(255) }
+		    MAX-ACCESS read-write
+	     	STATUS current
+		    DESCRIPTION	 
+            "Applicable to all units except for units with HW revision B and lower.
+            automatic(2) is not applicable for units with HW revision F or G.
+             Noise Immunity Algorithm"
+			::= { brzaccVLNoiseImmunityParameters 1 }
+   
+   brzaccVLNoiseImmunityLevel OBJECT-TYPE
+	     	SYNTAX	INTEGER ( 0..4 | 255 )
+		    MAX-ACCESS read-write
+	     	STATUS current
+		    DESCRIPTION	 
+            "Applicable to all units except for units with HW revision B and lower.
+             Noise Immunity Level. (255) : Not Available"
+			::= { brzaccVLNoiseImmunityParameters 2 }
+
+   brzaccVLSpuriousImmunityLevel OBJECT-TYPE
+	     	SYNTAX	INTEGER ( 0..7 | 255 )
+		    MAX-ACCESS read-write
+	     	STATUS current
+		    DESCRIPTION	 
+            "Applicable to all units except for units with HW revision B and lower.
+             (255) : Not Available"
+			::= { brzaccVLNoiseImmunityParameters 3 }
+
+
+   brzaccVLOFDMWeakSignal OBJECT-TYPE
+	     	SYNTAX	INTEGER { enable(1), disable(2), na(255) }
+		    MAX-ACCESS read-write
+	     	STATUS current
+		    DESCRIPTION	 
+            "Applicable to all units except for units with HW revision B and lower.
+             "
+			::= { brzaccVLNoiseImmunityParameters 4 }
+   
+   brzaccVLPulseDetectionSensitivity OBJECT-TYPE
+	     	SYNTAX	INTEGER { low(1), high(2) }
+		    MAX-ACCESS read-write
+	     	STATUS current
+		    DESCRIPTION	 
+            "Applicable to all units.
+             "
+			::= { brzaccVLNoiseImmunityParameters 5 }
+
+   brzaccVLNoiseFloorCalculationParameters   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 29}
+   
+   brzaccVLNoiseFloorCalculationMode OBJECT-TYPE
+            SYNTAX  INTEGER { automatic(1), forced(2), minimumlevel(3) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units."
+            ::= { brzaccVLNoiseFloorCalculationParameters 1 }
+            
+   brzaccVLNoiseFloorForcedValue OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to all units.
+            Range: -107 to -55"
+            ::= { brzaccVLNoiseFloorCalculationParameters 2 }
+
+	brzaccVLNoiseFloorCalibrationParameters OBJECT IDENTIFIER ::= {brzaccVLAirInterface 30}
+
+	brzaccVLNoiseFloorRunCalibration OBJECT-TYPE
+		SYNTAX INTEGER { run(1), cancel(2), na(255) }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION 
+		"Not applicable to 900 MHz units. 
+		Start calibration process for Noise Floor Indication.
+		The unit will rest itself, will perform calibration 
+		and after that will reset again.
+		The status of last calibration run can be read from
+		brzaccVLNoiseFloorIndicationLastCalibrationResult.
+		Get operation will return cancel(2); on 900 MHz units it will return na(255)."
+		::= { brzaccVLNoiseFloorCalibrationParameters 1 } 
+
+	brzaccVLNoiseFloorFieldCalibrationStatus OBJECT-TYPE
+		SYNTAX INTEGER { inactive (1), currentlyActive (2)}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+		"Applicable to all units.
+		Defines weather the unit is currently under performing 
+		a noise floor indication calibration."
+		::= { brzaccVLNoiseFloorCalibrationParameters 2 }
+
+	brzaccVLNoiseFloorLastFieldCalibrationResult OBJECT-TYPE
+		SYNTAX INTEGER { passed(1), failed(2), none(3) }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+		"Applicable to all units.
+		Return the status of last calibration of 
+		Noise Floor Indication that was performed."
+		::= { brzaccVLNoiseFloorCalibrationParameters 3 }
+	 
+	brzaccVLNoiseFloorBandwidthUsedForLastFieldCalibration OBJECT-TYPE
+		SYNTAX INTEGER { none(0), bandwidth-5MHz(5), bandwidth-10MHz(10), bandwidth-20MHz(20), bandwidth-40MHz(40) }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+		"Applicable to all units.
+		Return the bandwidth used for last successful calibration
+		of Noise Floor Indication."
+		::= { brzaccVLNoiseFloorCalibrationParameters 4 }
+
+	brzaccVLNoiseFloorAvailableCalibrationOptions OBJECT-TYPE
+		SYNTAX INTEGER { notCalibrated(1), factoryOnly(2), fieldOnly(3), factoryAndField(4) }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+		"Applicable to all units.
+		Indicates what types of Noise Floor Indication calibration
+		are available:
+		notCalibrated: means that the unit is not calibrated
+		factoryOnly: means that the unit was calibrated in factory
+		fieldOnly: means that the unit was calibrated in field using
+		brzaccVLNoiseFloorIndicationRunCalibration command
+		factoryAndField: means that unit was calibrated in factory and also
+		in field"
+		::= { brzaccVLNoiseFloorCalibrationParameters 5 }
+
+	brzaccVLNoiseFloorUseCalibration OBJECT-TYPE
+		SYNTAX INTEGER { none(1), fieldCalibration(2), factoryCalibration(3) }
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION 
+		"Not applicable to 900 MHz units. 
+		Select if the Noise Floor reported by the unit is using the
+		calibration of Noise Floor Indication.
+		The value that can be choose are according with 
+		brzaccVLNoiseFloorIndicationCalibrationAvailability."
+		::= { brzaccVLNoiseFloorCalibrationParameters 6 }
+
+-- InterferenceMitigationParameters
+
+brzaccVLInterferenceMitigationParameters      OBJECT IDENTIFIER ::= {brzaccVLAirInterface 31}
+
+    brzaccVLInterferenceMitigationChannelScanPeriod  OBJECT-TYPE
+            SYNTAX  INTEGER  
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10. 
+             The period of time, in seconds, to stay on each channel to gather information, 
+             when performing Interference Mitigation or Spectrum Analysis. 
+             Range: 2-30 seconds."
+            ::= { brzaccVLInterferenceMitigationParameters 1 }
+            
+    brzaccVLBeaconPeriod  OBJECT-TYPE
+            SYNTAX  INTEGER  
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable only to AU VL.
+            Range: 16-160 miliseconds."
+            ::= { brzaccVLAirInterface 32 }
+           
+    brzaccVLMaxBeaconsLost  OBJECT-TYPE
+            SYNTAX  INTEGER  
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable only to AU VL.
+            Range: 3-64."
+            ::= { brzaccVLAirInterface 33 }                
+
+    brzaccVLInterferenceMitigationAutomaticScanPeriod  OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10. 
+             The period of time, in minutes, to execute automatic channel scanning,
+             when performing Interference Mitigation.
+             Range: 0 or 10-10080 minutes.
+             A value of 0 means periodicity disabled,
+             Interference Mitigation being performed only one time."
+            ::= { brzaccVLInterferenceMitigationParameters 2 }
+
+    brzaccVLInterferenceMitigationScanType    OBJECT-TYPE
+            SYNTAX INTEGER  { clearChannelAndAutomaticNoiseFloorSelection (1), automaticNoiseFloorSelectionOnly (2), 
+              clearChannelSelectionOnly (3), statisticsOnly(4) } 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10.
+             The selected method for scanning, 
+             when performing Interference Mitigation."
+            ::= { brzaccVLInterferenceMitigationParameters 3 }
+
+    brzaccVLInterferenceMitigationScanMode    OBJECT-TYPE
+            SYNTAX INTEGER  { optimizePerformanceForMinimumDesiredDistance (1), optimizeDistanceForMinimumDesiredPerformance (2) } 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10. 
+             The selected Optimization Criteria to choose the best result, 
+             when performing Interference Mitigation: 
+             1 = best throughput, 2 = best distance."
+            ::= { brzaccVLInterferenceMitigationParameters 4 }
+
+    brzaccVLInterferenceMitigationDistance    OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10. 
+             The desired value of Maximum Distance, utilized if
+             Optimization Criteria is set to best distance,
+             when performing Interference Mitigation. 
+             Range: 100 - 54000 meters."
+            ::= { brzaccVLInterferenceMitigationParameters 5 }
+
+    brzaccVLInterferenceMitigationThroughput    OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10. 
+             The desired value of Throughput, utilized if
+             Optimization Criteria is set to best throughput,
+             when performing Interference Mitigation. 
+             Range: 500-10000 Kbps."
+            ::= { brzaccVLInterferenceMitigationParameters 6 }
+
+-- 7 reserved for frequency subset
+
+    brzaccVLInterferenceMitigationActivation    OBJECT-TYPE
+            SYNTAX  INTEGER  { cancelOperation (1), activateNow (2), notAvailable (3) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10.
+             Activates Interference Mitigation, the unit is automatically reset upon 
+             activation."
+            ::= { brzaccVLInterferenceMitigationParameters 8 }
+
+    brzaccVLInterferenceMitigationStatus    OBJECT-TYPE
+            SYNTAX  INTEGER  { inactive (1), currentlyActive (2), currentlyBlocked(3) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10.
+             Defines whether the unit is currently performing 
+             an Interference Mitigation process.
+             Value currentlyBlocked means unit current status prohibits 
+             Interference Mitigation activation."
+            ::= { brzaccVLInterferenceMitigationParameters 9 }
+
+    brzaccVLInterferenceMitigationDeleteStatisticsFile    OBJECT-TYPE
+            SYNTAX  INTEGER  { cancelOperation (1), delete (2) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10.
+             Deletes the Interference Mitigation statistics file."
+            ::= { brzaccVLInterferenceMitigationParameters 10 }
+            
+    brzaccVLInterferenceMitigationModel    OBJECT-TYPE
+            SYNTAX  INTEGER  { typeLOS (1), typenLOS (2), typeNoLOS (3) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10.
+             Specifies the Installation Model used by the cell."
+            ::= { brzaccVLInterferenceMitigationParameters 11 }            
+
+    brzaccVLInterferenceMitigationScanTime    OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10.
+             Displays the estimated value of the scan time."
+            ::= { brzaccVLInterferenceMitigationParameters 12 }
+
+    brzaccVLInterferenceMitigationAUheight    OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10.
+            The Base Station height used in determining
+            the best noise floor in the Interference
+            Mitigation algorithm. Range: 0 - 300 meters."
+            ::= { brzaccVLInterferenceMitigationParameters 13 }
+            
+    brzaccVLInterferenceMitigationAntennaGain    OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10.
+            The Antenna Gain of the pair unit (AU/SU),
+            expressed in dBi. Range: 10 - 17 dBi."
+            ::= { brzaccVLInterferenceMitigationParameters 14 }
+            
+    brzaccVLInterferenceMitigationMaxModulation    OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10.
+            The maximum modulation of the pair untit.
+            Range: 1 - 8."
+            ::= { brzaccVLInterferenceMitigationParameters 15 }
+            
+            
+    brzaccVLInterferenceMitigationKeepLink    OBJECT-TYPE
+            SYNTAX  INTEGER  { disabled (1), enabled (2) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable to 900 MHz AU units, 2.4 GHz AU units and BNB10.
+             Activates the KeepLink procedure in order to not
+             lose SUs near the border of the cell"
+            ::= { brzaccVLInterferenceMitigationParameters 16 }
+
+            
+	-- INTERFERENCE-MITIGATION-OUTPUT-TABLE
+	
+    brzaccVLInterferenceMitigationOutputTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF BrzaccVLInterferenceMitigationOutput
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10.
+             A table of Clear Channel Selection or Automatic Noise Floor Selection results. " 
+            ::= { brzaccVLInterferenceMitigationParameters 17 }
+
+    brzaccVLInterferenceMitigationOutputEntry  OBJECT-TYPE
+            SYNTAX BrzaccVLInterferenceMitigationOutput
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10.
+             An entry in the InterferenceMitigationOutputTable." 
+            INDEX { brzaccVLInterferenceMitigationOutputFrequency }
+            ::= { brzaccVLInterferenceMitigationOutputTable 1 }
+                                
+    BrzaccVLInterferenceMitigationOutput ::= SEQUENCE { brzaccVLInterferenceMitigationOutputFrequency INTEGER,
+                                                        brzaccVLInterferenceMitigationOutputScanningType INTEGER,
+                                                        brzaccVLInterferenceMitigationOutputInstallationModel INTEGER,
+                                                        brzaccVLInterferenceMitigationOutputNoiseFloor INTEGER,
+                                                        brzaccVLInterferenceMitigationOutputDistance INTEGER,
+                                                        brzaccVLInterferenceMitigationOutputPerformance INTEGER 
+                                                      }
+
+    brzaccVLInterferenceMitigationOutputFrequency OBJECT-TYPE
+            SYNTAX INTEGER ( 905..925 )
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10.
+            The channel frequency" 
+            ::= { brzaccVLInterferenceMitigationOutputEntry 1 }
+            
+	brzaccVLInterferenceMitigationOutputScanningType OBJECT-TYPE
+            SYNTAX INTEGER { typeCCSandANFS (1), typeANFS (2), typeCCS(3), typeStatistics(4) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10.
+            Type of scan that was run" 
+            ::= { brzaccVLInterferenceMitigationOutputEntry 2 }
+            
+     brzaccVLInterferenceMitigationOutputInstallationModel OBJECT-TYPE
+            SYNTAX INTEGER { typeLOS (1), typeNearLOS (2), typeNoLOS (3) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+             "Applicable to 900 MHz units, 2.4 GHz units and BNB10.
+             Specifies the Installation Model used by the cell."
+            ::= { brzaccVLInterferenceMitigationOutputEntry 3 }
+            
+	brzaccVLInterferenceMitigationOutputNoiseFloor OBJECT-TYPE
+            SYNTAX INTEGER ( -102..-55 )
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10.
+            Noise floor calculated for current frequency" 
+            ::= { brzaccVLInterferenceMitigationOutputEntry 4 }
+            
+     brzaccVLInterferenceMitigationOutputDistance OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10.
+            Estimated cell radius" 
+            ::= { brzaccVLInterferenceMitigationOutputEntry 5 }
+            
+	brzaccVLInterferenceMitigationOutputPerformance OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "Applicable to 900 MHz units, 2.4 GHz units and BNB10.
+            Estimated cell performance" 
+            ::= { brzaccVLInterferenceMitigationOutputEntry 6 }
+            
+	-- end of INTERFERENCE-MITIGATION-OUTPUT-TABLE
+            
+-- end of InterferenceMitigationParameters
+
+
 -- Service Params
 -- ==============
    brzaccVLServiceParameters       OBJECT IDENTIFIER ::= {breezeAccessVLMib 7}
@@ -3336,10 +5242,14 @@ brzaccVLDisassociate   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 20}
                         128 to 6,016 (Kbps) for SU-6 with SW version greater than 4.0,
          	            128 to 14,976 (Kbps) for SU-24, 
          	            128 to 53,888 (Kbps) for SU-BD and SU-54,
+                        128 to 13,440 (Kbps) for SU-8,
          	            128 to 6,912  (Kbps) for RB-14, 
          	            128 to 22,016 (Kbps) for RB-28,
-         	            128 to 107,904 (Kbps) for RB-100.
-         	            128 to 6,016 (Kbps) for SU-I.
+                        128 to 107,904 (Kbps) for RB-100,
+                        128 to 6,016 (Kbps) for SU-I,
+         	            128 to 12,032 (Kbps) for SU-V,
+         	            128 to 4,992  (Kbps) for RB-10, 
+         	            128 to 1,024 (Kbps) for SU-1-BD 
          The actual value (Get) will be the entered value rounded to the nearest 
          multiple of 128 (N*128)." 
     ::= { brzaccVLServiceParameters 2 }
@@ -3357,10 +5267,14 @@ brzaccVLDisassociate   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 20}
                         128 to 4,096  (Kbps) for SU-6 with SW version greater than 4.0,
          	            128 to 14,976 (Kbps) for SU-24, 
          	            128 to 53,888 (Kbps) for SU-BD and SU-54,
+                        128 to 13,440 (Kbps) for SU-8,
          	            128 to 6,912  (Kbps) for RB-14, 
          	            128 to 22,016 (Kbps) for RB-28, 
-         	            128 to 107,904 (Kbps) for RB-100.
-         	            128 to 2,048 (Kbps) for SU-I.
+                        128 to 107,904 (Kbps) for RB-100,
+                        128 to 4,096 (Kbps) for SU-I,
+         	            128 to 8,064 (Kbps) for SU-V,
+                        128 to 4,992 (Kbps) for RB-10, 
+                        128 to 896 (Kbps) for SU-1-BD 
 		 The actual value (Get) will be the entered value rounded to the nearest 
 		 multiple of 128 (N*128)." 
     ::= { brzaccVLServiceParameters 3 }
@@ -3379,10 +5293,14 @@ brzaccVLDisassociate   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 20}
          0 to 2,048 (Kbps) for SU-3 with SW version below 4.0,
 		 0 to 3,072 (Kbps) for SU-3 with SW version 4.0 and higher,				
          0 to 3,968 (Kbps) for SU-6 with SW version less than 4.0,
-         0 to 6,016 (Kbps) for SU-6 with SW version greater than 4.0
+         0 to 6,016 (Kbps) for SU-6 with SW version greater than 4.0,
          0 to 14,976 (Kbps) for SU-24, 
-         0 to 45,056 (Kbps) for SU-BD and SU-54. 
-         0 to 6,016 (Kbps) for SU-I.
+         0 to 45,056 (Kbps) for SU-BD and SU-54,
+         0 to 11,264 (Kbps) for SU-8,
+         0 to 6,016 (Kbps) for SU-I,
+         0 to 12,032 (Kbps) for SU-V,
+		 0 to 4,992 (Kbps) for RB-10,
+		 0 to 1,024 (Kbps) for SU-1-BD 
          The actual value (Get) will be the entered value rounded to the 
          nearest multiple of 128 (N*128).
 		 BreezeNET-B products will return 65535."
@@ -3403,8 +5321,12 @@ brzaccVLDisassociate   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 20}
           0 to 3,968  (Kbps) for SU-6 with SW version less than 4.0,
           0 to 4,096  (Kbps) for SU-6 with SW version greater than 4.0,
           0 to 14,976 (Kbps) for SU-24, 
-          0 to 45,056 (Kbps) for SU-BD and SU-54. 
-          0 to 2,048 (Kbps) for SU-I.
+          0 to 45,056 (Kbps) for SU-BD and SU-54,
+          0 to 11,264 (Kbps) for SU-8,
+          0 to 2,048 (Kbps) for SU-I,
+          0 to 8,064 (Kbps) for SU-V,
+		  0 to 4,992 (Kbps) for RB-10,
+		  0 to 896 (Kbps) for SU-1-BD 
           The actual value (Get) will be the entered value rounded to the nearest 
           multiple of 128 (N*128).
           BreezeNET-B products will return 65535."
@@ -3430,12 +5352,10 @@ brzaccVLDisassociate   OBJECT IDENTIFIER ::= {brzaccVLAirInterface 20}
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION 
-        "Applicable to AU and SU. 
-         Not applicable to BreezeNET-B products.
+        "Applicable to all units. 
          The maximum time during which inactivity bonus time 
          can be accumulated for future burst transmissions.
-         Range: 0 to 2000 milliseconds.
-         BreezeNET-B products return 65535"
+         Range: 0 to 2000 milliseconds."
     ::= { brzaccVLServiceParameters 7 }
 
     brzaccVLGracefulDegradationLimit OBJECT-TYPE
@@ -3552,11 +5472,11 @@ brzaccVLUdpPortPriRTPRTCP OBJECT-TYPE
         DESCRIPTION 
         "Applicale to all units.
         RTP/RTCP ports prioritization option for UDP packets. 
-        rtpANDrtcp(1): the possible RTP and RTCP packet with destination port in the
+        rtpANDrtcp(1): RTP and RTCP packets with destination port in the
                        defined port ranges will get HIGH priority
-		rtpOnly(2): only possible RTP packet (packet with even destination port ) 
-		            with destination port in the defined port ranges will get HIGH 
-		            priority."
+        rtpOnly(2):    only RTP packets (packets with even destination port) 
+                       with destination port in the defined port ranges will get  
+                       HIGH priority."
     ::= { brzaccVLUdpPortRangeConfig 1 }
 
 brzaccVLUdpPortRangeNum OBJECT-TYPE
@@ -3667,9 +5587,11 @@ brzaccVLTcpPortPriRTPRTCP OBJECT-TYPE
         STATUS current
         DESCRIPTION 
         "Applicable to all units. RTP/RTCP ports prioritization option for TCP packets. 
-		rtpANDrtcp(1): the possible RTP and RTCP packet with destination port 
-		in the defined port ranges will get HIGH priority
-		rtpOnly(2): only possible RTP packet (packet with even destination port )"
+        rtpANDrtcp(1): RTP and RTCP packets with destination port in the
+                       defined port ranges will get HIGH priority
+        rtpOnly(2):    only RTP packets (packets with even destination port) 
+                       with destination port in the defined port ranges will get  
+                       HIGH priority."
     ::= { brzaccVLTcpPortRangeConfig 1 }
 
 brzaccVLTcpPortRangeNum OBJECT-TYPE
@@ -3768,7 +5690,7 @@ brzaccVLTcpPortRangeDeleteAll OBJECT-TYPE
         "Applicable to all units. Delete all entries form TCP Port Ranges Table
         Get operation will return 1"
     ::= { brzaccVLTcpPortRangeConfig 6 }
-    
+
 brzaccVLWirelessLinkPrioritization OBJECT IDENTIFIER ::= {brzaccVLTrafficPrioritization 4}
 
 brzaccVLWirelessLinkPrioritizationOption OBJECT-TYPE
@@ -3782,7 +5704,7 @@ brzaccVLWirelessLinkPrioritizationOption OBJECT-TYPE
             ::= { brzaccVLWirelessLinkPrioritization  1}
 
 brzaccVLlowPriorityAIFS OBJECT-TYPE
-            SYNTAX  INTEGER  (3..254)
+            SYNTAX  INTEGER  (3..50)
             MAX-ACCESS read-write      
             STATUS current       
             DESCRIPTION  
@@ -3867,6 +5789,47 @@ brzaccVLSUBurstDurationLowPriority OBJECT-TYPE
             ::= { brzaccVLWirelessLinkPrioritization  8}
 
 
+brzaccVLTrafficPriIpRange  OBJECT IDENTIFIER ::= {brzaccVLTrafficPrioritization 5}
+
+brzaccVLTrafficPriIpRangeOption  OBJECT-TYPE
+        SYNTAX  INTEGER {disable(1), ipSource(2), ipDestination(3), ipSourceOrDestination(4) } 
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION 
+        "Applicable to all units.
+        disable(1):       Disable IP Range Prioritization.
+        ipSource(2):      Prioritization of the IP protocol packets with
+                          IP source address in range defined by following two OIDs.
+        ipDestination(3): Prioritization of the IP protocol packets with
+                          IP destination address in range defined by following two OIDs.
+        ipSourceOrDestination(4): Prioritization of the IP protocol packets with
+                          IP source address or  IP destination address
+                          in range defined by following two OIDs."
+    ::= { brzaccVLTrafficPriIpRange 1 }
+
+brzaccVLTrafficPriIpRangeIpAddress  OBJECT-TYPE
+        SYNTAX  IpAddress  
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+        "Applicable to all units.
+        Defines the IP Address for the IP Range Prioritization.
+        IP protocol packets with IP source address in range defined by Address and Mask
+        will get High Priority."
+    ::= { brzaccVLTrafficPriIpRange 2 }
+
+brzaccVLTrafficPriIpRangeIpMask  OBJECT-TYPE
+        SYNTAX  IpAddress  
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+        "Applicable to all units.
+        Defines the IP Mask for the IP Range Prioritization.
+        IP protocol packets with IP source address in range defined by Address and Mask
+        will get High Priority."
+    ::= { brzaccVLTrafficPriIpRange 3 }
+
+
 --DRAP BEGIN
 
 brzaccVLDrap OBJECT IDENTIFIER ::= { brzaccVLServiceParameters 11 }
@@ -3932,16 +5895,18 @@ brzaccVLLowPriorityTrafficMinimumPercent OBJECT-TYPE
 		::= { brzaccVLServiceParameters 12 }
 				
 
-brzaccVLSUPMirDownlink OBJECT-TYPE
+brzaccVLSUEZMirDownlink OBJECT-TYPE
         SYNTAX  INTEGER  
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION 
         "Applicable to AU only. 
-         The Maximum Information Rate (MIR) from AU to SUP.
-            Range for set: 128 to 12,032 (Kbps).
+         The Maximum Information Rate (MIR) from AU to SU-EZ.
+         Range for set: 128 to 12,032 (Kbps).
          The actual value (Get) will be the entered value rounded to the nearest 
-         multiple of 128 (N*128)." 
+         multiple of 128 (N*128).
+         This parameter is not runtime. The SU-EZ must be re-associated
+         in order to re-apply this parameter." 
     ::= { brzaccVLServiceParameters 13 }
    
 brzaccVLMIRThresholdPercent OBJECT-TYPE
@@ -3951,8 +5916,55 @@ brzaccVLMIRThresholdPercent OBJECT-TYPE
         DESCRIPTION 
         "Applicable to AU only. 
 		MIR Threshold Percent" 
-    ::= { brzaccVLServiceParameters 14 }		
- 
+    ::= { brzaccVLServiceParameters 14 }
+
+
+-- Proportional IR Parameters
+
+brzaccVLProportionalIRParameters   OBJECT IDENTIFIER ::= { brzaccVLServiceParameters 15 }
+
+brzaccVLProportionalIRFactor OBJECT-TYPE
+            SYNTAX INTEGER  (0..100)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable to SU only.
+            Proportional IR Factor (percentage).
+            The weight used for computing the used MIR/CIR values." 
+         ::= {brzaccVLProportionalIRParameters  1}
+
+brzaccVLProportionalIRUpdatePeriod OBJECT-TYPE
+            SYNTAX INTEGER  (1..30)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable to SU only.
+            The period of time (in minutes) for periodical computation of used MIR/CIR values."
+         ::= {brzaccVLProportionalIRParameters  2}
+
+brzaccVLProportionalIRThresholdPercentage OBJECT-TYPE
+            SYNTAX INTEGER  (0..100)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable to SU only.
+            When the difference between two consecutive calculations of used MIR/CIR value
+            is bigger than this percentage from value, the new computed MIR/CIR values
+            will be considered." 
+         ::= {brzaccVLProportionalIRParameters  3}
+
+brzaccVLProportionalIRThresholdRate OBJECT-TYPE
+            SYNTAX INTEGER  (1..8)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable to SU only.
+            The new computed MIR/CIR values will be considered only when the rate,
+            on uplink or downlink respectively, is lower than the rate corresponding
+            to this threshold rate." 
+         ::= {brzaccVLProportionalIRParameters  4}
+
+
 -- User Filtering Params
 -- =====================
    brzaccVLUserFilterParams   OBJECT IDENTIFIER ::= {breezeAccessVLMib 8}
@@ -3966,13 +5978,14 @@ brzaccVLMIRThresholdPercent OBJECT-TYPE
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION 
-            "Applicable to SU/RB only. 
+            "Applicable to SU, RB and AU. 
+             Not applicable to AU on 900 MHz. 
              Defines user-filtering options.
              disable: No filtering.
              iPOnly: Only IP protocol frames pass. 
              userDefinedAddrOnly: Only ip frames to/from user defined IP 
                                   addresses pass.
-             pPPoE Only: Only PPPoE frames pass."
+             pPPoE Only: Only PPPoE frames pass. This option is not applicable for AU"
              ::= { brzaccVLUserFilterParams 1 }
 
     brzaccVLIpFilterTable OBJECT-TYPE
@@ -3980,7 +5993,10 @@ brzaccVLMIRThresholdPercent OBJECT-TYPE
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-            "Applicable to SU/RB only. 
+            "Starting with version 5.0, this is deprecated. 
+            Use brzaccVLNewIpFilterTable instead.
+			Applicable to SU, RB and AU. 
+             Not applicable to AU on 900 MHz. 
              An IP Filter Table of up to 8 user defined addresses, 
              or address groups, to be used if the selected User 
              Filtering option is userDefinedAddrOnly." 
@@ -3991,7 +6007,8 @@ brzaccVLMIRThresholdPercent OBJECT-TYPE
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-            "Applicable to SU/RB only. 
+            "Applicable to SU, RB and AU. 
+             Not applicable to AU on 900 MHz.
              An IP Filter Table entry." 
             INDEX { brzaccVLIpFilterIdx }
             ::= { brzaccVLIpFilterTable 1 }
@@ -4008,7 +6025,8 @@ brzaccVLMIRThresholdPercent OBJECT-TYPE
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION 
-            "Applicable to SU/RB only. 
+            "Applicable to SU, RB and AU. 
+             Not applicable to AU on 900 MHz.
              An IP address of an IP Filter Table entry."
            ::= { brzaccVLIpFilterEntry 1 }
 
@@ -4017,7 +6035,8 @@ brzaccVLMIRThresholdPercent OBJECT-TYPE
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION 
-            "Applicable to SU/RB only. 
+            "Applicable to SU, RB and AU. 
+             Not applicable to AU on 900 MHz.
              An IP Mask of an IP Filter Table entry. Either a mask 
              or a range, but not both can be used to define an 
              address group. If the range is other than 0, than the mask is 
@@ -4029,10 +6048,11 @@ brzaccVLMIRThresholdPercent OBJECT-TYPE
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION 
-            "Applicable to SU/RB only. 
+            "Applicable to SU, RB and AU. 
+             Not applicable to AU on 900 MHz.
              An addresses range for the IP Filter Table entry. The 
              first address in the range is the IP address.
-             O means that the range is not used.  
+             0 means that the range is not used.  
              Either a mask or a range, but not both can be used to 
              define an address group.
 			 If the range is other than 0, than the mask is ignored and 
@@ -4045,7 +6065,8 @@ brzaccVLMIRThresholdPercent OBJECT-TYPE
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION 
-            "Applicable to SU/RB only. 
+            "Applicable to SU, RB and AU. 
+             Not applicable to AU on 900 MHz.
              A table index for the IP Filter Table entry." 
          ::= { brzaccVLIpFilterEntry 4 }
 
@@ -4059,7 +6080,7 @@ brzaccVLMIRThresholdPercent OBJECT-TYPE
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION 
-            "Applicable to SU/RB only. 
+            "Applicable to SU/RB and AU-EZ only.  
              Deletes a single selected entry from the IP Filter 
              Table."
             ::= { brzaccVLUserFilterParams 3 }
@@ -4070,7 +6091,8 @@ brzaccVLMIRThresholdPercent OBJECT-TYPE
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION 
-            "Applicable to SU/RB only. 
+            "Applicable to SU, RB and AU. 
+             Not applicable to AU on 900 MHz.
              Deletes all entries from the IP Filter Table."
             ::= { brzaccVLUserFilterParams 4 }
 
@@ -4079,13 +6101,105 @@ brzaccVLMIRThresholdPercent OBJECT-TYPE
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION  
-            "Applicable to SU/RB only. 
+            "Applicable to SU, RB and AU. 
+             Not applicable to AU on 900 MHz.
              Enables or disables the unicast DHCP messages, 
              overriding the IP Filtering option." 
             ::= { brzaccVLUserFilterParams 5 }
 
 
-	 
+    brzaccVLNewIpFilterTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF BrzaccVLNewIpFilterEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to SU, RB and AU. 
+             Not applicable to AU on 900 MHz.
+             An IP Filter Table of up to 8 user defined addresses, 
+             or address groups, to be used if the selected User 
+             Filtering option is userDefinedAddrOnly." 
+            ::= { brzaccVLUserFilterParams 6 }
+
+    brzaccVLNewIpFilterEntry  OBJECT-TYPE
+            SYNTAX BrzaccVLNewIpFilterEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "Applicable to SU, RB and AU. 
+             Not applicable to AU on 900 MHz.
+             An IP Filter Table entry." 
+            INDEX { brzaccVLNewIpID }
+            ::= { brzaccVLNewIpFilterTable 1 }
+
+   BrzaccVLNewIpFilterEntry ::= SEQUENCE {
+            brzaccVLNewIpID   IpAddress,
+            brzaccVLNewMaskID IpAddress,
+            brzaccVLNewIpFilterRange INTEGER,
+            brzaccVLNewIpFilterCommand INTEGER
+            }
+               
+    brzaccVLNewIpID   OBJECT-TYPE
+            SYNTAX IpAddress  
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to SU, RB and AU. 
+             Not applicable to AU on 900 MHz.
+             An IP address of an IP Filter Table entry."
+           ::= { brzaccVLNewIpFilterEntry 1 }
+
+    brzaccVLNewMaskID OBJECT-TYPE
+            SYNTAX IpAddress  
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable to SU, RB and AU. 
+             Not applicable to AU on 900 MHz.
+             An IP Mask of an IP Filter Table entry. Either a mask 
+             or a range, but not both can be used to define an 
+             address group. If the range is other than 0, than the mask is 
+             ignored and only the range value is used to define the address group."
+           ::= { brzaccVLNewIpFilterEntry 2 }
+   
+    brzaccVLNewIpFilterRange OBJECT-TYPE
+            SYNTAX INTEGER 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable to SU, RB and AU. 
+             Not applicable to AU on 900 MHz.
+             An addresses range for the IP Filter Table entry. The 
+             first address in the range is the IP address.
+             0 means that the range is not used.  
+             Either a mask or a range, but not both can be used to 
+             define an address group.
+			 If the range is other than 0, than the mask is ignored and 
+			 only the range value is used to define the address group.
+             Range: 0 to 255."
+            ::= { brzaccVLNewIpFilterEntry 3 }
+
+    brzaccVLNewIpFilterCommand   OBJECT-TYPE
+            SYNTAX INTEGER  { active(1), notInService(2), notReady(3), createAndGo(4), createAndWait(5), destroy(6) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION 
+            "Applicable to SU, RB and AU. 
+             Not applicable to AU on 900 MHz.
+             Supports only active(1), createAndGo(4) and destroy(6).
+             A command for the IP Filter Table entry." 
+         ::= { brzaccVLNewIpFilterEntry 4 }
+
+    brzaccVLDHCPPPPoEOverrideFilter OBJECT-TYPE
+            SYNTAX  INTEGER { disable (1), enable (2), na (255) } 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION  
+            "Applicable to SU, RB and AU. 
+             Not applicable to AU on 900 MHz.
+             Enables or disables the PPPoE messages, 
+             overriding the IP Filtering option." 
+            ::= { brzaccVLUserFilterParams 7 }
+            	 
 -- Security Params
 -- ==================
 brzaccVLSecurityParameters     OBJECT IDENTIFIER ::= {breezeAccessVLMib 9}
@@ -4138,7 +6252,8 @@ brzaccVLSecurityParameters     OBJECT IDENTIFIER ::= {breezeAccessVLMib 9}
             "Applicable to all units. The fips197 option is applicable only to units with a license to
              use FIPS 197 algorithm.
              The encryption algorithm to be used for authentication messages 
-             and/or data encryption."
+             and/or data encryption.
+             The aesOCB option is not applicable for AU-EZ."
             ::= { brzaccVLSecurityParameters 5 }
 
 
@@ -4414,6 +6529,64 @@ brzaccVLAdaptiveModulationParams     OBJECT IDENTIFIER ::= {brzaccVLPerformanceP
              Defines the setting of thresholds for the rate decision algorithm. 
              high (2) should typically be used when the SNR is lower than 13dB."
             ::= { brzaccVLAdaptiveModulationParams  5 }
+ 
+	brzaccVLAdaptiveModulationHistorySize OBJECT-TYPE
+            SYNTAX  INTEGER (15..25)
+            MAX-ACCESS read-write      
+            STATUS current       
+            DESCRIPTION  
+            "Applicable to all units with HW version C or higher. 
+             This value is used to compute the transmission time.
+             Not used in version 6.0 and higher."
+            ::= { brzaccVLAdaptiveModulationParams 7 }
+            
+	brzaccVLAdaptiveModulationPacketThresholdToTestUpRate OBJECT-TYPE
+            SYNTAX  INTEGER (10..10000)
+            MAX-ACCESS read-write      
+            STATUS current       
+            DESCRIPTION  
+            "Applicable to all units with HW version C or higher. 
+             When the number of transmitted frames exceeds this number
+             the upper modulations will be tested."
+            ::= { brzaccVLAdaptiveModulationParams 8 }
+            
+	brzaccVLAdaptiveModulationPacketNoOnUpperRate OBJECT-TYPE
+            SYNTAX  INTEGER (1..3)
+            MAX-ACCESS read-write      
+            STATUS current       
+            DESCRIPTION  
+            "Applicable to all units with HW version C or higher. 
+             The number of frames used on upper modulations."
+            ::= { brzaccVLAdaptiveModulationParams 9 }
+                       
+	brzaccVLAdaptiveModulationAlgorithm OBJECT-TYPE
+            SYNTAX INTEGER  { adaptiveModulation(1), statisticsBasedRateControl(2), na(255) }
+            MAX-ACCESS read-write      
+            STATUS current       
+            DESCRIPTION  
+            "Applicable to all units with HW version C or higher. 
+             Defines the adaptive modulation algorithm used by the unit."
+            ::= { brzaccVLAdaptiveModulationParams 10 }
+            
+	brzaccVLAdaptiveModulationRetriesOnLowerModulations OBJECT-TYPE
+            SYNTAX INTEGER  { disable(1), enable(2) }
+            MAX-ACCESS read-write      
+            STATUS current       
+            DESCRIPTION  
+            "Applicable to all units with HW version C or higher. 
+             It allows retransmissions at lower modulation levels."
+            ::= { brzaccVLAdaptiveModulationParams 11 }
+            
+	brzaccVLAdaptiveModulationRTSDurationMode OBJECT-TYPE
+            SYNTAX INTEGER  { shortRTSDuration(1), longRTSDuration(2) }
+            MAX-ACCESS read-write      
+            STATUS current       
+            DESCRIPTION  
+            "Applicable to all units with HW version C or higher. 
+            It defines the mode to calculate the value for RTS duration field."
+            ::= { brzaccVLAdaptiveModulationParams 12 }
+            
+            
 
 brzaccVLBurstMode     OBJECT IDENTIFIER ::= {brzaccVLPerformanceParams 10}
 
@@ -4479,9 +6652,41 @@ brzaccVLConcatenationParameters     OBJECT IDENTIFIER ::= {brzaccVLPerformancePa
 			 256 to 2200 (bytes) for BreezeNET-B products BU/RB14 BU/RB28, 
 			 or for AU/SU with HW revision A or B.
 			 256 to 4032 (bytes) for AU/SU with HW Revision 
-			 C or higher and BreezeNET-B products BU/RB100."
+			 C or higher, BreezeNET-B products BU/RB100
+			 and BreezeNET-B products BU/RB10."
             ::= { brzaccVLConcatenationParameters 3 }
 
+                        
+	brzaccVLControlModulationLevel OBJECT-TYPE
+		SYNTAX INTEGER { basicRate(1), modulationLevel1(2) } 
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION  
+		"Applicable to all units wits software version 6.0 and higher.
+		The modulation level for control frames.
+		basicRates(1) means the all control frames will be sent at basic rate and
+		modulationLevel1(2) means the all control frames will be sent at modulation level 1" 
+		::= { brzaccVLPerformanceParams 13 }
+
+	brzaccVLEthernetFrameSize OBJECT-TYPE
+           SYNTAX INTEGER { size1600(1), size2000(2) }
+           MAX-ACCESS read-write
+           STATUS current
+            DESCRIPTION 
+           "Applicable only for BNB-10 products.
+			The maximum frame size used on Ethernet port."
+            ::= { brzaccVLPerformanceParams 14 }
+
+	brzaccVLRunningEthernetFrameSize OBJECT-TYPE
+           SYNTAX INTEGER
+           MAX-ACCESS read-only
+           STATUS current
+            DESCRIPTION 
+           "Applicable only for BNB-10 products.
+			The frame size used on Ethernet port."
+            ::= { brzaccVLPerformanceParams 15 }
+
+                  
                         
 -- Site Survey Params
 -- ==================
@@ -4873,6 +7078,24 @@ brzaccVLDataFramesSubmittedToBridge	 OBJECT IDENTIFIER ::= {brzaccVLWirelessLink
              frames received from the wireless media, including duplicate frames."
 			::= { brzaccVLWirelessLinkCounters 12 }
 					
+    brzaccVLTXRetransmissionPercentage OBJECT-TYPE
+      		SYNTAX  Counter32
+		    MAX-ACCESS read-only
+	     	STATUS current
+		    DESCRIPTION	 
+            "Applicable to all units. 
+             Indicates the percentage of frames that have been retransmitted."
+			::= { brzaccVLWirelessLinkCounters 13 }
+			
+    brzaccVLRXCRCPercentage OBJECT-TYPE
+      		SYNTAX  Counter32
+		    MAX-ACCESS read-only
+	     	STATUS current
+		    DESCRIPTION	 
+            "Applicable to all units. 
+             Indicates the percentage of received frames with CRC error."
+			::= { brzaccVLWirelessLinkCounters 14 }
+					
 --	brzaccVLInternallyGeneratedFramesSubmittedToBridge OBJECT-TYPE
 --      		SYNTAX  Counter32
 --		    MAX-ACCESS read-only
@@ -5069,7 +7292,9 @@ BrzaccVLAUAdbEntry ::= SEQUENCE {
 	  brzaccVLAdbAuthOption			INTEGER,
 	  brzaccVLAdbDataEncyptOption	INTEGER,
 	  brzaccVLAdbAge                INTEGER,
-	  brzaccVLAdbUnitName           DisplayString
+	  brzaccVLAdbUnitName           DisplayString,
+	  brzaccVLAdbRSSI				INTEGER,
+	  brzaccVLAdbIpAddress			IpAddress
 	  }
 
 brzaccVLAdbIndex OBJECT-TYPE
@@ -5108,7 +7333,8 @@ brzaccVLAdbSwVersion OBJECT-TYPE
 	  STATUS current
 	  DESCRIPTION	
       "Applicable to AU/BU only. 
-	   The SW version of the relevant SU/RB."
+	   The SW version of the relevant SU/RB.
+	   Not available for SU-EZ."
 	  ::= { brzaccVLAUAdbEntry 4 }
 
 brzaccVLAdbSNR	OBJECT-TYPE
@@ -5129,7 +7355,8 @@ brzaccVLAdbMaxModulationLevel  OBJECT-TYPE
                         modLevel-5 (5), 
                         modLevel-6 (6), 
                         modLevel-7 (7), 
-                        modLevel-8 (8) 
+                        modLevel-8 (8),
+                        na ( 255 ) 
                       }  
 	  MAX-ACCESS read-only
 	  STATUS current
@@ -5137,7 +7364,8 @@ brzaccVLAdbMaxModulationLevel  OBJECT-TYPE
       "Applicable to AU/BU only. 
 	   The value configured in the relevant SU/RB for the Maximum Modulation 
 	   Level parameter.
-	   Modulation Level 8 is not applicable for units with HW revision A."
+	   Modulation Level 8 is not applicable for units with HW revision A.
+	   It is not applicable for SU-EZ and it returns na."
 	  ::= { brzaccVLAUAdbEntry 6 }
 
 brzaccVLAdbTxFramesTotal	OBJECT-TYPE
@@ -5338,7 +7566,9 @@ brzaccVLAdbCirTx  OBJECT-TYPE
    STATUS current
    DESCRIPTION 
    "Applicable to AU Only. 
-    Not applicable to BreezeNET-B products. Read-only. 
+    Not applicable to BreezeNET-B products. 
+    This parameter is not relevant for SU-EZ with SW 1.00.15
+    and it is 0.
     The value configured in the relevant SU for the CIR: 
     SU to AU parameter."
    ::= { brzaccVLAUAdbEntry 25 }
@@ -5350,9 +7580,11 @@ brzaccVLAdbMirTx  OBJECT-TYPE
    DESCRIPTION 
    "Applicable to AU/BU only. 
     The value configured in the relevant SU/RB for the MIR: 
-    SU/RB to AU/BU parameter."
+    SU/RB to AU/BU parameter.
+    For SU-EZ SW version 1.00.15, it represents the value 
+    set in AU-EZ."
    ::= { brzaccVLAUAdbEntry 26 }
-
+    
 brzaccVLAdbCirRx  OBJECT-TYPE
    SYNTAX INTEGER 
    MAX-ACCESS read-only
@@ -5360,6 +7592,8 @@ brzaccVLAdbCirRx  OBJECT-TYPE
    DESCRIPTION 
    "Applicable to AU Only.
     Not applicable to BreezeNET-B products.
+    This parameter is not relevant for SU-EZ with SW 
+    version 1.00.15 and it is 0.    
     The value configured in the relevant SU for the CIR: 
     AU to SU parameter."
    ::= { brzaccVLAUAdbEntry 27 }
@@ -5370,6 +7604,8 @@ brzaccVLAdbMirRx  OBJECT-TYPE
    STATUS current
    DESCRIPTION 
    "Applicable to AU/BU only. 
+    This parameter is not relevant for SU-EZ with SW 
+    version 1.00.15 and it is 0.
     The value configured in the relevant SU/RB for the MIR: 
     AU/BU to SU/RB parameter."
    ::= { brzaccVLAUAdbEntry 28 }
@@ -5382,7 +7618,9 @@ brzaccVLAdbCirMaxDelay   OBJECT-TYPE
    "Applicable to AU Only. 
     Not applicable to BreezeNET-B products.
     The value configured in the relevant SU for the CIR Maximum 
-    Delay parameter."
+    Delay parameter.
+    It returns maximum value on 32 bits for SU-EZ with SW 
+    version 1.00.15 and this means NA (Not Available)."
    ::= { brzaccVLAUAdbEntry 29 }
 
 brzaccVLAdbDistance     OBJECT-TYPE
@@ -5391,17 +7629,20 @@ brzaccVLAdbDistance     OBJECT-TYPE
    STATUS current
    DESCRIPTION 
    "Applicable to AU/BU Only.  
-    The distance between the SU/RB and the AU/BU (In Kilometers)."
+    The distance between the SU/RB and the AU/BU (In Kilometers).
+    It is not applicable for SU-EZ and it returns 0."
    ::= { brzaccVLAUAdbEntry 30 }
 
 brzaccVLAdbHwRevision     OBJECT-TYPE
    SYNTAX INTEGER  {hwRevisionA(1), hwRevisionB(2), hwRevisionC(3), 
-                    hwRevisionD(4), hwRevisionE(5), na(255)}
+                    hwRevisionD(4), hwRevisionE(5), hwRevisionF(6),
+                    hwRevisionG(7), na(255)}
    MAX-ACCESS read-only
    STATUS current
    DESCRIPTION 
    "Applicable to AU/BU Only.  
-    The SU/RB HW Revision."
+    The SU/RB HW Revision.
+    Not available for SU-EZ."
    ::= { brzaccVLAUAdbEntry 31 }
 
 brzaccVLAdbCpldVer     OBJECT-TYPE
@@ -5410,7 +7651,8 @@ brzaccVLAdbCpldVer     OBJECT-TYPE
    STATUS current
    DESCRIPTION 
    "Applicable to AU/BU Only.  
-    The SU/RB CPLD Version."
+    The SU/RB CPLD Version.
+    Not available for SU-EZ."
    ::= { brzaccVLAUAdbEntry 32 }
 
 brzaccVLAdbCountryCode     OBJECT-TYPE
@@ -5419,7 +7661,8 @@ brzaccVLAdbCountryCode     OBJECT-TYPE
    STATUS current
    DESCRIPTION 
    "Applicable to AU/BU Only.  
-    The SU/RB supported country code."
+    The SU/RB country code.
+    9999 means unavailable country code."
    ::= { brzaccVLAUAdbEntry 33 }
 
 brzaccVLAdbBootVer     OBJECT-TYPE
@@ -5428,7 +7671,8 @@ brzaccVLAdbBootVer     OBJECT-TYPE
    STATUS current
    DESCRIPTION 
    "Applicable to AU/BU Only.  
-    The SU/RB Boot Version."
+    The SU/RB Boot Version.
+    Not available for SU-EZ."
    ::= { brzaccVLAUAdbEntry 34 }
 
 brzaccVLAdbAtpcOption     OBJECT-TYPE
@@ -5446,7 +7690,8 @@ brzaccVLAdbAdapModOption     OBJECT-TYPE
    STATUS current
    DESCRIPTION 
    "Applicable to AU/BU Only.  
-    The SU/RB adaptive modulation option configuration."
+    The SU/RB adaptive modulation option configuration.
+    It is not applicable for SU-EZ."
    ::= { brzaccVLAUAdbEntry 36 }
 
 brzaccVLAdbBurstModeOption     OBJECT-TYPE
@@ -5455,7 +7700,8 @@ brzaccVLAdbBurstModeOption     OBJECT-TYPE
    STATUS current
    DESCRIPTION 
    "Applicable to AU/BU Only.  
-    The SU/RB burst mode option configuration."
+    The SU/RB burst mode option configuration.
+    It is not applicable for SU-EZ."
    ::= { brzaccVLAUAdbEntry 37 }
 
 brzaccVLAdbConcatenationOption     OBJECT-TYPE
@@ -5464,7 +7710,8 @@ brzaccVLAdbConcatenationOption     OBJECT-TYPE
    STATUS current
    DESCRIPTION 
    "Applicable to AU/BU Only.  
-    The SU/RB concatenation option configuration."
+    The SU/RB concatenation option configuration.
+    It is not applicable for SU-EZ."
    ::= { brzaccVLAUAdbEntry 39 }
 
 brzaccVLAdbSecurityMode     OBJECT-TYPE
@@ -5473,7 +7720,8 @@ brzaccVLAdbSecurityMode     OBJECT-TYPE
    STATUS current
    DESCRIPTION 
    "Applicable to AU/BU Only.  
-    The SU/RB security mode configuration."
+    The SU/RB security mode configuration.
+    Not available for SU-EZ."
    ::= { brzaccVLAUAdbEntry 41 }
 
 brzaccVLAdbAuthOption     OBJECT-TYPE
@@ -5482,7 +7730,8 @@ brzaccVLAdbAuthOption     OBJECT-TYPE
    STATUS current
    DESCRIPTION 
    "Applicable to AU/BU Only.  
-    The SU/RB authentication algorithm configuration."
+    The SU/RB authentication algorithm configuration.
+    Not available for SU-EZ."
    ::= { brzaccVLAUAdbEntry 42 }
 
 brzaccVLAdbDataEncyptOption     OBJECT-TYPE
@@ -5491,7 +7740,8 @@ brzaccVLAdbDataEncyptOption     OBJECT-TYPE
    STATUS current
    DESCRIPTION 
    "Applicable to AU/BU Only.  
-    The SU/RB data encryption option configuration."
+    The SU/RB data encryption option configuration.
+    Not available for SU-EZ."
    ::= { brzaccVLAUAdbEntry 43 }
 
 brzaccVLAdbAge	OBJECT-TYPE
@@ -5507,12 +7757,788 @@ brzaccVLAdbUnitName	OBJECT-TYPE
 	  SYNTAX DisplayString 
 	  MAX-ACCESS read-only
 	  STATUS current
-	  DESCRIPTION	
+	  DESCRIPTION
       "Applicable to AU/BU only. 
-	   The unit name of the relevant SU/RB."
+	   The unit name of the relevant SU/RB.
+	   Not available for SU-EZ."
 	  ::= { brzaccVLAUAdbEntry 45 }
+	  
+brzaccVLAdbRSSI OBJECT-TYPE
+	SYNTAX INTEGER  
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+	"Applicable to AU/BU only with SW version 5.1 and higher. 
+	The average Received Signal Strength Indication of frames received by 
+	the AU/BU from the relevant SU/RB.
+	This value is given in dBm units."
+	::= { brzaccVLAUAdbEntry 46 }
+
+brzaccVLAdbIpAddress OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+	"Applicable to AU/BU only with SW version 5.2.11 and higher. 
+	The Running IP address of the relevant SU/RB.
+	Not available for SU-EZ with SW version lower than 1.1.1"
+	::= { brzaccVLAUAdbEntry 47 }
 
 
+brzaccVLAUNewAdbTable OBJECT-TYPE
+	  SYNTAX SEQUENCE OF BrzaccVLAUNewAdbEntry
+	  MAX-ACCESS not-accessible
+	  STATUS current
+	  DESCRIPTION
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+       AU/BU MAC Address New Database table idexed by MAC Address"
+	  ::= { brzaccVLAUMacAddressDatabase 3 }
+
+brzaccVLAUNewAdbEntry  OBJECT-TYPE
+	  SYNTAX BrzaccVLAUNewAdbEntry
+	  MAX-ACCESS not-accessible
+	  STATUS current
+      DESCRIPTION
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+       An entry in the AU/BU MAC Address New Database table."
+	  INDEX { brzaccVLNewAdbMacAddress }
+	  ::= { brzaccVLAUNewAdbTable 1 }
+
+
+BrzaccVLAUNewAdbEntry ::= SEQUENCE {
+		brzaccVLNewAdbMacAddress				MacAddress,  
+		brzaccVLNewAdbIPaddress					IpAddress,
+		brzaccVLNewAdbUnitName					DisplayString,
+		brzaccVLNewAdbUnitType					INTEGER,
+		brzaccVLNewAdbSwVersion					DisplayString,
+		brzaccVLNewAdbHwRevision				INTEGER,
+		brzaccVLNewAdbCpldVer					DisplayString,
+		brzaccVLNewAdbBootVer					DisplayString,
+		brzaccVLNewAdbCountryCode    			INTEGER,
+		brzaccVLNewAdbCirTx						INTEGER,
+		brzaccVLNewAdbMirTx						INTEGER,
+		brzaccVLNewAdbCirRx						INTEGER,
+		brzaccVLNewAdbMirRx						INTEGER,
+		brzaccVLNewAdbCirMaxDelay				INTEGER,
+		brzaccVLNewAdbAtpcOption				INTEGER,
+		brzaccVLNewAdbAdapModOption				INTEGER,
+		brzaccVLNewAdbBurstModeOption			INTEGER,
+		brzaccVLNewAdbConcatenationOption		INTEGER,
+		brzaccVLNewAdbSecurityMode				INTEGER,
+		brzaccVLNewAdbAuthOption				INTEGER,
+		brzaccVLNewAdbDataEncyptOption			INTEGER,
+		brzaccVLAdbWi2IPaddress					IpAddress,
+		brzaccVLNewAdbStatus					INTEGER,
+		brzaccVLNewAdbAge						INTEGER,
+		brzaccVLNewAdbDistance					INTEGER,
+		brzaccVLNewAdbSNR						INTEGER,
+		brzaccVLNewAdbMaxModulationLevel		INTEGER,
+		brzaccVLNewAdbTxFramesTotal				Counter32,
+		brzaccVLNewAdbDroppedFramesTotal		Counter32,
+		brzaccVLNewAdbTxSuccessModLevel1		Counter32,
+		brzaccVLNewAdbTxSuccessModLevel2		Counter32,
+		brzaccVLNewAdbTxSuccessModLevel3		Counter32,
+		brzaccVLNewAdbTxSuccessModLevel4		Counter32,
+		brzaccVLNewAdbTxSuccessModLevel5		Counter32,
+		brzaccVLNewAdbTxSuccessModLevel6		Counter32,
+		brzaccVLNewAdbTxSuccessModLevel7		Counter32,
+		brzaccVLNewAdbTxSuccessModLevel8		Counter32,
+		brzaccVLNewAdbTxFailedModLevel1			Counter32,
+		brzaccVLNewAdbTxFailedModLevel2			Counter32,
+		brzaccVLNewAdbTxFailedModLevel3			Counter32,
+		brzaccVLNewAdbTxFailedModLevel4			Counter32,
+		brzaccVLNewAdbTxFailedModLevel5			Counter32,
+		brzaccVLNewAdbTxFailedModLevel6			Counter32,
+		brzaccVLNewAdbTxFailedModLevel7			Counter32,
+		brzaccVLNewAdbTxFailedModLevel8			Counter32,
+		brzaccVLNewAdbMainSwVersion				DisplayString,
+		brzaccVLNewAdbShadowSwVersion			DisplayString,
+		brzaccVLNewAdbReadOnlyCommunity			DisplayString,
+		brzaccVLNewAdbWriteCommunity			DisplayString,
+		brzaccVLNewAdbAIFS						INTEGER,
+		brzaccVLNewAdbMinimumCW					INTEGER,
+		brzaccVLNewAdbMaximumCW					INTEGER,
+		brzaccVLNewAdbESSID						DisplayString,
+		brzaccVLNewAdbRSSI						INTEGER,
+		brzaccVLNewAdbDfsOption					INTEGER
+	 }
+
+brzaccVLNewAdbMacAddress  OBJECT-TYPE
+	  SYNTAX MacAddress  
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   The MAC Address of an SU/RB entry in the MAC Address Database 
+	   table."
+	  ::= { brzaccVLAUNewAdbEntry 1 }
+
+brzaccVLNewAdbIPaddress	OBJECT-TYPE
+	  SYNTAX IpAddress
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   The Running IP address of the relevant SU/RB.
+	   Not available for SU-EZ with SW version lower than 1.1.1"
+	  ::= { brzaccVLAUNewAdbEntry 2 }
+
+brzaccVLNewAdbUnitName	OBJECT-TYPE
+	  SYNTAX DisplayString 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   The unit name of the relevant SU/RB.
+	   Not available for SU-EZ."
+	  ::= { brzaccVLAUNewAdbEntry 3 }
+
+brzaccVLNewAdbUnitType	OBJECT-TYPE
+	  SYNTAX INTEGER { su-6-1D(3),
+	                   su-6-BD(4),
+	                   su-24-BD(5),
+                       rb-B14(8),
+                       rb-B28(9), 
+                       su-BD(10),
+                       su-54-BD (11), 
+                       su-3-1D(12),
+                       su-3-4D(13),
+                       su4900(18), 
+                       rb-B100(20), 
+                       su-I(21),
+                       su-EZ(23),
+                       su-V(24),
+                       rb-B10(26),
+                       su-8-BD(27),
+                       su-1-BD(28),
+                       su-3-L(29),
+                       su-6-L(30),
+                       su-12-L(31),
+                       su(33),
+					   na (255)
+					 }
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   The type of the relevant SU/RB.
+			 su-6-1D  (3) : SU-6-1D (subscriber unit supporting 6 Mbps)
+                            Starting with 5.0 this is deprecated.
+                            When a SU-6-1D is upgraded to 5.0, its type will be changed to SU-6-BD.
+             su-6-BD  (4) : SU-6-BD (subscriber unit supporting 6 Mbps).
+             su-24-BD (5) : SU-24-BD (subscriber unit supporting 24 Mbps).
+			 rb-B14   (8) : RB-B14 (BreezeNET Remote Bridge supporting 14 Mbps).
+			 rb-B28   (9) : RB-B28 (BreezeNET Remote Bridge supporting 28 Mbps).
+			 su-BD   (10) : SU-BD (subscriber unit).
+			 su-54-BD(11) : SU-54-BD (subscriber unit supporting 54 Mbps).
+             su-3-1D (12) : SU-3-1D (subscriber unit supporting 3 Mbps).
+                            Starting with 5.0 this is deprecated.
+                            When a SU-3-1D is upgraded to 5.0, its type will be changed to SU-3-BD.
+             su-3-4D (13) : SU-3-4D (subscriber unit supporting 3 Mbps).
+                            Starting with 5.0 SW version this unit will work in BD mode
+             suBD4900(18) : SU-BD-4900 (BreezeAccess 4900 subscriber unit)
+             rb-B100 (20) : BU-B100 (BreezeNET Remote Bridge unlimited throughput) 
+             su-I    (21) : SU-I
+             su-EZ   (23) : SU-EZ
+             su-8-BD (27) : SU-8-BD (subscriber unit supporting 8 Mbps).
+             su-1-BD (28) : SU-1-BD (subscriber unit supporting 1 Mbps).
+             su-3-L (29) : SU-3-L (subscriber unit supporting 3 Mbps).
+             su-6-L (30) : SU-6-L (subscriber unit supporting 6 Mbps).
+             su-12-L (31) : SU-12-L (subscriber unit supporting 12 Mbps).
+             su      (33) : SU (security subscriber unit)
+			 na     (255) : Not Available"
+	  ::= { brzaccVLAUNewAdbEntry 4 }
+
+brzaccVLNewAdbSwVersion OBJECT-TYPE
+	  SYNTAX DisplayString  
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   The SW version of the relevant SU/RB.
+	   Not available for SU-EZ."
+	  ::= { brzaccVLAUNewAdbEntry 5 }
+
+brzaccVLNewAdbHwRevision     OBJECT-TYPE
+   SYNTAX INTEGER  {hwRevisionA(1), hwRevisionB(2), hwRevisionC(3), 
+                    hwRevisionD(4), hwRevisionE(5), hwRevisionF(6),
+                    hwRevisionG(7), na(255)}
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION 
+   "Applicable to AU/BU only with SW version 5.0 and higher.  
+    The SU/RB HW Revision.
+    Not available for SU-EZ."
+   ::= { brzaccVLAUNewAdbEntry 6 }
+
+brzaccVLNewAdbCpldVer     OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION 
+   "Applicable to AU/BU only with SW version 5.0 and higher.  
+    The SU/RB CPLD Version.
+    Not available for SU-EZ."
+   ::= { brzaccVLAUNewAdbEntry 7 }
+
+brzaccVLNewAdbBootVer     OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION 
+   "Applicable to AU/BU only with SW version 5.0 and higher.  
+    The SU/RB Boot Version.
+    Not available for SU-EZ."
+   ::= { brzaccVLAUNewAdbEntry 8 }
+
+brzaccVLNewAdbCountryCode     OBJECT-TYPE
+   SYNTAX INTEGER  
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION 
+   "Applicable to AU/BU only with SW version 5.0 and higher.  
+    The SU/RB country code. 9999 means unavailable country code"
+   ::= { brzaccVLAUNewAdbEntry 9 }
+
+brzaccVLNewAdbCirTx  OBJECT-TYPE
+   SYNTAX INTEGER 
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION 
+   "Applicable to AU/BU only with SW version 5.0 and higher.   
+    For BreezeNET-B products it is 0. 
+    For SU_EZ with SW version 1.00.15 is not relevant and it is 0.
+    The value configured in the relevant SU for the CIR: 
+    SU to AU parameter."
+   ::= { brzaccVLAUNewAdbEntry 10 }
+
+brzaccVLNewAdbMirTx  OBJECT-TYPE
+   SYNTAX INTEGER 
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION 
+   "Applicable to AU/BU only with SW version 5.0 and higher. 
+    The value configured in the relevant SU/RB for the MIR: 
+    SU/RB to AU/BU parameter.
+    For SU-EZ SW version 1.00.15, it represents the value 
+    set in AU-EZ."
+   ::= { brzaccVLAUNewAdbEntry 11 }
+
+brzaccVLNewAdbCirRx  OBJECT-TYPE
+   SYNTAX INTEGER 
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION 
+   "Applicable to AU/BU only with SW version 5.0 and higher.   
+    For BreezeNET-B products it is 0. 
+    This parameter is not relevant for SU-EZ with version 1.00.15 
+    and it is 0.
+    The value configured in the relevant SU for the CIR: 
+    AU to SU parameter."
+   ::= { brzaccVLAUNewAdbEntry 12 }
+
+brzaccVLNewAdbMirRx  OBJECT-TYPE
+   SYNTAX INTEGER 
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION 
+   "Applicable to AU/BU only with SW version 5.0 and higher. 
+    This parameter is not relevant for SU-EZ with version 1.00.15 
+    and it is 0.
+    The value configured in the relevant SU/RB for the MIR: 
+    AU/BU to SU/RB parameter."
+   ::= { brzaccVLAUNewAdbEntry 13 }
+
+brzaccVLNewAdbCirMaxDelay   OBJECT-TYPE
+   SYNTAX INTEGER 
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION 
+   "Applicable to AU/BU only with SW version 5.0 and higher. 
+    For BreezeNET-B products and SU-EZ with SW version 1.00.15 
+    it is not relevant.
+    The value configured in the relevant SU/RB for the CIR Maximum 
+    Delay parameter.
+    It returns maximum value on 32 bits for SU-EZ with 1.00.15 
+    and this means NA (Not Available)."
+   ::= { brzaccVLAUNewAdbEntry 14 }
+
+brzaccVLNewAdbAtpcOption     OBJECT-TYPE
+   SYNTAX INTEGER  {disable (1), enable (2), na (255)}
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION 
+   "Applicable to AU/BU only with SW version 5.0 and higher.  
+    The SU/RB ATPC option configuration."
+   ::= { brzaccVLAUNewAdbEntry 15 }
+
+brzaccVLNewAdbAdapModOption     OBJECT-TYPE
+   SYNTAX INTEGER  {disable (1), enable (2), na (255)}
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION 
+   "Applicable to AU/BU only with SW version 5.0 and higher.  
+    The SU/RB adaptive modulation option configuration. 
+    It is not applicable for SU-EZ."
+   ::= { brzaccVLAUNewAdbEntry 16 }
+
+brzaccVLNewAdbBurstModeOption     OBJECT-TYPE
+   SYNTAX INTEGER  {disable (1), enable (2), na (255)}
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION 
+   "Applicable to AU/BU only with SW version 5.0 and higher.  
+    The SU/RB burst mode option configuration.
+    It is not applicable for SU-EZ."
+   ::= { brzaccVLAUNewAdbEntry 17 }
+
+brzaccVLNewAdbConcatenationOption     OBJECT-TYPE
+   SYNTAX INTEGER  {disable (1), enable (2), na(255)}
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION 
+   "Applicable to AU/BU only with SW version 5.0 and higher.  
+    The SU/RB concatenation option configuration.
+    It is not applicable for SU-EZ."
+   ::= { brzaccVLAUNewAdbEntry 18 }
+
+brzaccVLNewAdbSecurityMode     OBJECT-TYPE
+   SYNTAX INTEGER  {wep(1), aes(2), fips197(3), na(255)}
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION 
+   "Applicable to AU/BU only with SW version 5.0 and higher.  
+    The SU/RB security mode configuration.
+    Not available for SU-EZ."
+   ::= { brzaccVLAUNewAdbEntry 19 }
+
+brzaccVLNewAdbAuthOption     OBJECT-TYPE
+   SYNTAX INTEGER  {openSystem (1), sharedKey (2), na (255)}
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION 
+   "Applicable to AU/BU only with SW version 5.0 and higher.  
+    The SU/RB authentication algorithm configuration.
+    Not available for SU-EZ."
+   ::= { brzaccVLAUNewAdbEntry 20 }
+
+brzaccVLNewAdbDataEncyptOption     OBJECT-TYPE
+   SYNTAX INTEGER  {disable (1), enable (2), na (255)}
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION 
+   "Applicable to AU/BU only with SW version 5.0 and higher.  
+    The SU/RB data encryption option configuration.
+    Not available for SU-EZ."
+   ::= { brzaccVLAUNewAdbEntry 21 }
+
+brzaccVLAdbWi2IPaddress	OBJECT-TYPE
+	  SYNTAX IpAddress
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   The IP address of the Wi2 Access Point.
+	   Not available for SU-EZ."
+	  ::= { brzaccVLAUNewAdbEntry 22 }
+
+brzaccVLNewAdbStatus	 OBJECT-TYPE
+	  SYNTAX INTEGER { associated       (1), 
+	                   authenticated    (2),
+	                   notAuthenticated (3) }
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   The status of the relevant SU/RB."
+	  ::= { brzaccVLAUNewAdbEntry 23 }
+
+brzaccVLNewAdbAge	OBJECT-TYPE
+	  SYNTAX INTEGER  
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   The time since any packet was received from the relevant SU/RB."
+	  ::= { brzaccVLAUNewAdbEntry 24 }
+
+brzaccVLNewAdbDistance     OBJECT-TYPE
+   SYNTAX INTEGER  {below-2-Km(1)}
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION 
+   "Applicable to AU/BU only with SW version 5.0 and higher.  
+    The distance between the SU/RB and the AU/BU (In Kilometers).
+    It is not applicable for SU-EZ and it returns 0."
+   ::= { brzaccVLAUNewAdbEntry 25 }
+
+brzaccVLNewAdbSNR	OBJECT-TYPE
+	  SYNTAX INTEGER  
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   The average Signal to Noise Ratio in dB of frames received by 
+	   the AU/BU from the relevant SU/RB."
+	  ::= { brzaccVLAUNewAdbEntry 26 }
+
+brzaccVLNewAdbMaxModulationLevel  OBJECT-TYPE
+	  SYNTAX INTEGER  { modLevel-1 (1), 
+	                    modLevel-2 (2), 
+                        modLevel-3 (3), 
+                        modLevel-4 (4), 
+                        modLevel-5 (5), 
+                        modLevel-6 (6), 
+                        modLevel-7 (7), 
+                        modLevel-8 (8),
+                        na ( 255 ) 
+                      }  
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   The value configured in the relevant SU/RB for the Maximum Modulation 
+	   Level parameter.
+	   Modulation Level 8 is not applicable for units with HW revision A.
+	   It is not applicable for SU-EZ and it returns na."
+	  ::= { brzaccVLAUNewAdbEntry 27 }
+
+brzaccVLNewAdbTxFramesTotal	OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of unicast  frames (excluding retransmissions) 
+	   that were successfully transmitted to the SU/RB over the wireless link."
+	  ::= { brzaccVLAUNewAdbEntry 28 }
+
+brzaccVLNewAdbDroppedFramesTotal  OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of frames intended to the SU/RB that 
+	   were dropped because they were retransmitted to the extent 
+	   of the maximum allowed number of retransmissions without 
+	   being acknowledged."
+	  ::= { brzaccVLAUNewAdbEntry 29 }
+
+brzaccVLNewAdbTxSuccessModLevel1	OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of unicast frames (excluding retransmissions) 
+	   that were successfully transmitted to the SU/RB over the wireless link 
+	   using modulation level 1."
+	  ::= { brzaccVLAUNewAdbEntry 30 }
+
+brzaccVLNewAdbTxSuccessModLevel2	OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of unicast frames (excluding retransmissions) 
+	   that were successfully transmitted to the SU/RB over the wireless link 
+	   using modulation level 2."
+	  ::= { brzaccVLAUNewAdbEntry 31 }
+
+brzaccVLNewAdbTxSuccessModLevel3	OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of unicast frames (excluding retransmissions) 
+	   that were successfully transmitted to the SU/BU over the wireless link 
+	   using modulation level 3."
+	  ::= { brzaccVLAUNewAdbEntry 32 }
+
+brzaccVLNewAdbTxSuccessModLevel4	OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of unicast frames (excluding retransmissions) 
+	   that were successfully transmitted to the SU/RB over the wireless link 
+	   using modulation level 4."
+	  ::= { brzaccVLAUNewAdbEntry 33 }
+
+brzaccVLNewAdbTxSuccessModLevel5	OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of unicast frames (excluding retransmissions) 
+	   that were successfully transmitted to the SU/RB over the wireless link 
+	   using modulation level 5."
+	  ::= { brzaccVLAUNewAdbEntry 34 }
+
+brzaccVLNewAdbTxSuccessModLevel6	OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of unicast frames (excluding retransmissions) 
+	   that were successfully transmitted to the SU/BU over the wireless link 
+	   using modulation level 6."
+	  ::= { brzaccVLAUNewAdbEntry 35 }
+
+brzaccVLNewAdbTxSuccessModLevel7	OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of unicast frames (excluding retransmissions) 
+	   that were successfully transmitted to the SU/RB over the wireless link 
+	   using modulation level 7."
+	  ::= { brzaccVLAUNewAdbEntry 36 }
+
+brzaccVLNewAdbTxSuccessModLevel8	OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of unicast frames (excluding retransmissions) 
+	   that were successfully transmitted to the SU/RB over the wireless link 
+	   using modulation level 8.
+	   Not applicable for units with HW revision A."
+	  ::= { brzaccVLAUNewAdbEntry 37 }
+
+brzaccVLNewAdbTxFailedModLevel1	OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of failures to successfully
+	   transmit unicast frames intended to the SU/RB using modulation level 1."
+	  ::= { brzaccVLAUNewAdbEntry 38 }
+
+brzaccVLNewAdbTxFailedModLevel2	OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of failures to successfully
+	   transmit unicast frames intended to the SU/RB using modulation level 2."
+	  ::= { brzaccVLAUNewAdbEntry 39 }
+
+brzaccVLNewAdbTxFailedModLevel3	OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of failures to successfully
+	   transmit unicast frames intended to the SU/RB using modulation level 3."
+	  ::= { brzaccVLAUNewAdbEntry 40 }
+
+brzaccVLNewAdbTxFailedModLevel4	OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of failures to successfully
+	   transmit unicast frames intended to the SU/RB using modulation level 4."
+	  ::= { brzaccVLAUNewAdbEntry 41 }
+
+brzaccVLNewAdbTxFailedModLevel5	OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of failures to successfully
+	   transmit unicast frames intended to the SU/RB using modulation level 5."
+	  ::= { brzaccVLAUNewAdbEntry 42 }
+
+brzaccVLNewAdbTxFailedModLevel6	OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of failures to successfully
+	   transmit unicast frames intended to the SU/RB using modulation level 6."
+	  ::= { brzaccVLAUNewAdbEntry 43 }
+
+brzaccVLNewAdbTxFailedModLevel7	OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of failures to successfully
+	   transmit unicast frames intended to the SU/RB using modulation level 7."
+	  ::= { brzaccVLAUNewAdbEntry 44 }
+
+brzaccVLNewAdbTxFailedModLevel8	OBJECT-TYPE
+	  SYNTAX Counter32 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Counts the total number of failures to successfully
+	   transmit unicast frames intended to the SU/RB using modulation level 8.
+	   Not applicable for units with HW revision A."
+	  ::= { brzaccVLAUNewAdbEntry 45 }
+	  
+brzaccVLNewAdbMainSwVersion	OBJECT-TYPE
+	  SYNTAX DisplayString (SIZE(0..35)) 
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Main Software Version of SU. Not available for SU-EZ."
+	  ::= { brzaccVLAUNewAdbEntry 46 }
+	  
+brzaccVLNewAdbShadowSwVersion	OBJECT-TYPE
+	  SYNTAX DisplayString (SIZE(0..35))
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   Shadow Software Version of SU. Not available for SU-EZ."
+	  ::= { brzaccVLAUNewAdbEntry 47 }
+	  
+brzaccVLNewAdbReadOnlyCommunity	OBJECT-TYPE
+	  SYNTAX DisplayString (SIZE(1..8))
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher . 
+	   SU/RB Read Only Community. Not available for SU-EZ."
+	  ::= { brzaccVLAUNewAdbEntry 48 }
+	  
+
+brzaccVLNewAdbWriteCommunity	OBJECT-TYPE
+	  SYNTAX DisplayString (SIZE(1..8))
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   SU/RB Write Community
+   	   The Community is accessible only with the Read-Write community 
+       string (administrator password).
+       If the Read-Only community of the AU/BU is used this field will 
+       contain the SU/RB read-only community.
+       Not available for SU-EZ with SW version lower than 1.1.1"
+	  ::= { brzaccVLAUNewAdbEntry 49 }
+	
+ brzaccVLNewAdbAIFS	OBJECT-TYPE
+	  SYNTAX INTEGER  
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	  The Arbitration Inter-Frame Spacing (AIFS) of relevant SU/RB.
+	  Not available for SU-EZ and it returns 0."
+	  ::= { brzaccVLAUNewAdbEntry 50 }
+	  	  
+
+ brzaccVLNewAdbMinimumCW OBJECT-TYPE
+	  SYNTAX INTEGER  
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   The Minimum Contention Window of relevant SU/RB.
+	   Not available for SU-EZ and it returns 0."
+	  ::= { brzaccVLAUNewAdbEntry 51 }
+
+ brzaccVLNewAdbMaximumCW OBJECT-TYPE
+	  SYNTAX INTEGER  
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   The Maximum Contention Window of relevant SU/RB.
+	   Not available for SU-EZ and it returns 0."
+	  ::= { brzaccVLAUNewAdbEntry 52 }
+
+brzaccVLNewAdbESSID	OBJECT-TYPE
+	  SYNTAX DisplayString (SIZE(0..31))  
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION	
+      "Applicable to AU/BU only with SW version 5.0 and higher. 
+	   The ESSID of relevant SU/RB.
+       The ESSID is accessible only with the write community 
+             string (administrator password)."
+	  ::= { brzaccVLAUNewAdbEntry 53 }
+
+brzaccVLNewAdbRSSI OBJECT-TYPE
+	SYNTAX INTEGER  
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+	 "Applicable to AU/BU only with SW version 5.1 and higher. 
+	 The average Received Signal Strength Indication of frames received by 
+	 the AU/BU from the relevant SU/RB.
+	 This value is given in dBm units."
+	::= { brzaccVLAUNewAdbEntry 54 }
+
+brzaccVLNewAdbDfsOption OBJECT-TYPE
+	SYNTAX INTEGER { disable (1), enable (2)}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+	 "Applicable to AU/BU only with SW version 5.5.21 and higher. 
+	 The DFS option configuration received by 
+	 the AU/BU from the relevant SU/RB."
+	::= { brzaccVLAUNewAdbEntry 55 }
+
+
+brzaccVLAggregateMIRCIR OBJECT IDENTIFIER ::= { brzaccVLAUMacAddressDatabase 4 }
+
+brzaccVLAggregateMIRUplink OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+	"Applicable to AU only with SW version 6.0 and higher. 
+	Aggregate MIR uplink."
+	::= { brzaccVLAggregateMIRCIR 1 }
+	
+brzaccVLAggregateMIRDownlink OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+	"Applicable to AU only with SW version 6.0 and higher. 
+	Aggregate MIR downlink."
+	::= { brzaccVLAggregateMIRCIR 2 }
+	
+brzaccVLAggregateCIRUplink OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+	"Applicable to AU only with SW version 6.0 and higher. 
+	Aggregate CIR uplink."
+	::= { brzaccVLAggregateMIRCIR 3 }
+	
+brzaccVLAggregateCIRDownlink OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION 
+	"Applicable to AU only with SW version 6.0 and higher. 
+	Aggregate CIR downlink."
+	::= { brzaccVLAggregateMIRCIR 4 }
+	
 brzaccVLUpLinkQualityIndicator  OBJECT IDENTIFIER ::= { brzaccVLSiteSurvey 6}
 
 brzaccVLMeasureUpLinkQualityIndicator	 OBJECT-TYPE
@@ -5619,6 +8645,51 @@ brzaccVLDrapGatewaysTable OBJECT-TYPE
 		"This table provides information about Gateways supporting DRAP that are
 		registered at the AU"
         ::= { brzaccVLSiteSurvey 8 }
+        
+brzaccVLHiddenESSIDTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF BrzaccVLHiddenESSIDEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+        "Applicable to SU/RB only with SW version 5.0 and higher.
+        The AU/BU units that rejected the subcribers because 
+        of worng ESSID"
+		::= {brzaccVLSiteSurvey 9}
+		
+brzaccVLHiddenESSIDEntry OBJECT-TYPE
+   SYNTAX BrzaccVLHiddenESSIDEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+          DESCRIPTION
+         "Applicable to SU/RB only with SW version 5.0 and higher. 
+          An entry in the Hidden ESSID table."
+   INDEX { brzaccVLHiddenESSIDMacAddress }
+   ::= { brzaccVLHiddenESSIDTable 1 }
+ 
+      
+BrzaccVLHiddenESSIDEntry ::= SEQUENCE {
+  brzaccVLHiddenESSIDMacAddress  MacAddress,  
+  brzaccVLHiddenESSIDAge   INTEGER
+                }
+ 
+brzaccVLHiddenESSIDMacAddress  OBJECT-TYPE
+   SYNTAX MacAddress  
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+          "The MAC Address of the staion that rejected the subscriber
+          beacuse of wrong ESSID"
+   ::= { brzaccVLHiddenESSIDEntry 1 }
+ 
+brzaccVLHiddenESSIDAge OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+          "The time (in second) passed since the corresponding AU/BU 
+          rejected the subscriber because of wrong ESSID"
+   ::= { brzaccVLHiddenESSIDEntry 2 }
+
 
 brzaccVLDrapGatewayEntry  OBJECT-TYPE
         SYNTAX BrzaccVLDrapGatewayEntry
@@ -5672,6 +8743,36 @@ brzaccVLDrapGatewayNoOfActiveVoiceCalls OBJECT-TYPE
         "The current number of active voice calls handled by the Gateway"
         ::= { brzaccVLDrapGatewayEntry 4 }
 
+brzaccVLAverageReceiveRSSI  OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to SU/RB only. 
+             The average Received Signal Strength Indication of frames.
+             This value is given in dBm units."
+            ::= { brzaccVLSiteSurvey 10 }
+
+brzaccVLCurrentNoiseFloor  OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to all units. 
+             The current Noise Floor of the unit."
+            ::= { brzaccVLSiteSurvey 11 }
+
+brzaccVLAverageSignalInterferenceRatio  OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Applicable to all units. 
+             The current Average Signal Interference Ratio of the unit."
+            ::= { brzaccVLSiteSurvey 12 }
+
+
+
 -- GATEWAY TABLE END 
 
 -- ****************************************************************************************
@@ -5714,7 +8815,7 @@ brzaccVLTrapToggle    OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-    "Applicable to all units.
+    "Applicable to AU/BU only.
      An On/Off toggle status." 
     ::= { brzaccVLTraps 4 }
 
@@ -5725,7 +8826,8 @@ brzaccVLTrapParameterChanged  OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-    "Applicable to all units.
+    "Not applicable starting with version 5.0.
+	 Applicable to all units.
      A modification to one of the parameters related to CIR/MIR,  
      IP Filtering or VLAN."
     ::= { brzaccVLTraps 5 }
@@ -5802,7 +8904,8 @@ brzaccVLDFSMoveFreqNew    OBJECT-TYPE
     "Applicable to AU/BU. 
      The new frequency in MHz after detecting radar on a previous channel. 
      (Replaces brzaccVLDFSMoveFreq to support a resolution of 0.5 MHz for 
-     units with HW revision C and higher)."
+     units with HW revision C and higher. If HW revision is B it will contain the same 
+     value as brzaccVLDFSMoveFreq, but represented as string.)."
     ::= { brzaccVLTraps 12 }
 
     
@@ -5819,7 +8922,7 @@ brzaccVLEthBroadcastThresholdExceeded    OBJECT-TYPE
 brzaccVLTrapSubscriberType    OBJECT-TYPE
     SYNTAX INTEGER{ unknownSubscriberType(0), 
                     su-3(3)  , su-6(6)  , rb-14(14), 
-                    su-24(24), rb-28(28), su-54(54), 
+                    su-24(24), rb-28(28), su-54(54), su-8(8), 
                     rb-100(100) }
     MAX-ACCESS read-only
     STATUS current
@@ -5856,6 +8959,42 @@ brzaccVLTrapSWVersion  OBJECT-TYPE
     with a station that has Wireless Link Prioritization Enabled"
     ::= { brzaccVLTraps 17 }    
             
+brzaccVLTrapSequenceNumber    OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Apllicable to AU/BU only. 
+    Trap Variable indicating the sequence number of the last trap generated."
+    ::= { brzaccVLTraps 18 }
+    
+brzaccVLTrapUnitMacAddr OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only  
+    STATUS current
+    DESCRIPTION
+    "Applicable to all units.
+    The MAC Address of the unit that is initiating the trap."
+    ::= { brzaccVLTraps 19 }
+
+brzaccVLTrapParameterGroupCode    OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Applicable to AU/BU only.
+    The code of group parameter that was changed."
+    ::= { brzaccVLTraps 20 }
+
+brzaccVLTrapNewIP    OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Applicable to AU/BU only.
+    The code of group parameter that was changed."
+    ::= { brzaccVLTraps 21 }    
+           
 --
 -- Private Traps for BreezeAccessVL
 --
@@ -5863,7 +9002,8 @@ brzaccVLTrapSWVersion  OBJECT-TYPE
 brzaccVLSUassociatedAUTRAP NOTIFICATION-TYPE
         OBJECTS
         {
-           brzaccVLTrapSUMacAddr     -- SU MAC address
+           brzaccVLTrapSUMacAddr,     -- SU MAC address
+           brzaccVLTrapSequenceNumber
         }
         STATUS current
         DESCRIPTION
@@ -5873,24 +9013,19 @@ brzaccVLSUassociatedAUTRAP NOTIFICATION-TYPE
 brzaccVLAUdisassociatedTRAP NOTIFICATION-TYPE
         OBJECTS
         {
-           brzaccVLTrapSUMacAddr      --Unit MAC address
+           brzaccVLTrapSUMacAddr,      --Unit MAC address
+           brzaccVLTrapSequenceNumber
         }
         STATUS current
         DESCRIPTION
-        "An AU/BU trap indicating that an SU/RB has been disassociated 
-         from the AU.
-         The AU/BU decides that an SU/RB has been disassociated from it and remove it
-         from the ADB after receiving from another AU/BU a SNAP frame with the SU/RB 
-         MAC address.
-         The SNAP frame indicating a network topology change where the SU/RB has 
-         associated with another AU/BU will be received if both AUs/BUs are 
-         connected to the same Ethernet backbone."
+        "An AU/BU trap indicating that an SU/RB has been disassociated from the AU/BU."
     ::= { brzAccessVLProducts 3 }
 
 brzaccVLAUagingTRAP NOTIFICATION-TYPE
         OBJECTS
         {
-     	  brzaccVLTrapSUMacAddr  	-- Unit MAC address
+     	  brzaccVLTrapSUMacAddr,  	-- Unit MAC address
+     	  brzaccVLTrapSequenceNumber
         }
         STATUS current
         DESCRIPTION
@@ -5899,16 +9034,17 @@ brzaccVLAUagingTRAP NOTIFICATION-TYPE
 	     to acknowledge a specified number of consecutive frames."
     ::= { brzAccessVLProducts 4 }
 
-brzaccVLSUassociatedTRAP NOTIFICATION-TYPE
+brzaccVLSUassociatedTRAP NOTIFICATION-TYPE		--Not available in version 5.0
         OBJECTS
         {
 --         brzaccVLLastAUMacAddress,          Old AU mac address
-           brzaccVLAssociatedAU              -- New AU mac address
+           brzaccVLAssociatedAU               -- New AU mac address
 --         brzaccVLTrapLastSNRQuality,          Average SNR with old AU
         }
         STATUS current
         DESCRIPTION
-        "An SU/RB trap indicating association with an AU/BU. 
+        "Starting with 5.0 this trap is not generated.
+         An SU/RB trap indicating association with an AU/BU. 
          In addition to the MAC address information of the AU/BU, the 
          trap also includes information on the average SNR of frames 
          received from the AU/BU."
@@ -5918,7 +9054,9 @@ brzaccVLAUwirelessQualityTRAP NOTIFICATION-TYPE
         OBJECTS
         {
           brzaccVLTrapToggle,
-          brzaccVLTrapRTx
+          brzaccVLTrapUnitMacAddr,
+          brzaccVLTrapRTx,
+          brzaccVLTrapSequenceNumber
         }
         STATUS current
         DESCRIPTION
@@ -5931,7 +9069,8 @@ brzaccVLAUwirelessQualityTRAP NOTIFICATION-TYPE
 brzaccVLPowerUpFromReset NOTIFICATION-TYPE
         OBJECTS
         {
-           brzaccVLUnitMacAddress    -- Unit MAC address
+           brzaccVLUnitMacAddress,    -- Unit MAC address
+           brzaccVLTrapSequenceNumber
         }
         STATUS current
         DESCRIPTION
@@ -5942,8 +9081,10 @@ brzaccVLTelnetStatusTRAP NOTIFICATION-TYPE
         OBJECTS
         {
           brzaccVLTrapLog,
+          brzaccVLTrapTelnetUserIpAddress,
           brzaccVLTrapAccessRights,
-          brzaccVLTrapTelnetUserIpAddress
+          brzaccVLTrapUnitMacAddr,
+          brzaccVLTrapSequenceNumber
         }
         STATUS current
         DESCRIPTION
@@ -5956,11 +9097,14 @@ brzaccVLTelnetStatusTRAP NOTIFICATION-TYPE
 brzaccVLParameterChangedTRAP NOTIFICATION-TYPE
         OBJECTS
         {
-           brzaccVLTrapParameterChanged
+           brzaccVLTrapParameterChanged,
+           brzaccVLTrapSequenceNumber
         }
         STATUS current
         DESCRIPTION
-        "Applicable to all units. A trap indicating a change in a CIR/MIR, IP Filter 
+        "Starting with version 5.0, this trap is not generated.
+         It is replaced by brzaccVLParameterChangeTRAP.
+         Applicable to all units. A trap indicating a change in a CIR/MIR, IP Filter 
          or VLAN parameter."
     ::= { brzAccessVLProducts 103 }
 
@@ -5968,12 +9112,13 @@ brzaccVLLoadingStatusTRAP NOTIFICATION-TYPE
         OBJECTS
         {
           brzaccVLTrapFtpOrTftpStatus,
-		  brzaccVLUnitMacAddress
+		  brzaccVLUnitMacAddress,
+		  brzaccVLTrapSequenceNumber
         }
         STATUS current
         DESCRIPTION
         "Applicable to all units.
-         A trap indicating that last FTP/TFTP loading process has been 
+         A trap indicating that last FTP/TFTP firmware loading process has been 
          finished successfully or failed. "
     ::= { brzAccessVLProducts 104 }
 
@@ -5981,7 +9126,8 @@ brzaccVLPromiscuousModeTRAP NOTIFICATION-TYPE
         OBJECTS
         {
           brzaccVLTrapToggle,
-		  brzaccVLUnitMacAddress
+		  brzaccVLUnitMacAddress,
+		  brzaccVLTrapSequenceNumber
         }
         STATUS current
         DESCRIPTION
@@ -5989,18 +9135,23 @@ brzaccVLPromiscuousModeTRAP NOTIFICATION-TYPE
          out (Off) Promiscuous Mode." 
     ::= { brzAccessVLProducts 105 }
 
-brzaccVLDFSRadarDetecetedTRAP NOTIFICATION-TYPE
+brzaccVLDFSRadarDetectedTRAP NOTIFICATION-TYPE
+        OBJECTS
+        {
+          brzaccVLTrapSequenceNumber
+        }
         STATUS current
         DESCRIPTION
         "DFS: Applicable to AU/BU only.
          A trap indicating that a radar was detected. "
     ::= { brzAccessVLProducts 106 }
 
-brzaccVLDFSFrequcnyTRAP NOTIFICATION-TYPE
+brzaccVLDFSFrequencyTRAP NOTIFICATION-TYPE
         OBJECTS
         {
           brzaccVLDFSMoveFreq, 
-          brzaccVLDFSMoveFreqNew        
+          brzaccVLDFSMoveFreqNew,
+          brzaccVLTrapSequenceNumber
         }
         STATUS current
         DESCRIPTION
@@ -6009,6 +9160,10 @@ brzaccVLDFSFrequcnyTRAP NOTIFICATION-TYPE
     ::= { brzAccessVLProducts 107 }
 
 brzaccVLDFSNoFreeChannelsExistsTRAP NOTIFICATION-TYPE
+        OBJECTS
+        {
+          brzaccVLTrapSequenceNumber
+        }
         STATUS current
         DESCRIPTION
         "Applicable to AU/BU only.
@@ -6016,14 +9171,16 @@ brzaccVLDFSNoFreeChannelsExistsTRAP NOTIFICATION-TYPE
          free channel. "
     ::= { brzAccessVLProducts 108 }
 
-brzaccVLEthBroadcastMulticatLimiterTRAP NOTIFICATION-TYPE
+brzaccVLEthBroadcastMulticastLimiterTRAP NOTIFICATION-TYPE
         OBJECTS
         {
-			brzaccVLEthBroadcastThresholdExceeded
+			brzaccVLEthBroadcastThresholdExceeded,
+			brzaccVLTrapUnitMacAddr,
+			brzaccVLTrapSequenceNumber
 		}
         STATUS current
         DESCRIPTION
-		"Applicable to all units. The trap is send if the 
+		"Applicable to all units. The trap is sent if the 
 		ethernet broadcast filter threshold is exceeded
 		and it contains the number of dropped packets."
     ::= { brzAccessVLProducts 109 }
@@ -6032,13 +9189,15 @@ brzaccVLAUSUnsupportedSubscriberTypeTRAP NOTIFICATION-TYPE
         OBJECTS
         {
 			brzaccVLTrapSUMacAddr,
-			brzaccVLTrapSubscriberType
+			brzaccVLTrapSubscriberType,
+			brzaccVLTrapSequenceNumber
 		}
         STATUS current
         DESCRIPTION
 		"Applicable to AUS only.
 		This trap is generated when a subscriber with unsupported type tries to associate to AUS.
-		The AUS supports only SU-3 and SU-6.
+        The AUS supports only SU-3, SU-6, SU-V. If licensed, SU-54 is supported too.
+        For 900 MHz band, AUS supports only SU-3. If licensed, SU-8 is supported too.
 		The first variable of the trap is the subscriber MAC Address.
 		The second variable is the type of subscriber"
     ::= { brzAccessVLProducts 110 }
@@ -6048,12 +9207,13 @@ brzaccVLUnitTypeChangedTRAP NOTIFICATION-TYPE
         OBJECTS
         {
 			brzaccVLTrapMACAddress,
-			brzaccVLNewUnitTypeTrap
+			brzaccVLNewUnitTypeTrap,
+			brzaccVLTrapSequenceNumber
 		}
         STATUS current
         DESCRIPTION
 		"Applicable to BU/RB only.
-		This trap is generated when the user change the type of the BreezeNET B unit.
+		This trap is generated when the user changes the type of the BreezeNET B unit.
 		The RB can be converted in BU or vice versa.
 		The first variable of the trap is the unit MAC Address.
 		The second variable is the new type of the unit"
@@ -6063,7 +9223,8 @@ brzaccVLWLPrioritizationNotSupportedBySUTRAP NOTIFICATION-TYPE
         OBJECTS
         {
 			brzaccVLTrapSUMacAddr,
-			brzaccVLTrapSWVersion
+			brzaccVLTrapSWVersion,
+			brzaccVLTrapSequenceNumber
 		}
         STATUS current
         DESCRIPTION
@@ -6074,4 +9235,60 @@ brzaccVLWLPrioritizationNotSupportedBySUTRAP NOTIFICATION-TYPE
 		 The first variable of the trap is the SU/RB MAC Address.
 		 The second variable is the SW version of the SU/RB"
     ::= { brzAccessVLProducts 112 }
+
+brzaccVLParameterChangeTRAP NOTIFICATION-TYPE
+        OBJECTS
+        {
+			brzaccVLTrapUnitMacAddr,
+			brzaccVLTrapParameterGroupCode,
+			brzaccVLTrapSequenceNumber
+		}
+        STATUS current
+        DESCRIPTION
+		"Applicable to AU/BU only with SW version 5.0 or higher.
+		This trap is generated by AU/BU when a parameter from a group
+		was changed. Also, if an SU/RB parameter is changed and if the 
+		parameter is in ADB the Au/BU will generate the trap for that SU/RB.
+		brzaccVLTrapSequenceNumber	  - trap sequence number
+		brzaccVLTrapUnitMacAddr		  - MAC Address of the AU/BU if the parametr 
+									    was changed in AU/BU
+									  - MAC Address of the SU/RB if the parameter 
+									    was changed in SU/RB
+		brzaccVLTrapParameterGroupCode- Code of Parameter Group  
+		"
+    ::= { brzAccessVLProducts 113 } 
+
+brzaccVLRunTimeIPChangeTRAP NOTIFICATION-TYPE
+        OBJECTS
+        {
+			brzaccVLTrapUnitMacAddr,
+			brzaccVLTrapNewIP,
+			brzaccVLTrapSequenceNumber
+		}
+        STATUS current
+        DESCRIPTION
+		"Applicable to AU/BU only with SW version 5.0 or higher.
+		This trap is generated by AU/BU when the running IP of the unit was changed. 
+		Also, if the running IP of an associated SU/RB is changed this trap will
+		be genarated by AU/BU.
+		brzaccVLTrapSequenceNumber	  - trap sequence number
+		brzaccVLTrapUnitMacAddr		  - MAC Address of the AU/BU if the running IP
+		                                was changed in AU/BU
+									  - MAC Address of the SU/RB if the running IP 
+									    was changed in SU/RB
+		brzaccVLTrapNewIP			  - New IP of the unit.
+		"
+    ::= { brzAccessVLProducts 114 } 
+    
+brzaccVLDisassociateAllStationsTRAP NOTIFICATION-TYPE
+        OBJECTS
+        {
+          brzaccVLTrapSequenceNumber
+        }
+        STATUS current
+        DESCRIPTION
+        "Applicable to AU/BU only.
+         A trap indicating that all stations were disassociated. "
+    ::= { brzAccessVLProducts 115 }
+    
 END

@@ -21,7 +21,6 @@ use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
-use LibreNMS\Util\Url;
 
 class Grafana extends Transport
 {
@@ -44,7 +43,7 @@ class Grafana extends Transport
             'alert_uid' => $alert_data['id'],
             'title' => $alert_data['title'] ?? null,
             'image_url' => route('graph', $graph_args),
-            'link_to_upstream_details' => Url::deviceUrl($device),
+            'link_to_upstream_details' => route('device.overview', ['device' => $device]),
             'state' => ($alert_data['state'] == AlertState::ACTIVE) ? 'alerting' : 'ok',
             'raw_state' => $alert_data['state'],
             'device_id' => $alert_data['device_id'],

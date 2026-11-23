@@ -14,10 +14,28 @@ IMPORTS
 ;
 
 viptela-traps MODULE-IDENTITY
-    LAST-UPDATED "202007010000Z"
+    LAST-UPDATED "202307010000Z"
     ORGANIZATION "Viptela, Inc."
     CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
     DESCRIPTION "This module defines the data model for VPN operational data"
+    REVISION "202307010000Z"
+    DESCRIPTION "Viptela Revision 20.12"
+    REVISION "202303010000Z"
+    DESCRIPTION "Viptela Revision 20.11"
+    REVISION "202212150000Z"
+    DESCRIPTION "Viptela Revision 20.10"
+    REVISION "202206010000Z"
+    DESCRIPTION "Viptela Revision 20.9"
+    REVISION "202203010000Z"
+    DESCRIPTION "Viptela Revision 20.8"
+    REVISION "202111010000Z"
+    DESCRIPTION "Viptela Revision 20.7"
+    REVISION "202107010000Z"
+    DESCRIPTION "Viptela Revision 20.6"
+    REVISION "202103010000Z"
+    DESCRIPTION "Viptela Revision 20.5"
+    REVISION "202011010000Z"
+    DESCRIPTION "Viptela Revision 20.4"
     REVISION "202007010000Z"
     DESCRIPTION "Viptela Revision 20.3"
     REVISION "202002240000Z"
@@ -308,6 +326,16 @@ WwanQosStatusEnum ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION ""
     SYNTAX      INTEGER {activated(1),modified(2),deleted(3),suspended(4),enabled(5),disabled(6)}
+
+CertificateTypeEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Certificate Type"
+    SYNTAX      INTEGER {web-server(1),enterprise(2),vmanage(3)}
+
+SfpDiagStateEnum ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "SFP Diagnostic Alarm State"
+    SYNTAX      INTEGER {no-alarm(0),warn-low(1),alarm-low(2),warn-high(3),alarm-high(4)}
 
 -- Notification field definitions
 eventTime OBJECT-TYPE
@@ -1618,7 +1646,112 @@ viptelaSecuritySubjectSerialNumber OBJECT-TYPE
     STATUS      current
     DESCRIPTION ""
     ::= { fields 187 }
+
+viptelaAppRouteAppProbePfrStats OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fields 188 }
+
+viptelaPolicySlaAppProbeClass OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fields 189 }
+
+viptelaSystemCpuUserPercentage OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fields 190 }
+
+viptelaSystemCpuSystemPercentage OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fields 191 }
+
+viptelaSystemCpuIdlePercentage OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fields 192 }
+
+viptelaSecurityCertificateType OBJECT-TYPE
+    SYNTAX      CertificateTypeEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fields 193 }
+
+viptelaSecurityIssuer OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fields 194 }
+
+viptelaSecurityDaysToExpiry OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fields 195 }
     
+viptelaSecurityCertificateSerialNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fields 196 }
+
+viptelaPolicyAppAlias OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fields 197 }
+
+viptelaPolicyUnsupportedApp OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fields 198 }
+
+viptelaPolicyAppListName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fields 199 }
+
+viptelaHardwareSfpDiagName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fields 200 }
+
+viptelaHardwareSfpDiagState OBJECT-TYPE
+    SYNTAX      SfpDiagStateEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fields 201 }
+
+viptelaHardwareSfpDiagStateDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { fields 202 }
+
 -- Notification definitions
 viptelaActionsSystemSoftwareInstallStatus NOTIFICATION-TYPE
 	OBJECTS {
@@ -1629,7 +1762,7 @@ viptelaActionsSystemSoftwareInstallStatus NOTIFICATION-TYPE
 		viptelaActionsMessage
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-actions"
+	DESCRIPTION "Status of system software install"
 	::= { traps 1 }
 
 viptelaActionsSystemRebootIssued NOTIFICATION-TYPE
@@ -1639,7 +1772,7 @@ viptelaActionsSystemRebootIssued NOTIFICATION-TYPE
                 viptelaActionsRebootReason
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-actions"
+	DESCRIPTION "Issued a system reboot"
 	::= { traps 2 }
 
 viptelaActionsSystemRebootComplete NOTIFICATION-TYPE
@@ -1648,7 +1781,7 @@ viptelaActionsSystemRebootComplete NOTIFICATION-TYPE
 		netconfNotificationSeverity
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-actions"
+	DESCRIPTION "System reboot completed"
 	::= { traps 3 }
 
 viptelaBfdBfdStateChange NOTIFICATION-TYPE
@@ -1669,7 +1802,7 @@ viptelaBfdBfdStateChange NOTIFICATION-TYPE
         viptelaBfdFlapReason
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-bfd"
+	DESCRIPTION "Bfd state has changed"
 	::= { traps 4 }
 
 viptelaHardwareFlashFault NOTIFICATION-TYPE
@@ -1679,7 +1812,7 @@ viptelaHardwareFlashFault NOTIFICATION-TYPE
 		viptelaHardwareNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-hardware"
+	DESCRIPTION "Flash fault"
 	::= { traps 5 }
 
 viptelaHardwareEmmcFault NOTIFICATION-TYPE
@@ -1689,7 +1822,7 @@ viptelaHardwareEmmcFault NOTIFICATION-TYPE
 		viptelaHardwareNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-hardware"
+	DESCRIPTION "Emmc fault"
 	::= { traps 6 }
 
 viptelaHardwareSdcardFault NOTIFICATION-TYPE
@@ -1699,7 +1832,7 @@ viptelaHardwareSdcardFault NOTIFICATION-TYPE
 		viptelaHardwareNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-hardware"
+	DESCRIPTION "Sdcard fault"
 	::= { traps 7 }
 
 viptelaHardwareTempsensorFault NOTIFICATION-TYPE
@@ -1712,7 +1845,7 @@ viptelaHardwareTempsensorFault NOTIFICATION-TYPE
 		viptelaHardwareNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-hardware"
+	DESCRIPTION "Tempsensor fault"
 	::= { traps 8 }
 
 viptelaHardwareTempsensorState NOTIFICATION-TYPE
@@ -1726,7 +1859,7 @@ viptelaHardwareTempsensorState NOTIFICATION-TYPE
 		viptelaHardwareSensorNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-hardware"
+	DESCRIPTION "Tempsensor state"
 	::= { traps 9 }
 
 viptelaHardwareFanFault NOTIFICATION-TYPE
@@ -1738,7 +1871,7 @@ viptelaHardwareFanFault NOTIFICATION-TYPE
 		viptelaHardwareNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-hardware"
+	DESCRIPTION "Fan fault"
 	::= { traps 10 }
 
 viptelaHardwareFantrayFault NOTIFICATION-TYPE
@@ -1749,7 +1882,7 @@ viptelaHardwareFantrayFault NOTIFICATION-TYPE
 		viptelaHardwareNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-hardware"
+	DESCRIPTION "Fantray fault"
 	::= { traps 11 }
 
 viptelaHardwarePemFault NOTIFICATION-TYPE
@@ -1760,7 +1893,7 @@ viptelaHardwarePemFault NOTIFICATION-TYPE
 		viptelaHardwareNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-hardware"
+	DESCRIPTION "Pem fault"
 	::= { traps 12 }
 
 viptelaHardwarePemStateChange NOTIFICATION-TYPE
@@ -1771,7 +1904,7 @@ viptelaHardwarePemStateChange NOTIFICATION-TYPE
 		viptelaHardwareNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-hardware"
+	DESCRIPTION "Pem state change"
 	::= { traps 13 }
 
 viptelaHardwarePimFault NOTIFICATION-TYPE
@@ -1782,7 +1915,7 @@ viptelaHardwarePimFault NOTIFICATION-TYPE
 		viptelaHardwareNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-hardware"
+	DESCRIPTION "Pim fault"
 	::= { traps 14 }
 
 viptelaHardwarePimStateChange NOTIFICATION-TYPE
@@ -1793,7 +1926,7 @@ viptelaHardwarePimStateChange NOTIFICATION-TYPE
 		viptelaHardwareNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-hardware"
+	DESCRIPTION "Pim state change"
 	::= { traps 15 }
 
 viptelaHardwareSfpStateChange NOTIFICATION-TYPE
@@ -1804,7 +1937,7 @@ viptelaHardwareSfpStateChange NOTIFICATION-TYPE
 		viptelaHardwareNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-hardware"
+	DESCRIPTION "Sfp state change"
 	::= { traps 16 }
 
 viptelaHardwareUsbStateChange NOTIFICATION-TYPE
@@ -1815,7 +1948,7 @@ viptelaHardwareUsbStateChange NOTIFICATION-TYPE
 		viptelaHardwareNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-hardware"
+	DESCRIPTION "Usb state change"
 	::= { traps 17 }
 
 viptelaOmpOmpNumberOfVsmartsChange NOTIFICATION-TYPE
@@ -1825,7 +1958,7 @@ viptelaOmpOmpNumberOfVsmartsChange NOTIFICATION-TYPE
 		viptelaOmpNumberOfVsmarts
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-omp"
+	DESCRIPTION "The number of vsmarts changed"
 	::= { traps 18 }
 
 viptelaOmpOmpStateChange NOTIFICATION-TYPE
@@ -1835,7 +1968,7 @@ viptelaOmpOmpStateChange NOTIFICATION-TYPE
 		viptelaOmpNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-omp"
+	DESCRIPTION "Omp state changed"
 	::= { traps 19 }
 
 viptelaOmpOmpPeerStateChange NOTIFICATION-TYPE
@@ -1846,7 +1979,7 @@ viptelaOmpOmpPeerStateChange NOTIFICATION-TYPE
 		viptelaOmpPeerNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-omp"
+	DESCRIPTION "Omp peer state changed"
 	::= { traps 20 }
 
 viptelaOmpOmpTlocStateChange NOTIFICATION-TYPE
@@ -1856,7 +1989,7 @@ viptelaOmpOmpTlocStateChange NOTIFICATION-TYPE
 		viptelaOmpOmpAddressFamily
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-omp"
+	DESCRIPTION "Omp tloc state changed"
 	::= { traps 21 }
 
 viptelaOmpOmpPolicy NOTIFICATION-TYPE
@@ -1867,7 +2000,7 @@ viptelaOmpOmpPolicy NOTIFICATION-TYPE
 		viptelaOmpVsmartPeer
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-omp"
+	DESCRIPTION "Omp policy"
 	::= { traps 22 }
 
 viptelaSecurityControlConnectionStateChange NOTIFICATION-TYPE
@@ -1886,7 +2019,7 @@ viptelaSecurityControlConnectionStateChange NOTIFICATION-TYPE
 		viptelaSecurityNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Control connections state changed"
 	::= { traps 23 }
 
 viptelaSecurityControlConnectionAuthFail NOTIFICATION-TYPE
@@ -1901,7 +2034,7 @@ viptelaSecurityControlConnectionAuthFail NOTIFICATION-TYPE
 		viptelaSecurityReason
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Control connection authentication failed"
 	::= { traps 24 }
 
 viptelaSecurityControlVbondStateChange NOTIFICATION-TYPE
@@ -1912,7 +2045,7 @@ viptelaSecurityControlVbondStateChange NOTIFICATION-TYPE
 		viptelaSecurityNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Control vbond state changed"
 	::= { traps 25 }
 
 viptelaSecurityControlConnectionTlocIpChange NOTIFICATION-TYPE
@@ -1926,7 +2059,7 @@ viptelaSecurityControlConnectionTlocIpChange NOTIFICATION-TYPE
 		viptelaSecurityNewPublicPort
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Control connection tloc ip changed"
 	::= { traps 26 }
 
 viptelaSecurityControlNoActiveVsmart NOTIFICATION-TYPE
@@ -1936,7 +2069,7 @@ viptelaSecurityControlNoActiveVsmart NOTIFICATION-TYPE
 		viptelaSecurityPersonality
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "No active vsmart in control"
 	::= { traps 27 }
 
 viptelaSecurityControlNoActiveVbond NOTIFICATION-TYPE
@@ -1946,7 +2079,7 @@ viptelaSecurityControlNoActiveVbond NOTIFICATION-TYPE
 		viptelaSecurityPersonality
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "No active vbond in control"
 	::= { traps 28 }
 
 viptelaSecurityTunnelIpsecRekey NOTIFICATION-TYPE
@@ -1957,7 +2090,7 @@ viptelaSecurityTunnelIpsecRekey NOTIFICATION-TYPE
 		viptelaSecurityColor
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Tunnel ipsec rekey"
 	::= { traps 29 }
 
 viptelaSecurityTunnelIpsecManualRekey NOTIFICATION-TYPE
@@ -1968,7 +2101,7 @@ viptelaSecurityTunnelIpsecManualRekey NOTIFICATION-TYPE
 		viptelaSecurityColor
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Tunnel ipsec manual rekey"
 	::= { traps 30 }
 
 viptelaSecuritySecurityRootCertChainInstalled NOTIFICATION-TYPE
@@ -1977,7 +2110,7 @@ viptelaSecuritySecurityRootCertChainInstalled NOTIFICATION-TYPE
 		netconfNotificationSeverity
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Security root cert chain was installed"
 	::= { traps 31 }
 
 viptelaSecuritySecurityCertificateInstalled NOTIFICATION-TYPE
@@ -1986,7 +2119,7 @@ viptelaSecuritySecurityCertificateInstalled NOTIFICATION-TYPE
 		netconfNotificationSeverity
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Security certificate was installed"
 	::= { traps 32 }
 
 viptelaSecuritySecurityNewCsrGenerated NOTIFICATION-TYPE
@@ -1995,7 +2128,7 @@ viptelaSecuritySecurityNewCsrGenerated NOTIFICATION-TYPE
 		netconfNotificationSeverity
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Security csr was generated"
 	::= { traps 33 }
 
 viptelaSecuritySecurityRootCertChainUninstalled NOTIFICATION-TYPE
@@ -2004,7 +2137,7 @@ viptelaSecuritySecurityRootCertChainUninstalled NOTIFICATION-TYPE
 		netconfNotificationSeverity
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Security root cert chain was uninstalled"
 	::= { traps 34 }
 
 viptelaSecuritySecurityClearInstalledCertificate NOTIFICATION-TYPE
@@ -2013,7 +2146,7 @@ viptelaSecuritySecurityClearInstalledCertificate NOTIFICATION-TYPE
 		netconfNotificationSeverity
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Security clear installed certificate"
 	::= { traps 35 }
 
 viptelaSecuritySecurityVedgeSerialFileUploaded NOTIFICATION-TYPE
@@ -2022,7 +2155,7 @@ viptelaSecuritySecurityVedgeSerialFileUploaded NOTIFICATION-TYPE
 		netconfNotificationSeverity
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Security vedge serial file was uploaded"
 	::= { traps 36 }
 
 viptelaSecuritySecurityVsmartSerialFileUploaded NOTIFICATION-TYPE
@@ -2031,7 +2164,7 @@ viptelaSecuritySecurityVsmartSerialFileUploaded NOTIFICATION-TYPE
 		netconfNotificationSeverity
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Security vsmart serial file was uploaded"
 	::= { traps 37 }
 
 viptelaSecuritySecurityVedgeEntryAdded NOTIFICATION-TYPE
@@ -2042,7 +2175,7 @@ viptelaSecuritySecurityVedgeEntryAdded NOTIFICATION-TYPE
 		viptelaSecuritySerial
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Security vedge entry was added"
 	::= { traps 38 }
 
 viptelaSecuritySecurityVedgeEntryRemoved NOTIFICATION-TYPE
@@ -2052,7 +2185,7 @@ viptelaSecuritySecurityVedgeEntryRemoved NOTIFICATION-TYPE
 		viptelaSecurityUuid
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Security vedge entry was removed"
 	::= { traps 39 }
 
 viptelaSecuritySecurityVsmartEntryAdded NOTIFICATION-TYPE
@@ -2062,7 +2195,7 @@ viptelaSecuritySecurityVsmartEntryAdded NOTIFICATION-TYPE
 		viptelaSecuritySerial
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Security vsmart entry was added"
 	::= { traps 40 }
 
 viptelaSecuritySecurityVsmartEntryRemoved NOTIFICATION-TYPE
@@ -2072,7 +2205,7 @@ viptelaSecuritySecurityVsmartEntryRemoved NOTIFICATION-TYPE
 		viptelaSecuritySerial
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Security vsmart entry was removed"
 	::= { traps 41 }
 
 viptelaSystemProcessRestart NOTIFICATION-TYPE
@@ -2084,7 +2217,7 @@ viptelaSystemProcessRestart NOTIFICATION-TYPE
 		viptelaSystemReason
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-system"
+	DESCRIPTION "Process restart"
 	::= { traps 42 }
 
 viptelaSystemDiskUsage NOTIFICATION-TYPE
@@ -2096,7 +2229,7 @@ viptelaSystemDiskUsage NOTIFICATION-TYPE
 		viptelaSystemFreeMb
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-system"
+	DESCRIPTION "Disk usage"
 	::= { traps 43 }
 
 viptelaSystemMemoryUsage NOTIFICATION-TYPE
@@ -2108,7 +2241,7 @@ viptelaSystemMemoryUsage NOTIFICATION-TYPE
 		viptelaSystemFreeMb
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-system"
+	DESCRIPTION "Memory usage"
 	::= { traps 44 }
 
 viptelaSystemAaaAdminPwdChange NOTIFICATION-TYPE
@@ -2117,7 +2250,7 @@ viptelaSystemAaaAdminPwdChange NOTIFICATION-TYPE
 		netconfNotificationSeverity
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-system"
+	DESCRIPTION "AAA admin password has changed"
 	::= { traps 45 }
 
 viptelaSystemSiteIdChange NOTIFICATION-TYPE
@@ -2128,7 +2261,7 @@ viptelaSystemSiteIdChange NOTIFICATION-TYPE
 		viptelaSystemNewSiteId
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-system"
+	DESCRIPTION "Site id has changed"
 	::= { traps 46 }
 
 viptelaSystemDomainIdChange NOTIFICATION-TYPE
@@ -2139,7 +2272,7 @@ viptelaSystemDomainIdChange NOTIFICATION-TYPE
 		viptelaSystemNewDomainId
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-system"
+	DESCRIPTION "Domain id has changed"
 	::= { traps 47 }
 
 viptelaSystemSystemIpChange NOTIFICATION-TYPE
@@ -2150,7 +2283,7 @@ viptelaSystemSystemIpChange NOTIFICATION-TYPE
 		viptelaSystemNewSystemIp
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-system"
+	DESCRIPTION "System ip has changed"
 	::= { traps 48 }
 
 viptelaSystemOrgNameChange NOTIFICATION-TYPE
@@ -2161,7 +2294,7 @@ viptelaSystemOrgNameChange NOTIFICATION-TYPE
 		viptelaSystemNewOrganizationName
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-system"
+	DESCRIPTION "System organization name has changed"
 	::= { traps 49 }
 
 viptelaSystemSystemLoginChange NOTIFICATION-TYPE
@@ -2172,7 +2305,7 @@ viptelaSystemSystemLoginChange NOTIFICATION-TYPE
 		viptelaSystemUserId
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-system"
+	DESCRIPTION "System login has changed"
 	::= { traps 50 }
 
 viptelaSystemSystemLogoutChange NOTIFICATION-TYPE
@@ -2183,7 +2316,7 @@ viptelaSystemSystemLogoutChange NOTIFICATION-TYPE
 		viptelaSystemUserId
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-system"
+	DESCRIPTION "System logout has changed"
 	::= { traps 51 }
 
 viptelaSystemSystemAaaLoginFail NOTIFICATION-TYPE
@@ -2194,7 +2327,7 @@ viptelaSystemSystemAaaLoginFail NOTIFICATION-TYPE
 		viptelaSystemRemoteHost
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-system"
+	DESCRIPTION "System aaa login has Failed"
 	::= { traps 52 }
 
 viptelaSystemSystemCommit NOTIFICATION-TYPE
@@ -2204,7 +2337,7 @@ viptelaSystemSystemCommit NOTIFICATION-TYPE
 		viptelaSystemUserName
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-system"
+	DESCRIPTION "System commit"
 	::= { traps 53 }
 
 viptelaVpnBgpPeerStateChange NOTIFICATION-TYPE
@@ -2219,7 +2352,7 @@ viptelaVpnBgpPeerStateChange NOTIFICATION-TYPE
 		viptelaVpnPeerRouterid
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Bgp peer state has changed"
 	::= { traps 54 }
 
 viptelaVpnInterfaceStateChange NOTIFICATION-TYPE
@@ -2231,7 +2364,7 @@ viptelaVpnInterfaceStateChange NOTIFICATION-TYPE
 		viptelaVpnNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Interface state has changed"
 	::= { traps 55 }
 
 viptelaVpnVrrpGroupStateChange NOTIFICATION-TYPE
@@ -2244,7 +2377,7 @@ viptelaVpnVrrpGroupStateChange NOTIFICATION-TYPE
         viptelaVpnVrrpGroupState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Vrrp group state has changed"
 	::= { traps 56 }
 
 viptelaVpnRouteInstallFail NOTIFICATION-TYPE
@@ -2255,7 +2388,7 @@ viptelaVpnRouteInstallFail NOTIFICATION-TYPE
 		viptelaVpnFailureReason
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Route install has failed"
 	::= { traps 57 }
 
 viptelaVpnTunnelInstallFail NOTIFICATION-TYPE
@@ -2267,7 +2400,7 @@ viptelaVpnTunnelInstallFail NOTIFICATION-TYPE
 		viptelaVpnFailureReason
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Tunnel install has failed"
 	::= { traps 58 }
 
 viptelaVpnDhcpAddressAssigned NOTIFICATION-TYPE
@@ -2280,7 +2413,7 @@ viptelaVpnDhcpAddressAssigned NOTIFICATION-TYPE
 		viptelaVpnIp
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Dhcp address was assigned"
 	::= { traps 59 }
 
 viptelaVpnDhcpAddressRenewed NOTIFICATION-TYPE
@@ -2293,7 +2426,7 @@ viptelaVpnDhcpAddressRenewed NOTIFICATION-TYPE
 		viptelaVpnIp
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Dhcp address was renewed"
 	::= { traps 60 }
 
 viptelaVpnDhcpAddressReleased NOTIFICATION-TYPE
@@ -2307,7 +2440,7 @@ viptelaVpnDhcpAddressReleased NOTIFICATION-TYPE
 		viptelaVpnReason
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Dhcp address was released"
 	::= { traps 61 }
 
 viptelaVpnDhcpRequestRejected NOTIFICATION-TYPE
@@ -2321,7 +2454,7 @@ viptelaVpnDhcpRequestRejected NOTIFICATION-TYPE
 		viptelaVpnReason
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Dhcp request was rejected"
 	::= { traps 62 }
 
 viptelaVpnDhcpServerStateChange NOTIFICATION-TYPE
@@ -2333,7 +2466,7 @@ viptelaVpnDhcpServerStateChange NOTIFICATION-TYPE
 		viptelaVpnState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Dhcp server state has changed"
 	::= { traps 63 }
 
 viptelaVpnPimNeighborStateChange NOTIFICATION-TYPE
@@ -2345,7 +2478,7 @@ viptelaVpnPimNeighborStateChange NOTIFICATION-TYPE
 		viptelaVpnPimNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Pim neighbor state has changed"
 	::= { traps 64 }
 
 viptelaVpnPimInterfaceStateChange NOTIFICATION-TYPE
@@ -2359,7 +2492,7 @@ viptelaVpnPimInterfaceStateChange NOTIFICATION-TYPE
         viptelaVpnPimEnabled
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Pim interface state has changed"
 	::= { traps 65 }
 
 viptelaVpnPimTunnelStateChange NOTIFICATION-TYPE
@@ -2370,7 +2503,7 @@ viptelaVpnPimTunnelStateChange NOTIFICATION-TYPE
 		viptelaVpnPimNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Pim tunnel state has changed"
 	::= { traps 66 }
 
 viptelaVpnOspfNeighborStateChange NOTIFICATION-TYPE
@@ -2384,7 +2517,7 @@ viptelaVpnOspfNeighborStateChange NOTIFICATION-TYPE
 		viptelaVpnOspfNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Ospf neighbor state has changed"
 	::= { traps 67 }
 
 viptelaVpnOspfInterfaceStateChange NOTIFICATION-TYPE
@@ -2396,7 +2529,7 @@ viptelaVpnOspfInterfaceStateChange NOTIFICATION-TYPE
 		viptelaVpnOspfInterfaceNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Ospf interface state has changed"
 	::= { traps 68 }
 
 viptelaSystemPseudoCommitStatus NOTIFICATION-TYPE
@@ -2406,7 +2539,7 @@ viptelaSystemPseudoCommitStatus NOTIFICATION-TYPE
 		viptelaSystemStatusStr
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-system"
+	DESCRIPTION "Pseudo commit status"
 	::= { traps 69 }
 
 viptelaAppRouteSlaChange NOTIFICATION-TYPE
@@ -2422,14 +2555,12 @@ viptelaAppRouteSlaChange NOTIFICATION-TYPE
         viptelaAppRouteLocalColor,
         viptelaAppRouteRemoteSystemIp,
         viptelaAppRouteRemoteColor,
-        viptelaAppRouteMeanLoss,
-        viptelaAppRouteMeanLatency,
-        viptelaAppRouteMeanJitter,
+        viptelaAppRouteAppProbePfrStats,
         viptelaAppRouteSlaClasses,
         viptelaAppRouteOldSlaClasses
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-app-route"
+    DESCRIPTION "Sla change"
     ::= { traps 70 }
 
 viptelaSecuritySecurityCertificateExpired NOTIFICATION-TYPE
@@ -2438,7 +2569,7 @@ viptelaSecuritySecurityCertificateExpired NOTIFICATION-TYPE
 		netconfNotificationSeverity
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Security certificate has expired"
 	::= { traps 71 }
 
 viptelaVpnFibStateChange NOTIFICATION-TYPE
@@ -2450,7 +2581,7 @@ viptelaVpnFibStateChange NOTIFICATION-TYPE
 		viptelaVpnFibLastUpdateTime
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Fib state has changed"
 	::= { traps 72 }
 
 viptelaBridgeCreation NOTIFICATION-TYPE
@@ -2460,7 +2591,7 @@ viptelaBridgeCreation NOTIFICATION-TYPE
 		viptelaBridgeId
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-bridge"
+	DESCRIPTION "Bridge creation"
 	::= { traps 73 }
 
 viptelaBridgeDeletion NOTIFICATION-TYPE
@@ -2470,7 +2601,7 @@ viptelaBridgeDeletion NOTIFICATION-TYPE
 		viptelaBridgeId
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-bridge"
+	DESCRIPTION "Bridge deletion"
 	::= { traps 74 }
 
 viptelaBridgeMaxMacReached NOTIFICATION-TYPE
@@ -2481,7 +2612,7 @@ viptelaBridgeMaxMacReached NOTIFICATION-TYPE
 		viptelaNumMacs
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-bridge"
+	DESCRIPTION "Bridge maximum mac was reached"
 	::= { traps 75 }
 
 viptelaSecurityControlVedgeListRequest NOTIFICATION-TYPE
@@ -2493,7 +2624,7 @@ viptelaSecurityControlVedgeListRequest NOTIFICATION-TYPE
         viptelaSecurityUuid
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Control vedge list request"
 	::= { traps 76 }
 
 viptelaPolicySlaViolation NOTIFICATION-TYPE
@@ -2512,7 +2643,7 @@ viptelaPolicySlaViolation NOTIFICATION-TYPE
         viptelaPolicySlaStatus
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-policy"
+    DESCRIPTION "SLA violation"
     ::= { traps 77 }
 
 viptelaPolicySlaViolationPktDrop NOTIFICATION-TYPE
@@ -2531,7 +2662,7 @@ viptelaPolicySlaViolationPktDrop NOTIFICATION-TYPE
         viptelaPolicySlaStatus
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-policy"
+    DESCRIPTION "SLA violation packet drop"
     ::= { traps 78 }
 
 viptelaVpnInterfacePcsFaultDetected NOTIFICATION-TYPE
@@ -2543,7 +2674,7 @@ viptelaVpnInterfacePcsFaultDetected NOTIFICATION-TYPE
 		viptelaVpnNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Interface pcs fault was detected"
 	::= { traps 79 }
 
 viptelaSystemAppDpiFlowsOutOfMemory NOTIFICATION-TYPE
@@ -2553,7 +2684,7 @@ viptelaSystemAppDpiFlowsOutOfMemory NOTIFICATION-TYPE
 		viptelaSystemDpiOutOfMemoryState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-system"
+	DESCRIPTION "App dpi flows out of memory"
 	::= { traps 80 }
 
 viptelaSecurityGreStateUpdate NOTIFICATION-TYPE
@@ -2569,7 +2700,7 @@ viptelaSecurityGreStateUpdate NOTIFICATION-TYPE
 		viptelaSecurityGreGreIp
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-security"
+	DESCRIPTION "Gre state was updated"
 	::= { traps 81 }
 
 viptelaVpnInterfaceBw NOTIFICATION-TYPE
@@ -2583,7 +2714,7 @@ viptelaVpnInterfaceBw NOTIFICATION-TYPE
 		viptelaVpnDuration
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Interface bw"
 	::= { traps 82 }
 
 
@@ -2595,7 +2726,7 @@ viptelaHardwareSfpSupportState NOTIFICATION-TYPE
 		viptelaHardwareNewState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-hardware"
+	DESCRIPTION "Sfp support state"
 	::= { traps 83 }
 
 viptelaPolicyDataPolicyAssociationStatus NOTIFICATION-TYPE
@@ -2607,7 +2738,7 @@ viptelaPolicyDataPolicyAssociationStatus NOTIFICATION-TYPE
         viptelaPolicyStatus
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-policy"
+    DESCRIPTION "Status of data policy association"
     ::= { traps 84 }
 
 viptelaPolicyAccessListAssociationStatus NOTIFICATION-TYPE
@@ -2618,7 +2749,7 @@ viptelaPolicyAccessListAssociationStatus NOTIFICATION-TYPE
         viptelaPolicyStatus
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-policy"
+    DESCRIPTION "Status of access list association"
     ::= { traps 85 }
 
 viptelaSecurityVmanageConnectionPreferenceChanged NOTIFICATION-TYPE
@@ -2629,7 +2760,7 @@ viptelaSecurityVmanageConnectionPreferenceChanged NOTIFICATION-TYPE
         viptelaSecurityVmanageConnectionPreference
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-security"
+    DESCRIPTION "Vmanage connection preference has changed"
     ::= { traps 86 }
 
 viptelaVpnCloudExpressMaxLocalExitExceeded NOTIFICATION-TYPE
@@ -2638,7 +2769,7 @@ viptelaVpnCloudExpressMaxLocalExitExceeded NOTIFICATION-TYPE
         netconfNotificationSeverity
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-oper-vpn"
+    DESCRIPTION "Maximum local exit of cloud express was exceeded"
     ::= { traps 87 }
 
 viptelaVpnCloudExpressApplicationChange NOTIFICATION-TYPE
@@ -2656,7 +2787,7 @@ viptelaVpnCloudExpressApplicationChange NOTIFICATION-TYPE
         viptelaExitRemoteColor
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-oper-vpn"
+    DESCRIPTION "Cloud express application has changed"
     ::= { traps 88 }
 
 viptelaVpnCloudExpressScoreChange NOTIFICATION-TYPE
@@ -2674,7 +2805,7 @@ viptelaVpnCloudExpressScoreChange NOTIFICATION-TYPE
         viptelaExitRemoteColor
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-oper-vpn"
+    DESCRIPTION "Cloud express score has changed"
     ::= { traps 89 }
 
 viptelaWwanSimStateChange NOTIFICATION-TYPE
@@ -2685,7 +2816,7 @@ viptelaWwanSimStateChange NOTIFICATION-TYPE
 		viptelaWwanSimState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-wwan"
+	DESCRIPTION "Sim state has changed"
 	::= { traps 90 }
 
 viptelaSystemAppDpiFlowsWriteFailedVedge NOTIFICATION-TYPE                                                                                                                             
@@ -2694,7 +2825,7 @@ viptelaSystemAppDpiFlowsWriteFailedVedge NOTIFICATION-TYPE
         netconfNotificationSeverity                                                                                                                              
     }                                                                                                                                                                
     STATUS current                                                                                                                                                   
-    DESCRIPTION "viptela trap from viptela-system"                                                                                                                   
+    DESCRIPTION "App dpi flows write failed on vedge"
     ::= { traps 91 }
 
 viptelaVpnInterfaceAdminStateChange NOTIFICATION-TYPE
@@ -2706,7 +2837,7 @@ viptelaVpnInterfaceAdminStateChange NOTIFICATION-TYPE
 		viptelaVpnNewAdminState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-vpn"
+	DESCRIPTION "Interface admin state has changed"
 	::= { traps 92 }
 
 viptelaWwanDomainStateChange NOTIFICATION-TYPE
@@ -2717,7 +2848,7 @@ viptelaWwanDomainStateChange NOTIFICATION-TYPE
 		viptelaWwanDomainState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-wwan"
+	DESCRIPTION "Domain state has changed"
 	::= { traps 93 }
 
 viptelaWwanRegStateChange NOTIFICATION-TYPE
@@ -2728,7 +2859,7 @@ viptelaWwanRegStateChange NOTIFICATION-TYPE
 		viptelaWwanRegState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-wwan"
+	DESCRIPTION "Registration state has changed"
 	::= { traps 94 }
 
 viptelaWwanBearerChange NOTIFICATION-TYPE
@@ -2739,7 +2870,7 @@ viptelaWwanBearerChange NOTIFICATION-TYPE
 		viptelaWwanBearer
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-wwan"
+	DESCRIPTION "Bearer has changed"
 	::= { traps 95 }
 
 viptelaSystemProcessDown NOTIFICATION-TYPE
@@ -2751,7 +2882,7 @@ viptelaSystemProcessDown NOTIFICATION-TYPE
 		viptelaSystemReason
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-system"
+	DESCRIPTION "Process is down"
 	::= { traps 96 }
 
 viptelaActionsSystemRebootAborted NOTIFICATION-TYPE
@@ -2761,7 +2892,7 @@ viptelaActionsSystemRebootAborted NOTIFICATION-TYPE
 		viptelaActionsReason
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-actions"
+	DESCRIPTION "System reboot was aborted"
 	::= { traps 97 }
 
 viptelaSecurityVbondRejectVedgeConnection NOTIFICATION-TYPE
@@ -2774,7 +2905,7 @@ viptelaSecurityVbondRejectVedgeConnection NOTIFICATION-TYPE
 		viptelaSecurityReason
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-security"
+    DESCRIPTION "Vbond rejected vedge connection"
     ::= { traps 98 }
 
 viptelaSecurityDeviceTemplateMissing NOTIFICATION-TYPE
@@ -2785,7 +2916,7 @@ viptelaSecurityDeviceTemplateMissing NOTIFICATION-TYPE
         viptelaSecurityPeerType
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-security"
+    DESCRIPTION "Device template is missing"
     ::= { traps 99 }
 
 viptelaSecurityDeviceTemplateAttachedDuringZtp NOTIFICATION-TYPE
@@ -2796,7 +2927,7 @@ viptelaSecurityDeviceTemplateAttachedDuringZtp NOTIFICATION-TYPE
         viptelaSecurityPeerType
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-security"
+    DESCRIPTION "Device template was attached during ztp"
     ::= { traps 100 }
 
 viptelaPolicyZbfFlowCreation NOTIFICATION-TYPE
@@ -2815,7 +2946,7 @@ viptelaPolicyZbfFlowCreation NOTIFICATION-TYPE
         viptelaPolicyState
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-policy"
+    DESCRIPTION "Zbf flow creation"
     ::= { traps 101 }
 
 viptelaPolicyZbfFlowDeletion NOTIFICATION-TYPE
@@ -2834,7 +2965,7 @@ viptelaPolicyZbfFlowDeletion NOTIFICATION-TYPE
         viptelaPolicyState
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-policy"
+    DESCRIPTION "Zbf flow deletion"
     ::= { traps 102 }
 
 viptelaPolicyZbfFlowTableFull NOTIFICATION-TYPE
@@ -2846,7 +2977,7 @@ viptelaPolicyZbfFlowTableFull NOTIFICATION-TYPE
         viptelaPolicyMaxFlows
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-policy"
+    DESCRIPTION "Zbf flow table full"
     ::= { traps 103 }
 
 viptelaPolicyZbfClearFlowTableFull NOTIFICATION-TYPE
@@ -2858,7 +2989,7 @@ viptelaPolicyZbfClearFlowTableFull NOTIFICATION-TYPE
         viptelaPolicyMaxFlows
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-policy"
+    DESCRIPTION "Zbf clear flow table full"
     ::= { traps 104 }
 
 viptelaPolicyZbfPktLog NOTIFICATION-TYPE
@@ -2877,7 +3008,7 @@ viptelaPolicyZbfPktLog NOTIFICATION-TYPE
         viptelaPolicyAction
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-policy"
+    DESCRIPTION "Zbf packet log"
     ::= { traps 105 }
 
 viptelaPolicyZbfHalfOpenHit NOTIFICATION-TYPE
@@ -2889,7 +3020,7 @@ viptelaPolicyZbfHalfOpenHit NOTIFICATION-TYPE
         viptelaPolicyMaxHalfOpenFlows
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-policy"
+    DESCRIPTION "Zbf half open hit"
     ::= { traps 106 }
 
 viptelaPolicyZbfClearHalfOpenHit NOTIFICATION-TYPE
@@ -2901,7 +3032,7 @@ viptelaPolicyZbfClearHalfOpenHit NOTIFICATION-TYPE
         viptelaPolicyMaxHalfOpenFlows
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-policy"
+    DESCRIPTION "Zbf clear half open hit"
     ::= { traps 107 }
 
 viptelaPolicySlaConfig NOTIFICATION-TYPE
@@ -2912,10 +3043,11 @@ viptelaPolicySlaConfig NOTIFICATION-TYPE
         viptelaPolicySlaOperation,
         viptelaPolicySlaLoss,
         viptelaPolicySlaLatency,
-        viptelaPolicySlaJitter
+        viptelaPolicySlaJitter,
+        viptelaPolicySlaAppProbeClass
     }
     STATUS current
-    DESCRIPTION "Viptela SLA configuration trap from Viptela policy"
+    DESCRIPTION "Sla configuration"
     ::= { traps 108 }
 
 viptelaVpnLastResortStateChange NOTIFICATION-TYPE
@@ -2927,7 +3059,7 @@ viptelaVpnLastResortStateChange NOTIFICATION-TYPE
                 viptelaVpnNewState
         }
         STATUS current
-        DESCRIPTION "viptela trap from viptela-vpn"
+        DESCRIPTION "Last resort state has changed"
         ::= { traps 109 }
 
 viptelaPolicyDevicePolicyAssociationStatus NOTIFICATION-TYPE
@@ -2938,7 +3070,7 @@ viptelaPolicyDevicePolicyAssociationStatus NOTIFICATION-TYPE
         viptelaPolicyStatus
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-policy"
+    DESCRIPTION "Status of device policy association"
     ::= { traps 110 }
 
 viptelaWwanQosStateChange NOTIFICATION-TYPE
@@ -2949,7 +3081,7 @@ viptelaWwanQosStateChange NOTIFICATION-TYPE
 		viptelaWwanQosState
 	}
 	STATUS current
-	DESCRIPTION "viptela trap from viptela-wwan"
+	DESCRIPTION "Qos state has changed"
 	::= { traps 111 }
     
 viptelaCdbUnlocked NOTIFICATION-TYPE
@@ -2959,7 +3091,7 @@ viptelaCdbUnlocked NOTIFICATION-TYPE
         viptelaSecurityPersonality
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-security"
+    DESCRIPTION "Cdb was unlocked"
     ::= { traps 112 }
 
 viptelaSecuritySecurityUnclaimedVedgeEntryAdded NOTIFICATION-TYPE
@@ -2972,7 +3104,121 @@ viptelaSecuritySecurityUnclaimedVedgeEntryAdded NOTIFICATION-TYPE
         viptelaSecurityOrganizationName
     }
     STATUS current
-    DESCRIPTION "viptela trap from viptela-security"
+    DESCRIPTION "Security unclaimed vedge entry was added"
     ::= { traps 113 }
+
+viptelaSystemCpuUsage NOTIFICATION-TYPE
+    OBJECTS {
+        eventTime,
+        netconfNotificationSeverity,
+        viptelaSystemWarning,
+        viptelaSystemCpuUserPercentage,
+        viptelaSystemCpuSystemPercentage,
+        viptelaSystemCpuIdlePercentage
+    }
+    STATUS current
+    DESCRIPTION "Cpu usage"
+    ::= { traps 114 }
+
+viptelaSecuritySecurityCertificateExpiring NOTIFICATION-TYPE
+    OBJECTS {
+        eventTime,
+        netconfNotificationSeverity,
+        viptelaSecurityCertificateType,
+        viptelaSecurityCertificateSerialNumber,
+        viptelaSecurityIssuer,
+        viptelaSecurityDaysToExpiry
+    }
+    STATUS current
+    DESCRIPTION "Security certificate is expiring"
+    ::= { traps 115 }
+
+viptelaPolicyAppListAppAliasesNotify NOTIFICATION-TYPE
+    OBJECTS {
+        eventTime,
+        netconfNotificationSeverity,
+        viptelaPolicyAppListName,
+        viptelaPolicyAppAlias
+    }
+    STATUS current
+    DESCRIPTION "App list app aliases notify"
+    ::= { traps 116 }
+
+viptelaPolicyAppListUnsupportedAppNotify NOTIFICATION-TYPE
+    OBJECTS {
+        eventTime,
+        netconfNotificationSeverity,
+        viptelaPolicyAppListName,
+        viptelaPolicyUnsupportedApp
+    }
+    STATUS current
+    DESCRIPTION "App list unsupported app notify"
+    ::= { traps 117 }
+
+
+viptelaSecuritySecurityRootCaCrlInstalled NOTIFICATION-TYPE
+	OBJECTS {
+		eventTime,
+		netconfNotificationSeverity
+	}
+	STATUS current
+	DESCRIPTION "Security root ca crl was installed"
+	::= { traps 118 }
+
+viptelaSecuritySecurityRootCaCrlUninstalled NOTIFICATION-TYPE
+	OBJECTS {
+		eventTime,
+		netconfNotificationSeverity
+	}
+	STATUS current
+	DESCRIPTION "Security root ca crl was uninstalled"
+	::= { traps 119 }
+
+viptelaHardwareSfpDiagAlarmState NOTIFICATION-TYPE
+	OBJECTS {
+		eventTime,
+		netconfNotificationSeverity,
+		viptelaHardwareSfpName,
+		viptelaHardwareSfpDiagName,
+		viptelaHardwareSfpDiagState,
+		viptelaHardwareSfpDiagStateDescription
+	}
+	STATUS current
+	DESCRIPTION "Sfp diagnostic alarm state change"
+	::= { traps 120 }
+
+viptelaSecurityBaseConfigDownloadError NOTIFICATION-TYPE
+    OBJECTS {
+        eventTime,
+        netconfNotificationSeverity,
+        viptelaSecurityUuid,
+        viptelaSecurityPeerType,
+        viptelaSecurityReason
+    }
+    STATUS current
+    DESCRIPTION "Unable to send rest api request"
+    ::= { traps 121 }
+
+viptelaAaaUserLocked NOTIFICATION-TYPE
+    OBJECTS {
+        eventTime,
+        netconfNotificationSeverity,
+        viptelaSystemUserName,
+        viptelaSystemRemoteHost
+    }
+    STATUS current
+    DESCRIPTION "AAA user is locked"
+    ::= { traps 122 }
+
+viptelaAaaUserLoginAnomaly NOTIFICATION-TYPE
+    OBJECTS {
+        eventTime,
+        netconfNotificationSeverity,
+        viptelaSystemUserName,
+        viptelaSystemRemoteHost
+    }
+    STATUS current
+    DESCRIPTION "AAA user anomalous login"
+    ::= { traps 123 }
 
 END
