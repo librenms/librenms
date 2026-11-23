@@ -117,7 +117,7 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
     }
 
     /**
-     * Sensors are polled by their method, sensors that are not read are not recorded.
+     * Sensors are polled by their method. IPMI and unix agent sensors that are not read are not recorded.
      */
     public function poll(OS $os, WriteInterface $datastore): void
     {
@@ -126,8 +126,15 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
 
         foreach ($this->pollingMethods($os->getDevice()) as $method) {
             $methodSensors = $sensors->where('poller_type', self::pollerType($method));
-            if ($methodSensors->isNotEmpty()) {
-                $values += $os->dataSource($method, SensorsPolling::class)?->pollSensors($methodSensors) ?? [];
+            $source = $methodSensors->isEmpty() ? null : $os->dataSource($method, SensorsPolling::class);
+            if ($source === null) {
+                continue;
+            }
+
+            $values += $source->pollSensors($methodSensors);
+            if ($method === PollingMethodType::Snmp) {
+                // SNMP sensors that are not read are recorded as 0
+                $values += array_fill_keys($methodSensors->modelKeys(), '');
             }
         }
 

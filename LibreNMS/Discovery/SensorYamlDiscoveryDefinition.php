@@ -83,12 +83,12 @@ class SensorYamlDiscoveryDefinition extends YamlDiscoveryDefinition
     /**
      * Skip rules are checked against the converted value, values without a number are skipped.
      *
-     * @param  array<string, mixed>  $row
+     * @param  array<string, mixed>|string  $row
      * @param  array<string, mixed>  $yamlItem
      * @param  array<string, mixed>  $yaml
      * @param  array<int|string, mixed>  $fetchedData
      */
-    protected function canSkipItem(array $row, int|string $index, array $yamlItem, array $yaml, array $fetchedData): bool
+    protected function canSkipItem(array|string $row, int|string $index, array $yamlItem, array $yaml, array $fetchedData): bool
     {
         [$value] = SensorValueField::parse(SensorValueField::raw($yamlItem, $row), $this->type, $yamlItem);
 

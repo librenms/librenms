@@ -270,7 +270,7 @@ class YamlDiscoveryDefinition
      *
      * @param  array<string, mixed>  $yamlItem
      * @param  array<int|string, mixed>  $fetchedData
-     * @return array<int|string, array<string, mixed>>
+     * @return array<int|string, array<string, mixed>|string> rows by index, the value itself for numeric oids
      */
     private function fetchItem(array $yamlItem, array &$fetchedData): array
     {
@@ -325,15 +325,16 @@ class YamlDiscoveryDefinition
 
     /**
      * Check the skip rules of the yaml against the value of a row.
+     * Rows of numeric oids are the value itself, they have no value to compare.
      *
-     * @param  array<string, mixed>  $row
+     * @param  array<string, mixed>|string  $row
      * @param  array<string, mixed>  $yamlItem
      * @param  array<string, mixed>  $yaml
      * @param  array<int|string, mixed>  $fetchedData
      */
-    protected function canSkipItem(array $row, int|string $index, array $yamlItem, array $yaml, array $fetchedData): bool
+    protected function canSkipItem(array|string $row, int|string $index, array $yamlItem, array $yaml, array $fetchedData): bool
     {
-        $value = $row[$yamlItem['value'] ?? $yamlItem['oid'] ?? ''] ?? null;
+        $value = is_array($row) ? $row[$yamlItem['value'] ?? $yamlItem['oid'] ?? ''] ?? null : null;
 
         return YamlDiscovery::canSkipItem($value, $index, $yamlItem, $yaml, $fetchedData);
     }
