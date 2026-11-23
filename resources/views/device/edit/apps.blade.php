@@ -31,7 +31,7 @@
 
                 <div class="tw:columns-1 tw:gap-2 tw:sm:columns-2 tw:lg:columns-3">
                     <template x-for="app in visibleApplications" :key="app.type">
-                        <div class="tw:mb-2 tw:flex tw:items-center tw:gap-3 tw:break-inside-avoid">
+                        <div class="tw:mb-2 tw:flex tw:items-center tw:gap-3 tw:break-inside-avoid tw:border tw:rounded-lg tw:px-3 tw:py-2 tw:border-gray-200 tw:dark:border-dark-gray-400 tw:bg-white tw:dark:bg-dark-gray-500">
                             <x-toggle ::checked="app.enabled"
                                       ::disabled="app.managed || ! canUpdate"
                                       x-on:change="toggle($event, app.type)">
@@ -43,7 +43,7 @@
                                     <span class="text-blue-600 tw:dark:text-blue-400">({{ __('Manual') }})</span>
                                 </template>
                             </x-toggle>
-                            <a x-if="app.docs" target="_blank" :href="app.docs" class="tw:ml-auto tw:shrink-0">{{ __('Docs') }} <i class="fa fa-book"></i></a>
+                            <a x-if="app.docs" target="_blank" :href="app.docs" title="{{ __('Docs') }}" aria-label="{{ __('Docs') }}" class="tw:ml-auto tw:shrink-0"><i class="fa fa-book"></i></a>
                         </div>
                     </template>
                 </div>
