@@ -76,6 +76,7 @@ class AlertsController extends TableController
             'acknowledged' => 'nullable|integer|in:0,1',
             'fired' => 'nullable|integer|in:0,1',
             'unreachable' => 'nullable|integer|in:0,1',
+            'scheduled_downtime' => 'nullable|integer|in:0,1',
             'state' => 'nullable|integer',
             'min_severity' => 'nullable|string',
             'group' => 'nullable|integer|min:1',
@@ -140,6 +141,14 @@ class AlertsController extends TableController
                 /** @var Builder<AlertFault> $q */
                 if ($unreachable !== null) {
                     $q->unreachable((bool) $unreachable);
+                }
+            },
+
+            'scheduled_downtime' => function ($q, ?string $scheduledDowntime): void {
+                /** @var Builder<AlertFault> $q */
+                // the alerts widget sends an empty value when "not filtered" is selected
+                if ($scheduledDowntime !== null && $scheduledDowntime !== '') {
+                    $q->scheduledDowntime((bool) $scheduledDowntime);
                 }
             },
 

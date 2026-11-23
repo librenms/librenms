@@ -22,6 +22,14 @@
         </select>
     </div>
     <div class="form-group">
+        <label for="scheduled_downtime-{{ $id }}" class="control-label">{{ __('Show scheduled downtime') }}:</label>
+        <select class="form-control" name="scheduled_downtime" id="scheduled_downtime-{{ $id }}">
+            <option value="">{{ __('not filtered') }}</option>
+            <option value="1" @if((string) $scheduled_downtime === '1') selected @endif>{{ __('show only alerts on devices in a scheduled downtime') }}</option>
+            <option value="0" @if((string) $scheduled_downtime === '0') selected @endif>{{ __('hide alerts on devices in a scheduled downtime') }}</option>
+        </select>
+    </div>
+    <div class="form-group">
         <label for="fired-{{ $id }}" class="control-label">{{ __('Show only fired') }}:</label>
         <select class="form-control" name="fired" id="fired-{{ $id }}">
             <option value="">{{ __('not filtered') }}</option>

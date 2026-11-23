@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use LibreNMS\Enum\AlertState;
 
 /**
@@ -89,6 +90,7 @@ class AlertFault extends DeviceRelatedModel
         'device.location_id',
         'device.groups.id',
         'unreachable',
+        'scheduled_downtime',
         'note',
     ];
 
@@ -102,6 +104,11 @@ class AlertFault extends DeviceRelatedModel
             [
                 'key' => 'unreachable',
                 'label' => __('Unreachable'),
+                'type' => 'boolean',
+            ],
+            [
+                'key' => 'scheduled_downtime',
+                'label' => __('Scheduled Downtime'),
                 'type' => 'boolean',
             ],
             [
@@ -131,6 +138,11 @@ class AlertFault extends DeviceRelatedModel
         $this->scopeUnreachable($query, (bool) $value xor ($config['not'] ?? false));
     }
 
+    public function filterScheduledDowntime(Builder $query, mixed $value, array $config): void
+    {
+        $this->scopeScheduledDowntime($query, (bool) $value xor ($config['not'] ?? false));
+    }
+
     // ---- Query scopes ----
 
     /**
@@ -154,6 +166,42 @@ class AlertFault extends DeviceRelatedModel
         return $unreachable
             ? $query->whereExists($hasParent)->whereNotExists($hasUpParent)
             : $query->where(fn ($q) => $q->whereNotExists($hasParent)->orWhereExists($hasUpParent));
+    }
+
+    /**
+     * Faults on devices inside an active scheduled downtime (alert schedule).
+     * A schedule covers the device itself, or every device of a scheduled location or device group.
+     *
+     * @param  Builder<AlertFault>  $query
+     * @return Builder<AlertFault>
+     */
+    public function scopeScheduledDowntime($query, bool $inDowntime = true): Builder
+    {
+        // how the devices of each schedulable type are found, keyed by the class alert_schedulables refers to
+        $targets = [
+            Device::class => fn ($q) => $q->whereColumn('alert_schedulables.alert_schedulable_id', 'alert_faults.device_id'),
+            Location::class => fn ($q) => $q
+                ->join('devices as scheduled_devices', 'scheduled_devices.location_id', '=', 'alert_schedulables.alert_schedulable_id')
+                ->whereColumn('scheduled_devices.device_id', 'alert_faults.device_id'),
+            DeviceGroup::class => fn ($q) => $q
+                ->join('device_group_device', 'device_group_device.device_group_id', '=', 'alert_schedulables.alert_schedulable_id')
+                ->whereColumn('device_group_device.device_id', 'alert_faults.device_id'),
+        ];
+
+        $scheduled = function ($query) use ($targets): void {
+            foreach ($targets as $class => $devices) {
+                // alert_schedulables stores the morph alias, older rows can still hold the class name
+                $types = array_unique([Relation::getMorphAlias($class), $class]);
+
+                $query->orWhereExists(fn ($q) => $devices(
+                    $q->from('alert_schedulables')
+                        ->whereIn('alert_schedulables.alert_schedulable_type', $types)
+                        ->whereIn('alert_schedulables.schedule_id', AlertSchedule::isActive()->select('schedule_id'))
+                ));
+            }
+        };
+
+        return $inDowntime ? $query->where($scheduled) : $query->whereNot($scheduled);
     }
 
     /**
