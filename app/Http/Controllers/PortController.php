@@ -57,4 +57,14 @@ class PortController extends Controller
             ? response(['message' => $message])
             : response(['message' => trans('port.groups.none', ['port' => $port->getLabel()])], 400);
     }
+
+    public function notes(\Illuminate\Http\Request $request, Port $port): \Illuminate\Http\JsonResponse
+    {
+        $this->authorize('update', $port);
+
+        $notes = (string) $request->validate(['notes' => 'nullable|string'])['notes'];
+        $port->device->setAttrib("port_id_notes:$port->port_id", $notes);
+
+        return response()->json(['message' => __('Port notes saved')]);
+    }
 }

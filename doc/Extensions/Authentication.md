@@ -90,13 +90,13 @@ setsebool -P httpd_can_connect_ldap=1
 
 ## Testing authentication
 
-You can test authentication with this script:
+You can test authentication with this command, which prompts for your password:
 
 ```bash
-./scripts/auth_test.php
+./lnms auth:test <username>
 ```
 
-Enable debug output to troubleshoot issues
+Add `-v` for authentication logging or `-vv` for debug output to troubleshoot issues.
 
 ## MySQL Authentication
 

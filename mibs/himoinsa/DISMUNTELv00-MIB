@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (text after END)
 DISMUNTELv00-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS  
@@ -1291,4 +1292,3 @@ alarmMsg TRAP-TYPE
 ::= 1
 
 END
-cj

@@ -1,10 +1,10 @@
 -- =================================================================
--- Copyright (c) 2004-2016 New H3C Tech.  Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech.  Co., Ltd.  All rights reserved.
 --
 -- Description: Network Time Protocol (NTP) Version 3, is used to synchronize
 --              timekeeping among a set of distributed time servers and clients.
 -- Reference:
--- Version: V1.8
+-- Version: V2.2
 -- History:
 -- V1.0   <sunhaipeng>, <2003-03-19>, <initial>
 -- V1.1   jinyi, 2004-12-02,
@@ -24,19 +24,45 @@
 --       Added hh3cNTPSysSrcPeer.
 -- V1.8  2016-09-14 by chenzichao
 --       Corrected spelling of the word 'message'.
+-- V1.9  2022-3-16 by yinwenyao kf8812
+--       Added hh3cNTPSysOldServerIP for Trap by yinwenyao kf8812
+--       Added hh3cNTPSysSrcVpnName for Trap by yinwenyao kf8812
+--       Added hh3cNTPSysOldSrcVpnName for Trap by yinwenyao kf8812
+--       Added hh3cNTPSysMaxDynamicSessions for Trap by yinwenyao kf8812
+--       Added hh3cNTPSystemMIBTraps to hh3cNTPSystemMIB by yinwenyao kf8812
+--       Added hh3cNTPSysStateChangeTrap by yinwenyao kf8812
+--       Added hh3cNTPSysPeerChangeTrap by yinwenyao kf8812
+--       Added hh3cNTPDynSessionLimit by yinwenyao kf8812
+--       Added hh3cNTPDynSessionLimitResume by yinwenyao kf8812
+-- V2.0  2022-06-28 by duwei
+--       Added hh3cNTPSessionLimit
+--       Added hh3cNTPSessionLimitResume
+-- V2.1  2022-09-01 by duwei
+--       Added hh3cNTPSysOldStratum,hh3cNTPSysTimeOffsetThres,
+--       hh3cNTPSysTimeOffsetLimit for trap.
+--       Added hh3cNTPSynchronizationLost.
+--       Added hh3cNTPSynchronizationResume.
+--       Added hh3cNTPSysStratumChange.
+--       Added hh3cNTPTimeOffsetThresExceed.
+--       Added hh3cNTPTimeOffsetThresResume.
+--       Added hh3cNTPTimeOffsetLimit.
+--       Added hh3cNTPTimeOffsetLimitResume.
+-- V2.2  2022-09-01 by duwei
+--       Added hh3cNTPSysLeapChangeTrap, hh3cNTPServerAbnormal,
+--       hh3cNTPServerNormal, and hh3cNTPStepSetTimeFailed for trap.
 -- =================================================================
 HH3C-NTP-MIB DEFINITIONS ::= BEGIN
 
     IMPORTS
-        IpAddress, Integer32, MODULE-IDENTITY, OBJECT-TYPE, Counter32, Unsigned32
+        IpAddress, Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, Counter32, Unsigned32
             FROM SNMPv2-SMI
-        RowStatus, TruthValue
+        RowStatus, TruthValue, DisplayString
             FROM SNMPv2-TC
         hh3cRhw
             FROM HH3C-OID-MIB;
 
         hh3cNTP MODULE-IDENTITY
-            LAST-UPDATED "200303150000Z"
+            LAST-UPDATED "202212010000Z"
             ORGANIZATION
                 "New H3C Tech.  Co., Ltd."
             CONTACT-INFO
@@ -47,6 +73,36 @@ HH3C-NTP-MIB DEFINITIONS ::= BEGIN
                 "
             DESCRIPTION
                 "This MIB provides mechanisms to monitor a NTP server."
+            REVISION "202212010000Z"
+            DESCRIPTION
+                "Add hh3cNTPSysLeapChangeTrap, hh3cNTPServerAbnormal,
+                 hh3cNTPServerNormal, and hh3cNTPStepSetTimeFailed for trap."
+            REVISION "202209010000Z"
+            DESCRIPTION
+                "Added hh3cNTPSysOldStratum,hh3cNTPSysTimeOffsetThres,
+                 hh3cNTPSysTimeOffsetLimit for trap.
+                 Added hh3cNTPSynchronizationLost.
+                 Added hh3cNTPSynchronizationResume.
+                 Added hh3cNTPSysStratumChange.
+                 Added hh3cNTPTimeOffsetThresExceed.
+                 Added hh3cNTPTimeOffsetThresResume.
+                 Added hh3cNTPTimeOffsetLimit.
+                 Added hh3cNTPTimeOffsetLimitResume."
+            REVISION "202206280000Z"
+            DESCRIPTION
+                "Added hh3cNTPSessionLimit for trap.
+                 Added hh3cNTPSessionLimitResume for trap."
+            REVISION "202203160000Z"
+            DESCRIPTION
+                "Added hh3cNTPSysOldServerIP for Trap.
+                 Added hh3cNTPSysSrcVpnName for Trap.
+                 Added hh3cNTPSysOldSrcVpnName for Trap.
+                 Added hh3cNTPSysMaxDynamicSessions for Trap.
+                 Added hh3cNTPSystemMIBTraps to hh3cNTPSystemMIB.
+                 Added hh3cNTPSysStateChangeTrap.
+                 Added hh3cNTPSysPeerChangeTrap.
+                 Added hh3cNTPSysDynamicSessionLimitReach.
+                 Added hh3cNTPSysDynamicSessionLimitReachResume."
             REVISION "200303150000Z"
             DESCRIPTION
                 "The initial revision of this MIB module."
@@ -298,6 +354,221 @@ HH3C-NTP-MIB DEFINITIONS ::= BEGIN
             its value range is unlimited, and data type is changed from
             Integer32 to Unsigned32."
         ::= { hh3cNTPSystemMIBObjects 20 }
+
+    hh3cNTPSysOldServerIP OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The Old NTP server ip address. "
+        ::= { hh3cNTPSystemMIBObjects 21 }
+
+    hh3cNTPSysSrcVpnName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The NTP server VPN Name."
+        ::= { hh3cNTPSystemMIBObjects 22 }
+
+    hh3cNTPSysOldSrcVpnName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "The Old NTP server VPN Name. "
+        ::= { hh3cNTPSystemMIBObjects 23 }
+
+    hh3cNTPSysMaxDynamicSessions OBJECT-TYPE
+        SYNTAX      Unsigned32(0..4294967295)
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Maximum number of NTP dynamic sessions."
+        ::= { hh3cNTPSystemMIBObjects 24 }
+
+    hh3cNTPSysMaxSessions OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Maximum number of NTP sessions."
+        ::= { hh3cNTPSystemMIBObjects 25 }
+
+    hh3cNTPSysOldStratum OBJECT-TYPE
+        SYNTAX Integer32 (1..16)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The old the stratum level of the local clock."
+        ::= { hh3cNTPSystemMIBObjects 26 }
+
+    hh3cNTPSysTimeOffsetThres OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..128))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Time offset alarm threshold, in milliseconds."
+        ::= { hh3cNTPSystemMIBObjects 27 }
+
+    hh3cNTPSysTimeOffsetLimit OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..128))
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Clock synchronization offset threshold, in milliseconds."
+        ::= { hh3cNTPSystemMIBObjects 28 }
+
+--
+-- Notification definitions
+--
+-- =================================================================
+-- Traps are defined below.
+hh3cNTPSystemMIBTraps OBJECT IDENTIFIER ::= { hh3cNTPSystemMIB 2 }
+
+-- All trap definitions should be placed under this object.
+hh3cNTPSystemMIBTrapPrefix OBJECT IDENTIFIER ::= { hh3cNTPSystemMIBTraps 0 }
+
+-- All objects used for TRAP only are defined here.
+hh3cNTPSysStateChangeTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cNTPSysState,
+            hh3cNTPServerIP,
+            hh3cNTPSysSrcVpnName
+        }
+    STATUS      current
+    DESCRIPTION
+        "The trap is generated when The NTP local clock state changed."
+    ::= { hh3cNTPSystemMIBTrapPrefix 1 }
+
+hh3cNTPSysPeerChangeTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cNTPSysOldServerIP,
+            hh3cNTPSysOldSrcVpnName,
+            hh3cNTPServerIP,
+            hh3cNTPSysSrcVpnName
+        }
+    STATUS      current
+    DESCRIPTION
+        "The trap is generated when The peer specified by NTP has changed."
+    ::= { hh3cNTPSystemMIBTrapPrefix 2 }
+
+hh3cNTPDynSessionLimit NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cNTPSysMaxDynamicSessions
+        }
+    STATUS      current
+    DESCRIPTION
+        "The trap is generated when The number of NTP dynamic sessions has reached the upper limit."
+    ::= { hh3cNTPSystemMIBTrapPrefix 3 }
+
+hh3cNTPDynSessionLimitResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cNTPSysMaxDynamicSessions
+        }
+    STATUS      current
+    DESCRIPTION
+        "The trap is generated when The NTP dynamic session number below the limit."
+    ::= { hh3cNTPSystemMIBTrapPrefix 4 }
+
+hh3cNTPSessionLimit NOTIFICATION-TYPE
+    OBJECTS { hh3cNTPSysMaxSessions }
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when the number of NTP sessions reaches the upper limit."
+    ::= { hh3cNTPSystemMIBTrapPrefix 5 }
+
+hh3cNTPSessionLimitResume NOTIFICATION-TYPE
+    OBJECTS { hh3cNTPSysMaxSessions }
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when the number of NTP sessions drops below the limit."
+    ::= { hh3cNTPSystemMIBTrapPrefix 6 }
+
+hh3cNTPSynchronizationLost NOTIFICATION-TYPE
+    OBJECTS { hh3cNTPSysState, hh3cNTPServerIP}
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when the local clock loses synchronization with the NTP server."
+    ::= { hh3cNTPSystemMIBTrapPrefix 7 }
+
+hh3cNTPSynchronizationResume NOTIFICATION-TYPE
+    OBJECTS { hh3cNTPSysState, hh3cNTPServerIP}
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when the local clock resumes synchronization with the NTP server."
+    ::= { hh3cNTPSystemMIBTrapPrefix 8 }
+
+hh3cNTPSysStratumChange NOTIFICATION-TYPE
+    OBJECTS { hh3cNTPSysStratum, hh3cNTPSysOldStratum }
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when the stratum level of the local clock changes."
+    ::= { hh3cNTPSystemMIBTrapPrefix 9 }
+
+hh3cNTPTimeOffsetThresExceed NOTIFICATION-TYPE
+    OBJECTS { hh3cNTPSysOffset, hh3cNTPSysTimeOffsetThres }
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when the time offset between the clock source and
+        the client reaches the threshold."
+    ::= { hh3cNTPSystemMIBTrapPrefix 10 }
+
+hh3cNTPTimeOffsetThresResume NOTIFICATION-TYPE
+    OBJECTS { hh3cNTPSysOffset, hh3cNTPSysTimeOffsetThres }
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when the time offset between the clock source and
+        the client drops below the threshold."
+    ::= { hh3cNTPSystemMIBTrapPrefix 11 }
+
+hh3cNTPTimeOffsetLimit NOTIFICATION-TYPE
+    OBJECTS { hh3cNTPSysOffset, hh3cNTPSysTimeOffsetLimit }
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when the time offset between the clock source and
+        the client over the upper limit for clock synchronization.
+        The client will not synchronize with the clock source."
+    ::= { hh3cNTPSystemMIBTrapPrefix 12 }
+
+hh3cNTPTimeOffsetLimitResume NOTIFICATION-TYPE
+    OBJECTS { hh3cNTPSysOffset, hh3cNTPSysTimeOffsetLimit }
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when the time offset between the clock source and
+        the client drops below the upper limit for clock synchronization."
+    ::= { hh3cNTPSystemMIBTrapPrefix 13 }
+
+hh3cNTPSysLeapChangeTrap NOTIFICATION-TYPE
+    OBJECTS { hh3cNTPSysLeap }
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when System Leap Indicator changed after clock update."
+    ::= { hh3cNTPSystemMIBTrapPrefix 14 }
+
+hh3cNTPServerAbnormal NOTIFICATION-TYPE
+    OBJECTS { hh3cNTPServerIP }
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when NTP server state went abnormal."
+    ::= { hh3cNTPSystemMIBTrapPrefix 15 }
+
+hh3cNTPServerNormal NOTIFICATION-TYPE
+    OBJECTS { hh3cNTPServerIP }
+    STATUS current
+    DESCRIPTION
+        "The trap is generated when NTP server state returned to normal."
+    ::= { hh3cNTPSystemMIBTrapPrefix 16 }
+
+hh3cNTPStepSetTimeFailed NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+        "The trap is generated upon failure to set system time in the one-step adjustment process."
+    ::= { hh3cNTPSystemMIBTrapPrefix 17 }
 
     hh3cNTPPeerMIB OBJECT IDENTIFIER ::= { hh3cNTP 2 }
 
@@ -868,7 +1139,6 @@ HH3C-NTP-MIB DEFINITIONS ::= BEGIN
             "The information about the message."
         ::= { hh3cNTPPeerEntry 35 }
 
-
     hh3cNTPPeerRowStatus OBJECT-TYPE
         SYNTAX      RowStatus
         MAX-ACCESS  read-create
@@ -880,3 +1150,4 @@ HH3C-NTP-MIB DEFINITIONS ::= BEGIN
             row can be made 'active'."
         ::= { hh3cNTPPeerEntry 36 }
 END
+

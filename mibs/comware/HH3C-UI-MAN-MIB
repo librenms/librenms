@@ -1,9 +1,9 @@
 -- =======================================================================
--- Copyright (C) 2002-2004 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (C) 2002-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: User-interfaces management mib
 -- Reference:
--- Version: V1.6
+-- Version: V1.7
 -- History:
 --  V1.0 Initial version 2002-12-20
 --  V1.1 2004-10-12 updated by gaolong
@@ -21,6 +21,9 @@
 --  V1.6 2007-12-12 updated by miaochunyan05345
 --       Add hh3cTerminalUserName, hh3cTerminalSource, hh3cTerminalUserAuthFailureReason,
 --       hh3cLogIn, hh3cLogOut and hh3cLogInAuthenFailure.
+--  V1.7 2022-06-15 updated by caohao13309
+--       Add hh3cVtyCurrentVty, hh3cVtyMaxVty, hh3cVtyThreshold, hh3cVtyUsageExceed
+--       and hh3cVtyUsageResume.
 -- =======================================================================
 HH3C-UI-MAN-MIB DEFINITIONS ::= BEGIN
 
@@ -31,12 +34,12 @@ IMPORTS
         FROM SNMPv2-CONF
     RowStatus,DisplayString
         FROM SNMPv2-TC
-    Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+    Unsigned32, Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
         FROM SNMPv2-SMI;
 
 
 hh3cUIMgt MODULE-IDENTITY
-    LAST-UPDATED "200404081405Z"            -- April 08, 2004 at 14:05 GMT
+    LAST-UPDATED "202206150000Z"
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -47,6 +50,13 @@ hh3cUIMgt MODULE-IDENTITY
         "
     DESCRIPTION
         "User interfaces management MIB"
+    REVISION "202206150000Z"
+    DESCRIPTION
+        "Add hh3cVtyCurrentVty
+        hh3cVtyMaxVty
+        hh3cVtyThreshold
+        hh3cVtyUsageExceed
+        hh3cVtyUsageResume."
     ::= { hh3cCommon 2 }
 
 
@@ -96,6 +106,30 @@ hh3cTerminalUserAuthFailureReason OBJECT-TYPE
         "The reason why a user failed to log in."
     ::= { hh3cUITrapBindObjects 3 }
 
+hh3cVtyCurrentVty OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Number of VTY user lines currently in use."
+    ::= {hh3cUITrapBindObjects 4}
+
+hh3cVtyMaxVty OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of VTY user lines."
+    ::= {hh3cUITrapBindObjects 5}
+
+hh3cVtyThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "VTY user line threshold."
+    ::= {hh3cUITrapBindObjects 6}
+
 hh3cUINotifications OBJECT IDENTIFIER ::= { hh3cUIBasicInfo 3 }
 
 hh3cUINotificationsPrefix OBJECT IDENTIFIER ::= { hh3cUINotifications 0 }
@@ -140,6 +174,30 @@ hh3cLogInAuthenFailure NOTIFICATION-TYPE
         because of authentication.
         "
     ::= { hh3cUINotificationsPrefix 3 }
+
+hh3cVtyUsageExceed NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cVtyCurrentVty,
+            hh3cVtyMaxVty,
+            hh3cVtyThreshold
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the number of used VTY user lines reaches or exceeds the maximum value."
+    ::= { hh3cUINotificationsPrefix 4 }
+
+hh3cVtyUsageResume NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cVtyCurrentVty,
+            hh3cVtyMaxVty,
+            hh3cVtyThreshold
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the number of used VTY user lines returns to normal."
+    ::= { hh3cUINotificationsPrefix 5 }
 
 hh3cVtyMan OBJECT IDENTIFIER ::= { hh3cUIMgtObjects 2 }
 

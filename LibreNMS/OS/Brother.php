@@ -28,9 +28,8 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
-use LibreNMS\OS;
 
-class Brother extends OS implements OSDiscovery
+class Brother extends Shared\Printer implements OSDiscovery
 {
     public function discoverOS(Device $device): void
     {

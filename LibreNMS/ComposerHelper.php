@@ -68,12 +68,14 @@ class ComposerHelper
     {
         return self::execComposerCommand(
             ['require', '--no-update', $package . ($version ? ":$version" : '')],
-            ['COMPOSER' => 'composer.plugins.json'],
+            ['COMPOSER' => self::getPluginsFile()],
         );
     }
 
     public static function addPackage(string $package, ?string $version = null): int
     {
+        self::prepareComposerFile();
+
         return self::execComposerCommand(
             ['require', '--update-no-dev', $package . ($version ? ":$version" : '')],
             ['FORCE' => 1],
@@ -84,28 +86,87 @@ class ComposerHelper
     {
         return self::execComposerCommand(
             ['remove', '--no-update', $package],
-            ['COMPOSER' => 'composer.plugins.json'],
+            ['COMPOSER' => self::getPluginsFile()],
         );
     }
 
     public static function removePackage(string $package): int
     {
+        self::prepareComposerFile();
+
         return self::execComposerCommand(
             ['remove', '--update-no-dev', $package],
             ['FORCE' => 1],
         );
     }
 
+    /**
+     * Install all packages listed in the plugins file
+     */
+    public static function installPlugins(): int
+    {
+        $packages = [];
+        foreach (self::getPlugins() as $package => $version) {
+            $packages[] = "$package:$version";
+        }
+
+        if (empty($packages)) {
+            return 0;
+        }
+
+        self::prepareComposerFile();
+
+        return self::execComposerCommand(
+            ['require', '--update-no-dev', ...$packages],
+            ['FORCE' => 1],
+        );
+    }
+
     public static function getPlugins(): array
     {
-        // Not cwd-relative: also reached from the web UI, where cwd is the
-        // document root. Not base_path(): this class runs as a composer script.
-        $file = realpath(__DIR__ . '/..') . '/composer.plugins.json';
+        $file = self::getPluginsFile();
 
         $plugins = is_file($file) && is_readable($file) ?
             json_decode((string) file_get_contents($file), true) : [];
 
         return $plugins['require'] ?? [];
+    }
+
+    /**
+     * The file that records the packages added by plugin:add
+     */
+    public static function getPluginsFile(): string
+    {
+        // Not cwd-relative: also reached from the web UI, where cwd is the
+        // document root. Not base_path(): this class runs as a composer script.
+        return getenv('LIBRENMS_COMPOSER_PLUGINS') ?: self::installDir() . '/composer.plugins.json';
+    }
+
+    /**
+     * When composer is pointed at another composer.json with the COMPOSER
+     * environment variable, start it from the one LibreNMS ships.
+     */
+    private static function prepareComposerFile(): void
+    {
+        $file = getenv('COMPOSER');
+        if (! $file || is_file($file)) {
+            return;
+        }
+
+        $dir = dirname($file);
+        if (! is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+
+        copy(self::installDir() . '/composer.json', $file);
+
+        $lock = pathinfo($file, PATHINFO_EXTENSION) === 'json' ? substr($file, 0, -4) . 'lock' : $file . '.lock';
+        copy(self::installDir() . '/composer.lock', $lock);
+    }
+
+    private static function installDir(): string
+    {
+        return (string) realpath(__DIR__ . '/..');
     }
 
     /**
@@ -155,10 +216,15 @@ class ComposerHelper
 
     private static function setPermissions(): void
     {
+        $dirs = implode(' ', array_map(
+            fn (string $dir): string => escapeshellarg(self::installDir() . "/$dir"),
+            ['rrd', 'logs', 'storage', 'bootstrap/cache'],
+        ));
+
+        // -P: leave data directories that are symlinks alone, they can point outside the install directory
         self::exec([
-            'cd ' . realpath(__DIR__ . '/../..'),
-            'setfacl -R -m g::rwx rrd/ logs/ storage/ bootstrap/cache/',
-            'setfacl -d -m g::rwx rrd/ logs/ storage/ bootstrap/cache/',
+            "setfacl -P -R -m g::rwx $dirs",
+            "setfacl -P -d -m g::rwx $dirs",
         ]);
     }
 
@@ -184,10 +250,10 @@ class ComposerHelper
     {
         $cli = [];
         foreach ($env as $key => $value) {
-            $cli[] = "$key=$value";
+            $cli[] = $key . '=' . escapeshellarg((string) $value);
         }
         $cli[] = PHP_BINARY;
-        $cli[] = realpath(__DIR__ . '/../scripts/composer_wrapper.php');
+        $cli[] = escapeshellarg(self::installDir() . '/scripts/composer_wrapper.php');
         foreach ($command as $word) {
             $cli[] = escapeshellarg($word);
         }

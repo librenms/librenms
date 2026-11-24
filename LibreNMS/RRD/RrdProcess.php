@@ -22,8 +22,9 @@ class RrdProcess
     private ?Process $process = null;
     private Closure $processFactory;
     private float $lastUsed = 0;
+    private bool $startedInRrdDir = true;
 
-    public function __construct(private readonly LoggerInterface $logger, Binaries $binaries, private readonly int $timeout = 300, ?Closure $processFactory = null, ?string $timezone = null)
+    public function __construct(private readonly LoggerInterface $logger, Binaries $binaries, private readonly int $timeout = 300, ?Closure $processFactory = null, ?string $timezone = null, bool $allowMissingRrdDir = false)
     {
         $this->rrd_dir = Str::finish(LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd'), '/');
         // set up process factory
@@ -36,11 +37,15 @@ class RrdProcess
             if ($timezone) {
                 $env['TZ'] = $timezone;
             }
-            $this->processFactory = fn () => new Process(
-                command: $command,
-                cwd: $this->rrd_dir,
-                env: $env,
-            );
+            $this->processFactory = function () use ($command, $env, $allowMissingRrdDir): Process {
+                $this->startedInRrdDir = ! $allowMissingRrdDir || is_dir($this->rrd_dir);
+
+                return new Process(
+                    command: $command,
+                    cwd: $this->startedInRrdDir ? $this->rrd_dir : '/',
+                    env: $env,
+                );
+            };
         } else {
             $this->processFactory = $processFactory;
         }
@@ -51,6 +56,10 @@ class RrdProcess
         // the idle timeout counts time between commands, so replace a process that sat idle
         // for half of it to leave the next command enough time before it is killed
         if ($this->process?->isRunning() && microtime(true) - $this->lastUsed > $this->timeout / 2) {
+            $this->stop();
+        }
+
+        if ($this->process?->isRunning() && ! $this->startedInRrdDir && is_dir($this->rrd_dir)) {
             $this->stop();
         }
 

@@ -33,11 +33,6 @@ or
 ```
 *Information inside parentheses is ignored during GEO lookup*
 
-We have two current mapping engines available:
-
-- Leaflet (default)
-- Jquery-Mapael
-
 ### World Map Widget Settings
 
 - *Initial Latitude / Longitude*: the map centre is at these
@@ -92,7 +87,6 @@ lnms config:set leaflet.tile_url 'https://tiles.example.com/{z}/{x}/{y}@2x.png?k
 ## Additional Leaflet config
 
 ```bash
-lnms config:set map.engine leaflet
 lnms config:set leaflet.default_lat "51.981074"
 lnms config:set leaflet.default_lng "5.350342"
 lnms config:set leaflet.default_zoom 8
@@ -131,20 +125,3 @@ Cons: inaccurate: most addresses are returned as locations at the center of the 
 Bing:  
 Pros: free, no credit card required, accurate  
 Cons: Microsoft (debatable)
-
-## Jquery-Mapael config
-
-Further custom options are available to load different maps of the
-world. Set the default coordinates of the map centre and the zoom
-level by default. An example of this is:
-
-```bash
-lnms config:set map.engine jquery-mapael
-lnms config:set mapael.default_map 'mapael-maps/united_kingdom/united_kingdom.js'
-lnms config:set mapael.map_width 400
-lnms config:set mapael.default_lat '50.898482'
-lnms config:set mapael.default_lng '-3.401402'
-lnms config:set mapael.default_zoom 20
-```
-
-A list of maps can be found in ```html/js/maps/``` or ```html/js/mapael-maps/```.

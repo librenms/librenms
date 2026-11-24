@@ -25,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->web([
             \App\Http\Middleware\CheckInstalled::class,
+            \App\Http\Middleware\AutoLoginTestUser::class,
             \App\Http\Middleware\LegacyExternalAuth::class,
             \App\Http\Middleware\VerifyUserEnabled::class,
             \App\Http\Middleware\VerifyTwoFactor::class,
@@ -33,8 +34,15 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->api([
             \App\Http\Middleware\EnforceJson::class,  // prevent redirect to login page
+            \App\Http\Middleware\LogApiAuthFailure::class,
             'auth:sanctum',
         ]);
+
+        // must wrap authentication to see its failures
+        $middleware->prependToPriorityList(
+            before: \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
+            prepend: \App\Http\Middleware\LogApiAuthFailure::class,
+        );
 
         $middleware->replace(\Illuminate\Http\Middleware\TrustProxies::class, \App\Http\Middleware\TrustProxies::class);
         $middleware->replace(\Illuminate\Http\Middleware\HandleCors::class, \App\Http\Middleware\HandleCors::class);
@@ -51,6 +59,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\EnforceJson::class, // must be before auth
+            \App\Http\Middleware\AutoLoginTestUser::class, // must be before auth
             \App\Http\Middleware\LegacyExternalAuth::class, // must be before auth
             \Illuminate\Contracts\Auth\Middleware\AuthenticatesRequests::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class,

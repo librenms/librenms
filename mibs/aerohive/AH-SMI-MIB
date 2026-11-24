@@ -1,5 +1,5 @@
 --
--- Copyright (c) 2006-2013. Aerohive Netowrks, Inc
+-- Copyright (c) 2006-2022. Extreme Networks, Inc
 -- All rights reserved.
 
 AH-SMI-MIB DEFINITIONS ::= BEGIN
@@ -18,11 +18,10 @@ IMPORTS MODULE-IDENTITY, OBJECT-TYPE, enterprises
 --        
 
 aerohive MODULE-IDENTITY
-         LAST-UPDATED  "201608310000Z"  --  Aug 31, 2016
-         ORGANIZATION  "Aerohive Networks, Inc"
-         CONTACT-INFO  "info@aerohive.com
-                        1011 McCarthy Boulevard
-                        
+         LAST-UPDATED  "201807140000Z"  --  July 14, 2018		 
+         ORGANIZATION  "Aerohive Networks, Inc"	 
+         CONTACT-INFO  "info@aerohive.com		 
+                        1011 McCarthy Boulevard  						
                         Milpitas, CA 95035"
          DESCRIPTION
            "This is the MIB module for object type definitions
@@ -34,17 +33,49 @@ aerohive MODULE-IDENTITY
 
 ahProduct          OBJECT IDENTIFIER ::= { aerohive 1 }
 
-ahAP     	   OBJECT IDENTIFIER ::= { ahProduct 1 }
+ahAP     	       OBJECT IDENTIFIER ::= { ahProduct 1 }
 ahAPCommon         OBJECT IDENTIFIER ::= { ahAP 1 }
-ahAPTrap	   OBJECT IDENTIFIER ::= { ahAPCommon 1 }
+ahAPTrap	       OBJECT IDENTIFIER ::= { ahAPCommon 1 }
 ahAPInterface	   OBJECT IDENTIFIER ::= { ahAPCommon 2 }
 ahAPMRP            OBJECT IDENTIFIER ::= { ahAPCommon 3 }
 ahAPIDP            OBJECT IDENTIFIER ::= { ahAPCommon 4 }
 
-ahAPHiveAP020-ag            OBJECT IDENTIFIER ::= { ahAP 2 }
-ahAPHiveAP028-ag            OBJECT IDENTIFIER ::= { ahAP 3 }
+ahAPHiveAP020-ag          OBJECT IDENTIFIER ::= { ahAP 2 }
+ahAPHiveAP028-ag          OBJECT IDENTIFIER ::= { ahAP 3 }
 ahAPHiveAP320-n           OBJECT IDENTIFIER ::= { ahAP 4 }
 ahAPHiveAP340-n           OBJECT IDENTIFIER ::= { ahAP 5 }
+ahAPHiveAP110-n           OBJECT IDENTIFIER ::= { ahAP 6 }
+ahAPHiveAP120-n           OBJECT IDENTIFIER ::= { ahAP 7 }
+ahAPHiveAP170-n           OBJECT IDENTIFIER ::= { ahAP 8 }
+ahAPHiveAP330-n           OBJECT IDENTIFIER ::= { ahAP 9 }
+ahAPHiveAP350-n           OBJECT IDENTIFIER ::= { ahAP 10 }
+ahAPHiveAP121-n           OBJECT IDENTIFIER ::= { ahAP 11 }
+ahAPHiveAP141-n           OBJECT IDENTIFIER ::= { ahAP 12 }
+ahAPHiveAP370-ac          OBJECT IDENTIFIER ::= { ahAP 13 }
+ahAPHiveAP390-ac          OBJECT IDENTIFIER ::= { ahAP 14 }
+ahAPHiveAP230-ac          OBJECT IDENTIFIER ::= { ahAP 15 }
+ahAPHiveAP1130-ac         OBJECT IDENTIFIER ::= { ahAP 16 }
+ahAPHiveAP130-ac          OBJECT IDENTIFIER ::= { ahAP 17 }
+ahAPHiveAP250-ac          OBJECT IDENTIFIER ::= { ahAP 18 }
+ahAPHiveAP245X-ac         OBJECT IDENTIFIER ::= { ahAP 19 }
+ahAPHiveAP550-ac          OBJECT IDENTIFIER ::= { ahAP 20 }
+ahAPHiveAP122-ac          OBJECT IDENTIFIER ::= { ahAP 21 }
+ahAPHiveAP122X-ac         OBJECT IDENTIFIER ::= { ahAP 22 }
+ahAPHiveAP150W-ac         OBJECT IDENTIFIER ::= { ahAP 23 }
+ahAPHiveAP30-ac           OBJECT IDENTIFIER ::= { ahAP 24 }
+ahAPHiveAP630-ax          OBJECT IDENTIFIER ::= { ahAP 25 }
+ahAPHiveAP650-ax          OBJECT IDENTIFIER ::= { ahAP 26 }
+ahAPHiveAP650X-ax         OBJECT IDENTIFIER ::= { ahAP 27 }
+ahAPHiveAP510CX-ax        OBJECT IDENTIFIER ::= { ahAP 29 }
+ahAPHiveAP305C-ax         OBJECT IDENTIFIER ::= { ahAP 30 }
+ahAPHiveAP305CX-ax        OBJECT IDENTIFIER ::= { ahAP 31 }
+ahAPHiveAP410C-ax         OBJECT IDENTIFIER ::= { ahAP 32 }
+ahAPHiveAP460C-ax         OBJECT IDENTIFIER ::= { ahAP 33 }
+ahAPHiveAP460S6C-ax       OBJECT IDENTIFIER ::= { ahAP 34 }
+ahAPHiveAP460S12C-ax      OBJECT IDENTIFIER ::= { ahAP 35 }
+ahAPHiveAP302W-ax         OBJECT IDENTIFIER ::= { ahAP 36 }
+ahAPHiveAP4000-ax         OBJECT IDENTIFIER ::= { ahAP 37 }
+ahAPHiveAP4000U-ax        OBJECT IDENTIFIER ::= { ahAP 38 }
 
 AhString ::= TEXTUAL-CONVENTION
    STATUS        current
@@ -71,19 +102,25 @@ AhInterfaceMode ::= TEXTUAL-CONVENTION
                    ahNotUsed    (0), -- interface is not used
                    ahAccess     (1), -- interface is used for access 
                    ahBackhaul   (2), -- interface is used for backhaul
-                   ahBridge     (3)  -- interface is used for bridge
+                   ahBridge     (3), -- interface is used for bridge
+                   ahDual       (4)  -- interface is used for dual
+                   ahSensor     (5)  -- interface is used for Sensor
+                   ahWLAN-Wan   (6)  -- interface is used for WLAN-Wan
                  }
 
 AhMACProtocol ::= TEXTUAL-CONVENTION
    STATUS        current
    DESCRIPTION   "Radio Mode"
    SYNTAX        INTEGER {
-                   ah11a        (0), -- A mode 
-                   ah11b        (1), -- B mode
-                   ah11g        (2), -- G mode
-                   ah11na       (3), -- NA mode
-                   ah11ng       (4)  -- NG mode
+                   ah11a        (0), -- 802.11a mode
+                   ah11b        (1), -- 802.11b mode
+                   ah11g        (2), -- 802.11g mode
+                   ah11na       (3), -- 802.11na mode
+                   ah11ng       (4), -- 802.11ng mode
+                   ah11ac       (5), -- 802.11ac mode
+                   ahBLE        (6), -- Bluetooth Low Energy mode
+                   ahZigbee     (7), -- Zigbee (802.15.4) mode
+                   ah11ax       (8)  -- 802.11ax mode
                  }
 
 END
-

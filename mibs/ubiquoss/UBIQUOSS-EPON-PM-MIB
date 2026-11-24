@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP; TEXTUAL-CONVENTION name must start uppercase)
 -- *****************************************************************
 -- UBIQUOSS-EPON-PM-MIB.mib:  
 -- Ubiquoss Enterprise Vdsl Performance Structure of Management Information
@@ -61,7 +62,7 @@ ubiEponPMMIB  MODULE-IDENTITY
    				
 	ubiEponPMMIBObjects OBJECT IDENTIFIER ::= { ubiEponPMMIB  1 }
     
-    ubiEponPhysSide ::= TEXTUAL-CONVENTION
+    UbiEponPhysSide ::= TEXTUAL-CONVENTION
        STATUS       current
        DESCRIPTION
            "switch(1)  -- switch side of port
@@ -481,14 +482,7 @@ ubiEponPMMIBCompliance MODULE-COMPLIANCE
         ::= { ubiEponPMMIBCompliances 1 }
 
 -- ports of conformance
-ubiEponPMMIBGroup OBJECT-GROUP
-        OBJECTS {
-							   
-        }
-        STATUS  current
-        DESCRIPTION
-                "ubiquoss epon pm."
-        ::= { ubiEponPMMIBGroups 1 }
+ubiEponPMMIBGroup OBJECT IDENTIFIER ::= { ubiEponPMMIBGroups 1 }
         
 ubiEponPMMIBNotifGroup NOTIFICATION-GROUP
         NOTIFICATIONS {

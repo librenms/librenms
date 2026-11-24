@@ -4,7 +4,6 @@
 use App\Jobs\PingCheck;
 use LibreNMS\Util\Debug;
 
-$init_modules = ['alerts', 'laravel', 'nodb'];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('fhdvg:');

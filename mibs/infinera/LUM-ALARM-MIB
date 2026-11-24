@@ -1,0 +1,3507 @@
+LUM-ALARM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32, Counter32, IpAddress
+        FROM SNMPv2-SMI
+    OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION, DateAndTime, RowPointer,
+    VariablePointer, DisplayString, TestAndIncr
+        FROM SNMPv2-TC
+    lumModules, lumAlarmMIB
+        FROM LUM-REG
+    FaultStatus, MgmtNameString, CommandString
+        FROM LUM-TC;
+
+lumAlarmMIBModule MODULE-IDENTITY
+    LAST-UPDATED
+        "201706150000Z" -- June 15th 2017
+    ORGANIZATION
+        "Infinera Corporation"
+    CONTACT-INFO
+        "techsupport@infinera.com"
+    DESCRIPTION
+        "The alarm MIB.
+
+        - General and log size configuration
+
+        - Alarm log
+
+        - Alarm statistics
+
+        - Notifications for new and changed alarms and heartbeat
+
+        - Alarm test utility
+
+        - Alarm definitions for use by the network manager.
+
+        - External alarms
+
+        - New alarm log
+
+        - Event log
+
+"
+    REVISION
+        "201706150000Z" -- June 15th 2017
+    DESCRIPTION
+        "Changes made for release r29.0:
+         - Added alarmRemoteBackupReplicationRetryFailed attribute
+         - Added alarmRemoteBackupReplicationFileNotAvailable attribute
+         - Changed ORGANIZATION and CONTACT-INFO"
+    REVISION
+        "201611300000Z" -- November 30th 2016
+    DESCRIPTION
+        "Changes made for release r28.0:
+        - Added soak-in interval attribute.
+		- Updated alarm text and descriptions from TNM to DNA-M."
+    REVISION
+        "201103240000Z" -- March 24th 2011
+    DESCRIPTION
+        "Added remote software not supported alarm."
+    REVISION
+        "200509190000Z" -- Septemver 19th 2005
+    DESCRIPTION
+        "Added node name and IP address to alarm attributes.
+        Added alarm event log."
+    REVISION
+        "200507070000Z" -- July 7th 2005
+    DESCRIPTION
+        "Added external alarms."
+    REVISION
+        "200504290000Z" -- April 29th 2005
+    DESCRIPTION
+        "Added heartbeat notification."
+    REVISION
+        "200502070000Z" -- February 7th 2005
+    DESCRIPTION
+        "Fixed the order of the attributes in the alarm traps."
+    REVISION
+        "200409300000Z" -- September 30th 2004
+    DESCRIPTION
+        "Added log and list size and previous severity
+        in the alarm log."
+    REVISION
+        "200309230000Z" -- September 23rd 2003
+    DESCRIPTION
+        "Added alarmTestSetXxx variables since the
+        alarmTestXxx faultstatus variables now
+        are hidden in the CLI by default."
+    REVISION
+        "200308070000Z" -- August 7th 2003
+    DESCRIPTION
+        "Added alarmRemote group."
+    REVISION
+        "200303050000Z" -- March 5th 2003
+    DESCRIPTION
+        "Changed indexing in alarm and alarm log tables."
+    REVISION
+        "200201100000Z" -- January 10th 2002
+    DESCRIPTION
+        "Added alarm log."
+    REVISION
+        "200110300000Z" -- October 30th 2001
+    DESCRIPTION
+        "MIB version and testAndIncr are hidden, not supported.
+        Updated compliance info."
+    REVISION
+        "200110110000Z" -- October 11th 2001
+    DESCRIPTION
+        "Deprecated the replay function...
+        Changed 'unknown' to 'undefined'."
+    REVISION
+        "200109130000Z" -- September 13th 2001
+    DESCRIPTION
+        "Replaced TimeStamp with DateAndTime.
+        Fixed alias for the module."
+    REVISION
+        "200107170000Z" -- July 17th 2001
+    DESCRIPTION
+        "Added version information to the general group.
+        Added addtional alias, persistence and alarm
+        meta-information."
+    REVISION
+        "200105100000Z" -- May 10th 2001
+    DESCRIPTION
+        "Changed inventory references from the ENTITY-MIB
+        to the LUM-INVENTORY-MIB."
+    REVISION
+        "200103120000Z" -- March 12th 2001
+    DESCRIPTION
+        "Changed naming convention from 'lumemtis' to 'lum'.
+        Removed the severity based test alarms, one
+        set of test alarm should be sufficient."
+    REVISION
+        "200103080000Z" -- March 8th 2001
+    DESCRIPTION
+        "Added alarm test group and alarm object."
+    REVISION
+        "200103050000Z" -- March 5th 2001
+    DESCRIPTION
+        "Added alarm summary group."
+    REVISION
+        "200103010000Z" -- March 1st 2001
+    DESCRIPTION
+        "The initial revision of this module."
+    ::= { lumModules 3 }
+
+-- ----------------------------------------------------
+-- Conformance area, containing groups and complicance
+-- specifications.
+-- ----------------------------------------------------
+
+lumAlarmConfs OBJECT IDENTIFIER ::= { lumAlarmMIB 1 }
+lumAlarmGroups OBJECT IDENTIFIER ::= { lumAlarmConfs 1 }
+lumAlarmCompl OBJECT IDENTIFIER ::= { lumAlarmConfs 2 }
+lumAlarmMinimalGroups OBJECT IDENTIFIER ::= { lumAlarmConfs 3 }
+lumAlarmMinimalCompl OBJECT IDENTIFIER ::= { lumAlarmConfs 4 }
+
+-- ----------------------------------------------------
+-- Root for objects in the alarm MIB
+-- ----------------------------------------------------
+
+lumAlarmMIBObjects OBJECT IDENTIFIER ::= { lumAlarmMIB 2 }
+
+-- ----------------------------------------------------
+-- This MIB contains the following groups:
+-- ----------------------------------------------------
+
+alarmGeneral OBJECT IDENTIFIER ::= { lumAlarmMIBObjects 1 } -- alias=general
+alarmList  OBJECT IDENTIFIER ::= { lumAlarmMIBObjects 2 }
+lumentisAlarmNotifications  OBJECT IDENTIFIER ::= { lumAlarmMIBObjects 3 }
+alarmSum OBJECT IDENTIFIER ::= { lumAlarmMIBObjects 4 } -- alias=sum
+alarmTest OBJECT IDENTIFIER ::= { lumAlarmMIBObjects 5 } -- alias=test
+alarmLog OBJECT IDENTIFIER ::= { lumAlarmMIBObjects 6 }
+alarmRemote OBJECT IDENTIFIER ::= { lumAlarmMIBObjects 7 }
+alarmExternal OBJECT IDENTIFIER ::= { lumAlarmMIBObjects 8 }
+alarmLog2 OBJECT IDENTIFIER ::= { lumAlarmMIBObjects 9 }
+alarmEvent OBJECT IDENTIFIER ::= { lumAlarmMIBObjects 10 }
+
+-- ----------------------------------------------------
+-- Textual Conventions
+-- ----------------------------------------------------
+
+AlarmNotificationType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Type of alarm as defined in ITU-T X.733."
+    SYNTAX INTEGER {
+        undefined (0),
+        communications (1),
+        qualityOfService (2),
+        processingError (3),
+        equipment (4),
+        environmental (5) }
+
+AlarmPerceivedSeverity ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Alarm severity as defined in ITU-T X.733."
+    SYNTAX INTEGER {
+        undefined (0),
+        cleared (1),
+        indeterminate (2),
+        warning (3),
+        minor (4),
+        major (5),
+        critical (6) }
+
+AlarmProbableCause ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Alarm probable cause as defined in ITU-T X.733."
+    SYNTAX INTEGER {
+        undefined (0),
+        adapterError (1),                       -- Equipment
+        applicationSubsystemFailure (2),        -- Processing
+        bandwidthReduced (3),                   -- Quality of service
+        callEstablishmentError (4),             -- Communications
+        communicationsProtocolError (5),        -- Communications
+        communicationsSubsystemFailure (6),     -- Communications
+        configurationOrCustomizationError (7),  -- Processing
+        congestion (8),                         -- Quality of service
+        corruptData (9),                        -- Processing
+        cpuCyclesLimitExceeded (10),            -- Processing
+        dTEdCEInterfaceError (11),              -- Communications
+        datasetOrModemError (12),               -- Equipment
+        degradedSignal (13),                    -- Communications
+        enclosureDoorOpen (14),                 -- Environmental
+        equipmentMalfunction (15),              -- Equipment
+        excessiveVibration (16),                -- Environmental
+        fileError (17),                         -- Processing
+        fireDetected (18),                      -- Environmental
+        floodDetected (19),                     -- Environmental
+        framingError (20),                      -- Communications
+        heatingOrVentilationOrCoolingSystemProblem (21), -- Environmental
+        humidityUnacceptable (22),              -- Environmental
+        inputDeviceError (23),                  -- Equipment
+        inputOutputDeviceError (24),            -- Equipment
+        lANError (25),                          -- Communications
+        leakDetected (26),                      -- Environmental
+        localNodeTransmissionError (27),        -- Communications
+        lossOfFrame (28),                       -- Communications
+        lossOfSignal (29),                      -- Communications
+        materialSupplyExhausted (30),           -- Environmental
+        multiplexerProblem (31),                -- Equipment
+        outOfMemory (32),                       -- Processing
+        outputDeviceError (33),                 -- Equipment
+        performanceDegraded (34),               -- Quality of service
+        powerProblem (35),                      -- Equipment
+        pressureUnacceptable (36),              -- Environmental
+        processorProblem (37),                  -- Equipment
+        pumpFailure (38),                       -- Environmental
+        queueSizeExceeded (39),                 -- Quality of service
+        receiveFailure (40),                    -- Equipment
+        receiverFailure (41),                   -- Equipment
+        remoteNodeTransmissionError (42),       -- Communications
+        resourceAtOrNearingCapacity (43),       -- Quality of service
+        responseTimeExcessive (44),             -- Quality of service
+        retransmissionRateExcessive (45),       -- Quality of service
+        softwareProgramError (46),              -- Processing
+        softwareError (47),                     -- Processing
+        softwareProgramAbnormallyTerminated (48), -- Processing
+        storageCapacityProblem (49),            -- Processing
+        temperatureUnacceptable (50),           -- Environmental
+        thresholdCrossed (51),                  -- Quality of service
+        timingProblem (52),                     -- Equipment
+        toxicLeakDetected (53),                 -- Environmental
+        transmitFailure (54),                   -- Equipment
+        transmitterFailure (55),                -- Equipment
+        underlyingResourceUnavailable (56),     -- Processing
+        versionMismatch (57) }                  -- Processing
+
+AlarmEventCategory ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Different event categories used in the system."
+    SYNTAX INTEGER {
+        undefined (0),
+        state (1),
+        configuration (2),
+        maintenance (3),
+        alarm (4), -- not used today
+        auth (5), -- authentication event (see syslog standard)
+        authPriv (6) -- private authentication event (see syslog standard)
+    }
+
+-- ----------------------------------------------------
+-- General group
+-- ----------------------------------------------------
+
+alarmGeneralLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the alarm list was last changed.
+"
+    ::= { alarmGeneral 1 }
+
+alarmGeneralLogSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of recently cleared alarms kept in the
+        alarm log.
+"
+    DEFVAL { 200 }
+    ::= { alarmGeneral 2 }
+
+alarmGeneralLastSeqNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sequence number last used when issuing
+        a notification.
+"
+    ::= { alarmGeneral 3 }
+
+alarmGeneralReplayBufferSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1000)
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Note: Not supported!
+
+        The maximum number of alarm status changes
+        saved for re-play.
+"
+    DEFVAL { 10 }
+    ::= { alarmGeneral 4 }
+
+alarmGeneralReplayRequestSeq OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1000)
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Note: Not supported!
+
+        Request re-play of the indicated last number of
+        changed status.
+"
+    ::= { alarmGeneral 5 }
+
+alarmGeneralReplayRequestTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Note: Not supported!
+
+        Request re-play of status changes that has occured
+        since the time indicated.
+"
+    ::= { alarmGeneral 6 }
+
+alarmGeneralTestAndIncr OBJECT-TYPE
+    SYNTAX      TestAndIncr
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Note: Not supported!
+
+        Protection against simultaneous access from
+        multiple managers. See SNMPv2-TC.
+"
+    ::= { alarmGeneral 7 }
+
+alarmGeneralMibSpecVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Note: Not supported!
+
+        The MIB specification version.
+"
+    DEFVAL { "" }
+    ::= { alarmGeneral 8 }
+
+alarmGeneralMibImplVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Note: Not supported!
+
+        The MIB implementation version.
+"
+    DEFVAL { "" }
+    ::= { alarmGeneral 9 }
+
+alarmGeneralSuppressionMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    off (1),
+                    on (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables/disables suppression of alarms.
+"
+    DEFVAL { on }
+    ::= { alarmGeneral 10 }
+
+alarmGeneralFilterMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    off (1),
+                    on (2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enables/disables low-pass filtering of raising
+        and clearing of alarms. With filtering enabled
+        alarms must stay active/cleared for a certain time
+        before appearing in the alarm list.
+"
+    DEFVAL { on }
+    ::= { alarmGeneral 11 }
+
+alarmGeneralConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the MIB was
+        last changed.
+"
+    ::= { alarmGeneral 12 }
+
+alarmGeneralAlarmTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of rows available in the
+        alarm list.
+"
+    ::= { alarmGeneral 13 }
+
+alarmGeneralAlarmLogTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of rows available in the
+        alarm log.
+"
+    ::= { alarmGeneral 14 }
+
+alarmGeneralHeartBeatInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..60)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The interval (in minutes) with
+        which the heartbeat notification
+        (trap) from the node is sent.
+        The first heartbeat notification
+        is sent approx. one interval after
+        the the function is enabled.
+        To disable the heartbeat notification
+        set the interval to 0.
+"
+    DEFVAL { 0 }
+    ::= { alarmGeneral 15 }
+
+alarmGeneralAlarmLog2TableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of rows available in the
+        alarm log.
+"
+    ::= { alarmGeneral 16 }
+
+alarmGeneralAlarmNotificationVersion OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    v1 (1),
+                    v2 (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets which version of the alarm
+        notifications to use.
+
+        v1 - 'Classic'.
+        v2 - Node name and IP address appended to traps.
+
+        Note: Alarm trap version is not to be confused
+        with SNMP protocol versions. All traps from the
+        nodes are sent as SNMP v2c traps.
+
+        Note: The alarm related traps with node name
+        and IP address appended (v2) except for the
+        heartbeat-trap still uses the older (v1) trap
+        OIDs even though new trap OIDs have
+        been defined.
+        This is a bug but kept for compatibility reasons.
+"
+    DEFVAL { v1 }
+    ::= { alarmGeneral 17 }
+
+alarmGeneralAlarmLog2Size OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of alarm to be
+        stored in the alarm log.
+"
+    DEFVAL { 200 }
+    ::= { alarmGeneral 18 }
+
+alarmGeneralHighestSeverity OBJECT-TYPE
+    SYNTAX      AlarmPerceivedSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current highest severity present among
+        the active alarms.
+"
+    ::= { alarmGeneral 19 }
+
+alarmGeneralEventLogTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of rows available in the
+        event log.
+"
+    ::= { alarmGeneral 20 }
+
+alarmGeneralEventLogSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of events to be
+        stored in the event log.
+"
+    DEFVAL { 200 }
+    ::= { alarmGeneral 21 }
+
+alarmGeneralEventLastSeqNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sequence number last used when creating
+        a new entry in the event log.
+
+"
+    ::= { alarmGeneral 22 }
+
+alarmGeneralSoakInInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1440)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The interval (in minutes) with
+        which the interfaces in the node change
+        state from Auto In-Service to
+        In-Service after it expires.
+        To disable the Soak-in interval
+        set it to 0. Acceptable value is
+        in the range 5m to 24h (1440m).
+"
+    DEFVAL { 0 }
+    ::= { alarmGeneral 23 }
+
+-- ----------------------------------------------------
+-- Alarm list group
+-- ----------------------------------------------------
+
+alarmTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The alarm list."
+    ::= { alarmList 1 }
+
+alarmEntry OBJECT-TYPE
+    SYNTAX      AlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the alarm list.
+"
+    INDEX { alarmSeqNumber }
+    ::= { alarmTable 1 }
+
+AlarmEntry ::=
+    SEQUENCE {
+        alarmIndex                      Unsigned32,
+        alarmObject                     RowPointer,
+        alarmFaultStatus                VariablePointer,
+        alarmMgmtName                   MgmtNameString,
+        alarmInvPhysIndexOrZero         Unsigned32,
+        alarmInvLogicalIndexOrZero      Unsigned32,
+        alarmType                       AlarmNotificationType,
+        alarmCause                      AlarmProbableCause,
+        alarmText                       DisplayString,
+        alarmSeverity                   AlarmPerceivedSeverity,
+        alarmCreatedTime                DateAndTime,
+        alarmLastChangeTime             DateAndTime,
+        alarmSeqNumber                  Counter32,
+        alarmNeName                     DisplayString,
+        alarmNeIpAddress                IpAddress }
+
+alarmIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each alarm.
+"
+    ::= { alarmEntry 1 }
+
+alarmObject OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pointer to the fault status variable related to
+        this alarm.
+"
+    ::= { alarmEntry 2 }
+
+alarmFaultStatus OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pointer to the fault status variable related to
+        this alarm.
+"
+    ::= { alarmEntry 3 }
+
+alarmMgmtName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the entity this alarm
+        pertains to.
+"
+    ::= { alarmEntry 4 }
+
+alarmInvPhysIndexOrZero OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object identifies the physical
+        entity in the LUM-INVENTORY-MIB this alarm
+        pertains to.
+
+        Set to zero if not used.
+"
+    ::= { alarmEntry 5 }
+
+alarmInvLogicalIndexOrZero OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object identifies the logical
+        entity in the LUM-INVENTORY-MIB this alarm
+        pertains to.
+
+        Set to zero if not used.
+"
+    ::= { alarmEntry 6 }
+
+alarmType OBJECT-TYPE
+    SYNTAX      AlarmNotificationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of alarm as defined in ITU-T X.733.
+"
+    ::= { alarmEntry 7 }
+
+alarmCause OBJECT-TYPE
+    SYNTAX      AlarmProbableCause
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The probable cause of the alarm as defined in
+        ITU-T X.733.
+"
+    ::= { alarmEntry 8 }
+
+alarmText OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The additional text for the alarm.
+"
+    ::= { alarmEntry 9 }
+
+alarmSeverity OBJECT-TYPE
+    SYNTAX      AlarmPerceivedSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The severity of the alarm as defined in
+        ITU-T X.733.
+"
+    ::= { alarmEntry 10 }
+
+alarmCreatedTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the alarm was created.
+"
+    ::= { alarmEntry 11 }
+
+alarmLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the alarm was last changed.
+"
+    ::= { alarmEntry 12 }
+
+alarmSeqNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The last sequence number used when issuing
+        a notification for this alarm.
+"
+    ::= { alarmEntry 13 }
+
+alarmNeName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the alarming network element.
+        Contains the user configurable network
+        element name (system::node::0::neUserName)
+        if set, otherwise the host name
+        (system::node::0::name).
+
+"
+    ::= { alarmEntry 14 }
+
+alarmNeIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address for the alarming network element.
+
+"
+    ::= { alarmEntry 15 }
+
+-- ----------------------------------------------------
+-- Notifications
+-- ----------------------------------------------------
+
+alarmNotifyPrefix OBJECT IDENTIFIER ::= { lumentisAlarmNotifications 0 }
+
+alarmNotificationColdStart NOTIFICATION-TYPE
+    OBJECTS {
+        alarmGeneralLastChangeTime }
+    STATUS      current
+    DESCRIPTION
+        "Sent when the alarm list re-starts.
+"
+    ::= { alarmNotifyPrefix 1 }
+
+alarmNotificationCleared NOTIFICATION-TYPE
+    OBJECTS {
+        alarmIndex,
+        alarmObject,
+        alarmFaultStatus,
+        alarmMgmtName,
+        alarmInvPhysIndexOrZero,
+        alarmInvLogicalIndexOrZero,
+        alarmType,
+        alarmCause,
+        alarmText,
+        alarmSeverity,
+        alarmCreatedTime,
+        alarmLastChangeTime,
+        alarmSeqNumber }
+    STATUS      current
+    DESCRIPTION
+        "Sent when an alarm is cleared.
+"
+    ::= { alarmNotifyPrefix 2 }
+
+alarmNotificationIndeterminate NOTIFICATION-TYPE
+    OBJECTS {
+        alarmIndex,
+        alarmObject,
+        alarmFaultStatus,
+        alarmMgmtName,
+        alarmInvPhysIndexOrZero,
+        alarmInvLogicalIndexOrZero,
+        alarmType,
+        alarmCause,
+        alarmText,
+        alarmSeverity,
+        alarmCreatedTime,
+        alarmLastChangeTime,
+        alarmSeqNumber
+    }
+    STATUS      current
+    DESCRIPTION
+        "Sent when an alarm with indeterminate severity is
+        raised.
+"
+    ::= { alarmNotifyPrefix 3 }
+
+alarmNotificationWarning NOTIFICATION-TYPE
+    OBJECTS {
+        alarmIndex,
+        alarmObject,
+        alarmFaultStatus,
+        alarmMgmtName,
+        alarmInvPhysIndexOrZero,
+        alarmInvLogicalIndexOrZero,
+        alarmType,
+        alarmCause,
+        alarmText,
+        alarmSeverity,
+        alarmCreatedTime,
+        alarmLastChangeTime,
+        alarmSeqNumber }
+    STATUS      current
+    DESCRIPTION
+        "Sent when an alarm with warning severity is
+        raised.
+"
+    ::= { alarmNotifyPrefix 4 }
+
+alarmNotificationMinor NOTIFICATION-TYPE
+    OBJECTS {
+        alarmIndex,
+        alarmObject,
+        alarmFaultStatus,
+        alarmMgmtName,
+        alarmInvPhysIndexOrZero,
+        alarmInvLogicalIndexOrZero,
+        alarmType,
+        alarmCause,
+        alarmText,
+        alarmSeverity,
+        alarmCreatedTime,
+        alarmLastChangeTime,
+        alarmSeqNumber }
+    STATUS      current
+    DESCRIPTION
+        "Sent when an alarm with minor severity is
+        raised.
+"
+    ::= { alarmNotifyPrefix 5 }
+
+alarmNotificationMajor NOTIFICATION-TYPE
+    OBJECTS {
+        alarmIndex,
+        alarmObject,
+        alarmFaultStatus,
+        alarmMgmtName,
+        alarmInvPhysIndexOrZero,
+        alarmInvLogicalIndexOrZero,
+        alarmType,
+        alarmCause,
+        alarmText,
+        alarmSeverity,
+        alarmCreatedTime,
+        alarmLastChangeTime,
+        alarmSeqNumber }
+    STATUS      current
+    DESCRIPTION
+        "Sent when an alarm with major severity is
+        raised.
+"
+    ::= { alarmNotifyPrefix 6 }
+
+alarmNotificationCritical NOTIFICATION-TYPE
+    OBJECTS {
+        alarmIndex,
+        alarmObject,
+        alarmFaultStatus,
+        alarmMgmtName,
+        alarmInvPhysIndexOrZero,
+        alarmInvLogicalIndexOrZero,
+        alarmType,
+        alarmCause,
+        alarmText,
+        alarmSeverity,
+        alarmCreatedTime,
+        alarmLastChangeTime,
+        alarmSeqNumber }
+    STATUS      current
+    DESCRIPTION
+        "Sent when an alarm with critical severity is
+        raised.
+"
+    ::= { alarmNotifyPrefix 7 }
+
+alarmNotificationHeartBeat NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "Heartbeat.
+"
+    ::= { alarmNotifyPrefix 8 }
+
+alarmNotificationClearedV2 NOTIFICATION-TYPE
+    OBJECTS {
+        alarmIndex,
+        alarmObject,
+        alarmFaultStatus,
+        alarmMgmtName,
+        alarmInvPhysIndexOrZero,
+        alarmInvLogicalIndexOrZero,
+        alarmType,
+        alarmCause,
+        alarmText,
+        alarmSeverity,
+        alarmCreatedTime,
+        alarmLastChangeTime,
+        alarmSeqNumber,
+        alarmNeName,
+        alarmNeIpAddress  }
+    STATUS      current
+    DESCRIPTION
+        "Sent when an alarm is cleared.
+"
+    ::= { alarmNotifyPrefix 9 }
+
+alarmNotificationIndeterminateV2 NOTIFICATION-TYPE
+    OBJECTS {
+        alarmIndex,
+        alarmObject,
+        alarmFaultStatus,
+        alarmMgmtName,
+        alarmInvPhysIndexOrZero,
+        alarmInvLogicalIndexOrZero,
+        alarmType,
+        alarmCause,
+        alarmText,
+        alarmSeverity,
+        alarmCreatedTime,
+        alarmLastChangeTime,
+        alarmSeqNumber,
+        alarmNeName,
+        alarmNeIpAddress }
+    STATUS      current
+    DESCRIPTION
+        "Sent when an alarm with indeterminate severity is
+        raised.
+"
+    ::= { alarmNotifyPrefix 10 }
+
+alarmNotificationWarningV2 NOTIFICATION-TYPE
+    OBJECTS {
+        alarmIndex,
+        alarmObject,
+        alarmFaultStatus,
+        alarmMgmtName,
+        alarmInvPhysIndexOrZero,
+        alarmInvLogicalIndexOrZero,
+        alarmType,
+        alarmCause,
+        alarmText,
+        alarmSeverity,
+        alarmCreatedTime,
+        alarmLastChangeTime,
+        alarmSeqNumber,
+        alarmNeName,
+        alarmNeIpAddress }
+    STATUS      current
+    DESCRIPTION
+        "Sent when an alarm with warning severity is
+        raised.
+"
+    ::= { alarmNotifyPrefix 11 }
+
+alarmNotificationMinorV2 NOTIFICATION-TYPE
+    OBJECTS {
+        alarmIndex,
+        alarmObject,
+        alarmFaultStatus,
+        alarmMgmtName,
+        alarmInvPhysIndexOrZero,
+        alarmInvLogicalIndexOrZero,
+        alarmType,
+        alarmCause,
+        alarmText,
+        alarmSeverity,
+        alarmCreatedTime,
+        alarmLastChangeTime,
+        alarmSeqNumber,
+        alarmNeName,
+        alarmNeIpAddress }
+    STATUS      current
+    DESCRIPTION
+        "Sent when an alarm with minor severity is
+        raised.
+"
+    ::= { alarmNotifyPrefix 12 }
+
+alarmNotificationMajorV2 NOTIFICATION-TYPE
+    OBJECTS {
+        alarmIndex,
+        alarmObject,
+        alarmFaultStatus,
+        alarmMgmtName,
+        alarmInvPhysIndexOrZero,
+        alarmInvLogicalIndexOrZero,
+        alarmType,
+        alarmCause,
+        alarmText,
+        alarmSeverity,
+        alarmCreatedTime,
+        alarmLastChangeTime,
+        alarmSeqNumber,
+        alarmNeName,
+        alarmNeIpAddress }
+    STATUS      current
+    DESCRIPTION
+        "Sent when an alarm with major severity is
+        raised.
+"
+    ::= { alarmNotifyPrefix 13 }
+
+alarmNotificationCriticalV2 NOTIFICATION-TYPE
+    OBJECTS {
+        alarmIndex,
+        alarmObject,
+        alarmFaultStatus,
+        alarmMgmtName,
+        alarmInvPhysIndexOrZero,
+        alarmInvLogicalIndexOrZero,
+        alarmType,
+        alarmCause,
+        alarmText,
+        alarmSeverity,
+        alarmCreatedTime,
+        alarmLastChangeTime,
+        alarmSeqNumber,
+        alarmNeName,
+        alarmNeIpAddress }
+    STATUS      current
+    DESCRIPTION
+        "Sent when an alarm with critical severity is
+        raised.
+"
+    ::= { alarmNotifyPrefix 14 }
+
+-- fixme should really be sysNodeNeUserName and ipXxxXxxx???
+-- sysNodeNeUserName from LUM-SYSTEM_MIB
+-- ipGeneralStoredMgmtAddress from LUM-IP-MIB
+alarmNotificationHeartBeatV2 NOTIFICATION-TYPE
+    OBJECTS {
+        alarmNeName,
+        alarmNeIpAddress }
+    STATUS      current
+    DESCRIPTION
+        "Heartbeat.
+"
+    ::= { alarmNotifyPrefix 15 }
+
+-- ----------------------------------------------------
+-- Alarm summary
+-- ----------------------------------------------------
+
+alarmSumActiveIndeterminate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of currently active indeterminate
+        alarms.
+"
+    ::= { alarmSum 1 }
+
+alarmSumTotalIndeterminate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of indeterminate alarms since
+        re-start.
+"
+    ::= { alarmSum 2 }
+
+alarmSumActiveWarning OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of currently active warning alarms.
+"
+    ::= { alarmSum 3 }
+
+alarmSumTotalWarning OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of warning alarms since
+        re-start.
+"
+    ::= { alarmSum 4 }
+
+alarmSumActiveMinor OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of currently active minor alarms.
+"
+    ::= { alarmSum 5 }
+
+alarmSumTotalMinor OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of minor alarms since re-start.
+"
+    ::= { alarmSum 6 }
+
+alarmSumActiveMajor OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of currently active major alarms.
+"
+    ::= { alarmSum 7 }
+
+alarmSumTotalMajor OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of major alarms since re-start.
+"
+    ::= { alarmSum 8 }
+
+alarmSumActiveCritical OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of currently active critical alarms.
+"
+    ::= { alarmSum 9 }
+
+alarmSumTotalCritical OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of critical alarms since
+        re-start.
+"
+    ::= { alarmSum 10 }
+
+alarmSumTotalActive OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of active alarms.
+"
+    ::= { alarmSum 11 }
+
+
+-- ----------------------------------------------------
+-- Alarm test
+-- ----------------------------------------------------
+
+alarmTestCommunication OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Test alarm.
+"
+    ::= { alarmTest 1 }
+
+alarmTestQualityOfService OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Test alarm.
+"
+    ::= { alarmTest 2 }
+
+alarmTestProcessingError OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Test alarm.
+"
+    ::= { alarmTest 3 }
+
+alarmTestEquipment OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Test alarm.
+"
+    ::= { alarmTest 4 }
+
+alarmTestEnvironmental OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Test alarm.
+"
+    ::= { alarmTest 5 }
+
+alarmTestNonPrintable OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Used for internal testing.
+"
+    ::= { alarmTest 6 }
+
+alarmTestConfirm OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Used for internal testing.
+"
+    ::= { alarmTest 7 }
+
+alarmTestMsg OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Used for internal testing.
+"
+    ::= { alarmTest 8 }
+
+alarmTestSetAlarms OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Used for internal testing.
+"
+    ::= { alarmTest 9 }
+
+alarmTestQueryAlarms OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Used for internal testing.
+"
+    ::= { alarmTest 10 }
+
+alarmTestSetCommunication OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     ok(1),
+                     alarm(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Issues a test alarm if set to 'alarm'.
+
+        The alarm is cleared when set to 'ok'.
+
+        This attribute can be written via SNMP.
+
+"
+    ::= { alarmTest 11 }
+
+alarmTestSetQualityOfService OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     ok(1),
+                     alarm(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Issues a test alarm if set to 'alarm'.
+
+        The alarm is cleared when set to 'ok'.
+
+        This attribute can be written via SNMP.
+"
+    ::= { alarmTest 12 }
+
+alarmTestSetProcessingError OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     ok(1),
+                     alarm(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Issues a test alarm if set to 'alarm'.
+
+        The alarm is cleared when set to 'ok'.
+
+        This attribute can be written via SNMP.
+"
+    ::= { alarmTest 13 }
+
+alarmTestSetEquipment OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     ok(1),
+                     alarm(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Issues a test alarm if set to 'alarm'.
+
+        The alarm is cleared when set to 'ok'.
+
+        This attribute can be written via SNMP.
+"
+    ::= { alarmTest 14 }
+
+alarmTestSetEnvironmental OBJECT-TYPE
+    SYNTAX      INTEGER {
+                     ok(1),
+                     alarm(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Issues a test alarm if set to 'alarm'.
+
+        The alarm is cleared when set to 'ok'.
+
+        This attribute can be written via SNMP.
+"
+    ::= { alarmTest 15 }
+
+-- ----------------------------------------------------
+-- Alarm log table
+-- ----------------------------------------------------
+
+alarmLogTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlarmLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The alarm log."
+    ::= { alarmLog 1 }
+
+alarmLogEntry OBJECT-TYPE
+    SYNTAX      AlarmLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the alarm log.
+"
+    INDEX { alarmLogSeqNumber }
+    ::= { alarmLogTable 1 }
+
+AlarmLogEntry ::=
+    SEQUENCE {
+        alarmLogIndex                   Unsigned32,
+        alarmLogObject                  RowPointer,
+        alarmLogFaultStatus             VariablePointer,
+        alarmLogMgmtName                MgmtNameString,
+        alarmLogInvPhysIndexOrZero      Unsigned32,
+        alarmLogInvLogicalIndexOrZero   Unsigned32,
+        alarmLogType                    AlarmNotificationType,
+        alarmLogCause                   AlarmProbableCause,
+        alarmLogText                    DisplayString,
+        alarmLogSeverity                AlarmPerceivedSeverity,
+        alarmLogCreatedTime             DateAndTime,
+        alarmLogLastChangeTime          DateAndTime,
+        alarmLogSeqNumber               Counter32,
+        alarmLogPrevSeverity            AlarmPerceivedSeverity,
+        alarmLogNeName                  DisplayString,
+        alarmLogNeIpAddress             IpAddress }
+
+alarmLogIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each alarm.
+"
+    ::= { alarmLogEntry 1 }
+
+alarmLogObject OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pointer to the fault status variable related to
+        this alarm.
+"
+    ::= { alarmLogEntry 2 }
+
+alarmLogFaultStatus OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pointer to the fault status variable related to
+        this alarm.
+"
+    ::= { alarmLogEntry 3 }
+
+alarmLogMgmtName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the entity this alarm
+        pertains to.
+"
+    ::= { alarmLogEntry 4 }
+
+alarmLogInvPhysIndexOrZero OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object identifies the physical
+        entity in the inventory table this alarm
+        pertains to.
+
+        Set to zero if not used.
+"
+    ::= { alarmLogEntry 5 }
+
+alarmLogInvLogicalIndexOrZero OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object identifies the logical
+        entity in the LUM-INVENTORY-MIB this alarm
+        pertains to.
+
+        Set to zero if not used.
+"
+    ::= { alarmLogEntry 6 }
+
+alarmLogType OBJECT-TYPE
+    SYNTAX      AlarmNotificationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of alarm as defined in ITU-T X.733.
+"
+    ::= { alarmLogEntry 7 }
+
+alarmLogCause OBJECT-TYPE
+    SYNTAX      AlarmProbableCause
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The probable cause of the alarm as defined in
+        ITU-T X.733.
+
+"
+    ::= { alarmLogEntry 8 }
+
+alarmLogText OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The additional text for the alarm.
+
+"
+    ::= { alarmLogEntry 9 }
+
+alarmLogSeverity OBJECT-TYPE
+    SYNTAX      AlarmPerceivedSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The severity of the alarm as defined in
+        ITU-T X.733.
+
+"
+    ::= { alarmLogEntry 10 }
+
+alarmLogCreatedTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the alarm was created.
+
+"
+    ::= { alarmLogEntry 11 }
+
+alarmLogLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the alarm was last changed.
+
+"
+    ::= { alarmLogEntry 12 }
+
+alarmLogSeqNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The last sequence number used when issuing
+        a notification for this alarm.
+
+"
+    ::= { alarmLogEntry 13 }
+
+alarmLogPrevSeverity OBJECT-TYPE
+    SYNTAX      AlarmPerceivedSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The original severity of the alarm as
+        defined in ITU-T X.733.
+
+"
+    ::= { alarmLogEntry 14 }
+
+alarmLogNeName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the alarming network element.
+        Contains the user configurable network
+        element name (system::node::0::neUserName)
+        if set, otherwise the host name
+        (system::node::0::name).
+
+"
+    ::= { alarmLogEntry 15 }
+
+alarmLogNeIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address for the alarming network element.
+
+"
+    ::= { alarmLogEntry 16 }
+
+-- ----------------------------------------------------
+-- Alarm remote
+-- ----------------------------------------------------
+
+alarmRemoteNotReachable OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The network element is not reachable.
+
+        A(ctivation): Communication is lost.
+
+        D(e-activation): Contact has been established.
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+
+"
+    ::= { alarmRemote 1 }
+
+alarmRemoteConnectionFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "SNMP connect attempt failed.
+
+        A(ctivation): The SNMP connect failed.
+
+        D(e-activation): SNMP connection successful
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+
+"
+    ::= { alarmRemote 2 }
+
+alarmTimeWindowFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "There is a problem with the agent time.
+
+        A(ctivation): The SNMP connect failed due to agent time window problems.
+
+        D(e-activation): SNMP connection successful
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+
+"
+    ::= { alarmRemote 3 }
+
+alarmRemoteLoginFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "SNMP connect attempt failed due to faulty user name, password or privacy protocol.
+
+        A(ctivation): The SNMP connect failed due to wrong user name, password or privacy protocol.
+
+        D(e-activation): SNMP connection successful.
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+
+"
+    ::= { alarmRemote 4 }
+
+alarmRemoteMibRefreshFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reading the MIB content from the network element failed.
+
+        A(ctivation): The SNMP get operations to synchronize the DNA-M data with the NE data failed.
+
+        D(e-activation): DNA-M updated with the latest NE data.
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+
+"
+    ::= { alarmRemote 5 }
+
+alarmRemoteLocalTimeDiffFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The local time in the network element differs too much from the DNA-M time.
+
+        A(ctivation): The comparison of local time in node and in DNA-M failed.
+
+        D(e-activation): The local time in DNA-M or network element was corrected.
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+
+"
+    ::= { alarmRemote 6 }
+
+alarmRemoteBackupUnsavedFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configuration in the nod is not saved.
+
+        A(ctivation): Configuration in the node is changed since 15 minutes.
+
+        D(e-activation): Backup of the node configuration.
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+
+"
+    ::= { alarmRemote 7 }
+
+alarmRemotePmFtpFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The FTP access to get PM from the node failed.
+
+        A(ctivation): PM FTP transfer from the node failed.
+
+        D(e-activation): Sucessful PM FTP transfer.
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+
+"
+    ::= { alarmRemote 8 }
+
+alarmRemoteNotificationOverflowFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The notification load from the node are too high.
+
+        A(ctivation): The average number of traps/minute during the last 5 minutes are above limit
+
+        D(e-activation): The average number of traps/minute during the last 5 minutes are below limit
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+
+"
+    ::= { alarmRemote 9 }
+
+alarmRemoteAlarmsIgnored OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarms from the node is disabled.
+
+        A(ctivation): The DNA-M operator set the Ignore Alarms attribute on the node
+
+        D(e-activation): The DNA-M operator clears the Ignore Alarms attribute on the node
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+
+"
+    ::= { alarmRemote 10 }
+
+alarmRemoteSoftwareNotSupported OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The remote software is not supported.
+
+        A(ctivation): The DNA-M operator detects remote software not supported
+
+        D(e-activation): The DNA-M operator detects remote supported software
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+
+"
+    ::= { alarmRemote 11 }
+
+alarmRemoteUnexpectedNodeFamily OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The node is not of the expected type.
+
+        A(ctivation): The node is not identified as the expected family
+
+        D(e-activation): The node is identified as the expected family
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+
+"
+    ::= { alarmRemote 12 }
+
+alarmRemoteSetAccessFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An initial set operation towards the node failed
+
+        A(ctivation): An initial set operation towards the node failed
+
+        D(e-activation): The node is is fully refreshed
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+
+"
+    ::= { alarmRemote 13 }
+
+alarmRemoteConnectionTimedOut OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "SNMP connect attempt timed out.
+
+        A(ctivation): The SNMP connect timed out.
+
+        D(e-activation): SNMP connection successful
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+
+"
+    ::= { alarmRemote 14 }
+
+alarmRemoteLogEntriesLost OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Log entries lost during log Synchronization.
+
+        A(ctivation): Log entries lost.
+
+        D(e-activation): Log entries lost.
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+
+"
+    ::= { alarmRemote 15 }
+
+alarmRemoteBackupReplicationRetryFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Backup replication using (S)FTP failed after two
+	unsuccessful attempts.
+
+        A(ctivation): Backup replication using (S)FTP failed.
+
+        D(e-activation): Backup replication using (S)FTP successful.
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+"
+    ::= { alarmRemote 16 }
+
+alarmRemoteBackupReplicationFileNotAvailable OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Backup replication using (S)FTP failed afted two
+        unsuccessful attempts. No backup file available on node.
+
+        A(ctivation): Backup replication using (S)FTP failed.
+
+        D(e-activation): Backup replication using (S)FTP successful.
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+"
+    ::= { alarmRemote 17 }
+
+alarmRemoteBackupReplicationRestoreFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Restore of backup configuration using (S)FTP failed.
+
+        A(ctivation): Restore of backup configuration using (S)FTP failed.
+
+        D(e-activation): Restore of backup configuration using (S)FTP successful.
+
+        Note: This attribute defines an alarm
+        assigned to the network element in the
+        overlying management system. It is not available
+        in the network element.
+
+"
+    ::= { alarmRemote 18 }
+-- ----------------------------------------------------
+-- Alarm external
+-- ----------------------------------------------------
+
+alarmExternal1 OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "External alarm 1.
+
+        A(ctivation): fixme
+
+        D(e-activation): fixme
+
+"
+    ::= { alarmExternal 1 }
+
+alarmExternal2 OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "External alarm 2.
+
+        A(ctivation): fixme
+
+        D(e-activation): fixme
+
+"
+    ::= { alarmExternal 2 }
+
+alarmExternal3 OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "External alarm 3.
+
+        A(ctivation): fixme
+
+        D(e-activation): fixme
+
+"
+    ::= { alarmExternal 3 }
+
+
+-- ----------------------------------------------------
+-- Alarm log '2'
+-- ----------------------------------------------------
+
+alarmLog2Table  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlarmLog2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The alarm log '2'."
+    ::= { alarmLog2 1 }
+
+alarmLog2Entry OBJECT-TYPE
+    SYNTAX      AlarmLog2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the alarm log.
+"
+    INDEX { alarmLog2SeqNumber }
+    ::= { alarmLog2Table 1 }
+
+AlarmLog2Entry ::=
+    SEQUENCE {
+        alarmLog2Index                 Unsigned32,
+        alarmLog2Object                RowPointer,
+        alarmLog2FaultStatus           VariablePointer,
+        alarmLog2MgmtName              MgmtNameString,
+        alarmLog2InvPhysIndexOrZero    Unsigned32,
+        alarmLog2InvLogicalIndexOrZero Unsigned32,
+        alarmLog2Type                  AlarmNotificationType,
+        alarmLog2Cause                 AlarmProbableCause,
+        alarmLog2Text                  DisplayString,
+        alarmLog2Severity              AlarmPerceivedSeverity,
+        alarmLog2CreatedTime           DateAndTime,
+        alarmLog2LastChangeTime        DateAndTime,
+        alarmLog2SeqNumber             Counter32,
+        alarmLog2NeName                DisplayString,
+        alarmLog2NeIpAddress           IpAddress }
+
+alarmLog2Index OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each alarm.
+"
+    ::= { alarmLog2Entry 1 }
+
+alarmLog2Object OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pointer to the fault status variable related to
+        this alarm.
+"
+    ::= { alarmLog2Entry 2 }
+
+alarmLog2FaultStatus OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pointer to the fault status variable related to
+        this alarm.
+"
+    ::= { alarmLog2Entry 3 }
+
+alarmLog2MgmtName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the entity this alarm
+        pertains to.
+"
+    ::= { alarmLog2Entry 4 }
+
+alarmLog2InvPhysIndexOrZero OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object identifies the physical
+        entity in the inventory table this alarm
+        pertains to.
+
+        Set to zero if not used.
+"
+    ::= { alarmLog2Entry 5 }
+
+alarmLog2InvLogicalIndexOrZero OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object identifies the logical
+        entity in the LUM-INVENTORY-MIB this alarm
+        pertains to.
+
+        Set to zero if not used.
+"
+    ::= { alarmLog2Entry 6 }
+
+alarmLog2Type OBJECT-TYPE
+    SYNTAX      AlarmNotificationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of alarm as defined in ITU-T X.733.
+"
+    ::= { alarmLog2Entry 7 }
+
+alarmLog2Cause OBJECT-TYPE
+    SYNTAX      AlarmProbableCause
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The probable cause of the alarm as defined in
+        ITU-T X.733.
+
+"
+    ::= { alarmLog2Entry 8 }
+
+alarmLog2Text OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The additional text for the alarm.
+
+"
+    ::= { alarmLog2Entry 9 }
+
+alarmLog2Severity OBJECT-TYPE
+    SYNTAX      AlarmPerceivedSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The severity of the alarm as defined in
+        ITU-T X.733.
+
+"
+    ::= { alarmLog2Entry 10 }
+
+alarmLog2CreatedTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the alarm was created.
+
+"
+    ::= { alarmLog2Entry 11 }
+
+alarmLog2LastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the alarm was last changed.
+
+"
+    ::= { alarmLog2Entry 12 }
+
+alarmLog2SeqNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The last sequence number used when issuing
+        a notification for this alarm.
+
+"
+    ::= { alarmLog2Entry 13 }
+
+alarmLog2NeName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the alarming network element.
+        Contains the user configurable network
+        element name (system::node::0::neUserName)
+        if set, otherwise the host name
+        (system::node::0::name).
+
+"
+    ::= { alarmLog2Entry 14 }
+
+alarmLog2NeIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address for the alarming network element.
+
+"
+    ::= { alarmLog2Entry 15 }
+
+-- ----------------------------------------------------
+-- Event log table
+-- ----------------------------------------------------
+
+alarmEventTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlarmEventEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The event log '2'."
+    ::= { alarmEvent 1 }
+
+alarmEventEntry OBJECT-TYPE
+    SYNTAX      AlarmEventEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the event log.
+"
+    INDEX { alarmEventSeqNumber }
+    ::= { alarmEventTable 1 }
+
+AlarmEventEntry ::=
+    SEQUENCE {
+        alarmEventIndex                 Unsigned32,
+        alarmEventMgmtName              MgmtNameString,
+        alarmEventInvLogicalIndexOrZero Unsigned32,
+        alarmEventCategory              AlarmEventCategory,
+        alarmEventText                  DisplayString,
+        alarmEventOccurredTime          DateAndTime,
+        alarmEventSeqNumber             Counter32,
+        alarmEventUserInfo              DisplayString,
+        alarmEventLongName              MgmtNameString }
+
+alarmEventIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each alarm.
+"
+    ::= { alarmEventEntry 1 }
+
+alarmEventMgmtName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the entity this event
+        pertains to, if any.
+"
+    ::= { alarmEventEntry 2 }
+
+alarmEventInvLogicalIndexOrZero OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object identifies the logical
+        entity in the LUM-INVENTORY-MIB this event
+        pertains to, if any.
+
+        Set to zero if not used.
+"
+    ::= { alarmEventEntry 3 }
+
+alarmEventCategory OBJECT-TYPE
+    SYNTAX      AlarmEventCategory
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The category of the event:
+
+        - configuration (SET, CREATE, DELETE)
+        - maintenance   (SAVE)
+        - state change  (Spontaneous events)
+
+"
+    ::= { alarmEventEntry 4 }
+
+alarmEventText OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The text describing the event.
+
+"
+    ::= { alarmEventEntry 5 }
+
+alarmEventOccurredTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the event was occurred.
+
+"
+    ::= { alarmEventEntry 6 }
+
+alarmEventSeqNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The last sequence number used when
+        this event occurred.
+
+"
+    ::= { alarmEventEntry 7 }
+
+alarmEventUserInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User name and other information about who
+        performed a configuration/maintenance.
+
+"
+    ::= { alarmEventEntry 8 }
+
+alarmEventLongName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The long management name of the entity this event
+        pertains to, if any.
+"
+    ::= { alarmEventEntry 9 }
+
+-- ----------------------------------------------------
+-- Object and event groups
+-- ----------------------------------------------------
+
+alarmGeneralGroup OBJECT-GROUP
+    OBJECTS {
+        alarmGeneralLastChangeTime,
+        alarmGeneralLogSize,
+        alarmGeneralLastSeqNumber,
+        alarmGeneralTestAndIncr,
+        alarmGeneralReplayBufferSize,
+        alarmGeneralReplayRequestSeq,
+        alarmGeneralReplayRequestTime,
+        alarmGeneralMibSpecVersion,
+        alarmGeneralMibImplVersion }
+    STATUS      deprecated
+    DESCRIPTION
+        "Note: This group is deprecated.
+
+        The general alarm objects."
+    ::= { lumAlarmGroups 1 }
+
+alarmListGroup OBJECT-GROUP
+    OBJECTS {
+        alarmIndex,
+        alarmObject,
+        alarmFaultStatus,
+        alarmMgmtName,
+        alarmInvPhysIndexOrZero,
+        alarmInvLogicalIndexOrZero,
+        alarmType,
+        alarmCause,
+        alarmSeverity,
+        alarmText,
+        alarmCreatedTime,
+        alarmLastChangeTime,
+        alarmSeqNumber }
+    STATUS      deprecated
+    DESCRIPTION
+        "The alarm list objects."
+    ::= { lumAlarmGroups 2 }
+
+alarmNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        alarmNotificationColdStart,
+        alarmNotificationCleared,
+        alarmNotificationIndeterminate,
+        alarmNotificationWarning,
+        alarmNotificationMinor,
+        alarmNotificationMajor,
+        alarmNotificationCritical }
+    STATUS      deprecated
+    DESCRIPTION
+        "The alarm notifications."
+    ::= { lumAlarmGroups 3 }
+
+alarmSumGroup OBJECT-GROUP
+    OBJECTS {
+       alarmSumActiveIndeterminate,
+       alarmSumTotalIndeterminate,
+       alarmSumActiveWarning,
+       alarmSumTotalWarning,
+       alarmSumActiveMinor,
+       alarmSumTotalMinor,
+       alarmSumActiveMajor,
+       alarmSumTotalMajor,
+       alarmSumActiveCritical,
+       alarmSumTotalCritical,
+       alarmSumTotalActive }
+    STATUS      current
+    DESCRIPTION
+        "The alarm summary objects."
+    ::= { lumAlarmGroups 4 }
+
+alarmTestGroup OBJECT-GROUP
+
+    OBJECTS {
+        alarmTestCommunication,
+        alarmTestQualityOfService,
+        alarmTestProcessingError,
+        alarmTestEquipment,
+        alarmTestEnvironmental }
+    STATUS      deprecated
+    DESCRIPTION
+        "The alarm test objects."
+    ::= { lumAlarmGroups 5 }
+
+alarmGeneralGroupV2 OBJECT-GROUP
+    OBJECTS {
+        alarmGeneralLastChangeTime,
+        alarmGeneralLogSize,
+        alarmGeneralLastSeqNumber }
+    STATUS      deprecated
+    DESCRIPTION
+        "The general alarm objects."
+    ::= { lumAlarmGroups 6 }
+
+alarmLogGroup OBJECT-GROUP
+    OBJECTS {
+        alarmLogIndex,
+        alarmLogObject,
+        alarmLogFaultStatus,
+        alarmLogMgmtName,
+        alarmLogInvPhysIndexOrZero,
+        alarmLogInvLogicalIndexOrZero,
+        alarmLogType,
+        alarmLogCause,
+        alarmLogSeverity,
+        alarmLogText,
+        alarmLogCreatedTime,
+        alarmLogLastChangeTime,
+        alarmLogSeqNumber }
+    STATUS      deprecated
+    DESCRIPTION
+        "The alarm log objects."
+    ::= { lumAlarmGroups 7 }
+
+alarmGeneralGroupV3 OBJECT-GROUP
+    OBJECTS {
+        alarmGeneralLastChangeTime,
+        alarmGeneralLogSize,
+        alarmGeneralLastSeqNumber,
+        alarmGeneralSuppressionMode }
+    STATUS      deprecated
+    DESCRIPTION
+        "The general alarm objects."
+    ::= { lumAlarmGroups 8 }
+
+alarmGeneralGroupV4 OBJECT-GROUP
+    OBJECTS {
+        alarmGeneralLastChangeTime,
+        alarmGeneralLogSize,
+        alarmGeneralLastSeqNumber,
+        alarmGeneralSuppressionMode,
+        alarmGeneralFilterMode }
+    STATUS      deprecated
+    DESCRIPTION
+        "The general alarm objects."
+    ::= { lumAlarmGroups 9 }
+
+alarmTestGroupV2 OBJECT-GROUP
+    OBJECTS {
+        alarmTestCommunication,
+        alarmTestQualityOfService,
+        alarmTestProcessingError,
+        alarmTestEquipment,
+        alarmTestEnvironmental,
+        alarmTestNonPrintable,
+        alarmTestConfirm,
+        alarmTestMsg,
+        alarmTestSetAlarms,
+        alarmTestQueryAlarms }
+    STATUS      deprecated
+    DESCRIPTION
+        "The alarm test objects v2."
+    ::= { lumAlarmGroups 10 }
+
+alarmGeneralGroupV5 OBJECT-GROUP
+    OBJECTS {
+        alarmGeneralLastChangeTime,
+        alarmGeneralLogSize,
+        alarmGeneralLastSeqNumber,
+        alarmGeneralSuppressionMode,
+        alarmGeneralFilterMode,
+        alarmGeneralConfigLastChangeTime }
+    STATUS      current
+    DESCRIPTION
+        "The general alarm objects."
+    ::= { lumAlarmGroups 11 }
+
+alarmRemoteGroup OBJECT-GROUP
+    OBJECTS {
+        alarmRemoteNotReachable,
+        alarmRemoteConnectionFailed,
+        alarmRemoteLoginFailed,
+        alarmRemoteMibRefreshFailed
+         }
+    STATUS      current
+    DESCRIPTION
+        "The remote alarm objects."
+    ::= { lumAlarmGroups 12 }
+
+alarmTestGroupV3 OBJECT-GROUP
+    OBJECTS {
+        alarmTestCommunication,
+        alarmTestQualityOfService,
+        alarmTestProcessingError,
+        alarmTestEquipment,
+        alarmTestEnvironmental,
+        alarmTestNonPrintable,
+        alarmTestConfirm,
+        alarmTestMsg,
+        alarmTestSetAlarms,
+        alarmTestQueryAlarms,
+        alarmTestSetCommunication,
+        alarmTestSetQualityOfService,
+        alarmTestSetProcessingError,
+        alarmTestSetEquipment,
+        alarmTestSetEnvironmental }
+    STATUS      current
+    DESCRIPTION
+        "The alarm test objects v3."
+    ::= { lumAlarmGroups 13 }
+
+alarmLogGroupV2 OBJECT-GROUP
+    OBJECTS {
+        alarmLogIndex,
+        alarmLogObject,
+        alarmLogFaultStatus,
+        alarmLogMgmtName,
+        alarmLogInvPhysIndexOrZero,
+        alarmLogInvLogicalIndexOrZero,
+        alarmLogType,
+        alarmLogCause,
+        alarmLogSeverity,
+        alarmLogText,
+        alarmLogCreatedTime,
+        alarmLogLastChangeTime,
+        alarmLogSeqNumber,
+        alarmLogPrevSeverity }
+    STATUS      deprecated
+    DESCRIPTION
+        "The alarm log objects v2."
+    ::= { lumAlarmGroups 14 }
+
+alarmGeneralGroupV6 OBJECT-GROUP
+    OBJECTS {
+        alarmGeneralLastChangeTime,
+        alarmGeneralLogSize,
+        alarmGeneralLastSeqNumber,
+        alarmGeneralSuppressionMode,
+        alarmGeneralFilterMode,
+        alarmGeneralConfigLastChangeTime,
+        alarmGeneralAlarmTableSize,
+        alarmGeneralAlarmLogTableSize }
+    STATUS      deprecated
+    DESCRIPTION
+        "The general alarm objects."
+    ::= { lumAlarmGroups 15 }
+
+alarmRemoteGroupV2 OBJECT-GROUP
+    OBJECTS {
+        alarmRemoteNotReachable,
+        alarmRemoteConnectionFailed,
+        alarmRemoteLoginFailed,
+        alarmRemoteMibRefreshFailed,
+        alarmTimeWindowFailed,
+        alarmRemoteLocalTimeDiffFailed,
+        alarmRemoteBackupUnsavedFailed }
+    STATUS      deprecated
+    DESCRIPTION
+        "The remote alarm objects."
+    ::= { lumAlarmGroups 16 }
+
+alarmGeneralGroupV7 OBJECT-GROUP
+    OBJECTS {
+        alarmGeneralLastChangeTime,
+        alarmGeneralLogSize,
+        alarmGeneralLastSeqNumber,
+        alarmGeneralSuppressionMode,
+        alarmGeneralFilterMode,
+        alarmGeneralConfigLastChangeTime,
+        alarmGeneralAlarmTableSize,
+        alarmGeneralAlarmLogTableSize,
+        alarmGeneralHeartBeatInterval }
+    STATUS      current
+    DESCRIPTION
+        "The general alarm objects."
+    ::= { lumAlarmGroups 17 }
+
+alarmNotificationGroupV2 NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        alarmNotificationColdStart,
+        alarmNotificationCleared,
+        alarmNotificationIndeterminate,
+        alarmNotificationWarning,
+        alarmNotificationMinor,
+        alarmNotificationMajor,
+        alarmNotificationCritical,
+        alarmNotificationHeartBeat }
+    STATUS      deprecated
+    DESCRIPTION
+        "The alarm notifications v2."
+    ::= { lumAlarmGroups 18 }
+
+alarmExternalGroupV1 OBJECT-GROUP
+    OBJECTS {
+        alarmExternal1,
+        alarmExternal2,
+        alarmExternal3 }
+    STATUS      current
+    DESCRIPTION
+        "The external alarm objects."
+    ::= { lumAlarmGroups 19 }
+
+alarmNotificationGroupV3 NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        alarmNotificationColdStart,
+        alarmNotificationCleared,
+        alarmNotificationIndeterminate,
+        alarmNotificationWarning,
+        alarmNotificationMinor,
+        alarmNotificationMajor,
+        alarmNotificationCritical,
+        alarmNotificationHeartBeat,
+        alarmNotificationClearedV2,
+        alarmNotificationIndeterminateV2,
+        alarmNotificationWarningV2,
+        alarmNotificationMinorV2,
+        alarmNotificationMajorV2,
+        alarmNotificationCriticalV2,
+        alarmNotificationHeartBeatV2 }
+    STATUS      current
+    DESCRIPTION
+        "The alarm notifications v2."
+    ::= { lumAlarmGroups 21 }
+
+alarmGeneralGroupV8 OBJECT-GROUP
+    OBJECTS {
+        alarmGeneralLastChangeTime,
+        alarmGeneralLogSize,
+        alarmGeneralLastSeqNumber,
+        alarmGeneralSuppressionMode,
+        alarmGeneralFilterMode,
+        alarmGeneralConfigLastChangeTime,
+        alarmGeneralAlarmTableSize,
+        alarmGeneralAlarmLogTableSize,
+        alarmGeneralHeartBeatInterval,
+        alarmGeneralAlarmLog2TableSize,
+        alarmGeneralAlarmNotificationVersion,
+        alarmGeneralAlarmLog2Size,
+        alarmGeneralHighestSeverity }
+    STATUS      deprecated
+    DESCRIPTION
+        "The general alarm objects v8."
+    ::= { lumAlarmGroups 22 }
+
+alarmListGroupV2 OBJECT-GROUP
+    OBJECTS {
+        alarmIndex,
+        alarmObject,
+        alarmFaultStatus,
+        alarmMgmtName,
+        alarmInvPhysIndexOrZero,
+        alarmInvLogicalIndexOrZero,
+        alarmType,
+        alarmCause,
+        alarmSeverity,
+        alarmText,
+        alarmCreatedTime,
+        alarmLastChangeTime,
+        alarmSeqNumber,
+        alarmNeName,
+        alarmNeIpAddress }
+    STATUS      current
+    DESCRIPTION
+        "The alarm list objects V2."
+    ::= { lumAlarmGroups 23 }
+
+alarmLogGroupV3 OBJECT-GROUP
+    OBJECTS {
+        alarmLogIndex,
+        alarmLogObject,
+        alarmLogFaultStatus,
+        alarmLogMgmtName,
+        alarmLogInvPhysIndexOrZero,
+        alarmLogInvLogicalIndexOrZero,
+        alarmLogType,
+        alarmLogCause,
+        alarmLogSeverity,
+        alarmLogText,
+        alarmLogCreatedTime,
+        alarmLogLastChangeTime,
+        alarmLogSeqNumber,
+        alarmLogPrevSeverity,
+        alarmLogNeName,
+        alarmLogNeIpAddress }
+    STATUS      current
+    DESCRIPTION
+        "The alarm log objects v3."
+    ::= { lumAlarmGroups 24 }
+
+alarmLog2LogGroupV1 OBJECT-GROUP
+    OBJECTS {
+        alarmLog2Index,
+        alarmLog2Object,
+        alarmLog2FaultStatus,
+        alarmLog2MgmtName,
+        alarmLog2InvPhysIndexOrZero,
+        alarmLog2InvLogicalIndexOrZero,
+        alarmLog2Type,
+        alarmLog2Cause,
+        alarmLog2Severity,
+        alarmLog2Text,
+        alarmLog2CreatedTime,
+        alarmLog2LastChangeTime,
+        alarmLog2SeqNumber,
+        alarmLog2NeName,
+        alarmLog2NeIpAddress }
+    STATUS      current
+    DESCRIPTION
+        "The alarm log 2 objects v1."
+    ::= { lumAlarmGroups 25 }
+
+alarmRemoteGroupV3 OBJECT-GROUP
+    OBJECTS {
+        alarmRemoteNotReachable,
+        alarmRemoteConnectionFailed,
+        alarmRemoteLoginFailed,
+        alarmRemoteMibRefreshFailed,
+        alarmTimeWindowFailed,
+        alarmRemoteLocalTimeDiffFailed,
+        alarmRemoteBackupUnsavedFailed,
+        alarmRemotePmFtpFailed }
+    STATUS      deprecated
+    DESCRIPTION
+        "The remote alarm objects."
+    ::= { lumAlarmGroups 26 }
+
+alarmGeneralGroupV9 OBJECT-GROUP
+    OBJECTS {
+        alarmGeneralLastChangeTime,
+        alarmGeneralLogSize,
+        alarmGeneralLastSeqNumber,
+        alarmGeneralSuppressionMode,
+        alarmGeneralFilterMode,
+        alarmGeneralConfigLastChangeTime,
+        alarmGeneralAlarmTableSize,
+        alarmGeneralAlarmLogTableSize,
+        alarmGeneralHeartBeatInterval,
+        alarmGeneralAlarmLog2TableSize,
+        alarmGeneralAlarmNotificationVersion,
+        alarmGeneralAlarmLog2Size,
+        alarmGeneralHighestSeverity,
+        alarmGeneralEventLogTableSize,
+        alarmGeneralEventLogSize,
+        alarmGeneralEventLastSeqNumber }
+    STATUS      deprecated
+    DESCRIPTION
+        "The general alarm objects v9."
+    ::= { lumAlarmGroups 27 }
+
+alarmEventGroupV1 OBJECT-GROUP
+    OBJECTS {
+        alarmEventIndex,
+        alarmEventMgmtName,
+        alarmEventInvLogicalIndexOrZero,
+        alarmEventCategory,
+        alarmEventText,
+        alarmEventOccurredTime,
+        alarmEventSeqNumber,
+        alarmEventUserInfo
+    }
+    STATUS      current
+    DESCRIPTION
+        "The event objects v1."
+    ::= { lumAlarmGroups 28 }
+
+alarmEventGroupV2 OBJECT-GROUP
+    OBJECTS {
+        alarmEventIndex,
+        alarmEventMgmtName,
+        alarmEventInvLogicalIndexOrZero,
+        alarmEventCategory,
+        alarmEventText,
+        alarmEventOccurredTime,
+        alarmEventSeqNumber,
+        alarmEventUserInfo,
+        alarmEventLongName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The event objects v2. (8.0)"
+    ::= { lumAlarmGroups 29 }
+
+alarmRemoteGroupV4 OBJECT-GROUP
+    OBJECTS {
+        alarmRemoteNotReachable,
+        alarmRemoteConnectionFailed,
+        alarmRemoteLoginFailed,
+        alarmRemoteMibRefreshFailed,
+        alarmTimeWindowFailed,
+        alarmRemoteLocalTimeDiffFailed,
+        alarmRemoteBackupUnsavedFailed,
+        alarmRemotePmFtpFailed,
+        alarmRemoteAlarmsIgnored }
+    STATUS      current
+    DESCRIPTION
+        "The remote alarm objects."
+    ::= { lumAlarmGroups 30 }
+
+alarmRemoteGroupV5 OBJECT-GROUP
+    OBJECTS {
+        alarmRemoteNotReachable,
+        alarmRemoteConnectionFailed,
+        alarmRemoteLoginFailed,
+        alarmRemoteMibRefreshFailed,
+        alarmTimeWindowFailed,
+        alarmRemoteLocalTimeDiffFailed,
+        alarmRemoteBackupUnsavedFailed,
+        alarmRemotePmFtpFailed,
+        alarmRemoteAlarmsIgnored,
+        alarmRemoteNotificationOverflowFailed }
+    STATUS      current
+    DESCRIPTION
+        "The remote alarm objects."
+    ::= { lumAlarmGroups 31 }
+
+alarmRemoteGroupV6 OBJECT-GROUP
+    OBJECTS {
+        alarmRemoteNotReachable,
+        alarmRemoteConnectionFailed,
+        alarmRemoteLoginFailed,
+        alarmRemoteMibRefreshFailed,
+        alarmTimeWindowFailed,
+        alarmRemoteLocalTimeDiffFailed,
+        alarmRemoteBackupUnsavedFailed,
+        alarmRemotePmFtpFailed,
+        alarmRemoteAlarmsIgnored,
+        alarmRemoteNotificationOverflowFailed,
+        alarmRemoteSoftwareNotSupported }
+    STATUS      current
+    DESCRIPTION
+        "The remote alarm objects."
+    ::= { lumAlarmGroups 32 }
+
+alarmRemoteGroupV7 OBJECT-GROUP
+    OBJECTS {
+        alarmRemoteNotReachable,
+        alarmRemoteConnectionFailed,
+        alarmRemoteLoginFailed,
+        alarmRemoteMibRefreshFailed,
+        alarmTimeWindowFailed,
+        alarmRemoteLocalTimeDiffFailed,
+        alarmRemoteBackupUnsavedFailed,
+        alarmRemotePmFtpFailed,
+        alarmRemoteAlarmsIgnored,
+        alarmRemoteNotificationOverflowFailed,
+        alarmRemoteSoftwareNotSupported,
+        alarmRemoteUnexpectedNodeFamily }
+    STATUS      current
+    DESCRIPTION
+        "The remote alarm objects."
+    ::= { lumAlarmGroups 33 }
+
+alarmRemoteGroupV8 OBJECT-GROUP
+    OBJECTS {
+        alarmRemoteNotReachable,
+        alarmRemoteConnectionFailed,
+        alarmRemoteLoginFailed,
+        alarmRemoteMibRefreshFailed,
+        alarmTimeWindowFailed,
+        alarmRemoteLocalTimeDiffFailed,
+        alarmRemoteBackupUnsavedFailed,
+        alarmRemotePmFtpFailed,
+        alarmRemoteAlarmsIgnored,
+        alarmRemoteNotificationOverflowFailed,
+        alarmRemoteSoftwareNotSupported,
+        alarmRemoteUnexpectedNodeFamily,
+        alarmRemoteSetAccessFailed }
+    STATUS      current
+    DESCRIPTION
+        "The remote alarm objects."
+    ::= { lumAlarmGroups 34 }
+
+alarmRemoteGroupV9 OBJECT-GROUP
+    OBJECTS {
+        alarmRemoteNotReachable,
+        alarmRemoteConnectionFailed,
+        alarmRemoteLoginFailed,
+        alarmRemoteMibRefreshFailed,
+        alarmTimeWindowFailed,
+        alarmRemoteLocalTimeDiffFailed,
+        alarmRemoteBackupUnsavedFailed,
+        alarmRemotePmFtpFailed,
+        alarmRemoteAlarmsIgnored,
+        alarmRemoteNotificationOverflowFailed,
+        alarmRemoteSoftwareNotSupported,
+        alarmRemoteUnexpectedNodeFamily,
+        alarmRemoteSetAccessFailed,
+        alarmRemoteConnectionTimedOut }
+    STATUS      deprecated
+    DESCRIPTION
+        "The remote alarm objects."
+    ::= { lumAlarmGroups 35 }
+
+alarmGeneralGroupV10 OBJECT-GROUP
+    OBJECTS {
+        alarmGeneralLastChangeTime,
+        alarmGeneralLogSize,
+        alarmGeneralLastSeqNumber,
+        alarmGeneralSuppressionMode,
+        alarmGeneralFilterMode,
+        alarmGeneralConfigLastChangeTime,
+        alarmGeneralAlarmTableSize,
+        alarmGeneralAlarmLogTableSize,
+        alarmGeneralHeartBeatInterval,
+        alarmGeneralAlarmLog2TableSize,
+        alarmGeneralAlarmNotificationVersion,
+        alarmGeneralAlarmLog2Size,
+        alarmGeneralHighestSeverity,
+        alarmGeneralEventLogTableSize,
+        alarmGeneralEventLogSize,
+        alarmGeneralEventLastSeqNumber,
+        alarmGeneralSoakInInterval }
+    STATUS      current
+    DESCRIPTION
+        "The general alarm objects v10 (28.0)."
+    ::= { lumAlarmGroups 36 }
+
+alarmRemoteGroupV10 OBJECT-GROUP
+    OBJECTS {
+        alarmRemoteNotReachable,
+        alarmRemoteConnectionFailed,
+        alarmRemoteLoginFailed,
+        alarmRemoteMibRefreshFailed,
+        alarmTimeWindowFailed,
+        alarmRemoteLocalTimeDiffFailed,
+        alarmRemoteBackupUnsavedFailed,
+        alarmRemotePmFtpFailed,
+        alarmRemoteAlarmsIgnored,
+        alarmRemoteNotificationOverflowFailed,
+        alarmRemoteSoftwareNotSupported,
+        alarmRemoteUnexpectedNodeFamily,
+        alarmRemoteSetAccessFailed,
+        alarmRemoteConnectionTimedOut,
+	alarmRemoteLogEntriesLost}
+    STATUS      deprecated
+    DESCRIPTION
+        "The remote alarm objects v10 (28.0)."
+    ::= { lumAlarmGroups 37 }
+
+alarmRemoteGroupV11 OBJECT-GROUP
+    OBJECTS {
+        alarmRemoteNotReachable,
+        alarmRemoteConnectionFailed,
+        alarmRemoteLoginFailed,
+        alarmRemoteMibRefreshFailed,
+        alarmTimeWindowFailed,
+        alarmRemoteLocalTimeDiffFailed,
+        alarmRemoteBackupUnsavedFailed,
+        alarmRemotePmFtpFailed,
+        alarmRemoteAlarmsIgnored,
+        alarmRemoteNotificationOverflowFailed,
+        alarmRemoteSoftwareNotSupported,
+        alarmRemoteUnexpectedNodeFamily,
+        alarmRemoteSetAccessFailed,
+        alarmRemoteConnectionTimedOut,
+        alarmRemoteLogEntriesLost,
+        alarmRemoteBackupReplicationRetryFailed,
+        alarmRemoteBackupReplicationFileNotAvailable}
+    STATUS      current
+    DESCRIPTION
+        "The remote alarm objects v11 (29.0)."
+    ::= { lumAlarmGroups 38 }
+
+-- ----------------------------------------------------
+-- Compliance
+-- ----------------------------------------------------
+
+lumAlarmBasicComplV1 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Note: This compliance statement is deprecated.
+
+        Basic implementation requirements for the alarm MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroup,
+            alarmListGroup,
+            alarmNotificationGroup,
+            alarmSumGroup,
+            alarmTestGroup }
+    ::= { lumAlarmCompl 1 }
+
+lumAlarmBasicComplV2 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV2,
+            alarmListGroup,
+            alarmNotificationGroup,
+            alarmSumGroup,
+            alarmTestGroup }
+    ::= { lumAlarmCompl 2 }
+
+lumAlarmBasicComplV3 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V3."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV2,
+            alarmListGroup,
+            alarmNotificationGroup,
+            alarmSumGroup,
+            alarmTestGroup,
+            alarmLogGroup }
+    ::= { lumAlarmCompl 3 }
+
+lumAlarmBasicComplV4 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V4."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV3,
+            alarmListGroup,
+            alarmNotificationGroup,
+            alarmSumGroup,
+            alarmTestGroup,
+            alarmLogGroup }
+    ::= { lumAlarmCompl 4 }
+
+lumAlarmBasicComplV5 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V5."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV4,
+            alarmListGroup,
+            alarmNotificationGroup,
+            alarmSumGroup,
+            alarmTestGroup,
+            alarmLogGroup }
+    ::= { lumAlarmCompl 5 }
+
+lumAlarmBasicComplV6 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V6."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV4,
+            alarmListGroup,
+            alarmNotificationGroup,
+            alarmSumGroup,
+            alarmTestGroup,
+            alarmLogGroup }
+    ::= { lumAlarmCompl 6 }
+
+lumAlarmBasicComplV7 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V7."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV4,
+            alarmListGroup,
+            alarmNotificationGroup,
+            alarmSumGroup,
+            alarmTestGroupV2,
+            alarmLogGroup }
+    ::= { lumAlarmCompl 7 }
+
+lumAlarmBasicComplV8 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V8."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV5,
+            alarmListGroup,
+            alarmNotificationGroup,
+            alarmSumGroup,
+            alarmTestGroupV2,
+            alarmLogGroup }
+    ::= { lumAlarmCompl 8 }
+
+lumAlarmBasicComplV9 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V9."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV5,
+            alarmListGroup,
+            alarmNotificationGroup,
+            alarmSumGroup,
+            alarmTestGroupV2,
+            alarmLogGroup,
+            alarmRemoteGroup }
+    ::= { lumAlarmCompl 9 }
+
+lumAlarmBasicComplV10 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V10."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV5,
+            alarmListGroup,
+            alarmNotificationGroup,
+            alarmSumGroup,
+            alarmTestGroupV3,
+            alarmLogGroup,
+            alarmRemoteGroup }
+    ::= { lumAlarmCompl 10 }
+
+lumAlarmBasicComplV11 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V11."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV6,
+            alarmListGroup,
+            alarmNotificationGroup,
+            alarmSumGroup,
+            alarmTestGroupV3,
+            alarmLogGroupV2,
+            alarmRemoteGroupV2 }
+    ::= { lumAlarmCompl 11 }
+
+lumAlarmBasicComplV12 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V12 (4.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV7,
+            alarmListGroup,
+            alarmNotificationGroupV2,
+            alarmSumGroup,
+            alarmTestGroupV3,
+            alarmLogGroupV2,
+            alarmRemoteGroupV2 }
+    ::= { lumAlarmCompl 12 }
+
+lumAlarmBasicComplV13 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V13 (5.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV8,
+            alarmListGroupV2,
+            alarmNotificationGroupV3,
+            alarmSumGroup,
+            alarmTestGroupV3,
+            alarmLogGroupV3,
+            alarmRemoteGroupV3,
+            alarmLog2LogGroupV1 }
+    ::= { lumAlarmCompl 13 }
+
+lumAlarmBasicComplV14 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V14 (7.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV9,
+            alarmListGroupV2,
+            alarmNotificationGroupV3,
+            alarmSumGroup,
+            alarmTestGroupV3,
+            alarmLogGroupV3,
+            alarmRemoteGroupV3,
+            alarmLog2LogGroupV1,
+            alarmEventGroupV1 }
+    ::= { lumAlarmCompl 14 }
+
+lumAlarmBasicComplV15 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V15 (8.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV9,
+            alarmListGroupV2,
+            alarmNotificationGroupV3,
+            alarmSumGroup,
+            alarmTestGroupV3,
+            alarmLogGroupV3,
+            alarmRemoteGroupV3,
+            alarmLog2LogGroupV1,
+            alarmEventGroupV2 }
+    ::= { lumAlarmCompl 15 }
+
+lumAlarmBasicComplV16 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V16 (9.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV9,
+            alarmListGroupV2,
+            alarmNotificationGroupV3,
+            alarmSumGroup,
+            alarmTestGroupV3,
+            alarmLogGroupV3,
+            alarmRemoteGroupV4,
+            alarmLog2LogGroupV1,
+            alarmEventGroupV2 }
+    ::= { lumAlarmCompl 16 }
+
+lumAlarmBasicComplV17 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V17 (11.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV9,
+            alarmListGroupV2,
+            alarmNotificationGroupV3,
+            alarmSumGroup,
+            alarmTestGroupV3,
+            alarmLogGroupV3,
+            alarmRemoteGroupV5,
+            alarmLog2LogGroupV1,
+            alarmEventGroupV2 }
+    ::= { lumAlarmCompl 17 }
+
+lumAlarmBasicComplV18 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V18 (17.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV9,
+            alarmListGroupV2,
+            alarmNotificationGroupV3,
+            alarmSumGroup,
+            alarmTestGroupV3,
+            alarmLogGroupV3,
+            alarmRemoteGroupV6,
+            alarmLog2LogGroupV1,
+            alarmEventGroupV2 }
+    ::= { lumAlarmCompl 18 }
+
+lumAlarmBasicComplV19 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V19 (19.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV9,
+            alarmListGroupV2,
+            alarmNotificationGroupV3,
+            alarmSumGroup,
+            alarmTestGroupV3,
+            alarmLogGroupV3,
+            alarmRemoteGroupV7,
+            alarmLog2LogGroupV1,
+            alarmEventGroupV2 }
+    ::= { lumAlarmCompl 19 }
+
+lumAlarmBasicComplV20 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V20 (20.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV9,
+            alarmListGroupV2,
+            alarmNotificationGroupV3,
+            alarmSumGroup,
+            alarmTestGroupV3,
+            alarmLogGroupV3,
+            alarmRemoteGroupV8,
+            alarmLog2LogGroupV1,
+            alarmEventGroupV2 }
+    ::= { lumAlarmCompl 20 }
+
+lumAlarmBasicComplV21 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V21 (22.1)."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV9,
+            alarmListGroupV2,
+            alarmNotificationGroupV3,
+            alarmSumGroup,
+            alarmTestGroupV3,
+            alarmLogGroupV3,
+            alarmRemoteGroupV9,
+            alarmLog2LogGroupV1,
+            alarmEventGroupV2 }
+    ::= { lumAlarmCompl 21 }
+
+lumAlarmBasicComplV22 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V22 (28.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV10,
+            alarmListGroupV2,
+            alarmNotificationGroupV3,
+            alarmSumGroup,
+            alarmTestGroupV3,
+            alarmLogGroupV3,
+            alarmRemoteGroupV10,
+            alarmLog2LogGroupV1,
+            alarmEventGroupV2 }
+    ::= { lumAlarmCompl 22 }
+
+lumAlarmBasicComplV23 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V23 (29.0)."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV10,
+            alarmListGroupV2,
+            alarmNotificationGroupV3,
+            alarmSumGroup,
+            alarmTestGroupV3,
+            alarmLogGroupV3,
+            alarmRemoteGroupV11,
+            alarmLog2LogGroupV1,
+            alarmEventGroupV2 }
+    ::= { lumAlarmCompl 23 }
+
+lumAlarmBasicComplV24 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V24 (30.1)."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralGroupV10,
+            alarmListGroupV2,
+            alarmNotificationGroupV3,
+            alarmSumGroup,
+            alarmTestGroupV3,
+            alarmLogGroupV3,
+            alarmRemoteGroupV11,
+            alarmLog2LogGroupV1,
+            alarmEventGroupV2 }
+    ::= { lumAlarmCompl 24 }
+-- ----------------------------------------------------
+-- Minimal object and event groups
+-- ----------------------------------------------------
+
+alarmGeneralMinimalGroupV1 OBJECT-GROUP
+    OBJECTS {
+        alarmGeneralLastChangeTime,
+        alarmGeneralLastSeqNumber,
+        alarmGeneralConfigLastChangeTime,
+        alarmGeneralAlarmTableSize,
+        alarmGeneralHeartBeatInterval }
+    STATUS      current
+    DESCRIPTION
+        "The minimal general alarm objects."
+    ::= { lumAlarmMinimalGroups 1 }
+
+alarmListMinimalGroupV1 OBJECT-GROUP
+    OBJECTS {
+        alarmIndex,
+        alarmObject,
+        alarmFaultStatus,
+        alarmMgmtName,
+        alarmInvPhysIndexOrZero,
+        alarmInvLogicalIndexOrZero,
+        alarmType,
+        alarmCause,
+        alarmSeverity,
+        alarmText,
+        alarmCreatedTime,
+        alarmLastChangeTime }
+    STATUS      deprecated
+    DESCRIPTION
+        "The minimal alarm list objects."
+    ::= { lumAlarmMinimalGroups 2 }
+
+alarmGeneralMinimalGroupV2 OBJECT-GROUP
+    OBJECTS {
+        alarmGeneralLastChangeTime,
+        alarmGeneralLastSeqNumber,
+        alarmGeneralConfigLastChangeTime,
+        alarmGeneralAlarmTableSize,
+        alarmGeneralHeartBeatInterval,
+        alarmGeneralAlarmNotificationVersion,
+        alarmGeneralHighestSeverity }
+    STATUS      deprecated
+    DESCRIPTION
+        "The minimal general alarm objects v2."
+    ::= { lumAlarmMinimalGroups 3 }
+
+alarmListMinimalGroupV2 OBJECT-GROUP
+    OBJECTS {
+        alarmIndex,
+        alarmObject,
+        alarmFaultStatus,
+        alarmMgmtName,
+        alarmInvPhysIndexOrZero,
+        alarmInvLogicalIndexOrZero,
+        alarmType,
+        alarmCause,
+        alarmSeverity,
+        alarmText,
+        alarmCreatedTime,
+        alarmLastChangeTime,
+        alarmNeName,
+        alarmNeIpAddress  }
+    STATUS      current
+    DESCRIPTION
+        "The minimal alarm list objects V2."
+    ::= { lumAlarmMinimalGroups 4 }
+
+alarmGeneralMinimalGroupV3 OBJECT-GROUP
+    OBJECTS {
+        alarmGeneralLastChangeTime,
+        alarmGeneralLastSeqNumber,
+        alarmGeneralConfigLastChangeTime,
+        alarmGeneralAlarmTableSize,
+        alarmGeneralHeartBeatInterval,
+        alarmGeneralAlarmNotificationVersion,
+        alarmGeneralHighestSeverity,
+        alarmGeneralAlarmLog2Size,
+        alarmGeneralEventLogTableSize,
+        alarmGeneralEventLogSize,
+        alarmGeneralEventLastSeqNumber }
+    STATUS      current
+    DESCRIPTION
+        "The minimal general alarm objects v3."
+    ::= { lumAlarmMinimalGroups 5 }
+
+
+-- ----------------------------------------------------
+-- Minimal Compliance
+-- ----------------------------------------------------
+
+lumAlarmMinimalComplV1 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Minimal implementation requirements for the alarm MIB v1."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralMinimalGroupV1,
+            alarmListMinimalGroupV1,
+            alarmNotificationGroupV2 }
+    ::= { lumAlarmMinimalCompl 1 }
+
+lumAlarmMinimalComplV2 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Minimal implementation requirements for the alarm MIB v2."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralMinimalGroupV2,
+            alarmListMinimalGroupV2,
+            alarmExternalGroupV1,
+            alarmNotificationGroupV3 }
+    ::= { lumAlarmMinimalCompl 2 }
+
+lumAlarmMinimalComplV3 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Minimal implementation requirements for the alarm MIB v3."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralMinimalGroupV3,
+            alarmListMinimalGroupV2,
+            alarmExternalGroupV1,
+            alarmNotificationGroupV3,
+            alarmEventGroupV1 }
+    ::= { lumAlarmMinimalCompl 3 }
+
+lumAlarmMinimalComplV4 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Minimal implementation requirements for the alarm MIB v4."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralMinimalGroupV3,
+            alarmListMinimalGroupV2,
+            alarmExternalGroupV1,
+            alarmNotificationGroupV3,
+            alarmEventGroupV1,
+            alarmLog2LogGroupV1 }
+
+    ::= { lumAlarmMinimalCompl 4 }
+
+lumAlarmMinimalComplV5 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Minimal implementation requirements for the alarm MIB v5."
+    MODULE
+        MANDATORY-GROUPS {
+            alarmGeneralMinimalGroupV3,
+            alarmListMinimalGroupV2,
+            alarmExternalGroupV1,
+            alarmNotificationGroupV3,
+            alarmEventGroupV1,
+            alarmLog2LogGroupV1 }
+
+    ::= { lumAlarmMinimalCompl 5 }
+
+END
+

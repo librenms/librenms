@@ -40,7 +40,7 @@ use LibreNMS\Data\Store\Rrd;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Exceptions\SnmpException;
+use LibreNMS\Exceptions\SnmpConnectionException;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Interfaces\Module;
@@ -88,7 +88,7 @@ class BgpPeers implements Module
 
         try {
             [$peers, $addressFamilies] = $this->fetch($os);
-        } catch (SnmpException $e) {
+        } catch (SnmpConnectionException $e) {
             Log::warning('Device did not answer, BGP sessions were not updated: ' . $e->getMessage());
 
             return;
@@ -135,7 +135,7 @@ class BgpPeers implements Module
 
         try {
             [$polledPeers, $polledFamilies] = $this->fetch($os, $device->bgpPeersCbgp()->exists());
-        } catch (SnmpException $e) {
+        } catch (SnmpConnectionException $e) {
             Log::warning('Device did not answer, BGP sessions were not polled: ' . $e->getMessage());
 
             return;
@@ -239,7 +239,7 @@ class BgpPeers implements Module
      *
      * @return array{0: Collection<int, BgpPeer>, 1: Collection<int, BgpPeerCbgp>}
      *
-     * @throws SnmpException
+     * @throws SnmpConnectionException
      */
     private function fetch(OS $os, bool $addressFamilies = true): array
     {

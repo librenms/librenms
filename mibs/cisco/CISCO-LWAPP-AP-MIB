@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing import)
 -- *******************************************************************
 -- CISCO-LWAPP-AP-MIB.my
 -- January 2006, Devesh Pujari, Prasanna Viswakumar, Srinath Candadai
@@ -46,7 +47,7 @@ IMPORTS
     CLApDot11RadioSubband,
     CLApDot11RadioRole,
     CLApMode,
-    CLApNtpStatus
+    CLApNtpStatus, CLDot11Band
         FROM CISCO-LWAPP-TC-MIB
     cldRegulatoryDomain
         FROM CISCO-LWAPP-DOT11-MIB

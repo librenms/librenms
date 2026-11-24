@@ -1,5 +1,5 @@
 --
---   
+--
 -- ARBOR NETWORKS
 -- 
 --
@@ -48,24 +48,66 @@ IMPORTS
 -- =================================================================================
 
 peakflowSPMIB MODULE-IDENTITY
-	LAST-UPDATED "201612060000Z" -- December 6, 2016
-	ORGANIZATION "Arbor Networks, Inc."
-	CONTACT-INFO
-		"	Arbor Networks, Inc.
-			Arbor Technical Assistance Center
+        LAST-UPDATED "201909170000Z" -- September 17, 2019
+        ORGANIZATION "NETSCOUT Systems, Inc."
+        CONTACT-INFO
+                "       NETSCOUT Systems, Inc.
+                        Arbor Technical Assistance Center
 
-			Postal: 76 Blanchard Road
-				Burlington, MA 01803
-				USA
+                        Postal: 310 Littleton Rd
+                                Westford, MA 01886
+                                USA
 
-			Tel: +1 866 212 7267 (toll free)
-			     +1 781 362 4300
-			Email: support@arbor.net "
+                        Tel: +1 866 272 6721 (toll free)
+                             +1 781 362 4301
+                        Email: support@arbor.net "
 
 	DESCRIPTION
 		"Peakflow SP MIB"
 
 	-- Revision log, reverse chrono
+	REVISION    "201909170000Z" -- September 17, 2019
+	DESCRIPTION "Adding Sightline Signaling"
+
+	REVISION    "201908270000Z" -- August 27, 2019
+	DESCRIPTION "Update contact info"
+
+	REVISION    "201901230000Z" -- January 23, 2019
+	DESCRIPTION "Added mitigationOrchestrationAlert,
+			 spMitOrchestrationSrcTMSGroup, and spMitOrchestrationDestTMSGroup."
+
+	REVISION    "201812050000Z" -- December 05, 2018
+	DESCRIPTION "Add spThresholdHC, spUsageHC, spImpactBpsHC, and
+		spImpactPpsHC to handle 64-bit versions of spThreshold,
+		spUsage, spImpactBps, and spImpactPps."
+
+	REVISION    "201809070000Z" -- September 07, 2018
+	DESCRIPTION "Change spAlertId to spAlertID for cloudSignalingFault and
+	         cloudSignalingFaultDone."
+
+	REVISION    "201808060000Z" -- August 6, 2018
+	DESCRIPTION "Add spImportance to smartThresholdAlert and
+	         smartThresholdAlertDone."
+
+	REVISION    "201808010000Z" -- August 01, 2018
+	DESCRIPTION "Add spSmartAlertThreshold and spSmartAlertObserved to handle
+	         64-bit values for the smartThresholdAlert and
+	         smartThresholdAlertDone snmp traps."
+
+	REVISION    "201807310000Z" -- July 31, 2018
+	DESCRIPTION "Add spSmartAlertSettingName to smartThresholdAlert and
+	         smartThresholdAlertDone."
+
+	REVISION    "201807130000Z" -- July 13, 2018
+	DESCRIPTION "Renamed insightThresholdAlert to smartThresholdAlert and
+	         insightThresholdAlertDone to smartThresholdAlertDone."
+
+	REVISION    "201806260000Z" -- June 26, 2018
+	DESCRIPTION "Added InsightThresholdAlert and InsightThresholdAlertDone."
+
+	REVISION    "201802010000Z" -- Feb 2, 2018
+	DESCRIPTION "Added AIFTemplatesUpdated."
+
 	REVISION    "201612060000Z" -- December 6, 2016
 	DESCRIPTION "Added spTMSMultiDiversionPrefix.
 		     Deprecated mitigationTMSStart trap and created a new trap
@@ -909,6 +951,108 @@ spTMSMultiDiversionPrefix OBJECT-TYPE
 		 the TMS multi-prefix mitigation."
 	::= { peakflowSPCMI 85 }
 
+spSmartAlertSettingName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Smart alert setting name"
+	::= { peakflowSPCMI 86 }
+
+spSmartAlertThreshold OBJECT-TYPE
+	SYNTAX  CounterBasedGauge64
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Smart alert setting threshold (bps/pps)"
+	::= { peakflowSPCMI 87 }
+
+spSmartAlertObserved OBJECT-TYPE
+	SYNTAX  CounterBasedGauge64
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Insight traffic observed (bps/pps)"
+	::= { peakflowSPCMI 88 }
+
+spImportance OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS	current
+	DESCRIPTION
+		"Importance level of alert (high/medium/low)."
+	::= { peakflowSPCMI 89 }
+
+spThresholdHC	OBJECT-TYPE
+	SYNTAX  CounterBasedGauge64
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Configured threshold
+		The 64-bit version of spThreshold"
+	::= { peakflowSPCMI 90 }
+
+spUsageHC	OBJECT-TYPE
+	SYNTAX  CounterBasedGauge64
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Observed per-object traffic usage
+		 The 64-bit version of SpUsage"
+	::= { peakflowSPCMI 91 }
+
+spImpactBpsHC OBJECT-TYPE
+	SYNTAX	CounterBasedGauge64
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The maximum observed bps of traffic for a given DoS alert
+		type.
+		The 64-bit version of spImpactBps"
+	::= { peakflowSPCMI 92 }
+
+spImpactPpsHC OBJECT-TYPE
+	SYNTAX  CounterBasedGauge64
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"The maximum observed pps of traffic for a given DoS alert
+		type.
+		The 64-bit version of spImpactPps"
+	::= { peakflowSPCMI 93 }
+
+spMitOrchestrationSrcTMSGroup OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Mitigation Orchestration source TMS group"
+	::= { peakflowSPCMI 94}
+
+spMitOrchestrationDestTMSGroup OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..64))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Mitigation Orchestration destination TMS group"
+	::= { peakflowSPCMI 95}
+
+spSightlineSignalingClientName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..128))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Sightline Signaling Client Name"
+	::= { peakflowSPCMI 96}
+
+spSightlineSignalingMessage OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..1024))
+	MAX-ACCESS  accessible-for-notify
+	STATUS  current
+	DESCRIPTION
+		"Sightline Signaling Message"
+	::= { peakflowSPCMI 97}
+
 -- =================================================================================
 --  Pollable SP device management types:
 --
@@ -1262,6 +1406,8 @@ managedObjectUsage NOTIFICATION-TYPE
 		spUsageType,
 		spThreshold,
 		spUsage,
+		spThresholdHC,
+		spUsageHC,
 		spUnit
 	}
 	STATUS  current
@@ -1521,6 +1667,8 @@ fingerprintUsage NOTIFICATION-TYPE
 		spUsageType,
 		spThreshold,
 		spUsage,
+		spThresholdHC,
+		spUsageHC,
 		spUnit
 	}
 	STATUS  current
@@ -1548,7 +1696,9 @@ serviceUsage NOTIFICATION-TYPE
 		spApplicationName,
 		spServiceElement,
 		spThreshold,
-		spUsage
+		spUsage,
+		spThresholdHC,
+		spUsageHC
 	}
 	STATUS  current
 	DESCRIPTION
@@ -1575,6 +1725,8 @@ dosNetworkProfiledAlert NOTIFICATION-TYPE
 		pdosUrl,
 		spImpactBps,
 		spImpactPps,
+		spImpactBpsHC,
+		spImpactPpsHC,
 		spManagedObject,
 		spDetectedCountries
 	}
@@ -1594,6 +1746,8 @@ dosNetworkProfiledAlertDone NOTIFICATION-TYPE
 		pdosUrl,
 		spImpactBps,
 		spImpactPps,
+		spImpactBpsHC,
+		spImpactPpsHC,
 		spManagedObject,
 		spDetectedCountries
 	}
@@ -1615,6 +1769,8 @@ dosHostDetectionAlert NOTIFICATION-TYPE
 		spInetAddressType,
 		spImpactBps,
 		spImpactPps,
+		spImpactBpsHC,
+		spImpactPpsHC,
 		pdosAnomalyClassification,
 		spManagedObjects
 	}
@@ -1636,6 +1792,8 @@ dosHostDetectionAlertDone NOTIFICATION-TYPE
 		spInetAddressType,
 		spImpactBps,
 		spImpactPps,
+		spImpactBpsHC,
+		spImpactPpsHC,
 		pdosAnomalyClassification,
 		spManagedObjects
 	}
@@ -1732,7 +1890,7 @@ licenseErrorDone NOTIFICATION-TYPE
 
 cloudSignalingFault NOTIFICATION-TYPE
 	OBJECTS {
-		spAlertId,
+		spAlertID,
 		spPravail,
 		spCloudSignalFaultDescription
 	}
@@ -1743,7 +1901,7 @@ cloudSignalingFault NOTIFICATION-TYPE
 
 cloudSignalingFaultDone NOTIFICATION-TYPE
 	OBJECTS {
-		spAlertId,
+		spAlertID,
 		spPravail,
 		spCloudSignalFaultDescription
 	}
@@ -1769,6 +1927,71 @@ mitigationTMSStartV2 NOTIFICATION-TYPE
 	DESCRIPTION
 		"TMS Mitigation has started"
 	::= { peakflowSPTrapsEnumerate 57 }
+
+aifTemplatesUpdated NOTIFICATION-TYPE
+	STATUS  current
+	DESCRIPTION
+		"AIF Templates have been updated"
+	::= { peakflowSPTrapsEnumerate 58 }
+
+smartThresholdAlert NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spSmartAlertSettingName,
+		spSmartAlertThreshold,
+		spSmartAlertObserved,
+		spUnit,
+		spImportance
+	}
+	STATUS  current
+	DESCRIPTION
+		"A Smart Threshold alert was started after one or more signatures
+		exceeded their thresholds."
+	::= { peakflowSPTrapsEnumerate 59 }
+
+smartThresholdAlertDone NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spSmartAlertSettingName,
+		spSmartAlertThreshold,
+		spSmartAlertObserved,
+		spUnit,
+		spImportance
+	}
+	STATUS  current
+	DESCRIPTION
+		"The Smart Threshold alert ended and is no longer exceeding signature
+		thresholds."
+	::= { peakflowSPTrapsEnumerate 60 }
+
+mitigationOrchestrationAlert NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spCollector,
+		spMitigationName,
+		spMitOrchestrationSrcTMSGroup,
+		spMitOrchestrationDestTMSGroup
+	}
+	STATUS  current
+	DESCRIPTION
+		"A mitigation was moved by Mitigation Orchestration."
+	::= { peakflowSPTrapsEnumerate 61 }
+
+sightlineSignalingAlert NOTIFICATION-TYPE
+	OBJECTS {
+		spAlertID,
+		spSightlineSignalingClientName,
+		spManagedObjects,
+		spAlertDetectionSignatures,
+		spInetAddress,
+		spInetAddressType,
+		spSightlineSignalingMessage
+	}
+	STATUS  current
+	DESCRIPTION
+		"A Sightline Signaling Request was received."
+	::= { peakflowSPTrapsEnumerate 62 }
+
 -- =================================================================================
 
 END

@@ -7,7 +7,7 @@
         initial: @js($initial),
         hide: @js($hide)
     })"
-    @click.outside="close()"
+    @click.outside="if (!dialog) close()"
     @keydown.escape.window="close()">
 
     {{-- Main Bar --}}
@@ -144,9 +144,10 @@
 
     {{-- Dialog Modal (Teleported) --}}
     <template x-teleport="body">
-        <div x-show="dialog" x-cloak
+        <div x-data="{ startedOnBackdrop: false }" x-show="dialog" x-cloak
              class="tw:fixed tw:inset-0 tw:z-100 tw:flex tw:items-center tw:justify-center tw:p-6 tw:bg-neutral-950/60 tw:backdrop-blur-xs"
-             @click="close()">
+             @pointerdown.capture="startedOnBackdrop = $event.target === $el"
+             @click.self.stop="if (startedOnBackdrop || $event.detail === 0) close()">
             <div x-show="dialog" x-transition @click.stop
                  class="tw:w-full tw:max-w-lg tw:bg-white tw:dark:bg-dark-gray-500 tw:border tw:border-neutral-200 tw:dark:border-dark-gray-300 tw:rounded-2xl tw:shadow-2xl tw:text-sm"
                  role="dialog" aria-modal="true">

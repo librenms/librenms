@@ -12,7 +12,9 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Testing\TestResponse;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\ProcessType;
 use LibreNMS\Tests\TestCase;
+use LibreNMS\Util\ModuleList;
 use Spatie\Permission\Models\Role;
 
 final class EditModulesControllerTest extends TestCase
@@ -105,6 +107,29 @@ final class EditModulesControllerTest extends TestCase
         $this->assertArrayNotHasKey('mempools', $modules, 'mempools does not use the proxmox-api method');
     }
 
+    public function testUnixAgentMethodEnablesTheUnixAgentModule(): void
+    {
+        LibrenmsConfig::set('poller_modules.unix-agent', false);
+        $device = $this->deviceWithMethods([], PollingMethodType::Snmp, PollingMethodType::UnixAgent);
+
+        $modules = $this->modulesFrom($this->actingAs($this->admin())->get(route('device.edit.modules', $device)));
+        $this->assertTrue($modules['unix-agent']['polling']['method']);
+        $this->assertTrue($modules['mempools']['polling']['method']);
+        $this->assertNull($modules['storage']['polling']['method'], 'snmp does not enable modules');
+
+        $this->assertTrue((new ModuleList)->moduleStatus(ProcessType::Poller, 'unix-agent', $device)->isEnabled());
+    }
+
+    public function testIpmiMethodEnablesTheSensorsModule(): void
+    {
+        $device = $this->deviceWithMethods([], PollingMethodType::Icmp, PollingMethodType::Ipmi);
+
+        $modules = $this->modulesFrom($this->actingAs($this->admin())->get(route('device.edit.modules', $device)));
+        $this->assertTrue($modules['sensors']['discovery']['method']);
+        $this->assertTrue($modules['sensors']['polling']['method']);
+        $this->assertArrayNotHasKey('storage', $modules);
+    }
+
     public function testAllModulesHaveFriendlyNames(): void
     {
         foreach (['poller_modules', 'discovery_modules'] as $configKey) {
@@ -171,10 +196,10 @@ final class EditModulesControllerTest extends TestCase
         $modules = $this->modulesFrom($response);
         $this->assertArrayHasKey('unix-agent', $modules);
         $this->assertArrayHasKey('mempools', $modules);
+        $this->assertArrayHasKey('sensors', $modules);
         $this->assertArrayNotHasKey('availability', $modules); // the agent is not checked for availability
         $this->assertArrayNotHasKey('storage', $modules);
         $this->assertArrayNotHasKey('ports', $modules);
-        $this->assertArrayNotHasKey('ipmi', $modules);
     }
 
     public function testAvailabilityIsShownForMethodsThatAffectAvailability(): void

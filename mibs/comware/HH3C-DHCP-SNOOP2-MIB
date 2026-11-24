@@ -1,14 +1,18 @@
 -- =========================================================================
--- Copyright (c) 2004-2017 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: DHCP Snooping MIB 2
 -- Reference:
--- Version:     V1.3
+-- Version:     V1.6
 -- History:
 -- V1.0 The initial version, created by lilin, 2012.05.15
 -- V1.1 Modified the mib description by lilin, 2013.04.15
 -- V1.2 Modified hh3cDhcpSnoop2IfMaxLearnNum by yuguoqing, 2014.03.20
 -- V1.3 Modified hh3cDhcpSnoop2IfOpt82CIDMode by heminhong, 2017.01.13
+-- V1.4 Modified hh3cDhcpSnoop2BindDbName by wugang, 2021.07.05
+-- V1.5 Modified hh3cDhcpSnoop2Traps by wanganyu, 2022.05.16
+-- V1.6 Add hh3cDhcpSnoop2UntrustRelpyAlm and hh3cDhcpSnoop2RateLimitAlm
+--      by wanganyu, 2022.07.22
 -- =========================================================================
 HH3C-DHCP-SNOOP2-MIB DEFINITIONS ::= BEGIN
 
@@ -18,9 +22,9 @@ HH3C-DHCP-SNOOP2-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     TruthValue, RowStatus, MacAddress
         FROM SNMPv2-TC
-    MODULE-IDENTITY, OBJECT-TYPE, Counter64, Unsigned32
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64, Unsigned32, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
-    ifIndex, InterfaceIndexOrZero
+    ifIndex, InterfaceIndexOrZero, ifName
         FROM IF-MIB
     InetAddressIPv4
         FROM INET-ADDRESS-MIB
@@ -31,16 +35,23 @@ IMPORTS
 -- Module identity
 -- =========================================================================
 hh3cDhcpSnoop2 MODULE-IDENTITY
-    LAST-UPDATED "201701130000Z"
+    LAST-UPDATED "202207260000Z"
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
         "Platform Team New H3C Technologies Co., Ltd.
          Hai-Dian District Beijing P.R. China
          http://www.h3c.com
-         Zip:100085
-        "
+         Zip:100085"
     DESCRIPTION "DHCP SNOOPING MIB 2"
+    REVISION
+        "202207260000Z"
+    DESCRIPTION
+        "Modified to add 'Trap' mode."
+    REVISION
+        "202107050000Z"
+    DESCRIPTION
+        "Modified to add 'hh3cDhcpSnoop2BindDbName' mode."
     REVISION
         "201701130000Z"
     DESCRIPTION
@@ -72,7 +83,7 @@ hh3cDhcpSnoop2Enabled OBJECT-TYPE
     ::= { hh3cDhcpSnoop2ConfigGroup 1 }
 
 hh3cDhcpSnoop2BindDbName OBJECT-TYPE
-    SYNTAX     OCTET STRING(SIZE(0..512))
+    SYNTAX     OCTET STRING(SIZE(0..255))
     MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
@@ -134,6 +145,21 @@ hh3cDhcpSnoop2PktDropNum OBJECT-TYPE
          DHCP snooping."
     ::= { hh3cDhcpSnoop2StatisticsGroup 3 }
 
+hh3cDhcpSnoop2TrapDropNum OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the packets dropped for Trap."
+    ::= { hh3cDhcpSnoop2StatisticsGroup 4 }
+
+hh3cDhcpSnoop2PktVlanID OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4094)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "VLAN ID."
+    ::= { hh3cDhcpSnoop2StatisticsGroup 5 }
 -- ==========================================================================
 -- Table definition
 -- ==========================================================================
@@ -724,5 +750,104 @@ hh3cDhcpSnoop2IfVlanRIDRowStatus    OBJECT-TYPE
           Three actions are used: active,
           createAndGo, destroy."
      ::= { hh3cDhcpSnoop2IfVlanRIDEntry 4 }
+-- ==========================================================================
+-- Trap definition
+-- ==========================================================================
+hh3cDhcpSnoop2Traps OBJECT IDENTIFIER ::= {  hh3cDhcpSnoop2 3  }
+
+hh3cDhcpSnoop2TrapNotify OBJECT IDENTIFIER ::= { hh3cDhcpSnoop2Traps 0 }
+
+hh3cDhcpSnoop2BindTblExh NOTIFICATION-TYPE
+    OBJECTS
+    {
+        ifIndex
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the DHCP snooping entry resource is exhausted"
+    ::= { hh3cDhcpSnoop2TrapNotify 1 }
+
+hh3cDhcpSnoop2BindTblExhRecov  NOTIFICATION-TYPE
+    OBJECTS
+    {
+        ifIndex
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the DHCP snooping entry resource recovers from exhaustion"
+    ::= { hh3cDhcpSnoop2TrapNotify 2 }
+
+hh3cDhcpSnoop2BindTblThresh  NOTIFICATION-TYPE
+    OBJECTS
+    {
+        ifIndex
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the usage of DHCP snooping entry
+         resource has exceeded the threshold
+         The value of the usage is sampled every minute."
+    ::= { hh3cDhcpSnoop2TrapNotify 3 }
+
+hh3cDhcpSnoop2BindTblThreshRecov  NOTIFICATION-TYPE
+    OBJECTS
+    {
+        ifIndex
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the usage of DHCP snooping entry resource has
+         dropped below the threshold.
+         The value of the usage is sampled every minute."
+    ::= { hh3cDhcpSnoop2TrapNotify 4 }
+
+hh3cDhcpSnoop2NomatchBindAlm  NOTIFICATION-TYPE
+    OBJECTS
+    {
+        ifIndex
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the number of DHCP requests discarded
+         due to DHCP snooping entry mismatch
+         has reached the threshold."
+    ::= { hh3cDhcpSnoop2TrapNotify 5}
+
+hh3cDhcpSnoop2ChaddrAlm  NOTIFICATION-TYPE
+    OBJECTS
+    {
+        ifIndex
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the number of DHCP requests discarded
+         due to MAC address mismatch has reached the threshold."
+    ::= { hh3cDhcpSnoop2TrapNotify 6 }
+
+hh3cDhcpSnoop2UntrustRelpyAlm  NOTIFICATION-TYPE
+    OBJECTS
+    {
+        ifName,
+        hh3cDhcpSnoop2TrapDropNum,
+        hh3cDhcpSnoop2PktVlanID
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the number of DHCP requests discarded
+         due to untrust port reply packets has reached the threshold."
+    ::= { hh3cDhcpSnoop2TrapNotify 7}
+
+hh3cDhcpSnoop2RateLimitAlm  NOTIFICATION-TYPE
+    OBJECTS
+    {
+        ifName,
+        hh3cDhcpSnoop2TrapDropNum,
+        hh3cDhcpSnoop2PktVlanID
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the number of DHCP requests discarded
+         due to rate limit has reached the threshold."
+    ::= { hh3cDhcpSnoop2TrapNotify 8}
 
 END

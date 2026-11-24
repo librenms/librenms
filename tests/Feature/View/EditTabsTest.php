@@ -57,7 +57,7 @@ final class EditTabsTest extends TestCase
         }
     }
 
-    public function testLegacyEditPageUsesTabs(): void
+    public function testEditPageUsesTabs(): void
     {
         Role::findOrCreate('admin');
         $admin = User::factory()->create(['enabled' => 1]);
@@ -66,11 +66,11 @@ final class EditTabsTest extends TestCase
         Mempool::factory()->for($device)->create();
 
         $response = $this->actingAs($admin)
-            ->get("/device/device=$device->device_id/tab=edit/section=alert-rules/")
+            ->get(route('device.edit.alert-rules', $device))
             ->assertOk()
             ->assertSee(route('device.edit.mempools', $device), false)
             ->assertDontSee(route('device.edit.storage', $device), false);
 
-        $this->assertMatchesRegularExpression('#<span class="pagemenu-selected">\s*<a href="[^"]*section=alert-rules"#', (string) $response->getContent());
+        $this->assertMatchesRegularExpression('#<span class="pagemenu-selected">\s*<a href="' . preg_quote(route('device.edit.alert-rules', $device), '#') . '"#', (string) $response->getContent());
     }
 }

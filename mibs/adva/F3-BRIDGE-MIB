@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing import)
 F3-BRIDGE-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -15,7 +16,7 @@ IMPORTS
     neIndex, shelfIndex, slotIndex, networkElementEntry
              FROM CM-ENTITY-MIB
     cmFlowEntry, cmEthernetAccPortIndex, 
-    cmFlowIndex, cmMPFlowIndex, cmFlowPointEntry
+    cmFlowIndex, cmMPFlowIndex, cmFlowPointEntry, cmEncapFlowPointEntry
              FROM CM-FACILITY-MIB
     cmFlowStatsEntry, cmFlowHistoryEntry
              FROM CM-PERFORMANCE-MIB;

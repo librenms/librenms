@@ -72,7 +72,6 @@ class PageTabs extends Component
         'latency' => \App\Http\Controllers\Device\Tabs\LatencyController::class,
         'nac' => \App\Http\Controllers\Device\Tabs\NacController::class,
         'notes' => \App\Http\Controllers\Device\Tabs\NotesController::class,
-        'edit' => \App\Http\Controllers\Device\Tabs\EditController::class,
         'capture' => \App\Http\Controllers\Device\Tabs\CaptureController::class,
     ];
 
@@ -80,8 +79,7 @@ class PageTabs extends Component
         public readonly Device $device,
         public readonly array $dropdownLinks = [],
     ) {
-        // remove tab= for legacy urls
-        $this->currentTab = str_replace('tab=', '', Request::segment(3, 'overview'));
+        $this->currentTab = Request::segment(3, 'overview');
 
         foreach (self::$tabsClasses as $tab => $class) {
             $this->tabs[$tab] = app()->make($class);

@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (BITS without named bits)
 ------------------------------------------------------------------------------
 --
 --  File              : gbnPlatformOAMSyslog-MIB.mi2
@@ -326,7 +327,7 @@
 	        syslogFilterRuleModname
 	            OCTET STRING,
 	        syslogFilterRuleLevelmask
-	            BITS      	            
+	            OCTET STRING      	            
 	        }
                  
 	syslogFilterRuleDevname OBJECT-TYPE
@@ -354,7 +355,7 @@
         ::= { syslogFilterRuleEntry 2 }            
                  
 	syslogFilterRuleLevelmask OBJECT-TYPE
-        SYNTAX   BITS
+        SYNTAX   OCTET STRING
         MAX-ACCESS   read-write
         STATUS   current
         DESCRIPTION

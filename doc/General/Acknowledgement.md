@@ -27,7 +27,6 @@ The lists below give each project and its license.
 - [Mktree](http://www.mattkruse.com/javascript/mktree/): Open License
 - [Moment](http://momentjs.com/): MIT
 - [Tag Manager](http://soliantconsulting.github.io/tagmanager/): MIT
-- [TW Sack](https://code.google.com/p/tw-sack/): GPLv3
 - [Gridstack](https://gridstackjs.com): MIT
 - [Pure PHP radius class](http://developer.sysco.ch/php/): GPLv3
 - MalaysiaMap.svg - By Exiang [CC BY 3.0](http://creativecommons.org/licenses/by/3.0), via Wikimedia Commons

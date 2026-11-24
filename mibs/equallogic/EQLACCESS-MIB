@@ -1,4 +1,4 @@
--- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+-- Mib files packaged on  Wed Jun 19 01:31:39 EDT 2019 for Storage Array Firmware V10.0.3 (R469188)
 
 EQLACCESS-MIB DEFINITIONS  ::= BEGIN
 IMPORTS
@@ -18,7 +18,7 @@ IMPORTS
             FROM EQLVOLUME-MIB;
 
 eqlAccessModule MODULE-IDENTITY
-	LAST-UPDATED "201503171528Z"
+	LAST-UPDATED "201906190531Z"
     ORGANIZATION  "Dell Inc."
     CONTACT-INFO
         "Contact: Customer Support
@@ -83,7 +83,8 @@ EqlAccessGroupEntry ::= SEQUENCE {
    eqlAccessGroupDescription  UTFString,
    eqlAccessGroupAdminKey     Unsigned32,
    eqlAccessGroupType         INTEGER,
-   eqlAccessGroupPrivacyFlag  INTEGER
+   eqlAccessGroupPrivacyFlag  INTEGER,
+   eqlAccessGroupTypeThinimport  INTEGER
 }
 
 
@@ -175,6 +176,17 @@ eqlAccessGroupPrivacyFlag OBJECT-TYPE
     DEFVAL          { private }
     ::=  { eqlAccessGroupEntry 9 } 
 
+eqlAccessGroupTypeThinimport OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    non-thinimport(1),
+                    thinimport(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is used to mark if an access group is non-thinimport
+                      or thinimport."
+    DEFVAL          { non-thinimport }
+    ::=  { eqlAccessGroupEntry 10 }
 ----------------------------------------------------------------------
 -- Access Group by Type Table
 --
@@ -321,7 +333,8 @@ EqlAccessPointEntry ::= SEQUENCE {
    eqlAccessPointRowStatus  RowStatus,
    eqlAccessPointInitiatorName         UTFString,
    eqlAccessPointInitiatorCHAPUserName UTFString,
-   eqlAccessPointDescription           UTFString
+   eqlAccessPointDescription           UTFString,
+   eqlAccessPointTypeThinimport         INTEGER
 }
 
 eqlAccessPointIndex OBJECT-TYPE
@@ -363,6 +376,17 @@ eqlAccessPointDescription OBJECT-TYPE
     DEFVAL          { "" }
     ::=  { eqlAccessPointEntry 5 } 
 
+eqlAccessPointTypeThinimport OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    non-thinimport(1),
+                    thinimport(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is used to mark if an access group is non-thinimport
+                      or thinimport."
+    DEFVAL          { non-thinimport }
+    ::=  { eqlAccessPointEntry 6 }
 
 ----------------------------------------------------------------------
 -- Access Point IP Address Table
@@ -393,7 +417,8 @@ EqlAccessPointAddrEntry ::= SEQUENCE {
    eqlAccessPointAddrInitiatorAddrType       InetAddressType,
    eqlAccessPointAddrInitiatorAddr           InetAddress,
    eqlAccessPointAddrInitiatorAddrWildcardType       InetAddressType,
-   eqlAccessPointAddrInitiatorAddrWildcard   InetAddress
+   eqlAccessPointAddrInitiatorAddrWildcard   InetAddress,
+   eqlAccessPointAddrTypeThinimport          INTEGER
 }
 
 eqlAccessPointAddrIndex OBJECT-TYPE
@@ -446,6 +471,18 @@ eqlAccessPointAddrInitiatorAddrWildcard OBJECT-TYPE
                      When x is 0, then that portion of the initiator's ip address does not have to match. "
     ::=  { eqlAccessPointAddrEntry 6 } 
 
+eqlAccessPointAddrTypeThinimport OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    non-thinimport(1),
+                    thinimport(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is used to mark if an access point is non-thinimport
+                      or thinimport."
+    DEFVAL          { non-thinimport }
+    ::=  { eqlAccessPointAddrEntry 7 }
+    
 ----------------------------------------------------------------------
 -- Access Group Object Association Table
 --

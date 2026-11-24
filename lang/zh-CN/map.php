@@ -4,7 +4,6 @@ return [
     'custom' => [
         'title' => [
             'edit_dialog' => '选择自定义地图进行编辑',
-            'create' => '创建新自定义地图',
             'view' => ':name | 自定义地图',
             'edit' => '编辑自定义地图',
             'manage' => '管理自定义地图',

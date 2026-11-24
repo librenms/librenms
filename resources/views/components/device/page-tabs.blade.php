@@ -2,7 +2,7 @@
     @foreach($tabs as $tab)
         @if($tab->visible($device))
             <li role="presentation" class="tw:-mb-px">
-                <a href="{{ route('device', [$device->device_id, $tab->slug()]) }}"
+                <a href="{{ route('device.' . $tab->slug(), ['device' => $device]) }}"
                    @class([
             'tw:inline-block tw:p-3 tw:border-b-2 tw:rounded-t-lg tw:font-medium tw:whitespace-nowrap tw:no-underline tw:transition-colors tw:duration-75',
             'tw:border-green-600 tw:text-gray-800 tw:dark:text-blue-500 tw:dark:border-green-600' => $currentTab === $tab->slug(),

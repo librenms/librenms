@@ -41,7 +41,7 @@ class MefTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'mef']))
+            ->get(route('device.mef', ['device' => $device]))
             ->assertOk()
             ->assertSee('EPL-Cust-101')
             ->assertSee('epl')
@@ -59,7 +59,7 @@ class MefTabTest extends TestCase
         $user->assignRole('user');
 
         $this->actingAs($user)
-            ->get(route('device', ['device' => $device, 'tab' => 'mef']))
+            ->get(route('device.mef', ['device' => $device]))
             ->assertForbidden();
     }
 }

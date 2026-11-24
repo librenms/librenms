@@ -1,4 +1,5 @@
------------------------------------------------------------------------------
+-- LibreNMS: fix syntax error (dashes in comment lines)
+------------------------------------------------------------------------------
 --  File         : gbnL3Ospf-Mib.mi2
 --  Description  : ADMIN  Enterprise MIB 
 --  Version      : 0.03

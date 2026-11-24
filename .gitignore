@@ -2,6 +2,7 @@
 # Ignore all dotfiles #
 #######################
 .*
+!/.coderabbit.yaml
 !/.gitignore
 !/.git-blame-ignore-revs
 !/.editorconfig

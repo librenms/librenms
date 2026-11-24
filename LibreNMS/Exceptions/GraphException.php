@@ -9,6 +9,8 @@ use Throwable;
  */
 class GraphException extends \Exception
 {
+    public ?string $graphTitle = null;
+
     public function __construct(string $message = '', public readonly ?string $shortText = null, ?Throwable $previous = null)
     {
         parent::__construct($message, 0, $previous);

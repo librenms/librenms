@@ -34,7 +34,9 @@ namespace App\Patches;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use LibreNMS\Util\Binaries;
+use LibreNMS\Util\EnvHelper;
 use LibreNMS\Util\Http;
 use Symfony\Component\Process\Process;
 
@@ -46,6 +48,9 @@ class PatchManager
 {
     private const string DIFF_URL = 'https://github.com/librenms/librenms/pull/%d.diff';
     private const string RAW_URL = 'https://raw.githubusercontent.com/librenms/librenms/%s/%s';
+
+    /** Directories removed by the official LibreNMS Dockerfile */
+    private const array DOCKER_OMITTED_DIRS = ['doc/', 'html/plugins/Test/', 'tests/'];
 
     /** Directories cleaned of untracked files by reset() */
     private const array RESET_DIRS = ['app/', 'bootstrap/', 'database/', 'doc/', 'html/', 'includes/', 'LibreNMS/', 'licenses/', 'misc/', 'mibs/', 'resources/', 'routes/', 'scripts/', 'tests/'];
@@ -100,7 +105,7 @@ class PatchManager
     }
 
     /**
-     * Download a pull request from GitHub and build the patch for it.
+     * Download a pull request from GitHub and build a patch for this installation.
      * GitHub diffs do not contain binary files, those are downloaded and added to the patch.
      *
      * @throws PatchException
@@ -109,25 +114,34 @@ class PatchManager
     {
         $info = $this->pullRequestInfo($pr);
         $sha = $info['head']['sha'] ?? '';
+        $headRef = $sha ?: "refs/pull/$pr/head";
 
         $response = $this->download(sprintf(self::DIFF_URL, $pr), "pull request #$pr");
 
         $diff = '';
         $files = [];
+        $skippedFileCount = 0;
+        $isDocker = EnvHelper::librenmsDocker();
         foreach (preg_split('/^(?=diff --git )/m', $response, flags: PREG_SPLIT_NO_EMPTY) ?: [] as $section) {
             if (! str_starts_with($section, 'diff --git ')) {
                 continue;
             }
 
             $file = $this->parseSection($section);
+            if ($isDocker && $this->isOmittedFromDockerImage($file)) {
+                $skippedFileCount++;
+                continue;
+            }
+
             $files[] = $file;
             $diff .= preg_match('/^Binary files .* differ$/m', $section)
-                ? $this->binarySection($section, $file, $sha ?: "refs/pull/$pr/head")
+                ? $this->binarySection($section, $file, $headRef)
                 : $section;
         }
 
         if (trim($diff) === '') {
-            throw new PatchException("Pull request #$pr has no changes");
+            $scope = $skippedFileCount > 0 ? ' for this Docker installation' : '';
+            throw new PatchException("Pull request #$pr has no changes$scope");
         }
 
         return new Patch(
@@ -137,6 +151,7 @@ class PatchManager
             files: $files,
             title: $info['title'] ?? '',
             author: $info['user']['login'] ?? '',
+            skippedFileCount: $skippedFileCount,
         );
     }
 
@@ -171,6 +186,11 @@ class PatchManager
         $patch->appliedAt = date('Y-m-d H:i:s');
         $this->forget($patch->pr); // re-add at the top of the stack
         $this->save($patch);
+
+        if ($patch->skippedFileCount > 0) {
+            $changes = $patch->skippedFileCount === 1 ? 'file change' : 'file changes';
+            $warnings[] = "Skipped $patch->skippedFileCount $changes from #$patch->pr in directories omitted from the Docker image";
+        }
 
         return $warnings;
     }
@@ -504,17 +524,29 @@ class PatchManager
     }
 
     /**
+     * Skip a rename only when both paths are omitted from the image.
+     *
+     * @param  PatchFile  $file
+     */
+    private function isOmittedFromDockerImage(array $file): bool
+    {
+        return Str::startsWith($file['path'], self::DOCKER_OMITTED_DIRS)
+            && Str::startsWith($file['old'] ?? $file['path'], self::DOCKER_OMITTED_DIRS);
+    }
+
+    /**
      * @return PatchFile
      */
     private function parseSection(string $section): array
     {
         if (preg_match('/^rename from (.+)$/m', $section, $from) && preg_match('/^rename to (.+)$/m', $section, $to)) {
-            return ['status' => 'R', 'path' => $to[1], 'old' => $from[1]];
+            return ['status' => 'R', 'path' => $this->unquotePath($to[1]), 'old' => $this->unquotePath($from[1])];
         }
 
-        // header is "diff --git a/<path> b/<path>", the path is the same on both sides
-        $header = substr(strtok($section, "\n") ?: '', strlen('diff --git '));
-        $path = substr($header, 2, intdiv(strlen($header) - 5, 2));
+        // Both paths in a non-rename header have the same length, even when they contain spaces.
+        $headerPaths = substr(strtok($section, "\n") ?: '', strlen('diff --git '));
+        $sourcePath = substr($headerPaths, 0, intdiv(strlen($headerPaths), 2));
+        $path = substr($this->unquotePath($sourcePath), strlen('a/'));
 
         if (preg_match('/^new file mode/m', $section)) {
             $status = 'A';
@@ -525,6 +557,11 @@ class PatchManager
         }
 
         return ['status' => $status, 'path' => $path];
+    }
+
+    private function unquotePath(string $path): string
+    {
+        return str_starts_with($path, '"') ? stripcslashes(substr($path, 1, -1)) : $path;
     }
 
     /**

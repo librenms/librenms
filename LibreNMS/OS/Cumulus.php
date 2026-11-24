@@ -28,15 +28,19 @@ namespace LibreNMS\OS;
 
 use App\Models\BgpPeer;
 use App\Models\Device;
+use App\Models\Sensor;
 use App\Models\Vrf;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use LibreNMS\OS\Traits\NetSnmpSensors;
 use LibreNMS\Util\Bgp;
 use LibreNMS\Util\IP;
 use SnmpQuery;
 
 class Cumulus extends \LibreNMS\OS
 {
+    use NetSnmpSensors;
+
     /** BgpPeer column to the column of both CUMULUS-BGPVRF-MIB and CUMULUS-BGPUN-MIB */
     private const array BGP_COLUMNS = [
         'bgpPeerRemoteAs' => 'bgpPeerRemoteAs',
@@ -118,5 +122,43 @@ class Cumulus extends \LibreNMS\OS
     public function discoverBgpLocalAs(): ?int
     {
         return $this->bgpLocalAsFallback(parent::discoverBgpLocalAs(), 'CUMULUS-BGPVRF-MIB::bgpLocalAs');
+    }
+
+    protected function discoverOsSensors(): Collection
+    {
+        $sensors = parent::discoverOsSensors()->merge($this->discoverNetSnmpSensors());
+
+        // hardware states are the oper status of the ENTITY-SENSOR-MIB sensors, the index tells the kind
+        foreach (SnmpQuery::cache()->walk('ENTITY-SENSOR-MIB::entPhySensorOperStatus')->pluck() as $index => $status) {
+            if (preg_match('/^1100000\d{2}$/', (string) $index)) {
+                $kind = 'Power Supply';
+            } elseif (preg_match('/^1000110\d{2}$/', (string) $index)) {
+                $kind = 'Fan';
+            } elseif (preg_match('/^1000000\d{2}$/', (string) $index)) {
+                $kind = 'Temperature Sensor';
+            } else {
+                continue;
+            }
+
+            $sensors->push(new Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'state',
+                'sensor_oid' => ".1.3.6.1.2.1.99.1.1.1.5.$index",
+                'sensor_index' => $index,
+                'sensor_type' => 'cumulus_hardware_state',
+                'sensor_descr' => "$kind " . substr((string) $index, -1) . ' State',
+                'sensor_divisor' => 1,
+                'sensor_multiplier' => 1,
+                'sensor_current' => $status,
+                'entPhysicalIndex' => $index,
+                'rrd_type' => 'GAUGE',
+            ])->withStates([
+                ['value' => 1, 'generic' => 0, 'descr' => 'OK'],
+                ['value' => 2, 'generic' => 3, 'descr' => 'UNAVAILABLE'],
+                ['value' => 3, 'generic' => 2, 'descr' => 'FAILED'],
+            ]));
+        }
+
+        return $sensors;
     }
 }
