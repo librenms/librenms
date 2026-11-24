@@ -146,4 +146,14 @@ trait FakesPollingMethods
     {
         return $os->getDevice()->pollingMethod($type)?->last_check_successful !== null;
     }
+
+    /**
+     * A fresh OS for the same device, like a new discovery/poller invocation
+     */
+    private function freshOs(OS $os): OS
+    {
+        $device = DeviceCache::refresh($os->getDeviceId())->toArray();
+
+        return OS::make($device);
+    }
 }

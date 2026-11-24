@@ -38,6 +38,7 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Modules\Sensors;
 use LibreNMS\OS;
+use LibreNMS\Polling\Method\Methods\RedfishPollingMethod;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Tests\InMemoryDbTestCase;
@@ -57,10 +58,62 @@ VCORE            | 1.310      | Volts      | ok    | na        | 0.680     | 0.7
 EOT;
 
     private const string SDR_OUTPUT = <<<'EOT'
-CPU Temp,47,degrees C,ok,
-FAN1,E1h,RPM,ok,
-PS Status,0x01,discrete,ok,
-EOT;
+ CPU Temp,47,degrees C,ok,
+ FAN1,E1h,RPM,ok,
+ PS Status,0x01,discrete,ok,
+ EOT;
+
+    /**
+     * The sensor readings the Redfish check crawled, in the layout of the Redfish data source.
+     *
+     * @var list<array{name: string, class: string, value: float|null, warn_low: float|null, warn_high: float|null, crit_low: float|null, crit_high: float|null, chassis: string, source: string}>
+     */
+    private const array REDFISH_READINGS = [
+        [
+            'name' => 'CPU Temp',
+            'class' => 'temperature',
+            'value' => 47.0,
+            'warn_low' => null,
+            'warn_high' => 80.0,
+            'crit_low' => null,
+            'crit_high' => 95.0,
+            'chassis' => '1',
+            'source' => '/Chassis/1/Thermal/CPU Temp',
+        ],
+        [
+            'name' => 'Inlet Temp',
+            'class' => 'temperature',
+            'value' => 25.5,
+            'warn_low' => null,
+            'warn_high' => null,
+            'crit_low' => null,
+            'crit_high' => null,
+            'chassis' => '1',
+            'source' => '/Chassis/1/Thermal/Inlet Temp',
+        ],
+        [
+            'name' => 'Fan 1',
+            'class' => 'fanspeed',
+            'value' => 3600.0,
+            'warn_low' => 960.0,
+            'warn_high' => null,
+            'crit_low' => 600.0,
+            'crit_high' => null,
+            'chassis' => '1',
+            'source' => '/Chassis/1/Thermal/Fan 1',
+        ],
+        [
+            'name' => 'Power Supply 1',
+            'class' => 'power',
+            'value' => 120.5,
+            'warn_low' => null,
+            'warn_high' => null,
+            'crit_low' => null,
+            'crit_high' => null,
+            'chassis' => '1',
+            'source' => '/Chassis/1/Power/Power Supply 1',
+        ],
+    ];
 
     private Device $device;
     private DevicePollingMethod $ipmiMethod;
@@ -116,6 +169,53 @@ EOT;
         $this->assertEquals([47, 225, 1.31], $this->device->sensors()->orderBy('sensor_index')->pluck('sensor_current')->all());
     }
 
+    public function testRedfishDiscoverAndPoll(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Redfish]);
+        $this->fakeMethod(RedfishPollingMethod::class, true, ['readings' => self::REDFISH_READINGS]);
+
+        $module = new Sensors;
+        $module->discover($os);
+
+        $sensors = $os->getDevice()->sensors()->orderBy('sensor_index')->get();
+        $this->assertSame(
+            ['CPU Temp', 'Inlet Temp', 'Fan 1', 'Power Supply 1'],
+            $sensors->pluck('sensor_descr')->all()
+        );
+        $this->assertSame(['redfish', 'redfish', 'redfish', 'redfish'], $sensors->pluck('poller_type')->all());
+        $this->assertSame(
+            ['temperature', 'temperature', 'fanspeed', 'power'],
+            $sensors->pluck('sensor_class')->all()
+        );
+        $this->assertEquals([0, 1, 2, 3], $sensors->pluck('sensor_index')->all());
+        $this->assertEquals(47, $sensors[0]->sensor_current);
+        $this->assertEquals(25.5, $sensors[1]->sensor_current);
+        $this->assertEquals(3600, $sensors[2]->sensor_current);
+        $this->assertEquals(95, $sensors[0]->sensor_limit);
+        $this->assertEquals(80, $sensors[0]->sensor_limit_warn);
+        $this->assertEquals(960, $sensors[2]->sensor_limit_low_warn);
+        $this->assertEquals(600, $sensors[2]->sensor_limit_low);
+        $this->assertTrue($module->dataExists($os->getDevice()));
+
+        $datastore = Mockery::mock(WriteInterface::class);
+        $datastore->shouldReceive('write')->once()->withArgs(fn ($measurement, $fields, $tags) => $measurement == 'sensor'
+            && $tags == ['hostname' => $os->getDevice()->hostname, 'class' => 'temperature', 'type' => 'redfish', 'descr' => 'CPU Temp'] && $fields == ['sensor' => 47]);
+        $datastore->shouldReceive('write')->once()->withArgs(fn ($measurement, $fields, $tags) => $measurement == 'sensor'
+            && $tags == ['hostname' => $os->getDevice()->hostname, 'class' => 'temperature', 'type' => 'redfish', 'descr' => 'Inlet Temp'] && $fields == ['sensor' => 25.5]);
+        $datastore->shouldReceive('write')->once()->withArgs(fn ($measurement, $fields, $tags) => $measurement == 'sensor'
+            && $tags == ['hostname' => $os->getDevice()->hostname, 'class' => 'fanspeed', 'type' => 'redfish', 'descr' => 'Fan 1'] && $fields == ['sensor' => 3600]);
+        $datastore->shouldReceive('write')->once()->withArgs(fn ($measurement, $fields, $tags) => $measurement == 'sensor'
+            && $tags == ['hostname' => $os->getDevice()->hostname, 'class' => 'power', 'type' => 'redfish', 'descr' => 'Power Supply 1'] && $fields == ['sensor' => 120.5]);
+
+        $this->assertTrue($module->shouldPoll($os));
+        $module->poll($os, $datastore);
+
+        $this->assertEquals(
+            [47, 25.5, 3600, 120.5],
+            $os->getDevice()->sensors()->orderBy('sensor_index')->pluck('sensor_current')->all()
+        );
+    }
+
     public function testIpmiPortAndTimeoutAreLeftToIpmitoolUnlessSet(): void
     {
         (new Sensors)->discover($this->os());
@@ -147,6 +247,27 @@ EOT;
 
         $this->assertSame([], $updated);
         $this->assertSame($sensor_ids, $this->device->sensors()->orderBy('sensor_index')->pluck('sensor_id')->all());
+    }
+
+    public function testRedfishRediscoveryDoesNotUpdateUnchangedSensors(): void
+    {
+        $module = new Sensors;
+        $os = $this->makeOs([PollingMethodType::Redfish]);
+        $this->fakeMethod(RedfishPollingMethod::class, true, ['readings' => self::REDFISH_READINGS]);
+        $module->discover($os);
+        $sensor_ids = $os->getDevice()->sensors()->orderBy('sensor_index')->pluck('sensor_id')->all();
+
+        $updated = [];
+        Event::listen('eloquent.updated: ' . Sensor::class, function (Sensor $sensor) use (&$updated): void {
+            $updated[] = $sensor->sensor_descr;
+        });
+
+        // a fresh run with the same readings
+        $os = $this->freshOs($os);
+        $module->discover($os);
+
+        $this->assertSame([], $updated);
+        $this->assertSame($sensor_ids, $os->getDevice()->sensors()->orderBy('sensor_index')->pluck('sensor_id')->all());
     }
 
     public function testIpmiDiscoverHandlesEmptyAndShortOutput(): void
@@ -193,6 +314,32 @@ EOT;
         $this->assertFalse($module->shouldPoll($os));
     }
 
+    public function testRedfishSensorsNeedTheRedfishMethod(): void
+    {
+        $module = new Sensors;
+        $os = $this->makeOs([PollingMethodType::Redfish]);
+        $this->fakeMethod(RedfishPollingMethod::class, true, ['readings' => self::REDFISH_READINGS]);
+
+        $this->assertTrue($module->shouldDiscover($os));
+        $this->assertFalse($module->shouldPoll($os)); // no sensors discovered
+
+        $module->discover($os);
+        $this->assertTrue($module->shouldPoll($os));
+
+        // a failure in an earlier poll is checked again
+        $os->getDevice()->pollingMethod(PollingMethodType::Redfish)?->update(['last_check_successful' => false]);
+        $this->assertTrue($module->shouldPoll($this->freshOs($os)));
+
+        // the Redfish check fails
+        $this->fakeMethod(RedfishPollingMethod::class, false);
+        $this->assertFalse($module->shouldPoll($this->freshOs($os)));
+
+        // no Redfish polling method
+        $os = $this->makeOs([]);
+        $this->assertFalse($module->shouldDiscover($os));
+        $this->assertFalse($module->shouldPoll($os));
+    }
+
     public function testPollUsesTheSdrFromTheIpmiCheck(): void
     {
         $module = new Sensors;
@@ -206,6 +353,28 @@ EOT;
         Process::assertRanTimes(fn (PendingProcess $process) => in_array('sdr', (array) $process->command), 1);
         Process::assertDidntRun(fn (PendingProcess $process) => in_array('power', (array) $process->command));
         $this->assertEquals(47, $this->device->sensors()->where('sensor_descr', 'CPU Temp')->value('sensor_current'));
+    }
+
+    public function testSensorsWithoutAReadingAreNotRecorded(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Redfish]);
+        $this->fakeMethod(RedfishPollingMethod::class, true, ['readings' => self::REDFISH_READINGS]);
+
+        $module = new Sensors;
+        $module->discover($os);
+
+        // the crawl no longer reaches the fan
+        $readings = array_map(fn (array $reading) => $reading['name'] === 'Fan 1' ? [...$reading, 'value' => null] : $reading, self::REDFISH_READINGS);
+        $os = $this->freshOs($os);
+        $this->fakeMethod(RedfishPollingMethod::class, true, ['readings' => $readings]);
+
+        $datastore = Mockery::mock(WriteInterface::class);
+        $datastore->shouldReceive('write')->times(3)->withArgs(fn ($measurement, $fields, $tags) => $tags['type'] == 'redfish' && $tags['descr'] != 'Fan 1');
+
+        $module->poll($os, $datastore);
+
+        $fan = Sensor::where('device_id', $os->getDeviceId())->where('sensor_descr', 'Fan 1')->first();
+        $this->assertEquals(3600, $fan->sensor_current); // the last polled value is kept
     }
 
     public function testAgentHddtempDiscoverAndPoll(): void
@@ -247,11 +416,37 @@ EOT;
         $this->assertSame(['agent', 'ipmi', 'snmp'], Sensor::where('device_id', $os->getDeviceId())->orderBy('poller_type')->pluck('poller_type')->all());
     }
 
+    public function testRedfishEachMethodSyncsOnlyItsSensors(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Redfish]);
+        Sensor::factory()->create(['device_id' => $os->getDeviceId(), 'poller_type' => 'snmp', 'sensor_class' => 'temperature', 'sensor_index' => '1', 'sensor_type' => 'linux']);
+        Sensor::factory()->create(['device_id' => $os->getDeviceId(), 'poller_type' => 'ipmi', 'sensor_class' => 'temperature', 'sensor_index' => '0', 'sensor_type' => 'ipmi']);
+        $this->fakeMethod(RedfishPollingMethod::class, true, ['readings' => self::REDFISH_READINGS]);
+
+        (new Sensors)->discover($os);
+
+        // the device has no SNMP or IPMI method, their sensors are kept
+        $this->assertSame(['ipmi', 'redfish', 'snmp'], Sensor::where('device_id', $os->getDeviceId())->orderBy('poller_type')->pluck('poller_type')->unique()->values()->all());
+    }
+
     public function testUnavailableMethodKeepsItsSensors(): void
     {
         $os = $this->makeOs([PollingMethodType::UnixAgent]);
         Sensor::factory()->create(['device_id' => $os->getDeviceId(), 'poller_type' => 'agent', 'sensor_class' => 'temperature', 'sensor_index' => '1', 'sensor_type' => 'hddtemp']);
         $this->fakeMethod(UnixAgentPollingMethod::class, false);
+
+        $module = new Sensors;
+        $this->assertFalse($module->shouldDiscover($os));
+        $module->discover($os);
+
+        $this->assertSame(1, Sensor::where('device_id', $os->getDeviceId())->count());
+    }
+
+    public function testRedfishUnavailableMethodKeepsItsSensors(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Redfish]);
+        Sensor::factory()->create(['device_id' => $os->getDeviceId(), 'poller_type' => 'redfish', 'sensor_class' => 'temperature', 'sensor_index' => '0', 'sensor_type' => 'redfish']);
+        $this->fakeMethod(RedfishPollingMethod::class, false);
 
         $module = new Sensors;
         $this->assertFalse($module->shouldDiscover($os));
@@ -340,6 +535,17 @@ EOT;
         (new Sensors)->removeMethodData($this->device, PollingMethodType::UnixAgent);
 
         $this->assertSame(['snmp'], $this->device->sensors()->pluck('poller_type')->all());
+    }
+
+    public function testRedfishRemovingAMethodDeletesOnlyItsSensors(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Redfish]);
+        Sensor::factory()->create(['device_id' => $os->getDeviceId(), 'poller_type' => 'snmp', 'sensor_class' => 'temperature', 'sensor_index' => '1', 'sensor_type' => 'linux']);
+        Sensor::factory()->create(['device_id' => $os->getDeviceId(), 'poller_type' => 'redfish', 'sensor_class' => 'temperature', 'sensor_index' => '0', 'sensor_type' => 'redfish']);
+
+        (new Sensors)->removeMethodData($os->getDevice(), PollingMethodType::Redfish);
+
+        $this->assertSame(['snmp'], $os->getDevice()->sensors()->pluck('poller_type')->all());
     }
 
     /**
