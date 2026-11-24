@@ -11,12 +11,7 @@
             ]))">
             <x-panel>
                 <x-slot name="heading" class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3">
-                    <div>
-                        <h3 class="panel-title">{{ __('Applications') }}</h3>
-                        <p class="tw:m-0 tw:mt-1 tw:text-base tw:text-gray-500 tw:dark:text-dark-white-400">
-                            {{ __('Applications can be enabled manually or automatically during discovery.') }}
-                        </p>
-                    </div>
+                    <h3 class="panel-title">{{ __('Applications') }}</h3>
                     <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
                         <input type="search"
                                x-model="search"
