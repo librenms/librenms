@@ -62,9 +62,17 @@ class Laravel
         $app = require_once $install_dir . '/bootstrap/app.php';
         $kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
 
-        // json accept prevents a login redirect, the response is discarded either way
+        // json accept prevents a login redirect back to the boot url
         $request = Request::create('/legacy-plugin-boot', 'GET', [], $_COOKIE, [], array_replace($_SERVER, ['HTTP_ACCEPT' => 'application/json']));
-        $kernel->handle($request);
+        $response = $kernel->handle($request);
+
+        // stop the plugin if middleware refused the request (guest, disabled user, 2fa, etc)
+        if ($response->getStatusCode() !== 204) {
+            $response = $response->getStatusCode() === 401 ? redirect()->route('login') : $response;
+            $response->send();
+            $kernel->terminate($request, $response);
+            exit;
+        }
     }
 
     public static function isBooted()
