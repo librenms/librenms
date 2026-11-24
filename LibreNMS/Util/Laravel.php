@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Util;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 
@@ -44,6 +45,34 @@ class Laravel
         $kernel = $app->make(\Illuminate\Contracts\Console\Kernel::class);
         $kernel->bootstrap();
         Log::setDefaultDriver('console');
+    }
+
+    /**
+     * Boot Laravel with session and auth for standalone v1 plugin scripts (such as the Weathermap editor).
+     * The request is routed to an empty endpoint, so the script can call Auth::check() and output its own response.
+     */
+    public static function bootWeb(): void
+    {
+        if (self::isBooted()) {
+            return;
+        }
+
+        define('LARAVEL_START', microtime(true));
+        $install_dir = realpath(__DIR__ . '/../..');
+        $app = require_once $install_dir . '/bootstrap/app.php';
+        $kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
+
+        // json accept prevents a login redirect back to the boot url
+        $request = Request::create('/legacy-plugin-boot', 'GET', [], $_COOKIE, [], array_replace($_SERVER, ['HTTP_ACCEPT' => 'application/json']));
+        $response = $kernel->handle($request);
+
+        // stop the plugin if middleware refused the request (guest, disabled user, 2fa, etc)
+        if ($response->getStatusCode() !== 204) {
+            $response = $response->getStatusCode() === 401 ? redirect()->route('login') : $response;
+            $response->send();
+            $kernel->terminate($request, $response);
+            exit;
+        }
     }
 
     public static function isBooted()
