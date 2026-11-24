@@ -61,16 +61,15 @@ class Apc extends OS implements OSDiscovery
                 $version = "AOS {$version_matches[1]} / App $version_matches[2]";
             }
             $device->version = $version;
-             }
+        }
 
-        // Replacement battery cartridge SKUs (PowerNet-MIB::upsAdvBatteryInternalSKU / upsAdvBatteryExternalSKU)
-        $battery = SnmpQuery::numeric()->get([
-            '.1.3.6.1.4.1.318.1.1.1.2.2.19.0',
-            '.1.3.6.1.4.1.318.1.1.1.2.2.20.0',
+        $battery = SnmpQuery::get([
+            'PowerNet-MIB::upsAdvBatteryInternalSKU.0',
+            'PowerNet-MIB::upsAdvBatteryExternalSKU.0',
         ])->values();
 
-        $internal = $battery['.1.3.6.1.4.1.318.1.1.1.2.2.19.0'] ?? '';
-        $external = $battery['.1.3.6.1.4.1.318.1.1.1.2.2.20.0'] ?? '';
+        $internal = $battery['PowerNet-MIB::upsAdvBatteryInternalSKU.0'] ?? '';
+        $external = $battery['PowerNet-MIB::upsAdvBatteryExternalSKU.0'] ?? '';
 
         if ($internal !== '') {
             $device->features = 'Battery: ' . $internal . ($external !== '' ? ' / Ext: ' . $external : '');
