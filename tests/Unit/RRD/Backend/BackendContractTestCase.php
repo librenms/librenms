@@ -13,6 +13,7 @@ use LibreNMS\RRD\Backend\RrdBackendInterface;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\Tests\TestCase;
+use LibreNMS\Util\Binaries;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -252,8 +253,8 @@ abstract class BackendContractTestCase extends TestCase
     {
         $this->start($mode);
         $rrd = RrdPath::make('host1', 'test.rrd');
-        $this->create($rrd);
-        $start = intdiv(time(), 300) * 300 + 300;
+        $start = intdiv(time(), 300) * 300;
+        $this->rrdtool('create', $rrd->fullPath(), '--start', (string) $start, ...$this->definition()->getCreateArguments());
         foreach ([1, 2, 3] as $row) {
             $this->backend->update($rrd, [$row * 10, null], $start + $row * 300);
         }
@@ -277,12 +278,16 @@ abstract class BackendContractTestCase extends TestCase
 
     protected function create(RrdPath $rrd): void
     {
-        $definition = RrdDefinition::make()
+        $this->backend->create($rrd, $this->definition());
+    }
+
+    private function definition(): RrdDefinition
+    {
+        return RrdDefinition::make()
             ->addDataset('a', 'GAUGE')
             ->addDataset('b', 'COUNTER')
             ->setStep(300)
             ->setRras(['RRA:AVERAGE:0.5:1:10']);
-        $this->backend->create($rrd, $definition);
     }
 
     /**
@@ -304,11 +309,13 @@ abstract class BackendContractTestCase extends TestCase
      */
     private function rrdtool(string ...$arguments): string
     {
-        if (! is_executable((string) LibrenmsConfig::get('rrdtool', '/usr/bin/rrdtool'))) {
+        // found the same way as the backend's RrdProcess
+        $rrdtool = app(Binaries::class)->find('rrdtool');
+        if ($rrdtool === null) {
             $this->markTestSkipped('rrdtool is needed to inspect rrd files');
         }
 
-        $process = new Process([LibrenmsConfig::get('rrdtool', '/usr/bin/rrdtool'), ...$arguments]);
+        $process = new Process([$rrdtool, ...$arguments]);
         $process->mustRun();
 
         return $process->getOutput();
