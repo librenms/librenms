@@ -252,8 +252,8 @@ abstract class BackendContractTestCase extends TestCase
     {
         $this->start($mode);
         $rrd = RrdPath::make('host1', 'test.rrd');
-        $this->create($rrd);
-        $start = intdiv(time(), 300) * 300 + 300;
+        $start = intdiv(time(), 300) * 300;
+        $this->rrdtool('create', $rrd->fullPath(), '--start', (string) $start, ...$this->definition()->getCreateArguments());
         foreach ([1, 2, 3] as $row) {
             $this->backend->update($rrd, [$row * 10, null], $start + $row * 300);
         }
@@ -277,12 +277,16 @@ abstract class BackendContractTestCase extends TestCase
 
     protected function create(RrdPath $rrd): void
     {
-        $definition = RrdDefinition::make()
+        $this->backend->create($rrd, $this->definition());
+    }
+
+    private function definition(): RrdDefinition
+    {
+        return RrdDefinition::make()
             ->addDataset('a', 'GAUGE')
             ->addDataset('b', 'COUNTER')
             ->setStep(300)
             ->setRras(['RRA:AVERAGE:0.5:1:10']);
-        $this->backend->create($rrd, $definition);
     }
 
     /**
