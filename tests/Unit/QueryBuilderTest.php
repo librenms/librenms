@@ -46,7 +46,7 @@ final class QueryBuilderTest extends TestCase
     public function testFieldPickersHideInternalTablesAndKeepMonitoringFields(): void
     {
         foreach (['alert', 'group'] as $type) {
-            $fields = array_column((new QueryBuilderFilter($type))->jsonSerialize(), 'id');
+            $fields = array_column(new QueryBuilderFilter($type)->jsonSerialize(), 'id');
 
             $this->assertNotContains('secrets.data', $fields, $type);
             $this->assertNotContains('users.password', $fields, $type);
