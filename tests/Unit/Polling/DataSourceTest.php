@@ -11,8 +11,11 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
+use LibreNMS\Interfaces\Discovery\SensorsDiscovery;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
+use LibreNMS\Interfaces\Polling\SensorsPolling;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
+use LibreNMS\Polling\Method\DataSources\IpmiDataSource;
 use LibreNMS\Polling\Method\DataSources\ProxmoxApiDataSource;
 use LibreNMS\Polling\Method\DataSources\UnixAgentDataSource;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
@@ -27,13 +30,14 @@ final class DataSourceTest extends TestCase
         $device = new Device(['hostname' => 'pve.example.com']);
         $registry = new PollingMethodRegistry;
         $expected = [
+            PollingMethodType::Ipmi->value => IpmiDataSource::class,
             PollingMethodType::ProxmoxApi->value => ProxmoxApiDataSource::class,
             PollingMethodType::UnixAgent->value => UnixAgentDataSource::class,
         ];
 
         foreach (PollingMethodType::cases() as $type) {
             $method = $registry->get($type);
-            $source = $method->dataSource($method->config($device), ProbeResult::success());
+            $source = $method->dataSource($device, $method->config($device), ProbeResult::success());
 
             $this->assertSame($expected[$type->value] ?? null, $source === null ? null : $source::class, $type->value);
         }
@@ -46,6 +50,8 @@ final class DataSourceTest extends TestCase
         $this->assertSame([PollingMethodType::ProxmoxApi], $registry->providing(VminfoDiscovery::class));
         $this->assertSame([PollingMethodType::ProxmoxApi], $registry->providing(VminfoPolling::class));
         $this->assertSame([PollingMethodType::UnixAgent], $registry->providing(MempoolsDiscovery::class));
+        $this->assertSame([PollingMethodType::Ipmi, PollingMethodType::UnixAgent], $registry->providing(SensorsDiscovery::class));
+        $this->assertSame([PollingMethodType::Ipmi, PollingMethodType::UnixAgent], $registry->providing(SensorsPolling::class));
     }
 
     public function testDataSourcesOfAvailableMethods(): void

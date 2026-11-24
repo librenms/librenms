@@ -1741,7 +1741,7 @@
                     "state_name": "Smoke_<private>",
                     "state_descr": "Alarm",
                     "state_value": 1,
-                    "state_generic_value": 0
+                    "state_generic_value": 2
                 }
             ]
         },

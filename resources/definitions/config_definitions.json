@@ -1984,13 +1984,6 @@
             "default": true,
             "type": "boolean"
         },
-        "discovery_modules.ipmi": {
-            "order": 285,
-            "group": "discovery",
-            "section": "discovery_modules",
-            "default": false,
-            "type": "boolean"
-        },
         "discovery_modules.storage": {
             "order": 300,
             "group": "discovery",
@@ -6107,13 +6100,6 @@
             "group": "poller",
             "section": "poller_modules",
             "default": true,
-            "type": "boolean"
-        },
-        "poller_modules.ipmi": {
-            "order": 210,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": false,
             "type": "boolean"
         },
         "poller_modules.qos": {

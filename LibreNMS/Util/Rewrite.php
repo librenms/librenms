@@ -31,6 +31,29 @@ use App\Models\Device;
 
 class Rewrite
 {
+    /**
+     * Shorten ENTITY-MIB descriptions used for sensor descriptions
+     */
+    public static function entityDescr(?string $descr): string
+    {
+        $descr = preg_replace([
+            '/7600 Series SPA Interface Processor-/',
+            '/Rev\. [0-9.]+ /',
+            '/12000 Series Performance Route Processor/',
+            '/^12000/',
+            '/Gigabit Ethernet/',
+            '/^ASR1000 /',
+        ], ['7600 SIP-', '', '12000 PRP', '', 'GigE', ''], str_replace('Distributed Forwarding Card', 'DFC', (string) $descr));
+
+        $descr = str_replace(
+            ['Routing Processor', 'Route Processor', 'Switching Processor', 'Sub-Module', 'DFC Card', 'Centralized Forwarding Card', 'Power Supply Module', 'Sensor', 'PMOD'],
+            ['RP', 'RP', 'SP', 'Module ', 'DFC', 'CFC', 'PSU ', '', 'PSU'],
+            $descr
+        );
+
+        return trim(str_replace('PowerSupply', 'PSU ', preg_replace(['/^temperatures /', '/^voltages /'], '', $descr)));
+    }
+
     public static function ipmiSensorName(?string $hardware, string $sensor): string
     {
         $names = [

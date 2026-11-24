@@ -63,9 +63,9 @@ trait FakesPollingMethods
                 return $this->real->dataSourceClass();
             }
 
-            public function dataSource(PollingMethodConfig $config, ProbeResult $result): ?object
+            public function dataSource(Device $device, PollingMethodConfig $config, ProbeResult $result): ?object
             {
-                return $this->real->dataSource($config, $result);
+                return $this->real->dataSource($device, $config, $result);
             }
 
             public function probe(Device $device, PollingMethodConfig $config): ProbeResult

@@ -38,6 +38,7 @@ use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Discovery\Neighbors\Neighbor;
 use LibreNMS\Discovery\Neighbors\NeighborParser;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\QosDiscovery;
@@ -1103,5 +1104,18 @@ class Routeros extends OS implements
 
             return NeighborParser::fromLldpRemEntry($entry, $this->lldpLocalPorts()->byDescr($ifName)?->port_id);
         })->values();
+    }
+
+    /**
+     * Before 6.47 upsEstimatedMinutesRemaining was in seconds
+     */
+    protected function upsMibDivisor(SensorType $type, string $oid): int
+    {
+        if ($type === SensorType::Runtime && str_starts_with($oid, '.1.3.6.1.2.1.33.1.2.3.')
+            && $this->getDevice()->version && version_compare($this->getDevice()->version, '6.47', '<')) {
+            return 60;
+        }
+
+        return parent::upsMibDivisor($type, $oid);
     }
 }

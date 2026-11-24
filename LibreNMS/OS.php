@@ -30,13 +30,19 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DeviceGraph;
 use App\Models\Mempool;
+use App\Models\Sensor;
 use DeviceCache;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Discovery\YamlDiscoveryDefinition;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SnmpOidOutput;
+use LibreNMS\Enum\SnmpQuickPrint;
+use LibreNMS\Enum\SnmpStringOutput;
+use LibreNMS\Exceptions\SnmpConnectionException;
 use LibreNMS\Interfaces\Discovery\BgpPeerDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
 use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
@@ -46,6 +52,7 @@ use LibreNMS\Interfaces\Discovery\NeighborDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\PackagesDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Discovery\SensorsDiscovery;
 use LibreNMS\Interfaces\Discovery\StorageDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\StpPortDiscovery;
@@ -61,22 +68,28 @@ use LibreNMS\Interfaces\Polling\Netstats\IpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\SnmpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\TcpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\UdpNetstatsPolling;
+use LibreNMS\Interfaces\Polling\SensorsPolling;
 use LibreNMS\Interfaces\Polling\StpInstancePolling;
 use LibreNMS\Interfaces\Polling\StpPortPolling;
 use LibreNMS\OS\Generic;
 use LibreNMS\OS\Traits\Bgp4Mib;
 use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
+use LibreNMS\OS\Traits\EntitySensorMib;
 use LibreNMS\OS\Traits\HostResources;
+use LibreNMS\OS\Traits\LegacySensorDiscovery;
+use LibreNMS\OS\Traits\LegacySensorPolling;
 use LibreNMS\OS\Traits\LldpMib;
 use LibreNMS\OS\Traits\MefUniEvcMib;
 use LibreNMS\OS\Traits\MplsVpnMib;
 use LibreNMS\OS\Traits\NetstatsPolling;
 use LibreNMS\OS\Traits\QBridgeMib;
 use LibreNMS\OS\Traits\UcdResources;
+use LibreNMS\OS\Traits\UpsMib;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\OS\Traits\YamlProcessorDiscovery;
+use LibreNMS\OS\Traits\YamlSensorDiscovery;
 use LibreNMS\OS\Traits\YamlStorageDiscovery;
 use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Util\StringHelpers;
@@ -85,6 +98,8 @@ class OS implements
     BgpPeerDiscovery,
     ProcessorDiscovery,
     OSDiscovery,
+    SensorsDiscovery,
+    SensorsPolling,
     MempoolsDiscovery,
     MempoolsPolling,
     PackagesDiscovery,
@@ -123,10 +138,15 @@ class OS implements
     use YamlMempoolsDiscovery;
     use YamlProcessorDiscovery;
     use YamlStorageDiscovery;
+    use YamlSensorDiscovery;
+    use LegacySensorDiscovery;
+    use LegacySensorPolling;
+    use UpsMib;
     use NetstatsPolling;
     use Bgp4Mib;
     use BridgeMib;
     use EntityMib;
+    use EntitySensorMib;
     use LldpMib;
     use MefUniEvcMib;
     use MplsVpnMib;
@@ -139,7 +159,6 @@ class OS implements
     private $device; // annoying use of references to make sure this is in sync with global $device variable
     private $graphs; // stores device graphs
     private $cache; // data cache
-    private $pre_cache; // pre-fetch data cache
     private ?PerDeviceMethodResults $methodResults = null;
 
     protected ?string $entityVendorTypeMib = null;
@@ -257,13 +276,6 @@ class OS implements
 
         // create missing graphs
         $device->graphs()->saveMany($graphs->diff($device->graphs->pluck('graph'))->map(fn ($graph) => new DeviceGraph(['graph' => $graph])));
-    }
-
-    public function preCache()
-    {
-        $this->pre_cache ??= YamlDiscovery::preCache($this);
-
-        return $this->pre_cache;
     }
 
     /**
@@ -491,6 +503,71 @@ class OS implements
         }
 
         return $this->discoverUcdStorage();
+    }
+
+    /**
+     * ENTITY-SENSOR-MIB sensors, then the sensors of this OS, UPS-MIB and the yaml sensors.
+     * A sensor replaces earlier sensors of the same class, type and index.
+     *
+     * @return Collection<int, Sensor>
+     */
+    public function discoverSensors(): Collection
+    {
+        return $this->discoverEntitySensors()
+            ->merge($this->discoverOsSensors())
+            ->merge($this->discoverLegacySensors())
+            ->merge($this->discoverUpsMibSensors())
+            ->merge($this->discoverYamlSensors());
+    }
+
+    /**
+     * Sensors this OS discovers with code, yaml sensors are preferred.
+     *
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverOsSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * The legacy pre-cache data is available to the yaml until the pre-cache includes are converted.
+     */
+    protected function walkSensorYaml(array $yaml): array
+    {
+        return $this->legacySensorPreCache() + YamlDiscoveryDefinition::walkAll($yaml, $this->yamlOids());
+    }
+
+    /**
+     * Get the oids of the sensors, some devices answer for the oid with .0 appended.
+     *
+     * @throws SnmpConnectionException when the device did not answer
+     */
+    public function pollSensors(EloquentCollection $sensors): array
+    {
+        $oids = $sensors->pluck('sensor_oid')->filter()->unique()->values()->all();
+        if (empty($oids)) {
+            return $this->pollLegacySensors($sensors, [], []);
+        }
+
+        $data = \SnmpQuery::options(new SnmpQueryOptions(
+            oidFormat: SnmpOidOutput::Numeric,
+            numericEnums: true,
+            numericTimeticks: true,
+            printUnits: false,
+            stringFormat: SnmpStringOutput::Ascii, // strings as ascii, some devices end numbers with a null byte
+            quickPrint: SnmpQuickPrint::Equals,
+        ))->get($oids)->throwIfConnectionError()->values();
+        $values = [];
+
+        foreach ($sensors as $sensor) {
+            $value = $data[$sensor->sensor_oid] ?? $data["$sensor->sensor_oid.0"] ?? null;
+            if ($value !== null) {
+                $values[$sensor->sensor_id] = trim(str_replace('"', '', (string) $value));
+            }
+        }
+
+        return $this->pollLegacySensors($sensors, $values, $data);
     }
 
     public function getDiscovery($module = null)

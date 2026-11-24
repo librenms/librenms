@@ -158,8 +158,13 @@ the string to the equivalent OID representation.
   link a sensor to a physical entity. These two variants are available:
     - `entPhysicalIndex` contains the entPhysicalIndex from entPhysical table, and `entPhysicalIndex_measured` is NULL
     - `entPhysicalIndex` contains "ifIndex" value of the linked port and `entPhysicalIndex_measured` contains "ports"
-- `user_func` (optional): the name of a function for the sensor value.
-  For example, `fahrenheit_to_celsius` converts fahrenheit to celsius
+- `user_func` (optional): converts the sensor value, after the divisor
+  and multiplier. Use a method of `LibreNMS\Util\UserFuncHelper`, such as
+  `fahrenheit_to_celsius`, `kelvin_to_celsius`, `mw_to_dbm`, `uw_to_dbm`,
+  `string_to_float`, `ieee754_to_decimal`, `dateToRuntime`,
+  `hhmmssToMinutes` or `highestBit`. A static method of the OS class, such
+  as `\LibreNMS\OS\Pmp::cnMaestroConnectionStatus`, gets the value, the
+  raw value and the sensor.
 - `snmp_flags` (optional): the flags for snmpwalk. They override the
   flags of the sensor type and of the OS. The default is `'-OQUb'`.
   String indexes are a common problem. The value `'-OQUsbe'` converts
@@ -235,7 +240,9 @@ It returns the next string after them.
 
 A reference to an OID in another table uses the full index of the match.
 If the two indexes do not match, give the index positions. The first
-position is 0. LibreNMS must already hold the data of the other table.
+position is 0. LibreNMS walks the referenced OID when it includes the MIB
+name, as in the examples below. Other OIDs must be walked by the yaml,
+for example in `additional_oids`.
 
 `{{ IF-MIB::ifName:2 }}`
 
@@ -334,66 +341,89 @@ If YAML cannot do the sensor discovery, use advanced health discovery.
 
 ### Advanced health discovery
 
-If the YAML files above do not work, write the discovery code in PHP.
-Use YAML where YAML is possible. We usually reject PHP discovery in
-that case, because PHP causes more problems later.
+If the YAML files above do not work, write the discovery code in the
+PHP class of the OS, `LibreNMS/OS/$Os.php`. Use YAML where YAML is
+possible. We usually reject PHP discovery in that case, because PHP
+causes more problems later.
 
-The directory structure of the sensor information is
-`includes/discovery/sensors/$class/$os.inc.php`. All sensors use the
-same code format. The code collects the sensor information over SNMP.
-It then calls the `discover_sensor()` function. A state sensor needs
-more code. The sensor information is usually in a table in an ENTITY
-MIB from the vendor of the device. Other MIB tables also work.
+The sensors module gets the sensors from `discoverSensors()` of the OS.
+It discovers, in this order:
 
-`discover_sensor()` accepts these arguments:
+1. ENTITY-SENSOR-MIB sensors (`discoverEntitySensors()`).
+   Shared\Cisco adds CISCO-ENTITY-SENSOR-MIB sensors, they replace the
+   ENTITY-SENSOR-MIB sensors of the same entity.
+2. The sensors of the OS code, `discoverOsSensors()`. OS that run on
+   servers (Unix, Windows, VMware ESXi) use the `ServerHardware` trait,
+   it adds the sensors of the Dell OpenManage, HP Insight or Supermicro
+   SuperDoctor agent that answers.
+3. UPS-MIB sensors when the OS has the `rfc1628_compat` setting.
+4. The YAML sensors.
 
-- &$valid = always null. LibreNMS does not use it.
-- $class = required. The sensor class from the table above, such as humidity.
-- $device = required. The `$device` array.
-- $oid = required. The numeric OID of the data, such as .1.2.3.4.5.6.7.0.
-- $index = required. It must be unique for this sensor class, device,
-  and type. It is usually the index of the walked table. For a single
-  value, it can be the name of the OID.
-- $type = required. The OS name, such as pulse.
-- $descr = required. A description of the sensor. Some devices supply a
-  name.
-- $divisor = the default is 1. It divides the returned value.
-- $multiplier = the default is 1. It multiplies the returned value.
-- $low_limit = the default is null. It sets the low threshold of the
-  sensor. The alerting uses it to report a sensor out of range.
-- $low_warn_limit = the default is null. It sets the low warning limit
-  of the sensor. The alerting uses it to report a sensor near its
-  range limit.
-- $warn_limit = the default is null. It sets the high warning limit of
-  the sensor. The alerting uses it to report a sensor near its range
-  limit.
-- $high_limit = the default is null. It sets the high limit of the
-  sensor. The alerting uses it to report a sensor out of range.
-- $current = the default is null. It sets the current value at the
-  discovery. The poller updates this value at the next poll cycle.
-- $poller_type = the default is snmp. A component such as the
-  unix-agent sets a different value. Keep the value snmp in most cases.
-- $entPhysicalIndex = the default is null. It sets the
-  entPhysicalIndex for the lookup of more hardware.
-- $entPhysicalIndex_measured = the default is null. It sets the type of
-  the entPhysicalIndex, such as ports.
-- $user_func = the default is null. It is the name of a function for
-  the sensor value. For example, `fahrenheit_to_celsius` converts
-  fahrenheit to celsius
-- $group = the default is null. It groups the sensors in the web
+A sensor replaces earlier sensors of the same class, type and index.
+
+To add sensors, override `discoverOsSensors()` and return a Collection
+of `App\Models\Sensor` models. Include the sensors of the parent class,
+the OS may extend a group class with sensors of its own. The
+attributes of a sensor are:
+
+- `sensor_class` = required. The sensor class from the table above, such
+  as humidity.
+- `sensor_oid` = required. The numeric OID of the data, such as
+  .1.2.3.4.5.6.7.0.
+- `sensor_index` = required. It must be unique for this sensor class,
+  device, and type. It is usually the index of the walked table. For a
+  single value, it can be the name of the OID.
+- `sensor_type` = required. The OS name, such as pulse. For a state
+  sensor, it is the state name.
+- `sensor_descr` = required. A description of the sensor. Some devices
+  supply a name.
+- `poller_type` = required, `snmp`.
+- `sensor_divisor` and `sensor_multiplier` = the default is 1. They
+  convert the polled value.
+- `sensor_current` = the current value at the discovery, converted like
+  the poller converts it. The poller updates this value at the next
+  poll cycle.
+- `sensor_limit_low`, `sensor_limit_low_warn`, `sensor_limit_warn` and
+  `sensor_limit` = the default is null. The low limit, the low warning
+  limit, the high warning limit and the high limit. The alerting uses
+  them to report a sensor out of range.
+- `entPhysicalIndex` and `entPhysicalIndex_measured` = the default is
+  null. They link the sensor to an entity or a port, see the YAML
+  fields above.
+- `user_func` = the default is null. See the YAML field above.
+- `group` = the default is null. It groups the sensors in the web
   interface under this text.
-- $rrd_type = the default is 'GAUGE'. It changes the type of the new
+- `category` = the default is null. A `SensorCategory` case, see
+  `category` above.
+- `rrd_type` = the default is 'GAUGE'. It changes the type of the new
   RRD file of this sensor. For more details, read the RRD
   documentation: https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html
-- $category = the default is null. Give a `SensorCategory` case to set
-  the category, see `category` above.
 
-For most devices, these steps give full sensor support. The polling
-uses the data from `discover_sensor()`. For your own polling code, the
-file format is the same as for discovery:
-`includes/polling/sensors/$class/$os.inc.php`. More SNMP queries in the
-polling are possible, but avoid them. The value of the OID is already
-available as `$sensor_value`.
+A state sensor gets its state translations with `withStates()`, see
+[Sensor State Support](../Sensor-State-Support.md).
+
+The poller reads the `sensor_oid` of every sensor and converts the
+value with the state translations, divisor, multiplier and user_func.
+For values the poller cannot read like this, override `pollSensors()`
+of the OS. It returns the raw values, before the divisor, multiplier and
+user_func are applied, by sensor_id. More SNMP queries in the polling
+are possible, but avoid them.
+
+```php
+public function pollSensors(Collection $sensors): array
+{
+    $values = parent::pollSensors($sensors);
+
+    // temperatures are strings, like "Temp: 45 C"
+    foreach ($sensors->where('sensor_class', 'temperature') as $sensor) {
+        if (preg_match('/(-?[0-9]+(?:\.[0-9]+)?) C/', (string) ($values[$sensor->sensor_id] ?? ''), $matches)) {
+            $values[$sensor->sensor_id] = $matches[1];
+        }
+    }
+
+    return $values;
+}
+```
 
 LibreNMS graphs the sensors automatically. Your own graphing code is
 not necessary and not supported.
@@ -404,130 +434,89 @@ Add code for your new sensor class to these existing files:
 
 - `LibreNMS/Enum/SensorType.php`: add accordingly, find free icon from [Font Awesome](https://fontawesome.com/icons?d=gallery&m=free)
 - `doc/Developing/os/Health-Information.md`: documentation for every sensor class is mandatory.
-- `includes/discovery/functions.inc.php`: optional - if sensible low_limit and high_limit values
+- `app/Models/Traits/HasThresholds.php`: optional - if sensible low and high limits
 are guessable when a SNMP-retrievable threshold is not available, add a case for the sensor class
-to the sensor_limit() and/or sensor_low_limit() functions.
+to `guessLimits()`.
 - `LibreNMS/Util/ObjectCache.php`: optional - choose menu grouping for the sensor class.
 - `lang/en/sensors.php`: add human-readable names and units for the sensor class
 in English. You can also add other languages.
 
 Create and populate new files for the sensor class in the following places:
 
-- `includes/discovery/sensors/$class/`: create the folder where advanced php-based discovery
-files are stored. Not used for yaml discovery.
 - `includes/html/graphs/device/$class.inc.php`: define unit names used in RRDtool graphs.
 - `includes/html/graphs/sensor/$class.inc.php`: define various [parameters](https://oss.oetiker.ch/rrdtool/doc/rrdgraph_graph.en.html) for RRDtool graphs.
 
 #### Advanced health sensor example
 
-This example builds sensors with the advanced method. It collects the
-optical power level in dBm from the Adva FSP150CC family of MetroE
-devices. The example assumes knowledge of SNMP and MIBs.
+This example discovers the optical power levels in dBm of the ports of
+the Adva FSP150CC family of MetroE devices. The example assumes
+knowledge of SNMP and MIBs.
 
-The first line walks the cmEntityObject table. It gets the information
-about the chassis and the line cards. From this information, the code
-extracts the model type. The model type gives the tables of the ports
-in the CM-Facility-Mib. The program then reads that table into the
-`$data` array `adva_fsp150_ports`. This array holds the OID index of
-each port. A later step uses these indexes to build the sensor OIDs.
-
-The next step builds the sensor discovery code. These readings are
-optical, so the file uses the dBm sensor type. Create the file
-`includes/discover/sensors/dbm/adva_fsp150.inc.php`. This is part of
-the code:
+The code walks the port table of CM-FACILITY-MIB and the optical power
+statistics of CM-PERFORMANCE-MIB. It adds the code to the OS class,
+`LibreNMS/OS/AdvaFsp150.php`:
 
 ```php
-$data = SnmpQuery::walk([
-    'CM-FACILITY-MIB::cmEthernetTrafficPortTable',
-    'CM-PERFORMANCE-MIB::cmEthernetTrafficPortStatsOPT',
-    'CM-PERFORMANCE-MIB::cmEthernetTrafficPortStatsOPR',
-])->valuesByIndex();
+protected function discoverOsSensors(): Collection
+{
+    $sensors = parent::discoverOsSensors();
+    $data = SnmpQuery::walk([
+        'CM-FACILITY-MIB::cmEthernetTrafficPortTable',
+        'CM-PERFORMANCE-MIB::cmEthernetTrafficPortStatsOPT',
+        'CM-PERFORMANCE-MIB::cmEthernetTrafficPortStatsOPR',
+    ])->valuesByIndex();
 
-foreach ($data as $index => $entry) {
-    if (isset($entry['CM-FACILITY-MIB::cmEthernetTrafficPortMediaType']) && $entry['CM-FACILITY-MIB::cmEthernetTrafficPortMediaType'] == 'fiber') {
-        //Discover received power level
-        $oidRx = '.1.3.6.1.4.1.2544.1.12.5.1.21.1.34.' . $index . '.3';
-        $oidTx = '.1.3.6.1.4.1.2544.1.12.5.1.21.1.33.' . $index . '.3';
-        $currentTx = $data[$index . '.3']['CM-PERFORMANCE-MIB::cmEthernetTrafficPortStatsOPT'] ?? null;
-        $currentRx = $data[$index . '.3']['CM-PERFORMANCE-MIB::cmEthernetTrafficPortStatsOPR'] ?? null;
-        if ($currentRx != 0 || $currentTx != 0) {
-            $ifIndex = $entry['CM-FACILITY-MIB::cmEthernetTrafficPortIfIndex'] ?? 0;
-            $ifName = PortCache::getByIfIndex($ifIndex)?->ifName;
+    foreach ($data as $index => $entry) {
+        if (($entry['CM-FACILITY-MIB::cmEthernetTrafficPortMediaType'] ?? null) != 'fiber') {
+            continue;
+        }
 
-            app('sensor-discovery')->discover(new \App\Models\Sensor([
-                'poller_type' => $poller_type,
+        $tx = $data["$index.3"]['CM-PERFORMANCE-MIB::cmEthernetTrafficPortStatsOPT'] ?? null;
+        $rx = $data["$index.3"]['CM-PERFORMANCE-MIB::cmEthernetTrafficPortStatsOPR'] ?? null;
+        if ($rx == 0 && $tx == 0) {
+            continue; // no DOM
+        }
+
+        $ifIndex = $entry['CM-FACILITY-MIB::cmEthernetTrafficPortIfIndex'] ?? 0;
+        $ifName = PortCache::getByIfIndex($ifIndex, $this->getDeviceId())?->ifName;
+
+        foreach ([
+            ['Rx', '.1.3.6.1.4.1.2544.1.12.5.1.21.1.34', 'cmEthernetTrafficPortStatsOPR', $rx],
+            ['Tx', '.1.3.6.1.4.1.2544.1.12.5.1.21.1.33', 'cmEthernetTrafficPortStatsOPT', $tx],
+        ] as [$direction, $oid, $name, $value]) {
+            $sensors->push(new Sensor([
+                'poller_type' => 'snmp',
                 'sensor_class' => 'dbm',
-                'device_id' => $device['device_id'],
-                'sensor_oid' => $oidRx,
-                'sensor_index' => 'cmEthernetTrafficPortStatsOPR.' . $index,
-                'sensor_type' => 'adva_fsp150,
-                'sensor_descr' => $ifName . ' Rx Power',
-                'sensor_divisor' => 1,
-                'sensor_multiplier' => 1,
-                'sensor_limit' => null,
-                'sensor_limit_warn' => null,
-                'sensor_limit_low' => null,
-                'sensor_limit_low_warn' => null,
-                'sensor_current' => $currentRx,
-                'entPhysicalIndex' => $ifIndex,
-                'entPhysicalIndex_measured' => 'ports',
-            ]));
-
-            app('sensor-discovery')->discover(new \App\Models\Sensor([
-                'poller_type' => $poller_type,
-                'sensor_class' => 'dbm',
-                'device_id' => $device['device_id'],
-                'sensor_oid' => $oidRx,
-                'sensor_index' => 'cmEthernetTrafficPortStatsOPT.' . $index,
-                'sensor_type' => 'adva_fsp150,
-                'sensor_descr' => $ifName . ' Tx Power',
-                'sensor_divisor' => 1,
-                'sensor_multiplier' => 1,
-                'sensor_limit' => null,
-                'sensor_limit_warn' => null,
-                'sensor_limit_low' => null,
-                'sensor_limit_low_warn' => null,
-                'sensor_current' => $currentTx,
+                'sensor_oid' => "$oid.$index.3",
+                'sensor_index' => "$name.$index",
+                'sensor_type' => 'adva_fsp150',
+                'sensor_descr' => "$ifName $direction Power",
+                'sensor_current' => $value,
                 'entPhysicalIndex' => $ifIndex,
                 'entPhysicalIndex_measured' => 'ports',
             ]));
         }
     }
+
+    return $sensors;
 }
 ```
 
-The program first loops through the index value of each port. On an
-Adva device, the port names are Ethernet 1-1-1-1, 1-1-1-2, and so on.
-The MIB indexes them as oid.1.1.1.1, oid.1.1.1.2, and so on.
+The code loops through the index value of each port. On an Adva
+device, the port names are Ethernet 1-1-1-1, 1-1-1-2, and so on. The
+MIB indexes them as oid.1.1.1.1, oid.1.1.1.2, and so on.
 
-The program then finds the table of the port and tests the connector
-type for the value 'fiber'. The full code holds other port tables. This
-example leaves them out. Copper media give no optical reading. The
-discovery therefore skips a port without the fiber media type.
+Copper media give no optical reading, the code skips a port without
+the fiber media type. Some SFPs do not collect digital optical
+monitoring (DOM) data. On an Adva device without DOM, both values are 0.
+0 is a valid optical power value, but two values of 0 with DOM are very
+improbable. Other vendors handle optics without DOM in a different way.
+Read the MIBs of your vendor.
 
-The next two lines build the OIDs of the optical receive value and the
-optical transmit value. They use the `$index` of the port. The program
-then gets the current receive value and the current transmit value,
-that is `$currentRx` and `$currentTx`. It tests both values against 0.
-Some SFPs do not collect digital optical monitoring (DOM) data. On an
-Adva device without DOM, both values are 0. 0 is a valid optical power
-value, but two values of 0 with DOM are very improbable. Without DOM,
-the program stops the discovery of that port. Other vendors handle
-optics without DOM in a different way. Read the MIBs of your vendor.
-
-The program then sets `$entPhysicalIndex` and
-`$entPhysicalIndex_measured`. Here, `$entPhysicalIndex` takes the value
-of `CM-FACILITY-MIB::cmEthernetTrafficPortIfIndex`. The sensor then
-belongs to the port. The sensor graphs then also appear on the page of
-that port, and not only on the Health page.
-
-The program then reads the description of the port from the database.
-This description becomes the title of the graph in the web interface.
-
-The program then calls `discover_sensor()` with the collected
-information. The `null` values are the low limit, the low warning
-limit, the high limit, and the high warning limit. The Adva MIB does
-not hold these values.
+`entPhysicalIndex` is the ifIndex of the port and
+`entPhysicalIndex_measured` is `ports`. The sensor then belongs to the
+port. The sensor graphs then also appear on the page of that port, and
+not only on the Health page.
 
 To test the code, run the discovery manually with
 `lnms device:discover $device_id -m sensors`. The flag `-vv` shows the
@@ -552,7 +541,6 @@ LibreNMS Discovery
 
 
 #### Load discovery module sensors ####
-Pre-cache adva_fsp150:
  ENTITY-SENSOR: Caching OIDs: entPhysicalDescr entPhysicalName entPhySensorType entPhySensorScale entPhySensorPrecision entPhySensorValue entPhySensorOperStatus
 Airflow:
 Current: .

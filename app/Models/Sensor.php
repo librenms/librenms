@@ -140,6 +140,26 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
         return $this->translations->firstWhere('state_value', $this->sensor_current);
     }
 
+    /**
+     * Set the state translations of a discovered state sensor.
+     * They are saved for the state name of the sensor (sensor_type) when the sensor is synced.
+     *
+     * @param  iterable<StateTranslation|array{value: int|string, generic: int|string, descr: string, graph?: int|string}>  $states
+     */
+    public function withStates(iterable $states): static
+    {
+        $translations = new \Illuminate\Database\Eloquent\Collection;
+        foreach ($states as $state) {
+            $translations->push($state instanceof StateTranslation ? $state : new StateTranslation([
+                'state_descr' => $state['descr'],
+                'state_value' => $state['value'],
+                'state_generic_value' => $state['generic'],
+            ]));
+        }
+
+        return $this->setRelation('translations', $translations);
+    }
+
     // ---- Define Relationships ----
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\App\Models\Eventlog, $this>

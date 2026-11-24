@@ -141,7 +141,7 @@ abstract class PollingMethod
      * The data source of this method for a device, see dataSourceClass().
      * Made after a successful check, so it can read what the check fetched.
      */
-    public function dataSource(PollingMethodConfig $config, ProbeResult $result): ?object
+    public function dataSource(Device $device, PollingMethodConfig $config, ProbeResult $result): ?object
     {
         return null;
     }

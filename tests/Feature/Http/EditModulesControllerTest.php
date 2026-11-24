@@ -120,16 +120,14 @@ final class EditModulesControllerTest extends TestCase
         $this->assertTrue((new ModuleList)->moduleStatus(ProcessType::Poller, 'unix-agent', $device)->isEnabled());
     }
 
-    public function testIpmiMethodEnablesTheIpmiModule(): void
+    public function testIpmiMethodEnablesTheSensorsModule(): void
     {
-        $snmpOnly = $this->deviceWithMethods([], PollingMethodType::Snmp);
-        $ipmi = $this->deviceWithMethods([], PollingMethodType::Snmp, PollingMethodType::Ipmi);
-        $moduleList = new ModuleList;
+        $device = $this->deviceWithMethods([], PollingMethodType::Icmp, PollingMethodType::Ipmi);
 
-        foreach ([ProcessType::Discovery, ProcessType::Poller] as $type) {
-            $this->assertFalse($moduleList->moduleStatus($type, 'ipmi', $snmpOnly)->isEnabled(), 'ipmi is off by default');
-            $this->assertTrue($moduleList->moduleStatus($type, 'ipmi', $ipmi)->isEnabled());
-        }
+        $modules = $this->modulesFrom($this->actingAs($this->admin())->get(route('device.edit.modules', $device)));
+        $this->assertTrue($modules['sensors']['discovery']['method']);
+        $this->assertTrue($modules['sensors']['polling']['method']);
+        $this->assertArrayNotHasKey('storage', $modules);
     }
 
     public function testAllModulesHaveFriendlyNames(): void
@@ -198,10 +196,10 @@ final class EditModulesControllerTest extends TestCase
         $modules = $this->modulesFrom($response);
         $this->assertArrayHasKey('unix-agent', $modules);
         $this->assertArrayHasKey('mempools', $modules);
+        $this->assertArrayHasKey('sensors', $modules);
         $this->assertArrayNotHasKey('availability', $modules); // the agent is not checked for availability
         $this->assertArrayNotHasKey('storage', $modules);
         $this->assertArrayNotHasKey('ports', $modules);
-        $this->assertArrayNotHasKey('ipmi', $modules);
     }
 
     public function testAvailabilityIsShownForMethodsThatAffectAvailability(): void

@@ -4,31 +4,7 @@ use App\Facades\LibrenmsConfig;
 
 function rewrite_entity_descr($descr)
 {
-    if (is_null($descr)) {
-        return '';
-    }
-    $descr = str_replace('Distributed Forwarding Card', 'DFC', $descr);
-    $descr = preg_replace('/7600 Series SPA Interface Processor-/', '7600 SIP-', $descr);
-    $descr = preg_replace('/Rev\.\ [0-9\.]+\ /', '', $descr);
-    $descr = preg_replace('/12000 Series Performance Route Processor/', '12000 PRP', $descr);
-    $descr = preg_replace('/^12000/', '', $descr);
-    $descr = preg_replace('/Gigabit Ethernet/', 'GigE', $descr);
-    $descr = preg_replace('/^ASR1000\ /', '', $descr);
-    $descr = str_replace('Routing Processor', 'RP', $descr);
-    $descr = str_replace('Route Processor', 'RP', $descr);
-    $descr = str_replace('Switching Processor', 'SP', $descr);
-    $descr = str_replace('Sub-Module', 'Module ', $descr);
-    $descr = str_replace('DFC Card', 'DFC', $descr);
-    $descr = str_replace('Centralized Forwarding Card', 'CFC', $descr);
-    $descr = str_replace('Power Supply Module', 'PSU ', $descr);
-    $descr = str_replace('/Voltage Sensor/', 'Voltage', $descr);
-    $descr = str_replace('Sensor', '', $descr);
-    $descr = str_replace('PMOD', 'PSU', $descr);
-    $descr = preg_replace('/^temperatures /', '', $descr);
-    $descr = preg_replace('/^voltages /', '', $descr);
-    $descr = str_replace('PowerSupply', 'PSU ', $descr);
-
-    return trim($descr);
+    return \LibreNMS\Util\Rewrite::entityDescr($descr);
 }
 
 /**
