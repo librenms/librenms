@@ -11,7 +11,7 @@
                     "hardware": "UCG-Ultra",
                     "features": null,
                     "location": null,
-                    "os": "unifi-gateway",
+                    "os": "unifi-os",
                     "type": "network",
                     "serial": null,
                     "icon": "ubiquiti.svg"

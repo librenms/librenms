@@ -1,5 +1,5 @@
-os: unifi-gateway
-text: 'Ubiquiti UniFi Gateway'
+os: unifi-os
+text: 'Ubiquiti UniFi OS'
 type: network
 group: unix
 icon: ubiquiti
