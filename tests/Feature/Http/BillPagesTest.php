@@ -302,7 +302,7 @@ class BillPagesTest extends TestCase
             $history->update(['bill_type' => 'CDR', 'rate_95th' => $rate]);
         }
         [$from, $to] = Billing::getDates($first->bill_day, 1);
-        $duplicate = $this->createHistory($first, Carbon::parse($from), Carbon::parse($to));
+        $duplicate = $this->createHistory($first, Carbon::parse($from)->subDay(), Carbon::parse($to));
         $duplicate->update(['bill_type' => 'cdr', 'rate_95th' => 250]);
         $this->createHistory($second, Carbon::parse($from), Carbon::parse($to))->update(['rate_95th' => 9999]);
 
@@ -317,6 +317,7 @@ class BillPagesTest extends TestCase
         DB::disableQueryLog();
 
         $this->assertCount(1, $historyQueries);
+        $this->assertSame($first->formatUsage(400 * 29 / 30 + 75 / 30), $response->json('rows.0.predicted'));
         foreach ($expected as $index => $prediction) {
             $this->assertSame($prediction, $response->json("rows.$index.predicted"));
         }
