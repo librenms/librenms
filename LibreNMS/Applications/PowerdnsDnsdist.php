@@ -20,6 +20,7 @@ class PowerdnsDnsdist extends ApplicationDefinition
 {
     public const string TYPE = 'powerdns-dnsdist';
     protected const ?string NAME = 'PowerDNS dnsdist';
+    protected const ?string GRAPH_PREFIX = 'powerdns_dnsdist';
 
     protected const ?array OVERVIEW = [
         'cache',

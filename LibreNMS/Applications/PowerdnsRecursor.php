@@ -30,6 +30,7 @@ class PowerdnsRecursor extends ApplicationDefinition
 {
     public const string TYPE = 'powerdns-recursor';
     protected const ?string NAME = 'PowerDNS Recursor';
+    protected const ?string GRAPH_PREFIX = 'powerdns_recursor';
 
     protected const ?array OVERVIEW = [
         'questions',
