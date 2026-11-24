@@ -73,9 +73,11 @@ final class GraphDataApiTest extends DBTestCase
 
     public function testInvalidParametersAreValidationErrors(): void
     {
+        $device = Device::factory()->create();
         Sanctum::actingAs($this->apiUser('admin'));
 
-        $this->getJson('/api/v1/graph-data?type=device_netstat_ip&width=1')
+        // authorization runs before validation, so the graph must be one the user may see
+        $this->getJson("/api/v1/graph-data?type=device_netstat_ip&device=$device->device_id&width=1")
             ->assertUnprocessable()
             ->assertJsonPath('errors.0.source.pointer', '/width');
     }
