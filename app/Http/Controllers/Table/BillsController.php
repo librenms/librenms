@@ -92,7 +92,16 @@ class BillsController extends TableController
         } else {
             $allowed = "CASE WHEN LOWER(bills.bill_type) = 'cdr' THEN bills.bill_cdr ELSE bills.bill_quota END";
             $used = "CASE WHEN LOWER(bills.bill_type) = 'cdr' THEN bills.rate_95th ELSE bills.total_data END";
-            $query->select('bills.*')->selectRaw("$allowed AS bill_allowed");
+            $now = now();
+            $earliest = min(array_map(fn (int $day) => Billing::getDates($day, 3, $now)[0], range(1, 31)));
+            $query->select('bills.*')->selectRaw("$allowed AS bill_allowed")
+                ->with(['history' => fn ($history) => $history
+                    ->whereRaw('LOWER(bill_type) = ?', ['cdr'])
+                    ->where('bill_dateto', '>=', Carbon::createFromFormat('YmdHis', $earliest)->format('Y-m-d H:i:s'))
+                    ->where('bill_dateto', '<', $now->format('Y-m-d H:i:s'))
+                    ->orderByDesc('bill_dateto')
+                    ->orderByDesc('bill_hist_id')
+                    ->select(['bill_id', 'bill_dateto', 'rate_95th'])]);
             $table = 'bills';
         }
 
@@ -128,7 +137,9 @@ class BillsController extends TableController
             ['from' => $from, 'to' => $to] = $bill->billingPeriod();
             $percent = Number::calculatePercent($bill->used(), $allowed);
             $overuse = $bill->used() - $allowed;
-            $predicted = $bill->formatUsage(Billing::getPredictedUsage($bill->bill_day, $bill->used()));
+            $predicted = $bill->formatUsage($bill->isCdr()
+                ? Billing::getPredictedCdrUsage($bill, $bill->relationLoaded('history') ? $bill->getRelation('history') : null)
+                : Billing::getPredictedUsage($bill->bill_day, $bill->used()));
         }
 
         $colors = Color::percentage($percent);
