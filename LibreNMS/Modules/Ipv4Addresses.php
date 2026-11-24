@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Modules;
 
-use App\Facades\LibrenmsConfig;
 use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\Ipv4Address;
@@ -252,7 +251,7 @@ class Ipv4Addresses implements Module
                     ]);
                 })->filter();
 
-            if (! $this->needsLegacyTable($device, $modern, $hasBroadcast, $ifIndexes)) {
+            if (! $this->needsLegacyTable($modern, $hasBroadcast, $ifIndexes)) {
                 $ips = $ips->merge($modern);
 
                 continue;
@@ -280,14 +279,8 @@ class Ipv4Addresses implements Module
      * @param  Collection<int, Ipv4Address>  $modern  unicast IPv4 addresses from ipAddressTable
      * @param  int[]  $ifIndexes  interface of each unicast IPv4 address in ipAddressTable
      */
-    private function needsLegacyTable(Device $device, Collection $modern, bool $hasBroadcast, array $ifIndexes): bool
+    private function needsLegacyTable(Collection $modern, bool $hasBroadcast, array $ifIndexes): bool
     {
-        if (LibrenmsConfig::getOsSetting($device->os, 'ipv4_always_walk_ipaddrtable')) {
-            Log::debug('ipv4_always_walk_ipaddrtable is enabled for this OS, walking ipAddrTable');
-
-            return true;
-        }
-
         if ($modern->isEmpty()) {
             Log::debug('ipAddressTable has no IPv4 addresses, walking ipAddrTable');
 
