@@ -14,11 +14,11 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class Ciscospark extends Transport
+class Ciscospark extends AlertDataTransport
 {
     protected string $name = 'Cisco Webex Teams';
     // This is the total length minus 4 bytes for ellipses.
@@ -28,7 +28,7 @@ class Ciscospark extends Transport
      * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         $room_id = $this->config['room-id'];
         $token = $this->config['api-token'];

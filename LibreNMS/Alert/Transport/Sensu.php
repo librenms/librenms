@@ -26,12 +26,12 @@ namespace LibreNMS\Alert\Transport;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class Sensu extends Transport
+class Sensu extends AlertDataTransport
 {
     // Sensu alert coding
     public const OK = 0;
@@ -49,7 +49,7 @@ class Sensu extends Transport
      * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         $sensu_opts['source-key'] = $this->config['sensu-source-key'];
 
@@ -88,7 +88,7 @@ class Sensu extends Transport
         throw new AlertTransportDeliveryException($alert_data, $result->status(), $result->body(), json_encode($data), $sensu_opts);
     }
 
-    private function generateData(array $alert_data, int $status, int $offset = 0): array
+    private function generateData(array|AlertData $alert_data, int $status, int $offset = 0): array
     {
         $namespace = $this->config['sensu-namespace'] ?: 'default';
 
@@ -119,7 +119,7 @@ class Sensu extends Transport
         ];
     }
 
-    private function generateAnnotations(array $alert_data): array
+    private function generateAnnotations(array|AlertData $alert_data): array
     {
         return array_filter([
             'generated-by' => 'LibreNMS',
@@ -149,7 +149,7 @@ class Sensu extends Transport
         return self::$status[$severity] ?? self::UNKNOWN;
     }
 
-    private function getEntityName(array $obj): string
+    private function getEntityName(array|AlertData $obj): string
     {
         $key = $this->config['sensu-source-key'] ?: 'display';
 

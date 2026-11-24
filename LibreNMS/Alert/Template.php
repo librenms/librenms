@@ -71,15 +71,16 @@ class Template
     {
         $templateBody = $alert->template?->template;
         $templateName = $alert->template->name ?? '';
+        $data = ['alert' => new TemplateAlertData($alert->toArray())];
 
         if (empty($templateBody)) {
-            return Blade::render($this->getDefaultTemplate($templateName, 'No template defined'), ['alert' => $alert]);
+            return Blade::render($this->getDefaultTemplate($templateName, 'No template defined'), $data);
         }
 
         try {
-            return Blade::render($templateBody, ['alert' => $alert]);
+            return Blade::render($templateBody, $data);
         } catch (\Exception $e) {
-            return Blade::render($this->getDefaultTemplate($templateName, $e->getMessage()), ['alert' => $alert]);
+            return Blade::render($this->getDefaultTemplate($templateName, $e->getMessage()), $data);
         }
     }
 
@@ -99,7 +100,7 @@ class Template
         $title = $defaultTitle;
         if (! empty($templateTitle)) {
             try {
-                $title = Blade::render($templateTitle, ['alert' => $alert]);
+                $title = Blade::render($templateTitle, ['alert' => new TemplateAlertData($alert->toArray())]);
             } catch (\Throwable) {
                 // fall back to the default title
             }
@@ -126,11 +127,11 @@ class Template
             'Timestamp: {{ $alert->timestamp }}' . PHP_EOL .
             'Unique-ID: {{ $alert->uid }}' . PHP_EOL .
             'Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif ' . PHP_EOL .
-            '@if ($alert->faults)Faults:' . PHP_EOL .
+            '@if ($alert->faults ?? [])Faults:' . PHP_EOL .
             '@foreach ($alert->faults as $key => $value)' . PHP_EOL .
             '  #{{ $key }}: {{ $value[\'string\'] }} @endforeach' . PHP_EOL .
             '@endif' . PHP_EOL .
-            'Alert sent to: @foreach ($alert->contacts as $key => $value) {{ $value }} <{{ $key }}> @endforeach' . PHP_EOL .
+            'Alert sent to: @foreach ($alert->contacts ?? [] as $key => $value) {{ $value }} <{{ $key }}> @endforeach' . PHP_EOL .
             'Warning! Fallback template used due to error in template ' . htmlspecialchars($template_name) . ': ' . htmlspecialchars($error) . PHP_EOL;
     }
 }

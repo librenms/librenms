@@ -26,12 +26,12 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class Ilert extends Transport
+class Ilert extends AlertDataTransport
 {
     public function name(): string
     {
@@ -42,7 +42,7 @@ class Ilert extends Transport
      * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         if ($alert_data['state'] == AlertState::RECOVERED) {
             $event_type = 'RESOLVE';

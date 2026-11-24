@@ -25,11 +25,11 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class Smsfeedback extends Transport
+class Smsfeedback extends AlertDataTransport
 {
     protected string $name = 'SMSfeedback';
 
@@ -37,7 +37,7 @@ class Smsfeedback extends Transport
      * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         $url = 'http://api.smsfeedback.ru/messages/v2/send/';
         $params = [

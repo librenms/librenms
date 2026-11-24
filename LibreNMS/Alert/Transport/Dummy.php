@@ -25,16 +25,16 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 
-class Dummy extends Transport
+class Dummy extends AlertDataTransport
 {
     /**
      * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         throw new AlertTransportDeliveryException($alert_data, 0, 'Dummy transport always fails', $alert_data['msg']);
     }

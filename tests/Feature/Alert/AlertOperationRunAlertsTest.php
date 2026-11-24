@@ -39,11 +39,17 @@ use App\Models\Port;
 use App\Models\Processor;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alert\RunAlerts;
+use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\Transport\Dummy;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -52,6 +58,80 @@ use Spatie\Permission\Models\Role;
 final class AlertOperationRunAlertsTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function testLiveIcmpAlertKeepsDeliveringAfterAWebhookFailure(): void
+    {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://alerts.example.test/slack' => Http::response('unavailable', 503),
+            'https://alerts.example.test/api*' => Http::response(),
+            'https://alerts.example.test/jsm' => Http::response(),
+        ]);
+
+        $context = $this->makeActiveAlert([
+            ['type' => 'slack'],
+            ['type' => 'api'],
+            ['type' => 'jsm'],
+        ]);
+        $device = $context['device'];
+        $device->pollingMethods()->updateOrCreate(['method_type' => PollingMethodType::Icmp], ['enabled' => true]);
+        $pingTime = now()->startOfSecond();
+        $device->stats()->updateOrCreate([], ['ping_last_timestamp' => $pingTime, 'ping_rtt_last' => 2.5]);
+        $context['segments'][0]['transport']->update(['transport_config' => ['slack-url' => 'https://alerts.example.test/slack']]);
+        $context['segments'][1]['transport']->update(['transport_config' => [
+            'api-url' => 'https://alerts.example.test/api',
+            'api-method' => 'post',
+            'api-auth-username' => '',
+            'api-auth-password' => '',
+            'api-body' => '{{ hostname }}',
+            'api-options' => 'device={{ device_id }}',
+        ]]);
+        $context['segments'][2]['transport']->update(['transport_config' => ['jsm-url' => 'https://alerts.example.test/jsm']]);
+
+        (new RunAlerts)->runAlerts();
+
+        Http::assertSent(fn (Request $request) => $request->url() === 'https://alerts.example.test/api?device=' . $device->device_id
+            && $request->body() === $device->hostname);
+        [$request] = Http::recorded(fn (Request $request) => $request->url() === 'https://alerts.example.test/jsm')->sole();
+        $payload = json_decode($request->body(), true, flags: JSON_THROW_ON_ERROR);
+        $this->assertSame($device->hostname, $payload['alert']['hostname']);
+        $this->assertSame($pingTime->toJSON(), $payload['ping_timestamp']);
+        $this->assertSame('', $payload['ping_min']);
+        $this->assertArrayNotHasKey('diff', $payload);
+
+        $failure = Eventlog::query()->where('device_id', $device->device_id)->where('type', 'error')->sole();
+        $this->assertStringContainsString('Transport delivery failed with 503', $failure->message);
+    }
+
+    public function testCustomTransportCanStillOverrideTheArrayEntryPoint(): void
+    {
+        $transport = new class extends Dummy
+        {
+            public static array $payload = [];
+
+            public function deliverAlert(array $alert_data): bool
+            {
+                self::$payload = $alert_data;
+
+                return true;
+            }
+        };
+        class_alias($transport::class, Transport::getClass('legacyArrayTest'));
+        $device = Device::factory()->create();
+        $alert = new AlertData([
+            'device_id' => $device->device_id,
+            'hostname' => $device->hostname,
+            'state' => AlertState::ACTIVE,
+        ]);
+
+        (new RunAlerts)->extTransports($alert, [
+            ['transport_id' => null, 'transport_type' => 'legacyArrayTest', 'transport_name' => 'Legacy transport'],
+        ]);
+
+        $this->assertSame($device->hostname, $transport::$payload['alert']->get('hostname'));
+        $this->assertArrayHasKey('msg', $transport::$payload);
+        $this->assertFalse($transport::$payload['alert']->has('msg'));
+    }
 
     public function testActiveAlertIssuesDueSegmentTransportAndRespectsTimer(): void
     {

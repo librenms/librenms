@@ -25,17 +25,17 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class Signalgrid extends Transport
+class Signalgrid extends AlertDataTransport
 {
     /**
      * @param  array<string, mixed>|AlertData  $alert_data
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         $type = match (true) {
             $alert_data['state'] == AlertState::RECOVERED => 'SUCCESS',

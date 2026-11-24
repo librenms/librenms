@@ -25,12 +25,12 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class Signl4 extends Transport
+class Signl4 extends AlertDataTransport
 {
     protected string $name = 'SIGNL4';
 
@@ -38,7 +38,7 @@ class Signl4 extends Transport
      * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         $url = $this->config['signl4-url'];
 
@@ -54,7 +54,8 @@ class Signl4 extends Transport
             'Body' => $alert_data['alert_notes'],
         ];
 
-        $data = array_merge($s4_data, $alert_data);
+        $payload = $alert_data instanceof AlertData ? $alert_data->toTransportPayload() : $alert_data;
+        $data = array_merge($s4_data, $payload);
 
         $res = Http::client()->post($url, $data);
 

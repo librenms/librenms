@@ -26,12 +26,12 @@ namespace LibreNMS\Alert\Transport;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Pool;
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class Alertmanager extends Transport
+class Alertmanager extends AlertDataTransport
 {
     protected string $name = 'Alert Manager';
 
@@ -39,7 +39,7 @@ class Alertmanager extends Transport
      * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         $url = $this->config['alertmanager-url'];
         $username = $this->config['alertmanager-username'];

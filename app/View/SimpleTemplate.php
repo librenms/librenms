@@ -26,6 +26,7 @@
 
 namespace App\View;
 
+use ArrayAccess;
 use LibreNMS\Util\StringHelpers;
 
 class SimpleTemplate implements \Stringable
@@ -37,7 +38,7 @@ class SimpleTemplate implements \Stringable
 
     public function __construct(
         private readonly string $template,
-        private array $variables = []
+        private array|ArrayAccess $variables = []
     ) {
     }
 
@@ -75,7 +76,7 @@ class SimpleTemplate implements \Stringable
     /**
      * Create and parse a simple template
      */
-    public static function parse(string $template, array $variables): string
+    public static function parse(string $template, array|ArrayAccess $variables): string
     {
         return (string) new static($template, $variables);
     }

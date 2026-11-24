@@ -15,17 +15,17 @@ namespace LibreNMS\Alert\Transport;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class Kayako extends Transport
+class Kayako extends AlertDataTransport
 {
     /**
      * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         $url = $this->config['kayako-url'] . '/Tickets/Ticket';
         $key = $this->config['kayako-key'];

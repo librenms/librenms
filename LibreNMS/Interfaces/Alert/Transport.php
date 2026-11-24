@@ -26,8 +26,6 @@
 
 namespace LibreNMS\Interfaces\Alert;
 
-use LibreNMS\Alert\AlertData;
-
 interface Transport
 {
     /**
@@ -38,12 +36,12 @@ interface Transport
     /**
      * Gets called when an alert is sent
      *
-     * @param  array<string, mixed>|AlertData  $alert_data  An AlertData object or array created by DescribeAlert
+     * @param  array<string, mixed>  $alert_data  The legacy alert payload
      * @return bool Returns true if the call was successful.
      *
      * @throws \LibreNMS\Exceptions\AlertTransportDeliveryException
      */
-    public function deliverAlert($alert_data): bool;
+    public function deliverAlert(array $alert_data): bool;
 
     /**
      * @return array<string, mixed>

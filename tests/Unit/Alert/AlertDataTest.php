@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests\Unit\Alert;
 
+use App\Models\AlertTemplate;
 use App\Models\Device;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Alert\AlertData;
@@ -174,6 +175,11 @@ final class AlertDataTest extends TestCase
         unset($alert['title']);
         $this->assertNull($alert->title);
         $this->assertFalse(isset($alert['title']));
+
+        $alert['faults'] = [['string' => 'test fault']];
+        unset($alert['faults']);
+        $this->assertSame([], $alert->faults);
+        $this->assertArrayNotHasKey('faults', $alert->toArray());
     }
 
     public function testUndefinedPropertyFallback(): void
@@ -200,6 +206,23 @@ final class AlertDataTest extends TestCase
         $decoded = json_decode($json, true);
         $this->assertSame('host1', $decoded['hostname']);
         $this->assertSame(10, $decoded['device_id']);
+        $this->assertArrayNotHasKey('faults', $decoded);
+    }
+
+    public function testTemplateRenderingSupportsCollectionMethods(): void
+    {
+        $alert = new AlertData([
+            'hostname' => 'router.example.com',
+            'state' => AlertState::ACTIVE,
+            'template' => new AlertTemplate([
+                'title' => '{{ $alert->get("hostname") }}',
+                'template' => '{{ $alert->only(["hostname"])->get("hostname") }}',
+            ]),
+        ]);
+
+        $template = new Template;
+        $this->assertSame('router.example.com', $template->getTitle($alert));
+        $this->assertSame('router.example.com', $template->getBody($alert));
     }
 
     public function testTestData(): void

@@ -26,12 +26,12 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class Victorops extends Transport
+class Victorops extends AlertDataTransport
 {
     protected string $name = 'Splunk On-Call';
 
@@ -39,7 +39,7 @@ class Victorops extends Transport
      * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         $url = $this->config['victorops-url'];
         $protocol = [

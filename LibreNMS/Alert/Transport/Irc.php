@@ -26,10 +26,10 @@ namespace LibreNMS\Alert\Transport;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 
-class Irc extends Transport
+class Irc extends AlertDataTransport
 {
     protected string $name = 'IRC';
 
@@ -37,7 +37,7 @@ class Irc extends Transport
      * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         $container_dir = '/data';
         if (file_exists($container_dir) and posix_getpwuid(fileowner($container_dir))['name'] == 'librenms') {
@@ -47,7 +47,8 @@ class Irc extends Transport
         }
         if (file_exists($f) && filetype($f) == 'fifo') {
             $f = fopen($f, 'w+');
-            $r = fwrite($f, json_encode($alert_data) . "\n");
+            $payload = $alert_data instanceof AlertData ? $alert_data->toTransportPayload() : $alert_data;
+            $r = fwrite($f, json_encode($payload) . "\n");
             fclose($f);
 
             if ($r === false) {

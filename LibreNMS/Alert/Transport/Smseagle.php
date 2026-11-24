@@ -25,11 +25,11 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class Smseagle extends Transport
+class Smseagle extends AlertDataTransport
 {
     protected string $name = 'SMSEagle';
 
@@ -37,7 +37,7 @@ class Smseagle extends Transport
      * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         $url = $this->config['smseagle-url'] . '/http_api/send_sms';
         if (! str_starts_with($url, 'http')) {

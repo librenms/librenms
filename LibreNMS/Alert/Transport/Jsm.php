@@ -3,11 +3,11 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class Jsm extends Transport
+class Jsm extends AlertDataTransport
 {
     protected string $name = 'Jira Service Management';
 
@@ -15,11 +15,12 @@ class Jsm extends Transport
      * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         $url = $this->config['jsm-url'];
 
-        $res = Http::client()->post($url, $alert_data);
+        $payload = $alert_data instanceof AlertData ? $alert_data->toTransportPayload() : $alert_data;
+        $res = Http::client()->post($url, $payload);
 
         if ($res->successful()) {
             return true;

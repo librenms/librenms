@@ -30,6 +30,7 @@ use App\Facades\LibrenmsConfig;
 use App\Models\AlertTemplate;
 use App\Models\Device;
 use ArrayAccess;
+use Carbon\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
 use LibreNMS\Enum\AlertState;
@@ -85,10 +86,10 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
     public mixed $builder = null;
     /** @var array<int|string, string>|null */
     public ?array $device_groups = null;
-    public ?int $ping_timestamp = null;
+    public Carbon|int|null $ping_timestamp = null;
     public float|int|null $ping_loss = null;
-    public float|int|null $ping_min = null;
-    public float|int|null $ping_max = null;
+    public float|int|string|null $ping_min = null;
+    public float|int|string|null $ping_max = null;
     public float|int|null $ping_avg = null;
     public ?string $debug = null;
     public mixed $applications = null;
@@ -106,6 +107,9 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
     public mixed $extra = null;
     public ?string $query = null;
 
+    /** @var array<string, true> */
+    private array $providedFields = [];
+
     /**
      * @param  array<string, mixed>|self  $data
      */
@@ -116,9 +120,7 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
         }
 
         foreach ($data as $key => $value) {
-            if (property_exists($this, $key)) {
-                $this->{$key} = $value;
-            }
+            $this->offsetSet($key, $value);
         }
     }
 
@@ -132,7 +134,7 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
 
     public function __get(string $name): mixed
     {
-        if (property_exists($this, $name)) {
+        if ($this->hasProperty($name)) {
             return $this->{$name};
         }
 
@@ -141,12 +143,12 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
 
     public function __isset(string $name): bool
     {
-        return property_exists($this, $name) && isset($this->{$name});
+        return $this->hasProperty($name) && isset($this->{$name});
     }
 
     public function offsetExists(mixed $offset): bool
     {
-        return is_string($offset) && property_exists($this, $offset) && isset($this->{$offset});
+        return is_string($offset) && $this->__isset($offset);
     }
 
     public function offsetGet(mixed $offset): mixed
@@ -156,16 +158,23 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
 
     public function offsetSet(mixed $offset, mixed $value): void
     {
-        if (is_string($offset) && property_exists($this, $offset)) {
+        if (is_string($offset) && $this->hasProperty($offset)) {
             $this->{$offset} = $value;
+            $this->providedFields[$offset] = true;
         }
     }
 
     public function offsetUnset(mixed $offset): void
     {
-        if (is_string($offset) && property_exists($this, $offset)) {
-            $this->{$offset} = null;
+        if (is_string($offset) && $this->hasProperty($offset)) {
+            $this->{$offset} = $offset === 'faults' ? [] : null;
+            unset($this->providedFields[$offset]);
         }
+    }
+
+    private function hasProperty(string $name): bool
+    {
+        return $name !== 'providedFields' && property_exists($this, $name);
     }
 
     /**
@@ -173,7 +182,26 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
      */
     public function toArray(): array
     {
-        return get_object_vars($this);
+        $data = get_object_vars($this);
+        unset($data['providedFields']);
+
+        return array_filter($data, fn ($value, $key) => isset($this->providedFields[$key])
+            || ($value !== null && ($key !== 'faults' || $value !== [])), ARRAY_FILTER_USE_BOTH);
+    }
+
+    /**
+     * The full alert payload used by existing integrations.
+     *
+     * @return array<string, mixed>
+     */
+    public function toTransportPayload(): array
+    {
+        $payload = $this->toArray();
+        $templateData = $payload;
+        unset($templateData['msg']);
+        $payload['alert'] = new TemplateAlertData($templateData);
+
+        return $payload;
     }
 
     /**

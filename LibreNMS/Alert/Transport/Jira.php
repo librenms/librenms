@@ -18,11 +18,11 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class Jira extends Transport
+class Jira extends AlertDataTransport
 {
     protected string $name = 'Jira';
 
@@ -30,7 +30,7 @@ class Jira extends Transport
      * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         $webhook_on = $this->config['enable-webhook'] ?? false;
 

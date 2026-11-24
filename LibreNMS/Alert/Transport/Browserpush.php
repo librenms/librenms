@@ -29,10 +29,10 @@ namespace LibreNMS\Alert\Transport;
 use App\Models\User;
 use App\Notifications\AlertNotification;
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use Notification;
 
-class Browserpush extends Transport
+class Browserpush extends AlertDataTransport
 {
     protected string $name = 'Browser Push';
 
@@ -40,7 +40,7 @@ class Browserpush extends Transport
      * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         $users = User::when($this->config['user'] ?? 0, fn ($query, $user_id) => $query->where('user_id', $user_id))->get();
 

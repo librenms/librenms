@@ -244,7 +244,7 @@ class RunAlerts
         $obj['rule'] = $alert['builder']; //Backwards compatibility for old rule
         $obj['name'] = $alert['name'];
         $obj['timestamp'] = $alert['time_logged'];
-        $obj['contacts'] = $extra['contacts'];
+        $obj['contacts'] = $extra['contacts'] ?? [];
         $obj['state'] = $alert['state'];
         $obj['alerted'] = $alert['alerted'];
         $obj['template'] = $template;
@@ -821,17 +821,22 @@ class RunAlerts
                 $transport_title = "Transport {$item['transport_type']}";
                 $alert->transport = $item['transport_type'];
                 $alert->transport_name = $item['transport_name'];
-                $alert->title = $type->getTitle($alert);
-                $alert->msg = $type->getBody($alert);
                 c_echo(" :: $transport_title => ");
                 try {
+                    $alert->title = $type->getTitle($alert);
+                    $alert->msg = $type->getBody($alert);
                     $instance = new $class(AlertTransport::find($item['transport_id']));
-                    $tmp = $instance->deliverAlert($alert);
+                    // Custom transports can still implement or override the array entry point.
+                    $acceptsAlertData = $instance instanceof AlertDataTransport
+                        && (new \ReflectionMethod($instance, 'deliverAlert'))->getDeclaringClass()->getName() === AlertDataTransport::class;
+                    $tmp = $acceptsAlertData
+                        ? $instance->deliverAlertData($alert)
+                        : $instance->deliverAlert($alert->toTransportPayload());
                     $this->alertLog($tmp, $alert, $alert->transport);
                 } catch (AlertTransportDeliveryException $e) {
                     Log::warning("Alert transport '{$alert->transport}' delivery failed for device {$alert->device_id}: {$e->getMessage()}", ['exception' => $e]);
                     $this->alertLog($e->getMessage(), $alert, $alert->transport);
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     $this->alertLog($e, $alert, $alert->transport);
                 }
                 unset($instance);

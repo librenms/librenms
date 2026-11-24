@@ -14,12 +14,12 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class Msteams extends Transport
+class Msteams extends AlertDataTransport
 {
     protected string $name = 'Microsoft Teams';
 
@@ -27,7 +27,7 @@ class Msteams extends Transport
      * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         $url = $this->config['msteam-url'];
         $useJson = $this->config['use-json'] === 'on';
@@ -62,7 +62,7 @@ class Msteams extends Transport
         );
     }
 
-    private function adaptiveCard(array $alert_data): array
+    private function adaptiveCard(array|AlertData $alert_data): array
     {
         $color = match ((int) $alert_data['state']) {
             AlertState::CLEAR => 'Good',

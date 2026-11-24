@@ -31,11 +31,11 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Util\Http;
 
-class Pagertree extends Transport
+class Pagertree extends AlertDataTransport
 {
     protected string $name = 'PagerTree';
 
@@ -43,7 +43,7 @@ class Pagertree extends Transport
      * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         $event_type = match ($alert_data['state']) {
             0 => 'resolve',

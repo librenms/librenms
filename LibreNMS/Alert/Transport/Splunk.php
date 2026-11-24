@@ -20,17 +20,17 @@ namespace LibreNMS\Alert\Transport;
 
 use App\Facades\DeviceCache;
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\Transport;
+use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 
-class Splunk extends Transport
+class Splunk extends AlertDataTransport
 {
     /**
      * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlert($alert_data): bool
+    public function deliverAlertData(array|AlertData $alert_data): bool
     {
         $splunk_host = empty($this->config['Splunk-host']) ? '127.0.0.1' : $this->config['Splunk-host'];
         $splunk_port = empty($this->config['Splunk-port']) ? 514 : $this->config['Splunk-port'];
@@ -57,7 +57,8 @@ class Splunk extends Transport
 
         $ignore = ['template', 'contacts', 'rule', 'string', 'debug', 'faults', 'builder', 'transport', 'alert', 'msg', 'transport_name'];
         $splunk_prefix = '<' . $severity . '> ';
-        foreach ($alert_data as $key => $val) {
+        $fields = $alert_data instanceof AlertData ? $alert_data->toArray() : $alert_data;
+        foreach ($fields as $key => $val) {
             if (in_array($key, $ignore)) {
                 continue;
             }
