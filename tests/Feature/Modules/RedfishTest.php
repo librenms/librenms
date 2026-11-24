@@ -232,7 +232,7 @@ final class RedfishTest extends InMemoryDbTestCase
         (new Sensors)->discover($os);
 
         // the device has no SNMP or IPMI method, their sensors are kept
-        $this->assertSame(['ipmi', 'redfish', 'snmp'], Sensor::where('device_id', $os->getDeviceId())->orderBy('poller_type')->pluck('poller_type')->unique()->all());
+        $this->assertSame(['ipmi', 'redfish', 'snmp'], Sensor::where('device_id', $os->getDeviceId())->orderBy('poller_type')->pluck('poller_type')->unique()->values()->all());
     }
 
     public function testRemovingAMethodDeletesOnlyItsSensors(): void
