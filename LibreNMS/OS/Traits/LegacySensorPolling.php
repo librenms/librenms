@@ -54,7 +54,7 @@ trait LegacySensorPolling
                 continue;
             }
 
-            Log::warning("Sensor polling include $file is deprecated and support will be removed, move it to pollSensors() of the OS class");
+            Log::warning("Legacy sensor include $file is deprecated and support will be removed, convert it to YAML or the PHP class of the OS: https://docs.librenms.org/Developing/os/Health-Information/");
 
             include_once base_path('includes/functions.php');
             include_once base_path('includes/common.php');

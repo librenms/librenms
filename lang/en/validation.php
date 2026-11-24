@@ -198,8 +198,8 @@ return [
                 'warn' => 'The Dispatcher Service was used, but not recently',
             ],
             'CheckLegacySensorIncludes' => [
-                'warn' => 'Sensor polling includes are deprecated and support for them will be removed.',
-                'fix' => 'Move the code of these files to the pollSensors() method of the OS class, then delete them.',
+                'warn' => 'Legacy sensor include files are deprecated and support for them will be removed.',
+                'fix' => 'Convert them to YAML sensor discovery, or to sensor code in the PHP class of the OS when YAML is not possible, then delete them. See https://docs.librenms.org/Developing/os/Health-Information/',
             ],
             'CheckLocking' => [
                 'fail' => 'Caching server issue: :message',

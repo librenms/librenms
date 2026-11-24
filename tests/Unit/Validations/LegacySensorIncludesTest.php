@@ -47,6 +47,6 @@ final class LegacySensorIncludesTest extends TestCase
         $result = $check->validate();
         $this->assertSame(ValidationResult::WARNING, $result->getStatus());
         $this->assertSame(["$this->dir/state/myos.inc.php", "$this->dir/temperature/myos.inc.php"], $result->getList());
-        $this->assertStringContainsString('pollSensors()', (string) $result->getFix());
+        $this->assertStringContainsString('https://docs.librenms.org/Developing/os/Health-Information/', (string) $result->getFix());
     }
 }
