@@ -8,6 +8,7 @@ use App\Models\Application;
 class Suricata extends ApplicationDefinition
 {
     public const string TYPE = 'suricata';
+    protected const ?string DOCS = 'Suricata';
 
     protected const ?array OVERVIEW = [
         'packets_overview',

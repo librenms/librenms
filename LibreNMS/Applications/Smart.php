@@ -7,6 +7,7 @@ use App\Models\Application;
 class Smart extends ApplicationDefinition
 {
     public const string TYPE = 'smart';
+    protected const ?string DOCS = 'SMART';
     protected const ?string NAME = 'SMART';
 
     protected const ?array OVERVIEW = [

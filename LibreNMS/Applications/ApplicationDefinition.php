@@ -13,6 +13,9 @@ class ApplicationDefinition
     public const string TYPE = '';
     protected const ?string NAME = null;
     protected const ?string GRAPH_PREFIX = null;
+    protected const ?string DOCS = null;
+
+    private const string DOCS_BASE = 'https://docs.librenms.org/Extensions/Applications/';
 
     /** @var array<string, string> Graph suffixes and titles for the device page. */
     protected const array GRAPHS = [];
@@ -37,6 +40,17 @@ class ApplicationDefinition
     public function displayName(): string
     {
         return static::NAME ?? StringHelpers::niceCase($this->type);
+    }
+
+    public function docsUrl(): ?string
+    {
+        $slug = static::DOCS;
+
+        if ($slug === null) {
+            return null;
+        }
+
+        return self::DOCS_BASE . rawurlencode($slug) . '/';
     }
 
     public function graphType(string $suffix): string

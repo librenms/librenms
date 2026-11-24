@@ -30,6 +30,7 @@ namespace LibreNMS\Applications;
 class Tinydns extends ApplicationDefinition
 {
     public const string TYPE = 'tinydns';
+    protected const ?string DOCS = 'TinyDNS aka djbdns';
 
     protected const array GRAPHS = [
         'queries' => 'Queries',

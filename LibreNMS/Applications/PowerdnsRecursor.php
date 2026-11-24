@@ -29,6 +29,7 @@ namespace LibreNMS\Applications;
 class PowerdnsRecursor extends ApplicationDefinition
 {
     public const string TYPE = 'powerdns-recursor';
+    protected const ?string DOCS = 'PowerDNS Recursor';
     protected const ?string NAME = 'PowerDNS Recursor';
 
     protected const ?array OVERVIEW = [

@@ -25,6 +25,7 @@ namespace LibreNMS\Applications;
 class UpsApcups extends ApplicationDefinition
 {
     public const string TYPE = 'ups-apcups';
+    protected const ?string DOCS = 'UPS-apcups';
     protected const ?string NAME = 'UPS apcups';
 
     protected const array GRAPHS = [

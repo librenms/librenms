@@ -21,18 +21,27 @@ class EditApplicationsController
     {
         $this->authorize('update', $device);
 
-        $enabled = $device->applications()->pluck('discovered', 'app_type');
-        $autoDiscovery = $device->getAttrib('poll_applications') || LibrenmsConfig::getOsSetting($device->os, 'poller_modules.applications');
+        $flags = $device->applications()->pluck('discovered', 'app_type');
+        $autoDiscovery = (bool) ($device->getAttrib('poll_applications') || LibrenmsConfig::getOsSetting($device->os, 'poller_modules.applications'));
 
         return view('device.edit.apps', [
             'device' => $device,
             'canUpdate' => auth()->user()->can('update', Application::class),
-            'applications' => collect($this->types())->map(fn (string $type) => [
-                'type' => $type,
-                'name' => ApplicationDefinition::forType($type)->displayName(),
-                'enabled' => $enabled->has($type),
-                'discovered' => $autoDiscovery && $enabled->get($type),
-            ])->all(),
+            'applications' => collect($this->types())->map(function (string $type) use ($flags, $autoDiscovery) {
+                $definition = ApplicationDefinition::forType($type);
+                $enabled = $flags->has($type);
+                $discovered = (bool) $flags->get($type);
+
+                return [
+                    'type' => $type,
+                    'name' => $definition->displayName(),
+                    'enabled' => $enabled,
+                    'discovered' => $discovered,
+                    'manual' => $enabled && ! $discovered,
+                    'managed' => $discovered && $autoDiscovery,
+                    'docs' => $definition->docsUrl(),
+                ];
+            })->all(),
         ]);
     }
 

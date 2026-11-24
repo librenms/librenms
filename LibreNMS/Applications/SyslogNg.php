@@ -7,6 +7,7 @@ use App\Models\Application;
 class SyslogNg extends ApplicationDefinition
 {
     public const string TYPE = 'syslog-ng';
+    protected const ?string DOCS = 'Syslog-NG';
     protected const ?string NAME = 'Syslog-NG';
     protected const ?string GRAPH_PREFIX = 'syslog_ng';
 

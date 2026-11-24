@@ -50,6 +50,21 @@ final class DeviceEditSectionsTest extends TestCase
             ->assertNotFound();
     }
 
+    public function testApplicationsMarkDiscoveryAndManualSource(): void
+    {
+        $device = Device::factory()->create();
+        Application::factory()->create(['device_id' => $device->device_id, 'app_type' => 'apache', 'discovered' => 0]);
+        Application::factory()->create(['device_id' => $device->device_id, 'app_type' => 'nginx', 'discovered' => 1]);
+        $admin = $this->admin();
+
+        $this->actingAs($admin)
+            ->get(route('device.edit.apps', $device))
+            ->assertOk()
+            ->assertSee('\u0022name\u0022:\u0022Apache\u0022,\u0022enabled\u0022:true,\u0022discovered\u0022:false,\u0022manual\u0022:true,\u0022managed\u0022:false', false)
+            ->assertSee('\u0022name\u0022:\u0022Nginx\u0022,\u0022enabled\u0022:true,\u0022discovered\u0022:true,\u0022manual\u0022:false,\u0022managed\u0022:false', false)
+            ->assertSee('\u0022name\u0022:\u0022BIND\u0022,\u0022enabled\u0022:false,\u0022discovered\u0022:false,\u0022manual\u0022:false,\u0022managed\u0022:false', false);
+    }
+
     public function testApplicationsRequirePermission(): void
     {
         $device = Device::factory()->create();

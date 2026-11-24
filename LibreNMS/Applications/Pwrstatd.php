@@ -7,6 +7,7 @@ use App\Models\Application;
 class Pwrstatd extends ApplicationDefinition
 {
     public const string TYPE = 'pwrstatd';
+    protected const ?string DOCS = 'Pwrstatd';
 
     protected const ?array OVERVIEW = [
         'wattage',

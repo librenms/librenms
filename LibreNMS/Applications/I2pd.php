@@ -22,6 +22,7 @@ use App\Models\Application;
 class I2pd extends ApplicationDefinition
 {
     public const string TYPE = 'i2pd';
+    protected const ?string DOCS = 'I2PD';
     protected const ?string NAME = 'I2PD Router';
 
     protected const ?array OVERVIEW = [

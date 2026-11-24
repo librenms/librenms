@@ -31,6 +31,7 @@ namespace LibreNMS\Applications;
 class Bind extends ApplicationDefinition
 {
     public const string TYPE = 'bind';
+    protected const ?string DOCS = 'BIND9 aka named';
     protected const ?string NAME = 'BIND';
 
     protected const ?array OVERVIEW = [

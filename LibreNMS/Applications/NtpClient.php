@@ -5,6 +5,7 @@ namespace LibreNMS\Applications;
 class NtpClient extends ApplicationDefinition
 {
     public const string TYPE = 'ntp-client';
+    protected const ?string DOCS = 'NTP Client';
     protected const ?string NAME = 'NTP Client';
     protected const ?string GRAPH_PREFIX = 'ntp_client';
 

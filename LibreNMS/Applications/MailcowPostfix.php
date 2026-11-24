@@ -25,6 +25,7 @@ namespace LibreNMS\Applications;
 class MailcowPostfix extends ApplicationDefinition
 {
     public const string TYPE = 'mailcow-postfix';
+    protected const ?string DOCS = 'Mailcow-dockerized postfix';
     protected const ?string NAME = 'mailcow-dockerized postfix';
 
     protected const array GRAPHS = [

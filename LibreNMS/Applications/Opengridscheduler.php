@@ -19,6 +19,7 @@ namespace LibreNMS\Applications;
 class Opengridscheduler extends ApplicationDefinition
 {
     public const string TYPE = 'opengridscheduler';
+    protected const ?string DOCS = 'Open Grid Scheduler';
     protected const ?string NAME = 'Open Grid Scheduler';
 
     protected const array GRAPHS = [

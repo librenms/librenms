@@ -7,6 +7,7 @@ use App\Models\Application;
 class Docker extends ApplicationDefinition
 {
     public const string TYPE = 'docker';
+    protected const ?string DOCS = 'Docker Stats';
 
     protected const ?array OVERVIEW = [
         'cpu_usage',

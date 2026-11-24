@@ -7,6 +7,7 @@ use App\Models\Application;
 class Strongswan extends ApplicationDefinition
 {
     public const string TYPE = 'strongswan';
+    protected const ?string DOCS = 'Strongswan';
 
     protected const array TUNNEL_GRAPHS = [
         'bits_in' => 'Inbound traffic (bits/s)',
