@@ -50,8 +50,12 @@ require_once $install_dir . '/includes/functions.php';
 require_once $install_dir . '/includes/rewrites.php';
 require_once $install_dir . '/includes/html/functions.inc.php';
 
-// Boot Laravel
-Laravel::bootCli();
+// Boot Laravel, standalone v1 plugin web scripts set $init_modules = ['web', 'auth']
+if (in_array('web', $init_modules ?? [])) {
+    Laravel::bootWeb();
+} else {
+    Laravel::bootCli();
+}
 Debug::set($debug ?? false); // override laravel configured settings (hides legacy errors too)
 
 \LibreNMS\DB\Eloquent::setStrictMode(false); // disable strict mode for legacy code...

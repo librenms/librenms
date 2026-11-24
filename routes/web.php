@@ -655,6 +655,9 @@ Route::middleware(['auth'])->group(function (): void {
 
     // demo helper
     Route::permanentRedirect('demo', '/');
+
+    // session and auth boot for standalone v1 plugin scripts, see Laravel::bootWeb()
+    Route::get('legacy-plugin-boot', fn () => response()->noContent())->name('plugin.legacy-boot');
 });
 
 // routes that don't need authentication
