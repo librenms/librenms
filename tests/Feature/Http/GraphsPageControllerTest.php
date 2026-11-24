@@ -250,6 +250,7 @@ class GraphsPageControllerTest extends TestCase
         $this->assertSame(route('graph.data', ['device' => $device->device_id, 'type' => 'device_netstat_ip', 'showcommand' => 'yes']), $page['dataUrl']);
         $response->assertSee('x-data="graphsPage(' . Js::from($page) . ')"', false);
         $response->assertSee('x-data="timeSeriesGraph(', false);
+        $response->assertSee(__('graph.legend.p95'));
         $response->assertSee('data-reload="false"', false);
         $response->assertSee(__('graph.help.title'));
         $response->assertSee(__('graph.help.zoom_range'));
@@ -381,6 +382,20 @@ class GraphsPageControllerTest extends TestCase
         // nothing of the shared graph is kept for the next one
         $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_netstat_ip");
         $this->assertEquals(new GraphViewOptions(columns: ['avg'], line_style: 'smooth'), $response->viewData('graphPage')['options']);
+    }
+
+    public function testInteractiveProcessorGraphDoesNotOfferPercentilesWhenDisabledGlobally(): void
+    {
+        LibrenmsConfig::set('graph_stat_percentile_disable', true);
+        $device = Device::factory()->create();
+        $user = $this->adminUser();
+        $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_renderer', 'value' => 'js'])->assertOk();
+        $this->actingAs($user)->postJson('/preferences', ['pref' => 'graph_options', 'value' => ['columns' => ['avg', 'p95']]])->assertOk();
+
+        $response = $this->actingAs($user)->get("/graphs?device={$device->device_id}&type=device_processor");
+
+        $response->assertSee('x-data="timeSeriesGraph(', false);
+        $response->assertDontSee(__('graph.legend.p95'));
     }
 
     public function testViewParametersMustBeKnownValues(): void

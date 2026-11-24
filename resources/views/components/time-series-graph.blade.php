@@ -16,12 +16,15 @@
     stacking: all, none or some stacked, null for one series, scale: fit, zero or limits, percentileLines: draws percentile lines}.
 --}}
 @php
-    $columnLabels = collect(App\Data\Graphing\GraphViewOptions::COLUMNS)->mapWithKeys(fn (string $column) => [$column => __("graph.legend.$column")]);
+    $columns = App\Data\Graphing\GraphOptions::showsPercentiles()
+        ? App\Data\Graphing\GraphViewOptions::COLUMNS
+        : App\Data\Graphing\GraphViewOptions::DEFAULT_COLUMNS;
+    $columnLabels = collect($columns)->mapWithKeys(fn (string $column) => [$column => __("graph.legend.$column")]);
     $chart = [
         'src' => $src,
         'range' => $range,
         'options' => [...get_object_vars($options), ...$view],
-        'columns' => App\Data\Graphing\GraphViewOptions::COLUMNS,
+        'columns' => $columns,
         'columnLabels' => $columnLabels,
         // the header of a percentile column of the graph, such as 25th
         'percentileLabel' => __('graph.legend.percentile', ['percentile' => '%p']),

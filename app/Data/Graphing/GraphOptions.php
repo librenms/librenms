@@ -56,7 +56,32 @@ readonly class GraphOptions
      */
     public static function statsPercentiles(): array
     {
-        return LibrenmsConfig::get('graph_stat_percentile_disable') ? [] : [25, 50, 75];
+        return self::showsPercentiles() ? [25, 50, 75] : [];
+    }
+
+    public static function showsPercentiles(): bool
+    {
+        return ! LibrenmsConfig::get('graph_stat_percentile_disable');
+    }
+
+    /**
+     * @param  list<string>|null  $series  traffic series to summarize, all series when null
+     * @param  list<Threshold>  $thresholds  reference lines for the traffic graph
+     */
+    public static function forTraffic(?array $series = null, bool $speedZoom = false, array $thresholds = []): self
+    {
+        $percentile = self::showsPercentiles() ? (float) LibrenmsConfig::get('percentile_value', 95) : null;
+
+        return new self(
+            legendTitle: 'bps',
+            traffic: new TrafficOptions(
+                highestPercentile: LibrenmsConfig::get('rrdgraph_real_percentile') ? $percentile : null,
+                speedZoom: $speedZoom,
+                series: $series,
+            ),
+            percentiles: $percentile === null ? [] : [$percentile],
+            thresholds: $thresholds,
+        );
     }
 
     /**
