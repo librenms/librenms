@@ -4,7 +4,7 @@ namespace LibreNMS\Interfaces\Discovery;
 
 use App\Models\Vrf;
 use Illuminate\Support\Collection;
-use LibreNMS\Exceptions\SnmpException;
+use LibreNMS\Exceptions\SnmpConnectionException;
 
 interface VrfDiscovery
 {
@@ -17,7 +17,7 @@ interface VrfDiscovery
      *
      * @return Collection<int, Vrf>
      *
-     * @throws SnmpException when the device did not answer, existing VRFs are kept
+     * @throws SnmpConnectionException when the device did not answer, existing VRFs are kept
      */
     public function discoverVrfs(): Collection;
 }
