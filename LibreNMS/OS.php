@@ -78,6 +78,7 @@ use LibreNMS\OS\Traits\EntityMib;
 use LibreNMS\OS\Traits\EntitySensorMib;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\LegacySensorDiscovery;
+use LibreNMS\OS\Traits\LegacySensorPolling;
 use LibreNMS\OS\Traits\LldpMib;
 use LibreNMS\OS\Traits\MefUniEvcMib;
 use LibreNMS\OS\Traits\MplsVpnMib;
@@ -139,6 +140,7 @@ class OS implements
     use YamlStorageDiscovery;
     use YamlSensorDiscovery;
     use LegacySensorDiscovery;
+    use LegacySensorPolling;
     use UpsMib;
     use NetstatsPolling;
     use Bgp4Mib;
@@ -545,7 +547,7 @@ class OS implements
     {
         $oids = $sensors->pluck('sensor_oid')->filter()->unique()->values()->all();
         if (empty($oids)) {
-            return [];
+            return $this->pollLegacySensors($sensors, [], []);
         }
 
         $data = \SnmpQuery::options(new SnmpQueryOptions(
@@ -565,7 +567,7 @@ class OS implements
             }
         }
 
-        return $values;
+        return $this->pollLegacySensors($sensors, $values, $data);
     }
 
     public function getDiscovery($module = null)

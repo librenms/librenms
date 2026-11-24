@@ -197,6 +197,10 @@ return [
                 'not_detected' => 'Dispatcher Service not detected',
                 'warn' => 'The Dispatcher Service was used, but not recently',
             ],
+            'CheckLegacySensorIncludes' => [
+                'warn' => 'Sensor polling includes are deprecated and support for them will be removed.',
+                'fix' => 'Move the code of these files to the pollSensors() method of the OS class, then delete them.',
+            ],
             'CheckLocking' => [
                 'fail' => 'Caching server issue: :message',
                 'ok' => 'Locks are functional',

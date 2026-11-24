@@ -30,6 +30,7 @@ use App\Models\DevicePollingMethod;
 use App\Models\Sensor;
 use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
@@ -297,6 +298,40 @@ EOT;
         $this->assertEquals(37, Sensor::where('device_id', $os->getDeviceId())->value('sensor_current'));
     }
 
+    public function testLegacyPollingIncludeAdjustsTheValues(): void
+    {
+        $dir = base_path('includes/polling/sensors/temperature');
+        $file = "$dir/linux.inc.php";
+        if (file_exists($file)) {
+            $this->markTestSkipped("$file exists");
+        }
+
+        $os = $this->makeOs([PollingMethodType::Snmp]);
+        $oid = '.1.3.6.1.4.1.2021.13.16.2.1.3.1';
+        Sensor::factory()->create(['device_id' => $os->getDeviceId(), 'poller_type' => 'snmp', 'sensor_class' => 'temperature', 'sensor_oid' => $oid, 'sensor_divisor' => 10, 'sensor_current' => 0]);
+        $this->fakeSnmp(fn (array $oids): ?RawSnmpResponse => in_array($oid, $oids) ? new RawSnmpResponse("$oid = 37", '', 0) : null);
+
+        // remove only the directories the test creates
+        $root = base_path('includes/polling/sensors');
+        $created = is_dir($root) ? (is_dir($dir) ? null : $dir) : $root;
+        File::ensureDirectoryExists($dir);
+        file_put_contents($file, '<?php if ($class == "temperature" && $device["os"] == "linux") { $sensor_value = $snmp_data[$sensor["sensor_oid"]] * 2; }');
+
+        try {
+            $datastore = Mockery::mock(WriteInterface::class);
+            $datastore->shouldReceive('write')->once()->withArgs(fn ($measurement, $fields) => $fields == ['sensor' => 7.4]);
+            (new Sensors)->poll($os, $datastore);
+        } finally {
+            unlink($file);
+            if ($created !== null) {
+                File::deleteDirectory($created);
+            }
+        }
+
+        // the include runs before the divisor
+        $this->assertEquals(7.4, Sensor::where('device_id', $os->getDeviceId())->value('sensor_current'));
+    }
+
     public function testRemovingAMethodDeletesOnlyItsSensors(): void
     {
         Sensor::factory()->create(['device_id' => $this->device->device_id, 'poller_type' => 'snmp', 'sensor_class' => 'temperature', 'sensor_index' => '1', 'sensor_type' => 'linux']);
@@ -315,11 +350,20 @@ EOT;
     private function fakeSnmpTimeout(callable $getTimesOut): void
     {
         $timeout = new RawSnmpResponse('', 'Timeout: No Response from 192.0.2.1', 1);
+        $this->fakeSnmp(fn (array $oids): ?RawSnmpResponse => $getTimesOut($oids) ? $timeout : null, $timeout);
+    }
+
+    /**
+     * The device answers the SNMP check and the gets with the response of the callback
+     *
+     * @param  callable(string[]): ?RawSnmpResponse  $get  null to answer as the SNMP check
+     */
+    private function fakeSnmp(callable $get, ?RawSnmpResponse $walk = null): void
+    {
         $backend = Mockery::mock(SnmpBackendInterface::class);
-        $backend->shouldReceive('get')->andReturnUsing(fn (string $target, array $oids): RawSnmpResponse => $getTimesOut($oids)
-            ? $timeout
-            : new RawSnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1.3.6.1.1.1.1', '', 0));
-        $backend->shouldReceive('walk')->andReturn($timeout);
+        $backend->shouldReceive('get')->andReturnUsing(fn (string $target, array $oids): RawSnmpResponse => $get($oids)
+            ?? new RawSnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1.3.6.1.1.1.1', '', 0));
+        $backend->shouldReceive('walk')->andReturn($walk ?? new RawSnmpResponse('', '', 0));
         $this->app->instance(SnmpBackendInterface::class, $backend);
         $this->app->instance(SnmpPollingMethod::class, new SnmpPollingMethod($backend));
     }
