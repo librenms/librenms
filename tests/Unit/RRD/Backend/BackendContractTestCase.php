@@ -13,6 +13,7 @@ use LibreNMS\RRD\Backend\RrdBackendInterface;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\Tests\TestCase;
+use LibreNMS\Util\Binaries;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -308,11 +309,13 @@ abstract class BackendContractTestCase extends TestCase
      */
     private function rrdtool(string ...$arguments): string
     {
-        if (! is_executable((string) LibrenmsConfig::get('rrdtool', '/usr/bin/rrdtool'))) {
+        // found the same way as the backend's RrdProcess
+        $rrdtool = app(Binaries::class)->find('rrdtool');
+        if ($rrdtool === null) {
             $this->markTestSkipped('rrdtool is needed to inspect rrd files');
         }
 
-        $process = new Process([LibrenmsConfig::get('rrdtool', '/usr/bin/rrdtool'), ...$arguments]);
+        $process = new Process([$rrdtool, ...$arguments]);
         $process->mustRun();
 
         return $process->getOutput();
