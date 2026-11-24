@@ -20,6 +20,7 @@ reviews:
   in_progress_fortune: false
   review_info: false
   review_details: false
+  review_status: false
   collapse_walkthrough: true
   enable_prompt_for_ai_agents: false
 
@@ -36,8 +37,15 @@ reviews:
     issue_assessment:
       mode: 'off'
 
+  # Each enabled finishing touch adds a checkbox to the main comment
   finishing_touches:
     unit_tests:
+      enabled: false
+    autofix:
+      enabled: false
+    fix_ci:
+      enabled: false
+    resolve_merge_conflict:
       enabled: false
 
   # Generated files, fixtures, vendored assets
