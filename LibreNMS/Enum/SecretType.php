@@ -28,12 +28,14 @@ namespace LibreNMS\Enum;
 
 use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
 use LibreNMS\Polling\Secrets\Data\ProxmoxApiSecretData;
+use LibreNMS\Polling\Secrets\Data\RedfishSecretData;
 use LibreNMS\Polling\Secrets\Data\SecretData;
 use LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData;
 use LibreNMS\Polling\Secrets\Data\SnmpV3SecretData;
 use LibreNMS\Polling\Secrets\Data\UnknownSecretData;
 use LibreNMS\Polling\Secrets\Definitions\IpmiSecretDefinition;
 use LibreNMS\Polling\Secrets\Definitions\ProxmoxApiSecretDefinition;
+use LibreNMS\Polling\Secrets\Definitions\RedfishSecretDefinition;
 use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
 use LibreNMS\Polling\Secrets\Definitions\SnmpCommunitySecretDefinition;
 use LibreNMS\Polling\Secrets\Definitions\SnmpV3SecretDefinition;
@@ -48,6 +50,7 @@ enum SecretType: string
     case SnmpV3 = 'snmp-v3';
     case Ipmi = 'ipmi';
     case ProxmoxApi = 'proxmox-api';
+    case Redfish = 'redfish';
     /** Stored types this version does not know, such as ones from a development branch */
     case Unknown = 'unknown';
 
@@ -66,6 +69,7 @@ enum SecretType: string
             self::SnmpV3 => new SnmpV3SecretDefinition,
             self::Ipmi => new IpmiSecretDefinition,
             self::ProxmoxApi => new ProxmoxApiSecretDefinition,
+            self::Redfish => new RedfishSecretDefinition,
             self::Unknown => new UnknownSecretDefinition,
         };
     }
@@ -82,6 +86,7 @@ enum SecretType: string
             self::SnmpV3 => SnmpV3SecretData::fromArray($data),
             self::Ipmi => IpmiSecretData::fromArray($data),
             self::ProxmoxApi => ProxmoxApiSecretData::fromArray($data),
+            self::Redfish => RedfishSecretData::fromArray($data),
             self::Unknown => new UnknownSecretData($data),
         };
     }

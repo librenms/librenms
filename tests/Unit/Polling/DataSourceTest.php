@@ -17,6 +17,7 @@ use LibreNMS\Interfaces\Polling\SensorsPolling;
 use LibreNMS\Interfaces\Polling\VminfoPolling;
 use LibreNMS\Polling\Method\DataSources\IpmiDataSource;
 use LibreNMS\Polling\Method\DataSources\ProxmoxApiDataSource;
+use LibreNMS\Polling\Method\DataSources\RedfishDataSource;
 use LibreNMS\Polling\Method\DataSources\UnixAgentDataSource;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\Method\ProbeResult;
@@ -32,6 +33,7 @@ final class DataSourceTest extends TestCase
         $expected = [
             PollingMethodType::Ipmi->value => IpmiDataSource::class,
             PollingMethodType::ProxmoxApi->value => ProxmoxApiDataSource::class,
+            PollingMethodType::Redfish->value => RedfishDataSource::class,
             PollingMethodType::UnixAgent->value => UnixAgentDataSource::class,
         ];
 
@@ -50,8 +52,8 @@ final class DataSourceTest extends TestCase
         $this->assertSame([PollingMethodType::ProxmoxApi], $registry->providing(VminfoDiscovery::class));
         $this->assertSame([PollingMethodType::ProxmoxApi], $registry->providing(VminfoPolling::class));
         $this->assertSame([PollingMethodType::UnixAgent], $registry->providing(MempoolsDiscovery::class));
-        $this->assertSame([PollingMethodType::Ipmi, PollingMethodType::UnixAgent], $registry->providing(SensorsDiscovery::class));
-        $this->assertSame([PollingMethodType::Ipmi, PollingMethodType::UnixAgent], $registry->providing(SensorsPolling::class));
+        $this->assertSame([PollingMethodType::Ipmi, PollingMethodType::Redfish, PollingMethodType::UnixAgent], $registry->providing(SensorsDiscovery::class));
+        $this->assertSame([PollingMethodType::Ipmi, PollingMethodType::Redfish, PollingMethodType::UnixAgent], $registry->providing(SensorsPolling::class));
     }
 
     public function testDataSourcesOfAvailableMethods(): void

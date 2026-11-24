@@ -268,7 +268,7 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
      */
     public function metricIdentity(string $measurement): MetricIdentity
     {
-        $byDescr = $this->poller_type == 'ipmi' || LibrenmsConfig::getOsSetting($this->device?->os, 'sensor_descr');
+        $byDescr = in_array($this->poller_type, ['ipmi', 'redfish'], true) || LibrenmsConfig::getOsSetting($this->device?->os, 'sensor_descr');
 
         return new MetricIdentity($measurement, [
             'hostname' => (string) $this->device?->hostname,
@@ -280,7 +280,7 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
 
     public function labels(): array
     {
-        if ($this->poller_type == 'ipmi') {
+        if (in_array($this->poller_type, ['ipmi', 'redfish'], true)) {
             return [
                 'class' => $this->sensor_class,
                 'type' => $this->sensor_type,
