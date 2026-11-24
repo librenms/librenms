@@ -7,7 +7,6 @@ use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\SeriesRole;
 use App\Data\Graphing\SeriesStyle;
 use App\Data\Graphing\Threshold;
-use App\Data\Graphing\TrafficOptions;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Util\Number;
 
@@ -46,15 +45,8 @@ class BitsGraph extends PortGraph
         }
         $shown = $this->showsPortSpeed();
 
-        $percentile = (float) LibrenmsConfig::get('percentile_value', 95);
-
-        return new GraphOptions(
-            legendTitle: 'bps',
-            traffic: new TrafficOptions(
-                highestPercentile: LibrenmsConfig::get('rrdgraph_real_percentile') ? $percentile : null,
-                speedZoom: $shown && ($in || $out),
-            ),
-            percentiles: [$percentile],
+        return GraphOptions::forTraffic(
+            speedZoom: $shown && ($in || $out),
             thresholds: $this->portSpeeds($in, $out, $shown),
         );
     }

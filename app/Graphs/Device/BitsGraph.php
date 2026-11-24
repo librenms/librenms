@@ -7,7 +7,6 @@ use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\SeriesRole;
 use App\Data\Graphing\SeriesStyle;
 use App\Data\Graphing\SeriesSum;
-use App\Data\Graphing\TrafficOptions;
 use App\Facades\LibrenmsConfig;
 use App\Models\Port;
 
@@ -58,16 +57,7 @@ class BitsGraph extends DeviceGraph
 
     protected function options(): GraphOptions
     {
-        $percentile = (float) LibrenmsConfig::get('percentile_value', 95);
-
-        return new GraphOptions(
-            legendTitle: 'bps',
-            traffic: new TrafficOptions(
-                highestPercentile: LibrenmsConfig::get('rrdgraph_real_percentile') ? $percentile : null,
-                series: ['in', 'out'],
-            ),
-            percentiles: [$percentile],
-        );
+        return GraphOptions::forTraffic(series: ['in', 'out']);
     }
 
     /**
