@@ -78,6 +78,6 @@ trait ServerHardware
 
     private function supermicroBoard(string $name): string
     {
-        return trim((string) SnmpQuery::cache()->mibDir('supermicro')->get("SUPERMICRO-SD5-MIB::$name.1")->value());
+        return trim((string) SnmpQuery::mibDir('supermicro')->get("SUPERMICRO-SD5-MIB::$name.1")->value());
     }
 }
