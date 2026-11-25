@@ -15,6 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         // channels: __DIR__.'/../routes/channels.php',
         health: '/up',
+        then: function (): void {
+            Illuminate\Support\Facades\Route::prefix('api/v1')
+                ->name('api.v1.')
+                ->middleware('api.v1')
+                ->group(base_path('routes/api-v1.php'));
+        },
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->validateCsrfTokens(except: [
@@ -47,6 +53,13 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->replace(\Illuminate\Http\Middleware\TrustProxies::class, \App\Http\Middleware\TrustProxies::class);
         $middleware->replace(\Illuminate\Http\Middleware\HandleCors::class, \App\Http\Middleware\HandleCors::class);
 
+        $middleware->group('api.v1', [
+            \App\Http\Middleware\FormatJsonApiError::class, // first, so it formats the errors of the others
+            \App\Http\Middleware\EnsureApiV1Enabled::class,
+            \App\Http\Middleware\EnforceJsonApi::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ]);
+
         $middleware->alias([
             'deny-demo' => \App\Http\Middleware\DenyDemoUser::class,
             'saved-filter' => \App\Http\Middleware\MergeSavedFilter::class,
@@ -75,10 +88,10 @@ return Application::configure(basePath: dirname(__DIR__))
         );
         new \App\Exceptions\ErrorReporting($exceptions);
 
-        $exceptions->map(
-            \Binaryk\LaravelRestify\Exceptions\RepositoryNotFoundException::class,
-            fn (\Binaryk\LaravelRestify\Exceptions\RepositoryNotFoundException $e) => new \Symfony\Component\HttpKernel\Exception\NotFoundHttpException($e->getMessage(), $e),
-        );
+        // unmatched v1 routes, such as unknown endpoints, never reach the api.v1 middleware
+        $exceptions->respond(fn (Symfony\Component\HttpFoundation\Response $response, Throwable $e, Request $request) => $request->route() === null && $request->is('api/v1', 'api/v1/*')
+            ? (new \App\Http\Middleware\FormatJsonApiError)->handle($request, fn () => $response)
+            : $response);
     })
     ->booting(function (Application $app): void {
         // Resolve the exception handler early so ErrorReporting installs its error handler
