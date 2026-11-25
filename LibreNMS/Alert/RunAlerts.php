@@ -99,7 +99,6 @@ class RunAlerts
     public function describeAlert($alert): ?AlertData
     {
         $obj = [];
-        $i = 0;
         $device = DeviceCache::get($alert['device_id']);
 
         $obj['hostname'] = $device->hostname;
@@ -159,19 +158,7 @@ class RunAlerts
         }
 
         if ($alert['state'] >= AlertState::ACTIVE) {
-            foreach ($extra['rule'] ?? [] as $incident) {
-                if (! is_array($incident)) {
-                    continue;
-                }
-                $i++;
-                $obj['faults'][$i] = $incident;
-                $obj['faults'][$i]['string'] = null;
-                foreach ($incident as $k => $v) {
-                    if (! empty($v) && $k != 'device_id' && (stristr((string) $k, 'id') || stristr((string) $k, 'desc') || stristr((string) $k, 'msg')) && substr_count((string) $k, '_') <= 1) {
-                        $obj['faults'][$i]['string'] .= $k . ' = ' . $v . '; ';
-                    }
-                }
-            }
+            $obj['faults'] = $this->describeFaults($extra['rule'] ?? []);
             $obj['elapsed'] = Time::formatInterval(time() - strtotime((string) $alert['time_logged']), true) ?: 'none';
             if (! empty($extra['diff'])) {
                 $obj['diff'] = $extra['diff'];
@@ -220,16 +207,7 @@ class RunAlerts
 
             $obj['elapsed'] = Time::formatInterval(strtotime((string) $alert['time_logged']) - strtotime((string) $previousLog->time_logged), true) ?: 'none';
             $obj['id'] = $previousLog->id;
-            foreach ($extra['rule'] ?? [] as $incident) {
-                $i++;
-                $obj['faults'][$i] = $incident;
-                $obj['faults'][$i]['string'] = '';
-                foreach ($incident as $k => $v) {
-                    if (! empty($v) && $k != 'device_id' && (stristr((string) $k, 'id') || stristr((string) $k, 'desc') || stristr((string) $k, 'msg')) && substr_count((string) $k, '_') <= 1) {
-                        $obj['faults'][$i]['string'] .= $k . ' => ' . $v . '; ';
-                    }
-                }
-            }
+            $obj['faults'] = $this->describeFaults($extra['rule'] ?? []);
         } else {
             return null;
         }//end if
@@ -254,6 +232,35 @@ class RunAlerts
         }
 
         return new AlertData($obj);
+    }
+
+    /**
+     * Number the fault rows from 1 and add a short 'string' summary of their id, desc and msg columns.
+     *
+     * @param  array<mixed>  $rows
+     * @return array<int, array<string, mixed>>
+     */
+    private function describeFaults(array $rows): array
+    {
+        $faults = [];
+        $i = 0;
+        foreach ($rows as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $string = '';
+            foreach ($row as $k => $v) {
+                $k = (string) $k;
+                if (! empty($v) && $k !== 'device_id' && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg')) && substr_count($k, '_') <= 1) {
+                    $string .= $k . ' = ' . $v . '; ';
+                }
+            }
+
+            $faults[++$i] = [...$row, 'string' => $string];
+        }
+
+        return $faults;
     }
 
     public function clearStaleAlerts()
@@ -777,8 +784,6 @@ class RunAlerts
      */
     public function extTransports(AlertData $alert, ?array $transportOverride = null): void
     {
-        $type = Template::forRule($alert->rule_id);
-
         // Per-segment scheduling supplies an explicit transport list; otherwise use the default lookup.
         $transport_maps = $transportOverride ?? AlertUtil::getAlertTransports(
             $alert->alert_id,
@@ -807,18 +812,18 @@ class RunAlerts
             ];
         }
 
+        $template = Template::forRule($alert->rule_id);
+
         foreach ($transport_maps as $item) {
             $class = Transport::getClass($item['transport_type']);
             if (class_exists($class)) {
-                //FIXME remove Deprecated transport
-                $transport_title = "Transport {$item['transport_type']}";
-                c_echo(" :: $transport_title => ");
+                c_echo(" :: Transport {$item['transport_type']} => ");
                 try {
-                    $transportAlert = $alert->forTransport($item['transport_type'], $item['transport_name'], $type);
+                    $transportAlert = $alert->forTransport($item['transport_type'], $item['transport_name'], $template);
                     $instance = new $class(AlertTransport::find($item['transport_id']));
                     $tmp = $instance instanceof AlertTransportInterface
                         ? $instance->deliver($transportAlert)
-                        : $instance->deliverAlert($transportAlert->toTransportPayload($type->template));
+                        : $instance->deliverAlert($transportAlert->toTransportPayload($template->template));
                     $this->alertLog($tmp, $alert, $item['transport_type']);
                 } catch (AlertTransportDeliveryException $e) {
                     Log::warning("Alert transport '{$item['transport_type']}' delivery failed for device {$alert->device_id}: {$e->getMessage()}", ['exception' => $e]);

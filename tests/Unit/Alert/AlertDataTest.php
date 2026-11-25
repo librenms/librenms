@@ -299,5 +299,25 @@ final class AlertDataTest extends TestCase
         $this->assertStringContainsString('Alert for device core-router - Down Rule', $body);
         $this->assertStringContainsString('Severity: critical', $body);
         $this->assertStringContainsString('Unique-ID: 123', $body);
+        $this->assertStringNotContainsString('Warning!', $body);
+    }
+
+    public function testMissingTemplateUsesDefaultBodyWithoutWarning(): void
+    {
+        $alert = new AlertData(['display' => 'core-router', 'name' => 'Down Rule', 'state' => AlertState::ACTIVE])
+            ->forTransport(null, null, new Template(null));
+
+        $this->assertStringContainsString('Alert for device core-router - Down Rule', (string) $alert->msg);
+        $this->assertStringNotContainsString('Warning!', (string) $alert->msg);
+    }
+
+    public function testBrokenTemplateFallsBackWithWarning(): void
+    {
+        $template = new Template(new AlertTemplate(['name' => 'Broken', 'template' => '@if(true)']));
+        $alert = new AlertData(['display' => 'core-router', 'name' => 'Down Rule', 'state' => AlertState::ACTIVE])
+            ->forTransport(null, null, $template);
+
+        $this->assertStringContainsString('Alert for device core-router - Down Rule', (string) $alert->msg);
+        $this->assertStringContainsString('Warning! Fallback template used due to error in template Broken', (string) $alert->msg);
     }
 }

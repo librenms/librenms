@@ -50,53 +50,18 @@ class Template
 
     public function getTitle(AlertData $alert): string
     {
-        return $this->bladeTitle($alert);
-    }
-
-    public function getBody(AlertData $alert): string
-    {
-        return $this->bladeBody($alert);
-    }
-
-    /**
-     * Parse Blade body
-     */
-    public function bladeBody(AlertData $alert): string
-    {
-        $templateBody = $this->template?->template;
-        $templateName = $this->template->name ?? '';
-        $data = ['alert' => $alert];
-
-        if (empty($templateBody)) {
-            return Blade::render($this->getDefaultTemplate($templateName, 'No template defined'), $data);
-        }
-
-        try {
-            return Blade::render($templateBody, $data);
-        } catch (\Exception $e) {
-            return Blade::render($this->getDefaultTemplate($templateName, $e->getMessage()), $data);
-        }
-    }
-
-    /**
-     * Parse Blade title
-     */
-    public function bladeTitle(AlertData $alert): string
-    {
         $isRecovered = $alert->state == AlertState::RECOVERED;
 
-        $defaultTitle = $isRecovered
+        $title = $isRecovered
             ? 'Device ' . $alert->display . ' recovered from ' . ($alert->name ?: $alert->rule)
             : 'Alert for device ' . $alert->display . ' - ' . $alert->name;
 
         $templateTitle = $isRecovered ? $this->template?->title_rec : $this->template?->title;
-
-        $title = $defaultTitle;
         if (! empty($templateTitle)) {
             try {
                 $title = Blade::render($templateTitle, ['alert' => $alert]);
             } catch (\Throwable) {
-                // fall back to the default title
+                // keep the default title
             }
         }
 
@@ -113,19 +78,44 @@ class Template
         return $title;
     }
 
-    public function getDefaultTemplate(string $template_name, string $error): string
+    public function getBody(AlertData $alert): string
     {
-        return '{{ $alert->title }}' . PHP_EOL .
+        $data = ['alert' => $alert];
+        $templateBody = $this->template?->template;
+
+        // No template (or an empty one) is not an error: use the built-in template without a warning.
+        if (empty($templateBody)) {
+            return Blade::render($this->defaultTemplate(), $data);
+        }
+
+        try {
+            return Blade::render($templateBody, $data);
+        } catch (\Exception $e) {
+            return Blade::render($this->defaultTemplate($this->template->name ?? '', $e->getMessage()), $data);
+        }
+    }
+
+    /**
+     * The built-in body template. A warning line is added when it replaces a template that failed.
+     */
+    private function defaultTemplate(string $templateName = '', ?string $error = null): string
+    {
+        $template = '{{ $alert->title }}' . PHP_EOL .
             'Severity: {{ $alert->severity }}' . PHP_EOL .
             '@if ($alert->state == ' . AlertState::RECOVERED . ')Time elapsed: {{ $alert->elapsed }} @endif ' . PHP_EOL .
             'Timestamp: {{ $alert->timestamp }}' . PHP_EOL .
             'Unique-ID: {{ $alert->uid }}' . PHP_EOL .
             'Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif ' . PHP_EOL .
-            '@if ($alert->faults ?? [])Faults:' . PHP_EOL .
+            '@if ($alert->faults)Faults:' . PHP_EOL .
             '@foreach ($alert->faults as $key => $value)' . PHP_EOL .
             '  #{{ $key }}: {{ $value[\'string\'] }} @endforeach' . PHP_EOL .
             '@endif' . PHP_EOL .
-            'Alert sent to: @foreach ($alert->contacts ?? [] as $key => $value) {{ $value }} <{{ $key }}> @endforeach' . PHP_EOL .
-            'Warning! Fallback template used due to error in template ' . htmlspecialchars($template_name) . ': ' . htmlspecialchars($error) . PHP_EOL;
+            'Alert sent to: @foreach ($alert->contacts ?? [] as $key => $value) {{ $value }} <{{ $key }}> @endforeach' . PHP_EOL;
+
+        if ($error !== null) {
+            $template .= 'Warning! Fallback template used due to error in template ' . htmlspecialchars($templateName) . ': ' . htmlspecialchars($error) . PHP_EOL;
+        }
+
+        return $template;
     }
 }
