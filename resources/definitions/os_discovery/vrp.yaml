@@ -251,6 +251,14 @@ modules:
                             oid: HUAWEI-WAN-MIB::hw3GIMEI
                             op: '='
                             value: ''
+                # Optical Rx/Tx power. Three definitions per direction share the same index, so
+                # exactly one of them must match a port:
+                #   1. per-lane power (0.01 dBm), used whenever the device has the lane column;
+                #   2. total power in uW, older devices without the lane column;
+                #   3. total power in 0.01 dBm, older devices without the lane column.
+                # The 'exists' rule on the lane column keeps 2 and 3 from overwriting 1. Thresholds
+                # are always 0.01 dBm, so 2 has none: uw_to_dbm would also be applied to them.
+                # BiasCurrent <= 0 means an empty cage or a laser that is off.
                 -
                     oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
                     value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneRxPower
@@ -282,13 +290,8 @@ modules:
                     group: transceiver
                     index: 'rx-{{ $index }}'
                     user_func: 'uw_to_dbm'
-                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxLowWarnThreshold
-                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxHighWarnThreshold
+                    skip_value_lt: 1
                     skip_values:
-                        -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxPower
-                            op: '<='
-                            value: 0
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
                             op: '='
@@ -307,10 +310,13 @@ modules:
                     group: transceiver
                     index: 'rx-{{ $index }}'
                     divisor: 100
+                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxLowWarnThreshold
+                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxHighWarnThreshold
+                    skip_value_gt: 0
                     skip_values:
                         -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxPower
-                            op: '>'
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                            op: '<='
                             value: 0
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
@@ -320,10 +326,6 @@ modules:
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneRxPower
                             op: 'exists'
                             value: true
-                        -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
-                            op: '<='
-                            value: 0
                 -
                     oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
                     value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneTxPower
@@ -355,11 +357,8 @@ modules:
                     group: transceiver
                     index: 'tx-{{ $index }}'
                     user_func: 'uw_to_dbm'
+                    skip_value_lt: 1
                     skip_values:
-                        -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxPower
-                            op: '<='
-                            value: 0
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
                             op: '='
@@ -378,10 +377,13 @@ modules:
                     group: transceiver
                     index: 'tx-{{ $index }}'
                     divisor: 100
+                    low_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxLowWarnThreshold
+                    high_limit: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxHighWarnThreshold
+                    skip_value_gt: 0
                     skip_values:
                         -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxPower
-                            op: '>'
+                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
+                            op: '<='
                             value: 0
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityAdminStatus
@@ -391,10 +393,6 @@ modules:
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneTxPower
                             op: 'exists'
                             value: true
-                        -
-                            oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalBiasCurrent
-                            op: '<='
-                            value: 0
         voltage:
             data:
                 -
