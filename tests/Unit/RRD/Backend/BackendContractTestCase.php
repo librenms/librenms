@@ -3,7 +3,9 @@
 namespace LibreNMS\Tests\Unit\RRD\Backend;
 
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Exceptions\RrdCachedConnectionException;
 use LibreNMS\Exceptions\RrdException;
@@ -101,6 +103,37 @@ abstract class BackendContractTestCase extends TestCase
 
         $this->assertTrue($store->checkRrdExists(RrdPath::make('host1', 'test.rrd')));
         $this->assertFalse($store->checkRrdExists(RrdPath::make('host1', 'missing.rrd')));
+    }
+
+    /**
+     * #21457: with a remote rrdcached, the first write for a new port creates the file and then updates it
+     */
+    public function testStoreCreatesMissingRemoteFileOnFirstWrite(): void
+    {
+        $this->start('tcp');
+        LibrenmsConfig::set('rrd_dir', "$this->directory/no-local-rrd"); // not the daemon's base dir, like a separate container
+        $this->app->instance(RrdBackendInterface::class, $this->makeBackend(LibrenmsConfig::get('rrdcached')));
+        $logged = [];
+        Log::spy()->shouldReceive('debug', 'info', 'warning', 'error')->andReturnUsing(function (string $message) use (&$logged): void {
+            $logged[] = $message;
+        });
+
+        (new Rrd)->write('ports', ['a' => 5, 'b' => 1], [], [
+            'device' => new Device(['hostname' => 'host1']),
+            'rrd_name' => 'port-id1',
+            'rrd_def' => $this->definition(),
+        ]);
+
+        $commands = [];
+        foreach ($logged as $message) {
+            if (preg_match('/RRD\[(?:%g)?(\w+) host1\/port-id1\.rrd/', $message, $matches)) {
+                $commands[] = $matches[1];
+            }
+        }
+        $this->assertSame(['update', 'create', 'update'], $commands, implode("\n", $logged));
+        $this->assertEmpty(array_filter($logged, fn ($message) => str_contains($message, 'RRD Error') || str_contains($message, 'stat failed')), implode("\n", $logged));
+        $this->assertFileExists("$this->directory/rrd/host1/port-id1.rrd");
+        $this->assertDirectoryDoesNotExist("$this->directory/no-local-rrd");
     }
 
     public function testUnreachableDaemonDoesNotReportFileMissing(): void

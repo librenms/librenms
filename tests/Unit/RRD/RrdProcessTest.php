@@ -140,6 +140,34 @@ class RrdProcessTest extends TestCase
         $this->assertInstanceOf(RrdCachedConnectionException::class, RrdException::parse($error));
     }
 
+    /**
+     * Replies captured from rrdcached 1.7.2 over tcp
+     *
+     * @return array<string, array{string, class-string<RrdException>}>
+     */
+    public static function rrdcachedReplies(): array
+    {
+        return [
+            'update missing file' => ['ERROR: rrdcached@127.0.0.1:42217: No such file: /var/lib/rrdcached/db/host1/missing.rrd', RrdNotFoundException::class],
+            'last missing file' => ["ERROR: rrdcached@127.0.0.1:42217: RRD Error: opening '/var/lib/rrdcached/db/host1/missing.rrd': No such file or directory", RrdNotFoundException::class],
+            'update permission denied' => ['ERROR: rrdcached@127.0.0.1:42217: stat failed with error 13.', RrdPermissionException::class],
+            'update operation not permitted' => ['ERROR: rrdcached@127.0.0.1:42217: stat failed with error 1.', RrdPermissionException::class],
+            'last permission denied' => ["ERROR: rrdcached@127.0.0.1:42217: RRD Error: opening '/var/lib/rrdcached/db/locked/x.rrd': Permission denied", RrdPermissionException::class],
+            // errno lost while rrdcached logged, could be a missing file or a permission error
+            'update stat error 0' => ['ERROR: rrdcached@rrdcached:42217: stat failed with error 0.', RrdUnknownException::class],
+            'update stat other errno' => ['ERROR: rrdcached@rrdcached:42217: stat failed with error 5.', RrdUnknownException::class],
+        ];
+    }
+
+    /**
+     * @param  class-string<RrdException>  $expected
+     */
+    #[DataProvider('rrdcachedReplies')]
+    public function testClassifiesRrdcachedReplies(string $error, string $expected): void
+    {
+        $this->assertInstanceOf($expected, RrdException::parse($error));
+    }
+
     public function testRestartsInRrdDirOnceItExists(): void
     {
         $rrdDir = sys_get_temp_dir() . '/librenms-rrd-process-' . uniqid();

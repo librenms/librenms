@@ -93,6 +93,52 @@ final class RrdtoolTest extends TestCase
     }
 
     /**
+     * Restored from #19842 for the backend split: rrdtool forwards to rrdcached through RRDCACHED_ADDRESS,
+     * so commands keep the same relative paths (no rrd_dir prefix, no --daemon) whatever the rrdtool version
+     */
+    public function testBuildCommandRemote(): void
+    {
+        LibrenmsConfig::set('rrdcached', 'server:42217');
+        $rrd = RrdPath::make('host', 'f.rrd');
+
+        foreach (['1.4.2', '1.6.0'] as $version) {
+            $this->commands = [];
+            $backend = new Rrdtool('server:42217', $this->process, $version);
+            $backend->create($rrd, $this->definition());
+            $backend->tune($rrd, ['a' => ['max' => 1]]);
+            $backend->update($rrd, [1]);
+
+            $this->assertSame([
+                'create host/f.rrd --step 300 DS:a:GAUGE:600:U:U' . ($version === '1.6.0' ? ' -O' : ''),
+                'tune host/f.rrd --maximum a:1',
+                'update host/f.rrd N:1',
+            ], $this->commands, "rrdtool $version");
+            $this->assertStringNotContainsString('/opt/librenms/rrd', implode("\n", $this->commands));
+        }
+    }
+
+    /**
+     * @return array<string, array{?string, bool}>
+     */
+    public static function rrdcachedAddresses(): array
+    {
+        return [
+            'none' => [null, false],
+            'empty' => ['', false],
+            'host and port' => ['server:42217', true],
+            'ip and port' => ['127.0.0.1:42217', true],
+            'unix prefix' => ['unix:/run/rrdcached.sock', false],
+            'bare socket path' => ['/run/rrdcached.sock', false],
+        ];
+    }
+
+    #[DataProvider('rrdcachedAddresses')]
+    public function testRemoteDetection(?string $rrdcached, bool $remote): void
+    {
+        $this->assertSame($remote, (new Rrdtool($rrdcached, $this->process))->remote());
+    }
+
+    /**
      * @return array<string, array{string, class-string<RrdException>}>
      */
     public static function remoteLastErrors(): array

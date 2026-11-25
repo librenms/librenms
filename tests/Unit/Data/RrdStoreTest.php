@@ -80,6 +80,25 @@ final class RrdStoreTest extends TestCase
         (new Rrd)->write('test', ['a' => 5], [], ['device' => $this->device, 'rrd_def' => $definition]);
     }
 
+    public function testRemotePermissionErrorIsStoreErrorWithoutCreatingFile(): void
+    {
+        $eventlog = Mockery::mock(Eventlog::class);
+        $eventlog->shouldReceive('_log')->once();
+        $this->app->instance(Eventlog::class, $eventlog);
+
+        $this->backend->shouldReceive('update')->times(3)
+            ->andThrow(RrdException::parse('ERROR: rrdcached@rrdcached:42217: stat failed with error 13.'));
+        $this->backend->shouldReceive('remote')->andReturnTrue();
+        $this->backend->shouldReceive('last')->never();
+        $this->backend->shouldReceive('create')->never();
+
+        $rrd = new Rrd;
+        $meta = ['device' => $this->device, 'rrd_def' => RrdDefinition::make()->addDataset('a', 'GAUGE')];
+        foreach (range(1, 4) as $ignored) {
+            $rrd->write('test', ['a' => 5], [], $meta); // counted as store errors, the 4th write is skipped
+        }
+    }
+
     /** @return array<string, array{bool}> */
     public static function remoteProbeStages(): array
     {

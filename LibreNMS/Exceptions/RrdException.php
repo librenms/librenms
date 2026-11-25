@@ -79,6 +79,12 @@ abstract class RrdException extends \Exception
             return new RrdPermissionException($error);
         }
 
+        // rrdcached replies to update with the stat errno: EPERM (1) or EACCES (13).
+        // Error 0 is ambiguous (rrdcached can lose errno while logging), the store probes the file instead.
+        if (preg_match('/stat failed with error (1|13)\.?$/', $error)) {
+            return new RrdPermissionException($error);
+        }
+
         if (str_contains($error, 'reached EOF while loading header')) {
             return new RrdCorruptionException($error);
         }
