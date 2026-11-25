@@ -47,7 +47,7 @@ final class MtuPollingMethod extends PollingMethod
     }
 
     /**
-     * @return array{ip_version: string, packet_size: int}
+     * @return array{ip_version: string, packet_size: int, fragmentation: string}
      */
     public function defaults(?Device $device = null): array
     {
