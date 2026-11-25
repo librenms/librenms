@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\HeaderUtils;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -49,7 +50,7 @@ class EnforceJsonApi
 
     private function isSupported(string $contentType): bool
     {
-        [$type, $parameters] = $this->parseMediaType($contentType);
+        [$type, $parameters] = $this->parseMediaType(HeaderUtils::split($contentType, ';='));
 
         return $type === self::CONTENT_TYPE && $this->hasSupportedParameters($parameters);
     }
@@ -61,7 +62,7 @@ class EnforceJsonApi
     private function isAcceptable(string $accept): bool
     {
         $jsonApiRanges = array_filter(
-            array_map($this->parseMediaType(...), explode(',', $accept)),
+            array_map($this->parseMediaType(...), HeaderUtils::split($accept, ',;=')),
             fn (array $range): bool => $range[0] === self::CONTENT_TYPE,
         );
 
@@ -88,17 +89,18 @@ class EnforceJsonApi
     }
 
     /**
+     * Quoted values may contain delimiters, such as a profile URI with a ; or a comma.
+     *
+     * @param  array<array<int, string>>  $parts  a media type split by HeaderUtils::split() on ;=
      * @return array{0: string, 1: array<string, string>}
      */
-    private function parseMediaType(string $mediaType): array
+    private function parseMediaType(array $parts): array
     {
-        $parts = explode(';', $mediaType);
-        $type = strtolower(trim(array_shift($parts)));
+        $type = strtolower(array_shift($parts)[0] ?? '');
 
         $parameters = [];
         foreach ($parts as $part) {
-            [$name, $value] = array_pad(explode('=', $part, 2), 2, '');
-            $parameters[strtolower(trim($name))] = trim($value, " \t\"");
+            $parameters[strtolower($part[0])] = $part[1] ?? '';
         }
 
         return [$type, $parameters];

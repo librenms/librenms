@@ -111,6 +111,10 @@ final class DeviceApiTest extends DBTestCase
         $this->assertSame([(string) $b->device_id, (string) $a->device_id], $ids('filter[os][eq]=apifilteros&filter[isEnabled]=true&sort=-hostname'));
         $this->assertCount(1, $ids('filter[os]=apifilteros&filter[hostname][starts_with]=c.'));
         $this->assertCount(3, $ids('filter[os]=apifilteros&filter[isEnabled][in]=true,false'));
+        $this->assertCount(1, $ids('filter[os]=apifilteros&filter[isEnabled][neq]=true'));
+
+        // an ordering of true and false has no meaning
+        $this->getJson('/api/v1/devices?filter[isEnabled][gt]=false')->assertStatus(400);
     }
 
     public function testSparseFieldsets(): void
@@ -121,6 +125,21 @@ final class DeviceApiTest extends DBTestCase
         $attributes = $this->getJson("/api/v1/devices/$device->device_id?fields[devices]=hostname,os")->assertOk()->json('data.attributes');
 
         $this->assertSame(['hostname', 'os'], array_keys($attributes));
+
+        // fieldsets select relationships too
+        $this->getJson("/api/v1/devices/$device->device_id?fields[devices]=hostname")
+            ->assertOk()
+            ->assertJsonMissingPath('data.relationships');
+        $this->getJson("/api/v1/devices/$device->device_id?fields[devices]=hostname,ports")
+            ->assertOk()
+            ->assertJsonPath('data.relationships.ports.links.related', route('api.v1.devices.ports', $device->device_id));
+
+        // an empty fieldset selects no fields
+        $this->getJson("/api/v1/devices/$device->device_id?fields[devices]=")
+            ->assertOk()
+            ->assertJsonPath('data.id', (string) $device->device_id)
+            ->assertJsonMissingPath('data.attributes')
+            ->assertJsonMissingPath('data.relationships');
     }
 
     public function testPortsRelationshipListsTheDevicePorts(): void

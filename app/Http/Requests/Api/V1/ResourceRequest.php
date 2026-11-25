@@ -40,7 +40,7 @@ class ResourceRequest extends FormRequest
         return [
             'include' => ['sometimes', 'string'],
             'fields' => ['sometimes', 'array'],
-            'fields.*' => ['string'],
+            'fields.*' => ['nullable', 'string'],
             'sort' => ['sometimes', 'string'],
             'filter' => ['sometimes', 'array'],
             'page' => ['sometimes', 'array:number,size'],
@@ -77,7 +77,7 @@ class ResourceRequest extends FormRequest
      *
      * @param  Builder<TModel>  $query  a query for a model using Filterable
      * @param  array<string, string>  $sorts  sort name => column
-     * @param  array<string, string|array{0: string, 1: Closure(mixed): mixed}>  $filters  filter name => Filterable field, optionally with a value converter
+     * @param  array<string, string|array{0: string, 1: Closure(mixed, string): mixed}>  $filters  filter name => Filterable field, optionally with a value converter
      * @return LengthAwarePaginator<int, TModel>
      */
     public function paginate(Builder $query, array $sorts = [], array $filters = []): LengthAwarePaginator
@@ -115,9 +115,10 @@ class ResourceRequest extends FormRequest
 
     /**
      * Converts true or false filter values to the stored 1 or 0.
+     * Only equality and set operators, an ordering of true and false has no meaning.
      *
      * @param  bool  $inverted  the column stores the opposite, such as disabled for isEnabled
-     * @return Closure(mixed): (int|list<int>|null)
+     * @return Closure(mixed, string): (int|list<int>|null)
      */
     public static function booleanFilter(bool $inverted = false): Closure
     {
@@ -127,7 +128,11 @@ class ResourceRequest extends FormRequest
             return $bool === null ? null : (int) ($bool !== $inverted);
         };
 
-        return function (mixed $value) use ($convert): int|array|null {
+        return function (mixed $value, string $operator) use ($convert): int|array|null {
+            if (! in_array($operator, ['eq', 'neq', 'in', 'not_in'], true)) {
+                return null;
+            }
+
             if (! is_array($value)) {
                 return $convert($value);
             }
@@ -140,8 +145,9 @@ class ResourceRequest extends FormRequest
 
     /**
      * Converted values are no longer strings, so split set operator lists first.
+     * A null conversion means the value or the operator is not supported.
      *
-     * @param  Closure(mixed): mixed  $convert
+     * @param  Closure(mixed, string): mixed  $convert
      */
     private function convertFilterValue(string $name, string $operator, mixed $value, Closure $convert): mixed
     {
@@ -149,7 +155,7 @@ class ResourceRequest extends FormRequest
             $value = explode(',', $value);
         }
 
-        return $convert($value) ?? $this->badParameter("filter.$name", "Invalid value for filter: $name");
+        return $convert($value, $operator) ?? $this->badParameter("filter.$name", "Invalid $operator filter: $name");
     }
 
     /**

@@ -178,6 +178,7 @@ final class ApiV1Test extends DBTestCase
         $acceptable = [
             'application/vnd.api+json',
             'application/vnd.api+json; profile="https://example.com/profile"',
+            'application/vnd.api+json; profile="https://example.com/p;v=1,2 https://example.com/other"',
             'application/vnd.api+json;q=0.9',
             'application/vnd.api+json; ext="https://example.com/ext", application/vnd.api+json',
             'application/json',

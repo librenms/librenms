@@ -6,6 +6,7 @@ use App\Http\Middleware\EnforceJsonApi;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\JsonApi\JsonApiRequest;
 use Illuminate\Http\Resources\JsonApi\JsonApiResource as BaseJsonApiResource;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 
 /**
@@ -36,6 +37,12 @@ abstract class JsonApiResource extends BaseJsonApiResource
 
         foreach ($this->toRelationshipLinks($request) as $name => $url) {
             $relationships[$name] = ['links' => ['related' => $url], ...$relationships[$name] ?? []];
+        }
+
+        // fieldsets select relationships too, Laravel only applies them to attributes
+        $type = $this->resolveResourceType($request);
+        if ($this->usesRequestQueryString && $request->hasSparseFieldset($type)) {
+            return Arr::only($relationships, $request->sparseFields($type));
         }
 
         return $relationships;
