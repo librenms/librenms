@@ -63,7 +63,8 @@ result with `php artisan route:list --path=api/v1`.
    A port is an interface, so `ifOperStatus` on `/ports` → `operationalStatus`.
    Keep the prefix when the bare name is reserved: a device's `type` is `deviceType`,
    a port's `ifType` is `interfaceType`.
-   Well known identifiers keep their name: `ifIndex`.
+   Well known SNMP identifiers keep their exact name: `ifIndex`, `sysObjectID`.
+   Descriptive values still expand: `sysDescr` → `systemDescription`.
 4. **`id` and `type` are reserved.** `id` is the primary key of the model,
    `type` is the endpoint name (`devices`).
 5. **Plural** names for lists, singular otherwise.

@@ -167,7 +167,7 @@ final class DeviceApiTest extends DBTestCase
             'systemName',
             'systemDescription',
             'systemContact',
-            'systemObjectId',
+            'sysObjectID',
             'os',
             'osVersion',
             'osFeatures',

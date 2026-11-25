@@ -27,7 +27,7 @@ class DeviceResource extends JsonApiResource
             'systemName' => $this->sysName,
             'systemDescription' => $this->sysDescr,
             'systemContact' => $this->sysContact,
-            'systemObjectId' => $this->sysObjectID,
+            'sysObjectID' => $this->sysObjectID,
             'os' => $this->os,
             'osVersion' => $this->version,
             'osFeatures' => $this->features,
