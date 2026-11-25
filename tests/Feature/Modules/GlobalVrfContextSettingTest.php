@@ -8,7 +8,6 @@ use App\Models\BgpPeer;
 use App\Models\Device;
 use App\Models\Vrf as VrfModel;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Modules\Vrf;
 use LibreNMS\OS;
@@ -187,8 +186,8 @@ class GlobalContextTestSync
 {
     use SyncsModels;
 
-    public function sync(Device $device): Collection
+    public function sync(Device $device): void
     {
-        return $this->syncVrfContextModels($device, 'bgppeers', collect());
+        $this->syncVrfContextModels($device, 'bgppeers', collect());
     }
 }

@@ -15,13 +15,7 @@ class VrfContextCleanup
 
     public static function hasContextData(Device $device): bool
     {
-        foreach (self::RELATIONSHIPS as $relationship) {
-            if ($device->$relationship()->where('context_name', '!=', '')->exists()) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any(self::RELATIONSHIPS, fn ($relationship) => $device->$relationship()->where('context_name', '!=', '')->exists());
     }
 
     /**
