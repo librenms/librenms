@@ -3,7 +3,7 @@
 @section('content')
 <x-device.page :device="$device">
     @isset($data['submenu'])
-        <x-submenu :title="$title" :menu="$data['submenu']" :device-id="$device_id" :current-tab="$current_tab" :selected="$vars" />
+        <x-submenu :title="$title" :menu="$data['submenu']" :device-id="$device_id" :current-tab="$current_tab" :selected="$data['view']" />
     @endisset
 
     {{-- VLAN Search Filters --}}
@@ -68,7 +68,7 @@
                         @continue
                     @endif
 
-                    @if(!$vars)
+                    @if(!$data['view'])
                         <span class="tw:inline-flex">
                             <x-port-link :port="$port->port">{{ $port->port->getShortLabel() }}</x-port-link>
                             @if($port->untagged)<span>&nbsp;(U)</span>@endif
@@ -77,7 +77,7 @@
                     @else
                         <div style="display: block; padding: 2px; margin: 2px; min-width: 139px; max-width:139px; min-height:85px; max-height:85px; text-align: center; float: left; background-color: {{ \App\Facades\LibrenmsConfig::get('list_colour.odd_alt2') }}">
                             <div style="font-weight: bold;">{{ $port->port->ifDescr }}</div>
-                            {!! \LibreNMS\Util\Url::modernPortLink($port->port, new \Illuminate\Support\HtmlString('<img src="' . e(route('graph', ['type' => 'port_' . $vars, 'id' => $port->port->port_id, 'from' => '-2d', 'width' => 132, 'height' => 40, 'legend' => 'no'])) . '">')) !!}
+                            {!! \LibreNMS\Util\Url::modernPortLink($port->port, new \Illuminate\Support\HtmlString('<img src="' . e(route('graph', ['type' => 'port_' . $data['view'], 'id' => $port->port->port_id, 'from' => '-2d', 'width' => 132, 'height' => 40, 'legend' => 'no'])) . '">')) !!}
                             <div style="font-size: 9px;">{{ $port->port->ifAlias }}</div>
                         </div>
                     @endif

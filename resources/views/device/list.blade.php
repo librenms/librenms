@@ -2,7 +2,7 @@
 
 <div class="table-responsive">
     <table id="devices" class="table table-hover table-condensed table-striped"
-           data-url="{{ route('table.device') }}">
+           data-url="{{ route('table.device') }}" data-export-url="{{ route('table.device.export') }}">
         <thead>
         <tr>
             <th data-column-id="status" data-formatter="status" data-width="7px" data-searchable="false">{{ $detailed ? 'S.' : __('Status') }}</th>
@@ -25,7 +25,7 @@
 <script>
     var filter = @js($filter);
 
-    var grid = $("#devices").bootgrid({
+    var grid = bootgridWithExport($("#devices"), {
         ajax: true,
         rowCount: [50, 100, 250, -1],
         columnSelection: true,
@@ -56,7 +56,7 @@
             },
         },
         templates: {
-            header: "<div class=\"devices-headers-table-menu\" style=\"padding:6px 6px 0px 0px;\"><p class=\"@{{css.actions}}\"></p></div><div class=\"row\"></div>",
+            header: "<div id=\"@{{ctx.id}}\" class=\"devices-headers-table-menu\" style=\"padding:6px 6px 0px 0px;\"><p class=\"@{{css.actions}}\"></p></div><div class=\"row\"></div>",
             search: "" // hide the generic search
         },
         post: function () {

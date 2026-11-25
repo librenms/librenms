@@ -41,6 +41,7 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
+use App\Models\Sensor;
 use LibreNMS\OS;
 use SnmpQuery;
 
@@ -55,5 +56,21 @@ class Fortiswitch extends OS
         $basePort = $this->basePortIndexes[$bridgePort] ?? $bridgePort;
 
         return PortCache::getIdFromIfIndex($this->bridgePortIfIndexes()[$basePort] ?? null, $this->getDeviceId());
+    }
+
+    /**
+     * FortiSwitch reports fan speeds in percent, not rpm, and the precision does not apply
+     */
+    protected function entitySensor(Sensor $sensor, array $entry): ?Sensor
+    {
+        if (($entry['entPhySensorType'] ?? null) == 'rpm') {
+            $sensor->fill([
+                'sensor_class' => 'percent',
+                'sensor_divisor' => 1,
+                'sensor_current' => $entry['entPhySensorValue'] * $sensor->sensor_multiplier,
+            ]);
+        }
+
+        return $sensor;
     }
 }

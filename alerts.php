@@ -31,7 +31,6 @@
 use LibreNMS\Alert\RunAlerts;
 use LibreNMS\Util\Debug;
 
-$init_modules = ['alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('fd::');

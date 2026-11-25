@@ -1,9 +1,9 @@
 <?php
 
 /*
- * PCHardware.php
+ * ServerHardware.php
  *
- * Helpers to discover OS info from various server vendor MIB addons
+ * The server management agents of Dell, HP and Supermicro: hardware, serial and sensors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,72 +26,58 @@
 
 namespace LibreNMS\OS\Traits;
 
+use App\Models\Sensor;
+use Illuminate\Support\Collection;
+use SnmpQuery;
+
+/**
+ * For OS that run on servers. The agent of the server vendor tells the hardware and serial and has the sensors.
+ */
 trait ServerHardware
 {
-    protected function discoverServerHardware()
+    use DellOpenManage;
+    use HpInsightAgents;
+    use SupermicroHealthMib;
+
+    protected function discoverServerHardware(): void
     {
-        $this->discoverDellHardware() || $this->discoverHpHardware() || $this->discoverSupermicroHardware();
+        $device = $this->getDevice();
+
+        if ($this->hasDellOpenManage()) {
+            $model = $this->dellChassis('chassisModelName');
+            $device->hardware = $model ? "Dell $model" : $device->hardware;
+            $device->serial = $this->dellChassis('chassisServiceTagName') ?: $device->serial;
+        } elseif ($this->hasHpInsightAgents()) {
+            $device->hardware = $this->hpServerInfo('cpqSiProductName') ?: $device->hardware;
+            $device->serial = $this->hpServerInfo('cpqSiSysSerialNum') ?: $device->serial;
+        } else {
+            // Supermicro SuperDoctor 5
+            $model = $this->supermicroBoard('mbProductName');
+            $device->hardware = $model ? "Supermicro $model" : $device->hardware;
+            $device->serial = $this->supermicroBoard('mbSerialNumber') ?: $device->serial;
+        }
     }
 
-    protected function discoverDellHardware()
+    /**
+     * The sensors of the server management agent that answers, there is one per server
+     *
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverServerHardwareSensors(): Collection
     {
-        // Detect Dell hardware via OpenManage SNMP
-        $hw = snmp_get_multi_oid($this->getDeviceArray(), [
-            'MIB-Dell-10892::chassisModelName.1',
-            'MIB-Dell-10892::chassisServiceTagName.1',
-        ], '-OUQ', null, 'dell');
-
-        if (empty($hw)) {
-            return false;
+        if ($this->hasDellOpenManage()) {
+            return $this->discoverDellOpenManageSensors();
         }
 
-        $device = $this->getDevice();
-        if (! empty($hw['MIB-Dell-10892::chassisModelName.1'])) {
-            $device->hardware = 'Dell ' . $hw['MIB-Dell-10892::chassisModelName.1'];
+        if ($this->hasHpInsightAgents()) {
+            return $this->discoverHpInsightSensors();
         }
 
-        $device->serial = $hw['MIB-Dell-10892::chassisServiceTagName.1'] ?? $device->serial;
-
-        return true;
+        return $this->discoverSupermicroSensors();
     }
 
-    protected function discoverHpHardware()
+    private function supermicroBoard(string $name): string
     {
-        $hw = snmp_get_multi_oid($this->getDeviceArray(), [
-            'CPQSINFO-MIB::cpqSiProductName.0',
-            'CPQSINFO-MIB::cpqSiSysSerialNum.0',
-        ], '-OUQ', null, 'hp');
-
-        if (empty($hw)) {
-            return false;
-        }
-
-        $device = $this->getDevice();
-        $device->hardware = $hw['CPQSINFO-MIB::cpqSiProductName.0'] ?? $device->hardware;
-        $device->serial = $hw['CPQSINFO-MIB::cpqSiSysSerialNum.0'] ?? $device->serial;
-
-        return true;
-    }
-
-    protected function discoverSupermicroHardware()
-    {
-        // Detect Supermicro hardware via Supermicro SuperDoctor 5
-        $hw = snmp_get_multi_oid($this->getDeviceArray(), [
-            'SUPERMICRO-SD5-MIB::mbProductName.1',
-            'SUPERMICRO-SD5-MIB::mbSerialNumber.1',
-        ], '-OUQ', null, 'supermicro');
-
-        if (empty($hw)) {
-            return false;
-        }
-
-        $device = $this->getDevice();
-        if (! empty($hw['SUPERMICRO-SD5-MIB::mbProductName.1'])) {
-            $device->hardware = 'Supermicro ' . $hw['SUPERMICRO-SD5-MIB::mbProductName.1'];
-        }
-
-        $device->serial = $hw['SUPERMICRO-SD5-MIB::mbSerialNumber.1'] ?? $device->serial;
-
-        return true;
+        return trim((string) SnmpQuery::cache()->mibDir('supermicro')->get("SUPERMICRO-SD5-MIB::$name.1")->value());
     }
 }

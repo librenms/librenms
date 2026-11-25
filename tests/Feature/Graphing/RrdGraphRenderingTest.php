@@ -7,8 +7,10 @@ use App\Data\Graphing\GraphParameters;
 use App\Data\Graphing\SeriesStyle;
 use App\Facades\LibrenmsConfig;
 use App\Facades\Rrd;
+use App\Graphs\AbstractSeriesGraph;
 use App\Graphs\Device\DeviceGraph;
 use App\Graphs\GraphFactory;
+use App\Models\Application;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\Processor;
@@ -98,6 +100,30 @@ class RrdGraphRenderingTest extends TestCase
         $this->assertStringStartsWith(self::PNG_HEADER, $graph->render()->data);
     }
 
+    #[TestWith(['device_bits'])]
+    #[TestWith(['port_bits'])]
+    public function test_traffic_graphs_hide_percentiles_when_disabled_globally(string $type): void
+    {
+        LibrenmsConfig::set('graph_stat_percentile_disable', true);
+        LibrenmsConfig::set('rrdgraph_real_percentile', true);
+        $device = Device::factory()->create();
+        $port = Port::factory()->for($device)->create(['ifType' => 'ethernetCsmacd', 'ifName' => 'eth0', 'ifDescr' => 'eth0']);
+        $this->createRrd($device, "port-id$port->port_id.rrd", ['INOCTETS', 'OUTOCTETS']);
+        $graph = (new GraphFactory)->graphFor(new GraphParameters([
+            'type' => $type, 'device' => $device->device_id, 'port' => $port->port_id, 'previous' => 'yes',
+        ]));
+        $this->assertInstanceOf(AbstractSeriesGraph::class, $graph);
+
+        $command = $graph->getDebugCommand();
+        $data = $graph->getData();
+
+        $this->assertIsString($command);
+        $this->assertStringNotContainsString('PERCENTNAN', $command);
+        $this->assertStringContainsString('GPRINT:trafficbytes:', $command);
+        $this->assertStringContainsString('GPRINT:trafficprevbytes:', $command);
+        $this->assertSame([], $data->percentiles);
+    }
+
     public function test_it_draws_stacked_series_with_the_previous_period(): void
     {
         $device = Device::factory()->create(['os' => 'linux']);
@@ -124,6 +150,21 @@ class RrdGraphRenderingTest extends TestCase
                 return ['bits' => new DataSeries($this->metric('traffic'), 'bytes', 'Traffic', 'bps', 8, new SeriesStyle(fill: true, invert: true))];
             }
         };
+
+        $this->assertStringStartsWith(self::PNG_HEADER, $graph->render()->data);
+    }
+
+    #[TestWith(['application_ntp_client_stats'])]
+    #[TestWith(['application_ntp_client_offset'])]
+    #[TestWith(['application_ntp_client_freq'])]
+    #[TestWith(['application_ntp_client_stability'])]
+    public function test_it_draws_ntp_client_graphs(string $type): void
+    {
+        $device = Device::factory()->create();
+        $app = Application::factory()->for($device)->create(['app_type' => 'ntp-client']);
+        $this->createRrd($device, "app-ntp-client-$app->app_id.rrd", ['offset', 'frequency', 'jitter', 'noise', 'stability']);
+
+        $graph = (new GraphFactory)->graphFor(new GraphParameters(['type' => $type, 'id' => $app->app_id, 'graph_type' => 'png', 'from' => time() - 800000]));
 
         $this->assertStringStartsWith(self::PNG_HEADER, $graph->render()->data);
     }

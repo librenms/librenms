@@ -8,7 +8,6 @@
  *
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
-$init_modules = [];
 require __DIR__ . '/includes/init.php';
 
 c_echo('%RWarning: delhost.php is deprecated!%n Use %9lnms device:remove%n instead.' . PHP_EOL . PHP_EOL);

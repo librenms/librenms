@@ -2,6 +2,7 @@
 
 namespace LibreNMS\Tests\Unit\RRD;
 
+use App\Facades\LibrenmsConfig;
 use LibreNMS\Exceptions\RrdCachedConnectionException;
 use LibreNMS\Exceptions\RrdCorruptionException;
 use LibreNMS\Exceptions\RrdDsMismatchException;
@@ -16,6 +17,7 @@ use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\Binaries;
 use Mockery;
 use Mockery\MockInterface;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Process\Process;
 
@@ -121,6 +123,43 @@ class RrdProcessTest extends TestCase
         $this->expectExceptionMessageIsOrContains('Unable to connect to rrdcached: No such file or directory.');
 
         $rrdProcess->run('update test.rrd N:1');
+    }
+
+    /** @return array<string, array{string}> */
+    public static function rrdcachedTransportErrors(): array
+    {
+        return [
+            'socket error' => ['ERROR: request: socket error (32) while talking to rrdcached'],
+            'internal error' => ['ERROR: request: internal error while talking to rrdcached'],
+        ];
+    }
+
+    #[DataProvider('rrdcachedTransportErrors')]
+    public function testRrdcachedTransportErrorsAreConnectionErrors(string $error): void
+    {
+        $this->assertInstanceOf(RrdCachedConnectionException::class, RrdException::parse($error));
+    }
+
+    public function testRestartsInRrdDirOnceItExists(): void
+    {
+        $rrdDir = sys_get_temp_dir() . '/librenms-rrd-process-' . uniqid();
+        LibrenmsConfig::set('rrd_dir', $rrdDir);
+        LibrenmsConfig::set('rrdcached', '');
+        $binaries = Mockery::mock(Binaries::class);
+        $binaries->shouldReceive('path')->with('rrdtool')->andReturn('/bin/sh'); // sh - runs commands from stdin like rrdtool -
+        $rrdProcess = new RrdProcess($this->logger, $binaries, 300, allowMissingRrdDir: true);
+        $pwd = 'pwd; echo "OK u:0"';
+
+        try {
+            $this->assertSame('/', $rrdProcess->run($pwd), 'without rrd_dir, run from /');
+            $this->assertSame('/', $rrdProcess->run($pwd), 'keep the process while rrd_dir is missing');
+
+            mkdir($rrdDir);
+            $this->assertSame(realpath($rrdDir), $rrdProcess->run($pwd));
+        } finally {
+            $rrdProcess->stop();
+            @rmdir($rrdDir);
+        }
     }
 
     public function testThrowsGenericRrdException(): void

@@ -446,18 +446,16 @@ class PortsController implements DeviceTab
     }
 
     /**
-     * get the ports sub tab name including handling legacy urls
+     * get the ports sub tab name
      */
     private function parseTab(Request $request): string
     {
-        if (preg_match('#view=([^/]+)#', $request->fullUrl(), $matches)) {
-            return match ($matches[1]) {
-                'neighbours' => 'links',
-                default => $matches[1],
-            };
+        $view = $request->query('view');
+        if (! is_string($view) || $view === '') {
+            $view = $request->route('view') ?? LibrenmsConfig::get('ports_page_default');
         }
 
-        return $request->route('vars', LibrenmsConfig::get('ports_page_default')); // fourth segment is called vars to handle legacy urls
+        return $view === 'neighbours' ? 'links' : $view;
     }
 
     private function migrateFilterSettings(array $saved, Request $request): array

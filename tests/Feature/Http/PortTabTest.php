@@ -8,7 +8,6 @@ use App\Models\PortVlan;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Tests\TestCase;
-use LibreNMS\Util\Url;
 use Spatie\Permission\Models\Role;
 
 final class PortTabTest extends TestCase
@@ -78,16 +77,6 @@ final class PortTabTest extends TestCase
             ->assertSee('(U)');
     }
 
-    public function testPortUrlUsesPortIdPathAndQueryOptions(): void
-    {
-        $port = $this->port();
-
-        $this->assertSame(
-            url("device/$port->device_id/port/$port->port_id") . '?view=realtime&interval=5',
-            Url::portUrl($port, ['view' => 'realtime', 'interval' => '5', 'empty' => ''])
-        );
-    }
-
     public function testMenuLinksUseQueryString(): void
     {
         $port = $this->port();
@@ -127,7 +116,7 @@ final class PortTabTest extends TestCase
         $this->actingAs($this->admin())
             ->get("/device/$port->device_id/port/port=$port->port_id/")
             ->assertStatus(301)
-            ->assertRedirect(url("device/$port->device_id/port/$port->port_id"));
+            ->assertRedirect(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id]));
     }
 
     public function testLegacyDeviceSegmentRedirects(): void
@@ -154,7 +143,7 @@ final class PortTabTest extends TestCase
         $port = $this->port();
 
         $this->actingAs(User::factory()->create(['enabled' => 1]))
-            ->get(route('device', ['device' => $port->device_id, 'tab' => 'port', 'vars' => "port=$port->port_id/view=notes"]))
+            ->get(route('device.legacy', ['device' => $port->device_id, 'tab' => 'port', 'vars' => "port=$port->port_id/view=notes"]))
             ->assertForbidden();
     }
 
@@ -172,7 +161,7 @@ final class PortTabTest extends TestCase
         $port = $this->port();
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $port->device_id, 'tab' => 'port', 'port' => $port->port_id]))
+            ->get(route('device.legacy', ['device' => $port->device_id, 'tab' => 'port', 'port' => $port->port_id]))
             ->assertNotFound();
     }
 

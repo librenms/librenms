@@ -145,6 +145,7 @@ return [
         'title' => 'Event Log',
         'viewAll' => ['label' => 'View the whole event log', 'description' => 'See events for every device.'],
         'view' => ['label' => 'View the event log', 'description' => 'See events for devices the user can access.'],
+        'create' => ['label' => 'Add event log entries', 'description' => 'Append events through the API for devices the user can access.'],
     ],
 
     'inventory' => [

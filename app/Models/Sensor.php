@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Observers\SensorObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -139,6 +140,26 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
         return $this->translations->firstWhere('state_value', $this->sensor_current);
     }
 
+    /**
+     * Set the state translations of a discovered state sensor.
+     * They are saved for the state name of the sensor (sensor_type) when the sensor is synced.
+     *
+     * @param  iterable<StateTranslation|array{value: int|string, generic: int|string, descr: string, graph?: int|string}>  $states
+     */
+    public function withStates(iterable $states): static
+    {
+        $translations = new \Illuminate\Database\Eloquent\Collection;
+        foreach ($states as $state) {
+            $translations->push($state instanceof StateTranslation ? $state : new StateTranslation([
+                'state_descr' => $state['descr'],
+                'state_value' => $state['value'],
+                'state_generic_value' => $state['generic'],
+            ]));
+        }
+
+        return $this->setRelation('translations', $translations);
+    }
+
     // ---- Define Relationships ----
     /**
      * @return \Illuminate\Database\Eloquent\Relations\MorphMany<\App\Models\Eventlog, $this>
@@ -239,6 +260,22 @@ class Sensor extends SensorModel implements HasSyncProtectedAttributes, Keyable
     public function scopeIsDisabled($query)
     {
         return $query->where('sensor_alert', 0);
+    }
+
+    /**
+     * Identity used when storing and reading a measurement of this sensor.
+     * Sensors without a stable index, such as ipmi sensors, are told apart by their description.
+     */
+    public function metricIdentity(string $measurement): MetricIdentity
+    {
+        $byDescr = $this->poller_type == 'ipmi' || LibrenmsConfig::getOsSetting($this->device?->os, 'sensor_descr');
+
+        return new MetricIdentity($measurement, [
+            'hostname' => (string) $this->device?->hostname,
+            'class' => $this->sensor_class,
+            'type' => $this->sensor_type,
+            $byDescr ? 'descr' : 'index' => $byDescr ? $this->sensor_descr : $this->sensor_index,
+        ]);
     }
 
     public function labels(): array

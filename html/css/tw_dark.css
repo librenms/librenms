@@ -14,6 +14,15 @@
     color: #FFF
 }
 
+.dark .leaflet-tile-pane {
+    filter: brightness(0.65);
+}
+
+/* Disable the per-tile inversion that clips detail from already dark tiles. */
+.dark .leaflet-tile-pane .leaflet-tile {
+    filter: none;
+}
+
 /* match Tailwind's layer order so utilities (tw:text-*) can override this */
 @layer theme, base, components, utilities;
 

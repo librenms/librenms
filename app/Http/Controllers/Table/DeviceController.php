@@ -241,7 +241,8 @@ class DeviceController extends TableController
 
     private function formatMetric(Device $device, int $count, string $tab, string $icon): string
     {
-        $html = '<a href="' . Url::deviceUrl($device, ['tab' => $tab]) . '">';
+        $url = route("device.$tab", ['device' => $device]);
+        $html = '<a href="' . $url . '">';
         $html .= '<span><i title="' . $tab . '" class="fa ' . $icon . ' fa-lg icon-theme"></i> ' . $count;
         $html .= '</span></a> ';
 
@@ -263,7 +264,7 @@ class DeviceController extends TableController
             [
                 [
                     'title' => 'View Device',
-                    'href' => Url::deviceUrl($device),
+                    'href' => route('device.overview', ['device' => $device]),
                     'icon' => 'fa-id-card',
                     'external' => false,
                 ],

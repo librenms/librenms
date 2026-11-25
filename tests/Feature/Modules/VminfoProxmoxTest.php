@@ -197,6 +197,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
             self::API . 'nodes/localhost/certificates/info' => self::rootCa(),
             self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [['vmid' => 101, 'status' => 'running', 'cpu' => 0.5]]]),
             self::API . 'nodes/localhost/lxc' => Http::response(['data' => []]),
+            self::API . 'cluster/resources?type=vm' => self::clusterGuests([['vmid' => 101, 'status' => 'running']]),
             self::API . 'nodes/localhost/qemu/101/agent/get-fsinfo' => Http::response(null, 500),
         ]);
         $this->createVm('proxmox', 100, 'web');
@@ -222,7 +223,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
 
         (new Vminfo)->poll($this->os(), $datastore);
 
-        Http::assertSentCount(5); // the check and cluster, the VM and container lists and the agent of the running VM
+        Http::assertSentCount(6); // the check and cluster, the VM and container lists, the agent of the running VM and the cluster CPU usage
         Http::assertNotSent(fn (Request $request) => str_contains($request->url(), '/status/current'));
         Http::assertNotSent(fn (Request $request) => str_contains($request->url(), 'qemu/101/agent'));
     }
@@ -403,6 +404,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
             self::API . 'nodes/localhost/certificates/info' => self::rootCa(),
             self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [['vmid' => 100, 'status' => 'running', 'disk' => 5, 'maxdisk' => 10]]]),
             self::API . 'nodes/localhost/lxc' => Http::response(['data' => []]),
+            self::API . 'cluster/resources?type=vm' => self::clusterGuests([['vmid' => 100, 'status' => 'running']]),
             self::API . 'nodes/localhost/qemu/100/agent/get-fsinfo' => Http::response(['data' => ['result' => $filesystems]]),
         ]);
         $this->createVm('proxmox', 100, 'web');
@@ -448,12 +450,81 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
             self::API . 'nodes/localhost/certificates/info' => self::rootCa(),
             self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [['vmid' => 100, 'status' => 'stopped']]]),
             self::API . 'nodes/localhost/lxc' => Http::response(['data' => []]),
+            self::API . 'cluster/resources?type=vm' => self::clusterGuests([['vmid' => 100, 'status' => 'stopped']]),
         ]);
         $this->createVm('proxmox', 100, 'web');
 
         (new Vminfo)->poll($this->os(), Mockery::mock(WriteInterface::class));
 
         $this->assertSame(PowerState::OFF, $this->device->vminfo()->first()->vmwVmState);
+    }
+
+    /**
+     * The guest lists of a node measure the CPU per API worker process, a worker that was not asked about a guest before reports 0.
+     */
+    public function testCpuComesFromTheClusterStatistics(): void
+    {
+        $this->fakeCpu(self::clusterGuests(
+            [['vmid' => 100, 'status' => 'running', 'cpu' => 0.4]],
+            [['vmid' => 126, 'status' => 'running', 'cpu' => 0.1]],
+        ));
+
+        $cpu = $this->pollCpu();
+
+        $this->assertEquals(['usage' => 40], $cpu[100]);
+        $this->assertEquals(['usage' => 10], $cpu[126]);
+    }
+
+    public function testCpuOfTheNodeListsIsUsedWithoutClusterStatistics(): void
+    {
+        $this->fakeCpu(self::clusterGuests([['vmid' => 100, 'status' => 'unknown']])); // no statistics, the container is missing
+
+        $cpu = $this->pollCpu();
+
+        $this->assertEquals(['usage' => 25], $cpu[100]);
+        $this->assertEquals(['usage' => 50], $cpu[126]);
+    }
+
+    public function testCpuOfTheNodeListsIsUsedWhenTheClusterCanNotBeRead(): void
+    {
+        $this->fakeCpu(Http::response(null, 500));
+
+        $cpu = $this->pollCpu();
+
+        $this->assertEquals(['usage' => 25], $cpu[100]);
+        $this->assertEquals(['usage' => 50], $cpu[126]);
+    }
+
+    private function fakeCpu(PromiseInterface $clusterResources): void
+    {
+        Http::fake([
+            self::API . 'version' => Http::response(['data' => ['version' => '9.1.1']]),
+            self::API . 'nodes/localhost/certificates/info' => self::rootCa(),
+            self::API . 'nodes/localhost/qemu?full=1' => Http::response(['data' => [['vmid' => 100, 'status' => 'running', 'cpu' => 0.25]]]),
+            self::API . 'nodes/localhost/lxc' => Http::response(['data' => [['vmid' => 126, 'type' => 'lxc', 'status' => 'running', 'cpu' => 0.5]]]),
+            self::API . 'nodes/localhost/qemu/100/agent/get-fsinfo' => Http::response(null, 500),
+            self::API . 'cluster/resources?type=vm' => $clusterResources,
+        ]);
+        $this->createVm('proxmox', 100, 'web');
+        $this->createVm('proxmox-lxc', 126, 'ct');
+    }
+
+    /**
+     * @return array<int, array<string, mixed>> the CPU fields written per guest id
+     */
+    private function pollCpu(): array
+    {
+        $cpu = [];
+        $datastore = Mockery::mock(WriteInterface::class);
+        $datastore->shouldReceive('write')->andReturnUsing(function (string $measurement, array $fields, array $tags) use (&$cpu): void {
+            if ($measurement === 'vm.cpu') {
+                $cpu[$tags['id']] = $fields;
+            }
+        });
+
+        (new Vminfo)->poll($this->os(), $datastore);
+
+        return $cpu;
     }
 
     public function testStuckGuestAgentDoesNotFailTheOtherVms(): void

@@ -523,7 +523,6 @@
                 this.isDestroyed = false;
 
                 custommap.baseUrl = this.baseUrl;
-                visPopups.baseUrl = this.baseUrl;
                 this.init();
             }
 
@@ -664,13 +663,13 @@
                 var container = document.getElementById(this.elementId);
 
                 visPopups.attach(this.network, {
-                    devicePath: function (nodeId) {
+                    deviceUrl: function (nodeId) {
                         var node = self.networkNodes.get(nodeId);
-                        return node && node.device_id ? '/device/' + node.device_id + '/popup?type=device_bits&from[]=-1d&from[]=-7d' : null;
+                        return node && node.device_id ? route('device.popup', {device: node.device_id, type: 'device_bits', from: ['-1d', '-7d']}) : null;
                     },
-                    portPath: function (edgeId) {
+                    portUrl: function (edgeId) {
                         var portData = self.edgePortMap[String(edgeId).split('_')[0]];
-                        return portData ? '/port/' + portData.port_id + '/popup?from=-1d' : null;
+                        return portData ? route('port.popup', {port: portData.port_id, from: '-1d'}) : null;
                     },
                 });
 
@@ -688,7 +687,7 @@
                             window.location.href = route('maps.custom.show', {map: node.linked_map_id});
                             return;
                         } else if (node.device_id) {
-                            window.location.href = (self.baseUrl || '') + "device/" + node.device_id;
+                            window.location.href = route('device.overview', {device: node.device_id});
                             return;
                         } else if (node_id.endsWith('_mid')) {
                             edge_id = node_id.split("_")[0];
@@ -698,7 +697,7 @@
                     }
 
                     if (edge_id && (edge_id in self.edgePortMap)) {
-                        window.location.href = (self.baseUrl || '') + 'device/' + self.edgePortMap[edge_id].device_id + '/port/' + self.edgePortMap[edge_id].port_id;
+                        window.location.href = route('device.port', {device: self.edgePortMap[edge_id].device_id, port: self.edgePortMap[edge_id].port_id});
                     }
                 });
 
@@ -722,17 +721,17 @@
                             menuItems.push({
                                 icon: 'fa-solid fa-server',
                                 label: "{{ __('View Device') }}",
-                                action: function () { window.location.href = (self.baseUrl || '') + 'device/' + node.device_id; }
+                                action: function () { window.location.href = route('device.overview', {device: node.device_id}); }
                             });
                             menuItems.push({
                                 icon: 'fa-solid fa-network-wired',
                                 label: "{{ __('View Ports') }}",
-                                action: function () { window.location.href = (self.baseUrl || '') + 'device/' + node.device_id + '/tab=ports/'; }
+                                action: function () { window.location.href = route('device.ports', {device: node.device_id}); }
                             });
                             menuItems.push({
                                 icon: 'fa-solid fa-chart-area',
                                 label: "{{ __('View Graphs') }}",
-                                action: function () { window.location.href = (self.baseUrl || '') + 'device/' + node.device_id + '/graphs'; }
+                                action: function () { window.location.href = route('device.graphs', {device: node.device_id}); }
                             });
                             if (node.label) {
                                 menuItems.push({
@@ -762,7 +761,7 @@
                             menuItems.push({
                                 icon: 'fa-solid fa-network-wired',
                                 label: "{{ __('View Port') }}",
-                                action: function () { window.location.href = (self.baseUrl || '') + 'device/' + portData.device_id + '/port/' + portData.port_id; }
+                                action: function () { window.location.href = route('device.port', {device: portData.device_id, port: portData.port_id}); }
                             });
                         }
                     }

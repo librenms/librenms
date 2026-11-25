@@ -17,6 +17,6 @@ class CpuGraph extends VminfoGraph
 
     protected function options(): GraphOptions
     {
-        return new GraphOptions(scaleMin: 0, scaleMax: 100, legendTitle: 'CPU Usage %', palette: 'oranges');
+        return new GraphOptions(scaleMin: 0, scaleMax: 100, legendTitle: __('graph.vminfo.cpu_usage'), palette: 'oranges');
     }
 }

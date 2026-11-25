@@ -161,8 +161,6 @@ class AppServiceProvider extends ServiceProvider
         Blade::if('notconfig', fn ($key) => ! LibrenmsConfig::get($key));
         Blade::if('admin', fn () => auth()->check() && auth()->user()->hasRole('admin')); // TODO remove
 
-        Blade::directive('deviceUrl', fn ($arguments) => "<?php echo \LibreNMS\Util\Url::deviceUrl($arguments); ?>");
-
         // Graphing
         Blade::directive('signedGraphUrl', fn ($vars) => "<?php echo \LibreNMS\Util\Url::forExternalGraph($vars); ?>");
 

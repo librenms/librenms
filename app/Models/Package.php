@@ -31,12 +31,15 @@ use App\Observers\PackageObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Models\Keyable;
 
 #[ObservedBy([PackageObserver::class])]
 class Package extends DeviceRelatedModel implements Keyable
 {
     use Filterable;
+
+    /** @use HasFactory<\Database\Factories\PackageFactory> */
     use HasFactory;
 
     public $timestamps = false;
@@ -44,7 +47,7 @@ class Package extends DeviceRelatedModel implements Keyable
     protected $fillable = [
         'name',
         'manager',
-        'status',
+        'polling_method',
         'version',
         'build',
         'arch',
@@ -60,6 +63,16 @@ class Package extends DeviceRelatedModel implements Keyable
         'size',
         'device_id',
     ];
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'polling_method' => PollingMethodType::class,
+        ];
+    }
 
     /**
      * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: string[], search?: bool}>
@@ -167,7 +180,9 @@ class Package extends DeviceRelatedModel implements Keyable
 
     public function getCompositeKey(): string
     {
-        return "$this->manager-$this->name-$this->arch";
+        // version and build are part of the identity so simultaneously installed
+        // versions of a package are not collapsed by keyBy()/synchronization deletion
+        return "$this->manager-$this->name-$this->arch-$this->version-$this->build";
     }
 
     public function __toString(): string

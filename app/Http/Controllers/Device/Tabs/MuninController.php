@@ -29,7 +29,6 @@ namespace App\Http\Controllers\Device\Tabs;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use LibreNMS\Interfaces\UI\DeviceTab;
-use LibreNMS\Util\Url;
 
 class MuninController implements DeviceTab
 {
@@ -69,7 +68,7 @@ class MuninController implements DeviceTab
         $categoryOptions = $categories->mapWithKeys(fn ($category) => [
             $category => [
                 'text' => ucfirst($category),
-                'link' => Url::deviceUrl($device, ['tab' => 'munin', 'group' => $category]),
+                'link' => route('device.munin', ['device' => $device, 'group' => $category]),
             ],
         ])->all();
 

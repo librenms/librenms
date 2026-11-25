@@ -7,4 +7,6 @@ return [
     'serial' => 'Serial No',
     'part' => 'Part',
     'all_parts' => 'All Parts',
+    'physical' => 'Physical Component',
+    'transceiver' => 'Transceiver',
 ];

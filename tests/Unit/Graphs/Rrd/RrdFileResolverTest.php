@@ -112,6 +112,22 @@ class RrdFileResolverTest extends TestCase
         $this->assertSame('localhost/port-id42.rrd', $this->rrdFiles->pathFor(new MetricIdentity('port', ['hostname' => 'localhost', 'id' => 42])));
     }
 
+    public function test_ping_reads_the_icmp_perf_file(): void
+    {
+        Rrd::shouldReceive('checkRrdExists')->with($this->pathMatcher('localhost/icmp-perf.rrd'))->once()->andReturn(true);
+
+        $this->assertSame('localhost/icmp-perf.rrd', $this->rrdFiles->pathFor(new MetricIdentity('ping', ['hostname' => 'localhost'])));
+    }
+
+    public function test_ipmi_sensors_read_the_sensor_file(): void
+    {
+        Rrd::shouldReceive('checkRrdExists')->with($this->pathMatcher('localhost/sensor-voltage-ipmi-PSU_1.rrd'))->once()->andReturn(true);
+
+        $metric = new MetricIdentity('sensor', ['hostname' => 'localhost', 'class' => 'voltage', 'type' => 'ipmi', 'descr' => 'PSU 1']);
+
+        $this->assertSame('localhost/sensor-voltage-ipmi-PSU_1.rrd', $this->rrdFiles->pathFor($metric));
+    }
+
     public function test_port_metrics_find_legacy_files_when_canonical_names_are_enabled(): void
     {
         LibrenmsConfig::set('datastore.canonical_metrics', true);

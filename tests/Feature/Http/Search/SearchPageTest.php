@@ -24,7 +24,7 @@ class SearchPageTest extends SearchTestCase
             ->assertSeeInOrder([__('search.mac_format'), __('search.per_page')])
             ->assertSee("window.Alpine.data('searchHost'", false);
 
-        $this->get(url('about'))->assertOk()->assertDontSee("window.Alpine.data('searchHost'", false);
+        $this->get(route('about'))->assertOk()->assertDontSee("window.Alpine.data('searchHost'", false);
     }
 
     public function testSavedFiltersAreApplied(): void
@@ -103,11 +103,11 @@ class SearchPageTest extends SearchTestCase
         $this->actingAs($this->admin())->get(route('search'))->assertSeeInOrder([$link, 'href="' . route('ports') . '"'], false);
 
         $user = User::factory()->create(['enabled' => 1]);
-        $this->actingAs($user)->get(url('about'))->assertOk()->assertDontSee($link, false);
+        $this->actingAs($user)->get(route('about'))->assertOk()->assertDontSee($link, false);
         $this->actingAs($user)->get(route('search'))->assertForbidden();
 
         $user->assignRole('user');
-        $this->actingAs($user->fresh())->get(url('about'))->assertOk()->assertSee($link, false);
+        $this->actingAs($user->fresh())->get(route('about'))->assertOk()->assertSee($link, false);
         $this->actingAs($user->fresh())->get(route('search'))->assertOk();
     }
 }

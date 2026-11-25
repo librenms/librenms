@@ -93,7 +93,6 @@ the web interface at Device -> Settings -> Modules.
     lnms config:set discovery_modules.ipv6-addresses true
     lnms config:set discovery_modules.route false
     lnms config:set discovery_modules.sensors true
-    lnms config:set discovery_modules.ipmi false
     lnms config:set discovery_modules.storage true
     lnms config:set discovery_modules.hr-device true
     lnms config:set discovery_modules.discovery-protocols true
@@ -160,8 +159,8 @@ history data. The default route limit is 1000. To change the limit, use
 `lnms config:set routes.max_number 1000`.
 
 `sensors`: sensor detection for temperature, humidity, voltage, and more.
-
-`ipmi`: IPMI sensor detection via ipmitool. Enabled by the IPMI polling method.
+Sensors come from SNMP and from the IPMI (ipmitool) and unix agent (hddtemp)
+polling methods of the device.
 
 `storage`: storage detection for hard disks.
 

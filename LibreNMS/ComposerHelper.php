@@ -216,10 +216,15 @@ class ComposerHelper
 
     private static function setPermissions(): void
     {
+        $dirs = implode(' ', array_map(
+            fn (string $dir): string => escapeshellarg(self::installDir() . "/$dir"),
+            ['rrd', 'logs', 'storage', 'bootstrap/cache'],
+        ));
+
+        // -P: leave data directories that are symlinks alone, they can point outside the install directory
         self::exec([
-            'cd ' . realpath(__DIR__ . '/../..'),
-            'setfacl -R -m g::rwx rrd/ logs/ storage/ bootstrap/cache/',
-            'setfacl -d -m g::rwx rrd/ logs/ storage/ bootstrap/cache/',
+            "setfacl -P -R -m g::rwx $dirs",
+            "setfacl -P -d -m g::rwx $dirs",
         ]);
     }
 
@@ -248,7 +253,7 @@ class ComposerHelper
             $cli[] = $key . '=' . escapeshellarg((string) $value);
         }
         $cli[] = PHP_BINARY;
-        $cli[] = realpath(__DIR__ . '/../scripts/composer_wrapper.php');
+        $cli[] = escapeshellarg(self::installDir() . '/scripts/composer_wrapper.php');
         foreach ($command as $word) {
             $cli[] = escapeshellarg($word);
         }

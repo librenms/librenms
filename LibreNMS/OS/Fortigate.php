@@ -28,6 +28,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use App\Models\Location;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
@@ -137,5 +138,23 @@ class Fortigate extends OS implements
         }
 
         return $location;
+    }
+
+    /**
+     * License expiration dates are converted to days left, the cluster state is the number of cluster members
+     */
+    public function pollSensors(EloquentCollection $sensors): array
+    {
+        $values = parent::pollSensors($sensors);
+
+        foreach ($sensors->where('sensor_class', 'count') as $sensor) {
+            if (preg_match('/fgLicContractExpiry\.\d+/', (string) $sensor->sensor_index) && isset($values[$sensor->sensor_id])) {
+                $values[$sensor->sensor_id] = round((strtotime((string) $values[$sensor->sensor_id]) - time()) / 86400);
+            } elseif ($sensor->sensor_type === 'clusterState') {
+                $values[$sensor->sensor_id] = count(SnmpQuery::walk('FORTINET-FORTIGATE-MIB::fgHaStatsIndex')->table(1));
+            }
+        }
+
+        return $values;
     }
 }

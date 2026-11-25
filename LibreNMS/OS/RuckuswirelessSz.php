@@ -4,6 +4,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use App\Models\EntPhysical;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
@@ -169,5 +170,28 @@ class RuckuswirelessSz extends OS implements
     private function getNodes(): array
     {
         return SnmpQuery::cache()->walk('RUCKUS-CTRL-MIB::ruckusCTRLSystemNodeTable')->table(1);
+    }
+
+    /**
+     * AP licenses are per node, the cluster total is the sum, remaining is polled from the consumed oid
+     */
+    public function pollSensors(EloquentCollection $sensors): array
+    {
+        $values = parent::pollSensors($sensors);
+        $licenses = $sensors->where('sensor_class', 'count')->whereIn('sensor_index', ['licenses.total', 'licenses.remaining']);
+
+        if ($licenses->isNotEmpty()) {
+            $total = array_sum(SnmpQuery::walk('RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeNumApLicense')->values());
+
+            foreach ($licenses as $sensor) {
+                if ($sensor->sensor_index === 'licenses.total') {
+                    $values[$sensor->sensor_id] = $total;
+                } elseif (is_numeric($values[$sensor->sensor_id] ?? null)) {
+                    $values[$sensor->sensor_id] = $total - $values[$sensor->sensor_id];
+                }
+            }
+        }
+
+        return $values;
     }
 }

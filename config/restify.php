@@ -17,6 +17,7 @@ return [
         App\Http\Middleware\FormatJsonApiError::class,
         App\Http\Middleware\EnsureApiV1Enabled::class,
         'auth:sanctum',
+        'can:api.access',
         DispatchRestifyStartingEvent::class,
     ],
 
