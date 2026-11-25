@@ -135,7 +135,7 @@ final class RrdtoolTest extends TestCase
     #[DataProvider('rrdcachedAddresses')]
     public function testRemoteDetection(?string $rrdcached, bool $remote): void
     {
-        $this->assertSame($remote, (new Rrdtool($rrdcached, $this->process))->remote());
+        $this->assertSame($remote, new Rrdtool($rrdcached, $this->process)->remote());
     }
 
     /**
