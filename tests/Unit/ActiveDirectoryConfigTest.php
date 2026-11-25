@@ -91,7 +91,7 @@ class ActiveDirectoryConfigTest extends TestCase
         LibrenmsConfig::set('auth_ad_url', 'ldap://dc1.example.com ldaps://dc2.example.com');
 
         $this->expectException(AuthenticationException::class);
-        $this->expectExceptionMessage('same protocol and port');
+        $this->expectExceptionMessageIsOrContains('same protocol and port');
         app(ActiveDirectoryConfig::class)->connection();
     }
 

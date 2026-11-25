@@ -6,18 +6,21 @@ use App\Facades\LibrenmsConfig;
 use App\Ldap\ActiveDirectoryConfig;
 use App\Ldap\ActiveDirectoryGroups;
 use App\Ldap\ActiveDirectoryUser;
+use App\Models\AuthLog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Testing\TestResponse;
 use LdapRecord\Connection;
 use LdapRecord\Container;
 use LdapRecord\Laravel\Auth\DatabaseUserProvider;
 use LdapRecord\Laravel\Testing\DirectoryEmulator;
 use LdapRecord\Models\ActiveDirectory\Group;
 use LibreNMS\Tests\DBTestCase;
-use Mockery\MockInterface;
 use Mockery;
+use Mockery\MockInterface;
+use Symfony\Component\HttpFoundation\Response;
 
 class ActiveDirectoryAuthTest extends DBTestCase
 {
@@ -63,7 +66,7 @@ class ActiveDirectoryAuthTest extends DBTestCase
 
         $this->post('/login', ['username' => 'alice', 'password' => 'secret'])->assertRedirect('/');
 
-        $this->assertInstanceOf(DatabaseUserProvider::class, Auth::getProvider());
+        $this->assertSame(DatabaseUserProvider::class, Auth::getProvider()::class);
         $this->assertAuthenticatedAs($existing);
         $existing->refresh();
         $this->assertSame($ldap->getConvertedGuid(), $existing->auth_id);
@@ -72,6 +75,111 @@ class ActiveDirectoryAuthTest extends DBTestCase
         $this->assertSame('alice@example.com', $existing->email);
         $this->assertSame(0, $existing->can_modify_passwd);
         $this->assertFalse($existing->hasRole('admin'));
+    }
+
+    public function testRememberedLoginRestoresAnActiveDirectoryUser(): void
+    {
+        DirectoryEmulator::setup('active_directory')->actingAs($this->ldapUser());
+        $this->rememberLogin();
+
+        $this->get(route('login'))->assertRedirectToRoute('home');
+        $this->assertAuthenticated();
+        $this->assertTrue(Auth::viaRemember());
+    }
+
+    public function testRememberedLoginRejectsADeletedDirectoryUser(): void
+    {
+        $fake = DirectoryEmulator::setup('active_directory');
+        $ldap = $this->ldapUser();
+        $fake->actingAs($ldap);
+        $this->rememberLogin();
+        $ldap->delete();
+
+        $this->get(route('preferences.index'))
+            ->assertRedirectToRoute('login')
+            ->assertSessionMissing(Auth::getName())
+            ->assertCookieExpired(Auth::getRecallerName());
+
+        $this->assertGuest();
+        $this->assertSame(1, AuthLog::where('user', 'alice')->where('result', 'Logged In')->count());
+    }
+
+    public function testRememberedLoginRejectsAReplacementDirectoryUserWithTheSameUsername(): void
+    {
+        $fake = DirectoryEmulator::setup('active_directory');
+        $ldap = $this->ldapUser();
+        $fake->actingAs($ldap);
+        $this->rememberLogin();
+        $ldap->delete();
+        $this->ldapUser(['objectguid' => 'c8c78151-9980-44f1-aaf8-25637638f7aa']);
+
+        $this->get(route('preferences.index'))->assertRedirectToRoute('login');
+        $this->assertGuest();
+    }
+
+    public function testRememberedLoginRechecksDirectoryAccessRequirements(): void
+    {
+        DirectoryEmulator::setup('active_directory')->actingAs($this->ldapUser());
+        $this->rememberLogin();
+        LibrenmsConfig::set('auth_ad_groups', ['Admins' => ['roles' => ['admin']]]);
+        LibrenmsConfig::set('auth_ad_require_groupmembership', true);
+
+        $this->get(route('preferences.index'))->assertRedirectToRoute('login');
+        $this->assertGuest();
+    }
+
+    public function testRememberedLoginRejectsAnAdAccountWhenTheDirectoryIsUnavailable(): void
+    {
+        DirectoryEmulator::setup('active_directory')->actingAs($this->ldapUser());
+        $this->rememberLogin();
+
+        $this->getWithDirectoryUnavailable(route('preferences.index'))->assertRedirectToRoute('login');
+        $this->assertGuest();
+    }
+
+    public function testRememberedLoginRestoresALegacyAdAccountWithAMatchingSid(): void
+    {
+        DirectoryEmulator::setup('active_directory')->actingAs($this->ldapUser(['objectsid' => 'S-1-5-21-111-222-333-1001']));
+        $this->rememberLogin();
+        User::where('auth_type', 'active_directory')->where('username', 'alice')->update(['auth_id' => '1001']);
+
+        $this->get(route('login'))->assertRedirectToRoute('home');
+        $this->assertAuthenticated();
+        $this->assertTrue(Auth::viaRemember());
+    }
+
+    public function testRememberedLoginRejectsALegacyAdAccountWithADifferentSid(): void
+    {
+        DirectoryEmulator::setup('active_directory')->actingAs($this->ldapUser(['objectsid' => 'S-1-5-21-111-222-333-1002']));
+        $this->rememberLogin();
+        User::where('auth_type', 'active_directory')->where('username', 'alice')->update(['auth_id' => '1001']);
+
+        $this->get(route('preferences.index'))->assertRedirectToRoute('login');
+        $this->assertGuest();
+    }
+
+    public function testRememberedLoginRestoresALocalFallbackAccountWithoutTheDirectory(): void
+    {
+        LibrenmsConfig::set('auth_fallback_local', true);
+        DirectoryEmulator::setup('active_directory');
+        $local = User::factory()->create(['username' => 'alice', 'auth_type' => 'mysql', 'enabled' => 1]);
+        $this->rememberLogin('password');
+
+        $this->getWithDirectoryUnavailable(route('login'))->assertRedirectToRoute('home');
+        $this->assertAuthenticatedAs($local);
+        $this->assertTrue(Auth::viaRemember());
+    }
+
+    public function testRememberedLoginRejectsALocalAccountWhenFallbackIsDisabled(): void
+    {
+        LibrenmsConfig::set('auth_fallback_local', true);
+        DirectoryEmulator::setup('active_directory');
+        User::factory()->create(['username' => 'alice', 'auth_type' => 'mysql', 'enabled' => 1]);
+        $this->rememberLogin('password');
+        LibrenmsConfig::set('auth_fallback_local', false);
+
+        $this->get(route('preferences.index'))->assertRedirectToRoute('login');
+        $this->assertGuest();
     }
 
     public function testFailedPasswordDoesNotCreateAnAccount(): void
@@ -274,6 +382,34 @@ class ActiveDirectoryAuthTest extends DBTestCase
         $this->assertTrue(Auth::attempt($this->credentials()));
         $this->assertTrue(Auth::user()->hasRole('global-read'));
         $this->assertNull(Auth::user()->password);
+    }
+
+    private function rememberLogin(string $password = 'secret'): void
+    {
+        $cookieName = Auth::getRecallerName();
+        $response = $this->post('/login', ['username' => 'alice', 'password' => $password, 'remember' => 'on']);
+        $response->assertRedirect('/');
+        $cookie = $response->getCookie($cookieName);
+        $this->assertNotNull($cookie);
+
+        $this->flushSession();
+        Auth::forgetGuards();
+        $this->withCookie($cookieName, $cookie->getValue());
+    }
+
+    /**
+     * @return TestResponse<Response>
+     */
+    private function getWithDirectoryUnavailable(string $url): TestResponse
+    {
+        $connection = Container::getConnection('active_directory');
+        Container::removeConnection('active_directory');
+
+        try {
+            return $this->get($url);
+        } finally {
+            Container::addConnection($connection, 'active_directory');
+        }
     }
 
     private function spyOnDiagnosticLog(): MockInterface
