@@ -12,11 +12,13 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
+use LibreNMS\Polling\Method\Config\RedfishConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
 use LibreNMS\Polling\Method\Methods\PollingMethod;
 use LibreNMS\Polling\Method\Methods\ProxmoxApiPollingMethod;
+use LibreNMS\Polling\Method\Methods\RedfishPollingMethod;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
@@ -205,6 +207,35 @@ final class PollingMethodConfigTest extends TestCase
         $this->assertSame('abc123', $config->tokenSecret);
     }
 
+    public function testRedfishHostnameDefaultsToDeviceHostname(): void
+    {
+        $device = new Device(['hostname' => 'server.example.com']);
+        $method = new RedfishPollingMethod;
+
+        $config = $this->config($method, $this->deviceMethod(PollingMethodType::Redfish, device: $device));
+        $this->assertSame('server.example.com', $config->hostname);
+        $this->assertSame('https', $config->scheme);
+        $this->assertNull($config->port); // left to the scheme
+        $this->assertFalse($config->insecure);
+        $this->assertSame(10, $config->timeout);
+        $this->assertSame('', $config->username); // no secret
+
+        $config = $this->config($method, $this->deviceMethod(PollingMethodType::Redfish, [
+            'hostname' => 'bmc.example.com',
+            'scheme' => 'http',
+            'port' => 8000,
+            'insecure' => 1,
+            'timeout' => 30,
+        ], ['username' => 'admin', 'password' => 'secret'], device: $device));
+        $this->assertSame('bmc.example.com', $config->hostname);
+        $this->assertSame('http', $config->scheme);
+        $this->assertSame(8000, $config->port);
+        $this->assertTrue($config->insecure);
+        $this->assertSame(30, $config->timeout);
+        $this->assertSame('admin', $config->username);
+        $this->assertSame('secret', $config->password);
+    }
+
     public function testDeviceUsesConfiguredMethodOrDefault(): void
     {
         $icmp = $this->deviceMethod(PollingMethodType::Icmp, ['ip_version' => 'ipv6']);
@@ -218,6 +249,10 @@ final class PollingMethodConfigTest extends TestCase
         $ipmi = $device->polling()->get(PollingMethodType::Ipmi);
         $this->assertInstanceOf(IpmiConfig::class, $ipmi);
         $this->assertSame('192.0.2.1', $ipmi->hostname);
+        $this->assertFalse($device->polling()->isEnabled(PollingMethodType::Redfish));
+        $redfish = $device->polling()->get(PollingMethodType::Redfish);
+        $this->assertInstanceOf(RedfishConfig::class, $redfish);
+        $this->assertSame('192.0.2.1', $redfish->hostname);
         $agent = $device->polling()->get(PollingMethodType::UnixAgent);
         $this->assertInstanceOf(UnixAgentConfig::class, $agent);
         $this->assertSame(6556, $agent->port);

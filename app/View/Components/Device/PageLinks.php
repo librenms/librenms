@@ -120,6 +120,22 @@ class PageLinks extends Component
             ];
         }
 
+        // Redfish
+        $redfishMethod = $device->pollingMethod(PollingMethodType::Redfish);
+        $redfishHostname = $redfishMethod?->settings['hostname'] ?? $device->hostname;
+        if ($redfishMethod?->enabled && $redfishHostname) {
+            $redfishScheme = $redfishMethod?->settings['scheme'] ?? 'https';
+            $redfishPort = $redfishMethod?->settings['port'] ?? null;
+            $redfishPortSuffix = is_int($redfishPort) && $redfishPort !== ($redfishScheme === 'http' ? 80 : 443) ? ':' . $redfishPort : '';
+            $device_links['redfish'] = [
+                'icon' => 'fa-fish',
+                'url' => $redfishScheme . '://' . $redfishHostname . $redfishPortSuffix,
+                'title' => __('Redfish'),
+                'external' => true,
+                'onclick' => 'http_fallback(this); return false;',
+            ];
+        }
+
         // SSH
         $ssh_port = $device->attribs->firstWhere('attrib_type', 'override_device_ssh_port') ? ':' . $device->attribs->firstWhere('attrib_type', 'override_device_ssh_port')->attrib_value : '';
         $ssh_url = LibrenmsConfig::get('gateone.server')

@@ -4,6 +4,7 @@ namespace LibreNMS\Tests\Unit\Polling;
 
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
+use LibreNMS\Polling\Secrets\Data\RedfishSecretData;
 use LibreNMS\Polling\Secrets\Data\SnmpCommunitySecretData;
 use LibreNMS\Polling\Secrets\Data\SnmpV3SecretData;
 use LibreNMS\Polling\Secrets\Definitions\SecretDefinition;
@@ -67,5 +68,9 @@ final class SecretDefinitionTest extends TestCase
         $ipmi = IpmiSecretData::fromArray(['username' => 'admin']);
         $this->assertSame('admin', $ipmi->username);
         $this->assertSame('', $ipmi->password);
+
+        $redfish = RedfishSecretData::fromArray(['username' => 'admin']);
+        $this->assertSame('admin', $redfish->username);
+        $this->assertSame('', $redfish->password);
     }
 }

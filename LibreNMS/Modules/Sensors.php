@@ -52,7 +52,7 @@ use LibreNMS\Util\ProgressList;
 use LibreNMS\Util\UserFuncHelper;
 
 /**
- * Sensors of the SNMP, IPMI and unix agent polling methods, each method has its own sensors (poller_type).
+ * Sensors of the SNMP, IPMI, Redfish and unix agent polling methods, each method has its own sensors (poller_type).
  * Submodules are sensor classes.
  */
 class Sensors implements Module, RemovesMethodData, SupportsSubmodules
@@ -72,7 +72,7 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
 
     public function pollingMethods(Device $device): array
     {
-        return [PollingMethodType::Snmp, PollingMethodType::Ipmi, PollingMethodType::UnixAgent];
+        return [PollingMethodType::Snmp, PollingMethodType::Ipmi, PollingMethodType::Redfish, PollingMethodType::UnixAgent];
     }
 
     public function setSubmodules(?array $submodules): void

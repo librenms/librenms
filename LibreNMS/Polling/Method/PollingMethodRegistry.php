@@ -8,6 +8,7 @@ use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
 use LibreNMS\Polling\Method\Methods\PollingMethod;
 use LibreNMS\Polling\Method\Methods\ProxmoxApiPollingMethod;
+use LibreNMS\Polling\Method\Methods\RedfishPollingMethod;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnknownPollingMethod;
@@ -26,6 +27,7 @@ class PollingMethodRegistry
             PollingMethodType::Icmp => IcmpPollingMethod::class,
             PollingMethodType::Ipmi => IpmiPollingMethod::class,
             PollingMethodType::ProxmoxApi => ProxmoxApiPollingMethod::class,
+            PollingMethodType::Redfish => RedfishPollingMethod::class,
             PollingMethodType::Snmp => SnmpPollingMethod::class,
             PollingMethodType::UnixAgent => UnixAgentPollingMethod::class,
             PollingMethodType::Unknown => UnknownPollingMethod::class,
