@@ -79,8 +79,7 @@ result with `php artisan route:list --path=api/v1`.
 9. **No units in names.** Document them instead: `uptimeSeconds` → `uptime` (seconds).
 10. **Reuse names** already used elsewhere in v1 for the same meaning, such as
     `ipAddress` and `macAddress`. Name a field for what users call it: the
-    `description` a user enters is a device's purpose and a port's ifAlias, and a
-    port's ifDescr is `hardwareDescription`.
+    `description` a user enters is a device's purpose and a port's ifAlias.
 
 ## Endpoints
 

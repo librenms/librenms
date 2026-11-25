@@ -25,7 +25,7 @@ class PortResource extends JsonApiResource
             'ifIndex' => $this->ifIndex,
             'name' => $this->ifName,
             'description' => $this->ifAlias,
-            'hardwareDescription' => $this->ifDescr,
+            'ifDescr' => $this->ifDescr,
             'interfaceType' => $this->ifType,
             'speed' => $this->ifSpeed,
             'mtu' => $this->ifMtu,

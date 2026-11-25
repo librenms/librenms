@@ -175,7 +175,7 @@ final class PortApiTest extends DBTestCase
             'ifIndex',
             'name',
             'description',
-            'hardwareDescription',
+            'ifDescr',
             'interfaceType',
             'speed',
             'mtu',
