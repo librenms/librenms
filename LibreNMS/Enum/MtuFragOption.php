@@ -11,4 +11,12 @@ enum MtuFragOption: string
     case PMTU = 'pmtu'; // Allow fragmentation using PMTU discovery
     case Allow = 'allow'; // Allow routers to fragment and transmit packets
     case Deny = 'deny'; // Do not allow fragmentation
+
+    public function isSupported(): bool
+    {
+        return match (PHP_OS_FAMILY) {
+            'BSD' => in_array($this, [self::Default, self::Deny], true),
+            default => true,
+        };
+    }
 }

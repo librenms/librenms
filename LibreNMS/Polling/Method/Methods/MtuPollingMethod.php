@@ -51,21 +51,24 @@ final class MtuPollingMethod extends PollingMethod
      */
     public function defaults(?Device $device = null): array
     {
+        $fragmentation = MtuFragOption::tryFrom((string) LibrenmsConfig::get('mtu_options.fragmentation'));
+
         return [
             'ip_version' => 'default',
             'packet_size' => LibrenmsConfig::get('mtu_options.bytes') ?? 0,
-            'fragmentation' => LibrenmsConfig::get('mtu_options.fragmentation'),
+            'fragmentation' => $fragmentation?->isSupported() ? $fragmentation->value : MtuFragOption::Default->value,
         ];
     }
 
     public function config(Device $device, ?DevicePollingMethod $deviceMethod = null): MtuConfig
     {
         $settings = ($deviceMethod->settings ?? []) + $this->defaults($device);
+        $fragmentation = MtuFragOption::tryFrom((string) $settings['fragmentation']);
 
         return new MtuConfig(
             ipVersion: $settings['ip_version'],
             packetSize: $settings['packet_size'],
-            fragmentation: $settings['fragmentation'],
+            fragmentation: $fragmentation?->isSupported() ? $fragmentation : MtuFragOption::Default,
         );
     }
 

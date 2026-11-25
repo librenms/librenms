@@ -52,22 +52,32 @@ class Ping
         $ipheadsize = $address_family == AddressFamily::IPv4 ? 28 : 48;
         $bytes = $size > $ipheadsize ? $size - $ipheadsize : $size;
 
-        $frag = match ($fragmentation) {
-            MtuFragOption::Allow => 'dont',
-            MtuFragOption::Deny => 'do',
-            MtuFragOption::PMTU => 'want',
-            default => '',
-        };
-
         $args = [
             '-c', '1',
             '-s', (string) $bytes,
             '-w', '4',
         ];
 
-        if ($frag) {
-            $args[] = '-M';
-            $args[] = $frag;
+        if (PHP_OS_FAMILY === 'BSD') {
+            if ($fragmentation === MtuFragOption::Deny) {
+                $args[] = '-D';
+            }
+
+            if ($address_family === AddressFamily::IPv6) {
+                $args[] = '-u';
+            }
+        } else {
+            $frag = match ($fragmentation) {
+                MtuFragOption::Allow => 'dont',
+                MtuFragOption::Deny => 'do',
+                MtuFragOption::PMTU => 'want',
+                default => '',
+            };
+
+            if ($frag) {
+                $args[] = '-M';
+                $args[] = $frag;
+            }
         }
 
         $args[] = $host;

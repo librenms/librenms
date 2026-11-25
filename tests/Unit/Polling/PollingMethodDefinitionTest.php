@@ -2,10 +2,16 @@
 
 namespace LibreNMS\Tests\Unit\Polling;
 
+use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use App\Models\DevicePollingMethod;
+use LibreNMS\Enum\MtuFragOption;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Definitions\IpmiDefinition;
+use LibreNMS\Polling\Method\Definitions\MtuDefinition;
 use LibreNMS\Polling\Method\Definitions\SnmpDefinition;
 use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
+use LibreNMS\Polling\Method\Methods\MtuPollingMethod;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Tests\TestCase;
@@ -68,6 +74,36 @@ final class PollingMethodDefinitionTest extends TestCase
         $this->assertSame("Default: device's hostname", $ipmiFields['hostname']['placeholder']);
         $this->assertSame('Default: ipmitool', $ipmiFields['timeout']['placeholder']); // ipmitool's default differs by interface
         $this->assertSame('Auto-detect', $ipmiFields['type']['default_option']);
+    }
+
+    public function testMtuFragmentationOptionIsOnlyAvailableWhenSupported(): void
+    {
+        $expected = array_filter(
+            [
+                'default' => 'System Default',
+                'pmtu' => 'Allow with PMTU',
+                'allow' => 'Allow',
+                'deny' => 'Not Allowed',
+            ],
+            fn ($label, $value) => MtuFragOption::from($value)->isSupported(),
+            ARRAY_FILTER_USE_BOTH
+        );
+        $this->assertSame($expected, (new MtuDefinition)->fields()['fragmentation']->options);
+        $this->assertSame($expected, LibrenmsConfig::getDefinitions()['mtu_options.fragmentation']['options']);
+        $this->assertArrayNotHasKey('hidden', LibrenmsConfig::getDefinitions()['mtu_options.fragmentation']);
+    }
+
+    public function testMtuFragmentationUsesSupportedConfigAndDeviceOverrides(): void
+    {
+        LibrenmsConfig::set('mtu_options.fragmentation', MtuFragOption::Deny->value);
+        $method = new MtuPollingMethod;
+        $device = new Device;
+        $deviceMethod = new DevicePollingMethod(['settings' => ['fragmentation' => MtuFragOption::Allow->value]]);
+        $expectedDefault = MtuFragOption::Deny->isSupported() ? MtuFragOption::Deny : MtuFragOption::Default;
+        $expectedOverride = MtuFragOption::Allow->isSupported() ? MtuFragOption::Allow : MtuFragOption::Default;
+
+        $this->assertSame($expectedDefault->value, $method->defaults()['fragmentation']);
+        $this->assertSame($expectedOverride, $method->config($device, $deviceMethod)->fragmentation);
     }
 
     public function testBulkFieldShowsNoForV1(): void
