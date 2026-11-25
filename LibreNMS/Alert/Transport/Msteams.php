@@ -68,7 +68,8 @@ class Msteams extends Transport
 
         // A TextBlock renders markdown but not HTML and needs a blank line for a line break.
         $text = preg_replace('#<br\s*/?>|</(p|div|li|h[1-6])>#i', "\n", (string) $alert_data['msg']);
-        $text = preg_replace('/\R+/', "\n\n", trim(strip_tags($text)));
+        $text = trim(strip_tags($text));
+        $text = preg_replace('/\R+/u', "\n\n", $text) ?? $text;
         // Teams rejects messages over 28 KB.
         $text = mb_strcut($text, 0, 20000);
 
