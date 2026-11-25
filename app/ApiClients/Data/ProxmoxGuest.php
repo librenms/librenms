@@ -30,6 +30,7 @@ final readonly class ProxmoxGuest
         public int $diskWrite,
         public bool $template,
         public array $blockStats,
+        public ?string $lock = null,
     ) {
     }
 
@@ -55,6 +56,7 @@ final readonly class ProxmoxGuest
             diskWrite: (int) ($data['diskwrite'] ?? 0),
             template: ! empty($data['template']),
             blockStats: $data['blockstat'] ?? [],
+            lock: $data['lock'] ?? null,
         );
     }
 
@@ -69,5 +71,13 @@ final readonly class ProxmoxGuest
     public function isRunning(): bool
     {
         return $this->powerState() === PowerState::ON;
+    }
+
+    /**
+     * A locked VM may be using the guest agent for an operation such as a backup.
+     */
+    public function canQueryGuestAgent(): bool
+    {
+        return $this->isRunning() && ($this->lock ?? '') === '';
     }
 }

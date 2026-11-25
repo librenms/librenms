@@ -81,8 +81,8 @@ class ProxmoxApiDataSource implements VminfoClusterSource, VminfoDiscovery, Vmin
     {
         $guests = $this->localGuests();
         $vms = array_filter($guests[self::TYPE_VM], fn (ProxmoxGuest $vm): bool => ! $vm->template);
-        $running = array_filter($vms, fn (ProxmoxGuest $vm): bool => $vm->isRunning());
-        $guestOs = $this->api->getVmsGuestOs(array_column($running, 'id'));
+        $agentVms = array_filter($vms, fn (ProxmoxGuest $vm): bool => $vm->canQueryGuestAgent());
+        $guestOs = $this->api->getVmsGuestOs(array_keys($agentVms));
 
         $containers = array_filter($guests[self::TYPE_CONTAINER], fn (ProxmoxGuest $container): bool => ! $container->template);
         $containerOs = $this->api->getContainersOsType(array_column($containers, 'id'));
@@ -104,8 +104,8 @@ class ProxmoxApiDataSource implements VminfoClusterSource, VminfoDiscovery, Vmin
 
         $polledVms = $vms->where('vm_type', self::TYPE_VM);
         $polledGuests = array_intersect_key($guests[self::TYPE_VM], $polledVms->keyBy('vmwVmVMID')->all());
-        $running = array_filter($polledGuests, fn (ProxmoxGuest $guest): bool => $guest->isRunning());
-        $filesystems = $this->api->getVmsFsInfo(array_keys($running));
+        $agentVms = array_filter($polledGuests, fn (ProxmoxGuest $vm): bool => $vm->canQueryGuestAgent());
+        $filesystems = $this->api->getVmsFsInfo(array_keys($agentVms));
         $clusterCpu = $this->clusterCpu();
 
         foreach ($vms as $vm) {

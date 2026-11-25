@@ -52,7 +52,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         DeviceCache::setPrimary($this->device->device_id);
     }
 
-    private function fakeApi(): void
+    private function fakeApi(?string $lock = null): void
     {
         Http::fake([
             self::API . 'version' => Http::response(['data' => ['version' => '8.2.4']]),
@@ -64,6 +64,7 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
                 [
                     'vmid' => 100, 'name' => 'web', 'cpus' => 2, 'status' => 'running', 'cpu' => 0.25, 'mem' => 1073741824, 'maxmem' => 4294967296,
                     'disk' => 0, 'maxdisk' => 34359738368, 'netin' => 1000, 'netout' => 2000,
+                    ...($lock === null ? [] : ['lock' => $lock]),
                     'blockstat' => [
                         'scsi0' => ['rd_bytes' => 100, 'wr_bytes' => 200, 'rd_operations' => 1, 'wr_operations' => 2],
                         'scsi1' => ['rd_bytes' => 10, 'wr_bytes' => 20, 'rd_operations' => 3, 'wr_operations' => 4],
@@ -127,6 +128,44 @@ final class VminfoProxmoxTest extends InMemoryDbTestCase
         $this->proxmoxMethod->delete();
         $this->assertFalse($module->shouldDiscover($this->os()));
         $this->assertFalse($module->shouldPoll($this->os()));
+    }
+
+    public function testDiscoverySkipsTheAgentAndKeepsTheGuestOsWhileTheVmIsLocked(): void
+    {
+        Http::preventStrayRequests();
+        $this->fakeApi('backup');
+        $vm = $this->createVmOn($this->device, self::CLUSTER, 100);
+        $vm->update(['vmwVmGuestOS' => 'Arch Linux']);
+
+        (new Vminfo)->discover($this->os());
+
+        Http::assertNotSent(fn (Request $request) => str_contains($request->url(), '/agent/'));
+        $vm->refresh();
+        $this->assertSame('Arch Linux', $vm->vmwVmGuestOS);
+        $this->assertSame('web', $vm->vmwVmDisplayName);
+        $this->assertSame(PowerState::ON, $vm->vmwVmState);
+    }
+
+    public function testPollingSkipsTheAgentAndRecordsHostMetricsWhileTheVmIsLocked(): void
+    {
+        Http::preventStrayRequests();
+        $this->fakeApi('snapshot');
+        $this->createVm('proxmox', 100, 'web');
+        $written = [];
+        $datastore = Mockery::mock(WriteInterface::class);
+        $datastore->shouldReceive('write')->andReturnUsing(function (string $measurement, array $fields, array $tags) use (&$written): void {
+            $written[$measurement][$tags['id']] = $fields;
+        });
+
+        (new Vminfo)->poll($this->os(), $datastore);
+
+        Http::assertNotSent(fn (Request $request) => str_contains($request->url(), '/agent/'));
+        $this->assertSame(['usage' => 25.0], $written['vm.cpu'][100]);
+        $this->assertSame(['used' => 1073741824, 'total' => 4294967296], $written['vm.memory'][100]);
+        $this->assertSame(['used' => 0, 'total' => 34359738368], $written['vm.disk'][100]);
+        $this->assertSame(['in' => 1000, 'out' => 2000], $written['vm.net'][100]);
+        $this->assertSame(['read_bytes' => 110, 'write_bytes' => 220], $written['vm.diskio'][100]);
+        $this->assertSame(6, $written['vm.diskops'][100]['write_ops']);
     }
 
     public function testOnlySyncsTheVmsOfItsType(): void
