@@ -12,8 +12,8 @@
                     <th>{{ __('Description') }}</th>
                     <th>{{ __('Current') }}</th>
                     <th class="col-sm-1">{{ __('High Limit') }}</th>
-                    <th class="col-sm-1">{{ __('High warn') }}</th>
-                    <th class="col-sm-1">{{ __('Low warn') }}</th>
+                    <th class="col-sm-1">{{ __('High Warning') }}</th>
+                    <th class="col-sm-1">{{ __('Low Warning') }}</th>
                     <th class="col-sm-1">{{ __('Low Limit') }}</th>
                     <th class="col-sm-2">{{ __('Alerts') }}</th>
                     <th></th>
