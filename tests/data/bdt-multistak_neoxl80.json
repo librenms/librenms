@@ -1,0 +1,222 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.20884.77.83.1",
+                    "sysDescr": "BDT MULTISTAK",
+                    "sysContact": "<private>",
+                    "version": "3.00",
+                    "hardware": "MULTISTAK",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "bdt-multistak",
+                    "type": "storage",
+                    "serial": "DE12345678",
+                    "icon": "bdt.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.20884.2.1.0",
+                    "sensor_index": "bdtDeviceStatAct.0",
+                    "sensor_type": "bdtDeviceStatAct",
+                    "sensor_descr": "Activity",
+                    "group": "Library",
+                    "category": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "bdtDeviceStatAct"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.20884.2.3.0",
+                    "sensor_index": "bdtDeviceStatHealth.0",
+                    "sensor_type": "bdtDeviceStatHealth",
+                    "sensor_descr": "Overall Health",
+                    "group": "Library",
+                    "category": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "bdtDeviceStatHealth"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.20884.2.4.1.4.1",
+                    "sensor_index": "bdtModDPwr1.1",
+                    "sensor_type": "bdtDeviceStatModString",
+                    "sensor_descr": "Module 1 Drive Power 1",
+                    "group": "Modules",
+                    "category": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "bdtDeviceStatModString"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.20884.2.4.1.5.1",
+                    "sensor_index": "bdtModDPwr2.1",
+                    "sensor_type": "bdtDeviceStatModString",
+                    "sensor_descr": "Module 1 Drive Power 2",
+                    "group": "Modules",
+                    "category": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "bdtDeviceStatModString"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.20884.2.4.1.6.1",
+                    "sensor_index": "bdtModPwrSupply.1",
+                    "sensor_type": "bdtDeviceStatModString",
+                    "sensor_descr": "Module 1 Power Supply",
+                    "group": "Modules",
+                    "category": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "rrd_type": "GAUGE",
+                    "state_name": "bdtDeviceStatModString"
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "bdtDeviceStatAct",
+                    "state_descr": "Not Reported",
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "bdtDeviceStatAct",
+                    "state_descr": "Idle",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "bdtDeviceStatAct",
+                    "state_descr": "Busy",
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "bdtDeviceStatAct",
+                    "state_descr": "Offline",
+                    "state_value": 3,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "bdtDeviceStatHealth",
+                    "state_descr": "Unknown",
+                    "state_value": 1,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "bdtDeviceStatHealth",
+                    "state_descr": "OK",
+                    "state_value": 2,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "bdtDeviceStatHealth",
+                    "state_descr": "Warning",
+                    "state_value": 3,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "bdtDeviceStatHealth",
+                    "state_descr": "Critical",
+                    "state_value": 4,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "bdtDeviceStatModString",
+                    "state_descr": "Fault",
+                    "state_value": 0,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "bdtDeviceStatModString",
+                    "state_descr": "OK",
+                    "state_value": 1,
+                    "state_generic_value": 0
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
