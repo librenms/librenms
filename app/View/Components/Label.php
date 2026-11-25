@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\View\Component;
 use LibreNMS\Enum\Severity;
+use LibreNMS\Util\Html;
 
 class Label extends Component
 {
@@ -17,14 +18,7 @@ class Label extends Component
     public function __construct(
         public ?Severity $status = null
     ) {
-        $this->statusClass = match ($status) {
-            Severity::Ok => 'label-success',
-            Severity::Error => 'label-danger',
-            Severity::Info => 'label-info',
-            Severity::Notice => 'label-primary',
-            Severity::Warning => 'label-warning',
-            default => 'label-default',
-        };
+        $this->statusClass = Html::severityClass($status ?? Severity::Unknown);
     }
 
     /**

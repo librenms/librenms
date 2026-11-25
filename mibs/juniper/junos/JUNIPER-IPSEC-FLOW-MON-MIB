@@ -22,7 +22,7 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
 
 
     jnxIpSecFlowMonMIB  MODULE-IDENTITY
-        LAST-UPDATED "202004290000Z"     -- Wed Apr 29 00:00:00 2020 UTC
+        LAST-UPDATED "202103150000Z"     -- Mon Mar 15 00:00:00 2021 UTC
         ORGANIZATION "Juniper Networks, Inc."
         CONTACT-INFO
                      "Juniper Technical Assistance Center
@@ -43,7 +43,24 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
 	         Building on the existing IKE infrastruature, the  
 	         security IKE implementation integrates the value-added 
 	         features for the security products"
-        
+
+        REVISION    "202403120000Z" -- March 12, 2024
+        DESCRIPTION
+            "Added a new type digitalSignature in jnxIkeAuthMethod and
+             Added the following fields related to new IKE digital sign auth:
+                jnxIkeTunMonLocalSignatureHashAlgo
+                jnxIkeTunMonRemoteSignatureHashAlgo
+                jnxIkeTunMonDigitalSignAuthKey"
+
+        REVISION    "202103150000Z" -- March 15, 2021
+
+        DESCRIPTION
+            "Added the following fields related to Tunnel MTU:
+                jnxIpSecTunMonTunMtu
+                jnxIpSecTunMonExceedsTunMtu
+                jnxIpSecGlobalExceedsTunMtu
+                jnxIpSecHaLinkGlobalExceedsTunMtu"
+
         REVISION    "202004290000Z" -- April 29, 2020
         DESCRIPTION
             "Added New field for jnxIkeGlobalInitiatorIkev2SaInitStats for
@@ -87,13 +104,13 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
             "Added traffic-selector-name and vpn-name to ipsec-tunnel
             -monitor-entry table"
 
-        REVISION    "200705160000Z" -- May 16, 2007
-        DESCRIPTION 
-            "Revised the MIB to exlude platform/product specific attributes"
-
         REVISION    "201605310000Z" -- 31-May-16
         DESCRIPTION
             "Consolidated TC duplicated b/n jnx-ipsec-flow-mon.mib, jnx-ipsec-monitor-asp.mib"
+
+        REVISION    "200705160000Z" -- May 16, 2007
+        DESCRIPTION 
+            "Revised the MIB to exlude platform/product specific attributes"
 
         ::= { jnxIpSecMibRoot 1 } 
 
@@ -156,11 +173,32 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
                    sha512(5)
          }
 
+    JnxIkeLocalSignatureHashAlgo ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "The signature hash algorithm used locally in IPsec Phase-1 IKE negotiations."
+         SYNTAX INTEGER {
+                   sha1(1),
+                   sha256(2),
+                   sha384(3),
+                   sha512(4)
+         }
+
+    JnxIkeRemoteSignatureHashAlgo ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "The signature hash algorithm used by remote peer in IPsec Phase-1 IKE negotiations."
+         SYNTAX INTEGER {
+                   sha1(1),
+                   sha256(2),
+                   sha384(3),
+                   sha512(4)
+         }
+
     JnxIkeAuthMethod ::= TEXTUAL-CONVENTION
          STATUS     current
          DESCRIPTION
-            "The authentication method used in IPsec Phase-1 IKE
-             negotiations."
+            "The authentication method used in IPsec Phase-1 IKE negotiations."
          SYNTAX INTEGER {
                    preSharedKey           (1),
                    dssSignature           (2),
@@ -174,7 +212,18 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
                    xauthRevRsaEncryption  (10),
                    ecdsa256Signature      (11),
                    ecdsa384Signature      (12),
-                   ecdsa521Signature      (13)
+                   ecdsa521Signature      (13),
+                   digitalSignature       (14)
+         }
+
+    JnxIkeDigitalSignAuthKey ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "Signature key RSA/DSA/ECDSA used for digital-signature auth method."
+         SYNTAX INTEGER {
+                   signAuthRsa            (1),
+                   signAuthDsa            (2),
+                   signAuthEcdsa          (3)
          }
 
     JnxIkePeerRole ::= TEXTUAL-CONVENTION
@@ -259,7 +308,8 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
                    espAes256            (6),
                    espAesGcm128         (7),
                    espAesGcm192         (8),
-                   espAesGcm256         (9)
+                   espAesGcm256         (9),
+                   espChaCha20Poly1305  (10)
          }
 
     JnxAuthAlgo      ::= TEXTUAL-CONVENTION
@@ -273,7 +323,11 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
                    hmacSha            (2),
                    hmacSha256         (3),
                    hmacSha384         (4),
-                   hmacSha512         (5)
+                   hmacSha512         (5),
+                   aesGcm128          (6),
+                   aesGcm192          (7),
+                   aesGcm256          (8),
+                   chacha20Poly1305   (9)
 
          }
 
@@ -337,6 +391,15 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
          SYNTAX INTEGER {
                    regular (1),
                    halink  (2)
+         }
+
+    JnxIpSecTsType ::= TEXTUAL-CONVENTION
+         STATUS     current
+         DESCRIPTION
+            "Type of the TS."
+         SYNTAX INTEGER {
+                   proxyId          (1),
+                   trafficSelector  (2)
          }
 
     -- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -670,7 +733,10 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
          jnxIkeTunMonResponderIkev2IPSecSaRekeyTsUnacceptableOut     Counter64,
          jnxIkeTunMonResponderIkev2IPSecSaRekeyResDhComputeKeyFail   Counter64,
          jnxIkeTunMonGwName                                          DisplayString,
-         jnxIkeTunMonTunType                                         JnxIkeTunType
+         jnxIkeTunMonTunType               JnxIkeTunType,
+         jnxIkeTunMonLocalSignatureHashAlgo      JnxIkeLocalSignatureHashAlgo,
+         jnxIkeTunMonRemoteSignatureHashAlgo     JnxIkeRemoteSignatureHashAlgo,
+         jnxIkeTunMonDigitalSignAuthKey          JnxIkeDigitalSignAuthKey
       }
 
 
@@ -1118,6 +1184,29 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
             "The Tunnel type. It can be regular (1) or ha-link (2)"
          ::= { jnxIkeTunnelMonEntry 44 }
 
+      jnxIkeTunMonLocalSignatureHashAlgo OBJECT-TYPE
+         SYNTAX         JnxIkeLocalSignatureHashAlgo
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The signature hash algorithm used locally in IPsec Phase-1 IKE negotiations."
+         ::= { jnxIkeTunnelMonEntry 45 }
+
+      jnxIkeTunMonRemoteSignatureHashAlgo OBJECT-TYPE
+         SYNTAX         JnxIkeRemoteSignatureHashAlgo
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The signature hash algorithm used by remote peer in IPsec Phase-1 IKE negotiations."
+         ::= { jnxIkeTunnelMonEntry 46 }
+
+      jnxIkeTunMonDigitalSignAuthKey OBJECT-TYPE
+         SYNTAX         JnxIkeDigitalSignAuthKey
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "Signature key RSA/DSA/ECDSA used for digital-signature auth method."
+         ::= { jnxIkeTunnelMonEntry 47 }
    -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
    -- The IKEv2 global Statistics
    -- Provides global statistics for all IKE tunnels, active and previous.
@@ -1820,7 +1909,7 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
         jnxIkePeerAddrLocalGwAddr           InetAddress,
         jnxIkePeerAddrLocalPort             InetPortNumber,
         jnxIkePeerAddrRoutingInstance       DisplayString,
-        jnxIkePeerAddrIndex                 Integer32
+        jnxIkePeerAddrIndex                 Unsigned32
     }
 
     jnxIkePeerAddrState OBJECT-TYPE
@@ -1901,7 +1990,7 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
         ::= { jnxIkePeerAddrEntry 8 }
 
     jnxIkePeerAddrIndex OBJECT-TYPE
-        SYNTAX          Integer32 (1..2147483647)
+        SYNTAX          Unsigned32 (1..4294967295)
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
@@ -1955,7 +2044,7 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
         jnxIkePeerIdLocalIdType         JnxIkePeerType,
         jnxIkePeerIdLocalIdValue        DisplayString,
         jnxIkePeerIdAAAUserName         DisplayString,
-        jnxIkePeerIdIndex               Integer32,
+        jnxIkePeerIdIndex               Unsigned32,
         jnxIkePeerInternalIndex         Integer32
     }
 
@@ -2051,7 +2140,7 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
         ::= { jnxIkePeerIdEntry 7 }
 
     jnxIkePeerIdIndex OBJECT-TYPE
-        SYNTAX          Integer32 (1..2147483647)
+        SYNTAX          Unsigned32 (1..4294967295)
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
@@ -2084,7 +2173,7 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
 
     JnxIkePeerStatsEntry::= SEQUENCE {
         jnxIkePeerStatsState                    JnxPeerStateType,
-        jnxIkePeerStatsIndex                    Integer32,
+        jnxIkePeerStatsIndex                    Unsigned32,
         jnxIkePeerStatsRemoteGwAddrType         InetAddressType,
         jnxIkePeerStatsRemoteGwAddr             InetAddress,
         jnxIkePeerStatsRemotePort               InetPortNumber,
@@ -2175,7 +2264,7 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
          ::= { jnxIkePeerStatsEntry 1 }
 
     jnxIkePeerStatsIndex OBJECT-TYPE
-        SYNTAX          Integer32 (1..2147483647)
+        SYNTAX          Unsigned32 (1..4294967295)
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
@@ -2963,7 +3052,7 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
     JnxPeerIkeSaCorrEntry ::= SEQUENCE {
         jnxPeerIkeSaCorrPeerIndex           Integer32,
         jnxPeerIkeSaCorrIntIndex            Integer32,
-        jnxPeerIkeSaCorrIkeTunMonIndex      Integer32
+        jnxPeerIkeSaCorrIkeTunMonIndex      Unsigned32
     }
 
     jnxPeerIkeSaCorrPeerIndex OBJECT-TYPE
@@ -2987,7 +3076,7 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
         ::= { jnxPeerIkeSaCorrEntry 2 }
 
     jnxPeerIkeSaCorrIkeTunMonIndex OBJECT-TYPE
-        SYNTAX          Integer32 (1..2147483647)
+        SYNTAX          Unsigned32 (1..4294967295)
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
@@ -3787,7 +3876,12 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
          jnxIpSecTunMonInvalidSpi           Counter64,
          jnxIpSecTunMonTsCheckFail          Counter64,
          jnxIpSecTunMonDiscarded            Counter64,
-         jnxIpSecTunMonTunType              JnxIkeTunType
+         jnxIpSecTunMonTunType              JnxIkeTunType,
+         jnxIpSecTunMonTsType               JnxIpSecTsType,
+         jnxIpSecTunMonTSi                  DisplayString,
+         jnxIpSecTunMonTSr                  DisplayString,
+         jnxIpSecTunMonTunMtu               Integer32,
+         jnxIpSecTunMonExceedsTunMtu        Counter64
       }
 
       jnxIpSecTunMonRemoteGwAddrType OBJECT-TYPE
@@ -3840,7 +3934,7 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
       jnxIpSecTunMonLocalProxyId OBJECT-TYPE
          SYNTAX        DisplayString
          MAX-ACCESS    read-only 
-         STATUS        current 
+         STATUS        deprecated
          DESCRIPTION
             "Identifier for the local end."
          ::= { jnxIpSecTunnelMonEntry 6 }
@@ -3848,7 +3942,7 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
       jnxIpSecTunMonRemoteProxyId OBJECT-TYPE
          SYNTAX        DisplayString
          MAX-ACCESS    read-only 
-         STATUS        current 
+         STATUS        deprecated
          DESCRIPTION
             "Identifier for the remote end."
          ::= { jnxIpSecTunnelMonEntry 7 }
@@ -4079,6 +4173,50 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
          DESCRIPTION
             "The Tunnel type. It can be regular (1) or ha-link (2)."
          ::= { jnxIpSecTunnelMonEntry 33 }
+
+      jnxIpSecTunMonTsType OBJECT-TYPE
+         SYNTAX        JnxIpSecTsType
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "The TS type. It can be proxyId (1) or trafficSelector (2)."
+         ::= { jnxIpSecTunnelMonEntry 34 }
+
+      jnxIpSecTunMonTSi OBJECT-TYPE
+         SYNTAX        DisplayString
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Negotiated Traffic Selector or Proxy ID for the local end."
+         ::= { jnxIpSecTunnelMonEntry 35 }
+
+      jnxIpSecTunMonTSr OBJECT-TYPE
+         SYNTAX        DisplayString
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Negotiated Traffic Selector or Proxy ID for the remote end."
+         ::= { jnxIpSecTunnelMonEntry 36 }
+
+      jnxIpSecTunMonTunMtu OBJECT-TYPE
+         SYNTAX         Integer32 (0..9192)
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION
+            "The maximum transmit packet size (256..9192) for IPSec
+             tunnels. The value of this object will be 0, if tunnel
+             MTU is not configured."
+         ::= { jnxIpSecTunnelMonEntry 37 }
+
+      jnxIpSecTunMonExceedsTunMtu OBJECT-TYPE
+         SYNTAX        Counter64
+         UNITS         "Packets"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets received by this Phase-2 tunnel that
+             failed due to Exceeding Tunnel MTU."
+         ::= { jnxIpSecTunnelMonEntry 38 }
 
    -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
    -- The IPsec Phase-2 Security Association (SA) Table
@@ -4446,6 +4584,16 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
             "Total number of discarded packets."
          ::= { jnxIpSecGlobalStats 17 }
 
+      jnxIpSecGlobalExceedsTunMtu OBJECT-TYPE
+         SYNTAX        Counter64
+         UNITS         "Packets"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets received by all Phase-2 tunnel that
+             failed due to Exceeding Tunnel MTU."
+         ::= { jnxIpSecGlobalStats 18 }
+
    -- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
    -- The IPsec Phase-2 HA Link Global Statistics
    -- Provides global statistics for all HA Link phase 2 tunnels.
@@ -4600,6 +4748,16 @@ JUNIPER-IPSEC-FLOW-MON-MIB DEFINITIONS ::= BEGIN
          DESCRIPTION
             "Total number of discarded packets."
          ::= { jnxIpSecHaLinkGlobalStats 17 }
+
+      jnxIpSecHaLinkGlobalExceedsTunMtu OBJECT-TYPE
+         SYNTAX        Counter64
+         UNITS         "Packets"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+            "Number of packets received by all Phase-2 tunnel that
+             failed due to Exceeding Tunnel MTU."
+         ::= { jnxIpSecHaLinkGlobalStats 18 }
 
 END
 

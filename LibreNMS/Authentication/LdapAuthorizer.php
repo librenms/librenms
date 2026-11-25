@@ -337,6 +337,7 @@ class LdapAuthorizer extends AuthorizerBase
             'realname' => $entry['cn'][0] ?? null,
             'user_id' => $entry[$uid_attr][0] ?? null,
             'email' => $entry[LibrenmsConfig::get('auth_ldap_emailattr', 'mail')][0] ?? null,
+            'phone' => $entry[LibrenmsConfig::get('auth_ldap_phoneattr', 'mobile')][0] ?? null,
         ];
     }
 

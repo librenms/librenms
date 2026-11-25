@@ -39,6 +39,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\DeviceType;
 use LibreNMS\Enum\IfOperStatus;
 
 class MapDataController extends Controller
@@ -487,12 +488,12 @@ class MapDataController extends Controller
                 $updowntime = '';
             }
 
-            $deviceTypes = collect(LibrenmsConfig::get('device_types', []))->pluck('icon', 'type');
+            $deviceTypes = DeviceType::icons();
 
             $device_list[$device->device_id] = [
                 'id' => $device->device_id,
                 'icon' => $device->icon,
-                'typeIcon' => $deviceTypes->get($device->type, 'server'),
+                'typeIcon' => $deviceTypes[$device->type] ?? 'server',
                 'icontitle' => $device->icon ? str_replace(['.svg', '.png'], '', basename((string) $device->icon)) : $device->os,
                 'sname' => $device->shortDisplayName(),
                 'status' => $device->status,
@@ -501,7 +502,7 @@ class MapDataController extends Controller
                 'last_polled' => $device->last_polled,
                 'disabled' => $device->disabled,
                 'no_alerts' => $device->disable_notify,
-                'url' => route('device', ['device' => $device->device_id]),
+                'url' => route('device.overview', ['device' => $device->device_id]),
                 'style' => self::deviceStyle($device, $request->highlight_node),
                 'lat' => $device->location ? $device->location->lat : null,
                 'lng' => $device->location ? $device->location->lng : null,
@@ -799,7 +800,7 @@ class MapDataController extends Controller
                 'icon' => $service->device->icon,
                 'icontitle' => $service->device->icon ? str_replace(['.svg', '.png'], '', basename((string) $service->device->icon)) : $service->device->os,
                 'device_name' => $service->device->shortDisplayName(),
-                'url' => route('device', ['device' => $service->device_id]),
+                'url' => route('device.overview', ['device' => $service->device_id]),
                 'updowntime' => $updowntime,
                 'compact' => LibrenmsConfig::get('webui.availability_map_compact'),
                 'box_size' => LibrenmsConfig::get('webui.availability_map_box_size'),

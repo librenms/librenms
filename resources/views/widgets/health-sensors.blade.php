@@ -20,8 +20,8 @@
                     <tr @class(['danger' => $status === 'critical', 'warning' => $status === 'warning'])>
                         <td class="tw:text-right tw:text-gray-500">{{ $index + 1 }}</td>
                         <td>
-                            <a href="{{ route('device', ['device' => $sensor->device_id]) }}" class="tw:text-inherit tw:no-underline hover:tw:underline">
-                                {{ $sensor->device?->displayName() ?? __('Unknown device') }}
+                            <a href="{{ route('device.overview', ['device' => $sensor->device_id]) }}" class="tw:text-inherit tw:no-underline hover:tw:underline">
+                                {{ $sensor->device?->display ?? __('Unknown device') }}
                             </a>
                         </td>
                         <td>
@@ -36,69 +36,73 @@
         </table>
     </div>
 @else
-    @php($colWidth = max(1, min(12, intdiv(12, max(1, (int) ($cols ?? 3))))))
+    {{--
+        Layout: an outer container-query context (tw:@container) wraps a CSS grid that
+        tiles cards evenly and reflows columns as the widget narrows. Each card is its own
+        container (tw:@container) so the value can size to the card with cqi units.
+        --hs-cols (grid) and --hs-len (value length) are per-render values set inline below.
+    --}}
+    <div class="health-sensors-widget tw:@container">
+        <div class="tw:grid tw:gap-3
+                    tw:grid-cols-[repeat(var(--hs-cols,3),minmax(0,1fr))]
+                    tw:@max-[640px]:grid-cols-[repeat(min(var(--hs-cols,3),2),minmax(0,1fr))]
+                    tw:@max-[380px]:grid-cols-[minmax(0,1fr)]"
+             style="--hs-cols: {{ max(1, min(12, (int) ($cols ?? 3))) }}">
+            @foreach ($sensors as $row)
+                @php($sensor = $row['sensor'])
+                @php($status = $row['status'] ?? 'unknown')
+                @php($deviceUrl = route('device.overview', ['device' => $sensor->device_id]))
+                @php($graphType = $sensor->getGraphType())
+                @php($graphUrl = route('graphs', ['type' => $graphType, 'id' => $sensor->sensor_id]))
+                @php($graphVars = ['id' => $sensor->sensor_id])
 
-    <div class="health-sensors-widget row">
-        @foreach ($sensors as $row)
-            @php($sensor = $row['sensor'])
-            @php($status = $row['status'] ?? 'unknown')
-            @php($deviceUrl = route('device', ['device' => $sensor->device_id]))
-            @php($graphType = $sensor->getGraphType())
-            @php($graphUrl = route('graphs', ['type' => $graphType, 'id' => $sensor->sensor_id]))
-            @php($graphVars = ['id' => $sensor->sensor_id])
-
-            @if ($display_mode === 'progress-bar')
-                @php($value = is_numeric($sensor->sensor_current) ? (float) $sensor->sensor_current : null)
-                @php($min = is_numeric($row['gauge_min'] ?? null) ? (float) $row['gauge_min'] : 0.0)
-                @php($max = is_numeric($row['gauge_max'] ?? null) ? (float) $row['gauge_max'] : 1.0)
-                @php($range = max(0.000001, $max - $min))
-                @php($pct = $value === null ? 0.0 : max(0.0, min(100.0, (($value - $min) / $range) * 100.0)))
-                @php($barColor = match ($status) {
-                'critical' => 'tw:bg-red-600',
-                'warning' => 'tw:bg-amber-500',
-                default => 'tw:bg-green-600',
-            })
-
-                                                    <div class="col-sm-{{ $colWidth }}">
-                                                        <div class="tw:mb-3 tw:pt-1.5">
-                                                            <div class="tw:text-center tw:text-2xl tw:font-bold tw:dark:text-gray-500">
-                                                                <a href="{{ $graphUrl }}" class="tw:block tw:w-full tw:no-underline tw:hover:no-underline">{{ \Str::limit($sensor->sensor_descr, 42) }}</a>
-                                                            </div>
-                                                            <div class="tw:rounded tw:border tw:border-black/10 tw:dark:border-black/60 tw:bg-black/5 tw:dark:bg-[#3e444c] tw:p-3">
-                                                                <div class="tw:flex tw:items-baseline tw:justify-between tw:gap-2">
-                                                                    <div class="tw:text-2xl tw:font-semibold tw:leading-tight">
-                                                                        <a href="{{ $graphUrl }}" class="tw:block tw:w-full tw:no-underline tw:hover:no-underline">{{ $sensor->formatValue() }}</a>
-                                                                    </div>
-                                                                    <div class="tw:text-xl tw-font-semibold tw-leading-tight tw:text-right"><a href="{{ $deviceUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline tw:dark:text-gray-500">{{ $sensor->device?->displayName() ?? __('Unknown device') }}</a>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="tw:mt-2 tw:h-3 tw:w-full tw:rounded tw:bg-black/10 tw:dark:bg-black/40 tw:overflow-hidden">
-                                                                    <div class="tw:h-full {{ $barColor }}" style="width: {{ $pct }}%"></div>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                @elseif ($display_mode === 'gauge')
-                    <div class="col-sm-{{ $colWidth }}">
-                        <div class="tw:mb-3 tw:pt-1.5">
-                            <div class="tw:text-center tw:text-base tw:font-bold tw:dark:text-gray-500">
-                                <a href="{{ $graphUrl }}" class="tw:no-underline tw:hover:no-underline">{{ \Str::limit($sensor->sensor_descr, 42) }}</a> - <a href="{{ $deviceUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline tw:dark:text-gray-500">{{ $sensor->device?->displayName() ?? __('Unknown device') }}</a>
+                @if ($display_mode === 'progress-bar')
+                    @php($value = is_numeric($sensor->sensor_current) ? (float) $sensor->sensor_current : null)
+                    @php($min = is_numeric($row['gauge_min'] ?? null) ? (float) $row['gauge_min'] : 0.0)
+                    @php($max = is_numeric($row['gauge_max'] ?? null) ? (float) $row['gauge_max'] : 1.0)
+                    @php($range = max(0.000001, $max - $min))
+                    @php($pct = $value === null ? 0.0 : max(0.0, min(100.0, (($value - $min) / $range) * 100.0)))
+                    @php($barColor = match ($status) {
+                        'critical' => 'tw:bg-red-600',
+                        'warning' => 'tw:bg-amber-500',
+                        default => 'tw:bg-green-600',
+                    })
+                    <div class="tw:@container tw:flex tw:flex-col tw:justify-center">
+                        <div class="tw:text-center tw:text-xl tw:font-bold tw:truncate tw:dark:text-gray-500">
+                            <a href="{{ $graphUrl }}" class="tw:text-inherit tw:no-underline tw:hover:no-underline">{{ \Str::limit($sensor->sensor_descr, 42) }}</a>
+                        </div>
+                        <div class="tw:mt-1 tw:rounded tw:border tw:border-black/10 tw:dark:border-black/60 tw:bg-black/5 tw:dark:bg-[#3e444c] tw:p-3">
+                            <div class="tw:flex tw:items-baseline tw:justify-between tw:gap-2">
+                                <div class="tw:text-xl tw:font-semibold tw:leading-tight tw:whitespace-nowrap">
+                                    <a href="{{ $graphUrl }}" class="tw:text-inherit tw:no-underline tw:hover:no-underline">{{ $sensor->formatValue() }}</a>
+                                </div>
+                                <div class="tw:text-sm tw:font-semibold tw:leading-tight tw:text-right tw:truncate">
+                                    <a href="{{ $deviceUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline tw:dark:text-gray-500">{{ $sensor->device?->display ?? __('Unknown device') }}</a>
+                                </div>
                             </div>
-                            <div
-                                id="health-gauge-{{ $id }}-{{ $sensor->sensor_id }}"
-                                class="health-gauge-{{ $id }} tw:h-28"
-                                data-value="{{ $sensor->sensor_current ?? 0 }}"
-                                data-min="{{ $row['gauge_min'] }}"
-                                data-max="{{ $row['gauge_max'] }}"
-                                data-symbol="{{ $sensor->unit() }}"
-                            ></div>
+                            <div class="tw:mt-2 tw:h-3 tw:w-full tw:rounded tw:bg-black/10 tw:dark:bg-black/40 tw:overflow-hidden">
+                                <div class="tw:h-full {{ $barColor }}" style="width: {{ $pct }}%"></div>
+                            </div>
                         </div>
                     </div>
+                @elseif ($display_mode === 'gauge')
+                    <div class="tw:@container tw:flex tw:flex-col tw:justify-center">
+                        <div class="tw:text-center tw:text-base tw:font-bold tw:truncate tw:dark:text-gray-500">
+                            <a href="{{ $graphUrl }}" class="tw:no-underline tw:hover:no-underline">{{ \Str::limit($sensor->sensor_descr, 42) }}</a> - <a href="{{ $deviceUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline tw:dark:text-gray-500">{{ $sensor->device?->display ?? __('Unknown device') }}</a>
+                        </div>
+                        <div
+                            id="health-gauge-{{ $id }}-{{ $sensor->sensor_id }}"
+                            class="health-gauge-{{ $id }} tw:h-28"
+                            data-value="{{ $sensor->sensor_current ?? 0 }}"
+                            data-min="{{ $row['gauge_min'] }}"
+                            data-max="{{ $row['gauge_max'] }}"
+                            data-symbol="{{ $sensor->unit() }}"
+                        ></div>
+                    </div>
                 @elseif ($display_mode === 'graph')
-                <div class="col-sm-{{ $colWidth }}">
-                    <div class="tw:mb-3 tw:rounded tw:border tw:border-black/10 tw:dark:border-black/60 tw:bg-black/5 tw:dark:bg-[#3e444c] tw:p-2">
-                        <div class="tw:text-center tw:text-base tw:font-medium tw:dark:text-gray-700 tw:dark:text-gray-300">
-                            <a href="{{ $graphUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline tw:dark:text-gray-500">{{ \Str::limit($sensor->sensor_descr, 52) }}</a> - <a href="{{ $deviceUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline tw:dark:text-gray-500">{{ $sensor->device?->displayName() ?? __('Unknown device') }}</a>
+                    <div class="tw:@container tw:rounded tw:border tw:border-black/10 tw:dark:border-black/60 tw:bg-black/5 tw:dark:bg-[#3e444c] tw:p-2">
+                        <div class="tw:text-center tw:text-base tw:font-medium tw:truncate tw:dark:text-gray-300">
+                            <a href="{{ $graphUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline tw:dark:text-gray-500">{{ \Str::limit($sensor->sensor_descr, 52) }}</a> - <a href="{{ $deviceUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline tw:dark:text-gray-500">{{ $sensor->device?->display ?? __('Unknown device') }}</a>
                         </div>
                         <x-graph
                             :type="$graphType"
@@ -111,31 +115,31 @@
                             img-class="tw:w-full tw:h-auto"
                         />
                     </div>
-                </div>
-            @else
-                <div class="col-sm-{{ $colWidth }}">
-                    <div class="tw:mb-3 tw:rounded tw:border tw:border-black/10 tw:dark:border-black/60 tw:shadow-sm tw:dark:shadow-black/30 tw:bg-black/5 tw:dark:bg-[#3e444c] tw:border-l-4 tw:min-h-24 tw:flex tw:flex-col tw:justify-center tw:items-center tw:px-3 tw:py-2
+                @else
+                    @php($valueStr = $sensor->formatValue())
+                    <div class="tw:@container tw:rounded tw:border tw:border-black/10 tw:dark:border-black/60 tw:shadow-sm tw:dark:shadow-black/30 tw:bg-black/5 tw:dark:bg-[#3e444c] tw:border-l-4 tw:min-h-24 tw:flex tw:flex-col tw:justify-center tw:items-center tw:px-3 tw:py-2
                         @if($status === 'critical') tw:border-l-red-600
                         @elseif($status === 'warning') tw:border-l-amber-500
                         @else tw:border-l-green-600
                         @endif">
-                        <a href="{{ $graphUrl }}" class="tw:block tw:w-full tw:no-underline tw:hover:no-underline">
-                            <div class="tw:text-7xl tw:font-semibold tw:leading-tight tw:whitespace-nowrap">
-                                {{ $sensor->formatValue() }}
+                        <a href="{{ $graphUrl }}" class="tw:block tw:w-full tw:text-center tw:no-underline tw:hover:no-underline">
+                            <div class="tw:text-[length:clamp(1rem,calc(145cqi/max(var(--hs-len,4),3)),4.5rem)] tw:leading-[1.05] tw:whitespace-nowrap tw:font-semibold tw:dark:text-gray-200"
+                                 style="--hs-len: {{ max(3, mb_strlen($valueStr)) }}">
+                                {{ $valueStr }}
                             </div>
-                            <div class="tw:mt-1 tw:font-medium tw:hover:underline">
+                            <div class="tw:mt-1 tw:font-medium tw:line-clamp-2 tw:hover:underline">
                                 {{ \Str::limit($sensor->sensor_descr, 64) }}
                             </div>
                         </a>
-                        <div class="tw:mt-1.5 tw:w-full tw:text-center tw:text-sm tw:text-gray-500">
+                        <div class="tw:mt-1.5 tw:w-full tw:text-center tw:text-sm tw:text-gray-500 tw:truncate">
                             <a href="{{ $deviceUrl }}" class="tw:text-inherit tw:no-underline tw:hover:underline">
-                                {{ $sensor->device?->displayName() ?? __('Unknown device') }}
+                                {{ $sensor->device?->display ?? __('Unknown device') }}
                             </a>
                         </div>
                     </div>
-                </div>
-            @endif
-        @endforeach
+                @endif
+            @endforeach
+        </div>
     </div>
 
     @if ($display_mode === 'gauge')

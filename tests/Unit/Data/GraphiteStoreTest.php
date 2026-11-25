@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Tests\Unit\Data;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Carbon\Carbon;
@@ -93,6 +94,19 @@ final class GraphiteStoreTest extends TestCase
         $mockSocket->shouldReceive('write')
             ->with("testhost.testmeasure.rrd_name.ifOut 53453 $this->timestamp\n")->once();
         $graphite->write($measurement, $fields, $tags, $meta);
+    }
+
+    public function testMetricsAreNamedAfterTheirIdentity(): void
+    {
+        $mockSocket = \Mockery::mock(\Socket\Raw\Socket::class);
+        $graphite = $this->mockGraphite($mockSocket);
+
+        foreach ([100, 101] as $id) {
+            $identity = new MetricIdentity('vm.cpu', ['cluster' => 'proxmox-abc', 'type' => 'proxmox', 'id' => $id]);
+            $mockSocket->shouldReceive('write')
+                ->with("proxmox-abc.vm_cpu.proxmox.$id.usage 25 $this->timestamp\n")->once();
+            $graphite->write('vm.cpu', ['usage' => 25], $identity->tags, ['device' => new Device(['hostname' => 'testhost']), 'metric' => $identity]);
+        }
     }
 
     private function mockGraphite(Socket $mockSocket): Graphite

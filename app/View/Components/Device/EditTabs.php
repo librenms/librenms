@@ -42,7 +42,6 @@ class EditTabs extends Component
         ?string $tab = null,
     ) {
         $this->tab = $tab ?? Request::segment(4, 'edit');
-        $snmpEnabled = $this->device->polling()->isEnabled(PollingMethodType::Snmp);
 
         $this->tabs = [
             'edit' => [
@@ -55,50 +54,41 @@ class EditTabs extends Component
             ],
         ];
 
-        if ($snmpEnabled) {
+        if ($this->device->ports()->exists()) {
             $this->tabs['ports'] = [
                 'text' => __('Ports'),
                 'link' => route('device.edit.ports', $this->device->device_id),
             ];
         }
 
-        if ($device->bgppeers()->exists()) {
+        if ($device->bgppeers()->exists() || $device->vrfs()->exists()) {
             $this->tabs['routing'] = [
                 'text' => __('Routing'),
                 'link' => route('device.edit.routing', $this->device->device_id),
             ];
         }
 
-        if (count(LibrenmsConfig::get("os.{$device->os}.icons", []))) {
-            $this->tabs['icon'] = [
-                'text' => __('Icon'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=icon/'),
-            ];
-        }
-
-        if ($snmpEnabled) {
+        if ($this->device->polling()->isEnabled(PollingMethodType::Snmp)) {
             $this->tabs['apps'] = [
                 'text' => __('Applications'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=apps/'),
+                'link' => route('device.edit.apps', $this->device->device_id),
             ];
         }
 
         $this->tabs['alert-rules'] = [
             'text' => __('Alert Rules'),
-            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=alert-rules/'),
+            'link' => route('device.edit.alert-rules', $this->device->device_id),
         ];
 
-        if ($snmpEnabled) {
-            $this->tabs['modules'] = [
-                'text' => __('Modules'),
-                'link' => route('device.edit.modules', $this->device->device_id),
-            ];
-        }
+        $this->tabs['modules'] = [
+            'text' => __('Modules'),
+            'link' => route('device.edit.modules', $this->device->device_id),
+        ];
 
         if (LibrenmsConfig::get('show_services')) {
             $this->tabs['services'] = [
                 'text' => __('Services'),
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=services/'),
+                'link' => route('device.edit.services', $this->device->device_id),
             ];
         }
 
@@ -116,15 +106,21 @@ class EditTabs extends Component
             ];
         }
 
-        if ($snmpEnabled) {
+        if ($this->device->storage()->exists()) {
             $this->tabs['storage'] = [
                 'text' => __('Storage'),
                 'link' => route('device.edit.storage', $this->device->device_id),
             ];
+        }
+
+        if ($this->device->processors()->exists()) {
             $this->tabs['processors'] = [
                 'text' => __('Processors'),
                 'link' => route('device.edit.processors', $this->device->device_id),
             ];
+        }
+
+        if ($this->device->mempools()->exists()) {
             $this->tabs['mempools'] = [
                 'text' => __('Memory'),
                 'link' => route('device.edit.mempools', $this->device->device_id),
@@ -138,12 +134,12 @@ class EditTabs extends Component
 
         $this->tabs['component'] = [
             'text' => __('Components'),
-            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=component/'),
+            'link' => route('device.edit.components', $this->device->device_id),
         ];
 
         $this->tabs['customoid'] = [
             'text' => __('Custom OID'),
-            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=customoid/'),
+            'link' => route('device.edit.customoids', $this->device->device_id),
         ];
     }
 

@@ -215,9 +215,11 @@ class PortsController extends TableController
         $adminStatus = $port->ifAdminStatus?->value;
         $speed = Number::formatSi($port->ifSpeed);
 
+        $device = $port->device;
+
         return [
             'device_id' => $port->device_id,
-            'hostname' => $port->device?->displayName(),
+            'hostname' => $device->display,
             'port' => $port->ifName ?: $port->ifDescr,
             'ifindex' => $port->ifIndex,
             'status' => $status,

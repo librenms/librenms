@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (INDEX { 1 } is not an object)
 -- *****************************************************************
 -- OTDR-MIB:  Vitesse private MIB
 --
@@ -686,8 +687,7 @@ tnOTDRReportEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "Each OTDR interface has a set of parameters"
---    INDEX { ifIndex}
-    INDEX { 1  }
+    INDEX { ifIndex }
            ::= { tnOTDRReportTable 1 }
 
 TnOTDRReportEntry ::= SEQUENCE {

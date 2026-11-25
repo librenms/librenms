@@ -26,9 +26,9 @@
 
 namespace LibreNMS\Util;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
-use Symfony\Component\HttpFoundation\HeaderBag;
 
 class Laravel
 {
@@ -48,13 +48,11 @@ class Laravel
     }
 
     /**
-     * Boot Laravel in a non-Laravel web script
-     *
-     * @param  bool  $authenticate  Use session+db to authenticate user (does not authorize)
+     * Boot Laravel with session and auth for standalone v1 plugin scripts (such as the Weathermap editor).
+     * The request is routed to an empty endpoint, so the script can call Auth::check() and output its own response.
      */
-    public static function bootWeb($authenticate = false)
+    public static function bootWeb(): void
     {
-        // this is not a substitute for the normal Laravel boot, just a way to make auth work for external php
         if (self::isBooted()) {
             return;
         }
@@ -64,13 +62,17 @@ class Laravel
         $app = require_once $install_dir . '/bootstrap/app.php';
         $kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
 
-        $request = \Illuminate\Http\Request::capture();
-
-        self::rewriteDummyHeaders($request, $authenticate);
-
+        // json accept prevents a login redirect back to the boot url
+        $request = Request::create('/legacy-plugin-boot', 'GET', [], $_COOKIE, [], array_replace($_SERVER, ['HTTP_ACCEPT' => 'application/json']));
         $response = $kernel->handle($request);
 
-//        $response->send(); // don't send response, legacy code will
+        // stop the plugin if middleware refused the request (guest, disabled user, 2fa, etc)
+        if ($response->getStatusCode() !== 204) {
+            $response = $response->getStatusCode() === 401 ? redirect()->route('login') : $response;
+            $response->send();
+            $kernel->terminate($request, $response);
+            exit;
+        }
     }
 
     public static function isBooted()
@@ -89,28 +91,5 @@ class Laravel
         return Laravel::isBooted()
             ? App::runningInConsole()
             : (php_sapi_name() == 'cli' && empty($_SERVER['REMOTE_ADDR']));
-    }
-
-    /**
-     * Add prefix and strip .php to make the url helper work in non-laravel php scripts
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  bool  $auth
-     */
-    private static function rewriteDummyHeaders($request, $auth)
-    {
-        // set dummy path allows url helper to work and prevents full init again
-        $new_uri = ($auth ? '/dummy_legacy_auth' : '/dummy_legacy_unauth');
-        $request->server->set('REQUEST_URI', $new_uri);
-
-        // tests fail without this
-        if ($request->server->get('REMOTE_ADDR') === null) {
-            $request->server->set('REMOTE_ADDR', '127.0.0.1');
-        }
-
-        // set json type to prevent redirects in the dummy page
-        $request->server->set('HTTP_ACCEPT', 'dummy/json');
-
-        $request->headers = new HeaderBag($request->server->getHeaders());
     }
 }

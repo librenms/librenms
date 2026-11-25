@@ -22,5 +22,4 @@ discovery_modules:
     storage: false
     ospf: false
     ucd-diskio: false
-    cisco-vrf-lite: false
     wireless: false

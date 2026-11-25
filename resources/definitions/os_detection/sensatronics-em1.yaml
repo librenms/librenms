@@ -1,6 +1,6 @@
 os: sensatronics-em1
 text: 'Sensatronics EM1'
-type: sensor
+type: environment
 icon: sensatronics
 over:
     - { graph: device_temperature, text: 'Temperature' }

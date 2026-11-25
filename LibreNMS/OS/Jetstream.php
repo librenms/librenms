@@ -35,6 +35,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Discovery\Neighbors\Neighbor;
 use LibreNMS\Discovery\Neighbors\NeighborParser;
+use LibreNMS\Discovery\Neighbors\PortFinder;
 use LibreNMS\Enum\LldpPortIdSubtype;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Interfaces\Discovery\Ipv6AddressDiscovery;
@@ -47,6 +48,8 @@ use SnmpQuery;
 
 class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, VlanDiscovery, VlanPortDiscovery
 {
+    private ?PortFinder $portFinder = null;
+
     public function discoverIpv6Addresses(): Collection
     {
         return \SnmpQuery::allowUnordered()->enumStrings()->walk('TPLINK-IPV6ADDR-MIB::ipv6ParaConfigAddrTable')
@@ -253,5 +256,29 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
             'agent circuit id' => LldpPortIdSubtype::AgentCircuitId,
             default => LldpPortIdSubtype::Local,
         };
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function fdbBridgePorts(): array
+    {
+        $table = SnmpQuery::allowUnordered()->walk('Q-BRIDGE-MIB::dot1qTpFdbPort')->table(1);
+
+        return array_map(fn ($data) => $this->fixFdbMacIndexes($data['Q-BRIDGE-MIB::dot1qTpFdbPort'] ?? []), $table) ?: parent::fdbBridgePorts();
+    }
+
+    protected function fdbPortId(int|string $bridgePort, int|string $vlan): ?int
+    {
+        // TP-Link JetStream: ifIndex = bridge port + 49152
+        $port_id = PortCache::getIdFromIfIndex((int) $bridgePort + 49152, $this->getDeviceId());
+        if ($port_id) {
+            return $port_id;
+        }
+
+        // fallback: try name match (with and without space)
+        $this->portFinder ??= PortFinder::forDevice($this->getDeviceId());
+
+        return ($this->portFinder->byDescr('gigabitEthernet 1/0/' . $bridgePort) ?? $this->portFinder->byName('gigabitEthernet1/0/' . $bridgePort))->port_id ?? 0;
     }
 }

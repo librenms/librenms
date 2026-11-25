@@ -6,13 +6,12 @@ OMNITRON-TC-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, Integer32, Unsigned32, Counter64, enterprises
-        FROM SNMPv2-SMI         -- RFC-2578
+        FROM SNMPv2-SMI           -- RFC-2578
     TEXTUAL-CONVENTION
-        FROM SNMPv2-TC;         -- RFC 2579
-
+        FROM SNMPv2-TC;           -- RFC 2579
 
 ostOmnitronTcMib MODULE-IDENTITY
-    LAST-UPDATED "201505131200Z"     -- May 13, 2015
+    LAST-UPDATED "201706061200Z"  -- June 6, 2017    
     ORGANIZATION "Omnitron Systems Technology, Inc."
     CONTACT-INFO "Omnitron Systems Technology, Inc.
                   38 Tesla
@@ -22,28 +21,33 @@ ostOmnitronTcMib MODULE-IDENTITY
              Tel: (949) 250 6510
              Fax: (949) 250 6514
           E-mail: info@omnitron-systems.com
-   International:  949 250 6510
+   International: +1 949 250 6510
 
                   Technical Support and Customer Service
              Tel: (800) 675 8410
           E-mail: support@omnitron-systems.com
-   International:  949 250 6510"
+   International: +1 949 250 6510"
 
     DESCRIPTION
-            "Omnitron TC MIB for use with v5.2 iConverter Management Modules
+            "Omnitron TC MIB for use with v5.3 iConverter Management Modules
              and NetOutlook
 
-             Copyright 2015 Omnitron Systems Technology, Inc.
+             Copyright 2017 Omnitron Systems Technology, Inc.
              All rights reserved
             "
 
-    REVISION    "201505131200Z"     -- May 13, 2015
-    DESCRIPTION "Added OstIpv6Addr, OstIpAddr
-                "
 
-    REVISION    "201501211200Z"     -- January 21, 2015
-    DESCRIPTION "Initial version of v5.2 MIB.
-                   Added OstAccessibiltyType from the OMNITRON-ACL-MIB
+    REVISION    "201706061200Z"  -- June 6, 2017
+    DESCRIPTION "Updated max length for OstIpPriorityList and OstPcpPriorityList
+                   to 64 to match module implementation
+                "
+                
+    REVISION    "201702161200Z"  -- February 16, 2017
+    DESCRIPTION "Added OstFileNameStringOrNone
+                "
+                
+    REVISION    "201603171200Z"     -- March 17, 2016
+    DESCRIPTION "Initial version of v5.3 MIB.
                 "
     ::= { enterprises 7342 11 }
 
@@ -93,7 +97,7 @@ OstCosL2cpDstAddr ::= TEXTUAL-CONVENTION
         "L2CP destination address enumeration.
 
          Index | Destination Address | Name
-         ------+--------------------+---------
+         ------+---------------------+----------
              1 | 01-80-C2-00-00-00   | RSTP
              2 | 01-80-C2-00-00-01   | Pause
              3 | 01-80-C2-00-00-02   | LACP
@@ -202,9 +206,9 @@ OstElpsProtectType ::= TEXTUAL-CONVENTION
        "A value that represents the ELPS protection type.  The value can be one
         of the following:
 
-        e1plus1UniNoAps(1)   1 unidirectional without APS communication
-        e1plus1UniAps(2)     1 unidirectional switching with APS communication
-        e1plus1BiAps(3)      1 bidirectional w/APS communication
+        e1plus1UniNoAps(1)   1+1 unidirectional without APS communication
+        e1plus1UniAps(2)     1+1 unidirectional switching with APS communication
+        e1plus1BiAps(3)      1+1 bidirectional w/APS communication
         e1to1(4)             1:1 bidirectional w/APS communication
         notAvailable(5)      Protect Type is unknown or not available, value returned
                                  for status read, not allowed to write
@@ -430,6 +434,12 @@ OstFileNameString ::= TEXTUAL-CONVENTION
        "A internal file name."
     SYNTAX      OCTET STRING (SIZE(1..45))
 
+OstFileNameStringOrNone ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION
+       "A internal file name."
+    SYNTAX      OCTET STRING (SIZE(0..45))
 
 OstFingerprintString ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "255a"
@@ -539,7 +549,7 @@ OstIpPriorityList ::= TEXTUAL-CONVENTION
          2..5
          0,2..5
        "
-    SYNTAX      OCTET STRING (SIZE(0..14))
+    SYNTAX      OCTET STRING (SIZE(0..64))
 
 
 OstIpv6Addr ::= TEXTUAL-CONVENTION
@@ -649,7 +659,7 @@ OstPcpPriorityList ::= TEXTUAL-CONVENTION
          2..5
          0,2..5
        "
-    SYNTAX      OCTET STRING (SIZE(0..14))
+    SYNTAX      OCTET STRING (SIZE(0..64))
 
 
 OstPortClockType ::= TEXTUAL-CONVENTION
@@ -871,3 +881,4 @@ OstVlanIdList ::= TEXTUAL-CONVENTION
 
 
 END
+

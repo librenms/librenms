@@ -12,7 +12,7 @@
                     "features": null,
                     "location": null,
                     "os": "quantum",
-                    "type": "server",
+                    "type": "storage",
                     "serial": "263102381",
                     "icon": "quantum.svg"
                 }

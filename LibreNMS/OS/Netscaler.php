@@ -26,10 +26,15 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Sensor;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Oid;
+use SnmpQuery;
 
 class Netscaler extends \LibreNMS\OS implements OSPolling
 {
@@ -165,5 +170,46 @@ class Netscaler extends \LibreNMS\OS implements OSPolling
         $this->enableGraph('netscaler_tcp_conn');
         $this->enableGraph('netscaler_tcp_bits');
         $this->enableGraph('netscaler_tcp_pkts');
+    }
+
+    /**
+     * Health counters are named by their index, the name tells the type
+     */
+    protected function discoverOsSensors(): Collection
+    {
+        $sensors = new Collection;
+
+        foreach (SnmpQuery::walk('NS-ROOT-MIB::sysHealthCounterValue')->table(1) as $name => $data) {
+            $name = trim((string) $name, '"');
+            $value = $data['NS-ROOT-MIB::sysHealthCounterValue'] ?? null;
+            $divisor = 1;
+            if (str_contains($name, 'Temp')) {
+                $type = SensorType::Temperature;
+            } elseif (str_contains($name, 'Fan')) {
+                $type = SensorType::Fanspeed;
+            } elseif (str_contains($name, 'Volt') || str_contains($name, 'Vtt')) {
+                $type = SensorType::Voltage;
+                $divisor = 1000;
+            } else {
+                continue;
+            }
+
+            if (is_numeric($value)) {
+                $sensors->push(new Sensor([
+                    'poller_type' => 'snmp',
+                    'sensor_class' => $type->value,
+                    'sensor_oid' => '.1.3.6.1.4.1.5951.4.1.1.41.7.1.2.' . Oid::encodeString($name),
+                    'sensor_index' => $name,
+                    'sensor_type' => 'netscaler-health',
+                    'sensor_descr' => $name,
+                    'sensor_divisor' => $divisor,
+                    'sensor_multiplier' => 1,
+                    'sensor_current' => $value / $divisor,
+                    'rrd_type' => 'GAUGE',
+                ]));
+            }
+        }
+
+        return $sensors;
     }
 }

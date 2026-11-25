@@ -4,7 +4,6 @@ return [
     'custom' => [
         'title' => [
             'edit_dialog' => 'Wähle eine Karte zum Bearbeiten',
-            'create' => 'Erstelle eine individuelle Karte',
             'view' => ':name | Individuelle Karte',
             'edit' => 'Bearbeite eine individuelle Karte',
             'manage' => 'Verwalte individuelle Karten',

@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing imports)
 --- ArubaOS 8.8.0.1_80393
 -- vim:set ts=4 sw=4: 
 WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
@@ -48,7 +49,7 @@ WLSX-WLAN-MIB DEFINITIONS ::= BEGIN
        ArubaMeshRole,
 	   ArubaHTMode,
 	   ArubaPortSpeed,
-	   ArubaHTExtChannel
+	   ArubaHTExtChannel, ArubaFlexRadioMode, ArubaDual5GMode, ArubaSplit5GMode
 	   		FROM ARUBA-TC
 
        OBJECT-GROUP

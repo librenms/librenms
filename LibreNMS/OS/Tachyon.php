@@ -32,6 +32,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
+use SnmpQuery;
 
 class Tachyon extends OS implements
     WirelessClientsDiscovery,
@@ -71,10 +72,10 @@ class Tachyon extends OS implements
     public function discoverWirelessFrequency()
     {
         $sensors = [];
-        $data = $this->getCacheTable('TACHYON-MIB::wirelessRadioTable');
+        $data = SnmpQuery::cache()->numericIndex()->walk('TACHYON-MIB::wirelessRadioTable')->valuesByIndex();
 
         foreach ($data as $index => $entry) {
-            if (! empty($entry['wirelessRadioFrequency'])) {
+            if (! empty($entry['TACHYON-MIB::wirelessRadioFrequency'])) {
                 $sensors[] = new WirelessSensor(
                     WirelessSensorType::Frequency,
                     $this->getDeviceId(),
@@ -101,10 +102,10 @@ class Tachyon extends OS implements
     public function discoverWirelessPower()
     {
         $sensors = [];
-        $data = $this->getCacheTable('TACHYON-MIB::wirelessRadioTable');
+        $data = SnmpQuery::cache()->numericIndex()->walk('TACHYON-MIB::wirelessRadioTable')->valuesByIndex();
 
         foreach ($data as $index => $entry) {
-            if (! empty($entry['wirelessRadioTxPower'])) {
+            if (! empty($entry['TACHYON-MIB::wirelessRadioTxPower'])) {
                 $sensors[] = new WirelessSensor(
                     WirelessSensorType::Power,
                     $this->getDeviceId(),
@@ -131,11 +132,11 @@ class Tachyon extends OS implements
     public function discoverWirelessRssi()
     {
         $sensors = [];
-        $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
+        $data = SnmpQuery::cache()->numericIndex()->walk('TACHYON-MIB::wirelessPeersTable')->valuesByIndex();
 
         foreach ($data as $index => $entry) {
-            if (! empty($entry['wirelessPeerRxPower'])) {
-                $mac = $entry['wirelessPeerMac'];
+            if (! empty($entry['TACHYON-MIB::wirelessPeerRxPower'])) {
+                $mac = $entry['TACHYON-MIB::wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     WirelessSensorType::Rssi,
                     $this->getDeviceId(),
@@ -162,11 +163,11 @@ class Tachyon extends OS implements
     public function discoverWirelessRate()
     {
         $sensors = [];
-        $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
+        $data = SnmpQuery::cache()->numericIndex()->walk('TACHYON-MIB::wirelessPeersTable')->valuesByIndex();
 
         foreach ($data as $index => $entry) {
-            if (! empty($entry['wirelessPeerTxRate'])) {
-                $mac = $entry['wirelessPeerMac'];
+            if (! empty($entry['TACHYON-MIB::wirelessPeerTxRate'])) {
+                $mac = $entry['TACHYON-MIB::wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     WirelessSensorType::Rate,
                     $this->getDeviceId(),
@@ -179,8 +180,8 @@ class Tachyon extends OS implements
                     1
                 );
             }
-            if (! empty($entry['wirelessPeerRxRate'])) {
-                $mac = $entry['wirelessPeerMac'];
+            if (! empty($entry['TACHYON-MIB::wirelessPeerRxRate'])) {
+                $mac = $entry['TACHYON-MIB::wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     WirelessSensorType::Rate,
                     $this->getDeviceId(),
@@ -207,11 +208,11 @@ class Tachyon extends OS implements
     public function discoverWirelessDistance()
     {
         $sensors = [];
-        $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
+        $data = SnmpQuery::cache()->numericIndex()->walk('TACHYON-MIB::wirelessPeersTable')->valuesByIndex();
 
         foreach ($data as $index => $entry) {
-            if (! empty($entry['wirelessPeerLinkDistance'])) {
-                $mac = $entry['wirelessPeerMac'];
+            if (! empty($entry['TACHYON-MIB::wirelessPeerLinkDistance'])) {
+                $mac = $entry['TACHYON-MIB::wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     WirelessSensorType::Distance,
                     $this->getDeviceId(),
@@ -238,11 +239,11 @@ class Tachyon extends OS implements
     public function discoverWirelessSnr()
     {
         $sensors = [];
-        $data = $this->getCacheTable('TACHYON-MIB::wirelessPeersTable');
+        $data = SnmpQuery::cache()->numericIndex()->walk('TACHYON-MIB::wirelessPeersTable')->valuesByIndex();
 
         foreach ($data as $index => $entry) {
-            if (! empty($entry['wirelessPeerSnr'])) {
-                $mac = $entry['wirelessPeerMac'];
+            if (! empty($entry['TACHYON-MIB::wirelessPeerSnr'])) {
+                $mac = $entry['TACHYON-MIB::wirelessPeerMac'];
                 $sensors[] = new WirelessSensor(
                     WirelessSensorType::Snr,
                     $this->getDeviceId(),

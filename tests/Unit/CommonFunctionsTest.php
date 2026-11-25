@@ -152,31 +152,6 @@ final class CommonFunctionsTest extends TestCase
         $this->assertFalse(Validate::hostname(''), 'Empty string');
     }
 
-    public function testResolveGlues(): void
-    {
-        $this->dbSetUp();
-
-        $this->assertFalse(ResolveGlues(['dbSchema'], 'device_id'));
-
-        $this->assertSame(['devices.device_id'], ResolveGlues(['devices'], 'device_id'));
-        $this->assertSame(['sensors.device_id'], ResolveGlues(['sensors'], 'device_id'));
-
-        // does not work right with current code
-//        $expected = array('bill_data.bill_id', 'bill_ports.port_id', 'ports.device_id');
-//        $this->assertSame($expected, ResolveGlues(array('bill_data'), 'device_id'));
-
-        $expected = ['application_metrics.app_id', 'applications.device_id'];
-        $this->assertSame($expected, ResolveGlues(['application_metrics'], 'device_id'));
-
-        $expected = ['state_translations.state_index_id', 'sensors_to_state_indexes.sensor_id', 'sensors.device_id'];
-        $this->assertSame($expected, ResolveGlues(['state_translations'], 'device_id'));
-
-        $expected = ['ipv4_addresses.port_id', 'ports.device_id'];
-        $this->assertSame($expected, ResolveGlues(['ipv4_addresses'], 'device_id'));
-
-        $this->dbTearDown();
-    }
-
     public function testFormatHostname(): void
     {
         $device_dns = [

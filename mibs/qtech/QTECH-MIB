@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (lowercase type name; uppercase object name)
 QTECH-MIB DEFINITIONS ::= BEGIN
 
 --2.1.26
@@ -1404,7 +1405,7 @@ sysAddUserStatus OBJECT-TYPE
     
 --xxx.100.1.23 weiyya begin  
 priPowerTable OBJECT-TYPE
-        SYNTAX      SEQUENCE OF priPowerEntry
+        SYNTAX      SEQUENCE OF PriPowerEntry
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "Table of power information about
@@ -1413,7 +1414,7 @@ priPowerTable OBJECT-TYPE
         
 --xxx.100.1.23.1
 priPowerEntry OBJECT-TYPE
-        SYNTAX      priPowerEntry
+        SYNTAX      PriPowerEntry
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "An entry in the table, containing information
@@ -1421,7 +1422,7 @@ priPowerEntry OBJECT-TYPE
         INDEX       { priPowerIndex}
         ::= { priPowerTable 1 }
 
-priPowerEntry ::= SEQUENCE
+PriPowerEntry ::= SEQUENCE
 {
     priPowerIndex               INTEGER,
     priPowerPresent             INTEGER,
@@ -1476,7 +1477,7 @@ vsfCount OBJECT-TYPE
         ::= { vsfInfo 1 }
 		
 vsfModuleTable OBJECT-TYPE
-        SYNTAX      SEQUENCE OF vsfModuleEntry
+        SYNTAX      SEQUENCE OF VsfModuleEntry
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "Table of descriptive and status information about
@@ -1485,7 +1486,7 @@ vsfModuleTable OBJECT-TYPE
         
 --xxx.100.1.30.2.1
 vsfModuleEntry OBJECT-TYPE
-        SYNTAX      vsfModuleEntry
+        SYNTAX      VsfModuleEntry
         MAX-ACCESS  not-accessible
         STATUS      current
         DESCRIPTION "An entry in the table, containing information
@@ -1493,7 +1494,7 @@ vsfModuleEntry OBJECT-TYPE
         INDEX       { vsfSlotIndex , vsfMemberIndex }
         ::= { vsfModuleTable 1 }
 
-vsfModuleEntry ::= SEQUENCE
+VsfModuleEntry ::= SEQUENCE
 {
     vsfSlotIndex             INTEGER,
     vsfMemberIndex             INTEGER,
@@ -21666,7 +21667,7 @@ macStatus OBJECT-TYPE
 --***************************************      
 --xxx.100.37.1
 cableTable OBJECT-TYPE
-    SYNTAX  SEQUENCE OF priCableEntry
+    SYNTAX  SEQUENCE OF PriCableEntry
     MAX-ACCESS  not-accessible
     STATUS  current
     DESCRIPTION
@@ -21675,23 +21676,23 @@ cableTable OBJECT-TYPE
 
 --xxx.100.37.1.1
     priCableEntry OBJECT-TYPE
-        SYNTAX  priCableEntry
+        SYNTAX  PriCableEntry
         MAX-ACCESS  not-accessible
         STATUS  current
         DESCRIPTION
             " A port entry containing port information, 
             status, and control."
-        INDEX   { CableLengthInfo }
+        INDEX   { cableLengthInfo }
         ::= { cableTable 1 }
 
-    priCableEntry
+    PriCableEntry
         ::= SEQUENCE
             {
-                CableLengthInfo               DisplayString                   
+                cableLengthInfo               DisplayString                   
             }
 
 --xxx.100.37.1.1.1
-        CableLengthInfo OBJECT-TYPE
+        cableLengthInfo OBJECT-TYPE
             SYNTAX  DisplayString (SIZE(0..32))
             MAX-ACCESS  read-only
             STATUS  current
@@ -21708,7 +21709,7 @@ cableTable OBJECT-TYPE
 --xxx.100.38.1  priMrppRing
 
 priMrppRingTable OBJECT-TYPE
-    SYNTAX     SEQUENCE OF priMrppRingEntry
+    SYNTAX     SEQUENCE OF PriMrppRingEntry
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
@@ -21717,14 +21718,14 @@ priMrppRingTable OBJECT-TYPE
    
 --xxx.100.38.1.1
 priMrppRingEntry OBJECT-TYPE
-    SYNTAX     priMrppRingEntry
+    SYNTAX     PriMrppRingEntry
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
             "The index of this table is RING index."
     INDEX      { mrppRingIndex }
     ::= { priMrppRingTable 1 }
-priMrppRingEntry
+PriMrppRingEntry
         ::= SEQUENCE
             {
                 mrppRingIndex                      INTEGER,

@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing commas)
 -- Revision 4.00 12/20/08
 TEMPUSLXUNISON-MIB DEFINITIONS ::= BEGIN
 
@@ -396,13 +397,13 @@ cdmaTrapTimeFigureOfMeritChange NOTIFICATION-TYPE
 cdmaFaultStatus OBJECT-TYPE
    SYNTAX BITS
    {
-      cdmaNotUsed         (0)
-      cdmaNTPNotPolling   (1)
-      cdmaRefTimeFlt      (2)
-      cdmaLOPLLFlt        (3)
-      cdmaFLASHWriteFlt   (4)
-      cdmaFPGACfgFlt      (5)
-      cdmaNoSignalTimeout (6)
+      cdmaNotUsed         (0),
+      cdmaNTPNotPolling   (1),
+      cdmaRefTimeFlt      (2),
+      cdmaLOPLLFlt        (3),
+      cdmaFLASHWriteFlt   (4),
+      cdmaFPGACfgFlt      (5),
+      cdmaNoSignalTimeout (6),
       cdmaDACNearLimit    (7)
    }
    MAX-ACCESS read-only
@@ -1134,13 +1135,13 @@ gpsTrapTimeFigureOfMeritChange NOTIFICATION-TYPE
 gpsFaultStatus OBJECT-TYPE
    SYNTAX BITS
    {
-      gpsAntennaFlt      (0)
-      gpsNTPNotPolling   (1)
-      gpsRefTimeFlt      (2)
-      gpsEngineCommFlt   (3)
-      gpsFLASHWriteFlt   (4)
-      gpsFPGACfgFlt      (5)
-      gpsNoSignalTimeout (6)
+      gpsAntennaFlt      (0),
+      gpsNTPNotPolling   (1),
+      gpsRefTimeFlt      (2),
+      gpsEngineCommFlt   (3),
+      gpsFLASHWriteFlt   (4),
+      gpsFPGACfgFlt      (5),
+      gpsNoSignalTimeout (6),
       gpsDACNearLimit    (7)
    }
    MAX-ACCESS read-only

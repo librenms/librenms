@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "HT814V2",
                     "os": "grandstream-ht",
-                    "type": "network",
+                    "type": "voice",
                     "serial": "9610009211A",
                     "icon": "grandstream.png"
                 }

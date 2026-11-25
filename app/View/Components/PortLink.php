@@ -7,7 +7,6 @@ use Illuminate\Support\Arr;
 use Illuminate\View\Component;
 use LibreNMS\Enum\IfOperStatus;
 use LibreNMS\Util\Rewrite;
-use LibreNMS\Util\Url;
 
 class PortLink extends Component
 {
@@ -44,7 +43,7 @@ class PortLink extends Component
     public function __construct(Port $port, ?array $graphs = null, public bool $basic = false, array $vars = [])
     {
         $this->port = $port;
-        $this->link = Url::portUrl($port, $vars);
+        $this->link = route('device.port', ['device' => $port->device_id, 'port' => $port->port_id] + $vars);
         $this->label = Rewrite::normalizeIfName($port->getLabel());
         $this->description = $port->getDescription();
         $this->status = $this->status();

@@ -1,5 +1,5 @@
 -- ============================================================================
--- Copyright (C) 2004-2019 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (C) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: There are three standard MIB definitions, "LLDP-MIB", "LLDP-EXT-
 --     DOT1-MIB", "LLDP-EXT-DOT3-MIB", define almost all MIB objects of LLDP.
@@ -15,7 +15,7 @@
 --        bor by matching local neighbor identity information with the informat-
 --        ion in the received chassis ID TLV and port ID TLV.
 -- Reference:
--- Version: V1.3
+-- Version: V1.4
 -- History:
 -- V1.0 created by qizhenglin 2009-03-20
 -- V1.1 2015-09-01 Updated by zhaixiaoxiang
@@ -28,6 +28,8 @@
 -- V1.3 2019-09-17 Updated by tongwenxin
 --      The value 'rx(3)' is added for data type 'hh3clldpPortConfigCDPComplian-
 --      ceStatus'.
+-- V1.4 2022-07-18 Updated by Zheng jun
+--      add trap hh3clldpGlobalEnableStatus and hh3clldpLocManAddrChange
 -- ============================================================================
 HH3C-LLDP-EXT-MIB DEFINITIONS ::= BEGIN
 
@@ -45,7 +47,7 @@ IMPORTS
         FROM LLDP-MIB;
 
 hh3clldp MODULE-IDENTITY
-    LAST-UPDATED "201909170000Z"
+    LAST-UPDATED "202207181038Z"
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -56,6 +58,8 @@ hh3clldp MODULE-IDENTITY
         "
     DESCRIPTION
         "LLDP extended management information."
+    REVISION  "202207181038Z"
+    DESCRIPTION "Add trap hh3clldpGlobalEnableStatus and hh3clldpLocManAddrChange."
     REVISION  "201909170000Z"
     DESCRIPTION "Add the value of hh3clldpPortConfigCDPComplian."
     REVISION  "201903070000Z"
@@ -445,4 +449,38 @@ hh3clldpAgingStatusChange NOTIFICATION-TYPE
         "This notification will be sent when the neighbor aging protection
           status of a port is changed."
     ::= { hh3clldpPortStatusTrap 2 }
+
+hh3clldpGlobalEnableStatus NOTIFICATION-TYPE
+    OBJECTS { hh3clldpAdminStatus }
+    STATUS        current
+    DESCRIPTION
+        "This notification will be sent when the global LLDP
+        status is changed."
+    ::= { hh3clldpPortStatusTrap 3 }
+
+hh3clldpLocManAddrChange NOTIFICATION-TYPE
+    OBJECTS { hh3clldpManAddr, hh3clldpPortName }
+    STATUS        current
+    DESCRIPTION
+        "This notification will be sent when the local LLDP
+        management address of a port is changed."
+    ::= { hh3clldpPortStatusTrap 4 }
+
+hh3clldpTrapObjects                OBJECT IDENTIFIER ::= { hh3clldp 3 }
+hh3clldpManAddr OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..31))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Management address"
+    ::= { hh3clldpTrapObjects 1 }
+
+hh3clldpPortName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Interface name"
+    ::= { hh3clldpTrapObjects 2 }
+
 END

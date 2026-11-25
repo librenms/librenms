@@ -104,7 +104,7 @@ class DeviceController extends TableController
 
         /** @var Builder $query */
         $query = Device::hasAccess($request->user())
-            ->with(['location', 'groups'])
+            ->with(['location', 'groups', 'attribs' => fn ($q) => $q->ofType(['override_device_http_port', 'override_device_ssh_port', 'override_device_telnet_port'])])
             ->applyFilters($request->array('filter'))
             ->withCount(['ports', 'sensors', 'wirelessSensors']);
 
@@ -241,7 +241,8 @@ class DeviceController extends TableController
 
     private function formatMetric(Device $device, int $count, string $tab, string $icon): string
     {
-        $html = '<a href="' . Url::deviceUrl($device, ['tab' => $tab]) . '">';
+        $url = route("device.$tab", ['device' => $device]);
+        $html = '<a href="' . $url . '">';
         $html .= '<span><i title="' . $tab . '" class="fa ' . $icon . ' fa-lg icon-theme"></i> ' . $count;
         $html .= '</span></a> ';
 
@@ -263,13 +264,13 @@ class DeviceController extends TableController
             [
                 [
                     'title' => 'View Device',
-                    'href' => Url::deviceUrl($device),
+                    'href' => route('device.overview', ['device' => $device]),
                     'icon' => 'fa-id-card',
                     'external' => false,
                 ],
                 [
                     'title' => 'View alerts',
-                    'href' => Url::deviceUrl($device, ['tab' => 'alerts']),
+                    'href' => route('device.faults', $device->device_id),
                     'icon' => 'fa-exclamation-circle',
                     'external' => false,
                 ],
@@ -286,14 +287,16 @@ class DeviceController extends TableController
         }
         $row = $this->isDetailed() ? 1 : 0;
 
+        $telnet_port = $device->getAttrib('override_device_telnet_port');
         $actions[$row][] = [
             'title' => 'Telnet to ' . $device->hostname,
-            'href' => 'telnet://' . $device->hostname,
+            'href' => 'telnet://' . $device->hostname . ($telnet_port ? ':' . $telnet_port : ''),
             'icon' => 'fa-terminal',
             'external' => false,
         ];
 
-        $ssh_href = 'ssh://' . $device->hostname;
+        $ssh_port = $device->getAttrib('override_device_ssh_port');
+        $ssh_href = 'ssh://' . $device->hostname . ($ssh_port ? ':' . $ssh_port : '');
         if ($server = LibrenmsConfig::get('gateone.server')) {
             $ssh_href = LibrenmsConfig::get('gateone.use_librenms_user')
                 ? $server . '?ssh=ssh://' . Auth::user()->username . '@' . $device->hostname . '&location=' . $device->hostname
@@ -307,9 +310,10 @@ class DeviceController extends TableController
             'external' => false,
         ];
 
+        $http_port = $device->getAttrib('override_device_http_port');
         $actions[$row][] = [
             'title' => 'Launch browser to ' . $device->hostname,
-            'href' => 'https://' . $device->hostname,
+            'href' => 'https://' . $device->hostname . ($http_port ? ':' . $http_port : ''),
             'onclick' => 'http_fallback(this); return false;',
             'icon' => 'fa-globe',
         ];
@@ -365,7 +369,7 @@ class DeviceController extends TableController
 
         return [
             'device_id' => $device->device_id,
-            'hostname' => $device->displayName(),
+            'hostname' => $device->display,
             'ip' => $device->ip,
             'hardware' => Rewrite::ciscoHardware($device),
             'os' => LibrenmsConfig::getOsSetting($device->os, 'text', $device->os),

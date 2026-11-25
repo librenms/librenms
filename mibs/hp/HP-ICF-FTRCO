@@ -1,0 +1,395 @@
+HP-ICF-FTRCO DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      OBJECT-TYPE, MODULE-IDENTITY, Integer32
+         FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP
+         FROM SNMPv2-CONF
+      SnmpAdminString
+         FROM SNMP-FRAMEWORK-MIB
+      RowStatus, 
+      TruthValue,
+      DateAndTime,
+      TEXTUAL-CONVENTION
+         FROM SNMPv2-TC
+      PortList
+         FROM Q-BRIDGE-MIB 
+      hpSwitch
+         FROM HP-ICF-OID;
+
+   hpicfFtrCo MODULE-IDENTITY
+      LAST-UPDATED "201006010000Z" -- June 1, 2010
+      ORGANIZATION "HP Networking"
+      CONTACT-INFO "Hewlett Packard Company
+                    8000 Foothills Blvd.
+                    Roseville, CA 95747"
+      DESCRIPTION "This MIB module manages Application 
+                   Coordination Restriction Policies"
+
+      REVISION     "201006010000Z" -- June 1, 2010
+      DESCRIPTION  "Added aclPermitLogging."
+
+      REVISION     "200908280002Z" -- Aug 28, 2009
+      DESCRIPTION  "Initial revision."
+
+      ::= { hpSwitch 46 }
+
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+   VidList ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT "512x"
+      STATUS      current
+      DESCRIPTION 
+         "Each octet within this value specifies a set of eight
+         VlanIIndex (VID), with the first octet specifying VIDs 1
+         through 8, the second octet specifying VIDs 9 through 16,
+         etc.  Within each octet, the most significant bit represents
+         the lowest numbered VID, and the least significant bit
+         represents the highest numbered VID.  Thus, each VID
+         is represented by a single bit within the value of this
+         object.  If that bit has a value of 1 then that VID is
+         included in the set of VIDs; the VID is not included if its
+         bit has a value of 0.  This list represents the entire
+         range of VlanIndex values defined in the scope of IEEE
+         802.1Q."
+      SYNTAX      OCTET STRING (SIZE (512))
+
+   IndexName ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT "32a"
+      STATUS      current
+      DESCRIPTION
+         "This object is valid when used as an index - an IndexName
+         is similar to a DisplayString, except that it does allow
+         a tilde ('~') and spaces within ts definition.  Otherwise
+         it fully follows the textual-convention of the standard 
+         DisplayString definition."
+      SYNTAX      OCTET STRING (SIZE (0..32))
+
+
+-- -------------------------------------------------------------
+-- Start of MIB Objects
+-- -------------------------------------------------------------
+
+  hpicfFtrcoObjects OBJECT IDENTIFIER ::= { hpicfFtrCo 1 }
+
+   hpFtrCoEntityTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF HpFtrcoEntityEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "Table of all Entities setting restrictions, as set by some external
+      entity.  Any restriction for an Entity can be deleted by deleting the 
+      Entity name, by deleting a specific restriction, or by any expiration
+      value.  Once an Entity name has been added to the table, it exist until
+      the name has specifically been removed.  Entity rows also maintain the
+      'next-index' value for any restriction table entry."
+   ::= { hpicfFtrcoObjects 1 }
+
+   hpFtrCoEntityEntry OBJECT-TYPE
+      SYNTAX       HpFtrcoEntityEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+         "A row entry in the table for a specific entity user of the Feature
+         Coordinator facility.  Entries in this table are created and removed
+         dynamically.  An entity can add and remove a restriction regarding 
+         some pre-defined facility in the switch and it will only be for a 
+         specific Entity name.  If the Entity name is removed, so are all of
+         its restrictions."
+      INDEX       { hpFtrCoEntityName }
+      ::= { hpFtrCoEntityTable 1 }
+
+   HpFtrcoEntityEntry ::=
+      SEQUENCE {
+         hpFtrCoEntityName           IndexName,
+         hpFtrCoRestrictNextIndex    Integer32,
+         hpFtrCoEntityDate           DateAndTime,
+         hpFtrCoEntityStatus         RowStatus
+      }
+
+   hpFtrCoEntityName OBJECT-TYPE
+      SYNTAX      IndexName (SIZE(1..32))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "An administratively assigned string, which may be used to identify 
+         the unique owner of a set of restrictions."
+      ::= { hpFtrCoEntityEntry 1 }
+
+   hpFtrCoRestrictNextIndex OBJECT-TYPE
+      SYNTAX      Integer32 (0..2147483647)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION 
+            "Is the next indexing parameter that allows multiple, like 
+            restrictions.  It is has a default value of 1 and is incremented
+            each time its index value is used.  This is an independent value
+            and must be specified as the next added index (regardless of the
+            restriction type).  In the event there is a collision due to a race
+            with reading the current value, the 'losing' restriction is denied
+            and the value should be re-read for a next attempt.  The value is
+            always 1 whenever a new Entity record is created."
+      DEFVAL { 1 }
+      ::= { hpFtrCoEntityEntry 2 }
+
+   hpFtrCoEntityDate OBJECT-TYPE
+      SYNTAX      DateAndTime
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "This represents the switch's understanding of the current UTC time.
+          It should be used when setting an restriction expiration 
+          DateAndTime value.  Please note that this value is uniquely 
+          determined each time the object is read (dynamic) and is 
+          subject to changing when a change is made to the switch's
+          configuration (e.g. setting the local time-zone)."
+      ::= { hpFtrCoEntityEntry 3 }
+
+   hpFtrCoEntityStatus OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "Administrative status of this Entity entry."
+      ::= { hpFtrCoEntityEntry 4 }
+
+   hpFtrCoRestrictionTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF HpFtrCoRestrictEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "Table of all restrictions, set by an external entity.  The restrictions
+      can be deleted by deleting the entity name or by the restriction 
+      expiration value. Expiration policies are logically ORed so that any policy 
+      expiration that is met causes the restriction to be removed."
+   ::= { hpicfFtrcoObjects 2 }
+
+   hpFtrCoRestrictEntry OBJECT-TYPE
+      SYNTAX       HpFtrCoRestrictEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+         "An entry in the table for a specific Entity user of the Feature 
+         Coordinator facility.  Entries in this table are created and removed 
+         dynamically.  An entity can add and remove a restriction to some 
+         facility in the switch.  These entries can also expire, based on 
+         entity specified criteria.  A restriction is never modified (all
+         restrictions are only created or deleted).  If a value needs to be 
+         modified, a new restriction could be added and then the old one 
+         deleted (e.g. adding or removing an interface)."
+      INDEX       { hpFtrCoEntityName, 
+                    hpFtrCoRestrictId,
+                    hpFtrCoRestrictIndex }
+      ::= { hpFtrCoRestrictionTable 1 }
+
+   HpFtrCoRestrictEntry ::=
+      SEQUENCE {
+         hpFtrCoRestrictId           INTEGER,
+         hpFtrCoRestrictIndex        Integer32,
+         hpFtrCoRestrictIdParm       Integer32,
+         hpFtrCoRestrictStatus       RowStatus,
+         hpFtrCoRestrictMessage      SnmpAdminString,
+         hpFtrCoRestrictPorts        PortList,
+         hpFtrCoRestrictVlans        VidList,
+         hpFtrCoExpireSlot           Integer32,
+         hpFtrCoExpireApplication    IndexName,
+         hpFtrCoExpireVidDelete      Integer32,
+         hpFtrCoExpireDate           DateAndTime,
+         hpFtrCoExpireBoot           TruthValue
+      }
+
+
+   hpFtrCoRestrictId OBJECT-TYPE
+      SYNTAX      INTEGER {
+         vidIpConfig(1),
+         vidDelete(2),
+         portSecurity(3),
+         portAcl(4),
+         portSourcePortFilter(5),
+         portMeshing(6),
+         portLacp(7),
+         distributedTrunk(8),
+         portVirusThrottling(9),
+         portSflow(10),
+         portDhcpSnoop(11),
+         portLoopDetection(12),
+         portBpduPvstGuard(13),
+         qinq(14),
+         portQos(15),
+         portRateLimit(16),
+         portStaticMac(17),
+         portIpLockdown(18),
+         portIgmp(19),
+         portMirrorDestination(20),
+         portLinkConfig(21),
+         portLldp(22),
+         portKeepalive(23),
+         aclPermitLogging(24)
+      }
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "The Restriction enumeration (Id).  Expect this list to grow as are 
+         more restrictions are developed (and needed)."
+      ::= { hpFtrCoRestrictEntry 1}
+
+   hpFtrCoRestrictIndex OBJECT-TYPE
+      SYNTAX      Integer32 (0..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION 
+         "An indexing parameter to allow multiple, like restrictions.  It is 
+         created by the Entity portion of MIB and used for addressing an 
+         individual restriction rule.  Any new restriction added to a
+         restriction table must be equal to the current 'next-restriction'
+         value."
+      ::= { hpFtrCoRestrictEntry 2 }
+
+   hpFtrCoRestrictIdParm OBJECT-TYPE
+      SYNTAX      Integer32 (0..2147483647)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION 
+         "An optional parameter for the restriction enumeration."
+      ::= { hpFtrCoRestrictEntry 3 }
+
+   hpFtrCoRestrictStatus OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "Administrative status of this entry."
+      ::= { hpFtrCoRestrictEntry 4 }
+
+   hpFtrCoRestrictMessage OBJECT-TYPE
+      SYNTAX      SnmpAdminString (SIZE (1..255))
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "An error message containing information about the restriction that 
+         can be used by the caller, indicating the reason for this restriction 
+         being in place.  It is occasionally referred to as a friendly error
+         message.  SIZE reflects that a message must exist and that it has
+         a maximum 'String' length of 255 character."
+      ::= { hpFtrCoRestrictEntry 5 }
+
+   hpFtrCoRestrictPorts OBJECT-TYPE
+      SYNTAX      PortList
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION 
+         "A list of ports, if applicable to the restriction."
+      ::= { hpFtrCoRestrictEntry 6 }
+
+   hpFtrCoRestrictVlans OBJECT-TYPE
+      SYNTAX      VidList
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION 
+         "A VidList of vlan IDs, if applicable to the restriction."
+      ::= { hpFtrCoRestrictEntry 7 }
+
+   hpFtrCoExpireSlot OBJECT-TYPE
+      SYNTAX      Integer32 (0..2147483647)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION 
+         "Setting this value will cause this restriction to expire when 
+         corresponding switch slot is signaled to be down.  Note, if the slot 
+         never comes up, there will be no slot-down signal."
+      ::= { hpFtrCoRestrictEntry 8 }
+
+   hpFtrCoExpireApplication OBJECT-TYPE
+      SYNTAX      IndexName (SIZE (0..32))
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION 
+         "This setting will cause the restriction to expire whenever a signal 
+         is received that this application-name has gone down."
+        ::= { hpFtrCoRestrictEntry 9 }
+
+   hpFtrCoExpireVidDelete OBJECT-TYPE
+      SYNTAX      Integer32 (0..4096)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION 
+         "A signal indicating this VlanIndex has been deleted will cause this 
+         restriction to expire.  The specified VID record must exist in the 
+         switch configuration for this policy to be set.  NOTE: ExpireVidDelete
+         is unused in this release; it is available, you can set it; but it is 
+         totally ignored with current processing."
+
+      ::= { hpFtrCoRestrictEntry 10 }
+
+   hpFtrCoExpireDate OBJECT-TYPE
+      SYNTAX      DateAndTime
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION 
+         "This expiration event occurs whenever it is determined that the
+          switch-time exceeds this setting.  The switches sw_time() represents
+          the UTC time value (relative to Jan 1, 1990) used with this comparison
+          (compare with sw_localtime).  NOTE: ExpireDate is unused in this release;
+          it is available, you can set it; but it is totally ignored with current
+          processing."
+      ::= { hpFtrCoRestrictEntry 11 }
+
+   hpFtrCoExpireBoot OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+         "When specified as 'true', this expiration event occurs whenever the 
+          switch reboots.  It is a necessary expiration policy since all 
+          restrictions are persistent and it is possible that we can have an 
+          obsolete policy (slot-down) following a power-fail condition."
+      DEFVAL      { false }
+      ::= { hpFtrCoRestrictEntry 12 }
+
+
+-- **********************************************************************
+-- Conformance Information
+-- **********************************************************************
+
+    hpicfFtrCoConformance OBJECT IDENTIFIER ::= { hpicfFtrCo 2 }
+
+    hpicfFtrCoCompliances  OBJECT IDENTIFIER ::= { hpicfFtrCoConformance 1 }
+    hpicfFtrCoGroups       OBJECT IDENTIFIER ::= { hpicfFtrCoConformance 2 }
+
+    hpicfFtrCoCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP switches
+                    implementing the HP-ICF-FTRCO-MIB."
+        MODULE
+            MANDATORY-GROUPS { hpicfFtrCoGroup }
+            GROUP       hpicfFtrCoGroup
+            DESCRIPTION "Support for this group is required for HP switches
+                        that implement Feature Coordinator."
+        ::= { hpicfFtrCoCompliances 1 }
+
+    hpicfFtrCoGroup OBJECT-GROUP
+        OBJECTS     {
+         hpFtrCoRestrictNextIndex,
+         hpFtrCoEntityDate,
+         hpFtrCoEntityStatus,
+         hpFtrCoRestrictIdParm,
+         hpFtrCoRestrictStatus,
+         hpFtrCoRestrictMessage,
+         hpFtrCoRestrictPorts,
+         hpFtrCoRestrictVlans,
+         hpFtrCoExpireSlot,
+         hpFtrCoExpireApplication,
+         hpFtrCoExpireVidDelete,
+         hpFtrCoExpireDate,
+         hpFtrCoExpireBoot
+        }
+        STATUS      current
+        DESCRIPTION "A collection of HP proprietary objects to support
+                    Feature Coordinator."
+        ::= { hpicfFtrCoGroups 1 }
+
+
+END

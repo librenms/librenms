@@ -7,7 +7,6 @@ use App\Models\Device;
 use App\Models\User;
 use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Util\IP;
-use LibreNMS\Util\Url;
 
 class DevicesSearchController extends GroupedSearchController
 {
@@ -63,13 +62,18 @@ class DevicesSearchController extends GroupedSearchController
                 DeviceStatus::Disabled => 'tw:border-l-black!',
                 DeviceStatus::NeverPolled => 'tw:border-l-gray-400!',
             },
-            'url' => Url::deviceUrl($device),
+            'url' => route('device.overview', ['device' => $device]),
         ]);
 
         if ($results->isEmpty()) {
             return [null];
         }
 
-        return [['type' => 'devices', 'label' => __('search.devices'), 'results' => $results]];
+        return [[
+            'type' => 'devices',
+            'label' => __('search.devices'),
+            'url' => route('devices', ['filter' => ['search' => ['contains' => $search]]]),
+            'results' => $results,
+        ]];
     }
 }

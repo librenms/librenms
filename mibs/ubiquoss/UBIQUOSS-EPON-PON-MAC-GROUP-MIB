@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP; trailing comma before })
 -- *****************************************************************
 -- UBIQUOSS-EPON-PON-MAC-GROUP-MIB.my
 --
@@ -591,7 +592,7 @@
 				dot3MpcpRxReport
 					Counter32,
 				dot3MpcpTxGate
-					Counter32,
+					Counter32
 --				dot3MpcpRxGate
 --					Counter32,
 --				dot3MpcpTxRegister
@@ -3149,14 +3150,7 @@
        ::= { ubiPonMacMIBCompliances 1 }
 	                            
 -- compliance statements
-   	ubiPonMacMIBGroup  OBJECT-GROUP
-		OBJECTS {     
-			-- TODO 
-               }
-        STATUS  current
-        DESCRIPTION
-                "ubiquoss pon mac information MIB"
-        ::= { ubiPonMacMIBGroups 1 }
+   	ubiPonMacMIBGroup  OBJECT IDENTIFIER ::= { ubiPonMacMIBGroups 1 }
      
      ubiPonMacMIBNotificationGroup    OBJECT-GROUP
       	OBJECTS {     
@@ -3170,7 +3164,7 @@
         	ubiEponOnuRegistrationErrorNotification,
         	ubiEponOnuRegistrationOverloadNotification,
         	ubiEponSoftwareErrorNotification,
-        	ubiEponBadEncriptionKeyNotification, 
+        	ubiEponBadEncriptionKeyNotification 
                }
         STATUS  current
         DESCRIPTION

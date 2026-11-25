@@ -16,7 +16,7 @@ class HealthRepository extends RestifyRepository
     public static function routes(Router $router, array $attributes, $wrap = true): void
     {
         $router->get('health', HealthController::class)
-            ->withoutMiddleware('auth:sanctum')
+            ->withoutMiddleware(['auth:sanctum', 'can:api.access'])
             ->middleware('throttle:60,1')
             ->name('api.v1.health');
     }

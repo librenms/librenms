@@ -32,21 +32,22 @@ use App\Models\Eventlog;
 use Illuminate\Support\Facades\Cache;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Interfaces\ConfigBackupProvider;
+use LibreNMS\Util\Binaries;
 use Symfony\Component\Process\Process;
 
 class RancidProvider implements ConfigBackupProvider
 {
     /** Revisions listed per page (matches OxidizedProvider). */
-    private const PER_PAGE = 100;
+    private const int PER_PAGE = 100;
 
     /** Backup id for the on-disk file when there is no VCS history. */
-    private const CURRENT = 'current';
+    private const string CURRENT = 'current';
 
     /** Unchanged lines kept around each change when diffs are rebuilt without comments. */
-    private const DIFF_CONTEXT = 3;
+    private const int DIFF_CONTEXT = 3;
 
     /** Seconds between repeated eventlog entries for the same unreadable repo. */
-    private const FAILURE_LOG_INTERVAL = 3600;
+    private const int FAILURE_LOG_INTERVAL = 3600;
 
     private ?string $lastError = null;
 
@@ -54,6 +55,10 @@ class RancidProvider implements ConfigBackupProvider
 
     /** @var array<int, array{path: string, file: string}|null> */
     private array $resolved = [];
+
+    public function __construct(private readonly Binaries $binaries)
+    {
+    }
 
     public static function isConfigured(): bool
     {
@@ -470,7 +475,10 @@ class RancidProvider implements ConfigBackupProvider
             $candidates[] = $device->hostname . '.' . $domain;
         }
 
-        return array_values(array_unique(array_filter($candidates)));
+        // a config file name never spans directories
+        $candidates = array_filter($candidates, fn ($name) => $name && ! preg_match('#[/\\\\]|\.\.#', $name));
+
+        return array_values(array_unique($candidates));
     }
 
     /**
@@ -479,7 +487,7 @@ class RancidProvider implements ConfigBackupProvider
      */
     private function git(array $args, array $repo): ?string
     {
-        return $this->run(['git', '--literal-pathspecs', ...$args], $repo['path']);
+        return $this->run([$this->binaries->path('git'), '--literal-pathspecs', ...$args], $repo['path']);
     }
 
     /**
@@ -488,7 +496,7 @@ class RancidProvider implements ConfigBackupProvider
      */
     private function svn(array $args, array $repo): ?string
     {
-        return $this->run([LibrenmsConfig::locateBinary('svn'), '--non-interactive', ...$args], $repo['path']);
+        return $this->run([$this->binaries->path('svn'), '--non-interactive', ...$args], $repo['path']);
     }
 
     /**

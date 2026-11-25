@@ -133,10 +133,10 @@ class TopDevicesController extends WidgetController
     /**
      * @param  Device  $device
      * @param  string  $graph_type
-     * @param  array  $graph_params
+     * @param  string|null  $url  graph link, defaults to the device overview
      * @return array
      */
-    private function standardRow($device, $graph_type, $graph_params = [])
+    private function standardRow($device, $graph_type, ?string $url = null)
     {
         return [
             Url::deviceLink($device, $device->shortDisplayName()),
@@ -148,7 +148,7 @@ class TopDevicesController extends WidgetController
                 'no',
                 150,
                 21
-            )), $graph_params, 0, 0),
+            )), $url, 0, 0),
         ];
     }
 
@@ -181,7 +181,7 @@ class TopDevicesController extends WidgetController
 
         $results = $query->get()->map(function ($device) {
             /** @var Device $device */
-            return $this->standardRow($device, 'device_uptime', ['tab' => 'graphs', 'group' => 'system']);
+            return $this->standardRow($device, 'device_uptime', route('device.graphs', ['device' => $device->device_id, 'group' => 'system']));
         });
 
         return $this->formatData('Uptime', $results);
@@ -198,7 +198,7 @@ class TopDevicesController extends WidgetController
 
         $results = $query->get()->map(function ($device) {
             /** @var Device $device */
-            return $this->standardRow($device, 'device_icmp_perf', ['tab' => 'graphs', 'group' => 'poller']);
+            return $this->standardRow($device, 'device_icmp_perf', route('device.graphs', ['device' => $device->device_id, 'group' => 'poller']));
         });
 
         return $this->formatData('Response time', $results);
@@ -213,7 +213,7 @@ class TopDevicesController extends WidgetController
             ->orderByRaw('AVG(`processor_usage`) ' . $sort)
             ->limit($settings['device_count']);
 
-        $results = $query->get()->map(fn ($port) => $this->standardRow($port->device, 'device_processor', ['tab' => 'health', 'metric' => 'processor']));
+        $results = $query->get()->map(fn ($port) => $this->standardRow($port->device, 'device_processor', route('device.health', ['device' => $port->device_id, 'metric' => 'processor'])));
 
         return $this->formatData('CPU Load', $results);
     }
@@ -227,7 +227,7 @@ class TopDevicesController extends WidgetController
             ->orderBy('mempool_perc', $sort)
             ->limit($settings['device_count']);
 
-        $results = $query->get()->map(fn ($port) => $this->standardRow($port->device, 'device_mempool', ['tab' => 'health', 'metric' => 'mempool']));
+        $results = $query->get()->map(fn ($port) => $this->standardRow($port->device, 'device_mempool', route('device.health', ['device' => $port->device_id, 'metric' => 'mempool'])));
 
         return $this->formatData('Memory usage', $results);
     }
@@ -240,7 +240,7 @@ class TopDevicesController extends WidgetController
 
         $results = $query->get()->map(function ($device) {
             /** @var Device $device */
-            return $this->standardRow($device, 'device_poller_perf', ['tab' => 'graphs', 'group' => 'poller']);
+            return $this->standardRow($device, 'device_poller_perf', route('device.graphs', ['device' => $device->device_id, 'group' => 'poller']));
         });
 
         return $this->formatData('Poller duration', $results);
@@ -274,12 +274,11 @@ class TopDevicesController extends WidgetController
                 'type' => 'storage_usage',
                 'legend' => 'no',
             ];
-            $overlib_content = Url::overlibContent($graph_array, $device->displayName() . ' - ' . $storage->storage_descr);
+            $overlib_content = Url::overlibContent($graph_array, $device->display . ' - ' . $storage->storage_descr);
 
             $link_array = $graph_array;
-            $link_array['page'] = 'graphs';
             unset($link_array['height'], $link_array['width'], $link_array['legend']);
-            $link = Url::generate($link_array);
+            $link = route('graphs', $link_array);
 
             return [
                 Url::deviceLink($device, $device->shortDisplayName()),

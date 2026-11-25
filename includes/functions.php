@@ -16,55 +16,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
-function device_discovery_trigger($id)
-{
-    if (App::runningInConsole() === false) {
-        ignore_user_abort(true);
-        set_time_limit(0);
-    }
-
-    $update = dbUpdate(['last_discovered' => null], 'devices', '`device_id` = ?', [$id]);
-    if (! empty($update) || $update == '0') {
-        $message = 'Device will be rediscovered';
-    } else {
-        $message = 'Error rediscovering device';
-    }
-
-    return ['status' => $update, 'message' => $message];
-}
-
-function delete_device($id)
-{
-    $device = DeviceCache::get($id);
-    if (! $device->exists) {
-        return 'No such device.';
-    }
-
-    if ($device->delete()) {
-        return "Removed device $device->hostname\n";
-    }
-
-    return "Failed to remove device $device->hostname";
-}
-
-// FIXME port to LibreNMS\Util\IPv6 class
-function snmp2ipv6($ipv6_snmp)
-{
-    // Workaround stupid Microsoft bug in Windows 2008 -- this is fixed length!
-    // < fenestro> "because whoever implemented this mib for Microsoft was ignorant of RFC 2578 section 7.7 (2)"
-    $ipv6 = array_slice(explode('.', (string) $ipv6_snmp), -16);
-    $ipv6_2 = [];
-
-    for ($i = 0; $i <= 15; $i++) {
-        $ipv6[$i] = Str::padLeft(dechex($ipv6[$i]), 2, '0');
-    }
-    for ($i = 0; $i <= 15; $i += 2) {
-        $ipv6_2[] = $ipv6[$i] . $ipv6[$i + 1];
-    }
-
-    return implode(':', $ipv6_2);
-}
-
 /**
  * Check if port is valid to poll.
  * Settings: empty_ifdescr, good_if, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype, bad_ifoperstatus
@@ -208,64 +159,7 @@ function create_state_index($state_name, $states = []): void
 
 function hytera_h2f($number, $nd)
 {
-    if (strlen(str_replace(' ', '', $number)) == 4) {
-        $number = \LibreNMS\Util\StringHelpers::asciiToHex($number, ' ');
-    }
-    $r = '';
-    $y = explode(' ', (string) $number);
-    foreach ($y as $z) {
-        $r = $z . '' . $r;
-    }
-
-    $hex = [];
-    $number = substr($r, 0, -1);
-    //$number = str_replace(" ", "", $number);
-    for ($i = 0; $i < strlen($number); $i++) {
-        $hex[] = substr($number, $i, 1);
-    }
-
-    $dec = [];
-    $hexCount = count($hex);
-    for ($i = 0; $i < $hexCount; $i++) {
-        $dec[] = hexdec($hex[$i]);
-    }
-
-    $binfinal = '';
-    $decCount = count($dec);
-    for ($i = 0; $i < $decCount; $i++) {
-        $binfinal .= sprintf('%04d', decbin($dec[$i]));
-    }
-
-    $sign = substr($binfinal, 0, 1);
-    $exp = substr($binfinal, 1, 8);
-    $exp = bindec($exp);
-    $exp -= 127;
-    $scibin = substr($binfinal, 9);
-    $binint = substr($scibin, 0, $exp);
-    $binpoint = substr($scibin, $exp);
-    $intnumber = bindec('1' . $binint);
-
-    $tmppoint = [];
-    for ($i = 0; $i < strlen($binpoint); $i++) {
-        $tmppoint[] = substr($binpoint, $i, 1);
-    }
-
-    $tmppoint = array_reverse($tmppoint);
-    $tpointnumber = min(number_format($tmppoint[0] / 2, strlen($binpoint), '.', ''), 1);
-
-    $pointnumber = '';
-    for ($i = 1; $i < strlen($binpoint); $i++) {
-        $pointnumber = number_format($tpointnumber / 2, strlen($binpoint), '.', '');
-        $tpointnumber = $tmppoint[$i + 1] . substr($pointnumber, 1);
-    }
-
-    $floatfinal = $intnumber + $pointnumber;
-
-    if ($sign == 1) {
-        $floatfinal = -$floatfinal;
-    }
-
-    return number_format($floatfinal, $nd, '.', '');
+    return \LibreNMS\OS\Hytera::hexToFloat((string) $number, (int) $nd);
 }
 
 /**

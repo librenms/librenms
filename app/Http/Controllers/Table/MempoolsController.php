@@ -133,7 +133,7 @@ class MempoolsController extends TableController
             'width' => 80,
         ];
 
-        $link = Url::generate(['page' => 'graphs'], Arr::only($graph, ['id', 'type', 'from']));
+        $link = route('graphs', Arr::only($graph, ['id', 'type', 'from']));
 
         return Url::overlibLink($link, Url::graphTag($graph), Url::graphTag(['height' => 150, 'width' => 400] + $graph));
     }
@@ -154,7 +154,7 @@ class MempoolsController extends TableController
         $total = $is_percent ? $mempool->mempool_total : Number::formatBi($mempool->mempool_total);
 
         $percent = Html::percentageBar(400, 10, $mempool->mempool_perc, "$used / $total", $total !== $free ? $free : $free, $mempool->mempool_perc_warn);
-        $link = Url::generate(['page' => 'graphs'], Arr::only($graph, ['id', 'type', 'from']));
+        $link = route('graphs', Arr::only($graph, ['id', 'type', 'from']));
 
         return Url::overlibLink($link, $percent, Url::graphTag($graph));
     }
@@ -186,9 +186,11 @@ class MempoolsController extends TableController
     {
         $is_percent = $mempool->mempool_total == 100;
 
+        $device = $mempool->device;
+
         return [
             'device_id' => $mempool->device_id,
-            'hostname' => $mempool->device->displayName(),
+            'hostname' => $device->display,
             'description' => $mempool->mempool_descr,
             'used' => $is_percent ? $mempool->mempool_used : Number::formatBi($mempool->mempool_used),
             'free' => $is_percent ? $mempool->mempool_free : Number::formatBi($mempool->mempool_free),

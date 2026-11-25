@@ -39,6 +39,7 @@ class Patch
 
     /**
      * @param  list<PatchFile>  $files
+     * @param  int  $skippedFileCount  Omitted changes in a freshly downloaded patch
      */
     public function __construct(
         public readonly int $pr,
@@ -49,6 +50,7 @@ class Patch
         public readonly string $author = '',
         public string $state = self::APPLIED,
         public string $appliedAt = '',
+        public readonly int $skippedFileCount = 0,
     ) {
     }
 
@@ -100,13 +102,7 @@ class Patch
 
     public function changesDependencies(): bool
     {
-        foreach ($this->files as $file) {
-            if (in_array($file['path'], ['composer.json', 'composer.lock'])) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->files, fn ($file) => in_array($file['path'], ['composer.json', 'composer.lock']));
     }
 
     /**

@@ -1,5 +1,6 @@
 import debounce from "lodash/debounce";
 import isEqual from "lodash/isEqual";
+import LibreNMSClipboard from "../../clipboard.js";
 
 const clone = (value) => (value === undefined ? undefined : JSON.parse(JSON.stringify(value)));
 
@@ -74,29 +75,7 @@ export function settingsPage({ prefix, tab, section, setting, groups, settings, 
         },
 
         copySettingLink(name) {
-            const url = this.settingLink(name);
-            const copied = () => toastr.success(this.lang.copied ?? "Copied");
-            const failed = () => toastr.error(url, this.lang.copyFailed ?? "Copy failed");
-
-            // the clipboard api is only available on https
-            if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(url).then(copied, failed);
-                return;
-            }
-
-            const textarea = document.createElement("textarea");
-            textarea.value = url;
-            textarea.setAttribute("readonly", "");
-            textarea.style.position = "fixed";
-            textarea.style.opacity = "0";
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand("copy") ? copied() : failed();
-            } catch {
-                failed();
-            }
-            textarea.remove();
+            LibreNMSClipboard.copyLink(this.settingLink(name), { copied: this.lang.copied, failed: this.lang.copyFailed });
         },
 
         changeTab(tab) {
@@ -530,8 +509,37 @@ export function settingArraySubKeyed() {
             });
         },
 
-        updateSubItem(index, subindex, value) {
-            if (this.subGroups[index][subindex] === value) return;
+        // nested values (such as a saml2 attribute_map) are edited as json
+        isNested(value) {
+            return value !== null && typeof value === "object";
+        },
+
+        displaySubItem(value) {
+            return this.isNested(value) ? JSON.stringify(value) : value;
+        },
+
+        updateSubItem(index, subindex, input) {
+            const current = this.subGroups[index][subindex];
+            let value = input.value;
+
+            if (this.isNested(current)) {
+                try {
+                    value = JSON.parse(value);
+                } catch {
+                    value = undefined;
+                }
+
+                if (!this.isNested(value)) {
+                    input.value = this.displaySubItem(current);
+                    toastr.error("Invalid JSON");
+                    return;
+                }
+
+                if (isEqual(current, value)) return;
+            } else if (current === value) {
+                return;
+            }
+
             this.update((groups) => (groups[index][subindex] = value));
         },
 

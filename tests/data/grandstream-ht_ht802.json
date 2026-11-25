@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "HT802",
                     "os": "grandstream-ht",
-                    "type": "network",
+                    "type": "voice",
                     "serial": "9610003725A",
                     "icon": "grandstream.png"
                 }

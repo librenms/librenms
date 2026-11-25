@@ -8,6 +8,7 @@ use App\Models\Secret;
 use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Testing\TestResponse;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
@@ -34,6 +35,33 @@ final class AddDeviceControllerTest extends DBTestCase
         $this->admin = User::factory()->admin()->create(['enabled' => 1]);
     }
 
+    public function testNewSecretDataIsAJsonObjectWithoutDefaults(): void
+    {
+        // Alpine sets the fields by name, those are lost when a JSON array is posted
+        $this->actingAs($this->admin)->get(route('device.add'))
+            ->assertOk()
+            ->assertViewHas('add_device_config', fn (array $config): bool => json_encode($config['methods']['proxmox-api']['formData']) === '{}'
+                && json_encode($config['methods']['ipmi']['formData']) === '{}'
+                && json_encode($config['methods']['snmp']['formData']) !== '{}');
+    }
+
+    public function testProxmoxTokenSecretMustBeAUuid(): void
+    {
+        $this->actingAs($this->admin)->postJson(route('device.add.store'), [
+            'hostname' => 'pve.example.com',
+            'polling_methods' => ['proxmox-api' => [
+                'active' => 1,
+                'secret_mode' => 'new',
+                'secret_data' => ['token_id' => 'librenms@pve!monitoring', 'token_secret' => 'Not-A-Token!'],
+            ]],
+        ])->assertJsonValidationErrors('polling_methods.proxmox-api.secret_data.token_secret');
+
+        $this->assertTrue(Validator::make(
+            ['token_id' => 'librenms@pve!monitoring', 'token_secret' => '5b1d6f3e-7c2a-4e8b-9f10-2a3b4c5d6e7f'],
+            SecretType::ProxmoxApi->definition()->rules(),
+        )->passes());
+    }
+
     public function testIndexProvidesDefaultDisplayTemplate(): void
     {
         LibrenmsConfig::set('device_display_default', '{{ $hostname }} - {{ $sysName }}');
@@ -46,6 +74,17 @@ final class AddDeviceControllerTest extends DBTestCase
             ->assertSee('name="polling_methods[snmp][secret_id]"', false)
             ->assertSee('id="os-select"', false)
             ->assertSee(__('poller.validation_failed')); // add anyway dialog
+    }
+
+    public function testIndexPrefillsHostnameFromSearch(): void
+    {
+        $this->actingAs($this->admin)->get(route('device.add', ['hostname' => '198.51.100.30']))
+            ->assertOk()
+            ->assertViewHas('add_device_config', fn (array $config): bool => $config['hostname'] === '198.51.100.30');
+
+        $this->withSession(['_old_input' => ['hostname' => 'corrected.example.test']])
+            ->get(route('device.add', ['hostname' => '198.51.100.30']))
+            ->assertViewHas('add_device_config', fn (array $config): bool => $config['hostname'] === 'corrected.example.test');
     }
 
     public function testIndexDefaultMethodsFollowIcmpCheck(): void
@@ -71,7 +110,7 @@ final class AddDeviceControllerTest extends DBTestCase
         ], ['display_template' => '{{ $hostname }} ({{ $ip }})']);
 
         $device = Device::where('hostname', 'unchecked.example.com')->firstOrFail();
-        $response->assertOk()->assertJson(['status' => 'ok', 'redirect' => route('device', ['device' => $device->device_id])]);
+        $response->assertOk()->assertJson(['status' => 'ok', 'redirect' => route('device.overview', ['device' => $device->device_id])]);
         $this->assertSame('{{ $hostname }} ({{ $ip }})', $device->display_template);
 
         $snmp = $device->pollingMethod(PollingMethodType::Snmp);
@@ -102,6 +141,8 @@ final class AddDeviceControllerTest extends DBTestCase
         $reasons = [
             'SNMP v2c: No reply using credential "Default public"',
             'SNMP v2c: No reply using credential "Default private"',
+            'SNMP v1: No reply using credential "Default public"',
+            'SNMP v1: No reply using credential "Default private"',
         ];
         $response->assertStatus(422)
             ->assertJsonPath('status', 'unreachable')
@@ -116,13 +157,13 @@ final class AddDeviceControllerTest extends DBTestCase
     {
         $this->defaultSecrets('global-community');
         $secret = Secret::factory()->create([
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => 'target-community'],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => 'target-community'],
         ]);
 
         $tried = [];
         $this->snmpBackend()->shouldReceive('get')->andReturnUsing(function ($target, $oids, $config) use (&$tried) {
-            $tried[] = $config->community;
+            $tried[] = "$config->version $config->community";
 
             return new RawSnmpResponse('', 'Timeout', 1);
         });
@@ -131,7 +172,7 @@ final class AddDeviceControllerTest extends DBTestCase
             'snmp' => ['validate' => '1', 'secret_mode' => 'existing', 'secret_id' => $secret->id],
         ])->assertStatus(422);
 
-        $this->assertSame(['target-community'], $tried);
+        $this->assertSame(['v2c target-community', 'v1 target-community'], $tried); // without a version a community is tried as v1 too
     }
 
     public function testStoreWithoutCheckingStillRejectsDuplicateIp(): void
@@ -227,7 +268,7 @@ final class AddDeviceControllerTest extends DBTestCase
                 'validate' => '0',
                 'secret_mode' => 'new',
                 'description' => 'Not Allowed',
-                'secret_data' => ['version' => 'v2c', 'community' => 'public'],
+                'secret_type' => 'snmp-community', 'secret_data' => ['community' => 'public'],
             ]],
         ])->assertForbidden();
 
@@ -237,16 +278,42 @@ final class AddDeviceControllerTest extends DBTestCase
 
     public function testNewSecretGetsUniqueDefaultDescription(): void
     {
-        Secret::factory()->create(['description' => 'SNMP 127.0.0.10', 'secret_type' => SecretType::Snmp]);
+        Secret::factory()->create(['description' => 'SNMP 127.0.0.10', 'secret_type' => SecretType::SnmpCommunity]);
 
         $this->store('127.0.0.10', ['snmp' => [
             'validate' => '0',
             'secret_mode' => 'new',
             'description' => '',
-            'secret_data' => ['version' => 'v2c', 'community' => 'y'],
+            'secret_type' => 'snmp-community', 'secret_data' => ['community' => 'y'],
         ]])->assertOk();
 
         $this->assertDatabaseHas('secrets', ['description' => 'SNMP 127.0.0.10 (2)']);
+    }
+
+    public function testSecretOfAnotherTypeIsAnErrorOfTheMethod(): void
+    {
+        $ipmi = Secret::factory()->create(['description' => 'add ipmi', 'secret_type' => SecretType::Ipmi, 'data' => ['username' => 'admin']]);
+
+        // the error is for the method, so the form shows it on its tab
+        $this->store('wrong-type.example.com', ['snmp' => [
+            'validate' => '0',
+            'secret_mode' => 'existing',
+            'secret_id' => $ipmi->id,
+        ]])->assertUnprocessable()->assertJsonValidationErrors(['polling_methods.snmp.secret_id']);
+
+        $this->assertDatabaseMissing('devices', ['hostname' => 'wrong-type.example.com']);
+    }
+
+    public function testIndexShowsTheCommunityVersionForCommunitiesOnly(): void
+    {
+        $community = Secret::factory()->create(['description' => 'add community', 'secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'public']]);
+        $response = $this->actingAs($this->admin)->get(route('device.add'))->assertOk();
+        $snmp = collect($response->viewData('availableMethods'))->firstWhere('type', 'snmp');
+
+        $field = collect($snmp['settings_fields'])->firstWhere('key', 'version');
+        $this->assertStringContainsString("secretTypes['snmp']", $field['visible_if_expression']);
+        $this->assertSame(['snmp-community', 'snmp-v3'], array_column($snmp['secret_types'], 'type'));
+        $this->assertSame('snmp-community', $response->viewData('add_device_config')['secret_type_by_id']['snmp']->{$community->id});
     }
 
     public function testStoreRequiresAPollingMethod(): void
@@ -305,8 +372,8 @@ final class AddDeviceControllerTest extends DBTestCase
     {
         $secrets = array_map(fn (string $community) => Secret::factory()->create([
             'description' => "Default $community",
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => $community],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => $community],
         ]), $communities);
         LibrenmsConfig::set('snmp.default_credentials', array_map(fn (Secret $secret) => $secret->id, $secrets));
 

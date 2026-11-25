@@ -28,7 +28,7 @@ class Services extends Component
             'warning' => $device->services->where('service_status', 1)->count(),
             'critical' => $device->services->where('service_status', 2)->count(),
         ];
-        $this->servicesUrl = route('device', ['device' => $device->device_id, 'tab' => 'services']);
+        $this->servicesUrl = route('device.services', ['device' => $device->device_id]);
         $this->serviceLabels = $device->services->map(function (Service $service): array {
             $type = strtolower((string) $service->service_type);
 

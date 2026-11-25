@@ -25,8 +25,9 @@ $options['f'] = isset($options['f']) ? $options['f'] : '';
 if ($options['f'] === 'composer_get_plugins') {
     $output = [];
 
-    $plugins = is_file('composer.plugins.json') ?
-        json_decode(file_get_contents('composer.plugins.json')) : [];
+    $plugins_file = getenv('LIBRENMS_COMPOSER_PLUGINS') ?: 'composer.plugins.json';
+    $plugins = is_file($plugins_file) ?
+        json_decode(file_get_contents($plugins_file)) : [];
 
     foreach ($plugins->require ?? [] as $package => $version) {
         $output[] = "$package:$version";
@@ -40,7 +41,6 @@ if ($options['f'] === 'composer_get_plugins') {
 /**
  * Scripts with dependencies
  */
-$init_modules = ['alerts'];
 require __DIR__ . '/includes/init.php';
 
 if (isset($options['d'])) {

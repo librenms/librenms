@@ -7,7 +7,7 @@
 
 <div x-data="{
         deviceId: @js($device->device_id),
-        deviceName: @js($device->displayName()),
+        deviceName: @js($device->display),
         maintenanceId: @js($maintenanceId ?: null),
         inMaintenance: @js((bool) $maintenance),
         notes: '',

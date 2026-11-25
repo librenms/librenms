@@ -29,7 +29,7 @@ class Processors extends Component
                 'processors' => $processors
                     ->map(fn (Processor $processor): Processor => $processor)
                     ->values(),
-                'usage' => (int) ceil($processors->avg('processor_usage')),
+                'usage' => (int) ceil($processors->avg('processor_usage') ?? 0),
                 'warning' => $processors->avg('processor_perc_warn'),
             ],
             );

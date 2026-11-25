@@ -33,21 +33,21 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Modules\UnixAgent;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Polling\Method\Definitions\UnixAgentDefinition;
 use LibreNMS\Polling\Method\Methods\PollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Polling\Method\ProbeResult;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Tests\InMemoryDbTestCase;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class UnixAgentTest extends InMemoryDbTestCase
 {
-    public function testCheckUsesThePollingMethodPort(): void
+    #[DataProvider('agentAddressProvider')]
+    public function testCheckConnectsToTheConfiguredAddressAndPort(string $target, array $settings): void
     {
         $server = stream_socket_server('tcp://127.0.0.1:0');
         $this->assertNotFalse($server);
@@ -56,16 +56,16 @@ final class UnixAgentTest extends InMemoryDbTestCase
         LibrenmsConfig::set('unix-agent.port', 1); // nothing listens here
         LibrenmsConfig::set('unix-agent.read-timeout', 1);
 
-        $device = new Device(['hostname' => '127.0.0.1']);
+        $device = new Device(['hostname' => 'example.test', 'overwrite_ip' => $target]);
         $device->setRelation('pollingMethods', collect([new DevicePollingMethod([
             'method_type' => PollingMethodType::UnixAgent,
             'enabled' => true,
-            'settings' => ['port' => $port, 'timeout' => 2],
+            'settings' => ['port' => $port, 'timeout' => 2] + $settings,
         ])]));
 
         $log = Log::spy();
 
-        $result = (new PerDeviceMethodResults($device))->result(PollingMethodType::UnixAgent);
+        $result = new PerDeviceMethodResults($device)->result(PollingMethodType::UnixAgent);
         $this->assertTrue($result?->isSuccess());
         $this->assertSame('', $result->stat('output')); // the listener never sends data
 
@@ -73,6 +73,17 @@ final class UnixAgentTest extends InMemoryDbTestCase
         $log->shouldHaveReceived('error')->with("Connection to UNIX agent timed out during fetch on port $port")->once();
 
         fclose($server);
+    }
+
+    /**
+     * @return array<string, array{string, array{use_localhost?: bool}}>
+     */
+    public static function agentAddressProvider(): array
+    {
+        return [
+            'device polling address' => ['127.0.0.1', []],
+            'local agent override' => ['127.0.0.2', ['use_localhost' => true]],
+        ];
     }
 
     public function testParseKeysMemcachedAndDrbdByInstance(): void
@@ -144,8 +155,7 @@ final class UnixAgentTest extends InMemoryDbTestCase
         $datastore->shouldReceive('put')->once()->withArgs(fn ($device, $measurement, $tags, $fields) => $measurement == 'agent' && $fields == ['time' => 15]);
 
         $module = new UnixAgent;
-        $connectivity = new ConnectivityHelper($os->getDevice(), $os->getMethodResults());
-        $this->assertTrue($module->shouldPoll($os, new ModuleStatus(true), $connectivity));
+        $this->assertTrue($module->shouldPoll($os));
         $module->poll($os, $datastore);
 
         $this->assertSame(1, $agent->probes); // the module did not connect again

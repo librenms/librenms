@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Traits\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Vlan extends DeviceRelatedModel
 {
-    use HasFactory;
+    use HasFactory, Filterable;
     protected $primaryKey = 'vlan_id';
+    protected array $filterable = ['vlan_vlan'];
     public $timestamps = false;
     protected $fillable = [
         'device_id',

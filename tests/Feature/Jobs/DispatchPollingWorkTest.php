@@ -6,6 +6,7 @@ use App\Jobs\DiscoverDevice;
 use App\Jobs\DispatchPollingWork;
 use App\Jobs\PollDevice;
 use App\Models\Device;
+use App\Queue\WorkedQueues;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Queue;
 use LibreNMS\Tests\DBTestCase;
@@ -30,7 +31,7 @@ final class DispatchPollingWorkTest extends DBTestCase
             'last_polled' => $polled ? now()->subMinute() : null,
         ]);
 
-        (new DispatchPollingWork(poll: false, discover: true))->handle();
+        new DispatchPollingWork(poll: false, discover: true)->handle();
 
         if ($expected) {
             Queue::assertPushed(DiscoverDevice::class, fn (DiscoverDevice $job) => $job->device_id == $device->device_id);
@@ -55,6 +56,49 @@ final class DispatchPollingWorkTest extends DBTestCase
         ];
     }
 
+    public function testQueuedForThePollerGroup(): void
+    {
+        Queue::fake();
+        $default = Device::factory()->create(['status' => 1, 'poller_group' => 0, 'last_discovered' => null, 'last_polled' => now()->subMinutes(10)]);
+        $grouped = Device::factory()->create(['status' => 1, 'poller_group' => 3, 'last_discovered' => null, 'last_polled' => now()->subMinutes(10)]);
+
+        new DispatchPollingWork(poll: true, discover: true)->handle();
+
+        Queue::assertPushedOn('poll', PollDevice::class, fn (PollDevice $job) => $job->device_id == $default->device_id);
+        Queue::assertPushedOn('discovery', DiscoverDevice::class, fn (DiscoverDevice $job) => $job->device_id == $default->device_id);
+        Queue::assertPushedOn('poll-3', PollDevice::class, fn (PollDevice $job) => $job->device_id == $grouped->device_id);
+        Queue::assertPushedOn('discovery-3', DiscoverDevice::class, fn (DiscoverDevice $job) => $job->device_id == $grouped->device_id);
+    }
+
+    public function testUnworkedPollerGroupIsNotQueued(): void
+    {
+        Queue::fake();
+        $this->workedQueues(['poll', 'discovery', 'poll-1']);
+        $worked = Device::factory()->create(['status' => 1, 'poller_group' => 1, 'last_discovered' => now()->subMinute(), 'last_polled' => now()->subMinutes(10)]);
+        $unworked = Device::factory()->create(['status' => 1, 'poller_group' => 2, 'last_discovered' => now()->subMinute(), 'last_polled' => now()->subMinutes(10)]);
+
+        new DispatchPollingWork(poll: true, discover: false)->handle();
+
+        Queue::assertPushedOn('poll-1', PollDevice::class, fn (PollDevice $job) => $job->device_id == $worked->device_id);
+        Queue::assertNotPushed(PollDevice::class, fn (PollDevice $job) => $job->device_id == $unworked->device_id);
+    }
+
+    public function testEverythingIsQueuedWhenNoWorkerHasReported(): void
+    {
+        Queue::fake();
+        $this->workedQueues([]);
+        $device = Device::factory()->create(['status' => 1, 'poller_group' => 2, 'last_discovered' => now()->subMinute(), 'last_polled' => now()->subMinutes(10)]);
+
+        new DispatchPollingWork(poll: true, discover: false)->handle();
+
+        Queue::assertPushedOn('poll-2', PollDevice::class, fn (PollDevice $job) => $job->device_id == $device->device_id);
+    }
+
+    public function testScheduledOnSchedulerQueue(): void
+    {
+        $this->assertSame('scheduler', (new DispatchPollingWork)->queue);
+    }
+
     public function testDiscoveryDueBeforeTheNextDispatchIsDelayed(): void
     {
         Queue::fake();
@@ -64,7 +108,7 @@ final class DispatchPollingWorkTest extends DBTestCase
             'last_discovered_timetaken' => 0,
         ]);
 
-        (new DispatchPollingWork(poll: false, discover: true))->handle();
+        new DispatchPollingWork(poll: false, discover: true)->handle();
 
         // due 3 seconds early, at 21597 seconds
         Queue::assertPushed(DiscoverDevice::class, fn (DiscoverDevice $job) => $job->device_id == $device->device_id && $job->delay >= 4 && $job->delay <= 6);
@@ -85,7 +129,7 @@ final class DispatchPollingWorkTest extends DBTestCase
             'last_polled_timetaken' => $polled === null ? null : 0,
         ]);
 
-        (new DispatchPollingWork(poll: true, discover: false))->handle();
+        new DispatchPollingWork(poll: true, discover: false)->handle();
 
         if ($expected) {
             Queue::assertPushed(PollDevice::class, fn (PollDevice $job) => $job->device_id == $device->device_id);
@@ -121,9 +165,17 @@ final class DispatchPollingWorkTest extends DBTestCase
             'last_polled_timetaken' => 0,
         ]);
 
-        (new DispatchPollingWork(poll: true, discover: false))->handle();
+        new DispatchPollingWork(poll: true, discover: false)->handle();
 
         // due 3 seconds early, at 297 seconds
         Queue::assertPushed(PollDevice::class, fn (PollDevice $job) => $job->device_id == $device->device_id && $job->delay >= 4 && $job->delay <= 6);
+    }
+
+    /**
+     * @param  string[]  $queues
+     */
+    private function workedQueues(array $queues): void
+    {
+        $this->mock(WorkedQueues::class, fn ($mock) => $mock->shouldReceive('worked')->andReturn($queues));
     }
 }

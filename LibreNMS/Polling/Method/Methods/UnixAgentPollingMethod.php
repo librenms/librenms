@@ -8,6 +8,7 @@ use App\Models\DevicePollingMethod;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\UnixAgentConfig;
+use LibreNMS\Polling\Method\DataSources\UnixAgentDataSource;
 use LibreNMS\Polling\Method\Definitions\UnixAgentDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Util\Rewrite;
@@ -17,6 +18,22 @@ use LibreNMS\Util\Rewrite;
  */
 final class UnixAgentPollingMethod extends PollingMethod
 {
+    /**
+     * @param  string|null  $recordedOutput  agent output to use instead of connecting, for test fixtures (tests/unix-agent)
+     */
+    public function __construct(
+        private readonly ?string $recordedOutput = null,
+    ) {
+    }
+
+    /**
+     * Use an agent output recorded from a device, like `nc <host> 6556 > tests/unix-agent/<os>_<variant>.txt`.
+     */
+    public static function recorded(string $file): self
+    {
+        return new self((string) file_get_contents($file));
+    }
+
     public function definition(): UnixAgentDefinition
     {
         return new UnixAgentDefinition;
@@ -28,11 +45,12 @@ final class UnixAgentPollingMethod extends PollingMethod
     }
 
     /**
-     * @return array{port: int, timeout: int}
+     * @return array{use_localhost: bool, port: int, timeout: int}
      */
     public function defaults(?Device $device = null): array
     {
         return [
+            'use_localhost' => false,
             'port' => (int) LibrenmsConfig::get('unix-agent.port', 6556),
             'timeout' => (int) LibrenmsConfig::get('unix-agent.connection-timeout', 10),
         ];
@@ -45,7 +63,18 @@ final class UnixAgentPollingMethod extends PollingMethod
         return new UnixAgentConfig(
             port: $settings['port'],
             timeout: $settings['timeout'],
+            useLocalhost: $settings['use_localhost'],
         );
+    }
+
+    public function dataSourceClass(): string
+    {
+        return UnixAgentDataSource::class;
+    }
+
+    public function dataSource(Device $device, PollingMethodConfig $config, ProbeResult $result): UnixAgentDataSource
+    {
+        return new UnixAgentDataSource($result);
     }
 
     /**
@@ -56,10 +85,16 @@ final class UnixAgentPollingMethod extends PollingMethod
         assert($config instanceof UnixAgentConfig);
 
         $stats = ['port' => $config->port, 'timeout' => $config->timeout];
+
+        if ($this->recordedOutput !== null) {
+            return ProbeResult::success($stats + ['output' => $this->recordedOutput, 'time' => 0]);
+        }
+
         $start = microtime(true);
+        $hostname = $config->useLocalhost ? '127.0.0.1' : $device->pollerTarget();
 
         try {
-            $socket = @fsockopen(Rewrite::addIpv6Brackets($device->pollerTarget()), $config->port, $errno, $errstr, $config->timeout);
+            $socket = @fsockopen(Rewrite::addIpv6Brackets($hostname), $config->port, $errno, $errstr, $config->timeout);
         } catch (\ErrorException $e) {
             return ProbeResult::failure($stats, $e->getMessage()); // usually connection timed out
         }
@@ -85,6 +120,7 @@ final class UnixAgentPollingMethod extends PollingMethod
         return ProbeResult::success($stats + [
             'output' => $output,
             'time' => round((microtime(true) - $start) * 1000),
+            'timed_out' => (bool) $info['timed_out'],
         ]);
     }
 }

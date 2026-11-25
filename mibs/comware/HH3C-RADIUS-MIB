@@ -1,5 +1,5 @@
 -- =================================================================
--- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description:
 --
@@ -9,106 +9,124 @@
 -- traps supported to notify client the RADIUS Server's down and up state.
 --
 -- Reference: RFC2866, RADIUS-AUTH-CLIENT-MIB, RADIUS-ACC-CLIENT-MIB
--- Version: V2.6
+-- Version: V2.9
 -- History:
 --  V1.0 Initial version 2004-07-13
---  V1.1 2004-10-12 updated by gaolong
---       Set size of DisplayString from 0 to 255.
---  V1.2 2005-03-10 updated by xulei
---       Modified description of this MIB
---       Modified MAX-ACCESS of nodes in hh3cRdInfoTable
---       Modified description of nodes in hh3cRdInfoTable
---       Added nodes of hh3cRdInfoTable
---       Added hh3cRdAccInfoTable
---       Added hh3cRadiusAccServerTable
---       Added Traps
---  V1.3 2005-05-08 updated by xulei
---       Modified MAX-ACCESS of hh3cRdPrimAccState and hh3cRdSecAccState
---  V1.4 2005-06-03 updated by xulei
---       Modified SYNTAX and DESCRIPTION of hh3cRdAccPacketUnit
---  V1.5 2008-05-19 updated by yangxu
---       Added nodes of hh3cRdAccInfoTable
---       Added node of hh3cRdAcctOnEnable
---       Added node of hh3cRdAcctOnSendTimes
---       Added node of hh3cRdAcctOnSendInterval
---  V1.6 2008-07-18 updated by d04528
---       Added nodes of hh3cRadiusAuthenticating
---       Added node of hh3cRadiusAuthClient
---       Added node of hh3cRadiusAuthServerTable
---       Added node of hh3cRadiusAuthServerEntry
---       Added node of hh3cRadiusAuthFailureTimes
---       Added node of hh3cRadiusAuthTimeoutTimes
---       Added node of hh3cRadiusAuthRejectTimes
---  V1.7 2009-04-30 update by h02978
---       Added node of hh3cRdSecKey
---       Added node of hh3cRdSecAccKey
---       Added node of hh3cRadiusAuthServerUpTrap
---       Added node of hh3cRadiusAccServerUpTrap
---  V1.8 2009-08-05 update by h02978
---       Added node of hh3cRadiusAuthErrThreshold
---       Added node of hh3cRadiusAuthErrTrap
---  V1.9 2010-03-29 Modifyed by x04730
---       Modify SYNTAX of hh3cRdAccRealTime
---       2010-07-14 Modifyed by x04730
---       Modify SYNTAX of hh3cRdQuietTime
---       Modify SYNTAX of hh3cRdAccQuietTime
---       2010-08-26 update by y06401
---       Added hh3cRadiusSchAuthTable
---       Added hh3cRadiusSchAccTable
---  V2.0 2010-03-29 Modifyed by y07111
---       Added nodes of hh3cRadiusStatistic
---       Added node of hh3cRadiusStatAccReq
---       Added node of hh3cRadiusStatAccAck
---       Added node of hh3cRadiusStatLogoutReq
---       Added node of hh3cRadiusStatLogoutAck
---  V2.1 2011-11-28, Added by xuyonggang
---       Added node of hh3cRadiusServerTrapVarObjects
---       2012-02-28 Modifyed by y002965
---       Added table of hh3cRdSecondaryAuthServerTable
---       Added table of hh3cRdSecondaryAcctServerTable
---       Added node of hh3cRdPrimVpnName
---       Added node of hh3cRdSecVpnName
---       Added node of hh3cRdAuthNasIpAddrType
---       Added node of hh3cRdAuthNasIpAddr
---       Added node of hh3cRdPrimAccVpnName
---       Added node of hh3cRdSecAccVpnName
---       Added node of hh3cRdAccNasIpAddrType
---       Added node of hh3cRdAccNasIpAddr
---       Change the length of hh3cRdSecAccKey
---       Change the length of hh3cRdAccKey
---       Change the length of hh3cRdSecKey
---       Change the length of hh3cRdKey
---  V2.2 2012-10-11, Added by liubo
---       Added node of hh3cRdAuthNasIpv6Addr
---       Added node of hh3cRdAccNasIpv6Addr
---       Modified the length of hh3cRdSecAccKey
---       Modified the length of hh3cRdAccKey
---       Modified the length of hh3cRdSecKey
---       Modified the length of hh3cRdKey
---       Modified the length of hh3cRdPrimVpnName
---       Modified the length of hh3cRdSecVpnName
---       Modified the length of hh3cRdPrimAccVpnName
---       Modified the length of hh3cRdSecAccVpnName
---       Modified the length of hh3cRdSecondaryAuthVpnName
---       Modified the length of hh3cRdSecondaryAccVpnName
---       Modified the length of hh3cRdSecondaryAuthKey
---       Modified the length of hh3cRdSecondaryAccKey
---       Modified the default value and description of hh3cRdAcctOnSendTimes
---  V2.3 2013-03-30, Modified by luyu
---       Modified description of hh3cRdSecondaryAccUdpPort
---       Modified the default value and description of hh3cRadiusSchAccPrimUdpPort
---       Modified the default value and description of hh3cRadiusSchAccSecUdpPort
---  V2.4 2014-06-07, Modified by liubo
---       Modified description of hh3cRdSecondaryAuthRowStatus
---       Modified description of hh3cRdSecondaryAccRowStatus
---  V2.5 2016-11-03, Modified by yemingxia
---       Modified the value range of hh3cRdAccRealTime
---       Added node of hh3cRdAccRealTimeUnit
---  V2.6 2019-01-12, Modified by yuhua
---       Added node of hh3cRadiusAuthenticationServerUpTrap
---       Added node of hh3cRadiusAccountingServerUpTrap
---       Added node of hh3cRadiusAuthenticationServerDownTrap
---       Added node of hh3cRadiusAccountingServerDownTrap
+--  V1.1 2004-10-12 Updated by gaolong
+--       Set the size of DisplayString from 0 to 255.
+--  V1.2 2005-03-10 Updated by xulei
+--       Modified the description of this MIB.
+--       Modified the max access to nodes in hh3cRdInfoTable.
+--       Modified the descriptions of nodes in hh3cRdInfoTable.
+--       Added nodes to hh3cRdInfoTable.
+--       Added hh3cRdAccInfoTable.
+--       Added hh3cRadiusAccServerTable.
+--       Added traps.
+--  V1.3 2005-05-08 Updated by xulei
+--       Modified the max access to hh3cRdPrimAccState and hh3cRdSecAccState.
+--  V1.4 2005-06-03 Updated by xulei
+--       Modified the SYNTAX and DESCRIPTION of hh3cRdAccPacketUnit.
+--  V1.5 2008-05-19 Updated by yangxu
+--       Added nodes to hh3cRdAccInfoTable.
+--       Added node hh3cRdAcctOnEnable.
+--       Added node hh3cRdAcctOnSendTimes.
+--       Added node hh3cRdAcctOnSendInterval.
+--  V1.6 2008-07-18 Updated by d04528
+--       Added nodes to table hh3cRadiusAuthenticating.
+--       Added node hh3cRadiusAuthClient.
+--       Added node hh3cRadiusAuthServerTable.
+--       Added node hh3cRadiusAuthServerEntry.
+--       Added node hh3cRadiusAuthFailureTimes.
+--       Added node hh3cRadiusAuthTimeoutTimes.
+--       Added node hh3cRadiusAuthRejectTimes.
+--  V1.7 2009-04-30 Update by h02978
+--       Added node hh3cRdSecKey.
+--       Added node hh3cRdSecAccKey.
+--       Added node hh3cRadiusAuthServerUpTrap.
+--       Added node hh3cRadiusAccServerUpTrap.
+--  V1.8 2009-08-05 Update by h02978
+--       Added node hh3cRadiusAuthErrThreshold.
+--       Added node hh3cRadiusAuthErrTrap.
+--  V1.9 2010-03-29 Updated by x04730
+--       Modified the SYNTAX of hh3cRdAccRealTime.
+--       2010-07-14 Updated by x04730
+--       Modified the SYNTAX of hh3cRdQuietTime.
+--       Modified the SYNTAX of hh3cRdAccQuietTime.
+--       2010-08-26 Update by y06401
+--       Added hh3cRadiusSchAuthTable.
+--       Added hh3cRadiusSchAccTable.
+--  V2.0 2010-03-29 Updated by y07111
+--       Added nodes to table hh3cRadiusStatistic.
+--       Added node hh3cRadiusStatAccReq.
+--       Added node hh3cRadiusStatAccAck.
+--       Added node hh3cRadiusStatLogoutReq.
+--       Added node hh3cRadiusStatLogoutAck.
+--  V2.1 2011-11-28, Updated by xuyonggang
+--       Added node hh3cRadiusServerTrapVarObjects.
+--       2012-02-28 Updated by y002965
+--       Added table hh3cRdSecondaryAuthServerTable.
+--       Added table hh3cRdSecondaryAcctServerTable.
+--       Added node hh3cRdPrimVpnName.
+--       Added node hh3cRdSecVpnName.
+--       Added node hh3cRdAuthNasIpAddrType.
+--       Added node hh3cRdAuthNasIpAddr.
+--       Added node hh3cRdPrimAccVpnName.
+--       Added node hh3cRdSecAccVpnName.
+--       Added node hh3cRdAccNasIpAddrType.
+--       Added node hh3cRdAccNasIpAddr.
+--       Changed the length of hh3cRdSecAccKey.
+--       Changed the length of hh3cRdAccKey.
+--       Changed the length of hh3cRdSecKey.
+--       Changed the length of hh3cRdKey.
+--  V2.2 2012-10-11, Updated by liubo
+--       Added node hh3cRdAuthNasIpv6Addr.
+--       Added node hh3cRdAccNasIpv6Addr.
+--       Modified the length of hh3cRdSecAccKey.
+--       Modified the length of hh3cRdAccKey.
+--       Modified the length of hh3cRdSecKey.
+--       Modified the length of hh3cRdKey.
+--       Modified the length of hh3cRdPrimVpnName.
+--       Modified the length of hh3cRdSecVpnName.
+--       Modified the length of hh3cRdPrimAccVpnName.
+--       Modified the length of hh3cRdSecAccVpnName.
+--       Modified the length of hh3cRdSecondaryAuthVpnName.
+--       Modified the length of hh3cRdSecondaryAccVpnName.
+--       Modified the length of hh3cRdSecondaryAuthKey.
+--       Modified the length of hh3cRdSecondaryAccKey.
+--       Modified the default value and description of hh3cRdAcctOnSendTimes.
+--  V2.3 2013-03-30, Updated by luyu
+--       Modified the description of hh3cRdSecondaryAccUdpPort.
+--       Modified the default value and description of hh3cRadiusSchAccPrimUdpPort.
+--       Modified the default value and description of hh3cRadiusSchAccSecUdpPort.
+--  V2.4 2014-06-07, Updated by liubo
+--       Modified the description of hh3cRdSecondaryAuthRowStatus.
+--       Modified the description of hh3cRdSecondaryAccRowStatus.
+--  V2.5 2016-11-03, Updated by yemingxia
+--       Modified the value range of hh3cRdAccRealTime.
+--       Added node hh3cRdAccRealTimeUnit.
+--  V2.6 2019-01-12, Updated by yuhua
+--       Added node hh3cRadiusAuthenticationServerUpTrap.
+--       Added node hh3cRadiusAccountingServerUpTrap.
+--       Added node hh3cRadiusAuthenticationServerDownTrap.
+--       Added node hh3cRadiusAccountingServerDownTrap.
+--  V2.7 2021-09-06, Updated by jinyu
+--       Added node hh3cRdAccStopPktTimeResend.
+--       Modified the properties of hh3cRdGroupName.
+--       Modified the properties of hh3cRdAccGroupName.
+--  V2.8 2021-12-13 Updated by zhanghang
+--       Added node hh3cRadiusAccCachePacketTrap.
+--       Added node hh3cRadiusAccCacheVarObjects.
+--       Added node hh3cRadiusAccCacheNotifications.
+--       Added node hh3cRadiusAccCacheMaxPackets.
+--       Added node hh3cRadiusAccCacheUpperValue.
+--       Added node hh3cRadiusAccCacheLowerValue.
+--       Added node hh3cRadiusAccCacheMemoryUsage.
+--       Added node hh3cRadiusAccCachePackets.
+--       Added node hh3cRadiusAccCacheAlarm.
+--       Added node hh3cRadiusAccCacheResume.
+--       Added node hh3cRadiusAccCachePacketDiscard.
+--  V2.9 2022-3-3 Updated by zhanghang
+--       Modified node hh3cRadiusAccCachePackets.
 -- =================================================================
 HH3C-RADIUS-MIB DEFINITIONS ::= BEGIN
     IMPORTS
@@ -129,7 +147,7 @@ HH3C-RADIUS-MIB DEFINITIONS ::= BEGIN
             FROM RADIUS-ACC-CLIENT-MIB;
 
     hh3cRadius MODULE-IDENTITY
-    LAST-UPDATED "201901121800Z"            -- January 12, 2019 at 18:00 GMT
+    LAST-UPDATED "202203031800Z"            -- March 3, 2022 at 18:00 GMT
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -142,20 +160,41 @@ HH3C-RADIUS-MIB DEFINITIONS ::= BEGIN
         "The HH3C-RADIUS-MIB contains objects to
         Manage configuration and Monitor running state
         for RADIUS feature."
+    REVISION "202203031800Z"        -- March 3, 2022 at 18:00 GMT
+    DESCRIPTION
+         "Modified node hh3cRadiusAccCachePackets."
+    REVISION "202112131800Z"        -- December 13 2021 at 18:00 GMT
+    DESCRIPTION
+         "Added node hh3cRadiusAccCachePacketTrap.
+         Added node hh3cRadiusAccCacheVarObjects.
+         Added node hh3cRadiusAccCacheNotifications.
+         Added node hh3cRadiusAccCacheMaxPackets.
+         Added node hh3cRadiusAccCacheUpperValue.
+         Added node hh3cRadiusAccCacheLowerValue.
+         Added node hh3cRadiusAccCacheMemoryUsage.
+         Added node hh3cRadiusAccCachePackets.
+         Added node hh3cRadiusAccCacheAlarm.
+         Added node hh3cRadiusAccCacheResume.
+         Added node hh3cRadiusAccCachePacketDiscard."
+    REVISION "202109061800Z"        -- Sept 06, 2021 at 18:00 GMT
+    DESCRIPTION
+         "Added node hh3cRdAccStopPktTimeResend.
+         Modified the properties of hh3cRdGroupName.
+         Modified the properties of hh3cRdAccGroupName."
     REVISION "201901121800Z"        -- January 12, 2019 at 18:00 GMT
     DESCRIPTION
-        "Added node of hh3cRadiusAuthenticationServerUpTrap.
-         Added node of hh3cRadiusAccountingServerUpTrap.
-         Added node of hh3cRadiusAuthenticationServerDownTrap.
-         Added node of hh3cRadiusAccountingServerDownTrap"
+        "Added node hh3cRadiusAuthenticationServerUpTrap.
+         Added node hh3cRadiusAccountingServerUpTrap.
+         Added node hh3cRadiusAuthenticationServerDownTrap.
+         Added node hh3cRadiusAccountingServerDownTrap."
     REVISION "201611031800Z"        -- November 3, 2016 at 18:00 GMT
     DESCRIPTION
         "Modified the value range of hh3cRdAccRealTime.
-        Added node of hh3cRdAccRealTimeUnit"
+        Added node hh3cRdAccRealTimeUnit."
     REVISION "201406071800Z"        -- June 7, 2014 at 18:00 GMT
     DESCRIPTION
-        "Modified description of hh3cRdSecondaryAuthRowStatus.
-        Modified description of hh3cRdSecondaryAccRowStatus"
+        "Modified the description of hh3cRdSecondaryAuthRowStatus.
+        Modified the description of hh3cRdSecondaryAccRowStatus."
     ::= { hh3cCommon 13 }
 
     hh3cRdObjects OBJECT IDENTIFIER ::= { hh3cRadius 1 }
@@ -206,7 +245,7 @@ HH3C-RADIUS-MIB DEFINITIONS ::= BEGIN
 
     hh3cRdGroupName OBJECT-TYPE
         SYNTAX DisplayString(SIZE (1..32))
-        MAX-ACCESS not-accessible
+        MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
         "The name of the RADIUS authentication group referred to in this table
@@ -510,12 +549,13 @@ HH3C-RADIUS-MIB DEFINITIONS ::= BEGIN
         hh3cRdAccNasIpAddrType       InetAddressType,
         hh3cRdAccNasIpAddr           IpAddress,
         hh3cRdAccNasIpv6Addr         Ipv6Address,
-        hh3cRdAccRealTimeUnit        INTEGER
+        hh3cRdAccRealTimeUnit        INTEGER,
+        hh3cRdAccStopPktTimeResend   Integer32
         }
 
     hh3cRdAccGroupName OBJECT-TYPE
         SYNTAX DisplayString(SIZE (1..32))
-        MAX-ACCESS not-accessible
+        MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
         "The name of the RADIUS group referred to in this table entry."
@@ -873,6 +913,16 @@ HH3C-RADIUS-MIB DEFINITIONS ::= BEGIN
         1  - second."
         DEFVAL { minute }
     ::= { hh3cRdAccInfoEntry 32 }
+
+    hh3cRdAccStopPktTimeResend OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Interval of Stop-Accounting packets.
+         0 - Not support."
+    ::= { hh3cRdAccInfoEntry 33 }
+
 
 -- ***********************************************************************
 --
@@ -1636,5 +1686,90 @@ hh3cRadiusServerFirstTrapTime OBJECT-TYPE
     DESCRIPTION
         "Represents the first trap time."
     ::= { hh3cRadiusServerTrapVarObjects 1 }
+
+-- ***********************************************************************
+--
+-- RADIUS STOP-ACCOUNTING CACHE TRAP
+--
+-- ***********************************************************************
+hh3cRadiusAccCachePacketTrap OBJECT IDENTIFIER ::= { hh3cRadius 8 }
+
+hh3cRadiusAccCacheNotifications OBJECT IDENTIFIER ::= { hh3cRadiusAccCachePacketTrap 0 }
+
+hh3cRadiusAccCacheAlarm NOTIFICATION-TYPE
+    OBJECTS     { hh3cRadiusAccCacheMaxPackets,
+                 hh3cRadiusAccCacheUpperValue}
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the ratio of the number of buffered
+         RADIUS stop-accounting packets to the maximum number reaches
+         the upper threshold."
+    ::= { hh3cRadiusAccCacheNotifications 1 }
+
+hh3cRadiusAccCacheResume NOTIFICATION-TYPE
+    OBJECTS     { hh3cRadiusAccCacheMaxPackets,
+                 hh3cRadiusAccCacheLowerValue}
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the ratio of the number of buffered
+         RADIUS stop-accounting packets to the maximum number drops below
+         the lower threshold."
+    ::= { hh3cRadiusAccCacheNotifications 2 }
+
+hh3cRadiusAccCachePacketDiscard NOTIFICATION-TYPE
+    OBJECTS     { hh3cRadiusAccCacheMemoryUsage,
+                 hh3cRadiusAccCachePackets}
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the device discards
+         RADIUS stop-accounting packets because the memory usage
+         has reached the minor alarm threshold."
+    ::= { hh3cRadiusAccCacheNotifications 3 }
+
+hh3cRadiusAccCacheVarObjects OBJECT IDENTIFIER ::= { hh3cRadiusAccCachePacketTrap 1 }
+
+hh3cRadiusAccCacheMaxPackets OBJECT-TYPE
+    SYNTAX Integer32 (256..2147483647)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Maximum number of RADIUS stop-accounting packets that can be buffered."
+    ::= { hh3cRadiusAccCacheVarObjects 1 }
+
+hh3cRadiusAccCacheUpperValue OBJECT-TYPE
+    SYNTAX Integer32 (1..100)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Upper threshold for the ratio of the number of buffered
+         RADIUS stop-accounting packets to the maximum number of
+         RADIUS stop-accounting packets that can be buffered."
+    ::= { hh3cRadiusAccCacheVarObjects 2 }
+
+hh3cRadiusAccCacheLowerValue OBJECT-TYPE
+    SYNTAX Integer32 (0..99)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Lower threshold for the ratio of the number of buffered
+         RADIUS stop-accounting packets to the maximum number of
+         RADIUS stop-accounting packets that can be buffered."
+    ::= { hh3cRadiusAccCacheVarObjects 3 }
+
+hh3cRadiusAccCacheMemoryUsage OBJECT-TYPE
+    SYNTAX Integer32 (0..100)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Current memory usage of the device."
+    ::= { hh3cRadiusAccCacheVarObjects 4 }
+
+hh3cRadiusAccCachePackets OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Current number of buffered RADIUS stop-accounting packets."
+    ::= { hh3cRadiusAccCacheVarObjects 5 }
 
 END

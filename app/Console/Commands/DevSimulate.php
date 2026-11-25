@@ -7,12 +7,15 @@ use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
 use Illuminate\Support\Str;
+use Laravel\Prompts\Progress;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Util\Snmpsim;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Exception\ProcessSignaledException;
+
+use function Laravel\Prompts\progress;
 
 class DevSimulate extends LnmsCommand
 {
@@ -22,6 +25,10 @@ class DevSimulate extends LnmsCommand
      * @var Snmpsim
      */
     protected $snmpsim = null;
+    /**
+     * @var int[] devices saved by this run, removed on exit with --remove
+     */
+    private array $addedDeviceIds = [];
 
     /**
      * The console command description.
@@ -39,9 +46,8 @@ class DevSimulate extends LnmsCommand
     {
         parent::__construct();
 
-        $this->addArgument('file', InputArgument::OPTIONAL);
-        $this->addOption('multiple', 'm', InputOption::VALUE_NONE);
-        $this->addOption('remove', 'r', InputOption::VALUE_NONE);
+        $this->addArgument('file', InputArgument::OPTIONAL | InputArgument::IS_ARRAY);
+        $this->addOption('keep', 'k', InputOption::VALUE_NONE);
         $this->addOption('setup-venv', mode: InputOption::VALUE_NONE);
     }
 
@@ -52,11 +58,14 @@ class DevSimulate extends LnmsCommand
      */
     public function handle(): int
     {
-        $file = $this->argument('file');
-        if ($file && ! file_exists(base_path("tests/snmpsim/$file.snmprec"))) {
-            $this->error("$file does not exist");
+        // accept paths like tests/snmpsim/*.snmprec, so the shell can do the globbing
+        $files = array_unique(array_map(fn ($file) => basename($file, '.snmprec'), $this->argument('file')));
+        foreach ($files as $file) {
+            if (! file_exists(base_path("tests/snmpsim/$file.snmprec"))) {
+                $this->error("$file does not exist");
 
-            return 1;
+                return 1;
+            }
         }
 
         $this->snmpsim = new Snmpsim;
@@ -71,7 +80,7 @@ class DevSimulate extends LnmsCommand
 
         $this->snmpsim->start();
         $this->line($this->snmpsim->waitForStartup());
-        $this->started();
+        $this->started($files);
         $this->line(trans('commands.dev:simulate.exit'));
         try {
             $this->snmpsim->wait();
@@ -90,23 +99,46 @@ class DevSimulate extends LnmsCommand
         return 0;
     }
 
-    private function started(): void
+    private function started(array $files): void
     {
-        if ($file = $this->argument('file')) {
-            $this->addDevice($file);
+        // set up removal shutdown function before adding, so a failure part way still cleans up
+        if ($files && ! $this->option('keep')) {
+            $this->queueRemoval();
+        }
+
+        if (count($files) > 1) {
+            progress(
+                label: trans('commands.dev:simulate.adding'),
+                steps: $files,
+                callback: fn (string $file, Progress $progress) => $progress->hint($this->addDevice($file)),
+            );
+        } else {
+            foreach ($files as $file) {
+                $this->info($this->addDevice($file));
+            }
+        }
+
+        // after the progress bar, it resets the SIGINT handler when finished
+        if ($files && ! $this->option('keep') && function_exists('pcntl_signal')) {
+            pcntl_signal(SIGINT, function (): void {
+                exit; // exit normally on SIGINT, so the removal shutdown function runs
+            });
         }
     }
 
-    private function addDevice($community): void
+    /**
+     * @return string added or updated message
+     */
+    private function addDevice(string $community): string
     {
-        $hostname = $this->option('multiple') ? $community : 'snmpsim';
-        $device = Device::with('pollingMethods')->firstOrNew(['hostname' => $hostname]);
+        $device = Device::with('pollingMethods')->firstOrNew(['hostname' => "snmpsim-$community"]);
         $device->overwrite_ip = $this->snmpsim->ip;
         $action = $device->exists ? 'updated' : 'added';
 
         $device->last_discovered = null;
         $device->status_reason = '';
         $device->save();
+        $this->addedDeviceIds[] = $device->device_id;
 
         $method = $device->pollingMethod(PollingMethodType::Snmp);
         if ($method === null) {
@@ -123,31 +155,35 @@ class DevSimulate extends LnmsCommand
 
         $secret = Secret::updateOrCreate([
             'description' => "snmpsim secret ($device->hostname)",
-            'secret_type' => SecretType::Snmp,
+            'secret_type' => SecretType::SnmpCommunity,
         ], [
-            'data' => ['version' => 'v2c', 'community' => $community],
+            'data' => ['community' => $community],
         ]);
         $method->secret()->associate($secret)->save();
 
-        $this->info(trans("commands.dev:simulate.$action", ['hostname' => $device->hostname, 'id' => $device->device_id]));
-
-        // set up removal shutdown function if requested
-        if ($this->option('remove')) {
-            $this->queueRemoval($device->device_id);
-        }
+        return trans("commands.dev:simulate.$action", ['hostname' => $device->hostname, 'id' => $device->device_id]);
     }
 
-    private function queueRemoval($device_id): void
+    private function queueRemoval(): void
     {
-        if (function_exists('pcntl_signal')) {
-            pcntl_signal(SIGINT, function (): void {
-                exit; // exit normally on SIGINT
-            });
-        }
+        register_shutdown_function(function (): void {
+            $devices = Device::whereIn('device_id', $this->addedDeviceIds)->get();
 
-        register_shutdown_function(function () use ($device_id): void {
-            Device::findOrNew($device_id)->delete();
-            $this->info(trans('commands.dev:simulate.removed', ['id' => $device_id]));
+            if ($devices->count() > 1) {
+                progress(
+                    label: trans('commands.dev:simulate.removing'),
+                    steps: $devices,
+                    callback: function (Device $device, Progress $progress): void {
+                        $progress->hint($device->hostname);
+                        $device->delete();
+                    },
+                );
+            } else {
+                foreach ($devices as $device) {
+                    $device->delete();
+                    $this->info(trans('commands.dev:simulate.removed', ['id' => $device->device_id]));
+                }
+            }
             exit;
         });
     }

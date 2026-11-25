@@ -13,7 +13,7 @@ final class EditDeviceControllerTest extends DBTestCase
 {
     use DatabaseTransactions;
 
-    private const DETAILS = ['sysName' => 'manual', 'hardware' => 'Rack PDU', 'os' => ''];
+    private const array DETAILS = ['sysName' => 'manual', 'hardware' => 'Rack PDU', 'os' => ''];
 
     public function testDetailsCanBeSetWithoutSnmp(): void
     {

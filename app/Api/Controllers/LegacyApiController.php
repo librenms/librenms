@@ -37,7 +37,6 @@ class LegacyApiController
      */
     public function __call($method_name, $arguments)
     {
-        $init_modules = ['web', 'alerts'];
         require base_path('/includes/init.php');
         require_once base_path('includes/html/api_functions.inc.php');
 

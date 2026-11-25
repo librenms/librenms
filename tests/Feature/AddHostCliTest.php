@@ -30,9 +30,9 @@ use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Secret;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use LibreNMS\Tests\DBTestCase;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
+use LibreNMS\Tests\DBTestCase;
 use PHPUnit\Framework\Attributes\TestDox;
 
 #[TestDox('Add Host CLI')]
@@ -57,8 +57,8 @@ final class AddHostCliTest extends DBTestCase
         $this->assertNotNull($snmpMethod);
         $secret = $snmpMethod->secret;
         $this->assertNotNull($secret);
-        $this->assertEquals('community', $secret->data['community']);
-        $this->assertEquals('v1', $secret->data['version']);
+        $this->assertSame(['community' => 'community'], $secret->data);
+        $this->assertEquals('v1', $snmpMethod->settings['version']);
 
         $icmpMethod = $device->pollingMethod(PollingMethodType::Icmp);
         $this->assertNotNull($icmpMethod);
@@ -79,8 +79,8 @@ final class AddHostCliTest extends DBTestCase
         $this->assertNotNull($snmpMethod);
         $secret = $snmpMethod->secret;
         $this->assertNotNull($secret);
-        $this->assertEquals('community', $secret->data['community']);
-        $this->assertEquals('v2c', $secret->data['version']);
+        $this->assertSame(['community' => 'community'], $secret->data);
+        $this->assertSame('v2c', $snmpMethod->settings['version']); // a given version is not tried as v1
     }
 
     #[TestDox('CLI SNMP v3 user and password')]
@@ -97,7 +97,7 @@ final class AddHostCliTest extends DBTestCase
         $this->assertNotNull($snmpMethod);
         $secret = $snmpMethod->secret;
         $this->assertNotNull($secret);
-        $this->assertEquals('v3', $secret->data['version']);
+        $this->assertSame(SecretType::SnmpV3, $secret->secret_type);
         $this->assertEquals('SecName', $secret->data['authname']);
         $this->assertEquals('AuthPW', $secret->data['authpass']);
         $this->assertEquals('PrivPW', $secret->data['cryptopass']);
@@ -203,7 +203,7 @@ final class AddHostCliTest extends DBTestCase
     public function testExistingDevice(): void
     {
         // without credentials, a forced add uses the default credentials
-        $secret = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'public']]);
+        $secret = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'public']]);
         LibrenmsConfig::set('snmp.default_credentials', [$secret->id]);
 
         $this->artisan('device:add', ['device spec' => 'existing', '--force' => true])
@@ -223,8 +223,9 @@ final class AddHostCliTest extends DBTestCase
             ->assertExitCode(0)
             ->execute();
 
-        $data = Device::findByHostname($this->hostName)->pollingMethod(PollingMethodType::Snmp)->secret->data;
-        $this->assertSame('v3', $data['version']);
+        $snmpMethod = Device::findByHostname($this->hostName)->pollingMethod(PollingMethodType::Snmp);
+        $data = $snmpMethod->secret->data;
+        $this->assertSame(SecretType::SnmpV3, $snmpMethod->secret->secret_type);
         $this->assertSame('root', $data['authname']);
         $this->assertSame('noAuthNoPriv', $data['authlevel']);
     }
@@ -236,8 +237,9 @@ final class AddHostCliTest extends DBTestCase
             ->assertExitCode(0)
             ->execute();
 
-        $data = Device::findByHostname($this->hostName)->pollingMethod(PollingMethodType::Snmp)->secret->data;
-        $this->assertSame('v3', $data['version']);
+        $snmpMethod = Device::findByHostname($this->hostName)->pollingMethod(PollingMethodType::Snmp);
+        $data = $snmpMethod->secret->data;
+        $this->assertSame(SecretType::SnmpV3, $snmpMethod->secret->secret_type);
         $this->assertSame('SecName', $data['authname']);
         $this->assertSame('authNoPriv', $data['authlevel']);
         $this->assertSame('SHA', $data['authalgo']);
@@ -247,14 +249,16 @@ final class AddHostCliTest extends DBTestCase
     #[TestDox('Only a version uses the default credentials for that version')]
     public function testVersionOnlyUsesDefaultCredentialsForThatVersion(): void
     {
-        $secrets = $this->setDefaultCredentials('v2c', 'v1');
+        $secrets = $this->setDefaultCredentials('v3', 'v2c');
 
         $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '--v1' => true])
             ->assertExitCode(0)
             ->execute();
 
+        // a community is a v1 credential too
         $snmpMethod = Device::findByHostname($this->hostName)->pollingMethod(PollingMethodType::Snmp);
-        $this->assertSame($secrets['v1']->id, $snmpMethod->secret_id);
+        $this->assertSame($secrets['v2c']->id, $snmpMethod->secret_id);
+        $this->assertSame('v1', $snmpMethod->settings['version']);
     }
 
     #[TestDox('Only a version without default credentials for that version')]
@@ -262,7 +266,7 @@ final class AddHostCliTest extends DBTestCase
     {
         $this->setDefaultCredentials('v2c');
 
-        $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '--v1' => true])
+        $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '--v3' => true])
             ->expectsOutput(trans('exceptions.missing_secret', ['method' => PollingMethodType::Snmp->label()]))
             ->assertExitCode(1)
             ->execute();
@@ -271,7 +275,7 @@ final class AddHostCliTest extends DBTestCase
     }
 
     /**
-     * Replace the default credentials with one for each SNMP version, in order.
+     * Replace the default credentials with one for each SNMP version, in order. v1 and v2c are both communities.
      *
      * @return array<string, Secret>
      */
@@ -279,7 +283,9 @@ final class AddHostCliTest extends DBTestCase
     {
         $secrets = [];
         foreach ($versions as $version) {
-            $secrets[$version] = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => $version, 'community' => "public-$version"]]);
+            $secrets[$version] = $version === 'v3'
+                ? Secret::factory()->create(['secret_type' => SecretType::SnmpV3, 'data' => ['authlevel' => 'noAuthNoPriv', 'authname' => 'public-v3']])
+                : Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => "public-$version"]]);
         }
         LibrenmsConfig::set('snmp.default_credentials', array_values(array_map(fn (Secret $secret) => $secret->id, $secrets)));
 

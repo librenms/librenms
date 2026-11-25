@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Tests\Unit;
 
+use LibreNMS\Alerting\QueryBuilderFilter;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use LibreNMS\Tests\TestCase;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -40,6 +41,24 @@ final class QueryBuilderTest extends TestCase
             $this->loadQueryData(),
             'Could not load query builder test data from ' . self::$data_file
         );
+    }
+
+    public function testFieldPickersHideInternalTablesAndKeepMonitoringFields(): void
+    {
+        foreach (['alert', 'group'] as $type) {
+            $fields = array_column(new QueryBuilderFilter($type)->jsonSerialize(), 'id');
+
+            $this->assertNotContains('secrets.data', $fields, $type);
+            $this->assertNotContains('users.password', $fields, $type);
+            $this->assertNotContains('sessions.payload', $fields, $type);
+            $this->assertNotContains('alert_faults.state', $fields, $type);
+            $this->assertContains('devices.hostname', $fields, $type);
+            $this->assertContains('device_polling_methods.last_check_successful', $fields, $type);
+            $this->assertContains('device_groups.name', $fields, $type);
+            $this->assertContains('service_templates.name', $fields, $type);
+            $this->assertContains('eventlog.message', $fields, $type);
+            $this->assertContains('syslog.msg', $fields, $type);
+        }
     }
 
     /**

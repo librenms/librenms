@@ -1,21 +1,30 @@
 -- ============================================================================
--- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: 802.1 VLAN Mapping MIB Version 1
 -- Reference:
--- Version: V1.1
+-- Version: V1.2
 -- History:
 -- V1.0 Initial version Created by XiaoRen Yang, 2013.3.8
 -- V1.1 Updated by zhuhaifeng 2018-12-12.
 --   Add hh3cVMAP1to2RangeNestedPrio to hh3cVMAP1to2RangeTable.
 --   Add hh3cVMAP1to2SingleNestedPrio to hh3cVMAP1to2SingleTable.
 --   Add hh3cVMAP2to1Table.
+-- V1.2 Updated by chenjie 2022-06-17
+--   Add hh3cVMAPTrapGroup
+--   Add hh3cVMAPIfChassis to hh3cVMAPTrapGroup
+--   Add hh3cVMAPIfSlot to hh3cVMAPTrapGroup
+--   Add hh3cVMAPThresholdRatio to hh3cVMAPTrapGroup.
+--   Add hh3cVMAPTrap to hh3cVmap
+--   Add hh3cVMAPTrapPrex to hh3cVMAPTrap.
+--   Add hh3cVMAPCountThresholdAlarm to hh3cVMAPTrapPrex
+--   Add hh3cVMAPCountThresholdResume to hh3cVMAPTrapPrex.
 -- ==================================================================
 HH3C-VMAP-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     RowStatus, TruthValue
         FROM SNMPv2-TC
-    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
     ifIndex
         FROM IF-MIB
@@ -29,7 +38,7 @@ IMPORTS
 -- ==================================================================
 hh3cVmap MODULE-IDENTITY
     LAST-UPDATED
-        "201812120000Z"
+        "202206170000Z"
     ORGANIZATION
        "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -39,6 +48,15 @@ hh3cVmap MODULE-IDENTITY
         Zip: 100085"
     DESCRIPTION
         "802.1 VLAN Mapping MIB Version"
+    REVISION    "202206170000Z"
+    DESCRIPTION "Add hh3cVMAPTrapGroup
+                 Add hh3cVMAPIfChassis to hh3cVMAPTrapGroup
+                 Add hh3cVMAPIfSlot to hh3cVMAPTrapGroup
+                 Add hh3cVMAPThresholdRatio to hh3cVMAPTrapGroup.
+                 Add hh3cVMAPTrap to hh3cVmap
+                 Add hh3cVMAPTrapPrex to hh3cVMAPTrap.
+                 Add hh3cVMAPCountThresholdAlarm to hh3cVMAPTrapPrex
+                 Add hh3cVMAPCountThresholdResume to hh3cVMAPTrapPrex."
     REVISION    "201812120000Z"
     DESCRIPTION "Add hh3cVMAP1to2RangeNestedPrio to hh3cVMAP1to2RangeTable.
                  Add hh3cVMAP1to2SingleNestedPrio to hh3cVMAP1to2SingleTable.
@@ -502,5 +520,61 @@ hh3cVMAP2to1RowStatus OBJECT-TYPE
     DESCRIPTION
         "Operation status of this table entry."
     ::= { hh3cVMAP2to1Entry 4 }
+
+hh3cVMAPTrapGroup OBJECT IDENTIFIER ::= { hh3cVmap 9 }
+
+hh3cVMAPIfChassis    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Chassis number."
+    ::= { hh3cVMAPTrapGroup 1 }
+
+hh3cVMAPIfSlot    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Slot number."
+    ::= { hh3cVMAPTrapGroup 2 }
+
+hh3cVMAPThresholdRatio    OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Ratio which the current configure number in the system total about vlan mapping
+        and vlan stacking."
+    ::= { hh3cVMAPTrapGroup 3 }
+
+hh3cVMAPTrap OBJECT IDENTIFIER ::= { hh3cVmap 10 }
+hh3cVMAPTrapPrex OBJECT IDENTIFIER ::= { hh3cVMAPTrap 0 }
+
+hh3cVMAPCountThresholdAlarm NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cVMAPIfChassis,
+        hh3cVMAPIfSlot,
+        hh3cVMAPThresholdRatio
+    }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when configure number exceeds the
+         upper threshold."
+    ::= { hh3cVMAPTrapPrex 1 }
+
+hh3cVMAPCountThresholdResume NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cVMAPIfChassis,
+        hh3cVMAPIfSlot,
+        hh3cVMAPThresholdRatio
+    }
+    STATUS current
+    DESCRIPTION
+        "The notification is generated when configure number from
+         above the upper threshold to below the lower threshold."
+    ::= { hh3cVMAPTrapPrex 2 }
 
 END

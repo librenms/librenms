@@ -65,15 +65,13 @@ class PageTabs extends Component
         'services' => \App\Http\Controllers\Device\Tabs\ServicesController::class,
         'printer' => \App\Http\Controllers\Device\Tabs\PrinterController::class,
         'logs' => \App\Http\Controllers\Device\Tabs\LogsController::class,
-        'alerts' => \App\Http\Controllers\Device\Tabs\AlertsController::class,
-        'alert-stats' => \App\Http\Controllers\Device\Tabs\AlertStatsController::class,
+        'faults' => \App\Http\Controllers\Device\Tabs\FaultsController::class,
         'config' => \App\Http\Controllers\Device\Tabs\ConfigController::class,
         'netflow' => \App\Http\Controllers\Device\Tabs\NetflowController::class,
         'qos' => \App\Http\Controllers\Device\Tabs\QosController::class,
         'latency' => \App\Http\Controllers\Device\Tabs\LatencyController::class,
         'nac' => \App\Http\Controllers\Device\Tabs\NacController::class,
         'notes' => \App\Http\Controllers\Device\Tabs\NotesController::class,
-        'edit' => \App\Http\Controllers\Device\Tabs\EditController::class,
         'capture' => \App\Http\Controllers\Device\Tabs\CaptureController::class,
     ];
 
@@ -81,8 +79,7 @@ class PageTabs extends Component
         public readonly Device $device,
         public readonly array $dropdownLinks = [],
     ) {
-        // remove tab= for legacy urls
-        $this->currentTab = str_replace('tab=', '', Request::segment(3, 'overview'));
+        $this->currentTab = Request::segment(3, 'overview');
 
         foreach (self::$tabsClasses as $tab => $class) {
             $this->tabs[$tab] = app()->make($class);

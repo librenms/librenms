@@ -4,7 +4,7 @@
 <x-device.page :device="$device">
     <h2>{{ __('Capture Debug Information') }}</h2>
 
-    <x-tabs active="discovery">
+    <x-tabs :active="$data['section']">
         @foreach($data['tabs'] as $tab => $tab_data)
             <x-tab :name="$tab_data['name']" :value="$tab">
                 <div class="row">
@@ -23,6 +23,11 @@
                 </div>
             </x-tab>
         @endforeach
+        @if($data['jobs'])
+            <x-tab :name="__('Jobs')" value="jobs">
+                @include('device.tabs.capture.jobs', ['jobs' => $data['jobs']])
+            </x-tab>
+        @endif
     </x-tabs>
 </x-device.page>
 @endsection

@@ -1,6 +1,6 @@
 os: dell-ome-m
 text: 'Dell OpenManage Enterprise Modular'
-type: appliance
+type: management
 icon: dell
 group: dell
 mib_dir: dell

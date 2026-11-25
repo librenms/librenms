@@ -1,0 +1,161 @@
+DATACOM-XCVR-MIB DEFINITIONS ::= BEGIN
+
+-- Partial MIB (RouterX custom) exposing DmOS transceiver DDM to LibreNMS.
+-- Three real agent subtrees under enterprises.3709.3.6, all keyed by ifIndex:
+--   .11.3  inventory + alarm/warning thresholds (per port)
+--   .8.1   real-time temperature / voltage        (per port)
+--   .8.2   real-time rx/tx power / bias current    (per port, per lane)
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32, Gauge32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ifIndex
+        FROM IF-MIB;
+
+datacomXcvrMIB MODULE-IDENTITY
+    LAST-UPDATED "202610050000Z"
+    ORGANIZATION "RouterX"
+    CONTACT-INFO  "Josi - RouterX"
+    DESCRIPTION   "Partial DmOS transceiver DDM MIB for LibreNMS optical monitoring."
+    REVISION      "202610050000Z"
+    DESCRIPTION   "Values + thresholds mapped against DmOS CLI digital-diagnostics."
+    ::= { enterprises 3709 }
+
+-- ============ .3.6.11.3 : inventory + thresholds (index = ifIndex) ============
+dmXcvrTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DmXcvrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Transceiver inventory and DDM thresholds."
+    ::= { enterprises 3709 3 6 11 3 }
+
+dmXcvrEntry OBJECT-TYPE
+    SYNTAX DmXcvrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry."
+    INDEX { ifIndex }
+    ::= { dmXcvrTable 1 }
+
+DmXcvrEntry ::= SEQUENCE {
+    dmXcvrType        DisplayString,
+    dmXcvrTempLoAlarm DisplayString, dmXcvrTempHiAlarm DisplayString,
+    dmXcvrTempLoWarn  DisplayString, dmXcvrTempHiWarn  DisplayString,
+    dmXcvrRxLoAlarm   DisplayString, dmXcvrRxHiAlarm   DisplayString,
+    dmXcvrRxLoWarn    DisplayString, dmXcvrRxHiWarn    DisplayString,
+    dmXcvrTxLoAlarm   DisplayString, dmXcvrTxHiAlarm   DisplayString,
+    dmXcvrTxLoWarn    DisplayString, dmXcvrTxHiWarn    DisplayString,
+    dmXcvrVoltLoAlarm DisplayString, dmXcvrVoltHiAlarm DisplayString,
+    dmXcvrVoltLoWarn  DisplayString, dmXcvrVoltHiWarn  DisplayString,
+    dmXcvrBiasLoAlarm DisplayString, dmXcvrBiasHiAlarm DisplayString,
+    dmXcvrBiasLoWarn  DisplayString, dmXcvrBiasHiWarn  DisplayString
+}
+
+dmXcvrType        OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Compliance/type." ::= { dmXcvrEntry 4 }
+dmXcvrTempLoAlarm OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Temp low alarm (C)."  ::= { dmXcvrEntry 10 }
+dmXcvrTempHiAlarm OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Temp high alarm (C)." ::= { dmXcvrEntry 11 }
+dmXcvrTempLoWarn  OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Temp low warn (C)."   ::= { dmXcvrEntry 12 }
+dmXcvrTempHiWarn  OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Temp high warn (C)."  ::= { dmXcvrEntry 13 }
+dmXcvrRxLoAlarm   OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Rx low alarm (dBm)."  ::= { dmXcvrEntry 14 }
+dmXcvrRxHiAlarm   OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Rx high alarm (dBm)." ::= { dmXcvrEntry 15 }
+dmXcvrRxLoWarn    OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Rx low warn (dBm)."   ::= { dmXcvrEntry 16 }
+dmXcvrRxHiWarn    OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Rx high warn (dBm)."  ::= { dmXcvrEntry 17 }
+dmXcvrTxLoAlarm   OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Tx low alarm (dBm)."  ::= { dmXcvrEntry 18 }
+dmXcvrTxHiAlarm   OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Tx high alarm (dBm)." ::= { dmXcvrEntry 19 }
+dmXcvrTxLoWarn    OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Tx low warn (dBm)."   ::= { dmXcvrEntry 20 }
+dmXcvrTxHiWarn    OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Tx high warn (dBm)."  ::= { dmXcvrEntry 21 }
+dmXcvrVoltLoAlarm OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Vcc low alarm (V)."   ::= { dmXcvrEntry 22 }
+dmXcvrVoltHiAlarm OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Vcc high alarm (V)."  ::= { dmXcvrEntry 23 }
+dmXcvrVoltLoWarn  OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Vcc low warn (V)."    ::= { dmXcvrEntry 24 }
+dmXcvrVoltHiWarn  OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Vcc high warn (V)."   ::= { dmXcvrEntry 25 }
+dmXcvrBiasLoAlarm OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Bias low alarm (mA)." ::= { dmXcvrEntry 26 }
+dmXcvrBiasHiAlarm OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Bias high alarm (mA)."::= { dmXcvrEntry 27 }
+dmXcvrBiasLoWarn  OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Bias low warn (mA)."  ::= { dmXcvrEntry 28 }
+dmXcvrBiasHiWarn  OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Bias high warn (mA)." ::= { dmXcvrEntry 29 }
+
+-- ============ .3.6.8.1 : real-time temperature / voltage (index = ifIndex) ============
+dmXcvrDiagTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DmXcvrDiagEntry
+    MAX-ACCESS not-accessible STATUS current
+    DESCRIPTION "Real-time per-port temperature/voltage (scaled x100)."
+    ::= { enterprises 3709 3 6 8 1 }
+dmXcvrDiagE1 OBJECT IDENTIFIER ::= { dmXcvrDiagTable 1 }
+dmXcvrDiagEntry OBJECT-TYPE
+    SYNTAX DmXcvrDiagEntry MAX-ACCESS not-accessible STATUS current
+    DESCRIPTION "Entry." INDEX { ifIndex } ::= { dmXcvrDiagE1 1 }
+DmXcvrDiagEntry ::= SEQUENCE { dmXcvrDiagTemp Integer32, dmXcvrDiagVolt Integer32 }
+dmXcvrDiagTemp OBJECT-TYPE SYNTAX Integer32 MAX-ACCESS read-only STATUS current DESCRIPTION "Temperature, 0.01 C." ::= { dmXcvrDiagEntry 1 }
+dmXcvrDiagVolt OBJECT-TYPE SYNTAX Integer32 MAX-ACCESS read-only STATUS current DESCRIPTION "Voltage, 0.01 V."     ::= { dmXcvrDiagEntry 2 }
+
+-- ============ .3.6.8.2 : real-time rx/tx power, bias (index = ifIndex, lane) ============
+dmXcvrLaneTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DmXcvrLaneEntry
+    MAX-ACCESS not-accessible STATUS current
+    DESCRIPTION "Real-time per-lane rx/tx power and bias (scaled x100)."
+    ::= { enterprises 3709 3 6 8 2 }
+dmXcvrLaneE1 OBJECT IDENTIFIER ::= { dmXcvrLaneTable 1 }
+dmXcvrLaneEntry OBJECT-TYPE
+    SYNTAX DmXcvrLaneEntry MAX-ACCESS not-accessible STATUS current
+    DESCRIPTION "Entry." INDEX { ifIndex, dmXcvrLaneNum } ::= { dmXcvrLaneE1 1 }
+DmXcvrLaneEntry ::= SEQUENCE {
+    dmXcvrLaneNum  Integer32,
+    dmXcvrRxDbm    Integer32,
+    dmXcvrTxDbm    Integer32,
+    dmXcvrBias     Integer32
+}
+dmXcvrLaneNum OBJECT-TYPE SYNTAX Integer32 MAX-ACCESS not-accessible STATUS current DESCRIPTION "Lane number." ::= { dmXcvrLaneEntry 1 }
+dmXcvrRxDbm   OBJECT-TYPE SYNTAX Integer32 MAX-ACCESS read-only STATUS current DESCRIPTION "Rx power, 0.01 dBm." ::= { dmXcvrLaneEntry 2 }
+dmXcvrTxDbm   OBJECT-TYPE SYNTAX Integer32 MAX-ACCESS read-only STATUS current DESCRIPTION "Tx power, 0.01 dBm." ::= { dmXcvrLaneEntry 3 }
+dmXcvrBias    OBJECT-TYPE SYNTAX Integer32 MAX-ACCESS read-only STATUS current DESCRIPTION "Tx bias, 0.01 mA."   ::= { dmXcvrLaneEntry 4 }
+
+-- ============ .3.6.6.1.3 : equipment temperature sensors (scaled x10) ============
+dmEnvTempTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DmEnvTempEntry
+    MAX-ACCESS not-accessible STATUS current
+    DESCRIPTION "Board/CPU/fabric/PSU temperature sensors."
+    ::= { enterprises 3709 3 6 6 1 3 }
+dmEnvTempEntry OBJECT-TYPE
+    SYNTAX DmEnvTempEntry MAX-ACCESS not-accessible STATUS current
+    DESCRIPTION "Entry." INDEX { dmEnvTempUnit } ::= { dmEnvTempTable 1 }
+DmEnvTempEntry ::= SEQUENCE {
+    dmEnvTempUnit Integer32, dmEnvTempName DisplayString,
+    dmEnvTempHiAlarm Integer32, dmEnvTempValue Integer32
+}
+dmEnvTempUnit    OBJECT-TYPE SYNTAX Integer32     MAX-ACCESS not-accessible STATUS current DESCRIPTION "Unit." ::= { dmEnvTempEntry 1 }
+dmEnvTempName    OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Sensor name."        ::= { dmEnvTempEntry 2 }
+dmEnvTempHiAlarm OBJECT-TYPE SYNTAX Integer32     MAX-ACCESS read-only STATUS current DESCRIPTION "High alarm, 0.1 C."  ::= { dmEnvTempEntry 3 }
+dmEnvTempValue   OBJECT-TYPE SYNTAX Integer32     MAX-ACCESS read-only STATUS current DESCRIPTION "Temperature, 0.1 C." ::= { dmEnvTempEntry 6 }
+
+-- ============ .3.6.6.1.4 : fans (RPM) ============
+dmEnvFanTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DmEnvFanEntry
+    MAX-ACCESS not-accessible STATUS current
+    DESCRIPTION "Fan tray speeds."
+    ::= { enterprises 3709 3 6 6 1 4 }
+dmEnvFanEntry OBJECT-TYPE
+    SYNTAX DmEnvFanEntry MAX-ACCESS not-accessible STATUS current
+    DESCRIPTION "Entry." INDEX { dmEnvFanUnit } ::= { dmEnvFanTable 1 }
+DmEnvFanEntry ::= SEQUENCE {
+    dmEnvFanUnit Integer32, dmEnvFanName DisplayString, dmEnvFanRpm Gauge32
+}
+dmEnvFanUnit OBJECT-TYPE SYNTAX Integer32     MAX-ACCESS not-accessible STATUS current DESCRIPTION "Unit." ::= { dmEnvFanEntry 1 }
+dmEnvFanName OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Fan name." ::= { dmEnvFanEntry 2 }
+dmEnvFanRpm  OBJECT-TYPE SYNTAX Gauge32       MAX-ACCESS read-only STATUS current DESCRIPTION "Fan speed, RPM." ::= { dmEnvFanEntry 4 }
+
+-- ============ .3.6.11.2 : chassis / module / PSU inventory + status ============
+dmInvTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DmInvEntry
+    MAX-ACCESS not-accessible STATUS current
+    DESCRIPTION "Chassis, module and power-supply inventory."
+    ::= { enterprises 3709 3 6 11 2 }
+dmInvEntry OBJECT-TYPE
+    SYNTAX DmInvEntry MAX-ACCESS not-accessible STATUS current
+    DESCRIPTION "Entry." INDEX { dmInvIdx } ::= { dmInvTable 1 }
+DmInvEntry ::= SEQUENCE { dmInvIdx Integer32, dmInvName DisplayString, dmUnitStatus Integer32 }
+dmInvIdx     OBJECT-TYPE SYNTAX Integer32     MAX-ACCESS not-accessible STATUS current DESCRIPTION "Index." ::= { dmInvEntry 1 }
+dmInvName    OBJECT-TYPE SYNTAX DisplayString MAX-ACCESS read-only STATUS current DESCRIPTION "Unit name (e.g. 1/PSU2)." ::= { dmInvEntry 2 }
+dmUnitStatus OBJECT-TYPE SYNTAX Integer32     MAX-ACCESS read-only STATUS current DESCRIPTION "Operational status (1=OK)." ::= { dmInvEntry 18 }
+
+END

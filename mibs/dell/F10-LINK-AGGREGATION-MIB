@@ -1,589 +1,960 @@
-	F10-LINK-AGGREGATION-MIB DEFINITIONS ::= BEGIN
+F10-LINK-AGGREGATION-MIB DEFINITIONS ::= BEGIN
 
-	--  Force10 Networks, Inc.
-	--  1440 McCarthy Blvd
-	--  Milpitas, CA 95035-7438
+--  This module provides authoritative definitions for Dell Networking OS
+--  Link Aggregation Mib.
+--
+--  This module will be extended, as needed.
+--
 
-	--  This module provides authoritative definitions for Force10
-	--  enterprise Link Aggregation Mib.
-	--
-	--  This module will be extended, as needed.
-	--
+IMPORTS
+	MODULE-IDENTITY, 
+	OBJECT-TYPE, 
+	NOTIFICATION-TYPE,
+	Unsigned32 
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION,
+	MacAddress,
+	TruthValue
+		FROM SNMPv2-TC
+	MODULE-COMPLIANCE, 
+	OBJECT-GROUP,
+       NOTIFICATION-GROUP
+		FROM SNMPv2-CONF
+	f10Mgmt
+		FROM FORCE10-SMI
+	PortList		
+              FROM FORCE10-TC;
 
-	IMPORTS
-		MODULE-IDENTITY, OBJECT-TYPE, 
-		Integer32 
-			FROM SNMPv2-SMI
-		MacAddress
-			FROM SNMPv2-TC
-		MODULE-COMPLIANCE, OBJECT-GROUP
-			FROM SNMPv2-CONF
-		f10Mgmt
-			FROM FORCE10-SMI
-		PortList		
-			FROM FORCE10-TC;
-		
+-- ##################################################################
+-- MODULE IDENTITY 
+-- ##################################################################
 	
-	f10LinkAggMib MODULE-IDENTITY
-	LAST-UPDATED "0308010000Z"  -- Auguest 1, 2003
-	ORGANIZATION
-	  "Force10 Networks, Inc."
-	CONTACT-INFO
-	  "Force10 Networks, Inc
-	   1440 McCarthy Blvd
-	   Milpitas, CA 95035
-	   (408) 571-3500
-	   support@force10networks.com
-	   http://www.force10networks.com"
-
-	DESCRIPTION
-	   "Force10 Enterprise Link Aggregation MIB. "
-
-	REVISION     "0308010000Z"
-	DESCRIPTION
-		"Force10 Link Aggreagation MIB version 1.3.
-		  - Add FDB common table for configured or negotiated link aggregation"
-
-	REVISION     "0308010000Z"
-	DESCRIPTION
-		"1. Move textual conventions to the Textual-Convention MIB f10-tc.mib.
-		 2. Rename dot3aClearCurAggFdb to dot3aClearFdb."
-
-	REVISION     "0203120000Z"
-	DESCRIPTION
-		"Force10 Link Aggreagation MIB version 1.1.
-		Deprecated dot3aAggStaticTable & dot3aAggFdbTable
-		Added dot3aCurAggStaticTable & dot3aCurAggFdbTable
-		because of indexing changes"
-
-	REVISION     "0011210000Z"
-	DESCRIPTION
-          "Force10 Link Aggreagation MIB version 1.0."
-
-	REVISION     "0103010000Z"
-	DESCRIPTION
-          "First revision of Force10 link aggregation mib."
-
-           ::= { f10Mgmt 2 }   
-
-
-	-- ### Groups ###
-
-	f10LinkAggObjects OBJECT IDENTIFIER ::={ f10LinkAggMib 1 }
-
-        f10dot3dAgg	OBJECT IDENTIFIER ::={ f10LinkAggObjects 1 }
-        f10LinkAggMgmt	OBJECT IDENTIFIER ::={ f10LinkAggObjects 2 }
-
-
-	-- ### Aggregation Configuration Port List Table 
-
-	   dot3aAggConfigTable	OBJECT-TYPE
-		SYNTAX		SEQUENCE OF Dot3aAggConfigEntry
-		MAX-ACCESS	not-accessible
-		STATUS		current
-		DESCRIPTION
-			"A list of all aggregated links configured."
-		::= { f10dot3dAgg 1 }
-
-	  dot3aAggConfigEntry	OBJECT-TYPE 
-		SYNTAX		Dot3aAggConfigEntry
-		MAX-ACCESS	not-accessible
-		STATUS		current
-		DESCRIPTION
-			"A list of all aggregated links configured 
-			in the system"
-		INDEX	{ dot3aAggCfgId }
-		::= { dot3aAggConfigTable 1 }
-
-	  Dot3aAggConfigEntry	::=
-		SEQUENCE {
-		   dot3aAggCfgId			    Integer32,
-		   dot3aAggCfgMacAddr		    MacAddress,		
-		   dot3aAggCfgIfIndex		    Integer32,
-		   dot3aAggCfgNumPorts		    Integer32,
-		   dot3aAggCfgPortList		    PortList,
-		   dot3aAggCfgPortListString    OCTET STRING
-		}
-
-	   dot3aAggCfgId	OBJECT-TYPE
-		SYNTAX		Integer32
-		MAX-ACCESS	read-only
-		STATUS		current
-		DESCRIPTION
-		"The link aggregation id or port channel id."
-		::= { dot3aAggConfigEntry 1 }
-
-	   dot3aAggCfgMacAddr	OBJECT-TYPE
-		SYNTAX		MacAddress
-		MAX-ACCESS	read-only
-		STATUS		current
-		DESCRIPTION
-		"A 6-octet read only value MAC Address assigned 
-		 to this link aggregation or user-defined MAC address
-		 if a static user-defined MAC address is configured."
-		::= { dot3aAggConfigEntry 2 }
-
-	   dot3aAggCfgIfIndex	OBJECT-TYPE
-		SYNTAX		Integer32
-		MAX-ACCESS	read-only
-		STATUS		current
-		DESCRIPTION
-		"The logical interface index assigned to this 
-		 link aggregation."
-		::= { dot3aAggConfigEntry 3 }
-
-	   dot3aAggCfgNumPorts	OBJECT-TYPE
-		SYNTAX		Integer32
-		MAX-ACCESS	read-only
-		STATUS		current
-		DESCRIPTION
-		"The number of physical ports configured to this 
-		 link aggregation. Maximum is 16 ports"
-		::= { dot3aAggConfigEntry 4 }
-
-	   dot3aAggCfgPortList	OBJECT-TYPE
-		SYNTAX		PortList
-		MAX-ACCESS	read-only
-		STATUS		current
-		DESCRIPTION
-        	"The bitmask of ports configured for this link aggregation.
-            This object is deprecated and no longer in use. Please use the new
-            dot3aAggCfgPortListString object instead.
-            " 
-		::= { dot3aAggConfigEntry 5 }
-
-	   dot3aAggCfgPortListString	OBJECT-TYPE
-		SYNTAX		OCTET STRING 
-		MAX-ACCESS  read-only
-		STATUS		deprecated
-		DESCRIPTION
-        "The list of ports configured for this link aggregation.
-		 The format of this output is as follows:
-		 <interface type> <slot/port>, or 
-		 <port channel> <number>"
-		::= { dot3aAggConfigEntry 6 }
-
-
-
-
-        -- ### Aggregation MAC Addr Table
-
-           dot3aAggStaticTable  OBJECT-TYPE
-            SYNTAX          SEQUENCE OF Dot3aAggStaticEntry
-            MAX-ACCESS      not-accessible
-		STATUS          current
-		DESCRIPTION
-		"A list of statically configured MAC Address on the aggregated links."
-            ::= { f10dot3dAgg 2 }
-
-          dot3aAggStaticEntry   OBJECT-TYPE
-            SYNTAX          Dot3aAggStaticEntry
-            MAX-ACCESS      not-accessible
-            STATUS          deprecated
-            DESCRIPTION
-            "A list of statically configured MAC Address on the aggregated links in the system"
-            INDEX   { dot3aAggIndex, dot3aAggVlanId, dot3aAggMacAddr }
-            ::= { dot3aAggStaticTable 1 }
-
-          Dot3aAggStaticEntry   ::=
-            SEQUENCE {
-               dot3aAggIndex              Integer32,
-               dot3aAggVlanId             Integer32,
-		   dot3aAggMacAddr	      MacAddress,		
-		   dot3aAggStatus			INTEGER,		
-		   dot3aAggDistributedPort	OCTET STRING	
-            }
-
-	   dot3aAggIndex	OBJECT-TYPE
-		SYNTAX		Integer32
-		MAX-ACCESS      read-only
-		STATUS		deprecated
-		DESCRIPTION
-		"The link aggregation id or port channel id."
-		::= { dot3aAggStaticEntry 1 }
-
-	   dot3aAggVlanId	OBJECT-TYPE
-		SYNTAX		Integer32 
-		MAX-ACCESS      read-only
-		STATUS		deprecated
-		DESCRIPTION
-		"VLAN id that this ports configured to ."
-		::= { dot3aAggStaticEntry 2 }
-
-	   dot3aAggMacAddr	OBJECT-TYPE
-		SYNTAX		MacAddress
-		MAX-ACCESS      read-only
-		STATUS		deprecated
-		DESCRIPTION
-		"A 6-octet read only value MAC Address assigned 
-		 to this link aggregation or user-defined MAC address
-		 if a static user-defined MAC address is configured."
-		::= { dot3aAggStaticEntry 3 }
-
-	   dot3aAggStatus	OBJECT-TYPE
-		SYNTAX		INTEGER {
-				   	active(1),
-				   	inactive(2)
-					}	  
-		MAX-ACCESS	read-only
-		STATUS		deprecated
-		DESCRIPTION
-		"The status of this aggregation link .
-		 active - this aggregation link is active.
-		 inactive  - this aggregation link is no active." 
-		::= { dot3aAggStaticEntry 4 }
-
-	   dot3aAggDistributedPort	OBJECT-TYPE
-		SYNTAX		OCTET STRING 
-		MAX-ACCESS      read-only
-		STATUS		deprecated
-		DESCRIPTION
-		"The interface of the MAC address.
-		 The format of this output is as follows:
-		 <interface type> <slot/port>, or 
-		 <port channel> <number>"
-		::= { dot3aAggStaticEntry 5 }
-
-
-        -- ### Aggregation Dynamic FDB Table
-
-           dot3aAggFdbTable  OBJECT-TYPE
-            SYNTAX          SEQUENCE OF Dot3aAggFdbEntry
-            MAX-ACCESS      not-accessible
-		STATUS          current
-		DESCRIPTION
-		"A list of dynamically learned Mac Address on the aggregated links"
-                ::= { f10dot3dAgg 3 }
-
-          dot3aAggFdbEntry   OBJECT-TYPE
-            SYNTAX          Dot3aAggFdbEntry
-            MAX-ACCESS      not-accessible
-            STATUS          deprecated
-            DESCRIPTION
-            "A list of dynamically learned Mac Address on the aggregated links in the system"
-            INDEX   { dot3aAggFdbIndex, dot3aAggFdbVlanId, dot3aAggFdbMacAddr }
-            ::= { dot3aAggFdbTable 1 }
-
-          Dot3aAggFdbEntry   ::=
-            SEQUENCE {
-             dot3aAggFdbIndex        	Integer32,
-             dot3aAggFdbVlanId       	Integer32,
-	       dot3aAggFdbMacAddr      	MacAddress,		
-	       dot3aAggFdbStatus       	INTEGER,		
-	       dot3aAggFdbDistributedPort	OCTET STRING	
-            }
-
-	   dot3aAggFdbIndex	OBJECT-TYPE
-		SYNTAX		Integer32
-		MAX-ACCESS      read-only
-		STATUS		deprecated
-		DESCRIPTION
-		"The FDB link aggregation id or port channel id."
-		::= { dot3aAggFdbEntry 1 }
-
-	   dot3aAggFdbVlanId	OBJECT-TYPE
-		SYNTAX		Integer32
-		MAX-ACCESS      read-only
-		STATUS		deprecated
-		DESCRIPTION
-		"The forwarding table VLAN id that this ports configured to ."
-		::= { dot3aAggFdbEntry 2 }
-
-	   dot3aAggFdbMacAddr	OBJECT-TYPE
-		SYNTAX		MacAddress
-		MAX-ACCESS      read-only
-		STATUS		deprecated
-		DESCRIPTION
-		"A 6-octet read only value MAC Address assigned 
-		 to this link aggregation or user-defined MAC address
-		 if a static user-defined MAC address is configured."
-		::= { dot3aAggFdbEntry 3 }
-
-	   dot3aAggFdbStatus	OBJECT-TYPE
-		SYNTAX		INTEGER {
-				   	active(1),
-				   	inactive(2)
-					}	  
-		MAX-ACCESS	read-only
-		STATUS		deprecated
-		DESCRIPTION
-		"The status of this aggregation link .
-		 active - this aggregation link is active.
-		 inactive  - this aggregation link is no active." 
-		::= { dot3aAggFdbEntry 4 }
-
-	   dot3aAggFdbDistributedPort	OBJECT-TYPE
-		SYNTAX		OCTET STRING 
-		MAX-ACCESS      read-only
-		STATUS		deprecated
-		DESCRIPTION
-		"The interface of the MAC address.
-		 The format of this output is as follows:
-		 <interface type> <slot/port>,  
-		 <port channel> <number>,
-                 or NULL if it is not available"
-		::= { dot3aAggFdbEntry 5 }
-
-        -- ### Current Aggregation MAC Addr Table
-
-           dot3aCurAggStaticTable  OBJECT-TYPE
-            SYNTAX          SEQUENCE OF Dot3aCurAggStaticEntry
-            MAX-ACCESS      not-accessible
-                STATUS      current
-                DESCRIPTION
-                "A list of statically configured MAC Address on the aggregated links."
-                ::= { f10dot3dAgg 4 }
-
-          dot3aCurAggStaticEntry   OBJECT-TYPE
-            SYNTAX          Dot3aCurAggStaticEntry
-            MAX-ACCESS      not-accessible
-            STATUS          current
-            DESCRIPTION
-            "A list of statically configured MAC Address on the aggregated links in the system"
-            INDEX   { dot3aCurAggVlanId, dot3aCurAggMacAddr, dot3aCurAggIndex }
-            ::= { dot3aCurAggStaticTable 1 }
-
-          Dot3aCurAggStaticEntry   ::=
-            SEQUENCE {
-                   dot3aCurAggVlanId               Integer32,
-                   dot3aCurAggMacAddr              MacAddress,
-                   dot3aCurAggIndex                Integer32,
-                   dot3aCurAggStatus               INTEGER
-            }
-
-           dot3aCurAggVlanId    OBJECT-TYPE
-                SYNTAX          Integer32
-                MAX-ACCESS      read-only
-                STATUS          current
-                DESCRIPTION
-                "VLAN id that this ports configured to ."
-                ::= { dot3aCurAggStaticEntry 1 }
-
-           dot3aCurAggMacAddr   OBJECT-TYPE
-                SYNTAX          MacAddress
-                MAX-ACCESS      read-only
-                STATUS          current
-                DESCRIPTION
-                "A 6-octet read only value MAC Address assigned 
-                 to this link aggregation or user-defined MAC address
-                 if a static user-defined MAC address is configured."
-                ::= { dot3aCurAggStaticEntry 2 }
-
-           dot3aCurAggIndex     OBJECT-TYPE
-                SYNTAX          Integer32
-                MAX-ACCESS      read-only
-                STATUS          current
-                DESCRIPTION
-                "The link aggregation id or port channel id."
-                ::= { dot3aCurAggStaticEntry 3 }
-
-           dot3aCurAggStatus    OBJECT-TYPE
-                SYNTAX          INTEGER {
-                                        active(1),
-                                        inactive(2)
-                                        }
-                MAX-ACCESS      read-only
-                STATUS          current
-                DESCRIPTION
-                "The status of this aggregation link .
-                 active - this aggregation link is active.
-                 inactive  - this aggregation link is no active."
-                ::= { dot3aCurAggStaticEntry 4 }
-
-        -- ### Current Aggregation Dynamic FDB Table
-
-           dot3aCurAggFdbTable  OBJECT-TYPE
-            SYNTAX          SEQUENCE OF Dot3aCurAggFdbEntry
-            MAX-ACCESS      not-accessible
-                STATUS      current
-                DESCRIPTION
-                "A list of dynamically learned Mac Address on the aggregated links"
-                ::= { f10dot3dAgg 5 }
-
-          dot3aCurAggFdbEntry   OBJECT-TYPE
-            SYNTAX          Dot3aCurAggFdbEntry
-            MAX-ACCESS      not-accessible
-            STATUS          current
-            DESCRIPTION
-            "A list of dynamically learned Mac Address on the aggregated links in the system"
-            INDEX   { dot3aCurAggFdbVlanId, dot3aCurAggFdbMacAddr, dot3aCurAggFdbIndex }
-            ::= { dot3aCurAggFdbTable 1 }
-
-          Dot3aCurAggFdbEntry   ::=
-            SEQUENCE {
-               dot3aCurAggFdbVlanId       Integer32,
-               dot3aCurAggFdbMacAddr      MacAddress,
-               dot3aCurAggFdbIndex        Integer32,
-               dot3aCurAggFdbStatus       INTEGER
-            }
-
-           dot3aCurAggFdbVlanId    OBJECT-TYPE
-                SYNTAX          Integer32
-                MAX-ACCESS      read-only
-                STATUS          current
-                DESCRIPTION
-                "The forwarding table VLAN id that this ports configured to ."
-                ::= { dot3aCurAggFdbEntry 1 }
-
-           dot3aCurAggFdbMacAddr   OBJECT-TYPE
-                SYNTAX          MacAddress
-                MAX-ACCESS      read-only
-                STATUS          current
-                DESCRIPTION
-                "A 6-octet read only value MAC Address assigned 
-                 to this link aggregation or user-defined MAC address
-                 if a static user-defined MAC address is configured."
-                ::= { dot3aCurAggFdbEntry 2 }
-
-           dot3aCurAggFdbIndex     OBJECT-TYPE
-                SYNTAX          Integer32
-                MAX-ACCESS      read-only
-                STATUS          current
-                DESCRIPTION
-                "The FDB link aggregation id or port channel id."
-                ::= { dot3aCurAggFdbEntry 3 }
-
-           dot3aCurAggFdbStatus    OBJECT-TYPE
-                SYNTAX          INTEGER {
-                                        active(1),
-                                        inactive(2)
-                                        }
-                MAX-ACCESS      read-only
-                STATUS          current
-                DESCRIPTION
-                "The status of this aggregation link .
-                 active - this aggregation link is active.
-                 inactive  - this aggregation link is not active."
-                ::= { dot3aCurAggFdbEntry 4 }
-
-        -- ### Common Aggregation FDB Table
-
-           dot3aCommonAggFdbTable  OBJECT-TYPE
-            SYNTAX          SEQUENCE OF Dot3aCommonAggFdbEntry
-            MAX-ACCESS      not-accessible
-                STATUS      current
-                DESCRIPTION
-                "A list of configured and dynamically negotiated aggregated links"
-                ::= { f10dot3dAgg 6 }
-
-          dot3aCommonAggFdbEntry   OBJECT-TYPE
-            SYNTAX          Dot3aCommonAggFdbEntry
-            MAX-ACCESS      not-accessible
-            STATUS          current
-            DESCRIPTION
-            "A list of configured and dynamically negotiated aggregated links in the system"
-            INDEX   { dot3aCommonAggFdbIndex, dot3aCommonAggFdbVlanId }
-            ::= { dot3aCommonAggFdbTable 1 }
-
-          Dot3aCommonAggFdbEntry   ::=
-            SEQUENCE {
-               dot3aCommonAggFdbIndex     Integer32,
-               dot3aCommonAggFdbVlanId    Integer32,
-               dot3aCommonAggFdbTagConfig INTEGER,
-               dot3aCommonAggFdbStatus    INTEGER
-            }
-
-           dot3aCommonAggFdbIndex     OBJECT-TYPE
-                SYNTAX          Integer32
-                MAX-ACCESS      read-only
-                STATUS          current
-                DESCRIPTION
-                "The FDB link aggregation id or port channel id."
-                ::= { dot3aCommonAggFdbEntry 1 }
-
-           dot3aCommonAggFdbVlanId    OBJECT-TYPE
-                SYNTAX          Integer32
-                MAX-ACCESS      read-only
-                STATUS          current
-                DESCRIPTION
-                "The VLAN id belongs to this port channel."
-                ::= { dot3aCommonAggFdbEntry 2 }
-
-           dot3aCommonAggFdbTagConfig    OBJECT-TYPE
-                SYNTAX          INTEGER {
-                                        tagged(1),
-                                        untagged(2)
-                                        }
-                MAX-ACCESS      read-only
-                STATUS          current
-                DESCRIPTION
-                "The status if the aggregation link is tagged, untagged, or not configured.
-                 tagged    - this aggregation link is tagged.
-                 untagged  - this aggregation link is untagged.
-                 notConfigured  - this aggregation link is not tagged or untagged."
-                 
-                ::= { dot3aCommonAggFdbEntry 3 }
-
-           dot3aCommonAggFdbStatus    OBJECT-TYPE
-                SYNTAX          INTEGER {
-                                        active(1),
-                                        inactive(2)
-                                        }
-                MAX-ACCESS      read-only
-                STATUS          current
-                DESCRIPTION
-                "The status of this aggregation link .
-                 active - this aggregation link is active.
-                 inactive  - this aggregation link is not active."
-                ::= { dot3aCommonAggFdbEntry 4 }
-
-           dot3aClearFdb		OBJECT-TYPE
-                SYNTAX          INTEGER {
-                                        yes(1),
-                                        no(2)
-                                        }
-                MAX-ACCESS      read-write
-                STATUS          current
-                DESCRIPTION
-				"Write yes(1) to this object will clear all fdb entries.
-				The value will be changed to no(2) once the fdb is cleared.
-					yes(1) - clear fdb aggregation links.
-					no(2)  - do not clear fdb aggregation links"
-				DEFVAL {2}
-                ::= { f10LinkAggMgmt 1 }
-
-        -- ### conformance information ###
-
-        f10LinkAggMibConformance        OBJECT IDENTIFIER       ::=     { f10LinkAggMib 2 }
-        f10LinkAggMibCompliances        OBJECT IDENTIFIER       ::=     { f10LinkAggMibConformance 1 }
-        f10LinkAggMibGroups             OBJECT IDENTIFIER       ::=     { f10LinkAggMibConformance 2 }
-
-
-        -- ## compliance statements
-
-        f10LinkAggMibCompliance MODULE-COMPLIANCE
-                STATUS          current
-                DESCRIPTION
-                    "The compliance statement for Force10
-                    product which implement the f10
-                    Link Aggregation MIB."
-                MODULE  -- this module
-                MANDATORY-GROUPS {
-                        f10CommonGroup
-                }
-                ::= { f10LinkAggMibCompliances 1 }
-
-        -- ## units of conformance
-
-        f10CommonGroup  OBJECT-GROUP
-                OBJECTS {
-
-                dot3aAggCfgMacAddr,
-                dot3aAggCfgIfIndex,
-                dot3aAggCfgNumPorts,
-                dot3aAggCfgPortList,
-                dot3aAggStatus,
-                dot3aAggDistributedPort,
-                dot3aAggFdbStatus,
-                dot3aAggFdbDistributedPort,
-                dot3aCurAggStatus,
-                dot3aCurAggFdbStatus,
-				dot3aClearFdb
-                }
-                STATUS  current
-                DESCRIPTION
-                        "A collection of objects providing the
-                        overall chassis information."
-                ::= { f10LinkAggMibGroups 1 }
-
-	END
+f10LinkAggMib MODULE-IDENTITY
+       
+       LAST-UPDATED "201304160000Z"  -- Apr 16, 2013
+       ORGANIZATION
+	  	"Dell Inc"
+       CONTACT-INFO
+              "http://www.force10networks.com/support"
+
+       DESCRIPTION
+              "Dell Networking OS Link Aggregation MIB. "
+
+       REVISION      "201304160000Z"
+       DESCRIPTION
+               "linkBundleType updated."
+                      
+       REVISION      "201211260000Z"
+       DESCRIPTION
+               "link bundle notificatins added."
+                	  
+       REVISION     "201107040000Z" -- July 7, 2011 
+	     DESCRIPTION                    
+              "Added support for LACP state monitoring and state change traps.
+              1. Added dot3aAggCfgLacpSupported, dot3aAggCfgOperStatus to 
+    	       dot3aAggConfigTable. 
+              2. Added a new table dot3adAggPortTable for monitoring LACP state
+              information per port.
+              3. Added textual convention F10LacpState for lacp state 
+              information and F10LacpKey for lacp key maintained at every 
+              physical port.
+              4. Added a notification dot3adAggLacpStateChange.
+              5. Modified alignment and description of some objects.
+              6. Deprecated f10LinkAggMibCompliance and added a new compliance
+              statement f10LinkAggMibComplianceRev1.
+              7. Deprecated f10LinkAggCommonGroup and added a new object group
+              f10LinkAggCommonGroupRev1.
+              8. Added two new object groups- 
+                     - f10LinkAggPortGroup for the aggregator port table and 
+                     - f10LinkAggNotificationGroup for the notification of lacp
+                     state change."
+                     
+       REVISION     "200308010000Z"
+       DESCRIPTION
+              "Dell Networking OS Link Aggregation MIB version 1.3.
+              - Add FDB common table for configured or negotiated link 
+              aggregation.
+              1. Move textual conventions to the Textual-Convention MIB 
+              f10-tc.mib.
+              2. Rename dot3aClearCurAggFdb to dot3aClearFdb."
+
+       REVISION     "200203120000Z"
+       DESCRIPTION
+              "Dell Networking OS Link Aggregation MIB version 1.1.
+              Deprecated dot3aAggStaticTable & dot3aAggFdbTable
+              Added dot3aCurAggStaticTable & dot3aCurAggFdbTable
+              because of indexing changes"
+
+       REVISION     "200103010000Z"
+       DESCRIPTION
+              "First revision of Dell Networking OS link aggregation mib."
+
+       REVISION     "200011210000Z"
+       DESCRIPTION
+              "Dell Networking OS Link Aggregation MIB version 1.0."
+
+       ::= { f10Mgmt 2 }   
+
+-- ###################################################################
+-- Textual Conventions 
+-- ###################################################################
+              
+F10LacpKey ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d"
+       STATUS       current
+       DESCRIPTION
+       "The Actor or Partner Key value maintained by every port that is
+       part of an aggregator."
+       SYNTAX      Unsigned32(0..128)
+
+F10LacpState ::= TEXTUAL-CONVENTION
+       STATUS      current
+       DESCRIPTION
+       "The Actor and Partner State values from the LACPDU."
+       SYNTAX      BITS {
+           lacpActivity(0),
+           lacpTimeout(1),
+           aggregation(2),
+           synchronization(3),
+           collecting(4),
+           distributing(5),
+           defaulted(6),
+           expired(7)
+           }
+
+-- ###################################################################
+-- Groups 
+-- ###################################################################
+
+f10LinkAggObjects           OBJECT IDENTIFIER 
+       ::={ f10LinkAggMib 1 }
+
+f10LinkAggAlarms          OBJECT IDENTIFIER 
+       ::= {f10LinkAggMib 2}
+
+f10dot3dAgg                 OBJECT IDENTIFIER 
+       ::={ f10LinkAggObjects 1 }
+
+f10LinkAggMgmt              OBJECT IDENTIFIER 
+       ::={ f10LinkAggObjects 2 }
+
+-- ##################################################################
+-- Aggregation Configuration Port List Table 
+-- ##################################################################
+
+dot3aAggConfigTable         OBJECT-TYPE
+       SYNTAX               SEQUENCE OF Dot3aAggConfigEntry
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+       "A list of all aggregated links configured."
+       ::= { f10dot3dAgg 1 }
+
+dot3aAggConfigEntry         OBJECT-TYPE 
+       SYNTAX               Dot3aAggConfigEntry
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+       "A list of all aggregated links configured in the system"
+       INDEX	{ dot3aAggCfgId }
+       ::= { dot3aAggConfigTable 1 }
+
+Dot3aAggConfigEntry	::=
+       SEQUENCE {
+           dot3aAggCfgId                  Unsigned32,
+           dot3aAggCfgMacAddr             MacAddress,		
+           dot3aAggCfgIfIndex             Unsigned32,
+           dot3aAggCfgNumPorts            Unsigned32,
+           dot3aAggCfgPortList            PortList,
+           dot3aAggCfgPortListString      OCTET STRING,
+           dot3aAggCfgLacpSupported       TruthValue,
+           dot3aAggCfgOperStatus          INTEGER
+           }
+
+dot3aAggCfgId               OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+       "The link aggregation id or port channel id."
+       ::= { dot3aAggConfigEntry 1 }
+
+dot3aAggCfgMacAddr          OBJECT-TYPE
+       SYNTAX               MacAddress
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+       "A 6-octet read only value MAC Address assigned to this link aggregation
+       or user-defined MAC address if a static user-defined MAC address is 
+       configured."
+       ::= { dot3aAggConfigEntry 2 }
+
+dot3aAggCfgIfIndex          OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+       "The logical interface index assigned to this link aggregation."
+       ::= { dot3aAggConfigEntry 3 }
+
+dot3aAggCfgNumPorts         OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+       "The number of physical ports configured to this link aggregation. 
+       Maximum is 16 ports"
+       ::= { dot3aAggConfigEntry 4 }
+
+dot3aAggCfgPortList         OBJECT-TYPE
+       SYNTAX               PortList
+       MAX-ACCESS           read-only
+       STATUS               deprecated
+       DESCRIPTION
+       "The bitmask of ports configured for this link aggregation.
+       This object is deprecated and no longer in use. Please use the new
+       dot3aAggCfgPortListString object instead." 
+       ::= { dot3aAggConfigEntry 5 }
+
+dot3aAggCfgPortListString   OBJECT-TYPE
+       SYNTAX               OCTET STRING 
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+       "The list of ports configured for this link aggregation.
+       The format of this output is as follows:
+       <interface type> <slot/port>, or 
+       <port channel> <number>"
+       ::= { dot3aAggConfigEntry 6 }
+
+dot3aAggCfgLacpSupported    OBJECT-TYPE
+       SYNTAX               TruthValue
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION 
+       "This object contains information about whether the link 
+       aggregation uses IEEE 802.3ad (Link Aggregation Control Protocol).
+       true - indicates the Aggregation link uses LACP protocol.
+       false - indicates the aggregation link is a statically configured link."
+       ::= { dot3aAggConfigEntry 7 }
+
+dot3aAggCfgOperStatus       OBJECT-TYPE
+       SYNTAX               INTEGER {
+                            up(1),       -- ready to pass packets
+                            down(2)
+                            }
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+       "The current operational status of the link aggregation. 
+       up - indicates the aggregated link is ready to transmit and
+       receive network traffic.
+       down - indicates there is some fault that prevents the 
+       aggregation link from going to the up(1) state."
+       ::= { dot3aAggConfigEntry 8 }
+
+-- ##################################################################
+-- Aggregation MAC Addr Table
+-- ##################################################################
+
+dot3aAggStaticTable         OBJECT-TYPE
+       SYNTAX               SEQUENCE OF Dot3aAggStaticEntry
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+       "A list of statically configured MAC Address on the aggregated 
+       links."
+       ::= { f10dot3dAgg 2 }
+
+dot3aAggStaticEntry         OBJECT-TYPE
+       SYNTAX               Dot3aAggStaticEntry
+       MAX-ACCESS           not-accessible
+       STATUS               deprecated
+       DESCRIPTION
+       "A list of statically configured MAC Address on the aggregated links in 
+       the system"
+       INDEX   { dot3aAggIndex, dot3aAggVlanId, dot3aAggMacAddr }
+       ::= { dot3aAggStaticTable 1 }
+
+Dot3aAggStaticEntry   ::=
+       SEQUENCE {
+           dot3aAggIndex                  Unsigned32,
+           dot3aAggVlanId                 Unsigned32,
+           dot3aAggMacAddr                MacAddress,		
+           dot3aAggStatus                 INTEGER,		
+           dot3aAggDistributedPort        OCTET STRING	
+           }
+
+dot3aAggIndex               OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           not-accessible
+       STATUS               deprecated
+       DESCRIPTION
+       "The link aggregation id or port channel id."
+       ::= { dot3aAggStaticEntry 1 }
+
+dot3aAggVlanId              OBJECT-TYPE
+       SYNTAX               Unsigned32 
+       MAX-ACCESS           not-accessible
+       STATUS               deprecated
+       DESCRIPTION
+       "VLAN id that this ports configured to ."
+       ::= { dot3aAggStaticEntry 2 }
+
+dot3aAggMacAddr             OBJECT-TYPE
+       SYNTAX               MacAddress
+       MAX-ACCESS           not-accessible
+       STATUS               deprecated
+       DESCRIPTION
+       "A 6-octet read only value MAC Address assigned 
+       to this link aggregation or user-defined MAC address
+       if a static user-defined MAC address is configured."
+       ::= { dot3aAggStaticEntry 3 }
+
+dot3aAggStatus              OBJECT-TYPE
+       SYNTAX               INTEGER {
+                            active(1),
+                            inactive(2)
+                            }	  
+       MAX-ACCESS           read-only
+       STATUS               deprecated
+       DESCRIPTION
+       "The status of this aggregation link .
+       active - this aggregation link is active.
+       inactive  - this aggregation link is no active." 
+       ::= { dot3aAggStaticEntry 4 }
+
+dot3aAggDistributedPort     OBJECT-TYPE
+       SYNTAX               OCTET STRING 
+       MAX-ACCESS           read-only
+       STATUS               deprecated
+       DESCRIPTION
+       "The interface of the MAC address.
+       The format of this output is as follows:
+       <interface type> <slot/port>, or 
+       <port channel> <number>"
+       ::= { dot3aAggStaticEntry 5 }
+
+-- ##################################################################
+-- Aggregation Dynamic FDB Table
+-- ##################################################################
+
+dot3aAggFdbTable            OBJECT-TYPE
+       SYNTAX               SEQUENCE OF Dot3aAggFdbEntry
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+       "A list of dynamically learned Mac Address on the aggregated links"
+       ::= { f10dot3dAgg 3 }
+
+dot3aAggFdbEntry            OBJECT-TYPE
+       SYNTAX               Dot3aAggFdbEntry
+       MAX-ACCESS           not-accessible
+       STATUS               deprecated
+       DESCRIPTION
+      	"A list of dynamically learned Mac Address on the aggregated links in 
+      	the system"
+       INDEX   { dot3aAggFdbIndex, dot3aAggFdbVlanId, dot3aAggFdbMacAddr }
+       ::= { dot3aAggFdbTable 1 }
+
+Dot3aAggFdbEntry   ::=
+       SEQUENCE {
+           dot3aAggFdbIndex               Unsigned32,
+           dot3aAggFdbVlanId              Unsigned32,
+           dot3aAggFdbMacAddr             MacAddress,		
+           dot3aAggFdbStatus              INTEGER,		
+           dot3aAggFdbDistributedPort     OCTET STRING	
+           }
+
+dot3aAggFdbIndex            OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           not-accessible
+       STATUS               deprecated
+       DESCRIPTION
+       "The FDB link aggregation id or port channel id."
+       ::= { dot3aAggFdbEntry 1 }
+
+dot3aAggFdbVlanId	       OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           not-accessible
+       STATUS               deprecated
+       DESCRIPTION
+       "The forwarding table VLAN id that this ports configured to ."
+       ::= { dot3aAggFdbEntry 2 }
+
+dot3aAggFdbMacAddr          OBJECT-TYPE
+       SYNTAX               MacAddress
+       MAX-ACCESS           not-accessible
+       STATUS               deprecated
+       DESCRIPTION
+       "A 6-octet read only value MAC Address assigned 
+       to this link aggregation or user-defined MAC address
+       if a static user-defined MAC address is configured."
+       ::= { dot3aAggFdbEntry 3 }
+
+dot3aAggFdbStatus           OBJECT-TYPE
+       SYNTAX               INTEGER {
+                            active(1),
+                            inactive(2)
+                            }	  
+	MAX-ACCESS           read-only
+       STATUS               deprecated
+       DESCRIPTION
+       "The status of this aggregation link .
+       active - this aggregation link is active.
+       inactive  - this aggregation link is no active." 
+       ::= { dot3aAggFdbEntry 4 }
+
+dot3aAggFdbDistributedPort  OBJECT-TYPE
+       SYNTAX               OCTET STRING 
+       MAX-ACCESS           read-only
+       STATUS               deprecated
+       DESCRIPTION
+       "The interface of the MAC address.
+       The format of this output is as follows:
+       <interface type> <slot/port>,  
+       <port channel> <number>,
+       or NULL if it is not available"
+       ::= { dot3aAggFdbEntry 5 }
+
+-- ##################################################################
+-- Current Aggregation MAC Addr Table
+-- ##################################################################
+
+dot3aCurAggStaticTable      OBJECT-TYPE
+       SYNTAX               SEQUENCE OF Dot3aCurAggStaticEntry
+       MAX-ACCESS           not-accessible
+       STATUS      	       current
+       DESCRIPTION
+       "A list of statically configured MAC Address on the aggregated 
+         links."
+       ::= { f10dot3dAgg 4 }
+
+dot3aCurAggStaticEntry      OBJECT-TYPE
+       SYNTAX               Dot3aCurAggStaticEntry
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+       "A list of statically configured MAC Address on the aggregated 
+       links in the system"
+       INDEX   { dot3aCurAggVlanId, dot3aCurAggMacAddr, dot3aCurAggIndex }
+       ::= { dot3aCurAggStaticTable 1 }
+
+Dot3aCurAggStaticEntry   ::=
+       SEQUENCE {
+           dot3aCurAggVlanId       Unsigned32,
+           dot3aCurAggMacAddr      MacAddress,
+           dot3aCurAggIndex        Unsigned32,
+           dot3aCurAggStatus       INTEGER
+           }
+
+dot3aCurAggVlanId           OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+      	"This objects describes the VLAN id that this port is part of."
+       ::= { dot3aCurAggStaticEntry 1 }
+
+dot3aCurAggMacAddr          OBJECT-TYPE
+       SYNTAX               MacAddress
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+      	"A 6-octet read only value MAC Address assigned 
+       to this link aggregation or user-defined MAC address
+       if a static user-defined MAC address is configured."
+       ::= { dot3aCurAggStaticEntry 2 }
+
+dot3aCurAggIndex            OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+       "The link aggregation id or port channel id."
+       ::= { dot3aCurAggStaticEntry 3 }
+
+dot3aCurAggStatus           OBJECT-TYPE
+       SYNTAX               INTEGER {
+                                   active(1),
+                                   inactive(2)
+                            }
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+      	"The status of the static address configured on the
+       aggregation link .
+       active - the mac address is active.
+       inactive  - the mac address is not active."
+       ::= { dot3aCurAggStaticEntry 4 }
+
+-- ##################################################################
+-- Current Aggregation Dynamic FDB Table
+-- ##################################################################
+
+dot3aCurAggFdbTable         OBJECT-TYPE
+       SYNTAX               SEQUENCE OF Dot3aCurAggFdbEntry
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+       "A list of dynamically learned Mac Address on the aggregated 
+       links"
+       ::= { f10dot3dAgg 5 }
+
+dot3aCurAggFdbEntry         OBJECT-TYPE
+       SYNTAX               Dot3aCurAggFdbEntry
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+       "A list of dynamically learned Mac Address on the aggregated links
+       in the system"
+       INDEX   { dot3aCurAggFdbVlanId, dot3aCurAggFdbMacAddr, 
+       dot3aCurAggFdbIndex }       
+       ::= { dot3aCurAggFdbTable 1 }
+
+Dot3aCurAggFdbEntry   ::=
+       SEQUENCE {
+           dot3aCurAggFdbVlanId       Unsigned32,
+           dot3aCurAggFdbMacAddr      MacAddress,
+           dot3aCurAggFdbIndex        Unsigned32,
+           dot3aCurAggFdbStatus       INTEGER
+           }
+
+dot3aCurAggFdbVlanId        OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+      	"This object gives information on the forwarding table VLAN id 
+       that this port is configured to ."
+       ::= { dot3aCurAggFdbEntry 1 }
+
+dot3aCurAggFdbMacAddr       OBJECT-TYPE
+       SYNTAX               MacAddress
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+       "A 6-octet read only value MAC Address assigned 
+       to this link aggregation or user-defined MAC address
+       if a static user-defined MAC address is configured."
+       ::= { dot3aCurAggFdbEntry 2 }
+
+dot3aCurAggFdbIndex         OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+       "The FDB link aggregation id or port channel id."
+       ::= { dot3aCurAggFdbEntry 3 }
+
+dot3aCurAggFdbStatus        OBJECT-TYPE
+       SYNTAX               INTEGER {
+                            active(1),
+                            inactive(2)
+                            }
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+       "The status of this dynamic mac address learnt on the 
+       aggregation link .
+       active - this mac address is active.        
+       inactive  - this mac address is not active."
+       ::= { dot3aCurAggFdbEntry 4 }
+
+-- ##################################################################
+-- Common Aggregation FDB Table
+-- ##################################################################
+
+dot3aCommonAggFdbTable      OBJECT-TYPE
+       SYNTAX               SEQUENCE OF Dot3aCommonAggFdbEntry
+       MAX-ACCESS           not-accessible
+       STATUS      		current
+       DESCRIPTION
+       "A list of configured and dynamically negotiated aggregated links"
+       ::= { f10dot3dAgg 6 }
+
+dot3aCommonAggFdbEntry      OBJECT-TYPE
+       SYNTAX               Dot3aCommonAggFdbEntry
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+       "A list of configured and dynamically negotiated aggregated links 
+       in the system"
+       INDEX   { dot3aCommonAggFdbIndex, dot3aCommonAggFdbVlanId }
+       ::= { dot3aCommonAggFdbTable 1 }
+
+Dot3aCommonAggFdbEntry   ::=
+       SEQUENCE {
+           dot3aCommonAggFdbIndex     Unsigned32,
+           dot3aCommonAggFdbVlanId    Unsigned32,
+           dot3aCommonAggFdbTagConfig INTEGER,
+           dot3aCommonAggFdbStatus    INTEGER
+           }
+
+dot3aCommonAggFdbIndex      OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+       "The FDB link aggregation id or port channel id."
+       ::= { dot3aCommonAggFdbEntry 1 }
+
+dot3aCommonAggFdbVlanId     OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+       "This object gives information about the VLAN id that the port 
+       channel is part of."
+       ::= { dot3aCommonAggFdbEntry 2 }
+
+dot3aCommonAggFdbTagConfig  OBJECT-TYPE
+       SYNTAX               INTEGER {
+                            tagged(1),
+                            untagged(2)
+                            }
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+       "The status if the aggregation link is tagged, untagged, 
+       or not configured.
+       tagged    - this aggregation link is tagged.
+       untagged  - this aggregation link is untagged."               
+       ::= { dot3aCommonAggFdbEntry 3 }
+
+dot3aCommonAggFdbStatus     OBJECT-TYPE
+       SYNTAX               INTEGER {
+                            active(1),
+                            inactive(2)
+                            }
+       MAX-ACCESS           read-only
+       STATUS               current
+       DESCRIPTION
+       "The status of the aggregation link in the vlan.
+       active - when the aggregation link is up and part of vlan.
+       inactive  - when the aggregation link is down."
+       ::= { dot3aCommonAggFdbEntry 4 }
+
+-- ##################################################################
+-- Aggregation Port Table
+-- ##################################################################
+
+dot3adAggPortTable          OBJECT-TYPE
+       SYNTAX               SEQUENCE OF Dot3adAggPortEntry
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+       " A list of Link Aggregation Control configuration parameters for
+       each Aggregation Port on this device."
+       ::= { f10dot3dAgg 7 }
+
+dot3adAggPortEntry          OBJECT-TYPE
+       SYNTAX               Dot3adAggPortEntry
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+       "List of aggregation control confirguration information
+       per aggregated port in the system."
+       INDEX      { dot3adAggPortIndex }
+       ::= { dot3adAggPortTable 1 }
+         
+Dot3adAggPortEntry      ::=
+       SEQUENCE      {
+           dot3adAggPortIndex                    Unsigned32,
+           dot3adAggPortActorOperKey             F10LacpKey,
+           dot3adAggPortPartnerOperKey           F10LacpKey,
+           dot3adAggPortActorAdminState          F10LacpState,
+           dot3adAggPortActorOperState           F10LacpState,
+           dot3adAggPortPartnerAdminState        F10LacpState,
+           dot3adAggPortPartnerOperState         F10LacpState    
+           }
+       
+dot3adAggPortIndex          OBJECT-TYPE
+       SYNTAX               Unsigned32
+       MAX-ACCESS           not-accessible
+       STATUS               current
+       DESCRIPTION
+       "The ifIndex of the physical port that is part of an aggregator."
+       ::= { dot3adAggPortEntry 1 }
+       
+dot3adAggPortActorOperKey          OBJECT-TYPE
+       SYNTAX                      F10LacpKey
+       MAX-ACCESS                  read-only
+       STATUS                      current
+       DESCRIPTION
+       "The current operational value of the Key for the Aggregation 
+       Port. The meaning of the particular Key values is of local 
+       significance."
+       ::= { dot3adAggPortEntry 2 }
+
+dot3adAggPortPartnerOperKey        OBJECT-TYPE
+       SYNTAX                      F10LacpKey
+       MAX-ACCESS                  read-only
+       STATUS                      current
+    	DESCRIPTION
+       "The current operational value of the Key for the protocol 
+        Partner. The value of this attribute may contain the manually 
+        configured value carried in the system if there is no protocol 
+        Partner."
+       ::= { dot3adAggPortEntry 3 }
+
+dot3adAggPortActorAdminState       OBJECT-TYPE
+       SYNTAX                      F10LacpState
+       MAX-ACCESS                  read-only
+       STATUS                      current
+       DESCRIPTION
+       "A string of 8 bits, corresponding to the current administrative
+       values of Actor_State as transmitted by the Actor in LACPDUs.
+       The first bit corresponds to bit 0 of Actor_State (LACP_Activity),
+       the second bit corresponds to bit 1 (LACP_Timeout),
+       the third bit corresponds to bit 2 (Aggregation),
+       the fourth bit corresponds to bit 3 (Synchronization),
+       the fifth bit corresponds to bit 4 (Collecting),
+       the sixth bit corresponds to bit 5 (Distributing),
+       the seventh bit corresponds to bit 6 (Defaulted),
+       and the eighth bit corresponds to bit 7 (Expired).
+       These values allow administrative control over the
+       values of LACP_Activity, LACP_Timeout and Aggregation."
+       ::= { dot3adAggPortEntry 4 }
+
+dot3adAggPortActorOperState        OBJECT-TYPE
+       SYNTAX                      F10LacpState
+       MAX-ACCESS                  read-only
+       STATUS                      current
+       DESCRIPTION   
+       "A string of 8 bits, corresponding to the current operational 
+       values of Actor_State as transmitted by the Actor in LACPDUs. 
+       The bit allocations are as defined in dot3adAggPortActorAdminState."
+       ::= { dot3adAggPortEntry 5 }
+              
+dot3adAggPortPartnerAdminState     OBJECT-TYPE
+       SYNTAX                      F10LacpState
+       MAX-ACCESS                  read-only
+       STATUS                      current
+       DESCRIPTION
+        "A string of 8 bits, corresponding to the current administrative 
+         value of Actor_State for the protocol Partner. The bit allocations
+         are as defined in dot3adAggPortActorAdminState."
+       ::= { dot3adAggPortEntry 6 }
+
+ 
+dot3adAggPortPartnerOperState      OBJECT-TYPE
+      SYNTAX                       F10LacpState
+      MAX-ACCESS                   read-only
+      STATUS                       current
+      DESCRIPTION
+      "A string of 8 bits, corresponding to the current values of
+      Actor_State in the most recently received LACPDU transmitted by 
+      the protocol Partner. The bit allocations are as defined in
+      dot3adAggPortActorAdminState. In the absence of an active protocol
+      Partner, this value may reflect the manually configured value 
+      carried in the system."
+      ::= { dot3adAggPortEntry 7 } 
+
+dot3aClearFdb        OBJECT-TYPE
+       SYNTAX        INTEGER {
+                            yes(1),
+                            no(2)
+                            }
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+        "Write yes(1) to this object will clear all fdb entries.
+         The value will be changed to no(2) once the fdb is cleared.
+              yes(1) - clear fdb aggregation links.
+              no(2)  - do not clear fdb aggregation links"
+       DEFVAL {2}
+       ::= { f10LinkAggMgmt 1 }
+
+-- ##################################################################
+-- Notifications 
+-- ################################################################## 
+
+f10Dot3adAggNotifications          OBJECT IDENTIFIER 
+       ::= { f10LinkAggAlarms 0 }
+        
+dot3adAggLacpStateChange    NOTIFICATION-TYPE
+       OBJECTS              {
+                            dot3adAggPortActorOperState,
+                            dot3adAggPortPartnerOperState
+                            }
+       STATUS               current
+       DESCRIPTION
+       "The dot3adAggLacpStateChange indicates that the agent has
+       detected a change in the Lacp state for one of the member ports 
+       of the aggregation link. This notification contains the information 
+       on the port which has gone through the state change and the oper state
+       information of the actor and its partner."
+       ::= { f10Dot3adAggNotifications 1 }  
+
+f10LinkBundleNotifications        OBJECT IDENTIFIER
+       ::= { f10LinkAggAlarms 1 }
+
+linkBundleType OBJECT-TYPE
+       SYNTAX      INTEGER {
+                        ecmpBundle(1),
+                        lagBundle(2)
+       }
+       MAX-ACCESS   accessible-for-notify
+       STATUS       current
+       DESCRIPTION
+       "Indicates whether LAG or ECMP-GROUP bundle"
+       ::= { f10LinkAggAlarms 2 }
+
+linkBundleNumber OBJECT-TYPE
+       SYNTAX      INTEGER
+       MAX-ACCESS   accessible-for-notify
+       STATUS       current
+       DESCRIPTION
+       "The LAG or ECMP-GROUP ID which is overloaded"
+       ::= { f10LinkAggAlarms 3 }
+
+linkBundleImbalance NOTIFICATION-TYPE
+       OBJECTS         {   linkBundleType,
+                           linkBundleNumber
+                       }
+       STATUS          current
+       DESCRIPTION
+       "Trap generated when traffic imbalance
+        observed in Link Bundle."
+       ::= { f10LinkBundleNotifications 1 }
+
+linkBundleImbalanceClear NOTIFICATION-TYPE
+       OBJECTS         {   linkBundleType,
+                           linkBundleNumber
+                       }
+       STATUS          current
+       DESCRIPTION
+       "Trap generated when traffic imbalance
+        is no longer observed."
+       ::= { f10LinkBundleNotifications 2 }
+
+-- #################################################################
+-- Conformance information 
+-- #################################################################
+
+f10LinkAggMibConformance        OBJECT IDENTIFIER       
+       ::=     { f10LinkAggMib 3 }
+
+f10LinkAggMibCompliances        OBJECT IDENTIFIER       
+       ::=     { f10LinkAggMibConformance 1 }
+    
+f10LinkAggMibGroups             OBJECT IDENTIFIER       
+       ::=     { f10LinkAggMibConformance 2 }
+
+-- ##################################################################
+-- Compliance statements
+-- ##################################################################
+
+f10LinkAggMibCompliance            MODULE-COMPLIANCE
+       STATUS                      deprecated
+       DESCRIPTION
+       "The compliance statement for Dell Networking OS product which implement the f10
+       Link Aggregation MIB. This module compliance is deprecated and is 
+       superced by f10LinkAggMibComplianceRev1."
+       MODULE        
+       MANDATORY-GROUPS {
+              f10LinkAggCommonGroup
+       }
+       ::= { f10LinkAggMibCompliances 1 }
+
+f10LinkAggMibComplianceRev1        MODULE-COMPLIANCE
+       STATUS                      current
+       DESCRIPTION
+       "The compliance statement for Dell Networking OS product which implement the f10
+       Link Aggregation MIB."
+       MODULE        
+       MANDATORY-GROUPS {
+           f10LinkAggCommonGroupRev1,
+           f10LinkAggPortGroup,
+           f10LinkAggNotificationGroup
+           }
+       ::= { f10LinkAggMibCompliances 2 }
+
+-- ##################################################################
+-- Units of conformance
+-- ##################################################################
+
+f10LinkAggCommonGroup   OBJECT-GROUP
+       OBJECTS { 
+           dot3aAggCfgMacAddr,
+           dot3aAggCfgIfIndex,
+           dot3aAggCfgNumPorts,
+           dot3aAggCfgPortListString,
+           dot3aAggCfgLacpSupported,
+           dot3aAggCfgOperStatus,
+           dot3aCurAggStatus,
+           dot3aCurAggFdbStatus,
+           dot3aCommonAggFdbTagConfig,
+           dot3aCommonAggFdbStatus,
+           dot3aClearFdb,
+           dot3aAggCfgPortList,
+           dot3aAggStatus,
+           dot3aAggDistributedPort,
+           dot3aAggFdbStatus,
+           dot3aAggFdbDistributedPort
+       }
+       STATUS        deprecated
+       DESCRIPTION
+       "A collection of objects giving overall information about the Link 
+       Aggregation. This group is deprecated and is superced by
+       f10LinkAggCommonGroupRev1."
+       ::= { f10LinkAggMibGroups 1 }
+
+f10LinkAggCommonGroupRev1  OBJECT-GROUP
+       OBJECTS {
+           dot3aAggCfgMacAddr,
+           dot3aAggCfgIfIndex,
+           dot3aAggCfgNumPorts,
+           dot3aAggCfgPortListString,
+           dot3aAggCfgLacpSupported,
+           dot3aAggCfgOperStatus,
+           dot3aCurAggStatus,
+           dot3aCurAggFdbStatus,
+           dot3aCommonAggFdbTagConfig,
+           dot3aCommonAggFdbStatus,
+           dot3aClearFdb
+           }
+       STATUS        current
+       DESCRIPTION
+       "A collection of objects providing the overall information on the 
+       Link Aggregation."
+       ::= { f10LinkAggMibGroups 2 }
+
+f10LinkAggPortGroup  OBJECT-GROUP
+       OBJECTS {
+           dot3adAggPortActorOperKey,
+           dot3adAggPortPartnerOperKey,
+           dot3adAggPortActorAdminState,
+           dot3adAggPortActorOperState,
+           dot3adAggPortPartnerAdminState,
+           dot3adAggPortPartnerOperState
+       }
+       STATUS        current
+       DESCRIPTION
+       "A collection of objects providing the information about every port 
+       in an aggregation that uses IEEE 802.3ad."
+       ::= { f10LinkAggMibGroups 3 }
+
+f10LinkAggNotificationGroup NOTIFICATION-GROUP
+       NOTIFICATIONS {
+           dot3adAggLacpStateChange,
+           linkBundleImbalance,
+           linkBundleImbalanceClear
+       }
+       STATUS        current
+       DESCRIPTION
+       "A collection of notification objects for Dell Networking OS Link Aggregation MIB"
+       ::= { f10LinkAggMibGroups 4 }
+
+f10LinkAggAlarmObjectGroup  OBJECT-GROUP
+       OBJECTS  {
+           linkBundleType,
+           linkBundleNumber
+       }
+       STATUS current
+       DESCRIPTION
+       "Conformance group for objects contained in LinkBundle Notifications."
+       ::= { f10LinkAggMibGroups 5 }
+     
+END

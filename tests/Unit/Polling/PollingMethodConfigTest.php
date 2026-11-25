@@ -10,12 +10,16 @@ use App\Models\Secret;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
+use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
+use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
 use LibreNMS\Polling\Method\Methods\PollingMethod;
+use LibreNMS\Polling\Method\Methods\ProxmoxApiPollingMethod;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
+use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Tests\TestCase;
 
 final class PollingMethodConfigTest extends TestCase
@@ -64,9 +68,9 @@ final class PollingMethodConfigTest extends TestCase
 
     public function testSecretIsFilledIntoConfig(): void
     {
-        $v2c = $this->deviceMethod(PollingMethodType::Snmp, ['port' => 1161], ['version' => 'v2c', 'community' => 'shared']);
+        $v2c = $this->deviceMethod(PollingMethodType::Snmp, ['port' => 1161], ['community' => 'shared']);
+        $v1 = $this->deviceMethod(PollingMethodType::Snmp, ['version' => 'v1'], ['community' => 'shared']);
         $v3 = $this->deviceMethod(PollingMethodType::Snmp, [], [
-            'version' => 'v3',
             'authlevel' => 'authPriv',
             'authname' => 'user1',
             'authpass' => 'pass12345',
@@ -78,6 +82,10 @@ final class PollingMethodConfigTest extends TestCase
         $this->assertSame('v2c', $v2cConfig->version);
         $this->assertSame('shared', $v2cConfig->community);
         $this->assertSame(1161, $v2cConfig->port);
+
+        $v1Config = $this->config($method, $v1);
+        $this->assertSame('v1', $v1Config->version); // a community may be used as v1
+        $this->assertSame('shared', $v1Config->community);
 
         $v3Config = $this->config($method, $v3);
         $this->assertSame('v3', $v3Config->version);
@@ -95,6 +103,35 @@ final class PollingMethodConfigTest extends TestCase
 
         // nothing stored, so the OS default is used rather than pinned
         $this->assertSame(3, $this->config(new SnmpPollingMethod, $this->deviceMethod(PollingMethodType::Snmp, device: $device))->maxRepeaters);
+    }
+
+    public function testSnmpBulkSettingIsUsedExceptForV1(): void
+    {
+        $method = new SnmpPollingMethod;
+        $community = ['community' => 'shared'];
+        $v3 = ['authlevel' => 'noAuthNoPriv', 'authname' => 'user1'];
+
+        $this->assertTrue($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, [], $community))->bulk);
+        $this->assertFalse($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['bulk' => false], $community))->bulk);
+        $this->assertFalse($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['bulk' => false], $v3))->bulk);
+
+        // v1 has no GETBULK, whatever the setting or OS default
+        $this->assertFalse($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['version' => 'v1'], $community))->bulk);
+        $this->assertFalse($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['version' => 'v1', 'bulk' => true], $community))->bulk);
+
+        // the version setting only applies to a community, so v3 keeps bulk
+        $this->assertTrue($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['version' => 'v1'], $v3))->bulk);
+    }
+
+    public function testSnmpBulkDefaultFollowsOsSetting(): void
+    {
+        LibrenmsConfig::set('os.test-os.snmp_bulk', false);
+        $device = new Device(['hostname' => 'example.com', 'os' => 'test-os']);
+        $method = new SnmpPollingMethod;
+
+        $this->assertFalse($method->defaults($device)['bulk']);
+        $this->assertFalse($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, device: $device))->bulk);
+        $this->assertTrue($this->config($method, $this->deviceMethod(PollingMethodType::Snmp, ['bulk' => true], device: $device))->bulk); // stored setting wins
     }
 
     public function testSnmpTransportDefaultFollowsConfig(): void
@@ -127,6 +164,47 @@ final class PollingMethodConfigTest extends TestCase
         $this->assertSame('lanplus', $config->type);
     }
 
+    public function testStoredBoolSettingsSelectTheirFormOption(): void
+    {
+        $definition = (new ProxmoxApiPollingMethod)->definition();
+
+        foreach (['1' => true, '0' => false] as $option => $stored) {
+            $values = $definition->formValues(['verify_ssl' => $stored]);
+
+            $this->assertSame((string) $option, $values['verify_ssl']);
+            $this->assertSame($stored, $definition->filterOverrides($values)['verify_ssl']);
+        }
+
+        $this->assertSame('', $definition->formValues([])['verify_ssl']); // the default
+    }
+
+    public function testProxmoxDefaultsAndToken(): void
+    {
+        $device = new Device(['hostname' => 'pve.example.com']);
+        $method = new ProxmoxApiPollingMethod;
+
+        $config = $this->config($method, $this->deviceMethod(PollingMethodType::ProxmoxApi, device: $device));
+        $this->assertSame('pve.example.com', $config->hostname);
+        $this->assertSame(8006, $config->port);
+        $this->assertSame(10, $config->timeout);
+        $this->assertTrue($config->verifySsl);
+        $this->assertSame('', $config->tokenId);
+
+        $config = $this->config($method, $this->deviceMethod(PollingMethodType::ProxmoxApi, [
+            'hostname' => '192.0.2.10',
+            'port' => 443,
+            'verify_ssl' => true,
+        ], [
+            'token_id' => 'librenms@pve!monitoring',
+            'token_secret' => 'abc123',
+        ], $device));
+        $this->assertSame('192.0.2.10', $config->hostname);
+        $this->assertSame(443, $config->port);
+        $this->assertTrue($config->verifySsl);
+        $this->assertSame('librenms@pve!monitoring', $config->tokenId);
+        $this->assertSame('abc123', $config->tokenSecret);
+    }
+
     public function testDeviceUsesConfiguredMethodOrDefault(): void
     {
         $icmp = $this->deviceMethod(PollingMethodType::Icmp, ['ip_version' => 'ipv6']);
@@ -137,8 +215,12 @@ final class PollingMethodConfigTest extends TestCase
         $this->assertSame('ipv6', $device->polling()->icmp()->ipVersion);
 
         $this->assertFalse($device->polling()->isEnabled(PollingMethodType::Ipmi));
-        $this->assertSame('192.0.2.1', $device->polling()->ipmi()->hostname);
-        $this->assertSame(6556, $device->polling()->unixAgent()->port);
+        $ipmi = $device->polling()->get(PollingMethodType::Ipmi);
+        $this->assertInstanceOf(IpmiConfig::class, $ipmi);
+        $this->assertSame('192.0.2.1', $ipmi->hostname);
+        $agent = $device->polling()->get(PollingMethodType::UnixAgent);
+        $this->assertInstanceOf(UnixAgentConfig::class, $agent);
+        $this->assertSame(6556, $agent->port);
     }
 
     public function testSnmpWithoutPollingMethodsUsesTheDefaults(): void
@@ -188,7 +270,10 @@ final class PollingMethodConfigTest extends TestCase
         ]);
         $deviceMethod->setRelation('device', $device ?? new Device(['hostname' => 'example.com']));
         $deviceMethod->setRelation('secret', $secretData === null ? null : new Secret([
-            'secret_type' => $type === PollingMethodType::Ipmi ? SecretType::Ipmi : SecretType::Snmp,
+            'secret_type' => match ($type) {
+                PollingMethodType::Snmp => isset($secretData['community']) ? SecretType::SnmpCommunity : SecretType::SnmpV3,
+                default => (new PollingMethodRegistry)->get($type)->secretTypes()[0],
+            },
             'data' => $secretData,
         ]));
 

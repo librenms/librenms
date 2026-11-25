@@ -6,7 +6,6 @@ use App\Facades\LibrenmsConfig;
 use App\Models\BgpPeer;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
-use LibreNMS\Util\Url;
 
 class RoutingSearchController extends GroupedSearchController
 {
@@ -35,7 +34,7 @@ class RoutingSearchController extends GroupedSearchController
                     $bgpPeer->bgpPeerState !== 'established' => 'tw:border-l-red-600!',
                     default => 'tw:border-l-green-600!',
                 },
-                'url' => Url::deviceUrl($bgpPeer->device, ['tab' => 'routing', 'proto' => 'bgp']),
+                'url' => route('device.routing.bgp', ['device' => $bgpPeer->device_id]),
             ]);
 
         return [$bgp->isEmpty() ? null : ['type' => 'bgp', 'label' => __('search.bgp_sessions'), 'results' => $bgp]];

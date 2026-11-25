@@ -3,7 +3,7 @@
 @section('content')
     <x-device.page :device="$device">
         <p>
-            <a href="{{ route('device', ['device' => $device, 'tab' => 'accesspoints']) }}">
+            <a href="{{ route('device.accesspoints', ['device' => $device]) }}">
                 <i class="fa fa-arrow-left" aria-hidden="true"></i>
                 {{ __('All access points') }}
             </a>

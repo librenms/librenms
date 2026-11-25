@@ -33,9 +33,24 @@ use LibreNMS\DB\Schema;
 class QueryBuilderFilter implements \JsonSerializable
 {
     private static $table_blacklist = [
-        'device_group_device',
-        'alerts',
+        'alert_device_map',
+        'alert_faults',
+        'alert_location_map',
         'alert_log',
+        'alerts',
+        'custom_map_backgrounds',
+        'dashboards',
+        'device_graphs',
+        'device_group_device',
+        'devices_group_perms',
+        'notifications',
+        'notifications_attribs',
+        'secrets',
+        'session',
+        'sessions',
+        'users',
+        'users_prefs',
+        'users_widgets',
     ];
 
     private $filter = [];

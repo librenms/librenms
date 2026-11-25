@@ -4,6 +4,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Device;
 use App\Models\EntPhysical;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
@@ -98,5 +99,22 @@ class Eurostor extends OS implements OSDiscovery
         }
 
         return $inventory;
+    }
+
+    /**
+     * Disk states are polled as strings
+     */
+    public function pollSensors(EloquentCollection $sensors): array
+    {
+        $states = ['RaidSet Member' => 1, 'Hot Spare' => 2, 'Failed' => 3];
+        $values = parent::pollSensors($sensors);
+
+        foreach ($sensors->where('sensor_class', 'state') as $sensor) {
+            if (isset($values[$sensor->sensor_id], $states[$values[$sensor->sensor_id]])) {
+                $values[$sensor->sensor_id] = $states[$values[$sensor->sensor_id]];
+            }
+        }
+
+        return $values;
     }
 }

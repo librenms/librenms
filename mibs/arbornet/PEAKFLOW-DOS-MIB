@@ -33,24 +33,27 @@ IMPORTS
 -- =================================================================================
 
 peakflowDosMIB MODULE-IDENTITY
-	LAST-UPDATED "201406240000Z" -- June 24, 2014
-	ORGANIZATION "Arbor Networks, Inc."
-	CONTACT-INFO
-		"	Arbor Networks, Inc.
-			Arbor Technical Assistance Center
+        LAST-UPDATED "201908270000Z" -- August 27, 2019
+        ORGANIZATION "NETSCOUT Systems, Inc."
+        CONTACT-INFO
+                "       NETSCOUT Systems, Inc.
+                        Arbor Technical Assistance Center
 
-			Postal: 76 Blanchard Road
-				Burlington, MA 01803
-				USA
+                        Postal: 310 Littleton Rd
+                                Westford, MA 01886
+                                USA
 
-			Tel: +1 866 212 7267 (toll free)
-			     +1 781 362 4300
-			Email: support@arbor.net "
+                        Tel: +1 866 272 6721 (toll free)
+                             +1 781 362 4301
+                        Email: support@arbor.net "
 
 	DESCRIPTION
 		"Peakflow DoS MIB"
 
 	-- Revision log, reverse chrono
+        REVISION    "201908270000Z" -- August 27, 2019
+        DESCRIPTION "Update contact info"
+
 	REVISION    "201511170000Z" -- November 17, 2015
 	DESCRIPTION "Add pdosAnomalyIpVersion to Anomaly notifications"
 

@@ -34,7 +34,7 @@ use LibreNMS\Data\Store\Datastore;
 class DatastoreServiceProvider extends ServiceProvider
 {
     protected $namespace = 'LibreNMS\\Data\\Store\\';
-    private const STORES = [
+    private const array STORES = [
         \LibreNMS\Data\Store\Graphite::class,
         \LibreNMS\Data\Store\InfluxDB::class,
         \LibreNMS\Data\Store\InfluxDBv2::class,
@@ -43,7 +43,7 @@ class DatastoreServiceProvider extends ServiceProvider
         \LibreNMS\Data\Store\Rrd::class,
         \LibreNMS\Data\Store\Kafka::class,
     ];
-    private const CLIENTS = [
+    private const array CLIENTS = [
         \InfluxDB\Database::class => [\LibreNMS\Data\Store\InfluxDB::class, 'createFromConfig'],
         \RdKafka\Producer::class => [\LibreNMS\Data\Store\Kafka::class, 'getClient'],
     ];

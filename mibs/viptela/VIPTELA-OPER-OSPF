@@ -1,5 +1,6 @@
 -- Namespace: http://viptela.com/oper-ospf
 
+
 VIPTELA-OPER-OSPF DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE,
@@ -9,15 +10,71 @@ IMPORTS
     TEXTUAL-CONVENTION, RowStatus, DateAndTime,
     TruthValue
         FROM SNMPv2-TC
-    viptela
+    viptela, VpnIndex
         FROM VIPTELA-GLOBAL
 ;
 
 viptela-oper-ospf MODULE-IDENTITY
-    LAST-UPDATED "201608100000Z"
+    LAST-UPDATED "202307010000Z"
     ORGANIZATION "Viptela, Inc."
     CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
     DESCRIPTION "This module defines the data model for OSPF operational data"
+    REVISION "202307010000Z"
+    DESCRIPTION "Viptela Revision 20.12"
+    REVISION "202303010000Z"
+    DESCRIPTION "Viptela Revision 20.11"
+    REVISION "202212150000Z"
+    DESCRIPTION "Viptela Revision 20.10"
+    REVISION "202206010000Z"
+    DESCRIPTION "Viptela Revision 20.9"
+    REVISION "202203010000Z"
+    DESCRIPTION "Viptela Revision 20.8"
+    REVISION "202111010000Z"
+    DESCRIPTION "Viptela Revision 20.7"
+    REVISION "202107010000Z"
+    DESCRIPTION "Viptela Revision 20.6"
+    REVISION "202103010000Z"
+    DESCRIPTION "Viptela Revision 20.5"
+    REVISION "202011010000Z"
+    DESCRIPTION "Viptela Revision 20.4"
+    REVISION "202007010000Z"
+    DESCRIPTION "Viptela Revision 20.3"
+    REVISION "202002240000Z"
+    DESCRIPTION "Viptela Revision 20.1"
+    REVISION "201911150000Z"
+    DESCRIPTION "Viptela Revision 19.3"
+    REVISION "201908150000Z"
+    DESCRIPTION "Viptela Revision 19.2"
+    REVISION "201811010000Z"
+    DESCRIPTION "Viptela Revision 18.4"
+    REVISION "201809200000Z"
+    DESCRIPTION "Viptela Revision 18.3.1"
+    REVISION "201806250000Z"
+    DESCRIPTION "Viptela Revision 18.3"
+    REVISION "201804250000Z"
+    DESCRIPTION "Viptela Revision 18.2"
+    REVISION "201803150000Z"
+    DESCRIPTION "Viptela Revision 18.1.1"
+    REVISION "201801160000Z"
+    DESCRIPTION "Viptela Revision 17.2.3"
+    REVISION "201708010000Z"
+    DESCRIPTION "Viptela Revision 17.2"
+    REVISION "201708010000Z"
+    DESCRIPTION "Viptela Revision 17.2"
+    REVISION "201705250000Z"
+    DESCRIPTION "Viptela Revision 17.1.1"
+    REVISION "201704060000Z"
+    DESCRIPTION "Viptela Revision 17.1"
+    REVISION "201702150000Z"
+    DESCRIPTION "Viptela Revision 16.3.2"
+    REVISION "201702060000Z"
+    DESCRIPTION "Viptela Revision 16.3.1"
+    REVISION "201611160000Z"
+    DESCRIPTION "Viptela Revision 16.3"
+    REVISION "201610250000Z"
+    DESCRIPTION "Viptela Revision 16.2.10"
+    REVISION "201610240000Z"
+    DESCRIPTION "Viptela Revision 16.2.4"
     REVISION "201608100000Z"
     DESCRIPTION "Viptela Revision 16.2.2"
     REVISION "201608010000Z"
@@ -127,7 +184,7 @@ OspfNeighborEntry ::=
 
 -- tagpath /ospf/neighbor/vpn-id
 ospfNeighborVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -354,7 +411,7 @@ OspfInterfaceEntry ::=
 
 -- tagpath /ospf/interface/vpn-id
 ospfInterfaceVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -592,7 +649,7 @@ ospfInterfaceMd5Key OBJECT-TYPE
     DESCRIPTION "MD5 key (hashed)"
     ::= { ospfInterfaceEntry 30 }
 
--- tagpath /ospf/database
+-- tagpath /ospf/lsa-database
 ospfDatabaseTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF OspfDatabaseEntry
     MAX-ACCESS  not-accessible
@@ -600,7 +657,7 @@ ospfDatabaseTable OBJECT-TYPE
     DESCRIPTION "LSA database"
     ::= { viptela-oper-ospf 4 }
 
--- tagpath /ospf/database
+-- tagpath /ospf/lsa-database
 ospfDatabaseEntry OBJECT-TYPE
     SYNTAX      OspfDatabaseEntry
     MAX-ACCESS  not-accessible
@@ -634,15 +691,15 @@ OspfDatabaseEntry ::=
         ospfDatabaseLinkCount Unsigned32
     }
 
--- tagpath /ospf/database/vpn-id
+-- tagpath /ospf/lsa-database/vpn-id
 ospfDatabaseVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
     ::= { ospfDatabaseEntry 1 }
 
--- tagpath /ospf/database/area
+-- tagpath /ospf/lsa-database/area
 ospfDatabaseArea OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  not-accessible
@@ -650,7 +707,7 @@ ospfDatabaseArea OBJECT-TYPE
     DESCRIPTION "Area"
     ::= { ospfDatabaseEntry 2 }
 
--- tagpath /ospf/database/lsa-type
+-- tagpath /ospf/lsa-database/lsa-type
 ospfDatabaseLsaType OBJECT-TYPE
     SYNTAX      INTEGER {unknown(0),router(1),network(2),summary(3),asbr-summary(4),external(5),group-member(6),nssa-external(7),type-ext-attributes(8),link-local-opaque(9),area-local-opaque(10),as-external-opaque(11)}
     MAX-ACCESS  not-accessible
@@ -658,7 +715,7 @@ ospfDatabaseLsaType OBJECT-TYPE
     DESCRIPTION "Link type"
     ::= { ospfDatabaseEntry 3 }
 
--- tagpath /ospf/database/link-id
+-- tagpath /ospf/lsa-database/link-id
 ospfDatabaseLinkId OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  not-accessible
@@ -666,7 +723,7 @@ ospfDatabaseLinkId OBJECT-TYPE
     DESCRIPTION "Link state ID"
     ::= { ospfDatabaseEntry 4 }
 
--- tagpath /ospf/database/adv-router
+-- tagpath /ospf/lsa-database/adv-router
 ospfDatabaseAdvRouter OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  not-accessible
@@ -674,7 +731,7 @@ ospfDatabaseAdvRouter OBJECT-TYPE
     DESCRIPTION "Advertising router"
     ::= { ospfDatabaseEntry 5 }
 
--- tagpath /ospf/database/checksum
+-- tagpath /ospf/lsa-database/checksum
 ospfDatabaseChecksum OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
@@ -682,7 +739,7 @@ ospfDatabaseChecksum OBJECT-TYPE
     DESCRIPTION "Checksum"
     ::= { ospfDatabaseEntry 6 }
 
--- tagpath /ospf/database/age
+-- tagpath /ospf/lsa-database/age
 ospfDatabaseAge OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
@@ -690,7 +747,7 @@ ospfDatabaseAge OBJECT-TYPE
     DESCRIPTION "Age"
     ::= { ospfDatabaseEntry 7 }
 
--- tagpath /ospf/database/sequence
+-- tagpath /ospf/lsa-database/sequence
 ospfDatabaseSequence OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
@@ -698,7 +755,7 @@ ospfDatabaseSequence OBJECT-TYPE
     DESCRIPTION "Sequence"
     ::= { ospfDatabaseEntry 8 }
 
--- tagpath /ospf/database/length
+-- tagpath /ospf/lsa-database/length
 ospfDatabaseLength OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
@@ -706,7 +763,7 @@ ospfDatabaseLength OBJECT-TYPE
     DESCRIPTION "Length"
     ::= { ospfDatabaseEntry 9 }
 
--- tagpath /ospf/database/options
+-- tagpath /ospf/lsa-database/options
 ospfDatabaseOptions OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
@@ -714,7 +771,7 @@ ospfDatabaseOptions OBJECT-TYPE
     DESCRIPTION "Options"
     ::= { ospfDatabaseEntry 10 }
 
--- tagpath /ospf/database/options-flags
+-- tagpath /ospf/lsa-database/options-flags
 ospfDatabaseOptionsFlags OBJECT-TYPE
     SYNTAX      OspfNeighborOptions
     MAX-ACCESS  read-only
@@ -722,7 +779,7 @@ ospfDatabaseOptionsFlags OBJECT-TYPE
     DESCRIPTION "Options flags"
     ::= { ospfDatabaseEntry 11 }
 
--- tagpath /ospf/database/flags
+-- tagpath /ospf/lsa-database/flags
 ospfDatabaseFlags OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
@@ -730,7 +787,7 @@ ospfDatabaseFlags OBJECT-TYPE
     DESCRIPTION "Flags"
     ::= { ospfDatabaseEntry 12 }
 
--- tagpath /ospf/database/rlsa-flags
+-- tagpath /ospf/lsa-database/rlsa-flags
 ospfDatabaseRlsaFlags OBJECT-TYPE
     SYNTAX      OspfDbRlsaFlags
     MAX-ACCESS  read-only
@@ -738,7 +795,7 @@ ospfDatabaseRlsaFlags OBJECT-TYPE
     DESCRIPTION "Router LSA flags (valid for router) (ABR, ASBR, NT, shortcut ABR, Type-7, Virtual"
     ::= { ospfDatabaseEntry 13 }
 
--- tagpath /ospf/database/rlsa-flags-value
+-- tagpath /ospf/lsa-database/rlsa-flags-value
 ospfDatabaseRlsaFlagsValue OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
@@ -746,7 +803,7 @@ ospfDatabaseRlsaFlagsValue OBJECT-TYPE
     DESCRIPTION "Router LSA flags value (valid for router)"
     ::= { ospfDatabaseEntry 14 }
 
--- tagpath /ospf/database/prefix
+-- tagpath /ospf/lsa-database/prefix
 ospfDatabasePrefix OBJECT-TYPE
     SYNTAX      Ipv4Prefix
     MAX-ACCESS  read-only
@@ -754,7 +811,7 @@ ospfDatabasePrefix OBJECT-TYPE
     DESCRIPTION "Prefix"
     ::= { ospfDatabaseEntry 15 }
 
--- tagpath /ospf/database/tag
+-- tagpath /ospf/lsa-database/tag
 ospfDatabaseTag OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
@@ -762,7 +819,7 @@ ospfDatabaseTag OBJECT-TYPE
     DESCRIPTION "Tag"
     ::= { ospfDatabaseEntry 16 }
 
--- tagpath /ospf/database/metric-type
+-- tagpath /ospf/lsa-database/metric-type
 ospfDatabaseMetricType OBJECT-TYPE
     SYNTAX      INTEGER {type1(0),type2(1)}
     MAX-ACCESS  read-only
@@ -770,7 +827,7 @@ ospfDatabaseMetricType OBJECT-TYPE
     DESCRIPTION "Metric type"
     ::= { ospfDatabaseEntry 17 }
 
--- tagpath /ospf/database/mask
+-- tagpath /ospf/lsa-database/mask
 ospfDatabaseMask OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-only
@@ -778,7 +835,7 @@ ospfDatabaseMask OBJECT-TYPE
     DESCRIPTION "Mask"
     ::= { ospfDatabaseEntry 18 }
 
--- tagpath /ospf/database/metric
+-- tagpath /ospf/lsa-database/metric
 ospfDatabaseMetric OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
@@ -786,7 +843,7 @@ ospfDatabaseMetric OBJECT-TYPE
     DESCRIPTION "Metric"
     ::= { ospfDatabaseEntry 19 }
 
--- tagpath /ospf/database/forwarding-addr
+-- tagpath /ospf/lsa-database/forwarding-addr
 ospfDatabaseForwardingAddr OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-only
@@ -794,7 +851,7 @@ ospfDatabaseForwardingAddr OBJECT-TYPE
     DESCRIPTION "Forwarding address"
     ::= { ospfDatabaseEntry 20 }
 
--- tagpath /ospf/database/link-count
+-- tagpath /ospf/lsa-database/link-count
 ospfDatabaseLinkCount OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
@@ -802,7 +859,7 @@ ospfDatabaseLinkCount OBJECT-TYPE
     DESCRIPTION "Router links"
     ::= { ospfDatabaseEntry 21 }
 
--- tagpath /ospf/database/router-link
+-- tagpath /ospf/lsa-database/router-link
 ospfDatabaseRouterLinkTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF OspfDatabaseRouterLinkEntry
     MAX-ACCESS  not-accessible
@@ -810,7 +867,7 @@ ospfDatabaseRouterLinkTable OBJECT-TYPE
     DESCRIPTION "List of router links"
     ::= { viptela-oper-ospf 5 }
 
--- tagpath /ospf/database/router-link
+-- tagpath /ospf/lsa-database/router-link
 ospfDatabaseRouterLinkEntry OBJECT-TYPE
     SYNTAX      OspfDatabaseRouterLinkEntry
     MAX-ACCESS  not-accessible
@@ -828,7 +885,7 @@ OspfDatabaseRouterLinkEntry ::=
         ospfDatabaseRouterLinkRouterLinkType INTEGER
     }
 
--- tagpath /ospf/database/router-link/link-index
+-- tagpath /ospf/lsa-database/router-link/link-index
 ospfDatabaseRouterLinkLinkIndex OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  not-accessible
@@ -836,7 +893,7 @@ ospfDatabaseRouterLinkLinkIndex OBJECT-TYPE
     DESCRIPTION "Link Index"
     ::= { ospfDatabaseRouterLinkEntry 1 }
 
--- tagpath /ospf/database/router-link/router-link-id
+-- tagpath /ospf/lsa-database/router-link/router-link-id
 ospfDatabaseRouterLinkRouterLinkId OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-only
@@ -844,7 +901,7 @@ ospfDatabaseRouterLinkRouterLinkId OBJECT-TYPE
     DESCRIPTION "Link ID"
     ::= { ospfDatabaseRouterLinkEntry 2 }
 
--- tagpath /ospf/database/router-link/data
+-- tagpath /ospf/lsa-database/router-link/data
 ospfDatabaseRouterLinkData OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-only
@@ -852,7 +909,7 @@ ospfDatabaseRouterLinkData OBJECT-TYPE
     DESCRIPTION "Link Data"
     ::= { ospfDatabaseRouterLinkEntry 3 }
 
--- tagpath /ospf/database/router-link/tos-metric
+-- tagpath /ospf/lsa-database/router-link/tos-metric
 ospfDatabaseRouterLinkTosMetric OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
@@ -860,7 +917,7 @@ ospfDatabaseRouterLinkTosMetric OBJECT-TYPE
     DESCRIPTION "TOS metric"
     ::= { ospfDatabaseRouterLinkEntry 4 }
 
--- tagpath /ospf/database/router-link/router-link-type
+-- tagpath /ospf/lsa-database/router-link/router-link-type
 ospfDatabaseRouterLinkRouterLinkType OBJECT-TYPE
     SYNTAX      INTEGER {point-to-point(0),transit(1),stub(2)}
     MAX-ACCESS  read-only
@@ -868,7 +925,7 @@ ospfDatabaseRouterLinkRouterLinkType OBJECT-TYPE
     DESCRIPTION "Link type"
     ::= { ospfDatabaseRouterLinkEntry 5 }
 
--- tagpath /ospf/database/network-link
+-- tagpath /ospf/lsa-database/network-link
 ospfDatabaseNetworkLinkTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF OspfDatabaseNetworkLinkEntry
     MAX-ACCESS  not-accessible
@@ -876,7 +933,7 @@ ospfDatabaseNetworkLinkTable OBJECT-TYPE
     DESCRIPTION "List of network links"
     ::= { viptela-oper-ospf 6 }
 
--- tagpath /ospf/database/network-link
+-- tagpath /ospf/lsa-database/network-link
 ospfDatabaseNetworkLinkEntry OBJECT-TYPE
     SYNTAX      OspfDatabaseNetworkLinkEntry
     MAX-ACCESS  not-accessible
@@ -891,7 +948,7 @@ OspfDatabaseNetworkLinkEntry ::=
         ospfDatabaseNetworkLinkNetworkLinkId IpAddress
     }
 
--- tagpath /ospf/database/network-link/link-index
+-- tagpath /ospf/lsa-database/network-link/link-index
 ospfDatabaseNetworkLinkLinkIndex OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  not-accessible
@@ -899,7 +956,7 @@ ospfDatabaseNetworkLinkLinkIndex OBJECT-TYPE
     DESCRIPTION "Link Index"
     ::= { ospfDatabaseNetworkLinkEntry 1 }
 
--- tagpath /ospf/database/network-link/network-link-id
+-- tagpath /ospf/lsa-database/network-link/network-link-id
 ospfDatabaseNetworkLinkNetworkLinkId OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-only
@@ -946,7 +1003,7 @@ OspfExternalDatabaseEntry ::=
 
 -- tagpath /ospf/external-database/vpn-id
 ospfExternalDatabaseVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -1098,7 +1155,7 @@ OspfRoutesTableEntry ::=
 
 -- tagpath /ospf/routes-table/vpn-id
 ospfRoutesTableVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -1255,14 +1312,14 @@ OspfDatabaseSummaryEntry ::=
         ospfDatabaseSummaryRouterLsa Unsigned32,
         ospfDatabaseSummaryNetworkLsa Unsigned32,
         ospfDatabaseSummarySummaryLsa Unsigned32,
-        ospfDatabaseSummaryAsExternalLsa Unsigned32,
+        ospfDatabaseSummaryAsbrSummaryLsa Unsigned32,
         ospfDatabaseSummaryNssaLsa Unsigned32,
         ospfDatabaseSummaryTotalLsa Unsigned32
     }
 
 -- tagpath /ospf/database-summary/vpn-id
 ospfDatabaseSummaryVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -1300,12 +1357,12 @@ ospfDatabaseSummarySummaryLsa OBJECT-TYPE
     DESCRIPTION "Summary LSA count"
     ::= { ospfDatabaseSummaryEntry 5 }
 
--- tagpath /ospf/database-summary/as-external-lsa
-ospfDatabaseSummaryAsExternalLsa OBJECT-TYPE
+-- tagpath /ospf/database-summary/asbr-summary-lsa
+ospfDatabaseSummaryAsbrSummaryLsa OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "AS external LSA count"
+    DESCRIPTION "ASBR summary LSA count"
     ::= { ospfDatabaseSummaryEntry 6 }
 
 -- tagpath /ospf/database-summary/nssa-lsa
@@ -1377,7 +1434,7 @@ OspfProcessEntry ::=
 
 -- tagpath /ospf/process/vpn-id
 ospfProcessVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"

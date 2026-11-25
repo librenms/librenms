@@ -16,16 +16,15 @@
         var grid = $("#alertlog-stats-{{ $id }}").bootgrid({
             ajax: true,
             rowCount: [50, 100, 250, -1],
-            navigation: ! {{ $hidenavigation }},
+            navigation: @json(! $hidenavigation),
             post: function () {
                 return {
-                    id: "alertlog-stats",
                     device_id: "",
-                    min_severity: '{{ $min_severity }}',
-                    time_interval: '{{ $time_interval }}'
+                    min_severity: @json($min_severity),
+                    time_interval: @json($time_interval)
                 };
             },
-            url: "ajax_table.php"
+            url: "{{ route('table.alertlog-stats') }}"
         });
 
         $('#alertlog-stats_container-{{ $id }}').on('refresh', function (event) {

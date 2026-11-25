@@ -13,7 +13,6 @@
 
 use App\Models\Device;
 
-$init_modules = [];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 ?>

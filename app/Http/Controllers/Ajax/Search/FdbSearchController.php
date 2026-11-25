@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Mac;
-use LibreNMS\Util\Url;
 
 class FdbSearchController extends GroupedSearchController
 {
@@ -29,7 +28,7 @@ class FdbSearchController extends GroupedSearchController
             ->groupBy('port_id');
 
         $fdb = PortsFdb::hasAccess($user)
-            ->select(['ports_fdb.ports_fdb_id', 'ports_fdb.mac_address', 'ports_fdb.port_id', 'ports_fdb.device_id', 'ports_fdb.vlan_id', 'mac_counts.mac_count'])
+            ->select(['ports_fdb.ports_fdb_id', 'ports_fdb.mac_address', 'ports_fdb.port_id', 'ports_fdb.device_id', 'ports_fdb.vlan', 'mac_counts.mac_count'])
             ->joinSub($macCountSubquery, 'mac_counts', function ($join): void {
                 $join->on('ports_fdb.port_id', '=', 'mac_counts.port_id');
             })
@@ -73,7 +72,7 @@ class FdbSearchController extends GroupedSearchController
                     ])),
                     'icon' => 'fa fa-plug',
                     'status' => $isConnected ? 'tw:border-l-green-600!' : null,
-                    'url' => Url::generate(['page' => 'search', 'search' => 'fdb', 'searchPhrase' => $portsFdb->mac_address]),
+                    'url' => route('search', ['q' => Mac::parse($portsFdb->mac_address)->readable()]),
                 ];
             });
 
@@ -81,6 +80,11 @@ class FdbSearchController extends GroupedSearchController
             return [null];
         }
 
-        return [['type' => 'fdb_tables', 'label' => __('search.fdb_tables'), 'results' => $fdb]];
+        return [[
+            'type' => 'fdb_tables',
+            'label' => __('search.fdb_tables'),
+            'url' => $this->addressSearchUrl($search, 'fdb'),
+            'results' => $fdb,
+        ]];
     }
 }
