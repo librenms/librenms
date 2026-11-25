@@ -111,15 +111,15 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="customoid-limit" class="col-sm-3 control-label">{{ __('Alert High') }}</label>
+                        <label for="customoid-limit" class="col-sm-3 control-label">{{ __('High Alert') }}</label>
                         <div class="col-sm-3"><input type="number" step="any" id="customoid-limit" class="form-control" x-model="form.limit"></div>
-                        <label for="customoid-limit-low" class="col-sm-3 control-label">{{ __('Alert Low') }}</label>
+                        <label for="customoid-limit-low" class="col-sm-3 control-label">{{ __('Low Alert') }}</label>
                         <div class="col-sm-3"><input type="number" step="any" id="customoid-limit-low" class="form-control" x-model="form.limit_low"></div>
                     </div>
                     <div class="form-group">
-                        <label for="customoid-limit-warn" class="col-sm-3 control-label">{{ __('Warning High') }}</label>
+                        <label for="customoid-limit-warn" class="col-sm-3 control-label">{{ __('High Warning') }}</label>
                         <div class="col-sm-3"><input type="number" step="any" id="customoid-limit-warn" class="form-control" x-model="form.limit_warn"></div>
-                        <label for="customoid-limit-low-warn" class="col-sm-3 control-label">{{ __('Warning Low') }}</label>
+                        <label for="customoid-limit-low-warn" class="col-sm-3 control-label">{{ __('Low Warning') }}</label>
                         <div class="col-sm-3"><input type="number" step="any" id="customoid-limit-low-warn" class="form-control" x-model="form.limit_low_warn"></div>
                     </div>
                     <div class="form-group">
