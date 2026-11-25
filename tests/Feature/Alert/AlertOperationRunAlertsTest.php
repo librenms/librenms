@@ -132,9 +132,10 @@ final class AlertOperationRunAlertsTest extends TestCase
             ['transport_id' => null, 'transport_type' => 'legacyArrayTest', 'transport_name' => 'Legacy transport'],
         ]);
 
-        $this->assertSame($device->hostname, $transport::$payload['alert']->get('hostname'));
+        $this->assertSame($device->hostname, $transport::$payload['hostname']);
+        $this->assertSame($device->hostname, $transport::$payload['alert']->hostname);
         $this->assertArrayHasKey('msg', $transport::$payload);
-        $this->assertFalse($transport::$payload['alert']->has('msg'));
+        $this->assertArrayHasKey('template', $transport::$payload);
     }
 
     public function testActiveAlertIssuesDueSegmentTransportAndRespectsTimer(): void

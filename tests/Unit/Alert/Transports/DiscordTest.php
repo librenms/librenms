@@ -184,7 +184,7 @@ final class DiscordTest extends TestCase
         /** @var Device $mock_device */
         $mock_device = Device::factory()->make(['hostname' => 'my-hostname.com']);
 
-        $alert_data = AlertData::testData($mock_device)->with(['msg' => 'This test alert should not have image <img class="librenms-graph" src="google.jpeg" /> or <h2>html tags</h2></br>']);
+        $alert_data = AlertData::testData($mock_device, ['msg' => 'This test alert should not have image <img class="librenms-graph" src="google.jpeg" /> or <h2>html tags</h2></br>']);
 
         $transport->deliver($alert_data);
 

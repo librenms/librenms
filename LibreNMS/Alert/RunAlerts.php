@@ -255,9 +255,7 @@ class RunAlerts
             $obj['escalation_step'] = 1;
         }
 
-        $alertData = new AlertData($obj);
-
-        return $alertData->with(['template' => (new Template)->getTemplate($alertData->rule_id)]);
+        return new AlertData($obj);
     }
 
     public function clearStaleAlerts()
@@ -816,23 +814,19 @@ class RunAlerts
             if (class_exists($class)) {
                 //FIXME remove Deprecated transport
                 $transport_title = "Transport {$item['transport_type']}";
-                $transportAlert = $alert->with([
-                    'transport' => $item['transport_type'],
-                    'transport_name' => $item['transport_name'],
-                ]);
                 c_echo(" :: $transport_title => ");
                 try {
-                    $transportAlert = $type->render($transportAlert);
+                    $transportAlert = $alert->forTransport($item['transport_type'], $item['transport_name'], $type);
                     $instance = new $class(AlertTransport::find($item['transport_id']));
                     $tmp = $instance instanceof AlertTransportInterface
                         ? $instance->deliver($transportAlert)
-                        : $instance->deliverAlert($transportAlert->toTransportPayload());
-                    $this->alertLog($tmp, $transportAlert, $transportAlert->transport);
+                        : $instance->deliverAlert($transportAlert->toTransportPayload($type->getTemplate($alert->rule_id)));
+                    $this->alertLog($tmp, $alert, $item['transport_type']);
                 } catch (AlertTransportDeliveryException $e) {
-                    Log::warning("Alert transport '{$transportAlert->transport}' delivery failed for device {$transportAlert->device_id}: {$e->getMessage()}", ['exception' => $e]);
-                    $this->alertLog($e->getMessage(), $transportAlert, $transportAlert->transport);
+                    Log::warning("Alert transport '{$item['transport_type']}' delivery failed for device {$alert->device_id}: {$e->getMessage()}", ['exception' => $e]);
+                    $this->alertLog($e->getMessage(), $alert, $item['transport_type']);
                 } catch (\Throwable $e) {
-                    $this->alertLog($e, $transportAlert, $transportAlert->transport);
+                    $this->alertLog($e, $alert, $item['transport_type']);
                 }
                 unset($instance);
                 echo PHP_EOL;

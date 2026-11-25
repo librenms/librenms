@@ -54,7 +54,7 @@ class Splunk extends Transport implements AlertTransport
 
         $ignore = ['template', 'contacts', 'rule', 'string', 'debug', 'faults', 'builder', 'transport', 'alert', 'msg', 'transport_name'];
         $splunk_prefix = '<' . $severity . '> ';
-        $fields = $alert_data->toArray();
+        $fields = $alert_data->toTransportPayload();
         foreach ($fields as $key => $val) {
             if (in_array($key, $ignore)) {
                 continue;

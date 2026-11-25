@@ -144,23 +144,6 @@ final class AlertDataTest extends TestCase
         $this->assertSame('Default Mail', $alert->transport_name);
     }
 
-    public function testConstructFromSelf(): void
-    {
-        $original = new AlertData(['hostname' => 'switch1', 'device_id' => 5]);
-        $copy = new AlertData($original);
-
-        $this->assertSame('switch1', $copy->hostname);
-        $this->assertSame(5, $copy->device_id);
-    }
-
-    public function testFromArrayStaticMethod(): void
-    {
-        $alert = AlertData::fromArray(['hostname' => 'switch2', 'severity' => 'warning']);
-
-        $this->assertSame('switch2', $alert->hostname);
-        $this->assertSame('warning', $alert->severity);
-    }
-
     public function testArrayAccess(): void
     {
         $alert = new AlertData(['hostname' => 'server1', 'title' => 'Initial Title']);
@@ -199,19 +182,37 @@ final class AlertDataTest extends TestCase
         $alert->title = 'Updated Title'; // @phpstan-ignore assign.propertyPrivateSet
     }
 
-    public function testWithReturnsChangedCopy(): void
+    public function testForTransportRendersTitleThenBody(): void
     {
-        $alert = new AlertData(['hostname' => 'server1', 'title' => 'Initial Title']);
+        $alert = new AlertData(['hostname' => 'router1', 'state' => AlertState::ACTIVE]);
+        $template = new Template;
+        $template->template = new AlertTemplate([
+            'title' => '{{ $alert->hostname }} via {{ $alert->transport }}',
+            'template' => '{{ $alert->title }} ({{ $alert->transport_name }})',
+        ]);
 
-        $changed = $alert->with(['title' => 'Updated Title', 'msg' => null, 'not_a_field' => 'ignored']);
+        $forTransport = $alert->forTransport('mail', 'Ops Mail', $template);
 
-        $this->assertNotSame($alert, $changed);
-        $this->assertSame('Initial Title', $alert->title);
-        $this->assertSame('Updated Title', $changed->title);
-        $this->assertSame('server1', $changed->hostname);
-        $this->assertArrayNotHasKey('msg', $alert->toArray());
-        $this->assertArrayHasKey('msg', $changed->toArray());
-        $this->assertArrayNotHasKey('not_a_field', $changed->toArray());
+        $this->assertNotSame($alert, $forTransport);
+        $this->assertNull($alert->transport);
+        $this->assertNull($alert->title);
+        $this->assertSame('mail', $forTransport->transport);
+        $this->assertSame('Ops Mail', $forTransport->transport_name);
+        $this->assertSame('router1 via mail', $forTransport->title);
+        $this->assertSame('router1 via mail (Ops Mail)', $forTransport->msg);
+    }
+
+    public function testTransportPayloadIncludesTemplateAndAlert(): void
+    {
+        $alert = new AlertData(['hostname' => 'router1', 'msg' => 'down']);
+        $template = new AlertTemplate(['name' => 'Custom']);
+
+        $payload = $alert->toTransportPayload($template);
+
+        $this->assertSame('router1', $payload['hostname']);
+        $this->assertSame('down', $payload['msg']);
+        $this->assertSame($template, $payload['template']);
+        $this->assertSame($alert, $payload['alert']);
     }
 
     public function testUndefinedPropertyFallback(): void
@@ -239,22 +240,6 @@ final class AlertDataTest extends TestCase
         $this->assertSame('host1', $decoded['hostname']);
         $this->assertSame(10, $decoded['device_id']);
         $this->assertArrayNotHasKey('faults', $decoded);
-    }
-
-    public function testTemplateRenderingSupportsCollectionMethods(): void
-    {
-        $alert = new AlertData([
-            'hostname' => 'router.example.com',
-            'state' => AlertState::ACTIVE,
-            'template' => new AlertTemplate([
-                'title' => '{{ $alert->get("hostname") }}',
-                'template' => '{{ $alert->only(["hostname"])->get("hostname") }}',
-            ]),
-        ]);
-
-        $template = new Template;
-        $this->assertSame('router.example.com', $template->getTitle($alert));
-        $this->assertSame('router.example.com', $template->getBody($alert));
     }
 
     public function testTestData(): void
@@ -303,10 +288,11 @@ final class AlertDataTest extends TestCase
         ]);
 
         $template = new Template;
-        $alert = $alert->with(['title' => $template->getTitle($alert)]);
+        $template->template = new AlertTemplate(['name' => 'Default Alert Template']);
+        $alert = $alert->forTransport(null, null, $template);
         $this->assertSame('Alert for device core-router - Down Rule', $alert->title);
 
-        $body = $template->getBody($alert);
+        $body = $alert->msg;
         $this->assertStringContainsString('Alert for device core-router - Down Rule', $body);
         $this->assertStringContainsString('Severity: critical', $body);
         $this->assertStringContainsString('Unique-ID: 123', $body);

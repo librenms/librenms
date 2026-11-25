@@ -102,7 +102,6 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
     public private(set) ?string $transport_name = null;
     public private(set) ?string $operation_phase = null;
     public private(set) ?int $escalation_step = null;
-    public private(set) ?AlertTemplate $template = null;
     /** @var array<string, mixed>|null */
     public private(set) ?array $info = null;
     public private(set) mixed $extra = null;
@@ -112,40 +111,28 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
     private array $providedFields = [];
 
     /**
-     * @param  array<string, mixed>|self  $data
+     * @param  array<string, mixed>  $data
      */
-    public function __construct(array|self $data = [])
+    public function __construct(array $data = [])
     {
-        if ($data instanceof self) {
-            $data = $data->toArray();
-        }
-
         foreach ($data as $key => $value) {
             $this->set($key, $value);
         }
     }
 
     /**
-     * Return a copy with the given fields changed. AlertData itself is never modified.
-     *
-     * @param  array<string, mixed>  $changes
+     * The alert as sent to one transport: the transport fields, then the rendered
+     * title, then the rendered body (which may use the title and transport).
      */
-    public function with(array $changes): static
+    public function forTransport(?string $transport, ?string $transportName, Template $template): self
     {
-        $copy = clone $this;
-        foreach ($changes as $key => $value) {
-            $copy->set($key, $value);
-        }
+        $alert = clone $this;
+        $alert->set('transport', $transport);
+        $alert->set('transport_name', $transportName);
+        $alert->set('title', $template->getTitle($alert));
+        $alert->set('msg', $template->getBody($alert));
 
-        return $copy;
-    }
-
-    /**
-     * @param  array<string, mixed>|self  $data
-     */
-    public static function fromArray(array|self $data): self
-    {
-        return new self($data);
+        return $alert;
     }
 
     public function __get(string $name): mixed
@@ -175,12 +162,12 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
 
     public function offsetSet(mixed $offset, mixed $value): never
     {
-        throw new LogicException('AlertData is immutable, use with() to get a changed copy');
+        throw new LogicException('AlertData is immutable');
     }
 
     public function offsetUnset(mixed $offset): never
     {
-        throw new LogicException('AlertData is immutable, use with() to get a changed copy');
+        throw new LogicException('AlertData is immutable');
     }
 
     private function set(mixed $key, mixed $value): void
@@ -209,16 +196,15 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
     }
 
     /**
-     * The full alert payload used by existing integrations.
+     * The array payload for legacy transports that only implement deliverAlert().
      *
      * @return array<string, mixed>
      */
-    public function toTransportPayload(): array
+    public function toTransportPayload(?AlertTemplate $template = null): array
     {
         $payload = $this->toArray();
-        $templateData = $payload;
-        unset($templateData['msg']);
-        $payload['alert'] = new TemplateAlertData($templateData);
+        $payload['template'] = $template;
+        $payload['alert'] = $this;
 
         return $payload;
     }
@@ -232,9 +218,9 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
     }
 
     /**
-     * @param  array<int|string, mixed>  $faults
+     * @param  array<string, mixed>  $overrides  fields to set instead of the test values
      */
-    public static function testData(Device $device, array $faults = []): self
+    public static function testData(Device $device, array $overrides = []): self
     {
         return new self([
             'hostname' => $device->hostname,
@@ -266,7 +252,7 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
             'proc' => 'This is the procedure for the test alert',
             'rule_id' => 0,
             'id' => 0,
-            'faults' => $faults,
+            'faults' => [],
             'uid' => 0,
             'severity' => 'critical',
             'rule' => 'macros.device = 1',
@@ -277,6 +263,7 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
             'state' => AlertState::ACTIVE,
             'msg' => 'This is a test alert',
             'builder' => '{}',
+            ...$overrides,
         ]);
     }
 }

@@ -14,9 +14,8 @@ pass the unit tests:
 `deliver(AlertData $alert_data)` - the alert code calls this
 function to start the transport. It receives a `LibreNMS\Alert\AlertData`
 object. Read fields with `$alert_data->title` or `$alert_data['title']`.
-`AlertData` cannot be changed; use `$alert_data->with([...])` to get a
-changed copy. In this function, prepare the transport configuration for
-use.
+`AlertData` cannot be changed. In this function, prepare the transport
+configuration for use.
 
 Older transports do not implement `AlertTransport`. They implement
 `deliverAlert(array $alert_data)` instead of `deliver()` and receive the

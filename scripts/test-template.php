@@ -37,13 +37,8 @@ if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
         echo "Failed to describe alert.\n";
         exit(2);
     }
-    if (isset($options['p'])) {
-        $alert = $alert->with(['transport' => $options['p']]);
-    }
-    $alert = (new Template)->render($alert);
-    $output = $alert->toArray();
-    unset($output['template']);
-    print_r($output);
+    $alert = $alert->forTransport($options['p'] ?? null, null, new Template);
+    echo json_encode($alert, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . PHP_EOL;
 } else {
     c_echo('
 Usage:

@@ -74,7 +74,7 @@ final class SignalgridTest extends TestCase
         /** @var Device $mock_device */
         $mock_device = Device::factory()->make();
 
-        $alert_data = AlertData::testData($mock_device)->with(['severity' => 'warning']);
+        $alert_data = AlertData::testData($mock_device, ['severity' => 'warning']);
 
         $transport->deliver($alert_data);
 
@@ -100,7 +100,7 @@ final class SignalgridTest extends TestCase
         /** @var Device $mock_device */
         $mock_device = Device::factory()->make();
 
-        $alert_data = AlertData::testData($mock_device)->with(['state' => AlertState::RECOVERED]);
+        $alert_data = AlertData::testData($mock_device, ['state' => AlertState::RECOVERED]);
 
         $transport->deliver($alert_data);
 

@@ -19,7 +19,6 @@ use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\LegacyTemplateConverter;
-use LibreNMS\Alert\TemplateAlertData;
 use Throwable;
 
 class AlertTemplateController extends Controller
@@ -210,7 +209,7 @@ class AlertTemplateController extends Controller
             'proc' => '',
             'invert_map' => 0,
             'notes' => '',
-            'alert' => new TemplateAlertData(AlertData::testData($device)),
+            'alert' => AlertData::testData($device),
         ];
 
         foreach (['template', 'title', 'title_rec'] as $field) {

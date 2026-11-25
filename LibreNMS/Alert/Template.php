@@ -54,16 +54,6 @@ class Template
         return $this->template;
     }
 
-    /**
-     * Render the title, then the body (which may reference the title).
-     */
-    public function render(AlertData $alert): AlertData
-    {
-        $alert = $alert->with(['title' => $this->getTitle($alert)]);
-
-        return $alert->with(['msg' => $this->getBody($alert)]);
-    }
-
     public function getTitle(AlertData $alert): string
     {
         return $this->bladeTitle($alert);
@@ -79,9 +69,10 @@ class Template
      */
     public function bladeBody(AlertData $alert): string
     {
-        $templateBody = $alert->template?->template;
-        $templateName = $alert->template->name ?? '';
-        $data = ['alert' => new TemplateAlertData($alert->toArray())];
+        $template = $this->getTemplate($alert->rule_id);
+        $templateBody = $template?->template;
+        $templateName = $template->name ?? '';
+        $data = ['alert' => $alert];
 
         if (empty($templateBody)) {
             return Blade::render($this->getDefaultTemplate($templateName, 'No template defined'), $data);
@@ -105,12 +96,13 @@ class Template
             ? 'Device ' . $alert->display . ' recovered from ' . ($alert->name ?: $alert->rule)
             : 'Alert for device ' . $alert->display . ' - ' . $alert->name;
 
-        $templateTitle = $isRecovered ? $alert->template?->title_rec : $alert->template?->title;
+        $template = $this->getTemplate($alert->rule_id);
+        $templateTitle = $isRecovered ? $template?->title_rec : $template?->title;
 
         $title = $defaultTitle;
         if (! empty($templateTitle)) {
             try {
-                $title = Blade::render($templateTitle, ['alert' => new TemplateAlertData($alert->toArray())]);
+                $title = Blade::render($templateTitle, ['alert' => $alert]);
             } catch (\Throwable) {
                 // fall back to the default title
             }
