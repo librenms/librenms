@@ -189,6 +189,12 @@ with history data.
 Contexts come from the device (CISCO-CONTEXT-MAPPING-MIB) or are added under Device -> Edit -> Routing.
 Each discovery checks that a context answers. The routing modules walk the default context and every
 context that answered, unless it is disabled under Device -> Edit -> Routing.
+To disable checks and walks for newly discovered or manually added VRF contexts,
+run `lnms config:set snmp.vrf_contexts false`. Existing VRF settings are not
+changed; use Device -> Edit -> Routing to enable or disable individual contexts.
+Changing the global setting later does not change contexts already discovered.
+The default SNMP context, VLAN contexts and an explicitly configured device
+SNMP context are not affected. Data for disabled VRF contexts is retained.
 
 `cisco-cef`: CEF detection and support.
 

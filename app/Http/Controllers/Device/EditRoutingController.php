@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers\Device;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\BgpPeer;
 use App\Models\Device;
 use App\Models\Vrf as VrfModel;
@@ -84,6 +85,7 @@ class EditRoutingController
             'context_name' => $validated['context'],
             'context_manual' => true,
             'vrf_manual' => true,
+            'context_enabled' => LibrenmsConfig::get('snmp.vrf_contexts', true),
             'mplsVpnVrfDescription' => '',
         ]);
 

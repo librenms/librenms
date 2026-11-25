@@ -2299,6 +2299,10 @@ return [
                 'description' => 'Default Credentials (priority)',
                 'help' => 'Select default SNMP credentials and put them in the order to try during device discovery and addition.',
             ],
+            'vrf_contexts' => [
+                'description' => 'Enable new VRF SNMP contexts',
+                'help' => 'Default polling setting for newly discovered or manually added VRF contexts. Existing contexts retain their individual settings, which can be changed under Device > Edit > Routing.',
+            ],
             'max_oid' => [
                 'description' => 'Max OIDs',
                 'help' => 'Maximum OIDs per query. You can override this at the OS and device level.',

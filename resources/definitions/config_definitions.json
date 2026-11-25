@@ -7084,6 +7084,13 @@
                 "value.*": "integer|exists:secrets,id"
             }
         },
+        "snmp.vrf_contexts": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 7,
+            "type": "boolean",
+            "default": true
+        },
         "snmp.unescape": {
             "type": "boolean"
         },
