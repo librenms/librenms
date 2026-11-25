@@ -123,20 +123,24 @@ class FormatJsonApiError
     }
 
     /**
-     * One error object per failed rule, with an RFC 6901 JSON Pointer to the attribute
-     * that failed. Laravel separates nested attribute names with dots.
+     * One error object per failed rule. A 400 names the query parameter that failed,
+     * such as filter[os], otherwise an RFC 6901 JSON Pointer names the attribute.
+     * Laravel separates nested names with dots.
      */
     protected function validationErrorResponse(ValidationException $exception): Response
     {
         $errors = [];
         foreach ($exception->errors() as $attribute => $messages) {
-            $segments = array_map(fn (string $segment): string => str_replace(['~', '/'], ['~0', '~1'], $segment), explode('.', (string) $attribute));
+            $segments = explode('.', (string) $attribute);
+            $source = $exception->status === 400
+                ? ['parameter' => array_shift($segments) . implode('', array_map(fn (string $segment): string => "[$segment]", $segments))]
+                : ['pointer' => '/' . implode('/', array_map(fn (string $segment): string => str_replace(['~', '/'], ['~0', '~1'], $segment), $segments))];
             foreach ($messages as $message) {
                 $errors[] = [
                     'status' => (string) $exception->status,
                     'title' => Response::$statusTexts[$exception->status] ?? 'Unprocessable Content',
                     'detail' => $message,
-                    'source' => ['pointer' => '/' . implode('/', $segments)],
+                    'source' => $source,
                 ];
             }
         }
@@ -177,11 +181,12 @@ class FormatJsonApiError
     }
 
     /**
-     * @param  list<array{status: string, title: string, detail: string, source?: array{pointer: string}}>  $errors
+     * @param  list<array{status: string, title: string, detail: string, source?: array{pointer: string}|array{parameter: string}}>  $errors
      */
     private function jsonApiErrors(array $errors, int $code): Response
     {
         return response()->json([
+            'jsonapi' => ['version' => EnforceJsonApi::VERSION],
             'errors' => $errors,
         ], $code, [
             'Content-Type' => 'application/vnd.api+json',
