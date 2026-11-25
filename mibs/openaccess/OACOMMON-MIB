@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (SEQUENCE member without an object)
 OACOMMON-MIB DEFINITIONS ::= BEGIN 
 
     IMPORTS
@@ -299,7 +300,6 @@ Fault OBJECT-TYPE
 Fault ::=
     SEQUENCE {
         Type          INTEGER,
-        Severity      INTEGER,
         Module        DisplayString,
         ErrorText     DisplayString,
         Acknowledged  DisplayString,

@@ -28,6 +28,7 @@ namespace LibreNMS\Validations\Rrd;
 
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Interfaces\Validation;
+use LibreNMS\Util\SystemUser;
 use LibreNMS\ValidationResult;
 
 class CheckRrdcachedConnectivity implements Validation
@@ -42,22 +43,44 @@ class CheckRrdcachedConnectivity implements Validation
         // librrd treats unix: and bare paths as unix sockets
         if (str_starts_with($rrdcached, 'unix:') || str_starts_with($rrdcached, '/')) {
             $socket = preg_replace('/^unix:/', '', $rrdcached);
-            if (! file_exists($socket)) {
+
+            // connect instead of file_exists: the socket can exist while rrdcached is stopped or without
+            // permission, and file_exists also returns false when a parent directory is not accessible
+            $error = self::connect("unix://$socket", $errno);
+            if ($errno === SOCKET_ENOENT) {
                 return ValidationResult::fail(trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_socket', ['socket' => $socket]));
             }
 
-            return ValidationResult::ok(trans('validation.validations.rrd.CheckRrdcachedConnectivity.ok'));
+            if ($error !== null) {
+                return ValidationResult::fail(
+                    trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_socket_connect', ['socket' => $socket, 'user' => SystemUser::name(), 'error' => $error]),
+                    trans('validation.validations.rrd.CheckRrdcachedConnectivity.fix_socket_connect', ['group' => config('librenms.group')])
+                );
+            }
+        } else {
+            [$host, $port] = self::hostAndPort($rrdcached);
+            // any colon means ipv6: Rewrite::addIpv6Brackets skips scoped addresses like fe80::1%eth0
+            if (self::connect('tcp://' . (str_contains($host, ':') ? "[$host]" : $host) . ":$port") !== null) {
+                return ValidationResult::fail(trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_port', ['server' => $host, 'port' => $port]));
+            }
         }
 
-        [$host, $port] = self::hostAndPort($rrdcached);
-        $connection = @stream_socket_client('tcp://' . (str_contains($host, ':') ? "[$host]" : $host) . ":$port", $errno, $errstr, 5);
+        return ValidationResult::ok(trans('validation.validations.rrd.CheckRrdcachedConnectivity.ok'));
+    }
+
+    /**
+     * Open and close a connection, returns the error or null on success
+     */
+    private static function connect(string $address, ?int &$errno = null): ?string
+    {
+        $connection = @stream_socket_client($address, $errno, $errstr, 5);
         if (! is_resource($connection)) {
-            return ValidationResult::fail(trans('validation.validations.rrd.CheckRrdcachedConnectivity.fail_port', ['server' => $host, 'port' => $port]));
+            return $errstr ?: "error $errno";
         }
 
         fclose($connection);
 
-        return ValidationResult::ok(trans('validation.validations.rrd.CheckRrdcachedConnectivity.ok'));
+        return null;
     }
 
     /**

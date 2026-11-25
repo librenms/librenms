@@ -7,7 +7,7 @@ export default function portLink(options = {}) {
     }
 
     options.showDelay = options.showDelay || 300;
-    const popupUrl = `${window.location.origin}/port/${options.port_id}/popup`;
+    const popupUrl = route('port.popup', {port: options.port_id});
 
     // params are handled by the popup component
     // Return the popup component with the constructed URL

@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (STATUS in TRAP-TYPE)
 EXELTECH-XFERSW DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -431,14 +432,12 @@ Settings     	OBJECT IDENTIFIER 	::= { objects     5 }
 
 
 	LowDC-trap		TRAP-TYPE
-				STATUS current
 				ENTERPRISE batV
 				VARIABLES { batV, DCVLow }
 				DESCRIPTION "Battery voltage low limit has been triggered."
 	::=  1
 
 	HighDC-trap		TRAP-TYPE
-				STATUS current
 				ENTERPRISE batV
 				VARIABLES { batV, DCVHigh }
 				DESCRIPTION "Battery voltage high limit has been triggered."
@@ -447,14 +446,12 @@ Settings     	OBJECT IDENTIFIER 	::= { objects     5 }
 
 
 	MinorAlarm-trap		TRAP-TYPE
-				STATUS current
 				ENTERPRISE Alarms
 				VARIABLES { source1Alarms, source2Alarms, source3Alarms}
 				DESCRIPTION "A minor alarm has been triggered."
 	::=  3
 
 	MajorAlarm-trap		TRAP-TYPE
-				STATUS current
 				ENTERPRISE Alarms
 				VARIABLES { source1Alarms, source2Alarms, source3Alarms}
 				DESCRIPTION "A major alarm has been triggered."

@@ -114,27 +114,33 @@ final readonly class LegacyGraphScript
     {
         $legacyParams = new LegacyGraphParameters($params);
 
-        $scope = $this->include($this->graphFile, [
-            ...$auth->scope,
-            'graph_params' => $legacyParams,
-            'type' => $params->type,
-            'subtype' => $params->subtype,
-            'height' => $params->height,
-            'width' => $params->width,
-            'from' => $params->from,
-            'to' => $params->to,
-            'period' => $params->period,
-            'prev_from' => $params->prev_from,
-            'inverse' => $params->inverse,
-            'in' => $params->in,
-            'out' => $params->out,
-            'float_precision' => 2,
-            'title' => $params->visible('title'),
-            'nototal' => ! $params->visible('total'),
-            'nodetails' => ! $params->visible('details'),
-            'noagg' => ! $params->visible('aggregate'),
-            'rrd_options' => [],
-        ]);
+        try {
+            $scope = $this->include($this->graphFile, [
+                ...$auth->scope,
+                'graph_params' => $legacyParams,
+                'type' => $params->type,
+                'subtype' => $params->subtype,
+                'height' => $params->height,
+                'width' => $params->width,
+                'from' => $params->from,
+                'to' => $params->to,
+                'period' => $params->period,
+                'prev_from' => $params->prev_from,
+                'inverse' => $params->inverse,
+                'in' => $params->in,
+                'out' => $params->out,
+                'float_precision' => 2,
+                'title' => $params->visible('title'),
+                'nototal' => ! $params->visible('total'),
+                'nodetails' => ! $params->visible('details'),
+                'noagg' => ! $params->visible('aggregate'),
+                'rrd_options' => [],
+            ]);
+        } catch (GraphException $e) {
+            $e->graphTitle ??= $legacyParams->title ?: null;
+
+            throw $e;
+        }
 
         return new LegacyGraphResult(
             rrdOptions: $scope['rrd_options'] ?? [],
@@ -206,12 +212,12 @@ final readonly class LegacyGraphScript
         } catch (GraphException $e) {
             throw $e;
         } catch (RrdNotFoundException $e) {
-            throw new NoGraphData('No Data file', $e);
+            throw new NoGraphData(__('graph.errors.no_data_files'), $e);
         } catch (Throwable $e) {
             // legacy scripts fail with warnings and errors on unexpected input, keep the details out of the image
             report($e);
 
-            throw new GraphException('Graph Error', 'Error', $e);
+            throw new GraphException(__('graph.errors.graph'), __('graph.errors.graph_short'), $e);
         } finally {
             if ($previousCwd !== false) {
                 chdir($previousCwd);

@@ -26,20 +26,89 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
+use App\Models\Traits\Filterable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use LibreNMS\Enum\Severity;
 
 class Eventlog extends DeviceRelatedModel
 {
+    use Filterable;
     use HasFactory;
 
     protected $table = 'eventlog';
     protected $primaryKey = 'event_id';
     public $timestamps = false;
     protected $fillable = ['datetime', 'device_id', 'message', 'type', 'reference', 'username', 'severity'];
+
+    /** @var string[] */
+    protected array $filterable = ['device_id', 'type', 'port', 'search'];
+
+    /**
+     * @param  Device|null  $device  limit the port choices to this device and leave out the device filter
+     * @return array<array{key: string, label: string, type: string, search?: bool, endpoint?: string, params?: array<string, string|int>}>
+     */
+    public static function filterFieldDefinitions(?Device $device = null): array
+    {
+        $fields = [
+            ['key' => 'search', 'label' => __('Message'), 'type' => 'text', 'search' => true],
+            ['key' => 'type', 'label' => __('Type'), 'type' => 'select', 'endpoint' => route('ajax.select.eventlog'), 'params' => ['field' => 'type']],
+            ['key' => 'port', 'label' => __('Port'), 'type' => 'select', 'endpoint' => route('ajax.select.port'), 'params' => $device ? ['device' => $device->device_id] : []],
+        ];
+
+        if ($device === null) {
+            $fields[] = ['key' => 'device_id', 'label' => __('Device'), 'type' => 'select', 'endpoint' => route('ajax.select.device')];
+        }
+
+        return $fields;
+    }
+
+    /**
+     * Match the message, or the label of the port of interface events
+     *
+     * @param  Builder<static>  $query
+     * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
+     */
+    public function filterSearch(Builder $query, mixed $value, array $config): void
+    {
+        $positive = ['not' => false] + $config;
+
+        // empty checks only apply to the message
+        $ports = ($config['null'] ?? false) ? null : Port::query()->select('port_id')->where(function (Builder $query) use ($value, $positive): void {
+            foreach (['ifName', 'ifAlias', 'ifDescr'] as $column) {
+                $this->applyQueryLogic($query, $column, $value, $positive, 'or');
+            }
+        });
+
+        $match = fn (Builder $query) => $query
+            ->where(fn (Builder $query) => $this->applyQueryLogic($query, $this->qualifyColumn('message'), $value, $positive))
+            ->when($ports, fn (Builder $query, $ports) => $query->orWhere(fn (Builder $query) => $query
+                ->whereNotNull('eventlog.type')
+                ->where('eventlog.type', 'interface')
+                ->whereIn('eventlog.reference', $ports)));
+
+        ($config['not'] ?? false) ? $query->whereNot($match) : $query->where($match);
+    }
+
+    /**
+     * Interface events of the port
+     *
+     * @param  Builder<static>  $query
+     * @param  array{operator?: string, wildcard?: string, not?: bool, null?: bool, set?: bool}  $config
+     */
+    public function filterPort(Builder $query, mixed $value, array $config): void
+    {
+        $positive = ['not' => false] + $config;
+        $match = fn (Builder $query) => $query
+            ->whereNotNull('eventlog.type')
+            ->where('eventlog.type', 'interface')
+            ->where(fn (Builder $query) => $this->applyQueryLogic($query, 'eventlog.reference', $value, $positive));
+
+        ($config['not'] ?? false) ? $query->whereNot($match) : $query->where($match);
+    }
 
     /**
      * @return array<string, string>
@@ -74,24 +143,17 @@ class Eventlog extends DeviceRelatedModel
      */
     public function _log(string $text, Device|int|null $device = null, ?string $type = null, Severity $severity = Severity::Info, int|string|null $reference = null): void
     {
-        $log = new static([
-            'reference' => $reference,
-            'type' => $type,
-            'datetime' => Carbon::now(),
-            'severity' => $severity,
-            'message' => $text,
-            'username' => (class_exists('\Auth') && Auth::check()) ? Auth::user()->username : '',
-        ]);
-
-        if (is_numeric($device)) {
-            $log->device_id = $device;
-        }
-
-        if ($device instanceof Device) {
-            $device->eventlogs()->save($log);
-        } else {
-            $log->save();
-        }
+        Log::channel('event')->log(
+            $severity->toLogLevel(),
+            $text,
+            [
+                'device_id' => $device instanceof Device ? $device->device_id : $device,
+                'type' => $type,
+                'severity' => $severity,
+                'reference' => $reference,
+                'username' => Auth::user()->username ?? '',
+            ],
+        );
     }
 
     // ---- Define Relationships ----

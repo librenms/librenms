@@ -29,9 +29,8 @@ namespace LibreNMS\Util;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\ProcessType;
-use LibreNMS\Interfaces\UsesDataSources;
-use LibreNMS\Polling\Method\PollingMethodRegistry;
 use LibreNMS\Polling\ModuleStatus;
 
 class ModuleList
@@ -122,7 +121,7 @@ class ModuleList
                 $device->getAttrib("discover_$module_name"),
                 $override == null ? null : true,
                 is_array($override) ? $override : null,
-                $this->methodSetting($type, $module_name, $device),
+                $this->methodSetting($module_name, $device),
             ),
             ProcessType::Poller => new ModuleStatus(
                 LibrenmsConfig::get("poller_modules.$module_name"),
@@ -130,23 +129,24 @@ class ModuleList
                 $device->getAttrib("poll_$module_name"),
                 $override == null ? null : true,
                 is_array($override) ? $override : null,
-                $this->methodSetting($type, $module_name, $device),
+                $this->methodSetting($module_name, $device),
             ),
         };
     }
 
     /**
-     * Enabled by the device's polling methods, when one of them has a data source the module uses.
-     * Null when the methods do not set it.
+     * True when a non-SNMP method auto-enables the module, otherwise null.
      */
-    public function methodSetting(ProcessType $type, string $module_name, Device $device): ?bool
+    public function methodSetting(string $module_name, Device $device): ?bool
     {
-        $module = Module::fromName($module_name);
-        if (! $module instanceof UsesDataSources) {
-            return null;
+        if ($module_name === 'packages') {
+            return null; // the module settings control when inventory is collected
         }
 
-        $methods = app(PollingMethodRegistry::class)->providing($module->dataSourceInterface($type));
+        $methods = array_filter(
+            Module::fromName($module_name)->pollingMethods($device),
+            fn (PollingMethodType $method): bool => $method !== PollingMethodType::Snmp,
+        );
 
         return $device->polling()->anyEnabled($methods) ?: null;
     }

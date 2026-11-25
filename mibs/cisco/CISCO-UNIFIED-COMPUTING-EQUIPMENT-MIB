@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing imports)
 -- *********************************************************************
 -- CISCO-UNIFIED-COMPUTING-EQUIPMENT-MIB.my
 -- 
@@ -242,7 +243,7 @@ IMPORTS
     CucsStorageControllerForm,
     CucsStorageControllerMode,
     CucsStorageLocalDiskMode,
-    CucsStorageTechnology
+    CucsStorageTechnology, CucsEquipmentControllerForm, CucsNetworkEvacState
         FROM CISCO-UNIFIED-COMPUTING-TC-MIB;
 
 cucsEquipmentObjects MODULE-IDENTITY

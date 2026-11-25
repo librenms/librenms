@@ -29,7 +29,7 @@ namespace LibreNMS\Tests\Unit;
 use App\Facades\LibrenmsConfig;
 use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpResponse;
-use LibreNMS\Exceptions\SnmpException;
+use LibreNMS\Exceptions\SnmpConnectionException;
 use LibreNMS\Tests\TestCase;
 
 final class SnmpResponseTest extends TestCase
@@ -525,7 +525,7 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
         $response = new SnmpResponse(['IF-MIB::ifDescr.1' => 'lo']);
         $this->assertSame($response, $response->throwIfConnectionError());
 
-        $this->expectException(SnmpException::class);
+        $this->expectException(SnmpConnectionException::class);
         new SnmpResponse([], "Timeout: No Response from udp:192.0.2.1:161.\n", 1)->throwIfConnectionError();
     }
 }

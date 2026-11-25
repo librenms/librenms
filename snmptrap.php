@@ -13,7 +13,6 @@
 
 use LibreNMS\Util\Debug;
 
-$init_modules = [];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('d::');

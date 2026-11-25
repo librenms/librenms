@@ -156,7 +156,7 @@ class PackagesPageTest extends TestCase
         Package::factory()->for(Device::factory())->create(['name' => 'pkgtest-tab-other', 'version' => '3.0.0']);
 
         $this->actingAs($this->admin())
-            ->get(url("device/$device->device_id/packages"))
+            ->get(route('device.packages', ['device' => $device->device_id]))
             ->assertOk()
             ->assertSee('pkgtest-tab-new')
             ->assertSee('pkgtest-tab-old')
@@ -164,7 +164,7 @@ class PackagesPageTest extends TestCase
             ->assertSee('device.packages');
 
         $this->actingAs($this->admin())
-            ->get(url("device/$device->device_id/packages") . '?' . http_build_query(['filter' => ['version' => ['gte' => '2.10']]]))
+            ->get(route('device.packages', ['device' => $device->device_id, 'filter' => ['version' => ['gte' => '2.10']]]))
             ->assertOk()
             ->assertSee('pkgtest-tab-new')
             ->assertDontSee('pkgtest-tab-old')
@@ -178,7 +178,7 @@ class PackagesPageTest extends TestCase
         Package::factory()->for($device)->create(['name' => 'pkgtest-tab-big', 'size' => 5000]);
         Package::factory()->for($device)->create(['name' => 'pkgtest-tab-small', 'size' => 100]);
         Package::factory()->for($other)->create(['name' => 'pkgtest-tab-other', 'size' => 5000]);
-        $tab = url("device/$device->device_id/packages") . '?';
+        $tab = route('device.packages', ['device' => $device->device_id]) . '?';
 
         $this->actingAs($this->admin())
             ->get($tab . http_build_query(['filter' => ['size' => ['gte' => 1000]]]))
@@ -253,7 +253,7 @@ class PackagesPageTest extends TestCase
             ->assertSee('No packages found');
 
         $this->actingAs($this->admin())
-            ->get(url("device/$device->device_id/packages") . '?' . http_build_query($filter))
+            ->get(route('device.packages', ['device' => $device->device_id] + $filter))
             ->assertOk()
             ->assertSee('No packages found for this device.');
     }

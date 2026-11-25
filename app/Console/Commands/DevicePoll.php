@@ -46,17 +46,18 @@ class DevicePoll extends LnmsCommand
             return $this->dispatchWork(poll: true, discover: false);
         }
 
-        if ($this->option('no-data')) {
-            LibrenmsConfig::set('rrd.enable', false);
-            LibrenmsConfig::set('influxdb.enable', false);
-            LibrenmsConfig::set('influxdbv2.enable', false);
-            LibrenmsConfig::set('prometheus.enable', false);
-            LibrenmsConfig::set('graphite.enable', false);
-            LibrenmsConfig::set('kafka.enable', false);
-        }
-
         try {
             $this->handleDebug();
+
+            // after handleDebug(), it reloads the config
+            if ($this->option('no-data')) {
+                LibrenmsConfig::set('rrd.enable', false);
+                LibrenmsConfig::set('influxdb.enable', false);
+                LibrenmsConfig::set('influxdbv2.enable', false);
+                LibrenmsConfig::set('prometheus.enable', false);
+                LibrenmsConfig::set('graphite.enable', false);
+                LibrenmsConfig::set('kafka.enable', false);
+            }
 
             $processor = new PerDeviceProcess(
                 $this->processType,

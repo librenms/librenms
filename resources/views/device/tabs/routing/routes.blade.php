@@ -49,7 +49,7 @@ $(function () {
                 showProtocols: showProtocols
             };
         },
-        url: "{{ url('ajax/table/routes') }}"
+        url: "{{ route('table.routes') }}"
     });
 
     $(".actionBar").append(

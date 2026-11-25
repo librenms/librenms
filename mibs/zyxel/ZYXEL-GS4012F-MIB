@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (dashes in comment lines; trailing comma before })
 ZYXEL-GS4012F-MIB DEFINITIONS ::= BEGIN
     IMPORTS
  enterprises  FROM RFC1155-SMI
@@ -1459,7 +1460,7 @@ ZYXEL-GS4012F-MIB DEFINITIONS ::= BEGIN
         sysMgmtTftpConfigIndex OBJECT-TYPE
         SYNTAX  INTEGER {
              config1(1),
-             config2(2),
+             config2(2)
         }
         ACCESS  read-write
         STATUS  mandatory
@@ -1471,7 +1472,7 @@ ZYXEL-GS4012F-MIB DEFINITIONS ::= BEGIN
         SYNTAX  INTEGER {
           none(0),
            backupConfig(1),
-           restoreConfig(2),
+           restoreConfig(2)
         }
         ACCESS  read-write
         STATUS  mandatory        DESCRIPTION
@@ -2211,7 +2212,7 @@ ZYXEL-GS4012F-MIB DEFINITIONS ::= BEGIN
         portQueuingMethodMode OBJECT-TYPE
         SYNTAX  INTEGER {
          strictlyPriority(0),
-         weightedRoundRobin(1),
+         weightedRoundRobin(1)
         }
         ACCESS  read-write
         STATUS  mandatory
@@ -5763,7 +5764,7 @@ eventClearedTrap NOTIFICATION-TYPE
         radiusAuthServerMode OBJECT-TYPE
         SYNTAX  INTEGER{
           index-priority(1),
-      round-robin(2),
+      round-robin(2)
         }
         ACCESS  read-write
         STATUS  mandatory
@@ -5911,7 +5912,7 @@ eventClearedTrap NOTIFICATION-TYPE
         tacacsAuthServerMode OBJECT-TYPE
         SYNTAX  INTEGER{
           index-priority(1),
-  round-robin(2),
+  round-robin(2)
         }
         ACCESS  read-write
         STATUS  mandatory
@@ -6684,11 +6685,11 @@ eventClearedTrap NOTIFICATION-TYPE
 
 
 
------------------------------------------------------------------
+------------------------------------------------------------------
 --
 -- ip source guard
 --
------------------------------------------------------------------
+------------------------------------------------------------------
 
  ipsg OBJECT IDENTIFIER ::= { gs4012f 101 }
 
@@ -6775,11 +6776,11 @@ eventClearedTrap NOTIFICATION-TYPE
                        ""
         ::= { ipsgEntry 7 }
 
------------------------------------------------------------------
+------------------------------------------------------------------
 --
 -- arpInspect
 --
------------------------------------------------------------------
+------------------------------------------------------------------
 
  arpInspect      OBJECT IDENTIFIER ::= { gs4012f 102 }
 

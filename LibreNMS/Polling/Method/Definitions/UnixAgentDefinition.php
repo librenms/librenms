@@ -14,6 +14,8 @@ final class UnixAgentDefinition extends PollingMethodDefinition
     public function fields(): array
     {
         return [
+            'use_localhost' => FieldDefinition::make('use_localhost', 'checkbox'),
+
             'port' => FieldDefinition::make('port', 'number')
                 ->min(1)
                 ->max(65535),

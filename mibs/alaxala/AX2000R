@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing imports)
 --
 -- Copyright(C) 2005 ALAXALA Networks Corporation. All Rights Reserved.
 --
@@ -8,14 +9,20 @@ IMPORTS
 enterprises, OBJECT-TYPE, NetworkAddress, IpAddress,
 Counter, Gauge, TimeTicks
 	FROM RFC1155-SMI
-RouterID, AreaID
+RouterID, AreaID, BigMetric, DesignatedRouterPriority, HelloRange, Metric, PositiveInteger, Status, UpToMaxAge
 	FROM RFC1253-MIB
 OBJECT-TYPE
 	FROM RFC-1212
 TRAP-TYPE
 	FROM RFC-1215
 ifIndex
-	FROM RFC-1213;
+	FROM RFC-1213
+    Counter32, Counter64, Gauge32, Integer32
+        FROM SNMPv2-SMI
+    TimeStamp, RowStatus, TruthValue, DisplayString
+        FROM SNMPv2-TC
+    Ipv6Address, Ipv6AddressPrefix, Ipv6IfIndex
+        FROM IPV6-TC;
 alaxala            OBJECT IDENTIFIER ::= { enterprises 21839 }
 alaxalaProductId   OBJECT IDENTIFIER ::= { alaxala 1 }
 axRouter           OBJECT IDENTIFIER ::= { alaxalaProductId 1 }

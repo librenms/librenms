@@ -40,6 +40,7 @@ return [
             'port_association_mode' => 'Port Association Mode',
         ],
         'unix-agent' => [
+            'use_localhost' => 'Use localhost',
             'port' => 'Unix Agent Port',
             'timeout' => 'Unix Agent Timeout',
         ],

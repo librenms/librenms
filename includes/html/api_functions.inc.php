@@ -2130,7 +2130,7 @@ function get_inventory_for_device(Illuminate\Http\Request $request)
 function search_oxidized(Illuminate\Http\Request $request)
 {
     $search_in_conf_textbox = $request->route('searchstring');
-    $result = search_oxidized_config($search_in_conf_textbox);
+    $result = new \App\ApiClients\Oxidized()->searchConfigs($search_in_conf_textbox);
 
     if (! $result) {
         return api_error(404, 'Received no data from Oxidized');
@@ -2696,6 +2696,8 @@ function rename_device(Illuminate\Http\Request $request)
         return api_error(404, 'Existing device not found');
     } elseif ($request->user()->cannot('update', $device)) {
         return api_error(403, 'Insufficient permissions to update this device');
+    } elseif (! \LibreNMS\Util\Validate::hostname($new_hostname) && ! IP::isValid($new_hostname)) {
+        return api_error(400, 'Invalid hostname or IP: ' . $new_hostname);
     } else {
         try {
             $device->hostname = $new_hostname;

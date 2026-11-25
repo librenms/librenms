@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Enum\WirelessSensorType;
@@ -593,5 +594,18 @@ class Pmp extends OS implements
                 null
             ),
         ];
+    }
+
+    public function pollSensors(EloquentCollection $sensors): array
+    {
+        $values = parent::pollSensors($sensors);
+
+        foreach ($sensors->where('sensor_class', 'state')->where('sensor_type', 'cnMaestroConnectionStatus') as $sensor) {
+            if (isset($values[$sensor->sensor_id])) {
+                $values[$sensor->sensor_id] = self::cnMaestroConnectionStatus((string) $values[$sensor->sensor_id]);
+            }
+        }
+
+        return $values;
     }
 }

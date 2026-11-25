@@ -4,7 +4,6 @@ return [
     'custom' => [
         'title' => [
             'edit_dialog' => 'Select Custom Map To Edit',
-            'create' => 'Create New Custom Map',
             'view' => ':name | Custom Map',
             'edit' => 'Edit Custom Map',
             'manage' => 'Manage Custom Maps',

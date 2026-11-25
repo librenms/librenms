@@ -28,6 +28,7 @@ namespace LibreNMS;
 
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
+use App\Models\Device;
 use App\Models\Eventlog;
 use App\Models\Service as ServiceModel;
 use LibreNMS\Enum\Severity;
@@ -57,32 +58,40 @@ class Services
     /**
      * Create a service entry for a device.
      *
-     * @param  array|int|\App\Models\Device  $device
+     * @param  array|int|Device  $device
      */
-    public static function addService($device, string $type, string $desc, string $ip = '', string $param = '', int $ignore = 0, int $disabled = 0, $template_id = '', string $name = '')
+    public static function addService($device, string $type, string $desc, string $ip = '', string $param = '', int $ignore = 0, int $disabled = 0, $template_id = '', string $name = ''): ServiceModel
     {
-        $deviceModel = DeviceCache::get(is_array($device) ? $device['device_id'] : $device);
+        $device = $device instanceof Device ? $device : DeviceCache::get(is_array($device) ? $device['device_id'] : $device);
 
-        if (empty($ip)) {
-            $ip = $deviceModel->pollerTarget();
-        }
-
-        $insert = [
-            'device_id' => $deviceModel->device_id,
+        return self::createForDevice($device, [
             'service_ip' => $ip,
             'service_type' => $type,
             'service_desc' => $desc,
             'service_param' => $param,
             'service_ignore' => $ignore,
-            'service_status' => 3,
-            'service_message' => 'Service not yet checked',
-            'service_ds' => '{}',
             'service_disabled' => $disabled,
             'service_template_id' => $template_id,
             'service_name' => $name,
-        ];
+        ]);
+    }
 
-        return ServiceModel::create($insert);
+    /**
+     * @param  array<model-property<ServiceModel>, mixed>  $attributes
+     */
+    public static function createForDevice(Device $device, array $attributes): ServiceModel
+    {
+        $attributes['service_ip'] = empty($attributes['service_ip']) ? $device->pollerTarget() : $attributes['service_ip'];
+        $attributes['service_param'] ??= '';
+
+        return $device->services()->create($attributes + [
+            'service_status' => 3,
+            'service_message' => 'Service not yet checked',
+            'service_ds' => '{}',
+            'service_desc' => '',
+            'service_name' => '',
+            'service_template_id' => 0,
+        ]);
     }
 
     /**
@@ -121,6 +130,39 @@ class Services
         $check = strtolower(Clean::fileName($check_name));
 
         return LibrenmsConfig::get('install_dir') . '/includes/services/check_' . $check . '.inc.php';
+    }
+
+    /**
+     * @return array{sources: array, options: array}
+     */
+    public static function graphDefinitions(ServiceModel $model, ?string $rrd_filename = null): array
+    {
+        $data = (string) $model->service_ds;
+        $check = [];
+        $checkScript = self::customCheckPath($model->service_type);
+        if (is_file($checkScript)) {
+            // Custom checks use the same service array as the poller.
+            $service = $model->getAttributes() + [
+                'service_param' => '',
+                'service_ip' => '',
+                'hostname' => $model->device->hostname ?? '',
+                'overwrite_ip' => $model->device->overwrite_ip ?? '',
+            ];
+            include $checkScript;
+            $check = get_defined_vars();
+        }
+
+        if (is_string($check['check_ds'] ?? null)) {
+            $data = $check['check_ds'];
+        }
+
+        // Older service records can contain HTML-encoded JSON.
+        $sources = json_decode($data, true) ?? json_decode(htmlspecialchars_decode($data), true);
+
+        return [
+            'sources' => is_array($sources) ? $sources : [],
+            'options' => $check['check_graph'] ?? [],
+        ];
     }
 
     /**

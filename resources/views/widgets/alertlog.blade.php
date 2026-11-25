@@ -1,6 +1,6 @@
 <div id="alertlog_container-{{ $id }}" data-reload="false">
     <div class="table-responsive">
-        <table id="alertlog_{{ $id }}" class="table table-hover table-condensed alerts" data-url="{{ route('table.alertlog') }}">
+        <table id="alertlog_{{ $id }}" class="table table-hover table-condensed alerts" data-url="{{ route('table.alertlog') }}" data-export-url="{{ route('table.alertlog.export') }}">
             <thead>
             <tr>
                 <th data-column-id="status" data-sortable="false" data-visible-in-selection="false"></th>
@@ -15,17 +15,18 @@
 </div>
 <script>
     (function () {
-        var grid = $("#alertlog_{{ $id }}").bootgrid({
+        var grid = bootgridWithExport($("#alertlog_{{ $id }}"), {
             ajax: true,
             rowCount: [50, 100, 250, -1],
-            navigation: ! {{ $hidenavigation }},
+            navigation: @json(! $hidenavigation),
             post: function () {
                 return {
-                    device_group: "{{ $device_group }}",
-                    state: '{{ $state }}',
+                    device_group: @json($device_group),
+                    state: @json($state),
                     severity: @json($severity),
-                    from: '{{ $from }}',
-                    to: '{{ $to }}',
+                    from: @json($from),
+                    to: @json($to),
+                    widget_id: @json($id),
                 };
             },
             converters: {

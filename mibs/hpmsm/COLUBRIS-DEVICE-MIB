@@ -1,7 +1,8 @@
 -- ****************************************************************************
 --  COLUBRIS-DEVICE-MIB definitions
 --
---  Copyright (c) 2006, Colubris Networks, Inc.
+--  Copyright (c) 2006, Hewlett-Packard Development Company, L.P. 
+--  The information contained herein is subject to change without notice.
 --  All Rights Reserved.
 --
 --  Colubris Device MIB file.
@@ -27,7 +28,7 @@ IMPORTS
 
 
 colubrisDeviceMIB MODULE-IDENTITY
-    LAST-UPDATED    "200609050000Z"
+    LAST-UPDATED    "200910190000Z"
     ORGANIZATION    "Colubris Networks, Inc."
     CONTACT-INFO    "Colubris Networks
                      Postal: 200 West Street Ste 300
@@ -111,7 +112,7 @@ coDeviceDiscoveryEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION "An entry in the coDeviceDiscoveryTable.
                  coDevDisIndex - Uniquely identifies a device on the
-                                 MultiService Controller."
+                                 controller."
     INDEX       { coDevDisIndex }
     ::= { coDeviceDiscoveryTable 1 }
 
@@ -126,7 +127,8 @@ CoDeviceDiscoveryEntry ::= SEQUENCE
     coDevDisLocation               DisplayString,
     coDevDisContact                DisplayString,
     coDevDisGroupName              DisplayString,
-    coDevDisConnectionTime         Counter32
+    coDevDisConnectionTime         Counter32,
+    coDevDisControllerIndex        Integer32
 }
 
 coDevDisIndex OBJECT-TYPE
@@ -209,6 +211,14 @@ coDevDisConnectionTime OBJECT-TYPE
     DESCRIPTION "Elapsed time in minutes since the device was last authorized."
     ::= { coDeviceDiscoveryEntry 10 }
 
+coDevDisControllerIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..5)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "If the device belongs to an controller team, this
+                 index refer to coControllerDisIndex, otherwise it is 0."
+    ::= { coDeviceDiscoveryEntry 11 }
+
 -- The Device Information Group
 coDeviceInfoTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF CoDeviceInfoEntry
@@ -223,7 +233,7 @@ coDeviceInfoEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION "An entry in the coDeviceInfoTable.
                  coDevDisIndex - Uniquely identifies a device on the
-                                 MultiService Controller."
+                                 controller."
     AUGMENTS    { coDeviceDiscoveryEntry }
     ::= { coDeviceInfoTable 1 }
 
@@ -240,14 +250,14 @@ coDevInfoProductType OBJECT-TYPE
     SYNTAX      OBJECT IDENTIFIER
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Refer to a Colubris product inside colubrisProductsMIB."
+    DESCRIPTION "Refer to a HP product inside colubrisProductsMIB."
     ::= { coDeviceInfoEntry 1 }
 
 coDevInfoProductName OBJECT-TYPE
     SYNTAX      DisplayString
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Colubris Networks product name for the device."
+    DESCRIPTION "Product name for the device."
     ::= { coDeviceInfoEntry 2 }
 
 coDevInfoFirmwareRevision OBJECT-TYPE
@@ -285,7 +295,7 @@ coDeviceStatusEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION "An entry in the coDeviceStatusTable.
                  coDevDisIndex - Uniquely identifies a device on the
-                                 MultiService Controller."
+                                 controller."
     AUGMENTS    { coDeviceDiscoveryEntry }
     ::= { coDeviceStatusTable 1 }
 
@@ -528,7 +538,8 @@ colubrisDeviceDiscoveryMIBGroup OBJECT-GROUP
                     coDevDisLocation,
                     coDevDisContact,
                     coDevDisGroupName,
-                    coDevDisConnectionTime
+                    coDevDisConnectionTime,
+                    coDevDisControllerIndex
                 }
     STATUS      current
     DESCRIPTION "A collection of objects for Device

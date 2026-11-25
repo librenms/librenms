@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Cache\DeviceMaintenanceCache;
 use LibreNMS\Enum\DeviceStatus;
@@ -683,6 +684,8 @@ class Device extends BaseModel
 
     public function scopeInDeviceGroup($query, $deviceGroup)
     {
+        $deviceGroup = $deviceGroup instanceof Collection ? $deviceGroup->all() : $deviceGroup;
+
         return $query->whereIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup): void {
                 $query->select('device_id')
@@ -694,6 +697,8 @@ class Device extends BaseModel
 
     public function scopeNotInDeviceGroup($query, $deviceGroup)
     {
+        $deviceGroup = $deviceGroup instanceof Collection ? $deviceGroup->all() : $deviceGroup;
+
         return $query->whereNotIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup): void {
                 $query->select('device_id')
@@ -866,6 +871,14 @@ class Device extends BaseModel
     public function components(): HasMany
     {
         return $this->hasMany(Component::class, 'device_id');
+    }
+
+    /**
+     * @return HasMany<Customoid, $this>
+     */
+    public function customoids(): HasMany
+    {
+        return $this->hasMany(Customoid::class, 'device_id');
     }
 
     /**

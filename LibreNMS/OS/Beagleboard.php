@@ -25,7 +25,10 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use App\Models\Sensor;
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use SnmpQuery;
 
 class Beagleboard extends Linux implements OSDiscovery
 {
@@ -38,5 +41,37 @@ class Beagleboard extends Linux implements OSDiscovery
         $info = snmp_get_multi($this->getDeviceArray(), $oids);
         $device->version = str_replace('BeagleBoard.org ', '', $info['"distro"']['nsExtendOutputFull']);
         $device->hardware = $info['"hardware"']['nsExtendOutputFull'];
+    }
+
+    /**
+     * The beagleboard extend outputs CPU, GPU, Core, DSP and IVA-HD temperatures in millidegrees
+     */
+    protected function discoverOsSensors(): Collection
+    {
+        $sensors = parent::discoverOsSensors();
+        $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.11.98.101.97.103.108.101.98.111.97.114.100';
+        $values = array_values(SnmpQuery::numeric()->walk($oid)->values());
+
+        foreach (['CPU', 'GPU', 'Core', 'DSP', 'IVA-HD'] as $index => $descr) {
+            $value = trim((string) ($values[$index] ?? ''), '"');
+            if (! is_numeric($value)) {
+                break;
+            }
+
+            $sensors->push(new Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => 'temperature',
+                'sensor_oid' => "$oid." . ($index + 1),
+                'sensor_index' => $index,
+                'sensor_type' => 'beagleboardTemp',
+                'sensor_descr' => $descr,
+                'sensor_divisor' => 1000,
+                'sensor_multiplier' => 1,
+                'sensor_current' => $value / 1000,
+                'rrd_type' => 'GAUGE',
+            ]));
+        }
+
+        return $sensors;
     }
 }

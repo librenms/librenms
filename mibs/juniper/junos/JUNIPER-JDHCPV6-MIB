@@ -1,7 +1,7 @@
 -- *******************************************************************
 -- Juniper enterprise specific DHCPv6 MIB.
 --
--- Copyright (c) 2010-2011, Juniper Networks, Inc.
+-- Copyright (c) 2010-2021, Juniper Networks, Inc.
 -- All rights reserved.
 --
 -- The contents of this document are subject to change without notice.
@@ -22,7 +22,7 @@ IMPORTS
         FROM JUNIPER-SMI;
 
 jnxJdhcpv6MIB  MODULE-IDENTITY
-    LAST-UPDATED "201103150000Z" --  March 15, 2011
+    LAST-UPDATED "202106150000Z" --  June 15, 2021
     ORGANIZATION "Juniper Networks, Inc."
     CONTACT-INFO
             "        Juniper Technical Assistance Center
@@ -35,6 +35,8 @@ jnxJdhcpv6MIB  MODULE-IDENTITY
         "The JUNOS DHCP MIB for the Juniper Networks enterprise."
 
     -- revision history
+    REVISION      "202106150000Z"
+    DESCRIPTION   "Add DHCPv6 Relay Scalar Statistics and Interface Statistics Table"
     REVISION      "201103150000Z"
     DESCRIPTION   "Add OIDs to the Interface Statistics Table"
     REVISION      "201101250000Z"
@@ -46,6 +48,7 @@ jnxJdhcpv6MIB  MODULE-IDENTITY
 -- Managed object groups
 jnxJdhcpv6Objects                         OBJECT IDENTIFIER ::= { jnxJdhcpv6MIB 1 }
 jnxJdhcpv6LocalServerObjects              OBJECT IDENTIFIER ::= { jnxJdhcpv6MIB 2 }
+jnxJdhcpv6RelayObjects                    OBJECT IDENTIFIER ::= { jnxJdhcpv6MIB 3 }
 
 
 -- Managed objects for DHCPv6 local server
@@ -753,5 +756,477 @@ jnxJdhcpv6LocalServerHealth NOTIFICATION-TYPE
         "Reports when a health event occurs in the V6 Local Server 
          application."
     ::= { jnxJdhcpv6LocalServerTraps 4 }
+
+
+-- Managed objects for DHCPv6 Relay
+jnxJdhcpv6RelayStatistics OBJECT IDENTIFIER
+    ::= { jnxJdhcpv6RelayObjects 1 }
+jnxJdhcpv6RelayIfcStats   OBJECT IDENTIFIER
+    ::= { jnxJdhcpv6RelayObjects 2 }
+
+-- DHCP V6 Relay Statistics
+jnxJdhcpv6RelayTotalDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total DHCP v6 packets dropped." 
+    ::= { jnxJdhcpv6RelayStatistics 1 }
+
+jnxJdhcpv6RelayNoSafdDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to no safd match."
+    ::= { jnxJdhcpv6RelayStatistics 2 }
+
+jnxJdhcpv6RelayBadSendDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to send error."
+    ::= { jnxJdhcpv6RelayStatistics 3 }
+
+jnxJdhcpv6RelayShortPacketDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to packet being too short."
+    ::= { jnxJdhcpv6RelayStatistics 4 }
+
+jnxJdhcpv6RelayBadMsgtypeDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to bad opcode in the packet."
+    ::= { jnxJdhcpv6RelayStatistics 5 }
+
+jnxJdhcpv6RelayBadOptionsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to bad options in the packet."
+    ::= { jnxJdhcpv6RelayStatistics 6 }
+
+jnxJdhcpv6RelayBadSrcAddressDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to invalid addr family."
+    ::= { jnxJdhcpv6RelayStatistics 7 }
+
+jnxJdhcpv6RelayRelayHopCountDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to max relays supported."
+    ::= { jnxJdhcpv6RelayStatistics 8 }
+
+jnxJdhcpv6RelayNoClientIdDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to missing client id."
+    ::= { jnxJdhcpv6RelayStatistics 9 }
+
+jnxJdhcpv6RelayDeclineReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Decline packets received."
+    ::= { jnxJdhcpv6RelayStatistics 10}
+
+jnxJdhcpv6RelaySolicitReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Solicit packets received."
+    ::= { jnxJdhcpv6RelayStatistics 11}
+
+jnxJdhcpv6RelayInformationRequestReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Information Request packets received."
+    ::= { jnxJdhcpv6RelayStatistics 12 }
+
+jnxJdhcpv6RelayReleaseReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Release packets received."
+    ::= { jnxJdhcpv6RelayStatistics 13 }
+
+jnxJdhcpv6RelayRequestReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Request packets received."
+    ::= { jnxJdhcpv6RelayStatistics 14 }
+
+jnxJdhcpv6RelayConfirmReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Confirm packets received."
+    ::= { jnxJdhcpv6RelayStatistics 15 }
+
+jnxJdhcpv6RelayRenewReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Renew packets received."
+    ::= { jnxJdhcpv6RelayStatistics 16 }
+
+jnxJdhcpv6RelayRebindReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Rebind packets received."
+    ::= { jnxJdhcpv6RelayStatistics 17 }
+
+jnxJdhcpv6RelayRelayForwReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Relay Fowr packets received."
+    ::= { jnxJdhcpv6RelayStatistics 18 }
+
+jnxJdhcpv6RelayRelayReplReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Relay Repl packets received."
+    ::= { jnxJdhcpv6RelayStatistics 19 }
+
+jnxJdhcpv6RelayAdvertiseSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Advertise packets sent."
+    ::= { jnxJdhcpv6RelayStatistics 20 }
+
+jnxJdhcpv6RelayReplySent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Reply packets sent."
+    ::= { jnxJdhcpv6RelayStatistics 21 }
+
+jnxJdhcpv6RelayReconfigureSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Reconfigure packets sent."
+    ::= { jnxJdhcpv6RelayStatistics 22 }
+
+jnxJdhcpv6RelayTotalLeaseCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Bound DHCP Clients."
+    ::= { jnxJdhcpv6RelayStatistics 23}
+
+
+-- DHCP V6 Relay Interface Statistics Table
+
+jnxJdhcpv6RelayIfcStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxJdhcpv6RelayIfcStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of interface statistics maintained by this JUNOS DHCPv6 Relay."
+    ::= { jnxJdhcpv6RelayIfcStats 1 }
+
+jnxJdhcpv6RelayIfcStatsEntry OBJECT-TYPE
+    SYNTAX      JnxJdhcpv6RelayIfcStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) representing an interface associated with
+        this JUNOS DHCPv6 Relay."
+    INDEX     { jnxJdhcpv6RelayIfcStatsIfIndex }
+    ::= { jnxJdhcpv6RelayIfcStatsTable 1 }
+
+JnxJdhcpv6RelayIfcStatsEntry ::= SEQUENCE {
+    jnxJdhcpv6RelayIfcStatsIfIndex                    InterfaceIndex,
+    jnxJdhcpv6RelayIfcStatsTotalDropped               Counter32,
+    jnxJdhcpv6RelayIfcStatsNoSafdDropped              Counter32,
+    jnxJdhcpv6RelayIfcStatsBadSendDropped             Counter32,
+    jnxJdhcpv6RelayIfcStatsShortPacketDropped         Counter32,
+    jnxJdhcpv6RelayIfcStatsBadMsgtypeDropped          Counter32,
+    jnxJdhcpv6RelayIfcStatsBadOptionsDropped          Counter32,
+    jnxJdhcpv6RelayIfcStatsBadSrcAddressDropped       Counter32,
+    jnxJdhcpv6RelayIfcStatsRelayCountDropped          Counter32,
+    jnxJdhcpv6RelayIfcStatsNoClientIdDropped          Counter32,
+    jnxJdhcpv6RelayIfcStatsDeclineReceived            Counter32,
+    jnxJdhcpv6RelayIfcStatsSolicitReceived            Counter32,
+    jnxJdhcpv6RelayIfcStatsInformationRequestReceived Counter32,
+    jnxJdhcpv6RelayIfcStatsReleaseReceived            Counter32,
+    jnxJdhcpv6RelayIfcStatsRequestReceived            Counter32,
+    jnxJdhcpv6RelayIfcStatsConfirmReceived            Counter32,
+    jnxJdhcpv6RelayIfcStatsRenewReceived              Counter32,
+    jnxJdhcpv6RelayIfcStatsRebindReceived             Counter32,
+    jnxJdhcpv6RelayIfcStatsRelayForwReceived          Counter32,
+    jnxJdhcpv6RelayIfcStatsRelayReplReceived          Counter32,
+    jnxJdhcpv6RelayIfcStatsAdvertiseSent              Counter32,
+    jnxJdhcpv6RelayIfcStatsReplySent                  Counter32,
+    jnxJdhcpv6RelayIfcStatsReconfigureSent            Counter32,
+    jnxJdhcpv6RelayIfcStatsTotalLeaseCount            Counter32,
+    jnxJdhcpv6RelayIfcStatsStrictReconfigDropped      Counter32,
+    jnxJdhcpv6RelayIfcStatsAuthenticationDropped      Counter32,
+    jnxJdhcpv6RelayIfcStatsDynamicProfileDropped      Counter32,
+    jnxJdhcpv6RelayIfcStatsLicenseDropped             Counter32
+    }
+
+-- According to IF-MIB.txt and interface index is an Integer 32 (1 - 2147483647) 
+-- This will correlate with an IFL in DHCP
+
+jnxJdhcpv6RelayIfcStatsIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The ifIndex value of the interface for which this entry
+            contains information."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 1}
+
+jnxJdhcpv6RelayIfcStatsTotalDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total DHCP v6 packets dropped." 
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 2}
+
+jnxJdhcpv6RelayIfcStatsNoSafdDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to no safd match."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 3}
+
+jnxJdhcpv6RelayIfcStatsBadSendDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to send error."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 4}
+
+jnxJdhcpv6RelayIfcStatsShortPacketDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to packet being too short."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 5}
+
+jnxJdhcpv6RelayIfcStatsBadMsgtypeDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to bad opcode in the packet."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 6}
+
+jnxJdhcpv6RelayIfcStatsBadOptionsDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to bad options in the packet."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 7}
+
+jnxJdhcpv6RelayIfcStatsBadSrcAddressDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to invalid addr family."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 8}
+
+jnxJdhcpv6RelayIfcStatsRelayCountDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to max relays supported."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 9}
+
+jnxJdhcpv6RelayIfcStatsNoClientIdDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 packets dropped due to missing client id."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 10}
+
+jnxJdhcpv6RelayIfcStatsDeclineReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Decline packets received."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 11}
+
+jnxJdhcpv6RelayIfcStatsSolicitReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Solicit packets received."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 12}
+
+jnxJdhcpv6RelayIfcStatsInformationRequestReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Information Request packets received."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 13}
+
+jnxJdhcpv6RelayIfcStatsReleaseReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Release packets received."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 14}
+
+jnxJdhcpv6RelayIfcStatsRequestReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Request packets received."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 15}
+
+jnxJdhcpv6RelayIfcStatsConfirmReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Confirm packets received."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 16}
+
+jnxJdhcpv6RelayIfcStatsRenewReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Renew packets received."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 17}
+
+jnxJdhcpv6RelayIfcStatsRebindReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Rebind packets received."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 18}
+
+jnxJdhcpv6RelayIfcStatsRelayForwReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Relay Fowr packets received."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 19}
+
+jnxJdhcpv6RelayIfcStatsRelayReplReceived OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Relay Repl packets received."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 20}
+
+jnxJdhcpv6RelayIfcStatsAdvertiseSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Advertise packets sent."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 21}
+
+jnxJdhcpv6RelayIfcStatsReplySent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Reply packets sent."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 22}
+
+jnxJdhcpv6RelayIfcStatsReconfigureSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DHCPv6 Reconfigure packets sent."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 23}
+
+jnxJdhcpv6RelayIfcStatsTotalLeaseCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of Bound DHCP Clients."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 24}
+
+jnxJdhcpv6RelayIfcStatsStrictReconfigDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to strict reconfigure."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 25}
+
+jnxJdhcpv6RelayIfcStatsAuthenticationDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to authentication failure."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 26}
+
+jnxJdhcpv6RelayIfcStatsDynamicProfileDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to dynamic profile error."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 27}
+
+jnxJdhcpv6RelayIfcStatsLicenseDropped OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets dropped due to license error."
+    ::= { jnxJdhcpv6RelayIfcStatsEntry 28}
 
 END

@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (uppercase object name; missing imports; lowercase type name)
 -- ******************************************************************************
 -- HILLSTONE-STATISTICS-MIB 
 --
@@ -15,7 +16,11 @@ IMPORTS
 	hillstoneStatistics
 		FROM HILLSTONE-SMI
 	OBJECT-TYPE
-		FROM RFC-1212;	
+		FROM RFC-1212
+    Counter32, Counter64
+        FROM SNMPv2-SMI
+    Counter, Gauge
+        FROM RFC1155-SMI;	
 
           -- textual conventions
 
@@ -65,7 +70,7 @@ hillstoneIPSecStatisticTable OBJECT-TYPE
 		"The table of the ipsec tunnel flow statistics"
         ::= { hillstoneIPSecStatistic 3 }
 
-HillstoneIPSecStatisticEntry OBJECT-TYPE
+hillstoneIPSecStatisticEntry OBJECT-TYPE
 	SYNTAX HillstoneIPSecStatisticEntry
 	MAX-ACCESS not-accessible
 	STATUS current
@@ -123,7 +128,7 @@ hillstoneIPsecTunnelID OBJECT-TYPE
 	STATUS current
 	DESCRIPTION
 		"The IPSec tunnel ID"
-	::= { HillstoneIPSecStatisticEntry 1 }
+	::= { hillstoneIPSecStatisticEntry 1 }
 
 hillstoneIPSecInOctets OBJECT-TYPE
 	SYNTAX Counter64
@@ -133,7 +138,7 @@ hillstoneIPSecInOctets OBJECT-TYPE
 		"The total number of octets received by all current and previous
 		 IPSec Phase-2 Tunnels. This value is accumulated BEFORE determining 
 		 whether or not the packet should be decompressed."
-	::= { HillstoneIPSecStatisticEntry 2 }
+	::= { hillstoneIPSecStatisticEntry 2 }
 
 hillstoneIPSecInDecompOctets OBJECT-TYPE
 	SYNTAX Counter64
@@ -143,7 +148,7 @@ hillstoneIPSecInDecompOctets OBJECT-TYPE
 		"The total number of decompressed octets received by all current
 		 and previous IPSec Phase-2 Tunnels. This value is accumulated 
 		 AFTER the packet is decompressed."
-	::= { HillstoneIPSecStatisticEntry 3 }
+	::= { hillstoneIPSecStatisticEntry 3 }
 
 hillstoneIPSecInPkts OBJECT-TYPE
 	SYNTAX Counter64
@@ -152,7 +157,7 @@ hillstoneIPSecInPkts OBJECT-TYPE
 	DESCRIPTION
 		"The total number of packets received by all current and 
 		 previous IPSec Phase-2 Tunnels."
-	::= { HillstoneIPSecStatisticEntry 4 }
+	::= { hillstoneIPSecStatisticEntry 4 }
 
 hillstoneIPSecInDrops OBJECT-TYPE
 	SYNTAX Counter64
@@ -162,7 +167,7 @@ hillstoneIPSecInDrops OBJECT-TYPE
 		"The total number of packets dropped during receiving
 		 process by all current and previous IPSec Phase-2 
 		 Tunnels. "
-	::= { HillstoneIPSecStatisticEntry 5 }
+	::= { hillstoneIPSecStatisticEntry 5 }
 
 hillstoneIPSecInReplayDrops OBJECT-TYPE
 	SYNTAX Counter32
@@ -172,7 +177,7 @@ hillstoneIPSecInReplayDrops OBJECT-TYPE
 		"The total number of packets dropped during receiving
 		 process due to Anti-Replay process by all 
 		 current and previous IPSec Phase-2 Tunnels."
-	::= { HillstoneIPSecStatisticEntry 6 } 
+	::= { hillstoneIPSecStatisticEntry 6 } 
 
 hillstoneIPSecInAuthFails OBJECT-TYPE
 	SYNTAX Counter32
@@ -181,7 +186,7 @@ hillstoneIPSecInAuthFails OBJECT-TYPE
 	DESCRIPTION
 		"The total number of inbound authentication's which ended
 		 in failure by all current and previous IPSec Phase-2 Tunnels."
-	::= { HillstoneIPSecStatisticEntry 7 }
+	::= { hillstoneIPSecStatisticEntry 7 }
 						
 hillstoneIPSecInDecryptFails OBJECT-TYPE
 	SYNTAX Counter32
@@ -190,7 +195,7 @@ hillstoneIPSecInDecryptFails OBJECT-TYPE
 	DESCRIPTION
 		"The total number of inbound decryption's which ended in
 		 failure by all current and previous IPSec Phase-2 Tunnels."
-	::= { HillstoneIPSecStatisticEntry 8 }
+	::= { hillstoneIPSecStatisticEntry 8 }
 
 hillstoneIPSecOutOctets OBJECT-TYPE
 	SYNTAX Counter64
@@ -200,7 +205,7 @@ hillstoneIPSecOutOctets OBJECT-TYPE
 		"The total number of octets sent by all current and previous 
 		 IPSec Phase-2 Tunnels. This value is accumulated AFTER 
 		 determining whether or not the packet should be compressed."
-	::= { HillstoneIPSecStatisticEntry 9 }
+	::= { hillstoneIPSecStatisticEntry 9 }
 
 hillstoneIPSecOutUncompOctets OBJECT-TYPE
 	SYNTAX Counter64
@@ -210,7 +215,7 @@ hillstoneIPSecOutUncompOctets OBJECT-TYPE
 		"The total number of uncompressed octets sent by all current
 		 and previous IPSec Phase-2 Tunnels. This value is accumulated 
 		 BEFORE the packet is compressed."
-	::= { HillstoneIPSecStatisticEntry 10 }
+	::= { hillstoneIPSecStatisticEntry 10 }
 
 hillstoneIPSecOutPkts OBJECT-TYPE
 	SYNTAX Counter64
@@ -219,7 +224,7 @@ hillstoneIPSecOutPkts OBJECT-TYPE
 	DESCRIPTION
 		"The total number of packets sent by all current and previous
 		 IPSec Phase-2 Tunnels."
-	::= { HillstoneIPSecStatisticEntry 11 }
+	::= { hillstoneIPSecStatisticEntry 11 }
 
 hillstoneIPSecOutDrops OBJECT-TYPE
 	SYNTAX Counter64
@@ -228,7 +233,7 @@ hillstoneIPSecOutDrops OBJECT-TYPE
 	DESCRIPTION
 		"The total number of packets dropped during sending process
 		 by all current and previous IPSec Phase-2 Tunnels."
-	::= { HillstoneIPSecStatisticEntry 12 }
+	::= { hillstoneIPSecStatisticEntry 12 }
 
 hillstoneIPSecOutEncryptFails OBJECT-TYPE
 	SYNTAX Counter32
@@ -237,7 +242,7 @@ hillstoneIPSecOutEncryptFails OBJECT-TYPE
 	DESCRIPTION
 		"The total number of outbound encryption's which ended in failure
 		 by all current and previous IPSec Phase-2 Tunnels."
-	::= { HillstoneIPSecStatisticEntry 13 }
+	::= { hillstoneIPSecStatisticEntry 13 }
 
 hillstoneIPSecNoMemoryDropPkts OBJECT-TYPE
 	SYNTAX Counter32
@@ -246,7 +251,7 @@ hillstoneIPSecNoMemoryDropPkts OBJECT-TYPE
 	DESCRIPTION
 		"The total number of packets dropped due to no enough memory
 		 by all current and previous IPSec Phase-2 Tunnels."
-	::= { HillstoneIPSecStatisticEntry 14 }
+	::= { hillstoneIPSecStatisticEntry 14 }
 
 hillstoneIPSecNoFindSaDropPkts OBJECT-TYPE
 	SYNTAX Counter32
@@ -255,7 +260,7 @@ hillstoneIPSecNoFindSaDropPkts OBJECT-TYPE
 	DESCRIPTION
 		"The total number of packets dropped due to not find SA by 
 		 all current and previous IPSec Phase-2 Tunnels."
-	::= { HillstoneIPSecStatisticEntry 15 }
+	::= { hillstoneIPSecStatisticEntry 15 }
 
 hillstoneIPSecQueueFullDropPkts OBJECT-TYPE
 	SYNTAX Counter32
@@ -264,7 +269,7 @@ hillstoneIPSecQueueFullDropPkts OBJECT-TYPE
 	DESCRIPTION
 		"The total number of packets dropped due to queue full by 
 		 all current and previous IPSec Phase-2 Tunnels."
-	::= { HillstoneIPSecStatisticEntry 16 }
+	::= { hillstoneIPSecStatisticEntry 16 }
 	
 hillstoneIPSecInvalidLenDropPkts OBJECT-TYPE
 	SYNTAX Counter32
@@ -273,7 +278,7 @@ hillstoneIPSecInvalidLenDropPkts OBJECT-TYPE
 	DESCRIPTION
 		"The total number of packets dropped due to invalid packet
 		length by all current and previous IPSec Phase-2 Tunnels."
-	::= { HillstoneIPSecStatisticEntry 17 }
+	::= { hillstoneIPSecStatisticEntry 17 }
 
 hillstoneIPSecTooLongDropPkts OBJECT-TYPE
 	SYNTAX Counter32
@@ -282,7 +287,7 @@ hillstoneIPSecTooLongDropPkts OBJECT-TYPE
 	DESCRIPTION
 		"The total number of packets dropped due to too long packet by 
 		 all current and previous IPSec Phase-2 Tunnels."
-	::= { HillstoneIPSecStatisticEntry 18 }
+	::= { hillstoneIPSecStatisticEntry 18 }
 
 hillstoneIPSecInvalidSaDropPkts OBJECT-TYPE
 	SYNTAX Counter32
@@ -291,7 +296,7 @@ hillstoneIPSecInvalidSaDropPkts OBJECT-TYPE
 	DESCRIPTION
 		"The total number of packets dropped due to invalid SA by all
 		 current and previous IPSec Phase-2 Tunnels."
-	::= { HillstoneIPSecStatisticEntry 19 }
+	::= { hillstoneIPSecStatisticEntry 19 }
 
 
 	
@@ -1268,7 +1273,7 @@ hillstoneMFByKeyWord  OBJECT-TYPE
     ::= { hillstoneMailFltStatistics 8 }    
 
 hillstoneAtkEventStatisticsTable OBJECT-TYPE
-	SYNTAX SEQUENCE OF hillstoneAtkEventStatisticsEntry   
+	SYNTAX SEQUENCE OF HillstoneAtkEventStatisticsEntry   
 	MAX-ACCESS not-accessible      
 	STATUS current      
 	DESCRIPTION         
@@ -1276,7 +1281,7 @@ hillstoneAtkEventStatisticsTable OBJECT-TYPE
         ::= { hillstoneStatistics 10 }
 
 hillstoneAtkEventStatisticsEntry OBJECT-TYPE
-	SYNTAX hillstoneAtkEventStatisticsEntry
+	SYNTAX HillstoneAtkEventStatisticsEntry
 	MAX-ACCESS not-accessible
 	STATUS current
 	DESCRIPTION
@@ -1284,7 +1289,7 @@ hillstoneAtkEventStatisticsEntry OBJECT-TYPE
 	INDEX { hillstoneAtkEventZoneIdx }
 	::= { hillstoneAtkEventStatisticsTable 1 } 
 
-hillstoneAtkEventStatisticsEntry ::=
+HillstoneAtkEventStatisticsEntry ::=
       SEQUENCE{
 	  hillstoneAtkEventZoneIdx
 		Counter,
@@ -1645,7 +1650,7 @@ hillstoneAtkEventIPDirectedAtk  OBJECT-TYPE
     ::= { hillstoneAtkEventStatisticsEntry 35 }
 
 hillstoneAtkFlowStatisticsTable OBJECT-TYPE
-	SYNTAX SEQUENCE OF hillstoneAtkFlowStatisticsEntry   
+	SYNTAX SEQUENCE OF HillstoneAtkFlowStatisticsEntry   
 	MAX-ACCESS not-accessible      
 	STATUS current      
 	DESCRIPTION         
@@ -1653,7 +1658,7 @@ hillstoneAtkFlowStatisticsTable OBJECT-TYPE
         ::= { hillstoneStatistics 11 }
 
 hillstoneAtkFlowStatisticsEntry OBJECT-TYPE
-	SYNTAX hillstoneAtkFlowStatisticsEntry 
+	SYNTAX HillstoneAtkFlowStatisticsEntry 
 	MAX-ACCESS not-accessible
 	STATUS current
 	DESCRIPTION
@@ -1661,7 +1666,7 @@ hillstoneAtkFlowStatisticsEntry OBJECT-TYPE
 	INDEX { hillstoneFlowPktsZoneIdx }
 	::= { hillstoneAtkFlowStatisticsTable 1 } 
 
-hillstoneAtkFlowStatisticsEntry ::=
+HillstoneAtkFlowStatisticsEntry ::=
       SEQUENCE{
 	  hillstoneFlowPktsZoneIdx
 		Counter,

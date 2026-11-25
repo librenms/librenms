@@ -1,35 +1,37 @@
 CISCOSB-RMON DEFINITIONS ::= BEGIN
 
--- Title:      CISCOSB Rmon Private Extension
+-- Title: CISCOSB Rmon Private Extension
 -- Version:    7.37.00.00
 -- Date:       17 May 2004
 
 IMPORTS
-    switch001                                               FROM CISCOSB-MIB
-    OwnerString, EntryStatus                                FROM RMON-MIB
+    OwnerString, EntryStatus, etherStatsEntry               FROM RMON-MIB
     Unsigned32, Integer32, Counter32, TimeTicks,
     MODULE-IDENTITY, OBJECT-TYPE                            FROM SNMPv2-SMI
     DisplayString, RowStatus, TruthValue,
-    TEXTUAL-CONVENTION                                      FROM SNMPv2-TC;
+    TEXTUAL-CONVENTION                                      FROM SNMPv2-TC
+    switch001                                                FROM CISCOSB-MIB;
 
 
 rlRmonControl  MODULE-IDENTITY
-                 LAST-UPDATED "200406010001Z"
-                 ORGANIZATION "Cisco Systems, Inc."
+                 LAST-UPDATED "201705220000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
 
-                 CONTACT-INFO
-                 "Postal: 170 West Tasman Drive
-                 San Jose , CA 95134-1706
-                 USA
-
-                 
-                 Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
 
                  DESCRIPTION
-                      "The private MIB module definition for switch001 RMON MIB."
+                      "The private MIB module definition for CISCOSB RMON MIB."
                  REVISION "200406010000Z"
                  DESCRIPTION
                       "Initial version of this MIB."
+                 REVISION "201705220000Z"
+                 DESCRIPTION
+                      "Added rlEtherStatsTable"
                  ::= { switch001 49 }
 
 
@@ -331,11 +333,11 @@ rlControlHistoryMaxEntries OBJECT-TYPE
    DEFVAL  { 300 }
    ::= {rlRmonControl 8}
 
--- 
+--
 -- rlEtherStatsTable
--- 
+--
 rlEtherStatsTable OBJECT-TYPE
-    SYNTAX     SEQUENCE OF RlEtherStatsEntry 
+    SYNTAX     SEQUENCE OF RlEtherStatsEntry
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
@@ -361,7 +363,7 @@ rlEtherStatsPkts1519toMaxOctets OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The total number of packets (including bad
-        packets) received that were at least 1518 
+        packets) received that were at least 1518
 		octets in length inclusive
         (excluding framing bits but including FCS octets)."
     ::= { rlEtherStatsEntry 1 }

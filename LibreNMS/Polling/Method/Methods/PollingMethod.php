@@ -115,8 +115,7 @@ abstract class PollingMethod
 
     /**
      * The class of the module data this method provides, it implements module interfaces such as VminfoDiscovery.
-     * Modules get it through OS::dataSources() when the method is enabled and its check succeeds,
-     * and modules that implement UsesDataSources are enabled by default for devices with the method enabled.
+     * Modules get it through OS::dataSources() when the method is enabled and its check succeeds.
      * It is known without checking the method, see dataSource().
      *
      * @return class-string|null
@@ -142,7 +141,7 @@ abstract class PollingMethod
      * The data source of this method for a device, see dataSourceClass().
      * Made after a successful check, so it can read what the check fetched.
      */
-    public function dataSource(PollingMethodConfig $config, ProbeResult $result): ?object
+    public function dataSource(Device $device, PollingMethodConfig $config, ProbeResult $result): ?object
     {
         return null;
     }

@@ -1,5 +1,5 @@
 -- ============================================================================
--- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 -- Description:  This MIB file is used for configuration of NAT.
 --                include :1.NAT pool
 --                         2.NAT out bound
@@ -9,7 +9,7 @@
 --                         6.NAT statistics information
 --                         7.NAT DNS
 -- Reference:
--- Version: V1.8
+-- Version: V2.0
 -- History:
 -- V1.0 2004/09/17 created by xiaoshuchao
 -- V1.1 2005/06/01 Modified by liguanmin
@@ -38,6 +38,20 @@
 --      Add the hh3cNatIPPoolAddrUsageRecoveryTraps
 --      Add the hh3cInstAddrUsgTotalIPCount, hh3cInstAddrUsgUsedIPCount,
 --      hh3cInstAddrUsgUnusedIPCount, hh3cInstAddrMemUsgGrpIPMask
+-- V1.9 2021/09/17 Modified by j18129
+--      Add the hh3cNatIPPoolIpAllocFailTrap,
+--      hh3cNatIPPoolIpAllocFailRecoveryTrap, hh3cNatIPPoolIpApplyFailTrap,
+--      hh3cNatPortBlockAllocFailTrap, hh3cNatPortBlockAllocFailRecoveryTrap,
+--      hh3cNatPortAllocFailTrap, hh3cNatPortAllocFailRecoveryTrap,
+--      hh3cNatPortUsageTrap, hh3cNatPortUsageRecoveryTrap
+-- V2.0 2022/08/03 Modified by l17656
+--      Add the hh3cNat444PortBlockOverTrap,
+--      hh3cNat444PortBlockBelowTrap, hh3cNatEIMOverTrap,
+--      hh3cNatEIMBelowTrap, hh3cNatNoPatOverTrap,
+--      hh3cNatNoPatBelowTrap, hh3cNatNqaTrap, hh3cNatNqaExcessiveTrap,
+--      hh3cNatNqaBelowTrap,hh3cNatPortSplitTrap, hh3cNatPortRecycleTrap,
+--      hh3cNatTrapChassis, hh3cNatTrapSlot, hh3cNatTrapCpu, hh3cNatAddrNum, hh3cNat444PortBlockCount,
+--      hh3cNat444PortBlockUseCount, hh3cNat444PortBlockUsage, hh3cNatNqaAddr, hh3cNatConflictVar
 -- ============================================================================
 HH3C-NAT-MIB DEFINITIONS ::= BEGIN
 
@@ -46,6 +60,8 @@ HH3C-NAT-MIB DEFINITIONS ::= BEGIN
                                 FROM HH3C-OID-MIB
                         ifIndex
                                 FROM IF-MIB
+                        InetAddress, InetAddressType
+                                FROM INET-ADDRESS-MIB
                         TimeTicks, IpAddress, Integer32, Counter32, Counter64, Unsigned32, OBJECT-TYPE,
                         MODULE-IDENTITY, NOTIFICATION-TYPE
                                 FROM SNMPv2-SMI
@@ -54,7 +70,7 @@ HH3C-NAT-MIB DEFINITIONS ::= BEGIN
 
 
                 hh3cNat MODULE-IDENTITY
-                        LAST-UPDATED "202012291440Z"             -- December 29, 2020 at 14:40 GMT
+                        LAST-UPDATED "202208031105Z"             -- August 3, 2022 at 11:05 GMT
                         ORGANIZATION
                             "New H3C Tech. Co., Ltd."
                         CONTACT-INFO
@@ -63,6 +79,26 @@ HH3C-NAT-MIB DEFINITIONS ::= BEGIN
                             http://www.h3c.com
                             Zip:100085
                             "
+                        DESCRIPTION
+                                "Add the hh3cNatIPPoolIpAllocFailTrap,
+                                 hh3cNatIPPoolIpAllocFailRecoveryTrap,
+                                 hh3cNatIPPoolIpApplyFailTrap,
+                                 hh3cNatPortBlockAllocFailTrap,
+                                 hh3cNatPortBlockAllocFailRecoveryTrap,
+                                 hh3cNatPortAllocFailTrap,
+                                 hh3cNatPortAllocFailRecoveryTrap,
+                                 hh3cNatPortUsageTrap,
+                                 hh3cNatPortUsageRecoveryTrap"
+
+                        REVISION "202208031105Z"                -- August 3, 2022 at 11:05 GMT
+                        DESCRIPTION
+                                "Add the hh3cNat444PortBlockOverTrap,hh3cNatEIMOverTrap,hh3cNatEIMBelowTrap,
+                                hh3cNat444PortBlockBelowTrap,hh3cNatNoPatOverTrap,hh3cNatNoPatBelowTrap,
+                                hh3cNatIPPoolAddrUsageRecoveryTraps,hh3cNatNqaTrap, hh3cNatNqaExcessiveTrap,
+                hh3cNatNqaBelowTrap,hh3cNatPortSplitTrap, hh3cNatPortRecycleTrap,
+                hh3cNatTrapChassis, hh3cNatTrapSlot, hh3cNatTrapCpu, hh3cNatAddrNum, hh3cNat444PortBlockCount,
+                hh3cNat444PortBlockUseCount, hh3cNat444PortBlockUsage, hh3cNatNqaAddr, hh3cNatConflictVar"
+            REVISION "202109171711Z"                -- september 17, 2021 at 17:11 GMT
                         DESCRIPTION
                                 "Add the hh3cNatIPPoolGroupTable,
                                 hh3cNatIPPoolAddrUsageExceedTraps,
@@ -2062,6 +2098,39 @@ DESCRIPTION
 "Send trap when dropped below the threshold."
 ::= { hh3cNatIPPoolAddrUsageExceedPrefix 2 }
 
+hh3cNatIPPoolIpAllocFailTrap NOTIFICATION-TYPE
+OBJECTS
+{
+   hh3cNatTrapIPPoolName
+}
+STATUS current
+DESCRIPTION
+"Send traps when IP addresses in a NAT IP pool are used up."
+::= { hh3cNatIPPoolAddrUsageExceedPrefix 3 }
+
+hh3cNatIPPoolIpAllocFailRecoveryTrap NOTIFICATION-TYPE
+OBJECTS
+{
+   hh3cNatTrapIPPoolName
+}
+STATUS current
+DESCRIPTION
+"Send traps when IP addresses in a NAT IP pool become available."
+::= { hh3cNatIPPoolAddrUsageExceedPrefix 4 }
+
+hh3cNatIPPoolIpApplyFailTrap NOTIFICATION-TYPE
+OBJECTS
+{
+   hh3cNatTrapIPPoolName,
+   hh3cNatTrapIPPoolMemStartIP,
+   hh3cNatTrapIPPoolMemIPMask,
+   hh3cNatTrapIPPoolFailReason
+}
+STATUS current
+DESCRIPTION
+"Send trap when IP addresses apply failed."
+::= { hh3cNatIPPoolAddrUsageExceedPrefix 5 }
+
 hh3cNatIPPoolAddrUsageTrapExceed OBJECT IDENTIFIER ::= { hh3cNatIPPoolAddrUsageExceedTraps 1 }
 hh3cNatTrapIPPoolName OBJECT-TYPE
    SYNTAX OCTET STRING(SIZE (1..32))
@@ -2078,5 +2147,436 @@ hh3cNatTrapIPPoolAddrUsage OBJECT-TYPE
    DESCRIPTION
    "NAT IP pool address usage."
 ::= { hh3cNatIPPoolAddrUsageTrapExceed 2 }
+
+hh3cNatTrapIPPoolMemStartIP OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "The start IP address of the address pool."
+::= { hh3cNatIPPoolAddrUsageTrapExceed 3 }
+
+hh3cNatTrapIPPoolMemIPMask OBJECT-TYPE
+   SYNTAX OCTET STRING(SIZE (0..32))
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "IP address mask."
+::= { hh3cNatIPPoolAddrUsageTrapExceed 4 }
+
+hh3cNatTrapIPPoolFailReason OBJECT-TYPE
+   SYNTAX OCTET STRING(SIZE (1..127))
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "IP address application failure reason."
+::= { hh3cNatIPPoolAddrUsageTrapExceed 5 }
+
+-- Describes objects for NAT port block traps
+hh3cNatPortBlockTraps OBJECT IDENTIFIER ::= { hh3cNATMibObjects 21 }
+
+hh3cNatPortBlockPrefix OBJECT IDENTIFIER ::= { hh3cNatPortBlockTraps 0 }
+hh3cNatPortBlockAllocFailTrap NOTIFICATION-TYPE
+OBJECTS
+{
+   hh3cNatTrapAddrGrpIndex,
+   hh3cNatTrapAddrGrpChassis,
+   hh3cNatTrapAddrGrpSlot,
+   hh3cNatTrapAddrGrpCpu
+}
+STATUS current
+DESCRIPTION
+"Send trap when port blocks ran out."
+::= { hh3cNatPortBlockPrefix 1 }
+
+hh3cNatPortBlockAllocFailRecoveryTrap NOTIFICATION-TYPE
+OBJECTS
+{
+   hh3cNatTrapAddrGrpIndex,
+   hh3cNatTrapAddrGrpChassis,
+   hh3cNatTrapAddrGrpSlot,
+   hh3cNatTrapAddrGrpCpu
+}
+STATUS current
+DESCRIPTION
+"Send traps when port blocks become available."
+::= { hh3cNatPortBlockPrefix 2 }
+
+hh3cNatPortAllocFailTrap NOTIFICATION-TYPE
+OBJECTS
+{
+   hh3cNatTrapAddrGrpIndex,
+   hh3cNatTrapUserIPType,
+   hh3cNatTrapUserIP,
+   hh3cNatTrapUserID,
+   hh3cNatTrapAddrGrpMemberIP,
+   hh3cNatTrapMemberIPPortNums,
+   hh3cNatTrapAddrGrpChassis,
+   hh3cNatTrapAddrGrpSlot,
+   hh3cNatTrapAddrGrpCpu
+}
+STATUS current
+DESCRIPTION
+"Send traps when port resources are used up."
+::= { hh3cNatPortBlockPrefix 3 }
+
+hh3cNatPortAllocFailRecoveryTrap NOTIFICATION-TYPE
+OBJECTS
+{
+   hh3cNatTrapAddrGrpIndex,
+   hh3cNatTrapUserIPType,
+   hh3cNatTrapUserIP,
+   hh3cNatTrapUserID,
+   hh3cNatTrapAddrGrpMemberIP,
+   hh3cNatTrapMemberIPPortNums,
+   hh3cNatTrapAddrGrpChassis,
+   hh3cNatTrapAddrGrpSlot,
+   hh3cNatTrapAddrGrpCpu
+}
+STATUS current
+DESCRIPTION
+"Send traps when port resources become available."
+::= { hh3cNatPortBlockPrefix 4 }
+
+hh3cNatPortUsageTrap NOTIFICATION-TYPE
+OBJECTS
+{
+   hh3cNatTrapAddrGrpIndex,
+   hh3cNatTrapUserIPType,
+   hh3cNatTrapUserIP,
+   hh3cNatTrapUserID,
+   hh3cNatTrapAddrGrpMemberIP,
+   hh3cNatTrapMemberIPPortNums,
+   hh3cNatTrapPortAllocMode,
+   hh3cNatTrapPortUsgProtocol,
+   hh3cNatTrapPortUsgThreshold,
+   hh3cNatTrapAddrGrpChassis,
+   hh3cNatTrapAddrGrpSlot,
+   hh3cNatTrapAddrGrpCpu
+}
+STATUS current
+DESCRIPTION
+"Send traps when the ratio of assigned ports reaching the port usage threshold."
+::= { hh3cNatPortBlockPrefix 5 }
+
+hh3cNatPortUsageRecoveryTrap NOTIFICATION-TYPE
+OBJECTS
+{
+   hh3cNatTrapAddrGrpIndex,
+   hh3cNatTrapUserIPType,
+   hh3cNatTrapUserIP,
+   hh3cNatTrapUserID,
+   hh3cNatTrapAddrGrpMemberIP,
+   hh3cNatTrapMemberIPPortNums,
+   hh3cNatTrapPortAllocMode,
+   hh3cNatTrapPortUsgProtocol,
+   hh3cNatTrapPortUsgThreshold,
+   hh3cNatTrapAddrGrpChassis,
+   hh3cNatTrapAddrGrpSlot,
+   hh3cNatTrapAddrGrpCpu
+}
+STATUS current
+DESCRIPTION
+"Send traps when the ratio of assigned ports is below 87.5% of the port usage threshold."
+::= { hh3cNatPortBlockPrefix 6 }
+
+hh3cNatPortBlockTrapInfo OBJECT IDENTIFIER ::= { hh3cNatPortBlockTraps 1 }
+hh3cNatTrapAddrGrpIndex OBJECT-TYPE
+   SYNTAX Integer32 (1..65536)
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "Index of the address group."
+::= { hh3cNatPortBlockTrapInfo 1 }
+
+hh3cNatTrapUserIPType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "The type of user IP address."
+::= { hh3cNatPortBlockTrapInfo 2 }
+
+hh3cNatTrapUserIP OBJECT-TYPE
+   SYNTAX InetAddress
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "User IP address."
+::= { hh3cNatPortBlockTrapInfo 3 }
+
+hh3cNatTrapUserID OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "User ID."
+::= { hh3cNatPortBlockTrapInfo 4 }
+
+hh3cNatTrapAddrGrpMemberIP OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "Public network address."
+::= { hh3cNatPortBlockTrapInfo 5 }
+
+hh3cNatTrapMemberIPPortNums OBJECT-TYPE
+   SYNTAX Integer32 (1..65536)
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "IP port numbers."
+::= { hh3cNatPortBlockTrapInfo 6 }
+
+hh3cNatTrapPortAllocMode OBJECT-TYPE
+   SYNTAX INTEGER {
+      cdm(1),
+      eim(2)
+   }
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "Public IP address port allocation mode."
+::= { hh3cNatPortBlockTrapInfo 7 }
+
+hh3cNatTrapPortUsgProtocol OBJECT-TYPE
+   SYNTAX Integer32 (0..255)
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "The protocol type of public IP address port usage."
+::= { hh3cNatPortBlockTrapInfo 8 }
+
+hh3cNatTrapPortUsgThreshold OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "Port usage threshold."
+::= { hh3cNatPortBlockTrapInfo 9 }
+
+hh3cNatTrapAddrGrpChassis OBJECT-TYPE
+   SYNTAX Integer32 (0..65534)
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "Chassis ID."
+::= { hh3cNatPortBlockTrapInfo 10 }
+
+hh3cNatTrapAddrGrpSlot OBJECT-TYPE
+   SYNTAX Integer32 (0..65534)
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "Slot ID."
+::= { hh3cNatPortBlockTrapInfo 11 }
+
+hh3cNatTrapAddrGrpCpu OBJECT-TYPE
+   SYNTAX Integer32 (0..7)
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION
+   "CPU ID."
+::= { hh3cNatPortBlockTrapInfo 12 }
+
+--Describe objects for nat abrupt trap
+hh3cNatMonitor OBJECT IDENTIFIER ::= { hh3cNat 3}
+
+hh3cNatTrapObjects OBJECT IDENTIFIER ::= { hh3cNatMonitor 0 }
+
+hh3cNat444PortBlockOverTrap NOTIFICATION-TYPE
+    OBJECTS{
+    hh3cNatTrapChassis,
+    hh3cNatTrapSlot,
+    hh3cNatTrapCpu,
+    hh3cNatAddrNum,
+    hh3cNat444PortBlockCount,
+    hh3cNat444PortBlockUseCount,
+    hh3cNat444PortBlockUsage
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when the port-block reaches the upper threshold is generated."
+    ::= { hh3cNatTrapObjects 1}
+hh3cNat444PortBlockBelowTrap NOTIFICATION-TYPE
+    OBJECTS{
+    hh3cNatTrapChassis,
+    hh3cNatTrapSlot,
+    hh3cNatTrapCpu,
+    hh3cNatAddrNum,
+    hh3cNat444PortBlockCount,
+    hh3cNat444PortBlockUseCount,
+    hh3cNat444PortBlockUsage
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when the port-block returns to the upper threshold is generated."
+    ::= { hh3cNatTrapObjects 2}
+hh3cNatEIMOverTrap NOTIFICATION-TYPE
+    OBJECTS{
+    hh3cNatTrapChassis,
+    hh3cNatTrapSlot,
+    hh3cNatTrapCpu,
+    hh3cNatAddrNum
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when the EIM mode address resource is insufficient."
+    ::= { hh3cNatTrapObjects 3}
+hh3cNatEIMBelowTrap NOTIFICATION-TYPE
+    OBJECTS{
+    hh3cNatTrapChassis,
+    hh3cNatTrapSlot,
+    hh3cNatTrapCpu,
+    hh3cNatAddrNum
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when the EIM address returns to adequate."
+    ::= { hh3cNatTrapObjects 4}
+hh3cNatNoPatOverTrap NOTIFICATION-TYPE
+    OBJECTS{
+    hh3cNatTrapChassis,
+    hh3cNatTrapSlot,
+    hh3cNatTrapCpu,
+    hh3cNatAddrNum
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when the nat no-pat address reaches the upper thresholdd is generated."
+    ::= { hh3cNatTrapObjects 5}
+hh3cNatNoPatBelowTrap NOTIFICATION-TYPE
+    OBJECTS{
+    hh3cNatTrapChassis,
+    hh3cNatTrapSlot,
+    hh3cNatTrapCpu,
+    hh3cNatAddrNum
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when the nat no-pat address returns to the upper threshold is generated."
+    ::= { hh3cNatTrapObjects 6}
+hh3cNatNqaTrap NOTIFICATION-TYPE
+    OBJECTS{
+    hh3cNatTrapChassis,
+    hh3cNatTrapSlot,
+    hh3cNatTrapCpu,
+    hh3cNatAddrNum,
+    hh3cNatNqaAddr
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when when NQA detects an unhealthy IP and is discharged from the address pool is generated."
+    ::= { hh3cNatTrapObjects 7}
+hh3cNatNqaExcessiveTrap NOTIFICATION-TYPE
+    OBJECTS{
+    hh3cNatTrapChassis,
+    hh3cNatTrapSlot,
+    hh3cNatTrapCpu,
+    hh3cNatAddrNum
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when when too many address ran out is generated."
+    ::= { hh3cNatTrapObjects 8}
+hh3cNatNqaBelowTrap NOTIFICATION-TYPE
+    OBJECTS{
+    hh3cNatTrapChassis,
+    hh3cNatTrapSlot,
+    hh3cNatTrapCpu,
+    hh3cNatAddrNum
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when address become available is generated."
+    ::= { hh3cNatTrapObjects 9}
+hh3cNatPortSplitTrap NOTIFICATION-TYPE
+    OBJECTS{
+    hh3cNatTrapChassis,
+    hh3cNatTrapSlot,
+    hh3cNatTrapCpu,
+    hh3cNatConflictVar
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when port block is in split mode."
+    ::= { hh3cNatTrapObjects 10}
+hh3cNatPortRecycleTrap NOTIFICATION-TYPE
+    OBJECTS{
+    hh3cNatTrapChassis,
+    hh3cNatTrapSlot,
+    hh3cNatTrapCpu,
+    hh3cNatConflictVar
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when port block is in recycle mode."
+    ::= { hh3cNatTrapObjects 11}
+
+hh3cNatTrapValues OBJECT IDENTIFIER ::= { hh3cNatMonitor 1 }
+hh3cNatTrapChassis OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "An IRF member device ID."
+    ::= { hh3cNatTrapValues 1}
+hh3cNatTrapSlot OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The slot where the card resides."
+    ::= { hh3cNatTrapValues 2 }
+hh3cNatTrapCpu OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "CPU ID."
+    ::= { hh3cNatTrapValues 3 }
+hh3cNatAddrNum OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65535)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The number of address-group."
+    ::= { hh3cNatTrapValues 4 }
+hh3cNat444PortBlockCount OBJECT-TYPE
+    SYNTAX Unsigned32 (1..4294967295)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The number of address-group."
+    ::= { hh3cNatTrapValues 5 }
+hh3cNat444PortBlockUseCount OBJECT-TYPE
+    SYNTAX Unsigned32 (1..4294967295)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The number of address-group."
+    ::= { hh3cNatTrapValues 6 }
+hh3cNat444PortBlockUsage OBJECT-TYPE
+    SYNTAX Unsigned32 (0..100)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The number of address-group."
+    ::= { hh3cNatTrapValues 7 }
+hh3cNatNqaAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The addresses of nqa excluded."
+    ::= { hh3cNatTrapValues 8 }
+hh3cNatConflictVar OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..256))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The string description port assignment status."
+    ::= { hh3cNatTrapValues 9 }
 
 END

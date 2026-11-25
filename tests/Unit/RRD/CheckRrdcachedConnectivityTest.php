@@ -42,4 +42,47 @@ final class CheckRrdcachedConnectivityTest extends TestCase
         $this->assertSame(ValidationResult::SUCCESS, (new CheckRrdcachedConnectivity)->validate()->getStatus());
         fclose($server);
     }
+
+    public function testConnectsUnixSocket(): void
+    {
+        $socket = sys_get_temp_dir() . '/librenms-rrdcached-test-' . getmypid() . '.sock';
+        $server = stream_socket_server("unix://$socket");
+        LibrenmsConfig::set('rrdcached', "unix:$socket");
+
+        $result = (new CheckRrdcachedConnectivity)->validate();
+        fclose($server);
+        unlink($socket);
+
+        $this->assertSame(ValidationResult::SUCCESS, $result->getStatus());
+    }
+
+    public function testUnixSocketNotListening(): void
+    {
+        // the path exists, but nothing accepts connections on it (stale socket or no permission)
+        $socket = tempnam(sys_get_temp_dir(), 'librenms-rrdcached-test');
+        LibrenmsConfig::set('rrdcached', "unix:$socket");
+
+        $result = (new CheckRrdcachedConnectivity)->validate();
+        unlink($socket);
+
+        $this->assertSame(ValidationResult::FAILURE, $result->getStatus());
+        $this->assertStringContainsString("Cannot connect to rrdcached socket $socket", $result->getMessage());
+    }
+
+    public function testUnixSocketParentNotAccessible(): void
+    {
+        $directory = sys_get_temp_dir() . '/librenms-rrdcached-test-' . getmypid();
+        mkdir($directory, 0);
+        if (is_readable($directory)) {
+            rmdir($directory);
+            $this->markTestSkipped('Directory permissions do not apply to this user');
+        }
+        LibrenmsConfig::set('rrdcached', "unix:$directory/rrdcached.sock");
+
+        $result = (new CheckRrdcachedConnectivity)->validate();
+        rmdir($directory);
+
+        $this->assertSame(ValidationResult::FAILURE, $result->getStatus());
+        $this->assertStringContainsString('Permission denied', $result->getMessage());
+    }
 }

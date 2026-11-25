@@ -39,7 +39,7 @@ class ProcessorGraph extends DeviceGraph
 
     protected function options(): GraphOptions
     {
-        return new GraphOptions(scaleMin: 0, scaleMax: 100, legendTitle: 'Load %', palette: $this->isStacked() ? 'oranges' : 'mixed');
+        return new GraphOptions(scaleMin: 0, scaleMax: 100, legendTitle: __('graph.device.processor.load'), palette: $this->isStacked() ? 'oranges' : 'mixed');
     }
 
     private function isStacked(): bool

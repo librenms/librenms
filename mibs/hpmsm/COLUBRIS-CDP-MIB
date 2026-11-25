@@ -1,7 +1,8 @@
 -- ****************************************************************************
 --  COLUBRIS-CDP-MIB definitions
 --
---  Copyright (c) 2004, Colubris Networks, Inc.
+--  Copyright (c) 2004, Hewlett-Packard Development Company, L.P. 
+--  The information contained herein is subject to change without notice.
 --  All Rights Reserved.
 --
 --  Colubris Networks CDP MIB file.
@@ -14,9 +15,9 @@ COLUBRIS-CDP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE,
-    Integer32, Unsigned32
+    Integer32, Unsigned32, IpAddress
         FROM    SNMPv2-SMI
-    DisplayString, MacAddress
+    DisplayString
         FROM    SNMPv2-TC
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM    SNMPv2-CONF
@@ -26,7 +27,7 @@ IMPORTS
 
 
 colubrisCdpMIB   MODULE-IDENTITY
-    LAST-UPDATED    "200402200000Z"
+    LAST-UPDATED    "200901160000Z"
     ORGANIZATION    "Colubris Networks, Inc."
     CONTACT-INFO    "Colubris Networks
                      Postal: 200 West Street Ste 300
@@ -55,9 +56,9 @@ coCdpCacheTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "The (conceptual) table containing the cached information
-                 obtained from CDP messages. In tabular form to allow
+                 obtained from CDP messages in tabular form to allow
                  multiple instances on an agent. This table applies to
-                 access controllers only."
+                 controllers only."
     ::= { coCdpCache 1 }
 
 coCdpCacheEntry OBJECT-TYPE
@@ -77,7 +78,7 @@ CoCdpCacheEntry ::= SEQUENCE
 {
     coCdpCacheDeviceIndex             Integer32,
     coCdpCacheLocalInterface          DisplayString,
-    coCdpCacheAddress                 MacAddress,
+    coCdpCacheAddress                 IpAddress,
     coCdpCacheDeviceId                DisplayString,
     coCdpCacheTimeToLive              Unsigned32,
     coCdpCacheCapabilities            DisplayString,
@@ -102,35 +103,35 @@ coCdpCacheLocalInterface OBJECT-TYPE
     ::= { coCdpCacheEntry 2 }
 
 coCdpCacheAddress OBJECT-TYPE
-    SYNTAX      MacAddress
+    SYNTAX      IpAddress
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Indicates the Ethernet address of the device that sent the CDP message."
+    DESCRIPTION "Indicates the IP address of the device that sent the CDP message."
     ::= { coCdpCacheEntry 3 }
 
 coCdpCacheDeviceId OBJECT-TYPE
     SYNTAX      DisplayString
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Indicates the Device-ID string as reported in the most recent CDP
-                 message. A zero-length string indicates that no Device-ID field (TLV) 
-                 was reported in the most recent CDP message."
+    DESCRIPTION "Indicates the Device-ID string as reported in the most recent 
+                 CDP message. A zero-length string indicates that no Device-ID 
+                 field (TLV)was reported in the most recent CDP message."
     ::= { coCdpCacheEntry 4 }
 
 coCdpCacheTimeToLive OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Indicates the number of seconds to keep the remote device in the
-                 cache table after receiving the CDP message."
+    DESCRIPTION "Indicates the number of seconds to keep the remote device in
+                 the cache table after receiving the CDP message."
     ::= { coCdpCacheEntry 5 }
 
 coCdpCacheCapabilities OBJECT-TYPE
     SYNTAX      DisplayString
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Indicates the device's functional capabilities as reported in the
-                 most recent CDP message. Possible values are:
+    DESCRIPTION "Indicates the device's functional capabilities as reported in
+                 the most recent CDP message. Possible values are:
 
                    R - layer 3 router
 
@@ -154,28 +155,30 @@ coCdpCacheVersion OBJECT-TYPE
     SYNTAX      DisplayString
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Indicates the Version string as reported in the most recent CDP
-                 message. A zero-length string indicates no Version field (TLV) 
-                 was reported in the most recent CDP message."
+    DESCRIPTION "Indicates the Version string as reported in the most recent
+                 CDP message. A zero-length string indicates no Version field 
+                (TLV) was reported in the most recent CDP message."
     ::= { coCdpCacheEntry 7 }
 
 coCdpCachePlatform OBJECT-TYPE
     SYNTAX      DisplayString
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Indicates the Device's Hardware Platform as reported in the most
-                 recent CDP message. A zero-length string indicates that no Platform
-                 field (TLV) was reported in the most recent CDP message."
+    DESCRIPTION "Indicates the Device's Hardware Platform as reported in the
+                 most recent CDP message. A zero-length string indicates that                    
+                 no Platform field (TLV) was reported in the most recent CDP 
+                 message."
     ::= { coCdpCacheEntry 8 }
 
 coCdpCachePortId OBJECT-TYPE
     SYNTAX      DisplayString
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION "Indicates the Port-ID string as reported in the most recent CDP
-                 message. This will typically be the value of the ifName
+    DESCRIPTION "Indicates the Port-ID string as reported in the most recent 
+                 CDP message. This will typically be the value of the ifName
                  object (e.g., 'Ethernet0'). A zero-length string indicates no 
-                 Port-ID field (TLV) was reported in the most recent CDP message."
+                 Port-ID field (TLV) was reported in the most recent CDP 
+                 message."
     ::= { coCdpCacheEntry 9 }
 
 -- CDP global configuration

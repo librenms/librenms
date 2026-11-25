@@ -5,6 +5,8 @@ namespace LibreNMS\OS;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Location;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
@@ -158,5 +160,22 @@ class Enexus extends OS implements OSDiscovery
         }
 
         return $inventory;
+    }
+
+    /**
+     * Battery test results are a table of tests, the last one is the latest
+     */
+    public function pollSensors(EloquentCollection $sensors): array
+    {
+        $values = parent::pollSensors($sensors);
+
+        foreach ($sensors as $sensor) {
+            if (($sensor->sensor_class == 'percent' && $sensor->sensor_type === 'batteryTestQuality')
+                || ($sensor->sensor_class == 'runtime' && $sensor->sensor_type === 'batteryTestDuration')) {
+                $values[$sensor->sensor_id] = Arr::last(SnmpQuery::walk($sensor->sensor_oid)->values());
+            }
+        }
+
+        return $values;
     }
 }

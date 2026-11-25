@@ -42,7 +42,7 @@ class ProcessesTabTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'processes']))
+            ->get(route('device.processes', ['device' => $device]))
             ->assertOk()
             ->assertSee('1234')
             ->assertSee('root')
@@ -64,7 +64,7 @@ class ProcessesTabTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'processes', 'order' => 'user', 'by' => 'asc']))
+            ->get(route('device.processes', ['device' => $device, 'order' => 'user', 'by' => 'asc']))
             ->assertOk();
 
         $content = $response->getContent();
@@ -80,7 +80,7 @@ class ProcessesTabTest extends TestCase
         Process::factory()->for($device)->create();
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'processes', 'order' => 'invalid_col', 'by' => 'invalid_dir']))
+            ->get(route('device.processes', ['device' => $device, 'order' => 'invalid_col', 'by' => 'invalid_dir']))
             ->assertSessionHasErrors(['order', 'by']);
     }
 
@@ -93,7 +93,7 @@ class ProcessesTabTest extends TestCase
         $user->assignRole('user');
 
         $this->actingAs($user)
-            ->get(route('device', ['device' => $device, 'tab' => 'processes']))
+            ->get(route('device.processes', ['device' => $device]))
             ->assertForbidden();
     }
 }

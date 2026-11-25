@@ -159,64 +159,7 @@ function create_state_index($state_name, $states = []): void
 
 function hytera_h2f($number, $nd)
 {
-    if (strlen(str_replace(' ', '', $number)) == 4) {
-        $number = \LibreNMS\Util\StringHelpers::asciiToHex($number, ' ');
-    }
-    $r = '';
-    $y = explode(' ', (string) $number);
-    foreach ($y as $z) {
-        $r = $z . '' . $r;
-    }
-
-    $hex = [];
-    $number = substr($r, 0, -1);
-    //$number = str_replace(" ", "", $number);
-    for ($i = 0; $i < strlen($number); $i++) {
-        $hex[] = substr($number, $i, 1);
-    }
-
-    $dec = [];
-    $hexCount = count($hex);
-    for ($i = 0; $i < $hexCount; $i++) {
-        $dec[] = hexdec($hex[$i]);
-    }
-
-    $binfinal = '';
-    $decCount = count($dec);
-    for ($i = 0; $i < $decCount; $i++) {
-        $binfinal .= sprintf('%04d', decbin($dec[$i]));
-    }
-
-    $sign = substr($binfinal, 0, 1);
-    $exp = substr($binfinal, 1, 8);
-    $exp = bindec($exp);
-    $exp -= 127;
-    $scibin = substr($binfinal, 9);
-    $binint = substr($scibin, 0, $exp);
-    $binpoint = substr($scibin, $exp);
-    $intnumber = bindec('1' . $binint);
-
-    $tmppoint = [];
-    for ($i = 0; $i < strlen($binpoint); $i++) {
-        $tmppoint[] = substr($binpoint, $i, 1);
-    }
-
-    $tmppoint = array_reverse($tmppoint);
-    $tpointnumber = min(number_format($tmppoint[0] / 2, strlen($binpoint), '.', ''), 1);
-
-    $pointnumber = '';
-    for ($i = 1; $i < strlen($binpoint); $i++) {
-        $pointnumber = number_format($tpointnumber / 2, strlen($binpoint), '.', '');
-        $tpointnumber = $tmppoint[$i + 1] . substr($pointnumber, 1);
-    }
-
-    $floatfinal = $intnumber + $pointnumber;
-
-    if ($sign == 1) {
-        $floatfinal = -$floatfinal;
-    }
-
-    return number_format($floatfinal, $nd, '.', '');
+    return \LibreNMS\OS\Hytera::hexToFloat((string) $number, (int) $nd);
 }
 
 /**

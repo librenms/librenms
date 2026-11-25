@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (dashes in comment lines; trailing comma before })
 -- ZyXEL Communications Corporation
 -- Private Enterprise MIB definition 
   
@@ -548,7 +549,7 @@ ZYXEL-MGS3712-MIB DEFINITIONS ::= BEGIN
                       	Modes:  Peer(0), Tunnel(1), Discard(2),  Network(3)"
         ::= { ctlProtTransTunnelPortEntry 1 }
 
----------------------------------------------------------------------
+----------------------------------------------------------------------
 --
 --  dot1x Setup
 --
@@ -558,7 +559,7 @@ ZYXEL-MGS3712-MIB DEFINITIONS ::= BEGIN
 --  3. remove radiusAnd8021xServer (AAA Service: radius server setup)
 --  4. DO NOT change oid for backward compatible
 --
----------------------------------------------------------------------
+----------------------------------------------------------------------
 --  dot1xSetup
 	dot1xSetup OBJECT IDENTIFIER ::= { mgs3712 7 }
                                 
@@ -5699,7 +5700,7 @@ eventClearedTrap NOTIFICATION-TYPE
         radiusAuthServerMode OBJECT-TYPE
         SYNTAX  INTEGER{
         		index-priority(1),
-						round-robin(2),
+						round-robin(2)
         }
         ACCESS  read-write
         STATUS  mandatory
@@ -5847,7 +5848,7 @@ eventClearedTrap NOTIFICATION-TYPE
         tacacsAuthServerMode OBJECT-TYPE
         SYNTAX  INTEGER{
         		index-priority(1),
-		round-robin(2),
+		round-robin(2)
         }
         ACCESS  read-write
         STATUS  mandatory
@@ -7044,11 +7045,11 @@ eventClearedTrap NOTIFICATION-TYPE
 
 
 
------------------------------------------------------------------
+------------------------------------------------------------------
 --
 -- ip source guard
 --
------------------------------------------------------------------
+------------------------------------------------------------------
 
 	ipsg OBJECT IDENTIFIER ::= { mgs3712 101 }
 	
@@ -7135,11 +7136,11 @@ eventClearedTrap NOTIFICATION-TYPE
                       	""
         ::= { ipsgEntry 7 } 
         
------------------------------------------------------------------
+------------------------------------------------------------------
 --
 -- arpInspect
 --
------------------------------------------------------------------
+------------------------------------------------------------------
 
 	arpInspect     	OBJECT IDENTIFIER ::= { mgs3712 102 }
 

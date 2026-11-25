@@ -201,18 +201,62 @@ Set these named arguments on `SeriesStyle` to control an individual series:
 
 | Option | Effect |
 | --- | --- |
-| `color: '0000cc'` | Sets a hex line or area color, without `#`. Otherwise, uses the graph palette. |
+| `role: SeriesRole::In` | Says what the series shows, which sets its colors. Otherwise, uses the graph palette. |
 | `fill: true` | Fills the area beneath a line. |
-| `fillColor: '9999cc'` | Sets the fill color; the default is a transparent version of the line color. |
 | `stacked: true` | Draws an area above the preceding stacked series. |
 | `invert: true` | Draws below zero, unless `webui.graph_stacked` is enabled. |
 | `drawScale: 0.5` | Scales only the drawing; legend values retain the series value. |
 | `stackAverage: true` | Divides the drawing by the number of drawn series with this set, so a stack of percentages shows their average. |
+| `maxFill: true` | Fills the area below the highest value of each interval, behind the other fills. |
+| `range: true` | Fills the area between the lowest and highest value of each interval, behind the other fills. |
+| `legendOnly: true` | Shows the series in the legend without drawing it. |
+
+Inverted stacked series stack separately below the axis. Stacked series may be
+listed in any order, such as the in and out series of each port together.
+
+Graphs never set colors. A `SeriesRole` says what a series shows, such as
+`In`, `Out`, `Error`, `Value` (the measured value, in the color of the legend
+text), `Muted` (free space) or `SeriesRole::usage($percent, $warn)` for used
+capacity, and the renderer picks colors that suit the light or dark site style.
+Drawn series that share a role get different shades, so stacked ports each get
+their own color. Stacked `In` and `Out` series take their shades from the
+`graph_colours.greens` and `graph_colours.purples` palettes, so a site that
+changes those palettes changes these graphs too. When `webui.graph_stacked`
+draws inverted series above the axis, the renderer makes areas and fills
+translucent so the series behind them stay visible.
 
 To convert the values themselves, use `scale` on `DataSeries`. For example,
 `scale: 8, unit: 'bps'` converts a stored bytes-per-second field to bits per
 second, including the legend values. Setting `unit` alone only adds a suffix;
-it does not convert values.
+it does not convert values. `offset` is added after the scale: `scale: 1.8,
+offset: 32` converts celsius to fahrenheit.
+
+The lowest and highest value of each interval come from the stored minimum and
+maximum of `field`. When they are stored in fields of their own, name them with
+`minField` and `maxField`.
+
+To show a value calculated from several fields of the metric, pass a `Formula`
+as the field. It is written in reverse polish notation with field names,
+numbers and the operators `+ - * /`:
+
+```php
+// percent of pings lost
+new DataSeries($metric, new Formula('xmt', 'rcv', '-', 'xmt', '/', 100, '*'), 'Loss', '%');
+```
+
+The lowest and highest values of a formula are those of its averages.
+Datastores that cannot calculate it themselves use `Formula::evaluate()`.
+
+To add up series of the graph, such as the traffic of every port of a device,
+add a `SeriesSum` with the keys of those series. It may only use series listed
+before it, including other sums. A series without a value at a time counts as
+zero, and series without stored data are left out:
+
+```php
+$series['in'] = new SeriesSum(['in_1', 'in_2'], 'Total In', 'bps', new SeriesStyle(legendOnly: true));
+```
+
+Like a formula, the lowest and highest values of a sum are those of its averages.
 
 ### Graph options
 
@@ -226,10 +270,62 @@ Common named arguments on `GraphOptions` are:
 | `legendTitle` | Adds a heading above the series labels. |
 | `palette` | Selects a palette from `graph_colours`; defaults to `mixed`. |
 | `base` | Sets the scaling base, such as `1024` for binary units. |
-| `unitsExponent` | Controls the axis unit exponent; `0` uses unprefixed units. |
+| `unitsExponent` | Controls the axis unit exponent; `0` shows axis and legend values without SI prefixes, for units such as days or milliseconds. |
+| `thresholds` | Draws a dashed `Threshold` line for each value, such as alert limits, in the units of the series. Its role, such as `SeriesRole::HighLimit`, sets its color. |
+| `scaleMargin` | Widens an autoscaled axis by this fraction of the values, so values that barely change still get axis labels. |
+| `axisUnit` | Shows a unit after the axis values, which are then shown without SI prefixes. |
+| `rightAxisLabel` | Adds a right axis with the same scale as the left one. |
+
+Describe what the graph should show rather than how rrdtool draws it.
+`leftAxisFormat` and `rightAxis` take rrdtool syntax and only exist for the
+legacy graphs; graphs drawn from other datastores ignore them.
 
 For example, a percentage graph can use `scaleMin: 0, scaleMax: 100,
 scaleRigid: true`. See `app/Data/Graphing/GraphOptions.php` for all options.
+
+### Percentiles and rolling averages
+
+Percentiles summarize a series, like its min, max and average.
+`GraphOptions::percentiles` adds a legend column for each one to every row.
+A series with `SeriesStyle::percentileLines` also draws them as dashed lines
+in its color; a legend only series, such as a total, uses the percentile
+color of the theme. Percentiles leave out missing samples.
+
+`SeriesStyle::rollingAverages` adds lines averaging the series over each
+hour, day and week, each with its own legend row. The daily lines need a graph
+covering at least 36 hours and the weekly lines at least 8 days. They take
+the next colors of the palette and their labels do not name the series, so
+use them on graphs of one series.
+
+The legacy `generic_stats` graphs are both, with the `stats` palette:
+
+```php
+public function getSeries(): array
+{
+    return [
+        'offset' => new DataSeries($this->metric(), 'offset', 'Offset', 's',
+            style: new SeriesStyle(fill: true, rollingAverages: true, percentileLines: true)),
+    ];
+}
+
+protected function options(): GraphOptions
+{
+    return new GraphOptions(palette: 'stats', percentiles: GraphOptions::statsPercentiles());
+}
+```
+
+`GraphOptions::statsPercentiles()` is the 25th, 50th and 75th percentile,
+or none when `graph_stat_percentile_disable` is set. Traffic graphs use
+`[LibrenmsConfig::get('percentile_value', 95)]`.
+
+Image graphs leave the lines out of graphs 25 pixels tall or less. The browser
+chart computes percentiles from the points in view, so they follow the
+resolution of the chart, and a rolling period that starts before the view
+averages only the part inside it.
+
+In the browser chart, viewers can hide a percentile column in the legend
+columns menu, which also leaves out its lines, and turn all percentile lines
+off in the graph settings.
 
 ## Troubleshooting
 
@@ -248,6 +344,17 @@ name. LibreNMS prefers a matching graph class over a legacy
 `includes/html/graphs/<type>/<subtype>.inc.php` file. If no class matches, it
 falls back to the legacy include.
 
+A graph type may have a `GenericGraph` class that draws every subtype without
+a class or legacy include of its own. For example, `App\Graphs\Sensor\GenericGraph`
+draws `sensor_temperature`, `sensor_voltage` and the other sensor classes.
+
+The metric identity is authoritative: datastores store and read the metric by
+it, so choose clean measurement and tag names rather than copying how the data
+happens to be stored now. If existing data is stored under other names, such
+as the `icmp-perf` measurement of `ping` or `mempool_type` instead of `type`,
+add those names to `LibreNMS\Data\Store\MetricNames`. Every datastore then
+finds the existing data by the clean identity.
+
 Replace legacy RRD filename and dataset variables with `MetricIdentity` and
 `DataSeries`, and move presentation settings into `SeriesStyle` and
 `GraphOptions`. Compare the resulting graph and legend before removing the
@@ -257,6 +364,22 @@ For working examples, read `app/Graphs/Device/NetstatIpGraph.php` for multiple
 fields and inverted series, or `app/Graphs/Device/ProcessorGraph.php` for one
 series per model and stacked drawing. Their regression tests are in
 `tests/Feature/Graphs/Device`.
+
+`app/Graphs/Port/BitsGraph.php` shows a port graph with byte-to-bit conversion
+and maximum fills. It extends `PortGraph`, which checks permission to view the
+port and supplies its page context and title. Its `GraphOptions::traffic`
+uses `TrafficOptions` to add transferred-byte totals, previous period
+comparisons and future trend lines, and its `percentiles` the configured
+percentile. `TrafficOptions::series` limits the traffic summaries to some of
+the series: `app/Graphs/Device/BitsGraph.php` stacks the traffic of each port
+and only summarizes, and draws the percentiles of, the device totals.
+
+For application graphs, extend `App\Graphs\Application\ApplicationGraph`;
+`$this->metric()` reads the `app-<app_type>-<app_id>.rrd` file the application
+poller writes. Graph class names can not contain hyphens, so an app such as
+`ntp-client` sets `GRAPH_PREFIX` in its `ApplicationDefinition` to name its
+graphs `application_ntp_client_*`. See
+`app/Graphs/Application/NtpClientOffsetGraph.php`.
 
 For graph types outside device graphs, extend `AbstractSeriesGraph` and
 implement `isAuthorized()` for the entities being displayed, using `canView()`

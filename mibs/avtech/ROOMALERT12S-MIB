@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (ObjectsPart keyword)
 --
 --defines ROOMALERT12S-MIB for SNMP agent extension of Room Alert 12S
 --Contents: Global Registration Module
@@ -291,7 +292,7 @@ switch-sen4 OBJECT-TYPE
 ::= { switch 4 }
 
 alarmmessage NOTIFICATION-TYPE
- ObjectsPart  { alarmmessage }
+ OBJECTS  { alarmmessage }
  STATUS current
  DESCRIPTION	"Indicates that an alarm condition has occurred on the sensor indicated by the alarmMessage variable."
 ::= { traps 1 }
