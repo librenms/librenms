@@ -41,7 +41,7 @@ final class SnmpPollingMethod extends PollingMethod
         return true;
     }
 
-    public function defaultCreationInput(): ?array
+    public function defaultCreationInput(): array
     {
         return ['active' => true];
     }

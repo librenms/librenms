@@ -28,7 +28,7 @@ final class IcmpPollingMethod extends PollingMethod
         return true;
     }
 
-    public function defaultCreationInput(): ?array
+    public function defaultCreationInput(): array
     {
         return ['active' => (bool) LibrenmsConfig::get('icmp_check', true)];
     }
