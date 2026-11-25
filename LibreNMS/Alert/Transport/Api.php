@@ -46,14 +46,17 @@ class Api extends Transport implements AlertTransport
         $method = strtolower((string) $this->config['api-method']);
         $host = explode('?', (string) $this->config['api-url'], 2)[0]; //we don't use the parameter part, cause we build it out of options.
 
+        // User-written templates use the legacy flat variable names, e.g. {{ $msg }}
+        $variables = $alert_data->toTransportPayload();
+
         //get each line of key-values and process the variables for Options
-        $query = $this->parseUserOptions($this->config['api-options'] ?? '', $alert_data);
-        $request_headers = $this->parseUserOptions($this->config['api-headers'] ?? '', $alert_data);
+        $query = $this->parseUserOptions($this->config['api-options'] ?? '', $variables);
+        $request_headers = $this->parseUserOptions($this->config['api-headers'] ?? '', $variables);
         $client = Http::client()
         ->withHeaders($request_headers); //get each line of key-values and process the variables for Headers
 
         if ($method !== 'get') {
-            $request_body = SimpleTemplate::parse($request_body, $alert_data);
+            $request_body = SimpleTemplate::parse($request_body, $variables);
             if ($as_form == true) {
                 $request_body = $this->parseUserOptions($request_body);
                 $method = 'postform';

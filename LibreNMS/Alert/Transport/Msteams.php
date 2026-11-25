@@ -34,9 +34,9 @@ class Msteams extends Transport implements AlertTransport
         if ($useJson) {
             // JSON mode: the template must supply the full payload, including
             // the {"type":"message","attachments":[...]} envelope.
-            $msg = $alert_data['uid'] === '000'
+            $msg = $alert_data->uid === 0
                 ? $this->testJsonMessage() // use pre-made JSON for tests
-                : $alert_data['msg'];
+                : $alert_data->msg;
 
             $client->withBody($msg, 'application/json');
         } else {
@@ -54,14 +54,14 @@ class Msteams extends Transport implements AlertTransport
             $alert_data,
             $res->status(),
             $res->body(),
-            $alert_data['msg'],
+            $alert_data->msg,
             $payload ?? []
         );
     }
 
     private function adaptiveCard(AlertData $alert_data): array
     {
-        $color = match ((int) $alert_data['state']) {
+        $color = match ((int) $alert_data->state) {
             AlertState::CLEAR => 'Good',
             AlertState::ACKNOWLEDGED => 'Accent',
             AlertState::BETTER, AlertState::CHANGED => 'Warning',
@@ -69,7 +69,7 @@ class Msteams extends Transport implements AlertTransport
         };
 
         // A TextBlock renders markdown but not HTML and needs a blank line for a line break.
-        $text = preg_replace('#<br\s*/?>|</(p|div|li|h[1-6])>#i', "\n", (string) $alert_data['msg']);
+        $text = preg_replace('#<br\s*/?>|</(p|div|li|h[1-6])>#i', "\n", (string) $alert_data->msg);
         $text = preg_replace('/\R+/', "\n\n", trim(strip_tags($text)));
         // Teams rejects messages over 28 KB.
         $text = mb_strcut($text, 0, 20000);
@@ -89,7 +89,7 @@ class Msteams extends Transport implements AlertTransport
                                 'size' => 'Medium',
                                 'weight' => 'Bolder',
                                 'color' => $color,
-                                'text' => $alert_data['title'],
+                                'text' => $alert_data->title,
                                 'wrap' => true,
                             ],
                             [

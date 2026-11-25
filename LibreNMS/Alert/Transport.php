@@ -5,7 +5,6 @@ namespace LibreNMS\Alert;
 use App\Facades\LibrenmsConfig;
 use App\Models\AlertTransport;
 use App\View\SimpleTemplate;
-use ArrayAccess;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Interfaces\Alert\AlertTransport as AlertTransportInterface;
@@ -76,10 +75,10 @@ abstract class Transport implements TransportInterface
      * Helper function to parse free form text box defined in ini style to key value pairs
      *
      * @param  string  $input
-     * @param  array<string, mixed>|ArrayAccess<string, mixed>  $replacements  for SimpleTemplate if desired
+     * @param  array  $replacements  for SimpleTemplate if desired
      * @return array
      */
-    protected function parseUserOptions(string $input, array|ArrayAccess $replacements = []): array
+    protected function parseUserOptions(string $input, array $replacements = []): array
     {
         $options = [];
         foreach (preg_split('/\\r\\n|\\r|\\n/', $input, -1, PREG_SPLIT_NO_EMPTY) as $option) {

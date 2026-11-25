@@ -57,7 +57,7 @@ class Syslog extends Transport implements AlertTransport
             $syslog_port = $this->config['syslog-port'];
         }
 
-        switch ($alert_data['severity']) {
+        switch ($alert_data->severity) {
             case 'critical':
                 $severity = 2;
                 $sev_txt = 'Critical';
@@ -68,7 +68,7 @@ class Syslog extends Transport implements AlertTransport
                 break;
         }
 
-        switch ($alert_data['state']) {
+        switch ($alert_data->state) {
             case AlertState::RECOVERED:
                 $state = 'OK';
                 $severity = 6;
@@ -91,20 +91,20 @@ class Syslog extends Transport implements AlertTransport
             . gethostname()
             . ' librenms'
             . '['
-            . $alert_data['device_id']
+            . $alert_data->device_id
             . ']: '
-            . $alert_data['hostname']
+            . $alert_data->hostname
             . ': ['
             . $state
             . '] '
-            . $alert_data['name'];
+            . $alert_data->name;
 
         if (($socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) === false) {
             throw new AlertTransportDeliveryException($alert_data, 0, 'socket_create() failed: reason: ' . socket_strerror(socket_last_error()));
         }
 
-        if (! empty($alert_data['faults'])) {
-            foreach ($alert_data['faults'] as $fault) {
+        if (! empty($alert_data->faults)) {
+            foreach ($alert_data->faults as $fault) {
                 $syslog_msg = $syslog_prefix . ' - ' . $fault['string'];
                 socket_sendto($socket, $syslog_msg, strlen($syslog_msg), 0, $syslog_host, $syslog_port);
             }

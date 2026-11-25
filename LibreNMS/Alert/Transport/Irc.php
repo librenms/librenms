@@ -49,13 +49,13 @@ class Irc extends Transport implements AlertTransport
             fclose($f);
 
             if ($r === false) {
-                throw new AlertTransportDeliveryException($alert_data, 0, 'Could not write to fifo', $alert_data['msg'], $alert_data);
+                throw new AlertTransportDeliveryException($alert_data, 0, 'Could not write to fifo', $alert_data->msg, $alert_data);
             }
 
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, 0, 'fifo does not exist', $alert_data['msg'], $alert_data);
+        throw new AlertTransportDeliveryException($alert_data, 0, 'fifo does not exist', $alert_data->msg, $alert_data);
     }
 
     public static function configTemplate(): array

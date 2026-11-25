@@ -58,27 +58,27 @@ class Pushover extends Transport implements AlertTransport
         // Entities are html encoded so this will cause them to be displayed correctly in pushover alerts
         $data['html'] = '1';
 
-        if ($alert_data['severity'] == 'critical') {
+        if ($alert_data->severity == 'critical') {
             $data['priority'] = 1;
             if (! empty($options['sound_critical'])) {
                 $data['sound'] = $options['sound_critical'];
             }
-        } elseif ($alert_data['severity'] == 'warning') {
+        } elseif ($alert_data->severity == 'warning') {
             $data['priority'] = 0;
             if (! empty($options['sound_warning'])) {
                 $data['sound'] = $options['sound_warning'];
             }
         }
 
-        if ($alert_data['state'] == AlertState::RECOVERED) {
+        if ($alert_data->state == AlertState::RECOVERED) {
             $data['priority'] = 0;
             if (! empty($options['sound_ok'])) {
                 $data['sound'] = $options['sound_ok'];
             }
         }
 
-        $data['title'] = $alert_data['title'];
-        $data['message'] = $alert_data['msg'];
+        $data['title'] = $alert_data->title;
+        $data['message'] = $alert_data->msg;
         if ($options) {
             $data = array_merge($data, $options);
         }

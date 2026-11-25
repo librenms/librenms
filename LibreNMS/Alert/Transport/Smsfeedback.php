@@ -39,7 +39,7 @@ class Smsfeedback extends Transport implements AlertTransport
         $url = 'http://api.smsfeedback.ru/messages/v2/send/';
         $params = [
             'phone' => $this->config['smsfeedback-mobiles'],
-            'text' => $alert_data['title'],
+            'text' => $alert_data->title,
             'sender' => $this->config['smsfeedback-sender'],
         ];
 
@@ -51,7 +51,7 @@ class Smsfeedback extends Transport implements AlertTransport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['title'], $params);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->title, $params);
     }
 
     public static function configTemplate(): array

@@ -42,31 +42,31 @@ class Mail extends Transport implements AlertTransport
     public function deliver(AlertData $alert_data): bool
     {
         $emails = match ($this->config['mail-contact'] ?? '') {
-            'sysContact' => AlertUtil::findContactsSysContact($alert_data['faults']),
-            'owners' => AlertUtil::findContactsOwners($alert_data['faults']),
+            'sysContact' => AlertUtil::findContactsSysContact($alert_data->faults),
+            'owners' => AlertUtil::findContactsOwners($alert_data->faults),
             'role' => AlertUtil::findContactsRoles([$this->config['role']]),
-            default => $this->config['email'] ?? $alert_data['contacts'] ?? [], // contacts is only used by legacy synthetic transport
+            default => $this->config['email'] ?? $alert_data->contacts ?? [], // contacts is only used by legacy synthetic transport
         };
 
         if (is_array($emails) && count($emails) == 0) {
-            $device = DeviceCache::get($alert_data['device_id']);
-            Eventlog::log('No e-mail recipients found for transport ' . $alert_data['transport_name'], $device, 'alert', Severity::Notice);
+            $device = DeviceCache::get($alert_data->device_id);
+            Eventlog::log('No e-mail recipients found for transport ' . $alert_data->transport_name, $device, 'alert', Severity::Notice);
 
             return true;
         }
 
         $html = LibrenmsConfig::get('email_html');
 
-        if ($html && ! $this->isHtmlContent($alert_data['msg'])) {
+        if ($html && ! $this->isHtmlContent($alert_data->msg)) {
             // if there are no html tags in the content, but we are sending an html email, use br for line returns instead
-            $msg = preg_replace("/\r?\n/", "<br />\n", (string) $alert_data['msg']);
+            $msg = preg_replace("/\r?\n/", "<br />\n", (string) $alert_data->msg);
         } else {
             // fix line returns for windows mail clients
-            $msg = preg_replace("/(?<!\r)\n/", "\r\n", (string) $alert_data['msg']);
+            $msg = preg_replace("/(?<!\r)\n/", "\r\n", (string) $alert_data->msg);
         }
 
         try {
-            return \LibreNMS\Util\Mail::send($emails, $alert_data['title'], $msg, $html, $this->config['bcc'] ?? false, $this->config['attach-graph'] ?? null);
+            return \LibreNMS\Util\Mail::send($emails, $alert_data->title, $msg, $html, $this->config['bcc'] ?? false, $this->config['attach-graph'] ?? null);
         } catch (Exception $e) {
             throw new AlertTransportDeliveryException($alert_data, 0, $e->getMessage());
         }

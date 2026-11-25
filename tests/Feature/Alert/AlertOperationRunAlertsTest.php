@@ -95,7 +95,7 @@ final class AlertOperationRunAlertsTest extends TestCase
         $payload = json_decode($request->body(), true, flags: JSON_THROW_ON_ERROR);
         $this->assertSame($device->hostname, $payload['alert']['hostname']);
         $this->assertSame($pingTime->toJSON(), $payload['ping_timestamp']);
-        $this->assertSame('', $payload['ping_min']);
+        $this->assertArrayNotHasKey('ping_min', $payload);
         $this->assertArrayNotHasKey('diff', $payload);
 
         $failure = Eventlog::query()->where('device_id', $device->device_id)->where('type', 'error')->sole();
@@ -719,10 +719,10 @@ final class AlertOperationRunAlertsTest extends TestCase
         });
         $runAlerts->runAlerts();
 
-        $recovery = collect($objs)->first(fn ($obj) => (int) $obj['state'] === AlertState::RECOVERED);
+        $recovery = collect($objs)->first(fn (AlertData $obj) => $obj->state === AlertState::RECOVERED);
         $this->assertNotNull($recovery, 'Per-entity rules send a recovery as each entity clears');
-        $this->assertSame($recoveredLog->id, $recovery['uid'], 'Recovery must use the fault RECOVERED log, not a later BETTER log');
-        $this->assertSame($recoveredActiveLog->id, $recovery['id'], 'elapsed/previousLog must be the recovered fault\'s prior incident');
+        $this->assertSame($recoveredLog->id, $recovery->uid, 'Recovery must use the fault RECOVERED log, not a later BETTER log');
+        $this->assertSame($recoveredActiveLog->id, $recovery->id, 'elapsed/previousLog must be the recovered fault\'s prior incident');
         $this->assertSame(0, (int) $recovered->fresh()->open, 'The recovered fault must be closed after delivery');
         $keep = AlertFault::query()
             ->where('rule_id', $context['rule']->id)
@@ -894,7 +894,7 @@ final class AlertOperationRunAlertsTest extends TestCase
         $runAlerts->runAlerts();
 
         $this->assertCount(1, $objs);
-        $this->assertSame(AlertState::RECOVERED, (int) $objs[0]['state']);
+        $this->assertSame(AlertState::RECOVERED, $objs[0]->state);
         $this->assertSame(0, (int) $fault->fresh()->open);
         $this->assertDatabaseHas('alerts', [
             'rule_id' => $context['rule']->id,
@@ -1346,7 +1346,7 @@ final class AlertOperationRunAlertsTest extends TestCase
     }
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return list<AlertData>
      */
     private function runRecoveryRace(AlertRule $rule, Device $device): array
     {
@@ -1395,7 +1395,7 @@ final class AlertOperationRunAlertsTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $objs
+     * @param  list<AlertData>  $objs
      * @return list<int>
      */
     private function issuedStates(array $objs): array
@@ -1404,14 +1404,14 @@ final class AlertOperationRunAlertsTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $objs
+     * @param  list<AlertData>  $objs
      * @return list<int>
      */
     private function issuedPortIds(array $objs): array
     {
         $ids = [];
         foreach ($objs as $obj) {
-            foreach ($obj['faults'] ?? [] as $fault) {
+            foreach ($obj->faults as $fault) {
                 $ids[] = $fault['port_id'];
             }
         }

@@ -37,12 +37,12 @@ class Pagerduty extends Transport implements AlertTransport
 
     public function deliver(AlertData $alert_data): bool
     {
-        $event_action = match ($alert_data['state']) {
+        $event_action = match ($alert_data->state) {
             AlertState::RECOVERED => 'resolve',
             AlertState::ACKNOWLEDGED => 'acknowledge',
             default => 'trigger'
         };
-        $msg_raw = (string) $alert_data['msg'];
+        $msg_raw = (string) $alert_data->msg;
         $decoded = json_decode($msg_raw, true);
 
         if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
@@ -57,14 +57,14 @@ class Pagerduty extends Transport implements AlertTransport
         $data = [
             'routing_key' => $this->config['service_key'],
             'event_action' => $event_action,
-            'dedup_key' => (string) $alert_data['alert_id'],
+            'dedup_key' => (string) $alert_data->alert_id,
             'payload' => [
                 'custom_details' => $custom_details,
-                'group' => (string) \DeviceCache::get($alert_data['device_id'])->groups->pluck('name'),
-                'source' => $alert_data['hostname'],
-                'severity' => $alert_data['severity'],
-                'summary' => ($alert_data['title'] ?: $alert_data['name'] . ' on ' . $alert_data['hostname']),
-                'class' => $alert_data['type'],
+                'group' => (string) \DeviceCache::get($alert_data->device_id)->groups->pluck('name'),
+                'source' => $alert_data->hostname,
+                'severity' => $alert_data->severity,
+                'summary' => ($alert_data->title ?: $alert_data->name . ' on ' . $alert_data->hostname),
+                'class' => $alert_data->type,
             ],
         ];
 

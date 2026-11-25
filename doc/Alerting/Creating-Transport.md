@@ -13,7 +13,7 @@ pass the unit tests:
 
 `deliver(AlertData $alert_data)` - the alert code calls this
 function to start the transport. It receives a `LibreNMS\Alert\AlertData`
-object. Read fields with `$alert_data->title` or `$alert_data['title']`.
+object. Read fields as properties, such as `$alert_data->title`.
 `AlertData` cannot be changed. In this function, prepare the transport
 configuration for use.
 

@@ -36,7 +36,7 @@ class Googlechat extends Transport implements AlertTransport
 
     public function deliver(AlertData $alert_data): bool
     {
-        $data = ['text' => $alert_data['msg']];
+        $data = ['text' => $alert_data->msg];
         $res = Http::client()->post($this->config['googlechat-webhook'], $data);
 
         if ($res->successful()) {

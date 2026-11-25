@@ -36,7 +36,7 @@ class Pushbullet extends Transport implements AlertTransport
     {
         // Note: At this point it might be useful to iterate through $obj['contacts'] and send each of them a note ?
         $url = 'https://api.pushbullet.com/v2/pushes';
-        $data = ['type' => 'note', 'title' => $alert_data['title'], 'body' => $alert_data['msg']];
+        $data = ['type' => 'note', 'title' => $alert_data->title, 'body' => $alert_data->msg];
 
         $res = Http::client()
             ->withToken($this->config['pushbullet-token'])
@@ -46,7 +46,7 @@ class Pushbullet extends Transport implements AlertTransport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $data);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->msg, $data);
     }
 
     public static function configTemplate(): array

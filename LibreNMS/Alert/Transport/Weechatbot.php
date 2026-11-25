@@ -47,8 +47,8 @@ class Weechatbot extends Transport implements AlertTransport
             throw new AlertTransportDeliveryException($alert_data, $e->getCode(), $e->getMessage());
         }
 
-        $fp->write($pre . $alert_data['title']);
-        foreach (preg_split('/((\r?\n)|(\r\n?))/', (string) $alert_data['msg']) as $line) {
+        $fp->write($pre . $alert_data->title);
+        foreach (preg_split('/((\r?\n)|(\r\n?))/', (string) $alert_data->msg) as $line) {
             $fp->write($pre . $line);
         }
         $fp->close();

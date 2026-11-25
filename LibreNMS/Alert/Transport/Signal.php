@@ -35,7 +35,7 @@ class Signal extends Transport implements AlertTransport
            . ' --dbus-system send'
            . (($this->config['recipient-type'] == 'group') ? ' -g ' : ' ')
            . escapeshellarg((string) $this->config['recipient'])
-           . ' -m ' . escapeshellarg((string) $alert_data['title']));
+           . ' -m ' . escapeshellarg((string) $alert_data->title));
 
         return true;
     }

@@ -38,42 +38,42 @@ class Zenduty extends Transport implements AlertTransport
     {
         $url = $this->config['zenduty-url'];
         // If the alert has recovered set to resolved
-        if ($alert_data['state'] == 0) {
+        if ($alert_data->state == 0) {
             $alert_type = 'resolved';
-        } elseif ($alert_data['state'] == 2) {
+        } elseif ($alert_data->state == 2) {
             $alert_type = 'acknowledged';
         } else {
-            $alert_type = $alert_data['severity'];
+            $alert_type = $alert_data->severity;
         }
         // Set the standard data ZD expects to see
-        $msg = json_decode((string) $alert_data['msg'], true) ?: $alert_data['msg'];
+        $msg = json_decode((string) $alert_data->msg, true) ?: $alert_data->msg;
         $data = [
-            'message' => $alert_data['title'],
+            'message' => $alert_data->title,
             'alert_type' => $alert_type,
-            'entity_id' => $alert_data['alert_id'],
+            'entity_id' => $alert_data->alert_id,
             'payload' => [
-                'hostname' => $alert_data['hostname'],
-                'sysName' => $alert_data['sysName'],
-                'id' => $alert_data['id'],
-                'uid' => $alert_data['uid'],
-                'sysDescr' => $alert_data['sysDescr'],
-                'os' => $alert_data['os'],
+                'hostname' => $alert_data->hostname,
+                'sysName' => $alert_data->sysName,
+                'id' => $alert_data->id,
+                'uid' => $alert_data->uid,
+                'sysDescr' => $alert_data->sysDescr,
+                'os' => $alert_data->os,
                 'type' => $alert_type,
-                'ip' => $alert_data['ip'],
-                'hardware' => $alert_data['hardware'],
-                'version' => $alert_data['version'],
-                'uptime' => $alert_data['uptime'],
-                'uptime_short' => $alert_data['uptime_short'],
-                'timestamp' => $alert_data['timestamp'],
-                'description' => $alert_data['description'],
-                'title' => $alert_data['title'],
+                'ip' => $alert_data->ip,
+                'hardware' => $alert_data->hardware,
+                'version' => $alert_data->version,
+                'uptime' => $alert_data->uptime,
+                'uptime_short' => $alert_data->uptime_short,
+                'timestamp' => $alert_data->timestamp,
+                'description' => $alert_data->description,
+                'title' => $alert_data->title,
                 'msg' => $msg,
-                'state' => $alert_data['state'],
+                'state' => $alert_data->state,
             ],
             'urls' => [
                 [
-                    'link_url' => route('device.overview', ['device' => $alert_data['device_id']]),
-                    'link_text' => $alert_data['hostname'],
+                    'link_url' => route('device.overview', ['device' => $alert_data->device_id]),
+                    'link_text' => $alert_data->hostname,
                 ],
             ],
         ];
@@ -86,11 +86,11 @@ class Zenduty extends Transport implements AlertTransport
             $data['escalation_policy'] = $this->config['escalation_policy_id'];
         }
 
-        $tmp_msg = json_decode((string) $alert_data['msg'], true);
+        $tmp_msg = json_decode((string) $alert_data->msg, true);
         if (isset($tmp_msg['message']) && isset($tmp_msg['summary'])) {
             $data = array_merge($data, $tmp_msg);
         } else {
-            $data['summary'] = $alert_data['msg'];
+            $data['summary'] = $alert_data->msg;
         }
 
         $client = Http::client();

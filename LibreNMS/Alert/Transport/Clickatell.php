@@ -38,7 +38,7 @@ class Clickatell extends Transport implements AlertTransport
         $params = [
             'apiKey' => $this->config['clickatell-token'],
             'to' => implode(',', preg_split('/([,\r\n]+)/', (string) $this->config['clickatell-numbers'])),
-            'content' => $alert_data['title'],
+            'content' => $alert_data->title,
         ];
 
         $res = Http::client()->get($url, $params);
@@ -47,7 +47,7 @@ class Clickatell extends Transport implements AlertTransport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['title'], $params);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->title, $params);
     }
 
     public static function configTemplate(): array

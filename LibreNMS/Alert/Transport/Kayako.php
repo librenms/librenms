@@ -36,10 +36,10 @@ class Kayako extends Transport implements AlertTransport
         $signature = base64_encode(hash_hmac('sha256', $salt, (string) $secret, true));
 
         $protocol = [
-            'subject' => ($alert_data['name'] ? $alert_data['name'] . ' on ' . $alert_data['hostname'] : $alert_data['title']),
+            'subject' => ($alert_data->name ? $alert_data->name . ' on ' . $alert_data->hostname : $alert_data->title),
             'fullname' => 'LibreNMS Alert',
             'email' => $user,
-            'contents' => strip_tags((string) $alert_data['msg']),
+            'contents' => strip_tags((string) $alert_data->msg),
             'departmentid' => $department,
             'ticketstatusid' => $ticket_status,
             'ticketpriorityid' => $ticket_prio,

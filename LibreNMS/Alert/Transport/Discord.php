@@ -76,12 +76,12 @@ class Discord extends Transport implements AlertTransport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $this->discord_message);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->msg, $this->discord_message);
     }
 
     private function getTitle(AlertData $alert_data): string
     {
-        return '#' . $alert_data['uid'] . ' ' . $alert_data['title'];
+        return '#' . $alert_data->uid . ' ' . $alert_data->title;
     }
 
     private function stripHTMLTagsFromDescription(): array
@@ -93,7 +93,7 @@ class Discord extends Transport implements AlertTransport
 
     private function getColorOfAlertState(AlertData $alert_data): int
     {
-        $hexColor = self::getColorForState($alert_data['state']);
+        $hexColor = self::getColorForState($alert_data->state);
         $sanitized = preg_replace('/[^\dA-Fa-f]/', '', $hexColor);
 
         return hexdec((string) $sanitized);
@@ -101,12 +101,12 @@ class Discord extends Transport implements AlertTransport
 
     private function getDescription(AlertData $alert_data): string
     {
-        return $alert_data['msg'];
+        return $alert_data->msg;
     }
 
     private function getFooter(AlertData $alert_data): string
     {
-        return $alert_data['elapsed'] ? 'alert took ' . $alert_data['elapsed'] : '';
+        return $alert_data->elapsed ? 'alert took ' . $alert_data->elapsed : '';
     }
 
     private function includeINIFields(): array
@@ -173,7 +173,7 @@ class Discord extends Transport implements AlertTransport
 
             $result[] = [
                 'name' => $this->embedFieldTranslations[$field] ?? ucfirst($field),
-                'value' => $alert_data[$field] ?? 'Error: Invalid Field',
+                'value' => $alert_data->{$field} ?? 'Error: Invalid Field',
             ];
         }
 

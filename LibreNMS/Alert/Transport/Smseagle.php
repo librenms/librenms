@@ -52,7 +52,7 @@ class Smseagle extends Transport implements AlertTransport
         }
 
         $params['to'] = implode(',', preg_split('/([,\r\n]+)/', (string) $this->config['smseagle-mobiles']));
-        $params['message'] = $alert_data['title'];
+        $params['message'] = $alert_data->title;
 
         $res = Http::client()->get($url, $params);
 

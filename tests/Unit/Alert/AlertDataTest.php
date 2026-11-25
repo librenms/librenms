@@ -27,6 +27,7 @@ namespace LibreNMS\Tests\Unit\Alert;
 
 use App\Models\AlertTemplate;
 use App\Models\Device;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Blade;
 use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Template;
@@ -51,7 +52,7 @@ final class AlertDataTest extends TestCase
             'hardware' => 'Cisco 2901',
             'features' => 'IPBASE',
             'serial' => 'FOC12345678',
-            'status' => 1,
+            'status' => true,
             'status_reason' => 'normal',
             'location' => 'DataCenter',
             'description' => 'Core Router',
@@ -79,7 +80,7 @@ final class AlertDataTest extends TestCase
             'msg' => 'Device is down',
             'builder' => '{"condition":"AND"}',
             'device_groups' => [1 => 'Routers'],
-            'ping_timestamp' => 1600000000,
+            'ping_timestamp' => CarbonImmutable::createFromTimestamp(1600000000),
             'ping_loss' => 0.0,
             'ping_min' => 1.2,
             'ping_max' => 3.4,
@@ -105,7 +106,7 @@ final class AlertDataTest extends TestCase
         $this->assertSame('Cisco 2901', $alert->hardware);
         $this->assertSame('IPBASE', $alert->features);
         $this->assertSame('FOC12345678', $alert->serial);
-        $this->assertSame(1, $alert->status);
+        $this->assertTrue($alert->status);
         $this->assertSame('normal', $alert->status_reason);
         $this->assertSame('DataCenter', $alert->location);
         $this->assertSame('Core Router', $alert->description);
@@ -133,7 +134,7 @@ final class AlertDataTest extends TestCase
         $this->assertSame('Device is down', $alert->msg);
         $this->assertSame('{"condition":"AND"}', $alert->builder);
         $this->assertSame([1 => 'Routers'], $alert->device_groups);
-        $this->assertSame(1600000000, $alert->ping_timestamp);
+        $this->assertSame(1600000000, $alert->ping_timestamp?->getTimestamp());
         $this->assertSame(0.0, $alert->ping_loss);
         $this->assertSame(1.2, $alert->ping_min);
         $this->assertSame(3.4, $alert->ping_max);
@@ -144,34 +145,10 @@ final class AlertDataTest extends TestCase
         $this->assertSame('Default Mail', $alert->transport_name);
     }
 
-    public function testArrayAccess(): void
+    public function testUnknownFieldThrows(): void
     {
-        $alert = new AlertData(['hostname' => 'server1', 'title' => 'Initial Title']);
-
-        $this->assertTrue(isset($alert['hostname']));
-        $this->assertSame('server1', $alert['hostname']);
-
-        $this->assertFalse(isset($alert['severity']));
-        $this->assertNull($alert['severity']);
-    }
-
-    public function testArrayWritesThrow(): void
-    {
-        $alert = new AlertData(['title' => 'Initial Title']);
-
-        try {
-            $alert['title'] = 'Updated Title';
-            $this->fail('offsetSet should throw');
-        } catch (\LogicException) {
-        }
-
-        try {
-            unset($alert['title']);
-            $this->fail('offsetUnset should throw');
-        } catch (\LogicException) {
-        }
-
-        $this->assertSame('Initial Title', $alert->title);
+        $this->expectException(\InvalidArgumentException::class);
+        new AlertData(['hostname' => 'server1', 'severty' => 'critical']);
     }
 
     public function testPropertyWritesThrow(): void
@@ -185,11 +162,10 @@ final class AlertDataTest extends TestCase
     public function testForTransportRendersTitleThenBody(): void
     {
         $alert = new AlertData(['hostname' => 'router1', 'state' => AlertState::ACTIVE]);
-        $template = new Template;
-        $template->template = new AlertTemplate([
+        $template = new Template(new AlertTemplate([
             'title' => '{{ $alert->hostname }} via {{ $alert->transport }}',
             'template' => '{{ $alert->title }} ({{ $alert->transport_name }})',
-        ]);
+        ]));
 
         $forTransport = $alert->forTransport('mail', 'Ops Mail', $template);
 
@@ -220,25 +196,22 @@ final class AlertDataTest extends TestCase
         $alert = new AlertData();
 
         $this->assertSame('non_existent is not a valid $alert data name', $alert->__get('non_existent'));
-        $this->assertNull($alert['non_existent']);
-        $this->assertFalse($alert->__isset('non_existent'));
-        $this->assertFalse(isset($alert['non_existent']));
+        $this->assertFalse(isset($alert->non_existent));
+        $this->assertSame('fallback', $alert->non_existent ?? 'fallback');
+        $this->assertNull($alert->hostname ?? null);
     }
 
-    public function testToArrayAndJsonSerialize(): void
+    public function testJsonSerializeOnlyIncludesProvidedFields(): void
     {
-        $alert = new AlertData(['hostname' => 'host1', 'device_id' => 10]);
-
-        $array = $alert->toArray();
-        $this->assertIsArray($array);
-        $this->assertSame('host1', $array['hostname']);
-        $this->assertSame(10, $array['device_id']);
+        $alert = new AlertData(['hostname' => 'host1', 'device_id' => 10, 'title' => null]);
 
         $json = json_encode($alert);
         $this->assertIsString($json);
         $decoded = json_decode($json, true);
         $this->assertSame('host1', $decoded['hostname']);
         $this->assertSame(10, $decoded['device_id']);
+        $this->assertArrayHasKey('title', $decoded);
+        $this->assertNull($decoded['title']);
         $this->assertArrayNotHasKey('faults', $decoded);
     }
 
@@ -287,8 +260,7 @@ final class AlertDataTest extends TestCase
             'contacts' => ['admin@example.com' => 'Admin'],
         ]);
 
-        $template = new Template;
-        $template->template = new AlertTemplate(['name' => 'Default Alert Template']);
+        $template = new Template(new AlertTemplate(['name' => 'Default Alert Template']));
         $alert = $alert->forTransport(null, null, $template);
         $this->assertSame('Alert for device core-router - Down Rule', $alert->title);
 

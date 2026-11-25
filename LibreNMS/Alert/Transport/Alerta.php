@@ -28,22 +28,22 @@ class Alerta extends Transport implements AlertTransport
 {
     public function deliver(AlertData $alert_data): bool
     {
-        $severity = ($alert_data['state'] == AlertState::RECOVERED ? $this->config['recoverstate'] : $this->config['alertstate']);
+        $severity = ($alert_data->state == AlertState::RECOVERED ? $this->config['recoverstate'] : $this->config['alertstate']);
         $data = [
-            'resource' => $alert_data['display'],
-            'event' => $alert_data['title'],
+            'resource' => $alert_data->display,
+            'event' => $alert_data->title,
             'environment' => $this->config['environment'],
             'severity' => $severity,
-            'service' => [$alert_data['type']],
-            'group' => $alert_data['name'],
-            'value' => $alert_data['state'],
-            'text' => $alert_data['msg'],
+            'service' => [$alert_data->type],
+            'group' => $alert_data->name,
+            'value' => $alert_data->state,
+            'text' => $alert_data->msg,
             'attributes' => [
-                'sysName' => $alert_data['sysName'],
-                'sysDescr' => $alert_data['sysDescr'],
-                'os' => $alert_data['os'],
-                'ip' => $alert_data['ip'],
-                'uptime' => $alert_data['uptime_long'],
+                'sysName' => $alert_data->sysName,
+                'sysDescr' => $alert_data->sysDescr,
+                'os' => $alert_data->os,
+                'ip' => $alert_data->ip,
+                'uptime' => $alert_data->uptime_long,
             ],
             'origin' => $this->config['origin'],
         ];

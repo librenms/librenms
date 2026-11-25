@@ -42,7 +42,7 @@ class Hue extends Transport implements AlertTransport
     public function deliver(AlertData $alert_data): bool
     {
         // Don't alert on resolve at this time
-        if ($alert_data['state'] == AlertState::RECOVERED) {
+        if ($alert_data->state == AlertState::RECOVERED) {
             return true;
         }
 

@@ -45,7 +45,8 @@ class Matrix extends Transport implements AlertTransport
         $server = preg_replace('/\/$/', '', (string) $server);
         $host = $server . '/_matrix/client/r0/rooms/' . urlencode((string) $room) . '/send/m.room.message/' . $txnid;
 
-        $message = SimpleTemplate::parse($message, $alert_data);
+        // User-written templates use the legacy flat variable names, e.g. {{ $msg }}
+        $message = SimpleTemplate::parse($message, $alert_data->toTransportPayload());
 
         $body = ['body' => strip_tags($message), 'formatted_body' => "$message", 'msgtype' => 'm.notice', 'format' => 'org.matrix.custom.html'];
 

@@ -131,10 +131,8 @@ class RunAlerts
 
         if ($device->polling()->isEnabled(PollingMethodType::Icmp)) {
             if ($device->stats) {
-                $obj['ping_timestamp'] = $device->stats->ping_last_timestamp;
+                $obj['ping_timestamp'] = $device->stats->ping_last_timestamp?->toImmutable();
                 $obj['ping_loss'] = $device->stats->ping_loss_last;
-                $obj['ping_min'] = '';
-                $obj['ping_max'] = '';
                 $obj['ping_avg'] = $device->stats->ping_rtt_last;
                 $obj['debug'] = 'unsupported';
             } else {
@@ -779,7 +777,7 @@ class RunAlerts
      */
     public function extTransports(AlertData $alert, ?array $transportOverride = null): void
     {
-        $type = new Template;
+        $type = Template::forRule($alert->rule_id);
 
         // Per-segment scheduling supplies an explicit transport list; otherwise use the default lookup.
         $transport_maps = $transportOverride ?? AlertUtil::getAlertTransports(
@@ -820,7 +818,7 @@ class RunAlerts
                     $instance = new $class(AlertTransport::find($item['transport_id']));
                     $tmp = $instance instanceof AlertTransportInterface
                         ? $instance->deliver($transportAlert)
-                        : $instance->deliverAlert($transportAlert->toTransportPayload($type->getTemplate($alert->rule_id)));
+                        : $instance->deliverAlert($transportAlert->toTransportPayload($type->template));
                     $this->alertLog($tmp, $alert, $item['transport_type']);
                 } catch (AlertTransportDeliveryException $e) {
                     Log::warning("Alert transport '{$item['transport_type']}' delivery failed for device {$alert->device_id}: {$e->getMessage()}", ['exception' => $e]);

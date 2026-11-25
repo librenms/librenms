@@ -37,7 +37,7 @@ class AlertTransportDeliveryException extends \Exception
         protected string $template = '',
         protected array|AlertData $params = []
     ) {
-        $name = $data['transport_name'] ?? '';
+        $name = ($data instanceof AlertData ? $data->transport_name : $data['transport_name'] ?? null) ?? '';
 
         $message = "Transport delivery failed with $code for $name: $response";
 

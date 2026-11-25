@@ -42,9 +42,9 @@ class Browserpush extends Transport implements AlertTransport
         $users = User::when($this->config['user'] ?? 0, fn ($query, $user_id) => $query->where('user_id', $user_id))->get();
 
         Notification::send($users, new AlertNotification(
-            $alert_data['alert_id'],
-            $alert_data['title'],
-            $alert_data['msg'],
+            $alert_data->alert_id,
+            $alert_data->title,
+            $alert_data->msg,
         ));
 
         return true;

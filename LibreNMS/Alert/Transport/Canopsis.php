@@ -30,7 +30,7 @@ class Canopsis extends Transport implements AlertTransport
         $ch->exchange_declare($exchange, AMQPExchangeType::TOPIC, false, true, false);
 
         // Create Canopsis event, see: https://github.com/capensis/canopsis/wiki/Event-specification
-        $state = match ($alert_data['severity']) {
+        $state = match ($alert_data->severity) {
             'ok' => 0,
             'warning' => 2,
             'critical' => 3,
@@ -42,10 +42,10 @@ class Canopsis extends Transport implements AlertTransport
             'connector_name' => 'LibreNMS1',
             'event_type' => 'check',
             'source_type' => 'resource',
-            'component' => $alert_data['hostname'],
-            'resource' => $alert_data['name'],
+            'component' => $alert_data->hostname,
+            'resource' => $alert_data->name,
             'state' => $state,
-            'output' => $alert_data['msg'],
+            'output' => $alert_data->msg,
             'display_name' => 'librenms',
         ];
         $msg_raw = json_encode($msg_body);

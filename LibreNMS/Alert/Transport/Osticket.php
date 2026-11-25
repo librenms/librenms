@@ -38,8 +38,8 @@ class Osticket extends Transport implements AlertTransport
         $protocol = [
             'name' => 'LibreNMS',
             'email' => $email,
-            'subject' => ($alert_data['name'] ? $alert_data['name'] . ' on ' . $alert_data['hostname'] : $alert_data['title']),
-            'message' => strip_tags((string) $alert_data['msg']),
+            'subject' => ($alert_data->name ? $alert_data->name . ' on ' . $alert_data->hostname : $alert_data->title),
+            'message' => strip_tags((string) $alert_data->msg),
             'ip' => $_SERVER['REMOTE_ADDR'],
             'attachments' => [],
         ];
@@ -52,7 +52,7 @@ class Osticket extends Transport implements AlertTransport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $protocol);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->msg, $protocol);
     }
 
     public static function configTemplate(): array

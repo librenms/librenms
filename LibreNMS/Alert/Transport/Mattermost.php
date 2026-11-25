@@ -35,15 +35,15 @@ class Mattermost extends Transport implements AlertTransport
     public function deliver(AlertData $alert_data): bool
     {
         $host = $this->config['mattermost-url'];
-        $mattermost_msg = strip_tags((string) $alert_data['msg']);
-        $color = self::getColorForState($alert_data['state']);
+        $mattermost_msg = strip_tags((string) $alert_data->msg);
+        $color = self::getColorForState($alert_data->state);
         $data = [
             'attachments' => [
                 0 => [
                     'fallback' => $mattermost_msg,
                     'color' => $color,
-                    'title' => $alert_data['title'],
-                    'text' => $alert_data['msg'],
+                    'title' => $alert_data->title,
+                    'text' => $alert_data->msg,
                     'mrkdwn_in' => ['text', 'fallback'],
                     'author_name' => $this->config['mattermost-author_name'],
                 ],
@@ -59,7 +59,7 @@ class Mattermost extends Transport implements AlertTransport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $data);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->msg, $data);
     }
 
     public static function configTemplate(): array

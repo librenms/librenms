@@ -34,7 +34,7 @@ class Linemessagingapi extends Transport implements AlertTransport
             'messages' => [
                 [
                     'type' => 'text',
-                    'text' => $alert_data['msg'],
+                    'text' => $alert_data->msg,
                 ],
             ],
         ];
@@ -48,7 +48,7 @@ class Linemessagingapi extends Transport implements AlertTransport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $data);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->msg, $data);
     }
 
     /**

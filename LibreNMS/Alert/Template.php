@@ -32,26 +32,20 @@ use LibreNMS\Enum\AlertState;
 
 class Template
 {
-    public ?AlertTemplate $template = null;
+    public function __construct(public readonly ?AlertTemplate $template = null)
+    {
+    }
 
     /**
-     * Get the template details
+     * The template mapped to the rule, or the default template if the rule has none.
      */
-    public function getTemplate(?int $ruleId = null): ?AlertTemplate
+    public static function forRule(?int $ruleId): self
     {
-        if ($this->template) {
-            // Return the cached template information.
-            return $this->template;
-        }
-
-        $this->template = AlertTemplate::whereHas('map', function ($query) use ($ruleId): void {
+        $template = AlertTemplate::whereHas('map', function ($query) use ($ruleId): void {
             $query->where('alert_rule_id', '=', $ruleId);
         })->first();
-        if (! $this->template) {
-            $this->template = AlertTemplate::where('name', '=', 'Default Alert Template')->first();
-        }
 
-        return $this->template;
+        return new self($template ?? AlertTemplate::where('name', '=', 'Default Alert Template')->first());
     }
 
     public function getTitle(AlertData $alert): string
@@ -69,9 +63,8 @@ class Template
      */
     public function bladeBody(AlertData $alert): string
     {
-        $template = $this->getTemplate($alert->rule_id);
-        $templateBody = $template?->template;
-        $templateName = $template->name ?? '';
+        $templateBody = $this->template?->template;
+        $templateName = $this->template->name ?? '';
         $data = ['alert' => $alert];
 
         if (empty($templateBody)) {
@@ -96,8 +89,7 @@ class Template
             ? 'Device ' . $alert->display . ' recovered from ' . ($alert->name ?: $alert->rule)
             : 'Alert for device ' . $alert->display . ' - ' . $alert->name;
 
-        $template = $this->getTemplate($alert->rule_id);
-        $templateTitle = $isRecovered ? $template?->title_rec : $template?->title;
+        $templateTitle = $isRecovered ? $this->template?->title_rec : $this->template?->title;
 
         $title = $defaultTitle;
         if (! empty($templateTitle)) {

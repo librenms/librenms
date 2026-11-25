@@ -45,7 +45,7 @@ class Playsms extends Transport implements AlertTransport
             'u' => $this->config['playsms-user'],
             'h' => $this->config['playsms-token'],
             'to' => implode(',', $to),
-            'msg' => $alert_data['title'],
+            'msg' => $alert_data->title,
         ];
         if (! empty($this->config['playsms-from'])) {
             $data['from'] = $this->config['playsms-from'];

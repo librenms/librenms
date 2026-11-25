@@ -36,17 +36,17 @@ class Signalgrid extends Transport implements AlertTransport
     public function deliver(AlertData $alert_data): bool
     {
         $type = match (true) {
-            $alert_data['state'] == AlertState::RECOVERED => 'SUCCESS',
-            $alert_data['severity'] === 'critical' => 'CRIT',
-            $alert_data['severity'] === 'warning' => 'WARN',
+            $alert_data->state == AlertState::RECOVERED => 'SUCCESS',
+            $alert_data->severity === 'critical' => 'CRIT',
+            $alert_data->severity === 'warning' => 'WARN',
             default => 'INFO',
         };
 
         $data = [
             'client_key' => $this->config['signalgrid-client-key'],
             'channel' => $this->config['signalgrid-channel'],
-            'title' => $alert_data['title'],
-            'body' => $alert_data['msg'],
+            'title' => $alert_data->title,
+            'body' => $alert_data->msg,
             'type' => $type,
         ];
 
@@ -64,7 +64,7 @@ class Signalgrid extends Transport implements AlertTransport
             $alert_data,
             $res->status(),
             $response['text'] ?? $res->body(),
-            $alert_data['msg'],
+            $alert_data->msg,
             $data
         );
     }

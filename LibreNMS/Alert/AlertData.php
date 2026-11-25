@@ -28,20 +28,19 @@ namespace LibreNMS\Alert;
 
 use App\Facades\LibrenmsConfig;
 use App\Models\AlertTemplate;
+use App\Models\Application;
 use App\Models\Device;
-use ArrayAccess;
-use Carbon\Carbon;
-use Illuminate\Contracts\Support\Arrayable;
+use Carbon\CarbonImmutable;
+use Illuminate\Support\Collection;
+use InvalidArgumentException;
 use JsonSerializable;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Util\Time;
-use LogicException;
 
 /**
- * @implements ArrayAccess<string, mixed>
- * @implements Arrayable<string, mixed>
+ * An alert as passed to templates and transports. It cannot be changed after it is built.
  */
-class AlertData implements ArrayAccess, Arrayable, JsonSerializable
+class AlertData implements JsonSerializable
 {
     public private(set) ?string $hostname = null;
     public private(set) ?int $device_id = null;
@@ -56,7 +55,7 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
     public private(set) ?string $hardware = null;
     public private(set) ?string $features = null;
     public private(set) ?string $serial = null;
-    public private(set) bool|int|null $status = null;
+    public private(set) ?bool $status = null;
     public private(set) ?string $status_reason = null;
     public private(set) ?string $location = null;
     public private(set) ?string $description = null;
@@ -67,34 +66,34 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
     public private(set) ?string $uptime_long = null;
     public private(set) ?string $title = null;
     public private(set) ?string $elapsed = null;
-    public private(set) int|bool|null $alerted = null;
+    public private(set) ?int $alerted = null;
     public private(set) ?int $alert_id = null;
     public private(set) ?int $rule_id = null;
     public private(set) ?int $id = null;
     public private(set) ?string $proc = null;
-    /** @var array<int|string, mixed> */
+    /** @var array<int, array<string, mixed>> */
     public private(set) array $faults = [];
     public private(set) ?int $uid = null;
     public private(set) ?string $severity = null;
     public private(set) ?string $rule = null;
     public private(set) ?string $name = null;
-    public private(set) ?string $string = null;
     public private(set) ?string $timestamp = null;
     /** @var array<string, string>|null */
     public private(set) ?array $contacts = null;
     public private(set) ?int $state = null;
     public private(set) ?string $msg = null;
-    public private(set) mixed $builder = null;
-    /** @var array<int|string, string>|null */
+    public private(set) ?string $builder = null;
+    /** @var array<int, string>|null */
     public private(set) ?array $device_groups = null;
-    public private(set) Carbon|int|null $ping_timestamp = null;
-    public private(set) float|int|null $ping_loss = null;
-    public private(set) float|int|string|null $ping_min = null;
-    public private(set) float|int|string|null $ping_max = null;
-    public private(set) float|int|null $ping_avg = null;
+    public private(set) ?CarbonImmutable $ping_timestamp = null;
+    public private(set) ?float $ping_loss = null;
+    public private(set) ?float $ping_min = null;
+    public private(set) ?float $ping_max = null;
+    public private(set) ?float $ping_avg = null;
     public private(set) ?string $debug = null;
-    public private(set) mixed $applications = null;
-    /** @var array<string, mixed>|null */
+    /** @var Collection<array-key, \Illuminate\Support\Collection<int, Application>>|null */
+    public private(set) ?Collection $applications = null;
+    /** @var array<string, list<array<string, array{value: mixed, value_prev: mixed}>>>|null */
     public private(set) ?array $applications_metrics = null;
     /** @var array<string, mixed>|null */
     public private(set) ?array $diff = null;
@@ -102,9 +101,13 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
     public private(set) ?string $transport_name = null;
     public private(set) ?string $operation_phase = null;
     public private(set) ?int $escalation_step = null;
+
+    // Not set for real alerts. Declared only so old templates that still reference
+    // them render empty instead of "<name> is not a valid $alert data name".
+    public private(set) ?string $string = null;
     /** @var array<string, mixed>|null */
     public private(set) ?array $info = null;
-    public private(set) mixed $extra = null;
+    public private(set) ?string $extra = null;
     public private(set) ?string $query = null;
 
     /** @var array<string, true> */
@@ -112,6 +115,8 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
 
     /**
      * @param  array<string, mixed>  $data
+     *
+     * @throws InvalidArgumentException when a key is not an AlertData field
      */
     public function __construct(array $data = [])
     {
@@ -135,64 +140,17 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
         return $alert;
     }
 
-    public function __get(string $name): mixed
+    /**
+     * Templates reading a name that is not a field get a readable error instead of a PHP warning.
+     */
+    public function __get(string $name): string
     {
-        if ($this->hasProperty($name)) {
-            return $this->{$name};
-        }
-
         return "$name is not a valid \$alert data name";
     }
 
     public function __isset(string $name): bool
     {
-        return $this->hasProperty($name) && isset($this->{$name});
-    }
-
-    public function offsetExists(mixed $offset): bool
-    {
-        return is_string($offset) && $this->__isset($offset);
-    }
-
-    public function offsetGet(mixed $offset): mixed
-    {
-        // Unlike __get (used by templates), array access mirrors a plain array: unknown keys are null.
-        return is_string($offset) && $this->hasProperty($offset) ? $this->{$offset} : null;
-    }
-
-    public function offsetSet(mixed $offset, mixed $value): never
-    {
-        throw new LogicException('AlertData is immutable');
-    }
-
-    public function offsetUnset(mixed $offset): never
-    {
-        throw new LogicException('AlertData is immutable');
-    }
-
-    private function set(mixed $key, mixed $value): void
-    {
-        if (is_string($key) && $this->hasProperty($key)) {
-            $this->{$key} = $value;
-            $this->providedFields[$key] = true;
-        }
-    }
-
-    private function hasProperty(string $name): bool
-    {
-        return $name !== 'providedFields' && property_exists($this, $name);
-    }
-
-    /**
-     * @return array<string, mixed>
-     */
-    public function toArray(): array
-    {
-        $data = get_object_vars($this);
-        unset($data['providedFields']);
-
-        return array_filter($data, fn ($value, $key) => isset($this->providedFields[$key])
-            || ($value !== null && ($key !== 'faults' || $value !== [])), ARRAY_FILTER_USE_BOTH);
+        return false;
     }
 
     /**
@@ -215,6 +173,26 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
     public function jsonSerialize(): array
     {
         return $this->toArray();
+    }
+
+    private function set(int|string $key, mixed $value): void
+    {
+        if (! is_string($key) || $key === 'providedFields' || ! property_exists($this, $key)) {
+            throw new InvalidArgumentException("$key is not an AlertData field");
+        }
+
+        $this->{$key} = $value;
+        $this->providedFields[$key] = true;
+    }
+
+    /**
+     * Only the fields that were set.
+     *
+     * @return array<string, mixed>
+     */
+    private function toArray(): array
+    {
+        return array_intersect_key(get_object_vars($this), $this->providedFields);
     }
 
     /**

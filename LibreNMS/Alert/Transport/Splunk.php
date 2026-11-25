@@ -32,9 +32,9 @@ class Splunk extends Transport implements AlertTransport
         $splunk_host = empty($this->config['Splunk-host']) ? '127.0.0.1' : $this->config['Splunk-host'];
         $splunk_port = empty($this->config['Splunk-port']) ? 514 : $this->config['Splunk-port'];
         $severity = 6; // Default severity is 6 (Informational)
-        $device = DeviceCache::get($alert_data['device_id']); // for event logging
+        $device = DeviceCache::get($alert_data->device_id); // for event logging
 
-        switch ($alert_data['severity']) {
+        switch ($alert_data->severity) {
             case 'critical':
                 $severity = 2;
                 break;
@@ -43,7 +43,7 @@ class Splunk extends Transport implements AlertTransport
                 break;
         }
 
-        switch ($alert_data['state']) {
+        switch ($alert_data->state) {
             case AlertState::RECOVERED:
                 $severity = 6;
                 break;
@@ -74,8 +74,8 @@ class Splunk extends Transport implements AlertTransport
             throw new AlertTransportDeliveryException($alert_data, 0, 'socket_create() failed: reason: ' . socket_strerror(socket_last_error()));
         }
 
-        if (! empty($alert_data['faults'])) {
-            foreach ($alert_data['faults'] as $fault) {
+        if (! empty($alert_data->faults)) {
+            foreach ($alert_data->faults as $fault) {
                 $splunk_msg = $splunk_prefix . ' - ' . $fault['string'];
                 socket_sendto($socket, $splunk_msg, strlen($splunk_msg), 0, $splunk_host, $splunk_port);
             }

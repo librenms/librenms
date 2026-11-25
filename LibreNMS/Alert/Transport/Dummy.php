@@ -33,7 +33,7 @@ class Dummy extends Transport implements AlertTransport
 {
     public function deliver(AlertData $alert_data): bool
     {
-        throw new AlertTransportDeliveryException($alert_data, 0, 'Dummy transport always fails', $alert_data['msg']);
+        throw new AlertTransportDeliveryException($alert_data, 0, 'Dummy transport always fails', $alert_data->msg);
     }
 
     public static function configTemplate(): array

@@ -58,9 +58,9 @@ class Hipchat extends Transport implements AlertTransport
 
         // Sane default of making the message color green if the message indicates
         // that the alert recovered.   If it rebooted, make it yellow.
-        if ($alert_data['state'] == AlertState::RECOVERED) {
+        if ($alert_data->state == AlertState::RECOVERED) {
             $color = 'green';
-        } elseif (str_contains((string) $alert_data['msg'], 'rebooted')) {
+        } elseif (str_contains((string) $alert_data->msg, 'rebooted')) {
             $color = 'yellow';
         } elseif (empty($options['color']) || $options['color'] == 'u') {
             $color = 'red';
@@ -69,7 +69,7 @@ class Hipchat extends Transport implements AlertTransport
         }
 
         $data = [
-            'message' => $alert_data['msg'],
+            'message' => $alert_data->msg,
             'from' => $this->config['hipchat-from-name'] ?: 'LibreNMS',
             'color' => $color,
             'notify' => $options['notify'] ?? '1',

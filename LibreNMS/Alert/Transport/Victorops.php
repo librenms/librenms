@@ -40,23 +40,23 @@ class Victorops extends Transport implements AlertTransport
     {
         $url = $this->config['victorops-url'];
         $protocol = [
-            'entity_id' => strval($alert_data['id'] ?: $alert_data['uid']),
-            'state_start_time' => strtotime((string) $alert_data['timestamp']),
-            'entity_display_name' => $alert_data['title'],
-            'state_message' => $alert_data['msg'],
+            'entity_id' => strval($alert_data->id ?: $alert_data->uid),
+            'state_start_time' => strtotime((string) $alert_data->timestamp),
+            'entity_display_name' => $alert_data->title,
+            'state_message' => $alert_data->msg,
             'monitoring_tool' => 'librenms',
         ];
-        $protocol['message_type'] = match ($alert_data['state']) {
+        $protocol['message_type'] = match ($alert_data->state) {
             AlertState::RECOVERED => 'RECOVERY',
             AlertState::ACKNOWLEDGED => 'ACKNOWLEDGEMENT',
-            default => match ($alert_data['severity']) {
+            default => match ($alert_data->severity) {
                 'ok' => 'INFO',
                 'warning' => 'WARNING',
                 default => 'CRITICAL',
             },
         };
 
-        foreach ($alert_data['faults'] as $data) {
+        foreach ($alert_data->faults as $data) {
             $protocol['state_message'] .= $data['string'];
         }
 
@@ -66,7 +66,7 @@ class Victorops extends Transport implements AlertTransport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $protocol);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->msg, $protocol);
     }
 
     public static function configTemplate(): array

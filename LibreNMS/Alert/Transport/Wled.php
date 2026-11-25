@@ -15,11 +15,11 @@ class Wled extends Transport implements AlertTransport
     {
         $host = $this->config['wled-host'];
 
-        if ($alert_data['state'] === AlertState::RECOVERED) {
+        if ($alert_data->state === AlertState::RECOVERED) {
             $wled_preset = $this->config['wled-recovery'];
-        } elseif ($alert_data['severity'] === 'critical') {
+        } elseif ($alert_data->severity === 'critical') {
             $wled_preset = $this->config['wled-critical'];
-        } elseif ($alert_data['severity'] === 'warning') {
+        } elseif ($alert_data->severity === 'warning') {
             $wled_preset = $this->config['wled-warning'];
         }
 

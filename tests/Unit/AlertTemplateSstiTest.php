@@ -21,13 +21,12 @@ class AlertTemplateSstiTest extends TestCase
             'name' => 'Test Rule',
         ];
 
-        $tpl = new Template();
-        $tpl->template = (new AlertTemplate)->forceFill([
+        $tpl = new Template((new AlertTemplate)->forceFill([
             'name' => 'Default Alert Template',
             'title' => '',
             'title_rec' => '',
             'template' => '{{ $alert->title }}',
-        ]);
+        ]));
         $renderedTitle = $tpl->getTitle(new AlertData($data));
 
         $this->assertFalse($GLOBALS['__test_ssti_flag'], 'Blade expressions in device display string should not be evaluated');
@@ -44,13 +43,12 @@ class AlertTemplateSstiTest extends TestCase
             'name' => 'Ping Latency',
         ];
 
-        $tpl = new Template();
-        $tpl->template = (new AlertTemplate)->forceFill([
+        $tpl = new Template((new AlertTemplate)->forceFill([
             'name' => 'Custom Template',
             'title' => 'Custom Alert: {{ $alert->display }} - {{ $alert->name }}',
             'title_rec' => 'Recovered: {{ $alert->display }}',
             'template' => '{{ $alert->title }}',
-        ]);
+        ]));
         $renderedTitle = $tpl->getTitle(new AlertData($data));
 
         $this->assertEquals('Custom Alert: my-switch-01 - Ping Latency', $renderedTitle);
@@ -68,13 +66,12 @@ class AlertTemplateSstiTest extends TestCase
             'name' => 'Test Rule',
         ];
 
-        $tpl = new Template();
-        $tpl->template = (new AlertTemplate)->forceFill([
+        $tpl = new Template((new AlertTemplate)->forceFill([
             'name' => 'Default Alert Template',
             'title' => '',
             'title_rec' => '',
             'template' => '{{ $alert->title }}',
-        ]);
+        ]));
         $renderedTitle = $tpl->getTitle(new AlertData($data));
 
         $this->assertFalse($GLOBALS['__test_ssti_flag_directive'], 'Blade directives like @php in device display string should not be evaluated');
@@ -91,12 +88,11 @@ class AlertTemplateSstiTest extends TestCase
             'name' => 'Test Rule',
         ];
 
-        $tpl = new Template();
-        $tpl->template = (new AlertTemplate)->forceFill([
+        $tpl = new Template((new AlertTemplate)->forceFill([
             'name' => 'Broken Template',
             'title' => '{{ $alert->invalidMethod() }}',
             'template' => '{{ $alert->title }}',
-        ]);
+        ]));
         $renderedTitle = $tpl->getTitle(new AlertData($data));
 
         $this->assertEquals('Alert for device router & switch - Test Rule', $renderedTitle);

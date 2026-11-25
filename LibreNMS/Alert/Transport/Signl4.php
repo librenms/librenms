@@ -39,16 +39,16 @@ class Signl4 extends Transport implements AlertTransport
     {
         $url = $this->config['signl4-url'];
 
-        $alert_status = match ($alert_data['state']) {
+        $alert_status = match ($alert_data->state) {
             AlertState::RECOVERED => 'resolved',
             AlertState::ACKNOWLEDGED => 'acknowledged',
             default => 'new'
         };
 
         $s4_data = [
-            'X-S4-ExternalID' => (string) $alert_data['alert_id'],
+            'X-S4-ExternalID' => (string) $alert_data->alert_id,
             'X-S4-Status' => $alert_status,
-            'Body' => $alert_data['alert_notes'],
+            'Body' => $alert_data->alert_notes,
         ];
 
         $payload = $alert_data->toTransportPayload();

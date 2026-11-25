@@ -48,8 +48,8 @@ class Telegram extends Transport implements AlertTransport
 
         $format = $this->config['telegram-format'];
         $this->message['text'] = $format == 'Markdown'
-            ? preg_replace('/([a-z0-9]+)_([a-z0-9]+)/', "$1\_$2", (string) $alert_data['msg'])
-            : $alert_data['msg'];
+            ? preg_replace('/([a-z0-9]+)_([a-z0-9]+)/', "$1\_$2", (string) $alert_data->msg)
+            : $alert_data->msg;
 
         $this->embedGraphs();
 

@@ -71,7 +71,7 @@ class Snmptrap extends Transport implements AlertTransport
         $cmd[] = $trapdefinition;
 
         // Append varbind arguments parsed from the alert template output
-        foreach ($this->parseVarbinds($alert_data['msg'] ?? '') as $arg) {
+        foreach ($this->parseVarbinds($alert_data->msg ?? '') as $arg) {
             $cmd[] = $arg;
         }
 
@@ -89,7 +89,7 @@ class Snmptrap extends Transport implements AlertTransport
                 $alert_data,
                 $process->getExitCode() ?? 1,
                 $process->getErrorOutput(),
-                $alert_data['msg'] ?? '',
+                $alert_data->msg ?? '',
                 $this->config
             );
         }

@@ -38,13 +38,13 @@ class Rocket extends Transport implements AlertTransport
     {
         $rocket_opts = $this->parseUserOptions($this->config['rocket-options'] ?? '');
 
-        $rocket_msg = strip_tags((string) $alert_data['msg']);
+        $rocket_msg = strip_tags((string) $alert_data->msg);
         $data = [
             'attachments' => [
                 0 => [
                     'fallback' => $rocket_msg,
-                    'color' => self::getColorForState($alert_data['state']),
-                    'title' => $alert_data['title'],
+                    'color' => self::getColorForState($alert_data->state),
+                    'title' => $alert_data->title,
                     'text' => $rocket_msg,
                 ],
             ],

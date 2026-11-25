@@ -30,7 +30,7 @@ class Twilio extends Transport implements AlertTransport
 
         $data = [
             'From' => $this->config['twilio-sender'],
-            'Body' => $alert_data['msg'],
+            'Body' => $alert_data->msg,
             'To' => $this->config['twilio-to'],
         ];
 
@@ -42,7 +42,7 @@ class Twilio extends Transport implements AlertTransport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $data);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->msg, $data);
     }
 
     public static function configTemplate(): array

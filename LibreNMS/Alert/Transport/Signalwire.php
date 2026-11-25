@@ -35,7 +35,7 @@ class Signalwire extends Transport implements AlertTransport
         $data = [
             'From' => $this->config['signalwire-sender'],
             'To' => $this->config['signalwire-to'],
-            'Body' => $alert_data['title'],
+            'Body' => $alert_data->title,
         ];
 
         $res = Http::client()->asForm()
@@ -46,7 +46,7 @@ class Signalwire extends Transport implements AlertTransport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['title'], $data);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->title, $data);
     }
 
     public static function configTemplate(): array
