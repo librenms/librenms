@@ -420,7 +420,8 @@ main () {
             ;;
             cleanup)
                 # Cleanups
-                options=("refresh_alert_rules"
+                options=("legacy_schedule_options"
+                               "refresh_alert_rules"
                                "refresh_device_groups"
                                "recalculate_device_dependencies"
                                "eventlog"

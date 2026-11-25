@@ -85,6 +85,10 @@ return [
             'user' => 'User',
             'webserver' => 'Web Server',
         ],
+        'configuration' => [
+            'legacy_schedule_options' => 'Legacy scheduling options are explicitly configured: :options.',
+            'legacy_schedule_options_fix' => 'For tasks still using legacy scheduling, consider these settings: :options. Verify that the corresponding dispatcher or cron jobs are running before removing the legacy options.',
+        ],
         'rrd' => [
             'CheckRrdVersion' => [
                 'fail' => 'The rrdtool version :installed_version is too old. The minimum supported version is 1.5.5.',
