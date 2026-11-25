@@ -40,6 +40,9 @@ final class LegacyScheduleOptionsNotificationTest extends InMemoryDbTestCase
         $this->assertSame(0, Notification::count());
     }
 
+    /**
+     * @return list<array{string}>
+     */
     public static function legacyOptions(): array
     {
         return array_map(fn (string $option): array => [$option], self::OPTIONS);
@@ -130,6 +133,8 @@ final class LegacyScheduleOptionsNotificationTest extends InMemoryDbTestCase
         $fix = $messages['Legacy scheduling options are explicitly configured: service_ping_enabled, service_poller_enabled.'];
         $this->assertStringContainsString('lnms config:set schedule_type.ping cron', $fix);
         $this->assertStringContainsString('lnms config:set schedule_type.poller dispatcher', $fix);
-        $this->assertStringContainsString('a disabled dispatcher does not imply a cron job exists', $fix);
+        $this->assertStringContainsString('Remove the legacy options from config.php', $fix);
+        $this->assertStringContainsString('lnms config:set service_ping_enabled, lnms config:set service_poller_enabled', $fix);
+        $this->assertStringContainsString('omit the value and confirm', $fix);
     }
 }

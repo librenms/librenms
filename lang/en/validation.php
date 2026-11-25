@@ -87,7 +87,7 @@ return [
         ],
         'configuration' => [
             'legacy_schedule_options' => 'Legacy scheduling options are explicitly configured: :options.',
-            'legacy_schedule_options_fix' => 'For tasks still using legacy scheduling, consider these settings: :options. Verify that the corresponding dispatcher or cron jobs are running before removing the legacy options.',
+            'legacy_schedule_options_fix' => 'If appropriate for tasks still using legacy scheduling, set the corresponding schedule_type values: :options. Verify that the dispatcher or cron jobs are running. Remove the legacy options from config.php on each node where they are set, and remove any saved database settings with :remove_options (omit the value and confirm).',
         ],
         'rrd' => [
             'CheckRrdVersion' => [

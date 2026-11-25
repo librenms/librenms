@@ -57,6 +57,10 @@ class Configuration extends BaseValidation
                             . ' ' . (LibrenmsConfig::get($option) ? 'dispatcher' : 'cron'),
                         $legacyScheduleOptions
                     )),
+                    'remove_options' => implode(', ', array_map(
+                        fn (string $option): string => 'lnms config:set ' . $option,
+                        $legacyScheduleOptions
+                    )),
                 ])
             );
         }
