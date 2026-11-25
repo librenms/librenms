@@ -2,33 +2,64 @@ name: 'Pull Request Labeler'
 
 on:
   pull_request_target:
-    types: [opened, synchronize, reopened, labeled]
+    types: [opened, ready_for_review, labeled]
 
 permissions:
   contents: read
   pull-requests: write
 
+env:
+  GH_TOKEN: ${{ github.token }}
+  ISSUE_API: repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}
+  NEEDS_DEVICE_DATA: 'Needs Device Data :unicorn:'
+
 jobs:
   labeler:
+    if: >-
+      (github.event.action == 'labeled' && github.event.label.name == 'Needs Device Data :unicorn:')
+      || (github.event.action != 'labeled' && !github.event.pull_request.draft)
     runs-on: ubuntu-slim
+    concurrency:
+      group: pr-labeler-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
     steps:
-      - id: labeler
+      - name: Check label history
+        id: history
         if: github.event.action != 'labeled'
+        run: |
+          events=$(gh api "$ISSUE_API/events" --paginate --slurp)
+          jq -r --arg device_data "$NEEDS_DEVICE_DATA" '
+            "eligible=\(all(.[][]; .event != "unlabeled"
+              and (.event != "labeled" or .label.name == $device_data)))"
+          ' <<< "$events" >> "$GITHUB_OUTPUT"
+
+      - name: Add labels
+        if: steps.history.outputs.eligible == 'true'
         uses: actions/labeler@v7
         with:
-          sync-labels: true
+          sync-labels: false
 
-      # Labels added with GITHUB_TOKEN don't trigger a labeled event, so handle both here
-      - name: Comment on Needs Device Data
-        if: >-
-          (github.event.action == 'labeled' && github.event.label.name == 'Needs Device Data :unicorn:')
-          || contains(format(',{0},', steps.labeler.outputs.new-labels), ',Needs Device Data :unicorn:,')
+      - name: Remind author about device data
         env:
-          GH_TOKEN: ${{ github.token }}
-          GH_REPO: ${{ github.repository }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
           PR_AUTHOR: ${{ github.event.pull_request.user.login }}
         run: |
-          gh pr comment "$PR_NUMBER" --body "@$PR_AUTHOR please add test data so we can ensure your change is not broken in the future.
+          labels=$(gh api "$ISSUE_API" --jq 'select(.state == "open") | .labels[].name')
+          if ! grep -Fxq "$NEEDS_DEVICE_DATA" <<< "$labels"; then
+            exit 0
+          fi
+
+          reminder="@$PR_AUTHOR please add test data so we can ensure your change is not broken in the future.
 
           Read the docs to find out how: https://docs.librenms.org/Developing/os/Test-Units"
+          marker='<!-- librenms-needs-device-data -->'
+          comments=$(gh api "$ISSUE_API/comments" --paginate --slurp)
+          if jq -e --arg reminder "$reminder" --arg marker "$marker" '
+            any(.[][]; .user.login == "github-actions[bot]"
+              and (.body == $reminder or (.body | contains($marker))))
+          ' <<< "$comments" > /dev/null; then
+            exit 0
+          fi
+
+          gh api "$ISSUE_API/comments" --method POST --raw-field "body=$reminder
+
+          $marker" --silent

@@ -5,6 +5,7 @@ namespace LibreNMS\Applications;
 class Nvidia extends ApplicationDefinition
 {
     public const string TYPE = 'nvidia';
+    protected const ?string DOCS = 'Nvidia GPU';
 
     protected const ?array OVERVIEW = [
         'sm',

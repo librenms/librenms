@@ -19,6 +19,7 @@ namespace LibreNMS\Applications;
 class PowerdnsDnsdist extends ApplicationDefinition
 {
     public const string TYPE = 'powerdns-dnsdist';
+    protected const ?string DOCS = 'PowerDNS-dnsdist';
     protected const ?string NAME = 'PowerDNS dnsdist';
 
     protected const ?array OVERVIEW = [

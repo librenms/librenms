@@ -5,6 +5,7 @@ namespace LibreNMS\Applications;
 class Apache extends ApplicationDefinition
 {
     public const string TYPE = 'apache';
+    protected const ?string DOCS = 'Apache';
 
     protected const ?array OVERVIEW = [
         'bits',

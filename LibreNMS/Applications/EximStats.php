@@ -25,6 +25,7 @@ namespace LibreNMS\Applications;
 class EximStats extends ApplicationDefinition
 {
     public const string TYPE = 'exim-stats';
+    protected const ?string DOCS = 'EXIM Stats';
     protected const ?string NAME = 'EXIM Stats';
 
     protected const array GRAPHS = [

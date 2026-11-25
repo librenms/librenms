@@ -5,6 +5,7 @@ namespace LibreNMS\Applications;
 class Squid extends ApplicationDefinition
 {
     public const string TYPE = 'squid';
+    protected const ?string DOCS = 'Squid';
 
     protected const ?array OVERVIEW = [
         'memory',

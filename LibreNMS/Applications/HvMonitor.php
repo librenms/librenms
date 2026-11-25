@@ -9,6 +9,7 @@ use App\Models\Port;
 class HvMonitor extends ApplicationDefinition
 {
     public const string TYPE = 'hv-monitor';
+    protected const ?string DOCS = 'HV Monitor';
     protected const ?string NAME = 'HV Monitor';
 
     protected const ?array OVERVIEW = ['status', 'memory', 'pmem', 'time', 'pcpu', 'flt', 'csw', 'cow', 'etimes', 'snaps', 'snaps_size'];

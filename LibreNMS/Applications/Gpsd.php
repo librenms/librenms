@@ -28,6 +28,7 @@ use App\Models\Application;
 class Gpsd extends ApplicationDefinition
 {
     public const string TYPE = 'gpsd';
+    protected const ?string DOCS = 'GPSD';
     protected const ?string NAME = 'GPSD';
 
     protected const ?array OVERVIEW = [

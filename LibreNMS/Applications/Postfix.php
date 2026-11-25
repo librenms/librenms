@@ -5,6 +5,7 @@ namespace LibreNMS\Applications;
 class Postfix extends ApplicationDefinition
 {
     public const string TYPE = 'postfix';
+    protected const ?string DOCS = 'Postfix';
 
     protected const ?array OVERVIEW = [
         'messages',

@@ -7,6 +7,7 @@ use App\Models\Application;
 class Opensearch extends ApplicationDefinition
 {
     public const string TYPE = 'opensearch';
+    protected const ?string DOCS = 'Opensearch';
     protected const ?string NAME = 'Elasticsearch\\Opensearch';
 
     protected const ?array OVERVIEW = [

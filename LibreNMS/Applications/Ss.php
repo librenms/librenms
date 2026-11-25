@@ -7,6 +7,7 @@ use App\Models\Application;
 class Ss extends ApplicationDefinition
 {
     public const string TYPE = 'ss';
+    protected const ?string DOCS = 'Socket Statistics (ss)';
     protected const ?string NAME = 'Socket Statistics';
 
     protected const ?array OVERVIEW = [

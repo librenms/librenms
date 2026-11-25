@@ -7,6 +7,7 @@ use App\Models\Application;
 class Mysql extends ApplicationDefinition
 {
     public const string TYPE = 'mysql';
+    protected const ?string DOCS = 'MySQL';
     protected const ?string NAME = 'MySQL';
 
     protected const ?array OVERVIEW = [

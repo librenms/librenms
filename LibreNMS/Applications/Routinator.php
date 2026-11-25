@@ -7,6 +7,7 @@ use App\Models\Application;
 class Routinator extends ApplicationDefinition
 {
     public const string TYPE = 'routinator';
+    protected const ?string DOCS = 'Routinator';
 
     protected const ?array OVERVIEW = [];
 

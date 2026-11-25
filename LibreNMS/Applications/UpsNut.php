@@ -26,6 +26,7 @@ namespace LibreNMS\Applications;
 class UpsNut extends ApplicationDefinition
 {
     public const string TYPE = 'ups-nut';
+    protected const ?string DOCS = 'UPS-nut';
     protected const ?string NAME = 'UPS nut';
 
     protected const array GRAPHS = [

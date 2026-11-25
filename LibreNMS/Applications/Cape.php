@@ -7,6 +7,7 @@ use App\Models\Application;
 class Cape extends ApplicationDefinition
 {
     public const string TYPE = 'cape';
+    protected const ?string DOCS = 'CAPEv2';
     protected const ?string NAME = 'CAPEv2';
 
     protected const ?array OVERVIEW = [
@@ -96,8 +97,13 @@ class Cape extends ApplicationDefinition
         $packages = array_map(fn (string $file) => preg_replace('/^pkg___-___-/', '', $file), $files);
         $package = $page->option('package');
 
-        $labels = ['statsavg' => 'Run Stats Averages', 'bytimeslot' => 'By Time Slot', 'bypkg' => 'By Package',
-            'stddev' => 'Standard Deviation', 'runstats' => 'More Run Stats'];
+        $labels = [
+            'statsavg' => 'Run Stats Averages',
+            'bytimeslot' => 'By Time Slot',
+            'bypkg' => 'By Package',
+            'stddev' => 'Standard Deviation',
+            'runstats' => 'More Run Stats',
+        ];
         $options = [];
         foreach ($labels as $key => $label) {
             $options[$key] = $page->option($key) === 'on' ? 'on' : 'off';

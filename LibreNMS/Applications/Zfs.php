@@ -7,6 +7,7 @@ use App\Models\Application;
 class Zfs extends ApplicationDefinition
 {
     public const string TYPE = 'zfs';
+    protected const ?string DOCS = 'ZFS';
     protected const ?string NAME = 'ZFS';
 
     protected const array POOL_GRAPHS = [

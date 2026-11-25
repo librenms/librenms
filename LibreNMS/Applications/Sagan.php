@@ -7,6 +7,7 @@ use App\Models\Application;
 class Sagan extends ApplicationDefinition
 {
     public const string TYPE = 'sagan';
+    protected const ?string DOCS = 'Sagan';
 
     protected const ?array OVERVIEW = [
         'after',

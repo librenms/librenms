@@ -21,6 +21,7 @@ namespace LibreNMS\Applications;
 class Powermon extends ApplicationDefinition
 {
     public const string TYPE = 'powermon';
+    protected const ?string DOCS = 'PowerMon';
     protected const ?string NAME = 'PowerMon';
 
     protected const array GRAPHS = [
