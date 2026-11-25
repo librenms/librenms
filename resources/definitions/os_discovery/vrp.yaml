@@ -253,11 +253,12 @@ modules:
                             value: ''
                 # Optical Rx/Tx power. Three definitions per direction share the same index, so
                 # exactly one of them must match a port:
-                #   1. per-lane power (0.01 dBm), used whenever the device has the lane column;
-                #   2. total power in uW, older devices without the lane column;
-                #   3. total power in 0.01 dBm, older devices without the lane column.
-                # The 'exists' rule on the lane column keeps 2 and 3 from overwriting 1. Thresholds
-                # are always 0.01 dBm, so 2 has none: uw_to_dbm would also be applied to them.
+                #   1. per-lane power (0.01 dBm), used whenever the port has a lane reading;
+                #   2. total power in uW, for ports without a lane reading;
+                #   3. total power in 0.01 dBm, for ports without a lane reading.
+                # 2 and 3 skip ports whose lane reading has a number, so they never overwrite 1; an
+                # empty lane reading falls back to them. Thresholds are always 0.01 dBm, so 2 has
+                # none: uw_to_dbm would also be applied to them.
                 # BiasCurrent <= 0 means an empty cage or a laser that is off.
                 -
                     oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
@@ -298,8 +299,8 @@ modules:
                             value: 12
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneRxPower
-                            op: 'exists'
-                            value: true
+                            op: 'regex'
+                            value: '/\d/'
                 -
                     oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
                     value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalRxPower
@@ -324,8 +325,8 @@ modules:
                             value: 12
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneRxPower
-                            op: 'exists'
-                            value: true
+                            op: 'regex'
+                            value: '/\d/'
                 -
                     oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
                     value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneTxPower
@@ -365,8 +366,8 @@ modules:
                             value: 12
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneTxPower
-                            op: 'exists'
-                            value: true
+                            op: 'regex'
+                            value: '/\d/'
                 -
                     oid: HUAWEI-ENTITY-EXTENT-MIB::hwOpticalModuleInfoTable
                     value: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalTxPower
@@ -391,8 +392,8 @@ modules:
                             value: 12
                         -
                             oid: HUAWEI-ENTITY-EXTENT-MIB::hwEntityOpticalLaneTxPower
-                            op: 'exists'
-                            value: true
+                            op: 'regex'
+                            value: '/\d/'
         voltage:
             data:
                 -
