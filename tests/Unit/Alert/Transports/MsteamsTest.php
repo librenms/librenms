@@ -108,6 +108,6 @@ final class MsteamsTest extends TestCase
 
         /** @var Device $mock_device */
         $mock_device = Device::factory()->make();
-        $msteams->deliverAlert([...AlertData::testData($mock_device), ...$alert]);
+        $msteams->deliver(AlertData::testData($mock_device, $alert));
     }
 }

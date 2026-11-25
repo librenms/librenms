@@ -24,25 +24,27 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Gitlab extends Transport
+class Gitlab extends Transport implements AlertTransport
 {
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         // Don't create tickets for resolutions
-        if ($alert_data['state'] == AlertState::RECOVERED) {
+        if ($alert_data->state == AlertState::RECOVERED) {
             return true;
         }
 
         $project_id = $this->config['gitlab-id'];
         $url = $this->config['gitlab-host'] . "/api/v4/projects/$project_id/issues";
         $data = [
-            'title' => 'Librenms alert for: ' . $alert_data['hostname'],
-            'description' => $alert_data['msg'],
+            'title' => 'Librenms alert for: ' . $alert_data->hostname,
+            'description' => $alert_data->msg,
         ];
 
         $res = Http::client()

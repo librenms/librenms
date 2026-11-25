@@ -25,17 +25,19 @@
 namespace LibreNMS\Alert\Transport;
 
 use Illuminate\Support\Str;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Slack extends Transport
+class Slack extends Transport implements AlertTransport
 {
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $slack_opts = $this->parseUserOptions($this->config['slack-options'] ?? '');
         $icon = $this->config['slack-icon_emoji'] ?? $slack_opts['icon_emoji'] ?? null;
-        $slack_msg = html_entity_decode(strip_tags($alert_data['msg'] ?? ''), ENT_QUOTES);
+        $slack_msg = html_entity_decode(strip_tags($alert_data->msg ?? ''), ENT_QUOTES);
 
         /*
          * Normalize spaces since you might want to do logic in your template, and Slack is
@@ -55,8 +57,8 @@ class Slack extends Transport
             'attachments' => [
                 0 => [
                     'fallback' => $slack_msg,
-                    'color' => self::getColorForState($alert_data['state']),
-                    'title' => $alert_data['title'] ?? null,
+                    'color' => self::getColorForState($alert_data->state),
+                    'title' => $alert_data->title ?? null,
                     'text' => $slack_msg,
                     'mrkdwn_in' => ['text', 'fallback'],
                     'author_name' => $this->config['slack-author'] ?? $slack_opts['author'] ?? null,

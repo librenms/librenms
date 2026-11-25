@@ -39,11 +39,16 @@ use App\Models\Port;
 use App\Models\Processor;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alert\RunAlerts;
+use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Tests\TestCase;
 use Mockery;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -52,6 +57,86 @@ use Spatie\Permission\Models\Role;
 final class AlertOperationRunAlertsTest extends TestCase
 {
     use RefreshDatabase;
+
+    public function testLiveIcmpAlertKeepsDeliveringAfterAWebhookFailure(): void
+    {
+        Http::preventStrayRequests();
+        Http::fake([
+            'https://alerts.example.test/slack' => Http::response('unavailable', 503),
+            'https://alerts.example.test/api*' => Http::response(),
+            'https://alerts.example.test/jsm' => Http::response(),
+        ]);
+
+        $context = $this->makeActiveAlert([
+            ['type' => 'slack'],
+            ['type' => 'api'],
+            ['type' => 'jsm'],
+        ]);
+        $device = $context['device'];
+        $device->pollingMethods()->updateOrCreate(['method_type' => PollingMethodType::Icmp], ['enabled' => true]);
+        $pingTime = now()->startOfSecond();
+        $device->stats()->updateOrCreate([], ['ping_last_timestamp' => $pingTime, 'ping_rtt_last' => 2.5]);
+        $context['segments'][0]['transport']->update(['transport_config' => ['slack-url' => 'https://alerts.example.test/slack']]);
+        $context['segments'][1]['transport']->update(['transport_config' => [
+            'api-url' => 'https://alerts.example.test/api',
+            'api-method' => 'post',
+            'api-auth-username' => '',
+            'api-auth-password' => '',
+            'api-body' => '{{ hostname }}',
+            'api-options' => 'device={{ device_id }}',
+        ]]);
+        $context['segments'][2]['transport']->update(['transport_config' => ['jsm-url' => 'https://alerts.example.test/jsm']]);
+
+        (new RunAlerts)->runAlerts();
+
+        Http::assertSent(fn (Request $request) => $request->url() === 'https://alerts.example.test/api?device=' . $device->device_id
+            && $request->body() === $device->hostname);
+        [$request] = Http::recorded(fn (Request $request) => $request->url() === 'https://alerts.example.test/jsm')->sole();
+        $payload = json_decode($request->body(), true, flags: JSON_THROW_ON_ERROR);
+        $this->assertSame($device->hostname, $payload['alert']['hostname']);
+        $this->assertSame($pingTime->toJSON(), $payload['ping_timestamp']);
+        $this->assertArrayNotHasKey('ping_min', $payload);
+        $this->assertArrayNotHasKey('diff', $payload);
+
+        $failure = Eventlog::query()->where('device_id', $device->device_id)->where('type', 'error')->sole();
+        $this->assertStringContainsString('Transport delivery failed with 503', $failure->message);
+    }
+
+    public function testCustomArrayTransportReceivesLegacyPayload(): void
+    {
+        $transport = new class extends Transport
+        {
+            public static array $payload = [];
+
+            public function deliverAlert(array $alert_data): bool
+            {
+                self::$payload = $alert_data;
+
+                return true;
+            }
+
+            public static function configTemplate(): array
+            {
+                return [];
+            }
+        };
+        class_alias($transport::class, Transport::getClass('legacyArrayTest'));
+        $device = Device::factory()->create();
+        $alert = new AlertData([
+            'device_id' => $device->device_id,
+            'hostname' => $device->hostname,
+            'state' => AlertState::ACTIVE,
+        ]);
+
+        (new RunAlerts)->extTransports($alert, [
+            ['transport_id' => null, 'transport_type' => 'legacyArrayTest', 'transport_name' => 'Legacy transport'],
+        ]);
+
+        $this->assertSame($device->hostname, $transport::$payload['hostname']);
+        $this->assertSame($device->hostname, $transport::$payload['alert']->hostname);
+        $this->assertArrayHasKey('msg', $transport::$payload);
+        $this->assertArrayHasKey('template', $transport::$payload);
+    }
 
     public function testActiveAlertIssuesDueSegmentTransportAndRespectsTimer(): void
     {
@@ -634,10 +719,10 @@ final class AlertOperationRunAlertsTest extends TestCase
         });
         $runAlerts->runAlerts();
 
-        $recovery = collect($objs)->first(fn ($obj) => (int) $obj['state'] === AlertState::RECOVERED);
+        $recovery = collect($objs)->first(fn (AlertData $obj) => $obj->state === AlertState::RECOVERED);
         $this->assertNotNull($recovery, 'Per-entity rules send a recovery as each entity clears');
-        $this->assertSame($recoveredLog->id, $recovery['uid'], 'Recovery must use the fault RECOVERED log, not a later BETTER log');
-        $this->assertSame($recoveredActiveLog->id, $recovery['id'], 'elapsed/previousLog must be the recovered fault\'s prior incident');
+        $this->assertSame($recoveredLog->id, $recovery->uid, 'Recovery must use the fault RECOVERED log, not a later BETTER log');
+        $this->assertSame($recoveredActiveLog->id, $recovery->id, 'elapsed/previousLog must be the recovered fault\'s prior incident');
         $this->assertSame(0, (int) $recovered->fresh()->open, 'The recovered fault must be closed after delivery');
         $keep = AlertFault::query()
             ->where('rule_id', $context['rule']->id)
@@ -809,7 +894,7 @@ final class AlertOperationRunAlertsTest extends TestCase
         $runAlerts->runAlerts();
 
         $this->assertCount(1, $objs);
-        $this->assertSame(AlertState::RECOVERED, (int) $objs[0]['state']);
+        $this->assertSame(AlertState::RECOVERED, $objs[0]->state);
         $this->assertSame(0, (int) $fault->fresh()->open);
         $this->assertDatabaseHas('alerts', [
             'rule_id' => $context['rule']->id,
@@ -1261,7 +1346,7 @@ final class AlertOperationRunAlertsTest extends TestCase
     }
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return list<AlertData>
      */
     private function runRecoveryRace(AlertRule $rule, Device $device): array
     {
@@ -1310,7 +1395,7 @@ final class AlertOperationRunAlertsTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $objs
+     * @param  list<AlertData>  $objs
      * @return list<int>
      */
     private function issuedStates(array $objs): array
@@ -1319,14 +1404,14 @@ final class AlertOperationRunAlertsTest extends TestCase
     }
 
     /**
-     * @param  array<int, array<string, mixed>>  $objs
+     * @param  list<AlertData>  $objs
      * @return list<int>
      */
     private function issuedPortIds(array $objs): array
     {
         $ids = [];
         foreach ($objs as $obj) {
-            foreach ($obj['faults'] ?? [] as $fault) {
+            foreach ($obj->faults as $fault) {
                 $ids[] = $fault['port_id'];
             }
         }

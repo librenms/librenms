@@ -7,11 +7,20 @@ name of its transport. An example is `Discord.php` for Discord.
 
 ## Transport structure
 
-A new transport needs these functions to pass the unit tests:
+A new transport extends `LibreNMS\Alert\Transport`, implements
+`LibreNMS\Interfaces\Alert\AlertTransport`, and needs these functions to
+pass the unit tests:
 
-`deliverAlert()` - the alert code calls this function to start the
-transport. In this function, prepare the transport configuration for
-use.
+`deliver(AlertData $alert_data)` - the alert code calls this
+function to start the transport. It receives a `LibreNMS\Alert\AlertData`
+object. Read fields as properties, such as `$alert_data->title`.
+`AlertData` cannot be changed. In this function, prepare the transport
+configuration for use.
+
+Older transports do not implement `AlertTransport`. They implement
+`deliverAlert(array $alert_data)` instead of `deliver()` and receive the
+alert as an array. These still work, but new transports should implement
+`AlertTransport`.
 
 `contact$Transport()` - this function has the name of the transport.
 For Discord, the name is `contactDiscord()`. This function connects to

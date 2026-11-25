@@ -48,7 +48,7 @@ final class SlackTest extends TestCase
 
         /** @var Device $mock_device */
         $mock_device = Device::factory()->make();
-        $slack->deliverAlert(AlertData::testData($mock_device));
+        $slack->deliver(AlertData::testData($mock_device));
 
         Http::assertSent(fn (Request $request) => $request->url() == 'https://slack.com/some/webhook' &&
         $request->method() == 'POST' &&
@@ -85,7 +85,7 @@ final class SlackTest extends TestCase
 
         /** @var Device $mock_device */
         $mock_device = Device::factory()->make();
-        $slack->deliverAlert(AlertData::testData($mock_device));
+        $slack->deliver(AlertData::testData($mock_device));
 
         Http::assertSent(fn (Request $request) => $request->url() == 'https://slack.com/some/webhook' &&
         $request->method() == 'POST' &&
@@ -125,7 +125,7 @@ final class SlackTest extends TestCase
 
         /** @var Device $mock_device */
         $mock_device = Device::factory()->make();
-        $slack->deliverAlert(AlertData::testData($mock_device));
+        $slack->deliver(AlertData::testData($mock_device));
 
         Http::assertSent(fn (Request $request) => $request->url() == 'https://slack.com/some/webhook' &&
         $request->method() == 'POST' &&

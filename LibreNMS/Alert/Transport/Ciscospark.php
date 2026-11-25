@@ -13,17 +13,19 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Ciscospark extends Transport
+class Ciscospark extends Transport implements AlertTransport
 {
     protected string $name = 'Cisco Webex Teams';
     // This is the total length minus 4 bytes for ellipses.
     private static int $MAX_MSG_SIZE = 7435;
 
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $room_id = $this->config['room-id'];
         $token = $this->config['api-token'];
@@ -34,10 +36,10 @@ class Ciscospark extends Transport
 
         if ($this->config['use-markdown'] === 'on') {
             // Remove blank lines as they create weird markdown behaviors.
-            $msg = preg_replace('/^\s+/m', '', (string) $alert_data['msg']);
+            $msg = preg_replace('/^\s+/m', '', (string) $alert_data->msg);
             $mtype = 'markdown';
         } else {
-            $msg = strip_tags((string) $alert_data['msg']);
+            $msg = strip_tags((string) $alert_data->msg);
             $mtype = 'text';
         }
 

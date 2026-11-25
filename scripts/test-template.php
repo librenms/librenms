@@ -3,7 +3,6 @@
 
 require __DIR__ . '/../includes/init.php';
 
-use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\RunAlerts;
 use LibreNMS\Alert\Template;
 use LibreNMS\Util\Debug;
@@ -33,17 +32,13 @@ if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
         exit(2);
     }
 
-    $obj = $runAlerts->describeAlert($alerts[0]);
-    if (isset($options['p'])) {
-        $obj['transport'] = $options['p'];
+    $alert = $runAlerts->describeAlert($alerts[0]);
+    if (! $alert) {
+        echo "Failed to describe alert.\n";
+        exit(2);
     }
-    $type = new Template;
-    $obj['title'] = $type->getTitle($obj);
-    $obj['alert'] = new AlertData($obj);
-    $obj['msg'] = $type->getBody($obj);
-    unset($obj['template']);
-    unset($obj['alert']);
-    print_r($obj);
+    $alert = $alert->forTransport($options['p'] ?? null, null, Template::forRule($alert->rule_id));
+    echo json_encode($alert, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . PHP_EOL;
 } else {
     c_echo('
 Usage:

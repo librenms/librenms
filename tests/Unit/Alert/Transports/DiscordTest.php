@@ -53,7 +53,7 @@ final class DiscordTest extends TestCase
         /** @var Device $mock_device */
         $mock_device = Device::factory()->make(['hostname' => 'my-hostname.com']);
 
-        $transport->deliverAlert(AlertData::testData($mock_device));
+        $transport->deliver(AlertData::testData($mock_device));
 
         Http::assertSent(function (Request $request) {
             assertEquals('https://discord.com/api/webhooks/number/id', $request->url());
@@ -63,7 +63,7 @@ final class DiscordTest extends TestCase
                 [
                     'embeds' => [
                         [
-                            'title' => '#000 Testing transport from LibreNMS',
+                            'title' => '#0 Testing transport from LibreNMS',
                             'color' => 16711680,
                             'description' => 'This is a test alert',
                             'fields' => [],
@@ -95,7 +95,7 @@ final class DiscordTest extends TestCase
         /** @var Device $mock_device */
         $mock_device = Device::factory()->make(['hostname' => 'my-hostname.com']);
 
-        $transport->deliverAlert(AlertData::testData($mock_device));
+        $transport->deliver(AlertData::testData($mock_device));
 
         Http::assertSent(function (Request $request) {
             assertEquals('https://discord.com/api/webhooks/number/id', $request->url());
@@ -105,7 +105,7 @@ final class DiscordTest extends TestCase
                 [
                     'embeds' => [
                         [
-                            'title' => '#000 Testing transport from LibreNMS',
+                            'title' => '#0 Testing transport from LibreNMS',
                             'color' => 16711680,
                             'description' => 'This is a test alert',
                             'fields' => [],
@@ -137,7 +137,7 @@ final class DiscordTest extends TestCase
         /** @var Device $mock_device */
         $mock_device = Device::factory()->make(['hostname' => 'my-hostname.com']);
 
-        $transport->deliverAlert(AlertData::testData($mock_device));
+        $transport->deliver(AlertData::testData($mock_device));
 
         Http::assertSent(function (Request $request) {
             assertEquals('https://discord.com/api/webhooks/number/id', $request->url());
@@ -147,7 +147,7 @@ final class DiscordTest extends TestCase
                 [
                     'embeds' => [
                         [
-                            'title' => '#000 Testing transport from LibreNMS',
+                            'title' => '#0 Testing transport from LibreNMS',
                             'color' => 16711680,
                             'description' => 'This is a test alert',
                             'fields' => [
@@ -184,11 +184,9 @@ final class DiscordTest extends TestCase
         /** @var Device $mock_device */
         $mock_device = Device::factory()->make(['hostname' => 'my-hostname.com']);
 
-        $alert_data = AlertData::testData($mock_device);
+        $alert_data = AlertData::testData($mock_device, ['msg' => 'This test alert should not have image <img class="librenms-graph" src="google.jpeg" /> or <h2>html tags</h2></br>']);
 
-        $alert_data['msg'] = 'This test alert should not have image <img class="librenms-graph" src="google.jpeg" /> or <h2>html tags</h2></br>';
-
-        $transport->deliverAlert($alert_data);
+        $transport->deliver($alert_data);
 
         Http::assertSent(function (Request $request) {
             assertEquals($request->url(), 'https://discord.com/api/webhooks/number/id');
@@ -200,7 +198,7 @@ final class DiscordTest extends TestCase
                     'content' => 'This is a text',
                     'embeds' => [
                         [
-                            'title' => '#000 Testing transport from LibreNMS',
+                            'title' => '#0 Testing transport from LibreNMS',
                             'color' => 16711680,
                             'description' => 'This test alert should not have image [Image 1] or html tags',
                             'fields' => [

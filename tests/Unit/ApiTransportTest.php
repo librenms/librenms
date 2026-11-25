@@ -5,6 +5,8 @@ namespace LibreNMS\Tests\Unit;
 use App\Models\AlertTransport;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http as LaravelHttp;
+use LibreNMS\Alert\AlertData;
+use LibreNMS\Alert\Transport\Api;
 use LibreNMS\Tests\TestCase;
 
 final class ApiTransportTest extends TestCase
@@ -18,8 +20,8 @@ final class ApiTransportTest extends TestCase
             '*' => LaravelHttp::response(),
         ]);
 
-        $obj = ['msg' => "This is a multi-line\nalert."];
-        $result = $transport->instance()->deliverAlert($obj);
+        $obj = new AlertData(['msg' => "This is a multi-line\nalert."]);
+        $result = new Api($transport)->deliver($obj);
 
         $this->assertTrue($result);
 
@@ -41,8 +43,8 @@ final class ApiTransportTest extends TestCase
             '*' => LaravelHttp::response(),
         ]);
 
-        $obj = ['msg' => "This is a post multi-line\nalert."];
-        $result = $transport->instance()->deliverAlert($obj);
+        $obj = new AlertData(['msg' => "This is a post multi-line\nalert."]);
+        $result = new Api($transport)->deliver($obj);
 
         $this->assertTrue($result);
 
@@ -69,7 +71,7 @@ final class ApiTransportTest extends TestCase
             '*' => LaravelHttp::response(),
         ]);
 
-        $result = $transport->instance()->deliverAlert(['msg' => 'test']);
+        $result = new Api($transport)->deliver(new AlertData(['msg' => 'test']));
 
         $this->assertTrue($result);
         LaravelHttp::assertSentCount(1);

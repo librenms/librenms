@@ -30,11 +30,13 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Discord extends Transport
+class Discord extends Transport implements AlertTransport
 {
     private array $embedFieldTranslations = [
         'name' => 'Rule Name',
@@ -46,10 +48,9 @@ class Discord extends Transport
      * Composes a Discord JSON message and delivers it using HTTP POST
      * https://discord.com/developers/docs/resources/message#create-message
      *
-     * @param  array  $alert_data
      * @return bool
      */
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $this->discord_message = [
             'embeds' => [
@@ -75,12 +76,12 @@ class Discord extends Transport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $this->discord_message);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->msg, $this->discord_message);
     }
 
-    private function getTitle(array $alert_data): string
+    private function getTitle(AlertData $alert_data): string
     {
-        return '#' . $alert_data['uid'] . ' ' . $alert_data['title'];
+        return '#' . $alert_data->uid . ' ' . $alert_data->title;
     }
 
     private function stripHTMLTagsFromDescription(): array
@@ -90,22 +91,22 @@ class Discord extends Transport
         return $this->discord_message;
     }
 
-    private function getColorOfAlertState(array $alert_data): int
+    private function getColorOfAlertState(AlertData $alert_data): int
     {
-        $hexColor = self::getColorForState($alert_data['state']);
+        $hexColor = self::getColorForState($alert_data->state);
         $sanitized = preg_replace('/[^\dA-Fa-f]/', '', $hexColor);
 
         return hexdec((string) $sanitized);
     }
 
-    private function getDescription(array $alert_data): string
+    private function getDescription(AlertData $alert_data): string
     {
-        return $alert_data['msg'];
+        return $alert_data->msg;
     }
 
-    private function getFooter(array $alert_data): string
+    private function getFooter(AlertData $alert_data): string
     {
-        return $alert_data['elapsed'] ? 'alert took ' . $alert_data['elapsed'] : '';
+        return $alert_data->elapsed ? 'alert took ' . $alert_data->elapsed : '';
     }
 
     private function includeINIFields(): array
@@ -147,7 +148,6 @@ class Discord extends Transport
      * Converts comma-separated values into an array of name-value pairs.
      * https://discord.com/developers/docs/resources/message#embed-object-embed-field-structure
      *
-     * * @param  array  $alert_data  Array containing the values.
      * @return array An array of name-value pairs.
      *
      * @example
@@ -158,7 +158,7 @@ class Discord extends Transport
      *     ['name' => 'SysDescr', 'value' => 'Linux server description'],
      * ]
      */
-    public function getEmbedFields(array $alert_data): array
+    public function getEmbedFields(AlertData $alert_data): array
     {
         $result = [];
 
@@ -173,7 +173,7 @@ class Discord extends Transport
 
             $result[] = [
                 'name' => $this->embedFieldTranslations[$field] ?? ucfirst($field),
-                'value' => $alert_data[$field] ?? 'Error: Invalid Field',
+                'value' => $alert_data->{$field} ?? 'Error: Invalid Field',
             ];
         }
 

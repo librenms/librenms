@@ -17,18 +17,20 @@
 namespace LibreNMS\Alert\Transport;
 
 use App\Facades\DeviceCache;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Grafana extends Transport
+class Grafana extends Transport implements AlertTransport
 {
     protected string $name = 'Grafana Oncall';
 
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
-        $device = DeviceCache::get($alert_data['device_id']);
+        $device = DeviceCache::get($alert_data->device_id);
 
         $graph_args = [
             'type' => 'device_bits', // FIXME use graph url related to alert
@@ -40,37 +42,37 @@ class Grafana extends Transport
         ];
 
         $data = [
-            'alert_uid' => $alert_data['id'],
-            'title' => $alert_data['title'] ?? null,
+            'alert_uid' => $alert_data->id,
+            'title' => $alert_data->title ?? null,
             'image_url' => route('graph', $graph_args),
             'link_to_upstream_details' => route('device.overview', ['device' => $device]),
-            'state' => ($alert_data['state'] == AlertState::ACTIVE) ? 'alerting' : 'ok',
-            'raw_state' => $alert_data['state'],
-            'device_id' => $alert_data['device_id'],
-            'hostname' => $alert_data['hostname'],
-            'sysName' => $alert_data['sysName'],
-            'location' => $alert_data['location'],
-            'sysDescr' => $alert_data['sysDescr'],
-            'os' => $alert_data['os'],
-            'type' => $alert_data['type'],
-            'hardware' => $alert_data['hardware'],
-            'software' => $alert_data['software'] ?? '',
-            'features' => $alert_data['features'],
-            'serial' => $alert_data['serial'] ?? '',
-            'uptime' => $alert_data['uptime'],
-            'notes' => $alert_data['notes'],
-            'alert_notes' => $alert_data['alert_notes'],
-            'severity' => $alert_data['severity'],
-            'proc' => $alert_data['proc'],
-            'transport' => $alert_data['transport'] ?? '',
-            'transport_name' => $alert_data['transport_name'] ?? '',
+            'state' => ($alert_data->state == AlertState::ACTIVE) ? 'alerting' : 'ok',
+            'raw_state' => $alert_data->state,
+            'device_id' => $alert_data->device_id,
+            'hostname' => $alert_data->hostname,
+            'sysName' => $alert_data->sysName,
+            'location' => $alert_data->location,
+            'sysDescr' => $alert_data->sysDescr,
+            'os' => $alert_data->os,
+            'type' => $alert_data->type,
+            'hardware' => $alert_data->hardware,
+            'software' => '',
+            'features' => $alert_data->features,
+            'serial' => $alert_data->serial ?? '',
+            'uptime' => $alert_data->uptime,
+            'notes' => $alert_data->notes,
+            'alert_notes' => $alert_data->alert_notes,
+            'severity' => $alert_data->severity,
+            'proc' => $alert_data->proc,
+            'transport' => $alert_data->transport ?? '',
+            'transport_name' => $alert_data->transport_name ?? '',
         ];
 
-        $tmp_msg = json_decode((string) $alert_data['msg'], true);
+        $tmp_msg = json_decode((string) $alert_data->msg, true);
         if (isset($tmp_msg['title']) && isset($tmp_msg['message'])) {
             $data = array_merge($data, $tmp_msg);
         } else {
-            $data['message'] = $alert_data['msg'];
+            $data['message'] = $alert_data->msg;
         }
 
         $res = Http::client()->post($this->config['url'] ?? '', $data);
@@ -79,7 +81,7 @@ class Grafana extends Transport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $data);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->msg, $data);
     }
 
     public static function configTemplate(): array

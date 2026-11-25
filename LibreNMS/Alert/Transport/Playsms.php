@@ -24,15 +24,17 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Playsms extends Transport
+class Playsms extends Transport implements AlertTransport
 {
     protected string $name = 'playSMS';
 
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $to = preg_split('/([,\r\n]+)/', (string) $this->config['playsms-mobiles']);
 
@@ -43,7 +45,7 @@ class Playsms extends Transport
             'u' => $this->config['playsms-user'],
             'h' => $this->config['playsms-token'],
             'to' => implode(',', $to),
-            'msg' => $alert_data['title'],
+            'msg' => $alert_data->title,
         ];
         if (! empty($this->config['playsms-from'])) {
             $data['from'] = $this->config['playsms-from'];

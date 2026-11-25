@@ -16,19 +16,21 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Twilio extends Transport
+class Twilio extends Transport implements AlertTransport
 {
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $url = 'https://api.twilio.com/2010-04-01/Accounts/' . $this->config['twilio-sid'] . '/Messages.json';
 
         $data = [
             'From' => $this->config['twilio-sender'],
-            'Body' => $alert_data['msg'],
+            'Body' => $alert_data->msg,
             'To' => $this->config['twilio-to'],
         ];
 
@@ -40,7 +42,7 @@ class Twilio extends Transport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $data);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->msg, $data);
     }
 
     public static function configTemplate(): array

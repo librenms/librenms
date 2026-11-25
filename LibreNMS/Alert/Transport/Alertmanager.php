@@ -25,35 +25,37 @@ namespace LibreNMS\Alert\Transport;
 
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Pool;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Alertmanager extends Transport
+class Alertmanager extends Transport implements AlertTransport
 {
     protected string $name = 'Alert Manager';
 
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $url = $this->config['alertmanager-url'];
         $username = $this->config['alertmanager-username'];
         $password = $this->config['alertmanager-password'];
 
-        $alertmanager_status = $alert_data['state'] == AlertState::RECOVERED ? 'endsAt' : 'startsAt';
-        $alertmanager_msg = strip_tags((string) $alert_data['msg']);
+        $alertmanager_status = $alert_data->state == AlertState::RECOVERED ? 'endsAt' : 'startsAt';
+        $alertmanager_msg = strip_tags((string) $alert_data->msg);
         $data = [[
             $alertmanager_status => date('c'),
-            'generatorURL' => route('device.overview', ['device' => $alert_data['device_id']]),
+            'generatorURL' => route('device.overview', ['device' => $alert_data->device_id]),
             'annotations' => [
-                'summary' => $alert_data['name'],
-                'title' => $alert_data['title'],
+                'summary' => $alert_data->name,
+                'title' => $alert_data->title,
                 'description' => $alertmanager_msg,
             ],
             'labels' => [
-                'alertname' => $alert_data['name'],
-                'severity' => $alert_data['severity'],
-                'instance' => $alert_data['hostname'],
+                'alertname' => $alert_data->name,
+                'severity' => $alert_data->severity,
+                'instance' => $alert_data->hostname,
             ],
         ]];
 
@@ -65,8 +67,8 @@ class Alertmanager extends Transport
                 $data[0]['labels'][$cleanLabel] = strip_tags((string) $value);
             } else {
                 // Dynamic label: try to resolve value from alert data, faults, or fall back to literal
-                $resolved = $alert_data[$value] ?? current(array_filter(
-                    array_column($alert_data['faults'] ?? [], $value),
+                $resolved = $alert_data->{$value} ?? current(array_filter(
+                    array_column($alert_data->faults, $value),
                     fn ($v) => ! empty($v)
                 )) ?: $value;
 

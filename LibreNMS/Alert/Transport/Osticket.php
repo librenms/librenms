@@ -14,15 +14,17 @@
 namespace LibreNMS\Alert\Transport;
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Osticket extends Transport
+class Osticket extends Transport implements AlertTransport
 {
     protected string $name = 'osTicket';
 
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $url = $this->config['os-url'];
         $token = $this->config['os-token'];
@@ -36,8 +38,8 @@ class Osticket extends Transport
         $protocol = [
             'name' => 'LibreNMS',
             'email' => $email,
-            'subject' => ($alert_data['name'] ? $alert_data['name'] . ' on ' . $alert_data['hostname'] : $alert_data['title']),
-            'message' => strip_tags((string) $alert_data['msg']),
+            'subject' => ($alert_data->name ? $alert_data->name . ' on ' . $alert_data->hostname : $alert_data->title),
+            'message' => strip_tags((string) $alert_data->msg),
             'ip' => $_SERVER['REMOTE_ADDR'],
             'attachments' => [],
         ];
@@ -50,7 +52,7 @@ class Osticket extends Transport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $protocol);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->msg, $protocol);
     }
 
     public static function configTemplate(): array

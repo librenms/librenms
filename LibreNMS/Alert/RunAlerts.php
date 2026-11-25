@@ -47,6 +47,7 @@ use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport as AlertTransportInterface;
 use LibreNMS\Util\Time;
 
 class RunAlerts
@@ -94,12 +95,10 @@ class RunAlerts
      * Describe Alert
      *
      * @param  array  $alert  Alert-Result from DB
-     * @return array|bool|string
      */
-    public function describeAlert($alert)
+    public function describeAlert($alert): ?AlertData
     {
         $obj = [];
-        $i = 0;
         $device = DeviceCache::get($alert['device_id']);
 
         $obj['hostname'] = $device->hostname;
@@ -131,10 +130,8 @@ class RunAlerts
 
         if ($device->polling()->isEnabled(PollingMethodType::Icmp)) {
             if ($device->stats) {
-                $obj['ping_timestamp'] = $device->stats->ping_last_timestamp;
+                $obj['ping_timestamp'] = $device->stats->ping_last_timestamp?->toImmutable();
                 $obj['ping_loss'] = $device->stats->ping_loss_last;
-                $obj['ping_min'] = '';
-                $obj['ping_max'] = '';
                 $obj['ping_avg'] = $device->stats->ping_rtt_last;
                 $obj['debug'] = 'unsupported';
             } else {
@@ -160,23 +157,8 @@ class RunAlerts
             }
         }
 
-        $tpl = new Template;
-        $template = $tpl->getTemplate($obj);
-
         if ($alert['state'] >= AlertState::ACTIVE) {
-            foreach ($extra['rule'] ?? [] as $incident) {
-                if (! is_array($incident)) {
-                    continue;
-                }
-                $i++;
-                $obj['faults'][$i] = $incident;
-                $obj['faults'][$i]['string'] = null;
-                foreach ($incident as $k => $v) {
-                    if (! empty($v) && $k != 'device_id' && (stristr((string) $k, 'id') || stristr((string) $k, 'desc') || stristr((string) $k, 'msg')) && substr_count((string) $k, '_') <= 1) {
-                        $obj['faults'][$i]['string'] .= $k . ' = ' . $v . '; ';
-                    }
-                }
-            }
+            $obj['faults'] = $this->describeFaults($extra['rule'] ?? []);
             $obj['elapsed'] = Time::formatInterval(time() - strtotime((string) $alert['time_logged']), true) ?: 'none';
             if (! empty($extra['diff'])) {
                 $obj['diff'] = $extra['diff'];
@@ -195,7 +177,7 @@ class RunAlerts
 
             $previousLog = $previousLogQuery->orderByDesc('id')->first();
             if ($previousLog === null) {
-                return false;
+                return null;
             }
 
             $extra = $previousLog->details;
@@ -223,21 +205,11 @@ class RunAlerts
                 }
             }
 
-            $obj['title'] = ($template?->title_rec ?: 'Device ' . $obj['display'] . ' recovered from ' . ($alert['name'] ?: $alert['rule']));
             $obj['elapsed'] = Time::formatInterval(strtotime((string) $alert['time_logged']) - strtotime((string) $previousLog->time_logged), true) ?: 'none';
             $obj['id'] = $previousLog->id;
-            foreach ($extra['rule'] ?? [] as $incident) {
-                $i++;
-                $obj['faults'][$i] = $incident;
-                $obj['faults'][$i]['string'] = '';
-                foreach ($incident as $k => $v) {
-                    if (! empty($v) && $k != 'device_id' && (stristr((string) $k, 'id') || stristr((string) $k, 'desc') || stristr((string) $k, 'msg')) && substr_count((string) $k, '_') <= 1) {
-                        $obj['faults'][$i]['string'] .= $k . ' => ' . $v . '; ';
-                    }
-                }
-            }
+            $obj['faults'] = $this->describeFaults($extra['rule'] ?? []);
         } else {
-            return 'Unknown State';
+            return null;
         }//end if
         $obj['builder'] = $alert['builder'];
         $obj['uid'] = $alert['id'];
@@ -246,11 +218,9 @@ class RunAlerts
         $obj['rule'] = $alert['builder']; //Backwards compatibility for old rule
         $obj['name'] = $alert['name'];
         $obj['timestamp'] = $alert['time_logged'];
-        $obj['contacts'] = $extra['contacts'];
+        $obj['contacts'] = $extra['contacts'] ?? [];
         $obj['state'] = $alert['state'];
         $obj['alerted'] = $alert['alerted'];
-        $obj['template'] = $template;
-
         $obj['operation_phase'] = AlertUtil::mapAlertStateToOperationPhase((int) $alert['state']);
         $detailCount = (int) ($extra['count'] ?? 0);
         $obj['escalation_step'] = max(1, $detailCount);
@@ -261,7 +231,36 @@ class RunAlerts
             $obj['escalation_step'] = 1;
         }
 
-        return $obj;
+        return new AlertData($obj);
+    }
+
+    /**
+     * Number the fault rows from 1 and add a short 'string' summary of their id, desc and msg columns.
+     *
+     * @param  array<mixed>  $rows
+     * @return array<int, array<string, mixed>>
+     */
+    private function describeFaults(array $rows): array
+    {
+        $faults = [];
+        $i = 0;
+        foreach ($rows as $row) {
+            if (! is_array($row)) {
+                continue;
+            }
+
+            $string = '';
+            foreach ($row as $k => $v) {
+                $k = (string) $k;
+                if (! empty($v) && $k !== 'device_id' && (stristr($k, 'id') || stristr($k, 'desc') || stristr($k, 'msg')) && substr_count($k, '_') <= 1) {
+                    $string .= $k . ' = ' . $v . '; ';
+                }
+            }
+
+            $faults[++$i] = [...$row, 'string' => $string];
+        }
+
+        return $faults;
     }
 
     public function clearStaleAlerts()
@@ -421,11 +420,11 @@ class RunAlerts
         }
 
         foreach ($units as $unit) {
-            $obj = $this->describeAlert($unit);
-            if (is_array($obj)) {
+            $alertData = $this->describeAlert($unit);
+            if ($alertData instanceof AlertData) {
                 echo 'Issuing Alert-UID #' . $unit['id'] . '/' . $unit['state'] . ':' . PHP_EOL;
                 if ((int) $unit['state'] !== AlertState::ACKNOWLEDGED || LibrenmsConfig::get('alert.acknowledged')) {
-                    $this->extTransports($obj, $transportOverride);
+                    $this->extTransports($alertData, $transportOverride);
                 }
                 echo "\r\n";
             }
@@ -455,10 +454,10 @@ class RunAlerts
                         $unit['id'] = $recoveryLog->id;
                         $unit['time_logged'] = (string) $recoveryLog->time_logged;
                     }
-                    $obj = $this->describeAlert($unit);
-                    if (is_array($obj)) {
+                    $alertData = $this->describeAlert($unit);
+                    if ($alertData instanceof AlertData) {
                         echo 'Issuing Alert-UID #' . $unit['id'] . '/' . $unit['state'] . ':' . PHP_EOL;
-                        $this->extTransports($obj);
+                        $this->extTransports($alertData);
                         echo "\r\n";
                     }
                 }
@@ -781,35 +780,31 @@ class RunAlerts
     /**
      * Run external transports
      *
-     * @param  array  $obj  Alert-Array
-     * @return void
+     * @param  array<int, array<string, mixed>>|null  $transportOverride
      */
-    public function extTransports($obj, ?array $transportOverride = null)
+    public function extTransports(AlertData $alert, ?array $transportOverride = null): void
     {
-        $type = new Template;
-
         // Per-segment scheduling supplies an explicit transport list; otherwise use the default lookup.
         $transport_maps = $transportOverride ?? AlertUtil::getAlertTransports(
-            $obj['alert_id'],
-            $obj['operation_phase'] ?? null,
-            (int) ($obj['escalation_step'] ?? 1)
+            $alert->alert_id,
+            $alert->operation_phase,
+            $alert->escalation_step ?? 1
         );
 
-        $ruleId = (int) ($obj['rule_id'] ?? 0);
         if (! $transport_maps || count($transport_maps) === 0) {
             $reason = 'No mapped transport for this operation';
-            if ($ruleId > 0 && ! AlertUtil::ruleHasAlertOperations($ruleId)) {
+            if ($alert->rule_id !== null && ! AlertUtil::ruleHasAlertOperations($alert->rule_id)) {
                 $reason = 'No operations configured for this rule';
             }
 
-            Eventlog::log($reason . ' (notification skipped)', $obj['device_id'], 'alert', Severity::Notice);
+            Eventlog::log($reason . ' (notification skipped)', $alert->device_id, 'alert', Severity::Notice);
             c_echo(" :: Skipped => $reason");
 
             return;
         }
 
         // alerting for default contacts, etc
-        if (LibrenmsConfig::get('alert.transports.mail') === true && ! empty($obj['contacts'])) {
+        if (LibrenmsConfig::get('alert.transports.mail') === true && ! empty($alert->contacts)) {
             $transport_maps[] = [
                 'transport_id' => null,
                 'transport_type' => 'mail',
@@ -817,26 +812,24 @@ class RunAlerts
             ];
         }
 
+        $template = Template::forRule($alert->rule_id);
+
         foreach ($transport_maps as $item) {
             $class = Transport::getClass($item['transport_type']);
             if (class_exists($class)) {
-                //FIXME remove Deprecated transport
-                $transport_title = "Transport {$item['transport_type']}";
-                $obj['transport'] = $item['transport_type'];
-                $obj['transport_name'] = $item['transport_name'];
-                $obj['title'] = $type->getTitle($obj);
-                $obj['alert'] = new AlertData($obj);
-                $obj['msg'] = $type->getBody($obj);
-                c_echo(" :: $transport_title => ");
+                c_echo(" :: Transport {$item['transport_type']} => ");
                 try {
+                    $transportAlert = $alert->forTransport($item['transport_type'], $item['transport_name'], $template);
                     $instance = new $class(AlertTransport::find($item['transport_id']));
-                    $tmp = $instance->deliverAlert($obj);
-                    $this->alertLog($tmp, $obj, $obj['transport']);
+                    $tmp = $instance instanceof AlertTransportInterface
+                        ? $instance->deliver($transportAlert)
+                        : $instance->deliverAlert($transportAlert->toTransportPayload($template->template));
+                    $this->alertLog($tmp, $alert, $item['transport_type']);
                 } catch (AlertTransportDeliveryException $e) {
-                    Log::warning("Alert transport '{$obj['transport']}' delivery failed for device {$obj['device_id']}: {$e->getMessage()}", ['exception' => $e]);
-                    $this->alertLog($e->getMessage(), $obj, $obj['transport']);
-                } catch (\Exception $e) {
-                    $this->alertLog($e, $obj, $obj['transport']);
+                    Log::warning("Alert transport '{$item['transport_type']}' delivery failed for device {$alert->device_id}: {$e->getMessage()}", ['exception' => $e]);
+                    $this->alertLog($e->getMessage(), $alert, $item['transport_type']);
+                } catch (\Throwable $e) {
+                    $this->alertLog($e, $alert, $item['transport_type']);
                 }
                 unset($instance);
                 echo PHP_EOL;
@@ -845,33 +838,33 @@ class RunAlerts
     }
 
     // Log alert event
-    public function alertLog($result, $obj, $transport)
+    public function alertLog($result, AlertData $alert, $transport)
     {
         $prefix = [
             AlertState::RECOVERED => 'recovery',
-            AlertState::ACTIVE => $obj['severity'] . ' alert',
+            AlertState::ACTIVE => $alert->severity . ' alert',
             AlertState::ACKNOWLEDGED => 'acknowledgment',
             AlertState::WORSE => 'worsened',
             AlertState::BETTER => 'improved',
             AlertState::CHANGED => 'changed',
         ];
 
-        $severity = match ($obj['state']) {
+        $severity = match ($alert->state) {
             AlertState::RECOVERED => Severity::Ok,
-            AlertState::ACTIVE => Severity::fromAlertRule($obj['severity'] ?? null),
+            AlertState::ACTIVE => Severity::fromAlertRule($alert->severity),
             AlertState::ACKNOWLEDGED => Severity::Notice,
             default => Severity::Unknown,
         };
 
         if ($result === true) {
             echo 'OK';
-            Eventlog::log('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', $severity);
+            Eventlog::log('Issued ' . $prefix[$alert->state] . " for rule '" . $alert->name . "' to transport '" . $transport . "'", $alert->device_id, 'alert', $severity);
         } elseif ($result === false) {
             echo 'ERROR';
-            Eventlog::log('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, Severity::Error);
+            Eventlog::log('Could not issue ' . $prefix[$alert->state] . " for rule '" . $alert->name . "' to transport '" . $transport . "'", $alert->device_id, null, Severity::Error);
         } else {
             echo "ERROR: $result\r\n";
-            Eventlog::log('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $result, $obj['device_id'], 'error', Severity::Error);
+            Eventlog::log('Could not issue ' . $prefix[$alert->state] . " for rule '" . $alert->name . "' to transport '" . $transport . "' Error: " . $result, $alert->device_id, 'error', Severity::Error);
         }
     }
 

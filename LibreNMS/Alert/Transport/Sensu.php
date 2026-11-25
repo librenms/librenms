@@ -25,12 +25,14 @@ namespace LibreNMS\Alert\Transport;
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Sensu extends Transport
+class Sensu extends Transport implements AlertTransport
 {
     // Sensu alert coding
     public const OK = 0;
@@ -44,7 +46,7 @@ class Sensu extends Transport
         'critical' => self::CRITICAL,
     ];
 
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $sensu_opts['source-key'] = $this->config['sensu-source-key'];
 
@@ -59,7 +61,7 @@ class Sensu extends Transport
             throw new AlertTransportDeliveryException($alert_data, $health_check, 'Sensu API is not responding');
         }
 
-        if ($alert_data['state'] !== AlertState::RECOVERED && $alert_data['state'] !== AlertState::ACKNOWLEDGED && $alert_data['alerted'] === 0) {
+        if ($alert_data->state !== AlertState::RECOVERED && $alert_data->state !== AlertState::ACKNOWLEDGED && $alert_data->alerted === 0) {
             // If this is the first event, send a forced "ok" dated (rrd.step / 2) seconds ago to tell Sensu the last time the check was healthy
             $data = $this->generateData($alert_data, self::OK, (int) round(LibrenmsConfig::get('rrd.step', 300) / 2));
             Log::debug('Sensu transport sent last good event to socket: ', $data);
@@ -72,7 +74,7 @@ class Sensu extends Transport
             sleep(5);
         }
 
-        $data = $this->generateData($alert_data, $this->calculateStatus($alert_data['state'], $alert_data['severity']));
+        $data = $this->generateData($alert_data, $this->calculateStatus($alert_data->state, $alert_data->severity));
 
         $result = $client->post($url . '/events', $data);
 
@@ -83,22 +85,22 @@ class Sensu extends Transport
         throw new AlertTransportDeliveryException($alert_data, $result->status(), $result->body(), json_encode($data), $sensu_opts);
     }
 
-    private function generateData(array $alert_data, int $status, int $offset = 0): array
+    private function generateData(AlertData $alert_data, int $status, int $offset = 0): array
     {
         $namespace = $this->config['sensu-namespace'] ?: 'default';
 
         return [
             'check' => [
                 'metadata' => [
-                    'name' => $this->checkName($this->config['sensu-prefix'], $alert_data['name']),
+                    'name' => $this->checkName($this->config['sensu-prefix'], $alert_data->name),
                     'namespace' => $namespace,
                     'annotations' => $this->generateAnnotations($alert_data),
                 ],
-                'command' => sprintf('LibreNMS: %s', $alert_data['builder']),
+                'command' => sprintf('LibreNMS: %s', $alert_data->builder),
                 'executed' => time() - $offset,
                 'interval' => LibrenmsConfig::get('rrd.step', 300),
                 'issued' => time() - $offset,
-                'output' => $alert_data['msg'],
+                'output' => $alert_data->msg,
                 'status' => $status,
             ],
             'entity' => [
@@ -107,26 +109,26 @@ class Sensu extends Transport
                     'namespace' => $namespace,
                 ],
                 'system' => [
-                    'hostname' => $alert_data['hostname'],
-                    'os' => $alert_data['os'],
+                    'hostname' => $alert_data->hostname,
+                    'os' => $alert_data->os,
                 ],
             ],
         ];
     }
 
-    private function generateAnnotations(array $alert_data): array
+    private function generateAnnotations(AlertData $alert_data): array
     {
         return array_filter([
             'generated-by' => 'LibreNMS',
-            'acknowledged' => $alert_data['state'] === AlertState::ACKNOWLEDGED ? 'true' : 'false',
-            'contact' => $alert_data['sysContact'],
-            'description' => $alert_data['sysDescr'],
-            'location' => $alert_data['location'],
-            'documentation' => $alert_data['proc'],
-            'librenms-notes' => $alert_data['notes'],
-            'librenms-device-id' => strval($alert_data['device_id']),
-            'librenms-rule-id' => strval($alert_data['rule_id']),
-            'librenms-status-reason' => $alert_data['status_reason'],
+            'acknowledged' => $alert_data->state === AlertState::ACKNOWLEDGED ? 'true' : 'false',
+            'contact' => $alert_data->sysContact,
+            'description' => $alert_data->sysDescr,
+            'location' => $alert_data->location,
+            'documentation' => $alert_data->proc,
+            'librenms-notes' => $alert_data->notes,
+            'librenms-device-id' => strval($alert_data->device_id),
+            'librenms-rule-id' => strval($alert_data->rule_id),
+            'librenms-status-reason' => $alert_data->status_reason,
         ], function (?string $s): bool {
             return (bool) strlen($s); // strlen returns 0 for null, false or '', but 1 for integer 0 - unlike empty()
         });
@@ -144,11 +146,11 @@ class Sensu extends Transport
         return self::$status[$severity] ?? self::UNKNOWN;
     }
 
-    private function getEntityName(array $obj): string
+    private function getEntityName(AlertData $obj): string
     {
         $key = $this->config['sensu-source-key'] ?: 'display';
 
-        return $key === 'shortname' ? $this->shortenName($obj['display']) : $obj[$key];
+        return $key === 'shortname' ? $this->shortenName((string) $obj->display) : (string) ($obj->{$key} ?? '');
     }
 
     private function shortenName(string $name): string

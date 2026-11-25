@@ -18,24 +18,26 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Elasticsearch extends Transport
+class Elasticsearch extends Transport implements AlertTransport
 {
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $es_host = $this->config['es-host'];
         $es_port = $this->config['es-port'] ?: 9200;
         $index = date($this->config['es-pattern'] ?: "\l\i\b\\r\\e\\n\m\s\-Y.m.d");
         $type = 'alert';
-        $severity = $alert_data['severity'];
+        $severity = $alert_data->severity;
 
         $host = $es_host . ':' . $es_port . '/' . $index . '/' . $type;
 
-        $state = match ($alert_data['state']) {
+        $state = match ($alert_data->state) {
             AlertState::RECOVERED => 'ok',
             AlertState::ACTIVE => $severity,
             AlertState::ACKNOWLEDGED => 'acknowledged',
@@ -47,24 +49,24 @@ class Elasticsearch extends Transport
         $data = [
             '@timestamp' => date('c'),
             'host' => gethostname(),
-            'location' => $alert_data['location'],
-            'title' => $alert_data['name'],
-            'message' => $alert_data['string'],
-            'device_id' => $alert_data['device_id'],
-            'device_name' => $alert_data['hostname'],
-            'device_hardware' => $alert_data['hardware'],
-            'device_version' => $alert_data['version'],
+            'location' => $alert_data->location,
+            'title' => $alert_data->name,
+            'message' => $alert_data->string,
+            'device_id' => $alert_data->device_id,
+            'device_name' => $alert_data->hostname,
+            'device_hardware' => $alert_data->hardware,
+            'device_version' => $alert_data->version,
             'state' => $state,
             'severity' => $severity,
-            'first_occurrence' => $alert_data['timestamp'],
+            'first_occurrence' => $alert_data->timestamp,
             'entity_type' => 'device',
             'entity_tab' => 'overview',
-            'entity_id' => $alert_data['device_id'],
-            'entity_name' => $alert_data['hostname'],
-            'entity_descr' => $alert_data['sysDescr'],
+            'entity_id' => $alert_data->device_id,
+            'entity_name' => $alert_data->hostname,
+            'entity_descr' => $alert_data->sysDescr,
         ];
 
-        foreach ($alert_data['faults'] as $v) {
+        foreach ($alert_data->faults as $v) {
             $data['message'] = $v['string'];
             switch (true) {
                 case array_key_exists('port_id', $v):
@@ -106,7 +108,7 @@ class Elasticsearch extends Transport
                     $data['entity_type'] = 'bgp';
                     $data['entity_tab'] = 'routing';
                     $data['entity_id'] = $v['bgpPeer_id'];
-                    $data['entity_name'] = 'local: ' . $v['bgpPeerLocalAddr'] . ' - AS' . $alert_data['bgpLocalAs'];
+                    $data['entity_name'] = 'local: ' . $v['bgpPeerLocalAddr'] . ' - AS' . ($v['bgpLocalAs'] ?? '');
                     $data['entity_descr'] = 'remote: ' . $v['bgpPeerIdentifier'] . ' - AS' . $v['bgpPeerRemoteAs'];
                     break;
                 case array_key_exists('tunnel_id', $v):

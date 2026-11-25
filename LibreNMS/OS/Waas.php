@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * Waas.php
  *
  * -Description-
@@ -16,18 +16,19 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
- * @copyright  2021 Tony Murray
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2026 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS;
+namespace LibreNMS\OS;
 
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
 class Waas extends OS implements OSPolling

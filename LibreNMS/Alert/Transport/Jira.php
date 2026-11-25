@@ -17,20 +17,22 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Jira extends Transport
+class Jira extends Transport implements AlertTransport
 {
     protected string $name = 'Jira';
 
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $webhook_on = $this->config['enable-webhook'] ?? false;
 
         // Check if messsage is an alert or not
-        if ($alert_data['state'] != 0) {
+        if ($alert_data->state != 0) {
             $url = $this->config['jira-url'];
             // If webhooks are not enabled, append the API info
             if (! $webhook_on) {
@@ -47,8 +49,8 @@ class Jira extends Transport
 
         $project_key = $this->config['jira-key'];
         $issue_type = $this->config['jira-type'];
-        $title = empty($alert_data['title']) ? 'Librenms alert for: ' . $alert_data['hostname'] : $alert_data['title'];
-        $description = $alert_data['msg'];
+        $title = empty($alert_data->title) ? 'Librenms alert for: ' . $alert_data->hostname : $alert_data->title;
+        $description = $alert_data->msg;
 
         // Construct the payload
         $data = [
@@ -67,9 +69,9 @@ class Jira extends Transport
         // Add Custom Webhook ID to the payload
         if ($webhook_on) {
             if (! empty($this->config['webhook-id'])) {
-                $data['fields'][$this->config['webhook-id']] = $alert_data['id'];
+                $data['fields'][$this->config['webhook-id']] = $alert_data->id;
             } else {
-                $data['fields']['alert_id'] = $alert_data['id'];
+                $data['fields']['alert_id'] = $alert_data->id;
             }
         }
 

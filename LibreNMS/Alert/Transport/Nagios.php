@@ -24,12 +24,14 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 
-class Nagios extends Transport
+class Nagios extends Transport implements AlertTransport
 {
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         /*
          host_perfdata_file_template=
@@ -46,13 +48,13 @@ class Nagios extends Transport
 
         $format = '';
         $format .= "[HOSTPERFDATA]\t";
-        $format .= strtotime((string) $alert_data['timestamp']) . "\t";
-        $format .= $alert_data['hostname'] . "\t";
-        $format .= md5((string) $alert_data['rule']) . "\t"; //FIXME: Better entity
-        $format .= ($alert_data['state'] ? $alert_data['severity'] : 'ok') . "\t";
+        $format .= strtotime((string) $alert_data->timestamp) . "\t";
+        $format .= $alert_data->hostname . "\t";
+        $format .= md5((string) $alert_data->rule) . "\t"; //FIXME: Better entity
+        $format .= ($alert_data->state ? $alert_data->severity : 'ok') . "\t";
         $format .= "0\t";
         $format .= "0\t";
-        $format .= str_replace("\n", '', nl2br((string) $alert_data['msg'])) . "\t";
+        $format .= str_replace("\n", '', nl2br((string) $alert_data->msg)) . "\t";
         $format .= 'NULL'; //FIXME: What's the HOSTPERFDATA equivalent for LibreNMS? Oo
         $format .= "\n";
 

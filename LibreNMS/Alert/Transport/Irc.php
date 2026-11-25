@@ -25,14 +25,16 @@
 namespace LibreNMS\Alert\Transport;
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 
-class Irc extends Transport
+class Irc extends Transport implements AlertTransport
 {
     protected string $name = 'IRC';
 
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $container_dir = '/data';
         if (file_exists($container_dir) and posix_getpwuid(fileowner($container_dir))['name'] == 'librenms') {
@@ -42,17 +44,18 @@ class Irc extends Transport
         }
         if (file_exists($f) && filetype($f) == 'fifo') {
             $f = fopen($f, 'w+');
-            $r = fwrite($f, json_encode($alert_data) . "\n");
+            $payload = $alert_data->toTransportPayload();
+            $r = fwrite($f, json_encode($payload) . "\n");
             fclose($f);
 
             if ($r === false) {
-                throw new AlertTransportDeliveryException($alert_data, 0, 'Could not write to fifo', $alert_data['msg'], $alert_data);
+                throw new AlertTransportDeliveryException($alert_data, 0, 'Could not write to fifo', $alert_data->msg, $alert_data);
             }
 
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, 0, 'fifo does not exist', $alert_data['msg'], $alert_data);
+        throw new AlertTransportDeliveryException($alert_data, 0, 'fifo does not exist', $alert_data->msg, $alert_data);
     }
 
     public static function configTemplate(): array

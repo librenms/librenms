@@ -24,19 +24,21 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Clickatell extends Transport
+class Clickatell extends Transport implements AlertTransport
 {
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $url = 'https://platform.clickatell.com/messages/http/send';
         $params = [
             'apiKey' => $this->config['clickatell-token'],
             'to' => implode(',', preg_split('/([,\r\n]+)/', (string) $this->config['clickatell-numbers'])),
-            'content' => $alert_data['title'],
+            'content' => $alert_data->title,
         ];
 
         $res = Http::client()->get($url, $params);
@@ -45,7 +47,7 @@ class Clickatell extends Transport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['title'], $params);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->title, $params);
     }
 
     public static function configTemplate(): array

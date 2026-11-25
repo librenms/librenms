@@ -33,17 +33,19 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Messagebirdvoice extends Transport
+class Messagebirdvoice extends Transport implements AlertTransport
 {
     protected string $name = 'Messagebird Voice';
 
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
-        $messagebird_msg = mb_strimwidth((string) $alert_data['msg'], 0, 1000, '...');
+        $messagebird_msg = mb_strimwidth((string) $alert_data->msg, 0, 1000, '...');
         $api_url = 'https://rest.messagebird.com/voicemessages';
         $fields = [
             'recipients' => $this->config['messagebird-recipient'],

@@ -25,16 +25,18 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Hipchat extends Transport
+class Hipchat extends Transport implements AlertTransport
 {
     protected string $name = 'HipChat';
 
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $options = $this->parseUserOptions($this->config['hipchat-options'] ?? '');
 
@@ -56,9 +58,9 @@ class Hipchat extends Transport
 
         // Sane default of making the message color green if the message indicates
         // that the alert recovered.   If it rebooted, make it yellow.
-        if ($alert_data['state'] == AlertState::RECOVERED) {
+        if ($alert_data->state == AlertState::RECOVERED) {
             $color = 'green';
-        } elseif (str_contains((string) $alert_data['msg'], 'rebooted')) {
+        } elseif (str_contains((string) $alert_data->msg, 'rebooted')) {
             $color = 'yellow';
         } elseif (empty($options['color']) || $options['color'] == 'u') {
             $color = 'red';
@@ -67,7 +69,7 @@ class Hipchat extends Transport
         }
 
         $data = [
-            'message' => $alert_data['msg'],
+            'message' => $alert_data->msg,
             'from' => $this->config['hipchat-from-name'] ?: 'LibreNMS',
             'color' => $color,
             'notify' => $options['notify'] ?? '1',

@@ -23,14 +23,16 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 
-class Weechatbot extends Transport
+class Weechatbot extends Transport implements AlertTransport
 {
     protected string $name = 'Weechat Bot';
 
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $pre = "{$this->config['bot-password']} ";
         if (isset($this->config['irc-server']) && strlen($this->config['irc-server']) !== 0) {
@@ -45,8 +47,8 @@ class Weechatbot extends Transport
             throw new AlertTransportDeliveryException($alert_data, $e->getCode(), $e->getMessage());
         }
 
-        $fp->write($pre . $alert_data['title']);
-        foreach (preg_split('/((\r?\n)|(\r\n?))/', (string) $alert_data['msg']) as $line) {
+        $fp->write($pre . $alert_data->title);
+        foreach (preg_split('/((\r?\n)|(\r\n?))/', (string) $alert_data->msg) as $line) {
             $fp->write($pre . $line);
         }
         $fp->close();

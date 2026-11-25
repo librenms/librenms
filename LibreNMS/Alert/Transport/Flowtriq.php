@@ -24,19 +24,20 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Flowtriq extends Transport
+class Flowtriq extends Transport implements AlertTransport
 {
-    /** @param  array<string, mixed>  $alert_data */
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $url = $this->config['flowtriq-url'];
 
-        $alert_status = match ($alert_data['state']) {
+        $alert_status = match ($alert_data->state) {
             AlertState::RECOVERED => 'recovered',
             AlertState::ACKNOWLEDGED => 'acknowledged',
             AlertState::WORSE => 'worse',
@@ -47,21 +48,21 @@ class Flowtriq extends Transport
         $data = [
             'source' => 'librenms',
             'status' => $alert_status,
-            'alert_id' => $alert_data['alert_id'] ?? null,
-            'severity' => $alert_data['severity'] ?? null,
-            'title' => $alert_data['title'] ?? null,
-            'message' => strip_tags($alert_data['msg'] ?? ''),
-            'rule' => $alert_data['rule'] ?? null,
-            'timestamp' => $alert_data['timestamp'] ?? null,
+            'alert_id' => $alert_data->alert_id ?? null,
+            'severity' => $alert_data->severity ?? null,
+            'title' => $alert_data->title ?? null,
+            'message' => strip_tags($alert_data->msg ?? ''),
+            'rule' => $alert_data->rule ?? null,
+            'timestamp' => $alert_data->timestamp ?? null,
             'device' => [
-                'device_id' => $alert_data['device_id'] ?? null,
-                'hostname' => $alert_data['hostname'] ?? null,
-                'sysName' => $alert_data['sysName'] ?? null,
-                'os' => $alert_data['os'] ?? null,
-                'type' => $alert_data['type'] ?? null,
-                'ip' => $alert_data['ip'] ?? null,
-                'hardware' => $alert_data['hardware'] ?? null,
-                'location' => $alert_data['location'] ?? null,
+                'device_id' => $alert_data->device_id ?? null,
+                'hostname' => $alert_data->hostname ?? null,
+                'sysName' => $alert_data->sysName ?? null,
+                'os' => $alert_data->os ?? null,
+                'type' => $alert_data->type ?? null,
+                'ip' => $alert_data->ip ?? null,
+                'hardware' => $alert_data->hardware ?? null,
+                'location' => $alert_data->location ?? null,
             ],
         ];
 
@@ -80,7 +81,7 @@ class Flowtriq extends Transport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'] ?? '', $data);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->msg ?? '', $data);
     }
 
     /** @return array<string, array<int|string, mixed>> */

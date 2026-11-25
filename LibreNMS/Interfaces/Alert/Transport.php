@@ -36,7 +36,7 @@ interface Transport
     /**
      * Gets called when an alert is sent
      *
-     * @param  array  $alert_data  An array created by DescribeAlert
+     * @param  array<string, mixed>  $alert_data  The legacy alert payload
      * @return bool Returns true if the call was successful.
      *
      * @throws \LibreNMS\Exceptions\AlertTransportDeliveryException
@@ -44,7 +44,7 @@ interface Transport
     public function deliverAlert(array $alert_data): bool;
 
     /**
-     * @return array
+     * @return array<string, mixed>
      */
     public static function configTemplate(): array;
 

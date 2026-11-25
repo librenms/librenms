@@ -24,20 +24,22 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Smsfeedback extends Transport
+class Smsfeedback extends Transport implements AlertTransport
 {
     protected string $name = 'SMSfeedback';
 
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $url = 'http://api.smsfeedback.ru/messages/v2/send/';
         $params = [
             'phone' => $this->config['smsfeedback-mobiles'],
-            'text' => $alert_data['title'],
+            'text' => $alert_data->title,
             'sender' => $this->config['smsfeedback-sender'],
         ];
 
@@ -49,7 +51,7 @@ class Smsfeedback extends Transport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['title'], $params);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->title, $params);
     }
 
     public static function configTemplate(): array

@@ -18,18 +18,20 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 
-class Syslog extends Transport
+class Syslog extends Transport implements AlertTransport
 {
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         return $this->contactSyslog($alert_data);
     }
 
-    public function contactSyslog(array $alert_data): bool
+    public function contactSyslog(AlertData $alert_data): bool
     {
         $syslog_host = '127.0.0.1';
         $syslog_port = 514;
@@ -55,7 +57,7 @@ class Syslog extends Transport
             $syslog_port = $this->config['syslog-port'];
         }
 
-        switch ($alert_data['severity']) {
+        switch ($alert_data->severity) {
             case 'critical':
                 $severity = 2;
                 $sev_txt = 'Critical';
@@ -66,7 +68,7 @@ class Syslog extends Transport
                 break;
         }
 
-        switch ($alert_data['state']) {
+        switch ($alert_data->state) {
             case AlertState::RECOVERED:
                 $state = 'OK';
                 $severity = 6;
@@ -89,20 +91,20 @@ class Syslog extends Transport
             . gethostname()
             . ' librenms'
             . '['
-            . $alert_data['device_id']
+            . $alert_data->device_id
             . ']: '
-            . $alert_data['hostname']
+            . $alert_data->hostname
             . ': ['
             . $state
             . '] '
-            . $alert_data['name'];
+            . $alert_data->name;
 
         if (($socket = socket_create(AF_INET, SOCK_DGRAM, SOL_UDP)) === false) {
             throw new AlertTransportDeliveryException($alert_data, 0, 'socket_create() failed: reason: ' . socket_strerror(socket_last_error()));
         }
 
-        if (! empty($alert_data['faults'])) {
-            foreach ($alert_data['faults'] as $fault) {
+        if (! empty($alert_data->faults)) {
+            foreach ($alert_data->faults as $fault) {
                 $syslog_msg = $syslog_prefix . ' - ' . $fault['string'];
                 socket_sendto($socket, $syslog_msg, strlen($syslog_msg), 0, $syslog_host, $syslog_port);
             }

@@ -209,7 +209,7 @@ class AlertTemplateController extends Controller
             'proc' => '',
             'invert_map' => 0,
             'notes' => '',
-            'alert' => new AlertData(AlertData::testData($device)),
+            'alert' => AlertData::testData($device),
         ];
 
         foreach (['template', 'title', 'title_rec'] as $field) {

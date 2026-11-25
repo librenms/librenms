@@ -24,30 +24,29 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Signalgrid extends Transport
+class Signalgrid extends Transport implements AlertTransport
 {
-    /**
-     * @param  array<string, mixed>  $alert_data
-     */
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $type = match (true) {
-            $alert_data['state'] == AlertState::RECOVERED => 'SUCCESS',
-            $alert_data['severity'] === 'critical' => 'CRIT',
-            $alert_data['severity'] === 'warning' => 'WARN',
+            $alert_data->state == AlertState::RECOVERED => 'SUCCESS',
+            $alert_data->severity === 'critical' => 'CRIT',
+            $alert_data->severity === 'warning' => 'WARN',
             default => 'INFO',
         };
 
         $data = [
             'client_key' => $this->config['signalgrid-client-key'],
             'channel' => $this->config['signalgrid-channel'],
-            'title' => $alert_data['title'],
-            'body' => $alert_data['msg'],
+            'title' => $alert_data->title,
+            'body' => $alert_data->msg,
             'type' => $type,
         ];
 
@@ -65,7 +64,7 @@ class Signalgrid extends Transport
             $alert_data,
             $res->status(),
             $response['text'] ?? $res->body(),
-            $alert_data['msg'],
+            $alert_data->msg,
             $data
         );
     }

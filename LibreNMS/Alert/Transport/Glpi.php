@@ -24,15 +24,17 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Glpi extends Transport
+class Glpi extends Transport implements AlertTransport
 {
     protected string $name = 'GLPI';
 
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         // Connect to the API with app/user tokens
         $headers = [
@@ -51,7 +53,7 @@ class Glpi extends Transport
 
         if (! $res->successful()) {
             throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(),
-                $alert_data['msg'], $data);
+                $alert_data->msg, $data);
         }
 
         $headers['Session-Token'] = $res->json()['session_token'];
@@ -77,7 +79,7 @@ class Glpi extends Transport
             'forcedisplay[1]=12&' .
             'criteria[0][field]=1&' .
             'criteria[0][searchtype]=contains&' .
-            'criteria[0][value]=^[LibreNMS: ' . $alert_data['sysName'] . '] ' . $alert_data['name'] . '$&' .
+            'criteria[0][value]=^[LibreNMS: ' . $alert_data->sysName . '] ' . $alert_data->name . '$&' .
             'criteria[1][link]=AND&' .
             'criteria[1][field]=12&' .
             'criteria[1][searchtype]=equals&' .
@@ -97,7 +99,7 @@ class Glpi extends Transport
                 'forcedisplay[1]=80&' .
                 'criteria[0][field]=1&' .
                 'criteria[0][searchtype]=contains&' .
-                'criteria[0][value]=^' . $alert_data['sysName'] . '$';
+                'criteria[0][value]=^' . $alert_data->sysName . '$';
 
             $res = Http::client()
                 ->withHeaders($headers)
@@ -123,8 +125,8 @@ class Glpi extends Transport
             // Create the ticket
             $data = [
                 'input' => [
-                    'name' => '[LibreNMS: ' . $alert_data['sysName'] . '] ' . $alert_data['name'],
-                    'content' => $alert_data['msg'],
+                    'name' => '[LibreNMS: ' . $alert_data->sysName . '] ' . $alert_data->name,
+                    'content' => $alert_data->msg,
                     '_users_id_requester' => $userID,
                 ],
             ];
@@ -160,7 +162,7 @@ class Glpi extends Transport
             // Add followup to ticket
             $data = [
                 'input' => [
-                    'content' => $alert_data['msg'],
+                    'content' => $alert_data->msg,
                     'itemtype' => 'Ticket',
                     'items_id' => $ticketID,
                 ],
@@ -180,7 +182,7 @@ class Glpi extends Transport
                     ],
                 ];
 
-                if ($alert_data['state'] == 0) {
+                if ($alert_data->state == 0) {
                     $data['input']['status'] = 6;
                 }
 
@@ -195,7 +197,7 @@ class Glpi extends Transport
         }
 
         throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(),
-            $alert_data['msg'], $data);
+            $alert_data->msg, $data);
     }
 
     public static function configTemplate(): array

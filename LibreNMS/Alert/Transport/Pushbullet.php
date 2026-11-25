@@ -24,17 +24,19 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Pushbullet extends Transport
+class Pushbullet extends Transport implements AlertTransport
 {
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         // Note: At this point it might be useful to iterate through $obj['contacts'] and send each of them a note ?
         $url = 'https://api.pushbullet.com/v2/pushes';
-        $data = ['type' => 'note', 'title' => $alert_data['title'], 'body' => $alert_data['msg']];
+        $data = ['type' => 'note', 'title' => $alert_data->title, 'body' => $alert_data->msg];
 
         $res = Http::client()
             ->withToken($this->config['pushbullet-token'])
@@ -44,7 +46,7 @@ class Pushbullet extends Transport
             return true;
         }
 
-        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $data);
+        throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data->msg, $data);
     }
 
     public static function configTemplate(): array

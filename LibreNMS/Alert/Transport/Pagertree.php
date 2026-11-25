@@ -30,17 +30,19 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Pagertree extends Transport
+class Pagertree extends Transport implements AlertTransport
 {
     protected string $name = 'PagerTree';
 
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
-        $event_type = match ($alert_data['state']) {
+        $event_type = match ($alert_data->state) {
             0 => 'resolve',
             2 => 'acknowledge',
             default => 'create',
@@ -48,16 +50,16 @@ class Pagertree extends Transport
 
         $event = [
             'event_type' => $event_type,
-            'Id' => $alert_data['alert_id'],
-            'Title' => $alert_data['title'],
-            'Description' => strip_tags((string) $alert_data['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>'),
+            'Id' => $alert_data->alert_id,
+            'Title' => $alert_data->title,
+            'Description' => strip_tags((string) $alert_data->msg, '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>'),
         ];
 
         $event_json = json_encode($event);
 
         $client = Http::client();
 
-        $msg = $alert_data['uid'] === '000'
+        $msg = $alert_data->uid === 0
             ? $this->testMessage() // use static JSON for tests
             : $event_json;
 

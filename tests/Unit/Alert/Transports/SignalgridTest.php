@@ -48,7 +48,7 @@ final class SignalgridTest extends TestCase
         /** @var Device $mock_device */
         $mock_device = Device::factory()->make();
 
-        $transport->deliverAlert(AlertData::testData($mock_device));
+        $transport->deliver(AlertData::testData($mock_device));
 
         Http::assertSent(fn (Request $request) => $request->url() === 'https://api.signalgrid.co/v1/push'
             && $request->method() === 'POST'
@@ -74,10 +74,9 @@ final class SignalgridTest extends TestCase
         /** @var Device $mock_device */
         $mock_device = Device::factory()->make();
 
-        $alert_data = AlertData::testData($mock_device);
-        $alert_data['severity'] = 'warning';
+        $alert_data = AlertData::testData($mock_device, ['severity' => 'warning']);
 
-        $transport->deliverAlert($alert_data);
+        $transport->deliver($alert_data);
 
         Http::assertSent(fn (Request $request) => $request->data() === [
             'client_key' => 'test-client-key',
@@ -101,10 +100,9 @@ final class SignalgridTest extends TestCase
         /** @var Device $mock_device */
         $mock_device = Device::factory()->make();
 
-        $alert_data = AlertData::testData($mock_device);
-        $alert_data['state'] = AlertState::RECOVERED;
+        $alert_data = AlertData::testData($mock_device, ['state' => AlertState::RECOVERED]);
 
-        $transport->deliverAlert($alert_data);
+        $transport->deliver($alert_data);
 
         Http::assertSent(fn (Request $request) => $request->data() === [
             'client_key' => 'test-client-key',
@@ -131,7 +129,7 @@ final class SignalgridTest extends TestCase
         /** @var Device $mock_device */
         $mock_device = Device::factory()->make();
 
-        $transport->deliverAlert(AlertData::testData($mock_device));
+        $transport->deliver(AlertData::testData($mock_device));
     }
 
     private function transport(): Transport\Signalgrid

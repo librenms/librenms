@@ -24,25 +24,27 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Rocket extends Transport
+class Rocket extends Transport implements AlertTransport
 {
     protected string $name = 'Rocket Chat';
 
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $rocket_opts = $this->parseUserOptions($this->config['rocket-options'] ?? '');
 
-        $rocket_msg = strip_tags((string) $alert_data['msg']);
+        $rocket_msg = strip_tags((string) $alert_data->msg);
         $data = [
             'attachments' => [
                 0 => [
                     'fallback' => $rocket_msg,
-                    'color' => self::getColorForState($alert_data['state']),
-                    'title' => $alert_data['title'],
+                    'color' => self::getColorForState($alert_data->state),
+                    'title' => $alert_data->title,
                     'text' => $rocket_msg,
                 ],
             ],

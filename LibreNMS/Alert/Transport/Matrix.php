@@ -25,13 +25,15 @@
 namespace LibreNMS\Alert\Transport;
 
 use App\View\SimpleTemplate;
+use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Matrix extends Transport
+class Matrix extends Transport implements AlertTransport
 {
-    public function deliverAlert(array $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $server = $this->config['matrix-server'];
         $room = $this->config['matrix-room'];
@@ -43,7 +45,8 @@ class Matrix extends Transport
         $server = preg_replace('/\/$/', '', (string) $server);
         $host = $server . '/_matrix/client/r0/rooms/' . urlencode((string) $room) . '/send/m.room.message/' . $txnid;
 
-        $message = SimpleTemplate::parse($message, $alert_data);
+        // User-written templates use the legacy flat variable names, e.g. {{ $msg }}
+        $message = SimpleTemplate::parse($message, $alert_data->toTransportPayload());
 
         $body = ['body' => strip_tags($message), 'formatted_body' => "$message", 'msgtype' => 'm.notice', 'format' => 'org.matrix.custom.html'];
 
