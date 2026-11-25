@@ -449,7 +449,7 @@
   "Add Polling Type": "Abfragemethode hinzufügen",
   "Add VRF by SNMP context": "VRF per SNMP-Kontext hinzufügen",
   "Add a polling type from the list on the left to start polling this device.": "Wähle links eine Abfragemethode aus, um dieses Gerät abzufragen.",
-  "Alert Threshold": "Alarmschwelle",
+  "Alert Threshold": "Grenzwert",
   "Alerts Enabled": "Alarme aktiv",
   "Alerts ignored": "Alarme ignoriert",
   "An error occurred while removing.": "Beim Entfernen ist ein Fehler aufgetreten.",
@@ -602,6 +602,6 @@
   "WARNING": "WARNUNG",
   "Warning Threshold": "Warnschwelle",
   "None": "Keine",
-  "High Alert": "Obere Alarmschwelle",
-  "Low Alert": "Untere Alarmschwelle"
+  "High Alert": "Oberer Grenzwert",
+  "Low Alert": "Unterer Grenzwert"
 }
