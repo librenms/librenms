@@ -34,10 +34,41 @@ jobs:
           ' <<< "$events" >> "$GITHUB_OUTPUT"
 
       - name: Add labels
+        id: labeler
         if: steps.history.outputs.eligible == 'true'
         uses: actions/labeler@v7
         with:
           sync-labels: false
+
+      - name: Label linked bug fixes
+        if: >-
+          steps.history.outputs.eligible == 'true'
+          && (steps.labeler.outputs.all-labels == '' || steps.labeler.outputs.all-labels == env.NEEDS_DEVICE_DATA)
+        run: |
+          pr=$(gh api graphql \
+            -f owner="${GITHUB_REPOSITORY%/*}" -f repo="${GITHUB_REPOSITORY#*/}" -F number="${ISSUE_API##*/}" \
+            -f query='query($owner: String!, $repo: String!, $number: Int!) {
+              repository(owner: $owner, name: $repo) {
+                pullRequest(number: $number) {
+                  body
+                  closingIssuesReferences(first: 10, excludeUserLinked: true) {
+                    nodes { number repository { nameWithOwner } }
+                  }
+                }
+              }
+            }')
+
+          fixes_issue=$(jq -r --arg repo "$GITHUB_REPOSITORY" '
+            .data.repository.pullRequest
+            | [.body | scan("(?i)\\bfix(?:es|ed)?[\\t :]+(?:([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+))?#([0-9]+)\\b")] as $fixes
+            | any(.closingIssuesReferences.nodes[];
+                .number as $number | .repository.nameWithOwner as $issue_repo
+                | any($fixes[]; (.[1] | tonumber) == $number
+                    and ((.[0] // $repo) | ascii_downcase) == ($issue_repo | ascii_downcase)))
+          ' <<< "$pr")
+          if [[ "$fixes_issue" == true ]]; then
+            gh api "$ISSUE_API/labels" --method POST --input - --silent <<< '{"labels":["Bug :spider:"]}'
+          fi
 
       - name: Remind author about device data
         env:

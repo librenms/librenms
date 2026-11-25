@@ -1,5 +1,6 @@
 # Area rules are ordered by precedence. Each rule excludes files from higher-priority areas.
 # Allow one topic and the independent device data request.
+# The labeler workflow handles Bug labels based on closing issue links.
 changed-files-labels-limit: 2
 
 'Device :desktop_computer:':
@@ -62,7 +63,13 @@ changed-files-labels-limit: 2
               - *not-alerting
               - *not-applications
               - *not-api
-              - '!{LibreNMS/Data/Graphing/**,includes/html/graphs/**,html/graph.php,resources/views/graphs/**,app/Http/Controllers/{Graph,GraphData,GraphsPage,RealtimeGraph,Device/Tabs/Graphs}Controller.php}'
+              - &not-graphs '!{LibreNMS/Data/Graphing/**,includes/html/graphs/**,html/graph.php,resources/views/graphs/**,app/Http/Controllers/{Graph,GraphData,GraphsPage,RealtimeGraph,Device/Tabs/Graphs}Controller.php}'
+    any:
+      - changed-files:
+          - all-globs-to-all-files: '!lang/**'
+          - any-glob-to-any-file:
+              - '!{lang/**,resources/views/**/*.blade.php}'
+              - 'lang/{en/**,en.json}'
 
 # Match these labels only on PRs dedicated to that kind of change.
 'Documentation :book:':
@@ -75,7 +82,16 @@ changed-files-labels-limit: 2
   - all:
       - changed-files:
           - any-glob-to-any-file: &translation 'lang/**'
+          - any-glob-to-all-files: '{lang/**,resources/views/**/*.blade.php}'
+          - all-globs-to-all-files:
+              - *not-alerting
+              - *not-applications
+              - *not-graphs
+    # Locale-only PRs may edit English. With Blade changes, require localized strings.
+    any:
+      - changed-files:
           - any-glob-to-all-files: *translation
+          - all-globs-to-all-files: '!lang/{en/**,en.json}'
 
 'Tests :test_tube:':
   - all:
