@@ -142,11 +142,12 @@ class DashboardController extends Controller implements HasMiddleware
 
         $widgets = self::listWidgets();
 
-        $user_list = $user->can('viewAny', User::class)
-            ? User::where('user_id', '!=', $user->user_id)
-                ->orderBy('username')
-                ->pluck('username', 'user_id')
-            : [];
+        $copy_targets = [];
+        if ($user->can('copy', Dashboard::class) && $user->can('viewAny', User::class)) {
+            $copy_targets = User::orderBy('username')->pluck('username', 'user_id');
+        } elseif ($user->can('copy', [$dashboard, $user->user_id])) {
+            $copy_targets = [$user->user_id => $user->username];
+        }
 
         return view('overview.default', [
             'bare' => $request->input('bare'),
@@ -156,7 +157,7 @@ class DashboardController extends Controller implements HasMiddleware
             'user_dashboards' => $user_dashboards,
             'shared_dashboards' => $shared_dashboards,
             'widgets' => $widgets,
-            'user_list' => $user_list,
+            'copy_targets' => $copy_targets,
         ]);
     }
 
@@ -215,15 +216,14 @@ class DashboardController extends Controller implements HasMiddleware
 
     public function copy(Request $request, Dashboard $dashboard): JsonResponse
     {
-        $this->authorize('copy', $dashboard);
+        $target_user_id = filter_var($request->input('target_user_id'), FILTER_VALIDATE_INT) ?: 0;
+
+        // Authorize before checking whether the target user exists.
+        $this->authorize('copy', [$dashboard, $target_user_id]);
 
         $this->validate($request, [
-            'target_user_id' => 'required|exists:App\Models\User,user_id',
+            'target_user_id' => 'bail|required|integer|exists:App\Models\User,user_id',
         ]);
-
-        $target_user_id = $request->input('target_user_id');
-
-        $this->authorize('copy', [$dashboard, $target_user_id]);
 
         $dashboard_copy = $dashboard->replicate()->fill([
             'user_id' => $target_user_id,
