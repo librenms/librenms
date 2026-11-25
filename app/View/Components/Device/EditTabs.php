@@ -31,6 +31,7 @@ use App\Models\Device;
 use Illuminate\Support\Facades\Request;
 use Illuminate\View\Component;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Util\VrfContextCleanup;
 
 class EditTabs extends Component
 {
@@ -61,7 +62,7 @@ class EditTabs extends Component
             ];
         }
 
-        if ($device->bgppeers()->exists() || $device->vrfs()->exists()) {
+        if ($device->bgppeers()->exists() || $device->vrfs()->exists() || VrfContextCleanup::hasContextData($device)) {
             $this->tabs['routing'] = [
                 'text' => __('Routing'),
                 'link' => route('device.edit.routing', $this->device->device_id),

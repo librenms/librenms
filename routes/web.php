@@ -305,6 +305,7 @@ Route::middleware(['auth'])->group(function (): void {
     Route::post('/device/{device}/edit/processors/{processor}', [Device\EditProcessorsController::class, 'update'])->name('device.edit.processors.update')->scopeBindings();
     Route::get('/device/{device}/edit/routing', [Device\EditRoutingController::class, 'index'])->name('device.edit.routing');
     Route::post('/device/{device}/edit/routing/vrf', [Device\EditRoutingController::class, 'storeVrf'])->name('device.edit.routing.vrf.store');
+    Route::post('/device/{device}/edit/routing/context/cleanup', [Device\EditRoutingController::class, 'cleanupContext'])->name('device.edit.routing.context.cleanup');
     Route::patch('/device/{device}/edit/routing/vrf/{vrf}', [Device\EditRoutingController::class, 'updateVrf'])->name('device.edit.routing.vrf.update')->scopeBindings()->whereNumber('vrf');
     Route::delete('/device/{device}/edit/routing/vrf/{vrf}', [Device\EditRoutingController::class, 'destroyVrf'])->name('device.edit.routing.vrf.destroy')->scopeBindings()->whereNumber('vrf');
     Route::post('/device/{device}/edit/routing/peer/{bgpPeer}', [Device\EditRoutingController::class, 'updatePeer'])->name('device.edit.routing.peer.update')->scopeBindings();

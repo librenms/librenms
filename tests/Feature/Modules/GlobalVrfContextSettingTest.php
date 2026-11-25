@@ -116,6 +116,20 @@ final class GlobalVrfContextSettingTest extends InMemoryDbTestCase
         $this->assertTrue($vrf->fresh()->context_enabled);
     }
 
+    public function testSyncKeepsDisabledContextsAndRemovesMissingContexts(): void
+    {
+        $device = Device::factory()->create();
+        VrfModel::factory()->for($device)->create([
+            'context_name' => 'disabled', 'context_enabled' => false, 'context_verified' => true,
+        ]);
+        BgpPeer::factory()->for($device)->create(['context_name' => 'disabled']);
+        BgpPeer::factory()->for($device)->create(['context_name' => 'missing']);
+        $sync = new GlobalContextTestSync;
+
+        $sync->sync($device);
+        $this->assertSame(['disabled'], $device->bgppeers()->pluck('context_name')->all());
+    }
+
     public function testManuallyAddedContextUsesGlobalDefault(): void
     {
         $device = Device::factory()->create();

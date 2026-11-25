@@ -194,7 +194,10 @@ run `lnms config:set snmp.vrf_contexts false`. Existing VRF settings are not
 changed; use Device -> Edit -> Routing to enable or disable individual contexts.
 Changing the global setting later does not change contexts already discovered.
 The default SNMP context, VLAN contexts and an explicitly configured device
-SNMP context are not affected. Data for disabled VRF contexts is retained.
+SNMP context are not affected. Data from disabled, removed, or non-answering
+VRF contexts can be removed under Device -> Edit -> Routing. Historical routes
+are retained according to the normal route retention policy. Some modules also
+remove data for removed contexts during their normal synchronization.
 
 `cisco-cef`: CEF detection and support.
 
