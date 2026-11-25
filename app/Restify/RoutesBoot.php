@@ -4,6 +4,7 @@ namespace App\Restify;
 
 use Binaryk\LaravelRestify\Bootstrap\RoutesBoot as BaseRoutesBoot;
 use Binaryk\LaravelRestify\Bootstrap\RoutesDefinition;
+use Binaryk\LaravelRestify\Restify;
 use Illuminate\Support\Facades\Route;
 
 /**
@@ -28,6 +29,35 @@ class RoutesBoot extends BaseRoutesBoot
             // Intentionally omit app(RoutesDefinition::class)->once() so profile, search and restifyjs/setup are not registered.
             app(RoutesDefinition::class)();
         });
+
+        return $this;
+    }
+
+    /**
+     * Register the routes of repositories that declare a prefix() under that prefix.
+     *
+     * @param  array<string, mixed>  $config
+     */
+    public function registerPrefixed($config): self
+    {
+        foreach (Restify::$repositories as $repository) {
+            if (! $repository::prefix()) {
+                continue;
+            }
+
+            $config['prefix'] = $repository::prefix();
+            Route::group($config, function () use ($repository): void {
+                app(RoutesDefinition::class)($repository::uriKey());
+            });
+
+            // Set the default on every route under this repository's path.
+            $path = trim((string) $config['prefix'], '/') . '/' . $repository::uriKey();
+            foreach (Route::getRoutes()->getRoutes() as $route) {
+                if (str_starts_with($route->uri(), $path)) {
+                    $route->defaults('repository', $repository::uriKey());
+                }
+            }
+        }
 
         return $this;
     }

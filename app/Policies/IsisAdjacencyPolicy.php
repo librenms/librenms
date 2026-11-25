@@ -43,15 +43,7 @@ class IsisAdjacencyPolicy
         }
 
         return $this->hasGlobalPermission($user, 'view', true)
-            && Permissions::canAccessPort($isisAdjacency->port_id, $user);
-    }
-
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, IsisAdjacency $isisAdjacency): bool
-    {
-        return $this->hasGlobalPermission($user, 'update')
-            && Permissions::canAccessPort($isisAdjacency->port_id, $user);
+            && (Permissions::canAccessPort($isisAdjacency->port_id, $user)
+                || Permissions::canAccessDevice($isisAdjacency->device_id, $user));
     }
 }

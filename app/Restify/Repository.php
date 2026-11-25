@@ -70,8 +70,18 @@ abstract class Repository extends RestifyRepository
         return parent::authorizedTo($request, $ability);
     }
 
+    /**
+     * Store maps to the create ability, which, like update and delete, is denied unless the
+     * policy defines it. Without the method_exists guard, Gate::before() would grant create
+     * to every admin for a model whose policy has no create method.
+     */
     public static function authorizedToStore(Request $request): bool
     {
+        $policy = Gate::getPolicyFor(static::guessModelClassName());
+        if ($policy === null || ! method_exists($policy, 'create')) {
+            return false;
+        }
+
         return static::authorizable() && Gate::check('create', static::guessModelClassName());
     }
 
