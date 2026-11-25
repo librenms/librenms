@@ -11,7 +11,6 @@ class LegacyAuth
     protected static $_instance;
     private static $configToClassMap = [
         'mysql' => \LibreNMS\Authentication\MysqlAuthorizer::class,
-        'active_directory' => \LibreNMS\Authentication\ActiveDirectoryAuthorizer::class,
         'ldap' => \LibreNMS\Authentication\LdapAuthorizer::class,
         'radius' => \LibreNMS\Authentication\RadiusAuthorizer::class,
         'http-auth' => \LibreNMS\Authentication\HttpAuthAuthorizer::class,
