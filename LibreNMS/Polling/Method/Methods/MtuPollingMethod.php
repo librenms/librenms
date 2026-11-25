@@ -32,6 +32,20 @@ final class MtuPollingMethod extends PollingMethod
         return true;
     }
 
+    public function defaultCreationInput(): ?array
+    {
+        if (LibrenmsConfig::get('mtu_options.bytes', 0) <= 0) {
+            return null;
+        }
+
+        return ['active' => (bool) LibrenmsConfig::get('icmp_check', true)];
+    }
+
+    public function defaultCreationOrder(): int
+    {
+        return 2;
+    }
+
     /**
      * @return array{ip_version: string, packet_size: int}
      */

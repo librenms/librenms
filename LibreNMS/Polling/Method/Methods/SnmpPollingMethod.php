@@ -41,6 +41,16 @@ final class SnmpPollingMethod extends PollingMethod
         return true;
     }
 
+    public function defaultCreationInput(): ?array
+    {
+        return ['active' => true];
+    }
+
+    public function defaultCreationOrder(): int
+    {
+        return 1;
+    }
+
     /**
      * @return array{version: string, transport: string, port: int, timeout: int|float, retries: int, max_repeaters: int, max_oid: int, bulk: bool, context: ?string, port_association_mode: string}
      */
