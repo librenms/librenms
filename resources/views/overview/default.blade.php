@@ -179,6 +179,13 @@
     var gridstack_state = 0;
     var grid;
 
+    function dashboard_request_error(xhr) {
+        const message = xhr.responseJSON?.message;
+        toastr.error(document.createTextNode(
+            typeof message === 'string' && message.trim() ? message : @js(__('Request failed'))
+        ));
+    }
+
     @if ($dashboard->dashboard_id > 0)
         var dashboard_id = {{ $dashboard->dashboard_id }};
     @else
@@ -257,9 +264,7 @@
                         toastr.error(data.message);
                     }
                 },
-                error: function (data) {
-                    toastr.error(data.message);
-                }
+                error: dashboard_request_error
             });
         }
     });
@@ -285,9 +290,7 @@
                         toastr.error(data.message);
                     }
                 },
-                error: function (data) {
-                    toastr.error(data.message);
-                }
+                error: dashboard_request_error
             });
         }
     });
@@ -311,9 +314,7 @@
                     toastr.error(data.message);
                 }
             },
-            error: function (data) {
-                toastr.error(data.message);
-            }
+            error: dashboard_request_error
         });
     });
 
@@ -358,9 +359,7 @@
                         toastr.error(data.message);
                     }
                 },
-                error: function (data) {
-                    toastr.error(data.message);
-                }
+                error: dashboard_request_error
             });
         }
     }
@@ -398,9 +397,7 @@
                     toastr.error(data.message);
                 }
             },
-            error: function (data) {
-                toastr.error(data.message);
-            }
+            error: dashboard_request_error
         });
     }
 
@@ -435,9 +432,7 @@
                         toastr.error(data.message);
                     }
                 },
-                error: function(data) {
-                    toastr.error(data.message);
-                }
+                error: dashboard_request_error
             });
         }
     }
@@ -464,9 +459,7 @@
                     toastr.error(data.message);
                 }
             },
-            error: function(data) {
-                toastr.error(data.message);
-            }
+            error: dashboard_request_error
         });
     }
 
@@ -502,9 +495,7 @@
                         toastr.error(data.message);
                     }
                 },
-                error: function(data) {
-                    toastr.error(data.message);
-                }
+                error: dashboard_request_error
             });
             $("#dashboard_copy_target option:eq(-1)").prop('selected', true);
             dashboard_copy_user_select();
@@ -597,9 +588,7 @@
                         toastr.error(data.message);
                     }
                 },
-                error: function (data) {
-                    toastr.error(data.message);
-                }
+                error: dashboard_request_error
             });
         }
     return false;
@@ -636,8 +625,9 @@
                     $widget_body.html('<div class="alert alert-info">' + data.message + '</div>');
                 }
             },
-            error: function (data) {
-                $widget_body.html('<div class="alert alert-info">' + (data.responseJSON.error || '{{ __('Problem with backend') }}') + '</div>');
+            error: function (xhr) {
+                const message = xhr.responseJSON?.message || xhr.responseJSON?.error || @js(__('Problem with backend'));
+                $widget_body.empty().append($('<div class="alert alert-info">').text(message));
             }
         });
     }
