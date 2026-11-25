@@ -55,6 +55,19 @@ final class MsteamsTest extends TestCase
             ]);
     }
 
+    public function testWorkflowDeliveryPreservesUtf8(): void
+    {
+        Http::fake();
+
+        $this->deliver(self::WORKFLOW_URL, null, ['msg' => "封包遺失\u{0085}連線中斷"]);
+
+        Http::assertSent(function (Request $request) {
+            $text = $request->data()['attachments'][0]['content']['body'][1]['text'];
+
+            return $text === "封包遺失\n\n連線中斷";
+        });
+    }
+
     public function testWorkflowDeliveryCutsLongMessage(): void
     {
         Http::fake();
