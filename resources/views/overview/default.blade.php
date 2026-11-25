@@ -96,13 +96,12 @@
                             </div>
                         </form>
                     </div>
-                    @can('copy', \App\Models\Dashboard::class)
-                    @if (count($user_list))
+                    @if (count($copy_targets))
                     <div class="btn-group btn-lg" style="margin-top:5px;position:absolute;right:0px;">
                         <div class="btn-group">
                         <select class="form-control" id="dashboard_copy_target" name="dashboard_copy_target" onchange="dashboard_copy_user_select()">
                             <option value="-1" selected> {{ trans('dashboard.buttons.copy_to') }} </option>
-                        @foreach ($user_list as $user_id => $username)
+                        @foreach ($copy_targets as $user_id => $username)
                             <option value="{{ $user_id }}">{{ $username }}</option>
                         @endforeach
                         </select>
@@ -110,7 +109,6 @@
                         <button disabled id="do_copy_dashboard" class="btn btn-primary" onclick="dashboard_copy(this)" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.copy') }}"><i class="fa fa-copy fa-fw"></i></button>
                     </div>
                     @endif
-                    @endcan
                 </div>
             </div>
             <!-- End Dashboard-Settings -->
