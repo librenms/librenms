@@ -30,17 +30,24 @@ use App\Facades\LibrenmsConfig;
 use App\Models\AlertTemplate;
 use App\Models\Application;
 use App\Models\Device;
+use ArrayAccess;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use JsonSerializable;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Util\Time;
+use LogicException;
 
 /**
  * An alert as passed to templates and transports. It cannot be changed after it is built.
+ *
+ * Read-only array access exists only for user-written templates that use $alert['hostname'];
+ * code should read the typed properties.
+ *
+ * @implements ArrayAccess<string, mixed>
  */
-class AlertData implements JsonSerializable
+class AlertData implements ArrayAccess, JsonSerializable
 {
     public private(set) ?string $hostname = null;
     public private(set) ?int $device_id = null;
@@ -153,6 +160,29 @@ class AlertData implements JsonSerializable
         return false;
     }
 
+    public function offsetExists(mixed $offset): bool
+    {
+        return is_string($offset) && $this->isField($offset) && isset($this->{$offset});
+    }
+
+    /**
+     * Unknown names are null, like a missing array key, so checks such as @if ($alert['x']) stay false.
+     */
+    public function offsetGet(mixed $offset): mixed
+    {
+        return is_string($offset) && $this->isField($offset) ? $this->{$offset} : null;
+    }
+
+    public function offsetSet(mixed $offset, mixed $value): never
+    {
+        throw new LogicException('AlertData is immutable');
+    }
+
+    public function offsetUnset(mixed $offset): never
+    {
+        throw new LogicException('AlertData is immutable');
+    }
+
     /**
      * The array payload for legacy transports that only implement deliverAlert().
      *
@@ -177,12 +207,17 @@ class AlertData implements JsonSerializable
 
     private function set(int|string $key, mixed $value): void
     {
-        if (! is_string($key) || $key === 'providedFields' || ! property_exists($this, $key)) {
+        if (! is_string($key) || ! $this->isField($key)) {
             throw new InvalidArgumentException("$key is not an AlertData field");
         }
 
         $this->{$key} = $value;
         $this->providedFields[$key] = true;
+    }
+
+    private function isField(string $name): bool
+    {
+        return $name !== 'providedFields' && property_exists($this, $name);
     }
 
     /**

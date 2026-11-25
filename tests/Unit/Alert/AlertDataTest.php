@@ -145,6 +145,37 @@ final class AlertDataTest extends TestCase
         $this->assertSame('Default Mail', $alert->transport_name);
     }
 
+    public function testTemplatesCanUseArrayAccess(): void
+    {
+        $alert = new AlertData(['hostname' => 'router1', 'faults' => [1 => ['string' => 'port down']]]);
+
+        $rendered = Blade::render(
+            '{{ $alert[\'hostname\'] }} {{ $alert[\'faults\'][1][\'string\'] }}@if ($alert[\'typo\']) typo @endif {{ $alert[\'severity\'] ?? \'none\' }}',
+            ['alert' => $alert]
+        );
+
+        $this->assertSame('router1 port down none', $rendered);
+    }
+
+    public function testArrayWritesThrow(): void
+    {
+        $alert = new AlertData(['title' => 'Initial Title']);
+
+        try {
+            $alert['title'] = 'Updated Title';
+            $this->fail('offsetSet should throw');
+        } catch (\LogicException) {
+        }
+
+        try {
+            unset($alert['title']);
+            $this->fail('offsetUnset should throw');
+        } catch (\LogicException) {
+        }
+
+        $this->assertSame('Initial Title', $alert->title);
+    }
+
     public function testUnknownFieldThrows(): void
     {
         $this->expectException(\InvalidArgumentException::class);
