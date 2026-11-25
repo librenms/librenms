@@ -30,19 +30,16 @@ use App\Models\Eventlog;
 use Exception;
 use Illuminate\Support\Str;
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\AlertDataTransport;
 use LibreNMS\Alert\AlertUtil;
+use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use Spatie\Permission\Models\Role;
 
-class Mail extends AlertDataTransport
+class Mail extends Transport implements AlertTransport
 {
-    /**
-     * @param  array<string, mixed>|AlertData  $alert_data
-     * @return bool
-     */
-    public function deliverAlertData(array|AlertData $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $emails = match ($this->config['mail-contact'] ?? '') {
             'sysContact' => AlertUtil::findContactsSysContact($alert_data['faults']),

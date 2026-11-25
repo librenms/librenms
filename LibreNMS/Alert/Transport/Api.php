@@ -27,19 +27,16 @@ namespace LibreNMS\Alert\Transport;
 
 use App\View\SimpleTemplate;
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\AlertDataTransport;
+use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Api extends AlertDataTransport
+class Api extends Transport implements AlertTransport
 {
     protected string $name = 'API';
 
-    /**
-     * @param  array<string, mixed>|AlertData  $alert_data
-     * @return bool
-     */
-    public function deliverAlertData(array|AlertData $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $request_body = $this->config['api-body'] ?? '';
         $username = $this->config['api-auth-username'];

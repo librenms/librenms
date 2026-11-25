@@ -38,11 +38,9 @@ if (isset($options['t']) && isset($options['h']) && isset($options['r'])) {
         exit(2);
     }
     if (isset($options['p'])) {
-        $alert->transport = $options['p'];
+        $alert = $alert->with(['transport' => $options['p']]);
     }
-    $type = new Template;
-    $alert->title = $type->getTitle($alert);
-    $alert->msg = $type->getBody($alert);
+    $alert = (new Template)->render($alert);
     $output = $alert->toArray();
     unset($output['template']);
     print_r($output);

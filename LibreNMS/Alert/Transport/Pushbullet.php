@@ -25,17 +25,14 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\AlertDataTransport;
+use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Pushbullet extends AlertDataTransport
+class Pushbullet extends Transport implements AlertTransport
 {
-    /**
-     * @param  array<string, mixed>|AlertData  $alert_data
-     * @return bool
-     */
-    public function deliverAlertData(array|AlertData $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         // Note: At this point it might be useful to iterate through $obj['contacts'] and send each of them a note ?
         $url = 'https://api.pushbullet.com/v2/pushes';

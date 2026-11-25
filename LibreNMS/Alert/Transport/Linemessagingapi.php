@@ -11,21 +11,22 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\AlertDataTransport;
+use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Linemessagingapi extends AlertDataTransport
+class Linemessagingapi extends Transport implements AlertTransport
 {
     protected string $name = 'LINE Messaging API';
 
     /**
      * Deliver Alert
      *
-     * @param  array<string, mixed>|AlertData  $alert_data  Alert data
+     * @param  AlertData  $alert_data  Alert data
      * @return bool True if message sent successfully
      */
-    public function deliverAlertData(array|AlertData $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $apiURL = 'https://api.line.me/v2/bot/message/push';
         $data = [

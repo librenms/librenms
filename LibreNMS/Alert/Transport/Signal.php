@@ -24,15 +24,12 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\AlertDataTransport;
+use LibreNMS\Alert\Transport;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 
-class Signal extends AlertDataTransport
+class Signal extends Transport implements AlertTransport
 {
-    /**
-     * @param  array<string, mixed>|AlertData  $alert_data
-     * @return bool
-     */
-    public function deliverAlertData(array|AlertData $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         exec(escapeshellarg((string) $this->config['path'])
            . ' --dbus-system send'

@@ -8,7 +8,9 @@ use App\View\SimpleTemplate;
 use ArrayAccess;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Interfaces\Alert\AlertTransport as AlertTransportInterface;
 use LibreNMS\Interfaces\Alert\Transport as TransportInterface;
+use LogicException;
 
 abstract class Transport implements TransportInterface
 {
@@ -43,6 +45,17 @@ abstract class Transport implements TransportInterface
     public function __construct(?AlertTransport $transport = null)
     {
         $this->config = (array) ($transport ? $transport->transport_config : []);
+    }
+
+    /**
+     * Legacy array entry point, only called for transports that do not implement
+     * AlertTransportInterface. Legacy transports override it.
+     *
+     * @param  array<string, mixed>  $alert_data
+     */
+    public function deliverAlert(array $alert_data): bool
+    {
+        throw new LogicException(static::class . ' must implement ' . AlertTransportInterface::class . ' or deliverAlert()');
     }
 
     /**

@@ -26,20 +26,17 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\AlertDataTransport;
+use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Hipchat extends AlertDataTransport
+class Hipchat extends Transport implements AlertTransport
 {
     protected string $name = 'HipChat';
 
-    /**
-     * @param  array<string, mixed>|AlertData  $alert_data
-     * @return bool
-     */
-    public function deliverAlertData(array|AlertData $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $options = $this->parseUserOptions($this->config['hipchat-options'] ?? '');
 

@@ -17,6 +17,7 @@ use Illuminate\Validation\Rule;
 use LibreNMS\Alert\AlertData;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport as AlertTransportInterface;
 use LibreNMS\Util\Exceptions;
 
 class AlertTransportController extends Controller
@@ -79,7 +80,10 @@ class AlertTransportController extends Controller
         $alert_data = AlertData::testData($device);
 
         try {
-            $result = $transport->instance()->deliverAlert($alert_data);
+            $instance = $transport->instance();
+            $result = $instance instanceof AlertTransportInterface
+                ? $instance->deliver($alert_data)
+                : $instance->deliverAlert($alert_data->toTransportPayload());
 
             if ($result === true) {
                 return response()->json(['status' => 'ok']);

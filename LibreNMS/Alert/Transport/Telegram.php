@@ -27,22 +27,19 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\AlertDataTransport;
+use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\Http;
 
-class Telegram extends AlertDataTransport
+class Telegram extends Transport implements AlertTransport
 {
     private  const string BASE_URL = 'https://api.telegram.org/bot';
 
     private $message = [];
 
-    /**
-     * @param  array<string, mixed>|AlertData  $alert_data
-     * @return bool
-     */
-    public function deliverAlertData(array|AlertData $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $url_send_message = self::BASE_URL . "{$this->config['telegram-token']}/sendMessage";
         $url_send_photo = self::BASE_URL . "{$this->config['telegram-token']}/sendPhoto";

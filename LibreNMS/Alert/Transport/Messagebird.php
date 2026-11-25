@@ -34,17 +34,14 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\AlertDataTransport;
+use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Messagebird extends AlertDataTransport
+class Messagebird extends Transport implements AlertTransport
 {
-    /**
-     * @param  array<string, mixed>|AlertData  $alert_data
-     * @return bool
-     */
-    public function deliverAlertData(array|AlertData $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $messagebird_msg = mb_strimwidth((string) $alert_data['msg'], 0, $this->config['messagebird-limit'] - 3, '...');
         $api_url = 'https://rest.messagebird.com/messages';

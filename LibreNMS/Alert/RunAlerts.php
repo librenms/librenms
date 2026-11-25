@@ -47,6 +47,7 @@ use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport as AlertTransportInterface;
 use LibreNMS\Util\Time;
 
 class RunAlerts
@@ -159,9 +160,6 @@ class RunAlerts
             }
         }
 
-        $tpl = new Template;
-        $template = $tpl->getTemplate((int) $alert['rule_id']);
-
         if ($alert['state'] >= AlertState::ACTIVE) {
             foreach ($extra['rule'] ?? [] as $incident) {
                 if (! is_array($incident)) {
@@ -247,8 +245,6 @@ class RunAlerts
         $obj['contacts'] = $extra['contacts'] ?? [];
         $obj['state'] = $alert['state'];
         $obj['alerted'] = $alert['alerted'];
-        $obj['template'] = $template;
-
         $obj['operation_phase'] = AlertUtil::mapAlertStateToOperationPhase((int) $alert['state']);
         $detailCount = (int) ($extra['count'] ?? 0);
         $obj['escalation_step'] = max(1, $detailCount);
@@ -259,7 +255,9 @@ class RunAlerts
             $obj['escalation_step'] = 1;
         }
 
-        return new AlertData($obj);
+        $alertData = new AlertData($obj);
+
+        return $alertData->with(['template' => (new Template)->getTemplate($alertData->rule_id)]);
     }
 
     public function clearStaleAlerts()
@@ -792,10 +790,9 @@ class RunAlerts
             $alert->escalation_step ?? 1
         );
 
-        $ruleId = (int) ($alert->rule_id ?? 0);
         if (! $transport_maps || count($transport_maps) === 0) {
             $reason = 'No mapped transport for this operation';
-            if ($ruleId > 0 && ! AlertUtil::ruleHasAlertOperations($ruleId)) {
+            if ($alert->rule_id !== null && ! AlertUtil::ruleHasAlertOperations($alert->rule_id)) {
                 $reason = 'No operations configured for this rule';
             }
 
@@ -819,25 +816,23 @@ class RunAlerts
             if (class_exists($class)) {
                 //FIXME remove Deprecated transport
                 $transport_title = "Transport {$item['transport_type']}";
-                $alert->transport = $item['transport_type'];
-                $alert->transport_name = $item['transport_name'];
+                $transportAlert = $alert->with([
+                    'transport' => $item['transport_type'],
+                    'transport_name' => $item['transport_name'],
+                ]);
                 c_echo(" :: $transport_title => ");
                 try {
-                    $alert->title = $type->getTitle($alert);
-                    $alert->msg = $type->getBody($alert);
+                    $transportAlert = $type->render($transportAlert);
                     $instance = new $class(AlertTransport::find($item['transport_id']));
-                    // Custom transports can still implement or override the array entry point.
-                    $acceptsAlertData = $instance instanceof AlertDataTransport
-                        && (new \ReflectionMethod($instance, 'deliverAlert'))->getDeclaringClass()->getName() === AlertDataTransport::class;
-                    $tmp = $acceptsAlertData
-                        ? $instance->deliverAlertData($alert)
-                        : $instance->deliverAlert($alert->toTransportPayload());
-                    $this->alertLog($tmp, $alert, $alert->transport);
+                    $tmp = $instance instanceof AlertTransportInterface
+                        ? $instance->deliver($transportAlert)
+                        : $instance->deliverAlert($transportAlert->toTransportPayload());
+                    $this->alertLog($tmp, $transportAlert, $transportAlert->transport);
                 } catch (AlertTransportDeliveryException $e) {
-                    Log::warning("Alert transport '{$alert->transport}' delivery failed for device {$alert->device_id}: {$e->getMessage()}", ['exception' => $e]);
-                    $this->alertLog($e->getMessage(), $alert, $alert->transport);
+                    Log::warning("Alert transport '{$transportAlert->transport}' delivery failed for device {$transportAlert->device_id}: {$e->getMessage()}", ['exception' => $e]);
+                    $this->alertLog($e->getMessage(), $transportAlert, $transportAlert->transport);
                 } catch (\Throwable $e) {
-                    $this->alertLog($e, $alert, $alert->transport);
+                    $this->alertLog($e, $transportAlert, $transportAlert->transport);
                 }
                 unset($instance);
                 echo PHP_EOL;

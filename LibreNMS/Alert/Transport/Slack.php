@@ -26,17 +26,14 @@ namespace LibreNMS\Alert\Transport;
 
 use Illuminate\Support\Str;
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\AlertDataTransport;
+use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Slack extends AlertDataTransport
+class Slack extends Transport implements AlertTransport
 {
-    /**
-     * @param  array<string, mixed>|AlertData  $alert_data
-     * @return bool
-     */
-    public function deliverAlertData(array|AlertData $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $slack_opts = $this->parseUserOptions($this->config['slack-options'] ?? '');
         $icon = $this->config['slack-icon_emoji'] ?? $slack_opts['icon_emoji'] ?? null;

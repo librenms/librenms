@@ -25,21 +25,18 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\AlertDataTransport;
+use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Opsgenie extends AlertDataTransport
+class Opsgenie extends Transport implements AlertTransport
 {
-    /**
-     * @param  array<string, mixed>|AlertData  $alert_data
-     * @return bool
-     */
-    public function deliverAlertData(array|AlertData $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $url = $this->config['genie-url'];
 
-        $payload = $alert_data instanceof AlertData ? $alert_data->toTransportPayload() : $alert_data;
+        $payload = $alert_data->toTransportPayload();
         $res = Http::client()->post($url, $payload);
 
         if ($res->successful()) {

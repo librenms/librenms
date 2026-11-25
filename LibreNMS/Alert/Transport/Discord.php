@@ -31,11 +31,12 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\AlertDataTransport;
+use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Discord extends AlertDataTransport
+class Discord extends Transport implements AlertTransport
 {
     private array $embedFieldTranslations = [
         'name' => 'Rule Name',
@@ -47,10 +48,9 @@ class Discord extends AlertDataTransport
      * Composes a Discord JSON message and delivers it using HTTP POST
      * https://discord.com/developers/docs/resources/message#create-message
      *
-     * @param  array<string, mixed>|AlertData  $alert_data
      * @return bool
      */
-    public function deliverAlertData(array|AlertData $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $this->discord_message = [
             'embeds' => [
@@ -79,7 +79,7 @@ class Discord extends AlertDataTransport
         throw new AlertTransportDeliveryException($alert_data, $res->status(), $res->body(), $alert_data['msg'], $this->discord_message);
     }
 
-    private function getTitle(array|AlertData $alert_data): string
+    private function getTitle(AlertData $alert_data): string
     {
         return '#' . $alert_data['uid'] . ' ' . $alert_data['title'];
     }
@@ -91,7 +91,7 @@ class Discord extends AlertDataTransport
         return $this->discord_message;
     }
 
-    private function getColorOfAlertState(array|AlertData $alert_data): int
+    private function getColorOfAlertState(AlertData $alert_data): int
     {
         $hexColor = self::getColorForState($alert_data['state']);
         $sanitized = preg_replace('/[^\dA-Fa-f]/', '', $hexColor);
@@ -99,12 +99,12 @@ class Discord extends AlertDataTransport
         return hexdec((string) $sanitized);
     }
 
-    private function getDescription(array|AlertData $alert_data): string
+    private function getDescription(AlertData $alert_data): string
     {
         return $alert_data['msg'];
     }
 
-    private function getFooter(array|AlertData $alert_data): string
+    private function getFooter(AlertData $alert_data): string
     {
         return $alert_data['elapsed'] ? 'alert took ' . $alert_data['elapsed'] : '';
     }
@@ -148,7 +148,6 @@ class Discord extends AlertDataTransport
      * Converts comma-separated values into an array of name-value pairs.
      * https://discord.com/developers/docs/resources/message#embed-object-embed-field-structure
      *
-     * @param  array<string, mixed>|AlertData  $alert_data  The alert fields.
      * @return array An array of name-value pairs.
      *
      * @example
@@ -159,7 +158,7 @@ class Discord extends AlertDataTransport
      *     ['name' => 'SysDescr', 'value' => 'Linux server description'],
      * ]
      */
-    public function getEmbedFields(array|AlertData $alert_data): array
+    public function getEmbedFields(AlertData $alert_data): array
     {
         $result = [];
 

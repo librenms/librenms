@@ -25,24 +25,21 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\AlertDataTransport;
+use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Ibmocm extends AlertDataTransport
+class Ibmocm extends Transport implements AlertTransport
 {
     protected string $name = 'IBM On Call Manager';
 
-    /**
-     * @param  array<string, mixed>|AlertData  $alert_data
-     * @return bool
-     */
-    public function deliverAlertData(array|AlertData $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $url = $this->config['ocm-url'];
 
         // Send HTTP POST request
-        $payload = $alert_data instanceof AlertData ? $alert_data->toTransportPayload() : $alert_data;
+        $payload = $alert_data->toTransportPayload();
         $res = Http::client()->post($url, $payload);
 
         // Check if request was successful

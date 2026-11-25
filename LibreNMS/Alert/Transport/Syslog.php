@@ -19,22 +19,19 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\AlertDataTransport;
+use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 
-class Syslog extends AlertDataTransport
+class Syslog extends Transport implements AlertTransport
 {
-    /**
-     * @param  array<string, mixed>|AlertData  $alert_data
-     * @return bool
-     */
-    public function deliverAlertData(array|AlertData $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         return $this->contactSyslog($alert_data);
     }
 
-    public function contactSyslog(array|AlertData $alert_data): bool
+    public function contactSyslog(AlertData $alert_data): bool
     {
         $syslog_host = '127.0.0.1';
         $syslog_port = 514;

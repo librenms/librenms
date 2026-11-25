@@ -35,6 +35,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Util\Time;
+use LogicException;
 
 /**
  * @implements ArrayAccess<string, mixed>
@@ -42,70 +43,70 @@ use LibreNMS\Util\Time;
  */
 class AlertData implements ArrayAccess, Arrayable, JsonSerializable
 {
-    public ?string $hostname = null;
-    public ?int $device_id = null;
-    public ?string $sysDescr = null;
-    public ?string $sysName = null;
-    public ?string $sysContact = null;
-    public ?string $os = null;
-    public ?string $type = null;
-    public ?string $ip = null;
-    public ?string $display = null;
-    public ?string $version = null;
-    public ?string $hardware = null;
-    public ?string $features = null;
-    public ?string $serial = null;
-    public bool|int|null $status = null;
-    public ?string $status_reason = null;
-    public ?string $location = null;
-    public ?string $description = null;
-    public ?string $notes = null;
-    public ?string $alert_notes = null;
-    public ?int $uptime = null;
-    public ?string $uptime_short = null;
-    public ?string $uptime_long = null;
-    public ?string $title = null;
-    public ?string $elapsed = null;
-    public int|bool|null $alerted = null;
-    public int|string|null $alert_id = null;
-    public int|string|null $rule_id = null;
-    public int|string|null $id = null;
-    public ?string $proc = null;
+    public private(set) ?string $hostname = null;
+    public private(set) ?int $device_id = null;
+    public private(set) ?string $sysDescr = null;
+    public private(set) ?string $sysName = null;
+    public private(set) ?string $sysContact = null;
+    public private(set) ?string $os = null;
+    public private(set) ?string $type = null;
+    public private(set) ?string $ip = null;
+    public private(set) ?string $display = null;
+    public private(set) ?string $version = null;
+    public private(set) ?string $hardware = null;
+    public private(set) ?string $features = null;
+    public private(set) ?string $serial = null;
+    public private(set) bool|int|null $status = null;
+    public private(set) ?string $status_reason = null;
+    public private(set) ?string $location = null;
+    public private(set) ?string $description = null;
+    public private(set) ?string $notes = null;
+    public private(set) ?string $alert_notes = null;
+    public private(set) ?int $uptime = null;
+    public private(set) ?string $uptime_short = null;
+    public private(set) ?string $uptime_long = null;
+    public private(set) ?string $title = null;
+    public private(set) ?string $elapsed = null;
+    public private(set) int|bool|null $alerted = null;
+    public private(set) ?int $alert_id = null;
+    public private(set) ?int $rule_id = null;
+    public private(set) ?int $id = null;
+    public private(set) ?string $proc = null;
     /** @var array<int|string, mixed> */
-    public array $faults = [];
-    public int|string|null $uid = null;
-    public ?string $severity = null;
-    public ?string $rule = null;
-    public ?string $name = null;
-    public ?string $string = null;
-    public ?string $timestamp = null;
+    public private(set) array $faults = [];
+    public private(set) ?int $uid = null;
+    public private(set) ?string $severity = null;
+    public private(set) ?string $rule = null;
+    public private(set) ?string $name = null;
+    public private(set) ?string $string = null;
+    public private(set) ?string $timestamp = null;
     /** @var array<string, string>|null */
-    public ?array $contacts = null;
-    public ?int $state = null;
-    public ?string $msg = null;
-    public mixed $builder = null;
+    public private(set) ?array $contacts = null;
+    public private(set) ?int $state = null;
+    public private(set) ?string $msg = null;
+    public private(set) mixed $builder = null;
     /** @var array<int|string, string>|null */
-    public ?array $device_groups = null;
-    public Carbon|int|null $ping_timestamp = null;
-    public float|int|null $ping_loss = null;
-    public float|int|string|null $ping_min = null;
-    public float|int|string|null $ping_max = null;
-    public float|int|null $ping_avg = null;
-    public ?string $debug = null;
-    public mixed $applications = null;
+    public private(set) ?array $device_groups = null;
+    public private(set) Carbon|int|null $ping_timestamp = null;
+    public private(set) float|int|null $ping_loss = null;
+    public private(set) float|int|string|null $ping_min = null;
+    public private(set) float|int|string|null $ping_max = null;
+    public private(set) float|int|null $ping_avg = null;
+    public private(set) ?string $debug = null;
+    public private(set) mixed $applications = null;
     /** @var array<string, mixed>|null */
-    public ?array $applications_metrics = null;
+    public private(set) ?array $applications_metrics = null;
     /** @var array<string, mixed>|null */
-    public ?array $diff = null;
-    public ?string $transport = null;
-    public ?string $transport_name = null;
-    public ?string $operation_phase = null;
-    public ?int $escalation_step = null;
-    public ?AlertTemplate $template = null;
+    public private(set) ?array $diff = null;
+    public private(set) ?string $transport = null;
+    public private(set) ?string $transport_name = null;
+    public private(set) ?string $operation_phase = null;
+    public private(set) ?int $escalation_step = null;
+    public private(set) ?AlertTemplate $template = null;
     /** @var array<string, mixed>|null */
-    public ?array $info = null;
-    public mixed $extra = null;
-    public ?string $query = null;
+    public private(set) ?array $info = null;
+    public private(set) mixed $extra = null;
+    public private(set) ?string $query = null;
 
     /** @var array<string, true> */
     private array $providedFields = [];
@@ -120,8 +121,23 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
         }
 
         foreach ($data as $key => $value) {
-            $this->offsetSet($key, $value);
+            $this->set($key, $value);
         }
+    }
+
+    /**
+     * Return a copy with the given fields changed. AlertData itself is never modified.
+     *
+     * @param  array<string, mixed>  $changes
+     */
+    public function with(array $changes): static
+    {
+        $copy = clone $this;
+        foreach ($changes as $key => $value) {
+            $copy->set($key, $value);
+        }
+
+        return $copy;
     }
 
     /**
@@ -153,22 +169,25 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
 
     public function offsetGet(mixed $offset): mixed
     {
-        return is_string($offset) ? $this->__get($offset) : null;
+        // Unlike __get (used by templates), array access mirrors a plain array: unknown keys are null.
+        return is_string($offset) && $this->hasProperty($offset) ? $this->{$offset} : null;
     }
 
-    public function offsetSet(mixed $offset, mixed $value): void
+    public function offsetSet(mixed $offset, mixed $value): never
     {
-        if (is_string($offset) && $this->hasProperty($offset)) {
-            $this->{$offset} = $value;
-            $this->providedFields[$offset] = true;
-        }
+        throw new LogicException('AlertData is immutable, use with() to get a changed copy');
     }
 
-    public function offsetUnset(mixed $offset): void
+    public function offsetUnset(mixed $offset): never
     {
-        if (is_string($offset) && $this->hasProperty($offset)) {
-            $this->{$offset} = $offset === 'faults' ? [] : null;
-            unset($this->providedFields[$offset]);
+        throw new LogicException('AlertData is immutable, use with() to get a changed copy');
+    }
+
+    private function set(mixed $key, mixed $value): void
+    {
+        if (is_string($key) && $this->hasProperty($key)) {
+            $this->{$key} = $value;
+            $this->providedFields[$key] = true;
         }
     }
 
@@ -214,11 +233,10 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
 
     /**
      * @param  array<int|string, mixed>  $faults
-     * @return array<string, mixed>
      */
-    public static function testData(Device $device, array $faults = []): array
+    public static function testData(Device $device, array $faults = []): self
     {
-        return [
+        return new self([
             'hostname' => $device->hostname,
             'device_id' => $device->device_id,
             'sysDescr' => $device->sysDescr,
@@ -243,13 +261,13 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
             'title' => 'Testing transport from ' . LibrenmsConfig::get('project_name'),
             'elapsed' => '11s',
             'alerted' => 0,
-            'alert_id' => '000',
+            'alert_id' => 0,
             'alert_notes' => 'This is the note for the test alert',
             'proc' => 'This is the procedure for the test alert',
-            'rule_id' => '000',
-            'id' => '000',
+            'rule_id' => 0,
+            'id' => 0,
             'faults' => $faults,
-            'uid' => '000',
+            'uid' => 0,
             'severity' => 'critical',
             'rule' => 'macros.device = 1',
             'name' => 'Test-Rule',
@@ -259,6 +277,6 @@ class AlertData implements ArrayAccess, Arrayable, JsonSerializable
             'state' => AlertState::ACTIVE,
             'msg' => 'This is a test alert',
             'builder' => '{}',
-        ];
+        ]);
     }
 }

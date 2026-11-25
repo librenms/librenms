@@ -19,19 +19,16 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\AlertDataTransport;
+use LibreNMS\Alert\Transport;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Signalwire extends AlertDataTransport
+class Signalwire extends Transport implements AlertTransport
 {
     protected string $name = 'SignalWire';
 
-    /**
-     * @param  array<string, mixed>|AlertData  $alert_data
-     * @return bool
-     */
-    public function deliverAlertData(array|AlertData $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $url = 'https://' . $this->config['signalwire-spaceUrl'] . '.signalwire.com/api/laml/2010-04-01/Accounts/' . $this->config['signalwire-project-id'] . '/Messages.json';
 

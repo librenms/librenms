@@ -26,9 +26,10 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\AlertDataTransport;
+use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
 /**
@@ -36,13 +37,9 @@ use LibreNMS\Util\Http;
  * At it's current implementation we can send ['lselect' => "15 second flash", 'select' => "1 second flash"]
  * If a colour request is sent with it it will permenantly change the colour which is less than desired
  */
-class Hue extends AlertDataTransport
+class Hue extends Transport implements AlertTransport
 {
-    /**
-     * @param  array<string, mixed>|AlertData  $alert_data
-     * @return bool
-     */
-    public function deliverAlertData(array|AlertData $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         // Don't alert on resolve at this time
         if ($alert_data['state'] == AlertState::RECOVERED) {

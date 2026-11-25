@@ -26,12 +26,13 @@ namespace LibreNMS\Alert\Transport;
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Alert\AlertData;
-use LibreNMS\Alert\AlertDataTransport;
+use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
+use LibreNMS\Interfaces\Alert\AlertTransport;
 use LibreNMS\Util\Http;
 
-class Sensu extends AlertDataTransport
+class Sensu extends Transport implements AlertTransport
 {
     // Sensu alert coding
     public const OK = 0;
@@ -45,11 +46,7 @@ class Sensu extends AlertDataTransport
         'critical' => self::CRITICAL,
     ];
 
-    /**
-     * @param  array<string, mixed>|AlertData  $alert_data
-     * @return bool
-     */
-    public function deliverAlertData(array|AlertData $alert_data): bool
+    public function deliver(AlertData $alert_data): bool
     {
         $sensu_opts['source-key'] = $this->config['sensu-source-key'];
 
@@ -88,7 +85,7 @@ class Sensu extends AlertDataTransport
         throw new AlertTransportDeliveryException($alert_data, $result->status(), $result->body(), json_encode($data), $sensu_opts);
     }
 
-    private function generateData(array|AlertData $alert_data, int $status, int $offset = 0): array
+    private function generateData(AlertData $alert_data, int $status, int $offset = 0): array
     {
         $namespace = $this->config['sensu-namespace'] ?: 'default';
 
@@ -119,7 +116,7 @@ class Sensu extends AlertDataTransport
         ];
     }
 
-    private function generateAnnotations(array|AlertData $alert_data): array
+    private function generateAnnotations(AlertData $alert_data): array
     {
         return array_filter([
             'generated-by' => 'LibreNMS',
@@ -149,7 +146,7 @@ class Sensu extends AlertDataTransport
         return self::$status[$severity] ?? self::UNKNOWN;
     }
 
-    private function getEntityName(array|AlertData $obj): string
+    private function getEntityName(AlertData $obj): string
     {
         $key = $this->config['sensu-source-key'] ?: 'display';
 

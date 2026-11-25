@@ -47,7 +47,6 @@ use LibreNMS\Alert\AlertRules;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alert\RunAlerts;
 use LibreNMS\Alert\Transport;
-use LibreNMS\Alert\Transport\Dummy;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Tests\TestCase;
@@ -103,9 +102,9 @@ final class AlertOperationRunAlertsTest extends TestCase
         $this->assertStringContainsString('Transport delivery failed with 503', $failure->message);
     }
 
-    public function testCustomTransportCanStillOverrideTheArrayEntryPoint(): void
+    public function testCustomArrayTransportReceivesLegacyPayload(): void
     {
-        $transport = new class extends Dummy
+        $transport = new class extends Transport
         {
             public static array $payload = [];
 
@@ -114,6 +113,11 @@ final class AlertOperationRunAlertsTest extends TestCase
                 self::$payload = $alert_data;
 
                 return true;
+            }
+
+            public static function configTemplate(): array
+            {
+                return [];
             }
         };
         class_alias($transport::class, Transport::getClass('legacyArrayTest'));

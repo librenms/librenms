@@ -54,6 +54,16 @@ class Template
         return $this->template;
     }
 
+    /**
+     * Render the title, then the body (which may reference the title).
+     */
+    public function render(AlertData $alert): AlertData
+    {
+        $alert = $alert->with(['title' => $this->getTitle($alert)]);
+
+        return $alert->with(['msg' => $this->getBody($alert)]);
+    }
+
     public function getTitle(AlertData $alert): string
     {
         return $this->bladeTitle($alert);

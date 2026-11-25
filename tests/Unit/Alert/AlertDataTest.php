@@ -168,18 +168,50 @@ final class AlertDataTest extends TestCase
         $this->assertTrue(isset($alert['hostname']));
         $this->assertSame('server1', $alert['hostname']);
 
-        $alert['title'] = 'Updated Title';
-        $this->assertSame('Updated Title', $alert->title);
-        $this->assertSame('Updated Title', $alert['title']);
+        $this->assertFalse(isset($alert['severity']));
+        $this->assertNull($alert['severity']);
+    }
 
-        unset($alert['title']);
-        $this->assertNull($alert->title);
-        $this->assertFalse(isset($alert['title']));
+    public function testArrayWritesThrow(): void
+    {
+        $alert = new AlertData(['title' => 'Initial Title']);
 
-        $alert['faults'] = [['string' => 'test fault']];
-        unset($alert['faults']);
-        $this->assertSame([], $alert->faults);
-        $this->assertArrayNotHasKey('faults', $alert->toArray());
+        try {
+            $alert['title'] = 'Updated Title';
+            $this->fail('offsetSet should throw');
+        } catch (\LogicException) {
+        }
+
+        try {
+            unset($alert['title']);
+            $this->fail('offsetUnset should throw');
+        } catch (\LogicException) {
+        }
+
+        $this->assertSame('Initial Title', $alert->title);
+    }
+
+    public function testPropertyWritesThrow(): void
+    {
+        $alert = new AlertData(['title' => 'Initial Title']);
+
+        $this->expectException(\Error::class);
+        $alert->title = 'Updated Title'; // @phpstan-ignore assign.propertyPrivateSet
+    }
+
+    public function testWithReturnsChangedCopy(): void
+    {
+        $alert = new AlertData(['hostname' => 'server1', 'title' => 'Initial Title']);
+
+        $changed = $alert->with(['title' => 'Updated Title', 'msg' => null, 'not_a_field' => 'ignored']);
+
+        $this->assertNotSame($alert, $changed);
+        $this->assertSame('Initial Title', $alert->title);
+        $this->assertSame('Updated Title', $changed->title);
+        $this->assertSame('server1', $changed->hostname);
+        $this->assertArrayNotHasKey('msg', $alert->toArray());
+        $this->assertArrayHasKey('msg', $changed->toArray());
+        $this->assertArrayNotHasKey('not_a_field', $changed->toArray());
     }
 
     public function testUndefinedPropertyFallback(): void
@@ -187,7 +219,7 @@ final class AlertDataTest extends TestCase
         $alert = new AlertData();
 
         $this->assertSame('non_existent is not a valid $alert data name', $alert->__get('non_existent'));
-        $this->assertSame('non_existent is not a valid $alert data name', $alert['non_existent']);
+        $this->assertNull($alert['non_existent']);
         $this->assertFalse($alert->__isset('non_existent'));
         $this->assertFalse(isset($alert['non_existent']));
     }
@@ -235,16 +267,12 @@ final class AlertDataTest extends TestCase
         ]);
         $device->device_id = 99;
 
-        $testData = AlertData::testData($device);
+        $alert = AlertData::testData($device);
 
-        $this->assertIsArray($testData);
-        $this->assertSame('test-device', $testData['hostname']);
-        $this->assertSame(99, $testData['device_id']);
-        $this->assertSame('linux', $testData['os']);
-
-        $alert = new AlertData($testData);
         $this->assertSame('test-device', $alert->hostname);
         $this->assertSame(99, $alert->device_id);
+        $this->assertSame('linux', $alert->os);
+        $this->assertSame(0, $alert->uid);
     }
 
     public function testBladeRenderingWithAlertData(): void
@@ -275,7 +303,7 @@ final class AlertDataTest extends TestCase
         ]);
 
         $template = new Template;
-        $alert->title = $template->getTitle($alert);
+        $alert = $alert->with(['title' => $template->getTitle($alert)]);
         $this->assertSame('Alert for device core-router - Down Rule', $alert->title);
 
         $body = $template->getBody($alert);
