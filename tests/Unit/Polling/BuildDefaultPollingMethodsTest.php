@@ -37,6 +37,9 @@ final class BuildDefaultPollingMethodsTest extends TestCase
         }
     }
 
+    /**
+     * @return array<string, array{bool, int, list<PollingMethodType>}>
+     */
     public static function defaultMethodsProvider(): array
     {
         return [

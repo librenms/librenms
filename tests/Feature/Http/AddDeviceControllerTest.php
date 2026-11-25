@@ -104,6 +104,9 @@ final class AddDeviceControllerTest extends DBTestCase
                 && $config['active_tab'] === PollingMethodType::Snmp->value);
     }
 
+    /**
+     * @return array<string, array{bool, int, list<string>}>
+     */
     public static function defaultMethodsProvider(): array
     {
         return [
