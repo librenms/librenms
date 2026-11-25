@@ -58,6 +58,7 @@ final class DashboardCopyTest extends InMemoryDbTestCase
             ->assertJsonPath('status', 'ok');
         $this->assertDatabaseHas('dashboards', ['user_id' => $user->user_id, 'dashboard_name' => 'Original_' . $user->username]);
 
+        $this->postJson(route('dashboard.copy', $shared), ['target_user_id' => $user->user_id . 'invalid'])->assertForbidden();
         $this->postJson(route('dashboard.copy', $shared), ['target_user_id' => $owner->user_id])->assertForbidden();
         $this->postJson(route('dashboard.copy', $shared), ['target_user_id' => $owner->user_id + 1])->assertForbidden();
         $this->postJson(route('dashboard.copy', $private), ['target_user_id' => $user->user_id])->assertForbidden();

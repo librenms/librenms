@@ -216,7 +216,7 @@ class DashboardController extends Controller implements HasMiddleware
 
     public function copy(Request $request, Dashboard $dashboard): JsonResponse
     {
-        $target_user_id = filter_var($request->input('target_user_id'), FILTER_VALIDATE_INT) ?: 0;
+        $target_user_id = $request->integer('target_user_id', strict: true);
 
         // Authorize before checking whether the target user exists.
         $this->authorize('copy', [$dashboard, $target_user_id]);
