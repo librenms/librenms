@@ -13,6 +13,8 @@
             <th>{{ __('System ID') }}</th>
             <th>{{ __('Area') }}</th>
             <th>{{ __('System Type') }}</th>
+            <th>{{ __('Metric') }}</th>
+            <th>{{ __('Wide Metric') }}</th>
             <th>{{ __('Admin') }}</th>
             <th>{{ __('State') }}</th>
             <th>{{ __('Last Uptime') }}</th>
@@ -35,6 +37,8 @@
                 <td>{{ $adj->isisISAdjNeighSysID }}</td>
                 <td>{{ $adj->isisISAdjAreaAddress }}</td>
                 <td>{{ $adj->isisISAdjNeighSysType }}</td>
+                <td>{{ $adj->isisCircLevelMetric }}</td>
+                <td>{{ $adj->isisCircLevelWideMetric }}</td>
                 <td>{{ $adj->isisCircAdminState }}</td>
                 <td>
                     <span @class(['label', 'label-success' => $adj->isisISAdjState === 'up', 'label-danger' => $adj->isisISAdjState === 'down', 'label-warning' => ! in_array($adj->isisISAdjState, ['up', 'down'])])>{{ $adj->isisISAdjState }}</span>
