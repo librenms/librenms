@@ -13,6 +13,7 @@ use App\Http\Controllers\AlertTemplateController;
 use App\Http\Controllers\AlertTransportController;
 use App\Http\Controllers\AlertTransportGroupController;
 use App\Http\Controllers\ApiAccessController;
+use App\Http\Controllers\ApiV1SpecificationController;
 use App\Http\Controllers\AppsController;
 use App\Http\Controllers\Auth;
 use App\Http\Controllers\Auth\SocialiteController;
@@ -87,6 +88,7 @@ use App\Http\Controllers\WidgetSettingsController;
 use App\Http\Controllers\WirelessSensorController;
 use App\Http\Controllers\ZiggyRoutesController;
 use App\Http\Middleware\AuthenticateGraph;
+use App\Http\Middleware\EnsureApiV1Enabled;
 use Illuminate\Support\Facades\Auth as AuthFacade;
 use Illuminate\Support\Facades\Route;
 
@@ -235,6 +237,11 @@ Route::middleware(['auth'])->group(function (): void {
         Route::patch('api-access/{id}', [ApiAccessController::class, 'update'])->name('api-access.update')->whereNumber('id');
         Route::post('api-access/{id}/reset', [ApiAccessController::class, 'reset'])->name('api-access.reset')->whereNumber('id');
         Route::delete('api-access/{id}', [ApiAccessController::class, 'destroy'])->name('api-access.destroy')->whereNumber('id');
+
+        Route::prefix('api-docs/v1')->name('api-docs.v1.')->middleware(EnsureApiV1Enabled::class)->group(function (): void {
+            Route::view('/', 'api-docs.v1')->name('index');
+            Route::get('openapi.json', ApiV1SpecificationController::class)->name('specification');
+        });
     });
     Route::resource('users', UserController::class);
     Route::prefix('users/{user}/permissions')->name('users.permissions.')->group(function (): void {

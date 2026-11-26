@@ -142,6 +142,16 @@ Once v1 is final:
 
 ## Testing
 
+Keep `resources/openapi/v1.yaml` in sync when adding or changing an endpoint.
+The in-app reference renders this file and serves it as JSON with the URL of
+the current installation. CI lints the specification and compares its
+operations with the registered v1 routes.
+
+The reference uses Scalar's standalone browser bundle in
+`html/js/scalar-api-reference-1.84.0.min.js`. To update it, use
+`dist/browser/standalone.js` from the pinned `@scalar/api-reference` npm release,
+drop the source map comment, and update the version in the Blade view and its test.
+
 Feature tests live in `tests/Feature/Api/V1/`. Cover the document shape, access
 for a limited user and each supported sort and filter.
 
