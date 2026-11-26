@@ -143,7 +143,7 @@
                         <a href="{{ route('home') }}">
                             <button type="button" class="btn btn-secondary">{{ __('install.finish.dashboard') }}</button>
                         </a>
-                        <a href="{{ url('validate') }}">
+                        <a href="{{ route('validate') }}">
                             <button type="button" class="btn btn-primary">{{ __('install.finish.validate_button') }}</button>
                         </a>
                     </div>

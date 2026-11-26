@@ -40,7 +40,7 @@
                     loglevel: @json($loglevel)
                 };
             },
-            url: "{{ url('/ajax/table/graylog') }}"
+            url: "{{ route('table.graylog') }}"
         });
 
         $('#graylog_container-{{ $id }}').on('refresh', function (event) {

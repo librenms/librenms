@@ -96,7 +96,7 @@
                         </td>
                         <td>
                             @forelse($segments->flatMap(fn ($segment) => $segment->transportGroups->map(fn ($group) => ['group', $group->transport_group_id, $group->transport_group_name])->concat($segment->transportSingles->map(fn ($transport) => ['transport', $transport->transport_id, $transport->transport_name]))) as [$type, $id, $name])
-                                <div><a href="{{ url('alert-transports') }}#{{ $type == 'group' ? 'transport-group' : 'transport' }}-{{ $id }}">{{ $name }}</a></div>
+                                <div><a href="{{ route('alert-transports.index') }}#{{ $type == 'group' ? 'transport-group' : 'transport' }}-{{ $id }}">{{ $name }}</a></div>
                             @empty
                                 {{ __('none') }}
                             @endforelse

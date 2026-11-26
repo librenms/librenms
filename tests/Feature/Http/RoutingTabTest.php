@@ -706,7 +706,7 @@ class RoutingTabTest extends TestCase
         ]);
 
         $response = $this->actingAs($this->admin())
-            ->postJson(url('ajax/table/routes'), [
+            ->postJson(route('table.routes'), [
                 'device_id' => $device->device_id,
                 'showAllRoutes' => 'true',
                 'showProtocols' => 'all',

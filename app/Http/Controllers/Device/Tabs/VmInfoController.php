@@ -77,7 +77,7 @@ class VmInfoController implements DeviceTab
                 ->filter(fn ($field) => $field['key'] !== 'device_id')->values()->all(),
             'filter' => $request->array('filter'),
             'graph' => $graph,
-            'nav' => VminfoGraphs::nav($request->query(), fn (array $query): string => route('device', ['device' => $device->device_id, 'tab' => 'vm', ...$query])),
+            'nav' => VminfoGraphs::nav($request->query(), fn (array $query): string => route('device.vm', ['device' => $device->device_id, ...$query])),
             'vms' => $graph ? $device->vminfo()
                 ->chaperone()
                 ->recordsMetrics(VminfoGraphs::types()[$graph]['metric'])

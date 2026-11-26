@@ -38,7 +38,7 @@ class PortEventlogLinksTest extends TestCase
 
         $this->actingAs($this->admin())
             ->followingRedirects()
-            ->get(route('device', [
+            ->get(route('device.legacy', [
                 'device' => $device,
                 'tab' => 'port',
                 'vars' => 'port=' . $port->port_id . '/view=notes/graph=bits/subview=graphs',
@@ -61,7 +61,7 @@ class PortEventlogLinksTest extends TestCase
         ]);
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'ports']))
+            ->get(route('device.ports', ['device' => $device]))
             ->assertOk()
             ->assertSee(route('device.eventlog', ['device' => $device->device_id, 'port' => $portWithEvents->port_id]))
             ->assertDontSee(route('device.eventlog', ['device' => $device->device_id, 'port' => $portWithoutEvents->port_id]));
@@ -74,7 +74,7 @@ class PortEventlogLinksTest extends TestCase
 
         $this->actingAs($this->admin())
             ->followingRedirects()
-            ->get(route('device', [
+            ->get(route('device.legacy', [
                 'device' => $device,
                 'tab' => 'port',
                 'vars' => 'port=' . $port->port_id . '/view=events',

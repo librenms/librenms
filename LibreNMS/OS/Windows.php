@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use Illuminate\Support\Collection;
 use LibreNMS\OS\Traits\ServerHardware;
 
 class Windows extends \LibreNMS\OS
@@ -153,5 +154,10 @@ class Windows extends \LibreNMS\OS
         ];
 
         return $builds[$build] ?? null;
+    }
+
+    protected function discoverOsSensors(): Collection
+    {
+        return parent::discoverOsSensors()->merge($this->discoverServerHardwareSensors());
     }
 }

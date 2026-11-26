@@ -96,13 +96,12 @@
                             </div>
                         </form>
                     </div>
-                    @can('copy', \App\Models\Dashboard::class)
-                    @if (count($user_list))
+                    @if (count($copy_targets))
                     <div class="btn-group btn-lg" style="margin-top:5px;position:absolute;right:0px;">
                         <div class="btn-group">
                         <select class="form-control" id="dashboard_copy_target" name="dashboard_copy_target" onchange="dashboard_copy_user_select()">
                             <option value="-1" selected> {{ trans('dashboard.buttons.copy_to') }} </option>
-                        @foreach ($user_list as $user_id => $username)
+                        @foreach ($copy_targets as $user_id => $username)
                             <option value="{{ $user_id }}">{{ $username }}</option>
                         @endforeach
                         </select>
@@ -110,7 +109,6 @@
                         <button disabled id="do_copy_dashboard" class="btn btn-primary" onclick="dashboard_copy(this)" data-toggle="tooltip" data-container="body" data-placement="top" title="{{ trans('dashboard.buttons.copy') }}"><i class="fa fa-copy fa-fw"></i></button>
                     </div>
                     @endif
-                    @endcan
                 </div>
             </div>
             <!-- End Dashboard-Settings -->
@@ -178,6 +176,13 @@
     var serialization = @json($dash_config);
     var gridstack_state = 0;
     var grid;
+
+    function dashboard_request_error(xhr) {
+        const message = xhr.responseJSON?.message;
+        toastr.error(document.createTextNode(
+            typeof message === 'string' && message.trim() ? message : @js(__('Request failed'))
+        ));
+    }
 
     @if ($dashboard->dashboard_id > 0)
         var dashboard_id = {{ $dashboard->dashboard_id }};
@@ -257,9 +262,7 @@
                         toastr.error(data.message);
                     }
                 },
-                error: function (data) {
-                    toastr.error(data.message);
-                }
+                error: dashboard_request_error
             });
         }
     });
@@ -285,9 +288,7 @@
                         toastr.error(data.message);
                     }
                 },
-                error: function (data) {
-                    toastr.error(data.message);
-                }
+                error: dashboard_request_error
             });
         }
     });
@@ -311,9 +312,7 @@
                     toastr.error(data.message);
                 }
             },
-            error: function (data) {
-                toastr.error(data.message);
-            }
+            error: dashboard_request_error
         });
     });
 
@@ -358,9 +357,7 @@
                         toastr.error(data.message);
                     }
                 },
-                error: function (data) {
-                    toastr.error(data.message);
-                }
+                error: dashboard_request_error
             });
         }
     }
@@ -398,9 +395,7 @@
                     toastr.error(data.message);
                 }
             },
-            error: function (data) {
-                toastr.error(data.message);
-            }
+            error: dashboard_request_error
         });
     }
 
@@ -435,9 +430,7 @@
                         toastr.error(data.message);
                     }
                 },
-                error: function(data) {
-                    toastr.error(data.message);
-                }
+                error: dashboard_request_error
             });
         }
     }
@@ -464,9 +457,7 @@
                     toastr.error(data.message);
                 }
             },
-            error: function(data) {
-                toastr.error(data.message);
-            }
+            error: dashboard_request_error
         });
     }
 
@@ -502,9 +493,7 @@
                         toastr.error(data.message);
                     }
                 },
-                error: function(data) {
-                    toastr.error(data.message);
-                }
+                error: dashboard_request_error
             });
             $("#dashboard_copy_target option:eq(-1)").prop('selected', true);
             dashboard_copy_user_select();
@@ -597,9 +586,7 @@
                         toastr.error(data.message);
                     }
                 },
-                error: function (data) {
-                    toastr.error(data.message);
-                }
+                error: dashboard_request_error
             });
         }
     return false;
@@ -617,7 +604,7 @@
 
         $.ajax({
             type: 'POST',
-            url: ajax_url + '/dash/' + data_type,
+            url: route('widget.' + data_type),
             data: {
                 id: id,
                 dimensions: {x: Math.floor($widget_body.width()), y: Math.floor($widget_body.height())},
@@ -636,8 +623,9 @@
                     $widget_body.html('<div class="alert alert-info">' + data.message + '</div>');
                 }
             },
-            error: function (data) {
-                $widget_body.html('<div class="alert alert-info">' + (data.responseJSON.error || '{{ __('Problem with backend') }}') + '</div>');
+            error: function (xhr) {
+                const message = xhr.responseJSON?.message || xhr.responseJSON?.error || @js(__('Problem with backend'));
+                $widget_body.empty().append($('<div class="alert alert-info">').text(message));
             }
         });
     }

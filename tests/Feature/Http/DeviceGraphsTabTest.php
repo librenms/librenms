@@ -30,7 +30,7 @@ final class DeviceGraphsTabTest extends TestCase
             ->get(route('device.graphs', ['device' => $device, 'group' => 'system']))
             ->assertOk()
             ->assertSee('graphs?group=netstats', false)
-            ->assertSee('type=device_uptime', false)
+            ->assertSee('type=device_uptime&legend=yes')
             ->assertDontSee('type=device_netstat_tcp', false)
             ->assertDontSee('unknown_graph');
     }
@@ -45,6 +45,7 @@ final class DeviceGraphsTabTest extends TestCase
             ->get(route('device.graphs', ['device' => $device]))
             ->assertOk()
             ->assertSee('99.123%')
+            ->assertSee('type=device_availability&legend=yes')
             ->assertSee('duration=86400', false);
     }
 
@@ -58,7 +59,7 @@ final class DeviceGraphsTabTest extends TestCase
             ->get(route('device.graphs', ['device' => $device, 'group' => 'customoid']))
             ->assertOk()
             ->assertSee('Custom OID: temp')
-            ->assertSee('type=customoid_temp', false)
+            ->assertSee('type=customoid_temp&legend=yes')
             ->assertSee('unit=C', false);
     }
 

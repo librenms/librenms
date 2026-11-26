@@ -28,6 +28,12 @@ class GraphFactory
         }
 
         $className = $this->graphClass($params->type, $params->subtype);
+
+        // a graph type may draw subtypes without a graph of their own, such as sensor classes
+        if ($className === null && LegacyGraphScript::find($params->type, $params->subtype) === null) {
+            $className = $this->graphClass($params->type, 'generic');
+        }
+
         if ($className !== null) {
             return app($className, ['params' => $params]);
         }

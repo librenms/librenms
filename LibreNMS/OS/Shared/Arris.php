@@ -12,6 +12,16 @@ class Arris extends OS
         OS\Traits\EntityMib::discoverEntityPhysical as discoverBaseEntityPhysical;
     }
 
+    /**
+     * Sensors are named by their card (the index rounded to hundreds) and their description
+     */
+    protected function entitySensorDescr(int $index, array $entities): string
+    {
+        $card = (int) floor($index / 100) * 100;
+
+        return ucwords($entities[$card]['entPhysicalName'] ?? '') . ' ' . ucwords($entities[$index]['entPhysicalDescr'] ?? '');
+    }
+
     public function discoverEntityPhysical(): \Illuminate\Support\Collection
     {
         return $this->discoverBaseEntityPhysical()->each(function (EntPhysical $entity): void {

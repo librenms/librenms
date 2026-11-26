@@ -112,6 +112,11 @@ Route: `/api/v0/devices/:hostname/eventlog`
 
 Adds events to a device's eventlog.
 
+Requires the `eventlog.create` permission and access to the target device.
+Administrators have this permission automatically. For other users, assign it
+through a custom role under **Settings -> Manage Users -> Roles**. The built-in
+`global-read` and `user` roles do not grant event-log creation.
+
 Example
 ```
 curl -k -X POST -d '{"text": "Eventlog entry - Severity:Ok","severity":"1"}' -H 'Authorization: Bearer YOURAPITOKENHERE' https://foo.example/api/v0/devices/127.0.0.1/eventlog

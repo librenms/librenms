@@ -4,6 +4,8 @@ namespace LibreNMS\Tests\Unit\Graphs\Rrd;
 
 use App\Data\Graphing\GraphOptions;
 use App\Data\Graphing\GraphParameters;
+use App\Data\Graphing\SeriesRole;
+use App\Data\Graphing\Threshold;
 use App\Facades\LibrenmsConfig;
 use App\Graphs\Rrd\RrdOptionsBuilder;
 use LibreNMS\Tests\TestCase;
@@ -29,6 +31,14 @@ class RrdOptionsBuilderTest extends TestCase
         $options = $this->scaleOptions(new GraphOptions(scaleMin: 0, scaleMax: 100), ['scale_min' => '5']);
 
         $this->assertSame(['-l', '0', '-u', '100', '--slope-mode'], $options);
+    }
+
+    public function test_limits_widen_to_show_every_shown_threshold(): void
+    {
+        $thresholds = [new Threshold(-10, 'low', SeriesRole::LowLimit), new Threshold(110, 'high', SeriesRole::HighLimit), new Threshold(1000, 'off', SeriesRole::HighWarning, shown: false)];
+
+        $this->assertSame(['-l', '-16', '-u', '116', '--slope-mode'], $this->scaleOptions(new GraphOptions(scaleMin: 0, scaleMax: 100, thresholds: $thresholds), []));
+        $this->assertSame(['-l', '-100', '--slope-mode'], $this->scaleOptions(new GraphOptions(scaleMin: -100, thresholds: $thresholds), []), 'limits that already show them stay');
     }
 
     public function test_it_escapes_text_options(): void
@@ -75,6 +85,14 @@ class RrdOptionsBuilderTest extends TestCase
             '--right-axis', '1:0', '--right-axis-label', 'r', '--left-axis-format', 'l',
             '--units-length', '5', '--vertical-label', 'v',
         ], $this->scaleOptions($options, []));
+    }
+
+    public function test_an_axis_unit_shows_plain_values_and_a_right_axis_label_mirrors_the_left_axis(): void
+    {
+        $this->assertSame([
+            '-l', '0', '--slope-mode', '--units-exponent', '0',
+            '--right-axis', '1:0', '--right-axis-label', 'Loss %', '--left-axis-format', '%lg 100%%',
+        ], $this->scaleOptions(new GraphOptions(scaleMin: 0, rightAxisLabel: 'Loss %', axisUnit: '100%'), []));
     }
 
     public function test_it_shortens_long_titles_to_fit_the_width(): void

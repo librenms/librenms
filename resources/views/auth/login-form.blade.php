@@ -10,7 +10,7 @@
     @endconfig
 
     <div class="container-fluid">
-        <form class="form-horizontal" role="form" action="{{ url('login') }}" method="post" name="logonform">
+        <form class="form-horizontal" role="form" action="{{ route('login') }}" method="post" name="logonform">
             {{ csrf_field() }}
             <div class="form-group{{ $errors->has('username') ? ' has-error' : '' }}">
                 <div class="col-md-12">

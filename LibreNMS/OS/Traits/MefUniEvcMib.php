@@ -70,7 +70,7 @@ trait MefUniEvcMib
      */
     private function walkMefEvcs(): ?array
     {
-        $response = SnmpQuery::mibs(['MEF-UNI-EVC-MIB'])->cache()->enumStrings()->abortOnFailure()->walk([
+        $response = SnmpQuery::mibs(['MEF-UNI-EVC-MIB'])->enumStrings()->abortOnFailure()->walk([
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgServiceType',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgIdentifier',
             'MEF-UNI-EVC-MIB::mefServiceEvcCfgMtuSize',

@@ -15,7 +15,7 @@
             <ul class="nav navbar-nav">
 {{-- Overview --}}
                 <li class="dropdown">
-                    <a href="{{ url('overview') }}" class="dropdown-toggle" data-hover="dropdown"
+                    <a href="{{ route('overview') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-home fa-fw fa-lg fa-nav-icons"
                                                  aria-hidden="true"></i> <span
                             class="tw:md:hidden tw:2xl:inline-block">{{ __('Overview') }}</span></a>
@@ -90,7 +90,7 @@
                                 </li>
                                 @endconfig
                                 @can('viewAny', \App\Models\SslCertificate::class)
-                                <li><a href="{{ url('ssl-certificates') }}"><i class="fa fa-lock fa-fw fa-lg fa-nav-icons"
+                                <li><a href="{{ route('ssl-certificates.index') }}"><i class="fa fa-lock fa-fw fa-lg fa-nav-icons"
                                     aria-hidden="true"></i> {{ __('SSL Certificates') }}</a>
                                 </li>
                                 @endcan
@@ -152,9 +152,9 @@
                     @can('viewAny', \App\Models\Location::class)
                     @if($locations->isNotEmpty())
                         <li class="dropdown-submenu">
-                            <a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> {{ __('Geo Locations') }}</a>
+                            <a href="{{ route('locations.index') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> {{ __('Geo Locations') }}</a>
                             <ul class="dropdown-menu scrollable-menu">
-                                <li><a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Locations') }}</a></li>
+                                <li><a href="{{ route('locations.index') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Locations') }}</a></li>
                             @foreach($locations as $location)
                                     <li><a href="{{ route('devices', ['filter' => ['location_id' => ['eq' => $location->id]]]) }}"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> {{ $location->display() }}</a></li>
                             @endforeach
@@ -171,7 +171,7 @@
                         <li role="presentation" class="divider"></li>
                         @endif
                         @can('viewAny', \App\Models\DeviceGroup::class)
-                            <li><a href="{{ url('device-groups') }}"><i class="fa fa-th fa-fw fa-lg"
+                            <li><a href="{{ route('device-groups.index') }}"><i class="fa fa-th fa-fw fa-lg"
                                                                         aria-hidden="true"></i> {{ __('Manage Groups') }}
                                 </a></li>
                         @endcan
@@ -179,7 +179,7 @@
                         <li><a href="{{ route('device-dependencies.index') }}"><i class="fa fa-group fa-fw fa-lg"></i> {{ __('Device Dependencies') }}</a></li>
                         @endcan
                         @if($show_vmwinfo)
-                            <li><a href="{{ url('vminfo') }}"><i
+                            <li><a href="{{ route('vminfo.index') }}"><i
                                         class="fa fa-cog fa-fw fa-lg"></i> {{ __('Virtual Machines') }}</a></li>
                         @endif
                         @canany(['device.create', 'device.delete'])
@@ -203,11 +203,11 @@
                                                  aria-hidden="true"></i> <span
                             class="tw:md:hidden tw:lg:inline-block">{{ __('Maps') }}</span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ url('availability-map') }}"><i class="fa fa-arrow-circle-up fa-fw fa-lg"
+                        <li><a href="{{ route('maps.availability') }}"><i class="fa fa-arrow-circle-up fa-fw fa-lg"
                                                                        aria-hidden="true"></i> {{ __('Availability') }}
                             </a></li>
                         @if($device_dependencies)
-                        <li><a href="{{ url('maps/devicedependency') }}"><i class="fa fa-chain fa-fw fa-lg"
+                        <li><a href="{{ route('maps.devicedependency') }}"><i class="fa fa-chain fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Device Dependency') }}</a></li>
                         @endif
                         @if($device_group_dependencies)
@@ -216,17 +216,17 @@
                                 </a>
                                 <ul class="dropdown-menu scrollable-menu">
                                     @foreach($device_groups as $group)
-                                        <li><a href="{{ url("maps/devicedependency?group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-chain fa-fw fa-lg" aria-hidden="true"></i>
+                                        <li><a href="{{ route('maps.devicedependency', ['group' => $group->id]) }}" title="{{ $group->desc }}"><i class="fa fa-chain fa-fw fa-lg" aria-hidden="true"></i>
                                                 {{ ucfirst($group->name) }}
                                             </a></li>
                                     @endforeach
                                 </ul></li>
                         @endif
                         @if($links)
-                        <li><a href="{{ url('map') }}"><i class="fa fa-sitemap fa-fw fa-lg"
+                        <li><a href="{{ route('maps.network') }}"><i class="fa fa-sitemap fa-fw fa-lg"
                                                           aria-hidden="true"></i> {{ __('Network') }}</a></li>
                         @endif
-                        <li><a href="{{ url('fullscreenmap') }}"><i class="fa fa-expand fa-fw fa-lg"
+                        <li><a href="{{ route('maps.fullscreen') }}"><i class="fa fa-expand fa-fw fa-lg"
                                                                     aria-hidden="true"></i> {{ __('Geographical') }}
                             </a></li>
                         <li><a href="{{ route('maps.custom.index') }}">
@@ -238,7 +238,7 @@
                                 </a>
                                 <ul class="dropdown-menu scrollable-menu">
                                     @foreach($device_groups as $group)
-                                        <li><a href="{{ url("map/group=$group->id") }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i>
+                                        <li><a href="{{ route('maps.network', ['group' => $group->id]) }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i>
                                                 {{ ucfirst($group->name) }}
                                             </a></li>
                                     @endforeach
@@ -344,7 +344,7 @@
 
                             @if($port_nac)
                                 <li role="presentation" class="divider"></li>
-                                <li><a href="{{ url('nac') }}"><i class="fa fa-lock fa-fw fa-lg"
+                                <li><a href="{{ route('nac') }}"><i class="fa fa-lock fa-fw fa-lg"
                                                                   aria-hidden="true"></i> NAC</a></li>
                             @endif
 
@@ -387,11 +387,11 @@
 
                             <li role="presentation" class="divider"></li>
                             @can('manage', \App\Models\PortGroup::class)
-                            <li><a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Manage Groups') }} </a></li>
+                            <li><a href="{{ route('port-groups.index') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Manage Groups') }} </a></li>
                             @endcan
                             @if($port_groups->isNotEmpty())
                                 <li class="dropdown-submenu">
-                                <a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Port Groups') }}</a>
+                                <a href="{{ route('port-groups.index') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Port Groups') }}</a>
                                 <ul class="dropdown-menu scrollable-menu">
                                 @foreach($port_groups as $group)
                                     <li><a href="{{ route('ports', ['filter' => ['groups.id' => ['eq' => $group->id]]]) }}" title="{{ $group->desc }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($group->name) }}</a></li>
@@ -430,28 +430,28 @@
 {{-- Sensors --}}
                 @if($show_health_menu)
                 <li class="dropdown">
-                    <a href="{{ url('health') }}" class="dropdown-toggle" data-hover="dropdown"
+                    <a href="{{ route('sensor.index') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-heartbeat fa-fw fa-lg fa-nav-icons"
                                                  aria-hidden="true"></i> <span class="tw:md:hidden tw:lg:inline-block">{{ __('Health') }}</span></a>
                     <ul class="dropdown-menu">
                         @can('viewAny', \App\Models\Sensor::class)
-                        <li><a href="{{ url('health/metric=all?status=alert') }}"><i class="fas fa-bell fa-fw fa-lg"
+                        <li><a href="{{ route('sensor.index', ['metric' => 'all', 'status' => 'alert']) }}"><i class="fas fa-bell fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Alerts') }}</a>
                         </li>
                         <li role="presentation" class="divider"></li>
                         @endcan
                         @can('viewAny', \App\Models\Mempool::class)
-                        <li><a href="{{ url('health/metric=mempool') }}"><i class="fas fa-memory fa-fw fa-lg"
+                        <li><a href="{{ route('sensor.index', ['metric' => 'mempool']) }}"><i class="fas fa-memory fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Memory') }}</a>
                         </li>
                         @endcan
                         @can('viewAny', \App\Models\Processor::class)
-                        <li><a href="{{ url('health/metric=processor') }}"><i class="fa fa-microchip fa-fw fa-lg"
+                        <li><a href="{{ route('sensor.index', ['metric' => 'processor']) }}"><i class="fa fa-microchip fa-fw fa-lg"
                                                                               aria-hidden="true"></i> {{ __('Processor') }}
                             </a></li>
                         @endcan
                         @can('viewAny', \App\Models\Storage::class)
-                        <li><a href="{{ url('health/metric=storage') }}"><i class="fa fa-database fa-fw fa-lg"
+                        <li><a href="{{ route('sensor.index', ['metric' => 'storage']) }}"><i class="fa fa-database fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Storage') }}</a>
                         </li>
                         @endcan
@@ -462,7 +462,7 @@
                                 @if($loop->first)
                                     <li role="presentation" class="divider"></li>
                                 @endif
-                                <li><a href="{{ url('health/metric=' . $sensor_menu_entry['class']) }}"><i class="fa fa-{{ $sensor_menu_entry['icon'] }} fa-fw fa-lg" aria-hidden="true"></i> {{ $sensor_menu_entry['descr'] }}</a></li>
+                                <li><a href="{{ route('sensor.index', ['metric' => $sensor_menu_entry['class']]) }}"><i class="fa fa-{{ $sensor_menu_entry['icon'] }} fa-fw fa-lg" aria-hidden="true"></i> {{ $sensor_menu_entry['descr'] }}</a></li>
                             @endforeach
                         @endforeach
                         @endcan
@@ -473,13 +473,13 @@
                 @can('viewAny', \App\Models\WirelessSensor::class)
                 @if($wireless_menu->isNotEmpty())
                     <li class="dropdown">
-                        <a href="{{ url('wireless') }}" class="dropdown-toggle" data-hover="dropdown"
+                        <a href="{{ route('wireless.index') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-wifi fa-fw fa-lg fa-nav-icons"
                                                      aria-hidden="true"></i> <span
                                 class="tw:md:hidden tw:2xl:inline-block">{{ __('wireless.title') }}</span></a>
                         <ul class="dropdown-menu">
                         @foreach($wireless_menu as $wireless_menu_entry)
-                                <li><a href="{{ url('wireless/metric=' . $wireless_menu_entry->sensor_class->value) }}"><i class="fa fa-{{ $wireless_menu_entry->icon() }} fa-fw fa-lg" aria-hidden="true"></i> {{ $wireless_menu_entry->classDescr() }}</a></li>
+                                <li><a href="{{ route('wireless.index', ['metric' => $wireless_menu_entry->sensor_class->value]) }}"><i class="fa fa-{{ $wireless_menu_entry->icon() }} fa-fw fa-lg" aria-hidden="true"></i> {{ $wireless_menu_entry->classDescr() }}</a></li>
                         @endforeach
                         </ul>
                     </li>
@@ -530,25 +530,26 @@
 {{-- App --}}
                 @if(Gate::allows('viewAny', \App\Models\Application::class) && $app_menu->isNotEmpty())
                     <li class="dropdown">
-                        <a href="{{ url('apps') }}" class="dropdown-toggle" data-hover="dropdown"
+                        <a href="{{ route('apps.index') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons"
                                                      aria-hidden="true"></i> <span
                                 class="tw:md:hidden tw:2xl:inline-block">{{ __('Apps') }}</span></a>
                         <ul class="dropdown-menu">
-                            <li><a href="{{ url('apps') }}"><i class="fa fa-object-group fa-fw fa-lg"
+                            <li><a href="{{ route('apps.index') }}"><i class="fa fa-object-group fa-fw fa-lg"
                                                                aria-hidden="true"></i> {{ __('Overview') }}</a></li>
                             @foreach($app_menu as $app_type => $app_instances)
-                                @if($app_instances->filter->app_instance->isNotEmpty())
+                                @php($instances = $app_instances->pluck('app_instance')->filter(fn ($instance) => filled($instance))->unique())
+                                @if($instances->isNotEmpty())
                                     <li class="dropdown-submenu">
-                                        <a href="{{ url('apps/app=' . $app_type) }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ $app_instances->first()->displayName() }}</a>
+                                        <a href="{{ route('apps.index', ['app' => $app_type]) }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ $app_instances->first()->displayName() }}</a>
                                         <ul class="dropdown-menu scrollable-menu">
-                                            @foreach($app_instances as $app_instance)
-                                            <li><a href="{{ url("apps/app=$app_type/instance=$app_instance->app_instance") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($app_instance->app_instance) }}</a></li>
+                                            @foreach($instances as $instance)
+                                                <li><a href="{{ route('apps.index', ['app' => $app_type, 'instance' => $instance]) }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ $instance }}</a></li>
                                             @endforeach
                                         </ul>
                                     </li>
                                 @else
-                                    <li><a href="{{ url('apps/app=' . $app_type) }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ $app_instances->first()->displayName() }}</a></li>
+                                    <li><a href="{{ route('apps.index', ['app' => $app_type]) }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ $app_instances->first()->displayName() }}</a></li>
                                 @endif
                             @endforeach
                         </ul>
@@ -609,7 +610,7 @@
                         <li role="presentation" class="divider"></li>
                         @endif
                         @can('viewAny', \App\Models\AlertRule::class)
-                        <li><a href="{{ url('alert-rules') }}"><i class="fa fa-list fa-fw fa-lg"
+                        <li><a href="{{ route('alert-rules.index') }}"><i class="fa fa-list fa-fw fa-lg"
                                                                   aria-hidden="true"></i> {{ __('Alert Rules') }}</a></li>
                         @endcan
                         @can('viewAny', \App\Models\AlertOperation::class)
@@ -715,9 +716,9 @@
                         <span class="visible-xs-inline-block">{{ __('settings.title') }}</span></a>
                     <ul class="dropdown-menu">
                         @canany(['settings.view', 'settings.update'])
-                        <li><a href="{{ url('settings') }}"><i class="fa fa-cogs fa-fw fa-lg"
+                        <li><a href="{{ route('settings') }}"><i class="fa fa-cogs fa-fw fa-lg"
                                                                aria-hidden="true"></i> {{ __('Global Settings') }}</a></li>
-                        <li><a href="{{ url('validate') }}"><i class="fa fa-check-circle fa-fw fa-lg"
+                        <li><a href="{{ route('validate') }}"><i class="fa fa-check-circle fa-fw fa-lg"
                                                                aria-hidden="true"></i> {{ __('Validate Config') }}</a></li>
                         @endcanany
                         @can('viewAny', \App\Models\User::class)
@@ -757,7 +758,7 @@
                                 @endcan
                                 @if(\App\Horizon\Supervisors::supported())
                                 @can('worker.horizon')
-                                <li><a href="{{ url(config('horizon.path')) }}" target="_blank"><i class="fa fa-external-link fa-fw fa-lg" aria-hidden="true"></i> {{ __('Horizon') }}</a></li>
+                                <li><a href="{{ route('horizon.index') }}" target="_blank"><i class="fa fa-external-link fa-fw fa-lg" aria-hidden="true"></i> {{ __('Horizon') }}</a></li>
                                 @endcan
                                 @endif
                                 @endif
@@ -787,7 +788,7 @@
                             </ul>
                         </li>
                         <li role="presentation" class="divider" id="countdown_timer_divider" style="display: none"></li>
-                        <li><a href="{{ url('about') }}"><i class="fa-solid fa-circle-info fa-fw fa-lg"
+                        <li><a href="{{ route('about') }}"><i class="fa-solid fa-circle-info fa-fw fa-lg"
                                                             aria-hidden="true"></i> {{ __('About :project_name', ['project_name' => $project_name]) }}
                             </a></li>
                     </ul>

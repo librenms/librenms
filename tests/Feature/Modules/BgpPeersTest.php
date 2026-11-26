@@ -35,7 +35,9 @@ use App\Models\Vrf;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
+use LibreNMS\Exceptions\SnmpConnectionException;
 use LibreNMS\Exceptions\SnmpException;
+use LibreNMS\Exceptions\UnsupportedSnmpOption;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\BgpAddressFamilyDiscovery;
 use LibreNMS\Modules\BgpPeers;
@@ -134,11 +136,19 @@ final class BgpPeersTest extends DBTestCase
     public function testUnansweredDiscoveryKeepsSessions(): void
     {
         $this->device->bgppeers()->create($this->peerAttributes('10.0.0.1'));
-        $os = $this->os(exception: new SnmpException('Timeout'));
+        $os = $this->os(exception: new SnmpConnectionException('Timeout'));
 
         (new BgpPeers)->discover($os);
 
         $this->assertSame(['10.0.0.1'], $this->device->bgppeers()->pluck('bgpPeerIdentifier')->all());
+    }
+
+    public function testDiscoveryPropagatesUnsupportedSnmpOptions(): void
+    {
+        $os = $this->os(exception: new UnsupportedSnmpOption('Unknown option'));
+
+        $this->expectException(UnsupportedSnmpOption::class);
+        (new BgpPeers)->discover($os);
     }
 
     public function testOnlyNewSessionsWithAnAddressAreAutoDiscovered(): void

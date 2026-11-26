@@ -7,7 +7,6 @@ use App\Models\Eventlog;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Util\Url;
 
 class LogsSearchController extends GroupedSearchController
 {
@@ -33,7 +32,7 @@ class LogsSearchController extends GroupedSearchController
                     Severity::Error => 'tw:border-l-red-600!',
                     default => 'tw:border-l-gray-400!',
                 },
-                'url' => Url::deviceUrl($eventlog->device_id, ['tab' => 'logs']),
+                'url' => route('device.eventlog', ['device' => $eventlog->device_id]),
             ]);
 
         return [$eventlog->isEmpty() ? null : ['type' => 'eventlog', 'label' => __('search.eventlog'), 'results' => $eventlog]];

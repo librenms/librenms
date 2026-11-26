@@ -27,6 +27,7 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
@@ -38,5 +39,21 @@ class Quantastor extends OS implements OSDiscovery
         $device->version = $info['storageSystem-ServiceVersion.0'];
         $device->hardware = $info['hwEnclosure-Vendor.0'] . ' ' . $info['hwEnclosure-Model.0'];
         $device->serial = $info['storageSystem-SerialNumber.0'];
+    }
+
+    /**
+     * Temperatures are strings, use the first number
+     */
+    public function pollSensors(EloquentCollection $sensors): array
+    {
+        $values = parent::pollSensors($sensors);
+
+        foreach ($sensors->where('sensor_class', 'temperature') as $sensor) {
+            if (preg_match('/([0-9]+)/', (string) ($values[$sensor->sensor_id] ?? ''), $matches)) {
+                $values[$sensor->sensor_id] = $matches[1];
+            }
+        }
+
+        return $values;
     }
 }

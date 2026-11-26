@@ -223,7 +223,7 @@
                     });
                     network.on('doubleClick', function (properties) {
                         if (properties.nodes > 0) {
-                            window.location.href = "device/device="+properties.nodes+"/"
+                            window.location.href = route('device.overview', {device: properties.nodes[0]})
                         }
                     });
                     visPopups.attach(network);

@@ -19,9 +19,11 @@ class Memory extends Component
     public function __construct(public Device $device)
     {
         $this->mempools = $device->mempools->map(function (Mempool $mempool) use ($device): array {
-            $total = Number::formatBi($mempool->mempool_total);
-            $used = Number::formatBi($mempool->mempool_used);
-            $free = Number::formatBi($mempool->mempool_free);
+            $isPercent = $mempool->mempool_total == 100;
+            $suffix = $isPercent ? '%' : 'B';
+            $total = Number::formatBi($mempool->mempool_total, suffix: $suffix);
+            $used = Number::formatBi($mempool->mempool_used, suffix: $suffix);
+            $free = Number::formatBi($mempool->mempool_free, suffix: $suffix);
             $percent = (float) $mempool->mempool_perc;
             $shadow = null;
 
@@ -31,8 +33,9 @@ class Memory extends Component
                 $shadow = Number::calculatePercent($mempool->mempool_used + $buffers + $cached, $mempool->mempool_total, 0);
             }
 
-            [$leftText, $rightText] = match ($mempool->mempool_class) {
-                'system', 'virtual', 'swap' => ["$used / $total ($percent%)", $free],
+            [$leftText, $rightText] = match (true) {
+                $isPercent => ["$percent%", ''],
+                in_array($mempool->mempool_class, ['system', 'virtual', 'swap'], true) => ["$used / $total ($percent%)", $free],
                 default => ["$used ($percent%)", ''],
             };
 

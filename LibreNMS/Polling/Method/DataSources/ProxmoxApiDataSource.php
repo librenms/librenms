@@ -7,6 +7,8 @@ use App\ApiClients\Data\ProxmoxGuest;
 use App\ApiClients\ProxmoxApi;
 use App\Data\TimeSeries\MetricCollector;
 use App\Models\Vminfo;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\VminfoDiscovery;
@@ -79,8 +81,8 @@ class ProxmoxApiDataSource implements VminfoClusterSource, VminfoDiscovery, Vmin
     {
         $guests = $this->localGuests();
         $vms = array_filter($guests[self::TYPE_VM], fn (ProxmoxGuest $vm): bool => ! $vm->template);
-        $running = array_filter($vms, fn (ProxmoxGuest $vm): bool => $vm->isRunning());
-        $guestOs = $this->api->getVmsGuestOs(array_column($running, 'id'));
+        $agentVms = array_filter($vms, fn (ProxmoxGuest $vm): bool => $vm->canQueryGuestAgent());
+        $guestOs = $this->api->getVmsGuestOs(array_keys($agentVms));
 
         $containers = array_filter($guests[self::TYPE_CONTAINER], fn (ProxmoxGuest $container): bool => ! $container->template);
         $containerOs = $this->api->getContainersOsType(array_column($containers, 'id'));
@@ -102,8 +104,9 @@ class ProxmoxApiDataSource implements VminfoClusterSource, VminfoDiscovery, Vmin
 
         $polledVms = $vms->where('vm_type', self::TYPE_VM);
         $polledGuests = array_intersect_key($guests[self::TYPE_VM], $polledVms->keyBy('vmwVmVMID')->all());
-        $running = array_filter($polledGuests, fn (ProxmoxGuest $guest): bool => $guest->isRunning());
-        $filesystems = $this->api->getVmsFsInfo(array_keys($running));
+        $agentVms = array_filter($polledGuests, fn (ProxmoxGuest $vm): bool => $vm->canQueryGuestAgent());
+        $filesystems = $this->api->getVmsFsInfo(array_keys($agentVms));
+        $clusterCpu = $this->clusterCpu();
 
         foreach ($vms as $vm) {
             $guest = $guests[$vm->vm_type][$vm->vmwVmVMID] ?? null;
@@ -121,7 +124,7 @@ class ProxmoxApiDataSource implements VminfoClusterSource, VminfoDiscovery, Vmin
 
             // CPU
             $metrics->record($vm, 'vm.cpu', [
-                'usage' => $guest->cpu * 100,
+                'usage' => ($clusterCpu[$vm->vm_type][$guest->id] ?? $guest->cpu) * 100,
             ]);
 
             // Memory
@@ -149,6 +152,23 @@ class ProxmoxApiDataSource implements VminfoClusterSource, VminfoDiscovery, Vmin
         }
 
         return $vms;
+    }
+
+    /**
+     * The CPU usage measured by pvestatd, the node lists report 0 now and then (a Proxmox VE bug), see ProxmoxApi::clusterGuestCpu().
+     * Without it the node lists are used.
+     *
+     * @return array{proxmox: array<int, float>, proxmox-lxc: array<int, float>}
+     */
+    private function clusterCpu(): array
+    {
+        try {
+            $cpu = $this->api->clusterGuestCpu();
+        } catch (ConnectionException|RequestException) {
+            return [self::TYPE_VM => [], self::TYPE_CONTAINER => []];
+        }
+
+        return [self::TYPE_VM => $cpu['qemu'], self::TYPE_CONTAINER => $cpu['lxc']];
     }
 
     /**

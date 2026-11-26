@@ -46,7 +46,7 @@ class HistoricbitsGraph extends BillGraph
         $xmin = $ticks[0];
         $xmax = $ticks[count($ticks) - 1];
 
-        $graph = $this->newGraph($graph_data['graph_name'] ?? 'Bill Graph', 'Bits per second', 'datlin', [0, 0, $graph_data['from'], $graph_data['to']]);
+        $graph = $this->newGraph($graph_data['graph_name'] ?? __('graph.bill.graph'), __('graph.bill.bits_per_second'), 'datlin', [0, 0, $graph_data['from'], $graph_data['to']]);
         $graph->legend->Pos(0.52, 0.90, 'center');
         $graph->xaxis->SetTextLabelInterval(2);
         $graph->xaxis->SetLabelFormatCallback(function ($aVal) use ($dur) {
@@ -62,18 +62,18 @@ class HistoricbitsGraph extends BillGraph
         $graph->yaxis->HideZeroLabel(1);
 
         $lineplot = new LinePlot($graph_data['tot_data'], $ticks);
-        $lineplot->SetLegend('Traffic total');
+        $lineplot->SetLegend(__('graph.bill.traffic_total'));
         $lineplot->SetColor('#d5d5d5');
         $lineplot->SetFillColor('#d5d5d5@0.5');
 
         $lineplot_in = new LinePlot($graph_data['in_data'], $ticks);
-        $lineplot_in->SetLegend('Traffic In');
+        $lineplot_in->SetLegend(__('graph.bill.traffic_in'));
         $lineplot_in->SetColor('darkgreen');
         $lineplot_in->SetFillColor('lightgreen@0.4');
         $lineplot_in->SetWeight(1);
 
         $lineplot_out = new LinePlot(array_map(fn ($x) => $x * -1, $graph_data['out_data']), $ticks);
-        $lineplot_out->SetLegend('Traffic Out');
+        $lineplot_out->SetLegend(__('graph.bill.traffic_out'));
         $lineplot_out->SetColor('darkblue');
         $lineplot_out->SetFillColor('lightblue@0.4');
         $lineplot_out->SetWeight(1);

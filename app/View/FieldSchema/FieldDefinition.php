@@ -206,6 +206,8 @@ class FieldDefinition
             }
         } elseif ($this->type === 'select' && ! empty($this->options)) {
             $generated[] = Rule::in(array_keys($this->options));
+        } elseif ($this->type === 'checkbox') {
+            $generated[] = 'boolean';
         } elseif (in_array($this->type, ['text', 'password'], true)) {
             $generated[] = 'string';
         }
@@ -227,6 +229,8 @@ class FieldDefinition
         if ($targetType === null) {
             if ($this->type === 'number') {
                 $targetType = 'int';
+            } elseif ($this->type === 'checkbox') {
+                $targetType = 'bool';
             } elseif (in_array($this->type, ['text', 'password', 'select'], true)) {
                 $targetType = 'string';
             }

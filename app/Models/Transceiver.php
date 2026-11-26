@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\Filterable;
 use App\Observers\TransceiverObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,7 +11,10 @@ use LibreNMS\Interfaces\Models\Keyable;
 #[ObservedBy([TransceiverObserver::class])]
 class Transceiver extends PortRelatedModel implements Keyable
 {
+    use Filterable;
     use HasFactory;
+
+    protected array $filterable = ['device_id'];
 
     protected $fillable = [
         'device_id',

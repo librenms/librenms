@@ -52,7 +52,7 @@ class PackagesController implements DeviceTab
 
     public function name(): string
     {
-        return __('Pkgs');
+        return __('Packages');
     }
 
     public function data(Device $device, Request $request): array

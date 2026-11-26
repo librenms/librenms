@@ -42,13 +42,13 @@ class HistoricmonthlyGraph extends BillGraph
         $graph = $this->transferGraph($graph_data);
 
         $barplot_over = new BarPlot($graph_data['overuse_data']);
-        $barplot_over->SetLegend('Traffic Overusage');
+        $barplot_over->SetLegend(__('graph.bill.traffic_overusage'));
         $barplot_over->SetColor('darkred');
         $barplot_over->SetFillColor('lightred@0.4');
         $barplot_over->SetWeight(1);
 
         $lineplot_allow = new LinePlot($graph_data['allow_data']);
-        $lineplot_allow->SetLegend('Traffic Allowed');
+        $lineplot_allow->SetLegend(__('graph.bill.traffic_allowed'));
         $lineplot_allow->SetColor('black');
         $lineplot_allow->SetWeight(1);
 

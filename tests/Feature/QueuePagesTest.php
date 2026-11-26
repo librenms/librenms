@@ -60,7 +60,7 @@ class QueuePagesTest extends TestCase
             ->assertSee('node-a')
             ->assertSee('poll-7, discovery-7')
             ->assertSee('4.5 / 6')
-            ->assertSee(url(config('horizon.path')))
+            ->assertSee(route('horizon.index'))
             ->assertSee('PollDevice')
             ->assertSee('SNMP timeout')
             ->assertSeeInOrder([__('Down Devices Retrying'), 'PollDevice', '2 / 4', __('Failed Jobs')])
@@ -113,6 +113,14 @@ class QueuePagesTest extends TestCase
         $this->actingAs($user)->post(route('poller.queues.retry', 'job-uuid'))->assertForbidden();
     }
 
+    public function test_menu_links_to_horizon(): void
+    {
+        $this->actingAs(User::factory()->admin()->create(['enabled' => true]))
+            ->get(route('about'))
+            ->assertOk()
+            ->assertSee('href="' . route('horizon.index') . '"', false);
+    }
+
     public function test_queues_require_a_queue(): void
     {
         config(['queue.default' => 'sync']);
@@ -129,7 +137,7 @@ class QueuePagesTest extends TestCase
             ->get(route('poller.queues'))
             ->assertOk()
             ->assertSee(__('Failed Jobs'))
-            ->assertDontSee(url(config('horizon.path')));
+            ->assertDontSee(route('horizon.index'));
     }
 
     public function test_queues_hidden_when_queue_workers_are_not_used(): void
@@ -142,7 +150,7 @@ class QueuePagesTest extends TestCase
         $this->actingAs($user)->get(route('poller.performance'))
             ->assertOk()
             ->assertDontSee(route('poller.queues'))
-            ->assertDontSee(url(config('horizon.path')));
+            ->assertDontSee(route('horizon.index'));
     }
 
     public function test_pollers_page_lists_worker_nodes_without_stats(): void
@@ -179,7 +187,7 @@ class QueuePagesTest extends TestCase
         $this->mock(FailedJobs::class, fn (MockInterface $mock) => $mock->shouldReceive('list')->with($device->device_id)->andReturn(collect()));
 
         $this->actingAs(User::factory()->admin()->create(['enabled' => true]))
-            ->get(route('device', ['device' => $device->device_id, 'tab' => 'capture', 'section' => 'jobs']))
+            ->get(route('device.capture', ['device' => $device->device_id, 'section' => 'jobs']))
             ->assertOk()
             ->assertSee(route('device.jobs.monitor', $device))
             ->assertSee("activeTab: 'jobs'", false)
@@ -199,7 +207,7 @@ class QueuePagesTest extends TestCase
         $this->mock(FailedJobs::class, fn (MockInterface $mock) => $mock->shouldReceive('list')->andReturn(collect()));
 
         $this->actingAs(User::factory()->admin()->create(['enabled' => true]))
-            ->get(route('device', ['device' => $device->device_id, 'tab' => 'capture', 'section' => 'jobs']))
+            ->get(route('device.capture', ['device' => $device->device_id, 'section' => 'jobs']))
             ->assertOk()
             ->assertSee('DiscoverDevice:' . $device->device_id)
             ->assertSee(route('device.jobs.stop-monitoring', $device));
@@ -212,7 +220,7 @@ class QueuePagesTest extends TestCase
         $this->mock(FailedJobs::class, fn (MockInterface $mock) => $mock->shouldReceive('list')->andReturn(collect([$this->job(['device_id' => $device->device_id])])));
 
         $this->actingAs(User::factory()->admin()->create(['enabled' => true]))
-            ->get(route('device', ['device' => $device->device_id, 'tab' => 'capture', 'section' => 'jobs']))
+            ->get(route('device.capture', ['device' => $device->device_id, 'section' => 'jobs']))
             ->assertOk()
             ->assertSee('SNMP timeout')
             ->assertDontSee(route('device.jobs.monitor', $device));
@@ -228,7 +236,7 @@ class QueuePagesTest extends TestCase
         $this->mock(FailedJobs::class, fn (MockInterface $mock) => $mock->shouldNotReceive('list'));
 
         $this->actingAs(User::factory()->admin()->create(['enabled' => true]))
-            ->get(route('device', ['device' => $device->device_id, 'tab' => 'capture']))
+            ->get(route('device.capture', ['device' => $device->device_id]))
             ->assertOk()
             ->assertDontSee(route('device.jobs.monitor', $device));
     }
@@ -268,7 +276,7 @@ class QueuePagesTest extends TestCase
         });
         $user = $this->userWithPermissions('worker.update', 'device.viewAll');
 
-        $capture = route('device', ['device' => $device->device_id, 'tab' => 'capture', 'section' => 'jobs']);
+        $capture = route('device.capture', ['device' => $device->device_id, 'section' => 'jobs']);
         $this->actingAs($user)->post(route('device.jobs.monitor', $device))->assertRedirect($capture);
         $this->actingAs($user)->delete(route('device.jobs.stop-monitoring', $device))->assertRedirect($capture);
     }

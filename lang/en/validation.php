@@ -99,6 +99,8 @@ return [
             ],
             'CheckRrdcachedConnectivity' => [
                 'fail_socket' => ':socket does not exist. The rrdcached connectivity test failed.',
+                'fail_socket_connect' => 'Cannot connect to rrdcached socket :socket as user :user: :error',
+                'fix_socket_connect' => 'Make sure rrdcached is running and the group :group can read and write the socket: rrdcached options "-s :group -m 0660" before -l (SOCKGROUP and SOCKMODE on Debian and Ubuntu)',
                 'fail_port' => 'Cannot connect to rrdcached server :server on port :port',
                 'ok' => 'Connected to rrdcached',
             ],
@@ -194,6 +196,10 @@ return [
                 'nodes_down' => 'Some dispatcher nodes did not check in recently',
                 'not_detected' => 'Dispatcher Service not detected',
                 'warn' => 'The Dispatcher Service was used, but not recently',
+            ],
+            'CheckLegacySensorIncludes' => [
+                'warn' => 'Legacy sensor include files are deprecated and support for them will be removed.',
+                'fix' => 'Convert them to YAML sensor discovery, or to sensor code in the PHP class of the OS when YAML is not possible, then delete them. See https://docs.librenms.org/Developing/os/Health-Information/',
             ],
             'CheckLocking' => [
                 'fail' => 'Caching server issue: :message',

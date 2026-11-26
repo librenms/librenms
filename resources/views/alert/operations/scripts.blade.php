@@ -74,7 +74,7 @@ $(function () {
         initAoSuppressSwitch();
         $aoSuppress.bootstrapSwitch('state', !!defaultSuppress);
         if (opId) {
-            $.get('{{ url('alert-operation') }}/' + opId, function (res) {
+            $.get(route('alert-operation.show', {alert_operation: opId}), function (res) {
                 if (res.status !== 'ok' || !res.operation) {
                     return;
                 }
@@ -131,7 +131,7 @@ $(function () {
             $('#alert-operation-form-error').text(@json(__('Add at least one segment.'))).show();
             return;
         }
-        var url = '{{ url('alert-operation') }}';
+        var url = opId ? route('alert-operation.update', {alert_operation: opId}) : route('alert-operation.store');
         var dsRaw = $('#ao_default_step_duration').val();
         var body = {
             name: $('#ao_name').val(),
@@ -141,7 +141,6 @@ $(function () {
             _token: '{{ csrf_token() }}'
         };
         if (opId) {
-            url += '/' + opId;
             body._method = 'PUT';
         }
         $.ajax({
@@ -186,7 +185,7 @@ $(document).on('click', '.btn-delete-alert-operation', function () {
     }
     $.ajax({
         type: 'POST',
-        url: '{{ url('alert-operation') }}/' + id,
+        url: route('alert-operation.destroy', {alert_operation: id}),
         data: {_token: '{{ csrf_token() }}', _method: 'DELETE'},
         dataType: 'json',
         success: function (data) {
