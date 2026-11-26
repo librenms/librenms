@@ -245,7 +245,10 @@ class Isis implements Module
             default => [],
         };
 
-        $row = Arr::first($circuit_levels); // undefined usage: use the first configured level
+        // Metrics are level-specific: for a known usage, only the matching
+        // level's row applies, so a missing row yields null rather than another
+        // level's metrics. Unknown usage falls back to the first configured level.
+        $row = empty($level_keys) ? Arr::first($circuit_levels) : [];
         foreach ($level_keys as $key) {
             if (isset($circuit_levels[$key])) {
                 $row = $circuit_levels[$key];
