@@ -54,6 +54,17 @@ class Rewrite
         return trim(str_replace('PowerSupply', 'PSU ', preg_replace(['/^temperatures /', '/^voltages /'], '', $descr)));
     }
 
+    /**
+     * Shorten processor descriptions for display by removing vendor and trademark noise
+     * such as "GenuineIntel:", "Intel(R)", "(TM)" and a standalone "CPU".
+     */
+    public static function processorDescr(?string $descr): string
+    {
+        $descr = str_ireplace(['GenuineIntel:', 'AuthenticAMD:', 'Intel(R)', '(R)', '(TM)'], '', (string) $descr);
+
+        return trim(preg_replace(['/\bCPU\b/', '/\s+/'], ['', ' '], $descr));
+    }
+
     public static function ipmiSensorName(?string $hardware, string $sensor): string
     {
         $names = [
