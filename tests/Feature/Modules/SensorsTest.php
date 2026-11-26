@@ -25,6 +25,7 @@
 namespace LibreNMS\Tests\Feature\Modules;
 
 use App\Facades\DeviceCache;
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
 use App\Models\Sensor;
@@ -32,17 +33,25 @@ use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
+use InfluxDB\Database;
 use LibreNMS\Data\Source\Snmp\RawSnmpResponse;
 use LibreNMS\Data\Source\Snmp\SnmpBackendInterface;
+use LibreNMS\Data\Store\Datastore;
+use LibreNMS\Data\Store\InfluxDB;
+use LibreNMS\Data\Store\Rrd;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Modules\Sensors;
 use LibreNMS\OS;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
+use LibreNMS\RRD\Backend\RrdBackendInterface;
+use LibreNMS\RRD\RrdPath;
 use LibreNMS\Tests\InMemoryDbTestCase;
 use LibreNMS\Tests\Traits\FakesPollingMethods;
 use Mockery;
+use PHPUnit\Framework\Attributes\TestWith;
 
 final class SensorsTest extends InMemoryDbTestCase
 {
@@ -195,12 +204,19 @@ EOT;
 
     public function testPollUsesTheSdrFromTheIpmiCheck(): void
     {
+        LibrenmsConfig::set('datastore.canonical_metrics', false);
         $module = new Sensors;
         Sensor::factory()->create(['device_id' => $this->device->device_id, 'poller_type' => 'ipmi', 'sensor_class' => 'temperature', 'sensor_index' => '0', 'sensor_type' => 'ipmi', 'sensor_descr' => 'CPU Temp']);
+        $store = Mockery::mock(DatastoreContract::class);
+        $store->shouldReceive('write')->once()->with('ipmi', ['sensor' => 47], [
+            'sensor_class' => 'temperature',
+            'sensor_type' => 'ipmi',
+            'sensor_descr' => 'CPU Temp',
+        ], Mockery::any());
 
         $os = $this->os();
         $this->assertTrue($module->shouldPoll($os));
-        $module->poll($os, Mockery::mock(WriteInterface::class)->shouldIgnoreMissing());
+        $module->poll($os, new Datastore([$store]));
 
         // the check reads the records, polling does not run ipmitool again
         Process::assertRanTimes(fn (PendingProcess $process) => in_array('sdr', (array) $process->command), 1);
@@ -210,6 +226,7 @@ EOT;
 
     public function testAgentHddtempDiscoverAndPoll(): void
     {
+        LibrenmsConfig::set('datastore.canonical_metrics', false);
         $os = $this->makeOs([PollingMethodType::UnixAgent]);
         $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => "<<<hddtemp>>>\n|/dev/sda|WDC WD1003FBYX|35|C||/dev/sdb|ST4000|SLP|*|\n"]);
         $module = new Sensors;
@@ -225,11 +242,16 @@ EOT;
         $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => "<<<hddtemp>>>\n|/dev/sda|WDC WD1003FBYX|37|C||/dev/sdb|ST4000|SLP|*|\n"]);
         $device = DeviceCache::refresh($os->getDeviceId())->toArray();
         $os = OS::make($device);
-        $datastore = Mockery::mock(WriteInterface::class);
-        $datastore->shouldReceive('write')->once()->withArgs(fn ($measurement, $fields, $tags) => $tags['index'] == 1 && $fields == ['sensor' => 37]);
+        $store = Mockery::mock(DatastoreContract::class);
+        $store->shouldReceive('write')->once()->with('sensor', ['sensor' => 37], [
+            'sensor_class' => 'temperature',
+            'sensor_type' => 'hddtemp',
+            'sensor_descr' => '/dev/sda: WDC WD1003FBYX',
+            'sensor_index' => '1',
+        ], Mockery::any());
 
         $this->assertTrue($module->shouldPoll($os));
-        $module->poll($os, $datastore);
+        $module->poll($os, new Datastore([$store]));
 
         $this->assertEquals([37, null], Sensor::where('device_id', $os->getDeviceId())->orderBy('sensor_index')->pluck('sensor_current')->all());
     }
@@ -296,6 +318,58 @@ EOT;
         (new Sensors)->poll($os, $datastore);
 
         $this->assertEquals(37, Sensor::where('device_id', $os->getDeviceId())->value('sensor_current'));
+    }
+
+    #[TestWith([false, false, 'Receive Power', '1085', '1085'], 'legacy index key')]
+    #[TestWith([false, true, 'Receive Power', '1085', 'Receive_Power'], 'legacy description key')]
+    #[TestWith([false, false, null, '1085', '1085'], 'missing description')]
+    #[TestWith([false, true, 'Receive Power', null, 'Receive_Power'], 'missing index')]
+    #[TestWith([true, false, 'Receive Power', '1085', '1085'], 'canonical index key')]
+    #[TestWith([true, true, 'Receive Power', '1085', 'Receive_Power'], 'canonical description key')]
+    public function testSnmpSensorInfluxTagsAndRrdPath(bool $canonical, bool $byDescription, ?string $description, ?string $index, string $rrdKey): void
+    {
+        LibrenmsConfig::set('datastore.canonical_metrics', $canonical);
+        LibrenmsConfig::set('os.linux.sensor_descr', $byDescription);
+        $os = $this->makeOs([PollingMethodType::Snmp]);
+        $hostname = $os->getDevice()->hostname;
+        $oid = '.1.3.6.1.4.1.2021.13.16.2.1.3.1';
+        Sensor::factory()->create([
+            'device_id' => $os->getDeviceId(),
+            'poller_type' => 'snmp',
+            'sensor_class' => 'dbm',
+            'sensor_type' => 'cisco-entity-sensor',
+            'sensor_descr' => $description,
+            'sensor_index' => $index,
+            'sensor_oid' => $oid,
+        ]);
+        $this->fakeSnmp(fn (array $oids): ?RawSnmpResponse => in_array($oid, $oids) ? new RawSnmpResponse("$oid = -2", '', 0) : null);
+
+        $database = Mockery::mock(Database::class);
+        $database->shouldReceive('writePoints')->once()->with(Mockery::capture($points), 's');
+        $rrdBackend = $this->mock(RrdBackendInterface::class);
+        $rrdBackend->shouldReceive('update')->once()->with(Mockery::capture($rrdPath), [-2], null);
+        $datastore = new Datastore([new InfluxDB($database), new Rrd]);
+
+        (new Sensors)->poll($os, $datastore);
+        $datastore->terminate();
+
+        $this->assertCount(1, $points);
+        $this->assertSame('sensor', $points[0]->getMeasurement());
+        $this->assertSame(['sensor' => -2.0], $points[0]->getFields());
+        $this->assertSame($canonical ? [
+            'hostname' => $hostname,
+            'class' => 'dbm',
+            'type' => 'cisco-entity-sensor',
+            $byDescription ? 'descr' : 'index' => $byDescription ? $description : $index,
+        ] : [
+            'hostname' => $hostname,
+            'sensor_class' => 'dbm',
+            'sensor_type' => 'cisco-entity-sensor',
+            'sensor_descr' => $description ?? '_blank_',
+            'sensor_index' => $index ?? '_blank_',
+        ], $points[0]->getTags());
+        $this->assertInstanceOf(RrdPath::class, $rrdPath);
+        $this->assertSame("$hostname/sensor-dbm-cisco-entity-sensor-$rrdKey.rrd", $rrdPath->relativePath());
     }
 
     public function testLegacyPollingIncludeAdjustsTheValues(): void
