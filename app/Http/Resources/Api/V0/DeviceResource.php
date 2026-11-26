@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Resources;
+namespace App\Http\Resources\Api\V0;
 
 use App\Models\DevicePollingMethod;
 use App\Models\Secret;
@@ -18,7 +18,7 @@ use LibreNMS\Polling\Secrets\Data\SnmpV3SecretData;
 /**
  * @mixin \App\Models\Device
  */
-class Device extends JsonResource
+class DeviceResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
