@@ -30,9 +30,14 @@ use App\Facades\PortCache;
 use App\Models\Device;
 use App\Models\EntPhysical;
 use App\Models\Port;
+use App\Models\Sensor;
 use App\Models\Transceiver;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
+use LibreNMS\Enum\SnmpOidOutput;
+use LibreNMS\Enum\SnmpQuickPrint;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
@@ -44,17 +49,20 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
     private const array SFP_CONNECTORS = [1 => 'undefined', 2 => 'SC', 3 => 'LC', 4 => 'RJ45', 5 => 'DAC'];
 
     // -10000000 (-1000000.0 after the IfotecTenthDbm display hint) means minus infinity: no optical signal
-    public const OPTICAL_POWER_MIN_VALID = -1000.0;
+    public const float OPTICAL_POWER_MIN_VALID = -1000.0;
 
     private const float OPTICAL_POWER_FLOOR = -40.0;
 
     // the device reports minus infinity when the power is 3 dB under the low alarm threshold
     private const float OPTICAL_POWER_INFINITY_MARGIN = 3.0;
 
-    // IfotecYesNoType and IfotecDataStatus (IFOTEC-SMI): value => [name, generic state]
-    // ifoSFPTable: column of the power value => its status
-    private const array POWER_STATUS_COLUMNS = [10 => 'ifoSFPrxPowerStatus', 16 => 'ifoSFPtxPowerStatus'];
+    // ifoSFPTable (IFOTEC-SMI) entry oid
+    private const string SFP_ENTRY_OID = '.1.3.6.1.4.1.21362.101.5.1.1';
 
+    // ifoSFPTable: column of the power value (rx, tx) => column of its status
+    private const array POWER_STATUS_COLUMNS = [10 => 15, 16 => 21];
+
+    // IfotecYesNoType and IfotecDataStatus (IFOTEC-SMI): value => [name, generic state]
     private const array YES_NO = [1 => ['yes', 0], 2 => ['no', 3]];
 
     private const array DATA_STATUS = [
@@ -139,26 +147,80 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
     }
 
     /**
-     * Discover the SFP sensors of the requested classes, called from the dbm and state include files.
+     * Optical power and state sensors of the SFP cages.
      *
-     * @param  string[]  $types
+     * @return Collection<int, Sensor>
      */
-    public function discoverTransceiverSensors($types = ['dbm', 'state']): void
+    protected function discoverOsSensors(): Collection
     {
-        if (in_array('dbm', $types)) {
-            $this->discoverSfpPowerSensors();
+        return parent::discoverOsSensors()
+            ->merge($this->discoverSfpPowerSensors())
+            ->merge($this->discoverSfpStateSensors());
+    }
+
+    /**
+     * A power value whose status is noData is not a measure: it is returned empty, so that
+     * UserFuncHelper::ifotecOpticalPower() records it as unknown. The statuses are read in one get.
+     */
+    public function pollSensors(EloquentCollection $sensors): array
+    {
+        $values = parent::pollSensors($sensors);
+
+        $statusOids = [];
+        foreach ($sensors->where('sensor_type', 'ifotecSfp') as $sensor) {
+            $statusOid = $this->powerStatusOid((string) $sensor->sensor_oid);
+            if ($statusOid !== null) {
+                $statusOids[$sensor->sensor_id] = $statusOid;
+            }
         }
 
-        if (in_array('state', $types)) {
-            $this->discoverSfpStateSensors();
+        if (empty($statusOids)) {
+            return $values;
         }
+
+        $statuses = SnmpQuery::options(new SnmpQueryOptions(
+            oidFormat: SnmpOidOutput::Numeric,
+            numericEnums: true,
+            quickPrint: SnmpQuickPrint::Equals,
+        ))->get(array_values(array_unique($statusOids)))->values();
+
+        foreach ($statusOids as $sensorId => $statusOid) {
+            if (self::isNoData($statuses[$statusOid] ?? null)) {
+                $values[$sensorId] = '';
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * Numeric oid of the status of an optical power value, null when the oid is not an ifoSFPTable power value.
+     */
+    private function powerStatusOid(string $sensorOid): ?string
+    {
+        if (! str_starts_with($sensorOid, self::SFP_ENTRY_OID . '.')) {
+            return null;
+        }
+
+        $parts = explode('.', substr($sensorOid, strlen(self::SFP_ENTRY_OID) + 1));
+        if (count($parts) !== 3) {
+            return null;
+        }
+
+        [$column, $sysIndex, $sfpIndex] = $parts;
+        $statusColumn = self::POWER_STATUS_COLUMNS[(int) $column] ?? null;
+
+        return $statusColumn === null ? null : self::SFP_ENTRY_OID . ".$statusColumn.$sysIndex.$sfpIndex";
     }
 
     /**
      * Receive and transmit optical power sensors of the plugged optical SFPs (SC or LC connector).
+     *
+     * @return Collection<int, Sensor>
      */
-    private function discoverSfpPowerSensors(): void
+    private function discoverSfpPowerSensors(): Collection
     {
+        $sensors = new Collection;
         $sysIndex = $this->sysProductIndex();
         $directions = ['rx' => ['Receive', 10], 'tx' => ['Transmit', 16]];
 
@@ -190,10 +252,10 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
                 $sensorIndex = "ifoSFP{$prefix}PowerVal.$sfpIndex";
 
                 // values read through the MIB are in dBm (DISPLAY-HINT d-1), the numeric OID polled is in tenths of dBm
-                $sensor = new \App\Models\Sensor([
+                $sensor = new Sensor([
                     'poller_type' => 'snmp',
                     'sensor_class' => 'dbm',
-                    'sensor_oid' => ".1.3.6.1.4.1.21362.101.5.1.1.$valueColumn.$sysIndex.$sfpIndex",
+                    'sensor_oid' => self::SFP_ENTRY_OID . ".$valueColumn.$sysIndex.$sfpIndex",
                     'sensor_index' => $sensorIndex,
                     'sensor_type' => 'ifotecSfp',
                     'sensor_descr' => "$ifName Transceiver $label Power",
@@ -216,25 +278,11 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
                     $sensor->sensor_custom = 'Reset';
                 }
 
-                app('sensor-discovery')->discover($sensor);
+                $sensors->push($sensor);
             }
         }
-    }
 
-    /**
-     * True when the status of a polled optical power value is noData: the value is then not a measure.
-     */
-    public static function powerReadingIsNoData(string $sensorOid): bool
-    {
-        [$column, $sysIndex, $sfpIndex] = array_slice(explode('.', $sensorOid), -3);
-        $statusName = self::POWER_STATUS_COLUMNS[(int) $column] ?? null;
-        if ($statusName === null) {
-            return false;
-        }
-
-        $statuses = SnmpQuery::cache()->hideMib()->walk(array_map(fn ($name) => "IFOTEC-SMI::$name", self::POWER_STATUS_COLUMNS))->valuesByIndex();
-
-        return self::isNoData($statuses["$sysIndex.$sfpIndex"][$statusName] ?? null);
+        return $sensors;
     }
 
     /**
@@ -242,7 +290,7 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
      */
     private function powerSensorCustom(string $sensorIndex): ?string
     {
-        $this->powerSensorCustoms ??= \App\Models\Sensor::where('device_id', $this->getDevice()->device_id)
+        $this->powerSensorCustoms ??= Sensor::where('device_id', $this->getDevice()->device_id)
             ->where('sensor_class', 'dbm')
             ->where('sensor_type', 'ifotecSfp')
             ->pluck('sensor_custom', 'sensor_index')
@@ -253,9 +301,13 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
 
     /**
      * Presence, signal and status sensors of each SFP cage, linked to the port entity.
+     * The state name is the sensor_type: ifoDataStatus is shared by three sensors of each SFP.
+     *
+     * @return Collection<int, Sensor>
      */
-    private function discoverSfpStateSensors(): void
+    private function discoverSfpStateSensors(): Collection
     {
+        $stateSensors = new Collection;
         $sysIndex = $this->sysProductIndex();
         $sensors = [
             ['ifoSFPisPlugged', 4, 'ifoSFPisPlugged', 'Presence', self::YES_NO],
@@ -264,10 +316,6 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
             ['ifoSFPrxPowerStatus', 15, 'ifoDataStatus', 'Receive Power Status', self::DATA_STATUS],
             ['ifoSFPtxPowerStatus', 21, 'ifoDataStatus', 'Transmit Power Status', self::DATA_STATUS],
         ];
-
-        foreach ($sensors as [, , $stateName, , $map]) {
-            create_state_index($stateName, states: $this->stateDefinitions($map));
-        }
 
         foreach ($this->sfpRows() as $sfpIndex => $sfp) {
             $ifIndex = $this->sfpIfIndex($sfp);
@@ -278,10 +326,10 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
             $ifName = PortCache::getNameFromIfIndex($ifIndex, $this->getDevice());
 
             foreach ($sensors as [$field, $column, $stateName, $label, $map]) {
-                app('sensor-discovery')->discover(new \App\Models\Sensor([
+                $stateSensors->push(new Sensor([
                     'poller_type' => 'snmp',
                     'sensor_class' => 'state',
-                    'sensor_oid' => ".1.3.6.1.4.1.21362.101.5.1.1.$column.$sysIndex.$sfpIndex",
+                    'sensor_oid' => self::SFP_ENTRY_OID . ".$column.$sysIndex.$sfpIndex",
                     'sensor_index' => "$field.$sysIndex.$sfpIndex",
                     'sensor_type' => $stateName,
                     'sensor_descr' => "$ifName Transceiver $label",
@@ -289,9 +337,11 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
                     'entPhysicalIndex' => $this->portEntityIndex($ifIndex),
                     'entPhysicalIndex_measured' => 'port',
                     'group' => 'transceiver',
-                ]));
+                ])->withStates($this->stateDefinitions($map)));
             }
         }
+
+        return $stateSensors;
     }
 
     /**

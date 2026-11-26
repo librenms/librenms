@@ -135,7 +135,7 @@ class UserFuncHelper
      */
     public function ifotecOpticalPower(): ?float
     {
-        // empty when there is no answer or when the status is noData (includes/polling/sensors/dbm/ifotec.inc.php)
+        // empty when there is no answer or when the status is noData (Ifotec::pollSensors())
         if (! is_numeric($this->value_raw)) {
             return null;
         }
