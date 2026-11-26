@@ -153,7 +153,7 @@ final class PortApiTest extends DBTestCase
         Port::factory()->for($device)->create(['ifName' => 'eth2', 'disabled' => 1]);
         Sanctum::actingAs(User::factory()->admin()->create());
 
-        $ids = array_column($this->getJson("/api/v1/devices/$device->device_id/ports?filter[isEnabled]=true&sort=name")->assertOk()->json('data'), 'id');
+        $ids = array_column($this->getJson("/api/v1/devices/$device->device_id/ports?filter[isPollingEnabled]=true&sort=name")->assertOk()->json('data'), 'id');
 
         $this->assertSame([(string) $eth0->port_id, (string) $eth1->port_id], $ids);
     }
@@ -171,7 +171,7 @@ final class PortApiTest extends DBTestCase
 
         $this->assertSame(['id', 'type', 'attributes', 'relationships', 'links'], array_keys($data));
         $this->assertSame([
-            'label',
+            'displayName',
             'name',
             'description',
             'ifIndex',
@@ -183,9 +183,9 @@ final class PortApiTest extends DBTestCase
             'duplex',
             'mtu',
             'macAddress',
-            'vlan',
+            'untaggedVlan',
             'trunkEncapsulation',
-            'isEnabled',
+            'isPollingEnabled',
             'isIgnored',
             'isDeleted',
             'lastPolledAt',

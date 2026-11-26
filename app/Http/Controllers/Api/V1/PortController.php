@@ -26,7 +26,7 @@ class PortController extends Controller
             Port::query()
                 ->hasAccess($request->user())
                 ->when($device, fn ($query) => $query->where('ports.device_id', $device->device_id))
-                ->with('device'), // the label depends on the device os
+                ->with('device'), // the display name depends on the device os
             sorts: [
                 'name' => 'ifName',
                 'description' => 'ifAlias',
@@ -52,8 +52,8 @@ class PortController extends Controller
                 'duplex' => 'ifDuplex',
                 'mtu' => 'ifMtu',
                 'macAddress' => 'ifPhysAddress',
-                'vlan' => 'ifVlan',
-                'isEnabled' => ['disabled', ResourceRequest::booleanFilter(inverted: true)],
+                'untaggedVlan' => 'ifVlan',
+                'isPollingEnabled' => ['disabled', ResourceRequest::booleanFilter(inverted: true)],
                 'isIgnored' => ['ignore', ResourceRequest::booleanFilter()],
                 'isDeleted' => ['deleted', ResourceRequest::booleanFilter()],
             ],

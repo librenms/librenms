@@ -21,7 +21,7 @@ class PortResource extends JsonApiResource
     public function toAttributes(Request $request): array
     {
         return [
-            'label' => $this->getLabel(...),
+            'displayName' => $this->getLabel(...),
             'name' => $this->ifName,
             'description' => $this->ifAlias,
             'ifIndex' => $this->ifIndex,
@@ -33,9 +33,9 @@ class PortResource extends JsonApiResource
             'duplex' => $this->ifDuplex,
             'mtu' => $this->ifMtu,
             'macAddress' => $this->ifPhysAddress,
-            'vlan' => $this->ifVlan,
+            'untaggedVlan' => $this->ifVlan,
             'trunkEncapsulation' => $this->ifTrunk,
-            'isEnabled' => ! $this->disabled,
+            'isPollingEnabled' => ! $this->disabled,
             'isIgnored' => (bool) $this->ignore,
             'isDeleted' => (bool) $this->deleted,
             'lastPolledAt' => $this->poll_time ? Carbon::createFromTimestampUTC($this->poll_time) : null,

@@ -53,7 +53,7 @@ final class DeviceApiTest extends DBTestCase
             ->assertJsonPath('data.attributes.hostname', $device->hostname)
             ->assertJsonPath('data.attributes.systemName', 'core1')
             ->assertJsonPath('data.attributes.isUp', true)
-            ->assertJsonPath('data.attributes.isEnabled', false)
+            ->assertJsonPath('data.attributes.isMonitored', false)
             ->assertJsonMissingPath('data.attributes.sysName')
             ->assertJsonPath('data.links.self', route('api.v1.devices.show', $device->device_id))
             ->assertJsonPath('data.relationships.ports.links.related', route('api.v1.devices.ports', $device->device_id))
@@ -107,14 +107,14 @@ final class DeviceApiTest extends DBTestCase
 
         $ids = fn (string $query) => array_column($this->getJson("/api/v1/devices?$query")->assertOk()->json('data'), 'id');
 
-        $this->assertSame([(string) $a->device_id, (string) $b->device_id], $ids('filter[os]=apifilteros&filter[isEnabled]=true&sort=hostname'));
-        $this->assertSame([(string) $b->device_id, (string) $a->device_id], $ids('filter[os][eq]=apifilteros&filter[isEnabled]=true&sort=-hostname'));
+        $this->assertSame([(string) $a->device_id, (string) $b->device_id], $ids('filter[os]=apifilteros&filter[isMonitored]=true&sort=hostname'));
+        $this->assertSame([(string) $b->device_id, (string) $a->device_id], $ids('filter[os][eq]=apifilteros&filter[isMonitored]=true&sort=-hostname'));
         $this->assertCount(1, $ids('filter[os]=apifilteros&filter[hostname][starts_with]=c.'));
-        $this->assertCount(3, $ids('filter[os]=apifilteros&filter[isEnabled][in]=true,false'));
-        $this->assertCount(1, $ids('filter[os]=apifilteros&filter[isEnabled][neq]=true'));
+        $this->assertCount(3, $ids('filter[os]=apifilteros&filter[isMonitored][in]=true,false'));
+        $this->assertCount(1, $ids('filter[os]=apifilteros&filter[isMonitored][neq]=true'));
 
         // an ordering of true and false has no meaning
-        $this->getJson('/api/v1/devices?filter[isEnabled][gt]=false')->assertStatus(400);
+        $this->getJson('/api/v1/devices?filter[isMonitored][gt]=false')->assertStatus(400);
     }
 
     public function testSparseFieldsets(): void
@@ -198,7 +198,7 @@ final class DeviceApiTest extends DBTestCase
             'hardware',
             'serialNumber',
             'bgpLocalAs',
-            'isEnabled',
+            'isMonitored',
             'isIgnored',
             'isStatusIgnored',
             'isAlertingEnabled',

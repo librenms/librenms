@@ -39,7 +39,7 @@ class DeviceResource extends JsonApiResource
             'hardware' => $this->hardware,
             'serialNumber' => $this->serial,
             'bgpLocalAs' => $this->bgpLocalAs,
-            'isEnabled' => ! $this->disabled,
+            'isMonitored' => ! $this->disabled,
             'isIgnored' => $this->ignore,
             'isStatusIgnored' => $this->ignore_status,
             'isAlertingEnabled' => ! $this->disable_notify,
