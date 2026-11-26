@@ -335,6 +335,12 @@ class RunAlerts
                 if (LibrenmsConfig::get('alert.fixed-contacts') == false) {
                     $alert['details']['contacts'] = AlertUtil::getContacts($rows);
                 }
+                // Ack notes are stored on the faults, not the aggregate alerts row.
+                $notes = $faults->where('state', AlertState::ACKNOWLEDGED)
+                    ->pluck('note')->filter(fn ($note) => trim((string) $note) !== '')->unique()->all();
+                if ($notes !== []) {
+                    $alert['note'] = implode(PHP_EOL, $notes);
+                }
             }
             $units[] = $alert;
         } elseif ($faults->isEmpty()) {
@@ -352,6 +358,9 @@ class RunAlerts
                 $unit = $alert;
                 $unit['state'] = $faultState;
                 $unit['fault_id'] = $fault->id;
+                if ($fault->note !== null && $fault->note !== '') {
+                    $unit['note'] = $fault->note;
+                }
                 $unit['details']['rule'] = $fault->details['rule'] ?? [];
                 $unit['details']['contacts'] = $fault->details['contacts'] ?? ($alert['details']['contacts'] ?? []);
                 $latestLogId = AlertLog::query()->where('fault_id', $fault->id)->max('id');
