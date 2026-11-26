@@ -112,7 +112,8 @@ class Availability
     {
         $now = time();
 
-        $found_outages = $device->outages()->where('up_again', '>=', $now - $duration)
+        $found_outages = $device->outages()
+            ->where(fn ($q) => $q->where('up_again', '>=', $now - $duration)->orWhereNull('up_again'))
             ->orderBy('going_down')->get();
 
         // no recorded outages found, so use current status

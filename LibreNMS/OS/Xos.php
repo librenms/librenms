@@ -30,6 +30,7 @@ use App\Models\Port;
 use LibreNMS\Discovery\Neighbors\Neighbor;
 use LibreNMS\Discovery\Neighbors\PortFinder;
 use LibreNMS\Interfaces\Discovery\NeighborPortResolution;
+use SnmpQuery;
 
 class Xos extends Shared\Extreme implements NeighborPortResolution
 {
@@ -45,5 +46,22 @@ class Xos extends Shared\Extreme implements NeighborPortResolution
         $slot = (int) ($matches[1] ?: 1);
 
         return $ports->byIfIndex($slot * 1000 + (int) $matches[2]);
+    }
+
+    /**
+     * Sensors in a port are named by the port
+     */
+    protected function entitySensorDescr(int $index, array $entities): string
+    {
+        $parent = SnmpQuery::cache()->walk('ENTITY-MIB::entPhysicalContainedIn')->pluck()[$index] ?? null;
+        $alias = SnmpQuery::cache()->numeric()->walk('ENTITY-MIB::entAliasMappingIdentifier')->values()[".1.3.6.1.2.1.47.1.3.2.1.2.$parent.0"] ?? '';
+
+        if ($parent && preg_match('/^\.1\.3\.6\.1\.2\.1\.2\.2\.1\.1\.(\d+)$/', (string) $alias, $matches)) {
+            $ifName = SnmpQuery::cache()->walk('IF-MIB::ifName')->pluck()[$matches[1]] ?? '';
+
+            return ucwords($ifName . ' ' . str_replace(' Sensor', '', $entities[$index]['entPhysicalDescr'] ?? ''));
+        }
+
+        return parent::entitySensorDescr($index, $entities);
     }
 }

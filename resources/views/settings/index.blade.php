@@ -5,7 +5,7 @@
 @section('content')
     <div class="container-fluid">
         <div x-data="settingsPage({
-                prefix: {{ Js::from(url('settings')) }},
+                prefix: {{ Js::from(route('settings')) }},
                 tab: {{ Js::from($active_tab) }},
                 section: {{ Js::from($active_section) }},
                 setting: {{ Js::from($active_setting) }},

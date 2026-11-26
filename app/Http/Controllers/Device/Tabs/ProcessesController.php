@@ -82,9 +82,8 @@ class ProcessesController implements DeviceTab
                 'label' => $colMeta['label'],
                 'title' => isset($colMeta['title']) ? __($colMeta['title']) : null,
                 'icon' => $isSorted ? ($by === 'asc' ? 'fa fa-chevron-up' : 'fa fa-chevron-down') : '',
-                'url' => route('device', [
+                'url' => route('device.processes', [
                     'device' => $device,
-                    'tab' => 'processes',
                     'order' => $colKey,
                     'by' => $nextBy,
                 ]),

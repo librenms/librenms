@@ -28,59 +28,22 @@ namespace LibreNMS\Util;
 
 class StringHelpers
 {
+    /**
+     * Prefix device-reported text that spreadsheets could interpret as a formula.
+     */
+    public static function neutralizeCsvFormula(mixed $value): mixed
+    {
+        return is_string($value) && preg_match('/^[=+\-@\t\r]/', $value) ? "'" . $value : $value;
+    }
+
     public static function isValidUtf8(string $string): bool
     {
         return preg_match('//u', $string) === 1;
     }
 
-    public static function niceCase($string)
+    public static function niceCase(string $string): string
     {
-        $replacements = [
-            'bind' => 'BIND',
-            'cape' => 'CAPEv2',
-            'dbm' => 'dBm',
-            'dhcp-stats' => 'DHCP Stats',
-            'entropy' => 'Random entropy',
-            'exim-stats' => 'EXIM Stats',
-            'fbsd-nfs-client' => 'FreeBSD NFS Client',
-            'fbsd-nfs-server' => 'FreeBSD NFS Server',
-            'freeradius' => 'FreeRADIUS',
-            'gpsd' => 'GPSD',
-            'hv-monitor' => 'HV Monitor',
-            'http_access_log_combined' => 'HTTP Access Log Combined',
-            'i2pd' => 'I2PD Router',
-            'mojo_cape_submit' => 'Mojo CAPE Submit',
-            'mailcow-postfix' => 'mailcow-dockerized postfix',
-            'mysql' => 'MySQL',
-            'nfs' => 'NFS',
-            'nfs-server' => 'NFS Server',
-            'nfs-stats' => 'NFS Stats',
-            'nfs-v3-stats' => 'NFS v3 Stats',
-            'ntp' => 'NTP',
-            'ntp-client' => 'NTP Client',
-            'ntp-server' => 'NTP Server',
-            'opengridscheduler' => 'Open Grid Scheduler',
-            'opensearch' => 'Elasticsearch\Opensearch',
-            'oslv_monitor' => 'OS Level Virtualization',
-            'os-updates' => 'OS Updates',
-            'php-fpm' => 'PHP-FPM',
-            'pi-hole' => 'Pi-hole',
-            'powerdns' => 'PowerDNS',
-            'powerdns-dnsdist' => 'PowerDNS dnsdist',
-            'powerdns-recursor' => 'PowerDNS Recursor',
-            'powermon' => 'PowerMon',
-            'pureftpd' => 'PureFTPd',
-            'rrdcached' => 'RRDCached',
-            'sdfsinfo' => 'SDFS info',
-            'smart' => 'SMART',
-            'ss' => 'Socket Statistics',
-            'syslog-ng' => 'Syslog-NG',
-            'ups-apcups' => 'UPS apcups',
-            'ups-nut' => 'UPS nut',
-            'zfs' => 'ZFS',
-        ];
-
-        return $replacements[$string] ?? ucwords(str_replace(['_', '-'], ' ', $string));
+        return $string === 'dbm' ? 'dBm' : ucwords(str_replace(['_', '-'], ' ', $string));
     }
 
     /**

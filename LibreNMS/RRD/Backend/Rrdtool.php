@@ -26,11 +26,13 @@
 
 namespace LibreNMS\RRD\Backend;
 
+use LibreNMS\Exceptions\RrdCachedConnectionException;
 use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdFileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\Exceptions\RrdSourceException;
+use LibreNMS\Exceptions\RrdUnknownException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\RRD\RrdProcess;
@@ -76,6 +78,8 @@ class Rrdtool implements RrdBackendInterface
             }
         } catch (RrdFileExistsException) {
             Log::debug("RRD[%g$rrd already exists%n]", ['color' => true]);
+        } catch (RrdNotFoundException $e) {
+            throw $this->remoteFallbackError($e, $rrd);
         }
     }
 
@@ -139,7 +143,30 @@ class Rrdtool implements RrdBackendInterface
      */
     public function last(RrdPath $rrd): int
     {
-        return (int) $this->run('last', $rrd->relativePath());
+        try {
+            $output = $this->run('last', $rrd->relativePath());
+        } catch (RrdNotFoundException $e) {
+            throw $this->remoteFallbackError($e, $rrd);
+        }
+
+        if (! ctype_digit($output)) {
+            throw new RrdUnknownException('Invalid RRD last update response for ' . $rrd);
+        }
+
+        return (int) $output;
+    }
+
+    /**
+     * RRDtool falls back to local files if it cannot connect to the daemon,
+     * so a missing file that rrdcached didn't report means the daemon is unreachable.
+     */
+    private function remoteFallbackError(RrdNotFoundException $e, RrdPath $rrd): RrdException
+    {
+        if ($this->remote() && ! preg_match('/^rrdcached[@:]/', $e->getMessage())) {
+            return new RrdCachedConnectionException('Unable to reach rrdcached for ' . $rrd, previous: $e);
+        }
+
+        return $e;
     }
 
     /**
@@ -175,6 +202,36 @@ class Rrdtool implements RrdBackendInterface
     }
 
     /**
+     * @param  string[]  $options
+     * @return array<string, array<int, float|null>>
+     *
+     * @throws RrdException
+     */
+    public function xport(array $options): array
+    {
+        $process = app(RrdProcess::class, ['timeout' => 300]);
+        $export = json_decode($process->run('"' . implode('" "', ['xport', '--json', ...$options]) . '"'), true);
+        $meta = $export['meta'] ?? null;
+
+        if (! is_int($meta['start'] ?? null) || ! is_int($meta['step'] ?? null)) {
+            throw new RrdUnknownException('Unexpected rrdtool xport output');
+        }
+
+        // a single pass, exports can be large
+        $legends = $meta['legend'] ?? [];
+        $columns = array_fill_keys($legends, []);
+        foreach ($export['data'] ?? [] as $row => $values) {
+            $time = $meta['start'] + $row * $meta['step'];
+            foreach ($legends as $index => $legend) {
+                $value = $values[$index] ?? null;
+                $columns[$legend][$time] = is_float($value) ? $value : (is_int($value) ? (float) $value : null);
+            }
+        }
+
+        return $columns;
+    }
+
+    /**
      * Pipe a command to rrdtool
      *
      * @param  string[]  $arguments
@@ -183,7 +240,7 @@ class Rrdtool implements RrdBackendInterface
      */
     private function run(string $command, string $filename, array $arguments = []): string
     {
-        $this->process ??= app(RrdProcess::class, ['timeout' => 1200]);
+        $this->process ??= app(RrdProcess::class, ['timeout' => 1200, 'allowMissingRrdDir' => $this->remote()]);
         $output = $this->process->run(implode(' ', [$command, $filename, ...$arguments]));
 
         if (Debug::isVerbose() && $output) {

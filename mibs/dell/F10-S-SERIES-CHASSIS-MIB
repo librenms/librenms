@@ -1,10 +1,6 @@
     F10-S-SERIES-CHASSIS-MIB DEFINITIONS ::= BEGIN
-    --  Force10 Networks, Inc.
-    --  390 Holger Way
-    --  San Jose, CA 95134
-
     --  This module provides authoritative definitions for S-series
-    --  Force10 enterprise Chassis MIB.
+    --  Dell Networking OS Chassis MIB.
     --
     --  This module will be extended, as needed.
     --  
@@ -26,22 +22,41 @@
             FROM F10-CHASSIS-MIB
         F10SwDate, F10ChassisType, F10ProcessorModuleType,
         F10MfgDate, F10HundredthdB, F10SSeriesPortType
-            FROM FORCE10-TC;        
+            FROM FORCE10-TC
+        ifIndex
+            FROM IF-MIB;
+            -- from [RFC2863]
+
         
     f10SSerChassisMib MODULE-IDENTITY
-    LAST-UPDATED "200710031200Z"  -- Oct 3, 2007 12:00:00 GMT
+    LAST-UPDATED "201301011200Z"  -- Jan 1, 2013 12:00:00 GMT
     ORGANIZATION
-      "Force10 Networks, Inc."
+      "Dell Inc"
     CONTACT-INFO
-       "Force10 Networks, Inc.
-        350 Holger Way
-        San Jose, CA 95134 USA
-        Phone: +1 (408) 571 3500
-        Fax:   +1 (408) 571 3550
-        Email: support@force10networks.com"
+      "http://www.force10networks.com/support"
 
     DESCRIPTION
-       "Force10 S-Series Enterprise Chassis MIB. "
+       "Dell Networking OS S-Series Chassis MIB. "
+
+    REVISION     "201301011200Z"
+    DESCRIPTION
+          "Adding new objects - Dell PPID, Revision, Service Tag,
+          Express Service Code in Fan Tray and PSU Tables."
+
+    REVISION     "201212211200Z"
+    DESCRIPTION
+          "Adding absent state to the chSysPowerSupplyOperStatus
+          and chSysFanTrayOperStatus."
+
+    REVISION     "201211301200Z"
+    DESCRIPTION
+          "Adding new objects - chSysSwInPartitionAImgVers
+          and chSysSwInPartitionBImgVers"
+
+    REVISION     "201203271200Z"
+    DESCRIPTION
+          "Adding new objects - Dell PPID, Revision, Service Tag,
+          Express Service Code."
 
     REVISION     "200710031200Z"
     DESCRIPTION
@@ -95,7 +110,7 @@
         ::= { chObjects 2 }
 
        chStackUnitIndexNext OBJECT-TYPE
-        SYNTAX        Integer32 (0|1..8)
+        SYNTAX        Integer32 (0|1..12)
         MAX-ACCESS    read-only
         STATUS        current
         DESCRIPTION
@@ -113,7 +128,9 @@
             made available for reuse.
             
             Note that this object is not the unit number assigned by
-            the management unit."
+            the management unit. 
+            The max number of stackable units allowed on this chassis
+            is found from the object chNumMaxStackableUnits."
         ::= { chObjects 3 }
 
     -- ### Chassis System  ###
@@ -249,7 +266,12 @@
            chStackUnitNumFanTrays         Integer32,
            chStackUnitNumPowerSupplies    Integer32,
            chStackUnitNumPluggableModules Integer32,
-           chStackUnitRowStatus           RowStatus
+           chStackUnitNum40GigEtherPorts  Integer32,
+           chStackUnitRowStatus           RowStatus,
+           chStackUnitPiecePartID         DisplayString,
+           chStackUnitPPIDRevision        DisplayString,
+           chStackUnitServiceTag          DisplayString,
+           chStackUnitExpressServiceCode  DisplayString
         }
        
        chStackUnitIndex		OBJECT-TYPE
@@ -262,14 +284,14 @@
         ::= { chStackUnitEntry 1 }
         
        chStackUnitNumber	OBJECT-TYPE
-        SYNTAX        Integer32 (0|1..8)
+        SYNTAX        Integer32 (0|1..12)
         MAX-ACCESS    read-create
         STATUS        current
         DESCRIPTION
              "The unit number associated with this unit.
              The unit number can be manually assigned to stack members. 
              
-             Note that the unit number assignement is based on 
+             Note that the unit number assignment is based on 
              the following factors:
              
              - if the unit number is requested here, but another unit 
@@ -282,7 +304,9 @@
              unit number.
              - if a unit detects that the maximum number of units already 
              exist, the unit sets its unit number to 0, i.e. unassigned, 
-             and stays in the Initialization state." 
+             and stays in the Initialization state.
+             - The max number of stackable units allowed on this chassis 
+             is found from the object chNumMaxStackableUnits." 
         ::= { chStackUnitEntry 2 }
 
        chStackUnitSID		OBJECT-TYPE
@@ -420,7 +444,7 @@
         MAX-ACCESS    read-only
         STATUS        current
         DESCRIPTION
-            "The Force10 system type for this unit." 
+            "The Dell Networking OS system type for this unit." 
         ::= { chStackUnitEntry 16 }   
         
        chStackUnitVendorId    OBJECT-TYPE
@@ -536,6 +560,15 @@
             in the stack."
         ::= { chStackUnitEntry 29 }
 
+       chStackUnitNum40GigEtherPorts     OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of 40G Ethernet/802.3 interfaces
+            in this unit."
+        ::= { chStackUnitEntry 30 }
+
        chStackUnitRowStatus OBJECT-TYPE
         SYNTAX      RowStatus
         MAX-ACCESS  read-create
@@ -548,7 +581,39 @@
             active(1)      - This instance is active.
             createAndGo(4) - Creates a new instance.
             destroy(6)     - Removes this instance."
-        ::= { chStackUnitEntry 30 }
+        ::= { chStackUnitEntry 31 }
+
+       chStackUnitPiecePartID OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..24))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's piece part id."
+        ::= { chStackUnitEntry 32 }
+                
+       chStackUnitPPIDRevision OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..3))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's PPID revision."
+        ::= { chStackUnitEntry 33 }
+                
+       chStackUnitServiceTag OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..7))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's service tag."
+        ::= { chStackUnitEntry 34 }
+
+       chStackUnitExpressServiceCode OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..14))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's express service code."
+        ::= { chStackUnitEntry 35 }
 
 
     -- ### Power Supply Table
@@ -575,9 +640,13 @@
 
       ChSysPowerSupplyEntry    ::=
         SEQUENCE {
-           chSysPowerSupplyIndex        Integer32,
-           chSysPowerSupplyOperStatus   INTEGER,
-           chSysPowerSupplyType         INTEGER
+           chSysPowerSupplyIndex              Integer32,
+           chSysPowerSupplyOperStatus         INTEGER,
+           chSysPowerSupplyType               INTEGER,
+           chSysPowerSupplyPiecePartID        DisplayString,
+           chSysPowerSupplyPPIDRevision       DisplayString,
+           chSysPowerSupplyServiceTag         DisplayString,
+           chSysPowerSupplyExpressServiceCode DisplayString
         }
 
        chSysPowerSupplyIndex    OBJECT-TYPE
@@ -591,7 +660,8 @@
        chSysPowerSupplyOperStatus    OBJECT-TYPE
         SYNTAX      INTEGER {
                         up(1),
-                        down(2)
+                        down(2),
+                        absent(3)
                     }
         MAX-ACCESS    read-only
         STATUS        current
@@ -609,6 +679,38 @@
         DESCRIPTION
             "The type of the power supply."
         ::= { chSysPowerSupplyEntry 3 }
+
+       chSysPowerSupplyPiecePartID OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..24))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The power supply's piece part id."
+        ::= { chSysPowerSupplyEntry 4 }
+
+       chSysPowerSupplyPPIDRevision OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..3))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The power supply's PPID revision."
+        ::= { chSysPowerSupplyEntry 5 }
+
+       chSysPowerSupplyServiceTag OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..7))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The power supply's service tag."
+        ::= { chSysPowerSupplyEntry 6 }
+
+       chSysPowerSupplyExpressServiceCode OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..14))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The power supply's express service code."
+        ::= { chSysPowerSupplyEntry 7 }
 
 
     -- ## Fan Tray Table
@@ -634,8 +736,13 @@
 
       ChSysFanTrayEntry    ::=
         SEQUENCE {
-           chSysFanTrayIndex        Integer32,
-           chSysFanTrayOperStatus   INTEGER
+           chSysFanTrayIndex              Integer32,
+           chSysFanTrayOperStatus         INTEGER,
+           chSysFanTrayPiecePartID        DisplayString,
+           chSysFanTrayPPIDRevision       DisplayString,
+           chSysFanTrayServiceTag         DisplayString,
+           chSysFanTrayExpressServiceCode DisplayString
+
         }
 
        chSysFanTrayIndex    OBJECT-TYPE
@@ -649,13 +756,46 @@
        chSysFanTrayOperStatus    OBJECT-TYPE
         SYNTAX      INTEGER {
                         up(1),
-                        down(2)
+                        down(2),
+                        absent(3)
                     }
         MAX-ACCESS  read-only
         STATUS      current
         DESCRIPTION
             "The status of the fan tray."
         ::= { chSysFanTrayEntry 2 }
+
+       chSysFanTrayPiecePartID OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..24))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The fan tray's piece part id."
+        ::= { chSysFanTrayEntry 3 }
+
+       chSysFanTrayPPIDRevision OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..3))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The fan tray's PPID revision."
+        ::= { chSysFanTrayEntry 4 }
+                
+       chSysFanTrayServiceTag OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..7))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The fan tray's service tag."
+        ::= { chSysFanTrayEntry 5 }
+
+       chSysFanTrayExpressServiceCode OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..14))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The fan tray's express service code."
+        ::= { chSysFanTrayEntry 6 }
 
 
     -- ## Port Table 
@@ -686,7 +826,9 @@
            chSysPortAdminStatus  INTEGER,
            chSysPortOperStatus   INTEGER,
            chSysPortIfIndex      Integer32,           
-           chSysPortXfpRecvPower F10HundredthdB
+           chSysPortXfpRecvPower F10HundredthdB,
+           chSysPortXfpRecvTemp  Integer32,
+           chSysPortXfpTxPower   F10HundredthdB
         }
 
        chSysPortIndex OBJECT-TYPE
@@ -764,10 +906,30 @@
         DESCRIPTION
             "
             The power signal strength (dB) received for
-            10G Ethernet/802.3 interface.
-            This object is applied to 10Gig port only.
+            1G/10G/40G Ethernet/802.3 interface.
             "
         ::= { chSysPortEntry 6 }
+
+       chSysPortXfpRecvTemp    OBJECT-TYPE
+       SYNTAX        Integer32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The temperature value received for the optics."
+       ::= { chSysPortEntry 7 }
+
+        chSysPortXfpTxPower    OBJECT-TYPE
+        SYNTAX        F10HundredthdB
+        UNITS         "dB"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "
+            The power signal strength (dB) Transmitted for
+            1G/10G/40G Ethernet/802.3 interface.
+            "
+
+        ::= { chSysPortEntry 8 }
 
 
     -- ## Stack Port Table 
@@ -1020,7 +1182,9 @@
            chSysSwBackupBootImgDate     DateAndTime,
            chSysSwBackupBootImgStatus   INTEGER,
            chSysSwNextRebootImage       INTEGER,
-           chSysSwCurrentBootImage      INTEGER
+           chSysSwCurrentBootImage      INTEGER,
+           chSysSwInPartitionAImgVers   DisplayString,
+           chSysSwInPartitionBImgVers   DisplayString
         }
 
        chSysSwRuntimeImgVersion    OBJECT-TYPE
@@ -1035,8 +1199,8 @@
             the format as follow:
             <major version>.<minor version>.<minor 
             version>......
-            '1.1' indicate major version of 1 and
-            minor release of 1."    
+            '1.2' indicate major version of 1 and
+            minor release of 2."    
         ::= { chSysSwModuleEntry 1 }
 
        chSysSwRuntimeImgDate    OBJECT-TYPE
@@ -1053,12 +1217,13 @@
         MAX-ACCESS    read-only
         STATUS        current
         DESCRIPTION
-            "The software release version is in 
+            "This provides the uboot image version
+            that is currently running and it is in 
             the format as follow:
             <major version>.<minor version>.<minor 
             version>......
-            '1.1' indicate major version of 1 and
-            minor release of 1."    
+            '1.2' indicate major version of 1 and
+            minor release of 2."    
         ::= { chSysSwModuleEntry 3 }
 
        chSysSwCurrentBootImgDate    OBJECT-TYPE
@@ -1080,7 +1245,7 @@
         MAX-ACCESS    read-only
         STATUS        current
         DESCRIPTION
-            "Fill this in later"
+            "The status of current boot image."
         ::= { chSysSwModuleEntry 5 }
 
        chSysSwBackupBootImgVersion OBJECT-TYPE
@@ -1088,12 +1253,13 @@
         MAX-ACCESS      read-only
         STATUS          current
         DESCRIPTION
-                "The software release version is in
+                "This provides the uboot image version
+                that would be the backup image and it is in
                 the format as follow:
                 <major version>.<minor version>.<minor
                 version>......
-                '1.1' indicate major version of 1 and
-                minor release of 1."
+                '1.2' indicate major version of 1 and
+                minor release of 2."
         ::= { chSysSwModuleEntry 6 }
 
        chSysSwBackupBootImgDate    OBJECT-TYPE
@@ -1142,6 +1308,30 @@
         "
        ::= { chSysSwModuleEntry 10 }
 
+       chSysSwInPartitionAImgVers    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This provides the Dell Networking OS system image version
+            that is stored in partition A: and The version 
+            string has Major and Minor release numbers. It 
+            also denotes if the release is Maintenance, 
+            Technical, Patch, Beta, or Generally Available"
+        ::= { chSysSwModuleEntry 11 }
+
+       chSysSwInPartitionBImgVers OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This provides the Dell Networking OS system image version
+            that is stored in partition B: and  The version
+            string has Major and Minor release numbers. It
+            also denotes if the release is Maintenance,
+            Technical, Patch, Beta, or Generally Available"
+        ::= { chSysSwModuleEntry 12 }
+
 
     -- ## Stack Unit CPU and Memory Utilization
 
@@ -1169,7 +1359,8 @@
            chStackUnitCpuUtil5Sec     Gauge32,
            chStackUnitCpuUtil1Min     Gauge32,
            chStackUnitCpuUtil5Min     Gauge32,
-           chStackUnitMemUsageUtil    Gauge32
+           chStackUnitMemUsageUtil    Gauge32,
+           chStackUnitFlashUsageUtil  Gauge32
         }
 
        chStackUnitCpuType   OBJECT-TYPE
@@ -1216,6 +1407,211 @@
             "Total memory usage in percentage."
         ::= { chStackUnitUtilEntry 5 }
 
+       chStackUnitFlashUsageUtil  OBJECT-TYPE
+        SYNTAX              Gauge32(0..100)
+        UNITS               "percent"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "Total flash usage in percentage."
+        ::= { chStackUnitUtilEntry 6 }
+
+
+    -- ## Software Cores Table
+
+       chSysSwCoresTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChSysCoresEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A table containing information about the software
+             cores that have been generated as a result of
+             system failures."
+        ::= { chSysObjects 10 }
+
+      chSysCoresEntry  OBJECT-TYPE
+        SYNTAX        ChSysCoresEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A row in the software core table representing 
+             information about a core that has been generated."
+        INDEX    { chStackUnitNumber,
+                   chSysCoresInstance  }
+        ::= { chSysSwCoresTable 1 }
+
+      ChSysCoresEntry    ::=
+        SEQUENCE {
+           chSysCoresInstance         INTEGER,
+           chSysCoresFileName         DisplayString,
+           chSysCoresTimeCreated      F10SwDate,
+           chSysCoresStackUnitNumber  Integer32,
+           chSysCoresProcess          DisplayString
+        }
+
+       chSysCoresInstance    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "A unique index assigned to the cores stored on
+             this stack unit."
+        ::= { chSysCoresEntry 1 }
+
+       chSysCoresFileName    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The name of the core file including the path."
+        ::= { chSysCoresEntry 2 }
+
+       chSysCoresTimeCreated    OBJECT-TYPE
+        SYNTAX        F10SwDate
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The time at which the core file was created."
+        ::= { chSysCoresEntry 3 }
+
+       chSysCoresStackUnitNumber  OBJECT-TYPE
+        SYNTAX        Integer32 (1..12)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The stack unit member which generated the core."
+        ::= { chSysCoresEntry 4 }
+
+       chSysCoresProcess    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The name of the process which generated the core."
+        ::= { chSysCoresEntry 5 }
+
+
+    -- ## Interface Table 
+
+       chSysIfTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChSysIfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of intefaces in the S-series chassis.
+             This table is similar to chSysPortTable but
+             supported only for ON platforms due to change
+             in numbering scheme."
+        ::= { chSysObjects 11 }
+
+      chSysIfEntry  OBJECT-TYPE 
+        SYNTAX        ChSysIfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A interface entry containing objects for a
+            particular interface."
+        INDEX    { ifIndex }
+        ::= { chSysIfTable 1 }
+
+      ChSysIfEntry    ::=
+        SEQUENCE {
+           chSysIfType         F10SSeriesPortType,
+           chSysIfName         DisplayString,
+           chSysIfAdminStatus  INTEGER,
+           chSysIfOperStatus   INTEGER,
+           chSysIfXfpRecvPower F10HundredthdB,
+           chSysIfXfpRecvTemp  Integer32,
+           chSysIfXfpTxPower   F10HundredthdB
+        }
+
+       chSysIfType  OBJECT-TYPE
+        SYNTAX        F10SSeriesPortType
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The type of Interface."
+        ::= { chSysIfEntry 1 }
+
+       chSysIfName  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Display name of the interface."
+        ::= { chSysIfEntry 2 }
+
+       chSysIfAdminStatus    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        down(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The admin status of the interface.
+            The interface admin status is Up if 
+            the user has configured it to be up 
+            otherwise, the admin status is Down."
+        ::= { chSysIfEntry 3 }
+
+       chSysIfOperStatus    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      ready(1),
+                      portDown(2),
+                      portProblem(3),
+                      cardProblem(4),
+                      cardDown(5),
+                      notPresent(6)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The operational status provides further
+            condition of the interface.
+            If the chSysIfAdminStatus is 'up', the 
+            valid state is
+            'ready' - the card is present and 
+                    ready and the chSysIfAdminStatus
+                    status is 'up'.
+            'portDown'    - the interface is down or not enabled.
+            'portProblem' - interface hardware problems.
+                        'cardProblem' - not used.  Same as cardDown.
+            'cardDown'    - the card is downed.
+            'notPresent' - the card is not present."
+        ::= { chSysIfEntry 4 }
+
+       chSysIfXfpRecvPower    OBJECT-TYPE
+        SYNTAX        F10HundredthdB
+        UNITS         "dB"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "
+            The power signal strength (dB) received for
+            1G/10G/40G Ethernet/802.3 interface.
+            "
+        ::= { chSysIfEntry 5 }
+
+       chSysIfXfpRecvTemp    OBJECT-TYPE
+       SYNTAX        Integer32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The temperature value received for the optics."
+       ::= { chSysIfEntry 6 }
+
+        chSysIfXfpTxPower    OBJECT-TYPE
+        SYNTAX        F10HundredthdB
+        UNITS         "dB"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "
+            The power signal strength (dB) Transmitted for
+            1G/10G/40G Ethernet/802.3 interface.
+            "
+        ::= { chSysIfEntry 7 }
 
     --
     -- ## Notifications 
@@ -1323,7 +1719,7 @@
     f10sSeriesMibCompliance    MODULE-COMPLIANCE
         STATUS                  current
         DESCRIPTION
-            "The compliance statement for Force10
+            "The compliance statement for Dell Networking OS
             product which implement the f10
             S-Series Chassis MIB."
         MODULE    -- this module
@@ -1383,17 +1779,31 @@
         chStackUnitNumPowerSupplies,
         chStackUnitNumPluggableModules,
         chStackUnitRowStatus,
+        chStackUnitPiecePartID,
+        chStackUnitPPIDRevision,
+        chStackUnitServiceTag,
+        chStackUnitExpressServiceCode,
         chSysPowerSupplyIndex,
         chSysPowerSupplyOperStatus,
         chSysPowerSupplyType,
+        chSysPowerSupplyPiecePartID,
+        chSysPowerSupplyPPIDRevision,
+        chSysPowerSupplyServiceTag,
+        chSysPowerSupplyExpressServiceCode,
         chSysFanTrayIndex,
         chSysFanTrayOperStatus,
+        chSysFanTrayPiecePartID,
+        chSysFanTrayPPIDRevision,
+        chSysFanTrayServiceTag,
+        chSysFanTrayExpressServiceCode,
         chSysPortIndex,
         chSysPortType,
         chSysPortAdminStatus ,
         chSysPortOperStatus,
         chSysPortIfIndex,           
         chSysPortXfpRecvPower,                
+        chSysPortXfpRecvTemp,
+        chSysPortXfpTxPower,
         chSysStackPortIndex,
         chSysStackPortConfiguredMode,
         chSysStackPortRunningMode,          
@@ -1419,11 +1829,26 @@
         chSysSwBackupBootImgStatus,
         chSysSwNextRebootImage,
         chSysSwCurrentBootImage,
+        chSysSwInPartitionAImgVers,
+        chSysSwInPartitionBImgVers,
         chStackUnitCpuType,
         chStackUnitCpuUtil5Sec,
         chStackUnitCpuUtil1Min,
         chStackUnitCpuUtil5Min,
-        chStackUnitMemUsageUtil                                       
+        chStackUnitMemUsageUtil,
+        chStackUnitFlashUsageUtil,
+        chSysCoresInstance,
+        chSysCoresFileName,
+        chSysCoresTimeCreated,
+        chSysCoresStackUnitNumber,
+        chSysCoresProcess,
+        chSysIfType,
+        chSysIfName,
+        chSysIfAdminStatus,
+        chSysIfOperStatus,
+        chSysIfXfpRecvPower,
+        chSysIfXfpRecvTemp,
+        chSysIfXfpTxPower
         }
         STATUS    current
         DESCRIPTION
@@ -1443,7 +1868,7 @@
         }
         STATUS    current
         DESCRIPTION
-            "Notifications for Force10 S-Series Chassis mib"
+            "Notifications for Dell Networking OS S-Series Chassis mib"
         ::= { f10sSeriesMibGroups 3 }
 
     END

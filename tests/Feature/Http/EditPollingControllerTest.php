@@ -182,6 +182,8 @@ final class EditPollingControllerTest extends DBTestCase
         $response = $this->actingAs($admin)->get(route('device.edit.polling', ['device' => $device]));
         $response->assertOk();
         $response->assertSee('SNMP Secret 123');
+        $response->assertSee('Use localhost');
+        $response->assertSee('name="settings[use_localhost]"', false);
         $response->assertViewHas('allMethods', function ($allMethods) use ($secret) {
             $snmp = $allMethods->firstWhere('type', 'snmp');
             $this->assertSame(['id' => $secret->id, 'description' => 'SNMP Secret 123', 'secret_type' => 'snmp-community'], $snmp['secret']);
@@ -920,7 +922,7 @@ final class EditPollingControllerTest extends DBTestCase
             'settings' => [],
         ]);
 
-        // 1. Update with empty port/timeout (should store empty array, not fallback values)
+        // 1. Empty fields should leave the settings array empty
         $response = $this->actingAs($admin)->putJson(
             route('device.edit.polling.update', ['device' => $device, 'methodType' => 'unix-agent']),
             [
@@ -942,7 +944,7 @@ final class EditPollingControllerTest extends DBTestCase
         $this->assertEquals(6556, $config->port);
         $this->assertEquals(10, $config->timeout);
 
-        // 2. Update with custom port override
+        // 2. Enable localhost and set a port
         $response2 = $this->actingAs($admin)->putJson(
             route('device.edit.polling.update', ['device' => $device, 'methodType' => 'unix-agent']),
             [
@@ -950,6 +952,7 @@ final class EditPollingControllerTest extends DBTestCase
                 'affects_availability' => '0',
                 'force_save' => '1',
                 'settings' => [
+                    'use_localhost' => '1',
                     'port' => 6557,
                     'timeout' => '',
                 ],
@@ -958,12 +961,14 @@ final class EditPollingControllerTest extends DBTestCase
         $response2->assertOk();
 
         $freshMethod = $method->fresh();
-        $this->assertEquals(['port' => 6557], $freshMethod->settings);
+        $this->assertEquals(['use_localhost' => true, 'port' => 6557], $freshMethod->settings);
+        $response2->assertJsonPath('method.settings.use_localhost', true);
         $config = $device->fresh()->polling()->get(PollingMethodType::UnixAgent);
         $this->assertInstanceOf(UnixAgentConfig::class, $config);
+        $this->assertTrue($config->useLocalhost);
         $this->assertEquals(6557, $config->port);
 
-        // 3. Clear the override by submitting empty port
+        // 3. Clear both overrides
         $response3 = $this->actingAs($admin)->putJson(
             route('device.edit.polling.update', ['device' => $device, 'methodType' => 'unix-agent']),
             [
@@ -971,6 +976,7 @@ final class EditPollingControllerTest extends DBTestCase
                 'affects_availability' => '0',
                 'force_save' => '1',
                 'settings' => [
+                    'use_localhost' => '0',
                     'port' => '',
                     'timeout' => '',
                 ],
@@ -979,10 +985,32 @@ final class EditPollingControllerTest extends DBTestCase
         $response3->assertOk();
 
         $freshMethod = $method->fresh();
-        $this->assertEquals([], $freshMethod->settings);
+        $this->assertSame(['use_localhost' => false], $freshMethod->settings);
+        $response3->assertJsonPath('method.settings.use_localhost', false);
         $config = $device->fresh()->polling()->get(PollingMethodType::UnixAgent);
         $this->assertInstanceOf(UnixAgentConfig::class, $config);
+        $this->assertFalse($config->useLocalhost);
         $this->assertEquals(6556, $config->port);
+    }
+
+    public function testUnixAgentRejectsInvalidLocalhostSetting(): void
+    {
+        $admin = User::factory()->admin()->create(['enabled' => 1]);
+        $method = DevicePollingMethod::factory()->create([
+            'method_type' => PollingMethodType::UnixAgent,
+            'settings' => [],
+        ]);
+
+        $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $method->device_id, 'methodType' => 'unix-agent']),
+            [
+                'enabled' => '1',
+                'force_save' => '1',
+                'settings' => ['use_localhost' => 'invalid'],
+            ],
+        )->assertUnprocessable()->assertJsonValidationErrors(['settings.use_localhost']);
+
+        $this->assertSame([], $method->refresh()->settings);
     }
 
     public function testUpdateIcmpSettingsSavesIpVersion(): void

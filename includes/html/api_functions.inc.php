@@ -17,7 +17,7 @@ use App\Data\Graphing\GraphParameters;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Graphs\GraphFactory;
-use App\Http\Resources\Device as DeviceResource;
+use App\Http\Resources\Api\V0\DeviceResource as DeviceResource;
 use App\Models\Alert;
 use App\Models\AlertFault;
 use App\Models\AlertLog;
@@ -2130,7 +2130,7 @@ function get_inventory_for_device(Illuminate\Http\Request $request)
 function search_oxidized(Illuminate\Http\Request $request)
 {
     $search_in_conf_textbox = $request->route('searchstring');
-    $result = search_oxidized_config($search_in_conf_textbox);
+    $result = new \App\ApiClients\Oxidized()->searchConfigs($search_in_conf_textbox);
 
     if (! $result) {
         return api_error(404, 'Received no data from Oxidized');

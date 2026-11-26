@@ -3,8 +3,8 @@
         <table id="alerts-{{ $id }}" class="table table-hover table-condensed alerts">
             <thead>
             <tr>
-                <th data-column-id="severity"></th>
-                <th data-column-id="timestamp">{{ __('Timestamp') }}</th>
+                <th data-column-id="severity" @if($sort === 'severity') data-order="desc" @endif></th>
+                <th data-column-id="timestamp" @if($sort !== 'severity') data-order="desc" @endif>{{ __('Timestamp') }}</th>
                 <th data-column-id="rule">{{ __('Rule') }}</th>
                 <th data-column-id="details" data-sortable="false"></th>
                 <th data-column-id="hostname">{{ __('Hostname') }}</th>
@@ -68,13 +68,6 @@
                 $("#widget_title_counter_{{ $id }}").text(response.total ? ` (${response.total})` : '')
 
                 return response
-            },
-            sort: {
-                @if($sort === 'severity' || $sort == 1)
-                    severity: 'desc'
-                @else
-                    timestamp: 'desc'
-                @endif
             },
             url: "{{ route('table.alerts') }}",
             navigation: @json(! $hidenavigation),

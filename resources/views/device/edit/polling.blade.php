@@ -154,7 +154,7 @@
                     ];
                 @endphp
                 @foreach($allMethods as $method)
-                    <div x-data="pollingMethodForm(@js([
+                    <div id="polling-method-{{ $method['type'] }}" x-data="pollingMethodForm(@js([
                             'type' => $method['type'],
                             'configured' => (bool) $method['configured'],
                             'enabled' => (bool) $method['enabled'],
@@ -169,11 +169,10 @@
                             'settingsData' => (object) ($method['settings'] ?? []),
                             'updateUrl' => route('device.edit.polling.update', ['device' => $device, 'methodType' => $method['type']]),
                             'storeUrl' => route('device.edit.polling.store', ['device' => $device]),
-                            'secretUrl' => route('secrets.show', ['secret' => '__ID__']),
                             'destroyUrl' => route('device.edit.polling.destroy', ['device' => $device, 'methodType' => $method['type']]),
                             'labels' => $formLabels,
                         ]))"
-                         x-show="activeTab === '{{ $method["type"] }}' && activeMethods.includes('{{ $method["type"] }}')"
+                         :hidden="activeTab !== '{{ $method["type"] }}' || !activeMethods.includes('{{ $method["type"] }}')"
                          x-cloak>
 
                         <div class="tw:flex tw:items-center tw:justify-between tw:mb-6 tw:border-b tw:pb-3 tw:dark:border-dark-gray-400">
@@ -511,7 +510,6 @@
                 newSecretType: config.newSecretType,
                 secretTypeById: config.secretTypeById,
                 secrets: {}, // id => {description, usage_count, data}, loaded when selected
-                secretUrl: config.secretUrl,
                 secretFieldLabels: config.secretFieldLabels,
                 formData: config.formData,
                 settingsData: config.settingsData,
@@ -595,7 +593,7 @@
                     }
                     if (!this.secrets[id]) {
                         try {
-                            const { data } = await axios.get(this.secretUrl.replace('__ID__', id));
+                            const { data } = await axios.get(route('secrets.show', {secret: id}));
                             this.secrets = { ...this.secrets, [id]: data };
                         } catch (error) {
                             return null; // not cached, retried on next selection

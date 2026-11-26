@@ -126,34 +126,41 @@ modules:
 
 ## Advanced Example
 
-For advanced state discovery:
+For advanced state discovery, add the sensors to `discoverOsSensors()`
+of the OS class (see [Health Information](os/Health-Information.md)).
+A state sensor carries its state translations, set them with
+`withStates()`. The state name is the `sensor_type` of the sensor.
 
-This example uses a Cisco power supply sensor. It gives full sensor
-state support for the power supplies of Cisco switches. Put the file in
-`/includes/discovery/sensors/state/cisco.inc.php`.
+This example gives full state support for the power supplies of Cisco
+switches.
 
 ```php
-<?php
-
-$oids = SnmpQuery::hideMib()->walk('CISCO-ENVMON-MIB::ciscoEnvMonSupplyStatusTable')->valuesByIndex;
-
-if (!empty($oids)) {
-    //Create State Index
-    $state_name = 'CISCO-ENVMON-MIB::ciscoEnvMonSupplyState';
+protected function discoverOsSensors(): Collection
+{
+    $sensors = parent::discoverOsSensors();
     $states = [
-        ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'normal'],
-        ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'warning'],
-        ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'critical'],
-        ['value' => 4, 'generic' => 3, 'graph' => 0, 'descr' => 'shutdown'],
-        ['value' => 5, 'generic' => 3, 'graph' => 0, 'descr' => 'notPresent'],
-        ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'notFunctioning'],
+        ['value' => 1, 'generic' => 0, 'descr' => 'normal'],
+        ['value' => 2, 'generic' => 1, 'descr' => 'warning'],
+        ['value' => 3, 'generic' => 2, 'descr' => 'critical'],
+        ['value' => 4, 'generic' => 3, 'descr' => 'shutdown'],
+        ['value' => 5, 'generic' => 3, 'descr' => 'notPresent'],
+        ['value' => 6, 'generic' => 2, 'descr' => 'notFunctioning'],
     ];
-    create_state_index($state_name, $states);
 
-    $num_oid = '.1.3.6.1.4.1.9.9.13.1.5.1.3.';
-    foreach ($oids as $index => $entry) {
-        //Discover Sensors
-        discover_sensor(null, 'state', $device, $num_oid.$index, $index, $state_name, $entry['ciscoEnvMonSupplyStatusDescr'], '1', '1', null, null, null, null, $entry['ciscoEnvMonSupplyState'], 'snmp', $index);
+    $supplies = SnmpQuery::hideMib()->walk('CISCO-ENVMON-MIB::ciscoEnvMonSupplyStatusTable')->valuesByIndex();
+    foreach ($supplies as $index => $entry) {
+        $sensors->push(new Sensor([
+            'poller_type' => 'snmp',
+            'sensor_class' => 'state',
+            'sensor_oid' => ".1.3.6.1.4.1.9.9.13.1.5.1.3.$index",
+            'sensor_index' => $index,
+            'sensor_type' => 'ciscoEnvMonSupplyState',
+            'sensor_descr' => $entry['ciscoEnvMonSupplyStatusDescr'] ?? "Power Supply $index",
+            'sensor_current' => $entry['ciscoEnvMonSupplyState'] ?? null,
+            'entPhysicalIndex' => $index,
+        ])->withStates($states));
     }
+
+    return $sensors;
 }
 ```

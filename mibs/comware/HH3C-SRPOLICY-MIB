@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Segment Routing Traffic Engineering (SR-TE) policy MIB
 -- Reference:
--- Version: V1.1
+-- Version: V1.3
 -- History:
 -- V1.0 2019-12-06 The initial version, created by Xu Jing
 -- V1.1 2021-05-15 Add hh3cSrpolicyPathTable by lin hao
@@ -13,6 +13,10 @@
 --                 Add nodes hh3cSrpSeglistStatus, hh3cSrpSeglistDownReason
 --                 in hh3cSrpSeglistTable
 --                 Add Trap in HH3C-SRPOLICY-MIB
+-- V1.2 2022-03-15 Modifed the hh3cSrpolicyColor, hh3cSrpSeglistColor,
+--                 hh3cSrpFwdColor valid range by lin hao
+-- V1.3 2022-10-05 Deprecated hh3cSrpForwardingTable,
+--                 added hh3cSrpForwardingNewTable by liu yuejuan
 -- =================================================================
 HH3C-SRPOLICY-MIB DEFINITIONS ::= BEGIN
 
@@ -21,11 +25,13 @@ IMPORTS
         FROM SNMPv2-SMI
     InterfaceIndex
         FROM IF-MIB
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
     hh3cCommon
         FROM HH3C-OID-MIB;
 
 hh3cSrpolicy MODULE-IDENTITY
-    LAST-UPDATED "201912061100Z"
+    LAST-UPDATED "202210051100Z"
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -36,6 +42,14 @@ hh3cSrpolicy MODULE-IDENTITY
         "
     DESCRIPTION
         "This MIB file provides information about SR-TE policies."
+    REVISION "202210051100Z"
+    DESCRIPTION
+        "Deprecated hh3cSrpForwardingTable,
+        added hh3cSrpForwardingNewTable"
+    REVISION "202203211100Z"
+    DESCRIPTION
+        "Modifed the hh3cSrpolicyColor, hh3cSrpSeglistColor
+        ,hh3cSrpFwdColor valid range"
     REVISION "201912061100Z"
     DESCRIPTION
         "The initial version of this MIB file."
@@ -88,7 +102,7 @@ Hh3cSrpolicyEntry ::=
      }
 
 hh3cSrpolicyColor OBJECT-TYPE
-    SYNTAX Unsigned32 (1..4294967295)
+    SYNTAX Unsigned32 (0..4294967295)
     MAX-ACCESS accessible-for-notify
     STATUS current
     DESCRIPTION
@@ -237,7 +251,7 @@ Hh3cSrpSeglistEntry ::=
      }
 
 hh3cSrpSeglistColor OBJECT-TYPE
-    SYNTAX Unsigned32 (1..4294967295)
+    SYNTAX Unsigned32 (0..4294967295)
     MAX-ACCESS accessible-for-notify
     STATUS current
     DESCRIPTION
@@ -344,16 +358,25 @@ hh3cSrpSeglistDownReason OBJECT-TYPE
 hh3cSrpForwardingTable OBJECT-TYPE
     SYNTAX SEQUENCE OF Hh3cSrpForwardingEntry
     MAX-ACCESS not-accessible
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
         "This table provides information about forwarding paths for the
-        SR-TE policy."
+        SR-TE policy.
+        To support IPv6 next hop addresses, deprecated the
+        hh3cSrpForwardingTable table and started to use the
+        hh3cSrpForwardingNewTable table.
+        The hh3cSrpForwardingNewTable table inherits the functions of
+        hh3cSrpForwardingTable, reduced the OutIf and Nexthop columns
+        in the index columns, and added the hh3cSrpNewFwdEndPointType and
+        hh3cSrpPathId columns in the index columns.
+        The hh3cSrpForwardingNewTable table supports IPv6 endpoints and
+        IPv6 next hop addresses."
     ::= { hh3cSrpolicy 3 }
 
 hh3cSrpForwardingEntry OBJECT-TYPE
     SYNTAX Hh3cSrpForwardingEntry
     MAX-ACCESS not-accessible
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
         "Each entry contains information about forwarding paths."
     INDEX { hh3cSrpFwdColor, hh3cSrpFwdEndPoint, hh3cSrpFwdPathProto,
@@ -388,9 +411,9 @@ Hh3cSrpForwardingEntry ::=
      }
 
 hh3cSrpFwdColor OBJECT-TYPE
-    SYNTAX Unsigned32 (1..4294967295)
+    SYNTAX Unsigned32 (0..4294967295)
     MAX-ACCESS not-accessible
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
         "The color associates the SR-TE policy with certain intent."
     ::= { hh3cSrpForwardingEntry 1 }
@@ -398,7 +421,7 @@ hh3cSrpFwdColor OBJECT-TYPE
 hh3cSrpFwdEndPoint OBJECT-TYPE
     SYNTAX IpAddress
     MAX-ACCESS not-accessible
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
         "The endpoint is the destination of the SR-TE policy."
     ::= { hh3cSrpForwardingEntry 2 }
@@ -410,7 +433,7 @@ hh3cSrpFwdPathProto OBJECT-TYPE
                    cli(30)
                }
     MAX-ACCESS not-accessible
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
         "Protocol-Origin of a candidate path identifies the protocol that
          originates or signals the candidate path."
@@ -419,7 +442,7 @@ hh3cSrpFwdPathProto OBJECT-TYPE
 hh3cSrpFwdPathInst OBJECT-TYPE
     SYNTAX Integer32 (0..65535)
     MAX-ACCESS not-accessible
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
         "The instance is a value of BGP instance number, when
          the candidate path is originated by BGP."
@@ -428,7 +451,7 @@ hh3cSrpFwdPathInst OBJECT-TYPE
 hh3cSrpFwdPathOri OBJECT-TYPE
     SYNTAX OCTET STRING (SIZE (1..63))
     MAX-ACCESS not-accessible
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
         "Originator is the identifier of the node that instantiated or signalled
         the candidate path on the headend."
@@ -437,7 +460,7 @@ hh3cSrpFwdPathOri OBJECT-TYPE
 hh3cSrpFwdPathDis OBJECT-TYPE
     SYNTAX Unsigned32
     MAX-ACCESS not-accessible
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
         "The discriminator uniquely identifies a candidate path from a
          specific Protocol-Origin."
@@ -446,7 +469,7 @@ hh3cSrpFwdPathDis OBJECT-TYPE
 hh3cSrpFwdSeglistId OBJECT-TYPE
     SYNTAX Unsigned32 (1..4294967295)
     MAX-ACCESS not-accessible
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
         "The ID uniquely identifies the segment list."
     ::= { hh3cSrpForwardingEntry 7 }
@@ -454,7 +477,7 @@ hh3cSrpFwdSeglistId OBJECT-TYPE
 hh3cSrpFwdOutIf OBJECT-TYPE
     SYNTAX InterfaceIndex
     MAX-ACCESS not-accessible
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
         "The value of ifIndex for the outbound interface."
     ::= { hh3cSrpForwardingEntry 8 }
@@ -462,7 +485,7 @@ hh3cSrpFwdOutIf OBJECT-TYPE
 hh3cSrpFwdNexthop OBJECT-TYPE
     SYNTAX IpAddress
     MAX-ACCESS not-accessible
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
         "The IP address of the next hop."
     ::= { hh3cSrpForwardingEntry 9 }
@@ -470,7 +493,7 @@ hh3cSrpFwdNexthop OBJECT-TYPE
 hh3cSrpFwdOutPackets OBJECT-TYPE
     SYNTAX Counter64
     MAX-ACCESS read-only
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
         "The number of outbound packets for the outbound interface."
     ::= { hh3cSrpForwardingEntry 10 }
@@ -478,7 +501,7 @@ hh3cSrpFwdOutPackets OBJECT-TYPE
 hh3cSrpFwdOutOctets OBJECT-TYPE
     SYNTAX Counter64
     MAX-ACCESS read-only
-    STATUS current
+    STATUS deprecated
     DESCRIPTION
         "The number of outbound bytes for the outbound interface."
     ::= { hh3cSrpForwardingEntry 11 }
@@ -608,6 +631,191 @@ hh3cSrpolicyPathDownReason OBJECT-TYPE
          is operationally down."
     ::= { hh3cSrpolicyPathEntry 9 }
 
+-- Forwarding paths information new table for the policy
+hh3cSrpForwardingNewTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSrpForwardingNewEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table provides information about forwarding paths for the
+        SR-MPLS TE policy.
+        To support IPv6 next hop addresses, deprecated the
+        hh3cSrpForwardingTable table and started to use the
+        hh3cSrpForwardingNewTable table.
+        The hh3cSrpForwardingNewTable table inherits the functions of
+        hh3cSrpForwardingTable, reduced the OutIf and Nexthop columns
+        in the index columns, and added the hh3cSrpNewFwdEndPointType and
+        hh3cSrpPathId columns in the index columns.
+        The hh3cSrpForwardingNewTable table supports IPv6 endpoints and
+        IPv6 next hop addresses."
+    ::= { hh3cSrpolicy 5 }
+
+hh3cSrpForwardingNewEntry OBJECT-TYPE
+    SYNTAX Hh3cSrpForwardingNewEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information about forwarding paths."
+    INDEX { hh3cSrpNewFwdColor, hh3cSrpNewFwdEndPointType, hh3cSrpNewFwdEndPoint,
+          hh3cSrpNewFwdPathProto, hh3cSrpNewFwdPathInst, hh3cSrpNewFwdPathOri,
+          hh3cSrpNewFwdPathDis, hh3cSrpNewFwdSeglistId, hh3cSrpPathId }
+    ::= { hh3cSrpForwardingNewTable 1 }
+
+Hh3cSrpForwardingNewEntry ::=
+    SEQUENCE {
+        hh3cSrpNewFwdColor
+            Unsigned32,
+        hh3cSrpNewFwdEndPointType
+            InetAddressType,
+        hh3cSrpNewFwdEndPoint
+            InetAddress,
+        hh3cSrpNewFwdPathProto
+            INTEGER,
+        hh3cSrpNewFwdPathInst
+            Integer32,
+        hh3cSrpNewFwdPathOri
+            OCTET STRING,
+        hh3cSrpNewFwdPathDis
+            Unsigned32,
+        hh3cSrpNewFwdSeglistId
+            Unsigned32,
+        hh3cSrpPathId
+            Unsigned32,
+        hh3cSrpNewFwdOutIf
+            InterfaceIndex,
+        hh3cSrpNewFwdNexthopType
+            InetAddressType,
+        hh3cSrpNewFwdNexthop
+            InetAddress,
+        hh3cSrpNewFwdOutPackets
+            Counter64,
+        hh3cSrpNewFwdOutOctets
+            Counter64
+     }
+
+hh3cSrpNewFwdColor OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4294967295)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Color associated with the SR-MPLS TE policy."
+    ::= { hh3cSrpForwardingNewEntry 1 }
+
+hh3cSrpNewFwdEndPointType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Type of the endpoint IP address."
+    ::= { hh3cSrpForwardingNewEntry 2 }
+
+hh3cSrpNewFwdEndPoint OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Destination node of the SR-MPLS TE policy.
+        The type of this address is determined by the value of
+        hh3cSrpFwdEndPointType."
+    ::= { hh3cSrpForwardingNewEntry 3 }
+
+hh3cSrpNewFwdPathProto OBJECT-TYPE
+    SYNTAX INTEGER{
+                   pcep(10),
+                   bgp(20),
+                   cli(30)
+               }
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Origin protocol of a candidate path, which identifies the protocol that
+         originated or signaled the candidate path."
+    ::= { hh3cSrpForwardingNewEntry 4 }
+
+hh3cSrpNewFwdPathInst OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "BGP instance number when
+         the candidate path was originated by BGP."
+    ::= { hh3cSrpForwardingNewEntry 5 }
+
+hh3cSrpNewFwdPathOri OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..63))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Originator, which is the identifier of the headend node that
+        instantiated or signaled the candidate path."
+    ::= { hh3cSrpForwardingNewEntry 6 }
+
+hh3cSrpNewFwdPathDis OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Discriminator that uniquely identifies the candidate path generated by a
+         specific protocol."
+    ::= { hh3cSrpForwardingNewEntry 7 }
+
+hh3cSrpNewFwdSeglistId OBJECT-TYPE
+    SYNTAX Unsigned32 (1..4294967295)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ID that uniquely identifies an SID list."
+    ::= { hh3cSrpForwardingNewEntry 8 }
+
+hh3cSrpPathId OBJECT-TYPE
+    SYNTAX Unsigned32 (0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ID that uniquely identifies a forwarding path."
+    ::= { hh3cSrpForwardingNewEntry 9 }
+
+hh3cSrpNewFwdOutIf OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Output interface index."
+    ::= { hh3cSrpForwardingNewEntry 10 }
+
+hh3cSrpNewFwdNexthopType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Type of the next hop."
+    ::= { hh3cSrpForwardingNewEntry 11 }
+
+hh3cSrpNewFwdNexthop OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address of the next hop.
+        The type of this address is determined by the value of
+        hh3cSrpFwdNexthopType."
+    ::= { hh3cSrpForwardingNewEntry 12 }
+
+hh3cSrpNewFwdOutPackets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of packets forwarded by the output interface."
+    ::= { hh3cSrpForwardingNewEntry 13 }
+
+hh3cSrpNewFwdOutOctets OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of bytes forwarded by the output interface."
+    ::= { hh3cSrpForwardingNewEntry 14 }
 
 -- Notification Definitions
 hh3cSrpolicyNotifications  OBJECT IDENTIFIER ::= { hh3cSrpolicy 0 }

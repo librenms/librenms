@@ -30,6 +30,7 @@ use App\Exceptions\RunningAsIncorrectUserException;
 use Illuminate\Console\Events\CommandStarting;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\SystemUser;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class CommandStartingListener
@@ -91,15 +92,14 @@ class CommandStartingListener
             return;
         }
 
-        $current_user = posix_getpwuid(posix_geteuid())['name'];
         $executable = basename((string) ($_SERVER['argv'][0] ?? $_SERVER['SCRIPT_FILENAME'] ?? 'this'));
 
-        if ($current_user == 'root') {
+        if (SystemUser::isRoot()) {
             throw new RunningAsIncorrectUserException("Error: $executable must not run as root.");
         }
 
         $librenms_user = config('librenms.user');
-        if ($librenms_user !== $current_user) {
+        if ($librenms_user !== SystemUser::name()) {
             throw new RunningAsIncorrectUserException("Error: $executable must be run as the user $librenms_user.");
         }
     }

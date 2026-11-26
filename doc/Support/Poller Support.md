@@ -45,7 +45,6 @@ the web interface at Device -> Edit -> Modules.
     ```bash
     lnms config:set poller_modules.unix-agent false
     lnms config:set poller_modules.os true
-    lnms config:set poller_modules.ipmi false
     lnms config:set poller_modules.sensors true
     lnms config:set poller_modules.processors true
     lnms config:set poller_modules.mempools true
@@ -116,9 +115,9 @@ module for the Linux OS, use these commands:
 
 `os`: OS detection. This module finds the OS of the device.
 
-`ipmi`: IPMI sensor polling. Enabled by the IPMI polling method.
-
-`sensors`: sensor detection for temperature, humidity, voltage, and more.
+`sensors`: sensor polling for temperature, humidity, voltage, and more.
+Sensors come from SNMP and from the IPMI (ipmitool) and unix agent (hddtemp)
+polling methods of the device.
 
 `processors`: processor support for devices.
 

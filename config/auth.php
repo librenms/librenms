@@ -10,6 +10,9 @@
 
 return [
 
+    // development only (APP_ENV=local): username to log in automatically in the web ui
+    'test_user' => env('AUTH_TEST_USER'),
+
     'guards' => [
         'web' => [
             'driver' => 'session',

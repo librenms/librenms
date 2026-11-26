@@ -1,12 +1,12 @@
 -- **********************************************
--- ZyXEL Communications Corporation
+-- Zyxel Communications Corporation
 --
 -- Enterprise Solution MIB definitions
--- CAPWAP MIBs 
+-- CAPWAP MIBs
 --
 -- LiKuang
 --
--- Copyright by ZyXEL Communications Corp.
+-- Copyright by Zyxel Communications Corp.
 -- All rights reserved.
 -- **********************************************
 
@@ -14,109 +14,115 @@ ZYXEL-ES-CAPWAP DEFINITIONS ::= BEGIN
 
 IMPORTS
 
-	MODULE-IDENTITY,
-	OBJECT-IDENTITY,
-	OBJECT-TYPE		FROM SNMPv2-SMI
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    OBJECT-TYPE     FROM SNMPv2-SMI
 
-	OBJECT-GROUP,
-	MODULE-COMPLIANCE	FROM SNMPv2-CONF
+    OBJECT-GROUP,
+    MODULE-COMPLIANCE   FROM SNMPv2-CONF
 
-	DisplayString	FROM SNMPv2-TC
+    DisplayString   FROM SNMPv2-TC
 
-	esMgmt			FROM ZYXEL-ES-SMI;
+    esMgmt          FROM ZYXEL-ES-SMI;
 
 esCAPWAP MODULE-IDENTITY
-	LAST-UPDATED	"201010060000Z"    
-	ORGANIZATION "Enterprise Solution ZyXEL"     
-	CONTACT-INFO
-		""	   
-	DESCRIPTION
-		"The subtree for CAPWAP information"
-	::= { esMgmt 3 }
+    LAST-UPDATED    "201010060000Z"
+    ORGANIZATION "Enterprise Solution Zyxel"
+    CONTACT-INFO
+        ""
+    DESCRIPTION
+        "The subtree for CAPWAP information"
+    ::= { esMgmt 3 }
 
 
 -- esCAPWAP OIDs
-                        
-	capwapInfo			OBJECT-IDENTITY
-		STATUS		current
-		DESCRIPTION
-			"The subtree for CAPWAP"
-		::= { esCAPWAP 1 }
 
-	capwapTraps			OBJECT-IDENTITY
-		STATUS		current
-		DESCRIPTION
-			"The subtree for CAPWAP"
-		::= { esCAPWAP 2 }
-          
-	capwapOnlineAP  OBJECT-TYPE
-		SYNTAX	  Unsigned32
-		MAX-ACCESS  read-only
-		STATUS	current
-		DESCRIPTION
-			"Capwap online AP. "
-	::= { capwapInfo	1 }
-                            
+    capwapInfo          OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "The subtree for CAPWAP"
+        ::= { esCAPWAP 1 }
+
+    capwapTraps         OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "The subtree for CAPWAP"
+        ::= { esCAPWAP 2 }
+
+    capwapOnlineAP  OBJECT-TYPE
+        SYNTAX    Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Capwap online AP. "
+    ::= { capwapInfo    1 }
+
     capwapOfflineAP OBJECT-TYPE
-		SYNTAX	  Unsigned32
-		MAX-ACCESS  read-only
-		STATUS	current
-		DESCRIPTION
-			"Capwap offline AP. "
-	::= { capwapInfo	2 }   
-	
-	capwapUnMgntAP OBJECT-TYPE
-		SYNTAX	  Unsigned32
-		MAX-ACCESS  read-only
-		STATUS	current
-		DESCRIPTION
-			"Capwap unmanagment AP. "
-	::= { capwapInfo	3 }             
-	
-	capwapTotalStation OBJECT-TYPE
-		SYNTAX	  Unsigned32
-		MAX-ACCESS  read-only
-		STATUS	current
-		DESCRIPTION
-			"Total stations in all AP. "
-	::= { capwapInfo	4 }  
-	                           
---	capwapTrapsControl			OBJECT-IDENTITY
---		STATUS		current
---		DESCRIPTION
---			"The subtree for CAPWAP"
---		::= { capwapTraps 1 }
-		
+        SYNTAX    Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Capwap offline AP. "
+    ::= { capwapInfo    2 }
+
+    capwapUnMgntAP OBJECT-TYPE
+        SYNTAX    Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Capwap unmanagment AP. "
+    ::= { capwapInfo    3 }
+
+    capwapTotalStation OBJECT-TYPE
+        SYNTAX    Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Total stations in all AP. "
+    ::= { capwapInfo    4 }
+
+--  capwapTrapsControl          OBJECT-IDENTITY
+--      STATUS      current
+--      DESCRIPTION
+--          "The subtree for CAPWAP"
+--      ::= { capwapTraps 1 }
+
     capwapTrapsControl OBJECT-TYPE
- 		SYNTAX INTEGER {
- 			enable(1),
- 			disable(2)
- 		}
- 		MAX-ACCESS read-write
- 		STATUS current
- 		DESCRIPTION
- 		"Controls capwap group traps enable or disable."
- 	::= { capwapTraps 1 }
+        SYNTAX INTEGER {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Controls capwap group traps enable or disable."
+    ::= { capwapTraps 1 }
 
 
-	capwapTrapsItems			OBJECT-IDENTITY
-		STATUS		current
-		DESCRIPTION
-			"The subtree for CAPWAP"
-		::= { capwapTraps 2 }
-                                  
-                                  
+    capwapTrapsItems            OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "The subtree for CAPWAP"
+        ::= { capwapTraps 2 }
+
+
     capwapWTPOnline NOTIFICATION-TYPE
-		STATUS	current
-		DESCRIPTION
-			"WTP online notification. "
-	::= { capwapTrapsItems	1 }
-                            
+        STATUS  current
+        DESCRIPTION
+            "WTP online notification. "
+    ::= { capwapTrapsItems  1 }
+
     capwapWTPOffline NOTIFICATION-TYPE
-		STATUS	current
-		DESCRIPTION
-			"WTP offline notification. "
-	::= { capwapTrapsItems	2 }       
-	                           
+        STATUS  current
+        DESCRIPTION
+            "WTP offline notification. "
+    ::= { capwapTrapsItems  2 }
+
+    capwapWARReboot NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+            "WAR reboot notification. "
+    ::= { capwapTrapsItems  3 }
+
 END
 

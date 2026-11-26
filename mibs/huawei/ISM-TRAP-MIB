@@ -17,7 +17,7 @@
 	
 	
 		huaweistorage MODULE-IDENTITY 
-			LAST-UPDATED "201210101725Z"		-- October 10, 2012 at 17:25 GMT
+			LAST-UPDATED "201304071915Z"		-- April 07, 2013 at 19:15 GMT
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -28,10 +28,13 @@
 				Website: http://www.huawei.com
 				Email: support@huawei.com"
 			DESCRIPTION 
-				"Description."
+				"The ISM-TRAP-MIB contains objects to query alarm informations."
 			REVISION "201304071915Z"		-- April 07, 2013 at 19:15 GMT
 			DESCRIPTION 
 				" "
+			REVISION "201210101725Z"  		-- October 10, 2012 at 17:25 GMT
+			DESCRIPTION 
+				"Description."
 			::= { enterprises 34774 }
 
 		
@@ -61,22 +64,23 @@
 		
 		trapAddress OBJECT IDENTIFIER ::= { hwISM 2 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.2.1
 		forwardAddrTable OBJECT-TYPE
 			SYNTAX SEQUENCE OF ForwardAddrEntry
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"This table gives information about alarm forwarding address information, involving IP addresses, ports, and versions.
+				This table is used exclusively for ISM management software and is not available to others."
 			::= { trapAddress 1 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.2.1.1
 		forwardAddrEntry OBJECT-TYPE
 			SYNTAX ForwardAddrEntry
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"A table containing the part component."
 			INDEX { forwardAddrIndex }
 			::= { forwardAddrTable 1 }
 
@@ -96,93 +100,122 @@
 				forwardAddrIPNew
 					OCTET STRING,
 				forwardAddrTrapType
-					Integer32
+					Integer32,
+				forwardAddrUSMUserName
+					OCTET STRING
 			 }
-
+			 
+		-- 1.3.6.1.4.1.34774.4.1.2.1.1.1
 		forwardAddrIndex OBJECT-TYPE
-			SYNTAX OCTET STRING
+			SYNTAX OCTET STRING (SIZE (0..1024))
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Index to the alarm forwarding address. The value can be 0 to 3."
 			::= { forwardAddrEntry 1 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.2.1.1.2
 		forwardAddrIP OBJECT-TYPE
 			SYNTAX IpAddress
 			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"IP address to which the alarm is forwarded. Only support IPv4 format.
+				If domain names are supported and valid, the destination address is the IP address corresponding to the domain name;
+				if the domain name is invalid, '0.0.0.0' is displayed."
 			::= { forwardAddrEntry 2 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.2.1.1.3
 		forwardAddrPort OBJECT-TYPE
 			SYNTAX Gauge32
 			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Port of the alarm forwarding address. The value can be 1 to 65535."
 			::= { forwardAddrEntry 3 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.2.1.1.4
 		forwardAddrTrapVer OBJECT-TYPE
 			SYNTAX Integer32
 			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
-				"Description.
-				1: V1 Trap
-				2: V2 Trap
-				3: V3 Trap"
+				"Version of the alarm forwarding address. The value can be:
+				 1: SNMPv1
+				 2: SNMPv2c
+				 3: SNMPv3
+				When configuring the alarm forwarding address, if this field is not filled, the default is SNMPv2c."
 			::= { forwardAddrEntry 4 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.2.1.1.5
 		forwardAddrRowStatus OBJECT-TYPE
 			SYNTAX RowStatus
 			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Row status value. The value can be:
+				 1: Modify the alarm forwarding address
+				 4: Add the alarm forwarding address
+				 6: Delete the alarm forwarding address"
 			::= { forwardAddrEntry 5 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.2.1.1.6
 		forwardAddrIPNew OBJECT-TYPE
 			SYNTAX OCTET STRING
 			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"New alarm forwarding address. Support IPv4 or IPv6 format.
+				If forwardAddrIP and forwardAddrIPNew fields are filled with values, take the value of the forwardAddrIPNew field by default."
 			::= { forwardAddrEntry 6 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.2.1.1.7
 		forwardAddrTrapType OBJECT-TYPE
 			SYNTAX Integer32
 			MAX-ACCESS read-create
 			STATUS current
 			DESCRIPTION
-				" "
+				"Type of the alarm forwarding address. The value can be:
+				1: Parsed. Sends parsed alarms to the alarm forwarding address (Trap OID:1.3.6.1.4.1.2011.2.91.10.2.1.0.1)
+				2: Original. Sends original alarms to the alarm forwarding address (Trap OID:1.3.6.1.4.1.34774.4.1.4.2).
+				3: All. sends Parsed, Original, and Parsed_alarm_oid alarms to the destination address for trap forwarding.
+				4: Parsed_alarm_oid. sends parsed alarms to the destination address for trap forwarding. (Each alarm corresponds to one OID. Products later than V3R6 support the alarm OID).
+				5: Parsed_time_string. Sends parsed alarms to the destination address for trap forwarding (Products V3R3C20SPC200 and later than V3R6 support this trap type. Trap OID: 1.3.6.1.4.1.2011.2.251.20.1.2.1)
+				6: Original_time_string. Sends original alarms to the destination address for trap forwarding (Products V3R3C20SPC200 and later than V3R6 support this trap type. Trap OID: 1.3.6.1.4.1.2011.2.251.20.2.1.1).
+				When configuring the alarm forwarding address, if this field is not filled, the default is Original."
 			::= { forwardAddrEntry 7 }
---  
-		
-		event OBJECT IDENTIFIER ::= { hwISM 3 }
+
+		-- 1.3.6.1.4.1.34774.4.1.2.1.1.8
+		forwardAddrUSMUserName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"USM user name of the destination address for trap forwarding.
+				When the trap forwarding address type is SNMPv3, this field is mandatory and users must ensure a specified USM user exists in the system.
+				Otherwise, this operation fails to be performed. If this field is mandatory, and the parameter is not delivered or no value is specified for the parameter, the system default value is Kaimse."
+			::= { forwardAddrEntry 8 }
 
 		
+--   
+		event OBJECT IDENTIFIER ::= { hwISM 3 }
+
+		-- 1.3.6.1.4.1.34774.4.1.3.1
 		eventTable OBJECT-TYPE
 			SYNTAX SEQUENCE OF EventEntry
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"This table gives device alarm information, which can be queried. This table is used exclusively for ISM management software and is not available to others."
 			::= { event 1 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.1.1
 		eventEntry OBJECT-TYPE
 			SYNTAX EventEntry
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"A table containing the part component."
 			INDEX { hwIsmEventSequence }
 			::= { eventTable 1 }
 
@@ -207,180 +240,197 @@
 					RowStatus
 			 }
 
+		-- 1.3.6.1.4.1.34774.4.1.3.1.1.1
 		hwIsmEventType OBJECT-TYPE
 			SYNTAX Unsigned32
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Alarm type. The value can be:
+				0: Event
+				1: Fault
+				2: Recovery"
 			::= { eventEntry 1 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.1.1.2
 		hwIsmEventID OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Original alarm ID. It indicates a collection of alarms with the same category."
 			::= { eventEntry 2 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.1.1.3
 		hwIsmEventLevel OBJECT-TYPE
 			SYNTAX Unsigned32
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Alarm severity. The value can be:
+				2: Info
+				3: Warning
+				5: Major
+				6: Critical"
 			::= { eventEntry 3 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.1.1.4
 		hwIsmEventSequence OBJECT-TYPE
 			SYNTAX Unsigned32
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Alarm SN, namely, unique identifier of the alarm."
 			::= { eventEntry 4 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.1.1.5
 		hwIsmEventTime OBJECT-TYPE
 			SYNTAX Unsigned32
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"UTC time when the alarm was generated, unit: seconds."
 			::= { eventEntry 5 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.1.1.6
 		hwIsmEventRecoveryTime OBJECT-TYPE
 			SYNTAX Unsigned32
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"UTC time when the alarm was cleared, unit: seconds."
 			::= { eventEntry 6 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.1.1.7
 		hwIsmEventParameter OBJECT-TYPE
 			SYNTAX OCTET STRING
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Alarm location parameter. This parameter can be used to resolve alarm description. It is used with the alarm configuration file of the upper-layer network management system."
 			::= { eventEntry 7 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.1.1.20
 		hwIsmEventRowStatus OBJECT-TYPE
 			SYNTAX RowStatus
 			MAX-ACCESS read-write
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Row status value. The value can be:
+				1: Row Active
+				6: Remove a alarm according to the alarm serial number."
 			::= { eventEntry 20 }
 
 		
 		trapEvent OBJECT IDENTIFIER ::= { event 3 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.3.1
 		hwIsmTrapEventType OBJECT-TYPE
 			SYNTAX Unsigned32
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				" Alarm type. The value can be:
+				0: Event
+				1: Fault
+				2: Recovery"
 			::= { trapEvent 1 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.3.2
 		hwIsmTrapEventID OBJECT-TYPE
 			SYNTAX Counter64
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Original alarm ID."
 			::= { trapEvent 2 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.3.3
 		hwIsmTrapEventLevel OBJECT-TYPE
 			SYNTAX Unsigned32
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Alarm severity. The value can be:
+				2: Info
+				3: Warning
+				5: Major
+				6: Critical"
 			::= { trapEvent 3 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.3.4
 		hwIsmTrapEventSequence OBJECT-TYPE
 			SYNTAX Unsigned32
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Alarm SN, namely, unique identifier of the alarm."
 			::= { trapEvent 4 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.3.5
 		hwIsmTrapEventTime OBJECT-TYPE
 			SYNTAX Unsigned32
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"UTC time when the alarm was generated, unit: seconds."
 			::= { trapEvent 5 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.3.6
 		hwIsmTrapEventRecoveryTime OBJECT-TYPE
 			SYNTAX Unsigned32
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"UTC time when the alarm was cleared, unit: seconds."
 			::= { trapEvent 6 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.3.7
 		hwIsmTrapEventParameter OBJECT-TYPE
 			SYNTAX OCTET STRING
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Alarm location parameter. This parameter can be used to resolve alarm description. It is used with the alarm configuration file of the upper-layer network management system."
 			::= { trapEvent 7 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.3.8
 		hwIsmTrapEventID32Bit OBJECT-TYPE
 			SYNTAX Unsigned32
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Alarm ID of I2000 network management software."
 			::= { trapEvent 8 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.3.9
 		hwIsmTrapEventTimeStr OBJECT-TYPE
 			SYNTAX OCTET STRING
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Time when an alarm was generated. string format."
 			::= { trapEvent 9 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.3.3.10
 		hwIsmTrapEventRecoveryTimeStr OBJECT-TYPE
 			SYNTAX OCTET STRING
 			MAX-ACCESS accessible-for-notify
 			STATUS current
 			DESCRIPTION
-				"Description."
+				"Time when an alarm was cleared. string format."
 			::= { trapEvent 10 }
 
 		
 		notificationType OBJECT IDENTIFIER ::= { hwISM 4 }
 
-		
+		-- 1.3.6.1.4.1.34774.4.1.4.2
 		eventType NOTIFICATION-TYPE
 			OBJECTS { hwIsmTrapEventType, hwIsmTrapEventID, hwIsmTrapEventLevel, hwIsmTrapEventSequence, hwIsmTrapEventTime, 
 				hwIsmTrapEventRecoveryTime, hwIsmTrapEventParameter }
 			STATUS current
 			DESCRIPTION 
-				" "
+				"This table is used exclusively for ISM management software and is not available to others."
 			::= { notificationType 2 }
 
 		
@@ -393,10 +443,10 @@
 		currentObjectGroup OBJECT-GROUP
 			OBJECTS { forwardAddrIndex, forwardAddrIP, forwardAddrPort, forwardAddrTrapVer, forwardAddrRowStatus, 
 				hwIsmTrapEventType, hwIsmTrapEventID, hwIsmTrapEventLevel, hwIsmTrapEventSequence, hwIsmTrapEventTime, 
-				hwIsmTrapEventRecoveryTime, forwardAddrIPNew, forwardAddrTrapType, hwIsmTrapEventID32Bit, hwIsmTrapEventTimeStr, 
-				hwIsmTrapEventRecoveryTimeStr, hwIsmTrapEventParameter, hwIsmEventType, hwIsmEventID, hwIsmEventLevel, 
-				hwIsmEventSequence, hwIsmEventTime, hwIsmEventRecoveryTime, hwIsmEventParameter, hwIsmEventRowStatus
-				 }
+				hwIsmTrapEventRecoveryTime, forwardAddrIPNew, forwardAddrTrapType, forwardAddrUSMUserName, hwIsmTrapEventID32Bit, 
+				hwIsmTrapEventTimeStr, hwIsmTrapEventRecoveryTimeStr, hwIsmTrapEventParameter, hwIsmEventType, hwIsmEventID, 
+				hwIsmEventLevel, hwIsmEventSequence, hwIsmEventTime, hwIsmEventRecoveryTime, hwIsmEventParameter, 
+				hwIsmEventRowStatus }
 			STATUS current
 			DESCRIPTION 
 				"Enter the description of the created OBJECT-GROUP."

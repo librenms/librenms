@@ -135,10 +135,14 @@ class ModuleList
     }
 
     /**
-     * True when one of the module's non-SNMP methods is enabled, otherwise null.
+     * True when a non-SNMP method auto-enables the module, otherwise null.
      */
     public function methodSetting(string $module_name, Device $device): ?bool
     {
+        if ($module_name === 'packages') {
+            return null; // the module settings control when inventory is collected
+        }
+
         $methods = array_filter(
             Module::fromName($module_name)->pollingMethods($device),
             fn (PollingMethodType $method): bool => $method !== PollingMethodType::Snmp,

@@ -27,6 +27,7 @@
 namespace App\Http\Controllers\Table\Traits;
 
 use App\Models\SensorModel;
+use App\Models\WirelessSensor;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Blade;
@@ -78,8 +79,9 @@ trait SensorTrait
         ];
 
         $hostname = Blade::render('<x-device-link :device="$device" />', ['device' => $model->device]);
-        $sensor_class = $model->sensor_class instanceof \BackedEnum ? $model->sensor_class->value : $model->sensor_class;
-        $link = Url::generate(['page' => 'device', 'device' => $model['device_id'], 'tab' => 'health', 'metric' => $sensor_class]);
+        $link = $model instanceof WirelessSensor
+            ? route('device.wireless', ['device' => $model->device_id, 'metric' => $model->sensor_class->value])
+            : route('device.health', ['device' => $model->device_id, 'metric' => $model->sensor_class]);
         $descr = Url::graphPopup($graph_array, htmlentities((string) $model->sensor_descr), $link);
         $mini_graph = Url::graphPopup($graph_array);
         $sensor_current = Html::severityToLabel($model->currentStatus(), $model->formatValue());

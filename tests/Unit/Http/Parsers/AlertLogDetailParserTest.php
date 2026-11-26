@@ -172,8 +172,7 @@ class AlertLogDetailParserTest extends TestCase
 
         $this->assertEquals('Access Point', $fields[0]['label']);
         $this->assertEquals('AP-01', $fields[0]['value']);
-        $this->assertStringContainsString('accesspoints', $fields[0]['url']);
-        $this->assertStringContainsString('ap=101', $fields[0]['url']);
+        $this->assertSame('/device/1/accesspoints/101', parse_url($fields[0]['url'], PHP_URL_PATH));
     }
 
     public function testFormatService(): void
@@ -227,8 +226,7 @@ class AlertLogDetailParserTest extends TestCase
 
         $this->assertEquals('BGP Peer', $fields[0]['label']);
         $this->assertEquals('10.0.0.1', $fields[0]['value']);
-        $this->assertStringContainsString('routing', $fields[0]['url']);
-        $this->assertStringContainsString('proto=bgp', $fields[0]['url']);
+        $this->assertEquals(route('device.routing.bgp', ['device' => 1]), $fields[0]['url']);
         $this->assertEquals('Description', $fields[1]['label']);
         $this->assertEquals('ISP-A', $fields[1]['value']);
         $this->assertEquals('Remote AS', $fields[2]['label']);

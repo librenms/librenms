@@ -288,7 +288,7 @@ class GlobalRoutingTest extends TestCase
             ->get(route('routing.mpls', ['view' => 'saps']))
             ->assertOk()
             ->assertSee('Customer-SAP')
-            ->assertSee('port=' . $sapPort->port_id, false)
+            ->assertSee(route('device.port', ['device' => $sapPort->device_id, 'port' => $sapPort->port_id]), false)
             ->assertSee('200.1234.4095');
     }
 

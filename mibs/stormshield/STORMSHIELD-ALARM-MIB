@@ -6,7 +6,7 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       stormshieldMIB, snsNotifications                             FROM STORMSHIELD-SMI-MIB;
 
    snsAlarm MODULE-IDENTITY
-      LAST-UPDATED  "201702200000Z"
+      LAST-UPDATED  "202504170000Z"
       ORGANIZATION  "Stormshield"
       CONTACT-INFO
          "Customer Support
@@ -52,7 +52,9 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       snsADport             Integer32,
       snsASname             OCTET STRING,
       snsADname             OCTET STRING,
-      snsAMessage           SnmpAdminString
+      snsAMessage           SnmpAdminString,
+      snsAPriority          Integer32,
+      snsARepeat            Integer32
    }
 
    snsAIndex OBJECT-TYPE
@@ -151,6 +153,31 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
          "Alarm Message"
       ::= { snsAEntry 12 }
 
+   snsAPriority OBJECT-TYPE
+      SYNTAX     Integer32 {
+          emergency(0),
+          major(1), -- alert
+          critical(2),
+          error(3),
+          minor(4), -- warning
+          notice(5),
+          info(6),
+          debug(7)
+      }
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "Alarm priority"
+      ::= { snsAEntry 13 }
+
+   snsARepeat OBJECT-TYPE
+      SYNTAX     Integer32
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "Number of repetition"
+      ::= { snsAEntry 14 }
+
    snsAicmpTable OBJECT-TYPE
       SYNTAX SEQUENCE OF SnsAicmpEntry
       MAX-ACCESS  not-accessible
@@ -179,7 +206,9 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       snsAicmpCode      Integer32,
       snsAicmpSname     OCTET STRING,
       snsAicmpDname     OCTET STRING,
-      snsAicmpMessage   SnmpAdminString
+      snsAicmpMessage   SnmpAdminString,
+      snsAicmpPriority  Integer32,
+      snsAicmpRepeat    Integer32
    }
 
    snsAicmpIndex OBJECT-TYPE
@@ -271,6 +300,31 @@ STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "Alarm message"
       ::= { snsAicmpEntry 11 }
+
+   snsAicmpPriority OBJECT-TYPE
+      SYNTAX     Integer32 {
+          emergency(0),
+          major(1), -- alert
+          critical(2),
+          error(3),
+          minor(4), -- warning
+          notice(5),
+          info(6),
+          debug(7)
+      }
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "Alarm priority"
+      ::= { snsAicmpEntry 12 }
+
+   snsAicmpRepeat OBJECT-TYPE
+      SYNTAX     Integer32
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "Number of repetition"
+      ::= { snsAicmpEntry 13 }
 
    snsNotification NOTIFICATION-TYPE
    OBJECTS { snsATime, snsASif, snsASaddr, snsADaddr, snsAMessage }

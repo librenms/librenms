@@ -72,7 +72,7 @@
                 <form class="form-inline" x-on:submit.prevent="addContext()">
                     <div class="form-group">
                         <label for="manual-context">{{ __('Add VRF by SNMP context') }}</label>
-                        <input type="text" id="manual-context" class="form-control" x-model="newContext" maxlength="128" placeholder="{{ __('SNMP context') }}">
+                        <input type="text" id="manual-context" class="form-control" x-model="newContext" maxlength="128" placeholder="{{ __('SNMP Context') }}">
                     </div>
                     <button type="submit" class="btn btn-default" :disabled="newContext.trim() === '' || isPending('add')"><i class="fa fa-plus"></i> {{ __('Add') }}</button>
                 </form>

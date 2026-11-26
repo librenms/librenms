@@ -30,4 +30,9 @@ class EventlogPolicy
         return $this->hasGlobalPermission($user, 'view', true)
             && Permissions::canAccessDevice($eventLog->device_id, $user);
     }
+
+    public function create(User $user): bool
+    {
+        return $this->hasGlobalPermission($user, 'create');
+    }
 }

@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved
 --
 -- Description: stack mib
 -- Reference: STACK-MIB
--- Version: V1.5
+-- Version: V1.7
 -- History:
 --   V1.0 Created by ranbin
 --        Initial version 2008-04-30
@@ -28,6 +28,20 @@
 --        Added hh3cStackPhysicalIntfName
 --   V1.5 2021-03-17 Updated by meishenhe
 --        Added notification node hh3cStackPhysicalIntfRxTimeout
+--   V1.6 2022-06-18 Updated by meishenhe
+--        Added notification node hh3cStackMemberAdd
+--        Added notification node hh3cStackMemberLeave
+--        Added notification node hh3cStackLinkUp
+--        Added notification nodehh3cStackLinkDown
+--        Added notification node hh3cStackMemberLimit
+--        Added notification node hh3cStackMemberPortLoopAlarm
+--        Added notification node hh3cStackMemberPortLoopAlarmRecover
+--        Added notification node hh3cStackBrigdgeMacChange
+--        Added notification node hh3cStackLogicStackPortLinkErr
+--        Added notification node hh3cStackLogicStackPortLinkErrRecover
+--   V1.7 2022-09-20 Updated by meishenhe
+--        Added notification node hh3cStackPortConfigureFailure
+--        Added notification node hh3cStackSetUpFailure
 -- =================================================================
 HH3C-STACK-MIB DEFINITIONS ::= BEGIN
 
@@ -39,10 +53,12 @@ IMPORTS
         ifIndex, ifDescr
     FROM IF-MIB
         Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Unsigned32
-    FROM SNMPv2-SMI;
+    FROM SNMPv2-SMI
+        DisplayString, MacAddress
+    FROM SNMPv2-TC;
 
 hh3cStack MODULE-IDENTITY
-    LAST-UPDATED "202103250943Z"
+    LAST-UPDATED "202209221353Z"
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -56,6 +72,22 @@ hh3cStack MODULE-IDENTITY
          This MIB is applicable to IRF-capable products.  Some objects in
          this MIB may be used only for some specific products, so users should
          refer to the related documents to acquire more detailed information."
+    REVISION "202209221353Z"
+    DESCRIPTION
+        "Added notification node hh3cStackPortConfigureFailure
+         Added notification node hh3cStackSetUpFailure"
+    REVISION "202206180943Z"
+    DESCRIPTION
+        "Added notification node hh3cStackMemberAdd
+         Added notification node hh3cStackMemberLeave
+         Added notification node hh3cStackLinkUp
+         Added notification node hh3cStackLinkDown
+         Added notification node hh3cStackMemberLimit
+         Added notification node hh3cStackMemberPortLoopAlarm
+         Added notification node hh3cStackMemberPortLoopAlarmRecover
+         Added notification node hh3cStackBrigdgeMacChange
+         Added notification node hh3cStackLogicStackPortLinkErr
+         Added notification node hh3cStackLogicStackPortLinkErrRecover"
     REVISION "202103250943Z"
     DESCRIPTION
         "Added notification node hh3cStackPhysicalIntfRxTimeout."
@@ -625,6 +657,146 @@ hh3cStackPhysicalIntfRxTimeout NOTIFICATION-TYPE
          physical interface to receive packets has timed out."
     ::= { hh3cStackTrapOjbects 9 }
 
+hh3cStackMemberAdd NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cStackMemberID,
+            hh3cStackMacAddress
+        }
+    STATUS      current
+    DESCRIPTION
+        "The hh3cStackMemberAdd trap indicates that
+         the new stack member has joined."
+    ::= { hh3cStackTrapOjbects 10 }
+
+hh3cStackMemberLeave NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cStackMemberID,
+            hh3cStackMacAddress
+        }
+    STATUS      current
+    DESCRIPTION
+        "The hh3cStackMemberLeave trap indicates that
+         the stack member has left."
+    ::= { hh3cStackTrapOjbects 11 }
+
+hh3cStackLinkUp NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cStackPortIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "The hh3cStackLinkUp trap indicates that
+         the stack logical interface has changed to the up state."
+    ::= { hh3cStackTrapOjbects 12 }
+
+hh3cStackLinkDown NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cStackPortIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "The hh3cStackLinkDown trap indicates that
+         the stack logical interface has changed to the down state."
+    ::= { hh3cStackTrapOjbects 13 }
+
+hh3cStackMemberLimit NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cStackMemberThreshold
+        }
+    STATUS      current
+    DESCRIPTION
+        "The hh3cStackMemberLimit trap indicates that
+         the number of stack members reached the upper limit, and new members failed to join the stack."
+    ::= { hh3cStackTrapOjbects 14}
+
+hh3cStackMemberPortLoopAlarm NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cStackPortIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "The hh3cStackMemberPortLoopAlarm trap indicates that
+         error packets are being forwarded in a ring on the stack port."
+    ::= { hh3cStackTrapOjbects 15}
+
+hh3cStackMemberPortLoopAlarmRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cStackPortIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "The hh3cStackMemberPortLoopAlarmRecover trap indicates that
+         the fault of error packets' circular forwarding on the stack port is recovered."
+    ::= { hh3cStackTrapOjbects 16}
+
+hh3cStackBrigdgeMacChange NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cStackMemberID
+        }
+    STATUS      current
+    DESCRIPTION
+        "The hh3cStackBrigdgeMacChange trap indicates that
+         the MAC address of the stack system has changed to that of the new primary device."
+    ::= { hh3cStackTrapOjbects 17}
+
+hh3cStackLogicStackPortLinkErr NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cStackLocalPhysicalIntfName,
+            hh3cStackPeerPhysicalIntfName,
+            hh3cStackLinkErrReason
+        }
+    STATUS      current
+    DESCRIPTION
+        "The hh3cStackLogicStackPortLinkErr trap indicates that
+         the logical stack port has incorrectly connected."
+    ::= { hh3cStackTrapOjbects 18}
+
+hh3cStackLogicStackPortLinkErrRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cStackLocalPhysicalIntfName,
+            hh3cStackPeerPhysicalIntfName,
+            hh3cStackLinkErrReason
+        }
+    STATUS      current
+    DESCRIPTION
+        "The hh3cStackLogicStackPortLinkErrRecover trap indicates that
+         the logical stack port is recovered."
+    ::= { hh3cStackTrapOjbects 19}
+
+hh3cStackPortConfigureFailure NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cStackMemberID
+        }
+    STATUS      current
+    DESCRIPTION
+        "The hh3cStackPortConfigureFailure trap indicates that
+         Stack port configuration failed."
+    ::= { hh3cStackTrapOjbects 20}
+
+hh3cStackSetUpFailure NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cStackLocalSlotID,
+            hh3cStackPeerSlotID,
+            hh3cStackSetUpFailureReason
+        }
+    STATUS      current
+    DESCRIPTION
+        "The hh3cStackSetUpFailure trap indicates that
+         Stack creation failed."
+    ::= { hh3cStackTrapOjbects 21}
+
 hh3cStackTrapObjectDefinitions OBJECT IDENTIFIER ::= { hh3cStackTrap 1 }
 -- All objects used for TRAP only are defined here.
 
@@ -635,6 +807,70 @@ hh3cStackPhysicalIntfName OBJECT-TYPE
     DESCRIPTION
         "The textual name of the stack physical interface."
     ::= { hh3cStackTrapObjectDefinitions 1 }
+
+hh3cStackMacAddress OBJECT-TYPE
+    SYNTAX         MacAddress
+    MAX-ACCESS     accessible-for-notify
+    STATUS         current
+    DESCRIPTION
+        "The textual name of the stack mac address."
+    ::= { hh3cStackTrapObjectDefinitions 2 }
+
+hh3cStackMemberThreshold OBJECT-TYPE
+    SYNTAX         OCTET STRING (SIZE(1..255))
+    MAX-ACCESS     accessible-for-notify
+    STATUS         current
+    DESCRIPTION
+        "The textual name of the stack member threshold"
+    ::= { hh3cStackTrapObjectDefinitions 3 }
+
+hh3cStackLocalPhysicalIntfName OBJECT-TYPE
+    SYNTAX         OCTET STRING (SIZE(1..255))
+    MAX-ACCESS     accessible-for-notify
+    STATUS         current
+    DESCRIPTION
+        "The textual name of the stack local physical interface."
+    ::= { hh3cStackTrapObjectDefinitions 4 }
+
+hh3cStackPeerPhysicalIntfName OBJECT-TYPE
+    SYNTAX         OCTET STRING (SIZE(1..255))
+    MAX-ACCESS     accessible-for-notify
+    STATUS         current
+    DESCRIPTION
+        "The textual name of the stack peer physical interface."
+    ::= { hh3cStackTrapObjectDefinitions 5 }
+
+hh3cStackLinkErrReason OBJECT-TYPE
+    SYNTAX         DisplayString (SIZE(1..512))
+    MAX-ACCESS     accessible-for-notify
+    STATUS         current
+    DESCRIPTION
+        "The textual name of the stack link error reason."
+    ::= { hh3cStackTrapObjectDefinitions 6 }
+
+hh3cStackLocalSlotID OBJECT-TYPE
+    SYNTAX         Integer32 (1..32)
+    MAX-ACCESS     accessible-for-notify
+    STATUS         current
+    DESCRIPTION
+        "Local stack member slot number"
+    ::= { hh3cStackTrapObjectDefinitions 7 }
+
+hh3cStackPeerSlotID OBJECT-TYPE
+    SYNTAX         Integer32 (1..32)
+    MAX-ACCESS     accessible-for-notify
+    STATUS         current
+    DESCRIPTION
+        "Peer stack member slot number"
+    ::= { hh3cStackTrapObjectDefinitions 8 }
+
+hh3cStackSetUpFailureReason OBJECT-TYPE
+    SYNTAX         DisplayString (SIZE(1..512))
+    MAX-ACCESS     accessible-for-notify
+    STATUS         current
+    DESCRIPTION
+        "The textual name of the stack creation failed error reason."
+    ::= { hh3cStackTrapObjectDefinitions 9 }
 
 END
 

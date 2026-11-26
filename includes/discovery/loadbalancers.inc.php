@@ -18,3 +18,10 @@ if ($device['os'] == 'f5') {
         include base_path('includes/discovery/loadbalancers/f5-gtm.inc.php');
     }
 }
+
+// A10 Networks ACOS / Thunder devices (Virtual Servers, Service Groups, Real Servers)
+if ($device['os'] == 'acos') {
+    if (file_exists(base_path('includes/discovery/loadbalancers/a10-acos-slb.inc.php'))) {
+        include base_path('includes/discovery/loadbalancers/a10-acos-slb.inc.php');
+    }
+}

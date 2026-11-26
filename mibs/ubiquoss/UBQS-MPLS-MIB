@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP)
 -- *****************************************************************
 -- UBQS-MPLS-MIB : Ubiquoss MPLS MIB
 --   
@@ -662,14 +663,7 @@ ubiMplsMIBGroups  	 	OBJECT IDENTIFIER		::= { ubiMplsMIBConformance 2 }
      	::= { ubiMplsMIBCompliances 1 }
 
 
-	ubiMplsMIBGroup OBJECT-GROUP
-    	OBJECTS         {     
-    	}   
-    	STATUS          current
-    	DESCRIPTION
-        	"A collection of objects containing
-        	information about the MPLS information."
-    	::= { ubiMplsMIBGroups 1 }
+	ubiMplsMIBGroup OBJECT IDENTIFIER ::= { ubiMplsMIBGroups 1 }
     	                               
     	                               
 END

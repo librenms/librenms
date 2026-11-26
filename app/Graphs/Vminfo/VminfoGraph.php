@@ -31,7 +31,7 @@ abstract class VminfoGraph extends AbstractSeriesGraph
     {
         $vminfo = $this->findVminfo();
 
-        return new GraphPageContext($vminfo?->device, subtitle: $vminfo ? " :: VM :: $vminfo->vmwVmDisplayName" : null);
+        return new GraphPageContext($vminfo?->device, subtitle: $vminfo ? __('graph.vminfo.subtitle', ['name' => $vminfo->vmwVmDisplayName]) : null);
     }
 
     public function getTitle(): string

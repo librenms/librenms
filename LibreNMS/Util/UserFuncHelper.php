@@ -28,6 +28,21 @@ use LibreNMS\Exceptions\UserFunctionExistException;
 
 class UserFuncHelper
 {
+    /**
+     * Sensors store these conversions by the name of the global function they used to call
+     */
+    private const array LEGACY_NAMES = [
+        'fahrenheit_to_celsius' => 'fahrenheitToCelsius',
+        'kelvin_to_celsius' => 'kelvinToCelsius',
+        'string_to_float' => 'stringToFloat',
+        'uw_to_dbm' => 'uwToDbm',
+        'mw_to_dbm' => 'mwToDbm',
+        'ieee754_to_decimal' => 'ieee754ToDecimal',
+    ];
+
+    /**
+     * @param  array<string, mixed>  $sensor
+     */
     public function __construct(
         public string|int|float $value,
         public string|int|float|null $value_raw = null,
@@ -35,9 +50,71 @@ class UserFuncHelper
     ) {
     }
 
+    /**
+     * Convert a sensor value with its user_func: a method of this class, a static method (Class::method)
+     * that also gets the raw value and the sensor, or a function that gets the value.
+     *
+     * @param  array<string, mixed>  $sensor
+     *
+     * @throws UserFunctionExistException
+     */
+    public static function apply(string $function, int|float $value, string|int|float|null $raw = null, array $sensor = []): mixed
+    {
+        $method = self::LEGACY_NAMES[$function] ?? $function;
+
+        if (method_exists(self::class, $method)) {
+            return new self($value, $raw, $sensor)->$method();
+        }
+
+        if (! is_callable($function)) {
+            throw new UserFunctionExistException("Invalid user function: $function");
+        }
+
+        return str_contains($function, '::') ? $function($value, $raw, $sensor) : $function($value);
+    }
+
     public function __call(string $name, array $arguments): mixed
     {
         throw new UserFunctionExistException("Invalid user function: $name");
+    }
+
+    public function fahrenheitToCelsius(): float
+    {
+        return round(($this->value - 32) / 1.8, 2);
+    }
+
+    public function kelvinToCelsius(): float
+    {
+        return round($this->value - 273.15, 2);
+    }
+
+    public function stringToFloat(): float
+    {
+        return round((float) $this->value, 2);
+    }
+
+    /**
+     * Convert microwatts to dBm, -60 for 0 and null for negative values
+     */
+    public function uwToDbm(): int|float|null
+    {
+        return $this->value < 0 ? null : ($this->value == 0 ? -60 : 10 * log10($this->value / 1000));
+    }
+
+    /**
+     * Convert milliwatts to dBm, -60 for 0 and null for negative values
+     */
+    public function mwToDbm(): int|float|null
+    {
+        return $this->value < 0 ? null : ($this->value == 0 ? -60 : 10 * log10($this->value));
+    }
+
+    /**
+     * Convert the integer representation of an IEEE 754 32-bit float to its value
+     */
+    public function ieee754ToDecimal(): float
+    {
+        return unpack('G', pack('N', (int) $this->value))[1];
     }
 
     public function dateToRuntime(): int

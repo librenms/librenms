@@ -58,7 +58,7 @@ class TwoFactorController extends Controller
 
             $toast->info(__('TwoFactor auth removed.'));
 
-            return redirect('preferences');
+            return redirect()->route('preferences.index');
         }
 
         $request->session()->put('twofactor', true);

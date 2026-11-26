@@ -4,7 +4,7 @@ namespace LibreNMS\Tests\Feature\Modules;
 
 use App\Models\Mempool;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Modules\Mempools;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
@@ -31,8 +31,8 @@ final class MempoolsTest extends InMemoryDbTestCase
         $this->assertSame([PollingMethodType::UnixAgent], $mempools->pluck('polling_method')->unique()->values()->all());
         $this->assertEquals(65717444 * 1024, $mempools['system']->mempool_total);
 
-        $datastore = Mockery::mock(DataStorageInterface::class);
-        $datastore->shouldReceive('put')->times(4)->withArgs(fn ($device, $measurement) => $measurement == 'mempool');
+        $datastore = Mockery::mock(WriteInterface::class);
+        $datastore->shouldReceive('write')->times(4)->withArgs(fn ($measurement) => $measurement == 'mempool');
 
         $os->getDevice()->unsetRelation('mempools');
         $this->assertTrue($module->shouldPoll($os));
@@ -111,8 +111,8 @@ final class MempoolsTest extends InMemoryDbTestCase
         $this->fakeMethod(SnmpPollingMethod::class, false);
         $this->fakeMethod(UnixAgentPollingMethod::class, true, ['output' => $this->agentMemOutput(100, 40)]);
 
-        $datastore = Mockery::mock(DataStorageInterface::class);
-        $datastore->shouldReceive('put')->once()->withArgs(fn ($device, $measurement, $tags) => $tags['mempool_type'] == 'unix-agent');
+        $datastore = Mockery::mock(WriteInterface::class);
+        $datastore->shouldReceive('write')->once()->withArgs(fn ($measurement, $fields, $tags) => $tags['type'] == 'unix-agent');
 
         (new Mempools)->poll($os, $datastore);
 

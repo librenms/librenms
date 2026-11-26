@@ -41,7 +41,7 @@ class HistorictransferGraph extends BillGraph
         $graph = $this->transferGraph($graph_data);
 
         $lineplot_allow = new LinePlot($graph_data['ave_data']);
-        $lineplot_allow->SetLegend('Average');
+        $lineplot_allow->SetLegend(__('graph.bill.average'));
         $lineplot_allow->SetColor('black');
         $lineplot_allow->SetWeight(1);
 

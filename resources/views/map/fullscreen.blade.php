@@ -4,18 +4,6 @@
 
 @section('content')
 
-@if($map_engine != 'leaflet')
-
-<div class="container-fluid">
-<div class="row">
-<div class="col-md-12">
-Only leaflet map engine is currently supported
-</div>
-</div>
-</div>
-
-@else
-
 @if($group_name)
 <div class="container-fluid">
 <div class="row" id="controls-row">
@@ -31,8 +19,6 @@ Only leaflet map engine is currently supported
 
 <div class="container" id="fullscreen-map"></div>
 
-@endif
-
 @endsection
 
 @section('css')
@@ -47,12 +33,10 @@ html, body, #fullscreen-map {
 @endsection
 
 @section('javascript')
-@if($map_engine == "leaflet")
 <script src="js/leaflet.js"></script>
 <script src="js/L.Control.Locate.min.js"></script>
 <script src="js/leaflet.markercluster.js"></script>
 <script src="js/leaflet.awesome-markers.min.js"></script>
-@endif
 
 @endsection
 

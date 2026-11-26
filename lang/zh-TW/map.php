@@ -4,7 +4,6 @@ return [
     'custom' => [
         'title' => [
             'edit_dialog' => '選擇要編輯的自訂地圖',
-            'create' => '建立新的自訂地圖',
             'view' => ':name | 自訂地圖',
             'edit' => '編輯自訂地圖',
             'manage' => '管理自訂地圖',

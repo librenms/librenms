@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP)
 -- *****************************************************************
 -- UBIQUOSS-EPON-SERVICE-POLICY-GROUP-MIB.my
 --
@@ -348,23 +349,9 @@
        ::= { ubiServicePolicyMIBCompliances 1 }
 	                            
 -- compliance statements
-   	ubiServicePolicyMIBGroup  OBJECT-GROUP
-		OBJECTS {     
-			-- TODO 
-               }
-        STATUS  current
-        DESCRIPTION
-                "ubiquoss service policy information MIB"
-        ::= { ubiServicePolicyMIBGroups 1 }
+   	ubiServicePolicyMIBGroup  OBJECT IDENTIFIER ::= { ubiServicePolicyMIBGroups 1 }
      
-     ubiServicePolicyMIBNotificationGroup    OBJECT-GROUP
-      	OBJECTS {     
-			-- TODO 
-               }
-        STATUS  current
-        DESCRIPTION
-                "ubiquoss service policy information Notifications"
-        ::= { ubiServicePolicyMIBGroups 2 }
+     ubiServicePolicyMIBNotificationGroup    OBJECT IDENTIFIER ::= { ubiServicePolicyMIBGroups 2 }
 		
 	
 	END

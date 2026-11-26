@@ -57,7 +57,7 @@ class Page extends Component
         $this->pagetitle = $subtitle ? ($device->display . ': ' . $subtitle) : $device->display;
         $this->alertClass = $device->disabled ? 'alert-info' : ($device->status ? '' : 'alert-danger');
         $this->awaitingDiscovery = ! $device->disabled && $device->last_discovered === null;
-        $this->isEditPage = request()->routeIs('device.edit*') || str_replace('tab=', '', (string) request()->route('tab')) === 'edit';
+        $this->isEditPage = request()->routeIs('device.edit*');
         $this->parentDeviceId = Vminfo::guessFromDevice($device)->value('device_id');
         $this->populateTypeFields();
     }

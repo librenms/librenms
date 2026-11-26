@@ -1,0 +1,3544 @@
+RUGGEDCOM-SWITCH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, Integer32      FROM SNMPv2-SMI
+    AGENT-CAPABILITIES              FROM SNMPv2-CONF
+    OwnerString                     FROM RMON-MIB
+    ruggedcomProducts, ruggedcomAgentCapabilities 
+                                    FROM RUGGEDCOM-MIB;
+
+ruggedcomSwitchModule MODULE-IDENTITY
+    LAST-UPDATED "201105011700Z"      -- May 1, 17:00 EST 2011
+    ORGANIZATION "RuggedCom - Industrial Strength Networks"
+    CONTACT-INFO
+       "Postal: RuggedCom Inc.
+                300 Applewood Crescent
+                Concord, Ontario, 
+                L4K 5C7 Canada
+        Tel:    1-905-856-5288
+        E-Mail: support@ruggedcom.com"
+    DESCRIPTION
+        "The MIB module that describes the management of RuggedSwitch
+        devices."
+
+    REVISION "201105011700Z"      -- May 1, 17:00 EST 2011
+    DESCRIPTION
+        "Obsolete all AGENT-CAPABILITIES statemenst from this MIB."
+
+    REVISION "200905151700Z"      -- May 15, 17:00 EST 2009;
+    DESCRIPTION
+        "Added ruggedcomSwitchAgents071 and ruggedcomSwitchAgents081 
+        statements.	
+        VARIATION for sysName changed.
+        rcSysStsObjectsGroup1 is supported from RUGGEDCOM-SYS-INFO-MIB."
+
+    REVISION "200811111300Z"      -- Nov 11, 13:00 EST 2008;
+    DESCRIPTION
+        "Fixed typos in Agent Capabilities."
+
+    REVISION "200809081500Z"      -- Sep 8, 15:00 EST 2008;
+    DESCRIPTION
+        "Fixed typos in REVISION DESCRIPTION.
+        Created ruggedcomSwitchAgents07 agent ruggedcomSwitchAgents08
+        capabilities.
+        Added support for: 
+        - IP-MIB (RFC2011)
+        - Q-BRIDGE-MIB (RFC4363)
+        ."
+
+    REVISION "200803071100Z"      -- Mar 7, 11:00 EST 2008;
+    DESCRIPTION
+        "Fixed typos in AGENT-CAPABILITIES.
+        Created ruggedcomSwitchAgents05 and ruggedcomSwitchAgents06
+        agent capabilities.
+        Added support for LLDP-MIB per IEEE std 802.1AB LLDP 
+        MIB Definition.
+        Supports updated RUGGEDCOM-TRAPS-MIB and RUGGEDCOM-SYS-INFO-MIB."
+
+    REVISION "200611021100Z"      -- November 2, 11:00 EST 2006; 
+    DESCRIPTION
+        "Fixed typos in AGENT-CAPABILITIES."
+
+    REVISION "200609090900Z"      -- September 9, 09:00 EST 2006; 
+    DESCRIPTION
+        "Created ruggedcomSwitchAgents04 agent capabilities for
+        RS8000 and RS1600 families of RuggedSwitch product.
+        Created ruggedcomSwitchAgents03 agent capabilities for all other
+        RuggedSwitch products.
+        Added support for SNMPV3 (RFC 3411, RFC 3414, RFC 3415) and 
+        RUGGEDCOM-SYS-INFO-MIB. 
+        Support for RSTP-MIB per draft-ietf-bridge-rstpmib-03.txt is 
+        replaced by support per RFC 4318.
+        Support for BRIDGE-MIB per draft-ietf-bridge-bridgemib-smiv2-03.txt 
+        is replaced by support per RFC 4188.
+        Updated CONTACT-INFO."
+
+    REVISION "200307221400Z"      -- July 22, 14:00 EST 2003; 
+    DESCRIPTION
+        "The MIB module that describes the management of devices RS8000 
+        and RS1600.
+        This version temporarily supports two draft MIBs:
+        draft-ietf-bridge-rstpmib-03.txt (RSTP-MIB) and 
+        draft-ietf-bridge-bridgemib-smiv2-03.txt (BRIDGE-MIB).  It will be 
+        updated with updates or RFC releases of RSTP-MIB and BRIDGE-MIB.
+        The BRIDGE-MIB defined by RFC 1493 is supported as a subset of 
+        MIB defined by draft-ietf-bridge-bridgemib-smiv2-03.txt."
+    ::= { ruggedcomProducts 1 }
+
+-- ---------------------------------------------------------------------- --
+-- Branches commented out are reserved for possible future implementation
+-- ---------------------------------------------------------------------- --
+-- switchObjects  OBJECT IDENTIFIER ::= { ruggedcomSwitchModule 1 }
+-- switchTables OBJECT IDENTIFIER ::= { ruggedcomSwitchModule 2 }
+-- switchConformance  OBJECT IDENTIFIER ::= { ruggedcomSwitchModule 3 }
+-- switchCompliances  OBJECT IDENTIFIER ::= { switchConformance 1 }
+-- switchGroups OBJECT IDENTIFIER ::= { switchConformance 2 }
+
+-- ---------------------------------------------------------------------- --
+--  Rugged Switch Agent Capabilities
+-- ---------------------------------------------------------------------- --
+
+ruggedcomSwitchAgents  AGENT-CAPABILITIES
+    PRODUCT-RELEASE "Rugged Switch Agent capabilities version 1.0.0. "
+    STATUS          obsolete
+    DESCRIPTION
+        "The Rugged Switch Agent."
+
+-- ---------------------------------------------------------------------- --       
+    SUPPORTS RUGGEDCOM-TRAPS-MIB 
+        INCLUDES    { ruggedcomGenericTrapGroup,
+                      ruggedcomPowerSupplyGroup  }
+-- ---------------------------------------------------------------------- --        
+    SUPPORTS SNMPv2-MIB
+    -- rfc1907.txt
+    
+        INCLUDES     { snmpGroup, snmpCommunityGroup, snmpSetGroup, 
+                       systemGroup, snmpBasicNotificationsGroup }
+        
+        VARIATION   sysContact           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this
+                 object."
+
+        VARIATION   sysName
+            DESCRIPTION
+                "The string of up to 19 characters is supported for this 
+                object."
+            
+        VARIATION   sysLocation           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this 
+                object."
+
+        VARIATION   sysORIndex           
+            DESCRIPTION
+                "Only one sysOREntry is created by Rugged Switch Agent.
+                Dynamic configuration of MIB modules is not supported."
+    
+    
+-- ---------------------------------------------------------------------- --
+    SUPPORTS UDP-MIB
+    -- rfc2013.txt
+
+        INCLUDES    { udpGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS TCP-MIB
+    -- rfc2012.txt
+    
+        INCLUDES    { tcpGroup }
+
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS IF-MIB
+        -- rfc2863.txt
+        
+        INCLUDES    { ifGeneralInformationGroup, 
+                      ifVHCPacketGroup,
+                      ifCounterDiscontinuityGroup,
+                      linkUpDownNotificationsGroup }
+
+        VARIATION   ifIndex
+            DESCRIPTION
+                "A numbering scheme has been implemented to allow
+                one-to-one mapping between physical port values and
+                ifIndex interface values.  Te value of ifIndex will be
+                1 to 8 for RS8000 device, and 1 to 16 for RS1600 device."
+                
+        VARIATION   ifAdminStatus
+            SYNTAX   INTEGER {
+                         up(1),
+                         down(2)
+                     }
+            DESCRIPTION
+                "Support for the value 'testing(3)' is not implemented
+                per RFC 2863 compliance statement."
+
+        VARIATION   ifOperStatus
+            SYNTAX  INTEGER {
+                         up(1),
+                         down(2)
+                    }
+            DESCRIPTION
+                "Information limited by Rugged Switch Agent for read-only
+                object."
+
+        VARIATION   ifPromiscuousMode
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 2863 compliance
+                statement.  This mode is always 'true(1)'."
+
+        VARIATION   ifAlias
+            DESCRIPTION
+                "String length is limitted to 15 characters."        
+        
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RMON-MIB
+    -- rfc2819.txt
+    
+        INCLUDES    { rmonEtherStatsGroup, rmonHistoryControlGroup,
+                      rmonEthernetHistoryGroup, rmonAlarmGroup, 
+                      rmonEventGroup }
+
+        VARIATION   etherStatsIndex
+            DESCRIPTION
+                "Two entries per port are created in etherStatsTable.
+                Te value of etherStatsIndex will be 1 to 32 for RS8000 
+                device, and 1 to 64 for RS1600 device."
+                 
+        VARIATION   etherStatsOwner
+            DESCRIPTION
+                "The value of this entry is always set to 'Monitor' and
+                may not be modified." 
+                 
+        VARIATION   etherStatsStatus
+            DESCRIPTION
+                "One entry per port is created in etherStatsTable upon 
+                initialization up.  These entries may not be modified
+                or deleted.
+                No new entries can be created.
+                Therefore, historyControlStatus always set to 'valid(1)'." 
+                 
+        VARIATION   historyControlIndex
+            DESCRIPTION
+                "An average of four entries per port can be created 
+                in historyControlTable.
+                Te value of historyControlIndex will be 1 to 32 for 
+                RS8000 device, and 1 to 64 for RS1600 device."
+
+        VARIATION   historyControlBucketsRequested
+            SYNTAX  Integer32(1..4000)
+            DESCRIPTION
+                "The value of historyControBucketRequested is restricted
+                to 4000.
+                This object may not be modified if the associted 
+                historyControlStatus object is set to 'valid(1)'."
+
+        VARIATION   historyControlOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "" }
+            DESCRIPTION
+                "A default value of a historyControlOwner is a 
+                zero-length string."
+
+        VARIATION   historyControlStatus
+            DESCRIPTION
+                "Two entries per port are created in historyControlTable
+                upon initialization.  These entries may not be modified 
+                or deleted.
+                Therefore, for RS8000 historyControlStatus of entries 1 
+                to 16 is always set to 'valid(1)'. 
+                For RS1600 historyControlStatus of entries 1 to 32 is 
+                always set to 'valid(1)'."
+                        
+        VARIATION   alarmIndex
+            DESCRIPTION
+                "An average of four entries per port can be created 
+                in alarmTable.
+                Te value of alarmIndex will be 1 to 32 for RS8000 device, 
+                and 1 to 64 for RS1600 device."
+
+        VARIATION   alarmInterval
+            SYNTAX  Integer32
+            DEFVAL  { 60 }
+            DESCRIPTION
+                "A default value of an alarmInterval is 60 seconds."
+
+        VARIATION   alarmSampleType
+            SYNTAX  INTEGER {
+                        absosluteValue(1),
+                        deltaValue(2)
+                    }
+            DEFVAL  { deltaValue }
+            DESCRIPTION
+                "A default value of an alarmSampleType is 'deltaValue(2)'."
+
+        VARIATION   alarmStartupAlarm
+            SYNTAX  INTEGER {
+                        risingAlarm(1),
+                        fallingAlarm(2),
+                        risingOrFallingAlarm(3)
+                    }
+            DEFVAL  { risingOrFallingAlarm }
+            DESCRIPTION
+                "A default value of alarmStartupAlarm is 
+                'risingOrFallingAlarm(3)'."
+                
+        VARIATION   alarmOwner
+            DEFVAL  { "" }
+            DESCRIPTION
+                "A default value of an alarmOwner is a zero-length 
+                string."
+
+        VARIATION   eventIndex
+            DESCRIPTION
+                "An average of one entry per alarmEntry may be created 
+                in eventTable.
+                Te value of eventIndex will be 1 to 32 for RS8000 device, 
+                and 1 to 64 for RS1600 device."
+                
+        VARIATION   eventType
+            SYNTAX  INTEGER {
+                        none(1),
+                        log(2),
+                        snmptrap(3),
+                        logandtrap(4)
+                    }
+            DEFVAL  { none }
+            DESCRIPTION
+                "A default value of an eventType is 'none(1)'."
+
+        VARIATION   eventCommunity
+            DESCRIPTION
+                "The string of up to 30 characters is supported for this
+                 object."
+                
+        VARIATION   eventOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "" }
+            DESCRIPTION
+                "A default value of an eventOwner is a zero-length string."
+
+        VARIATION   logIndex
+            DESCRIPTION
+                "For each eventEntry a hundred of entries in logTable may
+                be created.  The value of thi object will increase for each
+                new log generated for coresponding event.  When value of
+                this object becomes greater than 100, oldest entries will 
+                be deleted."
+-- ---------------------------------------------------------------------- --
+    SUPPORTS BRIDGE-MIB
+    -- draft-ietf-bridge-bridgemib-smiv2-03.txt
+    
+        INCLUDES    { dot1dBaseBridgeGroup, dot1dBasePortGroup,
+                      dot1dStpBridgeGroup, dot1dStpPortGroup,
+                      dot1dTpBridgeGroup, dot1dTpFdbGroup, 
+                      dot1dTpGroup, dot1dStaticGroup, 
+                      dot1dNotificationGroup }
+
+        VARIATION   dot1dBasePortDelayExceededDiscards
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dStpPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 61440, in steps
+                of 4096, as per draft-ietf-bridge-rstpmib-03.txt."
+                
+        VARIATION   dot1dStpTimeSinceTopologyChange
+            DESCRIPTION
+                "The time since the tcWhile timer for any port on this 
+                Bridge was non-zero, as per draft-ietf-bridge-rstpmib-03.txt."
+                
+        VARIATION   dot1dStpTopChanges
+            DESCRIPTION
+                "The number of times that there have been at least one
+                non-zero txWhile timer on this Bridge, as per
+                draft-ietf-bridge-rstpmib-03.txt."
+
+        VARIATION   dot1dStpBridgeMaxAge
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeHelloTime
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeForwardDelay
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+                
+        VARIATION   dot1dStpPortPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 240, in steps
+                of 16, as per draft-ietf-bridge-rstpmib-03.txt."
+
+        VARIATION   dot1dTpLearnedEntryDiscards        
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dTpAgingTime        
+            DESCRIPTION
+                "The range of valid values is restricted to 15 to 800
+                seconds.
+                Lower limit of 15 seconds is a hardware limitation."
+                
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RSTP-MIB
+    -- draft-ietf-bridge-rstpmib-03.txt
+    
+        INCLUDES    { rstpBridgeGroup, rstpPortGroup }
+-- ---------------------------------------------------------------------- --
+    ::= { ruggedcomAgentCapabilities 1 }
+
+
+-- ---------------------------------------------------------------------- --
+--  Rugged Switch Agent Capabilities
+-- ---------------------------------------------------------------------- --
+
+ruggedcomSwitchAgents03 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "Rugged Switch Agent capabilities version 3.0.0. "
+    STATUS          obsolete
+    DESCRIPTION
+        "The Rugged Switch Agent."
+
+-- ---------------------------------------------------------------------- --       
+    SUPPORTS RUGGEDCOM-TRAPS-MIB 
+        INCLUDES    { ruggedcomGenericTrapGroup,
+                      ruggedcomPowerSupplyGroup  }
+-- ---------------------------------------------------------------------- --        
+    SUPPORTS RUGGEDCOM-SYS-INFO-MIB 
+        INCLUDES    { rcSysErrObjectsGroup, 
+					  rcSysStsObjectsGroup,
+					  rcSysStsObjectsTemperatureGroup,
+					  rcSysStsPowerSupplyGroup,
+					  rcSysInfoDeviceInfoGroup }
+-- ---------------------------------------------------------------------- --        
+    SUPPORTS SNMPv2-MIB
+    -- rfc1907.txt
+    
+        INCLUDES     { snmpGroup, snmpCommunityGroup, snmpSetGroup, 
+                       systemGroup, snmpBasicNotificationsGroup }
+        
+        VARIATION   sysContact           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this
+                 object."
+
+        VARIATION   sysName
+            DESCRIPTION
+                "The string of up to 19 characters is supported for this 
+                object."
+            
+        VARIATION   sysLocation           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this 
+                object."
+
+        VARIATION   sysORIndex           
+            DESCRIPTION
+                "Only one sysOREntry is created by Rugged Switch Agent.
+                Dynamic configuration of MIB modules is not supported."
+    
+    
+-- ---------------------------------------------------------------------- --
+    SUPPORTS UDP-MIB
+    -- rfc2013.txt
+
+        INCLUDES    { udpGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS TCP-MIB
+    -- rfc2012.txt
+    
+        INCLUDES    { tcpGroup }
+
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS IF-MIB
+        -- rfc2863.txt
+        
+        INCLUDES    { ifGeneralInformationGroup, 
+                      ifVHCPacketGroup,
+                      ifCounterDiscontinuityGroup,
+                      linkUpDownNotificationsGroup }
+
+        VARIATION   ifIndex
+            DESCRIPTION
+                "A numbering scheme has been implemented to allow
+                one-to-one mapping between physical port values and
+                ifIndex interface values."
+                
+        VARIATION   ifAdminStatus
+            SYNTAX   INTEGER {
+                         up(1),
+                         down(2)
+                     }
+            DESCRIPTION
+                "Support for the value 'testing(3)' is not implemented
+                per RFC 2863 compliance statement."
+
+        VARIATION   ifOperStatus
+            SYNTAX  INTEGER {
+                         up(1),
+                         down(2)
+                    }
+            DESCRIPTION
+                "Information limited by Rugged Switch Agent for read-only
+                object."
+
+        VARIATION   ifPromiscuousMode
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 2863 compliance
+                statement.  This mode is always 'true(1)'."
+
+        VARIATION   ifAlias
+            DESCRIPTION
+                "String length is limitted to 15 characters."        
+        
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RMON-MIB
+    -- rfc2819.txt
+    
+        INCLUDES    { rmonEtherStatsGroup, rmonHistoryControlGroup,
+                      rmonEthernetHistoryGroup, rmonAlarmGroup, 
+                      rmonEventGroup }
+
+        VARIATION   etherStatsIndex
+            DESCRIPTION
+                "Two entries per port are created in etherStatsTable."
+                 
+        VARIATION   etherStatsOwner
+            DESCRIPTION
+                "The value of this entry is always set to 'Monitor' and
+                may not be modified." 
+                 
+        VARIATION   etherStatsStatus
+            DESCRIPTION
+                "One entry per port is created in etherStatsTable upon 
+                initialization up.  These entries may not be modified
+                or deleted.
+                No new entries can be created.
+                Therefore, historyControlStatus always set to 'valid(1)'." 
+                 
+        VARIATION   historyControlIndex
+            DESCRIPTION
+                "An average of four entries per ethernet port can be created 
+                in historyControlTable."
+
+        VARIATION   historyControlBucketsRequested
+            SYNTAX  Integer32(1..4000)
+            DESCRIPTION
+                "The value of historyControBucketRequested is restricted
+                to 4000."
+
+        VARIATION   historyControlOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of a historyControlOwner is a 
+                'Monitor' string."
+                        
+        VARIATION   alarmIndex
+            DESCRIPTION
+                "An average of four entries per port can be created 
+                in alarmTable."
+
+        VARIATION   alarmInterval
+            SYNTAX  Integer32
+            DEFVAL  { 60 }
+            DESCRIPTION
+                "A default value of an alarmInterval is 60 seconds."
+
+        VARIATION   alarmSampleType
+            SYNTAX  INTEGER {
+                        absosluteValue(1),
+                        deltaValue(2)
+                    }
+            DEFVAL  { deltaValue }
+            DESCRIPTION
+                "A default value of an alarmSampleType is 'deltaValue(2)'."
+
+        VARIATION   alarmStartupAlarm
+            SYNTAX  INTEGER {
+                        risingAlarm(1),
+                        fallingAlarm(2),
+                        risingOrFallingAlarm(3)
+                    }
+            DEFVAL  { risingOrFallingAlarm }
+            DESCRIPTION
+                "A default value of alarmStartupAlarm is 
+                'risingOrFallingAlarm(3)'."
+                
+        VARIATION   alarmOwner
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of an alarmOwner is a 'Monitor'
+                string."
+
+        VARIATION   eventIndex
+            DESCRIPTION
+                "An average of one entry per alarmEntry may be created 
+                in eventTable."
+                
+        VARIATION   eventType
+            SYNTAX  INTEGER {
+                        none(1),
+                        log(2),
+                        snmptrap(3),
+                        logandtrap(4)
+                    }
+            DEFVAL  { none }
+            DESCRIPTION
+                "A default value of an eventType is 'logandtrap(4)'."
+
+        VARIATION   eventCommunity
+            DESCRIPTION
+                "The string of up to 30 characters is supported for this
+                 object."
+                
+        VARIATION   eventOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of an eventOwner is a 'Monitor' string."
+
+        VARIATION   logIndex
+            DESCRIPTION
+                "For each eventEntry a hundred of entries in logTable may
+                be created.  The value of thi object will increase for each
+                new log generated for coresponding event.  When value of
+                this object becomes greater than 100, oldest entries will 
+                be deleted."
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS BRIDGE-MIB
+    -- rfc4188.txt
+    
+        INCLUDES    { dot1dBaseBridgeGroup, dot1dBasePortGroup,
+                      dot1dStpBridgeGroup, dot1dStpPortGroup,
+                      dot1dTpBridgeGroup, dot1dTpFdbGroup, 
+                      dot1dTpGroup, dot1dNotificationGroup }
+
+        VARIATION   dot1dBasePortDelayExceededDiscards
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dStpPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 61440, in steps
+                of 4096, as per RFC 4188."
+                
+        VARIATION   dot1dStpTimeSinceTopologyChange
+            DESCRIPTION
+                "The time since the tcWhile timer for any port on this 
+                Bridge was non-zero, as per RFV 4188."
+                
+        VARIATION   dot1dStpBridgeMaxAge
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeHelloTime
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeForwardDelay
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+                
+        VARIATION   dot1dStpPortPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 240, in steps
+                of 16, as per RFC 4188."
+
+        VARIATION   dot1dTpLearnedEntryDiscards        
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dTpAgingTime        
+            DESCRIPTION
+                "The range of valid values is restricted to 15 to 800
+                seconds.
+                Lower limit of 15 seconds is a hardware limitation."
+                
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RSTP-MIB
+    -- rfc4318.txt
+    
+        INCLUDES    { rstpBridgeGroup, rstpPortGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-FRAMEWORK-MIB
+    -- rfc3411.txt
+    
+        INCLUDES    { snmpEngineGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-USER-BASED-SM-MIB
+    -- rfc3414.txt
+
+        INCLUDES    { usmMIBBasicGroup }
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-VIEW-BASED-ACM-MIB
+    -- rfc3415.txt
+    
+        INCLUDES    { vacmBasicGroup }
+
+        VARIATION   vacmAccessContextMatch
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmAccessStorageType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 
+                'nonVolatile(3)'."
+
+        VARIATION   vacmAccessStatus
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'active(1)'."
+
+        VARIATION   vacmViewTreeFamilyMask
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmViewTreeFamilyType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmViewTreeFamilyStorageType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'permanent(4)'."
+
+        VARIATION   vacmViewTreeFamilyStatus
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'active(1)'."
+                
+-- ---------------------------------------------------------------------- --
+    ::= { ruggedcomAgentCapabilities 4 }
+
+-- ---------------------------------------------------------------------- --
+--  Rugged Switch Agent Capabilities for Product Families
+--  RS8000 and RS1600
+-- ---------------------------------------------------------------------- --
+
+ruggedcomSwitchAgents04 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "Rugged Switch Agent capabilities version 4.0.0. "
+    STATUS          obsolete
+    DESCRIPTION
+        "The Rugged Switch Agent."
+
+-- ---------------------------------------------------------------------- --       
+    SUPPORTS RUGGEDCOM-TRAPS-MIB 
+        INCLUDES    { ruggedcomGenericTrapGroup,
+                      ruggedcomPowerSupplyGroup  }
+-- ---------------------------------------------------------------------- --        
+    SUPPORTS RUGGEDCOM-SYS-INFO-MIB 
+        INCLUDES    { rcSysErrObjectsGroup, 
+					  rcSysStsObjectsGroup,
+					  rcSysStsPowerSupplyGroup,
+					  rcSysInfoDeviceInfoGroup }
+-- ---------------------------------------------------------------------- --        
+    SUPPORTS SNMPv2-MIB
+    -- rfc1907.txt
+    
+        INCLUDES     { snmpGroup, snmpCommunityGroup, snmpSetGroup, 
+                       systemGroup, snmpBasicNotificationsGroup }
+        
+        VARIATION   sysContact           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this
+                 object."
+
+        VARIATION   sysName
+            DESCRIPTION
+                "The string of up to 19 characters is supported for this 
+                object."
+            
+        VARIATION   sysLocation           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this 
+                object."
+
+        VARIATION   sysORIndex           
+            DESCRIPTION
+                "Only one sysOREntry is created by Rugged Switch Agent.
+                Dynamic configuration of MIB modules is not supported."
+    
+    
+-- ---------------------------------------------------------------------- --
+    SUPPORTS UDP-MIB
+    -- rfc2013.txt
+
+        INCLUDES    { udpGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS TCP-MIB
+    -- rfc2012.txt
+    
+        INCLUDES    { tcpGroup }
+
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS IF-MIB
+        -- rfc2863.txt
+        
+        INCLUDES    { ifGeneralInformationGroup, 
+                      ifVHCPacketGroup,
+                      ifCounterDiscontinuityGroup,
+                      linkUpDownNotificationsGroup }
+
+        VARIATION   ifIndex
+            DESCRIPTION
+                "A numbering scheme has been implemented to allow
+                one-to-one mapping between physical port values and
+                ifIndex interface values.  Te value of ifIndex will be
+                1 to 8 for RS8000 device, and 1 to 16 for RS1600 device."
+                
+        VARIATION   ifAdminStatus
+            SYNTAX   INTEGER {
+                         up(1),
+                         down(2)
+                     }
+            DESCRIPTION
+                "Support for the value 'testing(3)' is not implemented
+                per RFC 2863 compliance statement."
+
+        VARIATION   ifOperStatus
+            SYNTAX  INTEGER {
+                         up(1),
+                         down(2)
+                    }
+            DESCRIPTION
+                "Information limited by Rugged Switch Agent for read-only
+                object."
+
+        VARIATION   ifPromiscuousMode
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 2863 compliance
+                statement.  This mode is always 'true(1)'."
+
+        VARIATION   ifAlias
+            DESCRIPTION
+                "String length is limitted to 15 characters."        
+        
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RMON-MIB
+    -- rfc2819.txt
+    
+        INCLUDES    { rmonEtherStatsGroup, rmonHistoryControlGroup,
+                      rmonEthernetHistoryGroup, rmonAlarmGroup, 
+                      rmonEventGroup }
+
+        VARIATION   etherStatsIndex
+            DESCRIPTION
+                "Two entries per port are created in etherStatsTable."
+                 
+        VARIATION   etherStatsOwner
+            DESCRIPTION
+                "The value of this entry is always set to 'Monitor' and
+                may not be modified." 
+                 
+        VARIATION   etherStatsStatus
+            DESCRIPTION
+                "One entry per port is created in etherStatsTable upon 
+                initialization up.  These entries may not be modified
+                or deleted.
+                No new entries can be created.
+                Therefore, historyControlStatus always set to 'valid(1)'." 
+                 
+        VARIATION   historyControlIndex
+            DESCRIPTION
+                "An average of four entries per ethernet port can be created 
+                in historyControlTable."
+
+        VARIATION   historyControlBucketsRequested
+            SYNTAX  Integer32(1..4000)
+            DESCRIPTION
+                "The value of historyControBucketRequested is restricted
+                to 4000."
+
+        VARIATION   historyControlOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of a historyControlOwner is a 
+                'Monitor' string."
+                        
+        VARIATION   alarmIndex
+            DESCRIPTION
+                "An average of four entries per port can be created 
+                in alarmTable."
+
+        VARIATION   alarmInterval
+            SYNTAX  Integer32
+            DEFVAL  { 60 }
+            DESCRIPTION
+                "A default value of an alarmInterval is 60 seconds."
+
+        VARIATION   alarmSampleType
+            SYNTAX  INTEGER {
+                        absosluteValue(1),
+                        deltaValue(2)
+                    }
+            DEFVAL  { deltaValue }
+            DESCRIPTION
+                "A default value of an alarmSampleType is 'deltaValue(2)'."
+
+        VARIATION   alarmStartupAlarm
+            SYNTAX  INTEGER {
+                        risingAlarm(1),
+                        fallingAlarm(2),
+                        risingOrFallingAlarm(3)
+                    }
+            DEFVAL  { risingOrFallingAlarm }
+            DESCRIPTION
+                "A default value of alarmStartupAlarm is 
+                'risingOrFallingAlarm(3)'."
+                
+        VARIATION   alarmOwner
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of an alarmOwner is a 'Monitor'
+                string."
+
+        VARIATION   eventIndex
+            DESCRIPTION
+                "An average of one entry per alarmEntry may be created 
+                in eventTable."
+                
+        VARIATION   eventType
+            SYNTAX  INTEGER {
+                        none(1),
+                        log(2),
+                        snmptrap(3),
+                        logandtrap(4)
+                    }
+            DEFVAL  { none }
+            DESCRIPTION
+                "A default value of an eventType is 'logandtrap(4)'."
+
+        VARIATION   eventCommunity
+            DESCRIPTION
+                "The string of up to 30 characters is supported for this
+                 object."
+                
+        VARIATION   eventOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of an eventOwner is a 'Monitor' string."
+
+        VARIATION   logIndex
+            DESCRIPTION
+                "For each eventEntry a hundred of entries in logTable may
+                be created.  The value of thi object will increase for each
+                new log generated for coresponding event.  When value of
+                this object becomes greater than 100, oldest entries will 
+                be deleted."
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS BRIDGE-MIB
+    -- rfc4188.txt
+    
+        INCLUDES    { dot1dBaseBridgeGroup, dot1dBasePortGroup,
+                      dot1dStpBridgeGroup, dot1dStpPortGroup,
+                      dot1dTpBridgeGroup, dot1dTpFdbGroup, 
+                      dot1dTpGroup, dot1dNotificationGroup }
+
+        VARIATION   dot1dBasePortDelayExceededDiscards
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dStpPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 61440, in steps
+                of 4096, as per RFC 4188."
+                
+        VARIATION   dot1dStpTimeSinceTopologyChange
+            DESCRIPTION
+                "The time since the tcWhile timer for any port on this 
+                Bridge was non-zero, as per RFV 4188."
+                
+        VARIATION   dot1dStpBridgeMaxAge
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeHelloTime
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeForwardDelay
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+                
+        VARIATION   dot1dStpPortPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 240, in steps
+                of 16, as per RFC 4188."
+
+        VARIATION   dot1dTpLearnedEntryDiscards        
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dTpAgingTime        
+            DESCRIPTION
+                "The range of valid values is restricted to 15 to 800
+                seconds.
+                Lower limit of 15 seconds is a hardware limitation."
+                
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RSTP-MIB
+    -- rfc4318.txt
+    
+        INCLUDES    { rstpBridgeGroup, rstpPortGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-FRAMEWORK-MIB
+    -- rfc3411.txt
+    
+        INCLUDES    { snmpEngineGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-USER-BASED-SM-MIB
+    -- rfc3414.txt
+
+        INCLUDES    { usmMIBBasicGroup }
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-VIEW-BASED-ACM-MIB
+    -- rfc3415.txt
+    
+        INCLUDES    { vacmBasicGroup }
+
+        VARIATION   vacmAccessContextMatch
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmAccessStorageType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 
+                'nonVolatile(3)'."
+
+        VARIATION   vacmAccessStatus
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'active(1)'."
+
+        VARIATION   vacmViewTreeFamilyMask
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmViewTreeFamilyType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmViewTreeFamilyStorageType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'permanent(4)'."
+
+        VARIATION   vacmViewTreeFamilyStatus
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'active(1)'."
+                
+-- ---------------------------------------------------------------------- --
+    ::= { ruggedcomAgentCapabilities 7 }
+
+-- ---------------------------------------------------------------------- --
+--  Rugged Switch Agent Capabilities
+-- ---------------------------------------------------------------------- --
+
+ruggedcomSwitchAgents05 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "Rugged Switch Agent capabilities version 4.0.0. "
+    STATUS          obsolete
+    DESCRIPTION
+        "The Rugged Switch Agent."
+
+-- ---------------------------------------------------------------------- --       
+    SUPPORTS RUGGEDCOM-TRAPS-MIB 
+        INCLUDES    { ruggedcomNotificationsGroup}
+-- ---------------------------------------------------------------------- --        
+    SUPPORTS RUGGEDCOM-SYS-INFO-MIB 
+        INCLUDES    { rcSysErrObjectsGroup, 
+					  rcSysStsObjectsGroup,
+					  rcSysStsObjectsTemperatureGroup,
+					  rcSysStsPowerSupplyGroup,
+					  rcSysInfoDeviceInfoGroup,
+					  rcSysDeviceCommGroup }
+-- ---------------------------------------------------------------------- --        
+    SUPPORTS SNMPv2-MIB
+    -- rfc1907.txt
+    
+        INCLUDES     { snmpGroup, snmpCommunityGroup, snmpSetGroup, 
+                       systemGroup, snmpBasicNotificationsGroup }
+        
+        VARIATION   sysContact           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this
+                 object."
+
+        VARIATION   sysName
+            DESCRIPTION
+                "The string of up to 19 characters is supported for this 
+                object."
+            
+        VARIATION   sysLocation           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this 
+                object."
+
+        VARIATION   sysORIndex           
+            DESCRIPTION
+                "Only one sysOREntry is created by Rugged Switch Agent.
+                Dynamic configuration of MIB modules is not supported."
+    
+    
+-- ---------------------------------------------------------------------- --
+    SUPPORTS UDP-MIB
+    -- rfc2013.txt
+
+        INCLUDES    { udpGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS TCP-MIB
+    -- rfc2012.txt
+    
+        INCLUDES    { tcpGroup }
+
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS IF-MIB
+        -- rfc2863.txt
+        
+        INCLUDES    { ifGeneralInformationGroup, 
+                      ifVHCPacketGroup,
+                      ifCounterDiscontinuityGroup,
+                      linkUpDownNotificationsGroup }
+
+        VARIATION   ifIndex
+            DESCRIPTION
+                "A numbering scheme has been implemented to allow
+                one-to-one mapping between physical port values and
+                ifIndex interface values."
+                
+        VARIATION   ifAdminStatus
+            SYNTAX   INTEGER {
+                         up(1),
+                         down(2)
+                     }
+            DESCRIPTION
+                "Support for the value 'testing(3)' is not implemented
+                per RFC 2863 compliance statement."
+
+        VARIATION   ifOperStatus
+            SYNTAX  INTEGER {
+                         up(1),
+                         down(2)
+                    }
+            DESCRIPTION
+                "Information limited by Rugged Switch Agent for read-only
+                object."
+
+        VARIATION   ifPromiscuousMode
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 2863 compliance
+                statement.  This mode is always 'true(1)'."
+
+        VARIATION   ifAlias
+            DESCRIPTION
+                "String length is limitted to 15 characters."        
+        
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RMON-MIB
+    -- rfc2819.txt
+    
+        INCLUDES    { rmonEtherStatsGroup, rmonHistoryControlGroup,
+                      rmonEthernetHistoryGroup, rmonAlarmGroup, 
+                      rmonEventGroup }
+
+        VARIATION   etherStatsIndex
+            DESCRIPTION
+                "Two entries per port are created in etherStatsTable."
+                 
+        VARIATION   etherStatsOwner
+            DESCRIPTION
+                "The value of this entry is always set to 'Monitor' and
+                may not be modified." 
+                 
+        VARIATION   etherStatsStatus
+            DESCRIPTION
+                "One entry per port is created in etherStatsTable upon 
+                initialization up.  These entries may not be modified
+                or deleted.
+                No new entries can be created.
+                Therefore, historyControlStatus always set to 'valid(1)'." 
+                 
+        VARIATION   historyControlIndex
+            DESCRIPTION
+                "An average of four entries per ethernet port can be created 
+                in historyControlTable."
+
+        VARIATION   historyControlBucketsRequested
+            SYNTAX  Integer32(1..4000)
+            DESCRIPTION
+                "The value of historyControBucketRequested is restricted
+                to 4000."
+
+        VARIATION   historyControlOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of a historyControlOwner is a 
+                'Monitor' string."
+                        
+        VARIATION   alarmIndex
+            DESCRIPTION
+                "An average of four entries per port can be created 
+                in alarmTable."
+
+        VARIATION   alarmInterval
+            SYNTAX  Integer32
+            DEFVAL  { 60 }
+            DESCRIPTION
+                "A default value of an alarmInterval is 60 seconds."
+
+        VARIATION   alarmSampleType
+            SYNTAX  INTEGER {
+                        absosluteValue(1),
+                        deltaValue(2)
+                    }
+            DEFVAL  { deltaValue }
+            DESCRIPTION
+                "A default value of an alarmSampleType is 'deltaValue(2)'."
+
+        VARIATION   alarmStartupAlarm
+            SYNTAX  INTEGER {
+                        risingAlarm(1),
+                        fallingAlarm(2),
+                        risingOrFallingAlarm(3)
+                    }
+            DEFVAL  { risingOrFallingAlarm }
+            DESCRIPTION
+                "A default value of alarmStartupAlarm is 
+                'risingOrFallingAlarm(3)'."
+                
+        VARIATION   alarmOwner
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of an alarmOwner is a 'Monitor'
+                string."
+
+        VARIATION   eventIndex
+            DESCRIPTION
+                "An average of one entry per alarmEntry may be created 
+                in eventTable."
+                
+        VARIATION   eventType
+            SYNTAX  INTEGER {
+                        none(1),
+                        log(2),
+                        snmptrap(3),
+                        logandtrap(4)
+                    }
+            DEFVAL  { none }
+            DESCRIPTION
+                "A default value of an eventType is 'logandtrap(4)'."
+
+        VARIATION   eventCommunity
+            DESCRIPTION
+                "The string of up to 30 characters is supported for this
+                 object."
+                
+        VARIATION   eventOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of an eventOwner is a 'Monitor' string."
+
+        VARIATION   logIndex
+            DESCRIPTION
+                "For each eventEntry a hundred of entries in logTable may
+                be created.  The value of thi object will increase for each
+                new log generated for coresponding event.  When value of
+                this object becomes greater than 100, oldest entries will 
+                be deleted."
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS BRIDGE-MIB
+    -- rfc4188.txt
+    
+        INCLUDES    { dot1dBaseBridgeGroup, dot1dBasePortGroup,
+                      dot1dStpBridgeGroup, dot1dStpPortGroup,
+                      dot1dTpBridgeGroup, dot1dTpFdbGroup, 
+                      dot1dTpGroup, dot1dNotificationGroup }
+
+        VARIATION   dot1dBasePortDelayExceededDiscards
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dStpPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 61440, in steps
+                of 4096, as per RFC 4188."
+                
+        VARIATION   dot1dStpTimeSinceTopologyChange
+            DESCRIPTION
+                "The time since the tcWhile timer for any port on this 
+                Bridge was non-zero, as per RFV 4188."
+                
+        VARIATION   dot1dStpBridgeMaxAge
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeHelloTime
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeForwardDelay
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+                
+        VARIATION   dot1dStpPortPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 240, in steps
+                of 16, as per RFC 4188."
+
+        VARIATION   dot1dTpLearnedEntryDiscards        
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dTpAgingTime        
+            DESCRIPTION
+                "The range of valid values is restricted to 15 to 800
+                seconds.
+                Lower limit of 15 seconds is a hardware limitation."
+                
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RSTP-MIB
+    -- rfc4318.txt
+    
+        INCLUDES    { rstpBridgeGroup, rstpPortGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-FRAMEWORK-MIB
+    -- rfc3411.txt
+    
+        INCLUDES    { snmpEngineGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-USER-BASED-SM-MIB
+    -- rfc3414.txt
+
+        INCLUDES    { usmMIBBasicGroup }
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-VIEW-BASED-ACM-MIB
+    -- rfc3415.txt
+    
+        INCLUDES    { vacmBasicGroup }
+
+        VARIATION   vacmAccessContextMatch
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmAccessStorageType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 
+                'nonVolatile(3)'."
+
+        VARIATION   vacmAccessStatus
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'active(1)'."
+
+        VARIATION   vacmViewTreeFamilyMask
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmViewTreeFamilyType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmViewTreeFamilyStorageType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'permanent(4)'."
+
+        VARIATION   vacmViewTreeFamilyStatus
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'active(1)'."
+                
+-- ---------------------------------------------------------------------- --
+    SUPPORTS LLDP-MIB
+    -- Std 802.1AB-2005, LLDP MIB definition
+
+		INCLUDES    { lldpConfigGroup,
+				      lldpConfigRxGroup,
+				      lldpConfigTxGroup,
+				      lldpStatsRxGroup,
+				      lldpStatsTxGroup,
+				      lldpLocSysGroup,
+				      lldpRemSysGroup,
+				      lldpNotificationsGroup}
+
+        VARIATION   lldpNotificationInterval
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpPortConfigTLVsTxEnable
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpConfigManAddrPortsTxEnable
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpRemUnknownTLVInfo
+            DESCRIPTION
+                "This object is not supported."
+
+        VARIATION   lldpRemOrgDefInfo
+            DESCRIPTION
+                "This object is not supported."
+
+-- ---------------------------------------------------------------------- --
+    ::= { ruggedcomAgentCapabilities 8 }
+
+-- ---------------------------------------------------------------------- --
+--  Rugged Switch Agent Capabilities 05 for Product Families
+--  RS8000 and RS1600
+-- ---------------------------------------------------------------------- --
+
+ruggedcomSwitchAgents06 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "Rugged Switch Agent capabilities version 5.0.0. "
+    STATUS          obsolete
+    DESCRIPTION
+        "The Rugged Switch Agent."
+
+-- ---------------------------------------------------------------------- --       
+    SUPPORTS RUGGEDCOM-TRAPS-MIB 
+        INCLUDES    { ruggedcomNotificationsGroup}
+-- ---------------------------------------------------------------------- --        
+    SUPPORTS RUGGEDCOM-SYS-INFO-MIB 
+        INCLUDES    { rcSysErrObjectsGroup, 
+					  rcSysStsObjectsGroup,
+					  rcSysStsPowerSupplyGroup,
+					  rcSysInfoDeviceInfoGroup,
+					  rcSysDeviceCommGroup }
+-- ---------------------------------------------------------------------- --        
+    SUPPORTS SNMPv2-MIB
+    -- rfc1907.txt
+    
+        INCLUDES     { snmpGroup, snmpCommunityGroup, snmpSetGroup, 
+                       systemGroup, snmpBasicNotificationsGroup }
+        
+        VARIATION   sysContact           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this
+                 object."
+
+        VARIATION   sysName
+            DESCRIPTION
+                "The string of up to 19 characters is supported for this 
+                object."
+            
+        VARIATION   sysLocation           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this 
+                object."
+
+        VARIATION   sysORIndex           
+            DESCRIPTION
+                "Only one sysOREntry is created by Rugged Switch Agent.
+                Dynamic configuration of MIB modules is not supported."
+    
+    
+-- ---------------------------------------------------------------------- --
+    SUPPORTS UDP-MIB
+    -- rfc2013.txt
+
+        INCLUDES    { udpGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS TCP-MIB
+    -- rfc2012.txt
+    
+        INCLUDES    { tcpGroup }
+
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS IF-MIB
+        -- rfc2863.txt
+        
+        INCLUDES    { ifGeneralInformationGroup, 
+                      ifVHCPacketGroup,
+                      ifCounterDiscontinuityGroup,
+                      linkUpDownNotificationsGroup }
+
+        VARIATION   ifIndex
+            DESCRIPTION
+                "A numbering scheme has been implemented to allow
+                one-to-one mapping between physical port values and
+                ifIndex interface values.  Te value of ifIndex will be
+                1 to 8 for RS8000 device, and 1 to 16 for RS1600 device."
+                
+        VARIATION   ifAdminStatus
+            SYNTAX   INTEGER {
+                         up(1),
+                         down(2)
+                     }
+            DESCRIPTION
+                "Support for the value 'testing(3)' is not implemented
+                per RFC 2863 compliance statement."
+
+        VARIATION   ifOperStatus
+            SYNTAX  INTEGER {
+                         up(1),
+                         down(2)
+                    }
+            DESCRIPTION
+                "Information limited by Rugged Switch Agent for read-only
+                object."
+
+        VARIATION   ifPromiscuousMode
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 2863 compliance
+                statement.  This mode is always 'true(1)'."
+
+        VARIATION   ifAlias
+            DESCRIPTION
+                "String length is limitted to 15 characters."        
+        
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RMON-MIB
+    -- rfc2819.txt
+    
+        INCLUDES    { rmonEtherStatsGroup, rmonHistoryControlGroup,
+                      rmonEthernetHistoryGroup, rmonAlarmGroup, 
+                      rmonEventGroup }
+
+        VARIATION   etherStatsIndex
+            DESCRIPTION
+                "Two entries per port are created in etherStatsTable."
+                 
+        VARIATION   etherStatsOwner
+            DESCRIPTION
+                "The value of this entry is always set to 'Monitor' and
+                may not be modified." 
+                 
+        VARIATION   etherStatsStatus
+            DESCRIPTION
+                "One entry per port is created in etherStatsTable upon 
+                initialization up.  These entries may not be modified
+                or deleted.
+                No new entries can be created.
+                Therefore, historyControlStatus always set to 'valid(1)'." 
+                 
+        VARIATION   historyControlIndex
+            DESCRIPTION
+                "An average of four entries per ethernet port can be created 
+                in historyControlTable."
+
+        VARIATION   historyControlBucketsRequested
+            SYNTAX  Integer32(1..4000)
+            DESCRIPTION
+                "The value of historyControBucketRequested is restricted
+                to 4000."
+
+        VARIATION   historyControlOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of a historyControlOwner is a 
+                'Monitor' string."
+                        
+        VARIATION   alarmIndex
+            DESCRIPTION
+                "An average of four entries per port can be created 
+                in alarmTable."
+
+        VARIATION   alarmInterval
+            SYNTAX  Integer32
+            DEFVAL  { 60 }
+            DESCRIPTION
+                "A default value of an alarmInterval is 60 seconds."
+
+        VARIATION   alarmSampleType
+            SYNTAX  INTEGER {
+                        absosluteValue(1),
+                        deltaValue(2)
+                    }
+            DEFVAL  { deltaValue }
+            DESCRIPTION
+                "A default value of an alarmSampleType is 'deltaValue(2)'."
+
+        VARIATION   alarmStartupAlarm
+            SYNTAX  INTEGER {
+                        risingAlarm(1),
+                        fallingAlarm(2),
+                        risingOrFallingAlarm(3)
+                    }
+            DEFVAL  { risingOrFallingAlarm }
+            DESCRIPTION
+                "A default value of alarmStartupAlarm is 
+                'risingOrFallingAlarm(3)'."
+                
+        VARIATION   alarmOwner
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of an alarmOwner is a 'Monitor'
+                string."
+
+        VARIATION   eventIndex
+            DESCRIPTION
+                "An average of one entry per alarmEntry may be created 
+                in eventTable."
+                
+        VARIATION   eventType
+            SYNTAX  INTEGER {
+                        none(1),
+                        log(2),
+                        snmptrap(3),
+                        logandtrap(4)
+                    }
+            DEFVAL  { none }
+            DESCRIPTION
+                "A default value of an eventType is 'logandtrap(4)'."
+
+        VARIATION   eventCommunity
+            DESCRIPTION
+                "The string of up to 30 characters is supported for this
+                 object."
+                
+        VARIATION   eventOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of an eventOwner is a 'Monitor' string."
+
+        VARIATION   logIndex
+            DESCRIPTION
+                "For each eventEntry a hundred of entries in logTable may
+                be created.  The value of thi object will increase for each
+                new log generated for coresponding event.  When value of
+                this object becomes greater than 100, oldest entries will 
+                be deleted."
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS BRIDGE-MIB
+    -- rfc4188.txt
+    
+        INCLUDES    { dot1dBaseBridgeGroup, dot1dBasePortGroup,
+                      dot1dStpBridgeGroup, dot1dStpPortGroup,
+                      dot1dTpBridgeGroup, dot1dTpFdbGroup, 
+                      dot1dTpGroup, dot1dNotificationGroup }
+
+        VARIATION   dot1dBasePortDelayExceededDiscards
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dStpPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 61440, in steps
+                of 4096, as per RFC 4188."
+                
+        VARIATION   dot1dStpTimeSinceTopologyChange
+            DESCRIPTION
+                "The time since the tcWhile timer for any port on this 
+                Bridge was non-zero, as per RFV 4188."
+                
+        VARIATION   dot1dStpBridgeMaxAge
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeHelloTime
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeForwardDelay
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+                
+        VARIATION   dot1dStpPortPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 240, in steps
+                of 16, as per RFC 4188."
+
+        VARIATION   dot1dTpLearnedEntryDiscards        
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dTpAgingTime        
+            DESCRIPTION
+                "The range of valid values is restricted to 15 to 800
+                seconds.
+                Lower limit of 15 seconds is a hardware limitation."
+                
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RSTP-MIB
+    -- rfc4318.txt
+    
+        INCLUDES    { rstpBridgeGroup, rstpPortGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-FRAMEWORK-MIB
+    -- rfc3411.txt
+    
+        INCLUDES    { snmpEngineGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-USER-BASED-SM-MIB
+    -- rfc3414.txt
+
+        INCLUDES    { usmMIBBasicGroup }
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-VIEW-BASED-ACM-MIB
+    -- rfc3415.txt
+    
+        INCLUDES    { vacmBasicGroup }
+
+        VARIATION   vacmAccessContextMatch
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmAccessStorageType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 
+                'nonVolatile(3)'."
+
+        VARIATION   vacmAccessStatus
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'active(1)'."
+
+        VARIATION   vacmViewTreeFamilyMask
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmViewTreeFamilyType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmViewTreeFamilyStorageType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'permanent(4)'."
+
+        VARIATION   vacmViewTreeFamilyStatus
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'active(1)'."
+                
+-- ---------------------------------------------------------------------- --
+    SUPPORTS LLDP-MIB
+    -- Std 802.1AB-2005, LLDP MIB definition
+
+		INCLUDES    { lldpConfigGroup,
+				      lldpConfigRxGroup,
+				      lldpConfigTxGroup,
+				      lldpStatsRxGroup,
+				      lldpStatsTxGroup,
+				      lldpLocSysGroup,
+				      lldpRemSysGroup,
+				      lldpNotificationsGroup}
+
+        VARIATION   lldpNotificationInterval
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpPortConfigTLVsTxEnable
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpConfigManAddrPortsTxEnable
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpRemUnknownTLVInfo
+            DESCRIPTION
+                "This object is not supported."
+
+        VARIATION   lldpRemOrgDefInfo
+            DESCRIPTION
+                "This object is not supported."
+
+-- ---------------------------------------------------------------------- --
+    ::= { ruggedcomAgentCapabilities 9 }
+
+
+-- ---------------------------------------------------------------------- --
+--  Rugged Switch Agent Capabilities 07
+-- ---------------------------------------------------------------------- --
+
+ruggedcomSwitchAgents07 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "Rugged Switch Agent capabilities version 6.0.0. "
+    STATUS          obsolete
+    DESCRIPTION
+        "The Rugged Switch Agent."
+
+-- ---------------------------------------------------------------------- --       
+    SUPPORTS RUGGEDCOM-TRAPS-MIB 
+        INCLUDES    { ruggedcomNotificationsGroup}
+-- ---------------------------------------------------------------------- --        
+    SUPPORTS RUGGEDCOM-SYS-INFO-MIB 
+        INCLUDES    { rcSysErrObjectsGroup, 
+					  rcSysStsObjectsGroup,
+					  rcSysStsObjectsTemperatureGroup,
+					  rcSysStsPowerSupplyGroup,
+					  rcSysInfoDeviceInfoGroup,
+					  rcSysDeviceCommGroup }
+-- ---------------------------------------------------------------------- --        
+    SUPPORTS SNMPv2-MIB
+    -- rfc1907.txt
+    
+        INCLUDES     { snmpGroup, snmpCommunityGroup, snmpSetGroup, 
+                       systemGroup, snmpBasicNotificationsGroup }
+        
+        VARIATION   sysContact           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this
+                 object."
+
+        VARIATION   sysName
+            DESCRIPTION
+                "The string of up to 19 characters is supported for this 
+                object."
+            
+        VARIATION   sysLocation           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this 
+                object."
+
+        VARIATION   sysORIndex           
+            DESCRIPTION
+                "Only one sysOREntry is created by Rugged Switch Agent.
+                Dynamic configuration of MIB modules is not supported."
+    
+    
+-- ---------------------------------------------------------------------- --
+    SUPPORTS UDP-MIB
+    -- rfc2013.txt
+
+        INCLUDES    { udpGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS TCP-MIB
+    -- rfc2012.txt
+    
+        INCLUDES    { tcpGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS IP-MIB
+    -- rfc2011.txt
+    
+        INCLUDES    { ipGroup, icmpGroup }
+
+        VARIATION   ipForwarding
+            SYNTAX   INTEGER {
+                         notForwarding(2)
+                     }
+            DESCRIPTION
+                "Support for the value 'forwarding(1)' is not implemented
+                per RFC 2011."
+
+        VARIATION   ipDefaultTTL
+			ACCESS read-only
+            DESCRIPTION
+                "Write access is not supported."
+-- ---------------------------------------------------------------------- --
+    SUPPORTS IF-MIB
+        -- rfc2863.txt
+        
+        INCLUDES    { ifGeneralInformationGroup, 
+                      ifVHCPacketGroup,
+                      ifCounterDiscontinuityGroup,
+                      linkUpDownNotificationsGroup }
+
+        VARIATION   ifIndex
+            DESCRIPTION
+                "A numbering scheme has been implemented to allow
+                one-to-one mapping between physical port values and
+                ifIndex interface values."
+                
+        VARIATION   ifAdminStatus
+            SYNTAX   INTEGER {
+                         up(1),
+                         down(2)
+                     }
+            DESCRIPTION
+                "Support for the value 'testing(3)' is not implemented
+                per RFC 2863 compliance statement."
+
+        VARIATION   ifOperStatus
+            SYNTAX  INTEGER {
+                         up(1),
+                         down(2)
+                    }
+            DESCRIPTION
+                "Information limited by Rugged Switch Agent for read-only
+                object."
+
+        VARIATION   ifPromiscuousMode
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 2863 compliance
+                statement.  This mode is always 'true(1)'."
+
+        VARIATION   ifAlias
+            DESCRIPTION
+                "String length is limitted to 15 characters."        
+        
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RMON-MIB
+    -- rfc2819.txt
+    
+        INCLUDES    { rmonEtherStatsGroup, rmonHistoryControlGroup,
+                      rmonEthernetHistoryGroup, rmonAlarmGroup, 
+                      rmonEventGroup }
+
+        VARIATION   etherStatsIndex
+            DESCRIPTION
+                "Two entries per port are created in etherStatsTable."
+                 
+        VARIATION   etherStatsOwner
+            DESCRIPTION
+                "The value of this entry is always set to 'Monitor' and
+                may not be modified." 
+                 
+        VARIATION   etherStatsStatus
+            DESCRIPTION
+                "One entry per port is created in etherStatsTable upon 
+                initialization up.  These entries may not be modified
+                or deleted.
+                No new entries can be created.
+                Therefore, historyControlStatus always set to 'valid(1)'." 
+                 
+        VARIATION   historyControlIndex
+            DESCRIPTION
+                "An average of four entries per ethernet port can be created 
+                in historyControlTable."
+
+        VARIATION   historyControlBucketsRequested
+            SYNTAX  Integer32(1..4000)
+            DESCRIPTION
+                "The value of historyControBucketRequested is restricted
+                to 4000."
+
+        VARIATION   historyControlOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of a historyControlOwner is a 
+                'Monitor' string."
+                        
+        VARIATION   alarmIndex
+            DESCRIPTION
+                "An average of four entries per port can be created 
+                in alarmTable."
+
+        VARIATION   alarmInterval
+            SYNTAX  Integer32
+            DEFVAL  { 60 }
+            DESCRIPTION
+                "A default value of an alarmInterval is 60 seconds."
+
+        VARIATION   alarmSampleType
+            SYNTAX  INTEGER {
+                        absosluteValue(1),
+                        deltaValue(2)
+                    }
+            DEFVAL  { deltaValue }
+            DESCRIPTION
+                "A default value of an alarmSampleType is 'deltaValue(2)'."
+
+        VARIATION   alarmStartupAlarm
+            SYNTAX  INTEGER {
+                        risingAlarm(1),
+                        fallingAlarm(2),
+                        risingOrFallingAlarm(3)
+                    }
+            DEFVAL  { risingOrFallingAlarm }
+            DESCRIPTION
+                "A default value of alarmStartupAlarm is 
+                'risingOrFallingAlarm(3)'."
+                
+        VARIATION   alarmOwner
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of an alarmOwner is a 'Monitor'
+                string."
+
+        VARIATION   eventIndex
+            DESCRIPTION
+                "An average of one entry per alarmEntry may be created 
+                in eventTable."
+                
+        VARIATION   eventType
+            SYNTAX  INTEGER {
+                        none(1),
+                        log(2),
+                        snmptrap(3),
+                        logandtrap(4)
+                    }
+            DEFVAL  { none }
+            DESCRIPTION
+                "A default value of an eventType is 'logandtrap(4)'."
+
+        VARIATION   eventCommunity
+            DESCRIPTION
+                "The string of up to 30 characters is supported for this
+                 object."
+                
+        VARIATION   eventOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of an eventOwner is a 'Monitor' string."
+
+        VARIATION   logIndex
+            DESCRIPTION
+                "For each eventEntry a hundred of entries in logTable may
+                be created.  The value of thi object will increase for each
+                new log generated for coresponding event.  When value of
+                this object becomes greater than 100, oldest entries will 
+                be deleted."
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS BRIDGE-MIB
+    -- rfc4188.txt
+    
+        INCLUDES    { dot1dBaseBridgeGroup, dot1dBasePortGroup,
+                      dot1dStpBridgeGroup, dot1dStpPortGroup,
+                      dot1dTpBridgeGroup, dot1dTpFdbGroup, 
+                      dot1dTpGroup, dot1dNotificationGroup }
+
+        VARIATION   dot1dBasePortDelayExceededDiscards
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dStpPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 61440, in steps
+                of 4096, as per RFC 4188."
+                
+        VARIATION   dot1dStpTimeSinceTopologyChange
+            DESCRIPTION
+                "The time since the tcWhile timer for any port on this 
+                Bridge was non-zero, as per RFV 4188."
+                
+        VARIATION   dot1dStpBridgeMaxAge
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeHelloTime
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeForwardDelay
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+                
+        VARIATION   dot1dStpPortPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 240, in steps
+                of 16, as per RFC 4188."
+
+        VARIATION   dot1dTpLearnedEntryDiscards        
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dTpAgingTime        
+            DESCRIPTION
+                "The range of valid values is restricted to 15 to 800
+                seconds.
+                Lower limit of 15 seconds is a hardware limitation."
+                
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RSTP-MIB
+    -- rfc4318.txt
+    
+        INCLUDES    { rstpBridgeGroup, rstpPortGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS Q-BRIDGE-MIB
+    -- rfc4363.txt
+    
+        INCLUDES    { qBridgeBaseGroup, qBridgeFdbUnicastGroup,
+        			  qBridgeFdbMulticastGroup, qBridgeVlanGroup,
+        			  qBridgeVlanStaticGroup, qBridgePortGroup }
+
+        VARIATION   dot1qVlanStaticEgressPorts
+			ACCESS read-only
+            DESCRIPTION
+                "Write access is not supported."
+
+        VARIATION   dot1qVlanStaticUntaggedPorts
+			ACCESS read-only
+            DESCRIPTION
+                "Write access is not supported."
+
+        VARIATION   dot1qVlanStaticRowStatus
+            SYNTAX   INTEGER {
+                         active(1),
+                         createAndGo(4),
+                         destroy(6)
+                     }
+            DESCRIPTION
+                "Support for values 'notInService(2)' , 'notReady(3)' and 
+                'createAndWait(5) is not implemented."
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-FRAMEWORK-MIB
+    -- rfc3411.txt
+    
+        INCLUDES    { snmpEngineGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-USER-BASED-SM-MIB
+    -- rfc3414.txt
+
+        INCLUDES    { usmMIBBasicGroup }
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-VIEW-BASED-ACM-MIB
+    -- rfc3415.txt
+    
+        INCLUDES    { vacmBasicGroup }
+
+        VARIATION   vacmAccessContextMatch
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmAccessStorageType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 
+                'nonVolatile(3)'."
+
+        VARIATION   vacmAccessStatus
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'active(1)'."
+
+        VARIATION   vacmViewTreeFamilyMask
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmViewTreeFamilyType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmViewTreeFamilyStorageType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'permanent(4)'."
+
+        VARIATION   vacmViewTreeFamilyStatus
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'active(1)'."
+                
+-- ---------------------------------------------------------------------- --
+    SUPPORTS LLDP-MIB
+    -- Std 802.1AB-2005, LLDP MIB definition
+
+		INCLUDES    { lldpConfigGroup,
+				      lldpConfigRxGroup,
+				      lldpConfigTxGroup,
+				      lldpStatsRxGroup,
+				      lldpStatsTxGroup,
+				      lldpLocSysGroup,
+				      lldpRemSysGroup,
+				      lldpNotificationsGroup}
+
+        VARIATION   lldpNotificationInterval
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpPortConfigTLVsTxEnable
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpConfigManAddrPortsTxEnable
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpRemUnknownTLVInfo
+            DESCRIPTION
+                "This object is not supported."
+
+        VARIATION   lldpRemOrgDefInfo
+            DESCRIPTION
+                "This object is not supported."
+
+-- ---------------------------------------------------------------------- --
+    ::= { ruggedcomAgentCapabilities 13 }
+
+
+-- ---------------------------------------------------------------------- --
+--  Rugged Switch Agent Capabilities 071
+-- ---------------------------------------------------------------------- --
+
+ruggedcomSwitchAgents071 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "Rugged Switch Agent capabilities version 6.1.0. "
+    STATUS          obsolete
+    DESCRIPTION
+        "The Rugged Switch Agent."
+
+-- ---------------------------------------------------------------------- --       
+    SUPPORTS RUGGEDCOM-TRAPS-MIB 
+        INCLUDES    { ruggedcomNotificationsGroup}
+-- ---------------------------------------------------------------------- --        
+    SUPPORTS RUGGEDCOM-SYS-INFO-MIB 
+        INCLUDES    { rcSysErrObjectsGroup, 
+                      rcSysStsObjectsGroup1,
+					  rcSysStsObjectsTemperatureGroup,
+					  rcSysStsPowerSupplyGroup,
+					  rcSysInfoDeviceInfoGroup,
+					  rcSysDeviceCommGroup }
+-- ---------------------------------------------------------------------- --       
+    SUPPORTS RUGGEDCOM-DOT11-MIB 
+        INCLUDES    { rcDot11GlobalParamsGroup,
+                      rcDot11NetworkParamsGroup,
+                      rcDot11SecurityParamsGroup,
+                      rcDot11DhcpParamsGroup,
+                      rcDot11MacFilteringTableGroup,
+                      rcDot11AssociationTableGroup }
+-- ---------------------------------------------------------------------- --        
+    SUPPORTS SNMPv2-MIB
+    -- rfc1907.txt
+    
+        INCLUDES     { snmpGroup, snmpCommunityGroup, snmpSetGroup, 
+                       systemGroup, snmpBasicNotificationsGroup }
+        
+        VARIATION   sysContact           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this
+                 object."
+
+        VARIATION   sysName
+            DESCRIPTION
+                "The string of up to 24 characters is supported for this 
+                object."
+            
+        VARIATION   sysLocation           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this 
+                object."
+
+        VARIATION   sysORIndex           
+            DESCRIPTION
+                "Only one sysOREntry is created by Rugged Switch Agent.
+                Dynamic configuration of MIB modules is not supported."
+    
+    
+-- ---------------------------------------------------------------------- --
+    SUPPORTS UDP-MIB
+    -- rfc2013.txt
+
+        INCLUDES    { udpGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS TCP-MIB
+    -- rfc2012.txt
+    
+        INCLUDES    { tcpGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS IP-MIB
+    -- rfc2011.txt
+    
+        INCLUDES    { ipGroup, icmpGroup }
+
+        VARIATION   ipForwarding
+            SYNTAX   INTEGER {
+                         notForwarding(2)
+                     }
+            DESCRIPTION
+                "Support for the value 'forwarding(1)' is not implemented
+                per RFC 2011."
+
+        VARIATION   ipDefaultTTL
+			ACCESS read-only
+            DESCRIPTION
+                "Write access is not supported."
+-- ---------------------------------------------------------------------- --
+    SUPPORTS IF-MIB
+        -- rfc2863.txt
+        
+        INCLUDES    { ifGeneralInformationGroup, 
+                      ifVHCPacketGroup,
+                      ifCounterDiscontinuityGroup,
+                      linkUpDownNotificationsGroup }
+
+        VARIATION   ifIndex
+            DESCRIPTION
+                "A numbering scheme has been implemented to allow
+                one-to-one mapping between physical port values and
+                ifIndex interface values."
+                
+        VARIATION   ifAdminStatus
+            SYNTAX   INTEGER {
+                         up(1),
+                         down(2)
+                     }
+            DESCRIPTION
+                "Support for the value 'testing(3)' is not implemented
+                per RFC 2863 compliance statement."
+
+        VARIATION   ifOperStatus
+            SYNTAX  INTEGER {
+                         up(1),
+                         down(2)
+                    }
+            DESCRIPTION
+                "Information limited by Rugged Switch Agent for read-only
+                object."
+
+        VARIATION   ifPromiscuousMode
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 2863 compliance
+                statement.  This mode is always 'true(1)'."
+
+        VARIATION   ifAlias
+            DESCRIPTION
+                "String length is limitted to 15 characters."        
+        
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RMON-MIB
+    -- rfc2819.txt
+    
+        INCLUDES    { rmonEtherStatsGroup, rmonHistoryControlGroup,
+                      rmonEthernetHistoryGroup, rmonAlarmGroup, 
+                      rmonEventGroup }
+
+        VARIATION   etherStatsIndex
+            DESCRIPTION
+                "Two entries per port are created in etherStatsTable."
+                 
+        VARIATION   etherStatsOwner
+            DESCRIPTION
+                "The value of this entry is always set to 'Monitor' and
+                may not be modified." 
+                 
+        VARIATION   etherStatsStatus
+            DESCRIPTION
+                "One entry per port is created in etherStatsTable upon 
+                initialization up.  These entries may not be modified
+                or deleted.
+                No new entries can be created.
+                Therefore, historyControlStatus always set to 'valid(1)'." 
+                 
+        VARIATION   historyControlIndex
+            DESCRIPTION
+                "An average of four entries per ethernet port can be created 
+                in historyControlTable."
+
+        VARIATION   historyControlBucketsRequested
+            SYNTAX  Integer32(1..4000)
+            DESCRIPTION
+                "The value of historyControBucketRequested is restricted
+                to 4000."
+
+        VARIATION   historyControlOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of a historyControlOwner is a 
+                'Monitor' string."
+                        
+        VARIATION   alarmIndex
+            DESCRIPTION
+                "An average of four entries per port can be created 
+                in alarmTable."
+
+        VARIATION   alarmInterval
+            SYNTAX  Integer32
+            DEFVAL  { 60 }
+            DESCRIPTION
+                "A default value of an alarmInterval is 60 seconds."
+
+        VARIATION   alarmSampleType
+            SYNTAX  INTEGER {
+                        absosluteValue(1),
+                        deltaValue(2)
+                    }
+            DEFVAL  { deltaValue }
+            DESCRIPTION
+                "A default value of an alarmSampleType is 'deltaValue(2)'."
+
+        VARIATION   alarmStartupAlarm
+            SYNTAX  INTEGER {
+                        risingAlarm(1),
+                        fallingAlarm(2),
+                        risingOrFallingAlarm(3)
+                    }
+            DEFVAL  { risingOrFallingAlarm }
+            DESCRIPTION
+                "A default value of alarmStartupAlarm is 
+                'risingOrFallingAlarm(3)'."
+                
+        VARIATION   alarmOwner
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of an alarmOwner is a 'Monitor'
+                string."
+
+        VARIATION   eventIndex
+            DESCRIPTION
+                "An average of one entry per alarmEntry may be created 
+                in eventTable."
+                
+        VARIATION   eventType
+            SYNTAX  INTEGER {
+                        none(1),
+                        log(2),
+                        snmptrap(3),
+                        logandtrap(4)
+                    }
+            DEFVAL  { none }
+            DESCRIPTION
+                "A default value of an eventType is 'logandtrap(4)'."
+
+        VARIATION   eventCommunity
+            DESCRIPTION
+                "The string of up to 30 characters is supported for this
+                 object."
+                
+        VARIATION   eventOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of an eventOwner is a 'Monitor' string."
+
+        VARIATION   logIndex
+            DESCRIPTION
+                "For each eventEntry a hundred of entries in logTable may
+                be created.  The value of thi object will increase for each
+                new log generated for coresponding event.  When value of
+                this object becomes greater than 100, oldest entries will 
+                be deleted."
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS BRIDGE-MIB
+    -- rfc4188.txt
+    
+        INCLUDES    { dot1dBaseBridgeGroup, dot1dBasePortGroup,
+                      dot1dStpBridgeGroup, dot1dStpPortGroup,
+                      dot1dTpBridgeGroup, dot1dTpFdbGroup, 
+                      dot1dTpGroup, dot1dNotificationGroup }
+
+        VARIATION   dot1dBasePortDelayExceededDiscards
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dStpPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 61440, in steps
+                of 4096, as per RFC 4188."
+                
+        VARIATION   dot1dStpTimeSinceTopologyChange
+            DESCRIPTION
+                "The time since the tcWhile timer for any port on this 
+                Bridge was non-zero, as per RFV 4188."
+                
+        VARIATION   dot1dStpBridgeMaxAge
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeHelloTime
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeForwardDelay
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+                
+        VARIATION   dot1dStpPortPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 240, in steps
+                of 16, as per RFC 4188."
+
+        VARIATION   dot1dTpLearnedEntryDiscards        
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dTpAgingTime        
+            DESCRIPTION
+                "The range of valid values is restricted to 15 to 800
+                seconds.
+                Lower limit of 15 seconds is a hardware limitation."
+                
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RSTP-MIB
+    -- rfc4318.txt
+    
+        INCLUDES    { rstpBridgeGroup, rstpPortGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS Q-BRIDGE-MIB
+    -- rfc4363.txt
+    
+        INCLUDES    { qBridgeBaseGroup, qBridgeFdbUnicastGroup,
+        			  qBridgeFdbMulticastGroup, qBridgeVlanGroup,
+        			  qBridgeVlanStaticGroup, qBridgePortGroup }
+
+        VARIATION   dot1qVlanStaticEgressPorts
+			ACCESS read-only
+            DESCRIPTION
+                "Write access is not supported."
+
+        VARIATION   dot1qVlanStaticUntaggedPorts
+			ACCESS read-only
+            DESCRIPTION
+                "Write access is not supported."
+
+        VARIATION   dot1qVlanStaticRowStatus
+            SYNTAX   INTEGER {
+                         active(1),
+                         createAndGo(4),
+                         destroy(6)
+                     }
+            DESCRIPTION
+                "Support for values 'notInService(2)' , 'notReady(3)' and 
+                'createAndWait(5) is not implemented."
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-FRAMEWORK-MIB
+    -- rfc3411.txt
+    
+        INCLUDES    { snmpEngineGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-USER-BASED-SM-MIB
+    -- rfc3414.txt
+
+        INCLUDES    { usmMIBBasicGroup }
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-VIEW-BASED-ACM-MIB
+    -- rfc3415.txt
+    
+        INCLUDES    { vacmBasicGroup }
+
+        VARIATION   vacmAccessContextMatch
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmAccessStorageType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 
+                'nonVolatile(3)'."
+
+        VARIATION   vacmAccessStatus
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'active(1)'."
+
+        VARIATION   vacmViewTreeFamilyMask
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmViewTreeFamilyType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmViewTreeFamilyStorageType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'permanent(4)'."
+
+        VARIATION   vacmViewTreeFamilyStatus
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'active(1)'."
+                
+-- ---------------------------------------------------------------------- --
+    SUPPORTS LLDP-MIB
+    -- Std 802.1AB-2005, LLDP MIB definition
+
+		INCLUDES    { lldpConfigGroup,
+				      lldpConfigRxGroup,
+				      lldpConfigTxGroup,
+				      lldpStatsRxGroup,
+				      lldpStatsTxGroup,
+				      lldpLocSysGroup,
+				      lldpRemSysGroup,
+				      lldpNotificationsGroup}
+
+        VARIATION   lldpNotificationInterval
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpPortConfigTLVsTxEnable
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpConfigManAddrPortsTxEnable
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpRemUnknownTLVInfo
+            DESCRIPTION
+                "This object is not supported."
+
+        VARIATION   lldpRemOrgDefInfo
+            DESCRIPTION
+                "This object is not supported."
+
+-- ---------------------------------------------------------------------- --
+    ::= { ruggedcomSwitchAgents07 1 }
+
+-- ---------------------------------------------------------------------- --
+--  Rugged Switch Agent Capabilities version 08 for Product Families
+--  RS8000 and RS1600
+-- ---------------------------------------------------------------------- --
+
+ruggedcomSwitchAgents08 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "Rugged Switch Agent capabilities version 7.0.0. "
+    STATUS          obsolete
+    DESCRIPTION
+        "The Rugged Switch Agent."
+
+-- ---------------------------------------------------------------------- --       
+    SUPPORTS RUGGEDCOM-TRAPS-MIB 
+        INCLUDES    { ruggedcomNotificationsGroup}
+-- ---------------------------------------------------------------------- --        
+    SUPPORTS RUGGEDCOM-SYS-INFO-MIB 
+        INCLUDES    { rcSysErrObjectsGroup, 
+					  rcSysStsObjectsGroup,
+					  rcSysStsPowerSupplyGroup,
+					  rcSysInfoDeviceInfoGroup,
+					  rcSysDeviceCommGroup }
+-- ---------------------------------------------------------------------- --        
+    SUPPORTS SNMPv2-MIB
+    -- rfc1907.txt
+    
+        INCLUDES     { snmpGroup, snmpCommunityGroup, snmpSetGroup, 
+                       systemGroup, snmpBasicNotificationsGroup }
+        
+        VARIATION   sysContact           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this
+                 object."
+
+        VARIATION   sysName
+            DESCRIPTION
+                "The string of up to 19 characters is supported for this 
+                object."
+            
+        VARIATION   sysLocation           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this 
+                object."
+
+        VARIATION   sysORIndex           
+            DESCRIPTION
+                "Only one sysOREntry is created by Rugged Switch Agent.
+                Dynamic configuration of MIB modules is not supported."
+    
+    
+-- ---------------------------------------------------------------------- --
+    SUPPORTS UDP-MIB
+    -- rfc2013.txt
+
+        INCLUDES    { udpGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS TCP-MIB
+    -- rfc2012.txt
+    
+        INCLUDES    { tcpGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS IP-MIB
+    -- rfc2011.txt
+    
+        INCLUDES    { ipGroup, icmpGroup }
+
+        VARIATION   ipForwarding
+            SYNTAX   INTEGER {
+                         notForwarding(2)
+                     }
+            DESCRIPTION
+                "Support for the value 'forwarding(1)' is not implemented
+                per RFC 2011."
+
+        VARIATION   ipDefaultTTL
+			ACCESS read-only
+            DESCRIPTION
+                "Write access is not supported."
+-- ---------------------------------------------------------------------- --
+    SUPPORTS IF-MIB
+        -- rfc2863.txt
+        
+        INCLUDES    { ifGeneralInformationGroup, 
+                      ifVHCPacketGroup,
+                      ifCounterDiscontinuityGroup,
+                      linkUpDownNotificationsGroup }
+
+        VARIATION   ifIndex
+            DESCRIPTION
+                "A numbering scheme has been implemented to allow
+                one-to-one mapping between physical port values and
+                ifIndex interface values.  Te value of ifIndex will be
+                1 to 8 for RS8000 device, and 1 to 16 for RS1600 device."
+                
+        VARIATION   ifAdminStatus
+            SYNTAX   INTEGER {
+                         up(1),
+                         down(2)
+                     }
+            DESCRIPTION
+                "Support for the value 'testing(3)' is not implemented
+                per RFC 2863 compliance statement."
+
+        VARIATION   ifOperStatus
+            SYNTAX  INTEGER {
+                         up(1),
+                         down(2)
+                    }
+            DESCRIPTION
+                "Information limited by Rugged Switch Agent for read-only
+                object."
+
+        VARIATION   ifPromiscuousMode
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 2863 compliance
+                statement.  This mode is always 'true(1)'."
+
+        VARIATION   ifAlias
+            DESCRIPTION
+                "String length is limitted to 15 characters."        
+        
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RMON-MIB
+    -- rfc2819.txt
+    
+        INCLUDES    { rmonEtherStatsGroup, rmonHistoryControlGroup,
+                      rmonEthernetHistoryGroup, rmonAlarmGroup, 
+                      rmonEventGroup }
+
+        VARIATION   etherStatsIndex
+            DESCRIPTION
+                "Two entries per port are created in etherStatsTable."
+                 
+        VARIATION   etherStatsOwner
+            DESCRIPTION
+                "The value of this entry is always set to 'Monitor' and
+                may not be modified." 
+                 
+        VARIATION   etherStatsStatus
+            DESCRIPTION
+                "One entry per port is created in etherStatsTable upon 
+                initialization up.  These entries may not be modified
+                or deleted.
+                No new entries can be created.
+                Therefore, historyControlStatus always set to 'valid(1)'." 
+                 
+        VARIATION   historyControlIndex
+            DESCRIPTION
+                "An average of four entries per ethernet port can be created 
+                in historyControlTable."
+
+        VARIATION   historyControlBucketsRequested
+            SYNTAX  Integer32(1..4000)
+            DESCRIPTION
+                "The value of historyControBucketRequested is restricted
+                to 4000."
+
+        VARIATION   historyControlOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of a historyControlOwner is a 
+                'Monitor' string."
+                        
+        VARIATION   alarmIndex
+            DESCRIPTION
+                "An average of four entries per port can be created 
+                in alarmTable."
+
+        VARIATION   alarmInterval
+            SYNTAX  Integer32
+            DEFVAL  { 60 }
+            DESCRIPTION
+                "A default value of an alarmInterval is 60 seconds."
+
+        VARIATION   alarmSampleType
+            SYNTAX  INTEGER {
+                        absosluteValue(1),
+                        deltaValue(2)
+                    }
+            DEFVAL  { deltaValue }
+            DESCRIPTION
+                "A default value of an alarmSampleType is 'deltaValue(2)'."
+
+        VARIATION   alarmStartupAlarm
+            SYNTAX  INTEGER {
+                        risingAlarm(1),
+                        fallingAlarm(2),
+                        risingOrFallingAlarm(3)
+                    }
+            DEFVAL  { risingOrFallingAlarm }
+            DESCRIPTION
+                "A default value of alarmStartupAlarm is 
+                'risingOrFallingAlarm(3)'."
+                
+        VARIATION   alarmOwner
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of an alarmOwner is a 'Monitor'
+                string."
+
+        VARIATION   eventIndex
+            DESCRIPTION
+                "An average of one entry per alarmEntry may be created 
+                in eventTable."
+                
+        VARIATION   eventType
+            SYNTAX  INTEGER {
+                        none(1),
+                        log(2),
+                        snmptrap(3),
+                        logandtrap(4)
+                    }
+            DEFVAL  { none }
+            DESCRIPTION
+                "A default value of an eventType is 'logandtrap(4)'."
+
+        VARIATION   eventCommunity
+            DESCRIPTION
+                "The string of up to 30 characters is supported for this
+                 object."
+                
+        VARIATION   eventOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of an eventOwner is a 'Monitor' string."
+
+        VARIATION   logIndex
+            DESCRIPTION
+                "For each eventEntry a hundred of entries in logTable may
+                be created.  The value of thi object will increase for each
+                new log generated for coresponding event.  When value of
+                this object becomes greater than 100, oldest entries will 
+                be deleted."
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS BRIDGE-MIB
+    -- rfc4188.txt
+    
+        INCLUDES    { dot1dBaseBridgeGroup, dot1dBasePortGroup,
+                      dot1dStpBridgeGroup, dot1dStpPortGroup,
+                      dot1dTpBridgeGroup, dot1dTpFdbGroup, 
+                      dot1dTpGroup, dot1dNotificationGroup }
+
+        VARIATION   dot1dBasePortDelayExceededDiscards
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dStpPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 61440, in steps
+                of 4096, as per RFC 4188."
+                
+        VARIATION   dot1dStpTimeSinceTopologyChange
+            DESCRIPTION
+                "The time since the tcWhile timer for any port on this 
+                Bridge was non-zero, as per RFV 4188."
+                
+        VARIATION   dot1dStpBridgeMaxAge
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeHelloTime
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeForwardDelay
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+                
+        VARIATION   dot1dStpPortPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 240, in steps
+                of 16, as per RFC 4188."
+
+        VARIATION   dot1dTpLearnedEntryDiscards        
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dTpAgingTime        
+            DESCRIPTION
+                "The range of valid values is restricted to 15 to 800
+                seconds.
+                Lower limit of 15 seconds is a hardware limitation."
+                
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RSTP-MIB
+    -- rfc4318.txt
+    
+        INCLUDES    { rstpBridgeGroup, rstpPortGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS Q-BRIDGE-MIB
+    -- rfc4363.txt
+    
+        INCLUDES    { qBridgeBaseGroup, qBridgeFdbUnicastGroup,
+        			  qBridgeFdbMulticastGroup, qBridgeVlanGroup,
+        			  qBridgeVlanStaticGroup, qBridgePortGroup }
+
+        VARIATION   dot1qVlanStaticEgressPorts
+			ACCESS read-only
+            DESCRIPTION
+                "Write access is not supported."
+
+        VARIATION   dot1qVlanStaticUntaggedPorts
+			ACCESS read-only
+            DESCRIPTION
+                "Write access is not supported."
+
+        VARIATION   dot1qVlanStaticRowStatus
+            SYNTAX   INTEGER {
+                         active(1),
+                         createAndGo(4),
+                         destroy(6)
+                     }
+            DESCRIPTION
+                "Support for values 'notInService(2)' , 'notReady(3)' and 
+                'createAndWait(5) is not implemented."
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-FRAMEWORK-MIB
+    -- rfc3411.txt
+    
+        INCLUDES    { snmpEngineGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-USER-BASED-SM-MIB
+    -- rfc3414.txt
+
+        INCLUDES    { usmMIBBasicGroup }
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-VIEW-BASED-ACM-MIB
+    -- rfc3415.txt
+    
+        INCLUDES    { vacmBasicGroup }
+
+        VARIATION   vacmAccessContextMatch
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmAccessStorageType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 
+                'nonVolatile(3)'."
+
+        VARIATION   vacmAccessStatus
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'active(1)'."
+
+        VARIATION   vacmViewTreeFamilyMask
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmViewTreeFamilyType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmViewTreeFamilyStorageType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'permanent(4)'."
+
+        VARIATION   vacmViewTreeFamilyStatus
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'active(1)'."
+                
+-- ---------------------------------------------------------------------- --
+    SUPPORTS LLDP-MIB
+    -- Std 802.1AB-2005, LLDP MIB definition
+
+		INCLUDES    { lldpConfigGroup,
+				      lldpConfigRxGroup,
+				      lldpConfigTxGroup,
+				      lldpStatsRxGroup,
+				      lldpStatsTxGroup,
+				      lldpLocSysGroup,
+				      lldpRemSysGroup,
+				      lldpNotificationsGroup}
+
+        VARIATION   lldpNotificationInterval
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpPortConfigTLVsTxEnable
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpConfigManAddrPortsTxEnable
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpRemUnknownTLVInfo
+            DESCRIPTION
+                "This object is not supported."
+
+        VARIATION   lldpRemOrgDefInfo
+            DESCRIPTION
+                "This object is not supported."
+
+-- ---------------------------------------------------------------------- --
+    ::= { ruggedcomAgentCapabilities 14 }
+
+
+
+-- ---------------------------------------------------------------------- --
+--  Rugged Switch Agent Capabilities version 08 for Product Families
+--  RS8000 and RS1600
+-- ---------------------------------------------------------------------- --
+
+ruggedcomSwitchAgents081 AGENT-CAPABILITIES
+    PRODUCT-RELEASE "Rugged Switch Agent capabilities version 7.1.0. "
+    STATUS          obsolete
+    DESCRIPTION
+        "The Rugged Switch Agent."
+
+-- ---------------------------------------------------------------------- --       
+    SUPPORTS RUGGEDCOM-TRAPS-MIB 
+        INCLUDES    { ruggedcomNotificationsGroup}
+-- ---------------------------------------------------------------------- --        
+    SUPPORTS RUGGEDCOM-SYS-INFO-MIB 
+        INCLUDES    { rcSysErrObjectsGroup, 
+					  rcSysStsObjectsGroup1,
+					  rcSysStsPowerSupplyGroup,
+					  rcSysInfoDeviceInfoGroup,
+					  rcSysDeviceCommGroup }
+-- ---------------------------------------------------------------------- --        
+    SUPPORTS SNMPv2-MIB
+    -- rfc1907.txt
+    
+        INCLUDES     { snmpGroup, snmpCommunityGroup, snmpSetGroup, 
+                       systemGroup, snmpBasicNotificationsGroup }
+        
+        VARIATION   sysContact           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this
+                 object."
+
+        VARIATION   sysName
+            DESCRIPTION
+                "The string of up to 24 characters is supported for this 
+                object."
+            
+        VARIATION   sysLocation           
+            DESCRIPTION
+                "The string of up to 49 characters is supported for this 
+                object."
+
+        VARIATION   sysORIndex           
+            DESCRIPTION
+                "Only one sysOREntry is created by Rugged Switch Agent.
+                Dynamic configuration of MIB modules is not supported."
+    
+    
+-- ---------------------------------------------------------------------- --
+    SUPPORTS UDP-MIB
+    -- rfc2013.txt
+
+        INCLUDES    { udpGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS TCP-MIB
+    -- rfc2012.txt
+    
+        INCLUDES    { tcpGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS IP-MIB
+    -- rfc2011.txt
+    
+        INCLUDES    { ipGroup, icmpGroup }
+
+        VARIATION   ipForwarding
+            SYNTAX   INTEGER {
+                         notForwarding(2)
+                     }
+            DESCRIPTION
+                "Support for the value 'forwarding(1)' is not implemented
+                per RFC 2011."
+
+        VARIATION   ipDefaultTTL
+			ACCESS read-only
+            DESCRIPTION
+                "Write access is not supported."
+-- ---------------------------------------------------------------------- --
+    SUPPORTS IF-MIB
+        -- rfc2863.txt
+        
+        INCLUDES    { ifGeneralInformationGroup, 
+                      ifVHCPacketGroup,
+                      ifCounterDiscontinuityGroup,
+                      linkUpDownNotificationsGroup }
+
+        VARIATION   ifIndex
+            DESCRIPTION
+                "A numbering scheme has been implemented to allow
+                one-to-one mapping between physical port values and
+                ifIndex interface values.  Te value of ifIndex will be
+                1 to 8 for RS8000 device, and 1 to 16 for RS1600 device."
+                
+        VARIATION   ifAdminStatus
+            SYNTAX   INTEGER {
+                         up(1),
+                         down(2)
+                     }
+            DESCRIPTION
+                "Support for the value 'testing(3)' is not implemented
+                per RFC 2863 compliance statement."
+
+        VARIATION   ifOperStatus
+            SYNTAX  INTEGER {
+                         up(1),
+                         down(2)
+                    }
+            DESCRIPTION
+                "Information limited by Rugged Switch Agent for read-only
+                object."
+
+        VARIATION   ifPromiscuousMode
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 2863 compliance
+                statement.  This mode is always 'true(1)'."
+
+        VARIATION   ifAlias
+            DESCRIPTION
+                "String length is limitted to 15 characters."        
+        
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RMON-MIB
+    -- rfc2819.txt
+    
+        INCLUDES    { rmonEtherStatsGroup, rmonHistoryControlGroup,
+                      rmonEthernetHistoryGroup, rmonAlarmGroup, 
+                      rmonEventGroup }
+
+        VARIATION   etherStatsIndex
+            DESCRIPTION
+                "Two entries per port are created in etherStatsTable."
+                 
+        VARIATION   etherStatsOwner
+            DESCRIPTION
+                "The value of this entry is always set to 'Monitor' and
+                may not be modified." 
+                 
+        VARIATION   etherStatsStatus
+            DESCRIPTION
+                "One entry per port is created in etherStatsTable upon 
+                initialization up.  These entries may not be modified
+                or deleted.
+                No new entries can be created.
+                Therefore, historyControlStatus always set to 'valid(1)'." 
+                 
+        VARIATION   historyControlIndex
+            DESCRIPTION
+                "An average of four entries per ethernet port can be created 
+                in historyControlTable."
+
+        VARIATION   historyControlBucketsRequested
+            SYNTAX  Integer32(1..4000)
+            DESCRIPTION
+                "The value of historyControBucketRequested is restricted
+                to 4000."
+
+        VARIATION   historyControlOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of a historyControlOwner is a 
+                'Monitor' string."
+                        
+        VARIATION   alarmIndex
+            DESCRIPTION
+                "An average of four entries per port can be created 
+                in alarmTable."
+
+        VARIATION   alarmInterval
+            SYNTAX  Integer32
+            DEFVAL  { 60 }
+            DESCRIPTION
+                "A default value of an alarmInterval is 60 seconds."
+
+        VARIATION   alarmSampleType
+            SYNTAX  INTEGER {
+                        absosluteValue(1),
+                        deltaValue(2)
+                    }
+            DEFVAL  { deltaValue }
+            DESCRIPTION
+                "A default value of an alarmSampleType is 'deltaValue(2)'."
+
+        VARIATION   alarmStartupAlarm
+            SYNTAX  INTEGER {
+                        risingAlarm(1),
+                        fallingAlarm(2),
+                        risingOrFallingAlarm(3)
+                    }
+            DEFVAL  { risingOrFallingAlarm }
+            DESCRIPTION
+                "A default value of alarmStartupAlarm is 
+                'risingOrFallingAlarm(3)'."
+                
+        VARIATION   alarmOwner
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of an alarmOwner is a 'Monitor'
+                string."
+
+        VARIATION   eventIndex
+            DESCRIPTION
+                "An average of one entry per alarmEntry may be created 
+                in eventTable."
+                
+        VARIATION   eventType
+            SYNTAX  INTEGER {
+                        none(1),
+                        log(2),
+                        snmptrap(3),
+                        logandtrap(4)
+                    }
+            DEFVAL  { none }
+            DESCRIPTION
+                "A default value of an eventType is 'logandtrap(4)'."
+
+        VARIATION   eventCommunity
+            DESCRIPTION
+                "The string of up to 30 characters is supported for this
+                 object."
+                
+        VARIATION   eventOwner
+            SYNTAX  OwnerString
+            DEFVAL  { "Monitor" }
+            DESCRIPTION
+                "A default value of an eventOwner is a 'Monitor' string."
+
+        VARIATION   logIndex
+            DESCRIPTION
+                "For each eventEntry a hundred of entries in logTable may
+                be created.  The value of thi object will increase for each
+                new log generated for coresponding event.  When value of
+                this object becomes greater than 100, oldest entries will 
+                be deleted."
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS BRIDGE-MIB
+    -- rfc4188.txt
+    
+        INCLUDES    { dot1dBaseBridgeGroup, dot1dBasePortGroup,
+                      dot1dStpBridgeGroup, dot1dStpPortGroup,
+                      dot1dTpBridgeGroup, dot1dTpFdbGroup, 
+                      dot1dTpGroup, dot1dNotificationGroup }
+
+        VARIATION   dot1dBasePortDelayExceededDiscards
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dStpPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 61440, in steps
+                of 4096, as per RFC 4188."
+                
+        VARIATION   dot1dStpTimeSinceTopologyChange
+            DESCRIPTION
+                "The time since the tcWhile timer for any port on this 
+                Bridge was non-zero, as per RFV 4188."
+                
+        VARIATION   dot1dStpBridgeMaxAge
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeHelloTime
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+
+        VARIATION   dot1dStpBridgeForwardDelay
+            DESCRIPTION
+                "The value of this object will be rounded to the closest 
+                number of tenths of a second."
+                
+        VARIATION   dot1dStpPortPriority        
+            DESCRIPTION
+                "Permissible values for this object are 0 to 240, in steps
+                of 16, as per RFC 4188."
+
+        VARIATION   dot1dTpLearnedEntryDiscards        
+            DESCRIPTION
+                "The switch does not have a knowledge of the value of this 
+                object.  In a response to a get request a zero value will 
+                be returned."
+
+        VARIATION   dot1dTpAgingTime        
+            DESCRIPTION
+                "The range of valid values is restricted to 15 to 800
+                seconds.
+                Lower limit of 15 seconds is a hardware limitation."
+                
+-- ---------------------------------------------------------------------- --
+    SUPPORTS RSTP-MIB
+    -- rfc4318.txt
+    
+        INCLUDES    { rstpBridgeGroup, rstpPortGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS Q-BRIDGE-MIB
+    -- rfc4363.txt
+    
+        INCLUDES    { qBridgeBaseGroup, qBridgeFdbUnicastGroup,
+        			  qBridgeFdbMulticastGroup, qBridgeVlanGroup,
+        			  qBridgeVlanStaticGroup, qBridgePortGroup }
+
+        VARIATION   dot1qVlanStaticEgressPorts
+			ACCESS read-only
+            DESCRIPTION
+                "Write access is not supported."
+
+        VARIATION   dot1qVlanStaticUntaggedPorts
+			ACCESS read-only
+            DESCRIPTION
+                "Write access is not supported."
+
+        VARIATION   dot1qVlanStaticRowStatus
+            SYNTAX   INTEGER {
+                         active(1),
+                         createAndGo(4),
+                         destroy(6)
+                     }
+            DESCRIPTION
+                "Support for values 'notInService(2)' , 'notReady(3)' and 
+                'createAndWait(5) is not implemented."
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-FRAMEWORK-MIB
+    -- rfc3411.txt
+    
+        INCLUDES    { snmpEngineGroup }
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-USER-BASED-SM-MIB
+    -- rfc3414.txt
+
+        INCLUDES    { usmMIBBasicGroup }
+
+-- ---------------------------------------------------------------------- --
+    SUPPORTS SNMP-VIEW-BASED-ACM-MIB
+    -- rfc3415.txt
+    
+        INCLUDES    { vacmBasicGroup }
+
+        VARIATION   vacmAccessContextMatch
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmAccessStorageType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 
+                'nonVolatile(3)'."
+
+        VARIATION   vacmAccessStatus
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'active(1)'."
+
+        VARIATION   vacmViewTreeFamilyMask
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmViewTreeFamilyType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement."
+
+        VARIATION   vacmViewTreeFamilyStorageType
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'permanent(4)'."
+
+        VARIATION   vacmViewTreeFamilyStatus
+            ACCESS  read-only
+            DESCRIPTION
+                "Write access is not implemented per RFC 3415 compliance
+                statement.  The value of this object is always 'active(1)'."
+                
+-- ---------------------------------------------------------------------- --
+    SUPPORTS LLDP-MIB
+    -- Std 802.1AB-2005, LLDP MIB definition
+
+		INCLUDES    { lldpConfigGroup,
+				      lldpConfigRxGroup,
+				      lldpConfigTxGroup,
+				      lldpStatsRxGroup,
+				      lldpStatsTxGroup,
+				      lldpLocSysGroup,
+				      lldpRemSysGroup,
+				      lldpNotificationsGroup}
+
+        VARIATION   lldpNotificationInterval
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpPortConfigTLVsTxEnable
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpConfigManAddrPortsTxEnable
+            DESCRIPTION
+                "Write access is not implemented."
+
+        VARIATION   lldpRemUnknownTLVInfo
+            DESCRIPTION
+                "This object is not supported."
+
+        VARIATION   lldpRemOrgDefInfo
+            DESCRIPTION
+                "This object is not supported."
+
+-- ---------------------------------------------------------------------- --
+    ::= { ruggedcomSwitchAgents08 1 }
+
+END

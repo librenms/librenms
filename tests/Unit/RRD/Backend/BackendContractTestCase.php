@@ -4,12 +4,16 @@ namespace LibreNMS\Tests\Unit\RRD\Backend;
 
 use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Facades\File;
+use LibreNMS\Data\Store\Rrd;
+use LibreNMS\Exceptions\RrdCachedConnectionException;
+use LibreNMS\Exceptions\RrdException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\RRD\Backend\RrdBackendInterface;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\Tests\TestCase;
+use LibreNMS\Util\Binaries;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -85,6 +89,30 @@ abstract class BackendContractTestCase extends TestCase
         $this->create($rrd);
 
         $this->assertFileExists($rrd->fullPath());
+    }
+
+    public function testProbesRemoteFilesWithoutLocalRrdDirectory(): void
+    {
+        $this->start('tcp');
+        $this->create(RrdPath::make('host1', 'test.rrd'));
+        LibrenmsConfig::set('rrd_dir', "$this->directory/no-local-rrd");
+        $this->app->instance(RrdBackendInterface::class, $this->makeBackend(LibrenmsConfig::get('rrdcached')));
+        $store = new Rrd;
+
+        $this->assertTrue($store->checkRrdExists(RrdPath::make('host1', 'test.rrd')));
+        $this->assertFalse($store->checkRrdExists(RrdPath::make('host1', 'missing.rrd')));
+    }
+
+    public function testUnreachableDaemonDoesNotReportFileMissing(): void
+    {
+        $this->start('tcp');
+        $this->daemon->stop(0);
+        LibrenmsConfig::set('rrd_dir', "$this->directory/no-local-rrd");
+        $this->app->instance(RrdBackendInterface::class, $this->backend);
+
+        $this->expectException(RrdCachedConnectionException::class);
+
+        (new Rrd)->checkRrdExists(RrdPath::make('host1', 'test.rrd'));
     }
 
     #[DataProvider('modes')]
@@ -220,14 +248,46 @@ abstract class BackendContractTestCase extends TestCase
         $this->backend->graph(['--start', '-1h', 'DEF:a=' . RrdPath::make('host1', 'missing.rrd') . ':a:AVERAGE', 'LINE1:a#ff0000']);
     }
 
+    #[DataProvider('modes')]
+    public function testXport(string $mode): void
+    {
+        $this->start($mode);
+        $rrd = RrdPath::make('host1', 'test.rrd');
+        $start = intdiv(time(), 300) * 300;
+        $this->rrdtool('create', $rrd->fullPath(), '--start', (string) $start, ...$this->definition()->getCreateArguments());
+        foreach ([1, 2, 3] as $row) {
+            $this->backend->update($rrd, [$row * 10, null], $start + $row * 300);
+        }
+
+        $export = $this->backend->xport(['--start', (string) $start, '--end', (string) ($start + 900), '--maxrows', '10', "DEF:a=$rrd:a:AVERAGE", "DEF:b=$rrd:b:AVERAGE", 'XPORT:a:first', 'XPORT:b:second']);
+
+        $this->assertSame(['first', 'second'], array_keys($export));
+        $this->assertSame(array_keys($export['first']), array_keys($export['second']));
+        // rows are at the end of their interval
+        $this->assertSame([$start + 300 => 10.0, $start + 600 => 20.0, $start + 900 => 30.0], array_filter($export['first'], fn (?float $value) => $value !== null));
+        $this->assertContains(null, $export['second'], 'unknown values are null');
+    }
+
+    #[DataProvider('modes')]
+    public function testXportError(string $mode): void
+    {
+        $this->start($mode);
+        $this->expectException(RrdException::class);
+        $this->backend->xport(['--start', '-1h', 'DEF:a=' . RrdPath::make('host1', 'missing.rrd') . ':a:AVERAGE', 'XPORT:a:a']);
+    }
+
     protected function create(RrdPath $rrd): void
     {
-        $definition = RrdDefinition::make()
+        $this->backend->create($rrd, $this->definition());
+    }
+
+    private function definition(): RrdDefinition
+    {
+        return RrdDefinition::make()
             ->addDataset('a', 'GAUGE')
             ->addDataset('b', 'COUNTER')
             ->setStep(300)
             ->setRras(['RRA:AVERAGE:0.5:1:10']);
-        $this->backend->create($rrd, $definition);
     }
 
     /**
@@ -249,11 +309,13 @@ abstract class BackendContractTestCase extends TestCase
      */
     private function rrdtool(string ...$arguments): string
     {
-        if (! is_executable((string) LibrenmsConfig::get('rrdtool', '/usr/bin/rrdtool'))) {
+        // found the same way as the backend's RrdProcess
+        $rrdtool = app(Binaries::class)->find('rrdtool');
+        if ($rrdtool === null) {
             $this->markTestSkipped('rrdtool is needed to inspect rrd files');
         }
 
-        $process = new Process([LibrenmsConfig::get('rrdtool', '/usr/bin/rrdtool'), ...$arguments]);
+        $process = new Process([$rrdtool, ...$arguments]);
         $process->mustRun();
 
         return $process->getOutput();
@@ -284,7 +346,7 @@ abstract class BackendContractTestCase extends TestCase
         $this->fail('rrdcached did not start: ' . $this->daemon->getErrorOutput());
     }
 
-    private function freePort(): int
+    protected function freePort(): int
     {
         $server = stream_socket_server('tcp://127.0.0.1:0');
         $port = (int) substr(strrchr((string) stream_socket_get_name($server, false), ':'), 1);

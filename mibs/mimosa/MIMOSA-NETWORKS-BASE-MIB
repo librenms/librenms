@@ -1,14 +1,14 @@
 MIMOSA-NETWORKS-BASE-MIB DEFINITIONS ::= BEGIN
 
---  Copyright (C) 2015, Mimosa Networks, Inc. All Rights Reserved.
+--  Copyright (C) 2021, Mimosa Networks, Inc. All Rights Reserved.
 --
 --  Mimosa Networks MIB
---  Revision: 1.00
---  Date: June 03, 2015
+--  Revision: 3.00
+--  Date: January 20, 2021
 --
 --  Mimosa Networks, Inc.
---  300 Orchard City Dr.
---  Campbell, CA 95008
+--  3150 Coronado Dr
+--  Santa Clara, CA 95054
 --  support@mimosa.co
 --
 --  This MIB defines the base MIB specification for Mimosa Network's
@@ -21,7 +21,7 @@ MIMOSA-NETWORKS-BASE-MIB DEFINITIONS ::= BEGIN
 --
 --  Current MIBs are available from Mimosa Networks at the following URLs:
 --
---		http://help.mimosa.co
+--      http://help.mimosa.co
 --
 --  In no event shall Mimosa Networks, Inc. be liable for any indirect,
 --  consequential, special or incidental damages whatsoever (including
@@ -36,30 +36,36 @@ MIMOSA-NETWORKS-BASE-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, Integer32,
-    NOTIFICATION-TYPE            			FROM SNMPv2-SMI
-    OBJECT-GROUP, NOTIFICATION-GROUP		FROM SNMPv2-CONF
-    enterprises				     			FROM RFC1155-SMI 
-    ifIndex						 			FROM IF-MIB;
+    NOTIFICATION-TYPE, enterprises          FROM SNMPv2-SMI
+    OBJECT-GROUP, NOTIFICATION-GROUP        FROM SNMPv2-CONF
+    DisplayString                           FROM SNMPv2-TC
+    ifIndex                                 FROM IF-MIB;
 
 
 -- EXPORTS mimosa...
 mimosa MODULE-IDENTITY
-    LAST-UPDATED "201506030000Z"
+    LAST-UPDATED "202012010000Z"
     ORGANIZATION "Mimosa Networks
-    			  www.mimosa.co"
+                  www.mimosa.co"
     CONTACT-INFO
-    	"postal:
-    	Mimosa Networks, Inc.
-		300 Orchard City Dr.
-		Campbell, CA 95008
+        "postal:
+        Mimosa Networks, Inc.
+        3150 Coronado Dr
+        Santa Clara, CA 95054
         email: support@mimosa.co"
     DESCRIPTION
-		"Mimosa device MIB definitions"
-	REVISION	"201506030000Z"
+        "Mimosa device MIB definitions"
+    REVISION    "202012010000Z"
     DESCRIPTION
-		"First draft"
+        "Added Mimosa products - B11, B24, C5c, and C5x"
+    REVISION    "201702150000Z"
+    DESCRIPTION
+        "Converted to SMIv2 version, and updated the Trap objects"
+    REVISION    "201505170000Z"
+    DESCRIPTION
+        "First draft"
     ::= { enterprises 43356 }
-    
+
 --mimosa                        OBJECT IDENTIFIER ::= { enterprises 43356 }
 
 mimosaProduct                 OBJECT IDENTIFIER ::= { mimosa 1 }
@@ -73,6 +79,10 @@ mimosaB5                      OBJECT IDENTIFIER ::= { mimosaHardware 1 }
 mimosaB5Lite                  OBJECT IDENTIFIER ::= { mimosaHardware 2 }
 mimosaA5                      OBJECT IDENTIFIER ::= { mimosaHardware 3 }
 mimosaC5                      OBJECT IDENTIFIER ::= { mimosaHardware 4 }
+mimosaB11                     OBJECT IDENTIFIER ::= { mimosaHardware 5 }
+mimosaB24                     OBJECT IDENTIFIER ::= { mimosaHardware 6 }
+mimosaC5c                     OBJECT IDENTIFIER ::= { mimosaHardware 7 }
+mimosaC5x                     OBJECT IDENTIFIER ::= { mimosaHardware 8 }
 
 mimosaTrap                    OBJECT IDENTIFIER ::= { mimosaMgmt 0 }
 mimosaMib                     OBJECT IDENTIFIER ::= { mimosaMgmt 1 }
@@ -82,6 +92,26 @@ mimosaConformanceGroup        OBJECT IDENTIFIER ::= { mimosaMgmt 4 }
 mimosaTrapMib                 OBJECT IDENTIFIER ::= { mimosaMib 1 }
 mimosaWireless                OBJECT IDENTIFIER ::= { mimosaMib 2 }
 
+-- *****************************************************************
+-- ***                   Mimosa Textual Conventions              ***
+-- *****************************************************************
+--DecimalOne ::= TEXTUAL-CONVENTION
+--    DISPLAY-HINT "d-1"
+--    STATUS       current
+--    DESCRIPTION  "Fixed point, one decimal"
+--    SYNTAX       Integer32
+--
+--DecimalTwo ::= TEXTUAL-CONVENTION
+--    DISPLAY-HINT "d-2"
+--    STATUS       current
+--    DESCRIPTION  "Fixed point, two decimals"
+--    SYNTAX       Integer32
+--
+--DecimalFive ::= TEXTUAL-CONVENTION
+--    DISPLAY-HINT "d-5"
+--    STATUS       current
+--    DESCRIPTION  "Fixed point, five decimals"
+--    SYNTAX       Integer32
 
 -- **********************************************************************
 -- ***       Mimosa General MIB variables are specified below.        ***
@@ -100,7 +130,7 @@ mimosaTrapMIBGroup OBJECT-GROUP
 
 
 mimosaTrapMessage OBJECT-TYPE
-    SYNTAX OCTET STRING
+    SYNTAX DisplayString (SIZE (1..32))
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -133,7 +163,7 @@ mimosaNewSpeed OBJECT-TYPE
 
 mimosaGenericNotificationsGroup NOTIFICATION-GROUP
     NOTIFICATIONS { mimosaCriticalFault, mimosaTempWarning,
-    				mimosaTempNormal, mimosaEthernetSpeedChange }
+                    mimosaTempNormal, mimosaEthernetSpeedChange}
     STATUS        current
     DESCRIPTION
        "The basic Trap notifications for all Mimosa products."
@@ -179,10 +209,19 @@ mimosaEthernetSpeedChange NOTIFICATION-TYPE
          in the IF-MIB."
     ::= {mimosaTrap 4 }
 
+mimosaClientStatus NOTIFICATION-TYPE
+    OBJECTS { mimosaTrapMessage }
+    STATUS  current
+    DESCRIPTION
+        "The mimosaClientStatus notification is sent by a Mimosa device acting
+        as an access-point, when the status of a station associating to its
+        wireless interface changes."
+    ::= { mimosaTrap 5 }
+
 -- Note the following publicly defined traps are also used for Mimosa Product
 -- Notifications:
 --
--- From SNMPv2-MIB:	coldStart, warmStart, linkUp, LinkDown and
+-- From SNMPv2-MIB: coldStart, warmStart, linkUp, LinkDown and
 --                      authenticationFailure
 END
 

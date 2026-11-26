@@ -1,0 +1,67 @@
+modules:
+    os:
+        hardware: BDT-MS-MIB::bdtDeviceDatProductId.0
+        serial: BDT-MS-MIB::bdtDeviceDatSerialNum.0
+        version: BDT-MS-MIB::bdtDeviceDatSWRevision.0
+    sensors:
+        state:
+            data:
+                -
+                    oid: BDT-MS-MIB::bdtDeviceStatHealth
+                    value: BDT-MS-MIB::bdtDeviceStatHealth
+                    num_oid: '.1.3.6.1.4.1.20884.2.3.{{ $index }}'
+                    descr: 'Overall Health'
+                    group: 'Library'
+                    index: 'bdtDeviceStatHealth.{{ $index }}'
+                    state_name: bdtDeviceStatHealth
+                    states:
+                        - { value: 1, generic: 3, descr: 'Unknown' }
+                        - { value: 2, generic: 0, descr: 'OK' }
+                        - { value: 3, generic: 1, descr: 'Warning' }
+                        - { value: 4, generic: 2, descr: 'Critical' }
+                -
+                    oid: BDT-MS-MIB::bdtDeviceStatAct
+                    value: BDT-MS-MIB::bdtDeviceStatAct
+                    num_oid: '.1.3.6.1.4.1.20884.2.1.{{ $index }}'
+                    descr: 'Activity'
+                    group: 'Library'
+                    index: 'bdtDeviceStatAct.{{ $index }}'
+                    state_name: bdtDeviceStatAct
+                    states:
+                        - { value: 0, generic: 0, descr: 'Not Reported' }
+                        - { value: 1, generic: 0, descr: 'Idle' }
+                        - { value: 2, generic: 0, descr: 'Busy' }
+                        - { value: 3, generic: 2, descr: 'Offline' }
+                -
+                    oid: BDT-MS-MIB::bdtDeviceStatModTable
+                    value: BDT-MS-MIB::bdtDeviceStatModEntryPwrSupply
+                    num_oid: '.1.3.6.1.4.1.20884.2.4.1.6.{{ $index }}'
+                    descr: 'Module {{ $index }} Power Supply'
+                    group: 'Modules'
+                    index: 'bdtModPwrSupply.{{ $index }}'
+                    state_name: bdtDeviceStatModString
+                    states:
+                        - { value: 0, generic: 2, descr: 'Fault' }
+                        - { value: 1, generic: 0, descr: 'OK' }
+                -
+                    oid: BDT-MS-MIB::bdtDeviceStatModTable
+                    value: BDT-MS-MIB::bdtDeviceStatModEntryDPwr1
+                    num_oid: '.1.3.6.1.4.1.20884.2.4.1.4.{{ $index }}'
+                    descr: 'Module {{ $index }} Drive Power 1'
+                    group: 'Modules'
+                    index: 'bdtModDPwr1.{{ $index }}'
+                    state_name: bdtDeviceStatModString
+                    states:
+                        - { value: 0, generic: 2, descr: 'Fault' }
+                        - { value: 1, generic: 0, descr: 'OK' }
+                -
+                    oid: BDT-MS-MIB::bdtDeviceStatModTable
+                    value: BDT-MS-MIB::bdtDeviceStatModEntryDPwr2
+                    num_oid: '.1.3.6.1.4.1.20884.2.4.1.5.{{ $index }}'
+                    descr: 'Module {{ $index }} Drive Power 2'
+                    group: 'Modules'
+                    index: 'bdtModDPwr2.{{ $index }}'
+                    state_name: bdtDeviceStatModString
+                    states:
+                        - { value: 0, generic: 2, descr: 'Fault' }
+                        - { value: 1, generic: 0, descr: 'OK' }

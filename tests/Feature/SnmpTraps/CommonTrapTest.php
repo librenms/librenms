@@ -36,6 +36,7 @@ use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 use LibreNMS\Tests\Traits\RequiresDatabase;
 use Log;
+use Mockery;
 
 final class CommonTrapTest extends SnmpTrapTestCase
 {
@@ -63,7 +64,9 @@ final class CommonTrapTest extends SnmpTrapTestCase
 UDP: [$ipv4->ipv4_address]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91\n";
 
-        Log::partialMock()->shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => null]);
+        // mock the real logger so other channels (such as the eventlog) keep working
+        Log::swap($log = Mockery::mock(Log::getFacadeRoot()));
+        $log->shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => null]);
 
         $trap = new Trap($trapText);
         $this->assertFalse(Dispatcher::handle($trap), 'Found handler for trap with no snmpTrapOID');
@@ -87,7 +90,9 @@ UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::someOid\n";
 
-        Log::partialMock()->shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => 'SNMPv2-MIB::someOid']);
+        // mock the real logger so other channels (such as the eventlog) keep working
+        Log::swap($log = Mockery::mock(Log::getFacadeRoot()));
+        $log->shouldReceive('info')->once()->with('Unhandled trap snmptrap', ['device' => $device->hostname, 'oid' => 'SNMPv2-MIB::someOid']);
 
         $trap = new Trap($trapText);
         $this->assertFalse(Dispatcher::handle($trap));

@@ -117,7 +117,7 @@ in the details and click 'Create pull request'.
 Thank you for your first pull request.
 
 This guide starts you on the path of a contributor. For more questions,
-join our [Discord server](https://t.libren.ms/discord).
+join our [Discord server](https://discord.com/invite/librenms).
 
 ### Hints and tips
 

@@ -1,14 +1,14 @@
 -- ==================================================================
--- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2023 New H3C Tech. Co., Ltd. All rights reserved.
 --
--- Description: Lan Switch trap MIB
+-- Description: Trap MIB
 -- Reference:
--- Version: V1.9
+-- Version: V2.4
 -- History:
 -- V1.0 Created by Zhangshilin, 2001.06.29
 -- V1.1 Modified by lifengguang 2008.11.10, add trap node hh3cBootImageUpdated
 -- V1.2 2011-11-26 updated by duyanbing
---      Add hh3cDevMFirstTrapTime to powerfailure and hh3cPowerNormal.
+--      Added hh3cDevMFirstTrapTime to powerfailure and hh3cPowerNormal.
 -- V1.3 2012-04-26 updated by wangcong
 --      Added hh3cNetworkHealthMonitorFailure, hh3cNetworkHealthMonitorNormal for reserving.
 -- V1.4 2013-03-08 updated by fangliwen
@@ -16,37 +16,71 @@
 --      2014-08-02 updated by fangliwen
 --      Added hh3cPowerIncompatible.
 -- V1.5 2016-12-21 updated by yanfang
---      Add hh3cCpuUsageSevereNotification
---          hh3cCpuUsageSevereRecoverNotification
---          hh3cCpuUsageMinorNotification
---          hh3cCpuUsageMinorRecoverNotification.
---          hh3cMemoryUsageEarlyWarningNotification
---          hh3cMemoryUsageEarlyWarningRecoverNotification
---          hh3cMemoryUsageMinorNotification
---          hh3cMemoryUsageMinorRecoverNotification
---          hh3cMemoryUsageSevereNotification
---          hh3cMemoryUsageSevereRecoverNotification
---          hh3cMemoryUsageCriticalNotification
---          hh3cMemoryUsageCriticalRecoverNotification.
+--      Added hh3cCpuUsageSevereNotification
+--            hh3cCpuUsageSevereRecoverNotification
+--            hh3cCpuUsageMinorNotification
+--            hh3cCpuUsageMinorRecoverNotification.
+--            hh3cMemoryUsageEarlyWarningNotification
+--            hh3cMemoryUsageEarlyWarningRecoverNotification
+--            hh3cMemoryUsageMinorNotification
+--            hh3cMemoryUsageMinorRecoverNotification
+--            hh3cMemoryUsageSevereNotification
+--            hh3cMemoryUsageSevereRecoverNotification
+--            hh3cMemoryUsageCriticalNotification
+--            hh3cMemoryUsageCriticalRecoverNotification.
 --      2017-06-23 updated by wangweihui
---      Add hh3cCoreUsageNotification
+--      Added hh3cCoreUsageNotification
 --      2017-07-17 updated by fangliwen
---      Add hh3cBoardPowerNotEnough, hh3cAvailablePower and hh3cRequiredPower.
+--      Added hh3cBoardPowerNotEnough, hh3cAvailablePower and hh3cRequiredPower.
 --      2017-12-5 updated by yuhaiyan
---      Add hh3cAlarmInPortIn
---          hh3cAlarmInPortRecover
+--      Added hh3cAlarmInPortIn
+--            hh3cAlarmInPortRecover
 -- V1.6 2018-04-13 updated by wangweihui
---      Add hh3cLswAlarmInPortInNum
+--      Added hh3cLswAlarmInPortInNum
 -- V1.7 2019-01-11 updated by wangweihui
---      Add hh3cCoreUsageSevereRecoveryNotification
---          hh3cCoreUsageMinorNotification
---          hh3cCoreUsageMinorRecoveryNotification
+--      Added hh3cCoreUsageSevereRecoveryNotification
+--            hh3cCoreUsageMinorNotification
+--            hh3cCoreUsageMinorRecoveryNotification
 -- V1.8 2019-11-22 updated by xuyuanqiang
---      Add hh3cDMAMemoryUsageCriticalNotification
---          hh3cDMAMemoryUsageRecoverNotification
+--      Added hh3cDMAMemoryUsageCriticalNotification
+--            hh3cDMAMemoryUsageRecoverNotification
 -- V1.9 2020-10-15 updated by caohao
---      Add hh3cRemainingPowerNotEnough
---          hh3cFrameRemainingPower
+--      Added hh3cRemainingPowerNotEnough
+--            hh3cFrameRemainingPower
+-- V2.0 2022-02-15 updated by fangliwen
+--      Added hh3cMMUParityError
+--      2022-03-02 updated by liwenxiao
+--      Added hh3cOutputPowerStatusNotification
+-- V2.1 2022-06-15 updated by caohao
+--      Added hh3cHeartbeatTimeoutSeconds
+--            hh3cBoardHeartbeatTimeout
+--            hh3cBoardHeartbeatResume.
+-- V2.2 2022-07-12 updated by zhangjindong
+--      Added hh3cDevTrapChassis
+--            hh3cDevTrapSrcSlot
+--            hh3cDevTrapSrcCpu
+--            hh3cDevTrapDestChassis
+--            hh3cDevTrapDestSlot
+--            hh3cDevTrapDestCpu
+--            hh3cDevTrapRebootReason
+--            hh3cDevTrapSlaveSwitchFailReason
+--            hh3cCommunicateError
+--            hh3cCommunicateResume
+--            hh3cBoardRebooted
+--            hh3cDevTrapSlaveSwitchFail
+--            hh3cAllBoardHeartbeatTimeout
+--            hh3cAllBoardHeartbeatResume
+--            hh3cDevTrapFanFailureErrcode
+-- V2.3 2022-09-26 updated by fangliwen
+--      Added hh3cBladeNotInsertedNotCleared
+--            hh3cBladeInsertedCleared
+-- V2.4 2022-12-06 updated by shenhongxia
+--      Added hh3cDevTrapSliceStarting
+--            hh3cDevTrapSliceOnline
+--            hh3cDevTrapSliceOffline
+--            hh3cDevTrapSliceIndex
+--      2023-02-23 updated by tianruichuan
+--      Added hh3cBoardReceiveWrongPackets
 -- ==================================================================
 
 -- ==================================================================
@@ -70,7 +104,8 @@ IMPORTS
     hh3cLswCoreMinorThreshold, hh3cLswCoreRecoveryThreshold,hh3cLswCpuRatio,hh3cLswCpuUsageMinorThreshold,hh3cLswCpuUsageSevereThreshold,
     hh3cLswCpuUsageRecoverThreshold,hh3cLswCpuMemory,hh3cLswCpuMemoryFree,hh3cLswCpuMemoryFreeRatio,hh3cLswCpuMemoryHighTotal,hh3cLswCpuMemoryHighFree,
     hh3cLswCpuMemoryLowTotal,hh3cLswCpuMemoryLowFree,hh3cLswCpuMemorySecureThreshold,hh3cLswCpuMemoryEarlyWarningThreshold,hh3cLswCpuMemoryNormalThreshold,
-    hh3cLswCpuMemoryMinorThreshold,hh3cLswCpuMemorySevereThreshold,hh3cLswCpuMemoryCriticalThreshold,hh3cLswCpuMemoryCurrentState
+    hh3cLswCpuMemoryMinorThreshold,hh3cLswCpuMemorySevereThreshold,hh3cLswCpuMemoryCriticalThreshold,hh3cLswCpuMemoryCurrentState,hh3cLswOutputPowerPortID,
+    hh3cLswOutputPowerStatus
         FROM HH3C-LSW-DEV-ADM-MIB;
 
 -- ==================================================================
@@ -80,7 +115,7 @@ IMPORTS
 -- ==================================================================
 
     hh3cLswTrapMib MODULE-IDENTITY
-            LAST-UPDATED "202010150000Z"
+            LAST-UPDATED "202302230000Z"
             ORGANIZATION
                 "New H3C Tech. Co., Ltd."
             CONTACT-INFO
@@ -91,13 +126,48 @@ IMPORTS
                 "
             DESCRIPTION
             ""
+            REVISION "202302230000Z"
+            DESCRIPTION
+            "Added hh3cBoardReceiveWrongPackets."
+            REVISION "202209260000Z"
+            DESCRIPTION
+            "Added hh3cBladeNotInsertedNotCleared
+             hh3cBladeInsertedCleared."
+            REVISION "202207120000Z"
+            DESCRIPTION
+            "Added hh3cLswSrcChassis
+             hh3cDevTrapSrcSlot
+             hh3cDevTrapSrcCpu
+             hh3cDevTrapDestChassis
+             hh3cDevTrapDestSlot
+             hh3cDevTrapDestCpu
+             hh3cDevTrapRebootReason
+             hh3cDevTrapSlaveSwitchFailReason
+             hh3cCommunicateError
+             hh3cCommunicateResume
+             hh3cBoardRebooted
+             hh3cDevTrapSlaveSwitchFail
+             hh3cAllBoardHeartbeatTimeout
+             hh3cAllBoardHeartbearReaume
+             hh3cDevTrapFanFailureErrcode."
+            REVISION "202206150000Z"
+            DESCRIPTION
+            "Added hh3cHeartbeatTimeoutSeconds
+             hh3cBoardHeartbeatTimeout
+             hh3cBoardHeartbeatResume."
+            REVISION "202203020000Z"
+            DESCRIPTION
+            "Added hh3cOutputPowerStatusNotification."
+            REVISION "202202150000Z"
+            DESCRIPTION
+            "Added hh3cMMUParityError."
             REVISION "202010150000Z"
             DESCRIPTION
-            "Add hh3cRemainingPowerNotEnough
+            "Added hh3cRemainingPowerNotEnough
              hh3cFrameRemainingPower."
             REVISION "201911220000Z"
             DESCRIPTION
-            "Add hh3cDMAMemoryUsageCriticalNotification
+            "Added hh3cDMAMemoryUsageCriticalNotification
              hh3cDMAMemoryUsageRecoverNotification."
             REVISION "201901110000Z"
             DESCRIPTION
@@ -116,10 +186,10 @@ IMPORTS
             REVISION "201706240000Z"
             DESCRIPTION
             "hh3cCoreUsageNotification.
-             Add hh3csLswTRAPMibObjectV2Prefix for bindings of notification."
+             Added hh3csLswTRAPMibObjectV2Prefix for bindings of notification."
             REVISION "201701120000Z"
             DESCRIPTION
-            "Add hh3cCpuUsageSevereNotification
+            "Added hh3cCpuUsageSevereNotification
              hh3cCpuUsageSevereRecoverNotification
              hh3cCpuUsageMinorNotification
              hh3cCpuUsageMinorRecoverNotification.
@@ -131,7 +201,7 @@ IMPORTS
              hh3cMemoryUsageSevereRecoverNotification
              hh3cMemoryUsageCriticalNotification
              hh3cMemoryUsageCriticalRecoverNotification.
-             Add hh3csLswTRAPMibInfor for bindings of notification."
+             Added hh3csLswTRAPMibInfor for bindings of notification."
             REVISION "201111260000Z"
             DESCRIPTION
             "Initial revision"
@@ -180,7 +250,7 @@ IMPORTS
       ::= { hh3csLswTRAPMibObject 5 }
 
     hh3cfanfailure NOTIFICATION-TYPE
-      OBJECTS { hh3cDevMFanNum }
+      OBJECTS { hh3cDevMFanNum, hh3cDevTrapFanFailureErrcode }
       STATUS  current
       DESCRIPTION
               "Fan failure"
@@ -872,6 +942,102 @@ IMPORTS
             "Remaining power of the frame."
         ::= {hh3csLswTRAPMibInfor 18}
 
+    hh3cHeartbeatTimeoutSeconds   OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS     accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+            "Heartbeat timeout value, in seconds."
+        ::= {hh3csLswTRAPMibInfor 19}
+
+    hh3cDevTrapSrcChassis   OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Source chassis number."
+        ::= {hh3csLswTRAPMibInfor 20}
+
+    hh3cDevTrapSrcSlot   OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Source slot number."
+        ::= {hh3csLswTRAPMibInfor 21}
+
+    hh3cDevTrapSrcCpu   OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Source CPU number."
+        ::= {hh3csLswTRAPMibInfor 22}
+
+    hh3cDevTrapDestChassis   OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Destination chassis number."
+        ::= {hh3csLswTRAPMibInfor 23}
+
+    hh3cDevTrapDestSlot   OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Destination slot number."
+        ::= {hh3csLswTRAPMibInfor 24}
+
+    hh3cDevTrapDestCpu   OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Destination CPU number."
+        ::= {hh3csLswTRAPMibInfor 25}
+
+    hh3cDevTrapRebootReason   OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE (0..255))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Reboot failure reason."
+        ::= {hh3csLswTRAPMibInfor 26}
+
+    hh3cDevTrapSlaveSwitchFailReason   OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        other(0),
+                        systemRestarting(1),
+                        standbyAbsent(2),
+                        standbyNoReady(3)
+                    }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Reason for active/standby or master/subordinate switchover failure."
+        ::= {hh3csLswTRAPMibInfor 27}
+
+    hh3cDevTrapFanFailureErrcode   OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        remove(0),
+                        failed(1)
+                    }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Cause of fan failure."
+        ::= {hh3csLswTRAPMibInfor 28}
+
+    hh3cDevTrapSliceIndex   OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "Slice index."
+        ::= {hh3csLswTRAPMibInfor 29}
+
     hh3csLswTRAPMibObjectV2 OBJECT IDENTIFIER ::= { hh3cLswTrapMib 3 }
     hh3csLswTRAPMibObjectV2Prefix OBJECT IDENTIFIER ::= { hh3csLswTRAPMibObjectV2 0 }
 
@@ -1029,4 +1195,149 @@ IMPORTS
       DESCRIPTION
             "The trap indicates that the remaining power of the chassis is not enouth."
       ::= { hh3csLswTRAPMibObjectV2Prefix 43 }
+
+    hh3cMMUParityError NOTIFICATION-TYPE
+      OBJECTS {
+            hh3cLswFrameIndex,
+            hh3cLswSlotIndex,
+            hh3cLswCpuIndex
+            }
+      STATUS current
+      DESCRIPTION
+            "MMU(Memory Management Unit) checking error on the slot is detected,
+             rebooting the slot is recommended."
+      ::= { hh3csLswTRAPMibObjectV2Prefix 44 }
+
+      hh3cOutputPowerStatusNotification NOTIFICATION-TYPE
+      OBJECTS { hh3cLswFrameIndex, hh3cLswSlotIndex, hh3cLswOutputPowerPortID, hh3cLswOutputPowerStatus }
+      STATUS current
+      DESCRIPTION
+            "The trap indicates that over voltage or over current."
+      ::= { hh3csLswTRAPMibObjectV2Prefix 45 }
+
+      hh3cBoardHeartbeatTimeout NOTIFICATION-TYPE
+      OBJECTS { hh3cLswFrameIndex, hh3cLswSlotIndex, hh3cLswCpuIndex, hh3cHeartbeatTimeoutSeconds }
+      STATUS current
+      DESCRIPTION
+            "This notification is generated when heartbeat between the MPU and a card times out."
+      ::= { hh3csLswTRAPMibObjectV2Prefix 46 }
+
+      hh3cBoardHeartbeatResume NOTIFICATION-TYPE
+      OBJECTS { hh3cLswFrameIndex, hh3cLswSlotIndex, hh3cLswCpuIndex }
+      STATUS current
+      DESCRIPTION
+            "This notification is generated when heartbeat between the MPU and a card recovers."
+      ::= { hh3csLswTRAPMibObjectV2Prefix 47 }
+
+      hh3cCommunicateError  NOTIFICATION-TYPE
+      OBJECTS
+          {
+              hh3cDevTrapSrcChassis,
+              hh3cDevTrapSrcSlot,
+              hh3cDevTrapSrcCpu,
+              hh3cDevTrapDestChassis,
+              hh3cDevTrapDestSlot,
+              hh3cDevTrapDestCpu
+          }
+      STATUS current
+      DESCRIPTION
+          "This notification is generated when communication between LIPC nodes times out."
+      ::= { hh3csLswTRAPMibObjectV2Prefix 48 }
+
+      hh3cCommunicateResume  NOTIFICATION-TYPE
+      OBJECTS
+          {
+              hh3cDevTrapSrcChassis,
+              hh3cDevTrapSrcSlot,
+              hh3cDevTrapSrcCpu,
+              hh3cDevTrapDestChassis,
+              hh3cDevTrapDestSlot,
+              hh3cDevTrapDestCpu
+          }
+      STATUS current
+      DESCRIPTION
+          "This notification is generated when LIPC nodes are reconnected after they are disconnected."
+      ::= { hh3csLswTRAPMibObjectV2Prefix 49 }
+
+      hh3cBoardRebooted  NOTIFICATION-TYPE
+      OBJECTS
+          {
+              hh3cDevTrapRebootReason,
+              hh3cDevTrapSrcChassis,
+              hh3cDevTrapSrcSlot,
+              hh3cDevTrapSrcCpu
+          }
+      STATUS current
+      DESCRIPTION
+          "This notification is generated when reboot fails for a single card or member device."
+      ::= { hh3csLswTRAPMibObjectV2Prefix 50 }
+
+      hh3cDevTrapSlaveSwitchFail  NOTIFICATION-TYPE
+      OBJECTS
+          {
+              hh3cDevTrapSlaveSwitchFailReason
+          }
+      STATUS current
+      DESCRIPTION
+          "This notification is generated when an active/standby or master/subordinate switchover fails."
+      ::= { hh3csLswTRAPMibObjectV2Prefix 51 }
+
+      hh3cAllBoardHeartbeatTimeout  NOTIFICATION-TYPE
+      OBJECTS
+          {
+              hh3cHeartbeatTimeoutSeconds
+          }
+      STATUS current
+      DESCRIPTION
+          "This notification is generated when the active MPU or master device is disconnected from all cards or member devices."
+      ::= { hh3csLswTRAPMibObjectV2Prefix 52 }
+
+      hh3cAllBoardHeartbeatResume  NOTIFICATION-TYPE
+      STATUS current
+      DESCRIPTION
+          "This notification is generated when the active MPU or master device is reconnected to any card or member device after a disconnection."
+      ::= { hh3csLswTRAPMibObjectV2Prefix 53 }
+
+      hh3cBladeNotInsertedNotCleared NOTIFICATION-TYPE
+      OBJECTS { hh3cLswFrameIndex, hh3cLswSlotIndex, hh3cLswCpuIndex }
+      STATUS  current
+      DESCRIPTION
+          "This notification is generated when a blade controller is not reinserted or data about the blade controller
+       is not cleared a long time after it is removed."
+      ::= { hh3csLswTRAPMibObjectV2Prefix 54 }
+
+      hh3cBladeInsertedCleared NOTIFICATION-TYPE
+      OBJECTS { hh3cLswFrameIndex, hh3cLswSlotIndex, hh3cLswCpuIndex }
+      STATUS  current
+      DESCRIPTION
+          "This notification is generated when the removed blade controller is reinserted or data about the removed blade controller is cleared."
+      ::= { hh3csLswTRAPMibObjectV2Prefix 55 }
+
+    hh3cDevTrapSliceStarting NOTIFICATION-TYPE
+      OBJECTS { hh3cLswFrameIndex, hh3cLswSlotIndex, hh3cDevTrapSliceIndex }
+      STATUS current
+      DESCRIPTION
+          "This notification is generated when the Slice module is starting."
+      ::= { hh3csLswTRAPMibObjectV2Prefix 56 }
+
+    hh3cDevTrapSliceOnline NOTIFICATION-TYPE
+      OBJECTS { hh3cLswFrameIndex, hh3cLswSlotIndex, hh3cDevTrapSliceIndex }
+      STATUS  current
+      DESCRIPTION
+          "This notification is generated when the slice module is onlined."
+      ::= { hh3csLswTRAPMibObjectV2Prefix 57 }
+
+    hh3cDevTrapSliceOffline NOTIFICATION-TYPE
+      OBJECTS { hh3cLswFrameIndex, hh3cLswSlotIndex, hh3cDevTrapSliceIndex }
+      STATUS  current
+      DESCRIPTION
+          "This notification is generated when the slice module is offlined."
+      ::= { hh3csLswTRAPMibObjectV2Prefix 58 }
+
+    hh3cBoardReceiveWrongPackets NOTIFICATION-TYPE
+      OBJECTS { hh3cLswFrameIndex, hh3cLswSlotIndex, hh3cLswCpuIndex }
+      STATUS  current
+      DESCRIPTION
+          "This notification is generated when a board has received some wrong packets."
+      ::= { hh3csLswTRAPMibObjectV2Prefix 59 }
 END

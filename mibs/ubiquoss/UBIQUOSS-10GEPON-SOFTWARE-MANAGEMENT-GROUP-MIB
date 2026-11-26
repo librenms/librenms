@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing imports)
 -- *****************************************************************
 -- UBIQUOSS-10GEPON-SOFTWARE-MANAGEMENT-GROUP-MIB.my
 --
@@ -20,7 +21,11 @@
 			ubi10GEponGroupMIB		
 				FROM UBQS-SMI 			
 			ubiPortIndex
-				FROM UBQS-INTERFACE-MIB;
+				FROM UBQS-INTERFACE-MIB
+    ubiSoftwareMIB
+        FROM UBIQUOSS-EPON-SOFTWARE-MANAGEMENT-GROUP-MIB
+    onu10gId
+        FROM UBIQUOSS-10GEPON-PON-MAC-GROUP-MIB;
 	
 	
 		ubi10gSoftwareMIB MODULE-IDENTITY 

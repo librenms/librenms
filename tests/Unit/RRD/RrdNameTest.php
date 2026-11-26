@@ -97,7 +97,7 @@ class RrdNameTest extends TestCase
             $this->assertNotSame('', LibrenmsConfig::get('rrdcached'), 'rrdtool should not be queried without rrdcached');
             $file = explode(' ', $command)[1];
             if (! in_array($file, $remote_files)) {
-                throw new RrdNotFoundException("opening '$file': No such file or directory");
+                throw new RrdNotFoundException("rrdcached@rrdcached.example.com:42217: RRD Error: opening '$file': No such file or directory");
             }
 
             return '1798761600';

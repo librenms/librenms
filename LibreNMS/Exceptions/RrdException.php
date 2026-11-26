@@ -39,7 +39,7 @@ abstract class RrdException extends \Exception
         }
         $error = trim($message);
 
-        if (str_contains($error, 'Unable to connect to rrdcached')) {
+        if (str_contains($error, 'Unable to connect to rrdcached') || str_contains($error, 'while talking to rrdcached')) {
             return new RrdCachedConnectionException($error);
         }
 

@@ -4,7 +4,7 @@ namespace LibreNMS\Interfaces\Discovery;
 
 use App\Models\BgpPeer;
 use Illuminate\Support\Collection;
-use LibreNMS\Exceptions\SnmpException;
+use LibreNMS\Exceptions\SnmpConnectionException;
 
 interface BgpPeerDiscovery
 {
@@ -17,7 +17,7 @@ interface BgpPeerDiscovery
      *
      * @return Collection<int, BgpPeer>
      *
-     * @throws SnmpException when the device did not answer, existing sessions are kept
+     * @throws SnmpConnectionException when the device did not answer, existing sessions are kept
      */
     public function discoverBgpPeers(): Collection;
 

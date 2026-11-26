@@ -10,7 +10,6 @@ use App\Models\Storage;
 use App\Models\User;
 use App\Models\WirelessSensor;
 use Illuminate\Database\Eloquent\Builder;
-use LibreNMS\Util\Url;
 
 class HealthSearchController extends GroupedSearchController
 {
@@ -29,8 +28,8 @@ class HealthSearchController extends GroupedSearchController
                 'name' => $sensor->sensor_descr,
                 'subtitle' => implode(' · ', array_filter([$sensor->device?->display, $sensor->classDescr()])),
                 'icon' => 'fa fa-heartbeat',
-                'url' => Url::generate([
-                    'page' => 'graphs', 'id' => $sensor->sensor_id, 'type' => $sensor->getGraphType(),
+                'url' => route('graphs', [
+                    'id' => $sensor->sensor_id, 'type' => $sensor->getGraphType(),
                     'from' => LibrenmsConfig::get('time.day'), 'to' => LibrenmsConfig::get('time.now'),
                 ]),
             ]);
@@ -44,8 +43,8 @@ class HealthSearchController extends GroupedSearchController
                 'name' => $sensor->sensor_descr,
                 'subtitle' => implode(' · ', array_filter([$sensor->device?->display, $sensor->sensor_class->value])),
                 'icon' => 'fa fa-wifi',
-                'url' => Url::generate([
-                    'page' => 'graphs', 'id' => $sensor->sensor_id, 'type' => $sensor->getGraphType(),
+                'url' => route('graphs', [
+                    'id' => $sensor->sensor_id, 'type' => $sensor->getGraphType(),
                     'from' => LibrenmsConfig::get('time.day'), 'to' => LibrenmsConfig::get('time.now'),
                 ]),
             ]);
@@ -59,8 +58,8 @@ class HealthSearchController extends GroupedSearchController
                 'subtitle' => implode(' · ', array_filter([$storage->device?->display, $storage->storage_type])),
                 'icon' => 'fa fa-hdd-o',
                 'status' => ($storage->storage_perc_warn !== null && $storage->storage_perc >= $storage->storage_perc_warn) ? 'tw:border-l-red-600!' : 'tw:border-l-green-600!',
-                'url' => Url::generate([
-                    'page' => 'graphs', 'id' => $storage->storage_id, 'type' => 'storage_usage',
+                'url' => route('graphs', [
+                    'id' => $storage->storage_id, 'type' => 'storage_usage',
                     'from' => LibrenmsConfig::get('time.day'), 'to' => LibrenmsConfig::get('time.now'),
                 ]),
             ]);
@@ -74,8 +73,8 @@ class HealthSearchController extends GroupedSearchController
                 'subtitle' => implode(' · ', array_filter([$mempool->device?->display, $mempool->mempool_type])),
                 'icon' => 'fa fa-memory',
                 'status' => ($mempool->mempool_perc_warn !== null && $mempool->mempool_perc >= $mempool->mempool_perc_warn) ? 'tw:border-l-red-600!' : 'tw:border-l-green-600!',
-                'url' => Url::generate([
-                    'page' => 'graphs', 'id' => $mempool->mempool_id, 'type' => 'mempool_usage',
+                'url' => route('graphs', [
+                    'id' => $mempool->mempool_id, 'type' => 'mempool_usage',
                     'from' => LibrenmsConfig::get('time.day'), 'to' => LibrenmsConfig::get('time.now'),
                 ]),
             ]);
@@ -89,8 +88,8 @@ class HealthSearchController extends GroupedSearchController
                 'subtitle' => implode(' · ', array_filter([$processor->device?->display, $processor->processor_type])),
                 'icon' => 'fa fa-microchip',
                 'status' => ($processor->processor_perc_warn !== null && $processor->processor_usage >= $processor->processor_perc_warn) ? 'tw:border-l-red-600!' : 'tw:border-l-green-600!',
-                'url' => Url::generate([
-                    'page' => 'graphs', 'id' => $processor->processor_id, 'type' => 'processor_usage',
+                'url' => route('graphs', [
+                    'id' => $processor->processor_id, 'type' => 'processor_usage',
                     'from' => LibrenmsConfig::get('time.day'), 'to' => LibrenmsConfig::get('time.now'),
                 ]),
             ]);

@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing import)
 -- *****************************************************************
 -- SNWL-SSLVPN-MIB.MIB
 --
@@ -18,7 +19,7 @@ IMPORTS
 	MODULE-IDENTITY,
 	OBJECT-IDENTITY			FROM SNMPv2-SMI
 	
-	sonicwallSSLVPN			FROM SONICWALL-SMI;
+	sonicwallSSLVPN, sonicwall			FROM SONICWALL-SMI;
 
 sonicwallSSLVPN MODULE-IDENTITY
 	LAST-UPDATED "201701060000z"

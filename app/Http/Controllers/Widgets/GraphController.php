@@ -210,23 +210,23 @@ class GraphController extends WidgetController
         $params = [];
 
         if ($type == 'device') {
-            $params[] = 'device=' . $settings['graph_device'];
+            $params['device'] = $settings['graph_device'];
         } elseif ($type == 'application') {
-            $params[] = 'id=' . $settings['graph_application'];
+            $params['id'] = $settings['graph_application'];
         } elseif ($type == 'munin') {
             if ($mplug = MuninPlugin::find($settings['graph_munin'])) {
-                $params[] = 'device=' . $mplug->device_id;
-                $params[] = 'plugin=' . $mplug->mplug_type;
+                $params['device'] = $mplug->device_id;
+                $params['plugin'] = $mplug->mplug_type;
             }
         } elseif ($type == 'service') {
             if ($service = Service::find($settings['graph_service'])) {
-                $params[] = 'device=' . $service->device_id;
-                $params[] = 'id=' . $service->service_id;
+                $params['device'] = $service->device_id;
+                $params['id'] = $service->service_id;
             }
         } elseif ($type == 'customoid') {
             if ($customoid = Customoid::find($settings['graph_customoid'])) {
-                $params[] = 'device=' . $customoid->device_id;
-                $params[] = 'id=' . $customoid->customoid_id;
+                $params['device'] = $customoid->device_id;
+                $params['id'] = $customoid->customoid_id;
                 $settings['graph_type'] = 'customoid_' . $customoid->customoid_descr;
             }
         } elseif ($type == 'aggregate') {
@@ -238,14 +238,14 @@ class GraphController extends WidgetController
             if ($aggregate_type == 'sensors') {
                 // Multi-sensor graph
                 $sensor_ids = $settings['graph_sensors'];
-                $params[] = 'id=' . implode(',', $sensor_ids);
+                $params['id'] = implode(',', $sensor_ids);
                 if (($settings['graph_stack'] ?? 'no') == 'yes') {
-                    $params[] = 'stack=1';
+                    $params['stack'] = 1;
                 }
                 $settings['graph_type'] = 'multisensor_graph';
             } elseif ($aggregate_type == 'ports') {
                 $port_ids = $settings['graph_ports'];
-                $params[] = 'id=' . implode(',', $port_ids);
+                $params['id'] = implode(',', $port_ids);
                 $settings['graph_type'] = 'multiport_bits_separate';
             } else {
                 $port_types = collect((array) $aggregate_type)->map(function ($type) {
@@ -263,11 +263,11 @@ class GraphController extends WidgetController
                         $query->orWhere('port_descr_type', 'LIKE', $port_type);
                     }
                 })->pluck('port_id')->all();
-                $params[] = 'id=' . implode(',', $port_ids);
+                $params['id'] = implode(',', $port_ids);
                 $settings['graph_type'] = 'multiport_bits_separate';
             }
         } else {
-            $params[] = 'id=' . $settings['graph_' . $type];
+            $params['id'] = $settings['graph_' . $type];
         }
 
         $data = $settings;

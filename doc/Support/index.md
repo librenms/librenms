@@ -12,6 +12,6 @@ You can ask for help in these places.
   - [Ask for Help](https://community.librenms.org/c/help)
   - [Feature Requests](https://community.librenms.org/c/feature-requests?order=op_likes&status=open)
 
-- [Discord](https://t.libren.ms/discord) Active chat and discussion
+- [Discord](https://discord.com/invite/librenms) Active chat and discussion
 
 - [Bug Reports](https://github.com/librenms/librenms/issues/new?template=bug_report.yml)

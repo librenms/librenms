@@ -1,9 +1,6 @@
 -- ################################################################################
 
 
-
-
-
 EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
 
         IMPORTS
@@ -18,11 +15,22 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
                 extremeAgent    FROM EXTREME-BASE-MIB
 		extremeCurrentTemperature	FROM EXTREME-SYSTEM-MIB;
 
-        extremeStackable MODULE-IDENTITY
-                LAST-UPDATED "201712061500Z"
+	    extremeStackable MODULE-IDENTITY
+                LAST-UPDATED "202501091330Z" -- Thu Jan 9 13:30 UTC 2025
                 ORGANIZATION "Extreme Networks, Inc."
                 CONTACT-INFO "www.extremenetworks.com"
                 DESCRIPTION "Extreme Stackable MIB objects"
+
+		REVISION    "202501091330Z" -- Thu Jan 9 13:30 UTC 2025
+                DESCRIPTION "Changed Inlet Temperature Range to be -24C .. 100C."
+                REVISION    "202411221110Z" -- Fri Nov 22 11:10 UTC 2024
+                DESCRIPTION "Added support for Inlet Temperature."
+		    
+                REVISION "202107201100Z" -- Tue Jul 20 11:00 UTC 2021
+                DESCRIPTION "Added extremeStackingPortDataPortIfIndex to extremeStackingPortEntry."
+
+                REVISION "202010271400Z" -- Tue Oct 27 14:00 UTC 2020
+                DESCRIPTION "Added extremeStackMemberCurrentTemperature."
 
                 REVISION "201712061500Z" -- Tue Dec 6 15:00 UTC 2017
                 DESCRIPTION "Change extremeStackingPortLinkSpeed description."
@@ -94,7 +102,10 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
              extremeStackMemberAutoConfig	TruthValue, 	  
 	     extremeStackMemberStackStatus	INTEGER,
 	     extremeStackMemberImageBooted      INTEGER,
-	     extremeStackMemberBootTime         DateAndTime
+	     extremeStackMemberBootTime         DateAndTime,
+	     extremeStackMemberCurrentTemperature   INTEGER,
+	     extremeStackMemberInletTemperature     INTEGER,
+	     extremeStackMemberInletTemperatureStatus  INTEGER
 	}
 
 	extremeStackMemberSlotId OBJECT-TYPE
@@ -296,6 +307,32 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
                 "The date and time when the switch was last booted."
                    ::= { extremeStackMemberEntry 20 }
 
+        extremeStackMemberCurrentTemperature OBJECT-TYPE
+             SYNTAX INTEGER (0..110)
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "Current temperature in degrees celcius measured inside
+            device enclosure."
+                  ::= { extremeStackMemberEntry 21 }
+
+        extremeStackMemberInletTemperature OBJECT-TYPE
+             SYNTAX INTEGER (-24..100)
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "Current inlet temperature in degrees celcius measured outside
+            device enclosure."
+                 ::= { extremeStackMemberEntry 22 }
+
+        extremeStackMemberInletTemperatureStatus OBJECT-TYPE
+             SYNTAX INTEGER { notPresent(1), present(2) }
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "Operational status of inlet temperature sensor."
+                 ::= { extremeStackMemberEntry 23 }
+	     
 --
 --  	Stacking Port Table
 --
@@ -322,7 +359,8 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
 	     extremeStackingPortIfIndex		INTEGER,
 	     extremeStackingPortRemoteMac       MacAddress,
 	     extremeStackingPortLinkSpeed	Unsigned32,
-	     extremeStackingPortLinkStatus	INTEGER
+	     extremeStackingPortLinkStatus	INTEGER,
+	     extremeStackingPortDataPortIfIndex INTEGER
 	}
 
           extremeStackingPortIfIndex OBJECT-TYPE
@@ -367,6 +405,16 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
 		"The Link status of the stacking port link "
 	     	   ::= { extremeStackingPortEntry 4 }
 
+	extremeStackingPortDataPortIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS      read-only
+        STATUS  current
+        DESCRIPTION
+            "The value of ifIndex that identifies the
+             corresponding data port of the stack port
+             if there is one, otherwise zero."
+            ::= { extremeStackingPortEntry 5 }
+
 
     extremeStackableTraps     OBJECT IDENTIFIER
 		    ::= { extremeStackable 4 }
@@ -404,4 +452,4 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
                 ::= { extremeStackTrapsPrefix 3 }
 
 
-END
+END	
