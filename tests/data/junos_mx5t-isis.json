@@ -11508,7 +11508,9 @@
                     "isisISAdjAreaAddress": "49.00.01",
                     "isisISAdjIPAddrType": "ipv4",
                     "isisISAdjIPAddrAddress": "10.99.252.255",
-                    "isisCircAdminState": "on"
+                    "isisCircAdminState": "on",
+                    "isisCircLevelMetric": 10,
+                    "isisCircLevelWideMetric": 100
                 },
                 {
                     "index": "572.2",
@@ -11521,7 +11523,9 @@
                     "isisISAdjAreaAddress": "49.00.01",
                     "isisISAdjIPAddrType": "ipv4",
                     "isisISAdjIPAddrAddress": "10.99.252.253",
-                    "isisCircAdminState": "on"
+                    "isisCircAdminState": "on",
+                    "isisCircLevelMetric": 20,
+                    "isisCircLevelWideMetric": 200
                 }
             ]
         },

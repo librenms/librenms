@@ -115,8 +115,9 @@ class Isis implements Module
 
         if ($circuits->isValid()) {
             $adjacencies_data = SnmpQuery::enumStrings()->displayHints(false)->walk('ISIS-MIB::isisISAdj')->table(2);
+            $level_data = SnmpQuery::walk(['ISIS-MIB::isisCircLevelMetric', 'ISIS-MIB::isisCircLevelWideMetric'])->table(2);
 
-            $adjacencies = $circuits->mapTable(function (array $circuit_data, string $circuit_id) use ($os, $adjacencies_data): ?Collection {
+            $adjacencies = $circuits->mapTable(function (array $circuit_data, string $circuit_id) use ($os, $adjacencies_data, $level_data): ?Collection {
                 if (! isset($circuit_data['ISIS-MIB::isisCircIfIndex'])) {
                     return null;
                 }
@@ -126,7 +127,12 @@ class Isis implements Module
                 }
 
                 return collect($adjacencies_data[$circuit_id] ?? [[]])
-                    ->map(function (array $adjacency_data, $adjacency_index) use ($os, $circuit_data, $circuit_id): IsisAdjacency {
+                    ->map(function (array $adjacency_data, $adjacency_index) use ($os, $circuit_data, $circuit_id, $level_data): IsisAdjacency {
+                        [$levelMetric, $levelWideMetric] = $this->circuitLevelMetrics(
+                            $level_data[$circuit_id] ?? [],
+                            $adjacency_data['ISIS-MIB::isisISAdjNeighSysType'] ?? null
+                        );
+
                         $attributes = [
                             'device_id' => $os->getDeviceId(),
                             'index' => $adjacency_index === 0 ? null : "$circuit_id.$adjacency_index",
@@ -134,6 +140,8 @@ class Isis implements Module
                             'port_id' => PortCache::getIdFromIfIndex($circuit_data['ISIS-MIB::isisCircIfIndex'], $os->getDevice()),
                             'isisCircAdminState' => $circuit_data['ISIS-MIB::isisCircAdminState'] ?? 'down',
                             'isisISAdjState' => $adjacency_data['ISIS-MIB::isisISAdjState'] ?? 'down',
+                            'isisCircLevelMetric' => $levelMetric,
+                            'isisCircLevelWideMetric' => $levelWideMetric,
                         ];
 
                         if (! empty($adjacency_data)) {
@@ -213,6 +221,40 @@ class Isis implements Module
     protected function parseAdjacencyTime(?array $data): int
     {
         return (int) (max($data['ISIS-MIB::isisISAdjLastUpTime'] ?? 1, 1) / 100);
+    }
+
+    /**
+     * Resolve the metric and wide metric for an adjacency from the
+     * isisCircLevelTable, which is keyed by circuit and level (area = L1,
+     * domain = L2).
+     *
+     * @param  array  $circuit_levels  Level rows for a single circuit, keyed by level
+     * @return array{0: int|null, 1: int|null} [metric, wideMetric]
+     */
+    protected function circuitLevelMetrics(array $circuit_levels, ?string $neighSysType): array
+    {
+        if (empty($circuit_levels)) {
+            return [null, null];
+        }
+
+        $level_keys = match ($neighSysType) {
+            'l1IntermediateSystem' => ['area', 1],
+            'l2IntermediateSystem' => ['domain', 2],
+            default => [],
+        };
+
+        $row = Arr::first($circuit_levels); // L1L2 / unknown: use the first configured level
+        foreach ($level_keys as $key) {
+            if (isset($circuit_levels[$key])) {
+                $row = $circuit_levels[$key];
+                break;
+            }
+        }
+
+        return [
+            $row['ISIS-MIB::isisCircLevelMetric'] ?? null,
+            $row['ISIS-MIB::isisCircLevelWideMetric'] ?? null,
+        ];
     }
 
     public function dataExists(Device $device): bool
