@@ -13,10 +13,10 @@
             </li>
             @if(request()->routeIs('api-docs.v1.index'))
                 <li class="pull-right">
-                    <a href="{{ route('api-docs.v1.specification') }}" download="librenms-api-v1.json">
+                    <a href="{{ route('api-docs.v1.specification') }}" download="librenms-api-v1.json"
+                       aria-label="{{ __('Download OpenAPI JSON') }}" title="{{ __('Download OpenAPI JSON') }}">
                         <i class="fa fa-download" aria-hidden="true"></i>
                         <span class="hidden-xs">{{ __('Download OpenAPI JSON') }}</span>
-                        <span class="visible-xs-inline">{{ __('OpenAPI JSON') }}</span>
                     </a>
                 </li>
             @endif
