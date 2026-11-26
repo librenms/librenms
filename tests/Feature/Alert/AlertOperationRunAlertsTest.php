@@ -179,6 +179,37 @@ final class AlertOperationRunAlertsTest extends TestCase
         $this->assertEquals(AlertState::ACKNOWLEDGED, $alerted);
     }
 
+    public function testAcknowledgementNotificationIncludesFaultNotes(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 0, 'dur' => 3600],
+        ]);
+
+        $objs = [];
+        /** @var RunAlerts&\Mockery\MockInterface $runAlerts */
+        $runAlerts = Mockery::mock(RunAlerts::class)->makePartial();
+        $runAlerts->shouldReceive('extTransports')->andReturnUsing(function ($obj) use (&$objs): void {
+            $objs[] = $obj;
+        });
+
+        $runAlerts->runAlerts();
+
+        AlertFault::query()
+            ->where('rule_id', $context['rule']->id)
+            ->where('device_id', $context['device']->device_id)
+            ->where('open', 1)
+            ->update(['state' => AlertState::ACKNOWLEDGED, 'note' => '2026-01-01 - Ack (admin) Planned maintenance']);
+        new AlertRules($context['device']->device_id)->syncAlertState($context['rule']);
+
+        $objs = [];
+        $runAlerts->runAlerts();
+        $runAlerts->runAcks();
+
+        $acks = array_values(array_filter($objs, static fn ($obj) => (int) $obj['state'] === AlertState::ACKNOWLEDGED));
+        $this->assertNotEmpty($acks, 'An acknowledgement notification must be sent');
+        $this->assertStringContainsString('Planned maintenance', $acks[0]['alert_notes']);
+    }
+
     public function testAcknowledgedFaultsSendWhileAggregateStillActive(): void
     {
         $context = $this->makeActiveAlert([
