@@ -17,7 +17,7 @@ use App\Data\Graphing\GraphParameters;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Graphs\GraphFactory;
-use App\Http\Resources\Device as DeviceResource;
+use App\Http\Resources\Api\V0\DeviceResource as DeviceResource;
 use App\Models\Alert;
 use App\Models\AlertFault;
 use App\Models\AlertLog;

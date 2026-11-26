@@ -223,9 +223,10 @@ trait Filterable
                 'bail',
                 'array',
                 function ($attribute, $value, $fail): void {
-                    $operator = array_key_first($value);
-                    if (! isset(static::$operatorMap[$operator])) {
-                        $fail("The operator '$operator' is not supported.");
+                    foreach (array_keys($value) as $operator) {
+                        if (! isset(static::$operatorMap[$operator])) {
+                            $fail("The operator '$operator' is not supported.");
+                        }
                     }
                 },
             ],

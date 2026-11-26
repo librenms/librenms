@@ -24,7 +24,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Api\Controllers;
+namespace App\Http\Controllers\Api\V0;
 
 class LegacyApiController
 {
