@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use LibreNMS\Interfaces\Models\HasMetrics;
 use LibreNMS\Interfaces\Models\Keyable;
 use LibreNMS\Util\Number;
+use LibreNMS\Util\Rewrite;
 
 /**
  * @property int $hrDeviceIndex
@@ -113,9 +114,7 @@ class Processor extends DeviceRelatedModel implements HasMetrics, Keyable
      */
     public function getFormattedDescription(): string
     {
-        $descr = str_replace(['GenuineIntel:', 'AuthenticAMD:', 'Intel(R)', 'CPU', '(R)', '(tm)'], '', $this->processor_descr);
-
-        return trim(preg_replace('/ {2,}/', ' ', $descr));
+        return Rewrite::processorDescr($this->processor_descr);
     }
 
     public function getCompositeKey(): string
