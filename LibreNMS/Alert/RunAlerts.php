@@ -323,6 +323,7 @@ class RunAlerts
         // Build the set of notifications to send: one per fault (per-entity) or one aggregate (grouped).
         $units = [];
         if ((int) $alert['state'] === AlertState::ACKNOWLEDGED) {
+            $ackNote = null;
             // Acknowledgement alerts are one notification per rule/device (runAcks), not per fault.
             if ($faults->isNotEmpty()) {
                 $rows = [];
@@ -339,10 +340,11 @@ class RunAlerts
                 $notes = $faults->where('state', AlertState::ACKNOWLEDGED)
                     ->pluck('note')->filter(fn ($note) => trim((string) $note) !== '')->uniqueStrict()->all();
                 if ($notes !== []) {
-                    $alert['note'] = implode(PHP_EOL, $notes);
+                    $ackNote = implode(PHP_EOL, $notes);
                 }
             }
-            $units[] = $alert;
+            // Only the ack unit carries the joined notes; $alert is reused for later recovery units.
+            $units[] = $ackNote !== null ? ['note' => $ackNote] + $alert : $alert;
         } elseif ($faults->isEmpty()) {
             if ($recovering) {
                 return true;
@@ -457,6 +459,7 @@ class RunAlerts
                     $unit = $alert;
                     $unit['state'] = AlertState::RECOVERED;
                     $unit['fault_id'] = $fault->id;
+                    $unit['note'] = $fault->note;
                     $unit['details']['rule'] = $fault->details['rule'] ?? [];
                     $unit['details']['contacts'] = $fault->details['contacts'] ?? ($alert['details']['contacts'] ?? []);
                     $recoveryLog = AlertLog::query()->where('fault_id', $fault->id)->orderByDesc('id')->first();
