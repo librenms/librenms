@@ -6,7 +6,7 @@ STORMSHIELD-PROPERTY-MIB DEFINITIONS ::= BEGIN
       stormshieldMIB                            FROM STORMSHIELD-SMI-MIB;
 
    snsProductProperty MODULE-IDENTITY
-      LAST-UPDATED  "201702200000Z"
+      LAST-UPDATED  "202504040000Z"
       ORGANIZATION  "Stormshield"
       CONTACT-INFO
          "Customer Support
@@ -19,8 +19,12 @@ STORMSHIELD-PROPERTY-MIB DEFINITIONS ::= BEGIN
          E-mail: support@stormshield.eu
          http://www.stormshield.eu"
       DESCRIPTION   "stormshield Product Property"
+      REVISION      "202504040000Z"
+      DESCRIPTION
+         "Bios version added"
       REVISION      "202206280000Z"
-      DESCRIPTION   "Initial"
+      DESCRIPTION
+         "Initial"
       ::= { stormshieldMIB 18 }
 
    snsModel OBJECT-TYPE
@@ -150,5 +154,13 @@ STORMSHIELD-PROPERTY-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "Firewall System Node Name"
       ::= { snsProductProperty 16 }
+
+   snsBiosVersion OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..255))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "BIOS version"
+      ::= { snsProductProperty 17 }
 
 END

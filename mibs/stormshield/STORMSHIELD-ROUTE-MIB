@@ -62,7 +62,10 @@ STORMSHIELD-ROUTE-MIB DEFINITIONS ::= BEGIN
       snsRouteLatency                      Unsigned32,
       snsRouteJitter                       Unsigned32,
       snsRoutePacketLossPrct               DisplayString,
-      snsRouteUnreachPrct                  DisplayString
+      snsRouteUnreachPrct                  DisplayString,
+      snsRouteUsagePrctRaw                 Integer32,
+      snsRoutePacketLossPrctRaw            Integer32,
+      snsRouteUnreachPrctRaw               Integer32
    }
 
    snsRouteIndex OBJECT-TYPE
@@ -187,9 +190,9 @@ STORMSHIELD-ROUTE-MIB DEFINITIONS ::= BEGIN
    snsRouteUsagePrct OBJECT-TYPE
       SYNTAX DisplayString
       MAX-ACCESS read-only
-      STATUS current
+      STATUS deprecated
       DESCRIPTION "Usage percentage of this gateway
-                   among all the gateways member of this router"
+                   among all the gateways member of this router. Deprecated, replaced by snsRouteUsagePrctRaw."
       ::= { snsRouteEntry 16 }
 
    snsRouteMonitoringMethod OBJECT-TYPE
@@ -219,16 +222,44 @@ STORMSHIELD-ROUTE-MIB DEFINITIONS ::= BEGIN
    snsRoutePacketLossPrct OBJECT-TYPE
       SYNTAX DisplayString
       MAX-ACCESS read-only
-      STATUS current
+      STATUS deprecated
       DESCRIPTION "Percentage of packet loss for one message.
-                   A negative value means that this route is not monitored or has not yet been monitored."
+                   A negative value means that this route is not monitored or has not yet been monitored. Deprecated, replaced by snsRoutePacketLossPrctRaw."
       ::= { snsRouteEntry 20 }
 
    snsRouteUnreachPrct OBJECT-TYPE
       SYNTAX DisplayString
       MAX-ACCESS read-only
-      STATUS current
+      STATUS deprecated
       DESCRIPTION "Percentage of time in a period when gateway was unreachable.
-                   A negative value means that this route is not monitored or has not yet been monitored."
+                   A negative value means that this route is not monitored or has not yet been monitored. Deprecated, replaced by snsRouteUnreachPrctRaw."
       ::= { snsRouteEntry 21 }
+
+   snsRouteUsagePrctRaw OBJECT-TYPE
+      SYNTAX Integer32 (0..1000)
+      UNITS         "%o"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Usage per thousand of this gateway
+                   among all the gateways member of this router"
+      ::= { snsRouteEntry 22 }
+
+   snsRoutePacketLossPrctRaw OBJECT-TYPE
+      SYNTAX Integer32 (0..1000)
+      UNITS         "%o"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Packet loss per thousand for one message.
+                   A negative value means that this route is not monitored or has not yet been monitored."
+      ::= { snsRouteEntry 23 }
+
+   snsRouteUnreachPrctRaw OBJECT-TYPE
+      SYNTAX Integer32 (0..1000)
+      UNITS         "%o"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Time per thousand in a period when the gateway was unreachable.
+                   A negative value means that this route is not monitored or has not yet been monitored."
+      ::= { snsRouteEntry 24 }
+
 END
