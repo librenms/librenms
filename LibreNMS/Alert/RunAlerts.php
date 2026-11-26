@@ -337,7 +337,7 @@ class RunAlerts
                 }
                 // Ack notes are stored on the faults, not the aggregate alerts row.
                 $notes = $faults->where('state', AlertState::ACKNOWLEDGED)
-                    ->pluck('note')->filter(fn ($note) => trim((string) $note) !== '')->unique()->all();
+                    ->pluck('note')->filter(fn ($note) => trim((string) $note) !== '')->uniqueStrict()->all();
                 if ($notes !== []) {
                     $alert['note'] = implode(PHP_EOL, $notes);
                 }
