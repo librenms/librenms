@@ -130,7 +130,7 @@ class Isis implements Module
                     ->map(function (array $adjacency_data, $adjacency_index) use ($os, $circuit_data, $circuit_id, $level_data): IsisAdjacency {
                         [$levelMetric, $levelWideMetric] = $this->circuitLevelMetrics(
                             $level_data[$circuit_id] ?? [],
-                            $adjacency_data['ISIS-MIB::isisISAdjNeighSysType'] ?? null
+                            $adjacency_data['ISIS-MIB::isisISAdjUsage'] ?? null
                         );
 
                         $attributes = [
@@ -229,21 +229,23 @@ class Isis implements Module
      * domain = L2).
      *
      * @param  array  $circuit_levels  Level rows for a single circuit, keyed by level
+     * @param  string|null  $adjUsage  isisISAdjUsage for the adjacency (level1/level2/level1and2)
      * @return array{0: int|null, 1: int|null} [metric, wideMetric]
      */
-    protected function circuitLevelMetrics(array $circuit_levels, ?string $neighSysType): array
+    protected function circuitLevelMetrics(array $circuit_levels, ?string $adjUsage): array
     {
         if (empty($circuit_levels)) {
             return [null, null];
         }
 
-        $level_keys = match ($neighSysType) {
-            'l1IntermediateSystem' => ['area', 1],
-            'l2IntermediateSystem' => ['domain', 2],
+        $level_keys = match ($adjUsage) {
+            'level1', '1' => ['area', 1],
+            'level2', '2' => ['domain', 2],
+            'level1and2', '3' => ['domain', 2, 'area', 1],
             default => [],
         };
 
-        $row = Arr::first($circuit_levels); // L1L2 / unknown: use the first configured level
+        $row = Arr::first($circuit_levels); // undefined usage: use the first configured level
         foreach ($level_keys as $key) {
             if (isset($circuit_levels[$key])) {
                 $row = $circuit_levels[$key];
