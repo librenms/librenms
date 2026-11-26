@@ -27,6 +27,7 @@ namespace LibreNMS\Tests\Feature\Modules;
 use App\Facades\DeviceCache;
 use App\Models\Device;
 use App\Models\DevicePollingMethod;
+use App\Models\Eventlog;
 use App\Models\Sensor;
 use Illuminate\Process\PendingProcess;
 use Illuminate\Support\Facades\Event;
@@ -330,6 +331,44 @@ EOT;
 
         // the include runs before the divisor
         $this->assertEquals(7.4, Sensor::where('device_id', $os->getDeviceId())->value('sensor_current'));
+    }
+
+    public function testUnknownValuesAreStoredAndCrossNoThreshold(): void
+    {
+        $os = $this->makeOs([PollingMethodType::Snmp]);
+        $oid = '.1.3.6.1.4.1.2021.13.16.2.1.3.1';
+        $sensor = Sensor::factory()->create(['device_id' => $os->getDeviceId(), 'poller_type' => 'snmp', 'sensor_class' => 'dbm', 'sensor_type' => 'linux', 'sensor_oid' => $oid, 'user_func' => 'uw_to_dbm', 'sensor_limit_low' => -5, 'sensor_limit' => 5, 'sensor_alert' => 1, 'sensor_current' => 0]);
+        $raw = '-1';
+        $this->fakeSnmp(function (array $oids) use ($oid, &$raw): ?RawSnmpResponse {
+            return in_array($oid, $oids) ? new RawSnmpResponse("$oid = $raw", '', 0) : null;
+        });
+        $datastore = Mockery::mock(WriteInterface::class)->shouldIgnoreMissing();
+        $thresholdEvents = fn (): int => Eventlog::where('device_id', $os->getDeviceId())->where('message', 'like', '%threshold%')->count();
+
+        // 0 to unknown (uw_to_dbm returns null for a negative value): stored, no threshold event
+        (new Sensors)->poll($os, $datastore);
+        $sensor->refresh();
+        $this->assertNull($sensor->sensor_current);
+        $this->assertNotNull($sensor->sensor_prev);
+        $this->assertEquals(0, $sensor->sensor_prev);
+        $this->assertSame(0, $thresholdEvents());
+
+        // unknown to under the low limit (100 uW = -10 dBm): the crossing is logged
+        $raw = '100';
+        (new Sensors)->poll($os, $datastore);
+        $this->assertEquals(-10, $sensor->refresh()->sensor_current);
+        $this->assertSame(1, Eventlog::where('device_id', $os->getDeviceId())->where('message', 'like', '%under threshold%')->count());
+
+        // unknown to exactly 0 dBm (1000 uW): stored
+        $raw = '-1';
+        (new Sensors)->poll($os, $datastore);
+        $this->assertNull($sensor->refresh()->sensor_current);
+        $raw = '1000';
+        (new Sensors)->poll($os, $datastore);
+        $sensor->refresh();
+        $this->assertNotNull($sensor->sensor_current);
+        $this->assertEquals(0, $sensor->sensor_current);
+        $this->assertSame(1, $thresholdEvents());
     }
 
     public function testRemovingAMethodDeletesOnlyItsSensors(): void
