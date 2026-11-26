@@ -40,7 +40,7 @@ class DeviceController extends Controller
                 'osVersion' => 'version',
                 'osFeatures' => 'features',
                 'hardware' => 'hardware',
-                'isEnabled' => ['disabled', ResourceRequest::booleanFilter(inverted: true)],
+                'isMonitored' => ['disabled', ResourceRequest::booleanFilter(inverted: true)],
                 'isIgnored' => ['ignore', ResourceRequest::booleanFilter()],
                 'isAlertingEnabled' => ['disable_notify', ResourceRequest::booleanFilter(inverted: true)],
             ],

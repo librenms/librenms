@@ -117,7 +117,7 @@ class ResourceRequest extends FormRequest
      * Converts true or false filter values to the stored 1 or 0.
      * Only equality and set operators, an ordering of true and false has no meaning.
      *
-     * @param  bool  $inverted  the column stores the opposite, such as disabled for isEnabled
+     * @param  bool  $inverted  the column stores the opposite, such as disabled for isMonitored
      * @return Closure(mixed, string): (int|list<int>|null)
      */
     public static function booleanFilter(bool $inverted = false): Closure
