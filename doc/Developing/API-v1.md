@@ -88,6 +88,12 @@ result with `php artisan route:list --path=api/v1`.
 - Actions include a verb, and a noun when acting on another model, in kebab-case
   like every other path segment: `/alerts/{id}/acknowledge`,
   `/devices/{id}/acknowledge-alerts`.
+- Related resources may be grouped under a section prefix with a route group, in
+  kebab-case, such as the routing resources under `/routing`
+  (`/routing/isis-adjacencies`). The resource `type` stays the bare name
+  (`isis-adjacencies`) and route names carry the section
+  (`api.v1.routing.isis-adjacencies.show`), so relationship links built with
+  `route()` resolve.
 
 ## Relationships
 

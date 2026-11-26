@@ -23,4 +23,12 @@ Route::middleware(['auth:sanctum', 'can:api.access'])->group(function (): void {
 
     Route::apiResource('ports', V1\PortController::class)->only(['index', 'show']);
     Route::get('ports/{port}/device', [V1\DeviceController::class, 'showForPort'])->name('ports.device');
+
+    Route::prefix('routing')->name('routing.')->group(function (): void {
+        Route::apiResource('isis-adjacencies', V1\IsisAdjacencyController::class)
+            ->only(['index', 'show'])
+            ->parameters(['isis-adjacencies' => 'isisAdjacency']);
+        Route::get('isis-adjacencies/{isisAdjacency}/device', [V1\DeviceController::class, 'showForIsisAdjacency'])->name('isis-adjacencies.device');
+        Route::get('isis-adjacencies/{isisAdjacency}/port', [V1\PortController::class, 'showForIsisAdjacency'])->name('isis-adjacencies.port');
+    });
 });

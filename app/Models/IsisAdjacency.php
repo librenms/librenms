@@ -26,16 +26,36 @@
 
 namespace App\Models;
 
+use App\Models\Traits\Filterable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class IsisAdjacency extends PortRelatedModel implements Keyable
 {
+    use Filterable;
     use HasFactory;
 
     //public $primaryKey = 'id';
     public $timestamps = false;
+
+    /**
+     * Columns the v1 API may filter and sort on, see App\Http\Controllers\Api\V1\IsisAdjacencyController.
+     *
+     * @var list<string>
+     */
+    protected array $filterable = [
+        'id',
+        'device_id',
+        'port_id',
+        'ifIndex',
+        'index',
+        'isisISAdjState',
+        'isisISAdjNeighSysID',
+        'isisISAdjIPAddrAddress',
+        'search',
+    ];
 
     protected $fillable = [
         'device_id',
@@ -69,5 +89,13 @@ class IsisAdjacency extends PortRelatedModel implements Keyable
     public function getCompositeKey(): string
     {
         return "$this->ifIndex-$this->index";
+    }
+
+    /**
+     * The v1 API search filter: neighbour system ID or IP address.
+     */
+    public function filterSearch(Builder $query, mixed $value, array $config): void
+    {
+        $this->applyFilterSearch(['isisISAdjNeighSysID', 'isisISAdjIPAddrAddress'], $query, $value, $config);
     }
 }

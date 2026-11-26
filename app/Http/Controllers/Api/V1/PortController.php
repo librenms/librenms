@@ -7,6 +7,7 @@ use App\Http\Requests\Api\V1\ResourceRequest;
 use App\Http\Resources\Api\V1\PortResource;
 use App\Http\Resources\Api\V1\ResourceCollection;
 use App\Models\Device;
+use App\Models\IsisAdjacency;
 use App\Models\Port;
 
 class PortController extends Controller
@@ -66,5 +67,16 @@ class PortController extends Controller
         $request->allowIncludes(['device']);
 
         return new PortResource($port);
+    }
+
+    /**
+     * The local port of an IS-IS adjacency, for the adjacency's port relationship.
+     */
+    public function showForIsisAdjacency(ResourceRequest $request, IsisAdjacency $isisAdjacency): PortResource
+    {
+        $this->authorize('view', $isisAdjacency);
+        abort_if($isisAdjacency->port === null, 404);
+
+        return $this->show($request, $isisAdjacency->port);
     }
 }

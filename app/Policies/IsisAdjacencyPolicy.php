@@ -43,7 +43,8 @@ class IsisAdjacencyPolicy
         }
 
         return $this->hasGlobalPermission($user, 'view', true)
-            && Permissions::canAccessPort($isisAdjacency->port_id, $user);
+            && (Permissions::canAccessDevice($isisAdjacency->device_id, $user)
+                || Permissions::canAccessPort($isisAdjacency->port_id, $user));
     }
 
     /**

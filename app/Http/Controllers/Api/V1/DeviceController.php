@@ -7,6 +7,7 @@ use App\Http\Requests\Api\V1\ResourceRequest;
 use App\Http\Resources\Api\V1\DeviceResource;
 use App\Http\Resources\Api\V1\ResourceCollection;
 use App\Models\Device;
+use App\Models\IsisAdjacency;
 use App\Models\Port;
 
 class DeviceController extends Controller
@@ -64,5 +65,16 @@ class DeviceController extends Controller
         abort_if($port->device === null, 404);
 
         return $this->show($request, $port->device);
+    }
+
+    /**
+     * The device of an IS-IS adjacency, for the adjacency's device relationship.
+     */
+    public function showForIsisAdjacency(ResourceRequest $request, IsisAdjacency $isisAdjacency): DeviceResource
+    {
+        $this->authorize('view', $isisAdjacency);
+        abort_if($isisAdjacency->device === null, 404);
+
+        return $this->show($request, $isisAdjacency->device);
     }
 }
