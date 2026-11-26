@@ -6863,13 +6863,6 @@
             "section": "sensors",
             "order": 4
         },
-        "sensors.warn_limits.enabled": {
-            "default": false,
-            "type": "boolean",
-            "group": "webui",
-            "section": "sensors",
-            "order": 5
-        },
         "service_poller_workers": {
             "default": 24,
             "group": "poller",
