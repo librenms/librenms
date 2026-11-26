@@ -104,6 +104,7 @@ final class PortDiscardsFilterTest extends DBTestCase
     }
 
     /**
+     * @param  Builder<Port>  $query
      * @return list<string>
      */
     private function names(Builder $query): array
