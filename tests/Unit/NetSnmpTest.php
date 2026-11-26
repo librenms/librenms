@@ -526,6 +526,21 @@ class NetSnmpTest extends TestCase
         $this->assertContains('.', $cmd);
     }
 
+    public function testDebugSnmpwalkControllerUsesTheConfiguredContext(): void
+    {
+        $device = $this->makeDeviceWithSnmpConfig(
+            secretData: ['community' => 'secret'],
+            settings: ['port' => 161, 'context' => 'cn1027'],
+            deviceAttrs: ['hostname' => 'context.device.local'],
+        );
+
+        $controller = new \App\Http\Controllers\Device\Debug\DebugSnmpwalkController();
+        $refMethod = new \ReflectionMethod($controller, 'buildCommandLine');
+        $cmd = $refMethod->invoke($controller, $device);
+
+        $this->assertContains('secret@cn1027', $cmd);
+    }
+
     public function testDebugSnmpwalkControllerRespectsOsSnmpBulkFalse(): void
     {
         \App\Facades\LibrenmsConfig::set('os.airos.snmp_bulk', false);

@@ -92,6 +92,21 @@ final class PollingMethodProbeTest extends TestCase
         $this->assertNull($result->errorMessage());
     }
 
+    public function testSnmpProbeUsesTheConfiguredContext(): void
+    {
+        $config = SnmpConfig::make(['context' => 'cn1027'] + (new SnmpPollingMethod)->defaults(), new SnmpCommunitySecretData(community: 'public'));
+
+        $backend = Mockery::mock(SnmpBackendInterface::class);
+        $backend->shouldReceive('get')
+            ->with('snmp.test.local', ['SNMPv2-MIB::sysObjectID.0'], $config, Mockery::on(fn (SnmpQueryOptions $options) => $options->context === 'cn1027'))
+            ->once()
+            ->andReturn(new RawSnmpResponse('SNMPv2-MIB::sysObjectID.0 = OID: SNMPv2-SMI::enterprises.2254.2.5', '', 0));
+
+        $result = new SnmpPollingMethod($backend)->probe(new Device(['hostname' => 'snmp.test.local']), $config);
+
+        $this->assertTrue($result->isSuccess());
+    }
+
     public function testSnmpProbeFailureHasErrorMessage(): void
     {
         $backend = Mockery::mock(SnmpBackendInterface::class);

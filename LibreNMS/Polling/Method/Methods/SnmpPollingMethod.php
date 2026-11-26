@@ -96,11 +96,14 @@ final class SnmpPollingMethod extends PollingMethod
 
         $backend = $this->backend ?? resolve(SnmpBackendInterface::class);
 
+        $options = SnmpQueryOptions::quickPrint();
+        $options->context = (string) $config->context;
+
         $response = $backend->get(
             $device->pollerTarget(),
             ['SNMPv2-MIB::sysObjectID.0'],
             $config,
-            SnmpQueryOptions::quickPrint()
+            $options
         );
 
         $success = $response->getExitCode() === 0
