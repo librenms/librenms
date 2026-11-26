@@ -878,16 +878,29 @@ foreach ($ports as $port) {
             $port_tune = $device_attribs['ifName_tune:' . $port['ifName']] ?? null;
             $tuning_enabled = $port_tune == 'true'
                 || ($port_tune != 'false' && ($device_tune == 'true' || ($device_tune != 'false' && $global_tune)));
-            $rrd_limits = $tuning_enabled ? PortRrd::tuneLimits((int) $if_speed) : [];
-            if ($rrd_limits !== [] && $port['ifSpeed'] < $if_speed) {
-                Rrd::tune(Rrd::name($device['hostname'], $rrd_name), $rrd_limits);
+            $tuned_maximum = $tuning_enabled ? PortRrd::tuneMaximum((int) $if_speed) : null;
+            if ($tuned_maximum !== null && $port['ifSpeed'] < $if_speed) {
+                Rrd::tune(Rrd::name($device['hostname'], $rrd_name), PortRrd::tuneLimits((int) $if_speed));
             }
 
             // A missing RRD gets these limits when the datastore creates it.
-            $rrd_def = RrdDefinition::make();
-            foreach (PortRrd::COUNTERS as $counter) {
-                $rrd_def->addDataset($counter, 'DERIVE', 0, $rrd_limits[$counter]['max'] ?? 12500000000);
-            }
+            $rrd_maximum = $tuned_maximum ?? 12500000000;
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('INOCTETS', 'DERIVE', 0, $rrd_maximum)
+                ->addDataset('OUTOCTETS', 'DERIVE', 0, $rrd_maximum)
+                ->addDataset('INERRORS', 'DERIVE', 0, $rrd_maximum)
+                ->addDataset('OUTERRORS', 'DERIVE', 0, $rrd_maximum)
+                ->addDataset('INUCASTPKTS', 'DERIVE', 0, $rrd_maximum)
+                ->addDataset('OUTUCASTPKTS', 'DERIVE', 0, $rrd_maximum)
+                ->addDataset('INNUCASTPKTS', 'DERIVE', 0, $rrd_maximum)
+                ->addDataset('OUTNUCASTPKTS', 'DERIVE', 0, $rrd_maximum)
+                ->addDataset('INDISCARDS', 'DERIVE', 0, $rrd_maximum)
+                ->addDataset('OUTDISCARDS', 'DERIVE', 0, $rrd_maximum)
+                ->addDataset('INUNKNOWNPROTOS', 'DERIVE', 0, $rrd_maximum)
+                ->addDataset('INBROADCASTPKTS', 'DERIVE', 0, $rrd_maximum)
+                ->addDataset('OUTBROADCASTPKTS', 'DERIVE', 0, $rrd_maximum)
+                ->addDataset('INMULTICASTPKTS', 'DERIVE', 0, $rrd_maximum)
+                ->addDataset('OUTMULTICASTPKTS', 'DERIVE', 0, $rrd_maximum);
 
             $tags = [
                 'ifName' => $port['ifName'],

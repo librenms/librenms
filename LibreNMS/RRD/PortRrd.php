@@ -34,10 +34,16 @@ final class PortRrd
      */
     public static function tuneLimits(int $ifSpeed): array
     {
-        if ($ifSpeed < 10000000) {
+        $maximum = self::tuneMaximum($ifSpeed);
+        if ($maximum === null) {
             return [];
         }
 
-        return array_fill_keys(self::COUNTERS, ['max' => $ifSpeed / 8]);
+        return array_fill_keys(self::COUNTERS, ['max' => $maximum]);
+    }
+
+    public static function tuneMaximum(int $ifSpeed): int|float|null
+    {
+        return $ifSpeed < 10000000 ? null : $ifSpeed / 8;
     }
 }
