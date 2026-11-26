@@ -3,26 +3,20 @@
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\Api\V1\MetaDocument;
 use Illuminate\Foundation\Events\DiagnosingHealth;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Event;
 
 class HealthController extends Controller
 {
-    public function __invoke(): JsonResponse
+    public function __invoke(): MetaDocument
     {
         try {
             Event::dispatch(new DiagnosingHealth);
-
-            return response()->json(['meta' => [
-                'status' => 'healthy',
-            ]]);
         } catch (\Throwable) {
-            return response()->json(['errors' => [[
-                'status' => '503',
-                'title' => 'Service Unavailable',
-                'detail' => 'A required service is unavailable.',
-            ]]], 503);
+            abort(503); // FormatJsonApiError keeps the details out of the response
         }
+
+        return new MetaDocument(['status' => 'healthy']);
     }
 }

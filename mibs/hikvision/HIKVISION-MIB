@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (SEQUENCE OF type case)
 HIKVISION-MIB DEFINITIONS ::= BEGIN
 
         IMPORTS
@@ -206,7 +207,7 @@ hikDiskNum OBJECT-TYPE
 -- the disk table
 
 hikDiskTable OBJECT-TYPE
-    SYNTAX  SEQUENCE OF hikDiskEntry
+    SYNTAX  SEQUENCE OF HikDiskEntry
     ACCESS  not-accessible
     STATUS  mandatory
     DESCRIPTION

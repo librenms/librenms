@@ -31,11 +31,11 @@ use LibreNMS\Util\IPv4;
 class LocalNetworks
 {
     /** interfaces of containers, VMs and VPNs, their networks are not where the devices are */
-    private const VIRTUAL_INTERFACES = '/^(lo|docker|br-|veth|virbr|vnet|cni|flannel|cali|vxlan|podman|lxc|tailscale|zt|wg)/';
+    private const string VIRTUAL_INTERFACES = '/^(lo|docker|br-|veth|virbr|vnet|cni|flannel|cali|vxlan|podman|lxc|tailscale|zt|wg)/';
     /** a larger network is narrowed to the /24 of the server, a large scan is slow */
-    private const MIN_PREFIX = 22;
+    private const int MIN_PREFIX = 22;
     /** the address family of IPv4, AF_INET needs the sockets extension */
-    private const AF_INET = 2;
+    private const int AF_INET = 2;
 
     /**
      * @param  string[]  $containerMarkers  files that exist inside a container (Docker, Podman)
@@ -83,13 +83,7 @@ class LocalNetworks
 
     private function inContainer(): bool
     {
-        foreach ($this->containerMarkers as $marker) {
-            if (file_exists($marker)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($this->containerMarkers, fn ($marker) => file_exists($marker));
     }
 
     private function network(string $address, string $netmask): ?string

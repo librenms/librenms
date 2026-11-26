@@ -43,7 +43,9 @@ STORMSHIELD-VPNIKESA-MIB DEFINITIONS ::= BEGIN
       snsVPNIKESALifetime    Counter64,
       snsVPNIKESAMaxLifetime Counter64,
       snsVPNIKESAGlobal      INTEGER,
-      snsVPNIKESAPPK         INTEGER
+      snsVPNIKESAPPK         INTEGER,
+      snsVPNIKESADRCompliant INTEGER,
+      snsVPNIKESAKem         DisplayString
    }
 
    snsVPNIKESAIndex OBJECT-TYPE
@@ -219,5 +221,21 @@ STORMSHIELD-VPNIKESA-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "PPK"
       ::= { snsVPNIKESAEntry 20 }
+
+   snsVPNIKESADRCompliant OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "DR compliant"
+      ::= { snsVPNIKESAEntry 21 }
+
+   snsVPNIKESAKem OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Post Quantum Algorithm"
+      ::= { snsVPNIKESAEntry 22 }
 
 END

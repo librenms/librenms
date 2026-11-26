@@ -8,7 +8,7 @@ namespace LibreNMS\RRD;
 final class PortRrd
 {
     /** Data sources in the port rrd file that count bytes or packets */
-    public const COUNTERS = [
+    public const array COUNTERS = [
         'INOCTETS',
         'OUTOCTETS',
         'INERRORS',

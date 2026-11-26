@@ -1,6 +1,6 @@
 @if($device->processors->isNotEmpty())
     <x-device.overview.panel :title="__('Processors')" icon="fa fa-microchip"
-        :href="route('device', ['device' => $device->device_id, 'tab' => 'health', 'vars' => 'metric=processor'])">
+        :href="route('device.health', ['device' => $device->device_id, 'metric' => 'processor'])">
         <div class="tw:divide-y tw:divide-gray-300 tw:dark:divide-zinc-800">
             @if($showDetails)
                 @foreach($device->processors as $processor)

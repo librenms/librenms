@@ -123,7 +123,7 @@ $('#group-removal').on("click", function(e) {
     groupId = $("#group_id").val();
     $.ajax({
         type: 'DELETE',
-        url: "ajax/pollergroup/" + groupId,
+        url: route('pollergroup.destroy', {pollergroup: groupId}),
         success: function(msg) {
             toastr.success('{{ __('Poller Group deleted') }}');
             $("#confirm-delete").modal('hide');

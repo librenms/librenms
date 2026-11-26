@@ -48,10 +48,10 @@ use LibreNMS\Util\IPv6;
 class HostLookup
 {
     /** Entries further apart than this are old data */
-    private const STALE_AFTER_SECONDS = 86400;
+    private const int STALE_AFTER_SECONDS = 86400;
 
     /** Keeps a MAC with a huge number of addresses in check, scaled so hosts in a batch don't take each other's share */
-    private const MAX_ENTRIES_PER_HOST = 2000;
+    private const int MAX_ENTRIES_PER_HOST = 2000;
 
     public function __construct(private readonly User $user)
     {
@@ -76,7 +76,7 @@ class HostLookup
                 ->values();
         }
 
-        $interfaces = (new SubnetLookup($this->user))->portsWithIps($allIps);
+        $interfaces = new SubnetLookup($this->user)->portsWithIps($allIps);
         $devices = Device::hasAccess($this->user)->whereIn('ip', $allIps->map(fn (IP $ip) => $ip->packed()))->get()
             ->keyBy(fn (Device $device) => (string) IP::parse((string) $device->ip, true)?->compressed());
 
@@ -170,7 +170,7 @@ class HostLookup
         return PortsFdb::hasAccess($this->user)
             ->select(['ports_fdb.*', 'mac_counts.mac_count'])
             ->joinSub($macCounts, 'mac_counts', 'ports_fdb.port_id', '=', 'mac_counts.port_id')
-            ->with(['vlan', 'port' => fn ($q) => $q->with('device')->withCount('links')])
+            ->with(['port' => fn ($q) => $q->with('device')->withCount('links')])
             ->whereIn('ports_fdb.mac_address', $macs)
             ->get()
             ->toBase()

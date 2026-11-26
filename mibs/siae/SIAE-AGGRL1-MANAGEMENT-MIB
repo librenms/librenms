@@ -15,7 +15,7 @@
 
         IMPORTS
              MODULE-IDENTITY, OBJECT-TYPE,
-             Integer32
+             Integer32, IpAddress
         FROM SNMPv2-SMI
              InterfaceIndexOrZero
         FROM IF-MIB
@@ -28,7 +28,7 @@
         FROM SIAE-ALARM-MIB;
 
     aggregationL1 MODULE-IDENTITY
-        LAST-UPDATED "201409290000Z"
+        LAST-UPDATED "201610180000Z"
         ORGANIZATION "SIAE MICROELETTRONICA spa"
         CONTACT-INFO
             "SIAE MICROELETTONICA s.p.a.
@@ -40,6 +40,11 @@
             "
         DESCRIPTION
             "Level 1 aggregations management for SIAE equipments.
+            "
+        REVISION "201610180000Z"
+        DESCRIPTION 
+            "MIB version 01.00.02.
+             - Added aggrL1CarrierTable
             "
         REVISION "201409290000Z"
         DESCRIPTION 
@@ -58,23 +63,23 @@
 --  Level 1 aggregation GROUP
 ------------------------------------------------------------------------------
 --
---   Aggregators    HW aggregator       Aggregables
+--   Aggregators    HW aggregator       Aggregables (carrier)
 --                                      Radios (or LAN connectors)
 --
 --   +--------+      +----------------+      +--------+
---   | if.A   | ---- |+ -+- + - - - ->| ---- | ODU.A  |
+--   | if.A   | ---- |+ -+- + - - - ->| ---- | ODU.A  | (or LAN.A)
 --   +--------+      | \  \  \        |      +--------+
 --                   |  \  \  \       |
 --   +--------+      |   \  \  \      |      +--------+
---   | if.B   | ---- |- - - - - + - ->| ---- | ODU.B  |
+--   | if.B   | ---- |- - - - - + - ->| ---- | ODU.B  | (or LAN.B)
 --   +--------+      |     \  \       |      +--------+
 --                   |      \  \      |
 --   +--------+      |       \  \     |      +--------+
---   | if.C   | ---- |- - - - - -+- ->| ---- | ODU.C  |
+--   | if.C   | ---- |- - - - - -+- ->| ---- | ODU.C  | (or LAN.C)
 --   +--------+      | \       \      |      +--------+
 --                   |  \       \     |
 --   +--------+      |   \       \    |      +--------+
---   | if.D   | ---- |- - + - - - + ->| ---- | ODU.D  |
+--   | if.D   | ---- |- - + - - - + ->| ---- | ODU.D  | (or LAN.D)
 --   +--------+      |                |      +--------+
 --                   +----------------+
 --
@@ -101,6 +106,9 @@
 --   1+1, for example, if ODU.A and ODU.B are combined in a 1+1 configuration,
 --   this table shows that if.A sends (the same) traffic to both ODU.A and
 --   ODU.B.
+--
+--   Table aggrL1CarrierTable shows information related to the agggregation 
+--   carrier connected through a LAN connector.
 --
 --   Table aggrL1AlarmTable reports alarms for each aggregator used as a
 --   traffic source of an aggregation.
@@ -160,9 +168,9 @@
 
     AggrL1CapabilityEntry  ::=
         SEQUENCE  {
-            aggrL1CapabilityAggregableIndex                 Integer32,
-            aggrL1CapabilityAggregableType                  AggregableType,
-            aggrL1CapabilityAggregatorIndex                 InterfaceIndexOrZero
+            aggrL1CapabilityAggregableIndex  Integer32,
+            aggrL1CapabilityAggregableType   AggregableType,
+            aggrL1CapabilityAggregatorIndex  InterfaceIndexOrZero
             }
        
     aggrL1CapabilityAggregableIndex OBJECT-TYPE
@@ -222,11 +230,11 @@
     ::= {aggrL1Table 1}
 
     AggrL1Entry  ::=
-        SEQUENCE  {aggrL1AggregableIndex              Integer32,
-                   aggrL1AggregableType               AggregableType,
-                   aggrL1AggregatorIndex              InterfaceIndexOrZero,
-                   aggrL1StorageType                  StorageType,
-                   aggrL1Rowstatus                    RowStatus  
+        SEQUENCE  {aggrL1AggregableIndex  Integer32,
+                   aggrL1AggregableType   AggregableType,
+                   aggrL1AggregatorIndex  InterfaceIndexOrZero,
+                   aggrL1StorageType      StorageType,
+                   aggrL1Rowstatus        RowStatus
                   }
             
     aggrL1AggregableIndex OBJECT-TYPE
@@ -303,10 +311,10 @@
 
    AggrL1AlarmEntry  ::=
         SEQUENCE {   
-            aggrL1AlarmAggregatorIndex            InterfaceIndexOrZero, 
-            aggrL1FailAlarm                       AlarmStatus,
-            aggrL1DegradeAlarm                    AlarmStatus,
-            aggrL1RealignmentAlarm                AlarmStatus            
+            aggrL1AlarmAggregatorIndex  InterfaceIndexOrZero, 
+            aggrL1FailAlarm             AlarmStatus,
+            aggrL1DegradeAlarm          AlarmStatus,
+            aggrL1RealignmentAlarm      AlarmStatus            
         }
    
   aggrL1AlarmAggregatorIndex OBJECT-TYPE
@@ -403,9 +411,9 @@
     ::= {aggrL1ConnectionTable 1}
 
     AggrL1ConnectionEntry  ::=
-        SEQUENCE  {aggrL1ConnAggregableIndex     Integer32,
-                   aggrL1ConnAggregableType      AggregableType,
-                   aggrL1ConnAggregatorIndex     InterfaceIndexOrZero
+        SEQUENCE  {aggrL1ConnAggregableIndex  Integer32,
+                   aggrL1ConnAggregableType   AggregableType,
+                   aggrL1ConnAggregatorIndex  InterfaceIndexOrZero
                   }
             
     aggrL1ConnAggregableIndex OBJECT-TYPE
@@ -438,10 +446,75 @@
             used as source of a given L1 aggregation. It must correspond to a
             valid aggregator interface in aggrL1CapabilityTable."
     ::= {aggrL1ConnectionEntry 3}
+
+   -- 
+   -------  End of aggrL1ConnectionTable
+
+   -------  Begin of aggrL1CarrierTable
+   --
+    aggrL1CarrierTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  AggrL1CarrierEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table shows the information about the aggregation carrier 
+             connected through a LAN connector. In this table every entry must
+             have the index aggrL1ConnAggregableType equal to lan(3)"
+    ::= {aggregationL1 9}
+    
+    aggrL1CarrierEntry OBJECT-TYPE
+        SYNTAX      AggrL1CarrierEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing information about the IP adddress and the 
+             throughput of the carrier connected by LAN.
+            " 
+        INDEX       {aggrL1ConnAggregableIndex,
+                     aggrL1ConnAggregableType
+                    }
+    ::= {aggrL1CarrierTable 1}
+
+    AggrL1CarrierEntry  ::=
+        SEQUENCE  {aggrL1CarrierIpAddress    IpAddress,
+                   aggrL1CarrierMinCapacity  Integer32,
+                   aggrL1CarrierMaxCapacity  Integer32
+                  }
+    
+    aggrL1CarrierIpAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object shows the Ip address of the carrier (Network Element)
+             connected with this LAN."
+    ::= {aggrL1CarrierEntry 1}
+   
+    aggrL1CarrierMinCapacity OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Kbps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object shows the lower bound of the Ethernet capacity
+             (in Kbit/sec) of the carrier (Network Element) connected
+             with this LAN."
+    ::= {aggrL1CarrierEntry 2}
+   
+    aggrL1CarrierMaxCapacity OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Kbps"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object shows the upper bound of the Ethernet capacity
+             (in Kbit/sec) of the carrier (Network Element) connected
+             with this LAN."
+    ::= {aggrL1CarrierEntry 3}
     
    -- 
    -------  End of aggrL1ConnectionTable
- 
+
 ------ End group -----------------------------------------------------------------
 
 ---------------------------------- End  -------------------------------------

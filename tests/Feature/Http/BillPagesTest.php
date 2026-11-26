@@ -9,7 +9,10 @@ use App\Models\BillPerm;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use LibreNMS\Billing;
 use LibreNMS\Tests\TestCase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -281,6 +284,44 @@ class BillPagesTest extends TestCase
         $this->assertEquals('Quota', $row['bill_type']);
         $this->assertEquals('-', $row['predicted']);
         $this->assertEquals('', $row['actions']);
+    }
+
+    public function testTableLoadsCdrPredictionsInOneHistoryQuery(): void
+    {
+        $this->travelTo(Carbon::parse('2024-06-02 12:00:00'));
+        $admin = $this->admin();
+        $first = Bill::factory()->create(['bill_name' => 'A CDR', 'bill_type' => 'cdr', 'bill_day' => 1, 'rate_95th' => 75]);
+        $second = Bill::factory()->create(['bill_name' => 'B CDR', 'bill_type' => 'CDR', 'bill_day' => 15, 'rate_95th' => 150]);
+        $empty = Bill::factory()->create(['bill_name' => 'C CDR', 'bill_type' => 'cdr', 'bill_day' => 31, 'rate_95th' => 200]);
+        Bill::factory()->create(['bill_name' => 'D Quota', 'bill_type' => 'quota', 'bill_day' => 1, 'total_data' => 1000]);
+        $outsidePage = Bill::factory()->create(['bill_name' => 'E CDR', 'bill_type' => 'cdr', 'bill_day' => 1]);
+
+        foreach ([[$first, 1, 200], [$first, 2, 100], [$first, 4, 10000], [$second, 1, 300], [$outsidePage, 1, 9999]] as [$bill, $offset, $rate]) {
+            [$from, $to] = Billing::getDates($bill->bill_day, $offset);
+            $history = $this->createHistory($bill, Carbon::parse($from), Carbon::parse($to));
+            $history->update(['bill_type' => 'CDR', 'rate_95th' => $rate]);
+        }
+        [$from, $to] = Billing::getDates($first->bill_day, 1);
+        $duplicate = $this->createHistory($first, Carbon::parse($from)->subDay(), Carbon::parse($to));
+        $duplicate->update(['bill_type' => 'cdr', 'rate_95th' => 250]);
+        $this->createHistory($second, Carbon::parse($from), Carbon::parse($to))->update(['rate_95th' => 9999]);
+
+        $expected = array_map(fn (Bill $bill) => $bill->formatUsage(Billing::getPredictedCdrUsage($bill)), [$first, $second, $empty]);
+        DB::flushQueryLog();
+        DB::enableQueryLog();
+        $response = $this->actingAs($admin)->postJson(route('table.bills'), ['rowCount' => 4])
+            ->assertOk()
+            ->assertJsonPath('total', 5)
+            ->assertJsonCount(4, 'rows');
+        $historyQueries = array_filter(DB::getQueryLog(), fn (array $query) => str_contains(strtolower($query['query']), 'from `bill_history`'));
+        DB::disableQueryLog();
+
+        $this->assertCount(1, $historyQueries);
+        $this->assertSame($first->formatUsage(400 * 29 / 30 + 75 / 30), $response->json('rows.0.predicted'));
+        foreach ($expected as $index => $prediction) {
+            $this->assertSame($prediction, $response->json("rows.$index.predicted"));
+        }
+        $this->assertNotSame('-', $response->json('rows.3.predicted'));
     }
 
     public function testTableOnlyShowsPermittedBills(): void

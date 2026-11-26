@@ -5,7 +5,7 @@ namespace LibreNMS\Interfaces\Discovery;
 use App\Models\BgpPeer;
 use App\Models\BgpPeerCbgp;
 use Illuminate\Support\Collection;
-use LibreNMS\Exceptions\SnmpException;
+use LibreNMS\Exceptions\SnmpConnectionException;
 
 interface BgpAddressFamilyDiscovery
 {
@@ -16,7 +16,7 @@ interface BgpAddressFamilyDiscovery
      * @param  Collection<int, BgpPeer>  $peers  discovered sessions
      * @return Collection<int, BgpPeerCbgp>
      *
-     * @throws SnmpException when the device did not answer, existing address families are kept
+     * @throws SnmpConnectionException when the device did not answer, existing address families are kept
      */
     public function discoverBgpAddressFamilies(Collection $peers): Collection;
 }

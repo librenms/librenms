@@ -22,9 +22,9 @@ use LibreNMS\Util\Version;
 class Supervisors
 {
     /** supervisor => WorkerNode::queues() type */
-    private const TYPES = ['supervisor-poll' => 'poller', 'supervisor-discovery' => 'discovery'];
+    private const array TYPES = ['supervisor-poll' => 'poller', 'supervisor-discovery' => 'discovery'];
     /** seconds between checkins and checks for changed settings */
-    private const HEARTBEAT = 60;
+    private const int HEARTBEAT = 60;
 
     /** @var NodeSupervisors|null supervisor options used when horizon started */
     private ?array $started = null;

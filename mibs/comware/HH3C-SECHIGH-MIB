@@ -3,12 +3,13 @@
 --
 -- Description: The MIB is designed to show information on high-end driver products.
 -- Reference:
--- Version: V1.3
+-- Version: V1.4
 -- History:
 -- V1.0  2017-09 Initial version created by meirongjun 14958.
 -- V1.1  2020-05 Added hh3cSecHighFaultMonitor by sunlibing 21109.
 -- V1.2  2021-01 Added hh3cSecHighTemperMonitor by sunlibing 21109.
 -- V1.3  2021-02 Added hh3cSecHighParityErrorMonitor by sunlibing 21109.
+-- V1.4  2021-05 Added hh3cSecHighInputVoltageMonitor by gkf 8708.
 -- ==========================================================================
 HH3C-SECHIGH-MIB DEFINITIONS ::= BEGIN
 
@@ -19,7 +20,7 @@ IMPORTS
         FROM SNMPv2-SMI;         -- [RFC2578]
 
 hh3cSecHigh MODULE-IDENTITY
-    LAST-UPDATED "202102030000Z"
+    LAST-UPDATED "202105170000Z"
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -30,6 +31,9 @@ hh3cSecHigh MODULE-IDENTITY
         "
     DESCRIPTION
         "The private MIB file includes the information on high-end driver products."
+    REVISION      "202105170000Z"
+    DESCRIPTION
+        "Add hh3cSecHighInputVoltageMonitor."
     REVISION      "202102030000Z"
     DESCRIPTION
         "Add hh3cSecHighParityErrorMonitor."
@@ -451,4 +455,63 @@ hh3cSecHighParityErrorAlarmNotify NOTIFICATION-TYPE
     DESCRIPTION
            "This notification is generated when a severe parity error occurs."
     ::= { hh3cSecHighParityErrorAlarmTrapPre 1 }
+
+-- ============
+-- hh3cSecHighInputVoltageMonitor definition
+-- ============
+hh3cSecHighInputVoltageMonitor OBJECT IDENTIFIER ::= { hh3cSecHigh 4 }
+
+-- ============
+-- hh3cSecHighInputVoltageAlarmVar definition
+-- ============
+hh3cSecHighInputVoltageAlarmVar OBJECT IDENTIFIER ::= { hh3cSecHighInputVoltageMonitor 1 }
+
+hh3cSecHighInputVoltageAlarmChassis OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the chassis in which input voltage abnormal."
+    ::= { hh3cSecHighInputVoltageAlarmVar 1 }
+
+hh3cSecHighInputVoltageAlarmPowerId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the slot in which input voltage abnormal."
+    ::= { hh3cSecHighInputVoltageAlarmVar 2 }
+
+hh3cSecHighInputVoltageAlarmState OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..512))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Index of the hotspot of which input voltage abnormal."
+    ::= { hh3cSecHighInputVoltageAlarmVar 3 }
+
+-- ===============================================
+-- Definition of InputVoltage monitor trap.
+-- ===============================================
+hh3cSecHighInputVoltageAlarmTrap OBJECT IDENTIFIER ::= { hh3cSecHighInputVoltageMonitor 2 }
+
+-- ===============================================
+-- Definition of InputVoltage monitor trap Pre.
+-- ===============================================
+hh3cSecHighInputVoltageAlmTrapPre OBJECT IDENTIFIER ::= { hh3cSecHighInputVoltageAlarmTrap 0 }
+
+-- ============
+-- hh3cSecHighInputVoltageAlarm trap definition
+-- ============
+
+hh3cSecHighInputVoltageAlarmNotify NOTIFICATION-TYPE
+    OBJECTS {
+                hh3cSecHighInputVoltageAlarmChassis,
+                hh3cSecHighInputVoltageAlarmPowerId,
+                hh3cSecHighInputVoltageAlarmState
+            }
+    STATUS     current
+    DESCRIPTION
+           "This notification is generated when the value of power's input voltage register is abnormal"
+    ::= { hh3cSecHighInputVoltageAlmTrapPre 1 }
 END

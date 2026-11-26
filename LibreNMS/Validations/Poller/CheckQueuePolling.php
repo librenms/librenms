@@ -18,7 +18,7 @@ use LibreNMS\ValidationResult;
 class CheckQueuePolling implements Validation
 {
     /** seconds without a completed DispatchPollingWork run before it is considered stopped */
-    private const DISPATCH_LATE = 120;
+    private const int DISPATCH_LATE = 120;
 
     /**
      * @inheritDoc

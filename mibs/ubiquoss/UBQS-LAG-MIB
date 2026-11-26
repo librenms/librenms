@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (trailing comma in IMPORTS)
 -- *****************************************************************
 -- UBQS-LAG-MIB.: Ubiquoss LAG MIB      
 --
@@ -13,20 +14,20 @@ UBQS-LAG-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     MODULE-IDENTITY,
     OBJECT-TYPE,
-    NOTIFICATION-TYPE,
+    NOTIFICATION-TYPE
         FROM SNMPv2-SMI
     MODULE-COMPLIANCE,
     OBJECT-GROUP,
-    NOTIFICATION-GROUP,
+    NOTIFICATION-GROUP
         FROM SNMPv2-CONF
     TEXTUAL-CONVENTION,
-    RowStatus,
+    RowStatus
         FROM SNMPv2-TC
-    ifIndex, InterfaceIndex,
+    ifIndex, InterfaceIndex
         FROM IF-MIB   
-	DisplayString, 		
+	DisplayString 		
 		FROM RFC1213-MIB 
-    UbiPortList,
+    UbiPortList
   FROM UBQS-TC           
     ubiMgmtv2
         FROM UBQS-SMI;                                     

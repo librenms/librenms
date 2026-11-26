@@ -15,7 +15,7 @@ readonly class BuildPollingMethodCandidates
     /**
      * The config of the default credentials of each polling method type, tried in order when a method has no secret.
      */
-    private const DEFAULT_CREDENTIALS = [
+    private const array DEFAULT_CREDENTIALS = [
         'snmp' => 'snmp.default_credentials',
     ];
 

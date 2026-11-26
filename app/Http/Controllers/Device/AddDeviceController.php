@@ -118,7 +118,7 @@ class AddDeviceController
                     'secret_id' => old("polling_methods.{$type}.secret_id", ''),
                     'secret_type' => old("polling_methods.{$type}.secret_type", $method['secret_types'][0]['type'] ?? ''),
                     'description' => old("polling_methods.{$type}.description", ''),
-                    'formData' => old("polling_methods.{$type}.secret_data", $method['schema_defaults'] ?? []),
+                    'formData' => old("polling_methods.{$type}.secret_data") ?: $method['schema_defaults'],
                     'settingsData' => old("polling_methods.{$type}.settings", array_fill_keys($method['settings_keys'], '')),
                 ]];
             })->all(),
@@ -227,7 +227,7 @@ class AddDeviceController
         return response()->json([
             'status' => 'ok',
             'message' => __('Device added successfully'),
-            'redirect' => route('device', ['device' => $device->device_id ?? 0]),
+            'redirect' => route('device.overview', ['device' => $device->device_id ?? 0]),
         ]);
     }
 }

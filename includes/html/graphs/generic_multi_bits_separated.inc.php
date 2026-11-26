@@ -37,7 +37,10 @@ if ($width > '1500') {
 
 $unit_text = 'Bits/sec';
 
-if (! $noagg || ! $nodetails) {
+// aggregating needs at least two series
+$show_aggregate = ! $noagg && count($rrd_list ?? []) > 1;
+
+if ($show_aggregate || ! $nodetails) {
     if ($width > '500') {
         $rrd_options[] = sprintf('COMMENT:%s', substr(str_pad($unit_text, $descr_len + 5), 0, $descr_len + 5));
         $rrd_options[] = sprintf('COMMENT:%12s', 'Current');
@@ -133,7 +136,7 @@ foreach ($rrd_list as $rrd) {
     $iter++;
 }
 
-if (! $noagg) {
+if ($show_aggregate) {
     $rrd_options[] = 'CDEF:aggr' . $in . 'bytes=' . $aggr_in . ',ADDNAN';
     $rrd_options[] = 'CDEF:aggr' . $out . 'bytes=' . $aggr_out . ',ADDNAN';
     $rrd_options[] = 'CDEF:aggrinbits=aggrinbytes,' . $multiplier . ',*';

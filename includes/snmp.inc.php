@@ -385,40 +385,6 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibd
 }
 
 /**
- * @deprecated Please use SnmpQuery instead
- */
-function snmpwalk_cache_twopart_oid($device, $oid, $array = [], $mib = 0, $mibdir = null, $snmpflags = '-OQUs')
-{
-    $data = trim(snmp_exec('snmpwalk', $oid, $snmpflags, $device, $mib, $mibdir));
-
-    if (empty($data)) {
-        return $array;
-    }
-
-    foreach (explode("\n", $data) as $entry) {
-        if (! Str::contains($entry, ' =')) {
-            if (! empty($entry) && isset($first, $second, $oid)) {
-                $array[$first][$second][$oid] .= "\n$entry"; // multi-line value, append to previous entry
-            }
-
-            continue;
-        }
-
-        [$oid,$value] = explode('=', $entry, 2);
-        $oid = trim($oid);
-        $value = trim($value);
-        $value = str_replace('"', '', $value);
-        $parts = explode('.', $oid);
-        if (! strstr($value, 'at this OID') && count($parts) >= 3) {
-            [$oid, $first, $second] = $parts;
-            $array[$first][$second][$oid] = $value;
-        }
-    }
-
-    return $array;
-}//end snmpwalk_cache_twopart_oid()
-
-/**
  * SNMPWalk_array_num - performs a numeric SNMPWalk and returns an array containing $count indexes
  * One Index:
  *  From: 1.3.6.1.4.1.9.9.166.1.15.1.1.27.18.655360 = 0

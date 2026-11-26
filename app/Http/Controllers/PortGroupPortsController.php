@@ -18,7 +18,7 @@ class PortGroupPortsController extends Controller
      *
      * @var array<string, string>
      */
-    private const SORT_FIELDS = [
+    private const array SORT_FIELDS = [
         'device' => 'device',
         'ifName' => 'ifName',
         'ifOperStatus' => 'ifOperStatus',
@@ -26,7 +26,7 @@ class PortGroupPortsController extends Controller
         'ifAlias' => 'ifAlias',
     ];
 
-    private const MEMBERSHIP = ['members', 'available', 'all'];
+    private const array MEMBERSHIP = ['members', 'available', 'all'];
 
     public function index(Request $request, PortGroup $portGroup): View
     {
@@ -175,14 +175,14 @@ class PortGroupPortsController extends Controller
             'ifDescr' => $port->ifDescr,
             'ifAlias' => $port->ifAlias,
             'ifSpeed' => $port->ifSpeed,
-            'url' => Url::portUrl($port),
+            'url' => route('device.port', ['device' => $port->device_id, 'port' => $port]),
             'link_class' => Url::portLinkDisplayClass($port),
             'ifAdminStatus' => $port->ifAdminStatus?->value,
             'ifOperStatus' => $port->ifOperStatus?->value,
             'deleted' => (bool) $port->deleted,
             'device_id' => $port->device_id,
             'device' => $port->device?->display,
-            'device_url' => $port->device ? Url::deviceUrl($port->device) : null,
+            'device_url' => $port->device ? route('device.overview', ['device' => $port->device]) : null,
             'member' => $membership === 'all' ? (bool) $port->getAttribute('member') : $membership === 'members',
         ];
     }

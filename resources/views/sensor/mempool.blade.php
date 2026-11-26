@@ -21,7 +21,7 @@
         </div>
         <div class="table-responsive">
             <table id="mempool" class="table table-hover table-condensed"
-                   data-url="{{ route('table.mempools') }}">
+                   data-url="{{ route('table.mempools') }}" data-export-url="{{ route('table.mempools.export') }}">
                 <thead>
                 <tr>
                     <th data-column-id="hostname">{{ __('Device') }}</th>
@@ -35,7 +35,7 @@
         </div>
     </div>
     <script>
-        var grid = $("#mempool").bootgrid({
+        var grid = bootgridWithExport($("#mempool"), {
             ajax: true,
             rowCount: [50, 100, 250, -1],
             post: function ()

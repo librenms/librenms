@@ -22,7 +22,7 @@ final class PollDeviceTest extends DBTestCase
 {
     use DatabaseTransactions;
 
-    public function testOnlyEnabledModulesArePolled(): void
+    public function testDeviceModuleSettingOverridesPollingMethod(): void
     {
         Event::fake([PollingModule::class]);
         LibrenmsConfig::set('rrd.enable', false);
@@ -36,15 +36,17 @@ final class PollDeviceTest extends DBTestCase
 
         $device = Device::factory()->create(['hostname' => '192.0.2.1']);
         DevicePollingMethod::factory()->for($device)->create(['method_type' => PollingMethodType::Icmp]);
+        // The polling method enables availability unless the device explicitly disables it.
+        $device->setAttrib('poll_availability', 0);
 
-        (new PollDevice($device->device_id, ModuleList::fromUserOverrides([])))->handle();
+        new PollDevice($device->device_id, ModuleList::fromUserOverrides([]))->handle();
 
         Event::assertDispatched(PollingModule::class, fn (PollingModule $event): bool => $event->module === 'core');
         Event::assertNotDispatched(PollingModule::class, fn (PollingModule $event): bool => $event->module === 'availability');
 
         $device->setAttrib('poll_availability', 1);
         DeviceCache::flush(); // the job loads the device again in a new run
-        (new PollDevice($device->device_id, ModuleList::fromUserOverrides([])))->handle();
+        new PollDevice($device->device_id, ModuleList::fromUserOverrides([]))->handle();
 
         Event::assertDispatched(PollingModule::class, fn (PollingModule $event): bool => $event->module === 'availability');
     }

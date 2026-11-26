@@ -1,0 +1,88 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: en-US
+tone_instructions: 'Be brief. Only comment on real bugs, security issues, or clear regressions. Skip style, naming, and speculative suggestions.'
+
+reviews:
+  # Only the most important feedback
+  profile: quiet
+
+  # Trim the walkthrough comment down to the essentials
+  high_level_summary: false
+  changed_files_summary: false
+  sequence_diagrams: false
+  estimate_code_review_effort: false
+  assess_linked_issues: false
+  related_issues: false
+  related_prs: false
+  suggested_labels: false
+  suggested_reviewers: false
+  poem: false
+  in_progress_fortune: false
+  review_info: false
+  review_details: false
+  review_status: false
+  collapse_walkthrough: true
+  enable_prompt_for_ai_agents: false
+
+  auto_review:
+    enabled: true
+    drafts: false
+    auto_pause_after_reviewed_commits: 3
+
+  pre_merge_checks:
+    title:
+      mode: 'off'
+    description:
+      mode: 'off'
+    issue_assessment:
+      mode: 'off'
+
+  # Each enabled finishing touch adds a checkbox to the main comment
+  finishing_touches:
+    unit_tests:
+      enabled: false
+    autofix:
+      enabled: false
+    fix_ci:
+      enabled: false
+    resolve_merge_conflict:
+      enabled: false
+
+  # Generated files, fixtures, vendored assets
+  path_filters:
+    - '!html/build/**'
+    - '!html/js/**/*.min.js'
+    - '!html/css/**/*.min.css'
+    - '!mibs/**'
+    - '!tests/data/**'
+    - '!tests/snmpsim/**'
+    - '!composer.lock'
+    - '!package-lock.json'
+
+  # Linters already run in CI (phpstan, phpcs, etc.); avoid duplicate findings
+  tools:
+    phpstan:
+      enabled: false
+    phpcs:
+      enabled: false
+    phpmd:
+      enabled: false
+    markdownlint:
+      enabled: false
+    languagetool:
+      enabled: false
+    yamllint:
+      enabled: false
+    biome:
+      enabled: false
+    eslint:
+      enabled: false
+    ruff:
+      enabled: false
+    flake8:
+      enabled: false
+    pylint:
+      enabled: false
+
+chat:
+  art: false

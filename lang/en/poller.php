@@ -6,6 +6,7 @@ return [
         'snmp' => 'SNMP',
         'icmp' => 'ICMP',
         'ipmi' => 'IPMI',
+        'proxmox-api' => 'Proxmox API',
         'unix-agent' => 'Unix Agent',
         'unknown' => 'Unknown',
     ],
@@ -20,6 +21,12 @@ return [
             'timeout' => 'Timeout',
             'type' => 'Interface',
         ],
+        'proxmox-api' => [
+            'hostname' => 'Hostname',
+            'port' => 'Port',
+            'timeout' => 'Timeout',
+            'verify_ssl' => 'Verify TLS Certificate',
+        ],
         'snmp' => [
             'version' => 'SNMP version',
             'transport' => 'SNMP transport',
@@ -33,6 +40,7 @@ return [
             'port_association_mode' => 'Port Association Mode',
         ],
         'unix-agent' => [
+            'use_localhost' => 'Use localhost',
             'port' => 'Unix Agent Port',
             'timeout' => 'Unix Agent Timeout',
         ],
@@ -41,6 +49,7 @@ return [
         'snmp-community' => 'SNMP v1/v2c Community',
         'snmp-v3' => 'SNMP v3',
         'ipmi' => 'IPMI',
+        'proxmox-api' => 'Proxmox API',
         'unknown' => 'Unknown',
     ],
     'unknown_type' => 'Unknown (:type)',

@@ -27,12 +27,16 @@
 namespace LibreNMS\Tests\Unit;
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Exceptions\RrdCachedConnectionException;
+use LibreNMS\Exceptions\RrdException;
+use LibreNMS\Exceptions\RrdNotFoundException;
 use LibreNMS\RRD\Backend\Rrdtool;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\RRD\RrdPath;
 use LibreNMS\RRD\RrdProcess;
 use LibreNMS\Tests\TestCase;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 final class RrdtoolTest extends TestCase
 {
@@ -86,6 +90,31 @@ final class RrdtoolTest extends TestCase
             'update host/f.rrd 1700000000:3',
             'tune host/f.rrd --maximum a:100 --minimum b:0 --maximum b:U',
         ], $this->commands);
+    }
+
+    /**
+     * @return array<string, array{string, class-string<RrdException>}>
+     */
+    public static function remoteLastErrors(): array
+    {
+        return [
+            'daemon with address' => ['rrdcached@127.0.0.1:42217: ', RrdNotFoundException::class],
+            'daemon without address' => ['rrdcached: ', RrdNotFoundException::class],
+            'local fallback' => ['', RrdCachedConnectionException::class],
+        ];
+    }
+
+    #[DataProvider('remoteLastErrors')]
+    public function testClassifiesRemoteLastErrors(string $prefix, string $expectedException): void
+    {
+        $rrd = RrdPath::make('host', 'missing.rrd');
+        $process = Mockery::mock(RrdProcess::class);
+        $process->shouldReceive('run')->once()->with('last host/missing.rrd')
+            ->andThrow(RrdException::parse("ERROR: {$prefix}opening 'host/missing.rrd': No such file or directory"));
+        $backend = new Rrdtool('127.0.0.1:42217', $process);
+
+        $this->expectException($expectedException);
+        $backend->last($rrd);
     }
 
     private function backend(): Rrdtool

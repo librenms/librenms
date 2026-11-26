@@ -8,7 +8,6 @@
 <script type="text/javascript">
     var visPopups = {
         enabled: @json((bool) \App\Facades\LibrenmsConfig::get('web_mouseover', true)),
-        baseUrl: @json(url('/')),
         cacheTtl: 60000,
         showDelay: 500,
         navbarHeight: 70,
@@ -34,10 +33,10 @@
         },
 
         /**
-         * Show the popup for path, placed so it does not cover the hovered element
+         * Show the popup for a URL, placed so it does not cover the hovered element
          * avoid: {left, top, right, bottom} viewport rect of the hovered element
          */
-        show: function (path, avoid) {
+        show: function (url, avoid) {
             clearTimeout(visPopups.showTimeout);
             clearTimeout(visPopups.hideTimeout);
 
@@ -49,7 +48,6 @@
                 };
                 popup.classList.remove('tw:hidden');
 
-                const url = visPopups.baseUrl.replace(/\/$/, '') + path;
                 visPopups.request = null;
                 const cached = visPopups.cache[url];
                 if (cached && Date.now() - cached.time < visPopups.cacheTtl) {
@@ -155,31 +153,31 @@
 
         /**
          * options.ports: edge ids are "<port_id>.<remote_port_id>", show the port popup on hover
-         * options.devicePath(nodeId) / options.portPath(edgeId): override the popup path, return null to show nothing
+         * options.deviceUrl(nodeId) / options.portUrl(edgeId): override the popup path, return null to show nothing
          */
         attach: function (network, options = {}) {
             if (!visPopups.enabled) {
                 return;
             }
 
-            const devicePath = options.devicePath ?? ((nodeId) => '/device/' + nodeId + '/popup');
-            const portPath = options.portPath ?? (options.ports ? (edgeId) => '/port/' + String(edgeId).split('.')[0] + '/popup?from=-1d' : null);
+            const deviceUrl = options.deviceUrl ?? ((nodeId) => route('device.popup', {device: nodeId}));
+            const portUrl = options.portUrl ?? (options.ports ? (edgeId) => route('port.popup', {port: String(edgeId).split('.')[0], from: '-1d'}) : null);
 
             network.setOptions({interaction: {hover: true}});
 
             network.on('hoverNode', function (params) {
-                const path = devicePath(params.node);
-                if (path) {
-                    visPopups.show(path, visPopups.nodeRect(network, params.node));
+                const url = deviceUrl(params.node);
+                if (url) {
+                    visPopups.show(url, visPopups.nodeRect(network, params.node));
                 }
             });
             network.on('blurNode', () => visPopups.hide(200));
 
-            if (portPath) {
+            if (portUrl) {
                 network.on('hoverEdge', function (params) {
-                    const path = portPath(params.edge);
-                    if (path) {
-                        visPopups.show(path, visPopups.pointerRect(network, params));
+                    const url = portUrl(params.edge);
+                    if (url) {
+                        visPopups.show(url, visPopups.pointerRect(network, params));
                     }
                 });
                 network.on('blurEdge', () => visPopups.hide(200));

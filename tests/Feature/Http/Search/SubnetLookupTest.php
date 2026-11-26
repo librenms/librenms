@@ -24,9 +24,9 @@ class SubnetLookupTest extends SearchTestCase
     private function subnetOf(string $ip): HostSubnet
     {
         $admin = $this->admin();
-        $host = (new HostLookup($admin))->find([new HostKey([IP::parse($ip)])])[0];
+        $host = new HostLookup($admin)->find([new HostKey([IP::parse($ip)])])[0];
 
-        return (new SubnetLookup($admin))->find($host);
+        return new SubnetLookup($admin)->find($host);
     }
 
     /**
@@ -51,7 +51,7 @@ class SubnetLookupTest extends SearchTestCase
         $this->assertSame(6, $subnet->count());
         $this->assertSame(1, $subnet->hiddenOnNetwork(3));
         $this->assertSame(2, $subnet->hiddenOnNetwork(1));
-        $this->assertSame(0, (new HostSubnet(collect([new Gateway(IP::parse('10.88.1.1'), $port, 1)]), collect(), null))->hiddenOnNetwork(0));
+        $this->assertSame(0, new HostSubnet(collect([new Gateway(IP::parse('10.88.1.1'), $port, 1)]), collect(), null)->hiddenOnNetwork(0));
     }
 
     /**

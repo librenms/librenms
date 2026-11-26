@@ -18,7 +18,7 @@
 
     <x-panel title="{{ __('Locations') }}" id="locations-panel">
         <div class="table-responsive">
-            <table id="locations" class="table table-hover table-condensed table-striped" data-url="{{ route('table.location') }}">
+            <table id="locations" class="table table-hover table-condensed table-striped" data-url="{{ route('table.location') }}" data-export-url="{{ route('table.location.export') }}">
                 <thead>
                 <tr>
                     <th data-column-id="location" data-formatter="location" data-order="asc">{{ __('Location') }}</th>
@@ -78,7 +78,7 @@
         var locations_grid = null;
 
         $(document).ready(function () {
-            locations_grid = $("#locations").bootgrid({
+            locations_grid = bootgridWithExport($("#locations"), {
                 ajax: true,
                 rowCount: [25, 50, 100, -1],
                 formatters: {

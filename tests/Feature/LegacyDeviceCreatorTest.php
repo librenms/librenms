@@ -167,7 +167,7 @@ final class LegacyDeviceCreatorTest extends DBTestCase
         $v3 = $this->snmpSecret(['authlevel' => 'authNoPriv', 'authname' => 'user', 'authpass' => 'password1'], SecretType::SnmpV3);
         LibrenmsConfig::set('snmp.default_credentials', [$v2c->id, $v3->id]);
 
-        $this->assertTrue((new LegacyDeviceCreator(hostname: 'forced-v3.example.com', snmpver: 'v3', force: true))->execute());
+        $this->assertTrue(new LegacyDeviceCreator(hostname: 'forced-v3.example.com', snmpver: 'v3', force: true)->execute());
 
         $device = Device::where('hostname', 'forced-v3.example.com')->firstOrFail();
         $this->assertSame($v3->id, $device->pollingMethod(PollingMethodType::Snmp)->secret_id);

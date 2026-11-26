@@ -73,4 +73,4 @@ Opt back in before the next run of `daily.sh`. All your existing data
 stays.
 
 If you have more questions, ask on our [discord
-server](https://t.libren.ms/discord) or on the community forum.
+server](https://discord.com/invite/librenms) or on the community forum.

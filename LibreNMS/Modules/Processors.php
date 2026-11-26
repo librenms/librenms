@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Enum\PollingMethodType;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\ProcessorPolling;
 use LibreNMS\OS;
@@ -58,7 +58,7 @@ class Processors implements Module
     /**
      * @inheritDoc
      */
-    public function poll(OS $os, DataStorageInterface $datastore): void
+    public function poll(OS $os, WriteInterface $datastore): void
     {
         $processors = $os->getDevice()->processors;
 
@@ -88,10 +88,8 @@ class Processors implements Module
             $usage = $processor->processor_usage === null ? null : round($processor->processor_usage, 2);
             Log::info("$processor->processor_descr: $usage%");
 
-            $rrd_name = ['processor', $processor->processor_type, $processor->processor_index];
-            $tags = ['processor_type' => $processor->processor_type, 'processor_index' => $processor->processor_index, 'rrd_name' => $rrd_name, 'rrd_def' => $rrd_def];
-            $fields = ['usage' => $usage];
-            $datastore->put($os->getDeviceArray(), 'processors', $tags, $fields);
+            $metric = $processor->setRelation('device', $os->getDevice())->metricIdentity('processor');
+            $datastore->write($metric->measurement, ['usage' => $usage], $metric->tags, ['metric' => $metric, 'rrd_def' => $rrd_def]);
 
             // store null usage when polling fails so a stale value is not shown
             $processor->save();

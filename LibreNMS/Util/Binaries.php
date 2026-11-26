@@ -35,7 +35,7 @@ use App\Facades\LibrenmsConfig;
 class Binaries
 {
     /** searched after PATH, which may be empty when running from cron or systemd */
-    private const SEARCH_DIRS = ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'];
+    private const array SEARCH_DIRS = ['/usr/local/sbin', '/usr/local/bin', '/usr/sbin', '/usr/bin', '/sbin', '/bin'];
     /** binaries that could be set in the LibreNMS config and their setting, support for these settings will be removed */
     public const LEGACY_SETTINGS = [
         'fping' => 'fping',

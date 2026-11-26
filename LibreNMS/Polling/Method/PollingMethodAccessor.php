@@ -7,10 +7,8 @@ use App\Models\DevicePollingMethod;
 use Illuminate\Support\Collection;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Polling\Method\Config\IcmpConfig;
-use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
 use LibreNMS\Polling\Method\Config\SnmpConfig;
-use LibreNMS\Polling\Method\Config\UnixAgentConfig;
 
 readonly class PollingMethodAccessor
 {
@@ -37,18 +35,6 @@ readonly class PollingMethodAccessor
         return $this->get(PollingMethodType::Icmp);
     }
 
-    public function ipmi(): IpmiConfig
-    {
-        /** @var IpmiConfig */
-        return $this->get(PollingMethodType::Ipmi);
-    }
-
-    public function unixAgent(): UnixAgentConfig
-    {
-        /** @var UnixAgentConfig */
-        return $this->get(PollingMethodType::UnixAgent);
-    }
-
     /**
      * The method is configured and enabled for this device.
      */
@@ -64,13 +50,7 @@ readonly class PollingMethodAccessor
      */
     public function anyEnabled(array $types): bool
     {
-        foreach ($types as $type) {
-            if ($this->isEnabled($type)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($types, fn ($type) => $this->isEnabled($type));
     }
 
     /**

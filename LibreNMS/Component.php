@@ -75,6 +75,11 @@ class Component
         }
     }
 
+    /**
+     * Components with their prefs, grouped by device_id then keyed by component id
+     *
+     * @return array<int, array<int, array<string, mixed>>>
+     */
     public function getComponents($device_id = null, $options = [])
     {
         $query = \App\Models\Component::query()

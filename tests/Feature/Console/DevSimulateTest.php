@@ -42,8 +42,8 @@ final class DevSimulateTest extends DBTestCase
         $command->setInput($input);
         $command->setOutput(new OutputStyle($input, new BufferedOutput));
 
-        (new \ReflectionProperty($command, 'snmpsim'))->setValue($command, $snmpsim);
+        new \ReflectionProperty($command, 'snmpsim')->setValue($command, $snmpsim);
 
-        (new \ReflectionMethod($command, 'addDevice'))->invoke($command, $community);
+        new \ReflectionMethod($command, 'addDevice')->invoke($command, $community);
     }
 }

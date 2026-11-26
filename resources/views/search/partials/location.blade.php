@@ -12,7 +12,7 @@
             </div>
             <span class="tw:block tw:text-sm tw:text-gray-500 tw:dark:text-dark-white-400">
                 {{ collect([
-                    $location->vlan ? __('search.list.vlan') . ' ' . $location->vlan->vlan_vlan : null,
+                    $location->vlan ? __('search.list.vlan') . ' ' . $location->vlan : null,
                     trans_choice('search.macs_count', $location->macCount),
                     $location->portDescription(),
                     $location->updatedAt?->diffForHumans(),

@@ -30,6 +30,7 @@ use App\Models\Dashboard;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * @extends SelectController<Dashboard>
@@ -52,7 +53,7 @@ class DashboardController extends SelectController
             ->leftJoin('users', 'dashboards.user_id', 'users.user_id') // left join so we can search username
             ->orderBy('dashboards.user_id')
             ->orderBy('dashboard_name')
-            ->select(['dashboard_id', 'username', 'dashboard_name']);
+            ->select(['dashboards.dashboard_id', 'users.username', 'dashboards.dashboard_name', 'dashboards.access', 'dashboards.user_id']);
     }
 
     /**
@@ -88,6 +89,6 @@ class DashboardController extends SelectController
         $username = $dashboard->username ?? __('Unknown');
 
         return "$username: {$dashboard->dashboard_name} ("
-            . ($dashboard->access == 1 ? __('read-only') : __('read-write')) . ')';
+            . (Gate::allows('update', $dashboard) ? __('read-write') : __('read-only')) . ')';
     }
 }

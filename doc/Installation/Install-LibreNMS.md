@@ -370,7 +370,7 @@ This saves resources. You can also tune the performance settings in `librenms.co
 
          charset utf-8;
          gzip on;
-         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+         gzip_types text/css application/javascript text/javascript application/x-javascript application/json image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
          location / {
           try_files $uri $uri/ /index.php?$query_string;
          }
@@ -408,7 +408,7 @@ This saves resources. You can also tune the performance settings in `librenms.co
 
          charset utf-8;
          gzip on;
-         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+         gzip_types text/css application/javascript text/javascript application/x-javascript application/json image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
          location / {
           try_files $uri $uri/ /index.php?$query_string;
          }
@@ -446,7 +446,7 @@ This saves resources. You can also tune the performance settings in `librenms.co
 
          charset utf-8;
          gzip on;
-         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+         gzip_types text/css application/javascript text/javascript application/x-javascript application/json image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
          location / {
           try_files $uri $uri/ /index.php?$query_string;
          }
@@ -484,7 +484,7 @@ This saves resources. You can also tune the performance settings in `librenms.co
 
          charset utf-8;
          gzip on;
-         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+         gzip_types text/css application/javascript text/javascript application/x-javascript application/json image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
          location / {
           try_files $uri $uri/ /index.php?$query_string;
          }
@@ -522,7 +522,7 @@ This saves resources. You can also tune the performance settings in `librenms.co
 
          charset utf-8;
          gzip on;
-         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+         gzip_types text/css application/javascript text/javascript application/x-javascript application/json image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
          location / {
           try_files $uri $uri/ /index.php?$query_string;
          }
@@ -803,4 +803,4 @@ page](../General/Callback-Stats-and-Privacy.md).
 
 There are [many ways to help](../Support/FAQ.md#faq9) to make LibreNMS
 better. You can also [back LibreNMS on Open
-Collective](https://t.libren.ms/donations).
+Collective](https://opencollective.com/librenms).

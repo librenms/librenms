@@ -42,12 +42,12 @@ class DeviceLocks
      */
     public function release(Device $device): void
     {
-        (new UniqueLock($this->cache))->release($this->pollJob($device));
+        new UniqueLock($this->cache)->release($this->pollJob($device));
     }
 
     private function pollJob(Device $device): PollDevice
     {
-        return (new PollDevice($device->device_id, ModuleList::fromUserOverrides([])))
+        return new PollDevice($device->device_id, ModuleList::fromUserOverrides([]))
             ->onQueue(PollDevice::queueFor((int) $device->poller_group));
     }
 }

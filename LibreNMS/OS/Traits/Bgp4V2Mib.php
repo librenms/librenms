@@ -111,6 +111,6 @@ trait Bgp4V2Mib
             }
         }
 
-        return (new Collection($families))->filter()->values();
+        return new Collection($families)->filter()->values();
     }
 }

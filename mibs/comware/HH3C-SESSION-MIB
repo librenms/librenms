@@ -1,9 +1,9 @@
 -- =========================================================================
--- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: The MIB is designed to set session configuration or get session information.
 -- Reference:
--- Version: V1.4
+-- Version: V1.6
 -- History:
 --  V1.0 2013-12-20 created by liqian 04379
 --       Initial version.
@@ -31,6 +31,15 @@
 --       Add hh3cSessUsageAbruptAlarmTrap hh3cSessRateAbruptAlarmTrap hh3cSessTryRateAbruptAlarmTrap.
 --       2019-11-11 modified by zhongtingming 18548
 --       Add hh3cSessionThdMaxTrap hh3cSessionThdRecoveryTrap.
+--  V1.5 2022-08-02 modified by liuzhengrui 17656
+--       Add hh3cSessSpecMaxTrap, hh3cSessSpecOverTrap, hh3cSessSpecBelowTrap, hh3cSessAlgSpecMaxTrap,
+--       hh3cSessAlgSpecOverTrap,hh3cSessAlgSpecBelowTrap, hh3cSessDenySpecMaxTrap,
+--       hh3cSessDenySpecOverTrap, hh3cSessDenySpecBelowTrap, hh3cSessCapabilityMaxTrap,
+--       hh3cSessCapabilityOverTrap, hh3cSessCapabilityBelowTrap, hh3cSessCapabilityRateMaxTrap,
+--       hh3cSessCapabilityRateOverTrap, hh3cSessCapabilityRateBelowTrap, hh3cSessionTrapUser.
+--  V1.6 2022-09-30 modified by liuzhengrui 17656
+--       Add hh3cSessionAllTables, hh3cSessionAllStatTable, hh3cSessionAllStatEntry, hh3cSessionAllIndex,
+--       hh3cSessionAllStatCount,hh3cSessionAllStatCreateRate.
 -- =========================================================================
 HH3C-SESSION-MIB DEFINITIONS ::= BEGIN
 
@@ -41,7 +50,7 @@ IMPORTS
     FROM SNMPv2-SMI;
 
 hh3cSession MODULE-IDENTITY
-    LAST-UPDATED "201911111427Z"   -- November 11, 2019
+    LAST-UPDATED "202209301105Z"   -- September 30, 2022
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -53,6 +62,17 @@ hh3cSession MODULE-IDENTITY
         "The MIB is designed to manage sessions."
 
     -- Revision History
+    REVISION "202209301105Z"  -- September 30, 2022
+    DESCRIPTION
+        "Add hh3cSessionAllTables, hh3cSessionAllStatTable, hh3cSessionAllStatEntry, ,
+    hh3cSessionAllStatCount, hh3cSessionAllStatCreateRate"
+    REVISION "202208031105Z"  -- August 3, 2022
+    DESCRIPTION
+        "Add hh3cSessSpecMaxTrap, hh3cSessSpecOverTrap, hh3cSessSpecBelowTrap, hh3cSessAlgSpecMaxTrap,
+    hh3cSessAlgSpecOverTrap,hh3cSessAlgSpecBelowTrap, hh3cSessDenySpecMaxTrap,
+    hh3cSessDenySpecOverTrap, hh3cSessDenySpecBelowTrap, hh3cSessCapabilityMaxTrap,
+    hh3cSessCapabilityOverTrap, hh3cSessCapabilityBelowTrap, hh3cSessCapabilityRateMaxTrap,
+    hh3cSessCapabilityRateOverTrap, hh3cSessCapabilityRateBelowTrap, hh3cSessionTrapUser"
     REVISION "201911111427Z"  -- November 11, 2019
     DESCRIPTION
         "Add hh3cSessionThdMaxTrap hh3cSessionThdRecoveryTrap"
@@ -65,24 +85,24 @@ hh3cSession MODULE-IDENTITY
     REVISION "201612251105Z"  -- December 25, 2016
     DESCRIPTION
         "Add the hh3cSessionStatDNSCount,
-         h3cSessionStatFTPCount,
-         h3cSessionStatGTPCount,
-         h3cSessionStatH323Count,
-         h3cSessionStatHTTPCount,
-         h3cSessionStatILSCount,
-         h3cSessionStatMGCPCount,
-         h3cSessionStatNBTCount,
-         h3cSessionStatPPTPCount,
-         h3cSessionStatRSHCount,
-         h3cSessionStatRTSPCount,
-         h3cSessionStatSCCPCount,
-         h3cSessionStatSIPCount,
-         h3cSessionStatSMTPCount,
-         h3cSessionStatSQLNETCount,
-         h3cSessionStatSSHCount,
-         h3cSessionStatTELNETCount,
-         h3cSessionStatTFTPCount,
-         h3cSessionStatXDMCPCount."
+         hh3cSessionStatFTPCount,
+         hh3cSessionStatGTPCount,
+         hh3cSessionStatH323Count,
+         hh3cSessionStatHTTPCount,
+         hh3cSessionStatILSCount,
+         hh3cSessionStatMGCPCount,
+         hh3cSessionStatNBTCount,
+         hh3cSessionStatPPTPCount,
+         hh3cSessionStatRSHCount,
+         hh3cSessionStatRTSPCount,
+         hh3cSessionStatSCCPCount,
+         hh3cSessionStatSIPCount,
+         hh3cSessionStatSMTPCount,
+         hh3cSessionStatSQLNETCount,
+         hh3cSessionStatSSHCount,
+         hh3cSessionStatTELNETCount,
+         hh3cSessionStatTFTPCount,
+         hh3cSessionStatXDMCPCount."
     REVISION "201410141830Z"
     DESCRIPTION
         "Add hh3cSessionEntTCPTotal, hh3cSessionEntUDPTotal, hh3cSessionEntOtherTotal, hh3cSessionEntTable."
@@ -699,45 +719,292 @@ hh3cSessTryRateAbruptAlarmTrap NOTIFICATION-TYPE
     alarm is generated."
 ::= { hh3cSessionTrapObjects 3 }
 
+hh3cSessSpecMaxTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the session exceeds the board software specification."
+    ::= { hh3cSessionTrapObjects 4 }
+
+hh3cSessSpecOverTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the session exceeds the board software specification."
+    ::= { hh3cSessionTrapObjects 5 }
+
+hh3cSessSpecBelowTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the session recovers to the lower limit of the board."
+    ::= { hh3cSessionTrapObjects 6 }
+
+hh3cSessAlgSpecMaxTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the alg reached the threshold."
+    ::= { hh3cSessionTrapObjects 7 }
+
+hh3cSessAlgSpecOverTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the alg reached the threshold."
+    ::= { hh3cSessionTrapObjects 8 }
+
+hh3cSessAlgSpecBelowTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the alg recovers to the lower limit of the board."
+    ::= { hh3cSessionTrapObjects 9 }
+
+hh3cSessDenySpecMaxTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the deny session reached the threshold."
+    ::= { hh3cSessionTrapObjects 10 }
+
+hh3cSessDenySpecOverTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the deny session reached the threshold."
+    ::= { hh3cSessionTrapObjects 11 }
+
+hh3cSessDenySpecBelowTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the deny session recovers to the lower limit of the board."
+    ::= { hh3cSessionTrapObjects 12 }
+
+hh3cSessCapabilityMaxTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu,
+            hh3cSessionTrapUser
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the maximum number of concurrent session has been reached."
+    ::= { hh3cSessionTrapObjects 13 }
+
+hh3cSessCapabilityOverTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu,
+            hh3cSessionTrapUser
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the maximum number of concurrent session has been reached."
+    ::= { hh3cSessionTrapObjects 14 }
+
+hh3cSessCapabilityBelowTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu,
+            hh3cSessionTrapUser
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the number of concurrent sessions is restored to the lower limit."
+    ::= { hh3cSessionTrapObjects 15 }
+
+hh3cSessCapabilityRateMaxTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu,
+            hh3cSessionTrapUser
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the session creation rate reaches the upper limit."
+    ::= { hh3cSessionTrapObjects 16 }
+
+hh3cSessCapabilityRateOverTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu,
+            hh3cSessionTrapUser
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the session creation rate reaches the upper limit."
+    ::= { hh3cSessionTrapObjects 17 }
+
+hh3cSessCapabilityRateBelowTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cSessionChassis,
+            hh3cSessionSlot,
+            hh3cSessionCpu,
+            hh3cSessionTrapUser
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the session creation rate returns to the lower limit."
+    ::= { hh3cSessionTrapObjects 18 }
+
+
 hh3cSessionAbruptAlarm OBJECT IDENTIFIER ::= { hh3cSessionMonitor 1 }
 
 hh3cSessionUsageAbruptVar OBJECT-TYPE
-  SYNTAX Unsigned32
-  MAX-ACCESS accessible-for-notify
-  STATUS current
-  DESCRIPTION
-    "The value is percentage change about session concurrency during a statistical period(10s)."
-  ::= { hh3cSessionAbruptAlarm 1}
+    SYNTAX Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The value is percentage change about session concurrency during a statistical period(10s)."
+    ::= { hh3cSessionAbruptAlarm 1}
 
 hh3cSessionRateAbruptVar OBJECT-TYPE
-  SYNTAX Unsigned32
-  MAX-ACCESS accessible-for-notify
-  STATUS current
-  DESCRIPTION
-    "The value is percentage change about session creation rate during a statistical period(10s)."
-  ::= { hh3cSessionAbruptAlarm 2 }
+    SYNTAX Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The value is percentage change about session creation rate during a statistical period(10s)."
+    ::= { hh3cSessionAbruptAlarm 2 }
 
 hh3cSessionTryRateAbruptVar OBJECT-TYPE
-  SYNTAX Unsigned32
-  MAX-ACCESS accessible-for-notify
-  STATUS current
-  DESCRIPTION
-    "The value is percentage change about session attempt rate during a statistical period(10s)."
-  ::= { hh3cSessionAbruptAlarm 3 }
+    SYNTAX Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The value is percentage change about session attempt rate during a statistical period(10s)."
+    ::= { hh3cSessionAbruptAlarm 3 }
 
 hh3cSessionLastStat OBJECT-TYPE
-  SYNTAX Unsigned32
-  MAX-ACCESS accessible-for-notify
-  STATUS current
-  DESCRIPTION
-    "The value of last session statistics(Usage:piece  Rate/TryRate:piece/s)."
-  ::= { hh3cSessionAbruptAlarm 4}
+    SYNTAX Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The value of last session statistics(Usage:piece  Rate/TryRate:piece/s)."
+    ::= { hh3cSessionAbruptAlarm 4}
 
 hh3cSessionCurrentStat OBJECT-TYPE
-  SYNTAX Unsigned32
-  MAX-ACCESS accessible-for-notify
-  STATUS current
-  DESCRIPTION
-    "The value of current session statistics(Usage:piece  Rate/TryRate:piece/s)."
-  ::= { hh3cSessionAbruptAlarm 5}
+    SYNTAX Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The value of current session statistics(Usage:piece  Rate/TryRate:piece/s)."
+    ::= { hh3cSessionAbruptAlarm 5}
+
+hh3cSessionTrapUser OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..256))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The value is the users to which the current notification belongs."
+    ::= { hh3cSessionAbruptAlarm 6}
+
+hh3cSessionAllTables OBJECT IDENTIFIER ::= { hh3cSession 2 }
+-- ----------------------------------------------------------------------
+  -- Session statistic table all slot
+-- ----------------------------------------------------------------------
+hh3cSessionAllStatTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Hh3cSessionAllStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "The statistics of all sessions."
+    ::= { hh3cSessionAllTables 1 }
+
+hh3cSessionAllStatEntry OBJECT-TYPE
+    SYNTAX  Hh3cSessionAllStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "An entry (conceptual row) representing session all statistics information."
+  INDEX { hh3cSessionAllIndex }
+    ::= { hh3cSessionAllStatTable 1 }
+
+Hh3cSessionAllStatEntry ::= SEQUENCE {
+  hh3cSessionAllIndex                Unsigned32,
+    hh3cSessionAllStatCount            Unsigned32,
+    hh3cSessionAllStatCreateRate       Unsigned32
+    }
+
+hh3cSessionAllIndex   OBJECT-TYPE
+    SYNTAX Unsigned32(0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "Device entity index."
+    ::= { hh3cSessionAllStatEntry  1 }
+
+hh3cSessionAllStatCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of current all sessions."
+    ::= { hh3cSessionAllStatEntry  2 }
+
+hh3cSessionAllStatCreateRate     OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "The number of all sessions per second."
+    ::= { hh3cSessionAllStatEntry  3 }
+
 END

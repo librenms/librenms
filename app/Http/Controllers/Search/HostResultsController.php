@@ -47,7 +47,7 @@ class HostResultsController extends Controller
     /**
      * Loopback and link local addresses are in use on many hosts, so they don't identify this one
      */
-    private const LOCAL_NETWORKS = ['127.0.0.0/8', '169.254.0.0/16', '::1/128', 'fe80::/10'];
+    private const array LOCAL_NETWORKS = ['127.0.0.0/8', '169.254.0.0/16', '::1/128', 'fe80::/10'];
 
     public function __invoke(HostSearchRequest $request, Dns $dns): JsonResponse
     {
@@ -76,10 +76,10 @@ class HostResultsController extends Controller
             return null;
         }
 
-        $host = (new HostLookup($request->user()))->find([$target], follow: true)[0];
+        $host = new HostLookup($request->user())->find([$target], follow: true)[0];
 
         $searchedIp = $term->isExactIp() ? $term->ip : null;
-        $subnet = (new SubnetLookup($request->user()))->find($host, $searchedIp);
+        $subnet = new SubnetLookup($request->user())->find($host, $searchedIp);
 
         if ($host->isNotSeen()) {
             // not a host, but it may be the start of an IPv6 address, or the name or serial number of a device
@@ -191,7 +191,7 @@ class HostResultsController extends Controller
             'dir' => $direction,
             'summary' => $this->summary($request, $query, $results->total()),
             'html' => view('search.list', [
-                'hosts' => (new HostLookup($request->user()))->find($keys),
+                'hosts' => new HostLookup($request->user())->find($keys),
                 'results' => $results,
                 'sort' => $sort,
                 'direction' => $direction,

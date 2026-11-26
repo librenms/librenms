@@ -35,7 +35,7 @@ class PrinterTabTest extends TestCase
         PrinterSupply::factory()->for($device)->create();
 
         $this->actingAs($this->admin())
-            ->get(route('device', ['device' => $device, 'tab' => 'printer']))
+            ->get(route('device.printer', ['device' => $device]))
             ->assertOk()
             ->assertSee('Toner')
             ->assertSee('device_toner')
@@ -51,7 +51,7 @@ class PrinterTabTest extends TestCase
         $user->assignRole('user');
 
         $this->actingAs($user)
-            ->get(route('device', ['device' => $device, 'tab' => 'printer']))
+            ->get(route('device.printer', ['device' => $device]))
             ->assertForbidden();
     }
 }

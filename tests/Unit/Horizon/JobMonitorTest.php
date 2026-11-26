@@ -23,7 +23,7 @@ final class JobMonitorTest extends TestCase
             $this->job('c', 'completed', 4),
         ]));
 
-        $monitored = (new JobMonitor($jobs, $tags, Mockery::mock(MasterSupervisorRepository::class)))->monitoredJobs('device:9');
+        $monitored = new JobMonitor($jobs, $tags, Mockery::mock(MasterSupervisorRepository::class))->monitoredJobs('device:9');
 
         $this->assertSame(['a' => 'pending', 'b' => 'retrying', 'c' => 'completed'], $monitored->pluck('status', 'id')->all());
         $this->assertSame('PollDevice', $monitored[0]['name']);

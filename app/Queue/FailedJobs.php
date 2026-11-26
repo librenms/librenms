@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
  * Jobs that crashed, timed out or ran out of memory, recorded by the queue failer in failed_jobs.
  * Horizon keeps its own list too, retrying or deleting a job in one does not change the other.
  *
- * @phpstan-type FailedJobRow array{id: string, name: string, queue: string, status: 'failed', device_id: int|null, attempts: int|null, finished: Carbon|null, error: string, exception: string}
+ * @phpstan-type FailedJobRow array{id: string, name: string, queue: string, status: string, device_id: int|null, attempts: int|null, finished: Carbon|null, error: string, exception: string}
  */
 class FailedJobs
 {

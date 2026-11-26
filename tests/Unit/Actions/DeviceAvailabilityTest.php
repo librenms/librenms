@@ -113,7 +113,7 @@ final class DeviceAvailabilityTest extends TestCase
         $this->assertTrue($method->last_check_successful);
 
         // a new poll checks again
-        $this->assertFalse((new PerDeviceMethodResults($device))->isAvailable(PollingMethodType::UnixAgent));
+        $this->assertFalse(new PerDeviceMethodResults($device)->isAvailable(PollingMethodType::UnixAgent));
         $this->assertSame(2, $agent->probes);
     }
 

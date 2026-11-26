@@ -9,6 +9,7 @@ use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Polling\Method\Methods\IcmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\IpmiPollingMethod;
+use LibreNMS\Polling\Method\Methods\ProxmoxApiPollingMethod;
 use LibreNMS\Polling\Method\Methods\SnmpPollingMethod;
 use LibreNMS\Polling\Method\Methods\UnixAgentPollingMethod;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
@@ -23,6 +24,7 @@ final class PollingMethodRegistryTest extends TestCase
 
         $this->assertInstanceOf(IcmpPollingMethod::class, $registry->get(PollingMethodType::Icmp));
         $this->assertInstanceOf(IpmiPollingMethod::class, $registry->get(PollingMethodType::Ipmi));
+        $this->assertInstanceOf(ProxmoxApiPollingMethod::class, $registry->get(PollingMethodType::ProxmoxApi));
         $this->assertInstanceOf(SnmpPollingMethod::class, $registry->get(PollingMethodType::Snmp));
         $this->assertInstanceOf(UnixAgentPollingMethod::class, $registry->get(PollingMethodType::UnixAgent));
     }
@@ -50,6 +52,7 @@ final class PollingMethodRegistryTest extends TestCase
 
         $this->assertSame([], $registry->get(PollingMethodType::Icmp)->secretTypes());
         $this->assertSame([SecretType::Ipmi], $registry->get(PollingMethodType::Ipmi)->secretTypes());
+        $this->assertSame([SecretType::ProxmoxApi], $registry->get(PollingMethodType::ProxmoxApi)->secretTypes());
         $this->assertSame([], $registry->get(PollingMethodType::UnixAgent)->secretTypes());
 
         $snmp = $registry->get(PollingMethodType::Snmp);
@@ -88,6 +91,7 @@ final class PollingMethodRegistryTest extends TestCase
 
         $this->assertTrue($registry->get(PollingMethodType::Icmp)->defaultAffectsAvailability());
         $this->assertFalse($registry->get(PollingMethodType::Ipmi)->defaultAffectsAvailability());
+        $this->assertFalse($registry->get(PollingMethodType::ProxmoxApi)->defaultAffectsAvailability());
         $this->assertTrue($registry->get(PollingMethodType::Snmp)->defaultAffectsAvailability());
         $this->assertFalse($registry->get(PollingMethodType::UnixAgent)->defaultAffectsAvailability());
     }

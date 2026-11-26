@@ -26,8 +26,18 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Collection;
+
 class Asa extends Shared\Cisco
 {
+    /**
+     * ENTITY-SENSOR-MIB values of ASA security contexts are not valid
+     */
+    public function discoverEntitySensors(): Collection
+    {
+        return str_ends_with((string) $this->getDevice()->hardware, 'sc') ? new Collection : parent::discoverEntitySensors();
+    }
+
     // disable unsupported netstats
     public function pollIcmpNetstats(array $oids): array
     {

@@ -47,7 +47,7 @@ class DevicePopupController
         return view('device.popup', [
             'device' => $device,
             'osText' => LibrenmsConfig::getOsSetting($device->os ?? '', 'text'),
-            'href' => route('device', ['device' => $device->device_id]),
+            'href' => route('device.overview', ['device' => $device->device_id]),
             'graphs' => $this->buildGraphs($request, $device),
         ]);
     }

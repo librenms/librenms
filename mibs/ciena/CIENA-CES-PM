@@ -1,4 +1,4 @@
--- This file was included in WWP MIB release 04-16-00-0047
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-06-00-5005
 --                                                      
 -- CIENA-CES-PM-MIB.my
 --
@@ -10,27 +10,146 @@
    Integer32,Counter64,Unsigned32, NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY
         FROM SNMPv2-SMI                 
    DisplayString, RowStatus, TruthValue, TEXTUAL-CONVENTION
-       FROM SNMPv2-TC                
+       FROM SNMPv2-TC
    cienaGlobalSeverity, cienaGlobalMacAddress
         FROM CIENA-GLOBAL-MIB
    cienaCesStatistics, cienaCesNotifications
         FROM CIENA-SMI
    CienaGlobalState, CienaStatsClear
    		FROM CIENA-TC;
-	
+
 	cienaCesPmMib MODULE-IDENTITY
-			LAST-UPDATED "201609140000Z"
-			ORGANIZATION
-				"Ciena Corp."
-			CONTACT-INFO
-        	"  Mib Meister
-               115 North Sullivan Road
-               Spokane Valley, WA 99037
-               USA            
-               Phone:  +1 509 242 9000
-               Email:  support@ciena.com"  
+          LAST-UPDATED "201801310000Z"
+          ORGANIZATION "Ciena Corp."
+          CONTACT-INFO
+          "   Mib Meister
+              7035 Ridge Road
+              Hanover, Maryland 21076
+              USA
+              Phone:  +1 800 921 1144
+              Email:  support@ciena.com"
           DESCRIPTION
 				"This module defines the performance monitor statistics objects."
+
+          REVISION    "201801310000Z"
+          DESCRIPTION
+                                "Added the following objects to cienaCesPmTdmPwHistoryBinTable:
+                                    cienaCesPmTdmPwHistoryBinTxLbit
+                                    cienaCesPmTdmPwHistoryBinTxRbit
+                                    cienaCesPmTdmPwHistoryBinTxMbit
+                                    cienaCesPmTdmPwHistoryBinNbit
+                                    cienaCesPmTdmPwHistoryBinTxNbit
+                                    cienaCesPmTdmPwHistoryBinPbit
+                                    cienaCesPmTdmPwHistoryBinTxPbit
+
+                                 Added the following objects to cienaCesPmTdmPwCurrBinTable:
+                                    cienaCesPmTdmPwCurrBinTxLbit
+                                    cienaCesPmTdmPwCurrBinTxRbit
+                                    cienaCesPmTdmPwCurrBinTxMbit
+                                    cienaCesPmTdmPwCurrBinNbit
+                                    cienaCesPmTdmPwCurrBinTxNbit
+                                    cienaCesPmTdmPwCurrBinPbit
+                                    cienaCesPmTdmPwCurrBinTxPbit
+
+                                 Added the following objets to cienaCesPmTdmPwCurr24HBinTable:
+                                    cienaCesPmTdmPwCurr24HBinTxLbit
+                                    cienaCesPmTdmPwCurr24HBinTxRbit
+                                    cienaCesPmTdmPwCurr24HBinTxMbit
+                                    cienaCesPmTdmPwCurr24HBinNbit
+                                    cienaCesPmTdmPwCurr24HBinTxNbit
+                                    cienaCesPmTdmPwCurr24HBinPbit
+                                    cienaCesPmTdmPwCurr24HBinTxPbit
+
+                                 Added the following objects to cienaCesPmTdmPwHist24HBinTable:
+                                    cienaCesPmTdmPwHist24HBinTxLbit
+                                    cienaCesPmTdmPwHist24HBinTxRbit
+                                    cienaCesPmTdmPwHist24HBinTxMbit
+                                    cienaCesPmTdmPwHist24HBinNbit
+                                    cienaCesPmTdmPwHist24HBinTxNbit
+                                    cienaCesPmTdmPwHist24HBinPbit
+                                    cienaCesPmTdmPwHist24HBinTxPbit
+
+                                Added the following objects to cienaCesPmTdmPwStatisticsBinTable:
+                                    cienaCesPmTdmPwStatisticsBinTxLbit
+                                    cienaCesPmTdmPwStatisticsBinTxRbit
+                                    cienaCesPmTdmPwStatisticsBinTxMbit
+                                    cienaCesPmTdmPwStatisticsBinNbit
+                                    cienaCesPmTdmPwStatisticsBinTxNbit
+                                    cienaCesPmTdmPwStatisticsBinPbit
+                                    cienaCesPmTdmPwStatisticsBinTxPbit
+
+                                Added the following objects to cienaCesPmTdmPwTotalStatisticsBinTable:
+                                    cienaCesPmTdmPwTotalStatisticsBinTxLbit
+                                    cienaCesPmTdmPwTotalStatisticsBinTxRbit
+                                    cienaCesPmTdmPwTotalStatisticsBinTxMbit
+                                    cienaCesPmTdmPwTotalStatisticsBinNbit
+                                    cienaCesPmTdmPwTotalStatisticsBinTxNbit
+                                    cienaCesPmTdmPwTotalStatisticsBinPbit
+                                    cienaCesPmTdmPwTotalStatisticsBinTxPbit"
+
+          REVISION    "201706070000Z"
+          DESCRIPTION 
+                                "Updated contact info."
+
+          REVISION    "201704110000Z"
+          DESCRIPTION
+                                "Added the following objects:
+                                    cienaCesPmFloodContainerHistoryBinTotalDroppedBytes
+                                    cienaCesPmFloodContainerHistoryBinTotalDroppedFrames
+                                    cienaCesPmFloodContainerCurrBinTotalDroppedBytes
+                                    cienaCesPmFloodContainerCurrBinTotalDroppedFrames
+                                    cienaCesPmFloodContainerCurr24HBinTotalDroppedBytes
+                                    cienaCesPmFloodContainerCurr24HBinTotalDroppedFrames
+                                    cienaCesPmFloodContainerHist24HBinTotalDroppedBytes
+                                    cienaCesPmFloodContainerHist24HBinTotalDroppedFrames
+                                    cienaCesPmFloodContainerStatsBinTotalDroppedBytes
+                                    cienaCesPmFloodContainerStatsBinTotalDroppedFrames
+                                    cienaCesPmFloodContainerTotalStatsBinTotalDroppedBytes
+                                    cienaCesPmFloodContainerTotalStatsBinTotalDroppedFrames
+                                 
+                                 Obsoleted the following table and all objects defined within:
+                                    cienaCesPmFloodContainerAllTimeBinTable
+                                    cienaCesPmFloodContainerAllTimeBinEntry
+                                    cienaCesPmFloodContainerAllTimeBinBcastDroppedBytes
+                                    cienaCesPmFloodContainerAllTimeBinBcastDroppedFrames
+                                    cienaCesPmFloodContainerAllTimeBinL2McastDroppedBytes
+                                    cienaCesPmFloodContainerAllTimeBinL2McastDroppedFrames
+                                    cienaCesPmFloodContainerAllTimeBinUnknownUnicastDroppedBytes
+                                    cienaCesPmFloodContainerAllTimeBinUnknownUnicastDroppedFrames"
+
+
+          REVISION    "201704050000Z"
+          DESCRIPTION
+                                "The following tables have been expanded with additional statitistics
+                                 added to the ExtendedTxRxProfile:
+                                  cienaCesPmExtendedTxRxHistoryBinTable, cienaCesPmExtendedTxRxCurrBinTable, 
+                                  cienaCesPmExtendedTxRxCurr24HBinTable, cienaCesPmExtendedTxRxHist24HBinTable, 
+                                  cienaCesPmExtendedTxRxStatisticsBinTable, cienaCesPmExtendedTxRxTotalStatisticsBinTable
+                                 The stats that were added:
+                                  9217To16383OctsPkts, Tx9217To16383OctsPkts"
+
+          REVISION    "201702060000Z"
+          DESCRIPTION
+                                "Split the PortOCn MIB into PortOCn and PortSTMn."
+
+          REVISION    "201611020000Z"
+          DESCRIPTION
+                                "Defined cienaCesPmEgressQueueIndexedStats branch, containing the
+                                 the following tables:
+                                  cienaCesPmEgressQueueIndexedHistoryBinTable,
+                                  cienaCesPmEgressQueueIndexedCurrBinTable,
+                                  cienaCesPmEgressQueueIndexedCurr24HBinTable,
+                                  cienaCesPmEgressQueueIndexedHist24HBinTable,
+                                  cienaCesPmEgressQueueIndexedStatisticsBinTable,
+                                  cienaCesPmEgressQueueIndexedTotalStatisticsBinTable
+                                 Each egress queue indexed table reports per-queue equivalent of
+                                 the aggregated statistics reported by the following tables:
+                                  cienaCesPmEgressqueueHistoryBinTable,
+                                  cienaCesPmEgressQueueCurrBinTable,
+                                  cienaCesPmEgressQueueCurr24HBinTable,
+                                  cienaCesPmEgressQueueHist24HBinTable,
+                                  cienaCesPmEgressQueueStatisticsBinTable,
+                                  cienaCesPmEgressQueueTotalStatisticsBinTable"
 
           REVISION    "201609140000Z"
           DESCRIPTION
@@ -71,8 +190,6 @@
           DESCRIPTION
                                 "Added ETSI stats for the follwing profile types:
                                     tdmOcnPortStats"
-
-
 
           REVISION    "201603080000Z"
           DESCRIPTION
@@ -294,6 +411,7 @@
     cienaCesPmFloodContainerStats            OBJECT IDENTIFIER ::= { cienaCesPmStatistics 5 } 
     cienaCesPmBasicRxStats                   OBJECT IDENTIFIER ::= { cienaCesPmStatistics 6 }
     cienaCesPmEgressQueueStats               OBJECT IDENTIFIER ::= { cienaCesPmStatistics 7 }
+    cienaCesPmEgressQueueIndexedStats        OBJECT IDENTIFIER ::= { cienaCesPmEgressQueueStats 10 }
     cienaCesPmQueueGroupStats                OBJECT IDENTIFIER ::= { cienaCesPmStatistics 8 }
     cienaCesPmTdmT1PortStats                 OBJECT IDENTIFIER ::= { cienaCesPmStatistics 9 }
     cienaCesPmTdmE1PortStats                 OBJECT IDENTIFIER ::= { cienaCesPmStatistics 10 }
@@ -305,6 +423,7 @@
     cienaCesPmTdmOCnPortStats                OBJECT IDENTIFIER ::= { cienaCesPmStatistics 16 }
     cienaCesPmTdmDS3PortStats                OBJECT IDENTIFIER ::= { cienaCesPmStatistics 17 }
     cienaCesPmBasicTxStats                   OBJECT IDENTIFIER ::= { cienaCesPmStatistics 18 }
+    cienaCesPmTdmSTMnPortStats               OBJECT IDENTIFIER ::= { cienaCesPmStatistics 19 }
     cienaCesPmInstanceIndexXref              OBJECT IDENTIFIER ::= { cienaCesPmMIBObjects 4 }
     cienaCesPmInstanceIndexXrefAuto          OBJECT IDENTIFIER ::= { cienaCesPmInstanceIndexXref 1 }
     cienaCesPmThreshold                      OBJECT IDENTIFIER ::= { cienaCesPmMib 3 }
@@ -405,6 +524,7 @@
  			   basicOdu(17),
 			   tdmOcnPortStats(18),
 			   tdmDs3PortStats(19),
+			   tdmStmnPortStats(20),
    			   unknown(99)
    			} 
   PmProfileFieldMapBasicPtp ::= TEXTUAL-CONVENTION
@@ -1182,7 +1302,9 @@
      cienaCesPmExtendedTxRxHistoryBinTxDeferPkts                Counter64,
      cienaCesPmExtendedTxRxHistoryBinLinkUp                     Counter64,
      cienaCesPmExtendedTxRxHistoryBinLinkDown                   Counter64,
-     cienaCesPmExtendedTxRxHistoryBinLinkFlap                   Counter64
+     cienaCesPmExtendedTxRxHistoryBinLinkFlap                   Counter64,
+     cienaCesPmExtendedTxRxHistoryBin9217To16383OctsPkts        Counter64,
+     cienaCesPmExtendedTxRxHistoryBinTx9217To16383OctsPkts      Counter64
   }                                                        
   cienaCesPmExtendedTxRxHistoryBinIndex OBJECT-TYPE
      SYNTAX      Unsigned32 (1..65535) 
@@ -1768,6 +1890,28 @@
              "The number of link flap events on the port."
      ::= { cienaCesPmExtendedTxRxHistoryBinEntry 64 }
 
+  cienaCesPmExtendedTxRxHistoryBin9217To16383OctsPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The total number of packets (including bad
+             packets) received that were between
+             9217 and 16383 octets in length inclusive
+             (excluding framing bits but including FCS octets)."
+     ::= { cienaCesPmExtendedTxRxHistoryBinEntry 65 }
+
+  cienaCesPmExtendedTxRxHistoryBinTx9217To16383OctsPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The total number of packets (including bad
+             packets) transmitted that were between
+             9217 and 16383 octets in length inclusive
+             (excluding framing bits but including FCS octets)."
+     ::= { cienaCesPmExtendedTxRxHistoryBinEntry 66 }
+
   --Extended Tx Rx Curr Bin Statistics Table
 
   cienaCesPmExtendedTxRxCurrBinTable OBJECT-TYPE
@@ -1852,7 +1996,9 @@
      cienaCesPmExtendedTxRxCurrBinTxDeferPkts                   Counter64,
      cienaCesPmExtendedTxRxCurrBinLinkUp                        Counter64,
      cienaCesPmExtendedTxRxCurrBinLinkDown                      Counter64,
-     cienaCesPmExtendedTxRxCurrBinLinkFlap                      Counter64
+     cienaCesPmExtendedTxRxCurrBinLinkFlap                      Counter64,
+     cienaCesPmExtendedTxRxCurrBin9217To16383OctsPkts           Counter64,
+     cienaCesPmExtendedTxRxCurrBinTx9217To16383OctsPkts         Counter64
  } 
   
   cienaCesPmExtendedTxRxCurrBinStartTime   OBJECT-TYPE
@@ -2424,6 +2570,28 @@
              "The number of link flap events on the port."
      ::= { cienaCesPmExtendedTxRxCurrBinEntry 62 }
   
+  cienaCesPmExtendedTxRxCurrBin9217To16383OctsPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The total number of packets (including bad
+             packets) received that were between
+             9217 and 16383 octets in length inclusive
+             (excluding framing bits but including FCS octets)."
+     ::= { cienaCesPmExtendedTxRxCurrBinEntry 63 }
+
+  cienaCesPmExtendedTxRxCurrBinTx9217To16383OctsPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The total number of packets (including bad
+             packets) transmitted that were between
+             9217 and 16383 octets in length inclusive
+             (excluding framing bits but including FCS octets)."
+     ::= { cienaCesPmExtendedTxRxCurrBinEntry 64 }
+
  --24 Hours Current Bin
  
  cienaCesPmExtendedTxRxCurr24HBinTable OBJECT-TYPE
@@ -2509,7 +2677,9 @@
      cienaCesPmExtendedTxRxCurr24HBinTxDeferPkts              Counter64,
      cienaCesPmExtendedTxRxCurr24HBinLinkUp                   Counter64,
      cienaCesPmExtendedTxRxCurr24HBinLinkDown                 Counter64,
-     cienaCesPmExtendedTxRxCurr24HBinLinkFlap                 Counter64
+     cienaCesPmExtendedTxRxCurr24HBinLinkFlap                 Counter64,
+     cienaCesPmExtendedTxRxCurr24HBin9217To16383OctsPkts      Counter64,
+     cienaCesPmExtendedTxRxCurr24HBinTx9217To16383OctsPkts    Counter64
    }
    cienaCesPmExtendedTxRxCurr24HBinStartTime   OBJECT-TYPE
      SYNTAX		DisplayString
@@ -3087,6 +3257,28 @@
              "The number of link flap events on the port."
      ::= { cienaCesPmExtendedTxRxCurr24HBinEntry 63 }
 
+  cienaCesPmExtendedTxRxCurr24HBin9217To16383OctsPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The total number of packets (including bad
+             packets) received that were between
+             9217 and 16383 octets in length inclusive
+             (excluding framing bits but including FCS octets)."
+     ::= { cienaCesPmExtendedTxRxCurr24HBinEntry 64 }
+
+  cienaCesPmExtendedTxRxCurr24HBinTx9217To16383OctsPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The total number of packets (including bad
+             packets) transmitted that were between
+             9217 and 16383 octets in length inclusive
+             (excluding framing bits but including FCS octets)."
+     ::= { cienaCesPmExtendedTxRxCurr24HBinEntry 65 }
+
  --24 Hours History Bin
  
  cienaCesPmExtendedTxRxHist24HBinTable OBJECT-TYPE
@@ -3172,7 +3364,9 @@
      cienaCesPmExtendedTxRxHist24HBinTxDeferPkts              Counter64,
      cienaCesPmExtendedTxRxHist24HBinLinkUp                   Counter64,
      cienaCesPmExtendedTxRxHist24HBinLinkDown                 Counter64,
-     cienaCesPmExtendedTxRxHist24HBinLinkFlap                 Counter64
+     cienaCesPmExtendedTxRxHist24HBinLinkFlap                 Counter64,
+     cienaCesPmExtendedTxRxHist24HBin9217To16383OctsPkts      Counter64,
+     cienaCesPmExtendedTxRxHist24HBinTx9217To16383OctsPkts    Counter64
 
    } 
    cienaCesPmExtendedTxRxHist24HBinStartTime   OBJECT-TYPE
@@ -3750,6 +3944,28 @@
              "The number of link flap events on the port."
      ::= { cienaCesPmExtendedTxRxHist24HBinEntry 63 }
 
+  cienaCesPmExtendedTxRxHist24HBin9217To16383OctsPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The total number of packets (including bad
+             packets) received that were between
+             9217 and 16383 octets in length inclusive
+             (excluding framing bits but including FCS octets)."
+     ::= { cienaCesPmExtendedTxRxHist24HBinEntry 64 }
+
+  cienaCesPmExtendedTxRxHist24HBinTx9217To16383OctsPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The total number of packets (including bad
+             packets) transmitted that were between
+             9217 and 16383 octets in length inclusive
+             (excluding framing bits but including FCS octets)."
+     ::= { cienaCesPmExtendedTxRxHist24HBinEntry 65 }
+
  --AllTime Bin
  
  cienaCesPmExtendedTxRxAllTimeBinTable OBJECT-TYPE
@@ -4241,7 +4457,9 @@
      cienaCesPmExtendedTxRxStatsBinTxDeferPkts                      Counter64,
      cienaCesPmExtendedTxRxStatsBinLinkUp                           Counter64,
      cienaCesPmExtendedTxRxStatsBinLinkDown                         Counter64,
-     cienaCesPmExtendedTxRxStatsBinLinkFlap                         Counter64
+     cienaCesPmExtendedTxRxStatsBinLinkFlap                         Counter64,
+     cienaCesPmExtendedTxRxStatsBin9217To16383OctsPkts              Counter64,
+     cienaCesPmExtendedTxRxStatsBinTx9217To16383OctsPkts            Counter64
    }
 
    cienaCesPmExtendedTxRxStatsBinStartTime OBJECT-TYPE
@@ -4794,6 +5012,28 @@
              "The number of link flap events on the port."
      ::= { cienaCesPmExtendedTxRxStatisticsBinEntry 60 }
 
+  cienaCesPmExtendedTxRxStatsBin9217To16383OctsPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The total number of packets (including bad
+             packets) received that were between
+             9217 and 16383 octets in length inclusive
+             (excluding framing bits but including FCS octets)."
+     ::= { cienaCesPmExtendedTxRxStatisticsBinEntry 61 }
+
+  cienaCesPmExtendedTxRxStatsBinTx9217To16383OctsPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The total number of packets (including bad
+             packets) transmitted that were between
+             9217 and 16383 octets in length inclusive
+             (excluding framing bits but including FCS octets)."
+     ::= { cienaCesPmExtendedTxRxStatisticsBinEntry 62 }
+
    --ExtendedTxRx Profile Stats, totalstatistics bin
  
  cienaCesPmExtendedTxRxTotalStatisticsBinTable OBJECT-TYPE
@@ -4872,7 +5112,9 @@
      cienaCesPmExtendedTxRxTotalStatsBinTxDeferPkts                 Counter64,
      cienaCesPmExtendedTxRxTotalStatsBinLinkUp                      Counter64,
      cienaCesPmExtendedTxRxTotalStatsBinLinkDown                    Counter64,
-     cienaCesPmExtendedTxRxTotalStatsBinLinkFlap                    Counter64
+     cienaCesPmExtendedTxRxTotalStatsBinLinkFlap                    Counter64,
+     cienaCesPmExtendedTxRxTotalStatsBin9217To16383OctsPkts         Counter64,
+     cienaCesPmExtendedTxRxTotalStatsBinTx9217To16383OctsPkts       Counter64
    }
 
    cienaCesPmExtendedTxRxTotalStatsBinStartTime OBJECT-TYPE
@@ -5417,6 +5659,28 @@
      DESCRIPTION
              "The number of link flap events on the port."
      ::= { cienaCesPmExtendedTxRxTotalStatisticsBinEntry 59 }
+
+  cienaCesPmExtendedTxRxTotalStatsBin9217To16383OctsPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The total number of packets (including bad
+             packets) received that were between
+             9217 and 16383 octets in length inclusive
+             (excluding framing bits but including FCS octets)."
+     ::= { cienaCesPmExtendedTxRxTotalStatisticsBinEntry 60 }
+
+  cienaCesPmExtendedTxRxTotalStatsBinTx9217To16383OctsPkts OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The total number of packets (including bad
+             packets) transmitted that were between
+             9217 and 16383 octets in length inclusive
+             (excluding framing bits but including FCS octets)."
+     ::= { cienaCesPmExtendedTxRxTotalStatisticsBinEntry 61 }
 
   --BasicTxRx Profile Stats
   
@@ -8609,18 +8873,20 @@
      ::= { cienaCesPmFloodContainerHistoryBinTable 1 }
         
  CienaCesPmFloodContainerHistoryBinEntry ::=  SEQUENCE { 
- 	 cienaCesPmFloodContainerHistoryBinIndex                       Unsigned32,
-     cienaCesPmFloodContainerHistoryBinStartTime			 		DisplayString,
+ 	 cienaCesPmFloodContainerHistoryBinIndex                   Unsigned32,
+     cienaCesPmFloodContainerHistoryBinStartTime                   DisplayString,
      cienaCesPmFloodContainerHistoryBinEndTime                     DisplayString,
-     cienaCesPmFloodContainerHistoryBinClearTime					DisplayString,
-     cienaCesPmFloodContainerHistoryBinDuration			 		Unsigned32,   
-     cienaCesPmFloodContainerHistoryBinState			 			PmBinState,  
+     cienaCesPmFloodContainerHistoryBinClearTime                   DisplayString,
+     cienaCesPmFloodContainerHistoryBinDuration                    Unsigned32,   
+     cienaCesPmFloodContainerHistoryBinState                       PmBinState,  
      cienaCesPmFloodContainerHistoryBinBcastDroppedBytes           Counter64,
      cienaCesPmFloodContainerHistoryBinBcastDroppedFrames          Counter64,
-     cienaCesPmFloodContainerHistoryBinL2McastDroppedBytes           Counter64,
-     cienaCesPmFloodContainerHistoryBinL2McastDroppedFrames          Counter64,
-     cienaCesPmFloodContainerHistoryBinUnknownUnicastDroppedBytes           Counter64,
-     cienaCesPmFloodContainerHistoryBinUnknownUnicastDroppedFrames          Counter64
+     cienaCesPmFloodContainerHistoryBinL2McastDroppedBytes         Counter64,
+     cienaCesPmFloodContainerHistoryBinL2McastDroppedFrames        Counter64,
+     cienaCesPmFloodContainerHistoryBinUnknownUnicastDroppedBytes  Counter64,
+     cienaCesPmFloodContainerHistoryBinUnknownUnicastDroppedFrames Counter64,
+     cienaCesPmFloodContainerHistoryBinTotalDroppedBytes           Counter64,
+     cienaCesPmFloodContainerHistoryBinTotalDroppedFrames          Counter64
      } 
   
    cienaCesPmFloodContainerHistoryBinIndex OBJECT-TYPE
@@ -8718,7 +8984,23 @@
         	"Unicast dropped frames."
         ::= { cienaCesPmFloodContainerHistoryBinEntry 12 }	 
     
- -- Pm Contain Current Bin Table   
+   cienaCesPmFloodContainerHistoryBinTotalDroppedBytes OBJECT-TYPE
+       SYNTAX Counter64
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+       		"Total dropped bytes." 
+       ::= { cienaCesPmFloodContainerHistoryBinEntry 13 }
+       
+   cienaCesPmFloodContainerHistoryBinTotalDroppedFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        	"Total dropped frames."
+        ::= { cienaCesPmFloodContainerHistoryBinEntry 14 }	 
+    
+-- Pm Contain Current Bin Table   
     
  cienaCesPmFloodContainerCurrBinTable OBJECT-TYPE
      SYNTAX     SEQUENCE OF CienaCesPmFloodContainerCurrBinEntry
@@ -8740,16 +9022,18 @@
      ::= { cienaCesPmFloodContainerCurrBinTable 1 }
         
  CienaCesPmFloodContainerCurrBinEntry ::=  SEQUENCE { 
- 	 cienaCesPmFloodContainerCurrBinStartTime		 					DisplayString,
-     cienaCesPmFloodContainerCurrBinClearedTime		 				DisplayString,
-     cienaCesPmFloodContainerCurrBinDuration			 				Unsigned32,   
-     cienaCesPmFloodContainerCurrBinState			 					PmBinState,  
-     cienaCesPmFloodContainerCurrBinBcastDroppedBytes       			Counter64,
-     cienaCesPmFloodContainerCurrBinBcastDroppedFrames      			Counter64,
-     cienaCesPmFloodContainerCurrBinL2McastDroppedBytes       			Counter64,
-     cienaCesPmFloodContainerCurrBinL2McastDroppedFrames      			Counter64,
-     cienaCesPmFloodContainerCurrBinUnknownUnicastDroppedBytes       	Counter64,
-     cienaCesPmFloodContainerCurrBinUnknownUnicastDroppedFrames      	Counter64
+ 	 cienaCesPmFloodContainerCurrBinStartTime               DisplayString,
+     cienaCesPmFloodContainerCurrBinClearedTime                 DisplayString,
+     cienaCesPmFloodContainerCurrBinDuration                    Unsigned32,   
+     cienaCesPmFloodContainerCurrBinState                       PmBinState,  
+     cienaCesPmFloodContainerCurrBinBcastDroppedBytes       	Counter64,
+     cienaCesPmFloodContainerCurrBinBcastDroppedFrames      	Counter64,
+     cienaCesPmFloodContainerCurrBinL2McastDroppedBytes       	Counter64,
+     cienaCesPmFloodContainerCurrBinL2McastDroppedFrames      	Counter64,
+     cienaCesPmFloodContainerCurrBinUnknownUnicastDroppedBytes  Counter64,
+     cienaCesPmFloodContainerCurrBinUnknownUnicastDroppedFrames Counter64,
+     cienaCesPmFloodContainerCurrBinTotalDroppedBytes           Counter64,
+     cienaCesPmFloodContainerCurrBinTotalDroppedFrames          Counter64
      } 
   
   cienaCesPmFloodContainerCurrBinStartTime   OBJECT-TYPE
@@ -8831,6 +9115,22 @@
         	"Unknown unicast dropped frames."
         ::= { cienaCesPmFloodContainerCurrBinEntry 10 }
  
+     cienaCesPmFloodContainerCurrBinTotalDroppedBytes OBJECT-TYPE
+       SYNTAX Counter64
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+       		"Total dropped bytes." 
+       ::= { cienaCesPmFloodContainerCurrBinEntry 11 }
+       
+      cienaCesPmFloodContainerCurrBinTotalDroppedFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        	"Total dropped frames."
+        ::= { cienaCesPmFloodContainerCurrBinEntry 12 }
+ 
   --FloodContainer bin current 24H bin stats.
   
   cienaCesPmFloodContainerCurr24HBinTable OBJECT-TYPE
@@ -8853,17 +9153,19 @@
      ::= { cienaCesPmFloodContainerCurr24HBinTable 1 }
         
  CienaCesPmFloodContainerCurr24HBinEntry ::=  SEQUENCE {
- 	 cienaCesPmFloodContainerCurr24HBinStartTime		 	 DisplayString,
-     cienaCesPmFloodContainerCurr24HBinEndTime		 		 DisplayString,
-     cienaCesPmFloodContainerCurr24HBinClearedTime		 	 DisplayString,
-     cienaCesPmFloodContainerCurr24HBinDuration		 		 Unsigned32,   
-     cienaCesPmFloodContainerCurr24HBinState		 		 PmBinState,  
-     cienaCesPmFloodContainerCurr24HBinBcastDroppedBytes     Counter64,
-     cienaCesPmFloodContainerCurr24HBinBcastDroppedFrames    Counter64,
-     cienaCesPmFloodContainerCurr24HBinL2McastDroppedBytes     Counter64,
-     cienaCesPmFloodContainerCurr24HBinL2McastDroppedFrames    Counter64,
-     cienaCesPmFloodContainerCurr24HBinUnknownUnicastDroppedBytes     Counter64,
-     cienaCesPmFloodContainerCurr24HBinUnknownUnicastDroppedFrames    Counter64
+ 	 cienaCesPmFloodContainerCurr24HBinStartTime               DisplayString,
+     cienaCesPmFloodContainerCurr24HBinEndTime                     DisplayString,
+     cienaCesPmFloodContainerCurr24HBinClearedTime                 DisplayString,
+     cienaCesPmFloodContainerCurr24HBinDuration                    Unsigned32,   
+     cienaCesPmFloodContainerCurr24HBinState                       PmBinState,  
+     cienaCesPmFloodContainerCurr24HBinBcastDroppedBytes           Counter64,
+     cienaCesPmFloodContainerCurr24HBinBcastDroppedFrames          Counter64,
+     cienaCesPmFloodContainerCurr24HBinL2McastDroppedBytes         Counter64,
+     cienaCesPmFloodContainerCurr24HBinL2McastDroppedFrames        Counter64,
+     cienaCesPmFloodContainerCurr24HBinUnknownUnicastDroppedBytes  Counter64,
+     cienaCesPmFloodContainerCurr24HBinUnknownUnicastDroppedFrames Counter64,
+     cienaCesPmFloodContainerCurr24HBinTotalDroppedBytes           Counter64,
+     cienaCesPmFloodContainerCurr24HBinTotalDroppedFrames          Counter64
      } 
    cienaCesPmFloodContainerCurr24HBinStartTime   OBJECT-TYPE
      SYNTAX		DisplayString
@@ -8951,7 +9253,22 @@
         	"Unknown unicast dropped frames."
         ::= { cienaCesPmFloodContainerCurr24HBinEntry 11 }
  
-
+     cienaCesPmFloodContainerCurr24HBinTotalDroppedBytes OBJECT-TYPE
+       SYNTAX Counter64
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+       		"Total dropped bytes." 
+       ::= { cienaCesPmFloodContainerCurr24HBinEntry 12 }
+       
+      cienaCesPmFloodContainerCurr24HBinTotalDroppedFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        	"Total dropped frames."
+        ::= { cienaCesPmFloodContainerCurr24HBinEntry 13 }
+ 
   --FloodContainer bin history 24H bin stats.
   
   cienaCesPmFloodContainerHist24HBinTable OBJECT-TYPE
@@ -8974,17 +9291,19 @@
      ::= { cienaCesPmFloodContainerHist24HBinTable 1 }
         
  CienaCesPmFloodContainerHist24HBinEntry ::=  SEQUENCE {
- 	 cienaCesPmFloodContainerHist24HBinStartTime		 	DisplayString,
-     cienaCesPmFloodContainerHist24HBinDuration		 		Unsigned32,   
-     cienaCesPmFloodContainerHist24HBinState		 		PmBinState,  
-     cienaCesPmFloodContainerHist24HBinBcastDroppedBytes    Counter64,
-     cienaCesPmFloodContainerHist24HBinBcastDroppedFrames   Counter64,
-     cienaCesPmFloodContainerHist24HBinL2McastDroppedBytes    Counter64,
-     cienaCesPmFloodContainerHist24HBinL2McastDroppedFrames   Counter64,
-     cienaCesPmFloodContainerHist24HBinUnknownUnicastDroppedBytes    Counter64,
-     cienaCesPmFloodContainerHist24HBinUnknownUnicastDroppedFrames   Counter64,
-     cienaCesPmFloodContainerHist24HBinEndTime                  DisplayString,
-     cienaCesPmFloodContainerHist24HBinClearTime                DisplayString
+ 	 cienaCesPmFloodContainerHist24HBinStartTime               DisplayString,
+     cienaCesPmFloodContainerHist24HBinDuration                    Unsigned32,   
+     cienaCesPmFloodContainerHist24HBinState                       PmBinState,  
+     cienaCesPmFloodContainerHist24HBinBcastDroppedBytes           Counter64,
+     cienaCesPmFloodContainerHist24HBinBcastDroppedFrames          Counter64,
+     cienaCesPmFloodContainerHist24HBinL2McastDroppedBytes         Counter64,
+     cienaCesPmFloodContainerHist24HBinL2McastDroppedFrames        Counter64,
+     cienaCesPmFloodContainerHist24HBinUnknownUnicastDroppedBytes  Counter64,
+     cienaCesPmFloodContainerHist24HBinUnknownUnicastDroppedFrames Counter64,
+     cienaCesPmFloodContainerHist24HBinEndTime                     DisplayString,
+     cienaCesPmFloodContainerHist24HBinClearTime                   DisplayString,
+     cienaCesPmFloodContainerHist24HBinTotalDroppedBytes           Counter64,
+     cienaCesPmFloodContainerHist24HBinTotalDroppedFrames          Counter64
      } 
   
    cienaCesPmFloodContainerHist24HBinStartTime   OBJECT-TYPE
@@ -9035,7 +9354,7 @@
       		"L2 multicast dropped bytes."
       ::= { cienaCesPmFloodContainerHist24HBinEntry 6 }
      
-    cienaCesPmFloodContainerHist24HBinL2McastDroppedFrames  OBJECT-TYPE
+   cienaCesPmFloodContainerHist24HBinL2McastDroppedFrames  OBJECT-TYPE
      SYNTAX Counter64
      MAX-ACCESS read-only
      STATUS current
@@ -9043,21 +9362,21 @@
       		"L2 multicast dropped frames."
       ::= { cienaCesPmFloodContainerHist24HBinEntry 7 }
 
-     cienaCesPmFloodContainerHist24HBinUnknownUnicastDroppedBytes OBJECT-TYPE
-       SYNTAX Counter64
-       MAX-ACCESS read-only
-       STATUS current
-       DESCRIPTION
-       		"Unicast dropped bytes." 
-       ::= { cienaCesPmFloodContainerHist24HBinEntry 8 }
+   cienaCesPmFloodContainerHist24HBinUnknownUnicastDroppedBytes OBJECT-TYPE
+     SYNTAX Counter64
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+      		"Unicast dropped bytes." 
+      ::= { cienaCesPmFloodContainerHist24HBinEntry 8 }
        
-      cienaCesPmFloodContainerHist24HBinUnknownUnicastDroppedFrames OBJECT-TYPE
-        SYNTAX Counter64
-        MAX-ACCESS read-only
-        STATUS current
-        DESCRIPTION
-        	"Unicast dropped frames."
-        ::= { cienaCesPmFloodContainerHist24HBinEntry 9 }
+   cienaCesPmFloodContainerHist24HBinUnknownUnicastDroppedFrames OBJECT-TYPE
+     SYNTAX Counter64
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+              	"Unicast dropped frames."
+      ::= { cienaCesPmFloodContainerHist24HBinEntry 9 }
 
    cienaCesPmFloodContainerHist24HBinEndTime OBJECT-TYPE
      SYNTAX      DisplayString
@@ -9072,13 +9391,27 @@
      STATUS      current
      DESCRIPTION "Collection clear time of the bin."
      ::= { cienaCesPmFloodContainerHist24HBinEntry 11 }
-
              
- -- FloodContainer All time bin Table.             
+   cienaCesPmFloodContainerHist24HBinTotalDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Total dropped bytes." 
+     ::= { cienaCesPmFloodContainerHist24HBinEntry 12 }
+       
+   cienaCesPmFloodContainerHist24HBinTotalDroppedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Total dropped frames."
+     ::= { cienaCesPmFloodContainerHist24HBinEntry 13 }
+             
+ -- FloodContainer All time bin Table.
+
  cienaCesPmFloodContainerAllTimeBinTable OBJECT-TYPE
      SYNTAX     SEQUENCE OF CienaCesPmFloodContainerAllTimeBinEntry
      MAX-ACCESS not-accessible
-     STATUS     deprecated
+     STATUS     obsolete
      DESCRIPTION
             "The (conceptual) read-only table listing the bin statistics."  
      ::= { cienaCesPmFloodContainerStats 5 }
@@ -9086,7 +9419,7 @@
    cienaCesPmFloodContainerAllTimeBinEntry OBJECT-TYPE
      SYNTAX      CienaCesPmFloodContainerAllTimeBinEntry
      MAX-ACCESS  not-accessible
-     STATUS      deprecated
+     STATUS      obsolete
      DESCRIPTION
            "An entry (conceptual row) in the cienaPortPmIGMPBinTable.
 
@@ -9095,60 +9428,70 @@
      ::= { cienaCesPmFloodContainerAllTimeBinTable 1 }
         
  CienaCesPmFloodContainerAllTimeBinEntry ::=  SEQUENCE { 
- 	 cienaCesPmFloodContainerAllTimeBinBcastDroppedBytes    Counter64,            
-     cienaCesPmFloodContainerAllTimeBinBcastDroppedFrames   Counter64,             
-     cienaCesPmFloodContainerAllTimeBinL2McastDroppedBytes    Counter64,
-     cienaCesPmFloodContainerAllTimeBinL2McastDroppedFrames   Counter64,
-     cienaCesPmFloodContainerAllTimeBinUnknownUnicastDroppedBytes    Counter64,
-     cienaCesPmFloodContainerAllTimeBinUnknownUnicastDroppedFrames   Counter64
+ 	 cienaCesPmFloodContainerAllTimeBinBcastDroppedBytes       Counter64,            
+     cienaCesPmFloodContainerAllTimeBinBcastDroppedFrames          Counter64,             
+     cienaCesPmFloodContainerAllTimeBinL2McastDroppedBytes         Counter64,
+     cienaCesPmFloodContainerAllTimeBinL2McastDroppedFrames        Counter64,
+     cienaCesPmFloodContainerAllTimeBinUnknownUnicastDroppedBytes  Counter64,
+     cienaCesPmFloodContainerAllTimeBinUnknownUnicastDroppedFrames Counter64,
+     cienaCesPmFloodContainerAllTimeBinTotalDroppedBytes           Counter64,
+     cienaCesPmFloodContainerAllTimeBinTotalDroppedFrames          Counter64
      } 
    cienaCesPmFloodContainerAllTimeBinBcastDroppedBytes  OBJECT-TYPE
      SYNTAX      Counter64 
      MAX-ACCESS  read-only
-     STATUS      deprecated
-     DESCRIPTION
-             "Broadcast dropped bytes."
+     STATUS      obsolete
+     DESCRIPTION "Broadcast dropped bytes."
      ::= { cienaCesPmFloodContainerAllTimeBinEntry 1 }
      
    cienaCesPmFloodContainerAllTimeBinBcastDroppedFrames OBJECT-TYPE
-      SYNTAX Counter64
-      MAX-ACCESS read-only
-      STATUS deprecated
-      DESCRIPTION 
-      		"Broadcast dropped frames."
-      ::= { cienaCesPmFloodContainerAllTimeBinEntry 2 }
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      obsolete
+     DESCRIPTION "Broadcast dropped frames."
+     ::= { cienaCesPmFloodContainerAllTimeBinEntry 2 }
 
    cienaCesPmFloodContainerAllTimeBinL2McastDroppedBytes  OBJECT-TYPE
-     SYNTAX Counter64
-     MAX-ACCESS read-only
-     STATUS deprecated
-     DESCRIPTION 
-      		"L2 multicast dropped bytes."
-      ::= { cienaCesPmFloodContainerAllTimeBinEntry 3 }
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      obsolete
+     DESCRIPTION "L2 multicast dropped bytes."
+     ::= { cienaCesPmFloodContainerAllTimeBinEntry 3 }
      
-    cienaCesPmFloodContainerAllTimeBinL2McastDroppedFrames  OBJECT-TYPE
-     SYNTAX Counter64
-     MAX-ACCESS read-only
-     STATUS deprecated
-     DESCRIPTION 
-      		"L2 multicast dropped frames."
-      ::= { cienaCesPmFloodContainerAllTimeBinEntry 4 }
+   cienaCesPmFloodContainerAllTimeBinL2McastDroppedFrames  OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      obsolete
+     DESCRIPTION "L2 multicast dropped frames."
+     ::= { cienaCesPmFloodContainerAllTimeBinEntry 4 }
 
-     cienaCesPmFloodContainerAllTimeBinUnknownUnicastDroppedBytes OBJECT-TYPE
-       SYNTAX Counter64
-       MAX-ACCESS read-only
-       STATUS deprecated
-       DESCRIPTION
-       		"Unknown unicast dropped bytes." 
-       ::= { cienaCesPmFloodContainerAllTimeBinEntry 5 }
+   cienaCesPmFloodContainerAllTimeBinUnknownUnicastDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      obsolete
+     DESCRIPTION "Unknown unicast dropped bytes." 
+     ::= { cienaCesPmFloodContainerAllTimeBinEntry 5 }
                     
-      cienaCesPmFloodContainerAllTimeBinUnknownUnicastDroppedFrames OBJECT-TYPE
-        SYNTAX Counter64
-        MAX-ACCESS read-only
-        STATUS deprecated
-        DESCRIPTION
-        	"Unknown unicast dropped frames."
-        ::= { cienaCesPmFloodContainerAllTimeBinEntry 6 } 
+   cienaCesPmFloodContainerAllTimeBinUnknownUnicastDroppedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      obsolete
+     DESCRIPTION "Unknown unicast dropped frames."
+     ::= { cienaCesPmFloodContainerAllTimeBinEntry 6 } 
+
+   cienaCesPmFloodContainerAllTimeBinTotalDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      obsolete
+     DESCRIPTION "Unknown unicast dropped frames."
+     ::= { cienaCesPmFloodContainerAllTimeBinEntry 7 } 
+
+   cienaCesPmFloodContainerAllTimeBinTotalDroppedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      obsolete
+     DESCRIPTION "Unknown unicast dropped frames."
+     ::= { cienaCesPmFloodContainerAllTimeBinEntry 8 } 
 
 
    --FloodContainer Profile Stats, statistics bin
@@ -9178,7 +9521,9 @@
      cienaCesPmFloodContainerStatsBinL2McastDroppedBytes            Counter64,
      cienaCesPmFloodContainerStatsBinL2McastDroppedFrames           Counter64,
      cienaCesPmFloodContainerStatsBinUnknownUnicastDroppedBytes     Counter64,
-     cienaCesPmFloodContainerStatsBinUnknownUnicastDroppedFrames    Counter64
+     cienaCesPmFloodContainerStatsBinUnknownUnicastDroppedFrames    Counter64,
+     cienaCesPmFloodContainerStatsBinTotalDroppedBytes              Counter64,
+     cienaCesPmFloodContainerStatsBinTotalDroppedFrames             Counter64
    } 
 
    cienaCesPmFloodContainerStatsBinStartTime OBJECT-TYPE
@@ -9237,6 +9582,19 @@
      DESCRIPTION "Unknown unicast dropped frames."
      ::= { cienaCesPmFloodContainerStatisticsBinEntry 8 } 
 
+   cienaCesPmFloodContainerStatsBinTotalDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Total dropped bytes." 
+     ::= { cienaCesPmFloodContainerStatisticsBinEntry 9 }
+                    
+   cienaCesPmFloodContainerStatsBinTotalDroppedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Total dropped frames."
+     ::= { cienaCesPmFloodContainerStatisticsBinEntry 10 } 
 
    --FloodContainer Profile Stats, total statistics bin
 
@@ -9264,7 +9622,9 @@
      cienaCesPmFloodContainerTotalStatsBinL2McastDroppedBytes            Counter64,
      cienaCesPmFloodContainerTotalStatsBinL2McastDroppedFrames           Counter64,
      cienaCesPmFloodContainerTotalStatsBinUnknownUnicastDroppedBytes     Counter64,
-     cienaCesPmFloodContainerTotalStatsBinUnknownUnicastDroppedFrames    Counter64
+     cienaCesPmFloodContainerTotalStatsBinUnknownUnicastDroppedFrames    Counter64,
+     cienaCesPmFloodContainerTotalStatsBinTotalDroppedBytes              Counter64,
+     cienaCesPmFloodContainerTotalStatsBinTotalDroppedFrames             Counter64
    } 
 
    cienaCesPmFloodContainerTotalStatsBinStartTime OBJECT-TYPE
@@ -9316,7 +9676,21 @@
      DESCRIPTION "Unknown unicast dropped frames."
      ::= { cienaCesPmFloodContainerTotalStatisticsBinEntry 7 } 
 
- 
+   cienaCesPmFloodContainerTotalStatsBinTotalDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Total dropped bytes." 
+     ::= { cienaCesPmFloodContainerTotalStatisticsBinEntry 8 }
+                    
+   cienaCesPmFloodContainerTotalStatsBinTotalDroppedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Total dropped frames."
+     ::= { cienaCesPmFloodContainerTotalStatisticsBinEntry 9 } 
+
+
  --
  -- BASIC Rx Bin
  --
@@ -11586,6 +11960,677 @@
      ::= { cienaCesPmEgressQueueTotalStatisticsBinEntry 7 }  
 
 
+   --EgressQueue Profile Stats, per queue, by index, history bins
+
+   cienaCesPmEgressQueueIndexedHistoryBinTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF CienaCesPmEgressQueueIndexedHistoryBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+            "The (conceptual) read-only table listing the egress queue profile statistics."
+     ::= { cienaCesPmEgressQueueIndexedStats 1 }
+
+   cienaCesPmEgressQueueIndexedHistoryBinEntry OBJECT-TYPE
+     SYNTAX      CienaCesPmEgressQueueIndexedHistoryBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaCesPmEgressQueueIndexedHistoryBinTable.
+
+           This table lists the statistics for all the history bins of the PM instance, as
+           specified by the bin-count object of the PM instance.  History bins are displayed in the order
+           so that #1 bin always represents the most recently completed bin and #2 - the bin previous to that
+           and so on.
+
+           The statistics are displayed for only the instances with valid bins (with start time >0),
+           as indicated by the operational state of the corresponding PM instance."
+     INDEX { cienaCesPmInstanceIndex, cienaCesPmEgressQueueIndexedHistoryBinIndex, cienaCesPmEgressQueueIndexedQueueIndex }
+     ::= { cienaCesPmEgressQueueIndexedHistoryBinTable 1 }
+
+   CienaCesPmEgressQueueIndexedHistoryBinEntry ::=  SEQUENCE {
+     cienaCesPmEgressQueueIndexedHistoryBinIndex                           Unsigned32,
+     cienaCesPmEgressQueueIndexedQueueIndex                                Integer32,
+     cienaCesPmEgressQueueIndexedHistoryBinStartTime                       DisplayString,
+     cienaCesPmEgressQueueIndexedHistoryBinEndTime                         DisplayString,
+     cienaCesPmEgressQueueIndexedHistoryBinClearTime                       DisplayString,
+     cienaCesPmEgressQueueIndexedHistoryBinDuration                        Unsigned32,
+     cienaCesPmEgressQueueIndexedHistoryBinState                           PmBinState,
+     cienaCesPmEgressQueueIndexedHistoryBinUnicastDroppedBytes             Counter64,
+     cienaCesPmEgressQueueIndexedHistoryBinUnicastDroppedFrames            Counter64,
+     cienaCesPmEgressQueueIndexedHistoryBinMulticastEnqueuedBytes          Counter64,
+     cienaCesPmEgressQueueIndexedHistoryBinMulticastEnqueuedFrames         Counter64,
+     cienaCesPmEgressQueueIndexedHistoryBinMulticastDroppedBytes           Counter64,
+     cienaCesPmEgressQueueIndexedHistoryBinMulticastDroppedFrames          Counter64
+  }
+
+   cienaCesPmEgressQueueIndexedHistoryBinIndex OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..65535)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION "Bin number associated with the table entry."
+     ::= { cienaCesPmEgressQueueIndexedHistoryBinEntry 1 }
+
+   cienaCesPmEgressQueueIndexedQueueIndex OBJECT-TYPE
+     SYNTAX      Integer32(0..65535)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION "This object indicates a unique index for each queue of the egress queue."
+     ::= { cienaCesPmEgressQueueIndexedHistoryBinEntry 2 }
+
+   cienaCesPmEgressQueueIndexedHistoryBinStartTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection start time of the bin."
+     ::= { cienaCesPmEgressQueueIndexedHistoryBinEntry 3 }
+
+   cienaCesPmEgressQueueIndexedHistoryBinEndTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection end time of the bin."
+     ::= { cienaCesPmEgressQueueIndexedHistoryBinEntry 4 }
+
+   cienaCesPmEgressQueueIndexedHistoryBinClearTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection clear time of the bin."
+     ::= { cienaCesPmEgressQueueIndexedHistoryBinEntry 5 }
+
+   cienaCesPmEgressQueueIndexedHistoryBinDuration OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..65535)
+     UNITS       "minutes"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Duration of the bin."
+     ::= { cienaCesPmEgressQueueIndexedHistoryBinEntry 6 }
+
+   cienaCesPmEgressQueueIndexedHistoryBinState OBJECT-TYPE
+     SYNTAX      PmBinState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "State of the bin."
+     ::= { cienaCesPmEgressQueueIndexedHistoryBinEntry 7 }
+
+   cienaCesPmEgressQueueIndexedHistoryBinUnicastDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of received unicast bytes that were dropped at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedHistoryBinEntry 8 }
+
+   cienaCesPmEgressQueueIndexedHistoryBinUnicastDroppedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of received unicast frames that were dropped at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedHistoryBinEntry 9 }
+
+   cienaCesPmEgressQueueIndexedHistoryBinMulticastEnqueuedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast bytes that were enqueued at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedHistoryBinEntry 10 }
+
+   cienaCesPmEgressQueueIndexedHistoryBinMulticastEnqueuedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast frames that were enqueued at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedHistoryBinEntry 11 }
+
+   cienaCesPmEgressQueueIndexedHistoryBinMulticastDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast bytes that were dropped before being enqueued on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedHistoryBinEntry 12 }
+
+   cienaCesPmEgressQueueIndexedHistoryBinMulticastDroppedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast frames that were dropped before being enqueued on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedHistoryBinEntry 13 }
+
+
+   --EgressQueue Profile Stats, per queue, by index, current bin
+
+   cienaCesPmEgressQueueIndexedCurrBinTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF CienaCesPmEgressQueueIndexedCurrBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+            "The (conceptual) read-only table listing the egress queue profile statistics."
+     ::= { cienaCesPmEgressQueueIndexedStats 2 }
+
+   cienaCesPmEgressQueueIndexedCurrBinEntry OBJECT-TYPE
+     SYNTAX      CienaCesPmEgressQueueIndexedCurrBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaCesPmEgressQueueIndexedCurrBinTable.
+
+           This table lists the statistics for the current bin of the PM instance."
+     INDEX { cienaCesPmInstanceIndex, cienaCesPmEgressQueueIndexedQueueIndex }
+     ::= { cienaCesPmEgressQueueIndexedCurrBinTable 1 }
+
+   CienaCesPmEgressQueueIndexedCurrBinEntry ::=  SEQUENCE {
+     cienaCesPmEgressQueueIndexedCurrBinStartTime                          DisplayString,
+     cienaCesPmEgressQueueIndexedCurrBinClearedTime                        DisplayString,
+     cienaCesPmEgressQueueIndexedCurrBinDuration                           Unsigned32,
+     cienaCesPmEgressQueueIndexedCurrBinState                              PmBinState,
+     cienaCesPmEgressQueueIndexedCurrBinUnicastDroppedBytes                Counter64,
+     cienaCesPmEgressQueueIndexedCurrBinUnicastDroppedFrames               Counter64,
+     cienaCesPmEgressQueueIndexedCurrBinMulticastEnqueuedBytes             Counter64,
+     cienaCesPmEgressQueueIndexedCurrBinMulticastEnqueuedFrames            Counter64,
+     cienaCesPmEgressQueueIndexedCurrBinMulticastDroppedBytes              Counter64,
+     cienaCesPmEgressQueueIndexedCurrBinMulticastDroppedFrames             Counter64
+   }
+
+   cienaCesPmEgressQueueIndexedCurrBinStartTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection start time of the bin."
+     ::= { cienaCesPmEgressQueueIndexedCurrBinEntry 1 }
+
+   cienaCesPmEgressQueueIndexedCurrBinClearedTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Cleared time of the bin."
+     ::= { cienaCesPmEgressQueueIndexedCurrBinEntry 2 }
+
+   cienaCesPmEgressQueueIndexedCurrBinDuration OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..65535)
+     UNITS       "minutes"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Duration of the bin."
+     ::= { cienaCesPmEgressQueueIndexedCurrBinEntry 3 }
+
+   cienaCesPmEgressQueueIndexedCurrBinState OBJECT-TYPE
+     SYNTAX      PmBinState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "State of the bin."
+     ::= { cienaCesPmEgressQueueIndexedCurrBinEntry 4 }
+
+   cienaCesPmEgressQueueIndexedCurrBinUnicastDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of received unicast bytes that were dropped at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedCurrBinEntry 5 }
+
+   cienaCesPmEgressQueueIndexedCurrBinUnicastDroppedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of received unicast frames that were dropped at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedCurrBinEntry 6 }
+
+   cienaCesPmEgressQueueIndexedCurrBinMulticastEnqueuedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast bytes that were enqueued at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedCurrBinEntry 7 }
+
+   cienaCesPmEgressQueueIndexedCurrBinMulticastEnqueuedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast frames that were enqueued at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedCurrBinEntry 8 }
+
+   cienaCesPmEgressQueueIndexedCurrBinMulticastDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast bytes that were dropped before being enqueued on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedCurrBinEntry 9 }
+
+   cienaCesPmEgressQueueIndexedCurrBinMulticastDroppedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast frames that were dropped before being enqueued on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedCurrBinEntry 10 }
+
+
+   --EgressQueue Profile Stats, per queue, by index, current 24 hour bin
+
+   cienaCesPmEgressQueueIndexedCurr24HBinTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF CienaCesPmEgressQueueIndexedCurr24HBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+            "The (conceptual) read-only table listing the egress queue profile statistics"
+     ::= { cienaCesPmEgressQueueIndexedStats 3 }
+
+   cienaCesPmEgressQueueIndexedCurr24HBinEntry OBJECT-TYPE
+     SYNTAX      CienaCesPmEgressQueueIndexedCurr24HBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaCesPmEgressQueueIndexedCurr24HBinTable.
+
+           This table lists the statistics for the current 24 hours bin."
+     INDEX { cienaCesPmInstanceIndex, cienaCesPmEgressQueueIndexedQueueIndex }
+     ::= { cienaCesPmEgressQueueIndexedCurr24HBinTable 1 }
+
+   CienaCesPmEgressQueueIndexedCurr24HBinEntry ::=  SEQUENCE {
+     cienaCesPmEgressQueueIndexedCurr24HBinStartTime                       DisplayString,
+     cienaCesPmEgressQueueIndexedCurr24HBinEndTime                         DisplayString,
+     cienaCesPmEgressQueueIndexedCurr24HBinClearedTime                     DisplayString,
+     cienaCesPmEgressQueueIndexedCurr24HBinDuration                        Unsigned32,
+     cienaCesPmEgressQueueIndexedCurr24HBinState                           PmBinState,
+     cienaCesPmEgressQueueIndexedCurr24HBinUnicastDroppedBytes             Counter64,
+     cienaCesPmEgressQueueIndexedCurr24HBinUnicastDroppedFrames            Counter64,
+     cienaCesPmEgressQueueIndexedCurr24HBinMulticastEnqueuedBytes          Counter64,
+     cienaCesPmEgressQueueIndexedCurr24HBinMulticastEnqueuedFrames         Counter64,
+     cienaCesPmEgressQueueIndexedCurr24HBinMulticastDroppedBytes           Counter64,
+     cienaCesPmEgressQueueIndexedCurr24HBinMulticastDroppedFrames          Counter64
+   }
+
+   cienaCesPmEgressQueueIndexedCurr24HBinStartTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection start time of the bin."
+     ::= { cienaCesPmEgressQueueIndexedCurr24HBinEntry 1 }
+
+   cienaCesPmEgressQueueIndexedCurr24HBinEndTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection end time for the bin."
+     ::= { cienaCesPmEgressQueueIndexedCurr24HBinEntry 2 }
+
+    cienaCesPmEgressQueueIndexedCurr24HBinClearedTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Cleared time of the bin."
+     ::= { cienaCesPmEgressQueueIndexedCurr24HBinEntry 3 }
+
+   cienaCesPmEgressQueueIndexedCurr24HBinDuration OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..65535)
+     UNITS       "minutes"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Duration of the bin."
+     ::= { cienaCesPmEgressQueueIndexedCurr24HBinEntry 4 }
+
+  cienaCesPmEgressQueueIndexedCurr24HBinState OBJECT-TYPE
+     SYNTAX      PmBinState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "State of the bin."
+     ::= { cienaCesPmEgressQueueIndexedCurr24HBinEntry 5 }
+
+  cienaCesPmEgressQueueIndexedCurr24HBinUnicastDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of received unicast bytes that were dropped on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedCurr24HBinEntry 6 }
+
+    cienaCesPmEgressQueueIndexedCurr24HBinUnicastDroppedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of received unicast frames that were dropped on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedCurr24HBinEntry 7}
+
+     cienaCesPmEgressQueueIndexedCurr24HBinMulticastEnqueuedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast bytes that were enqueued at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedCurr24HBinEntry 8}
+
+   cienaCesPmEgressQueueIndexedCurr24HBinMulticastEnqueuedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast frames that were enqueued at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedCurr24HBinEntry 9}
+
+     cienaCesPmEgressQueueIndexedCurr24HBinMulticastDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast bytes that were enqueued at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedCurr24HBinEntry 10}
+
+   cienaCesPmEgressQueueIndexedCurr24HBinMulticastDroppedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast frames that were enqueued at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedCurr24HBinEntry 11}
+
+
+     --EgressQueue Profile Stats, per queue, by index, history 24 hour bin
+
+   cienaCesPmEgressQueueIndexedHist24HBinTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF CienaCesPmEgressQueueIndexedHist24HBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+             "The (conceptual) read-only table listing the egress queue profile statistics."
+     ::= { cienaCesPmEgressQueueIndexedStats 4 }
+
+   cienaCesPmEgressQueueIndexedHist24HBinEntry OBJECT-TYPE
+     SYNTAX      CienaCesPmEgressQueueIndexedHist24HBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaCesPmEgressQueueIndexedHist24HBinTable.
+           This table lists the statistics for the history 24 hours bin."
+     INDEX { cienaCesPmInstanceIndex, cienaCesPmEgressQueueIndexedQueueIndex }
+     ::= { cienaCesPmEgressQueueIndexedHist24HBinTable 1 }
+
+   CienaCesPmEgressQueueIndexedHist24HBinEntry ::=  SEQUENCE {
+     cienaCesPmEgressQueueIndexedHist24HBinStartTime                       DisplayString,
+     cienaCesPmEgressQueueIndexedHist24HBinDuration                        Unsigned32,
+     cienaCesPmEgressQueueIndexedHist24HBinState                           PmBinState,
+     cienaCesPmEgressQueueIndexedHist24HBinUnicastDroppedBytes             Counter64,
+     cienaCesPmEgressQueueIndexedHist24HBinUnicastDroppedFrames            Counter64,
+     cienaCesPmEgressQueueIndexedHist24HBinMulticastEnqueuedBytes          Counter64,
+     cienaCesPmEgressQueueIndexedHist24HBinMulticastEnqueuedFrames         Counter64,
+     cienaCesPmEgressQueueIndexedHist24HBinMulticastDroppedBytes           Counter64,
+     cienaCesPmEgressQueueIndexedHist24HBinMulticastDroppedFrames          Counter64,
+     cienaCesPmEgressQueueIndexedHist24HBinEndTime                         DisplayString,
+     cienaCesPmEgressQueueIndexedHist24HBinClearTime                       DisplayString
+   }
+
+   cienaCesPmEgressQueueIndexedHist24HBinStartTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection start time of the bin."
+     ::= { cienaCesPmEgressQueueIndexedHist24HBinEntry 1 }
+
+   cienaCesPmEgressQueueIndexedHist24HBinDuration OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..65535)
+     UNITS       "minutes"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Duration of the bin."
+     ::= { cienaCesPmEgressQueueIndexedHist24HBinEntry 2 }
+
+   cienaCesPmEgressQueueIndexedHist24HBinState OBJECT-TYPE
+     SYNTAX      PmBinState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "State of the bin."
+     ::= { cienaCesPmEgressQueueIndexedHist24HBinEntry 3 }
+
+   cienaCesPmEgressQueueIndexedHist24HBinUnicastDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of unicast bytes that were dropped at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedHist24HBinEntry 4 }
+
+   cienaCesPmEgressQueueIndexedHist24HBinUnicastDroppedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of unicast frames that were dropped at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedHist24HBinEntry 5 }
+
+   cienaCesPmEgressQueueIndexedHist24HBinMulticastEnqueuedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast bytes that were enqueued at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedHist24HBinEntry 6}
+
+   cienaCesPmEgressQueueIndexedHist24HBinMulticastEnqueuedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast frames that were enqueued at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedHist24HBinEntry 7}
+
+   cienaCesPmEgressQueueIndexedHist24HBinMulticastDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast bytes that were dropped before being enqueued at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedHist24HBinEntry 8}
+
+   cienaCesPmEgressQueueIndexedHist24HBinMulticastDroppedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast frames that were dropped before being enqueued at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedHist24HBinEntry 9 }
+
+   cienaCesPmEgressQueueIndexedHist24HBinEndTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection end time of the bin."
+     ::= { cienaCesPmEgressQueueIndexedHist24HBinEntry 10 }
+
+   cienaCesPmEgressQueueIndexedHist24HBinClearTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection clear time of the bin."
+     ::= { cienaCesPmEgressQueueIndexedHist24HBinEntry 11 }
+
+
+   --EgressQueue Profile Stats, per queue, by index, statistics bin
+
+   cienaCesPmEgressQueueIndexedStatisticsBinTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesPmEgressQueueIndexedStatisticsBinEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION "The (conceptual) read-only table listing the bin statistics."
+     ::= { cienaCesPmEgressQueueIndexedStats 5 }
+
+   cienaCesPmEgressQueueIndexedStatisticsBinEntry OBJECT-TYPE
+     SYNTAX      CienaCesPmEgressQueueIndexedStatisticsBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaCesPmEgressQueueIndexedStatisticsBinTable.
+           This table lists the statistics for the statistics bin of the PM instance." 
+     INDEX { cienaCesPmInstanceIndex, cienaCesPmEgressQueueIndexedQueueIndex }
+     ::= { cienaCesPmEgressQueueIndexedStatisticsBinTable 1 }
+
+   CienaCesPmEgressQueueIndexedStatisticsBinEntry ::=  SEQUENCE {
+     cienaCesPmEgressQueueIndexedStatsBinStartTime                         DisplayString,
+     cienaCesPmEgressQueueIndexedStatsBinClearTime                         DisplayString,
+     cienaCesPmEgressQueueIndexedStatsBinUnicastDroppedBytes               Counter64,
+     cienaCesPmEgressQueueIndexedStatsBinUnicastDroppedFrames              Counter64,
+     cienaCesPmEgressQueueIndexedStatsBinMulticastEnqueuedBytes            Counter64,
+     cienaCesPmEgressQueueIndexedStatsBinMulticastEnqueuedFrames           Counter64,
+     cienaCesPmEgressQueueIndexedStatsBinMulticastDroppedBytes             Counter64,
+     cienaCesPmEgressQueueIndexedStatsBinMulticastDroppedFrames            Counter64
+   }
+
+   cienaCesPmEgressQueueIndexedStatsBinStartTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection start time of the bin."
+     ::= { cienaCesPmEgressQueueIndexedStatisticsBinEntry 1 }
+
+   cienaCesPmEgressQueueIndexedStatsBinClearTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection clear time of the bin."
+     ::= { cienaCesPmEgressQueueIndexedStatisticsBinEntry 2 }
+
+   cienaCesPmEgressQueueIndexedStatsBinUnicastDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of unicast bytes that were dropped at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedStatisticsBinEntry 3 }
+
+   cienaCesPmEgressQueueIndexedStatsBinUnicastDroppedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+            "The number of unicast frames that were dropped at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedStatisticsBinEntry 4 }
+
+   cienaCesPmEgressQueueIndexedStatsBinMulticastEnqueuedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast bytes that were enqueued at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedStatisticsBinEntry 5 }
+
+   cienaCesPmEgressQueueIndexedStatsBinMulticastEnqueuedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast frames that were enqueued at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedStatisticsBinEntry 6 }
+
+   cienaCesPmEgressQueueIndexedStatsBinMulticastDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast bytes that were dropped at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedStatisticsBinEntry 7 }
+
+   cienaCesPmEgressQueueIndexedStatsBinMulticastDroppedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast frames that were dropped at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedStatisticsBinEntry 8 }
+
+
+   --EgressQueue Profile Stats, per queue, by index, total statistics bin
+
+   cienaCesPmEgressQueueIndexedTotalStatisticsBinTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesPmEgressQueueIndexedTotalStatisticsBinEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION "The (conceptual) read-only table listing the bin statistics."
+     ::= { cienaCesPmEgressQueueIndexedStats 6 }
+
+   cienaCesPmEgressQueueIndexedTotalStatisticsBinEntry OBJECT-TYPE
+     SYNTAX      CienaCesPmEgressQueueIndexedTotalStatisticsBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaCesPmEgressQueueIndexedTotalStatisticsBinTable.
+           This table lists the statistics for the total statistics bin of the PM instance."
+     INDEX { cienaCesPmInstanceIndex, cienaCesPmEgressQueueIndexedQueueIndex }
+     ::= { cienaCesPmEgressQueueIndexedTotalStatisticsBinTable 1 }
+
+   CienaCesPmEgressQueueIndexedTotalStatisticsBinEntry ::=  SEQUENCE {
+     cienaCesPmEgressQueueIndexedTotalStatsBinStartTime                    DisplayString,
+     cienaCesPmEgressQueueIndexedTotalStatsBinUnicastDroppedBytes          Counter64,
+     cienaCesPmEgressQueueIndexedTotalStatsBinUnicastDroppedFrames         Counter64,
+     cienaCesPmEgressQueueIndexedTotalStatsBinMulticastEnqueuedBytes       Counter64,
+     cienaCesPmEgressQueueIndexedTotalStatsBinMulticastEnqueuedFrames      Counter64,
+     cienaCesPmEgressQueueIndexedTotalStatsBinMulticastDroppedBytes        Counter64,
+     cienaCesPmEgressQueueIndexedTotalStatsBinMulticastDroppedFrames       Counter64
+   }
+
+   cienaCesPmEgressQueueIndexedTotalStatsBinStartTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection start time of the bin."
+     ::= { cienaCesPmEgressQueueIndexedTotalStatisticsBinEntry 1 }
+
+   cienaCesPmEgressQueueIndexedTotalStatsBinUnicastDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of unicast bytes that were dropped at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedTotalStatisticsBinEntry 2 }
+
+   cienaCesPmEgressQueueIndexedTotalStatsBinUnicastDroppedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+            "The number of unicast frames that were dropped at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedTotalStatisticsBinEntry 3 }
+
+   cienaCesPmEgressQueueIndexedTotalStatsBinMulticastEnqueuedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast bytes that were enqueued at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedTotalStatisticsBinEntry 4 }
+
+   cienaCesPmEgressQueueIndexedTotalStatsBinMulticastEnqueuedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast frames that were enqueued at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedTotalStatisticsBinEntry 5 }
+
+   cienaCesPmEgressQueueIndexedTotalStatsBinMulticastDroppedBytes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast bytes that were dropped at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedTotalStatisticsBinEntry 6 }
+
+   cienaCesPmEgressQueueIndexedTotalStatsBinMulticastDroppedFrames OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The number of multicast frames that were dropped at egress on this PM instance."
+     ::= { cienaCesPmEgressQueueIndexedTotalStatisticsBinEntry 7 }
+
+
    --TdmT1Port Profile Stats, history bins
 
    cienaCesPmTdmT1PortHistoryBinTable OBJECT-TYPE
@@ -13203,7 +14248,14 @@
      cienaCesPmTdmPwHistoryBinCvp                               Counter64,
      cienaCesPmTdmPwHistoryBinFcp                               Counter64,
      cienaCesPmTdmPwHistoryBinAsp                               Counter64,
-     cienaCesPmTdmPwHistoryBinTtp                               Counter64
+     cienaCesPmTdmPwHistoryBinTtp                               Counter64,
+     cienaCesPmTdmPwHistoryBinTxLbit                            Counter64,
+     cienaCesPmTdmPwHistoryBinTxRbit                            Counter64,
+     cienaCesPmTdmPwHistoryBinTxMbit                            Counter64,
+     cienaCesPmTdmPwHistoryBinNbit                              Counter64,
+     cienaCesPmTdmPwHistoryBinTxNbit                            Counter64,
+     cienaCesPmTdmPwHistoryBinPbit                              Counter64,
+     cienaCesPmTdmPwHistoryBinTxPbit                            Counter64
    }
    cienaCesPmTdmPwHistoryBinIndex OBJECT-TYPE
      SYNTAX      Unsigned32 (1..65535)
@@ -13322,21 +14374,21 @@
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of L-bit set events."
+     DESCRIPTION "Number of L-bit set events received."
      ::= { cienaCesPmTdmPwHistoryBinEntry 17 }
 
    cienaCesPmTdmPwHistoryBinRbit OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of R-bit set events."
+     DESCRIPTION "Number of R-bit set events received."
      ::= { cienaCesPmTdmPwHistoryBinEntry 18 }
 
    cienaCesPmTdmPwHistoryBinMbit OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of M-bit set events (CESoP specific counter)."
+     DESCRIPTION "Number of M-bit set events received (CESoP specific counter)."
      ::= { cienaCesPmTdmPwHistoryBinEntry 19 }
 
    cienaCesPmTdmPwHistoryBinRxPkt OBJECT-TYPE
@@ -13403,6 +14455,55 @@
      DESCRIPTION "Path total times seconds."
      ::= { cienaCesPmTdmPwHistoryBinEntry 28 }
 
+   cienaCesPmTdmPwHistoryBinTxLbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of L-bit set events transmitted."
+     ::= { cienaCesPmTdmPwHistoryBinEntry 29 }
+
+   cienaCesPmTdmPwHistoryBinTxRbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of R-bit set events transmitted."
+     ::= { cienaCesPmTdmPwHistoryBinEntry 30 }
+
+   cienaCesPmTdmPwHistoryBinTxMbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of M-bit set events transmitted."
+     ::= { cienaCesPmTdmPwHistoryBinEntry 31 }
+
+   cienaCesPmTdmPwHistoryBinNbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of N-bit set events received."
+     ::= { cienaCesPmTdmPwHistoryBinEntry 32 }
+
+   cienaCesPmTdmPwHistoryBinTxNbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of N-bit set events transmitted."
+     ::= { cienaCesPmTdmPwHistoryBinEntry 33 }
+
+   cienaCesPmTdmPwHistoryBinPbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of P-bit set events received."
+     ::= { cienaCesPmTdmPwHistoryBinEntry 34 }
+
+   cienaCesPmTdmPwHistoryBinTxPbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of P-bit set events transmitted."
+     ::= { cienaCesPmTdmPwHistoryBinEntry 35 }
+
 
    --TdmPw Profile Stats, current bin
 
@@ -13449,7 +14550,14 @@
      cienaCesPmTdmPwCurrBinCvp                                  Counter64,
      cienaCesPmTdmPwCurrBinFcp                                  Counter64,
      cienaCesPmTdmPwCurrBinAsp                                  Counter64,
-     cienaCesPmTdmPwCurrBinTtp                                  Counter64
+     cienaCesPmTdmPwCurrBinTtp                                  Counter64,
+     cienaCesPmTdmPwCurrBinTxLbit                               Counter64,
+     cienaCesPmTdmPwCurrBinTxRbit                               Counter64,
+     cienaCesPmTdmPwCurrBinTxMbit                               Counter64,
+     cienaCesPmTdmPwCurrBinNbit                                 Counter64,
+     cienaCesPmTdmPwCurrBinTxNbit                               Counter64,
+     cienaCesPmTdmPwCurrBinPbit                                 Counter64,
+     cienaCesPmTdmPwCurrBinTxPbit                               Counter64
    }
 
    cienaCesPmTdmPwCurrBinStartTime OBJECT-TYPE
@@ -13555,21 +14663,21 @@
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of L-bit set events."
+     DESCRIPTION "Number of L-bit set events received."
      ::= { cienaCesPmTdmPwCurrBinEntry 15 }
 
    cienaCesPmTdmPwCurrBinRbit OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of R-bit set events."
+     DESCRIPTION "Number of R-bit set events received."
      ::= { cienaCesPmTdmPwCurrBinEntry 16 }
 
    cienaCesPmTdmPwCurrBinMbit OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of M-bit set events (CESoP specific counter)."
+     DESCRIPTION "Number of M-bit set events received (CESoP specific counter)."
      ::= { cienaCesPmTdmPwCurrBinEntry 17 }
 
    cienaCesPmTdmPwCurrBinRxPkt OBJECT-TYPE
@@ -13635,6 +14743,55 @@
      DESCRIPTION "Path total time seconds."
      ::= { cienaCesPmTdmPwCurrBinEntry 26 }
 
+   cienaCesPmTdmPwCurrBinTxLbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of L-bit set events transmitted."
+     ::= { cienaCesPmTdmPwCurrBinEntry 27 }
+
+   cienaCesPmTdmPwCurrBinTxRbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of R-bit set events transmitted."
+     ::= { cienaCesPmTdmPwCurrBinEntry 28 }
+
+   cienaCesPmTdmPwCurrBinTxMbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of M-bit set events transmitted."
+     ::= { cienaCesPmTdmPwCurrBinEntry 29 }
+
+   cienaCesPmTdmPwCurrBinNbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of N-bit set events received."
+     ::= { cienaCesPmTdmPwCurrBinEntry 30 }
+
+   cienaCesPmTdmPwCurrBinTxNbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of N-bit set events transmitted."
+     ::= { cienaCesPmTdmPwCurrBinEntry 31 }
+
+   cienaCesPmTdmPwCurrBinPbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of P-bit set events received."
+     ::= { cienaCesPmTdmPwCurrBinEntry 32 }
+
+   cienaCesPmTdmPwCurrBinTxPbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of P-bit set events transmitted."
+     ::= { cienaCesPmTdmPwCurrBinEntry 33 }
+
 
    --TdmPw Profile Stats, current 24 hour bin
   
@@ -13681,7 +14838,14 @@
      cienaCesPmTdmPwCurr24HBinCvp                               Counter64,
      cienaCesPmTdmPwCurr24HBinFcp                               Counter64,
      cienaCesPmTdmPwCurr24HBinAsp                               Counter64,
-     cienaCesPmTdmPwCurr24HBinTtp                               Counter64
+     cienaCesPmTdmPwCurr24HBinTtp                               Counter64,
+     cienaCesPmTdmPwCurr24HBinTxLbit                            Counter64,
+     cienaCesPmTdmPwCurr24HBinTxRbit                            Counter64,
+     cienaCesPmTdmPwCurr24HBinTxMbit                            Counter64,
+     cienaCesPmTdmPwCurr24HBinNbit                              Counter64,
+     cienaCesPmTdmPwCurr24HBinTxNbit                            Counter64,
+     cienaCesPmTdmPwCurr24HBinPbit                              Counter64,
+     cienaCesPmTdmPwCurr24HBinTxPbit                            Counter64
    } 
 
    cienaCesPmTdmPwCurr24HBinStartTime OBJECT-TYPE
@@ -13787,21 +14951,21 @@
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of L-bit set events."
+     DESCRIPTION "Number of L-bit set events received."
      ::= { cienaCesPmTdmPwCurr24HBinEntry 15 }
 
    cienaCesPmTdmPwCurr24HBinRbit OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of R-bit set events."
+     DESCRIPTION "Number of R-bit set events received."
      ::= { cienaCesPmTdmPwCurr24HBinEntry 16 }
 
    cienaCesPmTdmPwCurr24HBinMbit OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of M-bit set events (CESoP specific counter)."
+     DESCRIPTION "Number of M-bit set events received (CESoP specific counter)."
      ::= { cienaCesPmTdmPwCurr24HBinEntry 17 }
 
    cienaCesPmTdmPwCurr24HBinRxPkt OBJECT-TYPE
@@ -13867,6 +15031,55 @@
      DESCRIPTION "Path total time seconds."
      ::= { cienaCesPmTdmPwCurr24HBinEntry 26 }
 
+   cienaCesPmTdmPwCurr24HBinTxLbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of L-bit set events transmitted."
+     ::= { cienaCesPmTdmPwCurr24HBinEntry 27 }
+
+   cienaCesPmTdmPwCurr24HBinTxRbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of R-bit set events transmitted."
+     ::= { cienaCesPmTdmPwCurr24HBinEntry 28 }
+
+   cienaCesPmTdmPwCurr24HBinTxMbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of M-bit set events transmitted."
+     ::= { cienaCesPmTdmPwCurr24HBinEntry 29 }
+
+   cienaCesPmTdmPwCurr24HBinNbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of N-bit set events received."
+     ::= { cienaCesPmTdmPwCurr24HBinEntry 30 }
+
+   cienaCesPmTdmPwCurr24HBinTxNbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of N-bit set events transmitted."
+     ::= { cienaCesPmTdmPwCurr24HBinEntry 31 }
+
+   cienaCesPmTdmPwCurr24HBinPbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of P-bit set events received."
+     ::= { cienaCesPmTdmPwCurr24HBinEntry 32 }
+
+   cienaCesPmTdmPwCurr24HBinTxPbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of P-bit set events transmitted."
+     ::= { cienaCesPmTdmPwCurr24HBinEntry 33 }
+
 
    --TdmPw Profile Stats, history 24 hour bin
   
@@ -13914,7 +15127,14 @@
      cienaCesPmTdmPwHist24HBinCvp                               Counter64,
      cienaCesPmTdmPwHist24HBinFcp                               Counter64,
      cienaCesPmTdmPwHist24HBinAsp                               Counter64,
-     cienaCesPmTdmPwHist24HBinTtp                               Counter64
+     cienaCesPmTdmPwHist24HBinTtp                               Counter64,
+     cienaCesPmTdmPwHist24HBinTxLbit                            Counter64,
+     cienaCesPmTdmPwHist24HBinTxRbit                            Counter64,
+     cienaCesPmTdmPwHist24HBinTxMbit                            Counter64,
+     cienaCesPmTdmPwHist24HBinNbit                              Counter64,
+     cienaCesPmTdmPwHist24HBinTxNbit                            Counter64,
+     cienaCesPmTdmPwHist24HBinPbit                              Counter64,
+     cienaCesPmTdmPwHist24HBinTxPbit                            Counter64
    }
 
    cienaCesPmTdmPwHist24HBinStartTime OBJECT-TYPE
@@ -14027,21 +15247,21 @@
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of L-bit set events."
+     DESCRIPTION "Number of L-bit set events received."
      ::= { cienaCesPmTdmPwHist24HBinEntry 16 }
 
    cienaCesPmTdmPwHist24HBinRbit OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of R-bit set events."
+     DESCRIPTION "Number of R-bit set events received."
      ::= { cienaCesPmTdmPwHist24HBinEntry 17 }
 
    cienaCesPmTdmPwHist24HBinMbit OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of M-bit set events (CESoP specific counter)."
+     DESCRIPTION "Number of M-bit set events received (CESoP specific counter)."
      ::= { cienaCesPmTdmPwHist24HBinEntry 18 }
 
    cienaCesPmTdmPwHist24HBinRxPkt OBJECT-TYPE
@@ -14107,6 +15327,55 @@
      DESCRIPTION "Path total time seconds."
      ::= { cienaCesPmTdmPwHist24HBinEntry 27 }
 
+   cienaCesPmTdmPwHist24HBinTxLbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of L-bit set events transmitted."
+     ::= { cienaCesPmTdmPwHist24HBinEntry 28 }
+
+   cienaCesPmTdmPwHist24HBinTxRbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of R-bit set events transmitted."
+     ::= { cienaCesPmTdmPwHist24HBinEntry 29 }
+
+   cienaCesPmTdmPwHist24HBinTxMbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of M-bit set events transmitted."
+     ::= { cienaCesPmTdmPwHist24HBinEntry 30 }
+
+   cienaCesPmTdmPwHist24HBinNbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of N-bit set events received."
+     ::= { cienaCesPmTdmPwHist24HBinEntry 31 }
+
+   cienaCesPmTdmPwHist24HBinTxNbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of N-bit set events transmitted."
+     ::= { cienaCesPmTdmPwHist24HBinEntry 32 }
+
+   cienaCesPmTdmPwHist24HBinPbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of P-bit set events received."
+     ::= { cienaCesPmTdmPwHist24HBinEntry 33 }
+
+   cienaCesPmTdmPwHist24HBinTxPbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of P-bit set events transmitted."
+     ::= { cienaCesPmTdmPwHist24HBinEntry 34 }
+
 
    --TdmPw Profile Stats, statistics bin
 
@@ -14151,7 +15420,14 @@
      cienaCesPmTdmPwStatisticsBinCvp                            Counter64,
      cienaCesPmTdmPwStatisticsBinFcp                            Counter64,
      cienaCesPmTdmPwStatisticsBinAsp                            Counter64,
-     cienaCesPmTdmPwStatisticsBinTtp                            Counter64
+     cienaCesPmTdmPwStatisticsBinTtp                            Counter64,
+     cienaCesPmTdmPwStatisticsBinTxLbit                         Counter64,
+     cienaCesPmTdmPwStatisticsBinTxRbit                         Counter64,
+     cienaCesPmTdmPwStatisticsBinTxMbit                         Counter64,
+     cienaCesPmTdmPwStatisticsBinNbit                           Counter64,
+     cienaCesPmTdmPwStatisticsBinTxNbit                         Counter64,
+     cienaCesPmTdmPwStatisticsBinPbit                           Counter64,
+     cienaCesPmTdmPwStatisticsBinTxPbit                         Counter64
    }          
 
    cienaCesPmTdmPwStatisticsBinStartTime OBJECT-TYPE
@@ -14242,21 +15518,21 @@
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of L-bit set events."
+     DESCRIPTION "Number of L-bit set events received."
      ::= { cienaCesPmTdmPwStatisticsBinEntry 13 }
 
    cienaCesPmTdmPwStatisticsBinRbit OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of R-bit set events."
+     DESCRIPTION "Number of R-bit set events received."
      ::= { cienaCesPmTdmPwStatisticsBinEntry 14 }
 
    cienaCesPmTdmPwStatisticsBinMbit OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of M-bit set events (CESoP specific counter)."
+     DESCRIPTION "Number of M-bit set events received (CESoP specific counter)."
      ::= { cienaCesPmTdmPwStatisticsBinEntry 15 }
 
    cienaCesPmTdmPwStatisticsBinRxPkt OBJECT-TYPE
@@ -14322,6 +15598,56 @@
      DESCRIPTION "Path total time seconds."
      ::= { cienaCesPmTdmPwStatisticsBinEntry 24 }
 
+   cienaCesPmTdmPwStatisticsBinTxLbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of L-bit set events transmitted."
+     ::= { cienaCesPmTdmPwStatisticsBinEntry 25 }
+
+   cienaCesPmTdmPwStatisticsBinTxRbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of R-bit set events transmitted."
+     ::= { cienaCesPmTdmPwStatisticsBinEntry 26 }
+
+   cienaCesPmTdmPwStatisticsBinTxMbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of M-bit set events transmitted."
+     ::= { cienaCesPmTdmPwStatisticsBinEntry 27 }
+
+   cienaCesPmTdmPwStatisticsBinNbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of N-bit set events received."
+     ::= { cienaCesPmTdmPwStatisticsBinEntry 28 }
+
+   cienaCesPmTdmPwStatisticsBinTxNbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of N-bit set events transmitted."
+     ::= { cienaCesPmTdmPwStatisticsBinEntry 29 }
+
+   cienaCesPmTdmPwStatisticsBinPbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of P-bit set events received."
+     ::= { cienaCesPmTdmPwStatisticsBinEntry 30 }
+
+   cienaCesPmTdmPwStatisticsBinTxPbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of P-bit set events transmitted."
+     ::= { cienaCesPmTdmPwStatisticsBinEntry 31 }
+
+
 
    --TdmPw Profile Stats, total statistics bin
 
@@ -14365,7 +15691,14 @@
      cienaCesPmTdmPwTotalStatisticsBinCvp                       Counter64,
      cienaCesPmTdmPwTotalStatisticsBinFcp                       Counter64,
      cienaCesPmTdmPwTotalStatisticsBinAsp                       Counter64,
-     cienaCesPmTdmPwTotalStatisticsBinTtp                       Counter64
+     cienaCesPmTdmPwTotalStatisticsBinTtp                       Counter64,
+     cienaCesPmTdmPwTotalStatisticsBinTxLbit                    Counter64,
+     cienaCesPmTdmPwTotalStatisticsBinTxRbit                    Counter64,
+     cienaCesPmTdmPwTotalStatisticsBinTxMbit                    Counter64,
+     cienaCesPmTdmPwTotalStatisticsBinNbit                      Counter64,
+     cienaCesPmTdmPwTotalStatisticsBinTxNbit                    Counter64,
+     cienaCesPmTdmPwTotalStatisticsBinPbit                      Counter64,
+     cienaCesPmTdmPwTotalStatisticsBinTxPbit                    Counter64
    }          
 
    cienaCesPmTdmPwTotalStatisticsBinStartTime OBJECT-TYPE
@@ -14449,21 +15782,21 @@
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of L-bit set events."
+     DESCRIPTION "Number of L-bit set events received."
      ::= { cienaCesPmTdmPwTotalStatisticsBinEntry 12 }
 
    cienaCesPmTdmPwTotalStatisticsBinRbit OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of R-bit set events."
+     DESCRIPTION "Number of R-bit set events received."
      ::= { cienaCesPmTdmPwTotalStatisticsBinEntry 13 }
 
    cienaCesPmTdmPwTotalStatisticsBinMbit OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
      STATUS      current
-     DESCRIPTION "Number of M-bit set events (CESoP specific counter)."
+     DESCRIPTION "Number of M-bit set events received (CESoP specific counter)."
      ::= { cienaCesPmTdmPwTotalStatisticsBinEntry 14 }
 
    cienaCesPmTdmPwTotalStatisticsBinRxPkt OBJECT-TYPE
@@ -14528,6 +15861,55 @@
      STATUS      current
      DESCRIPTION "Path total time seconds."
      ::= { cienaCesPmTdmPwTotalStatisticsBinEntry 23 }
+
+   cienaCesPmTdmPwTotalStatisticsBinTxLbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of L-bit set events transmitted."
+     ::= { cienaCesPmTdmPwTotalStatisticsBinEntry 24 }
+
+   cienaCesPmTdmPwTotalStatisticsBinTxRbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of R-bit set events transmitted."
+     ::= { cienaCesPmTdmPwTotalStatisticsBinEntry 25 }
+
+   cienaCesPmTdmPwTotalStatisticsBinTxMbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of M-bit set events transmitted."
+     ::= { cienaCesPmTdmPwTotalStatisticsBinEntry 26 }
+
+   cienaCesPmTdmPwTotalStatisticsBinNbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of N-bit set events received."
+     ::= { cienaCesPmTdmPwTotalStatisticsBinEntry 27 }
+
+   cienaCesPmTdmPwTotalStatisticsBinTxNbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of N-bit set events transmitted."
+     ::= { cienaCesPmTdmPwTotalStatisticsBinEntry 28 }
+
+   cienaCesPmTdmPwTotalStatisticsBinPbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of P-bit set events received."
+     ::= { cienaCesPmTdmPwTotalStatisticsBinEntry 29 }
+
+   cienaCesPmTdmPwTotalStatisticsBinTxPbit OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Number of P-bit set events transmitted."
+     ::= { cienaCesPmTdmPwTotalStatisticsBinEntry 30 }
 
 
    --BasicTxRxBiDir Profile Stats, history bins
@@ -19087,49 +20469,49 @@
      cienaCesPmTdmOCnPortHistoryBinEb OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Errored Blocks."
      ::= { cienaCesPmTdmOCnPortHistoryBinEntry 17 }
 
      cienaCesPmTdmOCnPortHistoryBinBbe OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Backgroup Block Errors."
      ::= { cienaCesPmTdmOCnPortHistoryBinEntry 18 }
 
      cienaCesPmTdmOCnPortHistoryBinEs OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Errored seconds."
      ::= { cienaCesPmTdmOCnPortHistoryBinEntry 19 }
 
      cienaCesPmTdmOCnPortHistoryBinSes OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Severely Errored seconds."
      ::= { cienaCesPmTdmOCnPortHistoryBinEntry 20 }
 
      cienaCesPmTdmOCnPortHistoryBinAs OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Available seconds."
      ::= { cienaCesPmTdmOCnPortHistoryBinEntry 21 }
 
      cienaCesPmTdmOCnPortHistoryBinUas OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Unavailable seconds."
      ::= { cienaCesPmTdmOCnPortHistoryBinEntry 22 }
 
      cienaCesPmTdmOCnPortHistoryBinTt OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Total Time seconds."
      ::= { cienaCesPmTdmOCnPortHistoryBinEntry 23 }
 
@@ -19279,49 +20661,49 @@
      cienaCesPmTdmOCnPortCurrBinEb OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Errored Blocks."
      ::= { cienaCesPmTdmOCnPortCurrBinEntry 15 }
 
      cienaCesPmTdmOCnPortCurrBinBbe OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Backgroup Block Errors."
      ::= { cienaCesPmTdmOCnPortCurrBinEntry 16 }
 
      cienaCesPmTdmOCnPortCurrBinEs OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Errored seconds."
      ::= { cienaCesPmTdmOCnPortCurrBinEntry 17 }
 
      cienaCesPmTdmOCnPortCurrBinSes OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Severely Errored seconds."
      ::= { cienaCesPmTdmOCnPortCurrBinEntry 18 }
 
      cienaCesPmTdmOCnPortCurrBinAs OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Available seconds."
      ::= { cienaCesPmTdmOCnPortCurrBinEntry 19 }
 
      cienaCesPmTdmOCnPortCurrBinUas OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Unavailable seconds."
      ::= { cienaCesPmTdmOCnPortCurrBinEntry 20 }
 
      cienaCesPmTdmOCnPortCurrBinTt OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Total Time seconds."
      ::= { cienaCesPmTdmOCnPortCurrBinEntry 21 }
 
@@ -19470,49 +20852,49 @@
      cienaCesPmTdmOCnPortCurr24HBinEb OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Errored Blocks."
      ::= { cienaCesPmTdmOCnPortCurr24HBinEntry 15 }
 
      cienaCesPmTdmOCnPortCurr24HBinBbe OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Backgroup Block Errors."
      ::= { cienaCesPmTdmOCnPortCurr24HBinEntry 16 }
 
      cienaCesPmTdmOCnPortCurr24HBinEs OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Errored seconds."
      ::= { cienaCesPmTdmOCnPortCurr24HBinEntry 17 }
 
      cienaCesPmTdmOCnPortCurr24HBinSes OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Severely Errored seconds."
      ::= { cienaCesPmTdmOCnPortCurr24HBinEntry 18 }
 
      cienaCesPmTdmOCnPortCurr24HBinAs OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Available seconds."
      ::= { cienaCesPmTdmOCnPortCurr24HBinEntry 19 }
 
      cienaCesPmTdmOCnPortCurr24HBinUas OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Unavailable seconds."
      ::= { cienaCesPmTdmOCnPortCurr24HBinEntry 20 }
 
      cienaCesPmTdmOCnPortCurr24HBinTt OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Total Time seconds."
      ::= { cienaCesPmTdmOCnPortCurr24HBinEntry 21 }
 
@@ -19669,49 +21051,49 @@
      cienaCesPmTdmOCnPortHist24HBinEb OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Errored Blocks."
      ::= { cienaCesPmTdmOCnPortHist24HBinEntry 16 }
 
      cienaCesPmTdmOCnPortHist24HBinBbe OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Backgroup Block Errors."
      ::= { cienaCesPmTdmOCnPortHist24HBinEntry 17 }
 
      cienaCesPmTdmOCnPortHist24HBinEs OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Errored seconds."
      ::= { cienaCesPmTdmOCnPortHist24HBinEntry 18 }
 
      cienaCesPmTdmOCnPortHist24HBinSes OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Severely Errored seconds."
      ::= { cienaCesPmTdmOCnPortHist24HBinEntry 19 }
 
      cienaCesPmTdmOCnPortHist24HBinAs OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Available seconds."
      ::= { cienaCesPmTdmOCnPortHist24HBinEntry 20 }
 
      cienaCesPmTdmOCnPortHist24HBinUas OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Unavailable seconds."
      ::= { cienaCesPmTdmOCnPortHist24HBinEntry 21 }
 
      cienaCesPmTdmOCnPortHist24HBinTt OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Total Time seconds."
      ::= { cienaCesPmTdmOCnPortHist24HBinEntry 22 }
 
@@ -19843,49 +21225,49 @@
      cienaCesPmTdmOCnPortStatisticsBinEb OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Errored Blocks."
      ::= { cienaCesPmTdmOCnPortStatisticsBinEntry 13 }
 
      cienaCesPmTdmOCnPortStatisticsBinBbe OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Backgroup Block Errors."
      ::= { cienaCesPmTdmOCnPortStatisticsBinEntry 14 }
 
      cienaCesPmTdmOCnPortStatisticsBinEs OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Errored seconds."
      ::= { cienaCesPmTdmOCnPortStatisticsBinEntry 15 }
 
      cienaCesPmTdmOCnPortStatisticsBinSes OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Severely Errored seconds."
      ::= { cienaCesPmTdmOCnPortStatisticsBinEntry 16 }
 
      cienaCesPmTdmOCnPortStatisticsBinAs OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Available seconds."
      ::= { cienaCesPmTdmOCnPortStatisticsBinEntry 17 }
 
      cienaCesPmTdmOCnPortStatisticsBinUas OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Unavailable seconds."
      ::= { cienaCesPmTdmOCnPortStatisticsBinEntry 18 }
 
      cienaCesPmTdmOCnPortStatisticsBinTt OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Total Time seconds."
      ::= { cienaCesPmTdmOCnPortStatisticsBinEntry 19 }
 
@@ -20009,49 +21391,49 @@
      cienaCesPmTdmOCnPortTotalStatisticsBinEb OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Errored Blocks."
      ::= { cienaCesPmTdmOCnPortTotalStatisticsBinEntry 12 }
 
      cienaCesPmTdmOCnPortTotalStatisticsBinBbe OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Backgroup Block Errors."
      ::= { cienaCesPmTdmOCnPortTotalStatisticsBinEntry 13 }
 
      cienaCesPmTdmOCnPortTotalStatisticsBinEs OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Errored seconds."
      ::= { cienaCesPmTdmOCnPortTotalStatisticsBinEntry 14 }
 
      cienaCesPmTdmOCnPortTotalStatisticsBinSes OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Severely Errored seconds."
      ::= { cienaCesPmTdmOCnPortTotalStatisticsBinEntry 15 }
 
      cienaCesPmTdmOCnPortTotalStatisticsBinAs OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Available seconds."
      ::= { cienaCesPmTdmOCnPortTotalStatisticsBinEntry 16 }
 
      cienaCesPmTdmOCnPortTotalStatisticsBinUas OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Unavailable seconds."
      ::= { cienaCesPmTdmOCnPortTotalStatisticsBinEntry 17 }
 
      cienaCesPmTdmOCnPortTotalStatisticsBinTt OBJECT-TYPE
      SYNTAX      Counter64
      MAX-ACCESS  read-only
-     STATUS      current
+     STATUS      deprecated
      DESCRIPTION "Total Time seconds."
      ::= { cienaCesPmTdmOCnPortTotalStatisticsBinEntry 18 }
 
@@ -23310,6 +24692,662 @@
      DESCRIPTION "This notification is sent when the device reports an Alert
                   Threshold Crossing Alert (TCA) event."
      ::= { cienaCesPmMIBNotifications 1 }
+
+   --TdmSTMnPort Profile Stats, history bins
+
+   cienaCesPmTdmSTMnPortHistoryBinTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF CienaCesPmTdmSTMnPortHistoryBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "The (conceptual) read-only table listing the bin statistics."
+     ::= { cienaCesPmTdmSTMnPortStats 1 }
+
+   cienaCesPmTdmSTMnPortHistoryBinEntry OBJECT-TYPE
+     SYNTAX      CienaCesPmTdmSTMnPortHistoryBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaPortPmTdmSTMnPortHistoryBinTable.
+
+           This table lists the statistics for all the history bins of the PM instance, as 
+           specified by the bin-count object of the PM instance.  History bins are displayed in the order
+           so that #1 bin always represents the most recently completed bin and #2 - the bin previous to that
+           and so on.
+
+           The statistics are displayed for only the instances with valid bins (with start time >0), 
+           as indicated by the operational state of the corresponding PM instance."
+     INDEX { cienaCesPmInstanceIndex, cienaCesPmTdmSTMnPortHistoryBinIndex }
+     ::= { cienaCesPmTdmSTMnPortHistoryBinTable 1 }
+
+   CienaCesPmTdmSTMnPortHistoryBinEntry ::=  SEQUENCE {
+     cienaCesPmTdmSTMnPortHistoryBinIndex                             Unsigned32,
+     cienaCesPmTdmSTMnPortHistoryBinStartTime                         DisplayString,
+     cienaCesPmTdmSTMnPortHistoryBinEndTime                           DisplayString,
+     cienaCesPmTdmSTMnPortHistoryBinClearTime                         DisplayString,
+     cienaCesPmTdmSTMnPortHistoryBinDuration                          Unsigned32,
+     cienaCesPmTdmSTMnPortHistoryBinState                             PmBinState,
+     cienaCesPmTdmSTMnPortHistoryBinEb                                Counter64,
+     cienaCesPmTdmSTMnPortHistoryBinBbe                               Counter64,
+     cienaCesPmTdmSTMnPortHistoryBinEs                                Counter64,
+     cienaCesPmTdmSTMnPortHistoryBinSes                               Counter64,
+     cienaCesPmTdmSTMnPortHistoryBinAs                                Counter64,
+     cienaCesPmTdmSTMnPortHistoryBinUas                               Counter64,
+     cienaCesPmTdmSTMnPortHistoryBinTt                                Counter64
+   }
+   cienaCesPmTdmSTMnPortHistoryBinIndex OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..65535)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION "Bin number associated with the PmTdmSTMnPortHistoryBin entry."
+     ::= { cienaCesPmTdmSTMnPortHistoryBinEntry 1 }
+
+   cienaCesPmTdmSTMnPortHistoryBinStartTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection start time of the bin."
+     ::= { cienaCesPmTdmSTMnPortHistoryBinEntry 2 }
+
+   cienaCesPmTdmSTMnPortHistoryBinEndTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection end time of the bin."
+     ::= { cienaCesPmTdmSTMnPortHistoryBinEntry 3 }
+
+   cienaCesPmTdmSTMnPortHistoryBinClearTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection clear time of the bin."
+     ::= { cienaCesPmTdmSTMnPortHistoryBinEntry 4 }
+
+   cienaCesPmTdmSTMnPortHistoryBinDuration OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..65535)
+     UNITS       "minutes"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Duration of the bin."
+     ::= { cienaCesPmTdmSTMnPortHistoryBinEntry 5 }
+
+   cienaCesPmTdmSTMnPortHistoryBinState OBJECT-TYPE
+     SYNTAX      PmBinState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "State of the bin."
+     ::= { cienaCesPmTdmSTMnPortHistoryBinEntry 6 }
+
+     cienaCesPmTdmSTMnPortHistoryBinEb OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Errored Blocks."
+     ::= { cienaCesPmTdmSTMnPortHistoryBinEntry 7 }
+
+     cienaCesPmTdmSTMnPortHistoryBinBbe OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Backgroup Block Errors."
+     ::= { cienaCesPmTdmSTMnPortHistoryBinEntry 8 }
+
+     cienaCesPmTdmSTMnPortHistoryBinEs OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Errored seconds."
+     ::= { cienaCesPmTdmSTMnPortHistoryBinEntry 9 }
+
+     cienaCesPmTdmSTMnPortHistoryBinSes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Severely Errored seconds."
+     ::= { cienaCesPmTdmSTMnPortHistoryBinEntry 10 }
+
+     cienaCesPmTdmSTMnPortHistoryBinAs OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Available seconds."
+     ::= { cienaCesPmTdmSTMnPortHistoryBinEntry 11 }
+
+     cienaCesPmTdmSTMnPortHistoryBinUas OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Unavailable seconds."
+     ::= { cienaCesPmTdmSTMnPortHistoryBinEntry 12 }
+
+     cienaCesPmTdmSTMnPortHistoryBinTt OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Total Time seconds."
+     ::= { cienaCesPmTdmSTMnPortHistoryBinEntry 13 }
+
+
+   --TdmSTMnPort Profile Stats, current bin
+
+   cienaCesPmTdmSTMnPortCurrBinTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF CienaCesPmTdmSTMnPortCurrBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION "The (conceptual) read-only table listing the bin statistics."
+     ::= { cienaCesPmTdmSTMnPortStats 2 }
+
+   cienaCesPmTdmSTMnPortCurrBinEntry OBJECT-TYPE
+     SYNTAX      CienaCesPmTdmSTMnPortCurrBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaPortPmTdmSTMnPortCurrBinTable.
+           This table lists the statistics for the current bin of the PM instance."
+     INDEX {cienaCesPmInstanceIndex}
+     ::= { cienaCesPmTdmSTMnPortCurrBinTable 1 }
+
+   CienaCesPmTdmSTMnPortCurrBinEntry ::=  SEQUENCE {
+     cienaCesPmTdmSTMnPortCurrBinStartTime                            DisplayString,
+     cienaCesPmTdmSTMnPortCurrBinClearTime                            DisplayString,
+     cienaCesPmTdmSTMnPortCurrBinDuration                             Unsigned32,
+     cienaCesPmTdmSTMnPortCurrBinState                                PmBinState,
+     cienaCesPmTdmSTMnPortCurrBinEb                                   Counter64,
+     cienaCesPmTdmSTMnPortCurrBinBbe                                  Counter64,
+     cienaCesPmTdmSTMnPortCurrBinEs                                   Counter64,
+     cienaCesPmTdmSTMnPortCurrBinSes                                  Counter64,
+     cienaCesPmTdmSTMnPortCurrBinAs                                   Counter64,
+     cienaCesPmTdmSTMnPortCurrBinUas                                  Counter64,
+     cienaCesPmTdmSTMnPortCurrBinTt                                   Counter64
+   }
+
+   cienaCesPmTdmSTMnPortCurrBinStartTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection start time of the bin."
+     ::= { cienaCesPmTdmSTMnPortCurrBinEntry 1 }
+
+   cienaCesPmTdmSTMnPortCurrBinClearTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Cleared time of the bin."
+     ::= { cienaCesPmTdmSTMnPortCurrBinEntry 2 }
+
+   cienaCesPmTdmSTMnPortCurrBinDuration OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..65535)
+     UNITS       "minutes"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Interval of the bin."
+     ::= { cienaCesPmTdmSTMnPortCurrBinEntry 3 }
+
+   cienaCesPmTdmSTMnPortCurrBinState OBJECT-TYPE
+     SYNTAX      PmBinState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "State of the bin."
+     ::= { cienaCesPmTdmSTMnPortCurrBinEntry 4 }
+
+     cienaCesPmTdmSTMnPortCurrBinEb OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Errored Blocks."
+     ::= { cienaCesPmTdmSTMnPortCurrBinEntry 5 }
+
+     cienaCesPmTdmSTMnPortCurrBinBbe OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Backgroup Block Errors."
+     ::= { cienaCesPmTdmSTMnPortCurrBinEntry 6 }
+
+     cienaCesPmTdmSTMnPortCurrBinEs OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Errored seconds."
+     ::= { cienaCesPmTdmSTMnPortCurrBinEntry 7 }
+
+     cienaCesPmTdmSTMnPortCurrBinSes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Severely Errored seconds."
+     ::= { cienaCesPmTdmSTMnPortCurrBinEntry 8 }
+
+     cienaCesPmTdmSTMnPortCurrBinAs OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Available seconds."
+     ::= { cienaCesPmTdmSTMnPortCurrBinEntry 9 }
+
+     cienaCesPmTdmSTMnPortCurrBinUas OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Unavailable seconds."
+     ::= { cienaCesPmTdmSTMnPortCurrBinEntry 10 }
+
+     cienaCesPmTdmSTMnPortCurrBinTt OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Total Time seconds."
+     ::= { cienaCesPmTdmSTMnPortCurrBinEntry 11 }
+
+   --TdmSTMnPort Profile Stats, current 24 hour bin
+  
+   cienaCesPmTdmSTMnPortCurr24HBinTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF CienaCesPmTdmSTMnPortCurr24HBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION "The (conceptual) read-only table listing the bin statistics."
+     ::= { cienaCesPmTdmSTMnPortStats 3 }
+
+   cienaCesPmTdmSTMnPortCurr24HBinEntry OBJECT-TYPE
+     SYNTAX      CienaCesPmTdmSTMnPortCurr24HBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaPortPmTdmSTMnPortCurr24HBinTable.
+           This table lists the statistics for the current 24 hours bin."
+     INDEX {cienaCesPmInstanceIndex }
+     ::= { cienaCesPmTdmSTMnPortCurr24HBinTable 1 }
+
+   CienaCesPmTdmSTMnPortCurr24HBinEntry ::=  SEQUENCE {
+     cienaCesPmTdmSTMnPortCurr24HBinStartTime                         DisplayString,
+     cienaCesPmTdmSTMnPortCurr24HBinClearTime                         DisplayString,
+     cienaCesPmTdmSTMnPortCurr24HBinDuration                          Unsigned32,
+     cienaCesPmTdmSTMnPortCurr24HBinState                             PmBinState,
+     cienaCesPmTdmSTMnPortCurr24HBinEb                                Counter64,
+     cienaCesPmTdmSTMnPortCurr24HBinBbe                               Counter64,
+     cienaCesPmTdmSTMnPortCurr24HBinEs                                Counter64,
+     cienaCesPmTdmSTMnPortCurr24HBinSes                               Counter64,
+     cienaCesPmTdmSTMnPortCurr24HBinAs                                Counter64,
+     cienaCesPmTdmSTMnPortCurr24HBinUas                               Counter64,
+     cienaCesPmTdmSTMnPortCurr24HBinTt                                Counter64
+   } 
+
+   cienaCesPmTdmSTMnPortCurr24HBinStartTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection start time of the bin."
+     ::= { cienaCesPmTdmSTMnPortCurr24HBinEntry 1 }
+
+   cienaCesPmTdmSTMnPortCurr24HBinClearTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Cleared time of the bin."
+     ::= { cienaCesPmTdmSTMnPortCurr24HBinEntry 2 }
+
+   cienaCesPmTdmSTMnPortCurr24HBinDuration OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..65535)
+     UNITS       "minutes"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Duration of the bin."
+     ::= { cienaCesPmTdmSTMnPortCurr24HBinEntry 3 }
+
+   cienaCesPmTdmSTMnPortCurr24HBinState OBJECT-TYPE
+     SYNTAX      PmBinState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "State of the bin."
+     ::= { cienaCesPmTdmSTMnPortCurr24HBinEntry 4 }
+
+     cienaCesPmTdmSTMnPortCurr24HBinEb OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Errored Blocks."
+     ::= { cienaCesPmTdmSTMnPortCurr24HBinEntry 5 }
+
+     cienaCesPmTdmSTMnPortCurr24HBinBbe OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Backgroup Block Errors."
+     ::= { cienaCesPmTdmSTMnPortCurr24HBinEntry 6 }
+
+     cienaCesPmTdmSTMnPortCurr24HBinEs OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Errored seconds."
+     ::= { cienaCesPmTdmSTMnPortCurr24HBinEntry 7 }
+
+     cienaCesPmTdmSTMnPortCurr24HBinSes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Severely Errored seconds."
+     ::= { cienaCesPmTdmSTMnPortCurr24HBinEntry 8 }
+
+     cienaCesPmTdmSTMnPortCurr24HBinAs OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Available seconds."
+     ::= { cienaCesPmTdmSTMnPortCurr24HBinEntry 9 }
+
+     cienaCesPmTdmSTMnPortCurr24HBinUas OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Unavailable seconds."
+     ::= { cienaCesPmTdmSTMnPortCurr24HBinEntry 10 }
+
+     cienaCesPmTdmSTMnPortCurr24HBinTt OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Total Time seconds."
+     ::= { cienaCesPmTdmSTMnPortCurr24HBinEntry 11 }
+
+   --TdmSTMnPort Profile Stats, history 24 hour bin
+  
+   cienaCesPmTdmSTMnPortHist24HBinTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF CienaCesPmTdmSTMnPortHist24HBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION "The (conceptual) read-only Table listing the Bin Statistics."
+     ::= { cienaCesPmTdmSTMnPortStats 4 }
+
+   cienaCesPmTdmSTMnPortHist24HBinEntry OBJECT-TYPE
+     SYNTAX      CienaCesPmTdmSTMnPortHist24HBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaPortPmTdmSTMnPortHist24HBinTable.
+           This table lists the statistics for the history 24 hours bin."
+     INDEX {cienaCesPmInstanceIndex}
+     ::= { cienaCesPmTdmSTMnPortHist24HBinTable 1 }
+
+   CienaCesPmTdmSTMnPortHist24HBinEntry ::=  SEQUENCE {
+     cienaCesPmTdmSTMnPortHist24HBinStartTime                         DisplayString,
+     cienaCesPmTdmSTMnPortHist24HBinEndTime                           DisplayString,
+     cienaCesPmTdmSTMnPortHist24HBinClearTime                         DisplayString,
+     cienaCesPmTdmSTMnPortHist24HBinDuration                          Unsigned32,
+     cienaCesPmTdmSTMnPortHist24HBinState                             PmBinState,
+     cienaCesPmTdmSTMnPortHist24HBinEb                                Counter64,
+     cienaCesPmTdmSTMnPortHist24HBinBbe                               Counter64,
+     cienaCesPmTdmSTMnPortHist24HBinEs                                Counter64,
+     cienaCesPmTdmSTMnPortHist24HBinSes                               Counter64,
+     cienaCesPmTdmSTMnPortHist24HBinAs                                Counter64,
+     cienaCesPmTdmSTMnPortHist24HBinUas                               Counter64,
+     cienaCesPmTdmSTMnPortHist24HBinTt                                Counter64
+   }
+
+   cienaCesPmTdmSTMnPortHist24HBinStartTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection start time of the bin."
+     ::= { cienaCesPmTdmSTMnPortHist24HBinEntry 1 }
+
+   cienaCesPmTdmSTMnPortHist24HBinEndTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection end time for the bin."
+     ::= { cienaCesPmTdmSTMnPortHist24HBinEntry 2 }
+
+   cienaCesPmTdmSTMnPortHist24HBinClearTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Cleared time of the bin."
+     ::= { cienaCesPmTdmSTMnPortHist24HBinEntry 3 }
+
+   cienaCesPmTdmSTMnPortHist24HBinDuration OBJECT-TYPE
+     SYNTAX      Unsigned32 (1..65535)
+     UNITS       "minutes"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Duration of the bin."
+     ::= { cienaCesPmTdmSTMnPortHist24HBinEntry 4 }
+
+   cienaCesPmTdmSTMnPortHist24HBinState OBJECT-TYPE
+     SYNTAX      PmBinState
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "State of the bin."
+     ::= { cienaCesPmTdmSTMnPortHist24HBinEntry 5 }
+
+     cienaCesPmTdmSTMnPortHist24HBinEb OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Errored Blocks."
+     ::= { cienaCesPmTdmSTMnPortHist24HBinEntry 6 }
+
+     cienaCesPmTdmSTMnPortHist24HBinBbe OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Backgroup Block Errors."
+     ::= { cienaCesPmTdmSTMnPortHist24HBinEntry 7 }
+
+     cienaCesPmTdmSTMnPortHist24HBinEs OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Errored seconds."
+     ::= { cienaCesPmTdmSTMnPortHist24HBinEntry 8 }
+
+     cienaCesPmTdmSTMnPortHist24HBinSes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Severely Errored seconds."
+     ::= { cienaCesPmTdmSTMnPortHist24HBinEntry 9 }
+
+     cienaCesPmTdmSTMnPortHist24HBinAs OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Available seconds."
+     ::= { cienaCesPmTdmSTMnPortHist24HBinEntry 10 }
+
+     cienaCesPmTdmSTMnPortHist24HBinUas OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Unavailable seconds."
+     ::= { cienaCesPmTdmSTMnPortHist24HBinEntry 11 }
+
+     cienaCesPmTdmSTMnPortHist24HBinTt OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Total Time seconds."
+     ::= { cienaCesPmTdmSTMnPortHist24HBinEntry 12 }
+
+   --TdmSTMnPort Profile Stats, statistics bin
+
+   cienaCesPmTdmSTMnPortStatisticsBinTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF CienaCesPmTdmSTMnPortStatisticsBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION "The (conceptual) read-only table listing the bin statistics."
+     ::= { cienaCesPmTdmSTMnPortStats 5 }
+
+   cienaCesPmTdmSTMnPortStatisticsBinEntry OBJECT-TYPE
+     SYNTAX      CienaCesPmTdmSTMnPortStatisticsBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaPortPmTdmSTMnPortStatisticsBinTable.
+           This table lists the statistics for the statistics bin of the PM instance."
+     INDEX {cienaCesPmInstanceIndex}
+     ::= { cienaCesPmTdmSTMnPortStatisticsBinTable 1 }
+
+   CienaCesPmTdmSTMnPortStatisticsBinEntry ::=  SEQUENCE {
+     cienaCesPmTdmSTMnPortStatisticsBinStartTime                      DisplayString,
+     cienaCesPmTdmSTMnPortStatisticsBinClearTime                      DisplayString,
+     cienaCesPmTdmSTMnPortStatisticsBinEb                             Counter64,
+     cienaCesPmTdmSTMnPortStatisticsBinBbe                            Counter64,
+     cienaCesPmTdmSTMnPortStatisticsBinEs                             Counter64,
+     cienaCesPmTdmSTMnPortStatisticsBinSes                            Counter64,
+     cienaCesPmTdmSTMnPortStatisticsBinAs                             Counter64,
+     cienaCesPmTdmSTMnPortStatisticsBinUas                            Counter64,
+     cienaCesPmTdmSTMnPortStatisticsBinTt                             Counter64
+   }          
+
+   cienaCesPmTdmSTMnPortStatisticsBinStartTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection start time of the bin."
+     ::= { cienaCesPmTdmSTMnPortStatisticsBinEntry 1 }
+
+   cienaCesPmTdmSTMnPortStatisticsBinClearTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Cleared time of the bin."
+     ::= { cienaCesPmTdmSTMnPortStatisticsBinEntry 2 }
+
+     cienaCesPmTdmSTMnPortStatisticsBinEb OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Errored Blocks."
+     ::= { cienaCesPmTdmSTMnPortStatisticsBinEntry 3 }
+
+     cienaCesPmTdmSTMnPortStatisticsBinBbe OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Backgroup Block Errors."
+     ::= { cienaCesPmTdmSTMnPortStatisticsBinEntry 4 }
+
+     cienaCesPmTdmSTMnPortStatisticsBinEs OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Errored seconds."
+     ::= { cienaCesPmTdmSTMnPortStatisticsBinEntry 5 }
+
+     cienaCesPmTdmSTMnPortStatisticsBinSes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Severely Errored seconds."
+     ::= { cienaCesPmTdmSTMnPortStatisticsBinEntry 6 }
+
+     cienaCesPmTdmSTMnPortStatisticsBinAs OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Available seconds."
+     ::= { cienaCesPmTdmSTMnPortStatisticsBinEntry 7 }
+
+     cienaCesPmTdmSTMnPortStatisticsBinUas OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Unavailable seconds."
+     ::= { cienaCesPmTdmSTMnPortStatisticsBinEntry 8 }
+
+     cienaCesPmTdmSTMnPortStatisticsBinTt OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Total Time seconds."
+     ::= { cienaCesPmTdmSTMnPortStatisticsBinEntry 9 }
+
+   --TdmSTMnPort Profile Stats, total statistics bin
+
+   cienaCesPmTdmSTMnPortTotalStatisticsBinTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF CienaCesPmTdmSTMnPortTotalStatisticsBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION "The (conceptual) read-only table listing the bin statistics."
+     ::= { cienaCesPmTdmSTMnPortStats 6 }
+
+   cienaCesPmTdmSTMnPortTotalStatisticsBinEntry OBJECT-TYPE
+     SYNTAX      CienaCesPmTdmSTMnPortTotalStatisticsBinEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaPortPmTdmSTMnPortTotalStatisticsBinTable.
+           This table lists the statistics for the total statistics bin of the PM instance."
+     INDEX {cienaCesPmInstanceIndex}
+     ::= { cienaCesPmTdmSTMnPortTotalStatisticsBinTable 1 }
+
+   CienaCesPmTdmSTMnPortTotalStatisticsBinEntry ::=  SEQUENCE {
+     cienaCesPmTdmSTMnPortTotalStatisticsBinStartTime                 DisplayString,
+     cienaCesPmTdmSTMnPortTotalStatisticsBinEb                        Counter64,
+     cienaCesPmTdmSTMnPortTotalStatisticsBinBbe                       Counter64,
+     cienaCesPmTdmSTMnPortTotalStatisticsBinEs                        Counter64,
+     cienaCesPmTdmSTMnPortTotalStatisticsBinSes                       Counter64,
+     cienaCesPmTdmSTMnPortTotalStatisticsBinAs                        Counter64,
+     cienaCesPmTdmSTMnPortTotalStatisticsBinUas                       Counter64,
+     cienaCesPmTdmSTMnPortTotalStatisticsBinTt                        Counter64
+   }          
+
+   cienaCesPmTdmSTMnPortTotalStatisticsBinStartTime OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Collection start time of the bin."
+     ::= { cienaCesPmTdmSTMnPortTotalStatisticsBinEntry 1 }
+
+     cienaCesPmTdmSTMnPortTotalStatisticsBinEb OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Errored Blocks."
+     ::= { cienaCesPmTdmSTMnPortTotalStatisticsBinEntry 2 }
+
+     cienaCesPmTdmSTMnPortTotalStatisticsBinBbe OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Backgroup Block Errors."
+     ::= { cienaCesPmTdmSTMnPortTotalStatisticsBinEntry 3 }
+
+     cienaCesPmTdmSTMnPortTotalStatisticsBinEs OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Errored seconds."
+     ::= { cienaCesPmTdmSTMnPortTotalStatisticsBinEntry 4 }
+
+     cienaCesPmTdmSTMnPortTotalStatisticsBinSes OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Severely Errored seconds."
+     ::= { cienaCesPmTdmSTMnPortTotalStatisticsBinEntry 5 }
+
+     cienaCesPmTdmSTMnPortTotalStatisticsBinAs OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Available seconds."
+     ::= { cienaCesPmTdmSTMnPortTotalStatisticsBinEntry 6 }
+
+     cienaCesPmTdmSTMnPortTotalStatisticsBinUas OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Unavailable seconds."
+     ::= { cienaCesPmTdmSTMnPortTotalStatisticsBinEntry 7 }
+
+     cienaCesPmTdmSTMnPortTotalStatisticsBinTt OBJECT-TYPE
+     SYNTAX      Counter64
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION "Total Time seconds."
+     ::= { cienaCesPmTdmSTMnPortTotalStatisticsBinEntry 8 }
 
    END
 

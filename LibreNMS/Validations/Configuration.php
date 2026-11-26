@@ -51,7 +51,7 @@ class Configuration extends BaseValidation
         }
 
         if (Eloquent::isConnected() && ! \DB::table('devices')->exists()) {
-            $validator->warn('You have no devices.', 'Consider adding a device such as localhost: ' . $validator->getBaseURL() . '/addhost');
+            $validator->warn('You have no devices.', 'Consider adding a device such as localhost: ' . route('device.add'));
         }
 
         if (LibrenmsConfig::has('validation.encryption.test')) {

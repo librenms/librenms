@@ -1,11 +1,11 @@
 -- =============================================================================
--- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2023 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description:
 --   The file defines a MIB to provide AP object information such as
 --   performance statistic and notification events.
 -- Reference:
--- Version: V3.5
+-- Version: V3.7
 -- History:
 --   V1.0 2006-05-10 Initial version, created by shiyang (Richard)
 --   V1.1 2007-02-01 modified by xingjichen(Daniel)
@@ -332,6 +332,15 @@
 --        hh3cDot11APGpsElevation, and hh3cDot11APGpsObtainTime to Hh3cDot11APObjectStatusEntry
 --        Add new table hh3cDot11MaxPowerCapaTable to hh3cDot11APObjectGroup
 --        Add new nodes hh3cDot11APGateWayIPv4 and hh3cDot11APGateWayIPv6 to Hh3cDot11APObjectStatusEntry
+--   V3.6 2021-06-18 modified by liyapeng
+--        Add new object hh3cDot11APMtTrapRadioFailReason to hh3cDot11APMtRadioFailRecoverTrap
+--   V3.7 2023-01-06 modified by fanwenyang
+--        Add new object hh3cDot11RadioType to hh3cDot11APRadioTable
+--        Add new object hh3cDot11RadioOper to hh3cDot11APRadioTable
+--        Add new object hh3cDot11BindSSID to hh3cDot11APRadioTable
+--        Add new object hh3cDot11RadioAverageSignalStrength to hh3cDot11APRadioTable
+--        Add new object hh3cDot11RadioMaxSignalStrength to hh3cDot11APRadioTable
+--        Add new object hh3cDot11RadioMinSignalStrength to hh3cDot11APRadioTable
 -- =============================================================================
 HH3C-DOT11-APMT-MIB DEFINITIONS ::= BEGIN
 
@@ -367,7 +376,7 @@ IMPORTS
     FROM HH3C-DOT11-REF-MIB;
 
 hh3cDot11APMT MODULE-IDENTITY
-    LAST-UPDATED "201806041800Z"        -- Jun 04, 2018 at 18:00 GMT
+    LAST-UPDATED "202301061800Z"        -- Jan 6, 2023 at 18:00 GMT
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -426,6 +435,12 @@ hh3cDot11APMT MODULE-IDENTITY
         A data rate that is mandatory for client
         devices to support in order for them to achieve
         successful association."
+    REVISION "202301061800Z"        -- Jan 6, 2023 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes."
+    REVISION "202106181800Z"        -- Jun 18, 2021 at 18:00 GMT
+    DESCRIPTION
+        " Modify the OBJECTS of the trap node."
     REVISION "201806041800Z"        -- Jun 04, 2018 at 18:00 GMT
     DESCRIPTION
         "Modified to add new tables and new nodes."
@@ -882,7 +897,7 @@ Hh3cDot11APObjectEntry ::= SEQUENCE
 
 hh3cDot11APObjID OBJECT-TYPE
     SYNTAX      Hh3cDot11ObjectIDType
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "To uniquely identify each AP, and relation-ship between hh3cDot11APObjID
@@ -1214,12 +1229,18 @@ Hh3cDot11APRadioEntry ::= SEQUENCE
         hh3cDot11AirPrimChnlBusy          Integer32,
         hh3cDot11AirPrimChnlTxBusy        Integer32,
         hh3cDot11AirPrimChnlRxBusy        Integer32,
-        hh3cDot11AirExtChnlBusy           Integer32
+        hh3cDot11AirExtChnlBusy           Integer32,
+        hh3cDot11RadioType                Integer32,
+        hh3cDot11RadioOper                Integer32,
+        hh3cDot11BindSSID                 OCTET STRING,
+        hh3cDot11RadioAverageSignalStrength Integer32,
+        hh3cDot11RadioMaxSignalStrength   Integer32,
+        hh3cDot11RadioMinSignalStrength   Integer32
     }
 
 hh3cDot11CurAPID OBJECT-TYPE
     SYNTAX      OCTET STRING(SIZE(0..64))
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "To uniquely identify a AP in running status."
@@ -1227,7 +1248,7 @@ hh3cDot11CurAPID OBJECT-TYPE
 
 hh3cDot11RadioID OBJECT-TYPE
     SYNTAX      Integer32(0..2147483647)
-    MAX-ACCESS  accessible-for-notify
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "Represents each radio."
@@ -1495,6 +1516,58 @@ hh3cDot11AirExtChnlBusy OBJECT-TYPE
     "Represents air interface utilization on the secondary channel.
     The value 255 represents an invalid value."
     ::= { hh3cDot11APRadioEntry 29 }
+
+hh3cDot11RadioType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Represents the radio type of the radio."
+    ::= { hh3cDot11APRadioEntry 30 }
+
+hh3cDot11RadioOper OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Set the status of the radio."
+    ::= { hh3cDot11APRadioEntry 31 }
+
+hh3cDot11BindSSID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Represents all SSIDs of the radio."
+    ::= { hh3cDot11APRadioEntry 32 }
+
+hh3cDot11RadioAverageSignalStrength OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the average received signal strength."
+    ::= { hh3cDot11APRadioEntry 33 }
+
+hh3cDot11RadioMaxSignalStrength OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the highest received signal strength."
+    ::= { hh3cDot11APRadioEntry 34 }
+
+hh3cDot11RadioMinSignalStrength OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the lowest received signal strength."
+    ::= { hh3cDot11APRadioEntry 35 }
+
 -- *****************************************************************************
 -- *  End of hh3cDot11APRadioTable Definition
 -- *****************************************************************************
@@ -7453,7 +7526,8 @@ hh3cDot11APMtRadioFailRecoverTrap NOTIFICATION-TYPE
     OBJECTS
         {
             hh3cDot11APID,
-            hh3cDot11RadioID
+            hh3cDot11RadioID,
+            hh3cDot11APMtTrapRadioFailReason
         }
     STATUS      current
     DESCRIPTION

@@ -28,7 +28,7 @@ namespace LibreNMS\Data\Source\Snmp;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use LibreNMS\Exceptions\SnmpException;
+use LibreNMS\Exceptions\SnmpConnectionException;
 use LibreNMS\Util\Oid;
 use Log;
 
@@ -125,12 +125,12 @@ class SnmpResponse implements \Stringable
     /**
      * For queries whose result must be known, for example before removing data the device no longer reports
      *
-     * @throws SnmpException
+     * @throws SnmpConnectionException
      */
     public function throwIfConnectionError(): static
     {
         if ($this->hasConnectionError()) {
-            throw new SnmpException(trim($this->stderr));
+            throw new SnmpConnectionException(trim($this->stderr));
         }
 
         return $this;

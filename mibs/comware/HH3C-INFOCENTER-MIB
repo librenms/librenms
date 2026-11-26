@@ -1,13 +1,13 @@
 -- ==========================================================================
--- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Infomation center MIB
 -- Reference: RFC5424
--- Version: V1.2
+-- Version: V1.4
 -- History:
 --   V1.0 Initial version 2012-03-07 by shuaixiaojuan
 --        2012-11-03
---        add hh3cICLogbufferContTable, hh3cICLogbufferContEntry,
+--        Added hh3cICLogbufferContTable, hh3cICLogbufferContEntry,
 --        hh3cICLogbufferContIndex, hh3cICLogbufferContDescription by chenkaiping
 --   V1.1 2014-09-05 by SongHao
 --        Added isoWithTimezone(5) to ICTimeStampType.
@@ -16,6 +16,11 @@
 --        Added dataWithMilliseconds(6), isoWithMilliseconds(7),
 --        isoWithMillisecondsAndTimezone(8) to hh3cICLoghostTimestampType.
 --        Modified description of hh3cICLoghostTimestampType.
+--   V1.3 2022-06-15 by caohao
+--        Added hh3cICNotification, hh3cICLogWriteFail,
+--        hh3cICLogType, hh3cICFailReason.
+--   V1.4 2022-07-21 by zhangjindong
+--        Added hh3cICLogFileName, and hh3cICLogFileAging.
 -- ==========================================================================
 HH3C-INFOCENTER-MIB DEFINITIONS ::= BEGIN
 
@@ -24,7 +29,7 @@ IMPORTS
         FROM HH3C-OID-MIB
     DisplayString, TruthValue, RowStatus, TAddress, TEXTUAL-CONVENTION
         FROM SNMPv2-TC
-    Counter32, Unsigned32, Integer32, OBJECT-TYPE, MODULE-IDENTITY
+    Counter32, Unsigned32, Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
         FROM SNMPv2-SMI
     InetAddressType, InetAddress
         FROM INET-ADDRESS-MIB
@@ -32,7 +37,7 @@ IMPORTS
         FROM IF-MIB;
 
 hh3cInfoCenter MODULE-IDENTITY
-    LAST-UPDATED "202002070459Z"
+    LAST-UPDATED "202207210000Z"
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -43,9 +48,17 @@ hh3cInfoCenter MODULE-IDENTITY
     DESCRIPTION
         "All the configuration of the info center can be managed
         by info center MIB."
+    REVISION "202207210000Z"
+    DESCRIPTION
+        "Added hh3cICLogFileName and
+         hh3cICLogFileAging."
+    REVISION "202206150000Z"
+    DESCRIPTION
+        "Added hh3cICNotification, hh3cICLogWriteFail,
+        hh3cICLogType, hh3cICFailReason."
     REVISION "202002070459Z"
     DESCRIPTION
-        "Add dataWithMilliseconds(6), isoWithMilliseconds(7),
+        "Added dataWithMilliseconds(6), isoWithMilliseconds(7),
         isoWithMillisecondsAndTimezone(8) to hh3cICLoghostTimestampType.
         Modified description of hh3cICLoghostTimestampType."
     REVISION "201409050325Z"
@@ -54,7 +67,7 @@ hh3cInfoCenter MODULE-IDENTITY
         Modified description of hh3cICLogTimestampType."
     REVISION "201211031900Z"
     DESCRIPTION
-        "Add hh3cICLogbufferContTable, hh3cICLogbufferContEntry,
+        "Added hh3cICLogbufferContTable, hh3cICLogbufferContEntry,
         hh3cICLogbufferContIndex, hh3cICLogbufferContDescription."
     REVISION "201203071900Z"        -- Mar 07, 2012 at 19:00 GMT
     DESCRIPTION
@@ -528,4 +541,55 @@ hh3cICLogRowStatus OBJECT-TYPE
         "The status of this table entry."
     ::= { hh3cICLogEntry 2 }
 
+hh3cICNotification OBJECT IDENTIFIER ::= { hh3cICLog 3 }
+hh3cICTrapPrefix OBJECT IDENTIFIER ::= { hh3cICNotification 0 }
+
+hh3cICLogWriteFail NOTIFICATION-TYPE
+    OBJECTS { hh3cICLogType, hh3cICFailReason }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when write to the log file fails."
+    ::= { hh3cICTrapPrefix 1 }
+
+hh3cICLogFileAging  NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cICLogFileName
+        }
+    STATUS current
+    DESCRIPTION
+        "This notification is generated each time when the oldest files are deleted (single file is not supported)."
+    ::= { hh3cICTrapPrefix 2 }
+
+hh3cICTrapInfor OBJECT IDENTIFIER ::= { hh3cICLog 4 }
+
+hh3cICLogType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            logfile(1),
+            diagfile(2),
+            secfile(3),
+            tracefile(4)
+        }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Log file type"
+    ::= { hh3cICTrapInfor 1}
+
+hh3cICFailReason OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Log file write failure reason."
+    ::= { hh3cICTrapInfor 2}
+
+hh3cICLogFileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Name of a deleted log file."
+    ::= { hh3cICTrapInfor 3}
 END

@@ -12,33 +12,16 @@
  * the source code distribution for details.
  */
 
+use App\Data\Graphing\Legacy\LegacyGraphParameters;
 use App\Facades\LibrenmsConfig;
 use App\Models\Service;
-use LibreNMS\Data\Graphing\GraphParameters;
 use LibreNMS\Services;
 
 /** @var Service $service */
-/** @var GraphParameters $graph_params */
+/** @var LegacyGraphParameters $graph_params */
 $rrd_filename = Rrd::name($service->device->hostname, ['services', $service->service_id]);
 
-$service_ds = json_decode(htmlspecialchars_decode((string) $service->service_ds), true) ?: [];
-
-$check_script = Services::customCheckPath($service->service_type);
-if (is_file($check_script)) {
-    $serviceData = array_merge([
-        'service_param' => '',
-        'service_ip' => '',
-        'hostname' => '',
-        'overwrite_ip' => '',
-        'service_type' => $service->service_type,
-    ], $service->toArray());
-    $service = $serviceData;
-    include $check_script;
-
-    if (isset($check_ds)) {
-        $service_ds = json_decode($check_ds, true) ?: [];
-    }
-}
+['sources' => $service_ds, 'options' => $check_graph] = Services::graphDefinitions($service, $rrd_filename);
 
 include 'includes/html/graphs/common.inc.php';
 $graph_params->scale_min = 0;

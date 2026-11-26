@@ -161,14 +161,12 @@ class AppServiceProvider extends ServiceProvider
         Blade::if('notconfig', fn ($key) => ! LibrenmsConfig::get($key));
         Blade::if('admin', fn () => auth()->check() && auth()->user()->hasRole('admin')); // TODO remove
 
-        Blade::directive('deviceUrl', fn ($arguments) => "<?php echo \LibreNMS\Util\Url::deviceUrl($arguments); ?>");
-
         // Graphing
         Blade::directive('signedGraphUrl', fn ($vars) => "<?php echo \LibreNMS\Util\Url::forExternalGraph($vars); ?>");
 
         Blade::directive('signedGraphTag', fn ($vars) => "<?php echo '<img class=\"librenms-graph\" src=\"' . \LibreNMS\Util\Url::forExternalGraph($vars) . '\" />'; ?>");
 
-        Blade::directive('graphImage', fn ($vars, $flags = 0) => "<?php echo \LibreNMS\Util\Graph::getImageData($vars, $flags); ?>");
+        Blade::directive('graphImage', fn ($expression) => "<?php echo \LibreNMS\Util\Graph::getImageData($expression); ?>");
     }
 
     private function configureMorphAliases(): void
@@ -270,13 +268,7 @@ class AppServiceProvider extends ServiceProvider
                 return false;
             }
 
-            foreach ($value as $key => $_) {
-                if (is_string($key) && strlen(trim($key)) == 0) {
-                    return false;
-                }
-            }
-
-            return true;
+            return array_all($value, fn ($_, $key) => ! (is_string($key) && strlen(trim($key)) == 0));
         });
 
         Validator::extend('date_or_relative', function ($attribute, $value, $parameters, $validator) {
@@ -303,7 +295,8 @@ class AppServiceProvider extends ServiceProvider
                 return $request->header('X-Auth-Token')
                     ?? $request->bearerToken()
                     ?? $request->query('api_token')
-                    ?? $request->input('api_token');
+                    ?? $request->input('api_token')
+                    ?? $request->getPassword();
             }
 
             return $request->bearerToken();

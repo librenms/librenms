@@ -7,7 +7,7 @@
         <x-panel title="{{ __('Outages') }}">
             <div class="table-responsive">
                 <table id="outages" class="table table-hover table-condensed table-striped"
-                       data-url="{{ route('table.outages') }}">
+                       data-url="{{ route('table.outages') }}" data-export-url="{{ route('table.outages.export') }}">
                     <thead>
                     <tr>
                         <th data-column-id="status" data-sortable="false"></th>
@@ -25,7 +25,7 @@
 
 @section('scripts')
 <script>
-    var outages_grid = $("#outages").bootgrid({
+    var outages_grid = bootgridWithExport($("#outages"), {
         ajax: true,
         rowCount: [50, 100, 250, -1],
         templates: {

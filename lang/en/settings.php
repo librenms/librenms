@@ -583,6 +583,10 @@ return [
                 'sso' => 'Single Sign On',
             ],
         ],
+        'auth_fallback_local' => [
+            'description' => 'Allow local users to log in if the configured authentication does not know them',
+            'help' => 'Users created in LibreNMS (auth type mysql) can log in with their LibreNMS password when the configured authentication (LDAP, Active Directory, RADIUS, ...) does not know them or cannot be reached.',
+        ],
         'auth_remember' => [
             'description' => 'Remember me duration',
             'help' => 'Number of days to keep a user logged in when the user selects the remember me checkbox.',
@@ -785,6 +789,10 @@ return [
             'hr-device' => [
                 'description' => 'HR Device',
             ],
+            'packages' => [
+                'description' => 'Packages',
+                'help' => 'Collects installed software packages from the Unix agent or via SNMP from the HOST-RESOURCES-MIB (hrSWInstalledTable). The Unix agent takes precedence when enabled.',
+            ],
             'ipv4-addresses' => [
                 'description' => 'IPv4 Addresses',
             ],
@@ -831,10 +839,6 @@ return [
 
             'route' => [
                 'description' => 'Route',
-            ],
-
-            'ipmi' => [
-                'description' => 'IPMI',
             ],
 
             'sensors' => [
@@ -985,10 +989,6 @@ return [
         'enable_libvirt' => [
             'description' => 'Enable Libvirt',
             'help' => 'Enables the libvirt page, which shows the virtual machines of devices.',
-        ],
-        'enable_proxmox' => [
-            'description' => 'Enable Proxmox',
-            'help' => 'Enables the Proxmox page, which shows the virtual machines of devices.',
         ],
         'enable_pseudowires' => [
             'description' => 'Enable Pseudowires',
@@ -1750,11 +1750,12 @@ return [
             'unix-agent' => [
                 'description' => 'Unix Agent',
             ],
+            'packages' => [
+                'description' => 'Packages',
+                'help' => 'Collects installed software packages via SNMP from the HOST-RESOURCES-MIB (hrSWInstalledTable). The unix agent takes precedence when enabled.',
+            ],
             'os' => [
                 'description' => 'OS',
-            ],
-            'ipmi' => [
-                'description' => 'IPMI',
             ],
             'qos' => [
                 'description' => 'QoS',
@@ -1773,6 +1774,9 @@ return [
             ],
             'netstats' => [
                 'description' => 'Netstats',
+            ],
+            'fdb-table' => [
+                'description' => 'FDB Tables',
             ],
             'hr-mib' => [
                 'description' => 'HR Mib',

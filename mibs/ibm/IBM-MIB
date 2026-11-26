@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (pysmi reads the commented-out exports list as code)
 --*************************************************************************
 -- ATTENTION!
 -- This MIB is provided for use in the event that a down-level IBM
@@ -16,7 +17,7 @@ IMPORTS
        enterprises
             FROM RFC1155-SMI;
 
--- EXPORTS
+-- Exports:
 --        ibm, ibmResearch, ibmAgents, ibmArchitecture, alert, fddi,
 --        topology, tokenRing, ibmProd, ibm3172, ibm6611, netView6000,
 --        netView6000SubAgent, systemsMonitor6000;

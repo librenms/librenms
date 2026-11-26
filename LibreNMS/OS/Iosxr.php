@@ -27,10 +27,47 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use App\Models\Sensor;
+use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Util\UserFuncHelper;
 
 class Iosxr extends Shared\Cisco implements OSDiscovery
 {
+    /**
+     * Optical power is reported in watts, add dBm sensors for it.
+     */
+    public function discoverCiscoEntitySensors(): Collection
+    {
+        $sensors = parent::discoverCiscoEntitySensors();
+
+        return $sensors->merge($sensors
+            ->filter(fn (Sensor $sensor) => $sensor->sensor_class == 'power' && preg_match('/power [RT]x|[RT]x (Power|Lane)/i', $sensor->sensor_descr))
+            ->map(function (Sensor $sensor) {
+                $dbm = $sensor->replicate()->fill([
+                    'sensor_class' => 'dbm',
+                    'sensor_multiplier' => $sensor->sensor_multiplier * 1000,
+                    'user_func' => 'mw_to_dbm',
+                    'sensor_current' => UserFuncHelper::apply('mw_to_dbm', $sensor->sensor_current * 1000),
+                ]);
+
+                foreach (Sensor::LIMITS as $limit) {
+                    $value = $sensor->$limit === null ? null : UserFuncHelper::apply('mw_to_dbm', $sensor->$limit * 1000);
+                    $dbm->$limit = $value === null ? null : round($value, 3);
+                }
+
+                return $dbm;
+            }));
+    }
+
+    /**
+     * Sensor entities are always named, descriptions are not used.
+     */
+    protected function ciscoEntitySensorName(int $index, array $entities): string
+    {
+        return $entities[$index]['ENTITY-MIB::entPhysicalName'] ?? '';
+    }
+
     public function discoverOS(Device $device): void
     {
         $device->serial = $this->getMainSerial();

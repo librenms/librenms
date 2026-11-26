@@ -580,6 +580,12 @@ return [
                 'help' => 'Aktiviere PeeringDB lookup (Daten werden mit daily.sh heruntergeladen)',
             ],
         ],
+        'poller_modules' => [
+            'packages' => [
+                'description' => 'Pakete',
+                'help' => 'Sammelt installierte Software-Pakete per SNMP aus der HOST-RESOURCES-MIB (hrSWInstalledTable). Bei aktivem Unix-Agent hat dieser Vorrang.',
+            ],
+        ],
         'ports_fdb_purge' => [
             'description' => 'Port FDB Einträge älter als',
             'help' => 'Bereinigung wird erledigt durch daily.sh',

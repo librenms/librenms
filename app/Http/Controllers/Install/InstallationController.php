@@ -60,11 +60,6 @@ class InstallationController extends Controller
         return redirect()->route('install.checks');
     }
 
-    public function invalid()
-    {
-        abort(404);
-    }
-
     public function stepsCompleted()
     {
         return response()->json($this->stepStatus());

@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (BITS without named bits)
 -- ZyXEL Communications Corporation
 -- Private Enterprise MIB definition
 
@@ -8793,8 +8794,8 @@ alarmTarget OBJECT-TYPE
         vdslLineConfSosNToneUs	Unsigned32,
         vdslLineConfSosMaxDs	Unsigned32,
         vdslLineConfSosMaxUs	Unsigned32,
-        vdslLineConfSosMultiStepDs	BITS,
-        vdslLineConfSosMultiStepUs	BITS,
+        vdslLineConfSosMultiStepDs	OCTET STRING,
+        vdslLineConfSosMultiStepUs	OCTET STRING,
         vdslLineConfRocEnableDs	INTEGER,
         vdslLineConfRocEnableUs	INTEGER,
         vdslLineConfRocSnrmDs	Unsigned32,
@@ -9665,7 +9666,7 @@ alarmTarget OBJECT-TYPE
         ::= { vdslLineConfEntry 75 }
         
         vdslLineConfSosMultiStepDs OBJECT-TYPE
-        SYNTAX 	BITS
+        SYNTAX 	OCTET STRING
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -9680,7 +9681,7 @@ alarmTarget OBJECT-TYPE
         ::= { vdslLineConfEntry 76 }
         
         vdslLineConfSosMultiStepUs OBJECT-TYPE
-        SYNTAX 	BITS
+        SYNTAX 	OCTET STRING
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -15196,8 +15197,8 @@ alarmTarget OBJECT-TYPE
 	       	vdsl2LineProfSosNToneUs    Unsigned32,
 	       	vdsl2LineProfSosMaxDs      Unsigned32,
 	       	vdsl2LineProfSosMaxUs      Unsigned32,
-	       	vdsl2LineProfSosMultiStepDs	BITS,
-	       	vdsl2LineProfSosMultiStepUs BITS,
+	       	vdsl2LineProfSosMultiStepDs	OCTET STRING,
+	       	vdsl2LineProfSosMultiStepUs OCTET STRING,
 	       	vdsl2LineProfRocEnableDs   INTEGER,
 	       	vdsl2LineProfRocEnableUs   INTEGER,
 	       	vdsl2LineProfRocSnrmDs     Unsigned32,
@@ -15207,7 +15208,7 @@ alarmTarget OBJECT-TYPE
 	      	vdsl2LineProfDpboType      INTEGER,
 	      	vdsl2LineProfDpboEselMin   INTEGER,
 	      	vdsl2LineProfCompatible    INTEGER,
-	      	vdsl2LineProfTransmissionType	BITS
+	      	vdsl2LineProfTransmissionType	OCTET STRING
            	}
 
         vdsl2LineProfDpboEPsdID OBJECT-TYPE
@@ -15392,7 +15393,7 @@ alarmTarget OBJECT-TYPE
 	    ::= { vdsl2LineConfProfileExtendedEntry 14 }
 	
 	    vdsl2LineProfSosMultiStepDs OBJECT-TYPE
-	    SYNTAX BITS 
+	    SYNTAX OCTET STRING 
 	    MAX-ACCESS  read-write
 	    STATUS  current
 	    DESCRIPTION
@@ -15407,7 +15408,7 @@ alarmTarget OBJECT-TYPE
 	    ::= { vdsl2LineConfProfileExtendedEntry 15 }
 	
 	    vdsl2LineProfSosMultiStepUs OBJECT-TYPE
-	    SYNTAX BITS 
+	    SYNTAX OCTET STRING 
 	    MAX-ACCESS  read-write
 	    STATUS  current
 	    DESCRIPTION
@@ -15518,7 +15519,7 @@ alarmTarget OBJECT-TYPE
 	    ::= { vdsl2LineConfProfileExtendedEntry 25 }
 
 	    vdsl2LineProfTransmissionType OBJECT-TYPE
-        SYNTAX BITS
+        SYNTAX OCTET STRING
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION

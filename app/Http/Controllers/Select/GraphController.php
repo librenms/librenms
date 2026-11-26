@@ -110,21 +110,9 @@ class GraphController extends Controller
      */
     private function formatGraph(string $top, string $graph): array
     {
-        $text = $graph;
-        if (Str::contains('_', $graph)) {
-            [$type, $subtype] = explode('_', (string) $graph, 2);
-        } else {
-            $type = $graph;
-            $subtype = '';
-        }
-
-        if (! Graph::isMibGraph($type, $subtype)) {
-            $text = ucwords($top . ' ' . str_replace(['_', '-'], ' ', $text));
-        }
-
         return [
             'id' => $top . '_' . $graph,
-            'text' => $text,
+            'text' => ucwords($top . ' ' . str_replace(['_', '-'], ' ', $graph)),
         ];
     }
 

@@ -8,8 +8,8 @@ use App\Models\Ipv4Address;
 use App\Models\Ipv4Mac;
 use App\Models\PortsFdb;
 use App\Models\User;
-use App\Models\Vlan;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class HostListTest extends SearchTestCase
 {
@@ -45,10 +45,9 @@ class HostListTest extends SearchTestCase
     {
         [$first, $firstPort] = $this->portOn('first-port');
         [$second, $secondPort] = $this->portOn('second-port');
-        $vlan = Vlan::factory()->create(['device_id' => $first->device_id, 'vlan_vlan' => 342]);
         Ipv4Mac::factory()->create(['device_id' => $first->device_id, 'port_id' => $firstPort->port_id, 'mac_address' => '02b2b2b2b001', 'ipv4_address' => '192.0.2.61']);
         Ipv4Mac::factory()->create(['device_id' => $second->device_id, 'port_id' => $secondPort->port_id, 'mac_address' => '02b2b2b2b002', 'ipv4_address' => '192.0.2.62']);
-        PortsFdb::factory()->create(['device_id' => $first->device_id, 'port_id' => $firstPort->port_id, 'mac_address' => '02b2b2b2b001', 'vlan_id' => $vlan->vlan_id]);
+        PortsFdb::factory()->create(['device_id' => $first->device_id, 'port_id' => $firstPort->port_id, 'mac_address' => '02b2b2b2b001', 'vlan' => 342]);
         PortsFdb::factory()->create(['device_id' => $second->device_id, 'port_id' => $secondPort->port_id, 'mac_address' => '02b2b2b2b003']);
 
         $q = '02:b2:b2';
@@ -257,6 +256,21 @@ class HostListTest extends SearchTestCase
         $this->results(['q' => '192.0.2.92'], $user)->assertJsonPath('mode', 'not_found');
     }
 
+    public function testVlanFilterIgnoresFdbEntriesTheUserCannotAccess(): void
+    {
+        [$visible, $visiblePort] = $this->portOn();
+        [$hidden, $hiddenPort] = $this->portOn();
+        Ipv4Mac::factory()->create(['device_id' => $visible->device_id, 'port_id' => $visiblePort->port_id, 'mac_address' => '02b6b6b6b001', 'ipv4_address' => '192.0.2.93']);
+        PortsFdb::factory()->create(['device_id' => $hidden->device_id, 'port_id' => $hiddenPort->port_id, 'mac_address' => '02b6b6b6b001', 'vlan' => 342]);
+
+        $user = User::factory()->create(['enabled' => 1]);
+        $user->assignRole('user');
+        $user->devicesOwned()->attach($visible->device_id);
+
+        $this->results(['q' => '192.0.2.'], $user)->assertJson(['total' => 1]);
+        $this->results(['q' => '192.0.2.', 'filter' => ['vlan' => ['eq' => 342]]], $user)->assertJsonMissing(['total' => 1]);
+    }
+
     public function testRowsThatTieHaveAStableOrder(): void
     {
         [$device, $port] = $this->portOn();
@@ -295,14 +309,45 @@ class HostListTest extends SearchTestCase
     public function testVlanFilterSupportsTheFilterOperators(): void
     {
         [$device, $port] = $this->portOn();
-        $vlan = Vlan::factory()->create(['device_id' => $device->device_id, 'vlan_vlan' => 342]);
-        $other = Vlan::factory()->create(['device_id' => $device->device_id, 'vlan_vlan' => 343]);
-        PortsFdb::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => '02e8e8e8e001', 'vlan_id' => $vlan->vlan_id]);
-        PortsFdb::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => '02e8e8e8e002', 'vlan_id' => $other->vlan_id]);
+        PortsFdb::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => '02e8e8e8e001', 'vlan' => 342]);
+        PortsFdb::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => '02e8e8e8e002', 'vlan' => 343]);
 
         foreach (['in' => '342', 'eq' => '342', 'lt' => '343'] as $operator => $value) {
             $this->results(['q' => '02:e8:e8', 'filter' => ['vlan' => [$operator => $value]]])->assertJson(['total' => 1]);
         }
+    }
+
+    #[DataProvider('unknownVlanFilters')]
+    public function testVlanFiltersExcludeUnknownVlans(string $operator, string $value, int $expected): void
+    {
+        [$device, $port] = $this->portOn();
+        foreach (['02e8e8e8e003' => 342, '02e8e8e8e004' => null] as $mac => $vlan) {
+            PortsFdb::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => $mac, 'vlan' => $vlan]);
+            Ipv4Mac::factory()->create(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => $mac]);
+        }
+
+        $this->results(['q' => '02:e8:e8'])->assertJson(['total' => 2]);
+        foreach (['fdb', 'neighbor'] as $source) {
+            $this->results(['q' => '02:e8:e8', 'filter' => ['source' => ['eq' => $source], 'vlan' => [$operator => $value]]])
+                ->assertJsonPath('total', $expected);
+        }
+    }
+
+    /**
+     * @return array<string, array{string, string, int}>
+     */
+    public static function unknownVlanFilters(): array
+    {
+        return [
+            'less than' => ['lt', '343', 1],
+            'less than or equal' => ['lte', '342', 1],
+            'not equal' => ['neq', '343', 1],
+            'not in' => ['not_in', '343', 1],
+            'equal to zero' => ['eq', '0', 0],
+            'in zero' => ['in', '0', 0],
+            'unknown VLAN' => ['is_empty', '1', 1],
+            'known VLAN' => ['is_not_empty', '1', 1],
+        ];
     }
 
     public function testNetworkSearchStaysInItsAddressFamily(): void

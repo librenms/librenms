@@ -27,7 +27,7 @@ class FdbSearchTest extends TestCase
             'device_id' => $device->device_id,
             'port_id' => $port->port_id,
             'mac_address' => $mac,
-            'vlan_id' => 1,
+            'vlan' => 1,
         ]);
 
         $response = $this->actingAs($user)
@@ -51,7 +51,7 @@ class FdbSearchTest extends TestCase
             'device_id' => $device->device_id,
             'port_id' => $port->port_id,
             'mac_address' => $mac,
-            'vlan_id' => 1,
+            'vlan' => 1,
         ]);
 
         Ipv4Mac::forceCreate([
@@ -77,7 +77,7 @@ class FdbSearchTest extends TestCase
         $mac = '001122334455';
         $ip = '10.0.0.1';
 
-        PortsFdb::forceCreate(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => $mac, 'vlan_id' => 1]);
+        PortsFdb::forceCreate(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => $mac, 'vlan' => 1]);
         Ipv4Mac::forceCreate(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => $mac, 'ipv4_address' => $ip]);
 
         $response = $this->actingAs($user)
@@ -98,7 +98,7 @@ class FdbSearchTest extends TestCase
         $mac = '001122334455';
         $ipv6 = 'fe80::1';
 
-        PortsFdb::forceCreate(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => $mac, 'vlan_id' => 1]);
+        PortsFdb::forceCreate(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => $mac, 'vlan' => 1]);
         Ipv6Nd::forceCreate(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => $mac, 'ipv6_address' => $ipv6]);
 
         $response = $this->actingAs($user)
@@ -122,7 +122,7 @@ class FdbSearchTest extends TestCase
             'device_id' => $device->device_id,
             'port_id' => $port->port_id,
             'mac_address' => $mac,
-            'vlan_id' => 1,
+            'vlan' => 1,
         ]);
 
         $response = $this->actingAs($user)
@@ -139,12 +139,12 @@ class FdbSearchTest extends TestCase
 
         // Port with 2 MACs (uplink/trunk) — should sort after single-MAC port
         $uplink = Port::factory()->create(['device_id' => $device->device_id]);
-        PortsFdb::forceCreate(['device_id' => $device->device_id, 'port_id' => $uplink->port_id, 'mac_address' => 'aabbcc001111', 'vlan_id' => 1]);
-        PortsFdb::forceCreate(['device_id' => $device->device_id, 'port_id' => $uplink->port_id, 'mac_address' => 'aabbcc002222', 'vlan_id' => 1]);
+        PortsFdb::forceCreate(['device_id' => $device->device_id, 'port_id' => $uplink->port_id, 'mac_address' => 'aabbcc001111', 'vlan' => 1]);
+        PortsFdb::forceCreate(['device_id' => $device->device_id, 'port_id' => $uplink->port_id, 'mac_address' => 'aabbcc002222', 'vlan' => 1]);
 
         // Port with 1 MAC (direct connection) — should sort first
         $access = Port::factory()->create(['device_id' => $device->device_id]);
-        PortsFdb::forceCreate(['device_id' => $device->device_id, 'port_id' => $access->port_id, 'mac_address' => 'aabbcc003333', 'vlan_id' => 1]);
+        PortsFdb::forceCreate(['device_id' => $device->device_id, 'port_id' => $access->port_id, 'mac_address' => 'aabbcc003333', 'vlan' => 1]);
 
         $response = $this->actingAs($user)
             ->getJson(route('ajax.search.fdb', ['search' => 'aabbcc']));
@@ -172,7 +172,7 @@ class FdbSearchTest extends TestCase
             'device_id' => $device->device_id,
             'port_id' => $port->port_id,
             'mac_address' => $mac,
-            'vlan_id' => 1,
+            'vlan' => 1,
         ]);
 
         $response = $this->actingAs($user)
@@ -188,8 +188,8 @@ class FdbSearchTest extends TestCase
         $device = Device::factory()->create();
         $port = Port::factory()->create(['device_id' => $device->device_id]);
 
-        PortsFdb::forceCreate(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => '001122334455', 'vlan_id' => 1]);
-        PortsFdb::forceCreate(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => '001122334456', 'vlan_id' => 1]);
+        PortsFdb::forceCreate(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => '001122334455', 'vlan' => 1]);
+        PortsFdb::forceCreate(['device_id' => $device->device_id, 'port_id' => $port->port_id, 'mac_address' => '001122334456', 'vlan' => 1]);
 
         $response = $this->actingAs($user)
             ->getJson(route('ajax.search.fdb', ['search' => '001122334455']));

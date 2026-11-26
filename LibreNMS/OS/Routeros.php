@@ -29,6 +29,7 @@
 namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
+use App\Models\EntPhysical;
 use App\Models\PortVlan;
 use App\Models\Qos;
 use App\Models\Transceiver;
@@ -37,10 +38,12 @@ use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Discovery\Neighbors\Neighbor;
 use LibreNMS\Discovery\Neighbors\NeighborParser;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Enum\WirelessSensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Discovery\QosDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
@@ -56,6 +59,7 @@ use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\QosPolling;
+use LibreNMS\Interfaces\Polling\Sensors\WirelessCellPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Number;
@@ -69,6 +73,8 @@ class Routeros extends OS implements
     QosPolling,
     TransceiverDiscovery,
     WirelessCcqDiscovery,
+    WirelessCellDiscovery,
+    WirelessCellPolling,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
     WirelessNoiseFloorDiscovery,
@@ -91,13 +97,13 @@ class Routeros extends OS implements
     {
         $sensors = [];
 
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWlApTable');
+        $data = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrWlApTable')->table(1);
         foreach ($data as $index => $entry) {
             // skip sensors with no data (nv2 should report 1 client, but doesn't report ccq)
-            if ($entry['mtxrWlApClientCount'] > 0 && $entry['mtxrWlApOverallTxCCQ'] == 0) {
+            if ($entry['MIKROTIK-MIB::mtxrWlApClientCount'] > 0 && $entry['MIKROTIK-MIB::mtxrWlApOverallTxCCQ'] == 0) {
                 continue;
             }
-            $freq = $entry['mtxrWlApFreq'] ? substr((string) $entry['mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
+            $freq = $entry['MIKROTIK-MIB::mtxrWlApFreq'] ? substr((string) $entry['MIKROTIK-MIB::mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
 
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Ccq,
@@ -105,15 +111,15 @@ class Routeros extends OS implements
                 '.1.3.6.1.4.1.14988.1.1.1.3.1.10.' . $index,
                 'mikrotik',
                 $index,
-                "$freq: " . $entry['mtxrWlApSsid'],
-                $entry['mtxrWlApOverallTxCCQ']
+                "$freq: " . $entry['MIKROTIK-MIB::mtxrWlApSsid'],
+                $entry['MIKROTIK-MIB::mtxrWlApOverallTxCCQ']
             );
         }
 
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWlStatTable');
+        $data = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrWlStatTable')->table(1);
         foreach ($data as $index => $entry) {
-            $freq = $entry['mtxrWlStatFreq'] ? substr((string) $entry['mtxrWlStatFreq'], 0, 1) . 'G' : 'SSID';
-            if (empty($entry['mtxrWlStatTxCCQ']) && empty($entry['mtxrWlStatRxCCQ'])) {
+            $freq = $entry['MIKROTIK-MIB::mtxrWlStatFreq'] ? substr((string) $entry['MIKROTIK-MIB::mtxrWlStatFreq'], 0, 1) . 'G' : 'SSID';
+            if (empty($entry['MIKROTIK-MIB::mtxrWlStatTxCCQ']) && empty($entry['MIKROTIK-MIB::mtxrWlStatRxCCQ'])) {
                 continue;
             }
 
@@ -123,8 +129,8 @@ class Routeros extends OS implements
                 '.1.3.6.1.4.1.14988.1.1.1.1.1.9.' . $index,
                 'mikrotik-tx-ccq',
                 $index,
-                "$freq: " . $entry['mtxrWlStatSsid'] . ' Tx',
-                $entry['mtxrWlStatTxCCQ']
+                "$freq: " . $entry['MIKROTIK-MIB::mtxrWlStatSsid'] . ' Tx',
+                $entry['MIKROTIK-MIB::mtxrWlStatTxCCQ']
             );
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Ccq,
@@ -132,8 +138,8 @@ class Routeros extends OS implements
                 '.1.3.6.1.4.1.14988.1.1.1.1.1.10.' . $index,
                 'mikrotik-rx-ccq',
                 $index,
-                "$freq: " . $entry['mtxrWlStatSsid'] . ' Rx',
-                $entry['mtxrWlStatRxCCQ']
+                "$freq: " . $entry['MIKROTIK-MIB::mtxrWlStatSsid'] . ' Rx',
+                $entry['MIKROTIK-MIB::mtxrWlStatRxCCQ']
             );
         }
 
@@ -148,9 +154,9 @@ class Routeros extends OS implements
     public function discoverWirelessClients()
     {
         $sensors = [];
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWlApTable');
+        $data = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrWlApTable')->table(1);
         foreach ($data as $index => $entry) {
-            $freq = $entry['mtxrWlApFreq'] ? substr((string) $entry['mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
+            $freq = $entry['MIKROTIK-MIB::mtxrWlApFreq'] ? substr((string) $entry['MIKROTIK-MIB::mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
 
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Clients,
@@ -158,8 +164,8 @@ class Routeros extends OS implements
                 '.1.3.6.1.4.1.14988.1.1.1.3.1.6.' . $index,
                 'mikrotik',
                 $index,
-                "$freq: " . $entry['mtxrWlApSsid'],
-                $entry['mtxrWlApClientCount']
+                "$freq: " . $entry['MIKROTIK-MIB::mtxrWlApSsid'],
+                $entry['MIKROTIK-MIB::mtxrWlApClientCount']
             );
         }
 
@@ -175,41 +181,41 @@ class Routeros extends OS implements
     public function discoverWirelessFrequency()
     {
         $sensors = [];
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWlApTable');
+        $data = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrWlApTable')->table(1);
         foreach ($data as $index => $entry) {
-            if ($entry['mtxrWlApFreq'] === '0') {
+            if ($entry['MIKROTIK-MIB::mtxrWlApFreq'] === '0') {
                 continue;
             }
-            $freq = substr((string) $entry['mtxrWlApFreq'], 0, 1) . 'G';
+            $freq = substr((string) $entry['MIKROTIK-MIB::mtxrWlApFreq'], 0, 1) . 'G';
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.14988.1.1.1.3.1.7.' . $index,
                 'mikrotik',
                 $index,
-                "$freq: " . $entry['mtxrWlApSsid'],
-                $entry['mtxrWlApFreq']
+                "$freq: " . $entry['MIKROTIK-MIB::mtxrWlApSsid'],
+                $entry['MIKROTIK-MIB::mtxrWlApFreq']
             );
         }
 
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWlStatTable');
+        $data = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrWlStatTable')->table(1);
         foreach ($data as $index => $entry) {
-            if ($entry['mtxrWlStatFreq'] === '0') {
+            if ($entry['MIKROTIK-MIB::mtxrWlStatFreq'] === '0') {
                 continue;
             }
-            $freq = substr((string) $entry['mtxrWlStatFreq'], 0, 1) . 'G';
+            $freq = substr((string) $entry['MIKROTIK-MIB::mtxrWlStatFreq'], 0, 1) . 'G';
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Frequency,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.14988.1.1.1.1.1.7.' . $index,
                 'mikrotik',
                 $index,
-                "$freq: " . $entry['mtxrWlStatSsid'],
-                $entry['mtxrWlStatFreq']
+                "$freq: " . $entry['MIKROTIK-MIB::mtxrWlStatSsid'],
+                $entry['MIKROTIK-MIB::mtxrWlStatFreq']
             );
         }
 
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWl60GTable');
+        $data = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrWl60GTable')->table(1);
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Frequency,
@@ -217,8 +223,8 @@ class Routeros extends OS implements
                 '.1.3.6.1.4.1.14988.1.1.1.8.1.6.' . $index,
                 'mikrotik-60g',
                 $index,
-                '60G: ' . $entry['mtxrWl60GSsid'],
-                $entry['mtxrWl60GFreq']
+                '60G: ' . $entry['MIKROTIK-MIB::mtxrWl60GSsid'],
+                $entry['MIKROTIK-MIB::mtxrWl60GFreq']
             );
         }
 
@@ -234,7 +240,7 @@ class Routeros extends OS implements
     public function discoverWirelessRssi()
     {
         $sensors = [];
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWl60GTable');
+        $data = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrWl60GTable')->table(1);
 
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
@@ -243,8 +249,25 @@ class Routeros extends OS implements
                 '.1.3.6.1.4.1.14988.1.1.1.8.1.12.' . $index,
                 'mikrotik',
                 $index,
-                '60G: ' . $entry['mtxrWl60GSsid'],
-                $entry['mtxrWl60GRssi']
+                '60G: ' . $entry['MIKROTIK-MIB::mtxrWl60GSsid'],
+                $entry['MIKROTIK-MIB::mtxrWl60GRssi']
+            );
+        }
+
+        foreach (SnmpQuery::cache()->walk(['MIKROTIK-MIB::mtxrLTEModemTable', 'MIKROTIK-MIB::mtxrInterfaceStatsName'])->table(1) as $ifIndex => $modem) {
+            // the modem reports 0 when it has no RSSI (lTAP mini)
+            if (! isset($modem['MIKROTIK-MIB::mtxrLTEModemSignalRSSI']) || (float) $modem['MIKROTIK-MIB::mtxrLTEModemSignalRSSI'] == 0) {
+                continue;
+            }
+
+            $sensors[] = new WirelessSensor(
+                WirelessSensorType::Rssi,
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.14988.1.1.16.1.1.2.' . $ifIndex,
+                'routeros',
+                $ifIndex,
+                ($modem['MIKROTIK-MIB::mtxrInterfaceStatsName'] ?? "lte$ifIndex") . ': Signal RSSI',
+                $modem['MIKROTIK-MIB::mtxrLTEModemSignalRSSI']
             );
         }
 
@@ -260,7 +283,7 @@ class Routeros extends OS implements
     public function discoverWirelessQuality()
     {
         $sensors = [];
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWl60GTable');
+        $data = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrWl60GTable')->table(1);
 
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
@@ -269,8 +292,27 @@ class Routeros extends OS implements
                 '.1.3.6.1.4.1.14988.1.1.1.8.1.8.' . $index,
                 'mikrotik',
                 $index,
-                '60G: ' . $entry['mtxrWl60GSsid'],
-                $entry['mtxrWl60GSignal']
+                '60G: ' . $entry['MIKROTIK-MIB::mtxrWl60GSsid'],
+                $entry['MIKROTIK-MIB::mtxrWl60GSignal']
+            );
+        }
+
+        // LTE/5G channel quality indicator 0-15 as percent
+        foreach (SnmpQuery::cache()->walk(['MIKROTIK-MIB::mtxrLTEModemTable', 'MIKROTIK-MIB::mtxrInterfaceStatsName'])->table(1) as $ifIndex => $modem) {
+            if (! is_numeric($modem['MIKROTIK-MIB::mtxrLTEModemCQI'] ?? null)) {
+                continue;
+            }
+
+            $sensors[] = new WirelessSensor(
+                WirelessSensorType::Quality,
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.14988.1.1.16.1.1.21.' . $ifIndex,
+                'routeros-cqi',
+                $ifIndex,
+                ($modem['MIKROTIK-MIB::mtxrInterfaceStatsName'] ?? "lte$ifIndex") . ': CQI',
+                $modem['MIKROTIK-MIB::mtxrLTEModemCQI'] * 20 / 3,
+                20,
+                3
             );
         }
 
@@ -285,10 +327,10 @@ class Routeros extends OS implements
     public function discoverWirelessNoiseFloor()
     {
         $sensors = [];
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWlApTable');
+        $data = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrWlApTable')->table(1);
 
         foreach ($data as $index => $entry) {
-            $freq = $entry['mtxrWlApFreq'] ? substr((string) $entry['mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
+            $freq = $entry['MIKROTIK-MIB::mtxrWlApFreq'] ? substr((string) $entry['MIKROTIK-MIB::mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
 
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::NoiseFloor,
@@ -296,8 +338,8 @@ class Routeros extends OS implements
                 '.1.3.6.1.4.1.14988.1.1.1.3.1.9.' . $index,
                 'mikrotik',
                 $index,
-                "$freq: " . $entry['mtxrWlApSsid'],
-                $entry['mtxrWlApNoiseFloor']
+                "$freq: " . $entry['MIKROTIK-MIB::mtxrWlApSsid'],
+                $entry['MIKROTIK-MIB::mtxrWlApNoiseFloor']
             );
         }
 
@@ -314,21 +356,21 @@ class Routeros extends OS implements
     {
         $sensors = [];
 
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWlApTable');
+        $data = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrWlApTable')->table(1);
         foreach ($data as $index => $entry) {
-            if ($entry['mtxrWlApTxRate'] === '0' && $entry['mtxrWlApRxRate'] === '0') {
+            if ($entry['MIKROTIK-MIB::mtxrWlApTxRate'] === '0' && $entry['MIKROTIK-MIB::mtxrWlApRxRate'] === '0') {
                 continue;  // no data
             }
 
-            $freq = $entry['mtxrWlApFreq'] ? substr((string) $entry['mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
+            $freq = $entry['MIKROTIK-MIB::mtxrWlApFreq'] ? substr((string) $entry['MIKROTIK-MIB::mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.14988.1.1.1.3.1.2.' . $index,
                 'mikrotik-tx',
                 $index,
-                "$freq: " . $entry['mtxrWlApSsid'] . ' Tx',
-                $entry['mtxrWlApTxRate']
+                "$freq: " . $entry['MIKROTIK-MIB::mtxrWlApSsid'] . ' Tx',
+                $entry['MIKROTIK-MIB::mtxrWlApTxRate']
             );
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Rate,
@@ -336,25 +378,25 @@ class Routeros extends OS implements
                 '.1.3.6.1.4.1.14988.1.1.1.3.1.3.' . $index,
                 'mikrotik-rx',
                 $index,
-                "$freq: " . $entry['mtxrWlApSsid'] . ' Rx',
-                $entry['mtxrWlApRxRate']
+                "$freq: " . $entry['MIKROTIK-MIB::mtxrWlApSsid'] . ' Rx',
+                $entry['MIKROTIK-MIB::mtxrWlApRxRate']
             );
         }
 
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWlStatTable');
+        $data = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrWlStatTable')->table(1);
         foreach ($data as $index => $entry) {
-            if ($entry['mtxrWlStatTxRate'] === '0' && $entry['mtxrWlStatRxRate'] === '0') {
+            if ($entry['MIKROTIK-MIB::mtxrWlStatTxRate'] === '0' && $entry['MIKROTIK-MIB::mtxrWlStatRxRate'] === '0') {
                 continue;  // no data
             }
-            $freq = $entry['mtxrWlStatFreq'] ? substr((string) $entry['mtxrWlStatFreq'], 0, 1) . 'G' : 'SSID';
+            $freq = $entry['MIKROTIK-MIB::mtxrWlStatFreq'] ? substr((string) $entry['MIKROTIK-MIB::mtxrWlStatFreq'], 0, 1) . 'G' : 'SSID';
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Rate,
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.14988.1.1.1.1.1.2.' . $index,
                 'mikrotik-tx',
                 $index,
-                "$freq: " . $entry['mtxrWlStatSsid'] . ' Tx',
-                $entry['mtxrWlStatTxRate']
+                "$freq: " . $entry['MIKROTIK-MIB::mtxrWlStatSsid'] . ' Tx',
+                $entry['MIKROTIK-MIB::mtxrWlStatTxRate']
             );
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Rate,
@@ -362,12 +404,12 @@ class Routeros extends OS implements
                 '.1.3.6.1.4.1.14988.1.1.1.1.1.3.' . $index,
                 'mikrotik-rx',
                 $index,
-                "$freq: " . $entry['mtxrWlStatSsid'] . ' Rx',
-                $entry['mtxrWlStatRxRate']
+                "$freq: " . $entry['MIKROTIK-MIB::mtxrWlStatSsid'] . ' Rx',
+                $entry['MIKROTIK-MIB::mtxrWlStatRxRate']
             );
         }
 
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWl60GTable');
+        $data = SnmpQuery::cache()->walk('MIKROTIK-MIB::mtxrWl60GTable')->table(1);
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Rate,
@@ -375,8 +417,8 @@ class Routeros extends OS implements
                 '.1.3.6.1.4.1.14988.1.1.1.8.1.13.' . $index,
                 'mikrotik-60g-tx',
                 $index,
-                '60G: ' . $entry['mtxrWl60GSsid'],
-                $entry['mtxrWl60GPhyRate'],
+                '60G: ' . $entry['MIKROTIK-MIB::mtxrWl60GSsid'],
+                $entry['MIKROTIK-MIB::mtxrWl60GPhyRate'],
                 1000000
             );
         }
@@ -394,7 +436,7 @@ class Routeros extends OS implements
     {
         $sensors = [];
 
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWl60GStaTable');
+        $data = SnmpQuery::walk('MIKROTIK-MIB::mtxrWl60GStaTable')->table(1);
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 WirelessSensorType::Distance,
@@ -402,8 +444,8 @@ class Routeros extends OS implements
                 '.1.3.6.1.4.1.14988.1.1.1.9.1.10.' . $index,
                 'mikrotik',
                 $index,
-                '60G: Sta > ' . $entry['mtxrWl60GStaRemote'],
-                $entry['mtxrWl60GStaDistance'],
+                '60G: Sta > ' . $entry['MIKROTIK-MIB::mtxrWl60GStaRemote'],
+                $entry['MIKROTIK-MIB::mtxrWl60GStaDistance'],
                 1,
                 100000
             );
@@ -413,84 +455,350 @@ class Routeros extends OS implements
     }
 
     /**
-     * Discover LTE RSRQ.  This is in Dbm. Type is Dbm.
+     * Discover LTE RSRQ (and 5G NR RSRQ on RouterOS versions that report it).  This is in dB.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors
      */
-    public function discoverWirelessRsrq()
+    public function discoverWirelessRsrq(): array
     {
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable');
-
         $sensors = [];
-        foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
-            $sensors[] = new WirelessSensor(
-                WirelessSensorType::Rsrq,
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.14988.1.1.16.1.1.3.' . $index,
-                'routeros',
-                $index,
-                $name[$index] . ': Signal RSRQ',
-                $entry['mtxrLTEModemSignalRSRQ']
-            );
+        foreach (SnmpQuery::cache()->walk(['MIKROTIK-MIB::mtxrLTEModemTable', 'MIKROTIK-MIB::mtxrInterfaceStatsName'])->table(1) as $ifIndex => $modem) {
+            $name = $modem['MIKROTIK-MIB::mtxrInterfaceStatsName'] ?? "lte$ifIndex";
+
+            // RouterOS 7.2x adds RSRQ with one decimal, same sensor index so history is kept after an upgrade.
+            // IDiv10 columns walked by name are already scaled by the MIB display hint ('-8.0')
+            if (is_numeric($modem['MIKROTIK-MIB::mtxrLTEModemSignalRSRQD10'] ?? null)) {
+                $sensors[] = new WirelessSensor(
+                    WirelessSensorType::Rsrq,
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.14988.1.1.16.1.1.25.' . $ifIndex,
+                    'routeros',
+                    $ifIndex,
+                    "$name: Signal RSRQ",
+                    $modem['MIKROTIK-MIB::mtxrLTEModemSignalRSRQD10'],
+                    1,
+                    10
+                );
+            } elseif (is_numeric($modem['MIKROTIK-MIB::mtxrLTEModemSignalRSRQ'] ?? null)) {
+                $sensors[] = new WirelessSensor(
+                    WirelessSensorType::Rsrq,
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.14988.1.1.16.1.1.3.' . $ifIndex,
+                    'routeros',
+                    $ifIndex,
+                    "$name: Signal RSRQ",
+                    $modem['MIKROTIK-MIB::mtxrLTEModemSignalRSRQ']
+                );
+            }
+
+            // 5G NR is absent on older RouterOS and reports 0 ('.0') on LTE-only modems
+            if (is_numeric($modem['MIKROTIK-MIB::mtxrLTEModemNrRSRQ'] ?? null) && $modem['MIKROTIK-MIB::mtxrLTEModemNrRSRQ'] != 0) {
+                $sensors[] = new WirelessSensor(
+                    WirelessSensorType::Rsrq,
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.14988.1.1.16.1.1.23.' . $ifIndex,
+                    'routeros',
+                    'nr.' . $ifIndex,
+                    "$name: NR Signal RSRQ",
+                    $modem['MIKROTIK-MIB::mtxrLTEModemNrRSRQ'],
+                    1,
+                    10
+                );
+            }
         }
 
         return $sensors;
     }
 
     /**
-     * Discover LTE RSRP.  This is in Dbm. Type is Dbm.
+     * Discover LTE RSRP (and 5G NR RSRP on RouterOS versions that report it).  This is in dBm.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors
      */
-    public function discoverWirelessRsrp()
+    public function discoverWirelessRsrp(): array
     {
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable');
-
         $sensors = [];
-        foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
-            $sensors[] = new WirelessSensor(
-                WirelessSensorType::Rsrp,
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.14988.1.1.16.1.1.4.' . $index,
-                'routeros',
-                $index,
-                $name[$index] . ': Signal RSRP',
-                $entry['mtxrLTEModemSignalRSRP']
-            );
+        foreach (SnmpQuery::cache()->walk(['MIKROTIK-MIB::mtxrLTEModemTable', 'MIKROTIK-MIB::mtxrInterfaceStatsName'])->table(1) as $ifIndex => $modem) {
+            $name = $modem['MIKROTIK-MIB::mtxrInterfaceStatsName'] ?? "lte$ifIndex";
+
+            if (is_numeric($modem['MIKROTIK-MIB::mtxrLTEModemSignalRSRP'] ?? null)) {
+                $sensors[] = new WirelessSensor(
+                    WirelessSensorType::Rsrp,
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.14988.1.1.16.1.1.4.' . $ifIndex,
+                    'routeros',
+                    $ifIndex,
+                    "$name: Signal RSRP",
+                    $modem['MIKROTIK-MIB::mtxrLTEModemSignalRSRP']
+                );
+            }
+
+            // 5G NR is absent on older RouterOS and reports 0 on LTE-only modems
+            if (is_numeric($modem['MIKROTIK-MIB::mtxrLTEModemNrRSRP'] ?? null) && $modem['MIKROTIK-MIB::mtxrLTEModemNrRSRP'] != 0) {
+                $sensors[] = new WirelessSensor(
+                    WirelessSensorType::Rsrp,
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.14988.1.1.16.1.1.22.' . $ifIndex,
+                    'routeros',
+                    'nr.' . $ifIndex,
+                    "$name: NR Signal RSRP",
+                    $modem['MIKROTIK-MIB::mtxrLTEModemNrRSRP']
+                );
+            }
         }
 
         return $sensors;
     }
 
     /**
-     * Discover LTE SINR.  This is in Dbm. Type is Dbm.
+     * Discover LTE SINR (and 5G NR SINR on RouterOS versions that report it).  This is in dB.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array Sensors
      */
-    public function discoverWirelessSinr()
+    public function discoverWirelessSinr(): array
     {
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable');
-
         $sensors = [];
-        foreach ($data as $index => $entry) {
-            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
-            $sensors[] = new WirelessSensor(
-                WirelessSensorType::Sinr,
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.14988.1.1.16.1.1.7.' . $index,
-                'routeros',
-                $index,
-                $name[$index] . ': Signal SINR',
-                $entry['mtxrLTEModemSignalSINR']
-            );
+        foreach (SnmpQuery::cache()->walk(['MIKROTIK-MIB::mtxrLTEModemTable', 'MIKROTIK-MIB::mtxrInterfaceStatsName'])->table(1) as $ifIndex => $modem) {
+            $name = $modem['MIKROTIK-MIB::mtxrInterfaceStatsName'] ?? "lte$ifIndex";
+
+            if (is_numeric($modem['MIKROTIK-MIB::mtxrLTEModemSignalSINR'] ?? null)) {
+                $sensors[] = new WirelessSensor(
+                    WirelessSensorType::Sinr,
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.14988.1.1.16.1.1.7.' . $ifIndex,
+                    'routeros',
+                    $ifIndex,
+                    "$name: Signal SINR",
+                    $modem['MIKROTIK-MIB::mtxrLTEModemSignalSINR']
+                );
+            }
+
+            // 5G NR is absent on older RouterOS and reports 0 on LTE-only modems
+            if (is_numeric($modem['MIKROTIK-MIB::mtxrLTEModemNrSINR'] ?? null) && $modem['MIKROTIK-MIB::mtxrLTEModemNrSINR'] != 0) {
+                $sensors[] = new WirelessSensor(
+                    WirelessSensorType::Sinr,
+                    $this->getDeviceId(),
+                    '.1.3.6.1.4.1.14988.1.1.16.1.1.24.' . $ifIndex,
+                    'routeros',
+                    'nr.' . $ifIndex,
+                    "$name: NR Signal SINR",
+                    $modem['MIKROTIK-MIB::mtxrLTEModemNrSINR']
+                );
+            }
         }
 
         return $sensors;
+    }
+
+    /**
+     * Discover the LTE serving cell id (ECI = eNB id * 256 + sector id).
+     * A change in value means the modem moved to another cell.
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessCell(): array
+    {
+        // walked numerically like the poller: by name the MIB display hint renders the HexInt as hex
+        $cellIds = SnmpQuery::numeric()->walk('.1.3.6.1.4.1.14988.1.1.16.1.1.5')->pluck('.1.3.6.1.4.1.14988.1.1.16.1.1.5');
+
+        return SnmpQuery::cache()->walk(['MIKROTIK-MIB::mtxrLTEModemTable', 'MIKROTIK-MIB::mtxrInterfaceStatsName'])->mapTable(function (array $modem, string $ifIndex) use ($cellIds) {
+            $cellId = self::validCellId($cellIds[$ifIndex] ?? null);
+
+            return $cellId === null ? null : new WirelessSensor(
+                WirelessSensorType::Cell,
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.14988.1.1.16.1.1.5.' . $ifIndex,
+                'routeros',
+                $ifIndex,
+                ($modem['MIKROTIK-MIB::mtxrInterfaceStatsName'] ?? "lte$ifIndex") . ': Cell ID',
+                $cellId
+            );
+        })->filter()->values()->all();
+    }
+
+    /**
+     * The cell id is fetched numerically like at discovery, an invalid cell id is unknown (null)
+     *
+     * @param  array<int, \App\Models\WirelessSensor>  $sensors
+     * @return array<int, int|null>
+     */
+    public function pollWirelessCell(array $sensors): array
+    {
+        $values = SnmpQuery::numeric()->get(array_map(fn ($sensor) => $sensor->sensor_oids[0], $sensors))->values();
+
+        $cellIds = [];
+        foreach ($sensors as $sensor) {
+            $cellIds[$sensor->sensor_id] = self::validCellId($values[$sensor->sensor_oids[0]] ?? null);
+        }
+
+        return $cellIds;
+    }
+
+    /**
+     * -1 (or all ones) means the modem does not report the cell id (seen on SXT LTE)
+     */
+    public static function validCellId(mixed $value): ?int
+    {
+        if (! is_numeric($value)) {
+            return null;
+        }
+
+        $cellId = (int) $value;
+
+        return $cellId < 0 || $cellId >= 0xFFFFFFFF ? null : $cellId;
+    }
+
+    public function discoverEntityPhysical(): Collection
+    {
+        $inventory = parent::discoverEntityPhysical();
+        $chassis = $inventory->firstWhere('entPhysicalClass', 'chassis')->entPhysicalIndex ?? 0;
+
+        return $inventory->concat(SnmpQuery::cache()->walk(['MIKROTIK-MIB::mtxrLTEModemTable', 'MIKROTIK-MIB::mtxrInterfaceStatsName'])->mapTable(function (array $modem, string $ifIndex) use ($chassis) {
+            $modemIndex = self::lteEntityIndex($ifIndex);
+            $simIndex = self::lteEntityIndex($ifIndex, true);
+            // interfaces that are not LTE modems only have a name
+            if ($simIndex === null || ! isset($modem['MIKROTIK-MIB::mtxrLTEModemSignalRSRP'])) {
+                return [];
+            }
+
+            $model = trim($modem['MIKROTIK-MIB::mtxrLTEModemModel'] ?? '');
+            $firmware = trim($modem['MIKROTIK-MIB::mtxrLTEModemFirmware'] ?? '');
+            $entities = [new EntPhysical([
+                'entPhysicalIndex' => $modemIndex,
+                'entPhysicalContainedIn' => $chassis,
+                'entPhysicalClass' => 'module',
+                'entPhysicalName' => $modem['MIKROTIK-MIB::mtxrInterfaceStatsName'] ?? "lte$ifIndex",
+                'entPhysicalDescr' => ($model ?: 'LTE') . ' modem' . ($firmware ? ", firmware $firmware" : ''),
+                'entPhysicalModelName' => $model ?: null,
+                'entPhysicalFirmwareRev' => $firmware ?: null,
+                'entPhysicalSerialNum' => trim($modem['MIKROTIK-MIB::mtxrLTEModemIMEI'] ?? '') ?: null,
+                'entPhysicalParentRelPos' => -1,
+                'ifIndex' => $ifIndex,
+            ])];
+
+            // older RouterOS does not report the ICCID, so SIM presence is unknown
+            if (isset($modem['MIKROTIK-MIB::mtxrLTEModemUICC'])) {
+                $iccid = trim($modem['MIKROTIK-MIB::mtxrLTEModemUICC']);
+                $imsi = trim($modem['MIKROTIK-MIB::mtxrLTEModemIMSI'] ?? '');
+                $entities[] = new EntPhysical([
+                    'entPhysicalIndex' => $simIndex,
+                    'entPhysicalContainedIn' => $modemIndex,
+                    'entPhysicalClass' => 'module',
+                    'entPhysicalName' => 'SIM card',
+                    'entPhysicalDescr' => $iccid === '' ? 'SIM card not detected' : 'SIM card' . ($imsi ? ", IMSI $imsi" : ''),
+                    'entPhysicalSerialNum' => $iccid ?: null,
+                    'entPhysicalParentRelPos' => -1,
+                ]);
+            }
+
+            return $entities;
+        })->flatten());
+    }
+
+    /**
+     * Inventory index for the LTE modem (or its SIM card), offset to stay clear of RouterOS ENTITY-MIB indexes.
+     * Null when it does not fit the entPhysicalIndex column (signed int), the modem then has no inventory entry.
+     */
+    public static function lteEntityIndex(int|string $ifIndex, bool $sim = false): ?int
+    {
+        $index = 1000000000 + (int) $ifIndex * 10 + ($sim ? 1 : 0);
+
+        return (int) $ifIndex >= 0 && $index <= 2147483647 ? $index : null;
+    }
+
+    /**
+     * Sensor user_func: the sensor oid is the installed RouterBOOT version, compare it with the version RouterOS would upgrade to.
+     * Keep the previous state when either version can't be fetched, so a lost packet does not change the state.
+     *
+     * @param  array<string, mixed>  $sensor
+     */
+    public static function pollFirmwareState(int|float $value, string $raw, array $sensor): int
+    {
+        $upgrade = $raw === '' ? '' : SnmpQuery::get('MIKROTIK-MIB::mtxrFirmwareUpgradeVersion.0')->value();
+
+        if ($raw === '' || $upgrade === '') {
+            return (int) $sensor['sensor_current'];
+        }
+
+        return self::firmwareState($raw, $upgrade);
+    }
+
+    /**
+     * Sensor user_func: LTE state columns are free-form strings, map them to the numeric states created at discovery.
+     * A string matching a state description was already translated by the poller.
+     * Columns other than the ICCID are only discovered when filled, so an empty value is a missing oid
+     * (e.g. one bulk chunk timed out) and the previous state is kept. An empty ICCID is a missing SIM.
+     *
+     * @param  array<string, mixed>  $sensor
+     */
+    public static function pollLteState(int|float $value, string $raw, array $sensor): int
+    {
+        if ($sensor['sensor_type'] !== 'mtxrLTEModemUICC') {
+            if ($raw === '') {
+                return (int) $sensor['sensor_current'];
+            }
+
+            if (is_numeric($raw)) {
+                return (int) $raw;
+            }
+        }
+
+        return self::normalizeLteState($sensor['sensor_type'], $raw) ?? (int) $sensor['sensor_current'];
+    }
+
+    /**
+     * RouterBOARD firmware (RouterBOOT) state: 0 up to date, 1 upgrade available, 2 unknown
+     */
+    public static function firmwareState(?string $current, ?string $upgrade): int
+    {
+        $current = trim((string) $current);
+        $upgrade = trim((string) $upgrade);
+
+        if ($current === '' || $upgrade === '') {
+            return 2;
+        }
+
+        return version_compare($upgrade, $current, '>') ? 1 : 0;
+    }
+
+    /**
+     * Map the raw RouterOS string of an LTE state column to its numeric state.
+     */
+    public static function normalizeLteState(string $column, mixed $value): ?int
+    {
+        $value = strtolower(trim((string) $value));
+
+        return match ($column) {
+            'mtxrLTEModemUICC' => $value === '' ? 0 : 1,
+            'mtxrLTEModemRAT' => match (true) {
+                str_contains($value, 'nsa') || (str_contains($value, 'lte') && preg_match('/\bnr|5g/', $value)) => 5,
+                (bool) preg_match('/\bnr|5g/', $value) => 6,
+                (bool) preg_match('/lte|4g|e-?utran/', $value) => 4,
+                (bool) preg_match('/umts|wcdma|hspa|utran|3g/', $value) => 3,
+                (bool) preg_match('/gsm|gprs|edge|2g/', $value) => 2,
+                default => 0,
+            },
+            'mtxrLTEModemRegStatus' => match (true) {
+                // before 'not registered': 'not registered, searching' is a modem that is re-attaching
+                str_contains($value, 'search') => 3,
+                (bool) preg_match('/not registered|unregistered|not-registered/', $value) => 5,
+                str_contains($value, 'denied') => 4,
+                str_contains($value, 'roaming') => 2,
+                str_contains($value, 'registered') => 1,
+                default => 0,
+            },
+            'mtxrLTEModemPinStatus' => match (true) {
+                (bool) preg_match('/not inserted|not present|no sim|absent/', $value) => 0,
+                str_contains($value, 'puk') => 3,
+                (bool) preg_match('/\bpin\b/', $value) => 2,
+                (bool) preg_match('/^ok$|ready|no password/', $value) => 1,
+                default => 4,
+            },
+            default => null,
+        };
     }
 
     public function pollOS(DataStorageInterface $datastore): void
@@ -791,10 +1099,23 @@ class Routeros extends OS implements
         $interfaceIds = SnmpQuery::hideMib()->walk('MIKROTIK-MIB::mtxrNeighborInterfaceID')->pluck();
         $interfaceNames = SnmpQuery::hideMib()->walk('MIKROTIK-MIB::mtxrInterfaceStatsName')->pluck();
 
-        return (new Collection($entries))->filter(fn ($entry) => is_array($entry))->map(function (array $entry, $index) use ($interfaceIds, $interfaceNames) {
+        return new Collection($entries)->filter(fn ($entry) => is_array($entry))->map(function (array $entry, $index) use ($interfaceIds, $interfaceNames) {
             $ifName = isset($interfaceIds[$index]) ? $interfaceNames[hexdec((string) $interfaceIds[$index])] ?? null : null;
 
             return NeighborParser::fromLldpRemEntry($entry, $this->lldpLocalPorts()->byDescr($ifName)?->port_id);
         })->values();
+    }
+
+    /**
+     * Before 6.47 upsEstimatedMinutesRemaining was in seconds
+     */
+    protected function upsMibDivisor(SensorType $type, string $oid): int
+    {
+        if ($type === SensorType::Runtime && str_starts_with($oid, '.1.3.6.1.2.1.33.1.2.3.')
+            && $this->getDevice()->version && version_compare($this->getDevice()->version, '6.47', '<')) {
+            return 60;
+        }
+
+        return parent::upsMibDivisor($type, $oid);
     }
 }

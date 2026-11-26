@@ -46,7 +46,6 @@ class LegacyModule implements Module, SupportsSubmodules
 
     private array $module_deps = [
         'arp-table' => ['ports'],
-        'fdb-table' => ['ports', 'vlans'],
         'transceivers' => ['ports'],
         'vlans' => ['ports'],
     ];
@@ -210,7 +209,7 @@ class LegacyModule implements Module, SupportsSubmodules
 
     private function collectComponents(int $device_id): array
     {
-        $components = (new Component())->getComponents($device_id)[$device_id] ?? [];
+        $components = new Component()->getComponents($device_id)[$device_id] ?? [];
         $components = Arr::sort($components, fn ($item) => $item['type'] . $item['label']);
 
         return array_values($components);

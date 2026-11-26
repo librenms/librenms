@@ -11,7 +11,7 @@ return new class extends Migration
      * octets. The columns held 96, so a device that reports a longer string aborted the
      * entity-physical update with a data too long error on every discovery and poll.
      */
-    private const COLUMNS = [
+    private const array COLUMNS = [
         'entPhysicalHardwareRev',
         'entPhysicalFirmwareRev',
         'entPhysicalSoftwareRev',

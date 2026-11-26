@@ -17,12 +17,16 @@ final class PatchManagerTest extends TestCase
     private string $upstream;
     private string $local;
     private PatchManager $manager;
+    private string|false $dockerEnvironment;
     /** @var array<int, array<string, mixed>> */
     private array $apiResponses = [];
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->dockerEnvironment = getenv('LIBRENMS_DOCKER');
+        putenv('LIBRENMS_DOCKER=0');
 
         $this->tmp = sys_get_temp_dir() . '/lnms-patch-test-' . uniqid();
         $this->upstream = "$this->tmp/upstream";
@@ -69,6 +73,7 @@ final class PatchManagerTest extends TestCase
 
     protected function tearDown(): void
     {
+        putenv($this->dockerEnvironment === false ? 'LIBRENMS_DOCKER' : "LIBRENMS_DOCKER=$this->dockerEnvironment");
         File::deleteDirectory($this->tmp);
 
         parent::tearDown();
@@ -130,7 +135,7 @@ final class PatchManagerTest extends TestCase
         $this->local = "$parent/install";
         mkdir($this->local);
         $this->git($this->upstream, 'archive', '--output', "$this->tmp/export.tar", 'master');
-        (new Process(['tar', '-xf', "$this->tmp/export.tar", '-C', $this->local]))->mustRun();
+        new Process(['tar', '-xf', "$this->tmp/export.tar", '-C', $this->local])->mustRun();
         $manager = $this->newManager();
 
         $this->createPullRequest(1, ['file.txt' => fn ($c) => str_replace('two', 'TWO', $c), 'logo.png' => "\x89PNG\0data"]);
@@ -142,6 +147,91 @@ final class PatchManagerTest extends TestCase
         $this->assertSame("one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n", $this->read('file.txt'));
         $this->assertFileDoesNotExist("$this->local/logo.png");
         $this->assertFileDoesNotExist("$parent/file.txt");
+    }
+
+    public function testDockerAppliesAndRemovesOnlyChangesOutsideTrimmedDirectories(): void
+    {
+        putenv('LIBRENMS_DOCKER=1');
+        File::deleteDirectory("$this->local/.git");
+        File::ensureDirectoryExists("$this->upstream/tests/Unit");
+        File::ensureDirectoryExists("$this->upstream/doc");
+        $this->write($this->upstream, 'tests/Unit/RrdStoreTest.php', "old test\n");
+        $this->write($this->upstream, 'doc/café.png', "\x89PNG\0old");
+        $this->commit($this->upstream, 'Files omitted from the image');
+        $this->createPullRequest(1, [
+            'file.txt' => fn ($c) => str_replace('two', 'TWO', $c),
+            'tests/Unit/RrdStoreTest.php' => "updated test\n",
+            'doc/café.png' => "\x89PNG\0new",
+            'html/plugins/Test/new.php' => "new example plugin file\n",
+        ]);
+
+        $warnings = $this->manager->apply($this->manager->fetch(1));
+
+        $this->assertSame(['Skipped 3 file changes from #1 in directories omitted from the Docker image'], $warnings);
+        $this->assertStringContainsString("TWO\n", $this->read('file.txt'));
+        $this->assertDirectoryDoesNotExist("$this->local/tests");
+        $this->assertDirectoryDoesNotExist("$this->local/doc");
+        $this->assertDirectoryDoesNotExist("$this->local/html/plugins/Test");
+
+        $manager = $this->newManager();
+        $patch = $manager->get(1);
+        $this->assertSame(['file.txt'], $patch->paths());
+        $this->assertTrue($manager->isApplied($patch));
+        $manager->remove($patch);
+
+        $this->assertSame("one\ntwo\nthree\nfour\nfive\nsix\nseven\neight\nnine\nten\n", $this->read('file.txt'));
+        $this->assertEmpty($this->newManager()->all());
+    }
+
+    public function testDockerRejectsPullRequestWithOnlyTrimmedDirectoryChanges(): void
+    {
+        putenv('LIBRENMS_DOCKER=1');
+        $this->createPullRequest(1, ['tests/new.txt' => "new test\n"]);
+
+        $this->expectException(PatchException::class);
+        $this->expectExceptionMessageIsOrContains('Pull request #1 has no changes for this Docker installation');
+        $this->manager->apply($this->manager->fetch(1));
+    }
+
+    public function testDockerKeepsRenamesThatAffectInstalledFiles(): void
+    {
+        putenv('LIBRENMS_DOCKER=1');
+        File::ensureDirectoryExists("$this->upstream/tests");
+        $this->createPullRequest(1, [], rename: ['other.txt' => 'tests/moved.txt']);
+
+        $this->manager->apply($this->manager->fetch(1));
+
+        $this->assertFileDoesNotExist("$this->local/other.txt");
+        $this->assertSame("other\n", $this->read('tests/moved.txt'));
+        $this->manager->remove($this->manager->get(1));
+        $this->assertSame("other\n", $this->read('other.txt'));
+    }
+
+    public function testDockerStillRejectsChangesToMissingRuntimeFiles(): void
+    {
+        putenv('LIBRENMS_DOCKER=1');
+        unlink("$this->local/file.txt");
+        $this->createPullRequest(1, ['file.txt' => "changed\n", 'new.txt' => "new\n"]);
+
+        try {
+            $this->manager->apply($this->manager->fetch(1));
+            $this->fail('Expected exception');
+        } catch (PatchException $exception) {
+            $this->assertStringContainsString('file.txt', $exception->getMessage());
+        }
+
+        $this->assertFileDoesNotExist("$this->local/new.txt");
+        $this->assertEmpty($this->manager->all());
+    }
+
+    public function testFullCheckoutAppliesChangesToDirectoriesTrimmedInDocker(): void
+    {
+        $this->createPullRequest(1, ['tests/new.txt' => "new test\n"]);
+
+        $warnings = $this->manager->apply($this->manager->fetch(1));
+
+        $this->assertSame([], $warnings);
+        $this->assertSame("new test\n", $this->read('tests/new.txt'));
     }
 
     public function testApplyingAgainUpdatesToNewVersion(): void

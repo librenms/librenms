@@ -30,7 +30,7 @@ final class LocalNetworksTest extends TestCase
             '192.168.1.0/24', // once for both interfaces
             '10.20.30.0/24', // a large network is narrowed to the /24 of the server
             '172.16.0.0/22',
-        ], (new LocalNetworks(containerMarkers: []))->find($interfaces));
+        ], new LocalNetworks(containerMarkers: [])->find($interfaces));
     }
 
     public function testSuggestsNothingInsideAContainer(): void
@@ -40,6 +40,6 @@ final class LocalNetworksTest extends TestCase
             'eth0' => ['up' => true, 'unicast' => [['family' => 2, 'address' => '172.18.0.5', 'netmask' => '255.255.0.0']]],
         ];
 
-        $this->assertSame([], (new LocalNetworks(containerMarkers: [__FILE__]))->find($interfaces));
+        $this->assertSame([], new LocalNetworks(containerMarkers: [__FILE__])->find($interfaces));
     }
 }

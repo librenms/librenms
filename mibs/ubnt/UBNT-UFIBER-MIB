@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (TEXTUAL-CONVENTION without DESCRIPTION; DISPLAY-HINT after STATUS)
 UBNT-UFIBER-MIB DEFINITIONS ::= BEGIN
     IMPORTS
         MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, Counter64,
@@ -316,11 +317,13 @@ UBNT-UFIBER-MIB DEFINITIONS ::= BEGIN
     
     UbntOnuSN ::= TEXTUAL-CONVENTION
         STATUS      current
+        DESCRIPTION "ONU serial number"
         SYNTAX      DisplayString (SIZE (0..12))
 
     SignalLevel ::= TEXTUAL-CONVENTION
-        STATUS          current
         DISPLAY-HINT    "d-2"
+        STATUS          current
+        DESCRIPTION ""
         SYNTAX          Integer32
 
     ubntOnus OBJECT IDENTIFIER ::= { ubntEdgeMax 6 }

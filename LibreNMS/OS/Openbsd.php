@@ -26,10 +26,14 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\Sensor;
+use Illuminate\Support\Collection;
+use LibreNMS\Enum\SensorType;
 use LibreNMS\Interfaces\Data\DataStorageInterface;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Shared\Unix;
 use LibreNMS\RRD\RrdDefinition;
+use SnmpQuery;
 
 class Openbsd extends Unix implements OSPolling
 {
@@ -117,5 +121,62 @@ class Openbsd extends Unix implements OSPolling
         $datastore->put($this->getDeviceArray(), "pf_$graphName", $tags, $fields);
 
         $this->enableGraph("pf_$graphName");
+    }
+
+    /**
+     * OPENBSD-SENSORS-MIB, values are in the units LibreNMS uses
+     */
+    protected function discoverOsSensors(): Collection
+    {
+        $sensors = parent::discoverOsSensors();
+        $data = SnmpQuery::enumStrings()->walk([
+            'OPENBSD-SENSORS-MIB::sensorDevice',
+            'OPENBSD-SENSORS-MIB::sensorDescr',
+            'OPENBSD-SENSORS-MIB::sensorValue',
+            'OPENBSD-SENSORS-MIB::sensorType',
+        ])->table(1);
+
+        foreach ($data as $index => $entry) {
+            $value = $entry['OPENBSD-SENSORS-MIB::sensorValue'] ?? null;
+            $type = match ($entry['OPENBSD-SENSORS-MIB::sensorType'] ?? null) {
+                'voltsdc', 'voltsac' => SensorType::Voltage,
+                'fan' => SensorType::Fanspeed,
+                'current' => SensorType::Current,
+                'power' => SensorType::Power,
+                'freq' => SensorType::Frequency,
+                'humidity' => SensorType::Humidity,
+                'temperature' => SensorType::Temperature,
+                default => null,
+            };
+
+            if ($type === null || ! is_numeric($value) || ! is_numeric($index)) {
+                continue;
+            }
+
+            $descr = ($entry['OPENBSD-SENSORS-MIB::sensorDevice'] ?? '') . ' ' . ($entry['OPENBSD-SENSORS-MIB::sensorDescr'] ?? '');
+            if ($type === SensorType::Voltage) {
+                $descr = preg_replace('/ voltage/i', '', $descr);
+            } elseif ($type === SensorType::Temperature) {
+                if ($value < -40 || $value > 200) {
+                    continue; // bogus
+                }
+                $descr = preg_replace('/ temperature/i', '', $descr);
+            }
+
+            $sensors->push(new Sensor([
+                'poller_type' => 'snmp',
+                'sensor_class' => $type->value,
+                'sensor_oid' => ".1.3.6.1.4.1.30155.2.1.2.1.5.$index",
+                'sensor_index' => $index,
+                'sensor_type' => 'openbsd-sensor',
+                'sensor_descr' => $descr,
+                'sensor_divisor' => 1,
+                'sensor_multiplier' => 1,
+                'sensor_current' => $value,
+                'rrd_type' => 'GAUGE',
+            ]));
+        }
+
+        return $sensors;
     }
 }

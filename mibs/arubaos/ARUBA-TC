@@ -1,4 +1,4 @@
---- ArubaOS 8.8.0.1_80393
+-- ArubaOS 8.12.0.4_91755
 -- vim:set ts=4 sw=4:
 ARUBA-TC DEFINITIONS ::= BEGIN
 
@@ -45,7 +45,8 @@ ArubaPhyType ::= TEXTUAL-CONVENTION
 						dot11b(2),
 						dot11g(3),
 						dot11ag(4),
-						wired(5)
+						wired(5),
+						dot11ax6ghz(6)
 					  }
         
 ArubaHTMode ::= TEXTUAL-CONVENTION
@@ -78,7 +79,8 @@ ArubaHTExtChannel ::= TEXTUAL-CONVENTION
 						above(2),
 						below(3),
 						eighty(4),
-                        onesixty(5)
+						onesixty(5),
+						eightyPlusEighty(6)
 					  }
         
 ArubaMonEncryptionType ::= TEXTUAL-CONVENTION
@@ -132,9 +134,9 @@ ArubaSwitchRole ::= TEXTUAL-CONVENTION
 	DESCRIPTION
   		" Represents the role of the controller"
 	SYNTAX       INTEGER {
-		 				master(1),
+		 				conductor(1),
 						local(2),
-						backupmaster(3),
+						backupconductor(3),
                                                 standalone(4)
 					  }
           
@@ -246,7 +248,7 @@ ArubaSubAuthenticationMethods ::= TEXTUAL-CONVENTION
 ArubaEncryptionType ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-  		" Encryption Method."
+  		" Encryption Type."
 	SYNTAX       INTEGER {
 		 				none(0),
 		 				static-wep(1),
@@ -269,7 +271,8 @@ ArubaEncryptionType ::= TEXTUAL-CONVENTION
                         wpa3-cnsa(18),
                         owe-aes(20),
                         wpa3-sae-aes(21),
-                        wpa3-aes-gcmp-256(22)
+                        wpa3-aes-gcmp-256(22),
+                        wpa3-aes-ccm-128(23) 
 					  }
      
 ArubaUserForwardMode ::= TEXTUAL-CONVENTION
@@ -345,7 +348,7 @@ ArubaStationType ::= TEXTUAL-CONVENTION
 ArubaEncryptionMethods ::= TEXTUAL-CONVENTION
 	STATUS		current
 	DESCRIPTION
-  		" Represents the Actions in an ACL rule."
+  		" Encryption Methods. "
     SYNTAX      BITS{
 						disabled(0),
 						static-wep(1),
@@ -533,7 +536,12 @@ ArubaAccessPointMode ::= TEXTUAL-CONVENTION
 						meshPortal(4),
 						meshPoint(5),
 						rfprotectSensor(6),
-						spectrumSensor(7)
+						spectrumSensor(7),
+						station(8),
+						stationMeshP(9),
+						amsMode(10),
+						controllerMode(11),
+						airmatchMonitor(12)
 		 		 }
 
 ArubaAuthServerType ::= TEXTUAL-CONVENTION
@@ -563,10 +571,12 @@ ArubaAddressType ::= TEXTUAL-CONVENTION
 		 		 }
 
 ArubaBlackListReason ::= TEXTUAL-CONVENTION
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION
 		"
 		Black List Reason. 
+		**NOTE: this textual convention is obsoleted and replaced by
+		ArubaDenyListReason.
 		"
 	SYNTAX       INTEGER {
 		 				userDefined(1),
@@ -580,6 +590,25 @@ ArubaBlackListReason ::= TEXTUAL-CONVENTION
 						esiBlacklist(9),
 						other(100)
 		 			  }
+
+ArubaDenyListReason ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+                "
+                Deny List Reason. 
+                "
+        SYNTAX       INTEGER {
+                                                userDefined(1),
+                                                mitmAttack(2),
+                                                authFailure(3),
+                                                pingFlood(4),
+                                                sessionFlood(5),
+                                                synFlood(6),
+                                                sessionDenylist(7),
+                                                ipSpoofing(8),
+                                                esiDenylist(9),
+                                                other(100)
+                                          }
 
 ArubaDBType ::= TEXTUAL-CONVENTION
 	STATUS		current
@@ -892,11 +921,13 @@ ArubaARMChangeReason ::= TEXTUAL-CONVENTION
    }
 
 ArubaAPMasterStatus ::= TEXTUAL-CONVENTION
-	STATUS		current
+	STATUS		obsolete
 	DESCRIPTION
 		"
 		  AP status as seen by the master controller
           (used to indicate a status change).
+          **NOTE: this textual convention is obsoleted and replaced by
+          ArubaAPConductorStatus.
 		"
 	SYNTAX		INTEGER {
 			up(1),
@@ -1158,5 +1189,18 @@ ArubaSplit5GMode ::= TEXTUAL-CONVENTION
                             unknown(2),
                             notApplicable(3)
                        }
+
+ArubaAPConductorStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "
+          AP status as seen by the conductor controller
+          (used to indicate a status change).
+        "
+    SYNTAX      INTEGER {
+            up(1),
+            down(2),
+            move(3)
+    }
 
 END

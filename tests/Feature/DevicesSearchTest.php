@@ -81,7 +81,7 @@ class DevicesSearchTest extends TestCase
             'device_id' => $device->device_id,
             'port_id' => \App\Models\Port::factory()->create(['device_id' => $device->device_id])->port_id,
             'mac_address' => $mac,
-            'vlan_id' => 1,
+            'vlan' => 1,
         ]);
 
         $response = $this->actingAs($user)
