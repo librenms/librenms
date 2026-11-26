@@ -1,0 +1,416 @@
+BDT-MS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        enterprises,
+        snmpV2,
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Unsigned32
+                FROM SNMPv2-SMI
+        DisplayString
+                FROM SNMPv2-TC
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF;
+
+bdt MODULE-IDENTITY
+        LAST-UPDATED "201702211500Z"    -- Feb 21, 2017 3:00:00 PM
+        ORGANIZATION "BDT Media Automation GmbH"
+        CONTACT-INFO "info@bdt.de"
+        DESCRIPTION ""
+        REVISION "201702211500Z"        -- Feb 21, 2017 3:00:00 PM
+        DESCRIPTION "BDT MIB"
+        -- 1.3.6.1.4.1.20884
+::= { enterprises 20884 }
+
+
+bdtDeviceData OBJECT IDENTIFIER 
+        -- 1.3.6.1.4.1.20884.1
+::= { bdt 1 }
+
+
+bdtDeviceDatVendor OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Device Vendor Name"
+        -- 1.3.6.1.4.1.20884.1.1 --
+::= { bdtDeviceData 1 }
+
+
+bdtDeviceDatProductId OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Device Product ID"
+        -- 1.3.6.1.4.1.20884.1.2
+::= { bdtDeviceData 2 }
+
+
+bdtDeviceDatSerialNum OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Device Serial Number"
+        -- 1.3.6.1.4.1.20884.1.3
+::= { bdtDeviceData 3 }
+
+
+bdtDeviceDatSWRevision OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Device SW Revision"
+        -- 1.3.6.1.4.1.20884.1.4
+::= { bdtDeviceData 4 }
+
+
+bdtDeviceDatSWBuildDate OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Device SW Build Date"
+        -- 1.3.6.1.4.1.20884.1.5
+::= { bdtDeviceData 5 }
+
+
+bdtDeviceDatRoboticHWRev OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Robotic HW Revision"
+        -- 1.3.6.1.4.1.20884.1.6
+::= { bdtDeviceData 6 }
+
+
+bdtDeviceDatRoboticSWRev OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Device Robotic FW Revision"
+        -- 1.3.6.1.4.1.20884.1.7
+::= { bdtDeviceData 7 }
+
+
+bdtDeviceDatWWI OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Device World Wide ID"
+        -- 1.3.6.1.4.1.20884.1.8
+::= { bdtDeviceData 8 }
+
+
+bdtDeviceDatSystemName OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Device System Name"
+        -- 1.3.6.1.4.1.20884.1.9 
+::= { bdtDeviceData 9 }
+
+
+bdtDeviceTableModule OBJECT-TYPE
+        SYNTAX  SEQUENCE OF BdtDeviceDatModEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Device Module Table"
+        -- 1.3.6.1.4.1.20884.1.10
+::= { bdtDeviceData 10 }
+
+
+bdtDeviceDatModEntry OBJECT-TYPE
+        SYNTAX  BdtDeviceDatModEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Device Module specific Entries"
+        INDEX {
+                bdtDeviceDatModEntryID }
+        -- 1.3.6.1.4.1.20884.1.10.1
+::= { bdtDeviceTableModule 1 }
+
+
+BdtDeviceDatModEntry ::= SEQUENCE {
+
+        bdtDeviceDatModEntryID      Unsigned32,
+        bdtDeviceDatModEntryIDPhys  INTEGER,
+        bdtDeviceDatModEntryCtrlRev DisplayString }
+
+
+bdtDeviceDatModEntryID OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Module ID NUmber"
+        -- 1.3.6.1.4.1.20884.1.10.1.1
+::= { bdtDeviceDatModEntry 1 }
+
+
+bdtDeviceDatModEntryIDPhys OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Physical Module ID"
+        -- 1.3.6.1.4.1.20884.1.10.1.2
+::= { bdtDeviceDatModEntry 2 }
+
+
+bdtDeviceDatModEntryCtrlRev OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Module Controller Revision"
+        -- 1.3.6.1.4.1.20884.1.10.1.3
+::= { bdtDeviceDatModEntry 3 }
+
+
+bdtDeviceStatus OBJECT IDENTIFIER 
+        -- 1.3.6.1.4.1.20884.2 --
+::= { bdt 2 }
+
+bdtDeviceStatAct OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        Idle(1),
+                        Busy(2),
+                        Offline(3) }
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Current Device Activity"
+        -- 1.3.6.1.4.1.20884.2.1
+::= { bdtDeviceStatus 1 }
+
+
+bdtDeviceStatPwrOn OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Current Device Power Up Time"
+        -- 1.3.6.1.4.1.20884.2.2
+::= { bdtDeviceStatus 2 }
+
+
+bdtDeviceStatHealth OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        unknown(1),
+                        ok(2),
+                        warning(3),
+                        critical(4) }
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Current Device Health Status"
+        -- 1.3.6.1.4.1.20884.2.3
+::= { bdtDeviceStatus 3 }
+
+
+bdtDeviceStatModTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF BdtDeviceStatModEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Module dependent status table"
+        -- 1.3.6.1.4.1.20884.2.4
+::= { bdtDeviceStatus 4 }
+
+
+bdtDeviceStatModEntry OBJECT-TYPE
+        SYNTAX  BdtDeviceStatModEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Device Module Entry "
+        INDEX {
+                bdtDeviceStatModEntryID }
+        -- 1.3.6.1.4.1.20884.2.4.1
+::= { bdtDeviceStatModTable 1 }
+
+
+BdtDeviceStatModEntry ::= SEQUENCE {
+
+        bdtDeviceStatModEntryID        Unsigned32,
+        bdtDeviceStatModEntryIDPhys    INTEGER,
+        bdtDeviceStatModEntryHealth    DisplayString,
+        bdtDeviceStatModEntryDPwr1     DisplayString,
+        bdtDeviceStatModEntryDPwr2     DisplayString,
+        bdtDeviceStatModEntryPwrSupply DisplayString }
+
+
+bdtDeviceStatModEntryID OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Device Module ID"
+        -- 1.3.6.1.4.1.20884.2.4.1.1
+::= { bdtDeviceStatModEntry 1 }
+
+
+bdtDeviceStatModEntryIDPhys OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Device Module ID physical"
+        -- 1.3.6.1.4.1.20884.2.4.1.2
+::= { bdtDeviceStatModEntry 2 }
+
+
+bdtDeviceStatModEntryHealth OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Current Module Health Stat"
+        -- 1.3.6.1.4.1.20884.2.4.1.3
+::= { bdtDeviceStatModEntry 3 }
+
+
+bdtDeviceStatModEntryDPwr1 OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Module Drive Power Module 1 Status"
+        -- 1.3.6.1.4.1.20884.2.4.1.4
+::= { bdtDeviceStatModEntry 4 }
+
+
+bdtDeviceStatModEntryDPwr2 OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Module Drive Power Board 2 status"
+        -- 1.3.6.1.4.1.20884.2.4.1.5
+::= { bdtDeviceStatModEntry 5 }
+
+
+bdtDeviceStatModEntryPwrSupply OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Module Power Supply Status"
+        -- 1.3.6.1.4.1.20884.2.4.1.6
+::= { bdtDeviceStatModEntry 6 }
+
+
+bdtDeviceTrapDefs OBJECT IDENTIFIER 
+        -- 1.3.6.1.4.1.20884.3
+::= { bdt 3 }
+
+
+bdtDeviceHealthTrap NOTIFICATION-TYPE
+        OBJECTS {
+                bdtDeviceTrapEventCode,
+                bdtDeviceTrapDescription,
+                bdtDeviceTrapEventType,
+                bdtDeviceTrapAdditionalInfo }
+        STATUS  current
+        DESCRIPTION
+                "Health Trap sent from MS"
+        -- 1.3.6.1.4.1.20884.3.1
+::= { bdtDeviceTrapDefs 1 }
+
+
+bdtDeviceTrapEventCode OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "The event code which occured"
+        -- 1.3.6.1.4.1.20884.3.2
+::= { bdtDeviceTrapDefs 2 }
+
+
+bdtDeviceTrapDescription OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Description of Event code"
+        -- 1.3.6.1.4.1.20884.3.3
+::= { bdtDeviceTrapDefs 3 }
+
+
+bdtDeviceTrapEventType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        critical(1),
+                        warning(2),
+                        informational(3),
+                        configuration(4) }
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "The Trap Type"
+        -- 1.3.6.1.4.1.20884.3.4
+::= { bdtDeviceTrapDefs 4 }
+
+
+bdtDeviceTrapAdditionalInfo OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+                "Additional info for the event"
+        -- 1.3.6.1.4.1.20884.3.5
+::= { bdtDeviceTrapDefs 5 }
+
+
+bdtDeviceDataGroup OBJECT-GROUP
+        OBJECTS {
+                bdtDeviceDatVendor,
+                bdtDeviceDatProductId,
+                bdtDeviceDatSerialNum,
+                bdtDeviceDatSWRevision,
+                bdtDeviceDatSWBuildDate,
+                bdtDeviceDatRoboticHWRev,
+                bdtDeviceDatRoboticSWRev,
+                bdtDeviceDatWWI,
+                bdtDeviceDatModEntryID,
+                bdtDeviceDatModEntryIDPhys,
+                bdtDeviceDatModEntryCtrlRev,
+                bdtDeviceStatAct,
+                bdtDeviceStatPwrOn,
+                bdtDeviceStatHealth,
+                bdtDeviceStatModEntryID,
+                bdtDeviceStatModEntryIDPhys,
+                bdtDeviceStatModEntryHealth,
+                bdtDeviceStatModEntryDPwr1,
+                bdtDeviceStatModEntryDPwr2,
+                bdtDeviceStatModEntryPwrSupply }
+        STATUS  current
+        DESCRIPTION
+                ""
+        -- 1.3.6.1.4.1.20884.5
+::= { bdt 5 }
+
+
+bdtDeviceTraps NOTIFICATION-GROUP
+        NOTIFICATIONS {
+                bdtDeviceHealthTrap }
+        STATUS  current
+        DESCRIPTION
+                ""
+        -- 1.3.6.1.4.1.20884.4
+::= { bdt 4 }
+
+END
+
