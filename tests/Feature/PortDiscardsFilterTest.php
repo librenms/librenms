@@ -79,6 +79,26 @@ final class PortDiscardsFilterTest extends DBTestCase
         $this->assertSame('33.33 mPPS', $rows[1]['ifInDiscards_delta']);
     }
 
+    public function testPortsPageColumnVisibility(): void
+    {
+        // [query, errors columns visible, discards columns visible]
+        $cases = [
+            [['view' => 'detail', 'filter' => ['errors' => ['eq' => '1']]], 'true', 'false'],
+            [['view' => 'detail', 'filter' => ['discards' => ['eq' => '1']]], 'false', 'true'],
+            [['view' => 'detail'], 'true', 'true'],
+            [[], 'false', 'false'],
+        ];
+
+        $user = User::factory()->admin()->create(['enabled' => true]);
+
+        foreach ($cases as [$query, $errors, $discards]) {
+            $this->actingAs($user)->get(route('ports', $query))
+                ->assertOk()
+                ->assertSee('data-column-id="ifInErrors_delta" data-searchable="false" data-visible="' . $errors . '"', false)
+                ->assertSee('data-column-id="ifInDiscards_delta" data-searchable="false" data-visible="' . $discards . '"', false);
+        }
+    }
+
     /**
      * @param  array{int, int}|null  $discards  in/out discard deltas, null to create the port without a ports_statistics row
      * @param  array<string, mixed>  $attributes

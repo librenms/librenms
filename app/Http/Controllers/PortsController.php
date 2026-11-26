@@ -56,6 +56,12 @@ class PortsController extends Controller
             $graph = substr($view, 6);
         }
 
+        // the Errored and Discarded views only show their own counters, detail view shows both
+        $filterErrors = $request->boolean('filter.errors.eq');
+        $filterDiscards = $request->boolean('filter.discards.eq');
+        $showErrors = $filterErrors || ($view === 'detail' && ! $filterDiscards);
+        $showDiscards = $filterDiscards || ($view === 'detail' && ! $filterErrors);
+
         $graphTemplate = [
             'height' => 100,
             'width' => session('widescreen') ? 357 : 315,
@@ -73,8 +79,8 @@ class PortsController extends Controller
             'view' => $view,
             'graph' => $graph,
             'show_detail' => $view === 'detail' ? 'true' : 'false',
-            'show_errors' => $view === 'detail' || $request->boolean('filter.errors.eq') ? 'true' : 'false',
-            'show_discards' => $view === 'detail' || $request->boolean('filter.discards.eq') ? 'true' : 'false',
+            'show_errors' => $showErrors ? 'true' : 'false',
+            'show_discards' => $showDiscards ? 'true' : 'false',
             'ports' => $this->getPorts($view, $perPage, $sort),
             'group' => $request->array('filter')['groups.id']['eq'] ?? 0,
             'perPage' => $perPage,
