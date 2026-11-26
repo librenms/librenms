@@ -4,7 +4,6 @@ use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Eventlog;
 use LibreNMS\Enum\Severity;
-use LibreNMS\RRD\PortRrd;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Mac;
@@ -552,9 +551,6 @@ $device_global_ports = [
 ];
 
 $globally_updated_port_ids = [];
-$device_attribs = DeviceCache::getPrimary()->getAttribs();
-$device_tune = $device_attribs['override_rrdtool_tune'] ?? null;
-$global_tune = LibrenmsConfig::get('rrdtool_tune') == 'true';
 
 // Loop ports in the DB and update where necessary
 foreach ($ports as $port) {
@@ -676,7 +672,7 @@ foreach ($ports as $port) {
         port_fill_missing_and_trim($this_port, $device);
 
         // Update IF-MIB data
-        $if_speed = $device_attribs['ifSpeed:' . $port['ifName']] ?? $this_port['ifSpeed'];
+        $tune_port = false;
         foreach ($data_oids as $oid) {
             $current_oid = $this_port[$oid] ?? null;
 
@@ -691,7 +687,8 @@ foreach ($ports as $port) {
                 }
             }
             if ($oid == 'ifSpeed') {
-                $current_oid = $if_speed;
+                $ifSpeed_override = DeviceCache::getPrimary()->getAttrib('ifSpeed:' . $port['ifName']);
+                $current_oid = $ifSpeed_override ?? $current_oid;
             }
 
             if ($port[$oid] != $current_oid && ! isset($current_oid)) {
@@ -700,6 +697,17 @@ foreach ($ports as $port) {
                 d_echo($oid . ': ' . $port[$oid] . ' -> NULL ', $oid . ' ');
             } elseif ($port[$oid] != $current_oid) {
                 // if the value is different, update it
+
+                // rrdtune if needed
+                if ($oid == 'ifSpeed') {
+                    $port_tune = DeviceCache::getPrimary()->getAttrib('ifName_tune:' . $port['ifName']);
+                    $device_tune = DeviceCache::getPrimary()->getAttrib('override_rrdtool_tune');
+                    if ($port_tune == 'true' ||
+                        ($device_tune == 'true' && $port_tune != 'false') ||
+                        (LibrenmsConfig::get('rrdtool_tune') == 'true' && $port_tune != 'false' && $device_tune != 'false')) {
+                        $tune_port = $port[$oid] < $current_oid; // only tune when speed goes up
+                    }
+                }
 
                 // set the update data
                 $port['update'][$oid] = $current_oid;
@@ -843,6 +851,26 @@ foreach ($ports as $port) {
             $port_info_string .= 'bytes(' . Number::formatBi($current_port_stats['ifInOctets_diff'] ?? 0) . '/' . Number::formatBi($current_port_stats['ifOutOctets_diff'] ?? 0) . ') ';
             $port_info_string .= 'pkts(' . Number::formatSi($current_port_stats['ifInUcastPkts_rate'] ?? 0, 2, 3, 'pps') . '/' . Number::formatSi($current_port_stats['ifOutUcastPkts_rate'] ?? 0, 2, 0, 'pps') . ') ';
 
+            // Update data stores
+            $rrd_name = Rrd::portName($port_id, '');
+            $rrdfile = Rrd::name($device['hostname'], $rrd_name);
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('INOCTETS', 'DERIVE', 0, 12500000000)
+                ->addDataset('OUTOCTETS', 'DERIVE', 0, 12500000000)
+                ->addDataset('INERRORS', 'DERIVE', 0, 12500000000)
+                ->addDataset('OUTERRORS', 'DERIVE', 0, 12500000000)
+                ->addDataset('INUCASTPKTS', 'DERIVE', 0, 12500000000)
+                ->addDataset('OUTUCASTPKTS', 'DERIVE', 0, 12500000000)
+                ->addDataset('INNUCASTPKTS', 'DERIVE', 0, 12500000000)
+                ->addDataset('OUTNUCASTPKTS', 'DERIVE', 0, 12500000000)
+                ->addDataset('INDISCARDS', 'DERIVE', 0, 12500000000)
+                ->addDataset('OUTDISCARDS', 'DERIVE', 0, 12500000000)
+                ->addDataset('INUNKNOWNPROTOS', 'DERIVE', 0, 12500000000)
+                ->addDataset('INBROADCASTPKTS', 'DERIVE', 0, 12500000000)
+                ->addDataset('OUTBROADCASTPKTS', 'DERIVE', 0, 12500000000)
+                ->addDataset('INMULTICASTPKTS', 'DERIVE', 0, 12500000000)
+                ->addDataset('OUTMULTICASTPKTS', 'DERIVE', 0, 12500000000);
+
             $fields = [
                 'INOCTETS' => $this_port['ifInOctets'] ?? null,
                 'OUTOCTETS' => $this_port['ifOutOctets'] ?? null,
@@ -873,34 +901,10 @@ foreach ($ports as $port) {
             $fields['ifInBits_rate'] = $current_port_stats['ifInBits_rate'];
             $fields['ifOutBits_rate'] = $current_port_stats['ifOutBits_rate'];
 
-            // Update data stores
-            $rrd_name = Rrd::portName($port_id, '');
-            $port_tune = $device_attribs['ifName_tune:' . $port['ifName']] ?? null;
-            $tuning_enabled = $port_tune == 'true'
-                || ($port_tune != 'false' && ($device_tune == 'true' || ($device_tune != 'false' && $global_tune)));
-            $tuned_maximum = $tuning_enabled ? PortRrd::tuneMaximum((int) $if_speed) : null;
-            if ($tuned_maximum !== null && $port['ifSpeed'] < $if_speed) {
-                Rrd::tune(Rrd::name($device['hostname'], $rrd_name), PortRrd::tuneLimits((int) $if_speed));
+            $tune_limits = $tune_port ? \LibreNMS\RRD\PortRrd::tuneLimits((int) $this_port['ifSpeed']) : [];
+            if ($tune_limits !== [] && Rrd::tune($rrdfile, $tune_limits)) {
+                $tune_limits = [];
             }
-
-            // A missing RRD gets these limits when the datastore creates it.
-            $rrd_maximum = $tuned_maximum ?? 12500000000;
-            $rrd_def = RrdDefinition::make()
-                ->addDataset('INOCTETS', 'DERIVE', 0, $rrd_maximum)
-                ->addDataset('OUTOCTETS', 'DERIVE', 0, $rrd_maximum)
-                ->addDataset('INERRORS', 'DERIVE', 0, $rrd_maximum)
-                ->addDataset('OUTERRORS', 'DERIVE', 0, $rrd_maximum)
-                ->addDataset('INUCASTPKTS', 'DERIVE', 0, $rrd_maximum)
-                ->addDataset('OUTUCASTPKTS', 'DERIVE', 0, $rrd_maximum)
-                ->addDataset('INNUCASTPKTS', 'DERIVE', 0, $rrd_maximum)
-                ->addDataset('OUTNUCASTPKTS', 'DERIVE', 0, $rrd_maximum)
-                ->addDataset('INDISCARDS', 'DERIVE', 0, $rrd_maximum)
-                ->addDataset('OUTDISCARDS', 'DERIVE', 0, $rrd_maximum)
-                ->addDataset('INUNKNOWNPROTOS', 'DERIVE', 0, $rrd_maximum)
-                ->addDataset('INBROADCASTPKTS', 'DERIVE', 0, $rrd_maximum)
-                ->addDataset('OUTBROADCASTPKTS', 'DERIVE', 0, $rrd_maximum)
-                ->addDataset('INMULTICASTPKTS', 'DERIVE', 0, $rrd_maximum)
-                ->addDataset('OUTMULTICASTPKTS', 'DERIVE', 0, $rrd_maximum);
 
             $tags = [
                 'ifName' => $port['ifName'],
@@ -911,6 +915,11 @@ foreach ($ports as $port) {
                 'rrd_def' => $rrd_def,
             ];
             app('Datastore')->put($device, 'ports', $tags, $fields);
+
+            // The datastore may have just created the RRD.
+            if ($tune_limits !== []) {
+                Rrd::tune($rrdfile, $tune_limits);
+            }
 
             // End Update IF-MIB
             // Update PAgP
