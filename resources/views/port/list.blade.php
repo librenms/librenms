@@ -109,9 +109,20 @@
         $(".actionBar").append($wrapper);
     }
 
+    // the errors/discards columns are chosen server side, reload the page when those filters change
+    function counterFilters(filters) {
+        const isSet = (key) => ['1', 'true', 'on', 'yes'].includes(String(filters?.[key]?.eq));
+        return isSet('errors') + ':' + isSet('discards');
+    }
+    const initialCounterFilters = counterFilters(filter);
+
     $(window).on('filter:apply', function (event) {
         if (event.originalEvent.detail.name === 'ports') {
             filter = event.originalEvent.detail.filters;
+            if (counterFilters(filter) !== initialCounterFilters) {
+                window.location.reload(); // the filter bar already put the new filters in the url
+                return;
+            }
             grid.bootgrid('reload');
         }
     });
