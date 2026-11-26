@@ -8,7 +8,7 @@ STORMSHIELD-SYSTEM-MONITOR-MIB DEFINITIONS ::= BEGIN
       stormshieldMIB                           FROM STORMSHIELD-SMI-MIB;
 
    snsSystemMonitor MODULE-IDENTITY
-      LAST-UPDATED  "202504100000Z"
+      LAST-UPDATED  "202505120000Z"
       ORGANIZATION  "Stormshield"
       CONTACT-INFO
          "Customer Support
@@ -21,10 +21,12 @@ STORMSHIELD-SYSTEM-MONITOR-MIB DEFINITIONS ::= BEGIN
          E-mail: support@stormshield.eu
          http://www.stormshield.eu"
       DESCRIPTION   "stormshield System Monitor"
+      REVISION      "202505120000Z"
+      DESCRIPTION   "uptime in TimeTicks"
       REVISION      "202504100000Z"
-         DESCRIPTION   "snsMemUsageEntry added"
+      DESCRIPTION   "snsMemUsageEntry added"
       REVISION      "202206090000Z"
-         DESCRIPTION   "Initial"
+      DESCRIPTION   "Initial"
       ::= { stormshieldMIB 10 }
 
    snsDate OBJECT-TYPE
@@ -37,8 +39,9 @@ STORMSHIELD-SYSTEM-MONITOR-MIB DEFINITIONS ::= BEGIN
    snsUptime OBJECT-TYPE
       SYNTAX DisplayString (SIZE (0..255))
       MAX-ACCESS read-only
-      STATUS current
-      DESCRIPTION "Stormshield Firewal system running for day:hour:min:sec"
+      STATUS deprecated
+      DESCRIPTION "Stormshield Firewall system running for day:hour:min:sec
+                  Deprecated, replaced by snsSysUptime"
       ::= { snsSystemMonitor 2 }
 
    snsMem OBJECT-TYPE
@@ -423,4 +426,10 @@ STORMSHIELD-SYSTEM-MONITOR-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION   "Socket memory utilization percentage"
       ::= { snsMemUsageEntry 10 }
 
+   snsSysUptime OBJECT-TYPE
+      SYNTAX        TimeTicks
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION   "Stormshield Firewall system uptime (in hundredths of a second)"
+      ::= { snsSystemMonitor 11 }
 END

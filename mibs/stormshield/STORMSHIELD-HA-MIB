@@ -8,7 +8,7 @@ STORMSHIELD-HA-MIB DEFINITIONS ::= BEGIN
       stormshieldMIB                             FROM STORMSHIELD-SMI-MIB;
 
    snsHA MODULE-IDENTITY
-      LAST-UPDATED  "201808270000Z"
+      LAST-UPDATED  "202508280000Z"
       ORGANIZATION  "Stormshield"
       CONTACT-INFO
          "Customer Support
@@ -21,7 +21,9 @@ STORMSHIELD-HA-MIB DEFINITIONS ::= BEGIN
          E-mail: support@stormshield.eu
          http://www.stormshield.eu"
       DESCRIPTION   "stormshield HA cluster"
-      REVISION      "201808270000Z"
+      REVISION      "202505120000Z"
+      DESCRIPTION   "uptime in TimeTicks"
+      REVISION      "202508280000Z"
       DESCRIPTION   "Initial"
       ::= { stormshieldMIB 11 }
 
@@ -86,7 +88,8 @@ STORMSHIELD-HA-MIB DEFINITIONS ::= BEGIN
       snsHAPriority       Integer32,
       snsHAStatusForced   Integer32,
       snsHAActive         TruthValue,
-      snsHAUptime         Integer32
+      snsHAUptime         Integer32,
+      snsHASysUptime      TimeTicks
    }
 
    snsNodeIndex OBJECT-TYPE
@@ -165,8 +168,16 @@ STORMSHIELD-HA-MIB DEFINITIONS ::= BEGIN
       SYNTAX Integer32
       MAX-ACCESS read-only
       STATUS current
-      DESCRIPTION "Firewall uptime"
+      DESCRIPTION "Firewall uptime
+                  Deprecated, replaced by snsHASysUptime"
       ::= { snsNode 11 }
+
+   snsHASysUptime OBJECT-TYPE
+      SYNTAX TimeTicks
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Firewall uptime (in hundredths of a second)"
+      ::= { snsNode 12 }
 
    snsHASyncStatus OBJECT-TYPE
       SYNTAX Integer32
@@ -336,7 +347,7 @@ STORMSHIELD-HA-MIB DEFINITIONS ::= BEGIN
       SYNTAX        SnsNodeFanEntry
       MAX-ACCESS    not-accessible
       STATUS        current
-      DESCRIPTION   "CPU information"
+      DESCRIPTION   "Fan information"
       INDEX         { snsNodeIndex, snsNodeFanIndex }
       ::= { snsNodeFanTable 1 }
 
@@ -374,5 +385,50 @@ STORMSHIELD-HA-MIB DEFINITIONS ::= BEGIN
       STATUS        current
       DESCRIPTION   "Speed of the Fan"
       ::= { snsNodeFanEntry 4 }
+
+   snsNodeLicenceOptionTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF snsNodeLicenceOptionEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION   "Licence information about Firewalls"
+      ::= { snsHA 14 }
+
+   snsNodeLicenceOptionEntry OBJECT-TYPE
+      SYNTAX        SnsNodeLicenceOptionEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION   "Licence options"
+      INDEX         { snsNodeIndex, snsNodeOptionIndex }
+      ::= { snsNodeLicenceOptionTable 1 }
+
+   SnsNodeLicenceOptionEntry ::= SEQUENCE {
+      snsNodeLicenceOptionIndex        Integer32,
+      snsNodeLicenceOptionName         DisplayString,
+      snsNodeLicenceExpirationDate     DisplayString,
+   }
+
+   snsNodeLicenceOptionIndex OBJECT-TYPE
+      SYNTAX        Integer32 (0..255)
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Index of the option in the licence option table."
+      ::= { snsNodeLicenceOptionEntry 1 }
+
+   snsNodeLicenceOptionName OBJECT-TYPE
+      SYNTAX     DisplayString
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "option name"
+      ::= { snsNodeLicenceOptionEntry 2 }
+
+   snsNodeLicenceExpirationDate OBJECT-TYPE
+      SYNTAX     DisplayString
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "expiration date"
+      ::= { snsNodeLicenceOptionEntry 3 }
 
 END

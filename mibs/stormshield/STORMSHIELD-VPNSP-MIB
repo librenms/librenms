@@ -40,7 +40,9 @@ STORMSHIELD-VPNSP-MIB DEFINITIONS ::= BEGIN
       snsVPNSPMaxLifetime  Counter64,
       snsVPNSPGlobal       INTEGER,
       snsVPNSPPPKID        DisplayString,
-      snsVPNSPPPKRequired  INTEGER
+      snsVPNSPPPKRequired  INTEGER,
+      snsVPNSPDRCompliant  INTEGER,
+      snsVPNSPVTI          DisplayString
    }
 
    snsVPNSPIndex OBJECT-TYPE
@@ -198,5 +200,21 @@ STORMSHIELD-VPNSP-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "PPKRequired"
       ::= { snsVPNSPEntry 17 }
+
+   snsVPNSPDRCompliant OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "DR compliant"
+      ::= { snsVPNSPEntry 18 }
+
+   snsVPNSPVTI OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "VTI"
+      ::= { snsVPNSPEntry 19 }
 
 END

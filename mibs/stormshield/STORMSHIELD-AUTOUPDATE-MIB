@@ -7,7 +7,7 @@ STORMSHIELD-AUTOUPDATE-MIB DEFINITIONS ::= BEGIN
       stormshieldMIB                            FROM STORMSHIELD-SMI-MIB;
 
    snsAutoupdate MODULE-IDENTITY
-      LAST-UPDATED  "201702200000Z"
+      LAST-UPDATED  "202511100000Z"
       ORGANIZATION  "Stormshield"
       CONTACT-INFO
          "Customer Support
@@ -20,6 +20,8 @@ STORMSHIELD-AUTOUPDATE-MIB DEFINITIONS ::= BEGIN
          E-mail: support@stormshield.eu
          http://www.stormshield.eu"
       DESCRIPTION   "stormshield autoupdate"
+      REVISION      "202511100000Z"
+      DESCRIPTION   "snsCustomWebservices added"
       REVISION      "201702200000Z"
       DESCRIPTION   "Initial"
       ::= { stormshieldMIB 9 }
@@ -82,5 +84,64 @@ STORMSHIELD-AUTOUPDATE-MIB DEFINITIONS ::= BEGIN
       DESCRIPTION
          "Date of the last update of a subsystem"
       ::= { snsAutoupdateEntry 4 }
+
+   snsCustomWebServicesTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsCustomWebServicesEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+         "State of autoupdate custom webservices lists"
+      ::= { snsAutoupdate 2 }
+
+   snsCustomWebServicesEntry OBJECT-TYPE
+      SYNTAX  SnsCustomWebServicesEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+         "Each entry in the snsCustomWebServicesTable holds a set of information
+         (name, state, last run)."
+      INDEX   { snsCustomWebServicesIndex }
+      ::= {  snsCustomWebServicesTable 1 }
+
+   SnsCustomWebServicesEntry ::= SEQUENCE {
+      snsCustomWebServicesIndex  Integer32,
+      snsCustomWebServicesName   SnmpAdminString,
+      snsCustomWebServicesState  DisplayString,
+      snsCustomWebServicesLast   DisplayString
+   }
+
+   snsCustomWebServicesIndex OBJECT-TYPE
+      SYNTAX  Integer32 (1..29)
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+         "A unique value for the table.  Its value
+         ranges between 1 and 29 and may not be contiguous.
+         the index has no other meaning but a pure index"
+      ::= {  snsCustomWebServicesEntry 1 }
+
+   snsCustomWebServicesName OBJECT-TYPE
+      SYNTAX SnmpAdminString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Custom webservice list name"
+      ::= { snsCustomWebServicesEntry 2 }
+
+   snsCustomWebServicesState OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "The current status of a custom webservice list"
+      ::= { snsCustomWebServicesEntry 3 }
+
+   snsCustomWebServicesLast OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Date of the last update of a custom webservice list"
+      ::= { snsCustomWebServicesEntry 4 }
 
 END
