@@ -2,11 +2,6 @@
 
 use App\Facades\LibrenmsConfig;
 
-function rewrite_entity_descr($descr)
-{
-    return \LibreNMS\Util\Rewrite::entityDescr($descr);
-}
-
 /**
  * Clean port values for html display
  * Add label to the port array (usually one of ifAlias, ifName, ifDescr)
@@ -67,40 +62,4 @@ function cleanPort($interface, $device = null)
     }
 
     return $interface;
-}
-
-function short_hrDeviceDescr($dev)
-{
-    $rewrite_hrDevice = [
-        'GenuineIntel:' => '',
-        'AuthenticAMD:' => '',
-        'Intel(R)' => '',
-        'CPU' => '',
-        '(R)' => '',
-        '  ' => ' ',
-    ];
-
-    $dev = str_replace(array_keys($rewrite_hrDevice), array_values($rewrite_hrDevice), $dev);
-    $dev = preg_replace('/\ +/', ' ', $dev);
-    $dev = trim($dev);
-
-    return $dev;
-}
-
-/**
- * @param  $state
- * @return int|void
- */
-function apc_relay_state($state)
-{
-    switch ($state) {
-        case 'immediateCloseEMS':
-        case 'immediateOnEMS':
-            return 1;
-            break;
-        case 'immediateOpenEMS':
-        case 'immediateOffEMS':
-            return 2;
-            break;
-    }
 }
