@@ -13,8 +13,8 @@
 
 use App\Models\Sensor;
 use App\Models\StateTranslation;
-use LibreNMS\Enum\Severity;
 use LibreNMS\Enum\SensorState;
+use LibreNMS\Enum\Severity;
 
 $temp = SnmpQuery::get('PowerNet-MIB::upsAdvBatteryReplaceIndicator.0')->value();
 $cur_oid = '.1.3.6.1.4.1.318.1.1.1.2.2.4.0';
@@ -102,7 +102,10 @@ foreach ($relays as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.10.3.2.1.1.3.' . $index;
     $state_name = $data['emsOutputRelayControlOutputRelayName'];
 
-    $current = apc_relay_state($data['emsOutputRelayControlOutputRelayCommand']);
+    $current = match ($data['emsOutputRelayControlOutputRelayCommand']) {
+        'immediateCloseEMS', 'immediateOnEMS' => 1,
+        'immediateOpenEMS', 'immediateOffEMS' => 2,
+    };
     if (is_numeric($current)) {
         app('sensor-discovery')->discover(new Sensor([
             'poller_type' => 'snmp',
@@ -131,7 +134,10 @@ foreach ($switched as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.10.3.3.1.1.3.' . $index;
     $state_name = $data['emsOutletControlOutletName'];
 
-    $current = apc_relay_state($data['emsOutletControlOutletCommand']);
+    $current = match ($data['emsOutletControlOutletCommand']) {
+        'immediateCloseEMS', 'immediateOnEMS' => 1,
+        'immediateOpenEMS', 'immediateOffEMS' => 2,
+    };
     if (is_numeric($current)) {
         app('sensor-discovery')->discover(new Sensor([
             'poller_type' => 'snmp',
