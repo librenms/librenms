@@ -8,6 +8,7 @@
   "Critical :service_count": "Критические :service_count",
   "Disabled :port_count": "Отключенные :port_count",
   "Errored :port_count": "Ошибки :port_count",
+  "Discarded :port_count": "Сбросы :port_count",
   "Ignored :port_count": "Игнорируемые :port_count",
   "Down :port_count": "Не работает :port_count",
   "Deleted :port_count": "Удаленные :port_count",

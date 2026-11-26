@@ -33,6 +33,7 @@ class PortsController extends Controller
                 'packets_in',
                 'packets_out',
                 'errors',
+                'discards',
                 'speed',
                 'port',
                 'media',
@@ -73,6 +74,7 @@ class PortsController extends Controller
             'graph' => $graph,
             'show_detail' => $view === 'detail' ? 'true' : 'false',
             'show_errors' => $view === 'detail' || $request->boolean('filter.errors.eq') ? 'true' : 'false',
+            'show_discards' => $view === 'detail' || $request->boolean('filter.discards.eq') ? 'true' : 'false',
             'ports' => $this->getPorts($view, $perPage, $sort),
             'group' => $request->array('filter')['groups.id']['eq'] ?? 0,
             'perPage' => $perPage,
@@ -225,6 +227,11 @@ class PortsController extends Controller
                 'type' => 'boolean',
             ],
             [
+                'key' => 'discards',
+                'label' => __('port.discards'),
+                'type' => 'boolean',
+            ],
+            [
                 'key' => 'ignore',
                 'label' => __('Ignored'),
                 'type' => 'boolean',
@@ -269,6 +276,8 @@ class PortsController extends Controller
             'packets_in' => $portsQuery->orderBy('ifInUcastPkts_rate', 'desc'),
             'packets_out' => $portsQuery->orderBy('ifOutUcastPkts_rate', 'desc'),
             'errors' => $portsQuery->orderByRaw('ifInErrors_rate + ifOutErrors_rate desc'),
+            'discards' => $portsQuery->leftJoin('ports_statistics', 'ports.port_id', 'ports_statistics.port_id')
+                ->orderByRaw('COALESCE(ports_statistics.ifInDiscards_rate, 0) + COALESCE(ports_statistics.ifOutDiscards_rate, 0) desc'),
             'speed' => $portsQuery->orderBy('ifSpeed', 'desc'),
             'port' => $portsQuery->orderBy('ifDescr'),
             'media' => $portsQuery->orderBy('ifType'),

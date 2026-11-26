@@ -101,6 +101,7 @@ return [
     'port_group' => 'Port Group',
     'port_type' => 'Port Type',
     'errors' => 'Errors',
+    'discards' => 'Discards',
     'groups' => [
         'updated' => ':port: groups updated',
         'none' => ':port no update requested',

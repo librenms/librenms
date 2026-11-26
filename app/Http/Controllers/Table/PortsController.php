@@ -90,6 +90,8 @@ class PortsController extends TableController
             'ifOutErrors',
             'ifInErrors_delta',
             'ifOutErrors_delta',
+            'ifInDiscards_delta',
+            'ifOutDiscards_delta',
             'ifInOctets_rate',
             'ifOutOctets_rate',
             'ifInUcastPkts_rate',
@@ -109,6 +111,7 @@ class PortsController extends TableController
         $query = Port::hasAccess($request->user())
             ->with(['device', 'device.location'])
             ->leftJoin('devices', 'ports.device_id', 'devices.device_id')
+            ->leftJoin('ports_statistics', 'ports.port_id', 'ports_statistics.port_id')
             ->when($request->array('filter'), fn ($q, $filter) => $q->applyFilters($filter))
             ->unless($request->has('filter.deleted'), fn ($q) => $q->where('ports.deleted', $request->input('deleted', 0)))
             ->when($request->input('hostname'), function (Builder $query, $hostname): void {
@@ -129,6 +132,8 @@ class PortsController extends TableController
         $select = [
             'ports.*',
             'hostname',
+            'ports_statistics.ifInDiscards_delta',
+            'ports_statistics.ifOutDiscards_delta',
         ];
 
         if (array_key_exists('secondsIfLastChange', Arr::wrap($request->input('sort')))) {
@@ -169,6 +174,8 @@ class PortsController extends TableController
             'ifOutErrors' => $model->ifOutErrors,
             'ifInErrors_delta' => $model->poll_period ? Number::formatSi($model->ifInErrors_delta / $model->poll_period, 2, 0, 'EPS') : '',
             'ifOutErrors_delta' => $model->poll_period ? Number::formatSi($model->ifOutErrors_delta / $model->poll_period, 2, 0, 'EPS') : '',
+            'ifInDiscards_delta' => $model->poll_period ? Number::formatSi($model->getAttribute('ifInDiscards_delta') / $model->poll_period, 2, 0, 'PPS') : '',
+            'ifOutDiscards_delta' => $model->poll_period ? Number::formatSi($model->getAttribute('ifOutDiscards_delta') / $model->poll_period, 2, 0, 'PPS') : '',
             'ifType' => Rewrite::normalizeIfType($model->ifType),
             'ifAlias' => htmlentities((string) $model->ifAlias),
             'actions' => (string) view('port.actions', ['port' => $model]),

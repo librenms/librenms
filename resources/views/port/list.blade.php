@@ -20,6 +20,8 @@
             <th data-column-id="ifOutErrors_delta" data-searchable="false" data-visible="{{ $show_errors }}" data-css-class="red">Errors Out Rate</th>
             <th data-column-id="ifInErrors" data-searchable="false" data-visible="{{ $show_errors }}" data-css-class="red">Errors In</th>
             <th data-column-id="ifOutErrors" data-searchable="false" data-visible="{{ $show_errors }}" data-css-class="red">Errors Out</th>
+            <th data-column-id="ifInDiscards_delta" data-searchable="false" data-visible="{{ $show_discards }}" data-css-class="red">Discards In Rate</th>
+            <th data-column-id="ifOutDiscards_delta" data-searchable="false" data-visible="{{ $show_discards }}" data-css-class="red">Discards Out Rate</th>
             <th data-column-id="ifType">Media</th>
             <th data-column-id="ifAlias">Description</th>
             <th data-column-id="actions" data-sortable="false" data-searchable="false">Actions</th>

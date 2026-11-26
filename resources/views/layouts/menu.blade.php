@@ -312,6 +312,12 @@
                                 </a></li>
                         @endif
 
+                        @if($port_counts['discarded'] > 0)
+                            <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['discards' => ['eq' => '1']]]) }}"><i class="fa fa-minus-circle fa-fw fa-lg"
+                                                                           aria-hidden="true"></i> {{ __('Discarded :port_count', ['port_count' => $port_counts['discarded']]) }}
+                                </a></li>
+                        @endif
+
                         @if($port_counts['ignored'] > 0)
                             <li><a href="{{ route('ports', ['view' => 'detail', 'filter' => ['ignore' => ['eq' => '1']]]) }}"><i class="fa fa-question-circle fa-fw fa-lg"
                                                                            aria-hidden="true"></i> {{ __('Ignored :port_count', ['port_count' => $port_counts['ignored']]) }}
