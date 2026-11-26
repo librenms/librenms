@@ -52,6 +52,9 @@ class Liebert extends OS implements DeviceTypeDiscovery
      * IS-UNITY cards on firmware 8.x serve no LIEBERT-GP-ENVIRONMENTAL-MIB, everything they measure
      * is in lgpFlexibleExtendedTable. Only cooling units read it: on UPS and power distribution cards
      * the same rows repeat what UPS-MIB and LIEBERT-GP-POWER-MIB report, so the table is not walked.
+     *
+     * @param  array<string, array{data?: list<array<string, mixed>>}>  $yaml
+     * @return array<string, mixed>
      */
     protected function walkSensorYaml(array $yaml): array
     {
@@ -92,6 +95,8 @@ class Liebert extends OS implements DeviceTypeDiscovery
     /**
      * The legacy liebert includes read no yaml data, and walking the whole yaml for them
      * would walk lgpFlexibleExtendedTable on UPS and power distribution cards too.
+     *
+     * @return array<string, mixed>
      */
     protected function legacySensorPreCache(bool $withYaml = false): array
     {
