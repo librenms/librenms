@@ -77,6 +77,8 @@ final class PortDiscardsFilterTest extends DBTestCase
         $this->assertSame('2 PPS', $rows[0]['ifOutDiscards_delta']);
         $this->assertSame('0 PPS', $rows[0]['ifInDiscards_delta']);
         $this->assertSame('33.33 mPPS', $rows[1]['ifInDiscards_delta']);
+        $this->assertEquals(6000, $rows[0]['ifOutDiscards']);
+        $this->assertEquals(100, $rows[1]['ifInDiscards']);
     }
 
     public function testPortsPageColumnVisibility(): void
@@ -95,7 +97,8 @@ final class PortDiscardsFilterTest extends DBTestCase
             $this->actingAs($user)->get(route('ports', $query))
                 ->assertOk()
                 ->assertSee('data-column-id="ifInErrors_delta" data-searchable="false" data-visible="' . $errors . '"', false)
-                ->assertSee('data-column-id="ifInDiscards_delta" data-searchable="false" data-visible="' . $discards . '"', false);
+                ->assertSee('data-column-id="ifInDiscards_delta" data-searchable="false" data-visible="' . $discards . '"', false)
+                ->assertSee('data-column-id="ifOutDiscards" data-searchable="false" data-visible="' . $discards . '"', false);
         }
     }
 
@@ -117,6 +120,8 @@ final class PortDiscardsFilterTest extends DBTestCase
                 'port_id' => $port->port_id,
                 'ifInDiscards_delta' => $discards[0],
                 'ifOutDiscards_delta' => $discards[1],
+                'ifInDiscards' => $discards[0] * 10,
+                'ifOutDiscards' => $discards[1] * 10,
             ]);
         }
 
