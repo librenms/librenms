@@ -84,6 +84,25 @@ final class IsisAdjacencyApiTest extends DBTestCase
             ->assertJsonMissingPath('included');
     }
 
+    public function testLevelMetricsAreExposed(): void
+    {
+        $adjacency = $this->adjacencyOnDevice(Device::factory()->create(), [
+            'isisCircLevelMetricL1' => 10,
+            'isisCircLevelWideMetricL1' => 16777215,
+            'isisCircLevelMetricL2' => null,
+            'isisCircLevelWideMetricL2' => null,
+        ]);
+        Sanctum::actingAs(User::factory()->admin()->create());
+
+        $response = $this->getJson(self::URI . '/' . $adjacency->id)->assertOk();
+
+        // a configured level reports its metric, an unused level is null
+        $this->assertEquals(10, $response->json('data.attributes.level1Metric'));
+        $this->assertEquals(16777215, $response->json('data.attributes.level1WideMetric'));
+        $this->assertNull($response->json('data.attributes.level2Metric'));
+        $this->assertNull($response->json('data.attributes.level2WideMetric'));
+    }
+
     public function testIncludeDeviceAndPort(): void
     {
         $device = Device::factory()->create();
@@ -290,6 +309,10 @@ final class IsisAdjacencyApiTest extends DBTestCase
             'index',
             'ifIndex',
             'circuitAdministrativeStatus',
+            'level1Metric',
+            'level1WideMetric',
+            'level2Metric',
+            'level2WideMetric',
             'state',
             'neighborSystemType',
             'neighborSystemId',
