@@ -19,10 +19,6 @@ class RrdLegend
     // measured: a legend character is a pixel narrower than the font size, the right margin keeps clear of the rrdtool watermark
     private const int LEFT_PIXELS = 15;
     private const int RIGHT_PIXELS = 16;
-    // added to the graph width by the axis, by font size
-    private const array AXIS_PIXELS = [7 => 75, 8 => 81];
-    // the color box of a row and the space after it
-    private const int ROW_INDENT = 4;
     private const int COLOR_BOX_WIDTH = 2;
 
     private const int PRECISION = 2;
@@ -64,19 +60,23 @@ class RrdLegend
     ) {
         $this->unitWidth = max([0, ...array_map(fn (DataSeries|SeriesSum $series) => mb_strlen($series->unit), $series)]);
 
-        $fontSize = RrdOptionsBuilder::fontSize($params->width);
-        $imageWidth = $params->full_size ? $params->width : $params->width + self::AXIS_PIXELS[$fontSize];
-        $this->lineWidth = intdiv(max(0, $imageWidth - self::LEFT_PIXELS - self::RIGHT_PIXELS), $fontSize - 1);
-        $rowWidth = $this->lineWidth - self::ROW_INDENT;
+        $imageWidth = RrdOptionsBuilder::imageWidth($params);
+        $this->lineWidth = intdiv(max(0, $imageWidth - self::LEFT_PIXELS - self::RIGHT_PIXELS), RrdOptionsBuilder::fontSize($params->width) - 1);
+        // after the color box and the space following the label
+        $rowWidth = $this->lineWidth - self::COLOR_BOX_WIDTH - self::ITEM_GAP - 1;
 
-        // labels are followed by a space
         $percentiles = array_keys($options->percentiles);
-        $fitting = max(1, intdiv($rowWidth - self::LABEL_WIDTH - 1, $this->columnWidth()));
-        $kept = array_slice(array_values(array_unique([...self::COLUMN_PRIORITY, ...$percentiles, ...array_keys(self::COLUMNS)])), 0, $fitting);
-        $this->columns = array_values(array_filter([...array_keys(self::COLUMNS), ...$percentiles], fn (string|int $column) => in_array($column, $kept, true)));
+        $fitting = max(1, intdiv($rowWidth - self::LABEL_WIDTH, $this->columnWidth()));
+        $kept = array_slice([...self::COLUMN_PRIORITY, ...$percentiles, 'min'], 0, $fitting);
+        $this->columns = array_values(array_intersect([...array_keys(self::COLUMNS), ...$percentiles], $kept));
 
         $longest = max([0, ...array_map(mb_strlen(...), $this->labels($series, $params))]);
-        $this->labelWidth = max(self::LABEL_WIDTH, min(self::MAX_LABEL_WIDTH, $longest, $rowWidth - 1 - count($this->columns) * $this->columnWidth()));
+        $this->labelWidth = max(self::LABEL_WIDTH, min(self::MAX_LABEL_WIDTH, $longest, $rowWidth - count($this->columns) * $this->columnWidth()));
+    }
+
+    public static function previousLabel(string $description): string
+    {
+        return __('graph.legend.previous', ['series' => $description]);
     }
 
     /**
@@ -91,7 +91,7 @@ class RrdLegend
         foreach ($series as $key => $row) {
             $labels[] = $row->description;
             if ($params->visible('previous') && $this->options->traffic?->summarizes($key)) {
-                $labels[] = __('graph.legend.previous', ['series' => $row->description]);
+                $labels[] = self::previousLabel($row->description);
             }
         }
 
@@ -146,13 +146,13 @@ class RrdLegend
         $used = 0;
         foreach ($totals as [$id, $label]) {
             $width = mb_strlen($label) + self::TOTAL_VALUE_WIDTH + mb_strlen($unit);
-            if ($used > 0 && $used + self::ITEM_GAP + $width > $this->lineWidth) {
+            if ($used > 0 && $used + $width > $this->lineWidth) {
                 $drawing[array_key_last($drawing)] .= '\\l';
                 $used = 0;
             }
 
             $drawing[] = "GPRINT:$id:" . Rrd::safeDescr($label) . " %6.2lf%s$unit";
-            $used += ($used > 0 ? self::ITEM_GAP : 0) + $width;
+            $used += $width + self::ITEM_GAP;
         }
 
         if ($drawing !== []) {

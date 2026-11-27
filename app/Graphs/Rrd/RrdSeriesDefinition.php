@@ -63,7 +63,6 @@ class RrdSeriesDefinition
         $this->files = [];
         $this->ids = [];
         $this->percentileDefs = [];
-        $legend = new RrdLegend($params, $this->options, $this->series, $this->percentileDef(...));
         foreach ($this->series as $key => $series) {
             if ($series instanceof DataSeries) {
                 $filename = $this->rrdFiles->pathFor($series->metric);
@@ -83,6 +82,8 @@ class RrdSeriesDefinition
         if ($this->files === []) {
             throw new NoGraphData(__('graph.errors.no_data_files'));
         }
+
+        $legend = new RrdLegend($params, $this->options, $drawable, $this->percentileDef(...));
 
         $overlaid = self::overlaid($this->options);
         $theme = new GraphTheme($params->isDark(), $this->options->palette, $overlaid && $inverted);

@@ -25,30 +25,30 @@ class RrdLegendTest extends TestCase
     }
 
     /**
-     * @return list<string>
+     * @return list<string> the value each column shows
      */
     private function columns(RrdLegend $legend): array
     {
-        return array_map(fn (string $value) => explode(':', $value)[1], $legend->values('ds0', 'bps'));
+        return array_map(fn (string $value) => preg_replace('/^GPRINT:(\w+(:[A-Z]+)?):.*/', '$1', $value), $legend->values('ds0', 'bps'));
     }
 
     /**
      * @param  list<string>  $columns
      */
-    #[TestWith([215, ['ds0']])]
-    #[TestWith([300, ['ds0', 'ds0max', 'ds0']])]
-    #[TestWith([500, ['ds0', 'ds0max', 'ds0', 'ds0p0']])]
-    #[TestWith([700, ['ds0', 'ds0min', 'ds0max', 'ds0', 'ds0p0']])]
+    #[TestWith([50, ['ds0:LAST']])]
+    #[TestWith([215, ['ds0:LAST']])]
+    #[TestWith([300, ['ds0:LAST', 'ds0max:MAX', 'ds0:AVERAGE']])]
+    #[TestWith([500, ['ds0:LAST', 'ds0max:MAX', 'ds0:AVERAGE', 'ds0p0']])]
+    #[TestWith([700, ['ds0:LAST', 'ds0min:MIN', 'ds0max:MAX', 'ds0:AVERAGE', 'ds0p0']])]
     public function test_narrow_graphs_keep_now_avg_and_max_before_the_percentiles_and_min(int $width, array $columns): void
     {
         $this->assertSame($columns, $this->columns($this->legend(['width' => $width])));
     }
 
-    public function test_columns_keep_their_order_and_headings_line_up(): void
+    public function test_headings_line_up_with_the_columns(): void
     {
         $legend = $this->legend(['width' => 500]);
 
-        $this->assertSame(['ds0:LAST', 'ds0max:MAX', 'ds0:AVERAGE', 'ds0p0'], array_map(fn (string $value) => preg_replace('/^GPRINT:([^:]+(:[A-Z]+)?):.*/', '$1', $value), $legend->values('ds0', 'bps')));
         $this->assertSame("COMMENT:         Now         Max         Avg        95th\l", $legend->header()[1]);
         $this->assertStringEndsWith('\n', $legend->values('ds0', 'bps')[3]);
     }
@@ -78,11 +78,6 @@ class RrdLegendTest extends TestCase
     {
         $this->assertCount(3, $this->columns($this->legend(['width' => 382])));
         $this->assertCount(2, $this->columns($this->legend(['width' => 382, 'absolute' => 1])));
-    }
-
-    public function test_tiny_graphs_keep_one_column(): void
-    {
-        $this->assertSame(['ds0'], $this->columns($this->legend(['width' => 50])));
     }
 
     public function test_totals_continue_on_the_next_line_where_they_do_not_fit(): void

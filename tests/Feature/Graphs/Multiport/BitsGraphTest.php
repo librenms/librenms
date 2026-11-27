@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\Gate;
 use LibreNMS\Exceptions\InvalidGraphInput;
 use LibreNMS\Exceptions\NoGraphData;
 use LibreNMS\Tests\TestCase;
-use Mockery;
 use PHPUnit\Framework\Attributes\TestWith;
 
 class BitsGraphTest extends TestCase
@@ -41,6 +40,7 @@ class BitsGraphTest extends TestCase
         $graph = (new GraphFactory)->graphFor(new GraphParameters(['type' => $type, 'id' => '1,2']));
 
         $this->assertInstanceOf(BitsGraph::class, $graph);
+        $this->assertSame('bits', new GraphParameters(['type' => $type])->subtype);
         $this->assertSame('Multi Port', $graph->getTitle());
         $this->assertSame(' :: Multi Port', $graph->getPageContext()->subtitle);
     }
@@ -92,8 +92,7 @@ class BitsGraphTest extends TestCase
     {
         $ports = Port::factory()->count(2)->for(Device::factory())->create();
         $this->actingAs(User::factory()->create());
-        Gate::shouldReceive('allows')->with('view', Mockery::on(fn ($port) => $port->port_id === $ports[0]->port_id))->andReturn(true);
-        Gate::shouldReceive('allows')->with('view', Mockery::on(fn ($port) => $port->port_id === $ports[1]->port_id))->andReturn(false);
+        Gate::shouldReceive('allows')->andReturnUsing(fn (string $ability, Port $port) => $port->port_id === $ports[0]->port_id);
 
         $this->assertTrue($this->graph((string) $ports[0]->port_id)->authorize());
         $this->assertFalse($this->graph($ports->pluck('port_id')->implode(','))->authorize());

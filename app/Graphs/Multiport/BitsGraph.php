@@ -3,6 +3,7 @@
 namespace App\Graphs\Multiport;
 
 use App\Data\Graphing\GraphPageContext;
+use App\Data\Graphing\GraphParameters;
 use App\Graphs\AbstractSeriesGraph;
 use App\Graphs\Port\StacksPortTraffic;
 use App\Models\Port;
@@ -17,10 +18,12 @@ class BitsGraph extends AbstractSeriesGraph
 
     /** @var Collection<int, Port>|null */
     private ?Collection $ports = null;
+    /** @var list<int>|null */
+    private ?array $portIds = null;
 
     protected function validation(): array
     {
-        return ['id' => ['nullable', 'regex:/^\d+(,\d+)*$/']];
+        return ['id' => ['nullable', 'regex:' . GraphParameters::ID_LIST_PATTERN]];
     }
 
     protected function isAuthorized(): bool
@@ -47,13 +50,16 @@ class BitsGraph extends AbstractSeriesGraph
     }
 
     /**
-     * @return Collection<int, Port>
+     * @return Collection<int, Port> in the requested order
      */
     private function ports(): Collection
     {
-        return $this->ports ??= Port::with('device')->whereIntegerInRaw('port_id', $this->portIds())->get()
-            ->sortBy(fn (Port $port) => array_search($port->port_id, $this->portIds(), true))
-            ->values();
+        if ($this->ports === null) {
+            $found = Port::with('device')->whereIntegerInRaw('port_id', $this->portIds())->get()->keyBy('port_id');
+            $this->ports = collect($this->portIds())->map(fn (int $id) => $found->get($id))->filter()->values();
+        }
+
+        return $this->ports;
     }
 
     /**
@@ -63,6 +69,6 @@ class BitsGraph extends AbstractSeriesGraph
     {
         $ids = $this->params->input->string('id') ?? '';
 
-        return $ids === '' ? [] : array_values(array_unique(array_map(intval(...), explode(',', $ids))));
+        return $this->portIds ??= $ids === '' ? [] : array_values(array_unique(array_map(intval(...), explode(',', $ids))));
     }
 }
