@@ -36,6 +36,10 @@ modules:
                             oid: RemoteKVMDevice-MIB::portDataType
                             op: '='
                             value: 'Modem'
+                        -
+                            oid: RemoteKVMDevice-MIB::portDataName
+                            op: '='
+                            value: 'Internal Modem'
                     index: 'portDataStatus.{{ $index }}'
                     group: 'Serial Port'
                     states:
@@ -50,9 +54,9 @@ modules:
                     descr: '{{ RemoteKVMDevice-MIB::portDataName }}'
                     skip_values:
                         -
-                            oid: RemoteKVMDevice-MIB::portDataType
+                            oid: RemoteKVMDevice-MIB::portDataName
                             op: '!='
-                            value: 'Modem'
+                            value: 'Internal Modem'
                     index: 'portDataStatus.{{ $index }}'
                     group: 'Serial Port'
                     states:
