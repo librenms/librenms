@@ -34,7 +34,7 @@ final class AristaPlr4DiscoveryTest extends DBTestCase
         // Keep the simulated device after the helper's first discovery/poll cycle.
         putenv('CI=1');
         try {
-            $helper = new ModuleTestHelper(new ModuleList(['os' => true, 'ports' => true, 'entity-physical' => true, 'sensors' => true]), 'arista_eos', 'plr4');
+            $helper = new ModuleTestHelper(new ModuleList(['os' => true, 'ports' => true, 'entity-physical' => true, 'transceivers' => true, 'sensors' => true]), 'arista_eos', 'plr4');
             $helper->setQuiet();
             $this->assertNotNull($helper->generateTestData($this->getSnmpsimIp(), $this->getSnmpsimPort()));
             $device = Device::where('hostname', $this->getSnmpsimIp())->firstOrFail();
@@ -45,10 +45,12 @@ final class AristaPlr4DiscoveryTest extends DBTestCase
             DeviceCache::flush();
             ob_start();
             try {
-                new DiscoverDevice($device->device_id, new ModuleList(['sensors' => true]))->handle();
+                new DiscoverDevice($device->device_id, new ModuleList(['transceivers' => true, 'sensors' => true]))->handle();
             } finally {
                 ob_end_clean();
             }
+            $transceivers = $device->transceivers()->with('port')->get()->keyBy('entity_physical_index');
+            $this->assertCount(4, $transceivers);
             $after = Sensor::where('device_id', $device->device_id)->get()->keyBy('sensor_id');
             $this->assertSame($before->keys()->all(), $after->keys()->all());
             foreach ($before as $id => $sensor) {
@@ -63,6 +65,9 @@ final class AristaPlr4DiscoveryTest extends DBTestCase
                 }
                 preg_match('/DOM (RX|TX) Power\s+For Ethernet25\/([1-4])$/', $sensor->sensor_descr, $match);
                 $this->assertCount(3, $match);
+                $this->assertSame('transceiver', $updated->group);
+                $this->assertTrue($transceivers->has($updated->entPhysicalIndex));
+                $this->assertSame('Ethernet25/' . (2 * (int) $match[2] - 1), $transceivers[$updated->entPhysicalIndex]->port->ifName);
                 $lane = (int) $match[2];
                 $this->assertSame('DOM ' . $match[1] . ' Power For Ethernet25/' . (2 * $lane - 1) . ' (optical lane ' . $lane . ')', $updated->sensor_descr);
             }
