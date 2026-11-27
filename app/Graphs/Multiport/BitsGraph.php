@@ -9,7 +9,7 @@ use App\Models\Port;
 use Illuminate\Support\Collection;
 
 /**
- * Traffic of the ports listed in the id input as comma separated port ids, each port stacked on the others
+ * Traffic of the comma separated port ids in the id input
  */
 class BitsGraph extends AbstractSeriesGraph
 {
@@ -23,9 +23,6 @@ class BitsGraph extends AbstractSeriesGraph
         return ['id' => ['nullable', 'regex:/^\d+(,\d+)*$/']];
     }
 
-    /**
-     * Every requested port has to exist and be viewable
-     */
     protected function isAuthorized(): bool
     {
         $ports = $this->ports();
@@ -50,8 +47,6 @@ class BitsGraph extends AbstractSeriesGraph
     }
 
     /**
-     * The requested ports that exist, in the requested order
-     *
      * @return Collection<int, Port>
      */
     private function ports(): Collection

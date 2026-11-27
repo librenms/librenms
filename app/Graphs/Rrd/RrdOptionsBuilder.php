@@ -20,7 +20,12 @@ class RrdOptionsBuilder
 
     public function __construct(private readonly GraphParameters $params)
     {
-        $this->fontSize = $params->width <= self::MEDIUM_SMALL ? 7 : 8;
+        $this->fontSize = self::fontSize($params->width);
+    }
+
+    public static function fontSize(int $width): int
+    {
+        return $width <= self::MEDIUM_SMALL ? 7 : 8;
     }
 
     /**

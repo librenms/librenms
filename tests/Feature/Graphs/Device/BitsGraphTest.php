@@ -30,9 +30,9 @@ class BitsGraphTest extends TestCase
         $this->device = Device::factory()->create(['os' => 'linux']);
     }
 
-    private function graph(): BitsGraph
+    private function graph(int $width = 400): BitsGraph
     {
-        return new BitsGraph(new GraphParameters(['type' => 'device_bits', 'device' => $this->device->device_id]));
+        return new BitsGraph(new GraphParameters(['type' => 'device_bits', 'device' => $this->device->device_id, 'width' => $width]));
     }
 
     /** @param array<string, mixed> $attributes */
@@ -112,7 +112,8 @@ class BitsGraphTest extends TestCase
         $this->port(['ifIndex' => 2, 'ifDescr' => 'eth1', 'ifName' => 'eth1']);
         $this->mock(RrdFileResolver::class)->shouldReceive('pathFor')->andReturn('host/port-id1.rrd');
 
-        $command = app(GraphAccess::class)->trusted(fn () => $this->graph()->getDebugCommand());
+        // wide enough for the 95th column
+        $command = app(GraphAccess::class)->trusted(fn () => $this->graph(700)->getDebugCommand());
 
         $this->assertMatchesRegularExpression("/'AREA:ds0#[0-9A-F]{6}:eth0 In +' .*'AREA:ds1drawn#[0-9A-F]{6}:eth0 Out +' .*'AREA:ds2#[0-9A-F]{6}:eth1 In +:STACK' .*'AREA:ds3drawn#[0-9A-F]{6}:eth1 Out +:STACK'/", $command);
         $this->assertStringContainsString("'CDEF:ds4=ds0,ds2,ADDNAN'", $command);

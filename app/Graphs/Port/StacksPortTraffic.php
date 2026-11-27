@@ -11,13 +11,13 @@ use App\Models\Port;
 use Closure;
 
 /**
- * Traffic of several ports, each port stacked on the others, with the totals and their percentiles in the legend
+ * Traffic of several ports stacked on each other, with their totals in the legend
  */
 trait StacksPortTraffic
 {
     /**
      * @param  iterable<Port>  $ports
-     * @param  Closure(Port): string  $label  the legend label of the port
+     * @param  Closure(Port): string  $label
      * @return array<string, DataSeries|SeriesSum>
      */
     protected function portTrafficSeries(iterable $ports, Closure $label): array
@@ -40,7 +40,7 @@ trait StacksPortTraffic
             return [];
         }
 
-        // the totals, their percentiles and previous period are drawn on the side of the axis of their ports
+        // totals are drawn on the side of the axis of their ports
         $series['in'] = new SeriesSum($in, __('graph.series.total_in'), 'bps', new SeriesStyle(legendOnly: true, percentileLines: true));
         $series['out'] = new SeriesSum($out, __('graph.series.total_out'), 'bps', new SeriesStyle(invert: true, legendOnly: true, percentileLines: true));
         $series['aggregate'] = new SeriesSum(['in', 'out'], __('graph.series.aggregate'), 'bps', new SeriesStyle(legendOnly: true));

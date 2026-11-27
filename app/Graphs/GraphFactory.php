@@ -18,7 +18,7 @@ class GraphFactory
     /** Directories of App\Graphs that hold graph machinery instead of graph types */
     private const array FRAMEWORK_DIRECTORIES = ['legacy', 'rrd'];
 
-    /** Graph types drawn by the graph of another type, so links to the old type keep working */
+    /** Old graph types that existing links still use */
     private const array ALIASES = [
         'multiport_bits_separate' => ['multiport', 'bits'],
     ];

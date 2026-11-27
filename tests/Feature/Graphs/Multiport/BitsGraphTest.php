@@ -68,7 +68,7 @@ class BitsGraphTest extends TestCase
         $this->assertSame(["in_$second->port_id", "in_$first->port_id"], $series['in']->series);
     }
 
-    #[TestWith([400, 'first Gi1/0/11 I'])]
+    #[TestWith([300, 'first Gi1/0/11 I'])]
     #[TestWith([700, 'first Gi1/0/11 In'])]
     public function test_wider_graphs_have_room_for_longer_labels(int $width, string $label): void
     {
