@@ -158,56 +158,56 @@ class Jetstream extends OS implements Ipv6AddressDiscovery, RouteDiscovery, Vlan
             return $QBridgeMibVlans;
         }
 
-        return SnmpQuery::cache()->walk('TPLINK-DOT1Q-VLAN-MIB::vlanConfigTable')
-            ->mapTable(fn ($data, $vlan_id) => new Vlan([
-                'vlan_vlan' => $vlan_id,
+        $descriptions = SnmpQuery::allowUnordered()
+            ->hideMib()
+            ->walk('TPLINK-DOT1Q-VLAN-MIB::dot1qVlanDescription')
+            ->valuesByIndex();
+
+        return collect($descriptions)->map(function ($data, $vlan_id) {
+            $id = (int) preg_replace('/\D/', '', (string) $vlan_id);
+            $rawName = is_array($data) ? ($data['dot1qVlanDescription'] ?? reset($data)) : $data;
+
+            return new Vlan([
+                'vlan_vlan' => $id,
                 'vlan_domain' => 1,
-                'vlan_name' => $data['TPLINK-DOT1Q-VLAN-MIB::dot1qVlanDescription'],
-            ]));
+                'vlan_name' => trim((string) $rawName, '"'),
+            ]);
+        })->filter(fn (Vlan $vlan) => $vlan->vlan_vlan > 0)->values();
     }
-
-    public function discoverVlanPorts(Collection $vlans): Collection
+    
+    public function discoverVlans(): Collection
     {
-        $ports = parent::discoverVlanPorts($vlans); // Q-BRIDGE-MIB
-        if ($ports->isNotEmpty()) {
-            return $ports;
+        if (($QBridgeMibVlans = parent::discoverVlans())->isNotEmpty()) {
+            return $QBridgeMibVlans;
         }
 
-        $vlanPortConfigTable = SnmpQuery::walk('TPLINK-DOT1Q-VLAN-MIB::vlanPortConfigTable')->table(1);
-        foreach ($vlanPortConfigTable as $ifIndex => $data) {
-            $portConfig[$data['TPLINK-DOT1Q-VLAN-MIB::vlanPortNumber']] = $ifIndex;
-        }
+        $descriptions = SnmpQuery::allowUnordered()
+            ->hideMib()
+            ->walk('TPLINK-DOT1Q-VLAN-MIB::dot1qVlanDescription')
+            ->valuesByIndex();
 
-        $vlanConfigTable = SnmpQuery::cache()->walk('TPLINK-DOT1Q-VLAN-MIB::vlanConfigTable')->table(1);
-        foreach ($vlanConfigTable as $vlan_id => $data) {
-            $types = ['TPLINK-DOT1Q-VLAN-MIB::vlanTagPortMemberAdd' => 0, 'TPLINK-DOT1Q-VLAN-MIB::vlanUntagPortMemberAdd' => 1];
-            foreach ($types as $type => $tag) {
-                $expand = $this->jetstreamExpand($data[$type] ?? []);
-                foreach ($expand as $port) {
-                    $ifIndex = $portConfig[$port] ?? 0;
-                    $ports->push(new PortVlan([
-                        'vlan' => $vlan_id,
-                        'baseport' => $this->bridgePortFromIfIndex($ifIndex),
-                        'untagged' => $tag,
-                        'port_id' => PortCache::getIdFromIfIndex($ifIndex, $this->getDeviceId()) ?? 0, // ifIndex from device
-                    ]));
-                }
-            }
-        }
+        return collect($descriptions)->map(function ($data, $vlan_id) {
+            $id = (int) preg_replace('/\D/', '', (string) $vlan_id);
+            $rawName = is_array($data) ? ($data['dot1qVlanDescription'] ?? reset($data)) : $data;
 
-        return $ports;
+            return new Vlan([
+                'vlan_vlan' => $id,
+                'vlan_domain' => 1,
+                'vlan_name' => trim((string) $rawName, '"'),
+            ]);
+        })->filter(fn (Vlan $vlan) => $vlan->vlan_vlan > 0)->values();
     }
 
     private function jetstreamExpand($var): array
     {
         $result = [];
 
-        preg_match_all('#(LAG|\d+/\d+/)(\d+)(?:-(\d+))?#', (string) $var, $lags);
+        preg_match_all('#(LAG|Po|[a-zA-Z]*\d+/\d+/)(\d+)(?:-(\d+))?#', (string) $var, $lags);
 
         foreach ($lags[2] as $index => $start) {
             $end = $lags[3][$index] ?: $start;
             for ($i = $start; $i <= $end; $i++) {
-                $result[] = $lags[1][$index] . $i; //need to be in form LAGx or 1/0/x
+                $result[] = $lags[1][$index] . $i;
             }
         }
 
