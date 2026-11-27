@@ -53,7 +53,7 @@ class GraphRequest extends FormRequest
             'showcommand' => ['nullable', 'string', 'in:yes,no'],
             'port_speed_zoom' => ['nullable', 'in:0,1'],
             'device' => ['nullable', 'integer'],
-            'id' => ['nullable', 'regex:/^\d+(,\d+)*$/'],
+            'id' => ['nullable', 'regex:' . GraphParameters::ID_LIST_PATTERN],
             'customer' => ['nullable', 'string', 'max:255'],
             'width' => ['nullable', 'integer', 'min:10', 'max:' . GraphParameters::MAX_SIZE],
             'height' => ['nullable', 'integer', 'min:10', 'max:' . GraphParameters::MAX_SIZE],

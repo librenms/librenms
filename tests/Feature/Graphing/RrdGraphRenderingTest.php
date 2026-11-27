@@ -100,6 +100,20 @@ class RrdGraphRenderingTest extends TestCase
         $this->assertStringStartsWith(self::PNG_HEADER, $graph->render()->data);
     }
 
+    public function test_it_draws_the_traffic_of_ports_of_several_devices(): void
+    {
+        $ports = Port::factory()->count(2)->for(Device::factory())->create()->push(Port::factory()->for(Device::factory())->create());
+        foreach ($ports as $port) {
+            $this->createRrd($port->device, "port-id$port->port_id.rrd", ['INOCTETS', 'OUTOCTETS']);
+        }
+
+        $graph = (new GraphFactory)->graphFor(new GraphParameters([
+            'type' => 'multiport_bits', 'id' => $ports->pluck('port_id')->implode(','), 'graph_type' => 'png', 'previous' => 'yes',
+        ]));
+
+        $this->assertStringStartsWith(self::PNG_HEADER, $graph->render()->data);
+    }
+
     #[TestWith(['device_bits'])]
     #[TestWith(['port_bits'])]
     public function test_traffic_graphs_hide_percentiles_when_disabled_globally(string $type): void

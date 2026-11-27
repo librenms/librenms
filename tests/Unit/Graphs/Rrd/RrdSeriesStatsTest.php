@@ -171,7 +171,8 @@ class RrdSeriesStatsTest extends TestCase
     {
         $rrdFiles = Mockery::mock(RrdFileResolver::class);
         $rrdFiles->shouldReceive('pathFor')->andReturn('host/test.rrd');
-        $params = new GraphParameters(['from' => 1000000, 'to' => 1000000 + $range, 'height' => $height]);
+        // wide enough for every legend column
+        $params = new GraphParameters(['from' => 1000000, 'to' => 1000000 + $range, 'height' => $height, 'width' => 1000]);
 
         return new RrdSeriesDefinition($series, new GraphOptions(legendTitle: $legendTitle, percentiles: $percentiles), $rrdFiles)->build($params);
     }

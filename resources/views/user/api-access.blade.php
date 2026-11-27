@@ -5,6 +5,7 @@
 @section('content')
 <div class="container-fluid" x-data="apiAccessManager()">
     <legend>{{ __('API Tokens') }}</legend>
+    @include('user.api-navigation')
 
     @if (session('status'))
         <div class="alert alert-info">{{ session('status') }}</div>

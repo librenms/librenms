@@ -9,7 +9,7 @@
         <div class=col-md-12><span class=list-large>{{ __("No ports found for type") }} {{ implode(' + ', $types) }}</span></div>
     </div>
     @else
-    <x-graph-row type="multiport_bits_separate" :vars="['id' => $ports->pluck('port_id')->implode(',')]" columns="responsive">
+    <x-graph-row type="multiport_bits" :vars="['id' => $ports->pluck('port_id')->implode(',')]" columns="responsive">
         <x-slot name="title">
             <div class="row">
                 <div class=col-md-12><span class=list-large>{{ __("Total Graph for ports of type") }} : {{ implode(' + ', $types) }}</span></div>

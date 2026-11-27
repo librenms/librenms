@@ -56,7 +56,6 @@ trait LegacySensorDiscovery
 
         include_once base_path('includes/functions.php');
         include_once base_path('includes/common.php');
-        include_once base_path('includes/rewrites.php');
         include_once base_path('includes/dbFacile.php');
         include_once base_path('includes/discovery/functions.inc.php');
 

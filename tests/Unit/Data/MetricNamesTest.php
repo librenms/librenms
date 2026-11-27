@@ -44,6 +44,12 @@ final class MetricNamesTest extends TestCase
         $this->assertSame(['sensor_class' => 'voltage', 'sensor_type' => 'ipmi', 'sensor_descr' => 'PSU 1'], $legacy->tagsOf($ipmi));
         $this->assertSame(['sensor', 'voltage', 'ipmi', 'PSU 1'], $legacy->rrdNameOf($ipmi));
 
+        $vp = new MetricIdentity('atm_vp', ['hostname' => 'localhost', 'ifIndex' => 42, 'vp' => 7]);
+        $legacy = new MetricNames()->storedAs($vp);
+        $this->assertSame('atm-vp', $legacy?->measurement);
+        $this->assertSame(['ifIndex' => 42, 'vp_id' => 7], $legacy->tagsOf($vp));
+        $this->assertSame(['vp', '42', '7'], $legacy->rrdNameOf($vp));
+
         $ping = new MetricIdentity('ping', ['hostname' => 'localhost']);
         $legacy = new MetricNames()->storedAs($ping);
         $this->assertSame('icmp-perf', $legacy?->measurement);
