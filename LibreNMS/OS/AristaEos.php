@@ -81,7 +81,7 @@ class AristaEos extends Shared\Arista implements TransceiverDiscovery
 
             foreach ($lanes as $index => $lane) {
                 $port = $breakout[(int) $lane['entPhysicalParentRelPos']];
-                $transceivers->put($index, (new Transceiver([
+                $transceivers->put($index, new Transceiver([
                     'index' => $index,
                     'entity_physical_index' => $index,
                     'port_id' => $port->port_id,
@@ -92,7 +92,7 @@ class AristaEos extends Shared\Arista implements TransceiverDiscovery
                     'revision' => $module['entPhysicalHardwareRev'] ?? null,
                     'channels' => 1,
                     'ddm' => true,
-                ]))->setRelation('port', $port));
+                ])->setRelation('port', $port));
             }
         }
 
