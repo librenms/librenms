@@ -222,7 +222,6 @@ class OverviewController implements DeviceTab
                 $description = $sensor->poller_type === 'ipmi'
                     ? Rewrite::ipmiSensorName($device->hardware, (string) $sensor->sensor_descr)
                     : (string) $sensor->sensor_descr;
-                // State sensor names are free text (e.g. "Serial Port 3"), not interface names
                 if ($sensor->sensor_class !== SensorType::State->value) {
                     $description = Rewrite::shortenIfName($description);
                 }
