@@ -25,14 +25,15 @@ trait StacksPortTraffic
         $series = [];
         $in = [];
         $out = [];
+        [$inField, $outField] = $this->params->inverse ? ['OUTOCTETS', 'INOCTETS'] : ['INOCTETS', 'OUTOCTETS'];
         foreach ($ports as $port) {
             $metric = $port->metricIdentity('port');
             $portLabel = $label($port);
             $in[] = "in_$port->port_id";
             $out[] = "out_$port->port_id";
-            $series["in_$port->port_id"] = new DataSeries($metric, 'INOCTETS', $portLabel . ' ' . __('graph.series.in'), 'bps', 8,
+            $series["in_$port->port_id"] = new DataSeries($metric, $inField, $portLabel . ' ' . __('graph.series.in'), 'bps', 8,
                 new SeriesStyle(SeriesRole::In, stacked: true));
-            $series["out_$port->port_id"] = new DataSeries($metric, 'OUTOCTETS', $portLabel . ' ' . __('graph.series.out'), 'bps', 8,
+            $series["out_$port->port_id"] = new DataSeries($metric, $outField, $portLabel . ' ' . __('graph.series.out'), 'bps', 8,
                 new SeriesStyle(SeriesRole::Out, stacked: true, invert: true));
         }
 

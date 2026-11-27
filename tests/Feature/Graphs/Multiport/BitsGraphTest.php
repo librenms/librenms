@@ -91,6 +91,16 @@ class BitsGraphTest extends TestCase
         $this->assertMatchesRegularExpression('/\'AREA:ds0#[0-9A-F]{6}:' . preg_quote($label, '/') . ' *\'/', $command);
     }
 
+    public function test_inverse_swaps_in_and_out(): void
+    {
+        $port = Port::factory()->for(Device::factory())->create();
+
+        $series = new BitsGraph(new GraphParameters(['type' => 'multiport_bits', 'id' => $port->port_id, 'inverse' => 1]))->getSeries();
+
+        $this->assertSame('OUTOCTETS', $series["in_$port->port_id"]->field);
+        $this->assertSame('INOCTETS', $series["out_$port->port_id"]->field);
+    }
+
     public function test_every_port_has_to_exist(): void
     {
         $port = Port::factory()->for(Device::factory())->create();
