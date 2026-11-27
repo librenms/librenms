@@ -37,7 +37,7 @@ return [
         ],
         'discovery' => [
             'general' => ['name' => 'General Discovery Settings'],
-            'route' => ['name' => 'Routes Discovery Module'],
+            'routes' => ['name' => 'Routes Discovery Module'],
             'discovery_modules' => ['name' => 'Discovery Modules'],
             'storage' => ['name' => 'Storage Module'],
             'networks' => ['name' => 'Networks'],

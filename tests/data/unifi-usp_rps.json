@@ -514,7 +514,7 @@
         },
         "poller": "matches discovery"
     },
-    "route": {
+    "routes": {
         "discovery": {
             "route": [
                 {

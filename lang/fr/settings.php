@@ -34,7 +34,7 @@ return [
         ],
         'discovery' => [
             'general' => ['name' => 'Réglages généraux de Découverte'],
-            'route' => ['name' => 'Module: Routes'],
+            'routes' => ['name' => 'Module: Routes'],
             'discovery_modules' => ['name' => 'Activation des Modules de Découverte'],
             'storage' => ['name' => 'Module: Stockage'],
         ],

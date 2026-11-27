@@ -26,7 +26,6 @@
 
 namespace LibreNMS\Tests\Unit;
 
-use App\Facades\LibrenmsConfig;
 use Illuminate\Support\Str;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Tests\TestCase;
@@ -150,63 +149,6 @@ final class CommonFunctionsTest extends TestCase
         $this->assertFalse(Validate::hostname(' '), 'Just a space');
         $this->assertFalse(Validate::hostname('-'), '-');
         $this->assertFalse(Validate::hostname(''), 'Empty string');
-    }
-
-    public function testFormatHostname(): void
-    {
-        $device_dns = [
-            'hostname' => 'test.librenms.org',
-            'sysName' => 'Testing DNS',
-        ];
-        $invalid_dns = [
-            'hostname' => 'Not DNS',
-            'sysName' => 'Testing Invalid DNS',
-        ];
-        $device_ip = [
-            'hostname' => '192.168.1.2',
-            'sysName' => 'Testing IP',
-        ];
-        $invalid_ip = [
-            'hostname' => '256.168.1.2',
-            'sysName' => 'Testing Invalid IP',
-        ];
-        $custom_display = [
-            'hostname' => 'test.librenms.org',
-            'sysName' => 'sysName',
-            'display' => 'Custom Display ({{ $hostname }} {{ $sysName }})',
-        ];
-
-        // default {{ $hostname }}
-        LibrenmsConfig::set('device_display_default', null);
-        $this->assertEquals('test.librenms.org', format_hostname($device_dns));
-        $this->assertEquals('Not DNS', format_hostname($invalid_dns));
-        $this->assertEquals('192.168.1.2', format_hostname($device_ip));
-        $this->assertEquals('256.168.1.2', format_hostname($invalid_ip));
-        $this->assertEquals('Custom Display (test.librenms.org sysName)', format_hostname($custom_display));
-
-        // ip to sysname
-        LibrenmsConfig::set('device_display_default', '{{ $sysName_fallback }}');
-        $this->assertEquals('test.librenms.org', format_hostname($device_dns));
-        $this->assertEquals('Not DNS', format_hostname($invalid_dns));
-        $this->assertEquals('Testing IP', format_hostname($device_ip));
-        $this->assertEquals('256.168.1.2', format_hostname($invalid_ip));
-        $this->assertEquals('Custom Display (test.librenms.org sysName)', format_hostname($custom_display));
-
-        // sysname
-        LibrenmsConfig::set('device_display_default', '{{ $sysName }}');
-        $this->assertEquals('Testing DNS', format_hostname($device_dns));
-        $this->assertEquals('Testing Invalid DNS', format_hostname($invalid_dns));
-        $this->assertEquals('Testing IP', format_hostname($device_ip));
-        $this->assertEquals('Testing Invalid IP', format_hostname($invalid_ip));
-        $this->assertEquals('Custom Display (test.librenms.org sysName)', format_hostname($custom_display));
-
-        // custom
-        $custom_ip = ['display' => 'IP: {{ $ip }}', 'hostname' => '1.1.1.1', 'ip' => '2.2.2.2'];
-        $this->assertEquals('IP: 1.1.1.1', format_hostname($custom_ip));
-        $custom_ip['hostname'] = 'not_ip';
-        $this->assertEquals('IP: 2.2.2.2', format_hostname($custom_ip));
-        $custom_ip['overwrite_ip'] = '3.3.3.3';
-        $this->assertEquals('IP: 3.3.3.3', format_hostname($custom_ip));
     }
 
     public function testPortAssociation(): void

@@ -48,7 +48,7 @@ return [
         ],
         'discovery' => [
             'general' => ['name' => '일반 탐색 설정'],
-            'route' => ['name' => '경로 탐색 모듈'],
+            'routes' => ['name' => '경로 탐색 모듈'],
             'discovery_modules' => ['name' => '탐색 모듈'],
             'autodiscovery' => ['name' => '네트워크 자동 탐색'],
             'ports' => ['name' => '포트 모듈'],

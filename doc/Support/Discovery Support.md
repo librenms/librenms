@@ -91,7 +91,7 @@ the web interface at Device -> Settings -> Modules.
     lnms config:set discovery_modules.cisco-otv false
     lnms config:set discovery_modules.ipv4-addresses true
     lnms config:set discovery_modules.ipv6-addresses true
-    lnms config:set discovery_modules.route false
+    lnms config:set discovery_modules.routes false
     lnms config:set discovery_modules.sensors true
     lnms config:set discovery_modules.storage true
     lnms config:set discovery_modules.hr-device true
@@ -154,7 +154,7 @@ ports that the configuration options ignore.
 
 `ipv6-addresses`: IPv6 address detection.
 
-`route`: this module loads the routing table of the device, with
+`routes`: this module loads the routing table of the device, with
 history data. The default route limit is 1000. To change the limit, use
 `lnms config:set routes.max_number 1000`.
 

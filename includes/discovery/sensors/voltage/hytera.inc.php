@@ -18,7 +18,7 @@ if ($oids !== false) {
             $index = $split_oid[count($split_oid) - 1];
             $descr = 'Voltage ' . $index;
             $oid = '.1.3.6.1.4.1.40297.1.2.1.2.1.' . $index;
-            $voltage = hytera_h2f(str_replace('"', '', SnmpQuery::get($oid)->value()), 2);
+            $voltage = \LibreNMS\OS\Hytera::hexToFloat((string) str_replace('"', '', SnmpQuery::get($oid)->value()), (int) 2);
             discover_sensor(null, SensorType::Voltage, $device, $oid, $index, $type, $descr, $divisor, '1', 11.00, 11.5, 14.5, 15, $voltage);
         }
     }

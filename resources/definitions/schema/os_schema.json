@@ -223,7 +223,7 @@
                 "qos": {
                     "type": "boolean"
                 },
-                "route": {
+                "routes": {
                     "type": "boolean"
                 },
                 "sensors": {
@@ -397,7 +397,7 @@
                 "qos": {
                     "type": "boolean"
                 },
-                "route": {
+                "routes": {
                     "type": "boolean"
                 },
                 "sensors": {
