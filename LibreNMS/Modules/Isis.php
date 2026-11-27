@@ -115,8 +115,9 @@ class Isis implements Module
 
         if ($circuits->isValid()) {
             $adjacencies_data = SnmpQuery::enumStrings()->displayHints(false)->walk('ISIS-MIB::isisISAdj')->table(2);
+            $level_data = SnmpQuery::walk(['ISIS-MIB::isisCircLevelMetric', 'ISIS-MIB::isisCircLevelWideMetric'])->table(2);
 
-            $adjacencies = $circuits->mapTable(function (array $circuit_data, string $circuit_id) use ($os, $adjacencies_data): ?Collection {
+            $adjacencies = $circuits->mapTable(function (array $circuit_data, string $circuit_id) use ($os, $adjacencies_data, $level_data): ?Collection {
                 if (! isset($circuit_data['ISIS-MIB::isisCircIfIndex'])) {
                     return null;
                 }
@@ -126,15 +127,18 @@ class Isis implements Module
                 }
 
                 return collect($adjacencies_data[$circuit_id] ?? [[]])
-                    ->map(function (array $adjacency_data, $adjacency_index) use ($os, $circuit_data, $circuit_id): IsisAdjacency {
-                        $attributes = [
+                    ->map(function (array $adjacency_data, $adjacency_index) use ($os, $circuit_data, $circuit_id, $level_data): IsisAdjacency {
+                        $attributes = array_merge([
                             'device_id' => $os->getDeviceId(),
                             'index' => $adjacency_index === 0 ? null : "$circuit_id.$adjacency_index",
                             'ifIndex' => $circuit_data['ISIS-MIB::isisCircIfIndex'],
                             'port_id' => PortCache::getIdFromIfIndex($circuit_data['ISIS-MIB::isisCircIfIndex'], $os->getDevice()),
                             'isisCircAdminState' => $circuit_data['ISIS-MIB::isisCircAdminState'] ?? 'down',
                             'isisISAdjState' => $adjacency_data['ISIS-MIB::isisISAdjState'] ?? 'down',
-                        ];
+                        ], $this->circuitLevelMetrics(
+                            $level_data[$circuit_id] ?? [],
+                            $adjacency_data['ISIS-MIB::isisISAdjUsage'] ?? null
+                        ));
 
                         if (! empty($adjacency_data)) {
                             $addresses = $adjacency_data['ISIS-MIB::isisISAdjIPAddrAddress'] ?? [];
@@ -213,6 +217,54 @@ class Isis implements Module
     protected function parseAdjacencyTime(?array $data): int
     {
         return (int) (max($data['ISIS-MIB::isisISAdjLastUpTime'] ?? 1, 1) / 100);
+    }
+
+    /**
+     * Resolve the per-level metric and wide metric for an adjacency from the
+     * isisCircLevelTable, which is keyed by circuit and level (area = L1,
+     * domain = L2).
+     *
+     * @param  array  $circuit_levels  Level rows for a single circuit, keyed by level
+     * @param  string|null  $adjUsage  isisISAdjUsage for the adjacency (level1/level2/level1and2)
+     * @return array<string, int|null>
+     */
+    protected function circuitLevelMetrics(array $circuit_levels, ?string $adjUsage): array
+    {
+        [$useL1, $useL2] = match ($adjUsage) {
+            'level1', '1' => [true, false],
+            'level2', '2' => [false, true],
+            default => [true, true], // level1and2 or undefined usage: both levels
+        };
+
+        $l1 = $useL1 ? $this->circuitLevelRow($circuit_levels, ['area', 1]) : [];
+        $l2 = $useL2 ? $this->circuitLevelRow($circuit_levels, ['domain', 2]) : [];
+
+        return [
+            'isisCircLevelMetricL1' => $l1['ISIS-MIB::isisCircLevelMetric'] ?? null,
+            'isisCircLevelWideMetricL1' => $l1['ISIS-MIB::isisCircLevelWideMetric'] ?? null,
+            'isisCircLevelMetricL2' => $l2['ISIS-MIB::isisCircLevelMetric'] ?? null,
+            'isisCircLevelWideMetricL2' => $l2['ISIS-MIB::isisCircLevelWideMetric'] ?? null,
+        ];
+    }
+
+    /**
+     * Return the circuit-level row matching one of the given level keys, or [].
+     * The level index resolves to its enum name when the MIB is loaded, so both
+     * the name (area/domain) and the numeric value (1/2) are accepted.
+     *
+     * @param  array  $circuit_levels  Level rows for a single circuit, keyed by level
+     * @param  array  $level_keys  Acceptable keys for the wanted level
+     * @return array
+     */
+    protected function circuitLevelRow(array $circuit_levels, array $level_keys): array
+    {
+        foreach ($level_keys as $key) {
+            if (isset($circuit_levels[$key])) {
+                return $circuit_levels[$key];
+            }
+        }
+
+        return [];
     }
 
     public function dataExists(Device $device): bool
