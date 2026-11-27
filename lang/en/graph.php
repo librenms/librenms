@@ -120,6 +120,8 @@ return [
     ],
     'units' => [
         'seconds' => 'Seconds',
+        'watts' => 'Watts',
+        'celsius' => 'Celsius',
     ],
     'series' => [
         'in' => 'In',
@@ -178,6 +180,23 @@ return [
             'stability' => 'Stability',
             'jitter' => 'Jitter',
             'noise' => 'Noise',
+        ],
+        'nvidia' => [
+            'gpu' => 'GPU :index',
+            'bar1_mb' => 'Bar1 MB',
+            'double_bit_ecc' => 'Double Bit ECC',
+            'single_bit_ecc' => 'Single Bit ECC',
+            'dec_use' => 'Dec Use %',
+            'enc_use' => 'Enc Use %',
+            'mem_use' => 'Mem Use %',
+            'gpu_use' => 'GPU Use %',
+            'fb_mb' => 'FB MB',
+            'ram_mhz' => 'RAM MHz',
+            'gpu_mhz' => 'GPU MHz',
+            'power_viol' => 'Power Viol. %',
+            'therm_viol' => 'Therm Viol.',
+            'rx_mb_per_second' => 'RX MB/s',
+            'tx_mb_per_second' => 'TX MB/s',
         ],
     ],
     'mempool' => [
