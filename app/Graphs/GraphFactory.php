@@ -18,6 +18,11 @@ class GraphFactory
     /** Directories of App\Graphs that hold graph machinery instead of graph types */
     private const array FRAMEWORK_DIRECTORIES = ['legacy', 'rrd'];
 
+    /** Graph types drawn by the graph of another type, so links to the old type keep working */
+    private const array ALIASES = [
+        'multiport_bits_separate' => ['multiport', 'bits'],
+    ];
+
     /**
      * @throws InvalidGraph
      */
@@ -27,7 +32,8 @@ class GraphFactory
             throw new InvalidGraph;
         }
 
-        $className = $this->graphClass($params->type, $params->subtype);
+        [$type, $subtype] = self::ALIASES["{$params->type}_$params->subtype"] ?? [$params->type, $params->subtype];
+        $className = $this->graphClass($type, $subtype);
 
         // a graph type may draw subtypes without a graph of their own, such as sensor classes
         if ($className === null && LegacyGraphScript::find($params->type, $params->subtype) === null) {

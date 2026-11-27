@@ -24,6 +24,7 @@ class RrdTrafficDefinition
     private array $totals = [];
 
     /**
+     * @param  Closure(string $text): string  $legendLabel  the label of a legend row, as wide as the others
      * @param  Closure(string $id, string $unit): list<string>  $legendValues  the legend values of a row, with the percentile columns of the graph
      * @param  Closure(string $id, float $factor, string $color): list<string>  $percentileLines  the percentile lines of a value
      */
@@ -31,6 +32,7 @@ class RrdTrafficDefinition
         private readonly TrafficOptions $options,
         private readonly GraphParameters $params,
         private readonly GraphTheme $theme,
+        private readonly Closure $legendLabel,
         private readonly Closure $legendValues,
         private readonly Closure $percentileLines,
     ) {
@@ -63,7 +65,7 @@ class RrdTrafficDefinition
             }
             $previousColor = $this->theme->previous($series->style->invert);
             $this->defs[] = "CDEF:{$previous}drawn=$previous,$factor,*";
-            $this->drawing[] = "LINE1.25:{$previous}drawn#$previousColor:" . RrdSeriesDefinition::legendLabel(__('graph.legend.previous', ['series' => $series->description]));
+            $this->drawing[] = "LINE1.25:{$previous}drawn#$previousColor:" . ($this->legendLabel)(__('graph.legend.previous', ['series' => $series->description]));
             array_push($this->drawing, ...($this->legendValues)($previous, $series->unit));
             if ($series->style->percentileLines) {
                 array_push($this->drawing, ...($this->percentileLines)($previous, $drawFactor, $previousColor));

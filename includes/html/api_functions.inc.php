@@ -855,7 +855,7 @@ function get_graph_by_portgroup(Request $request)
     }
 
     return api_get_graph($request, [
-        'type' => 'multiport_bits_separate',
+        'type' => 'multiport_bits',
         'id' => $if_list,
     ]);
 }

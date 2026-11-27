@@ -183,6 +183,10 @@ return [
     'mempool' => [
         'subtitle' => ' :: Memory Pool :: :descr',
     ],
+    'multiport' => [
+        'title' => 'Multi Port',
+        'subtitle' => ' :: Multi Port',
+    ],
     'port' => [
         'packets' => 'Packets',
         'packets_per_second' => 'Packets/sec',

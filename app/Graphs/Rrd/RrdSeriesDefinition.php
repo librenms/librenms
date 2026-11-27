@@ -18,7 +18,11 @@ use LibreNMS\Exceptions\NoGraphData;
  */
 class RrdSeriesDefinition
 {
+    // labels are this wide on narrow graphs, wider graphs have room for longer labels
     private const int LABEL_WIDTH = 16;
+    private const int MAX_LABEL_WIDTH = 40;
+    // approximate width of a legend character, the image is wider than the graph by the axis labels which leaves some room to spare
+    private const float LEGEND_CHAR_PIXELS = 7.5;
     private const int PRECISION = 2;
 
     /** @var array<string, array{suffix: string, cf: string}> legend columns and the value each one shows */
@@ -50,6 +54,9 @@ class RrdSeriesDefinition
 
     /** the widest unit, the units of all legend values are padded to it */
     private readonly int $unitWidth;
+
+    /** the width of the legend labels, set for the width of the graph */
+    private int $labelWidth = self::LABEL_WIDTH;
 
     /**
      * @param  array<string, DataSeries|SeriesSum>  $series
@@ -86,6 +93,7 @@ class RrdSeriesDefinition
         $this->files = [];
         $this->ids = [];
         $this->percentileDefs = [];
+        $this->labelWidth = $this->labelWidth($params->width);
         foreach ($this->series as $key => $series) {
             if ($series instanceof DataSeries) {
                 $filename = $this->rrdFiles->pathFor($series->metric);
@@ -110,7 +118,7 @@ class RrdSeriesDefinition
         $theme = new GraphTheme($params->isDark(), $this->options->palette, $overlaid && $inverted);
         $extraLines = $params->height > self::EXTRA_LINES_MIN_HEIGHT;
         $traffic = $this->options->traffic === null ? null : new RrdTrafficDefinition($this->options->traffic, $params, $theme,
-            $this->legendValues(...), fn (string $id, float $factor, string $color) => $extraLines ? $this->percentileLines($id, $factor, $color) : []);
+            $this->legendLabel(...), $this->legendValues(...), fn (string $id, float $factor, string $color) => $extraLines ? $this->percentileLines($id, $factor, $color) : []);
         $averaged = count(array_filter(array_keys($this->files), fn ($key) => $this->series[$key]->style->stackAverage));
 
         $i = 0;
@@ -120,7 +128,7 @@ class RrdSeriesDefinition
             $style = $series->style;
             $drawScale = $style->stackAverage ? $style->drawScale / $averaged : $style->drawScale;
             $factor = $style->invert && ! $overlaid ? -$drawScale : $drawScale;
-            $label = self::legendLabel($series->description);
+            $label = $this->legendLabel($series->description);
             $summarized = $traffic !== null && $this->options->traffic?->summarizes($key);
 
             foreach (['' => 'AVERAGE', 'min' => 'MIN', 'max' => 'MAX'] as $suffix => $cf) {
@@ -250,7 +258,7 @@ class RrdSeriesDefinition
             array_push($defs, ...$this->periodValueDefs($key, $average->name, '', 'AVERAGE', ":step=$average->step"));
 
             $lineId = $this->drawnValue($averageId, $factor, $defs);
-            $drawing[] = "LINE1.25:$lineId#$average->color:" . self::legendLabel($average->label);
+            $drawing[] = "LINE1.25:$lineId#$average->color:" . $this->legendLabel($average->label);
             array_push($drawing, ...$this->legendValues($averageId, $this->series[$key]->unit, sameValue: true));
         }
 
@@ -471,7 +479,7 @@ class RrdSeriesDefinition
         ];
 
         return [
-            'COMMENT:' . Rrd::fixedSafeDescr($this->options->legendTitle, self::LEGEND_COLOR_BOX_WIDTH + self::LABEL_WIDTH),
+            'COMMENT:' . Rrd::fixedSafeDescr($this->options->legendTitle, self::LEGEND_COLOR_BOX_WIDTH + $this->labelWidth),
             'COMMENT:' . implode('', array_map(fn (string $heading) => mb_str_pad($heading, $columnWidth, ' ', STR_PAD_LEFT), $headings)) . '\\l',
         ];
     }
@@ -479,9 +487,21 @@ class RrdSeriesDefinition
     /**
      * The label of a legend row, as wide as the others. rrdtool leaves the same space after every label, so the values line up.
      */
-    public static function legendLabel(string $text): string
+    private function legendLabel(string $text): string
     {
-        return Rrd::fixedSafeDescr($text, self::LABEL_WIDTH);
+        return Rrd::fixedSafeDescr($text, $this->labelWidth);
+    }
+
+    /**
+     * The room the legend line leaves for the label next to the values, so wider graphs show longer labels
+     */
+    private function labelWidth(int $graphWidth): int
+    {
+        $lineWidth = (int) floor($graphWidth / self::LEGEND_CHAR_PIXELS);
+        $columns = count(self::LEGEND_COLUMNS) + count($this->options->percentiles);
+        $valuesWidth = $columns * (self::LEGEND_COLUMN_GAP + self::LEGEND_VALUE_WIDTH + $this->unitWidth);
+
+        return max(self::LABEL_WIDTH, min(self::MAX_LABEL_WIDTH, $lineWidth - self::LEGEND_COLOR_BOX_WIDTH - $valuesWidth));
     }
 
     /**

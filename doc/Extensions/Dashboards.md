@@ -98,5 +98,5 @@ You can add `@AUTO_HEIGHT@` and `@AUTO_WIDTH@` to the Image URL as parameters.
 
 Examples:
 
-- <http://librenms.example.com/graph.php?id=333%2C444&type=multiport_bits_separate&legend=no&absolute=1&from=-14200&width=@AUTO_WIDTH@&height=@AUTO_HEIGHT@>
+- <http://librenms.example.com/graph.php?id=333%2C444&type=multiport_bits&legend=no&absolute=1&from=-14200&width=@AUTO_WIDTH@&height=@AUTO_HEIGHT@>
 - <http://example.com/myimage.php?size=@AUTO_WIDTH@x@AUTO_HEIGHT@>
