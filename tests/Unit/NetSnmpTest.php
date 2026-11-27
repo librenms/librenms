@@ -154,6 +154,26 @@ class NetSnmpTest extends TestCase
         $this->assertContains('public@vrf1', $cli);
     }
 
+    public function testBuildCliUsesTheConfigContextWhenTheOptionsHaveNone(): void
+    {
+        $defaults = ['context' => 'cn1027'] + (new SnmpPollingMethod)->defaults();
+        $v2c = SnmpConfig::make($defaults, new SnmpCommunitySecretData(community: 'public'));
+        $v3 = SnmpConfig::make($defaults, new SnmpV3SecretData(authname: 'admin', authlevel: 'noAuthNoPriv'));
+
+        $this->assertContains('public@cn1027', $this->optionsParser->buildCli('snmpget', '192.0.2.1', ['sysObjectID.0'], $v2c, SnmpQueryOptions::quickPrint()));
+        $this->assertSame(['-n', 'cn1027'], array_slice((new NetSnmpOptions)->buildAuth($v3), -2));
+    }
+
+    public function testBuildCliOptionsContextOverridesTheConfigContext(): void
+    {
+        $config = SnmpConfig::make(['context' => 'cn1027'] + (new SnmpPollingMethod)->defaults(), new SnmpCommunitySecretData(community: 'public'));
+
+        $cli = $this->optionsParser->buildCli('snmpget', '192.0.2.1', ['sysObjectID.0'], $config, new SnmpQueryOptions(context: 'vrf1'));
+
+        $this->assertContains('public@vrf1', $cli);
+        $this->assertNotContains('public@cn1027', $cli);
+    }
+
     public function testBuildCliV3AuthPriv(): void
     {
         $config = SnmpConfig::make(

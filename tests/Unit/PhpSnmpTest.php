@@ -96,6 +96,20 @@ class PhpSnmpTest extends TestCase
         $this->assertSame('public', $method->invoke($backend, $v2Default, ''));
     }
 
+    public function testContextDefaultsToTheConfigContext(): void
+    {
+        $method = new \ReflectionMethod(PhpSnmp::class, 'context');
+        $backend = new PhpSnmp;
+        $defaults = $this->backendDefaults();
+
+        $withContext = SnmpConfig::make(['context' => 'cn1027'] + $defaults, new SnmpCommunitySecretData(community: 'public'));
+        $withoutContext = SnmpConfig::make($defaults, new SnmpCommunitySecretData(community: 'public'));
+
+        $this->assertSame('cn1027', $method->invoke($backend, $withContext, new SnmpQueryOptions));
+        $this->assertSame('vrf1', $method->invoke($backend, $withContext, new SnmpQueryOptions(context: 'vrf1')));
+        $this->assertSame('', $method->invoke($backend, $withoutContext, new SnmpQueryOptions));
+    }
+
     public function testV3SecurityLevelsAndContext(): void
     {
         if (! class_exists(\SNMP::class)) {
