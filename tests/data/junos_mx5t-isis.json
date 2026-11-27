@@ -11509,14 +11509,16 @@
                     "isisISAdjIPAddrType": "ipv4",
                     "isisISAdjIPAddrAddress": "10.99.252.255",
                     "isisCircAdminState": "on",
-                    "isisCircLevelMetric": 10,
-                    "isisCircLevelWideMetric": 100
+                    "isisCircLevelMetricL1": null,
+                    "isisCircLevelWideMetricL1": null,
+                    "isisCircLevelMetricL2": 10,
+                    "isisCircLevelWideMetricL2": 100
                 },
                 {
                     "index": "572.2",
                     "ifIndex": 572,
                     "isisISAdjState": "up",
-                    "isisISAdjNeighSysType": "L2",
+                    "isisISAdjNeighSysType": "L1L2",
                     "isisISAdjNeighSysID": "10.99.20.40.00.51",
                     "isisISAdjNeighPriority": "0",
                     "isisISAdjLastUpTime": 1206503,
@@ -11524,8 +11526,10 @@
                     "isisISAdjIPAddrType": "ipv4",
                     "isisISAdjIPAddrAddress": "10.99.252.253",
                     "isisCircAdminState": "on",
-                    "isisCircLevelMetric": 20,
-                    "isisCircLevelWideMetric": 200
+                    "isisCircLevelMetricL1": 15,
+                    "isisCircLevelWideMetricL1": 150,
+                    "isisCircLevelMetricL2": 20,
+                    "isisCircLevelWideMetricL2": 200
                 }
             ]
         },
