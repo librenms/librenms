@@ -175,6 +175,9 @@ modules:
                         - { descr: yes, value: 1, generic: 2 }
                         - { descr: 'null', value: 2, generic: 3 }
                     skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrOpticalModulePresent
+                            op: regex
+                            value: '/^(0|false)$/'
                         -   oid: MIKROTIK-MIB::mtxrOpticalVendorSerial # RouterOS >= 7.24 lists empty SFP cages too
                             op: '=='
                             value: ''
@@ -191,6 +194,9 @@ modules:
                         - { descr: yes, value: 1, generic: 2 }
                         - { descr: 'null', value: 2, generic: 3 }
                     skip_values:
+                        -   oid: MIKROTIK-MIB::mtxrOpticalModulePresent
+                            op: regex
+                            value: '/^(0|false)$/'
                         -   oid: MIKROTIK-MIB::mtxrOpticalVendorSerial # RouterOS >= 7.24 lists empty SFP cages too
                             op: '=='
                             value: ''

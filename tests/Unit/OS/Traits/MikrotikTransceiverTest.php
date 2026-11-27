@@ -25,26 +25,31 @@
 
 namespace LibreNMS\Tests\Unit\OS\Traits;
 
+use App\Models\Device;
 use LibreNMS\OS\Traits\MikrotikTransceiver;
 use LibreNMS\Tests\TestCase;
 
 final class MikrotikTransceiverTest extends TestCase
 {
-    use MikrotikTransceiver {
-        parseMikrotikTransceiver as public parse;
+    private MikrotikTransceiverHarness $harness;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->harness = new MikrotikTransceiverHarness;
     }
 
     public function testParsesCurrentMibData(): void
     {
         $this->assertSame([
-            'type' => 'SFP',
+            'type' => 'sfp',
             'vendor' => 'CISCO-PUREOPTICS',
             'model' => 'SFP-10G-LR-BXU',
             'serial' => 'M5AW8471',
             'distance' => null,
             'wavelength' => 1270,
-            'connector' => 'LC',
-        ], $this->parse([
+            'connector' => 'lc',
+        ], $this->harness->parse([
             'MIKROTIK-MIB::mtxrOpticalModulePresent' => 'true',
             'MIKROTIK-MIB::mtxrOpticalVendorName' => 'CISCO-PUREOPTICS',
             'MIKROTIK-MIB::mtxrOpticalVendorPartNumber' => 'SFP-10G-LR-BXU',
@@ -56,45 +61,45 @@ final class MikrotikTransceiverTest extends TestCase
         ]));
     }
 
-    public function testParsesNumericEnumsAndDistance(): void
+    public function testParsesEnumStringsAndDistance(): void
     {
         $this->assertSame([
-            'type' => 'SFP',
+            'type' => 'sfp',
             'vendor' => 'BROCADE',
             'model' => 'SFP-H10GB-CU1M',
             'serial' => 'SOPCU1m#C770',
             'distance' => 1,
             'wavelength' => null,
-            'connector' => 'DAC',
-        ], $this->parse([
+            'connector' => 'copperPigtail',
+        ], $this->harness->parse([
             'MIKROTIK-MIB::mtxrOpticalModulePresent' => 1,
             'MIKROTIK-MIB::mtxrOpticalVendorName' => ' BROCADE ',
             'MIKROTIK-MIB::mtxrOpticalVendorPartNumber' => 'SFP-H10GB-CU1M',
             'MIKROTIK-MIB::mtxrOpticalVendorSerial' => 'SOPCU1m#C770',
-            'MIKROTIK-MIB::mtxrOpticalType' => 3,
-            'MIKROTIK-MIB::mtxrOpticalConnectorType' => 33,
+            'MIKROTIK-MIB::mtxrOpticalType' => 'sfp',
+            'MIKROTIK-MIB::mtxrOpticalConnectorType' => 'copperPigtail',
             'MIKROTIK-MIB::mtxrOpticalLinkLengthCopperOM4' => 1,
             'MIKROTIK-MIB::mtxrOpticalWavelength' => 0,
         ]));
     }
 
-    public function testKeepsPresentTransceiverWithoutDdm(): void
+    public function testUnknownEnumsBecomeNull(): void
     {
         $this->assertSame([
-            'type' => 'SFP',
+            'type' => null,
             'vendor' => 'CISCO-AGILENT',
             'model' => 'QFBR-5766LP',
             'serial' => 'SERIAL',
             'distance' => null,
             'wavelength' => 850,
-            'connector' => 'LC',
-        ], $this->parse([
+            'connector' => null,
+        ], $this->harness->parse([
             'MIKROTIK-MIB::mtxrOpticalModulePresent' => 1,
             'MIKROTIK-MIB::mtxrOpticalVendorName' => 'CISCO-AGILENT',
             'MIKROTIK-MIB::mtxrOpticalVendorPartNumber' => 'QFBR-5766LP',
             'MIKROTIK-MIB::mtxrOpticalVendorSerial' => 'SERIAL',
             'MIKROTIK-MIB::mtxrOpticalType' => 3,
-            'MIKROTIK-MIB::mtxrOpticalConnectorType' => 7,
+            'MIKROTIK-MIB::mtxrOpticalConnectorType' => 'unknown',
             'MIKROTIK-MIB::mtxrOpticalWavelength' => 850.00,
             'MIKROTIK-MIB::mtxrOpticalTemperature' => 0,
             'MIKROTIK-MIB::mtxrOpticalSupplyVoltage' => 0,
@@ -106,7 +111,7 @@ final class MikrotikTransceiverTest extends TestCase
 
     public function testRejectsEmptySlot(): void
     {
-        $this->assertNull($this->parse([
+        $this->assertNull($this->harness->parse([
             'MIKROTIK-MIB::mtxrOpticalModulePresent' => 'false',
         ]));
     }
@@ -121,7 +126,7 @@ final class MikrotikTransceiverTest extends TestCase
             'distance' => null,
             'wavelength' => null,
             'connector' => null,
-        ], $this->parse([
+        ], $this->harness->parse([
             'MIKROTIK-MIB::mtxrOpticalVendorName' => 'OEM',
             'MIKROTIK-MIB::mtxrOpticalVendorSerial' => 'S180300350827',
             'MIKROTIK-MIB::mtxrOpticalWavelength' => '65535.00',
@@ -130,13 +135,27 @@ final class MikrotikTransceiverTest extends TestCase
 
     public function testRejectsEmptySlotFromOlderMib(): void
     {
-        $this->assertNull($this->parse([
+        $this->assertNull($this->harness->parse([
             'MIKROTIK-MIB::mtxrOpticalWavelength' => '0',
             'MIKROTIK-MIB::mtxrOpticalTxBiasCurrent' => '0',
             'MIKROTIK-MIB::mtxrOpticalSupplyVoltage' => '.000',
             'MIKROTIK-MIB::mtxrOpticalTemperature' => '4294967168',
             'MIKROTIK-MIB::mtxrOpticalVendorName' => '',
             'MIKROTIK-MIB::mtxrOpticalVendorSerial' => '',
+        ]));
+    }
+
+    public function testRejectsOlderRouterosEmptyCageWithZeroTemperature(): void
+    {
+        $this->assertNull($this->harness->parse([
+            'MIKROTIK-MIB::mtxrOpticalWavelength' => '.00',
+            'MIKROTIK-MIB::mtxrOpticalTxBiasCurrent' => '0',
+            'MIKROTIK-MIB::mtxrOpticalSupplyVoltage' => '.000',
+            'MIKROTIK-MIB::mtxrOpticalTemperature' => '0',
+            'MIKROTIK-MIB::mtxrOpticalVendorName' => '',
+            'MIKROTIK-MIB::mtxrOpticalVendorSerial' => '',
+            'MIKROTIK-MIB::mtxrOpticalTxPower' => '0',
+            'MIKROTIK-MIB::mtxrOpticalRxPower' => '0',
         ]));
     }
 
@@ -150,14 +169,26 @@ final class MikrotikTransceiverTest extends TestCase
             'distance' => null,
             'wavelength' => null,
             'connector' => null,
-        ], $this->parse([
+        ], $this->harness->parse([
             'MIKROTIK-MIB::mtxrOpticalWavelength' => '16653.93',
         ]));
     }
 
+    public function testClearsWavelengthBelow600(): void
+    {
+        $transceiver = $this->harness->parse([
+            'MIKROTIK-MIB::mtxrOpticalVendorName' => 'FS',
+            'MIKROTIK-MIB::mtxrOpticalVendorSerial' => 'SERIAL',
+            'MIKROTIK-MIB::mtxrOpticalWavelength' => '256.00',
+        ]);
+
+        $this->assertNotNull($transceiver);
+        $this->assertNull($transceiver['wavelength']);
+    }
+
     public function testRejectsInvalidWavelength(): void
     {
-        $transceiver = $this->parse([
+        $transceiver = $this->harness->parse([
             'MIKROTIK-MIB::mtxrOpticalVendorName' => 'FS',
             'MIKROTIK-MIB::mtxrOpticalVendorSerial' => 'SERIAL',
             'MIKROTIK-MIB::mtxrOpticalWavelength' => '16653.93',
@@ -165,5 +196,22 @@ final class MikrotikTransceiverTest extends TestCase
 
         $this->assertNotNull($transceiver);
         $this->assertNull($transceiver['wavelength']);
+    }
+}
+
+/**
+ * Harness so PHPStan analyzes the trait against a host that provides getDevice().
+ *
+ * @internal
+ */
+final class MikrotikTransceiverHarness
+{
+    use MikrotikTransceiver {
+        parseMikrotikTransceiver as public parse;
+    }
+
+    public function getDevice(): Device
+    {
+        return new Device;
     }
 }

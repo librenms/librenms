@@ -23,32 +23,11 @@
 
 namespace LibreNMS\OS;
 
-use App\Facades\PortCache;
-use App\Models\Transceiver;
-use Illuminate\Support\Collection;
 use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\OS;
 use LibreNMS\OS\Traits\MikrotikTransceiver;
-use SnmpQuery;
 
 class Swos extends OS implements TransceiverDiscovery
 {
     use MikrotikTransceiver;
-
-    public function discoverTransceivers(): Collection
-    {
-        return SnmpQuery::enumStrings()->walk('MIKROTIK-MIB::mtxrOpticalTable')->mapTable(function ($data, $ifIndex) {
-            $transceiver = $this->parseMikrotikTransceiver($data);
-            if ($transceiver === null) {
-                return null;
-            }
-
-            return new Transceiver([
-                'port_id' => (int) PortCache::getIdFromIfIndex($ifIndex, $this->getDevice()),
-                'index' => $ifIndex,
-                'entity_physical_index' => $ifIndex,
-                ...$transceiver,
-            ]);
-        })->filter();
-    }
 }

@@ -1270,25 +1270,6 @@
                     "connector": null,
                     "channels": 1,
                     "ifIndex": 2
-                },
-                {
-                    "index": "6",
-                    "entity_physical_index": 6,
-                    "type": null,
-                    "vendor": null,
-                    "oui": null,
-                    "model": null,
-                    "revision": null,
-                    "serial": null,
-                    "date": null,
-                    "ddm": null,
-                    "encoding": null,
-                    "cable": null,
-                    "distance": null,
-                    "wavelength": null,
-                    "connector": null,
-                    "channels": 1,
-                    "ifIndex": 6
                 }
             ]
         }

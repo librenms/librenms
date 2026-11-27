@@ -1436,7 +1436,7 @@
                 {
                     "index": "13",
                     "entity_physical_index": 13,
-                    "type": "SFP",
+                    "type": "sfp",
                     "vendor": "MikroTik",
                     "oui": null,
                     "model": "XS+DA0001",
@@ -1448,14 +1448,14 @@
                     "cable": null,
                     "distance": 1,
                     "wavelength": null,
-                    "connector": "DAC",
+                    "connector": "copperPigtail",
                     "channels": 1,
                     "ifIndex": 13
                 },
                 {
                     "index": "14",
                     "entity_physical_index": 14,
-                    "type": "SFP",
+                    "type": "sfp",
                     "vendor": "MikroTik",
                     "oui": null,
                     "model": "XS+DA0001",
@@ -1467,14 +1467,14 @@
                     "cable": null,
                     "distance": 1,
                     "wavelength": null,
-                    "connector": "DAC",
+                    "connector": "copperPigtail",
                     "channels": 1,
                     "ifIndex": 14
                 },
                 {
                     "index": "2",
                     "entity_physical_index": 2,
-                    "type": "SFP",
+                    "type": "sfp",
                     "vendor": "MikroTik",
                     "oui": null,
                     "model": "S+RJ10",
@@ -1486,14 +1486,14 @@
                     "cable": null,
                     "distance": 1,
                     "wavelength": null,
-                    "connector": "RJ45",
+                    "connector": "rj45",
                     "channels": 1,
                     "ifIndex": 2
                 },
                 {
                     "index": "3",
                     "entity_physical_index": 3,
-                    "type": "SFP",
+                    "type": "sfp",
                     "vendor": "Mikrotik",
                     "oui": null,
                     "model": "S-RJ01",
@@ -1505,7 +1505,7 @@
                     "cable": null,
                     "distance": 100,
                     "wavelength": null,
-                    "connector": "LC",
+                    "connector": "lc",
                     "channels": 1,
                     "ifIndex": 3
                 }
