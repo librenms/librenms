@@ -42,12 +42,23 @@ class BitsGraphTest extends TestCase
         $this->assertInstanceOf(BitsGraph::class, $graph);
         $this->assertSame('bits', new GraphParameters(['type' => $type])->subtype);
         $this->assertSame('Multi Port', $graph->getTitle());
-        $this->assertSame(' :: Multi Port', $graph->getPageContext()->subtitle);
     }
 
     public function test_the_old_separate_type_is_not_listed_as_a_subtype(): void
     {
         $this->assertSame(['bits'], (new GraphFactory)->subtypes('multiport'));
+    }
+
+    public function test_the_heading_counts_the_ports_and_their_devices(): void
+    {
+        $first = Device::factory()->create(['hostname' => 'first.example.com']);
+        $ports = Port::factory()->count(2)->for($first)->create();
+        $other = Port::factory()->for(Device::factory())->create();
+
+        $this->assertSame('Multi Port', $this->graph('')->getPageContext()->subtitle);
+        $this->assertSame('Multi Port :: 1 port on first', $this->graph((string) $ports[0]->port_id)->getPageContext()->subtitle);
+        $this->assertSame('Multi Port :: 2 ports on first', $this->graph($ports->pluck('port_id')->implode(','))->getPageContext()->subtitle);
+        $this->assertSame('Multi Port :: 3 ports on 2 devices', $this->graph($ports->pluck('port_id')->push($other->port_id)->implode(','))->getPageContext()->subtitle);
     }
 
     public function test_it_stacks_the_requested_ports_in_order_with_their_devices(): void

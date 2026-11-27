@@ -36,7 +36,17 @@ class BitsGraph extends AbstractSeriesGraph
 
     public function getPageContext(): GraphPageContext
     {
-        return new GraphPageContext(subtitle: __('graph.multiport.subtitle'));
+        $ports = $this->ports();
+        if ($ports->isEmpty()) {
+            return new GraphPageContext(subtitle: $this->getTitle());
+        }
+
+        $devices = $ports->pluck('device')->filter()->unique('device_id');
+
+        return new GraphPageContext(subtitle: __('graph.multiport.subtitle', [
+            'ports' => trans_choice('graph.multiport.ports', $ports->count()),
+            'devices' => trans_choice('graph.multiport.devices', $devices->count(), ['device' => $devices->first()?->shortDisplayName()]),
+        ]));
     }
 
     public function getTitle(): string
