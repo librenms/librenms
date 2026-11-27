@@ -339,21 +339,6 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * Ports that discarded packets in either direction during the last poll.
-     *
-     * @param  Builder  $query
-     * @return Builder
-     */
-    public function scopeHasDiscards($query)
-    {
-        return $query->where([
-            [$this->qualifyColumn('deleted'), '=', 0],
-            [$this->qualifyColumn('ignore'), '=', 0],
-            [$this->qualifyColumn('disabled'), '=', 0],
-        ])->whereHas('statistics', $this->discardsConstraint(...));
-    }
-
-    /**
      * @param  Builder  $query
      * @return Builder
      */

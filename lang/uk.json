@@ -312,7 +312,6 @@
   "Critical :service_count": "Критичні :service_count",
   "Disabled :port_count": "Вимкнено :port_count",
   "Errored :port_count": "З помилками :port_count",
-  "Discarded :port_count": "Зі скиданнями :port_count",
   "Ignored :port_count": "Проігноровано :port_count",
   "Down :port_count": "Не піднялися :port_count",
   "Deleted :port_count": "Видалено :port_count",

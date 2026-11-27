@@ -36,9 +36,16 @@ final class PortDiscardsFilterTest extends DBTestCase
         ];
     }
 
-    public function testHasDiscardsMatchesBothDirections(): void
+    public function testDiscardsFilterMatchesBothDirectionsOnActivePorts(): void
     {
-        $this->assertSame(['in_discards', 'out_discards'], $this->names(Port::where('device_id', $this->device->device_id)->hasDiscards()));
+        $this->assertSame(
+            ['in_discards', 'out_discards'],
+            $this->names(Port::where('device_id', $this->device->device_id)->applyFilters([
+                'discards' => ['eq' => '1'],
+                'ignore' => ['eq' => '0'],
+                'disabled' => ['eq' => '0'],
+            ]))
+        );
     }
 
     public function testDiscardsFilterYes(): void
@@ -87,8 +94,9 @@ final class PortDiscardsFilterTest extends DBTestCase
         $cases = [
             [['view' => 'detail', 'filter' => ['errors' => ['eq' => '1']]], 'true', 'false'],
             [['view' => 'detail', 'filter' => ['discards' => ['eq' => '1']]], 'false', 'true'],
-            [['view' => 'detail'], 'true', 'true'],
+            [['view' => 'detail'], 'true', 'false'],
             [[], 'false', 'false'],
+            [['filter' => ['discards' => ['eq' => '1']]], 'false', 'true'],
         ];
 
         $user = User::factory()->admin()->create(['enabled' => true]);

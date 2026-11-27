@@ -134,7 +134,7 @@ class MenuComposer
         $vars['show_ports_menu'] = Gate::allows('viewAny', Port::class)
             || Gate::allows('viewAny', Vlan::class)
             || Gate::allows('viewAny', Bill::class);
-        $vars['port_counts'] = ObjectCache::portCounts(['errored', 'discarded', 'ignored', 'deleted', 'shutdown', 'down']);
+        $vars['port_counts'] = ObjectCache::portCounts(['errored', 'ignored', 'deleted', 'shutdown', 'down']);
         $vars['port_counts']['pseudowire'] = LibrenmsConfig::get('enable_pseudowires') ? ObjectCache::portCounts(['pseudowire'])['pseudowire'] : 0;
 
         $vars['port_counts']['alerted'] = 0; // not actually supported on old...

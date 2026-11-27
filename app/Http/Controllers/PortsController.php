@@ -33,7 +33,6 @@ class PortsController extends Controller
                 'packets_in',
                 'packets_out',
                 'errors',
-                'discards',
                 'speed',
                 'port',
                 'media',
@@ -56,11 +55,10 @@ class PortsController extends Controller
             $graph = substr($view, 6);
         }
 
-        // the Errored and Discarded views only show their own counters, detail view shows both
+        // discard columns only with the discards filter, which also hides the error columns
         $filterErrors = $request->boolean('filter.errors.eq');
         $filterDiscards = $request->boolean('filter.discards.eq');
         $showErrors = $filterErrors || ($view === 'detail' && ! $filterDiscards);
-        $showDiscards = $filterDiscards || ($view === 'detail' && ! $filterErrors);
 
         $graphTemplate = [
             'height' => 100,
@@ -80,7 +78,7 @@ class PortsController extends Controller
             'graph' => $graph,
             'show_detail' => $view === 'detail' ? 'true' : 'false',
             'show_errors' => $showErrors ? 'true' : 'false',
-            'show_discards' => $showDiscards ? 'true' : 'false',
+            'show_discards' => $filterDiscards ? 'true' : 'false',
             'ports' => $this->getPorts($view, $perPage, $sort),
             'group' => $request->array('filter')['groups.id']['eq'] ?? 0,
             'perPage' => $perPage,
@@ -282,8 +280,6 @@ class PortsController extends Controller
             'packets_in' => $portsQuery->orderBy('ifInUcastPkts_rate', 'desc'),
             'packets_out' => $portsQuery->orderBy('ifOutUcastPkts_rate', 'desc'),
             'errors' => $portsQuery->orderByRaw('ifInErrors_rate + ifOutErrors_rate desc'),
-            'discards' => $portsQuery->leftJoin('ports_statistics', 'ports.port_id', 'ports_statistics.port_id')
-                ->orderByRaw('COALESCE(ports_statistics.ifInDiscards_rate, 0) + COALESCE(ports_statistics.ifOutDiscards_rate, 0) desc'),
             'speed' => $portsQuery->orderBy('ifSpeed', 'desc'),
             'port' => $portsQuery->orderBy('ifDescr'),
             'media' => $portsQuery->orderBy('ifType'),

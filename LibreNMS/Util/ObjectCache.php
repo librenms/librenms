@@ -130,7 +130,7 @@ class ObjectCache
 
     /**
      * @param  int  $device_id  device id of the device to get counts for, 0 means all
-     * @param  array  $fields  array of counts to get. Valid options: total, up, down, ignored, shutdown, disabled, deleted, errored, discarded, pseudowire
+     * @param  array  $fields  array of counts to get. Valid options: total, up, down, ignored, shutdown, disabled, deleted, errored, pseudowire
      * @return mixed
      */
     public static function portCounts($fields = ['total'], $device_id = 0)
@@ -158,7 +158,6 @@ class ObjectCache
                 'disabled' => $query->isDisabled()->count(),
                 'deleted' => $query->isDeleted()->count(),
                 'errored' => $query->hasErrors()->count(),
-                'discarded' => $query->hasDiscards()->count(),
                 'pseudowire' => Pseudowire::hasAccess(auth()->user())->count(),
                 default => $query->isNotDeleted()->count(),
             };
