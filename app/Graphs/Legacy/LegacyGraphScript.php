@@ -198,7 +198,6 @@ final readonly class LegacyGraphScript
             include_once base_path('includes/common.php');
             include_once base_path('includes/html/functions.inc.php');
             include_once base_path('includes/dbFacile.php');
-            include_once base_path('includes/rewrites.php');
 
             return (static function (string $__file, array $__scope): array {
                 extract($__scope, EXTR_SKIP);

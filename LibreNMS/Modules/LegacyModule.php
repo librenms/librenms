@@ -90,7 +90,6 @@ class LegacyModule implements Module, SupportsSubmodules
 
         try {
             include_once base_path('includes/dbFacile.php');
-            include_once base_path('includes/rewrites.php');
             include base_path("includes/discovery/$this->name.inc.php");
         } finally {
             Debug::enableErrorReporting(); // and back to normal
@@ -109,7 +108,6 @@ class LegacyModule implements Module, SupportsSubmodules
         $submodules = $this->submodules;
 
         include_once base_path('includes/dbFacile.php');
-        include_once base_path('includes/rewrites.php');
         include base_path("includes/polling/$this->name.inc.php");
     }
 
