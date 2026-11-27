@@ -49,7 +49,7 @@ return [
         ],
         'discovery' => [
             'general' => ['name' => 'General Discovery Settings'],
-            'routes' => ['name' => 'Routes Discovery Module'],
+            'route' => ['name' => 'Routes Discovery Module'],
             'discovery_modules' => ['name' => 'Discovery Modules'],
             'autodiscovery' => ['name' => 'Network Discovery'],
             'ports' => ['name' => 'Ports Module'],
@@ -837,7 +837,7 @@ return [
                 'description' => 'QoS',
             ],
 
-            'route' => [
+            'routes' => [
                 'description' => 'Route',
             ],
 

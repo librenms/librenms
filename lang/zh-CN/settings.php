@@ -25,7 +25,7 @@ return [
         ],
         'discovery' => [
             'general' => ['name' => '一般探索设定'],
-            'routes' => ['name' => '路由探索模块'],
+            'route' => ['name' => '路由探索模块'],
         ],
         'external' => [
             'binaries' => ['name' => '执行文件位置'],

@@ -38,7 +38,7 @@ return [
         ],
         'discovery' => [
             'general' => ['name' => 'Общие настройки обнаружения'],
-            'routes' => ['name' => 'Модуль обнаружения маршрутов'],
+            'route' => ['name' => 'Модуль обнаружения маршрутов'],
             'discovery_modules' => ['name' => 'Модули обнаружения'],
             'ports' => ['name' => 'Модуль портов'],
             'storage' => ['name' => 'Модуль хранения'],
@@ -687,7 +687,7 @@ return [
             'processors' => [
                 'description' => 'Процессоры',
             ],
-            'route' => [
+            'routes' => [
                 'description' => 'Маршрут',
             ],
             'sensors' => [

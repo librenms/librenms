@@ -37,7 +37,7 @@ return [
         ],
         'discovery' => [
             'general' => ['name' => 'Загальні налаштування віднайдення'],
-            'routes' => ['name' => 'Модуль віднайдення маршрутів'],
+            'route' => ['name' => 'Модуль віднайдення маршрутів'],
             'discovery_modules' => ['name' => 'Модулі віднайдення'],
             'storage' => ['name' => 'Модуль збереження даних'],
             'networks' => ['name' => 'Мережі'],
@@ -542,7 +542,7 @@ return [
                 'description' => 'Процесори',
             ],
 
-            'route' => [
+            'routes' => [
                 'description' => 'Маршрут',
             ],
 

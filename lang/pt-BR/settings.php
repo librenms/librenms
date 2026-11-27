@@ -39,7 +39,7 @@ return [
         ],
         'discovery' => [
             'general' => ['name' => 'Configurações de Descoberta'],
-            'routes' => ['name' => 'Módulo de Descoberta de Rotas'],
+            'route' => ['name' => 'Módulo de Descoberta de Rotas'],
             'discovery_modules' => ['name' => 'Módulos de Descoberta'],
             'ports' => ['name' => 'Módulo de Portas'],
             'storage' => ['name' => 'Módulo de Armazenamento'],
@@ -693,7 +693,7 @@ return [
             'qos' => [
                 'description' => 'QoS',
             ],
-            'route' => [
+            'routes' => [
                 'description' => 'Rota',
             ],
             'sensors' => [

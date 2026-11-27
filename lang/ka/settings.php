@@ -39,7 +39,7 @@ return [
         ],
         'discovery' => [
             'general' => ['name' => 'მოწყობილობის ჯგუფების პარამეტრები'],
-            'routes' => ['name' => 'რაუტების აღმოჩენის მოდული'],
+            'route' => ['name' => 'რაუტების აღმოჩენის მოდული'],
             'discovery_modules' => ['name' => 'აღმოჩენის მოდულები'],
             'autodiscovery' => ['name' => 'ქსელის აღმოჩენა'],
             'ports' => ['name' => 'პორტების მოდული'],
@@ -701,7 +701,7 @@ return [
                 'description' => 'QoS',
             ],
 
-            'route' => [
+            'routes' => [
                 'description' => 'რაუტი',
             ],
 
