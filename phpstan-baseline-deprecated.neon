@@ -4115,15 +4115,6 @@ parameters:
 
 		-
 			message: '''
-				#^Call to deprecated function device_by_id_cache\(\)\:
-				Use DeviceCache\:\:get\(\) and the Device model instead$#
-			'''
-			identifier: function.deprecated
-			count: 1
-			path: includes/rewrites.php
-
-		-
-			message: '''
 				#^Call to deprecated function dbPlaceHolders\(\)\:
 				Please use Eloquent instead; https\://laravel\.com/docs/eloquent$#
 			'''
