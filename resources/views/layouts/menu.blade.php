@@ -776,6 +776,10 @@
                                 <li><a href="https://docs.librenms.org/API/" target="_blank" rel="noopener"><i
                                             class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> {{ __('API Docs') }}</a>
                                 </li>
+                                @config('api.v1.enabled')
+                                    <li><a href="{{ route('api-docs.v1.index') }}"><i class="fa fa-book fa-fw fa-lg"
+                                                aria-hidden="true"></i> {{ __('API v1 Reference') }}</a></li>
+                                @endconfig
                             </ul>
                         </li>
                         @endcan

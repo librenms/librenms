@@ -14,6 +14,19 @@ concurrency:
 
 jobs:
 
+  openapi:
+    runs-on: ubuntu-26.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: resources/openapi
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Lint API v1 OpenAPI specification
+        run: npx --yes @redocly/cli@2.83.0 lint --extends=recommended resources/openapi/v1.yaml
+
   dusk-php:
     runs-on: ubuntu-26.04
     steps:
