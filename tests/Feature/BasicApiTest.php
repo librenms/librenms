@@ -84,6 +84,32 @@ final class BasicApiTest extends DBTestCase
         Http::assertSentCount(1);
     }
 
+    public function testListOxidizedWithLocationMapAndDeviceWithoutLocation(): void
+    {
+        LibrenmsConfig::set('oxidized.group_support', true);
+        LibrenmsConfig::set('oxidized.maps', [
+            'group' => [
+                'location' => [
+                    ['match' => 'Server Room A', 'value' => 'server-room'],
+                ],
+            ],
+        ]);
+        $user = User::factory()->admin()->create();
+        $token = $user->createToken('test');
+        $location = Location::factory()->create(['location' => 'Server Room A']);
+        Device::factory()->create(['hostname' => 'with-location.example.com', 'location_id' => $location->id]);
+        Device::factory()->create(['hostname' => 'without-location.example.com', 'location_id' => null]);
+
+        $nodes = $this->json('GET', '/api/v0/oxidized', [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertOk()
+            ->collect()
+            ->keyBy('hostname');
+
+        $this->assertSame('server-room', $nodes['with-location.example.com']['group'] ?? null);
+        $this->assertArrayHasKey('without-location.example.com', $nodes);
+        $this->assertArrayNotHasKey('group', $nodes['without-location.example.com']);
+    }
+
     public function testListDevices(): void
     {
         /** @var User $user */
