@@ -28,7 +28,6 @@ namespace LibreNMS\OS;
 
 use App\Facades\PortCache;
 use App\Models\Device;
-use App\Models\EntPhysical;
 use App\Models\Port;
 use App\Models\Sensor;
 use App\Models\Transceiver;
@@ -71,8 +70,6 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
         8 => ['errorHighThreshold', 2], 9 => ['errorWrongData', 2], 10 => ['errorLowDataOverflow', 2],
         11 => ['errorHighDataOverflow', 2],
     ];
-
-    private ?array $portEntities = null;
 
     private ?array $portIfIndexes = null;
 
@@ -138,7 +135,7 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
             $transceivers->push(new Transceiver([
                 'port_id' => $portId,
                 'index' => $sfpIndex,
-                'entity_physical_index' => $this->portEntityIndex($ifIndex),
+                'entity_physical_index' => $ifIndex,
                 'connector' => $this->sfpConnector($sfp),
             ]));
         }
@@ -159,7 +156,7 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
     }
 
     /**
-     * A power value whose status is noData is not a measure: it is returned empty, so that
+     * A power value that is missing or whose status is noData is not a measure: it is returned empty, so that
      * UserFuncHelper::ifotecOpticalPower() records it as unknown. The statuses are read in one get.
      */
     public function pollSensors(EloquentCollection $sensors): array
@@ -168,6 +165,9 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
 
         $statusOids = [];
         foreach ($sensors->where('sensor_type', 'ifotecSfp') as $sensor) {
+            // no answer is unknown, not 0
+            $values[$sensor->sensor_id] ??= '';
+
             $statusOid = $this->powerStatusOid((string) $sensor->sensor_oid);
             if ($statusOid !== null) {
                 $statusOids[$sensor->sensor_id] = $statusOid;
@@ -267,8 +267,8 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
                     'sensor_limit' => $limitHigh,
                     'sensor_current' => $minusInfinity ? self::minusInfinityPower($limitLow) : (float) $value,
                     'user_func' => 'ifotecOpticalPower',
-                    'entPhysicalIndex' => $this->portEntityIndex($ifIndex),
-                    'entPhysicalIndex_measured' => 'port',
+                    'entPhysicalIndex' => $ifIndex,
+                    'entPhysicalIndex_measured' => 'ports',
                     'group' => 'transceiver',
                 ]);
 
@@ -334,8 +334,8 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
                     'sensor_type' => $stateName,
                     'sensor_descr' => "$ifName Transceiver $label",
                     'sensor_current' => $this->stateValue($sfp[$field] ?? null, $map),
-                    'entPhysicalIndex' => $this->portEntityIndex($ifIndex),
-                    'entPhysicalIndex_measured' => 'port',
+                    'entPhysicalIndex' => $ifIndex,
+                    'entPhysicalIndex_measured' => 'ports',
                     'group' => 'transceiver',
                 ])->withStates($this->stateDefinitions($map)));
             }
@@ -357,19 +357,6 @@ class Ifotec extends OS implements OSDiscovery, TransceiverDiscovery
         $table = SnmpQuery::cache()->hideMib()->walk('IFOTEC-SMI::ifoSFPTable')->table(2);
 
         return $table[$sysIndex] ?? [];
-    }
-
-    /**
-     * entPhysicalIndex of a port is not its ifIndex: look it up from the ifIndex of the entity.
-     */
-    private function portEntityIndex(int $ifIndex): ?int
-    {
-        $this->portEntities ??= EntPhysical::where('device_id', $this->getDevice()->device_id)
-            ->whereNotNull('ifIndex')
-            ->pluck('entPhysicalIndex', 'ifIndex')
-            ->all();
-
-        return isset($this->portEntities[$ifIndex]) ? (int) $this->portEntities[$ifIndex] : null;
     }
 
     /**
