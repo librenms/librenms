@@ -1017,6 +1017,10 @@ isis_adjacencies:
     - { Field: isisISAdjIPAddrType, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: isisISAdjIPAddrAddress, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: isisCircAdminState, Type: varchar(16), 'Null': false, Extra: '', Default: 'off' }
+    - { Field: isisCircLevelMetricL1, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: isisCircLevelWideMetricL1, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: isisCircLevelMetricL2, Type: 'int unsigned', 'Null': true, Extra: '' }
+    - { Field: isisCircLevelWideMetricL2, Type: 'int unsigned', 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     isis_adjacencies_device_id_index: { Name: isis_adjacencies_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

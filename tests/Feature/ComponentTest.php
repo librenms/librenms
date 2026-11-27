@@ -28,6 +28,7 @@ namespace LibreNMS\Tests\Feature;
 
 use App\Models\ComponentPref;
 use App\Models\ComponentStatusLog;
+use App\Models\Eventlog;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Str;
 use LibreNMS\Component;
@@ -142,6 +143,28 @@ final class ComponentTest extends DBTestCase
         $remove = $this->buildExpected($base)[$base->device_id];
         $component->setComponentPrefs($base->device_id, $remove);
         $this->assertFalse(ComponentPref::where('component', $base->id)->exists());
+    }
+
+    public function testSetComponentPrefsWithoutLog(): void
+    {
+        $base = \App\Models\Component::factory()->create(); /** @var \App\Models\Component $base */
+        $component = new Component();
+
+        $prefs = $this->buildExpected($base)[$base->device_id];
+        $prefs[$base->id]['counter'] = 1;
+        $component->setComponentPrefs($base->device_id, $prefs, log: false);
+
+        $prefs[$base->id]['counter'] = 2;
+        $component->setComponentPrefs($base->device_id, $prefs, log: false);
+
+        // The value is still saved, only the eventlog is skipped
+        $this->assertEquals(2, ComponentPref::where(['component' => $base->id, 'attribute' => 'counter'])->value('value'));
+        $this->assertFalse(Eventlog::where('reference', $base->id)->exists());
+
+        // Logging stays on by default
+        $prefs[$base->id]['counter'] = 3;
+        $component->setComponentPrefs($base->device_id, $prefs);
+        $this->assertContains("Component: $base->type($base->id). Attribute: counter, was modified from: 2, to: 3", Eventlog::where('reference', $base->id)->pluck('message'));
     }
 
     public function testCreateComponent(): void

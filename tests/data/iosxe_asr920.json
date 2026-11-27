@@ -6644,7 +6644,11 @@
                     "isisISAdjAreaAddress": "49.00.00",
                     "isisISAdjIPAddrType": "ipv4",
                     "isisISAdjIPAddrAddress": "10.246.1.30",
-                    "isisCircAdminState": "on"
+                    "isisCircAdminState": "on",
+                    "isisCircLevelMetricL1": null,
+                    "isisCircLevelWideMetricL1": null,
+                    "isisCircLevelMetricL2": null,
+                    "isisCircLevelWideMetricL2": null
                 },
                 {
                     "index": "[33][2]",
@@ -6657,7 +6661,11 @@
                     "isisISAdjAreaAddress": "49.00.00",
                     "isisISAdjIPAddrType": "ipv4",
                     "isisISAdjIPAddrAddress": "10.246.1.5",
-                    "isisCircAdminState": "on"
+                    "isisCircAdminState": "on",
+                    "isisCircLevelMetricL1": null,
+                    "isisCircLevelWideMetricL1": null,
+                    "isisCircLevelMetricL2": null,
+                    "isisCircLevelWideMetricL2": null
                 },
                 {
                     "index": "[34][3]",
@@ -6670,7 +6678,11 @@
                     "isisISAdjAreaAddress": "49.00.00",
                     "isisISAdjIPAddrType": "ipv4",
                     "isisISAdjIPAddrAddress": "10.246.1.33",
-                    "isisCircAdminState": "on"
+                    "isisCircAdminState": "on",
+                    "isisCircLevelMetricL1": null,
+                    "isisCircLevelWideMetricL1": null,
+                    "isisCircLevelMetricL2": null,
+                    "isisCircLevelWideMetricL2": null
                 }
             ]
         },

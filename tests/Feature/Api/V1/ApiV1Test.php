@@ -6,18 +6,22 @@ use App\Facades\LibrenmsConfig;
 use App\Http\Middleware\EnforceJsonApi;
 use App\Http\Middleware\FormatJsonApiError;
 use App\Models\Device;
+use App\Models\Port;
 use App\Models\User;
 use Illuminate\Foundation\Events\DiagnosingHealth;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Testing\TestResponse;
 use Illuminate\Validation\ValidationException;
+use JsonSchema\Validator;
 use Laravel\Sanctum\Sanctum;
 use LibreNMS\Tests\DBTestCase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Behaviour shared by every v1 endpoint: enabling, authentication, authorization and error documents.
@@ -62,6 +66,56 @@ final class ApiV1Test extends DBTestCase
     public function testHealthDoesNotRequireApiAccess(): void
     {
         $this->getJson('/api/v1/health')->assertOk();
+    }
+
+    public function testResponsesMatchOpenApiSpecification(): void
+    {
+        $specification = Yaml::parseFile(resource_path('openapi/v1.yaml'), Yaml::PARSE_OBJECT_FOR_MAP);
+        $port = Port::factory()->for(Device::factory()->state([
+            'last_polled' => now(),
+            'uptime' => 3600,
+            'last_polled_timetaken' => 0.25,
+        ]))->create(['ifSpeed' => 1000000000, 'ifVlan' => '12', 'poll_time' => now()->timestamp]);
+        $token = User::factory()->admin()->create()->createToken('openapi')->plainTextToken;
+        $headers = ['Authorization' => 'Bearer ' . $token];
+
+        $responses = [
+            ['/health', $this->getJson('/api/v1/health')->assertOk()],
+            ['/system', $this->getJson('/api/v1/system')->assertUnauthorized()],
+            ['/system', $this->getJson('/api/v1/system', $headers)->assertOk()],
+            ['/devices', $this->getJson('/api/v1/devices?page[size]=0', $headers)->assertBadRequest()],
+            ['/devices', $this->getJson('/api/v1/devices?page[size]=2', $headers)->assertOk()],
+            ['/devices/{device}', $this->getJson("/api/v1/devices/$port->device_id", $headers)->assertOk()],
+            ['/devices/{device}/ports', $this->getJson("/api/v1/devices/$port->device_id/ports", $headers)->assertOk()],
+            ['/ports', $this->getJson('/api/v1/ports?include=device&fields[ports]=name,device', $headers)->assertOk()],
+            ['/ports/{port}', $this->getJson("/api/v1/ports/$port->port_id", $headers)->assertOk()],
+            ['/ports/{port}/device', $this->getJson("/api/v1/ports/$port->port_id/device", $headers)->assertOk()],
+        ];
+
+        foreach ($responses as [$path, $response]) {
+            $this->assertMatchesOpenApiResponse($specification, $path, $response);
+        }
+    }
+
+    /** @param  TestResponse<Response>  $response */
+    private function assertMatchesOpenApiResponse(\stdClass $specification, string $path, TestResponse $response): void
+    {
+        $status = (string) $response->getStatusCode();
+        $mediaType = $response->headers->get('Content-Type');
+        $definition = $specification->paths->{$path}->get->responses->{$status};
+        if (isset($definition->{'$ref'})) {
+            $name = basename($definition->{'$ref'});
+            $definition = $specification->components->responses->{$name};
+        }
+        $this->assertObjectHasProperty($mediaType, $definition->content, "GET $path ($status)");
+
+        $schema = clone $definition->content->{$mediaType}->schema;
+        $schema->components = $specification->components;
+        $document = json_decode($response->getContent(), flags: JSON_THROW_ON_ERROR);
+        $validator = new Validator;
+        $validator->validate($document, $schema);
+
+        $this->assertSame([], $validator->getErrors(), sprintf('GET %s (%s): %s', $path, $status, json_encode($validator->getErrors())));
     }
 
     public function testUnhealthyIsGenericServiceUnavailable(): void

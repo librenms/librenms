@@ -124,12 +124,14 @@ class LegacyGraphTest extends TestCase
     public function test_multi_bits_aggregate_requires_two_series(): void
     {
         Rrd::partialMock()->shouldReceive('checkRrdExists')->andReturn(true);
-        $device = Device::factory()->create();
-        $ports = Port::factory()->count(2)->for($device)->create();
+        $customer = ['port_descr_type' => 'cust', 'port_descr_descr' => 'Example'];
+        Port::factory()->for(Device::factory())->create($customer);
+        $onePort = $this->aggregateOptions();
+        Port::factory()->for(Device::factory())->create($customer);
 
-        $this->assertEmpty($this->aggregateOptions((string) $ports[0]->port_id));
-        $this->assertNotEmpty($this->aggregateOptions($ports->pluck('port_id')->implode(',')));
-        $this->assertEmpty($this->aggregateOptions($ports->pluck('port_id')->implode(','), noagg: true));
+        $this->assertEmpty($onePort);
+        $this->assertNotEmpty($this->aggregateOptions());
+        $this->assertEmpty($this->aggregateOptions(noagg: true));
     }
 
     private function deviceGraph(Device $device): LegacyGraph
@@ -143,9 +145,9 @@ class LegacyGraphTest extends TestCase
     /**
      * @return array<int|string, mixed>
      */
-    private function aggregateOptions(string $ids, bool $noagg = false): array
+    private function aggregateOptions(bool $noagg = false): array
     {
-        $graph = (new GraphFactory)->graphFor(new GraphParameters(['type' => 'multiport_bits_separate', 'id' => $ids, 'noagg' => $noagg]));
+        $graph = (new GraphFactory)->graphFor(new GraphParameters(['type' => 'customer_bits', 'customer' => 'Example', 'noagg' => $noagg]));
         $this->assertInstanceOf(LegacyGraph::class, $graph);
 
         return preg_grep('/^CDEF:aggr/', array_map(strval(...), $graph->getRrdCommandOptions())) ?: [];

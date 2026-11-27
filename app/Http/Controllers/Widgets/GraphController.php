@@ -246,7 +246,7 @@ class GraphController extends WidgetController
             } elseif ($aggregate_type == 'ports') {
                 $port_ids = $settings['graph_ports'];
                 $params['id'] = implode(',', $port_ids);
-                $settings['graph_type'] = 'multiport_bits_separate';
+                $settings['graph_type'] = 'multiport_bits';
             } else {
                 $port_types = collect((array) $aggregate_type)->map(function ($type) {
                     // check for config definitions
@@ -264,7 +264,7 @@ class GraphController extends WidgetController
                     }
                 })->pluck('port_id')->all();
                 $params['id'] = implode(',', $port_ids);
-                $settings['graph_type'] = 'multiport_bits_separate';
+                $settings['graph_type'] = 'multiport_bits';
             }
         } else {
             $params['id'] = $settings['graph_' . $type];
