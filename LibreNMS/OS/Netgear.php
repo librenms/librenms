@@ -41,7 +41,7 @@ class Netgear extends OS implements NeighborPortResolution, TransceiverDiscovery
 {
     public function discoverTransceivers(): Collection
     {
-        return SnmpQuery::walk('NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoTable')->mapTable(function ($data, $ifIndex) {
+        return SnmpQuery::walk('NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoTable')->throwIfConnectionError()->mapTable(function ($data, $ifIndex) {
             $type = $this->cleanString($data['NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoCompliance'] ?? null);
             // link lengths are the raw SFF-8472 values, in units of 10 m
             $length50 = (int) ($data['NETGEAR-BOXSERVICES-PRIVATE-MIB::boxServicesFiberPortsOpticsInfoLinkLength50um'] ?? 0);
