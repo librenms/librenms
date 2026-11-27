@@ -20,18 +20,17 @@ class RrdTrafficDefinition
     private array $drawing = [];
     /** @var array<string, list<string>> */
     private array $values = [];
-    /** @var array<string, list<string>> */
+    /** @var array<string, list<array{string, string}>> value id and label, by period */
     private array $totals = [];
 
     /**
-     * @param  Closure(string $id, string $unit): list<string>  $legendValues  the legend values of a row, with the percentile columns of the graph
      * @param  Closure(string $id, float $factor, string $color): list<string>  $percentileLines  the percentile lines of a value
      */
     public function __construct(
         private readonly TrafficOptions $options,
         private readonly GraphParameters $params,
         private readonly GraphTheme $theme,
-        private readonly Closure $legendValues,
+        private readonly RrdLegend $legend,
         private readonly Closure $percentileLines,
     ) {
     }
@@ -63,8 +62,8 @@ class RrdTrafficDefinition
             }
             $previousColor = $this->theme->previous($series->style->invert);
             $this->defs[] = "CDEF:{$previous}drawn=$previous,$factor,*";
-            $this->drawing[] = "LINE1.25:{$previous}drawn#$previousColor:" . RrdSeriesDefinition::legendLabel(__('graph.legend.previous', ['series' => $series->description]));
-            array_push($this->drawing, ...($this->legendValues)($previous, $series->unit));
+            $this->drawing[] = "LINE1.25:{$previous}drawn#$previousColor:" . $this->legend->label(RrdLegend::previousLabel($series->description));
+            array_push($this->drawing, ...$this->legend->values($previous, $series->unit));
             if ($series->style->percentileLines) {
                 array_push($this->drawing, ...($this->percentileLines)($previous, $drawFactor, $previousColor));
             }
@@ -80,7 +79,7 @@ class RrdTrafficDefinition
             "VDEF:{$id}total={$id}bytes,TOTAL",
         );
         $this->values[$period][] = $id;
-        $this->totals[$period][] = "GPRINT:{$id}total:" . Rrd::safeDescr($series->description) . " %6.2lf%s{$this->options->totalUnit}";
+        $this->totals[$period][] = ["{$id}total", $series->description];
     }
 
     /** @return list<string> */
@@ -109,9 +108,7 @@ class RrdTrafficDefinition
                 $drawing[] = "GPRINT:traffic{$period}pct:%6.2lf%s\\n";
             }
             if ($this->params->visible('total')) {
-                $drawing[] = "GPRINT:traffic{$period}bytes:" . __($period === '' ? 'graph.legend.total' : 'graph.legend.previous_total') . " %6.2lf%s{$this->options->totalUnit}";
-                array_push($drawing, ...$totals);
-                $drawing[array_key_last($drawing)] .= '\\l';
+                array_push($drawing, ...$this->legend->totals([["traffic{$period}bytes", __($period === '' ? 'graph.legend.total' : 'graph.legend.previous_total')], ...$totals], $this->options->totalUnit));
             }
         }
 

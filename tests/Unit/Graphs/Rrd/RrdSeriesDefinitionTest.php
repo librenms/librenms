@@ -39,7 +39,8 @@ class RrdSeriesDefinitionTest extends TestCase
     {
         $this->assertSame([
             'COMMENT:Traffic            ',
-            "COMMENT:         Now         Min         Max         Avg\l",
+            // Min does not fit next to the labels at the default width
+            "COMMENT:         Now         Max         Avg\l",
             'DEF:ds0=host/test.rrd:in:AVERAGE',
             'DEF:ds0min=host/test.rrd:in:MIN',
             'DEF:ds0max=host/test.rrd:in:MAX',
@@ -51,12 +52,10 @@ class RrdSeriesDefinitionTest extends TestCase
             'AREA:ds1drawn#D42E08',
             'LINE1.25:ds0#FF0000:In               ',
             'GPRINT:ds0:LAST: %7.2lf%sbps\g',
-            'GPRINT:ds0min:MIN: %7.2lf%sbps\g',
             'GPRINT:ds0max:MAX: %7.2lf%sbps\g',
             'GPRINT:ds0:AVERAGE: %7.2lf%sbps\n',
             'LINE1.25:ds1drawn#D42E08:Out              ',
             'GPRINT:ds1:LAST: %7.2lf%sbps\g',
-            'GPRINT:ds1min:MIN: %7.2lf%sbps\g',
             'GPRINT:ds1max:MAX: %7.2lf%sbps\g',
             'GPRINT:ds1:AVERAGE: %7.2lf%sbps\n',
             'HRULE:0#555555',
@@ -485,7 +484,7 @@ class RrdSeriesDefinitionTest extends TestCase
         $definition = $this->build(['a' => new DataSeries($this->metric, 'a', 'A', 'a%:b')]);
 
         $this->assertContains('GPRINT:ds0:LAST: %7.2lf%sa%%\:b\g', $definition);
-        $this->assertSame("COMMENT:          Now          Min          Max          Avg\l", $definition[1]);
+        $this->assertSame("COMMENT:          Now          Max          Avg\l", $definition[1]);
     }
 
     public function test_it_skips_series_without_an_rrd_file(): void

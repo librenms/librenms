@@ -15,12 +15,27 @@ class RrdOptionsBuilder
     private const int TINY = 99;
     private const int MEDIUM_SMALL = 300;
     private const int MEDIUM = 350;
+    // measured, added to the graph width by the axis, by font size
+    private const array AXIS_PIXELS = [7 => 75, 8 => 81];
 
     private readonly int $fontSize;
 
     public function __construct(private readonly GraphParameters $params)
     {
-        $this->fontSize = $params->width <= self::MEDIUM_SMALL ? 7 : 8;
+        $this->fontSize = self::fontSize($params->width);
+    }
+
+    public static function fontSize(int $width): int
+    {
+        return $width <= self::MEDIUM_SMALL ? 7 : 8;
+    }
+
+    /**
+     * The requested width in full size mode, otherwise the graph and its axis
+     */
+    public static function imageWidth(GraphParameters $params): int
+    {
+        return $params->full_size ? $params->width : $params->width + self::AXIS_PIXELS[self::fontSize($params->width)];
     }
 
     /**

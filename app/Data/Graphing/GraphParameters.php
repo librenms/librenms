@@ -15,6 +15,11 @@ readonly class GraphParameters
     /** Graph type and subtype, a subtype may contain spaces: customoid subtypes are the description */
     public const TYPE_PATTERN = '/^([a-zA-Z0-9]+)_([a-zA-Z0-9_. -]+)$/';
     public const SUBTYPE_PATTERN = '/^[a-zA-Z0-9_. -]+$/';
+    public const ID_LIST_PATTERN = '/^\d+(,\d+)*$/';
+    /** Old graph types that existing links still use */
+    private const array TYPE_ALIASES = [
+        'multiport_bits_separate' => 'multiport_bits',
+    ];
     private const int SMALL = 224;
 
     /** @var array<string, bool> */
@@ -132,6 +137,6 @@ readonly class GraphParameters
      */
     private function extractType(string $type): array
     {
-        return preg_match(self::TYPE_PATTERN, $type, $matches) ? [$matches[1], $matches[2]] : ['', ''];
+        return preg_match(self::TYPE_PATTERN, self::TYPE_ALIASES[$type] ?? $type, $matches) ? [$matches[1], $matches[2]] : ['', ''];
     }
 }

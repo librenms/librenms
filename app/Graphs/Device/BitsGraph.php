@@ -2,12 +2,8 @@
 
 namespace App\Graphs\Device;
 
-use App\Data\Graphing\DataSeries;
-use App\Data\Graphing\GraphOptions;
-use App\Data\Graphing\SeriesRole;
-use App\Data\Graphing\SeriesStyle;
-use App\Data\Graphing\SeriesSum;
 use App\Facades\LibrenmsConfig;
+use App\Graphs\Port\StacksPortTraffic;
 use App\Models\Port;
 
 /**
@@ -15,6 +11,8 @@ use App\Models\Port;
  */
 class BitsGraph extends DeviceGraph
 {
+    use StacksPortTraffic;
+
     public function getTitle(): string
     {
         return $this->device()->display . '::bits';
@@ -23,41 +21,11 @@ class BitsGraph extends DeviceGraph
     public function getSeries(): array
     {
         $device = $this->device();
+        $ports = $device->ports()->isNotDeleted()->where('disabled', 0)->orderBy('ifIndex')->get()
+            ->each(fn (Port $port) => $port->setRelation('device', $device))
+            ->filter($this->isTraffic(...));
 
-        $series = [];
-        $in = [];
-        $out = [];
-        foreach ($device->ports()->isNotDeleted()->where('disabled', 0)->orderBy('ifIndex')->get() as $port) {
-            $port->setRelation('device', $device);
-            if (! $this->isTraffic($port)) {
-                continue;
-            }
-
-            $metric = $port->metricIdentity('port');
-            $label = $port->getShortLabel();
-            $in[] = "in_$port->port_id";
-            $out[] = "out_$port->port_id";
-            $series["in_$port->port_id"] = new DataSeries($metric, 'INOCTETS', $label . ' ' . __('graph.series.in'), 'bps', 8,
-                new SeriesStyle(SeriesRole::In, stacked: true));
-            $series["out_$port->port_id"] = new DataSeries($metric, 'OUTOCTETS', $label . ' ' . __('graph.series.out'), 'bps', 8,
-                new SeriesStyle(SeriesRole::Out, stacked: true, invert: true));
-        }
-
-        if ($series === []) {
-            return [];
-        }
-
-        // the device totals, their percentiles and previous period are drawn on the side of the axis of their ports
-        $series['in'] = new SeriesSum($in, __('graph.series.total_in'), 'bps', new SeriesStyle(legendOnly: true, percentileLines: true));
-        $series['out'] = new SeriesSum($out, __('graph.series.total_out'), 'bps', new SeriesStyle(invert: true, legendOnly: true, percentileLines: true));
-        $series['aggregate'] = new SeriesSum(['in', 'out'], __('graph.series.aggregate'), 'bps', new SeriesStyle(legendOnly: true));
-
-        return $series;
-    }
-
-    protected function options(): GraphOptions
-    {
-        return GraphOptions::forTraffic(series: ['in', 'out']);
+        return $this->portTrafficSeries($ports, fn (Port $port) => $port->getShortLabel());
     }
 
     /**
