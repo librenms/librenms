@@ -117,6 +117,29 @@ modules:
         state:
             data:
                 -
+                    oid: OG-STATUSv2-MIB::ogSerialPortTable
+                    value: OG-STATUSv2-MIB::ogSerialPortDCD
+                    num_oid: '.1.3.6.1.4.1.25049.17.2.1.16.{{ $index }}'
+                    descr: '{{ $index }}: {{ OG-STATUSv2-MIB::ogSerialPortLabel }}'
+                    index: 'ogSerialPortDCD.{{ $index }}'
+                    group: 'Serial Port'
+                    state_name: ogSerialPortDCD
+                    states:
+                        - { value: 1, descr: 'connected', generic: 0 }
+                        - { value: 2, descr: 'not connected', generic: 0 }
+                -
+                    oid: OG-OMTELEM-MIB::ogOmSerialPortTable
+                    value: OG-OMTELEM-MIB::ogOmSerialPortDCD
+                    num_oid: '.1.3.6.1.4.1.25049.10.19.2.2.1.17.{{ $index }}'
+                    descr: '{{ $index }}: {{ OG-OMTELEM-MIB::ogOmSerialPortLabel }}'
+                    index: 'ogOmSerialPortDCD.{{ $index }}'
+                    group: 'Serial Port'
+                    skip_values: 0
+                    state_name: ogOmSerialPortDCD
+                    states:
+                        - { value: 1, descr: 'connected', generic: 0 }
+                        - { value: 2, descr: 'not connected', generic: 0 }
+                -
                     oid: OG-STATUSv2-MIB::ogCellModemTable
                     value: OG-STATUSv2-MIB::ogCellModemConnected
                     num_oid: '.1.3.6.1.4.1.25049.17.17.1.5.{{ $index }}'
