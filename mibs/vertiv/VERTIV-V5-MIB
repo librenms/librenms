@@ -1,3 +1,4 @@
+
 VERTIV-V5-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -9,11 +10,15 @@ Gauge32, NOTIFICATION-TYPE, OBJECT-IDENTITY FROM SNMPv2-SMI
 sysName FROM SNMPv2-MIB;
 
 vertiv MODULE-IDENTITY
-	LAST-UPDATED "202001070000Z"
+	LAST-UPDATED "202007200000Z"
 	ORGANIZATION "Vertiv"
 	CONTACT-INFO "support@geistglobal.com"
 	DESCRIPTION
 		"The MIB for Vertiv products"
+
+	REVISION "202007200000Z"
+	DESCRIPTION
+		"Added residual current values"
 
 	REVISION "202001070000Z"
 	DESCRIPTION
@@ -238,8 +243,8 @@ pduMainEntry OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS current
 	DESCRIPTION
-		"Entry in the pduMainTable table: each entry contains an index
-		and other sensor details"
+		"Entry in the pduMainTable table: each entry contains an index and
+		other sensor details"
 	INDEX { pduMainIndex }
 	::= { pduMainTable 1 }
 
@@ -383,8 +388,8 @@ pduPhaseEntry OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS current
 	DESCRIPTION
-		"Entry in the pduPhaseTable table: each entry contains an index
-		and other sensor details"
+		"Entry in the pduPhaseTable table: each entry contains an index and
+		other sensor details"
 	INDEX { pduPhaseIndex }
 	::= { pduPhaseTable 1 }
 
@@ -399,7 +404,8 @@ PduPhaseEntry ::= SEQUENCE {
 	pduPhasePowerFactor				Gauge32,
 	pduPhaseEnergy				Gauge32,
 	pduPhaseBalance				Gauge32,
-	pduPhaseCurrentCrestFactor				Gauge32
+	pduPhaseCurrentCrestFactor				Gauge32,
+	pduPhaseResCurrentDetected				TruthValue
 }
 
 pduPhaseIndex OBJECT-TYPE
@@ -497,6 +503,15 @@ pduPhaseCurrentCrestFactor OBJECT-TYPE
 		"Current crest factor for phase, in hundredths"
 	::= { pduPhaseEntry 19 }
 
+pduPhaseResCurrentDetected OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Tells if residual current was detected. In normal operation, the value
+		will be false(2)."
+	::= { pduPhaseEntry 20 }
+
 --###########################################################################################--
 --pduBreakerTable--
 --###########################################################################################--
@@ -514,8 +529,8 @@ pduBreakerEntry OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS current
 	DESCRIPTION
-		"Entry in the pduBreakerTable table: each entry contains an index
-		and other sensor details"
+		"Entry in the pduBreakerTable table: each entry contains an index and
+		other sensor details"
 	INDEX { pduBreakerIndex }
 	::= { pduBreakerTable 1 }
 
@@ -528,7 +543,9 @@ PduBreakerEntry ::= SEQUENCE {
 	pduBreakerRealPower				Gauge32,
 	pduBreakerApparentPower				Gauge32,
 	pduBreakerPowerFactor				Gauge32,
-	pduBreakerEnergy				Gauge32
+	pduBreakerEnergy				Gauge32,
+	pduBreakerResCurrentDetected				TruthValue,
+	pduBreakerLossOfLoadDetected				TruthValue
 }
 
 pduBreakerIndex OBJECT-TYPE
@@ -614,6 +631,24 @@ pduBreakerEnergy OBJECT-TYPE
 		exist on all platforms, due to hardware differences."
 	::= { pduBreakerEntry 15 }
 
+pduBreakerResCurrentDetected OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Tells if residual current was detected. In normal operation, the value
+		will be false(2)."
+	::= { pduBreakerEntry 20 }
+
+pduBreakerLossOfLoadDetected OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Tells if a loss of load was detected. In normal operation, the value
+		will be false(2)."
+	::= { pduBreakerEntry 21 }
+
 --###########################################################################################--
 --pduLineTable--
 --###########################################################################################--
@@ -631,8 +666,8 @@ pduLineEntry OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS current
 	DESCRIPTION
-		"Entry in the pduLineTable table: each entry contains an index
-		and other sensor details"
+		"Entry in the pduLineTable table: each entry contains an index and
+		other sensor details"
 	INDEX { pduLineIndex }
 	::= { pduLineTable 1 }
 
@@ -1008,6 +1043,78 @@ pduOutletCurrentCrestFactor OBJECT-TYPE
 	::= { pduOutletMeterEntry 19 }
 
 --###########################################################################################--
+--pduResidualCurrentTable--
+--###########################################################################################--
+
+pduResidualCurrentTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PduResidualCurrentEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Residual current data for PDUs that support this feature"
+	::= { pdu 7 }
+
+pduResidualCurrentEntry OBJECT-TYPE
+	SYNTAX PduResidualCurrentEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entry in the pduResidualCurrentTable table: each entry contains an
+		index and other sensor details"
+	INDEX { pduResidualCurrentIndex }
+	::= { pduResidualCurrentTable 1 }
+
+PduResidualCurrentEntry ::= SEQUENCE {
+	pduResidualCurrentIndex				Integer32,
+	pduResidualCurrentName				SnmpAdminString,
+	pduResidualCurrentLabel				SnmpAdminString,
+	pduResidualCurrentAggregate				Gauge32,
+	pduResidualCurrentDc				Gauge32
+}
+
+pduResidualCurrentIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Table entry index value"
+	::= { pduResidualCurrentEntry 1 }
+
+pduResidualCurrentName OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (1..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU residual current name (factory-assigned)"
+	::= { pduResidualCurrentEntry 2 }
+
+pduResidualCurrentLabel OBJECT-TYPE
+	SYNTAX SnmpAdminString(SIZE (0..25))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU residual current label"
+	::= { pduResidualCurrentEntry 3 }
+
+pduResidualCurrentAggregate OBJECT-TYPE
+	SYNTAX Gauge32(0..1000)
+	UNITS "milliamps"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU residual current aggregate value in milliamps"
+	::= { pduResidualCurrentEntry 4 }
+
+pduResidualCurrentDc OBJECT-TYPE
+	SYNTAX Gauge32(0..1000)
+	UNITS "milliamps"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"PDU residual current DC value in milliamps"
+	::= { pduResidualCurrentEntry 5 }
+
+--###########################################################################################--
 --tempSensorTable--
 --###########################################################################################--
 
@@ -1024,8 +1131,8 @@ tempSensorEntry OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS current
 	DESCRIPTION
-		"Entry in the tempSensorTable table: each entry contains an index
-		and other sensor details"
+		"Entry in the tempSensorTable table: each entry contains an index and
+		other sensor details"
 	INDEX { tempSensorIndex }
 	::= { tempSensorTable 1 }
 
@@ -1205,8 +1312,8 @@ t3hdSensorEntry OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS current
 	DESCRIPTION
-		"Entry in the t3hdSensorTable table: each entry contains an index
-		and other sensor details"
+		"Entry in the t3hdSensorTable table: each entry contains an index and
+		other sensor details"
 	INDEX { t3hdSensorIndex }
 	::= { t3hdSensorTable 1 }
 
@@ -1372,8 +1479,8 @@ thdSensorEntry OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS current
 	DESCRIPTION
-		"Entry in the thdSensorTable table: each entry contains an index
-		and other sensor details"
+		"Entry in the thdSensorTable table: each entry contains an index and
+		other sensor details"
 	INDEX { thdSensorIndex }
 	::= { thdSensorTable 1 }
 
@@ -1468,8 +1575,8 @@ a2dSensorEntry OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS current
 	DESCRIPTION
-		"Entry in the a2dSensorTable table: each entry contains an index
-		and other sensor details"
+		"Entry in the a2dSensorTable table: each entry contains an index and
+		other sensor details"
 	INDEX { a2dSensorIndex }
 	::= { a2dSensorTable 1 }
 
@@ -1730,8 +1837,8 @@ sn2dSensorEntry OBJECT-TYPE
 	MAX-ACCESS  not-accessible
 	STATUS current
 	DESCRIPTION
-		"Entry in the sn2dSensorTable table: each entry contains an index
-		and other sensor details"
+		"Entry in the sn2dSensorTable table: each entry contains an index and
+		other sensor details"
 	INDEX { sn2dSensorIndex }
 	::= { sn2dSensorTable 1 }
 
@@ -5492,6 +5599,60 @@ pduOutletCurrentCrestFactorCLEAR NOTIFICATION-TYPE
 	DESCRIPTION "PDU outlet current crest factor clear trap"
 	::= { trapPrefix 20400 }
 
+--#####pduResidualCurrentTable#####--
+
+pduResidualCurrentAggregateNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduResidualCurrentAggregate,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduResidualCurrentLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU residual current aggregate trap"
+	::= { trapPrefix 12004 }
+
+pduResidualCurrentAggregateCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduResidualCurrentAggregate,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduResidualCurrentLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU residual current aggregate clear trap"
+	::= { trapPrefix 22004 }
+
+pduResidualCurrentDcNOTIFY NOTIFICATION-TYPE
+	OBJECTS {
+			pduResidualCurrentDc,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduResidualCurrentLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU residual current DC trap"
+	::= { trapPrefix 12005 }
+
+pduResidualCurrentDcCLEAR NOTIFICATION-TYPE
+	OBJECTS {
+			pduResidualCurrentDc,
+			trapThreshType,
+			trapSeverity,
+			sysName,
+			pduMainLabel,
+			pduResidualCurrentLabel
+		}
+	STATUS current
+	DESCRIPTION "PDU residual current DC clear trap"
+	::= { trapPrefix 22005 }
+
 --#####tempSensorTable#####--
 
 tempSensorAvailNOTIFY NOTIFICATION-TYPE
@@ -6456,16 +6617,16 @@ common OBJECT IDENTIFIER ::= { vertiv 42 }
 
 identity OBJECT IDENTIFIER ::= { common 1 }
 
-i03 OBJECT-IDENTITY
-	STATUS current
-	DESCRIPTION
-		"Value given for sysObjectID on IMD3 units"
-	::= { identity 53 }
-
 r05 OBJECT-IDENTITY
 	STATUS current
 	DESCRIPTION
 		"Value given for sysObjectID on R-Series units"
 	::= { identity 15 }
+
+i03 OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		"Value given for sysObjectID on IMD3 units"
+	::= { identity 53 }
 
 END

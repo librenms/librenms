@@ -1,0 +1,41 @@
+<?php
+
+namespace App\Graphs\Device;
+
+use App\Data\TimeSeries\MetricIdentity;
+use App\Graphs\AbstractSeriesGraph;
+use App\Models\Device;
+use LibreNMS\Exceptions\NoGraphData;
+
+/**
+ * A graph of one device, viewable by users who can view the device
+ */
+abstract class DeviceGraph extends AbstractSeriesGraph
+{
+    protected function isAuthorized(): bool
+    {
+        $device = $this->getPageContext()->device;
+
+        return $device !== null && $this->canView($device);
+    }
+
+    /**
+     * @throws NoGraphData
+     */
+    protected function device(): Device
+    {
+        return $this->getPageContext()->device ?? throw new NoGraphData;
+    }
+
+    /**
+     * A metric stored for the device
+     *
+     * @param  array<string, scalar>  $tags
+     *
+     * @throws NoGraphData
+     */
+    protected function metric(string $measurement, array $tags = []): MetricIdentity
+    {
+        return new MetricIdentity($measurement, ['hostname' => $this->device()->hostname, ...$tags]);
+    }
+}

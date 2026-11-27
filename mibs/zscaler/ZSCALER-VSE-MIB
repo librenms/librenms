@@ -1,0 +1,119 @@
+ZSCALER-VSE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Counter64,
+	Integer32, TimeTicks, mib-2,enterprises,
+	NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString,
+	PhysAddress, TruthValue, RowStatus,
+	TimeStamp, AutonomousType, TestAndIncr   FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                       FROM SNMPv2-CONF
+	snmpTraps                                FROM SNMPv2-MIB
+	IANAifType                               FROM IANAifType-MIB;
+
+vse MODULE-IDENTITY
+	LAST-UPDATED "202203170408Z"
+	ORGANIZATION "Zscaler"
+	CONTACT-INFO
+		"Zscaler Inc.
+		US"
+	DESCRIPTION
+		"Zscaler vSe specific information"
+	
+	REVISION      "202203170408Z"
+	DESCRIPTION
+		"Initial revision."
+	::= { enterprises 46262 }
+
+zscaler OBJECT IDENTIFIER ::= { enterprises 46262 }
+
+vseinfo OBJECT IDENTIFIER ::= { zscaler 9 }
+
+vseNumber  OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The number of vse present on this system."
+	::= { vseinfo 1 }
+
+vseTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF VseEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"A list of vse entries. The number of entries is
+		given by the value of vseNumber."
+	::= { vseinfo 2 }
+
+vseEntry OBJECT-TYPE
+	SYNTAX      VseEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		particular vse."
+	INDEX   { vseIndex }
+	::= { vseTable 1 }
+
+VseEntry ::=
+	SEQUENCE {
+		vseIndex Integer32,
+		vseName OCTET STRING,
+		vseRole OCTET STRING,
+		vseInstance OCTET STRING,
+		sme_ca_cur_health_state Counter64,
+		sme_cur_smsmclt_state Counter64,
+	}
+
+vseIndex OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The index of vse in the list of such objects"
+	::= { vseEntry 1 }
+
+vseName OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The name of the vse"
+	::= { vseEntry 2 }
+
+vseRole OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The Zscaler role to which this vse belongs"
+	::= { vseEntry 3 }
+
+vseInstance OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The Zscaler instance path where this vse is present"
+	::= { vseEntry 4 }
+
+sme_ca_cur_health_state OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Health status of the vse connection to Zscaler central authority"
+	::= { vseEntry 5 }
+
+sme_cur_smsmclt_state OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Health status of the vse connection to Zscaler log & reporting infra"
+	::= { vseEntry 6 }
+
+
+END

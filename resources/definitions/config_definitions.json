@@ -914,6 +914,13 @@
             "order": 18,
             "type": "text"
         },
+        "auth_ldap_phoneattr": {
+            "default": "mobile",
+            "group": "auth",
+            "section": "ldap",
+            "order": 19,
+            "type": "text"
+        },
         "auth_ldap_group": {
             "default": "",
             "group": "auth",
@@ -1071,6 +1078,13 @@
                 "ldap-authorization": "Externally authenticated LDAP",
                 "sso": "Single Sign On"
             }
+        },
+        "auth_fallback_local": {
+            "default": false,
+            "group": "auth",
+            "section": "general",
+            "order": 3,
+            "type": "boolean"
         },
         "auth_remember": {
             "default": 30,
@@ -1304,16 +1318,6 @@
         "billing.base": {
             "default": 1000,
             "type": "integer"
-        },
-        "branding": {
-            "default": {
-                "default": {}
-            },
-            "type": "array",
-            "validate": {
-                "value": "array",
-                "value.*": "array"
-            }
         },
         "callback_clear": {
             "default": "https://stats.librenms.org/clear.php",
@@ -1569,6 +1573,10 @@
             "section": "port-descr",
             "order": 11
         },
+        "datastore.canonical_metrics": {
+            "default": false,
+            "type": "boolean"
+        },
         "dateformat.byminute": {
             "default": "Y-m-d H:i",
             "type": "text"
@@ -1698,81 +1706,87 @@
             "section": "graph",
             "order": 8
         },
-        "device_types": {
-            "default": [
-                {
-                    "icon": "hard-drive",
-                    "text": "Appliance",
-                    "type": "appliance"
-                },
-                {
-                    "icon": "people-arrows",
-                    "text": "Collaboration",
-                    "type": "collaboration"
-                },
-                {
-                    "icon": "temperature-full",
-                    "text": "Environment",
-                    "type": "environment"
-                },
-                {
-                    "icon": "shield",
-                    "text": "Firewalls",
-                    "type": "firewall"
-                },
-                {
-                    "icon": "scale-balanced",
-                    "text": "Load Balancers",
-                    "type": "loadbalancer"
-                },
-                {
-                    "icon": "door-open",
-                    "text": "Management",
-                    "type": "management"
-                },
-                {
-                    "icon": "network-wired",
-                    "text": "Network",
-                    "type": "network"
-                },
-                {
-                    "icon": "print",
-                    "text": "Printers",
-                    "type": "printer"
-                },
-                {
-                    "icon": "plug",
-                    "text": "Power",
-                    "type": "power"
-                },
-                {
-                    "icon": "server",
-                    "text": "Servers",
-                    "type": "server"
-                },
-                {
-                    "icon": "database",
-                    "text": "Storage",
-                    "type": "storage"
-                },
-                {
-                    "icon": "wifi",
-                    "text": "Wireless",
-                    "type": "wireless"
-                },
-                {
-                    "icon": "computer",
-                    "text": "Workstation",
-                    "type": "workstation"
-                }
-            ],
-            "type": "array",
+        "device_types.*": {
+            "type": "text",
             "validate": {
-                "value": "array",
-                "value.*.icon": "required|string",
-                "value.*.text": "required|string",
-                "value.*.type": "required|string"
+                "value": "string"
             }
+        },
+        "device_types.audiovisual": {
+            "default": "photo-film",
+            "type": "text"
+        },
+        "device_types.collaboration": {
+            "default": "people-arrows",
+            "type": "text"
+        },
+        "device_types.environment": {
+            "default": "temperature-full",
+            "type": "text"
+        },
+        "device_types.firewall": {
+            "default": "shield",
+            "type": "text"
+        },
+        "device_types.iot": {
+            "default": "microchip",
+            "type": "text"
+        },
+        "device_types.loadbalancer": {
+            "default": "scale-balanced",
+            "type": "text"
+        },
+        "device_types.management": {
+            "default": "door-open",
+            "type": "text"
+        },
+        "device_types.network": {
+            "default": "network-wired",
+            "type": "text"
+        },
+        "device_types.optical": {
+            "default": "wave-square",
+            "type": "text"
+        },
+        "device_types.power": {
+            "default": "plug",
+            "type": "text"
+        },
+        "device_types.printer": {
+            "default": "print",
+            "type": "text"
+        },
+        "device_types.security": {
+            "default": "user-shield",
+            "type": "text"
+        },
+        "device_types.server": {
+            "default": "server",
+            "type": "text"
+        },
+        "device_types.storage": {
+            "default": "database",
+            "type": "text"
+        },
+        "device_types.surveillance": {
+            "default": "video",
+            "type": "text"
+        },
+        "device_types.timing": {
+            "default": "clock",
+            "type": "text"
+        },
+        "device_types.voice": {
+            "default": "phone",
+            "type": "text"
+        },
+        "device_types.wireless": {
+            "default": "wifi",
+            "type": "text"
+        },
+        "device_types.workstation": {
+            "default": "computer",
+            "type": "text"
         },
         "disabled_sensors": {
             "type": "array",
@@ -1872,13 +1886,6 @@
             "default": true,
             "type": "boolean"
         },
-        "discovery_modules.cisco-vrf-lite": {
-            "order": 80,
-            "group": "discovery",
-            "section": "discovery_modules",
-            "default": true,
-            "type": "boolean"
-        },
         "discovery_modules.mac-accounting": {
             "order": 60,
             "group": "discovery",
@@ -1897,7 +1904,7 @@
             "order": 360,
             "group": "discovery",
             "section": "discovery_modules",
-            "default": false,
+            "default": true,
             "type": "boolean"
         },
         "discovery_modules.ospfv3": {
@@ -1977,13 +1984,6 @@
             "default": true,
             "type": "boolean"
         },
-        "discovery_modules.ipmi": {
-            "order": 285,
-            "group": "discovery",
-            "section": "discovery_modules",
-            "default": true,
-            "type": "boolean"
-        },
         "discovery_modules.storage": {
             "order": 300,
             "group": "discovery",
@@ -1993,6 +1993,13 @@
         },
         "discovery_modules.hr-device": {
             "order": 140,
+            "group": "discovery",
+            "section": "discovery_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "discovery_modules.packages": {
+            "order": 145,
             "group": "discovery",
             "section": "discovery_modules",
             "default": true,
@@ -2281,18 +2288,6 @@
             "order": 3,
             "type": "boolean"
         },
-        "email_sendmail_path": {
-            "default": "/usr/sbin/sendmail",
-            "group": "alerting",
-            "section": "email",
-            "order": 5,
-            "type": "executable",
-            "when": {
-                "setting": "email_backend",
-                "operator": "equals",
-                "value": "sendmail"
-            }
-        },
         "email_smtp_auth": {
             "default": false,
             "group": "alerting",
@@ -2449,13 +2444,6 @@
             "section": "virtualization",
             "order": 0
         },
-        "enable_proxmox": {
-            "default": false,
-            "type": "boolean",
-            "group": "discovery",
-            "section": "virtualization",
-            "order": 1
-        },
         "enable_ports_adsl": {
             "default": true,
             "type": "boolean"
@@ -2489,14 +2477,6 @@
             "default": false,
             "type": "boolean"
         },
-        "enable_vrf_lite_cisco": {
-            "default": true,
-            "type": "boolean"
-        },
-        "enable_vrfs": {
-            "default": true,
-            "type": "boolean"
-        },
         "error_font": {
             "type": "text"
         },
@@ -2515,19 +2495,9 @@
             "order": 2,
             "type": "text"
         },
-        "fping": {
-            "default": "fping",
-            "group": "external",
-            "section": "binaries",
-            "order": 0,
-            "type": "executable"
-        },
-        "fping6": {
-            "default": "fping6",
-            "group": "external",
-            "section": "binaries",
-            "order": 1,
-            "type": "executable"
+        "first_run_complete": {
+            "default": false,
+            "type": "boolean"
         },
         "fping_options.count": {
             "default": 3,
@@ -2886,6 +2856,19 @@
                 "22CCBB",
                 "00BBCC",
                 "0099CC",
+                "3366BB",
+                "AA3355",
+                "881177",
+                "CC6666",
+                "EEDD00",
+                "44DD88",
+                "99DD55"
+            ],
+            "type": "array"
+        },
+        "graph_colours.stats": {
+            "default": [
+                "663399",
                 "3366BB",
                 "AA3355",
                 "881177",
@@ -5322,13 +5305,6 @@
             "section": "ipmi",
             "order": 1
         },
-        "ipmitool": {
-            "default": "/usr/bin/ipmitool",
-            "group": "external",
-            "section": "binaries",
-            "order": 3,
-            "type": "executable"
-        },
         "irc_alert": {
             "default": false,
             "type": "boolean"
@@ -5497,18 +5473,6 @@
             "order": 0,
             "type": "boolean"
         },
-        "map.engine": {
-            "default": "leaflet",
-            "type": "select",
-            "options": {
-                "leaflet": "Leaflet",
-                "mapeal": "Mapeal"
-            }
-        },
-        "mapael.default_map": {
-            "default": "maps/world_countries.js",
-            "type": "text"
-        },
         "mib_dir": {
             "type": "directory"
         },
@@ -5635,13 +5599,6 @@
             "group": "webui",
             "section": "worldmap",
             "order": 10
-        },
-        "nfdump": {
-            "default": "/usr/bin/nfdump",
-            "group": "external",
-            "section": "binaries",
-            "order": 8,
-            "type": "executable"
         },
         "nfsen_enable": {
             "default": false,
@@ -5790,10 +5747,6 @@
         "notifications.local": {
             "default": "misc/notifications.rss",
             "type": "text"
-        },
-        "old_graphs": {
-            "default": true,
-            "type": "boolean"
         },
         "opentsdb.co": {
             "type": "boolean",
@@ -6042,10 +5995,6 @@
             "units": "seconds",
             "order": 3
         },
-        "page_title_prefix": {
-            "default": "",
-            "type": "text"
-        },
         "page_title_suffix": {
             "type": "text"
         },
@@ -6125,6 +6074,13 @@
             "default": false,
             "type": "boolean"
         },
+        "poller_modules.packages": {
+            "order": 425,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "poller_modules.core": {
             "default": true,
             "type": "boolean",
@@ -6141,13 +6097,6 @@
         },
         "poller_modules.availability": {
             "order": 25,
-            "group": "poller",
-            "section": "poller_modules",
-            "default": true,
-            "type": "boolean"
-        },
-        "poller_modules.ipmi": {
-            "order": 210,
             "group": "poller",
             "section": "poller_modules",
             "default": true,
@@ -6298,11 +6247,25 @@
             "default": false,
             "type": "boolean"
         },
+        "poller_modules.vrf": {
+            "order": 420,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
+            "type": "boolean"
+        },
         "poller_modules.wireless": {
             "order": 440,
             "group": "poller",
             "section": "poller_modules",
             "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.fdb-table": {
+            "order": 185,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": false,
             "type": "boolean"
         },
         "poller_modules.ospf": {
@@ -6688,7 +6651,6 @@
         "reporting.throttle": {
             "default": 30,
             "type": "integer",
-            "units": "seconds",
             "group": "system",
             "section": "reporting",
             "order": 3
@@ -6733,6 +6695,17 @@
             "section": "cleanup",
             "order": 2,
             "type": "integer"
+        },
+        "rrd.backend": {
+            "default": "rrdtool",
+            "group": "poller",
+            "section": "rrdtool",
+            "order": 13,
+            "type": "select",
+            "options": {
+                "rrdtool": "rrdtool",
+                "php-rrd": "php-rrd"
+            }
         },
         "rrd.heartbeat": {
             "default": 600,
@@ -6795,13 +6768,6 @@
             "default": false,
             "type": "boolean"
         },
-        "rrdtool": {
-            "default": "rrdtool",
-            "group": "external",
-            "section": "binaries",
-            "order": -1,
-            "type": "executable"
-        },
         "rrdtool_tune": {
             "default": false,
             "group": "poller",
@@ -6849,7 +6815,7 @@
                 "legacy": "legacy",
                 "cron": "cron",
                 "dispatcher": "dispatcher",
-                "scheduler": "scheduler"
+                "worker": "worker"
             }
         },
         "schedule_type.ping": {
@@ -6875,7 +6841,7 @@
                 "legacy": "legacy",
                 "cron": "cron",
                 "dispatcher": "dispatcher",
-                "scheduler": "scheduler"
+                "worker": "worker"
             }
         },
         "schedule_type.services": {
@@ -7187,48 +7153,6 @@
                 "tcp6"
             ]
         },
-        "snmpbulkwalk": {
-            "default": "/usr/bin/snmpbulkwalk",
-            "group": "external",
-            "section": "binaries",
-            "order": 8,
-            "type": "executable"
-        },
-        "snmpget": {
-            "default": "/usr/bin/snmpget",
-            "group": "external",
-            "section": "binaries",
-            "order": 9,
-            "type": "executable"
-        },
-        "snmpgetnext": {
-            "default": "snmpgetnext",
-            "group": "external",
-            "section": "binaries",
-            "order": 10,
-            "type": "executable"
-        },
-        "snmptranslate": {
-            "default": "/usr/bin/snmptranslate",
-            "group": "external",
-            "section": "binaries",
-            "order": 11,
-            "type": "executable"
-        },
-        "snmpwalk": {
-            "default": "/usr/bin/snmpwalk",
-            "group": "external",
-            "section": "binaries",
-            "order": 12,
-            "type": "executable"
-        },
-        "snmptrap": {
-            "default": "/usr/bin/snmptrap",
-            "group": "external",
-            "section": "binaries",
-            "order": 13,
-            "type": "executable"
-        },
         "sso.create_users": {
             "default": true,
             "type": "boolean",
@@ -7537,13 +7461,6 @@
         "vertical_summary": {
             "default": 0,
             "type": "integer"
-        },
-        "virsh": {
-            "default": "/usr/bin/virsh",
-            "group": "external",
-            "section": "binaries",
-            "order": 15,
-            "type": "executable"
         },
         "warn.ifdown": {
             "default": true,

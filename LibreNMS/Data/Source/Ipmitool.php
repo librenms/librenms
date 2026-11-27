@@ -35,6 +35,7 @@ use Illuminate\Support\Facades\Process;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\IpmiConnectionFailed;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
+use LibreNMS\Util\Binaries;
 
 class Ipmitool
 {
@@ -45,7 +46,7 @@ class Ipmitool
         private readonly Device $device,
         private readonly IpmiConfig $method,
     ) {
-        $this->binary = LibrenmsConfig::get('ipmitool', 'ipmitool');
+        $this->binary = resolve(Binaries::class)->path('ipmitool');
         $this->type = $this->method->type;
     }
 
@@ -56,8 +57,8 @@ class Ipmitool
             return null;
         }
 
-        $ipmi = $config ?? $device->polling()->ipmi();
-        if (! $ipmi->hostname) {
+        $ipmi = $config ?? $device->polling()->get(PollingMethodType::Ipmi);
+        if (! $ipmi instanceof IpmiConfig || ! $ipmi->hostname) {
             return null;
         }
 

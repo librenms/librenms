@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing import)
 F3-OSPF-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -14,7 +15,7 @@ IMPORTS
     RouterID, AreaID, HelloRange, DesignatedRouterPriority,
     OspfAuthenticationType, ospfNbrEntry
              FROM OSPF-MIB
-    cmIpInterfaceEntry, ipManagementTunnelEntry
+    cmIpInterfaceEntry, ipManagementTunnelEntry, ipLoopbackInterfaceEntry
              FROM CM-IP-MIB
     F3DisplayString
              FROM CM-COMMON-MIB;

@@ -155,9 +155,9 @@ class DevSimulate extends LnmsCommand
 
         $secret = Secret::updateOrCreate([
             'description' => "snmpsim secret ($device->hostname)",
-            'secret_type' => SecretType::Snmp,
+            'secret_type' => SecretType::SnmpCommunity,
         ], [
-            'data' => ['version' => 'v2c', 'community' => $community],
+            'data' => ['community' => $community],
         ]);
         $method->secret()->associate($secret)->save();
 

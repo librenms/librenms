@@ -1,9 +1,9 @@
 -- =================================================================
--- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2023 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: description of Port Security
 -- Reference:
--- Version: V1.8
+-- Version: V1.9
 -- History:
 --   V1.0 2004-11-24, Created by lijian
 --   V1.1 2005-2-23,  Modified by Zhangmin
@@ -22,6 +22,18 @@
 --                    by huangyang
 --   V1.7 2012-04-11, Modified the range of hh3cSecureRalmAuthOfflineTime by xuyonggang
 --   V1.8 2014-06-05, Modified the range of hh3cSecureRalmAuthDomain by wuqiang
+--   V1.9 2023-04-12, Modified by yizhigao
+--        Add objects:hh3cSecureUserIPv4BeforeChange
+--                    hh3cSecureUserIPv4AftereChange
+--                    hh3cSecureUserIPv6BeforeChange
+--                    hh3cSecureUserIPv6AftereChange
+--                    hh3cSecureIPv4Change
+--                    hh3cSecureIPv6Change
+--                    hh3cSecureRalmIPv4Change
+--                    hh3cSecureRalmIPv6Change.
+--                    Modified the type of hh3cSecureOUIIndex,hh3cSecureRalmAuthServerTimeoutTime,
+--                    hh3cSecureRalmHoldoffTime and hh3cSecureRalmDefaultSessionTime by yizhigao
+--                    Modified the range of hh3cSecureNeedToKnowMode by luyu
 -- =================================================================
 HH3C-PORT-SECURITY-MIB DEFINITIONS ::= BEGIN
 
@@ -38,10 +50,11 @@ IMPORTS
     dot1xAuthSessionUserName, dot1xAuthSessionAuthenticMethod,
     dot1xAuthSessionTerminateCause, dot1xPaePortNumber
         FROM IEEE8021-PAE-MIB
-        ;
+    Ipv6Address
+        FROM IPV6-TC;
 
 hh3cPortSecurityMIB MODULE-IDENTITY
-    LAST-UPDATED "200411240000Z"
+    LAST-UPDATED "202304120000Z"
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -51,6 +64,16 @@ hh3cPortSecurityMIB MODULE-IDENTITY
         Zip:100085"
     DESCRIPTION
         "The MIB module is used for managing port security."
+
+    REVISION "202304120000Z"
+    DESCRIPTION
+        "Added hh3cUserIPv4BeforChange, hh3cUserIPv4AfterChange, hh3cUserIPv6BeforChange,
+         hh3cUserIPv6AfterChange, hh3cSecureIPv4Change, hh3cSecureIPv6Change, hh3cSecureRalmIPv4Change
+         and hh3cSecureRalmIPv6Change by yizhigao.
+         Modified the type of hh3cSecureOUIIndex, hh3cSecureRalmAuthServerTimeoutTime,
+         hh3cSecureRalmHoldoffTime and hh3cSecureRalmDefaultSessionTime by yizhigao.
+         Modified the range of hh3cSecureNeedToKnowMode by luyu"
+
     REVISION "200411240000Z"
     DESCRIPTION
         "The Initial Version of hh3cPortSecurityMIB"
@@ -98,7 +121,7 @@ hh3cSecurePortVlanMembershipList OBJECT-TYPE
 hh3cSecureRalmObjects    OBJECT IDENTIFIER ::= { hh3cPortSecurityLeaf 4 }
 
 hh3cSecureRalmDefaultSessionTime OBJECT-TYPE
-    SYNTAX      INTEGER(1..1000000)
+    SYNTAX      Integer32(1..1000000)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -107,9 +130,56 @@ hh3cSecureRalmDefaultSessionTime OBJECT-TYPE
         The default time is 1800 seconds."
     ::= { hh3cSecureRalmObjects 1 }
 
+--
+-- SECURITY USER IPv4 before change
+--
+
+hh3cSecureUserIPv4BeforeChange OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The user IPv4 address before change."
+    ::= {hh3cPortSecurityLeaf 5}
+
+--
+-- SECURITY USER IPv4 after change
+--
+
+hh3cSecureUserIPv4AfterChange OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The user IPv4 address after change."
+    ::= {hh3cPortSecurityLeaf 6}
+
+--
+-- SECURITY USER IPv6 before change
+--
+
+hh3cSecureUserIPv6BeforeChange OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The user IPv6 address before change."
+    ::= {hh3cPortSecurityLeaf 7}
+
+--
+-- SECURITY USER IPv6 after change
+--
+
+hh3cSecureUserIPv6AfterChange OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The user IPv6 address after change."
+    ::= {hh3cPortSecurityLeaf 8}
 
 hh3cSecureRalmHoldoffTime OBJECT-TYPE
-    SYNTAX      INTEGER(1..1000000)
+    SYNTAX      Integer32(1..1000000)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -201,7 +271,7 @@ hh3cSecureRalmAuthOfflineTime OBJECT-TYPE
     ::= {hh3cSecureRalmObjects 8}
 
 hh3cSecureRalmAuthServerTimeoutTime OBJECT-TYPE
-    SYNTAX      INTEGER(1..65535)
+    SYNTAX      Integer32(1..65535)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -400,7 +470,8 @@ hh3cSecureNeedToKnowMode OBJECT-TYPE
             needToKnowWithMulticastsAllowed(5),
             permanentNeedToKnowOnly(6),
             permanentNeedToKnowWithBroadcastsAllowed(7),
-            permanentNeedToKnowWithMulticastsAllowed(8)
+            permanentNeedToKnowWithMulticastsAllowed(8),
+            needToKnowAuto(9)
         }
     MAX-ACCESS  read-write
     STATUS      current
@@ -410,14 +481,16 @@ hh3cSecureNeedToKnowMode OBJECT-TYPE
 
         1 - Need To Know is not available.
         2 - All frames.
-        3 - Frames addressed to the authorised devices only.
-        4 - Frames addressed to the authorised devices, plus all broadcast
+        3 - Frames addressed to the authorized devices only.
+        4 - Frames addressed to the authorized devices, plus all broadcast
             frames.
-        5 - Frames addressed to the authorised devices, plus all broadcast
+        5 - Frames addressed to the authorized devices, plus all broadcast
             and multicast frames.
         6 - As 3 and cannot be changed.
         7 - As 4 and cannot be changed.
         8 - As 5 and cannot be changed.
+        9 - Similar to needToKnowWithMulticastsAllowed, but no frames are allowed
+            when the port has no online users.
 
         If this object returns 1,6,7 or 8, it means that the Need To Know
         configuration cannot be changed, and any attempt to write to this object
@@ -639,14 +712,14 @@ hh3cSecureOUIEntry OBJECT-TYPE
 
 Hh3cSecureOUIEntry ::= SEQUENCE
     {
-        hh3cSecureOUIIndex        INTEGER,
+        hh3cSecureOUIIndex        Integer32,
         hh3cSecureOUI             OCTET STRING,
         hh3cSecureOUIRowStatus    RowStatus
     }
 
 
 hh3cSecureOUIIndex OBJECT-TYPE
-    SYNTAX      INTEGER(1..1024)
+    SYNTAX      Integer32(1..1024)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -997,4 +1070,69 @@ hh3cSecureRalmLogoff NOTIFICATION-TYPE
         hh3cSecurePortVlanMembershipList object identifies the VLAN
         membership assigned to the port on session activation."
     ::= {hh3cPortSecurityNotifications 8}
+
+-- **********************************************************************
+-- Define enterprise repeater new traps. Rules for traps are that any
+-- varbind must be from a table in which the first qualifier on the
+-- object id is the service identifier of the 'thing' causing the trap.
+-- **********************************************************************
+hh3cPortSecurityTrapsV2 OBJECT IDENTIFIER ::= {hh3cPortSecurityMIB 4}
+
+hh3cPortSecurityTrapsV2Prefix OBJECT IDENTIFIER ::= {hh3cPortSecurityTrapsV2 0}
+
+hh3cSecureIPv4Change NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            hh3cSecureAddrMAC,
+            dot1xAuthSessionUserName,
+            hh3cSecureUserIPv4BeforeChange,
+            hh3cSecureUserIPv4AfterChange
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when an 802.1X authentication user IPv4 address changes."
+    ::= {hh3cPortSecurityTrapsV2Prefix 1}
+
+hh3cSecureIPv6Change NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            hh3cSecureAddrMAC,
+            dot1xAuthSessionUserName,
+            hh3cSecureUserIPv6BeforeChange,
+            hh3cSecureUserIPv6AfterChange
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when an 802.1X authentication user IPv6 address changes."
+    ::= {hh3cPortSecurityTrapsV2Prefix 2}
+
+hh3cSecureRalmIPv4Change NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            hh3cSecureAddrMAC,
+            hh3cSecureRalmAuthUsername,
+            hh3cSecureUserIPv4BeforeChange,
+            hh3cSecureUserIPv4AfterChange
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a MAC authentication user IPv4 address changes."
+    ::= {hh3cPortSecurityTrapsV2Prefix 3}
+
+hh3cSecureRalmIPv6Change NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            hh3cSecureAddrMAC,
+            hh3cSecureRalmAuthUsername,
+            hh3cSecureUserIPv6BeforeChange,
+            hh3cSecureUserIPv6AfterChange
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a MAC authentication user IPv6 address changes."
+    ::= {hh3cPortSecurityTrapsV2Prefix 4}
 END

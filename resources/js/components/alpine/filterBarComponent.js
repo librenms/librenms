@@ -1,3 +1,5 @@
+import isEqual from "lodash/isEqual";
+
 export default function filterBarComponent({
     name,
     fields,
@@ -33,6 +35,16 @@ export default function filterBarComponent({
                 { v: "lte", s: "≤", l: "Less or Equal" },
                 { v: "is_empty", s: "∅", l: "Is Empty" },
                 { v: "is_not_empty", s: "∃", l: "Is Not Empty" },
+            ],
+            version: [
+                { v: "contains", s: "~", l: "Contains" },
+                { v: "not_contains", s: "!~", l: "Not Contains" },
+                { v: "eq", s: "=", l: "Equals" },
+                { v: "neq", s: "≠", l: "Not Equals" },
+                { v: "gt", s: ">", l: "Greater Than" },
+                { v: "gte", s: "≥", l: "Greater or Equal" },
+                { v: "lt", s: "<", l: "Less Than" },
+                { v: "lte", s: "≤", l: "Less or Equal" },
             ],
             boolean: [{ v: "eq", s: "is", l: "Is" }],
             date: [
@@ -87,10 +99,14 @@ export default function filterBarComponent({
         },
 
         get formattedFilters() {
+            return this.formatFilters(this.filters);
+        },
+
+        formatFilters(filters) {
             const formatted = {};
-            this.filters.forEach((f) => {
+            filters.forEach((f) => {
                 if (!formatted[f.key]) formatted[f.key] = {};
-                formatted[f.key][f.op] = this.encodeValue(f.value);
+                formatted[f.key][f.op] = this.isNullary(f.op) ? "1" : this.encodeValue(f.value);
             });
             return formatted;
         },
@@ -126,37 +142,14 @@ export default function filterBarComponent({
                 }
             });
 
-            const params = new URLSearchParams(window.location.search);
-            const hasUrlFilters = Array.from(params.keys()).some((k) => k.startsWith("filter["));
-            this.isCleared = params.has("filter") && !hasUrlFilters;
-
-            if (hasUrlFilters) {
-                await this.restoreFromUrl(params);
-            } else if (this.isCleared) {
-                this.filters = []; // URL explicitly asked for no filters; bypass defaults
-            } else if (Object.keys(this.initial || {}).length > 0) {
-                await this.restoreFromData(this.initial); // Fresh page load; load backend defaults
-            }
-
-            // Sync external links on load
+            const { filters, from } = this.readFiltersFromLocation();
+            this.filters = filters;
+            this.isCleared = from === "clear";
             this.syncPageUrls();
 
-            this.$dispatch("filter:loaded", {
-                name: this.name,
-                filters: this.formattedFilters,
-                from: hasUrlFilters ? "url" : (this.isCleared ? "clear" : "initial"),
-            });
-
-            if (this.filters.length > 0 && !this.reload) {
-                this.$dispatch("filter:apply", {
-                    name: this.name,
-                    filters: this.formattedFilters,
-                });
+            if (!this.reload) {
+                window.addEventListener("popstate", () => this.restoreHistory());
             }
-
-            window.addEventListener("popstate", () =>
-                this.restoreFromUrl(new URLSearchParams(window.location.search))
-            );
 
             this.$watch("filters", () => {
                 this.$nextTick(() => this.updateScroll());
@@ -171,10 +164,64 @@ export default function filterBarComponent({
                     });
                 }
             });
+
+            const initialFilters = this.filters;
+            const initialUrl = window.location.href;
+            await this.hydrateAll();
+            if (this.filters !== initialFilters || window.location.href !== initialUrl) return;
+
+            this.$dispatch("filter:loaded", {
+                name: this.name,
+                filters: this.formattedFilters,
+                from,
+            });
+
+            if (this.filters.length > 0 && !this.reload) {
+                this.$dispatch("filter:apply", {
+                    name: this.name,
+                    filters: this.formattedFilters,
+                    initial: true,
+                });
+            }
         },
 
         // --- Data Restoration ---
-        async restoreFromUrl(params) {
+        readFiltersFromLocation() {
+            const params = new URLSearchParams(window.location.search);
+            if (Array.from(params.keys()).some((key) => key.startsWith("filter["))) {
+                return { filters: this.filtersFromUrl(params), from: "url" };
+            }
+            if (params.has("filter")) {
+                return { filters: [], from: "clear" };
+            }
+
+            return { filters: this.filtersFromData(this.initial || []), from: "initial" };
+        },
+
+        async restoreHistory() {
+            const url = window.location.href;
+            const previous = this.filters;
+            const { filters, from } = this.readFiltersFromLocation();
+            const formatted = this.formatFilters(filters);
+            const changed = !isEqual(this.formattedFilters, formatted);
+
+            if (changed) {
+                await this.hydrateAll(filters);
+                if (window.location.href !== url || this.filters !== previous) return;
+                this.filters = filters;
+            }
+
+            this.isCleared = from === "clear";
+            this.syncPageUrls();
+            const detail = { name: this.name, filters: formatted };
+            this.$dispatch("filter:loaded", { ...detail, from: "history" });
+
+            if (changed) {
+                this.$dispatch("filter:apply", { ...detail, restored: true });
+            }
+        },
+
+        filtersFromUrl(params) {
             const newFilters = [];
             for (const [fullKey, val] of params.entries()) {
                 const match = fullKey.match(/^filter\[(.+)\]\[(.+)\]$/);
@@ -187,11 +234,10 @@ export default function filterBarComponent({
                         );
                 }
             }
-            this.filters = newFilters;
-            await this.hydrateAll();
+            return newFilters;
         },
 
-        async restoreFromData(data) {
+        filtersFromData(data) {
             const newFilters = [];
             Object.entries(data).forEach(([key, ops]) => {
                 const field = this.fields.find((f) => f.key === key);
@@ -203,8 +249,7 @@ export default function filterBarComponent({
                     });
                 }
             });
-            this.filters = newFilters;
-            await this.hydrateAll();
+            return newFilters;
         },
 
         createFilterObject(field, op, val) {
@@ -230,6 +275,7 @@ export default function filterBarComponent({
             const url = this.applyFiltersToUrl(new URL(window.location));
 
             if (this.reload) {
+                url.searchParams.delete("page"); // the new results may not have this page
                 window.location.href = url.href;
             } else {
                 window.history.pushState({}, "", url);
@@ -329,8 +375,8 @@ export default function filterBarComponent({
             this.apply();
         },
 
-        async hydrateAll() {
-            await Promise.all(this.filters.map((f) => this.hydrate(f)));
+        async hydrateAll(filters = this.filters) {
+            await Promise.all(filters.map((f) => this.hydrate(f)));
         },
 
         async hydrate(filter) {

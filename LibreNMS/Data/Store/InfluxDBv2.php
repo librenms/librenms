@@ -131,8 +131,8 @@ class InfluxDBv2 extends BaseDatastore
 
         $stat = Measurement::start('write');
         $tmp_fields = [];
-        $tmp_tags['hostname'] = $device->hostname;
-        foreach ($tags as $k => $v) {
+        $tmp_tags = [];
+        foreach ($this->seriesTags($tags, $meta) as $k => $v) {
             if (empty($v)) {
                 $v = '_blank_';
             }
@@ -165,7 +165,6 @@ class InfluxDBv2 extends BaseDatastore
         try {
             // Construct data points using the InfluxDB2\Point class
             $point = Point::measurement($measurement)
-              ->addTag('hostname', $device->hostname)
               ->time(microtime(true)); // Assuming you want to use the current time
 
             // Write the data points to the database using the WriteApi instance

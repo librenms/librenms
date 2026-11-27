@@ -27,10 +27,14 @@
 namespace LibreNMS\Validations;
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Util\Version;
 use LibreNMS\Validator;
 
 class Snmp extends BaseValidation
 {
+    /** older versions escape strings with a display hint, see snmp.unescape */
+    public const NET_SNMP_MIN_VERSION = '5.8';
+
     /**
      * Validate this module.
      * To return ValidationResults, call ok, warn, fail, or result methods on the $validator
@@ -43,6 +47,22 @@ class Snmp extends BaseValidation
             $validator->fail(trans('validation.validations.snmp.fail_extension'), trans('validation.validations.snmp.fix_backend'));
         } else {
             $validator->ok(trans('validation.validations.snmp.backend_ok'));
+        }
+
+        $this->checkNetSnmpVersion($validator, Version::get()->netSnmp());
+    }
+
+    public function checkNetSnmpVersion(Validator $validator, string $version): void
+    {
+        if ($version === '') {
+            return; // not installed, reported by the programs validation
+        }
+
+        if (version_compare($version, self::NET_SNMP_MIN_VERSION, '<')) {
+            $validator->warn(
+                trans('validation.validations.snmp.netsnmp_old', ['version' => $version, 'required' => self::NET_SNMP_MIN_VERSION]),
+                trans('validation.validations.snmp.fix_netsnmp', ['required' => self::NET_SNMP_MIN_VERSION])
+            );
         }
     }
 }

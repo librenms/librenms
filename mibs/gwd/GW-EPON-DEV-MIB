@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (dashes in comment lines; missing commas)
 GW-EPON-DEV-MIB	DEFINITIONS ::= BEGIN
 	IMPORTS
 		devices
@@ -330,11 +331,11 @@ GW-EPON-DEV-MIB	DEFINITIONS ::= BEGIN
 		powerModuleType     INTEGER,
 		powerVoltage        INTEGER,
 		powerCurrent        INTEGER,
-		PowerVOLTHighThreshold    INTEGER,
-		PowerVOLTLowThreshold     INTEGER, 
-		PowerAlarmInfo       INTEGER,
-		PowerAlarmID        INTEGER,
-		PowerClearAlarmID    INTEGER
+		powerVOLTHighThreshold    INTEGER,
+		powerVOLTLowThreshold     INTEGER, 
+		powerAlarmInfo       INTEGER,
+		powerAlarmID        INTEGER,
+		powerClearAlarmID    INTEGER
 	}
 	
 	powerIndex     OBJECT-TYPE 
@@ -555,7 +556,7 @@ GW-EPON-DEV-MIB	DEFINITIONS ::= BEGIN
 		STATUS  current
 		DESCRIPTION  "The value indicates the device temperature spy enable"
 		::={temperatureInfoEntry  5}
-	------------- onuAlarmMaskGroup  ---------------------------------------------------
+	--          - onuAlarmMaskGroup                                                    -
 	onuAlarmMaskTable  OBJECT-TYPE 
 		SYNTAX 		SEQUENCE OF OnuAlarmMaskEntry
 		MAX-ACCESS 	not-accessible 

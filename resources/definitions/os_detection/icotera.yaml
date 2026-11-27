@@ -18,7 +18,6 @@ poller_modules:
     ntp: false
     entity-physical: false
 discovery_modules:
-    cisco-vrf-lite: false
     services: false
     ntp: false
     wireless: false

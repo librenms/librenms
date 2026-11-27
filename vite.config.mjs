@@ -11,7 +11,7 @@ export default defineConfig(({ mode }) => {
         plugins: [
             laravel({
                 publicDirectory: 'html',
-                input: ['resources/js/app.js'],
+                input: ['resources/js/app.js', 'resources/js/graphs.js'],
                 refresh: true,
             }),
             tailwindcss(),

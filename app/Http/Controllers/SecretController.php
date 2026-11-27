@@ -51,14 +51,13 @@ class SecretController extends Controller
     {
         Gate::authorize('create', Secret::class);
 
-        $type = $request->query('type', 'snmp');
-        $secretType = SecretType::tryFrom($type) ?? SecretType::Snmp;
+        $secretType = SecretType::tryFromKnown((string) $request->query('type')) ?? SecretType::SnmpCommunity;
         $definition = $secretType->definition();
         $schema = $definition->schema();
         $data = array_merge($definition->schemaDefaults(), old());
 
         return view('secrets.create', [
-            'types' => SecretType::cases(),
+            'types' => SecretType::known(),
             'currentType' => $secretType,
             'schema' => $schema,
             'data' => $data,
@@ -74,7 +73,7 @@ class SecretController extends Controller
             'secret_type' => 'required|string',
         ]);
 
-        $secretType = SecretType::tryFrom($validated['secret_type']);
+        $secretType = SecretType::tryFromKnown($validated['secret_type']);
         if (! $secretType) {
             abort(400, 'Invalid secret type.');
         }
@@ -103,7 +102,7 @@ class SecretController extends Controller
         return response()->json([
             'id' => $secret->id,
             'description' => $secret->description,
-            'secret_type' => $secret->secret_type->value,
+            'secret_type' => $secret->typeName(),
             'usage_count' => $secret->devices()->count(),
             'data' => (object) $this->secretData($secret),
         ]);
@@ -115,7 +114,9 @@ class SecretController extends Controller
         $this->abortUnlessAccessible($request, $secret);
 
         $definition = $secret->secret_type->definition();
-        $data = array_merge($definition->schemaDefaults(), $this->secretData($secret), old());
+        $data = $secret->secret_type === SecretType::Unknown
+            ? $this->secretData($secret)
+            : array_merge($definition->schemaDefaults(), $this->secretData($secret), old());
 
         return view('secrets.edit', [
             'secret' => $secret,
@@ -133,14 +134,15 @@ class SecretController extends Controller
             'description' => ['required', 'string', 'max:255', Rule::unique('secrets', 'description')->ignore($secret->id)],
         ]);
 
-        $definition = $secret->secret_type->definition();
-        $request->merge($definition->unmask($request->all(), $secret->data)); // masked means unchanged
-        $data = $request->validate($definition->rules());
+        // only the description of an unknown type can be edited
+        if ($secret->secret_type !== SecretType::Unknown) {
+            $definition = $secret->secret_type->definition();
+            $request->merge($definition->unmask($request->all(), $secret->data)); // masked means unchanged
+            $secret->data = $request->validate($definition->rules());
+        }
 
-        $secret->update([
-            'description' => $validated['description'],
-            'data' => $data,
-        ]);
+        $secret->description = $validated['description'];
+        $secret->save();
 
         $toast->success(__('Secret updated'));
 

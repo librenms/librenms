@@ -13,6 +13,7 @@
 
 use App\Models\Sensor;
 use App\Models\StateTranslation;
+use LibreNMS\Enum\SensorState;
 use LibreNMS\Enum\Severity;
 
 $temp = SnmpQuery::get('PowerNet-MIB::upsAdvBatteryReplaceIndicator.0')->value();
@@ -46,13 +47,9 @@ foreach ($cooling_status as $index => $data) {
     $translations = [];
     foreach ($tmp_states as $ref) {
         preg_match('/([\w ]+) ?\\(([\d]+)\\)/', $ref, $matches);
-        $severity = match (get_nagios_state($matches[1])) {
-            0 => Severity::Ok,
-            1 => Severity::Warning,
-            2 => Severity::Error,
-            default => Severity::Unknown,
-        };
-        $translations[] = StateTranslation::define($matches[1], $matches[2], $severity);
+        $descr = trim($matches[1]);
+        $severity = SensorState::fromDescr($descr);
+        $translations[] = StateTranslation::define($descr, $matches[2], $severity);
     }
 
     app('sensor-discovery')->discover(new Sensor([
@@ -80,13 +77,9 @@ foreach ($cooling_unit as $index => $data) {
     $translations = [];
     foreach ($tmp_states as $ref) {
         preg_match('/([\w ]+)\\(([\d]+)\\)/', $ref, $matches);
-        $severity = match (get_nagios_state($matches[1])) {
-            0 => Severity::Ok,
-            1 => Severity::Warning,
-            2 => Severity::Error,
-            default => Severity::Unknown,
-        };
-        $translations[] = StateTranslation::define($matches[1], $matches[2], $severity);
+        $descr = trim($matches[1]);
+        $severity = SensorState::fromDescr($descr);
+        $translations[] = StateTranslation::define($descr, $matches[2], $severity);
     }
 
     app('sensor-discovery')->discover(new Sensor([
@@ -109,7 +102,10 @@ foreach ($relays as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.10.3.2.1.1.3.' . $index;
     $state_name = $data['emsOutputRelayControlOutputRelayName'];
 
-    $current = apc_relay_state($data['emsOutputRelayControlOutputRelayCommand']);
+    $current = match ($data['emsOutputRelayControlOutputRelayCommand']) {
+        'immediateCloseEMS', 'immediateOnEMS' => 1,
+        'immediateOpenEMS', 'immediateOffEMS' => 2,
+    };
     if (is_numeric($current)) {
         app('sensor-discovery')->discover(new Sensor([
             'poller_type' => 'snmp',
@@ -138,7 +134,10 @@ foreach ($switched as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.10.3.3.1.1.3.' . $index;
     $state_name = $data['emsOutletControlOutletName'];
 
-    $current = apc_relay_state($data['emsOutletControlOutletCommand']);
+    $current = match ($data['emsOutletControlOutletCommand']) {
+        'immediateCloseEMS', 'immediateOnEMS' => 1,
+        'immediateOpenEMS', 'immediateOffEMS' => 2,
+    };
     if (is_numeric($current)) {
         app('sensor-discovery')->discover(new Sensor([
             'poller_type' => 'snmp',

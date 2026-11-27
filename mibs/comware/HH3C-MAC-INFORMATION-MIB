@@ -1,10 +1,10 @@
 -- ============================================================================
--- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: The purpose of this MIB file is to provide the definition of
 --              the MAC Information general configuration.
 -- Reference:
--- Version: V1.2
+-- Version: V1.3
 -- History:
 -- V1.0 2007-12-28
 --   Initial version, created by gejianzhuang
@@ -12,6 +12,13 @@
 --   Add 'hh3cMACInformationTrapObjectsExt' by gejianzhuang
 -- V1.2 2013-05-02
 --   Add 'hh3cMACInformationMovedTrap' by yangjie
+-- V1.3 2022-08-08
+--   Add 'hh3cMACInformationMovedRsmTrap'
+--   And 'hh3cMACInfoVsiMovedTrap'
+--   And 'hh3cMACInfoVsiMovedRsmTrap'
+--   And 'hh3cMACInfoTrapMsgMovedVsi'
+--   And 'hh3cMACInfoTrapMsgMovedFmIfName'
+--   And 'hh3cMACInfoTrapMsgMovedToIfName' by wangyuqing
 -- ============================================================================
 HH3C-MAC-INFORMATION-MIB DEFINITIONS ::= BEGIN
 
@@ -27,7 +34,7 @@ IMPORTS
 
 -- Node definitions
 hh3cMACInformation MODULE-IDENTITY
-    LAST-UPDATED "200712281912Z"        -- DEC 28, 2007 at 19:12 GMT
+    LAST-UPDATED "202208081800Z"        -- AUG 08, 2022 at 18:00 GMT
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -40,6 +47,11 @@ hh3cMACInformation MODULE-IDENTITY
         general configuration.  MAC Information feature is used to
         make that the changed MAC information in the monitored device is
         knowable in remote monitoring device."
+    REVISION "202208081800Z"
+    DESCRIPTION
+        "Add the objects of hh3cMACInformationMovedRsmTrap, hh3cMACInfoVsiMovedTrap,
+        hh3cMACInfoVsiMovedRsmTrap, hh3cMACInfoTrapMsgMovedVsi, hh3cMACInfoTrapMsgMovedFmIfName
+        and hh3cMACInfoTrapMsgMovedToIfName."
     REVISION "200712281912Z"
     DESCRIPTION
         "The initial version of this MIB file."
@@ -340,13 +352,84 @@ hh3cMACInformationMovedTrap NOTIFICATION-TYPE
             hh3cMACInfoTrapMsgMovedVlan,
             hh3cMACInfoTrapMsgMovedFromIf,
             hh3cMACInfoTrapMsgMovedToIf,
-            hh3cMACInfoTrapMsgMovedCount
+            hh3cMACInfoTrapMsgMovedCount,
+            hh3cMACInfoTrapMsgChassis,
+            hh3cMACInfoTrapMsgSlot
         }
     STATUS      current
     DESCRIPTION
         "When the MAC address has been moved to another interface, trap
         is generated and is sent to the remote monitoring device."
     ::= { hh3cMACInformationTrapsExt 2 }
+
+hh3cMACInformationMovedRsmTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cMACInfoTrapMsgMovedVlan,
+            hh3cMACInfoTrapMsgChassis,
+            hh3cMACInfoTrapMsgSlot
+        }
+    STATUS      current
+    DESCRIPTION
+        "In this cycle, this trap information is reported when the MAC address in the VLAN no longer migrates."
+    ::= { hh3cMACInformationTrapsExt 3 }
+
+hh3cMACInfoVsiMovedTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cMACInfoTrapMsgMovedAddress,
+            hh3cMACInfoTrapMsgMovedVsi,
+            hh3cMACInfoTrapMsgMovedFmIfName,
+            hh3cMACInfoTrapMsgMovedToIfName,
+            hh3cMACInfoTrapMsgMovedCount,
+            hh3cMACInfoTrapMsgChassis,
+            hh3cMACInfoTrapMsgSlot
+        }
+    STATUS      current
+    DESCRIPTION
+        "When the MAC address has been moved to another interface in the VSI, trap
+        is generated and is sent to the remote monitoring device."
+    ::= { hh3cMACInformationTrapsExt 4 }
+
+hh3cMACInfoVsiMovedRsmTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cMACInfoTrapMsgMovedVsi,
+            hh3cMACInfoTrapMsgChassis,
+            hh3cMACInfoTrapMsgSlot
+        }
+    STATUS      current
+    DESCRIPTION
+        "In this cycle, this trap information is reported when the MAC address in the VSI no longer migrates."
+    ::= { hh3cMACInformationTrapsExt 5 }
+
+hh3cMACInfoMovedIfBlockTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cMACInfoTrapMsgBlockIfName,
+            hh3cMACInfoTrapMsgBlockTime,
+            hh3cMACInfoTrapMsgMovedAddress,
+            hh3cMACInfoTrapMsgMovedVlan
+        }
+    STATUS      current
+    DESCRIPTION
+        "When the MAC migration suppression function is enabled, the interface is down for a
+        certain time due to frequent migration, and this trap information is reported."
+    ::= { hh3cMACInformationTrapsExt 6 }
+
+hh3cMACInfoMovedIfResumeTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cMACInfoTrapMsgBlockIfName,
+            hh3cMACInfoTrapMsgBlockTime,
+            hh3cMACInfoTrapMsgMovedVlan
+        }
+    STATUS      current
+    DESCRIPTION
+        "When the MAC migration suppression function is enabled, the interface is up after
+        the interface is down for a certain time due to frequent migration, and this trap
+        information is reported."
+    ::= { hh3cMACInformationTrapsExt 7 }
 
 hh3cMACInformationTrapObjectsExt OBJECT IDENTIFIER  ::= { hh3cMACInformationMibTrapExt 2 }
 
@@ -456,5 +539,62 @@ hh3cMACInfoTrapMsgMovedCount OBJECT-TYPE
         "The times for which the MAC address has been moved between the
         interfaces."
         ::= { hh3cMACInformationTrapObjectsExt  9 }
+
+hh3cMACInfoTrapMsgMovedVsi OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..31))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name of VSI in which the MAC address is moved."
+        ::= { hh3cMACInformationTrapObjectsExt  10 }
+
+hh3cMACInfoTrapMsgMovedFmIfName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name of the interface from which the MAC address is moved."
+        ::= { hh3cMACInformationTrapObjectsExt  11 }
+
+hh3cMACInfoTrapMsgMovedToIfName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name of the interface to which the MAC address is moved."
+        ::= { hh3cMACInformationTrapObjectsExt  12 }
+
+hh3cMACInfoTrapMsgChassis OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The information of chassis ID. If the value is 65535, the device is
+        not a stacked device ."
+    ::= { hh3cMACInformationTrapObjectsExt 13 }
+
+hh3cMACInfoTrapMsgSlot OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The information of slot."
+    ::= { hh3cMACInformationTrapObjectsExt 14 }
+
+hh3cMACInfoTrapMsgBlockIfName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The name of the interface."
+        ::= { hh3cMACInformationTrapObjectsExt  15 }
+
+hh3cMACInfoTrapMsgBlockTime OBJECT-TYPE
+    SYNTAX      Unsigned32(30..86400)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The time of MAC migration suppression, and the unit of time is seconds."
+        ::= { hh3cMACInformationTrapObjectsExt  16 }
 
 END

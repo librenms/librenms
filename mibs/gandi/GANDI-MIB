@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (SEQUENCE OF itself used for plain OID nodes)
 GANDI-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -21,37 +22,13 @@ gandiMIB MODULE-IDENTITY
 		"The MIB module describe our SNMP Objects"
 	::= { enterprises 26384 }
 
-pktjTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF pktjTable
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"The Packet Journey table OID."
-	::= { gandiMIB 1 }
+pktjTable OBJECT IDENTIFIER ::= { gandiMIB 1 }
 
-statTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF statTable
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"Packet Journey statistics OID."
-	::= { pktjTable 1 }
+statTable OBJECT IDENTIFIER ::= { pktjTable 1 }
 
-totalTable OBJECT-TYPE
-	SYNTAX		SEQUENCE OF totalTable
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"Total counters"
-	::= { statTable 1 }
+totalTable OBJECT IDENTIFIER ::= { statTable 1 }
 
-packetsCounters OBJECT-TYPE
-	SYNTAX		SEQUENCE OF packetsCounters
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"RX and TX counters passed into DPDK"
-	::= { totalTable 1 }
+packetsCounters OBJECT IDENTIFIER ::= { totalTable 1 }
 
 rxCounter OBJECT-TYPE
 	SYNTAX		Counter64
@@ -70,13 +47,7 @@ txCounter OBJECT-TYPE
 	::= { packetsCounters 1 }
 
 	
-dropCounters OBJECT-TYPE
-	SYNTAX		SEQUENCE OF dropCounters
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"Dropped packets counters passed into DPDK"
-	::= { totalTable 2 }
+dropCounters OBJECT IDENTIFIER ::= { totalTable 2 }
 
 dropCounter OBJECT-TYPE
 	SYNTAX		Counter64
@@ -102,13 +73,7 @@ ratedropCounter OBJECT-TYPE
 		"Rate Dropped counter"
 	::= { dropCounters 2 }
 
-kniCounters OBJECT-TYPE
-	SYNTAX		SEQUENCE OF kniCounters
-	MAX-ACCESS	not-accessible
-	STATUS		current
-	DESCRIPTION
-		"KNI counters"
-	::= { totalTable 3 }
+kniCounters OBJECT IDENTIFIER ::= { totalTable 3 }
 
 KNIrxCounter OBJECT-TYPE
 	SYNTAX		Counter64

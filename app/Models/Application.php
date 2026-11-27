@@ -26,10 +26,11 @@
 
 namespace App\Models;
 
+use App\Data\TimeSeries\MetricIdentity;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use LibreNMS\Util\StringHelpers;
+use LibreNMS\Applications\ApplicationDefinition;
 
 class Application extends DeviceRelatedModel
 {
@@ -51,9 +52,31 @@ class Application extends DeviceRelatedModel
 
     // ---- Helper Functions ----
 
-    public function displayName()
+    /**
+     * The metric of the application poller, kept in app-<app_type>-<app_id>.rrd by rrd
+     */
+    public function metricIdentity(): MetricIdentity
     {
-        return StringHelpers::niceCase($this->app_type);
+        return new MetricIdentity('app', ['hostname' => (string) $this->device?->hostname, 'name' => $this->app_type, 'app_id' => $this->app_id]);
+    }
+
+    public function definition(): ApplicationDefinition
+    {
+        return ApplicationDefinition::forType($this->app_type);
+    }
+
+    public function displayName(): string
+    {
+        return $this->definition()->displayName();
+    }
+
+    public function deviceAppsUrl(array $options = []): string
+    {
+        return route('device.apps', [
+            'device' => $this->device_id,
+            'app' => $this->app_type,
+            'instance' => filled($this->app_instance) ? $this->app_id : null,
+        ] + $options);
     }
 
     public function getShowNameAttribute()

@@ -1,0 +1,224 @@
+modules:
+    os:
+        version: ISKRATEL-MSAN-MIB::msanSwSteerVersion.0
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - IF-MIB::ifDescr
+        temperature:
+            data:
+                -
+                    oid: ISKRATEL-MSAN-MIB::msanDiagnosticsTempTable
+                    value: ISKRATEL-MSAN-MIB::msanDiagnosticsTempCurrent
+                    num_oid: '.1.3.6.1.4.1.1332.1.1.5.3.14.4.1.3.{{ $index }}'
+                    index: 'msanDiagnosticsTempCurrent.{{ $index }}'
+                    descr: '{{ ISKRATEL-MSAN-MIB::msanDiagnosticsTempSensorName }}'
+                    low_limit: ISKRATEL-MSAN-MIB::msanDiagnosticsTempCriticUnderheatThreshold
+                    low_warn_limit: ISKRATEL-MSAN-MIB::msanDiagnosticsTempUnderheatThreshold
+                    warn_limit: ISKRATEL-MSAN-MIB::msanDiagnosticsTempOverheatThreshold
+                    high_limit: ISKRATEL-MSAN-MIB::msanDiagnosticsTempCriticOverheatThreshold
+                -
+                    oid: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsTable
+                    value: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsTempCurrent
+                    num_oid: '.1.3.6.1.4.1.1332.1.1.5.3.32.3.1.2.{{ $index }}'
+                    index: 'msanSfpDiagnosticsTempCurrent.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }}'
+                    low_limit: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsTempMin
+                    high_limit: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsTempMax
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsTempCurrent
+                            op: '=='
+                            value: -129
+                -
+                    oid: ISKRATEL-MSAN-MIB::msanOnuInfoTable
+                    value: ISKRATEL-MSAN-MIB::msanOnuInfoTemp
+                    num_oid: '.1.3.6.1.4.1.1332.1.1.5.3.111.3.1.41.{{ $index }}'
+                    index: 'msanOnuInfoTemp.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: ISKRATEL-MSAN-MIB::msanOnuInfoPrimaryStatus
+                            op: '!='
+                            value: 3
+        fanspeed:
+            data:
+                -
+                    oid: ISKRATEL-MSAN-MIB::msanDiagnosticsFanTable
+                    value: ISKRATEL-MSAN-MIB::msanDiagnosticsFanCurrentRpm
+                    num_oid: '.1.3.6.1.4.1.1332.1.1.5.3.14.8.1.2.{{ $index }}'
+                    index: 'msanDiagnosticsFanCurrentRpm.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+        voltage:
+            data:
+                -
+                    oid: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsTable
+                    value: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsVoltageCurrent
+                    num_oid: '.1.3.6.1.4.1.1332.1.1.5.3.32.3.1.6.{{ $index }}'
+                    index: 'msanSfpDiagnosticsVoltageCurrent.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }}'
+                    divisor: 100
+                    low_limit: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsVoltageMin
+                    high_limit: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsVoltageMax
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsVoltageCurrent
+                            op: '=='
+                            value: -1
+        current:
+            data:
+                -
+                    oid: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsTable
+                    value: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsTxBiasCrrCurrent
+                    num_oid: '.1.3.6.1.4.1.1332.1.1.5.3.32.3.1.9.{{ $index }}'
+                    index: 'msanSfpDiagnosticsTxBiasCrrCurrent.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} Tx Bias'
+                    divisor: 100000
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsTxBiasCrrCurrent
+                            op: '=='
+                            value: -1
+        power:
+            data:
+                -
+                    oid: ISKRATEL-MSAN-MIB::msanBoardConfTable
+                    value: ISKRATEL-MSAN-MIB::msanBoardConfPowerConsumption
+                    num_oid: '.1.3.6.1.4.1.1332.1.1.5.3.39.2.1.18.{{ $index }}'
+                    index: 'msanBoardConfPowerConsumption.{{ $index }}'
+                    descr: '{{ ISKRATEL-MSAN-MIB::msanBoardConfDescription }}'
+                    divisor: 100
+        dbm:
+            data:
+                -
+                    oid: ISKRATEL-MSAN-MIB::msanOnuInfoTable
+                    value: ISKRATEL-MSAN-MIB::msanOnuInfoRxPower
+                    num_oid: '.1.3.6.1.4.1.1332.1.1.5.3.111.3.1.38.{{ $index }}'
+                    index: 'msanOnuInfoRxPower.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} Rx'
+                    divisor: 100
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: ISKRATEL-MSAN-MIB::msanOnuInfoRxPower
+                            op: '=='
+                            value: -9900
+                -
+                    oid: ISKRATEL-MSAN-MIB::msanOnuInfoTable
+                    value: ISKRATEL-MSAN-MIB::msanOnuInfoTxPower
+                    num_oid: '.1.3.6.1.4.1.1332.1.1.5.3.111.3.1.39.{{ $index }}'
+                    index: 'msanOnuInfoTxPower.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} Tx'
+                    divisor: 100
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: ISKRATEL-MSAN-MIB::msanOnuInfoTxPower
+                            op: '=='
+                            value: -9900
+                -
+                    oid: ISKRATEL-MSAN-MIB::msanOnuInfoTable
+                    value: ISKRATEL-MSAN-MIB::msanOnuInfoOltRxPower
+                    num_oid: '.1.3.6.1.4.1.1332.1.1.5.3.111.3.1.40.{{ $index }}'
+                    index: 'msanOnuInfoOltRxPower.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} OLT Rx'
+                    divisor: 100
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: ISKRATEL-MSAN-MIB::msanOnuInfoOltRxPower
+                            op: '=='
+                            value: -9900
+                -
+                    oid: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsTable
+                    value: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsTxPowerCurrentDBm
+                    num_oid: '.1.3.6.1.4.1.1332.1.1.5.3.32.3.1.24.{{ $index }}'
+                    index: 'msanSfpDiagnosticsTxPowerCurrentDBm.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} Tx'
+                    divisor: 100
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsTxPowerCurrentDBm
+                            op: '=='
+                            value: -100000
+                -
+                    oid: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsTable
+                    value: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsRxPowerCurrentDBm
+                    num_oid: '.1.3.6.1.4.1.1332.1.1.5.3.32.3.1.25.{{ $index }}'
+                    index: 'msanSfpDiagnosticsRxPowerCurrentDBm.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} Rx'
+                    divisor: 100
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsRxPowerCurrentDBm
+                            op: '=='
+                            value: -100000
+        state:
+            data:
+                -
+                    oid: ISKRATEL-MSAN-MIB::msanOnuInfoTable
+                    value: ISKRATEL-MSAN-MIB::msanOnuInfoPrimaryStatus
+                    num_oid: '.1.3.6.1.4.1.1332.1.1.5.3.111.3.1.2.{{ $index }}'
+                    index: 'msanOnuInfoPrimaryStatus.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }}'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    state_name: msanOnuInfoPrimaryStatus
+                    group: 'ONU'
+                    states:
+                        - { value: 0, generic: 3, descr: invalid }
+                        - { value: 1, generic: 1, descr: inactive }
+                        - { value: 2, generic: 1, descr: activatePending }
+                        - { value: 3, generic: 0, descr: active }
+                        - { value: 4, generic: 1, descr: deactivatePending }
+                        - { value: 5, generic: 1, descr: disablePending }
+                        - { value: 6, generic: 0, descr: disabled }
+                -
+                    oid: ISKRATEL-MSAN-MIB::msanOnuInfoTable
+                    value: ISKRATEL-MSAN-MIB::msanOnuInfoOperState
+                    num_oid: '.1.3.6.1.4.1.1332.1.1.5.3.111.3.1.9.{{ $index }}'
+                    index: 'msanOnuInfoOperState.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} Oper'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    state_name: msanOnuInfoOperState
+                    group: 'ONU'
+                    states:
+                        - { value: 1, generic: 0, descr: enabled }
+                        - { value: 2, generic: 1, descr: disabled }
+                        - { value: 3, generic: 3, descr: unknown }
+                -
+                    oid: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsTable
+                    value: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsSignal
+                    num_oid: '.1.3.6.1.4.1.1332.1.1.5.3.32.3.1.1.{{ $index }}'
+                    index: 'msanSfpDiagnosticsSignal.{{ $index }}'
+                    descr: '{{ IF-MIB::ifDescr }} Signal'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    state_name: msanSfpDiagnosticsSignal
+                    states:
+                        - { value: 1, generic: 2, descr: loss }
+                        - { value: 2, generic: 0, descr: ok }
+                        - { value: 3, generic: 3, descr: notSupported }
+                    skip_values:
+                        -
+                            oid: ISKRATEL-MSAN-MIB::msanSfpDiagnosticsSignal
+                            op: '=='
+                            value: 3

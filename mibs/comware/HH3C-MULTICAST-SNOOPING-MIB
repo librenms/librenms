@@ -1,9 +1,9 @@
 -- ==================================================================
--- Copyright (c) 2004-2017 New H3C Tech. Co., Ltd. All rights reserved.
+-- Copyright (c) 2004-2022 New H3C Tech. Co., Ltd. All rights reserved.
 --
 -- Description: Multicast Snooping MIB
 -- Reference:
--- Version: V1.1
+-- Version: V1.3
 -- History:
 -- V1.0 2014-06-17 Created by Huang Yun
 -- V1.1 2017-09-26 Modified by meihaitao and yangjingdong
@@ -12,6 +12,10 @@
 --      Added 'tunnel(6)', 'mtunnel(7)' to object hh3cMcsL2EntryPortType.
 --      Added 'b(6)', 'e(7)', 'de(8)', 'ee(9)', 'suc(10)', 'f(11)' to object hh3cMcsL2EntryPortAttribute.
 --      Modified the description of object hh3cMcsL2EntryPortAttribute.
+-- V1.2 2022-06-27 Add hh3cMcsNotifications, hh3cMcsTrapBindObjects, hh3cMcsNotificationsExceedLimit
+--      hh3cMcsNotificationsAddressType and hh3cMcsGlobalEntryExceed by jiayunda
+-- V1.3 2022-07-21 Add hh3cMcsNotificationsSourceAddr, hh3cMcsNotificationsGroupAddr,
+--      hh3cMcsNotificationsVUType, hh3cMcsNotificationsVUID, hh3cMcsEntryRefreshFailAlarm by jiayunda
 -- ==================================================================
 --
 -- Variables and types be imported
@@ -22,7 +26,8 @@ HH3C-MULTICAST-SNOOPING-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
 
-    MODULE-IDENTITY,OBJECT-TYPE,Unsigned32,Counter64
+    MODULE-IDENTITY,OBJECT-TYPE,Unsigned32,Counter64,
+    NOTIFICATION-TYPE
         FROM SNMPv2-SMI
 
     TEXTUAL-CONVENTION,RowStatus,TruthValue
@@ -38,7 +43,7 @@ IMPORTS
         FROM IF-MIB;
 
 hh3cMulticastSnoop MODULE-IDENTITY
-    LAST-UPDATED "201709260950Z"
+    LAST-UPDATED "202207211356Z"
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -50,6 +55,15 @@ hh3cMulticastSnoop MODULE-IDENTITY
     DESCRIPTION
         "IGMP/MLD Snooping Management MIB"
     -- Revision history.
+    REVISION "202207211356Z"
+    DESCRIPTION
+        "Add hh3cMcsNotificationsSourceAddr, hh3cMcsNotificationsGroupAddr,
+         hh3cMcsNotificationsVUType, hh3cMcsNotificationsVUID,
+         hh3cMcsEntryRefreshFailAlarm."
+    REVISION "202206271300Z"
+    DESCRIPTION
+        "Add hh3cMcsNotifications, hh3cMcsTrapBindObjects, hh3cMcsNotificationsExceedLimit
+         hh3cMcsNotificationsAddressType and hh3cMcsGlobalEntryExceed."
     REVISION "201709260950Z"
     DESCRIPTION
         "Added hh3cMcsVUProxyEnabled and hh3cMcsVUQuerierElection to hh3cMcsVirtualUnitConfigTable.
@@ -73,8 +87,9 @@ Hh3cVirtualUnitType ::= TEXTUAL-CONVENTION
 -- ======================= definition begin =========================
 --
 -- ==================================================================
-
+hh3cMcsNotifications OBJECT IDENTIFIER ::= { hh3cMulticastSnoop 0 }
 hh3cMulticastSnoopObject OBJECT IDENTIFIER ::= {   hh3cMulticastSnoop 1  }
+hh3cMcsTrapBindObjects OBJECT IDENTIFIER ::= { hh3cMulticastSnoop 2 }
 
 hh3cMcsGlobalConfigTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF Hh3cMcsGlobalConfigEntry
@@ -1075,4 +1090,86 @@ hh3cMcsPortConfigRowStatus OBJECT-TYPE
         of rows, which supports 'active', 'createAndGo' and 'destroy'."
     ::= { hh3cMcsPortConfigEntry 8 }
 
+--
+-- notification configuration
+--
+
+hh3cMcsNotificationsAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The address type of the global configuration. IPv4 means IGMP snooping
+        configuration, and IPv6 means MLD snooping configuration."
+    ::= { hh3cMcsTrapBindObjects 1 }
+
+hh3cMcsNotificationsExceedLimit OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The maximum number of global L2 multicast entries."
+    ::= { hh3cMcsTrapBindObjects 2 }
+
+hh3cMcsNotificationsSourceAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The source address of the Layer 2 multicast entry that failed
+             to set to the driver."
+    ::= { hh3cMcsTrapBindObjects 3 }
+
+hh3cMcsNotificationsGroupAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The multicast group address of the Layer 2 multicast entry that failed
+             to set to the driver."
+    ::= { hh3cMcsTrapBindObjects 4 }
+
+hh3cMcsNotificationsVUType  OBJECT-TYPE
+    SYNTAX     Hh3cVirtualUnitType
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "Type of virtual unit."
+    ::= { hh3cMcsTrapBindObjects 5 }
+
+hh3cMcsNotificationsVUID  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "VLAN ID or VSI Index.  The value ranges is 1 to 4094 when for a
+        VLAN and 0 to 0xFFFFFFFE for a VSI"
+    ::= { hh3cMcsTrapBindObjects 6 }
+
+--
+-- trap
+--
+hh3cMcsGlobalEntryExceed  NOTIFICATION-TYPE
+    OBJECTS { hh3cMcsNotificationsAddressType,
+              hh3cMcsNotificationsExceedLimit
+            }
+    STATUS    current
+    DESCRIPTION
+            "The hh3cMcsGlobalEntryExceed is generated when the total number of
+            global L2 multicast entries exceeds the maximum number of global
+            L2 multicast entries."
+    ::= { hh3cMcsNotifications 1 }
+
+hh3cMcsEntryRefreshFailAlarm  NOTIFICATION-TYPE
+    OBJECTS { hh3cMcsNotificationsAddressType,
+              hh3cMcsNotificationsVUType,
+              hh3cMcsNotificationsVUID,
+              hh3cMcsNotificationsSourceAddr,
+              hh3cMcsNotificationsGroupAddr
+            }
+    STATUS    current
+    DESCRIPTION
+            "The hh3cMcsEntryRefreshFailAlarm is generated when  Layer 2 multicast
+             entry fails to set to the driver."
+    ::= { hh3cMcsNotifications 2 }
 END

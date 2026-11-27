@@ -38,6 +38,7 @@ use App\Models\Vminfo;
 use App\Models\WirelessSensor;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SecretType;
 use LibreNMS\Tests\DBTestCase;
@@ -45,6 +46,69 @@ use LibreNMS\Tests\DBTestCase;
 final class BasicApiTest extends DBTestCase
 {
     use DatabaseTransactions;
+
+    public function testSearchOxidizedConfigs(): void
+    {
+        LibrenmsConfig::set('oxidized.enabled', true);
+        LibrenmsConfig::set('oxidized.url', 'http://oxidized.test');
+        $user = User::factory()->admin()->create(['enabled' => 1]);
+        $token = $user->createToken('test');
+        $nodes = [['node' => 'router.example.com', 'full_name' => 'core/router.example.com']];
+        Http::preventStrayRequests();
+        Http::fake(['oxidized.test/nodes/conf_search?format=json' => Http::response($nodes)]);
+
+        $this->json('GET', '/api/v0/oxidized/config/search/hostname', [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertOk()
+            ->assertJsonPath('status', 'ok')
+            ->assertJsonPath('nodes', $nodes)
+            ->assertJsonPath('count', 1);
+
+        Http::assertSent(fn ($request) => $request->method() === 'POST'
+            && $request['search_in_conf_textbox'] === 'hostname');
+    }
+
+    public function testSearchOxidizedConfigsReturns404WithoutData(): void
+    {
+        LibrenmsConfig::set('oxidized.enabled', true);
+        LibrenmsConfig::set('oxidized.url', 'http://oxidized.test');
+        $user = User::factory()->admin()->create(['enabled' => 1]);
+        $token = $user->createToken('test');
+        Http::preventStrayRequests();
+        Http::fake(['oxidized.test/nodes/conf_search?format=json' => Http::response([])]);
+
+        $this->json('GET', '/api/v0/oxidized/config/search/hostname', [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertNotFound()
+            ->assertJsonPath('status', 'error')
+            ->assertJsonPath('message', 'Received no data from Oxidized');
+
+        Http::assertSentCount(1);
+    }
+
+    public function testListOxidizedWithLocationMapAndDeviceWithoutLocation(): void
+    {
+        LibrenmsConfig::set('oxidized.group_support', true);
+        LibrenmsConfig::set('oxidized.maps', [
+            'group' => [
+                'location' => [
+                    ['match' => 'Server Room A', 'value' => 'server-room'],
+                ],
+            ],
+        ]);
+        $user = User::factory()->admin()->create();
+        $token = $user->createToken('test');
+        $location = Location::factory()->create(['location' => 'Server Room A']);
+        Device::factory()->create(['hostname' => 'with-location.example.com', 'location_id' => $location->id]);
+        Device::factory()->create(['hostname' => 'without-location.example.com', 'location_id' => null]);
+
+        $nodes = $this->json('GET', '/api/v0/oxidized', [], ['X-Auth-Token' => $token->plainTextToken])
+            ->assertOk()
+            ->collect()
+            ->keyBy('hostname');
+
+        $this->assertSame('server-room', $nodes['with-location.example.com']['group'] ?? null);
+        $this->assertArrayHasKey('without-location.example.com', $nodes);
+        $this->assertArrayNotHasKey('group', $nodes['without-location.example.com']);
+    }
 
     public function testListDevices(): void
     {
@@ -64,6 +128,26 @@ final class BasicApiTest extends DBTestCase
         $this->assertSame($device->hostname, $deviceData['hostname']);
         $this->assertSame((int) $device->status, (int) $deviceData['status']);
         $this->assertIsInt($deviceData['status']);
+    }
+
+    public function testDeviceDatesIncludeTimezone(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = $user->createToken('test');
+        $device = Device::factory()->create([
+            'last_polled' => '2026-10-20 06:32:01',
+            'last_discovered' => '2026-10-20 06:30:00',
+        ]);
+
+        $headers = ['X-Auth-Token' => $token->plainTextToken];
+        $res = $this->json('GET', "/api/v0/devices/{$device->hostname}", [], $headers);
+        $res->assertStatus(200);
+
+        // Dates must carry their zone so clients don't have to guess the server's timezone.
+        $this->assertSame($device->last_polled->toISOString(), $res->json('devices.0.last_polled'));
+        $this->assertSame($device->last_discovered->toISOString(), $res->json('devices.0.last_discovered'));
+        $this->assertStringEndsWith('Z', $res->json('devices.0.last_polled'));
     }
 
     public function testListDevicesWithParentsShape(): void
@@ -147,6 +231,19 @@ final class BasicApiTest extends DBTestCase
         $this->json('GET', "/api/v0/devices?api_token={$token->plainTextToken}")
             ->assertStatus(200)
             ->assertJsonPath('status', 'ok');
+
+        auth()->forgetGuards();
+
+        // Test with HTTP Basic auth password
+        $this->json('GET', '/api/v0/devices', [], ['Authorization' => 'Basic ' . base64_encode("X-Auth-Token:{$token->plainTextToken}")])
+            ->assertStatus(200)
+            ->assertJsonPath('status', 'ok');
+
+        auth()->forgetGuards();
+
+        // Test with invalid HTTP Basic auth password
+        $this->json('GET', '/api/v0/devices', [], ['Authorization' => 'Basic ' . base64_encode('X-Auth-Token:invalid')])
+            ->assertStatus(401);
 
         auth()->forgetGuards();
 
@@ -326,6 +423,12 @@ final class BasicApiTest extends DBTestCase
         // Query parameter api_token should be rejected on v1
         $this->json('GET', "/api/v1/system?api_token={$token->plainTextToken}")
             ->assertStatus(401);
+
+        auth()->forgetGuards();
+
+        // HTTP Basic auth password should be rejected on v1
+        $this->json('GET', '/api/v1/system', [], ['Authorization' => 'Basic ' . base64_encode("X-Auth-Token:{$token->plainTextToken}")])
+            ->assertStatus(401);
     }
 
     public function testAddRuleStoresProcedureUrl(): void
@@ -503,8 +606,8 @@ final class BasicApiTest extends DBTestCase
         $device = Device::factory()->create(['hostname' => 'secret-device.domain.local']);
         $secret = Secret::create([
             'description' => 'API test secret',
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v3', 'authlevel' => 'authPriv', 'authname' => 'user', 'authpass' => 'auth-secret', 'cryptopass' => 'crypto-secret'],
+            'secret_type' => SecretType::SnmpV3,
+            'data' => ['authlevel' => 'authPriv', 'authname' => 'user', 'authpass' => 'auth-secret', 'cryptopass' => 'crypto-secret'],
         ]);
         DevicePollingMethod::factory()->create([
             'device_id' => $device->device_id,
@@ -633,12 +736,12 @@ final class BasicApiTest extends DBTestCase
         $token = $admin->createToken('test');
 
         $broken = Device::factory()->create(['hostname' => 'a-broken.domain.local']);
-        $brokenSecret = Secret::factory()->create(['secret_type' => SecretType::Snmp]);
+        $brokenSecret = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity]);
         \DB::table('secrets')->where('id', $brokenSecret->id)->update(['data' => 'encrypted-with-another-key']);
         DevicePollingMethod::factory()->create(['device_id' => $broken->device_id, 'method_type' => PollingMethodType::Snmp, 'secret_id' => $brokenSecret->id, 'settings' => ['port' => 1161]]);
 
         $working = Device::factory()->create(['hostname' => 'b-working.domain.local']);
-        $workingSecret = Secret::factory()->create(['secret_type' => SecretType::Snmp, 'data' => ['version' => 'v2c', 'community' => 'public']]);
+        $workingSecret = Secret::factory()->create(['secret_type' => SecretType::SnmpCommunity, 'data' => ['community' => 'public']]);
         DevicePollingMethod::factory()->create(['device_id' => $working->device_id, 'method_type' => PollingMethodType::Snmp, 'secret_id' => $workingSecret->id]);
 
         $res = $this->json('GET', '/api/v0/devices', ['order' => 'hostname'], ['X-Auth-Token' => $token->plainTextToken])
@@ -646,7 +749,8 @@ final class BasicApiTest extends DBTestCase
             ->assertJsonPath('count', 2);
 
         $devices = collect($res->json('devices'))->keyBy('hostname');
-        $this->assertNull($devices['a-broken.domain.local']['snmpver']); // credentials are left out
+        $this->assertNull($devices['a-broken.domain.local']['community']); // credentials are left out
+        $this->assertSame('v2c', $devices['a-broken.domain.local']['snmpver']); // the version is not encrypted
         $this->assertSame(1161, $devices['a-broken.domain.local']['port']); // settings are not encrypted
         $this->assertSame('v2c', $devices['b-working.domain.local']['snmpver']);
         $this->assertSame('public', $devices['b-working.domain.local']['community']);
@@ -779,6 +883,31 @@ final class BasicApiTest extends DBTestCase
 
             $this->assertSame('renamed.example.com', $device->fresh()->hostname);
             $this->assertDirectoryExists($rrd_dir . '/renamed.example.com');
+        } finally {
+            File::deleteDirectory($rrd_dir);
+        }
+    }
+
+    public function testRenameDeviceWithoutRrdDirectoryReportsSuccess(): void
+    {
+        /** @var User $user */
+        $user = User::factory()->admin()->create();
+        $token = $user->createToken('test');
+        $device = Device::factory()->create();
+
+        // rrd_dir exists, but the device has no RRD folder (e.g. disabled, never polled)
+        $rrd_dir = sys_get_temp_dir() . '/librenms-rename-' . uniqid();
+        mkdir($rrd_dir, 0777, true);
+        LibrenmsConfig::set('rrd_dir', $rrd_dir);
+
+        try {
+            $this->json('PATCH', "/api/v0/devices/{$device->device_id}/rename/renamed.example.com", [], ['X-Auth-Token' => $token->plainTextToken])
+                ->assertStatus(200)
+                ->assertJsonPath('status', 'ok')
+                ->assertJsonPath('message', 'Device has been renamed');
+
+            $this->assertSame('renamed.example.com', $device->fresh()->hostname);
+            $this->assertDirectoryDoesNotExist($rrd_dir . '/renamed.example.com');
         } finally {
             File::deleteDirectory($rrd_dir);
         }

@@ -1,11 +1,13 @@
 -- =================================================================
--- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: BRAS(Broadband Remote Access Server) access MIB File
 -- Reference:
--- Version: V1.0
+-- Version: V1.1
 -- History:
 -- V1.0 2020-11-10 created by wangzhenjun
+-- V1.1 2021-11-1 add hh3cBrasAccOnlineMibTrapOid
+--                add hh3cBrasAccOnlineTrap  by fengshuxiang
 -- =================================================================
 HH3C-BRAS-ACCESS-MIB DEFINITIONS ::= BEGIN
 
@@ -19,7 +21,7 @@ IMPORTS
 
 hh3cBrasAcc MODULE-IDENTITY
     LAST-UPDATED
-        "202011100927Z"
+        "202111010927Z"
     ORGANIZATION
         "New H3C Technologies Co., Ltd."
     CONTACT-INFO
@@ -32,7 +34,7 @@ hh3cBrasAcc MODULE-IDENTITY
         of BRAS access.
         "
     REVISION
-        "202011100927Z"
+        "202111010927Z"
     DESCRIPTION
         "The initial version of this MIB file."
     ::= { hh3cCommon 200 }
@@ -107,7 +109,7 @@ hh3cBrasAccUPStatTable  OBJECT-TYPE
     SYNTAX      SEQUENCE OF Hh3cBrasAccCUStatEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION "A table for BRAS CU(C: control plane, U: user plane) 
+    DESCRIPTION "A table for BRAS CU(C: control plane, U: user plane)
                  user statistics."
     ::= { hh3cBrasAcc 2 }
 
@@ -528,5 +530,105 @@ hh3cBrasAccCUSlotWarningResume NOTIFICATION-TYPE
         "This trap is generated when the number of online users on the slot
          of the specified UP falls below the maximum user threshold."
     ::= { hh3cBrasAccCUTrapPrefix 4 }
+
+hh3cBrasAccOnlineMibTrapOid OBJECT IDENTIFIER ::= { hh3cBrasAcc 7 }
+
+hh3cBrasAccOnlineTrapType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        all(1),
+                        ipoe(2),
+                        ppp(3),
+                        l2tpv2(4)
+                        }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved type of trap information."
+    ::= { hh3cBrasAccOnlineMibTrapOid 1 }
+
+hh3cBrasAccOnlineTrapSlot OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved CP slot of trap information."
+    ::= { hh3cBrasAccOnlineMibTrapOid 2 }
+
+hh3cBrasAccOnlineTrapThreshold OBJECT-TYPE
+    SYNTAX      Integer32(0..100)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The involved threshold (percentage of online users) of
+         trap information."
+    ::= { hh3cBrasAccOnlineMibTrapOid 3 }
+
+hh3cBrasAccOnlineTrap OBJECT IDENTIFIER  ::= { hh3cBrasAcc 8 }
+
+hh3cBrasAccOnlineTrapPrefix OBJECT IDENTIFIER  ::= { hh3cBrasAccOnlineTrap 0 }
+
+hh3cBrasAccOnlineULimitAlarm NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cBrasAccOnlineTrapType,
+        hh3cBrasAccOnlineTrapSlot,
+        hh3cBrasAccOnlineTrapThreshold
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the number of online users reaches the maximum
+         user threshold. Subsequent users are recommended to access the device"
+    ::= { hh3cBrasAccOnlineTrapPrefix 1 }
+
+hh3cBrasAccOnlineULimitResume NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cBrasAccOnlineTrapType,
+        hh3cBrasAccOnlineTrapSlot,
+        hh3cBrasAccOnlineTrapThreshold
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the number of online users falls below
+         the maximum user threshold."
+    ::= { hh3cBrasAccOnlineTrapPrefix 2 }
+
+hh3cBrasAccOnlineLLimitAlarm NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cBrasAccOnlineTrapType,
+        hh3cBrasAccOnlineTrapSlot,
+        hh3cBrasAccOnlineTrapThreshold
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the number of online users reaches the minimum
+         user threshold. Subsequent users are recommended to access the device"
+    ::= { hh3cBrasAccOnlineTrapPrefix 3 }
+
+hh3cBrasAccOnlineLLimitResume NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cBrasAccOnlineTrapType,
+        hh3cBrasAccOnlineTrapSlot,
+        hh3cBrasAccOnlineTrapThreshold
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the number of online users higher the minimum
+         user threshold."
+    ::= { hh3cBrasAccOnlineTrapPrefix 4 }
+
+hh3cBrasAccOnlineFailEvent NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cBrasAccOnlineTrapSlot,
+        hh3cBrasAccOnlineTrapThreshold
+    }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when the number of failed online users on the
+         device reaches the threshold. "
+    ::= { hh3cBrasAccOnlineTrapPrefix 5 }
 
 END

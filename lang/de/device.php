@@ -25,6 +25,8 @@ return [
     'scheduled_maintenance' => 'Geplante Wartungsarbeiten',
     'warning_monitored' => '„Warnung: Dadurch wird das Gerät aus der Überwachung entfernt!“',
     'warning_data' => 'Dabei werden auch historische Daten über dieses Gerät entfernt, wie zum Beispiel:',
+    'no_availability' => 'Achtung: Für dieses Gerät sind keine Verfügbarkeitsquellen aktiviert. Es muss mindestens eine Abfragemethode aktiviert und so eingestellt sein, dass sie die Verfügbarkeit beeinflusst, andernfalls wird das Gerät IMMER als erreichbar angezeigt',
+
     'edit' => [
         'delete_device' => 'Gerät löschen',
         'rediscover_title' => 'Das Gerät so einstellen, dass es vom Poller sofort erneut erkannt wird',
@@ -35,6 +37,10 @@ return [
         'display_name' => 'Anzeigename',
         'system_default' => 'Systemstandard',
         'overwrite_ip_title' => 'Diese IP anstelle der aufgelösten IP für die Abfrage verwenden',
+        'no_snmp_title' => 'Ohne SNMP werden diese Details nicht erkannt, hier setzen',
+        'sysName' => 'sysName',
+        'hardware' => 'Hardware',
+        'os' => 'OS',
         'overwrite_ip' => 'IP überschreiben (nicht verwenden)',
         'description' => 'Beschreibung',
         'type' => 'Typ',

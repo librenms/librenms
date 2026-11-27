@@ -11,50 +11,50 @@ IMPORTS
         FROM SNMPv2-TC; -- RFC 2579
 
 ieee8021TcMib MODULE-IDENTITY
-    LAST-UPDATED "201806210000Z" -- June 21, 2018
+    LAST-UPDATED "202211080000Z" -- November 8, 2022
     ORGANIZATION "IEEE 802.1 Working Group"
     CONTACT-INFO
-        "  WG-URL: http://www.ieee802.org/1
-         WG-EMail: stds-802-1-L@ieee.org
-
+        "  WG-URL: http://www.ieee802.org/1/
+         WG-EMail: stds-802-1-l@ieee.org
           Contact: IEEE 802.1 Working Group Chair
            Postal: C/O IEEE 802.1 Working Group
                    IEEE Standards Association
                    445 Hoes Lane
-                   Piscataway
-                   NJ 08855
+                   Piscataway, NJ 08854
                    USA
-           E-mail: STDS-802-1-L@IEEE.ORG"
+           E-mail: stds-802-1-chairs@ieee.org"
     DESCRIPTION
         "Textual conventions used throughout the various IEEE 802.1 MIB
          modules.
 
          Unless otherwise indicated, the references in this MIB
-         module are to IEEE Std 802.1Q.
+         module are to IEEE Std 802.1Q-2022.
 
-         Copyright (C) IEEE (2014).
+         Copyright (C) IEEE (2022).
          This version of this MIB module is part of IEEE Std 802.1Q;
-         see the draft itself for full legal notices."
+         see that standard for full legal notices."
 
-    REVISION "201806210000Z" -- June 21, 2018
-
-    
+    REVISION "202211080000Z" -- November 8, 2022
     DESCRIPTION
-            "Published as part of IEEE Std 802.1Q 2017 revision.
+            "Published as part of IEEE Std 802.1Q-2022.
+            Cross references and contact information updated."
+
+    REVISION "201807010000Z" -- July 1, 2018
+    DESCRIPTION
+            "Published as part of IEEE Std 802.1Q 2018 revision.
             Cross references updated and corrected."
 
     REVISION "201412150000Z" -- December 15, 2014
-    
     DESCRIPTION
             "Published as part of IEEE Std 802.1Q 2014 revision.
             Cross references updated and corrected.
             Updating of definition of IEEE8021PbbIngressEgress
             New identifier types for new SPBM MA types"
-            
+
     REVISION     "201202150000Z" -- February 15, 2012
     DESCRIPTION
          "Modified IEEE8021BridgePortType textual convention to
-          include stationFacingBridgePort, 
+          include stationFacingBridgePort,
           uplinkAccessPort, and uplinkRelayPort types."
 
     REVISION     "201108230000Z" -- August 23, 2011
@@ -69,9 +69,9 @@ ieee8021TcMib MODULE-IDENTITY
 
     REVISION     "201102270000Z" -- February 27, 2011
     DESCRIPTION
-         "Minor edits to contact information etc. as part of 
+         "Minor edits to contact information etc. as part of
           2011 revision of IEEE Std 802.1Q."
-          
+
 
     REVISION     "200811180000Z" -- November 18, 2008
     DESCRIPTION
@@ -159,7 +159,7 @@ IEEE8021PbbServiceIdentifierOrUnassigned ::= TEXTUAL-CONVENTION
 IEEE8021PbbIngressEgress ::= TEXTUAL-CONVENTION
     STATUS       current
     DESCRIPTION
-        "A 2 bit selector which determines if frames on this VIP may
+        "A 2 bit selector that determines if frames on this VIP may
         ingress to the PBBN but not egress the PBBN, egress to the
         PBBN but not ingress the PBBN, or both ingress and egress
         the PBBN."
@@ -172,8 +172,8 @@ IEEE8021PbbIngressEgress ::= TEXTUAL-CONVENTION
 IEEE8021PriorityCodePoint ::= TEXTUAL-CONVENTION
     STATUS       current
     DESCRIPTION
-        "Bridge ports may encode or decode the PCP value of the 
-        frames that traverse the port. This textual convention 
+        "Bridge ports may encode or decode the PCP value of the
+        frames that traverse the port. This textual convention
         names the possible encoding and decoding schemes that
         the port may use.  The priority and drop_eligible
         parameters are encoded in the Priority Code Point (PCP)
@@ -215,7 +215,7 @@ IEEE8021BridgePortType ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "A port type.  The possible port types are:
 
-             customerVlanPort(2) - Indicates a port is a 
+             customerVlanPort(2) - Indicates a port is a
                  C-tag-aware port of an enterprise VLAN-aware Bridge.
 
              providerNetworkPort(3) - Indicates a port is an S-tag-
@@ -236,7 +236,7 @@ IEEE8021BridgePortType ::= TEXTUAL-CONVENTION
 
              virtualInstancePort(7) - Indicates a port is a virtual
                  S-tag-aware port within a Backbone Edge Bridge's
-                 I-component which is responsible for handling
+                 I-component that is responsible for handling
                  S-tagged traffic for a specific backbone service
                  instance.
 
@@ -247,16 +247,16 @@ IEEE8021BridgePortType ::= TEXTUAL-CONVENTION
                  S-tag-aware port of a Provider Bridge used for
                  connections to remote customer interface LANs
                  through another PBN.
-                 
+
              stationFacingBridgePort (10) - Indicates a port of a
                  Bridge that supports the EVB status parameters
                  (40.4) with an EVBMode parameter value of
                  EVB Bridge.
-                 
+
              uplinkAccessPort (11) - Indicates a port on a
                  Port-mapping S-VLAN component that connects an EVB
-                 Bridge with an EVB station.             
-                 
+                 Bridge with an EVB station.
+
              uplinkRelayPort (12) - Indicates a port of an edge relay
                  that supports the EVB status parameters (40.4)
                  with an EVBMode parameter value of EVB station."
@@ -352,20 +352,20 @@ IEEE8021ServiceSelectorType ::= TEXTUAL-CONVENTION
         in Bridges that implement PBB-TE functionality.  A selector of
         this type is interpreted as a 32 bit unsigned value of type
         IEEE8021PbbTeTSidId.  This type is used to index the
-        ieee8021PbbTeTeSiEspTable to find the ESPs which comprise the TE
+        ieee8021PbbTeTeSiEspTable to find the ESPs that comprise the TE
         Service Instance named by this TE-SID value.
-        
+
         The segid is used as a service selector for MAs that are present
         in Bridges that implement IPS functionality.  A selector of
         this type is interpreted as a 32 bit unsigned value of type
         IEEE8021TeipsSegid.  This type is used to index the
-        Ieee8021TeipsSegTable to find the SMPs which comprise the
+        Ieee8021TeipsSegTable to find the SMPs that comprise the
         Infrastructure Segment named by this segid value.
 
         The path-tesid is used as a service selector for SPBM path MAs.
         A selector of this type is interpreted as a 32 bit unsigned value
         corresponding to the MA index dot1agCfmMaIndex. This type is used
-        to index the dot1agCfmMepSpbmEspTable to find the ESPs which
+        to index the dot1agCfmMepSpbmEspTable to find the ESPs that
         comprise the SPBM path associated with an SPBM path MA.
 
         The group-isid is used as a service selector for SPBM group MAs.
@@ -460,7 +460,7 @@ IEEE8021PortAcceptableFrameTypes ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "Acceptable frame types on a port."
-    REFERENCE   "12.10.1.3, 12.13.3.3, 12.13.3.4"
+    REFERENCE   "12.10.1.3, 12.13.2.3, 12.13.2.4"
     SYNTAX      INTEGER {
                     admitAll(1),
                     admitUntaggedAndPriority(2),
@@ -472,14 +472,14 @@ IEEE8021PriorityValue ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "An IEEE 802.1Q user priority value."
-   REFERENCE   "12.13.3.3"
+   REFERENCE   "12.13.2.3"
     SYNTAX      Unsigned32 (0..7)
 
 IEEE8021PbbTeProtectionGroupId ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d"
     STATUS       current
     DESCRIPTION
-        "The PbbTeProtectionGroupId identifier is used to distinguish 
+        "The PbbTeProtectionGroupId identifier is used to distinguish
          protection group instances present in the B Component of
          an IB-BEB."
     REFERENCE "12.18.2"
@@ -495,7 +495,7 @@ IEEE8021PbbTeEsp ::= TEXTUAL-CONVENTION
         Bytes (1..6) of this textual convention contain the
         ESP-MAC-DA, bytes (7..12) contain the ESP-MAC-SA, and bytes
         (13..14) contain the ESP-VID."
-    REFERENCE "3.83"
+    REFERENCE "3.86"
     SYNTAX OCTET STRING ( SIZE(14))
 
 IEEE8021PbbTeTSidId ::= TEXTUAL-CONVENTION
@@ -507,7 +507,7 @@ IEEE8021PbbTeTSidId ::= TEXTUAL-CONVENTION
         a TE-SID is implementation dependent.  This textual convention
         defines the external representation of TE-SID values."
     REFERENCE
-        "3.270"
+        "3.275"
     SYNTAX  Unsigned32 (1..42947295)
 
 IEEE8021PbbTeProtectionGroupConfigAdmin ::= TEXTUAL-CONVENTION
@@ -516,7 +516,7 @@ IEEE8021PbbTeProtectionGroupConfigAdmin ::= TEXTUAL-CONVENTION
         "This textual convention is used to represent administrative
         commands that can be issued to a protection group.  The value
         noAdmin(1) is used to indicate that no administrative action
-        is to be performed."  
+        is to be performed."
     REFERENCE "26.10.3.3.5
                26.10.3.3.6
                26.10.3.3.7
@@ -545,16 +545,16 @@ IEEE8021PbbTeProtectionGroupActiveRequests ::= TEXTUAL-CONVENTION
                 manualSwitchToProtection(6),
                 manualSwitchToWorking(7)
             }
-            
+
 IEEE8021TeipsIpgid ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d"
     STATUS       current
     DESCRIPTION
-        "The TEIPS IPG identifier is used to distinguish 
+        "The TEIPS IPG identifier is used to distinguish
          IPG instances present in a PBB."
     REFERENCE "12.24.1.1.3 a)"
-    SYNTAX       Unsigned32 (1..429467295)    
- 
+    SYNTAX       Unsigned32 (1..429467295)
+
 IEEE8021TeipsSegid ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d"
     STATUS current
@@ -566,8 +566,8 @@ IEEE8021TeipsSegid ::= TEXTUAL-CONVENTION
         external representation of SEG-ID values."
     REFERENCE
         "26.11.1"
-    SYNTAX  Unsigned32 (1..42947295) 
-    
+    SYNTAX  Unsigned32 (1..42947295)
+
 IEEE8021TeipsSmpid ::= TEXTUAL-CONVENTION
     STATUS current
     DESCRIPTION
@@ -579,7 +579,7 @@ IEEE8021TeipsSmpid ::= TEXTUAL-CONVENTION
         SMP-MAC-DA, bytes (7..12) contain the SMP-MAC-SA, and bytes
         (13..14) contain the SMP-VID."
     REFERENCE "26.11.1"
-    SYNTAX OCTET STRING ( SIZE(14))   
+    SYNTAX OCTET STRING ( SIZE(14))
 
 IEEE8021TeipsIpgConfigAdmin ::= TEXTUAL-CONVENTION
     STATUS current
@@ -587,7 +587,7 @@ IEEE8021TeipsIpgConfigAdmin ::= TEXTUAL-CONVENTION
         "This textual convention is used to represent administrative
         commands that can be issued to an IPG.  The value
         clear(1) is used to indicate that no administrative action
-        is to be performed."  
+        is to be performed."
     REFERENCE "12.24.2.1.3 h)"
     SYNTAX    INTEGER {
                  clear(1),

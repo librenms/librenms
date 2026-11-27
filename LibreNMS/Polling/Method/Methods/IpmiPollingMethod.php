@@ -9,6 +9,7 @@ use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\IpmiConnectionFailed;
 use LibreNMS\Polling\Method\Config\IpmiConfig;
 use LibreNMS\Polling\Method\Config\PollingMethodConfig;
+use LibreNMS\Polling\Method\DataSources\IpmiDataSource;
 use LibreNMS\Polling\Method\Definitions\IpmiDefinition;
 use LibreNMS\Polling\Method\ProbeResult;
 use LibreNMS\Polling\Secrets\Data\IpmiSecretData;
@@ -47,7 +48,8 @@ final class IpmiPollingMethod extends PollingMethod
     public function config(Device $device, ?DevicePollingMethod $deviceMethod = null): IpmiConfig
     {
         $settings = ($deviceMethod->settings ?? []) + $this->defaults($device);
-        $secret = IpmiSecretData::fromArray($deviceMethod->secret->data ?? []);
+        $secret = $this->secretData($deviceMethod?->secret) ?? new IpmiSecretData;
+        assert($secret instanceof IpmiSecretData);
 
         return new IpmiConfig(
             hostname: $settings['hostname'],
@@ -61,8 +63,20 @@ final class IpmiPollingMethod extends PollingMethod
         );
     }
 
+    public function dataSourceClass(): string
+    {
+        return IpmiDataSource::class;
+    }
+
+    public function dataSource(Device $device, PollingMethodConfig $config, ProbeResult $result): IpmiDataSource
+    {
+        assert($config instanceof IpmiConfig);
+
+        return new IpmiDataSource($device, $config, $result);
+    }
+
     /**
-     * Reads the sensor data records, they are in the sdr stat for the ipmi module.
+     * Reads the sensor data records, the data source polls the sensors from them.
      */
     public function probe(Device $device, PollingMethodConfig $config): ProbeResult
     {
@@ -81,8 +95,8 @@ final class IpmiPollingMethod extends PollingMethod
         }
     }
 
-    public function secretType(): SecretType
+    public function secretTypes(): array
     {
-        return SecretType::Ipmi;
+        return [SecretType::Ipmi];
     }
 }

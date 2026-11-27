@@ -40,6 +40,6 @@ class ColdBoot implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $trap->log('SNMP Trap: Device ' . $device->displayName() . ' cold booted', Severity::Warning, 'reboot');
+        $trap->log('SNMP Trap: Device ' . $device->hostname . ' cold booted', Severity::Warning, 'reboot');
     }
 }

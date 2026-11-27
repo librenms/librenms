@@ -29,54 +29,90 @@ namespace LibreNMS;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\DeviceGraph;
+use App\Models\Mempool;
+use App\Models\Sensor;
 use DeviceCache;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use LibreNMS\Data\Source\Snmp\SnmpQueryOptions;
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Discovery\YamlDiscoveryDefinition;
+use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SnmpOidOutput;
+use LibreNMS\Enum\SnmpQuickPrint;
+use LibreNMS\Enum\SnmpStringOutput;
+use LibreNMS\Exceptions\SnmpConnectionException;
+use LibreNMS\Interfaces\Discovery\BgpPeerDiscovery;
 use LibreNMS\Interfaces\Discovery\EntityPhysicalDiscovery;
+use LibreNMS\Interfaces\Discovery\FdbTableDiscovery;
+use LibreNMS\Interfaces\Discovery\MefDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\NeighborDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Discovery\PackagesDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Discovery\SensorsDiscovery;
 use LibreNMS\Interfaces\Discovery\StorageDiscovery;
 use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
 use LibreNMS\Interfaces\Discovery\StpPortDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanDiscovery;
 use LibreNMS\Interfaces\Discovery\VlanPortDiscovery;
+use LibreNMS\Interfaces\Discovery\VrfDiscovery;
+use LibreNMS\Interfaces\Discovery\VrfPortDiscovery;
+use LibreNMS\Interfaces\Polling\MefPolling;
+use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpForwardNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\SnmpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\TcpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\UdpNetstatsPolling;
+use LibreNMS\Interfaces\Polling\SensorsPolling;
 use LibreNMS\Interfaces\Polling\StpInstancePolling;
 use LibreNMS\Interfaces\Polling\StpPortPolling;
 use LibreNMS\OS\Generic;
+use LibreNMS\OS\Traits\Bgp4Mib;
 use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\EntityMib;
+use LibreNMS\OS\Traits\EntitySensorMib;
 use LibreNMS\OS\Traits\HostResources;
+use LibreNMS\OS\Traits\LegacySensorDiscovery;
+use LibreNMS\OS\Traits\LegacySensorPolling;
 use LibreNMS\OS\Traits\LldpMib;
+use LibreNMS\OS\Traits\MefUniEvcMib;
+use LibreNMS\OS\Traits\MplsVpnMib;
 use LibreNMS\OS\Traits\NetstatsPolling;
 use LibreNMS\OS\Traits\QBridgeMib;
 use LibreNMS\OS\Traits\UcdResources;
+use LibreNMS\OS\Traits\UpsMib;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
+use LibreNMS\OS\Traits\YamlProcessorDiscovery;
+use LibreNMS\OS\Traits\YamlSensorDiscovery;
 use LibreNMS\OS\Traits\YamlStorageDiscovery;
 use LibreNMS\Polling\PerDeviceMethodResults;
 use LibreNMS\Util\StringHelpers;
 
 class OS implements
+    BgpPeerDiscovery,
     ProcessorDiscovery,
     OSDiscovery,
+    SensorsDiscovery,
+    SensorsPolling,
     MempoolsDiscovery,
+    MempoolsPolling,
+    PackagesDiscovery,
     StpInstanceDiscovery,
     StpPortDiscovery,
     EntityPhysicalDiscovery,
+    FdbTableDiscovery,
     IcmpNetstatsPolling,
     NeighborDiscovery,
     IpNetstatsPolling,
     IpForwardNetstatsPolling,
+    MefDiscovery,
+    MefPolling,
     SnmpNetstatsPolling,
     StorageDiscovery,
     StpInstancePolling,
@@ -84,7 +120,9 @@ class OS implements
     TcpNetstatsPolling,
     UdpNetstatsPolling,
     VlanDiscovery,
-    VlanPortDiscovery
+    VlanPortDiscovery,
+    VrfDiscovery,
+    VrfPortDiscovery
 {
     use HostResources {
         HostResources::discoverProcessors as discoverHrProcessors;
@@ -98,11 +136,20 @@ class OS implements
     }
     use YamlOSDiscovery;
     use YamlMempoolsDiscovery;
+    use YamlProcessorDiscovery;
     use YamlStorageDiscovery;
+    use YamlSensorDiscovery;
+    use LegacySensorDiscovery;
+    use LegacySensorPolling;
+    use UpsMib;
     use NetstatsPolling;
+    use Bgp4Mib;
     use BridgeMib;
     use EntityMib;
+    use EntitySensorMib;
     use LldpMib;
+    use MefUniEvcMib;
+    use MplsVpnMib;
     use QBridgeMib;
 
     /**
@@ -112,7 +159,6 @@ class OS implements
     private $device; // annoying use of references to make sure this is in sync with global $device variable
     private $graphs; // stores device graphs
     private $cache; // data cache
-    private $pre_cache; // pre-fetch data cache
     private ?PerDeviceMethodResults $methodResults = null;
 
     protected ?string $entityVendorTypeMib = null;
@@ -170,6 +216,45 @@ class OS implements
     }
 
     /**
+     * The sources of a module's data for this device: the data sources of the polling methods,
+     * then this OS when it implements the interface, most of its data is read with SNMP.
+     *
+     * @template T of object
+     *
+     * @param  class-string<T>  $interface
+     * @return list<T>
+     */
+    public function dataSources(string $interface): array
+    {
+        $sources = $this->getMethodResults()->dataSources($interface);
+        $os = $this->dataSource(PollingMethodType::Snmp, $interface);
+
+        if ($os !== null) {
+            $sources[] = $os;
+        }
+
+        return $sources;
+    }
+
+    /**
+     * The source of a module's data from one polling method, for modules that prefer one method. SNMP data comes from this OS.
+     * Null when the method is not available or does not have data for the interface.
+     *
+     * @template T of object
+     *
+     * @param  class-string<T>  $interface
+     * @return T|null
+     */
+    public function dataSource(PollingMethodType $type, string $interface): ?object
+    {
+        if ($type !== PollingMethodType::Snmp) {
+            return $this->getMethodResults()->dataSource($type, $interface);
+        }
+
+        return $this instanceof $interface && $this->getMethodResults()->isAvailable($type) ? $this : null;
+    }
+
+    /**
      * Enable a graph for this device
      *
      * @param  string  $name
@@ -193,13 +278,6 @@ class OS implements
         $device->graphs()->saveMany($graphs->diff($device->graphs->pluck('graph'))->map(fn ($graph) => new DeviceGraph(['graph' => $graph])));
     }
 
-    public function preCache()
-    {
-        $this->pre_cache ??= YamlDiscovery::preCache($this);
-
-        return $this->pre_cache;
-    }
-
     /**
      * Snmpwalk the specified oid and return an array of the data indexed by the oid index.
      * If the data is cached, return the cached data.
@@ -209,6 +287,8 @@ class OS implements
      * @param  string  $mib  mib for this oid
      * @param  string  $snmpflags  snmpflags for this oid
      * @return array|null array indexed by the snmp index with the value as the data returned by snmp
+     *
+     * @deprecated Please use SnmpQuery instead
      */
     public function getCacheByIndex($oid, $mib = null, $snmpflags = '-OQUs')
     {
@@ -235,6 +315,8 @@ class OS implements
      * @param  string  $mib  mib for this oid (optional)
      * @param  int  $depth  depth for snmpwalk_group (optional)
      * @return array|null array indexed by the snmp index with the value as the data returned by snmp
+     *
+     * @deprecated Use SnmpQuery
      */
     public function getCacheTable($oid, $mib = null, $depth = 1)
     {
@@ -254,6 +336,8 @@ class OS implements
      *
      * @param  string  $oid
      * @return bool
+     *
+     * @deprecated Only applies to getCacheByIndex(), use SnmpQuery::cache() instead
      */
     public function isCached($oid)
     {
@@ -347,19 +431,23 @@ class OS implements
 
     /**
      * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
+     * Returns a Collection of Processor models that have been discovered
      *
-     * @return array Processors
+     * @return Collection<int, \App\Models\Processor>
      */
-    public function discoverProcessors()
+    public function discoverProcessors(): Collection
     {
-        $processors = $this->discoverHrProcessors();
-
-        if (empty($processors)) {
-            $processors = $this->discoverUcdProcessors();
+        $processors = $this->discoverYamlProcessors();
+        if ($processors->isNotEmpty()) {
+            return $processors;
         }
 
-        return $processors;
+        $processors = $this->discoverHrProcessors();
+        if ($processors->isNotEmpty()) {
+            return collect($processors);
+        }
+
+        return $this->discoverUcdProcessors();
     }
 
     public function discoverMempools()
@@ -374,6 +462,30 @@ class OS implements
         }
 
         return $this->discoverUcdMempools();
+    }
+
+    /**
+     * Read the OIDs set when the mempools were discovered.
+     */
+    public function pollMempools(EloquentCollection $mempools): EloquentCollection
+    {
+        $oids = $mempools->map->only(['mempool_perc_oid', 'mempool_used_oid', 'mempool_free_oid', 'mempool_total_oid'])
+            ->flatten()->filter()->unique()->values()->all();
+
+        if (empty($oids)) {
+            return $mempools;
+        }
+
+        $data = \SnmpQuery::numeric()->get($oids)->values();
+
+        return $mempools->each(function (Mempool $mempool) use ($data): void {
+            $mempool->fillUsage(
+                $data[(string) $mempool->mempool_used_oid] ?? null,
+                $data[(string) $mempool->mempool_total_oid] ?? null,
+                $data[(string) $mempool->mempool_free_oid] ?? null,
+                $data[(string) $mempool->mempool_perc_oid] ?? null
+            );
+        });
     }
 
     public function discoverStorage(): Collection
@@ -391,6 +503,71 @@ class OS implements
         }
 
         return $this->discoverUcdStorage();
+    }
+
+    /**
+     * ENTITY-SENSOR-MIB sensors, then the sensors of this OS, UPS-MIB and the yaml sensors.
+     * A sensor replaces earlier sensors of the same class, type and index.
+     *
+     * @return Collection<int, Sensor>
+     */
+    public function discoverSensors(): Collection
+    {
+        return $this->discoverEntitySensors()
+            ->merge($this->discoverOsSensors())
+            ->merge($this->discoverLegacySensors())
+            ->merge($this->discoverUpsMibSensors())
+            ->merge($this->discoverYamlSensors());
+    }
+
+    /**
+     * Sensors this OS discovers with code, yaml sensors are preferred.
+     *
+     * @return Collection<int, Sensor>
+     */
+    protected function discoverOsSensors(): Collection
+    {
+        return new Collection;
+    }
+
+    /**
+     * The legacy pre-cache data is available to the yaml until the pre-cache includes are converted.
+     */
+    protected function walkSensorYaml(array $yaml): array
+    {
+        return $this->legacySensorPreCache() + YamlDiscoveryDefinition::walkAll($yaml, $this->yamlOids());
+    }
+
+    /**
+     * Get the oids of the sensors, some devices answer for the oid with .0 appended.
+     *
+     * @throws SnmpConnectionException when the device did not answer
+     */
+    public function pollSensors(EloquentCollection $sensors): array
+    {
+        $oids = $sensors->pluck('sensor_oid')->filter()->unique()->values()->all();
+        if (empty($oids)) {
+            return $this->pollLegacySensors($sensors, [], []);
+        }
+
+        $data = \SnmpQuery::options(new SnmpQueryOptions(
+            oidFormat: SnmpOidOutput::Numeric,
+            numericEnums: true,
+            numericTimeticks: true,
+            printUnits: false,
+            stringFormat: SnmpStringOutput::Ascii, // strings as ascii, some devices end numbers with a null byte
+            quickPrint: SnmpQuickPrint::Equals,
+        ))->get($oids)->throwIfConnectionError()->values();
+        $values = [];
+
+        foreach ($sensors as $sensor) {
+            $value = $data[$sensor->sensor_oid] ?? $data["$sensor->sensor_oid.0"] ?? null;
+            if ($value !== null) {
+                $values[$sensor->sensor_id] = trim(str_replace('"', '', (string) $value));
+            }
+        }
+
+        return $this->pollLegacySensors($sensors, $values, $data);
     }
 
     public function getDiscovery($module = null)

@@ -75,8 +75,8 @@
     <div class="form-group">
         <label for="sort-{{ $id }}" class="control-label">{{ __('Sort alerts by') }}:</label>
         <select class="form-control" name="sort" id="sort-{{ $id }}">
-            <option value="" @if($sort == 1) selected @endif>{{ __('timestamp, descending') }}</option>
-            <option value="severity" @if($sort == 0) selected @endif>{{ __('severity, descending') }}</option>
+            <option value="" @selected($sort !== 'severity')>{{ __('timestamp, descending') }}</option>
+            <option value="severity" @selected($sort === 'severity')>{{ __('severity, descending') }}</option>
         </select>
     </div>
     <div class="form-group">

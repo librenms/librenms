@@ -1,0 +1,70 @@
+NETGEAR-TC DEFINITIONS ::= BEGIN
+
+-- Broadcom NETGEAR Textual Conventions MIB
+-- Copyright 2020 Broadcom.
+-- This SNMP Management Information Specification
+-- embodies Broadcom's confidential and proprietary
+-- intellectual property.  Broadcom retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Broadcom 
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+IMPORTS
+    MODULE-IDENTITY, Integer32          FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                  FROM SNMPv2-TC
+    ng7000managedswitch                            FROM NETGEAR-REF-MIB;
+
+fastPathTc MODULE-IDENTITY
+      LAST-UPDATED "202004210000Z" -- 21 April 2020 12:00:00 GMT
+      ORGANIZATION "Netgear Inc"
+      CONTACT-INFO ""
+ 
+      DESCRIPTION
+          "This MIB defines NETGEAR textual conventions."
+
+      -- Revision history.
+      REVISION
+          "202004210000Z" -- 21 April 2020 12:00:00 GMT
+      DESCRIPTION
+          "Initial revision."
+      ::= { ng7000managedswitch 99 }
+
+DeciInteger32 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION  "Integer value expressed in tenths. The range is
+                  -214,748,364.8 thru 214,748,364.7."
+    SYNTAX       Integer32
+
+CentiInteger32 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS       current
+    DESCRIPTION  "Integer value expressed in tenths. The range is
+                  -21,474,836.48 thru 21,474,836.47."
+    SYNTAX       Integer32
+
+MilliInteger32 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-3"
+    STATUS       current
+    DESCRIPTION  "Integer value expressed in thousanths. The range is
+                  -2,147,483.648 thru 2,147,483.647."
+    SYNTAX       Integer32
+
+DBmTenths ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION  "Decibel value in hundreths. The range is
+                  -214,748,364.8 thru 214,748,364.7."
+    SYNTAX       Integer32
+
+DBmHundreths ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-3"
+    STATUS       current
+    DESCRIPTION  "Decibel value in hundreths. The range is
+                  -214,748,364.8 thru 214,748,364.7."
+    SYNTAX       Integer32
+
+END

@@ -1,0 +1,454 @@
+ECOSWITCH-HARDWARE-INFO-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Hardware information of SDN SWITCH platform
+--
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    enterprises,
+    Counter64,
+    Integer32,
+    Unsigned32
+        FROM SNMPv2-SMI
+    OBJECT-GROUP
+        FROM SNMPv2-CONF;
+
+
+rdp MODULE-IDENTITY
+    LAST-UPDATED "202409100000Z"
+    ORGANIZATION "RDP.RU"
+    CONTACT-INFO "web:      http://rdp.ru"
+    DESCRIPTION  "Includes information about hardware"
+    REVISION     "202409100000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { enterprises 45555 }
+
+ecoswitch     OBJECT IDENTIFIER ::= { rdp 3 }
+hardwareInfo  OBJECT IDENTIFIER ::= { ecoswitch 3 }
+
+productObjects OBJECT-GROUP
+    OBJECTS {
+                serialNumber,
+                productName,
+                biosVersion,
+                cpuCoreNumber,
+                cpuCoreLoad,
+                total,
+                free,
+                utilization,
+                storageDevice,
+                storageType,
+                storageTotal,
+                storageFree,
+                storageUtilization,
+                psuNumber,
+                psuType,
+                psuStatus,
+                psuInputVoltage,
+                psuInputCurrent,
+                psuOutputVoltage,
+                psuOutputCurrent,
+                fanNumber,
+                fanState,
+                fanSpeedFront,
+                fanSpeedRear,
+                sensorsAdapterName,
+                sensorsAdapterParameterName,
+                sensorsAdapterParameterValue
+            }
+    STATUS  current
+    DESCRIPTION
+        "The group of objects that constitute the information
+        about hardware"
+::= { hardwareInfo 8 }
+
+--
+-- platform info
+--
+
+platformInfo  OBJECT IDENTIFIER ::= { hardwareInfo 1 }
+
+serialNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Product Serial Number"
+    ::= { platformInfo 1 }
+
+productName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Product name"
+    ::= { platformInfo 2 }
+
+biosVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "BIOS version"
+    ::= { platformInfo 3 }
+
+--
+-- CPU Info
+--
+
+cpuInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CpuInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about CPUs"
+    ::= { hardwareInfo 2 }
+
+cpuInfoEntry OBJECT-TYPE
+    SYNTAX      CpuInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    ""
+    INDEX { cpuCoreNumber }
+    ::= { cpuInfoTable 1 }
+
+CpuInfoEntry ::=
+    SEQUENCE {
+        cpuCoreNumber Unsigned32,
+        cpuCoreLoad   Unsigned32
+    }
+
+    cpuCoreNumber OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Core number"
+        ::= { cpuInfoEntry 1 }
+
+    cpuCoreLoad OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "CPU utilization percentage"
+        ::= { cpuInfoEntry 2 }
+
+--
+-- Memory Info
+--
+
+memoryInfo  OBJECT IDENTIFIER ::= { hardwareInfo 3 }
+
+total OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total capacity"
+    ::= { memoryInfo 1 }
+
+free OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Free memory"
+    ::= { memoryInfo 2 }
+
+utilization OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Utilization in percents"
+    ::= { memoryInfo 3 }
+
+--
+-- Storage Info
+--
+
+storageInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF StorageInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about storage devices"
+    ::= { hardwareInfo 4 }
+
+storageInfoEntry OBJECT-TYPE
+    SYNTAX      StorageInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    ""
+    INDEX { storageDevice }
+    ::= { storageInfoTable 1 }
+
+StorageInfoEntry ::=
+    SEQUENCE {
+        storageDevice   Unsigned32,
+        storageType OCTET STRING,
+        storageTotal    Counter64,
+        storageFree Counter64,
+        storageUtilization  Unsigned32
+    }
+
+    storageDevice OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Storage device number"
+        ::= { storageInfoEntry 1 }
+
+    storageType OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Storage device type"
+        ::= { storageInfoEntry 2 }
+
+    storageTotal OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total capacity"
+        ::= { storageInfoEntry 3 }
+
+    storageFree OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Free memory"
+        ::= { storageInfoEntry 4 }
+
+    storageUtilization OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Utilization in percents"
+        ::= { storageInfoEntry 5 }
+
+--
+-- PSU Info
+--
+
+psuInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PsuInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about power consumption"
+    ::= { hardwareInfo 5 }
+
+psuInfoEntry OBJECT-TYPE
+    SYNTAX      PsuInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    ""
+    INDEX { psuNumber }
+    ::= { psuInfoTable 1 }
+
+PsuInfoEntry ::=
+    SEQUENCE {
+        psuNumber Unsigned32,
+        psuType INTEGER,
+        psuStatus INTEGER,
+        psuInputVoltage Unsigned32,
+        psuInputCurrent Unsigned32,
+        psuOutputVoltage Unsigned32,
+        psuOutputCurrent Unsigned32
+    }
+
+    psuNumber OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "PSU number"
+        ::= { psuInfoEntry 1 }
+
+    psuType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  unknown(0),
+                  AC(1),
+                  DC(2)
+                }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "PSU type"
+        ::= { psuInfoEntry 2 }
+
+    psuStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  unknown(0),
+                  PowerOn(1),
+                  PowerOff(2)
+                }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "PSU status"
+        ::= { psuInfoEntry 3 }
+
+    psuInputVoltage OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Input voltage, mV"
+        ::= { psuInfoEntry 4 }
+
+    psuInputCurrent OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Input current, mA"
+        ::= { psuInfoEntry 5 }
+
+    psuOutputVoltage OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Output voltage, mV"
+        ::= { psuInfoEntry 6 }
+
+    psuOutputCurrent OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Output current, mA"
+        ::= { psuInfoEntry 7 }
+
+--
+-- fan Info
+--
+
+fanInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FanInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about fans"
+    ::= { hardwareInfo 6 }
+
+fanInfoEntry OBJECT-TYPE
+    SYNTAX      FanInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    ""
+    INDEX { fanNumber }
+    ::= { fanInfoTable 1 }
+
+FanInfoEntry ::=
+    SEQUENCE {
+        fanNumber Unsigned32,
+        fanState INTEGER,
+        fanSpeedFront Unsigned32,
+        fanSpeedRear Unsigned32
+    }
+
+    fanNumber OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Fan number"
+        ::= { fanInfoEntry 1 }
+
+    fanState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  unknown(0),
+                  active(1),
+                  inactive(2)
+                }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Fan state"
+        ::= { fanInfoEntry 2 }
+
+    fanSpeedFront OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Fan speed in revolutions per minute"
+        ::= { fanInfoEntry 3 }
+
+    fanSpeedRear OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Fan speed in revolutions per minute"
+        ::= { fanInfoEntry 4 }
+
+--
+-- Sensors Info
+--
+
+sensorsInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SensorsInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    ""
+    ::= { hardwareInfo 7 }
+
+sensorsInfoEntry OBJECT-TYPE
+    SYNTAX      SensorsInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    ""
+    INDEX { sensorsAdapterName, sensorsAdapterParameterName }
+    ::= { sensorsInfoTable 1 }
+
+SensorsInfoEntry ::=
+    SEQUENCE {
+        sensorsAdapterName OCTET STRING,
+        sensorsAdapterParameterName OCTET STRING,
+        sensorsAdapterParameterValue OCTET STRING
+    }
+
+    sensorsAdapterName OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Name of the sensor"
+        ::= { sensorsInfoEntry 1 }
+
+    sensorsAdapterParameterName OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Name of sensor's parameter"
+        ::= { sensorsInfoEntry 2 }
+
+    sensorsAdapterParameterValue OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        ""
+        ::= { sensorsInfoEntry 3 }
+
+END

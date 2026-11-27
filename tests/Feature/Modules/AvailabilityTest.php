@@ -40,6 +40,16 @@ use Mockery\MockInterface;
 
 final class AvailabilityTest extends InMemoryDbTestCase
 {
+    public function testPollingMethodsAreTheMethodsThatAffectAvailability(): void
+    {
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->for($device)->create(['method_type' => PollingMethodType::Icmp, 'affects_availability' => true]);
+        DevicePollingMethod::factory()->for($device)->create(['method_type' => PollingMethodType::Snmp, 'affects_availability' => true, 'enabled' => false]);
+        DevicePollingMethod::factory()->for($device)->create(['method_type' => PollingMethodType::UnixAgent, 'affects_availability' => false]);
+
+        $this->assertSame([PollingMethodType::Icmp, PollingMethodType::Snmp], (new Availability)->pollingMethods($device));
+    }
+
     public function testMtuIsTestedWhenTheDeviceAnswersPing(): void
     {
         $fping = $this->mockFping(FpingResponse::artificialUp());

@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "edfa",
-                    "type": "network",
+                    "type": "optical",
                     "serial": "S26-PYA346",
                     "icon": "generic.svg"
                 }

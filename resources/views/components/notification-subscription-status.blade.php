@@ -10,7 +10,7 @@
     @else
     <div x-show="supported">
         @can('alert-transport.update')
-            <a href="{{ url('alert-transports') }}">
+            <a href="{{ route('alert-transports.index') }}">
                 {{ __('components.notification-subscription-status.no-transport') }}
             </a>
         @else
@@ -33,7 +33,7 @@
                                     if (subscription) {
                                         subscription.unsubscribe().then(function(success) {
                                             if (success) {
-                                                fetch('./push/unregister', {
+                                                fetch(route('push.unregister'), {
                                                     method: 'post',
                                                     headers: {
                                                         'Content-Type': 'application/json',

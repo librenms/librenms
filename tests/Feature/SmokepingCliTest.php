@@ -32,8 +32,9 @@ use App\Models\DevicePollingMethod;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use LibreNMS\Tests\DBTestCase;
 use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Tests\DBTestCase;
+use LibreNMS\Util\Binaries;
 
 final class SmokepingCliTest extends DBTestCase
 {
@@ -146,8 +147,29 @@ final class SmokepingCliTest extends DBTestCase
         $tests = [0, -1];
 
         foreach ($tests as $test) {
-            $this->assertEmpty($this->instance->assembleProbes($test));
+            $this->assertEmpty($this->instance->assembleProbes($test, new Binaries));
         }
+    }
+
+    public function testProbesRequireFping(): void
+    {
+        config(['librenms.binaries.fping' => '/nonexistent/fping']);
+        Device::factory()->create();
+
+        $this->assertNotEquals(0, \Artisan::call('smokeping:generate --probes'));
+        $this->assertStringContainsString(__('commands.smokeping:generate.no-fping'), \Artisan::output());
+        $this->assertEquals(0, \Artisan::call('smokeping:generate --targets --no-dns'));
+    }
+
+    public function testFping6FallsBackToFping(): void
+    {
+        $fping = base_path('lnms'); // any executable file
+        config(['librenms.binaries.fping' => $fping, 'librenms.binaries.fping6' => '/nonexistent/fping6']);
+
+        $probes = $this->instance->assembleProbes(1, new Binaries);
+
+        $this->assertContains('+ FPing6', $probes);
+        $this->assertSame(["  binary = $fping", "  binary = $fping"], array_values(array_filter($probes, fn (string $line): bool => str_starts_with($line, '  binary = '))));
     }
 
     public function testBuildProbe(): void
@@ -406,6 +428,36 @@ final class SmokepingCliTest extends DBTestCase
 
         $this->assertStringContainsString("   title = $device->display", $output);
         $this->assertStringContainsString('   probe = lnmsFPing6-', $output);
+    }
+
+    public function testTargetsUseTheIcmpAddressFamily(): void
+    {
+        // Polled over IPv4 by ICMP although SNMP is on udp6 (or absent): FPing, not FPing6
+        $v4 = Device::factory()->create(['hostname' => 'v4only.example.com', 'type' => 'server']);
+        DevicePollingMethod::factory()->create([
+            'device_id' => $v4->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'settings' => ['transport' => 'udp6'],
+        ]);
+        DevicePollingMethod::factory()->create([
+            'device_id' => $v4->device_id,
+            'method_type' => PollingMethodType::Icmp,
+            'settings' => ['ip_version' => 'ipv4'],
+        ]);
+
+        // Ping-only device polled over IPv6: FPing6 even if the SNMP default transport is udp
+        $v6 = Device::factory()->create(['hostname' => 'v6only.example.com', 'type' => 'server']);
+        DevicePollingMethod::factory()->create([
+            'device_id' => $v6->device_id,
+            'method_type' => PollingMethodType::Icmp,
+            'settings' => ['ip_version' => 'ipv6'],
+        ]);
+
+        \Artisan::call('smokeping:generate --targets --no-header --no-dns');
+        $output = \Artisan::output();
+
+        $this->assertMatchesRegularExpression('/\+\+ v4only_example_com\n.*\n.*\n   probe = lnmsFPing-\d+\n/', $output);
+        $this->assertMatchesRegularExpression('/\+\+ v6only_example_com\n.*\n.*\n   probe = lnmsFPing6-\d+\n/', $output);
     }
 
     public function legacyAlgo($data)

@@ -149,8 +149,9 @@ if (! empty($components) && is_array($components)) {
 
     /*
      * Update DB Components
+     * The values change on almost every poll and are graphed already, so don't log the changes
      */
-    $component->setComponentPrefs($device['device_id'], $components);
+    $component->setComponentPrefs($device['device_id'], $components, log: false);
 }
 
 unset($component, $components);

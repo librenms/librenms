@@ -52,6 +52,20 @@ final class DeviceGroupControllerTest extends TestCase
             ->assertDontSee('ajax_form.php', false);
     }
 
+    public function testIndexFiltersGroupsByServiceTemplate(): void
+    {
+        $template = ServiceTemplate::factory()->create();
+        $matchingGroup = DeviceGroup::factory()->create(['name' => 'Template member group']);
+        DeviceGroup::factory()->create();
+        $matchingGroup->serviceTemplates()->attach($template);
+
+        $response = $this->actingAs($this->admin())
+            ->get('/device-groups?serviceTemplates=' . $template->id);
+
+        $response->assertOk();
+        $this->assertSame([$matchingGroup->id], $response->viewData('device_groups')->modelKeys());
+    }
+
     public function testAdminCanRediscoverGroup(): void
     {
         $group = DeviceGroup::factory()->create(['name' => 'Core <b>']);

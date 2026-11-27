@@ -53,7 +53,7 @@ final class RancidProviderTest extends TestCase
     protected function tearDown(): void
     {
         if ($this->repo && is_dir($this->repo)) {
-            (new Process(['rm', '-rf', $this->repo]))->run();
+            new Process(['rm', '-rf', $this->repo])->run();
         }
         parent::tearDown();
     }
@@ -63,7 +63,7 @@ final class RancidProviderTest extends TestCase
      */
     private function git(array $args): void
     {
-        (new Process(array_merge(['git'], $args), $this->repo))->mustRun();
+        new Process(array_merge(['git'], $args), $this->repo)->mustRun();
     }
 
     /**
@@ -82,7 +82,7 @@ final class RancidProviderTest extends TestCase
     private function bareClone(string $path): void
     {
         mkdir(dirname($path), 0777, true);
-        (new Process(['git', 'clone', '-q', '--bare', $this->repo, $path]))->mustRun();
+        new Process(['git', 'clone', '-q', '--bare', $this->repo, $path])->mustRun();
         LibrenmsConfig::set('rancid_repo_type', 'git-bare');
     }
 
@@ -101,20 +101,20 @@ final class RancidProviderTest extends TestCase
 
         LibrenmsConfig::set('rancid_repo_type', 'svn');
         $url = 'file://' . $this->repo . '/SVN';
-        (new Process([dirname($svn) . '/svnadmin', 'create', $this->repo . '/SVN']))->mustRun();
-        (new Process([$svn, 'mkdir', '-q', '-m', 'init', "$url/core", "$url/core/configs"]))->mustRun();
-        (new Process([$svn, 'checkout', '-q', "$url/core", $this->repo . '/core']))->mustRun();
+        new Process([dirname($svn) . '/svnadmin', 'create', $this->repo . '/SVN'])->mustRun();
+        new Process([$svn, 'mkdir', '-q', '-m', 'init', "$url/core", "$url/core/configs"])->mustRun();
+        new Process([$svn, 'checkout', '-q', "$url/core", $this->repo . '/core'])->mustRun();
 
         $this->configs = $this->repo . '/core/configs';
         LibrenmsConfig::set('rancid_configs', [$this->configs]);
         foreach ($revisions as $index => $content) {
             file_put_contents($this->configs . '/router.example.com', $content);
             if ($index === 0) {
-                (new Process([$svn, 'add', '-q', 'router.example.com'], $this->configs))->mustRun();
+                new Process([$svn, 'add', '-q', 'router.example.com'], $this->configs)->mustRun();
             }
-            (new Process([$svn, 'commit', '-q', '-m', "v$index"], $this->configs))->mustRun();
+            new Process([$svn, 'commit', '-q', '-m', "v$index"], $this->configs)->mustRun();
         }
-        (new Process([$svn, 'update', '-q'], $this->configs))->mustRun();
+        new Process([$svn, 'update', '-q'], $this->configs)->mustRun();
     }
 
     private function makeDevice(string $hostname = 'router.example.com', int $id = 42): Device
@@ -154,7 +154,7 @@ final class RancidProviderTest extends TestCase
     public function testSupportsDeviceOnlyWhenConfigFileExists(): void
     {
         $this->initGitRepo();
-        $provider = new RancidProvider();
+        $provider = resolve(RancidProvider::class);
 
         $this->assertTrue($provider->supportsDevice($this->makeDevice()));
         $this->assertFalse($provider->supportsDevice($this->makeDevice('unknown.example.com', 43)));
@@ -163,7 +163,7 @@ final class RancidProviderTest extends TestCase
     public function testBackupsListsRevisionsNewestFirst(): void
     {
         $this->initGitRepo();
-        $list = (new RancidProvider())->backups($this->makeDevice());
+        $list = (resolve(RancidProvider::class))->backups($this->makeDevice());
 
         $this->assertSame(2, $list['total']);
         $this->assertSame(1, $list['totalPages']);
@@ -176,7 +176,7 @@ final class RancidProviderTest extends TestCase
     public function testLatestReturnsNewestContent(): void
     {
         $this->initGitRepo();
-        $latest = (new RancidProvider())->latest($this->makeDevice());
+        $latest = (resolve(RancidProvider::class))->latest($this->makeDevice());
 
         $this->assertStringContainsString('ntp server 2.2.2.2', $latest['content']);
     }
@@ -184,7 +184,7 @@ final class RancidProviderTest extends TestCase
     public function testContentFetchesSpecificRevision(): void
     {
         $this->initGitRepo();
-        $provider = new RancidProvider();
+        $provider = resolve(RancidProvider::class);
 
         $backups = $provider->backups($this->makeDevice())['backups'];
         $oldest = end($backups)['id'];
@@ -195,7 +195,7 @@ final class RancidProviderTest extends TestCase
     public function testContentRejectsNonHexId(): void
     {
         $this->initGitRepo();
-        $provider = new RancidProvider();
+        $provider = resolve(RancidProvider::class);
 
         $this->assertNull($provider->content($this->makeDevice(), 'not-a-hash'));
         $this->assertSame(ConfigBackupProvider::ERROR_BACKUP_NOT_FOUND, $provider->lastError());
@@ -204,7 +204,7 @@ final class RancidProviderTest extends TestCase
     public function testDiffProducesGroups(): void
     {
         $this->initGitRepo();
-        $provider = new RancidProvider();
+        $provider = resolve(RancidProvider::class);
 
         $backups = $provider->backups($this->makeDevice())['backups'];
         $new = $backups[0]['id'];
@@ -224,7 +224,7 @@ final class RancidProviderTest extends TestCase
     public function testDiffRejectsNonHexIds(): void
     {
         $this->initGitRepo();
-        $provider = new RancidProvider();
+        $provider = resolve(RancidProvider::class);
 
         $this->assertNull($provider->diff($this->makeDevice(), 'zzz', 'abc'));
         $this->assertSame(ConfigBackupProvider::ERROR_BACKUP_NOT_FOUND, $provider->lastError());
@@ -233,7 +233,7 @@ final class RancidProviderTest extends TestCase
     public function testDeviceNotFound(): void
     {
         $this->initGitRepo();
-        $provider = new RancidProvider();
+        $provider = resolve(RancidProvider::class);
 
         $this->assertNull($provider->backups($this->makeDevice('unknown.example.com', 99)));
         $this->assertSame(ConfigBackupProvider::ERROR_DEVICE_NOT_FOUND, $provider->lastError());
@@ -243,7 +243,7 @@ final class RancidProviderTest extends TestCase
     {
         LibrenmsConfig::set('rancid_repo_type', 'cvs'); // not git/git-bare/svn
         file_put_contents($this->configs . '/router.example.com', "hostname router\n");
-        $provider = new RancidProvider();
+        $provider = resolve(RancidProvider::class);
         $device = $this->makeDevice();
 
         $list = $provider->backups($device);
@@ -264,7 +264,7 @@ final class RancidProviderTest extends TestCase
     {
         LibrenmsConfig::set('rancid_repo_type', 'git'); // but the directory is not a git repo
         file_put_contents($this->configs . '/router.example.com', "hostname router\n");
-        $provider = new RancidProvider();
+        $provider = resolve(RancidProvider::class);
 
         $this->assertSame('current', $provider->backups($this->makeDevice())['backups'][0]['id']);
         $this->assertSame("hostname router\n", $provider->latest($this->makeDevice())['content']);
@@ -277,7 +277,7 @@ final class RancidProviderTest extends TestCase
     {
         $this->initGitRepo();
         file_put_contents($this->configs . '/new.example.com', "hostname new\n");
-        $provider = new RancidProvider();
+        $provider = resolve(RancidProvider::class);
 
         $list = $provider->backups($this->makeDevice('new.example.com', 50));
         $this->assertSame(1, $list['total']);
@@ -287,16 +287,26 @@ final class RancidProviderTest extends TestCase
     public function testCurrentIdOnlyReadsDeviceFile(): void
     {
         $this->initGitRepo();
-        $provider = new RancidProvider();
+        $provider = resolve(RancidProvider::class);
 
         // with history available, "current" still maps to this device's own file
         $this->assertStringContainsString('ntp server 2.2.2.2', $provider->content($this->makeDevice(), 'current'));
     }
 
+    public function testHostnameCannotEscapeConfigsDirectory(): void
+    {
+        LibrenmsConfig::set('rancid_repo_type', 'cvs');
+        file_put_contents($this->repo . '/outside', "secret\n");
+        $provider = resolve(RancidProvider::class);
+
+        $this->assertFalse($provider->supportsDevice($this->makeDevice('../outside')));
+        $this->assertFalse($provider->supportsDevice($this->makeDevice('sub/../../outside', 43)));
+    }
+
     public function testDiffWithUnknownRevisionIsBackupNotFound(): void
     {
         $this->initGitRepo();
-        $provider = new RancidProvider();
+        $provider = resolve(RancidProvider::class);
         $newest = $provider->backups($this->makeDevice())['backups'][0]['id'];
 
         $this->assertNull($provider->diff($this->makeDevice(), 'deadbeef', $newest));
@@ -307,10 +317,10 @@ final class RancidProviderTest extends TestCase
     {
         $this->initGitRepo();
         $bare = $this->repo . '/rancid.git';
-        (new Process(['git', 'clone', '-q', '--bare', $this->repo, $bare]))->mustRun();
+        new Process(['git', 'clone', '-q', '--bare', $this->repo, $bare])->mustRun();
         LibrenmsConfig::set('rancid_repo_type', 'git-bare');
         LibrenmsConfig::set('rancid_configs', [$bare . '/configs']);
-        $provider = new RancidProvider();
+        $provider = resolve(RancidProvider::class);
 
         $this->assertStringContainsString('ntp server 2.2.2.2', $provider->latest($this->makeDevice())['content']);
         $this->assertNull($provider->content($this->makeDevice(), 'current'));
@@ -328,7 +338,7 @@ final class RancidProviderTest extends TestCase
         $this->git(['add', '.']);
         $this->git(['commit', '-q', '-m', 'v1']);
 
-        $content = (new RancidProvider())->latest($this->makeDevice())['content'];
+        $content = (resolve(RancidProvider::class))->latest($this->makeDevice())['content'];
 
         $this->assertStringNotContainsString('drop me', $content);
         $this->assertStringContainsString('keep me', $content);
@@ -352,7 +362,7 @@ final class RancidProviderTest extends TestCase
         LibrenmsConfig::set('rancid_repo_type', 'cvs');
         file_put_contents($this->configs . '/router.example.com', "hostname router\n");
 
-        $this->assertSame('current', (new RancidProvider())->backups($this->makeDevice())['backups'][0]['id']);
+        $this->assertSame('current', (resolve(RancidProvider::class))->backups($this->makeDevice())['backups'][0]['id']);
     }
 
     public function testUnreadableRepoLogsEventOncePerInterval(): void
@@ -361,8 +371,8 @@ final class RancidProviderTest extends TestCase
         LibrenmsConfig::set('rancid_repo_type', 'git'); // but the directory is not a git repo
         file_put_contents($this->configs . '/router.example.com', "hostname router\n");
 
-        (new RancidProvider())->backups($this->makeDevice());
-        (new RancidProvider())->backups($this->makeDevice()); // repeated page views do not flood the eventlog
+        (resolve(RancidProvider::class))->backups($this->makeDevice());
+        (resolve(RancidProvider::class))->backups($this->makeDevice()); // repeated page views do not flood the eventlog
     }
 
     public function testGitBareRepoWithoutDotGitSuffix(): void
@@ -372,7 +382,7 @@ final class RancidProviderTest extends TestCase
         $this->bareClone($this->repo . '/CVS/core');
         LibrenmsConfig::set('rancid_configs', [$this->repo . '/CVS/core/configs/']);
 
-        $this->assertSame(2, (new RancidProvider())->backups($this->makeDevice())['total']);
+        $this->assertSame(2, (resolve(RancidProvider::class))->backups($this->makeDevice())['total']);
     }
 
     public function testGitBarePathWithDotGitInParentDirectory(): void
@@ -381,7 +391,7 @@ final class RancidProviderTest extends TestCase
         $this->bareClone($this->repo . '/.github-mirror/rancid.git');
         LibrenmsConfig::set('rancid_configs', [$this->repo . '/.github-mirror/rancid.git/configs']);
 
-        $this->assertSame(2, (new RancidProvider())->backups($this->makeDevice())['total']);
+        $this->assertSame(2, (resolve(RancidProvider::class))->backups($this->makeDevice())['total']);
     }
 
     public function testGitBareSiblingPath(): void
@@ -397,7 +407,7 @@ final class RancidProviderTest extends TestCase
         $this->bareClone($this->repo . '/bare/rancid.git');
         LibrenmsConfig::set('rancid_configs', [$this->repo . '/bare/rancid']);
 
-        $this->assertSame("hostname router\n", (new RancidProvider())->latest($this->makeDevice())['content']);
+        $this->assertSame("hostname router\n", (resolve(RancidProvider::class))->latest($this->makeDevice())['content']);
     }
 
     public function testGitBareOnlyMatchesConfigsPrefix(): void
@@ -409,7 +419,7 @@ final class RancidProviderTest extends TestCase
         $this->bareClone($this->repo . '/bare/rancid.git');
         LibrenmsConfig::set('rancid_configs', [$this->repo . '/bare/rancid.git/configs']);
 
-        $this->assertFalse((new RancidProvider())->supportsDevice($this->makeDevice('other.example.com', 51)));
+        $this->assertFalse((resolve(RancidProvider::class))->supportsDevice($this->makeDevice('other.example.com', 51)));
     }
 
     public function testGitHistoryIsPaged(): void
@@ -424,11 +434,11 @@ final class RancidProviderTest extends TestCase
             $stream .= "commit refs/heads/master\ncommitter Test <test@example.com> " . (1700000000 + $i) . " +0000\ndata 1\n\n"
                 . 'M 644 inline configs/router.example.com' . "\ndata " . strlen($data) . "\n$data\n";
         }
-        (new Process(['git', 'fast-import', '--quiet'], $this->repo, null, $stream))->mustRun();
+        new Process(['git', 'fast-import', '--quiet'], $this->repo, null, $stream)->mustRun();
         $this->git(['symbolic-ref', 'HEAD', 'refs/heads/master']);
         $this->git(['reset', '-q', '--hard']);
 
-        $provider = new RancidProvider();
+        $provider = resolve(RancidProvider::class);
         $first = $provider->backups($this->makeDevice());
         $second = $provider->backups($this->makeDevice(), 1);
 
@@ -453,7 +463,7 @@ final class RancidProviderTest extends TestCase
         $this->commitConfig("# uptime 2\nhostname router\n# c\na\nb\nc\nd\ne\nf\ng\nntp server 2.2.2.2\nend\n");
         $this->commitConfig("# uptime 3\nhostname router\n# c\na\nb\nc\nd\ne\nf\ng\nntp server 2.2.2.2\nend\n");
 
-        $provider = new RancidProvider();
+        $provider = resolve(RancidProvider::class);
         $ids = array_column($provider->backups($this->makeDevice())['backups'], 'id');
 
         // comment-only change shows as no changes
@@ -479,7 +489,7 @@ final class RancidProviderTest extends TestCase
     public function testSvnRepo(): void
     {
         $this->initSvnRepo(["hostname router\nntp server 1.1.1.1\nend\n", "hostname router\nntp server 2.2.2.2\nend\n"]);
-        $provider = new RancidProvider();
+        $provider = resolve(RancidProvider::class);
         $device = $this->makeDevice();
 
         $list = $provider->backups($device);
@@ -500,7 +510,7 @@ final class RancidProviderTest extends TestCase
     public function testSvnBadRevisions(): void
     {
         $this->initSvnRepo(["hostname router\n", "hostname router2\n"]);
-        $provider = new RancidProvider();
+        $provider = resolve(RancidProvider::class);
         $device = $this->makeDevice();
 
         $this->assertNull($provider->content($device, 'abc'));
@@ -516,7 +526,7 @@ final class RancidProviderTest extends TestCase
     {
         LibrenmsConfig::set('rancid_ignorecomments', true);
         $this->initSvnRepo(["# v1\nhostname router\nntp server 1.1.1.1\n", "# v2\nhostname router\nntp server 2.2.2.2\n"]);
-        $provider = new RancidProvider();
+        $provider = resolve(RancidProvider::class);
 
         $groups = $provider->diff($this->makeDevice(), '2', '3');
         $this->assertSame(['COMMON', 'DELETED', 'INSERTED'], array_column($groups, 'type'));

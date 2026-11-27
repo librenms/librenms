@@ -27,6 +27,7 @@
 namespace LibreNMS\Validations;
 
 use App\Facades\LibrenmsConfig;
+use LibreNMS\Util\SystemUser;
 use LibreNMS\Util\Version;
 use LibreNMS\Validator;
 use Symfony\Component\Process\Process;
@@ -52,8 +53,14 @@ class Python extends BaseValidation
         }
 
         $this->checkVersion($validator, $version);
-        $this->checkPipVersion($validator, $version);
-        $this->checkExtensions($validator);
+
+        $pip_output = (string) `pip3 --version 2>/dev/null`;
+        if (empty($pip_output)) {
+            $validator->warn('pip3 is not available');
+        } else {
+            $this->checkPipVersion($validator, $pip_output, $version);
+            $this->checkExtensions($validator);
+        }
     }
 
     private function checkVersion(Validator $validator, $version)
@@ -63,10 +70,10 @@ class Python extends BaseValidation
         }
     }
 
-    private function checkPipVersion(Validator $validator, $version)
+    private function checkPipVersion(Validator $validator, string $pip_output, string $version)
     {
-        preg_match('/\(python ([0-9.]+)\)/', (string) `pip3 --version 2>/dev/null`, $matches);
-        $pip = $matches[1];
+        preg_match('/\(python ([0-9.]+)\)/', $pip_output, $matches);
+        $pip = $matches[1] ?? '';
         $python = implode('.', array_slice(explode('.', (string) $version), 0, 2));
         if ($pip && version_compare($python, $pip, '!=')) {
             $validator->fail("python3 ($python) and pip3 ($pip) versions do not match.  This likely will cause dependencies to be installed for the wrong python version.");
@@ -81,7 +88,7 @@ class Python extends BaseValidation
 
         if ($process->getExitCode() !== 0) {
             $user = \config('librenms.user');
-            $user_mismatch = function_exists('posix_getpwuid') ? (posix_getpwuid(posix_geteuid())['name'] ?? null) !== $user : false;
+            $user_mismatch = function_exists('posix_getpwuid') && SystemUser::name() !== $user;
 
             if ($user_mismatch) {
                 $validator->warn(

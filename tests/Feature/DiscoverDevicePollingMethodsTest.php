@@ -25,8 +25,8 @@ final class DiscoverDevicePollingMethodsTest extends DBTestCase
     {
         $ids = collect(['public', 'private'])->map(fn (string $community) => Secret::create([
             'description' => "Default $community",
-            'secret_type' => SecretType::Snmp,
-            'data' => ['version' => 'v2c', 'community' => $community],
+            'secret_type' => SecretType::SnmpCommunity,
+            'data' => ['community' => $community],
         ])->id);
         LibrenmsConfig::set('snmp.default_credentials', $ids->all());
 
@@ -37,6 +37,8 @@ final class DiscoverDevicePollingMethodsTest extends DBTestCase
         $this->assertSame([
             'SNMP v2c: No reply using credential "Default public"',
             'SNMP v2c: No reply using credential "Default private"',
+            'SNMP v1: No reply using credential "Default public"',
+            'SNMP v1: No reply using credential "Default private"',
         ], $this->discoverReasons(['snmp' => ['active' => true]]));
     }
 

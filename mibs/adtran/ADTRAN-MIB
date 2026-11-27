@@ -15,6 +15,9 @@
     --   02/04/02 sls Converted to SMIv2
     --   02/08/09 pnb/sls add nodes for module identity, module compliance,
     --                and agent capabilities advances using SMIv2
+    --   03/06/18 pnb make Module Identity y2k compliant
+    --   2012/09/20 sls Added adLegalPolicy and adManagementPolicy OIDs for 
+    --                  PKI management
 
     -- *** ENSURE ANY UPDATES TO THIS FILE ARE ALSO REFLECTED IN ADTRAN.MIB ***
 
@@ -35,8 +38,9 @@
            FROM SNMPv2-CONF;
 
 adtran MODULE-IDENTITY
-        LAST-UPDATED "0208090000Z"
-        ORGANIZATION "ADTRAN, Inc."
+        LAST-UPDATED "201209200000Z"
+        ORGANIZATION "ADTRAN, Inc.
+                      http://www.adtran.com"
         CONTACT-INFO
                "        Technical Support Dept.
                 Postal: ADTRAN, Inc.
@@ -69,7 +73,8 @@ adtran MODULE-IDENTITY
         adAgentCapShared   OBJECT IDENTIFIER ::= { adAgentCapModule 2 }
     adConformance      OBJECT IDENTIFIER ::= { adtran 99 }
         adComplianceShared OBJECT IDENTIFIER ::= { adConformance 10000 }
-
+	adLegalPolicy      OBJECT IDENTIFIER ::= { adtran 100 }
+	adManagementPolicy OBJECT IDENTIFIER ::= { adtran 101 }
     --
     -- PRODUCT-IDENTITY SECTION - adProducts
     --
@@ -147,6 +152,25 @@ adtran MODULE-IDENTITY
     -- for all product MIBs and under the sub-node for adShared MIBs.
     -- OID.
 
+    --
+    -- LEGAL POLICY SECTION - adLegalPolicy
+    --
+    -- The Legal Policy OID entry is utilized by ADTRAN's PKI properties 
+    -- governing the use and management of its PKI environment.  The OID is 
+    -- documented here to ensure no collisions between it and any SNMP support.
+    -- For further information see:
+    --     http://www.adtran.com/certs/legalpolicy.htm
+    --
+
+    --
+    -- MANAGEMENT POLICY SECTION - adManagementPolicy
+    --
+    -- The Management Policy OID entry is utilized by ADTRAN's PKI properties 
+    -- governing the use and management of its PKI environment.  The OID is 
+    -- documented here to ensure no collisions between it and any SNMP support.
+    -- For further information see:
+    --     http://www.adtran.com/certs/managmentpolicy.htm
+    --
 
     --
     -- Product Information group

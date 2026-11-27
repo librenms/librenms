@@ -81,9 +81,9 @@ class LocationsPageTest extends TestCase
         $lines = array_values(array_filter(explode("\n", trim($csv))));
 
         $this->assertCount(2, $lines);
-        $this->assertSame(['ID', 'Location', 'Latitude', 'Longitude', 'Devices', 'Down'], str_getcsv($lines[0]));
-        $this->assertSame('Berlin', str_getcsv($lines[1])[1]);
-        $this->assertSame('1', str_getcsv($lines[1])[4]);
+        $this->assertSame(['ID', 'Location', 'Latitude', 'Longitude', 'Devices', 'Down'], str_getcsv($lines[0], escape: '\\'));
+        $this->assertSame('Berlin', str_getcsv($lines[1], escape: '\\')[1]);
+        $this->assertSame('1', str_getcsv($lines[1], escape: '\\')[4]);
     }
 
     private function admin(): User

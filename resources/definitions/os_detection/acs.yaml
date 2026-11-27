@@ -2,7 +2,7 @@ os: acs
 group: cisco
 text: 'Cisco ACS'
 ifname: true
-type: server
+type: security
 icon: cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
@@ -22,8 +22,6 @@ discovery_modules:
     slas: true
     cisco-otv: true
     cisco-pw: true
-    vrf: true
-    cisco-vrf-lite: true
 discovery:
     -
         sysObjectID:

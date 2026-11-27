@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "wti-console",
-                    "type": "appliance",
+                    "type": "management",
                     "serial": "01882810230169",
                     "icon": "wti.svg"
                 }
@@ -834,7 +834,6 @@
         "discovery": {
             "processors": [
                 {
-                    "entPhysicalIndex": 0,
                     "hrDeviceIndex": 196608,
                     "processor_oid": ".1.3.6.1.2.1.25.3.3.1.2.196608",
                     "processor_index": "196608",

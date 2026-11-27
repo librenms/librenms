@@ -8,6 +8,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.17.{{ $index }}'
                     descr: 'Node Status: {{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
                     group: '{{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                    category: cluster
                     state_name: RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeStatus
                     states:
                         - { value: 0, descr: out-of-service, generic: 2 }
@@ -18,6 +19,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.18.{{ $index }}'
                     descr: 'Cluster Status: {{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
                     group: '{{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                    category: cluster
                     state_name: RUCKUS-CTRL-MIB::ruckusCtrlSystemClusterStatus
                     states:
                         - { value: 0, descr: in-service, generic: 0 }
@@ -30,6 +32,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.26.{{ $index }}'
                     descr: 'Cluster HA State: {{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
                     group: '{{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                    category: cluster
                     state_name: RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeClusterHAState
                     states:
                         - { value: 1, descr: enabled, generic: 0 }
@@ -40,6 +43,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.27.{{ $index }}'
                     descr: 'Cluster HA Role: {{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
                     group: '{{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                    category: cluster
                     state_name: RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeClusterHARoles
                     states:
                         - { value: 1, descr: active, generic: 0 }
@@ -53,6 +57,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.25053.1.8.1.1.1.1.1.1.10.{{ $index }}'
                     descr: 'AP Licenses: {{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
                     group: '{{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
+                    category: license
                 -
                     oid: RUCKUS-CTRL-MIB::ruckusCTRLSystemNodeTable
                     value: RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeNumApConnected
@@ -60,8 +65,4 @@ modules:
                     index: 'aps.{{ $index }}'
                     descr: 'Connected APs: {{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
                     group: '{{ RUCKUS-CTRL-MIB::ruckusCtrlSystemNodeName }}'
-                -
-                    oid: RUCKUS-SZ-SYSTEM-MIB::ruckusSZSystemStatsNumAP
-                    num_oid: '.1.3.6.1.4.1.25053.1.4.1.1.1.15.1.{{ $index }}'
-                    index: total
-                    descr: 'Connected APs: Total'
+                    category: access-point

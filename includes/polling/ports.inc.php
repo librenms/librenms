@@ -901,8 +901,9 @@ foreach ($ports as $port) {
             $fields['ifInBits_rate'] = $current_port_stats['ifInBits_rate'];
             $fields['ifOutBits_rate'] = $current_port_stats['ifOutBits_rate'];
 
-            if ($tune_port === true) {
-                Rrd::tune('port', $rrdfile, $this_port['ifSpeed']);
+            $tune_limits = $tune_port ? \LibreNMS\RRD\PortRrd::tuneLimits((int) $this_port['ifSpeed']) : [];
+            if ($tune_limits !== [] && Rrd::tune($rrdfile, $tune_limits)) {
+                $tune_limits = [];
             }
 
             $tags = [
@@ -914,6 +915,11 @@ foreach ($ports as $port) {
                 'rrd_def' => $rrd_def,
             ];
             app('Datastore')->put($device, 'ports', $tags, $fields);
+
+            // The datastore may have just created the RRD.
+            if ($tune_limits !== []) {
+                Rrd::tune($rrdfile, $tune_limits);
+            }
 
             // End Update IF-MIB
             // Update PAgP

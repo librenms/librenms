@@ -1,12 +1,15 @@
 -- =========================================================================
--- Copyright (c) 2008-2020 New H3C Tech. Co., Ltd.  All rights reserved.
+-- Copyright (c) 2008-2022 New H3C Tech. Co., Ltd.  All rights reserved.
 --
 -- Description: The MIB is designed to set rbm configuration or get rbm information.
 -- Reference:
--- Version: V1.0
+-- Version: V1.1
 -- History:
 --  V1.0 2020-05-19 created by liuzhengrui 17656
 --       Initial version.
+--  V1.1 2022-08-03  modified by wangjuxnaing 27996
+--       Add hh3cRbmCompareTrap,hh3cRbmDualActiveCheckTrap,
+--       hh3cRbmDualActiveCheckRecvTrap,hh3cRbmCfgCheckAlarmTrap
 -- =========================================================================
 HH3C-RBM-MIB DEFINITIONS ::= BEGIN
 
@@ -18,7 +21,7 @@ IMPORTS
 
 
 hh3cRbm MODULE-IDENTITY
-    LAST-UPDATED "202005191105Z"  -- May 19, 2020
+    LAST-UPDATED "202208031105Z"  -- August 3, 2022
     ORGANIZATION
         "New H3C Tech. Co., Ltd."
     CONTACT-INFO
@@ -30,6 +33,9 @@ hh3cRbm MODULE-IDENTITY
         "The MIB is designed to manage Rbm products."
 
  -- Revision History
+    REVISION "202208031105Z"  -- August 3, 2022
+    DESCRIPTION
+        "Add hh3cRbmCompareTrap hh3cRbmDualActiveCheckTrap hh3cRbmDualActiveCheckRecvTrap hh3cRbmCfgCheckAlarmTrap"
     REVISION     "202005191105Z"  -- May 19, 2020
     DESCRIPTION  "Initial version."
     ::= { hh3cCommon 187 }
@@ -45,14 +51,20 @@ hh3cRbmTables OBJECT IDENTIFIER ::= { hh3cRbm 1 }
 hh3cRbmTrapObjects OBJECT IDENTIFIER ::= { hh3cRbmTables 1 }
 
 hh3cRbmTrapVar OBJECT-TYPE
-  SYNTAX Integer32 (0..1)
-  MAX-ACCESS accessible-for-notify
-  STATUS current
-  DESCRIPTION
+    SYNTAX Integer32 (0..1)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
         "The value is RBM trap."
 ::= { hh3cRbmTrapObjects 1 }
 
-
+hh3cRbmTrapLogVar OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..256))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+    "The value is the reason for this notification."
+    ::= { hh3cRbmTrapObjects 2}
 
 hh3cRbmMonitor OBJECT IDENTIFIER ::= { hh3cRbmTables 2 }
 
@@ -63,8 +75,8 @@ hh3cRbmKeepaliveNormal NOTIFICATION-TYPE
   {
     hh3cRbmTrapVar
   }
-  STATUS current
-  DESCRIPTION
+    STATUS current
+    DESCRIPTION
         "This notification is generated when RBM keepalive channel connected."
 ::= { hh3cRbmTrap 1 }
 
@@ -73,8 +85,8 @@ hh3cRbmKeepaliveFailure NOTIFICATION-TYPE
   {
     hh3cRbmTrapVar
   }
-  STATUS current
-  DESCRIPTION
+    STATUS current
+    DESCRIPTION
         "This notification is generated when RBM keepalive channel disconnected."
 ::= { hh3cRbmTrap 2 }
 
@@ -83,10 +95,56 @@ hh3cRbmStateChange NOTIFICATION-TYPE
   {
     hh3cRbmTrapVar
   }
-  STATUS current
-  DESCRIPTION
+    STATUS current
+    DESCRIPTION
         "This notification is generated when RBM running status changes(0:new-state = Active,1:new-state = Standby)."
 ::= { hh3cRbmTrap 3 }
 
+hh3cRbmCfgInconsistentTrap NOTIFICATION-TYPE
+    OBJECTS
+  {
+    hh3cRbmTrapLogVar
+  }
+    STATUS current
+    DESCRIPTION
+        "When the result of RBM configuration consistency check is inconsistent, it checks the result of the last check.
+        If the result of the last check is also inconsistent, this notification is generated."
+::= { hh3cRbmTrap 4 }
+
+hh3cRbmDualActiveCheckTrap NOTIFICATION-TYPE
+    OBJECTS
+  {
+    hh3cRbmTrapLogVar
+  }
+    STATUS current
+    DESCRIPTION
+        "After the RBM is linked with the MAD,it responds to the MAD event.
+        When it receives a dual-primary conflict reported by the MAD,
+        it adds this notification to the original processing logic."
+::= { hh3cRbmTrap 5 }
+
+hh3cRbmDualActiveCheckRecvTrap NOTIFICATION-TYPE
+    OBJECTS
+  {
+    hh3cRbmTrapLogVar
+  }
+    STATUS current
+    DESCRIPTION
+        "After the RBM is linked with the MAD,it responds to the MAD event.
+        When receiving the MAD report of dual-primary conflict recovery,
+        this notification is added to the original processing logic."
+::= { hh3cRbmTrap 6 }
+
+hh3cRbmCfgCheckTrap NOTIFICATION-TYPE
+    OBJECTS
+  {
+    hh3cRbmTrapLogVar
+  }
+    STATUS current
+    DESCRIPTION
+        "After the heartbeat cable is connected,
+         if the RBM configuration is a dual management master or dual management backup configuration or
+         is not configured with data-channel,this notification is sent every 30s."
+::= { hh3cRbmTrap 7 }
 
 END

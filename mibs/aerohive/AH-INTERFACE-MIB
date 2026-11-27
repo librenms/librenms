@@ -1,5 +1,5 @@
 --
--- Copyright (c) 2006-2013. Aerohive Netowrks, Inc
+-- Copyright (c) 2006-2018. Aerohive Netowrks, Inc
 -- All rights reserved.
 
 AH-INTERFACE-MIB DEFINITIONS ::= BEGIN
@@ -22,7 +22,9 @@ ahInterface MODULE-IDENTITY
          LAST-UPDATED  "201608310000Z"  --  Aug 31, 2016
          ORGANIZATION  "Aerohive Networks, Inc"
          CONTACT-INFO  "info@aerohive.com
-                        1011 McCarthy Boulevard                                                Milpitas, CA 95035"
+                        1011 McCarthy Boulevard
+                       
+                       Milpitas, CA 95035"
          DESCRIPTION   "This module contains the MIB definition of 
 			interface related information."
 	 
@@ -943,7 +945,7 @@ ahRadioChannel  OBJECT-TYPE
 	STATUS	    current
 	DESCRIPTION "The channel number currently in use for this radio."
 	::=  {  ahRadioAttributeEntry 1 }
-	
+
 ahRadioTxPower  OBJECT-TYPE	
     SYNTAX	    Integer32
 	MAX-ACCESS  read-only

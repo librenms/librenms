@@ -1,11 +1,12 @@
-
 PIM-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, experimental,
+    NOTIFICATION-TYPE,
     Integer32, IpAddress, TimeTicks  FROM SNMPv2-SMI
     RowStatus, TruthValue            FROM SNMPv2-TC
-    MODULE-COMPLIANCE, OBJECT-GROUP  FROM SNMPv2-CONF
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP               FROM SNMPv2-CONF
     ipMRouteGroup, ipMRouteSource,
     ipMRouteSourceMask, ipMRouteNextHopGroup,
     ipMRouteNextHopSource, ipMRouteNextHopSourceMask,
@@ -14,7 +15,7 @@ IMPORTS
     InterfaceIndex                   FROM IF-MIB;
 
 pimMIB MODULE-IDENTITY
-    LAST-UPDATED "9907231200Z" -- July 23, 1999
+    LAST-UPDATED "200009280000Z" -- September 28, 2000
     ORGANIZATION "IETF IDMR Working Group."
     CONTACT-INFO
             " Dave Thaler
@@ -24,36 +25,29 @@ pimMIB MODULE-IDENTITY
               US
 
               Phone: +1 425 703 8835
-              EMail: dthaler@dthaler.microsoft.com"
+              EMail: dthaler@microsoft.com"
     DESCRIPTION
             "The MIB module for management of PIM routers."
-    REVISION     "9907231200Z" -- July 23, 1999
+    REVISION     "200009280000Z" -- September 28, 2000
     DESCRIPTION
-            "Initial version, published as RFC xxxx (to be filled in by
-            RFC-Editor)."
---    ::= { mib-2 xx }
-
-    ::= { experimental 61 }  -- $$$ This value to be changed later !!!
-
-    -- NOTE TO RFC EDITOR: When this document is published as an
-    -- RFC, replace XX with IANA assignment, and delete this comment.
+            "Initial version, published as RFC 2934."
+    ::= { experimental 61 }
 
 pimMIBObjects OBJECT IDENTIFIER ::= { pimMIB 1 }
+
+pimTraps      OBJECT IDENTIFIER ::= { pimMIBObjects 0 }
 
 pim           OBJECT IDENTIFIER ::= { pimMIBObjects 1 }
 
 pimJoinPruneInterval OBJECT-TYPE
     SYNTAX     Integer32
-
-
     UNITS      "seconds"
-    MAX-ACCESS read-only
+    MAX-ACCESS read-write
     STATUS     current
     DESCRIPTION
             "The default interval at which periodic PIM-SM Join/Prune
             messages are to be sent."
     ::= { pim 1 }
-
 
 -- The PIM Interface Table
 
@@ -65,8 +59,6 @@ pimInterfaceTable OBJECT-TYPE
             "The (conceptual) table listing the router's PIM interfaces.
             IGMP and PIM are enabled on all interfaces listed in this
             table."
-
-
     ::= { pim 2 }
 
 pimInterfaceEntry OBJECT-TYPE
@@ -102,8 +94,6 @@ pimInterfaceAddress OBJECT-TYPE
     SYNTAX     IpAddress
     MAX-ACCESS read-only
     STATUS     current
-
-
     DESCRIPTION
             "The IP address of the PIM interface."
     ::= { pimInterfaceEntry 2 }
@@ -118,7 +108,7 @@ pimInterfaceNetMask OBJECT-TYPE
 
 pimInterfaceMode OBJECT-TYPE
     SYNTAX     INTEGER { dense(1), sparse(2), sparseDense(3) }
-    MAX-ACCESS read-only
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
             "The configured mode of this PIM interface.  A value of
@@ -131,14 +121,14 @@ pimInterfaceDR OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-            "The Designated Router on this PIM interface.  For point-
-            to-point interfaces, this object has the value 0.0.0.0."
+            "The Designated Router on this PIM interface.  For point-to-
+            point interfaces, this object has the value 0.0.0.0."
     ::= { pimInterfaceEntry 5 }
 
 pimInterfaceHelloInterval OBJECT-TYPE
     SYNTAX     Integer32
     UNITS      "seconds"
-    MAX-ACCESS read-only
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
             "The frequency at which PIM Hello messages are transmitted
@@ -148,9 +138,7 @@ pimInterfaceHelloInterval OBJECT-TYPE
 
 pimInterfaceStatus OBJECT-TYPE
     SYNTAX     RowStatus
-    MAX-ACCESS read-only
-
-
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
             "The status of this entry.  Creating the entry enables PIM
@@ -161,7 +149,7 @@ pimInterfaceStatus OBJECT-TYPE
 pimInterfaceJoinPruneInterval OBJECT-TYPE
     SYNTAX     Integer32
     UNITS      "seconds"
-    MAX-ACCESS read-only
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
             "The frequency at which PIM Join/Prune messages are
@@ -171,7 +159,7 @@ pimInterfaceJoinPruneInterval OBJECT-TYPE
 
 pimInterfaceCBSRPreference OBJECT-TYPE
     SYNTAX     Integer32 (-1..255)
-    MAX-ACCESS read-only
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
             "The preference value for the local interface as a candidate
@@ -188,8 +176,6 @@ pimNeighborTable OBJECT-TYPE
     STATUS     current
     DESCRIPTION
             "The (conceptual) table listing the router's PIM neighbors."
-
-
     ::= { pim 3 }
 
 pimNeighborEntry OBJECT-TYPE
@@ -197,8 +183,6 @@ pimNeighborEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
-
-
             "An entry (conceptual row) in the pimNeighborTable."
     INDEX      { pimNeighborAddress }
     ::= { pimNeighborTable 1 }
@@ -244,8 +228,6 @@ pimNeighborExpiryTime OBJECT-TYPE
     STATUS     current
     DESCRIPTION
             "The minimum time remaining before this PIM neighbor will be
-
-
             aged out."
     ::= { pimNeighborEntry 4 }
 
@@ -272,8 +254,6 @@ pimIpMRouteTable OBJECT-TYPE
             "The (conceptual) table listing PIM-specific information on
             a subset of the rows of the ipMRouteTable defined in the IP
             Multicast MIB."
-
-
     ::= { pim 4 }
 
 pimIpMRouteEntry OBJECT-TYPE
@@ -293,8 +273,6 @@ PimIpMRouteEntry ::= SEQUENCE {
     pimIpMRouteAssertMetricPref      Integer32,
     pimIpMRouteAssertRPTBit          TruthValue,
     pimIpMRouteFlags                 BITS
-
-
 }
 
 pimIpMRouteUpstreamAssertTimer OBJECT-TYPE
@@ -305,6 +283,7 @@ pimIpMRouteUpstreamAssertTimer OBJECT-TYPE
             "The time remaining before the router changes its upstream
             neighbor back to its RPF neighbor.  This timer is called the
             Assert timer in the PIM Sparse and Dense mode specification.
+
             A value of 0 indicates that no Assert has changed the
             upstream neighbor away from the RPF neighbor."
     ::= { pimIpMRouteEntry 1 }
@@ -340,8 +319,6 @@ pimIpMRouteAssertRPTBit OBJECT-TYPE
 pimIpMRouteFlags OBJECT-TYPE
     SYNTAX     BITS {
                   rpt(0),
-
-
                   spt(1)
                }
     MAX-ACCESS read-only
@@ -364,8 +341,6 @@ pimIpMRouteNextHopTable OBJECT-TYPE
             "The (conceptual) table listing PIM-specific information on
             a subset of the rows of the ipMRouteNextHopTable defined in
             the IP Multicast MIB."
-
-
     ::= { pim 7 }
 
 pimIpMRouteNextHopEntry OBJECT-TYPE
@@ -389,8 +364,6 @@ PimIpMRouteNextHopEntry ::= SEQUENCE {
 pimIpMRouteNextHopPruneReason OBJECT-TYPE
     SYNTAX     INTEGER {
                   other (1),
-
-
                   prune (2),
                   assert (3)
                }
@@ -413,8 +386,6 @@ pimRPTable OBJECT-TYPE
             for the Rendezvous Points (RPs) for IP multicast groups.
             This table is deprecated since its function is replaced by
             the pimRPSetTable for PIM version 2."
-
-
     ::= { pim 5 }
 
 pimRPEntry OBJECT-TYPE
@@ -426,7 +397,6 @@ pimRPEntry OBJECT-TYPE
             entry per RP address for each IP multicast group."
     INDEX      { pimRPGroupAddress, pimRPAddress }
     ::= { pimRPTable 1 }
-
 
 PimRPEntry ::= SEQUENCE {
     pimRPGroupAddress    IpAddress,
@@ -474,7 +444,6 @@ pimRPStateTimer OBJECT-TYPE
             order to retry)."
     ::= { pimRPEntry 4 }
 
-
 pimRPLastChange OBJECT-TYPE
     SYNTAX     TimeTicks
     MAX-ACCESS read-only
@@ -486,7 +455,7 @@ pimRPLastChange OBJECT-TYPE
 
 pimRPRowStatus OBJECT-TYPE
     SYNTAX     RowStatus
-    MAX-ACCESS read-only
+    MAX-ACCESS read-create
     STATUS     deprecated
     DESCRIPTION
             "The status of this row, by which new entries may be
@@ -506,8 +475,6 @@ pimRPSetTable OBJECT-TYPE
             obtained from received Candidate-RP-Advertisements.  When
             the local router is not the BSR, this information is
             obtained from received RP-Set messages."
-
-
     ::= { pim 6 }
 
 pimRPSetEntry OBJECT-TYPE
@@ -521,7 +488,6 @@ pimRPSetEntry OBJECT-TYPE
     ::= { pimRPSetTable 1 }
 
 PimRPSetEntry ::= SEQUENCE {
-
 
     pimRPSetGroupAddress    IpAddress,
     pimRPSetGroupMask       IpAddress,
@@ -569,7 +535,6 @@ pimRPSetHoldTime OBJECT-TYPE
             the BSR, this value is 0."
     ::= { pimRPSetEntry 4 }
 
-
 pimRPSetExpiryTime OBJECT-TYPE
     SYNTAX     TimeTicks
     MAX-ACCESS read-only
@@ -590,6 +555,13 @@ pimRPSetComponent OBJECT-TYPE
             a different index value."
     ::= { pimRPSetEntry 6 }
 
+--
+-- Note: { pim 8 } through { pim 10 } were used in older versions
+-- of this MIB.  Since some earlier versions of this MIB have been
+-- widely-deployed, these values must not be used in the future,
+-- as long the MIB is rooted under { experimental 61 }.
+--
+
 -- The PIM Candidate-RP Table
 
 pimCandidateRPTable OBJECT-TYPE
@@ -601,11 +573,10 @@ pimCandidateRPTable OBJECT-TYPE
             which the local router is to advertise itself as a
             Candidate-RP when the value of pimComponentCRPHoldTime is
             non-zero.  If this table is empty, then the local router
+
             will advertise itself as a Candidate-RP for all groups
             (providing the value of pimComponentCRPHoldTime is non-
             zero)."
-
-
     ::= { pim 11 }
 
 pimCandidateRPEntry OBJECT-TYPE
@@ -616,8 +587,6 @@ pimCandidateRPEntry OBJECT-TYPE
             "An entry (conceptual row) in the pimCandidateRPTable."
     INDEX      { pimCandidateRPGroupAddress,
                  pimCandidateRPGroupMask }
-
-
     ::= { pimCandidateRPTable 1 }
 
 PimCandidateRPEntry ::= SEQUENCE {
@@ -649,22 +618,21 @@ pimCandidateRPGroupMask OBJECT-TYPE
 
 pimCandidateRPAddress OBJECT-TYPE
     SYNTAX     IpAddress
-    MAX-ACCESS read-only
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
             "The (unicast) address of the interface which will be
+
             advertised as a Candidate-RP."
     ::= { pimCandidateRPEntry 3 }
 
 pimCandidateRPRowStatus OBJECT-TYPE
     SYNTAX     RowStatus
-    MAX-ACCESS read-only
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
             "The status of this row, by which new entries may be
             created, or old entries deleted from this table."
-
-
     ::= { pimCandidateRPEntry 4 }
 
 -- The PIM Component Table
@@ -682,8 +650,6 @@ pimComponentTable OBJECT-TYPE
             domain.  This table also supports, however, routers which
             may form a border between two PIM-SM domains and do not
             forward Bootstrap messages between them."
-
-
     ::= { pim 12 }
 
 pimComponentEntry OBJECT-TYPE
@@ -712,8 +678,6 @@ pimComponentIndex OBJECT-TYPE
             instance connected to a separate domain should have a
             different index value.  Routers that only support membership
             in a single PIM-SM domain should use a pimComponentIndex
-
-
             value of 1."
     ::= { pimComponentEntry 1 }
 
@@ -741,7 +705,7 @@ pimComponentBSRExpiryTime OBJECT-TYPE
 pimComponentCRPHoldTime OBJECT-TYPE
     SYNTAX     Integer32 (0..255)
     UNITS      "seconds"
-    MAX-ACCESS read-only
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
             "The holdtime of the component when it is a candidate RP in
@@ -752,7 +716,7 @@ pimComponentCRPHoldTime OBJECT-TYPE
 
 pimComponentStatus OBJECT-TYPE
     SYNTAX     RowStatus
-    MAX-ACCESS read-only
+    MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
             "The status of this entry.  Creating the entry creates
@@ -760,6 +724,20 @@ pimComponentStatus OBJECT-TYPE
             protocol instance."
     ::= { pimComponentEntry 5 }
 
+-- PIM Traps
+
+pimNeighborLoss NOTIFICATION-TYPE
+    OBJECTS {
+       pimNeighborIfIndex
+    }
+    STATUS             current
+    DESCRIPTION
+            "A pimNeighborLoss trap signifies the loss of an adjacency
+            with a neighbor.  This trap should be generated when the
+            neighbor timer expires, and the router has no other
+            neighbors on the same interface with a lower IP address than
+            itself."
+    ::= { pimTraps 1 }
 
 -- conformance information
 
@@ -776,7 +754,6 @@ pimV1MIBCompliance MODULE-COMPLIANCE
             implementing the PIM MIB."
     MODULE  -- this module
         MANDATORY-GROUPS { pimV1MIBGroup }
-
     ::= { pimMIBCompliances 1 }
 
 pimSparseV2MIBCompliance MODULE-COMPLIANCE
@@ -796,7 +773,6 @@ pimSparseV2MIBCompliance MODULE-COMPLIANCE
     MIN-ACCESS read-only
     DESCRIPTION
              "Write access is not required."
-
     ::= { pimMIBCompliances 2 }
 
 pimDenseV2MIBCompliance MODULE-COMPLIANCE
@@ -806,17 +782,23 @@ pimDenseV2MIBCompliance MODULE-COMPLIANCE
             and implementing the PIM MIB."
     MODULE  -- this module
 
-
         MANDATORY-GROUPS { pimDenseV2MIBGroup }
 
     OBJECT     pimInterfaceStatus
     MIN-ACCESS read-only
     DESCRIPTION
              "Write access is not required."
-
     ::= { pimMIBCompliances 3 }
 
 -- units of conformance
+
+pimNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { pimNeighborLoss }
+    STATUS  current
+    DESCRIPTION
+            "A collection of notifications for signaling important PIM
+            events."
+    ::= { pimMIBGroups 1 }
 
 pimV2MIBGroup OBJECT-GROUP
     OBJECTS { pimJoinPruneInterval, pimNeighborIfIndex,
@@ -829,6 +811,7 @@ pimV2MIBGroup OBJECT-GROUP
               pimComponentBSRAddress, pimComponentBSRExpiryTime,
               pimComponentCRPHoldTime, pimComponentStatus,
               pimIpMRouteFlags, pimIpMRouteUpstreamAssertTimer
+
             }
     STATUS  current
     DESCRIPTION
@@ -851,8 +834,6 @@ pimDenseV2MIBGroup OBJECT-GROUP
 
 pimV2CandidateRPMIBGroup OBJECT-GROUP
     OBJECTS { pimCandidateRPAddress,
-
-
               pimCandidateRPRowStatus
             }
     STATUS  current
@@ -879,6 +860,7 @@ pimV1MIBGroup OBJECT-GROUP
     ::= { pimMIBGroups 4 }
 
 pimNextHopGroup OBJECT-GROUP
+
     OBJECTS { pimIpMRouteNextHopPruneReason }
     STATUS  current
     DESCRIPTION
@@ -898,8 +880,6 @@ pimAssertGroup OBJECT-GROUP
             information about the assert election process.  There is no
             protocol reason to keep such information, but some
             implementations may already keep this information and make
-
-
             it available.  These objects can also be very useful in
             debugging connectivity or duplicate packet problems,
             especially if the assert winner does not support the PIM and

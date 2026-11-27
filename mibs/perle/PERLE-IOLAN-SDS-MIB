@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (Description keyword case; SEQUENCE OF type case; enum label; trailing comma before })
 PERLE-IOLAN-SDS-MIB DEFINITIONS ::= BEGIN
 
   -- The private MIB module for the Perle IOLAN SDS, SCS and STS
@@ -654,7 +655,7 @@ sdsMIBConformance OBJECT IDENTIFIER
      SYNTAX DisplayString(SIZE(0..32))
      MAX-ACCESS    read-only
      STATUS         current
-     Description
+     DESCRIPTION
      			"Device part Number"
      	::= { adminInfo 27}
 
@@ -662,7 +663,7 @@ sdsMIBConformance OBJECT IDENTIFIER
  	     SYNTAX DisplayString(SIZE(0..32))
      MAX-ACCESS    read-only
      STATUS         current
-     Description
+     DESCRIPTION
      			"IOLAN Internal temperature"
      	::= { adminInfo 28}
 
@@ -3987,7 +3988,7 @@ sdsMIBConformance OBJECT IDENTIFIER
         portSSHStrictHostKeyChecking OnOffValue,
         portSSHSixthSSH2Cipher            INTEGER,
         portSSHSeventhSSH2Cipher            INTEGER,
-        portSSHEighthSSH2Cipher            INTEGER,
+        portSSHEighthSSH2Cipher            INTEGER
 
   }
   portSSHIndex OBJECT-TYPE
@@ -17382,7 +17383,7 @@ ioChannelStatus      OBJECT IDENTIFIER ::= { ioChannelInfo 2 }
          ,
          wirelessWan(3),
          fiberOpticLan(4),
-         usb(5),
+         usb(5)
          }
       MAX-ACCESS  read-only
       STATUS      current
@@ -20654,7 +20655,7 @@ wwanStatsTxBytes OBJECT-TYPE
 -- sfpModuleTable
 --
   sfpModuleTable OBJECT-TYPE
-    SYNTAX		SEQUENCE OF sfpModuleEntry
+    SYNTAX		SEQUENCE OF SfpModuleEntry
     MAX-ACCESS	not-accessible
     STATUS		current
     DESCRIPTION
@@ -20778,7 +20779,7 @@ wwanStatsTxBytes OBJECT-TYPE
 		  mu(9),
 		  sg(10),
 		  opticalPigtail(11),
-		  MpoParallelOptic(12);
+		  mpoParallelOptic(12),
 		  hssdcII(32),
 		  copperPigtail(33),
 		  rj45(34)

@@ -83,10 +83,9 @@ the web interface at Device -> Settings -> Modules.
     lnms config:set discovery_modules.entity-state false
     lnms config:set discovery_modules.processors true
     lnms config:set discovery_modules.mempools true
-    lnms config:set discovery_modules.cisco-vrf-lite true
     lnms config:set discovery_modules.mac-accounting true
     lnms config:set discovery_modules.cisco-pw false
-    lnms config:set discovery_modules.vrf false
+    lnms config:set discovery_modules.vrf true
     lnms config:set discovery_modules.cisco-cef false
     lnms config:set discovery_modules.slas false
     lnms config:set discovery_modules.cisco-otv false
@@ -94,7 +93,6 @@ the web interface at Device -> Settings -> Modules.
     lnms config:set discovery_modules.ipv6-addresses true
     lnms config:set discovery_modules.route false
     lnms config:set discovery_modules.sensors true
-    lnms config:set discovery_modules.ipmi true
     lnms config:set discovery_modules.storage true
     lnms config:set discovery_modules.hr-device true
     lnms config:set discovery_modules.discovery-protocols true
@@ -152,8 +150,6 @@ ports that the configuration options ignore.
 
 `mempools`: memory detection support for devices.
 
-`cisco-vrf-lite`: VRF-Lite detection and support.
-
 `ipv4-addresses`: IPv4 address detection.
 
 `ipv6-addresses`: IPv6 address detection.
@@ -163,8 +159,8 @@ history data. The default route limit is 1000. To change the limit, use
 `lnms config:set routes.max_number 1000`.
 
 `sensors`: sensor detection for temperature, humidity, voltage, and more.
-
-`ipmi`: IPMI sensor detection via ipmitool when IPMI login details are supplied.
+Sensors come from SNMP and from the IPMI (ipmitool) and unix agent (hddtemp)
+polling methods of the device.
 
 `storage`: storage detection for hard disks.
 
@@ -189,7 +185,10 @@ with history data.
 
 `cisco-pw`: pseudowire detection and support.
 
-`vrf`: VRF detection and support.
+`vrf`: VRF detection, the interfaces in each VRF and the SNMP contexts that expose them.
+Contexts come from the device (CISCO-CONTEXT-MAPPING-MIB) or are added under Device -> Edit -> Routing.
+Each discovery checks that a context answers. The routing modules walk the default context and every
+context that answered, unless it is disabled under Device -> Edit -> Routing.
 
 `cisco-cef`: CEF detection and support.
 

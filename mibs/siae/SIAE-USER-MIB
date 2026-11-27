@@ -15,7 +15,7 @@ SIAE-USER-MIB
 
         IMPORTS
              MODULE-IDENTITY, OBJECT-TYPE,
-             IpAddress
+             Integer32, IpAddress
         FROM SNMPv2-SMI
              DisplayString,
              RowStatus,
@@ -27,7 +27,7 @@ SIAE-USER-MIB
         FROM SIAE-TREE-MIB;
 
     accessControl MODULE-IDENTITY
-        LAST-UPDATED "201609170000Z" 
+        LAST-UPDATED "201906100000Z"
         ORGANIZATION "SIAE MICROELETTRONICA spa"
         CONTACT-INFO
             "SIAE MICROELETTONICA s.p.a.
@@ -40,6 +40,18 @@ SIAE-USER-MIB
         DESCRIPTION
             "User privileges and credentials for SIAE equipment access
              control.
+            "
+        REVISION "201906100000Z"
+        DESCRIPTION
+            "Added accessControlUserAdminPwdMinimalLength.
+             Added accessControlUserOthersPwdMinimalLength.
+            "
+        REVISION "201905080000Z"
+        DESCRIPTION
+            "Added accessControlSecurityEnhTable.
+             Added accessControlSecurityEnhConfTable.
+             Added accessControlExtUserTable.
+             Added network manager Profile.
             "
         REVISION "201609170000Z"
         DESCRIPTION
@@ -135,15 +147,17 @@ SIAE-USER-MIB
                              admin            (1),
                              readwrite        (2),
                              maintenance      (3),
-                             readonly         (4)
+                             readonly         (4),
+                             networkMngr      (5)
                             }
         MAX-ACCESS  read-create
         STATUS      current
         DESCRIPTION
-            "This object defines the group access privileges. 'Admin' profile can 
-             read and write all MIB, 'readwrite' profile can write all MIB leaves 
-             but it can not manage users, 'maintenance' profile can do only manual 
-             operations, while 'readonly' can only perform get operations."
+            "This object defines the group access privileges. 'Admin' profile can
+             read and write all MIB, 'readwrite' profile can write all MIB leaves
+             but it can not manage users, 'maintenance' profile can do only manual
+             operations, while 'readonly' can only perform get operations.
+             'networkMngr' is a profile dedicated to network managers."
     ::= {accessControlGroupRecord 2}
 
     accessControlGroupHttp  OBJECT-TYPE
@@ -656,8 +670,253 @@ SIAE-USER-MIB
 
 --
 -------  End of accessControlExtLoginTable
-   
-   
+
+-------  Begin of accessControlSecurityEnhTable
+--
+    accessControlSecurityEnhTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  AccessControlSecurityEnhEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of security enhancement services.
+            This table is useful to show the manager the
+            status of all security services available
+            on the equipment."
+    ::= {accessControl 7}
+
+    accessControlSecurityEnhEntry  OBJECT-TYPE
+        SYNTAX      AccessControlSecurityEnhEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing management information
+            applicable to a given security service on the
+            equipment."
+        INDEX {accessControlSecurityEnhIndex}
+    ::= {accessControlSecurityEnhTable 1}
+
+    AccessControlSecurityEnhEntry  ::=
+        SEQUENCE {
+            accessControlSecurityEnhIndex              Integer32,
+            accessControlSecurityEnhName               DisplayString,
+            accessControlSecurityEnhAdminStatus        INTEGER,
+            accessControlSecurityEnhRowStatus          RowStatus
+        }
+
+    accessControlSecurityEnhIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique value, greater than zero, for each
+            security service. It is recommended that values
+            are assigned contiguously starting from 1."
+    ::= {accessControlSecurityEnhEntry 1}
+
+    accessControlSecurityEnhName OBJECT-TYPE
+        SYNTAX      DisplayString   (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string to identify the security service."
+        DEFVAL  {""}
+    ::= {accessControlSecurityEnhEntry 2}
+
+    accessControlSecurityEnhAdminStatus  OBJECT-TYPE
+        SYNTAX      INTEGER  {
+                               disable          (1),
+                               enable           (2)
+                             }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Object used to enable/disable a given security
+            service on the equipment."
+        DEFVAL  {disable}
+    ::= {accessControlSecurityEnhEntry 3}
+
+    accessControlSecurityEnhRowStatus   OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this conceptual row in
+            accessControlSecurityEnhTable."
+    ::= {accessControlSecurityEnhEntry 4}
+
+--
+-------  End of accessControlSecurityEnhTable
+
+-------  Begin of accessControlSecurityEnhConfTable
+--
+    accessControlSecurityEnhConfTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  AccessControlSecurityEnhConfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table is intended to gather the configuration
+            items related to enhanced security services."
+    ::= {accessControl 8}
+
+    accessControlSecurityEnhConfEntry  OBJECT-TYPE
+        SYNTAX      AccessControlSecurityEnhConfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing management information
+            applicable to a given security service on the
+            equipment."
+        INDEX {accessControlSecurityEnhConfIndex}
+    ::= {accessControlSecurityEnhConfTable 1}
+
+    AccessControlSecurityEnhConfEntry  ::=
+        SEQUENCE {
+            accessControlSecurityEnhConfIndex           Integer32,
+            accessControlUserLockoutTime                INTEGER,
+            accessControlUserLockoutMaxRetries          INTEGER,
+            accessControlUserPwdExpirationTimeout       INTEGER,
+            accessControlUserAdminPwdMinimalLength      INTEGER,
+            accessControlUserOthersPwdMinimalLength     INTEGER,
+            accessControlSecurityEnhConfRowStatus       RowStatus
+        }
+
+    accessControlSecurityEnhConfIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "accessControlSecurityEnhConfTable index."
+    ::= {accessControlSecurityEnhConfEntry 1}
+
+    accessControlUserLockoutTime OBJECT-TYPE
+        SYNTAX      INTEGER (5..60)
+        UNITS       "min"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the user lockout time
+             expressed in minutes after given number of
+             login failures."
+        DEFVAL  { 30 }
+    ::= {accessControlSecurityEnhConfEntry 2}
+
+    accessControlUserLockoutMaxRetries OBJECT-TYPE
+        SYNTAX      INTEGER (1..10)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+             "This object indicates the max number of login
+              retries. When max number of retries is exceeded
+              user account is locked."
+         DEFVAL  { 3 }
+    ::= {accessControlSecurityEnhConfEntry 3}
+
+    accessControlUserPwdExpirationTimeout OBJECT-TYPE
+        SYNTAX      INTEGER (1..105)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+             "This object indicates the password expiration
+              timeout, i.e. the number of days since the last
+              password set or change, during which a password
+              is valid.
+              A user is forced to change his password, once its
+              related expiration timeout period expires."
+         DEFVAL  { 105 }
+    ::= {accessControlSecurityEnhConfEntry 4}
+
+    accessControlUserAdminPwdMinimalLength OBJECT-TYPE
+        SYNTAX      INTEGER (8..15)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+             "This object indicates the password minimal length
+              for admin users."
+         DEFVAL  { 8 }
+    ::= {accessControlSecurityEnhConfEntry 5}
+
+    accessControlUserOthersPwdMinimalLength OBJECT-TYPE
+        SYNTAX      INTEGER (8..15)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+             "This object indicates the password minimal length
+              for others (not admin) users."
+         DEFVAL  { 8 }
+    ::= {accessControlSecurityEnhConfEntry 6}
+
+    accessControlSecurityEnhConfRowStatus   OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this conceptual row in
+            accessControlUserLockoutTable."
+    ::= {accessControlSecurityEnhConfEntry 7}
+
+--
+-------  End of accessControlSecurityEnhConfTable
+
+
+--
+------- The following table defines the users of the equipment,
+------- connected to the group table.
+
+-------  Begin of accessControlExtUserTable
+--
+    accessControlExtUserTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF    AccessControlExtUserRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table includes additional information about the
+             current status of each user."
+    ::= {accessControl 9}
+
+   accessControlExtUserRecord OBJECT-TYPE
+        SYNTAX      AccessControlExtUserRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Additional information record for an user."
+        AUGMENTS { accessControlUserRecord }
+    ::= { accessControlExtUserTable 1 }
+
+
+    AccessControlExtUserRecord  ::=
+        SEQUENCE {
+            accessControlUserLoginStatus     BITS
+        }
+
+    accessControlUserLoginStatus OBJECT-TYPE
+        SYNTAX        BITS {
+            -- must be 0
+            accessControlUserLockedOut(0),
+            -- User login is locked out due to repeated failures
+            accessControlUserPasswordExpired(1),
+            -- User password time period has expired
+            accessControlUserSnmpLogin(2),
+            -- User is currently logged in via SNMP
+            accessControlUserWebLogin(3),
+            -- User is currently logged in via WEB
+            accessControlUserCliLogin(4)
+            -- User is currently logged in via CLI
+        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This indicates the current status of user versus login:
+             -bit 7: = 1 user login is currently locked out
+             -bit 6: = 1 user password is expired
+             -bit 5: = 1 user is currently logged in through SNMP
+             -bit 4: = 1 user is currently logged in through WEB
+             -bit 3: = 1 user is currently logged in through CLI
+            "
+    ::= {accessControlExtUserRecord 1}
+
+--
+-------  End of accessControlExtUserTable
+
 ------ End group -------------------------------------------------------------
 
 END

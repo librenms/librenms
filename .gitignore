@@ -1,11 +1,14 @@
+*.log
 # Ignore all dotfiles #
 #######################
 .*
+!/.coderabbit.yaml
 !/.gitignore
 !/.git-blame-ignore-revs
 !/.editorconfig
 !/.php_cs
 !/.github/
+!/.github/linters/.yamllint.yml
 !/.mention-bot
 !/.env.example
 

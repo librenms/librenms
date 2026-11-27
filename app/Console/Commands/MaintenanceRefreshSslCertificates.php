@@ -58,11 +58,12 @@ class MaintenanceRefreshSslCertificates extends LnmsCommand
                 continue;
             }
 
+            $severity = $cert->isWithinWarningWindow() ? Severity::Warning : Severity::Info;
             $changes = $cert->getTrackedChanges();
             $cert->save();
             if ($changes !== '') {
                 $refreshed++;
-                Eventlog::log("SSL certificate refreshed: {$cert->host}:{$cert->port} – {$changes}", $cert->device_id, 'ssl-certificate', Severity::Info, $cert->id);
+                Eventlog::log("SSL certificate refreshed: {$cert->host}:{$cert->port} – {$changes}", $cert->device_id, 'ssl-certificate', $severity, $cert->id);
             }
         }
 

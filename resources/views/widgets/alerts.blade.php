@@ -3,8 +3,8 @@
         <table id="alerts-{{ $id }}" class="table table-hover table-condensed alerts">
             <thead>
             <tr>
-                <th data-column-id="severity"></th>
-                <th data-column-id="timestamp">{{ __('Timestamp') }}</th>
+                <th data-column-id="severity" @if($sort === 'severity') data-order="desc" @endif></th>
+                <th data-column-id="timestamp" @if($sort !== 'severity') data-order="desc" @endif>{{ __('Timestamp') }}</th>
                 <th data-column-id="rule">{{ __('Rule') }}</th>
                 <th data-column-id="details" data-sortable="false"></th>
                 <th data-column-id="hostname">{{ __('Hostname') }}</th>
@@ -53,30 +53,24 @@
             ajax: true,
             requestHandler: request => ({
                 ...request,
-                acknowledged: '{{ $acknowledged }}',
-                unreachable: '{{ $unreachable }}',
-                fired: '{{ $fired }}',
-                state: '{{ $state }}',
+                acknowledged: @json($acknowledged),
+                unreachable: @json($unreachable),
+                fired: @json($fired),
+                state: @json($state),
                 min_severity: severityQuickFilter !== null ? severityQuickFilter : (widgetDefaultMinSeverity ?? ''),
-                group: '{{ $device_group }}',
-                proc: '{{ $proc }}',
-                uncollapse_key_count: '{{ $uncollapse_key_count }}',
-                device_id: '{{ $device }}'
+                group: @json($device_group),
+                proc: @json($proc),
+                uncollapse_key_count: @json($uncollapse_key_count),
+                device_id: @json($device),
+                widget_id: @json($id)
             }),
             responseHandler: response => {
                 $("#widget_title_counter_{{ $id }}").text(response.total ? ` (${response.total})` : '')
 
                 return response
             },
-            sort: {
-                @if($sort === 'severity' || $sort == 1)
-                    severity: 'desc'
-                @else
-                    timestamp: 'desc'
-                @endif
-            },
             url: "{{ route('table.alerts') }}",
-            navigation: ! {{ $hidenavigation }},
+            navigation: @json(! $hidenavigation),
             rowCount: [50, 100, 250, -1],
             templates: {
                 header: "<div id=\"@{{ctx.id}}\" class=\"@{{css.header}}\"><div class=\"row\">" +

@@ -31,27 +31,29 @@ use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use LibreNMS\DB\SyncsModels;
-use LibreNMS\Interfaces\Data\DataStorageInterface;
+use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Exceptions\UncorrectableNegativeException;
+use LibreNMS\Interfaces\Data\WriteInterface;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\StoragePolling;
 use LibreNMS\OS;
-use LibreNMS\Polling\ConnectivityHelper;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Traits\RequiresPollingMethod;
 use LibreNMS\Util\Number;
 
 class Storage implements Module
 {
     use SyncsModels;
+    use RequiresPollingMethod;
 
     public function dependencies(): array
     {
         return [];
     }
 
-    public function shouldDiscover(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
+    public function pollingMethods(Device $device): array
     {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
+        return [PollingMethodType::Snmp];
     }
 
     /**
@@ -68,15 +70,10 @@ class Storage implements Module
         $saved->each($this->printStorage(...));
     }
 
-    public function shouldPoll(OS $os, ModuleStatus $status, ConnectivityHelper $connectivity): bool
-    {
-        return $status->isEnabled() && $connectivity->snmpIsAvailable();
-    }
-
     /**
      * @inheritDoc
      */
-    public function poll(OS $os, DataStorageInterface $datastore): void
+    public function poll(OS $os, WriteInterface $datastore): void
     {
         $storages = $os->getDevice()->storage;
 
@@ -97,16 +94,15 @@ class Storage implements Module
         foreach ($storages as $storage) {
             $this->printStorage($storage);
 
-            $datastore->put($os->getDeviceArray(), 'storage', [
-                'type' => $storage->type,
-                'descr' => $storage->storage_descr,
-                'rrd_name' => ['storage', $storage->type, $storage->storage_descr],
+            $metric = $storage->setRelation('device', $os->getDevice())->metricIdentity('storage');
+            $datastore->write($metric->measurement, [
+                'used' => $storage->storage_used,
+                'free' => $storage->storage_free,
+            ], $metric->tags, [
+                'metric' => $metric,
                 'rrd_def' => RrdDefinition::make()
                     ->addDataset('used', 'GAUGE', 0)
                     ->addDataset('free', 'GAUGE', 0),
-            ], [
-                'used' => $storage->storage_used,
-                'free' => $storage->storage_free,
             ]);
         }
     }
@@ -126,9 +122,20 @@ class Storage implements Module
         $data = \SnmpQuery::numeric()->get($oids)->values();
 
         return $storages->each(function (\App\Models\Storage $storage) use ($data): void {
+            $used = $data[(string) $storage->storage_used_oid] ?? null;
+            $total = $storage->storage_units ? $storage->storage_size / $storage->storage_units : null;
+            if ($storage->type == 'hrstorage' && is_numeric($used) && $used < 0) {
+                // signed Integer32 wrap, see HostResources::discoverStorage(), -1 is commonly "unknown"
+                try {
+                    $used = ($used < -1 && $total) ? Number::correctIntegerOverflow($used, (int) $total) : null;
+                } catch (UncorrectableNegativeException) {
+                    $used = null;
+                }
+            }
+
             $storage->fillUsage(
-                $data[(string) $storage->storage_used_oid] ?? null,
-                $storage->storage_units ? $storage->storage_size / $storage->storage_units : null,
+                $used,
+                $total,
                 $data[(string) $storage->storage_free_oid] ?? null,
                 $data[(string) $storage->storage_perc_oid] ?? null,
             );

@@ -35,6 +35,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\DB;
+use LibreNMS\Enum\DeviceType;
 use LibreNMS\Enum\MaintenanceBehavior;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\HostRenameException;
@@ -47,14 +48,8 @@ class EditDeviceController
     {
         $this->authorize('update', $device);
 
-        $types = collect(LibrenmsConfig::get('device_types'))->keyBy('type');
-        if (! $types->has($device->type)) {
-            $types->put($device->type, [
-                'icon' => null,
-                'text' => ucfirst($device->type),
-                'type' => $device->type,
-            ]);
-        }
+        $types = DeviceType::icons();
+        $types[$device->type] ??= null;
 
         $alertSchedules = $device->alertSchedules()->isActive()->get();
         $isUnderMaintenance = $alertSchedules->isNotEmpty();
@@ -77,7 +72,7 @@ class EditDeviceController
             'static_groups' => $static_groups,
             'types' => $types,
             'default_type' => LibrenmsConfig::getOsSetting($device->os, 'type'),
-            'parents' => $device->parents()->select(['devices.device_id', 'hostname', 'sysName', 'ip', 'overwrite_ip', 'display'])->get()->mapWithKeys(fn ($parent) => [$parent->device_id => $parent->displayName()]),
+            'parents' => $device->parents()->select(['devices.device_id', 'hostname', 'sysName', 'ip', 'overwrite_ip', 'display'])->get()->mapWithKeys(fn ($parent) => [$parent->device_id => $parent->display]),
             'poller_groups' => PollerGroup::orderBy('group_name')->pluck('group_name', 'id'),
             'default_poller_group' => LibrenmsConfig::get('distributed_poller_group'),
             'override_sysContact_bool' => $device->getAttrib('override_sysContact_bool'),

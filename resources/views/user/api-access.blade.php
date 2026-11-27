@@ -5,6 +5,7 @@
 @section('content')
 <div class="container-fluid" x-data="apiAccessManager()">
     <legend>{{ __('API Tokens') }}</legend>
+    @include('user.api-navigation')
 
     @if (session('status'))
         <div class="alert alert-info">{{ session('status') }}</div>
@@ -84,7 +85,7 @@
                         </button>
                     </td>
                     <td>
-                        <form method="post" :action="baseUrl + '/' + token.id + '/reset'" class="form-inline" onsubmit="return confirm(@js(__('This revokes the current token and issues a new one. Continue?')));">
+                        <form method="post" :action="route('api-access.reset', {id: token.id})" class="form-inline" onsubmit="return confirm(@js(__('This revokes the current token and issues a new one. Continue?')));">
                             @csrf
                             <button type="submit" class="btn btn-warning btn-xs">{{ __('Reset token') }}</button>
                         </form>
@@ -113,7 +114,7 @@
         <p>{{ __('If you would like to remove the API token then please click Delete.') }}</p>
         <x-slot:footer>
             <button type="button" class="btn btn-default" @click="deleteModalOpen = false">{{ __('Cancel') }}</button>
-            <form method="post" :action="baseUrl + '/' + deleteTokenId" style="display: inline;">
+            <form method="post" :action="deleteTokenId ? route('api-access.destroy', {id: deleteTokenId}) : null" style="display: inline;">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-danger">{{ __('Delete') }}</button>
@@ -219,7 +220,6 @@ function apiAccessManager() {
             'disabled' => $isExpired,
         ];
     })),
-    baseUrl: @js(url('api-access')),
     csrfToken: @js(csrf_token()),
 
     editingTokenId: null,
@@ -269,7 +269,7 @@ function apiAccessManager() {
       }
 
       try {
-        const response = await fetch(`${this.baseUrl}/${token.id}`, {
+        const response = await fetch(route('api-access.update', {id: token.id}), {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -328,7 +328,7 @@ function apiAccessManager() {
       }
 
       try {
-        const response = await fetch(`${this.baseUrl}/${this.expTokenId}`, {
+        const response = await fetch(route('api-access.update', {id: this.expTokenId}), {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',

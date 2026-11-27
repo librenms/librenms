@@ -1,6 +1,6 @@
 os: exinda
 text: Exinda
-type: appliance
+type: network
 icon: exinda
 over:
     - { graph: device_bits, text: 'Device Traffic' }

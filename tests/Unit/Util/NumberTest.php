@@ -135,7 +135,7 @@ final class NumberTest extends TestCase
     public function testCalculateRateInvalidTimeThrowsException(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Current time must be greater than previous time');
+        $this->expectExceptionMessageIsOrContains('Current time must be greater than previous time');
         Number::calculateRate('100', '200', 2.0, 1.0);
     }
 
@@ -148,7 +148,7 @@ final class NumberTest extends TestCase
     public function testCalculateRateNegativeValueThrowsException(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Counter values must be non-negative integers');
+        $this->expectExceptionMessageIsOrContains('Counter values must be non-negative integers');
         Number::calculateRate('-100', '200', 1.0, 2.0);
     }
 

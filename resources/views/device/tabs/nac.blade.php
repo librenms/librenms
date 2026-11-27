@@ -2,10 +2,6 @@
 
 @section('content')
     <x-device.page :device="$device">
-    @isset($data['submenu'])
-        <x-submenu :title="$title" :menu="$data['submenu']" :device-id="$device_id" :current-tab="$current_tab" :selected="$vars" />
-    @endisset
-
     <div class="row">
     <div class="col-md-12">
 

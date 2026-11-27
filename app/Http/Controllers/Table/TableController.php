@@ -105,9 +105,7 @@ abstract class TableController extends PaginatedAjaxController
     {
         $query = $this->prepareExportQuery($request);
 
-        if ($request->has('sort')) {
-            $this->sort($request, $query);
-        }
+        $this->sort($request, $query);
 
         $data = $query->get();
 

@@ -42,7 +42,7 @@ class AlertsController extends WidgetController
         'device_group' => null,
         'proc' => 0,
         'location' => 1,
-        'sort' => 1,
+        'sort' => '',
         'hidenavigation' => 0,
         'uncollapse_key_count' => 1,
         'unreachable' => null,

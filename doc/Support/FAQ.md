@@ -39,7 +39,7 @@ These distributions have official support:
 
 We help with other distributions where we can. If your distribution is
 not in the list, try the installation. For help, join our [discord
-server](https://t.libren.ms/discord).
+server](https://discord.com/invite/librenms).
 
 ### <a name="faq5"> Do you have a demo available?</a>
 
@@ -182,7 +182,7 @@ directory.
 Correct each problem in the output. Then run `./validate.php` again.
 
 For an unusual problem, join our [discord
-server](https://t.libren.ms/discord).
+server](https://discord.com/invite/librenms).
 
 ### <a name="faq21"> What do the values mean in my graphs?</a>
 

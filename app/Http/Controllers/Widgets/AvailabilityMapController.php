@@ -34,7 +34,6 @@ use App\Models\Service;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
-use LibreNMS\Util\Url;
 
 class AvailabilityMapController extends WidgetController
 {
@@ -114,7 +113,7 @@ class AvailabilityMapController extends WidgetController
 
             $data[] = [
                 'status' => $device->status,
-                'link' => Url::deviceUrl($device),
+                'link' => route('device.overview', ['device' => $device]),
                 'tooltip' => $this->getDeviceTooltip($device, $state_name),
                 'label' => $this->getDeviceLabel($device, $state_name), // add another field for the selected label
                 'labelClass' => $class,
@@ -160,7 +159,7 @@ class AvailabilityMapController extends WidgetController
 
             $data[] = [
                 'status' => $service->service_status,
-                'link' => Url::deviceUrl($service->device),
+                'link' => route('device.overview', ['device' => $service->device_id]),
                 'tooltip' => $this->getServiceTooltip($service),
                 'label' => $this->getServiceLabel($service),
                 'labelClass' => $class,
@@ -208,7 +207,7 @@ class AvailabilityMapController extends WidgetController
 
     private function getDeviceTooltip(Device $device, string $state_name): string
     {
-        $tooltip = $device->displayName();
+        $tooltip = $device->display;
 
         if (! $device->status && ! $device->last_polled) {
             $time = __('Never polled');
@@ -225,7 +224,8 @@ class AvailabilityMapController extends WidgetController
 
     private function getServiceTooltip(Service $service): string
     {
-        $tooltip = $service->device->displayName() . ' [' . $service->service_type . ']';
+        $device = $service->device;
+        $tooltip = $device->display . ' [' . $service->service_type . ']';
 
         $description = $service->service_name ?: $service->service_desc;
         if ($description) {

@@ -27,7 +27,9 @@
 namespace LibreNMS\OS\Shared;
 
 use App\Models\Device;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
+use LibreNMS\Util\StringHelpers;
 
 class Printer extends \LibreNMS\OS
 {
@@ -56,5 +58,36 @@ class Printer extends \LibreNMS\OS
         }
 
         return $vars;
+    }
+
+    /**
+     * hrPrinterDetectedErrorState is a bit string, translate it to one state, multiple issues are a warning or critical
+     */
+    public function pollSensors(Collection $sensors): array
+    {
+        // value => critical, from the hrPrinterDetectedErrorState bits
+        $states = [0 => false, 1 => false, 2 => true, 3 => false, 4 => true, 5 => true, 6 => true, 7 => true, 8 => true];
+        $values = parent::pollSensors($sensors);
+
+        foreach ($sensors->where('sensor_class', 'state')->where('sensor_type', 'hrPrinterDetectedErrorState') as $sensor) {
+            $bits = StringHelpers::bitsToIndices((string) ($values[$sensor->sensor_id] ?? ''));
+            $value = 0;
+            $critical = false;
+
+            foreach ($bits as $bit) {
+                if (isset($states[$bit])) {
+                    $value = $bit;
+                    if ($states[$bit]) {
+                        $critical = true;
+                        break;
+                    }
+                }
+            }
+
+            // a state for each combination of bits is not possible
+            $values[$sensor->sensor_id] = count($bits) > 1 ? ($critical ? 10 : 9) : $value;
+        }
+
+        return $values;
     }
 }

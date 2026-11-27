@@ -54,10 +54,10 @@ class SslCertificateController extends TableController
         $daysDanger = (int) LibrenmsConfig::get('ssl_certificates.days_until_expiry_danger', 0);
         $deviceLink = null;
         if ($sslCertificate->device) {
-            $deviceLink = '<a href="' . url('device/' . $sslCertificate->device_id) . '">' . e($sslCertificate->device->hostname) . '</a>';
+            $deviceLink = '<a href="' . route('device.overview', ['device' => $sslCertificate->device_id]) . '">' . e($sslCertificate->device->hostname) . '</a>';
         }
 
-        $validTo = $sslCertificate->valid_to !== null ? $sslCertificate->valid_to->format('Y-m-d H:i') : null;
+        $validTo = $sslCertificate->valid_to?->format('Y-m-d H:i');
         $status = '';
         if ($sslCertificate->disabled) {
             $status = '<span class="label label-default">' . __('Disabled') . '</span>';

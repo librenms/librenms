@@ -9,8 +9,8 @@ syntax.
 For more information about the Cisco Spark RoomID and token, read
 these pages:
 
-- [Getting started](https://developer.ciscospark.com/getting-started.html)
-- [Rooms](https://developer.ciscospark.com/resource-rooms.html)
+- [Getting started](https://developer.webex.com/docs/getting-started)
+- [Rooms](https://developer.webex.com/docs/api/v1/rooms)
 
 **Example:**
 

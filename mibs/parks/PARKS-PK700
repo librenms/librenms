@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (trailing comma in IMPORTS; full-width comma; lowercase type name; trailing comma before })
 PARKS-PK700 DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -10,7 +11,7 @@ IMPORTS
 	TimeTicks,
 	Unsigned32,
 	Counter32,
-	Counter64,
+	Counter64
 		FROM SNMPv2-SMI
 	DateAndTime,
 	MacAddress,
@@ -1062,7 +1063,7 @@ gpononuOfflineNum OBJECT-TYPE
 	::= { gponPortEntry 5 }
 
 oltPortOpticalTable OBJECT-TYPE
-	SYNTAX  SEQUENCE OF oltPortOpticalEntry
+	SYNTAX  SEQUENCE OF OltPortOpticalEntry
 	MAX-ACCESS not-accessible
 	STATUS  current
 	DESCRIPTION
@@ -1083,7 +1084,7 @@ oltPortOpticalEntry OBJECT-TYPE
 	::= { oltPortOpticalTable 1 }
 
 
-oltPortOpticalEntry ::= SEQUENCE {
+OltPortOpticalEntry ::= SEQUENCE {
 
 	portDeviceIndex       EponDeviceIndex,
 	modulePortName         OCTET STRING,
@@ -2031,7 +2032,7 @@ slaUsCommittedBW  OBJECT-TYPE
 
 
 onuAllowListTable  OBJECT-TYPE
-	SYNTAX      SEQUENCE OF onuAllowListEntry
+	SYNTAX      SEQUENCE OF OnuAllowListEntry
 	MAX-ACCESS  not-accessible
 	STATUS      current
 	DESCRIPTION
@@ -2047,7 +2048,7 @@ onuAllowListEntry  OBJECT-TYPE
 	INDEX       { onuAllowDeviceIndex }
 	::={onuAllowListTable 1 }
 
-onuAllowListEntry ::= SEQUENCE {
+OnuAllowListEntry ::= SEQUENCE {
 	onuAllowDeviceIndex           EponDeviceIndex,
 	onuAllowListName              DisplayString,
 	onuAllowListMacAddress        MacAddress,
@@ -2086,7 +2087,7 @@ onuAllowListMacAddress  OBJECT-TYPE
 onuAllowListAuthState  OBJECT-TYPE
 	SYNTAX      INTEGER {
 	true(1),
-	false(2),
+	false(2)
 	}
 	MAX-ACCESS  read-write
 	STATUS      current
@@ -2099,7 +2100,7 @@ onuAllowListAdminStatus  OBJECT-TYPE
 	SYNTAX      INTEGER {
 	up(1),
 	down(2),
-	register(3),
+	register(3)
 	}
 	MAX-ACCESS  read-write
 	STATUS      current
@@ -6022,9 +6023,9 @@ stpManagement OBJECT IDENTIFIER
         stpPortPointToPointOperStatus
           TruthValue,
         stpPortEnabled
-          TruthValue，
+          TruthValue,
 		stpPortRole
-		  INTEGER,
+		  INTEGER
        }
 
     stpPortStpIndex OBJECT-TYPE
@@ -8017,7 +8018,7 @@ SniAttributeEntry ::= SEQUENCE {
 	sniLastStatusChangeTime     TimeTicks,
 	sniMacAddrLearnMaxNum       INTEGER,
 	sniIsolationEnable          TruthValue,
-	sniPortType                 INTEGER,
+	sniPortType                 INTEGER
   }
 
 sniAttributeDeviceIndex  OBJECT-TYPE
@@ -9483,7 +9484,7 @@ gpononuAllowListMacAddress  OBJECT-TYPE
 gpononuAllowListAuthState  OBJECT-TYPE
 	SYNTAX      INTEGER {
 	true(1),
-	false(2),
+	false(2)
 	}
 	MAX-ACCESS  read-write
 	STATUS      current
@@ -9496,7 +9497,7 @@ gpononuAllowListAdminStatus  OBJECT-TYPE
 	SYNTAX      INTEGER {
 	up(1),
 	down(2),
-	register(3),
+	register(3)
 	}
 	MAX-ACCESS  read-write
 	STATUS      current

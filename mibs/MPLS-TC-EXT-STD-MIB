@@ -1,0 +1,148 @@
+MPLS-TC-EXT-STD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, Unsigned32
+      FROM SNMPv2-SMI               -- RFC 2578
+
+   TEXTUAL-CONVENTION
+      FROM SNMPv2-TC                -- RFC 2579
+
+   mplsStdMIB
+      FROM MPLS-TC-STD-MIB          -- RFC 3811
+
+   ;
+
+mplsTcExtStdMIB MODULE-IDENTITY
+
+   LAST-UPDATED
+      "201502020000Z" -- February 2, 2015
+   ORGANIZATION
+      "Multiprotocol Label Switching (MPLS) Working Group"
+   CONTACT-INFO
+      "
+             Venkatesan Mahalingam
+             Dell Inc,
+             5450 Great America Parkway,
+             Santa Clara, CA 95054, USA
+       Email: venkat.mahalingams@gmail.com
+
+             Kannan KV Sampath
+             Redeem,
+             India
+       Email: kannankvs@gmail.com
+
+             Sam Aldrin
+             Huawei Technologies
+             2330 Central Express Way,
+             Santa Clara, CA 95051, USA
+       Email:  aldrin.ietf@gmail.com
+
+             Thomas D. Nadeau
+       Email: tnadeau@lucidvision.com
+      "
+   DESCRIPTION
+      "This MIB module contains Textual Conventions for LSPs of MPLS-
+       based transport networks.
+
+       Copyright (c) 2015 IETF Trust and the persons identified as
+       authors of the code.  All rights reserved.
+
+       Redistribution and use in source and binary forms, with or
+       without modification, is permitted pursuant to, and subject to
+       the license terms contained in, the Simplified BSD License set
+       forth in Section 4.c of the IETF Trust's Legal Provisions
+       Relating to IETF Documents
+       (http://trustee.ietf.org/license-info)."
+
+   -- Revision history.
+
+   REVISION
+      "201502020000Z" -- February 2, 2015
+   DESCRIPTION
+        "MPLS Textual Convention Extensions"
+   ::= { mplsStdMIB 17 }
+
+MplsGlobalId ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION
+        "This object contains the Textual Convention for an IP-based
+         operator-unique identifier (Global_ID).  The Global_ID can
+         contain the 2-octet or 4-octet value of the operator's
+         Autonomous System Number (ASN).
+
+         When the Global_ID is derived from a 2-octet ASN,
+         the two high-order octets of this 4-octet identifier
+         MUST be set to zero (0x00).  Further, ASN 0 is reserved.
+         The size of the Global_ID string MUST be zero if
+         the Global_ID is invalid.
+
+         Note that a Global_ID of zero is limited to entities
+         contained within a single operator and MUST NOT be used
+         across a Network-to-Network Interface (NNI).  A non-zero
+         Global_ID MUST be derived from an ASN owned by
+         the operator."
+   REFERENCE
+        "MPLS Transport Profile (MPLS-TP) Identifiers, RFC 6370,
+         Section 3"
+   SYNTAX  OCTET STRING (SIZE (4))
+
+MplsCcId ::= TEXTUAL-CONVENTION
+STATUS      current
+DESCRIPTION
+     "The CC (Country Code) is a string of two characters, each
+      being an uppercase Basic Latin alphabetic (i.e., A-Z).
+
+      The characters are encoded using ITU-T Recommendation T.50.
+      The size of the CC string MUST be zero if the CC identifier
+      is invalid."
+REFERENCE
+     "MPLS-TP Identifiers Following ITU-T Conventions,
+      RFC 6923, Section 3.
+      International Reference Alphabet (IRA) (Formerly
+      International Alphabet No. 5 or IA5) - Information
+      technology - 7-bit coded character set for information
+      exchange, ITU-T Recommendation T.50, September 1992."
+SYNTAX  OCTET STRING (SIZE (0|2))
+
+MplsIccId ::= TEXTUAL-CONVENTION
+STATUS      current
+DESCRIPTION
+     "The ICC is a string of one to six characters, each
+      an uppercase Basic Latin alphabetic (i.e., A-Z) or
+      numeric (i.e., 0-9).  The characters are encoded
+      using ITU-T Recommendation T.50.  The size of
+      the ICC string MUST be zero if the ICC identifier
+      is invalid."
+REFERENCE
+     "MPLS-TP Identifiers Following ITU-T Conventions,
+      RFC 6923, Section 3.
+      International Reference Alphabet (IRA) (Formerly
+      International Alphabet No. 5 or IA5) - Information
+      technology - 7-bit coded character set for information
+      exchange, ITU-T Recommendation T.50, September 1992."
+SYNTAX  OCTET STRING (SIZE (0|1..6))
+
+MplsNodeId ::= TEXTUAL-CONVENTION
+   DISPLAY-HINT "d"
+   STATUS      current
+   DESCRIPTION
+       "The Node_ID is assigned within the scope of
+        the Global_ID/ICC_Operator_ID.
+
+        When IPv4 addresses are in use, the value of this object
+        can be derived from the LSR's IPv4 loopback address.
+        When IPv6 addresses are in use, the value of this object
+        can be a 32-bit value unique within the scope of
+        a Global_ID.
+
+        Note that, when IP reachability is not needed, the 32-bit
+        Node_ID is not required to have any association
+        with the IPv4 address space.  The value of 0 indicates
+        an invalid Node_ID."
+   REFERENCE
+        "MPLS Transport Profile (MPLS-TP) Identifiers, RFC 6370,
+         Section 4"
+   SYNTAX  Unsigned32 (0|1..4294967295)
+
+  -- MPLS-TC-EXT-STD-MIB module ends
+  END

@@ -1,4 +1,4 @@
--- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+-- Mib files packaged on  Wed Jun 19 01:31:39 EDT 2019 for Storage Array Firmware V10.0.3 (R469188)
 
 
 EQLCONTROLLER-MIB DEFINITIONS  ::= BEGIN   
@@ -17,7 +17,7 @@ IMPORTS
       
 
 eqlcontrollerModule MODULE-IDENTITY      
-	LAST-UPDATED "201503171528Z"
+	LAST-UPDATED "201906190531Z"
     ORGANIZATION  "EqualLogic Inc."
     CONTACT-INFO      
         "Contact: Customer Support
@@ -120,7 +120,8 @@ EqlControllerEntry ::=
         eqlControllerNVRAMBattery               INTEGER,
         eqlControllerSerialNumber2              DisplayString,
         eqlControllerType                       DisplayString,
-        eqlControllerBootTime                   Counter32
+        eqlControllerBootTime                   Counter32,
+        eqlControllerCompressionPct             INTEGER
     }
 
 eqlControllerIndex  OBJECT-TYPE      
@@ -430,6 +431,15 @@ eqlControllerBootTime  OBJECT-TYPE
     STATUS          current      
     DESCRIPTION     "This variable specifies time at which the controller was booted expressed as seconds since epoch."  
     ::=  { eqlControllerEntry 35}
+
+eqlControllerCompressionPct  OBJECT-TYPE      
+    SYNTAX          INTEGER (0..100)
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This variable specifies the percentage of total disk space that may be used for compressed pages within this member."
+    DEFVAL          {0}
+    ::=  { eqlControllerEntry 36 }
+
 
 --  ***************************************************************************************
 eqlBackplaneTable OBJECT-TYPE      

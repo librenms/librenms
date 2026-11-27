@@ -25,6 +25,9 @@
                 <div class="col-sm-9 col-md-10">
                     @foreach($poller_cluster as $id => $poller)
                         <div role="tabpanel" x-show="activePoller === {{ Js::from($id) }}" @if(! $loop->first) x-cloak @endif>
+                            @if($poller->poller_version == \App\Queue\WorkerNode::VERSION)
+                                <p class="text-muted">{{ __('These settings configure the workers Horizon runs (lnms worker). Other queue workers work the queues they are started with.') }}</p>
+                            @endif
                             @foreach($settings[$id] ?? [] as $setting)
                                 <div class="clearfix tw:mb-[10px]"
                                      x-data="librenmsSetting({{ Js::from($setting) }}, { prefix: 'poller.settings', id: {{ Js::from($poller->id) }} })"

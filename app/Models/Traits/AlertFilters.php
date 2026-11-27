@@ -16,7 +16,7 @@ trait AlertFilters
     use Filterable;
 
     /** alert_rules.severity enum values in order, so the position + 1 is the legacy numeric severity */
-    public const SEVERITIES = ['ok', 'warning', 'critical'];
+    public const array SEVERITIES = ['ok', 'warning', 'critical'];
 
     /**
      * States offered by the state filter, keyed by name. String keys keep the options a JSON object,
@@ -30,7 +30,7 @@ trait AlertFilters
      * @param  int|null  $deviceId  page is limited to this device, leave out the device, location and group filters
      * @return array<array{key: string, label: string, type: string, endpoint?: string, options?: array<string, string>, search?: bool}>
      */
-    protected static function alertFilterFields(?int $deviceId = null): array
+    protected static function alertFilterFields(string $ruleEndpoint, ?int $deviceId = null): array
     {
         $user = auth()->user();
 
@@ -57,7 +57,7 @@ trait AlertFilters
                 'key' => 'rule_id',
                 'label' => __('Rule'),
                 'type' => 'select',
-                'endpoint' => route('ajax.select.alert-rule'),
+                'endpoint' => route($ruleEndpoint, ['device' => $deviceId]),
             ],
         ];
 

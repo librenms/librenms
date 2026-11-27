@@ -35,8 +35,8 @@ use App\Models\AlertRule;
 use App\Models\AlertTransport;
 use App\Models\Device;
 use App\Models\Eventlog;
-use App\Models\Processor;
 use App\Models\Port;
+use App\Models\Processor;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -161,7 +161,7 @@ final class AlertOperationRunAlertsTest extends TestCase
             ->where('device_id', $context['device']->device_id)
             ->where('open', 1)
             ->update(['state' => AlertState::ACKNOWLEDGED]);
-        (new AlertRules($context['device']->device_id))->syncAlertState($context['rule']);
+        new AlertRules($context['device']->device_id)->syncAlertState($context['rule']);
 
         $objs = [];
         $runAlerts->runAlerts();
@@ -232,7 +232,7 @@ final class AlertOperationRunAlertsTest extends TestCase
             'processor_usage' => 96,
         ]);
 
-        (new AlertRules($context['device']))->run();
+        new AlertRules($context['device'])->run();
 
         AlertFault::query()
             ->where('rule_id', $context['rule']->id)
@@ -763,12 +763,12 @@ final class AlertOperationRunAlertsTest extends TestCase
         $this->assertSame(0, (int) $recovered->fresh()->open);
     }
 
-    public function testFullRecoveryDoesNotResendAfterIntervalContinue(): void
+    public function testFullRecoveryIgnoresLegacyRuleTimingAndNotifiesOnce(): void
     {
         $context = $this->makeActiveAlert([
             ['type' => 'api', 'start' => 0, 'dur' => 3600],
         ]);
-        $context['rule']->update(['extra' => ['interval' => 3600]]);
+        $context['rule']->update(['extra' => ['count' => 1, 'delay' => 3600, 'interval' => 3600]]);
 
         $fault = AlertFault::query()
             ->where('rule_id', $context['rule']->id)
@@ -780,7 +780,7 @@ final class AlertOperationRunAlertsTest extends TestCase
             'alerted' => AlertState::ACTIVE,
         ]);
 
-        $recoveredLog = AlertLog::create([
+        AlertLog::create([
             'rule_id' => $context['rule']->id,
             'device_id' => $context['device']->device_id,
             'fault_id' => $fault->id,
@@ -808,27 +808,8 @@ final class AlertOperationRunAlertsTest extends TestCase
         });
         $runAlerts->runAlerts();
 
-        $this->assertEmpty(
-            array_filter($objs, fn ($obj) => (int) $obj['state'] === AlertState::RECOVERED),
-            'Interval gate must hold the recovery in the main loop, not a second dispatcher'
-        );
-        $this->assertSame(1, (int) $fault->fresh()->open);
-        $this->assertDatabaseHas('alerts', [
-            'rule_id' => $context['rule']->id,
-            'device_id' => $context['device']->device_id,
-            'state' => AlertState::RECOVERED,
-            'open' => 1,
-            'alerted' => AlertState::ACTIVE,
-        ]);
-
-        $details = $recoveredLog->fresh()->details;
-        $details['interval'] = time() - 10000;
-        $recoveredLog->details = $details;
-        $recoveredLog->save();
-
-        $runAlerts->runAlerts();
-
-        $this->assertCount(1, array_filter($objs, fn ($obj) => (int) $obj['state'] === AlertState::RECOVERED));
+        $this->assertCount(1, $objs);
+        $this->assertSame(AlertState::RECOVERED, (int) $objs[0]['state']);
         $this->assertSame(0, (int) $fault->fresh()->open);
         $this->assertDatabaseHas('alerts', [
             'rule_id' => $context['rule']->id,
@@ -837,6 +818,9 @@ final class AlertOperationRunAlertsTest extends TestCase
             'open' => 0,
             'alerted' => AlertState::RECOVERED,
         ]);
+
+        $runAlerts->runAlerts();
+        $this->assertCount(1, $objs);
     }
 
     public function testRecoveredAlertWithZeroedAlertedStillSendsWhenFaultWasNotified(): void
@@ -1095,6 +1079,74 @@ final class AlertOperationRunAlertsTest extends TestCase
         );
     }
 
+    public function testGroupedRuleSendsRecoveryWhenFaultRecoversBeforeDispatcherReachesAlert(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 300, 'dur' => 3600],
+        ]);
+
+        $objs = $this->runRecoveryRace($context['rule'], $context['device']);
+
+        $this->assertCount(
+            1,
+            array_filter($this->issuedStates($objs), fn ($state) => $state === AlertState::RECOVERED),
+            'A grouped rule must send exactly one recovery when the fault recovers after the alerts snapshot was loaded'
+        );
+        $this->assertDatabaseHas('alerts', [
+            'rule_id' => $context['rule']->id,
+            'device_id' => $context['device']->device_id,
+            'state' => AlertState::RECOVERED,
+            'open' => 0,
+        ]);
+    }
+
+    public function testPerEntityRuleRecoveryUnchangedWhenFaultRecoversBeforeDispatcher(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 300, 'dur' => 3600],
+        ]);
+        $context['rule']->update([
+            'notify_per_entity' => true,
+            'max_entities' => 10,
+        ]);
+
+        $objs = $this->runRecoveryRace($context['rule'], $context['device']);
+
+        $this->assertCount(
+            1,
+            array_filter($this->issuedStates($objs), fn ($state) => $state === AlertState::RECOVERED),
+            'A per-entity rule must still send exactly one recovery'
+        );
+    }
+
+    public function testGroupedRaceRecoveryNotSentForIgnoredDevice(): void
+    {
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 300, 'dur' => 3600],
+        ]);
+        $context['device']->update(['ignore' => 1]);
+
+        $objs = $this->runRecoveryRace($context['rule'], $context['device']);
+
+        $this->assertNotContains(AlertState::RECOVERED, $this->issuedStates($objs), 'An ignored device must not get a recovery from the race path');
+    }
+
+    public function testGroupedRaceRecoveryNotSentWhenParentDown(): void
+    {
+        $parent = Device::factory()->create(['status' => 0, 'ignore' => 0, 'disabled' => 0]);
+        $context = $this->makeActiveAlert([
+            ['type' => 'api', 'start' => 300, 'dur' => 3600],
+        ]);
+        DB::table('device_relationships')->insert([
+            'parent_device_id' => $parent->device_id,
+            'child_device_id' => $context['device']->device_id,
+        ]);
+
+        $objs = $this->runRecoveryRace($context['rule'], $context['device']);
+
+        $this->assertNotContains(AlertState::RECOVERED, $this->issuedStates($objs), 'A recovery must not be sent from the race path while the parent is down');
+    }
+
     /**
      * Build a device + alert rule (optionally with an operation/segments/transports) and an
      * open, active alert ready for RunAlerts to process.
@@ -1206,6 +1258,55 @@ final class AlertOperationRunAlertsTest extends TestCase
         }
 
         return $captured;
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function runRecoveryRace(AlertRule $rule, Device $device): array
+    {
+        $fault = AlertFault::query()
+            ->where('rule_id', $rule->id)
+            ->where('device_id', $device->device_id)
+            ->firstOrFail();
+        $fault->update([
+            'state' => AlertState::RECOVERED,
+            'open' => 1,
+            'alerted' => AlertState::ACTIVE,
+        ]);
+        AlertLog::create([
+            'rule_id' => $rule->id,
+            'device_id' => $device->device_id,
+            'fault_id' => $fault->id,
+            'state' => AlertState::RECOVERED,
+            'details' => ['rule' => $fault->details['rule'] ?? [], 'contacts' => []],
+        ]);
+        Alert::query()
+            ->where('rule_id', $rule->id)
+            ->where('device_id', $device->device_id)
+            ->update([
+                'state' => AlertState::ACTIVE,
+                'alerted' => AlertState::ACTIVE,
+                'open' => 1,
+            ]);
+
+        $objs = [];
+
+        /** @var RunAlerts&\Mockery\MockInterface $runAlerts */
+        $runAlerts = Mockery::mock(RunAlerts::class)->makePartial();
+        $runAlerts->shouldReceive('extTransports')->andReturnUsing(function ($obj) use (&$objs): void {
+            $objs[] = $obj;
+        });
+        $runAlerts->runAlerts();
+
+        Alert::query()
+            ->where('rule_id', $rule->id)
+            ->where('device_id', $device->device_id)
+            ->update(['state' => AlertState::RECOVERED]);
+
+        $runAlerts->runAlerts();
+
+        return $objs;
     }
 
     /**

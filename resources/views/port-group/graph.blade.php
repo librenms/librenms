@@ -9,7 +9,7 @@
         <div class=col-md-12><span class=list-large>{{ __("No ports in port group") }} {{ $group->name }}</span></div>
     </div>
     @else
-    <x-graph-row type="multiport_bits_separate" :vars="['id' => $ports->pluck('port_id')->implode(',')]" columns="responsive">
+    <x-graph-row type="multiport_bits" :vars="['id' => $ports->pluck('port_id')->implode(',')]" columns="responsive">
         <x-slot name="title">
             <div class="row">
                 <div class=col-md-12><span class=list-large>{{ __("Total Graph for port group") }} {{ $group->name }}</span></div>
@@ -18,7 +18,7 @@
     </x-graph-row>
     @endif
     @foreach($ports as $port)
-        <x-graph-row type="port_bits" :port=$port columns="responsive" legend=true>
+        <x-graph-row type="port_bits" :port=$port columns="responsive" legend="yes">
             <x-slot name="title">
                 <div class="row">
                     <div class=col-md-3><x-port-link :port="$port" :basic=true><span class=list-large>{{ $port->port_descr_descr }}</span></x-port-link></div>

@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (missing comma)
 -- *****************************************************************
 -- DELLEMC-OS10-CHASSIS-MIB
 --
@@ -133,7 +134,7 @@
             os10ChassisExpServiceCode      DisplayString, 
             os10ChassisNumFanTrays         Unsigned32,
             os10ChassisNumPowerSupplies    Unsigned32,
-            os10ChassisTemp                INTEGER
+            os10ChassisTemp                INTEGER,
             os10ChassisProductBase         DisplayString,
             os10ChassisProductSN           DisplayString,
             os10ChassisProductPN           DisplayString

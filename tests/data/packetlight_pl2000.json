@@ -12,7 +12,7 @@
                     "features": null,
                     "location": "<private>",
                     "os": "packetlight",
-                    "type": "network",
+                    "type": "optical",
                     "serial": "190400431",
                     "icon": "packetlight.png"
                 }

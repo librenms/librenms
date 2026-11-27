@@ -1,10 +1,13 @@
+-- LibreNMS: fix syntax error (missing imports)
 CONEL-MOBILE-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
 					enterprises, IpAddress
 						FROM RFC1155-SMI
 					OBJECT-TYPE
-						FROM RFC-1212;
+						FROM RFC-1212
+    Counter32
+        FROM SNMPv2-SMI;
 
 conel					OBJECT IDENTIFIER ::= { enterprises 30140 }
 

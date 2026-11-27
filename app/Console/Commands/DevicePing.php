@@ -71,7 +71,7 @@ class DevicePing extends LnmsCommand
 
             /** @var FpingResponse $response */
             $response = $result->stat('fping_status');
-            $this->line($device->displayName() . ' : ' . ($response->wasSkipped() ? 'skipped' : $response));
+            $this->line($device->display . ' : ' . ($response->wasSkipped() ? 'skipped' : $response));
         }
 
         return 0;

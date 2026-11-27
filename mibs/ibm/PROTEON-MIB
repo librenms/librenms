@@ -1,0 +1,1454 @@
+    PROTEON-MIB DEFINITIONS ::= BEGIN
+    --
+    --    COMMON ROUTING SOFTWARE MIB
+    --
+    --            This MIB defines the system-wide network  management
+    --            functionality available on the IBM Nways family of
+    --            products which use the common router software.
+    --
+    --            This MIB was initially defined by Proteon and maintains
+    --            the structure and OID assignments required by the common
+    --            routing software. However, informational sections have
+    --            been enhanced or clarified, where needed, and any errors
+    --            have been corrected.
+    --
+    --            This MIB is defined in the SNMP version 1 SMI format.
+    --
+    --    June 23, 1998
+    --
+    --    Contact Information:
+    --            Randy Worzella
+    --            IBM Corp.
+    --            G420/664
+    --            Research Triangle Park, NC 27709
+    --
+    --            phone:    919-254-2202
+    --            email:    worzella@ralvm29.vnet.ibm.com
+    --
+
+
+    IMPORTS
+        enterprises, Counter, TimeTicks
+                FROM RFC1155-SMI
+        ifIndex, DisplayString
+                 FROM RFC1213-MIB
+        OBJECT-TYPE
+                FROM RFC-1212
+        TRAP-TYPE
+                FROM RFC-1215;
+
+
+    proteon             OBJECT IDENTIFIER ::= { enterprises 1 }
+    proAdmin            OBJECT IDENTIFIER ::= { proteon 1 }
+    proSystem           OBJECT IDENTIFIER ::= { proteon 6 }
+
+    -- Admin groups
+
+    proSysObjId         OBJECT IDENTIFIER ::= { proAdmin 1 }
+    proStatus           OBJECT IDENTIFIER ::= { proAdmin 2 }
+    proPriv             OBJECT IDENTIFIER ::= { proAdmin 5 }
+
+    -- System groups
+
+    proResource         OBJECT IDENTIFIER ::= { proSystem 1 }
+    proEls              OBJECT IDENTIFIER ::= { proSystem 2 }
+    proTemp             OBJECT IDENTIFIER ::= { proSystem 3 }
+    proConfig           OBJECT IDENTIFIER ::= { proSystem 4 }
+
+    -- Resource groups
+
+    proResMemory        OBJECT IDENTIFIER ::= { proResource 1 }
+    proResBuffers       OBJECT IDENTIFIER ::= { proResource 2 }
+    proResMemHeap       OBJECT IDENTIFIER ::= { proResMemory 1 }
+    proResMemBuf        OBJECT IDENTIFIER ::= { proResMemory 2 }
+    proResBufGlobal     OBJECT IDENTIFIER ::= { proResBuffers 1 }
+
+    -- ELS trap objects
+    --
+    -- The following objects are used when generating an elsTrap
+    -- in the old format, which is no longer supported.
+    --
+    -- Note that these objects are marked as deprecated and will be
+    -- removed in an upcoming release.
+
+    proElsTrapSeqs OBJECT-TYPE
+        SYNTAX    Counter
+        ACCESS    read-only
+        STATUS    deprecated
+        DESCRIPTION
+                "ELS trap sequence number"
+        ::= { proSysObjId 1 }
+
+    proElsTrapSubSystem OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    deprecated
+        DESCRIPTION
+                "ELS trap subsystem number"
+        ::= { proSysObjId 2 }
+
+    proElsTrapEvent OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    deprecated
+        DESCRIPTION
+                "ELS trap event number"
+        ::= { proSysObjId 3 }
+
+    proElsTrapVar1        OBJECT IDENTIFIER ::= { proSysObjId 5 }
+    proElsTrapVar2        OBJECT IDENTIFIER ::= { proSysObjId 6 }
+    proElsTrapVar3        OBJECT IDENTIFIER ::= { proSysObjId 7 }
+    proElsTrapVar4        OBJECT IDENTIFIER ::= { proSysObjId 8 }
+    proElsTrapVar5        OBJECT IDENTIFIER ::= { proSysObjId 9 }
+    proElsTrapVar6        OBJECT IDENTIFIER ::= { proSysObjId 10 }
+    proElsTrapVar7        OBJECT IDENTIFIER ::= { proSysObjId 11 }
+    proElsTrapVar8        OBJECT IDENTIFIER ::= { proSysObjId 12 }
+    proElsTrapVar9        OBJECT IDENTIFIER ::= { proSysObjId 13 }
+
+    -- ELS groups
+
+    proElsGeneric       OBJECT IDENTIFIER ::= { proEls 1 }
+
+
+    -- Textual conventions
+    --
+    -- Each ELS log message is classified by a log-level. This allows
+    -- the user to configure logging of a class of messages. The
+    -- following are the possible values for the log levels as
+    -- defined by ELS, with the exception of other(1), which
+    -- is defined for the purpose of the this MIB. This
+    -- other(1) value is returned when a GET is performed on the
+    -- following MIB variables:
+    --
+    --     proElsSubSysDisplayEnable
+    --     proElsSubSysTrapEnable
+    --     proElsSubSysDisplayDisable
+    --     proElsSubSysTrapDisable
+    --
+    --  This is due to the fact that these four variables are
+    --  intended only to be SET. See the dpecific DESCRIPTION
+    --  clauses of these variables for more details.
+    --
+
+    ProElsMsgLogLevel ::= INTEGER {
+        other(1),                        -- See above explanation
+        proMsgLevelUIError(2),           -- Unusual internal error
+        proMsgLevelCIError(3),           -- Common internal error
+        proMsgLevelUEError(4),           -- Unusual external error
+        proMsgLevelCEError(5),           -- Common external error
+        proMsgLevelError(6),             -- Includes all above error levels
+        proMsgLevelUInfo(7),             -- Unusual informational comment
+        proMsgLevelCInfo(8),             -- Common informational comment
+        proMsgLevelInfo(9),              -- Includes all above comment levels
+        proMsgLevelPTrace(10),           -- Per packet trace message
+        proMsgLevelUTrace(11),           -- Unusual operation trace message
+        proMsgLevelCTrace(12),           -- Common operation trace message
+        proMsgLevelTrace(13),            -- Includes all above trace levels
+        proMsgLevelAlways(14),           -- Messages that are defined as always active
+        proMsgLevelStandard(15),         -- Includes all above error and informational comment levels
+        proMsgLevelAll(16)               -- Includes all levels
+    }
+
+    --
+    -- The following values are used to indicate if logging is disabled
+    -- or enabled for a particular subsystem or an event.
+
+    ProElsLogStatus ::= INTEGER {
+        proElsLogDisabled(1),
+        proElsLogEnabled(2)
+    }
+
+    --
+    -- sysObjectID values
+    --
+    -- The following are the sysObjectID values for the various
+    -- devices. They are not used for any IBM products.
+
+    proSysObjIdP4100         OBJECT IDENTIFIER ::= { proSysObjId 41 }
+    proSysObjIdP4200         OBJECT IDENTIFIER ::= { proSysObjId 42 }
+    proSysObjIdDNX300        OBJECT IDENTIFIER ::= { proSysObjId 43 }
+    proSysObjIdCNX400        OBJECT IDENTIFIER ::= { proSysObjId 44 }
+    proSysObjIdCNX600        OBJECT IDENTIFIER ::= { proSysObjId 46 }
+    proSysObjIdRBX200        OBJECT IDENTIFIER ::= { proSysObjId 47 }
+    proSysObjIdCNX500        OBJECT IDENTIFIER ::= { proSysObjId 49 }
+    proSysObjIdRBX250        OBJECT IDENTIFIER ::= { proSysObjId 50 }
+    proSysObjIdBOSS3Slot     OBJECT IDENTIFIER ::= { proSysObjId 53 }
+    proSysObjIdBOSSs90       OBJECT IDENTIFIER ::= { proSysObjId 54 }
+
+    --
+    -- Restart action object
+    --
+    -- On 2210 and 2212, this action is equivalent to issuing RESTART
+    -- from the OPCON menu.
+    --
+    -- One 2216 and the 8210/blade, this action is equivalent
+    -- to issuing RELOAD from the OPCON menu, since these platforms
+    -- do not support the concept of restart at this time.
+    --
+
+    proActionReset OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This object, when read, returns a value of zero.
+
+             A set of this object causes the router to be reset. The
+             value represents the delay (in seconds) before the reset
+             will take affect.
+
+             This object should only be SET to 0 or a positive number"
+        ::= { proPriv 2 }
+
+    --
+    -- Reload action object
+    --
+    -- On 2210 and 2212, this action is equivalent to issuing RELOAD
+    -- from the OPCON menu.
+    --
+    -- One 2216 and the 8210/blade, this action is equivalent
+    -- to issuing RELOAD from the OPCON menu and for these platforms
+    -- is currently identical to proActionReset.
+    --
+
+    proActionReload OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This object, when read, returns a value of zero.
+             A set of this object causes the router to be reloaded. The
+             value represents the delay (in seconds) before the reload
+             will take affect.
+
+             This object should only be SET to 0 or a positive number"
+        ::= { proPriv 4 }
+
+    --
+    -- Status group
+    --
+    -- This group provides general status info on the device.
+    --
+    -- This group is currently only supported on the IBM 2210.
+    --
+
+    proStatusReloadTime OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The time (in hundredths of a second) since the last
+            time the router software was reloaded."
+        ::= { proStatus 1 }
+
+    proStatusStarts OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The number of times the router has started since
+            the last reload."
+        ::= { proStatus 2 }
+
+    proStatusCrashes OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The number of times the router has crashed since
+            the last reload. Only those crashes that caused
+            the router to deliberately restart due to a
+            software error are counted by this object."
+            ::= { proStatus 3 }
+
+    proStatusCrashMsg OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The last crash message. The message will indicate
+            if the router has not crashed since the last reload."
+        ::= { proStatus 4 }
+
+    --
+    -- Resource group
+    --
+
+    -- Memory group (Heap)
+    --
+    -- Heap memory is the memory used to dynamically allocate
+    -- data structures and data/packet buffers.
+    -- This group provides heap memory statistics.
+    --
+    -- These variables provide the same information as the T5
+    -- "mem" command, for example:
+    --
+    --                       Total  Reserve    Never     Perm     Temp     Prev
+    --                                         Alloc    Alloc    Alloc    Alloc
+    --     Heap memory     5530707    26600  4519155   905192    88760    17600
+    --
+
+    proResMemHeapTotal OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The total number of bytes of heap memory available
+            for allocation."
+        ::= { proResMemHeap 1 }
+
+    proResMemHeapReserve OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The minimum amount of memory needed by the currently
+            configured protocols and features."
+        ::= { proResMemHeap 2 }
+
+    proResMemHeapNeverAlloc OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             "The memory that has never been allocated."
+        ::= { proResMemHeap 3 }
+
+    proResMemHeapPermAlloc OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The memory that is permanently allocated to router tasks."
+        ::= { proResMemHeap 4 }
+
+    proResMemHeapTempAlloc OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The memory that is temporarily allocated to router tasks."
+         ::= { proResMemHeap 5 }
+
+    proResMemHeapPrevAlloc OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The memory that was temporarily allocated and returned to
+            the free pool."
+        ::= { proResMemHeap 6 }
+
+
+    -- Memory group (Buffer)
+    --
+    -- Buffer memory is the memory used to dynamically allocate
+    -- data buffers.
+    -- This group provides buffer memory statistics.
+    --
+    -- NOTE: These four MIB variables always indicate zero
+    --       because a distinct pool is not longer maintained
+    --       for buffers. The buffer memory is obtained from
+    --       the heap and reflected in the statistics of the
+    --       proResMemHeap* MIB variables above.
+    --
+
+    proResMemBufTotal OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The total number of bytes of buffer memory available
+            for allocation."
+        ::= { proResMemBuf 1 }
+
+    proResMemBufReserve OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The minimum amount of memory needed by the currently
+             configured protocols and features."
+        ::= { proResMemBuf 2 }
+
+    proResMemBufNeverAlloc OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             "The memory that has never been allocated."
+        ::= { proResMemBuf 3 }
+
+    proResMemBufPermAlloc OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The memory that is permanently allocated to router tasks."
+        ::= { proResMemBuf 4 }
+
+
+    -- Buffer group (Global)
+    --
+    -- This group provides statistics on global buffers available
+    -- in the configured system.
+    --
+    -- These variables provide the same information as the T5
+    -- "mem" command, for example:
+    --
+    --    Number of global buffers: Total = 200, Free = 200, Fair = 38, Low = 40
+    --
+
+    proResBufGlobalTotal OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The total number of global buffers in the system."
+        ::= { proResBufGlobal 1 }
+
+    proResBufGlobalFree OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The total number of free buffers in the system."
+        ::= { proResBufGlobal 2 }
+
+    proResBufGlobalFair OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The 'fair' number of buffers for each interface."
+        ::= { proResBufGlobal 3 }
+
+    proResBufGlobalLow OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The low mark for free buffers. If the value of
+            proResBufGlobalFree is less than this object then freed
+            buffers will not be placed on any queue that has more than
+            the 'fair' number of buffers on it."
+        ::= { proResBufGlobal 4 }
+
+
+    -- Buffer Table
+    --
+    -- This group provides statistics on packet buffers assigned
+    -- to each interface.
+    --
+    -- These variables provide the same information as the T5
+    -- "buf" command, for example:
+    --
+    --                   Input Buffers        Buffer sizes                   Bytes
+    --     Nt Interface  Req Alloc Low Curr   Hdr  Wrap  Data Trail Total    Alloc
+    --     0  TKR/0       40    40   7   40    85    92  2052     7  2236    89440
+    --     1  X25/0       24    24   4    0    84    92  1500    12  1688    40512
+    --     2  X25/1       24    24   4    0    84    92  1500    12  1688    40512
+    --
+
+    proResBufTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ProResBufTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "The per-port buffer table."
+        ::= { proResBuffers 2 }
+
+    proResBufTableEntry OBJECT-TYPE
+        SYNTAX  ProResBufTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "An entry indicating the buffers allocated per interface."
+        INDEX   { ifIndex }
+        ::= { proResBufTable 1 }
+
+    ProResBufTableEntry ::=
+        SEQUENCE {
+            proResInputBufsReq
+                INTEGER,
+            proResInputBufsAlloc
+                INTEGER,
+            proResInputBufsLow
+                INTEGER,
+            proResInputBufsCurrent
+                INTEGER,
+            proResInputBufsSize
+                INTEGER,
+            proResInputBufsTotalBytes
+                INTEGER
+        }
+
+    proResInputBufsReq OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The number of buffers requested for this interface."
+        ::= { proResBufTableEntry 1 }
+
+    proResInputBufsAlloc OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The number of buffers allocated for this interface."
+        ::= { proResBufTableEntry 2 }
+
+    proResInputBufsLow OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The low water mark for number of buffers."
+        ::= { proResBufTableEntry 3 }
+
+    proResInputBufsCurrent OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The current number of buffers for this device.
+            A value of zero indicates that the device is disabled.
+            If, on receipt of a packet, the value of this object
+            is less than proResInputBufsLow than the packet is
+            eligible for flow control."
+        ::= { proResBufTableEntry 4 }
+
+    proResInputBufsSize OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The size, in bytes, of each buffer allocated to this
+            interface."
+        ::= { proResBufTableEntry 5 }
+
+    proResInputBufsTotalBytes OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The total number of bytes allocated to this interface.
+            This is obtained by multiplying proResInputBufsAlloc by
+            proResInputBufsSize."
+        ::= { proResBufTableEntry 6 }
+
+
+    --
+    -- Event Logging System (ELS) groups
+    --
+    -- The following groups provide ELS subsystem information and control.
+    -- Depending on the variable, the SET operation may affect either the
+    -- operational parameter currently in use by ELS, or it may affect
+    -- the configuration. In the latter case, the change will not
+    -- become effective until the new configuration is  loaded, either
+    -- via a reload or a restart of the device.
+    --
+    -- The individual variable descriptions will indicate whether it
+    -- is related to the operational parameters or the configuration
+    -- parameters.
+    --
+
+    --
+    -- ELS generic group
+    --
+    -- The ELS system-wide objects
+    --
+
+    proElsPin OBJECT-TYPE
+        SYNTAX  INTEGER  (0..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The number of ELS enterprise specific traps which may be
+             generated per second. A value of zero indicates no limit.
+
+             This object reflects the operational pin value currently
+             in use by ELS. A SET of this object immediately affects
+             ELS.
+
+             This variable should only be SET to a value in the
+             range 0 to 65535."
+        ::= { proElsGeneric 1 }
+
+    proElsDropped OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The number of ELS enterprise specific traps which were
+             not sent because the pin had been reached."
+        ::= { proElsGeneric 2 }
+
+    proElsTimestamp OBJECT-TYPE
+        SYNTAX    INTEGER {
+                    proTSOff(1),
+                    proTSSysUpTime(2),
+                    proTSTimeOfDay(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This object indicates whether ELS messages should be
+             timestamped and, if yes, the timebase to use.
+
+             Setting the object to proTSOff(1) disables timestamping.
+
+             Setting the object to proTSSysUpTime(2) uses the
+             sysUpTime value as the timestamp.
+
+             Setting the object to proTSTimeOfDay(3) uses the
+             real-time clock value as the timestamp.
+
+             This object reflects the operational timestamp value currently
+             in use by ELS. A SET of this object immediately affects
+             ELS."
+        ::= { proElsGeneric 3 }
+
+    proElsAction OBJECT-TYPE
+        SYNTAX    INTEGER {
+                    other(1),
+                    proElsActionClear(2),
+                    proElsActionDefault(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "A read of this object always returns the value other(1).
+
+             Setting the object to elsActionClear(2) clears all ELS
+             configuration. Specifically, this clears all ELS related
+             sram records. This action is the same as entering the
+             <clear> command at the ELS config menu in the gateway
+             console.
+
+             Setting the object to proElsActionDefault(3) turns off
+             logging of ELS events to both the console and SNMP traps
+             for all configured subsystems. Note that it only
+             affects subsystem configuration and not individual
+             event or group configuration.
+
+             A SET of this object affects the configuration values defined
+             for ELS, but not the current operational parameters. Therefore,
+             these changes will only become active when the configuration
+             is updated."
+        ::= { proElsGeneric 4 }
+
+    --
+    -- The IBM Nways family of products only send traps
+    -- in the "new" format, noted as proElsTrapVersionV2(2)
+    -- below.
+    --
+    proElsTrapVersion OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    proElsTrapVersionV1(1),        -- No longer supported
+                    proElsTrapVersionV2(2)         -- Default
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The format of the ELS trap has been changed so that the
+            trap info is more useful to a majority of net managers.
+            It now contains the fully constructed ELS message text,
+            as opposed to the values that are presented in the text.
+            See the ELS enterprise specific trap definition for more
+            information."
+        ::= { proElsGeneric 5 }
+
+    --
+    -- ELS Subsystem group
+    --
+    -- This group describes and controls each ELS configured subsystem.
+    --
+
+    proElsSubSysTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ProElsSubSysTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "The ELS sub-system table."
+        ::= { proEls 2 }
+
+    proElsSubSysTableEntry OBJECT-TYPE
+        SYNTAX  ProElsSubSysTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "An entry corresponding to a specific subsystem."
+        INDEX   { proElsSubSysIndex }
+        ::= { proElsSubSysTable 1 }
+
+    ProElsSubSysTableEntry ::=
+        SEQUENCE {
+            proElsSubSysIndex
+                INTEGER,
+            proElsSubSysDescr
+                DisplayString,
+            proElsSubSysNumEvents
+                INTEGER,
+            proElsSubSysDisplayEnable
+                ProElsMsgLogLevel,
+            proElsSubSysDisplayDisable
+                ProElsMsgLogLevel,
+            proElsSubSysTrapEnable
+                ProElsMsgLogLevel,
+            proElsSubSysTrapDisable
+                ProElsMsgLogLevel,
+            proElsSubSysCurrDisplayLevel
+                INTEGER,
+            proElsSubSysCurrTrapLevel
+                INTEGER
+        }
+
+    proElsSubSysIndex OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    proElsSubSysIndexGw(1),     -- GW
+                    proElsSubSysIndexFlt(2),    -- FLT
+                    proElsSubSysIndexBrs(3),    -- BRS
+                    proElsSubSysIndexArp(5),    -- ARP
+                    proElsSubSysIndexIp(10),    -- IP
+                    proElsSubSysIndexIcmp(11),  -- ICMP
+                    proElsSubSysIndexTcp(12),   -- TCP
+                    proElsSubSysIndexUdp(13),   -- UDP
+                    proElsSubSysIndexBtp(14),   -- BTP
+                    proElsSubSysIndexRip(15),   -- RIP
+                    proElsSubSysIndexSpf(17),   -- OSPF
+                    proElsSubSysIndexMspf(18),  -- MSPF
+                    proElsSubSysIndexTftp(19),  -- TFTP
+                    proElsSubSysIndexSnmp(21),  -- SNMP
+                    proElsSubSysIndexDvm(22),   -- DVM
+                    proElsSubSysIndexDn(25),    -- DN
+                    proElsSubSysIndexXn(30),    -- XN
+                    proElsSubSysIndexIpx(35),   -- IPX
+                    proElsSubSysIndexIso(40),   -- ISO
+                    proElsSubSysIndexEsis(41),  -- ESIS
+                    proElsSubSysIndexIsis(42),  -- ISIS
+                    proElsSubSysIndexDnav(43),  -- DNAV
+                    proElsSubSysIndexAp2(53),   -- AP2
+                    proElsSubSysIndexZip2(54),  -- ZIP2
+                    proElsSubSysIndexR2mp(56),  -- R2MP
+                    proElsSubSysIndexVin(60),   -- VIN
+                    proElsSubSysIndexSrt(72),   -- SRT
+                    proElsSubSysIndexStp(73),   -- STP
+                    proElsSubSysIndexBr(74),    -- BR
+                    proElsSubSysIndexSrly(75),  -- SRLY
+                    proElsSubSysIndexEth(81),   -- ETH
+                    proElsSubSysIndexSl(83),    -- SL
+                    proElsSubSysIndexTkr(84),   -- TKR
+                    proElsSubSysIndexX25(85),   -- X25
+                    proElsSubSysIndexFddi(88),  -- FDDI
+                    proElsSubSysIndexSdlc(90),  -- SDLC
+                    proElsSubSysIndexFr(92),    -- FR
+                    proElsSubSysIndexPpp(95),   -- PPP
+                    proElsSubSysIndexX251(96),  -- X251
+                    proElsSubSysIndexX252(97),  -- X252
+                    proElsSubSysIndexX253(98),  -- X253
+                    proElsSubSysIndexIsdn(99),  -- ISDN
+                    proElsSubSysIndexIppn(100), -- IPPN
+                    proElsSubSysIndexWrs(101),  -- WRS
+                    proElsSubSysIndexLnm(102),  -- LNM
+                    proElsSubSysIndexLlc(103),  -- LLC
+                    proElsSubSysIndexBgp(104),  -- BGP
+                    proElsSubSysIndexMcf(105),  -- MCF
+                    proElsSubSysIndexDls(107),  -- DLS
+                    proElsSubSysIndexV25b(108), -- V25B
+                    proElsSubSysIndexEzstrt(109),   -- EZSTRT
+                    proElsSubSysIndexAi(110),   -- AI
+                    proElsSubSysIndexBan(111),  -- BAN
+                    proElsSubSysIndexEnv(112),  -- ENV
+                    proElsSubSysIndexCmp(113),  -- CMP
+                    proElsSubSysIndexNbs(114),  -- NBS
+                    proElsSubSysIndexAtm(115),  -- ATM
+                    proElsSubSysIndexLec(116),  -- LEC
+                    proElsSubSysIndexAppn(117), -- APPN
+                    proElsSubSysIndexIlmi(119), -- ILMI
+                    proElsSubSysIndexSaal(120), -- SAAL
+                    proElsSubSysIndexSvc(121),  -- SVC
+                    proElsSubSysIndexLes(123),  -- LES
+                    proElsSubSysIndexLecs(124), -- LECS
+                    proElsSubSysIndexEvlog(126),  -- EVLOG
+                    proElsSubSysIndexNot(127),  -- NOT
+                    proElsSubSysIndexMars(128), -- MARS
+                    proElsSubSysIndexMcs(129),  -- MCS
+                    proElsSubSysIndexIlec(130), -- ILEC
+                    proElsSubSysIndexNhrp(131), -- NHRP
+                    proElsSubSysIndexXtp(132),  -- XTP
+                    proElsSubSysIndexEsc(133),  -- ESCON
+                    proElsSubSysIndexBbcm(134), -- BBCM
+                    proElsSubSysIndexLcs(135),  -- LCS
+                    proElsSubSysIndexLsa(136),  -- LSA
+                    proElsSubSysIndexMpc(137),  -- MPC
+                    proElsSubSysIndexRsvp(138), -- RSVP
+                    proElsSubSysIndexVcrm(139), -- VCRM
+                    proElsSubSysIndexScsp(140), -- SCSP
+                    proElsSubSysIndexAllc(141), -- ALLC
+                    proElsSubSysIndexNdr(142),  -- NDR
+                    proElsSubSysIndexV34(143),  -- V34
+                    proElsSubSysIndexDout(144), -- DIALOUT
+                    proElsSubSysIndexMlp(145),  -- MLP
+                    proElsSubSysIndexDhcp(146), -- DHCP
+                    proElsSubSysIndexSec(147),  -- SEC
+                    proElsSubSysIndexEncr(148), -- ENC
+                    proElsSubSysIndexPm(149),   -- PM
+                    proElsSubSysIndexVlan(150), -- VLAN
+                    proElsSubSysIndexDgw(151),  -- DGW
+                    proElsSubSysIndexQllc(152), -- QLLC
+                    proElsSubSysIndexAris(153), -- ARIS
+                    proElsSubSysIndexGsmp(154)  -- GSMP
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This object is used to identify a specific subsystem."
+        ::= { proElsSubSysTableEntry 1 }
+
+    proElsSubSysDescr OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..16))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This is a textual string indicating the name of the
+            subsystem."
+        ::= { proElsSubSysTableEntry 2 }
+
+    proElsSubSysNumEvents OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The number of events defined for this subsystem."
+        ::= { proElsSubSysTableEntry 3 }
+
+    proElsSubSysDisplayEnable OBJECT-TYPE
+        SYNTAX  ProElsMsgLogLevel
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "A read of this object always returns the value other(1).
+             To check the current value, use the proElsSubSysCurrDisplayLevel
+             variable.
+
+             A SET of this object to one of the other enumerated values
+             has the effect of enabling ELS events of the specified
+             level to the console.
+
+             For 2210 platform, this SET changes the configuration parameters
+             and also immediately affects the operational parameters in use by
+             ELS.
+
+             For other platforms, this SET only affects the configuration
+             parameters and not the current operational parameters in use
+             by ELS. So in order for these changes to take effect, the
+             configuration must be updated."
+        ::= { proElsSubSysTableEntry 4 }
+
+    proElsSubSysDisplayDisable OBJECT-TYPE
+        SYNTAX  ProElsMsgLogLevel
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "A read of this object always returns the value other(1).
+             To check the current value, use the proElsSubSysCurrDisplayLevel
+             variable.
+
+             A SET of this object to one of the other enumerated values
+             has the effect of disabling ELS events of the specified
+             level to the console.
+
+             For 2210 platform, this SET changes the configuration parameters
+             and also immediately affects the operational parameters in use by
+             ELS.
+
+             For other platforms, this SET only affects the configuration
+             parameters and not the current operational parameters in use
+             by ELS. So in order for these changes to take effect, the
+             configuration must be updated."
+        ::= { proElsSubSysTableEntry 5 }
+
+    proElsSubSysTrapEnable OBJECT-TYPE
+        SYNTAX  ProElsMsgLogLevel
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "A read of this object always returns the value other(1).
+             To check the current value, use the proElsSubSysCurrTrapLevel
+             variable.
+
+             A SET of this object to one of the other enumerated values
+             has the effect of enabling ELS events of the specified
+             level to be sent via an SNMP trap.
+
+             For 2210 platform, this SET changes the configuration parameters
+             and also immediately affects the operational parameters in use by
+             ELS.
+
+             For other platforms, this SET only affects the configuration
+             parameters and not the current operational parameters in use
+             by ELS. So in order for these changes to take effect, the
+             configuration must be updated."
+        ::= { proElsSubSysTableEntry 6 }
+
+    proElsSubSysTrapDisable OBJECT-TYPE
+        SYNTAX  ProElsMsgLogLevel
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "A read of this object always returns the value other(1).
+             To check the current value, use the proElsSubSysCurrTrapLevel
+             variable.
+
+             A SET of this object to one of the other enumerated values
+             has the effect of disabling ELS events of the specified
+             level to be sent via an SNMP trap.
+
+             For 2210 platform, this SET changes the configuration parameters
+             and also immediately affects the operational parameters in use by
+             ELS.
+
+             For other platforms, this SET only affects the configuration
+             parameters and not the current operational parameters in use
+             by ELS. So in order for these changes to take effect, the
+             configuration must be updated."
+        ::= { proElsSubSysTableEntry 7 }
+
+    proElsSubSysCurrDisplayLevel OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The current event log levels that are enabled for display
+             to console. This information reflects the configuration
+             values not the current operational parameters in use
+             by ELS.
+
+             The value represents a bit string having a bit defined
+             for each of the values defined in the ProElsMsgLogLevel
+             textual convention (excluding the other(1) value, which
+             is not relevant here.)
+
+             The bit string is interpretted as follows:
+
+              Bit 15                                       Bit 1
+                ..............................................
+                .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+                .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+                ..............................................
+                 1  1  1  1  1  1  1  9  8  7  6  5  4  3  2   <== proElsMsgLogLevel
+                 6  5  4  3  2  1  0                               value
+
+
+             For example:
+                proMsgLevelUIError(2),  bit 1
+                proMsgLevelCIError(3),  bit 2
+                etc.
+
+             Note also that the levels:
+                proMsgLevelError
+                proMsgLevelInfo
+                proMsgLevelTrace
+                proMsgLevelStandard
+                proMsgLevelAll
+             are aggregates of other logging levels. So, for example,
+             turning on proMsgLogLevelError(6) will turn on (set the
+             bits) for all sub-levels in this category (i.e values
+             2,3,4 and 5).
+
+             Although this MIB variable can take on many values based on
+             what combination of levels is enabled, the following
+             represents the values of this MIB variable assuming just the
+             given level is enabled:
+
+               Level Set                       Value
+               =========                       =====
+
+               proMsgLevelUIError(2)             1
+               proMsgLevelCIError(3)             2
+               proMsgLevelUEError(4)             4
+               proMsgLevelCEError(5)             8
+               proMsgLevelError(6)              15
+               proMsgLevelUInfo(7)              16
+               proMsgLevelCInfo(8)              32
+               proMsgLevelInfo(9)               48
+               proMsgLevelPTrace(10)           256
+               proMsgLevelUTrace(11)           512
+               proMsgLevelCTrace(12)          1024
+               proMsgLevelTrace(13)           1792
+               proMsgLevelAlways(14)         32768
+               proMsgLevelStandard(15)          31
+               proMsgLevelAll(16)            61439
+               No level set                      0
+
+             A value of 0 means no ELS logging is enabled."
+        ::= { proElsSubSysTableEntry 8 }
+
+    proElsSubSysCurrTrapLevel OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The current event log levels that are enabled for sending
+             via SNMP trap. This information reflects the configuration
+             values not the current operational parameters in use
+             by ELS.
+
+             The value represents a bit string having a bit defined
+             for each of the values defined in the ProElsMsgLogLevel
+             textual convention (excluding the other(1) value, which
+             is not relevant here.)
+
+             The bit string is interpretted as follows:
+
+              Bit 15                                       Bit 1
+                ..............................................
+                .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+                .  .  .  .  .  .  .  .  .  .  .  .  .  .  .  .
+                ..............................................
+                 1  1  1  1  1  1  1  9  8  7  6  5  4  3  2   <== proElsMsgLogLevel
+                 6  5  4  3  2  1  0                               value
+
+
+             For example:
+                proMsgLevelUIError(2),  bit 1
+                proMsgLevelCIError(3),  bit 2
+                etc.
+
+             Note also that the levels:
+                proMsgLevelError
+                proMsgLevelInfo
+                proMsgLevelTrace
+                proMsgLevelStandard
+                proMsgLevelAll
+             are aggregates of other logging levels. So, for example,
+             turning on proMsgLogLevelError(6) will turn on (set the
+             bits) for all sub-levels in this category (i.e values
+             2,3,4 and 5).
+
+             Although this MIB variable can take on many values based on
+             what combination of levels is enabled, the following
+             represents the values of this MIB variable assuming just the
+             given level is enabled:
+
+               Level Set                       Value
+               =========                       =====
+
+               proMsgLevelUIError(2)             1
+               proMsgLevelCIError(3)             2
+               proMsgLevelUEError(4)             4
+               proMsgLevelCEError(5)             8
+               proMsgLevelError(6)              15
+               proMsgLevelUInfo(7)              16
+               proMsgLevelCInfo(8)              32
+               proMsgLevelInfo(9)               48
+               proMsgLevelPTrace(10)           256
+               proMsgLevelUTrace(11)           512
+               proMsgLevelCTrace(12)          1024
+               proMsgLevelTrace(13)           1792
+               proMsgLevelAlways(14)         32768
+               proMsgLevelStandard(15)          31
+               proMsgLevelAll(16)            61439
+               No level set                      0
+
+             A value of 0 means no ELS logging is enabled."
+        ::= { proElsSubSysTableEntry 9 }
+
+
+    --
+    -- ELS Subsystem Events group
+    --
+    -- This group describes and controls each event for each configured subsystem.
+    --
+
+    proElsSubSysEventTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ProElsSubSysEventTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "The ELS Sub system event table."
+        ::= { proEls 3 }
+
+    proElsSubSysEventTableEntry OBJECT-TYPE
+        SYNTAX  ProElsSubSysEventTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "An entry corresponding to a specific event in the
+            particular subsystem."
+        INDEX   { proElsSubSysIndex, proElsSubSysEventIndex }
+        ::= { proElsSubSysEventTable 1 }
+
+
+    ProElsSubSysEventTableEntry ::=
+        SEQUENCE {
+            proElsSubSysEventIndex
+                INTEGER,
+            proElsSubSysEventMsg
+                DisplayString,
+            proElsSubSysEventCount
+                INTEGER,
+            proElsSubSysEventLogLevel
+                ProElsMsgLogLevel,
+            proElsSubSysEventLogToConsole
+                ProElsLogStatus,
+            proElsSubSysEventLogToTrap
+                ProElsLogStatus
+        }
+
+    proElsSubSysEventIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The identifier of the event message for a given subsystem."
+        ::= { proElsSubSysEventTableEntry 1 }
+
+    proElsSubSysEventMsg OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The unformatted textual description for the message.
+             It provides the message text related to this event
+             and indiates where specific information will be
+             filled in when the message is displayed on the console
+             or sent in an SNMP trap.
+
+             For example, the text for the IP.008 event is:
+
+                no rte %I -> %I dsc
+
+             When sent in an SNMP trap, the variable binding of the
+             trap has this text with the specific IP addresses fillled
+             in. The format of this string is one of the two
+             following formats:
+
+             If ELS timestamping is enabled:
+
+                hr:min:sec subsys_name.event_num: message_text
+
+                For example - 09:32:56 IP.008: no rte 9.7.1.8 -> 9.7.4.3 dsc
+
+             If ELS timestamping is disabled:
+
+                subsys_name.event_num: message_text
+
+                For example - IP.008: no rte 9.7.1.8 -> 9.7.4.3 dsc"
+
+        ::= { proElsSubSysEventTableEntry 2 }
+
+    proElsSubSysEventCount OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The number of times this event has occurred. This
+             number will increment even if the event is not
+             enabled to be displayed on the console or sent in
+             an SNMP trap."
+        ::= { proElsSubSysEventTableEntry 3 }
+
+    proElsSubSysEventLogLevel OBJECT-TYPE
+        SYNTAX  ProElsMsgLogLevel
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The pre-defined setting that classifies this message."
+        ::= { proElsSubSysEventTableEntry 4 }
+
+    proElsSubSysEventLogToConsole OBJECT-TYPE
+        SYNTAX  ProElsLogStatus
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This object indicates whether this event should be logged
+             to the console.
+
+             For 2210 platform, this SET changes the configuration parameters
+             and also immediately affects the operational parameters in use by
+             ELS.
+
+             For other platforms, this SET only affects the configuration
+             parameters and not the current operational parameters in use
+             by ELS. So in order for these changes to take effect, the
+             configuration must be updated."
+        ::= { proElsSubSysEventTableEntry 5 }
+
+    proElsSubSysEventLogToTrap OBJECT-TYPE
+        SYNTAX  ProElsLogStatus
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This object indicates whether this event should be sent
+             as an SNMP trap.
+
+             For 2210 platform, this SET changes the configuration parameters
+             and also immediately affects the operational parameters in use by
+             ELS.
+
+             For other platforms, this SET only affects the configuration
+             parameters and not the current operational parameters in use
+             by ELS. So in order for these changes to take effect, the
+             configuration must be updated."
+        ::= { proElsSubSysEventTableEntry 6 }
+
+
+    -- Traps
+
+    -- ELS Trap
+    --
+    -- The following trap is generated when an ELS event occurs
+    -- and the corresponding event is enabled for trap generation.
+    --
+    -- The following two trap definitions are used only by Proteon
+    -- products, because the ENTERPRISE field is proteon.
+    -- The IBM Nways family of products provide an ELS trap
+    -- definition in their associated product specific MIBs. The
+    -- format is the same as that defined in proElsTrapV2, except
+    -- that the ENTERPRISE field identifies the specific product.
+    -- See the associated product specific MIB for more details.
+    --
+
+    proElsTrapV1 TRAP-TYPE
+        ENTERPRISE   proteon            -- actually sysObjectID
+        VARIABLES    { proElsTrapSeqs, proElsTrapSubSystem, proElsTrapEvent }
+        DESCRIPTION
+            "An ELS trap event."
+        ::= 1
+
+    proElsTrapV2 TRAP-TYPE
+        ENTERPRISE   proteon            -- actually sysObjectID
+        VARIABLES    { proElsSubSysEventMsg }
+        DESCRIPTION
+            "An ELS trap event. proElsSubSysEventMsg provides a
+             textual description of the event."
+        ::= 2
+
+
+    --- Proteon Temperature Group
+    ---
+    --- The Temperature Group is optional.  This group will be made
+    --- available only on those routers that have thermometer capability.
+    --- This group will not be exported on routers that do not have
+    --- thermometer support.
+    --
+    -- Currently, this temperature group is only supported by the new
+    -- model 2210 hardware, at release V1R3 or later.
+    --
+
+    proTempScale    OBJECT-TYPE
+        SYNTAX  INTEGER {
+            celsius(1),
+            fahrenheit(2)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Indicates the scale used when reporting temperature values.
+            If Celsius(1), all temperature values are in degrees Celsius.
+            If Fahrenheit(2), all temperature values are in degrees
+            Fahrenheit."
+        ::= {proTemp 1}
+
+    proMaxHwTemp    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This attribute indicates the maximum temperature that the
+            thermometer system can record.  This attribute is used as
+            an upper bound for all temperature ranges."
+        ::= {proTemp 2}
+
+    proMinHwTemp    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This attribute indicates the minimum temperature that the
+            thermometer system can record.  This attribute is used as
+            a lower bound for all temperature ranges."
+        ::= {proTemp 3}
+
+
+    proTempPollPeriod   OBJECT-TYPE
+        SYNTAX  INTEGER( 10..600 )
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This attribute determines how often the thermometer
+            system will recalculate the current temperature and
+            any temperature range checks.  This value represents
+            time in seconds between temperature recalculations."
+        DEFVAL  {60}
+        ::= {proTemp 4}
+
+    proCurrentTemp  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The current ambient temperature of the system.  This value
+            is recalculated by the system once per proTempPollPeriod."
+        ::= { proTemp 5}
+
+
+    proLowTempThreshold OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The temperature that will cause a Low Temperature
+            Condition to become true.  The Low Temperature Condition will
+            become true when:
+
+                proCurrentTemp <= proLowTempThreshold.
+
+            The low temperature condition will reset when:
+
+                proCurrentTemp > (proLowTempThreshold + proTempHysteresis).
+
+            This range is checked one per proTempPollPeriod."
+        ::= {proTemp 6}
+
+    proHighTempThreshold    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The temperature that will cause a High Temperature
+            Condition to become true.  The High Temperature Condition will
+            become true when:
+
+                proCurrentTemp >= proHighTempThreshold.
+
+            The high temperature condition will reset when:
+
+                proCurrentTemp < (proHighTempThreshold - proTempHysteresis).
+
+            This range is checked one per proTempPollPeriod."
+        ::= {proTemp 7}
+
+
+    proTempHysteresis   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The number of degrees that the current ambient temperature
+            must drop below proHighTempThreshold or above proLowTempTheshold
+            before the threshold's condition is deactivated."
+        DEFVAL {5}
+        ::= {proTemp 8}
+
+
+    proHighTempCondition OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    off(1),
+                    on(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Indicates whether a High Temperature Condition is active.
+            This attribute will be set ON(2) if a High Temperature Condition
+            is active."
+        ::= {proTemp 9}
+
+
+    proLowTempCondition  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    off(1),
+                    on(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Indicates whether a Low Temperature Condition is active.
+            This attribute will be set ON(2) if a Low Temperature Condition
+            is active."
+        ::= {proTemp 10}
+
+    proHighestTemp  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This is the highest temperature recorded by the router since
+            last reset."
+        ::= {proTemp 11}
+
+    proHighTempTime OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This is the time (in hundreds of seconds) that has elapsed
+            since proHighestTemp was last recorded."
+        ::= {proTemp 12}
+
+    proLowestTemp  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This is the lowest temperature recorded by the router since
+            last reset."
+        ::= {proTemp 13}
+
+    proLowTempTime OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This is the time (in hundreds of seconds) that has elapsed
+            since proLowestTemp was last recorded."
+        ::= {proTemp 14}
+
+
+    -- Config groups
+
+    proCfgLoad          OBJECT IDENTIFIER ::= { proConfig 1 }
+
+
+    --- Proteon Load Configuration Group
+    ---
+    --- This group describes the contents of the particular load
+    --- the router is running.  This information can be used to
+    --- determine which subsystems are able to be configured.
+    --
+    -- Currently, this config load group is only supported by the
+    -- 2210.
+    --
+
+    proCfgProtocols     OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This object returns an ASCII string containing the short
+             names of all protocol types supported in the current load."
+        ::= { proCfgLoad 1 }
+
+    proCfgDatalinks     OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This object returns an ASCII string containing the short
+             names of all datalink/MAC types supported in the current load."
+        ::= { proCfgLoad 2 }
+
+    proCfgFeatures      OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This object returns an ASCII string containing the short
+             names of all router features supported in the current load."
+        ::= { proCfgLoad 3 }
+
+    END

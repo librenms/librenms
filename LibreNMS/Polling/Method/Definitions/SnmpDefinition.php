@@ -4,6 +4,7 @@ namespace LibreNMS\Polling\Method\Definitions;
 
 use App\View\FieldSchema\FieldDefinition;
 use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Enum\SecretType;
 
 final class SnmpDefinition extends PollingMethodDefinition
 {
@@ -15,6 +16,14 @@ final class SnmpDefinition extends PollingMethodDefinition
     public function fields(): array
     {
         return [
+            // a v3 secret is always v3, so the version is only chosen for a community
+            'version' => FieldDefinition::make('version', 'select')
+                ->options([
+                    'v2c' => 'v2c',
+                    'v1' => 'v1',
+                ])
+                ->forSecretTypes(SecretType::SnmpCommunity),
+
             'transport' => FieldDefinition::make('transport', 'select')
                 ->options([
                     'udp' => 'UDP',
@@ -49,7 +58,8 @@ final class SnmpDefinition extends PollingMethodDefinition
                     1 => 'Yes',
                     0 => 'No',
                 ])
-                ->cast('bool'),
+                ->cast('bool')
+                ->fixedIf(['version' => 'v1'], 0), // v1 has no GETBULK
 
             'context' => FieldDefinition::make('context', 'text')
                 ->rules(['nullable', 'string', 'max:255']),

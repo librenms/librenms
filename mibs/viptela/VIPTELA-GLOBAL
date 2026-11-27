@@ -2,15 +2,36 @@
 
 VIPTELA-GLOBAL DEFINITIONS ::= BEGIN
 IMPORTS
-    MODULE-IDENTITY, enterprises
+    MODULE-IDENTITY, Unsigned32, enterprises
         FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
 ;
 
+
 viptela-global MODULE-IDENTITY
-    LAST-UPDATED "202007010000Z"
+    LAST-UPDATED "202307010000Z"
     ORGANIZATION "Viptela, Inc."
     CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
     DESCRIPTION "This module defines the data model for application-aware routing operational data"
+    REVISION "202307010000Z"
+    DESCRIPTION "Viptela Revision 20.12"
+    REVISION "202303010000Z"
+    DESCRIPTION "Viptela Revision 20.11"
+    REVISION "202212150000Z"
+    DESCRIPTION "Viptela Revision 20.10"
+    REVISION "202206010000Z"
+    DESCRIPTION "Viptela Revision 20.9"
+    REVISION "202203010000Z"
+    DESCRIPTION "Viptela Revision 20.8"
+    REVISION "202111010000Z"
+    DESCRIPTION "Viptela Revision 20.7"
+    REVISION "202107010000Z"
+    DESCRIPTION "Viptela Revision 20.6"
+    REVISION "202103010000Z"
+    DESCRIPTION "Viptela Revision 20.5"
+    REVISION "202011010000Z"
+    DESCRIPTION "Viptela Revision 20.4"
     REVISION "202007010000Z"
     DESCRIPTION "Viptela Revision 20.3"
     REVISION "202002240000Z"
@@ -74,5 +95,24 @@ viptela-global MODULE-IDENTITY
     ::= { viptela 7 }
 
 viptela OBJECT IDENTIFIER ::= { enterprises 41916 }
+--
+-- Textual Conventions
+--
+
+
+-- VpnIndex contains the semantics of vpn_id and should be used
+-- for any objects defined in other MIB modules that need these semantics.
+
+VpnIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+
+
+            "A unique value, which identifies a unique Virtual Private
+            Network (VPN) in amanaged system. It is identified as 
+            vpn_idthese values are assigned contiguously starting
+            from 0."
+    SYNTAX       Unsigned32 (0..65531)
 
 END

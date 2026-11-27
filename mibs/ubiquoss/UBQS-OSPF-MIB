@@ -1,3 +1,4 @@
+-- LibreNMS: fix syntax error (empty OBJECT-GROUP)
 -- *****************************************************************
 -- UBQS-OSPF-MIB : Ubiquoss OSPF Router Information MIB
 --   
@@ -327,14 +328,7 @@ ubiOspfMIBGroups  	 	OBJECT IDENTIFIER		::= { ubiOspfMIBConformance 2 }
      	::= { ubiOspfMIBCompliances 1 }
 
 
-	ubiOspfMIBGroup OBJECT-GROUP
-    	OBJECTS         {     
-    	}   
-    	STATUS          current
-    	DESCRIPTION
-        	"A collection of objects containing
-        	information about the OSPF information of system."
-    	::= { ubiOspfMIBGroups 1 }
+	ubiOspfMIBGroup OBJECT IDENTIFIER ::= { ubiOspfMIBGroups 1 }
     	                               
     	                               
 END

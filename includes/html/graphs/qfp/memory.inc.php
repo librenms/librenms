@@ -34,7 +34,7 @@ if ($width > '500') {
     $rrd_options[] = 'COMMENT:' . substr(str_pad((string) $unit_text, $descr_len + 5), 0, $descr_len + 5) . "Total       Used       Free\l";
 }
 
-$descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr(short_hrDeviceDescr($components['name']), $descr_len);
+$descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr(\LibreNMS\Util\Rewrite::processorDescr($components['name']), $descr_len);
 
 $perc = \LibreNMS\Util\Number::calculatePercent((int) $components['memory_used'], (int) $tmp_component['memory_total']);
 

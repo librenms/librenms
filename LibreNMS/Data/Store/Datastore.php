@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Data\TimeSeries\MetricIdentity;
 use App\Facades\DeviceCache;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
@@ -67,7 +68,7 @@ class Datastore implements WriteInterface, DataStorageInterface
      *
      * @param  DatastoreContract[]  $stores
      */
-    public function __construct(protected array $stores)
+    public function __construct(protected array $stores, private readonly MetricNames $metricNames = new MetricNames)
     {
     }
 
@@ -104,7 +105,7 @@ class Datastore implements WriteInterface, DataStorageInterface
      *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
      *   rrd_step             int: rrd step, defaults to 300
      *
-     * @param  array  $device
+     * @param  array|\App\Models\Device  $device
      * @param  string  $measurement  Name of this measurement
      * @param  array  $tags  tags for the data (or to control rrdtool)
      * @param  array|mixed  $fields  The data to update in an associative array, the order must be consistent with rrd_def,
@@ -138,6 +139,20 @@ class Datastore implements WriteInterface, DataStorageInterface
      */
     public function write(string $measurement, array $fields, array $tags = [], array $meta = []): void
     {
+        $metric = $meta['metric'] ?? null;
+        $legacy = $metric instanceof MetricIdentity ? $this->metricNames->storedAs($metric) : null;
+
+        if ($legacy !== null) {
+            // stored under the names it always had
+            $measurement = $legacy->measurement;
+            $tags = $legacy->tagsOf($metric);
+            unset($meta['metric']);
+
+            if ($rrdName = $legacy->rrdNameOf($metric)) {
+                $meta['rrd_name'] = $rrdName;
+            }
+        }
+
         foreach ($this->stores as $store) {
             $store->write($measurement, $fields, $tags, $meta);
         }

@@ -9,15 +9,33 @@ IMPORTS
     TEXTUAL-CONVENTION, RowStatus, DateAndTime,
     TruthValue
         FROM SNMPv2-TC
-    viptela
+    viptela, VpnIndex
         FROM VIPTELA-GLOBAL
 ;
 
 viptela-security MODULE-IDENTITY
-    LAST-UPDATED "202007010000Z"
+    LAST-UPDATED "202307010000Z"
     ORGANIZATION "Viptela, Inc."
     CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
     DESCRIPTION "This module defines data model for Viptela security management"
+    REVISION "202307010000Z"
+    DESCRIPTION "Viptela Revision 20.12"
+    REVISION "202303010000Z"
+    DESCRIPTION "Viptela Revision 20.11"
+    REVISION "202212150000Z"
+    DESCRIPTION "Viptela Revision 20.10"
+    REVISION "202206010000Z"
+    DESCRIPTION "Viptela Revision 20.9"
+    REVISION "202203010000Z"
+    DESCRIPTION "Viptela Revision 20.8"
+    REVISION "202111010000Z"
+    DESCRIPTION "Viptela Revision 20.7"
+    REVISION "202107010000Z"
+    DESCRIPTION "Viptela Revision 20.6"
+    REVISION "202103010000Z"
+    DESCRIPTION "Viptela Revision 20.5"
+    REVISION "202011010000Z"
+    DESCRIPTION "Viptela Revision 20.4"
     REVISION "202007010000Z"
     DESCRIPTION "Viptela Revision 20.3"
     REVISION "202002240000Z"
@@ -126,7 +144,91 @@ ConnFlagEnum ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION "Connection error flags"
     SYNTAX      INTEGER
-    {nOERR(0),aCSRREJ(1),sTENTRY(2),hSFAIL(3),dCERTFL(4),nLCERT(5),lISFD(6),sNOCHECK(7),iP-TOS(8),tMRALC(9),dCONFAIL(10),wRKRTO(11),vS-TMO(12),vB-TMO(13),vM-TMO(14),vP-TMO(15),dISTLOC(16),rMGSPR(17),pRCHAL(18),sYSPRCH(19),rECLEN0(20),tXCHTOBD(21),rDSIGFBD(22),sSLNFAIL(23),dHSTMO(24),nOVS(25),nOACTVB(26),oRPTMO(27),dEVALC(28),tUNALC(29),cRTREJSER(30),vBDEST(31),cRTREV(32),rXTRDWN(33),xTVSTRDN(34),nOSLPRCRT(35),dUPSER(36),sERNTPRES(37),cRTVERFL(38),bIDNTPR(39),bIDNTVRFD(40),bDSGVERFL(41),mEMALCFL(42),uNMSGBDRG(43),vSCRTREV(44),vECRTREV(45),uNAUTHEL(46),dISCVBD(47),cTORGNMMIS(48),nOZTPEN(49),nOVMCFG(50),cHVERFAIL(51),dUPCLHELO(52),cERTEXPRD(53),sYSIPCHNG(54),xTVMTRDN(55),mGRTBLCKD(56),nONCGN(57),xTMOS(58),iPTMISS(59),oPERDOWN(60),nTPRVMINT(61),sTNMODETD(62),lRNTPEER(63),cGNIDCHNGD(64),dUPSYSIPDEL(65),bIDSIG(66),iDREQDECFAIL(67),vEYIDBNDFAIL(68),cREDFAIL(69),rECCABLOBFAIL(70),eMBARGOFAIL(71),nEWVBNOVMNG(72),hWCERTREN(73),hWCERTREV(74)}
+    {
+        nOERR(0),
+        aCSRREJ(1),
+        sTENTRY(2),
+        hSFAIL(3),
+        dCERTFL(4),
+        nLCERT(5),
+        lISFD(6),
+        sNOCHECK(7),
+        iP-TOS(8),
+        tMRALC(9),
+        dCONFAIL(10),
+        wRKRTO(11),
+        vS-TMO(12),
+        vB-TMO(13),
+        vM-TMO(14),
+        vP-TMO(15),
+        dISTLOC(16),
+        rMGSPR(17),
+        pRCHAL(18),
+        sYSPRCH(19),
+        rECLEN0(20),
+        tXCHTOBD(21),
+        rDSIGFBD(22),
+        sSLNFAIL(23),
+        dHSTMO(24),
+        nOVS(25),
+        nOACTVB(26),
+        oRPTMO(27),
+        dEVALC(28),
+        tUNALC(29),
+        cRTREJSER(30),
+        vBDEST(31),
+        cRTREV(32),
+        rXTRDWN(33),
+        xTVSTRDN(34),
+        nOSLPRCRT(35),
+        dUPSER(36),
+        sERNTPRES(37),
+        cRTVERFL(38),
+        bIDNTPR(39),
+        bIDNTVRFD(40),
+        bDSGVERFL(41),
+        mEMALCFL(42),
+        uNMSGBDRG(43),
+        vSCRTREV(44),
+        vECRTREV(45),
+        uNAUTHEL(46),
+        dISCVBD(47),
+        cTORGNMMIS(48),
+        nOZTPEN(49),
+        nOVMCFG(50),
+        cHVERFAIL(51),
+        dUPCLHELO(52),
+        cERTEXPRD(53),
+        sYSIPCHNG(54),
+        xTVMTRDN(55),
+        mGRTBLCKD(56),
+        nONCGN(57),
+        xTMOS(58),
+        iPTMISS(59),
+        oPERDOWN(60),
+        nTPRVMINT(61),
+        sTNMODETD(62),
+        lRNTPEER(63),
+        cGNIDCHNGD(64),
+        dUPSYSIPDEL(65),
+        bIDSIG(66),
+        iDREQDECFAIL(67),
+        vEYIDBNDFAIL(68),
+        cREDFAIL(69),
+        rECCABLOBFAIL(70),
+        eMBARGOFAIL(71),
+        nEWVBNOVMNG(72),
+        hWCERTREN(73),
+        hWCERTREV(74),
+        iNZTPENTRY(75),
+        tENANTRM(76),
+        rEGIDMIS(77),
+        rEGIDCHG(78),
+        nOTENPRST(79),
+        cRTVERCRLFL(80),
+        rESTRQFAIL(81),
+        pSEV6DISC(82)
+    }
 
 AuthenticationEnum ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -1060,7 +1162,7 @@ securityInfo OBJECT IDENTIFIER ::= { viptela-security 6 }
 securityInfoAuthenticationType OBJECT-TYPE
     SYNTAX      String
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION ""
     ::= { securityInfo 1 }
 
@@ -1103,6 +1205,14 @@ securityInfoPairwiseKeying OBJECT-TYPE
     STATUS      current
     DESCRIPTION ""
     ::= { securityInfo 6 }
+
+-- tagpath /security-info/integrity-type
+securityInfoIntegrityType OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { securityInfo 7 }
 
 -- Display entries in the ZTP database
 -- tagpath /ztp
@@ -1176,7 +1286,8 @@ ControlConnectionsEntry ::=
         controlConnectionsRxCreateCert Unsigned32,
         controlConnectionsTxCreateCertReply Unsigned32,
         controlConnectionsRxCreateCertReply Unsigned32,
-        controlConnectionsBehindProxy String
+        controlConnectionsBehindProxy String,
+        controlConnectionsPeerSessId Counter64
     }
 
 -- tagpath /control/connections/instance
@@ -1579,6 +1690,14 @@ controlConnectionsBehindProxy OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Whether controller is behind proxy"
     ::= { controlConnectionsEntry 50 }
+
+-- tagpath /control/connections/peer-sess-id
+controlConnectionsPeerSessId OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Peer Session ID"
+    ::= { controlConnectionsEntry 51 }
 
 -- tagpath /control/connections-history
 controlConnectionsHistoryTable OBJECT-TYPE
@@ -2299,7 +2418,8 @@ ControlLocalPropertiesWanInterfaceListEntry ::=
         controlLocalPropertiesWanInterfaceListLowBandwidthLink String,
         controlLocalPropertiesWanInterfaceListNatType String,
         controlLocalPropertiesWanInterfaceListInterfaceAdminState StateEnum,
-        controlLocalPropertiesWanInterfaceListInterfaceOperState StateEnum
+        controlLocalPropertiesWanInterfaceListInterfaceOperState StateEnum,
+        controlLocalPropertiesWanInterfaceListRegionId String
     }
 
 -- tagpath /control/local-properties/wan-interface-list/index
@@ -2541,6 +2661,14 @@ controlLocalPropertiesWanInterfaceListInterfaceOperState OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Interface operational state"
     ::= { controlLocalPropertiesWanInterfaceListEntry 33 }
+
+-- tagpath /control/local-properties/wan-interface-list/region-id
+controlLocalPropertiesWanInterfaceListRegionId OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Region id"
+    ::= { controlLocalPropertiesWanInterfaceListEntry 34 }
 
 -- tagpath /control/affinity/config
 controlAffinityConfigTable OBJECT-TYPE
@@ -2947,6 +3075,129 @@ controlValidVManageIdChassisNumbers OBJECT-TYPE
     DESCRIPTION "Chassis number of the device"
     ::= { controlValidVmanageIdEntry 1 }
 
+-- tagpath /control/tenant-connections
+controlTenantConnectionsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ControlTenantConnectionsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display tenant control connections information"
+    ::= { control 11 }
+
+-- tagpath /control/tenant-connections
+controlTenantConnectionsEntry OBJECT-TYPE
+    SYNTAX      ControlTenantConnectionsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { controlTenantConnectionsInstance, controlTenantConnectionsSiteId, controlTenantConnectionsDomainId,
+            controlTenantConnectionsLocalPrivateIp, controlTenantConnectionsLocalPrivatePort,
+            controlTenantConnectionsPublicIp, controlTenantConnectionsPublicPort, controlTenantConnectionsTenantIdx }
+        ::= { controlTenantConnectionsTable 1 }
+
+ControlTenantConnectionsEntry ::=
+    SEQUENCE {
+        controlTenantConnectionsInstance Unsigned32,
+        controlTenantConnectionsSiteId Unsigned32,
+        controlTenantConnectionsDomainId Unsigned32,
+        controlTenantConnectionsLocalPrivateIp InetAddressIP,
+        controlTenantConnectionsLocalPrivatePort Unsigned32,
+        controlTenantConnectionsPublicIp InetAddressIP,
+        controlTenantConnectionsPublicPort Unsigned32,
+        controlTenantConnectionsTenantIdx Unsigned32,
+        controlTenantConnectionsPeerSystemIp InetAddressIP,
+        controlTenantConnectionsColor INTEGER,
+        controlTenantConnectionsTenantName String
+    }
+
+-- tagpath /control/tenant-connections/instance
+controlTenantConnectionsInstance OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "vdaemon instance ID"
+    ::= { controlTenantConnectionsEntry 1 }
+
+-- tagpath /control/tenant-connections/site-id
+controlTenantConnectionsSiteId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Site ID"
+    ::= { controlTenantConnectionsEntry 2 }
+
+-- tagpath /control/tenant-connections/domain-id
+controlTenantConnectionsDomainId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Domain ID"
+    ::= { controlTenantConnectionsEntry 3 }
+
+-- tagpath /control/tenant-connections/local-private-ip
+controlTenantConnectionsLocalPrivateIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Private IP address"
+    ::= { controlTenantConnectionsEntry 4 }
+
+-- tagpath /control/tenant-connections/local-private-port
+controlTenantConnectionsLocalPrivatePort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Private port number"
+    ::= { controlTenantConnectionsEntry 5 }
+
+-- tagpath /control/tenant-connections/public-ip
+controlTenantConnectionsPublicIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Public IP address"
+    ::= { controlTenantConnectionsEntry 6 }
+
+-- tagpath /control/tenant-connections/public-port
+controlTenantConnectionsPublicPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Public port number"
+    ::= { controlTenantConnectionsEntry 7 }
+
+-- tagpath /control/tenant-connections/tenant-idx
+controlTenantConnectionsTenantIdx OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Internal Tenant index"
+    ::= { controlTenantConnectionsEntry 8 }
+
+-- tagpath /control/tenant-connections/peer-system-ip
+controlTenantConnectionsPeerSystemIp OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Peer System IP address"
+    ::= { controlTenantConnectionsEntry 9 }
+
+-- tagpath /control/tenant-connections/color
+controlTenantConnectionsColor OBJECT-TYPE
+    SYNTAX      INTEGER {default(1),mpls(2),metro-ethernet(3),biz-internet(4),public-internet(5),lte(6),threeG(7),red(8),green(9),blue(10),gold(11),silver(12),bronze(13),custom1(14),custom2(15),custom3(16),private1(17),private2(18),private3(19),private4(20),private5(21),private6(22)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "color"
+    ::= { controlTenantConnectionsEntry 10 }
+
+-- tagpath /control/tenant-connections/tenant-name
+controlTenantConnectionsTenantName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Tenant name"
+    ::= { controlTenantConnectionsEntry 11 }
+
+
 -- tagpath /orchestrator/connections
 orchestratorConnectionsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF OrchestratorConnectionsEntry
@@ -3015,7 +3266,9 @@ OrchestratorConnectionsEntry ::=
         orchestratorConnectionsRxCreateCert Unsigned32,
         orchestratorConnectionsTxCreateCertReply Unsigned32,
         orchestratorConnectionsRxCreateCertReply Unsigned32,
-        orchestratorConnectionsCloudHosted TruthValue
+        orchestratorConnectionsCloudHosted TruthValue,
+        orchestratorConnectionsPeerRegionIdSet String,
+        orchestratorConnectionsPeerSessId Counter64
     }
 
 -- tagpath /orchestrator/connections/instance
@@ -3418,6 +3671,22 @@ orchestratorConnectionsCloudHosted OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Controller hosted in Cisco cloud"
     ::= { orchestratorConnectionsEntry 50 }
+
+-- tagpath /orchestrator/connections/peer-region-id-set
+orchestratorConnectionsPeerRegionIdSet OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Peer region id set"
+    ::= { orchestratorConnectionsEntry 51 }
+
+-- tagpath /orchestrator/connections/peer-sess-id
+orchestratorConnectionsPeerSessId OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Peer Session ID"
+    ::= { orchestratorConnectionsEntry 52 }
 
 -- tagpath /orchestrator/connections-history
 orchestratorConnectionsHistoryTable OBJECT-TYPE
@@ -4676,7 +4945,8 @@ IpsecOutboundConnectionsEntry ::=
         ipsecOutboundConnectionsPkeyHash String,
         ipsecOutboundConnectionsPeerSpi String,
         ipsecOutboundConnectionsLocalTlocAddress InetAddressIP,
-        ipsecOutboundConnectionsLocalTlocColor INTEGER
+        ipsecOutboundConnectionsLocalTlocColor INTEGER,
+        ipsecOutboundConnectionsIntegrityUsed String
     }
 
 -- tagpath /ipsec/outbound-connections/source-ip
@@ -4755,7 +5025,7 @@ ipsecOutboundConnectionsRemoteTlocColor OBJECT-TYPE
 ipsecOutboundConnectionsAuthenticationUsed OBJECT-TYPE
     SYNTAX      String
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION "Authentication used"
     ::= { ipsecOutboundConnectionsEntry 10 }
 
@@ -4822,6 +5092,14 @@ ipsecOutboundConnectionsLocalTlocColor OBJECT-TYPE
     STATUS      current
     DESCRIPTION "Local color"
     ::= { ipsecOutboundConnectionsEntry 18 }
+
+-- tagpath /ipsec/outbound-connections/integrity-used
+ipsecOutboundConnectionsIntegrityUsed OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Integrity used"
+    ::= { ipsecOutboundConnectionsEntry 19 }
 
 -- tagpath /ipsec/ike/inbound-connections
 ipsecIkeInboundConnectionsTable OBJECT-TYPE
@@ -5073,7 +5351,7 @@ IpsecIkeSessionsEntry ::=
 
 -- tagpath /ipsec/ike/sessions/vpn-id
 ipsecIkeSessionsVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"
@@ -5628,7 +5906,7 @@ TunnelGreKeepalivesEntry ::=
 
 -- tagpath /tunnel/gre-keepalives/vpn-id
 tunnelGreKeepalivesVpnId OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 .. 65530)
+    SYNTAX      VpnIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION "VPN ID"

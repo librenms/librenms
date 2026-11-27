@@ -8,7 +8,6 @@ use App\Models\Traits\Filterable;
 use App\Observers\DeviceObserver;
 use App\View\SimpleTemplate;
 use Carbon\Carbon;
-use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Cache\DeviceMaintenanceCache;
 use LibreNMS\Enum\DeviceStatus;
@@ -27,8 +27,8 @@ use LibreNMS\Enum\MaintenanceStatus;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Polling\Method\PollingMethodAccessor;
-use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Polling\Method\PollingMethodRegistry;
+use LibreNMS\Polling\ModuleStatus;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -44,7 +44,7 @@ use LibreNMS\Util\Url;
 #[ObservedBy([DeviceObserver::class])]
 class Device extends BaseModel
 {
-    use PivotEventTrait, HasFactory, Filterable;
+    use HasFactory, Filterable;
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
@@ -162,6 +162,10 @@ class Device extends BaseModel
 
     public function pollingMethod(PollingMethodType $method): ?DevicePollingMethod
     {
+        if ($method === PollingMethodType::Unknown) {
+            return null; // any number of unknown types, none of them is used
+        }
+
         if (! $this->relationLoaded('pollingMethods')) {
             if (! $this->exists) {
                 return null;
@@ -173,22 +177,59 @@ class Device extends BaseModel
     }
 
     /**
-     * Get VRF contexts to poll.
-     * If no contexts are found, return the default context ''
+     * SNMP contexts to walk for per VRF data: the default context, plus the contexts of
+     * non-default VRFs that answered at the last discovery and were not disabled by the user.
      *
-     * @return array
+     * @return string[]
      */
     public function getVrfContexts(): array
     {
-        return $this->vrfLites->isEmpty() ? [''] : $this->vrfLites->pluck('context_name')->all();
+        return $this->vrfs
+            ->filter(fn (Vrf $vrf) => $vrf->isContextWalked())
+            ->pluck('context_name')
+            ->prepend('')
+            ->unique()
+            ->values()
+            ->all();
     }
 
     /**
-     * @deprecated use display field directly
+     * Contexts of VRFs that are not walked right now, because they stopped answering or were disabled.
+     * Modules keep the rows of these contexts until the VRF or its context is removed.
+     *
+     * @return string[]
+     */
+    public function getSkippedVrfContexts(): array
+    {
+        return $this->vrfs
+            ->filter(fn (Vrf $vrf) => $vrf->context_name !== null && ! $vrf->isDefault() && ! $vrf->isContextWalked())
+            ->pluck('context_name')
+            ->diff($this->getVrfContexts())
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Find the VRF of rows walked from an SNMP context.
+     * Some tables store the VRF name as the context, so names are matched as well.
+     */
+    public function vrfIdForContext(?string $context): ?int
+    {
+        if ($context === null || $context === '') {
+            return null; // default context
+        }
+
+        return $this->vrfs->firstWhere('context_name', $context)->vrf_id
+            ?? $this->vrfs->firstWhere('vrf_name', $context)?->vrf_id;
+    }
+
+    /**
+     * @deprecated use display field directly.
      */
     public function displayName(): string
     {
-        return $this->display ?: $this->hostname ?: '';
+        return $this->display ?: '';
     }
 
     /**
@@ -196,7 +237,7 @@ class Device extends BaseModel
      */
     public function name(): string
     {
-        $display = $this->displayName();
+        $display = $this->display;
 
         if (! Str::contains($display, $this->hostname)) {
             return (string) $this->hostname;
@@ -260,9 +301,9 @@ class Device extends BaseModel
      * @param  int  $length  length to shorten to, will not break up words so may be longer
      * @return string
      */
-    public function shortDisplayName($length = 12)
+    public function shortDisplayName(int $length = 12): string
     {
-        $name = $this->displayName();
+        $name = $this->display;
 
         // IP addresses should not be shortened
         if (IP::isValid($name)) {
@@ -335,12 +376,13 @@ class Device extends BaseModel
     }
 
     /**
-     * Update the max_depth field based on parents
+     * Update the max_depth field based on parents, then update children if it changed
      * Performs SQL query, so make sure all parents are saved first
      *
-     * @param  int  $exclude  exclude a device_id from being considered (used for deleting)
+     * @param  int|null  $exclude  exclude a device_id from being considered as parent
+     * @param  int[]  $visited  device_ids already updated on this path, to stop on dependency loops
      */
-    public function updateMaxDepth($exclude = null)
+    public function updateMaxDepth($exclude = null, array $visited = []): void
     {
         // optimize for memory instead of time
         $query = $this->parents()->getQuery();
@@ -360,7 +402,16 @@ class Device extends BaseModel
             $this->max_depth = $parents_max_depth + 1;
         }
 
+        $changed = $this->isDirty('max_depth');
         $this->save();
+
+        if ($changed) {
+            $visited[] = $this->device_id;
+            $this->children()
+                ->whereNotIn('devices.device_id', $visited)
+                ->get()
+                ->each(fn (Device $child) => $child->updateMaxDepth(null, $visited));
+        }
     }
 
     /**
@@ -373,7 +424,7 @@ class Device extends BaseModel
     {
         if ($this->max_depth === 0 && $this->children()->count() > 0) {
             $this->max_depth = 1; // has children
-        } elseif ($this->max_depth === 1 && $this->parents()->count() === 0) {
+        } elseif ($this->max_depth === 1 && $this->parents()->count() === 0 && $this->children()->count() === 0) {
             $this->max_depth = 0; // no children or parents
         }
 
@@ -633,6 +684,8 @@ class Device extends BaseModel
 
     public function scopeInDeviceGroup($query, $deviceGroup)
     {
+        $deviceGroup = $deviceGroup instanceof Collection ? $deviceGroup->all() : $deviceGroup;
+
         return $query->whereIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup): void {
                 $query->select('device_id')
@@ -644,6 +697,8 @@ class Device extends BaseModel
 
     public function scopeNotInDeviceGroup($query, $deviceGroup)
     {
+        $deviceGroup = $deviceGroup instanceof Collection ? $deviceGroup->all() : $deviceGroup;
+
         return $query->whereNotIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup): void {
                 $query->select('device_id')
@@ -802,11 +857,12 @@ class Device extends BaseModel
     }
 
     /**
-     * @return BelongsToMany<Device, $this>
+     * @return BelongsToMany<Device, $this, DeviceRelationship>
      */
     public function children(): BelongsToMany
     {
-        return $this->belongsToMany(self::class, 'device_relationships', 'parent_device_id', 'child_device_id');
+        return $this->belongsToMany(self::class, 'device_relationships', 'parent_device_id', 'child_device_id')
+            ->using(DeviceRelationship::class);
     }
 
     /**
@@ -815,6 +871,14 @@ class Device extends BaseModel
     public function components(): HasMany
     {
         return $this->hasMany(Component::class, 'device_id');
+    }
+
+    /**
+     * @return HasMany<Customoid, $this>
+     */
+    public function customoids(): HasMany
+    {
+        return $this->hasMany(Customoid::class, 'device_id');
     }
 
     /**
@@ -920,6 +984,14 @@ class Device extends BaseModel
     public function isisAdjacencies(): HasMany
     {
         return $this->hasMany(IsisAdjacency::class, 'device_id', 'device_id');
+    }
+
+    /**
+     * @return HasManyThrough<JuniAtmVp, Port, $this>
+     */
+    public function juniAtmVps(): HasManyThrough
+    {
+        return $this->hasManyThrough(JuniAtmVp::class, Port::class, 'device_id', 'port_id');
     }
 
     /**
@@ -1085,11 +1157,12 @@ class Device extends BaseModel
     }
 
     /**
-     * @return BelongsToMany<Device, $this>
+     * @return BelongsToMany<Device, $this, DeviceRelationship>
      */
     public function parents(): BelongsToMany
     {
-        return $this->belongsToMany(self::class, 'device_relationships', 'child_device_id', 'parent_device_id');
+        return $this->belongsToMany(self::class, 'device_relationships', 'child_device_id', 'parent_device_id')
+            ->using(DeviceRelationship::class);
     }
 
     /**
@@ -1438,19 +1511,21 @@ class Device extends BaseModel
     }
 
     /**
-     * @return HasMany<VrfLite, $this>
-     */
-    public function vrfLites(): HasMany
-    {
-        return $this->hasMany(VrfLite::class, 'device_id');
-    }
-
-    /**
      * @return HasMany<Vrf, $this>
      */
     public function vrfs(): HasMany
     {
         return $this->hasMany(Vrf::class, 'device_id');
+    }
+
+    /**
+     * Scoped route bindings guess the relationship of {vrf} as vrves
+     *
+     * @param  string  $childType
+     */
+    protected function childRouteBindingRelationshipName($childType): string
+    {
+        return $childType === 'vrf' ? 'vrfs' : parent::childRouteBindingRelationshipName($childType);
     }
 
     /**

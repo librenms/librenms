@@ -123,7 +123,7 @@ $('#group-removal').on("click", function(e) {
     groupId = $("#group_id").val();
     $.ajax({
         type: 'DELETE',
-        url: "ajax/pollergroup/" + groupId,
+        url: route('pollergroup.destroy', {pollergroup: groupId}),
         success: function(msg) {
             toastr.success('{{ __('Poller Group deleted') }}');
             $("#confirm-delete").modal('hide');
@@ -138,10 +138,11 @@ $('#group-removal').on("click", function(e) {
 
 $('#poller-groups').on('show.bs.modal', function (event) {
     var button = $(event.relatedTarget);
-    var group_id = button.data('group_id');
+    var group_id = button.data('group_id') || '';
     $('#group_id').val(group_id);
-    if(group_id != '') {
-        $('#group_id').val(group_id);
+    $('#group_name').val('');
+    $('#descr').val('');
+    if (group_id) {
         $.ajax({
             type: "GET",
             url: route('pollergroup.show', {pollergroup: group_id}),
