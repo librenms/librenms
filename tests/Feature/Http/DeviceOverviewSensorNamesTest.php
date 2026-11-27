@@ -27,7 +27,7 @@ final class DeviceOverviewSensorNamesTest extends TestCase
             'device_id' => $device->device_id,
             'sensor_class' => SensorType::Dbm->value,
             'sensor_index' => 'rx.1',
-            'sensor_descr' => 'Serial0/0 Rx Power',
+            'sensor_descr' => 'GigabitEthernet1/0/1 Rx Power',
         ]);
 
         $controller = new OverviewController();
@@ -38,6 +38,6 @@ final class DeviceOverviewSensorNamesTest extends TestCase
             ->all();
 
         $this->assertContains('3: Serial Port 3', $descriptions);
-        $this->assertContains('Se0/0 Rx Power', $descriptions);
+        $this->assertContains('Gi1/0/1 Rx Power', $descriptions);
     }
 }
