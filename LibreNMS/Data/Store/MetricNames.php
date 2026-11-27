@@ -40,6 +40,7 @@ class MetricNames
             // ipmi sensors were a measurement of their own, except in rrd files
             'sensor' => new LegacyMetric(($metric->tags['type'] ?? null) === 'ipmi' ? 'ipmi' : 'sensor', self::SENSOR_TAGS, ['sensor', ...array_map(fn ($tag) => '{' . $tag . '}', array_keys($metric->tagsInGroup()))]),
             'ping' => new LegacyMetric('icmp-perf'),
+            'atm_vp' => new LegacyMetric('atm-vp', ['ifIndex' => 'ifIndex', 'vp' => 'vp_id'], ['vp', '{ifIndex}', '{vp}']),
             default => null,
         };
     }

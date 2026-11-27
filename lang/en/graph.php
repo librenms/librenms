@@ -190,6 +190,9 @@ return [
         'devices' => '{1} :device|[2,*] :count devices',
     ],
     'port' => [
+        'atmvp_subtitle' => ' :: ATM VP :: :vp',
+        'cells' => 'Cells',
+        'errors' => 'Errors',
         'packets' => 'Packets',
         'packets_per_second' => 'Packets/sec',
         'errors_in' => 'Errors In',

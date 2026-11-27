@@ -3,6 +3,7 @@
 namespace LibreNMS\Tests\Feature\Http;
 
 use App\Models\Device;
+use App\Models\JuniAtmVp;
 use App\Models\Port;
 use App\Models\PortVlan;
 use App\Models\User;
@@ -75,6 +76,20 @@ final class PortTabTest extends TestCase
             ->assertSee('Users &lt;10&gt;', false)
             ->assertSee('eth2')
             ->assertSee('(U)');
+    }
+
+    public function testAtmVpsGraphTheirPortAndVp(): void
+    {
+        $port = $this->port();
+        JuniAtmVp::factory()->create(['port_id' => $port->port_id, 'vp_id' => 7]);
+
+        $this->actingAs($this->admin())
+            ->get(route('device.port', ['device' => $port->device_id, 'port' => $port->port_id, 'view' => 'junose-atm-vp', 'graph' => 'cells']))
+            ->assertOk()
+            ->assertSee('VP7')
+            ->assertSee('type=port_atmvp_cells', false)
+            ->assertSee("id=$port->port_id", false)
+            ->assertSee('vp=7', false);
     }
 
     public function testMenuLinksUseQueryString(): void
