@@ -22,17 +22,106 @@
  *
  * @copyright  2026 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2026 Dr. Walter Snyder
  */
 
 namespace LibreNMS\OS;
 
 use App\Models\Sensor;
+use App\Models\Transceiver;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use LibreNMS\Interfaces\Discovery\TransceiverDiscovery;
 use LibreNMS\Util\UserFuncHelper;
 use SnmpQuery;
 
-class AristaEos extends Shared\Arista
+class AristaEos extends Shared\Arista implements TransceiverDiscovery
 {
+    /**
+     * @return Collection<int, Transceiver>
+     */
+    public function discoverTransceivers(): Collection
+    {
+        $snmpData = SnmpQuery::cache()
+            ->hideMib()
+            ->walk('ENTITY-MIB::entPhysicalTable')
+            ->table(1);
+
+        if (empty($snmpData)) {
+            return new Collection;
+        }
+
+        $ports = $this->getDevice()
+            ->ports()
+            ->get(['port_id', 'ifIndex', 'ifName', 'ifDescr']);
+
+        $sensorValues = SnmpQuery::cache()
+            ->hideMib()
+            ->walk('ENTITY-SENSOR-MIB::entPhySensorValue')
+            ->table(1);
+
+        $ddmTransceivers = collect($snmpData)
+            ->filter(fn (array $ent, $sensorIdx) => str_starts_with((string) ($ent['entPhysicalDescr'] ?? ''), 'DOM ')
+                && (empty($sensorValues) || ! in_array((string) ($sensorValues[$sensorIdx]['entPhySensorValue'] ?? '-1000000000'), ['-1000000000', '-2147483648', '0'], true)))
+            ->mapWithKeys(function (array $ent, $sensorIdx) use ($snmpData) {
+                $xcvrIndex = $this->findTransceiverEntityIndex($sensorIdx, $snmpData);
+
+                return $xcvrIndex !== null ? [$xcvrIndex => true] : [];
+            });
+
+        return collect($snmpData)
+            ->filter(fn (array $ent) => ! empty($ent['entPhysicalModelName'])
+                && str_starts_with((string) ($ent['entPhysicalDescr'] ?? ''), 'Xcvr for '))
+            ->map(function (array $ent, $index) use ($ports, $ddmTransceivers) {
+                $descr = (string) ($ent['entPhysicalDescr'] ?? '');
+                $candidates = array_filter(array_unique([
+                    ! empty($ent['entPhysicalAlias']) ? (string) $ent['entPhysicalAlias'] : null,
+                    (string) preg_replace('/^Xcvr for ([^:\s]+).*$/', '$1', $descr),
+                ]));
+
+                $port = null;
+                foreach ($candidates as $alias) {
+                    $port = $ports
+                        ->filter(fn ($p) => $p->ifName === $alias
+                            || str_starts_with((string) $p->ifName, $alias . '/')
+                            || $p->ifDescr === $alias
+                            || str_starts_with((string) $p->ifDescr, $alias . '/'))
+                        ->sortBy('ifIndex')
+                        ->first();
+                    if ($port) {
+                        break;
+                    }
+                }
+
+                if (! $port) {
+                    return null;
+                }
+
+                $type = $ent['entPhysicalModelName'] ?? null;
+                $cable = null;
+                if (preg_match('/^Xcvr for ([^:]+): .* type (\S+) media (.+)$/', $descr, $m)) {
+                    $type = $m[3] !== 'Unknown' ? "{$m[2]} {$m[3]}" : $m[2];
+                    if (preg_match('/-CR\d*$/', $m[3])) {
+                        $cable = 'Copper';
+                    }
+                }
+
+                return new Transceiver([
+                    'port_id' => (int) $port->port_id,
+                    'index' => (string) $index,
+                    'type' => $type,
+                    'vendor' => $ent['entPhysicalMfgName'] ?? null,
+                    'revision' => $ent['entPhysicalHardwareRev'] ?? null,
+                    'model' => $ent['entPhysicalModelName'] ?? null,
+                    'serial' => $ent['entPhysicalSerialNum'] ?? null,
+                    'cable' => $cable,
+                    'ddm' => $ddmTransceivers->has($index),
+                    'entity_physical_index' => (int) $index,
+                ]);
+            })
+            ->filter();
+    }
+
     /**
      * Unnamed entities get a name from their description and the unit they belong to
      */
@@ -88,6 +177,15 @@ class AristaEos extends Shared\Arista
         $descr = $sensor->sensor_descr;
         if (preg_match('/DOM /i', $descr)) {
             $sensor->group = 'SFPs';
+            $entities = SnmpQuery::cache()->hideMib()->walk([
+                'ENTITY-MIB::entPhysicalDescr',
+                'ENTITY-MIB::entPhysicalContainedIn',
+            ])->table(1);
+            $xcvrIndex = $this->findTransceiverEntityIndex($sensor->sensor_index, $entities);
+            if ($xcvrIndex !== null) {
+                $sensor->entPhysicalIndex = (string) $xcvrIndex;
+                $sensor->group = 'transceiver';
+            }
         } elseif (preg_match('/PwrCon/', $descr)) {
             $unit = explode(' ', $descr)[0];
             $sensor->group = preg_match('/PwrCon[0-9]/', $unit) ? $unit : preg_replace('/PwrCon/i', '', $unit);
@@ -102,5 +200,33 @@ class AristaEos extends Shared\Arista
         }
 
         return $sensor;
+    }
+
+    /**
+     * Walk up ENTITY-MIB containment to find the parent transceiver entity index.
+     *
+     * @param  array<int|string, array<string, mixed>>  $entities
+     */
+    private function findTransceiverEntityIndex(int|string|null $index, array $entities): ?int
+    {
+        if ($index === null) {
+            return null;
+        }
+
+        $parent = $entities[$index]['entPhysicalContainedIn'] ?? null;
+        $visited = [];
+        while (is_numeric($parent)) {
+            $parentId = (int) $parent;
+            if ($parentId <= 0 || ! isset($entities[$parentId]) || isset($visited[$parentId])) {
+                break;
+            }
+            $visited[$parentId] = true;
+            if (str_starts_with((string) ($entities[$parentId]['entPhysicalDescr'] ?? ''), 'Xcvr for ')) {
+                return $parentId;
+            }
+            $parent = $entities[$parentId]['entPhysicalContainedIn'] ?? null;
+        }
+
+        return null;
     }
 }
