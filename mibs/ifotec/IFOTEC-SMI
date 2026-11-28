@@ -10,16 +10,25 @@ IFOTEC-SMI DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Integer32, enterprises, TimeTicks FROM SNMPv2-SMI
-	TEXTUAL-CONVENTION, DisplayString                            			FROM SNMPv2-TC;
+	TEXTUAL-CONVENTION, DisplayString                            			FROM SNMPv2-TC
+	PhysicalIndexOrZero												FROM ENTITY-MIB;
  
 
 ifotec MODULE-IDENTITY
-    LAST-UPDATED    "202610080000Z"
+    LAST-UPDATED    "202610200000Z"
     ORGANIZATION    "IFOTEC"
     CONTACT-INFO    "contact@ifotec.com"
     DESCRIPTION
         "The Structure of Management Information for the
         IFOTEC enterprise."	
+    REVISION      "202610200000Z"
+    DESCRIPTION
+            "Add the ifotecAnalog node and ifoAnalogTable, for analog
+            probes such as the power supply voltages and currents; add
+            ifoTempEntPhysicalIndex, ifoDigitalInputEntPhysicalIndex,
+            ifoDigitalOutputEntPhysicalIndex and ifoAnalogEntPhysicalIndex,
+            the entPhysicalIndex of the entity which describes the probe in
+            the ENTITY-MIB."
     REVISION      "202610080000Z"
     DESCRIPTION
             "Add dot1x(256) to ifoLogNotifType."
@@ -126,6 +135,29 @@ IfotecTenthDbm ::= TEXTUAL-CONVENTION
 	DESCRIPTION   "An optical power, in tenths of dBm:
 		the value -52 is -5.2 dBm."
 	SYNTAX  Integer32
+
+IfotecAnalogType ::= TEXTUAL-CONVENTION
+	STATUS             current
+	DESCRIPTION   "Physical quantity measured by an analog probe."
+	SYNTAX  INTEGER {
+		voltageAC(1),
+		voltageDC(2),
+		currentAC(3),
+		currentDC(4),
+		powerWatt(5),
+		powerDbm(6)
+	}
+
+IfotecAnalogValue ::= TEXTUAL-CONVENTION
+	STATUS             current
+	DESCRIPTION   "A fixed-point analog value: the integer divided by 10 to the power
+		ifoAnalogPrecision of the same row, in the units given by ifoAnalogType."
+	SYNTAX  Integer32
+
+IfotecAnalogPrecision ::= TEXTUAL-CONVENTION
+	STATUS             current
+	DESCRIPTION   "The number of decimal places of the fixed-point analog values of a row."
+	SYNTAX  Integer32 (0..9)
 
 IfotecSFPmodeType ::= TEXTUAL-CONVENTION
 	STATUS             current
@@ -302,7 +334,8 @@ IfoTemperatureEntry ::= SEQUENCE {
 	ifoTempLowThldAlarm    IfotecTenthCelsius,
 	ifoTempHighThldAlarm   IfotecTenthCelsius,
 	ifoTempLowThldWarning  IfotecTenthCelsius,
-	ifoTempHighThldWarning  IfotecTenthCelsius
+	ifoTempHighThldWarning  IfotecTenthCelsius,
+	ifoTempEntPhysicalIndex		PhysicalIndexOrZero
 }	
 
 ifoTempIfoSysIndex OBJECT-TYPE 
@@ -377,6 +410,14 @@ ifoTempHighThldWarning OBJECT-TYPE
 	 DESCRIPTION "the value in 0.1 degree Celsius of the high threshold warning."
  	::= { ifoTemperatureEntry 10  }
 
+ifoTempEntPhysicalIndex OBJECT-TYPE
+	 SYNTAX PhysicalIndexOrZero
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "The entPhysicalIndex of the entity which describes this temperature probe in the
+		ENTITY-MIB entPhysicalTable. 0 when the ENTITY-MIB does not describe it."
+ 	::= { ifoTemperatureEntry 11 }
+
 
 -- *****************************************  
 ifotecIO OBJECT-IDENTITY
@@ -412,7 +453,8 @@ IfoIODigitalInputEntry ::= SEQUENCE {
 	ifoDigitalInputDescr           	DisplayString,
 	ifoDigitalInputType             IfotecDigitalInputType,
 	ifoDigitalInputValue		   	IfotecDigitalValue,
-	ifoDigitalInputAlarmStatus	  	IfotecDataStatus
+	ifoDigitalInputAlarmStatus	  	IfotecDataStatus,
+	ifoDigitalInputEntPhysicalIndex	PhysicalIndexOrZero
 }	
 
 ifoDigitalInputIfoSysIndex OBJECT-TYPE 
@@ -462,6 +504,14 @@ ifoDigitalInputAlarmStatus OBJECT-TYPE
 	 DESCRIPTION "Indicates the Digital Input alarm status."
  	::= { ifoIODigitalInputEntry 7  }
 
+ifoDigitalInputEntPhysicalIndex OBJECT-TYPE
+	 SYNTAX PhysicalIndexOrZero
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "The entPhysicalIndex of the entity which describes this digital input in the
+		ENTITY-MIB entPhysicalTable. 0 when the ENTITY-MIB does not describe it."
+ 	::= { ifoIODigitalInputEntry 8 }
+
 
 -- *****************************************
 ifotecIODigitalOutput OBJECT-IDENTITY
@@ -491,7 +541,8 @@ IfoIODigitalOutputEntry ::= SEQUENCE {
 	ifoDigitalOutputDescr           DisplayString,
 	ifoDigitalOutputType			IfotecDigitalOutputType,
 	ifoDigitalOutputValue		   	IfotecDigitalValue,
-	ifoDigitalOutputAlarmStatus   	IfotecDataStatus
+	ifoDigitalOutputAlarmStatus   	IfotecDataStatus,
+	ifoDigitalOutputEntPhysicalIndex	PhysicalIndexOrZero
 }	
 
 ifoDigitalOutputIfoSysIndex OBJECT-TYPE 
@@ -540,6 +591,14 @@ ifoDigitalOutputAlarmStatus OBJECT-TYPE
 	 STATUS current
 	 DESCRIPTION "Indicates the Digital Output alarm status."
  	::= { ifoIODigitalOutputEntry 7  }
+
+ifoDigitalOutputEntPhysicalIndex OBJECT-TYPE
+	 SYNTAX PhysicalIndexOrZero
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "The entPhysicalIndex of the entity which describes this digital output in the
+		ENTITY-MIB entPhysicalTable. 0 when the ENTITY-MIB does not describe it."
+ 	::= { ifoIODigitalOutputEntry 8 }
 
 -- *****************************************  	
 ifotecLog OBJECT-IDENTITY STATUS current DESCRIPTION     "IFOTEC Logs." ::= { ifotecGeneral 4 }
@@ -658,6 +717,77 @@ ifoSFPtxPowerErrThsdLow		OBJECT-TYPE SYNTAX IfotecTenthDbm UNITS "dBm"				MAX-AC
 	 DESCRIPTION "The value in 0.1dBm of the TX optical low threshold warning."			::= { ifoSFPEntry 20  }
  ifoSFPtxPowerStatus		OBJECT-TYPE SYNTAX IfotecDataStatus	 		MAX-ACCESS read-only		STATUS current
 	 DESCRIPTION "Indicates the status of the TX optical warning."		         			::= { ifoSFPEntry 21  }
+
+-- *****************************************
+ifotecAnalog OBJECT-IDENTITY STATUS current DESCRIPTION     "IFOTEC analog probes." 	::= { ifotecGeneral 6 }
+
+ifoAnalogTable OBJECT-TYPE SYNTAX SEQUENCE OF IfoAnalogEntry MAX-ACCESS not-accessible STATUS current
+	 DESCRIPTION "A list of analog probes." 							::= { ifotecAnalog 1  }
+
+ifoAnalogEntry OBJECT-TYPE SYNTAX IfoAnalogEntry MAX-ACCESS not-accessible STATUS current
+	 DESCRIPTION "An entry containing the measure and the status of an analog probe."
+	 INDEX { ifoAnalogIfoSysIndex, ifoAnalogIndex } 					::= { ifoAnalogTable 1  }
+
+IfoAnalogEntry ::= SEQUENCE {
+	ifoAnalogIfoSysIndex		Integer32,
+	ifoAnalogIndex				Integer32,
+	ifoAnalogName				DisplayString,
+	ifoAnalogDescr				DisplayString,
+	ifoAnalogType				IfotecAnalogType,
+	ifoAnalogPrecision			IfotecAnalogPrecision,
+	ifoAnalogValue				IfotecAnalogValue,
+	ifoAnalogUnitsDisplay		DisplayString,
+	ifoAnalogStatus				IfotecDataStatus,
+	ifoAnalogErrThsdHigh		IfotecAnalogValue,
+	ifoAnalogErrThsdLow			IfotecAnalogValue,
+	ifoAnalogWrngThsdHigh		IfotecAnalogValue,
+	ifoAnalogWrngThsdLow		IfotecAnalogValue,
+	ifoAnalogEntPhysicalIndex	PhysicalIndexOrZero
+}
+
+ifoAnalogIfoSysIndex		OBJECT-TYPE SYNTAX Integer32 				MAX-ACCESS not-accessible 	STATUS current
+	 DESCRIPTION "The index value which uniquely identifies the system in ifoSysMibTable."	::= { ifoAnalogEntry 1 }
+ifoAnalogIndex				OBJECT-TYPE SYNTAX Integer32 				MAX-ACCESS not-accessible 	STATUS current
+	 DESCRIPTION "A unique value, greater than zero, for each analog probe of a module. A range of
+		100 values is reserved for each value of ifoAnalogType, in the order of the enumeration:
+		1-100 voltageAC, 101-200 voltageDC, 201-300 currentAC, 301-400 currentDC,
+		401-500 powerWatt, 501-600 powerDbm. The values are not contiguous."					::= { ifoAnalogEntry 2 }
+ifoAnalogName				OBJECT-TYPE SYNTAX DisplayString 			MAX-ACCESS read-only 		STATUS current
+	 DESCRIPTION "The name of the probe. For a probe that ENTITY-MIB describes, this is its
+		entPhysicalName, and its entPhysicalVendorType is ifotecAnalog."						::= { ifoAnalogEntry 3 }
+ifoAnalogDescr				OBJECT-TYPE SYNTAX DisplayString 			MAX-ACCESS read-only 		STATUS current
+	 DESCRIPTION "The description of the probe."											::= { ifoAnalogEntry 4 }
+ifoAnalogType				OBJECT-TYPE SYNTAX IfotecAnalogType 		MAX-ACCESS read-only 		STATUS current
+	 DESCRIPTION "The physical quantity measured by the probe."								::= { ifoAnalogEntry 5 }
+ifoAnalogPrecision			OBJECT-TYPE SYNTAX IfotecAnalogPrecision			MAX-ACCESS read-only 		STATUS current
+	 DESCRIPTION "The number of decimal places of precision in fixed-point analog values
+		returned by the associated ifoAnalogValue object and by the threshold objects
+		of the same row."																		::= { ifoAnalogEntry 6 }
+ifoAnalogValue				OBJECT-TYPE SYNTAX IfotecAnalogValue 				MAX-ACCESS read-only 		STATUS current
+	 DESCRIPTION "The value of the probe: the integer divided by 10 to the power
+		ifoAnalogPrecision, in the units of ifoAnalogUnitsDisplay."							::= { ifoAnalogEntry 7 }
+ifoAnalogUnitsDisplay		OBJECT-TYPE SYNTAX DisplayString 			MAX-ACCESS read-only 		STATUS current
+	 DESCRIPTION "A textual description of the data units that should be used in the display
+		of ifoAnalogValue and of the thresholds."												::= { ifoAnalogEntry 8 }
+ifoAnalogStatus				OBJECT-TYPE SYNTAX IfotecDataStatus 		MAX-ACCESS read-only 		STATUS current
+	 DESCRIPTION "The status of the probe. It is ok both for a probe whose alarm is
+		not monitored and for a monitored probe within its thresholds."						::= { ifoAnalogEntry 9 }
+ifoAnalogErrThsdHigh		OBJECT-TYPE SYNTAX IfotecAnalogValue 				MAX-ACCESS read-only 		STATUS current
+	 DESCRIPTION "The high error threshold, with the precision of ifoAnalogPrecision.
+		The object does not exist for a probe without such a threshold."					::= { ifoAnalogEntry 10 }
+ifoAnalogErrThsdLow			OBJECT-TYPE SYNTAX IfotecAnalogValue 				MAX-ACCESS read-only 		STATUS current
+	 DESCRIPTION "The low error threshold, with the precision of ifoAnalogPrecision.
+		The object does not exist for a probe without such a threshold."					::= { ifoAnalogEntry 11 }
+ifoAnalogWrngThsdHigh		OBJECT-TYPE SYNTAX IfotecAnalogValue 				MAX-ACCESS read-only 		STATUS current
+	 DESCRIPTION "The high warning threshold, with the precision of ifoAnalogPrecision.
+		The object does not exist for a probe without such a threshold."					::= { ifoAnalogEntry 12 }
+ifoAnalogWrngThsdLow		OBJECT-TYPE SYNTAX IfotecAnalogValue 				MAX-ACCESS read-only 		STATUS current
+	 DESCRIPTION "The low warning threshold, with the precision of ifoAnalogPrecision.
+		The object does not exist for a probe without such a threshold."					::= { ifoAnalogEntry 13 }
+
+ifoAnalogEntPhysicalIndex	OBJECT-TYPE SYNTAX PhysicalIndexOrZero	MAX-ACCESS read-only	STATUS current
+	 DESCRIPTION "The entPhysicalIndex of the entity which describes this analog probe in the
+		ENTITY-MIB entPhysicalTable. 0 when the ENTITY-MIB does not describe it."			::= { ifoAnalogEntry 14 }
 
 -- ****************************************************************
 ifotecModules OBJECT-IDENTITY

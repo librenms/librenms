@@ -42,7 +42,9 @@ foreach ($pre_cache['ifoTemperatureTable'] ?? [] as $ifoSensor) {
         (float) $ifoSensor['ifoTempLowThldWarning']['value'],
         (float) $ifoSensor['ifoTempHighThldWarning']['value'],
         (float) $ifoSensor['ifoTempHighThldAlarm']['value'],
-        (float) $ifoSensor['ifoTempValue']['value']
+        (float) $ifoSensor['ifoTempValue']['value'],
+        'snmp',
+        (int) ($ifoSensor['ifoTempEntPhysicalIndex']['value'] ?? 0) ?: null // entPhysicalIndex, 0 when not described
     );
 
     $index++;

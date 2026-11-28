@@ -1,0 +1,139 @@
+modules:
+    sensors:
+        current:
+            data:
+                -
+                    oid: IFOTEC-SMI::ifoAnalogTable
+                    value: IFOTEC-SMI::ifoAnalogValue
+                    num_oid: '.1.3.6.1.4.1.21362.101.6.1.1.7.{{ $index }}'
+                    descr: '{{ IFOTEC-SMI::ifoAnalogDescr }}'
+                    index: 'ifoAnalogValue.{{ $index }}'
+                    entPhysicalIndex: '{{ IFOTEC-SMI::ifoAnalogEntPhysicalIndex }}'
+                    divisor: '1.0E+{{ IFOTEC-SMI::ifoAnalogPrecision }}'
+                    low_limit: IFOTEC-SMI::ifoAnalogErrThsdLow
+                    low_warn_limit: IFOTEC-SMI::ifoAnalogWrngThsdLow
+                    warn_limit: IFOTEC-SMI::ifoAnalogWrngThsdHigh
+                    high_limit: IFOTEC-SMI::ifoAnalogErrThsdHigh
+                    skip_values:
+                        - { oid: IFOTEC-SMI::ifoAnalogType, op: '<', value: 3 }
+                        - { oid: IFOTEC-SMI::ifoAnalogType, op: '>', value: 4 }
+                        - { oid: IFOTEC-SMI::ifoAnalogStatus, op: '=', value: 1 }
+        dbm:
+            data:
+                -
+                    oid: IFOTEC-SMI::ifoAnalogTable
+                    value: IFOTEC-SMI::ifoAnalogValue
+                    num_oid: '.1.3.6.1.4.1.21362.101.6.1.1.7.{{ $index }}'
+                    descr: '{{ IFOTEC-SMI::ifoAnalogDescr }}'
+                    index: 'ifoAnalogValue.{{ $index }}'
+                    entPhysicalIndex: '{{ IFOTEC-SMI::ifoAnalogEntPhysicalIndex }}'
+                    divisor: '1.0E+{{ IFOTEC-SMI::ifoAnalogPrecision }}'
+                    low_limit: IFOTEC-SMI::ifoAnalogErrThsdLow
+                    low_warn_limit: IFOTEC-SMI::ifoAnalogWrngThsdLow
+                    warn_limit: IFOTEC-SMI::ifoAnalogWrngThsdHigh
+                    high_limit: IFOTEC-SMI::ifoAnalogErrThsdHigh
+                    skip_values:
+                        - { oid: IFOTEC-SMI::ifoAnalogType, op: '!=', value: 6 }
+                        - { oid: IFOTEC-SMI::ifoAnalogStatus, op: '=', value: 1 }
+        power:
+            data:
+                -
+                    oid: IFOTEC-SMI::ifoAnalogTable
+                    value: IFOTEC-SMI::ifoAnalogValue
+                    num_oid: '.1.3.6.1.4.1.21362.101.6.1.1.7.{{ $index }}'
+                    descr: '{{ IFOTEC-SMI::ifoAnalogDescr }}'
+                    index: 'ifoAnalogValue.{{ $index }}'
+                    entPhysicalIndex: '{{ IFOTEC-SMI::ifoAnalogEntPhysicalIndex }}'
+                    divisor: '1.0E+{{ IFOTEC-SMI::ifoAnalogPrecision }}'
+                    low_limit: IFOTEC-SMI::ifoAnalogErrThsdLow
+                    low_warn_limit: IFOTEC-SMI::ifoAnalogWrngThsdLow
+                    warn_limit: IFOTEC-SMI::ifoAnalogWrngThsdHigh
+                    high_limit: IFOTEC-SMI::ifoAnalogErrThsdHigh
+                    skip_values:
+                        - { oid: IFOTEC-SMI::ifoAnalogType, op: '!=', value: 5 }
+                        - { oid: IFOTEC-SMI::ifoAnalogStatus, op: '=', value: 1 }
+        voltage:
+            data:
+                -
+                    oid: IFOTEC-SMI::ifoAnalogTable
+                    value: IFOTEC-SMI::ifoAnalogValue
+                    num_oid: '.1.3.6.1.4.1.21362.101.6.1.1.7.{{ $index }}'
+                    descr: '{{ IFOTEC-SMI::ifoAnalogDescr }}'
+                    index: 'ifoAnalogValue.{{ $index }}'
+                    entPhysicalIndex: '{{ IFOTEC-SMI::ifoAnalogEntPhysicalIndex }}'
+                    divisor: '1.0E+{{ IFOTEC-SMI::ifoAnalogPrecision }}'
+                    low_limit: IFOTEC-SMI::ifoAnalogErrThsdLow
+                    low_warn_limit: IFOTEC-SMI::ifoAnalogWrngThsdLow
+                    warn_limit: IFOTEC-SMI::ifoAnalogWrngThsdHigh
+                    high_limit: IFOTEC-SMI::ifoAnalogErrThsdHigh
+                    skip_values:
+                        - { oid: IFOTEC-SMI::ifoAnalogType, op: '>', value: 2 }
+                        - { oid: IFOTEC-SMI::ifoAnalogStatus, op: '=', value: 1 }
+        state:
+            data:
+                -
+                    oid: IFOTEC-SMI::ifotecIODigitalInputTable
+                    value: IFOTEC-SMI::ifoDigitalInputValue
+                    num_oid: '.1.3.6.1.4.1.21362.101.3.1.1.1.6.{{ $index }}'
+                    descr: '{{ IFOTEC-SMI::ifoDigitalInputDescr }}'
+                    group: '{{ IFOTEC-SMI::ifoDigitalInputDescr }}'
+                    index: 'ifoDigitalInputValue.{{ $index }}'
+                    entPhysicalIndex: '{{ IFOTEC-SMI::ifoDigitalInputEntPhysicalIndex }}'
+                    state_name: ifoDigitalInputValue
+                    states:
+                        - { value: 1, generic: 0, descr: active }
+                        - { value: 2, generic: 0, descr: inactive }
+                -
+                    oid: IFOTEC-SMI::ifotecIODigitalInputTable
+                    value: IFOTEC-SMI::ifoDigitalInputAlarmStatus
+                    num_oid: '.1.3.6.1.4.1.21362.101.3.1.1.1.7.{{ $index }}'
+                    descr: '{{ IFOTEC-SMI::ifoDigitalInputDescr }} alarm'
+                    group: '{{ IFOTEC-SMI::ifoDigitalInputDescr }}'
+                    index: 'ifoDigitalInputAlarmStatus.{{ $index }}'
+                    entPhysicalIndex: '{{ IFOTEC-SMI::ifoDigitalInputEntPhysicalIndex }}'
+                    state_name: ifoDataStatus
+                    states:
+                        - { value: 1, generic: 3, descr: noData }
+                        - { value: 2, generic: 0, descr: ok }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: warningLowThreshold }
+                        - { value: 5, generic: 1, descr: warningHighThreshold }
+                        - { value: 6, generic: 2, descr: error }
+                        - { value: 7, generic: 2, descr: errorLowThreshold }
+                        - { value: 8, generic: 2, descr: errorHighThreshold }
+                        - { value: 9, generic: 2, descr: errorWrongData }
+                        - { value: 10, generic: 2, descr: errorLowDataOverflow }
+                        - { value: 11, generic: 2, descr: errorHighDataOverflow }
+                -
+                    oid: IFOTEC-SMI::ifoIODigitalOutputTable
+                    value: IFOTEC-SMI::ifoDigitalOutputValue
+                    num_oid: '.1.3.6.1.4.1.21362.101.3.2.1.1.6.{{ $index }}'
+                    descr: '{{ IFOTEC-SMI::ifoDigitalOutputDescr }}'
+                    group: '{{ IFOTEC-SMI::ifoDigitalOutputDescr }}'
+                    index: 'ifoDigitalOutputValue.{{ $index }}'
+                    entPhysicalIndex: '{{ IFOTEC-SMI::ifoDigitalOutputEntPhysicalIndex }}'
+                    state_name: ifoDigitalOutputValue
+                    states:
+                        - { value: 1, generic: 0, descr: active }
+                        - { value: 2, generic: 0, descr: inactive }
+                -
+                    oid: IFOTEC-SMI::ifoIODigitalOutputTable
+                    value: IFOTEC-SMI::ifoDigitalOutputAlarmStatus
+                    num_oid: '.1.3.6.1.4.1.21362.101.3.2.1.1.7.{{ $index }}'
+                    descr: '{{ IFOTEC-SMI::ifoDigitalOutputDescr }} alarm'
+                    group: '{{ IFOTEC-SMI::ifoDigitalOutputDescr }}'
+                    index: 'ifoDigitalOutputAlarmStatus.{{ $index }}'
+                    entPhysicalIndex: '{{ IFOTEC-SMI::ifoDigitalOutputEntPhysicalIndex }}'
+                    state_name: ifoDataStatus
+                    states:
+                        - { value: 1, generic: 3, descr: noData }
+                        - { value: 2, generic: 0, descr: ok }
+                        - { value: 3, generic: 1, descr: warning }
+                        - { value: 4, generic: 1, descr: warningLowThreshold }
+                        - { value: 5, generic: 1, descr: warningHighThreshold }
+                        - { value: 6, generic: 2, descr: error }
+                        - { value: 7, generic: 2, descr: errorLowThreshold }
+                        - { value: 8, generic: 2, descr: errorHighThreshold }
+                        - { value: 9, generic: 2, descr: errorWrongData }
+                        - { value: 10, generic: 2, descr: errorLowDataOverflow }
+                        - { value: 11, generic: 2, descr: errorHighDataOverflow }

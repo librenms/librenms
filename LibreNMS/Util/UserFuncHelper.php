@@ -129,6 +129,26 @@ class UserFuncHelper
         return Number::cast(explode(',', $this->value_raw)[$channel] ?? '') * $this->sensor['sensor_multiplier'] / $this->sensor['sensor_divisor'];
     }
 
+    /**
+     * IFOTEC optical power: a minus infinity reading is an alarm on the received power (a value under the low
+     * threshold), but only "not measured" on the transmit power (unknown). No reading is unknown too.
+     */
+    public function ifotecOpticalPower(): ?float
+    {
+        // empty when there is no answer or when the status is noData (Ifotec::pollSensors())
+        if (! is_numeric($this->value_raw)) {
+            return null;
+        }
+
+        if ((float) $this->value >= \LibreNMS\OS\Ifotec::OPTICAL_POWER_MIN_VALID) {
+            return (float) $this->value;
+        }
+
+        return str_starts_with((string) ($this->sensor['sensor_index'] ?? ''), 'ifoSFPrxPowerVal')
+            ? \LibreNMS\OS\Ifotec::minusInfinityPower($this->sensor['sensor_limit_low'] ?? null)
+            : null;
+    }
+
     public function hhmmssToMinutes(): int
     {
         [$h, $m, $s] = explode(':', $this->value_raw);

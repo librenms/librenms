@@ -256,7 +256,8 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
 
         $this->logThresholds($sensor, $value, $previous);
 
-        if ($value != $previous) {
+        // null (unknown) loosely equals 0, a change to or from unknown is stored too
+        if ($value != $previous || ($value === null) !== ($previous === null)) {
             if ($sensor->sensor_class == 'state') {
                 $this->logStateChange($sensor, $value, $previous);
             }
@@ -305,17 +306,19 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
 
     private function logThresholds(Sensor $sensor, int|float|string|null $value, int|float|string|null $previous): void
     {
-        if (! $sensor->sensor_alert) {
+        // an unknown value crosses no threshold (null compares to numbers as false)
+        if (! $sensor->sensor_alert || $value === null) {
             return;
         }
 
         $class = $sensor->classDescr();
         $unit = SensorType::tryFrom($sensor->sensor_class)?->unit();
 
-        if ($sensor->sensor_limit_low !== null && $previous > $sensor->sensor_limit_low && $value < $sensor->sensor_limit_low) {
+        // an unknown previous value counts as inside the limits, the first value outside them is logged
+        if ($sensor->sensor_limit_low !== null && ($previous === null || $previous > $sensor->sensor_limit_low) && $value < $sensor->sensor_limit_low) {
             Log::info("Alerting for $sensor->sensor_descr");
             Eventlog::log("$class under threshold: $value $unit (< $sensor->sensor_limit_low $unit)", $sensor->device_id, $sensor->sensor_class, Severity::Warning, $sensor->sensor_id);
-        } elseif ($sensor->sensor_limit !== null && $previous < $sensor->sensor_limit && $value > $sensor->sensor_limit) {
+        } elseif ($sensor->sensor_limit !== null && ($previous === null || $previous < $sensor->sensor_limit) && $value > $sensor->sensor_limit) {
             Log::info("Alerting for $sensor->sensor_descr");
             Eventlog::log("$class above threshold: $value $unit (> $sensor->sensor_limit $unit)", $sensor->device_id, $sensor->sensor_class, Severity::Warning, $sensor->sensor_id);
         }
@@ -323,7 +326,8 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
 
     private function logStateChange(Sensor $sensor, int|float|string|null $value, int|float|string|null $previous): void
     {
-        $describe = fn ($state) => ($sensor->translations->firstWhere('state_value', $state)->state_descr ?? '#unamed state#') . " ($state)";
+        // firstWhere() compares loosely, null would match the state 0
+        $describe = fn ($state) => $state === null ? 'unknown' : ($sensor->translations->firstWhere('state_value', $state)->state_descr ?? '#unamed state#') . " ($state)";
         $class = $sensor->classDescr();
 
         Eventlog::log("$class sensor $sensor->sensor_descr has changed from {$describe($previous)} to {$describe($value)}", $sensor->device_id, $class, Severity::Notice, $sensor->sensor_id);
