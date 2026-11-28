@@ -28,7 +28,7 @@ namespace LibreNMS\OS;
 
 use App\Models\Sensor;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 use LibreNMS\Discovery\DiscoversSensors;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\OS;
@@ -36,14 +36,32 @@ use LibreNMS\Util\Number;
 use LibreNMS\Util\UserFuncHelper;
 use SnmpQuery;
 
-/**
- * cmcIIIVarTable has a row for each variable of a sensor (value, limits, logic).
- * The variables of a sensor are consecutive rows that share the name, without the last part.
- *
- * @phpstan-type CmcSensor array{name: string, descr: string, oid?: string, value?: int|float, type?: SensorType, divisor?: string, multiplier?: string, logic?: array{string, string}, user_func?: string, limits: array<string, mixed>}
- */
 class RittalCmcIiiPu extends OS
 {
+    /**
+     * Sensor class by cmcIIIVarUnit, values without a unit are states
+     */
+    private const UNIT_TYPES = [
+        '' => SensorType::State,
+        'mA' => SensorType::Current,
+        'A' => SensorType::Current,
+        'Wh' => SensorType::PowerConsumed,
+        'VAh' => SensorType::PowerConsumed,
+        'kWh' => SensorType::PowerConsumed,
+        'kVAh' => SensorType::PowerConsumed,
+        'Hz' => SensorType::Frequency,
+        'degree C' => SensorType::Temperature,
+        'degree F' => SensorType::Temperature,
+        '°C' => SensorType::Temperature,
+        '°F' => SensorType::Temperature,
+        'l/min' => SensorType::Waterflow,
+        'V' => SensorType::Voltage,
+        'W' => SensorType::Power,
+        'VA' => SensorType::Power,
+        'var' => SensorType::Power,
+        '%' => SensorType::Percent,
+    ];
+
     /**
      * ENTITY-SENSOR-MIB duplicates the CMC III sensors
      */
@@ -53,148 +71,109 @@ class RittalCmcIiiPu extends OS
     }
 
     /**
+     * cmcIIIVarTable rows are named <sensor>.<variable> (Temperature.Value, Temperature.SetPtHighAlarm, ...)
+     * and typed by cmcIIIVarType. Sensors are numbered in table order.
+     *
      * @return Collection<int, Sensor>
      */
     #[DiscoversSensors(SensorType::Current, SensorType::Frequency, SensorType::Percent, SensorType::Power, SensorType::PowerConsumed, SensorType::State, SensorType::Temperature, SensorType::Voltage, SensorType::Waterflow)]
     public function discoverCmcIiiSensors(): Collection
     {
-        $variables = SnmpQuery::hideMib()->enumStrings()->walk('RITTAL-CMC-III-MIB::cmcIIIVarTable')->valuesByIndex();
-        /** @var array<int, CmcSensor> $cmcSensors */
-        $cmcSensors = [];
-        $descriptions = [];
-        $lastPrefix = $prefix = '';
+        $groups = SnmpQuery::enumStrings()->walk('RITTAL-CMC-III-MIB::cmcIIIVarTable')
+            ->mapTable(function (array $entry, string $unit, string $var) {
+                $name = str_replace('.', ' ', Str::beforeLast((string) ($entry['RITTAL-CMC-III-MIB::cmcIIIVarName'] ?? ''), '.'));
 
-        foreach ($variables as $index => $entry) {
-            $nameParts = explode('.', (string) ($entry['cmcIIIVarName'] ?? ''));
-            array_pop($nameParts);
-            $name = implode(' ', $nameParts);
-            $id = count($cmcSensors);
-            $indexParts = explode('.', (string) $index);
-            if (count($indexParts) > 1) {
-                $prefix = $indexParts[0];
-            }
+                return [
+                    'sensor' => "$unit $name",
+                    'name' => $name,
+                    'oid' => ".1.3.6.1.4.1.2606.7.4.2.2.1.11.$unit.$var",
+                    'type' => $entry['RITTAL-CMC-III-MIB::cmcIIIVarType'] ?? '',
+                    'unit' => $entry['RITTAL-CMC-III-MIB::cmcIIIVarUnit'] ?? '',
+                    'scale' => (int) ($entry['RITTAL-CMC-III-MIB::cmcIIIVarScale'] ?? 0),
+                    'int' => $entry['RITTAL-CMC-III-MIB::cmcIIIVarValueInt'] ?? null,
+                    'string' => (string) ($entry['RITTAL-CMC-III-MIB::cmcIIIVarValueStr'] ?? ''),
+                ];
+            })
+            ->groupBy('sensor')
+            ->values()
+            ->map(fn (Collection $rows) => $rows->keyBy('type'));
 
-            // a new sensor starts when the name or the first index changes
-            if (($cmcSensors[$id]['name'] ?? null) !== $name || $lastPrefix != $prefix) {
-                $id = $id == 0 ? 1 : $id + 1;
-                $valueString = (string) ($entry['cmcIIIVarValueStr'] ?? '');
-                $descr = str_contains($name, $valueString) ? $valueString : "$name $valueString";
-                $cmcSensors[$id] = ['name' => $name, 'descr' => $descr, 'limits' => []];
-                $descriptions[$descr][] = $id;
-                $lastPrefix = $prefix;
-            }
+        // the description row is the user set name, duplicates are numbered in table order
+        $descriptions = $groups->map(function (Collection $variables) {
+            $name = $variables->first()['name'];
+            $descr = $variables['description']['string'] ?? $name;
 
-            $this->addCmcIiiVariable($cmcSensors[$id], (string) $index, $entry);
-        }
-
-        // make descriptions unique
-        foreach ($descriptions as $ids) {
-            if (count($ids) > 1) {
-                foreach ($ids as $position => $id) {
-                    $cmcSensors[$id]['descr'] .= ' ' . str_pad((string) ($position + 1), 2, '0', STR_PAD_LEFT);
-                }
-            }
-        }
+            return str_contains($name, $descr) ? $descr : "$name $descr";
+        });
+        $counts = $descriptions->countBy();
+        $descriptions = $descriptions->map(fn (string $descr, int $id) => $counts[$descr] > 1
+            ? sprintf('%s %02d', $descr, $descriptions->take($id + 1)->countBy()[$descr])
+            : $descr);
 
         // state names include the serial, the logic of a sensor depends on the configuration of the device
-        $serial = $this->getDevice()->serial ?: SnmpQuery::get('RITTAL-CMC-III-MIB::cmcIIIUnitSerial.0')->value();
-        $sensors = new Collection;
+        $serial = (string) ($this->getDevice()->serial ?: SnmpQuery::get('RITTAL-CMC-III-MIB::cmcIIIUnitSerial.0')->value());
 
-        foreach ($cmcSensors as $id => $cmcSensor) {
-            if (! isset($cmcSensor['oid'], $cmcSensor['type'])
-                || in_array($cmcSensor['name'], ['System V24 Port', 'Memory USB-Stick', 'Memory SD-Card', 'Login'])
-                || preg_match('/(Power Factor)|(Runtime)/', $cmcSensor['name'])) {
-                Log::debug("{$cmcSensor['name']} skipped");
-                continue;
-            }
-
-            // there is no logic for Smoke and Access sensors
-            $logic = match ($cmcSensor['name']) {
-                'Smoke' => ['OK', 'Alarm'],
-                'Access' => ['Closed', 'Open'],
-                default => $cmcSensor['logic'] ?? null,
-            };
-
-            // the same conversion as polling
-            $scale = function ($value) use ($cmcSensor) {
-                $value = $value / ($cmcSensor['divisor'] ?? 1) * ($cmcSensor['multiplier'] ?? 1);
-
-                return isset($cmcSensor['user_func']) ? UserFuncHelper::apply($cmcSensor['user_func'], $value) : $value;
-            };
-            $limit = fn (string $name) => isset($cmcSensor['limits'][$name]) ? $scale($cmcSensor['limits'][$name]) : null;
-
-            $sensor = new Sensor([
-                'poller_type' => 'snmp',
-                'sensor_class' => $cmcSensor['type']->value,
-                'sensor_oid' => $cmcSensor['oid'],
-                'sensor_index' => $id,
-                'sensor_type' => $logic ? "{$cmcSensor['name']}_$serial" : $cmcSensor['name'],
-                'sensor_descr' => $cmcSensor['descr'],
-                'sensor_divisor' => $cmcSensor['divisor'] ?? 1,
-                'sensor_multiplier' => $cmcSensor['multiplier'] ?? 1,
-                'user_func' => $cmcSensor['user_func'] ?? null,
-                'sensor_current' => $scale($cmcSensor['value'] ?? 0),
-                'sensor_limit_low' => $limit('setLow'),
-                'sensor_limit_low_warn' => $limit('setWarnLow'),
-                'sensor_limit_warn' => $limit('setWarn'),
-                'sensor_limit' => $limit('setHigh'),
-                'rrd_type' => 'GAUGE',
-            ]);
-
-            $sensors->push($logic ? $sensor->withStates([
-                ['value' => 0, 'generic' => 0, 'descr' => $logic[0]],
-                ['value' => 1, 'generic' => $cmcSensor['name'] == 'Smoke' ? 2 : 0, 'descr' => $logic[1]],
-            ]) : $sensor);
-        }
-
-        return $sensors;
+        // skip sensors without a value or with an unsupported unit (s, GB, ...),
+        // filter keeps the keys, so skipped groups still count towards the index
+        return $groups
+            ->filter(fn (Collection $variables) => isset($variables['value'], self::UNIT_TYPES[$variables['value']['unit']])
+                && ! in_array($variables->first()['name'], ['System V24 Port', 'Memory USB-Stick', 'Memory SD-Card', 'Login'])
+                && ! preg_match('/(Power Factor)|(Runtime)/', $variables->first()['name']))
+            ->map(fn (Collection $variables, int $id) => $this->makeCmcIiiSensor($variables, $id + 1, $descriptions[$id], $serial))
+            ->values();
     }
 
     /**
-     * @param  CmcSensor  $sensor
-     * @param  array<string, mixed>  $entry
+     * @param  Collection<string, array<string, mixed>>  $variables  rows of one sensor keyed by variable type
      */
-    private function addCmcIiiVariable(array &$sensor, string $index, array $entry): void
+    private function makeCmcIiiSensor(Collection $variables, int $index, string $descr, string $serial): Sensor
     {
-        $type = (string) ($entry['cmcIIIVarType'] ?? '');
+        $value = $variables['value'];
+        $name = $variables->first()['name'];
 
-        if (in_array($type, ['setHigh', 'setWarn', 'setWarnLow', 'setLow'])) {
-            $sensor['limits'][$type] = $entry['cmcIIIVarValueInt'] ?? null;
-        } elseif ($type == 'logic') {
-            $logic = explode(' / ', (string) ($entry['cmcIIIVarValueStr'] ?? ''));
-            $sensor['logic'] = [substr($logic[0], 2), substr($logic[1] ?? '', 2)];
-        } elseif ($type == 'value') {
-            $sensor['oid'] = ".1.3.6.1.4.1.2606.7.4.2.2.1.11.$index";
-            $sensor['value'] = Number::cast(empty($entry['cmcIIIVarValueInt']) ? ($entry['cmcIIIVarValueStr'] ?? '') : $entry['cmcIIIVarValueInt']);
+        $type = self::UNIT_TYPES[$value['unit']];
 
-            $scale = (string) ($entry['cmcIIIVarScale'] ?? '');
-            if (str_starts_with($scale, '-')) {
-                $sensor['divisor'] = substr($scale, 1);
-            } elseif (str_starts_with($scale, '+')) {
-                $sensor['multiplier'] = substr($scale, 1);
-            }
+        // a negative scale divides, a positive one multiplies, mA and Wh have a scale of 1
+        $divisor = in_array($value['unit'], ['mA', 'Wh', 'VAh']) ? 1000 : max(1, -$value['scale']);
+        $multiplier = max(1, $value['scale']);
+        $userFunc = in_array($value['unit'], ['degree F', '°F']) ? 'fahrenheit_to_celsius' : null;
 
-            [$sensor['type'], $divisor] = match ((string) ($entry['cmcIIIVarUnit'] ?? '')) {
-                'mA' => [SensorType::Current, '1000'], // the scale is 1 for mA values
-                'A' => [SensorType::Current, null],
-                'Wh', 'VAh' => [SensorType::PowerConsumed, '1000'],
-                'kWh', 'kVAh' => [SensorType::PowerConsumed, null],
-                'Hz' => [SensorType::Frequency, null],
-                'degree C', 'degree F', '°C', '°F' => [SensorType::Temperature, null],
-                'l/min' => [SensorType::Waterflow, null],
-                'V' => [SensorType::Voltage, null],
-                'W', 'VA', 'var' => [SensorType::Power, null],
-                '%' => [SensorType::Percent, null],
-                default => [SensorType::State, null],
-            };
+        // the same conversion as polling, limits are raw values too
+        $convert = function ($raw) use ($divisor, $multiplier, $userFunc) {
+            $converted = $raw / $divisor * $multiplier;
 
-            if ($divisor !== null) {
-                $sensor['divisor'] = $divisor;
-            }
+            return $userFunc ? UserFuncHelper::apply($userFunc, $converted) : $converted;
+        };
+        $limit = fn (string $varType) => isset($variables[$varType]['int']) ? $convert($variables[$varType]['int']) : null;
 
-            if (in_array($entry['cmcIIIVarUnit'] ?? null, ['degree F', '°F'])) {
-                $sensor['user_func'] = 'fahrenheit_to_celsius';
-            }
-        }
+        // logic looks like "0:Off / 1:On", there is none for Smoke and Access sensors
+        $logic = match ($name) {
+            'Smoke' => ['OK', 'Alarm'],
+            'Access' => ['Closed', 'Open'],
+            default => isset($variables['logic']) ? array_map(fn (string $state) => substr($state, 2), explode(' / ', $variables['logic']['string']) + ['', '']) : null,
+        };
+
+        $sensor = new Sensor([
+            'poller_type' => 'snmp',
+            'sensor_class' => $type->value,
+            'sensor_oid' => $value['oid'],
+            'sensor_index' => $index,
+            'sensor_type' => $logic ? "{$name}_$serial" : $name,
+            'sensor_descr' => $descr,
+            'sensor_divisor' => $divisor,
+            'sensor_multiplier' => $multiplier,
+            'user_func' => $userFunc,
+            'sensor_current' => $convert(Number::cast($value['int'] ?: $value['string'])),
+            'sensor_limit_low' => $limit('setLow'),
+            'sensor_limit_low_warn' => $limit('setWarnLow'),
+            'sensor_limit_warn' => $limit('setWarn'),
+            'sensor_limit' => $limit('setHigh'),
+            'rrd_type' => 'GAUGE',
+        ]);
+
+        return $logic ? $sensor->withStates([
+            ['value' => 0, 'generic' => 0, 'descr' => $logic[0]],
+            ['value' => 1, 'generic' => $name == 'Smoke' ? 2 : 0, 'descr' => $logic[1]],
+        ]) : $sensor;
     }
 }
