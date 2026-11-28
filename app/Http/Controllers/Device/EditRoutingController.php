@@ -26,6 +26,7 @@
 
 namespace App\Http\Controllers\Device;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\BgpPeer;
 use App\Models\Device;
 use App\Models\Vrf as VrfModel;
@@ -36,6 +37,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\ValidationException;
+use LibreNMS\Util\VrfContextCleanup;
 
 class EditRoutingController
 {
@@ -48,6 +50,7 @@ class EditRoutingController
         return view('device.edit.routing', [
             'device' => $device,
             'vrfs' => $this->vrfs($device),
+            'cleanup_contexts' => VrfContextCleanup::candidates($device),
             'peers' => $device->bgppeers()
                 ->orderBy('bgpPeerRemoteAs')
                 ->orderBy('bgpPeerIdentifier')
@@ -84,12 +87,14 @@ class EditRoutingController
             'context_name' => $validated['context'],
             'context_manual' => true,
             'vrf_manual' => true,
+            'context_enabled' => LibrenmsConfig::get('snmp.vrf_contexts', true),
             'mplsVpnVrfDescription' => '',
         ]);
 
         return response()->json([
             'message' => __('VRF :vrf added', ['vrf' => $vrf->vrf_name]),
             'vrfs' => $this->vrfs($device),
+            'cleanup_contexts' => VrfContextCleanup::candidates($device),
         ]);
     }
 
@@ -119,7 +124,9 @@ class EditRoutingController
 
         $vrf->save();
 
-        return response()->json($this->vrfData($device, $vrf));
+        return response()->json($this->vrfData($device, $vrf) + [
+            'cleanup_contexts' => VrfContextCleanup::candidates($device),
+        ]);
     }
 
     /**
@@ -134,7 +141,22 @@ class EditRoutingController
 
         return response()->json([
             'vrfs' => $this->vrfs($device),
+            'cleanup_contexts' => VrfContextCleanup::candidates($device),
         ]);
+    }
+
+    public function cleanupContext(Request $request, Device $device): JsonResponse
+    {
+        $this->authorize('update', $device);
+        $validated = $request->validate(['context' => 'required|string|max:684']);
+        $context = base64_decode($validated['context'], true);
+        if ($context === false || $context === '' || base64_encode($context) !== $validated['context']) {
+            throw ValidationException::withMessages(['context' => __('Invalid SNMP context.')]);
+        }
+
+        VrfContextCleanup::clean($device, $context);
+
+        return response()->json(['message' => __('Data for context :context was removed.', ['context' => $context])]);
     }
 
     /**

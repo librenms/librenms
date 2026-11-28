@@ -26,6 +26,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Facades\LibrenmsConfig;
 use App\Models\Device;
 use App\Models\Port;
 use App\Models\Vrf as VrfModel;
@@ -155,11 +156,13 @@ class Vrf implements Module
 
         foreach ($vrfs as $vrf) {
             $vrf->mplsVpnVrfDescription ??= '';
+            $saved = $existing->get($vrf->getCompositeKey());
+            $vrf->context_enabled = $saved->context_enabled ?? $vrf->context_enabled ?? LibrenmsConfig::get('snmp.vrf_contexts', true);
             if ($vrf->isDefault()) {
                 $vrf->context_name = null; // the default VRF is walked without a context
             }
 
-            $this->updateContextStatus($vrf, $existing->get($vrf->getCompositeKey()), $checkContexts);
+            $this->updateContextStatus($vrf, $saved, $checkContexts);
         }
 
         ModuleModelObserver::observe(VrfModel::class);
@@ -187,7 +190,7 @@ class Vrf implements Module
             return;
         }
 
-        $enabled = $existing->context_enabled ?? true;
+        $enabled = $vrf->context_enabled;
         $changed = $existing === null || $existing->context_name !== $vrf->context_name;
 
         if (! $checkContexts || ! $enabled) {
@@ -257,6 +260,7 @@ class Vrf implements Module
 
             $vrf->context_name = $context;
             $vrf->context_manual = true;
+            $vrf->context_enabled = $existing->context_enabled;
         }
 
         return $vrfs;

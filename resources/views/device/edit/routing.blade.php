@@ -4,7 +4,7 @@
     <x-device.page :device="$device">
         <x-device.edit-tabs :device="$device" tab="routing" />
 
-        <div x-data="deviceRouting(@js(['vrfs' => $vrfs, 'storeUrl' => route('device.edit.routing.vrf.store', $device)]))">
+        <div x-data="deviceRouting(@js(['vrfs' => $vrfs, 'cleanupContexts' => $cleanup_contexts, 'storeUrl' => route('device.edit.routing.vrf.store', $device), 'cleanupUrl' => route('device.edit.routing.context.cleanup', $device)]))">
             <x-panel :title="__('VRFs')">
                 <p class="text-muted">{{ __('Routing modules (BGP, OSPF, IP addresses, ARP, IPv6 neighbors) poll each VRF through its SNMP context.') }}</p>
                 <div class="table-responsive">
@@ -16,6 +16,7 @@
                             <th>{{ __('RD') }}</th>
                             <th>{{ __('SNMP Context') }}</th>
                             <th>{{ __('Status') }}</th>
+                            <th>{{ __('Data') }}</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -61,10 +62,20 @@
                                 <td>
                                     <span :class="statuses[vrf.status].class" :title="statuses[vrf.status].title" x-text="statuses[vrf.status].text"></span>
                                 </td>
+                                <td>
+                                    <template x-if="cleanupContexts.some(item => item.name === vrf.context)">
+                                        <button type="button" class="btn btn-xs btn-danger"
+                                                x-on:click="cleanup(cleanupContexts.find(item => item.name === vrf.context))"
+                                                :aria-label="@js(__('Clean up data for SNMP context')) + ' ' + vrf.context"
+                                                :disabled="isPending('cleanup')">
+                                            {{ __('Clean up data') }}
+                                        </button>
+                                    </template>
+                                </td>
                             </tr>
                         </template>
                         <tr x-show="vrfs.length === 0" x-cloak>
-                            <td colspan="5" class="text-center"><em>{{ __('No VRFs found for this device.') }}</em></td>
+                            <td colspan="6" class="text-center"><em>{{ __('No VRFs found for this device.') }}</em></td>
                         </tr>
                         </tbody>
                     </table>
@@ -77,6 +88,24 @@
                     <button type="submit" class="btn btn-default" :disabled="newContext.trim() === '' || isPending('add')"><i class="fa fa-plus"></i> {{ __('Add') }}</button>
                 </form>
             </x-panel>
+
+            <div x-show="orphanedContexts().length > 0" x-cloak>
+                <x-panel :title="__('Removed SNMP contexts')">
+                    <p class="text-muted">{{ __('These contexts have stored data but are no longer associated with a VRF.') }}</p>
+                    <ul class="list-unstyled">
+                        <template x-for="context in orphanedContexts()" :key="context.token">
+                            <li>
+                                <span x-text="context.name"></span>
+                                <button type="button" class="btn btn-xs btn-danger"
+                                        x-on:click="cleanup(context)" :disabled="isPending('cleanup')"
+                                        :aria-label="@js(__('Clean up data for SNMP context')) + ' ' + context.name">
+                                    {{ __('Clean up data') }}
+                                </button>
+                            </li>
+                        </template>
+                    </ul>
+                </x-panel>
+            </div>
 
             @if ($peers->isNotEmpty())
                 <x-panel :title="__('BGP Peers')">
@@ -124,6 +153,7 @@
         document.addEventListener('alpine:init', () => {
             Alpine.data('deviceRouting', (config) => ({
                 vrfs: config.vrfs,
+                cleanupContexts: config.cleanupContexts,
                 newContext: '',
                 pending: {},
                 statuses: {
@@ -136,6 +166,17 @@
 
                 isPending(key) {
                     return this.pending[key] === true;
+                },
+
+                orphanedContexts() {
+                    return this.cleanupContexts.filter(item => ! this.vrfs.some(vrf => vrf.context === item.name));
+                },
+
+                cleanup(context) {
+                    if (this.isPending('cleanup') || ! window.confirm(@js(__('Remove stored data for SNMP context :context? Historical routes will be kept.')).replace(':context', context.name))) return;
+                    this.request('cleanup', 'POST', config.cleanupUrl, {context: context.token})
+                        .then(() => window.location.reload())
+                        .catch(() => {});
                 },
 
                 request(key, method, url, data = {}) {
@@ -170,7 +211,10 @@
                     }
 
                     this.request(vrf.update_url, 'PATCH', vrf.update_url, {context_enabled: enabled})
-                        .then((updated) => Object.assign(vrf, updated))
+                        .then((updated) => {
+                            this.cleanupContexts = updated.cleanup_contexts;
+                            Object.assign(vrf, updated);
+                        })
                         .catch(() => input.checked = ! enabled);
                 },
 
@@ -181,6 +225,7 @@
                     this.request('add', 'POST', config.storeUrl, {context: context})
                         .then((response) => {
                             this.vrfs = response.vrfs;
+                            this.cleanupContexts = response.cleanup_contexts;
                             this.newContext = '';
                             toastr.success(response.message);
                         })
@@ -191,7 +236,10 @@
                     if (this.isPending(vrf.destroy_url)) return;
 
                     this.request(vrf.destroy_url, 'DELETE', vrf.destroy_url)
-                        .then((response) => this.vrfs = response.vrfs)
+                        .then((response) => {
+                            this.vrfs = response.vrfs;
+                            this.cleanupContexts = response.cleanup_contexts;
+                        })
                         .catch(() => {});
                 },
 
@@ -200,7 +248,10 @@
                     if (context === (vrf.context ?? '') || this.isPending(vrf.update_url)) return;
 
                     this.request(vrf.update_url, 'PATCH', vrf.update_url, {context_name: context})
-                        .then((updated) => Object.assign(vrf, updated))
+                        .then((updated) => {
+                            this.cleanupContexts = updated.cleanup_contexts;
+                            Object.assign(vrf, updated);
+                        })
                         .catch(() => input.value = vrf.context ?? '');
                 },
 
