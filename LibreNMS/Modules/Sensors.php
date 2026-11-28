@@ -34,6 +34,7 @@ use App\Models\StateTranslation;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Data\Store\MetricNames;
 use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\SensorType;
 use LibreNMS\Enum\Severity;
@@ -249,10 +250,20 @@ class Sensors implements Module, RemovesMethodData, SupportsSubmodules
         Log::info("$sensor->sensor_descr: $value " . SensorType::tryFrom($sensor->sensor_class)?->unit());
 
         $metric = $sensor->metricIdentity('sensor');
-        $datastore->write($metric->measurement, ['sensor' => $value], $metric->tags, [
-            'metric' => $metric,
-            'rrd_def' => RrdDefinition::make()->addDataset('sensor', $sensor->rrd_type),
-        ]);
+        $fields = ['sensor' => $value];
+        $meta = ['rrd_def' => RrdDefinition::make()->addDataset('sensor', $sensor->rrd_type)];
+
+        if ($sensor->poller_type !== 'ipmi' && ($legacy = app(MetricNames::class)->storedAs($metric)) !== null) {
+            // Legacy SNMP and agent exports included both tags, whichever one keyed the RRD file.
+            $datastore->write($legacy->measurement, $fields, [
+                'sensor_class' => $sensor->sensor_class,
+                'sensor_type' => $sensor->sensor_type,
+                'sensor_descr' => $sensor->sensor_descr,
+                'sensor_index' => $sensor->sensor_index,
+            ], $meta + ['rrd_name' => $legacy->rrdNameOf($metric)]);
+        } else {
+            $datastore->write($metric->measurement, $fields, $metric->tags, $meta + ['metric' => $metric]);
+        }
 
         $this->logThresholds($sensor, $value, $previous);
 
