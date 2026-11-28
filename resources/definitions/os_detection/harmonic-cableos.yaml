@@ -1,0 +1,11 @@
+os: harmonic-cableos
+text: 'Harmonic CableOS'
+type: network
+group: harmonic
+
+discovery:
+    -
+        sysObjectID:
+            - '.1.3.6.1.4.1.1563'
+        sysDescr:
+            - 'Harmonic CableOS Cloud-Native'

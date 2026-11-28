@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": ".1.3.6.1.4.1.1563",
+                    "sysDescr": "Harmonic CableOS Cloud-Native COS Software, Released Version 3.29.4",
+                    "sysContact": null,
+                    "version": "3.29.4",
+                    "hardware": null,
+                    "features": null,
+                    "location": null,
+                    "os": "harmonic-cableos",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "generic.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
