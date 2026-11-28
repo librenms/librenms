@@ -32,20 +32,27 @@ foreach ($isam_port_stats as $index => $value) {
     $port_stats[$index]['ifAlias'] = $isam_port_stats[$index]['asamIfExtCustomerId'];
 }
 
-// Now do the same as in ports.inc full ports
-SnmpQuery::context('ihub')->hideMib()->walk(['IF-MIB::ifXEntry'])->table(1, $port_stats);
-$hc_test = array_slice($port_stats, 0, 1);
-
-// If the device doesn't have ifXentry data, fetch ifEntry instead.
-if (! is_numeric($hc_test[0]['ifHCInOctets'] ?? null) || ! is_numeric($hc_test[0]['ifHighSpeed'] ?? null)) {
-    $ifEntrySnmpFlags = ['-OQUst'];
-    SnmpQuery::options($ifEntrySnmpFlags)->context('ihub')->hideMib()->walk(['IF-MIB::ifEntry'])->table(1, $port_stats);
-} else {
-    // For devices with ifXentry data, only specific ifEntry keys are fetched to reduce SNMP load
-    foreach ($ifmib_oids as $oid) {
-        echo "$oid ";
-        SnmpQuery::options('-OQUst')->context('ihub')->hideMib()->walk(['IF-MIB::' . $oid])->table(1, $port_stats);
+// Now do the same as in ports.inc full ports, for the ihub and shub context
+foreach (['ihub', 'shub'] as $context) {
+    $response = SnmpQuery::context($context)->hideMib()->walk(['IF-MIB::ifXEntry']);
+    if (! $response->isValid()) {
+        continue;
     }
+    $response->table(1, $port_stats);
+    $hc_test = array_slice($port_stats, 0, 1);
+
+    // If the device doesn't have ifXentry data, fetch ifEntry instead.
+    if (! is_numeric($hc_test[0]['ifHCInOctets'] ?? null) || ! is_numeric($hc_test[0]['ifHighSpeed'] ?? null)) {
+        $ifEntrySnmpFlags = ['-OQUst'];
+        SnmpQuery::options($ifEntrySnmpFlags)->context($context)->hideMib()->walk(['IF-MIB::ifEntry'])->table(1, $port_stats);
+    } else {
+        // For devices with ifXentry data, only specific ifEntry keys are fetched to reduce SNMP load
+        foreach ($ifmib_oids as $oid) {
+            echo "$oid ";
+            SnmpQuery::options('-OQUst')->context($context)->hideMib()->walk(['IF-MIB::' . $oid])->table(1, $port_stats);
+        }
+    }
+    break;
 }
 
 // The ISAM returns ifHC* as 8-byte OCTET STRINGs (hex); convert them so the HC counters are used.
@@ -66,4 +73,4 @@ foreach ($port_stats as &$p) {
     }
 }
 
-unset($isam_port_stats, $p, $hc_oid, $value);
+unset($isam_port_stats, $response, $context, $p, $hc_oid, $value);
